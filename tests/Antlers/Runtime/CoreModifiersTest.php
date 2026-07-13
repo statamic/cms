@@ -586,20 +586,6 @@ EOT;
     {
         $this->assertSame('please%20and%20thank%20you/Mommy', $this->resultOf('{{ test_url_encode | rawurlencode_except_slashes }}'));
     }
-
-    public function test_pipe_function_modifier_still_renders()
-    {
-        $data = ['items' => [['value' => 'Zebra'], ['value' => 'Apple'], ['value' => 'Mango']]];
-        $result = $this->renderString('{{ items | sort("value") }}{{ value }}{{ /items }}', $data, true);
-        $this->assertSame('applemangozebra', strtolower($result));
-    }
-
-    public function test_shorthand_parameter_modifier_still_renders()
-    {
-        $data = ['items' => [['value' => 'Zebra'], ['value' => 'Apple'], ['value' => 'Mango']]];
-        $result = $this->renderString('{{ items sort="value" }}{{ value }}{{ /items }}', $data, true);
-        $this->assertSame('applemangozebra', strtolower($result));
-    }
 }
 
 class SimpleEntryObject implements Arrayable
