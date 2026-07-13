@@ -4,7 +4,7 @@ Please take 30 seconds to read the following so we can be as efficient as possib
 
 1️⃣ Is this your first PR? If so, please read our [contribution guide](https://statamic.dev/contribution-guide) first.
 
-2️⃣ Did you use AI tools to create this PR? If so, please review changes carefully to make sure it meets our code standards. We all know how AI can behave sometimes. This helps making the review easier for us. Reviewing PRs can take a lot of time.
+2️⃣ Did you use AI tools to create this PR? If so, please review changes carefully to make sure they meet our code standards. We all know how AI can behave sometimes. This helps to make the review easier for us. Reviewing PRs can be a lot of work.
 
 3️⃣ Please make sure to create a new branch for your PR.
 
