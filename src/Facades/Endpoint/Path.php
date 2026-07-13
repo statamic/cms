@@ -196,9 +196,6 @@ class Path
         // PHP is capable of understanding Windows paths that use forward slashes.
         $path = str_replace('\\', '/', (string) $path);
 
-        // Normalize multiple leading slashes to a single slash (e.g., ////path => /path).
-        $path = preg_replace('#^/+#', '/', $path);
-
         // Remove occurrences of "//" in a $path (except when part of a protocol).
         return preg_replace('#(^|[^:])//+#', '\\1/', (string) $path);
     }
