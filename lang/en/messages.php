@@ -149,6 +149,7 @@ return [
     'form_require_login_message' => 'You must be logged in to submit this form.',
     'form_create_description' => 'Get started by creating your first form.',
     'form_builder' => 'Form Builder',
+    'form_builder_empty_inspector' => 'Drag fields onto the form to add them. Click a field, section, or page to edit its settings here.',
     'form_export_filtered_description' => 'Exports submissions with current filters and visible columns.',
     'form_fake_submissions_deleted' => 'Deleted :count fake submission.|Deleted :count fake submissions.',
     'form_fake_submissions_delete_failed' => 'Fake submissions could not be deleted.',

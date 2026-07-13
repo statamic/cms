@@ -30,6 +30,7 @@ import Layout from '@/pages/layout/Layout.vue';
 import LayoutPanel from '@/pages/layout/LayoutPanel.vue';
 import PanelLayout from '@/pages/layout/PanelLayout.vue';
 import ActionInspector from '@/components/forms/builder/ActionInspector.vue';
+import EmptyInspector from '@/components/forms/builder/EmptyInspector.vue';
 import FieldInspector from '@/components/forms/builder/FieldInspector.vue';
 import FieldsetInspector from '@/components/forms/builder/FieldsetInspector.vue';
 import FieldtypeHint from '@/components/forms/builder/FieldtypeHint.vue';
@@ -471,6 +472,7 @@ onUnmounted(() => {
         <LinkFieldsInspector v-if="inspectorType === InspectorType.LinkFields" />
         <FieldsetInspector v-if="inspectorType === InspectorType.FieldsetImport" />
         <FieldtypeHint v-if="inspectorType === InspectorType.FieldtypeHint" />
+        <EmptyInspector v-if="!inspectorType" />
     </LayoutPanel>
 
     <div
