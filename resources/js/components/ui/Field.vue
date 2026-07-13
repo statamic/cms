@@ -12,7 +12,7 @@ defineOptions({
     inheritAttrs: false,
 });
 
-const { uiDirection } = useUiDirection();
+const { direction } = useUiDirection();
 
 const props = defineProps({
     /** When `true`, the field is styled as a configuration field with a two-column grid layout. */
@@ -85,7 +85,7 @@ const hasErrors = computed(() => {
 <template>
     <div :class="[rootClasses, $attrs.class]" data-ui-input-group :data-ui-field-has-errors="hasErrors ? '' : null">
         <div
-            :dir="uiDirection"
+            :dir="direction"
             v-if="label || $slots.label || $slots.actions || (instructions && !instructionsBelow)"
             class="flex flex-col gap-1.5"
             data-ui-field-header

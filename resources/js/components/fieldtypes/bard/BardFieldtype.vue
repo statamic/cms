@@ -98,7 +98,7 @@
                                 @added="addSet"
                             >
                                 <template #trigger>
-                                    <div :dir="uiDirection" class="absolute flex items-center gap-2 top-[-6px] z-1 -start-7 @lg/bard:-start-4.5 group" :style="{ transform: `translateY(${y}px)` }">
+                                    <div :dir="direction" class="absolute flex items-center gap-2 top-[-6px] z-1 -start-7 @lg/bard:-start-4.5 group" :style="{ transform: `translateY(${y}px)` }">
                                         <ui-button
                                             icon="plus"
                                             size="sm"

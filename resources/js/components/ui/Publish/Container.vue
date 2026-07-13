@@ -105,7 +105,7 @@ const meta = ref(props.meta);
 const previews = ref({});
 const localizedFields = ref(props.modifiedFields || []);
 const components = ref([]);
-const { uiDirection } = useUiDirection();
+const { direction: uiDirection } = useUiDirection();
 const direction = computed(() => Statamic.$config.get('sites').find(s => s.handle === props.site)?.direction ?? uiDirection.value);
 
 const visibleValues = computed(() => {
