@@ -22,4 +22,5 @@ export const {
     debounce,
     deepClone,
     resetValuesFromResponse,
+    useUiDirection,
 } = __STATAMIC__.core;
