@@ -146,7 +146,7 @@ class Link extends Fieldtype
     private function initialOption($value, $entry, $asset)
     {
         if (! $value) {
-            $fallback = $this->field->isRequired() && ! collect($this->field->rules()[$this->field->handle()])->contains('sometimes') ? 'url' : null;
+            $fallback = $this->field->isRequired() && ! $this->field->hasSometimesRule() ? 'url' : null;
             $option = $this->field->get('default_option', $fallback);
 
             if ($option === 'first-child' && ! $this->showFirstChildOption()) {
