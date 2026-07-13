@@ -274,7 +274,7 @@ class AntlersNodeParser
         $node->runtimeNodes = $runtimeNodes;
 
         if ($node->hasParameters) {
-            foreach ($node->runtimeNodes as $runtimeNode) {
+            foreach ($runtimeNodes as $runtimeNode) {
                 if ($runtimeNode instanceof ModifierSeparator) {
                     throw ErrorFactory::makeSyntaxError(
                         AntlersErrorCodes::TYPE_MIXED_MODIFIER_STYLES,
