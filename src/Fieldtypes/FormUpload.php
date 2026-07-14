@@ -18,8 +18,6 @@ use Statamic\Fieldtypes\Assets\UndefinedContainerException;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
-use function Statamic\trans as __;
-
 class FormUpload extends Fieldtype
 {
     protected $selectable = false;
@@ -35,7 +33,7 @@ class FormUpload extends Fieldtype
 
     private function fileData(string $value): array
     {
-        if (! $this->config('store')) {
+        if (! $this->storesAsAsset()) {
             return ['filename' => basename($value)];
         }
 
@@ -52,7 +50,7 @@ class FormUpload extends Fieldtype
 
     public function preProcess($values)
     {
-        if (! $this->config('store')) {
+        if (! $this->storesAsAsset()) {
             return $values ?? [];
         }
 
@@ -74,7 +72,7 @@ class FormUpload extends Fieldtype
 
     public function process($values)
     {
-        if (! $this->config('store')) {
+        if (! $this->storesAsAsset()) {
             return $this->config('max_files') === 1 ? collect($values)->first() : $values;
         }
 
@@ -88,7 +86,7 @@ class FormUpload extends Fieldtype
 
     public function augment($values)
     {
-        if (! $this->config('store')) {
+        if (! $this->storesAsAsset()) {
             return $values;
         }
 
@@ -103,7 +101,7 @@ class FormUpload extends Fieldtype
 
     public function shallowAugment($values)
     {
-        if (! $this->config('store')) {
+        if (! $this->storesAsAsset()) {
             return $values;
         }
 
@@ -113,6 +111,11 @@ class FormUpload extends Fieldtype
         $items = $items->filter()->map(fn ($item) => $item->toShallowAugmentedCollection());
 
         return $this->config('max_files') === 1 ? $items->first() : $items;
+    }
+
+    private function storesAsAsset(): bool
+    {
+        return (bool) $this->config('store');
     }
 
     private function container(): ?AssetContainerContract
