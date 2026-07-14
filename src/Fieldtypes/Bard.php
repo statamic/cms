@@ -7,6 +7,7 @@ use Facades\Statamic\Fieldtypes\RowId;
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Statamic\Data\NestedFieldUpdater;
+use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
@@ -832,10 +833,21 @@ class Bard extends Replicator
                     return null;
                 }
 
+                $nestedField = new Field($handle, $config);
+                $nestedFieldtype = $nestedField->fieldtype();
+
+                try {
+                    $meta = $nestedFieldtype->preload();
+                } catch (CollectionNotFoundException) {
+                    $meta = [];
+                }
+
                 return [
                     'title' => $type->title(),
                     'icon' => $type->icon(),
-                    'config' => (new Field($handle, $config))->fieldtype()->config(),
+                    'component' => $nestedFieldtype->component(),
+                    'config' => $nestedFieldtype->config(),
+                    'meta' => $meta,
                 ];
             })
             ->filter()
