@@ -49,12 +49,9 @@ class TagIdentifierAnalyzer
     /**
      * Splits the input into the tag name and method part at the first
      * single colon. Double colons act as a namespace separator and
-     * remain part of the name (e.g. `ns::tag:method`).
-     *
-     * @param  string  $input  The content to split.
-     * @return array
+     * remain part of the name (e.g. `namespace::tag:method`).
      */
-    public static function splitNameAndMethodPart($input)
+    public static function splitNameAndMethodPart(string $input): array
     {
         // Mask double colons so the namespace separator
         // is not mistaken for the name/method boundary.

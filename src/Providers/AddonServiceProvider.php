@@ -165,19 +165,12 @@ abstract class AddonServiceProvider extends ServiceProvider
      */
     protected $fieldsetNamespace;
 
+    protected ?string $tagNamespace;
+
     /**
      * @var string
      */
     protected $viewNamespace;
-
-    /**
-     * When set, the addon's tags (and their aliases) are registered under
-     * this namespace instead of their bare handles, e.g. `{{ my-namespace::my_tag }}`.
-     * Must be a simple slug without colons.
-     *
-     * @var string|null
-     */
-    protected $tagNamespace;
 
     /**
      * @var bool
