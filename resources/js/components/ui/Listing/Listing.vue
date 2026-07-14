@@ -180,7 +180,7 @@ const columns = ref(initializeColumns());
 const sortColumn = ref(props.sortColumn || (columns.value.length ? columns.value[0].field : null));
 const sortDirection = ref(props.sortDirection || getDefaultSortDirectionForColumn(sortColumn.value));
 const selections = ref(props.selections || []);
-const allowsSelections = computed(() => (props.selections || hasActions.value) && !props.reorderable);
+const allowsSelections = computed(() => (props.selections || (props.allowBulkActions && hasActions.value)) && !props.reorderable);
 const allowsMultipleSelections = computed(() => props.maxSelections > 1);
 const hasReachedSelectionLimit = computed(() => selections.value.length === props.maxSelections);
 const hasActions = computed(() => !!props.actionUrl);
@@ -686,6 +686,8 @@ watch(parameters, (newParams, oldParams) => {
     pushState();
 });
 
+watch(() => props.url, () => request());
+
 watch(loading, (loading) => Statamic.$progress.loading(id, loading));
 
 onMounted(() => {
@@ -717,12 +719,12 @@ autoApplyState();
     <div>
         <slot name="initializing" v-if="shouldShowSkeleton">
             <div class="flex flex-col gap-4 justify-between mt-3 starting-style-transition starting-style-transition--delay">
-                <ui-skeleton class="h-5 w-48" />
-                <div class="flex gap-2 sm:gap-3">
-                    <ui-skeleton class="h-9 w-96" />
-                    <ui-skeleton class="h-9 w-24" />
+                <ui-skeleton v-if="showPresets" class="h-5 w-48" />
+                <div v-if="allowSearch || hasFilters || allowCustomizingColumns" class="flex gap-2 sm:gap-3">
+                    <ui-skeleton v-if="allowSearch" class="h-9 w-96" />
+                    <ui-skeleton v-if="hasFilters" class="h-9 w-24" />
                     <div class="flex-1" />
-                    <ui-skeleton class="size-10" />
+                    <ui-skeleton v-if="allowCustomizingColumns" class="size-10" />
                 </div>
                 <ui-skeleton class="h-48 w-full" />
             </div>
@@ -730,7 +732,7 @@ autoApplyState();
         <slot v-if="!initializing" :items="items" :is-column-visible="isColumnVisible" :loading="loading">
             <Presets v-if="showPresets" />
             <div v-if="allowSearch || hasFilters || allowCustomizingColumns" class="relative overflow-clip flex items-center gap-2 sm:gap-3 min-h-16 starting-style-transition st-overflow-clip-margin">
-                <div class="flex flex-1 items-center gap-2 sm:gap-3 w-full">
+                <div class="flex flex-1 items-center gap-2 sm:gap-3 overflow-x-auto -ms-1 ps-1 py-1">
                     <Search v-if="allowSearch" />
                     <Filters v-if="hasFilters" />
                 </div>

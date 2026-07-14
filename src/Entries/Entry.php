@@ -561,10 +561,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             return $this->value('order');
         }
 
-        return $this->structure()->in($this->locale())
-            ->flattenedPages()
-            ->map->reference()
-            ->flip()->get($this->id) + 1;
+        return $this->structure()->in($this->locale())->entryOrder($this->id) + 1;
     }
 
     public function template($template = null)
@@ -869,8 +866,26 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
     {
         $localizations = $this->directDescendants();
 
-        foreach ($localizations as $loc) {
-            $localizations = $localizations->merge($loc->descendants());
+        // Breadth-first: fetch each level in one batched query instead of one query per node.
+        $origins = $localizations->map->id()->values()->all();
+        $seen = array_merge($origins, [$this->id()]);
+
+        while (! empty($origins)) {
+            $children = Facades\Entry::query()
+                ->where('collection', $this->collectionHandle())
+                ->whereIn('origin', $origins)
+                ->get()
+                // Guard against cyclic or duplicate origin data, which would
+                // otherwise loop forever as the same entries reappear.
+                ->reject(fn ($entry) => in_array($entry->id(), $seen, true));
+
+            if ($children->isEmpty()) {
+                break;
+            }
+
+            $localizations = $localizations->merge($children->keyBy->locale());
+            $origins = $children->map->id()->values()->all();
+            $seen = array_merge($seen, $origins);
         }
 
         return $localizations;
@@ -968,7 +983,12 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
     public function routeData()
     {
-        $data = $this->values()->merge([
+        // This uses the `getValues(true)` method instead of values()
+        // This is so we can wrap computed fields in Value so we
+        // can delay their execution. If the computed value
+        // triggers the routeData() method, we will end
+        // up in an infinite loop that is not fun.
+        $data = $this->getValues(true)->merge([
             'id' => $this->id(),
             'slug' => $this->slug(),
             'published' => $this->published(),

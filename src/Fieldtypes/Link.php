@@ -49,6 +49,21 @@ class Link extends Fieldtype
                         'type' => 'toggle',
                         'width' => '50',
                     ],
+                    'default_option' => [
+                        'display' => __('Default Option'),
+                        'instructions' => __('statamic::fieldtypes.link.config.default_option'),
+                        'type' => 'select',
+                        'max_items' => 1,
+                        'width' => '50',
+                        'clearable' => true,
+                        'placeholder' => __('Default'),
+                        'options' => [
+                            'asset' => __('Asset'),
+                            'entry' => __('Entry'),
+                            'first-child' => __('First Child'),
+                            'url' => __('URL'),
+                        ],
+                    ],
                 ],
             ],
         ];
@@ -131,7 +146,18 @@ class Link extends Fieldtype
     private function initialOption($value, $entry, $asset)
     {
         if (! $value) {
-            return $this->field->isRequired() ? 'url' : null;
+            $fallback = $this->field->isRequired() && ! $this->field->hasSometimesRule() ? 'url' : null;
+            $option = $this->field->get('default_option', $fallback);
+
+            if ($option === 'first-child' && ! $this->showFirstChildOption()) {
+                return $fallback;
+            }
+
+            if ($option === 'asset' && ! $this->showAssetOption()) {
+                return $fallback;
+            }
+
+            return $option;
         }
 
         if ($value === '@child') {

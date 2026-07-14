@@ -15,6 +15,7 @@ class AssetsFieldtypeAsset extends JsonResource
         $data = [
             'id' => $this->id(),
             'basename' => $this->basename(),
+            'reference' => $this->reference(),
             'extension' => $this->extension(),
             'size' => Str::fileSizeForHumans($this->size()),
             'isImage' => $this->isImage(),

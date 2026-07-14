@@ -254,7 +254,11 @@ class Users extends Relationship
     {
         $single = $this->config('max_items') === 1;
 
-        $ids = Arr::wrap($values);
+        $ids = collect(Arr::wrap($values))
+            ->map(fn ($id) => $id === 'current' ? User::current()?->id() : $id)
+            ->filter()
+            ->values()
+            ->all();
 
         $query = (new OrderedQueryBuilder(User::query(), $ids))->whereIn('id', $ids);
 

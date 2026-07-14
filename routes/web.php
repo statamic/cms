@@ -52,7 +52,7 @@ Route::name('statamic.')->group(function () {
             });
 
             Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])->middleware('throttle:statamic.auth')->name('password.email');
-            Route::get('password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
+            Route::get('password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])->middleware('throttle:statamic.password-reset-form')->name('password.reset');
             Route::post('password/reset', [ResetPasswordController::class, 'reset'])->middleware('throttle:statamic.auth')->name('password.reset.action');
 
             if (config('statamic.users.elevated_sessions_enabled')) {
@@ -94,7 +94,7 @@ Route::name('statamic.')->group(function () {
         });
 
         Route::group(['prefix' => 'auth', 'middleware' => [CPAuthGuard::class]], function () {
-            Route::get('activate/{token}', [ActivateAccountController::class, 'showResetForm'])->name('account.activate');
+            Route::get('activate/{token}', [ActivateAccountController::class, 'showResetForm'])->middleware('throttle:statamic.password-reset-form')->name('account.activate');
             Route::post('activate', [ActivateAccountController::class, 'reset'])->name('account.activate.action');
         });
 
@@ -114,6 +114,9 @@ Route::name('statamic.')->group(function () {
         Route::match(['get', 'post'], config('statamic.oauth.routes.callback'), [OAuthController::class, 'handleProviderCallback'])
             ->withoutMiddleware(['App\Http\Middleware\VerifyCsrfToken', 'Illuminate\Foundation\Http\Middleware\VerifyCsrfToken'])
             ->name('oauth.callback');
+        Route::delete(config('statamic.oauth.routes.disconnect', 'oauth/{provider}/disconnect'), [OAuthController::class, 'disconnect'])
+            ->middleware([AuthGuard::class, 'auth', RequireElevatedSession::class])
+            ->name('oauth.disconnect');
     }
 });
 

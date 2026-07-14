@@ -33,7 +33,7 @@ const {
     desyncField,
     isTrackingOriginValues,
     originValues: containerOriginValues,
-    asConfig,
+    asConfig: containerAsConfig,
     errors: containerErrors,
     readOnly: containerReadOnly,
     setFieldPreviewValue,
@@ -52,7 +52,10 @@ const {
     fieldPathPrefix: injectedFieldPathPrefix,
     metaPathPrefix: injectedMetaPathPrefix,
     readOnly: fieldsProviderReadOnly,
+    asConfig: fieldsAsConfig,
 } = injectFieldsContext();
+
+const asConfig = computed(() => fieldsAsConfig.value ?? containerAsConfig.value ?? false);
 const fieldPathPrefix = computed(() => props.fieldPathPrefix || injectedFieldPathPrefix.value);
 const metaPathPrefix = computed(() => props.metaPathPrefix || injectedMetaPathPrefix.value);
 const handle = props.config.handle;
@@ -151,10 +154,13 @@ const shouldShowField = computed(() => {
 
 const shouldShowLabelText = computed(() => !props.config.hide_display);
 
+// Whether the label renders anything visible. When it doesn't, we avoid rendering
+// the field header entirely (so it doesn't reserve space) and instead attach a
+// screen-reader-only label to the control below.
 const shouldShowLabel = computed(
     () =>
         shouldShowLabelText.value || // Need to see the text
-        props.config.hide_display || // Need label for accessibility (visually hidden)
+        isRequired.value || // Need to see the required asterisk
         isLocked.value || // Need to see the avatar
         isSyncable.value, // Need to see the icon
 );
@@ -267,6 +273,7 @@ const fieldtypeComponentEvents = computed(() => ({
             <template #actions v-if="shouldShowFieldActions">
                 <FieldActions :actions="fieldActions" />
             </template>
+            <label v-if="!shouldShowLabel && config.hide_display" :for="fieldId" class="sr-only">{{ __(config.display) }}</label>
             <div class="text-xs text-red-600" v-if="!fieldtypeComponentExists && fieldtypeComponent !== 'spacer-fieldtype'">
                 Component <code v-text="fieldtypeComponent"></code> does not exist.
             </div>

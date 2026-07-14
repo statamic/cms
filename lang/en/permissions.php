@@ -88,6 +88,7 @@ return [
     'assign_user_groups' => 'Assign groups to users',
     'assign_roles' => 'Assign roles to users',
     'impersonate_users' => 'Impersonate users',
+    'impersonate_users_desc' => 'Allows logging in as any user, including super admins. Grant this permission with caution.',
 
     'group_updates' => 'Updates',
     'view_updates' => 'View updates',

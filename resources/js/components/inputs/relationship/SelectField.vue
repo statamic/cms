@@ -7,7 +7,7 @@
             :max-selections="maxSelections"
             :model-value="items.map((item) => item.id)"
             :multiple
-            :options
+            :options="comboboxOptions"
             :placeholder="__(config.placeholder) || __('Choose...')"
             :read-only="readOnly"
             :taggable="isTaggable"
@@ -94,6 +94,14 @@ export default {
 	    cacheKey() {
 			return JSON.stringify({ ...this.parameters, url: this.url });
 	    },
+
+        comboboxOptions() {
+            // Combobox resolves the selected label from this list, so a selected item missing
+            // from it (e.g. a just-created term) would otherwise display as its raw id.
+            const missing = this.items.filter((item) => !this.options.some((option) => option.id === item.id));
+
+            return [...this.options, ...missing];
+        },
 
         noOptionsText() {
             return this.typeahead && !this.requested ? __('Start typing to search.') : __('No options to choose from.');

@@ -254,7 +254,7 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
     /**
      * Save the container.
      *
-     * @return void
+     * @return $this|false
      */
     public function save()
     {
@@ -303,7 +303,7 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
     /**
      * Delete the container.
      *
-     * @return void
+     * @return bool
      */
     public function delete()
     {

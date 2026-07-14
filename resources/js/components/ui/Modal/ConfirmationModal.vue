@@ -93,9 +93,13 @@ const shouldCloseOnSubmit = computed(() => {
             <Icon name="loading" />
         </div>
 
-        <p v-if="bodyText" v-text="bodyText" />
+        <p
+            v-if="bodyText"
+            class="text-gray-700 dark:text-gray-200 antialiased"
+            v-text="bodyText"
+        />
         <slot v-else>
-            <p>{{ __('Are you sure?') }}</p>
+            <p class="text-gray-700 dark:text-gray-200 antialiased">{{ __('Are you sure?') }}</p>
         </slot>
 
         <template v-if="cancellable || submittable" #footer>

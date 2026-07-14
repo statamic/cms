@@ -289,7 +289,7 @@ export default {
             this.localizing = localization.handle;
 
             if (this.publishContainer === 'base') {
-                window.history.replaceState({}, '', localization.url);
+                window.history.replaceState({}, '', localization.url + window.location.hash);
             }
 
             this.$axios.get(localization.url).then((response) => {

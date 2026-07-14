@@ -4,16 +4,20 @@ namespace Tests\Fieldtypes;
 
 use Facades\Statamic\Routing\ResolveRedirect;
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Entries\Entry;
 use Statamic\Facades;
 use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\Link;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class LinkTest extends TestCase
 {
+    use PreventSavingStacheItemsToDisk;
+
     #[Test]
     public function it_augments_string_to_string()
     {
@@ -260,5 +264,38 @@ class LinkTest extends TestCase
         $fieldtype = (new Link)->setField($field);
 
         $this->assertNull($fieldtype->preProcessIndex('@child'));
+    }
+
+    #[Test]
+    #[DataProvider('initialOptionProvider')]
+    public function it_preloads_the_initial_option(array $config, mixed $value, bool $withParent, mixed $expected)
+    {
+        $this->actingAs(tap(Facades\User::make()->makeSuper())->save());
+        tap(Facades\Collection::make('pages')->routes('{slug}'))->sites(['en'])->save();
+
+        $field = new Field('test', $config);
+        $field->setValue($value);
+
+        if ($withParent) {
+            $field->setParent(Mockery::mock());
+        }
+
+        $fieldtype = (new Link)->setField($field);
+
+        $this->assertSame($expected, $fieldtype->preload()['initialOption']);
+    }
+
+    public static function initialOptionProvider(): array
+    {
+        return [
+            'configured option is used' => [['type' => 'link', 'default_option' => 'entry'], null, false, 'entry'],
+            'url when required and no default option' => [['type' => 'link', 'required' => true], null, false, 'url'],
+            'null when optional and no default option' => [['type' => 'link'], null, false, null],
+            'first-child falls back to url when unavailable' => [['type' => 'link', 'default_option' => 'first-child', 'required' => true], null, true, 'url'],
+            'asset falls back to url when unavailable and required' => [['type' => 'link', 'default_option' => 'asset', 'required' => true], null, false, 'url'],
+            'asset falls back to null when unavailable and optional' => [['type' => 'link', 'default_option' => 'asset'], null, false, null],
+            'existing value overrides default option' => [['type' => 'link', 'default_option' => 'entry'], 'https://example.com', false, 'url'],
+            'null when has sometimes rule even if required' => [['type' => 'link', 'required' => true, 'validate' => 'sometimes'], null, false, null],
+        ];
     }
 }

@@ -14,6 +14,7 @@ use Statamic\Contracts\Structures\Nav;
 use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Facades\Site;
+use Statamic\Facades\URL;
 use Statamic\Globals\Variables;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\DefaultInvalidator as Invalidator;
@@ -25,6 +26,13 @@ use Tests\TestCase;
 
 class DefaultInvalidatorTest extends TestCase
 {
+    public function tearDown(): void
+    {
+        URL::enforceTrailingSlashes(false);
+        URL::clearUrlCache();
+        parent::tearDown();
+    }
+
     #[Test]
     public function specifying_all_as_invalidation_rule_will_just_flush_the_cache()
     {
@@ -380,6 +388,50 @@ class DefaultInvalidatorTest extends TestCase
                         '/test/{test}',
                         '{{ if favourite_color == "purple" }}/purple{{ /if }}',
                         '{{ if favourite_color == "red" }}/red{{ /if }}',
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertNull($invalidator->invalidate($entry));
+    }
+
+    #[Test]
+    public function invalidation_urls_respect_trailing_slash_enforcement()
+    {
+        URL::enforceTrailingSlashes();
+
+        $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
+            $cacher->shouldReceive('invalidateUrls')->with([
+                'http://test.com/my/test/entry/',
+                'http://localhost/blog/three/',
+                'http://localhost/blog/one/',
+                'http://localhost/blog/two/',
+            ])->once();
+        });
+
+        $entry = tap(Mockery::mock(Entry::class), function ($m) {
+            $m->shouldReceive('isRedirect')->andReturn(false);
+            $m->shouldReceive('absoluteUrl')->andReturn('http://test.com/my/test/entry/');
+            $m->shouldReceive('collectionHandle')->andReturn('blog');
+            $m->shouldReceive('descendants')->andReturn(collect());
+            $m->shouldReceive('site')->andReturn(Site::default());
+            $m->shouldReceive('parent')->andReturnNull();
+            $m->shouldReceive('toAugmentedCollection')
+                ->andReturnSelf()
+                ->shouldReceive('merge')
+                ->andReturn(collect([
+                    'parent_uri' => '/my/test/',
+                ]));
+        });
+
+        $invalidator = new Invalidator($cacher, [
+            'collections' => [
+                'blog' => [
+                    'urls' => [
+                        '/blog/one',
+                        '/blog/two',
+                        'http://localhost/blog/three/',
                     ],
                 ],
             ],

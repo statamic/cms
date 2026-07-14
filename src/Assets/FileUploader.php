@@ -6,6 +6,9 @@ use Illuminate\Support\Facades\Storage;
 use Statamic\Facades\AssetContainer;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class FileUploader extends Uploader
 {
     protected $container;

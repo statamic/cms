@@ -76,6 +76,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\CollectionTitleFormats::class,
         Fieldtypes\Collections::class,
         Fieldtypes\Color::class,
+        Fieldtypes\ControlAppearance::class,
         Fieldtypes\Date::class,
         Fieldtypes\Dictionary::class,
         Fieldtypes\DictionaryFields::class,

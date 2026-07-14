@@ -442,11 +442,13 @@ export default {
         value(value, oldValue) {
             if (!this.editor) return;
 
+            if (document.activeElement?.closest('.bard-content')) return;
+
             const oldContent = this.editor.getJSON();
             const content = this.valueToContent(value);
 
             if (JSON.stringify(content) !== JSON.stringify(oldContent)) {
-                this.editor.commands.clearContent();
+                this.editor.commands.clearContent(false);
                 this.editor.commands.setContent(content, true);
             }
         },
