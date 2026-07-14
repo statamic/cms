@@ -194,7 +194,7 @@ class Link extends Fieldtype
     {
         $linkType = static::types()[$handle] ?? null;
 
-        return $linkType?->visible($this->field);
+        return $linkType?->visible($this->field) ?? false;
     }
 
     private function defaultOptionOptions(): array
