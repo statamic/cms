@@ -3,7 +3,7 @@
         <section class="flex gap-3 items-center">
             <ui-select
                 v-model="linkType"
-                :options="visibleLinkTypes"
+                :options="linkTypes"
                 option-label="title"
                 option-value="type"
                 class="w-1/4 min-w-24"
@@ -196,13 +196,6 @@ export default {
     data() {
         return {
             linkType: 'url',
-            linkTypes: [
-                { type: 'url', title: __('URL') },
-                { type: 'entry', title: __('Entry') },
-                { type: 'asset', title: __('Asset') },
-                { type: 'mailto', title: __('Email') },
-                { type: 'tel', title: __('Phone') },
-            ],
             url: {},
             urlData: {},
             itemData: {},
@@ -216,27 +209,35 @@ export default {
     },
 
     computed: {
-        visibleLinkTypes() {
-            return this.linkTypes.filter((type) => {
-                if (type.type === 'asset' && !this.config.container) {
-                    return false;
-                }
-                return true;
-            });
+        linkTypes() {
+            return [
+                { type: 'url', title: __('URL') },
+                ...Object.entries(this.bard.meta.linkTypes ?? {}).map(([handle, type]) => ({
+                    type: handle,
+                    title: type.title,
+                })),
+                { type: 'mailto', title: __('Email') },
+                { type: 'tel', title: __('Phone') },
+            ];
+        },
+
+        registeredLinkType() {
+            return this.bard.meta.linkTypes?.[this.linkType] ?? null;
         },
 
         displayValue() {
             switch (this.linkType) {
                 case 'url':
                     return this.url.url;
-                case 'entry':
-                    return this.itemData.entry ? this.itemData.entry.title : null;
                 case 'asset':
+                    // Assets use `basename` as their display name rather than `title`.
                     return this.itemData.asset ? this.itemData.asset.basename : null;
                 case 'mailto':
                     return this.urlData.mailto ? this.urlData.mailto : null;
                 case 'tel':
                     return this.urlData.tel ? this.urlData.tel : null;
+                default:
+                    return this.itemData[this.linkType] ? this.itemData[this.linkType].title : null;
             }
         },
 
@@ -263,22 +264,17 @@ export default {
         },
 
         selectedEntryValue() {
-            const { type, id } = this.parseDataUrl(this.url.entry);
+            const { type, id } = this.parseDataUrl(this.url[this.linkType]);
 
-            return type === 'entry' && id ? [id] : [];
+            return type === this.linkType && id ? [id] : [];
         },
 
         selectedEntryData() {
-            return this.itemData.entry ? [this.itemData.entry] : [];
+            return this.itemData[this.linkType] ? [this.itemData[this.linkType]] : [];
         },
 
         relationshipConfig() {
-            return {
-                type: 'entries',
-                collections: this.collections,
-                max_items: 1,
-                select_across_sites: this.config.select_across_sites,
-            };
+            return this.registeredLinkType?.config;
         },
 
         itemDataUrl() {
@@ -322,7 +318,7 @@ export default {
         },
 
         canHaveTarget() {
-            return ['url', 'entry', 'asset'].includes(this.linkType);
+            return !['mailto', 'tel'].includes(this.linkType);
         },
 
         selectedTextIsEmail() {
@@ -441,14 +437,14 @@ export default {
         },
 
         openSelector() {
-            if (this.linkType === 'entry') {
-                this.openEntrySelector();
-            } else if (this.linkType === 'asset') {
+            if (this.linkType === 'asset') {
                 this.openAssetSelector();
+            } else if (this.registeredLinkType) {
+                this.openRelationshipSelector();
             }
         },
 
-        openEntrySelector() {
+        openRelationshipSelector() {
             this.$refs.relationshipInput.openSelector();
         },
 
@@ -475,7 +471,7 @@ export default {
 
         entrySelected(data) {
             if (data.length) {
-                this.selectItem('entry', data[0]);
+                this.selectItem(this.linkType, data[0]);
             }
         },
 
