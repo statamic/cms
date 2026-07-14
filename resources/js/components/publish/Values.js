@@ -7,11 +7,12 @@ function data_delete(obj, path) {
     var parts = path.split('.');
     while (parts.length - 1) {
         var key = parts.shift();
+        if (obj === null || typeof obj !== 'object') return;
         var shouldBeArray = parts.length ? new RegExp('^[0-9]+$').test(parts[0]) : false;
         if (! (key in obj)) obj[key] = shouldBeArray ? [] : {};
         obj = obj[key];
     }
-    delete obj[parts[0]];
+    if (obj !== null && typeof obj === 'object') delete obj[parts[0]];
 }
 
 export default class Values {

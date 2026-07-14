@@ -574,3 +574,22 @@ test('it properly sets keys that javascript considers having numeric separators'
 
     expect(newValues).toEqual(expected);
 });
+
+
+test('it does not throw when rejecting a value nested under a null node', () => {
+    let values = {
+        first_name: 'Han',
+        ship: {
+            crew: null,
+        },
+    };
+
+    let rejected = new Values(values).except(['ship.crew.0.name']);
+
+    expect(rejected).toEqual({
+        first_name: 'Han',
+        ship: {
+            crew: null,
+        },
+    });
+});
