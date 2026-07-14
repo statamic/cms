@@ -295,6 +295,7 @@ class LinkTest extends TestCase
             'asset falls back to url when unavailable and required' => [['type' => 'link', 'default_option' => 'asset', 'required' => true], null, false, 'url'],
             'asset falls back to null when unavailable and optional' => [['type' => 'link', 'default_option' => 'asset'], null, false, null],
             'existing value overrides default option' => [['type' => 'link', 'default_option' => 'entry'], 'https://example.com', false, 'url'],
+            'null when has sometimes rule even if required' => [['type' => 'link', 'required' => true, 'validate' => 'sometimes'], null, false, null],
         ];
     }
 }
