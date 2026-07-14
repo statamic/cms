@@ -24,6 +24,7 @@ class LinkTest extends TestCase
         parent::tearDown();
 
         (new \ReflectionClass(Link::class))->setStaticPropertyValue('types', []);
+        (new \ReflectionClass(\Statamic\Fields\Fieldtype::class))->setStaticPropertyValue('extraConfigFields', []);
     }
 
     #[Test]

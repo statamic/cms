@@ -34,6 +34,7 @@ class BardTest extends TestCase
         static::$functions = null;
 
         (new \ReflectionClass(Link::class))->setStaticPropertyValue('types', []);
+        (new \ReflectionClass(\Statamic\Fields\Fieldtype::class))->setStaticPropertyValue('extraConfigFields', []);
     }
 
     #[Test]
