@@ -4,14 +4,21 @@ namespace Tests\Query;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\Site;
+use Statamic\Facades\Taxonomy;
+use Statamic\Facades\Term;
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\Integer as IntegerFieldtype;
+use Statamic\Fieldtypes\Terms as TermsFieldtype;
 use Statamic\Fieldtypes\Text;
 use Statamic\Query\Scopes\Filters\Fields\Dimensions;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class FieldtypeFilterTest extends TestCase
 {
+    use PreventSavingStacheItemsToDisk;
+
     #[Test]
     #[DataProvider('completenessProvider')]
     public function it_determines_if_a_filter_is_complete($values, $expected)
@@ -56,5 +63,31 @@ class FieldtypeFilterTest extends TestCase
             'missing value' => [['dimension' => 'width', 'operator' => '='], false],
             'missing dimension' => [['operator' => '=', 'value' => '100'], false],
         ];
+    }
+
+    #[Test]
+    public function it_shows_the_terms_filter_badge_in_the_selected_site()
+    {
+        $this->setSites([
+            'en' => ['url' => 'http://localhost/', 'locale' => 'en'],
+            'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
+        ]);
+
+        Taxonomy::make('tags')->sites(['en', 'fr'])->save();
+
+        Term::make('one')->taxonomy('tags')
+            ->dataForLocale('en', ['title' => 'One'])
+            ->dataForLocale('fr', ['title' => 'Un'])
+            ->save();
+
+        $filter = (new TermsFieldtype)
+            ->setField(new Field('tags', ['type' => 'terms', 'taxonomies' => 'tags']))
+            ->filter();
+
+        Site::setSelected('fr');
+        $this->assertEquals('Tags: Un', $filter->badge(['operator' => 'like', 'term' => 'one']));
+
+        Site::setSelected('en');
+        $this->assertEquals('Tags: One', $filter->badge(['operator' => 'like', 'term' => 'one']));
     }
 }

@@ -181,7 +181,7 @@ class Field implements Arrayable
         return collect($this->rules()[$this->handle])->contains('required');
     }
 
-    private function hasSometimesRule()
+    public function hasSometimesRule()
     {
         return collect($this->rules()[$this->handle])->contains('sometimes');
     }
