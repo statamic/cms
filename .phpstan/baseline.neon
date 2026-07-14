@@ -67,7 +67,7 @@ parameters:
 			path: ../src/Facades/Endpoint/Parse.php
 
 		-
-			message: '#^Method Illuminate\\Contracts\\Validation\\DataAwareRule@anonymous/Fieldtypes/Bard\.php\:923\:\:setData\(\) should return \$this\(Illuminate\\Contracts\\Validation\\DataAwareRule@anonymous/Fieldtypes/Bard\.php\:923\) but return statement is missing\.$#'
+			message: '#^Method Illuminate\\Contracts\\Validation\\DataAwareRule@anonymous/Fieldtypes/Bard\.php\:935\:\:setData\(\) should return \$this\(Illuminate\\Contracts\\Validation\\DataAwareRule@anonymous/Fieldtypes/Bard\.php\:935\) but return statement is missing\.$#'
 			identifier: return.missing
 			count: 1
 			path: ../src/Fieldtypes/Bard.php
