@@ -2,36 +2,22 @@
     <div class="flex gap-2 sm:gap-3">
         <!-- Link type selector -->
         <div class="w-fit">
-            <Select :options v-model="option"  />
+            <Select :options v-model="option" />
         </div>
 
         <div class="flex-1 flex">
-            <!-- URL text input -->
             <Input v-if="option === 'url'" :read-only="isReadOnly" v-model="urlValue" />
 
-            <!-- Entry select -->
-            <relationship-fieldtype
-                :config="meta.entry.config"
-                :meta="meta.entry.meta"
-                :value="selectedEntries"
-                @update:meta="meta.entry.meta = $event"
-                @update:value="entriesSelected"
-                button-size="base"
-                handle="entry"
-                ref="entries"
-                v-if="option === 'entry'"
-            />
-
-            <!-- Asset select -->
-            <assets-fieldtype
-                v-if="option === 'asset'"
-                ref="assets"
-                handle="asset"
-                :value="selectedAssets"
-                :config="meta.asset.config"
-                :meta="meta.asset.meta"
-                @update:value="assetsSelected"
-                @update:meta="meta.asset.meta = $event"
+            <component
+                v-else-if="matchedType"
+                :is="matchedTypeComponent"
+                ref="typeField"
+                :config="matchedType.config"
+                :meta="matchedType.meta"
+                :value="selectedByType[option]"
+                :handle="option"
+                @update:value="typeSelected"
+                @update:meta="updateTypeMeta"
             />
         </div>
     </div>
@@ -45,7 +31,7 @@ import { markRaw } from 'vue';
 import { UPDATE_DEBOUNCE_MS } from './constants';
 
 export default {
-    components: { Input, Text, Select },
+    components: { Input, Select },
     mixins: [Fieldtype],
 
     provide: {
@@ -57,8 +43,7 @@ export default {
             option: this.meta.initialOption,
             options: this.initialOptions(),
             urlValue: this.meta.initialUrl,
-            selectedEntries: this.meta.initialSelectedEntries,
-            selectedAssets: this.meta.initialSelectedAssets,
+            selectedByType: this.initialSelectedByType(this.meta),
             metaChanging: false,
         };
     },
@@ -71,26 +56,29 @@ export default {
     },
 
     computed: {
-        entryValue() {
-            return this.selectedEntries.length ? `entry::${this.selectedEntries[0]}` : null;
+        matchedType() {
+            return this.meta.types[this.option] ?? null;
         },
 
-        assetValue() {
-            return this.selectedAssets.length ? `asset::${this.selectedAssets[0]}` : null;
+        matchedTypeComponent() {
+            return `${this.matchedType.component}-fieldtype`;
+        },
+
+        typeValue() {
+            const selected = this.selectedByType[this.option];
+            return selected && selected.length ? `${this.option}::${selected[0]}` : null;
         },
 
         replicatorPreview() {
             if (!this.showFieldPreviews) return;
 
-            switch (this.option) {
-                case 'url':
-                    return this.urlValue;
-                case 'first-child':
-                    return __('First Child');
-                case 'entry':
-                    return data_get(this.meta, 'entry.meta.data.0.title', this.entryValue);
-                case 'asset':
-                    return data_get(this.meta, 'asset.meta.data.0.basename', this.assetValue);
+            if (this.option === 'url') return this.urlValue;
+            if (this.option === 'first-child') return __('First Child');
+
+            if (this.matchedType) {
+                return data_get(this.meta, `types.${this.option}.meta.data.0.title`)
+                    ?? data_get(this.meta, `types.${this.option}.meta.data.0.basename`)
+                    ?? this.typeValue;
             }
 
             return this.value;
@@ -107,18 +95,10 @@ export default {
                 this.updateDebounced(this.urlValue);
             } else if (option === 'first-child') {
                 this.update('@child');
-            } else if (option === 'entry') {
-                if (this.entryValue) {
-                    this.update(this.entryValue);
-                } else {
-                    setTimeout(() => this.$refs.entries.linkExistingItem(), 0);
-                }
-            } else if (option === 'asset') {
-                if (this.assetValue) {
-                    this.update(this.assetValue);
-                } else {
-                    setTimeout(() => this.$refs.assets.openSelector(), 0);
-                }
+            } else if (this.matchedType) {
+                this.typeValue
+                    ? this.update(this.typeValue)
+                    : this.$nextTick(() => this.openTypeSelector());
             }
 
             this.updateMeta({ ...this.meta, initialOption: option });
@@ -136,8 +116,7 @@ export default {
             this.metaChanging = true;
             this.urlValue = meta.initialUrl;
             this.option = meta.initialOption;
-            this.selectedEntries = meta.initialSelectedEntries;
-            this.selectedAssets = meta.initialSelectedAssets;
+            this.selectedByType = this.initialSelectedByType(meta);
             this.$nextTick(() => (this.metaChanging = false));
         },
     },
@@ -151,22 +130,45 @@ export default {
 
                 this.meta.showFirstChildOption ? { label: __('First Child'), value: 'first-child' } : null,
 
-                { label: __('Entry'), value: 'entry' },
-
-                this.meta.showAssetOption ? { label: __('Asset'), value: 'asset', maxFiles: 1 } : null,
+                ...Object.entries(this.meta.types).map(([handle, type]) => ({ label: type.title, value: handle })),
             ].filter((option) => option);
         },
 
-        entriesSelected(entries) {
-            this.selectedEntries = entries;
-            this.update(this.entryValue);
-            this.updateMeta({ ...this.meta, initialSelectedEntries: entries });
+        initialSelectedByType(meta) {
+            return Object.fromEntries(
+                Object.entries(meta.types).map(([handle, type]) => [handle, type.selected])
+            );
         },
 
-        assetsSelected(assets) {
-            this.selectedAssets = assets;
-            this.update(this.assetValue);
-            this.updateMeta({ ...this.meta, initialSelectedAssets: assets });
+        openTypeSelector() {
+            const field = this.$refs.typeField;
+
+            if (!field) return;
+
+            if (typeof field.linkExistingItem === 'function') field.linkExistingItem();
+            else if (typeof field.openSelector === 'function') field.openSelector();
+        },
+
+        typeSelected(selected) {
+            this.selectedByType = { ...this.selectedByType, [this.option]: selected };
+            this.update(this.typeValue);
+            this.updateMeta({
+                ...this.meta,
+                types: {
+                    ...this.meta.types,
+                    [this.option]: { ...this.meta.types[this.option], selected },
+                },
+            });
+        },
+
+        updateTypeMeta(typeMeta) {
+            this.updateMeta({
+                ...this.meta,
+                types: {
+                    ...this.meta.types,
+                    [this.option]: { ...this.meta.types[this.option], meta: typeMeta },
+                },
+            });
         },
     },
 };
