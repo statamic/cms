@@ -237,6 +237,10 @@ export default {
             }
 
             this.autofocus();
+
+            if (this.registeredLinkType && !this.selectedTypeValue.length) {
+                this.$nextTick(() => this.openSelector());
+            }
         },
 
         urlData: {
