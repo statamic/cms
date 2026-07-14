@@ -4,6 +4,7 @@ namespace Statamic\Fieldtypes\Link;
 
 use Statamic\Fields\Field;
 use Statamic\Support\Str;
+
 use function Statamic\trans as __;
 
 abstract class LinkType
