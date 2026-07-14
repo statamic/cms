@@ -19,6 +19,13 @@ class LinkTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
+    public function tearDown(): void
+    {
+        parent::tearDown();
+
+        (new \ReflectionClass(Link::class))->setStaticPropertyValue('types', []);
+    }
+
     #[Test]
     public function it_augments_string_to_string()
     {

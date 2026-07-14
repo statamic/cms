@@ -32,6 +32,8 @@ class BardTest extends TestCase
     {
         parent::tearDown();
         static::$functions = null;
+
+        (new \ReflectionClass(Link::class))->setStaticPropertyValue('types', []);
     }
 
     #[Test]
