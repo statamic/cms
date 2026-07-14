@@ -214,7 +214,7 @@ export default {
                 { type: 'url', title: __('URL') },
                 ...Object.entries(this.bard.meta.linkTypes ?? {}).map(([handle, type]) => ({
                     type: handle,
-                    title: type.title,
+                    title: __(type.title),
                 })),
                 { type: 'mailto', title: __('Email') },
                 { type: 'tel', title: __('Phone') },

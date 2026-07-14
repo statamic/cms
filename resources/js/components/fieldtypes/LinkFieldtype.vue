@@ -130,7 +130,7 @@ export default {
 
                 this.meta.showFirstChildOption ? { label: __('First Child'), value: 'first-child' } : null,
 
-                ...Object.entries(this.meta.types).map(([handle, type]) => ({ label: type.title, value: handle })),
+                ...Object.entries(this.meta.types).map(([handle, type]) => ({ label: __(type.title), value: handle })),
             ].filter((option) => option);
         },
 
