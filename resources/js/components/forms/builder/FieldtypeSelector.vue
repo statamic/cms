@@ -118,7 +118,7 @@ const displayedFieldtypes = computed(() => isSearching.value ? [{ fieldtypes: se
                 >
                     <h2
                         v-if="group.title"
-                        class="inline-flex items-center px-1.5 pb-1.5 text-sm text-gray-950 dark:text-gray-200 font-medium"
+                        class="inline-flex items-center px-1.5 pb-1.5 bg-gray-100 dark:bg-gray-900 text-sm text-gray-950 dark:text-gray-200 font-medium"
                         :class="fieldView === FieldView.Collapsed ? 'gap-1.5' : 'gap-0'"
                     >
                         <span
