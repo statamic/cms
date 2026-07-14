@@ -308,8 +308,38 @@ class SubmitFormTest extends TestCase
     }
 
     #[Test]
+    public function it_does_not_revalidate_an_already_uploaded_file_when_resubmitting_its_page()
+    {
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $form = $this->uploadForm();
+
+        $first = app(SubmitForm::class)
+            ->form($form)
+            ->page('main')
+            ->submit(
+                data: ['email' => 'test@example.com'],
+                files: ['avatar' => [UploadedFile::fake()->image('avatar.jpg')]],
+            );
+
+        // Going back to the page and resubmitting resends the already-resolved asset path as a
+        // plain string rather than a fresh upload. That shouldn't be revalidated as a file.
+        $result = app(SubmitForm::class)
+            ->form($form)
+            ->page('main')
+            ->resume($first->submission)
+            ->submit(data: ['email' => 'test@example.com', 'avatar' => $first->submission->get('avatar')]);
+
+        $this->assertTrue($result->isFinalized());
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
     public function it_validates_the_extension_of_uploaded_files()
     {
+        Bus::fake(); // Otherwise the temp file is deleted by DeleteTemporaryAttachments right after submission.
         Storage::fake('local');
 
         // store: false makes this a temporary "files" upload rather than a stored asset.
@@ -343,6 +373,7 @@ class SubmitFormTest extends TestCase
             ->submit(data: [], files: ['document' => [UploadedFile::fake()->create('resume.pdf', 10)]]);
 
         $this->assertTrue($result->isFinalized());
+        Storage::disk('local')->assertExists('statamic/file-uploads/'.$result->submission->get('document')[0]);
 
         $form->submissions()->each->delete();
     }

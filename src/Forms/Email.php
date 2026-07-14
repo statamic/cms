@@ -116,10 +116,14 @@ class Email extends Mailable
         }
 
         $this->getRenderableFieldData(Arr::except($this->submissionData, ['id', 'date', 'form']))
-            ->filter(fn ($field) => in_array($field['fieldtype'], ['assets', 'files']))
+            ->filter(fn ($field) => in_array($field['fieldtype'], ['assets', 'files', 'form_upload']))
             ->each(function ($field) {
                 $field['value'] = $field['value']->value();
-                $field['fieldtype'] === 'assets' ? $this->attachAssets($field) : $this->attachFiles($field);
+
+                $isStoredAsAsset = $field['fieldtype'] === 'assets'
+                    || ($field['fieldtype'] === 'form_upload' && Arr::get($field, 'config.store'));
+
+                $isStoredAsAsset ? $this->attachAssets($field) : $this->attachFiles($field);
             });
 
         return $this;
@@ -162,7 +166,7 @@ class Email extends Mailable
         $fields = $this->getRenderableFieldData(Arr::except($augmented, ['id', 'date', 'form']))
             ->reject(fn ($field) => $field['fieldtype'] === 'spacer')
             ->when(Arr::has($this->config, 'attachments'), function ($fields) {
-                return $fields->reject(fn ($field) => in_array($field['fieldtype'], ['assets', 'files']));
+                return $fields->reject(fn ($field) => in_array($field['fieldtype'], ['assets', 'files', 'form_upload']));
             });
         $formConfig = ($configFields = Form::extraConfigFor($form->handle()))
             ? Blueprint::makeFromTabs($configFields)->fields()->addValues($form->data()->all())->values()->all()

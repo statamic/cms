@@ -38,7 +38,8 @@ class DeletePartialFormSubmissions implements ShouldQueue
     private function garbageCollectAssets(Submission $submission): void
     {
         $submission->form()->blueprint()->fields()->all()
-            ->filter(fn ($field) => $field->fieldtype()->handle() === 'assets')
+            ->filter(fn ($field) => $field->fieldtype()->handle() === 'assets'
+                || ($field->fieldtype()->handle() === 'form_upload' && $field->fieldtype()->config('store')))
             ->each(function ($field) use ($submission) {
                 $container = $field->get('container');
 

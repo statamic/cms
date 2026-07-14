@@ -25,6 +25,7 @@ use Statamic\Facades\Stache;
 use Statamic\Forms\Uploaders\AssetsUploader;
 use Statamic\Forms\Uploaders\FilesUploader;
 use Statamic\Sites\Site;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
@@ -186,9 +187,12 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
         return collect($uploadedFiles)->map(function ($files, $handle) {
             $field = $this->fields()->get($handle);
 
-            return $field['type'] === 'files'
-                ? FilesUploader::field($field)->upload($files)
-                : AssetsUploader::field($field)->upload($files);
+            $isStoredAsAsset = $field['type'] === 'assets'
+                || ($field['type'] === 'form_upload' && Arr::get($field, 'store'));
+
+            return $isStoredAsAsset
+                ? AssetsUploader::field($field)->upload($files)
+                : FilesUploader::field($field)->upload($files);
         })->all();
     }
 

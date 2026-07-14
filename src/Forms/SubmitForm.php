@@ -108,7 +108,7 @@ class SubmitForm
     private function normalizeFiles(array $files): array
     {
         $assetFields = $this->form->blueprint()->fields()->all()
-            ->filter(fn ($field) => in_array($field->fieldtype()->handle(), ['assets', 'files']))
+            ->filter(fn ($field) => in_array($field->fieldtype()->handle(), ['assets', 'files', 'form_upload']))
             ->keys();
 
         foreach ($assetFields as $handle) {
@@ -198,7 +198,7 @@ class SubmitForm
 
         $validator = $fields
             ->validator()
-            ->withRules($this->extraRules($fields))
+            ->withRules($this->extraRules($fields, $files))
             ->validator();
 
         if (! $only && $this->page) {
@@ -212,12 +212,19 @@ class SubmitForm
         $this->withLocale($this->site()?->lang(), fn () => $validator->validate());
     }
 
-    private function extraRules($fields): array
+    private function extraRules($fields, array $files): array
     {
         return $fields->all()
-            ->filter(fn ($field): bool => in_array($field->fieldtype()->handle(), ['assets', 'files']))
+            ->filter(fn ($field): bool => in_array($field->fieldtype()->handle(), ['assets', 'files', 'form_upload']))
+            // Only validate as a file when one was actually uploaded in this request.
+            // Resubmitting a page whose file was uploaded earlier just resends its path,
+            // which isn't a file and shouldn't be re-validated as though it were one.
+            ->filter(fn ($field): bool => array_key_exists($field->handle(), $files))
             ->mapWithKeys(function ($field): array {
-                $rules = $field->fieldtype()->handle() === 'assets'
+                $isStoredAsAsset = $field->fieldtype()->handle() === 'assets'
+                    || ($field->fieldtype()->handle() === 'form_upload' && $field->fieldtype()->config('store'));
+
+                $rules = $isStoredAsAsset
                     ? array_merge(['file', new AllowedFile], $this->assetContainerRules($field))
                     : ['file', new AllowedFile($field->fieldtype()->config('allowed_extensions'))];
 
