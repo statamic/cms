@@ -236,10 +236,13 @@ class SubmitForm
                     return $rules;
                 }
 
-                // Anything not present in $files must match what's already stored against the field.
-                // Otherwise, it should be rejected. An unvalidated value could be used to read/delete
-                // arbitrary files when the submission is finalized.
-                if ($field->value() !== $this->submission?->get($handle)) {
+                // Anything not present in $files must already be stored against the field. Removing
+                // some of an existing multi-file value is fine, but a value that was never uploaded
+                // gets rejected - an unvalidated one could be used to read/delete arbitrary files
+                // when the submission is finalized.
+                $stored = Arr::wrap($this->submission?->get($handle));
+
+                if (collect(Arr::wrap($field->value()))->contains(fn ($value) => ! in_array($value, $stored, true))) {
                     $rules[$handle] = array_merge($rules[$handle] ?? [], ['prohibited']);
 
                     return $rules;

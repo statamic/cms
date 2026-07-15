@@ -507,6 +507,51 @@ class SubmitFormTest extends TestCase
     }
 
     #[Test]
+    public function it_allows_removing_a_file_from_a_multi_file_upload_when_resubmitting_its_page()
+    {
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $form = tap(Form::make('uploads')->formFields([
+            'pages' => [
+                [
+                    'id' => 'main',
+                    'sections' => [
+                        ['fields' => [
+                            ['handle' => 'email', 'field' => ['type' => 'email']],
+                            ['handle' => 'gallery', 'field' => ['type' => 'upload', 'store' => true, 'container' => 'avatars']],
+                        ]],
+                    ],
+                ],
+            ],
+        ]))->save();
+
+        $first = app(SubmitForm::class)
+            ->form($form)
+            ->page('main')
+            ->submit(
+                data: ['email' => 'test@example.com'],
+                files: ['gallery' => [UploadedFile::fake()->image('one.jpg'), UploadedFile::fake()->image('two.jpg')]],
+            );
+
+        // Dropping one of the two already-stored files, without uploading a replacement, is a valid
+        // subset of what's stored - it shouldn't be rejected as a forged value.
+        $result = app(SubmitForm::class)
+            ->form($form)
+            ->page('main')
+            ->resume($first->submission)
+            ->submit(data: [
+                'email' => 'test@example.com',
+                'gallery' => [$first->submission->get('gallery')[0]],
+            ]);
+
+        $this->assertTrue($result->isFinalized());
+        $this->assertEquals([$first->submission->get('gallery')[0]], $result->submission->get('gallery'));
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
     public function it_rejects_an_upload_value_that_was_never_actually_uploaded()
     {
         Storage::fake('avatars');
