@@ -5,14 +5,19 @@ namespace Statamic\Forms\Uploaders;
 use Statamic\Assets\FileUploader;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-/**
- * @phpstan-consistent-constructor
- */
 class FormFileUploader extends FileUploader
 {
-    public function __construct(protected string $submissionId, protected string $handle, ?string $container = null)
+    protected string $submissionId;
+
+    protected string $handle;
+
+    public static function submission(string $submissionId, string $handle, ?string $container = null): static
     {
-        parent::__construct($container);
+        $uploader = new static($container);
+        $uploader->submissionId = $submissionId;
+        $uploader->handle = $handle;
+
+        return $uploader;
     }
 
     protected function uploadPath(UploadedFile $file)

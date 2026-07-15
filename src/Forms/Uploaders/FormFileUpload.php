@@ -41,7 +41,7 @@ class FormFileUpload
     public function upload($files)
     {
         $paths = $this->getUploadableFiles($files)->map(function ($file) {
-            return (new FormFileUploader($this->submissionId, $this->config->get('handle'), $this->config->get('container')))->upload($file);
+            return FormFileUploader::submission($this->submissionId, $this->config->get('handle'), $this->config->get('container'))->upload($file);
         });
 
         return $this->isSingleFile()
