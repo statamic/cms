@@ -44,12 +44,15 @@ export default function useResizable() {
                     const resolveDefaultWidth = () =>
                         typeof defaultWidth === 'function' ? defaultWidth() : defaultWidth;
                     const clampWidth = (width) => Math.min(maxWidth, Math.max(minWidth, width));
+                    const applyWidth = (width) => {
+                        panel.style.width = typeof width === 'string' ? width : `${clampWidth(width)}px`;
+                    };
 
                     const storedWidth = getStoredWidth(storageKey);
                     const initialWidth = storedWidth ?? resolveDefaultWidth();
 
                     if (initialWidth !== null && initialWidth !== undefined) {
-                        panel.style.width = `${clampWidth(initialWidth)}px`;
+                        applyWidth(initialWidth);
                     }
 
                     const handle = document.createElement('div');
@@ -69,7 +72,7 @@ export default function useResizable() {
 
                         const currentDefaultWidth = resolveDefaultWidth();
                         if (currentDefaultWidth !== null && currentDefaultWidth !== undefined) {
-                            panel.style.width = `${clampWidth(currentDefaultWidth)}px`;
+                            applyWidth(currentDefaultWidth);
                             return;
                         }
 
@@ -91,8 +94,7 @@ export default function useResizable() {
 
                         const onMove = (e) => {
                             const diff = resolvedEdge === 'right' ? e.clientX - startX : startX - e.clientX;
-                            const newWidth = clampWidth(startWidth + diff);
-                            panel.style.width = `${newWidth}px`;
+                            applyWidth(startWidth + diff);
                         };
 
                         const onUp = () => {

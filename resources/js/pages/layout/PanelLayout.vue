@@ -4,13 +4,14 @@ import useResizable from '@/composables/use-resizable.js';
 
 const minWidth = 175;
 const maxWidth = 450;
+const paddingOffset = '0.5rem';
 const breakpoints = { narrow: 1250, compact: 1400 };
 
 const left = {
     ref: useTemplateRef('leftPanel'),
     active: ref(false),
     edge: 'right',
-    defaults: [minWidth, 262, 320],
+    defaults: [minWidth, 270, 300],
     storageKey: 'statamic.panels.left-width',
 };
 
@@ -18,18 +19,22 @@ const right = {
     ref: useTemplateRef('rightPanel'),
     active: ref(false),
     edge: 'left',
-    defaults: [300, 290, 320],
+    defaults: [300, 290, 340],
     storageKey: 'statamic.panels.right-width',
 };
 
 provide('leftPanelActive', left.active);
 provide('rightPanelActive', right.active);
 
+function formatWidth(panel, width) {
+    return panel === left ? `calc(${width}px - ${paddingOffset})` : `${width}px`;
+}
+
 function getDefaultWidth(panel) {
     const w = window.innerWidth;
-    if (w < breakpoints.narrow) return panel.defaults[0];
-    if (w < breakpoints.compact) return panel.defaults[1];
-    return panel.defaults[2];
+    if (w < breakpoints.narrow) return formatWidth(panel, panel.defaults[0]);
+    if (w < breakpoints.compact) return formatWidth(panel, panel.defaults[1]);
+    return formatWidth(panel, panel.defaults[2]);
 }
 
 const { makeResizable } = useResizable();
@@ -43,8 +48,8 @@ const { makeResizable } = useResizable();
         storageKey: panel.storageKey,
     });
 
-    // Pre-compute the set of pixel strings we treat as "unmodified by the user"
-    panel.priorDefaults = new Set(panel.defaults.map((d) => `${d}px`));
+    // Pre-compute the set of width strings we treat as "unmodified by the user"
+    panel.priorDefaults = new Set(panel.defaults.map((d) => formatWidth(panel, d)));
 });
 
 function applyBreakpointDefaults() {
@@ -57,7 +62,7 @@ function applyBreakpointDefaults() {
 
         const current = el.style.width;
         if (!current || panel.priorDefaults.has(current)) {
-            el.style.width = `${getDefaultWidth(panel)}px`;
+            el.style.width = getDefaultWidth(panel);
         }
     });
 }
