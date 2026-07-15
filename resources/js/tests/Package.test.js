@@ -40,6 +40,7 @@ it('exports core', async () => {
         'requireElevatedSession',
         'requireElevatedSessionIf',
         'resetValuesFromResponse',
+        'useUiDirection',
     ];
 
     expect(Object.keys(modules.core).toSorted()).toEqual(expected)
