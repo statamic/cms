@@ -472,7 +472,7 @@ onUnmounted(() => {
         <LinkFieldsInspector v-if="inspectorType === InspectorType.LinkFields" />
         <FieldsetInspector v-if="inspectorType === InspectorType.FieldsetImport" />
         <FieldtypeHint v-if="inspectorType === InspectorType.FieldtypeHint" />
-        <EmptyInspector v-else />
+        <EmptyInspector v-if="!inspectorType" />
     </LayoutPanel>
 
     <div
