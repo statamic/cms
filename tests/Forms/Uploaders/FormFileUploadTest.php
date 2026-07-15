@@ -71,4 +71,27 @@ class FormFileUploadTest extends TestCase
         Storage::disk('local')->assertExists('statamic/form-uploads/submission-123/avatar/avatar.jpg');
         Storage::disk('local')->assertExists('statamic/form-uploads/submission-123/document/resume.pdf');
     }
+
+    #[Test]
+    public function it_keeps_files_with_the_same_name_by_suffixing_duplicates()
+    {
+        Storage::fake('local');
+
+        $paths = FormFileUpload::field(['handle' => 'documents', 'max_files' => 3], 'submission-123')
+            ->upload([
+                UploadedFile::fake()->create('resume.pdf', 10),
+                UploadedFile::fake()->create('resume.pdf', 10),
+                UploadedFile::fake()->create('resume.pdf', 10),
+            ]);
+
+        $this->assertEquals([
+            'submission-123/documents/resume.pdf',
+            'submission-123/documents/resume-1.pdf',
+            'submission-123/documents/resume-2.pdf',
+        ], $paths);
+
+        Storage::disk('local')->assertExists('statamic/form-uploads/submission-123/documents/resume.pdf');
+        Storage::disk('local')->assertExists('statamic/form-uploads/submission-123/documents/resume-1.pdf');
+        Storage::disk('local')->assertExists('statamic/form-uploads/submission-123/documents/resume-2.pdf');
+    }
 }
