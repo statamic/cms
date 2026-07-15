@@ -3,11 +3,10 @@
 namespace Tests\Forms;
 
 use Carbon\Carbon;
-use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Bus;
 use PHPUnit\Framework\Attributes\Test;
-use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Form;
+use Statamic\Forms\DeleteTemporaryFiles;
 use Statamic\Jobs\DeletePartialFormSubmissions;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -87,66 +86,21 @@ class DeletePartialFormSubmissionsTest extends TestCase
     }
 
     #[Test]
-    public function it_deletes_attached_assets_when_garbage_collection_is_enabled()
+    public function it_dispatches_delete_temporary_files_for_each_abandoned_partial_submission()
     {
-        config([
-            'statamic.forms.delete_partial_submissions_after' => 7,
-            'statamic.forms.garbage_collect_assets' => true,
-        ]);
+        Bus::fake();
 
-        $form = $this->formWithUploadField();
-        $partial = $this->partialWithAsset($form);
+        config(['statamic.forms.delete_partial_submissions_after' => 7]);
 
-        Storage::disk('avatars')->assertExists('avatar.jpg');
-
-        (new DeletePartialFormSubmissions)->handle();
-
-        $this->assertNull($form->submission($partial->id()));
-        Storage::disk('avatars')->assertMissing('avatar.jpg');
-    }
-
-    #[Test]
-    public function it_leaves_attached_assets_when_garbage_collection_is_disabled()
-    {
-        config([
-            'statamic.forms.delete_partial_submissions_after' => 7,
-            'statamic.forms.garbage_collect_assets' => false,
-        ]);
-
-        $form = $this->formWithUploadField();
-        $partial = $this->partialWithAsset($form);
-
-        (new DeletePartialFormSubmissions)->handle();
-
-        // The partial is still deleted, but its asset is left untouched.
-        $this->assertNull($form->submission($partial->id()));
-        Storage::disk('avatars')->assertExists('avatar.jpg');
-    }
-
-    private function formWithUploadField()
-    {
-        Storage::fake('avatars');
-        tap(AssetContainer::make('avatars')->disk('avatars'))->save();
-
-        return tap(Form::make('contact')->formFields([
-            'sections' => [
-                ['fields' => [
-                    ['handle' => 'avatar', 'field' => ['type' => 'upload', 'store' => true, 'container' => 'avatars']],
-                ]],
-            ],
-        ]))->save();
-    }
-
-    private function partialWithAsset($form)
-    {
-        $asset = tap(AssetContainer::find('avatars')->makeAsset('avatar.jpg'))
-            ->upload(UploadedFile::fake()->image('avatar.jpg'));
+        $form = tap(Form::make('contact'))->save();
 
         Carbon::setTestNow('2025-06-01 12:00:00');
-        $partial = tap($form->makeSubmission()->set('partial', true)->set('avatar', [$asset->path()]))->save();
+        tap($form->makeSubmission()->set('partial', true))->save();
 
         Carbon::setTestNow('2025-06-30 12:00:00');
 
-        return $partial;
+        (new DeletePartialFormSubmissions)->handle();
+
+        Bus::assertDispatchedSync(DeleteTemporaryFiles::class);
     }
 }

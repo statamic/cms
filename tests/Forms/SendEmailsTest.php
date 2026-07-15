@@ -5,10 +5,9 @@ namespace Tests\Forms;
 use Illuminate\Support\Facades\Bus;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
-use Statamic\Contracts\Forms\SubmissionRepository;
 use Statamic\Facades\Form as FacadesForm;
 use Statamic\Facades\Site;
-use Statamic\Forms\DeleteTemporaryAttachments;
+use Statamic\Forms\DeleteTemporaryFiles;
 use Statamic\Forms\SendEmail;
 use Statamic\Forms\SendEmails;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -89,7 +88,7 @@ class SendEmailsTest extends TestCase
     }
 
     #[Test]
-    public function it_dispatches_delete_attachments_job_after_dispatching_email_jobs()
+    public function it_dispatches_delete_temporary_files_job_after_dispatching_email_jobs()
     {
         Bus::fake();
 
@@ -99,7 +98,7 @@ class SendEmailsTest extends TestCase
             'foo' => 'bar',
         ])->formFields([
             'fields' => [
-                ['handle' => 'attachments', 'field' => ['type' => 'files']],
+                ['handle' => 'document', 'field' => ['type' => 'form_upload', 'store' => false]],
             ],
         ]))->save();
 
@@ -114,31 +113,27 @@ class SendEmailsTest extends TestCase
                 'to' => 'first@recipient.com',
                 'foo' => 'bar',
             ]),
-            new DeleteTemporaryAttachments($submission),
+            new DeleteTemporaryFiles($submission),
         ]);
     }
 
     #[Test]
-    public function delete_attachments_job_only_saves_submission_when_enabled()
+    public function it_dispatches_delete_temporary_files_job_even_without_any_emails_configured()
     {
-        $form = tap(FacadesForm::make('attachments_test')->email([
-            'from' => 'first@sender.com',
-            'to' => 'first@recipient.com',
-            'foo' => 'bar',
+        Bus::fake();
+
+        $form = tap(FacadesForm::make('attachments_test')->formFields([
+            'fields' => [
+                ['handle' => 'document', 'field' => ['type' => 'form_upload', 'store' => false]],
+            ],
         ]))->save();
 
-        $form
-            ->store(false)
-            ->blueprint()
-            ->ensureField('attachments', ['type' => 'files'])->save();
+        (new SendEmails(
+            $form->makeSubmission(),
+            Site::default(),
+        ))->handle();
 
-        $submission = $form->makeSubmission();
-
-        (new DeleteTemporaryAttachments($submission))->handle();
-
-        $submissions = app(SubmissionRepository::class)->all();
-
-        $this->assertEmpty($submissions);
+        Bus::assertDispatched(DeleteTemporaryFiles::class);
     }
 
     #[Test]

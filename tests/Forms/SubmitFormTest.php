@@ -17,6 +17,7 @@ use Statamic\Exceptions\SilentFormFailureException;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Fieldset;
 use Statamic\Facades\Form;
+use Statamic\Forms\CreateAssetsFromFileUploads;
 use Statamic\Forms\SendEmails;
 use Statamic\Forms\SubmissionResult;
 use Statamic\Forms\SubmitForm;
@@ -165,6 +166,7 @@ class SubmitFormTest extends TestCase
         $this->assertEmpty($this->form->submissions());
         Event::assertDispatched(SubmissionCreated::class);
         Event::assertDispatched(SubmissionFinalized::class);
+        Bus::assertDispatched(CreateAssetsFromFileUploads::class);
         Bus::assertDispatched(SendEmails::class);
     }
 
@@ -308,6 +310,60 @@ class SubmitFormTest extends TestCase
     }
 
     #[Test]
+    public function it_uploads_files_via_assets_fieldtype()
+    {
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $form = tap(Form::make('avatar.png')->formFields([
+            'fields' => [
+                ['handle' => 'email', 'field' => ['type' => 'email']],
+                ['handle' => 'avatar', 'field' => ['type' => 'assets', 'container' => 'avatars', 'max_files' => 1]],
+            ],
+        ]))->save();
+
+        $result = app(SubmitForm::class)
+            ->form($form)
+            ->submit(
+                data: ['email' => 'test@example.com'],
+                files: ['avatar' => [UploadedFile::fake()->image('avatar.jpg')]],
+            );
+
+        Storage::disk('avatars')->assertExists('avatar.jpg');
+        $this->assertEquals('avatar.jpg', $result->submission->get('avatar'));
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function it_uploads_files_via_files_fieldtype()
+    {
+        Storage::fake('local');
+        Bus::fake(); // Otherwise finalize's queued cleanup job removes it before we can look.
+
+        $form = tap(Form::make('avatar.png')->formFields([
+            'fields' => [
+                ['handle' => 'email', 'field' => ['type' => 'email']],
+                ['handle' => 'avatar', 'field' => ['type' => 'files', 'max_files' => 1]],
+            ],
+        ]))->save();
+
+        $result = app(SubmitForm::class)
+            ->form($form)
+            ->submit(
+                data: ['email' => 'test@example.com'],
+                files: ['avatar' => [UploadedFile::fake()->create('resume.pdf', 10)]],
+            );
+
+        $path = $result->submission->get('avatar');
+
+        $this->assertNotNull($path);
+        Storage::disk('local')->assertExists('statamic/file-uploads/'.$path);
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
     public function it_does_not_revalidate_an_already_uploaded_file_when_resubmitting_its_page()
     {
         Storage::fake('avatars');
@@ -339,7 +395,7 @@ class SubmitFormTest extends TestCase
     #[Test]
     public function it_validates_the_extension_of_uploaded_files()
     {
-        Bus::fake(); // Otherwise the temp file is deleted by DeleteTemporaryAttachments right after submission.
+        Bus::fake(); // Otherwise the temp file is deleted by DeleteTemporaryFiles right after submission.
         Storage::fake('local');
 
         // store: false makes this a temporary "files" upload rather than a stored asset.
@@ -373,7 +429,7 @@ class SubmitFormTest extends TestCase
             ->submit(data: [], files: ['document' => [UploadedFile::fake()->create('resume.pdf', 10)]]);
 
         $this->assertTrue($result->isFinalized());
-        Storage::disk('local')->assertExists('statamic/file-uploads/'.$result->submission->get('document')[0]);
+        Storage::disk('local')->assertExists('statamic/form-uploads/'.$result->submission->get('document')[0]);
 
         $form->submissions()->each->delete();
     }
@@ -477,6 +533,7 @@ class SubmitFormTest extends TestCase
         Event::assertDispatched(SubmissionCreated::class);
         Event::assertNotDispatched(FormSubmitted::class);
         Event::assertNotDispatched(SubmissionFinalized::class);
+        Bus::assertNotDispatched(CreateAssetsFromFileUploads::class);
         Bus::assertNotDispatched(SendEmails::class);
 
         $form->submissions()->each->delete();
@@ -689,6 +746,7 @@ class SubmitFormTest extends TestCase
         $this->assertTrue($result->submission->isPartial());
         Event::assertNotDispatched(FormSubmitted::class);
         Event::assertNotDispatched(SubmissionFinalized::class);
+        Bus::assertNotDispatched(CreateAssetsFromFileUploads::class);
         Bus::assertNotDispatched(SendEmails::class);
 
         // Earlier-page values are preserved while the new page's values are merged in.
@@ -735,6 +793,7 @@ class SubmitFormTest extends TestCase
         // Finalizing fires the completion events once; it doesn't re-create the submission.
         Event::assertNotDispatched(SubmissionCreated::class);
         Event::assertDispatched(SubmissionFinalized::class, 1);
+        Bus::assertDispatched(CreateAssetsFromFileUploads::class, 1);
         Bus::assertDispatched(SendEmails::class, 1);
 
         $form->submissions()->each->delete();
@@ -761,6 +820,7 @@ class SubmitFormTest extends TestCase
 
         Event::assertNotDispatched(FormSubmitted::class);
         Event::assertNotDispatched(SubmissionFinalized::class);
+        Bus::assertNotDispatched(CreateAssetsFromFileUploads::class);
         Bus::assertNotDispatched(SendEmails::class);
 
         $form->submissions()->each->delete();

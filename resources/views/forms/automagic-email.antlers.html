@@ -6,11 +6,6 @@
                 {{ permalink }}
                 {{ if !last }},{{ /if }}
             {{ /value }}
-        {{ elseif fieldtype == "form_upload" }}
-            {{ value }}
-                {{ value | pathinfo:basename | sanitize }}
-                {{ if !last }},{{ /if }}
-            {{ /value }}
         {{ elseif fieldtype == "select" && !config:multiple }}
             {{ (value:label ?? value) | sanitize }}
         {{ elseif fieldtype == "radio" }}

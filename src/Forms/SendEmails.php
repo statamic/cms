@@ -40,8 +40,8 @@ class SendEmails
 
                 return new $class($this->submission, $this->site, $config);
             })
-            ->when($this->shouldDeleteTemporaryAttachments(), function ($jobs) {
-                $jobs->push(new DeleteTemporaryAttachments($this->submission));
+            ->when($this->shouldDeleteTemporaryFiles(), function ($jobs) {
+                $jobs->push(new DeleteTemporaryFiles($this->submission));
             });
     }
 
@@ -54,12 +54,9 @@ class SendEmails
         return collect($config);
     }
 
-    protected function shouldDeleteTemporaryAttachments(): bool
+    private function shouldDeleteTemporaryFiles(): bool
     {
         return $this->submission->form()->blueprint()->fields()->all()
-            ->filter(fn (Field $field) => $field->fieldtype()->handle() === 'files'
-                || ($field->fieldtype()->handle() === 'form_upload' && ! $field->fieldtype()->config('store')))
-            ->filter()
-            ->count() > 0;
+            ->contains(fn (Field $field) => $field->type() === 'files' || ($field->type() === 'form_upload' && ! $field->fieldtype()->config('store')));
     }
 }

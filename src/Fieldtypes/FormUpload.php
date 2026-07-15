@@ -27,61 +27,27 @@ class FormUpload extends Fieldtype
         $values = Arr::wrap($this->field->value());
 
         return [
-            'files' => collect($values)->map(fn ($value) => $this->fileData($value))->values()->all(),
+            'files' => collect($values)->map(function (string $value): array {
+                if (! $this->storesAsAsset()) {
+                    return ['filename' => basename($value)];
+                }
+
+                if (! $asset = Asset::find($value)) {
+                    return ['filename' => $value];
+                }
+
+                return [
+                    'filename' => $asset->basename(),
+                    'size' => $asset->size(),
+                    'download_url' => $asset->cpDownloadUrl(),
+                ];
+            })->values()->all(),
         ];
-    }
-
-    private function fileData(string $value): array
-    {
-        if (! $this->storesAsAsset()) {
-            return ['filename' => basename($value)];
-        }
-
-        if (! $asset = Asset::find($value)) {
-            return ['filename' => $value];
-        }
-
-        return [
-            'filename' => $asset->basename(),
-            'size' => $asset->size(),
-            'download_url' => $asset->cpDownloadUrl(),
-        ];
-    }
-
-    public function preProcess($values)
-    {
-        if (! $this->storesAsAsset()) {
-            return $values ?? [];
-        }
-
-        if (is_null($values)) {
-            return [];
-        }
-
-        return collect($values)->map(fn ($value) => $this->valueToId($value))->filter()->values()->all();
-    }
-
-    private function valueToId(string $value): string
-    {
-        if (Str::contains($value, '::')) {
-            return $value;
-        }
-
-        return optional($this->container()->asset($value))->id();
     }
 
     public function process($values)
     {
-        if (! $this->storesAsAsset()) {
-            return $this->config('max_files') === 1 ? collect($values)->first() : $values;
-        }
-
-        // A value is either a fresh upload's asset id (from AssetsUploader), or it's already a
-        // stored path from an earlier submission of this page riding along unchanged — e.g. going
-        // back and resubmitting a page without re-selecting its file. Only the former needs resolving.
-        $values = collect($values)->map(fn ($value) => Str::contains($value, '::') ? Asset::findOrFail($value)->path() : $value);
-
-        return $this->config('max_files') === 1 ? $values->first() : $values->all();
+        return $this->config('max_files') === 1 ? collect($values)->first() : $values;
     }
 
     public function augment($values)
