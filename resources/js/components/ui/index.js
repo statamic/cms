@@ -108,6 +108,7 @@ export { default as PublishLocalizations } from "./Publish/Localizations.vue";
 export { default as PublishSections } from "./Publish/Sections.vue";
 export { default as PublishTabs } from "./Publish/Tabs.vue";
 export { default as TabProvider } from "./Publish/TabProvider.vue";
+export { default as ContentDirection } from './ContentDirection.vue';
 export { default as StatusIndicator } from "./StatusIndicator.vue";
 export { default as Widget } from "./Widget.vue";
 export { default as Listing } from "./Listing/Listing.vue";
