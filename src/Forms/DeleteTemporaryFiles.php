@@ -31,6 +31,7 @@ class DeleteTemporaryFiles implements ShouldQueue
 
         $uploadFields->filter(fn (Field $field) => $field->type() === 'files')->each(function (Field $field): void {
             Collection::wrap($this->submission->get($field->handle(), []))
+                ->reject(fn ($path) => str_contains($path, '..'))
                 ->each(fn ($path) => Storage::disk('local')->delete('statamic/file-uploads/'.$path));
         });
 

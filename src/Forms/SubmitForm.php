@@ -236,10 +236,15 @@ class SubmitForm
                     return $rules;
                 }
 
-                // A carried-over value that's still an array (eg. removing one of several files without
-                // uploading a new one) should keep being validated normally. Only a `max_files: 1` field's
-                // collapsed scalar value needs the array/max/min rules skipped, since it was never a fresh
-                // upload to begin with.
+                // Anything not present in $files must match what's already stored against the field.
+                // Otherwise, it should be rejected. An unvalidated value could be used to read/delete
+                // arbitrary files when the submission is finalized.
+                if ($field->value() !== $this->submission?->get($handle)) {
+                    $rules[$handle] = array_merge($rules[$handle] ?? [], ['prohibited']);
+
+                    return $rules;
+                }
+
                 if (is_array($field->value()) || ! isset($rules[$handle])) {
                     return $rules;
                 }

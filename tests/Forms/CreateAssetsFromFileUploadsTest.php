@@ -142,6 +142,30 @@ class CreateAssetsFromFileUploadsTest extends TestCase
     }
 
     #[Test]
+    public function it_never_reads_or_deletes_outside_the_submissions_own_directory()
+    {
+        Storage::fake('local');
+        $this->fakeAvatarsContainer();
+
+        $form = tap(Form::make('contact')->formFields([
+            'sections' => [
+                ['fields' => [
+                    ['handle' => 'avatar', 'field' => ['type' => 'upload', 'store' => true, 'container' => 'avatars', 'max_files' => 1]],
+                ]],
+            ],
+        ]))->save();
+
+        Storage::disk('local')->put('framework/sessions/secret', 'sensitive');
+
+        $submission = tap($form->makeSubmission()->set('avatar', '../../framework/sessions/secret'))->save();
+
+        (new CreateAssetsFromFileUploads($submission))->handle();
+
+        Storage::disk('local')->assertExists('framework/sessions/secret');
+        $this->assertEmpty(AssetContainer::find('avatars')->assets());
+    }
+
+    #[Test]
     public function it_still_creates_the_asset_when_the_form_does_not_store_submissions()
     {
         Storage::fake('local');

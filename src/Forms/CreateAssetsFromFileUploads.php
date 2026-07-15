@@ -67,7 +67,7 @@ class CreateAssetsFromFileUploads implements ShouldQueue
 
     private function uploadAsset(Field $field, string $path): ?string
     {
-        $diskPath = "statamic/form-uploads/{$path}";
+        $diskPath = "statamic/form-uploads/{$this->submission->id()}/{$field->handle()}/".basename($path);
 
         if (! Storage::disk('local')->exists($diskPath)) {
             return null;

@@ -507,6 +507,117 @@ class SubmitFormTest extends TestCase
     }
 
     #[Test]
+    public function it_rejects_an_upload_value_that_was_never_actually_uploaded()
+    {
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $form = tap(Form::make('uploads')->formFields([
+            'pages' => [
+                [
+                    'id' => 'main',
+                    'sections' => [
+                        ['fields' => [
+                            ['handle' => 'email', 'field' => ['type' => 'email']],
+                            ['handle' => 'avatar', 'field' => ['type' => 'upload', 'store' => true, 'container' => 'avatars', 'max_files' => 1]],
+                        ]],
+                    ],
+                ],
+            ],
+        ]))->save();
+
+        try {
+            app(SubmitForm::class)
+                ->form($form)
+                ->page('main')
+                ->submit(data: ['email' => 'test@example.com', 'avatar' => '../../framework/sessions/x']);
+
+            $this->fail('Expected ValidationException was not thrown');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('avatar', $e->errors());
+        }
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function it_rejects_a_forged_multi_file_upload_value()
+    {
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $form = tap(Form::make('uploads')->formFields([
+            'pages' => [
+                [
+                    'id' => 'main',
+                    'sections' => [
+                        ['fields' => [
+                            ['handle' => 'email', 'field' => ['type' => 'email']],
+                            ['handle' => 'gallery', 'field' => ['type' => 'upload', 'store' => true, 'container' => 'avatars']],
+                        ]],
+                    ],
+                ],
+            ],
+        ]))->save();
+
+        try {
+            app(SubmitForm::class)
+                ->form($form)
+                ->page('main')
+                ->submit(data: ['email' => 'test@example.com', 'gallery' => ['../../framework/sessions/x']]);
+
+            $this->fail('Expected ValidationException was not thrown');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('gallery', $e->errors());
+        }
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function it_rejects_a_resubmitted_upload_value_that_doesnt_match_whats_stored()
+    {
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $form = tap(Form::make('uploads')->formFields([
+            'pages' => [
+                [
+                    'id' => 'main',
+                    'sections' => [
+                        ['fields' => [
+                            ['handle' => 'email', 'field' => ['type' => 'email']],
+                            ['handle' => 'avatar', 'field' => ['type' => 'upload', 'store' => true, 'container' => 'avatars', 'max_files' => 1]],
+                        ]],
+                    ],
+                ],
+            ],
+        ]))->save();
+
+        $first = app(SubmitForm::class)
+            ->form($form)
+            ->page('main')
+            ->submit(
+                data: ['email' => 'test@example.com'],
+                files: ['avatar' => [UploadedFile::fake()->image('avatar.jpg')]],
+            );
+
+        try {
+            app(SubmitForm::class)
+                ->form($form)
+                ->page('main')
+                ->resume($first->submission)
+                ->submit(data: ['email' => 'test@example.com', 'avatar' => '../../framework/sessions/x']);
+
+            $this->fail('Expected ValidationException was not thrown');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('avatar', $e->errors());
+        }
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
     public function it_validates_the_extension_of_uploaded_files()
     {
         Bus::fake(); // Otherwise the temp file is deleted by DeleteTemporaryFiles right after submission.
