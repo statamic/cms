@@ -2,6 +2,7 @@
 import { computed, useTemplateRef, watch, ref, inject } from 'vue';
 import { injectContainerContext } from './Container.vue';
 import { injectFieldsContext } from './FieldsProvider.vue';
+import { useUiDirection } from '@/composables/ui-direction';
 import {
     Avatar,
     Field,
@@ -46,7 +47,7 @@ const {
     focusField,
     blurField,
     container,
-    direction,
+    direction: contentDirection,
 } = injectContainerContext();
 const {
     fieldPathPrefix: injectedFieldPathPrefix,
@@ -54,6 +55,8 @@ const {
     readOnly: fieldsProviderReadOnly,
     asConfig: fieldsAsConfig,
 } = injectFieldsContext();
+
+const { direction } = useUiDirection();
 
 const asConfig = computed(() => fieldsAsConfig.value ?? containerAsConfig.value ?? false);
 const fieldPathPrefix = computed(() => props.fieldPathPrefix || injectedFieldPathPrefix.value);
