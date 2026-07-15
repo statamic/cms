@@ -462,6 +462,51 @@ class SubmitFormTest extends TestCase
     }
 
     #[Test]
+    public function it_still_validates_min_files_when_removing_files_without_uploading_a_new_one()
+    {
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $form = tap(Form::make('uploads')->formFields([
+            'pages' => [
+                [
+                    'id' => 'main',
+                    'sections' => [
+                        ['fields' => [
+                            ['handle' => 'email', 'field' => ['type' => 'email']],
+                            ['handle' => 'gallery', 'field' => ['type' => 'upload', 'store' => true, 'container' => 'avatars', 'min_files' => 2]],
+                        ]],
+                    ],
+                ],
+            ],
+        ]))->save();
+
+        $first = app(SubmitForm::class)
+            ->form($form)
+            ->page('main')
+            ->submit(
+                data: ['email' => 'test@example.com'],
+                files: ['gallery' => [UploadedFile::fake()->image('one.jpg'), UploadedFile::fake()->image('two.jpg')]],
+            );
+
+        // Dropping one of the two files, without uploading a replacement, still leaves an
+        // array-shaped value. It should keep being validated against min_files as normal.
+        try {
+            app(SubmitForm::class)
+                ->form($form)
+                ->page('main')
+                ->resume($first->submission)
+                ->submit(data: ['email' => 'test@example.com', 'gallery' => [$first->submission->get('gallery')[0]]]);
+
+            $this->fail('Expected ValidationException was not thrown');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('gallery', $e->errors());
+        }
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
     public function it_validates_the_extension_of_uploaded_files()
     {
         Bus::fake(); // Otherwise the temp file is deleted by DeleteTemporaryFiles right after submission.
