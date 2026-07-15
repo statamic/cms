@@ -15,6 +15,7 @@
         :name="name"
         :id="id"
         :direction="config.direction"
+        :input-attrs="{ dir: contentDirection }"
         @update:model-value="inputUpdated"
         @focus="$emit('focus')"
         @blur="$emit('blur')"
@@ -25,6 +26,7 @@
 import Fieldtype from '@/components/fieldtypes/fieldtype.js';
 import { Input } from '@/components/ui';
 import { computed } from 'vue';
+import { useContentDirection } from '@/composables/content-direction';
 
 const emit = defineEmits(Fieldtype.emits);
 const props = defineProps(Fieldtype.props);
@@ -35,6 +37,8 @@ const {
     updateDebounced,
     expose
 } = Fieldtype.use(emit, props);
+
+const { direction: contentDirection } = useContentDirection();
 
 const shouldFocus = computed(() => {
     if (props.config.focus === false || props.config.focus === true) {
