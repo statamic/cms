@@ -47,6 +47,34 @@ class DeleteTemporaryFilesTest extends TestCase
     }
 
     #[Test]
+    public function it_deletes_the_temporary_folder_for_a_form_with_only_store_true_fields()
+    {
+        Storage::fake('local');
+
+        $form = tap(Form::make('contact')->formFields([
+            'sections' => [
+                ['fields' => [
+                    ['handle' => 'avatar', 'field' => ['type' => 'upload', 'store' => true, 'max_files' => 1]],
+                ]],
+            ],
+        ]))->save();
+
+        $submission = tap($form->makeSubmission())->save();
+
+        // Simulates an abandoned partial: the upload landed in temporary storage but was never
+        // promoted to a real asset because the submission was never finalized.
+        $avatarPath = FormFileUpload::field(['handle' => 'avatar', 'max_files' => 1], $submission->id())
+            ->upload([UploadedFile::fake()->image('avatar.jpg')]);
+
+        $submission->set('avatar', $avatarPath)->save();
+
+        (new DeleteTemporaryFiles($submission))->handle();
+
+        Storage::disk('local')->assertMissing('statamic/form-uploads/'.$avatarPath);
+        Storage::disk('local')->assertDirectoryEmpty('statamic/form-uploads/'.$submission->id());
+    }
+
+    #[Test]
     public function it_removes_store_false_field_values_but_keeps_store_true_ones()
     {
         Storage::fake('local');

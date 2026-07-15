@@ -57,6 +57,6 @@ class SendEmails
     private function shouldDeleteTemporaryFiles(): bool
     {
         return $this->submission->form()->blueprint()->fields()->all()
-            ->contains(fn (Field $field) => $field->type() === 'files' || ($field->type() === 'form_upload' && ! $field->fieldtype()->config('store')));
+            ->contains(fn (Field $field) => in_array($field->type(), ['files', 'form_upload']));
     }
 }

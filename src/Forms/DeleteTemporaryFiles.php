@@ -22,14 +22,9 @@ class DeleteTemporaryFiles implements ShouldQueue
 
     public function handle(): void
     {
-        $uploadFields = $this->submission->form()->blueprint()->fields()->all()
-            ->filter(fn (Field $field) => $field->type() === 'files' || ($field->type() === 'form_upload' && ! $field->fieldtype()->config('store')));
+        $fields = $this->submission->form()->blueprint()->fields()->all();
 
-        if ($uploadFields->isEmpty()) {
-            return;
-        }
-
-        $uploadFields->filter(fn (Field $field) => $field->type() === 'files')->each(function (Field $field): void {
+        $fields->filter(fn (Field $field) => $field->type() === 'files')->each(function (Field $field): void {
             Collection::wrap($this->submission->get($field->handle(), []))
                 ->reject(fn ($path) => str_contains($path, '..'))
                 ->each(fn ($path) => Storage::disk('local')->delete('statamic/file-uploads/'.$path));
@@ -39,9 +34,12 @@ class DeleteTemporaryFiles implements ShouldQueue
             Storage::disk('local')->deleteDirectory($uploadsPath);
         }
 
-        $uploadFields->each(fn (Field $field) => $this->submission->remove($field->handle()));
+        $removed = $fields
+            ->filter(fn (Field $field) => $field->type() === 'files' || ($field->type() === 'form_upload' && ! $field->fieldtype()->config('store')))
+            ->each(fn (Field $field) => $this->submission->remove($field->handle()))
+            ->isNotEmpty();
 
-        if ($this->submission->form()->store()) {
+        if ($removed && $this->submission->form()->store()) {
             $this->submission->saveQuietly();
         }
     }
