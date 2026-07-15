@@ -41,7 +41,7 @@ class Upload extends FormFieldtype
             ],
             'min_files' => [
                 'display' => __('Min Files'),
-                'instructions' => __('The minimum number of files that may be uploaded.'),
+                'instructions' => __('The minimum number of files that must be uploaded.'),
                 'type' => 'integer',
                 'min' => 1,
             ],
