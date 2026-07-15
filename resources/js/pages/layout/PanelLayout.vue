@@ -11,7 +11,7 @@ const left = {
     ref: useTemplateRef('leftPanel'),
     active: ref(false),
     edge: 'right',
-    defaults: [minWidth, 220, 300],
+    defaults: [minWidth, 270, 300],
     storageKey: 'statamic.panels.left-width',
 };
 
