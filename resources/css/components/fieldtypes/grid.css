@@ -88,6 +88,11 @@
             .grid-cell :is(.replicator-fieldtype, .bard-fieldtype, .group-fieldtype) :is([data-ui-field-header], [data-ui-label], [data-ui-description]) {
                 @apply block;
             }
+
+            /* ...unless that container fieldtype has its own nested Grid cell, whose direct labels should stay hidden per the rule above. */
+            .grid-cell :is(.replicator-fieldtype, .bard-fieldtype, .group-fieldtype) .grid-cell :is([data-ui-field-header], [data-ui-label], [data-ui-description]) {
+                @apply hidden;
+            }
         }
 
         tbody .grid-row-controls {
