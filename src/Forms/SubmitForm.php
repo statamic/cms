@@ -196,12 +196,9 @@ class SubmitForm
         $files = $this->normalizeFiles($files);
         $fields = $this->form->blueprint()->fields()->addValues(array_merge($data, $files));
 
-        $validator = $fields
-            ->validator()
-            ->withRules($this->extraRules($fields, $files))
-            ->validator();
+        $validator = $fields->validator()->validator();
 
-        $validator->setRules($this->withoutRulesForAlreadyUploadedFiles($validator->getRulesWithoutPlaceholders(), $fields, $files));
+        $validator->setRules($this->withFileUploadRules($validator->getRulesWithoutPlaceholders(), $fields, $files));
 
         if (! $only && $this->page) {
             $only = $this->fieldHandles($this->page);
@@ -214,25 +211,46 @@ class SubmitForm
         $this->withLocale($this->site()?->lang(), fn () => $validator->validate());
     }
 
-    private function extraRules($fields, array $files): array
+    private function withFileUploadRules(array $rules, $fields, array $files): array
     {
         return $fields->all()
             ->filter(fn ($field): bool => in_array($field->fieldtype()->handle(), ['assets', 'files', 'form_upload']))
-            // Only validate as a file when one was actually uploaded in this request.
-            // Resubmitting a page whose file was uploaded earlier just resends its path,
-            // which isn't a file and shouldn't be re-validated as though it were one.
-            ->filter(fn ($field): bool => array_key_exists($field->handle(), $files))
-            ->mapWithKeys(function ($field): array {
-                $isStoredAsAsset = $field->fieldtype()->handle() === 'assets'
-                    || ($field->fieldtype()->handle() === 'form_upload' && $field->fieldtype()->config('store'));
+            ->reduce(function ($rules, $field) use ($files) {
+                $handle = $field->handle();
 
-                $rules = $isStoredAsAsset
-                    ? array_merge(['file', new AllowedFile], $this->assetContainerRules($field))
-                    : ['file', new AllowedFile($field->fieldtype()->config('allowed_extensions'))];
+                // Freshly uploaded files should be validated as files.
+                if (array_key_exists($handle, $files)) {
+                    $shouldBeStoredAsAsset = $field->fieldtype()->handle() === 'assets'
+                        || ($field->fieldtype()->handle() === 'form_upload' && $field->fieldtype()->config('store'));
 
-                return [$field->handle().'.*' => $rules];
-            })
-            ->all();
+                    $fileRules = $shouldBeStoredAsAsset
+                        ? array_merge(['file', new AllowedFile], $this->assetContainerRules($field))
+                        : ['file', new AllowedFile($field->fieldtype()->config('allowed_extensions'))];
+
+                    $rules["{$handle}.*"] = collect($rules["{$handle}.*"] ?? [])
+                        ->merge($fileRules)
+                        ->unique()
+                        ->values()
+                        ->all();
+
+                    return $rules;
+                }
+
+                // A carried-over value that's still an array (eg. removing one of several files without
+                // uploading a new one) should keep being validated normally. Only a `max_files: 1` field's
+                // collapsed scalar value needs the array/max/min rules skipped, since it was never a fresh
+                // upload to begin with.
+                if (is_array($field->value()) || ! isset($rules[$handle])) {
+                    return $rules;
+                }
+
+                $rules[$handle] = collect($rules[$handle])
+                    ->reject(fn ($rule) => $rule === 'array' || str_starts_with($rule, 'max:') || str_starts_with($rule, 'min:'))
+                    ->values()
+                    ->all();
+
+                return $rules;
+            }, $rules);
     }
 
     private function assetContainerRules($field): array
@@ -246,27 +264,6 @@ class SubmitForm
         return collect($container?->validationRules())
             ->map(fn ($rule) => FieldValidator::parse($rule))
             ->all();
-    }
-
-    private function withoutRulesForAlreadyUploadedFiles(array $rules, $fields, array $files): array
-    {
-        return $fields->all()
-            ->filter(fn ($field): bool => in_array($field->fieldtype()->handle(), ['assets', 'files', 'form_upload']))
-            ->filter(fn ($field): bool => ! array_key_exists($field->handle(), $files))
-            ->reduce(function ($rules, $field) {
-                $handle = $field->handle();
-
-                if (! isset($rules[$handle])) {
-                    return $rules;
-                }
-
-                $rules[$handle] = collect($rules[$handle])
-                    ->reject(fn ($rule) => $rule === 'array' || str_starts_with($rule, 'max:') || str_starts_with($rule, 'min:'))
-                    ->values()
-                    ->all();
-
-                return $rules;
-            }, $rules);
     }
 
     private function filterRules(array $rules, array $only): array
