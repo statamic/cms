@@ -201,6 +201,8 @@ class SubmitForm
             ->withRules($this->extraRules($fields, $files))
             ->validator();
 
+        $validator->setRules($this->withoutRulesForAlreadyUploadedFiles($validator->getRulesWithoutPlaceholders(), $fields, $files));
+
         if (! $only && $this->page) {
             $only = $this->fieldHandles($this->page);
         }
@@ -244,6 +246,27 @@ class SubmitForm
         return collect($container?->validationRules())
             ->map(fn ($rule) => FieldValidator::parse($rule))
             ->all();
+    }
+
+    private function withoutRulesForAlreadyUploadedFiles(array $rules, $fields, array $files): array
+    {
+        return $fields->all()
+            ->filter(fn ($field): bool => in_array($field->fieldtype()->handle(), ['assets', 'files', 'form_upload']))
+            ->filter(fn ($field): bool => ! array_key_exists($field->handle(), $files))
+            ->reduce(function ($rules, $field) {
+                $handle = $field->handle();
+
+                if (! isset($rules[$handle])) {
+                    return $rules;
+                }
+
+                $rules[$handle] = collect($rules[$handle])
+                    ->reject(fn ($rule) => $rule === 'array' || str_starts_with($rule, 'max:') || str_starts_with($rule, 'min:'))
+                    ->values()
+                    ->all();
+
+                return $rules;
+            }, $rules);
     }
 
     private function filterRules(array $rules, array $only): array

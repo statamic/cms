@@ -364,12 +364,74 @@ class SubmitFormTest extends TestCase
     }
 
     #[Test]
-    public function it_does_not_revalidate_an_already_uploaded_file_when_resubmitting_its_page()
+    public function it_does_not_revalidate_already_uploaded_files_when_resubmitting_their_page()
     {
         Storage::fake('avatars');
         AssetContainer::make('avatars')->disk('avatars')->save();
 
-        $form = $this->uploadForm();
+        $form = tap(Form::make('uploads')->formFields([
+            'pages' => [
+                [
+                    'id' => 'main',
+                    'sections' => [
+                        ['fields' => [
+                            ['handle' => 'email', 'field' => ['type' => 'email']],
+                            ['handle' => 'avatar', 'field' => ['type' => 'upload', 'store' => true, 'container' => 'avatars']],
+                            ['handle' => 'headshot', 'field' => ['type' => 'upload', 'store' => true, 'container' => 'avatars', 'max_files' => 1]],
+                        ]],
+                    ],
+                ],
+            ],
+        ]))->save();
+
+        $first = app(SubmitForm::class)
+            ->form($form)
+            ->page('main')
+            ->submit(
+                data: ['email' => 'test@example.com'],
+                files: [
+                    'avatar' => [UploadedFile::fake()->image('avatar.jpg')],
+                    'headshot' => [UploadedFile::fake()->image('headshot.jpg')],
+                ],
+            );
+
+        // Going back to the page and resubmitting resends each field's already-resolved value:
+        // an array for `avatar` (no max_files), a plain string for `headshot` (max_files: 1).
+        // Neither should be revalidated as though it were a fresh upload.
+        $result = app(SubmitForm::class)
+            ->form($form)
+            ->page('main')
+            ->resume($first->submission)
+            ->submit(data: [
+                'email' => 'test@example.com',
+                'avatar' => $first->submission->get('avatar'),
+                'headshot' => $first->submission->get('headshot'),
+            ]);
+
+        $this->assertTrue($result->isFinalized());
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function it_still_validates_a_freshly_uploaded_file_when_resubmitting_its_page()
+    {
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $form = tap(Form::make('uploads')->formFields([
+            'pages' => [
+                [
+                    'id' => 'main',
+                    'sections' => [
+                        ['fields' => [
+                            ['handle' => 'email', 'field' => ['type' => 'email']],
+                            ['handle' => 'avatar', 'field' => ['type' => 'upload', 'store' => true, 'container' => 'avatars', 'max_files' => 1]],
+                        ]],
+                    ],
+                ],
+            ],
+        ]))->save();
 
         $first = app(SubmitForm::class)
             ->form($form)
@@ -379,15 +441,22 @@ class SubmitFormTest extends TestCase
                 files: ['avatar' => [UploadedFile::fake()->image('avatar.jpg')]],
             );
 
-        // Going back to the page and resubmitting resends the already-resolved asset path as a
-        // plain string rather than a fresh upload. That shouldn't be revalidated as a file.
-        $result = app(SubmitForm::class)
-            ->form($form)
-            ->page('main')
-            ->resume($first->submission)
-            ->submit(data: ['email' => 'test@example.com', 'avatar' => $first->submission->get('avatar')]);
+        // Resubmitting with a genuinely new file should still be validated as a fresh upload,
+        // not skipped the way an already-uploaded field's carried-over value is.
+        try {
+            app(SubmitForm::class)
+                ->form($form)
+                ->page('main')
+                ->resume($first->submission)
+                ->submit(
+                    data: ['email' => 'test@example.com'],
+                    files: ['avatar' => [UploadedFile::fake()->create('virus.php', 10)]],
+                );
 
-        $this->assertTrue($result->isFinalized());
+            $this->fail('Expected ValidationException was not thrown');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('avatar.0', $e->errors());
+        }
 
         $form->submissions()->each->delete();
     }
