@@ -150,8 +150,8 @@ class Email extends Mailable
             return;
         }
 
-        $disk = config('statamic.system.file_uploads.disk', 'local');
-        $basePath = config('statamic.system.file_uploads.path', 'statamic/file-uploads');
+        $disk = config('statamic.system.file_uploads_disk', 'local');
+        $basePath = config('statamic.system.file_uploads_path', 'statamic/file-uploads');
 
         foreach ($value as $file) {
             $this->attachFromStorageDisk($disk, $basePath.'/'.$file);

@@ -30,7 +30,7 @@ class FileUploader extends Uploader
 
     protected function uploadPathPrefix()
     {
-        return config('statamic.system.file_uploads.path', 'statamic/file-uploads').'/';
+        return config('statamic.system.file_uploads_path', 'statamic/file-uploads').'/';
     }
 
     protected function preset()
@@ -40,6 +40,6 @@ class FileUploader extends Uploader
 
     protected function disk()
     {
-        return Storage::disk(config('statamic.system.file_uploads.disk', 'local'));
+        return Storage::disk(config('statamic.system.file_uploads_disk', 'local'));
     }
 }

@@ -34,7 +34,7 @@ class ReplacementFileTest extends TestCase
     #[Test]
     public function it_reads_from_configured_disk()
     {
-        config(['statamic.system.file_uploads.disk' => 'uploads']);
+        config(['statamic.system.file_uploads_disk' => 'uploads']);
 
         $originDisk = Storage::fake('uploads');
         $targetDisk = Storage::fake('target');
