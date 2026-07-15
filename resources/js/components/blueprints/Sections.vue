@@ -21,8 +21,7 @@
             <div class="blueprint-add-section-container w-full">
                 <button class="blueprint-add-section-button" @click="addAndEditSection">
                     <div class="flex items-center gap-2">
-                        <ui-icon name="plus" class="size-4" />
-                        <div v-text="addSectionText" />
+                        <div v-text="addSectionText" class="text-sm text-gray-600 dark:text-gray-400" />
                     </div>
                 </button>
             </div>
@@ -52,7 +51,7 @@ export default {
         },
         addSectionText: {
             type: String,
-            default: () => __('Add Section'),
+            default: () => __('Drag fields here to create a new set'),
         },
         editSectionText: {
             type: String,

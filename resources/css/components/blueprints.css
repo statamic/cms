@@ -20,7 +20,7 @@
 }
 
 .blueprint-add-section-container {
-    @apply flex min-h-40 p-2;
+    @apply flex min-h-32 p-2;
 
     .draggable-container--is-dragging & {
         display: none;
@@ -28,7 +28,7 @@
 }
 
 .blueprint-add-section-button {
-    @apply relative flex w-full items-center justify-center rounded-lg border border-dashed border-gray-500 text-gray-700 dark:border-gray-500 dark:text-gray-300;
+    @apply relative flex w-full items-center justify-center rounded-xl border border-dashed border-gray-400 dark:border-gray-600 text-gray-700 dark:text-gray-300;
 
     &:hover {
         @apply border-gray text-gray-925 dark:border-gray-400 dark:text-gray-200;
