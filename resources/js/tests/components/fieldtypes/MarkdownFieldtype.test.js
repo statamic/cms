@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils';
 import { expect, test } from 'vitest';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import * as Globals from '@/bootstrap/globals';
 import MarkdownFieldtype from '@/components/fieldtypes/markdown/MarkdownFieldtype.vue';
 import { containerContextKey } from '@/components/ui/Publish/Container.vue';
@@ -9,10 +9,8 @@ Object.keys(Globals).forEach((fn) => (window[fn] = Globals[fn]));
 window.cp_url = (url) => url;
 window.__ = (key) => key;
 
-test('the editable surface gets content direction while chrome does not', async () => {
-    document.documentElement.setAttribute('dir', 'ltr');
-
-    const wrapper = mount(MarkdownFieldtype, {
+function mountField(direction) {
+    return mount(MarkdownFieldtype, {
         props: {
             value: 'hello world',
             handle: 'markdown',
@@ -27,18 +25,38 @@ test('the editable surface gets content direction while chrome does not', async 
                 $events: { $on: () => {}, $off: () => {} },
             },
             provide: {
-                [containerContextKey]: {
-                    direction: computed(() => 'rtl'),
-                },
+                [containerContextKey]: { direction },
             },
         },
     });
+}
 
+test('chrome does not get an explicit content direction', async () => {
+    document.documentElement.setAttribute('dir', 'ltr');
+
+    const wrapper = mountField(computed(() => 'rtl'));
     await wrapper.vm.$nextTick();
-
-    const editor = wrapper.find('.editor');
-    expect(editor.attributes('dir')).toBe('rtl');
 
     const cheatsheetButton = wrapper.find('[aria-label="Show Markdown Cheatsheet"]');
     expect(cheatsheetButton.attributes('dir')).toBeUndefined();
+});
+
+test('the CodeMirror instance is initialized with the content direction', async () => {
+    const wrapper = mountField(ref('rtl'));
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.vm.codemirror.getOption('direction')).toBe('rtl');
+});
+
+test('the CodeMirror instance reacts to content direction changes', async () => {
+    const direction = ref('ltr');
+    const wrapper = mountField(direction);
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.vm.codemirror.getOption('direction')).toBe('ltr');
+
+    direction.value = 'rtl';
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.vm.codemirror.getOption('direction')).toBe('rtl');
 });
