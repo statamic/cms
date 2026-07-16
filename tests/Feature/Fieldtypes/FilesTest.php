@@ -97,6 +97,35 @@ class FilesTest extends TestCase
     }
 
     #[Test]
+    public function it_uploads_a_file_to_the_configured_disk_and_path()
+    {
+        config([
+            'statamic.system.file_uploads_disk' => 'uploads',
+            'statamic.system.file_uploads_path' => 'temp-uploads',
+        ]);
+
+        $localDisk = Storage::fake('local');
+        $uploadsDisk = Storage::fake('uploads');
+
+        $file = UploadedFile::fake()->create('test.txt');
+
+        Date::setTestNow(Date::createFromTimestamp(1671484636, config('app.timezone')));
+
+        $this
+            ->actingAs(tap(User::make()->makeSuper())->save())
+            ->post('/cp/fieldtypes/files/upload', ['file' => $file])
+            ->assertOk()
+            ->assertJson([
+                'data' => [
+                    'id' => '1671484636/test.txt',
+                ],
+            ]);
+
+        $uploadsDisk->assertExists('temp-uploads/1671484636/test.txt');
+        $localDisk->assertMissing('statamic/file-uploads/1671484636/test.txt');
+    }
+
+    #[Test]
     public function it_replaces_dimensions_rule()
     {
         $replaced = $this->fieldtype(['validate' => ['dimensions:width=180,height=180']])->fieldRules();
