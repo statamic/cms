@@ -8,6 +8,7 @@ use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Forms\Form;
 use Statamic\Contracts\Globals\Variables;
+use Statamic\Contracts\Routing\UrlBuilder;
 use Statamic\Contracts\Structures\Nav;
 use Statamic\Contracts\Structures\NavTree;
 use Statamic\Facades\Antlers;
@@ -32,6 +33,11 @@ class DefaultInvalidator implements Invalidator
 
     public function invalidate($item)
     {
+        // Old URLs no longer resolve so they cannot be recached, only invalidated.
+        if ($this->refreshing && ($oldUrls = $this->getItemOldUrls($item))) {
+            $this->cacher->invalidateUrls($oldUrls);
+        }
+
         if ($this->rules === 'all') {
             $this->refreshing
                 ? $this->cacher->refreshUrls($this->cacher->getUrls()->all())
@@ -44,7 +50,7 @@ class DefaultInvalidator implements Invalidator
 
         $this->refreshing
             ? $this->cacher->refreshUrls($urls)
-            : $this->cacher->invalidateUrls($urls);
+            : $this->cacher->invalidateUrls([...$urls, ...$this->getItemOldUrls($item)]);
     }
 
     public function refresh($item)
@@ -90,6 +96,32 @@ class DefaultInvalidator implements Invalidator
         }
 
         return $urls;
+    }
+
+    protected function getItemOldUrls($item)
+    {
+        return $item instanceof Entry ? $this->getOldEntryUrls($item) : [];
+    }
+
+    protected function getOldEntryUrls($entry)
+    {
+        if (
+            is_null($originalSlug = $entry->getOriginal('slug'))
+            || $originalSlug === $entry->slug()
+            || ! ($route = $entry->route())
+        ) {
+            return [];
+        }
+
+        $uri = app(UrlBuilder::class)->content($entry)->merge([
+            'parent_uri' => $entry->parent()?->uri(),
+            'slug' => $originalSlug,
+        ])->build($route);
+
+        $oldUrl = URL::tidy($entry->site()->url().'/'.$uri);
+
+        // Anything cached under the old URL (descendants, mounted collections) is stale too.
+        return [$oldUrl, Str::finish($oldUrl, '/').'*'];
     }
 
     protected function getFormUrls($form)
