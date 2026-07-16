@@ -159,7 +159,7 @@ class SendEmailsTest extends TestCase
 
         $submission = $form->makeSubmission()->data(['attachments' => ['1234567/file.txt']]);
 
-        (new DeleteTemporaryAttachments($submission))->handle();
+        (new DeleteTemporaryFiles($submission))->handle();
 
         $uploadsDisk->assertMissing('temp-uploads/1234567/file.txt');
         $localDisk->assertExists('statamic/file-uploads/1234567/file.txt');

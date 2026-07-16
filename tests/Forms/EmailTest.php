@@ -283,6 +283,33 @@ class EmailTest extends TestCase
     }
 
     #[Test]
+    public function it_attaches_temporary_file_upload_from_the_configured_disk_and_path()
+    {
+        config([
+            'statamic.system.file_uploads_disk' => 'uploads',
+            'statamic.forms.file_uploads_path' => 'temp-form-uploads',
+        ]);
+
+        Storage::fake('local');
+        Storage::fake('uploads');
+
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'document', 'field' => ['type' => 'upload', 'store' => false, 'max_files' => 1]],
+            ],
+        ]))->save();
+
+        $submission = $form->makeSubmission();
+        $path = FormFileUpload::field(['handle' => 'document', 'max_files' => 1], $submission->id())
+            ->upload([UploadedFile::fake()->create('resume.pdf', 10)]);
+        $submission->data(['document' => $path]);
+
+        $email = tap(new Email($submission, ['to' => 'test@test.com', 'attachments' => true], Site::default()))->build();
+
+        $this->assertTrue($email->hasAttachmentFromStorageDisk('uploads', 'temp-form-uploads/'.$path));
+    }
+
+    #[Test]
     public function it_attaches_files_from_assets_field()
     {
         Storage::fake('avatars');
@@ -322,6 +349,33 @@ class EmailTest extends TestCase
         $email = tap(new Email($submission, ['to' => 'test@test.com', 'attachments' => true], Site::default()))->build();
 
         $this->assertTrue($email->hasAttachmentFromStorageDisk('local', 'statamic/file-uploads/'.$documentPath));
+    }
+
+    #[Test]
+    public function it_attaches_files_from_files_field_on_the_configured_disk_and_path()
+    {
+        config([
+            'statamic.system.file_uploads_disk' => 'uploads',
+            'statamic.system.file_uploads_path' => 'temp-uploads',
+        ]);
+
+        Storage::fake('local');
+        $uploadsDisk = Storage::fake('uploads');
+
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'document', 'field' => ['type' => 'files', 'max_files' => 1]],
+            ],
+        ]))->save();
+
+        $documentPath = now()->timestamp.'/resume.pdf';
+        $uploadsDisk->put('temp-uploads/'.$documentPath, 'contents');
+
+        $submission = $form->makeSubmission()->data(['document' => $documentPath]);
+
+        $email = tap(new Email($submission, ['to' => 'test@test.com', 'attachments' => true], Site::default()))->build();
+
+        $this->assertTrue($email->hasAttachmentFromStorageDisk('uploads', 'temp-uploads/'.$documentPath));
     }
 
     #[Test]

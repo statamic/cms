@@ -2,7 +2,6 @@
 
 namespace Statamic\Forms\Uploaders;
 
-use Illuminate\Support\Facades\Storage;
 use Statamic\Assets\FileUploader;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -35,7 +34,7 @@ class FormFileUploader extends FileUploader
         $suffix = $count ? "-{$count}" : '';
         $candidate = $basename.$suffix.($extension ? ".{$extension}" : '');
 
-        if (Storage::disk('local')->exists($this->uploadPathPrefix()."{$directory}/{$candidate}")) {
+        if ($this->disk()->exists($this->uploadPathPrefix()."{$directory}/{$candidate}")) {
             return $this->uniqueFilename($directory, $filename, $count + 1);
         }
 
@@ -44,6 +43,6 @@ class FormFileUploader extends FileUploader
 
     protected function uploadPathPrefix()
     {
-        return 'statamic/form-uploads/';
+        return config('statamic.forms.file_uploads_path', 'statamic/form-uploads').'/';
     }
 }

@@ -50,6 +50,41 @@ class CreateAssetsFromFileUploadsTest extends TestCase
     }
 
     #[Test]
+    public function it_creates_an_asset_from_a_temporary_file_on_the_configured_disk_and_path()
+    {
+        config([
+            'statamic.system.file_uploads_disk' => 'uploads',
+            'statamic.forms.file_uploads_path' => 'temp-form-uploads',
+        ]);
+
+        Storage::fake('local');
+        $uploadsDisk = Storage::fake('uploads');
+        $this->fakeAvatarsContainer();
+
+        $form = tap(Form::make('contact')->formFields([
+            'sections' => [
+                ['fields' => [
+                    ['handle' => 'avatar', 'field' => ['type' => 'upload', 'store' => true, 'container' => 'avatars', 'max_files' => 1]],
+                ]],
+            ],
+        ]))->save();
+
+        $submission = tap($form->makeSubmission())->save();
+
+        $path = FormFileUpload::field(['handle' => 'avatar', 'max_files' => 1], $submission->id())
+            ->upload([UploadedFile::fake()->image('avatar.jpg')]);
+
+        $submission->set('avatar', $path)->save();
+
+        (new CreateAssetsFromFileUploads($submission))->handle();
+
+        $uploadsDisk->assertMissing('temp-form-uploads/'.$path);
+        Storage::disk('avatars')->assertExists('avatar.jpg');
+
+        $this->assertNotNull(Asset::find('avatars::'.$form->submission($submission->id())->get('avatar')));
+    }
+
+    #[Test]
     public function it_creates_assets_from_multiple_temporary_files()
     {
         Storage::fake('local');

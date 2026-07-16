@@ -23,15 +23,19 @@ class DeleteTemporaryFiles implements ShouldQueue
     public function handle(): void
     {
         $fields = $this->submission->form()->blueprint()->fields()->all();
+        $disk = Storage::disk(config('statamic.system.file_uploads_disk', 'local'));
+        $basePath = config('statamic.forms.file_uploads_path', 'statamic/form-uploads');
 
-        $fields->filter(fn (Field $field) => $field->type() === 'files')->each(function (Field $field): void {
+        $fields->filter(fn (Field $field) => $field->type() === 'files')->each(function (Field $field) use ($disk): void {
+            $fileUploadsPath = config('statamic.system.file_uploads_path', 'statamic/file-uploads');
+
             Collection::wrap($this->submission->get($field->handle(), []))
                 ->reject(fn ($path) => str_contains($path, '..'))
-                ->each(fn ($path) => Storage::disk('local')->delete('statamic/file-uploads/'.$path));
+                ->each(fn ($path) => $disk->delete("{$fileUploadsPath}/".$path));
         });
 
-        if (Storage::disk('local')->exists($uploadsPath = "statamic/form-uploads/{$this->submission->id()}")) {
-            Storage::disk('local')->deleteDirectory($uploadsPath);
+        if ($disk->exists($uploadsPath = "{$basePath}/{$this->submission->id()}")) {
+            $disk->deleteDirectory($uploadsPath);
         }
 
         $removed = $fields

@@ -154,10 +154,14 @@ class Email extends Mailable
             return;
         }
 
-        $prefix = $field['fieldtype'] === 'form_upload' ? 'statamic/form-uploads/' : 'statamic/file-uploads/';
+        $disk = config('statamic.system.file_uploads_disk', 'local');
+
+        $basePath = $field['fieldtype'] === 'form_upload'
+            ? config('statamic.forms.file_uploads_path', 'statamic/form-uploads')
+            : config('statamic.system.file_uploads_path', 'statamic/file-uploads');
 
         foreach ($value as $file) {
-            $this->attachFromStorageDisk('local', $prefix.$file);
+            $this->attachFromStorageDisk($disk, $basePath.'/'.$file);
         }
     }
 

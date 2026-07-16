@@ -15,6 +15,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | File Uploads Path
+    |--------------------------------------------------------------------------
+    |
+    | The path (on the file uploads disk) where file uploads are stored
+    | before they're converted to an asset or deleted.
+    |
+    */
+
+    'file_uploads_path' => env('STATAMIC_FORM_UPLOADS_PATH', 'statamic/form-uploads'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Email View Folder
     |--------------------------------------------------------------------------
     |

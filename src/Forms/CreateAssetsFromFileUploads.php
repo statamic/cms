@@ -67,16 +67,18 @@ class CreateAssetsFromFileUploads implements ShouldQueue
 
     private function uploadAsset(Field $field, string $path): ?string
     {
-        $diskPath = "statamic/form-uploads/{$this->submission->id()}/{$field->handle()}/".basename($path);
+        $disk = Storage::disk(config('statamic.system.file_uploads_disk', 'local'));
+        $basePath = config('statamic.forms.file_uploads_path', 'statamic/form-uploads');
+        $diskPath = "{$basePath}/{$this->submission->id()}/{$field->handle()}/".basename($path);
 
-        if (! Storage::disk('local')->exists($diskPath)) {
+        if (! $disk->exists($diskPath)) {
             return null;
         }
 
         $uploadedFile = new UploadedFile(
-            Storage::disk('local')->path($diskPath),
+            $disk->path($diskPath),
             basename($path),
-            Storage::disk('local')->mimeType($diskPath),
+            $disk->mimeType($diskPath),
             null,
             true
         );
@@ -84,7 +86,7 @@ class CreateAssetsFromFileUploads implements ShouldQueue
         $assetId = AssetsUploader::field($field->toArray())->upload($uploadedFile);
         $assetId = is_array($assetId) ? $assetId[0] : $assetId;
 
-        Storage::disk('local')->delete($diskPath);
+        $disk->delete($diskPath);
 
         return Asset::findOrFail($assetId)->path();
     }

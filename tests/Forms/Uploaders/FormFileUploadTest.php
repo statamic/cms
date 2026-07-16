@@ -94,4 +94,61 @@ class FormFileUploadTest extends TestCase
         Storage::disk('local')->assertExists('statamic/form-uploads/submission-123/documents/resume-1.pdf');
         Storage::disk('local')->assertExists('statamic/form-uploads/submission-123/documents/resume-2.pdf');
     }
+
+    #[Test]
+    public function it_writes_to_the_configured_disk()
+    {
+        config(['statamic.system.file_uploads_disk' => 'uploads']);
+
+        $localDisk = Storage::fake('local');
+        $uploadsDisk = Storage::fake('uploads');
+
+        FormFileUpload::field(['handle' => 'document', 'max_files' => 1], 'submission-123')
+            ->upload([UploadedFile::fake()->create('resume.pdf', 10)]);
+
+        $uploadsDisk->assertExists('statamic/form-uploads/submission-123/document/resume.pdf');
+        $localDisk->assertMissing('statamic/form-uploads/submission-123/document/resume.pdf');
+    }
+
+    #[Test]
+    public function it_writes_to_the_configured_path()
+    {
+        config(['statamic.forms.file_uploads_path' => 'temp-form-uploads']);
+
+        $localDisk = Storage::fake('local');
+
+        $path = FormFileUpload::field(['handle' => 'document', 'max_files' => 1], 'submission-123')
+            ->upload([UploadedFile::fake()->create('resume.pdf', 10)]);
+
+        $this->assertEquals('submission-123/document/resume.pdf', $path);
+
+        $localDisk->assertExists('temp-form-uploads/submission-123/document/resume.pdf');
+        $localDisk->assertMissing('statamic/form-uploads/submission-123/document/resume.pdf');
+    }
+
+    #[Test]
+    public function it_suffixes_duplicates_on_the_configured_disk_and_path()
+    {
+        config([
+            'statamic.system.file_uploads_disk' => 'uploads',
+            'statamic.forms.file_uploads_path' => 'temp-form-uploads',
+        ]);
+
+        Storage::fake('local');
+        $uploadsDisk = Storage::fake('uploads');
+
+        $paths = FormFileUpload::field(['handle' => 'documents', 'max_files' => 2], 'submission-123')
+            ->upload([
+                UploadedFile::fake()->create('resume.pdf', 10),
+                UploadedFile::fake()->create('resume.pdf', 10),
+            ]);
+
+        $this->assertEquals([
+            'submission-123/documents/resume.pdf',
+            'submission-123/documents/resume-1.pdf',
+        ], $paths);
+
+        $uploadsDisk->assertExists('temp-form-uploads/submission-123/documents/resume.pdf');
+        $uploadsDisk->assertExists('temp-form-uploads/submission-123/documents/resume-1.pdf');
+    }
 }

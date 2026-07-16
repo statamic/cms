@@ -154,6 +154,73 @@ class DeleteTemporaryFilesTest extends TestCase
     }
 
     #[Test]
+    public function it_deletes_the_temporary_storage_folder_from_the_configured_disk_and_path()
+    {
+        config([
+            'statamic.system.file_uploads_disk' => 'uploads',
+            'statamic.forms.file_uploads_path' => 'temp-form-uploads',
+        ]);
+
+        $localDisk = Storage::fake('local');
+        $uploadsDisk = Storage::fake('uploads');
+
+        $form = tap(Form::make('contact')->formFields([
+            'sections' => [
+                ['fields' => [
+                    ['handle' => 'document', 'field' => ['type' => 'upload', 'store' => false, 'max_files' => 1]],
+                ]],
+            ],
+        ]))->save();
+
+        $submission = tap($form->makeSubmission())->save();
+
+        $path = FormFileUpload::field(['handle' => 'document', 'max_files' => 1], $submission->id())
+            ->upload([UploadedFile::fake()->create('resume.pdf', 10)]);
+
+        $submission->set('document', $path)->save();
+
+        $localDisk->put('temp-form-uploads/'.$path, 'contents');
+
+        (new DeleteTemporaryFiles($submission))->handle();
+
+        $uploadsDisk->assertMissing('temp-form-uploads/'.$path);
+        $localDisk->assertExists('temp-form-uploads/'.$path);
+    }
+
+    #[Test]
+    public function it_deletes_files_fieldtype_uploads_from_the_configured_disk_and_path()
+    {
+        config([
+            'statamic.system.file_uploads_disk' => 'uploads',
+            'statamic.system.file_uploads_path' => 'temp-uploads',
+        ]);
+
+        $localDisk = Storage::fake('local');
+        $uploadsDisk = Storage::fake('uploads');
+
+        $form = tap(Form::make('contact')->formFields([
+            'sections' => [
+                ['fields' => [
+                    ['handle' => 'document', 'field' => ['type' => 'files', 'max_files' => 1]],
+                ]],
+            ],
+        ]))->save();
+
+        $submission = tap($form->makeSubmission())->save();
+
+        $path = now()->timestamp.'/resume.pdf';
+        $uploadsDisk->put('temp-uploads/'.$path, 'contents');
+        $localDisk->put('temp-uploads/'.$path, 'contents');
+
+        $submission->set('document', [$path])->save();
+
+        (new DeleteTemporaryFiles($submission))->handle();
+
+        $uploadsDisk->assertMissing('temp-uploads/'.$path);
+        $localDisk->assertExists('temp-uploads/'.$path);
+    }
+
+    #[Test]
     public function it_does_not_delete_asset_files()
     {
         Storage::fake('local');
