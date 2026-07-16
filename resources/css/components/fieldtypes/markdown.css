@@ -46,10 +46,6 @@
     @apply bg-transparent;
 }
 
-.markdown-fieldtype .CodeMirror-rtl pre {
-    direction: rtl;
-}
-
 
 /* Sticky Toolbar
 ========================================================================== */

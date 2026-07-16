@@ -41,52 +41,21 @@ test('chrome does not get an explicit content direction', async () => {
     expect(cheatsheetButton.attributes('dir')).toBeUndefined();
 });
 
-test('the CodeMirror instance is initialized with the content direction', async () => {
+// The editor is source/code-adjacent and is intentionally always ltr,
+// regardless of content direction (see PR #10931 and its revert #10992).
+test('the CodeMirror editor stays ltr regardless of content direction', async () => {
     const wrapper = mountField(ref('rtl'));
-    await wrapper.vm.$nextTick();
-
-    expect(wrapper.vm.codemirror.getOption('direction')).toBe('rtl');
-});
-
-test('the CodeMirror instance reacts to content direction changes', async () => {
-    const direction = ref('ltr');
-    const wrapper = mountField(direction);
     await wrapper.vm.$nextTick();
 
     expect(wrapper.vm.codemirror.getOption('direction')).toBe('ltr');
-
-    direction.value = 'rtl';
-    await wrapper.vm.$nextTick();
-
-    expect(wrapper.vm.codemirror.getOption('direction')).toBe('rtl');
+    expect(wrapper.vm.codemirror.getWrapperElement().getAttribute('dir')).toBeNull();
 });
 
-test('the CodeMirror wrapper gets an explicit dir attribute matching an rtl content direction', async () => {
+test('the preview pane gets the content direction', async () => {
     const wrapper = mountField(ref('rtl'));
     await wrapper.vm.$nextTick();
 
-    expect(wrapper.vm.codemirror.getWrapperElement().getAttribute('dir')).toBe('rtl');
-});
-
-// Regression test: CodeMirror doesn't set an explicit direction on its line
-// elements when ltr, so without an explicit dir on its own wrapper it would
-// inherit an ancestor's dir (e.g. an rtl CP) instead of the content direction.
-test('the CodeMirror wrapper gets an explicit dir attribute matching an ltr content direction', async () => {
-    const wrapper = mountField(ref('ltr'));
-    await wrapper.vm.$nextTick();
-
-    expect(wrapper.vm.codemirror.getWrapperElement().getAttribute('dir')).toBe('ltr');
-});
-
-test('the CodeMirror wrapper dir attribute reacts to content direction changes', async () => {
-    const direction = ref('ltr');
-    const wrapper = mountField(direction);
-    await wrapper.vm.$nextTick();
-
-    expect(wrapper.vm.codemirror.getWrapperElement().getAttribute('dir')).toBe('ltr');
-
-    direction.value = 'rtl';
-    await wrapper.vm.$nextTick();
-
-    expect(wrapper.vm.codemirror.getWrapperElement().getAttribute('dir')).toBe('rtl');
+    // The preview pane is always in the DOM (toggled via v-show), so its
+    // dir attribute can be asserted without switching into preview mode.
+    expect(wrapper.find('.markdown-preview').attributes('dir')).toBe('rtl');
 });

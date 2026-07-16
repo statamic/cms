@@ -291,12 +291,6 @@ export default {
                 this.codemirror.setOption('readOnly', readOnly ? 'nocursor' : false);
             },
         },
-        contentDirection: {
-            handler(direction) {
-                this.codemirror?.setOption('direction', direction);
-                this.codemirror?.getWrapperElement().setAttribute('dir', direction);
-            },
-        },
     },
 
     mounted() {
@@ -668,7 +662,6 @@ export default {
                     mode: 'gfm',
                     dragDrop: false,
                     keyMap: 'sublime',
-                    direction: self.contentDirection,
                     lineWrapping: true,
                     viewportMargin: Infinity,
                     tabindex: 0,
@@ -682,8 +675,6 @@ export default {
                     },
                 }),
             );
-
-            self.codemirror.getWrapperElement().setAttribute('dir', self.contentDirection);
 
                         // Set up floating toolbar event listeners if in floating mode
             if (this.toolbarIsFloating) {
