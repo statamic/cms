@@ -1,0 +1,59 @@
+import { mount } from '@vue/test-utils';
+import { expect, test } from 'vitest';
+import { defineComponent, h } from 'vue';
+import * as Globals from '@/bootstrap/globals';
+import Container from '@/components/ui/Publish/Container.vue';
+import { useContentDirection } from '@/composables/content-direction';
+
+Object.keys(Globals).forEach((fn) => (window[fn] = Globals[fn]));
+window.__ = (key) => key;
+
+window.Statamic = {
+    $config: {
+        get: (key) => (key === 'sites' ? [{ handle: 'default', direction: 'ltr' }] : undefined),
+    },
+    $dirty: { has: () => false, add: () => {}, remove: () => {} },
+    $events: { $emit: () => {} },
+};
+
+const Probe = defineComponent({
+    setup() {
+        const { direction } = useContentDirection();
+        return { direction };
+    },
+    render() {
+        return h('div', { 'data-direction': this.direction });
+    },
+});
+
+test('content direction is unaffected by the CP/document direction when the site has an explicit direction', () => {
+    document.documentElement.setAttribute('dir', 'rtl');
+
+    const wrapper = mount(Container, {
+        props: {
+            blueprint: { tabs: [] },
+            site: 'default',
+        },
+        slots: {
+            default: () => h(Probe),
+        },
+    });
+
+    expect(wrapper.find('[data-direction]').attributes('data-direction')).toBe('ltr');
+});
+
+test('content direction defaults to ltr (not the CP/document direction) when the site cannot be resolved', () => {
+    document.documentElement.setAttribute('dir', 'rtl');
+
+    const wrapper = mount(Container, {
+        props: {
+            blueprint: { tabs: [] },
+            site: 'unknown-site',
+        },
+        slots: {
+            default: () => h(Probe),
+        },
+    });
+
+    expect(wrapper.find('[data-direction]').attributes('data-direction')).toBe('ltr');
+});

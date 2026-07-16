@@ -104,7 +104,7 @@ const meta = ref(props.meta);
 const previews = ref({});
 const localizedFields = ref(props.modifiedFields || []);
 const components = ref([]);
-const direction = computed(() => Statamic.$config.get('sites').find(s => s.handle === props.site)?.direction ?? document.documentElement.dir ?? 'ltr');
+const direction = computed(() => Statamic.$config.get('sites').find(s => s.handle === props.site)?.direction ?? 'ltr');
 
 const visibleValues = computed(() => {
     const omittable = Object.keys(hiddenFields.value).filter(
