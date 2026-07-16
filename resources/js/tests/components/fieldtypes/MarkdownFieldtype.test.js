@@ -60,3 +60,33 @@ test('the CodeMirror instance reacts to content direction changes', async () => 
 
     expect(wrapper.vm.codemirror.getOption('direction')).toBe('rtl');
 });
+
+test('the CodeMirror wrapper gets an explicit dir attribute matching an rtl content direction', async () => {
+    const wrapper = mountField(ref('rtl'));
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.vm.codemirror.getWrapperElement().getAttribute('dir')).toBe('rtl');
+});
+
+// Regression test: CodeMirror doesn't set an explicit direction on its line
+// elements when ltr, so without an explicit dir on its own wrapper it would
+// inherit an ancestor's dir (e.g. an rtl CP) instead of the content direction.
+test('the CodeMirror wrapper gets an explicit dir attribute matching an ltr content direction', async () => {
+    const wrapper = mountField(ref('ltr'));
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.vm.codemirror.getWrapperElement().getAttribute('dir')).toBe('ltr');
+});
+
+test('the CodeMirror wrapper dir attribute reacts to content direction changes', async () => {
+    const direction = ref('ltr');
+    const wrapper = mountField(direction);
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.vm.codemirror.getWrapperElement().getAttribute('dir')).toBe('ltr');
+
+    direction.value = 'rtl';
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.vm.codemirror.getWrapperElement().getAttribute('dir')).toBe('rtl');
+});

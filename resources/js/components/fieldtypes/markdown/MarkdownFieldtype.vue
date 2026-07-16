@@ -294,6 +294,7 @@ export default {
         contentDirection: {
             handler(direction) {
                 this.codemirror?.setOption('direction', direction);
+                this.codemirror?.getWrapperElement().setAttribute('dir', direction);
             },
         },
     },
@@ -681,6 +682,8 @@ export default {
                     },
                 }),
             );
+
+            self.codemirror.getWrapperElement().setAttribute('dir', self.contentDirection);
 
                         // Set up floating toolbar event listeners if in floating mode
             if (this.toolbarIsFloating) {
