@@ -349,7 +349,7 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
      * Get a submission.
      *
      * @param  string  $id
-     * @return Submission
+     * @return Submission|null
      */
     public function submission($id)
     {

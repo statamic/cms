@@ -8,7 +8,7 @@ use Statamic\Contracts\Forms\Submission;
 use Statamic\Forms\Exporters\ExporterRepository;
 
 /**
- * @method static \Statamic\Contracts\Forms\Form find(string $handle)
+ * @method static \Statamic\Contracts\Forms\Form|null find(string $handle)
  * @method static \Statamic\Contracts\Forms\Form findOrFail(string $handle)
  * @method static \Illuminate\Support\Collection all()
  * @method static int count()

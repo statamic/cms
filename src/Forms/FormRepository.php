@@ -22,7 +22,7 @@ class FormRepository implements Contract
      * Find a form.
      *
      * @param  string  $handle
-     * @return FormContract
+     * @return FormContract|null
      */
     public function find($handle)
     {

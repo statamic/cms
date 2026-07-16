@@ -40,7 +40,7 @@ interface Form extends Arrayable
      * Get a submission.
      *
      * @param  string  $id
-     * @return Submission
+     * @return Submission|null
      */
     public function submission($id);
 

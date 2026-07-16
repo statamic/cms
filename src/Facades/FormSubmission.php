@@ -12,7 +12,7 @@ use Statamic\Contracts\Forms\SubmissionRepository;
  * @method static Collection all()
  * @method static Collection whereForm(string $handle)
  * @method static Collection whereInForm(array $handles)
- * @method static SubmissionContract find($id)
+ * @method static SubmissionContract|null find($id)
  * @method static void save(SubmissionContract $submission)
  * @method static void delete(SubmissionContract $submission)
  * @method static SubmissionQueryBuilder query()
