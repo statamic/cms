@@ -368,6 +368,7 @@ class DefaultInvalidatorTest extends TestCase
             $m->shouldReceive('descendants')->andReturn(collect());
             $m->shouldReceive('site')->andReturn(Site::default());
             $m->shouldReceive('parent')->andReturnNull();
+            $m->shouldReceive('getOriginal')->andReturnNull();
             $m->shouldReceive('toAugmentedCollection')
                 ->andReturnSelf()
                 ->shouldReceive('merge')
@@ -422,6 +423,7 @@ class DefaultInvalidatorTest extends TestCase
             $m->shouldReceive('descendants')->andReturn(collect());
             $m->shouldReceive('site')->andReturn(Site::get('fr'));
             $m->shouldReceive('parent')->andReturnNull();
+            $m->shouldReceive('getOriginal')->andReturnNull();
             $m->shouldReceive('toAugmentedCollection')
                 ->andReturnSelf()
                 ->shouldReceive('merge')
@@ -471,6 +473,7 @@ class DefaultInvalidatorTest extends TestCase
             $m->shouldReceive('descendants')->andReturn(collect());
             $m->shouldReceive('site')->andReturn(Site::default());
             $m->shouldReceive('parent')->andReturnNull();
+            $m->shouldReceive('getOriginal')->andReturnNull();
             $m->shouldReceive('toAugmentedCollection')
                 ->andReturnSelf()
                 ->shouldReceive('merge')
@@ -510,6 +513,7 @@ class DefaultInvalidatorTest extends TestCase
             $m->shouldReceive('collectionHandle')->andReturn('blog');
             $m->shouldReceive('descendants')->andReturn(collect());
             $m->shouldReceive('parent')->andReturnNull();
+            $m->shouldReceive('getOriginal')->andReturnNull();
             $m->shouldReceive('site')->andReturn(Site::default());
             $m->shouldReceive('toAugmentedCollection')
                 ->andReturnSelf()
@@ -529,6 +533,68 @@ class DefaultInvalidatorTest extends TestCase
                 ],
             ],
         ]);
+
+        $this->assertNull($invalidator->invalidate($entry));
+    }
+
+    #[Test]
+    public function old_entry_url_is_invalidated_when_the_slug_changes()
+    {
+        $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
+            $cacher->shouldReceive('invalidateUrls')->with([
+                'http://localhost/blog/new-slug',
+                'http://localhost/blog/old-slug',
+                'http://localhost/blog/old-slug/*',
+            ])->once();
+        });
+
+        $entry = tap(Mockery::mock(Entry::class), function ($m) {
+            $m->shouldReceive('isRedirect')->andReturn(false);
+            $m->shouldReceive('absoluteUrl')->andReturn('http://localhost/blog/new-slug');
+            $m->shouldReceive('collectionHandle')->andReturn('blog');
+            $m->shouldReceive('descendants')->andReturn(collect());
+            $m->shouldReceive('site')->andReturn(Site::default());
+            $m->shouldReceive('parent')->andReturnNull();
+            $m->shouldReceive('getOriginal')->with('slug')->andReturn('old-slug');
+            $m->shouldReceive('slug')->andReturn('new-slug');
+            $m->shouldReceive('route')->andReturn('/blog/{slug}');
+            $m->shouldReceive('routeData')->andReturn(['slug' => 'new-slug']);
+            $m->shouldReceive('toAugmentedCollection')
+                ->andReturnSelf()
+                ->shouldReceive('merge')
+                ->andReturn(collect(['parent_uri' => null]));
+        });
+
+        $invalidator = new Invalidator($cacher, []);
+
+        $this->assertNull($invalidator->invalidate($entry));
+    }
+
+    #[Test]
+    public function old_entry_url_is_not_invalidated_when_the_slug_is_unchanged()
+    {
+        $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
+            $cacher->shouldReceive('invalidateUrls')->with([
+                'http://localhost/blog/my-slug',
+            ])->once();
+        });
+
+        $entry = tap(Mockery::mock(Entry::class), function ($m) {
+            $m->shouldReceive('isRedirect')->andReturn(false);
+            $m->shouldReceive('absoluteUrl')->andReturn('http://localhost/blog/my-slug');
+            $m->shouldReceive('collectionHandle')->andReturn('blog');
+            $m->shouldReceive('descendants')->andReturn(collect());
+            $m->shouldReceive('site')->andReturn(Site::default());
+            $m->shouldReceive('parent')->andReturnNull();
+            $m->shouldReceive('getOriginal')->with('slug')->andReturn('my-slug');
+            $m->shouldReceive('slug')->andReturn('my-slug');
+            $m->shouldReceive('toAugmentedCollection')
+                ->andReturnSelf()
+                ->shouldReceive('merge')
+                ->andReturn(collect(['parent_uri' => null]));
+        });
+
+        $invalidator = new Invalidator($cacher, []);
 
         $this->assertNull($invalidator->invalidate($entry));
     }
@@ -1015,6 +1081,7 @@ class DefaultInvalidatorTest extends TestCase
             $m->shouldReceive('descendants')->andReturn(collect());
             $m->shouldReceive('site')->andReturn(Site::default());
             $m->shouldReceive('parent')->andReturnNull();
+            $m->shouldReceive('getOriginal')->andReturnNull();
             $m->shouldReceive('toAugmentedCollection')
                 ->andReturnSelf()
                 ->shouldReceive('merge')
@@ -1055,6 +1122,7 @@ class DefaultInvalidatorTest extends TestCase
             $m->shouldReceive('descendants')->andReturn(collect());
             $m->shouldReceive('site')->andReturn(Site::default());
             $m->shouldReceive('parent')->andReturnNull();
+            $m->shouldReceive('getOriginal')->andReturnNull();
             $m->shouldReceive('toAugmentedCollection')
                 ->andReturnSelf()
                 ->shouldReceive('merge')
@@ -1071,6 +1139,43 @@ class DefaultInvalidatorTest extends TestCase
                 ],
             ],
         ]);
+
+        $this->assertNull($invalidator->refresh($entry));
+    }
+
+    #[Test]
+    public function old_entry_url_is_invalidated_rather_than_recached_when_background_recache_is_enabled()
+    {
+        config()->set('statamic.static_caching.background_recache', true);
+
+        $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
+            $cacher->shouldReceive('invalidateUrls')->once()->with([
+                'http://localhost/blog/old-slug',
+                'http://localhost/blog/old-slug/*',
+            ]);
+            $cacher->shouldReceive('refreshUrls')->once()->with([
+                'http://localhost/blog/new-slug',
+            ]);
+        });
+
+        $entry = tap(Mockery::mock(Entry::class), function ($m) {
+            $m->shouldReceive('isRedirect')->andReturn(false);
+            $m->shouldReceive('absoluteUrl')->andReturn('http://localhost/blog/new-slug');
+            $m->shouldReceive('collectionHandle')->andReturn('blog');
+            $m->shouldReceive('descendants')->andReturn(collect());
+            $m->shouldReceive('site')->andReturn(Site::default());
+            $m->shouldReceive('parent')->andReturnNull();
+            $m->shouldReceive('getOriginal')->with('slug')->andReturn('old-slug');
+            $m->shouldReceive('slug')->andReturn('new-slug');
+            $m->shouldReceive('route')->andReturn('/blog/{slug}');
+            $m->shouldReceive('routeData')->andReturn(['slug' => 'new-slug']);
+            $m->shouldReceive('toAugmentedCollection')
+                ->andReturnSelf()
+                ->shouldReceive('merge')
+                ->andReturn(collect(['parent_uri' => null]));
+        });
+
+        $invalidator = new Invalidator($cacher, []);
 
         $this->assertNull($invalidator->refresh($entry));
     }
