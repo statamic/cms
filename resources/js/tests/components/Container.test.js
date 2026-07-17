@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils';
-import { expect, test } from 'vitest';
+import { afterEach, beforeEach, expect, test } from 'vitest';
 import { defineComponent, h } from 'vue';
 import * as Globals from '@/bootstrap/globals';
 import Container from '@/components/ui/Publish/Container.vue';
@@ -26,9 +26,17 @@ const Probe = defineComponent({
     },
 });
 
-test('content direction is unaffected by the CP/document direction when the site has an explicit direction', () => {
+beforeEach(async () => {
     document.documentElement.setAttribute('dir', 'rtl');
+    // Let the ui-direction composable's MutationObserver pick up the attribute change.
+    await new Promise((resolve) => queueMicrotask(resolve));
+});
 
+afterEach(() => {
+    document.documentElement.removeAttribute('dir');
+});
+
+test('content direction is unaffected by the CP/document direction when the site has an explicit direction', () => {
     const wrapper = mount(Container, {
         props: {
             blueprint: { tabs: [] },
@@ -42,11 +50,7 @@ test('content direction is unaffected by the CP/document direction when the site
     expect(wrapper.find('[data-direction]').attributes('data-direction')).toBe('ltr');
 });
 
-test('content direction falls back to the UI direction when the site cannot be resolved', async () => {
-    document.documentElement.setAttribute('dir', 'rtl');
-    // Let the ui-direction composable's MutationObserver pick up the attribute change.
-    await new Promise((resolve) => queueMicrotask(resolve));
-
+test('content direction falls back to the UI direction when the site cannot be resolved', () => {
     const wrapper = mount(Container, {
         props: {
             blueprint: { tabs: [] },
