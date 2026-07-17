@@ -91,7 +91,7 @@ class DictionaryTest extends TestCase
         $preload = $fieldtype->preload();
 
         $this->assertArraySubset([
-            'url' => 'http://localhost/cp/fieldtypes/dictionaries/countries',
+            'url' => 'http://localhost/!/fieldtypes/dictionaries/countries',
             'selectedOptions' => [
                 ['value' => 'USA', 'label' => '🇺🇸 United States', 'invalid' => false],
                 ['value' => 'AUS', 'label' => '🇦🇺 Australia', 'invalid' => false],

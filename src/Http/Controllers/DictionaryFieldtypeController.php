@@ -1,17 +1,16 @@
 <?php
 
-namespace Statamic\Http\Controllers\CP\Fieldtypes;
+namespace Statamic\Http\Controllers;
 
 use Facades\Statamic\Fields\FieldtypeRepository as Fieldtype;
 use Illuminate\Http\Request;
 use Statamic\Fields\Field;
-use Statamic\Http\Controllers\CP\CpController;
 
-class DictionaryFieldtypeController extends CpController
+class DictionaryFieldtypeController extends Controller
 {
     public function __invoke(Request $request, string $dictionary)
     {
-        $options = $this->fieldtype($request)->dictionary()->options($request->search);
+        $options = $dictionary->dictionary()->options($request->search);
 
         // Return an ordered list of key/value pairs rather than a value-keyed object.
         // When the values are integers, the browser would re-sort the object's keys ascending,
