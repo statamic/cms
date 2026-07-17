@@ -42,8 +42,10 @@ test('content direction is unaffected by the CP/document direction when the site
     expect(wrapper.find('[data-direction]').attributes('data-direction')).toBe('ltr');
 });
 
-test('content direction defaults to ltr (not the CP/document direction) when the site cannot be resolved', () => {
+test('content direction falls back to the UI direction when the site cannot be resolved', async () => {
     document.documentElement.setAttribute('dir', 'rtl');
+    // Let the ui-direction composable's MutationObserver pick up the attribute change.
+    await new Promise((resolve) => queueMicrotask(resolve));
 
     const wrapper = mount(Container, {
         props: {
@@ -55,5 +57,5 @@ test('content direction defaults to ltr (not the CP/document direction) when the
         },
     });
 
-    expect(wrapper.find('[data-direction]').attributes('data-direction')).toBe('ltr');
+    expect(wrapper.find('[data-direction]').attributes('data-direction')).toBe('rtl');
 });

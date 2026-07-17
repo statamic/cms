@@ -14,7 +14,6 @@
         :placeholder="__(config.placeholder)"
         :name="name"
         :id="id"
-        :direction="config.direction"
         :input-attrs="{ dir: contentDirection }"
         @update:model-value="inputUpdated"
         @focus="$emit('focus')"
