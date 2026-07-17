@@ -1,4 +1,5 @@
 <script setup>
+import { router } from '@inertiajs/vue3';
 import Head from '@/pages/layout/Head.vue';
 import DynamicHtmlRenderer from '@/components/DynamicHtmlRenderer.vue';
 import { Icon, EmptyStateMenu, EmptyStateItem, DocsCallout } from '@ui';
@@ -7,12 +8,17 @@ import useArchitecturalBackground from '@/pages/layout/architectural-background.
 const props = defineProps({
     widgets: Array,
     pro: Boolean,
+    enableProUrl: String,
     blueprintsUrl: String,
     collectionsCreateUrl: String,
     navigationCreateUrl: String,
 });
 
 if (props.widgets.length === 0) useArchitecturalBackground();
+
+function enablePro() {
+    router.post(props.enableProUrl);
+}
 
 function classes(widget) {
     return `${widget.classes} ${tailwindWidthClass(widget.width)}`;
@@ -80,10 +86,10 @@ function tailwindWidthClass(width) {
             />
             <EmptyStateItem
                 v-if="!pro"
-                href="https://statamic.dev/licensing"
                 icon="pro-ribbon"
                 :heading="__('Enable Pro Mode')"
                 :description="__('statamic::messages.getting_started_widget_pro')"
+                @click="enablePro"
             />
             <EmptyStateItem
                 :href="blueprintsUrl"

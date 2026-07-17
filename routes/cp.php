@@ -162,6 +162,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
 
     Route::get('/', StartPageController::class)->name('index');
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::post('dashboard/enable-pro', [DashboardController::class, 'enablePro'])->name('dashboard.enable-pro');
 
     Route::get('select-site/{handle}', [SelectSiteController::class, 'select']);
 

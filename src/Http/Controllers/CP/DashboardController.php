@@ -10,6 +10,8 @@ use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Widgets\Loader;
 
+use function Statamic\trans as __;
+
 class DashboardController extends CpController
 {
     /**
@@ -24,10 +26,18 @@ class DashboardController extends CpController
         return Inertia::render('Dashboard', [
             'widgets' => $widgets,
             'pro' => Statamic::pro(),
+            'enableProUrl' => cp_route('dashboard.enable-pro'),
             'blueprintsUrl' => cp_route('blueprints.index'),
             'collectionsCreateUrl' => cp_route('collections.create'),
             'navigationCreateUrl' => cp_route('navigation.create'),
         ]);
+    }
+
+    public function enablePro()
+    {
+        Statamic::enablePro();
+
+        return back()->withSuccess(__('Statamic Pro enabled'));
     }
 
     /**
