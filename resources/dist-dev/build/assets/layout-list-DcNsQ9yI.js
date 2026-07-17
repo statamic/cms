@@ -1,0 +1,4 @@
+//#region resources/svg/icons/layout-list.svg?raw
+var layout_list_default = "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 14 14\"><path stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M0.5 0.5h13\" stroke-width=\"1\"/><path stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M0.5 4.8335h13\" stroke-width=\"1\"/><path stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M0.5 9.1665h13\" stroke-width=\"1\"/><path stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M0.5 13.5h13\" stroke-width=\"1\"/></svg>";
+//#endregion
+export { layout_list_default as default };

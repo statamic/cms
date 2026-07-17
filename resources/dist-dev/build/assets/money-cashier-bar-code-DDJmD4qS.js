@@ -1,0 +1,4 @@
+//#region resources/svg/icons/money-cashier-bar-code.svg?raw
+var money_cashier_bar_code_default = "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 14 14\"><g stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M.5 1.499v7.638M3.28 1.499v7.638M6.062 1.499v7.638M13.5 12.501H.5M13.5 1.499v7.638M10.753 1.499v7.638\"/></g></svg>";
+//#endregion
+export { money_cashier_bar_code_default as default };

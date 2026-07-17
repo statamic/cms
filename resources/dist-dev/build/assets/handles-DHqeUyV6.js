@@ -1,0 +1,4 @@
+//#region resources/svg/icons/handles.svg?raw
+var handles_default = "<svg viewBox=\"0 0 8 17\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"><circle cx=\"1.72656\" cy=\"6.16858\" r=\"1.25\" fill=\"currentColor\"/><circle cx=\"1.72656\" cy=\"1.66858\" r=\"1.25\" fill=\"currentColor\"/><circle cx=\"1.72656\" cy=\"10.6686\" r=\"1.25\" fill=\"currentColor\"/><circle cx=\"1.72656\" cy=\"15.1686\" r=\"1.25\" fill=\"currentColor\"/><circle cx=\"6.44531\" cy=\"6.16864\" r=\"1.25\" fill=\"currentColor\"/><circle cx=\"6.44531\" cy=\"1.66864\" r=\"1.25\" fill=\"currentColor\"/><circle cx=\"6.44531\" cy=\"10.6686\" r=\"1.25\" fill=\"currentColor\"/><circle cx=\"6.44531\" cy=\"15.1686\" r=\"1.25\" fill=\"currentColor\"/></svg>";
+//#endregion
+export { handles_default as default };

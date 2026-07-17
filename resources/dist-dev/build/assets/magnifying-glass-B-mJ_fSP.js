@@ -1,0 +1,4 @@
+//#region resources/svg/icons/magnifying-glass.svg?raw
+var magnifying_glass_default = "<svg viewBox=\"0 0 20 20\" fill=\"none\" aria-hidden=\"true\"><path stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.5\" d=\"m12.712 12.712 3.538 3.538m-2-7.25a5.25 5.25 0 1 1-10.5 0 5.25 5.25 0 0 1 10.5 0Z\"></path></svg>\n";
+//#endregion
+export { magnifying_glass_default as default };
