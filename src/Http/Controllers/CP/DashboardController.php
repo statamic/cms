@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP;
 
 use Inertia\Inertia;
+use Statamic\Exceptions\AuthorizationException;
 use Statamic\Facades\Preference;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
@@ -26,6 +27,7 @@ class DashboardController extends CpController
         return Inertia::render('Dashboard', [
             'widgets' => $widgets,
             'pro' => Statamic::pro(),
+            'canEnablePro' => User::current()->isSuper(),
             'enableProUrl' => cp_route('dashboard.enable-pro'),
             'blueprintsUrl' => cp_route('blueprints.index'),
             'collectionsCreateUrl' => cp_route('collections.create'),
@@ -35,6 +37,10 @@ class DashboardController extends CpController
 
     public function enablePro()
     {
+        if (! User::current()->isSuper()) {
+            throw new AuthorizationException;
+        }
+
         Statamic::enablePro();
 
         return back()->withSuccess(__('Statamic Pro enabled'));

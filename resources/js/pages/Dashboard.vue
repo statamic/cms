@@ -1,13 +1,15 @@
 <script setup>
+import { ref } from 'vue';
 import { router } from '@inertiajs/vue3';
 import Head from '@/pages/layout/Head.vue';
 import DynamicHtmlRenderer from '@/components/DynamicHtmlRenderer.vue';
-import { Icon, EmptyStateMenu, EmptyStateItem, DocsCallout } from '@ui';
+import { Icon, EmptyStateMenu, EmptyStateItem, DocsCallout, ConfirmationModal } from '@ui';
 import useArchitecturalBackground from '@/pages/layout/architectural-background.js';
 
 const props = defineProps({
     widgets: Array,
     pro: Boolean,
+    canEnablePro: Boolean,
     enableProUrl: String,
     blueprintsUrl: String,
     collectionsCreateUrl: String,
@@ -16,8 +18,20 @@ const props = defineProps({
 
 if (props.widgets.length === 0) useArchitecturalBackground();
 
+const confirmingEnablePro = ref(false);
+const enablingPro = ref(false);
+
 function enablePro() {
-    router.post(props.enableProUrl);
+    enablingPro.value = true;
+
+    router.post(props.enableProUrl, {}, {
+        onSuccess: () => {
+            confirmingEnablePro.value = false;
+        },
+        onFinish: () => {
+            enablingPro.value = false;
+        },
+    });
 }
 
 function classes(widget) {
@@ -85,11 +99,11 @@ function tailwindWidthClass(width) {
                 :description="__('statamic::messages.getting_started_widget_docs')"
             />
             <EmptyStateItem
-                v-if="!pro"
+                v-if="!pro && canEnablePro"
                 icon="pro-ribbon"
                 :heading="__('Enable Pro Mode')"
                 :description="__('statamic::messages.getting_started_widget_pro')"
-                @click="enablePro"
+                @click="confirmingEnablePro = true"
             />
             <EmptyStateItem
                 :href="blueprintsUrl"
@@ -110,6 +124,16 @@ function tailwindWidthClass(width) {
                 :description="__('statamic::messages.getting_started_widget_navigation')"
             />
         </EmptyStateMenu>
+
+        <ConfirmationModal
+            v-model:open="confirmingEnablePro"
+            :title="__('Enable Statamic Pro?')"
+            :body-text="__('statamic::messages.getting_started_widget_pro')"
+            :button-text="__('Enable Pro Mode')"
+            :busy="enablingPro"
+            blur
+            @confirm="enablePro"
+        />
     </template>
 
     <DocsCallout :topic="__('Widgets')" url="widgets" />
