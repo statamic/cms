@@ -2,6 +2,7 @@
 import { computed, useTemplateRef, watch, ref, inject } from 'vue';
 import { injectContainerContext } from './Container.vue';
 import { injectFieldsContext } from './FieldsProvider.vue';
+import { useUiDirection } from '@/composables/ui-direction';
 import {
     Avatar,
     Field,
@@ -46,7 +47,7 @@ const {
     focusField,
     blurField,
     container,
-    direction,
+    direction: contentDirection,
 } = injectContainerContext();
 const {
     fieldPathPrefix: injectedFieldPathPrefix,
@@ -54,6 +55,8 @@ const {
     readOnly: fieldsProviderReadOnly,
     asConfig: fieldsAsConfig,
 } = injectFieldsContext();
+
+const { direction } = useUiDirection();
 
 const asConfig = computed(() => fieldsAsConfig.value ?? containerAsConfig.value ?? false);
 const fieldPathPrefix = computed(() => props.fieldPathPrefix || injectedFieldPathPrefix.value);
@@ -238,6 +241,7 @@ const fieldtypeComponentEvents = computed(() => ({
             v-show="shouldShowField"
             :class="`${config.type}-fieldtype`"
             :id="fieldId"
+            :dir="direction"
             :instructions="config.instructions"
             :instructions-below="config.instructions_position === 'below'"
             :required="isRequired"
@@ -277,7 +281,7 @@ const fieldtypeComponentEvents = computed(() => ({
             <div class="text-xs text-red-600" v-if="!fieldtypeComponentExists && fieldtypeComponent !== 'spacer-fieldtype'">
                 Component <code v-text="fieldtypeComponent"></code> does not exist.
             </div>
-            <div :dir="direction" v-if="fieldtypeComponentExists" @focusin="focused" @focusout="blurred" :class="{ 'pointer-events-none select-none': isLocked }">
+            <div v-if="fieldtypeComponentExists" @focusin="focused" @focusout="blurred" :class="{ 'pointer-events-none select-none': isLocked }">
                 <Component
                     ref="fieldtype"
                     :is="fieldtypeComponent"

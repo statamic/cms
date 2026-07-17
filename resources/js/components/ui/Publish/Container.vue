@@ -1,7 +1,7 @@
 <script>
-import createContext from '@/util/createContext.js';
+import { injectContainerContext, provideContainerContext, containerContextKey } from './context.js';
 
-export const [injectContainerContext, provideContainerContext, containerContextKey] = createContext('PublishContainer');
+export { injectContainerContext, provideContainerContext, containerContextKey };
 </script>
 
 <script setup>
@@ -11,6 +11,7 @@ import Component from '@/components/Component.js';
 import Tabs from './Tabs.vue';
 import Values from '@/components/publish/Values.js';
 import { data_get } from '@/bootstrap/globals.js';
+import { useUiDirection } from '@/composables/ui-direction';
 
 const emit = defineEmits(['update:modelValue', 'update:visibleValues', 'update:modifiedFields', 'update:meta']);
 
@@ -104,7 +105,8 @@ const meta = ref(props.meta);
 const previews = ref({});
 const localizedFields = ref(props.modifiedFields || []);
 const components = ref([]);
-const direction = computed(() => Statamic.$config.get('sites').find(s => s.handle === props.site)?.direction ?? document.documentElement.dir ?? 'ltr');
+const { direction: uiDirection } = useUiDirection();
+const direction = computed(() => Statamic.$config.get('sites').find(s => s.handle === props.site)?.direction ?? uiDirection.value);
 
 const visibleValues = computed(() => {
     const omittable = Object.keys(hiddenFields.value).filter(
