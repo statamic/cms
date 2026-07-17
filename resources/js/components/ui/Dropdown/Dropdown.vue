@@ -10,6 +10,8 @@ defineOptions({
 
 const attrs = useAttrs();
 
+const emit = defineEmits(['closed']);
+
 const props = defineProps({
     /** The preferred alignment against the trigger. May change when collisions occur. <br><br> Options: `start`, `center`, `end` */
     align: { type: String, default: 'start' },
@@ -18,6 +20,12 @@ const props = defineProps({
     /** The preferred side of the trigger to render against when open. <br><br> Options: `top`, `bottom`, `left`, `right` */
     side: { type: String, default: 'bottom' },
 });
+
+function onOpenChange(open) {
+    if (open === false) {
+        emit('closed');
+    }
+}
 
 const dropdownContentClasses = cva({
     base: [
@@ -29,7 +37,7 @@ const dropdownContentClasses = cva({
 </script>
 
 <template>
-    <DropdownMenuRoot>
+    <DropdownMenuRoot @update:open="onOpenChange">
         <DropdownMenuTrigger as-child data-ui-dropdown-trigger>
             <slot name="trigger">
                 <Button icon="dots" variant="ghost" size="sm" v-bind="attrs" :aria-label="__('Open dropdown menu')" />

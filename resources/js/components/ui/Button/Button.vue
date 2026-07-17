@@ -49,6 +49,29 @@ const tag = computed(() => {
 });
 const iconOnly = computed(() => (props.icon && !hasDefaultSlot && !props.text) || props.iconOnly);
 
+function focusButtonOnPointerDown(event) {
+    if (props.disabled || props.loading) return;
+
+    const target = event.currentTarget;
+    if (!(target instanceof HTMLButtonElement)) return;
+
+    // Safari may not focus buttons on click, which breaks :focus-within-dependent UI states.
+    target.focus({ preventScroll: true });
+}
+
+function keepGroupButtonFocused(event) {
+    if (props.disabled || props.loading) return;
+
+    const target = event.currentTarget;
+    if (!(target instanceof HTMLButtonElement)) return;
+
+    if (!target.closest('[data-ui-button-group]')) return;
+
+    // Some component stacks re-focus a wrapper on mouseup/click. Re-assert the button focus.
+    requestAnimationFrame(() => target.focus({ preventScroll: true }));
+    setTimeout(() => target.focus({ preventScroll: true }), 0);
+}
+
 const buttonClasses = computed(() => {
     const classes = cva({
         base: 'relative inline-flex items-center justify-center whitespace-nowrap shrink-0 font-medium antialiased cursor-pointer no-underline disabled:text-gray-400 dark:disabled:text-gray-600 disabled:[&_svg]:opacity-30 disabled:cursor-not-allowed [&_svg]:shrink-0 [&_svg]:text-gray-925 [&_svg]:opacity-60 dark:[&_svg]:text-white',
@@ -131,6 +154,8 @@ const restAttrs = computed(() => {
         :href
         :target
         :type="props.href ? null : type"
+        @pointerdown="focusButtonOnPointerDown"
+        @click="keepGroupButtonFocused"
     >
         <Icon v-if="icon" :name="icon" />
         <Icon v-if="loading" name="loading" :size />

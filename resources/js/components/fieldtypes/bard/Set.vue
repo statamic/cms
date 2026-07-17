@@ -4,11 +4,9 @@
             ref="container"
             class="shadow-ui-sm relative w-full rounded-lg border border-gray-300 bg-white text-base dark:border-white/10 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black"
             :class="{
-                // We’re styling a Set so that it shows a “selection outline” when selected with the mouse or keyboard.
-                // The extra `&:not(:has(:focus-within))` rule turns that outline off if any element inside the Set has focus (e.g. when editing inside a Bard field).
-                // This prevents the outer selection outline from showing while the user is actively working inside the Set.
-                'st-set-is-selected [&:not(:has(:focus-within))]:border-blue-400! [&:not(:has(:focus-within))]:dark:border-blue-400! [&:not(:has(:focus-within))]:before:content-[\'\'] [&:not(:has(:focus-within))]:before:absolute [&:not(:has(:focus-within))]:before:inset-[-1px] [&:not(:has(:focus-within))]:before:pointer-events-none [&:not(:has(:focus-within))]:before:border-2 [&:not(:has(:focus-within))]:before:border-blue-400 [&:not(:has(:focus-within))]:dark:before:border-blue-400 [&:not(:has(:focus-within))]:before:rounded-lg': showSelectionHighlight,
+                'st-set-is-selected': showSelectionHighlight,
                 'border-red-500': hasError,
+                'st-dropdown-just-closed': dropdownJustClosed,
             }"
             :data-type="config.handle"
             contenteditable="false"
@@ -49,7 +47,7 @@
                 <div class="flex items-center gap-2" v-if="!isReadOnly">
                     <Switch size="xs" v-model="enabled" v-tooltip="enabled ? __('Included in output') : __('Hidden from output')" />
 
-                    <Dropdown>
+                    <Dropdown @closed="onSetDropdownClosed">
                         <template #trigger>
                             <Button icon="dots" variant="ghost" size="xs" :aria-label="__('Open dropdown menu')" @mousedown.prevent />
                         </template>
@@ -120,6 +118,12 @@ import { reveal } from '@api';
 
 export default {
     props: nodeViewProps,
+
+    data() {
+        return {
+            dropdownJustClosed: false,
+        };
+    },
 
     components: {
         Button,
@@ -343,6 +347,15 @@ export default {
             this.$el.setAttribute('draggable', false);
             this._draggableObserver?.observe(this.$el, { attributes: true, attributeFilter: ['draggable'] });
         },
+
+        onSetDropdownClosed() {
+            this.dropdownJustClosed = true;
+            if (this._dropdownJustClosedTimeout) clearTimeout(this._dropdownJustClosedTimeout);
+            this._dropdownJustClosedTimeout = setTimeout(() => {
+                this.dropdownJustClosed = false;
+                this._dropdownJustClosedTimeout = null;
+            }, 150);
+        },
     },
 
     mounted() {
@@ -376,6 +389,7 @@ export default {
     },
 
     beforeUnmount() {
+        if (this._dropdownJustClosedTimeout) clearTimeout(this._dropdownJustClosedTimeout);
         this._draggableObserver?.disconnect();
     },
 };

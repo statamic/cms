@@ -122,6 +122,18 @@ function destroy() {
 
 const rootEl = ref();
 reveal.use(rootEl, () => emit('expanded'));
+
+const dropdownJustClosed = ref(false);
+let dropdownJustClosedTimeout = null;
+
+function onSetDropdownClosed() {
+    dropdownJustClosed.value = true;
+    if (dropdownJustClosedTimeout) clearTimeout(dropdownJustClosedTimeout);
+    dropdownJustClosedTimeout = setTimeout(() => {
+        dropdownJustClosed.value = false;
+        dropdownJustClosedTimeout = null;
+    }, 150);
+}
 </script>
 
 <template>
@@ -132,7 +144,8 @@ reveal.use(rootEl, () => emit('expanded'));
             data-replicator-set
             class="relative w-full rounded-lg border border-gray-300 text-base dark:border-white/10 bg-white dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black shadow-ui-sm dark:[&_[data-ui-switch]]:border-gray-600 dark:[&_[data-ui-switch]]:border-1"
             :class="{
-                'border-red-500': hasError
+                'border-red-500': hasError,
+                'st-dropdown-just-closed': dropdownJustClosed
             }"
             :data-collapsed="collapsed ?? undefined"
             :data-error="hasError ?? undefined"
@@ -174,7 +187,7 @@ reveal.use(rootEl, () => emit('expanded'));
                 </button>
                 <div class="flex items-center gap-2" v-if="!readOnly">
                     <Switch size="xs" :model-value="enabled" @update:model-value="toggleEnabledState" v-tooltip="enabled ? __('Included in output') : __('Hidden from output')" />
-                    <Dropdown>
+                    <Dropdown @closed="onSetDropdownClosed">
                         <template #trigger>
                             <Button icon="dots" variant="ghost" size="xs" :aria-label="__('Open dropdown menu')" />
                         </template>

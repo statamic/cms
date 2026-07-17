@@ -38,6 +38,38 @@
         }
     }
 }
+/* BARD / SELECTION STATE
+=================================================== */
+@layer ui {
+    /* Hide the selection outline when we have a modal or combobox open, since the focus outline will no longer be correct. */
+    body:not(:has([data-ui-modal-content], [data-ui-combobox-content])) {
+        /* 
+        Here we're carefully controlling the “selection outline” when a set is selected with the mouse or keyboard.
+        Style the selection outline...
+        */
+        .st-set-is-selected:not(:has(
+            /* Except if... */
+            /* Any element inside the Set has focus (e.g. when editing inside a Bard field). This prevents the outer selection outline from showing while the user is actively working inside the Set. */
+            :focus-within,
+            /* When the options dropdown is open on an _inner_ set, the outer selection outline should be hidden. Instead we'll show a focus outline just for the replicator set that's selected. */
+            [data-ui-dropdown-trigger][data-state="open"],
+            /* When the dropdown has just closed (open → closed), keep the outline hidden briefly so it doesn't flicker back to the parent while focus settles. */
+            .st-dropdown-just-closed
+        )),
+        /* Show a focus outline _just_ on the outer set, when we have the dropdown open on the outer set */
+        .st-set-is-selected:has(> header [data-ui-dropdown-trigger][data-state="open"]),
+        /* Show a focus outline just for the replicator set that's selected. We're using a direct descendant selector here in case there are further nested replicator sets. */
+        [data-replicator-set]:has(> header [data-ui-dropdown-trigger][data-state="open"]) {
+            &::before {
+                content: '';
+                position: absolute;
+                inset: -1px;
+                pointer-events: none;
+                @apply border-2 border-blue-400 dark:border-blue-400 rounded-lg;
+            }
+        }
+    }
+}
 /* BARD / FOOTER TOOLBAR
 =================================================== */
 @layer ui {
