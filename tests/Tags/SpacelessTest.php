@@ -8,11 +8,6 @@ use Tests\TestCase;
 
 class SpacelessTest extends TestCase
 {
-    private function tag($tag, $data = [])
-    {
-        return (string) Parse::template($tag, $data, trusted: true);
-    }
-
     #[Test]
     public function it_strips_whitespace_between_tags()
     {
@@ -69,5 +64,132 @@ class SpacelessTest extends TestCase
             $html,
             $this->tag('{{ spaceless }}'.$html.'{{ /spaceless }}')
         );
+    }
+
+    #[Test]
+    public function it_leaves_style_content_untouched()
+    {
+        $html = "<style>\n.foo {\n    color: hotpink;\n}\n</style>";
+
+        $this->assertEquals(
+            $html,
+            $this->tag('{{ spaceless }}'.$html.'{{ /spaceless }}')
+        );
+    }
+
+    #[Test]
+    public function it_leaves_textarea_content_untouched()
+    {
+        $html = "<textarea>\n    Some   text.\n</textarea>";
+
+        $this->assertEquals(
+            $html,
+            $this->tag('{{ spaceless }}'.$html.'{{ /spaceless }}')
+        );
+    }
+
+    #[Test]
+    public function it_protects_elements_regardless_of_tag_name_case()
+    {
+        $html = "<SCRIPT>\nalert(1);\n</SCRIPT>";
+
+        $this->assertEquals(
+            $html,
+            $this->tag('{{ spaceless }}'.$html.'{{ /spaceless }}')
+        );
+    }
+
+    #[Test]
+    public function it_still_strips_whitespace_around_a_protected_element()
+    {
+        $html = "<div>\n    <script>\n    alert(1);\n    </script>\n</div>";
+
+        $this->assertEquals(
+            "<div><script>\n    alert(1);\n    </script></div>",
+            $this->tag('{{ spaceless }}'.$html.'{{ /spaceless }}')
+        );
+    }
+
+    #[Test]
+    public function it_restores_multiple_protected_elements_independently()
+    {
+        $html = "<script>\n    var a = 1;\n</script>\n<pre>   x   y   </pre>";
+
+        $this->assertEquals(
+            "<script>\n    var a = 1;\n</script> <pre>   x   y   </pre>",
+            $this->tag('{{ spaceless }}'.$html.'{{ /spaceless }}')
+        );
+    }
+
+    #[Test]
+    public function it_handles_an_attribute_value_containing_a_single_quote()
+    {
+        $html = "<div title='a > b'>  <span>Hi</span>  </div>";
+
+        $this->assertEquals(
+            "<div title='a > b'><span>Hi</span></div>",
+            $this->tag('{{ spaceless }}'.$html.'{{ /spaceless }}')
+        );
+    }
+
+    #[Test]
+    public function it_strips_whitespace_around_self_closing_tags()
+    {
+        $html = '<div>  <img src="foo.jpg" />  <br />  </div>';
+
+        $this->assertEquals(
+            '<div><img src="foo.jpg" /><br /></div>',
+            $this->tag('{{ spaceless }}'.$html.'{{ /spaceless }}')
+        );
+    }
+
+    #[Test]
+    public function it_collapses_tabs_and_multiple_spaces_within_text()
+    {
+        $html = "<p>Hello\t\t  World</p>";
+
+        $this->assertEquals(
+            '<p>Hello World</p>',
+            $this->tag('{{ spaceless }}'.$html.'{{ /spaceless }}')
+        );
+    }
+
+    #[Test]
+    public function it_strips_whitespace_after_an_opening_tag_and_before_a_closing_tag()
+    {
+        $html = '<div>   Hello   </div>';
+
+        $this->assertEquals(
+            '<div>Hello</div>',
+            $this->tag('{{ spaceless }}'.$html.'{{ /spaceless }}')
+        );
+    }
+
+    #[Test]
+    public function it_leaves_whitespace_between_attributes_untouched()
+    {
+        $html = "<div\n    class=\"foo\"\n    id=\"bar\">Hi</div>";
+
+        $this->assertEquals(
+            $html,
+            $this->tag('{{ spaceless }}'.$html.'{{ /spaceless }}')
+        );
+    }
+
+    #[Test]
+    public function it_returns_an_empty_string_when_content_is_only_whitespace()
+    {
+        $html = "   \n   \t  ";
+
+        $this->assertEquals(
+            '',
+            $this->tag('{{ spaceless }}'.$html.'{{ /spaceless }}')
+        );
+    }
+
+    private function tag($tag): string
+    {
+        $data = [];
+        return (string) Parse::template($tag, $data, trusted: true);
     }
 }
