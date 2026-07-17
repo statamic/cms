@@ -43,4 +43,9 @@ class Locales extends BasicDictionary
 
         return ['locale', '-a'];
     }
+
+    public function allowsPublicAccess(): bool
+    {
+        return true;
+    }
 }

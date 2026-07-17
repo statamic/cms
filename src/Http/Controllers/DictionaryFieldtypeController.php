@@ -4,13 +4,21 @@ namespace Statamic\Http\Controllers;
 
 use Facades\Statamic\Fields\FieldtypeRepository as Fieldtype;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
+use Statamic\Exceptions\ForbiddenHttpException;
 use Statamic\Fields\Field;
 
 class DictionaryFieldtypeController extends Controller
 {
     public function __invoke(Request $request, string $dictionary)
     {
-        $options = $dictionary->dictionary()->options($request->search);
+        $dictionary = $this->fieldtype($request)->dictionary();
+
+        if (Gate::denies('access cp') && ! $dictionary->allowsPublicAccess()) {
+            throw new ForbiddenHttpException;
+        }
+
+        $options = $dictionary->options($request->search);
 
         // Return an ordered list of key/value pairs rather than a value-keyed object.
         // When the values are integers, the browser would re-sort the object's keys ascending,
