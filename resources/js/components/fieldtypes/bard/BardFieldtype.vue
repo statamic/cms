@@ -116,7 +116,13 @@
                         </floating-menu>
 
                         <div class="bard-error" v-if="initError" v-text="initError"></div>
-                        <editor-content :editor="editor" :id="fieldId" />
+
+                        <!-- Revealing (laying out) a ProseMirror editor in the same trusted-click
+                             turn that made it visible, while a clipboard copy is pending, crashes
+                             the tab on Chrome/Edge >= 148 (a renderer CFI abort). Keeping the editor
+                             hidden until the frame after it becomes visible moves the layout off that
+                             turn, wherever the reveal comes from. See statamic/cms#14946. -->
+                        <editor-content v-show="editorLayoutReady" :editor="editor" :id="fieldId" />
                     </div>
                     <div
                         class="bard-footer-toolbar"
@@ -207,6 +213,8 @@ export default {
             fullScreenMode: false,
             buttons: [],
             collapsed: this.meta.collapsed,
+            editorLayoutReady: false,
+            visibilityObserver: null,
             mounted: false,
             initError: null,
             pageHeader: null,
@@ -388,6 +396,7 @@ export default {
 
         this.initToolbarButtons();
         this.initEditor();
+        this.deferEditorLayoutWhileHidden();
 
         this.json = this.editor.getJSON().content;
         this.html = this.editor.getHTML();
@@ -420,6 +429,7 @@ export default {
     beforeUnmount() {
         this.editor?.destroy();
         this.escBinding?.destroy();
+        this.visibilityObserver?.disconnect();
     },
 
     watch: {
@@ -836,6 +846,32 @@ export default {
 
         visibleButtons(buttons) {
             return buttons.filter((button) => this.buttonIsVisible(button));
+        },
+
+        deferEditorLayoutWhileHidden() {
+            if (typeof ResizeObserver === 'undefined') {
+                this.editorLayoutReady = true;
+                return;
+            }
+
+            let visible = null;
+
+            this.visibilityObserver = new ResizeObserver(([entry]) => {
+                const isVisible = entry.contentRect.width > 0 || entry.contentRect.height > 0;
+                if (isVisible === visible) return;
+                visible = isVisible;
+
+                // Wait a frame before showing the editor once it becomes visible, so ProseMirror
+                // never lays out during the trusted click that revealed it (see #14946). Hiding it
+                // again immediately means the next reveal defers the same way.
+                if (isVisible) {
+                    requestAnimationFrame(() => (this.editorLayoutReady = true));
+                } else {
+                    this.editorLayoutReady = false;
+                }
+            });
+
+            this.visibilityObserver.observe(this.$refs.container);
         },
 
         initEditor() {
