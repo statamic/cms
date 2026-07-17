@@ -260,12 +260,12 @@ const fieldLocks = computed(() => {
 
 function focusField(handle, user = Statamic.user) {
     if (handle.includes('.')) throw new Error('focusField only supports top-level fields.');
-    fieldFocus.value[user.id] = { handle, user };
+    if (user) fieldFocus.value[user.id] = { handle, user };
 }
 
 function blurField(handle, user = Statamic.user) {
     if (handle.includes('.')) throw new Error('blurField only supports top-level fields.');
-    if (fieldFocus.value[user.id]?.handle === handle) {
+    if (user && fieldFocus.value[user.id]?.handle === handle) {
         delete fieldFocus.value[user.id];
     }
 }
