@@ -1,5 +1,5 @@
 import { computed, unref } from 'vue';
-import { injectContainerContext } from '@/components/ui/Publish/Container.vue';
+import { injectContainerContext } from '@/components/ui/Publish/context.js';
 import { useUiDirection } from './ui-direction';
 
 export function useContentDirection() {

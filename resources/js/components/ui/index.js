@@ -14,6 +14,7 @@ export { default as CheckboxGroup } from './Checkbox/Group.vue';
 export { default as CodeEditor } from './CodeEditor.vue';
 export { default as Combobox } from './Combobox/Combobox.vue';
 export { default as ConfirmationModal } from './Modal/ConfirmationModal.vue';
+export { default as ContentDirection } from './Publish/ContentDirection.vue';
 export { default as Context } from './Context/Context.vue';
 export { default as ContextFooter } from './Context/Footer.vue';
 export { default as ContextHeader } from './Context/Header.vue';
@@ -108,9 +109,6 @@ export { default as PublishLocalizations } from "./Publish/Localizations.vue";
 export { default as PublishSections } from "./Publish/Sections.vue";
 export { default as PublishTabs } from "./Publish/Tabs.vue";
 export { default as TabProvider } from "./Publish/TabProvider.vue";
-// Intentionally placed after the Publish/* exports, not alphabetically: ContentDirection.vue
-// pulls in Publish/Container.vue, and moving it earlier reintroduces a circular-import crash.
-export { default as ContentDirection } from './ContentDirection.vue';
 export { default as StatusIndicator } from "./StatusIndicator.vue";
 export { default as Widget } from "./Widget.vue";
 export { default as Listing } from "./Listing/Listing.vue";

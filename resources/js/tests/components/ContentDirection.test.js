@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils';
 import { afterEach, beforeEach, expect, test } from 'vitest';
-import ContentDirection from '@/components/ui/ContentDirection.vue';
+import ContentDirection from '@/components/ui/Publish/ContentDirection.vue';
 
 beforeEach(async () => {
     document.documentElement.setAttribute('dir', 'rtl');

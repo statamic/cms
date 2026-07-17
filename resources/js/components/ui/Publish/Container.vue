@@ -1,7 +1,7 @@
 <script>
-import createContext from '@/util/createContext.js';
+import { injectContainerContext, provideContainerContext, containerContextKey } from './context.js';
 
-export const [injectContainerContext, provideContainerContext, containerContextKey] = createContext('PublishContainer');
+export { injectContainerContext, provideContainerContext, containerContextKey };
 </script>
 
 <script setup>
