@@ -457,7 +457,7 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, ContainsQueryabl
             'fqh' => $this->fullyQualifiedHandle(),
             'token' => encrypt([
                 'fqh' => $this->fullyQualifiedHandle(),
-                'user_id' => User::current()->id(),
+                'user_id' => User::current()?->id(),
             ]),
         ];
     }
