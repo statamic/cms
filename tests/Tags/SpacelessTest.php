@@ -177,6 +177,17 @@ class SpacelessTest extends TestCase
     }
 
     #[Test]
+    public function it_does_not_glue_prose_around_an_inline_tag()
+    {
+        $html = '<p>Check out <a href="#">this link</a> for more info.</p>';
+
+        $this->assertEquals(
+            $html,
+            $this->tag('{{ spaceless }}'.$html.'{{ /spaceless }}')
+        );
+    }
+
+    #[Test]
     public function it_returns_an_empty_string_when_content_is_only_whitespace()
     {
         $html = "   \n   \t  ";
