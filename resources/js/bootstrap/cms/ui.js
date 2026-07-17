@@ -125,4 +125,6 @@ export {
     Widget,
     registerIconSet,
     registerIconSetFromStrings,
+    useContentDirection,
+    useUiDirection,
 } from '../../components/ui/index';

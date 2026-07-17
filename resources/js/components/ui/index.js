@@ -15,6 +15,8 @@ export { default as CodeEditor } from './CodeEditor.vue';
 export { default as Combobox } from './Combobox/Combobox.vue';
 export { default as ConfirmationModal } from './Modal/ConfirmationModal.vue';
 export { default as ContentDirection } from './Publish/ContentDirection.vue';
+export { useContentDirection } from '../../composables/content-direction.js';
+export { useUiDirection } from '../../composables/ui-direction.js';
 export { default as Context } from './Context/Context.vue';
 export { default as ContextFooter } from './Context/Footer.vue';
 export { default as ContextHeader } from './Context/Header.vue';

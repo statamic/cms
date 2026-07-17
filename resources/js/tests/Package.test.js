@@ -40,8 +40,6 @@ it('exports core', async () => {
         'requireElevatedSession',
         'requireElevatedSessionIf',
         'resetValuesFromResponse',
-        'useContentDirection',
-        'useUiDirection',
     ];
 
     expect(Object.keys(modules.core).toSorted()).toEqual(expected)
@@ -141,6 +139,8 @@ it('exports ui', async () => {
         'Combobox',
         'ConfirmationModal',
         'ContentDirection',
+        'useContentDirection',
+        'useUiDirection',
         'Context',
         'ContextFooter',
         'ContextHeader',

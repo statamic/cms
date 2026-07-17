@@ -18,6 +18,8 @@ export const {
     CommandPaletteItem,
     ConfirmationModal,
     ContentDirection,
+    useContentDirection,
+    useUiDirection,
     Context,
     ContextFooter,
     ContextHeader,

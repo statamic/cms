@@ -19,5 +19,3 @@ export { default as resetValuesFromResponse } from '../../util/resetValuesFromRe
 export { requireElevatedSession, requireElevatedSessionIf } from '../../components/elevated-sessions';
 export { default as clone, deepClone } from '../../util/clone.js';
 export { default as debounce } from '../../util/debounce.js';
-export { useContentDirection } from '../../composables/content-direction.js';
-export { useUiDirection } from '../../composables/ui-direction.js';
