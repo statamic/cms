@@ -19,7 +19,8 @@ class ProEnable extends Command
      */
     protected $signature = 'statamic:pro:enable
         { --force : Force the operation to run when in production }
-        { --update-config : Also update editions config to reference .env var }';
+        { --update-config : Also update editions config to reference .env var }
+        { --license-key= : Set the Statamic license key in .env }';
 
     /**
      * The console command description.
@@ -40,7 +41,7 @@ class ProEnable extends Command
         }
 
         $this->checkInfo('Statamic Pro successfully enabled in .env file!');
-        $this->promptToSetLicenseKey();
+        $this->setOrPromptLicenseKey();
 
         if ($this->option('update-config') && $this->updateConfig()) {
             $this->checkInfo('Statamic editions config successfully updated to reference .env var!');
@@ -113,13 +114,35 @@ class ProEnable extends Command
     }
 
     /**
+     * Set license key from option, or prompt interactively.
+     *
+     * @return void
+     */
+    protected function setOrPromptLicenseKey()
+    {
+        if ($licenseKey = trim((string) $this->option('license-key'))) {
+            if (! preg_match('/^[a-zA-Z0-9]{16}$/', $licenseKey)) {
+                $this->crossLine('Invalid license key. Site keys are 16-character alphanumeric strings.');
+
+                return;
+            }
+
+            $this->setLicenseKey($licenseKey);
+
+            return;
+        }
+
+        $this->promptToSetLicenseKey();
+    }
+
+    /**
      * Prompt to set the license key in the environment file.
      *
      * @return void
      */
     protected function promptToSetLicenseKey()
     {
-        if (! $this->input->isInteractive()) {
+        if (! $this->input->isInteractive() || ! defined('STDIN')) {
             return;
         }
 
@@ -135,11 +158,30 @@ class ProEnable extends Command
             return;
         }
 
+        if (! preg_match('/^[a-zA-Z0-9]{16}$/', $licenseKey)) {
+            $this->crossLine('Invalid license key. Site keys are 16-character alphanumeric strings.');
+
+            return;
+        }
+
+        $this->setLicenseKey($licenseKey);
+    }
+
+    /**
+     * Set the license key in the environment file.
+     *
+     * @param  string  $licenseKey
+     * @return void
+     */
+    protected function setLicenseKey($licenseKey)
+    {
         if ($this->licenseKeyEnvVarExists()) {
             $this->replaceLicenseKeyInEnv($licenseKey);
         } else {
             $this->appendLicenseKeyToEnv($licenseKey);
         }
+
+        config()->set('statamic.system.license_key', $licenseKey);
 
         $this->checkInfo('Statamic license key saved in .env file.');
     }

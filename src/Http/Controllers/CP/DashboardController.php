@@ -2,11 +2,14 @@
 
 namespace Statamic\Http\Controllers\CP;
 
+use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Statamic\Exceptions\AuthorizationException;
 use Statamic\Facades\Preference;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
+use Statamic\Licensing\LicenseManager;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Widgets\Loader;
@@ -23,11 +26,13 @@ class DashboardController extends CpController
     public function index(Loader $loader)
     {
         $widgets = $this->getDisplayableWidgets($loader);
+        $hasLicenseKey = filled(config('statamic.system.license_key'));
 
         return Inertia::render('Dashboard', [
             'widgets' => $widgets,
             'pro' => Statamic::pro(),
             'canEnablePro' => User::current()->isSuper(),
+            'hasLicenseKey' => $hasLicenseKey,
             'enableProUrl' => cp_route('dashboard.enable-pro'),
             'blueprintsUrl' => cp_route('blueprints.index'),
             'collectionsCreateUrl' => cp_route('collections.create'),
@@ -35,15 +40,58 @@ class DashboardController extends CpController
         ]);
     }
 
-    public function enablePro()
+    public function enablePro(Request $request, LicenseManager $licenses)
     {
         if (! User::current()->isSuper()) {
             throw new AuthorizationException;
         }
 
-        Statamic::enablePro();
+        $hasLicenseKey = filled(config('statamic.system.license_key'));
+        $licenseKey = trim((string) $request->input('license_key', ''));
+
+        $request->merge([
+            'license_key' => $licenseKey !== '' ? $licenseKey : null,
+        ]);
+
+        $request->validate([
+            'license_key' => [
+                $hasLicenseKey ? 'nullable' : 'required',
+                'string',
+                'regex:/^[a-zA-Z0-9]{16}$/',
+            ],
+        ], [
+            'license_key.required' => __('statamic::messages.enable_pro_license_key_required'),
+            'license_key.regex' => __('statamic::messages.enable_pro_license_key_invalid'),
+        ]);
+
+        if ($licenseKey !== '') {
+            $this->validateLicenseKeyWithOutpost($licenses, $licenseKey);
+        }
+
+        Statamic::enablePro($licenseKey !== '' ? $licenseKey : null);
 
         return back()->withSuccess(__('Statamic Pro enabled'));
+    }
+
+    private function validateLicenseKeyWithOutpost(LicenseManager $licenses, string $licenseKey): void
+    {
+        config(['statamic.system.license_key' => $licenseKey]);
+
+        $licenses->refresh();
+
+        if ($licenses->outpostIsOffline() || $licenses->requestFailed()) {
+            throw ValidationException::withMessages([
+                'license_key' => $licenses->requestFailureMessage(),
+            ]);
+        }
+
+        $reason = Arr::get($licenses->site()->response() ?? [], 'reason');
+
+        if ($reason === 'unknown_site' || $licenses->site()->response() === null) {
+            throw ValidationException::withMessages([
+                'license_key' => __('statamic::messages.enable_pro_license_key_invalid'),
+            ]);
+        }
     }
 
     /**
