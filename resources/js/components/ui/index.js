@@ -108,6 +108,8 @@ export { default as PublishLocalizations } from "./Publish/Localizations.vue";
 export { default as PublishSections } from "./Publish/Sections.vue";
 export { default as PublishTabs } from "./Publish/Tabs.vue";
 export { default as TabProvider } from "./Publish/TabProvider.vue";
+// Intentionally placed after the Publish/* exports, not alphabetically: ContentDirection.vue
+// pulls in Publish/Container.vue, and moving it earlier reintroduces a circular-import crash.
 export { default as ContentDirection } from './ContentDirection.vue';
 export { default as StatusIndicator } from "./StatusIndicator.vue";
 export { default as Widget } from "./Widget.vue";
