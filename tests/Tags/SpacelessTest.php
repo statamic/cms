@@ -108,7 +108,11 @@ class SpacelessTest extends TestCase
             '<em>a</em><strong>b</strong>',
             $this->tag('{{ spaceless }}'.$html.'{{ /spaceless }}')
         );
+    }
 
+    #[Test]
+    public function it_glues_adjacent_tags_separated_by_a_mixed_whitespace_run_containing_a_newline()
+    {
         $html = "<em>a</em> \n \r <strong>b</strong>";
 
         $this->assertEquals(
