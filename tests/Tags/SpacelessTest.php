@@ -317,8 +317,6 @@ class SpacelessTest extends TestCase
 
     private function tag($tag): string
     {
-        $data = [];
-
-        return (string) Parse::template($tag, $data, trusted: true);
+        return (string) Parse::template(str: $tag, trusted: true);
     }
 }
