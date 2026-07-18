@@ -6,6 +6,8 @@ class Spaceless extends Tags
 {
     private const PROTECTED_ELEMENTS = 'script|style|pre|textarea';
 
+    private const VOID_ELEMENTS = 'area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr';
+
     public function index(): string
     {
         $html = (string) $this->parse();
@@ -60,9 +62,12 @@ class Spaceless extends Tags
         foreach ($tagMatches[0] as [$tagString, $offset]) {
             $pushText(substr($html, $cursor, $offset - $cursor));
 
-            $type = str_starts_with($tagString, '</')
-                ? 'closing'
-                : (str_ends_with($tagString, '/>') ? 'void' : 'opening');
+            $type = match (true) {
+                str_starts_with($tagString, '</') => 'closing',
+                str_ends_with($tagString, '/>') => 'void',
+                (bool) preg_match('/^<('.self::VOID_ELEMENTS.')\b/i', $tagString) => 'void',
+                default => 'opening',
+            };
 
             $tokens[] = ['type' => $type, 'value' => $tagString];
             $cursor = $offset + strlen($tagString);

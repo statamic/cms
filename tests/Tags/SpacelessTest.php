@@ -250,6 +250,17 @@ class SpacelessTest extends TestCase
     }
 
     #[Test]
+    public function it_treats_a_void_element_without_a_trailing_slash_as_a_peer_not_a_container()
+    {
+        $html = '<div>text</div>   <hr>   <div>more</div>';
+
+        $this->assertEquals(
+            '<div>text</div> <hr> <div>more</div>',
+            $this->tag('{{ spaceless }}'.$html.'{{ /spaceless }}')
+        );
+    }
+
+    #[Test]
     public function it_returns_an_empty_string_when_content_is_only_whitespace()
     {
         $html = "   \n   \t  ";
