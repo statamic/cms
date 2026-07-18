@@ -100,6 +100,28 @@ class SpacelessTest extends TestCase
     }
 
     #[Test]
+    public function it_leaves_a_comment_nested_inside_a_protected_element_untouched()
+    {
+        $html = '<script>foo <!-- bar --> baz</script>';
+
+        $this->assertEquals(
+            $html,
+            $this->tag('{{ spaceless }}'.$html.'{{ /spaceless }}')
+        );
+    }
+
+    #[Test]
+    public function it_leaves_a_protected_element_example_nested_inside_a_comment_untouched()
+    {
+        $html = '<!-- example: <script>alert(1)</script> -->';
+
+        $this->assertEquals(
+            $html,
+            $this->tag('{{ spaceless }}'.$html.'{{ /spaceless }}')
+        );
+    }
+
+    #[Test]
     public function it_protects_elements_regardless_of_tag_name_case()
     {
         $html = "<SCRIPT>\nalert(1);\n</SCRIPT>";
@@ -267,6 +289,17 @@ class SpacelessTest extends TestCase
 
         $this->assertEquals(
             '<div>text</div> <hr> <div>more</div>',
+            $this->tag('{{ spaceless }}'.$html.'{{ /spaceless }}')
+        );
+    }
+
+    #[Test]
+    public function it_does_not_treat_a_hyphenated_custom_element_as_void()
+    {
+        $html = '<link-preview>   Hello   </link-preview>';
+
+        $this->assertEquals(
+            '<link-preview>Hello</link-preview>',
             $this->tag('{{ spaceless }}'.$html.'{{ /spaceless }}')
         );
     }

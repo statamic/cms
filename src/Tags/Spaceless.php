@@ -8,33 +8,26 @@ class Spaceless extends Tags
 
     private const VOID_ELEMENTS = 'area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr';
 
+    // Must be this explicit lookahead, not \b — \b doesn't handle hyphens
+    // correctly and would wrongly treat <link-preview> as void.
+    private const VOID_ELEMENTS_PATTERN = '/^<('.self::VOID_ELEMENTS.')(?=[\s\/>])/i';
+
     public function index(): string
     {
         $html = (string) $this->parse();
 
         $protected = [];
 
-        // Comments aren't rendered, so their whitespace is never touched either.
-        $html = $this->protect($html, '/<!--.*?-->/s', $protected);
-
-        // Protect elements whose whitespace is significant.
+        // Replace comments and whitespace-significant elements with placeholder
+        // tokens so collapse() never touches them; strtr() restores them after.
         $html = $this->protect(
             $html,
-            '/<('.self::PROTECTED_ELEMENTS.')\b(?:"[^"]*"|\'[^\']*\'|[^>"\'])*>.*?<\/\1>/is',
+            '/<!--.*?-->|<('.self::PROTECTED_ELEMENTS.')\b(?:"[^"]*"|\'[^\']*\'|[^>"\'])*>.*?<\/\1>/is',
             $protected
         );
 
+        // Collapse whitespace, then swap the placeholder tokens back for the originals.
         return strtr($this->collapse($html), $protected);
-    }
-
-    private function protect(string $html, string $pattern, array &$protected): string
-    {
-        return preg_replace_callback($pattern, function ($matches) use (&$protected) {
-            $key = "\x02spaceless:".count($protected)."\x02";
-            $protected[$key] = $matches[0];
-
-            return $key;
-        }, $html);
     }
 
     /**
@@ -130,11 +123,21 @@ class Spaceless extends Tags
         return trim($html);
     }
 
+    private function protect(string $html, string $pattern, array &$protected): string
+    {
+        return preg_replace_callback($pattern, function ($matches) use (&$protected) {
+            $key = "\x02spaceless:".count($protected)."\x02";
+            $protected[$key] = $matches[0];
+
+            return $key;
+        }, $html);
+    }
+
     // Self-closed syntax or a known void element name — either way, it has
     // no separate closing tag and no interior content of its own to trim.
     private function hasNoClosingTag(string $tagString): bool
     {
         return str_ends_with($tagString, '/>')
-            || preg_match('/^<('.self::VOID_ELEMENTS.')\b/i', $tagString) === 1;
+            || preg_match(self::VOID_ELEMENTS_PATTERN, $tagString) === 1;
     }
 }
