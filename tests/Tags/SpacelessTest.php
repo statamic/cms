@@ -168,10 +168,10 @@ class SpacelessTest extends TestCase
     #[Test]
     public function it_keeps_a_space_between_self_closing_tags_but_trims_a_containers_own_padding_spaces()
     {
-        $html = '<div>  <img src="foo.jpg" />  <br />  </div>';
+        $html = '<div>  <img src="https://example.com/foo.jpg" alt="" />  <br />  </div>';
 
         $this->assertEquals(
-            '<div><img src="foo.jpg" /> <br /></div>',
+            '<div><img src="https://example.com/foo.jpg" alt="" /> <br /></div>',
             $this->tag('{{ spaceless }}'.$html.'{{ /spaceless }}')
         );
     }
@@ -289,7 +289,7 @@ class SpacelessTest extends TestCase
     #[Test]
     public function it_leaves_a_comment_nested_inside_a_protected_element_untouched()
     {
-        $html = '<script>foo <!-- bar --> baz</script>';
+        $html = '<pre>foo <!-- bar --> baz</pre>';
 
         $this->assertEquals(
             $html,
@@ -300,7 +300,7 @@ class SpacelessTest extends TestCase
     #[Test]
     public function it_leaves_a_protected_element_example_nested_inside_a_comment_untouched()
     {
-        $html = '<!-- example: <script>alert(1)</script> -->';
+        $html = '<!-- example: <script>alert(1);</script> -->';
 
         $this->assertEquals(
             $html,
@@ -333,10 +333,10 @@ class SpacelessTest extends TestCase
     #[Test]
     public function it_restores_multiple_protected_elements_independently()
     {
-        $html = "<script>\n    var a = 1;\n</script>\n<pre>   x   y   </pre>";
+        $html = "<script>\n    let a = 1;\n</script>\n<pre>   x   y   </pre>";
 
         $this->assertEquals(
-            "<script>\n    var a = 1;\n</script> <pre>   x   y   </pre>",
+            "<script>\n    let a = 1;\n</script> <pre>   x   y   </pre>",
             $this->tag('{{ spaceless }}'.$html.'{{ /spaceless }}')
         );
     }
