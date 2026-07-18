@@ -133,12 +133,12 @@ class SpacelessTest extends TestCase
     }
 
     #[Test]
-    public function it_strips_whitespace_around_self_closing_tags()
+    public function it_keeps_a_space_between_self_closing_tags_but_trims_a_containers_own_padding_spaces()
     {
         $html = '<div>  <img src="foo.jpg" />  <br />  </div>';
 
         $this->assertEquals(
-            '<div><img src="foo.jpg" /><br /></div>',
+            '<div><img src="foo.jpg" /> <br /></div>',
             $this->tag('{{ spaceless }}'.$html.'{{ /spaceless }}')
         );
     }
@@ -194,6 +194,35 @@ class SpacelessTest extends TestCase
 
         $this->assertEquals(
             $html,
+            $this->tag('{{ spaceless }}'.$html.'{{ /spaceless }}')
+        );
+    }
+
+    #[Test]
+    public function it_keeps_a_plain_space_between_adjacent_inline_tags()
+    {
+        $html = '<em>a</em> <strong>b</strong>';
+
+        $this->assertEquals(
+            $html,
+            $this->tag('{{ spaceless }}'.$html.'{{ /spaceless }}')
+        );
+    }
+
+    #[Test]
+    public function it_glues_adjacent_tags_separated_by_a_line_break_and_removes_spaces()
+    {
+        $html = "<em>a</em>\n<strong>b</strong>";
+
+        $this->assertEquals(
+            '<em>a</em><strong>b</strong>',
+            $this->tag('{{ spaceless }}'.$html.'{{ /spaceless }}')
+        );
+
+        $html = "<em>a</em> \n \r <strong>b</strong>";
+
+        $this->assertEquals(
+            '<em>a</em><strong>b</strong>',
             $this->tag('{{ spaceless }}'.$html.'{{ /spaceless }}')
         );
     }

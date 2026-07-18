@@ -28,16 +28,24 @@ class Spaceless extends Tags
         // inside an attribute, isn't mistaken for the tag's closing bracket.
         $tag = '<\/?[a-zA-Z][^<>"\']*(?:"[^"]*"|\'[^\']*\'|[^<>"\'])*>';
 
-        // Collapse whitespace runs into a single space, but only within text
-        // nodes — tags (and their attribute values) are left untouched.
+        // Collapse whitespace in text nodes to a single space; tags untouched.
+        // Whitespace-only nodes (i.e. directly between two tags) collapse to
+        // a space too, unless they contain a newline, then they're removed.
         $html = preg_replace_callback(
             '/('.$tag.')|([^<]+)/u',
-            fn ($matches) => $matches[1] !== '' ? $matches[1] : preg_replace('/\s+/', ' ', $matches[2]),
+            function ($matches) {
+                if ($matches[1] !== '') {
+                    return $matches[1];
+                }
+
+                if (trim($matches[2]) === '') {
+                    return str_contains($matches[2], "\n") ? '' : ' ';
+                }
+
+                return preg_replace('/\s+/', ' ', $matches[2]);
+            },
             $html
         );
-
-        // Remove whitespace that sits directly between two tags.
-        $html = preg_replace('/('.$tag.')\s+(?='.$tag.')/u', '$1', $html);
 
         // Trim after an opening tag / before a closing tag, but only when
         // a boundary (whitespace, tag, or string edge) exists on the other side.
