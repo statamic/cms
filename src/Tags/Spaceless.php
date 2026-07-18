@@ -39,12 +39,12 @@ class Spaceless extends Tags
         // Remove whitespace that sits directly between two tags.
         $html = preg_replace('/('.$tag.')\s+(?='.$tag.')/u', '$1', $html);
 
-        // Also, trim right after an opening tag and right before a closing
-        // tag, but not whitespace touching external text, so prose stays intact.
+        // Trim after an opening tag / before a closing tag, but only when
+        // a boundary (whitespace, tag, or string edge) exists on the other side.
         $opening = '<(?!\/)[a-zA-Z][^<>"\']*(?:"[^"]*"|\'[^\']*\'|[^<>"\'])*(?<!\/)>';
         $closing = '<\/[a-zA-Z][^<>"\']*(?:"[^"]*"|\'[^\']*\'|[^<>"\'])*>';
-        $html = preg_replace('/('.$opening.')\s+/u', '$1', $html);
-        $html = preg_replace('/\s+('.$closing.')/u', '$1', $html);
+        $html = preg_replace('/(?:^|(?<=[\s>]))('.$opening.')\s+/u', '$1', $html);
+        $html = preg_replace('/\s+('.$closing.')(?=$|[\s<])/u', '$1', $html);
 
         $html = trim($html);
 

@@ -188,6 +188,17 @@ class SpacelessTest extends TestCase
     }
 
     #[Test]
+    public function it_does_not_glue_prose_around_whitespace_just_inside_an_inline_tag()
+    {
+        $html = 'This is<strong> important</strong> info.';
+
+        $this->assertEquals(
+            $html,
+            $this->tag('{{ spaceless }}'.$html.'{{ /spaceless }}')
+        );
+    }
+
+    #[Test]
     public function it_returns_an_empty_string_when_content_is_only_whitespace()
     {
         $html = "   \n   \t  ";
