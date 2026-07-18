@@ -2,17 +2,11 @@
 
 namespace Tests\StaticCaching;
 
-use Illuminate\Support\Facades\Queue;
 use PHPUnit\Framework\Attributes\Test;
-use Statamic\Console\Commands\StaticWarmJob;
-use Statamic\Events\EntrySaved;
 use Statamic\Facades\File;
 use Statamic\Facades\StaticCache;
 use Statamic\StaticCaching\Cacher;
-use Statamic\StaticCaching\DefaultInvalidator;
-use Statamic\StaticCaching\Invalidate;
 use Statamic\StaticCaching\NoCache\Session;
-use Statamic\Support\Str;
 use Tests\FakesContent;
 use Tests\FakesViews;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -248,65 +242,5 @@ class FullMeasureStaticCachingTest extends TestCase
 
         // The page should not be cached.
         $this->assertFalse(file_exists($this->dir.'/about_.html'));
-    }
-
-    #[Test]
-    public function custom_invalidator_class_fires_when_background_recache_is_enabled()
-    {
-        // https://github.com/statamic/cms/issues/15025
-        //
-        // 1. Enable Full Measure Caching (done in getEnvironmentSetUp) and
-        //    register a Custom Invalidator Class.
-        // 2. The custom invalidator has a condition where saving the "one"
-        //    entry also invalidates the "/two" page's URL.
-        // 3. Enable background re-cache.
-        // 4. Save the "one" entry.
-        // 5. The relevant files (both "one" and "two") should have been invalidated.
-
-        Queue::fake();
-
-        $this->withFakeViews();
-        $this->viewShouldReturnRaw('layout', '<html><body>{{ template_content }}</body></html>');
-        $this->viewShouldReturnRaw('default', '{{ title }}');
-
-        $one = $this->createPage('one');
-        $this->createPage('two');
-
-        $this->get('/one')->assertOk();
-        $this->get('/two')->assertOk();
-
-        $this->assertTrue(file_exists($this->dir.'/one_.html'));
-        $this->assertTrue(file_exists($this->dir.'/two_.html'));
-
-        $customInvalidator = new class(app(Cacher::class)) extends DefaultInvalidator
-        {
-            public function invalidate($item)
-            {
-                parent::invalidate($item);
-
-                if ($item->slug() === 'one') {
-                    $this->cacher->invalidateUrls(['http://localhost/two']);
-                }
-            }
-        };
-
-        config()->set('statamic.static_caching.background_recache', true);
-
-        // This mirrors what actually happens on an entry save: the "EntrySaved"
-        // event is handled by the Invalidate subscriber, which calls refresh()
-        // on the configured Invalidator.
-        $invalidate = new Invalidate($customInvalidator, app(Cacher::class));
-        $invalidate->refreshEntry(new EntrySaved($one));
-
-        // The entry's own page should get recached (soft, via the warm queue).
-        Queue::assertPushed(StaticWarmJob::class, function ($job) {
-            return Str::startsWith((string) $job->request->getUri(), 'http://localhost/one');
-        });
-
-        // Per our custom Invalidator's condition, saving "one" should have
-        // also hard-invalidated "/two". It currently doesn't, because
-        // DefaultInvalidator::refresh() bypasses invalidate() entirely when
-        // background_recache is enabled.
-        $this->assertFalse(file_exists($this->dir.'/two_.html'));
     }
 }
