@@ -12,21 +12,29 @@ class Spaceless extends Tags
     {
         $html = (string) $this->parse();
 
-        // Protect whitespace-sensitive elements and comments from any changes.
         $protected = [];
 
-        $html = preg_replace_callback(
-            '/<!--.*?-->|<('.self::PROTECTED_ELEMENTS.')\b(?:"[^"]*"|\'[^\']*\'|[^>"\'])*>.*?<\/\1>/is',
-            function ($matches) use (&$protected) {
-                $key = "\x02spaceless:".count($protected)."\x02";
-                $protected[$key] = $matches[0];
+        // Comments aren't rendered, so their whitespace is never touched either.
+        $html = $this->protect($html, '/<!--.*?-->/s', $protected);
 
-                return $key;
-            },
-            $html
+        // Protect elements whose whitespace is significant.
+        $html = $this->protect(
+            $html,
+            '/<('.self::PROTECTED_ELEMENTS.')\b(?:"[^"]*"|\'[^\']*\'|[^>"\'])*>.*?<\/\1>/is',
+            $protected
         );
 
         return strtr($this->collapse($html), $protected);
+    }
+
+    private function protect(string $html, string $pattern, array &$protected): string
+    {
+        return preg_replace_callback($pattern, function ($matches) use (&$protected) {
+            $key = "\x02spaceless:".count($protected)."\x02";
+            $protected[$key] = $matches[0];
+
+            return $key;
+        }, $html);
     }
 
     /**
@@ -64,8 +72,7 @@ class Spaceless extends Tags
 
             $type = match (true) {
                 str_starts_with($tagString, '</') => 'closing',
-                str_ends_with($tagString, '/>') => 'void',
-                (bool) preg_match('/^<('.self::VOID_ELEMENTS.')\b/i', $tagString) => 'void',
+                $this->hasNoClosingTag($tagString) => 'void',
                 default => 'opening',
             };
 
@@ -121,5 +128,13 @@ class Spaceless extends Tags
         }
 
         return trim($html);
+    }
+
+    // Self-closed syntax or a known void element name — either way, it has
+    // no separate closing tag and no interior content of its own to trim.
+    private function hasNoClosingTag(string $tagString): bool
+    {
+        return str_ends_with($tagString, '/>')
+            || preg_match('/^<('.self::VOID_ELEMENTS.')\b/i', $tagString) === 1;
     }
 }
