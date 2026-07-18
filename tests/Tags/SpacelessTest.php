@@ -89,6 +89,17 @@ class SpacelessTest extends TestCase
     }
 
     #[Test]
+    public function it_leaves_comment_content_untouched()
+    {
+        $html = "<div>\n    <!--   spacey   comment   -->\n    <p>Hi</p>\n</div>";
+
+        $this->assertEquals(
+            '<div><!--   spacey   comment   --><p>Hi</p></div>',
+            $this->tag('{{ spaceless }}'.$html.'{{ /spaceless }}')
+        );
+    }
+
+    #[Test]
     public function it_protects_elements_regardless_of_tag_name_case()
     {
         $html = "<SCRIPT>\nalert(1);\n</SCRIPT>";

@@ -12,11 +12,11 @@ class Spaceless extends Tags
     {
         $html = (string) $this->parse();
 
-        // Protect elements whose whitespace is significant so their contents are never touched.
+        // Protect whitespace-sensitive elements and comments from any changes.
         $protected = [];
 
         $html = preg_replace_callback(
-            '/<('.self::PROTECTED_ELEMENTS.')\b(?:"[^"]*"|\'[^\']*\'|[^>"\'])*>.*?<\/\1>/is',
+            '/<!--.*?-->|<('.self::PROTECTED_ELEMENTS.')\b(?:"[^"]*"|\'[^\']*\'|[^>"\'])*>.*?<\/\1>/is',
             function ($matches) use (&$protected) {
                 $key = "\x02spaceless:".count($protected)."\x02";
                 $protected[$key] = $matches[0];
