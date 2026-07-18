@@ -22,9 +22,6 @@ class DefaultInvalidator implements Invalidator
 {
     protected $cacher;
     protected $rules;
-
-    // Read by invalidate() to pick refreshUrls() over invalidateUrls()/flush(). Subclasses
-    // overriding invalidate() must check this themselves to get refresh-vs-invalidate semantics.
     protected $refreshing = false;
 
     public function __construct(Cacher $cacher, $rules = [])
