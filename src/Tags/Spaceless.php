@@ -135,6 +135,15 @@ class Spaceless extends Tags
         $left = $tokens[$i - 1] ?? null;
         $right = $tokens[$i + 1] ?? null;
 
+        if ($left && $right && $left['type'] === 'opening' && $right['type'] === 'closing') {
+            // Whitespace that is a tag's entire content: padding on both
+            // sides at once, only kept if the tag is glued to content on
+            // both outside edges (e.g. `is<strong> </strong>important`).
+            return ! $hasNewline
+                && $this->externallyGlued($tokens, $i - 1, -1)
+                && $this->externallyGlued($tokens, $i + 1, 1);
+        }
+
         if ($left && $left['type'] === 'opening') {
             // Whitespace right inside an opening tag: a container's own
             // padding, only kept if the tag itself is glued to content

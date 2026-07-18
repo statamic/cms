@@ -199,6 +199,28 @@ class SpacelessTest extends TestCase
     }
 
     #[Test]
+    public function it_strips_whitespace_only_content_even_when_only_one_side_is_glued()
+    {
+        $html = 'x<strong>   </strong>';
+
+        $this->assertEquals(
+            'x<strong></strong>',
+            $this->tag('{{ spaceless }}'.$html.'{{ /spaceless }}')
+        );
+    }
+
+    #[Test]
+    public function it_keeps_whitespace_only_content_when_glued_on_both_sides()
+    {
+        $html = 'x<strong>   </strong>y';
+
+        $this->assertEquals(
+            'x<strong> </strong>y',
+            $this->tag('{{ spaceless }}'.$html.'{{ /spaceless }}')
+        );
+    }
+
+    #[Test]
     public function it_leaves_whitespace_between_attributes_untouched()
     {
         $html = "<div\n    class=\"foo\"\n    id=\"bar\">Hi</div>";
