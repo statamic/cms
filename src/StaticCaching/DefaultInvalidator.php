@@ -22,6 +22,9 @@ class DefaultInvalidator implements Invalidator
 {
     protected $cacher;
     protected $rules;
+
+    // Read by invalidate() to pick refreshUrls() over invalidateUrls()/flush(). Subclasses
+    // overriding invalidate() must check this themselves to get refresh-vs-invalidate semantics.
     protected $refreshing = false;
 
     public function __construct(Cacher $cacher, $rules = [])
@@ -55,11 +58,14 @@ class DefaultInvalidator implements Invalidator
             return;
         }
 
+        $previous = $this->refreshing;
         $this->refreshing = true;
 
-        $this->invalidate($item);
-
-        $this->refreshing = false;
+        try {
+            $this->invalidate($item);
+        } finally {
+            $this->refreshing = $previous;
+        }
     }
 
     protected function getItemUrls($item)
