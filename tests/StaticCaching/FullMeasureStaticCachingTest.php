@@ -298,17 +298,15 @@ class FullMeasureStaticCachingTest extends TestCase
         $invalidate = new Invalidate($customInvalidator, app(Cacher::class));
         $invalidate->refreshEntry(new EntrySaved($one));
 
-        // The entry's own page should always get recached.
+        // The entry's own page should get recached (soft, via the warm queue).
         Queue::assertPushed(StaticWarmJob::class, function ($job) {
             return Str::startsWith((string) $job->request->getUri(), 'http://localhost/one');
         });
 
         // Per our custom Invalidator's condition, saving "one" should have
-        // also caused "/two" to be recached. It currently doesn't, because
+        // also hard-invalidated "/two". It currently doesn't, because
         // DefaultInvalidator::refresh() bypasses invalidate() entirely when
         // background_recache is enabled.
-        Queue::assertPushed(StaticWarmJob::class, function ($job) {
-            return Str::startsWith((string) $job->request->getUri(), 'http://localhost/two');
-        });
+        $this->assertFalse(file_exists($this->dir.'/two_.html'));
     }
 }

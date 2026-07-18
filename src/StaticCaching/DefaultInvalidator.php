@@ -22,6 +22,7 @@ class DefaultInvalidator implements Invalidator
 {
     protected $cacher;
     protected $rules;
+    protected $refreshing = false;
 
     public function __construct(Cacher $cacher, $rules = [])
     {
@@ -32,14 +33,18 @@ class DefaultInvalidator implements Invalidator
     public function invalidate($item)
     {
         if ($this->rules === 'all') {
-            $this->cacher->flush();
+            $this->refreshing
+                ? $this->cacher->refreshUrls($this->cacher->getUrls()->all())
+                : $this->cacher->flush();
 
             return;
         }
 
         $urls = $this->getItemUrls($item);
 
-        $this->cacher->invalidateUrls($urls);
+        $this->refreshing
+            ? $this->cacher->refreshUrls($urls)
+            : $this->cacher->invalidateUrls($urls);
     }
 
     public function refresh($item)
@@ -50,15 +55,11 @@ class DefaultInvalidator implements Invalidator
             return;
         }
 
-        if ($this->rules === 'all') {
-            $this->cacher->refreshUrls($this->cacher->getUrls()->all());
+        $this->refreshing = true;
 
-            return;
-        }
+        $this->invalidate($item);
 
-        $urls = $this->getItemUrls($item);
-
-        $this->cacher->refreshUrls($urls);
+        $this->refreshing = false;
     }
 
     protected function getItemUrls($item)
