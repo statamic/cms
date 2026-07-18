@@ -228,6 +228,28 @@ class SpacelessTest extends TestCase
     }
 
     #[Test]
+    public function it_keeps_a_space_inside_a_tag_chained_directly_onto_another_tag()
+    {
+        $html = 'a <em>b</em><strong> c</strong> d';
+
+        $this->assertEquals(
+            $html,
+            $this->tag('{{ spaceless }}'.$html.'{{ /spaceless }}')
+        );
+    }
+
+    #[Test]
+    public function it_glues_a_line_break_inside_a_tag_glued_to_prose()
+    {
+        $html = "<div>a<strong>\n b\n</strong>c</div>";
+
+        $this->assertEquals(
+            '<div>a<strong>b</strong>c</div>',
+            $this->tag('{{ spaceless }}'.$html.'{{ /spaceless }}')
+        );
+    }
+
+    #[Test]
     public function it_returns_an_empty_string_when_content_is_only_whitespace()
     {
         $html = "   \n   \t  ";

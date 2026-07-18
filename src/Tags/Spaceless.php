@@ -24,39 +24,97 @@ class Spaceless extends Tags
             $html
         );
 
+        return strtr($this->collapse($html), $protected);
+    }
+
+    /**
+     * Tokenize into tags, whitespace runs, and prose runs, then decide
+     * per whitespace token whether to remove it or collapse it to a
+     * single space.
+     */
+    private function collapse(string $html): string
+    {
         // A single HTML tag, aware of quoted attribute values so a literal '>'
         // inside an attribute, isn't mistaken for the tag's closing bracket.
         $tag = '<\/?[a-zA-Z][^<>"\']*(?:"[^"]*"|\'[^\']*\'|[^<>"\'])*>';
 
-        // Collapse whitespace in text nodes to a single space; tags untouched.
-        // Whitespace-only nodes (i.e. directly between two tags) collapse to
-        // a space too, unless they contain a newline, then they're removed.
-        $html = preg_replace_callback(
-            '/('.$tag.')|([^<]+)/u',
-            function ($matches) {
-                if ($matches[1] !== '') {
-                    return $matches[1];
-                }
+        preg_match_all('/'.$tag.'/u', $html, $tagMatches, PREG_OFFSET_CAPTURE);
 
-                if (trim($matches[2]) === '') {
-                    return str_contains($matches[2], "\n") ? '' : ' ';
-                }
+        $tokens = [];
+        $cursor = 0;
 
-                return preg_replace('/\s+/', ' ', $matches[2]);
-            },
-            $html
-        );
+        $pushText = function (string $text) use (&$tokens) {
+            if ($text === '') {
+                return;
+            }
 
-        // Trim after an opening tag / before a closing tag, but only when
-        // a boundary (whitespace, tag, or string edge) exists on the other side.
-        $opening = '<(?!\/)[a-zA-Z][^<>"\']*(?:"[^"]*"|\'[^\']*\'|[^<>"\'])*(?<!\/)>';
-        $closing = '<\/[a-zA-Z][^<>"\']*(?:"[^"]*"|\'[^\']*\'|[^<>"\'])*>';
-        $html = preg_replace('/(?:^|(?<=[\s>]))('.$opening.')\s+/u', '$1', $html);
-        $html = preg_replace('/\s+('.$closing.')(?=$|[\s<])/u', '$1', $html);
+            preg_match_all('/(\s+)|(\S+)/u', $text, $pieces, PREG_SET_ORDER);
 
-        $html = trim($html);
+            foreach ($pieces as $piece) {
+                $tokens[] = $piece[1] !== ''
+                    ? ['type' => 'ws', 'value' => $piece[1]]
+                    : ['type' => 'prose', 'value' => $piece[2]];
+            }
+        };
 
-        // Restore the protected elements exactly as they were.
-        return strtr($html, $protected);
+        foreach ($tagMatches[0] as [$tagString, $offset]) {
+            $pushText(substr($html, $cursor, $offset - $cursor));
+
+            $type = str_starts_with($tagString, '</')
+                ? 'closing'
+                : (str_ends_with($tagString, '/>') ? 'void' : 'opening');
+
+            $tokens[] = ['type' => $type, 'value' => $tagString];
+            $cursor = $offset + strlen($tagString);
+        }
+        $pushText(substr($html, $cursor));
+
+        $isTag = fn ($type) => in_array($type, ['opening', 'closing', 'void'], true);
+
+        // Whether the tag at $tagIndex is, ignoring any further tags in
+        // between, glued (no whitespace) to real content on the given side.
+        $externallyGlued = function (int $tagIndex, int $direction) use ($tokens, $isTag) {
+            $i = $tagIndex + $direction;
+
+            while (isset($tokens[$i]) && $isTag($tokens[$i]['type'])) {
+                $i += $direction;
+            }
+
+            return isset($tokens[$i]) && $tokens[$i]['type'] === 'prose';
+        };
+
+        $html = '';
+
+        foreach ($tokens as $i => $token) {
+            if ($token['type'] !== 'ws') {
+                $html .= $token['value'];
+
+                continue;
+            }
+
+            $hasNewline = str_contains($token['value'], "\n");
+            $left = $tokens[$i - 1] ?? null;
+            $right = $tokens[$i + 1] ?? null;
+
+            if ($left && $left['type'] === 'opening') {
+                // Whitespace right inside an opening tag: a container's own
+                // padding, only kept if the tag itself is glued to content
+                // outside it (e.g. `is<strong> important`).
+                $keep = ! $hasNewline && $externallyGlued($i - 1, -1);
+            } elseif ($right && $right['type'] === 'closing') {
+                $keep = ! $hasNewline && $externallyGlued($i + 1, 1);
+            } elseif ($left && $right && $left['type'] === 'prose' && $right['type'] === 'prose') {
+                // Mid-sentence whitespace always separates words, even across a line break.
+                $keep = true;
+            } else {
+                // A peer gap (e.g. between two tags, or beside a void tag):
+                // keep a real space, but a line break is formatter noise.
+                $keep = ! $hasNewline;
+            }
+
+            $html .= $keep ? ' ' : '';
+        }
+
+        return trim($html);
     }
 }
