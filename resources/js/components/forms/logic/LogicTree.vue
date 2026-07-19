@@ -23,7 +23,7 @@ import FieldInspector from '@/components/forms/builder/FieldInspector.vue';
 import PageInspector from '@/components/forms/builder/PageInspector.vue';
 import { Button, Icon } from '@ui';
 import { useSortable } from '@/composables/forms/use-drag-and-drop';
-import { computed, onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue';
+import { computed, nextTick, onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue';
 import type { PropType } from 'vue';
 
 const emit = defineEmits(['update:pages', 'select']);
@@ -37,6 +37,8 @@ const props = defineProps({
 const tree = useTemplateRef('tree');
 const isInspectorOpen = ref(false);
 const isRightPanelCollapsed = ref(true);
+const adjacentRightCells = ref<Record<string, boolean>>({});
+let resizeObserver: ResizeObserver | null = null;
 
 const pageAnchor = (pageIndex) => `--page-${pageIndex + 1}`;
 
@@ -63,6 +65,39 @@ const fieldConnections = computed(() => {
 
     return connections;
 });
+
+const measureAdjacentRightCells = () => {
+    if (! tree.value) return;
+
+    const columns = [...tree.value.querySelectorAll('.linked-list__column')];
+    const adjacent = {};
+
+    columns.forEach((column, index) => {
+        const nextColumn = columns[index + 1];
+        if (! nextColumn) return;
+
+        const nextRects = [...nextColumn.querySelectorAll('[data-field-item]')].map((cell) =>
+            cell.getBoundingClientRect(),
+        );
+
+        column.querySelectorAll('[data-field-item][data-field-id]').forEach((cell) => {
+            const rect = cell.getBoundingClientRect();
+            adjacent[cell.dataset.fieldId] = nextRects.some((next) => rect.top < next.bottom && rect.bottom > next.top);
+        });
+    });
+
+    adjacentRightCells.value = adjacent;
+};
+
+const observeLayout = async () => {
+    await nextTick();
+    resizeObserver?.disconnect();
+    resizeObserver = new ResizeObserver(measureAdjacentRightCells);
+    if (tree.value) {
+        resizeObserver.observe(tree.value);
+        measureAdjacentRightCells();
+    }
+};
 
 const pageTitle = (page, pageIndex) => page.display || __('Page :number', { number: pageIndex + 1 });
 
@@ -148,6 +183,8 @@ watch(() => props.selected, (selection) => {
     }
 });
 
+watch(() => [props.pages, props.density], () => observeLayout(), { deep: true });
+
 const onEscape = (event: KeyboardEvent) => {
     if (event.key !== 'Escape') return;
 
@@ -166,8 +203,16 @@ const onEscape = (event: KeyboardEvent) => {
     }
 };
 
-onMounted(() => document.addEventListener('keydown', onEscape));
-onUnmounted(() => document.removeEventListener('keydown', onEscape));
+onMounted(() => {
+    document.addEventListener('keydown', onEscape);
+    observeLayout();
+});
+
+onUnmounted(() => {
+    document.removeEventListener('keydown', onEscape);
+    resizeObserver?.disconnect();
+    resizeObserver = null;
+});
 </script>
 
 <template>
@@ -234,6 +279,7 @@ onUnmounted(() => document.removeEventListener('keydown', onEscape));
                                         v-for="field in section.fields"
                                         :key="field._id"
                                         data-field-item
+                                        :data-field-id="field._id"
                                         :data-field-item-selected="isFieldSelected(field) ? '' : undefined"
                                         class="cursor-pointer"
                                         :class="{
@@ -241,6 +287,7 @@ onUnmounted(() => document.removeEventListener('keydown', onEscape));
                                             'linked-list__hidden-field': field.config?.hidden,
                                             'linked-list__connector': fieldConnection(field),
                                             'linked-list__page-leap': fieldConnection(field)?.leap,
+                                            'test': fieldConnection(field)?.leap && adjacentRightCells[field._id],
                                             'ring-1 ring-blue-500': isFieldSelected(field),
                                         }"
                                         :style="fieldConnection(field) ? { '--end-connection': fieldConnection(field).endConnection } : null"
