@@ -57,11 +57,9 @@ class DashboardController extends CpController
             'license_key' => [
                 $hasLicenseKey ? 'nullable' : 'required',
                 'string',
-                'regex:/^[a-zA-Z0-9]{16}$/',
             ],
         ], [
             'license_key.required' => __('statamic::messages.enable_pro_license_key_required'),
-            'license_key.regex' => __('statamic::messages.enable_pro_license_key_invalid'),
         ]);
 
         if ($licenseKey !== '') {

@@ -121,12 +121,6 @@ class ProEnable extends Command
     protected function setOrPromptLicenseKey()
     {
         if ($licenseKey = trim((string) $this->option('license-key'))) {
-            if (! preg_match('/^[a-zA-Z0-9]{16}$/', $licenseKey)) {
-                $this->crossLine('Invalid license key. Site keys are 16-character alphanumeric strings.');
-
-                return;
-            }
-
             $this->setLicenseKey($licenseKey);
 
             return;
@@ -154,12 +148,6 @@ class ProEnable extends Command
 
         if ($licenseKey === '') {
             $this->comment('Add `STATAMIC_LICENSE_KEY=...` to your `.env` before or when your site goes live.');
-
-            return;
-        }
-
-        if (! preg_match('/^[a-zA-Z0-9]{16}$/', $licenseKey)) {
-            $this->crossLine('Invalid license key. Site keys are 16-character alphanumeric strings.');
 
             return;
         }

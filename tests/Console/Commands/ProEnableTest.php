@@ -239,12 +239,12 @@ ENV, $this->files->get($this->envPath));
     {
         $this
             ->artisan('statamic:pro:enable')
-            ->expectsQuestion('If you have a Statamic license key, paste it now (leave blank to add later)', 'aRadLicenseKey42');
+            ->expectsQuestion('If you have a Statamic license key, paste it now (leave blank to add later)', 'test-license-key');
 
         $this->assertEquals(<<<'ENV'
 APP_NAME=Statamic
 STATAMIC_PRO_ENABLED=true
-STATAMIC_LICENSE_KEY=aRadLicenseKey42
+STATAMIC_LICENSE_KEY=test-license-key
 ENV, $this->files->get($this->envPath));
     }
 
@@ -259,12 +259,12 @@ ENV);
 
         $this
             ->artisan('statamic:pro:enable')
-            ->expectsQuestion('If you have a Statamic license key, paste it now (leave blank to add later)', 'aRadLicenseKey42');
+            ->expectsQuestion('If you have a Statamic license key, paste it now (leave blank to add later)', 'test-license-key');
 
         $this->assertEquals(<<<'ENV'
 APP_NAME=Statamic
 STATAMIC_PRO_ENABLED=true
-STATAMIC_LICENSE_KEY=aRadLicenseKey42
+STATAMIC_LICENSE_KEY=test-license-key
 ENV, $this->files->get($this->envPath));
     }
 
@@ -279,12 +279,12 @@ ENV);
 
         $this
             ->artisan('statamic:pro:enable')
-            ->expectsQuestion('If you have a Statamic license key, paste it now (leave blank to add later)', 'aRadLicenseKey42');
+            ->expectsQuestion('If you have a Statamic license key, paste it now (leave blank to add later)', 'test-license-key');
 
         $this->assertEquals(<<<'ENV'
 APP_NAME=Statamic
 STATAMIC_PRO_ENABLED=true
-STATAMIC_LICENSE_KEY=aRadLicenseKey42
+STATAMIC_LICENSE_KEY=test-license-key
 ENV, $this->files->get($this->envPath));
     }
 
@@ -314,47 +314,15 @@ ENV, $this->files->get($this->envPath));
     {
         $this
             ->artisan('statamic:pro:enable', [
-                '--license-key' => 'aRadLicenseKey42',
+                '--license-key' => 'test-license-key',
                 '--no-interaction' => true,
             ]);
 
         $this->assertEquals(<<<'ENV'
 APP_NAME=Statamic
 STATAMIC_PRO_ENABLED=true
-STATAMIC_LICENSE_KEY=aRadLicenseKey42
+STATAMIC_LICENSE_KEY=test-license-key
 ENV, $this->files->get($this->envPath));
-        $this->assertEquals('aRadLicenseKey42', config('statamic.system.license_key'));
-    }
-
-    #[Test]
-    public function it_rejects_invalid_license_key_via_option()
-    {
-        $this
-            ->artisan('statamic:pro:enable', [
-                '--license-key' => 'not-a-valid-key',
-                '--no-interaction' => true,
-            ])
-            ->expectsOutputToContain('Invalid license key');
-
-        $this->assertEquals(<<<'ENV'
-APP_NAME=Statamic
-STATAMIC_PRO_ENABLED=true
-STATAMIC_LICENSE_KEY=
-ENV, $this->files->get($this->envPath));
-    }
-
-    #[Test]
-    public function it_rejects_invalid_license_key_from_prompt()
-    {
-        $this
-            ->artisan('statamic:pro:enable')
-            ->expectsQuestion('If you have a Statamic license key, paste it now (leave blank to add later)', 'not-a-valid-key')
-            ->expectsOutputToContain('Invalid license key');
-
-        $this->assertEquals(<<<'ENV'
-APP_NAME=Statamic
-STATAMIC_PRO_ENABLED=true
-STATAMIC_LICENSE_KEY=
-ENV, $this->files->get($this->envPath));
+        $this->assertEquals('test-license-key', config('statamic.system.license_key'));
     }
 }

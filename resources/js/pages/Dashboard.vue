@@ -32,34 +32,10 @@ watch(confirmingEnablePro, (open) => {
 });
 
 const trimmedLicenseKey = computed(() => licenseKey.value.trim());
-const hasValidEnteredKey = computed(() => /^[a-zA-Z0-9]{16}$/.test(trimmedLicenseKey.value));
-
-watch(trimmedLicenseKey, (key) => {
-    if (!key || hasValidEnteredKey.value) {
-        licenseKeyError.value = null;
-        return;
-    }
-
-    if (/[^a-zA-Z0-9]/.test(key) || key.length > 16) {
-        licenseKeyError.value = __('statamic::messages.enable_pro_license_key_invalid');
-    }
-});
 
 function validateLicenseKey() {
-    const key = trimmedLicenseKey.value;
-
-    if (!key) {
-        if (props.hasLicenseKey) {
-            licenseKeyError.value = null;
-            return true;
-        }
-
+    if (!trimmedLicenseKey.value && !props.hasLicenseKey) {
         licenseKeyError.value = __('statamic::messages.enable_pro_license_key_required');
-        return false;
-    }
-
-    if (!hasValidEnteredKey.value) {
-        licenseKeyError.value = __('statamic::messages.enable_pro_license_key_invalid');
         return false;
     }
 
