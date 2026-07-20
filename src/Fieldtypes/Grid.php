@@ -55,6 +55,7 @@ class Grid extends Fieldtype
                         'display' => __('Add Row Label'),
                         'instructions' => __('statamic::fieldtypes.grid.config.add_row'),
                         'type' => 'text',
+                        'placeholder' => __('Add Row'),
                         'width' => 50,
                     ],
                     'reorderable' => [

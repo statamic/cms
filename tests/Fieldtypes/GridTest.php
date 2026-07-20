@@ -522,6 +522,17 @@ class GridTest extends TestCase
     }
 
     #[Test]
+    public function it_has_add_row_config()
+    {
+        $configFields = collect((new \ReflectionMethod(Grid::class, 'configFieldItems'))->invoke(new Grid))
+            ->flatMap(fn ($section) => $section['fields']);
+
+        $this->assertSame('text', $configFields['add_row']['type']);
+        $this->assertSame('Add Row Label', $configFields['add_row']['display']);
+        $this->assertSame('Add Row', $configFields['add_row']['placeholder']);
+    }
+
+    #[Test]
     public function it_converts_a_queryable_value()
     {
         $this->assertNull((new Grid)->toQueryableValue(null));
