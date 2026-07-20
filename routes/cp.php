@@ -50,6 +50,7 @@ use Statamic\Http\Controllers\CP\CommandPaletteController;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Controllers\CP\DashboardController;
 use Statamic\Http\Controllers\CP\DuplicatesController;
+use Statamic\Http\Controllers\CP\EnableProController;
 use Statamic\Http\Controllers\CP\FieldActionModalController;
 use Statamic\Http\Controllers\CP\Fields\AdditionalBlueprintController;
 use Statamic\Http\Controllers\CP\Fields\BlueprintController;
@@ -162,7 +163,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
 
     Route::get('/', StartPageController::class)->name('index');
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::post('dashboard/enable-pro', [DashboardController::class, 'enablePro'])->name('dashboard.enable-pro');
+    Route::post('enable-pro', EnableProController::class)->name('enable-pro');
 
     Route::get('select-site/{handle}', [SelectSiteController::class, 'select']);
 
