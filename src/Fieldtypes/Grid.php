@@ -207,9 +207,11 @@ class Grid extends Fieldtype
 
     public function preload()
     {
+        $defaults = $this->defaultRowData()->all();
+
         return [
-            'defaults' => $this->defaultRowData()->all(),
-            'new' => $this->fields()->meta()->all(),
+            'defaults' => $defaults,
+            'new' => $this->fields()->addValues($defaults)->meta()->all(),
             'existing' => collect($this->field->value())->mapWithKeys(function ($row, $index) {
                 return [$row['_id'] => $this->fields($index)->addValues($row)->meta()];
             })->toArray(),
