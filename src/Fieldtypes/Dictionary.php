@@ -76,7 +76,7 @@ class Dictionary extends Fieldtype
     public function preload(): array
     {
         return [
-            'url' => cp_route('dictionary-fieldtype', $this->dictionary()->handle()),
+            'url' => route('statamic.dictionary-fieldtype', $this->dictionary()->handle()),
             'selectedOptions' => $this->getItemData($this->field->value()),
         ];
     }
