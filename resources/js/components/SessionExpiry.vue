@@ -1,17 +1,33 @@
 <template>
     <div class="session-expiry">
         <Modal
-            v-if="isWarning && !isShowingLogin && !isShowingTwoFactorChallenge"
-            :open="isWarning && !isShowingLogin && !isShowingTwoFactorChallenge"
+            v-if="isShowingWarningModal"
+            :open="isShowingWarningModal"
             :title="__('Your Session is Expiring')"
             class="max-w-[500px]!"
             :dismissible="false"
         >
             <ui-description v-text="warningText" />
-            <Button @click="extend" variant="primary" icon="rewind" :text="__('Extend Session')" class="w-full" />
+
+            <template #footer>
+                <div class="flex items-center justify-end space-x-3 pt-3 pb-1">
+                    <Button @click="dismissWarning" variant="ghost" :text="__('Cancel')" />
+                    <Button @click="extend" variant="primary" icon="rewind" :text="__('Extend Session')" />
+                </div>
+            </template>
         </Modal>
 
-        <Modal :title="__('Resume Your Session')" :open="isShowingLogin" height="auto" class="max-w-[500px]!" :dismissable="false">
+        <button
+            v-if="banner"
+            type="button"
+            @click="banner.resume"
+            class="fixed top-0 inset-x-0 z-(--z-index-portal) flex items-center justify-center gap-2 bg-red-600 px-4 py-2 text-sm font-medium text-white shadow-md hover:bg-red-700"
+        >
+            <ui-icon name="alert-alarm-bell" class="size-4" />
+            <span v-text="banner.text" />
+        </button>
+
+        <Modal :title="__('Resume Your Session')" :open="isShowingLoginModal" height="auto" class="max-w-[500px]!" :dismissible="false">
             <div v-if="isUsingOauth" class="space-y-3">
                 <ui-description v-text="__('messages.session_expiry_new_window')" />
                 <ui-button variant="primary" class="w-full" :href="oauthProvider.loginUrl" target="_blank" :text="__('Log in with :provider', { provider: oauthProvider.label })" />
@@ -34,9 +50,15 @@
                     </div>
                 </ui-field>
             </div>
+
+            <template #footer>
+                <div class="flex items-center justify-end pt-3 pb-1">
+                    <Button @click="dismissLogin" variant="ghost" :text="__('Cancel')" />
+                </div>
+            </template>
         </Modal>
 
-        <Modal :title="__('Resume Your Session')" :open="isShowingTwoFactorChallenge" height="auto" class="max-w-[500px]!" :dismissable="false">
+        <Modal :title="__('Resume Your Session')" :open="isShowingTwoFactorChallenge" height="auto" class="max-w-[500px]!" :dismissible="false">
             <div>
                 <div v-if="twoFactorMode === 'code'" class="space-y-3">
                     <ui-description v-text="__('messages.session_expiry_enter_two_factor_code')" />
@@ -138,12 +160,42 @@ export default {
             pinging: false,
             lastCount: new Date(),
             isPageHidden: false,
+            dismissedWarning: false,
+            dismissedLogin: false,
         };
     },
 
     computed: {
         isWarning() {
             return this.count <= this.warnAt;
+        },
+
+        isShowingWarningModal() {
+            return this.isWarning && !this.isShowingLogin && !this.isShowingTwoFactorChallenge && !this.dismissedWarning;
+        },
+
+        isShowingLoginModal() {
+            return this.isShowingLogin && !this.dismissedLogin;
+        },
+
+        // A single banner is shown whenever one of the modals has been explicitly
+        // dismissed. Clicking it resumes the flow by reopening that modal.
+        banner() {
+            if (this.isShowingLogin && this.dismissedLogin) {
+                return {
+                    text: __('messages.session_expiry_dismissed_login_banner'),
+                    resume: this.resumeLogin,
+                };
+            }
+
+            if (this.isWarning && !this.isShowingLogin && !this.isShowingTwoFactorChallenge && this.dismissedWarning) {
+                return {
+                    text: __('messages.session_expiry_dismissed_banner'),
+                    resume: this.resumeWarning,
+                };
+            }
+
+            return null;
         },
 
         warningText() {
@@ -187,6 +239,19 @@ export default {
 
         isShowingLogin(showing, wasShowing) {
             if (showing && !wasShowing) this.updateCsrfToken();
+
+            // Whenever we stop needing to log back in - whether they did so through the
+            // reopened modal, or the session was extended elsewhere before they got
+            // around to it - reset the dismissed state so that a subsequent expiry
+            // shows the modal normally rather than staying stuck on the banner.
+            if (!showing) this.dismissedLogin = false;
+        },
+
+        // When we leave the warning period (e.g. the session was extended in another
+        // tab, or a fresh countdown began), reset the dismissed state so the modal
+        // will show normally the next time the warning period is entered.
+        isWarning(isWarning) {
+            if (!isWarning) this.dismissedWarning = false;
         },
     },
 
@@ -294,6 +359,22 @@ export default {
             this.$axios.get(cp_url('auth/extend')).then((response) => {
                 this.remaining = this.lifetime;
             });
+        },
+
+        dismissWarning() {
+            this.dismissedWarning = true;
+        },
+
+        resumeWarning() {
+            this.dismissedWarning = false;
+        },
+
+        dismissLogin() {
+            this.dismissedLogin = true;
+        },
+
+        resumeLogin() {
+            this.dismissedLogin = false;
         },
 
         loginComplete() {

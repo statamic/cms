@@ -899,8 +899,8 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
     public function makeLocalization($site)
     {
         $localization = Facades\Entry::make()
-            ->collection($this->collection)
             ->origin($this)
+            ->collection($this->collection)
             ->locale($site)
             ->published($this->published)
             ->slug($this->slug());
