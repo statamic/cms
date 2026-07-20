@@ -42,7 +42,7 @@ Route::name('statamic.')->group(function () {
         Route::get('protect/password', [PasswordProtectController::class, 'show'])->name('protect.password.show')->middleware([HandleInertiaRequests::class]);
         Route::post('protect/password', [PasswordProtectController::class, 'store'])->name('protect.password.store');
 
-        Route::get('fieldtypes/dictionaries/{dictionary}', DictionaryFieldtypeController::class)->name('dictionary-fieldtype');
+        Route::get('fieldtypes/dictionaries/{dictionary}', DictionaryFieldtypeController::class)->middleware('throttle:statamic.dictionaries')->name('dictionary-fieldtype');
 
         Route::group(['prefix' => 'auth', 'middleware' => [AuthGuard::class]], function () {
             Route::get('logout', [LoginController::class, 'logout'])->name('logout');
