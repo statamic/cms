@@ -174,7 +174,7 @@ const selectedOptions = computed(() => {
 });
 
 const selectedOption = computed(() => {
-    if (props.multiple || !props.modelValue || selectedOptions.value.length !== 1) {
+    if (props.multiple || props.modelValue === null || selectedOptions.value.length !== 1) {
         return null;
     }
 
@@ -203,7 +203,7 @@ const limitIndicatorColor = computed(() => {
     return 'text-gray';
 });
 
-const canClearSelection = computed(() => props.clearable && props.modelValue);
+const canClearSelection = computed(() => props.clearable && props.modelValue !== null);
 const shouldCloseOnSelect = computed(() => props.closeOnSelect ?? !props.multiple);
 const shouldShowOptionsChevron = computed(() => props.options.length > 0 || props.ignoreFilter);
 const shouldShowLimitIndicator = computed(() => props.multiple && props.maxSelections && props.maxSelections !== Infinity);
@@ -212,7 +212,7 @@ const shouldShowInput = computed(() => {
     if (!props.searchable) return false;
     if (props.taggable) return true;
 
-    return dropdownOpen.value || !props.modelValue || (props.multiple && props.placeholder);
+    return dropdownOpen.value || props.modelValue === null || (props.multiple && props.placeholder);
 });
 
 const placeholder = computed(() => {
@@ -342,7 +342,7 @@ function pushTaggableOption(e) {
 }
 
 function scrollToSelectedOption() {
-    if (props.multiple || !props.modelValue) return;
+    if (props.multiple || props.modelValue === null) return;
 
     rootRef.value?.highlightSelected?.();
 }
