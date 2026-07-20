@@ -37,9 +37,9 @@ const props = defineProps({
 const tree = useTemplateRef('tree');
 const isInspectorOpen = ref(false);
 const isRightPanelCollapsed = ref(true);
-// Page-leap connectors need to know whether a field cell sits immediately to their
-// right (in the next page column). That depends on live layout — section markers,
-// density, etc. — so we measure bounding boxes rather than counting fields.
+// Page-leap connectors need to know whether a field cell sits beside them in any
+// subsequent page column. That depends on live layout — section markers, density,
+// etc. — so we measure bounding boxes rather than counting fields.
 const adjacentRightCells = ref<Record<string, boolean>>({});
 let resizeObserver: ResizeObserver | null = null;
 
@@ -69,8 +69,8 @@ const fieldConnections = computed(() => {
     return connections;
 });
 
-// For each field, check whether any field in the next column overlaps it vertically.
-// Overlap means there is a cell immediately to the right at that row.
+// For each field, check whether any field in a later column overlaps it vertically.
+// Overlap means the leap connector passes beside a real cell at that row.
 const measureAdjacentRightCells = () => {
     if (! tree.value) return;
 
@@ -78,16 +78,17 @@ const measureAdjacentRightCells = () => {
     const adjacent = {};
 
     columns.forEach((column, index) => {
-        const nextColumn = columns[index + 1];
-        if (! nextColumn) return;
-
-        const nextRects = [...nextColumn.querySelectorAll('[data-field-item]')].map((cell) =>
-            cell.getBoundingClientRect(),
+        const subsequentRects = columns.slice(index + 1).flatMap((nextColumn) =>
+            [...nextColumn.querySelectorAll('[data-field-item]')].map((cell) =>
+                cell.getBoundingClientRect(),
+            ),
         );
+
+        if (! subsequentRects.length) return;
 
         column.querySelectorAll('[data-field-item][data-field-id]').forEach((cell) => {
             const rect = cell.getBoundingClientRect();
-            adjacent[cell.dataset.fieldId] = nextRects.some((next) => rect.top < next.bottom && rect.bottom > next.top);
+            adjacent[cell.dataset.fieldId] = subsequentRects.some((next) => rect.top < next.bottom && rect.bottom > next.top);
         });
     });
 
