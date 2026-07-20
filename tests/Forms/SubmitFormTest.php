@@ -14,6 +14,7 @@ use Statamic\Events\SubmissionCreated;
 use Statamic\Events\SubmissionFinalized;
 use Statamic\Exceptions\FormRestrictedException;
 use Statamic\Exceptions\SilentFormFailureException;
+use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Fieldset;
 use Statamic\Facades\Form;
@@ -359,6 +360,52 @@ class SubmitFormTest extends TestCase
 
         $this->assertNotNull($path);
         Storage::disk('local')->assertExists('statamic/file-uploads/'.$path);
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function it_persists_the_real_asset_path_after_finalizing_a_store_true_upload()
+    {
+        // Deliberately no Bus::fake() here: the bug only reproduces when the real
+        // CreateAssetsFromFileUploads + SendEmails + DeleteTemporaryFiles chain runs.
+        Storage::fake('local');
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $form = tap(Form::make('uploads')->formFields([
+            'pages' => [
+                [
+                    'id' => 'main',
+                    'sections' => [
+                        [
+                            'fields' => [
+                                ['handle' => 'email', 'field' => ['type' => 'email']],
+                                ['handle' => 'photo', 'field' => ['type' => 'upload', 'store' => true, 'container' => 'avatars', 'max_files' => 1]],
+                                ['handle' => 'document', 'field' => ['type' => 'upload', 'store' => false, 'max_files' => 1]],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]))->save();
+
+        $result = app(SubmitForm::class)
+            ->form($form)
+            ->page('main')
+            ->submit(
+                data: ['email' => 'test@example.com'],
+                files: [
+                    'photo' => [UploadedFile::fake()->image('photo.jpg')],
+                    'document' => [UploadedFile::fake()->create('resume.pdf', 10)],
+                ],
+            );
+
+        // Re-read from disk: this is the persisted state, which is what matters.
+        $storedValue = $form->submission($result->submission->id())->get('photo');
+
+        $this->assertEquals('photo.jpg', $storedValue);
+        $this->assertNotNull(Asset::find("avatars::{$storedValue}"));
 
         $form->submissions()->each->delete();
     }
