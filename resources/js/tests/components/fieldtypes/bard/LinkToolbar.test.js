@@ -1,8 +1,14 @@
 import { mount } from '@vue/test-utils';
-import { expect, test, vi } from 'vitest';
+import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 import LinkToolbar from '@/components/fieldtypes/bard/LinkToolbar.vue';
 
 window.__ = (key) => key;
+
+// The toolbar's autofocus() schedules a setTimeout that calls this.$refs.urlInput.focus().
+// Under a shallow mount that ref doesn't exist, so use fake timers to keep the leaked
+// timer from firing after the test finishes (which would throw an unhandled error).
+beforeEach(() => vi.useFakeTimers());
+afterEach(() => vi.useRealTimers());
 
 function makeBard({ linkTypes = {}, linkData = {} } = {}) {
     return {
