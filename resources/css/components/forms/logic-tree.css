@@ -215,6 +215,16 @@
                     bottom: calc(anchor(center --start-connection) + var(--buffer-top-pull));
                     left: calc(anchor(right --start-connection) + var(--gap));
                 }
+                /* When there's no adjacent cell, we don't need the extra leap connector, because we don't need to "cut" through a join */
+                &:not(.has-adjacent-cell) {
+                    &::before {
+                        bottom: anchor(center --start-connection);
+                        left: anchor(right --start-connection);
+                    }
+                    .linked-list__extra-leap-connector {
+                        display: none;
+                    }
+                }
             }
         }
     }

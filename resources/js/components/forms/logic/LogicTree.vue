@@ -37,6 +37,9 @@ const props = defineProps({
 const tree = useTemplateRef('tree');
 const isInspectorOpen = ref(false);
 const isRightPanelCollapsed = ref(true);
+// Page-leap connectors need to know whether a field cell sits immediately to their
+// right (in the next page column). That depends on live layout — section markers,
+// density, etc. — so we measure bounding boxes rather than counting fields.
 const adjacentRightCells = ref<Record<string, boolean>>({});
 let resizeObserver: ResizeObserver | null = null;
 
@@ -66,6 +69,8 @@ const fieldConnections = computed(() => {
     return connections;
 });
 
+// For each field, check whether any field in the next column overlaps it vertically.
+// Overlap means there is a cell immediately to the right at that row.
 const measureAdjacentRightCells = () => {
     if (! tree.value) return;
 
@@ -89,6 +94,7 @@ const measureAdjacentRightCells = () => {
     adjacentRightCells.value = adjacent;
 };
 
+// Remeasure after Vue paints, and whenever the tree's size changes (e.g. density toggle).
 const observeLayout = async () => {
     await nextTick();
     resizeObserver?.disconnect();
@@ -183,6 +189,7 @@ watch(() => props.selected, (selection) => {
     }
 });
 
+// Fields moving or density changing can shift rows without always resizing the tree.
 watch(() => [props.pages, props.density], () => observeLayout(), { deep: true });
 
 const onEscape = (event: KeyboardEvent) => {
@@ -287,7 +294,8 @@ onUnmounted(() => {
                                             'linked-list__hidden-field': field.config?.hidden,
                                             'linked-list__connector': fieldConnection(field),
                                             'linked-list__page-leap': fieldConnection(field)?.leap,
-                                            'test': fieldConnection(field)?.leap && adjacentRightCells[field._id],
+                                            // Leap connectors that pass beside a cell in the next column.
+                                            'has-adjacent-cell': fieldConnection(field)?.leap && adjacentRightCells[field._id],
                                             'ring-1 ring-blue-500': isFieldSelected(field),
                                         }"
                                         :style="fieldConnection(field) ? { '--end-connection': fieldConnection(field).endConnection } : null"
