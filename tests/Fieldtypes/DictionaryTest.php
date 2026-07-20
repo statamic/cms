@@ -139,6 +139,26 @@ class DictionaryTest extends TestCase
             ->assertJsonStructure(['data' => [['key', 'value']]]);
     }
 
+    #[Test]
+    public function a_request_with_a_missing_dictionary_is_rejected()
+    {
+        $config = base64_encode(json_encode(['type' => 'dictionary']));
+
+        $this
+            ->getJson(route('statamic.dictionary-fieldtype', 'countries').'?config='.$config)
+            ->assertNotFound();
+    }
+
+    #[Test]
+    public function a_request_with_an_unknown_dictionary_is_rejected()
+    {
+        $config = base64_encode(json_encode(['type' => 'dictionary', 'dictionary' => 'not_a_real_dictionary']));
+
+        $this
+            ->getJson(route('statamic.dictionary-fieldtype', 'countries').'?config='.$config)
+            ->assertNotFound();
+    }
+
     private function optionsUrl(string $dictionary): string
     {
         $config = base64_encode(json_encode(['type' => 'dictionary', 'dictionary' => $dictionary]));
