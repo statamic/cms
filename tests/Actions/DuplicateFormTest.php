@@ -30,14 +30,14 @@ class DuplicateFormTest extends TestCase
     #[Test]
     public function it_duplicates_a_form()
     {
-        Form::make('a')->title('Original A')->honeypot('a')->save();
-        Form::make('b')->title('Original B')->honeypot('b')->save();
-        Form::make('c')->title('Original C')->honeypot('c')->save();
+        Form::make('a')->title('Original A')->honeypot('a')->formFields($this->fields('name'))->save();
+        Form::make('b')->title('Original B')->honeypot('b')->formFields($this->fields('email'))->save();
+        Form::make('c')->title('Original C')->honeypot('c')->formFields($this->fields('message'))->save();
 
         $this->assertEquals([
-            'a' => ['title' => 'Original A', 'honeypot' => 'a'],
-            'b' => ['title' => 'Original B', 'honeypot' => 'b'],
-            'c' => ['title' => 'Original C', 'honeypot' => 'c'],
+            'a' => ['title' => 'Original A', 'honeypot' => 'a', 'fields' => $this->fields('name')],
+            'b' => ['title' => 'Original B', 'honeypot' => 'b', 'fields' => $this->fields('email')],
+            'c' => ['title' => 'Original C', 'honeypot' => 'c', 'fields' => $this->fields('message')],
         ], $this->formData());
 
         (new DuplicateForm)->run(
@@ -46,10 +46,10 @@ class DuplicateFormTest extends TestCase
         );
 
         $this->assertEquals([
-            'a' => ['title' => 'Original A', 'honeypot' => 'a'],
-            'b' => ['title' => 'Original B', 'honeypot' => 'b'],
-            'c' => ['title' => 'Original C', 'honeypot' => 'c'],
-            'd' => ['title' => 'Duplicate of B', 'honeypot' => 'b'],
+            'a' => ['title' => 'Original A', 'honeypot' => 'a', 'fields' => $this->fields('name')],
+            'b' => ['title' => 'Original B', 'honeypot' => 'b', 'fields' => $this->fields('email')],
+            'c' => ['title' => 'Original C', 'honeypot' => 'c', 'fields' => $this->fields('message')],
+            'd' => ['title' => 'Duplicate of B', 'honeypot' => 'b', 'fields' => $this->fields('email')],
         ], $this->formData());
     }
 
@@ -79,6 +79,20 @@ class DuplicateFormTest extends TestCase
         return Form::all()->mapWithKeys(fn ($form) => [$form->handle() => [
             'title' => $form->title(),
             'honeypot' => $form->honeypot(),
+            'fields' => $form->formFields()->contents(),
         ]])->all();
+    }
+
+    private function fields(string $handle)
+    {
+        return [
+            'sections' => [
+                [
+                    'fields' => [
+                        ['handle' => $handle, 'field' => ['type' => 'short_answer']],
+                    ],
+                ],
+            ],
+        ];
     }
 }
