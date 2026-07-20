@@ -37,7 +37,7 @@ abstract class LinkType
 
     public function icon(): string
     {
-        return $this->icon ?? "fieldtype-{$this->handle()}";
+        return $this->icon ?? 'link';
     }
 
     public function configFieldItems(): array

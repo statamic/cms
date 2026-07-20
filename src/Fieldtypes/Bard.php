@@ -844,7 +844,6 @@ class Bard extends Replicator
 
                 return [
                     'title' => $type->title(),
-                    'icon' => $type->icon(),
                     'component' => $nestedFieldtype->component(),
                     'config' => $nestedFieldtype->config(),
                     'meta' => $meta,

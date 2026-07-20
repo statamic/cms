@@ -1561,7 +1561,6 @@ EOT;
 
         $this->assertArrayHasKey('bard-test-custom', $linkTypes);
         $this->assertEquals('Custom Type', $linkTypes['bard-test-custom']['title']);
-        $this->assertEquals('test-icon', $linkTypes['bard-test-custom']['icon']);
     }
 
     #[Test]
