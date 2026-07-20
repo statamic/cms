@@ -12,7 +12,7 @@ class LocalesTest extends TestCase
     #[Test]
     public function it_only_runs_the_locale_process_once_and_caches_the_result()
     {
-        Process::shouldReceive('run')->once()->andReturn("en_US.UTF-8\nfr_FR.UTF-8\nC\nPOSIX");
+        Process::shouldReceive('run')->once()->andReturn(implode(PHP_EOL, ['en_US.UTF-8', 'fr_FR.UTF-8', 'C', 'POSIX']));
 
         $expected = ['en_US' => 'en_US', 'fr_FR' => 'fr_FR'];
 
@@ -23,7 +23,7 @@ class LocalesTest extends TestCase
     #[Test]
     public function cached_items_can_still_be_searched()
     {
-        Process::shouldReceive('run')->once()->andReturn("en_US.UTF-8\nfr_FR.UTF-8");
+        Process::shouldReceive('run')->once()->andReturn(implode(PHP_EOL, ['en_US.UTF-8', 'fr_FR.UTF-8']));
 
         (new Locales)->options();
 
