@@ -24,6 +24,7 @@
                     :key="element._id"
                     :id="fieldId + '__' + element.key"
                     :readonly="isReadOnly"
+                    :input-attrs="{ dir: contentDirection }"
                 />
             </template>
         </ui-input-group>
@@ -41,6 +42,7 @@
                             :id="fieldId + '__' + element.key"
                             v-model="data[index].value"
                             :readonly="isReadOnly"
+                            :dir="contentDirection"
                         />
                     </td>
                 </tr>
@@ -72,12 +74,14 @@
                             <ui-input
                                 v-model="element.key"
                                 :readonly="isReadOnly"
+                                :input-attrs="{ dir: contentDirection }"
                             />
                         </td>
                         <td>
                             <ui-input
                                 v-model="element.value"
                                 :readonly="isReadOnly"
+                                :input-attrs="{ dir: contentDirection }"
                             />
                         </td>
                         <td v-if="canToggleVisibility" class="visibility-controls">
@@ -119,6 +123,7 @@
 import Fieldtype from './Fieldtype.vue';
 import { SortableList, SortableHelpers } from '../sortable/Sortable';
 import { Button } from '@/components/ui';
+import { useContentDirection } from '@/composables/content-direction';
 
 export default {
     mixins: [Fieldtype, SortableHelpers],
@@ -126,6 +131,12 @@ export default {
     components: {
         SortableList,
         Button,
+    },
+
+    setup() {
+        const { direction: contentDirection } = useContentDirection();
+
+        return { contentDirection };
     },
 
     data() {
