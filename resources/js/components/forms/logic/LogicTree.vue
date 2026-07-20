@@ -69,7 +69,7 @@ const fieldConnections = computed(() => {
     return connections;
 });
 
-// For each field, check whether any field in a later column overlaps it vertically.
+// For each leap cell, check whether any field in a later column overlaps it vertically.
 // Overlap means the leap connector passes beside a real cell at that row.
 const measureAdjacentRightCells = () => {
     if (! tree.value) return;
@@ -77,33 +77,20 @@ const measureAdjacentRightCells = () => {
     const columns = [...tree.value.querySelectorAll('.linked-list__column')];
     const adjacent = {};
 
-    columns.forEach((column, index) => {
-        const subsequentRects = columns.slice(index + 1).flatMap((nextColumn) =>
-            [...nextColumn.querySelectorAll('[data-field-item]')].map((cell) =>
-                cell.getBoundingClientRect(),
-            ),
-        );
+    tree.value.querySelectorAll('.linked-list__page-leap').forEach((cell) => {
+        const index = columns.indexOf(cell.closest('.linked-list__column'));
+        const rect = cell.getBoundingClientRect();
 
-        if (! subsequentRects.length) return;
-
-        column.querySelectorAll('[data-field-item][data-field-id]').forEach((cell) => {
-            const rect = cell.getBoundingClientRect();
-            adjacent[cell.dataset.fieldId] = subsequentRects.some((next) => rect.top < next.bottom && rect.bottom > next.top);
-        });
+        adjacent[cell.dataset.fieldId] = columns
+            .slice(index + 1)
+            .flatMap((column) => [...column.querySelectorAll('[data-field-item]')])
+            .some((other) => {
+                const next = other.getBoundingClientRect();
+                return rect.top < next.bottom && rect.bottom > next.top;
+            });
     });
 
     adjacentRightCells.value = adjacent;
-};
-
-// Remeasure after Vue paints, and whenever the tree's size changes (e.g. density toggle).
-const observeLayout = async () => {
-    await nextTick();
-    resizeObserver?.disconnect();
-    resizeObserver = new ResizeObserver(measureAdjacentRightCells);
-    if (tree.value) {
-        resizeObserver.observe(tree.value);
-        measureAdjacentRightCells();
-    }
 };
 
 const pageTitle = (page, pageIndex) => page.display || __('Page :number', { number: pageIndex + 1 });
@@ -191,7 +178,7 @@ watch(() => props.selected, (selection) => {
 });
 
 // Fields moving or density changing can shift rows without always resizing the tree.
-watch(() => [props.pages, props.density], () => observeLayout(), { deep: true });
+watch(() => [props.pages, props.density], () => nextTick(measureAdjacentRightCells), { deep: true });
 
 const onEscape = (event: KeyboardEvent) => {
     if (event.key !== 'Escape') return;
@@ -213,7 +200,8 @@ const onEscape = (event: KeyboardEvent) => {
 
 onMounted(() => {
     document.addEventListener('keydown', onEscape);
-    observeLayout();
+    resizeObserver = new ResizeObserver(measureAdjacentRightCells);
+    resizeObserver.observe(tree.value);
 });
 
 onUnmounted(() => {
