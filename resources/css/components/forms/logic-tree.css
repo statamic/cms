@@ -321,9 +321,9 @@
     [data-field-item-selected] {
         z-index: var(--z-index-above);
     }
-    
+
     .linked-list:has([data-field-item-selected]) {
-        --_border-color: var(--color-blue-100);
+        --_border-color: var(--color-blue-200);
 
         /* When an item is selected, get all columns that don't have an end connection */
         .linked-list__column:not(.linked-list__column--has-end-connection) {
