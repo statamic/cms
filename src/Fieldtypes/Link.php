@@ -22,6 +22,10 @@ class Link extends Fieldtype
 
     protected static array $types = [];
 
+    protected static array $resolvedTypes = [];
+
+    protected static ?string $resolvedTypesSignature = null;
+
     public static function extend(string $handle, string $type): void
     {
         static::$types[$handle] = $type;
@@ -38,7 +42,15 @@ class Link extends Fieldtype
 
     public static function types(): array
     {
-        return collect(static::$types)
+        $signature = serialize(static::$types);
+
+        if ($signature === static::$resolvedTypesSignature) {
+            return static::$resolvedTypes;
+        }
+
+        static::$resolvedTypesSignature = $signature;
+
+        return static::$resolvedTypes = collect(static::$types)
             ->keys()
             ->mapWithKeys(fn (string $handle): array => [$handle => static::resolveType($handle)])
             ->all();
