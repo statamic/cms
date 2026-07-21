@@ -8,6 +8,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Bus;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Fields\Field;
+use Statamic\Forms\Logic\RuleEvaluator;
 use Statamic\Sites\Site;
 
 class SendEmails
@@ -47,11 +48,10 @@ class SendEmails
 
     private function emailConfigs($submission)
     {
-        $config = $submission->form()->email();
-
-        $config = isset($config['to']) ? [$config] : $config;
-
-        return collect($config);
+        return collect($submission->form()->connections()->get('email', []))
+            ->reject(fn ($config) => ($config['enabled'] ?? true) === false)
+            ->filter(fn ($config) => empty($config['conditions'])
+                || (new RuleEvaluator)->passes($config['conditions'], $submission->toArray()));
     }
 
     protected function shouldDeleteTemporaryAttachments(): bool

@@ -4,6 +4,7 @@ namespace Tests\Forms;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Facades\Event;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\FormCreated;
 use Statamic\Events\FormCreating;
@@ -354,5 +355,122 @@ class FormTest extends TestCase
         $this->assertCount(2, $formFields->items());
         $this->assertEquals('email', $formFields->field('email')->handle());
         $this->assertEquals('name', $formFields->field('name')->handle());
+    }
+
+    #[Test]
+    #[DataProvider('connectionsProvider')]
+    public function it_gets_and_sets_connections($connections)
+    {
+        $form = Form::make('contact_us');
+
+        $this->assertEquals(collect(), $form->connections());
+
+        $form->connections($connections);
+
+        $this->assertEquals([
+            'email' => [['to' => 'foo@bar.com']],
+            'webhook' => [['url' => 'https://example.com/hook']],
+        ], $form->connections()->all());
+    }
+
+    public static function connectionsProvider()
+    {
+        $connections = [
+            'email' => [['to' => 'foo@bar.com']],
+            'webhook' => [['url' => 'https://example.com/hook']],
+        ];
+
+        return [
+            'array' => [$connections],
+            'collection' => [collect($connections)],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('legacyEmailProvider')]
+    public function it_projects_legacy_email_config_into_connections($legacy, $expected)
+    {
+        File::put(Form::make('contact_us')->path(), YAML::dump([
+            'title' => 'Contact Us',
+            'email' => $legacy,
+        ]));
+
+        $form = Form::find('contact_us');
+
+        $this->assertEquals($expected, $form->connections()->get('email'));
+    }
+
+    public static function legacyEmailProvider()
+    {
+        return [
+            'list of configs' => [
+                [['to' => 'foo@bar.com'], ['to' => 'baz@qux.com']],
+                [['to' => 'foo@bar.com'], ['to' => 'baz@qux.com']],
+            ],
+            'single config' => [
+                ['to' => 'foo@bar.com'],
+                [['to' => 'foo@bar.com']],
+            ],
+        ];
+    }
+
+    #[Test]
+    public function it_gets_email_configs_from_connections()
+    {
+        $form = Form::make('contact_us');
+
+        $this->assertEquals([], $form->email());
+
+        $form->connections(['email' => [['to' => 'foo@bar.com']]]);
+
+        $this->assertEquals([['to' => 'foo@bar.com']], $form->email());
+    }
+
+    #[Test]
+    public function it_sets_email_configs_into_connections()
+    {
+        $form = Form::make('contact_us')->connections(['webhook' => [['url' => 'https://example.com/hook']]]);
+
+        $form->email([['to' => 'foo@bar.com']]);
+
+        $this->assertEquals([
+            'webhook' => [['url' => 'https://example.com/hook']],
+            'email' => [['to' => 'foo@bar.com']],
+        ], $form->connections()->all());
+    }
+
+    #[Test]
+    public function it_wraps_a_single_email_config_when_setting()
+    {
+        $form = Form::make('contact_us')->email(['to' => 'foo@bar.com']);
+
+        $this->assertEquals([['to' => 'foo@bar.com']], $form->email());
+    }
+
+    #[Test]
+    public function saving_a_legacy_form_migrates_email_config_to_connections()
+    {
+        File::put(Form::make('contact_us')->path(), YAML::dump([
+            'title' => 'Contact Us',
+            'email' => ['to' => 'foo@bar.com'],
+        ]));
+
+        $form = Form::find('contact_us');
+        $form->save();
+
+        $saved = YAML::parse(File::get($form->path()));
+
+        $this->assertEquals(['email' => [['to' => 'foo@bar.com']]], $saved['connections']);
+        $this->assertArrayNotHasKey('email', $saved);
+    }
+
+    #[Test]
+    public function it_omits_connections_from_yaml_when_empty()
+    {
+        $form = tap(Form::make('contact_us')->title('Contact Us'))->save();
+
+        $saved = YAML::parse(File::get($form->path()));
+
+        $this->assertArrayNotHasKey('connections', $saved);
     }
 }

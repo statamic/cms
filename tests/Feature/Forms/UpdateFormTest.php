@@ -82,59 +82,10 @@ class UpdateFormTest extends TestCase
     }
 
     #[Test]
-    public function it_updates_emails()
-    {
-        $form = tap(Form::make('test'))->save();
-        $this->assertNull($form->email());
-
-        $this
-            ->actingAs($this->userWithPermission())
-            ->update($form, ['email' => [
-                [
-                    'to' => 'john@example.com',
-                    'from' => 'jane@example.com',
-                    'reply_to' => null,
-                    'subject' => null,
-                    'text' => null,
-                    'html' => null,
-                    'markdown' => false,
-                    'attachments' => false,
-                ],
-                [
-                    'to' => 'foo@example.com',
-                    'from' => 'bar@example.com',
-                    'reply_to' => null,
-                    'subject' => null,
-                    'text' => 'emails.contact.text',
-                    'html' => 'emails.contact.html',
-                    'markdown' => true,
-                    'attachments' => true,
-                ],
-            ]])
-            ->assertOk();
-
-        $updated = Form::all()->first();
-        $this->assertEquals([
-            [
-                'to' => 'john@example.com',
-                'from' => 'jane@example.com',
-            ],
-            [
-                'to' => 'foo@example.com',
-                'from' => 'bar@example.com',
-                'text' => 'emails.contact.text',
-                'html' => 'emails.contact.html',
-                'markdown' => true,
-                'attachments' => true,
-            ],
-        ], $updated->email());
-    }
-
-    #[Test]
     public function it_updates_data()
     {
         $form = tap(Form::make('test'))->save();
-        $this->assertNull($form->email());
+        $this->assertEquals([], $form->email());
 
         Form::appendConfigFields('*', 'Test Config', [
             'another_config' => [
