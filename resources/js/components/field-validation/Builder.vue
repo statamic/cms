@@ -189,10 +189,13 @@ export default {
             }
         },
 
-        rules(value) {
-            this.resetState();
+        rules: {
+            handler(value) {
+                this.resetState();
 
-            if (this.initialized) this.$emit('updated', value);
+                if (this.initialized) this.$emit('updated', value);
+            },
+            deep: true,
         },
     },
 
