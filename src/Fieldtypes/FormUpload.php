@@ -25,7 +25,7 @@ class FormUpload extends Fieldtype
     public function preload()
     {
         return [
-            'files' => collect(Arr::wrap($this->field->value()))->map(function (string $value): array {
+            'files' => collect(Arr::wrap($this->field->value()))->map(function ($value): array {
                 $asset = $this->storesAsAsset() ? Asset::find($this->container()->handle().'::'.$value) : null;
 
                 if (! $asset) {
