@@ -1,0 +1,6 @@
+
+@supports(text-box: cap alphabetic) {
+[data-ui-panel-footer] [data-ui-badge][data-v-a3d29dc5] {
+            padding-block: calc(var(--spacing) * 1.5);
+}
+}

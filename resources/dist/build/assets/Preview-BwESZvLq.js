@@ -1,0 +1,1 @@
+import{B as e,Tt as t,_ as n}from"./vue.esm-bundler-DPcJFgaB.js";import{Y as r}from"./ui-DjfG3oHN.js";import i from"./Blank-U5LTIrxC.js";var a=Object.assign({layout:i},{__name:`Preview`,setup(i){return(i,a)=>(e(),n(t(r)))}});export{a as default};

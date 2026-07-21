@@ -1,0 +1,16 @@
+import { B as openBlock, x as createStaticVNode, y as createElementBlock } from "./vue.esm-bundler-BbHU-fTn.js";
+//#region resources/svg/filetypes/video.svg
+var _hoisted_1 = {
+	xmlns: "http://www.w3.org/2000/svg",
+	"fill-rule": "evenodd",
+	"stroke-linejoin": "round",
+	"stroke-miterlimit": "2",
+	"clip-rule": "evenodd",
+	viewBox: "0 0 42 59"
+};
+function render(_ctx, _cache) {
+	return openBlock(), createElementBlock("svg", _hoisted_1, [..._cache[0] || (_cache[0] = [createStaticVNode("<path fill=\"#a1a1aa\" d=\"M42 12.014H32c-1.097 0-2-.903-2-2v-10z\"></path><path fill=\"#e4e4e7\" d=\"M42 12.014H32c-1.097 0-2-.903-2-2v-10H2c-1.097 0-2 .903-2 2v55c0 1.097.903 2 2 2h38c1.097 0 2-.903 2-2z\"></path><path fill=\"#546080\" d=\"M24 37.014H8c-1.097 0-2-.903-2-2v-12c0-1.097.903-2 2-2h16c1.097 0 2 .903 2 2v12c0 1.097-.903 2-2 2\"></path><path fill=\"#374564\" d=\"M33.425 35.242 26 33.014v-8l7.425-2.227A2.009 2.009 0 0 1 36 24.702v8.624c0 1.098-.903 2-2 2a2 2 0 0 1-.575-.084\"></path><path fill=\"#a7b3be\" d=\"M36 49.014H26c-.549 0-1-.451-1-1s.451-1 1-1h10c.549 0 1 .451 1 1s-.451 1-1 1m-5 4h-5c-.549 0-1-.451-1-1s.451-1 1-1h5c.549 0 1 .451 1 1s-.451 1-1 1m5 0h-1c-.549 0-1-.451-1-1s.451-1 1-1h1c.549 0 1 .451 1 1s-.451 1-1 1\"></path>", 5)])]);
+}
+var video_default = { render };
+//#endregion
+export { video_default as default, render };

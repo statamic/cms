@@ -1,0 +1,4 @@
+//#region resources/svg/icons/hr.svg?raw
+var hr_default = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\"><path fill=\"currentColor\" d=\"M1.5 13.5h21a1.5 1.5 0 0 0 0-3h-21a1.5 1.5 0 0 0 0 3Z\"/></svg>";
+//#endregion
+export { hr_default as default };
