@@ -4,7 +4,9 @@ namespace Tests\Forms\Fieldtypes;
 
 use Illuminate\Support\Facades\View;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Fieldtypes\Assets\Assets;
 use Statamic\Fieldtypes\Code;
+use Statamic\Fieldtypes\Files;
 use Statamic\Fieldtypes\Text;
 use Statamic\Fieldtypes\Textarea;
 use Statamic\Forms\Fieldtypes\Fallback;
@@ -46,5 +48,31 @@ class FallbackTest extends TestCase
         $fallback = (new Fallback)->wrapping(new Textarea);
 
         $this->assertEquals('text-long', $fallback->icon());
+    }
+
+    #[Test]
+    public function it_falls_back_to_the_upload_view_when_wrapping_assets()
+    {
+        $fallback = (new Fallback)->wrapping(new Assets);
+
+        $this->assertEquals('statamic::forms.antlers.fields.upload', $fallback->view());
+    }
+
+    #[Test]
+    public function it_falls_back_to_the_upload_view_when_wrapping_files()
+    {
+        $fallback = (new Fallback)->wrapping(new Files);
+
+        $this->assertEquals('statamic::forms.antlers.fields.upload', $fallback->view());
+    }
+
+    #[Test]
+    public function it_prefers_a_published_assets_view_over_the_upload_fallback()
+    {
+        View::addNamespace('statamic', __DIR__.'/__fixtures__/views');
+
+        $fallback = (new Fallback)->wrapping(new Assets);
+
+        $this->assertEquals('statamic::forms.antlers.fields.assets', $fallback->view());
     }
 }
