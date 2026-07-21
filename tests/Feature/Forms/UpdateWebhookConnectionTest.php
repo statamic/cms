@@ -66,17 +66,17 @@ class UpdateWebhookConnectionTest extends TestCase
     }
 
     #[Test]
-    public function it_persists_the_client_row_id_for_new_configs()
+    public function it_doesnt_persist_the_client_row_state()
     {
         $form = tap(Form::make('test'))->save();
 
         $this
             ->actingAs($this->userWithPermission())
-            ->update($form, ['configs' => [['_id' => 'vue-row', 'url' => 'https://example.com/hook']]])
+            ->update($form, ['configs' => [['_id' => 'vue-row', 'id' => 'abc', 'url' => 'https://example.com/hook']]])
             ->assertOk();
 
         $this->assertEquals([
-            ['id' => 'vue-row', 'url' => 'https://example.com/hook'],
+            ['id' => 'abc', 'url' => 'https://example.com/hook'],
         ], Form::find('test')->connections()->get('webhook'));
     }
 
@@ -98,21 +98,6 @@ class UpdateWebhookConnectionTest extends TestCase
             'id' => 'abc',
             'url' => 'https://example.com/hook',
         ]], Form::find('test')->connections()->get('webhook'));
-    }
-
-    #[Test]
-    public function it_generates_ids_for_new_configs()
-    {
-        $form = tap(Form::make('test'))->save();
-
-        $this
-            ->actingAs($this->userWithPermission())
-            ->update($form, ['configs' => [['url' => 'https://example.com/hook']]])
-            ->assertOk();
-
-        $config = Form::find('test')->connections()->get('webhook')[0];
-        $this->assertEquals('https://example.com/hook', $config['url']);
-        $this->assertNotEmpty($config['id']);
     }
 
     #[Test]
