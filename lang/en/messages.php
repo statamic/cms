@@ -323,5 +323,9 @@ return [
     'user_wizard_invitation_subject' => 'Activate your new Statamic account on :site',
     'user_wizard_roles_groups_intro' => 'Users can be assigned to roles that customize their permissions, access, and abilities throughout the Control Panel.',
     'user_wizard_super_admin_instructions' => 'Super admins have complete control and access to everything in the control panel. Grant this role wisely.',
+    'webhook_connection_description' => 'Send submissions to an external URL as they are received.',
+    'webhook_connection_payload_instructions' => 'Each submission is sent to the URL as a JSON POST request:',
+    'webhook_connection_url_instructions' => 'The URL that will receive a JSON POST request when a submission is created.',
+    'webhook_connection_verify_ssl_instructions' => "Verify the destination's SSL certificate when sending requests. Disable for self-signed certificates.",
     'width_x_height' => ':width × :height',
 ];

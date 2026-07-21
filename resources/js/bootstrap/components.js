@@ -60,6 +60,9 @@ export default function registerGlobalComponents(app) {
     app.component('form-widget', FormWidget);
     app.component('updater-widget', UpdaterWidget);
 
+    // Form Connections
+    app.component('webhook-connection', defineAsyncComponent(() => import('../components/forms/connections/WebhookConnection.vue')));
+
     // Reusable
     app.component('file-icon', FileIcon);
 
