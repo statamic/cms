@@ -73,7 +73,11 @@ class CreateAssetsFromFileUploads
         }
 
         $localPath = tempnam(sys_get_temp_dir(), 'statamic-form-upload');
-        file_put_contents($localPath, $disk->readStream($diskPath));
+        $stream = $disk->readStream($diskPath);
+        file_put_contents($localPath, $stream);
+        if (is_resource($stream)) {
+            fclose($stream);
+        }
 
         $uploadedFile = new UploadedFile(
             $localPath,

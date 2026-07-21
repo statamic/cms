@@ -2,10 +2,11 @@
 
 namespace Tests\Forms;
 
-use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use League\Flysystem\Filesystem;
+use League\Flysystem\Local\LocalFilesystemAdapter;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
@@ -89,7 +90,11 @@ class CreateAssetsFromFileUploadsTest extends TestCase
     #[Test]
     public function it_creates_an_asset_from_a_temporary_file_on_a_non_local_disk()
     {
-        Storage::extend('memory', fn () => new FilesystemAdapter(new Filesystem($adapter = new InMemoryFlysystemAdapter), $adapter));
+        $root = sys_get_temp_dir().'/statamic-non-local-disk-test-'.uniqid();
+
+        Storage::extend('memory', fn ($app, $config) => new NonLocalPathFilesystemAdapter(
+            new Filesystem($adapter = new LocalFilesystemAdapter($root)), $adapter, $config
+        ));
         config(['filesystems.disks.memory' => ['driver' => 'memory']]);
         config(['statamic.system.file_uploads_disk' => 'memory']);
 
@@ -118,6 +123,8 @@ class CreateAssetsFromFileUploadsTest extends TestCase
         $this->assertIsString($newValue);
         $this->assertNotEquals($path, $newValue);
         $this->assertNotNull(Asset::find("avatars::{$newValue}"));
+
+        File::deleteDirectory($root);
     }
 
     #[Test]
