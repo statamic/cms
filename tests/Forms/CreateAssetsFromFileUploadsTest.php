@@ -2,8 +2,10 @@
 
 namespace Tests\Forms;
 
+use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use League\Flysystem\Filesystem;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
@@ -82,6 +84,40 @@ class CreateAssetsFromFileUploadsTest extends TestCase
         Storage::disk('avatars')->assertExists('avatar.jpg');
 
         $this->assertNotNull(Asset::find('avatars::'.$form->submission($submission->id())->get('avatar')));
+    }
+
+    #[Test]
+    public function it_creates_an_asset_from_a_temporary_file_on_a_non_local_disk()
+    {
+        Storage::extend('memory', fn () => new FilesystemAdapter(new Filesystem($adapter = new InMemoryFlysystemAdapter), $adapter));
+        config(['filesystems.disks.memory' => ['driver' => 'memory']]);
+        config(['statamic.system.file_uploads_disk' => 'memory']);
+
+        $this->fakeAvatarsContainer();
+
+        $form = tap(Form::make('contact')->formFields([
+            'sections' => [
+                ['fields' => [
+                    ['handle' => 'avatar', 'field' => ['type' => 'upload', 'store' => true, 'container' => 'avatars', 'max_files' => 1]],
+                ]],
+            ],
+        ]))->save();
+
+        $submission = tap($form->makeSubmission())->save();
+
+        $path = FormFileUpload::field(['handle' => 'avatar', 'max_files' => 1], $submission->id())
+            ->upload([UploadedFile::fake()->image('avatar.jpg')]);
+
+        $submission->set('avatar', $path)->save();
+
+        (new CreateAssetsFromFileUploads($submission))->handle();
+
+        Storage::disk('avatars')->assertExists('avatar.jpg');
+
+        $newValue = $form->submission($submission->id())->get('avatar');
+        $this->assertIsString($newValue);
+        $this->assertNotEquals($path, $newValue);
+        $this->assertNotNull(Asset::find("avatars::{$newValue}"));
     }
 
     #[Test]

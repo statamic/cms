@@ -72,8 +72,11 @@ class CreateAssetsFromFileUploads
             return null;
         }
 
+        $localPath = tempnam(sys_get_temp_dir(), 'statamic-form-upload');
+        file_put_contents($localPath, $disk->readStream($diskPath));
+
         $uploadedFile = new UploadedFile(
-            $disk->path($diskPath),
+            $localPath,
             basename($path),
             $disk->mimeType($diskPath),
             null,
@@ -83,6 +86,7 @@ class CreateAssetsFromFileUploads
         $assetId = AssetsUploader::field($field->toArray())->upload($uploadedFile);
         $assetId = is_array($assetId) ? $assetId[0] : $assetId;
 
+        app('files')->delete($localPath);
         $disk->delete($diskPath);
 
         return Asset::findOrFail($assetId)->path();
