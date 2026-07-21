@@ -162,7 +162,7 @@ class FormConnectTest extends TestCase
                 ->where('component.name', 'email-connection')
                 ->where('component.props.action', cp_route('forms.connect.email.update', $form->handle()))
                 ->has('component.props.suggestableFields')
-                ->where('configs', [['id' => 'abc', 'to' => 'foo@example.com']]));
+                ->where('config', [['id' => 'abc', 'to' => 'foo@example.com', '_id' => 'abc']]));
     }
 
     #[Test]
