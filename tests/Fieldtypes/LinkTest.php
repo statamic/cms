@@ -11,12 +11,21 @@ use Statamic\Facades;
 use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\Link;
+use Statamic\Fieldtypes\Link\LinkType;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class LinkTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
+
+    public function tearDown(): void
+    {
+        parent::tearDown();
+
+        (new \ReflectionClass(Link::class))->setStaticPropertyValue('types', []);
+        (new \ReflectionClass(\Statamic\Fields\Fieldtype::class))->setStaticPropertyValue('extraConfigFields', []);
+    }
 
     #[Test]
     public function it_augments_string_to_string()
@@ -100,7 +109,7 @@ class LinkTest extends TestCase
         $fieldtype = (new Link)->setField(new Field('test', ['type' => 'link']));
 
         $this->assertEquals(
-            ['type' => 'url', 'url' => 'https://example.com'],
+            ['type' => 'url', 'url' => 'https://example.com', 'icon' => 'external-link'],
             $fieldtype->preProcessIndex('https://example.com')
         );
     }
@@ -111,7 +120,7 @@ class LinkTest extends TestCase
         $fieldtype = (new Link)->setField(new Field('test', ['type' => 'link']));
 
         $this->assertEquals(
-            ['type' => 'url', 'url' => 404],
+            ['type' => 'url', 'url' => 404, 'icon' => 'external-link'],
             $fieldtype->preProcessIndex('404')
         );
     }
@@ -127,7 +136,7 @@ class LinkTest extends TestCase
         $fieldtype = (new Link)->setField(new Field('test', ['type' => 'link']));
 
         $this->assertEquals(
-            ['type' => 'entry', 'url' => '/the-entry-url'],
+            ['type' => 'entry', 'url' => '/the-entry-url', 'icon' => 'collections'],
             $fieldtype->preProcessIndex('entry::entry-id')
         );
     }
@@ -143,7 +152,7 @@ class LinkTest extends TestCase
         $fieldtype = (new Link)->setField(new Field('test', ['type' => 'link']));
 
         $this->assertEquals(
-            ['type' => 'asset', 'url' => '/assets/image.jpg'],
+            ['type' => 'asset', 'url' => '/assets/image.jpg', 'icon' => 'assets'],
             $fieldtype->preProcessIndex('asset::main::image.jpg')
         );
     }
@@ -202,7 +211,7 @@ class LinkTest extends TestCase
         $fieldtype = (new Link)->setField($field);
 
         $this->assertEquals(
-            ['type' => 'child', 'url' => '/parent/child'],
+            ['type' => 'child', 'url' => '/parent/child', 'icon' => 'page'],
             $fieldtype->preProcessIndex('@child')
         );
     }
@@ -231,7 +240,7 @@ class LinkTest extends TestCase
         $fieldtype = (new Link)->setField($field);
 
         $this->assertEquals(
-            ['type' => 'child', 'url' => '/first-child'],
+            ['type' => 'child', 'url' => '/first-child', 'icon' => 'page'],
             $fieldtype->preProcessIndex('@child')
         );
     }
@@ -297,5 +306,236 @@ class LinkTest extends TestCase
             'existing value overrides default option' => [['type' => 'link', 'default_option' => 'entry'], 'https://example.com', false, 'url'],
             'null when has sometimes rule even if required' => [['type' => 'link', 'required' => true, 'validate' => 'sometimes'], null, false, null],
         ];
+    }
+
+    #[Test]
+    public function it_registers_a_custom_link_type()
+    {
+        Link::extend('link-extend-test-basic', TestBasicLinkType::class);
+
+        $this->assertArrayHasKey('link-extend-test-basic', Link::types());
+
+        $type = Link::resolveType('link-extend-test-basic');
+
+        $this->assertInstanceOf(TestBasicLinkType::class, $type);
+        $this->assertEquals('link-extend-test-basic', $type->handle());
+        $this->assertEquals('Basic Test Type', $type->title());
+    }
+
+    #[Test]
+    public function it_appends_config_field_items_into_links_config_fields()
+    {
+        Link::extend('link-extend-test-config', TestConfigFieldsLinkType::class);
+
+        $fields = (new Link)->configFields();
+
+        $this->assertTrue($fields->has('link_extend_test_field'));
+        $this->assertEquals('text', $fields->get('link_extend_test_field')->type());
+    }
+
+    #[Test]
+    public function it_resolves_a_custom_type_through_resolve_redirect()
+    {
+        Link::extend('link-extend-test-resolve', TestResolvingLinkType::class);
+
+        $resolver = new \Statamic\Routing\ResolveRedirect;
+
+        $this->assertEquals('resolved:the-id', $resolver->item('link-extend-test-resolve::the-id'));
+    }
+
+    #[Test]
+    public function it_passes_parent_and_localize_through_to_resolve()
+    {
+        Link::extend('link-extend-test-context', TestContextCapturingLinkType::class);
+
+        $resolver = new \Statamic\Routing\ResolveRedirect;
+
+        $resolver->item('link-extend-test-context::the-id', 'some-parent', true);
+
+        $this->assertEquals(['the-id', 'some-parent', true], TestContextCapturingLinkType::$captured);
+    }
+
+    #[Test]
+    public function it_includes_a_custom_type_in_preload_when_visible()
+    {
+        $this->setUpRoutableCollection();
+
+        Link::extend('link-extend-test-visible', TestAlwaysVisibleLinkType::class);
+
+        $fieldtype = (new Link)->setField(new Field('test', ['type' => 'link']));
+
+        $types = $fieldtype->preload()['types'];
+
+        $this->assertArrayHasKey('link-extend-test-visible', $types);
+        $this->assertEquals('Always Visible', $types['link-extend-test-visible']['title']);
+    }
+
+    #[Test]
+    public function it_excludes_a_custom_type_from_preload_when_not_visible()
+    {
+        $this->setUpRoutableCollection();
+
+        Link::extend('link-extend-test-hidden', TestNeverVisibleLinkType::class);
+
+        $fieldtype = (new Link)->setField(new Field('test', ['type' => 'link']));
+
+        $this->assertArrayNotHasKey('link-extend-test-hidden', $fieldtype->preload()['types']);
+    }
+
+    #[Test]
+    public function it_excludes_a_custom_type_with_a_null_fieldtype_from_preload()
+    {
+        $this->setUpRoutableCollection();
+
+        Link::extend('link-extend-test-no-picker', TestNoPickerLinkType::class);
+
+        $fieldtype = (new Link)->setField(new Field('test', ['type' => 'link']));
+
+        $this->assertArrayNotHasKey('link-extend-test-no-picker', $fieldtype->preload()['types']);
+    }
+
+    #[Test]
+    public function it_includes_custom_type_and_icon_in_pre_process_index()
+    {
+        Link::extend('link-extend-test-index', TestIndexLinkType::class);
+
+        $fieldtype = (new Link)->setField(new Field('test', ['type' => 'link']));
+
+        $this->assertEquals(
+            ['type' => 'link-extend-test-index', 'url' => '/resolved-url', 'icon' => 'custom-icon'],
+            $fieldtype->preProcessIndex('link-extend-test-index::the-id')
+        );
+    }
+
+    private function setUpRoutableCollection(): void
+    {
+        $this->actingAs(tap(Facades\User::make()->makeSuper())->save());
+        tap(Facades\Collection::make('pages')->routes('{slug}'))->sites(['en'])->save();
+    }
+}
+
+class TestBasicLinkType extends LinkType
+{
+    protected static ?string $title = 'Basic Test Type';
+
+    public function resolve(string $id, $parent = null, bool $localize = false): mixed
+    {
+        return "resolved:{$id}";
+    }
+
+    public function fieldtype(Field $field): ?array
+    {
+        return ['type' => 'text'];
+    }
+}
+
+class TestConfigFieldsLinkType extends LinkType
+{
+    public function resolve(string $id, $parent = null, bool $localize = false): mixed
+    {
+        return null;
+    }
+
+    public function fieldtype(Field $field): ?array
+    {
+        return ['type' => 'text'];
+    }
+
+    public function configFieldItems(): array
+    {
+        return [
+            'link_extend_test_field' => ['type' => 'text'],
+        ];
+    }
+}
+
+class TestResolvingLinkType extends LinkType
+{
+    public function resolve(string $id, $parent = null, bool $localize = false): mixed
+    {
+        return "resolved:{$id}";
+    }
+
+    public function fieldtype(Field $field): ?array
+    {
+        return null;
+    }
+}
+
+class TestContextCapturingLinkType extends LinkType
+{
+    public static $captured;
+
+    public function resolve(string $id, $parent = null, bool $localize = false): mixed
+    {
+        static::$captured = [$id, $parent, $localize];
+
+        return null;
+    }
+
+    public function fieldtype(Field $field): ?array
+    {
+        return null;
+    }
+}
+
+class TestAlwaysVisibleLinkType extends LinkType
+{
+    protected static ?string $title = 'Always Visible';
+
+    public function resolve(string $id, $parent = null, bool $localize = false): mixed
+    {
+        return null;
+    }
+
+    public function fieldtype(Field $field): ?array
+    {
+        return ['type' => 'text'];
+    }
+}
+
+class TestNeverVisibleLinkType extends LinkType
+{
+    public function resolve(string $id, $parent = null, bool $localize = false): mixed
+    {
+        return null;
+    }
+
+    public function fieldtype(Field $field): ?array
+    {
+        return ['type' => 'text'];
+    }
+
+    public function visible(Field $field): bool
+    {
+        return false;
+    }
+}
+
+class TestNoPickerLinkType extends LinkType
+{
+    public function resolve(string $id, $parent = null, bool $localize = false): mixed
+    {
+        return null;
+    }
+
+    public function fieldtype(Field $field): ?array
+    {
+        return null;
+    }
+}
+
+class TestIndexLinkType extends LinkType
+{
+    protected ?string $icon = 'custom-icon';
+
+    public function resolve(string $id, $parent = null, bool $localize = false): mixed
+    {
+        return '/resolved-url';
+    }
+
+    public function fieldtype(Field $field): ?array
+    {
+        return null;
     }
 }

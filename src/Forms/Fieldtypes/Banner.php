@@ -3,6 +3,7 @@
 namespace Statamic\Forms\Fieldtypes;
 
 use Statamic\Forms\Fields\FormFieldtype;
+use Statamic\Support\Arr;
 
 use function Statamic\trans as __;
 
@@ -45,6 +46,7 @@ class Banner extends FormFieldtype
             'text' => $this->config('text'),
             'icon' => $this->config('icon'),
             'listable' => false,
+            ...Arr::except($this->config(), ['type', 'display', 'text', 'icon', 'listable']),
         ];
     }
 

@@ -44,34 +44,36 @@ onUnmounted(() => {
     clearCpNavToggleHandler(toggle);
 });
 
-watch(
-    isOpen,
-    (open) => {
-        const el = document.getElementById('main');
-        el?.classList.toggle('nav-closed', !open);
-        el?.classList.toggle('nav-open', open);
+function applyOpenState(open) {
+    const el = document.getElementById('main');
+    el?.classList.toggle('nav-closed', !open);
+    el?.classList.toggle('nav-open', open);
 
-        if (clickOutsideEnableTimer !== null) {
-            clearTimeout(clickOutsideEnableTimer);
+    if (clickOutsideEnableTimer !== null) {
+        clearTimeout(clickOutsideEnableTimer);
+        clickOutsideEnableTimer = null;
+    }
+
+    // Delay enabling the click-outside listener to avoid catching the toggle click.
+    // Clear any pending timer so a fast close cannot leave clickListenerActive stuck true.
+    if (open) {
+        clickListenerActive = false;
+        clickOutsideEnableTimer = setTimeout(() => {
             clickOutsideEnableTimer = null;
-        }
+            clickListenerActive = true;
+        }, 100);
+    } else {
+        clickListenerActive = false;
+    }
+}
 
-        // Delay enabling the click-outside listener to avoid catching the toggle click.
-        // Clear any pending timer so a fast close cannot leave clickListenerActive stuck true.
-        if (open) {
-            clickListenerActive = false;
-            clickOutsideEnableTimer = setTimeout(() => {
-                clickOutsideEnableTimer = null;
-                clickListenerActive = true;
-            }, 100);
-        } else {
-            clickListenerActive = false;
-        }
-    },
-    { flush: 'post', immediate: true },
-);
+watch(isOpen, applyOpenState, { flush: 'post' });
 
 onMounted(() => {
+    // #main isn't in the document until the layout finishes mounting, so an immediate
+    // watcher run would silently miss it and leave the DOM out of sync with isOpen.
+    applyOpenState(isOpen.value);
+
     const keyBinding = Statamic.$keys.bind(['command+\\', ['[']], (e) => {
         e.preventDefault();
         toggle();

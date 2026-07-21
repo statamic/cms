@@ -256,6 +256,7 @@ class FormsController extends CpController
                             'close_date' => 'not empty',
                             'submission_limit' => 'not empty',
                         ],
+                        'placeholder' => __('statamic::messages.form_closed_message'),
                         'instructions' => __('statamic::messages.form_configure_closed_message_instructions'),
                     ],
                     'require_login' => [
@@ -269,6 +270,7 @@ class FormsController extends CpController
                         'if' => [
                             'require_login' => 'equals true',
                         ],
+                        'placeholder' => __('statamic::messages.form_require_login_message'),
                         'instructions' => __('statamic::messages.form_configure_require_login_message_instructions'),
                     ],
                 ],

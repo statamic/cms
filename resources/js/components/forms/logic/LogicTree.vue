@@ -23,7 +23,7 @@ import FieldInspector from '@/components/forms/builder/FieldInspector.vue';
 import PageInspector from '@/components/forms/builder/PageInspector.vue';
 import { Button, Icon } from '@ui';
 import { useSortable } from '@/composables/forms/use-drag-and-drop';
-import { computed, onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue';
+import { computed, nextTick, onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue';
 import type { PropType } from 'vue';
 
 const emit = defineEmits(['update:pages', 'select']);
@@ -37,6 +37,11 @@ const props = defineProps({
 const tree = useTemplateRef('tree');
 const isInspectorOpen = ref(false);
 const isRightPanelCollapsed = ref(true);
+// Page-leap connectors need to know whether a field cell sits beside them in any
+// subsequent page column. That depends on live layout — section markers, density,
+// etc. — so we measure bounding boxes rather than counting fields.
+const adjacentRightCells = ref<Record<string, boolean>>({});
+let resizeObserver: ResizeObserver | null = null;
 
 const pageAnchor = (pageIndex) => `--page-${pageIndex + 1}`;
 
@@ -63,6 +68,30 @@ const fieldConnections = computed(() => {
 
     return connections;
 });
+
+// For each leap cell, check whether any field in a later column overlaps it vertically.
+// Overlap means the leap connector passes beside a real cell at that row.
+const measureAdjacentRightCells = () => {
+    if (! tree.value) return;
+
+    const columns = [...tree.value.querySelectorAll('.linked-list__column')];
+    const adjacent = {};
+
+    tree.value.querySelectorAll('.linked-list__page-leap').forEach((cell) => {
+        const index = columns.indexOf(cell.closest('.linked-list__column'));
+        const rect = cell.getBoundingClientRect();
+
+        adjacent[cell.dataset.fieldId] = columns
+            .slice(index + 1)
+            .flatMap((column) => [...column.querySelectorAll('[data-field-item]')])
+            .some((other) => {
+                const next = other.getBoundingClientRect();
+                return rect.top < next.bottom && rect.bottom > next.top;
+            });
+    });
+
+    adjacentRightCells.value = adjacent;
+};
 
 const pageTitle = (page, pageIndex) => page.display || __('Page :number', { number: pageIndex + 1 });
 
@@ -148,6 +177,9 @@ watch(() => props.selected, (selection) => {
     }
 });
 
+// Fields moving or density changing can shift rows without always resizing the tree.
+watch(() => [props.pages, props.density], () => nextTick(measureAdjacentRightCells), { deep: true });
+
 const onEscape = (event: KeyboardEvent) => {
     if (event.key !== 'Escape') return;
 
@@ -166,8 +198,17 @@ const onEscape = (event: KeyboardEvent) => {
     }
 };
 
-onMounted(() => document.addEventListener('keydown', onEscape));
-onUnmounted(() => document.removeEventListener('keydown', onEscape));
+onMounted(() => {
+    document.addEventListener('keydown', onEscape);
+    resizeObserver = new ResizeObserver(measureAdjacentRightCells);
+    resizeObserver.observe(tree.value);
+});
+
+onUnmounted(() => {
+    document.removeEventListener('keydown', onEscape);
+    resizeObserver?.disconnect();
+    resizeObserver = null;
+});
 </script>
 
 <template>
@@ -234,6 +275,7 @@ onUnmounted(() => document.removeEventListener('keydown', onEscape));
                                         v-for="field in section.fields"
                                         :key="field._id"
                                         data-field-item
+                                        :data-field-id="field._id"
                                         :data-field-item-selected="isFieldSelected(field) ? '' : undefined"
                                         class="cursor-pointer"
                                         :class="{
@@ -241,6 +283,8 @@ onUnmounted(() => document.removeEventListener('keydown', onEscape));
                                             'linked-list__hidden-field': field.config?.hidden,
                                             'linked-list__connector': fieldConnection(field),
                                             'linked-list__page-leap': fieldConnection(field)?.leap,
+                                            // Leap connectors that pass beside a cell in the next column.
+                                            'has-adjacent-cell': fieldConnection(field)?.leap && adjacentRightCells[field._id],
                                             'ring-1 ring-blue-500': isFieldSelected(field),
                                         }"
                                         :style="fieldConnection(field) ? { '--end-connection': fieldConnection(field).endConnection } : null"

@@ -120,6 +120,7 @@ export default {
 
     data() {
         return {
+            initialized: false,
             isRequired: false,
             sometimesValidate: false,
             rules: [],
@@ -191,12 +192,13 @@ export default {
         rules(value) {
             this.resetState();
 
-            this.$emit('updated', value);
+            if (this.initialized) this.$emit('updated', value);
         },
     },
 
     created() {
         this.getInitial();
+        this.$nextTick(() => this.initialized = true);
     },
 
     methods: {

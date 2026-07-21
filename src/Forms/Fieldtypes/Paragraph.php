@@ -3,6 +3,7 @@
 namespace Statamic\Forms\Fieldtypes;
 
 use Statamic\Forms\Fields\FormFieldtype;
+use Statamic\Support\Arr;
 
 use function Statamic\trans as __;
 
@@ -40,6 +41,7 @@ class Paragraph extends FormFieldtype
             'display' => $this->config('display'),
             'hide_display' => true,
             'listable' => false,
+            ...Arr::except($this->config(), ['type', 'text', 'display', 'listable']),
         ];
     }
 }

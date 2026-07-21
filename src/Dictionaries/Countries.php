@@ -343,4 +343,9 @@ class Countries extends BasicDictionary
             ['name' => __('statamic::dictionary-countries.names.ZWE'), 'iso3' => 'ZWE', 'iso2' => 'ZW', 'region' => $this->regions['africa'], 'subregion' => $this->subregions['eastern_africa'], 'emoji' => '🇿🇼'],
         ];
     }
+
+    public function allowsPublicAccess(): bool
+    {
+        return true;
+    }
 }
