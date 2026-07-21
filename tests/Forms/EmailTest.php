@@ -3,15 +3,20 @@
 namespace Tests\Forms;
 
 use Facades\Statamic\Fields\BlueprintRepository;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\Asset;
+use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Site;
 use Statamic\Forms\Email;
 use Statamic\Forms\Submission;
+use Statamic\Forms\Uploaders\FormFileUpload;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -236,7 +241,141 @@ class EmailTest extends TestCase
     #[Test]
     public function attachments_are_added()
     {
-        $this->markTestIncomplete();
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        // "store: true" means that the uploaded file is now an asset.
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'avatar', 'field' => ['type' => 'upload', 'store' => true, 'container' => 'avatars', 'max_files' => 1]],
+            ],
+        ]))->save();
+
+        tap(Asset::make()->container('avatars')->path('avatar.jpg'))->save();
+
+        $submission = $form->makeSubmission()->data(['avatar' => 'avatar.jpg']);
+
+        $email = tap(new Email($submission, ['to' => 'test@test.com', 'attachments' => true], Site::default()))->build();
+
+        $this->assertTrue($email->hasAttachmentFromStorageDisk('avatars', 'avatar.jpg'));
+    }
+
+    #[Test]
+    public function it_attaches_temporary_file_upload()
+    {
+        Storage::fake('local');
+
+        // "store: false" means that the uploaded file is temporary.
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'document', 'field' => ['type' => 'upload', 'store' => false, 'max_files' => 1]],
+            ],
+        ]))->save();
+
+        $submission = $form->makeSubmission();
+        $path = FormFileUpload::field(['handle' => 'document', 'max_files' => 1], $submission->id())
+            ->upload([UploadedFile::fake()->create('resume.pdf', 10)]);
+        $submission->data(['document' => $path]);
+
+        $email = tap(new Email($submission, ['to' => 'test@test.com', 'attachments' => true], Site::default()))->build();
+
+        $this->assertTrue($email->hasAttachmentFromStorageDisk('local', 'statamic/form-uploads/'.$path));
+    }
+
+    #[Test]
+    public function it_attaches_temporary_file_upload_from_the_configured_disk_and_path()
+    {
+        config([
+            'statamic.system.file_uploads_disk' => 'uploads',
+            'statamic.forms.file_uploads_path' => 'temp-form-uploads',
+        ]);
+
+        Storage::fake('local');
+        Storage::fake('uploads');
+
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'document', 'field' => ['type' => 'upload', 'store' => false, 'max_files' => 1]],
+            ],
+        ]))->save();
+
+        $submission = $form->makeSubmission();
+        $path = FormFileUpload::field(['handle' => 'document', 'max_files' => 1], $submission->id())
+            ->upload([UploadedFile::fake()->create('resume.pdf', 10)]);
+        $submission->data(['document' => $path]);
+
+        $email = tap(new Email($submission, ['to' => 'test@test.com', 'attachments' => true], Site::default()))->build();
+
+        $this->assertTrue($email->hasAttachmentFromStorageDisk('uploads', 'temp-form-uploads/'.$path));
+    }
+
+    #[Test]
+    public function it_attaches_files_from_assets_field()
+    {
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'avatar', 'field' => ['type' => 'assets', 'container' => 'avatars', 'max_files' => 1]],
+            ],
+        ]))->save();
+
+        tap(Asset::make()->container('avatars')->path('avatar.jpg'))->save();
+
+        $submission = $form->makeSubmission()->data(['avatar' => 'avatar.jpg']);
+
+        $email = tap(new Email($submission, ['to' => 'test@test.com', 'attachments' => true], Site::default()))->build();
+
+        $this->assertTrue($email->hasAttachmentFromStorageDisk('avatars', 'avatar.jpg'));
+    }
+
+    #[Test]
+    public function it_attaches_files_from_files_field()
+    {
+        Storage::fake('local');
+
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'document', 'field' => ['type' => 'files', 'max_files' => 1]],
+            ],
+        ]))->save();
+
+        $documentPath = now()->timestamp.'/resume.pdf';
+        Storage::disk('local')->put('statamic/file-uploads/'.$documentPath, 'contents');
+
+        $submission = $form->makeSubmission()->data(['document' => $documentPath]);
+
+        $email = tap(new Email($submission, ['to' => 'test@test.com', 'attachments' => true], Site::default()))->build();
+
+        $this->assertTrue($email->hasAttachmentFromStorageDisk('local', 'statamic/file-uploads/'.$documentPath));
+    }
+
+    #[Test]
+    public function it_attaches_files_from_files_field_on_the_configured_disk_and_path()
+    {
+        config([
+            'statamic.system.file_uploads_disk' => 'uploads',
+            'statamic.system.file_uploads_path' => 'temp-uploads',
+        ]);
+
+        Storage::fake('local');
+        $uploadsDisk = Storage::fake('uploads');
+
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'document', 'field' => ['type' => 'files', 'max_files' => 1]],
+            ],
+        ]))->save();
+
+        $documentPath = now()->timestamp.'/resume.pdf';
+        $uploadsDisk->put('temp-uploads/'.$documentPath, 'contents');
+
+        $submission = $form->makeSubmission()->data(['document' => $documentPath]);
+
+        $email = tap(new Email($submission, ['to' => 'test@test.com', 'attachments' => true], Site::default()))->build();
+
+        $this->assertTrue($email->hasAttachmentFromStorageDisk('uploads', 'temp-uploads/'.$documentPath));
     }
 
     #[Test]

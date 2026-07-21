@@ -14,9 +14,11 @@ use Statamic\Events\SubmissionCreated;
 use Statamic\Events\SubmissionFinalized;
 use Statamic\Exceptions\FormRestrictedException;
 use Statamic\Exceptions\SilentFormFailureException;
+use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Fieldset;
 use Statamic\Facades\Form;
+use Statamic\Forms\CreateAssetsFromFileUploads;
 use Statamic\Forms\SendEmails;
 use Statamic\Forms\SubmissionResult;
 use Statamic\Forms\SubmitForm;
@@ -165,6 +167,7 @@ class SubmitFormTest extends TestCase
         $this->assertEmpty($this->form->submissions());
         Event::assertDispatched(SubmissionCreated::class);
         Event::assertDispatched(SubmissionFinalized::class);
+        Bus::assertDispatched(CreateAssetsFromFileUploads::class);
         Bus::assertDispatched(SendEmails::class);
     }
 
@@ -308,8 +311,408 @@ class SubmitFormTest extends TestCase
     }
 
     #[Test]
+    public function it_uploads_files_via_assets_fieldtype()
+    {
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $form = tap(Form::make('avatar.png')->formFields([
+            'fields' => [
+                ['handle' => 'email', 'field' => ['type' => 'email']],
+                ['handle' => 'avatar', 'field' => ['type' => 'assets', 'container' => 'avatars', 'max_files' => 1]],
+            ],
+        ]))->save();
+
+        $result = app(SubmitForm::class)
+            ->form($form)
+            ->submit(
+                data: ['email' => 'test@example.com'],
+                files: ['avatar' => [UploadedFile::fake()->image('avatar.jpg')]],
+            );
+
+        Storage::disk('avatars')->assertExists('avatar.jpg');
+        $this->assertEquals('avatar.jpg', $result->submission->get('avatar'));
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function it_uploads_files_via_files_fieldtype()
+    {
+        Storage::fake('local');
+        Bus::fake(); // Otherwise finalize's queued cleanup job removes it before we can look.
+
+        $form = tap(Form::make('avatar.png')->formFields([
+            'fields' => [
+                ['handle' => 'email', 'field' => ['type' => 'email']],
+                ['handle' => 'avatar', 'field' => ['type' => 'files', 'max_files' => 1]],
+            ],
+        ]))->save();
+
+        $result = app(SubmitForm::class)
+            ->form($form)
+            ->submit(
+                data: ['email' => 'test@example.com'],
+                files: ['avatar' => [UploadedFile::fake()->create('resume.pdf', 10)]],
+            );
+
+        $path = $result->submission->get('avatar');
+
+        $this->assertNotNull($path);
+        Storage::disk('local')->assertExists('statamic/file-uploads/'.$path);
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function it_persists_the_real_asset_path_after_finalizing_a_store_true_upload()
+    {
+        // Deliberately no Bus::fake() here: the bug only reproduces when the real
+        // CreateAssetsFromFileUploads + SendEmails + DeleteTemporaryFiles chain runs.
+        Storage::fake('local');
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $form = tap(Form::make('uploads')->formFields([
+            'pages' => [
+                [
+                    'id' => 'main',
+                    'sections' => [
+                        [
+                            'fields' => [
+                                ['handle' => 'email', 'field' => ['type' => 'email']],
+                                ['handle' => 'photo', 'field' => ['type' => 'upload', 'store' => true, 'container' => 'avatars', 'max_files' => 1]],
+                                ['handle' => 'document', 'field' => ['type' => 'upload', 'store' => false, 'max_files' => 1]],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]))->save();
+
+        $result = app(SubmitForm::class)
+            ->form($form)
+            ->page('main')
+            ->submit(
+                data: ['email' => 'test@example.com'],
+                files: [
+                    'photo' => [UploadedFile::fake()->image('photo.jpg')],
+                    'document' => [UploadedFile::fake()->create('resume.pdf', 10)],
+                ],
+            );
+
+        // Re-read from disk: this is the persisted state, which is what matters.
+        $storedValue = $form->submission($result->submission->id())->get('photo');
+
+        $this->assertEquals('photo.jpg', $storedValue);
+        $this->assertNotNull(Asset::find("avatars::{$storedValue}"));
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function it_does_not_revalidate_already_uploaded_files_when_resubmitting_their_page()
+    {
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $form = tap(Form::make('uploads')->formFields([
+            'pages' => [
+                [
+                    'id' => 'main',
+                    'sections' => [
+                        ['fields' => [
+                            ['handle' => 'email', 'field' => ['type' => 'email']],
+                            ['handle' => 'avatar', 'field' => ['type' => 'upload', 'store' => true, 'container' => 'avatars']],
+                            ['handle' => 'headshot', 'field' => ['type' => 'upload', 'store' => true, 'container' => 'avatars', 'max_files' => 1]],
+                        ]],
+                    ],
+                ],
+            ],
+        ]))->save();
+
+        $first = app(SubmitForm::class)
+            ->form($form)
+            ->page('main')
+            ->submit(
+                data: ['email' => 'test@example.com'],
+                files: [
+                    'avatar' => [UploadedFile::fake()->image('avatar.jpg')],
+                    'headshot' => [UploadedFile::fake()->image('headshot.jpg')],
+                ],
+            );
+
+        // Going back to the page and resubmitting resends each field's already-resolved value:
+        // an array for `avatar` (no max_files), a plain string for `headshot` (max_files: 1).
+        // Neither should be revalidated as though it were a fresh upload.
+        $result = app(SubmitForm::class)
+            ->form($form)
+            ->page('main')
+            ->resume($first->submission)
+            ->submit(data: [
+                'email' => 'test@example.com',
+                'avatar' => $first->submission->get('avatar'),
+                'headshot' => $first->submission->get('headshot'),
+            ]);
+
+        $this->assertTrue($result->isFinalized());
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function it_still_validates_a_freshly_uploaded_file_when_resubmitting_its_page()
+    {
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $form = tap(Form::make('uploads')->formFields([
+            'pages' => [
+                [
+                    'id' => 'main',
+                    'sections' => [
+                        ['fields' => [
+                            ['handle' => 'email', 'field' => ['type' => 'email']],
+                            ['handle' => 'avatar', 'field' => ['type' => 'upload', 'store' => true, 'container' => 'avatars', 'max_files' => 1]],
+                        ]],
+                    ],
+                ],
+            ],
+        ]))->save();
+
+        $first = app(SubmitForm::class)
+            ->form($form)
+            ->page('main')
+            ->submit(
+                data: ['email' => 'test@example.com'],
+                files: ['avatar' => [UploadedFile::fake()->image('avatar.jpg')]],
+            );
+
+        // Resubmitting with a genuinely new file should still be validated as a fresh upload,
+        // not skipped the way an already-uploaded field's carried-over value is.
+        try {
+            app(SubmitForm::class)
+                ->form($form)
+                ->page('main')
+                ->resume($first->submission)
+                ->submit(
+                    data: ['email' => 'test@example.com'],
+                    files: ['avatar' => [UploadedFile::fake()->create('virus.php', 10)]],
+                );
+
+            $this->fail('Expected ValidationException was not thrown');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('avatar.0', $e->errors());
+        }
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function it_still_validates_min_files_when_removing_files_without_uploading_a_new_one()
+    {
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $form = tap(Form::make('uploads')->formFields([
+            'pages' => [
+                [
+                    'id' => 'main',
+                    'sections' => [
+                        ['fields' => [
+                            ['handle' => 'email', 'field' => ['type' => 'email']],
+                            ['handle' => 'gallery', 'field' => ['type' => 'upload', 'store' => true, 'container' => 'avatars', 'min_files' => 2]],
+                        ]],
+                    ],
+                ],
+            ],
+        ]))->save();
+
+        $first = app(SubmitForm::class)
+            ->form($form)
+            ->page('main')
+            ->submit(
+                data: ['email' => 'test@example.com'],
+                files: ['gallery' => [UploadedFile::fake()->image('one.jpg'), UploadedFile::fake()->image('two.jpg')]],
+            );
+
+        // Dropping one of the two files, without uploading a replacement, still leaves an
+        // array-shaped value. It should keep being validated against min_files as normal.
+        try {
+            app(SubmitForm::class)
+                ->form($form)
+                ->page('main')
+                ->resume($first->submission)
+                ->submit(data: ['email' => 'test@example.com', 'gallery' => [$first->submission->get('gallery')[0]]]);
+
+            $this->fail('Expected ValidationException was not thrown');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('gallery', $e->errors());
+        }
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function it_allows_removing_a_file_from_a_multi_file_upload_when_resubmitting_its_page()
+    {
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $form = tap(Form::make('uploads')->formFields([
+            'pages' => [
+                [
+                    'id' => 'main',
+                    'sections' => [
+                        ['fields' => [
+                            ['handle' => 'email', 'field' => ['type' => 'email']],
+                            ['handle' => 'gallery', 'field' => ['type' => 'upload', 'store' => true, 'container' => 'avatars']],
+                        ]],
+                    ],
+                ],
+            ],
+        ]))->save();
+
+        $first = app(SubmitForm::class)
+            ->form($form)
+            ->page('main')
+            ->submit(
+                data: ['email' => 'test@example.com'],
+                files: ['gallery' => [UploadedFile::fake()->image('one.jpg'), UploadedFile::fake()->image('two.jpg')]],
+            );
+
+        // Dropping one of the two already-stored files, without uploading a replacement, is a valid
+        // subset of what's stored - it shouldn't be rejected as a forged value.
+        $result = app(SubmitForm::class)
+            ->form($form)
+            ->page('main')
+            ->resume($first->submission)
+            ->submit(data: [
+                'email' => 'test@example.com',
+                'gallery' => [$first->submission->get('gallery')[0]],
+            ]);
+
+        $this->assertTrue($result->isFinalized());
+        $this->assertEquals([$first->submission->get('gallery')[0]], $result->submission->get('gallery'));
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function it_rejects_an_upload_value_that_was_never_actually_uploaded()
+    {
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $form = tap(Form::make('uploads')->formFields([
+            'pages' => [
+                [
+                    'id' => 'main',
+                    'sections' => [
+                        ['fields' => [
+                            ['handle' => 'email', 'field' => ['type' => 'email']],
+                            ['handle' => 'avatar', 'field' => ['type' => 'upload', 'store' => true, 'container' => 'avatars', 'max_files' => 1]],
+                        ]],
+                    ],
+                ],
+            ],
+        ]))->save();
+
+        try {
+            app(SubmitForm::class)
+                ->form($form)
+                ->page('main')
+                ->submit(data: ['email' => 'test@example.com', 'avatar' => '../../framework/sessions/x']);
+
+            $this->fail('Expected ValidationException was not thrown');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('avatar', $e->errors());
+        }
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function it_rejects_a_forged_multi_file_upload_value()
+    {
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $form = tap(Form::make('uploads')->formFields([
+            'pages' => [
+                [
+                    'id' => 'main',
+                    'sections' => [
+                        ['fields' => [
+                            ['handle' => 'email', 'field' => ['type' => 'email']],
+                            ['handle' => 'gallery', 'field' => ['type' => 'upload', 'store' => true, 'container' => 'avatars']],
+                        ]],
+                    ],
+                ],
+            ],
+        ]))->save();
+
+        try {
+            app(SubmitForm::class)
+                ->form($form)
+                ->page('main')
+                ->submit(data: ['email' => 'test@example.com', 'gallery' => ['../../framework/sessions/x']]);
+
+            $this->fail('Expected ValidationException was not thrown');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('gallery', $e->errors());
+        }
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function it_rejects_a_resubmitted_upload_value_that_doesnt_match_whats_stored()
+    {
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $form = tap(Form::make('uploads')->formFields([
+            'pages' => [
+                [
+                    'id' => 'main',
+                    'sections' => [
+                        ['fields' => [
+                            ['handle' => 'email', 'field' => ['type' => 'email']],
+                            ['handle' => 'avatar', 'field' => ['type' => 'upload', 'store' => true, 'container' => 'avatars', 'max_files' => 1]],
+                        ]],
+                    ],
+                ],
+            ],
+        ]))->save();
+
+        $first = app(SubmitForm::class)
+            ->form($form)
+            ->page('main')
+            ->submit(
+                data: ['email' => 'test@example.com'],
+                files: ['avatar' => [UploadedFile::fake()->image('avatar.jpg')]],
+            );
+
+        try {
+            app(SubmitForm::class)
+                ->form($form)
+                ->page('main')
+                ->resume($first->submission)
+                ->submit(data: ['email' => 'test@example.com', 'avatar' => '../../framework/sessions/x']);
+
+            $this->fail('Expected ValidationException was not thrown');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('avatar', $e->errors());
+        }
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
     public function it_validates_the_extension_of_uploaded_files()
     {
+        Bus::fake(); // Otherwise the temp file is deleted by DeleteTemporaryFiles right after submission.
         Storage::fake('local');
 
         // store: false makes this a temporary "files" upload rather than a stored asset.
@@ -343,6 +746,7 @@ class SubmitFormTest extends TestCase
             ->submit(data: [], files: ['document' => [UploadedFile::fake()->create('resume.pdf', 10)]]);
 
         $this->assertTrue($result->isFinalized());
+        Storage::disk('local')->assertExists('statamic/form-uploads/'.$result->submission->get('document')[0]);
 
         $form->submissions()->each->delete();
     }
@@ -446,6 +850,7 @@ class SubmitFormTest extends TestCase
         Event::assertDispatched(SubmissionCreated::class);
         Event::assertNotDispatched(FormSubmitted::class);
         Event::assertNotDispatched(SubmissionFinalized::class);
+        Bus::assertNotDispatched(CreateAssetsFromFileUploads::class);
         Bus::assertNotDispatched(SendEmails::class);
 
         $form->submissions()->each->delete();
@@ -658,6 +1063,7 @@ class SubmitFormTest extends TestCase
         $this->assertTrue($result->submission->isPartial());
         Event::assertNotDispatched(FormSubmitted::class);
         Event::assertNotDispatched(SubmissionFinalized::class);
+        Bus::assertNotDispatched(CreateAssetsFromFileUploads::class);
         Bus::assertNotDispatched(SendEmails::class);
 
         // Earlier-page values are preserved while the new page's values are merged in.
@@ -704,6 +1110,7 @@ class SubmitFormTest extends TestCase
         // Finalizing fires the completion events once; it doesn't re-create the submission.
         Event::assertNotDispatched(SubmissionCreated::class);
         Event::assertDispatched(SubmissionFinalized::class, 1);
+        Bus::assertDispatched(CreateAssetsFromFileUploads::class, 1);
         Bus::assertDispatched(SendEmails::class, 1);
 
         $form->submissions()->each->delete();
@@ -730,6 +1137,7 @@ class SubmitFormTest extends TestCase
 
         Event::assertNotDispatched(FormSubmitted::class);
         Event::assertNotDispatched(SubmissionFinalized::class);
+        Bus::assertNotDispatched(CreateAssetsFromFileUploads::class);
         Bus::assertNotDispatched(SendEmails::class);
 
         $form->submissions()->each->delete();

@@ -7,8 +7,8 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Statamic\Contracts\Forms\Submission;
-use Statamic\Facades\Asset;
 use Statamic\Facades\FormSubmission;
+use Statamic\Forms\DeleteTemporaryFiles;
 
 class DeletePartialFormSubmissions implements ShouldQueue
 {
@@ -27,24 +27,9 @@ class DeletePartialFormSubmissions implements ShouldQueue
             ->where('date', '<', $threshold)
             ->get()
             ->each(function (Submission $submission): void {
-                if (config('statamic.forms.garbage_collect_assets')) {
-                    $this->garbageCollectAssets($submission);
-                }
+                DeleteTemporaryFiles::dispatchSync($submission);
 
                 $submission->delete();
-            });
-    }
-
-    private function garbageCollectAssets(Submission $submission): void
-    {
-        $submission->form()->blueprint()->fields()->all()
-            ->filter(fn ($field) => $field->fieldtype()->handle() === 'assets')
-            ->each(function ($field) use ($submission) {
-                $container = $field->get('container');
-
-                collect($submission->get($field->handle()))
-                    ->filter()
-                    ->each(fn ($path) => Asset::find("{$container}::{$path}")?->delete());
             });
     }
 }

@@ -10,7 +10,9 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\AssetContainer;
+use Statamic\Facades\Fieldset as FieldsetRepository;
 use Statamic\Facades\Form;
+use Statamic\Fields\Fieldset;
 use Statamic\Forms\SendEmails;
 use Statamic\Statamic;
 
@@ -1546,6 +1548,32 @@ EOT
             ]);
 
         Storage::disk('avatars')->assertMissing('avatar.jpg');
+    }
+
+    #[Test]
+    public function it_renders_file_input_for_assets_and_files_fields_imported_from_a_fieldset()
+    {
+        $fieldset = (new Fieldset)->setHandle('uploads')->setContents([
+            'fields' => [
+                ['handle' => 'photo', 'field' => ['type' => 'assets']],
+                ['handle' => 'attachment', 'field' => ['type' => 'files']],
+            ],
+        ]);
+
+        FieldsetRepository::shouldReceive('find')->with('uploads')->andReturn($fieldset);
+
+        $this->createForm([
+            'sections' => [
+                ['fields' => [['import' => 'uploads']]],
+            ],
+        ], 'survey');
+
+        $output = $this->tag('{{ form:survey }}{{ form:fields }}{{ field }}{{ /form:fields }}{{ /form:survey }}');
+
+        $this->assertStringContainsString('type="file"', $output);
+        $this->assertStringContainsString('name="photo[]"', $output);
+        $this->assertStringContainsString('name="attachment[]"', $output);
+        $this->assertStringContainsString('multiple', $output);
     }
 
     #[Test]

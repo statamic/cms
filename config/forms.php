@@ -15,6 +15,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | File Uploads Path
+    |--------------------------------------------------------------------------
+    |
+    | The path (on the file uploads disk) where file uploads are stored
+    | before they're converted to an asset or deleted.
+    |
+    */
+
+    'file_uploads_path' => env('STATAMIC_FORM_UPLOADS_PATH', 'statamic/form-uploads'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Email View Folder
     |--------------------------------------------------------------------------
     |
@@ -41,14 +53,11 @@ return [
     |--------------------------------------------------------------------------
     |
     | Partial submissions are automatically deleted after a set number of days.
-    | Set this to null to prevent their automatic deletion. You may also enable
-    | garbage collection to delete related assets at the same time.
+    | Set this to null to prevent their automatic deletion.
     |
     */
 
     'delete_partial_submissions_after' => 7,
-
-    'garbage_collect_assets' => false,
 
     /*
     |--------------------------------------------------------------------------

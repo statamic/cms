@@ -9,7 +9,7 @@ use function Statamic\trans as __;
 
 class Upload extends FormFieldtype
 {
-    protected static $fieldtype = 'files';
+    protected static $fieldtype = 'form_upload';
     protected $description = 'Upload files - store them permanently or use them temporarily.';
     protected $icon = 'upload-cloud';
     protected $categories = ['media'];
@@ -39,6 +39,12 @@ class Upload extends FormFieldtype
                 'max_items' => 1,
                 'if' => ['store' => true],
             ],
+            'min_files' => [
+                'display' => __('Min Files'),
+                'instructions' => __('The minimum number of files that must be uploaded.'),
+                'type' => 'integer',
+                'min' => 1,
+            ],
             'max_files' => [
                 'display' => __('Max Files'),
                 'instructions' => __('The maximum number of files that may be uploaded.'),
@@ -50,20 +56,14 @@ class Upload extends FormFieldtype
 
     public function toFieldArray(): array
     {
-        if ($this->config('store')) {
-            return [
-                'type' => 'assets',
-                'container' => $this->config('container'),
-                'folder' => $this->config('folder'),
-                'max_files' => $this->config('max_files'),
-                ...Arr::except($this->config(), ['type', 'store', 'container', 'folder', 'max_files']),
-            ];
-        }
-
         return [
-            'type' => 'files',
+            'type' => 'form_upload',
+            'store' => $this->config('store'),
+            'container' => $this->config('container'),
+            'folder' => $this->config('folder'),
+            'min_files' => $this->config('min_files'),
             'max_files' => $this->config('max_files'),
-            ...Arr::except($this->config(), ['type', 'store', 'max_files']),
+            ...Arr::except($this->config(), ['type', 'store', 'container', 'folder', 'min_files', 'max_files']),
         ];
     }
 
@@ -80,9 +80,8 @@ class Upload extends FormFieldtype
     public function view(): string
     {
         $language = config('statamic.templates.language', 'antlers');
-
-        // Check for user's custom assets or files views first (for backwards compatibility)
         $legacyType = $this->config('store') ? 'assets' : 'files';
+
         $legacyViews = [
             "statamic::forms.fields.{$legacyType}",
             "statamic::forms.{$language}.fields.{$legacyType}",
