@@ -26,7 +26,7 @@ class FormUpload extends Fieldtype
     {
         return [
             'files' => collect(Arr::wrap($this->field->value()))->map(function (string $value): array {
-                $asset = $this->storesAsAsset() ? Asset::find($value) : null;
+                $asset = $this->storesAsAsset() ? Asset::find($this->container()->handle().'::'.$value) : null;
 
                 if (! $asset) {
                     return ['filename' => basename($value)];
