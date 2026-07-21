@@ -87,6 +87,16 @@ class NavItem
     }
 
     /**
+     * Check if an ID has been explicitly set, rather than generated from the display.
+     *
+     * @return bool
+     */
+    public function hasCustomId()
+    {
+        return ! is_null($this->id);
+    }
+
+    /**
      * Preserve current ID.
      *
      * @return $this
@@ -277,7 +287,7 @@ class NavItem
             })
             ->map(function ($navItem) use ($generateNewIds) {
                 return $navItem
-                    ->id($generateNewIds ? $this->id().'::' : $navItem->id())
+                    ->id($generateNewIds && ! $navItem->hasCustomId() ? $this->id().'::' : $navItem->id())
                     ->icon($navItem->icon() ?? $this->icon())
                     ->section($this->section())
                     ->isChild(true);
