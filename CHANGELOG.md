@@ -1,5 +1,27 @@
 # Release Notes
 
+## 6.26.0 (2026-07-21)
+
+### What's new
+- Add support for custom link types [#15004](https://github.com/statamic/cms/issues/15004) by @duncanmcclean
+- Add support for public dictionaries [#15029](https://github.com/statamic/cms/issues/15029) by @duncanmcclean
+
+### What's fixed
+- Harmonize label customization config text [#15034](https://github.com/statamic/cms/issues/15034) by @duncanmcclean
+- Fix Custom Invalidator background recache [#15031](https://github.com/statamic/cms/issues/15031) by @marcorieser
+- Fix grid min_rows breaking CP navigation [#15033](https://github.com/statamic/cms/issues/15033) by @duncanmcclean
+- Do not hide the primary save button for mobile [#15041](https://github.com/statamic/cms/issues/15041) by @jaygeorge
+- Show an entry selector when filtering by an entries field [#15043](https://github.com/statamic/cms/issues/15043) by @duncanmcclean
+- Fix customized listing columns being overridden by default preferences [#15040](https://github.com/statamic/cms/issues/15040) by @mynetx
+- Fix origin() on null when fetching nav tree with origin_id field [#15042](https://github.com/statamic/cms/issues/15042) by @duncanmcclean
+- Pass field prefix to custom conditions [#15044](https://github.com/statamic/cms/issues/15044) by @duncanmcclean
+- Ensure application cache honours static_cache store [#15045](https://github.com/statamic/cms/issues/15045) by @ryanmitchell
+- German translations [#15036](https://github.com/statamic/cms/issues/15036) by @helloDanuk
+- Bump the github-actions group with 2 updates [#15032](https://github.com/statamic/cms/issues/15032) by @dependabot
+- Bump axios from 1.16.0 to 1.18.1 [#15038](https://github.com/statamic/cms/issues/15038) by @dependabot
+
+
+
 ## 6.25.0 (2026-07-17)
 
 ### What's new
