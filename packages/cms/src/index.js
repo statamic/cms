@@ -17,7 +17,6 @@ export const {
     SaveButtonOptions,
     SortableList,
     ConnectionList,
-    ConnectionListItem,
     ConnectionLogic,
     requireElevatedSession,
     requireElevatedSessionIf,

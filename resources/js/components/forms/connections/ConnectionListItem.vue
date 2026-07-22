@@ -1,5 +1,5 @@
 <script setup>
-import { Button, DragHandle, Dropdown, DropdownItem, DropdownMenu, Subheading, Switch } from '@ui';
+import { Button, DragHandle, Dropdown, DropdownItem, DropdownMenu, Switch } from '@ui';
 
 const emit = defineEmits(['collapsed', 'expanded', 'duplicated', 'removed', 'update:enabled']);
 
@@ -32,10 +32,7 @@ function toggleCollapsedState() {
         >
             <DragHandle :class="handleClass" class="ms-1 cursor-grab [&_svg]:opacity-75 dark:[&_svg]:opacity-50" />
             <button type="button" class="show-focus-within_target flex flex-1 items-center gap-1.75 p-2 py-1.75 min-w-0 focus:outline-none cursor-pointer" @click="toggleCollapsedState">
-                <slot name="title" />
-                <Subheading v-show="collapsed" class="overflow-hidden text-ellipsis whitespace-nowrap gap-1.5!">
-                    <slot name="summary" />
-                </Subheading>
+                <slot name="header" />
             </button>
             <div class="flex items-center gap-2">
                 <Switch

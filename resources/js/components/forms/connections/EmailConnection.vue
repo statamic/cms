@@ -3,7 +3,7 @@ import { onMounted, onUnmounted, ref, watch } from 'vue';
 import axios from 'axios';
 import { nanoid as uniqid } from 'nanoid';
 import { keys } from '@api';
-import { Badge, Button, Icon, PublishContainer, PublishFields, PublishFieldsProvider } from '@ui';
+import { Badge, Button, Icon, PublishContainer, PublishFields, PublishFieldsProvider, Subheading } from '@ui';
 import { deepClone } from '@/util/clone.js';
 import ConnectionList from './ConnectionList.vue';
 import ConnectionLogic from './ConnectionLogic.vue';
@@ -147,21 +147,19 @@ onUnmounted(() => {
         @duplicate="duplicateEmail"
         @remove="removeEmail"
     >
-        <template #title="{ item: email }">
+        <template #header="{ item: email, collapsed }">
             <Badge size="lg" pill color="white" class="px-3 text-gray-950 gap-1">
                 <Icon name="mail-sign-at" class="size-3.5 me-1 opacity-100! text-blue-600 dark:text-blue-400" aria-hidden="true" />
                 {{ email.values.to ? __('Message sent to :email', { email: email.values.to }) : __('New Email') }}
             </Badge>
-        </template>
-
-        <template #summary="{ item: email }">
-            <span class="truncate">{{ conditionsSummary(email) }}</span>
+            <Subheading v-show="collapsed" class="overflow-hidden text-ellipsis whitespace-nowrap gap-1.5!">
+                <span class="truncate">{{ conditionsSummary(email) }}</span>
+            </Subheading>
         </template>
 
         <template #default="{ item: email, index }">
             <ConnectionLogic
                 v-model:conditions="email.conditions"
-                :suggestable-fields="suggestableFields"
                 :always-label="__('Always send')"
                 :if-label="__('Send if...')"
             >

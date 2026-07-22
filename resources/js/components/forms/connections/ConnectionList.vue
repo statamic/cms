@@ -60,11 +60,8 @@ const expand = (id) => (collapsed.value = collapsed.value.filter((itemId) => ite
                         @removed="emit('remove', item)"
                         @update:enabled="item.enabled = $event"
                     >
-                        <template #title>
-                            <slot name="title" :item="item" :index="index" />
-                        </template>
-                        <template #summary>
-                            <slot name="summary" :item="item" :index="index" />
+                        <template #header>
+                            <slot name="header" :item="item" :index="index" :collapsed="collapsed.includes(item.id)" />
                         </template>
 
                         <slot :item="item" :index="index" />

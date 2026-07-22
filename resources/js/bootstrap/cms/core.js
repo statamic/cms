@@ -20,5 +20,4 @@ export { requireElevatedSession, requireElevatedSessionIf } from '../../componen
 export { default as clone, deepClone } from '../../util/clone.js';
 export { default as debounce } from '../../util/debounce.js';
 export { default as ConnectionList } from '../../components/forms/connections/ConnectionList.vue';
-export { default as ConnectionListItem } from '../../components/forms/connections/ConnectionListItem.vue';
 export { default as ConnectionLogic } from '../../components/forms/connections/ConnectionLogic.vue';

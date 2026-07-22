@@ -105,7 +105,7 @@ onUnmounted(() => {
         @duplicate="duplicateWebhook"
         @remove="removeWebhook"
     >
-        <template #title="{ item: webhook }">
+        <template #header="{ item: webhook }">
             <Badge size="lg" pill color="white" class="px-3 text-gray-950 gap-1">
                 <Icon name="globe-arrow" class="size-3.5 me-1 opacity-100! text-teal-600 dark:text-teal-400" aria-hidden="true" />
                 {{ webhook.url || __('New Webhook') }}
