@@ -21,6 +21,7 @@ class CoreConnections
             ->icon(Statamic::svg('forms/connect/email-notifications'))
             ->description(__('statamic::messages.email_connection_description'))
             ->developer('Statamic')
+            ->count(fn (Form $form) => count($form->connections()->get('email', [])))
             ->component('email-connection', fn (Form $form) => [
                 'action' => cp_route('forms.connect.email.update', $form->handle()),
                 'suggestableFields' => static::suggestableFields($form),
@@ -37,6 +38,7 @@ class CoreConnections
             ->icon('globe-arrow')
             ->description(__('statamic::messages.webhook_connection_description'))
             ->developer('Statamic')
+            ->count(fn (Form $form) => count($form->connections()->get('webhook', [])))
             ->component('webhook-connection', fn (Form $form) => [
                 'action' => cp_route('forms.connect.webhook.update', $form->handle()),
                 'examplePayload' => static::exampleWebhookPayload($form),

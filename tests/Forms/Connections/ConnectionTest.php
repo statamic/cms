@@ -35,6 +35,20 @@ class ConnectionTest extends TestCase
     }
 
     #[Test]
+    public function it_counts_configured_instances_for_a_form()
+    {
+        $form = Form::make('contact');
+
+        $connection = (new Connection)->handle('zapier');
+
+        $this->assertNull($connection->countFor($form));
+
+        $connection->count(fn () => 3);
+
+        $this->assertEquals(3, $connection->countFor($form));
+    }
+
+    #[Test]
     public function it_evaluates_component_data_for_a_form()
     {
         $form = Form::make('contact');

@@ -18,6 +18,7 @@ class Connection
     protected $description;
     protected $icon;
     protected $developer;
+    protected $count;
     protected $component;
     protected $componentData;
     protected $routes;
@@ -52,6 +53,18 @@ class Connection
     public function developer($developer = null)
     {
         return $this->fluentlyGetOrSet('developer')->args(func_get_args());
+    }
+
+    public function count(?Closure $count = null)
+    {
+        return $this->fluentlyGetOrSet('count')->args(func_get_args());
+    }
+
+    public function countFor(Form $form): ?int
+    {
+        $callback = $this->count();
+
+        return $callback ? $callback($form) : null;
     }
 
     public function component($name = null, $data = null)

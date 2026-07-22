@@ -37,7 +37,7 @@ type Connection = {
     description: string;
     icon: string;
     developer: string;
-    count: number;
+    count: number | null;
     url: string;
 }
 
