@@ -43,6 +43,12 @@ const expand = (id) => (collapsed.value = collapsed.value.filter((webhookId) => 
 
 const addWebhook = () => webhooks.value.push({ id: uniqid(), enabled: true, verify_ssl: true });
 
+const duplicateWebhook = (id) => {
+    const index = webhooks.value.findIndex((webhook) => webhook.id === id);
+
+    webhooks.value.splice(index + 1, 0, { ...webhooks.value[index], id: uniqid() });
+};
+
 const removeWebhook = (id) => {
     webhooks.value = webhooks.value.filter((webhook) => webhook.id !== id);
     collapsed.value = collapsed.value.filter((webhookId) => webhookId !== id);
@@ -131,6 +137,7 @@ onUnmounted(() => {
                         :handle-class="sortableHandleClass"
                         @collapsed="collapse(webhook.id)"
                         @expanded="expand(webhook.id)"
+                        @duplicated="duplicateWebhook(webhook.id)"
                         @removed="removeWebhook(webhook.id)"
                         @update:enabled="webhook.enabled = $event"
                     >
