@@ -8,6 +8,7 @@ use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\CP\Column;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
+use Statamic\Facades\FormConnection;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Controllers\CP\Forms\Concerns\ProvidesFormAbilities;
@@ -35,19 +36,26 @@ class FormsController extends CpController
             $columns[] = Column::make('submissions')->label(__('Submissions'));
         }
 
+        if ($forms->contains(fn ($form) => $user->can('edit', $form))) {
+            $columns[] = Column::make('connections')->label(__('Connections'));
+        }
+
         $forms = $forms
             ->map(function ($form) use ($user) {
                 $canViewSubmissions = $user->can('viewSubmissions', $form);
+                $canEdit = $user->can('edit', $form);
 
                 return [
                     'id' => $form->handle(),
                     'title' => __($form->title()),
                     'status' => $form->status(),
                     'submissions' => $canViewSubmissions ? $form->querySubmissions()->whereNull('partial')->count() : null,
+                    'connections' => $canEdit ? FormConnection::all()->sum(fn ($connection) => $connection->countFor($form) ?? 0) : null,
                     'show_url' => $form->showUrl(),
                     'submissions_url' => $form->submissionsUrl(),
+                    'connect_url' => cp_route('forms.connect.index', $form->handle()),
                     'edit_url' => $form->editUrl(),
-                    'can_edit' => $user->can('edit', $form),
+                    'can_edit' => $canEdit,
                     'can_view_submissions' => $canViewSubmissions,
                 ];
             })
