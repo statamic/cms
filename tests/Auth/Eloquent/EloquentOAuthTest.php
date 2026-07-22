@@ -102,6 +102,27 @@ class EloquentOAuthTest extends TestCase
     }
 
     #[Test]
+    public function a_callback_configured_on_the_provider_once_still_applies_on_later_calls()
+    {
+        // Regression test: consuming apps commonly configure a provider once
+        // (e.g. in a service provider's boot()) via withUserData()/withUser(),
+        // expecting that configuration to still apply whenever the same
+        // named provider is resolved later, e.g. during the actual OAuth
+        // callback request. An earlier version of this fix made provider()
+        // return a brand new instance on every call (to avoid stale-type
+        // caching across config changes), which silently broke this -- the
+        // callback was attached to an instance nothing else ever saw again.
+        OAuth::provider('test')->withUserData(function () {
+            return ['name' => 'Configured Name'];
+        });
+
+        $this->assertSame(
+            ['name' => 'Configured Name'],
+            OAuth::provider('test')->userData(null)
+        );
+    }
+
+    #[Test]
     public function it_persists_a_provider_link_to_the_database_instead_of_a_file()
     {
         $user = $this->makeUser();

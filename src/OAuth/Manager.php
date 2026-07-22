@@ -6,6 +6,8 @@ use Statamic\Auth\Eloquent\OAuthProvider as EloquentProvider;
 
 class Manager
 {
+    protected static $providers = [];
+
     public function enabled()
     {
         return config('statamic.oauth.enabled')
@@ -14,13 +16,24 @@ class Manager
 
     public function provider($provider)
     {
-        // Not cached: providers() is cheap (no I/O), and a static, by-name
-        // cache here previously meant the first-resolved provider for a
-        // given name stuck around for the life of the process (or Octane
-        // worker) regardless of later config changes -- the same class of
-        // staleness that motivated persisting connections in the database
-        // instead of a file in the first place.
-        return $this->providers()->get($provider);
+        // Caching the resolved instance (not just its class) matters:
+        // consuming apps commonly configure a provider once via
+        // withUserData()/withUser() and expect that same instance to be
+        // reused for the life of the request. But keying purely by name
+        // meant the first-resolved instance for that name stuck around for
+        // the life of the process (or Octane worker) regardless of later
+        // config changes -- the same class of staleness that motivated
+        // persisting connections in the database instead of a file in the
+        // first place. Keying by name *and* the current repository setting
+        // keeps the "configure once, reuse" behavior while still handing
+        // back a fresh instance whenever that config changes.
+        $key = $provider.':'.config('statamic.users.repository');
+
+        if (isset(static::$providers[$key])) {
+            return static::$providers[$key];
+        }
+
+        return static::$providers[$key] = $this->providers()->get($provider);
     }
 
     public function providers()
