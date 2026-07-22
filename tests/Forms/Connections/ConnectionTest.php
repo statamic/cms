@@ -11,27 +11,65 @@ use Tests\TestCase;
 class ConnectionTest extends TestCase
 {
     #[Test]
-    public function the_title_falls_back_to_a_titleized_handle()
+    public function the_handle_is_snake_cased_from_the_class_by_default()
     {
-        $connection = (new Connection)->handle('zapier');
-
-        $this->assertEquals('Zapier', $connection->title());
-
-        $connection->title('Zapier Workflows');
-
-        $this->assertEquals('Zapier Workflows', $connection->title());
+        $this->assertEquals('test_multi_word', (new TestMultiWordConnection)->handle());
     }
 
     #[Test]
-    public function it_gets_and_sets_the_developer()
+    public function handle_can_be_defined_as_a_property()
     {
-        $connection = (new Connection)->handle('zapier');
+        $connection = new class extends Connection
+        {
+            protected static $handle = 'example';
 
-        $this->assertNull($connection->developer());
+            public function render(\Statamic\Contracts\Forms\Form $form): VueComponent
+            {
+                return VueComponent::render('nothing');
+            }
+        };
 
-        $connection->developer('Zapier Inc');
+        $this->assertEquals('example', $connection->handle());
+    }
 
-        $this->assertEquals('Zapier Inc', $connection->developer());
+    #[Test]
+    public function title_is_the_humanized_handle_by_default()
+    {
+        $this->assertEquals('Test Multi Word', (new TestMultiWordConnection)->title());
+    }
+
+    #[Test]
+    public function title_can_be_defined_as_a_property()
+    {
+        $connection = new class extends Connection
+        {
+            protected static $title = 'Super Cool Example';
+
+            public function render(\Statamic\Contracts\Forms\Form $form): VueComponent
+            {
+                return VueComponent::render('nothing');
+            }
+        };
+
+        $this->assertEquals('Super Cool Example', $connection->title());
+    }
+
+    #[Test]
+    public function it_gets_the_description_and_developer()
+    {
+        $connection = new class extends Connection
+        {
+            protected $description = 'Send submissions to Acme.';
+            protected $developer = 'Acme Inc';
+
+            public function render(\Statamic\Contracts\Forms\Form $form): VueComponent
+            {
+                return VueComponent::render('nothing');
+            }
+        };
+
+        $this->assertEquals('Send submissions to Acme.', $connection->description());
+        $this->assertEquals('Acme Inc', $connection->developer());
     }
 
     #[Test]
@@ -39,34 +77,20 @@ class ConnectionTest extends TestCase
     {
         $form = Form::make('contact');
 
-        $connection = (new Connection)->handle('zapier');
+        $connection = new class extends Connection
+        {
+            public function render(\Statamic\Contracts\Forms\Form $form): VueComponent
+            {
+                return VueComponent::render('nothing');
+            }
 
-        $this->assertNull($connection->countFor($form));
+            public function count(\Statamic\Contracts\Forms\Form $form): ?int
+            {
+                return 3;
+            }
+        };
 
-        $connection->count(fn () => 3);
-
-        $this->assertEquals(3, $connection->countFor($form));
-    }
-
-    #[Test]
-    public function it_evaluates_component_data_for_a_form()
-    {
-        $form = Form::make('contact');
-
-        $connection = (new Connection)
-            ->handle('zapier')
-            ->component('zapier-connection', fn ($form) => ['form' => $form->handle()]);
-
-        $this->assertEquals('zapier-connection', $connection->component());
-        $this->assertEquals(['form' => 'contact'], $connection->componentData($form));
-    }
-
-    #[Test]
-    public function component_data_is_empty_without_a_callback()
-    {
-        $connection = (new Connection)->handle('zapier')->component('zapier-connection');
-
-        $this->assertEquals([], $connection->componentData(Form::make('contact')));
+        $this->assertEquals(3, $connection->count($form));
     }
 
     #[Test]
@@ -74,16 +98,30 @@ class ConnectionTest extends TestCase
     {
         $form = Form::make('contact');
 
-        $connection = (new Connection)
-            ->handle('zapier')
-            ->component('zapier-connection', fn ($form) => ['form' => $form->handle()]);
+        $connection = new class extends Connection
+        {
+            public function render(\Statamic\Contracts\Forms\Form $form): VueComponent
+            {
+                return VueComponent::render('acme-connection', [
+                    'foo' => 'bar',
+                ]);
+            }
+        };
 
         $component = $connection->render($form);
 
         $this->assertInstanceOf(VueComponent::class, $component);
         $this->assertEquals([
-            'name' => 'zapier-connection',
-            'props' => ['form' => 'contact'],
+            'name' => 'acme-connection',
+            'props' => ['foo' => 'bar'],
         ], $component->toArray());
+    }
+}
+
+class TestMultiWordConnection extends Connection
+{
+    public function render(\Statamic\Contracts\Forms\Form $form): VueComponent
+    {
+        return VueComponent::render('nothing');
     }
 }

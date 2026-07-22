@@ -15,7 +15,6 @@ use Statamic\CP\CarbonAsVueComponent;
 use Statamic\Facades;
 use Statamic\Facades\Addon;
 use Statamic\Facades\Config;
-use Statamic\Facades\FormConnection;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\Token;
@@ -47,7 +46,6 @@ class AppServiceProvider extends ServiceProvider
         $this->app->booted(function () {
             $this->registerMiddlewareGroup();
             Statamic::runBootedCallbacks();
-            FormConnection::boot();
             $this->loadRoutesFrom("{$this->root}/routes/routes.php");
         });
 
@@ -153,9 +151,7 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->singleton(Sites::class);
 
-        $this->app->singleton(ConnectionRepository::class, function () {
-            return new ConnectionRepository;
-        });
+        $this->app->singleton(ConnectionRepository::class);
 
         collect([
             \Statamic\Contracts\Entries\EntryRepository::class => \Statamic\Stache\Repositories\EntryRepository::class,

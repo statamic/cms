@@ -4,7 +4,7 @@ namespace Statamic\Http\Controllers\CP\Forms\Connections;
 
 use Illuminate\Http\Request;
 use Statamic\Forms\Connections\ConnectionLogic;
-use Statamic\Forms\Connections\CoreConnections;
+use Statamic\Forms\Connections\Emails;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Support\Arr;
 
@@ -30,7 +30,7 @@ class EmailConnectionController extends CpController
     {
         $config = array_map(fn ($value) => $value === '' ? null : $value, $config);
 
-        $values = CoreConnections::emailBlueprint()->fields()
+        $values = Emails::blueprint()->fields()
             ->addValues(Arr::except($config, ['_id', 'id', 'enabled', 'conditions']))
             ->process()
             ->values()

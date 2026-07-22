@@ -4,61 +4,58 @@ namespace Statamic\Forms\Connections;
 
 use Statamic\Contracts\Forms\Form;
 use Statamic\Facades\Blueprint;
-use Statamic\Facades\FormConnection;
-use Statamic\Forms\Fields\FormField;
 use Statamic\Http\Controllers\CP\Forms\Connections\EmailConnectionController;
-use Statamic\Http\Controllers\CP\Forms\Connections\WebhookConnectionController;
 use Statamic\Statamic;
+use Statamic\Support\VueComponent;
 
 use function Statamic\trans as __;
 
-class CoreConnections
+class Emails extends Connection
 {
-    public static function boot()
+    protected static $handle = 'email';
+
+    protected $developer = 'Statamic';
+
+    public function description()
     {
-        FormConnection::register('email')
-            ->title(__('Email'))
-            ->icon(Statamic::svg('forms/connect/email-notifications'))
-            ->description(__('statamic::messages.email_connection_description'))
-            ->developer('Statamic')
-            ->count(fn (Form $form) => count($form->connections()->get('email', [])))
-            ->component('email-connection', function (Form $form) {
-                $fields = static::emailBlueprint()->fields();
-                $blank = $fields->preProcess();
-
-                return [
-                    'action' => cp_route('forms.connect.email.update', $form->handle()),
-                    'blueprint' => static::emailBlueprint()->toPublishArray(),
-                    'rows' => collect($form->connections()->get('email', []))
-                        ->map(function (array $config) use ($fields) {
-                            $row = $fields->addValues($config)->preProcess();
-
-                            return ['values' => $row->values()->all(), 'meta' => $row->meta()->all()];
-                        })
-                        ->all(),
-                    'defaults' => ['values' => $blank->values()->all(), 'meta' => $blank->meta()->all()],
-                ];
-            })
-            ->routes(fn ($router) => $router
-                ->patch('/', [EmailConnectionController::class, 'update'])
-                ->name('update'));
-
-        FormConnection::register('webhook')
-            ->title(__('Webhook'))
-            ->icon('globe-arrow')
-            ->description(__('statamic::messages.webhook_connection_description'))
-            ->developer('Statamic')
-            ->count(fn (Form $form) => count($form->connections()->get('webhook', [])))
-            ->component('webhook-connection', fn (Form $form) => [
-                'action' => cp_route('forms.connect.webhook.update', $form->handle()),
-                'examplePayload' => static::exampleWebhookPayload($form),
-            ])
-            ->routes(fn ($router) => $router
-                ->patch('/', [WebhookConnectionController::class, 'update'])
-                ->name('update'));
+        return __('statamic::messages.email_connection_description');
     }
 
-    public static function emailBlueprint()
+    public function icon()
+    {
+        return Statamic::svg('forms/connect/email-notifications');
+    }
+
+    public function count(Form $form): ?int
+    {
+        return count($form->connections()->get('email', []));
+    }
+
+    public function render(Form $form): VueComponent
+    {
+        $fields = static::blueprint()->fields();
+        $blank = $fields->preProcess();
+
+        return VueComponent::render('email-connection', [
+            'action' => cp_route('forms.connect.email.update', $form->handle()),
+            'blueprint' => static::blueprint()->toPublishArray(),
+            'rows' => collect($form->connections()->get('email', []))
+                ->map(function (array $config) use ($fields) {
+                    $row = $fields->addValues($config)->preProcess();
+
+                    return ['values' => $row->values()->all(), 'meta' => $row->meta()->all()];
+                })
+                ->all(),
+            'defaults' => ['values' => $blank->values()->all(), 'meta' => $blank->meta()->all()],
+        ]);
+    }
+
+    public function routes($router): void
+    {
+        $router->patch('/', [EmailConnectionController::class, 'update'])->name('update');
+    }
+
+    public static function blueprint()
     {
         return Blueprint::make()->setContents([
             'tabs' => [
@@ -173,37 +170,5 @@ class CoreConnections
                 ],
             ],
         ]);
-    }
-
-    private static function exampleWebhookPayload(Form $form): array
-    {
-        $latestSubmission = null;
-
-        if (User::current()->can('viewSubmissions', $form)) {
-            $latestSubmission = $form->querySubmissions()->orderBy('date', 'desc')->first();
-        }
-
-        return [
-            'form' => $form->handle(),
-            'submission' => $form->formFields()->fields()
-                ->mapWithKeys(function (FormField $field) use ($latestSubmission): array {
-                    $value = '…';
-
-                    if ($latestSubmission) {
-                        $value = $latestSubmission->data()->get($field->handle());
-                    } else {
-                        $example = $field->fieldtype()->example();
-
-                        if (is_array($example) && isset($example['value'])) {
-                            $value = $example['value'];
-                        }
-                    }
-
-                    return [$field->handle() => $value];
-                })
-                ->prepend($latestSubmission?->date() ?? '…', 'date')
-                ->prepend($latestSubmission?->id() ?? '…', 'id')
-                ->all(),
-        ];
     }
 }

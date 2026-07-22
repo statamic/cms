@@ -28,7 +28,7 @@ class FormConnectController extends CpController
                 'description' => $connection->description(),
                 'icon' => $connection->icon(),
                 'developer' => $connection->developer(),
-                'count' => $connection->countFor($form),
+                'count' => $connection->count($form),
                 'url' => cp_route('forms.connect.show', [$form->handle(), $connection->handle()]),
             ])->values(),
         ]);

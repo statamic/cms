@@ -141,6 +141,11 @@ class ExtensionServiceProvider extends ServiceProvider
         \Statamic\Forms\Fieldtype::class,
     ];
 
+    protected $formConnections = [
+        Forms\Connections\Emails::class,
+        Forms\Connections\Webhooks::class,
+    ];
+
     protected $formFieldtypes = [
         Forms\Fieldtypes\Banner::class,
         Forms\Fieldtypes\Checkboxes::class,
@@ -353,6 +358,11 @@ class ExtensionServiceProvider extends ServiceProvider
                 'class' => Fieldtype::class,
                 'directory' => 'Fieldtypes',
                 'extensions' => $this->fieldtypes,
+            ],
+            'form-connections' => [
+                'class' => Forms\Connections\Connection::class,
+                'directory' => 'FormConnections',
+                'extensions' => $this->formConnections,
             ],
             'form-fieldtypes' => [
                 'class' => FormFieldtype::class,

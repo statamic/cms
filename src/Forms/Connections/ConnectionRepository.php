@@ -2,74 +2,35 @@
 
 namespace Statamic\Forms\Connections;
 
-use Facades\Statamic\Forms\Connections\CoreConnections;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Route;
 
 class ConnectionRepository
 {
-    protected $connections;
-    protected $extensions = [];
-
-    public function __construct()
+    public function all(): Collection
     {
-        $this->connections = collect([]);
+        return $this->classes()->map(fn ($class) => app($class));
     }
 
-    public function boot()
+    public function find($handle): ?Connection
     {
-        CoreConnections::boot();
-
-        foreach ($this->extensions as $callback) {
-            $callback($this);
-        }
-
-        return $this;
+        return ($class = $this->classes()->get($handle)) ? app($class) : null;
     }
 
-    public function extend($callback)
-    {
-        $this->extensions[] = $callback;
-    }
-
-    public function make($handle)
-    {
-        return (new Connection)->handle($handle);
-    }
-
-    public function register($connection)
-    {
-        if (! $connection instanceof Connection) {
-            $connection = $this->make($connection);
-        }
-
-        $this->connections[$connection->handle()] = $connection;
-
-        return $connection;
-    }
-
-    public function all()
-    {
-        return $this->connections;
-    }
-
-    public function find($handle)
-    {
-        return $this->all()->get($handle);
-    }
-
-    public function routes()
+    public function routes(): void
     {
         Route::namespace('\\')->prefix('forms/{form}/connect')->name('forms.connect.')->group(function () {
-            $this->boot()->all()->each(function ($connection) {
-                if ($routeClosure = $connection->routes()) {
-                    Route::name($connection->handle().'.')
-                        ->prefix($connection->handle())
-                        ->middleware('can:edit,form')
-                        ->group(function () use ($routeClosure) {
-                            $routeClosure(Route::getFacadeRoot());
-                        });
-                }
+            $this->all()->each(function (Connection $connection) {
+                Route::name($connection::handle().'.')
+                    ->prefix($connection::handle())
+                    ->middleware('can:edit,form')
+                    ->group(fn () => $connection->routes(Route::getFacadeRoot()));
             });
         });
+    }
+
+    public function classes(): Collection
+    {
+        return app('statamic.form-connections');
     }
 }

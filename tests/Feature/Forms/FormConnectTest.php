@@ -5,7 +5,8 @@ namespace Tests\Feature\Forms;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Form;
 use Statamic\Facades\User;
-use Statamic\Forms\Connections\ConnectionRepository;
+use Statamic\Forms\Connections\Connection;
+use Statamic\Support\VueComponent;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -21,13 +22,7 @@ class FormConnectTest extends TestCase
 
         $app['config']['statamic.forms.forms'] = $this->fakeStacheDirectory.'/forms';
 
-        $app->booting(function () use ($app) {
-            $app->make(ConnectionRepository::class)->extend(function ($connections) {
-                $connections->register('zapier')->routes(function ($router) {
-                    $router->post('process', fn () => ['processed' => true])->name('process');
-                });
-            });
-        });
+        $app->booting(fn () => AcmeConnection::register());
     }
 
     #[Test]
@@ -94,7 +89,7 @@ class FormConnectTest extends TestCase
                 ->where('connections.0.url', cp_route('forms.connect.show', [$form->handle(), 'email']))
                 ->where('connections.1.handle', 'webhook')
                 ->where('connections.1.count', 0)
-                ->where('connections.2.handle', 'zapier'));
+                ->where('connections.2.handle', 'acme'));
     }
 
     #[Test]
@@ -202,7 +197,7 @@ class FormConnectTest extends TestCase
 
         $this
             ->actingAs($user)
-            ->postJson(cp_route('forms.connect.zapier.process', $form->handle()))
+            ->postJson(cp_route('forms.connect.acme.process', $form->handle()))
             ->assertOk()
             ->assertExactJson(['processed' => true]);
     }
@@ -216,7 +211,20 @@ class FormConnectTest extends TestCase
 
         $this
             ->actingAs($user)
-            ->postJson(cp_route('forms.connect.zapier.process', $form->handle()))
+            ->postJson(cp_route('forms.connect.acme.process', $form->handle()))
             ->assertForbidden();
+    }
+}
+
+class AcmeConnection extends Connection
+{
+    public function render($form): VueComponent
+    {
+        return VueComponent::render('acme-connection');
+    }
+
+    public function routes($router): void
+    {
+        $router->post('process', fn () => ['processed' => true])->name('process');
     }
 }
