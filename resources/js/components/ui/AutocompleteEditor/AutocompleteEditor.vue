@@ -3,11 +3,16 @@
         class="autocomplete-editor shadow-ui-sm rounded-lg border border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-900"
         :class="{ 'border-dashed': readOnly }"
     >
-        <div v-if="showToolbar && editor" class="flex items-center border-b border-gray-200 p-1 dark:border-white/10">
+        <div
+            v-if="showToolbar && editor"
+            class="flex items-center rounded-t-[calc(var(--radius-lg)-1px)] border-b border-gray-300 bg-gray-50 p-1 dark:border-white/10 dark:bg-gray-925"
+        >
             <AutocompleteEditorToolbar :editor="editor" :buttons="resolvedButtons" />
         </div>
         <div v-if="initError" class="autocomplete-editor-error p-2 text-sm text-red-500" v-text="initError" />
-        <EditorContent :editor="editor" class="autocomplete-editor-content p-2" />
+        <div class="autocomplete-editor-content relative rounded-lg focus-within:focus-outline">
+            <EditorContent :editor="editor" />
+        </div>
     </div>
 </template>
 
@@ -103,7 +108,7 @@ function resolveOptions({ query }) {
 }
 
 function keyboardExtension() {
-    const disableEnter = !props.enableLineBreaks;
+    const disableEnter = props.inline && !props.enableLineBreaks;
 
     return Extension.create({
         name: 'autocompleteEditorKeymap',
@@ -145,8 +150,10 @@ function getExtensions() {
         keyboardExtension(),
     ];
 
-    if (props.enableLineBreaks) {
-        extensions.push(props.inline ? inlineHardBreak() : HardBreak);
+    if (props.inline) {
+        if (props.enableLineBreaks) extensions.push(inlineHardBreak());
+    } else {
+        extensions.push(HardBreak);
     }
 
     if (props.placeholder) extensions.push(Placeholder.configure({ placeholder: props.placeholder }));
@@ -228,3 +235,10 @@ watch(
     (readOnly) => editor.value?.setEditable(!readOnly),
 );
 </script>
+
+<style scoped>
+:deep(.ProseMirror) {
+    outline: none;
+    padding: 0.5rem;
+}
+</style>

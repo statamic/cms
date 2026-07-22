@@ -68,6 +68,7 @@ class AutocompleteEditor extends Fieldtype
                 'type' => 'toggle',
                 'default' => false,
                 'width' => 50,
+                'if' => ['inline' => 'equals true'],
             ],
         ];
     }

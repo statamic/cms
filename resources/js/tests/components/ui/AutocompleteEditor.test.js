@@ -79,7 +79,7 @@ test('enableLineBreaks true inserts a hard break in inline mode', async () => {
     ]);
 });
 
-test('enableLineBreaks false blocks Enter in block mode', async () => {
+test('enableLineBreaks false still splits into a new paragraph in block mode', async () => {
     const wrapper = await mountEditor({ inline: false, enableLineBreaks: false });
     const { editor } = wrapper.vm;
 
@@ -90,6 +90,7 @@ test('enableLineBreaks false blocks Enter in block mode', async () => {
 
     expect(editor.getJSON().content).toEqual([
         { type: 'paragraph', content: [{ type: 'text', text: 'hello' }] },
+        { type: 'paragraph' },
     ]);
 });
 
