@@ -8,7 +8,6 @@ use Statamic\Forms\Fields\FormField;
 use Statamic\Http\Controllers\CP\Forms\Connections\EmailConnectionController;
 use Statamic\Http\Controllers\CP\Forms\Connections\WebhookConnectionController;
 use Statamic\Statamic;
-use Statamic\Support\Arr;
 
 use function Statamic\trans as __;
 
@@ -24,7 +23,6 @@ class CoreConnections
             ->count(fn (Form $form) => count($form->connections()->get('email', [])))
             ->component('email-connection', fn (Form $form) => [
                 'action' => cp_route('forms.connect.email.update', $form->handle()),
-                'suggestableFields' => static::suggestableFields($form),
                 'mailers' => array_keys(config('mail.mailers')),
                 'fromAddress' => config('mail.from.address'),
                 'templateFolder' => config('statamic.forms.email_view_folder'),
@@ -46,24 +44,6 @@ class CoreConnections
             ->routes(fn ($router) => $router
                 ->patch('/', [WebhookConnectionController::class, 'update'])
                 ->name('update'));
-    }
-
-    private static function suggestableFields(Form $form): array
-    {
-        return $form->formFields()->fields()
-            ->map(fn ($field) => [
-                'handle' => $field->handle(),
-                'icon' => $field->fieldtype()->icon(),
-                'category' => $field->fieldtype()->categories()[0] ?? 'other',
-                'config' => Arr::removeNullValues([
-                    'type' => $field->type(),
-                    'display' => $field->display(),
-                    'options' => Arr::get($field->config(), 'options'),
-                ]),
-            ])
-            ->reject(fn ($field) => in_array($field['category'], ['information', 'structure']))
-            ->values()
-            ->all();
     }
 
     private static function exampleWebhookPayload(Form $form): array

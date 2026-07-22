@@ -17,6 +17,9 @@ it('exports modules', async () => {
 
 it('exports core', async () => {
     const expected = [
+        'ConnectionList',
+        'ConnectionListItem',
+        'ConnectionLogic',
         'DateFormatter',
         'Fieldtype',
         'FieldtypeMixin',

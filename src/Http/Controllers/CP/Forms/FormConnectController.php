@@ -8,6 +8,7 @@ use Statamic\Facades\FormConnection;
 use Statamic\Forms\Connections\Connection;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Controllers\CP\Forms\Concerns\ProvidesFormAbilities;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 class FormConnectController extends CpController
@@ -52,6 +53,25 @@ class FormConnectController extends CpController
             'config' => collect($form->connections()->get($type, []))
                 ->map(fn ($config) => array_merge($config, ['_id' => $config['id'] ?? Str::random(8)]))
                 ->all(),
+            'suggestableFields' => $this->suggestableFields($form),
         ]);
+    }
+
+    private function suggestableFields($form): array
+    {
+        return $form->formFields()->fields()
+            ->map(fn ($field) => [
+                'handle' => $field->handle(),
+                'icon' => $field->fieldtype()->icon(),
+                'category' => $field->fieldtype()->categories()[0] ?? 'other',
+                'config' => Arr::removeNullValues([
+                    'type' => $field->type(),
+                    'display' => $field->display(),
+                    'options' => Arr::get($field->config(), 'options'),
+                ]),
+            ])
+            ->reject(fn ($field) => in_array($field['category'], ['information', 'structure']))
+            ->values()
+            ->all();
     }
 }

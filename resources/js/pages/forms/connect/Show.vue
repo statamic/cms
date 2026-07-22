@@ -14,6 +14,7 @@ const props = defineProps({
     connection: Object,
     component: Object,
     config: Array,
+    suggestableFields: Array,
 });
 </script>
 
