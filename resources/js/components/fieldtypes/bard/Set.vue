@@ -289,7 +289,7 @@ export default {
                 updateMeta: (handle, value) =>
                     this.publishContainer.setFieldMeta(`${this.metaPathPrefix}.${handle}`, value),
                 isReadOnly: this.isReadOnly,
-	            container: this.publishContainer,
+                container: this.publishContainer,
             };
         },
 

@@ -45,8 +45,8 @@ const {
     setFieldValue,
     setFieldMeta,
     previews,
-	container,
-	meta
+    container,
+    meta
 } = injectContainerContext();
 const fieldPathPrefix = computed(() => `${props.fieldPath}.${props.index}`);
 const metaPathPrefix = computed(() => `${props.metaPath}.existing.${props.id}`);
@@ -74,7 +74,7 @@ const fieldActionPayload = computed(() => ({
     update: (handle, value) => setFieldValue(`${fieldPathPrefix.value}.${handle}`, value),
     updateMeta: (handle, value) => setFieldMeta(`${metaPathPrefix.value}.${handle}`, value),
     isReadOnly: props.readOnly,
-	container,
+    container,
 }));
 
 const fieldActions = computed(() => {
