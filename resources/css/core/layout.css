@@ -261,6 +261,7 @@ main.nav-closed {
                 height: calc(anchor-size(height) + var(--height-increase));
                 background: var(--theme-color-global-header-bg);
                 border-radius: 5px;
+                border-block-start: 1px solid var(--color-gray-600);
                 position-anchor: --active;
                 left: calc(anchor(left) - var(--item-padding) * 1.5 / 2);
                 top: calc(anchor(top) - var(--height-increase) / 2);

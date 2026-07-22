@@ -17,13 +17,13 @@ use Statamic\Events\SubmissionDeleted;
 use Statamic\Events\SubmissionFinalized;
 use Statamic\Events\SubmissionSaved;
 use Statamic\Events\SubmissionSaving;
-use Statamic\Facades\Asset;
 use Statamic\Facades\File;
 use Statamic\Facades\FormSubmission;
 use Statamic\Facades\Site as Sites;
 use Statamic\Facades\Stache;
 use Statamic\Forms\Uploaders\AssetsUploader;
 use Statamic\Forms\Uploaders\FilesUploader;
+use Statamic\Forms\Uploaders\FormFileUpload;
 use Statamic\Sites\Site;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
@@ -176,7 +176,7 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
     }
 
     /**
-     * Upload files and return asset IDs.
+     * Upload files and return their storage references.
      *
      * @param  array  $uploadedFiles
      * @return array
@@ -186,9 +186,13 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
         return collect($uploadedFiles)->map(function ($files, $handle) {
             $field = $this->fields()->get($handle);
 
-            return $field['type'] === 'files'
-                ? FilesUploader::field($field)->upload($files)
-                : AssetsUploader::field($field)->upload($files);
+            if ($field['type'] === 'form_upload') {
+                return FormFileUpload::field($field, $this->id())->upload($files);
+            }
+
+            return $field['type'] === 'assets'
+                ? AssetsUploader::field($field)->upload($files)
+                : FilesUploader::field($field)->upload($files);
         })->all();
     }
 
@@ -267,6 +271,7 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
 
         SubmissionFinalized::dispatch($this);
 
+        CreateAssetsFromFileUploads::dispatchSync($this);
         SendEmails::dispatch($this, $this->site());
 
         return $this;

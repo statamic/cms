@@ -108,7 +108,7 @@ class SubmitForm
     private function normalizeFiles(array $files): array
     {
         $assetFields = $this->form->blueprint()->fields()->all()
-            ->filter(fn ($field) => in_array($field->fieldtype()->handle(), ['assets', 'files']))
+            ->filter(fn ($field) => in_array($field->fieldtype()->handle(), ['assets', 'files', 'form_upload']))
             ->keys();
 
         foreach ($assetFields as $handle) {
@@ -196,10 +196,9 @@ class SubmitForm
         $files = $this->normalizeFiles($files);
         $fields = $this->form->blueprint()->fields()->addValues(array_merge($data, $files));
 
-        $validator = $fields
-            ->validator()
-            ->withRules($this->extraRules($fields))
-            ->validator();
+        $validator = $fields->validator()->validator();
+
+        $validator->setRules($this->withFileUploadRules($validator->getRulesWithoutPlaceholders(), $fields, $files));
 
         if (! $only && $this->page) {
             $only = $this->fieldHandles($this->page);
@@ -212,18 +211,54 @@ class SubmitForm
         $this->withLocale($this->site()?->lang(), fn () => $validator->validate());
     }
 
-    private function extraRules($fields): array
+    private function withFileUploadRules(array $rules, $fields, array $files): array
     {
         return $fields->all()
-            ->filter(fn ($field): bool => in_array($field->fieldtype()->handle(), ['assets', 'files']))
-            ->mapWithKeys(function ($field): array {
-                $rules = $field->fieldtype()->handle() === 'assets'
-                    ? array_merge(['file', new AllowedFile], $this->assetContainerRules($field))
-                    : ['file', new AllowedFile($field->fieldtype()->config('allowed_extensions'))];
+            ->filter(fn ($field): bool => in_array($field->fieldtype()->handle(), ['assets', 'files', 'form_upload']))
+            ->reduce(function ($rules, $field) use ($files) {
+                $handle = $field->handle();
 
-                return [$field->handle().'.*' => $rules];
-            })
-            ->all();
+                // Freshly uploaded files should be validated as files.
+                if (array_key_exists($handle, $files)) {
+                    $shouldBeStoredAsAsset = $field->fieldtype()->handle() === 'assets'
+                        || ($field->fieldtype()->handle() === 'form_upload' && $field->fieldtype()->config('store'));
+
+                    $fileRules = $shouldBeStoredAsAsset
+                        ? array_merge(['file', new AllowedFile], $this->assetContainerRules($field))
+                        : ['file', new AllowedFile($field->fieldtype()->config('allowed_extensions'))];
+
+                    $rules["{$handle}.*"] = collect($rules["{$handle}.*"] ?? [])
+                        ->merge($fileRules)
+                        ->unique()
+                        ->values()
+                        ->all();
+
+                    return $rules;
+                }
+
+                // Anything not present in $files must already be stored against the field. Removing
+                // some of an existing multi-file value is fine, but a value that was never uploaded
+                // gets rejected - an unvalidated one could be used to read/delete arbitrary files
+                // when the submission is finalized.
+                $stored = Arr::wrap($this->submission?->get($handle));
+
+                if (collect(Arr::wrap($field->value()))->contains(fn ($value) => ! in_array($value, $stored, true))) {
+                    $rules[$handle] = array_merge($rules[$handle] ?? [], ['prohibited']);
+
+                    return $rules;
+                }
+
+                if (is_array($field->value()) || ! isset($rules[$handle])) {
+                    return $rules;
+                }
+
+                $rules[$handle] = collect($rules[$handle])
+                    ->reject(fn ($rule) => $rule === 'array' || str_starts_with($rule, 'max:') || str_starts_with($rule, 'min:'))
+                    ->values()
+                    ->all();
+
+                return $rules;
+            }, $rules);
     }
 
     private function assetContainerRules($field): array

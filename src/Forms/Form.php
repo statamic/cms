@@ -671,7 +671,7 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
     public function hasFiles()
     {
         return $this->fields()->filter(function ($field) {
-            return in_array($field->fieldtype()->handle(), ['assets', 'files']);
+            return in_array($field->fieldtype()->handle(), ['assets', 'files', 'form_upload']);
         })->isNotEmpty();
     }
 

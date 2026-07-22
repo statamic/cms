@@ -16,6 +16,7 @@ use Statamic\Events\SubmissionSaved;
 use Statamic\Events\SubmissionSaving;
 use Statamic\Facades\Form;
 use Statamic\Facades\Site;
+use Statamic\Forms\CreateAssetsFromFileUploads;
 use Statamic\Forms\SendEmails;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -381,9 +382,24 @@ class SubmissionTest extends TestCase
 
         Event::assertDispatched(SubmissionCreated::class, 1);
         Event::assertDispatched(SubmissionFinalized::class, 1);
+        Bus::assertDispatched(CreateAssetsFromFileUploads::class, 1);
         Bus::assertDispatched(SendEmails::class, 1);
 
         $this->assertNotNull($form->submission($submission->id()));
+    }
+
+    #[Test]
+    public function finalizing_dispatches_asset_creation_synchronously_then_sends_emails()
+    {
+        Bus::fake();
+
+        $form = tap(Form::make('contact_us'))->save();
+        $submission = $form->makeSubmission()->asPartial();
+
+        $submission->finalize();
+
+        Bus::assertDispatchedSync(CreateAssetsFromFileUploads::class);
+        Bus::assertDispatched(SendEmails::class);
     }
 
     #[Test]
@@ -403,6 +419,7 @@ class SubmissionTest extends TestCase
         // existing submission won't dispatch it again, but it does finalize and email.
         Event::assertDispatched(SubmissionCreated::class, 1);
         Event::assertDispatched(SubmissionFinalized::class, 1);
+        Bus::assertDispatched(CreateAssetsFromFileUploads::class, 1);
         Bus::assertDispatched(SendEmails::class, 1);
     }
 
@@ -419,6 +436,7 @@ class SubmissionTest extends TestCase
 
         Event::assertDispatched(SubmissionCreated::class, 1);
         Event::assertDispatched(SubmissionFinalized::class, 1);
+        Bus::assertDispatched(CreateAssetsFromFileUploads::class, 1);
         Bus::assertDispatched(SendEmails::class, 1);
         $this->assertNull($form->submission($submission->id()));
     }
@@ -440,6 +458,7 @@ class SubmissionTest extends TestCase
 
         Event::assertDispatched(SubmissionCreated::class, 1);
         Event::assertDispatched(SubmissionFinalized::class, 1);
+        Bus::assertDispatched(CreateAssetsFromFileUploads::class, 1);
         Bus::assertDispatched(SendEmails::class, 1);
         Event::assertNotDispatched(SubmissionDeleted::class);
     }
@@ -458,6 +477,7 @@ class SubmissionTest extends TestCase
 
         // The second call is a no-op because the submission is no longer partial.
         Event::assertDispatched(SubmissionFinalized::class, 1);
+        Bus::assertDispatched(CreateAssetsFromFileUploads::class, 1);
         Bus::assertDispatched(SendEmails::class, 1);
     }
 
