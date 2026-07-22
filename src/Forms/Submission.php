@@ -274,9 +274,8 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
 
         SubmissionFinalized::dispatch($this);
 
-        // todo: garbage collection
         $jobsFromConnections = $this->form()->connections()
-            ->map(fn (array $config, string $connection) => FormConnection::find($connection)->finalized($this))
+            ->map(fn (array $config, string $connection) => FormConnection::find($connection)?->finalized($this))
             ->flatten();
 
         Bus::chain(array_filter([
