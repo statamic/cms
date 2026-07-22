@@ -81,4 +81,9 @@ abstract class Dictionary
     {
         return $this->keywords;
     }
+
+    public function allowsPublicAccess(): bool
+    {
+        return false;
+    }
 }

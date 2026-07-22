@@ -9,6 +9,8 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
+    --focus-outline-color: var(--color-blue-400);
+
     /* GROUP VARIABLES -- DECORATION -- COLOURS
     =================================================== */
     --color-code-background: hsl(287deg 80% 93.5%);
@@ -84,6 +86,14 @@
 
         p:not(.sb-anchor, .sb-unstyled, .sb-unstyled p) {
             font-weight: 300;
+        }
+
+        ul {
+            list-style: circle;
+        }
+
+        ol {
+            list-style: decimal;
         }
     }
 }

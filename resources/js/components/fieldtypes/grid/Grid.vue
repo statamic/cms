@@ -25,6 +25,7 @@
                         :can-add-rows="canAddRows"
                         :allow-fullscreen="config.fullscreen"
                         :hide-display="config.hide_display"
+                        :read-only="isReadOnly"
                         :errors="publishContainer.errors"
                         @updated="updated"
                         @meta-updated="updateRowMeta"
@@ -85,7 +86,7 @@ export default {
 
     computed: {
         component() {
-            const isNarrow = this.fields.length > 1 && this.containerWidth < 600;
+            const isNarrow = this.fields.length > 1 && this.containerWidth < 550;
 
             return this.config.mode === 'stacked' || isNarrow ? 'GridStacked' : 'GridTable';
         },
@@ -142,6 +143,7 @@ export default {
                     title: __('Toggle Fullscreen Mode'),
                     icon: ({ vm }) => (vm.fullScreenMode ? 'fullscreen-close' : 'fullscreen-open'),
                     quick: true,
+                    visible: this.config.fullscreen,
                     visibleWhenReadOnly: true,
                     run: this.toggleFullScreen,
                 },
@@ -173,9 +175,10 @@ export default {
     methods: {
         addRow() {
             const id = uniqid();
+            const defaults = JSON.parse(JSON.stringify(this.meta.defaults));
 
             const row = Object.fromEntries(
-                this.fields.map((field) => [field.handle, this.meta.defaults[field.handle]]),
+                this.fields.map((field) => [field.handle, defaults[field.handle]]),
             );
 
             row._id = id;
@@ -191,8 +194,9 @@ export default {
         removed(index) {
             // if the row is empty, don't show the confirmation. this.value[index] is an object with the row data
             const row = this.value[index];
+            const defaults = JSON.parse(JSON.stringify(this.meta.defaults));
             const emptyRow = Object.fromEntries(
-                this.fields.map((field) => [field.handle, this.meta.defaults[field.handle]]),
+                this.fields.map((field) => [field.handle, defaults[field.handle]]),
             );
 
             // Check if the row has been modified from its default state

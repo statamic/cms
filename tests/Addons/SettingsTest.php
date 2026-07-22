@@ -81,9 +81,22 @@ class SettingsTest extends TestCase
     }
 
     #[Test]
+    public function it_gets_a_dotted_value()
+    {
+        $addon = $this->makeFromPackage();
+        $settings = new Settings($addon, ['foo' => ['bar' => 'baz']]);
+
+        $this->assertEquals('baz', $settings->get('foo.bar'));
+        $this->assertEquals('default', $settings->get('nonexistent', 'default'));
+    }
+
+    #[Test]
     public function it_sets_a_value()
     {
-        config(['test' => ['a' => 'A', 'b' => 'B']]);
+        config([
+            'test' => ['a' => 'A', 'b' => 'B'],
+            'statamic.system.view_config_allowlist' => ['@default', 'test.a', 'test.b'],
+        ]);
         $addon = $this->makeFromPackage();
         $settings = new Settings($addon, ['foo' => 'bar']);
 
@@ -116,9 +129,39 @@ class SettingsTest extends TestCase
     }
 
     #[Test]
+    public function it_sets_a_dotted_value()
+    {
+        $addon = $this->makeFromPackage();
+        $settings = new Settings($addon, []);
+
+        $settings->set('foo.baz', 'dotted');
+
+        $this->assertEquals(['foo' => ['baz' => 'dotted']], $settings->all());
+    }
+
+    #[Test]
     public function it_sets_all_values()
     {
-        config(['test' => ['a' => 'A', 'b' => 'B']]);
+        config([
+            'test' => ['a' => 'A', 'b' => 'B'],
+            'statamic.system.view_config_allowlist' => ['@default', 'test.a', 'test.b'],
+        ]);
+
+        $this->app->bind('statamic.addons.test-addon.settings_blueprint', fn () => [
+            'tabs' => [
+                'main' => [
+                    'sections' => [
+                        [
+                            'fields' => [
+                                ['handle' => 'api_key', 'field' => ['type' => 'text', 'default' => 'my-default-key']],
+                                ['handle' => 'another_field', 'field' => ['type' => 'text', 'default' => 'default-value']],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
         $addon = $this->makeFromPackage();
         $settings = new Settings($addon, ['foo' => 'bar']);
 
@@ -131,11 +174,88 @@ class SettingsTest extends TestCase
         ]);
 
         $this->assertEquals([
+            'api_key' => 'my-default-key',
+            'another_field' => 'default-value',
             'alfa' => 'bravo',
             'charlie' => 'A',
             'delta' => ['echo' => 'B'],
         ], $settings->all());
         $this->assertEquals($raw, $settings->raw());
+    }
+
+    #[Test]
+    public function it_applies_blueprint_defaults_to_resolved_settings()
+    {
+        $this->app->bind('statamic.addons.test-addon.settings_blueprint', fn () => [
+            'tabs' => [
+                'main' => [
+                    'sections' => [
+                        [
+                            'fields' => [
+                                ['handle' => 'api_key', 'field' => ['type' => 'text', 'default' => 'my-default-key']],
+                                ['handle' => 'no_default_field', 'field' => ['type' => 'text']],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $addon = $this->makeFromPackage();
+        $settings = new Settings($addon, []);
+
+        $this->assertEquals('my-default-key', $settings->get('api_key'));
+        $this->assertNull($settings->get('no_default_field'));
+    }
+
+    #[Test]
+    public function it_does_not_include_blueprint_defaults_in_raw_settings()
+    {
+        $this->app->bind('statamic.addons.test-addon.settings_blueprint', fn () => [
+            'tabs' => [
+                'main' => [
+                    'sections' => [
+                        [
+                            'fields' => [
+                                ['handle' => 'api_key', 'field' => ['type' => 'text', 'default' => 'my-default-key']],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $addon = $this->makeFromPackage();
+        $settings = new Settings($addon, []);
+
+        $this->assertArrayNotHasKey('api_key', $settings->raw());
+        $this->assertSame([], $settings->raw());
+    }
+
+    #[Test]
+    public function saved_settings_take_precedence_over_blueprint_defaults()
+    {
+        $this->app->bind('statamic.addons.test-addon.settings_blueprint', fn () => [
+            'tabs' => [
+                'main' => [
+                    'sections' => [
+                        [
+                            'fields' => [
+                                ['handle' => 'api_key', 'field' => ['type' => 'text', 'default' => 'my-default-key']],
+                                ['handle' => 'another_field', 'field' => ['type' => 'text', 'default' => 'default-value']],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $addon = $this->makeFromPackage();
+        $settings = new Settings($addon, ['api_key' => 'saved-key']);
+
+        $this->assertEquals('saved-key', $settings->get('api_key'));
+        $this->assertEquals('default-value', $settings->get('another_field'));
+        $this->assertSame(['api_key' => 'saved-key'], $settings->raw());
     }
 
     #[Test]

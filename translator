@@ -36,6 +36,7 @@ $dontTranslate = [
 $additionalStrings = [
     'Author',
     'Content',
+    'Content Search',
     'Groups',
     'Tools',
     'Laptop',
@@ -123,9 +124,9 @@ $excludedKeys = [
 ];
 
 $app = new Symfony\Component\Console\Application('Statamic Translator');
-$app->add(new Statamic\Translator\Commands\Stats($discovery, $ignoredSubstrings));
-$app->add(new Statamic\Translator\Commands\Generate($discovery, $files, $manualFiles, $ignoredSubstrings, $additionalStrings, $additionalKeys, $excludedKeys));
-$app->add(new Statamic\Translator\Commands\Translate($files, $dontTranslate));
-$app->add(new Statamic\Translator\Commands\Review($files));
+$app->addCommand(new Statamic\Translator\Commands\Stats($discovery, $ignoredSubstrings));
+$app->addCommand(new Statamic\Translator\Commands\Generate($discovery, $files, $manualFiles, $ignoredSubstrings, $additionalStrings, $additionalKeys, $excludedKeys));
+$app->addCommand(new Statamic\Translator\Commands\Translate($files, $dontTranslate));
+$app->addCommand(new Statamic\Translator\Commands\Review($files));
 
 $app->run();

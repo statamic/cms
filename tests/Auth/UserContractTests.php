@@ -67,7 +67,7 @@ trait UserContractTests
         $this->assertEquals('John Smith', $this->makeUser()->set('name', 'John Smith')->name());
         $this->assertEquals('John', $this->makeUser()->data(['name' => null, 'first_name' => 'John'])->name());
         $this->assertEquals('John Smith', $this->makeUser()->data(['name' => null, 'first_name' => 'John', 'last_name' => 'Smith'])->name());
-        $this->assertEquals('john@example.com', $this->makeUser()->remove('name')->email('john@example.com')->name());
+        $this->assertNull($this->makeUser()->remove('name')->email('john@example.com')->name());
     }
 
     #[Test]
@@ -325,11 +325,11 @@ trait UserContractTests
     }
 
     #[Test]
-    public function it_gets_initials_from_email_if_name_doesnt_exist()
+    public function it_gets_question_mark_initials_if_name_doesnt_exist()
     {
         $user = $this->user()->remove('name');
 
-        $this->assertEquals('J', $user->initials());
+        $this->assertEquals('?', $user->initials());
     }
 
     #[Test]
@@ -355,6 +355,27 @@ trait UserContractTests
     public function it_gets_preferred_locale()
     {
         $this->assertEquals('en', $this->user()->preferredLocale());
+    }
+
+    #[Test]
+    #[DataProvider('preferredColorModeProvider')]
+    public function it_gets_preferred_color_mode($stored, $expected)
+    {
+        $user = $this->makeUser();
+        $user->setPreference('color_mode', $stored);
+
+        $this->assertEquals($expected, $user->preferredColorMode());
+    }
+
+    public static function preferredColorModeProvider(): array
+    {
+        return [
+            'null' => [null, 'auto'],
+            'light' => ['light', 'light'],
+            'dark' => ['dark', 'dark'],
+            'auto' => ['auto', 'auto'],
+            'invalid' => ['invalid', 'auto'],
+        ];
     }
 
     #[Test]
@@ -646,6 +667,23 @@ trait UserContractTests
             ->save();
 
         $this->assertTrue($user->hasEnabledTwoFactorAuthentication());
+    }
+
+    #[Test]
+    public function it_does_not_require_two_factor_when_globally_disabled_even_if_user_has_setup()
+    {
+        config()->set('statamic.users.two_factor_enabled', false);
+        config()->set('statamic.users.two_factor_enforced_roles', ['*']);
+
+        $user = $this->makeUser()
+            ->makeSuper()
+            ->set('two_factor_secret', 'secret')
+            ->set('two_factor_confirmed_at', now()->timestamp);
+
+        $user->save();
+
+        $this->assertTrue($user->hasEnabledTwoFactorAuthentication());
+        $this->assertFalse($user->isTwoFactorAuthenticationRequired());
     }
 
     #[Test]

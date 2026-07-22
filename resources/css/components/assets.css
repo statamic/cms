@@ -33,8 +33,8 @@
     background: rgba(255, 255, 255, 0.9);
 
     .dark & {
-        @apply bg-dark-900/90;
-        border-color: var(--color-dark-600);
+        @apply bg-gray-900/90;
+        border-color: var(--color-gray-700);
     }
 }
 
@@ -42,7 +42,7 @@
    ========================================================================== */
 
 .asset-table-listing {
-    @apply relative overflow-hidden rounded-sm border dark:border-dark-900;
+    @apply relative overflow-hidden rounded-sm border dark:border-gray-900;
 
     table {
         @apply m-0 w-full select-none rounded-b border-none;
@@ -52,7 +52,7 @@
     }
 
     tbody tr:not(:last-child) {
-        @apply border-b dark:border-dark-900;
+        @apply border-b dark:border-gray-900;
     }
 
     tbody tr td {
@@ -120,7 +120,7 @@
     grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
 
     [data-placeholder-shown] {
-        @apply overflow-hidden mt-2 text-center font-mono text-xs text-ellipsis whitespace-nowrap lowercase;
+        @apply overflow-hidden mt-2 text-center text-xs text-ellipsis whitespace-nowrap lowercase;
         &:has(+ .st-has-error) {
             @apply text-red-600 dark:text-red-500;
         }
@@ -158,7 +158,8 @@
 }
 
 .asset-filename {
-    @apply font-mono text-xs text-gray-500 dark:text-gray-300 mt-2 whitespace-nowrap text-center;
+    @apply text-xs text-gray-500 dark:text-gray-300 mt-2 whitespace-nowrap text-center st-text-legibility;
+    font-variant: tabular-nums; /* Disable common-ligatures from body default */
     .selected & {
         @apply text-blue-500;
         .dark & {
@@ -171,9 +172,8 @@
   ========================================================================== */
 
 .asset-editor {
-
     .loading {
-        @apply absolute inset-0 flex items-center justify-center rounded-sm bg-white/70;
+        @apply absolute inset-0 flex items-center justify-center rounded-sm bg-gray-800 dark:bg-gray-900;
         z-index: var(--z-index-portal);
     }
 

@@ -1,20 +1,80 @@
 <script setup>
-import { Link, usePage, router } from '@inertiajs/vue3';
+import { Link, router } from '@inertiajs/vue3';
 import { Badge, Icon } from '@ui';
 import useNavigation from './navigation.js';
-import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
+import { onMounted, onUnmounted, ref, watch } from 'vue';
 import DynamicHtmlRenderer from '@/components/DynamicHtmlRenderer.vue';
+import { setCpNavToggleHandler, clearCpNavToggleHandler } from './nav-toggle-channel.js';
 
 const { nav, setParentActive, setChildActive } = useNavigation();
 const localStorageKey = 'statamic.nav';
-const isOpen = ref(localStorage.getItem(localStorageKey) !== 'closed');
+
+function readInitialNavOpen() {
+    const stored = localStorage.getItem(localStorageKey);
+    const mobile = window.matchMedia('(width < 1024px)').matches;
+    // Desktop: preserve legacy default (open unless user chose "closed").
+    // Mobile: default to closed on load so the overlay does not cover the CP; only reopen if the user left it explicitly "open".
+    if (mobile) {
+        return stored === 'open';
+    }
+    return stored !== 'closed';
+}
+
+const isOpen = ref(readInitialNavOpen());
 const navRef = ref(null);
-const isMobile = ref(false);
+const isMobile = ref(window.matchMedia('(width < 1024px)').matches);
 const collapsedByViewport = ref(false);
 let clickListenerActive = false;
 let navigateEventListener = null;
+let clickOutsideEnableTimer = null;
+
+function toggle() {
+    isOpen.value = !isOpen.value;
+    // Reset viewport flag since user is explicitly toggling, so we should respect their preference
+    // even when viewport size changes (don't auto-expand if user manually closed it)
+    collapsedByViewport.value = false;
+    localStorage.setItem(localStorageKey, isOpen.value ? 'open' : 'closed');
+}
+
+setCpNavToggleHandler(toggle);
+
+onUnmounted(() => {
+    clearCpNavToggleHandler(toggle);
+});
+
+watch(
+    isOpen,
+    (open) => {
+        const el = document.getElementById('main');
+        el?.classList.toggle('nav-closed', !open);
+        el?.classList.toggle('nav-open', open);
+
+        if (clickOutsideEnableTimer !== null) {
+            clearTimeout(clickOutsideEnableTimer);
+            clickOutsideEnableTimer = null;
+        }
+
+        // Delay enabling the click-outside listener to avoid catching the toggle click.
+        // Clear any pending timer so a fast close cannot leave clickListenerActive stuck true.
+        if (open) {
+            clickListenerActive = false;
+            clickOutsideEnableTimer = setTimeout(() => {
+                clickOutsideEnableTimer = null;
+                clickListenerActive = true;
+            }, 100);
+        } else {
+            clickListenerActive = false;
+        }
+    },
+    { flush: 'post', immediate: true },
+);
 
 onMounted(() => {
+    const keyBinding = Statamic.$keys.bind(['command+\\', ['[']], (e) => {
+        e.preventDefault();
+        toggle();
+    });
+
     // Check if screen is less than lg breakpoint (1024px)
     const mediaQuery = window.matchMedia('(width < 1024px)');
     isMobile.value = mediaQuery.matches;
@@ -40,31 +100,15 @@ onMounted(() => {
     };
     
     mediaQuery.addEventListener('change', handleMediaChange);
-    
-    nextTick(() => {
-        watch(isOpen, (isOpen) => {
-            const el = document.getElementById('main');
-            el.classList.toggle('nav-closed', !isOpen);
-            el.classList.toggle('nav-open', isOpen);
-            
-            // Delay enabling the click-outside listener to avoid catching the toggle click
-            if (isOpen) {
-                setTimeout(() => {
-                    clickListenerActive = true;
-                }, 100);
-            } else {
-                clickListenerActive = false;
-            }
-        }, { immediate: true });
-    });
 
     // Mark page as fully loaded after all resources are loaded
-    if (document.readyState === 'complete') {
+    const onWindowLoad = () => {
         document.documentElement.classList.add('page-fully-loaded');
+    };
+    if (document.readyState === 'complete') {
+        onWindowLoad();
     } else {
-        window.addEventListener('load', () => {
-            document.documentElement.classList.add('page-fully-loaded');
-        });
+        window.addEventListener('load', onWindowLoad);
     }
 
     // Close nav when clicking outside (only on mobile)
@@ -81,27 +125,31 @@ onMounted(() => {
     onUnmounted(() => {
         document.removeEventListener('click', handleClickOutside);
         mediaQuery.removeEventListener('change', handleMediaChange);
+        if (document.readyState !== 'complete') {
+            window.removeEventListener('load', onWindowLoad);
+        }
         if (navigateEventListener) {
             navigateEventListener();
         }
+        if (clickOutsideEnableTimer !== null) {
+            clearTimeout(clickOutsideEnableTimer);
+            clickOutsideEnableTimer = null;
+        }
+        keyBinding.destroy();
     });
 });
 
 function handleClickOutside(event) {
     // Only handle click-outside on mobile (less than lg breakpoint)
     if (!isOpen.value || !clickListenerActive || !isMobile.value) return;
+    // Never treat the global header burger as an "outside" click — same gesture can race
+    // with document bubble listeners and cancel the toggle.
+    const target = event.target;
+    if (target instanceof Element && target.closest('[data-cp-global-nav-toggle]')) return;
     if (navRef.value && !navRef.value.contains(event.target)) {
         isOpen.value = false;
         localStorage.setItem(localStorageKey, 'closed');
     }
-}
-
-function toggle() {
-    isOpen.value = !isOpen.value;
-    // Reset viewport flag since user is explicitly toggling, so we should respect their preference
-    // even when viewport size changes (don't auto-expand if user manually closed it)
-    collapsedByViewport.value = false;
-    localStorage.setItem(localStorageKey, isOpen.value ? 'open' : 'closed');
 }
 
 function handleParentClick(event, item) {
@@ -134,12 +182,17 @@ function handleChildClick(event, item, child) {
     }
 }
 
-Statamic.$keys.bind(['command+\\', ['[']], (e) => {
-    e.preventDefault();
-    toggle();
-});
+const cpBaseUrl = Statamic.$config.get('cpUrl');
 
-Statamic.$events.$on('nav.toggle', toggle);
+function isUrlWithinControlPanel(url) {
+    return url && (url === cpBaseUrl || url.startsWith(cpBaseUrl + '/'));
+}
+
+function shouldRenderAsInertiaLink(item) {
+    if (item.attributes?.target === '_blank') return false;
+    return isUrlWithinControlPanel(item.url);
+}
+
 </script>
 
 <template>
@@ -155,7 +208,7 @@ Statamic.$events.$on('nav.toggle', toggle);
                     <DynamicHtmlRenderer v-if="item.view" :html="item.view" />
                     <template v-else>
                         <component
-                            :is="item.attributes?.target === '_blank' ? 'a' : Link"
+                            :is="shouldRenderAsInertiaLink(item) ? Link : 'a'"
                             :href="item.url"
                             v-bind="item.attributes"
                             :class="{ 'active': item.active }"
@@ -167,7 +220,7 @@ Statamic.$events.$on('nav.toggle', toggle);
                         <ul v-if="item.children.length && item.active">
                             <li v-for="(child, i) in item.children" :key="i">
                                 <component
-                                    :is="child.attributes?.target === '_blank' ? 'a' : Link"
+                                    :is="shouldRenderAsInertiaLink(child) ? Link : 'a'"
                                     :href="child.url"
                                     v-bind="child.attributes"
                                     v-text="__(child.display)"

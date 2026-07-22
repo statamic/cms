@@ -60,7 +60,7 @@ EOT;
 
     private function tag($tag, $context = [])
     {
-        return (string) Parse::template($tag, $context);
+        return (string) Parse::template($tag, $context, trusted: true);
     }
 
     #[Test]

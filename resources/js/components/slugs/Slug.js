@@ -116,7 +116,6 @@ export default class Slug {
             .catch((e) => {
                 if (axios.isCancel(e)) {
                     aborted = true;
-                    return;
                 }
                 throw e;
             })

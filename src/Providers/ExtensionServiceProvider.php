@@ -76,6 +76,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\CollectionTitleFormats::class,
         Fieldtypes\Collections::class,
         Fieldtypes\Color::class,
+        Fieldtypes\ControlAppearance::class,
         Fieldtypes\Date::class,
         Fieldtypes\Dictionary::class,
         Fieldtypes\DictionaryFields::class,
@@ -83,6 +84,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\FieldDisplay::class,
         Fieldtypes\Files::class,
         Fieldtypes\Floatval::class,
+        Fieldtypes\FormattingLocales::class,
         Fieldtypes\GlobalSetSites::class,
         Fieldtypes\Grid::class,
         Fieldtypes\Group::class,
@@ -154,6 +156,7 @@ class ExtensionServiceProvider extends ServiceProvider
     ];
 
     protected $scopes = [
+        Scopes\Filters\AssetProperties::class,
         Scopes\Filters\Fields::class,
         Scopes\Filters\Blueprint::class,
         Scopes\Filters\Status::class,
@@ -265,6 +268,12 @@ class ExtensionServiceProvider extends ServiceProvider
         $this->registerFormJsDrivers();
         $this->registerUpdateScripts();
         $this->app->instance('statamic.hooks', collect());
+    }
+
+    public function boot()
+    {
+        Fieldtypes\Link::extend('entry', Fieldtypes\Link\EntryLinkType::class);
+        Fieldtypes\Link::extend('asset', Fieldtypes\Link\AssetLinkType::class);
     }
 
     protected function registerAddonManifest()

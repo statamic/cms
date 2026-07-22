@@ -1,6 +1,7 @@
 <script setup>
 import { ref, watch, nextTick } from 'vue';
 import { Tooltip as VTooltip } from 'floating-vue';
+import DOMPurify from 'dompurify';
 import { useTooltip } from '@/composables/tooltip.js';
 
 const { isVisible, content, html, targetEl } = useTooltip();
@@ -40,8 +41,8 @@ function updatePosition() {
 watch([isVisible, targetEl, content], async ([visible, target]) => {
     if (visible && target) {
         // Update content and position (handles both initial show and target changes)
-        displayContent.value = content.value;
         displayHtml.value = html.value;
+        displayContent.value = displayHtml.value ? DOMPurify.sanitize(content.value ?? '') : content.value;
         updatePosition();
         tooltipKey.value++;
         await nextTick();

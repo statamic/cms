@@ -38,8 +38,18 @@ class Command {
 }
 
 export default class CommandPalette {
+    #preventIfCallbacks = [];
+
     get category() {
         return CATEGORY;
+    }
+
+    preventIf(fn) {
+        this.#preventIfCallbacks.push(fn);
+    }
+
+    shouldPreventOpening() {
+        return this.#preventIfCallbacks.some(fn => fn());
     }
 
     add(command) {

@@ -38,7 +38,12 @@
     .tree-node:has(.is-section) + .tree-node .page-tree-branch,
     /* 3rd level down */
     .tree-node:has(.page-tree-branch--has-children):has(.is-open) + .tree-node .page-tree-branch {
-        border-top-left-radius: 0;
+        border-start-start-radius: 0;
+    }
+
+    /* A section node followed by another section node should always have a rounded border. E.g. Tools + Settings */
+    .tree-node:has(.is-section) + .tree-node:has(.is-section) .page-tree-branch {
+        @apply rounded-xl;
     }
 }
 

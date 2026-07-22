@@ -180,7 +180,7 @@ const columns = ref(initializeColumns());
 const sortColumn = ref(props.sortColumn || (columns.value.length ? columns.value[0].field : null));
 const sortDirection = ref(props.sortDirection || getDefaultSortDirectionForColumn(sortColumn.value));
 const selections = ref(props.selections || []);
-const allowsSelections = computed(() => (props.selections || hasActions.value) && !props.reorderable);
+const allowsSelections = computed(() => (props.selections || (props.allowBulkActions && hasActions.value)) && !props.reorderable);
 const allowsMultipleSelections = computed(() => props.maxSelections > 1);
 const hasReachedSelectionLimit = computed(() => selections.value.length === props.maxSelections);
 const hasActions = computed(() => !!props.actionUrl);
@@ -236,6 +236,17 @@ watch(
         selections.value = props.selections || [];
     }
 );
+
+const removeFromSelections = (ids) => selections.value = selections.value.filter(selection => !ids.includes(selection));
+Statamic.$events.$on('removeFromSelections', removeFromSelections);
+
+const replaceInSelections = (replacements) => selections.value = selections.value.map(selection => replacements[selection] ?? selection);
+Statamic.$events.$on('replaceInSelections', replaceInSelections);
+
+onBeforeUnmount(() => {
+    Statamic.$events.$off('removeFromSelections', removeFromSelections);
+    Statamic.$events.$off('replaceInSelections', replaceInSelections);
+});
 
 const rawParameters = computed(() => ({
     page: currentPage.value,
@@ -300,7 +311,7 @@ const parameters = computed(() => {
 });
 
 const shouldRequestFirstPage = computed(() => {
-    if (currentPage.value > 1 && items.value.length === 0) {
+    if (currentPage.value > 1 && meta.value?.last_page && currentPage.value > meta.value.last_page) {
         currentPage.value = 1;
         return true;
     }
@@ -666,6 +677,7 @@ provideListingContext({
 defineExpose({
     refresh,
     setFilter,
+    parameters,
 });
 
 watch(parameters, (newParams, oldParams) => {
@@ -673,6 +685,8 @@ watch(parameters, (newParams, oldParams) => {
     request();
     pushState();
 });
+
+watch(() => props.url, () => request());
 
 watch(loading, (loading) => Statamic.$progress.loading(id, loading));
 
@@ -684,6 +698,7 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
+    Statamic.$progress.complete(id);
     if (props.pushQuery) window.removeEventListener('popstate', popState);
 });
 
@@ -701,47 +716,49 @@ autoApplyState();
 </script>
 
 <template>
-    <slot name="initializing" v-if="shouldShowSkeleton">
-        <div class="flex flex-col gap-4 justify-between mt-3 starting-style-transition starting-style-transition--delay">
-            <ui-skeleton class="h-5 w-48" />
-            <div class="flex gap-2 sm:gap-3">
-                <ui-skeleton class="h-9 w-96" />
-                <ui-skeleton class="h-9 w-24" />
-                <div class="flex-1" />
-                <ui-skeleton class="size-10" />
+    <div>
+        <slot name="initializing" v-if="shouldShowSkeleton">
+            <div class="flex flex-col gap-4 justify-between mt-3 starting-style-transition starting-style-transition--delay">
+                <ui-skeleton v-if="showPresets" class="h-5 w-48" />
+                <div v-if="allowSearch || hasFilters || allowCustomizingColumns" class="flex gap-2 sm:gap-3">
+                    <ui-skeleton v-if="allowSearch" class="h-9 w-96" />
+                    <ui-skeleton v-if="hasFilters" class="h-9 w-24" />
+                    <div class="flex-1" />
+                    <ui-skeleton v-if="allowCustomizingColumns" class="size-10" />
+                </div>
+                <ui-skeleton class="h-48 w-full" />
             </div>
-            <ui-skeleton class="h-48 w-full" />
-        </div>
-    </slot>
-    <slot v-if="!initializing" :items="items" :is-column-visible="isColumnVisible" :loading="loading">
-        <Presets v-if="showPresets" />
-        <div v-if="allowSearch || hasFilters || allowCustomizingColumns" class="relative overflow-clip flex items-center gap-2 sm:gap-3 min-h-16 starting-style-transition st-overflow-clip-margin">
-            <div class="flex flex-1 items-center gap-2 sm:gap-3 w-full">
-                <Search v-if="allowSearch" />
-                <Filters v-if="hasFilters" />
+        </slot>
+        <slot v-if="!initializing" :items="items" :is-column-visible="isColumnVisible" :loading="loading">
+            <Presets v-if="showPresets" />
+            <div v-if="allowSearch || hasFilters || allowCustomizingColumns" class="relative overflow-clip flex items-center gap-2 sm:gap-3 min-h-16 starting-style-transition st-overflow-clip-margin">
+                <div class="flex flex-1 items-center gap-2 sm:gap-3 overflow-x-auto -ms-1 ps-1 py-1">
+                    <Search v-if="allowSearch" />
+                    <Filters v-if="hasFilters" />
+                </div>
+                <CustomizeColumns v-if="allowCustomizingColumns" />
             </div>
-            <CustomizeColumns v-if="allowCustomizingColumns" />
-        </div>
 
-        <div
-            v-if="!items.length"
-            class="rounded-lg border border-dashed border-gray-300 dark:border-gray-700 p-6 text-center text-gray-500"
-            v-text="__('No results')"
-        />
+            <div
+                v-if="!items.length"
+                class="rounded-lg border border-dashed border-gray-300 dark:border-gray-700 p-6 text-center text-gray-500"
+                v-text="__('No results')"
+            />
 
-        <Panel v-else class="relative overflow-x-auto overscroll-x-contain" style="container-type: scroll-state;">
-            <Table>
-                <template v-for="(slot, slotName) in forwardedTableCellSlots" :key="slotName" #[slotName]="slotProps">
-                    <component :is="slot" v-bind="slotProps" />
-                </template>
-                <template v-if="$slots['prepended-row-actions']" #prepended-row-actions="{ row }">
-                    <slot name="prepended-row-actions" :row="row" />
-                </template>
-            </Table>
-            <PanelFooter v-if="meta">
-                <Pagination />
-            </PanelFooter>
-        </Panel>
-    </slot>
-    <BulkActions v-if="showBulkActions" />
+            <Panel v-else class="relative overflow-x-auto" style="container-type: scroll-state;">
+                <Table>
+                    <template v-for="(slot, slotName) in forwardedTableCellSlots" :key="slotName" #[slotName]="slotProps">
+                        <component :is="slot" v-bind="slotProps" />
+                    </template>
+                    <template v-if="$slots['prepended-row-actions']" #prepended-row-actions="{ row }">
+                        <slot name="prepended-row-actions" :row="row" />
+                    </template>
+                </Table>
+                <PanelFooter v-if="meta">
+                    <Pagination />
+                </PanelFooter>
+            </Panel>
+        </slot>
+        <BulkActions v-if="showBulkActions" />
+    </div>
 </template>

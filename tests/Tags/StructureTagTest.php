@@ -78,7 +78,7 @@ EOT;
         $this->assertXmlStringEqualsXmlString($expected, (string) Antlers::parse($template, [
             'foo' => 'bar', // to test that cascade is inherited.
             'title' => 'outer title', // to test that cascade the page's data takes precedence over the cascading data.
-        ]));
+        ], true));
     }
 
     #[Test]
@@ -143,7 +143,7 @@ EOT;
         $parsed = (string) Antlers::parse($template, [
             'foo' => 'bar', // to test that cascade is inherited.
             'title' => 'outer title', // to test that cascade the page's data takes precedence over the cascading data.
-        ]);
+        ], true);
 
         // This is really what we're interested in testing. The "Two" entry has a foo value
         // of "notbar", but we're only selecting the title, so we shouldn't get the real value.
@@ -217,7 +217,7 @@ EOT;
             'foo' => 'bar', // to test that cascade is inherited.
             'title' => 'outer title', // to test that cascade the page's data takes precedence over the cascading data.
             'nav_title' => 'outer nav_title', // to test that the cascade doesn't leak into the iterated scope
-        ]));
+        ], true));
     }
 
     #[Test]
@@ -259,7 +259,7 @@ EOT;
 
         $this->assertXmlStringEqualsXmlString($expected, (string) Antlers::parse($template, [
             'foo' => 'bar', // to test that cascade is inherited.
-        ]));
+        ], true));
     }
 
     #[Test]
@@ -340,35 +340,35 @@ EOT;
         ]);
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/1');
-        $result = (string) Antlers::parse($template);
+        $result = (string) Antlers::parse($template, [], true);
         $this->assertEquals('[home][home-1][1=current][1-1][1-1-1][1-1-1-1][2][3]', $result);
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/1/1');
-        $result = (string) Antlers::parse($template);
+        $result = (string) Antlers::parse($template, [], true);
         $this->assertEquals('[home][home-1][1=parent][1-1=current][1-1-1][1-1-1-1][2][3]', $result);
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/1/1/1');
-        $result = (string) Antlers::parse($template);
+        $result = (string) Antlers::parse($template, [], true);
         $this->assertEquals('[home][home-1][1=parent][1-1=parent][1-1-1=current][1-1-1-1][2][3]', $result);
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/1/1/1/1');
-        $result = (string) Antlers::parse($template);
+        $result = (string) Antlers::parse($template, [], true);
         $this->assertEquals('[home][home-1][1=parent][1-1=parent][1-1-1=parent][1-1-1-1=current][2][3]', $result);
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/2');
-        $result = (string) Antlers::parse($template);
+        $result = (string) Antlers::parse($template, [], true);
         $this->assertEquals('[home][home-1][1][1-1][1-1-1][1-1-1-1][2=current][3]', $result);
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/');
-        $result = (string) Antlers::parse($template);
+        $result = (string) Antlers::parse($template, [], true);
         $this->assertEquals('[home=current][home-1][1][1-1][1-1-1][1-1-1-1][2][3]', $result);
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/foo');
-        $result = (string) Antlers::parse($template);
+        $result = (string) Antlers::parse($template, [], true);
         $this->assertEquals('[home=parent][home-1=current][1][1-1][1-1-1][1-1-1-1][2][3]', $result);
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/other');
-        $result = (string) Antlers::parse($template);
+        $result = (string) Antlers::parse($template, [], true);
         $this->assertEquals('[home][home-1][1][1-1][1-1-1][1-1-1-1][2][3]', $result);
 
         // Only the last child has an URL.
@@ -383,15 +383,15 @@ EOT;
         ]);
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/1/1/1/1');
-        $result = (string) Antlers::parse($template);
+        $result = (string) Antlers::parse($template, [], true);
         $this->assertEquals('[1=parent][1-1=parent][1-1-1=parent][1-1-1-1=current]', $result);
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/');
-        $result = (string) Antlers::parse($template);
+        $result = (string) Antlers::parse($template, [], true);
         $this->assertEquals('[1][1-1][1-1-1][1-1-1-1]', $result);
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/other');
-        $result = (string) Antlers::parse($template);
+        $result = (string) Antlers::parse($template, [], true);
         $this->assertEquals('[1][1-1][1-1-1][1-1-1-1]', $result);
 
         // Only the top parent has an URL.
@@ -406,15 +406,15 @@ EOT;
         ]);
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/1');
-        $result = (string) Antlers::parse($template);
+        $result = (string) Antlers::parse($template, [], true);
         $this->assertEquals('[1=current][1-1][1-1-1][1-1-1-1]', $result);
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/');
-        $result = (string) Antlers::parse($template);
+        $result = (string) Antlers::parse($template, [], true);
         $this->assertEquals('[1][1-1][1-1-1][1-1-1-1]', $result);
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/other');
-        $result = (string) Antlers::parse($template);
+        $result = (string) Antlers::parse($template, [], true);
         $this->assertEquals('[1][1-1][1-1-1][1-1-1-1]', $result);
     }
 
@@ -443,15 +443,15 @@ EOT;
         ]);
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/');
-        $result = (string) Antlers::parse($template);
+        $result = (string) Antlers::parse($template, [], true);
         $this->assertEquals('[home=current][1][1-1][1-1-1][1-1-1-1][2][3]', $result);
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/1');
-        $result = (string) Antlers::parse($template);
+        $result = (string) Antlers::parse($template, [], true);
         $this->assertEquals('[home][1=current][1-1][1-1-1][1-1-1-1][2][3]', $result);
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/1/1/1');
-        $result = (string) Antlers::parse($template);
+        $result = (string) Antlers::parse($template, [], true);
         $this->assertEquals('[home][1=parent][1-1=parent][1-1-1=current][1-1-1-1][2][3]', $result);
     }
 
@@ -473,7 +473,7 @@ EOT;
         EntryFactory::collection('rad')->id('3')->slug('3')->data(['title' => 'Three'])->create();
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/1/2/3');
-        $result = (string) Antlers::parse($template);
+        $result = (string) Antlers::parse($template, [], true);
         $this->assertEquals('[1=parent][2=parent]', $result);
     }
 
@@ -513,31 +513,31 @@ EOT;
         \Statamic\Facades\URL::swap($mock);
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/');
-        $result = (string) Antlers::parse($template);
+        $result = (string) Antlers::parse($template, [], true);
         $this->assertEquals('[1][1-1][1-1-1][1-1-1-1][2]', $result);
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/other');
-        $result = (string) Antlers::parse($template);
+        $result = (string) Antlers::parse($template, [], true);
         $this->assertEquals('[1][1-1][1-1-1][1-1-1-1][2]', $result);
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/2');
-        $result = (string) Antlers::parse($template);
+        $result = (string) Antlers::parse($template, [], true);
         $this->assertEquals('[1][1-1][1-1-1][1-1-1-1][2=current]', $result);
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/1');
-        $result = (string) Antlers::parse($template);
+        $result = (string) Antlers::parse($template, [], true);
         $this->assertEquals('[1=current][1-1][1-1-1][1-1-1-1][2]', $result);
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/1/1');
-        $result = (string) Antlers::parse($template);
+        $result = (string) Antlers::parse($template, [], true);
         $this->assertEquals('[1=parent][1-1=current][1-1-1][1-1-1-1][2]', $result);
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/1/1/1');
-        $result = (string) Antlers::parse($template);
+        $result = (string) Antlers::parse($template, [], true);
         $this->assertEquals('[1=parent][1-1=parent][1-1-1=current][1-1-1-1][2]', $result);
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/1/1/1/1');
-        $result = (string) Antlers::parse($template);
+        $result = (string) Antlers::parse($template, [], true);
         $this->assertEquals('[1=parent][1-1=parent][1-1-1=parent][1-1-1-1=current][2]', $result);
     }
 
@@ -573,7 +573,7 @@ EOT;
 
         $this->assertXmlStringEqualsXmlString($expected, (string) Antlers::parse($template, [
             'title' => 'outer title', // to test that cascade the page's data takes precedence over the cascading data.
-        ]));
+        ], true));
     }
 
     private function makeNav($tree)
@@ -587,7 +587,7 @@ EOT;
 
     private function parseBasicTemplate($handle, $params = null)
     {
-        return (string) Antlers::parse($this->createBasicTemplate($handle, $params));
+        return (string) Antlers::parse($this->createBasicTemplate($handle, $params), [], true);
     }
 
     private function createBasicTemplate($handle, $params = null)

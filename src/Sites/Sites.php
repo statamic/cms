@@ -14,6 +14,8 @@ use Statamic\Facades\User;
 use Statamic\Facades\YAML;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class Sites
 {
     protected $sites;

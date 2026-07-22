@@ -102,7 +102,7 @@ PHP
             ->artisan('statamic:make:fieldtype', ['name' => 'KnightRider'])
             ->expectsQuestion("It doesn't look like Vite is setup for the Control Panel. Would you like to run `php please setup-cp-vite`?", true);
 
-        Process::assertRan('npm install');
+        Process::assertRan('npm install --ignore-scripts');
 
         $this->assertFileExists($fieldtype = base_path('app/Fieldtypes/KnightRider.php'));
         $this->assertStringContainsString('namespace App\Fieldtypes;', $this->files->get($fieldtype));
@@ -167,7 +167,7 @@ PHP
 
         $this->artisan('statamic:make:fieldtype', ['name' => 'Yoda', 'addon' => 'yoda/bag-odah']);
 
-        Process::assertRan('npm install');
+        Process::assertRan('npm install --ignore-scripts');
 
         $this->assertFileExists($fieldtype);
         $this->assertStringContainsString('namespace Yoda\BagOdah\Fieldtypes;', $this->files->get($fieldtype));

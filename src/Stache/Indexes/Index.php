@@ -11,7 +11,7 @@ abstract class Index
     protected $name;
     protected $items = [];
     protected $loaded = false;
-    private static ?string $currentlyLoading = null;
+    private static array $loadingStack = [];
 
     public function __construct($store, $name)
     {
@@ -66,27 +66,29 @@ abstract class Index
         }
 
         $loadingKey = $this->store->key().'/'.$this->name;
-        $currentlyLoadingThis = static::$currentlyLoading === $loadingKey;
+        $currentlyLoadingThis = in_array($loadingKey, static::$loadingStack);
 
-        static::$currentlyLoading = $loadingKey;
+        static::$loadingStack[] = $loadingKey;
 
-        $this->loaded = true;
+        try {
+            $this->loaded = true;
 
-        if (Statamic::isWorker() && ! $currentlyLoadingThis) {
-            $this->loaded = false;
+            if (Statamic::isWorker() && ! $currentlyLoadingThis) {
+                $this->loaded = false;
+            }
+
+            debugbar()->addMessage("Loading index: {$loadingKey}", 'stache');
+
+            $this->items = Stache::cacheStore()->get($this->cacheKey());
+
+            if ($this->items === null) {
+                $this->update();
+            }
+
+            $this->store->cacheIndexUsage($this);
+        } finally {
+            array_pop(static::$loadingStack);
         }
-
-        debugbar()->addMessage("Loading index: {$loadingKey}", 'stache');
-
-        $this->items = Stache::cacheStore()->get($this->cacheKey());
-
-        if ($this->items === null) {
-            $this->update();
-        }
-
-        $this->store->cacheIndexUsage($this);
-
-        static::$currentlyLoading = null;
 
         return $this;
     }
@@ -161,8 +163,14 @@ abstract class Index
         Stache::cacheStore()->forget($this->cacheKey());
     }
 
+    /** @deprecated */
     public static function currentlyLoading()
     {
-        return static::$currentlyLoading;
+        return end(static::$loadingStack) ?: null;
+    }
+
+    public static function isLoading(): bool
+    {
+        return ! empty(static::$loadingStack);
     }
 }

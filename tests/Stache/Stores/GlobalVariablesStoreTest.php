@@ -71,6 +71,17 @@ class GlobalVariablesStoreTest extends TestCase
     }
 
     #[Test]
+    public function it_makes_global_variable_instances_from_files_with_null_contents()
+    {
+        $item = $this->store->makeItemFromFile(Path::tidy($this->tempDir.'/en/example.yaml'), 'null');
+
+        $this->assertInstanceOf(Variables::class, $item);
+        $this->assertEquals('example::en', $item->id());
+        $this->assertEquals('example', $item->handle());
+        $this->assertEquals([], $item->data()->all());
+    }
+
+    #[Test]
     public function it_uses_the_id_as_the_item_key()
     {
         $set = Mockery::mock();

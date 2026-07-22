@@ -3,20 +3,57 @@
         <div>
             <Tabs v-model="currentTab" :unmount-on-hide="false">
                 <div v-if="!singleTab && tabs.length > 0" class="flex items-center justify-between gap-x-2 mb-6">
-                    <TabList class="flex-1">
-                        <div ref="tabs" class="flex-1 flex items-center gap-x-2.5">
-                            <BlueprintTab
-                                ref="tab"
-                                v-for="tab in tabs"
-                                :key="tab._id"
-                                :tab="tab"
-                                :current-tab="currentTab"
-                                :show-instructions="showTabInstructionsField"
-                                :edit-text="editTabText"
-                                @removed="removeTab(tab._id)"
-                                @updated="updateTab(tab._id, $event)"
-                                @mouseenter="mouseEnteredTab(tab._id)"
-                            />
+                    <TabList class="flex-1 min-w-0 overflow-x-clip overflow-y-visible pe-0.25">
+                        <div ref="tabs" class="flex-1 flex items-center gap-x-2.5 min-w-0">
+                            <div ref="tabWrapper" class="min-w-0 flex-1 flex overflow-clip px-0.25">
+                                <div ref="tabInner" class="flex items-center gap-x-2.5 shrink-0">
+                                    <BlueprintTab
+                                        ref="tab"
+                                        v-for="tab in tabs"
+                                        :key="tab._id"
+                                        :tab="tab"
+                                        :current-tab="currentTab"
+                                        :show-instructions="showTabInstructionsField"
+                                        :edit-text="editTabText"
+                                        @removed="removeTab(tab._id)"
+                                        @updated="updateTab(tab._id, $event)"
+                                        @mouseenter="mouseEnteredTab(tab._id)"
+                                    />
+                                </div>
+                            </div>
+                            <Dropdown
+                                v-if="overflowedTabs.length"
+                                align="end"
+                                side="bottom"
+                                class="shrink-0"
+                            >
+                                <template #trigger>
+                                    <Button
+                                        icon="dots"
+                                        variant="ghost"
+                                        size="sm"
+                                        :aria-label="__('Open dropdown menu')"
+                                    />
+                                </template>
+                                <DropdownMenu>
+                                    <DropdownItem
+                                        v-for="tab in overflowedTabs"
+                                        :key="tab._id"
+                                        :icon="tab.icon"
+                                        :class="{ 'bg-gray-100 dark:bg-gray-800': currentTab === tab._id }"
+                                        @click="selectTab(tab._id)"
+                                    >
+                                        <span class="block max-w-48 overflow-hidden text-ellipsis whitespace-nowrap">
+                                            {{ __(tab.display) }}
+                                        </span>
+                                    </DropdownItem>
+                                    <template v-if="activeTabIsOverflowed">
+                                        <DropdownSeparator />
+                                        <DropdownItem :text="__('Edit')" icon="edit" @click="editActiveOverflowedTab" />
+                                        <DropdownItem :text="__('Delete')" icon="trash" variant="destructive" @click="removeActiveOverflowedTab" />
+                                    </template>
+                                </DropdownMenu>
+                            </Dropdown>
                         </div>
                     </TabList>
 
@@ -54,10 +91,11 @@
 <script>
 import { Sortable, Plugins } from '@shopify/draggable';
 import { nanoid as uniqid } from 'nanoid';
+import { createTabsOverflowTracker } from '@/util/tabs-overflow.js';
 import BlueprintTab from './Tab.vue';
 import BlueprintTabContent from './TabContent.vue';
 import CanDefineLocalizable from '../fields/CanDefineLocalizable';
-import { Tabs, TabList, Button, Description } from '@/components/ui';
+import { Tabs, TabList, Button, Description, Dropdown, DropdownMenu, DropdownItem, DropdownSeparator } from '@/components/ui';
 
 export default {
     mixins: [CanDefineLocalizable],
@@ -69,6 +107,10 @@ export default {
         TabList,
         Button,
         Description,
+        Dropdown,
+        DropdownMenu,
+        DropdownItem,
+        DropdownSeparator,
     },
 
     props: {
@@ -138,15 +180,26 @@ export default {
             sortableTabs: null,
             sortableSections: null,
             sortableFields: null,
+            overflowedTabs: [],
         };
     },
 
+    computed: {
+        activeTabIsOverflowed() {
+            return this.overflowedTabs.some((t) => t._id === this.currentTab);
+        },
+    },
+
     watch: {
+        currentTab() {
+            this.$nextTick(this.checkOverflow);
+        },
 		tabs: {
 			deep: true,
 			handler(tabs) {
 				this.$emit('updated', tabs);
 				this.makeSortable();
+				this.$nextTick(this.checkOverflow);
 			},
 		},
     },
@@ -154,15 +207,32 @@ export default {
     mounted() {
         this.ensureTab();
         this.makeSortable();
+        this.overflowTracker = createTabsOverflowTracker({
+            getWrapper: () => this.$refs.tabWrapper,
+            getInner: () => this.$refs.tabInner,
+            getItems: () => this.tabs,
+            onUpdate: ({ overflowedItems }) => {
+                this.overflowedTabs = overflowedItems;
+            },
+        });
+        this.$nextTick(() => {
+            this.overflowTracker.observe();
+            this.overflowTracker.checkOverflow();
+        });
     },
 
     unmounted() {
         if (this.sortableTabs) this.sortableTabs.destroy();
         if (this.sortableSections) this.sortableSections.destroy();
         if (this.sortableFields) this.sortableFields.destroy();
+        this.overflowTracker?.disconnect();
     },
 
     methods: {
+        checkOverflow() {
+            this.overflowTracker?.checkOverflow();
+        },
+
         ensureTab() {
             if (this.requireSection && this.tabs.length === 0) {
                 this.addTab();
@@ -180,7 +250,10 @@ export default {
         makeTabsSortable() {
             if (this.sortableTabs) this.sortableTabs.destroy();
 
-            this.sortableTabs = new Sortable(this.$refs.tabs, {
+            const container = this.$refs.tabInner || this.$refs.tabs;
+            if (!container) return;
+
+            this.sortableTabs = new Sortable(container, {
                 draggable: '.blueprint-tab',
                 mirror: { constrainDimensions: true },
                 swapAnimation: { horizontal: true },
@@ -292,6 +365,22 @@ export default {
 
         selectTab(tabId) {
             this.currentTab = tabId;
+        },
+
+        editOverflowedTab(tab) {
+            if (!tab) return;
+            const refs = this.$refs.tab;
+            const tabRef = Array.isArray(refs) ? refs.find((c) => c.tab?._id === tab._id) : refs;
+            tabRef?.edit();
+        },
+
+        editActiveOverflowedTab() {
+            const tab = this.overflowedTabs.find((t) => t._id === this.currentTab);
+            if (tab) this.editOverflowedTab(tab);
+        },
+
+        removeActiveOverflowedTab() {
+            this.removeTab(this.currentTab);
         },
 
         mouseEnteredTab(tabId) {

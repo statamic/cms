@@ -24,6 +24,7 @@ class GraphQLController extends CpController
         return view('statamic::graphql.graphiql', [
             'url' => '/'.config('graphql.route.prefix'),
             'introspection' => GraphQL::introspectionEnabled(),
+            'authToken' => config('statamic.graphql.auth_token'),
         ]);
     }
 }

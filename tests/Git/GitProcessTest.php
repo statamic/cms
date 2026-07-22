@@ -161,6 +161,14 @@ EOT;
         $this->simulateLoggableErrorOutput('Error: Auto packing the repository in background for optimum performance.');
     }
 
+    #[Test]
+    public function it_doesnt_log_github_dependabot_warnings_as_error_output()
+    {
+        Log::shouldReceive('error')->never();
+
+        $this->simulateLoggableErrorOutput("remote: GitHub found 45 vulnerabilities on user/repo's default branch (1 critical, 17 high, 24 moderate, 3 low). To find out more, visit:\nremote: https://github.com/user/repo/security/dependabot");
+    }
+
     private function showLastCommit($path)
     {
         return Process::create($path)->run('git show');

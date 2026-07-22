@@ -215,9 +215,11 @@ class CollectionEntriesStore extends ChildStore
                 break;
             }
 
-            $itemFromDisk = $this->makeItemFromFile($path, $contents);
+            // Only parse the ID from the file rather than using makeItemFromFile,
+            // which would put a stale entry into the structure-entries blink store.
+            $id = Arr::get(YAML::file($path)->parse($contents), 'id');
 
-            if ($item->id() == $itemFromDisk->id()) {
+            if ($item->id() == $id) {
                 break;
             }
 
@@ -235,9 +237,7 @@ class CollectionEntriesStore extends ChildStore
             return null;
         }
 
-        $isLoadingIds = Index::currentlyLoading() === $this->key().'/id';
-
-        if (! $isLoadingIds && $this->shouldBlinkEntryUris && ($uri = $this->resolveIndex('uri')->load()->get($entry->id()))) {
+        if (! Index::isLoading() && $this->shouldBlinkEntryUris && ($uri = $this->resolveIndex('uri')->load()->get($entry->id()))) {
             Blink::store('entry-uris')->put($entry->id(), $uri);
         }
 
@@ -271,7 +271,7 @@ class CollectionEntriesStore extends ChildStore
 
     private function updateEntriesWithinIndex($index, $ids)
     {
-        if (empty($ids)) {
+        if (collect($ids)->isEmpty()) {
             return $index->update();
         }
 
@@ -283,7 +283,7 @@ class CollectionEntriesStore extends ChildStore
 
     private function updateEntriesWithinStore($ids)
     {
-        if (empty($ids)) {
+        if (collect($ids)->isEmpty()) {
             $ids = $this->paths()->keys();
         }
 

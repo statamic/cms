@@ -155,7 +155,10 @@ function getRange(start, end) {
     <div class="flex">
         <div class="flex flex-1 items-center">
             <div class="text-sm text-gray-600 dark:text-gray-500" v-if="showTotals && totalItems > 0">
-                {{ __(':start-:end of :total', { start: fromItem, end: toItem, total: totalItems }) }}
+                {{ __(':range of :total', {
+                    range: $number.formatRange(fromItem, toItem),
+                    total: $number.format(totalItems)
+                }) }}
             </div>
         </div>
 
@@ -163,6 +166,7 @@ function getRange(start, end) {
             <Button
                 size="sm"
                 :variant="hasPrevious && !showPageLinks ? 'filled' : 'ghost'"
+                class="disabled:cursor-default"
                 round
                 icon="chevron-left"
                 :disabled="!hasPrevious"
@@ -174,6 +178,7 @@ function getRange(start, end) {
                 v-for="(page, i) in pages"
                 size="sm"
                 round
+                class="disabled:cursor-default"
                 :variant="page == currentPage ? 'filled' : 'ghost'"
                 :key="i"
                 @click="selectPage(page)"
@@ -184,6 +189,7 @@ function getRange(start, end) {
             <Button
                 size="sm"
                 :variant="hasNext && !showPageLinks ? 'filled' : 'ghost'"
+                class="disabled:cursor-default"
                 round
                 icon="chevron-right"
                 :disabled="!hasNext"

@@ -7,21 +7,20 @@
             :max-selections="maxSelections"
             :model-value="items.map((item) => item.id)"
             :multiple
-            :options
+            :options="comboboxOptions"
             :placeholder="__(config.placeholder) || __('Choose...')"
             :read-only="readOnly"
             :taggable="isTaggable"
+            :close-on-select="isTaggable"
             option-label="title"
             option-value="id"
             @update:modelValue="itemsSelected"
             @search="search"
         >
             <template #option="{ title, hint, status }">
-                <div class="flex w-full items-center justify-between">
-                    <div class="flex items-center">
-                        <StatusIndicator v-if="status" class="me-2" :status="status" />
-                        <div v-text="title" class="truncate" />
-                    </div>
+                <div class="flex w-full text-left items-center gap-2">
+                    <StatusIndicator v-if="status" :status="status" />
+                    <div v-text="title" class="truncate grow" />
                     <ui-badge v-if="hint" size="sm" v-text="hint" />
                 </div>
             </template>
@@ -29,7 +28,7 @@
                 <div v-text="noOptionsText" />
             </template>
             <template #selected-option>
-                <span v-if="items.length === 1" v-text="items[0].title"></span>
+                <span v-if="items.length === 1" v-text="items[0].title" class="truncate"></span>
             </template>
             <template #selected-options>
                 <!-- We don't want to display the selected options here. The RelationshipInput component does that for us. -->
@@ -42,6 +41,8 @@
 <script>
 import { Combobox, StatusIndicator } from '@/components/ui';
 import { ref, watch } from 'vue';
+import { router } from '@inertiajs/vue3';
+import axios from 'axios';
 
 const optionsCache = ref({});
 const loaders = ref({});
@@ -68,6 +69,8 @@ export default {
         return {
             requested: false,
             options: [],
+            abortController: null,
+            removeNavigationListener: null,
         };
     },
 
@@ -92,6 +95,14 @@ export default {
 			return JSON.stringify({ ...this.parameters, url: this.url });
 	    },
 
+        comboboxOptions() {
+            // Combobox resolves the selected label from this list, so a selected item missing
+            // from it (e.g. a just-created term) would otherwise display as its raw id.
+            const missing = this.items.filter((item) => !this.options.some((option) => option.id === item.id));
+
+            return [...this.options, ...missing];
+        },
+
         noOptionsText() {
             return this.typeahead && !this.requested ? __('Start typing to search.') : __('No options to choose from.');
         },
@@ -107,6 +118,15 @@ export default {
 				this.requested = true;
 			}
 		);
+
+        this.removeNavigationListener = router.on('before', () => {
+            if (this.abortController) this.abortController.abort();
+        });
+    },
+
+    beforeUnmount() {
+        if (this.abortController) this.abortController.abort();
+        if (this.removeNavigationListener) this.removeNavigationListener();
     },
 
     watch: {
@@ -117,18 +137,25 @@ export default {
 
     methods: {
         request(params = {}) {
-			if (!params.length && loaders.value[this.cacheKey]) return;
+			if (!Object.keys(params).length && loaders.value[this.cacheKey]) return Promise.resolve();
 
             params = { ...this.parameters, ...params };
 
 			loaders.value = {...loaders.value, [this.cacheKey]: true};
 
-            return this.$axios.get(this.url, { params })
+            if (this.abortController) this.abortController.abort();
+            this.abortController = new AbortController();
+
+            return this.$axios.get(this.url, { params, signal: this.abortController.signal })
 	            .then((response) => {
 	                this.options = response.data.data;
 	                this.requested = true;
 		            optionsCache[this.cacheKey] = this.options;
 	                return Promise.resolve(response);
+	            })
+	            .catch((e) => {
+	                if (axios.isCancel(e)) return;
+	                throw e;
 	            })
 	            .finally(() => {
 					loaders.value = {...loaders.value, [this.cacheKey]: false};

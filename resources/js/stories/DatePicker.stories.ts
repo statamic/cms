@@ -12,10 +12,10 @@ const meta = {
             options: ['day', 'hour', 'minute', 'second'],
         },
         'update:modelValue': {
-            description: 'Event handler called when the date value changes. Returns the date as an ISO 8601 date and time string.',
+            description: 'Event handler called when the date value changes. <br><br> Returns a [`DateValue` object](https://reka-ui.com/docs/guides/dates).',
             table: {
                 category: 'events',
-                type: { summary: '(value: string) => void' }
+                type: { summary: '(value: DateValue) => void' }
             }
         }
     },

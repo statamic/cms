@@ -331,7 +331,7 @@ EOT;
     })
     .then((response) => response.json())
     .then((data) => {
-        map = createMap(); // Recreate map in case the DOM changed.
+        map = createMap();
 
         const regions = data.regions;
         for (var key in regions) {

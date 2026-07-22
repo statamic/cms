@@ -5,10 +5,10 @@
 
     <StackHeader v-if="!loading" :title="__(values.display) || __(config.display) || config.handle" :icon="fieldtype.icon">
         <template #actions>
-            <Button variant="default" @click.prevent="commit" :text="__('Apply')" />
-            <Button v-if="!(isNestedField)" variant="primary" @click.prevent="commitAndSave" icon="save" :text="__('Apply & Save')" />
-            <Button v-if="isNestedField" variant="default" @click.prevent="commitAndCloseAll" :text="__('Apply & Close All')" />
-            <Button v-if="isNestedField" variant="primary" @click.prevent="commitAndSaveAll" icon="save" :text="__('Save & Close All')" />
+            <Button v-if="!showSaveOnlyAtTopLevel" variant="default" @click.prevent="commit" :text="__('Apply')" />
+            <Button v-if="!(isNestedField)" variant="primary" @click.prevent="commitAndSave" icon="save" :text="showSaveOnlyAtTopLevel ? __('Save') : __('Apply & Save')" />
+            <Button v-if="isNestedField" variant="default" @click.prevent="commitAndSaveAll" :text="__('Save All')" v-tooltip="saveAllShortcutLabel" />
+            <Button v-if="isNestedField" variant="primary" @click.prevent="commitAndSaveTopStack" icon="save" :text="__('Save')" />
         </template>
     </StackHeader>
 
@@ -90,6 +90,10 @@ export default {
         fields: Array,
         suggestableConditionFields: Array,
         isInsideSet: Boolean,
+        showSaveOnlyAtTopLevel: {
+            type: Boolean,
+            default: false,
+        },
     },
 
     provide() {
@@ -106,7 +110,7 @@ export default {
             default: false
         },
         commitParentField: {
-            default: () => {}
+            default: null
         }
     },
 
@@ -192,18 +196,26 @@ export default {
         isNestedField() {
             return this.isInsideSet || this.isInsideConfigFields;
         },
+
+        saveAllShortcutLabel() {
+            const platform = typeof navigator !== 'undefined'
+                ? (navigator.userAgentData?.platform || navigator.platform || '')
+                : '';
+            const isMac = /Mac|iPhone|iPad|iPod/i.test(platform);
+            return isMac ? 'Cmd+Shift+S' : 'Ctrl+Shift+S';
+        },
     },
 
     created() {
         this.load();
 
-        // Add keyboard shortcut for Cmd+S / Ctrl+S only when this component is focused
-        this.saveBinding = this.$keys.bindGlobal(['mod+s'], (e) => {
+        // Add keyboard shortcuts only when this component is focused.
+        this.saveBinding = this.$keys.bindGlobal(['mod+s', 'mod+shift+s'], (e) => {
             // Only handle if this component is currently visible/focused
             if (this.$el && this.$el.offsetParent !== null) {
                 e.preventDefault();
                 e.stopPropagation();
-                this.handleSaveShortcut();
+                this.handleSaveShortcut(e);
             }
         });
     },
@@ -258,7 +270,7 @@ export default {
         },
 
         commit(params = {}) {
-            let { shouldCommitParent, shouldSaveRoot } = params;
+            let { shouldCommitParent, shouldSaveRoot, shouldClose = true } = params;
 
             this.clearErrors();
 
@@ -275,8 +287,10 @@ export default {
                     this.$emit('committed', response.data, this.editedFields);
 
                     if (shouldCommitParent && this.commitParentField) {
-                        this.commitParentField(params);
-                        this.close();
+						this.$nextTick(() => {
+							this.commitParentField(params);
+							if (shouldClose) this.close();
+						});
 
                         return;
                     }
@@ -285,7 +299,7 @@ export default {
                         this.saveRootForm();
                     }
 
-                    this.close();
+                    if (shouldClose) this.close();
                 })
                 .catch((e) => this.handleAxiosError(e));
         },
@@ -297,13 +311,6 @@ export default {
             });
         },
 
-        // Nested field: saves the current field and any parents.
-        commitAndCloseAll() {
-            this.commit({
-                shouldCommitParent: true,
-            });
-        },
-
         // Nested field: saves the current field and the blueprint/fieldset.
         commitAndSaveAll() {
             this.commit({
@@ -312,12 +319,41 @@ export default {
             });
         },
 
+        // Nested field: saves and closes only the current stack.
+        commitAndSaveTopStack() {
+            this.commit({
+                shouldSaveRoot: !this.isNestedField,
+            });
+        },
+
+        softSave() {
+            if (this.config.isNew) {
+                this.isNestedField ? this.commitAndSaveTopStack() : this.commitAndSave();
+                return;
+            }
+
+            this.commit({
+                shouldCommitParent: this.isNestedField,
+                shouldSaveRoot: true,
+                shouldClose: false,
+            });
+        },
+
         saveRootForm() {
             // The "root form" could be the blueprint or fieldset forms.
             this.$events.$emit('root-form-save');
         },
 
-        handleSaveShortcut() {
+        handleSaveShortcut(event) {
+            if (event?.key?.toLowerCase() === 's' && event?.shiftKey) {
+                this.saveAllShortcut();
+                return;
+            }
+
+            this.softSave();
+        },
+
+        saveAllShortcut() {
             this.isNestedField
                 ? this.commitAndSaveAll()
                 : this.commitAndSave();
@@ -330,7 +366,7 @@ export default {
                 this.errors = errors;
                 this.$toast.error(message);
             } else {
-                this.$toast.error(__('Something went wrong'));
+                this.$toast.error(e.response?.data?.message || __('Something went wrong'));
             }
         },
 
@@ -360,6 +396,10 @@ export default {
                     this.meta = { ...response.data.meta };
                     this.originValues = response.data.originValues;
                     this.originMeta = response.data.originMeta;
+                })
+                .catch((e) => {
+                    this.loading = false;
+                    this.handleAxiosError(e);
                 });
         },
     },

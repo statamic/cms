@@ -36,12 +36,15 @@ class Ffmpeg extends Process
     {
         return collect([
             escapeshellarg($ffmpegBinary),
+            '-hide_banner',
+            '-loglevel error',
             '-y',
             '-ss',
             escapeshellarg($this->startTimestamp),
             '-i',
             escapeshellarg($path),
-            '-vframes 1',
+            '-frames:v 1',
+            '-update 1',
             escapeshellarg($output),
         ])->join(' ');
     }

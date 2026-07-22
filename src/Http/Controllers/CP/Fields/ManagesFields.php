@@ -21,10 +21,16 @@ trait ManagesFields
     private function fieldsets()
     {
         return Fieldset::all()->mapWithKeys(function ($fieldset) {
+            $fields = $fieldset->hasSections()
+                ? $fieldset->sections()->flatMap(fn ($section) => Arr::get($section, 'fields', []))
+                : collect(Arr::get($fieldset->contents(), 'fields', []));
+
             return [$fieldset->handle() => [
                 'handle' => $fieldset->handle(),
                 'title' => $fieldset->title(),
-                'fields' => collect(Arr::get($fieldset->contents(), 'fields'))->map(function ($field) {
+                'has_sections' => $fieldset->hasSections(),
+                'sections_count' => $fieldset->hasSections() ? $fieldset->sections()->count() : 0,
+                'fields' => $fields->map(function ($field) {
                     return FieldTransformer::toVue($field);
                 })->sortBy('config.display')->values()->all(),
             ]];

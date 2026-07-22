@@ -961,6 +961,24 @@ EOT
     }
 
     #[Test]
+    public function it_does_not_follow_external_redirect_on_success()
+    {
+        $this->assertEmpty(Form::find('contact')->submissions());
+
+        $this
+            ->from('/contact')
+            ->post('/!/forms/contact', [
+                'email' => 'san@holo.com',
+                'message' => 'hello',
+                '_redirect' => 'https://evil.com/phishing',
+            ])
+            ->assertSessionHasNoErrors()
+            ->assertLocation('/contact');
+
+        $this->assertCount(1, Form::find('contact')->submissions());
+    }
+
+    #[Test]
     public function it_will_submit_form_with_honeypot_filled_and_render_fake_success()
     {
         $this->assertEmpty(Form::find('contact')->submissions());
@@ -1034,6 +1052,29 @@ EOT
 
         $this->assertEquals($expected, $errors[1]);
         $this->assertEmpty($success[1]);
+    }
+
+    #[Test]
+    public function it_does_not_follow_external_error_redirect()
+    {
+        $this->assertEmpty(Form::find('contact')->submissions());
+
+        Event::listen(function (\Statamic\Events\FormSubmitted $event) {
+            throw ValidationException::withMessages(['custom' => 'This is a custom message']);
+        });
+
+        $this
+            ->from('/contact')
+            ->post('/!/forms/contact', [
+                '_error_redirect' => 'https://evil.com/phishing',
+                'name' => 'Hansolo',
+                'email' => 'san@holo.com',
+                'message' => 'hello',
+            ])
+            ->assertSessionHasErrors(['custom'], null, 'form.contact')
+            ->assertLocation('/contact');
+
+        $this->assertCount(0, Form::find('contact')->submissions());
     }
 
     #[Test]

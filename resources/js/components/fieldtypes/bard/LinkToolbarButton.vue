@@ -14,6 +14,7 @@
                 size="sm"
                 :aria-label="button.text"
                 v-tooltip="button.text"
+                @mousedown.prevent
             >
                 <ui-icon :name="button.svg" v-if="button.svg" class="size-4" />
                 <div class="flex items-center" v-html="button.html" v-if="button.html" />

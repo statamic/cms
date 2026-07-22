@@ -85,6 +85,7 @@ class FormsController extends CpController
             ]),
             'actionUrl' => cp_route('forms.submissions.actions.run', $form->handle()),
             'exporters' => $form->exporters()->map(fn ($exporter) => [
+                'handle' => $exporter->handle(),
                 'title' => $exporter->title(),
                 'downloadUrl' => $exporter->downloadUrl(),
             ])->values(),

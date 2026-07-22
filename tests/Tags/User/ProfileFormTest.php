@@ -16,7 +16,7 @@ class ProfileFormTest extends TestCase
 
     private function tag($tag)
     {
-        return Parse::template($tag, []);
+        return Parse::template($tag, trusted: true);
     }
 
     #[Test]
@@ -237,10 +237,12 @@ EOT
         $this->actingAs(User::make()->save());
 
         $this
+            ->from('/profile-form')
             ->post('/!/auth/profile', [
                 'email' => 'san@holo.com',
             ])
-            ->assertSessionHasNoErrors();
+            ->assertSessionHasNoErrors()
+            ->assertLocation('/profile-form');
 
         $output = $this->tag(<<<'EOT'
 {{ user:profile_form }}
@@ -328,6 +330,19 @@ EOT
         $this->assertEmpty($success[1]);
         $this->assertEquals($expected, $errors[1]);
         $this->assertEquals($expected, $inlineErrors[1]);
+    }
+
+    #[Test]
+    public function it_wont_follow_redirect_to_external_url()
+    {
+        $this->actingAs(User::make()->id('1')->email('san@holo.com')->save());
+
+        $this
+            ->post('/!/auth/profile', [
+                'email' => 'san@holo.com',
+                '_redirect' => 'https://evil.com',
+            ])
+            ->assertLocation('/');
     }
 
     #[Test]

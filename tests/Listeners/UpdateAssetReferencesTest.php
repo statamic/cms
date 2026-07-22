@@ -1865,6 +1865,46 @@ EOT;
         $this->assertContains('additional-2', $items);
     }
 
+    #[Test]
+    public function it_updates_asset_references_in_working_copy()
+    {
+        config(['statamic.revisions.enabled' => true]);
+
+        $collection = tap(Facades\Collection::make('articles')->revisionsEnabled(true))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'hero',
+                    'field' => [
+                        'type' => 'assets',
+                        'container' => 'test_container',
+                        'max_files' => 1,
+                    ],
+                ],
+            ],
+        ]);
+
+        $entry = tap(Facades\Entry::make()->collection($collection)->data([
+            'hero' => 'hoff.jpg',
+        ]))->save();
+
+        $this->assertEquals('hoff.jpg', $entry->get('hero'));
+        $this->assertFalse($entry->hasWorkingCopy());
+
+        tap($entry->makeWorkingCopy(), function ($workingCopy) {
+            $workingCopy->save();
+        });
+
+        $this->assertTrue($entry->fresh()->hasWorkingCopy());
+        $this->assertEquals('hoff.jpg', $entry->fresh()->workingCopy()->attributes()['data']['hero'] ?? null);
+
+        $this->assetHoff->path('hoff-new.jpg')->save();
+
+        $this->assertEquals('hoff-new.jpg', $entry->fresh()->get('hero'));
+        $this->assertEquals('hoff-new.jpg', $entry->fresh()->workingCopy()->attributes()['data']['hero'] ?? null);
+    }
+
     protected function setSingleBlueprint($namespace, $blueprintContents)
     {
         $blueprint = tap(Facades\Blueprint::make('single-blueprint')->setContents($blueprintContents))->save();

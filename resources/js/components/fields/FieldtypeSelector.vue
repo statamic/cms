@@ -112,11 +112,18 @@ export default {
         fieldtypes() {
             if (!this.fieldtypesLoaded) return;
 
-            return loadedFieldtypes.value;
+            return loadedFieldtypes.value.data;
+        },
+
+        isFormBlueprint() {
+            return !!this.$config.get('isFormBlueprint');
         },
 
         fieldtypesLoaded() {
-            return Array.isArray(loadedFieldtypes.value);
+            // The cache is shared across every picker instance, but form and regular blueprints
+            // request different lists. Only treat it as loaded when the cached list matches the
+            // current blueprint mode, otherwise we'll refetch the correct one.
+            return Array.isArray(loadedFieldtypes.value?.data) && loadedFieldtypes.value.forms === this.isFormBlueprint;
         },
 
         allFieldtypes() {
@@ -225,11 +232,18 @@ export default {
     created() {
         if (this.fieldtypesLoaded) return;
 
+        const forms = this.isFormBlueprint;
+
         let url = cp_url('fields/fieldtypes?selectable=true');
 
-        if (this.$config.get('isFormBlueprint')) url += '&forms=true';
+        if (forms) url += '&forms=true';
 
-        this.$axios.get(url).then((response) => (loadedFieldtypes.value = response.data));
+        this.$axios.get(url)
+            .then((response) => (loadedFieldtypes.value = { forms, data: response.data }))
+            .catch((e) => {
+                this.$toast.error(e.response?.data?.message || __('Something went wrong'));
+                this.close();
+            });
     },
 
     methods: {

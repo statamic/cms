@@ -187,6 +187,7 @@ return [
     'publish_actions_publish' => 'Çalışma kopyasında yapılan değişiklikler girişe uygulanacak ve hemen yayınlanacaktır.',
     'publish_actions_schedule' => 'Çalışma kopyasında yapılan değişiklikler girişe uygulanacak ve seçilen tarihte yayınlanmış olarak görünecektir.',
     'publish_actions_unpublish' => 'Mevcut revizyon yayından kaldırılacaktır.',
+    'relationship_item_unavailable' => 'Bu öğe kullanılamıyor. Silinmiş olabilir veya görüntüleme izniniz olmayabilir.',
     'reset_password_notification_body' => 'Bu e-postayı, hesabınız için bir şifre sıfırlama isteği aldığımız için alıyorsunuz.',
     'reset_password_notification_no_action' => 'Parola sıfırlama talebinde bulunmadıysanız, başka bir işlem yapmanız gerekmez.',
     'reset_password_notification_subject' => 'Parola Sıfırlama Bildirimi',

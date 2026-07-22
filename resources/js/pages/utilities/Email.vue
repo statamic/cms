@@ -35,7 +35,7 @@ function send() {
                         {{ __('Send') }}
                     </Button>
                 </div>
-                <p v-if="errors.email" class="mt-4 text-red-700 text-sm">{{ errors.email }}</p>
+                <p v-if="errors.email" class="mt-4 text-red-600 text-sm">{{ errors.email }}</p>
             </form>
         </CardPanel>
 

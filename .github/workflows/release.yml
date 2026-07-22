@@ -1,21 +1,65 @@
 name: Create Release
 
-on:
-  push:
-    tags:
-      - 'v*'
+on: # zizmor: ignore[concurrency-limits]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version, without the v prefix (e.g. 6.2.0)'
+        required: true
+        type: string
+
+permissions: {}
 
 jobs:
-  build:
+  release:
+    name: Create Release
     runs-on: ubuntu-latest
+    environment: Releases
+    permissions: {} # all writes go through the App token; GITHUB_TOKEN needs no scopes
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - name: Resolve and validate version
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+          BRANCH: ${{ github.ref_name }}
+        run: |
+          version="${INPUT_VERSION#v}"
+
+          if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.]+)?$ ]]; then
+            echo "::error::Version must look like 6.2.0 (got: $INPUT_VERSION)"
+            exit 1
+          fi
+
+          if [ "${version%%.*}" != "${BRANCH%%.*}" ]; then
+            echo "::error::Version $version does not belong on the $BRANCH branch"
+            exit 1
+          fi
+
+          echo "TAG=v$version" >> "$GITHUB_ENV"
+
+      - name: Get release bot token
+        id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          client-id: ${{ secrets.RELEASE_APP_CLIENT_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+          permission-contents: write
+
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+          persist-credentials: true # zizmor: ignore[artipacked] App token is needed to push the tag
+
+      - name: Assert tag does not already exist
+        run: |
+          existing="$(git ls-remote --tags origin "$TAG")"
+          [ -z "$existing" ] || { echo "::error::Tag $TAG already exists on remote. Aborting."; exit 1; }
 
       - name: Use Node.js 20.19.0
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 20.19.0
+          package-manager-cache: false
 
       - name: Install dependencies
         run: npm ci
@@ -23,64 +67,52 @@ jobs:
       - name: Build release assets
         run: bash ./scripts/build-release.sh
 
+      - name: Create the build commit
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          APP_SLUG: ${{ steps.app-token.outputs.app-slug }}
+        run: |
+          USER_ID="$(gh api "/users/${APP_SLUG}[bot]" --jq .id)"
+          git config user.name "${APP_SLUG}[bot]"
+          git config user.email "${USER_ID}+${APP_SLUG}[bot]@users.noreply.github.com"
+          git add --force \
+            resources/dist \
+            resources/dist-dev \
+            resources/dist-frontend \
+            resources/dist-package
+          git commit -m "Build assets for $TAG"
+
+      - name: Tag and push the build commit
+        run: |
+          git tag "$TAG"
+          git push origin "$TAG"
+
       - name: Get Changelog
         id: changelog
-        uses: statamic/changelog-action@v1
+        uses: statamic/changelog-action@5d112d0d790cdeeb5adca3e584e37edc474ab51b # v1.0.2
         with:
-          version: ${{ github.ref }}
+          version: ${{ env.TAG }}
 
       - name: Create release
-        id: create_release
-        uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ steps.changelog.outputs.version }}
-          release_name: ${{ steps.changelog.outputs.version }}
-          body: ${{ steps.changelog.outputs.text }}
-          prerelease: false
-
-      - name: Upload dist zip to release
-        uses: actions/upload-release-asset@v1.0.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./resources/dist.tar.gz
-          asset_name: dist.tar.gz
-          asset_content_type: application/tar+gz
-
-      - name: Upload dist-dev zip to release
-        uses: actions/upload-release-asset@v1.0.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./resources/dist-dev.tar.gz
-          asset_name: dist-dev.tar.gz
-          asset_content_type: application/tar+gz
-
-      - name: Upload dist-frontend zip to release
-        uses: actions/upload-release-asset@v1.0.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./resources/dist-frontend.tar.gz
-          asset_name: dist-frontend.tar.gz
-          asset_content_type: application/tar+gz
-
-      - name: Upload dist-package zip to release
-        uses: actions/upload-release-asset@v1.0.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./resources/dist-package.tar.gz
-          asset_name: dist-package.tar.gz
-          asset_content_type: application/tar+gz
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          RELEASE_NOTES: ${{ steps.changelog.outputs.text }}
+          IS_DEFAULT_BRANCH: ${{ github.ref_name == github.event.repository.default_branch }}
+        run: |
+          latest="$IS_DEFAULT_BRANCH"
+          prerelease=false
+          case "$TAG" in
+            *-*) prerelease=true; latest=false ;;
+          esac
+          gh release create "$TAG" \
+            --title "$TAG" \
+            --notes "$RELEASE_NOTES" \
+            --latest="$latest" \
+            --prerelease="$prerelease"
 
       - name: Deploy Storybook to Forge
         continue-on-error: true
+        env:
+          FORGE_STORYBOOK_WEBHOOK: ${{ secrets.FORGE_STORYBOOK_WEBHOOK }}
         run: |
-          curl -X POST "${{ secrets.FORGE_STORYBOOK_WEBHOOK }}"
+          curl -X POST "$FORGE_STORYBOOK_WEBHOOK"

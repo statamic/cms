@@ -1,5 +1,5 @@
 /* =Jay. Tailwind already uses "Cascade Layers" internally. Here we are just adding an extra layer (to their internal layers) to manage states--particulary with complex fields like Bard--where specificity is much easier to handle with layers. */
-@layer addon-theme, addon-utilities, base, components, utilities, ui, ui-states;
+@layer base, addon-theme, addon-utilities, components, utilities, ui, ui-states;
 
 /* =Jay. Map layers to Tailwind's internal layers so that we can inject custom layers as needed */
 @layer base {
@@ -22,6 +22,7 @@
 @import './tailwind-animate.css';
 
 @source inline('bg-{slate,gray,zinc,neutral,stone,red,orange,amber,yellow,lime,green,emerald,teal,cyan,sky,blue,indigo,violet,purple,fuchsia,pink,rose}-{50,150,850,925,950,{100..900..100}}');
+@source inline('bg-checkerboard-{light,dark}');
 
 @custom-variant dark (&:where(.dark, .dark *));
 

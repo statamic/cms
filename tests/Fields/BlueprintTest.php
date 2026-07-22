@@ -417,6 +417,17 @@ class BlueprintTest extends TestCase
             ],
         ]);
 
+        $user = tap(Facades\User::make()->makeSuper())->save();
+        $this->actingAs($user);
+
+        $publishArray = $blueprint->toPublishArray();
+
+        $this->assertSame([
+            'fqh' => 'test',
+            'user_id' => $user->id(),
+        ], decrypt($publishArray['token']));
+        $publishArray['token'] = '__token__';
+
         $this->assertSame([
             'title' => 'Test',
             'handle' => 'test',
@@ -496,7 +507,8 @@ class BlueprintTest extends TestCase
             ],
             'empty' => false,
             'fqh' => 'test',
-        ], $blueprint->toPublishArray());
+            'token' => '__token__',
+        ], $publishArray);
     }
 
     #[Test]
@@ -544,6 +556,17 @@ class BlueprintTest extends TestCase
                 ],
             ],
         ]);
+
+        $user = tap(Facades\User::make()->makeSuper())->save();
+        $this->actingAs($user);
+
+        $publishArray = $blueprint->toPublishArray();
+
+        $this->assertSame([
+            'fqh' => 'test',
+            'user_id' => $user->id(),
+        ], decrypt($publishArray['token']));
+        $publishArray['token'] = '__token__';
 
         $this->assertSame([
             'title' => 'Test',
@@ -617,7 +640,8 @@ class BlueprintTest extends TestCase
             ],
             'empty' => false,
             'fqh' => 'test',
-        ], $blueprint->toPublishArray());
+            'token' => '__token__',
+        ], $publishArray);
     }
 
     #[Test]

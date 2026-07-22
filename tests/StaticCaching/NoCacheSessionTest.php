@@ -6,7 +6,9 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Mockery;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\StaticCache;
 use Statamic\StaticCaching\Cacher;
+use Statamic\StaticCaching\NoCache\RegionNotFound;
 use Statamic\StaticCaching\NoCache\Session;
 use Statamic\StaticCaching\NoCache\StringRegion;
 use Tests\FakesContent;
@@ -146,6 +148,39 @@ class NoCacheSessionTest extends TestCase
         $this->assertEquals('/test', $cascade['url']);
         $this->assertEquals('Test page', $cascade['title']);
         $this->assertEquals('http://localhost/cp', $cascade['cp_url']);
+    }
+
+    #[Test]
+    public function it_serializes_and_unserializes_regions_through_cache()
+    {
+        $session = new Session('http://localhost/test');
+
+        $region = $session->pushRegion('the contents', ['foo' => 'bar'], '.html');
+
+        $cached = StaticCache::cacheStore()->get('nocache::region.'.$region->key());
+        $this->assertIsString($cached, 'Region should be stored as a serialized string, not an object.');
+
+        $retrieved = $session->region($region->key());
+
+        $this->assertInstanceOf(StringRegion::class, $retrieved);
+        $this->assertEquals($region->key(), $retrieved->key());
+        $this->assertEquals(['foo' => 'bar'], $retrieved->context());
+    }
+
+    #[Test]
+    public function it_throws_region_not_found_when_cached_region_is_an_incomplete_class()
+    {
+        $session = new Session('http://localhost/test');
+
+        $region = $session->pushRegion('the contents', ['foo' => 'bar'], '.html');
+
+        // Simulate what happens when serializable_classes enforcement
+        // turns a cached Region object into __PHP_Incomplete_Class.
+        StaticCache::cacheStore()->forever('nocache::region.'.$region->key(), new \__PHP_Incomplete_Class);
+
+        $this->expectException(RegionNotFound::class);
+
+        $session->region($region->key());
     }
 
     #[Test]

@@ -115,8 +115,8 @@
                             </set-picker>
                         </floating-menu>
 
-                        <div class="bard-error" v-if="initError" v-html="initError"></div>
-                        <editor-content :editor="editor" :id="fieldId" />
+                        <div class="bard-error" v-if="initError" v-text="initError"></div>
+                        <editor-content :editor="editor" :id="fieldId" :dir="contentDirection" />
                     </div>
                     <div
                         class="bard-footer-toolbar"
@@ -177,9 +177,11 @@ import 'highlight.js/styles/github.css';
 import importTiptap from '@/util/tiptap.js';
 import { computed } from 'vue';
 import { data_get } from "@/bootstrap/globals.js";
+import { useContentDirection } from '@/composables/content-direction';
 
 const lowlight = createLowlight(common);
 let tiptap = null;
+let commandPaletteCallbackRegistered = false;
 
 export default {
     mixins: [Fieldtype, ManagesSetMeta],
@@ -195,6 +197,12 @@ export default {
 
     provide: {
         isInBardField: true,
+    },
+
+    setup() {
+        const { direction: contentDirection } = useContentDirection();
+
+        return { contentDirection };
     },
 
     data() {
@@ -395,6 +403,17 @@ export default {
 
         this.pageHeader = document.querySelector('.global-header');
 
+        if (!commandPaletteCallbackRegistered) {
+            commandPaletteCallbackRegistered = true;
+
+            Statamic.$commandPalette.preventIf(() => {
+                const selection = window.getSelection();
+                const node = selection?.anchorNode;
+                const isInBard = node?.parentElement?.closest('.bard-editor') !== null;
+                return isInBard && selection?.toString().length > 0;
+            });
+        }
+
         this.$nextTick(() => {
             let el = document.querySelector(`label[for="${this.fieldId}"]`);
             if (el) {
@@ -416,22 +435,27 @@ export default {
 
             if (JSON.stringify(json) === JSON.stringify(oldJson)) return;
 
-            // Temporarily disable debouncing.
-            this.debounceNextUpdate = false;
-
-            this.debounceNextUpdate
-                ? this.updateDebounced(json)
-                : this.update(json);
-
+            const shouldDebounce = this.debounceNextUpdate;
             this.debounceNextUpdate = true;
+
+            if (shouldDebounce) {
+                this.updateDebounced(json);
+            } else {
+                this.updateDebounced.cancel();
+                this.update(json);
+            }
         },
 
         value(value, oldValue) {
+            if (!this.editor) return;
+
+            if (this.editor.view.dom.contains(document.activeElement)) return;
+
             const oldContent = this.editor.getJSON();
             const content = this.valueToContent(value);
 
             if (JSON.stringify(content) !== JSON.stringify(oldContent)) {
-                this.editor.commands.clearContent();
+                this.editor.commands.clearContent(false);
                 this.editor.commands.setContent(content, true);
             }
         },
@@ -525,14 +549,22 @@ export default {
                 const field = this.bardFieldPath();
                 const setCacheKey = `${field}.${set}`;
                 const reference = this.publishContainer.reference;
-                const blueprint = this.publishContainer.blueprint.fqh;
+                const token = this.publishContainer.blueprint.token;
+
+	            if (this.meta.new?.hasOwnProperty(set)) {
+		            let meta = this.meta.new[set];
+		            let defaults = this.meta.defaults[set];
+
+		            resolve({ new: meta, defaults });
+		            return;
+	            }
 
                 if (this.setsCache[setCacheKey]) {
                     resolve(this.setsCache[setCacheKey]);
                     return;
                 }
 
-                this.$axios.post(cp_url('fieldtypes/replicator/set'), { blueprint, reference, field, set })
+                this.$axios.post(cp_url('fieldtypes/replicator/set'), { token, reference, field, set })
                     .then(response => {
                         this.setsCache[setCacheKey] = response.data;
                         resolve(response.data);
@@ -838,7 +870,8 @@ export default {
                     setTimeout(() => {
                         const isInsideBard = this.$refs.container.contains(document.activeElement);
                         const isSetPickerSearch = document.activeElement.hasAttribute('data-set-picker-search-input');
-                        if (!isInsideBard && !isSetPickerSearch) {
+                        const isSetPickerOpen = !!this.$refs.setPicker?.isOpen;
+                        if (!isInsideBard && !isSetPickerSearch && !isSetPickerOpen) {
                             this.$emit('blur');
                             this.showAddSetButton = false;
                         }

@@ -6,6 +6,8 @@ use Statamic\Facades\Icon as Icons;
 use Statamic\Fields\Fieldtype;
 use Statamic\Icons\IconSet;
 
+use function Statamic\trans as __;
+
 class Icon extends Fieldtype
 {
     protected $categories = ['media'];

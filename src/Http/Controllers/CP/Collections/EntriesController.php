@@ -18,10 +18,14 @@ use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Http\Resources\CP\Entries\Entries;
 use Statamic\Http\Resources\CP\Entries\Entry as EntryResource;
+use Statamic\Query\OrderBy;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
+use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\Hookable;
+
+use function Statamic\trans as __;
 
 class EntriesController extends CpController
 {
@@ -40,7 +44,7 @@ class EntriesController extends CpController
             'blueprints' => $collection->entryBlueprints()->map->handle(),
         ]);
 
-        $sortField = request('sort');
+        $sortField = OrderBy::column(request('sort'));
         $sortDirection = request('order', 'asc');
 
         if (! $sortField && ! request('search')) {
@@ -52,7 +56,7 @@ class EntriesController extends CpController
             $query->orderBy($sortField, $sortDirection);
         }
 
-        $entries = (new EntriesIndexQuery($query, $collection))->paginate(request('perPage'));
+        $entries = (new EntriesIndexQuery($query, $collection))->paginate(Statamic::cpPerPage(request('perPage')));
 
         if (request('search') && $collection->hasSearchIndex()) {
             $entries->setCollection($entries->getCollection()->map->getSearchable());
@@ -343,7 +347,7 @@ class EntriesController extends CpController
                 ];
             })->values()->all(),
             'revisionsEnabled' => $collection->revisionsEnabled(),
-            'canManagePublishState' => User::current()->can('publish '.$collection->handle().' entries'),
+            'canManagePublishState' => User::current()->can('publish', [EntryContract::class, $collection]),
             'previewTargets' => $collection->previewTargets()->all(),
             'autosaveInterval' => $collection->autosaveInterval(),
             'parent' => $collection->hasStructure() ? $request->parent : null,
@@ -485,12 +489,16 @@ class EntriesController extends CpController
 
         $parent = $parent ? $tree->find($parent) : null;
 
+        if ($parent && $parent->isRoot()) {
+            $parent = null;
+        }
+
         return app(\Statamic\Contracts\Routing\UrlBuilder::class)
             ->content($entry)
             ->merge([
                 'parent_uri' => $parent ? $parent->uri() : null,
                 'slug' => $entry->slug(),
-                // 'depth' => '', // todo
+                'depth' => $parent ? $parent->depth() + 1 : 1,
                 'is_root' => false,
             ])
             ->build($entry->route());

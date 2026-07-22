@@ -44,7 +44,7 @@ class Outpost
 
     public function response()
     {
-        return $this->response ?? $this->request();
+        return $this->response ??= $this->request();
     }
 
     private function request()
