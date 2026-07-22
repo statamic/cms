@@ -61,6 +61,7 @@ export default function registerGlobalComponents(app) {
     app.component('updater-widget', UpdaterWidget);
 
     // Form Connections
+    app.component('email-connection', defineAsyncComponent(() => import('../components/forms/connections/EmailConnection.vue')));
     app.component('webhook-connection', defineAsyncComponent(() => import('../components/forms/connections/WebhookConnection.vue')));
 
     // Reusable

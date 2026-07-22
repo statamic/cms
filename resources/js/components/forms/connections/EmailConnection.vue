@@ -1,0 +1,186 @@
+<script setup>
+import { onMounted, onUnmounted, ref, watch } from 'vue';
+import axios from 'axios';
+import { nanoid as uniqid } from 'nanoid';
+import { keys } from '@api';
+import { Badge, Button, Icon, PublishContainer, PublishFields, PublishFieldsProvider } from '@ui';
+import { deepClone } from '@/util/clone.js';
+import ConnectionList from './ConnectionList.vue';
+import ConnectionLogic from './ConnectionLogic.vue';
+import { usePage } from '@inertiajs/vue3';
+
+const suggestableFields = usePage().props.suggestableFields;
+
+const props = defineProps({
+    form: Object,
+    config: { type: Array, default: () => [] },
+    action: String,
+    blueprint: Object,
+    rows: { type: Array, default: () => [] },
+    defaults: Object,
+});
+
+const dirtyKey = 'email-connection';
+
+const errors = ref({});
+const saving = ref(false);
+const saveBinding = ref(null);
+
+const emails = ref(props.config.map((config, index) => ({
+    id: config.id ?? config._id,
+    enabled: config.enabled ?? true,
+    conditions: (config.conditions ?? []).map((condition) => ({ ...condition, _id: uniqid() })),
+    values: props.rows[index]?.values ?? deepClone(props.defaults.values),
+    meta: props.rows[index]?.meta ?? deepClone(props.defaults.meta),
+})));
+
+const operatorLabels = {
+    equals: __('equals'),
+    not: __('does not equal'),
+    contains: __('contains'),
+    contains_any: __('contains any of'),
+};
+
+const addEmail = () => emails.value.push({
+    id: uniqid(),
+    enabled: true,
+    conditions: [],
+    values: deepClone(props.defaults.values),
+    meta: deepClone(props.defaults.meta),
+});
+
+const duplicateEmail = (email) => {
+    const index = emails.value.indexOf(email);
+
+    emails.value.splice(index + 1, 0, {
+        id: uniqid(),
+        enabled: email.enabled,
+        conditions: email.conditions.map((condition) => ({ ...condition, _id: uniqid() })),
+        values: deepClone(email.values),
+        meta: deepClone(email.meta),
+    });
+};
+
+const removeEmail = (email) => (emails.value = emails.value.filter((item) => item !== email));
+
+const hasError = (index) => Object.keys(errors.value).some((key) => key.startsWith(`configs.${index}.`));
+
+const rowErrors = (index) => Object.fromEntries(
+    Object.entries(errors.value)
+        .filter(([key]) => key.startsWith(`configs.${index}.`))
+        .map(([key, messages]) => [key.replace(`configs.${index}.`, ''), messages]),
+);
+
+const save = () => {
+    if (saving.value) return;
+
+    errors.value = {};
+    saving.value = true;
+
+    const configs = emails.value.map(({ values, meta, ...config }) => ({ ...config, ...values }));
+
+    axios.patch(props.action, { configs })
+        .then(() => {
+            Statamic.$dirty.remove(dirtyKey);
+            Statamic.$toast.success(__('Saved'));
+        })
+        .catch((e) => {
+            if (e.response?.status === 422) {
+                errors.value = e.response.data.errors;
+                Statamic.$toast.error(e.response.data.message);
+            } else {
+                Statamic.$toast.error(__('Something went wrong'));
+            }
+        })
+        .finally(() => (saving.value = false));
+};
+
+function fieldDisplay(handle) {
+    const field = suggestableFields.find((field) => field.handle === handle);
+    return field?.config?.display ?? handle;
+}
+
+function conditionsSummary(email) {
+    const conditions = (email.conditions ?? []).filter((condition) => condition.field);
+
+    if (conditions.length === 0) return email.values.subject;
+
+    return conditions
+        .map((condition, index) => {
+            const prefix = index === 0 ? __('if') : __(condition.join === 'or' ? 'or' : 'and');
+            const operator = operatorLabels[condition.operator] ?? condition.operator;
+            return `${prefix} ${fieldDisplay(condition.field)} ${operator} ${condition.value ?? ''}`.trim();
+        })
+        .join(' ');
+}
+
+watch(emails, () => Statamic.$dirty.add(dirtyKey), { deep: true });
+
+onMounted(() => {
+    saveBinding.value = keys.bindGlobal(['return', 'mod+s'], (e) => {
+        e.preventDefault();
+        save();
+    });
+});
+
+onUnmounted(() => {
+    Statamic.$dirty.remove(dirtyKey);
+    saveBinding.value?.destroy();
+});
+</script>
+
+<template>
+    <Teleport to="#form-layout-actions">
+        <Button variant="primary" :aria-label="__('Save')" :disabled="saving" @click="save">
+            <Icon name="save" class="sm:hidden" />
+            <span class="hidden sm:inline">{{ __('Save') }}</span>
+        </Button>
+    </Teleport>
+
+    <ConnectionList
+        v-model="emails"
+        :add-label="__('Add Email')"
+        :empty-heading="__('No emails yet')"
+        :empty-description="__('statamic::messages.email_connection_description')"
+        :has-error="hasError"
+        @add="addEmail"
+        @duplicate="duplicateEmail"
+        @remove="removeEmail"
+    >
+        <template #title="{ item: email }">
+            <Badge size="lg" pill color="white" class="px-3 text-gray-950 gap-1">
+                <Icon name="mail-sign-at" class="size-3.5 me-1 opacity-100! text-blue-600 dark:text-blue-400" aria-hidden="true" />
+                {{ email.values.to ? __('Message sent to :email', { email: email.values.to }) : __('New Email') }}
+            </Badge>
+        </template>
+
+        <template #summary="{ item: email }">
+            <span class="truncate">{{ conditionsSummary(email) }}</span>
+        </template>
+
+        <template #default="{ item: email, index }">
+            <ConnectionLogic
+                v-model:conditions="email.conditions"
+                :suggestable-fields="suggestableFields"
+                :always-label="__('Always send')"
+                :if-label="__('Send if...')"
+            >
+                <template #then>
+                    <div class="rounded-lg border border-gray-300 bg-white p-4 dark:border-gray-700 dark:bg-gray-900">
+                        <PublishContainer
+                            :name="`email-connection-${email.id}`"
+                            :blueprint="blueprint"
+                            v-model="email.values"
+                            :meta="email.meta"
+                            :errors="rowErrors(index)"
+                        >
+                            <PublishFieldsProvider :fields="blueprint.tabs[0].sections[0].fields">
+                                <PublishFields />
+                            </PublishFieldsProvider>
+                        </PublishContainer>
+                    </div>
+                </template>
+            </ConnectionLogic>
+        </template>
+    </ConnectionList>
+</template>

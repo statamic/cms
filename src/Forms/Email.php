@@ -252,16 +252,18 @@ class Email extends Mailable
 
     protected function parseConfig(array $config)
     {
-        return collect($config)->map(function ($value) {
-            $value = Parse::env($value); // deprecated
+        return collect($config)
+            ->except('conditions')
+            ->map(function ($value) {
+                $value = Parse::env($value); // deprecated
 
-            $value = Parse::config($value);
+                $value = Parse::config($value);
 
-            return (string) Antlers::parse($value, array_merge(
-                ['config' => Cascade::config()],
-                $this->getGlobalsData(),
-                $this->submissionData,
-            ));
-        });
+                return (string) Antlers::parse($value, array_merge(
+                    ['config' => Cascade::config()],
+                    $this->getGlobalsData(),
+                    $this->submissionData,
+                ));
+            });
     }
 }

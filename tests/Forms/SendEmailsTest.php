@@ -188,4 +188,81 @@ class SendEmailsTest extends TestCase
             'empty array' => [[]],
         ];
     }
+
+    #[Test]
+    public function it_skips_disabled_email_configs()
+    {
+        Bus::fake();
+
+        $form = tap(FacadesForm::make('test')->connections(['email' => [
+            [
+                'from' => 'first@sender.com',
+                'to' => 'first@recipient.com',
+                'enabled' => false,
+            ], [
+                'from' => 'second@sender.com',
+                'to' => 'second@recipient.com',
+                'enabled' => true,
+            ], [
+                'from' => 'third@sender.com',
+                'to' => 'third@recipient.com',
+            ],
+        ]]))->save();
+
+        (new SendEmails(
+            $submission = $form->makeSubmission(),
+            $site = Site::default(),
+        ))->handle();
+
+        Bus::assertChained([
+            new SendEmail($submission, $site, [
+                'from' => 'second@sender.com',
+                'to' => 'second@recipient.com',
+                'enabled' => true,
+            ]),
+            new SendEmail($submission, $site, [
+                'from' => 'third@sender.com',
+                'to' => 'third@recipient.com',
+            ]),
+        ]);
+    }
+
+    #[Test]
+    #[DataProvider('emailConditionsProvider')]
+    public function it_filters_email_configs_using_conditions($conditions, $value, $shouldSend)
+    {
+        Bus::fake();
+
+        $config = [
+            'from' => 'first@sender.com',
+            'to' => 'first@recipient.com',
+            'conditions' => $conditions,
+        ];
+
+        $form = tap(FacadesForm::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'how_did_you_hear', 'field' => ['type' => 'text']],
+            ],
+        ])->connections(['email' => [$config]]))->save();
+
+        (new SendEmails(
+            $submission = $form->makeSubmission()->data(['how_did_you_hear' => $value]),
+            $site = Site::default(),
+        ))->handle();
+
+        $shouldSend
+            ? Bus::assertChained([new SendEmail($submission, $site, $config)])
+            : Bus::assertNothingDispatched();
+    }
+
+    public static function emailConditionsProvider()
+    {
+        $conditions = [['field' => 'how_did_you_hear', 'operator' => 'equals', 'value' => 'friend']];
+
+        return [
+            'no conditions' => [[], 'google', true],
+            'matching conditions' => [$conditions, 'friend', true],
+            'non-matching conditions' => [$conditions, 'google', false],
+        ];
+    }
 }

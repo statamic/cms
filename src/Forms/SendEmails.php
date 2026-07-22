@@ -46,12 +46,17 @@ class SendEmails
             });
     }
 
-    private function emailConfigs($submission)
+    private function emailConfigs($submission): Collection
     {
         return collect($submission->form()->connections()->get('email', []))
-            ->reject(fn ($config) => ($config['enabled'] ?? true) === false)
-            ->filter(fn ($config) => empty($config['conditions'])
-                || (new RuleEvaluator)->passes($config['conditions'], $submission->toArray()));
+            ->reject(fn (array $config) => ($config['enabled'] ?? true) === false)
+            ->filter(function (array $config) use ($submission) {
+                if (empty($config['conditions'])) {
+                    return true;
+                }
+
+                return (new RuleEvaluator)->passes($config['conditions'], $submission->toArray());
+            });
     }
 
     private function shouldDeleteTemporaryFiles(): bool
