@@ -177,7 +177,11 @@ class CoreConnections
 
     private static function exampleWebhookPayload(Form $form): array
     {
-        $latestSubmission = $form->querySubmissions()->orderBy('date', 'desc')->first();
+        $latestSubmission = null;
+
+        if (User::current()->can('viewSubmissions', $form)) {
+            $latestSubmission = $form->querySubmissions()->orderBy('date', 'desc')->first();
+        }
 
         return [
             'form' => $form->handle(),
