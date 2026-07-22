@@ -177,6 +177,25 @@ class EmailTest extends TestCase
     }
 
     #[Test]
+    public function it_excludes_informational_and_structural_fields_from_the_fields_data()
+    {
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'name', 'field' => ['type' => 'short_answer']],
+                ['handle' => 'intro', 'field' => ['type' => 'heading']],
+                ['handle' => 'gap', 'field' => ['type' => 'spacer']],
+                ['handle' => 'blurb', 'field' => ['type' => 'paragraph']],
+            ],
+        ]))->save();
+
+        $submission = $form->makeSubmission()->data(['name' => 'Foo Bar']);
+
+        $email = tap(new Email($submission, ['to' => 'test@test.com'], Site::default()))->build();
+
+        $this->assertEquals(['name'], collect($email->viewData['fields'])->pluck('handle')->all());
+    }
+
+    #[Test]
     public function it_escapes_submitted_values_in_the_automagic_email()
     {
         $form = tap(Form::make('test')->formFields([

@@ -169,8 +169,11 @@ class Email extends Mailable
     {
         $augmented = $this->submission->toAugmentedArray();
         $form = $this->submission->form();
+        $excludedFields = $form->formFields()->fields()
+            ->filter(fn ($field) => array_intersect($field->fieldtype()->categories(), ['information', 'structure']))
+            ->keys();
         $fields = $this->getRenderableFieldData(Arr::except($augmented, ['id', 'date', 'form']))
-            ->reject(fn ($field) => $field['fieldtype'] === 'spacer')
+            ->reject(fn ($field) => $excludedFields->contains($field['handle']))
             ->when(Arr::has($this->config, 'attachments'), function ($fields) {
                 return $fields->reject(fn ($field) => in_array($field['fieldtype'], ['assets', 'files', 'form_upload']));
             });
