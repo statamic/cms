@@ -9,6 +9,7 @@ import ArrayFieldtype from '../components/fieldtypes/ArrayFieldtype.vue';
 import AssetsFieldtype from '../components/fieldtypes/assets/AssetsFieldtype.vue';
 import AssetsIndexFieldtype from '../components/fieldtypes/assets/AssetsIndexFieldtype.vue';
 import AssetFolderFieldtype from '../components/fieldtypes/AssetFolderFieldtype.vue';
+import AutocompleteEditorFieldtype from '../components/fieldtypes/AutocompleteEditorFieldtype.vue';
 import BardButtonsSettingFieldtype from '../components/fieldtypes/bard/BardButtonsSettingFieldtype.vue';
 import BlueprintsFieldtype from '../components/fieldtypes/BlueprintsFieldtype.vue';
 import ButtonGroupFieldtype from '../components/fieldtypes/ButtonGroupFieldtype.vue';
@@ -71,6 +72,7 @@ export default function registerFieldtypes(app) {
     app.component('assets-fieldtype', AssetsFieldtype);
     app.component('assets-fieldtype-index', AssetsIndexFieldtype);
     app.component('asset_folder-fieldtype', AssetFolderFieldtype);
+    app.component('autocomplete_editor-fieldtype', AutocompleteEditorFieldtype);
     app.component(
         'bard-fieldtype',
         defineAsyncComponent(() => import('../components/fieldtypes/bard/BardFieldtype.vue')),
