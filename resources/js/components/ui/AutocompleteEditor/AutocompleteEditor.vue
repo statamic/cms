@@ -14,11 +14,11 @@
 <script setup>
 import { computed, ref, watch } from 'vue';
 import { EditorContent, useEditor } from '@tiptap/vue-3';
+import { Extension } from '@tiptap/core';
 import Bold from '@tiptap/extension-bold';
 import Italic from '@tiptap/extension-italic';
 import Heading from '@tiptap/extension-heading';
 import { BulletList, OrderedList, ListItem } from '@tiptap/extension-list';
-import Document from '@tiptap/extension-document';
 import HardBreak from '@tiptap/extension-hard-break';
 import Paragraph from '@tiptap/extension-paragraph';
 import Text from '@tiptap/extension-text';
@@ -26,6 +26,7 @@ import History from '@tiptap/extension-history';
 import { Placeholder, Dropcursor, Gapcursor } from '@tiptap/extensions';
 import { __, clone } from '@/bootstrap/globals';
 import { Autocomplete } from './extensions/Autocomplete';
+import { DocumentBlock, DocumentInline } from './extensions/Document';
 import AutocompleteEditorToolbar from './AutocompleteEditorToolbar.vue';
 
 const props = defineProps({
@@ -101,30 +102,66 @@ function resolveOptions({ query }) {
     return props.options.filter((option) => (option.label ?? option.value ?? '').toLowerCase().includes(needle));
 }
 
+function keyboardExtension() {
+    const disableEnter = !props.enableLineBreaks;
+
+    return Extension.create({
+        name: 'autocompleteEditorKeymap',
+        addKeyboardShortcuts() {
+            const shortcuts = {
+                'Ctrl-Enter': () => true,
+                'Cmd-Enter': () => true,
+            };
+
+            if (disableEnter) shortcuts.Enter = () => true;
+
+            return shortcuts;
+        },
+    });
+}
+
+function inlineHardBreak() {
+    return HardBreak.extend({
+        addKeyboardShortcuts() {
+            return {
+                ...this.parent?.(),
+                Enter: () => this.editor.commands.setHardBreak(),
+            };
+        },
+    });
+}
+
 function getExtensions() {
     const enabled = props.buttons;
 
     const extensions = [
-        Document,
+        props.inline ? DocumentInline : DocumentBlock,
         Paragraph,
         Text,
-        HardBreak,
         History,
         Dropcursor,
         Gapcursor,
         Autocomplete.configure({ suggestion: { char: props.trigger, items: resolveOptions } }),
+        keyboardExtension(),
     ];
+
+    if (props.enableLineBreaks) {
+        extensions.push(props.inline ? inlineHardBreak() : HardBreak);
+    }
 
     if (props.placeholder) extensions.push(Placeholder.configure({ placeholder: props.placeholder }));
 
     if (enabled.includes('bold')) extensions.push(Bold);
     if (enabled.includes('italic')) extensions.push(Italic);
-    if (enabled.includes('bulletlist')) extensions.push(BulletList);
-    if (enabled.includes('orderedlist')) extensions.push(OrderedList);
-    if (enabled.includes('bulletlist') || enabled.includes('orderedlist')) extensions.push(ListItem);
 
-    const levels = headingLevels.filter((level) => enabled.includes(`h${level}`));
-    if (levels.length) extensions.push(Heading.configure({ levels }));
+    if (!props.inline) {
+        if (enabled.includes('bulletlist')) extensions.push(BulletList);
+        if (enabled.includes('orderedlist')) extensions.push(OrderedList);
+        if (enabled.includes('bulletlist') || enabled.includes('orderedlist')) extensions.push(ListItem);
+
+        const levels = headingLevels.filter((level) => enabled.includes(`h${level}`));
+        if (levels.length) extensions.push(Heading.configure({ levels }));
+    }
 
     return extensions;
 }
