@@ -52,7 +52,7 @@
 =================================================== */
 @layer ui {
     .bard-editor.mode\:read-only .ProseMirror {
-        @apply bg-gray-300 text-gray-700 dark:bg-gray-600 dark:text-gray-100;
+        @apply bg-white text-gray-925 dark:bg-gray-900 dark:text-gray-300;
     }
 
     .bard-editor.mode\:minimal .ProseMirror {
