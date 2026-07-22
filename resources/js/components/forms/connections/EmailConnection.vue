@@ -88,7 +88,7 @@ const save = () => {
 watch(emails, () => Statamic.$dirty.add(dirtyKey), { deep: true });
 
 onMounted(() => {
-    saveBinding.value = keys.bindGlobal(['return', 'mod+s'], (e) => {
+    saveBinding.value = keys.bindGlobal(['mod+s'], (e) => {
         e.preventDefault();
         save();
     });
