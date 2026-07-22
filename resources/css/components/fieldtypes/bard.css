@@ -5,6 +5,9 @@
     .bard-fieldtype:not(.form-group, .grid-cell, [data-ui-input-group]) {
         @apply relative rounded-lg border outline-hidden dark:border-gray-700 with-contrast:border-gray-500;
     }
+    .bard-fieldtype:not(.form-group, .grid-cell, [data-ui-input-group]):has(.mode\:read-only) {
+        @apply border-dashed;
+    }
 }
 /* BARD / EDITOR
 =================================================== */
