@@ -1,10 +1,41 @@
+<script>
+import { usePage } from '@inertiajs/vue3';
+
+export function conditionsSummary(conditions) {
+    const suggestableFields = usePage().props.suggestableFields;
+
+    const operatorLabels = {
+        equals: __('equals'),
+        not: __('does not equal'),
+        contains: __('contains'),
+        contains_any: __('contains any of'),
+    };
+
+    const fieldDisplay = (handle) => {
+        const field = suggestableFields.find((field) => field.handle === handle);
+        return field?.config?.display ?? handle;
+    };
+
+    const filtered = (conditions ?? []).filter((condition) => condition.field);
+
+    if (filtered.length === 0) return null;
+
+    return filtered
+        .map((condition, index) => {
+            const prefix = index === 0 ? __('if') : __(condition.join === 'or' ? 'or' : 'and');
+            const operator = operatorLabels[condition.operator] ?? condition.operator;
+            return `${prefix} ${fieldDisplay(condition.field)} ${operator} ${condition.value ?? ''}`.trim();
+        })
+        .join(' ');
+}
+</script>
+
 <script setup>
 import { computed, ref } from 'vue';
 import { Button, Combobox, Icon } from '@ui';
 import { nanoid as uniqid } from 'nanoid';
 import Condition from '@/components/field-conditions/Condition.vue';
 import { categories, categoryColorClasses } from '@/components/forms/builder/categories';
-import { usePage } from '@inertiajs/vue3';
 
 const emit = defineEmits(['update:conditions']);
 

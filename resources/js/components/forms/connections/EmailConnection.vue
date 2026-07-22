@@ -6,10 +6,7 @@ import { keys } from '@api';
 import { Badge, Button, Icon, PublishContainer, PublishFields, PublishFieldsProvider, Subheading } from '@ui';
 import { deepClone } from '@/util/clone.js';
 import ConnectionList from './ConnectionList.vue';
-import ConnectionLogic from './ConnectionLogic.vue';
-import { usePage } from '@inertiajs/vue3';
-
-const suggestableFields = usePage().props.suggestableFields;
+import ConnectionLogic, { conditionsSummary } from './ConnectionLogic.vue';
 
 const props = defineProps({
     form: Object,
@@ -33,13 +30,6 @@ const emails = ref(props.config.map((config, index) => ({
     values: props.rows[index]?.values ?? deepClone(props.defaults.values),
     meta: props.rows[index]?.meta ?? deepClone(props.defaults.meta),
 })));
-
-const operatorLabels = {
-    equals: __('equals'),
-    not: __('does not equal'),
-    contains: __('contains'),
-    contains_any: __('contains any of'),
-};
 
 const addEmail = () => emails.value.push({
     id: uniqid(),
@@ -95,25 +85,6 @@ const save = () => {
         .finally(() => (saving.value = false));
 };
 
-function fieldDisplay(handle) {
-    const field = suggestableFields.find((field) => field.handle === handle);
-    return field?.config?.display ?? handle;
-}
-
-function conditionsSummary(email) {
-    const conditions = (email.conditions ?? []).filter((condition) => condition.field);
-
-    if (conditions.length === 0) return email.values.subject;
-
-    return conditions
-        .map((condition, index) => {
-            const prefix = index === 0 ? __('if') : __(condition.join === 'or' ? 'or' : 'and');
-            const operator = operatorLabels[condition.operator] ?? condition.operator;
-            return `${prefix} ${fieldDisplay(condition.field)} ${operator} ${condition.value ?? ''}`.trim();
-        })
-        .join(' ');
-}
-
 watch(emails, () => Statamic.$dirty.add(dirtyKey), { deep: true });
 
 onMounted(() => {
@@ -153,7 +124,7 @@ onUnmounted(() => {
                 {{ email.values.to ? __('Message sent to :email', { email: email.values.to }) : __('New Email') }}
             </Badge>
             <Subheading v-show="collapsed" class="overflow-hidden text-ellipsis whitespace-nowrap gap-1.5!">
-                <span class="truncate">{{ conditionsSummary(email) }}</span>
+                <span class="truncate">{{ conditionsSummary(email.conditions) ?? email.values.subject }}</span>
             </Subheading>
         </template>
 
