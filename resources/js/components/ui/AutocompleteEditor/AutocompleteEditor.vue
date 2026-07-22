@@ -10,7 +10,10 @@
             <AutocompleteEditorToolbar :editor="editor" :buttons="resolvedButtons" />
         </div>
         <div v-if="initError" class="autocomplete-editor-error p-2 text-sm text-red-500" v-text="initError" />
-        <div class="autocomplete-editor-content relative rounded-lg focus-within:focus-outline">
+        <div
+            class="autocomplete-editor-content relative focus-within:focus-outline"
+            :class="showToolbar ? 'rounded-t-none rounded-b-lg' : 'rounded-lg'"
+        >
             <EditorContent :editor="editor" />
         </div>
     </div>
