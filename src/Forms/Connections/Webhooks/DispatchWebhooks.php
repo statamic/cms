@@ -3,6 +3,7 @@
 namespace Statamic\Forms\Connections\Webhooks;
 
 use Statamic\Events\SubmissionFinalized;
+use Statamic\Forms\Logic\RuleEvaluator;
 
 class DispatchWebhooks
 {
@@ -11,7 +12,14 @@ class DispatchWebhooks
         $submission = $event->submission;
 
         collect($submission->form()->connections()->get('webhook', []))
-            ->reject(fn ($config) => ($config['enabled'] ?? true) === false)
-            ->each(fn ($config) => SendWebhook::dispatch($submission, $submission->site(), $config));
+            ->reject(fn (array $config) => ($config['enabled'] ?? true) === false)
+            ->filter(function (array $config) use ($submission) {
+                if (empty($config['conditions'])) {
+                    return true;
+                }
+
+                return (new RuleEvaluator)->passes($config['conditions'], $submission->toArray());
+            })
+            ->each(fn (array $config) => SendWebhook::dispatch($submission, $submission->site(), $config));
     }
 }

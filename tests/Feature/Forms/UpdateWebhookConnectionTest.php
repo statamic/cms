@@ -81,6 +81,45 @@ class UpdateWebhookConnectionTest extends TestCase
     }
 
     #[Test]
+    public function it_normalizes_the_conditions()
+    {
+        $form = tap(Form::make('test'))->save();
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->update($form, ['configs' => [
+                [
+                    'id' => 'abc',
+                    'url' => 'https://example.com/hook',
+                    'conditions' => [
+                        ['_id' => 'vue-row', 'field' => 'name', 'operator' => 'equals', 'value' => 'Bob', 'join' => 'and'],
+                        ['field' => null, 'operator' => 'equals', 'value' => 'incomplete', 'join' => 'and'],
+                    ],
+                ],
+                [
+                    'id' => 'def',
+                    'url' => 'https://example.com/other',
+                    'conditions' => [],
+                ],
+            ]])
+            ->assertOk();
+
+        $this->assertEquals([
+            [
+                'id' => 'abc',
+                'url' => 'https://example.com/hook',
+                'conditions' => [
+                    ['field' => 'name', 'operator' => 'equals', 'value' => 'Bob', 'join' => 'and'],
+                ],
+            ],
+            [
+                'id' => 'def',
+                'url' => 'https://example.com/other',
+            ],
+        ], Form::find('test')->connections()->get('webhook'));
+    }
+
+    #[Test]
     public function it_removes_null_values_from_configs()
     {
         $form = tap(Form::make('test'))->save();

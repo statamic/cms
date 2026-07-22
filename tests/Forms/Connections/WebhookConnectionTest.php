@@ -70,6 +70,40 @@ class WebhookConnectionTest extends TestCase
     }
 
     #[Test]
+    #[DataProvider('webhookConditionsProvider')]
+    public function it_filters_webhook_configs_using_conditions($conditions, $value, $shouldDispatch)
+    {
+        Bus::fake();
+
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'how_did_you_hear', 'field' => ['type' => 'text']],
+            ],
+        ])->connections(['webhook' => [
+            ['url' => 'https://example.com/hook', 'conditions' => $conditions],
+        ]]))->save();
+
+        $submission = $form->makeSubmission()->data(['how_did_you_hear' => $value]);
+
+        (new DispatchWebhooks)->handle(new SubmissionFinalized($submission));
+
+        $shouldDispatch
+            ? Bus::assertDispatched(SendWebhook::class, 1)
+            : Bus::assertNotDispatched(SendWebhook::class);
+    }
+
+    public static function webhookConditionsProvider()
+    {
+        $conditions = [['field' => 'how_did_you_hear', 'operator' => 'equals', 'value' => 'friend', 'join' => 'and']];
+
+        return [
+            'no conditions' => [[], 'google', true],
+            'matching conditions' => [$conditions, 'friend', true],
+            'non-matching conditions' => [$conditions, 'google', false],
+        ];
+    }
+
+    #[Test]
     #[DataProvider('validUrlProvider')]
     public function it_posts_the_form_and_submission_as_json($url)
     {
