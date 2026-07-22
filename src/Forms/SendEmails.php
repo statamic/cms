@@ -8,7 +8,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Bus;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Fields\Field;
-use Statamic\Forms\Logic\RuleEvaluator;
+use Statamic\Forms\Connections\ConnectionLogic;
 use Statamic\Sites\Site;
 
 class SendEmails
@@ -50,13 +50,7 @@ class SendEmails
     {
         return collect($submission->form()->connections()->get('email', []))
             ->reject(fn (array $config) => ($config['enabled'] ?? true) === false)
-            ->filter(function (array $config) use ($submission) {
-                if (empty($config['conditions'])) {
-                    return true;
-                }
-
-                return (new RuleEvaluator)->passes($config['conditions'], $submission->toArray());
-            });
+            ->filter(fn (array $config) => ConnectionLogic::passes($config, $submission));
     }
 
     private function shouldDeleteTemporaryFiles(): bool
