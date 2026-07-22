@@ -582,7 +582,7 @@ export default {
                         this.trackDirtyState = false;
                         this.values = resetValuesFromResponse(response.data.data.values, this.$refs.container);
                         this.extraValues = response.data.data.extraValues;
-                        this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 500);
+                        this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 3000);
                         this.$nextTick(() => this.$emit('saved', response));
                         return;
                     }
@@ -605,7 +605,7 @@ export default {
                     else {
                         clearTimeout(this.trackDirtyStateTimeout);
                         this.trackDirtyState = false;
-                        this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 500);
+                        this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 3000);
                         this.initialPublished = response.data.data.published;
                         this.activeLocalization.published = response.data.data.published;
                         this.activeLocalization.status = response.data.data.status;
@@ -694,7 +694,7 @@ export default {
                 this.initialPublished = data.values.published;
                 this.readOnly = data.readOnly;
 
-                this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 500); // after any fieldtypes do a debounced update
+                this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 3000); // after any fieldtypes do a debounced update
             });
         },
 
@@ -777,7 +777,7 @@ export default {
                 clearTimeout(this.trackDirtyStateTimeout);
                 this.trackDirtyState = false;
                 this.values = resetValuesFromResponse(response.data.data.values, this.$refs.container);
-                this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 500);
+                this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 3000);
                 this.activeLocalization.title = response.data.data.title;
                 this.activeLocalization.published = response.data.data.published;
                 this.activeLocalization.status = response.data.data.status;
@@ -813,7 +813,7 @@ export default {
                 clearTimeout(this.trackDirtyStateTimeout);
                 this.trackDirtyState = false;
                 this.values = resetValuesFromResponse(response.data.values, this.$refs.container);
-                this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 500);
+                this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 3000);
                 this.initialPublished = response.data.published;
                 this.activeLocalization.published = response.data.published;
                 this.activeLocalization.status = response.data.status;

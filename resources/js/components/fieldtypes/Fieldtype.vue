@@ -43,12 +43,39 @@ export default {
             // When using the Options API, this feels more natural. However since this is a
             // computed, it won't be avaialble within data(). In those cases you will
             // need to use this.injectedPublishContainer.someValue.value directly.
-            return Object.fromEntries(
-               Object.entries(this.injectedPublishContainer).map(([key, value]) => [
-                   key,
-                   isRef(value) ? value.value : value,
-               ])
-           );
+            //
+            // We build the cache once with lazy getters, so this computed has zero reactive
+            // deps and is never invalidated/recomputed itself — reading a specific key still
+            // goes through to the live ref, so dependency tracking happens correctly in
+            // whichever consumer's reactive scope reads it (e.g. a field's own condition
+            // computed), rather than recomputing this whole object for every field on the
+            // page whenever any one of the injected refs changes.
+            if (this._publishContainerCache) return this._publishContainerCache;
+
+            const cache = {};
+            const src = this.injectedPublishContainer;
+
+            for (const key in src) {
+                const val = src[key];
+
+                if (isRef(val)) {
+                    Object.defineProperty(cache, key, {
+                        enumerable: true,
+                        configurable: true,
+                        get: () => val.value,
+                    });
+                } else {
+                    Object.defineProperty(cache, key, {
+                        enumerable: true,
+                        configurable: true,
+                        writable: false,
+                        value: val,
+                    });
+                }
+            }
+
+            this._publishContainerCache = cache;
+            return cache;
         },
 
         name() {
