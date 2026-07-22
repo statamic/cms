@@ -3,7 +3,9 @@
 namespace Statamic\Forms\Connections;
 
 use Statamic\Contracts\Forms\Form;
+use Statamic\Contracts\Forms\Submission;
 use Statamic\Facades\User;
+use Statamic\Forms\Connections\Webhooks\SendWebhook;
 use Statamic\Forms\Fields\FormField;
 use Statamic\Http\Controllers\CP\Forms\Connections\WebhookConnectionController;
 use Statamic\Support\VueComponent;
@@ -25,6 +27,15 @@ class Webhooks extends Connection
     public function count(Form $form): ?int
     {
         return count($form->connections()->get('webhook', []));
+    }
+
+    public function finalized(Submission $submission)
+    {
+        return collect($submission->form()->connections()->get('webhook', []))
+            ->reject(fn (array $config) => ($config['enabled'] ?? true) === false)
+            ->filter(fn (array $config) => ConnectionLogic::passes($config, $submission))
+            ->map(fn (array $config) => new SendWebhook($submission, $submission->site(), $config))
+            ->all();
     }
 
     public function render(Form $form): VueComponent

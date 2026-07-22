@@ -16,7 +16,9 @@ use Statamic\Events\SubmissionSaved;
 use Statamic\Events\SubmissionSaving;
 use Statamic\Facades\Form;
 use Statamic\Facades\Site;
+use Statamic\Forms\Connections\Webhooks\SendWebhook;
 use Statamic\Forms\CreateAssetsFromFileUploads;
+use Statamic\Forms\DeleteTemporaryFiles;
 use Statamic\Forms\SendEmails;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -383,23 +385,33 @@ class SubmissionTest extends TestCase
         Event::assertDispatched(SubmissionCreated::class, 1);
         Event::assertDispatched(SubmissionFinalized::class, 1);
         Bus::assertDispatched(CreateAssetsFromFileUploads::class, 1);
-        Bus::assertDispatched(SendEmails::class, 1);
 
         $this->assertNotNull($form->submission($submission->id()));
     }
 
     #[Test]
-    public function finalizing_dispatches_asset_creation_synchronously_then_sends_emails()
+    public function finalizing_chains_various_jobs()
     {
         Bus::fake();
 
-        $form = tap(Form::make('contact_us'))->save();
-        $submission = $form->makeSubmission()->asPartial();
+        $form = tap(Form::make('contact_us')->connections([
+            'email' => [['to' => 'test@example.com']],
+            'webhook' => [['url' => 'https://example.com/webhook'], ['url' => 'https://example.com/webhook2']],
+        ])->formFields([
+            'fields' => [
+                ['handle' => 'document', 'field' => ['type' => 'form_upload', 'store' => false]],
+            ],
+        ]))->save();
 
-        $submission->finalize();
+        $form->makeSubmission()->asPartial()->finalize();
 
-        Bus::assertDispatchedSync(CreateAssetsFromFileUploads::class);
-        Bus::assertDispatched(SendEmails::class);
+        Bus::assertChained([
+            CreateAssetsFromFileUploads::class,
+            SendEmails::class,
+            SendWebhook::class,
+            SendWebhook::class,
+            DeleteTemporaryFiles::class,
+        ]);
     }
 
     #[Test]
@@ -420,7 +432,6 @@ class SubmissionTest extends TestCase
         Event::assertDispatched(SubmissionCreated::class, 1);
         Event::assertDispatched(SubmissionFinalized::class, 1);
         Bus::assertDispatched(CreateAssetsFromFileUploads::class, 1);
-        Bus::assertDispatched(SendEmails::class, 1);
     }
 
     #[Test]
@@ -437,7 +448,6 @@ class SubmissionTest extends TestCase
         Event::assertDispatched(SubmissionCreated::class, 1);
         Event::assertDispatched(SubmissionFinalized::class, 1);
         Bus::assertDispatched(CreateAssetsFromFileUploads::class, 1);
-        Bus::assertDispatched(SendEmails::class, 1);
         $this->assertNull($form->submission($submission->id()));
     }
 
@@ -459,7 +469,6 @@ class SubmissionTest extends TestCase
         Event::assertDispatched(SubmissionCreated::class, 1);
         Event::assertDispatched(SubmissionFinalized::class, 1);
         Bus::assertDispatched(CreateAssetsFromFileUploads::class, 1);
-        Bus::assertDispatched(SendEmails::class, 1);
         Event::assertNotDispatched(SubmissionDeleted::class);
     }
 
@@ -478,7 +487,6 @@ class SubmissionTest extends TestCase
         // The second call is a no-op because the submission is no longer partial.
         Event::assertDispatched(SubmissionFinalized::class, 1);
         Bus::assertDispatched(CreateAssetsFromFileUploads::class, 1);
-        Bus::assertDispatched(SendEmails::class, 1);
     }
 
     #[Test]

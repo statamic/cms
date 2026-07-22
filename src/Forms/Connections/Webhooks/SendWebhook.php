@@ -22,6 +22,8 @@ class SendWebhook implements ShouldQueue
 
     public function handle()
     {
+        $submission = $this->submission->form()->submission($this->submission->id()) ?? $this->submission;
+
         $url = $this->config['url'] ?? null;
         $scheme = strtolower((string) parse_url((string) $url, PHP_URL_SCHEME));
 
@@ -35,8 +37,8 @@ class SendWebhook implements ShouldQueue
             ->withOptions(['allow_redirects' => ['max' => 5, 'protocols' => ['http', 'https']]])
             ->when(($this->config['verify_ssl'] ?? true) === false, fn ($http) => $http->withoutVerifying())
             ->post($url, [
-                'form' => $this->submission->form()->handle(),
-                'submission' => $this->submission->toArray(),
+                'form' => $submission->form()->handle(),
+                'submission' => $submission->toArray(),
             ])
             ->throw();
     }

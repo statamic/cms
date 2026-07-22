@@ -3,7 +3,9 @@
 namespace Statamic\Forms\Connections;
 
 use Statamic\Contracts\Forms\Form;
+use Statamic\Contracts\Forms\Submission;
 use Statamic\Facades\Blueprint;
+use Statamic\Forms\SendEmails;
 use Statamic\Http\Controllers\CP\Forms\Connections\EmailConnectionController;
 use Statamic\Statamic;
 use Statamic\Support\VueComponent;
@@ -29,6 +31,11 @@ class Emails extends Connection
     public function count(Form $form): ?int
     {
         return count($form->connections()->get('email', []));
+    }
+
+    public function finalized(Submission $submission)
+    {
+        return new SendEmails($submission, $submission->site());
     }
 
     public function render(Form $form): VueComponent

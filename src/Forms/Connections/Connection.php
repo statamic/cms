@@ -3,6 +3,7 @@
 namespace Statamic\Forms\Connections;
 
 use Statamic\Contracts\Forms\Form;
+use Statamic\Contracts\Forms\Submission;
 use Statamic\Extend\HasHandle;
 use Statamic\Extend\RegistersItself;
 use Statamic\Statamic;
@@ -56,6 +57,11 @@ abstract class Connection
     public function count(Form $form): ?int
     {
         return null;
+    }
+
+    public function finalized(Submission $submission)
+    {
+        return [];
     }
 
     abstract public function render(Form $form): VueComponent;
