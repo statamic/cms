@@ -1,5 +1,6 @@
 import Mention from '@tiptap/extension-mention';
-import { VueRenderer } from '@tiptap/vue-3';
+import { VueNodeViewRenderer, VueRenderer } from '@tiptap/vue-3';
+import MentionBadge from '../MentionBadge.vue';
 import SuggestionList from '../SuggestionList.vue';
 
 function renderSuggestion() {
@@ -40,6 +41,10 @@ function renderSuggestion() {
 
 export const Autocomplete = Mention.extend({
     name: 'mention',
+
+    addNodeView() {
+        return VueNodeViewRenderer(MentionBadge);
+    },
 
     addOptions() {
         return {
