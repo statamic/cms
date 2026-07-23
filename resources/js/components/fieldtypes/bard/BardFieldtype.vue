@@ -175,9 +175,8 @@ import readTimeEstimate from 'read-time-estimate';
 import { common, createLowlight } from 'lowlight';
 import 'highlight.js/styles/github.css';
 import importTiptap from '@/util/tiptap.js';
-import { computed, markRaw } from 'vue';
+import { computed } from 'vue';
 import { data_get } from "@/bootstrap/globals.js";
-import { createMountScheduler } from '@/util/createMountScheduler.js';
 import { useContentDirection } from '@/composables/content-direction';
 
 const lowlight = createLowlight(common);
@@ -225,7 +224,6 @@ export default {
                 bard: this.makeBardProvide(),
                 bardSets: this.config.sets,
                 showReplicatorFieldPreviews: this.config.previews,
-                mountScheduler: createMountScheduler(),
             },
             errorsById: {},
             debounceNextUpdate: true,
@@ -398,9 +396,8 @@ export default {
         this.initToolbarButtons();
         this.initEditor();
 
-        this.json = markRaw(this.editor.getJSON().content);
+        this.json = this.editor.getJSON().content;
         this.html = this.editor.getHTML();
-        this._lastDocSize = this.editor.state.doc.content.size;
 
 		this.$nextTick(() => this.mounted = true);
 
@@ -880,31 +877,24 @@ export default {
                         }
                     }, 1);
                 },
-                onUpdate: ({ transaction }) => {
-                    // Selection-only transactions (cursor moves, etc.) don't change the
-                    // document at all — skip all of the work below entirely for those.
-                    if (!transaction.docChanged) return;
+                onUpdate: () => {
+                    const oldJson = this.json;
+                    const newJson = clone(this.editor.getJSON().content);
 
-                    const newDocSize = this.editor.state.doc.content.size;
-                    const oldDocSize = this._lastDocSize ?? newDocSize;
+                    const countNodes = (nodes) => {
+                        if (!nodes || !Array.isArray(nodes)) return 0;
+                        let count = nodes.length;
+                        nodes.forEach(node => {
+                            if (node.content) {
+                                count += countNodes(node.content);
+                            }
+                        });
+                        return count;
+                    };
 
-                    // doc.content.size changes on every keystroke, not just structural
-                    // edits (block add/remove). That's intentional here — debounceNextUpdate
-                    // previously used a recursive node-count comparison to approximate this,
-                    // but that required a full clone() + tree walk on every transaction just
-                    // to produce a coarser signal. If a debounce-suppression distinction
-                    // between "typed a character" and "added/removed a node" turns out to be
-                    // load-bearing elsewhere, this may need revisiting.
-                    if (oldDocSize !== newDocSize) this.debounceNextUpdate = false;
-                    this._lastDocSize = newDocSize;
+                    if (countNodes(oldJson) !== countNodes(newJson)) this.debounceNextUpdate = false;
 
-                    // markRaw prevents Vue from deep-reactive-proxying the full document
-                    // tree. Every node in a large Bard document would otherwise get its own
-                    // Proxy plus a dependency-tracking map, regenerated on every update — this
-                    // is the dominant cost (both CPU and memory) on large documents. json/html
-                    // are only used here for display/emit purposes and don't rely on deep
-                    // reactivity elsewhere in this component.
-                    this.json = markRaw(this.editor.getJSON().content);
+                    this.json = newJson;
                     this.html = this.editor.getHTML();
                 },
                 onCreate: ({ editor }) => {
