@@ -57,7 +57,7 @@ class Email extends Connection
 
     private static function splitLegacyAddressStrings(array $config): array
     {
-        foreach (['to', 'cc', 'bcc', 'from', 'reply_to'] as $handle) {
+        foreach (['to', 'cc', 'bcc', 'reply_to'] as $handle) {
             if (isset($config[$handle]) && is_string($config[$handle])) {
                 $config[$handle] = array_map(trim(...), explode(',', $config[$handle]));
             }
@@ -141,6 +141,7 @@ class Email extends Connection
                                         'instructions' => __('statamic::messages.form_configure_email_reply_to_instructions'),
                                         'options' => $addressOptions,
                                         'taggable' => true,
+                                        'multiple' => true,
                                         'width' => 50,
                                     ],
                                 ],
