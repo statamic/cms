@@ -1,6 +1,6 @@
 <script setup>
 import { computed, ref, useId } from 'vue';
-import { __ } from '@/bootstrap/globals';
+import { __ } from '@/bootstrap/globals.js';
 
 const props = defineProps({
     /** Whether the rating is disabled. */

@@ -1,8 +1,8 @@
 <script setup>
 import { computed, ref, watch } from 'vue';
 import { SortableList } from '@/components/sortable/Sortable.js';
-import { __ } from '@/bootstrap/globals';
-import DragHandle from '../DragHandle.vue';
+import { __ } from '@/bootstrap/globals.js';
+import DragHandle from './DragHandle.vue';
 
 const props = defineProps({
     /** Whether the list can be reordered. */

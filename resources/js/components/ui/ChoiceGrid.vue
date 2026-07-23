@@ -1,7 +1,7 @@
 <script setup>
 import { computed, useId } from 'vue';
 import { cva } from 'cva';
-import Icon from '../Icon/Icon.vue';
+import Icon from './Icon/Icon.vue';
 
 const props = defineProps({
     /** The shape of each option's image area, e.g. `16/9`. */
