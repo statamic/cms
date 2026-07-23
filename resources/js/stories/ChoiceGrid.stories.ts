@@ -24,11 +24,16 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+// Inline, so the stories don't depend on the network when they run in CI.
+const image = (hue: number) => `data:image/svg+xml,${encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480"><rect width="640" height="480" fill="hsl(${hue} 60% 70%)"/></svg>`
+)}`;
+
 const seasons = [
-    { value: 'spring', label: 'Spring', image: 'https://picsum.photos/seed/choice-grid-spring/640/480' },
-    { value: 'summer', label: 'Summer', image: 'https://picsum.photos/seed/choice-grid-summer/640/480' },
-    { value: 'autumn', label: 'Autumn', image: 'https://picsum.photos/seed/choice-grid-autumn/640/480' },
-    { value: 'winter', label: 'Winter', image: 'https://picsum.photos/seed/choice-grid-winter/640/480' },
+    { value: 'spring', label: 'Spring', image: image(110) },
+    { value: 'summer', label: 'Summer', image: image(45) },
+    { value: 'autumn', label: 'Autumn', image: image(20) },
+    { value: 'winter', label: 'Winter', image: image(210) },
 ];
 
 const defaultCode = `
