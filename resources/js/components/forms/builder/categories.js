@@ -1,16 +1,16 @@
 export const categories = {
-    structure: { title: __('Structure'), color: 'purple' },
-    information: { title: __('Information'), color: 'pink' },
-    text: { title: __('Text'), color: 'purple' },
-    choice: { title: __('Choice'), color: 'orange' },
-    rate: { title: __('Rate'), color: 'amber' },
-    contact: { title: __('Contact Info'), color: 'blue' },
-    number: { title: __('Number'), color: 'teal' },
-    datetime: { title: __('Date and Time'), color: 'fuchsia' },
-    media: { title: __('Media'), color: 'cyan' },
-    payment: { title: __('Payment'), color: 'green' },
-    fieldsets: { title: __('Fieldsets'), color: 'gray' },
-    other: { title: __('Other'), color: 'gray' },
+    structure: { get title() { return __('Structure'); }, color: 'purple' },
+    information: { get title() { return __('Information'); }, color: 'pink' },
+    text: { get title() { return __('Text'); }, color: 'purple' },
+    choice: { get title() { return __('Choice'); }, color: 'orange' },
+    rate: { get title() { return __('Rate'); }, color: 'amber' },
+    contact: { get title() { return __('Contact Info'); }, color: 'blue' },
+    number: { get title() { return __('Number'); }, color: 'teal' },
+    datetime: { get title() { return __('Date and Time'); }, color: 'fuchsia' },
+    media: { get title() { return __('Media'); }, color: 'cyan' },
+    payment: { get title() { return __('Payment'); }, color: 'green' },
+    fieldsets: { get title() { return __('Fieldsets'); }, color: 'gray' },
+    other: { get title() { return __('Other'); }, color: 'gray' },
 };
 
 export const categoryColorClasses = {
