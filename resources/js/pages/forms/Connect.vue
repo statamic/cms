@@ -246,7 +246,7 @@ watch(selectedIntegrationName, (integrationName) => {
             <template #actions>
                 <div class="flex items-center gap-2 sm:gap-3">
                     <Button variant="primary" href="#" icon-append="external-link">
-                        {{ __('Browse the Marketplace') }}
+                        {{ __('Explore Integrations') }}
                     </Button>
                     <ToggleGroup :model-value="mode" @update:model-value="modeChanged">
                         <ToggleItem value="grid" icon="layout-grid" />
