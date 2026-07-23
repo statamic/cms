@@ -13,6 +13,7 @@ use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Controllers\CP\Forms\Concerns\ProvidesFormAbilities;
 use Statamic\Rules\Handle;
 use Statamic\Statamic;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 use function Statamic\trans as __;
@@ -389,13 +390,23 @@ class FormsController extends CpController
             $merged = false;
             foreach ($fields as $sectionHandle => $section) {
                 if ($section['display'] == __($config['display'])) {
-                    $fields[$sectionHandle]['fields'] += $config['fields'];
+                    $fields[$sectionHandle]['fields'] = $this->insertRelative(
+                        $section['fields'],
+                        $config['fields'],
+                        $config['before'] ?? null,
+                        $config['after'] ?? null,
+                    );
                     $merged = true;
                 }
             }
 
             if (! $merged) {
-                $fields[$handle] = $config;
+                $fields = $this->insertRelative(
+                    $fields,
+                    [$handle => Arr::except($config, ['before', 'after'])],
+                    $config['before'] ?? null,
+                    $config['after'] ?? null,
+                );
             }
         }
 
@@ -417,5 +428,35 @@ class FormsController extends CpController
             ],
         ])->all());
 
+    }
+
+    protected function insertRelative(array $existing, array $new, ?string $before = null, ?string $after = null): array
+    {
+        if (! $before && ! $after) {
+            return $existing + $new;
+        }
+
+        $result = [];
+        $inserted = false;
+
+        foreach ($existing as $handle => $item) {
+            if ($before === $handle) {
+                foreach ($new as $newHandle => $newItem) {
+                    $result[$newHandle] = $newItem;
+                }
+                $inserted = true;
+            }
+
+            $result[$handle] = $item;
+
+            if ($after === $handle) {
+                foreach ($new as $newHandle => $newItem) {
+                    $result[$newHandle] = $newItem;
+                }
+                $inserted = true;
+            }
+        }
+
+        return $inserted ? $result : $existing + $new;
     }
 }
