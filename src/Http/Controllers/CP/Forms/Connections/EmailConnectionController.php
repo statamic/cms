@@ -18,29 +18,28 @@ class EmailConnectionController extends CpController
             'configs.*.to' => ['required'],
         ]);
 
-        $configs = collect($request->configs)
-            ->map(fn ($config) => $this->normalize($config))
+        $emailConfigs = collect($request->configs)
+            ->map(function (array $config) use ($form): array {
+                $config = Arr::removeNullValues($config);
+
+                $values = Emails::blueprint($form)->fields()
+                    ->addValues(Arr::except($config, ['_id', 'id', 'enabled', 'conditions']))
+                    ->process()
+                    ->values()
+                    ->all();
+
+                return Arr::removeNullValues([
+                    'id' => Arr::get($config, 'id'),
+                    ...$values,
+                    'enabled' => Arr::get($config, 'enabled') === false ? false : null,
+                    'markdown' => Arr::get($values, 'markdown') === true ? true : null,
+                    'attachments' => Arr::get($values, 'attachments') === true ? true : null,
+                    'conditions' => ConnectionLogic::normalize(Arr::get($config, 'conditions') ?? []),
+                ]);
+            })
             ->values()
             ->all();
 
-        $form->connections($form->connections()->put('email', $configs))->save();
-    }
-
-    private function normalize(array $config): array
-    {
-        $config = array_map(fn ($value) => $value === '' ? null : $value, $config);
-
-        $values = Emails::blueprint()->fields()
-            ->addValues(Arr::except($config, ['_id', 'id', 'enabled', 'conditions']))
-            ->process()
-            ->values()
-            ->all();
-
-        return Arr::removeNullValues(array_merge(['id' => Arr::get($config, 'id')], $values, [
-            'enabled' => Arr::get($config, 'enabled') === false ? false : null,
-            'markdown' => Arr::get($values, 'markdown') === true ? true : null,
-            'attachments' => Arr::get($values, 'attachments') === true ? true : null,
-            'conditions' => ConnectionLogic::normalize(Arr::get($config, 'conditions', [])),
-        ]));
+        $form->connections($form->connections()->put('email', $emailConfigs))->save();
     }
 }

@@ -19,10 +19,10 @@ class WebhookConnectionController extends CpController
         ]);
 
         $configs = collect($request->configs)
-            ->map(fn ($config) => Arr::removeNullValues(array_merge(Arr::except($config, '_id'), [
+            ->map(fn (array $config) => Arr::removeNullValues(array_merge(Arr::except($config, '_id'), [
                 'enabled' => Arr::get($config, 'enabled') === false ? false : null,
                 'verify_ssl' => Arr::get($config, 'verify_ssl') === false ? false : null,
-                'conditions' => ConnectionLogic::normalize(Arr::get($config, 'conditions', [])),
+                'conditions' => ConnectionLogic::normalize(Arr::get($config, 'conditions') ?? []),
             ])))
             ->values()
             ->all();

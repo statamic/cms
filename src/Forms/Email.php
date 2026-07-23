@@ -236,37 +236,55 @@ class Email extends Mailable
             return;
         }
 
-        return collect(explode(',', $addresses))->map(function ($address) {
-            $name = null;
-            $email = trim($address);
+        return collect(Arr::wrap($addresses))
+            ->flatMap(fn (string $address) => Str::startsWith($address, 'field:')
+                ? Arr::wrap($this->submission->get(Str::after($address, 'field:')))
+                : [$address])
+            ->flatMap(fn (string $address) => explode(',', (string) $address))
+            ->map(fn (string $address) => trim($this->sanitize($address)))
+            ->filter()
+            ->map(function (string $email): array {
+                $name = null;
 
-            if (Str::contains($email, '<')) {
-                preg_match('/^(.*) \<(.*)\>$/', $email, $matches);
-                $name = $matches[1];
-                $email = $matches[2];
-            }
+                if (Str::contains($email, '<') && preg_match('/^(.*) \<(.*)\>$/', $email, $matches)) {
+                    $name = $matches[1];
+                    $email = $matches[2];
+                }
 
-            return [
-                'email' => $email,
-                'name' => $name,
-            ];
-        })->all();
+                return [
+                    'email' => $email,
+                    'name' => $name,
+                ];
+            })
+            ->filter(fn (array $address) => filter_var($address['email'], FILTER_VALIDATE_EMAIL))
+            ->values()
+            ->all();
     }
 
-    protected function parseConfig(array $config)
+    private function sanitize($value)
+    {
+        return preg_replace('/[\x00-\x1F\x7F]/u', '', (string) $value);
+    }
+
+    private function parseConfig(array $config)
     {
         return collect($config)
             ->except('conditions')
-            ->map(function ($value) {
-                $value = Parse::env($value); // deprecated
+            ->map(fn ($value) => is_array($value)
+                ? array_map(fn ($item) => Str::startsWith($item, 'field:') ? $item : $this->parseConfigValue($item), $value)
+                : $this->parseConfigValue($value));
+    }
 
-                $value = Parse::config($value);
+    private function parseConfigValue($value)
+    {
+        $value = Parse::env($value); // deprecated
 
-                return (string) Antlers::parse($value, array_merge(
-                    ['config' => Cascade::config()],
-                    $this->getGlobalsData(),
-                    $this->submissionData,
-                ));
-            });
+        $value = Parse::config($value);
+
+        return (string) Antlers::parse($value, array_merge(
+            ['config' => Cascade::config()],
+            $this->getGlobalsData(),
+            $this->submissionData,
+        ));
     }
 }

@@ -40,15 +40,15 @@ class Emails extends Connection
 
     public function render(Form $form): VueComponent
     {
-        $fields = static::blueprint()->fields();
+        $fields = static::blueprint($form)->fields();
         $blank = $fields->preProcess();
 
         return VueComponent::render('email-connection', [
             'action' => cp_route('forms.connect.email.update', $form->handle()),
-            'blueprint' => static::blueprint()->toPublishArray(),
+            'blueprint' => static::blueprint($form)->toPublishArray(),
             'rows' => collect($form->connections()->get('email', []))
                 ->map(function (array $config) use ($fields) {
-                    $row = $fields->addValues($config)->preProcess();
+                    $row = $fields->addValues(static::splitLegacyAddressStrings($config))->preProcess();
 
                     return ['values' => $row->values()->all(), 'meta' => $row->meta()->all()];
                 })
@@ -57,13 +57,29 @@ class Emails extends Connection
         ]);
     }
 
+    private static function splitLegacyAddressStrings(array $config): array
+    {
+        foreach (['to', 'cc', 'bcc', 'from', 'reply_to'] as $handle) {
+            if (isset($config[$handle]) && is_string($config[$handle])) {
+                $config[$handle] = array_map(trim(...), explode(',', $config[$handle]));
+            }
+        }
+
+        return $config;
+    }
+
     public function routes($router): void
     {
         $router->patch('/', [EmailConnectionController::class, 'update'])->name('update');
     }
 
-    public static function blueprint()
+    public static function blueprint(Form $form): \Statamic\Fields\Blueprint
     {
+        $addressOptions = $form->formFields()->fields()
+            ->reject(fn ($field) => array_intersect($field->fieldtype()->categories(), ['information', 'structure']))
+            ->mapWithKeys(fn ($field) => ['field:'.$field->handle() => $field->display()])
+            ->all();
+
         return Blueprint::make()->setContents([
             'tabs' => [
                 'main' => [
@@ -73,45 +89,59 @@ class Emails extends Connection
                                 [
                                     'handle' => 'to',
                                     'field' => [
-                                        'type' => 'text',
+                                        'type' => 'select',
                                         'display' => __('Recipient(s)'),
                                         'validate' => ['required'],
                                         'instructions' => __('statamic::messages.form_configure_email_to_instructions'),
+                                        'options' => $addressOptions,
+                                        'multiple' => true,
+                                        'taggable' => true,
                                     ],
                                 ],
                                 [
                                     'handle' => 'cc',
                                     'field' => [
-                                        'type' => 'text',
+                                        'type' => 'select',
                                         'display' => __('CC Recipient(s)'),
                                         'instructions' => __('statamic::messages.form_configure_email_cc_instructions'),
+                                        'options' => $addressOptions,
+                                        'multiple' => true,
+                                        'taggable' => true,
                                         'width' => 50,
                                     ],
                                 ],
                                 [
                                     'handle' => 'bcc',
                                     'field' => [
-                                        'type' => 'text',
+                                        'type' => 'select',
                                         'display' => __('BCC Recipient(s)'),
                                         'instructions' => __('statamic::messages.form_configure_email_bcc_instructions'),
+                                        'options' => $addressOptions,
+                                        'multiple' => true,
+                                        'taggable' => true,
                                         'width' => 50,
                                     ],
                                 ],
                                 [
                                     'handle' => 'from',
                                     'field' => [
-                                        'type' => 'text',
+                                        'type' => 'select',
                                         'display' => __('Sender'),
-                                        'instructions' => __('statamic::messages.form_configure_email_from_instructions').' ('.config('mail.from.address').').',
+                                        'instructions' => __('statamic::messages.form_configure_email_from_instructions'),
+                                        'options' => $addressOptions,
+                                        'placeholder' => config('mail.from.address'),
+                                        'taggable' => true,
                                         'width' => 50,
                                     ],
                                 ],
                                 [
                                     'handle' => 'reply_to',
                                     'field' => [
-                                        'type' => 'text',
+                                        'type' => 'select',
                                         'display' => __('Reply To'),
                                         'instructions' => __('statamic::messages.form_configure_email_reply_to_instructions'),
+                                        'options' => $addressOptions,
+                                        'taggable' => true,
                                         'width' => 50,
                                     ],
                                 ],
@@ -169,6 +199,7 @@ class Emails extends Connection
                                         'instructions' => __('statamic::messages.form_configure_mailer_instructions'),
                                         'options' => array_keys(config('mail.mailers')),
                                         'clearable' => true,
+                                        'placeholder' => config('mail.default'),
                                     ],
                                 ],
                             ],

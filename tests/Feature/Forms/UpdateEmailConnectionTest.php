@@ -50,15 +50,15 @@ class UpdateEmailConnectionTest extends TestCase
         $this
             ->actingAs($this->userWithPermission())
             ->update($form, ['configs' => [
-                ['id' => 'abc', 'to' => 'new@example.com', 'subject' => 'Updated'],
-                ['id' => 'ghi', 'to' => 'another@example.com'],
+                ['id' => 'abc', 'to' => ['new@example.com', 'field:email'], 'subject' => 'Updated'],
+                ['id' => 'ghi', 'to' => ['another@example.com']],
             ]])
             ->assertOk();
 
         $updated = Form::find('test');
         $this->assertEquals([
-            ['id' => 'abc', 'to' => 'new@example.com', 'subject' => 'Updated'],
-            ['id' => 'ghi', 'to' => 'another@example.com'],
+            ['id' => 'abc', 'to' => ['new@example.com', 'field:email'], 'subject' => 'Updated'],
+            ['id' => 'ghi', 'to' => ['another@example.com']],
         ], $updated->connections()->get('email'));
         $this->assertEquals([['id' => 'def', 'url' => 'https://example.com/hook']], $updated->connections()->get('webhook'));
     }
@@ -73,7 +73,8 @@ class UpdateEmailConnectionTest extends TestCase
             ->update($form, ['configs' => [[
                 '_id' => 'vue-row',
                 'id' => 'abc',
-                'to' => 'foo@example.com',
+                'to' => ['foo@example.com'],
+                'cc' => [],
                 'subject' => '',
                 'reply_to' => null,
                 'markdown' => false,
@@ -84,7 +85,7 @@ class UpdateEmailConnectionTest extends TestCase
 
         $this->assertEquals([[
             'id' => 'abc',
-            'to' => 'foo@example.com',
+            'to' => ['foo@example.com'],
             'attachments' => true,
         ]], Form::find('test')->connections()->get('email'));
     }
@@ -99,7 +100,7 @@ class UpdateEmailConnectionTest extends TestCase
             ->update($form, ['configs' => [
                 [
                     'id' => 'abc',
-                    'to' => 'foo@example.com',
+                    'to' => ['foo@example.com'],
                     'conditions' => [
                         ['_id' => 'vue-row', 'field' => 'name', 'operator' => 'equals', 'value' => 'Bob', 'join' => 'and'],
                         ['field' => null, 'operator' => 'equals', 'value' => 'incomplete', 'join' => 'and'],
@@ -108,7 +109,7 @@ class UpdateEmailConnectionTest extends TestCase
                 ],
                 [
                     'id' => 'def',
-                    'to' => 'bar@example.com',
+                    'to' => ['bar@example.com'],
                     'conditions' => [],
                 ],
             ]])
@@ -117,14 +118,14 @@ class UpdateEmailConnectionTest extends TestCase
         $this->assertEquals([
             [
                 'id' => 'abc',
-                'to' => 'foo@example.com',
+                'to' => ['foo@example.com'],
                 'conditions' => [
                     ['field' => 'name', 'operator' => 'equals', 'value' => 'Bob', 'join' => 'and'],
                 ],
             ],
             [
                 'id' => 'def',
-                'to' => 'bar@example.com',
+                'to' => ['bar@example.com'],
             ],
         ], Form::find('test')->connections()->get('email'));
     }
@@ -152,7 +153,8 @@ class UpdateEmailConnectionTest extends TestCase
             'missing configs' => [[], ['configs']],
             'configs not an array' => [['configs' => 'nope'], ['configs']],
             'config not an array' => [['configs' => ['nope']], ['configs.0']],
-            'config without a recipient' => [['configs' => [['from' => 'foo@example.com']]], ['configs.0.to']],
+            'config without a recipient' => [['configs' => [['from' => ['foo@example.com']]]], ['configs.0.to']],
+            'config with an empty recipient list' => [['configs' => [['to' => []]]], ['configs.0.to']],
         ];
     }
 

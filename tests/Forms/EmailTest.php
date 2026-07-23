@@ -69,6 +69,26 @@ class EmailTest extends TestCase
         $this->assertEquals($expected, $email->bcc);
     }
 
+    #[Test]
+    public function it_sanitizes_field_values_used_as_addresses()
+    {
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'email', 'field' => ['type' => 'email']],
+            ],
+        ]))->save();
+
+        $submission = $form->makeSubmission()->data([
+            'email' => "evil@example.com\r\nBcc: victim@example.com",
+        ]);
+
+        $email = tap(new Email($submission, [
+            'to' => ['safe@example.com', 'field:email'],
+        ], Site::default()))->build();
+
+        $this->assertEquals([['address' => 'safe@example.com', 'name' => null]], $email->to);
+    }
+
     public static function singleAddressProvider()
     {
         return [
@@ -89,6 +109,12 @@ class EmailTest extends TestCase
             ]],
             'single email with name from global set using antlers' => ['{{ company_information:name }} <{{ company_information:email }}>', [
                 ['address' => 'info@example.com', 'name' => 'Example Company'],
+            ]],
+            'array with single email' => [['foo@bar.com'], [
+                ['address' => 'foo@bar.com', 'name' => null],
+            ]],
+            'array with single field reference' => [['field:email'], [
+                ['address' => 'foo@bar.com', 'name' => null],
             ]],
         ];
     }
@@ -111,6 +137,27 @@ class EmailTest extends TestCase
             'multiple emails with name using antlers' => ['{{ name }} <{{ email }}>, Baz Qux <baz@qux.com>', [
                 ['address' => 'foo@bar.com', 'name' => 'Foo Bar'],
                 ['address' => 'baz@qux.com', 'name' => 'Baz Qux'],
+            ]],
+            'array of emails' => [['foo@bar.com', 'baz@qux.com'], [
+                ['address' => 'foo@bar.com', 'name' => null],
+                ['address' => 'baz@qux.com', 'name' => null],
+            ]],
+            'array of emails with name using antlers' => [['{{ name }} <{{ email }}>', 'Baz Qux <baz@qux.com>'], [
+                ['address' => 'foo@bar.com', 'name' => 'Foo Bar'],
+                ['address' => 'baz@qux.com', 'name' => 'Baz Qux'],
+            ]],
+            'array with an antlers value that resolves empty' => [['{{ nonexistent_field }}', 'foo@bar.com'], [
+                ['address' => 'foo@bar.com', 'name' => null],
+            ]],
+            'array with a field reference and an email' => [['field:email', 'baz@qux.com'], [
+                ['address' => 'foo@bar.com', 'name' => null],
+                ['address' => 'baz@qux.com', 'name' => null],
+            ]],
+            'array with a field reference to a non-email value' => [['field:name', 'foo@bar.com'], [
+                ['address' => 'foo@bar.com', 'name' => null],
+            ]],
+            'array with a field reference to a missing field' => [['field:nonexistent', 'foo@bar.com'], [
+                ['address' => 'foo@bar.com', 'name' => null],
             ]],
         ]);
     }
