@@ -3,8 +3,11 @@
 namespace Tests\StaticCaching;
 
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Queue;
 use Orchestra\Testbench\Attributes\DefineEnvironment;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Console\Commands\StaticWarmJob;
+use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\Replacer;
 use Symfony\Component\HttpFoundation\Response;
 use Tests\FakesContent;
@@ -203,6 +206,56 @@ class HalfMeasureStaticCachingTest extends TestCase
             $store->get('nocache::session.'.md5('/__shared-errors/en/404')),
             'Expected nocache session to be stored under the shared-errors URL.'
         );
+    }
+
+    #[Test]
+    public function it_does_not_track_404_urls()
+    {
+        \Illuminate\Support\Facades\Cache::flush();
+
+        $this->withStandardFakeViews();
+        $this->viewShouldReturnRaw('errors.404', '404 not found');
+
+        $this->get('/this-does-not-exist')->assertNotFound();
+
+        $cacher = app(Cacher::class);
+        $this->assertEquals([], $cacher->getUrls()->all());
+
+        // The 404 response is still served from the cache on a repeat hit,
+        // even though it was never added to the tracked `.urls` set.
+        $response = $this->get('/this-does-not-exist')->assertNotFound();
+        $this->assertTrue($response->wasStaticallyCached());
+    }
+
+    #[Test]
+    public function wildcard_invalidation_does_not_warm_untracked_404_urls()
+    {
+        \Illuminate\Support\Facades\Cache::flush();
+
+        Queue::fake();
+
+        $this->withStandardFakeViews();
+        $this->viewShouldReturnRaw('default', '{{ title }}');
+        $this->viewShouldReturnRaw('errors.404', '404 not found');
+
+        $this->createPage('about', ['with' => ['title' => 'The About Page']]);
+
+        // A real page, matching the wildcard `/about*` rule below.
+        $this->get('/about')->assertOk();
+
+        // A junk URL that also matches the wildcard prefix, but doesn't resolve
+        // to real content (e.g. a bot/scanner probe under the same path).
+        $this->get('/about-this-does-not-exist')->assertNotFound();
+
+        app(Cacher::class)->refreshUrls(['/about*']);
+
+        Queue::assertPushed(StaticWarmJob::class, function ($job) {
+            return str_contains((string) $job->request->getUri(), '/about')
+                && ! str_contains((string) $job->request->getUri(), 'this-does-not-exist');
+        });
+        Queue::assertNotPushed(StaticWarmJob::class, function ($job) {
+            return str_contains((string) $job->request->getUri(), 'this-does-not-exist');
+        });
     }
 
     #[Test]

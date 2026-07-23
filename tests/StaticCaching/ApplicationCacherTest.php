@@ -4,9 +4,12 @@ namespace Tests\StaticCaching;
 
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Events\ResponsePrepared;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Queue;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Console\Commands\StaticWarmJob;
 use Statamic\Events\UrlInvalidated;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\Cachers\ApplicationCacher;
@@ -65,6 +68,78 @@ class ApplicationCacherTest extends TestCase
         $cachedPage = $cacher->getCachedPage($request);
         $this->assertEquals('html content', $cachedPage->content);
         $this->assertEquals('application/html', $cachedPage->headers['Content-Type']);
+    }
+
+    #[Test]
+    public function caching_a_successful_page_tracks_the_url()
+    {
+        $cache = app(Repository::class);
+        $cacher = new ApplicationCacher($cache, ['base_url' => 'http://example.com']);
+        $request = Request::create('http://example.com/about', 'GET');
+
+        $cacher->cachePage($request, response('about page', 200));
+        event(new ResponsePrepared($request, response('about page', 200)));
+
+        $this->assertEquals(['/about'], $cacher->getUrls()->values()->all());
+    }
+
+    #[Test]
+    public function caching_a_404_page_does_not_track_the_url()
+    {
+        $cache = app(Repository::class);
+        $cacher = new ApplicationCacher($cache, ['base_url' => 'http://example.com']);
+        $request = Request::create('http://example.com/this-does-not-exist', 'GET');
+        $response = response('not found', 404);
+
+        $cacher->cachePage($request, $response);
+        event(new ResponsePrepared($request, $response));
+
+        // The URL isn't tracked in the `.urls` set...
+        $this->assertEquals([], $cacher->getUrls()->all());
+
+        // ...but the 404 response is still cached and served directly by URL hash.
+        $this->assertTrue($cacher->hasCachedPage($request));
+        $this->assertEquals('not found', $cacher->getCachedPage($request)->content);
+    }
+
+    #[Test]
+    public function caching_a_shared_error_page_is_always_tracked()
+    {
+        $cache = app(Repository::class);
+        $cacher = new ApplicationCacher($cache, ['base_url' => 'http://example.com']);
+        $request = Request::createFrom(Request::create('http://example.com/'))->fakeStaticCacheStatus(404);
+        $response = response('shared not found', 404);
+
+        $cacher->cachePage($request, $response);
+        event(new ResponsePrepared($request, $response));
+
+        $this->assertEquals(['/__shared-errors/'.\Statamic\Facades\Site::current()->handle().'/404'], $cacher->getUrls()->values()->all());
+    }
+
+    #[Test]
+    public function wildcard_refresh_does_not_warm_untracked_404_urls()
+    {
+        Queue::fake();
+
+        $cache = app(Repository::class);
+        $cacher = new ApplicationCacher($cache, ['base_url' => 'http://example.com']);
+
+        $goodRequest = Request::create('http://example.com/rail/one', 'GET');
+        $cacher->cachePage($goodRequest, response('one', 200));
+        event(new ResponsePrepared($goodRequest, response('one', 200)));
+
+        $junkRequest = Request::create('http://example.com/rail/scanner-junk', 'GET');
+        $cacher->cachePage($junkRequest, response('not found', 404));
+        event(new ResponsePrepared($junkRequest, response('not found', 404)));
+
+        $cacher->refreshUrls(['/rail/*']);
+
+        Queue::assertPushed(StaticWarmJob::class, function ($job) {
+            return str_contains((string) $job->request->getUri(), '/rail/one');
+        });
+        Queue::assertNotPushed(StaticWarmJob::class, function ($job) {
+            return str_contains((string) $job->request->getUri(), 'scanner-junk');
+        });
     }
 
     #[Test]

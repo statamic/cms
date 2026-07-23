@@ -3,6 +3,7 @@
 namespace Statamic\StaticCaching\Cachers;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Routing\Events\ResponsePrepared;
 use Illuminate\Support\Facades\Event;
 use Statamic\Events\UrlInvalidated;
@@ -38,8 +39,10 @@ class ApplicationCacher extends AbstractCacher
         // and other URL characters wouldn't work as a cache key.
         $key = $this->makeHash($url);
 
-        // Keep track of the URL and key the response content is about to be stored within.
-        $this->cacheUrl($key, ...$this->getPathAndDomain($url));
+        if ($this->shouldTrackUrl($url, $content)) {
+            // Keep track of the URL and key the response content is about to be stored within.
+            $this->cacheUrl($key, ...$this->getPathAndDomain($url));
+        }
 
         $key = $this->normalizeKey('responses:'.$key);
         $value = $this->normalizeContent($content);
@@ -59,6 +62,21 @@ class ApplicationCacher extends AbstractCacher
                 ? $this->cache->put($key, $cacheValue, now()->addMinutes($this->getDefaultExpiration()))
                 : $this->cache->forever($key, $cacheValue);
         });
+    }
+
+    /**
+     * Determine whether a URL should be tracked in the cacher's URL set.
+     *
+     * @param  string  $url
+     * @param  mixed  $content
+     */
+    private function shouldTrackUrl($url, $content): bool
+    {
+        if (! $content instanceof Response || $content->isSuccessful()) {
+            return true;
+        }
+
+        return str_contains($url, '/__shared-errors/');
     }
 
     /**
