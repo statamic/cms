@@ -112,7 +112,7 @@ const shouldBeIndented = (index) => {
 </script>
 
 <template>
-    <div class="group/rule" data-logic-text>
+    <div data-logic-text>
         <div class="logic-text">
             <ol>
                 <li v-if="conditions.length === 0">
@@ -154,6 +154,7 @@ const shouldBeIndented = (index) => {
                 <li
                     v-for="(condition, index) in conditions"
                     :key="condition._id"
+                    class="group/condition"
                     :class="{ 'ms-(--inner-indent) indented-condition': shouldBeIndented(index) }"
                 >
                     <div class="flex items-center gap-0.25">
@@ -192,7 +193,7 @@ const shouldBeIndented = (index) => {
                                 </template>
                             </Combobox>
                         </div>
-                        <div class="ms-0.5 mb-2.5 inline-flex items-center gap-1.5 opacity-0 pointer-events-none transition-opacity group-hover/rule:opacity-100 group-hover/rule:pointer-events-auto [@media(any-hover:none)]:opacity-100 [@media(any-hover:none)]:pointer-events-auto">
+                        <div class="ms-0.5 mb-2.5 inline-flex items-center gap-1.5 opacity-0 pointer-events-none transition-opacity group-hover/condition:opacity-100 group-hover/condition:pointer-events-auto [@media(any-hover:none)]:opacity-100 [@media(any-hover:none)]:pointer-events-auto">
                             <Button
                                 size="sm"
                                 inset
