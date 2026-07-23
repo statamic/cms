@@ -5,6 +5,7 @@ namespace Statamic\Http\Controllers\CP\Forms\Connections;
 use Illuminate\Http\Request;
 use Statamic\Forms\Connections\ConnectionLogic;
 use Statamic\Forms\Connections\Emails;
+use Statamic\Forms\Connections\Rules\EmailConnectionAddress;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Support\Arr;
 
@@ -15,7 +16,11 @@ class EmailConnectionController extends CpController
         $request->validate([
             'configs' => ['present', 'array'],
             'configs.*' => ['array'],
-            'configs.*.to' => ['required'],
+            'configs.*.to' => ['required', new EmailConnectionAddress($form)],
+            'configs.*.cc' => [new EmailConnectionAddress($form)],
+            'configs.*.bcc' => [new EmailConnectionAddress($form)],
+            'configs.*.from' => [new EmailConnectionAddress($form)],
+            'configs.*.reply_to' => [new EmailConnectionAddress($form)],
         ]);
 
         $emailConfigs = collect($request->configs)

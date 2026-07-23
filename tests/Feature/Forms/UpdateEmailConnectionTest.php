@@ -42,7 +42,11 @@ class UpdateEmailConnectionTest extends TestCase
     #[Test]
     public function it_updates_the_email_configs()
     {
-        $form = tap(Form::make('test')->connections([
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'email', 'field' => ['type' => 'email']],
+            ],
+        ])->connections([
             'email' => [['id' => 'abc', 'to' => 'old@example.com']],
             'webhook' => [['id' => 'def', 'url' => 'https://example.com/hook']],
         ]))->save();
@@ -153,8 +157,13 @@ class UpdateEmailConnectionTest extends TestCase
             'missing configs' => [[], ['configs']],
             'configs not an array' => [['configs' => 'nope'], ['configs']],
             'config not an array' => [['configs' => ['nope']], ['configs.0']],
-            'config without a recipient' => [['configs' => [['from' => ['foo@example.com']]]], ['configs.0.to']],
+            'config without a recipient' => [['configs' => [['from' => 'foo@example.com']]], ['configs.0.to']],
             'config with an empty recipient list' => [['configs' => [['to' => []]]], ['configs.0.to']],
+            'config with an invalid recipient' => [['configs' => [['to' => ['not-an-email']]]], ['configs.0.to']],
+            'config with an invalid legacy string recipient' => [['configs' => [['to' => 'foo@example.com, not-an-email']]], ['configs.0.to']],
+            'config with an unknown field reference' => [['configs' => [['to' => ['field:unknown']]]], ['configs.0.to']],
+            'config with an invalid cc' => [['configs' => [['to' => ['foo@example.com'], 'cc' => ['not-an-email']]]], ['configs.0.cc']],
+            'config with an invalid sender' => [['configs' => [['to' => ['foo@example.com'], 'from' => 'not-an-email']]], ['configs.0.from']],
         ];
     }
 

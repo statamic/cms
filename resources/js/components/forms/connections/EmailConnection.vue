@@ -55,11 +55,14 @@ const removeEmail = (email) => (emails.value = emails.value.filter((item) => ite
 
 const hasError = (index) => Object.keys(errors.value).some((key) => key.startsWith(`configs.${index}.`));
 
-const rowErrors = (index) => Object.fromEntries(
+const rowErrors = (index) =>
     Object.entries(errors.value)
         .filter(([key]) => key.startsWith(`configs.${index}.`))
-        .map(([key, messages]) => [key.replace(`configs.${index}.`, ''), messages]),
-);
+        .reduce((fields, [key, messages]) => {
+            const handle = key.replace(`configs.${index}.`, '').split('.')[0];
+            fields[handle] = [...(fields[handle] ?? []), ...messages];
+            return fields;
+        }, {});
 
 const save = () => {
     if (saving.value) return;
