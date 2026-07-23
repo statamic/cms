@@ -30,8 +30,9 @@ class Name extends FormFieldtype
     {
         return [
             'type' => 'text',
+            'autocomplete' => 'name',
             'placeholder' => $this->config('placeholder'),
-            ...Arr::except($this->config(), ['type', 'placeholder']),
+            ...Arr::except($this->config(), ['type', 'autocomplete', 'placeholder']),
         ];
     }
 
