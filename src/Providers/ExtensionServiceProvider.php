@@ -142,8 +142,8 @@ class ExtensionServiceProvider extends ServiceProvider
     ];
 
     protected $formConnections = [
-        Forms\Connections\Emails::class,
-        Forms\Connections\Webhooks::class,
+        Forms\Connections\Email::class,
+        Forms\Connections\Webhook::class,
     ];
 
     protected $formFieldtypes = [

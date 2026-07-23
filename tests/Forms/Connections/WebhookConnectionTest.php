@@ -11,7 +11,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Form;
 use Statamic\Facades\Site;
-use Statamic\Forms\Connections\Webhooks;
+use Statamic\Forms\Connections\Webhook;
 use Statamic\Forms\Connections\Webhooks\SendWebhook;
 use Statamic\Forms\CreateAssetsFromFileUploads;
 use Statamic\Forms\SendEmails;
@@ -30,7 +30,7 @@ class WebhookConnectionTest extends TestCase
             ['url' => 'https://example.com/second'],
         ]]))->save();
 
-        $jobs = (new Webhooks)->finalized($form->makeSubmission());
+        $jobs = (new Webhook)->finalized($form->makeSubmission());
 
         $this->assertCount(2, $jobs);
         $this->assertContainsOnlyInstancesOf(SendWebhook::class, $jobs);
@@ -46,7 +46,7 @@ class WebhookConnectionTest extends TestCase
             ['url' => 'https://example.com/enabled', 'enabled' => true],
         ]]))->save();
 
-        $jobs = array_values((new Webhooks)->finalized($form->makeSubmission()));
+        $jobs = array_values((new Webhook)->finalized($form->makeSubmission()));
 
         $this->assertCount(1, $jobs);
         $this->assertEquals('https://example.com/enabled', $jobs[0]->config['url']);
@@ -66,7 +66,7 @@ class WebhookConnectionTest extends TestCase
 
         $submission = $form->makeSubmission()->data(['how_did_you_hear' => $value]);
 
-        $this->assertCount($shouldDispatch ? 1 : 0, (new Webhooks)->finalized($submission));
+        $this->assertCount($shouldDispatch ? 1 : 0, (new Webhook)->finalized($submission));
     }
 
     public static function webhookConditionsProvider()

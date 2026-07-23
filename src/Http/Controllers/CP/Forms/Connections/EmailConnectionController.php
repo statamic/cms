@@ -4,7 +4,7 @@ namespace Statamic\Http\Controllers\CP\Forms\Connections;
 
 use Illuminate\Http\Request;
 use Statamic\Forms\Connections\ConnectionLogic;
-use Statamic\Forms\Connections\Emails;
+use Statamic\Forms\Connections\Email;
 use Statamic\Forms\Connections\Rules\EmailConnectionAddress;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Support\Arr;
@@ -27,7 +27,7 @@ class EmailConnectionController extends CpController
             ->map(function (array $config) use ($form): array {
                 $config = Arr::removeNullValues($config);
 
-                $values = Emails::blueprint($form)->fields()
+                $values = Email::blueprint($form)->fields()
                     ->addValues(Arr::except($config, ['_id', 'id', 'enabled', 'conditions']))
                     ->process()
                     ->values()

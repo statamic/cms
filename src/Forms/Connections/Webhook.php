@@ -12,10 +12,8 @@ use Statamic\Support\VueComponent;
 
 use function Statamic\trans as __;
 
-class Webhooks extends Connection
+class Webhook extends Connection
 {
-    protected static $handle = 'webhook';
-
     protected $icon = 'globe-arrow';
     protected $developer = 'Statamic';
 

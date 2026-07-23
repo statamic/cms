@@ -12,10 +12,8 @@ use Statamic\Support\VueComponent;
 
 use function Statamic\trans as __;
 
-class Emails extends Connection
+class Email extends Connection
 {
-    protected static $handle = 'email';
-
     protected $developer = 'Statamic';
 
     public function description()
