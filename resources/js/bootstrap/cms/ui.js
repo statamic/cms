@@ -13,6 +13,7 @@ export {
     CharacterCounter,
     Checkbox,
     CheckboxGroup,
+    ChoiceGrid,
     CodeEditor,
     Combobox,
     CommandPaletteItem,

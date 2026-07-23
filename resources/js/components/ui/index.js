@@ -11,6 +11,7 @@ export { default as CardPanel } from './Card/Panel.vue';
 export { default as CharacterCounter } from './CharacterCounter.vue';
 export { default as Checkbox } from './Checkbox/Item.vue';
 export { default as CheckboxGroup } from './Checkbox/Group.vue';
+export { default as ChoiceGrid } from './ChoiceGrid/ChoiceGrid.vue';
 export { default as CodeEditor } from './CodeEditor.vue';
 export { default as Combobox } from './Combobox/Combobox.vue';
 export { default as ConfirmationModal } from './Modal/ConfirmationModal.vue';

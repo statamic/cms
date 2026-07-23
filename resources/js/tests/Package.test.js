@@ -135,6 +135,7 @@ it('exports ui', async () => {
         'CharacterCounter',
         'Checkbox',
         'CheckboxGroup',
+        'ChoiceGrid',
         'CodeEditor',
         'Combobox',
         'ConfirmationModal',
