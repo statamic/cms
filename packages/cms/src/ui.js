@@ -98,6 +98,7 @@ export const {
     SplitterGroup,
     SplitterPanel,
     SplitterResizeHandle,
+    StarRating,
     StatusIndicator,
     Subheading,
     Switch,

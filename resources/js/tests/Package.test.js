@@ -191,6 +191,7 @@ it('exports ui', async () => {
         'SplitterGroup',
         'SplitterPanel',
         'SplitterResizeHandle',
+        'StarRating',
         'Subheading',
         'Switch',
         'TabContent',

@@ -68,6 +68,7 @@ export { default as Skeleton } from './Skeleton.vue';
 export { default as SplitterGroup } from './Splitter/Group.vue';
 export { default as SplitterPanel } from './Splitter/Panel.vue';
 export { default as SplitterResizeHandle } from './Splitter/ResizeHandle.vue';
+export { default as StarRating } from './StarRating/StarRating.vue';
 export { default as Subheading } from './Subheading.vue';
 export { default as Switch } from './Switch.vue';
 export { default as TabContent } from './Tabs/Content.vue';

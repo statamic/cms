@@ -96,6 +96,7 @@ export {
     SplitterGroup,
     SplitterPanel,
     SplitterResizeHandle,
+    StarRating,
     StatusIndicator,
     Subheading,
     Switch,
