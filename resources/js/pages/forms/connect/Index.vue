@@ -69,7 +69,7 @@ watch(view, (view: View) => preferences.set('forms.connect.view', view));
             <template #actions>
                 <div class="flex items-center gap-2 sm:gap-3">
                     <Button variant="primary" href="https://statamic.com/addons?category=forms" target="_blank" rel="noopener" icon-append="external-link">
-                        {{ __('Browse the Marketplace') }}
+                        {{ __('Explore Integrations') }}
                     </Button>
                     <ToggleGroup v-model="view">
                         <ToggleItem :value="View.Grid" icon="layout-grid" />

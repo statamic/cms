@@ -46,7 +46,6 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
     protected $honeypot;
     protected $store;
     protected $connections;
-    protected $metrics;
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
 
@@ -386,7 +385,6 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
             'fields' => $this->formFields()->contents(),
             'honeypot' => $this->honeypot,
             'connections' => $this->connections()->map(fn ($config) => Arr::removeNullValues($config))->all(),
-            'metrics' => $this->metrics,
         ]))->filter()->all();
 
         if ($this->store === false) {
@@ -483,37 +481,6 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
         }
 
         return $this;
-    }
-
-    // TODO: Reimplement metrics()
-    public function metrics($metrics = null)
-    {
-        return collect();
-
-        // if (! is_null($metrics)) {
-        //     return $this->formset()->set('metrics', $metrics);
-        // }
-
-        // $metrics = [];
-
-        // foreach ($this->formset()->get('metrics', []) as $config) {
-        //     $name = Str::studly($config['type']);
-
-        //     $class = "Statamic\\Forms\\Metrics\\{$name}Metric";
-
-        //     if (! class_exists($class)) {
-        //         $class = "Statamic\\Addons\\{$name}\\{$name}Metric";
-        //     }
-
-        //     if (! class_exists($class)) {
-        //         \Log::error("Metric [{$config['type']}] does not exist.");
-        //         continue;
-        //     }
-
-        //     $metrics[] = new $class($this, $config);
-        // }
-
-        // return $metrics;
     }
 
     /**
