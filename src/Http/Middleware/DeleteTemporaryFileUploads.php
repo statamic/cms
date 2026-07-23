@@ -2,7 +2,6 @@
 
 namespace Statamic\Http\Middleware;
 
-use Carbon\CarbonInterface;
 use Closure;
 use Statamic\Facades\File;
 
@@ -13,32 +12,39 @@ class DeleteTemporaryFileUploads
         $lottery = [2, 100];
 
         if (random_int(1, $lottery[1]) <= $lottery[0]) {
-            $this->deleteTemporaryFileUploads(
-                directory: config('statamic.system.file_uploads_path', 'statamic/file-uploads'),
-                olderThan: now()->subHour()
-            );
-
-            $this->deleteTemporaryFileUploads(
-                directory: config('statamic.forms.file_uploads_path', 'statamic/form-uploads'),
-                olderThan: now()->subWeek()
-            );
+            $this->deleteFileUploads();
+            $this->deleteFormUploads();
         }
 
         return $next($request);
     }
 
-    private function deleteTemporaryFileUploads(string $directory, CarbonInterface $olderThan): void
+    private function deleteFileUploads(): void
     {
         $disk = File::disk(config('statamic.system.file_uploads_disk', 'local'));
+        $directory = config('statamic.system.file_uploads_path', 'statamic/file-uploads');
 
         $disk
             ->getFilesRecursively($directory)
-            ->filter(function ($path) use ($olderThan) {
+            ->filter(function ($path) {
                 $bits = explode('/', $path);
                 $timestamp = $bits[count($bits) - 2];
 
-                return $timestamp < $olderThan->timestamp;
+                return $timestamp < now()->subHour()->timestamp;
             })
+            ->each(fn ($path) => $disk->delete($path));
+
+        $disk->deleteEmptySubfolders($directory);
+    }
+
+    private function deleteFormUploads(): void
+    {
+        $disk = File::disk(config('statamic.system.file_uploads_disk', 'local'));
+        $directory = config('statamic.forms.file_uploads_path', 'statamic/form-uploads');
+
+        $disk
+            ->getFilesRecursively($directory)
+            ->filter(fn ($path) => $disk->lastModified($path) < now()->subWeek()->timestamp)
             ->each(fn ($path) => $disk->delete($path));
 
         $disk->deleteEmptySubfolders($directory);

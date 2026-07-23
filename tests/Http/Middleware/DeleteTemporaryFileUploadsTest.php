@@ -30,7 +30,7 @@ class DeleteTemporaryFileUploadsTest extends TestCase
         $uploadsDisk->put("temp-uploads/{$newTimestamp}/new.txt", 'new');
         $localDisk->put("statamic/file-uploads/{$oldTimestamp}/old.txt", 'old');
 
-        $this->deleteTemporaryFileUploads('temp-uploads', now()->subHour());
+        $this->invoke('deleteFileUploadsOverAnHourOld');
 
         $uploadsDisk->assertMissing("temp-uploads/{$oldTimestamp}/old.txt");
         $uploadsDisk->assertExists("temp-uploads/{$newTimestamp}/new.txt");
@@ -48,25 +48,24 @@ class DeleteTemporaryFileUploadsTest extends TestCase
         $localDisk = Storage::fake('local');
         $uploadsDisk = Storage::fake('uploads');
 
-        Date::setTestNow(now());
+        // Form uploads are nested under the submission ID and field handle, with no
+        // timestamp in the path, so their age comes from the file's modified time.
+        $uploadsDisk->put('temp-form-uploads/submission-one/document/old.txt', 'old');
+        $uploadsDisk->put('temp-form-uploads/submission-two/document/new.txt', 'new');
+        $localDisk->put('statamic/form-uploads/submission-one/document/old.txt', 'old');
 
-        $oldTimestamp = now()->subWeeks(2)->timestamp;
-        $newTimestamp = now()->subDay()->timestamp;
+        touch($uploadsDisk->path('temp-form-uploads/submission-one/document/old.txt'), now()->subWeeks(2)->timestamp);
 
-        $uploadsDisk->put("temp-form-uploads/{$oldTimestamp}/old.txt", 'old');
-        $uploadsDisk->put("temp-form-uploads/{$newTimestamp}/new.txt", 'new');
-        $localDisk->put("statamic/form-uploads/{$oldTimestamp}/old.txt", 'old');
+        $this->invoke('deleteFormUploadsOverAWeekOld');
 
-        $this->deleteTemporaryFileUploads('temp-form-uploads', now()->subWeek());
-
-        $uploadsDisk->assertMissing("temp-form-uploads/{$oldTimestamp}/old.txt");
-        $uploadsDisk->assertExists("temp-form-uploads/{$newTimestamp}/new.txt");
-        $localDisk->assertExists("statamic/form-uploads/{$oldTimestamp}/old.txt");
+        $uploadsDisk->assertMissing('temp-form-uploads/submission-one/document/old.txt');
+        $uploadsDisk->assertExists('temp-form-uploads/submission-two/document/new.txt');
+        $localDisk->assertExists('statamic/form-uploads/submission-one/document/old.txt');
     }
 
-    private function deleteTemporaryFileUploads(string $directory, $olderThan): void
+    private function invoke(string $method): void
     {
-        (new \ReflectionMethod(DeleteTemporaryFileUploads::class, 'deleteTemporaryFileUploads'))
-            ->invoke(new DeleteTemporaryFileUploads, $directory, $olderThan);
+        (new \ReflectionMethod(DeleteTemporaryFileUploads::class, $method))
+            ->invoke(new DeleteTemporaryFileUploads);
     }
 }
