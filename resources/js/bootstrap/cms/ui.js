@@ -89,6 +89,7 @@ export {
     PublishTabs,
     Radio,
     RadioGroup,
+    RankList,
     Select,
     Separator,
     Slider,

@@ -61,6 +61,7 @@ export { default as PanelHeader } from './Panel/Header.vue';
 export { default as Popover } from './Popover.vue';
 export { default as Radio } from './Radio/Item.vue';
 export { default as RadioGroup } from './Radio/Group.vue';
+export { default as RankList } from './RankList/RankList.vue';
 export { default as Select } from './Select/Select.vue';
 export { default as Separator } from './Separator.vue';
 export { default as Slider } from './Slider/Slider.vue';

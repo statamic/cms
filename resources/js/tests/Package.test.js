@@ -184,6 +184,7 @@ it('exports ui', async () => {
         'Popover',
         'Radio',
         'RadioGroup',
+        'RankList',
         'Select',
         'Separator',
         'Skeleton',
