@@ -131,6 +131,7 @@ class Emails extends Connection
                                         'options' => $addressOptions,
                                         'placeholder' => config('mail.from.address'),
                                         'taggable' => true,
+                                        'clearable' => true,
                                         'width' => 50,
                                     ],
                                 ],
