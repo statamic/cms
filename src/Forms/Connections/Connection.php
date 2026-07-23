@@ -10,6 +10,8 @@ use Statamic\Statamic;
 use Statamic\Support\Str;
 use Statamic\Support\VueComponent;
 
+use function Statamic\trans as __;
+
 abstract class Connection
 {
     use HasHandle, RegistersItself {
