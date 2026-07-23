@@ -14,7 +14,7 @@
         "bacon/bacon-qr-code": "^3.0",
         "composer/semver": "^3.4",
         "guzzlehttp/guzzle": "^6.3 || ^7.0",
-        "inertiajs/inertia-laravel": "^2.0",
+        "inertiajs/inertia-laravel": "^2.0 || ^3.0",
         "intervention/image": "^3.9.1 || ^4.0",
         "james-heinrich/getid3": "^1.9.21",
         "laravel/framework": "^12.40.0 || ^13.0",
