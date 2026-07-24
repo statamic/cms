@@ -12,6 +12,7 @@ class ApiAuthenticationException extends Exception implements Responsable
         return response()->json(
             ['message' => $this->getMessage()],
             401,
+            ['WWW-Authenticate' => 'Bearer'],
         );
     }
 }
