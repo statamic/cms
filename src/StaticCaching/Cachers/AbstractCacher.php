@@ -38,6 +38,16 @@ abstract class AbstractCacher implements Cacher
      */
     private $config;
 
+    /**
+     * Lock keys currently held by this instance, so nested withLock() calls for
+     * the same key (e.g. forgetUrl() called from within a batched invalidateUrls()
+     * loop that already holds the domain's urls lock) don't try to re-acquire a
+     * lock against themselves and deadlock until LOCK_WAIT expires.
+     *
+     * @var array<string, bool>
+     */
+    private $heldLocks = [];
+
     public function __construct(Repository $cache, $config)
     {
         $this->cache = $cache;
@@ -227,11 +237,23 @@ abstract class AbstractCacher implements Cacher
      */
     protected function withLock(string $key, \Closure $callback)
     {
+        if (isset($this->heldLocks[$key])) {
+            return $callback();
+        }
+
         if (! $this->cache->getStore() instanceof LockProvider) {
             return $callback();
         }
 
-        return $this->cache->lock($key, static::LOCK_TIMEOUT)->block(static::LOCK_WAIT, $callback);
+        return $this->cache->lock($key, static::LOCK_TIMEOUT)->block(static::LOCK_WAIT, function () use ($key, $callback) {
+            $this->heldLocks[$key] = true;
+
+            try {
+                return $callback();
+            } finally {
+                unset($this->heldLocks[$key]);
+            }
+        });
     }
 
     /**
@@ -265,18 +287,46 @@ abstract class AbstractCacher implements Cacher
     /**
      * Invalidate multiple URLs.
      *
+     * Grouped by domain and run under a single lock per domain, so a large
+     * batch doesn't acquire and release the domain's urls lock once per URL
+     * (each acquisition able to block up to LOCK_WAIT) and instead holds it
+     * once for the whole domain's batch.
+     *
      * @param  array  $urls
      * @return void
      */
     public function invalidateUrls($urls)
     {
-        collect($urls)->each(function ($url) {
-            if (Str::contains($url, '*')) {
-                $this->invalidateWildcardUrl($url);
-            } else {
-                $this->invalidateUrl(...$this->getPathAndDomain($url));
-            }
-        });
+        collect($urls)
+            ->groupBy(fn ($url) => $this->resolveDomainForInvalidation($url))
+            ->each(function ($urlsForDomain, $domain) {
+                $this->withLock($this->getUrlsLockKey($domain), function () use ($urlsForDomain) {
+                    $urlsForDomain->each(function ($url) {
+                        if (Str::contains($url, '*')) {
+                            $this->invalidateWildcardUrl($url);
+                        } else {
+                            $this->invalidateUrl(...$this->getPathAndDomain($url));
+                        }
+                    });
+                });
+            });
+    }
+
+    /**
+     * Resolve the domain an invalidation entry belongs to, the same way
+     * invalidateUrl()/invalidateWildcardUrl() would internally, so entries can
+     * be grouped by domain before either is called.
+     *
+     * @param  string  $url
+     * @return string
+     */
+    protected function resolveDomainForInvalidation($url)
+    {
+        $url = Str::contains($url, '*') ? substr($url, 0, -1) : $url;
+
+        [, $domain] = $this->getPathAndDomain($url);
+
+        return $domain;
     }
 
     /**
