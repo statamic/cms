@@ -589,7 +589,6 @@ EOT;
 
     public function test_pipe_with_shorthand_modifier_parameter_on_standalone_tag_still_renders()
     {
-        // https://github.com/statamic/cms/pull/14892#issuecomment-5052152507
         $data = ['last_modified' => Carbon::parse('2026-01-01 00:00:00')];
 
         $this->assertSame('1767225600', $this->renderString('{{ last_modified | format="U" }}', $data, true));
