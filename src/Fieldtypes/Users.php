@@ -87,6 +87,7 @@ class Users extends Relationship
                         'display' => __('Default'),
                         'instructions' => __('statamic::messages.fields_default_instructions'),
                         'type' => 'users',
+                        'allow_current' => true,
                     ],
                 ],
             ],
@@ -95,20 +96,36 @@ class Users extends Relationship
 
     public function preProcess($data)
     {
-        if ($data === 'current') {
-            $data = User::current()->id();
-        }
+        $data = collect(Arr::wrap($data))
+            ->map(function ($id) {
+                if ($id !== 'current' || $this->config('allow_current')) {
+                    return $id;
+                }
+
+                return User::current()?->id();
+            })
+            ->filter()
+            ->values()
+            ->all();
 
         return parent::preProcess($data);
     }
 
     protected function authorizeItemData($id): bool
     {
+        if ($id === 'current' && $this->config('allow_current')) {
+            return true;
+        }
+
         return $this->authorizeViewable(User::find($id));
     }
 
     protected function toItemArray($id, $site = null)
     {
+        if ($id === 'current' && $this->config('allow_current')) {
+            return $this->currentUserOption();
+        }
+
         if ($user = User::find($id)) {
             $canViewUsers = $this->canViewUser($user);
 
@@ -188,7 +205,34 @@ class Users extends Relationship
             return $users;
         }
 
-        return $query->get()->map($userFields);
+        $users = $query->get()->map($userFields);
+
+        return $this->prependCurrentUserOption($users, $request);
+    }
+
+    private function prependCurrentUserOption(Collection $users, $request): Collection
+    {
+        if (! $this->config('allow_current')) {
+            return $users;
+        }
+
+        if (in_array('current', $request->exclusions ?? [])) {
+            return $users;
+        }
+
+        if (($search = $request->search) && ! str_contains(strtolower(__('Current User')), strtolower($search))) {
+            return $users;
+        }
+
+        return collect([$this->currentUserOption()])->concat($users);
+    }
+
+    private function currentUserOption(): array
+    {
+        return [
+            'id' => 'current',
+            'title' => __('Current User'),
+        ];
     }
 
     protected function getColumns()
