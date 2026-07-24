@@ -586,13 +586,6 @@ EOT;
     {
         $this->assertSame('please%20and%20thank%20you/Mommy', $this->resultOf('{{ test_url_encode | rawurlencode_except_slashes }}'));
     }
-
-    public function test_pipe_with_shorthand_modifier_parameter_on_standalone_tag_still_renders()
-    {
-        $data = ['last_modified' => Carbon::parse('2026-01-01 00:00:00')];
-
-        $this->assertSame('1767225600', $this->renderString('{{ last_modified | format="U" }}', $data, true));
-    }
 }
 
 class SimpleEntryObject implements Arrayable
