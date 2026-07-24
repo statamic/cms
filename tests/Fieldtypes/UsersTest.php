@@ -91,6 +91,73 @@ class UsersTest extends TestCase
     }
 
     #[Test]
+    public function it_resolves_the_current_value_when_preprocessing_for_the_field()
+    {
+        $this->actingAs(Facades\User::find('123'));
+
+        $this->assertEquals(['123'], $this->fieldtype()->preProcess('current'));
+        $this->assertEquals(['123'], $this->fieldtype()->preProcess(['current']));
+        $this->assertEquals(['123', '456'], $this->fieldtype()->preProcess(['current', '456']));
+    }
+
+    #[Test]
+    public function it_keeps_the_current_value_when_preprocessing_the_config()
+    {
+        $this->actingAs(Facades\User::find('123'));
+
+        // The default picker keeps "current" as-is so it round-trips through the
+        // blueprint editor instead of being resolved to the current user's id.
+        $this->assertEquals(['current'], $this->fieldtype(['allow_current' => true])->preProcessConfig('current'));
+        $this->assertEquals(['current'], $this->fieldtype(['allow_current' => true])->preProcessConfig(['current']));
+    }
+
+    #[Test]
+    public function it_includes_a_current_user_option_when_allowed()
+    {
+        $this->actingAs($this->cpUserWithPermissions(['access cp', 'view users']));
+
+        $items = $this->fieldtype(['allow_current' => true])->getIndexItems(new Request(['paginate' => false]));
+
+        $this->assertEquals(['id' => 'current', 'title' => 'Current User'], $items->first());
+    }
+
+    #[Test]
+    public function it_does_not_include_a_current_user_option_by_default()
+    {
+        $this->actingAs($this->cpUserWithPermissions(['access cp', 'view users']));
+
+        $items = $this->fieldtype()->getIndexItems(new Request(['paginate' => false]));
+
+        $this->assertFalse($items->contains(fn ($item) => $item['id'] === 'current'));
+    }
+
+    #[Test]
+    public function it_excludes_the_current_user_option_when_it_does_not_match_the_search()
+    {
+        $this->actingAs($this->cpUserWithPermissions(['access cp', 'view users']));
+
+        $fieldtype = $this->fieldtype(['allow_current' => true]);
+
+        $this->assertTrue(
+            $fieldtype->getIndexItems(new Request(['paginate' => false, 'search' => 'curr']))
+                ->contains(fn ($item) => $item['id'] === 'current')
+        );
+
+        $this->assertFalse(
+            $fieldtype->getIndexItems(new Request(['paginate' => false, 'search' => 'zzz']))
+                ->contains(fn ($item) => $item['id'] === 'current')
+        );
+    }
+
+    #[Test]
+    public function it_provides_item_data_for_the_current_user_option()
+    {
+        $data = $this->fieldtype(['allow_current' => true])->getItemData(['current']);
+
+        $this->assertEquals([['id' => 'current', 'title' => 'Current User']], $data->all());
+    }
+
+    #[Test]
     public function it_shallow_augments_to_a_collection_of_users()
     {
         $augmented = $this->fieldtype()->shallowAugment(['123', 456]);
