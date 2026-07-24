@@ -3,6 +3,7 @@
 namespace Statamic\StaticCaching\Cachers;
 
 use GuzzleHttp\Psr7\Request as GuzzleRequest;
+use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -17,6 +18,16 @@ use Statamic\Support\Str;
 
 abstract class AbstractCacher implements Cacher
 {
+    /**
+     * Seconds until a held lock auto-expires, as a crash safety net.
+     */
+    protected const LOCK_TIMEOUT = 10;
+
+    /**
+     * Seconds a caller will wait to acquire a lock before giving up.
+     */
+    protected const LOCK_WAIT = 5;
+
     /**
      * @var Repository
      */
@@ -125,13 +136,17 @@ abstract class AbstractCacher implements Cacher
      */
     public function cacheDomain($domain = null)
     {
-        $domains = $this->getDomains();
+        $domain = $domain ?? $this->getBaseUrl();
 
-        if (! $domains->contains($domain = $domain ?? $this->getBaseUrl())) {
-            $domains->push($domain);
-        }
+        $this->withLock($this->normalizeKey('domains:lock'), function () use ($domain) {
+            $domains = $this->getDomains();
 
-        $this->cache->forever($this->normalizeKey('domains'), $domains->all());
+            if (! $domains->contains($domain)) {
+                $domains->push($domain);
+            }
+
+            $this->cache->forever($this->normalizeKey('domains'), $domains->all());
+        });
     }
 
     /**
@@ -174,13 +189,15 @@ abstract class AbstractCacher implements Cacher
 
         $this->cacheDomain($domain);
 
-        $urls = $this->getUrls($domain);
+        $this->withLock($this->getUrlsLockKey($domain), function () use ($key, $url, $domain) {
+            $urls = $this->getUrls($domain);
 
-        $url = Str::removeLeft($url, $domain);
+            $url = Str::removeLeft($url, $domain);
 
-        $urls->put($key, $url);
+            $urls->put($key, $url);
 
-        $this->cache->forever($this->getUrlsCacheKey($domain), $urls->all());
+            $this->cache->forever($this->getUrlsCacheKey($domain), $urls->all());
+        });
     }
 
     /**
@@ -191,11 +208,39 @@ abstract class AbstractCacher implements Cacher
      */
     public function forgetUrl($key, $domain = null)
     {
-        $urls = $this->getUrls($domain);
+        $this->withLock($this->getUrlsLockKey($domain), function () use ($key, $domain) {
+            $urls = $this->getUrls($domain);
 
-        $urls->forget($key);
+            $urls->forget($key);
 
-        $this->cache->forever($this->getUrlsCacheKey($domain), $urls->all());
+            $this->cache->forever($this->getUrlsCacheKey($domain), $urls->all());
+        });
+    }
+
+    /**
+     * Run a callback while holding an exclusive lock for the given key, if the
+     * configured cache store supports locking. Falls back to running the
+     * callback unprotected if it doesn't, so cache stores without lock
+     * support (e.g. some third-party addons) don't hard crash.
+     *
+     * @return mixed
+     */
+    protected function withLock(string $key, \Closure $callback)
+    {
+        if (! $this->cache->getStore() instanceof LockProvider) {
+            return $callback();
+        }
+
+        return $this->cache->lock($key, static::LOCK_TIMEOUT)->block(static::LOCK_WAIT, $callback);
+    }
+
+    /**
+     * @param  string|null  $domain
+     * @return string
+     */
+    protected function getUrlsLockKey($domain = null)
+    {
+        return $this->getUrlsCacheKey($domain).':lock';
     }
 
     /**

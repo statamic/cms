@@ -2,6 +2,7 @@
 
 namespace Statamic\Http\Controllers\CP\Utilities;
 
+use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Inertia\Inertia;
@@ -133,7 +134,11 @@ class CacheController extends CpController
             ...$prefixedRelativeUrls,
         ];
 
-        app(Cacher::class)->invalidateUrls($urls);
+        try {
+            app(Cacher::class)->invalidateUrls($urls);
+        } catch (LockTimeoutException $e) {
+            return back()->withError(__('Could not invalidate URLs because the cache was locked by another process. Please try again.'));
+        }
 
         return back()->withSuccess(__('Invalidated URLs in the Static Cache.'));
     }
