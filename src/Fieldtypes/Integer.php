@@ -6,6 +6,8 @@ use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
 use Statamic\Query\Scopes\Filters\Fields\Integer as IntegerFilter;
 
+use function Statamic\trans as __;
+
 class Integer extends Fieldtype
 {
     protected $categories = ['number'];

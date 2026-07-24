@@ -4,6 +4,9 @@ namespace Statamic\Widgets;
 
 use Illuminate\Contracts\Support\Arrayable;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class VueComponent implements Arrayable
 {
     public function __construct(private string $name, private array $props = [])

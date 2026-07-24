@@ -19,6 +19,7 @@ import VueComponentDebug from 'vue-component-debug';
 import { registerIconSetFromStrings } from '@ui';
 import Layout from '@/pages/layout/Layout.vue';
 import { setTranslations, setLocale } from '@/translations/translator.js';
+import { setDefaultLocale as setFormattingLocale } from '@/components/FormattingLocale.js';
 import {
     keys,
     components,
@@ -35,6 +36,7 @@ import {
     echo,
     permissions,
     dateFormatter,
+    numberFormatter,
     commandPalette,
     colorMode,
     contrast,
@@ -123,6 +125,10 @@ export default {
         return dateFormatter;
     },
 
+    get $number() {
+        return numberFormatter;
+    },
+
     get $progress() {
         return progress;
     },
@@ -176,6 +182,13 @@ export default {
         contrast.initialize(this.initialConfig.user?.preferences?.strict_accessibility);
         preferences.initialize(this.initialConfig.user?.preferences, this.initialConfig.defaultPreferences);
 
+        const formattingLocale = this.initialConfig.user?.preferences?.formatting_locale;
+        if (formattingLocale === 'language') {
+            setFormattingLocale(this.initialConfig.translationLocale);
+        } else if (formattingLocale) {
+            setFormattingLocale(formattingLocale);
+        }
+
         bootingCallbacks.forEach((callback) => callback(this));
         bootingCallbacks = [];
 
@@ -185,9 +198,11 @@ export default {
         const bladeContent = el?.innerHTML || '';
         const _this = this;
 
+        const corePages = import.meta.glob('../pages/**/*.vue');
+
         await createInertiaApp({
             id: 'statamic',
-            resolve: name => {
+            resolve: async name => {
                 if (name === 'NonInertiaPage') {
                     return {
                         default: {
@@ -198,8 +213,8 @@ export default {
                 }
 
                 // Resolve core pages
-                const pages = import.meta.glob('../pages/**/*.vue', { eager: true });
-                let page = pages[`../pages/${name}.vue`];
+                const pageImport = corePages[`../pages/${name}.vue`];
+                let page = pageImport ? await pageImport() : null;
 
                 // Resolve addon pages
                 if (!page) {
@@ -274,6 +289,7 @@ export default {
             $echo: echo,
             $permissions: permissions,
             $date: dateFormatter,
+            $number: numberFormatter,
             $commandPalette: commandPalette,
             $colorMode: colorMode,
             $contrast: contrast,

@@ -5,6 +5,8 @@ namespace Statamic\Fieldtypes;
 use Statamic\Fields\Fieldtype;
 use Statamic\Query\Scopes\Filters\Fields\Textarea as TextareaFilter;
 
+use function Statamic\trans as __;
+
 class Textarea extends Fieldtype
 {
     protected $categories = ['text'];

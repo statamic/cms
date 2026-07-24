@@ -269,4 +269,48 @@ return [
 
     'layout' => env('STATAMIC_LAYOUT', 'layout'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Blueprint Templates
+    |--------------------------------------------------------------------------
+    |
+    | When an entry's template is set to `@blueprint`, Statamic will look for
+    | a view named `{collection}.{blueprint}`. You may override this logic
+    | on a per-collection basis here.
+    |
+    | https://statamic.dev/content-modeling/collections#templates
+    |
+    */
+
+    'blueprint_templates' => [
+        //
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | File Uploads Disk
+    |--------------------------------------------------------------------------
+    |
+    | Temporary file uploads are stored here before being moved to their
+    | final destination. You may configure this to use a shared filesystem
+    | in multiserver environments. This disk may be shared by other kinds
+    | of temporary file uploads (e.g. forms) that use their own path below.
+    |
+    */
+
+    'file_uploads_disk' => env('STATAMIC_FILE_UPLOADS_DISK', 'local'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | File Uploads Path
+    |--------------------------------------------------------------------------
+    |
+    | The path (on the file uploads disk above) where temporary file uploads
+    | from the Files fieldtype are stored before being moved to their final
+    | destination. These files are automatically cleaned up over time.
+    |
+    */
+
+    'file_uploads_path' => env('STATAMIC_FILE_UPLOADS_PATH', 'statamic/file-uploads'),
+
 ];

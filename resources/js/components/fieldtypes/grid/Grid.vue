@@ -25,6 +25,7 @@
                         :can-add-rows="canAddRows"
                         :allow-fullscreen="config.fullscreen"
                         :hide-display="config.hide_display"
+                        :read-only="isReadOnly"
                         :errors="publishContainer.errors"
                         @updated="updated"
                         @meta-updated="updateRowMeta"
@@ -85,7 +86,7 @@ export default {
 
     computed: {
         component() {
-            const isNarrow = this.fields.length > 1 && this.containerWidth < 600;
+            const isNarrow = this.fields.length > 1 && this.containerWidth < 550;
 
             return this.config.mode === 'stacked' || isNarrow ? 'GridStacked' : 'GridTable';
         },

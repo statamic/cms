@@ -12,6 +12,8 @@ use Statamic\OAuth\Provider;
 use Statamic\Query\Scopes\AllowsScopes;
 use Statamic\Statamic;
 
+use function Statamic\trans as __;
+
 abstract class UserRepository implements RepositoryContract
 {
     use AllowsScopes, StoresComputedFieldCallbacks;

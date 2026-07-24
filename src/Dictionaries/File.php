@@ -6,6 +6,8 @@ use League\Flysystem\PathTraversalDetected;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\YAML;
 
+use function Statamic\trans as __;
+
 class File extends BasicDictionary
 {
     protected array $keywords = ['files', 'file', 'json', 'csv', 'yaml', 'yml'];

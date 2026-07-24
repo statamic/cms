@@ -34,6 +34,7 @@
                 multiple
                 searchable
                 taggable
+                paste-delimiter="|"
                 close-on-select
                 :model-value="rules"
                 @selected="add($event)"
@@ -54,7 +55,7 @@
                 v-model="customRule"
                 ref="customRuleInput"
                 @keydown.enter.prevent="add(customRule)"
-                @blur="add(customRule)"
+                @focusout="add(customRule)"
             />
 
             <sortable-list
@@ -76,7 +77,7 @@
                             <button
                                 type="button"
                                 class="opacity-75 hover:opacity-100 cursor-pointer"
-                                :aria-label="__('Deselect option')"
+                                :aria-label="__('Remove :label', { label: rule })"
                                 @click="remove(rule)"
                             >
                                 &times;
@@ -236,6 +237,8 @@ export default {
             if (!this.rules.includes(rule)) {
                 this.rules.push(rule);
             }
+
+            this.$nextTick(() => this.$refs.rulesSelect?.focus());
         },
 
         add(rule) {
@@ -245,7 +248,7 @@ export default {
                 this.resetState();
                 this.selectedLaravelRule = rule;
                 this.customRule = rule;
-                this.$nextTick(() => this.$refs.customRuleInput.focus());
+                this.$nextTick(() => this.$refs.customRuleInput?.focus());
             } else {
                 this.ensure(rule);
             }
@@ -258,8 +261,6 @@ export default {
             if (this.searchNotFound(rulesSelect) || this.hasUnfinishedParameters(rule)) return;
 
             this.add(rule);
-
-            this.$nextTick(() => this.$refs.searchInput.blur());
         },
 
         remove(rule) {

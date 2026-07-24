@@ -36,7 +36,7 @@ class AssetRepositoryTest extends TestCase
 
         $disk->assertExists($path = 'foo/.meta/image.jpg.yaml');
         $contents = <<<EOT
-data: {  }
+data: {}
 size: 723
 last_modified: $timestamp
 width: 30
@@ -45,7 +45,7 @@ mime_type: image/jpeg
 duration: null
 
 EOT;
-        $this->assertEquals($contents, $disk->get($path));
+        $this->assertEquals($contents, $this->normalizeYaml($disk->get($path)));
     }
 
     #[Test]

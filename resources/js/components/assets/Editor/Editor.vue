@@ -104,7 +104,7 @@
                             </div>
 
                             <!-- Video -->
-                            <video :src="asset.url" class="max-w-full max-h-full object-contain" controls v-else-if="asset.isVideo" />
+                            <video :src="asset.url" :width="asset.width" :height="asset.height" class="max-w-full max-h-full object-contain" controls v-else-if="asset.isVideo" />
 
                             <!-- Other thumbnail -->
                             <img v-else-if="asset.preview" :src="asset.preview" class="asset-thumb shadow-ui-xl max-w-full max-h-full object-contain" />
@@ -157,8 +157,8 @@
                         </ui-badge>
                     </div>
                     <div class="flex items-center space-x-3 rtl:space-x-reverse">
-                        <ui-button icon="chevron-left" @click="navigateToPreviousAsset" v-tooltip="__('Previous Asset')" />
-                        <ui-button icon="chevron-right" @click="navigateToNextAsset" v-tooltip="__('Next Asset')" />
+                        <ui-button v-if="showNavigation" icon="chevron-left" @click="navigateToPreviousAsset" v-tooltip="__('Previous Asset')" />
+                        <ui-button v-if="showNavigation" icon="chevron-right" @click="navigateToNextAsset" v-tooltip="__('Next Asset')" />
                         <ui-button variant="primary" icon="save" @click="saveAndClose" v-if="!readOnly" :text="__('Save')" />
                     </div>
                 </div>
@@ -236,6 +236,10 @@ export default {
             required: true,
         },
         showToolbar: {
+            type: Boolean,
+            default: true,
+        },
+        showNavigation: {
             type: Boolean,
             default: true,
         },
@@ -459,6 +463,7 @@ export default {
                     this.saving = false;
                     this.clearErrors();
                     this.$nextTick(() => this.$refs.container.clearDirtyState());
+                    Statamic.$events.$emit('asset.saved', this.asset);
                 })
                 .catch((e) => {
                     this.saving = false;

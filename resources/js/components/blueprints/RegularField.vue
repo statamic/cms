@@ -42,6 +42,7 @@
                             :overrides="field.config_overrides || []"
                             :suggestable-condition-fields="suggestableConditionFields"
                             :is-inside-set="isInsideSet"
+                            :show-save-only-at-top-level="true"
                             @committed="settingsUpdated"
                             @closed="editorClosed"
                         />

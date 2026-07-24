@@ -8,6 +8,7 @@ use Statamic\Contracts\Data\Augmented;
 use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Contracts\Forms\SubmissionQueryBuilder;
+use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Data\ContainsData;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Events\FormBlueprintFound;
@@ -26,9 +27,10 @@ use Statamic\Forms\Exceptions\BlueprintUndefinedException;
 use Statamic\Forms\Exporters\Exporter;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Form implements Arrayable, Augmentable, FormContract
+class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContract
 {
     use ContainsData, FluentlyGetsAndSets, HasAugmentedInstance;
 
@@ -446,5 +448,28 @@ class Form implements Arrayable, Augmentable, FormContract
     public function exporter(string $handle): ?Exporter
     {
         return $this->exporters()->get($handle);
+    }
+
+    public function getQueryableValue(string $field)
+    {
+        if (in_array($method = Str::camel($field), $this->queryableMethods())) {
+            return $this->{$method}();
+        }
+
+        $value = $this->get($field);
+
+        if (! $field = $this->blueprint()->field($field)) {
+            return $value;
+        }
+
+        return $field->fieldtype()->toQueryableValue($value);
+    }
+
+    private function queryableMethods(): array
+    {
+        return [
+            'actionUrl', 'apiUrl', 'blueprint', 'dateFormat', 'editUrl', 'fields',
+            'handle', 'honeypot', 'path', 'submissions', 'title',
+        ];
     }
 }

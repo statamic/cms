@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Statamic\Contracts\Auth\TwoFactor\TwoFactorAuthenticationProvider;
 
+use function Statamic\trans as __;
+
 class TwoFactorChallengeRequest extends FormRequest
 {
     /**
@@ -135,7 +137,7 @@ class TwoFactorChallengeRequest extends FormRequest
         return $this->remember;
     }
 
-    public function sendFailedTwoFactorChallengeResponse()
+    public function sendFailedTwoFactorChallengeResponse(?string $redirectUrl = null)
     {
         [$key, $message] = $this->filled('recovery_code')
             ? ['recovery_code', __('statamic::validation.invalid_two_factor_recovery_code')]
@@ -147,6 +149,8 @@ class TwoFactorChallengeRequest extends FormRequest
             ]);
         }
 
-        return redirect()->route('statamic.cp.two-factor-challenge')->withErrors([$key => $message]);
+        $redirect = $redirectUrl ?? route('statamic.cp.two-factor-challenge');
+
+        return redirect($redirect)->withErrors([$key => $message]);
     }
 }

@@ -38,7 +38,6 @@ class StoreTest extends TestCase
         // Check the value of the property to make sure the property was set with
         // the slash, and that ->directory() isn't just appending it.
         $property = (new \ReflectionClass($this->store))->getProperty('directory');
-        $property->setAccessible(true);
         $this->assertEquals('/path/to/directory/', $property->getValue($this->store));
     }
 

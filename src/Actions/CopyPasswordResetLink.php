@@ -6,6 +6,8 @@ use Exception;
 use Statamic\Auth\Passwords\PasswordReset;
 use Statamic\Contracts\Auth\User as UserContract;
 
+use function Statamic\trans as __;
+
 class CopyPasswordResetLink extends Action
 {
     protected $confirm = false;

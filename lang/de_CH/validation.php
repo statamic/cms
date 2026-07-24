@@ -131,6 +131,7 @@ return [
     'date_fieldtype_time_required' => 'Eine Zeitangabe ist erforderlich.',
     'duplicate_field_handle' => 'Ein Feld mit dem Handle «:handle» existiert bereits.',
     'duplicate_uri' => 'Doppelte URI: :value.',
+    'elevated_session_resend_code_unavailable' => 'Die Option «Code erneut senden» ist nur für die Methode mit Bestätigungscode verfügbar.',
     'elevated_session_verification_code' => 'Der Authentifizierungscode ist falsch.',
     'email_available' => 'Eine Benutzer:in mit dieser E-Mail-Adresse existiert bereits.',
     'fieldset_imported_recursively' => 'Fieldset :handle wird rekursiv importiert.',

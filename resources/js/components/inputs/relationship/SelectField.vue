@@ -7,10 +7,11 @@
             :max-selections="maxSelections"
             :model-value="items.map((item) => item.id)"
             :multiple
-            :options
+            :options="comboboxOptions"
             :placeholder="__(config.placeholder) || __('Choose...')"
             :read-only="readOnly"
             :taggable="isTaggable"
+            :close-on-select="isTaggable"
             option-label="title"
             option-value="id"
             @update:modelValue="itemsSelected"
@@ -27,7 +28,7 @@
                 <div v-text="noOptionsText" />
             </template>
             <template #selected-option>
-                <span v-if="items.length === 1" v-text="items[0].title"></span>
+                <span v-if="items.length === 1" v-text="items[0].title" class="truncate"></span>
             </template>
             <template #selected-options>
                 <!-- We don't want to display the selected options here. The RelationshipInput component does that for us. -->
@@ -93,6 +94,14 @@ export default {
 	    cacheKey() {
 			return JSON.stringify({ ...this.parameters, url: this.url });
 	    },
+
+        comboboxOptions() {
+            // Combobox resolves the selected label from this list, so a selected item missing
+            // from it (e.g. a just-created term) would otherwise display as its raw id.
+            const missing = this.items.filter((item) => !this.options.some((option) => option.id === item.id));
+
+            return [...this.options, ...missing];
+        },
 
         noOptionsText() {
             return this.typeahead && !this.requested ? __('Start typing to search.') : __('No options to choose from.');

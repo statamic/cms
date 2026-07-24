@@ -17,7 +17,7 @@ defineProps([
 </script>
 
 <template>
-    <Head :title="taxonomyTitle" />
+    <Head :title="[__(taxonomyTitle), __('Taxonomies')]" />
 
     <header class="py-8 pt-16 text-center">
         <h1 class="text-[25px] font-medium antialiased flex justify-center items-center gap-2">

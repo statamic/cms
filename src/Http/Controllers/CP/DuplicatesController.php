@@ -9,6 +9,8 @@ use Statamic\Facades\File;
 use Statamic\Facades\Stache;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class DuplicatesController extends CpController
 {
     public function index()

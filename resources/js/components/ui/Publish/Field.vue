@@ -2,9 +2,10 @@
 import { computed, useTemplateRef, watch, ref, inject } from 'vue';
 import { injectContainerContext } from './Container.vue';
 import { injectFieldsContext } from './FieldsProvider.vue';
+import { useUiDirection } from '@/composables/ui-direction';
 import {
+    Avatar,
     Field,
-    Icon,
     Label,
 } from '@ui';
 import FieldActions from '@/components/field-actions/FieldActions.vue';
@@ -33,7 +34,7 @@ const {
     desyncField,
     isTrackingOriginValues,
     originValues: containerOriginValues,
-    asConfig,
+    asConfig: containerAsConfig,
     errors: containerErrors,
     readOnly: containerReadOnly,
     setFieldPreviewValue,
@@ -42,14 +43,22 @@ const {
     setFieldMeta,
     hiddenFields,
     setHiddenField,
+    fieldLocks,
+    focusField,
+    blurField,
     container,
-    direction,
+    direction: contentDirection,
 } = injectContainerContext();
 const {
     fieldPathPrefix: injectedFieldPathPrefix,
     metaPathPrefix: injectedMetaPathPrefix,
     readOnly: fieldsProviderReadOnly,
+    asConfig: fieldsAsConfig,
 } = injectFieldsContext();
+
+const { direction } = useUiDirection();
+
+const asConfig = computed(() => fieldsAsConfig.value ?? containerAsConfig.value ?? false);
 const fieldPathPrefix = computed(() => props.fieldPathPrefix || injectedFieldPathPrefix.value);
 const metaPathPrefix = computed(() => props.metaPathPrefix || injectedMetaPathPrefix.value);
 const handle = props.config.handle;
@@ -112,11 +121,14 @@ watch(
 );
 
 function focused() {
-    // todo
+    if (fieldPathPrefix.value) return;
+    focusField(handle);
 }
 
-function blurred() {
-    // todo
+function blurred(event) {
+    if (fieldPathPrefix.value) return;
+    if (event?.currentTarget?.contains(event.relatedTarget)) return;
+    blurField(handle);
 }
 
 const values = computed(() => {
@@ -145,10 +157,13 @@ const shouldShowField = computed(() => {
 
 const shouldShowLabelText = computed(() => !props.config.hide_display);
 
+// Whether the label renders anything visible. When it doesn't, we avoid rendering
+// the field header entirely (so it doesn't reserve space) and instead attach a
+// screen-reader-only label to the control below.
 const shouldShowLabel = computed(
     () =>
         shouldShowLabelText.value || // Need to see the text
-        props.config.hide_display || // Need label for accessibility (visually hidden)
+        isRequired.value || // Need to see the required asterisk
         isLocked.value || // Need to see the avatar
         isSyncable.value, // Need to see the icon
 );
@@ -170,7 +185,8 @@ const isReadOnly = computed(() => {
     return isLocked.value || props.config.visibility === 'read_only' || false;
 });
 
-const isLocked = computed(() => false); // todo
+const lockedBy = computed(() => fieldLocks.value[handle] ?? null);
+const isLocked = computed(() => lockedBy.value !== null && lockedBy.value.id !== Statamic.user.id);
 
 const isSyncable = computed(() => {
     // Only top-level fields can be synced.
@@ -182,13 +198,14 @@ const isSyncable = computed(() => {
 
 const isSynced = computed(() => isSyncable.value && !localizedFields.value.includes(fullPath.value));
 const isNested = computed(() => fullPath.value.includes('.'));
+const rootFieldPath = computed(() => isNested.value ? fullPath.value.split('.')[0] : fullPath.value);
 
 function sync() {
-    syncField(fullPath.value);
+    syncField(rootFieldPath.value);
 }
 
 function desync() {
-    desyncField(fullPath.value);
+    desyncField(rootFieldPath.value);
 }
 
 const fieldtypeComponentProps = computed(() => ({
@@ -224,6 +241,7 @@ const fieldtypeComponentEvents = computed(() => ({
             v-show="shouldShowField"
             :class="`${config.type}-fieldtype`"
             :id="fieldId"
+            :dir="direction"
             :instructions="config.instructions"
             :instructions-below="config.instructions_position === 'below'"
             :required="isRequired"
@@ -234,7 +252,16 @@ const fieldtypeComponentEvents = computed(() => ({
             v-bind="$attrs"
         >
             <template #label v-if="shouldShowLabel">
-                <Label :for="fieldId" :required="isRequired">
+                <Label :for="fieldId" :required="isRequired" class="relative">
+                    <Transition name="lock-avatar-pop" mode="out-in">
+                        <Avatar
+                            v-if="isLocked"
+                            :key="`lock-avatar-${handle}-${lockedBy?.id}`"
+                            :user="lockedBy"
+                            class="inline-flex mx-1 -start-8 -top-0.5 absolute rounded-full size-6 text-3xs"
+                            v-tooltip="lockedBy.name"
+                        />
+                    </Transition>
                     <template v-if="shouldShowLabelText">
                         <span v-tooltip="config.handle">
                             {{ __(config.display) }}
@@ -250,10 +277,11 @@ const fieldtypeComponentEvents = computed(() => ({
             <template #actions v-if="shouldShowFieldActions">
                 <FieldActions :actions="fieldActions" />
             </template>
+            <label v-if="!shouldShowLabel && config.hide_display" :for="fieldId" class="sr-only">{{ __(config.display) }}</label>
             <div class="text-xs text-red-600" v-if="!fieldtypeComponentExists && fieldtypeComponent !== 'spacer-fieldtype'">
                 Component <code v-text="fieldtypeComponent"></code> does not exist.
             </div>
-            <div :dir="direction" v-if="fieldtypeComponentExists">
+            <div v-if="fieldtypeComponentExists" @focusin="focused" @focusout="blurred" :class="{ 'pointer-events-none select-none': isLocked }">
                 <Component
                     ref="fieldtype"
                     :is="fieldtypeComponent"
@@ -264,3 +292,16 @@ const fieldtypeComponentEvents = computed(() => ({
         </Field>
     </slot>
 </template>
+
+<style scoped>
+.lock-avatar-pop-enter-active,
+.lock-avatar-pop-leave-active {
+    transition: opacity 120ms ease, transform 120ms ease;
+}
+
+.lock-avatar-pop-enter-from,
+.lock-avatar-pop-leave-to {
+    opacity: 0;
+    transform: translateX(-5px) scale(0.85);
+}
+</style>

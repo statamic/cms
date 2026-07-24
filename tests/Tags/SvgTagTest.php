@@ -115,6 +115,19 @@ SVG);
     }
 
     #[Test]
+    public function it_sanitizes_css_in_style_tags()
+    {
+        File::put(resource_path('css-inject.svg'), '<svg xmlns="http://www.w3.org/2000/svg"><style>@import url("https://evil.com/track.css"); .cls-1 { fill: #333; }</style><rect class="cls-1"/></svg>');
+
+        $result = $this->tag('{{ svg src="css-inject" }}');
+
+        $this->assertStringNotContainsString('@import', $result);
+        $this->assertStringNotContainsString('evil.com', $result);
+        $this->assertStringContainsString('.cls-1', $result);
+        $this->assertStringContainsString('fill:', $result);
+    }
+
+    #[Test]
     public function fails_gracefully_when_src_is_empty()
     {
         $output = $this->tag('{{ svg :src="icon" }}', [

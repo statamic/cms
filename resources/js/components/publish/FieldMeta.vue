@@ -60,12 +60,18 @@ export default {
                 value: this.value,
             };
 
-            this.$axios.post(cp_url('fields/field-meta'), params).then((response) => {
-                this.meta = response.data.meta;
-                this.value = response.data.value;
-                this.loading = false;
-                this.$emit('loaded');
-            });
+            this.$axios
+                .post(cp_url('fields/field-meta'), params)
+                .then((response) => {
+                    this.meta = response.data.meta;
+                    this.value = response.data.value;
+                    this.loading = false;
+                    this.$emit('loaded');
+                })
+                .catch((e) => {
+                    this.loading = false;
+                    this.$toast.error(e.response?.data?.message || __('Something went wrong'));
+                });
         },
 
         updateMeta(value) {

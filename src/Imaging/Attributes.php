@@ -55,6 +55,15 @@ class Attributes
 
         [$width, $height] = $size;
 
+        if (function_exists('exif_read_data')) {
+            $exif = @exif_read_data($fullPath);
+            $orientation = $exif['Orientation'] ?? 1;
+
+            if (in_array($orientation, [5, 6, 7, 8])) {
+                [$width, $height] = [$height, $width];
+            }
+        }
+
         return compact('width', 'height');
     }
 

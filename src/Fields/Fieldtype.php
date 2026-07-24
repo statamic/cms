@@ -22,6 +22,7 @@ abstract class Fieldtype implements Arrayable
 
     protected static $title;
     protected static $binding = 'fieldtypes';
+    protected static $preloadable = null;
 
     protected $field;
     protected $localizable = true;
@@ -330,6 +331,11 @@ abstract class Fieldtype implements Arrayable
         return $this->preProcess($data);
     }
 
+    public function migrateConfig(array $values): array
+    {
+        return $values;
+    }
+
     public function preProcessIndex($data)
     {
         return $data;
@@ -337,11 +343,17 @@ abstract class Fieldtype implements Arrayable
 
     public function view()
     {
-        $default = 'statamic::forms.fields.'.$this->handle();
+        $language = config('statamic.templates.language', 'antlers');
+        $handle = $this->handle();
 
-        return view()->exists($default)
-            ? $default
-            : 'statamic::forms.fields.default';
+        $views = [
+            "statamic::forms.fields.{$handle}",
+            "statamic::forms.{$language}.fields.{$handle}",
+            'statamic::forms.fields.default',
+            "statamic::forms.{$language}.fields.default",
+        ];
+
+        return collect($views)->first(fn ($view) => view()->exists($view));
     }
 
     public function config(?string $key = null, $fallback = null)

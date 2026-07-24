@@ -8,6 +8,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Facades\Lang;
 use Rebing\GraphQL\Support\Field as GqlField;
 use Statamic\Contracts\Forms\Form;
+use Statamic\Facades\Field as FieldFacade;
 use Statamic\Facades\GraphQL;
 use Statamic\Rules\Handle;
 use Statamic\Support\Arr;
@@ -15,6 +16,9 @@ use Statamic\Support\Str;
 
 use function Statamic\trans as __;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class Field implements Arrayable
 {
     protected $handle;
@@ -177,7 +181,7 @@ class Field implements Arrayable
         return collect($this->rules()[$this->handle])->contains('required');
     }
 
-    private function hasSometimesRule()
+    public function hasSometimesRule()
     {
         return collect($this->rules()[$this->handle])->contains('sometimes');
     }
@@ -297,7 +301,24 @@ class Field implements Arrayable
 
     public function defaultValue()
     {
+        if ($this->hasComputedDefault()) {
+            return FieldFacade::resolveComputedDefault(Str::chopStart($this->config['default'], 'computed:'));
+        }
+
         return $this->config['default'] ?? $this->fieldtype()->defaultValue();
+    }
+
+    public function hasComputedDefault(): bool
+    {
+        if (! isset($this->config['default'])) {
+            return false;
+        }
+
+        if (! is_string($this->config['default'])) {
+            return false;
+        }
+
+        return Str::startsWith($this->config['default'], 'computed:');
     }
 
     public function validationValue()

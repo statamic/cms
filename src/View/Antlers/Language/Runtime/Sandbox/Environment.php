@@ -1194,8 +1194,14 @@ class Environment
             $leftVal = $leftVal->value();
         }
 
-        if ($leftVal != null) {
-            return $leftVal;
+        if ($group->strict) {
+            if ($leftVal !== null) {
+                return $leftVal;
+            }
+        } else {
+            if ($leftVal != null) {
+                return $leftVal;
+            }
         }
 
         return $this->getValue($group->right);

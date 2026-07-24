@@ -67,4 +67,11 @@ class UserPolicy
     {
         return $this->edit($authed, $user);
     }
+
+    public function impersonate($authed, $user)
+    {
+        $authed = User::fromUser($authed);
+
+        return $authed->hasPermission('impersonate users');
+    }
 }

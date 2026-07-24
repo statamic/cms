@@ -163,7 +163,10 @@ class URL
      */
     public function removeSiteUrl(?string $url): string
     {
-        return self::tidy(preg_replace('#^'.Config::getSiteUrl().'#', '/', $url));
+        $url = URL::makeAbsolute($url);
+        $url = Str::removeLeft($url, Site::current()->absoluteUrl());
+
+        return self::tidy($url);
     }
 
     /**
@@ -171,6 +174,9 @@ class URL
      */
     public function makeRelative(?string $url): string
     {
+        // Normalize duplicate leading slashes before parsing to avoid protocol-relative URL interpretation.
+        $url = preg_replace('#^/+#', '/', (string) $url);
+
         $parsed = parse_url($url);
 
         $url = $parsed['path'] ?? '/';
@@ -468,6 +474,13 @@ class URL
     private function getRequestRootUrl(): string
     {
         $rootUrl = url()->to('/');
+
+        // When the request hits the front controller directly (e.g. /index.php),
+        // Laravel's root URL ends with the script name. Strip it so the site's
+        // absolute URL stays invariant to whether the request came through it.
+        if ($script = pathinfo(request()->getScriptName())['basename'] ?? null) {
+            $rootUrl = Str::removeRight($rootUrl, '/'.$script);
+        }
 
         return self::tidy($rootUrl);
     }

@@ -7,6 +7,8 @@ use Statamic\Auth\Passwords\PasswordReset;
 use Statamic\Http\Middleware\CP\HandleInertiaRequests;
 use Statamic\Http\Middleware\CP\RedirectIfAuthorized;
 
+use function Statamic\trans as __;
+
 class ActivateAccountController extends ResetPasswordController
 {
     public function __construct()
