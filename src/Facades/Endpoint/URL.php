@@ -174,6 +174,9 @@ class URL
      */
     public function makeRelative(?string $url): string
     {
+        // Normalize duplicate leading slashes before parsing to avoid protocol-relative URL interpretation.
+        $url = preg_replace('#^/+#', '/', (string) $url);
+
         $parsed = parse_url($url);
 
         $url = $parsed['path'] ?? '/';

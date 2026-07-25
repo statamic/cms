@@ -39,7 +39,9 @@ class InstallSsg extends Command
     public function handle()
     {
         if (Composer::isInstalled('statamic/ssg')) {
-            return error('The Static Site Generator package is already installed.');
+            error('The Static Site Generator package is already installed.');
+
+            return;
         }
 
         spin(

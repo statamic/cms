@@ -21,6 +21,7 @@ class NavBuilder
     protected $withHidden = false;
     protected $itemsWithChildrenClosures = [];
     protected $sections = [];
+    protected $sectionsEmptiedByAuthorization = [];
     protected $sectionsOriginalItemIds = [];
     protected $sectionsManipulations = [];
     protected $sectionsOrder = [];
@@ -154,10 +155,33 @@ class NavBuilder
      */
     protected function authorizeItems()
     {
+        $sectionsBefore = $this->sectionsWithItems($this->items);
+
         $this->items = $this->filterAuthorizedNavItems($this->items);
         $this->itemsKeyedById = null;
 
+        $this->sectionsEmptiedByAuthorization = $sectionsBefore
+            ->diff($this->sectionsWithItems($this->items))
+            ->values()
+            ->all();
+
         return $this;
+    }
+
+    /**
+     * Get the sections that currently contain at least one top-level item.
+     *
+     * @param  mixed  $items
+     * @return \Illuminate\Support\Collection
+     */
+    protected function sectionsWithItems($items)
+    {
+        return collect($items)
+            ->reject(fn ($item) => $item->isChild())
+            ->map(fn ($item) => $item->section())
+            ->filter()
+            ->unique()
+            ->values();
     }
 
     /**
@@ -906,7 +930,7 @@ class NavBuilder
         // Collect and order each section's items...
         $built = collect($sections)
             ->reject(fn ($items, $section) => $this->withHidden ? false : Arr::get($manipulations, "{$section}.action") === '@hide')
-            ->filter(fn ($items) => $items || $this->withHidden)
+            ->filter(fn ($items, $section) => $items || ($this->withHidden && ! in_array($section, $this->sectionsEmptiedByAuthorization)))
             ->map(function ($items, $section) {
                 return collect($this->sectionsWithReorderedItems)->contains($section)
                     ? collect($items)->sortBy(fn ($item) => $item->order())->values()

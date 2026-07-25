@@ -1,0 +1,53 @@
+name: PHPStan
+
+on:
+  pull_request:
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  phpstan:
+    name: Analyze
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@9426d40962ed5378910ee2e21d5f8c6fcbf2dd96 # v47.0.6
+        with:
+          files: |
+            src/**
+            composer.json
+            phpstan.dist.neon
+            .phpstan/**
+            .github/workflows/phpstan.yml
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+        if: steps.changed-files.outputs.any_modified == 'true'
+        with:
+          php-version: 8.5
+          coverage: none
+
+      - name: Install dependencies
+        uses: nick-invision/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4.0.0
+        if: steps.changed-files.outputs.any_modified == 'true'
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer update --prefer-stable --prefer-dist --no-interaction
+
+      - name: Run PHPStan
+        if: steps.changed-files.outputs.any_modified == 'true'
+        run: vendor/bin/phpstan analyse --memory-limit=2G

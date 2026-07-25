@@ -188,13 +188,21 @@ export default {
                 let start = value.start;
                 let end = value.end;
 
+                if (!start.offset && !start.timeZone) {
+                    start = toZoned(start, this.displayTimezone);
+                }
+
+                if (!end.offset && !end.timeZone) {
+                    end = toZoned(end, this.displayTimezone);
+                }
+
                 if (!this.hasTime) {
                     end.set({ hour: 23, minute: 59, second: 59 });
                 }
 
                 return this.update({
-                    start: toZoned(start, 'UTC').toAbsoluteString(),
-                    end: toZoned(end, 'UTC').toAbsoluteString(),
+                    start: toTimeZone(start, 'UTC').toAbsoluteString(),
+                    end: toTimeZone(end, 'UTC').toAbsoluteString(),
                 });
             }
 

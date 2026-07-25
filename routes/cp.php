@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Statamic\Facades\OAuth;
 use Statamic\Facades\TwoFactor;
 use Statamic\Facades\Utility;
 use Statamic\Http\Controllers\CP\Addons\AddonsController;
@@ -23,6 +24,7 @@ use Statamic\Http\Controllers\CP\Auth\ExtendSessionController;
 use Statamic\Http\Controllers\CP\Auth\ForgotPasswordController;
 use Statamic\Http\Controllers\CP\Auth\ImpersonationController;
 use Statamic\Http\Controllers\CP\Auth\LoginController;
+use Statamic\Http\Controllers\CP\Auth\OAuthController;
 use Statamic\Http\Controllers\CP\Auth\PasskeyController;
 use Statamic\Http\Controllers\CP\Auth\PasskeyLoginController;
 use Statamic\Http\Controllers\CP\Auth\ResetPasswordController;
@@ -55,7 +57,6 @@ use Statamic\Http\Controllers\CP\Fields\FieldsController;
 use Statamic\Http\Controllers\CP\Fields\FieldsetController;
 use Statamic\Http\Controllers\CP\Fields\FieldtypesController;
 use Statamic\Http\Controllers\CP\Fields\MetaController;
-use Statamic\Http\Controllers\CP\Fieldtypes\DictionaryFieldtypeController;
 use Statamic\Http\Controllers\CP\Fieldtypes\FilesFieldtypeController;
 use Statamic\Http\Controllers\CP\Fieldtypes\IconFieldtypeController;
 use Statamic\Http\Controllers\CP\Fieldtypes\MarkdownFieldtypeController;
@@ -113,6 +114,7 @@ use Statamic\Http\Controllers\CP\Users\UserGroupsController;
 use Statamic\Http\Controllers\CP\Users\UsersController;
 use Statamic\Http\Controllers\CP\Users\UserWizardController;
 use Statamic\Http\Controllers\CP\Utilities\UtilitiesController;
+use Statamic\Http\Controllers\OAuthController as FrontendOAuthController;
 use Statamic\Http\Controllers\User\TwoFactorRecoveryCodesController;
 use Statamic\Http\Middleware\CP\RedirectIfTwoFactorSetupIncomplete;
 use Statamic\Http\Middleware\CP\RequireElevatedSession;
@@ -382,7 +384,6 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::get('relationship/filters', [RelationshipFieldtypeController::class, 'filters'])->name('relationship.filters');
         Route::post('markdown', [MarkdownFieldtypeController::class, 'preview'])->name('markdown.preview');
         Route::post('files/upload', [FilesFieldtypeController::class, 'upload'])->name('files.upload');
-        Route::get('dictionaries/{dictionary}', DictionaryFieldtypeController::class)->name('dictionary-fieldtype');
         Route::post('icons', IconFieldtypeController::class)->name('icon-fieldtype');
         Route::post('replicator/set', ReplicatorSetController::class)->name('replicator-fieldtype.set');
     });
@@ -435,6 +436,11 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::post('/', [PasskeyController::class, 'store'])->name('passkeys.store');
         Route::delete('{id}', [PasskeyController::class, 'destroy'])->name('passkeys.destroy');
     });
+
+    if (OAuth::enabled()) {
+        Route::get('oauth', [OAuthController::class, 'index'])->name('oauth');
+        Route::delete('oauth/{provider}/disconnect', [FrontendOAuthController::class, 'disconnect'])->middleware(RequireElevatedSession::class)->name('oauth.disconnect');
+    }
 
     Route::get('themes', [ThemeController::class, 'index']);
     Route::get('themes/refresh', [ThemeController::class, 'refresh']);

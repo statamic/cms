@@ -89,7 +89,17 @@ export default {
         },
 
         normalizedOptions() {
-            return this.normalizeInputOptions(this.options);
+            const options = this.normalizeInputOptions(this.options);
+
+            // Multi-select renders its selections from the slot below, so the options can be left alone.
+            if (this.multiple) return options;
+
+            // In single mode the Combobox resolves the selected label from these options, and the fetched
+            // options may not include the stored value (API-backed dictionaries only return a page of
+            // results), so merge the selected options in or it would display the raw value instead.
+            const values = new Set(options.map((option) => option.value));
+
+            return [...options, ...this.selectedOptions.filter((option) => !values.has(option.value))];
         },
 
         selectedOptions() {

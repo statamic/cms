@@ -6,6 +6,9 @@ use Illuminate\Support\Facades\Validator as LaravelValidator;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class Validator
 {
     protected $fields;

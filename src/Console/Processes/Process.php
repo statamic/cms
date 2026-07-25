@@ -12,6 +12,9 @@ use Statamic\Support\Str;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process as SymfonyProcess;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class Process
 {
     const CACHE_EXPIRY_MINUTES = 10;

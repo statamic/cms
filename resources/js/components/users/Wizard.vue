@@ -235,7 +235,7 @@ export default {
     data() {
         return {
             user: {
-                super: this.canCreateSupers,
+                super: false,
                 roles: [],
                 groups: [],
             },

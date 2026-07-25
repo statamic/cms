@@ -899,8 +899,8 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
     public function makeLocalization($site)
     {
         $localization = Facades\Entry::make()
-            ->collection($this->collection)
             ->origin($this)
+            ->collection($this->collection)
             ->locale($site)
             ->published($this->published)
             ->slug($this->slug());
@@ -983,7 +983,12 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
     public function routeData()
     {
-        $data = $this->values()->merge([
+        // This uses the `getValues(true)` method instead of values()
+        // This is so we can wrap computed fields in Value so we
+        // can delay their execution. If the computed value
+        // triggers the routeData() method, we will end
+        // up in an infinite loop that is not fun.
+        $data = $this->getValues(true)->merge([
             'id' => $this->id(),
             'slug' => $this->slug(),
             'published' => $this->published(),

@@ -201,6 +201,11 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Cont
         return optional($this->entry())->slug();
     }
 
+    public function origin()
+    {
+        return optional($this->entry())->origin();
+    }
+
     public function uri()
     {
         if ($this->url) {

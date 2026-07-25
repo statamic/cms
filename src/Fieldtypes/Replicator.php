@@ -75,6 +75,7 @@ class Replicator extends Fieldtype
                         'display' => __('Add Set Label'),
                         'instructions' => __('statamic::fieldtypes.replicator.config.button_label'),
                         'type' => 'text',
+                        'placeholder' => __('Add Set'),
                         'default' => '',
                         'width' => 50,
                     ],

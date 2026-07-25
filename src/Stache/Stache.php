@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Concurrency;
 use Statamic\Events\StacheCleared;
 use Statamic\Events\StacheWarmed;
 use Statamic\Extensions\FileStore;
+use Statamic\Facades\Blink;
 use Statamic\Facades\File;
 use Statamic\Stache\Stores\Store;
 use Statamic\Support\Str;
@@ -110,6 +111,9 @@ class Stache
         $this->duplicates()->clear();
 
         $this->cacheStore()->forget('stache::timing');
+
+        Blink::forget('collection-structure-tree*');
+        Blink::forget('structure-*');
 
         StacheCleared::dispatch();
 

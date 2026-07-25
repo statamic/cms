@@ -1020,4 +1020,27 @@ class DefaultInvalidatorTest extends TestCase
 
         $this->assertNull($invalidator->refresh($entry));
     }
+
+    #[Test]
+    public function it_calls_the_custom_invalidate_method_when_background_recache_is_enabled()
+    {
+        config()->set('statamic.static_caching.background_recache', true);
+
+        $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
+            $cacher->shouldReceive('refreshUrls')->never();
+            $cacher->shouldReceive('invalidateUrls')->once()->with([
+                'http://localhost/custom',
+            ]);
+        });
+
+        $invalidator = new class($cacher, []) extends Invalidator
+        {
+            public function invalidate($item)
+            {
+                $this->cacher->invalidateUrls(['http://localhost/custom']);
+            }
+        };
+
+        $invalidator->refresh(new \stdClass);
+    }
 }

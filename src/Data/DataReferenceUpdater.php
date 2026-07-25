@@ -7,6 +7,9 @@ use Statamic\Fieldtypes\UpdatesReferences;
 use Statamic\Git\Subscriber as GitSubscriber;
 use Statamic\Support\Arr;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 abstract class DataReferenceUpdater
 {
     /**

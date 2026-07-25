@@ -45,12 +45,18 @@ const props = defineProps([
                 :heading="createLabel"
                 :description="__('statamic::messages.collection_next_steps_create_entry_description')"
             >
-                <a
-                    v-for="blueprint in blueprints"
-                    :href="blueprint.createEntryUrl"
-                    class="text-blue-600 text-sm rtl:ml-2 ltr:mr-2"
-                    v-text="blueprint.title"
-                />
+                <div class="flex flex-wrap gap-2 mt-2">
+                    <ui-badge
+                        v-for="blueprint in blueprints"
+                        :key="blueprint.createEntryUrl"
+                        :href="blueprint.createEntryUrl"
+                        :text="blueprint.title"
+                        color="blue"
+                        size="sm"
+                        pill
+                        class="dark:bg-gray-925"
+                    />
+                </div>
             </ui-empty-state-item>
 
             <ui-empty-state-item

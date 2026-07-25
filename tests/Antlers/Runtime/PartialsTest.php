@@ -82,4 +82,17 @@ ANTLERS;
 
         $this->renderString($template, [], true);
     }
+
+    public function test_assignments_in_earlier_partials_do_not_blank_a_later_partials_slot()
+    {
+        $template = <<<'EOT'
+{{? $foo = 'bar' ?}}{{ partial:filter /}}{{ partial:card }}KEEPME{{ /partial:card }}
+EOT;
+
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('filter', "{{? \$values = 'v' ?}}FILTER");
+        $this->viewShouldReturnRaw('card', "{{ trans key='hi' }}<slot>{{ slot }}</slot>");
+
+        $this->assertSame('FILTERhi<slot>KEEPME</slot>', $this->renderString($template, [], true));
+    }
 }

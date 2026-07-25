@@ -97,6 +97,7 @@ class AppServiceProvider extends ServiceProvider
         ], 'statamic-scaffolding');
 
         $this->app['redirect']->macro('cpRoute', function ($route, $parameters = []) {
+            /** @var \Illuminate\Routing\Redirector $this */
             return $this->to(cp_route($route, $parameters));
         });
 
@@ -178,6 +179,7 @@ class AppServiceProvider extends ServiceProvider
                 ->setRepository('collection', \Statamic\Contracts\Entries\CollectionRepository::class)
                 ->setRepository('taxonomy', \Statamic\Contracts\Taxonomies\TaxonomyRepository::class)
                 ->setRepository('global', \Statamic\Contracts\Globals\GlobalRepository::class)
+                ->setRepository('globals', \Statamic\Contracts\Globals\GlobalVariablesRepository::class)
                 ->setRepository('asset', \Statamic\Contracts\Assets\AssetRepository::class)
                 ->setRepository('user', \Statamic\Contracts\Auth\UserRepository::class);
         });
@@ -366,6 +368,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Session::macro('elevate', function () {
+            /** @var \Illuminate\Session\Store $this */
             $this->put('statamic_elevated_session', now()->timestamp);
             $this->forget('statamic_elevated_session_verification_code');
         });

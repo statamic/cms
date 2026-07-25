@@ -347,7 +347,7 @@ class EntriesController extends CpController
                 ];
             })->values()->all(),
             'revisionsEnabled' => $collection->revisionsEnabled(),
-            'canManagePublishState' => User::current()->can('publish '.$collection->handle().' entries'),
+            'canManagePublishState' => User::current()->can('publish', [EntryContract::class, $collection]),
             'previewTargets' => $collection->previewTargets()->all(),
             'autosaveInterval' => $collection->autosaveInterval(),
             'parent' => $collection->hasStructure() ? $request->parent : null,

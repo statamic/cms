@@ -31,6 +31,10 @@ class RelationshipFieldtypeTest extends TestCase
         $this->collection = Collection::make('test')->save();
 
         app('statamic.scopes')[StartsWithC::handle()] = StartsWithC::class;
+
+        // Register one scope class under an alias that differs from its handle, so the
+        // test can prove the configured alias is what reaches the scope.
+        app('statamic.scopes')['fruit_filter'] = AliasedScope::class;
     }
 
     #[Test]
@@ -62,6 +66,34 @@ class RelationshipFieldtypeTest extends TestCase
         $this->assertContains('Cherry', $titles);
         $this->assertNotContains('Apple', $titles);
         $this->assertNotContains('Banana', $titles);
+    }
+
+    #[Test]
+    public function it_passes_the_active_scope_handles_to_aliased_scopes()
+    {
+        Entry::make()->collection('test')->slug('apple')->data(['title' => 'Apple'])->save();
+        Entry::make()->collection('test')->slug('carrot')->data(['title' => 'Carrot'])->save();
+        Entry::make()->collection('test')->slug('cherry')->data(['title' => 'Cherry'])->save();
+        Entry::make()->collection('test')->slug('banana')->data(['title' => 'Banana'])->save();
+
+        $this->setTestRoles(['test' => ['access cp', 'view test entries']]);
+        $user = User::make()->assignRole('test')->save();
+
+        $config = base64_encode(json_encode([
+            'type' => 'entries',
+            'collections' => ['test'],
+            'query_scopes' => ['fruit_filter'],
+        ]));
+
+        $response = $this
+            ->actingAs($user)
+            ->get("/cp/fieldtypes/relationship?config={$config}")
+            ->assertOk();
+
+        $titles = collect($response->json('data'))->pluck('title')->all();
+
+        // The scope only filters when its alias is present in the queryScopes param.
+        $this->assertEqualsCanonicalizing(['Carrot', 'Cherry'], $titles);
     }
 
     #[Test]
@@ -714,5 +746,15 @@ class StartsWithC extends Scope
     public function apply($query, $params)
     {
         $query->where('title', 'like', 'C%');
+    }
+}
+
+class AliasedScope extends Scope
+{
+    public function apply($query, $params)
+    {
+        if (in_array('fruit_filter', $params['queryScopes'] ?? [])) {
+            $query->where('title', 'like', 'C%');
+        }
     }
 }

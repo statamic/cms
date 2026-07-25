@@ -126,6 +126,11 @@ class JavascriptComposer
     protected function translations(): array
     {
         $translations = app('translator')->toJson();
+
+        if (app('translator')->locale() === 'en') {
+            return $translations;
+        }
+
         $fallbackTranslations = tap(app('translator'))->setLocale(app('translator')->getFallback())->toJson();
 
         return array_merge($fallbackTranslations, $translations);

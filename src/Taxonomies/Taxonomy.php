@@ -465,7 +465,7 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, ContainsQ
 
     public function createLabel()
     {
-        $key = "statamic::messages.{$this->handle()}_taxonomy_create_term";
+        $key = "messages.{$this->handle()}_taxonomy_create_term";
 
         $translation = __($key);
 

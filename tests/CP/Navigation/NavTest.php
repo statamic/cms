@@ -188,6 +188,21 @@ class NavTest extends TestCase
     }
 
     #[Test]
+    public function it_doesnt_build_unauthorized_sections_when_building_with_hidden()
+    {
+        $this->setTestRoles(['limited' => ['access cp']]);
+        $this->actingAs(tap(User::make()->assignRole('limited'))->save());
+
+        Nav::fields('Fields Management')->can('manage fields');
+        Nav::users('Users Management')->can('manage users');
+
+        $nav = Nav::build(true, true)->pluck('items', 'display');
+
+        $this->assertFalse($nav->has('Fields'));
+        $this->assertFalse($nav->has('Users'));
+    }
+
+    #[Test]
     public function it_can_create_a_nav_item_with_children()
     {
         $this->actingAs(tap(User::make()->makeSuper())->save());

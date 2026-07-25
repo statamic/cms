@@ -9,7 +9,7 @@ function log() {
     if (logged) return;
     console.warn(
         "Vue HMR is not enabled in this Control Panel build.\n",
-        'See https://v6.statamic.dev/addons/vite-tooling for more information.'
+        'See https://statamic.dev/addons/vite-tooling for more information.'
     );
     logged = true;
 }

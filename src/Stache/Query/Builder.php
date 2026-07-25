@@ -143,7 +143,7 @@ abstract class Builder extends BaseBuilder
 
     protected function getItems($keys)
     {
-        return $this->store->getItems($keys);
+        return $this->store->getItems($keys)->filter()->values();
     }
 
     protected function filterWhereBasic($values, $where)

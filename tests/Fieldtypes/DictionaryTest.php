@@ -6,14 +6,19 @@ use Facades\Statamic\Fields\FieldtypeRepository;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Dictionaries\Countries;
+use Statamic\Dictionaries\Dictionary;
 use Statamic\Dictionaries\Item;
 use Statamic\Exceptions\DictionaryNotFoundException;
 use Statamic\Exceptions\UndefinedDictionaryException;
+use Statamic\Facades\User;
 use Statamic\Fields\Field;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class DictionaryTest extends TestCase
 {
+    use PreventSavingStacheItemsToDisk;
+
     #[Test]
     #[DataProvider('dictionaryConfigProvider')]
     public function it_gets_the_dictionary($dictionaryConfig, $expectedConfig)
@@ -91,7 +96,7 @@ class DictionaryTest extends TestCase
         $preload = $fieldtype->preload();
 
         $this->assertArraySubset([
-            'url' => 'http://localhost/cp/fieldtypes/dictionaries/countries',
+            'url' => 'http://localhost/!/fieldtypes/dictionaries/countries',
             'selectedOptions' => [
                 ['value' => 'USA', 'label' => '🇺🇸 United States', 'invalid' => false],
                 ['value' => 'AUS', 'label' => '🇦🇺 Australia', 'invalid' => false],
@@ -101,6 +106,64 @@ class DictionaryTest extends TestCase
                 ['value' => 'GBR', 'label' => '🇬🇧 United Kingdom', 'invalid' => false],
             ],
         ], $preload);
+    }
+
+    #[Test]
+    public function a_guest_can_request_options_from_a_dictionary_that_allows_public_access()
+    {
+        $this
+            ->getJson($this->optionsUrl('countries'))
+            ->assertOk()
+            ->assertJsonStructure(['data' => [['key', 'value']]]);
+    }
+
+    #[Test]
+    public function a_guest_cannot_request_options_from_a_dictionary_that_does_not_allow_public_access()
+    {
+        RestrictedDictionary::register();
+
+        $this
+            ->getJson($this->optionsUrl('restricted'))
+            ->assertForbidden();
+    }
+
+    #[Test]
+    public function a_cp_user_can_request_options_from_a_dictionary_that_does_not_allow_public_access()
+    {
+        RestrictedDictionary::register();
+
+        $this
+            ->actingAs(User::make()->makeSuper())
+            ->getJson($this->optionsUrl('restricted'))
+            ->assertOk()
+            ->assertJsonStructure(['data' => [['key', 'value']]]);
+    }
+
+    #[Test]
+    public function a_request_with_a_missing_dictionary_is_rejected()
+    {
+        $config = base64_encode(json_encode(['type' => 'dictionary']));
+
+        $this
+            ->getJson(route('statamic.dictionary-fieldtype', 'countries').'?config='.$config)
+            ->assertNotFound();
+    }
+
+    #[Test]
+    public function a_request_with_an_unknown_dictionary_is_rejected()
+    {
+        $config = base64_encode(json_encode(['type' => 'dictionary', 'dictionary' => 'not_a_real_dictionary']));
+
+        $this
+            ->getJson(route('statamic.dictionary-fieldtype', 'countries').'?config='.$config)
+            ->assertNotFound();
+    }
+
+    private function optionsUrl(string $dictionary): string
+    {
+        $config = base64_encode(json_encode(['type' => 'dictionary', 'dictionary' => $dictionary]));
+
+        return route('statamic.dictionary-fieldtype', $dictionary).'?config='.$config;
     }
 
     #[Test]
@@ -278,5 +341,20 @@ class DictionaryTest extends TestCase
                 'USA' => '🇺🇸 United States',
             ],
         ], $extraRenderableFieldData);
+    }
+}
+
+class RestrictedDictionary extends Dictionary
+{
+    protected static $handle = 'restricted';
+
+    public function options(?string $search = null): array
+    {
+        return ['foo' => 'Foo', 'bar' => 'Bar'];
+    }
+
+    public function get(string $key): ?Item
+    {
+        return new Item($key, $this->options()[$key], []);
     }
 }

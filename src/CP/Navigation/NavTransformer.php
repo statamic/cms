@@ -8,6 +8,9 @@ use Statamic\Facades\URL;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class NavTransformer
 {
     protected $coreNav;

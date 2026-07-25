@@ -220,6 +220,29 @@ class RateLimitingTest extends TestCase
     }
 
     #[Test]
+    public function dictionary_fieldtype_endpoint_is_rate_limited()
+    {
+        $config = base64_encode(json_encode(['type' => 'dictionary', 'dictionary' => 'countries']));
+        $url = route('statamic.dictionary-fieldtype', 'countries').'?config='.$config;
+
+        collect(range(1, 60))->each(fn () => $this->getJson($url)->assertNotRateLimited());
+        $this->getJson($url)->assertRateLimited();
+    }
+
+    #[Test]
+    public function dictionary_fieldtype_rate_limiter_can_be_overridden()
+    {
+        RateLimiter::for('statamic.dictionaries', fn ($request) => Limit::perMinute(2)->by($request->ip()));
+
+        $config = base64_encode(json_encode(['type' => 'dictionary', 'dictionary' => 'countries']));
+        $url = route('statamic.dictionary-fieldtype', 'countries').'?config='.$config;
+
+        $this->getJson($url)->assertNotRateLimited();
+        $this->getJson($url)->assertNotRateLimited();
+        $this->getJson($url)->assertRateLimited();
+    }
+
+    #[Test]
     public function passkeys_rate_limiter_can_be_overridden()
     {
         RateLimiter::for('statamic.passkeys', fn ($request) => Limit::perMinute(2)->by($request->ip()));

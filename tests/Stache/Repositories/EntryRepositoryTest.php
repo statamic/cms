@@ -72,6 +72,21 @@ class EntryRepositoryTest extends TestCase
     }
 
     #[Test]
+    public function it_ignores_keys_in_indexes_that_no_longer_have_corresponding_files()
+    {
+        $store = $this->stache->store('entries')->store('alphabetical');
+
+        $store->index('title')->load();
+        (function () {
+            $this->paths = $this->paths()->forget('alphabetical-bravo');
+        })->call($store);
+
+        $entries = $this->repo->query()->whereIn('title', ['Alpha', 'Bravo', 'Zulu'])->get();
+
+        $this->assertEquals(['alphabetical-alpha', 'alphabetical-zulu'], $entries->map->id()->all());
+    }
+
+    #[Test]
     public function it_gets_entries_from_a_collection()
     {
         tap($this->repo->whereCollection('alphabetical'), function ($entries) {

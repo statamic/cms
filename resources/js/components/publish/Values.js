@@ -6,11 +6,12 @@ function data_delete(obj, path) {
     var parts = path.split('.');
     while (parts.length - 1) {
         var key = parts.shift();
+        if (obj === null || typeof obj !== 'object') return;
         var shouldBeArray = parts.length ? new RegExp('^[0-9]+$').test(parts[0]) : false;
         if (!(key in obj)) obj[key] = shouldBeArray ? [] : {};
         obj = obj[key];
     }
-    delete obj[parts[0]];
+    if (obj !== null && typeof obj === 'object') delete obj[parts[0]];
 }
 
 export default class Values {
@@ -82,7 +83,7 @@ export default class Values {
 
     missingValue(dottedKey) {
         var properties = Array.isArray(dottedKey) ? dottedKey : dottedKey.split('.');
-        var value = properties.reduce((prev, curr) => prev && prev[curr], clone(this.values));
+        var value = properties.reduce((prev, curr) => (prev == null ? undefined : prev[curr]), clone(this.values));
 
         return value === undefined;
     }

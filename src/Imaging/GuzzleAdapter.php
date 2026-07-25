@@ -11,7 +11,9 @@ use GuzzleHttp\Psr7\UriResolver;
 use League\Flysystem\Config;
 use League\Flysystem\FileAttributes;
 use League\Flysystem\FilesystemAdapter;
+use League\Flysystem\UnableToListContents;
 use League\Flysystem\UnableToReadFile;
+use League\Flysystem\UnableToRetrieveMetadata;
 use Statamic\Exceptions\InvalidRemoteUrlException;
 
 class GuzzleAdapter implements FilesystemAdapter
@@ -101,22 +103,22 @@ class GuzzleAdapter implements FilesystemAdapter
 
     public function mimeType(string $path): FileAttributes
     {
-        //
+        throw UnableToRetrieveMetadata::mimeType($path, 'Not supported by '.static::class);
     }
 
     public function lastModified(string $path): FileAttributes
     {
-        //
+        throw UnableToRetrieveMetadata::lastModified($path, 'Not supported by '.static::class);
     }
 
     public function fileSize(string $path): FileAttributes
     {
-        //
+        throw UnableToRetrieveMetadata::fileSize($path, 'Not supported by '.static::class);
     }
 
     public function listContents(string $path, bool $deep): iterable
     {
-        //
+        throw UnableToListContents::atLocation($path, $deep, new \RuntimeException('Not supported by '.static::class));
     }
 
     public function move(string $source, string $destination, Config $config): void
@@ -146,7 +148,7 @@ class GuzzleAdapter implements FilesystemAdapter
 
     public function visibility(string $path): FileAttributes
     {
-        //
+        throw UnableToRetrieveMetadata::visibility($path, 'Not supported by '.static::class);
     }
 
     /*
