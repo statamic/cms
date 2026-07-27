@@ -12,14 +12,14 @@ class DeleteTemporaryFileUploads
         $lottery = [2, 100];
 
         if (random_int(1, $lottery[1]) <= $lottery[0]) {
-            $this->deleteFileUploads();
-            $this->deleteFormUploads();
+            $this->deleteFileUploadsOverAnHourOld();
+            $this->deleteFormUploadsOverAWeekOld();
         }
 
         return $next($request);
     }
 
-    private function deleteFileUploads(): void
+    private function deleteFileUploadsOverAnHourOld(): void
     {
         $disk = File::disk(config('statamic.system.file_uploads_disk', 'local'));
         $directory = config('statamic.system.file_uploads_path', 'statamic/file-uploads');
@@ -37,7 +37,7 @@ class DeleteTemporaryFileUploads
         $disk->deleteEmptySubfolders($directory);
     }
 
-    private function deleteFormUploads(): void
+    private function deleteFormUploadsOverAWeekOld(): void
     {
         $disk = File::disk(config('statamic.system.file_uploads_disk', 'local'));
         $directory = config('statamic.forms.file_uploads_path', 'statamic/form-uploads');
