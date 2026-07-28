@@ -1,5 +1,71 @@
 # Release Notes
 
+## 6.26.0 (2026-07-21)
+
+### What's new
+- Add support for custom link types [#15004](https://github.com/statamic/cms/issues/15004) by @duncanmcclean
+- Add support for public dictionaries [#15029](https://github.com/statamic/cms/issues/15029) by @duncanmcclean
+
+### What's fixed
+- Harmonize label customization config text [#15034](https://github.com/statamic/cms/issues/15034) by @duncanmcclean
+- Fix Custom Invalidator background recache [#15031](https://github.com/statamic/cms/issues/15031) by @marcorieser
+- Fix grid min_rows breaking CP navigation [#15033](https://github.com/statamic/cms/issues/15033) by @duncanmcclean
+- Do not hide the primary save button for mobile [#15041](https://github.com/statamic/cms/issues/15041) by @jaygeorge
+- Show an entry selector when filtering by an entries field [#15043](https://github.com/statamic/cms/issues/15043) by @duncanmcclean
+- Fix customized listing columns being overridden by default preferences [#15040](https://github.com/statamic/cms/issues/15040) by @mynetx
+- Fix origin() on null when fetching nav tree with origin_id field [#15042](https://github.com/statamic/cms/issues/15042) by @duncanmcclean
+- Pass field prefix to custom conditions [#15044](https://github.com/statamic/cms/issues/15044) by @duncanmcclean
+- Ensure application cache honours static_cache store [#15045](https://github.com/statamic/cms/issues/15045) by @ryanmitchell
+- German translations [#15036](https://github.com/statamic/cms/issues/15036) by @helloDanuk
+- Bump the github-actions group with 2 updates [#15032](https://github.com/statamic/cms/issues/15032) by @dependabot
+- Bump axios from 1.16.0 to 1.18.1 [#15038](https://github.com/statamic/cms/issues/15038) by @dependabot
+
+
+
+## 6.25.0 (2026-07-17)
+
+### What's new
+- Allow taxonomy create button customization [#14997](https://github.com/statamic/cms/issues/14997) by @efc
+- Make Files fieldtype temporary upload storage configurable [#14733](https://github.com/statamic/cms/issues/14733) by @duncanmcclean
+- Support Glide 4 and Intervention Image 4 [#15019](https://github.com/statamic/cms/issues/15019) by @joshuablum
+
+### What's fixed
+- Hide permissions covered by a broader permission [#14970](https://github.com/statamic/cms/issues/14970) by @jasonvarga
+- Prevent vertical focus clipping on listing pages [#14978](https://github.com/statamic/cms/issues/14978) by @jaygeorge
+- Fix Control Panel not scrolling to top on navigation [#14965](https://github.com/statamic/cms/issues/14965) by @duncanmcclean
+- Fix video thumbnail generation logging an error on success [#14971](https://github.com/statamic/cms/issues/14971) by @lazerg
+- Preserve unregistered permissions when saving a role [#14975](https://github.com/statamic/cms/issues/14975) by @jasonvarga
+- Use form handle in key [#14974](https://github.com/statamic/cms/issues/14974) by @edalzell
+- Improve recursive behavior when using route data in computed values [#11855](https://github.com/statamic/cms/issues/11855) by @JohnathonKoster
+- Fix global variables being lost when migrated alongside addon update scripts [#14963](https://github.com/statamic/cms/issues/14963) by @duncanmcclean
+- Fix filter badge showing the term title in the wrong site [#14973](https://github.com/statamic/cms/issues/14973) by @lazerg
+- Pass the configured index name to the search insert job [#14949](https://github.com/statamic/cms/issues/14949) by @ajnsn
+- Hide unauthorized sections in nav [#14990](https://github.com/statamic/cms/issues/14990) by @lazerg
+- Fix English CP locale showing fallback locale translations [#15000](https://github.com/statamic/cms/issues/15000) by @jasonvarga
+- Fix performance issue when duplicating entries in large collections [#14995](https://github.com/statamic/cms/issues/14995) by @duncanmcclean
+- Update site:clear config stubs to match current defaults [#14991](https://github.com/statamic/cms/issues/14991) by @lazerg
+- Fix error on out-of-range pagination page number [#14981](https://github.com/statamic/cms/issues/14981) by @mynetx
+- Fix malformed URLs with duplicate leading slashes resolving to home page [#14982](https://github.com/statamic/cms/issues/14982) by @lazerg
+- Throw parser error when mixing pipe and shorthand modifier syntax [#14892](https://github.com/statamic/cms/issues/14892) by @marcorieser
+- Fix link fieldtype ignoring sometimes validator [#14985](https://github.com/statamic/cms/issues/14985) by @lazerg
+- Fix range date fields ignoring the configured timezone on save [#15001](https://github.com/statamic/cms/issues/15001) by @lazerg
+- Fix stache:refresh flattening structured collection trees [#15003](https://github.com/statamic/cms/issues/15003) by @mynetx
+- Fix save crash after deleting a Bard set containing a hidden field [#15008](https://github.com/statamic/cms/issues/15008) by @werner-freytag
+- Update link to permission docs [#15012](https://github.com/statamic/cms/issues/15012) by @duncanmcclean
+- Fix nested Bard data loss when reordering sets [#15013](https://github.com/statamic/cms/issues/15013) by @mynetx
+- Fix toasts breaking when sessions are serialized as JSON [#15015](https://github.com/statamic/cms/issues/15015) by @mynetx
+- Fix runtime assignment in a partial blanking a later partial's slot [#15014](https://github.com/statamic/cms/issues/15014) by @mynetx
+- Fix Replicator field labels hidden when nested in Grid [#14987](https://github.com/statamic/cms/issues/14987) by @lazerg
+- Fix blueprint assignment of entries using custom entry class [#15017](https://github.com/statamic/cms/issues/15017) by @daun
+- Fix session-expiry modals being dismissible and silently re-extending sessions [#15020](https://github.com/statamic/cms/issues/15020) by @jasonvarga
+- Fix validation rules being lost when saving without pressing enter [#15022](https://github.com/statamic/cms/issues/15022) by @mynetx
+- Fix search:update ignoring the index argument when index names are customized [#15024](https://github.com/statamic/cms/issues/15024) by @edalzell
+- Fix errors rendering blueprints & publish components when logged out [#15027](https://github.com/statamic/cms/issues/15027) by @duncanmcclean
+- Fix control panel text direction on RTL sites [#15023](https://github.com/statamic/cms/issues/15023) by @jasonvarga
+- Bump ws from 8.20.0 to 8.21.1 [#15011](https://github.com/statamic/cms/issues/15011) by @dependabot
+
+
+
 ## 6.24.2 (2026-07-08)
 
 ### What's fixed

@@ -116,7 +116,7 @@
                         </floating-menu>
 
                         <div class="bard-error" v-if="initError" v-text="initError"></div>
-                        <editor-content :editor="editor" :id="fieldId" />
+                        <editor-content :editor="editor" :id="fieldId" :dir="contentDirection" />
                     </div>
                     <div
                         class="bard-footer-toolbar"
@@ -177,6 +177,7 @@ import 'highlight.js/styles/github.css';
 import importTiptap from '@/util/tiptap.js';
 import { computed } from 'vue';
 import { data_get } from "@/bootstrap/globals.js";
+import { useContentDirection } from '@/composables/content-direction';
 
 const lowlight = createLowlight(common);
 let tiptap = null;
@@ -196,6 +197,12 @@ export default {
 
     provide: {
         isInBardField: true,
+    },
+
+    setup() {
+        const { direction: contentDirection } = useContentDirection();
+
+        return { contentDirection };
     },
 
     data() {

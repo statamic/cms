@@ -41,6 +41,11 @@ abstract class Index
         return $this->name;
     }
 
+    public function handle()
+    {
+        return $this->handle;
+    }
+
     public static function resolveNameUsing(?Closure $callback)
     {
         static::$nameCallback = $callback;

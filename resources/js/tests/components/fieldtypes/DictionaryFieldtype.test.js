@@ -14,7 +14,7 @@ function mountFieldtype({ value, maxItems, selectedOptions, fetchedOptions, shal
             handle: 'country',
             value,
             config: { max_items: maxItems },
-            meta: { url: '/cp/fieldtypes/dictionaries/partial_countries', selectedOptions },
+            meta: { url: '/!/fieldtypes/dictionaries/partial_countries', selectedOptions },
         },
         global: {
             mocks: {

@@ -251,6 +251,29 @@ class APITest extends TestCase
     }
 
     #[Test]
+    public function it_gets_origin_id_in_nav_route_when_an_item_is_not_linked_to_an_entry()
+    {
+        Facades\Config::set('statamic.api.resources.navs', true);
+
+        Facades\Collection::make('pages')->save();
+
+        $nav = Facades\Nav::make('footer');
+        $nav->makeTree('en', [
+            ['entry' => 'one'],
+            ['title' => 'Balki Bartokomous', 'url' => 'https://balki.com'],
+        ])->save();
+        $nav->save();
+
+        Facades\Entry::make()->collection('pages')->id('one')->slug('one')->published(true)->save();
+
+        $this
+            ->get('/api/navs/footer/tree?fields=title,origin_id')
+            ->assertSuccessful()
+            ->assertJsonPath('data.1.page.title', 'Balki Bartokomous')
+            ->assertJsonPath('data.1.page.origin_id', null);
+    }
+
+    #[Test]
     public function it_filters_by_taxonomy_terms()
     {
         Facades\Config::set('statamic.api.resources.collections.test', [

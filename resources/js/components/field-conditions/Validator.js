@@ -264,6 +264,7 @@ export default class {
             values: this.values,
             root: this.rootValues,
             fieldPath: this.currentFieldPath,
+            prefix: this.field.prefix,
             ...this.extraPayload,
         });
 
