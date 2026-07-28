@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\File;
 use Mockery;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Events\UrlInvalidated;
 use Statamic\StaticCaching\Cachers\AbstractCacher;
 use Statamic\StaticCaching\Cachers\ApplicationCacher;
 use Statamic\StaticCaching\Cachers\FileCacher;
@@ -122,10 +123,9 @@ class CacherConcurrencyTest extends TestCase
             'two' => '/two',
             'three' => '/three',
         ]);
-        $cache->shouldReceive('forever')->withArgs(fn ($key) => $key === $urlsKey);
+        // One lock, one map write for the whole batch - not one per URL.
+        $cache->shouldReceive('forever')->once()->withArgs(fn ($key) => $key === $urlsKey);
 
-        // The whole point of the fix: one lock covers the entire batch, not
-        // one acquisition per URL.
         $cache->shouldReceive('lock')
             ->once()
             ->withArgs(fn ($key) => $key === $lockKey)
@@ -245,6 +245,94 @@ class CacherConcurrencyTest extends TestCase
         $this->assertFileDoesNotExist($cacher->getFilePath('http://localhost/about'));
     }
 
+    #[Test]
+    public function urls_lock_is_released_before_invalidation_cleanup_and_events_run()
+    {
+        $cache = app(Repository::class);
+        $writer = Mockery::spy(Writer::class);
+
+        $cacher = new FileCacher($writer, $cache, [
+            'base_url' => 'http://example.com',
+            'path' => $this->cachePath(),
+            'locale' => 'en',
+        ]);
+
+        $cache->forever('static-cache:'.md5('http://example.com').'.urls', ['one' => '/one']);
+
+        $lockKey = 'static-cache:'.md5('http://example.com').'.urls:lock';
+
+        // If invalidation still held the urls lock while dispatching events,
+        // this listener wouldn't be able to acquire it - and neither would a
+        // visitor request trying to cache a page during a long cleanup.
+        $lockWasFree = null;
+        Event::listen(UrlInvalidated::class, function () use ($cache, $lockKey, &$lockWasFree) {
+            $lock = $cache->lock($lockKey, 10);
+
+            if ($lockWasFree = $lock->get()) {
+                $lock->release();
+            }
+        });
+
+        $cacher->invalidateUrls(['/one']);
+
+        $this->assertTrue($lockWasFree, 'The urls lock should be released before cleanup and events run.');
+        $this->assertSame([], $cacher->getUrls('http://example.com')->all());
+    }
+
+    #[Test]
+    public function file_cacher_flush_wipes_the_urls_map_before_deleting_files()
+    {
+        $cache = app(Repository::class);
+        $urlsKey = 'static-cache:'.md5('http://example.com').'.urls';
+
+        $cache->forever('static-cache:domains', ['http://example.com']);
+        $cache->forever($urlsKey, ['one' => '/one']);
+
+        // If files were deleted first, a request re-rendering one of them could
+        // write a fresh file whose map entry is then wiped - an orphan. Map
+        // first means the worst case is a map entry without a file, which the
+        // next request heals by re-caching under the same key.
+        $writer = Mockery::mock(Writer::class);
+        $writer->shouldReceive('flush')->once()->andReturnUsing(function () use ($cache, $urlsKey) {
+            $this->assertNull($cache->get($urlsKey), 'The urls map should be wiped before files are deleted.');
+        });
+
+        $cacher = new FileCacher($writer, $cache, [
+            'base_url' => 'http://example.com',
+            'path' => $this->cachePath(),
+            'locale' => 'en',
+        ]);
+
+        $cacher->flush();
+
+        $this->assertNull($cache->get($urlsKey));
+        $this->assertNull($cache->get('static-cache:domains'));
+    }
+
+    #[Test]
+    public function application_cacher_flush_wipes_the_urls_map_before_forgetting_responses()
+    {
+        $urlsKey = 'static-cache:'.md5('http://example.com').'.urls';
+
+        $store = Mockery::mock(\Illuminate\Contracts\Cache\LockProvider::class, \Illuminate\Contracts\Cache\Store::class);
+        $lock = Mockery::mock(\Illuminate\Contracts\Cache\Lock::class);
+        $lock->shouldReceive('block')->andReturnUsing(fn ($seconds, $callback) => $callback());
+
+        $cache = Mockery::mock(\Illuminate\Contracts\Cache\Repository::class);
+        $cache->shouldReceive('getStore')->andReturn($store);
+        $cache->shouldReceive('lock')->andReturn($lock);
+        $cache->shouldReceive('get')->with('static-cache:domains', [])->andReturn(['http://example.com']);
+        $cache->shouldReceive('get')->with($urlsKey, [])->andReturn(['one' => '/one']);
+
+        $cache->shouldReceive('forget')->with($urlsKey)->once()->ordered();
+        $cache->shouldReceive('forget')->with('static-cache:domains')->once()->ordered();
+        $cache->shouldReceive('forget')->with('static-cache:responses:one')->once()->ordered();
+
+        $cacher = new ApplicationCacher($cache, ['base_url' => 'http://example.com']);
+
+        $cacher->flush();
+    }
+
     private function cachePath()
     {
         return storage_path('framework/testing/static-cache-concurrency');
@@ -265,10 +353,8 @@ class CacherConcurrencyTest extends TestCase
     }
 
     /**
-     * A minimal concrete AbstractCacher whose invalidateUrl() mirrors the real
-     * FileCacher/ApplicationCacher pattern of looking up matching urls map
-     * entries and calling forgetUrl() per match, so tests can exercise the
-     * real nested-lock path (invalidateUrls() -> invalidateUrl() -> forgetUrl()).
+     * A minimal concrete AbstractCacher with no driver-side storage, so tests
+     * can exercise the shared two-phase invalidation path directly.
      */
     private function concreteCacher($cache, $config = [])
     {
@@ -286,15 +372,8 @@ class CacherConcurrencyTest extends TestCase
             {
             }
 
-            public function invalidateUrl($url, $domain = null)
+            protected function cleanupInvalidatedUrls($invalidated, $paths, $domain)
             {
-                $domain = $domain ?? $this->getBaseUrl();
-
-                $this->getUrls($domain)
-                    ->filter(fn ($value) => $value === $url)
-                    ->each(function ($value, $key) use ($domain) {
-                        $this->forgetUrl($key, $domain);
-                    });
             }
         };
     }

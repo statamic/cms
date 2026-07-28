@@ -9,6 +9,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Statamic\Console\Commands\StaticWarmJob;
+use Statamic\Events\UrlInvalidated;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\StaticCaching\Cacher;
@@ -39,10 +40,10 @@ abstract class AbstractCacher implements Cacher
     private $config;
 
     /**
-     * Lock keys currently held by this instance, so nested withLock() calls for
-     * the same key (e.g. forgetUrl() called from within a batched invalidateUrls()
-     * loop that already holds the domain's urls lock) don't try to re-acquire a
-     * lock against themselves and deadlock until LOCK_WAIT expires.
+     * Lock keys currently held by this instance, so nested withLock() calls
+     * for the same key (e.g. forgetUrl() called from code already holding the
+     * domain's urls lock) don't try to re-acquire a lock against themselves
+     * and deadlock until LOCK_WAIT expires.
      *
      * @var array<string, bool>
      */
@@ -180,7 +181,9 @@ abstract class AbstractCacher implements Cacher
     public function flushUrls()
     {
         $this->getDomains()->each(function ($domain) {
-            $this->cache->forget($this->getUrlsCacheKey($domain));
+            $this->withLock($this->getUrlsLockKey($domain), function () use ($domain) {
+                $this->cache->forget($this->getUrlsCacheKey($domain));
+            });
         });
 
         $this->cache->forget($this->normalizeKey('domains'));
@@ -266,31 +269,37 @@ abstract class AbstractCacher implements Cacher
     }
 
     /**
+     * Invalidate a URL.
+     *
+     * @param  string  $url
+     * @param  string|null  $domain
+     * @return void
+     */
+    public function invalidateUrl($url, $domain = null)
+    {
+        // For CLI contexts where Site::current()->url() may return the wrong
+        // domain causing getUrls() to look under the wrong cache key.
+        if ($domain === null) {
+            [$url, $domain] = $this->getPathAndDomain($url);
+        }
+
+        $this->invalidatePathsForDomain([$url], $domain);
+    }
+
+    /**
      * Invalidate a wildcard URL.
      *
      * @param  string  $wildcard
      */
     protected function invalidateWildcardUrl($wildcard)
     {
-        // Remove the asterisk
-        $wildcard = substr($wildcard, 0, -1);
+        [, $domain] = $this->getPathAndDomain(substr($wildcard, 0, -1));
 
-        [$wildcard, $domain] = $this->getPathAndDomain($wildcard);
-
-        $this->getUrls($domain)->filter(function ($url) use ($wildcard) {
-            return Str::startsWith($url, $wildcard);
-        })->each(function ($url) use ($domain) {
-            $this->invalidateUrl($url, $domain);
-        });
+        $this->invalidatePathsForDomain([$wildcard], $domain);
     }
 
     /**
      * Invalidate multiple URLs.
-     *
-     * Grouped by domain and run under a single lock per domain, so a large
-     * batch doesn't acquire and release the domain's urls lock once per URL
-     * (each acquisition able to block up to LOCK_WAIT) and instead holds it
-     * once for the whole domain's batch.
      *
      * @param  array  $urls
      * @return void
@@ -299,18 +308,73 @@ abstract class AbstractCacher implements Cacher
     {
         collect($urls)
             ->groupBy(fn ($url) => $this->resolveDomainForInvalidation($url))
-            ->each(function ($urlsForDomain, $domain) {
-                $this->withLock($this->getUrlsLockKey($domain), function () use ($urlsForDomain) {
-                    $urlsForDomain->each(function ($url) {
-                        if (Str::contains($url, '*')) {
-                            $this->invalidateWildcardUrl($url);
-                        } else {
-                            $this->invalidateUrl(...$this->getPathAndDomain($url));
-                        }
-                    });
-                });
-            });
+            ->each(fn ($urlsForDomain, $domain) => $this->invalidatePathsForDomain($urlsForDomain->all(), $domain));
     }
+
+    /**
+     * Invalidate a set of paths (and trailing-* wildcards) for a single domain.
+     *
+     * Two phases, so the urls lock is only held for map bookkeeping and never
+     * for driver cleanup (file deletes, cache forgets) or event listeners:
+     *
+     * 1. Under the domain's urls lock: resolve which map entries match, remove
+     *    them, and persist the map in a single write.
+     * 2. After releasing the lock: driver cleanup and UrlInvalidated events.
+     *
+     * A page cached concurrently with phase two can at worst leave a map entry
+     * whose cached copy was just deleted, which is self-healing: the next
+     * request re-renders and re-caches under the same key. The reverse - a
+     * cached copy the map doesn't know about - cannot happen.
+     *
+     * @param  array  $urls
+     * @param  string|null  $domain
+     * @return void
+     */
+    protected function invalidatePathsForDomain($urls, $domain)
+    {
+        $paths = collect($urls)->map(function ($url) {
+            $wildcard = Str::contains($url, '*');
+
+            [$path] = $this->getPathAndDomain($wildcard ? substr($url, 0, -1) : $url);
+
+            return ['path' => $path, 'wildcard' => $wildcard];
+        });
+
+        $invalidated = $this->withLock($this->getUrlsLockKey($domain), function () use ($paths, $domain) {
+            $urls = $this->getUrls($domain);
+
+            $invalidated = $urls->filter(fn ($value) => $paths->contains(fn ($path) => $path['wildcard']
+                ? Str::startsWith($value, $path['path'])
+                : ($value === $path['path'] || Str::startsWith($value, $path['path'].'?'))));
+
+            if ($invalidated->isNotEmpty()) {
+                $this->cache->forever($this->getUrlsCacheKey($domain), $urls->diffKeys($invalidated)->all());
+            }
+
+            return $invalidated;
+        });
+
+        $this->cleanupInvalidatedUrls($invalidated, $paths, $domain);
+
+        $paths->each(function ($path) use ($invalidated, $domain) {
+            $path['wildcard']
+                ? $invalidated
+                    ->filter(fn ($value) => Str::startsWith($value, $path['path']))
+                    ->each(fn ($value) => UrlInvalidated::dispatch($value, $domain))
+                : UrlInvalidated::dispatch($path['path'], $domain);
+        });
+    }
+
+    /**
+     * Clean up the driver's stored copies of invalidated pages. Runs after the
+     * urls lock has been released.
+     *
+     * @param  \Illuminate\Support\Collection  $invalidated  The removed entries, keyed by their urls map key.
+     * @param  \Illuminate\Support\Collection  $paths  The ['path' => string, 'wildcard' => bool] entries the invalidation was requested with.
+     * @param  string|null  $domain
+     * @return void
+     */
+    abstract protected function cleanupInvalidatedUrls($invalidated, $paths, $domain);
 
     /**
      * Resolve the domain an invalidation entry belongs to, the same way

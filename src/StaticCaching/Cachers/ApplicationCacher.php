@@ -6,7 +6,6 @@ use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Events\ResponsePrepared;
 use Illuminate\Support\Facades\Event;
-use Statamic\Events\UrlInvalidated;
 use Statamic\StaticCaching\Page;
 
 class ApplicationCacher extends AbstractCacher
@@ -106,38 +105,34 @@ class ApplicationCacher extends AbstractCacher
      */
     public function flush()
     {
-        $this->getDomains()->each(function ($domain) {
-            $this->getUrls($domain)->keys()->each(function ($key) {
-                $this->cache->forget($this->normalizeKey('responses:'.$key));
+        // Capture each domain's response keys and wipe its map under the urls
+        // lock, so a page cached mid-flush can't end up as a stored response
+        // the map doesn't know about. The responses are forgotten afterwards.
+        $keys = $this->getDomains()->flatMap(function ($domain) {
+            return $this->withLock($this->getUrlsLockKey($domain), function () use ($domain) {
+                $keys = $this->getUrls($domain)->keys();
+
+                $this->cache->forget($this->getUrlsCacheKey($domain));
+
+                return $keys;
             });
         });
 
-        $this->flushUrls();
+        $this->cache->forget($this->normalizeKey('domains'));
+
+        $keys->each(fn ($key) => $this->cache->forget($this->normalizeKey('responses:'.$key)));
     }
 
     /**
-     * Invalidate a URL.
+     * Forget the stored responses for invalidated urls map entries.
      *
-     * @param  string  $url
+     * @param  \Illuminate\Support\Collection  $invalidated
+     * @param  \Illuminate\Support\Collection  $paths
      * @param  string|null  $domain
      * @return void
      */
-    public function invalidateUrl($url, $domain = null)
+    protected function cleanupInvalidatedUrls($invalidated, $paths, $domain)
     {
-        // For CLI contexts where Site::current()->url() may return the wrong
-        // domain causing getUrls() to look under the wrong cache key.
-        if ($domain === null) {
-            [$url, $domain] = $this->getPathAndDomain($url);
-        }
-
-        $this
-            ->getUrls($domain)
-            ->filter(fn ($value) => $value === $url || str_starts_with($value, $url.'?'))
-            ->each(function ($value, $key) use ($domain) {
-                $this->cache->forget($this->normalizeKey('responses:'.$key));
-                $this->forgetUrl($key, $domain);
-            });
-
-        UrlInvalidated::dispatch($url, $domain);
+        $invalidated->keys()->each(fn ($key) => $this->cache->forget($this->normalizeKey('responses:'.$key)));
     }
 }

@@ -7,7 +7,6 @@ use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\LazyCollection;
-use Statamic\Events\UrlInvalidated;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\Facades\Site;
@@ -127,38 +126,45 @@ class FileCacher extends AbstractCacher
      */
     public function flush()
     {
+        // Wipe the urls map before deleting files, so a page cached mid-flush
+        // can't end up as a file the map doesn't know about.
+        $this->flushUrls();
+
         foreach ($this->getCachePaths() as $path) {
             $this->writer->flush($path);
         }
-
-        $this->flushUrls();
     }
 
     /**
-     * Invalidate a URL.
+     * Delete the static files for invalidated urls map entries.
      *
-     * @param  string  $url
+     * @param  \Illuminate\Support\Collection  $invalidated
+     * @param  \Illuminate\Support\Collection  $paths
+     * @param  string|null  $domain
      * @return void
      */
-    public function invalidateUrl($url, $domain = null)
+    protected function cleanupInvalidatedUrls($invalidated, $paths, $domain)
     {
-        $site = optional(Site::findByUrl($domain.$url))->handle();
+        $invalidated->each(function ($value) use ($domain) {
+            $site = optional(Site::findByUrl($domain.$value))->handle();
 
-        $this
-            ->getUrls($domain)
-            ->filter(fn ($value) => $value === $url || str_starts_with($value, $url.'?'))
-            ->each(function ($value, $key) use ($site, $domain) {
-                $this->writer->delete($this->getFilePath($domain.$value, $site));
-                $this->forgetUrl($key, $domain);
+            $this->writer->delete($this->getFilePath($domain.$value, $site));
+        });
+
+        // Also delete file variants that aren't tracked in the urls map,
+        // e.g. pagination pages written alongside the base url.
+        $paths
+            ->flatMap(fn ($path) => $path['wildcard']
+                ? $invalidated->filter(fn ($value) => Str::startsWith($value, $path['path']))->values()
+                : [$path['path']])
+            ->groupBy(fn ($prefix) => optional(Site::findByUrl($domain.$prefix))->handle() ?? '')
+            ->each(function ($prefixes, $site) {
+                $this->getFiles($site === '' ? null : $site)
+                    ->filter(fn ($file) => $prefixes->contains(fn ($prefix) => str_starts_with($file, $prefix.'_')))
+                    ->each(function ($file, $path) {
+                        $this->writer->delete($path);
+                    });
             });
-
-        $this->getFiles($site)
-            ->filter(fn ($file) => str_starts_with($file, $url.'_'))
-            ->each(function ($file, $path) {
-                $this->writer->delete($path);
-            });
-
-        UrlInvalidated::dispatch($url, $domain);
     }
 
     /**
