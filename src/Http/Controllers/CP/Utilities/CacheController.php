@@ -137,7 +137,7 @@ class CacheController extends CpController
         try {
             app(Cacher::class)->invalidateUrls($urls);
         } catch (LockTimeoutException $e) {
-            return back()->withError(__('Could not invalidate URLs because the cache was locked by another process. Please try again.'));
+            return back()->withError(__('statamic::messages.cache_utility_static_cache_invalidate_urls_locked'));
         }
 
         return back()->withSuccess(__('Invalidated URLs in the Static Cache.'));
