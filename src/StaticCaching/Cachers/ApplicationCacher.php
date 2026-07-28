@@ -2,6 +2,7 @@
 
 namespace Statamic\StaticCaching\Cachers;
 
+use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Events\ResponsePrepared;
 use Illuminate\Support\Facades\Event;
@@ -38,8 +39,14 @@ class ApplicationCacher extends AbstractCacher
         // and other URL characters wouldn't work as a cache key.
         $key = $this->makeHash($url);
 
-        // Keep track of the URL and key the response content is about to be stored within.
-        $this->cacheUrl($key, ...$this->getPathAndDomain($url));
+        try {
+            // Keep track of the URL and key the response content is about to be stored within.
+            $this->cacheUrl($key, ...$this->getPathAndDomain($url));
+        } catch (LockTimeoutException $e) {
+            // The URL couldn't be recorded in the urls map, so don't store the
+            // response either. The response will just go out uncached.
+            return;
+        }
 
         $key = $this->normalizeKey('responses:'.$key);
         $value = $this->normalizeContent($content);

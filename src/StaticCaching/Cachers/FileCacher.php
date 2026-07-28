@@ -2,6 +2,7 @@
 
 namespace Statamic\StaticCaching\Cachers;
 
+use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -81,7 +82,14 @@ class FileCacher extends AbstractCacher
             return;
         }
 
-        $this->cacheUrl($this->makeHash($url), ...$this->getPathAndDomain($url));
+        try {
+            $this->cacheUrl($this->makeHash($url), ...$this->getPathAndDomain($url));
+        } catch (LockTimeoutException $e) {
+            // The URL couldn't be recorded in the urls map. Remove the written
+            // file so it isn't served while being invisible to invalidation,
+            // and let the response go out uncached.
+            $this->writer->delete($path);
+        }
     }
 
     public function preventLoggingRewriteWarning()

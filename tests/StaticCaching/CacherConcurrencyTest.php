@@ -5,13 +5,29 @@ namespace Tests\StaticCaching;
 use Illuminate\Cache\Repository;
 use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Routing\Events\ResponsePrepared;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\File;
 use Mockery;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\StaticCaching\Cachers\AbstractCacher;
+use Statamic\StaticCaching\Cachers\ApplicationCacher;
+use Statamic\StaticCaching\Cachers\FileCacher;
+use Statamic\StaticCaching\Cachers\Writer;
+use Statamic\StaticCaching\Middleware\Cache as CacheMiddleware;
+use Statamic\StaticCaching\NoCache\Session;
 use Tests\TestCase;
 
 class CacherConcurrencyTest extends TestCase
 {
+    public function tearDown(): void
+    {
+        File::deleteDirectory($this->cachePath());
+
+        parent::tearDown();
+    }
+
     #[Test]
     public function cache_url_is_blocked_while_another_process_holds_the_urls_lock_for_the_domain()
     {
@@ -152,6 +168,95 @@ class CacherConcurrencyTest extends TestCase
             'two' => '/two',
             'three' => '/three',
         ], $cache->get($urlsKey));
+    }
+
+    #[Test]
+    public function file_cacher_removes_the_written_file_when_the_urls_lock_is_contended()
+    {
+        $cache = app(Repository::class);
+        $cacher = $this->fileCacher($cache, 'http://example.com');
+
+        $lockKey = 'static-cache:'.md5('http://example.com').'.urls:lock';
+        $externalLock = $cache->lock($lockKey, 10);
+        $this->assertTrue($externalLock->get());
+
+        try {
+            $cacher->cachePage(Request::create('http://example.com/about'), '<html>hello</html>');
+        } finally {
+            $externalLock->forceRelease();
+        }
+
+        // The page couldn't be recorded in the urls map, so the written file
+        // must be removed. Otherwise it would be served forever but invisible
+        // to invalidation - the exact orphaned state the locking prevents.
+        $this->assertFileDoesNotExist($cacher->getFilePath('http://example.com/about'));
+        $this->assertNull($cache->get('static-cache:'.md5('http://example.com').'.urls'));
+    }
+
+    #[Test]
+    public function application_cacher_skips_caching_the_response_when_the_urls_lock_is_contended()
+    {
+        $cache = app(Repository::class);
+        $cacher = new ApplicationCacher($cache, ['base_url' => 'http://example.com']);
+
+        $lockKey = 'static-cache:'.md5('http://example.com').'.urls:lock';
+        $externalLock = $cache->lock($lockKey, 10);
+        $this->assertTrue($externalLock->get());
+
+        try {
+            $cacher->cachePage($request = Request::create('http://example.com/about'), '<html>hello</html>');
+        } finally {
+            $externalLock->forceRelease();
+        }
+
+        // The response listener should never have been registered, so preparing
+        // a response must not store the page either.
+        Event::dispatch(new ResponsePrepared($request, new Response('<html>hello</html>')));
+
+        $this->assertNull($cache->get('static-cache:responses:'.md5('http://example.com/about')));
+        $this->assertNull($cache->get('static-cache:'.md5('http://example.com').'.urls'));
+    }
+
+    #[Test]
+    public function middleware_serves_the_rendered_response_uncached_when_the_urls_lock_is_contended()
+    {
+        $cache = app(Repository::class);
+        $cacher = $this->fileCacher($cache, 'http://localhost');
+
+        $middleware = new CacheMiddleware($cacher, app(Session::class));
+
+        $lockKey = 'static-cache:'.md5('http://localhost').'.urls:lock';
+        $externalLock = $cache->lock($lockKey, 10);
+        $this->assertTrue($externalLock->get());
+
+        try {
+            $response = $middleware->handle(
+                Request::create('http://localhost/about'),
+                fn () => new Response('<h1>Hello</h1>')
+            );
+        } finally {
+            $externalLock->forceRelease();
+        }
+
+        // The page rendered fine and should reach the visitor, not be discarded
+        // in favor of a 503 refresh response just because it couldn't be cached.
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertStringContainsString('<h1>Hello</h1>', $response->getContent());
+        $this->assertFileDoesNotExist($cacher->getFilePath('http://localhost/about'));
+    }
+
+    private function cachePath()
+    {
+        return storage_path('framework/testing/static-cache-concurrency');
+    }
+
+    private function fileCacher($cache, $baseUrl)
+    {
+        return new FileCacher(new Writer, $cache, [
+            'base_url' => $baseUrl,
+            'path' => $this->cachePath(),
+            'locale' => 'en',
+        ]);
     }
 
     private function cacher($cache, $config = [])
