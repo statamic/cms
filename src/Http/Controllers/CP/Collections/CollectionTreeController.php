@@ -18,6 +18,8 @@ class CollectionTreeController extends CpController
 {
     public function index(Request $request, Collection $collection)
     {
+        $this->authorize('view', $collection, trans('You are not authorized to view this collection.'));
+
         $site = $request->site ?? Site::selected()->handle();
 
         $pages = (new TreeBuilder)->buildForController([

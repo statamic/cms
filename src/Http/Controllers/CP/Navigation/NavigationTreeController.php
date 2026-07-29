@@ -11,6 +11,8 @@ use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Structures\TreeBuilder;
 use Statamic\Support\Arr;
 
+use function Statamic\trans as __;
+
 class NavigationTreeController extends CpController
 {
     private $data;
@@ -21,6 +23,8 @@ class NavigationTreeController extends CpController
         $nav = Nav::find($handle);
 
         $site = $request->site ?? Site::selected()->handle();
+
+        $this->authorize('view', $nav->in($site), __('You are not authorized to view navs.'));
 
         $nav->in($site)->ensureBranchIds();
 
