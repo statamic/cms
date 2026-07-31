@@ -113,13 +113,13 @@ onMounted(() => {
                     <div :id="`actions-${page._id}`" data-pagination class="mt-8">
                         <div class="cursor-pointer flex gap-2.5" @click.prevent="inspectAction">
                             <Button
-                                v-if="page.previous_page_label"
+                                v-if="page.show_previous_button"
                                 variant="filled"
                                 icon="chevron-left"
                                 :data-editing-field="isInspectingAction ? '' : undefined"
                                 :data-editing-item="isInspectingAction ? '' : undefined"
                                 class="ps-3"
-                                :text="__(page.previous_page_label)"
+                                :text="page.previous_page_label?.length ? __(page.previous_page_label) : __('Previous Page')"
                             />
                             <Button
                                 variant="primary"

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Field, Icon, Input, TabContent, TabList, Tabs, TabTrigger } from '@ui';
+import { Button, Field, Icon, Input, TabContent, TabList, Tabs, TabTrigger } from '@ui';
 import { computed, ref, watch } from 'vue';
 import { injectBuilderContext } from '@/pages/forms/Builder.vue';
 import { __ } from '@/bootstrap/globals';
@@ -15,12 +15,22 @@ const activeTab = ref<ActionInspectorTabs>(ActionInspectorTabs.Settings);
 const isFirstPage = computed(() => pages.value.findIndex((p) => p._id === page.value._id) === 0);
 const isLastPage = computed(() => pages.value.findIndex((p) => p._id === page.value._id) === pages.value.length - 1);
 
-const title = computed(() => isLastPage.value ? __('Submit button') : __('Next Page button'));
+const title = computed(() => isLastPage.value ? __('Submit button') : __('Page Buttons'));
 const submitButtonLabel = computed(() => isLastPage.value ? __('Submit Button Label') : __('Next Button Label'));
 const submitButtonPlaceholder = computed(() => isLastPage.value ? __('Submit') : __('Next Page'));
 
 watch(() => page.value.button_label, dirty);
+watch(() => page.value.show_previous_button, dirty);
 watch(() => page.value.previous_page_label, dirty);
+
+const addPreviousButton = () => {
+    page.value.show_previous_button = true;
+};
+
+const removePreviousButton = () => {
+    page.value.show_previous_button = false;
+    page.value.previous_page_label = null;
+};
 </script>
 
 <template>
@@ -49,9 +59,27 @@ watch(() => page.value.previous_page_label, dirty);
                         <Input v-model="page.button_label" :placeholder="submitButtonPlaceholder" focus />
                     </Field>
 
-                    <Field v-if="!isFirstPage" :label="__('Previous Button Label')">
-                        <Input v-model="page.previous_page_label" :placeholder="__('Previous Page')" />
-                    </Field>
+                    <template v-if="!isFirstPage">
+                        <Button
+                            v-if="!page.show_previous_button"
+                            size="sm"
+                            :text="__('Add Previous Button')"
+                            @click="addPreviousButton"
+                        />
+
+                        <Field v-else :label="__('Previous Button Label')">
+                            <template #actions>
+                                <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    icon="trash"
+                                    :aria-label="__('Remove Previous Button')"
+                                    @click="removePreviousButton"
+                                />
+                            </template>
+                            <Input v-model="page.previous_page_label" :placeholder="__('Previous Page')" />
+                        </Field>
+                    </template>
                 </div>
             </TabContent>
         </Tabs>
