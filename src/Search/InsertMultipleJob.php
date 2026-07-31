@@ -16,6 +16,16 @@ class InsertMultipleJob implements ShouldQueue
     use Queueable;
 
     /**
+     * The number of seconds the job can run before timing out.
+     *
+     * This needs to stay a property. Queue::createObjectPayload() reads it through
+     * getAttributeValue($job, Timeout::class, 'timeout'), which - unlike maxTries
+     * and backoff - has no method_exists() fallback, so a timeout() method here
+     * would be silently ignored.
+     */
+    public ?int $timeout = null;
+
+    /**
      * Create a new job instance.
      */
     public function __construct(
@@ -25,6 +35,8 @@ class InsertMultipleJob implements ShouldQueue
     ) {
         $this->onConnection($connection = config('statamic.search.queue_connection', config('queue.default')));
         $this->onQueue(config('statamic.search.queue', config("queue.connections.{$connection}.queue")));
+
+        $this->timeout = ($timeout = config('statamic.search.queue_timeout')) === null ? null : (int) $timeout;
     }
 
     /**
