@@ -58,7 +58,7 @@ const isToggleField = (field) => ['toggle', 'revealer', 'yes_no'].includes(field
 const showValueToggle = computed(() => isToggleField(selectedField.value) && ['equals', 'not', '===', '!=='].includes(props.condition.operator));
 
 const showValueDropdown = computed(() => {
-    const optionTypes = ['button_group', 'checkboxes', 'radio', 'select', 'dropdown', 'multi_choice', 'ranking'];
+    const optionTypes = ['button_group', 'checkboxes', 'radio', 'select', 'dropdown', 'multi_choice', 'ranking', 'image_choice'];
     return optionTypes.includes(selectedField.value?.config?.type) && ['equals', 'not', '===', '!=='].includes(props.condition.operator);
 });
 
