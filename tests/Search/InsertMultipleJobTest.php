@@ -23,6 +23,7 @@ class InsertMultipleJobTest extends TestCase
     {
         return [
             'not configured' => [null, null],
+            'empty env var' => ['', null],
             'integer' => [300, 300],
             'string from env' => ['300', 300],
         ];
