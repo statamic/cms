@@ -58,7 +58,7 @@ abstract class Uploader
     {
         $stream = fopen($sourcePath, 'r');
 
-        if (config('statamic.assets.svg_sanitization_on_upload', true) && Str::endsWith($destinationPath, '.svg')) {
+        if (config('statamic.assets.svg_sanitization_on_upload', true) && Str::of($destinationPath)->lower()->endsWith('.svg')) {
             $stream = Svg::sanitize(stream_get_contents($stream));
         }
 
