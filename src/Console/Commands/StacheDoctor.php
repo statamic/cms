@@ -37,7 +37,7 @@ class StacheDoctor extends Command
         });
 
         if ($missing->isEmpty()) {
-            $this->checkLine('No unconfigured indexes.');
+            $this->components->info('No unconfigured indexes.');
             $this->output->text('Indexes are created on demand through regular site usage.');
             $this->output->text('You could consider trying again after browsing your site.');
 
@@ -73,7 +73,7 @@ class StacheDoctor extends Command
         $this->hasDuplicateIds = $duplicates->isNotEmpty();
 
         if (! $this->hasDuplicateIds) {
-            $this->checkLine('No duplicate IDs detected.');
+            $this->components->info('No duplicate IDs detected.');
 
             return;
         }
