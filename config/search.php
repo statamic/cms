@@ -86,12 +86,6 @@ return [
     |
     | Here you may configure the queue name and connection used when indexing
     | documents, along with a timeout (in seconds) for each indexing job.
-    | Indexing augments every item, which can take longer than your
-    | worker's default timeout. Leaving the timeout null defers to
-    | the worker's --timeout option. Any value you set should
-    | stay below the connection's "retry_after", otherwise a
-    | job that is still running will be released and then
-    | processed a second time.
     |
     */
 

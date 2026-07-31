@@ -36,7 +36,7 @@ class InsertMultipleJob implements ShouldQueue
         $this->onConnection($connection = config('statamic.search.queue_connection', config('queue.default')));
         $this->onQueue(config('statamic.search.queue', config("queue.connections.{$connection}.queue")));
 
-        $this->timeout = ($timeout = config('statamic.search.queue_timeout')) === null ? null : (int) $timeout;
+        $this->timeout = config()->integer('statamic.search.queue_timeout', null);
     }
 
     /**
