@@ -14,19 +14,4 @@ trait EnhancesCommands
 
         return parent::run($input, $output);
     }
-
-    public function checkLine($message)
-    {
-        $this->line("<info>[✓]</info> $message");
-    }
-
-    public function checkInfo($message)
-    {
-        $this->info("[✓] $message");
-    }
-
-    public function crossLine($message)
-    {
-        $this->line("<fg=red>[✗]</> $message");
-    }
 }
