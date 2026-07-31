@@ -126,6 +126,32 @@ class FilesTest extends TestCase
     }
 
     #[Test]
+    public function it_sanitizes_svgs_on_upload_regardless_of_extension_case()
+    {
+        $disk = Storage::fake('local');
+
+        Date::setTestNow(Date::createFromTimestamp(1671484636, config('app.timezone')));
+
+        $file = UploadedFile::fake()->createWithContent('test.SVG', '<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" width="500" height="500"><script type="text/javascript">alert(`Bad stuff could go in here.`);</script></svg>');
+
+        $this
+            ->actingAs(tap(User::make()->makeSuper())->save())
+            ->post('/cp/fieldtypes/files/upload', ['file' => $file])
+            ->assertOk()
+            ->assertJson([
+                'data' => [
+                    'id' => $path = '1671484636/test.SVG',
+                ],
+            ]);
+
+        $contents = $disk->get('statamic/file-uploads/'.$path);
+
+        $this->assertStringNotContainsString('<script', $contents);
+        $this->assertStringNotContainsString('Bad stuff could go in here.', $contents);
+        $this->assertStringNotContainsString('</script>', $contents);
+    }
+
+    #[Test]
     public function it_replaces_dimensions_rule()
     {
         $replaced = $this->fieldtype(['validate' => ['dimensions:width=180,height=180']])->fieldRules();
