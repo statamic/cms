@@ -58,7 +58,7 @@ class SidecarInstall extends Command
             $available = collect(Sidecar::registeredDrivers());
 
             if ($available->isEmpty() && Sidecar::packages()->isEmpty()) {
-                error('No Sidecar drivers are available. Install a driver package first (e.g. statamic/sidecar-laradocs).');
+                error('No Sidecar drivers are available. Install a driver package first (e.g. composer require statamic/sidecar-laradocs), then re-run this command.');
 
                 return null;
             }
@@ -96,9 +96,21 @@ class SidecarInstall extends Command
 
     protected function packageForDriver(string $driver): ?string
     {
-        return Sidecar::packages()->first(
+        $package = Sidecar::packages()->first(
             fn ($package) => Str::endsWith($package, '/sidecar-'.$driver) || Str::endsWith($package, '/'.$driver)
         );
+
+        if ($package) {
+            return $package;
+        }
+
+        // Driver packages register via Sidecar::pair(), so when the package
+        // isn't installed yet we fall back to the first-party naming convention.
+        if (! Sidecar::hasDriver($driver)) {
+            return 'statamic/sidecar-'.$driver;
+        }
+
+        return null;
     }
 
     protected function writeConfig(string $driver): void

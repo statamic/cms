@@ -19,6 +19,8 @@ class Manager
 {
     protected array $customCreators = [];
 
+    protected array $packages = [];
+
     protected array $resolved = [];
 
     protected bool $booted = false;
@@ -26,6 +28,19 @@ class Manager
     public function extend(string $driver, Closure $callback): self
     {
         $this->customCreators[$driver] = $callback;
+
+        return $this;
+    }
+
+    /**
+     * Register a Sidecar driver package as compatible with an SSG/composer package.
+     *
+     * Used by `php please sidecar:install` to detect installed packages and
+     * offer the matching driver. Called from driver service providers.
+     */
+    public function pair(string $compatiblePackage, string $driverPackage): self
+    {
+        $this->packages[$compatiblePackage] = $driverPackage;
 
         return $this;
     }
@@ -86,7 +101,7 @@ class Manager
 
     public function packages(): IlluminateCollection
     {
-        return collect(config('statamic.sidecar.packages', []));
+        return collect($this->packages);
     }
 
     public function boot(): void
@@ -146,6 +161,7 @@ class Manager
         Event::listen(EntryDeleted::class, function (EntryDeleted $event) {
             $this->relayAfterDelete($event->entry);
         });
+
     }
 
     protected function relayAfterSave(Entry $entry): void

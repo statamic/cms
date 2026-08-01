@@ -8,6 +8,7 @@ use Statamic\Sidecar\Manager;
 
 /**
  * @method static \Statamic\Sidecar\Manager extend(string $driver, \Closure $callback)
+ * @method static \Statamic\Sidecar\Manager pair(string $compatiblePackage, string $driverPackage)
  * @method static bool hasDriver(string $driver)
  * @method static array registeredDrivers()
  * @method static Driver driver(string $collectionHandle)

@@ -26,18 +26,4 @@ return [
 
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Known Driver Packages
-    |--------------------------------------------------------------------------
-    |
-    | Used by `php please sidecar:install` to detect installed SSG packages and
-    | offer to install the matching Sidecar driver.
-    |
-    */
-
-    'packages' => [
-        'petebishwhip/laradocs' => 'statamic/sidecar-laradocs',
-    ],
-
 ];

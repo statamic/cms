@@ -123,6 +123,16 @@ class ManagerTest extends TestCase
     }
 
     #[Test]
+    public function it_registers_compatible_packages_from_drivers()
+    {
+        $this->manager->pair('acme/docs', 'statamic/sidecar-acme');
+
+        $this->assertEquals([
+            'acme/docs' => 'statamic/sidecar-acme',
+        ], $this->manager->packages()->all());
+    }
+
+    #[Test]
     public function it_resolves_entry_urls_from_driver_preview_url()
     {
         config(['statamic.sidecar.collections' => [
