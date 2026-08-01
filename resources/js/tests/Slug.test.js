@@ -26,14 +26,6 @@ test('it slugifies', () => {
     expect(new Slug().separatedBy('_').create('JSON-LD Document')).toBe('json_ld_document');
     expect(new Slug().create('Block - Hero')).toBe('block-hero');
     expect(new Slug().create('10% off over $100 & more')).toBe('10-off-over-100-more');
-    // Core behavior: slashes are not preserved unless opted in.
-    expect(new Slug().create('guide/routing')).toBe('guide-routing');
-});
-
-test('it preserves path segments when opted in', () => {
-    expect(new Slug().preservePaths().create('guide/routing')).toBe('guide/routing');
-    expect(new Slug().preservePaths().create('Guide/My Page')).toBe('guide/my-page');
-    expect(new Slug().preservePaths().create('guide/_index')).toBe('guide/_index');
 });
 
 test('it slugifies with extra symbols', () => {

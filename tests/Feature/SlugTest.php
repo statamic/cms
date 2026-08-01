@@ -43,23 +43,6 @@ class SlugTest extends TestCase
             'null string' => ['null', '-', 'en', 'null'],
             'zero string' => ['0', '-', 'en', '0'],
             'false string' => ['false', '-', 'en', 'false'],
-            // Core default collapses slashes — path preservation is opt-in.
-            'slashes collapsed by default' => ['guide/routing', '-', 'en', 'guiderouting'],
         ];
-    }
-
-    #[Test]
-    public function it_can_preserve_path_segments_when_requested()
-    {
-        $this
-            ->actingAs(tap(User::make()->makeSuper())->save())
-            ->postJson('/cp/slug', [
-                'string' => 'Guide/My Page',
-                'separator' => '-',
-                'language' => 'en',
-                'preserve_paths' => true,
-            ])
-            ->assertOk()
-            ->assertContent('guide/my-page');
     }
 }

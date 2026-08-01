@@ -18,16 +18,10 @@ export default {
             type: Boolean,
             default: true,
         },
-        preservePaths: {
-            type: Boolean,
-            default: false,
-        },
     },
 
     data() {
         let slugifier = this.$slug.in(this.language).separatedBy(this.separator);
-
-        if (this.preservePaths) slugifier.preservePaths();
         if (this.async) slugifier.async();
 
         return {
