@@ -20,6 +20,7 @@ class ConsoleServiceProvider extends ServiceProvider
         Commands\InstallCollaboration::class,
         Commands\InstallEloquentDriver::class,
         Commands\InstallSsg::class,
+        Commands\SidecarInstall::class,
         Commands\FlatCamp::class,
         Commands\LicenseSet::class,
         Commands\MakeAction::class,

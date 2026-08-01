@@ -120,6 +120,33 @@ class CollectionRepositoryTest extends TestCase
     }
 
     #[Test]
+    public function it_registers_a_collection_without_a_file()
+    {
+        $collection = CollectionAPI::make('docs')->title('Docs')->directory('/tmp/docs');
+
+        $this->assertNull($this->repo->findByHandle('docs'));
+        $this->assertFalse($this->repo->handleExists('docs'));
+
+        $this->repo->register($collection);
+
+        $this->assertSame($collection, $this->repo->findByHandle('docs'));
+        $this->assertTrue($this->repo->handleExists('docs'));
+        $this->assertTrue($this->repo->all()->map->handle()->contains('docs'));
+        $this->assertFalse(file_exists($this->directory.'/docs.yaml'));
+    }
+
+    #[Test]
+    public function a_registered_collection_takes_precedence_over_a_file_based_one()
+    {
+        $registered = CollectionAPI::make('blog')->title('Registered Blog');
+
+        $this->repo->register($registered);
+
+        $this->assertSame($registered, $this->repo->findByHandle('blog'));
+        $this->assertEquals('Registered Blog', $this->repo->findByHandle('blog')->title());
+    }
+
+    #[Test]
     public function test_find_or_fail_gets_collection()
     {
         $collection = $this->repo->findOrFail('blog');

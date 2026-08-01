@@ -84,6 +84,89 @@ class EntriesStoreTest extends TestCase
     }
 
     #[Test]
+    public function it_uses_a_custom_collection_directory()
+    {
+        $customDir = Path::tidy(sys_get_temp_dir().'/statamic-sidecar-entries-'.uniqid());
+        mkdir($customDir);
+        touch($customDir.'/hello.md', 1234567890);
+
+        $this->parent->setCustomDirectory('docs', $customDir);
+
+        $store = $this->parent->store('docs');
+
+        $this->assertEquals($customDir, Path::tidy($store->directory()));
+
+        $files = Traverser::filter([$store, 'getItemFilter'])->traverse($store);
+
+        $this->assertEquals([$customDir.'/hello.md'], $files->keys()->all());
+
+        (new \Illuminate\Filesystem\Filesystem)->deleteDirectory($customDir);
+    }
+
+    #[Test]
+    public function multisite_collections_still_require_site_folders_without_a_custom_directory()
+    {
+        $this->setSites([
+            'en' => ['url' => 'http://localhost/', 'locale' => 'en'],
+            'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
+        ]);
+
+        $dir = Path::tidy(sys_get_temp_dir().'/statamic-sidecar-multisite-'.uniqid());
+        mkdir($dir.'/pages/en', 0777, true);
+        mkdir($dir.'/pages/fr', 0777, true);
+        mkdir($dir.'/pages/notasite', 0777, true);
+        touch($dir.'/pages/en/about.md');
+        touch($dir.'/pages/loose.md'); // flat file — must be ignored in core multi-site
+        touch($dir.'/pages/notasite/nope.md');
+
+        $this->parent->directory($dir);
+        Facades\Collection::shouldReceive('findByHandle')->with('pages')->andReturn(
+            (new \Statamic\Entries\Collection)->handle('pages')->sites(['en', 'fr'])
+        );
+
+        $files = Traverser::filter([$this->parent->store('pages'), 'getItemFilter'])
+            ->traverse($this->parent->store('pages'));
+
+        $this->assertEquals([$dir.'/pages/en/about.md'], $files->keys()->all());
+
+        (new \Illuminate\Filesystem\Filesystem)->deleteDirectory($dir);
+    }
+
+    #[Test]
+    public function custom_directories_may_store_flat_entries_under_multisite()
+    {
+        $this->setSites([
+            'en' => ['url' => 'http://localhost/', 'locale' => 'en'],
+            'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
+        ]);
+
+        $customDir = Path::tidy(sys_get_temp_dir().'/statamic-sidecar-flat-'.uniqid());
+        mkdir($customDir.'/guide', 0777, true);
+        touch($customDir.'/hello.md');
+        touch($customDir.'/guide/routing.md');
+
+        // Collection::handle() re-registers a null directory onto the Stache store,
+        // so set the custom directory after constructing the collection mock.
+        Facades\Collection::shouldReceive('findByHandle')->with('docs')->andReturn(
+            (new \Statamic\Entries\Collection)->handle('docs')->sites(['en', 'fr'])
+        );
+        $this->parent->setCustomDirectory('docs', $customDir);
+
+        $store = $this->parent->store('docs');
+
+        $this->assertEquals($customDir, Path::tidy($store->directory()));
+
+        $files = Traverser::filter([$store, 'getItemFilter'])->traverse($store);
+
+        $this->assertEqualsCanonicalizing([
+            $customDir.'/hello.md',
+            $customDir.'/guide/routing.md',
+        ], $files->keys()->all());
+
+        (new \Illuminate\Filesystem\Filesystem)->deleteDirectory($customDir);
+    }
+
+    #[Test]
     public function it_makes_entry_instances_from_files()
     {
         Facades\Collection::shouldReceive('findByHandle')->with('blog')->andReturn(

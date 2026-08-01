@@ -343,7 +343,7 @@ class EntriesController extends CpController
                     'exists' => false,
                     'published' => false,
                     'url' => cp_route('collections.entries.create', [$collection->handle(), $handle, 'blueprint' => $blueprint->handle()]),
-                    'livePreviewUrl' => $collection->route($handle) ? cp_route('collections.entries.preview.create', [$collection->handle(), $handle]) : null,
+                    'livePreviewUrl' => $collection->hasLivePreview($handle) ? cp_route('collections.entries.preview.create', [$collection->handle(), $handle]) : null,
                 ];
             })->values()->all(),
             'revisionsEnabled' => $collection->revisionsEnabled(),

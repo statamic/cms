@@ -7,6 +7,7 @@
         :separator="separator"
         :language="language"
         :async="config.async"
+        :preserve-paths="config.preserve_paths"
         @slugifying="syncing = true"
         @slugified="
             syncing = false;

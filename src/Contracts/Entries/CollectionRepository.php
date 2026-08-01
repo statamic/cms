@@ -23,4 +23,6 @@ interface CollectionRepository
     public function handleExists(string $handle): bool;
 
     public function whereStructured(): IlluminateCollection;
+
+    public function register(Collection $collection): void;
 }

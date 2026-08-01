@@ -39,6 +39,8 @@ class SlugTest extends TestCase
         $this->assertFails('foo-!bar');
         $this->assertFails('foo_!bar');
         $this->assertFails('foo-_-bar');
+        $this->assertFails('guide/routing');
+        $this->assertFails('_index');
     }
 
     #[Test]

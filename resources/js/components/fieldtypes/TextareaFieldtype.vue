@@ -8,6 +8,7 @@
         :placeholder="__(config.placeholder)"
         :model-value="value"
         :dir="contentDirection"
+        :rows="config.rows || 3"
         @blur="$emit('blur')"
         @focus="$emit('focus')"
         @update:model-value="updateDebounced"

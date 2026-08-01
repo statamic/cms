@@ -24,6 +24,7 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Entry;
 use Statamic\Facades\File;
+use Statamic\Facades\Path;
 use Statamic\Facades\Search;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
@@ -69,6 +70,8 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contain
     protected $previewTargets = [];
     protected $autosave;
     protected $withEvents = true;
+    protected $directory;
+    protected $entryBlueprintFallback;
 
     protected $entryClass;
 
@@ -89,6 +92,9 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contain
         }
 
         $this->handle = $handle;
+
+        // Re-register once we know the handle, in case directory() was set first.
+        $this->registerCustomDirectory($this->directory);
 
         return $this;
     }
@@ -117,6 +123,25 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contain
         return $this->routes()->get($site);
     }
 
+    /**
+     * Whether Live Preview should be available for this collection.
+     *
+     * Collections without a route (e.g. Sidecar / headless) can still enable
+     * Live Preview by defining custom preview targets.
+     */
+    public function hasLivePreview($site = null): bool
+    {
+        if ($site && $this->route($site)) {
+            return true;
+        }
+
+        if (! $site && $this->routes()->filter()->isNotEmpty()) {
+            return true;
+        }
+
+        return ! empty($this->previewTargets);
+    }
+
     public function requiresSlugs($require = null)
     {
         return $this->fluentlyGetOrSet('requiresSlugs')->args(func_get_args());
@@ -125,6 +150,40 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contain
     public function entryClass($class = null)
     {
         return $this->fluentlyGetOrSet('entryClass')->args(func_get_args());
+    }
+
+    public function directory($directory = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('directory')
+            ->setter(function ($directory) {
+                $this->registerCustomDirectory($directory);
+
+                return $directory;
+            })
+            ->args(func_get_args());
+    }
+
+    public function resolvedDirectory(): string
+    {
+        if ($this->directory) {
+            return Path::tidy(
+                Path::isAbsolute($this->directory)
+                    ? $this->directory
+                    : base_path($this->directory)
+            );
+        }
+
+        return Path::tidy(Stache::store('entries')->directory().$this->handle);
+    }
+
+    protected function registerCustomDirectory(?string $directory): void
+    {
+        if (! $this->handle) {
+            return;
+        }
+
+        Stache::store('entries')->setCustomDirectory($this->handle, $directory);
     }
 
     public function titleFormats($formats = null)
@@ -375,17 +434,33 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contain
         });
     }
 
+    public function entryBlueprintFallback($fallback = null)
+    {
+        return $this->fluentlyGetOrSet('entryBlueprintFallback')->args(func_get_args());
+    }
+
     public function fallbackEntryBlueprint()
     {
-        $blueprint = (clone Blueprint::find('default'))
-            ->setHandle(Str::singular($this->handle()))
+        if ($this->entryBlueprintFallback instanceof \Closure) {
+            $blueprint = ($this->entryBlueprintFallback)();
+        } elseif ($this->entryBlueprintFallback instanceof \Statamic\Fields\Blueprint) {
+            $blueprint = clone $this->entryBlueprintFallback;
+        } else {
+            // Preserve exact core behavior when no Sidecar/custom fallback is set.
+            $blueprint = (clone Blueprint::find('default'))
+                ->setHandle(Str::singular($this->handle()))
+                ->setNamespace('collections.'.$this->handle());
+
+            $contents = $blueprint->contents();
+            $contents['title'] = Str::singular($this->title());
+            $blueprint->setContents($contents);
+
+            return $blueprint;
+        }
+
+        return $blueprint
+            ->setHandle($blueprint->handle() ?? Str::singular($this->handle()))
             ->setNamespace('collections.'.$this->handle());
-
-        $contents = $blueprint->contents();
-        $contents['title'] = Str::singular($this->title());
-        $blueprint->setContents($contents);
-
-        return $blueprint;
     }
 
     public function ensureEntryBlueprintFields($blueprint)
@@ -596,6 +671,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contain
             'title_format' => $this->titleFormats,
             'autosave' => $this->autosave,
             'entry_class' => $this->entryClass,
+            'directory' => $this->directory,
         ];
 
         $array = Arr::except($formerlyToArray, [
@@ -935,7 +1011,11 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contain
     public function deleteFile()
     {
         File::delete($this->path());
-        File::delete(dirname($this->path()).'/'.$this->handle);
+
+        // Don't delete a custom entry directory — it may belong to another system.
+        if (! $this->directory) {
+            File::delete(dirname($this->path()).'/'.$this->handle);
+        }
     }
 
     public function entryBlueprintCommandPaletteLinks()

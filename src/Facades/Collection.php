@@ -16,6 +16,7 @@ use Statamic\Contracts\Entries\CollectionRepository;
  * @method static bool handleExists(string $handle)
  * @method static void save(\Statamic\Entries\Collection $collection)
  * @method static void delete(\Statamic\Entries\Collection $collection)
+ * @method static void register(\Statamic\Entries\Collection $collection)
  * @method static \Illuminate\Support\Collection whereStructured()
  * @method static \Illuminate\Support\Collection additionalPreviewTargets(string $handle)
  * @method static void computed(string|array $scopes, string|array $field, ?\Closure $callback = null)

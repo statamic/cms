@@ -41,15 +41,23 @@ class CollectionEntriesStore extends ChildStore
         }
 
         if (Site::multiEnabled()) {
-            [$site, $relative] = explode('/', $relative, 2);
-            if (! $this->collection()->sites()->contains($site)) {
+            $site = Str::before($relative, '/');
+            $hasSiteFolder = Str::contains($relative, '/')
+                && $this->collection()->sites()->contains($site);
+
+            if ($hasSiteFolder) {
+                // Standard multi-site layout: {site}/entry.md
+            } elseif ($this->parent->customDirectory($this->childKey())) {
+                // Custom directories (Sidecar) may store entries flat — only when
+                // the collection includes the default site.
+                if (! $this->collection()->sites()->contains(Site::default()->handle())) {
+                    return false;
+                }
+            } elseif (! $this->collection()->sites()->contains($site)) {
+                // Core multi-site: first path segment must be a site handle.
                 return false;
             }
         }
-
-        // if (! Collection::findByHandle(explode('/', $relative)[0])) {
-        //     return false;
-        // }
 
         return $file->getExtension() !== 'yaml';
     }
@@ -114,16 +122,16 @@ class CollectionEntriesStore extends ChildStore
     protected function extractAttributesFromPath($path)
     {
         $site = Site::default()->handle();
-        $collection = pathinfo($path, PATHINFO_DIRNAME);
-        $collection = Str::after($collection, $this->parent->directory());
+        $collection = $this->childKey();
 
         if (Site::multiEnabled()) {
-            [$collection, $site] = explode('/', $collection);
-        }
+            $dir = Str::finish($this->directory(), '/');
+            $relative = Str::after(Path::tidy($path), $dir);
+            $maybeSite = Str::before($relative, '/');
 
-        // Support entries within subdirectories at any level.
-        if (Str::contains($collection, '/')) {
-            $collection = Str::before($collection, '/');
+            if ($maybeSite && Str::contains($relative, '/') && $this->collection()->sites()->contains($maybeSite)) {
+                $site = $maybeSite;
+            }
         }
 
         return [$collection, $site];

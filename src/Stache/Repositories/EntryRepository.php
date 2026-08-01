@@ -11,7 +11,9 @@ use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Exceptions\EntryNotFoundException;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
+use Statamic\Facades\Sidecar;
 use Statamic\Query\Scopes\AllowsScopes;
+use Statamic\Rules\PathSlug;
 use Statamic\Rules\Slug;
 use Statamic\Stache\Query\EntryQueryBuilder;
 use Statamic\Stache\Stache;
@@ -166,7 +168,7 @@ class EntryRepository implements RepositoryContract
     {
         return [
             'title' => $collection->autoGeneratesTitles() ? '' : 'required',
-            'slug' => [new Slug],
+            'slug' => [$this->slugRule($collection)],
         ];
     }
 
@@ -174,8 +176,19 @@ class EntryRepository implements RepositoryContract
     {
         return [
             'title' => $collection->autoGeneratesTitles() ? '' : 'required',
-            'slug' => [new Slug],
+            'slug' => [$this->slugRule($collection)],
         ];
+    }
+
+    /**
+     * Sidecar collections may use nested path slugs (e.g. guide/routing).
+     * Everything else keeps the strict core slug rule.
+     */
+    private function slugRule($collection): Slug|PathSlug
+    {
+        return Sidecar::manages($collection->handle())
+            ? new PathSlug
+            : new Slug;
     }
 
     public static function bindings(): array

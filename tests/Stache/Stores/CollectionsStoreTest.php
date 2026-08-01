@@ -70,6 +70,14 @@ class CollectionsStoreTest extends TestCase
     }
 
     #[Test]
+    public function it_makes_collection_instances_with_a_custom_directory()
+    {
+        $item = $this->store->makeItemFromFile($this->tempDir.'/example.yaml', "title: Example\ndirectory: docs");
+
+        $this->assertEquals('docs', $item->directory());
+    }
+
+    #[Test]
     public function it_normalizes_preview_target_url_into_format()
     {
         // it's just nicer to write "url" into yaml than "format".

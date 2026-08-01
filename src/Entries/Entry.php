@@ -43,7 +43,6 @@ use Statamic\Facades\Antlers;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
-use Statamic\Facades\Stache;
 use Statamic\GraphQL\ResolvesValues;
 use Statamic\Revisions\Revisable;
 use Statamic\Routing\Routable;
@@ -355,7 +354,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
     public function livePreviewUrl()
     {
-        return $this->collection()->route($this->locale())
+        return $this->collection()->hasLivePreview($this->locale())
             ? $this->cpUrl('collections.entries.preview.edit')
             : null;
     }
@@ -545,9 +544,8 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             $prefix = $this->date->copy()->setTimezone(config('app.timezone'))->format($format).'.';
         }
 
-        return vsprintf('%s/%s/%s%s%s.%s', [
-            rtrim(Stache::store('entries')->directory(), '/'),
-            $this->collectionHandle(),
+        return vsprintf('%s/%s%s%s.%s', [
+            rtrim($this->collection()->resolvedDirectory(), '/'),
             Site::multiEnabled() ? $this->locale().'/' : '',
             $prefix,
             $this->slug() ?? $this->id(),
@@ -1015,19 +1013,37 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             return Blink::store('entry-uris')->get($this->id());
         }
 
-        if (! $this->route()) {
-            return null;
-        }
+        $uri = null;
 
-        $uri = ($structure = $this->structure())
-            ? $structure->entryUri($this)
-            : $this->routableUri();
+        if ($this->route()) {
+            $uri = ($structure = $this->structure())
+                ? $structure->entryUri($this)
+                : $this->routableUri();
+        } elseif ($sidecarUri = $this->sidecarUri()) {
+            $uri = $sidecarUri;
+        }
 
         if ($uri && $this->id()) {
             Blink::store('entry-uris')->put($this->id(), $uri);
         }
 
         return $uri;
+    }
+
+    /**
+     * Public URI from a Sidecar driver when the collection has no Statamic route.
+     */
+    protected function sidecarUri(): ?string
+    {
+        $handle = $this->collectionHandle();
+
+        if (! $handle || ! Facades\Sidecar::manages($handle)) {
+            return null;
+        }
+
+        $url = Facades\Sidecar::driver($handle)->previewUrl($this);
+
+        return $url ? Facades\URL::makeRelative($url) : null;
     }
 
     public function fileExtension()

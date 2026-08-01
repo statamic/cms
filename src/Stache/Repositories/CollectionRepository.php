@@ -17,6 +17,7 @@ class CollectionRepository implements RepositoryContract
     protected $stache;
     protected $store;
     protected $additionalPreviewTargets = [];
+    protected $registered = [];
 
     public function __construct(Stache $stache)
     {
@@ -28,7 +29,11 @@ class CollectionRepository implements RepositoryContract
     {
         $keys = $this->store->paths()->keys();
 
-        return $this->store->getItems($keys);
+        return $this->store
+            ->getItems($keys)
+            ->keyBy->handle()
+            ->merge($this->registered)
+            ->values();
     }
 
     public function find($id): ?Collection
@@ -38,7 +43,16 @@ class CollectionRepository implements RepositoryContract
 
     public function findByHandle($handle): ?Collection
     {
-        return $this->store->getItem($handle);
+        return $this->registered[$handle] ?? $this->store->getItem($handle);
+    }
+
+    public function register(Collection $collection): void
+    {
+        $this->registered[$collection->handle()] = $collection;
+
+        Blink::forget('collection-handles');
+        Blink::forget('mounted-collections');
+        Blink::forget("collection-{$collection->handle()}");
     }
 
     public function findByMount($mount): ?Collection
@@ -93,6 +107,12 @@ class CollectionRepository implements RepositoryContract
 
     public function delete(Collection $collection)
     {
+        unset($this->registered[$collection->handle()]);
+
+        Blink::forget('collection-handles');
+        Blink::forget('mounted-collections');
+        Blink::forget("collection-{$collection->handle()}");
+
         $this->store->delete($collection);
     }
 

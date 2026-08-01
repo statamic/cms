@@ -10,6 +10,7 @@ export default class Slug {
     #debounced;
     #controller;
     #async = false;
+    #preservePaths = false;
 
     constructor() {
         this.#setInitialLanguage();
@@ -23,6 +24,12 @@ export default class Slug {
 
     in(language) {
         if (language) this.#language = language;
+
+        return this;
+    }
+
+    preservePaths(preserve = true) {
+        this.#preservePaths = preserve;
 
         return this;
     }
@@ -53,6 +60,22 @@ export default class Slug {
     }
 
     #createSynchronously() {
+        if (this.#preservePaths) {
+            return this.#string
+                .split('/')
+                .map((segment) => this.#slugifySegment(segment))
+                .filter((segment) => segment !== '')
+                .join('/');
+        }
+
+        return this.#slugifySegment(this.#string);
+    }
+
+    #slugifySegment(string) {
+        if (this.#preservePaths && string === '_index') {
+            return '_index';
+        }
+
         const symbols = Statamic.$config.get('asciiReplaceExtraSymbols');
         const charmap = Statamic.$config.get('charmap');
 
@@ -66,7 +89,7 @@ export default class Slug {
 
         if (this.#separator !== '-') custom['-'] = this.#separator; // Replace dashes with custom separator
 
-        return speakingUrl(this.#string, {
+        return speakingUrl(string, {
             separator: this.#separator,
             lang: this.#language,
             custom,
@@ -104,6 +127,7 @@ export default class Slug {
             string: this.#string,
             separator: this.#separator,
             language: this.#language,
+            preserve_paths: this.#preservePaths,
         };
 
         if (this.#controller) this.#controller.abort();

@@ -923,6 +923,61 @@ class EntryTest extends TestCase
     }
 
     #[Test]
+    public function it_gets_the_path_from_a_custom_collection_directory()
+    {
+        $this->setSites([
+            'en' => ['url' => '/', 'locale' => 'en_US'],
+        ]);
+
+        $directory = $this->fakeStacheDirectory.'/custom-docs';
+        $collection = tap(Facades\Collection::make('docs')->directory($directory))->save();
+        $entry = (new Entry)->collection($collection)->locale('en')->slug('getting-started');
+
+        $this->assertEquals($directory.'/getting-started.md', $entry->path());
+    }
+
+    #[Test]
+    public function it_preserves_unknown_front_matter_keys_on_save()
+    {
+        $collection = tap(Facades\Collection::make('docs'))->save();
+
+        $path = $this->fakeStacheDirectory.'/content/collections/docs/getting-started.md';
+        app('files')->makeDirectory(dirname($path), 0755, true);
+        app('files')->put($path, <<<'MD'
+---
+id: abc-123
+title: Getting Started
+order: 1
+group: Basics
+badge: New
+custom_ssg_key: keep-me
+---
+Hello world.
+MD);
+
+        Facades\Stache::store('entries')->store('docs')->clearCachedPaths();
+
+        $entry = Facades\Entry::query()->where('collection', 'docs')->where('slug', 'getting-started')->first();
+
+        $this->assertNotNull($entry);
+        $this->assertEquals('keep-me', $entry->get('custom_ssg_key'));
+        $this->assertEquals('Basics', $entry->get('group'));
+        $this->assertEquals(1, $entry->get('order'));
+
+        // Simulate a CP save that only updates blueprint-known fields.
+        $entry->merge(['title' => 'Getting Started Updated', 'order' => 2])->save();
+
+        $contents = app('files')->get($path);
+
+        $this->assertStringContainsString('custom_ssg_key: keep-me', $contents);
+        $this->assertStringContainsString('group: Basics', $contents);
+        $this->assertStringContainsString('badge: New', $contents);
+        $this->assertStringContainsString("title: 'Getting Started Updated'", $contents);
+        $this->assertStringContainsString('order: 2', $contents);
+        $this->assertStringContainsString('Hello world.', $contents);
+    }
+
+    #[Test]
     public function it_gets_the_path_and_includes_locale_when_theres_multiple_sites()
     {
         $this->setSites([

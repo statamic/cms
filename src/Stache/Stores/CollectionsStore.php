@@ -61,7 +61,8 @@ class CollectionsStore extends BasicStore
             ->propagate(Arr::get($data, 'propagate'))
             ->previewTargets($this->normalizePreviewTargets(Arr::get($data, 'preview_targets', [])))
             ->autosaveInterval(Arr::get($data, 'autosave'))
-            ->entryClass(Arr::get($data, 'entry_class'));
+            ->entryClass(Arr::get($data, 'entry_class'))
+            ->directory(Arr::get($data, 'directory'));
 
         if ($dateBehavior = Arr::get($data, 'date_behavior')) {
             $collection

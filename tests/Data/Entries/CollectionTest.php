@@ -225,6 +225,43 @@ class CollectionTest extends TestCase
     }
 
     #[Test]
+    public function it_gets_and_sets_the_directory()
+    {
+        $collection = (new Collection)->handle('docs');
+        $this->assertNull($collection->directory());
+
+        $return = $collection->directory('docs');
+
+        $this->assertEquals($collection, $return);
+        $this->assertEquals('docs', $collection->directory());
+    }
+
+    #[Test]
+    public function it_resolves_relative_and_absolute_directories()
+    {
+        $collection = (new Collection)->handle('docs');
+
+        $this->assertEquals(
+            Facades\Path::tidy($this->fakeStacheDirectory.'/content/collections/docs'),
+            $collection->resolvedDirectory()
+        );
+
+        $collection->directory('docs');
+        $this->assertEquals(Facades\Path::tidy(base_path('docs')), $collection->resolvedDirectory());
+
+        $collection->directory('/absolute/path/to/docs');
+        $this->assertEquals(Facades\Path::tidy('/absolute/path/to/docs'), $collection->resolvedDirectory());
+    }
+
+    #[Test]
+    public function directory_is_included_in_file_data()
+    {
+        $collection = (new Collection)->handle('docs')->directory('docs');
+
+        $this->assertEquals('docs', $collection->fileData()['directory']);
+    }
+
+    #[Test]
     public function it_gets_and_sets_the_sites_it_can_be_used_in_when_using_multiple_sites()
     {
         $this->setSites([
@@ -899,6 +936,29 @@ class CollectionTest extends TestCase
 
         $collection->updateEntryParent();
         $collection->updateEntryParent(['one', 'two']);
+    }
+
+    #[Test]
+    public function it_enables_live_preview_with_routes_or_custom_preview_targets()
+    {
+        $this->setSites([
+            'en' => ['url' => 'http://domain.com/'],
+        ]);
+
+        $collection = (new Collection)->handle('test');
+
+        $this->assertFalse($collection->hasLivePreview());
+        $this->assertFalse($collection->hasLivePreview('en'));
+
+        $collection->routes('{slug}');
+        $this->assertTrue($collection->hasLivePreview());
+        $this->assertTrue($collection->hasLivePreview('en'));
+
+        $collection->routes(null)->previewTargets([
+            ['label' => 'Docs', 'format' => '/!/sidecar/preview'],
+        ]);
+        $this->assertTrue($collection->hasLivePreview());
+        $this->assertTrue($collection->hasLivePreview('en'));
     }
 
     #[Test]
