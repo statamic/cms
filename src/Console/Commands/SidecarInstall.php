@@ -168,7 +168,7 @@ PHP;
     protected function defaultHandleFor(string $driver): string
     {
         return match ($driver) {
-            'laradocs' => 'docs',
+            'laradocs', 'jigsaw' => 'docs',
             default => $driver,
         };
     }
@@ -177,6 +177,7 @@ PHP;
     {
         return match ($driver) {
             'laradocs' => "base_path('docs')",
+            'jigsaw' => "base_path('source/docs')",
             default => "base_path('{$driver}')",
         };
     }
