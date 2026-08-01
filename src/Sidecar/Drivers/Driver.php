@@ -78,6 +78,30 @@ abstract class Driver implements DriverContract
         return null;
     }
 
+    public function usesNestedFolders(): bool
+    {
+        return false;
+    }
+
+    public function indexFileName(): string
+    {
+        return '_index';
+    }
+
+    public function syncOrder(Entry $entry, int $position): void
+    {
+        if ((int) $entry->get('order') === $position) {
+            return;
+        }
+
+        $entry->set('order', $position);
+    }
+
+    public function afterTreeSynced(\Statamic\Structures\CollectionTree $tree): void
+    {
+        //
+    }
+
     public function collectionHandle(): string
     {
         return $this->collectionHandle;

@@ -62,4 +62,25 @@ interface Driver
      * Public URL for the entry (Visit URL + fallback Live Preview target).
      */
     public function previewUrl(Entry $entry): ?string;
+
+    /**
+     * Whether this driver stores nesting as real subfolders on disk
+     * (synced from the collection structure tree).
+     */
+    public function usesNestedFolders(): bool;
+
+    /**
+     * Filename (without extension) used for section/root index pages.
+     */
+    public function indexFileName(): string;
+
+    /**
+     * Persist a sibling position onto the entry (e.g. `order` front matter).
+     */
+    public function syncOrder(Entry $entry, int $position): void;
+
+    /**
+     * Called after a nested-folder tree sync relocates files / writes order.
+     */
+    public function afterTreeSynced(\Statamic\Structures\CollectionTree $tree): void;
 }

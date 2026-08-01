@@ -8,9 +8,11 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 use InvalidArgumentException;
 use Statamic\Contracts\Entries\Entry;
+use Statamic\Events\CollectionTreeSaved;
 use Statamic\Events\EntryDeleted;
 use Statamic\Events\EntrySaved;
 use Statamic\Facades\Collection;
+use Statamic\Sidecar\Structures\SyncTreeToFilesystem;
 
 /**
  * @experimental
@@ -162,6 +164,7 @@ class Manager
             $this->relayAfterDelete($event->entry);
         });
 
+        Event::listen(CollectionTreeSaved::class, [SyncTreeToFilesystem::class, 'handle']);
     }
 
     protected function relayAfterSave(Entry $entry): void
