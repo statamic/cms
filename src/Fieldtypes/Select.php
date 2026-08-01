@@ -2,6 +2,11 @@
 
 namespace Statamic\Fieldtypes;
 
+use Illuminate\Support\Collection as IlluminateCollection;
+use Statamic\Contracts\Entries\Collection as CollectionContract;
+use Statamic\Contracts\Entries\Entry as EntryContract;
+use Statamic\Facades\Blink;
+use Statamic\Facades\Entry;
 use Statamic\Fields\Fieldtype;
 
 use function Statamic\trans as __;
@@ -14,6 +19,67 @@ class Select extends Fieldtype
     protected $keywords = ['select', 'option', 'choice', 'dropdown', 'list'];
     protected $selectableInForms = true;
     protected $indexComponent = 'tags';
+
+    public function preload(): array
+    {
+        $options = $this->getOptions();
+
+        if (! $this->config('taggable')) {
+            return ['options' => $options];
+        }
+
+        $existing = collect($options)->pluck('value');
+
+        $discovered = $this->discoverOptionsFromEntries()
+            ->reject(fn ($value) => $existing->contains($value))
+            ->map(fn ($value) => ['value' => $value, 'label' => $value])
+            ->values()
+            ->all();
+
+        return ['options' => array_merge($options, $discovered)];
+    }
+
+    protected function discoverOptionsFromEntries(): IlluminateCollection
+    {
+        $field = $this->field();
+
+        if (! $field || $field->parentField()) {
+            return collect();
+        }
+
+        $collection = $this->collectionHandleFromParent();
+
+        if (! $collection) {
+            return collect();
+        }
+
+        $handle = $field->handle();
+
+        return Blink::once("select-options-{$collection}-{$handle}", function () use ($collection, $handle) {
+            return Entry::query()
+                ->where('collection', $collection)
+                ->pluck($handle)
+                ->flatten()
+                ->filter(fn ($value) => ! is_null($value) && $value !== '')
+                ->unique()
+                ->values();
+        });
+    }
+
+    protected function collectionHandleFromParent(): ?string
+    {
+        $parent = $this->field()?->parent();
+
+        if ($parent instanceof EntryContract) {
+            return $parent->collectionHandle();
+        }
+
+        if ($parent instanceof CollectionContract) {
+            return $parent->handle();
+        }
+
+        return null;
+    }
 
     protected function configFieldItems(): array
     {

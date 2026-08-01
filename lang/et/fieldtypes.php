@@ -158,7 +158,6 @@ return [
     'select.config.multiple' => 'Luba mitut valikut.',
     'select.config.options' => 'Määra võtmed ja nende valikulised sildid.',
     'select.config.placeholder' => 'Määra kohatäite tekst.',
-    'select.config.push_tags' => 'Lisa äsja loodud sildid valikute loendisse.',
     'select.config.searchable' => 'Luba võimalike valikute otsimist.',
     'select.config.taggable' => 'Luba lisaks eelnevalt määratletud valikutele uute valikute lisamist.',
     'select.title' => 'Valik',

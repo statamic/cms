@@ -173,7 +173,7 @@ return [
     'select.config.options' => 'Set the keys and their optional labels.',
     'select.config.placeholder' => 'Set placeholder text.',
     'select.config.searchable' => 'Enable searching through possible options.',
-    'select.config.taggable' => 'Allow adding new options in addition to pre-defined options.',
+    'select.config.taggable' => 'Allow adding new options in addition to pre-defined ones. Additions become available on other entries.',
     'select.title' => 'Select',
     'sites.title' => 'Sites',
     'slug.config.from' => 'Target field to create a slug from.',

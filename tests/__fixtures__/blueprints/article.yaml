@@ -264,7 +264,6 @@ tabs:
           clearable: false
           searchable: true
           taggable: false
-          push_tags: false
           cast_booleans: false
           display: 'Select Field'
           type: select
@@ -531,7 +530,6 @@ tabs:
                     clearable: false
                     searchable: true
                     taggable: false
-                    push_tags: false
                     cast_booleans: false
                     display: 'Select Field'
                     type: select
@@ -824,7 +822,6 @@ tabs:
                     clearable: false
                     searchable: true
                     taggable: false
-                    push_tags: false
                     cast_booleans: false
                     display: 'Select Field'
                     type: select

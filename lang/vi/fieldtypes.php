@@ -155,7 +155,6 @@ return [
     'select.config.multiple' => 'Cho phép chọn nhiều tùy chọn.',
     'select.config.options' => 'Đặt các khóa và nhãn tùy chọn.',
     'select.config.placeholder' => 'Đặt văn bản giữ chỗ.',
-    'select.config.push_tags' => 'Thêm thẻ mới tạo vào danh sách tùy chọn.',
     'select.config.searchable' => 'Cho phép tìm kiếm thông qua các tùy chọn có thể.',
     'select.config.taggable' => 'Cho phép thêm các tùy chọn mới ngoài các tùy chọn được xác định trước',
     'select.title' => 'Chọn',
