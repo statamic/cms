@@ -457,6 +457,7 @@ class FieldsTest extends TestCase
                 'replicator_preview' => true,
                 'duplicate' => true,
                 'actions' => true,
+                'rows' => 3,
             ],
         ], $fields->toPublishArray());
     }

@@ -183,7 +183,12 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contain
             return;
         }
 
-        Stache::store('entries')->setCustomDirectory($this->handle, $directory);
+        // Entries store may be absent in partial Stache setups (e.g. unit tests).
+        if (! $store = Stache::store('entries')) {
+            return;
+        }
+
+        $store->setCustomDirectory($this->handle, $directory);
     }
 
     public function titleFormats($formats = null)
