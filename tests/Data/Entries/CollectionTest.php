@@ -446,6 +446,39 @@ class CollectionTest extends TestCase
     }
 
     #[Test]
+    public function custom_entry_blueprint_fallback_sets_title_from_collection()
+    {
+        BlueprintRepository::shouldReceive('in')->with('collections/articles')->andReturn(collect());
+        BlueprintRepository::shouldReceive('getAdditionalNamespaces')->andReturn(collect());
+
+        $fallback = (new Blueprint)
+            ->setHandle('doc')
+            ->setContents(['title' => 'Stale Title', 'fields' => [
+                ['handle' => 'content', 'field' => ['type' => 'markdown']],
+            ]]);
+
+        $fromInstance = (new Collection)
+            ->handle('articles')
+            ->title('Articles')
+            ->entryBlueprintFallback($fallback)
+            ->entryBlueprint();
+
+        $this->assertEquals('Article', $fromInstance->title());
+        $this->assertEquals('doc', $fromInstance->handle());
+        $this->assertEquals('collections.articles', $fromInstance->namespace());
+
+        $fromClosure = (new Collection)
+            ->handle('articles')
+            ->title('Articles')
+            ->entryBlueprintFallback(fn () => clone $fallback)
+            ->entryBlueprint();
+
+        $this->assertEquals('Article', $fromClosure->title());
+        $this->assertEquals('doc', $fromClosure->handle());
+        $this->assertEquals('collections.articles', $fromClosure->namespace());
+    }
+
+    #[Test]
     public function it_dispatches_an_event_when_getting_entry_blueprint()
     {
         Event::fake();

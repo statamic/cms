@@ -448,19 +448,18 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contain
         } else {
             // Preserve exact core behavior when no Sidecar/custom fallback is set.
             $blueprint = (clone Blueprint::find('default'))
-                ->setHandle(Str::singular($this->handle()))
-                ->setNamespace('collections.'.$this->handle());
-
-            $contents = $blueprint->contents();
-            $contents['title'] = Str::singular($this->title());
-            $blueprint->setContents($contents);
-
-            return $blueprint;
+                ->setHandle(Str::singular($this->handle()));
         }
 
-        return $blueprint
+        $blueprint
             ->setHandle($blueprint->handle() ?? Str::singular($this->handle()))
             ->setNamespace('collections.'.$this->handle());
+
+        $contents = $blueprint->contents();
+        $contents['title'] = Str::singular($this->title());
+        $blueprint->setContents($contents);
+
+        return $blueprint;
     }
 
     public function ensureEntryBlueprintFields($blueprint)
