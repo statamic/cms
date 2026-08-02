@@ -30,6 +30,13 @@ class Textarea extends Fieldtype
                         'type' => 'integer',
                         'width' => 50,
                     ],
+                    'rows' => [
+                        'display' => ['Rows'],
+                        'instructions' => __('statamic::fieldtypes.text.config.rows'),
+                        'type' => 'integer',
+                        'width' => 50,
+                        'default' => 3,
+                    ],
                 ],
             ],
             [
