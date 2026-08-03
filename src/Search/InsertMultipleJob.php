@@ -15,14 +15,6 @@ class InsertMultipleJob implements ShouldQueue
 {
     use Queueable;
 
-    /**
-     * The number of seconds the job can run before timing out.
-     *
-     * This needs to stay a property. Queue::createObjectPayload() reads it through
-     * getAttributeValue($job, Timeout::class, 'timeout'), which - unlike maxTries
-     * and backoff - has no method_exists() fallback, so a timeout() method here
-     * would be silently ignored.
-     */
     public ?int $timeout = null;
 
     /**
