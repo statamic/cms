@@ -152,6 +152,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Handle Scheduled Entries
+    |--------------------------------------------------------------------------
+    |
+    | Process entries that have reached their scheduled publish date.
+    | Disabling this may cause the static cache and search indexes to fall
+    | out of sync.
+    |
+    */
+
+    'handle_scheduled_entries' => env('STATAMIC_HANDLE_SCHEDULED_ENTRIES', true),
+
+    /*
+    |--------------------------------------------------------------------------
     | Enable Cache Tags
     |--------------------------------------------------------------------------
     |
