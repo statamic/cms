@@ -215,7 +215,7 @@ class Cache
             $store = AppCache::store('null');
         } else {
             $store = StaticCache::cacheStore();
-            $key .= '-'.$this->cacher->getUrl($request);
+            $key .= '-'.md5($this->cacher->getUrl($request));
         }
 
         return $store->lock($key, $this->lockFor);
