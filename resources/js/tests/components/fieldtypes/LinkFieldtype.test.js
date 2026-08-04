@@ -1,12 +1,13 @@
-import { mount } from '@vue/test-utils';
+import { flushPromises, mount } from '@vue/test-utils';
 import { expect, test, vi } from 'vitest';
 import * as Globals from '@/bootstrap/globals';
 import LinkFieldtype from '@/components/fieldtypes/LinkFieldtype.vue';
 
 Object.keys(Globals).forEach((fn) => (window[fn] = Globals[fn]));
 window.__ = (key) => key;
+window.Statamic = { $config: { get: (key) => ({ cpUrl: '/cp' })[key] } };
 
-function mountField({ value = null, config = {}, meta = {}, showFieldPreviews = false } = {}) {
+function mountField({ value = null, config = {}, meta = {}, showFieldPreviews = false, axiosPost } = {}) {
     return mount(LinkFieldtype, {
         shallow: true,
         props: {
@@ -21,6 +22,11 @@ function mountField({ value = null, config = {}, meta = {}, showFieldPreviews = 
                 ...meta,
             },
             showFieldPreviews,
+        },
+        global: {
+            mocks: {
+                $axios: { post: axiosPost ?? vi.fn(() => Promise.resolve({ data: { meta: {} } })) },
+            },
         },
     });
 }
@@ -212,4 +218,59 @@ test('replicatorPreview falls back to the type reference when there is no item d
     });
 
     expect(wrapper.vm.replicatorPreview).toBe('entry::4');
+});
+
+test('does not request meta for a type that was already preloaded', async () => {
+    const post = vi.fn(() => Promise.resolve({ data: { meta: {} } }));
+
+    const wrapper = mountField({
+        axiosPost: post,
+        meta: {
+            initialOption: 'entry',
+            types: {
+                entry: { title: 'Entries', component: 'relationship', config: {}, meta: { data: [] }, selected: [] },
+            },
+        },
+    });
+
+    await wrapper.vm.$nextTick();
+
+    expect(post).not.toHaveBeenCalled();
+});
+
+test('requests meta the first time a type without preloaded meta is picked', async () => {
+    const post = vi.fn(() => Promise.resolve({ data: { meta: { data: [] } } }));
+
+    const wrapper = mountField({
+        axiosPost: post,
+        meta: {
+            types: {
+                entry: {
+                    title: 'Entries',
+                    component: 'relationship',
+                    config: { type: 'entries', max_items: 1 },
+                    meta: null,
+                    selected: [],
+                },
+            },
+        },
+    });
+
+    wrapper.vm.option = 'entry';
+    await flushPromises();
+
+    expect(post).toHaveBeenCalledTimes(1);
+    expect(post.mock.calls[0][0]).toBe('/cp/fields/field-meta');
+    expect(JSON.parse(atob(post.mock.calls[0][1].config))).toEqual({
+        type: 'entries',
+        max_items: 1,
+        handle: 'entry',
+    });
+    expect(wrapper.emitted('update:meta').at(-1)[0].types.entry.meta).toEqual({ data: [] });
+
+    wrapper.vm.option = 'url';
+    wrapper.vm.option = 'entry';
+    await flushPromises();
+
+    expect(post).toHaveBeenCalledTimes(1);
 });

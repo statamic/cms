@@ -128,6 +128,8 @@ class Link extends Fieldtype
 
         $url = ($value !== '@child' && ! $linkType) ? $value : null;
 
+        $initialOption = $this->initialOption($value, $linkType);
+
         $types = [];
 
         foreach (static::types() as $handle => $type) {
@@ -149,14 +151,14 @@ class Link extends Fieldtype
                 'title' => $type->title(),
                 'component' => $nestedFieldtype->component(),
                 'config' => $nestedFieldtype->config(),
-                'meta' => $nestedFieldtype->preload(),
+                'meta' => $handle === $initialOption ? $nestedFieldtype->preload() : null,
                 'selected' => $selected ? [$selected] : [],
             ];
         }
 
         return [
             'initialUrl' => $url,
-            'initialOption' => $this->initialOption($value, $linkType),
+            'initialOption' => $initialOption,
             'showFirstChildOption' => $this->showFirstChildOption(),
             'types' => $types,
         ];
