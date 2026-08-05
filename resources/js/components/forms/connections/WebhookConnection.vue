@@ -129,6 +129,8 @@ onUnmounted(() => {
         :add-label="__('Add Webhook')"
         :empty-heading="__('No webhooks yet')"
         :empty-description="__('statamic::messages.webhook_connection_description')"
+        :delete-heading="__('Delete Webhook')"
+        :delete-description="__('statamic::messages.webhook_connection_delete_confirmation')"
         :has-error
         @add="addWebhook"
         @duplicate="duplicateWebhook"

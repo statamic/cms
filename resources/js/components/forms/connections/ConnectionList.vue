@@ -1,6 +1,6 @@
 <script setup>
 import { computed, ref } from 'vue';
-import { Button } from '@ui';
+import { Button, ConfirmationModal } from '@ui';
 import { SortableList } from '@/components/sortable/Sortable.js';
 import LogicEmptyState from '@/components/forms/logic/LogicEmptyState.vue';
 import ConnectionListItem from './ConnectionListItem.vue';
@@ -12,6 +12,8 @@ const props = defineProps({
     addLabel: String,
     emptyHeading: String,
     emptyDescription: String,
+    deleteHeading: String,
+    deleteDescription: String,
     hasError: { type: Function, default: () => false },
 });
 
@@ -32,6 +34,13 @@ const collapse = (id) => {
 };
 
 const expand = (id) => (collapsed.value = collapsed.value.filter((itemId) => itemId !== id));
+
+const confirmingRemoval = ref(null);
+
+const remove = () => {
+    emit('remove', confirmingRemoval.value);
+    confirmingRemoval.value = null;
+};
 </script>
 
 <template>
@@ -57,7 +66,7 @@ const expand = (id) => (collapsed.value = collapsed.value.filter((itemId) => ite
                         @collapsed="collapse(item.id)"
                         @expanded="expand(item.id)"
                         @duplicated="emit('duplicate', item)"
-                        @removed="emit('remove', item)"
+                        @removed="confirmingRemoval = item"
                         @update:enabled="item.enabled = $event"
                     >
                         <template #header>
@@ -75,6 +84,16 @@ const expand = (id) => (collapsed.value = collapsed.value.filter((itemId) => ite
             <Button size="sm" :text="addLabel" icon="plus" class="relative" @click="emit('add')" />
         </div>
     </template>
+
+    <ConfirmationModal
+        :open="confirmingRemoval !== null"
+        :title="deleteHeading"
+        :body-text="deleteDescription"
+        :button-text="__('Delete')"
+        danger
+        @update:open="confirmingRemoval = null"
+        @confirm="remove"
+    />
 </template>
 
 <style scoped>
