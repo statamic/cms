@@ -15,16 +15,16 @@ class EmailConnectionController extends CpController
     public function update(Request $request, $form)
     {
         $request->validate([
-            'configs' => ['present', 'array'],
-            'configs.*' => ['array'],
-            'configs.*.to' => ['required', new EmailConnectionAddress($form)],
-            'configs.*.cc' => [new EmailConnectionAddress($form)],
-            'configs.*.bcc' => [new EmailConnectionAddress($form)],
-            'configs.*.from' => [new EmailConnectionAddress($form)],
-            'configs.*.reply_to' => [new EmailConnectionAddress($form)],
+            'emails' => ['present', 'array'],
+            'emails.*' => ['array'],
+            'emails.*.to' => ['required', new EmailConnectionAddress($form)],
+            'emails.*.cc' => [new EmailConnectionAddress($form)],
+            'emails.*.bcc' => [new EmailConnectionAddress($form)],
+            'emails.*.from' => [new EmailConnectionAddress($form)],
+            'emails.*.reply_to' => [new EmailConnectionAddress($form)],
         ]);
 
-        $emailConfigs = collect($request->configs)
+        $emails = collect($request->emails)
             ->map(function (array $config) use ($form): array {
                 $config = Arr::removeNullValues($config);
 
@@ -46,6 +46,6 @@ class EmailConnectionController extends CpController
             ->values()
             ->all();
 
-        $form->connections($form->connections()->put('email', $emailConfigs))->save();
+        $form->connections($form->connections()->put('email', $emails))->save();
     }
 }

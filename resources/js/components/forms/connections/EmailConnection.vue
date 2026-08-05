@@ -53,13 +53,13 @@ const duplicateEmail = (email) => {
 
 const removeEmail = (email) => (emails.value = emails.value.filter((item) => item !== email));
 
-const hasError = (index) => Object.keys(errors.value).some((key) => key.startsWith(`configs.${index}.`));
+const hasError = (index) => Object.keys(errors.value).some((key) => key.startsWith(`emails.${index}.`));
 
 const rowErrors = (index) =>
     Object.entries(errors.value)
-        .filter(([key]) => key.startsWith(`configs.${index}.`))
+        .filter(([key]) => key.startsWith(`emails.${index}.`))
         .reduce((fields, [key, messages]) => {
-            const handle = key.replace(`configs.${index}.`, '').split('.')[0];
+            const handle = key.replace(`emails.${index}.`, '').split('.')[0];
             fields[handle] = [...(fields[handle] ?? []), ...messages];
             return fields;
         }, {});
@@ -70,9 +70,9 @@ const save = () => {
     errors.value = {};
     saving.value = true;
 
-    const configs = emails.value.map(({ values, meta, ...config }) => ({ ...config, ...values }));
-
-    axios.patch(props.action, { configs })
+    axios.patch(props.action, {
+        emails: emails.value.map(({ values, meta, ...config }) => ({ ...config, ...values })),
+    })
         .then(() => {
             Statamic.$dirty.remove(dirtyKey);
             Statamic.$toast.success(__('Saved'));

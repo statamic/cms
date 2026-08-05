@@ -13,13 +13,13 @@ class WebhookConnectionController extends CpController
     public function update(Request $request, $form)
     {
         $request->validate([
-            'configs' => ['present', 'array'],
-            'configs.*' => ['array'],
-            'configs.*.url' => ['required', 'url:http,https'],
-            'configs.*.verify_ssl' => ['sometimes', 'boolean'],
+            'webhooks' => ['present', 'array'],
+            'webhooks.*' => ['array'],
+            'webhooks.*.url' => ['required', 'url:http,https'],
+            'webhooks.*.verify_ssl' => ['sometimes', 'boolean'],
         ]);
 
-        $configs = collect($request->configs)
+        $webhooks = collect($request->webhooks)
             ->map(fn (array $config) => Arr::removeNullValues([
                 'id' => Arr::get($config, 'id') ?? Str::random(8),
                 ...Arr::except($config, ['_id', 'id']),
@@ -30,6 +30,6 @@ class WebhookConnectionController extends CpController
             ->values()
             ->all();
 
-        $form->connections($form->connections()->put('webhook', $configs))->save();
+        $form->connections($form->connections()->put('webhook', $webhooks))->save();
     }
 }

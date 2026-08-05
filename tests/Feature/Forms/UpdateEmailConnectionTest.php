@@ -32,7 +32,7 @@ class UpdateEmailConnectionTest extends TestCase
         $this
             ->from('/original')
             ->actingAs($this->userWithoutPermission())
-            ->update($form, ['configs' => []])
+            ->update($form, ['emails' => []])
             ->assertRedirect('/original')
             ->assertSessionHas('error');
 
@@ -53,7 +53,7 @@ class UpdateEmailConnectionTest extends TestCase
 
         $this
             ->actingAs($this->userWithPermission())
-            ->update($form, ['configs' => [
+            ->update($form, ['emails' => [
                 ['id' => 'abc', 'to' => ['new@example.com', 'field:email'], 'subject' => 'Updated'],
                 ['id' => 'ghi', 'to' => ['another@example.com']],
             ]])
@@ -74,7 +74,7 @@ class UpdateEmailConnectionTest extends TestCase
 
         $this
             ->actingAs($this->userWithPermission())
-            ->update($form, ['configs' => [['to' => ['foo@example.com']]]])
+            ->update($form, ['emails' => [['to' => ['foo@example.com']]]])
             ->assertOk();
 
         $config = Form::find('test')->connections()->get('email')[0];
@@ -90,7 +90,7 @@ class UpdateEmailConnectionTest extends TestCase
 
         $this
             ->actingAs($this->userWithPermission())
-            ->update($form, ['configs' => [[
+            ->update($form, ['emails' => [[
                 '_id' => 'vue-row',
                 'id' => 'abc',
                 'to' => ['foo@example.com'],
@@ -117,7 +117,7 @@ class UpdateEmailConnectionTest extends TestCase
 
         $this
             ->actingAs($this->userWithPermission())
-            ->update($form, ['configs' => [
+            ->update($form, ['emails' => [
                 [
                     'id' => 'abc',
                     'to' => ['foo@example.com'],
@@ -170,16 +170,16 @@ class UpdateEmailConnectionTest extends TestCase
     public static function invalidPayloads()
     {
         return [
-            'missing configs' => [[], ['configs']],
-            'configs not an array' => [['configs' => 'nope'], ['configs']],
-            'config not an array' => [['configs' => ['nope']], ['configs.0']],
-            'config without a recipient' => [['configs' => [['from' => 'foo@example.com']]], ['configs.0.to']],
-            'config with an empty recipient list' => [['configs' => [['to' => []]]], ['configs.0.to']],
-            'config with an invalid recipient' => [['configs' => [['to' => ['not-an-email']]]], ['configs.0.to']],
-            'config with an invalid legacy string recipient' => [['configs' => [['to' => 'foo@example.com, not-an-email']]], ['configs.0.to']],
-            'config with an unknown field reference' => [['configs' => [['to' => ['field:unknown']]]], ['configs.0.to']],
-            'config with an invalid cc' => [['configs' => [['to' => ['foo@example.com'], 'cc' => ['not-an-email']]]], ['configs.0.cc']],
-            'config with an invalid sender' => [['configs' => [['to' => ['foo@example.com'], 'from' => 'not-an-email']]], ['configs.0.from']],
+            'missing configs' => [[], ['emails']],
+            'configs not an array' => [['emails' => 'nope'], ['emails']],
+            'config not an array' => [['emails' => ['nope']], ['emails.0']],
+            'config without a recipient' => [['emails' => [['from' => 'foo@example.com']]], ['emails.0.to']],
+            'config with an empty recipient list' => [['emails' => [['to' => []]]], ['emails.0.to']],
+            'config with an invalid recipient' => [['emails' => [['to' => ['not-an-email']]]], ['emails.0.to']],
+            'config with an invalid legacy string recipient' => [['emails' => [['to' => 'foo@example.com, not-an-email']]], ['emails.0.to']],
+            'config with an unknown field reference' => [['emails' => [['to' => ['field:unknown']]]], ['emails.0.to']],
+            'config with an invalid cc' => [['emails' => [['to' => ['foo@example.com'], 'cc' => ['not-an-email']]]], ['emails.0.cc']],
+            'config with an invalid sender' => [['emails' => [['to' => ['foo@example.com'], 'from' => 'not-an-email']]], ['emails.0.from']],
         ];
     }
 

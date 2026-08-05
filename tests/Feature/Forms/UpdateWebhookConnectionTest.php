@@ -32,7 +32,7 @@ class UpdateWebhookConnectionTest extends TestCase
         $this
             ->from('/original')
             ->actingAs($this->userWithoutPermission())
-            ->update($form, ['configs' => []])
+            ->update($form, ['webhooks' => []])
             ->assertRedirect('/original')
             ->assertSessionHas('error');
 
@@ -49,7 +49,7 @@ class UpdateWebhookConnectionTest extends TestCase
 
         $this
             ->actingAs($this->userWithPermission())
-            ->update($form, ['configs' => [
+            ->update($form, ['webhooks' => [
                 ['id' => 'def', 'url' => 'https://example.com/updated', 'enabled' => false],
                 ['id' => 'ghi', 'url' => 'http://localhost:5678/n8n', 'verify_ssl' => false],
                 ['id' => 'jkl', 'url' => 'https://example.com/defaults', 'enabled' => true, 'verify_ssl' => true],
@@ -72,7 +72,7 @@ class UpdateWebhookConnectionTest extends TestCase
 
         $this
             ->actingAs($this->userWithPermission())
-            ->update($form, ['configs' => [['_id' => 'vue-row', 'id' => 'abc', 'url' => 'https://example.com/hook']]])
+            ->update($form, ['webhooks' => [['_id' => 'vue-row', 'id' => 'abc', 'url' => 'https://example.com/hook']]])
             ->assertOk();
 
         $this->assertEquals([
@@ -87,7 +87,7 @@ class UpdateWebhookConnectionTest extends TestCase
 
         $this
             ->actingAs($this->userWithPermission())
-            ->update($form, ['configs' => [['url' => 'https://example.com/hook']]])
+            ->update($form, ['webhooks' => [['url' => 'https://example.com/hook']]])
             ->assertOk();
 
         $config = Form::find('test')->connections()->get('webhook')[0];
@@ -103,7 +103,7 @@ class UpdateWebhookConnectionTest extends TestCase
 
         $this
             ->actingAs($this->userWithPermission())
-            ->update($form, ['configs' => [
+            ->update($form, ['webhooks' => [
                 [
                     'id' => 'abc',
                     'url' => 'https://example.com/hook',
@@ -142,7 +142,7 @@ class UpdateWebhookConnectionTest extends TestCase
 
         $this
             ->actingAs($this->userWithPermission())
-            ->update($form, ['configs' => [[
+            ->update($form, ['webhooks' => [[
                 'id' => 'abc',
                 'url' => 'https://example.com/hook',
                 'enabled' => null,
@@ -175,13 +175,13 @@ class UpdateWebhookConnectionTest extends TestCase
     public static function invalidPayloads()
     {
         return [
-            'missing configs' => [[], ['configs']],
-            'configs not an array' => [['configs' => 'nope'], ['configs']],
-            'config not an array' => [['configs' => ['nope']], ['configs.0']],
-            'config without a url' => [['configs' => [['enabled' => true]]], ['configs.0.url']],
-            'config with an invalid url' => [['configs' => [['url' => 'not a url']]], ['configs.0.url']],
-            'config with a non-http url' => [['configs' => [['url' => 'ftp://example.com/hook']]], ['configs.0.url']],
-            'config with a non-boolean verify_ssl' => [['configs' => [['url' => 'https://example.com/hook', 'verify_ssl' => 'nope']]], ['configs.0.verify_ssl']],
+            'missing configs' => [[], ['webhooks']],
+            'webhooks not an array' => [['webhooks' => 'nope'], ['webhooks']],
+            'config not an array' => [['webhooks' => ['nope']], ['webhooks.0']],
+            'config without a url' => [['webhooks' => [['enabled' => true]]], ['webhooks.0.url']],
+            'config with an invalid url' => [['webhooks' => [['url' => 'not a url']]], ['webhooks.0.url']],
+            'config with a non-http url' => [['webhooks' => [['url' => 'ftp://example.com/hook']]], ['webhooks.0.url']],
+            'config with a non-boolean verify_ssl' => [['webhooks' => [['url' => 'https://example.com/hook', 'verify_ssl' => 'nope']]], ['webhooks.0.verify_ssl']],
         ];
     }
 

@@ -44,8 +44,8 @@ const duplicateWebhook = (webhook) => {
 
 const removeWebhook = (webhook) => (webhooks.value = webhooks.value.filter((item) => item !== webhook));
 
-const error = (index, handle) => errors.value[`configs.${index}.${handle}`]?.[0];
-const hasError = (index) => Object.keys(errors.value).some((key) => key.startsWith(`configs.${index}.`));
+const error = (index, handle) => errors.value[`webhooks.${index}.${handle}`]?.[0];
+const hasError = (index) => Object.keys(errors.value).some((key) => key.startsWith(`webhooks.${index}.`));
 
 const save = () => {
     if (saving.value) return;
@@ -53,7 +53,7 @@ const save = () => {
     errors.value = {};
     saving.value = true;
 
-    axios.patch(props.action, { configs: webhooks.value })
+    axios.patch(props.action, { webhooks: webhooks.value })
         .then(() => {
             Statamic.$dirty.remove(dirtyKey);
             Statamic.$toast.success(__('Saved'));
