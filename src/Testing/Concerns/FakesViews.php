@@ -20,11 +20,11 @@ trait FakesViews
         $this->fakeViewFinder = new FakeViewFinder($this->app['files'], config('view.paths'));
 
         $this->fakeViewFactory = new FakeViewFactory($this->app['view.engine.resolver'], $this->fakeViewFinder, $this->app['events']);
+        $this->fakeViewFactory->setFakeEngine($this->fakeView);
         foreach (array_reverse($originalFactory->getExtensions()) as $ext => $engine) {
             $this->fakeViewFactory->addExtension($ext, $engine);
         }
 
-        $this->app->instance('FakeViewEngine', $this->fakeView);
         $this->app->instance('view.finder', $this->fakeViewFinder);
         $this->app->instance('view', $this->fakeViewFactory);
     }

@@ -9,13 +9,21 @@ class FakeViewFactory extends Factory
 {
     public $fileExtensions = [];
 
+    protected $fakeEngine;
+
+    public function setFakeEngine(FakeViewEngine $engine)
+    {
+        $this->fakeEngine = $engine;
+
+        return $this;
+    }
+
     public function make($view, $data = [], $mergeData = [])
     {
-        $engine = app('FakeViewEngine');
         $ext = $this->fileExtensions[$view] ?? 'antlers.html';
 
-        if ($engine->exists($view)) {
-            return new View($this, $engine, $view, "{$view}.{$ext}", $data);
+        if ($this->fakeEngine->exists($view)) {
+            return new View($this, $this->fakeEngine, $view, "{$view}.{$ext}", $data);
         }
 
         return parent::make($view, $data, $mergeData);
@@ -23,6 +31,6 @@ class FakeViewFactory extends Factory
 
     public function exists($view)
     {
-        return app('FakeViewEngine')->exists($view);
+        return $this->fakeEngine->exists($view);
     }
 }
