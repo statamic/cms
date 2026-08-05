@@ -147,6 +147,7 @@ onUnmounted(() => {
                             v-model="email.values"
                             :meta="email.meta"
                             :errors="rowErrors(index)"
+                            :track-dirty-state="false"
                         >
                             <PublishFieldsProvider :fields="blueprint.tabs[0].sections[0].fields">
                                 <PublishFields />
