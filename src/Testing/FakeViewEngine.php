@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Testing\Concerns;
+namespace Statamic\Testing;
 
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Str;

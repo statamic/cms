@@ -2,6 +2,10 @@
 
 namespace Statamic\Testing\Concerns;
 
+use Statamic\Testing\FakeViewEngine;
+use Statamic\Testing\FakeViewFactory;
+use Statamic\Testing\FakeViewFinder;
+
 trait FakesViews
 {
     protected $fakeView;
