@@ -36,8 +36,8 @@ test('builds dropdown options from the url, first child, and registered types', 
         meta: {
             showFirstChildOption: true,
             types: {
-                entry: { title: 'Entries', component: 'relationship', config: {}, meta: {}, selected: [] },
-                asset: { title: 'Assets', component: 'assets', config: {}, meta: {}, selected: [] },
+                entry: { title: 'Entries', component: 'relationship', config: {}, meta: {}, metaLoaded: true, selected: [] },
+                asset: { title: 'Assets', component: 'assets', config: {}, meta: {}, metaLoaded: true, selected: [] },
             },
         },
     });
@@ -90,7 +90,7 @@ test('selecting a type with an existing selection emits the type reference immed
     const wrapper = mountField({
         meta: {
             types: {
-                entry: { title: 'Entries', component: 'relationship', config: {}, meta: {}, selected: ['4'] },
+                entry: { title: 'Entries', component: 'relationship', config: {}, meta: {}, metaLoaded: true, selected: ['4'] },
             },
         },
     });
@@ -107,7 +107,7 @@ test('selecting a type with no existing selection does not emit a value', async 
     const wrapper = mountField({
         meta: {
             types: {
-                entry: { title: 'Entries', component: 'relationship', config: {}, meta: {}, selected: [] },
+                entry: { title: 'Entries', component: 'relationship', config: {}, meta: {}, metaLoaded: true, selected: [] },
             },
         },
     });
@@ -124,7 +124,7 @@ test('typeSelected stores the selection and emits the type reference', () => {
         meta: {
             initialOption: 'entry',
             types: {
-                entry: { title: 'Entries', component: 'relationship', config: {}, meta: {}, selected: ['1'] },
+                entry: { title: 'Entries', component: 'relationship', config: {}, meta: {}, metaLoaded: true, selected: ['1'] },
             },
         },
     });
@@ -139,8 +139,8 @@ test('initial selected values are indexed by type', () => {
     const wrapper = mountField({
         meta: {
             types: {
-                entry: { title: 'Entries', component: 'relationship', config: {}, meta: {}, selected: ['4'] },
-                asset: { title: 'Assets', component: 'assets', config: {}, meta: {}, selected: [] },
+                entry: { title: 'Entries', component: 'relationship', config: {}, meta: {}, metaLoaded: true, selected: ['4'] },
+                asset: { title: 'Assets', component: 'assets', config: {}, meta: {}, metaLoaded: true, selected: [] },
             },
         },
     });
@@ -177,6 +177,7 @@ test('replicatorPreview prefers the selected item title for a registered type', 
                     component: 'relationship',
                     config: {},
                     meta: { data: [{ title: 'About Us' }] },
+                    metaLoaded: true,
                     selected: ['4'],
                 },
             },
@@ -197,6 +198,7 @@ test('replicatorPreview falls back to the basename when there is no title', () =
                     component: 'assets',
                     config: {},
                     meta: { data: [{ basename: 'photo.jpg' }] },
+                    metaLoaded: true,
                     selected: ['4'],
                 },
             },
@@ -212,7 +214,7 @@ test('replicatorPreview falls back to the type reference when there is no item d
         meta: {
             initialOption: 'entry',
             types: {
-                entry: { title: 'Entries', component: 'relationship', config: {}, meta: {}, selected: ['4'] },
+                entry: { title: 'Entries', component: 'relationship', config: {}, meta: {}, metaLoaded: true, selected: ['4'] },
             },
         },
     });
@@ -228,7 +230,7 @@ test('does not request meta for a type that was already preloaded', async () => 
         meta: {
             initialOption: 'entry',
             types: {
-                entry: { title: 'Entries', component: 'relationship', config: {}, meta: { data: [] }, selected: [] },
+                entry: { title: 'Entries', component: 'relationship', config: {}, meta: { data: [] }, metaLoaded: true, selected: [] },
             },
         },
     });
@@ -250,6 +252,7 @@ test('requests meta the first time a type without preloaded meta is picked', asy
                     component: 'relationship',
                     config: { type: 'entries', max_items: 1 },
                     meta: null,
+                    metaLoaded: false,
                     selected: [],
                 },
             },
@@ -266,10 +269,48 @@ test('requests meta the first time a type without preloaded meta is picked', asy
         max_items: 1,
         handle: 'entry',
     });
-    expect(wrapper.emitted('update:meta').at(-1)[0].types.entry.meta).toEqual({ data: [] });
+    expect(wrapper.emitted('update:meta').at(-1)[0].types.entry).toMatchObject({
+        meta: { data: [] },
+        metaLoaded: true,
+    });
 
     wrapper.vm.option = 'url';
     wrapper.vm.option = 'entry';
+    await flushPromises();
+
+    expect(post).toHaveBeenCalledTimes(1);
+});
+
+test('does not request meta again for a type whose fieldtype has no meta to preload', async () => {
+    const post = vi.fn(() => Promise.resolve({ data: { meta: null } }));
+
+    const wrapper = mountField({
+        axiosPost: post,
+        meta: {
+            types: {
+                email: {
+                    title: 'Email',
+                    component: 'text',
+                    config: { type: 'text' },
+                    meta: null,
+                    metaLoaded: false,
+                    selected: [],
+                },
+            },
+        },
+    });
+
+    wrapper.vm.option = 'email';
+    await flushPromises();
+
+    expect(post).toHaveBeenCalledTimes(1);
+    expect(wrapper.emitted('update:meta').at(-1)[0].types.email.metaLoaded).toBe(true);
+
+    await wrapper.setProps({ meta: wrapper.emitted('update:meta').at(-1)[0] });
+
+    wrapper.vm.option = 'url';
+    await flushPromises();
+    wrapper.vm.option = 'email';
     await flushPromises();
 
     expect(post).toHaveBeenCalledTimes(1);

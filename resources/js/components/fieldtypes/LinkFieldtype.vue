@@ -9,7 +9,7 @@
             <Input v-if="option === 'url'" :read-only="isReadOnly" v-model="urlValue" />
 
             <component
-                v-else-if="matchedType && matchedType.meta"
+                v-else-if="matchedType && matchedType.metaLoaded"
                 :is="matchedTypeComponent"
                 ref="typeField"
                 :config="matchedType.config"
@@ -151,7 +151,7 @@ export default {
         loadTypeMeta(handle) {
             const type = this.meta.types[handle];
 
-            if (!type || type.meta) return Promise.resolve();
+            if (!type || type.metaLoaded) return Promise.resolve();
 
             const params = {
                 config: utf8btoa(JSON.stringify({ ...type.config, handle })),
@@ -190,7 +190,7 @@ export default {
                 ...this.meta,
                 types: {
                     ...this.meta.types,
-                    [handle]: { ...this.meta.types[handle], meta: typeMeta },
+                    [handle]: { ...this.meta.types[handle], meta: typeMeta, metaLoaded: true },
                 },
             });
         },

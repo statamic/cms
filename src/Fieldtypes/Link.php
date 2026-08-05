@@ -152,6 +152,7 @@ class Link extends Fieldtype
                 'component' => $nestedFieldtype->component(),
                 'config' => $nestedFieldtype->config(),
                 'meta' => $handle === $initialOption ? $nestedFieldtype->preload() : null,
+                'metaLoaded' => $handle === $initialOption,
                 'selected' => $selected ? [$selected] : [],
             ];
         }

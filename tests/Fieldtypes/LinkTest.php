@@ -407,7 +407,9 @@ class LinkTest extends TestCase
         $types = (new Link)->setField($field)->preload()['types'];
 
         $this->assertNotNull($types['entry']['meta']);
+        $this->assertTrue($types['entry']['metaLoaded']);
         $this->assertNull($types['asset']['meta']);
+        $this->assertFalse($types['asset']['metaLoaded']);
     }
 
     #[Test]
@@ -422,7 +424,9 @@ class LinkTest extends TestCase
         $types = (new Link)->setField($field)->preload()['types'];
 
         $this->assertNull($types['entry']['meta']);
+        $this->assertFalse($types['entry']['metaLoaded']);
         $this->assertNotNull($types['asset']['meta']);
+        $this->assertTrue($types['asset']['metaLoaded']);
     }
 
     #[Test]
@@ -437,7 +441,22 @@ class LinkTest extends TestCase
         $types = (new Link)->setField($field)->preload()['types'];
 
         $this->assertNull($types['entry']['meta']);
+        $this->assertFalse($types['entry']['metaLoaded']);
         $this->assertNull($types['asset']['meta']);
+        $this->assertFalse($types['asset']['metaLoaded']);
+    }
+
+    #[Test]
+    public function it_marks_meta_as_loaded_for_a_type_whose_fieldtype_preloads_nothing()
+    {
+        Link::extend('link-extend-test-basic-preload', TestBasicLinkType::class);
+
+        $field = new Field('test', ['type' => 'link', 'default_option' => 'link-extend-test-basic-preload']);
+
+        $types = (new Link)->setField($field)->preload()['types'];
+
+        $this->assertNull($types['link-extend-test-basic-preload']['meta']);
+        $this->assertTrue($types['link-extend-test-basic-preload']['metaLoaded']);
     }
 
     #[Test]
