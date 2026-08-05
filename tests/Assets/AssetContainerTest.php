@@ -9,6 +9,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Storage;
 use League\Flysystem\DirectoryAttributes;
@@ -581,7 +582,7 @@ class AssetContainerTest extends TestCase
     }
 
     #[Test]
-    public function it_gets_the_files_from_the_cache_every_time_if_running_in_a_queue_worker()
+    public function it_still_only_gets_the_files_from_the_cache_once_per_job_if_running_in_a_queue_worker()
     {
         $cacheKey = 'asset-list-contents-test';
 
@@ -607,6 +608,14 @@ class AssetContainerTest extends TestCase
         $expected = ['one.jpg', 'two.jpg'];
         $this->assertEquals($expected, $container->files()->all());
         $this->assertEquals(1, $cacheHits);
+        $this->assertEquals($expected, $container->files()->all());
+        $this->assertEquals(1, $cacheHits);
+
+        // Laravel's real queue worker daemon loop clears resolved facade instances
+        // before every job it processes, which resets the Blink-backed
+        // AssetContainerContents instance behind the `contents()` call.
+        Facade::clearResolvedInstances();
+
         $this->assertEquals($expected, $container->files()->all());
         $this->assertEquals(2, $cacheHits);
     }
@@ -709,7 +718,7 @@ class AssetContainerTest extends TestCase
     }
 
     #[Test]
-    public function it_gets_the_folders_from_the_cache_and_blink_every_time_if_running_in_a_queue_worker()
+    public function it_still_only_gets_the_folders_from_the_cache_and_blink_once_per_job_if_running_in_a_queue_worker()
     {
         $cacheKey = 'asset-list-contents-test';
 
@@ -735,11 +744,20 @@ class AssetContainerTest extends TestCase
         $this->assertEquals($expected, $container->folders()->all());
         $this->assertEquals(1, $cacheHits);
         $this->assertEquals($expected, $container->folders()->all());
-        $this->assertEquals(2, $cacheHits);
+        $this->assertEquals(1, $cacheHits);
 
+        // Still within the same job (resolved facade instances haven't been cleared),
+        // a freshly newed up container reuses the same Blink-cached contents.
         $anotherInstanceOfTheContainer = (new AssetContainer)->handle('test')->disk('test');
         $this->assertEquals($expected, $anotherInstanceOfTheContainer->folders()->all());
-        $this->assertEquals(3, $cacheHits);
+        $this->assertEquals(1, $cacheHits);
+
+        // Laravel's real queue worker daemon loop clears resolved facade instances
+        // before every job it processes, which resets the Blink-backed contents cache.
+        Facade::clearResolvedInstances();
+
+        $this->assertEquals($expected, $container->folders()->all());
+        $this->assertEquals(2, $cacheHits);
     }
 
     #[Test]
@@ -757,8 +775,11 @@ class AssetContainerTest extends TestCase
         Request::swap(new FakeArtisanRequest('queue:work'));
 
         // First job populates the instance's $metaFiles cache. metaFilesIn() has no
-        // isWorker() guard, so if contents() reused the same instance across jobs
-        // the filtered result would stick around and bleed into the next job.
+        // memoization guard of its own, so if contents() reused the same instance
+        // across jobs the filtered result would stick around and bleed into the
+        // next job. In real usage, Laravel's queue worker daemon loop clears
+        // resolved facade instances before every job it processes, which resets
+        // the Blink-backed instance behind `contents()` at each job boundary.
         $this->assertEquals(
             ['.meta/a.txt.yaml'],
             $container->contents()->metaFilesIn('/', true)->keys()->all()
@@ -771,6 +792,10 @@ class AssetContainerTest extends TestCase
             'b.txt' => ['type' => 'file', 'path' => 'b.txt', 'dirname' => ''],
             '.meta/b.txt.yaml' => ['type' => 'file', 'path' => '.meta/b.txt.yaml', 'dirname' => '.meta'],
         ]));
+
+        // Simulate the job boundary: Laravel clears resolved facade instances
+        // before every job.
+        Facade::clearResolvedInstances();
 
         $this->assertEquals(
             ['.meta/a.txt.yaml', '.meta/b.txt.yaml'],

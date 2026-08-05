@@ -64,7 +64,7 @@ class StoreTest extends TestCase
     }
 
     #[Test]
-    public function it_gets_the_paths_from_the_cache_every_time_if_running_in_a_queue_worker()
+    public function it_still_only_gets_the_paths_from_the_cache_once_per_job_if_running_in_a_queue_worker()
     {
         $store = $this->store->directory('/path/to/directory');
         $cacheKey = "stache::indexes::{$store->key()}::path";
@@ -83,6 +83,33 @@ class StoreTest extends TestCase
         $expected = collect(['foo', 'bar']);
         $this->assertEquals($expected, $store->paths());
         $this->assertEquals(1, $cacheHits);
+        $this->assertEquals($expected, $store->paths());
+        $this->assertEquals(1, $cacheHits);
+    }
+
+    #[Test]
+    public function it_gets_the_paths_from_the_cache_again_after_memoized_state_is_reset_between_jobs()
+    {
+        $store = $this->store->directory('/path/to/directory');
+        $cacheKey = "stache::indexes::{$store->key()}::path";
+
+        Cache::put($cacheKey, ['foo', 'bar']);
+
+        $cacheHits = 0;
+        Event::listen(CacheHit::class, function ($event) use (&$cacheHits, $cacheKey) {
+            if ($event->key === $cacheKey) {
+                $cacheHits++;
+            }
+        });
+
+        Request::swap(new FakeArtisanRequest('queue:listen'));
+
+        $expected = collect(['foo', 'bar']);
+        $this->assertEquals($expected, $store->paths());
+        $this->assertEquals(1, $cacheHits);
+
+        $store->resetMemoizedState();
+
         $this->assertEquals($expected, $store->paths());
         $this->assertEquals(2, $cacheHits);
     }

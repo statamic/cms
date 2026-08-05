@@ -27,7 +27,6 @@ use Statamic\Facades\Pattern;
 use Statamic\Facades\Search;
 use Statamic\Facades\Stache;
 use Statamic\Facades\URL;
-use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
@@ -345,7 +344,7 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
 
     public function contents()
     {
-        return Blink::onceIf(! Statamic::isWorker(), 'asset-listing-cache-'.$this->handle(), function () {
+        return Blink::once('asset-listing-cache-'.$this->handle(), function () {
             return app(AssetContainerContents::class)->container($this);
         });
     }

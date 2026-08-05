@@ -3,7 +3,6 @@
 namespace Statamic\Stache\Indexes;
 
 use Statamic\Facades\Stache;
-use Statamic\Statamic;
 
 abstract class Index
 {
@@ -66,16 +65,11 @@ abstract class Index
         }
 
         $loadingKey = $this->store->key().'/'.$this->name;
-        $currentlyLoadingThis = in_array($loadingKey, static::$loadingStack);
 
         static::$loadingStack[] = $loadingKey;
 
         try {
             $this->loaded = true;
-
-            if (Statamic::isWorker() && ! $currentlyLoadingThis) {
-                $this->loaded = false;
-            }
 
             debugbar()->addMessage("Loading index: {$loadingKey}", 'stache');
 
@@ -161,6 +155,11 @@ abstract class Index
         $this->items = null;
 
         Stache::cacheStore()->forget($this->cacheKey());
+    }
+
+    public function resetMemoizedState()
+    {
+        $this->loaded = false;
     }
 
     /** @deprecated */
