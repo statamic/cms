@@ -3,7 +3,8 @@ import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import axios from 'axios';
 import { nanoid as uniqid } from 'nanoid';
 import { keys } from '@api';
-import { Badge, Button, Field, Icon, Input, Label, Subheading, Switch } from '@ui';
+import { Badge, Button, Field, Icon, Label, PublishContainer, PublishFields, PublishFieldsProvider, Subheading } from '@ui';
+import { deepClone } from '@/util/clone.js';
 import ConnectionList from './ConnectionList.vue';
 import ConnectionLogic, { conditionsSummary } from './ConnectionLogic.vue';
 
@@ -11,6 +12,9 @@ const props = defineProps({
     form: Object,
     config: { type: Array, default: () => [] },
     action: String,
+    blueprint: Object,
+    rows: { type: Array, default: () => [] },
+    defaults: Object,
     examplePayload: Object,
 });
 
@@ -20,32 +24,48 @@ const errors = ref({});
 const saving = ref(false);
 const saveBinding = ref(null);
 
-const webhooks = ref(props.config.map((webhook) => ({
-    enabled: true,
-    verify_ssl: true,
-    ...webhook,
-    id: webhook.id ?? webhook._id,
-    conditions: (webhook.conditions ?? []).map((condition) => ({ ...condition, _id: uniqid() })),
+const webhooks = ref(props.config.map((config, index) => ({
+    id: config.id ?? config._id,
+    enabled: config.enabled ?? true,
+    conditions: (config.conditions ?? []).map((condition) => ({ ...condition, _id: uniqid() })),
+    values: props.rows[index]?.values ?? deepClone(props.defaults.values),
+    meta: props.rows[index]?.meta ?? deepClone(props.defaults.meta),
 })));
 
 const examplePayload = computed(() => JSON.stringify(props.examplePayload, null, 2));
 
-const addWebhook = () => webhooks.value.push({ id: uniqid(), enabled: true, verify_ssl: true, conditions: [] });
+const addWebhook = () => webhooks.value.push({
+    id: uniqid(),
+    enabled: true,
+    conditions: [],
+    values: deepClone(props.defaults.values),
+    meta: deepClone(props.defaults.meta),
+});
 
 const duplicateWebhook = (webhook) => {
     const index = webhooks.value.indexOf(webhook);
 
     webhooks.value.splice(index + 1, 0, {
-        ...webhook,
         id: uniqid(),
+        enabled: webhook.enabled,
         conditions: webhook.conditions.map((condition) => ({ ...condition, _id: uniqid() })),
+        values: deepClone(webhook.values),
+        meta: deepClone(webhook.meta),
     });
 };
 
 const removeWebhook = (webhook) => (webhooks.value = webhooks.value.filter((item) => item !== webhook));
 
-const error = (index, handle) => errors.value[`webhooks.${index}.${handle}`]?.[0];
 const hasError = (index) => Object.keys(errors.value).some((key) => key.startsWith(`webhooks.${index}.`));
+
+const rowErrors = (index) =>
+    Object.entries(errors.value)
+        .filter(([key]) => key.startsWith(`webhooks.${index}.`))
+        .reduce((fields, [key, messages]) => {
+            const handle = key.replace(`webhooks.${index}.`, '').split('.')[0];
+            fields[handle] = [...(fields[handle] ?? []), ...messages];
+            return fields;
+        }, {});
 
 const save = () => {
     if (saving.value) return;
@@ -53,7 +73,9 @@ const save = () => {
     errors.value = {};
     saving.value = true;
 
-    axios.patch(props.action, { webhooks: webhooks.value })
+    axios.patch(props.action, {
+        webhooks: webhooks.value.map(({ values, meta, ...config }) => ({ ...config, ...values })),
+    })
         .then(() => {
             Statamic.$dirty.remove(dirtyKey);
             Statamic.$toast.success(__('Saved'));
@@ -115,7 +137,7 @@ onUnmounted(() => {
         <template #header="{ item: webhook, collapsed }">
             <Badge size="lg" pill color="white" class="px-3 text-gray-950 gap-1">
                 <Icon name="globe-arrow" class="size-3.5 me-1 opacity-100! text-teal-600 dark:text-teal-400" aria-hidden="true" />
-                {{ webhook.url || __('New Webhook') }}
+                {{ webhook.values.url || __('New Webhook') }}
             </Badge>
             <Subheading v-show="collapsed" class="overflow-hidden text-ellipsis whitespace-nowrap gap-1.5!">
                 <span class="truncate">{{ conditionsSummary(webhook.conditions) }}</span>
@@ -129,21 +151,18 @@ onUnmounted(() => {
                 :if-label="__('Send if...')"
             >
                 <template #then>
-                    <div class="space-y-6 rounded-lg border border-gray-300 bg-white p-4 dark:border-gray-700 dark:bg-gray-900">
-                        <Field
-                            :label="__('URL')"
-                            :instructions="__('statamic::messages.webhook_connection_url_instructions')"
-                            required
-                            :error="error(index, 'url')"
+                    <div class="rounded-lg border border-gray-300 bg-white p-4 dark:border-gray-700 dark:bg-gray-900">
+                        <PublishContainer
+                            :name="`webhook-connection-${webhook.id}`"
+                            :blueprint="blueprint"
+                            v-model="webhook.values"
+                            :meta="webhook.meta"
+                            :errors="rowErrors(index)"
                         >
-                            <Input v-model="webhook.url" type="url" />
-                        </Field>
-                        <Field
-                            :label="__('Verify SSL Certificate')"
-                            :instructions="__('statamic::messages.webhook_connection_verify_ssl_instructions')"
-                        >
-                            <Switch v-model="webhook.verify_ssl" />
-                        </Field>
+                            <PublishFieldsProvider :fields="blueprint.tabs[0].sections[0].fields">
+                                <PublishFields />
+                            </PublishFieldsProvider>
+                        </PublishContainer>
                     </div>
                 </template>
             </ConnectionLogic>

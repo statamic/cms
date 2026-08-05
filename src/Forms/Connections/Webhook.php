@@ -39,9 +39,56 @@ class Webhook extends Connection
 
     public function render(Form $form): VueComponent
     {
+        $fields = static::blueprint($form)->fields();
+        $blank = $fields->preProcess();
+
         return VueComponent::render('webhook-connection', [
             'action' => cp_route('forms.connect.webhook.update', $form->handle()),
+            'blueprint' => static::blueprint($form)->toPublishArray(),
+            'rows' => collect($form->connections()->get('webhook'))
+                ->map(function (array $config) use ($fields) {
+                    $row = $fields->addValues($config)->preProcess();
+
+                    return ['values' => $row->values()->all(), 'meta' => $row->meta()->all()];
+                })
+                ->all(),
+            'defaults' => ['values' => $blank->values()->all(), 'meta' => $blank->meta()->all()],
             'examplePayload' => $this->examplePayload($form),
+        ]);
+    }
+
+    public static function blueprint(Form $form): \Statamic\Fields\Blueprint
+    {
+        return Blueprint::make()->setContents([
+            'tabs' => [
+                'main' => [
+                    'sections' => [
+                        [
+                            'fields' => [
+                                [
+                                    'handle' => 'url',
+                                    'field' => [
+                                        'type' => 'text',
+                                        'input_type' => 'url',
+                                        'display' => __('URL'),
+                                        'validate' => ['required'],
+                                        'instructions' => __('statamic::messages.webhook_connection_url_instructions'),
+                                    ],
+                                ],
+                                [
+                                    'handle' => 'verify_ssl',
+                                    'field' => [
+                                        'type' => 'toggle',
+                                        'display' => __('Verify SSL Certificate'),
+                                        'instructions' => __('statamic::messages.webhook_connection_verify_ssl_instructions'),
+                                        'default' => true,
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
         ]);
     }
 
