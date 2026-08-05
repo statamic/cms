@@ -23,6 +23,7 @@ const dirtyKey = 'webhook-connection';
 const errors = ref({});
 const saving = ref(false);
 const saveBinding = ref(null);
+const showExamplePayload = ref(props.config.length === 0);
 
 const webhooks = ref(props.config.map((config, index) => ({
     id: config.id ?? config._id,
@@ -116,10 +117,21 @@ onUnmounted(() => {
 
     <Field
         class="mb-8"
-        :label="__('Request Format')"
+        :label="__('Example Payload')"
         :instructions="__('statamic::messages.webhook_connection_payload_instructions')"
     >
-        <pre class="mt-2 overflow-x-auto rounded-lg border border-gray-200 bg-gray-50 p-4 text-xs text-gray-800 dark:border-white/10 dark:bg-gray-950/40 dark:text-gray-300"><code>{{ examplePayload }}</code></pre>
+        <template #actions>
+            <Button
+                variant="subtle"
+                size="xs"
+                :icon-append="showExamplePayload ? 'chevron-up' : 'chevron-down'"
+                :text="showExamplePayload ? __('Hide') : __('Show')"
+                :aria-expanded="showExamplePayload"
+                @click="showExamplePayload = !showExamplePayload"
+            />
+        </template>
+
+        <pre v-show="showExamplePayload" class="overflow-x-auto rounded-lg border border-gray-200 bg-gray-50 p-4 text-xs text-gray-800 dark:border-white/10 dark:bg-gray-950/40 dark:text-gray-300"><code>{{ examplePayload }}</code></pre>
     </Field>
 
     <Label :text="__('Webhooks')" />

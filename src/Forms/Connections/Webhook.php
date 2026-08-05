@@ -72,7 +72,7 @@ class Webhook extends Connection
                                         'input_type' => 'url',
                                         'display' => __('URL'),
                                         'validate' => ['required'],
-                                        'instructions' => __('statamic::messages.webhook_connection_url_instructions'),
+                                        'placeholder' => 'https://example.com/webhook',
                                     ],
                                 ],
                                 [

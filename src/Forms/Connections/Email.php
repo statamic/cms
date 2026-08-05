@@ -102,7 +102,6 @@ class Email extends Connection
                                     'field' => [
                                         'type' => 'select',
                                         'display' => __('CC Recipient(s)'),
-                                        'instructions' => __('statamic::messages.form_configure_email_cc_instructions'),
                                         'options' => $addressOptions,
                                         'multiple' => true,
                                         'taggable' => true,
@@ -114,7 +113,6 @@ class Email extends Connection
                                     'field' => [
                                         'type' => 'select',
                                         'display' => __('BCC Recipient(s)'),
-                                        'instructions' => __('statamic::messages.form_configure_email_bcc_instructions'),
                                         'options' => $addressOptions,
                                         'multiple' => true,
                                         'taggable' => true,
@@ -151,7 +149,6 @@ class Email extends Connection
                                     'field' => [
                                         'type' => 'text',
                                         'display' => __('Subject'),
-                                        'instructions' => __('statamic::messages.form_configure_email_subject_instructions'),
                                     ],
                                 ],
                                 [
@@ -159,7 +156,7 @@ class Email extends Connection
                                     'field' => [
                                         'type' => 'template',
                                         'display' => __('HTML view'),
-                                        'instructions' => __('statamic::messages.form_configure_email_html_instructions'),
+                                        'instructions' => __('statamic::messages.form_configure_email_views_instructions'),
                                         'folder' => config('statamic.forms.email_view_folder'),
                                         'width' => 50,
                                     ],
@@ -169,7 +166,7 @@ class Email extends Connection
                                     'field' => [
                                         'type' => 'template',
                                         'display' => __('Text view'),
-                                        'instructions' => __('statamic::messages.form_configure_email_text_instructions'),
+                                        'instructions' => __('statamic::messages.form_configure_email_views_instructions'),
                                         'folder' => config('statamic.forms.email_view_folder'),
                                         'width' => 50,
                                     ],
