@@ -1712,7 +1712,6 @@ class CoreModifiers extends Modifier
     /**
      * Generate an md5 hash of a value.
      *
-     * @param  $value
      * @return string
      */
     public function md5($value)
