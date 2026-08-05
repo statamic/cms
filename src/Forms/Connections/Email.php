@@ -45,7 +45,7 @@ class Email extends Connection
         return VueComponent::render('email-connection', [
             'action' => cp_route('forms.connect.email.update', $form->handle()),
             'blueprint' => static::blueprint($form)->toPublishArray(),
-            'rows' => collect($form->connections()->get('email', []))
+            'rows' => collect($form->connections()->get('email'))
                 ->map(function (array $config) use ($fields) {
                     $row = $fields->addValues(static::splitLegacyAddressStrings($config))->preProcess();
 
