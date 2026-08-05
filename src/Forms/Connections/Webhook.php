@@ -2,6 +2,7 @@
 
 namespace Statamic\Forms\Connections;
 
+use Illuminate\Routing\Router;
 use Statamic\Contracts\Forms\Form;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Facades\User;
@@ -17,7 +18,7 @@ class Webhook extends Connection
     protected $icon = 'globe-arrow';
     protected $developer = 'Statamic';
 
-    public function description()
+    public function description(): ?string
     {
         return __('statamic::messages.webhook_connection_description');
     }
@@ -27,7 +28,7 @@ class Webhook extends Connection
         return count($form->connections()->get('webhook', []));
     }
 
-    public function finalized(Submission $submission)
+    public function finalized(Submission $submission): object|array
     {
         return collect($submission->form()->connections()->get('webhook', []))
             ->reject(fn (array $config) => ($config['enabled'] ?? true) === false)
@@ -44,7 +45,7 @@ class Webhook extends Connection
         ]);
     }
 
-    public function routes($router): void
+    public function routes(Router $router): void
     {
         $router->patch('/', [WebhookConnectionController::class, 'update'])->name('update');
     }

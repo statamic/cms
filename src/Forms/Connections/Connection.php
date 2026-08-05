@@ -2,6 +2,7 @@
 
 namespace Statamic\Forms\Connections;
 
+use Illuminate\Routing\Router;
 use Statamic\Contracts\Forms\Form;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Extend\HasHandle;
@@ -23,12 +24,12 @@ abstract class Connection
     protected $icon;
     protected $developer;
 
-    public static function handle()
+    public static function handle(): string
     {
         return Str::removeRight(static::traitHandle(), '_connection');
     }
 
-    public function title()
+    public function title(): string
     {
         if (static::$title) {
             return static::$title;
@@ -37,12 +38,12 @@ abstract class Connection
         return __(Str::title(Str::humanize(static::handle())));
     }
 
-    public function description()
+    public function description(): ?string
     {
         return $this->description;
     }
 
-    public function icon()
+    public function icon(): ?string
     {
         if (! $this->icon) {
             return null;
@@ -51,7 +52,7 @@ abstract class Connection
         return Str::startsWith($this->icon, '<svg') ? $this->icon : Statamic::svg('icons/'.$this->icon);
     }
 
-    public function developer()
+    public function developer(): ?string
     {
         return $this->developer;
     }
@@ -61,14 +62,14 @@ abstract class Connection
         return null;
     }
 
-    public function finalized(Submission $submission)
+    public function finalized(Submission $submission): object|array
     {
         return [];
     }
 
     abstract public function render(Form $form): VueComponent;
 
-    public function routes($router): void
+    public function routes(Router $router): void
     {
         //
     }

@@ -2,6 +2,7 @@
 
 namespace Statamic\Forms\Connections;
 
+use Illuminate\Routing\Router;
 use Statamic\Contracts\Forms\Form;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Facades\Blueprint;
@@ -16,12 +17,12 @@ class Email extends Connection
 {
     protected $developer = 'Statamic';
 
-    public function description()
+    public function description(): ?string
     {
         return __('statamic::messages.email_connection_description');
     }
 
-    public function icon()
+    public function icon(): ?string
     {
         return Statamic::svg('forms/connect/email-notifications');
     }
@@ -31,7 +32,7 @@ class Email extends Connection
         return count($form->connections()->get('email', []));
     }
 
-    public function finalized(Submission $submission)
+    public function finalized(Submission $submission): object|array
     {
         return new SendEmails($submission, $submission->site());
     }
@@ -66,7 +67,7 @@ class Email extends Connection
         return $config;
     }
 
-    public function routes($router): void
+    public function routes(Router $router): void
     {
         $router->patch('/', [EmailConnectionController::class, 'update'])->name('update');
     }
