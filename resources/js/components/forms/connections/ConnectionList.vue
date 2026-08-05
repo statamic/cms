@@ -23,7 +23,7 @@ const items = computed({
     set: (value) => emit('update:modelValue', value),
 });
 
-const collapsed = ref(items.value.map((item) => item.id));
+const collapsed = ref([]);
 
 const collapse = (id) => {
     if (!collapsed.value.includes(id)) {
