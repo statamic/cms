@@ -19,7 +19,7 @@ class ConnectionRepository
 
     public function routes(): void
     {
-        Route::namespace('\\')->prefix('forms/{form}/connect')->name('forms.connect.')->group(function () {
+        Route::prefix('forms/{form}/connect')->name('forms.connect.')->group(function () {
             $this->all()->each(function (Connection $connection) {
                 Route::name($connection::handle().'.')
                     ->prefix($connection::handle())
