@@ -422,6 +422,7 @@ class FormBuilderTest extends TestCase
                     'display' => 'Personal Info',
                     'instructions' => 'Please provide your personal information.',
                     'button_label' => 'Next',
+                    'show_previous_button' => false,
                     'previous_page_label' => null,
                     'sections' => [
                         [
@@ -448,6 +449,7 @@ class FormBuilderTest extends TestCase
                     'display' => 'Contact Info',
                     'instructions' => 'How can we reach you?',
                     'button_label' => 'Submit',
+                    'show_previous_button' => true,
                     'previous_page_label' => 'Go Back',
                     'sections' => [
                         [
@@ -483,6 +485,9 @@ class FormBuilderTest extends TestCase
         $this->assertCount(2, $formFields->pages());
         $this->assertEquals('Personal Info', $formFields->pages()[0]['display']);
         $this->assertEquals('Contact Info', $formFields->pages()[1]['display']);
+        $this->assertFalse($formFields->pages()[0]['show_previous_button']);
+        $this->assertTrue($formFields->pages()[1]['show_previous_button']);
+        $this->assertEquals('Go Back', $formFields->pages()[1]['previous_page_label']);
     }
 
     #[Test]

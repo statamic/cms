@@ -529,7 +529,7 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
     /**
      * The specific glide presets to be used when warming glide image cache on upload.
      *
-     * @param  array|null  $presets
+     * @param  array|null  $preset
      * @return array|null|$this
      */
     public function warmPresets($preset = null)

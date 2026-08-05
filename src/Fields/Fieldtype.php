@@ -338,6 +338,16 @@ abstract class Fieldtype implements Arrayable
         return $data;
     }
 
+    /**
+     * Generate a fake value for form submission testing.
+     *
+     * Return null to fall back to FakeSubmissionGenerator's built-in handling.
+     */
+    public function fakeValue(): mixed
+    {
+        return null;
+    }
+
     public function preProcessConfig($data)
     {
         return $this->preProcess($data);

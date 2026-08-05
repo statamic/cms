@@ -19,6 +19,7 @@ class NameTest extends TestCase
 
         $this->assertEquals([
             'type' => 'text',
+            'autocomplete' => 'name',
             'placeholder' => 'Your name',
         ], $fieldtype->toFieldArray());
     }
@@ -34,6 +35,7 @@ class NameTest extends TestCase
 
         $this->assertEquals([
             'type' => 'text',
+            'autocomplete' => 'name',
             'placeholder' => 'Your name',
             'default' => 'John',
         ], $fieldtype->toFieldArray());

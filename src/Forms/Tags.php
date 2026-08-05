@@ -375,7 +375,13 @@ class Tags extends BaseTags
                 ];
 
                 if (! $isFirstPage) {
-                    $page['previous_page_label'] = $contents['previous_page_label'] ?? null;
+                    $showPreviousButton = $contents['show_previous_button'] ?? filled($contents['previous_page_label'] ?? null);
+
+                    if ($showPreviousButton) {
+                        $page['previous_page_label'] = filled($contents['previous_page_label'] ?? null)
+                            ? $contents['previous_page_label']
+                            : __('Previous Page');
+                    }
                 }
 
                 if ($jsDriver instanceof AbstractJsDriver) {
