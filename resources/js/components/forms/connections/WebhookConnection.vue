@@ -24,6 +24,7 @@ const webhooks = ref(props.config.map((webhook) => ({
     enabled: true,
     verify_ssl: true,
     ...webhook,
+    id: webhook.id ?? webhook._id,
     conditions: (webhook.conditions ?? []).map((condition) => ({ ...condition, _id: uniqid() })),
 })));
 

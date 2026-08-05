@@ -68,6 +68,22 @@ class UpdateEmailConnectionTest extends TestCase
     }
 
     #[Test]
+    public function it_generates_an_id_for_configs_that_dont_have_one()
+    {
+        $form = tap(Form::make('test'))->save();
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->update($form, ['configs' => [['to' => ['foo@example.com']]]])
+            ->assertOk();
+
+        $config = Form::find('test')->connections()->get('email')[0];
+
+        $this->assertNotEmpty($config['id']);
+        $this->assertEquals(['foo@example.com'], $config['to']);
+    }
+
+    #[Test]
     public function it_normalizes_the_configs()
     {
         $form = tap(Form::make('test'))->save();

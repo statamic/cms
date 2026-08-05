@@ -8,6 +8,7 @@ use Statamic\Forms\Connections\Email;
 use Statamic\Forms\Connections\Rules\EmailConnectionAddress;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 
 class EmailConnectionController extends CpController
 {
@@ -34,7 +35,7 @@ class EmailConnectionController extends CpController
                     ->all();
 
                 return Arr::removeNullValues([
-                    'id' => Arr::get($config, 'id'),
+                    'id' => Arr::get($config, 'id') ?? Str::random(8),
                     ...$values,
                     'enabled' => Arr::get($config, 'enabled') === false ? false : null,
                     'markdown' => Arr::get($values, 'markdown') === true ? true : null,

@@ -81,6 +81,22 @@ class UpdateWebhookConnectionTest extends TestCase
     }
 
     #[Test]
+    public function it_generates_an_id_for_configs_that_dont_have_one()
+    {
+        $form = tap(Form::make('test'))->save();
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->update($form, ['configs' => [['url' => 'https://example.com/hook']]])
+            ->assertOk();
+
+        $config = Form::find('test')->connections()->get('webhook')[0];
+
+        $this->assertNotEmpty($config['id']);
+        $this->assertEquals('https://example.com/hook', $config['url']);
+    }
+
+    #[Test]
     public function it_normalizes_the_conditions()
     {
         $form = tap(Form::make('test'))->save();
