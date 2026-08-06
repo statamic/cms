@@ -254,7 +254,7 @@ abstract class AbstractCacher implements Cacher
     /**
      * Refresh an individual URL.
      *
-     * @param  string  $path
+     * @param  string  $url
      * @param  string|null  $domain
      * @return void
      */

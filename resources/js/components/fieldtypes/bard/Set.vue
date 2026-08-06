@@ -16,6 +16,7 @@
             @copy.stop
             @paste.stop
             @cut.stop
+            @dragstart="preventNodeSelectionDrag"
         >
             <div ref="content" hidden />
             <header
@@ -350,6 +351,19 @@ export default {
         disableDragging() {
             this.$el.setAttribute('draggable', false);
             this._draggableObserver?.observe(this.$el, { attributes: true, attributeFilter: ['draggable'] });
+        },
+
+        preventNodeSelectionDrag(event) {
+            // When the set is node-selected, an invisible DOM selection spans the whole set.
+            // Dragging from anywhere inside it (e.g. a grid row's drag handle) would natively
+            // drag that selection and dump a serialized copy of the set into the editor.
+            const target = event.target instanceof Element ? event.target : event.target.parentElement;
+            if (target?.closest('[draggable="true"]')) return;
+
+            const selection = window.getSelection();
+            if (selection?.rangeCount && selection.containsNode(this.$el, false)) {
+                event.preventDefault();
+            }
         },
     },
 

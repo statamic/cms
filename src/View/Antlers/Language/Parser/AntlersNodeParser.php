@@ -15,7 +15,6 @@ use Statamic\View\Antlers\Language\Nodes\AntlersNode;
 use Statamic\View\Antlers\Language\Nodes\DirectiveNode;
 use Statamic\View\Antlers\Language\Nodes\Parameters\ParameterNode;
 use Statamic\View\Antlers\Language\Nodes\RecursiveNode;
-use Statamic\View\Antlers\Language\Nodes\Structures\ModifierSeparator;
 use Statamic\View\Antlers\Language\Nodes\TagIdentifier;
 use Statamic\View\Antlers\Language\Runtime\Sandbox\TypeCoercion;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
@@ -272,18 +271,6 @@ class AntlersNodeParser
         $runtimeNodes = $this->lexer->tokenize($node, $lexerContent);
 
         $node->runtimeNodes = $runtimeNodes;
-
-        if ($node->hasParameters) {
-            foreach ($runtimeNodes as $runtimeNode) {
-                if ($runtimeNode instanceof ModifierSeparator) {
-                    throw ErrorFactory::makeSyntaxError(
-                        AntlersErrorCodes::TYPE_MIXED_MODIFIER_STYLES,
-                        $node,
-                        'Cannot mix pipe and shorthand parameter modifier styles on the same expression. Use either "| modifier(\'value\')" or "modifier=\'value\'", but not both.'
-                    );
-                }
-            }
-        }
 
         $trimmedInner = trim($node->content);
 
