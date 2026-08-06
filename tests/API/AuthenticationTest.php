@@ -73,7 +73,7 @@ class AuthenticationTest extends TestCase
     }
 
     #[Test]
-    public function it_returns_json_for_unauthenticated_requests()
+    public function it_returns_json_even_when_html_is_requested()
     {
         Facades\Config::set('statamic.api.auth_token', 'foobar');
 
