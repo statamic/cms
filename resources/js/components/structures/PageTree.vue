@@ -133,6 +133,7 @@ export default {
             collapsedState: [],
             discardingChanges: false,
             ready: false,
+            saveKeyBinding: null,
         };
     },
 
@@ -178,14 +179,22 @@ export default {
             this.initialPages = clone(this.pages);
         });
 
-        this.$keys.bindGlobal(['mod+s'], (e) => {
-            e.preventDefault();
-            this.save();
-        });
+        // A read-only tree can't be saved, so binding the shortcut would only take it away
+        // from whatever is behind it. e.g. an entry being edited under a selector stack.
+        if (this.editable) {
+            this.saveKeyBinding = this.$keys.bindGlobal(['mod+s'], (e) => {
+                e.preventDefault();
+                this.save();
+            });
+        }
     },
 
     mounted() {
         setTimeout(() => this.ready = true, 500); // arbitrary delay after initial transitions
+    },
+
+    beforeUnmount() {
+        this.saveKeyBinding?.destroy();
     },
 
     methods: {

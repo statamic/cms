@@ -25,7 +25,6 @@ class Glide extends Tags
      * Where `field` is the variable containing the image ID
      *
      * @param  string  $method
-     * @param  array  $args
      * @return string
      */
     public function wildcard($method)

@@ -492,6 +492,7 @@ class BlueprintTest extends TestCase
                                     'type' => 'textarea',
                                     'placeholder' => null,
                                     'character_limit' => null,
+                                    'rows' => null,
                                     'default' => null,
                                     'antlers' => false,
                                     'component' => 'textarea',
@@ -783,12 +784,12 @@ class BlueprintTest extends TestCase
                     [
                         'fields' => [
                             ['handle' => 'existing_in_section_one', 'field' => ['type' => 'text']],
+                            ['handle' => 'new', 'field' => ['type' => 'textarea']],
                         ],
                     ],
                     [
                         'fields' => [
                             ['handle' => 'existing_in_section_two', 'field' => ['type' => 'text']],
-                            ['handle' => 'new', 'field' => ['type' => 'textarea']],
                         ],
                     ],
                 ],
@@ -1187,6 +1188,63 @@ class BlueprintTest extends TestCase
         $this->assertEquals(['tabs' => [
             'tab_one' => [
                 'sections' => [
+                    [
+                        'fields' => [
+                            [
+                                'import' => 'the_partial',
+                                'config' => [
+                                    'one' => ['foo' => 'bar'],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]], $blueprint->contents());
+        $this->assertEquals(['type' => 'text', 'foo' => 'bar'], $blueprint->fields()->get('one')->config());
+    }
+
+    #[Test]
+    public function it_merges_config_overrides_when_ensuring_a_field_inside_an_imported_fieldset_in_a_later_section()
+    {
+        FieldsetRepository::shouldReceive('find')->with('the_partial')->andReturn(
+            (new Fieldset)->setContents(['fields' => [
+                [
+                    'handle' => 'one',
+                    'field' => ['type' => 'text'],
+                ],
+            ]])
+        );
+
+        $blueprint = (new Blueprint)->setContents(['tabs' => [
+            'tab_one' => [
+                'sections' => [
+                    [
+                        'fields' => [
+                            ['handle' => 'existing', 'field' => ['type' => 'text']],
+                        ],
+                    ],
+                    [
+                        'fields' => [
+                            ['import' => 'the_partial'],
+                        ],
+                    ],
+                ],
+            ],
+        ]]);
+
+        $return = $blueprint->ensureField('one', ['type' => 'textarea', 'foo' => 'bar']);
+
+        $this->assertEquals($blueprint, $return);
+        $this->assertTrue($blueprint->hasField('one'));
+        $this->assertEquals(['tabs' => [
+            'tab_one' => [
+                'sections' => [
+                    [
+                        'fields' => [
+                            ['handle' => 'existing', 'field' => ['type' => 'text']],
+                        ],
+                    ],
                     [
                         'fields' => [
                             [

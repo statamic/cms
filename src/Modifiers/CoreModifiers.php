@@ -1196,7 +1196,9 @@ class CoreModifiers extends Modifier
     /**
      * Check if an item exists in an array using "dot" notation.
      *
-     * @param  $value
+     * @param  array  $haystack
+     * @param  array  $params
+     * @param  array  $context
      * @return bool
      */
     public function inArray($haystack, $params, $context)
@@ -1710,7 +1712,6 @@ class CoreModifiers extends Modifier
     /**
      * Generate an md5 hash of a value.
      *
-     * @param  $params
      * @return string
      */
     public function md5($value)
@@ -2902,7 +2903,6 @@ class CoreModifiers extends Modifier
      * Converts a Carbon instance to a timestamp.
      *
      * @param  Carbon  $value
-     * @param  array  $params
      * @return int
      */
     public function timestamp($value)

@@ -34,7 +34,6 @@ class NavBuilder
      * Instantiate nav builder.
      *
      * @param  array  $items
-     * @param  bool  $withHidden
      */
     public function __construct($items)
     {
