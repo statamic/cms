@@ -5,6 +5,7 @@ namespace Statamic\Forms\Connections;
 use Illuminate\Routing\Router;
 use Statamic\Contracts\Forms\Form;
 use Statamic\Contracts\Forms\Submission;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\User;
 use Statamic\Forms\Connections\Webhooks\SendWebhook;
 use Statamic\Forms\Fields\FormField;
@@ -39,20 +40,25 @@ class Webhook extends Connection
 
     public function render(Form $form): VueComponent
     {
-        $fields = static::blueprint($form)->fields();
-        $blank = $fields->preProcess();
+        $fields = static::blueprint($form)->fields()->preProcess();
 
         return VueComponent::render('webhook-connection', [
             'action' => cp_route('forms.connect.webhook.update', $form->handle()),
             'blueprint' => static::blueprint($form)->toPublishArray(),
-            'rows' => collect($form->connections()->get('webhook'))
-                ->map(function (array $config) use ($fields) {
-                    $row = $fields->addValues($config)->preProcess();
+            'webhooks' => collect($form->connections()->get('webhook'))
+                ->mapWithKeys(function (array $config) use ($fields): array {
+                    $fields = $fields->addValues($config)->preProcess();
 
-                    return ['values' => $row->values()->all(), 'meta' => $row->meta()->all()];
+                    return [$config['id'] => [
+                        'values' => $fields->values()->all(),
+                        'meta' => $fields->meta()->all(),
+                    ]];
                 })
                 ->all(),
-            'defaults' => ['values' => $blank->values()->all(), 'meta' => $blank->meta()->all()],
+            'defaults' => [
+                'values' => $fields->values()->all(),
+                'meta' => $fields->meta()->all(),
+            ],
             'examplePayload' => $this->examplePayload($form),
         ]);
     }
@@ -97,7 +103,7 @@ class Webhook extends Connection
         $router->patch('/', [WebhookConnectionController::class, 'update'])->name('update');
     }
 
-    private function examplePayload(Form $form): array
+    private function examplePayload(Form $form): string
     {
         $latestSubmission = null;
 
@@ -105,7 +111,7 @@ class Webhook extends Connection
             $latestSubmission = $form->querySubmissions()->orderBy('date', 'desc')->first();
         }
 
-        return [
+        return json_encode([
             'form' => $form->handle(),
             'submission' => $form->formFields()->fields()
                 ->mapWithKeys(function (FormField $field) use ($latestSubmission): array {
@@ -126,6 +132,6 @@ class Webhook extends Connection
                 ->prepend($latestSubmission?->date() ?? '…', 'date')
                 ->prepend($latestSubmission?->id() ?? '…', 'id')
                 ->all(),
-        ];
+        ], JSON_PRETTY_PRINT);
     }
 }

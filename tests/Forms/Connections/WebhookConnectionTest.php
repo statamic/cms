@@ -10,6 +10,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Form;
 use Statamic\Facades\Site;
+use Statamic\Facades\User;
 use Statamic\Forms\Connections\Webhook;
 use Statamic\Forms\Connections\Webhooks\SendWebhook;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -20,7 +21,7 @@ class WebhookConnectionTest extends TestCase
     use PreventSavingStacheItemsToDisk;
 
     #[Test]
-    public function it_returns_a_job_per_webhook_config()
+    public function it_returns_a_job_per_webhook()
     {
         $form = tap(Form::make('test')->connections(['webhook' => [
             ['url' => 'https://example.com/first'],
@@ -36,7 +37,7 @@ class WebhookConnectionTest extends TestCase
     }
 
     #[Test]
-    public function it_skips_disabled_webhook_configs()
+    public function it_skips_disabled_webhooks()
     {
         $form = tap(Form::make('test')->connections(['webhook' => [
             ['url' => 'https://example.com/disabled', 'enabled' => false],
@@ -51,7 +52,7 @@ class WebhookConnectionTest extends TestCase
 
     #[Test]
     #[DataProvider('webhookConditionsProvider')]
-    public function it_filters_webhook_configs_using_conditions($conditions, $value, $shouldDispatch)
+    public function it_filters_webhooks_using_conditions(array $conditions, string $value, bool $shouldDispatch)
     {
         $form = tap(Form::make('test')->formFields([
             'fields' => [
@@ -66,7 +67,7 @@ class WebhookConnectionTest extends TestCase
         $this->assertCount($shouldDispatch ? 1 : 0, (new Webhook)->finalized($submission));
     }
 
-    public static function webhookConditionsProvider()
+    public static function webhookConditionsProvider(): array
     {
         $conditions = [['field' => 'how_did_you_hear', 'operator' => 'equals', 'value' => 'friend', 'join' => 'and']];
 
@@ -79,7 +80,7 @@ class WebhookConnectionTest extends TestCase
 
     #[Test]
     #[DataProvider('validUrlProvider')]
-    public function it_posts_the_form_and_submission_as_json($url)
+    public function it_posts_the_form_and_submission_as_json(string $url)
     {
         Http::fake();
 
@@ -101,7 +102,7 @@ class WebhookConnectionTest extends TestCase
             && $request['submission']['id'] === $submission->id());
     }
 
-    public static function validUrlProvider()
+    public static function validUrlProvider(): array
     {
         return [
             'https' => ['https://example.com/hook'],
@@ -138,7 +139,7 @@ class WebhookConnectionTest extends TestCase
 
     #[Test]
     #[DataProvider('invalidUrlProvider')]
-    public function it_rejects_urls_without_an_http_scheme($url)
+    public function it_rejects_urls_without_an_http_scheme(?string $url)
     {
         Http::fake();
 
@@ -153,7 +154,7 @@ class WebhookConnectionTest extends TestCase
         Http::assertNothingSent();
     }
 
-    public static function invalidUrlProvider()
+    public static function invalidUrlProvider(): array
     {
         return [
             'ftp' => ['ftp://example.com/hook'],
@@ -161,5 +162,83 @@ class WebhookConnectionTest extends TestCase
             'schemeless' => ['example.com/hook'],
             'missing url' => [null],
         ];
+    }
+
+    #[Test]
+    #[DataProvider('webhookCountProvider')]
+    public function it_counts_the_configured_webhooks(array $webhooks, int $count)
+    {
+        $form = tap(Form::make('test')->connections(['webhook' => $webhooks]))->save();
+
+        $this->assertEquals($count, (new Webhook)->count($form));
+    }
+
+    public static function webhookCountProvider(): array
+    {
+        return [
+            'none configured' => [[], 0],
+            'one configured' => [[['id' => 'one', 'url' => 'https://example.com/first']], 1],
+            'two configured' => [[['id' => 'one', 'url' => 'https://example.com/first'], ['id' => 'two', 'url' => 'https://example.com/second']], 2],
+        ];
+    }
+
+    #[Test]
+    public function it_renders_the_vue_component()
+    {
+        $this->actingAs(tap(User::make()->makeSuper())->save());
+
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'full_name', 'field' => ['type' => 'name']],
+            ],
+        ])->connections(['webhook' => [
+            ['id' => 'one', 'url' => 'https://example.com/first'],
+            ['id' => 'two', 'url' => 'https://example.com/second', 'verify_ssl' => false],
+        ]]))->save();
+
+        $component = (new Webhook)->render($form)->toArray();
+
+        $this->assertEquals('webhook-connection', $component['name']);
+        $this->assertEquals(cp_route('forms.connect.webhook.update', 'test'), $component['props']['action']);
+        $this->assertEquals(['one', 'two'], array_keys($component['props']['webhooks']));
+        $this->assertEquals('https://example.com/first', $component['props']['webhooks']['one']['values']['url']);
+        $this->assertTrue($component['props']['webhooks']['one']['values']['verify_ssl']);
+        $this->assertEquals('https://example.com/second', $component['props']['webhooks']['two']['values']['url']);
+        $this->assertFalse($component['props']['webhooks']['two']['values']['verify_ssl']);
+        $this->assertNull($component['props']['defaults']['values']['url']);
+        $this->assertArrayHasKey('meta', $component['props']['defaults']);
+    }
+
+    #[Test]
+    public function the_example_payload_uses_the_latest_submission()
+    {
+        $this->actingAs(tap(User::make()->makeSuper())->save());
+
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'full_name', 'field' => ['type' => 'name']],
+            ],
+        ]))->save();
+
+        $this->assertEquals([
+            'form' => 'test',
+            'submission' => ['id' => '…', 'date' => '…', 'full_name' => 'Jamie Schmidt'],
+        ], $this->examplePayload($form));
+
+        $submission = tap($form->makeSubmission()->data(['full_name' => 'Gandalf']))->save();
+
+        $this->assertEquals([
+            'form' => 'test',
+            'submission' => ['id' => $submission->id(), 'date' => $submission->date()->toJson(), 'full_name' => 'Gandalf'],
+        ], $this->examplePayload($form));
+    }
+
+    private function examplePayload($form): array
+    {
+        $payload = (new Webhook)->render($form)->toArray()['props']['examplePayload'];
+
+        $this->assertJson($payload);
+
+        return json_decode($payload, true);
     }
 }

@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import axios from 'axios';
 import { nanoid as uniqid } from 'nanoid';
@@ -8,34 +8,40 @@ import { deepClone } from '@/util/clone.js';
 import ConnectionList from './ConnectionList.vue';
 import ConnectionLogic, { conditionsSummary } from './ConnectionLogic.vue';
 
+interface Webhook {
+    id: string;
+    enabled: boolean;
+    conditions: { _id: string; field: string; operator: string; value: string }[];
+    values: object;
+    meta: object;
+}
+
 const props = defineProps({
     form: Object,
-    config: { type: Array, default: () => [] },
+    config: Array,
     action: String,
     blueprint: Object,
-    rows: { type: Array, default: () => [] },
+    webhooks: Array,
     defaults: Object,
-    examplePayload: Object,
+    examplePayload: String,
 });
 
 const dirtyKey = 'webhook-connection';
 
-const errors = ref({});
-const saving = ref(false);
-const saveBinding = ref(null);
-const showExamplePayload = ref(props.config.length === 0);
+const errors = ref<object>({});
+const saving = ref<boolean>(false);
+const saveBinding = ref<ReturnType<typeof keys.bindGlobal> | null>(null);
+const showExamplePayload = ref<boolean>(props.config.length === 0);
 
-const webhooks = ref(props.config.map((config, index) => ({
-    id: config.id ?? config._id,
+const webhooks = ref<Webhook[]>(props.config.map((config: object): Webhook => ({
+    id: config.id,
     enabled: config.enabled ?? true,
-    conditions: (config.conditions ?? []).map((condition) => ({ ...condition, _id: uniqid() })),
-    values: props.rows[index]?.values ?? deepClone(props.defaults.values),
-    meta: props.rows[index]?.meta ?? deepClone(props.defaults.meta),
+    conditions: (config.conditions ?? []).map((condition: object) => ({ ...condition, _id: uniqid() })),
+    values: props.webhooks[config.id]?.values,
+    meta: props.webhooks[config.id]?.meta,
 })));
 
-const examplePayload = computed(() => JSON.stringify(props.examplePayload, null, 2));
-
-const addWebhook = () => webhooks.value.push({
+const addWebhook = (): void => webhooks.value.push({
     id: uniqid(),
     enabled: true,
     conditions: [],
@@ -43,7 +49,7 @@ const addWebhook = () => webhooks.value.push({
     meta: deepClone(props.defaults.meta),
 });
 
-const duplicateWebhook = (webhook) => {
+const duplicateWebhook = (webhook: Webhook) => {
     const index = webhooks.value.indexOf(webhook);
 
     webhooks.value.splice(index + 1, 0, {
@@ -55,11 +61,11 @@ const duplicateWebhook = (webhook) => {
     });
 };
 
-const removeWebhook = (webhook) => (webhooks.value = webhooks.value.filter((item) => item !== webhook));
+const removeWebhook = (webhook: Webhook) => (webhooks.value = webhooks.value.filter((item) => item !== webhook));
 
-const hasError = (index) => Object.keys(errors.value).some((key) => key.startsWith(`webhooks.${index}.`));
+const hasError = (index: number) => Object.keys(errors.value).some((key) => key.startsWith(`webhooks.${index}.`));
 
-const rowErrors = (index) =>
+const rowErrors = (index: number) =>
     Object.entries(errors.value)
         .filter(([key]) => key.startsWith(`webhooks.${index}.`))
         .reduce((fields, [key, messages]) => {
@@ -68,7 +74,7 @@ const rowErrors = (index) =>
             return fields;
         }, {});
 
-const save = () => {
+const save = (): void => {
     if (saving.value) return;
 
     errors.value = {};

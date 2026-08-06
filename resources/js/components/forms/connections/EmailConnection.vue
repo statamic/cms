@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { onMounted, onUnmounted, ref, watch } from 'vue';
 import axios from 'axios';
 import { nanoid as uniqid } from 'nanoid';
@@ -8,30 +8,38 @@ import { deepClone } from '@/util/clone.js';
 import ConnectionList from './ConnectionList.vue';
 import ConnectionLogic, { conditionsSummary } from './ConnectionLogic.vue';
 
+interface Email {
+    id: string;
+    enabled: boolean;
+    conditions: { _id: string; field: string; operator: string; value: string }[];
+    values: object;
+    meta: object;
+}
+
 const props = defineProps({
     form: Object,
-    config: { type: Array, default: () => [] },
+    config: Array,
     action: String,
     blueprint: Object,
-    rows: { type: Array, default: () => [] },
+    emails: Array,
     defaults: Object,
 });
 
 const dirtyKey = 'email-connection';
 
-const errors = ref({});
-const saving = ref(false);
-const saveBinding = ref(null);
+const errors = ref<object>({});
+const saving = ref<boolean>(false);
+const saveBinding = ref<ReturnType<typeof keys.bindGlobal> | null>(null);
 
-const emails = ref(props.config.map((config, index) => ({
-    id: config.id ?? config._id,
+const emails = ref<Email[]>(props.config.map((config: object): Email => ({
+    id: config.id,
     enabled: config.enabled ?? true,
-    conditions: (config.conditions ?? []).map((condition) => ({ ...condition, _id: uniqid() })),
-    values: props.rows[index]?.values ?? deepClone(props.defaults.values),
-    meta: props.rows[index]?.meta ?? deepClone(props.defaults.meta),
+    conditions: (config.conditions ?? []).map((condition: object) => ({ ...condition, _id: uniqid() })),
+    values: props.emails[config.id]?.values,
+    meta: props.emails[config.id]?.meta,
 })));
 
-const addEmail = () => emails.value.push({
+const addEmail = (): void => emails.value.push({
     id: uniqid(),
     enabled: true,
     conditions: [],
@@ -39,7 +47,7 @@ const addEmail = () => emails.value.push({
     meta: deepClone(props.defaults.meta),
 });
 
-const duplicateEmail = (email) => {
+const duplicateEmail = (email: Email) => {
     const index = emails.value.indexOf(email);
 
     emails.value.splice(index + 1, 0, {
@@ -51,11 +59,11 @@ const duplicateEmail = (email) => {
     });
 };
 
-const removeEmail = (email) => (emails.value = emails.value.filter((item) => item !== email));
+const removeEmail = (email: Email) => (emails.value = emails.value.filter((item) => item !== email));
 
-const hasError = (index) => Object.keys(errors.value).some((key) => key.startsWith(`emails.${index}.`));
+const hasError = (index: number) => Object.keys(errors.value).some((key) => key.startsWith(`emails.${index}.`));
 
-const rowErrors = (index) =>
+const rowErrors = (index: number) =>
     Object.entries(errors.value)
         .filter(([key]) => key.startsWith(`emails.${index}.`))
         .reduce((fields, [key, messages]) => {
@@ -64,7 +72,7 @@ const rowErrors = (index) =>
             return fields;
         }, {});
 
-const save = () => {
+const save = (): void => {
     if (saving.value) return;
 
     errors.value = {};
@@ -118,7 +126,7 @@ onUnmounted(() => {
         :empty-description="__('statamic::messages.email_connection_description')"
         :delete-heading="__('Delete Email')"
         :delete-description="__('statamic::messages.email_connection_delete_confirmation')"
-        :has-error="hasError"
+        :has-error
         @add="addEmail"
         @duplicate="duplicateEmail"
         @remove="removeEmail"

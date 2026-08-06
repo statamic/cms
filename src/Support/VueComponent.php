@@ -6,7 +6,7 @@ use Illuminate\Contracts\Support\Arrayable;
 
 /**
  * A neutral {name, props} DTO for rendering a Vue component registered
- * client-side via Statamic.component(), e.g. by widgets.
+ * client-side via Statamic.component(), e.g. by form connections and widgets.
  *
  * @phpstan-consistent-constructor
  */

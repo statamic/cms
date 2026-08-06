@@ -39,32 +39,33 @@ class Email extends Connection
 
     public function render(Form $form): VueComponent
     {
-        $fields = static::blueprint($form)->fields();
-        $blank = $fields->preProcess();
+        $fields = static::blueprint($form)->fields()->preProcess();
 
         return VueComponent::render('email-connection', [
             'action' => cp_route('forms.connect.email.update', $form->handle()),
             'blueprint' => static::blueprint($form)->toPublishArray(),
-            'rows' => collect($form->connections()->get('email'))
-                ->map(function (array $config) use ($fields) {
-                    $row = $fields->addValues(static::splitLegacyAddressStrings($config))->preProcess();
+            'emails' => collect($form->connections()->get('email'))
+                ->mapWithKeys(function (array $config) use ($fields): array {
+                    // Convert legacy address strings to arrays.
+                    foreach (['to', 'cc', 'bcc', 'reply_to'] as $handle) {
+                        if (isset($config[$handle]) && is_string($config[$handle])) {
+                            $config[$handle] = array_map(trim(...), explode(',', $config[$handle]));
+                        }
+                    }
 
-                    return ['values' => $row->values()->all(), 'meta' => $row->meta()->all()];
+                    $fields = $fields->addValues($config)->preProcess();
+
+                    return [$config['id'] => [
+                        'values' => $fields->values()->all(),
+                        'meta' => $fields->meta()->all(),
+                    ]];
                 })
                 ->all(),
-            'defaults' => ['values' => $blank->values()->all(), 'meta' => $blank->meta()->all()],
+            'defaults' => [
+                'values' => $fields->values()->all(),
+                'meta' => $fields->meta()->all(),
+            ],
         ]);
-    }
-
-    private static function splitLegacyAddressStrings(array $config): array
-    {
-        foreach (['to', 'cc', 'bcc', 'reply_to'] as $handle) {
-            if (isset($config[$handle]) && is_string($config[$handle])) {
-                $config[$handle] = array_map(trim(...), explode(',', $config[$handle]));
-            }
-        }
-
-        return $config;
     }
 
     public function routes(Router $router): void
