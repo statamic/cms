@@ -57,6 +57,7 @@ const {
 } = injectFieldsContext();
 
 const { direction } = useUiDirection();
+const isFormSubmission = inject('isFormSubmission', false);
 
 const asConfig = computed(() => fieldsAsConfig.value ?? containerAsConfig.value ?? false);
 const fieldPathPrefix = computed(() => props.fieldPathPrefix || injectedFieldPathPrefix.value);
@@ -155,6 +156,12 @@ const shouldShowField = computed(() => {
     ).showField(props.config, fullPath.value);
 });
 
+// Hidden fieldtypes are mounted like any other field so they take part in field
+// conditions, but they only become visible on a form submission.
+const isHiddenFieldtype = computed(() => props.config.type === 'hidden' && !isFormSubmission);
+
+const shouldRenderField = computed(() => shouldShowField.value && !isHiddenFieldtype.value);
+
 const shouldShowLabelText = computed(() => !props.config.hide_display);
 
 // Whether the label renders anything visible. When it doesn't, we avoid rendering
@@ -169,6 +176,8 @@ const shouldShowLabel = computed(
 );
 
 const shouldShowFieldPreviews = computed(() => {
+    if (isHiddenFieldtype.value) return false;
+
     if (! props.config.replicator_preview) return false;
 
     return inject('showReplicatorFieldPreviews', false);
@@ -238,7 +247,7 @@ const fieldtypeComponentEvents = computed(() => ({
         :shouldShowField="shouldShowField"
     >
         <Field
-            v-show="shouldShowField"
+            v-show="shouldRenderField"
             :class="`${config.type}-fieldtype`"
             :id="fieldId"
             :dir="direction"
