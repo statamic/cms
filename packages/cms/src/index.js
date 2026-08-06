@@ -18,6 +18,7 @@ export const {
     SortableList,
     ConnectionList,
     ConnectionLogic,
+    conditionsSummary,
     requireElevatedSession,
     requireElevatedSessionIf,
     clone,
