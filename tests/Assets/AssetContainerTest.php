@@ -10,7 +10,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Facade;
-use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Storage;
 use League\Flysystem\DirectoryAttributes;
 use League\Flysystem\DirectoryListing;
@@ -34,7 +33,6 @@ use Statamic\Facades\File;
 use Statamic\Fields\Blueprint;
 use Statamic\Filesystem\Filesystem;
 use Statamic\Filesystem\FlysystemAdapter;
-use Tests\Fakes\FakeArtisanRequest;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -603,8 +601,6 @@ class AssetContainerTest extends TestCase
 
         $container = (new AssetContainer)->handle('test')->disk('test');
 
-        Request::swap(new FakeArtisanRequest('queue:listen'));
-
         $expected = ['one.jpg', 'two.jpg'];
         $this->assertEquals($expected, $container->files()->all());
         $this->assertEquals(1, $cacheHits);
@@ -738,8 +734,6 @@ class AssetContainerTest extends TestCase
 
         $container = (new AssetContainer)->handle('test')->disk('test');
 
-        Request::swap(new FakeArtisanRequest('queue:listen'));
-
         $expected = ['one', 'two'];
         $this->assertEquals($expected, $container->folders()->all());
         $this->assertEquals(1, $cacheHits);
@@ -771,8 +765,6 @@ class AssetContainerTest extends TestCase
         ]));
 
         $container = (new AssetContainer)->handle('test')->disk('test');
-
-        Request::swap(new FakeArtisanRequest('queue:work'));
 
         // First job populates the instance's $metaFiles cache. metaFilesIn() has no
         // memoization guard of its own, so if contents() reused the same instance

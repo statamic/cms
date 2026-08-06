@@ -5,11 +5,9 @@ namespace Tests\Stache;
 use Illuminate\Cache\Events\CacheHit;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Request;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Stache\Stache;
 use Statamic\Stache\Stores\Store;
-use Tests\Fakes\FakeArtisanRequest;
 use Tests\TestCase;
 
 class StoreTest extends TestCase
@@ -78,8 +76,6 @@ class StoreTest extends TestCase
             }
         });
 
-        Request::swap(new FakeArtisanRequest('queue:listen'));
-
         $expected = collect(['foo', 'bar']);
         $this->assertEquals($expected, $store->paths());
         $this->assertEquals(1, $cacheHits);
@@ -101,8 +97,6 @@ class StoreTest extends TestCase
                 $cacheHits++;
             }
         });
-
-        Request::swap(new FakeArtisanRequest('queue:listen'));
 
         $expected = collect(['foo', 'bar']);
         $this->assertEquals($expected, $store->paths());
