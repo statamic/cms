@@ -9,7 +9,6 @@ use Statamic\Forms\Connections\Connection;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Controllers\CP\Forms\Concerns\ProvidesFormAbilities;
 use Statamic\Support\Arr;
-use Statamic\Support\Str;
 
 class FormConnectController extends CpController
 {
@@ -50,9 +49,7 @@ class FormConnectController extends CpController
                 'icon' => $connection->icon(),
             ],
             'component' => $connection->render($form),
-            'config' => collect($form->connections()->get($type, []))
-                ->map(fn ($config) => array_merge($config, ['_id' => $config['id'] ?? Str::random(8)]))
-                ->all(),
+            'config' => $form->connections()->get($type, []),
             'suggestableFields' => $this->suggestableFields($form),
         ]);
     }
