@@ -1,5 +1,44 @@
 # Release Notes
 
+## 6.27.0 (2026-08-05)
+
+### What's new
+- Add config to disable `HandleEntrySchedule` job [#15103](https://github.com/statamic/cms/issues/15103) by @duncanmcclean
+- Ability to configure search index update job timeout [#15093](https://github.com/statamic/cms/issues/15093) by @edalzell
+- Add config for textarea fieldtype rows [#15100](https://github.com/statamic/cms/issues/15100) by @jackmcdade
+- Export Inertia's `usePage` composable via `@statamic/cms/inertia` [#15123](https://github.com/statamic/cms/issues/15123) by @duncanmcclean
+
+### What's fixed
+- Prevent errors when Stache indexes contain keys without files [#15052](https://github.com/statamic/cms/issues/15052) by @joshuablum
+- Handle download responses in Inertia requests [#15050](https://github.com/statamic/cms/issues/15050) by @duncanmcclean
+- Prevent bogus content when dragging inside a node-selected Bard set [#15049](https://github.com/statamic/cms/issues/15049) by @duncanmcclean
+- Use correct types in Tags class [#15059](https://github.com/statamic/cms/issues/15059) by @daun
+- Use correct parameter name in Scope class [#15060](https://github.com/statamic/cms/issues/15060) by @daun
+- Resolve delete redirects from the configured CP route [#15107](https://github.com/statamic/cms/issues/15107) by @lazerg
+- Ensure fields are added to the first section of a tab instead of the last [#15091](https://github.com/statamic/cms/issues/15091) by @mynetx
+- Stop re-checking index existence on every Algolia write [#15090](https://github.com/statamic/cms/issues/15090) by @edalzell
+- Add autocomplete attribute to confirm password screen [#15101](https://github.com/statamic/cms/issues/15101) by @mytchallb
+- Bundle Control Panel icons into a single chunk [#15112](https://github.com/statamic/cms/issues/15112) by @duncanmcclean
+- Fix Outpost rate limiting [#15114](https://github.com/statamic/cms/issues/15114) by @duncanmcclean
+- Don't navigate between assets when typing in a field [#15111](https://github.com/statamic/cms/issues/15111) by @duncanmcclean
+- Fall back to default site on password-protected sites [#15086](https://github.com/statamic/cms/issues/15086) by @daun
+- Revert throw on mixed pipe/shorthand modifier syntax [#15073](https://github.com/statamic/cms/issues/15073) by @marcorieser
+- Remove stale `@param` from `wildcard()` docblocks [#15119](https://github.com/statamic/cms/issues/15119) by @darkdi
+- Fix `@param` names that do not match the signatures [#15120](https://github.com/statamic/cms/issues/15120) by @darkdi
+- Only preload meta for the selected link type [#15113](https://github.com/statamic/cms/issues/15113) by @duncanmcclean
+- Prevent blueprint field rows from overflowing [#15122](https://github.com/statamic/cms/issues/15122) by @duncanmcclean
+- Move testing traits into `Statamic\Testing\Concerns` [#15115](https://github.com/statamic/cms/issues/15115) by @duncanmcclean
+- Use standard console output helpers in commands [#15092](https://github.com/statamic/cms/issues/15092) by @duncanmcclean
+- Fix Eloquent user data setting roles and groups as model attributes [#15125](https://github.com/statamic/cms/issues/15125) by @lazerg
+- Fix Link fieldtype preventing Cmd+S keyboard shortcut in Entry mode [#14986](https://github.com/statamic/cms/issues/14986) by @lazerg
+- French translations [#15094](https://github.com/statamic/cms/issues/15094) by @ebeauchamps
+- Fix typo in Dutch translation for 'Move to Folder' [#15121](https://github.com/statamic/cms/issues/15121) by @Skullsneeze
+- Bump the github-actions group across 1 directory with 2 updates [#15080](https://github.com/statamic/cms/issues/15080) by @dependabot
+- Bump svgo from 3.3.3 to 3.3.4 [#15071](https://github.com/statamic/cms/issues/15071) by @dependabot
+- Bump the npm_and_yarn group across 1 directory with 4 updates [#15110](https://github.com/statamic/cms/issues/15110) by @dependabot
+
+
+
 ## 6.26.0 (2026-07-21)
 
 ### What's new

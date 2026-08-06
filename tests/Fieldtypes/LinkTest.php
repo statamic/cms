@@ -395,6 +395,71 @@ class LinkTest extends TestCase
     }
 
     #[Test]
+    public function it_only_preloads_meta_for_the_initial_option()
+    {
+        $this->setUpRoutableCollection();
+
+        Facades\AssetContainer::make('assets')->disk('local')->save();
+
+        $field = new Field('test', ['type' => 'link', 'container' => 'assets']);
+        $field->setValue('entry::123');
+
+        $types = (new Link)->setField($field)->preload()['types'];
+
+        $this->assertNotNull($types['entry']['meta']);
+        $this->assertTrue($types['entry']['metaLoaded']);
+        $this->assertNull($types['asset']['meta']);
+        $this->assertFalse($types['asset']['metaLoaded']);
+    }
+
+    #[Test]
+    public function it_preloads_meta_for_the_default_option_when_there_is_no_value()
+    {
+        $this->setUpRoutableCollection();
+
+        Facades\AssetContainer::make('assets')->disk('local')->save();
+
+        $field = new Field('test', ['type' => 'link', 'container' => 'assets', 'default_option' => 'asset']);
+
+        $types = (new Link)->setField($field)->preload()['types'];
+
+        $this->assertNull($types['entry']['meta']);
+        $this->assertFalse($types['entry']['metaLoaded']);
+        $this->assertNotNull($types['asset']['meta']);
+        $this->assertTrue($types['asset']['metaLoaded']);
+    }
+
+    #[Test]
+    public function it_preloads_no_type_meta_when_there_is_no_initial_option()
+    {
+        $this->setUpRoutableCollection();
+
+        Facades\AssetContainer::make('assets')->disk('local')->save();
+
+        $field = new Field('test', ['type' => 'link', 'container' => 'assets']);
+
+        $types = (new Link)->setField($field)->preload()['types'];
+
+        $this->assertNull($types['entry']['meta']);
+        $this->assertFalse($types['entry']['metaLoaded']);
+        $this->assertNull($types['asset']['meta']);
+        $this->assertFalse($types['asset']['metaLoaded']);
+    }
+
+    #[Test]
+    public function it_marks_meta_as_loaded_for_a_type_whose_fieldtype_preloads_nothing()
+    {
+        Link::extend('link-extend-test-basic-preload', TestBasicLinkType::class);
+
+        $field = new Field('test', ['type' => 'link', 'default_option' => 'link-extend-test-basic-preload']);
+
+        $types = (new Link)->setField($field)->preload()['types'];
+
+        $this->assertNull($types['link-extend-test-basic-preload']['meta']);
+        $this->assertTrue($types['link-extend-test-basic-preload']['metaLoaded']);
+    }
+
+    #[Test]
     public function it_includes_custom_type_and_icon_in_pre_process_index()
     {
         Link::extend('link-extend-test-index', TestIndexLinkType::class);
