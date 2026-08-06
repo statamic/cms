@@ -152,6 +152,7 @@ class Email extends Connection
                                         'display' => __('Subject'),
                                     ],
                                 ],
+                                // TODO: Add message field w/ autocomplete editor once its merged (https://github.com/statamic/cms/pull/15055)
                                 [
                                     'handle' => 'html',
                                     'field' => [
