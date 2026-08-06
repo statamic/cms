@@ -160,6 +160,7 @@ abstract class Index
     public function resetMemoizedState()
     {
         $this->loaded = false;
+        $this->items = null;
     }
 
     /** @deprecated */
