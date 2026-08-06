@@ -3,7 +3,7 @@ import Layout from '@/pages/layout/Layout.vue';
 import PanelLayout from '@/pages/layout/PanelLayout.vue';
 import FormsLayout from '../Layout.vue';
 import Head from '@/pages/layout/Head.vue';
-import { Card, DocsCallout, Header, Heading, Icon, Panel, PanelHeader } from '@ui';
+import { Card, Header, Heading, Icon, Panel, PanelHeader } from '@ui';
 import FormStatusIndicator from '@/components/forms/FormStatusIndicator.vue';
 import { Link } from '@inertiajs/vue3';
 
@@ -13,7 +13,7 @@ const props = defineProps({
     form: Object,
     connection: Object,
     component: Object,
-    config: Array,
+    config: Object,
     suggestableFields: Array,
 });
 </script>
@@ -55,7 +55,5 @@ const props = defineProps({
                 <component :is="component.name" :form :config v-bind="component.props" />
             </Card>
         </Panel>
-
-        <DocsCallout :topic="__('Connections')" url="forms" />
     </div>
 </template>
