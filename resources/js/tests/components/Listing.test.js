@@ -22,21 +22,18 @@ const Probe = defineComponent({
     },
 });
 
-function mountListing(filters) {
+function mountListing(props) {
     return mount(Listing, {
         props: {
             items: [],
-            filters,
-            allowPresets: false,
-            allowBulkActions: false,
-            allowCustomizingColumns: false,
+            ...props,
         },
         slots: { default: () => h(Probe) },
     });
 }
 
 test('counts active filter badges that belong to the listing filters', () => {
-    const wrapper = mountListing([{ handle: 'author', auto_apply: [] }, { handle: 'status', auto_apply: [] }]);
+    const wrapper = mountListing({ filters: [{ handle: 'author', auto_apply: [] }, { handle: 'status', auto_apply: [] }] });
     const { listing } = wrapper.findComponent(Probe).vm;
 
     listing.activeFilterBadges.value = { author: 'John', status: 'Published' };
@@ -45,7 +42,7 @@ test('counts active filter badges that belong to the listing filters', () => {
 });
 
 test('ignores active filter badges that are not configured filters', () => {
-    const wrapper = mountListing([{ handle: 'author', auto_apply: [] }]);
+    const wrapper = mountListing({ filters: [{ handle: 'author', auto_apply: [] }] });
     const { listing } = wrapper.findComponent(Probe).vm;
 
     listing.activeFilterBadges.value = { author: 'John', site: { site: 'default' } };
@@ -54,7 +51,7 @@ test('ignores active filter badges that are not configured filters', () => {
 });
 
 test('counts each nested field badge individually', () => {
-    const wrapper = mountListing([{ handle: 'fields', auto_apply: [] }]);
+    const wrapper = mountListing({ filters: [{ handle: 'fields', auto_apply: [] }] });
     const { listing } = wrapper.findComponent(Probe).vm;
 
     listing.activeFilterBadges.value = { fields: { title: 'Foo', slug: 'bar' } };
