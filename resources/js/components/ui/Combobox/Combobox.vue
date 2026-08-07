@@ -61,6 +61,8 @@ const props = defineProps({
 	readOnly: { type: Boolean, default: false },
 	/** When `true`, the options will be searchable. */
 	searchable: { type: Boolean, default: true },
+	/** Keys of the option object to search against. Defaults to just `optionLabel`. */
+	searchKeys: { type: Array, default: null },
 	/** Determines if the dropdown should open */
 	shouldOpenDropdown: { type: Function, default: () => true },
 	/** Controls the size of the combobox. <br><br> Options: `xs`, `sm`, `base`, `lg`, `xl` */
@@ -236,7 +238,7 @@ const filteredOptions = computed(() => {
         fuzzysort
             .go(searchQuery.value, props.options, {
                 all: true,
-                key: props.optionLabel,
+                ...(props.searchKeys?.length ? { keys: props.searchKeys } : { key: props.optionLabel }),
             })
             .map((result) => result.obj)
     );
