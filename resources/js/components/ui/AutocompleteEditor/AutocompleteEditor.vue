@@ -1,7 +1,7 @@
 <template>
     <div
         class="autocomplete-editor @container/autocomplete-editor shadow-ui-sm rounded-lg border border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-900"
-        :class="{ 'border-dashed': readOnly }"
+        :class="{ 'border-dashed': readOnly, 'mode:inline': inline }"
     >
         <div
             v-if="showToolbar && editor"
@@ -247,10 +247,18 @@ watch(
     @apply p-2 text-gray-900 leading-normal @lg/autocomplete-editor:p-4 dark:text-gray-300;
 }
 
+.mode\:inline :deep(.ProseMirror) {
+    @apply min-h-10 px-3 py-2 leading-[1.375rem];
+}
+
 :deep(.ProseMirror :is(p, ol, ul)) {
     @apply st-text-legibility;
     margin-top: 0;
     margin-bottom: 0.85em;
+}
+
+.mode\:inline :deep(.ProseMirror p) {
+    margin-bottom: 0;
 }
 
 :deep(.ProseMirror li > p) {
@@ -319,9 +327,5 @@ watch(
 
 :deep(.ProseMirror > :first-child) {
     margin-top: 0;
-}
-
-:deep(.ProseMirror > :last-child) {
-    margin-bottom: 0;
 }
 </style>
