@@ -473,7 +473,11 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
         if (! Arr::has($contents, 'connections.email') && isset($contents['email'])) {
             $email = $contents['email'];
 
-            $this->connections($this->connections()->put('email', isset($email['to']) ? [$email] : $email));
+            $emails = collect(isset($email['to']) ? [$email] : $email)
+                ->map(fn (array $config) => ['id' => Str::random(8), ...$config])
+                ->all();
+
+            $this->connections($this->connections()->put('email', $emails));
         }
 
         if (isset($contents['fields'])) {

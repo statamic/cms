@@ -17,6 +17,7 @@ use Statamic\Facades\File;
 use Statamic\Facades\Form;
 use Statamic\Facades\YAML;
 use Statamic\Forms\Fields\FormFields;
+use Statamic\Support\Arr;
 use Tests\TestCase;
 
 class FormTest extends TestCase
@@ -397,7 +398,10 @@ class FormTest extends TestCase
 
         $form = Form::find('contact_us');
 
-        $this->assertEquals($expected, $form->connections()->get('email'));
+        $emails = collect($form->connections()->get('email'));
+
+        $this->assertEquals($expected, $emails->map(fn ($email) => Arr::except($email, 'id'))->all());
+        $this->assertCount($emails->count(), $emails->pluck('id')->filter()->unique());
     }
 
     public static function legacyEmailProvider()
@@ -460,7 +464,9 @@ class FormTest extends TestCase
 
         $saved = YAML::parse(File::get($form->path()));
 
-        $this->assertEquals(['email' => [['to' => 'foo@bar.com']]], $saved['connections']);
+        $this->assertCount(1, $saved['connections']['email']);
+        $this->assertNotEmpty($saved['connections']['email'][0]['id']);
+        $this->assertEquals('foo@bar.com', $saved['connections']['email'][0]['to']);
         $this->assertArrayNotHasKey('email', $saved);
     }
 
