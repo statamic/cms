@@ -76,6 +76,42 @@ class FilesTest extends TestCase
         }
     }
 
+    #[Test]
+    #[DataProvider('svgExtensionCaseProvider')]
+    public function it_sanitizes_svgs_on_upload_regardless_of_extension_case($extension)
+    {
+        Date::setTestNow(Date::createFromTimestamp(1671484636, config('app.timezone')));
+
+        $disk = Storage::fake('local');
+
+        $file = UploadedFile::fake()->createWithContent("test.{$extension}", '<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" width="500" height="500"><script type="text/javascript">alert(`Bad stuff could go in here.`);</script></svg>');
+
+        $this
+            ->actingAs(tap(User::make()->makeSuper())->save())
+            ->post('/cp/fieldtypes/files/upload', ['file' => $file])
+            ->assertOk()
+            ->assertJson([
+                'data' => [
+                    'id' => $path = "1671484636/test.{$extension}",
+                ],
+            ]);
+
+        $contents = $disk->get('statamic/file-uploads/'.$path);
+
+        // Ensure the inline scripts were stripped out.
+        $this->assertStringNotContainsString('<script', $contents);
+        $this->assertStringNotContainsString('Bad stuff could go in here.', $contents);
+        $this->assertStringNotContainsString('</script>', $contents);
+    }
+
+    public static function svgExtensionCaseProvider()
+    {
+        return [
+            'uppercase' => ['SVG'],
+            'mixed case' => ['Svg'],
+        ];
+    }
+
     public static function uploadProvider()
     {
         return [

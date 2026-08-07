@@ -1957,6 +1957,42 @@ class AssetTest extends TestCase
         $this->assertStringContainsString('</script>', $asset->contents());
     }
 
+    #[Test]
+    #[DataProvider('svgExtensionCaseProvider')]
+    public function it_sanitizes_svgs_on_upload_regardless_of_extension_case($extension)
+    {
+        Event::fake();
+
+        // Disable filename lowercasing so the uppercase extension actually
+        // reaches the disk, otherwise it'd be normalized before we could
+        // prove the sanitization check itself is case insensitive.
+        config()->set('statamic.assets.lowercase', false);
+
+        $asset = (new Asset)->container($this->container)->path($path = "path/to/asset.{$extension}")->syncOriginal();
+
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
+        Storage::disk('test')->assertMissing($path);
+
+        $return = $asset->upload(UploadedFile::fake()->createWithContent("asset.{$extension}", '<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" width="500" height="500"><script type="text/javascript">alert(`Bad stuff could go in here.`);</script></svg>'));
+
+        $this->assertEquals($asset, $return);
+        Storage::disk('test')->assertExists($path);
+        $this->assertEquals($path, $asset->path());
+
+        // Ensure the inline scripts were stripped out.
+        $this->assertStringNotContainsString('<script', $asset->contents());
+        $this->assertStringNotContainsString('Bad stuff could go in here.', $asset->contents());
+        $this->assertStringNotContainsString('</script>', $asset->contents());
+    }
+
+    public static function svgExtensionCaseProvider()
+    {
+        return [
+            'uppercase' => ['SVG'],
+            'mixed case' => ['Svg'],
+        ];
+    }
+
     public static function nonGlideableFileExtensionsProvider()
     {
         return [
