@@ -39,38 +39,12 @@ function renderSuggestion() {
     };
 }
 
-// Mentions serialize to `{{ value }}`. A private sentinel is emitted instead of
-// the braces so that, once the whole document is serialized, any remaining
-// braces can be escaped as ones the author typed themselves. See markdown.js.
-export const MENTION_SENTINEL = '\u0000';
-
-const MENTION_TOKEN = /^\{\{\s*([\w.-]+)\s*\}\}/;
-
 export const Autocomplete = Mention.extend({
     name: 'mention',
 
     addNodeView() {
         return VueNodeViewRenderer(MentionBadge);
     },
-
-    markdownTokenName: 'mention',
-
-    markdownTokenizer: {
-        name: 'mention',
-        level: 'inline',
-        start: (src) => src.indexOf('{{'),
-        tokenize: (src) => {
-            const match = MENTION_TOKEN.exec(src);
-
-            if (!match) return;
-
-            return { type: 'mention', raw: match[0], value: match[1] };
-        },
-    },
-
-    parseMarkdown: (token) => ({ type: 'mention', attrs: { value: token.value } }),
-
-    renderMarkdown: (node) => `${MENTION_SENTINEL}${node.attrs.value}${MENTION_SENTINEL}`,
 
     addOptions() {
         return {

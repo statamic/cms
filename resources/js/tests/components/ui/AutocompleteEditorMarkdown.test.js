@@ -1,6 +1,5 @@
 import { expect, test } from 'vitest';
-import { contentToMarkdown, markdownToContent } from '@/components/ui/AutocompleteEditor/markdown';
-import { MENTION_SENTINEL } from '@/components/ui/AutocompleteEditor/extensions/Autocomplete';
+import { contentToMarkdown, markdownToContent, MENTION_SENTINEL } from '@/components/ui/AutocompleteEditor/markdown';
 
 test('a mention value that cannot be tokenized never leaks the sentinel', () => {
     const markdown = contentToMarkdown([

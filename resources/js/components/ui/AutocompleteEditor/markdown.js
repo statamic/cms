@@ -7,7 +7,38 @@ import Italic from '@tiptap/extension-italic';
 import Heading from '@tiptap/extension-heading';
 import HardBreak from '@tiptap/extension-hard-break';
 import { BulletList, OrderedList, ListItem } from '@tiptap/extension-list';
-import { Autocomplete, MENTION_SENTINEL } from './extensions/Autocomplete';
+import { Autocomplete } from './extensions/Autocomplete';
+
+// Mentions are serialized as a sentinel rather than the real `{{ value }}`
+// token. Tiptap gives no hook to escape text as it's written, so braces an
+// author typed literally can only be told apart from ours once the whole
+// document has been serialized. See contentToMarkdown.
+export const MENTION_SENTINEL = '\u0000';
+
+const MENTION_TOKEN = /^\{\{\s*([\w.-]+)\s*\}\}/;
+
+// Markdown is how the fieldtype stores its value, not something the editor
+// itself does, so this is declared here rather than on the shared extension.
+const MarkdownAutocomplete = Autocomplete.extend({
+    markdownTokenName: 'mention',
+
+    markdownTokenizer: {
+        name: 'mention',
+        level: 'inline',
+        start: (src) => src.indexOf('{{'),
+        tokenize: (src) => {
+            const match = MENTION_TOKEN.exec(src);
+
+            if (!match) return;
+
+            return { type: 'mention', raw: match[0], value: match[1] };
+        },
+    },
+
+    parseMarkdown: (token) => ({ type: 'mention', attrs: { value: token.value } }),
+
+    renderMarkdown: (node) => `${MENTION_SENTINEL}${node.attrs.value}${MENTION_SENTINEL}`,
+});
 
 // The default two-trailing-space hard break doesn't survive whitespace
 // stripping (editors, linters, pre-commit hooks). A trailing backslash does.
@@ -30,17 +61,15 @@ const manager = new MarkdownManager({
         BulletList,
         OrderedList,
         ListItem,
-        Autocomplete,
+        MarkdownAutocomplete,
     ],
 });
 
 export function contentToMarkdown(content) {
     const markdown = manager.serialize({ type: 'doc', content });
 
-    // Mentions are rendered as a sentinel by Autocomplete's renderMarkdown, not
-    // the real `{{ value }}` token. Escaping happens after serialize() so any
-    // `{{` an author typed as literal text (which the tokenizer can't tell
-    // apart from ours) is escaped first, then only our sentinels become tokens.
+    // Escape every brace pair first, so anything the author typed is treated as
+    // literal text, then turn only our own sentinels into real tokens.
     return markdown
         .replaceAll('{{', '\\{\\{')
         .replace(new RegExp(`${MENTION_SENTINEL}([^${MENTION_SENTINEL}]*)${MENTION_SENTINEL}`, 'g'), '{{ $1 }}');
