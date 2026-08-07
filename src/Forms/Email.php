@@ -13,6 +13,7 @@ use Statamic\Facades\Config;
 use Statamic\Facades\Form;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Parse;
+use Statamic\Forms\Fields\FormField;
 use Statamic\Sites\Site;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -171,7 +172,7 @@ class Email extends Mailable
         $augmented = $this->submission->toAugmentedArray();
         $form = $this->submission->form();
         $excludedFields = $form->formFields()->fields()
-            ->filter(fn ($field) => array_intersect($field->fieldtype()->categories(), ['information', 'structure']))
+            ->reject(fn (FormField $field) => $field->fieldtype()->collectsValue())
             ->keys();
         $fields = $this->getRenderableFieldData(Arr::except($augmented, ['id', 'date', 'form']))
             ->reject(fn ($field) => $excludedFields->contains($field['handle']))

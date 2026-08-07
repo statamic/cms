@@ -6,6 +6,7 @@ use Inertia\Inertia;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\FormConnection;
 use Statamic\Forms\Connections\Connection;
+use Statamic\Forms\Fields\FormField;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Controllers\CP\Forms\Concerns\ProvidesFormAbilities;
 use Statamic\Support\Arr;
@@ -57,7 +58,8 @@ class FormConnectController extends CpController
     private function suggestableFields($form): array
     {
         return $form->formFields()->fields()
-            ->map(fn ($field) => [
+            ->filter(fn (FormField $field) => $field->fieldtype()->collectsValue())
+            ->map(fn (FormField $field) => [
                 'handle' => $field->handle(),
                 'icon' => $field->fieldtype()->icon(),
                 'category' => $field->fieldtype()->categories()[0] ?? 'other',
@@ -67,7 +69,6 @@ class FormConnectController extends CpController
                     'options' => Arr::get($field->config(), 'options'),
                 ]),
             ])
-            ->reject(fn ($field) => in_array($field['category'], ['information', 'structure']))
             ->values()
             ->all();
     }

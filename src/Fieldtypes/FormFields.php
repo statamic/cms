@@ -16,8 +16,6 @@ class FormFields extends Fieldtype
 {
     use HasSelectOptions;
 
-    private const NON_VALUE_CATEGORIES = ['information', 'structure'];
-
     protected $selectable = false;
 
     protected function configFieldItems(): array
@@ -136,7 +134,7 @@ class FormFields extends Fieldtype
         return $form->formFields()->fields()->filter(function (FormField $field) use ($categories): bool {
             return $categories
                 ? in_array($this->category($field), $categories)
-                : ! in_array($this->category($field), self::NON_VALUE_CATEGORIES);
+                : $field->fieldtype()->collectsValue();
         });
     }
 
