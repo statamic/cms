@@ -240,8 +240,89 @@ watch(
 </script>
 
 <style scoped>
+@reference '../../../../css/app.css';
+
 :deep(.ProseMirror) {
     outline: none;
     padding: 0.5rem;
+    @apply text-gray-900 leading-normal dark:text-gray-300;
+}
+
+:deep(.ProseMirror :is(p, ol, ul)) {
+    @apply st-text-legibility;
+    margin-top: 0;
+    margin-bottom: 0.85em;
+}
+
+:deep(.ProseMirror li > p) {
+    margin-bottom: 0;
+}
+
+:deep(.ProseMirror :is(strong, b)) {
+    @apply font-bold text-gray-800 dark:text-gray-100;
+}
+
+:deep(.ProseMirror :is(em, i)) {
+    font-style: italic;
+}
+
+:deep(.ProseMirror :is(h1, h2, h3, h4, h5, h6)) {
+    @apply mt-5 mb-2.5 font-bold text-gray-900 dark:text-gray-100;
+}
+
+:deep(.ProseMirror h1) {
+    @apply text-3xl;
+}
+
+:deep(.ProseMirror h2) {
+    @apply text-2xl;
+}
+
+:deep(.ProseMirror h3) {
+    @apply text-xl;
+}
+
+:deep(.ProseMirror h4) {
+    @apply text-base;
+}
+
+:deep(.ProseMirror h5) {
+    @apply text-sm;
+}
+
+:deep(.ProseMirror h6) {
+    @apply text-2xs uppercase tracking-wider text-gray-800 dark:text-gray-500;
+}
+
+:deep(.ProseMirror ul) {
+    list-style-type: disc;
+}
+
+:deep(.ProseMirror ol) {
+    list-style-type: decimal;
+}
+
+:deep(.ProseMirror :is(ol, ul)) {
+    @apply ms-4 ps-4;
+}
+
+:deep(.ProseMirror li :is(ol, ul)) {
+    @apply my-0 ms-4 ps-4;
+}
+
+:deep(.ProseMirror li ul) {
+    list-style-type: circle;
+}
+
+:deep(.ProseMirror li ol) {
+    list-style-type: decimal;
+}
+
+:deep(.ProseMirror > :first-child) {
+    margin-top: 0;
+}
+
+:deep(.ProseMirror > :last-child) {
+    margin-bottom: 0;
 }
 </style>
