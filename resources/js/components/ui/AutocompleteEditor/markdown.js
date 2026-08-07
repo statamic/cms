@@ -43,7 +43,7 @@ export function contentToMarkdown(content) {
     // apart from ours) is escaped first, then only our sentinels become tokens.
     return markdown
         .replaceAll('{{', '\\{\\{')
-        .replace(new RegExp(`${MENTION_SENTINEL}([\\w.-]+)${MENTION_SENTINEL}`, 'g'), '{{ $1 }}');
+        .replace(new RegExp(`${MENTION_SENTINEL}([^${MENTION_SENTINEL}]*)${MENTION_SENTINEL}`, 'g'), '{{ $1 }}');
 }
 
 export function markdownToContent(markdown) {

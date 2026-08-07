@@ -1,5 +1,14 @@
 import { expect, test } from 'vitest';
 import { contentToMarkdown, markdownToContent } from '@/components/ui/AutocompleteEditor/markdown';
+import { MENTION_SENTINEL } from '@/components/ui/AutocompleteEditor/extensions/Autocomplete';
+
+test('a mention value that cannot be tokenized never leaks the sentinel', () => {
+    const markdown = contentToMarkdown([
+        { type: 'paragraph', content: [{ type: 'mention', attrs: { value: 'not a slug' } }] },
+    ]);
+
+    expect(markdown).not.toContain(MENTION_SENTINEL);
+});
 
 test('inline content round trips to a plain markdown scalar', () => {
     const content = [
