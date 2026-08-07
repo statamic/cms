@@ -1,6 +1,6 @@
 <template>
     <div
-        class="autocomplete-editor shadow-ui-sm rounded-lg border border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-900"
+        class="autocomplete-editor @container/autocomplete-editor shadow-ui-sm rounded-lg border border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-900"
         :class="{ 'border-dashed': readOnly }"
     >
         <div
@@ -244,8 +244,7 @@ watch(
 
 :deep(.ProseMirror) {
     outline: none;
-    padding: 0.5rem;
-    @apply text-gray-900 leading-normal dark:text-gray-300;
+    @apply p-2 text-gray-900 leading-normal @lg/autocomplete-editor:p-4 dark:text-gray-300;
 }
 
 :deep(.ProseMirror :is(p, ol, ul)) {
