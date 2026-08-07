@@ -30,7 +30,12 @@ class SendEmail implements ShouldQueue
     {
         $submission = $this->submission->form()->submission($this->submission->id()) ?? $this->submission;
 
-        Mail::mailer($this->config['mailer'] ?? null)
-            ->send(new Email($submission, $this->config, $this->site));
+        $email = new Email($submission, $this->config, $this->site);
+
+        if (! $email->hasRecipients()) {
+            return;
+        }
+
+        Mail::mailer($this->config['mailer'] ?? null)->send($email);
     }
 }

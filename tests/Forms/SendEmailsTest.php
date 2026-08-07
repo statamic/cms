@@ -121,6 +121,36 @@ class SendEmailsTest extends TestCase
     }
 
     #[Test]
+    #[DataProvider('recipientFieldProvider')]
+    public function it_skips_emails_whose_recipients_dont_resolve($value, $shouldSend)
+    {
+        Mail::fake();
+
+        $form = tap(FacadesForm::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'email', 'field' => ['type' => 'text']],
+            ],
+        ])->connections(['email' => [
+            ['id' => 'one', 'to' => ['field:email']],
+        ]]))->save();
+
+        $this->sendEmails($form->makeSubmission()->data(['email' => $value]));
+
+        $shouldSend
+            ? Mail::assertSent(Email::class, 1)
+            : Mail::assertNothingSent();
+    }
+
+    public static function recipientFieldProvider()
+    {
+        return [
+            'field was filled in' => ['someone@example.com', true],
+            'field was left blank' => [null, false],
+            'field contains junk' => ['not an email', false],
+        ];
+    }
+
+    #[Test]
     public function it_skips_disabled_email_configs()
     {
         Mail::fake();

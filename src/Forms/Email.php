@@ -54,6 +54,17 @@ class Email extends Mailable
         return $this->config;
     }
 
+    public function hasRecipients(): bool
+    {
+        if (blank($to = Arr::get($this->config, 'to'))) {
+            return false;
+        }
+
+        $this->submissionData = $this->submission->toAugmentedArray();
+
+        return filled($this->addresses($this->parseConfig(['to' => $to])->get('to')));
+    }
+
     public function build()
     {
         $this->submissionData = $this->submission->toAugmentedArray();
