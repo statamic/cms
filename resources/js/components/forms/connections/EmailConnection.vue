@@ -3,6 +3,7 @@ import { onMounted, onUnmounted, ref, watch } from 'vue';
 import axios from 'axios';
 import { nanoid as uniqid } from 'nanoid';
 import { keys } from '@api';
+import { usePage } from '@inertiajs/vue3';
 import { Badge, Button, Icon, PublishContainer, PublishFields, PublishFieldsProvider, Subheading } from '@ui';
 import { deepClone } from '@/util/clone.js';
 import ConnectionList from './ConnectionList.vue';
@@ -24,6 +25,8 @@ const props = defineProps({
     emails: Array,
     defaults: Object,
 });
+
+const suggestableFields = usePage().props.suggestableFields;
 
 const dirtyKey = 'email-connection';
 
@@ -60,6 +63,16 @@ const duplicateEmail = (email: Email) => {
 };
 
 const removeEmail = (email: Email) => (emails.value = emails.value.filter((item) => item !== email));
+
+const recipients = (to: string[] | string): string =>
+    [to].flat().map((recipient) => {
+        if (!recipient.startsWith('field:')) return recipient;
+
+        const handle = recipient.replace('field:', '');
+        const field = suggestableFields.find((field) => field.handle === handle);
+
+        return __(field?.config?.display ?? handle);
+    }).join(', ');
 
 const hasError = (index: number) => Object.keys(errors.value).some((key) => key.startsWith(`emails.${index}.`));
 
@@ -134,7 +147,7 @@ onUnmounted(() => {
         <template #header="{ item: email, collapsed }">
             <Badge size="lg" pill color="white" class="px-3 text-gray-950 gap-1">
                 <Icon name="mail-sign-at" class="size-3.5 me-1 opacity-100! text-blue-600 dark:text-blue-400" aria-hidden="true" />
-                {{ email.values.to ? __('Message sent to :email', { email: email.values.to }) : __('New Email') }}
+                {{ email.values.to?.length ? __('Message sent to :email', { email: recipients(email.values.to) }) : __('New Email') }}
             </Badge>
             <Subheading v-show="collapsed" class="overflow-hidden text-ellipsis whitespace-nowrap gap-1.5!">
                 <span class="truncate">{{ conditionsSummary(email.conditions) ?? email.values.subject }}</span>

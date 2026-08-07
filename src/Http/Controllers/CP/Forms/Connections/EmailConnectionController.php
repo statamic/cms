@@ -24,11 +24,13 @@ class EmailConnectionController extends CpController
             'emails.*.reply_to' => [new EmailConnectionAddress($form)],
         ]);
 
+        $fields = Email::blueprint($form)->fields();
+
         $emails = collect($request->emails)
-            ->map(function (array $config) use ($form): array {
+            ->map(function (array $config) use ($fields): array {
                 $config = Arr::removeNullValues($config);
 
-                $values = Email::blueprint($form)->fields()
+                $values = $fields
                     ->addValues(Arr::except($config, ['_id', 'id', 'enabled', 'conditions']))
                     ->process()
                     ->values()

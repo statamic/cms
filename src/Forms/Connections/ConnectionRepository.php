@@ -12,7 +12,7 @@ class ConnectionRepository
         return $this->classes()->map(fn ($class) => app($class));
     }
 
-    public function find($handle): ?Connection
+    public function find(string $handle): ?Connection
     {
         return ($class = $this->classes()->get($handle)) ? app($class) : null;
     }

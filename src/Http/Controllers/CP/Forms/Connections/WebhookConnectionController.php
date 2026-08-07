@@ -20,11 +20,13 @@ class WebhookConnectionController extends CpController
             'webhooks.*.verify_ssl' => ['sometimes', 'boolean'],
         ]);
 
+        $fields = Webhook::blueprint($form)->fields();
+
         $webhooks = collect($request->webhooks)
-            ->map(function (array $config) use ($form): array {
+            ->map(function (array $config) use ($fields): array {
                 $config = Arr::removeNullValues($config);
 
-                $values = Webhook::blueprint($form)->fields()
+                $values = $fields
                     ->addValues(Arr::except($config, ['_id', 'id', 'enabled', 'conditions']))
                     ->process()
                     ->values()

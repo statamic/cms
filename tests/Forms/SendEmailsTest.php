@@ -55,6 +55,25 @@ class SendEmailsTest extends TestCase
     }
 
     #[Test]
+    public function it_sends_emails_in_the_order_they_are_configured()
+    {
+        Mail::fake();
+
+        $form = tap(FacadesForm::make('test')->email([
+            ['to' => 'first@recipient.com'],
+            ['to' => 'second@recipient.com'],
+            ['to' => 'third@recipient.com'],
+        ]))->save();
+
+        $this->sendEmails($form->makeSubmission());
+
+        $this->assertEquals(
+            ['first@recipient.com', 'second@recipient.com', 'third@recipient.com'],
+            Mail::sent(Email::class)->map(fn (Email $email) => $email->getConfig()['to'])->all()
+        );
+    }
+
+    #[Test]
     public function it_sends_an_email_when_config_contains_single_email()
     {
         // The email config should be an array of email configs.

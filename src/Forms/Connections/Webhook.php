@@ -40,11 +40,12 @@ class Webhook extends Connection
 
     public function render(Form $form): VueComponent
     {
-        $fields = static::blueprint($form)->fields()->preProcess();
+        $blueprint = static::blueprint($form);
+        $fields = $blueprint->fields()->preProcess();
 
         return VueComponent::render('webhook-connection', [
             'action' => cp_route('forms.connect.webhook.update', $form->handle()),
-            'blueprint' => static::blueprint($form)->toPublishArray(),
+            'blueprint' => $blueprint->toPublishArray(),
             'webhooks' => collect($form->connections()->get('webhook'))
                 ->mapWithKeys(function (array $config) use ($fields): array {
                     $fields = $fields->addValues($config)->preProcess();

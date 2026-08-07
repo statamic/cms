@@ -16,11 +16,11 @@ class SendWebhook implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public function __construct(public Submission $submission, public Site $site, public $config)
+    public function __construct(public Submission $submission, public Site $site, public array $config)
     {
     }
 
-    public function handle()
+    public function handle(): void
     {
         $submission = $this->submission->form()->submission($this->submission->id()) ?? $this->submission;
 

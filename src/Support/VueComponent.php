@@ -16,12 +16,12 @@ class VueComponent implements Arrayable
     {
     }
 
-    public static function render($name, $props = [])
+    public static function render(string $name, array $props = []): static
     {
         return new static($name, $props);
     }
 
-    public function toArray()
+    public function toArray(): array
     {
         return [
             'name' => $this->name,

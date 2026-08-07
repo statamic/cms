@@ -5,6 +5,7 @@ namespace Statamic\Forms;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Collection;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Blueprint;
@@ -240,7 +241,7 @@ class Email extends Mailable
             ->flatMap(fn (string $address) => Str::startsWith($address, 'field:')
                 ? Arr::wrap($this->submission->get(Str::after($address, 'field:')))
                 : [$address])
-            ->flatMap(fn (string $address) => explode(',', (string) $address))
+            ->flatMap(fn ($address) => explode(',', (string) $address))
             ->map(fn (string $address) => trim($this->sanitize($address)))
             ->filter()
             ->map(function (string $email): array {
@@ -261,12 +262,12 @@ class Email extends Mailable
             ->all();
     }
 
-    private function sanitize($value)
+    private function sanitize(string $value): string
     {
-        return preg_replace('/[\x00-\x1F\x7F]/u', '', (string) $value);
+        return preg_replace('/[\x00-\x1F\x7F]/u', '', $value);
     }
 
-    private function parseConfig(array $config)
+    private function parseConfig(array $config): Collection
     {
         return collect($config)
             ->except('conditions')
@@ -275,7 +276,7 @@ class Email extends Mailable
                 : $this->parseConfigValue($value));
     }
 
-    private function parseConfigValue($value)
+    private function parseConfigValue($value): string
     {
         $value = Parse::env($value); // deprecated
 

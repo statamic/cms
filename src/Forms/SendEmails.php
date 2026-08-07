@@ -26,18 +26,17 @@ class SendEmails implements ShouldQueue
 
     public function handle(): void
     {
+        $class = config('statamic.forms.send_email_job');
         $submission = $this->submission->form()->submission($this->submission->id()) ?? $this->submission;
 
-        $this->emailConfigs($submission)
-            ->map(function ($config) use ($submission) {
-                $class = config('statamic.forms.send_email_job');
-
-                return new $class($submission, $this->site, $config);
-            })
-            ->each(fn ($job) => $this->prependtoChain($job));
+        $this->prependToChain(
+            $this->emailConfigs($submission)
+                ->map(fn (array $config) => new $class($submission, $this->site, $config))
+                ->all()
+        );
     }
 
-    private function emailConfigs($submission): Collection
+    private function emailConfigs(Submission $submission): Collection
     {
         return collect($submission->form()->connections()->get('email', []))
             ->reject(fn (array $config) => ($config['enabled'] ?? true) === false)

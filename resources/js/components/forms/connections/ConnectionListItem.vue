@@ -17,11 +17,8 @@ function toggleCollapsedState() {
 
 <template>
     <div
-        data-connection-config
         class="@container relative w-full rounded-lg border border-gray-300 text-base dark:border-white/10 bg-white dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black shadow-ui-sm"
         :class="{ 'border-red-500': hasError }"
-        :data-collapsed="collapsed ?? undefined"
-        :data-error="hasError ?? undefined"
     >
         <header
             class="group/header animate-border-color flex items-center show-focus-within rounded-[calc(var(--radius-lg)-1px)] px-1.5 antialiased duration-200 dark:bg-gray-925 border-gray-300 dark:shadow-md"
@@ -62,15 +59,9 @@ function toggleCollapsedState() {
             </div>
         </header>
 
-        <div
-            v-show="!collapsed"
-            :class="{ 'contain-paint': collapsed, 'isolate': !collapsed }"
-            class="border-t border-t-gray-300! dark:border-t-white/10!"
-        >
-            <div :tabindex="collapsed ? -1 : undefined" :inert="collapsed">
-                <div class="p-4">
-                    <slot />
-                </div>
+        <div v-show="!collapsed" class="isolate border-t border-t-gray-300! dark:border-t-white/10!">
+            <div class="p-4">
+                <slot />
             </div>
         </div>
     </div>

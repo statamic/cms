@@ -9,7 +9,7 @@ import { Link } from '@inertiajs/vue3';
 
 defineOptions({ layout: [Layout, PanelLayout, FormsLayout] });
 
-const props = defineProps({
+defineProps({
     form: Object,
     connection: Object,
     component: Object,

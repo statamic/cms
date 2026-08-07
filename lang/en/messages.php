@@ -84,7 +84,6 @@ return [
     'elevated_session_verification_code_sent' => 'Verification code has been sent to your email.',
     'email_connection_delete_confirmation' => 'Are you sure you want to delete this email?',
     'email_connection_description' => 'Send email notifications when submissions are received.',
-    'email_connection_test_sent' => 'Test email sent to :email.',
     'email_utility_configuration_description' => 'Mail settings are configured in <code>:path</code>',
     'email_utility_description' => 'Check email configuration settings and send test emails.',
     'entry_count' => ':count entry|:count entries',
@@ -324,7 +323,6 @@ return [
     'webhook_connection_delete_confirmation' => 'Are you sure you want to delete this webhook?',
     'webhook_connection_description' => 'Send submissions to an external URL as they are received.',
     'webhook_connection_payload_instructions' => 'Each submission is sent to the webhook URL as a JSON POST request.',
-    'webhook_connection_test_sent' => 'Test request sent successfully.',
     'webhook_connection_verify_ssl_instructions' => 'Only disable this if the receiving server uses a self-signed certificate.',
     'width_x_height' => ':width × :height',
 ];

@@ -39,11 +39,12 @@ class Email extends Connection
 
     public function render(Form $form): VueComponent
     {
-        $fields = static::blueprint($form)->fields()->preProcess();
+        $blueprint = static::blueprint($form);
+        $fields = $blueprint->fields()->preProcess();
 
         return VueComponent::render('email-connection', [
             'action' => cp_route('forms.connect.email.update', $form->handle()),
-            'blueprint' => static::blueprint($form)->toPublishArray(),
+            'blueprint' => $blueprint->toPublishArray(),
             'emails' => collect($form->connections()->get('email'))
                 ->mapWithKeys(function (array $config) use ($fields): array {
                     // Convert legacy address strings to arrays.

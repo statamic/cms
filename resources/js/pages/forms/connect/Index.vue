@@ -41,7 +41,7 @@ type Connection = {
     url: string;
 }
 
-const props = defineProps<{
+defineProps<{
     form: Object,
     connections: Connection[],
 }>();

@@ -9,7 +9,7 @@ use Statamic\Forms\Connections\ConnectionRepository;
  * @method static \Illuminate\Support\Collection all()
  * @method static \Statamic\Forms\Connections\Connection|null find(string $handle)
  * @method static void routes()
- * @method static array classes()
+ * @method static \Illuminate\Support\Collection classes()
  *
  * @see \Statamic\Forms\Connections\ConnectionRepository
  */
