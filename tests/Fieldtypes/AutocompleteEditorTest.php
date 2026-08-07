@@ -213,6 +213,147 @@ class AutocompleteEditorTest extends TestCase
     }
 
     #[Test]
+    public function it_strips_mention_labels_when_processing()
+    {
+        $fieldtype = $this->fieldtype(['options' => ['red' => 'Red']]);
+
+        $value = [
+            [
+                'type' => 'paragraph',
+                'content' => [
+                    ['type' => 'mention', 'attrs' => ['value' => 'red', 'label' => 'Red']],
+                ],
+            ],
+        ];
+
+        $this->assertSame(
+            [
+                [
+                    'type' => 'paragraph',
+                    'content' => [
+                        ['type' => 'mention', 'attrs' => ['value' => 'red']],
+                    ],
+                ],
+            ],
+            $fieldtype->process($value)
+        );
+    }
+
+    #[Test]
+    public function it_hydrates_mention_labels_from_config_when_preprocessing()
+    {
+        $fieldtype = $this->fieldtype(['options' => ['red' => 'Red']]);
+
+        $value = [
+            [
+                'type' => 'paragraph',
+                'content' => [
+                    ['type' => 'mention', 'attrs' => ['value' => 'red']],
+                ],
+            ],
+        ];
+
+        $this->assertSame(
+            [
+                [
+                    'type' => 'paragraph',
+                    'content' => [
+                        ['type' => 'mention', 'attrs' => ['value' => 'red', 'label' => 'Red']],
+                    ],
+                ],
+            ],
+            $fieldtype->preProcess($value)
+        );
+    }
+
+    #[Test]
+    public function it_hydrates_mention_labels_with_the_current_config_value()
+    {
+        $fieldtype = $this->fieldtype(['options' => ['red' => 'Crimson']]);
+
+        $value = [
+            [
+                'type' => 'paragraph',
+                'content' => [
+                    ['type' => 'mention', 'attrs' => ['value' => 'red', 'label' => 'Red']],
+                ],
+            ],
+        ];
+
+        $this->assertSame(
+            'Crimson',
+            $fieldtype->preProcess($value)[0]['content'][0]['attrs']['label']
+        );
+    }
+
+    #[Test]
+    public function it_leaves_mentions_without_a_matching_option_unlabeled()
+    {
+        $fieldtype = $this->fieldtype(['options' => ['red' => 'Red']]);
+
+        $value = [
+            [
+                'type' => 'paragraph',
+                'content' => [
+                    ['type' => 'mention', 'attrs' => ['value' => 'deleted']],
+                ],
+            ],
+        ];
+
+        $this->assertSame(
+            [['type' => 'mention', 'attrs' => ['value' => 'deleted']]],
+            $fieldtype->preProcess($value)[0]['content']
+        );
+    }
+
+    #[Test]
+    public function it_handles_mentions_nested_in_lists()
+    {
+        $fieldtype = $this->fieldtype(['options' => ['red' => 'Red']]);
+
+        $stored = [
+            [
+                'type' => 'bulletList',
+                'content' => [
+                    [
+                        'type' => 'listItem',
+                        'content' => [
+                            [
+                                'type' => 'paragraph',
+                                'content' => [
+                                    ['type' => 'mention', 'attrs' => ['value' => 'red']],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $preProcessed = $fieldtype->preProcess($stored);
+
+        $this->assertSame(
+            ['value' => 'red', 'label' => 'Red'],
+            $preProcessed[0]['content'][0]['content'][0]['content'][0]['attrs']
+        );
+
+        $this->assertSame($stored, $fieldtype->process($preProcessed));
+    }
+
+    #[Test]
+    public function it_round_trips_inline_mentions()
+    {
+        $fieldtype = $this->fieldtype(['inline' => true, 'options' => ['red' => 'Red']]);
+
+        $stored = [
+            ['type' => 'text', 'text' => 'Hi '],
+            ['type' => 'mention', 'attrs' => ['value' => 'red']],
+        ];
+
+        $this->assertSame($stored, $fieldtype->process($fieldtype->preProcess($stored)));
+    }
+
+    #[Test]
     public function preload_normalizes_a_list_of_plain_string_options()
     {
         $fieldtype = $this->fieldtype([

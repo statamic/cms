@@ -108,7 +108,7 @@ class AutocompleteEditor extends Fieldtype
             return null;
         }
 
-        return $value;
+        return $this->stripMentionLabels($value);
     }
 
     public function preProcess($value)
@@ -128,7 +128,40 @@ class AutocompleteEditor extends Fieldtype
             $value = $this->wrapInlineValue($value);
         }
 
-        return $value;
+        return $this->hydrateMentionLabels($value);
+    }
+
+    protected function stripMentionLabels($value)
+    {
+        return $this->mapMentions($value, function ($node) {
+            unset($node['attrs']['label']);
+
+            return $node;
+        });
+    }
+
+    protected function hydrateMentionLabels($value)
+    {
+        $labels = collect($this->getOptions())->pluck('label', 'value');
+
+        return $this->mapMentions($value, function ($node) use ($labels) {
+            if ($label = $labels->get($node['attrs']['value'] ?? null)) {
+                $node['attrs']['label'] = $label;
+            }
+
+            return $node;
+        });
+    }
+
+    private function mapMentions($value, $callback)
+    {
+        return collect($value)->map(function ($node) use ($callback) {
+            if (isset($node['content'])) {
+                $node['content'] = $this->mapMentions($node['content'], $callback);
+            }
+
+            return ($node['type'] ?? null) === 'mention' ? $callback($node) : $node;
+        })->all();
     }
 
     protected function removeBrokenNodes($value)
