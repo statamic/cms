@@ -85,7 +85,7 @@ const wrapperAttrs = computed(() => {
     return rest;
 });
 
-const triggerClasses = cva({
+const triggerClasses = computed(() => cva({
     base: 'w-full flex items-center justify-between antialiased cursor-pointer',
     variants: {
         variant: {
@@ -117,7 +117,7 @@ const triggerClasses = cva({
     'discrete-focus-outline': props.discreteFocusOutline,
     readOnly: props.readOnly,
     disabled: props.disabled,
-});
+}));
 
 const itemClasses = cva({
     base: [
