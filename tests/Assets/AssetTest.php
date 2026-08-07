@@ -42,10 +42,11 @@ use Statamic\Support\Arr;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
+use Tests\WindowsHelpers;
 
 class AssetTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk;
+    use PreventSavingStacheItemsToDisk, WindowsHelpers;
 
     private $container;
 
@@ -1961,6 +1962,10 @@ class AssetTest extends TestCase
     #[DataProvider('unnormalizedSvgExtensionProvider')]
     public function it_sanitizes_svgs_on_upload_regardless_of_how_the_extension_is_written($extension)
     {
+        if (trim($extension) !== $extension) {
+            $this->markTestSkippedInWindows('Windows does not allow filenames with trailing whitespace.');
+        }
+
         Event::fake();
 
         // Disable filename lowercasing so the uppercase extension actually
