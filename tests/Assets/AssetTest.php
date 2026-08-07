@@ -1958,8 +1958,8 @@ class AssetTest extends TestCase
     }
 
     #[Test]
-    #[DataProvider('svgExtensionCaseProvider')]
-    public function it_sanitizes_svgs_on_upload_regardless_of_extension_case($extension)
+    #[DataProvider('unnormalizedSvgExtensionProvider')]
+    public function it_sanitizes_svgs_on_upload_regardless_of_how_the_extension_is_written($extension)
     {
         Event::fake();
 
@@ -1985,11 +1985,13 @@ class AssetTest extends TestCase
         $this->assertStringNotContainsString('</script>', $asset->contents());
     }
 
-    public static function svgExtensionCaseProvider()
+    public static function unnormalizedSvgExtensionProvider()
     {
         return [
             'uppercase' => ['SVG'],
             'mixed case' => ['Svg'],
+            'trailing whitespace' => ['svg '],
+            'uppercase with trailing whitespace' => ['SVG '],
         ];
     }
 

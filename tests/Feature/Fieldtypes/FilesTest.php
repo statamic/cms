@@ -77,8 +77,8 @@ class FilesTest extends TestCase
     }
 
     #[Test]
-    #[DataProvider('svgExtensionCaseProvider')]
-    public function it_sanitizes_svgs_on_upload_regardless_of_extension_case($extension)
+    #[DataProvider('unnormalizedSvgExtensionProvider')]
+    public function it_sanitizes_svgs_on_upload_regardless_of_how_the_extension_is_written($extension)
     {
         Date::setTestNow(Date::createFromTimestamp(1671484636, config('app.timezone')));
 
@@ -104,11 +104,13 @@ class FilesTest extends TestCase
         $this->assertStringNotContainsString('</script>', $contents);
     }
 
-    public static function svgExtensionCaseProvider()
+    public static function unnormalizedSvgExtensionProvider()
     {
         return [
             'uppercase' => ['SVG'],
             'mixed case' => ['Svg'],
+            'trailing whitespace' => ['svg '],
+            'uppercase with trailing whitespace' => ['SVG '],
         ];
     }
 
