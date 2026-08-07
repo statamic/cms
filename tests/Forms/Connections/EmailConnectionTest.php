@@ -102,13 +102,13 @@ class EmailConnectionTest extends TestCase
             ],
         ]))->save();
 
-        $fields = Email::blueprint($form)->fields();
+        $meta = Email::blueprint($form)->fields()->meta();
 
         foreach (['to', 'cc', 'bcc', 'from', 'reply_to'] as $handle) {
             $this->assertEquals([
-                'field:full_name' => 'Full Name',
-                'field:email_address' => 'Email Address',
-            ], $fields->get($handle)->get('options'));
+                ['value' => 'field:full_name', 'label' => 'Full Name', 'icon' => 'user-avatar-flush', 'category' => 'contact'],
+                ['value' => 'field:email_address', 'label' => 'Email Address', 'icon' => 'mail-sign-at', 'category' => 'contact'],
+            ], $meta->get($handle)['options']);
         }
     }
 }

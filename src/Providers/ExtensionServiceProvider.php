@@ -92,6 +92,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Grid::class,
         Fieldtypes\Group::class,
         Fieldtypes\FormBanner::class,
+        Fieldtypes\FormFields::class,
         Fieldtypes\FormHeading::class,
         Fieldtypes\FormParagraph::class,
         Fieldtypes\FormUpload::class,

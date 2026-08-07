@@ -75,11 +75,6 @@ class Email extends Connection
 
     public static function blueprint(Form $form): \Statamic\Fields\Blueprint
     {
-        $addressOptions = $form->formFields()->fields()
-            ->reject(fn ($field) => array_intersect($field->fieldtype()->categories(), ['information', 'structure']))
-            ->mapWithKeys(fn ($field) => ['field:'.$field->handle() => $field->display()])
-            ->all();
-
         return Blueprint::make()->setContents([
             'tabs' => [
                 'main' => [
@@ -89,45 +84,49 @@ class Email extends Connection
                                 [
                                     'handle' => 'to',
                                     'field' => [
-                                        'type' => 'select',
+                                        'type' => 'form_fields',
                                         'display' => __('Recipient(s)'),
                                         'validate' => ['required'],
                                         'instructions' => __('statamic::messages.form_configure_email_to_instructions'),
-                                        'options' => $addressOptions,
-                                        'multiple' => true,
+                                        'form' => $form->handle(),
+                                        'prefix' => 'field:',
                                         'taggable' => true,
+                                        'multiple' => true,
                                     ],
                                 ],
                                 [
                                     'handle' => 'cc',
                                     'field' => [
-                                        'type' => 'select',
+                                        'type' => 'form_fields',
                                         'display' => __('CC Recipient(s)'),
-                                        'options' => $addressOptions,
-                                        'multiple' => true,
+                                        'form' => $form->handle(),
+                                        'prefix' => 'field:',
                                         'taggable' => true,
+                                        'multiple' => true,
                                         'width' => 50,
                                     ],
                                 ],
                                 [
                                     'handle' => 'bcc',
                                     'field' => [
-                                        'type' => 'select',
+                                        'type' => 'form_fields',
                                         'display' => __('BCC Recipient(s)'),
-                                        'options' => $addressOptions,
-                                        'multiple' => true,
+                                        'form' => $form->handle(),
+                                        'prefix' => 'field:',
                                         'taggable' => true,
+                                        'multiple' => true,
                                         'width' => 50,
                                     ],
                                 ],
                                 [
                                     'handle' => 'from',
                                     'field' => [
-                                        'type' => 'select',
+                                        'type' => 'form_fields',
                                         'display' => __('Sender'),
                                         'instructions' => __('statamic::messages.form_configure_email_from_instructions'),
-                                        'options' => $addressOptions,
                                         'placeholder' => config('mail.from.address'),
+                                        'form' => $form->handle(),
+                                        'prefix' => 'field:',
                                         'taggable' => true,
                                         'clearable' => true,
                                         'width' => 50,
@@ -136,10 +135,11 @@ class Email extends Connection
                                 [
                                     'handle' => 'reply_to',
                                     'field' => [
-                                        'type' => 'select',
+                                        'type' => 'form_fields',
                                         'display' => __('Reply To'),
                                         'instructions' => __('statamic::messages.form_configure_email_reply_to_instructions'),
-                                        'options' => $addressOptions,
+                                        'form' => $form->handle(),
+                                        'prefix' => 'field:',
                                         'taggable' => true,
                                         'multiple' => true,
                                         'width' => 50,
