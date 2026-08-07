@@ -1,0 +1,8 @@
+
+@media (height < 1000px) and (width >= 1200px) {
+.calendar-grid {
+tr:not([data-week-has-entries="true"]) td[data-v-d0b4e507] {
+            aspect-ratio: 2 / 1;
+}
+}
+}
