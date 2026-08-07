@@ -11,10 +11,11 @@ use Statamic\Assets\AssetContainer;
 use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
+use Tests\WindowsHelpers;
 
 class FilesTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk;
+    use PreventSavingStacheItemsToDisk, WindowsHelpers;
 
     public function setUp(): void
     {
@@ -74,6 +75,48 @@ class FilesTest extends TestCase
             $this->assertDirectoryExists($glideDir);
             $this->assertEmpty(app('files')->allFiles($glideDir)); // no temp files
         }
+    }
+
+    #[Test]
+    #[DataProvider('unnormalizedSvgExtensionProvider')]
+    public function it_sanitizes_svgs_on_upload_regardless_of_how_the_extension_is_written($extension)
+    {
+        if (trim($extension) !== $extension) {
+            $this->markTestSkippedInWindows('Windows does not allow filenames with trailing whitespace.');
+        }
+
+        Date::setTestNow(Date::createFromTimestamp(1671484636, config('app.timezone')));
+
+        $disk = Storage::fake('local');
+
+        $file = UploadedFile::fake()->createWithContent("test.{$extension}", '<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" width="500" height="500"><script type="text/javascript">alert(`Bad stuff could go in here.`);</script></svg>');
+
+        $this
+            ->actingAs(tap(User::make()->makeSuper())->save())
+            ->post('/cp/fieldtypes/files/upload', ['file' => $file])
+            ->assertOk()
+            ->assertJson([
+                'data' => [
+                    'id' => $path = "1671484636/test.{$extension}",
+                ],
+            ]);
+
+        $contents = $disk->get('statamic/file-uploads/'.$path);
+
+        // Ensure the inline scripts were stripped out.
+        $this->assertStringNotContainsString('<script', $contents);
+        $this->assertStringNotContainsString('Bad stuff could go in here.', $contents);
+        $this->assertStringNotContainsString('</script>', $contents);
+    }
+
+    public static function unnormalizedSvgExtensionProvider()
+    {
+        return [
+            'uppercase' => ['SVG'],
+            'mixed case' => ['Svg'],
+            'trailing whitespace' => ['svg '],
+            'uppercase with trailing whitespace' => ['SVG '],
+        ];
     }
 
     public static function uploadProvider()
