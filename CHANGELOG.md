@@ -1,5 +1,18 @@
 # Release Notes
 
+## 6.27.1 (2026-08-07)
+
+### What's fixed
+- Fix hidden fieldtypes ignoring their field conditions [#15132](https://github.com/statamic/cms/issues/15132) by @lazerg
+- Fix users select dropdown not searching by email [#15128](https://github.com/statamic/cms/issues/15128) by @edalzell
+- Exclude private (`$__`) variables from cache context to resolve serialization exception [#15130](https://github.com/statamic/cms/issues/15130) by @martyf
+- Fix Combobox trigger classes not reacting to prop changes [#15133](https://github.com/statamic/cms/issues/15133) by @duncanmcclean
+- Reset memoized Stache state between jobs instead of disabling it process-wide [#15126](https://github.com/statamic/cms/issues/15126) by @edalzell
+- Fall back to the default site when `sites.yaml` is empty [#15135](https://github.com/statamic/cms/issues/15135) by @lazerg
+- Prevent reordering from showing a false badge on the filter button [#15079](https://github.com/statamic/cms/issues/15079) by @lazerg
+
+
+
 ## 6.27.0 (2026-08-05)
 
 ### What's new
