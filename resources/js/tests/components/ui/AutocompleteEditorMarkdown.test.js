@@ -1,6 +1,14 @@
 import { expect, test } from 'vitest';
 import { contentToMarkdown, markdownToContent, MENTION_SENTINEL } from '@/components/ui/AutocompleteEditor/markdown';
 
+test('a value that is not a string is treated as empty', () => {
+    const proseMirror = [{ type: 'paragraph', content: [{ type: 'text', text: 'legacy' }] }];
+
+    expect(markdownToContent(proseMirror)).toEqual([]);
+    expect(markdownToContent(null)).toEqual([]);
+    expect(markdownToContent(undefined)).toEqual([]);
+});
+
 test('a mention value that cannot be tokenized never leaks the sentinel', () => {
     const markdown = contentToMarkdown([
         { type: 'paragraph', content: [{ type: 'mention', attrs: { value: 'not a slug' } }] },

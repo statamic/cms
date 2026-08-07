@@ -76,5 +76,9 @@ export function contentToMarkdown(content) {
 }
 
 export function markdownToContent(markdown) {
+    // The markdown lexer throws on anything that isn't a string, which would
+    // take down the whole publish form. Treat unexpected values as empty.
+    if (typeof markdown !== 'string') return [];
+
     return manager.parse(markdown).content;
 }
