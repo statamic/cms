@@ -21,7 +21,7 @@ const props = defineProps({
     config: Array,
     action: String,
     blueprint: Object,
-    webhooks: Array,
+    webhooks: Object,
     defaults: Object,
     examplePayload: String,
 });

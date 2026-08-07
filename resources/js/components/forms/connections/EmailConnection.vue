@@ -22,7 +22,7 @@ const props = defineProps({
     config: Array,
     action: String,
     blueprint: Object,
-    emails: Array,
+    emails: Object,
     defaults: Object,
 });
 
