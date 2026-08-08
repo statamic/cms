@@ -10,6 +10,7 @@ const props = defineProps({
     createUrl: String,
     actionUrl: String,
     canCreate: Boolean,
+    resourceIndex: Object,
 });
 
 if (props.collections.length === 0) useArchitecturalBackground();
@@ -25,6 +26,7 @@ if (props.collections.length === 0) useArchitecturalBackground();
         :can-create-collections="canCreate"
         :create-url="createUrl"
         :action-url="actionUrl"
+        :resource-index="resourceIndex"
     />
 
     <template v-else>

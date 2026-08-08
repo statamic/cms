@@ -72,6 +72,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Resource Indexes
+    |--------------------------------------------------------------------------
+    |
+    | The repository used to store resource index group customizations.
+    |
+    */
+
+    'resource_indexes' => [
+        'repository' => \Statamic\CP\ResourceIndex\PreferenceGroupRepository::class,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Links to Documentation
     |--------------------------------------------------------------------------
     |

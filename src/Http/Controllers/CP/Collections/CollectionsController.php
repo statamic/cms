@@ -12,6 +12,7 @@ use Statamic\Exceptions\SiteNotFoundException;
 use Statamic\Facades\Action;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
+use Statamic\Facades\ResourceIndex;
 use Statamic\Facades\Scope;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
@@ -44,13 +45,15 @@ class CollectionsController extends CpController
             ];
         }
 
-        return Inertia::render('collections/Index', [
-            'collections' => $this->collections()->all(),
+        $collections = $this->collections();
+
+        return ResourceIndex::make('collections', $collections)->render(fn () => Inertia::render('collections/Index', [
+            'collections' => $collections->all(),
             'columns' => $columns,
             'createUrl' => cp_route('collections.create'),
             'actionUrl' => cp_route('collections.actions.run'),
             'canCreate' => User::current()->can('create', 'Statamic\Contracts\Entries\Collection'),
-        ]);
+        ]));
     }
 
     private function collections()

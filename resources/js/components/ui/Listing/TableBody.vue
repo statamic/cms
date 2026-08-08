@@ -6,8 +6,14 @@ import { injectListingContext } from '../Listing/Listing.vue';
 import { computed, ref, watch } from 'vue';
 import { Checkbox } from '@ui';
 
+const props = defineProps({
+    items: {
+        type: Array,
+    },
+});
+
 const {
-    items,
+    items: listingItems,
     selections,
     reorderable,
     reordered,
@@ -21,6 +27,9 @@ const {
     allowsMultipleSelections,
     isColumnVisible,
 } = injectListingContext();
+
+const items = computed(() => props.items ?? listingItems.value);
+let lastSubsetSelectionClicked = null;
 
 function isSelected(id) {
     return selections.value.includes(id);
@@ -50,7 +59,7 @@ function getRowTitle(row) {
     return row.title || row.name || row.label || row.id || __('item');
 }
 
-function handleRowClick(event, index) {
+function handleRowClick(event, row, index) {
     if (! allowsSelections.value) return;
 
     // Check if the click target is an interactive element
@@ -59,7 +68,36 @@ function handleRowClick(event, index) {
 
     // If it's not an interactive element, fire the selection handler
     if (!isInteractive) {
+        selectRow(row, index, event);
+    }
+}
+
+function selectRow(row, index, event) {
+    if (props.items === undefined) {
         selectionClicked(index, event);
+        return;
+    }
+
+    const lastIndex = items.value.findIndex((item) => item.id === lastSubsetSelectionClicked);
+
+    if (event?.shiftKey && lastIndex !== -1) {
+        selectSubsetRange(Math.min(lastIndex, index), Math.max(lastIndex, index));
+    } else {
+        toggleSelection(row.id);
+    }
+
+    if (isSelected(row.id)) {
+        lastSubsetSelectionClicked = row.id;
+    }
+}
+
+function selectSubsetRange(from, to) {
+    for (let i = from; i <= to; i++) {
+        const id = items.value[i].id;
+
+        if (!selections.value.includes(id) && !hasReachedSelectionLimit.value) {
+            selections.value.push(id);
+        }
     }
 }
 </script>
@@ -80,7 +118,7 @@ function handleRowClick(event, index) {
                 :key="row.id"
                 class="sortable-row outline-hidden starting-style-transition"
                 :data-row="isSelected(row.id) ? 'selected' : 'unselected'"
-                @click="handleRowClick($event, index)"
+                @click="handleRowClick($event, row, index)"
             >
                 <td class="table-drag-handle" v-if="reorderable"></td>
                 <td class="checkbox-column" v-if="allowsSelections && !reorderable">
@@ -92,7 +130,7 @@ function handleRowClick(event, index) {
                         :description="getCheckboxDescription(row)"
                         size="sm"
                         solo
-                        @update:model-value="selectionClicked(index, $event)"
+                        @update:model-value="selectRow(row, index, $event)"
                     />
                 </td>
                 <td

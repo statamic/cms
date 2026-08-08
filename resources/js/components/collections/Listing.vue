@@ -1,9 +1,17 @@
 <template>
     <ui-header :title="__('Collections')" icon="collections">
-        <ui-toggle-group v-model="mode">
-            <ui-toggle-item icon="layout-list" value="list" :aria-label="__('List view')" />
-            <ui-toggle-item icon="layout-grid" value="grid" :aria-label="__('Grid view')" />
-        </ui-toggle-group>
+        <ui-button-group>
+            <ui-toggle-group v-model="mode">
+                <ui-toggle-item icon="layout-list" value="list" :aria-label="__('List view')" />
+                <ui-toggle-item icon="layout-grid" value="grid" :aria-label="__('Grid view')" />
+            </ui-toggle-group>
+            <ui-button
+                v-if="resourceIndex.organizeUrl"
+                :text="__('Organize')"
+                :href="resourceIndex.organizeUrl"
+                icon="hierarchy"
+            />
+        </ui-button-group>
         <ui-button
             :href="createUrl"
             :text="__('Create Collection')"
@@ -11,8 +19,20 @@
             v-if="canCreateCollections"
         />
     </ui-header>
-    <div class="@container/collections flex flex-wrap py-2 gap-y-6 -mx-3" v-if="mode === 'grid'">
-        <div v-for="collection in items" class="w-full @4xl:w-1/2 px-3" :key="collection.id">
+    <div
+        v-if="mode === 'grid'"
+        v-for="(group, groupIndex) in collectionGroups"
+        :key="group.id"
+        class="@container/collections flex flex-wrap py-2 gap-y-6 -mx-3"
+        :class="{ 'mt-6': groupIndex > 0 }"
+    >
+        <ui-subheading
+            v-if="group.title"
+            size="lg"
+            class="w-full px-3 -mt-2 -mb-2"
+            :text="group.title"
+        />
+        <div v-for="collection in group.items" class="w-full @4xl:w-1/2 px-3" :key="collection.id">
             <ui-panel>
                 <ui-panel-header class="flex items-center justify-between">
                     <div class="flex items-center gap-1.5">
@@ -138,13 +158,12 @@
         </div>
     </div>
 
-    <ui-listing
+    <ResourceIndexListing
         v-if="mode === 'list'"
+        :resource-index="resourceIndex"
         :items="items"
         :columns="columns"
         :action-url="actionUrl"
-        :allow-search="false"
-        :allow-customizing-columns="false"
         @refreshing="request"
     >
         <template #cell-title="{ row: collection }">
@@ -184,7 +203,7 @@
             <DropdownItem v-if="collection.blueprint_editable" :text="__('Edit Blueprints')" icon="blueprint-edit" :href="collection.blueprints_url" />
             <DropdownItem v-if="collection.editable" :text="__('Scaffold Views')" icon="scaffold" :href="collection.scaffold_url" />
         </template>
-    </ui-listing>
+    </ResourceIndexListing>
 </template>
 
 <script>
@@ -199,6 +218,8 @@ import {
     DropdownSeparator,
 } from '@/components/ui';
 import ItemActions from '@/components/actions/ItemActions.vue';
+import ResourceIndexListing from '@/components/resource-indexes/Listing.vue';
+import { groupResourceIndexItems } from '@/components/resource-indexes/group-items.js';
 import { Link } from '@inertiajs/vue3';
 
 export default {
@@ -213,6 +234,7 @@ export default {
         DropdownItem,
         DropdownSeparator,
         ItemActions,
+        ResourceIndexListing,
     },
 
     props: {
@@ -221,6 +243,10 @@ export default {
         initialRows: Array,
         initialColumns: Array,
         actionUrl: String,
+        resourceIndex: {
+            type: Object,
+            required: true,
+        },
     },
 
     data() {
@@ -234,6 +260,12 @@ export default {
             mode: !modePreference || !['list', 'grid'].includes(modePreference) ? 'list' : modePreference,
             source: null,
         };
+    },
+
+    computed: {
+        collectionGroups() {
+            return groupResourceIndexItems(this.items, this.resourceIndex);
+        },
     },
 
     watch: {
@@ -296,6 +328,14 @@ export default {
                 icon: 'collections',
                 when: () => this.canCreateCollections,
                 url: this.createUrl,
+            });
+
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Organize Collections'),
+                icon: 'hierarchy',
+                when: () => !!this.resourceIndex.organizeUrl,
+                url: this.resourceIndex.organizeUrl,
             });
 
             Statamic.$commandPalette.add({

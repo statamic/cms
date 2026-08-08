@@ -6,6 +6,8 @@ use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
+use Statamic\Contracts\CP\ResourceIndex\GroupRepository;
+use Statamic\CP\ResourceIndex\PreferenceGroupRepository;
 use Statamic\CP\Utilities\UtilityRepository;
 use Statamic\Extensions\Translation\Loader;
 use Statamic\Extensions\Translation\Translator;
@@ -52,6 +54,12 @@ class CpServiceProvider extends ServiceProvider
             $extended->setFallback($translator->getFallback());
 
             return $extended;
+        });
+
+        $this->app->singleton(GroupRepository::class, function ($app) {
+            $repository = config('statamic.cp.resource_indexes.repository', PreferenceGroupRepository::class);
+
+            return $app->make($repository);
         });
 
         $this->app->singleton(UtilityRepository::class, function () {

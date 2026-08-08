@@ -6,6 +6,9 @@ import TableHead from './TableHead.vue';
 import TableBody from './TableBody.vue';
 
 const props = defineProps({
+    items: {
+        type: Array,
+    },
     unstyled: {
         type: Boolean,
         default: false,
@@ -16,7 +19,8 @@ const props = defineProps({
     },
 });
 
-const { visibleColumns, selections, items, hasActions, showBulkActions, loading, reorderable } = injectListingContext();
+const { visibleColumns, selections, items: listingItems, hasActions, showBulkActions, loading, reorderable } = injectListingContext();
+const items = computed(() => props.items ?? listingItems.value);
 const shifting = ref(false);
 const hasSelections = computed(() => selections.value.length > 0);
 
@@ -57,8 +61,8 @@ const hasTbodyStartContent = hasSlotContent('tbody-start');
         @keydown.shift="shifting = true"
         @keyup="shifting = false"
     >
-        <TableHead />
-        <TableBody>
+        <TableHead :items="props.items" />
+        <TableBody :items="props.items">
             <template v-if="$slots['tbody-start']" #tbody-start><slot name="tbody-start" /></template>
             <template v-if="$slots['prepended-row-actions']" #prepended-row-actions="slotProps">
                 <slot name="prepended-row-actions" v-bind="slotProps" />

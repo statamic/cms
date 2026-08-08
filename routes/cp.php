@@ -87,6 +87,7 @@ use Statamic\Http\Controllers\CP\Preferences\Nav\UserNavController;
 use Statamic\Http\Controllers\CP\Preferences\PreferenceController;
 use Statamic\Http\Controllers\CP\Preferences\RolePreferenceController;
 use Statamic\Http\Controllers\CP\Preferences\UserPreferenceController;
+use Statamic\Http\Controllers\CP\ResourceIndexes\ResourceIndexOrganizationController;
 use Statamic\Http\Controllers\CP\SelectSiteController;
 use Statamic\Http\Controllers\CP\SessionTimeoutController;
 use Statamic\Http\Controllers\CP\Sites\SitesController;
@@ -413,6 +414,14 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::delete('js/{key}', [PreferenceController::class, 'destroy'])->name('destroy');
 
     });
+
+    Route::middleware('can:manage preferences')
+        ->prefix('resource-indexes/{resourceIndex}/organization')
+        ->as('resource-indexes.organization.')
+        ->group(function () {
+            Route::patch('/', [ResourceIndexOrganizationController::class, 'update'])->name('update');
+            Route::delete('/', [ResourceIndexOrganizationController::class, 'destroy'])->name('destroy');
+        });
 
     Route::group(['prefix' => 'nav', 'as' => 'preferences.nav.'], function () {
         Route::get('/', [NavController::class, 'index'])->name('index');
