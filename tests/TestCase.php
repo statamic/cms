@@ -12,7 +12,7 @@ use Statamic\Http\Middleware\CP\AuthenticateSession;
 
 abstract class TestCase extends \Orchestra\Testbench\TestCase
 {
-    use WindowsHelpers;
+    use RestoresTestbenchSkeleton, WindowsHelpers;
 
     protected $shouldFakeVersion = true;
     protected $shouldPreventNavBeingBuilt = true;
@@ -20,7 +20,11 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
     protected function setUp(): void
     {
+        $this->purgeTestbenchSkeleton();
+
         parent::setUp();
+
+        $this->snapshotTestbenchSkeleton();
 
         $this->withoutVite();
 
@@ -58,6 +62,8 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         }
 
         parent::tearDown();
+
+        $this->restoreTestbenchSkeleton();
     }
 
     protected function getPackageProviders($app)
