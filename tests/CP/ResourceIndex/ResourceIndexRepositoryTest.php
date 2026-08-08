@@ -74,18 +74,22 @@ class ResourceIndexRepositoryTest extends TestCase
     }
 
     #[Test]
-    public function an_empty_saved_configuration_is_distinct_from_no_saved_configuration()
+    public function saving_no_groups_resets_to_the_default_configuration()
     {
         $index = $this->makeIndex([
             ['id' => 'default', 'title' => 'Default', 'items' => ['one']],
         ]);
 
-        $this->assertFalse($this->repository->hasSavedGroups($index));
+        $this->repository->saveGroups($index, [
+            ['id' => 'custom', 'title' => 'Custom', 'items' => ['two']],
+        ]);
 
         $this->repository->saveGroups($index, []);
 
-        $this->assertTrue($this->repository->hasSavedGroups($index));
-        $this->assertSame([], $this->repository->groups($index));
+        $this->assertFalse($this->repository->hasSavedGroups($index));
+        $this->assertSame([
+            ['id' => 'default', 'title' => 'Default', 'items' => ['one']],
+        ], $this->repository->groups($index));
     }
 
     private function makeIndex(array $defaultGroups)

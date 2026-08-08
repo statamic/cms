@@ -51,7 +51,15 @@ class ResourceIndexRepository
 
     public function saveGroups(ResourceIndex|string $index, array $groups): void
     {
-        $this->groupRepository->save($this->handle($index), $this->normalizeGroups($groups));
+        $groups = $this->normalizeGroups($groups);
+
+        if ($groups === []) {
+            $this->resetGroups($index);
+
+            return;
+        }
+
+        $this->groupRepository->save($this->handle($index), $groups);
     }
 
     public function resetGroups(ResourceIndex|string $index): void
