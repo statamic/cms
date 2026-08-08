@@ -52,7 +52,7 @@ class User extends BaseUser
             return collect(Arr::except($data, ['id', 'email']));
         }
 
-        foreach ($data as $key => $value) {
+        foreach (Arr::except($data, ['roles', 'groups']) as $key => $value) {
             $this->set($key, $value);
         }
 

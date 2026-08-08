@@ -44,7 +44,16 @@ export default defineConfig(({ mode, command }) => {
             },
         },
         build: {
-            minify: isProdBuild
+            minify: isProdBuild,
+            rollupOptions: {
+                output: {
+                    advancedChunks: {
+                        groups: [
+                            { name: 'icons', test: /resources[\\/]svg[\\/]icons[\\/].*\.svg/ },
+                        ],
+                    },
+                },
+            },
         },
         test: {
             projects: [
