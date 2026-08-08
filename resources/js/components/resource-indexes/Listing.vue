@@ -1,5 +1,5 @@
 <script setup>
-import { computed, useSlots } from 'vue';
+import { computed, ref, useSlots } from 'vue';
 import { Listing, ListingTable, Panel, Subheading } from '@ui';
 import { groupResourceIndexItems } from './group-items.js';
 
@@ -25,10 +25,7 @@ const props = defineProps({
 });
 const slots = useSlots();
 const grouped = computed(() => props.resourceIndex.hasSavedGroups || props.resourceIndex.groups.length > 0);
-const listingColumns = computed(() => props.resourceIndex.hasSavedGroups
-    ? props.columns.map((column) => ({ ...column, sortable: false }))
-    : props.columns,
-);
+const sortColumn = ref(props.resourceIndex.hasSavedGroups ? null : undefined);
 const forwardedTableCellSlots = computed(() => Object.keys(slots)
     .filter((slotName) => slotName.startsWith('cell-'))
     .reduce((forwardedSlots, slotName) => {
@@ -38,18 +35,18 @@ const forwardedTableCellSlots = computed(() => Object.keys(slots)
 );
 
 function groupsFor(items) {
-    return groupResourceIndexItems(items, props.resourceIndex);
+    return groupResourceIndexItems(items, props.resourceIndex, sortColumn.value === null);
 }
 </script>
 
 <template>
     <Listing
         :items="items"
-        :columns="listingColumns"
+        :columns="columns"
         :action-url="actionUrl"
         :allow-search="false"
         :allow-customizing-columns="false"
-        :sortable="!resourceIndex.hasSavedGroups"
+        v-model:sort-column="sortColumn"
         @refreshing="emit('refreshing')"
     >
         <template #default="{ items }">

@@ -1,4 +1,4 @@
-export function groupResourceIndexItems(items, resourceIndex) {
+export function groupResourceIndexItems(items, resourceIndex, preserveSavedOrder = true) {
     const { groups, fallbackGroup, hasSavedGroups } = resourceIndex;
     const grouped = hasSavedGroups || groups.length > 0;
 
@@ -15,7 +15,7 @@ export function groupResourceIndexItems(items, resourceIndex) {
         return {
             id: group.id,
             title: group.title,
-            items: hasSavedGroups
+            items: hasSavedGroups && preserveSavedOrder
                 ? group.items.map((id) => itemsById.get(String(id))).filter(Boolean)
                 : items.filter((item) => groupItemIds.has(String(item.id))),
         };

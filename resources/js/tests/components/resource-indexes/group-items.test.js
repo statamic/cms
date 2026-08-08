@@ -53,6 +53,16 @@ describe('resource index grouping', () => {
         ]);
     });
 
+    it('uses the active listing sort within saved groups', () => {
+        const one = { id: 'one' };
+        const two = { id: 'two' };
+        const groups = [{ id: 'primary', title: 'Primary', items: ['two', 'one'] }];
+
+        expect(groupResourceIndexItems([one, two], resourceIndex(groups, true), false)).toEqual([
+            { id: 'primary', title: 'Primary', items: [one, two] },
+        ]);
+    });
+
     it('only includes current listing items and omits empty groups', () => {
         const item = { id: 'one' };
         const groups = [
