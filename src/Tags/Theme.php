@@ -17,7 +17,6 @@ class Theme extends Tags
      * eg. {{ theme:img }}, {{ theme:svg }}, etc.
      *
      * @param  string  $method  Tag part
-     * @param  array  $arguments  Unused
      * @return string
      */
     public function wildcard($method)
