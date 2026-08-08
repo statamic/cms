@@ -7,6 +7,8 @@ use Illuminate\Validation\ValidationException;
 use Statamic\CP\ResourceIndex\ResourceIndexRepository;
 use Statamic\Http\Controllers\CP\CpController;
 
+use function Statamic\trans as __;
+
 class ResourceIndexOrganizationController extends CpController
 {
     public function update(Request $request, string $resourceIndex, ResourceIndexRepository $repository)
