@@ -20,11 +20,9 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
     protected function setUp(): void
     {
-        $this->purgeTestbenchSkeleton();
+        $this->prepareTestbenchSkeleton();
 
         parent::setUp();
-
-        $this->snapshotTestbenchSkeleton();
 
         $this->withoutVite();
 

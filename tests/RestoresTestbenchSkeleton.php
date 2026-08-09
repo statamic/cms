@@ -22,8 +22,6 @@ trait RestoresTestbenchSkeleton
 
     private static ?string $skeletonRealPath = null;
 
-    private static bool $skeletonPurged = false;
-
     /**
      * Subtrees the framework owns and rebuilds on demand. Deleting these breaks
      * subsequent tests ("Please provide a valid cache path"), and walking them gets
@@ -38,18 +36,32 @@ trait RestoresTestbenchSkeleton
     ];
 
     /**
-     * The snapshot below only stops tests within a process from leaking into each other.
-     * A process starting against a skeleton dirtied by an earlier run would bake that dirt
-     * into its snapshot, so clear the known offenders before the app is ever booted.
+     * Runs once per process, before the first app is booted. Booting first would mean the
+     * directories the boot creates - a disk's root, say - were already there when the
+     * snapshot was taken, making them part of the baseline and invisible to the restore for
+     * the rest of the process.
      */
-    protected function purgeTestbenchSkeleton(): void
+    protected function prepareTestbenchSkeleton(): void
     {
-        if (self::$skeletonPurged) {
+        if (self::$skeletonSnapshot !== null) {
             return;
         }
 
-        self::$skeletonPurged = true;
+        self::$skeletonPath = default_skeleton_path();
+        self::$skeletonRealPath = realpath(self::$skeletonPath) ?: self::$skeletonPath;
 
+        $this->purgeTestbenchSkeleton();
+
+        self::$skeletonSnapshot = $this->scanTestbenchSkeleton();
+    }
+
+    /**
+     * The snapshot only stops tests within a process from leaking into each other. A process
+     * starting against a skeleton dirtied by an earlier run would bake that dirt into its
+     * snapshot, so clear the known offenders first.
+     */
+    private function purgeTestbenchSkeleton(): void
+    {
         $files = new Filesystem;
 
         $purge = Config::loadFromYaml(__DIR__.'/..')->getPurgeAttributes();
@@ -65,17 +77,6 @@ trait RestoresTestbenchSkeleton
         foreach ($expand($purge['directories']) as $directory) {
             $this->deleteDirectory($directory);
         }
-    }
-
-    protected function snapshotTestbenchSkeleton(): void
-    {
-        if (self::$skeletonSnapshot !== null) {
-            return;
-        }
-
-        self::$skeletonPath = $this->app->basePath();
-        self::$skeletonRealPath = realpath(self::$skeletonPath) ?: self::$skeletonPath;
-        self::$skeletonSnapshot = $this->scanTestbenchSkeleton();
     }
 
     protected function restoreTestbenchSkeleton(): void
