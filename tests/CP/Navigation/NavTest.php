@@ -67,6 +67,26 @@ class NavTest extends TestCase
     }
 
     #[Test]
+    public function it_returns_the_nav_item_when_created_without_a_display_name()
+    {
+        $item = Nav::create(null);
+
+        $this->assertInstanceOf(NavItem::class, $item);
+        $this->assertNull($item->display());
+        $this->assertEquals([$item], Nav::items());
+    }
+
+    #[Test]
+    public function it_returns_the_nav_item_when_created_without_a_display_name_using_the_item_alias()
+    {
+        $item = Nav::item(null);
+
+        $this->assertInstanceOf(NavItem::class, $item);
+        $this->assertNull($item->display());
+        $this->assertEquals([$item], Nav::items());
+    }
+
+    #[Test]
     public function it_can_create_a_nav_item_with_a_more_custom_config()
     {
         Gate::policy(DroidsClass::class, DroidsPolicy::class);
