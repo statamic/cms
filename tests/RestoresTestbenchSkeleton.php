@@ -10,13 +10,17 @@ use function Orchestra\Testbench\default_skeleton_path;
 
 trait RestoresTestbenchSkeleton
 {
+    use DeletesDirectories;
+
     /**
-     * The skeleton's contents before any test in this process had a chance to touch it,
-     * keyed by path relative to the skeleton root so lookups are hash based.
+     * The set of paths, relative to the skeleton root, that existed before any test in this
+     * process had a chance to touch it. Paths are keys so lookups are hash based.
      */
     private static ?array $skeletonSnapshot = null;
 
     private static ?string $skeletonPath = null;
+
+    private static ?string $skeletonRealPath = null;
 
     private static bool $skeletonPurged = false;
 
@@ -59,7 +63,7 @@ trait RestoresTestbenchSkeleton
         }
 
         foreach ($expand($purge['directories']) as $directory) {
-            $files->deleteDirectory($directory);
+            $this->deleteDirectory($directory);
         }
     }
 
@@ -70,6 +74,7 @@ trait RestoresTestbenchSkeleton
         }
 
         self::$skeletonPath = $this->app->basePath();
+        self::$skeletonRealPath = realpath(self::$skeletonPath) ?: self::$skeletonPath;
         self::$skeletonSnapshot = $this->scanTestbenchSkeleton();
     }
 
@@ -84,10 +89,14 @@ trait RestoresTestbenchSkeleton
         // Deepest first, so directories are empty by the time we get to them.
         uksort($added, fn ($a, $b) => substr_count($b, '/') <=> substr_count($a, '/'));
 
-        foreach ($added as $path => $isDir) {
+        foreach ($added as $path => $ignored) {
             $absolute = self::$skeletonPath.'/'.$path;
 
-            $isDir ? @rmdir($absolute) : @unlink($absolute);
+            // Same reasoning as DeletesDirectories: never ask whether the path is a file, a
+            // directory or a link, because a junction gives contradictory answers. unlink()
+            // takes files and file links, rmdir() takes empty directories, directory links
+            // and junctions without following them.
+            @unlink($absolute) || @rmdir($absolute);
         }
     }
 
@@ -109,18 +118,37 @@ trait RestoresTestbenchSkeleton
                     continue;
                 }
 
-                $isDir = is_dir($absolute.'/'.$entry) && ! is_link($absolute.'/'.$entry);
-
-                if ($isDir) {
+                if ($this->isRealSkeletonDirectory($absolute.'/'.$entry)) {
                     $scan($path);
                 }
 
-                $paths[$path] = $isDir;
+                $paths[$path] = true;
             }
         };
 
         $scan('');
 
         return $paths;
+    }
+
+    /**
+     * Whether the scan may descend into a path. Recursing through a link would record its
+     * target's contents as skeleton paths, and the restore would then delete files that can
+     * live anywhere on disk, so anything we can't positively place inside the skeleton is
+     * left alone. Resolving the path is what settles it: a junction whose lstat mode makes
+     * is_dir() and is_link() disagree still resolves to wherever it points.
+     */
+    private function isRealSkeletonDirectory(string $path): bool
+    {
+        clearstatcache(true, $path);
+
+        if (is_link($path) || ! is_dir($path)) {
+            return false;
+        }
+
+        $resolved = realpath($path);
+
+        return $resolved !== false
+            && str_starts_with($resolved.DIRECTORY_SEPARATOR, self::$skeletonRealPath.DIRECTORY_SEPARATOR);
     }
 }
