@@ -22,6 +22,17 @@ function probe(string $label, string $path): void
     );
 }
 
+// Candidate fix. hasChildren() takes the "not a link" branch for junctions and
+// returns S_ISDIR() of an lstat mode that is neither, so it never reaches the
+// FOLLOW_SYMLINKS branch. is_dir() is true for junctions, so fall back to it.
+class ViewDirectoryIterator extends RecursiveDirectoryIterator
+{
+    public function hasChildren(bool $allowLinks = false): bool
+    {
+        return parent::hasChildren($allowLinks) || is_dir($this->getPathname());
+    }
+}
+
 echo 'PHP '.PHP_VERSION.' on '.PHP_OS_FAMILY.PHP_EOL.PHP_EOL;
 
 @mkdir($base.'/views', 0777, true);
@@ -69,6 +80,25 @@ foreach ($found as $path) {
     echo '  '.$path.PHP_EOL;
 }
 
+echo PHP_EOL.'== 3b. Candidate fix: override hasChildren() to fall back to is_dir() =='.PHP_EOL;
+
+$fixed = [];
+
+foreach (new RecursiveIteratorIterator(
+    new ViewDirectoryIterator(
+        $base.'/views',
+        FilesystemIterator::SKIP_DOTS | FilesystemIterator::FOLLOW_SYMLINKS
+    )
+) as $file) {
+    $fixed[] = str_replace($base.DIRECTORY_SEPARATOR.'views'.DIRECTORY_SEPARATOR, '', $file->getPathname());
+}
+
+sort($fixed);
+
+foreach ($fixed as $path) {
+    echo '  '.$path.PHP_EOL;
+}
+
 echo PHP_EOL.'== 4. Can unlink() remove them? (this is what deleteDirectory() calls) =='.PHP_EOL;
 
 echo '  unlink(symlinked):  '.var_export(@unlink($symlink), true).PHP_EOL;
@@ -87,3 +117,6 @@ echo PHP_EOL.'== Predictions =='.PHP_EOL;
 echo '  mklink /J exits 0; is_dir(junction) is false but is_dir(symlinked) is true;'.PHP_EOL;
 echo '  the iterator yields "junction" and "empty-junction" as leaves but descends'.PHP_EOL;
 echo '  into "symlinked"; unlink() fails on both links, rmdir() removes the junction.'.PHP_EOL;
+echo '  With the candidate fix, 3b descends into the junction too, yielding'.PHP_EOL;
+echo '  "junction\tango.html" (virtual path preserved, not resolved to "target\..."),'.PHP_EOL;
+echo '  and "empty-junction" disappears entirely rather than becoming a leaf.'.PHP_EOL;
