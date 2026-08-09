@@ -29,14 +29,22 @@ class ViewDirectoryIterator extends RecursiveDirectoryIterator
 {
     public function hasChildren(bool $allowLinks = false): bool
     {
+        $path = $this->getPathname();
+
         $parent = parent::hasChildren($allowLinks);
-        $isDir = is_dir($this->getPathname());
 
-        echo '      [hasChildren] '.$this->getPathname()
+        // parent::hasChildren() lstat()s the path, and the cached lstat result is
+        // what is_dir() then sees. Drop it so is_dir() does a real stat().
+        $stale = is_dir($path);
+        clearstatcache(true, $path);
+        $fresh = is_dir($path);
+
+        echo '      [hasChildren] '.$path
             .' parent='.var_export($parent, true)
-            .' is_dir='.var_export($isDir, true).PHP_EOL;
+            .' is_dir(stale)='.var_export($stale, true)
+            .' is_dir(fresh)='.var_export($fresh, true).PHP_EOL;
 
-        return $parent || $isDir;
+        return $parent || $fresh;
     }
 }
 
