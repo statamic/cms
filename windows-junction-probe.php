@@ -29,7 +29,14 @@ class ViewDirectoryIterator extends RecursiveDirectoryIterator
 {
     public function hasChildren(bool $allowLinks = false): bool
     {
-        return parent::hasChildren($allowLinks) || is_dir($this->getPathname());
+        $parent = parent::hasChildren($allowLinks);
+        $isDir = is_dir($this->getPathname());
+
+        echo '      [hasChildren] '.$this->getPathname()
+            .' parent='.var_export($parent, true)
+            .' is_dir='.var_export($isDir, true).PHP_EOL;
+
+        return $parent || $isDir;
     }
 }
 
@@ -96,6 +103,38 @@ foreach (new RecursiveIteratorIterator(
 sort($fixed);
 
 foreach ($fixed as $path) {
+    echo '  '.$path.PHP_EOL;
+}
+
+echo PHP_EOL.'== 3c. Alternative: hand-rolled recursion using is_dir() =='.PHP_EOL;
+
+function scan(string $dir, string $prefix = ''): array
+{
+    $found = [];
+
+    foreach (new FilesystemIterator($dir, FilesystemIterator::SKIP_DOTS) as $file) {
+        $name = $file->getFilename();
+
+        if (str_starts_with($name, '.') || $name === 'node_modules') {
+            continue;
+        }
+
+        $path = $dir.DIRECTORY_SEPARATOR.$name;
+
+        if (is_dir($path)) {
+            $found = array_merge($found, scan($path, $prefix.$name.DIRECTORY_SEPARATOR));
+        } else {
+            $found[] = $prefix.$name;
+        }
+    }
+
+    return $found;
+}
+
+$handRolled = scan($base.'/views');
+sort($handRolled);
+
+foreach ($handRolled as $path) {
     echo '  '.$path.PHP_EOL;
 }
 
