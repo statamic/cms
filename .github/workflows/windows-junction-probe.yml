@@ -1,0 +1,75 @@
+name: Windows Junction Probe
+
+on:
+  push:
+    branches:
+      - 'probe/**'
+
+permissions: {}
+
+jobs:
+  probe:
+    runs-on: windows-latest
+    permissions:
+      contents: read
+
+    name: Windows junction probe
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+        with:
+          php-version: 8.5
+          extensions: fileinfo, exif, gd, pdo, sqlite, pdo_sqlite
+          ini-values: short_open_tag=on
+          coverage: none
+
+      - name: Probe the filesystem behaviour
+        run: php windows-junction-probe.php
+
+      - name: Install dependencies
+        run: |
+          composer require "illuminate/contracts:12.*" --dev --no-interaction --no-update
+          composer update --prefer-stable --prefer-dist --no-interaction
+
+      - name: TemplatesTest in isolation (predicted FAIL)
+        id: isolated
+        continue-on-error: true
+        run: vendor/bin/phpunit tests/Fieldtypes/TemplatesTest.php
+
+      - name: Leftovers after the isolated run
+        if: always()
+        shell: cmd
+        run: |
+          dir /AL /S tests\Fieldtypes\templates-test-tmp
+          exit /b 0
+
+      - name: Clean up between runs
+        if: always()
+        shell: cmd
+        run: |
+          rmdir /S /Q tests\Fieldtypes\templates-test-tmp
+          exit /b 0
+
+      - name: The whole Fieldtypes directory (predicted PASS)
+        id: together
+        continue-on-error: true
+        run: vendor/bin/phpunit tests/Fieldtypes
+
+      - name: Leftovers after the combined run
+        if: always()
+        shell: cmd
+        run: |
+          dir /AL /S tests\Fieldtypes\templates-test-tmp
+          exit /b 0
+
+      - name: Summary
+        if: always()
+        run: |
+          Write-Output "TemplatesTest in isolation: ${{ steps.isolated.outcome }} (predicted failure)"
+          Write-Output "Whole Fieldtypes directory: ${{ steps.together.outcome }} (predicted success)"
