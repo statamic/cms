@@ -18,24 +18,17 @@ trait DeletesDirectories
         foreach (new FilesystemIterator($directory, FilesystemIterator::SKIP_DOTS) as $item) {
             $path = $item->getPathname();
 
-            if (is_link($path)) {
-                @unlink($path) || @rmdir($path);
-
+            // Deliberately no is_dir()/is_link() calls. A junction reports an lstat
+            // mode that is neither, and PHP caches an lstat result as the stat result
+            // when it decides the path isn't a link, so the two answers contradict
+            // each other. unlink() removes files and file symlinks, rmdir() removes
+            // empty directories, directory symlinks and junctions without touching
+            // what they point at, and anything surviving both has contents in it.
+            if (@unlink($path) || @rmdir($path)) {
                 continue;
             }
 
-            if (! is_dir($path)) {
-                @unlink($path);
-
-                continue;
-            }
-
-            // A junction has neither a link nor a directory lstat mode, so it is
-            // indistinguishable from a directory here. rmdir() removes an empty
-            // directory or a junction, and leaves the junction's target alone.
-            if (! @rmdir($path)) {
-                $this->deleteDirectory($path);
-            }
+            $this->deleteDirectory($path);
         }
 
         @rmdir($directory);
