@@ -130,9 +130,11 @@ class Sites
 
     protected function getSavedSites()
     {
-        return File::exists($sitesPath = $this->path())
+        $sites = File::exists($sitesPath = $this->path())
             ? YAML::file($sitesPath)->parse()
-            : $this->getFallbackConfig();
+            : [];
+
+        return $sites ?: $this->getFallbackConfig();
     }
 
     protected function getFallbackConfig()
