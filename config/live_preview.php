@@ -43,7 +43,7 @@ return [
     |
     */
 
-    'debounce_ms' => max(0, (int) env('LIVE_PREVIEW_DEBOUNCE_MS', 150)),
+    'debounce_ms' => max(0, (int) env('STATAMIC_LIVE_PREVIEW_DEBOUNCE_MS', 150)),
 
     /*
     |--------------------------------------------------------------------------
