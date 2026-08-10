@@ -369,7 +369,7 @@ onBeforeUnmount(() => {
                     </PanelHeader>
 
                     <div
-                        class="resource-index-item-zone space-y-2 mb-4 min-h-16 outline-hidden"
+                        class="resource-index-item-zone space-y-2 mb-4 outline-hidden"
                         :data-group="group.id"
                         tabindex="-1"
                     >
