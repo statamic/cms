@@ -389,19 +389,27 @@ onBeforeUnmount(() => {
                                     name="handles"
                                     class="resource-index-item-handle size-4 shrink-0 cursor-grab text-gray-300 dark:text-gray-600"
                                 />
-                                <Icon :name="item.icon" class="size-4 shrink-0 text-gray-500 dark:text-gray-400" />
-                                <span
-                                    class="min-w-0 flex-1 truncate text-sm"
-                                    :class="{ 'text-gray-500': item.unavailable }"
-                                >{{ item.title }}</span>
-                                <Button
-                                    icon="trash"
-                                    size="sm"
-                                    variant="subtle"
-                                    :aria-label="__('Remove')"
-                                    v-tooltip="__('Remove')"
-                                    @click.prevent="removeItem(group.id, item.id)"
-                                />
+                                <div class="flex min-w-0 flex-1 items-center justify-between gap-2">
+                                    <div class="flex min-w-0 flex-1 items-center py-2">
+                                        <Icon
+                                            :name="item.icon"
+                                            class="size-4 shrink-0 me-2 text-gray-500 dark:text-gray-400"
+                                        />
+                                        <span
+                                            class="min-w-0 truncate text-sm"
+                                            :class="{ 'text-gray-500': item.unavailable }"
+                                        >{{ item.title }}</span>
+                                    </div>
+                                    <Button
+                                        inset
+                                        icon="trash"
+                                        size="sm"
+                                        variant="subtle"
+                                        :aria-label="__('Remove')"
+                                        v-tooltip="__('Remove')"
+                                        @click.prevent="removeItem(group.id, item.id)"
+                                    />
+                                </div>
                             </div>
                         </Card>
                     </div>
@@ -420,7 +428,7 @@ onBeforeUnmount(() => {
         </SortableList>
 
         <Panel>
-            <PanelHeader>
+            <PanelHeader class="pl-2.75! pr-3.25!">
                 <Heading :text="resourceIndex.fallbackGroup.title" />
             </PanelHeader>
 
@@ -446,8 +454,13 @@ onBeforeUnmount(() => {
                             name="handles"
                             class="resource-index-item-handle size-4 shrink-0 cursor-grab text-gray-300 dark:text-gray-600"
                         />
-                        <Icon :name="item.icon" class="size-4 shrink-0 text-gray-500 dark:text-gray-400" />
-                        <span class="min-w-0 flex-1 truncate text-sm">{{ item.title }}</span>
+                        <div class="flex min-w-0 flex-1 items-center py-2">
+                            <Icon
+                                :name="item.icon"
+                                class="size-4 shrink-0 me-2 text-gray-500 dark:text-gray-400"
+                            />
+                            <span class="min-w-0 truncate text-sm">{{ item.title }}</span>
+                        </div>
                     </div>
                 </Card>
             </div>
