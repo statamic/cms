@@ -59,9 +59,14 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             $this->deleteFakeStacheDirectory();
         }
 
-        parent::tearDown();
-
-        $this->restoreTestbenchSkeleton();
+        // Mockery verifies its expectations inside parent::tearDown() and throws when they
+        // aren't met, which would otherwise skip the restore and leak the failing test's files
+        // into the next one - right when you're already trying to work out what went wrong.
+        try {
+            parent::tearDown();
+        } finally {
+            $this->restoreTestbenchSkeleton();
+        }
     }
 
     protected function getPackageProviders($app)
