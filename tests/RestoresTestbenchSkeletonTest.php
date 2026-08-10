@@ -13,7 +13,9 @@ class RestoresTestbenchSkeletonTest extends TestCase
     {
         parent::setUp();
 
-        $this->target = __DIR__.'/restores-testbench-skeleton-tmp';
+        // Has to live outside the skeleton for the "doesn't follow links" assertions to mean
+        // anything, and outside the repo so this test doesn't do what the trait exists to stop.
+        $this->target = sys_get_temp_dir().'/restores-testbench-skeleton-tmp';
     }
 
     public function tearDown(): void
