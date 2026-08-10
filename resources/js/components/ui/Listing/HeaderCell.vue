@@ -13,7 +13,7 @@ const props = defineProps({
 const { sortColumn, sortDirection, setSortColumn } = injectListingContext();
 const isCurrentSortColumn = computed(() => props.column.field === sortColumn.value);
 const sortIcon = computed(() => {
-    if (!isCurrentSortColumn.value) return sortColumn.value === null ? 'chevron-vertical' : null;
+    if (!isCurrentSortColumn.value) return null;
     return sortDirection.value === 'asc' ? 'sort-asc' : 'sort-desc';
 });
 </script>
