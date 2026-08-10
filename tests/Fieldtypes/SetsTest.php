@@ -2,11 +2,13 @@
 
 namespace Tests\Fieldtypes;
 
+use Facades\Statamic\Fields\FieldtypeRepository;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Icon;
 use Statamic\Facades\Path;
 use Statamic\Fields\ConfigField;
 use Statamic\Fields\Field;
+use Statamic\Fields\Fieldtype;
 use Statamic\Fieldtypes\Sets;
 use Statamic\Statamic;
 use Tests\TestCase;
@@ -368,6 +370,43 @@ class SetsTest extends TestCase
         ]));
 
         $this->assertEquals([], $field->preProcess()->value());
+    }
+
+    #[Test]
+    public function it_preprocesses_for_config_using_config_provided_by_the_set_fieldtypes()
+    {
+        FieldtypeRepository::partialMock();
+
+        FieldtypeRepository::shouldReceive('find')
+            ->with('example')
+            ->andReturn(new class extends Fieldtype
+            {
+                protected $configFields = [
+                    'options' => ['type' => 'array'],
+                ];
+
+                public function config(?string $key = null, $fallback = null)
+                {
+                    $config = array_merge(parent::config(), ['options' => ['one' => 'One', 'two' => 'Two']]);
+
+                    return $key ? ($config[$key] ?? $fallback) : $config;
+                }
+            });
+
+        $field = (new ConfigField('test', [
+            'type' => 'sets',
+        ]))->setValue([
+            'one' => [
+                'fields' => [
+                    ['handle' => 'field_one', 'field' => ['type' => 'example']],
+                ],
+            ],
+        ]);
+
+        $this->assertSame(
+            ['one' => 'One', 'two' => 'Two'],
+            $field->preProcess()->value()[0]['sets'][0]['fields'][0]['options']
+        );
     }
 
     #[Test]
