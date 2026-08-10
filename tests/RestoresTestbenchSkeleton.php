@@ -15,6 +15,9 @@ trait RestoresTestbenchSkeleton
     /**
      * The set of paths, relative to the skeleton root, that existed before any test in this
      * process had a chance to touch it. Paths are keys so lookups are hash based.
+     *
+     * Only paths a test adds get restored. A test that overwrites or deletes something the
+     * skeleton already shipped still affects the ones after it. Nothing does that today.
      */
     private static ?array $skeletonSnapshot = null;
 
@@ -23,9 +26,13 @@ trait RestoresTestbenchSkeleton
     private static ?string $skeletonRealPath = null;
 
     /**
-     * Subtrees the framework owns and rebuilds on demand. Deleting these breaks
-     * subsequent tests ("Please provide a valid cache path"), and walking them gets
-     * expensive once thousands of compiled views have piled up.
+     * Subtrees left alone because something else rebuilds them on demand. Deleting them breaks
+     * subsequent tests ("Please provide a valid cache path"), and walking storage/framework/views
+     * gets expensive once thousands of compiled views have piled up.
+     *
+     * Note bootstrap/cache isn't only the framework's: Statamic's addon manifest lands there as
+     * addons.php, so it survives a run and the next one starts with it. Empty in practice, but
+     * it sits outside the guarantee the rest of this trait makes.
      */
     private static array $skeletonExclusions = [
         'bootstrap/cache',
