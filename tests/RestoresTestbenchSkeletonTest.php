@@ -13,9 +13,12 @@ class RestoresTestbenchSkeletonTest extends TestCase
     {
         parent::setUp();
 
-        // Has to live outside the skeleton for the "doesn't follow links" assertions to mean
-        // anything, and outside the repo so this test doesn't do what the trait exists to stop.
-        $this->target = sys_get_temp_dir().'/restores-testbench-skeleton-tmp';
+        // Outside the skeleton, so descending into a link would be a genuine delete beyond it.
+        // Not in the repo's tracked tree, so this test doesn't do what the trait exists to stop.
+        // And on the same volume as the checkout: Filesystem::link() hard links the file case on
+        // Windows, and hard links can't cross volumes, so a temp dir on another drive wouldn't be
+        // linkable at all. dirname(base_path()) is the skeleton's parent, inside gitignored vendor.
+        $this->target = dirname(base_path()).'/restores-testbench-skeleton-tmp';
     }
 
     public function tearDown(): void
@@ -48,6 +51,12 @@ class RestoresTestbenchSkeletonTest extends TestCase
 
         app('files')->link($this->target, $linkedDir = base_path('linked-dir'));
         app('files')->link($targetFile, $linkedFile = base_path('linked-file.html'));
+
+        // Filesystem::link() shells out on Windows and throws away exec()'s result, so a link
+        // that never got created would leave every assertion below passing on a path that
+        // isn't there. Fail loudly instead of silently testing nothing.
+        $this->assertDirectoryExists($linkedDir);
+        $this->assertFileExists($linkedFile);
 
         $this->restoreTestbenchSkeleton();
 
