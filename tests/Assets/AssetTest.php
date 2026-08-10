@@ -2112,6 +2112,10 @@ class AssetTest extends TestCase
 
         $this->container->sourcePreset('small');
 
+        // Glide only creates its temp directory when it actually processes an image, so
+        // create it up front. Otherwise there'd be nothing for the assertion below to check.
+        app('files')->makeDirectory($glideDir = storage_path('statamic/glide/tmp'), 0777, true, true);
+
         $asset = (new Asset)->container($this->container)->path("path/to/file.{$extension}")->syncOriginal();
 
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
@@ -2123,7 +2127,6 @@ class AssetTest extends TestCase
         $return = $asset->upload(UploadedFile::fake()->createWithContent("file.{$extension}", '<svg width="20" height="30"></svg>'));
 
         $this->assertEquals($asset, $return);
-        $this->assertDirectoryExists($glideDir = storage_path('statamic/glide/tmp'));
         $this->assertEmpty(app('files')->allFiles($glideDir)); // no temp files
         Storage::disk('test')->assertExists("path/to/file.{$extension}");
         $this->assertEquals("path/to/file.{$extension}", $asset->path());
