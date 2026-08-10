@@ -417,7 +417,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
             return null;
         }
 
-        return URL::assemble($this->container()->url(), $this->path());
+        return URL::assemble($this->container()->url(), URL::encode($this->path()));
     }
 
     public function absoluteUrl()
@@ -426,7 +426,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
             return null;
         }
 
-        return URL::assemble($this->container()->absoluteUrl(), $this->path());
+        return URL::assemble($this->container()->absoluteUrl(), URL::encode($this->path()));
     }
 
     public function thumbnailUrl($preset = null)

@@ -2376,6 +2376,31 @@ class AssetTest extends TestCase
     }
 
     #[Test]
+    #[DataProvider('urlEncodingProvider')]
+    public function it_encodes_the_url($path, $expected)
+    {
+        $container = $this->mock(AssetContainer::class);
+        $container->shouldReceive('private')->andReturnFalse();
+        $container->shouldReceive('url')->andReturn('http://example.com/container');
+        $container->shouldReceive('absoluteUrl')->andReturn('http://example.com/container');
+        $asset = (new Asset)->container($container)->path($path);
+
+        $this->assertEquals('http://example.com/container'.$expected, $asset->url());
+        $this->assertEquals('http://example.com/container'.$expected, $asset->absoluteUrl());
+        $this->assertEquals('http://example.com/container'.$expected, (string) $asset);
+    }
+
+    public static function urlEncodingProvider()
+    {
+        return [
+            'nothing to encode' => ['path/to/test.txt', '/path/to/test.txt'],
+            'spaces' => ['path/to/Image X - Whatever_17.jpg', '/path/to/Image%20X%20-%20Whatever_17.jpg'],
+            'accents' => ['path/to/Dún Laoghaire_18 2.jpg', '/path/to/D%C3%BAn%20Laoghaire_18%202.jpg'],
+            'spaces in folders' => ['path to/my folder/test.txt', '/path%20to/my%20folder/test.txt'],
+        ];
+    }
+
+    #[Test]
     public function there_is_no_url_for_a_private_asset()
     {
         $container = $this->mock(AssetContainer::class);
