@@ -107,6 +107,23 @@ EOT;
     }
 
     #[Test]
+    public function it_finds_assets_by_an_encoded_url()
+    {
+        Storage::fake('test', ['url' => 'test']);
+        Storage::disk('test')->put('foo/Dún Laoghaire_18 2.jpg', UploadedFile::fake()->image('bar.jpg')->getContent());
+
+        $container = tap(AssetContainer::make('test_container')->disk('test'))->save();
+        $asset = tap($container->makeAsset('foo/Dún Laoghaire_18 2.jpg'))->save();
+
+        $this->assertEquals('/test/foo/D%C3%BAn%20Laoghaire_18%202.jpg', $asset->url());
+
+        $found = Asset::findByUrl($asset->url());
+
+        $this->assertInstanceOf(AssetContract::class, $found);
+        $this->assertEquals($asset->id(), $found->id());
+    }
+
+    #[Test]
     public function it_finds_assets_by_id_when_the_path_contains_windows_separators()
     {
         Storage::fake('test');
