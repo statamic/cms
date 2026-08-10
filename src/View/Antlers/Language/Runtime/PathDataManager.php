@@ -861,9 +861,11 @@ class PathDataManager
         }
 
         if (is_object($this->reducedVar) && method_exists($this->reducedVar, $method = Str::camel($varPath))) {
-            if (MethodDenylist::blocks($method)) {
-                // The method name derives from user-influenceable data, so never
-                // dispatch to methods that mutate or destroy data. Resolve to null.
+            // The method name derives from user-influenceable data, so never dispatch to
+            // methods that mutate or destroy data. Writing `{{ object.method }}` without
+            // parentheses calls the method just like `{{ object:method() }}` does, so both
+            // forms honor the `statamic.antlers.allowMethodsInContent` setting.
+            if (MethodDenylist::blocks($method) || (GlobalRuntimeState::$isEvaluatingUserData && ! GlobalRuntimeState::$allowMethodsInContent)) {
                 $this->reducedVar = null;
                 $this->didFind = false;
                 $this->doBreak = true;
