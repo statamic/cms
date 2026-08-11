@@ -39,6 +39,10 @@ class Sites
 
     public function authorized()
     {
+        if (User::current()->isSuper()) {
+            return $this->sites;
+        }
+
         return $this->sites->filter(fn ($site) => User::current()->can('view', $site));
     }
 
