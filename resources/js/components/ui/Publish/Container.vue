@@ -109,10 +109,14 @@ const components = ref([]);
 const { direction: uiDirection } = useUiDirection();
 const direction = computed(() => Statamic.$config.get('sites').find(s => s.handle === props.site)?.direction ?? uiDirection.value);
 
+// Hot path: when nothing is omitted, return the live reactive tree by reference
+// (no clone). Consumers must not mutate visibleValues — that would corrupt form state.
+// Cold path: Values.except() clones once and strips omitted keys.
 const visibleValues = computed(() => {
     const omittable = Object.keys(hiddenFields.value).filter(
         (field) => hiddenFields.value[field].omitValue,
     );
+    if (omittable.length === 0) return values.value;
     return new Values(values.value).except(omittable);
 });
 
@@ -167,16 +171,20 @@ watch(
         perf.measure('publish.container.watch.values', () => {
             dirty();
             emit('update:modelValue', values);
+            // Emit visibleValues alongside values — avoids a separate deep watch
+            // that re-traverses the (possibly cloned) tree on every keystroke.
+            emit('update:visibleValues', visibleValues.value);
         });
     },
     { deep: true },
 );
 
+// Only re-emit visibleValues when omit/visibility bookkeeping actually changes.
 watch(
-    visibleValues,
-    (values) => {
+    hiddenFields,
+    () => {
         perf.measure('publish.container.watch.visibleValues', () => {
-            emit('update:visibleValues', values);
+            emit('update:visibleValues', visibleValues.value);
         });
     },
     { deep: true },
