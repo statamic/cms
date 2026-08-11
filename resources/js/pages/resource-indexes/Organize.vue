@@ -469,7 +469,7 @@ onBeforeUnmount(() => {
         <div class="flex min-h-40 p-2">
             <button
                 type="button"
-                class="relative flex w-full items-center justify-center rounded-lg border border-dashed border-gray-500 text-gray-700 hover:border-gray hover:text-gray-925 dark:border-gray-500 dark:text-gray-300 dark:hover:border-gray-400 dark:hover:text-gray-200"
+                class="relative flex w-full items-center justify-center rounded-xl border border-dashed border-gray-500 text-gray-700 hover:border-gray hover:text-gray-925 dark:border-gray-500 dark:text-gray-300 dark:hover:border-gray-400 dark:hover:text-gray-200"
                 :disabled="saving"
                 @click="addGroup"
             >
