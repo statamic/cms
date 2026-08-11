@@ -43,7 +43,7 @@ const slots = useSlots();
 const hasDefaultSlot = !!slots.default;
 const tag = computed(() => {
     if (props.as) return props.as;
-    if (props.href && !props.disabled && !props.loading) {
+    if (props.href && !props.disabled && !props.loading && !props.readOnly) {
         return props.target === '_blank' ? 'a' : Link;
     }
     return 'button';
