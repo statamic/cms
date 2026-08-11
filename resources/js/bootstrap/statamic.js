@@ -46,6 +46,7 @@ import {
     portals,
     stacks,
     inertia,
+    perf,
 } from '@api';
 
 let bootingCallbacks = [];
@@ -147,6 +148,10 @@ export default {
 
     get $dirty() {
         return dirty;
+    },
+
+    get $perf() {
+        return perf;
     },
 
     get $events() {
@@ -267,6 +272,7 @@ export default {
         this.$app.directive('tooltip', tooltipDirective);
         this.$app.use(VueComponentDebug, { enabled: import.meta.env.VITE_VUE_COMPONENT_DEBUG === 'true' });
         toast.initialize(this.$app);
+        perf.attachVueApp(this.$app);
 
         Object.assign(this.$app.config.globalProperties, {
             $config: config,
@@ -279,6 +285,7 @@ export default {
             $conditions: conditions,
             $callbacks: callbacks,
             $dirty: dirty,
+            $perf: perf,
             $slug: slug,
             $portals: portals,
             $stacks: stacks,

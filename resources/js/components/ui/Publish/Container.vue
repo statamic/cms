@@ -12,6 +12,7 @@ import Tabs from './Tabs.vue';
 import Values from '@/components/publish/Values.js';
 import { data_get } from '@/bootstrap/globals.js';
 import { useUiDirection } from '@/composables/ui-direction';
+import { perf } from '@api';
 
 const emit = defineEmits(['update:modelValue', 'update:visibleValues', 'update:modifiedFields', 'update:meta']);
 
@@ -163,27 +164,41 @@ watch(
 watch(
     values,
     (values) => {
-        dirty();
-        emit('update:modelValue', values);
+        perf.measure('publish.container.watch.values', () => {
+            dirty();
+            emit('update:modelValue', values);
+        });
     },
     { deep: true },
 );
 
 watch(
     visibleValues,
-    (values) => emit('update:visibleValues', values),
+    (values) => {
+        perf.measure('publish.container.watch.visibleValues', () => {
+            emit('update:visibleValues', values);
+        });
+    },
     { deep: true },
 );
 
 watch(
     localizedFields,
-    (values) => emit('update:modifiedFields', values),
+    (values) => {
+        perf.measure('publish.container.watch.localizedFields', () => {
+            emit('update:modifiedFields', values);
+        });
+    },
     { deep: true },
 );
 
 watch(
     meta,
-    (meta) => emit('update:meta', meta),
+    (meta) => {
+        perf.measure('publish.container.watch.meta', () => {
+            emit('update:meta', meta);
+        });
+    },
     { deep: true },
 );
 
@@ -355,6 +370,10 @@ onMounted(() => {
         focusField,
         blurField,
     });
+
+    // Debounced settle → interact. Fieldtypes (async Bard tip-tap import, etc.)
+    // call notifyMountActivity() again so phase.mount covers real initial render.
+    nextTick(() => perf.notifyMountActivity());
 });
 
 onUnmounted(() => {

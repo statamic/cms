@@ -21,6 +21,7 @@ import axios from 'axios';
 import wait from '@/util/wait.js';
 import { mapValues } from 'lodash-es';
 import { useIframeManager } from './ManagesIframes.js';
+import { perf } from '@api';
 
 const props = defineProps({
     enabled: {
@@ -101,7 +102,12 @@ const payload = computed(() => ({
 watch(
     [payload, target],
     (payload) => {
-        if (props.enabled) update();
+        perf.measure('livePreview.watch', () => {
+            if (props.enabled) {
+                perf.count('livePreview.update');
+                update();
+            }
+        });
     },
     { deep: true },
 );

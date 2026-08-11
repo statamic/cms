@@ -15,6 +15,7 @@ export const {
     inertia,
     keys,
     numberFormatter,
+    perf,
     permissions,
     portals,
     preferences,

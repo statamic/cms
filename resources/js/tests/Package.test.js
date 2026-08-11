@@ -65,6 +65,7 @@ it('exports api', async () => {
         'inertia',
         'keys',
         'numberFormatter',
+        'perf',
         'permissions',
         'portals',
         'preferences',

@@ -69,6 +69,22 @@ export default defineConfig(({ mode, command }) => {
                 },
                 {
                     extends: true,
+                    test: {
+                        name: 'bench',
+                        browser: {
+                            enabled: true,
+                            headless: true,
+                            provider: playwright(),
+                            instances: [{ browser: 'chromium' }],
+                        },
+                        setupFiles: 'resources/js/tests/browser/setup.js',
+                        benchmark: {
+                            include: ['resources/js/tests/browser/bench/**/*.bench.js'],
+                        },
+                    },
+                },
+                {
+                    extends: true,
                     plugins: [
                         storybookTest({
                             configDir: '.storybook',

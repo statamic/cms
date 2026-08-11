@@ -118,7 +118,7 @@ import {
 } from '@ui';
 import { containerContextKey } from '@/components/ui/Publish/Container.vue';
 import { watch } from 'vue';
-import { reveal } from '@api';
+import { reveal, perf } from '@api';
 import { useUiDirection } from '@/composables/ui-direction';
 
 export default {
@@ -371,10 +371,18 @@ export default {
         watch(
             () => data_get(this.publishContainer.values.value, this.fieldPathPrefix),
             (values) => {
-				if (! values) return;
-                if (JSON.stringify(values) === JSON.stringify(this.node.attrs.values)) return;
+                perf.measure('bard.set.syncAttributes', () => {
+                    if (!values) return;
 
-                this.updateAttributes({ values });
+                    const unchanged = perf.measure('bard.set.stringify', () => {
+                        return JSON.stringify(values) === JSON.stringify(this.node.attrs.values);
+                    });
+
+                    if (unchanged) return;
+
+                    perf.count('bard.set.updateAttributes');
+                    this.updateAttributes({ values });
+                });
             },
             { deep: true }
         );
