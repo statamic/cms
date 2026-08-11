@@ -303,6 +303,13 @@ function openDropdown(e) {
     updateDropdownOpen(true);
 }
 
+function handleEscapeKeyDown(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    updateDropdownOpen(false);
+    focus();
+}
+
 function onBlur(e) {
     if (!props.taggable) return;
 
@@ -458,7 +465,7 @@ defineExpose({
                             adaptiveWidth && 'w-max max-w-md',
                         ]"
                         data-ui-combobox-content
-                        @escape-key-down="focus"
+                        @escape-key-down="handleEscapeKeyDown"
                     >
                         <FocusScope
                             :trapped="!searchable"
