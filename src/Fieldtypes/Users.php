@@ -24,6 +24,7 @@ class Users extends Relationship
     protected $statusIcons = false;
     protected $formComponent = 'user-publish-form';
     protected $canEdit = true;
+    protected array $itemCache = [];
 
     protected $formComponentProps = [
         'initialTitle' => 'title',
@@ -104,12 +105,12 @@ class Users extends Relationship
 
     protected function authorizeItemData($id): bool
     {
-        return $this->authorizeViewable(User::find($id));
+        return $this->authorizeViewable($this->findUser($id));
     }
 
     protected function toItemArray($id, $site = null)
     {
-        if ($user = User::find($id)) {
+        if ($user = $this->findUser($id)) {
             $canViewUsers = $this->canViewUser($user);
 
             return [
@@ -121,6 +122,11 @@ class Users extends Relationship
         }
 
         return $this->invalidItemArray($id);
+    }
+
+    protected function findUser($id)
+    {
+        return $this->itemCache[$id] ??= User::find($id);
     }
 
     public function getIndexItems($request)

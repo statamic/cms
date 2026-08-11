@@ -44,6 +44,7 @@ class Entries extends Relationship
     protected $statusIcons = true;
     protected $formComponent = 'entry-publish-form';
     protected $activeFilterBadges;
+    protected array $itemCache = [];
 
     protected $formComponentProps = [
         'initialActions' => 'actions',
@@ -379,16 +380,21 @@ class Entries extends Relationship
 
     protected function authorizeItemData($id): bool
     {
-        return $this->authorizeViewable(Entry::find($id));
+        return $this->authorizeViewable($this->findEntry($id));
     }
 
     protected function toItemArray($id)
     {
-        if (! $entry = Entry::find($id)) {
+        if (! $entry = $this->findEntry($id)) {
             return $this->invalidItemArray($id);
         }
 
         return (new EntryResource($entry, $this))->resolve()['data'];
+    }
+
+    protected function findEntry($id)
+    {
+        return $this->itemCache[$id] ??= Entry::find($id);
     }
 
     protected function collect($value)
