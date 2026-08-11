@@ -109,6 +109,19 @@ import { router } from '@inertiajs/vue3';
 import axios from 'axios';
 
 const inFlightRequests = new Map();
+// Settled responses reused for the page-view lifetime. Cleared on Inertia
+// navigation and when selections are confirmed from the selector stack
+// (items may have been edited there).
+const settledResponses = new Map();
+let navigationListenerAttached = false;
+
+function ensureSettledCacheClearedOnNavigation() {
+    if (navigationListenerAttached) return;
+    navigationListenerAttached = true;
+    router.on('before', () => {
+        settledResponses.clear();
+    });
+}
 
 function detachFromInFlightRequest(component) {
     const entry = component._activeRequest;
@@ -258,6 +271,8 @@ export default {
     },
 
     created() {
+        ensureSettledCacheClearedOnNavigation();
+
         this.removeNavigationListener = router.on('before', () => {
             detachFromInFlightRequest(this);
         });
@@ -334,6 +349,9 @@ export default {
 	    },
 
         selectionsUpdated(selections) {
+            // Items may have been edited inside the selector stack — invalidate settled cache.
+            settledResponses.clear();
+
             this.getDataForSelections(selections).then(() => {
                 this.update(selections);
             });
@@ -354,6 +372,14 @@ export default {
             detachFromInFlightRequest(this);
 
             const cacheKey = JSON.stringify([this.itemDataUrl, this.site, selections?.slice().sort()]);
+
+            const settled = settledResponses.get(cacheKey);
+            if (settled) {
+                this.$emit('item-data-updated', settled.data.data);
+                this.loading = false;
+                return Promise.resolve(settled);
+            }
+
             let entry = inFlightRequests.get(cacheKey);
 
             if (!entry) {
@@ -361,6 +387,10 @@ export default {
                 entry = { cacheKey, controller, subscribers: 0 };
                 entry.promise = this.$axios
                     .post(this.itemDataUrl, { site: this.site, selections }, { signal: controller.signal })
+                    .then((response) => {
+                        settledResponses.set(cacheKey, response);
+                        return response;
+                    })
                     .finally(() => {
                         if (inFlightRequests.get(cacheKey) === entry) {
                             inFlightRequests.delete(cacheKey);
