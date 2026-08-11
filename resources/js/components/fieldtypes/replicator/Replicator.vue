@@ -96,6 +96,7 @@ import ManagesSetMeta from './ManagesSetMeta';
 import { SortableList } from '../../sortable/Sortable';
 import { data_get } from "@/bootstrap/globals.js";
 import { perf } from '@api';
+import { createMountScheduler } from '@/util/createMountScheduler.js';
 
 export default {
     mixins: [Fieldtype, ManagesSetMeta],
@@ -115,6 +116,7 @@ export default {
             provide: {
                 replicatorSets: this.config.sets,
                 showReplicatorFieldPreviews: this.config.previews,
+                mountScheduler: createMountScheduler(),
             },
             errorsById: {},
             setsCache: {},

@@ -1,5 +1,5 @@
 <script setup>
-import { computed, inject, ref } from 'vue';
+import { computed, inject, ref, watch, onBeforeUnmount } from 'vue';
 import {
     Icon,
     Switch,
@@ -14,14 +14,17 @@ import {
     PublishFieldsProvider as FieldsProvider,
     injectPublishContext as injectContainerContext,
 } from '@/components/ui';
-import PreviewHtml from '@/components/fieldtypes/replicator/PreviewHtml.js';
 import FieldAction from '@/components/field-actions/FieldAction.js';
 import toFieldActions from '@/components/field-actions/toFieldActions.js';
 import { reveal } from '@api';
+import usePreviewText from '@/composables/use-preview-text';
+import { createMountScheduler } from '@/util/createMountScheduler.js';
+import ShowField from '@/components/field-conditions/ShowField.js';
 
 const emit = defineEmits(['collapsed', 'expanded', 'duplicated', 'removed']);
 
 const replicatorSets = inject('replicatorSets');
+const mountScheduler = inject('mountScheduler', createMountScheduler());
 
 const props = defineProps({
     config: Object,
@@ -43,7 +46,13 @@ const props = defineProps({
 const {
     setFieldValue,
     setFieldMeta,
-    previews
+    previews,
+    extraValues,
+    visibleValues,
+    revealerValues,
+    hiddenFields,
+    setHiddenField,
+    container,
 } = injectContainerContext();
 const fieldPathPrefix = computed(() => `${props.fieldPath}.${props.index}`);
 const metaPathPrefix = computed(() => `${props.metaPath}.existing.${props.id}`);
@@ -79,30 +88,12 @@ const fieldActions = computed(() => {
     return toFieldActions('replicator-fieldtype-set', fieldActionPayload.value);
 });
 
-const previewText = computed(() => {
-    return Object.entries(data_get(previews.value, fieldPathPrefix.value) || {})
-        .filter(([handle, value]) => {
-            if (!handle.endsWith('_')) return false;
-            handle = handle.substr(0, handle.length - 1); // Remove the trailing underscore.
-            const config = props.config.fields.find((f) => f.handle === handle);
-            if (!config) return false;
-            return config.replicator_preview === undefined ? props.showFieldPreviews : config.replicator_preview;
-        })
-        .map(([handle, value]) => value)
-        .filter((value) => !['null', '[]', '{}', '', undefined].includes(JSON.stringify(value)))
-        .map((value) => {
-            if (value instanceof PreviewHtml) return value.html;
-
-            if (typeof value === 'string') return escapeHtml(value);
-
-            if (Array.isArray(value) && typeof value[0] === 'string') {
-                return escapeHtml(value.join(', '));
-            }
-
-            return escapeHtml(JSON.stringify(value));
-        })
-        .filter((html) => html && html.trim() !== '')
-        .join(' <span class="text-gray-400 dark:text-gray-600">/</span> ');
+const { previewText } = usePreviewText({
+    config: computed(() => props.config),
+    values: computed(() => props.values),
+    previews,
+    fieldPathPrefix,
+    showFieldPreviews: computed(() => props.showFieldPreviews),
 });
 
 function toggleEnabledState() {
@@ -119,6 +110,68 @@ function destroy() {
     deletingSet.value = false;
     emit('removed');
 }
+
+// Defer mounting collapsed set bodies. Once expanded, keep mounted (v-show thereafter).
+const hasBeenExpanded = ref(!props.collapsed);
+const fieldsReady = ref(!props.collapsed);
+let isUnmounted = false;
+
+onBeforeUnmount(() => {
+    isUnmounted = true;
+});
+
+watch(
+    () => props.collapsed,
+    (collapsed) => {
+        if (!collapsed && !hasBeenExpanded.value) {
+            hasBeenExpanded.value = true;
+            mountScheduler.schedule(() => {
+                if (!isUnmounted) {
+                    fieldsReady.value = true;
+                }
+            });
+        } else if (!collapsed) {
+            fieldsReady.value = true;
+        }
+    },
+);
+
+// Auto-expand when validation errors point at this set.
+watch(
+    () => props.hasError,
+    (hasError) => {
+        if (hasError && props.collapsed) {
+            emit('expanded');
+        }
+    },
+    { immediate: true },
+);
+
+// Headlessly evaluate conditions for never-mounted sets so omitValue bookkeeping
+// stays correct for the save payload.
+watch(
+    [() => props.values, fieldsReady],
+    () => {
+        if (fieldsReady.value || !hasFields.value) return;
+
+        const scopedValues = props.values || {};
+        const scopedExtra = data_get(extraValues.value, fieldPathPrefix.value) || {};
+        const showField = new ShowField(
+            scopedValues,
+            scopedExtra,
+            visibleValues.value,
+            revealerValues.value,
+            hiddenFields.value,
+            setHiddenField,
+            { container },
+        );
+
+        (props.config.fields || []).forEach((field) => {
+            showField.showField(field, `${fieldPathPrefix.value}.${field.handle}`);
+        });
+    },
+    { deep: true, immediate: true },
+);
 
 const rootEl = ref();
 reveal.use(rootEl, () => emit('expanded'));
@@ -203,20 +256,23 @@ reveal.use(rootEl, () => emit('expanded'));
             </header>
 
             <div
-                v-show="!collapsed && hasFields"
+                v-if="hasBeenExpanded && hasFields"
+                v-show="!collapsed"
                 :class="{ 'contain-paint': collapsed, 'isolate': !collapsed }"
                 class="border-t border-t-gray-300! dark:border-t-white/10!"
             >
                 <div :tabindex="collapsed ? -1 : undefined" :inert="collapsed">
-                    <FieldsProvider
-                        :fields="config.fields"
-                        :as-config="false"
-                        :read-only
-                        :field-path-prefix="fieldPathPrefix"
-                        :meta-path-prefix="metaPathPrefix"
-                    >
-                        <Fields class="p-4" />
-                    </FieldsProvider>
+                    <template v-if="fieldsReady">
+                        <FieldsProvider
+                            :fields="config.fields"
+                            :as-config="false"
+                            :read-only="readOnly"
+                            :field-path-prefix="fieldPathPrefix"
+                            :meta-path-prefix="metaPathPrefix"
+                        >
+                            <Fields class="p-4" />
+                        </FieldsProvider>
+                    </template>
                 </div>
             </div>
         </div>

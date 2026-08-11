@@ -58,6 +58,8 @@
                             'focus-within:focus-outline': !fullScreenMode,
                         }"
                         tabindex="0"
+                        @focusin="ensureEditor"
+                        @pointerdown="ensureEditor"
                     >
                         <bubble-menu
                             :editor="editor"
@@ -179,6 +181,8 @@ import importTiptap from '@/util/tiptap.js';
 import { computed } from 'vue';
 import { data_get } from "@/bootstrap/globals.js";
 import { useContentDirection } from '@/composables/content-direction';
+import extractBardText from '@/util/extractBardText';
+import { createMountScheduler } from '@/util/createMountScheduler.js';
 
 const lowlight = createLowlight(common);
 let tiptap = null;
@@ -225,6 +229,7 @@ export default {
                 bard: this.makeBardProvide(),
                 bardSets: this.config.sets,
                 showReplicatorFieldPreviews: this.config.previews,
+                mountScheduler: createMountScheduler(),
             },
             errorsById: {},
             debounceNextUpdate: true,
@@ -256,17 +261,19 @@ export default {
         },
 
         readingTime() {
-            if (this.html) {
-                var stats = readTimeEstimate(this.html, 265, 12, 500, ['img', 'Image', 'bard-set']);
-                var durationMs = stats.duration * 60 * 1000;
-                var minutes = Math.floor(durationMs / 60000);
-                var seconds = Math.floor((durationMs % 60000) / 1000);
+            const html = this.html || this.editor?.getHTML();
+            if (!html) return;
 
-                return String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
-            }
+            var stats = readTimeEstimate(html, 265, 12, 500, ['img', 'Image', 'bard-set']);
+            var durationMs = stats.duration * 60 * 1000;
+            var minutes = Math.floor(durationMs / 60000);
+            var seconds = Math.floor((durationMs % 60000) / 1000);
+
+            return String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
         },
 
         characterAndWordCountText() {
+            if (!this.editor) return '';
             const showWordCount = this.config.word_count;
             const wordCount = this.editor.storage.characterCount.words();
             const wordCountText = `${__n(':count word|:count words', wordCount)}`;
@@ -302,25 +309,7 @@ export default {
 
         replicatorPreview() {
             if (!this.showFieldPreviews) return;
-            const stack = [...this.value];
-            let text = '';
-            while (stack.length) {
-                const node = stack.shift();
-                if (node.type === 'text') {
-                    text += ` ${node.text || ''}`;
-                } else if (node.type === 'set') {
-                    const handle = node.attrs.values.type;
-                    const set = this.setConfigs.find((set) => set.handle === handle);
-                    text += ` [${__(set ? set.display : handle)}]`;
-                }
-                if (text.length > 150) {
-                    break;
-                }
-                if (node.content) {
-                    stack.unshift(...node.content);
-                }
-            }
-            return text;
+            return extractBardText(this.value, 150, this.setConfigs);
         },
 
         inputIsInline() {
@@ -377,6 +366,7 @@ export default {
         },
 
         shouldShowAddSetHelperText() {
+            if (!this.editor) return false;
             return !this.$refs.setPicker?.isOpen && this.suitableToShowSetButton(this.editor);
         },
     },
@@ -391,30 +381,10 @@ export default {
         }
     },
 
-    async mounted() {
-        perf.start('bard.mount');
-        perf.notifyMountActivity();
-
-        try {
-            tiptap = await importTiptap();
-
-            this.initToolbarButtons();
-            this.initEditor();
-
-            this.json = this.editor.getJSON().content;
-            this.html = this.editor.getHTML();
-
-            this.$nextTick(() => {
-                this.mounted = true;
-                perf.stop('bard.mount');
-                perf.notifyMountActivity();
-            });
-        } catch (error) {
-            perf.stop('bard.mount');
-            perf.notifyMountActivity();
-            throw error;
-        }
-
+    mounted() {
+        // Preview text and value watchers work without TipTap. Defer the expensive
+        // Editor construction until this field is (nearly) visible or focused.
+        this.initToolbarButtons();
         this.pageHeader = document.querySelector('.global-header');
 
         if (!commandPaletteCallbackRegistered) {
@@ -429,16 +399,19 @@ export default {
         }
 
         this.$nextTick(() => {
+            this.setupLazyEditor();
+
             let el = document.querySelector(`label[for="${this.fieldId}"]`);
             if (el) {
                 el.addEventListener('click', () => {
-                    this.editor.commands.focus();
+                    this.ensureEditor().then(() => this.editor?.commands.focus());
                 });
             }
         });
     },
 
     beforeUnmount() {
+        this._intersectionObserver?.disconnect();
         this.editor?.destroy();
         this.escBinding?.destroy();
     },
@@ -483,7 +456,7 @@ export default {
         },
 
         readOnly(readOnly) {
-            this.editor.setEditable(!this.readOnly);
+            this.editor?.setEditable(!this.readOnly);
         },
 
         collapsed(value) {
@@ -493,19 +466,22 @@ export default {
         },
 
         fullScreenMode(fullScreenMode) {
-            this.initEditor();
+            // Portal remount needs a fresh TipTap instance bound to the new DOM.
+            // ensureEditor() covers the lazy-init case; initEditor() recreates when
+            // an editor already existed outside the portal.
+            const hadEditor = !!this.editor;
+            this.ensureEditor().then(() => {
+                if (hadEditor) this.initEditor();
 
-            if (fullScreenMode) {
-                this.escBinding = this.$keys.bindGlobal('esc', this.closeFullscreen);
-                // Focus the editor content when entering fullscreen mode
-                this.$nextTick(() => {
-                    if (this.editor) {
-                        this.editor.commands.focus();
-                    }
-                });
-            } else {
-                this.escBinding?.destroy();
-            }
+                if (fullScreenMode) {
+                    this.escBinding = this.$keys.bindGlobal('esc', this.closeFullscreen);
+                    this.$nextTick(() => {
+                        this.editor?.commands.focus();
+                    });
+                } else {
+                    this.escBinding?.destroy();
+                }
+            });
         },
 
         loadingSet(loading) {
@@ -535,6 +511,67 @@ export default {
     },
 
     methods: {
+        setupLazyEditor() {
+            const el = this.$refs.container;
+            if (!el || typeof IntersectionObserver === 'undefined') {
+                this.ensureEditor();
+                return;
+            }
+
+            // Already in view (e.g. first expanded set) — init immediately.
+            const rect = el.getBoundingClientRect();
+            const inView = rect.top < window.innerHeight + 100 && rect.bottom > -100;
+            if (inView) {
+                this.ensureEditor();
+                return;
+            }
+
+            this._intersectionObserver = new IntersectionObserver(
+                (entries) => {
+                    if (entries.some((entry) => entry.isIntersecting)) {
+                        this._intersectionObserver?.disconnect();
+                        this._intersectionObserver = null;
+                        this.ensureEditor();
+                    }
+                },
+                { rootMargin: '100px' },
+            );
+            this._intersectionObserver.observe(el);
+        },
+
+        async ensureEditor() {
+            if (this.editor) return this.editor;
+            if (this._editorInitPromise) return this._editorInitPromise;
+
+            this._editorInitPromise = (async () => {
+                perf.start('bard.mount');
+                perf.notifyMountActivity();
+
+                try {
+                    tiptap = await importTiptap();
+                    this.initEditor();
+                    // Seed json from the editor once. Skip getHTML() here — it's a full-doc
+                    // serialize and only needed when reading-time/footer config is enabled
+                    // (computed lazily via onUpdate / readingTime).
+                    this.json = this.editor.getJSON().content;
+                    this.mounted = true;
+                    return this.editor;
+                } catch (error) {
+                    this.initError = error.message || String(error);
+                    throw error;
+                } finally {
+                    perf.stop('bard.mount');
+                    perf.notifyMountActivity();
+                }
+            })();
+
+            try {
+                return await this._editorInitPromise;
+            } finally {
+                this._editorInitPromise = null;
+            }
+        },
+
         addSet(handle) {
             this.loadingSet = handle;
 
@@ -847,6 +884,8 @@ export default {
         },
 
         buttonIsActive(button) {
+            // Toolbar can render before lazy TipTap init finishes.
+            if (!this.editor) return false;
             if (button.hasOwnProperty('active')) {
                 return button.active(this.editor, button.args);
             }
@@ -856,6 +895,7 @@ export default {
         },
 
         buttonIsVisible(button) {
+            if (!this.editor) return !button.hasOwnProperty('visibleWhenActive');
             if (button.hasOwnProperty('visible')) {
                 return button.visible(this.editor, button.args);
             }
@@ -974,7 +1014,7 @@ export default {
         },
 
         valueToContent(value) {
-            return value.length ? { type: 'doc', content: value } : null;
+            return value?.length ? { type: 'doc', content: value } : null;
         },
 
         getExtensions() {

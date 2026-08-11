@@ -80,20 +80,22 @@
             </header>
 
             <div
-                v-if="index !== undefined && hasFields"
+                v-if="index !== undefined && hasFields && hasBeenExpanded"
                 v-show="!collapsed"
                 :class="{ 'contain-paint': collapsed, 'isolate': !collapsed }"
                 class="border-t border-t-gray-300! dark:border-t-white/10!"
             >
-                <FieldsProvider
-                    :fields="fields"
-                    :as-config="false"
-                    :read-only="isReadOnly"
-                    :field-path-prefix="fieldPathPrefix"
-                    :meta-path-prefix="metaPathPrefix"
-                >
-                    <Fields class="p-4" />
-                </FieldsProvider>
+                <template v-if="fieldsReady">
+                    <FieldsProvider
+                        :fields="fields"
+                        :as-config="false"
+                        :read-only="isReadOnly"
+                        :field-path-prefix="fieldPathPrefix"
+                        :meta-path-prefix="metaPathPrefix"
+                    >
+                        <Fields class="p-4" />
+                    </FieldsProvider>
+                </template>
             </div>
         </div>
     </node-view-wrapper>
@@ -117,9 +119,11 @@ import {
     PublishFields as Fields
 } from '@ui';
 import { containerContextKey } from '@/components/ui/Publish/Container.vue';
-import { watch } from 'vue';
+import { watch, inject } from 'vue';
 import { reveal, perf } from '@api';
 import { useUiDirection } from '@/composables/ui-direction';
+import { createMountScheduler } from '@/util/createMountScheduler.js';
+import ShowField from '@/components/field-conditions/ShowField.js';
 
 export default {
     props: nodeViewProps,
@@ -127,6 +131,17 @@ export default {
     setup() {
         return {
             uiDirection: useUiDirection().direction,
+            mountScheduler: inject('mountScheduler', createMountScheduler()),
+        };
+    },
+
+    data() {
+        const collapsedIds = this.extension.options.bard.collapsed || [];
+        const initiallyCollapsed = collapsedIds.includes(this.node.attrs.id);
+
+        return {
+            hasBeenExpanded: !initiallyCollapsed,
+            fieldsReady: !initiallyCollapsed,
         };
     },
 
@@ -387,6 +402,54 @@ export default {
             { deep: true }
         );
 
+        watch(
+            () => this.collapsed,
+            (collapsed) => {
+                if (!collapsed && !this.hasBeenExpanded) {
+                    this.hasBeenExpanded = true;
+                    this.mountScheduler.schedule(() => {
+                        if (!this._setUnmounted) {
+                            this.fieldsReady = true;
+                        }
+                    });
+                } else if (!collapsed) {
+                    this.fieldsReady = true;
+                }
+            },
+        );
+
+        // Headlessly evaluate conditions for never-mounted sets so omitValue
+        // bookkeeping stays correct for the save payload.
+        watch(
+            [() => this.values, () => this.fieldsReady],
+            () => {
+                if (this.fieldsReady || !this.hasFields) return;
+
+                const fields = Array.isArray(this.fields)
+                    ? this.fields
+                    : Object.values(this.fields || {});
+
+                const showField = new ShowField(
+                    this.values || {},
+                    {},
+                    this.publishContainer.visibleValues.value,
+                    this.publishContainer.revealerValues.value,
+                    this.publishContainer.hiddenFields.value,
+                    this.publishContainer.setHiddenField,
+                    { container: this.publishContainer.container },
+                );
+
+                fields.forEach((field) => {
+                    showField.showField(field, `${this.fieldPathPrefix}.${field.handle}`);
+                });
+            },
+            { deep: true, immediate: true },
+        );
+
+        if (this.hasError && this.collapsed) {
+            this.expand();
+        }
+
         reveal.mount(this.$refs.container, this.expand);
 
         // Firefox bug 739071: text selection doesn't work inside elements with a
@@ -406,6 +469,7 @@ export default {
     },
 
     beforeUnmount() {
+        this._setUnmounted = true;
         this._draggableObserver?.disconnect();
     },
 };
