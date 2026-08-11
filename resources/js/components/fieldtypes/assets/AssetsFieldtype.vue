@@ -201,6 +201,7 @@ import { isEqual } from 'lodash-es';
 import { Button, Dropdown, DropdownMenu, DropdownItem, Stack } from '@/components/ui';
 import ItemActions from '@/components/actions/ItemActions.vue';
 import useCheckerboard from '@/composables/checkerboard.js';
+import { dedupeInFlight } from '@/util/dedupeInFlight.js';
 
 export default {
     components: {
@@ -496,14 +497,16 @@ export default {
 
             this.loading = true;
 
-            this.$axios
-                .post(cp_url('assets-fieldtype'), {
-                    assets,
-                })
-                .then((response) => {
-                    this.assets = response.data;
-                    this.loading = false;
-                });
+            const cacheKey = JSON.stringify([...assets].slice().sort());
+
+            dedupeInFlight('assets-fieldtype', cacheKey, () =>
+                this.$axios.post(cp_url('assets-fieldtype'), { assets }),
+            ).then((response) => {
+                // Clone so mutations on one field's asset rows don't bleed into others
+                // sharing the same in-flight response.
+                this.assets = clone(response.data);
+                this.loading = false;
+            });
         },
 
         /**
