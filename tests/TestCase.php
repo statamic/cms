@@ -9,6 +9,7 @@ use Statamic\Facades\Config;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Http\Middleware\CP\AuthenticateSession;
+use Statamic\View\State\StateManager;
 
 abstract class TestCase extends \Orchestra\Testbench\TestCase
 {
@@ -23,6 +24,8 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         $this->prepareTestbenchSkeleton();
 
         parent::setUp();
+
+        StateManager::resetState();
 
         $this->withoutVite();
 
