@@ -270,6 +270,14 @@ function save() {
         .finally(() => saving.value = false);
 }
 
+function discardChanges() {
+    groups.value = deepClone(initialGroups.value);
+    errors.value = {};
+    closeGroupEditor();
+    closeItemPicker();
+    fallbackRenderKey.value++;
+}
+
 function reset() {
     confirmingReset.value = false;
     saving.value = true;
@@ -316,6 +324,13 @@ onBeforeUnmount(() => {
                     />
                 </DropdownMenu>
             </Dropdown>
+            <Button
+                v-if="isDirty"
+                :text="__('Discard Changes')"
+                variant="filled"
+                :disabled="saving"
+                @click="discardChanges"
+            />
             <Button
                 :text="__('Save')"
                 variant="primary"
