@@ -130,6 +130,7 @@ class ResourceIndexRepository
             ])->values(),
             'groups' => $this->groups($index),
             'hasSavedGroups' => $this->hasSavedGroups($index),
+            'cancelUrl' => request()->fullUrlWithoutQuery(['resource-index']),
             'updateUrl' => cp_route('resource-indexes.organization.update', $index->handle()),
             'resetUrl' => cp_route('resource-indexes.organization.destroy', $index->handle()),
         ]);

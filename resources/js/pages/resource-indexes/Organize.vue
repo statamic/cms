@@ -39,6 +39,7 @@ const props = defineProps({
     items: Array,
     groups: Array,
     hasSavedGroups: Boolean,
+    cancelUrl: String,
     updateUrl: String,
     resetUrl: String,
 });
@@ -57,6 +58,7 @@ const groupTitleError = ref(null);
 const addingToGroupId = ref(null);
 const addingItemIds = ref([]);
 const fallbackRenderKey = ref(0);
+const ignoringDirtyState = ref(false);
 let itemsSortable;
 
 const title = computed(() => __('Organize :resource', { resource: props.resourceIndex.title }));
@@ -104,7 +106,7 @@ const itemPickerOptions = computed(() => {
         .filter((item) => !existingIds.has(item.id));
 });
 
-watch(isDirty, (dirty) => Statamic.$dirty.state(dirtyStateKey, dirty), { immediate: true });
+watch(isDirty, (dirty) => Statamic.$dirty.state(dirtyStateKey, ignoringDirtyState.value ? false : dirty), { immediate: true });
 
 watch(
     () => props.groups,
@@ -261,21 +263,27 @@ function save() {
         .then(() => {
             initialGroups.value = deepClone(groups.value);
             hasSavedGroups.value = true;
-            Statamic.$toast.success(__('Saved'));
+            ignoringDirtyState.value = true;
+            Statamic.$dirty.remove(dirtyStateKey);
+            Statamic.$dirty.disableWarning();
+            saving.value = false;
+            router.visit(props.cancelUrl, {
+                onSuccess: () => Statamic.$toast.success(__('Saved')),
+            });
         })
         .catch((error) => {
             errors.value = error.response?.data?.errors ?? {};
             Statamic.$toast.error(error.response?.data?.message ?? __('Something went wrong'));
         })
-        .finally(() => saving.value = false);
+        .finally(() => {
+            if (saving.value) saving.value = false;
+        });
 }
 
 function discardChanges() {
-    groups.value = deepClone(initialGroups.value);
-    errors.value = {};
-    closeGroupEditor();
-    closeItemPicker();
-    fallbackRenderKey.value++;
+    Statamic.$dirty.remove(dirtyStateKey);
+    Statamic.$dirty.disableWarning();
+    router.visit(props.cancelUrl);
 }
 
 function reset() {
@@ -324,6 +332,12 @@ onBeforeUnmount(() => {
                     />
                 </DropdownMenu>
             </Dropdown>
+            <Button
+                v-if="!isDirty"
+                :text="__('Cancel')"
+                :href="cancelUrl"
+                :disabled="saving"
+            />
             <Button
                 v-if="isDirty"
                 :text="__('Discard Changes')"
