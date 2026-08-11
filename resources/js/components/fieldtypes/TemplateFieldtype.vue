@@ -22,6 +22,20 @@
 <script>
 import Fieldtype from './Fieldtype.vue';
 import { Combobox } from '@/components/ui';
+import { ref } from 'vue';
+import { router } from '@inertiajs/vue3';
+
+// Raw template list shared across instances for the page-view lifetime.
+const templatesCache = ref(null);
+let navigationListenerAttached = false;
+
+function ensureCacheClearedOnNavigation() {
+    if (navigationListenerAttached) return;
+    navigationListenerAttached = true;
+    router.on('before', () => {
+        templatesCache.value = null;
+    });
+}
 
 export default {
     components: { Combobox },
@@ -35,9 +49,21 @@ export default {
     },
 
     mounted() {
-        this.$axios.get(cp_url('api/templates')).then((response) => {
-            var templates = response.data;
+        ensureCacheClearedOnNavigation();
 
+        if (templatesCache.value) {
+            this.applyTemplates(templatesCache.value);
+            return;
+        }
+
+        this.$axios.get(cp_url('api/templates')).then((response) => {
+            templatesCache.value = response.data;
+            this.applyTemplates(response.data);
+        });
+    },
+
+    methods: {
+        applyTemplates(templates) {
             // Filter out partials
             if (this.config.hide_partials) {
                 templates = templates.filter((template) => {
@@ -74,7 +100,7 @@ export default {
 
             this.options = options;
             this.loading = false;
-        });
+        },
     },
 };
 </script>
