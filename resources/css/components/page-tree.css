@@ -61,7 +61,7 @@
             @apply mt-8 pt-1 bg-gray-200/45 dark:bg-gray-950 rounded-t-2xl;
         }
         &:has(+ .tree-node .is-section),
-        &:last-child {
+        &:nth-last-child(1 of .tree-node) {
             @apply pb-1 rounded-b-2xl;
         }
         &:has(.is-top-level-section-placeholder) {
