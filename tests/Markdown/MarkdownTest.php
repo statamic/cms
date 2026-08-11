@@ -249,11 +249,12 @@ EOT;
 <h2>Charlie Delta</h2>
 EOT, $markdown);
 
+        // Newer commonmark versions may add tabindex="-1" on permalink anchors.
         $this->assertEquals(<<<'EOT'
 <h2><a id="content-alfa-bravo" href="#content-alfa-bravo" class="heading-permalink" aria-hidden="true" title="Permalink">¶</a>Alfa Bravo</h2>
 <h2><a id="content-charlie-delta" href="#content-charlie-delta" class="heading-permalink" aria-hidden="true" title="Permalink">¶</a>Charlie Delta</h2>
 EOT,
-            rtrim(Markdown::withHeadingPermalinks()->parse($markdown))
+            str(Markdown::withHeadingPermalinks()->parse($markdown))->replace(' tabindex="-1"', '')->trim()->toString()
         );
     }
 
@@ -289,10 +290,10 @@ EOT, $markdown);
 <p>Baz qux.</p>
 EOT;
 
-        // Make assertion without newlines because they differ between versions of commonmark.
+        // Normalize newlines / tabindex — both differ across commonmark versions.
         $this->assertEquals(
             str($expected)->replace("\n", ''),
-            str(Markdown::withTableOfContents()->parse($markdown))->trim()->replace("\n", '')
+            str(Markdown::withTableOfContents()->parse($markdown))->trim()->replace(' tabindex="-1"', '')->replace("\n", '')
         );
     }
 }

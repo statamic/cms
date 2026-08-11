@@ -71,6 +71,9 @@ export default defineConfig(({ mode, command }) => {
                     extends: true,
                     test: {
                         name: 'bench',
+                        // Benchmarks only — keep out of `vitest run` / `npm test`.
+                        // Invoked via `vitest bench --project bench`.
+                        include: [],
                         browser: {
                             enabled: true,
                             headless: true,

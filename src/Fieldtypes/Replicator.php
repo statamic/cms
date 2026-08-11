@@ -308,10 +308,12 @@ class Replicator extends Fieldtype
         // for the same Field object (fields()/preload()/augment() hot path).
         $fieldId = $this->field ? spl_object_id($this->field) : null;
 
-        if ($this->flattenedSetsConfigFieldId !== $fieldId) {
+        // When $this->field is null, $fieldId is null — same as the property's
+        // initial value — so also regenerate when the Blink key was never set.
+        if ($this->flattenedSetsConfigBlinkKey === null || $this->flattenedSetsConfigFieldId !== $fieldId) {
             $this->flattenedSetsConfigFieldId = $fieldId;
             $this->flattenedSetsConfigBlinkKey = md5(
-                $this->field?->handle().json_encode($this->field?->config())
+                ($this->field?->handle() ?? '').json_encode($this->field?->config())
             );
         }
 
