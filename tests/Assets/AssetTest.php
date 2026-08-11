@@ -43,10 +43,11 @@ use Statamic\Support\Arr;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
+use Tests\WindowsHelpers;
 
 class AssetTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk;
+    use PreventSavingStacheItemsToDisk, WindowsHelpers;
 
     private $container;
 
@@ -2089,6 +2090,48 @@ class AssetTest extends TestCase
         $this->assertStringContainsString('</script>', $asset->contents());
     }
 
+    #[Test]
+    #[DataProvider('unnormalizedSvgExtensionProvider')]
+    public function it_sanitizes_svgs_on_upload_regardless_of_how_the_extension_is_written($extension)
+    {
+        if (trim($extension) !== $extension) {
+            $this->markTestSkippedInWindows('Windows does not allow filenames with trailing whitespace.');
+        }
+
+        Event::fake();
+
+        // Disable filename lowercasing so the uppercase extension actually
+        // reaches the disk, otherwise it'd be normalized before we could
+        // prove the sanitization check itself is case insensitive.
+        config()->set('statamic.assets.lowercase', false);
+
+        $asset = (new Asset)->container($this->container)->path($path = "path/to/asset.{$extension}")->syncOriginal();
+
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
+        Storage::disk('test')->assertMissing($path);
+
+        $return = $asset->upload(UploadedFile::fake()->createWithContent("asset.{$extension}", '<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" width="500" height="500"><script type="text/javascript">alert(`Bad stuff could go in here.`);</script></svg>'));
+
+        $this->assertEquals($asset, $return);
+        Storage::disk('test')->assertExists($path);
+        $this->assertEquals($path, $asset->path());
+
+        // Ensure the inline scripts were stripped out.
+        $this->assertStringNotContainsString('<script', $asset->contents());
+        $this->assertStringNotContainsString('Bad stuff could go in here.', $asset->contents());
+        $this->assertStringNotContainsString('</script>', $asset->contents());
+    }
+
+    public static function unnormalizedSvgExtensionProvider()
+    {
+        return [
+            'uppercase' => ['SVG'],
+            'mixed case' => ['Svg'],
+            'trailing whitespace' => ['svg '],
+            'uppercase with trailing whitespace' => ['SVG '],
+        ];
+    }
+
     public static function nonGlideableFileExtensionsProvider()
     {
         return [
@@ -2112,6 +2155,10 @@ class AssetTest extends TestCase
 
         $this->container->sourcePreset('small');
 
+        // Glide only creates its temp directory when it actually processes an image, so
+        // create it up front. Otherwise there'd be nothing for the assertion below to check.
+        app('files')->makeDirectory($glideDir = storage_path('statamic/glide/tmp'), 0777, true, true);
+
         $asset = (new Asset)->container($this->container)->path("path/to/file.{$extension}")->syncOriginal();
 
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
@@ -2123,7 +2170,6 @@ class AssetTest extends TestCase
         $return = $asset->upload(UploadedFile::fake()->createWithContent("file.{$extension}", '<svg width="20" height="30"></svg>'));
 
         $this->assertEquals($asset, $return);
-        $this->assertDirectoryExists($glideDir = storage_path('statamic/glide/tmp'));
         $this->assertEmpty(app('files')->allFiles($glideDir)); // no temp files
         Storage::disk('test')->assertExists("path/to/file.{$extension}");
         $this->assertEquals("path/to/file.{$extension}", $asset->path());
