@@ -18,6 +18,11 @@
     .page-tree-branch {
         @apply relative rounded-xl bg-white text-xs shadow;
         @apply dark:bg-gray-800;
+        /* Skip layout/paint for off-screen branches.
+          - content-visibility already applies containment while rendering / skipped
+        */
+        content-visibility: auto;
+        contain-intrinsic-size: auto 44px;
     }
 
     .page-move {
