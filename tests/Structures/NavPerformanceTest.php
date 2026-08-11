@@ -70,4 +70,23 @@ class NavPerformanceTest extends TestCase
         // Nav should not exist in 'de' site
         $this->assertFalse($nav->existsIn('de'));
     }
+
+    /**
+     * Test that existsIn() stays bounded to currently registered sites,
+     * even if a tree file exists on disk for a site that's since been removed.
+     */
+    #[Test]
+    public function exists_in_ignores_trees_for_sites_that_are_no_longer_registered()
+    {
+        $nav = tap(Nav::make('links'))->save();
+
+        $nav->makeTree('de', [['title' => 'Startseite', 'url' => '/']])->save();
+
+        $this->setSites([
+            'en' => ['locale' => 'en_US', 'url' => '/'],
+            'fr' => ['locale' => 'fr_FR', 'url' => '/fr/'],
+        ]);
+
+        $this->assertFalse($nav->existsIn('de'));
+    }
 }
