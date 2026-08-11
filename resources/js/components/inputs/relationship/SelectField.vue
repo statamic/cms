@@ -41,12 +41,34 @@
 
 <script>
 import { Combobox, StatusIndicator } from '@/components/ui';
-import { ref, watch } from 'vue';
+import { ref } from 'vue';
 import { router } from '@inertiajs/vue3';
 import axios from 'axios';
 
+// Settled options, scoped to the current page view (cleared on Inertia navigation).
 const optionsCache = ref({});
-const loaders = ref({});
+const inFlightRequests = new Map();
+let navigationListenerAttached = false;
+
+function ensureCacheClearedOnNavigation() {
+    if (navigationListenerAttached) return;
+    navigationListenerAttached = true;
+    router.on('before', () => {
+        optionsCache.value = {};
+    });
+}
+
+function detachFromInFlightRequest(component) {
+    const entry = component._activeRequest;
+    if (!entry) return;
+    component._activeRequest = null;
+    entry.subscribers--;
+    if (entry.subscribers > 0) return;
+    entry.controller.abort();
+    if (inFlightRequests.get(entry.cacheKey) === entry) {
+        inFlightRequests.delete(entry.cacheKey);
+    }
+}
 
 export default {
     components: {
@@ -70,7 +92,6 @@ export default {
         return {
             requested: false,
             options: [],
-            abortController: null,
             removeNavigationListener: null,
         };
     },
@@ -98,9 +119,9 @@ export default {
             return this.config.type === 'users' ? ['title', 'email'] : null;
         },
 
-	    cacheKey() {
-			return JSON.stringify({ ...this.parameters, url: this.url });
-	    },
+        cacheKey() {
+            return JSON.stringify({ ...this.parameters, url: this.url });
+        },
 
         comboboxOptions() {
             // Combobox resolves the selected label from this list, so a selected item missing
@@ -116,57 +137,92 @@ export default {
     },
 
     created() {
-        if (!this.typeahead) this.request();
+        ensureCacheClearedOnNavigation();
 
-		watch(
-			() => loaders.value[this.cacheKey],
-			(loading) => {
-				this.options = optionsCache[this.cacheKey];
-				this.requested = true;
-			}
-		);
+        if (!this.typeahead) {
+            const cached = optionsCache.value[this.cacheKey];
+            if (cached) {
+                this.options = cached;
+                this.requested = true;
+            } else {
+                this.request();
+            }
+        }
 
         this.removeNavigationListener = router.on('before', () => {
-            if (this.abortController) this.abortController.abort();
+            detachFromInFlightRequest(this);
         });
     },
 
     beforeUnmount() {
-        if (this.abortController) this.abortController.abort();
+        detachFromInFlightRequest(this);
         if (this.removeNavigationListener) this.removeNavigationListener();
     },
 
     watch: {
-        parameters(params) {
+        // Watch the primitive string key — not the `parameters` object, which is a fresh
+        // literal every evaluation and would re-fire the request on identity alone.
+        cacheKey() {
             if (!this.typeahead) this.request();
         },
     },
 
     methods: {
         request(params = {}) {
-			if (!Object.keys(params).length && loaders.value[this.cacheKey]) return Promise.resolve();
+            const isSearch = Object.keys(params).length > 0;
+            const requestParams = { ...this.parameters, ...params };
+            const cacheKey = isSearch
+                ? JSON.stringify({ ...requestParams, url: this.url })
+                : this.cacheKey;
 
-            params = { ...this.parameters, ...params };
+            // Settled cache — non-search only (typeahead searches always hit the network).
+            if (!isSearch && optionsCache.value[cacheKey]) {
+                this.options = optionsCache.value[cacheKey];
+                this.requested = true;
+                return Promise.resolve({ data: { data: this.options } });
+            }
 
-			loaders.value = {...loaders.value, [this.cacheKey]: true};
+            detachFromInFlightRequest(this);
 
-            if (this.abortController) this.abortController.abort();
-            this.abortController = new AbortController();
+            let entry = inFlightRequests.get(cacheKey);
 
-            return this.$axios.get(this.url, { params, signal: this.abortController.signal })
-	            .then((response) => {
-	                this.options = response.data.data;
-	                this.requested = true;
-		            optionsCache[this.cacheKey] = this.options;
-	                return Promise.resolve(response);
-	            })
-	            .catch((e) => {
-	                if (axios.isCancel(e)) return;
-	                throw e;
-	            })
-	            .finally(() => {
-					loaders.value = {...loaders.value, [this.cacheKey]: false};
-	            });
+            if (!entry) {
+                const controller = new AbortController();
+                entry = { cacheKey, controller, subscribers: 0 };
+                entry.promise = this.$axios
+                    .get(this.url, { params: requestParams, signal: controller.signal })
+                    .then((response) => {
+                        if (!isSearch) {
+                            optionsCache.value = {
+                                ...optionsCache.value,
+                                [cacheKey]: response.data.data,
+                            };
+                        }
+                        return response;
+                    })
+                    .finally(() => {
+                        if (inFlightRequests.get(cacheKey) === entry) {
+                            inFlightRequests.delete(cacheKey);
+                        }
+                    });
+                inFlightRequests.set(cacheKey, entry);
+            }
+
+            entry.subscribers++;
+            this._activeRequest = entry;
+
+            return entry.promise
+                .then((response) => {
+                    if (this._activeRequest !== entry) return;
+                    this.options = response.data.data;
+                    this.requested = true;
+                    return response;
+                })
+                .catch((e) => {
+                    if (axios.isCancel(e)) return;
+                    if (this._activeRequest !== entry) return;
+                    throw e;
+                });
         },
 
         search(search, loading) {
