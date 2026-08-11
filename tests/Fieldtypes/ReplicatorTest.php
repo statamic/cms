@@ -1232,6 +1232,80 @@ class ReplicatorTest extends TestCase
         $this->assertSame('Add Set', $configFields['button_label']['placeholder']);
     }
 
+    #[Test]
+    public function it_preloads_collapsed_when_collapse_is_enabled()
+    {
+        $this->partialMock(RowId::class, function (MockInterface $mock) {
+            $mock->shouldReceive('generate')->andReturn('set-1', 'set-2');
+        });
+
+        $field = (new Field('test', [
+            'type' => 'replicator',
+            'collapse' => true,
+            'sets' => [
+                'main' => [
+                    'fields' => [
+                        ['handle' => 'words', 'field' => ['type' => 'text']],
+                    ],
+                ],
+            ],
+        ]))->setValue([
+            ['type' => 'main', 'words' => 'one'],
+            ['type' => 'main', 'words' => 'two'],
+        ])->preProcess();
+
+        $this->assertSame(['set-1', 'set-2'], $field->fieldtype()->preload()['collapsed']);
+    }
+
+    #[Test]
+    public function it_preloads_collapsed_empty_when_collapse_is_off_and_under_threshold()
+    {
+        $this->partialMock(RowId::class, function (MockInterface $mock) {
+            $mock->shouldReceive('generate')->andReturn('set-1', 'set-2');
+        });
+
+        $field = (new Field('test', [
+            'type' => 'replicator',
+            'sets' => [
+                'main' => [
+                    'fields' => [
+                        ['handle' => 'words', 'field' => ['type' => 'text']],
+                    ],
+                ],
+            ],
+        ]))->setValue([
+            ['type' => 'main', 'words' => 'one'],
+            ['type' => 'main', 'words' => 'two'],
+        ])->preProcess();
+
+        $this->assertSame([], $field->fieldtype()->preload()['collapsed']);
+    }
+
+    #[Test]
+    public function it_auto_collapses_on_preload_when_set_count_meets_threshold()
+    {
+        $ids = collect(range(1, 10))->map(fn ($i) => "set-{$i}")->all();
+
+        $this->partialMock(RowId::class, function (MockInterface $mock) use ($ids) {
+            $mock->shouldReceive('generate')->andReturn(...$ids);
+        });
+
+        $field = (new Field('test', [
+            'type' => 'replicator',
+            'sets' => [
+                'main' => [
+                    'fields' => [
+                        ['handle' => 'words', 'field' => ['type' => 'text']],
+                    ],
+                ],
+            ],
+        ]))->setValue(
+            collect($ids)->map(fn () => ['type' => 'main', 'words' => 'x'])->all()
+        )->preProcess();
+
+        $this->assertSame($ids, $field->fieldtype()->preload()['collapsed']);
+    }
+
     public static function groupedSetsProvider()
     {
         return [

@@ -655,7 +655,7 @@ class Bard extends Replicator
             'existing' => $existing,
             'new' => $new ?? null,
             'defaults' => $defaults ?? null,
-            'collapsed' => $this->config('collapse') ? array_keys($existing) : [],
+            'collapsed' => $this->initialCollapsedSetIds($existing),
             'previews' => $previews,
             '__collaboration' => ['existing'],
             'linkCollections' => $linkCollections,
@@ -673,9 +673,11 @@ class Bard extends Replicator
                 'folder' => $this->config('folder'),
             ]));
 
+            $assetMeta = $assetField->meta();
+
             $data['assets'] = [
-                'container' => $assetField->meta()['container'],
-                'columns' => $assetField->meta()['columns'],
+                'container' => $assetMeta['container'],
+                'columns' => $assetMeta['columns'],
             ];
         }
 
@@ -809,8 +811,15 @@ class Bard extends Replicator
 
         $nestedField = new Field($handle, $config);
         $nestedField->setValue([$id]);
+        $fieldtype = $nestedField->fieldtype();
 
-        return $nestedField->fieldtype()->preload()['data'][0] ?? null;
+        // Relationship fieldtypes expose getItemData(); custom link types may
+        // only implement preload() with a data payload.
+        if (method_exists($fieldtype, 'getItemData')) {
+            return $fieldtype->getItemData([$id])->first();
+        }
+
+        return $fieldtype->preload()['data'][0] ?? null;
     }
 
     private function linkTypeField(): Field
@@ -825,32 +834,35 @@ class Bard extends Replicator
     private function linkTypesForToolbar(): array
     {
         $field = $this->linkTypeField();
+        $config = $field->config();
 
-        return collect(Link::types())
-            ->filter(fn (LinkType $type): bool => $type->visible($field))
-            ->map(function (LinkType $type, string $handle) use ($field): ?array {
-                if (! $config = $type->fieldtype($field)) {
-                    return null;
-                }
+        return Blink::once('bard-link-types-'.md5(json_encode($config)), function () use ($field) {
+            return collect(Link::types())
+                ->filter(fn (LinkType $type): bool => $type->visible($field))
+                ->map(function (LinkType $type, string $handle) use ($field): ?array {
+                    if (! $config = $type->fieldtype($field)) {
+                        return null;
+                    }
 
-                $nestedField = new Field($handle, $config);
-                $nestedFieldtype = $nestedField->fieldtype();
+                    $nestedField = new Field($handle, $config);
+                    $nestedFieldtype = $nestedField->fieldtype();
 
-                try {
-                    $meta = $nestedFieldtype->preload();
-                } catch (CollectionNotFoundException) {
-                    $meta = [];
-                }
+                    try {
+                        $meta = $nestedFieldtype->preload();
+                    } catch (CollectionNotFoundException) {
+                        $meta = [];
+                    }
 
-                return [
-                    'title' => $type->title(),
-                    'component' => $nestedFieldtype->component(),
-                    'config' => $nestedFieldtype->config(),
-                    'meta' => $meta,
-                ];
-            })
-            ->filter()
-            ->all();
+                    return [
+                        'title' => $type->title(),
+                        'component' => $nestedFieldtype->component(),
+                        'config' => $nestedFieldtype->config(),
+                        'meta' => $meta,
+                    ];
+                })
+                ->filter()
+                ->all();
+        });
     }
 
     private function wrapInlineValue($value)
