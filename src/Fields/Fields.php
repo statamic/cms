@@ -118,10 +118,14 @@ class Fields
 
     public function newInstance()
     {
-        return (new static)
+        // Assign items directly — setItems() would re-resolve every field, then
+        // setFields() would immediately discard that work.
+        $instance = new static;
+        $instance->items = $this->items;
+
+        return $instance
             ->setParent($this->parent)
             ->setParentField($this->parentField, $this->parentIndex)
-            ->setItems($this->items)
             ->setFields($this->fields)
             ->setFilled($this->filled);
     }
