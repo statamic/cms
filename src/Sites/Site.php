@@ -11,6 +11,7 @@ use Statamic\Support\Str;
 use Statamic\Support\TextDirection;
 use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
 use Statamic\View\Antlers\Language\Runtime\RuntimeParser;
+use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Statamic\View\Cascade;
 
 class Site implements Augmentable
@@ -120,7 +121,7 @@ class Site implements Augmentable
         }
 
         if (! is_string($value) || ! Str::contains($value, ['{', '@'])) {
-            return $value;
+            return is_string($value) ? StringUtilities::sanitizePhp($value) : $value;
         }
 
         $value = Parse::config($value);
