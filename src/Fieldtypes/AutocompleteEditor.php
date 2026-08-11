@@ -2,6 +2,7 @@
 
 namespace Statamic\Fieldtypes;
 
+use Statamic\Facades\Markdown;
 use Statamic\Fields\Fieldtype;
 use Statamic\Support\Arr;
 
@@ -70,6 +71,12 @@ class AutocompleteEditor extends Fieldtype
                 'width' => 50,
                 'if' => ['inline' => 'equals true'],
             ],
+            'antlers' => [
+                'display' => __('Allow Antlers'),
+                'instructions' => __('statamic::fieldtypes.any.config.antlers'),
+                'type' => 'toggle',
+                'width' => 50,
+            ],
         ];
     }
 
@@ -101,5 +108,34 @@ class AutocompleteEditor extends Fieldtype
     public function process($value)
     {
         return $value ?: null;
+    }
+
+    public function augment($value)
+    {
+        return $this->parseMarkdown($value);
+    }
+
+    // Public so a consumer holding a raw config string, rather than a Value, can
+    // get the same HTML without going through augmentation.
+    public function parseMarkdown($value): ?string
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        $html = Markdown::parser('default')->parse((string) $value);
+
+        return $this->config('inline') ? $this->unwrapParagraph($html) : $html;
+    }
+
+    private function unwrapParagraph(string $html): string
+    {
+        $html = trim($html);
+
+        if (! preg_match('/^<p>(.*)<\/p>$/s', $html, $matches)) {
+            return $html;
+        }
+
+        return str_contains($matches[1], '<p>') ? $html : $matches[1];
     }
 }

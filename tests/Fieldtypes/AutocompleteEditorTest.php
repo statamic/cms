@@ -3,7 +3,9 @@
 namespace Tests\Fieldtypes;
 
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\Antlers;
 use Statamic\Fields\Field;
+use Statamic\Fields\Value;
 use Statamic\Fieldtypes\AutocompleteEditor;
 use Tests\TestCase;
 
@@ -120,6 +122,95 @@ class AutocompleteEditorTest extends TestCase
         $fieldtype = $this->fieldtype();
 
         $this->assertSame([], $fieldtype->preload()['options']);
+    }
+
+    #[Test]
+    public function it_augments_markdown_to_html()
+    {
+        $fieldtype = $this->fieldtype();
+
+        $this->assertSame(
+            "<p>Hi <strong>John</strong></p>\n",
+            $fieldtype->augment('Hi **John**')
+        );
+    }
+
+    #[Test]
+    public function it_augments_multiple_blocks_of_markdown()
+    {
+        $fieldtype = $this->fieldtype();
+
+        $this->assertSame(
+            "<p>One</p>\n<p>Two</p>\n",
+            $fieldtype->augment("One\n\nTwo")
+        );
+    }
+
+    #[Test]
+    public function it_unwraps_the_paragraph_when_inline()
+    {
+        $fieldtype = $this->fieldtype(['inline' => true]);
+
+        $this->assertSame('Hi <strong>John</strong>', $fieldtype->augment('Hi **John**'));
+    }
+
+    #[Test]
+    public function it_leaves_multiple_paragraphs_wrapped_when_inline()
+    {
+        $fieldtype = $this->fieldtype(['inline' => true]);
+
+        $this->assertSame("<p>One</p>\n<p>Two</p>", $fieldtype->augment("One\n\nTwo"));
+    }
+
+    #[Test]
+    public function it_augments_null_and_empty_values_to_null()
+    {
+        $fieldtype = $this->fieldtype();
+
+        $this->assertNull($fieldtype->augment(null));
+        $this->assertNull($fieldtype->augment(''));
+    }
+
+    #[Test]
+    public function augment_delegates_to_the_parse_markdown_method()
+    {
+        $fieldtype = $this->fieldtype();
+
+        $this->assertSame($fieldtype->parseMarkdown('Hi **John**'), $fieldtype->augment('Hi **John**'));
+    }
+
+    #[Test]
+    public function it_leaves_mention_tokens_alone_when_augmenting()
+    {
+        $fieldtype = $this->fieldtype();
+
+        $this->assertSame("<p>Hi [[ first_name ]]</p>\n", $fieldtype->augment('Hi [[ first_name ]]'));
+    }
+
+    #[Test]
+    public function antlers_is_parsed_after_the_markdown_is_augmented()
+    {
+        $fieldtype = $this->fieldtype(['antlers' => true, 'inline' => true]);
+
+        $value = new Value('Hi **{{ first_name }}**', 'test', $fieldtype);
+
+        $this->assertSame(
+            'Hi <strong>John</strong>',
+            (string) Antlers::parse('{{ test }}', ['test' => $value, 'first_name' => 'John'])
+        );
+    }
+
+    #[Test]
+    public function antlers_is_not_parsed_when_the_config_is_disabled()
+    {
+        $fieldtype = $this->fieldtype(['inline' => true]);
+
+        $value = new Value('Hi {{ first_name }}', 'test', $fieldtype);
+
+        $this->assertSame(
+            'Hi {{ first_name }}',
+            (string) Antlers::parse('{{ test }}', ['test' => $value, 'first_name' => 'John'])
+        );
     }
 
     private function fieldtype($config = [])
