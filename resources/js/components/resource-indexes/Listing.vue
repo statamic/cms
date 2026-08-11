@@ -58,7 +58,7 @@ function groupsFor(items) {
 
             <div v-else class="space-y-6">
                 <section v-for="group in groupsFor(items)" :key="group.id">
-                    <Subheading v-if="group.title" class="mb-2.5 ps-0.5" :text="group.title" />
+                    <Subheading v-if="group.title" class="mb-2 ps-0.5" :text="group.title" />
 
                     <Panel class="relative overflow-x-auto" style="container-type: scroll-state;">
                         <ListingTable :items="grouped ? group.items : undefined">
