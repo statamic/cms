@@ -22,18 +22,18 @@ const { blueprint, container, visibleValues, extraValues, revealerValues, asConf
 const tab = injectTabContext();
 const sections = tab.sections;
 const visibleSections = computed(() => {
+    const showField = new ShowField(
+        visibleValues.value,
+        extraValues.value,
+        visibleValues.value,
+        revealerValues.value,
+        hiddenFields.value,
+        setHiddenField,
+        { container },
+    );
+
     return sections.filter((section) => {
-        return section.fields.some((field) => {
-            return new ShowField(
-                visibleValues.value,
-                extraValues.value,
-                visibleValues.value,
-                revealerValues.value,
-                hiddenFields.value,
-                setHiddenField,
-                { container }
-            ).showField(field, field.handle);
-        });
+        return section.fields.some((field) => showField.showField(field, field.handle));
     });
 });
 
