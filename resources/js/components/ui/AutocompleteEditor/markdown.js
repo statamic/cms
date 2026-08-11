@@ -9,13 +9,7 @@ import HardBreak from '@tiptap/extension-hard-break';
 import { BulletList, OrderedList, ListItem } from '@tiptap/extension-list';
 import { Autocomplete } from './extensions/Autocomplete';
 
-// Mentions are serialized as a sentinel rather than the real `{{ value }}`
-// token. Tiptap gives no hook to escape text as it's written, so braces an
-// author typed literally can only be told apart from ours once the whole
-// document has been serialized. See contentToMarkdown.
-export const MENTION_SENTINEL = '\u0000';
-
-const MENTION_TOKEN = /^\{\{\s*([\w.-]+)\s*\}\}/;
+const MENTION_TOKEN = /^\[\[\s*([\w.-]+)\s*\]\]/;
 
 // Markdown is how the fieldtype stores its value, not something the editor
 // itself does, so this is declared here rather than on the shared extension.
@@ -25,7 +19,7 @@ const MarkdownAutocomplete = Autocomplete.extend({
     markdownTokenizer: {
         name: 'mention',
         level: 'inline',
-        start: (src) => src.indexOf('{{'),
+        start: (src) => src.indexOf('[['),
         tokenize: (src) => {
             const match = MENTION_TOKEN.exec(src);
 
@@ -37,7 +31,9 @@ const MarkdownAutocomplete = Autocomplete.extend({
 
     parseMarkdown: (token) => ({ type: 'mention', attrs: { value: token.value } }),
 
-    renderMarkdown: (node) => `${MENTION_SENTINEL}${node.attrs.value}${MENTION_SENTINEL}`,
+    // Brackets an author typed literally are escaped by the text serializer,
+    // so a mention rendering them raw is unambiguously ours.
+    renderMarkdown: (node) => `[[ ${node.attrs.value} ]]`,
 });
 
 // The default two-trailing-space hard break doesn't survive whitespace
@@ -66,13 +62,7 @@ const manager = new MarkdownManager({
 });
 
 export function contentToMarkdown(content) {
-    const markdown = manager.serialize({ type: 'doc', content });
-
-    // Escape every brace pair first, so anything the author typed is treated as
-    // literal text, then turn only our own sentinels into real tokens.
-    return markdown
-        .replaceAll('{{', '\\{\\{')
-        .replace(new RegExp(`${MENTION_SENTINEL}([^${MENTION_SENTINEL}]*)${MENTION_SENTINEL}`, 'g'), '{{ $1 }}');
+    return manager.serialize({ type: 'doc', content });
 }
 
 export function markdownToContent(markdown) {

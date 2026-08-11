@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest';
-import { contentToMarkdown, markdownToContent, MENTION_SENTINEL } from '@/components/ui/AutocompleteEditor/markdown';
+import { contentToMarkdown, markdownToContent } from '@/components/ui/AutocompleteEditor/markdown';
 
 test('a value that is not a string is treated as empty', () => {
     const proseMirror = [{ type: 'paragraph', content: [{ type: 'text', text: 'legacy' }] }];
@@ -9,12 +9,13 @@ test('a value that is not a string is treated as empty', () => {
     expect(markdownToContent(undefined)).toEqual([]);
 });
 
-test('a mention value that cannot be tokenized never leaks the sentinel', () => {
-    const markdown = contentToMarkdown([
-        { type: 'paragraph', content: [{ type: 'mention', attrs: { value: 'not a slug' } }] },
-    ]);
+test('a mention on its own round trips', () => {
+    const content = [{ type: 'paragraph', content: [{ type: 'mention', attrs: { value: 'first_name' } }] }];
 
-    expect(markdown).not.toContain(MENTION_SENTINEL);
+    const markdown = contentToMarkdown(content);
+
+    expect(markdown).toBe('[[ first_name ]]');
+    expect(markdownToContent(markdown)).toEqual(content);
 });
 
 test('inline content round trips to a plain markdown scalar', () => {
@@ -31,7 +32,7 @@ test('inline content round trips to a plain markdown scalar', () => {
 
     const markdown = contentToMarkdown(content);
 
-    expect(markdown).toBe('Hi {{ first_name }}, thanks!');
+    expect(markdown).toBe('Hi [[ first_name ]], thanks!');
     expect(markdownToContent(markdown)).toEqual(content);
 });
 
@@ -102,14 +103,14 @@ test('block content with headings, marks, lists, and mentions round trips', () =
         [
             '## Thanks for getting in touch',
             '',
-            'Hi {{ first_name }},',
+            'Hi [[ first_name ]],',
             '',
-            'We received your message and will reply to {{ email }} within **two business days**.',
+            'We received your message and will reply to [[ email ]] within **two business days**.',
             '',
             'Here is what you sent us:',
             '',
-            '- Subject: {{ subject }}',
-            '- Message: {{ message }}',
+            '- Subject: [[ subject ]]',
+            '- Message: [[ message ]]',
             '',
             'Thanks,\\',
             'The Team',
@@ -118,31 +119,82 @@ test('block content with headings, marks, lists, and mentions round trips', () =
     expect(markdownToContent(markdown)).toEqual(content);
 });
 
-test('a literal {{ }} typed by an author round trips as text, not a mention', () => {
-    const content = [{ type: 'paragraph', content: [{ type: 'text', text: 'Type {{ notamention }} literally' }] }];
+test('a literal [[ ]] typed by an author round trips as text, not a mention', () => {
+    const content = [{ type: 'paragraph', content: [{ type: 'text', text: 'Type [[ first_name ]] literally' }] }];
 
     const markdown = contentToMarkdown(content);
 
-    expect(markdown).toBe('Type \\{\\{ notamention }} literally');
+    expect(markdown).toBe('Type \\[\\[ first\\_name \\]\\] literally');
     expect(markdownToContent(markdown)).toEqual(content);
 });
 
-test('a real mention and literal braces in the same line both round trip correctly', () => {
+test('a real mention and a literal in the same line both round trip correctly', () => {
     const content = [
         {
             type: 'paragraph',
             content: [
-                { type: 'text', text: 'Real ' },
-                { type: 'mention', attrs: { value: 'email' } },
-                { type: 'text', text: ' vs literal {{ fake }}' },
+                { type: 'text', text: 'Hi ' },
+                { type: 'mention', attrs: { value: 'handle' } },
+                { type: 'text', text: ', see [[ first_name ]] literally' },
             ],
         },
     ];
 
     const markdown = contentToMarkdown(content);
 
-    expect(markdown).toBe('Real {{ email }} vs literal \\{\\{ fake }}');
+    expect(markdown).toBe('Hi [[ handle ]], see \\[\\[ first\\_name \\]\\] literally');
     expect(markdownToContent(markdown)).toEqual(content);
+});
+
+test('a literal before a real mention round trips correctly', () => {
+    const content = [
+        {
+            type: 'paragraph',
+            content: [
+                { type: 'text', text: 'See [[ first_name ]] then ' },
+                { type: 'mention', attrs: { value: 'handle' } },
+            ],
+        },
+    ];
+
+    const markdown = contentToMarkdown(content);
+
+    expect(markdown).toBe('See \\[\\[ first\\_name \\]\\] then [[ handle ]]');
+    expect(markdownToContent(markdown)).toEqual(content);
+});
+
+test('escaped brackets parse to text rather than a mention', () => {
+    expect(markdownToContent('\\[\\[ first\\_name \\]\\]')).toEqual([
+        { type: 'paragraph', content: [{ type: 'text', text: '[[ first_name ]]' }] },
+    ]);
+
+    // Underscores don't need escaping to be part of an escaped literal.
+    expect(markdownToContent('\\[\\[ first_name \\]\\]')).toEqual([
+        { type: 'paragraph', content: [{ type: 'text', text: '[[ first_name ]]' }] },
+    ]);
+});
+
+test('an escaped literal alongside a real mention parses in either order', () => {
+    expect(markdownToContent('Hi [[ handle ]], see \\[\\[ first\\_name \\]\\] literally')).toEqual([
+        {
+            type: 'paragraph',
+            content: [
+                { type: 'text', text: 'Hi ' },
+                { type: 'mention', attrs: { value: 'handle' } },
+                { type: 'text', text: ', see [[ first_name ]] literally' },
+            ],
+        },
+    ]);
+
+    expect(markdownToContent('See \\[\\[ first\\_name \\]\\] then [[ handle ]]')).toEqual([
+        {
+            type: 'paragraph',
+            content: [
+                { type: 'text', text: 'See [[ first_name ]] then ' },
+                { type: 'mention', attrs: { value: 'handle' } },
+            ],
+        },
+    ]);
 });
 
 test('hard breaks survive trailing whitespace stripping', () => {

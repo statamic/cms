@@ -60,7 +60,7 @@ class AutocompleteEditorTest extends TestCase
     {
         $fieldtype = $this->fieldtype();
 
-        $this->assertSame('Hi {{ first_name }}, thanks!', $fieldtype->process('Hi {{ first_name }}, thanks!'));
+        $this->assertSame('Hi [[ first_name ]], thanks!', $fieldtype->process('Hi [[ first_name ]], thanks!'));
     }
 
     #[Test]
