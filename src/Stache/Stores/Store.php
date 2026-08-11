@@ -9,7 +9,6 @@ use Statamic\Facades\Stache;
 use Statamic\Stache\Exceptions\DuplicateKeyException;
 use Statamic\Stache\Indexes;
 use Statamic\Stache\Indexes\Index;
-use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
@@ -299,7 +298,7 @@ abstract class Store
     {
         $this->handleFileChanges();
 
-        if ($this->paths && ! Statamic::isWorker()) {
+        if ($this->paths) {
             return $this->paths;
         }
 
@@ -376,6 +375,11 @@ abstract class Store
     {
         $this->paths = null;
         Stache::cacheStore()->forget($this->pathsCacheKey());
+    }
+
+    public function resetMemoizedState()
+    {
+        $this->paths = null;
     }
 
     protected function pathsCacheKey()

@@ -78,7 +78,7 @@ class UpdateRoleTest extends TestCase
         $role = tap(
             Role::make('test')
                 ->title('Test')
-                ->permissions(['one', 'two'])
+                ->permissions(['configure fields', 'manage preferences'])
         )->save();
 
         $this
@@ -87,7 +87,7 @@ class UpdateRoleTest extends TestCase
             ->update($role, [
                 'title' => 'Updated',
                 'handle' => 'changed',
-                'permissions' => ['one', 'three'],
+                'permissions' => ['configure fields', 'resolve duplicate ids'],
             ])
             ->assertOk()
             ->assertJson(['redirect' => cp_route('roles.index')]);
@@ -95,7 +95,53 @@ class UpdateRoleTest extends TestCase
         $this->assertNull(Role::find('test'));
         $role = Role::find('changed');
         $this->assertEquals('Updated', $role->title());
-        $this->assertEquals(['one', 'three'], $role->permissions()->all());
+        $this->assertEquals(['configure fields', 'resolve duplicate ids'], $role->permissions()->all());
+        $this->assertFalse($role->isSuper());
+    }
+
+    #[Test]
+    public function it_preserves_permissions_that_are_no_longer_registered()
+    {
+        // A permission that used to be registered, but no longer is. For example, one
+        // belonging to an addon that's been disabled, or a deprecated core permission.
+        $role = tap(
+            Role::make('test')
+                ->title('Test')
+                ->permissions(['configure fields', 'manage preferences', 'do addon things'])
+        )->save();
+
+        $this
+            ->actingAsUserWithPermissions(['edit roles'])
+            ->withActiveElevatedSession()
+            ->update($role, [
+                'permissions' => ['configure fields'],
+            ])
+            ->assertOk();
+
+        $role = Role::find('test');
+        $this->assertEquals(['configure fields', 'do addon things'], $role->permissions()->all());
+    }
+
+    #[Test]
+    public function demoting_a_super_role_does_not_resurrect_the_super_permission()
+    {
+        $role = tap(
+            Role::make('test')
+                ->title('Test')
+                ->permissions(['super'])
+        )->save();
+
+        $this
+            ->actingAs(tap(User::make()->makeSuper())->save())
+            ->withActiveElevatedSession()
+            ->update($role, [
+                'super' => false,
+                'permissions' => [],
+            ])
+            ->assertOk();
+
+        $role = Role::find('test');
+        $this->assertEquals([], $role->permissions()->all());
         $this->assertFalse($role->isSuper());
     }
 

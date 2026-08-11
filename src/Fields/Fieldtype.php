@@ -22,6 +22,7 @@ abstract class Fieldtype implements Arrayable
 
     protected static $title;
     protected static $binding = 'fieldtypes';
+    protected static $preloadable = null;
 
     protected $field;
     protected $localizable = true;

@@ -270,6 +270,12 @@ class ExtensionServiceProvider extends ServiceProvider
         $this->app->instance('statamic.hooks', collect());
     }
 
+    public function boot()
+    {
+        Fieldtypes\Link::extend('entry', Fieldtypes\Link\EntryLinkType::class);
+        Fieldtypes\Link::extend('asset', Fieldtypes\Link\AssetLinkType::class);
+    }
+
     protected function registerAddonManifest()
     {
         $cachePath = $this->app->bootstrapPath().'/cache/addons.php';

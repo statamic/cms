@@ -281,8 +281,7 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, ContainsQueryabl
             }
         }
 
-        $targetSectionIndex = $existingField['section']
-            ?? ($prepend ? 0 : count($contents['tabs'][$tab]['sections'] ?? []) - 1);
+        $targetSectionIndex = $existingField['section'] ?? 0;
 
         $fields = collect($tabs[$tab]['sections'][$targetSectionIndex]['fields'] ?? [])->keyBy(function ($field) {
             return (isset($field['import'])) ? 'import:'.($field['prefix'] ?? null).$field['import'] : $field['handle'];
@@ -293,6 +292,7 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, ContainsQueryabl
                 $importKey = 'import:'.$importedField['partial'];
                 $field = $allFields->get($importKey);
                 $tab = $field['tab'];
+                $targetSectionIndex = $field['section'];
                 $fields = collect($tabs[$tab]['sections'][$targetSectionIndex]['fields'])->keyBy(function ($field) {
                     return (isset($field['import'])) ? 'import:'.($field['prefix'] ?? null).$field['import'] : $field['handle'];
                 });
@@ -457,7 +457,7 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, ContainsQueryabl
             'fqh' => $this->fullyQualifiedHandle(),
             'token' => encrypt([
                 'fqh' => $this->fullyQualifiedHandle(),
-                'user_id' => User::current()->id(),
+                'user_id' => User::current()?->id(),
             ]),
         ];
     }

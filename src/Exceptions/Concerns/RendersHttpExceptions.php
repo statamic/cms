@@ -9,6 +9,7 @@ use Inertia\Inertia;
 use Statamic\Exceptions\AuthenticationException;
 use Statamic\Facades\Cascade;
 use Statamic\Facades\User;
+use Statamic\Http\Middleware\CP\HandleInertiaRequests;
 use Statamic\Statamic;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\Cachers\ApplicationCacher;
@@ -30,6 +31,7 @@ trait RendersHttpExceptions
             }
 
             return Inertia::render('errors/'.$this->getStatusCode())
+                ->rootView(HandleInertiaRequests::ROOT_VIEW)
                 ->toResponse(request())
                 ->setStatusCode($this->getStatusCode());
         }

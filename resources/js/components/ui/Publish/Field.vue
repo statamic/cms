@@ -2,6 +2,7 @@
 import { computed, useTemplateRef, watch, ref, inject } from 'vue';
 import { injectContainerContext } from './Container.vue';
 import { injectFieldsContext } from './FieldsProvider.vue';
+import { useUiDirection } from '@/composables/ui-direction';
 import {
     Avatar,
     Field,
@@ -46,7 +47,7 @@ const {
     focusField,
     blurField,
     container,
-    direction,
+    direction: contentDirection,
 } = injectContainerContext();
 const {
     fieldPathPrefix: injectedFieldPathPrefix,
@@ -54,6 +55,9 @@ const {
     readOnly: fieldsProviderReadOnly,
     asConfig: fieldsAsConfig,
 } = injectFieldsContext();
+
+const { direction } = useUiDirection();
+const isFormSubmission = inject('isFormSubmission', false);
 
 const asConfig = computed(() => fieldsAsConfig.value ?? containerAsConfig.value ?? false);
 const fieldPathPrefix = computed(() => props.fieldPathPrefix || injectedFieldPathPrefix.value);
@@ -152,6 +156,12 @@ const shouldShowField = computed(() => {
     ).showField(props.config, fullPath.value);
 });
 
+// Hidden fieldtypes are mounted like any other field so they take part in field
+// conditions, but they only become visible on a form submission.
+const isHiddenFieldtype = computed(() => props.config.type === 'hidden' && !isFormSubmission);
+
+const shouldRenderField = computed(() => shouldShowField.value && !isHiddenFieldtype.value);
+
 const shouldShowLabelText = computed(() => !props.config.hide_display);
 
 // Whether the label renders anything visible. When it doesn't, we avoid rendering
@@ -166,6 +176,8 @@ const shouldShowLabel = computed(
 );
 
 const shouldShowFieldPreviews = computed(() => {
+    if (isHiddenFieldtype.value) return false;
+
     if (! props.config.replicator_preview) return false;
 
     return inject('showReplicatorFieldPreviews', false);
@@ -235,9 +247,10 @@ const fieldtypeComponentEvents = computed(() => ({
         :shouldShowField="shouldShowField"
     >
         <Field
-            v-show="shouldShowField"
+            v-show="shouldRenderField"
             :class="`${config.type}-fieldtype`"
             :id="fieldId"
+            :dir="direction"
             :instructions="config.instructions"
             :instructions-below="config.instructions_position === 'below'"
             :required="isRequired"
@@ -277,7 +290,7 @@ const fieldtypeComponentEvents = computed(() => ({
             <div class="text-xs text-red-600" v-if="!fieldtypeComponentExists && fieldtypeComponent !== 'spacer-fieldtype'">
                 Component <code v-text="fieldtypeComponent"></code> does not exist.
             </div>
-            <div :dir="direction" v-if="fieldtypeComponentExists" @focusin="focused" @focusout="blurred" :class="{ 'pointer-events-none select-none': isLocked }">
+            <div v-if="fieldtypeComponentExists" @focusin="focused" @focusout="blurred" :class="{ 'pointer-events-none select-none': isLocked }">
                 <Component
                     ref="fieldtype"
                     :is="fieldtypeComponent"

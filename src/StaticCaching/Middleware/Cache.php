@@ -185,7 +185,7 @@ class Cache
 
     private function canBeCached($request)
     {
-        if ($request->method() !== 'GET') {
+        if (! in_array($request->method(), ['GET', 'HEAD'])) {
             return false;
         }
 
