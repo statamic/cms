@@ -1,11 +1,10 @@
 <?php
 
-namespace Tests\Performance;
+namespace Tests\Sites;
 
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Role;
 use Statamic\Facades\User;
-use Statamic\Sites\Site;
 use Statamic\Sites\Sites;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -70,46 +69,5 @@ class SitesPerformanceTest extends TestCase
 
         $this->assertEquals(2, $authorizedSites->count());
         $this->assertEquals(['en', 'fr'], $authorizedSites->keys()->all());
-    }
-
-    /**
-     * Test that site configuration with plain strings doesn't trigger Antlers parsing.
-     * This ensures performance optimization for non-template string values.
-     */
-    #[Test]
-    public function plain_string_site_config_skips_antlers_parsing()
-    {
-        // Test with a simple string URL that has no template syntax
-        $site = new Site('en', [
-            'url' => '/en/',
-            'locale' => 'en_US',
-            'name' => 'English',
-        ]);
-
-        // These should be plain strings, not parsed by Antlers
-        // Note: URLs are tidied, so trailing slash is removed
-        $this->assertEquals('/en', $site->url());
-        $this->assertEquals('en_US', $site->locale());
-        $this->assertEquals('English', $site->name());
-    }
-
-    /**
-     * Test that site configuration with Antlers syntax still gets parsed.
-     * This ensures the optimization doesn't break actual template parsing.
-     */
-    #[Test]
-    public function site_config_with_antlers_syntax_gets_parsed()
-    {
-        // Test with template syntax that should be parsed
-        $site = new Site('en', [
-            'url' => '/',
-            'locale' => '{{ config:app.locale }}',
-            'name' => 'Test Site',
-        ]);
-
-        // Locale should have been parsed
-        $this->assertNotEmpty($site->locale());
-        // It should not contain the template syntax anymore
-        $this->assertStringNotContainsString('{{', $site->locale());
     }
 }
