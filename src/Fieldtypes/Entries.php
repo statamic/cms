@@ -526,7 +526,9 @@ class Entries extends Relationship
             ? Collection::findByHandle($this->getConfiguredCollections()[0])
             : null;
 
-        if (! $collection || ! $collection->hasStructure()) {
+        // Without permission to view the collection, the tree endpoint would reject the
+        // request, so don't offer the tree at all. The selector falls back to the list.
+        if (! $collection || ! $collection->hasStructure() || ! User::current()?->can('view', $collection)) {
             return parent::preload();
         }
 

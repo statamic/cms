@@ -3,12 +3,14 @@
 namespace Statamic\Http\Controllers\CP\Collections;
 
 use Illuminate\Http\Request;
+use Statamic\Facades\Site;
 use Statamic\Http\Controllers\CP\CpController;
 
 class ReorderEntriesController extends CpController
 {
     public function __invoke(Request $request, $collection)
     {
+        // Checked up front so an unauthorized user is denied before seeing any validation feedback.
         $this->authorize('reorder', $collection);
 
         $request->validate([
@@ -18,7 +20,11 @@ class ReorderEntriesController extends CpController
             'site' => 'required',
         ]);
 
-        $tree = $collection->structure()->in($request->site);
+        abort_unless($site = Site::get($request->site), 404);
+
+        $this->authorize('reorderInSite', [$collection, $site]);
+
+        $tree = $collection->structure()->in($site->handle());
 
         $contents = collect($tree->tree())->keyBy('entry');
 

@@ -144,6 +144,37 @@ class ReorderEntriesTest extends TestCase
         $this->assertEquals(7, Entry::find(7)->order());
     }
 
+    #[Test]
+    public function it_denies_access_to_a_site_you_cannot_access()
+    {
+        $this->setSites([
+            'en' => ['url' => '/', 'locale' => 'en_US'],
+            'fr' => ['url' => '/fr', 'locale' => 'fr_FR'],
+        ]);
+
+        $this->collection->sites(['en', 'fr'])->save();
+        $this->structure->makeTree('fr')->save();
+
+        EntryFactory::id('fr1')->collection('test')->locale('fr')->slug('a')->create();
+        EntryFactory::id('fr2')->collection('test')->locale('fr')->slug('b')->create();
+        $this->structure->in('fr')->tree([['entry' => 'fr1'], ['entry' => 'fr2']])->save();
+
+        $this->setTestRoles(['test' => ['access cp', 'view test entries', 'reorder test entries', 'access en site']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+
+        $this
+            ->from('/original')
+            ->actingAs($user)
+            ->reorder(['site' => 'fr', 'ids' => ['fr2', 'fr1'], 'page' => 1, 'perPage' => 10])
+            ->assertRedirect('/original')
+            ->assertSessionHas('error');
+
+        $this->assertEquals(
+            ['fr1', 'fr2'],
+            collect($this->structure->in('fr')->tree())->pluck('entry')->all()
+        );
+    }
+
     private function reorder($payload)
     {
         return $this->post(cp_route('collections.entries.reorder', 'test'), array_merge(['site' => 'en'], $payload));

@@ -18,11 +18,15 @@ class NavigationTreeController extends CpController
 
     public function index(Request $request, $handle)
     {
-        $nav = Nav::find($handle);
+        abort_unless($nav = Nav::find($handle), 404);
 
         $site = $request->site ?? Site::selected()->handle();
 
-        $nav->in($site)->ensureBranchIds();
+        abort_unless($tree = $nav->in($site), 404);
+
+        $this->authorize('view', $tree, __('You are not authorized to view navs.'));
+
+        $tree->ensureBranchIds();
 
         $pages = (new TreeBuilder)->buildForController([
             'structure' => $nav,

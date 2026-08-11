@@ -200,6 +200,70 @@ class UpdateCollectionTreeTest extends TestCase
             ->assertForbidden();
     }
 
+    #[Test]
+    public function it_denies_access_to_a_site_you_cannot_access()
+    {
+        $this->setSites([
+            'en' => ['url' => '/', 'locale' => 'en_US'],
+            'fr' => ['url' => '/fr', 'locale' => 'fr_FR'],
+        ]);
+
+        $this->setTestRoles(['test' => ['access cp', 'view test entries', 'reorder test entries', 'access en site']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+
+        $collection = tap(Collection::make('test')->sites(['en', 'fr'])->routes('{parent_uri}/{slug}'))->save();
+        EntryFactory::id('fr1')->collection($collection)->locale('fr')->slug('a')->create();
+        EntryFactory::id('fr2')->collection($collection)->locale('fr')->slug('b')->create();
+        $collection->structureContents(['root' => false])->save();
+        $collection->structure()->in('en')->tree([])->save();
+        $collection->structure()->in('fr')->tree([['entry' => 'fr1'], ['entry' => 'fr2']])->save();
+
+        $this
+            ->actingAs($user)
+            ->update($collection, ['site' => 'fr', 'pages' => [
+                ['id' => 'fr2', 'children' => []],
+                ['id' => 'fr1', 'children' => []],
+            ]])
+            ->assertForbidden();
+
+        $this->assertEquals(
+            ['fr1', 'fr2'],
+            collect(Collection::findByHandle('test')->structure()->in('fr')->tree())->pluck('entry')->all()
+        );
+    }
+
+    #[Test]
+    public function configure_collections_can_update_any_site()
+    {
+        $this->setSites([
+            'en' => ['url' => '/', 'locale' => 'en_US'],
+            'fr' => ['url' => '/fr', 'locale' => 'fr_FR'],
+        ]);
+
+        $this->setTestRoles(['test' => ['access cp', 'configure collections']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+
+        $collection = tap(Collection::make('test')->sites(['en', 'fr'])->routes('{parent_uri}/{slug}'))->save();
+        EntryFactory::id('fr1')->collection($collection)->locale('fr')->slug('a')->create();
+        EntryFactory::id('fr2')->collection($collection)->locale('fr')->slug('b')->create();
+        $collection->structureContents(['root' => false])->save();
+        $collection->structure()->in('en')->tree([])->save();
+        $collection->structure()->in('fr')->tree([['entry' => 'fr1'], ['entry' => 'fr2']])->save();
+
+        $this
+            ->actingAs($user)
+            ->update($collection, ['site' => 'fr', 'pages' => [
+                ['id' => 'fr2', 'children' => []],
+                ['id' => 'fr1', 'children' => []],
+            ]])
+            ->assertOk();
+
+        $this->assertEquals(
+            ['fr2', 'fr1'],
+            collect(Collection::findByHandle('test')->structure()->in('fr')->tree())->pluck('entry')->all()
+        );
+    }
+
     public function update($collection, $payload = [])
     {
         $validParams = [

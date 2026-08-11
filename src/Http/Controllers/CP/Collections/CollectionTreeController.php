@@ -12,16 +12,20 @@ use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Structures\TreeBuilder;
 use Statamic\Support\Arr;
 
+use function Statamic\trans as __;
+
 class CollectionTreeController extends CpController
 {
     public function index(Request $request, Collection $collection)
     {
-        $site = $request->site ?? Site::selected()->handle();
+        abort_unless($site = Site::get($request->site ?? Site::selected()->handle()), 404);
+
+        $this->authorize('viewInSite', [$collection, $site], __('You are not authorized to view this collection.'));
 
         $pages = (new TreeBuilder)->buildForController([
             'structure' => $collection->structure(),
             'include_home' => true,
-            'site' => $site,
+            'site' => $site->handle(),
         ]);
 
         return ['pages' => $pages];
@@ -29,12 +33,14 @@ class CollectionTreeController extends CpController
 
     public function update(Request $request, $collection)
     {
-        $this->authorize('reorder', $collection);
+        abort_unless($site = Site::get($request->site ?? Site::selected()->handle()), 404);
+
+        $this->authorize('reorderInSite', [$collection, $site]);
 
         $contents = $this->toTree($request->pages);
 
         $structure = $collection->structure();
-        $tree = $structure->in($request->site);
+        $tree = $structure->in($site->handle());
 
         // Clone the tree and add the submitted contents into it so we can
         // validate URI uniqueness without affecting the real object in memory.
@@ -44,7 +50,7 @@ class CollectionTreeController extends CpController
 
         // Validate the tree, which will add any missing entries or throw an exception
         // if somehow the root would end up having child pages, which isn't allowed.
-        $contents = $structure->validateTree($contents, $request->site);
+        $contents = $structure->validateTree($contents, $site->handle());
 
         return [
             'saved' => $tree->tree($contents)->save(),
