@@ -633,14 +633,23 @@ function toCsv(input) {
     return lines.join('\n');
 }
 
+function escapeMarkdownCell(value) {
+    return String(value ?? '')
+        .replace(/\|/g, '\\|')
+        .replace(/`/g, "'");
+}
+
 function toMarkdown(input) {
     const rows = Array.isArray(input) ? input : (input?.rows ?? reportJson());
     const header = '| phase | name | heat | count | total (ms) | mean (ms) | p95 (ms) | max (ms) |';
     const sep = '| --- | --- | --- | ---: | ---: | ---: | ---: | ---: |';
-    const body = rows.map(
-        (row) =>
-            `| ${row.phase} | \`${row.name}\` | ${row.heat} | ${row.count} | ${row.total} | ${row.mean} | ${row.p95} | ${row.max} |`,
-    );
+    const body = rows.map((row) => {
+        const name = escapeMarkdownCell(row.name);
+        const phase = escapeMarkdownCell(row.phase);
+        const heat = escapeMarkdownCell(row.heat);
+
+        return `| ${phase} | \`${name}\` | ${heat} | ${row.count ?? 0} | ${row.total ?? 0} | ${row.mean ?? 0} | ${row.p95 ?? 0} | ${row.max ?? 0} |`;
+    });
 
     return [header, sep, ...body].join('\n');
 }
@@ -672,14 +681,20 @@ async function copy(format = 'tsv') {
     const text = serialize(format);
     const rows = reportJson().length;
 
-    if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(text);
-        console.log(`%cCopied%c $perf ${format} (${rows} rows) to clipboard`, 'font-weight:700;color:#22c55e', '');
-    } else {
-        // Fallback: dump a selectable string when Clipboard API is unavailable.
-        console.log(`%cClipboard unavailable%c — copy the string below:`, 'font-weight:700;color:#f97316', '');
-        console.log(text);
+    // Clipboard API often rejects when invoked from the console without a user
+    // gesture (NotAllowedError) — fall back to dumping the string.
+    try {
+        if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(text);
+            console.log(`%cCopied%c $perf ${format} (${rows} rows) to clipboard`, 'font-weight:700;color:#22c55e', '');
+            return text;
+        }
+    } catch (error) {
+        console.warn(`$perf.copy(${JSON.stringify(format)}) clipboard write failed:`, error);
     }
+
+    console.log(`%cClipboard unavailable%c — copy the string below:`, 'font-weight:700;color:#f97316', '');
+    console.log(text);
 
     return text;
 }
@@ -843,16 +858,21 @@ async function copyDiff(baseline, current) {
     ];
     const text = lines.join('\n');
 
-    if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(text);
-        console.log(
-            `%cCopied%c $perf diff TSV (${result.rows.length} rows) to clipboard`,
-            'font-weight:700;color:#22c55e',
-            '',
-        );
-    } else {
-        console.log(text);
+    try {
+        if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(text);
+            console.log(
+                `%cCopied%c $perf diff TSV (${result.rows.length} rows) to clipboard`,
+                'font-weight:700;color:#22c55e',
+                '',
+            );
+            return text;
+        }
+    } catch (error) {
+        console.warn('$perf.copyDiff() clipboard write failed:', error);
     }
+
+    console.log(text);
 
     return text;
 }

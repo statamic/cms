@@ -204,6 +204,26 @@ test('copy writes export text to the clipboard', async () => {
     vi.unstubAllGlobals();
 });
 
+test('copy falls back to console when clipboard write is denied', async () => {
+    const writeText = vi.fn().mockRejectedValue(new Error('NotAllowedError'));
+    const log = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    vi.stubGlobal('navigator', { clipboard: { writeText } });
+
+    perf.enable();
+    perf.count('demo.copy.fallback');
+
+    const text = await perf.copy('md');
+    expect(writeText).toHaveBeenCalledOnce();
+    expect(text).toContain('`interact.demo.copy.fallback`');
+    expect(warn).toHaveBeenCalled();
+    expect(log).toHaveBeenCalledWith(text);
+
+    log.mockRestore();
+    warn.mockRestore();
+    vi.unstubAllGlobals();
+});
+
 test('formatDuration scales ms to s (and m) for readability', () => {
     expect(perf.formatDuration(0)).toBe('0ms');
     expect(perf.formatDuration(16)).toBe('16ms');
