@@ -16,8 +16,15 @@ class SendWebhook implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    public $tries = 5;
+
     public function __construct(public Submission $submission, public Site $site, public array $config)
     {
+    }
+
+    public function backoff(): array
+    {
+        return [10, 30, 120, 600];
     }
 
     public function handle(): void

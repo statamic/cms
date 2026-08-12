@@ -35,6 +35,7 @@ class Webhook extends Connection
             ->reject(fn (array $config) => ($config['enabled'] ?? true) === false)
             ->filter(fn (array $config) => ConnectionLogic::passes($config, $submission))
             ->map(fn (array $config) => new SendWebhook($submission, $submission->site(), $config))
+            ->values()
             ->all();
     }
 
