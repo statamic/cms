@@ -16,6 +16,7 @@ const props = defineProps({
     description: { type: String, default: null },
     /** When `true`, disables the checkbox */
     disabled: { type: Boolean, default: false },
+    id: { type: String, default: null },
     /** When `true`, displays the checkbox in an indeterminate state (shows a dash) */
     indeterminate: { type: Boolean, default: false },
     /** Label text to display next to the checkbox */
@@ -37,7 +38,7 @@ const emit = defineEmits(['update:modelValue', 'keydown']);
 
 const { appearance } = injectCheckboxContext() ?? { appearance: computed(() => 'default') };
 
-const id = useId();
+const id = useId(props.id);
 
 const handleKeydown = (event) => {
     emit('keydown', event);
