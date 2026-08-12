@@ -553,7 +553,11 @@ export default {
                     // Seed json from the editor once. Skip getHTML() here — it's a full-doc
                     // serialize and only needed when reading-time/footer config is enabled
                     // (computed lazily via onUpdate / readingTime).
+                    // Defer `mounted` so the json watcher skips this seed — TipTap often
+                    // normalizes content slightly, and pushing that into values was
+                    // refreshing Live Preview on scroll/expand (lazy init).
                     this.json = this.editor.getJSON().content;
+                    await this.$nextTick();
                     this.mounted = true;
                     return this.editor;
                 } catch (error) {

@@ -99,35 +99,47 @@ const payload = computed(() => ({
     extras: extras.value,
 }));
 
+// Progressive mounting / TipTap seed can deep-watch-churn `values` without a real
+// content change. Skip identical payloads from the watch so the iframe doesn't
+// refresh on scroll/expand. Explicit update() callers (open / popout / refresh)
+// still always POST.
+let lastPostedPayloadKey = null;
+
 watch(
     [payload, target],
-    (payload) => {
+    () => {
         perf.measure('livePreview.watch', () => {
-            if (props.enabled) {
-                perf.count('livePreview.update');
-                update();
-            }
+            if (!props.enabled) return;
+
+            const key = JSON.stringify([payload.value, target.value]);
+            if (key === lastPostedPayloadKey) return;
+
+            perf.count('livePreview.update');
+            update();
         });
     },
     { deep: true },
 );
 
 const update = debounce(() => {
+    const body = payload.value;
+    lastPostedPayloadKey = JSON.stringify([body, target.value]);
+
     if (source) source.abort();
     source = new AbortController();
 
     loading.value = true;
 
     axios
-        .post(tokenizedUrl.value, payload.value, { signal: source.signal })
+        .post(tokenizedUrl.value, body, { signal: source.signal })
         .then((response) => {
             token.value = response.data.token;
             const url = response.data.url;
             const tgt = toRaw(props.targets[target.value]);
-            const payload = { token: token.value, reference: props.reference };
+            const messagePayload = { token: token.value, reference: props.reference };
             poppedOut.value
-                ? channel.value.postMessage({ event: 'updated', url, target: tgt, payload })
-                : updateIframeContents(url, tgt, payload, setIframeAttributes);
+                ? channel.value.postMessage({ event: 'updated', url, target: tgt, payload: messagePayload })
+                : updateIframeContents(url, tgt, messagePayload, setIframeAttributes);
             loading.value = false;
         })
         .catch((e) => {
