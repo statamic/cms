@@ -70,6 +70,57 @@ class HalfMeasureStaticCachingTest extends TestCase
     }
 
     #[Test]
+    public function it_serves_head_requests_from_the_cache()
+    {
+        app()->instance('example_count', 0);
+
+        (new class extends \Statamic\Tags\Tags
+        {
+            public static $handle = 'example_count';
+
+            public function index()
+            {
+                $count = app('example_count');
+                $count++;
+                app()->instance('example_count', $count);
+
+                return $count;
+            }
+        })::register();
+
+        $this->withStandardFakeViews();
+        $this->viewShouldReturnRaw('default', '{{ example_count }}');
+
+        $this->createPage('about');
+
+        $this->get('/about')->assertOk()->assertSee('1');
+
+        $this->head('/about')->assertNoContent(200);
+
+        $this->assertEquals(1, app('example_count'));
+    }
+
+    #[Test]
+    public function it_doesnt_statically_cache_head_requests()
+    {
+        $this->withStandardFakeViews();
+        $this->viewShouldReturnRaw('default', '<h1>{{ title }}</h1>');
+
+        $page = $this->createPage('about', ['with' => ['title' => 'The About Page']]);
+
+        $this->head('/about')->assertNoContent(200);
+
+        $page
+            ->set('title', 'Updated title')
+            ->saveQuietly(); // Save quietly to prevent the invalidator from clearing the statically cached page.
+
+        $this
+            ->get('/about')
+            ->assertOk()
+            ->assertSee('<h1>Updated title</h1>', false);
+    }
+
+    #[Test]
     public function it_performs_replacements()
     {
         Carbon::setTestNow(Carbon::parse('2019-01-01'));

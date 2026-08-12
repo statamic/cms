@@ -162,6 +162,7 @@ class Email extends Connection
                                         'instructions' => __('statamic::messages.form_configure_email_views_instructions'),
                                         'folder' => config('statamic.forms.email_view_folder'),
                                         'width' => 50,
+                                        'clearable' => true,
                                     ],
                                 ],
                                 [
@@ -172,6 +173,7 @@ class Email extends Connection
                                         'instructions' => __('statamic::messages.form_configure_email_views_instructions'),
                                         'folder' => config('statamic.forms.email_view_folder'),
                                         'width' => 50,
+                                        'clearable' => true,
                                     ],
                                 ],
                                 [
