@@ -156,6 +156,11 @@ watch(
 );
 
 watch(
+    () => props.extraValues,
+    (newExtraValues) => extraValues.value = newExtraValues,
+);
+
+watch(
     () => props.meta,
     (newMeta) => meta.value = newMeta,
 );
