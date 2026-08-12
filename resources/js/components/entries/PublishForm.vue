@@ -285,6 +285,7 @@ import {
 	Stack,
 } from '@ui';
 import resetValuesFromResponse from '@/util/resetValuesFromResponse.js';
+import debounce from '@/util/debounce.js';
 import { computed, ref } from 'vue';
 import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } from '@ui/Publish/SavePipeline.js';
 import { router } from '@inertiajs/vue3';
@@ -629,6 +630,36 @@ export default {
             }
         },
 
+        generateTitle() {
+            const values = this.titleFormatValues();
+            const serialized = JSON.stringify(values);
+
+            if (serialized === this.lastTitleFormatValues) return;
+            this.lastTitleFormatValues = serialized;
+
+            this.titleRequest?.abort();
+            this.titleRequest = new AbortController();
+
+            this.$axios
+                .post(
+                    this.actions.titleFormat,
+                    { blueprint: this.fieldset.handle, values },
+                    { signal: this.titleRequest.signal },
+                )
+                .then(({ data }) => {
+                    if (data.title !== this.values.title) this.$refs.container.setFieldValue('title', data.title);
+                })
+                .catch((e) => {
+                    if (e.code !== 'ERR_CANCELED') throw e;
+                });
+        },
+
+        titleFormatValues() {
+            const { title, slug, ...values } = this.values;
+
+            return values;
+        },
+
         localizationSelected(localization) {
             if (!this.canSave) {
                 if (localization.exists) this.editLocalization(localization);
@@ -876,6 +907,11 @@ export default {
 
     created() {
         window.history.replaceState({}, document.title, document.location.href.replace('created=true', ''));
+
+        if (this.actions.titleFormat) {
+            this.lastTitleFormatValues = JSON.stringify(this.titleFormatValues());
+            this.$watch('values', debounce(() => this.generateTitle(), 300), { deep: true });
+        }
 
         this.selectedOrigin =
             this.originBehavior === 'active'
