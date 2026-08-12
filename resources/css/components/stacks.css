@@ -36,6 +36,11 @@
     }
 
     .stack-content {
+        /* Isolate stack layout from the rest of the CP.
+          - layout-only: no paint/size
+          - keeps shadows, focus rings, and portaled menus intact
+        */
+        contain: layout;
         @apply relative h-[calc(100svh-1rem)];
     }
 
