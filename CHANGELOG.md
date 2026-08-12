@@ -1,5 +1,15 @@
 # Release Notes
 
+## 5.74.4 (2026-08-12)
+
+### What's fixed
+- Hash URL in static caching lock key [#15061](https://github.com/statamic/cms/issues/15061) by @david-windsock
+- Tighten get modifier [#15138](https://github.com/statamic/cms/issues/15138) by @jasonvarga
+- Harden SVG sanitization [#15137](https://github.com/statamic/cms/issues/15137) by @jasonvarga
+- Tighten Antlers variable path resolution [#15154](https://github.com/statamic/cms/issues/15154) by @jasonvarga
+
+
+
 ## 5.74.3 (2026-07-08)
 
 ### What's fixed
