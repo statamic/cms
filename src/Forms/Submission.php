@@ -274,15 +274,22 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
 
         SubmissionFinalized::dispatch($this);
 
+        // Assets need to exist before anything reads the submission, so this stays
+        // synchronous. The connection jobs are chained behind each other instead.
+        CreateAssetsFromFileUploads::dispatchSync($this);
+
         $jobsFromConnections = $this->form()->connections()
-            ->map(fn (array $config, string $connection) => FormConnection::find($connection)?->finalized($this))
+            ->map(fn ($config, $connection) => FormConnection::find($connection)?->finalized($this))
             ->flatten();
 
-        Bus::chain(array_filter([
-            new CreateAssetsFromFileUploads($this),
+        $jobs = array_filter([
             ...$jobsFromConnections,
             $this->shouldDeleteTemporaryFiles() ? new DeleteTemporaryFiles($this) : null,
-        ]))->dispatch();
+        ]);
+
+        if ($jobs) {
+            Bus::chain($jobs)->dispatch();
+        }
 
         return $this;
     }

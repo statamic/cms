@@ -250,11 +250,11 @@ class Email extends Mailable
         }
 
         return collect(Arr::wrap($addresses))
-            ->flatMap(fn (string $address) => Str::startsWith($address, 'field:')
+            ->flatMap(fn ($address) => Str::startsWith($address, 'field:')
                 ? Arr::wrap($this->submission->get(Str::after($address, 'field:')))
                 : [$address])
-            ->flatMap(fn ($address) => explode(',', (string) $address))
-            ->map(fn (string $address) => trim($this->sanitize($address)))
+            ->flatMap(fn ($address) => is_scalar($address) ? explode(',', (string) $address) : [])
+            ->map(fn ($address) => trim($this->sanitize((string) $address)))
             ->filter()
             ->map(function (string $email): array {
                 $name = null;
@@ -279,7 +279,7 @@ class Email extends Mailable
         return preg_replace('/[\x00-\x1F\x7F]/u', '', $value);
     }
 
-    private function parseConfig(array $config): Collection
+    protected function parseConfig(array $config): Collection
     {
         return collect($config)
             ->except('conditions')

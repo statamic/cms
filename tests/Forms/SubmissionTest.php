@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Queue;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\SubmissionCreated;
@@ -405,13 +406,28 @@ class SubmissionTest extends TestCase
 
         $form->makeSubmission()->asPartial()->finalize();
 
+        Bus::assertDispatchedSync(CreateAssetsFromFileUploads::class);
+
         Bus::assertChained([
-            CreateAssetsFromFileUploads::class,
             SendEmails::class,
             SendWebhook::class,
             SendWebhook::class,
             DeleteTemporaryFiles::class,
         ]);
+    }
+
+    #[Test]
+    public function finalizing_without_connections_or_uploads_doesnt_chain_anything()
+    {
+        // Not faking the bus, so an empty chain would blow up on a null first job.
+        Queue::fake();
+
+        $form = tap(Form::make('contact_us'))->save();
+
+        $form->makeSubmission()->asPartial()->finalize();
+
+        Queue::assertPushed(CreateAssetsFromFileUploads::class);
+        Queue::assertCount(1);
     }
 
     #[Test]

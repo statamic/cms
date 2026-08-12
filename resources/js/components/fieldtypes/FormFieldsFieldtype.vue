@@ -12,7 +12,8 @@ const options = computed(() => props.meta.options ?? []);
 
 const category = (handle) => categories[handle] ?? categories.other;
 const categoryTitle = (handle) => category(handle).title;
-const iconClasses = (handle) => `size-4 shrink-0 ${categoryColorClasses[category(handle).color].icon}`;
+const iconClasses = (handle) =>
+    `size-4 shrink-0 ${categoryColorClasses[category(handle).color]?.icon ?? 'text-gray-600 dark:text-gray-400'}`;
 </script>
 
 <template>

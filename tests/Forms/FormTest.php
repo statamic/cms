@@ -459,10 +459,27 @@ class FormTest extends TestCase
 
         $form->email([['to' => 'foo@bar.com']]);
 
-        $this->assertEquals([
-            'webhook' => [['url' => 'https://example.com/hook']],
-            'email' => [['to' => 'foo@bar.com']],
-        ], $form->connections()->all());
+        $this->assertEquals(['webhook', 'email'], $form->connections()->keys()->all());
+        $this->assertEquals([['url' => 'https://example.com/hook']], $form->connections()->get('webhook'));
+        $this->assertEquals([['to' => 'foo@bar.com']], collect($form->email())->map(fn ($config) => Arr::except($config, 'id'))->all());
+    }
+
+    #[Test]
+    public function it_gives_email_configs_an_id_when_setting()
+    {
+        $form = Form::make('contact_us')->email([['to' => 'foo@bar.com'], ['to' => 'baz@qux.com']]);
+
+        $ids = collect($form->email())->pluck('id');
+
+        $this->assertCount(2, $ids->filter()->unique());
+    }
+
+    #[Test]
+    public function it_keeps_existing_email_ids_when_setting()
+    {
+        $form = Form::make('contact_us')->email([['id' => 'abc', 'to' => 'foo@bar.com']]);
+
+        $this->assertEquals('abc', $form->email()[0]['id']);
     }
 
     #[Test]
@@ -470,7 +487,7 @@ class FormTest extends TestCase
     {
         $form = Form::make('contact_us')->email(['to' => 'foo@bar.com']);
 
-        $this->assertEquals([['to' => 'foo@bar.com']], $form->email());
+        $this->assertEquals([['to' => 'foo@bar.com']], collect($form->email())->map(fn ($config) => Arr::except($config, 'id'))->all());
     }
 
     #[Test]

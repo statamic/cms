@@ -323,9 +323,16 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
 
         is_null($emails)
             ? $connections->forget('email')
-            : $connections->put('email', isset($emails['to']) ? [$emails] : $emails);
+            : $connections->put('email', $this->emailsWithIds($emails));
 
         return $this->connections($connections);
+    }
+
+    private function emailsWithIds($emails): array
+    {
+        return collect(isset($emails['to']) ? [$emails] : $emails)
+            ->map(fn ($config) => ['id' => Str::random(8), ...$config])
+            ->all();
     }
 
     /**
@@ -389,7 +396,7 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
             'title' => $this->title,
             'fields' => $this->formFields()->contents(),
             'honeypot' => $this->honeypot,
-            'connections' => $this->connections()->map(fn ($config) => Arr::removeNullValues($config))->all(),
+            'connections' => $this->connectionsFileData(),
         ]))->filter()->all();
 
         if ($this->store === false) {
@@ -417,6 +424,21 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
 
             FormSaved::dispatch($this);
         }
+    }
+
+    private function connectionsFileData(): array
+    {
+        return $this->connections()
+            ->map(function ($config) {
+                if (! is_array($config)) {
+                    return $config;
+                }
+
+                return array_is_list($config)
+                    ? array_map(fn ($item) => is_array($item) ? Arr::removeNullValues($item) : $item, $config)
+                    : Arr::removeNullValues($config);
+            })
+            ->all();
     }
 
     public function deleteQuietly()
@@ -475,14 +497,8 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
                 $this->{$property}($value);
             });
 
-        if (! Arr::has($contents, 'connections.email') && isset($contents['email'])) {
-            $email = $contents['email'];
-
-            $emails = collect(isset($email['to']) ? [$email] : $email)
-                ->map(fn (array $config) => ['id' => Str::random(8), ...$config])
-                ->all();
-
-            $this->connections($this->connections()->put('email', $emails));
+        if (! is_null($emails = Arr::get($contents, 'connections.email', $contents['email'] ?? null))) {
+            $this->connections($this->connections()->put('email', $this->emailsWithIds($emails)));
         }
 
         if (isset($contents['fields'])) {

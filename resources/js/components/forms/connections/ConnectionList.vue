@@ -38,9 +38,16 @@ const expand = (id) => (collapsed.value = collapsed.value.filter((itemId) => ite
 const confirmingRemoval = ref(null);
 
 const remove = () => {
-    emit('remove', confirmingRemoval.value);
+    const item = items.value.find((item) => item.id === confirmingRemoval.value);
+
+    expand(confirmingRemoval.value);
     confirmingRemoval.value = null;
+
+    if (item) emit('remove', item);
 };
+
+const updateEnabled = (item, enabled) =>
+    (items.value = items.value.map((existing) => (existing.id === item.id ? { ...existing, enabled } : existing)));
 </script>
 
 <template>
@@ -66,8 +73,8 @@ const remove = () => {
                         @collapsed="collapse(item.id)"
                         @expanded="expand(item.id)"
                         @duplicated="emit('duplicate', item)"
-                        @removed="confirmingRemoval = item"
-                        @update:enabled="item.enabled = $event"
+                        @removed="confirmingRemoval = item.id"
+                        @update:enabled="updateEnabled(item, $event)"
                     >
                         <template #header>
                             <slot name="header" :item="item" :index="index" :collapsed="collapsed.includes(item.id)" />

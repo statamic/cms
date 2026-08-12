@@ -11,6 +11,7 @@ use Statamic\Facades\Form as FacadesForm;
 use Statamic\Facades\Site;
 use Statamic\Forms\Email;
 use Statamic\Forms\SendEmails;
+use Statamic\Support\Arr;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -39,7 +40,7 @@ class SendEmailsTest extends TestCase
         $this->sendEmails($form->makeSubmission());
 
         Mail::assertSent(Email::class, 2);
-        Mail::assertSent(Email::class, fn (Email $email) => $email->getConfig() === [
+        Mail::assertSent(Email::class, fn (Email $email) => Arr::except($email->getConfig(), 'id') === [
             'from' => 'first@sender.com',
             'to' => 'first@recipient.com',
             'foo' => 'bar',
@@ -47,7 +48,7 @@ class SendEmailsTest extends TestCase
             // the email class will handle that. we don't want to double parse.
             'unparsed' => '{{ test }}',
         ]);
-        Mail::assertSent(Email::class, fn (Email $email) => $email->getConfig() === [
+        Mail::assertSent(Email::class, fn (Email $email) => Arr::except($email->getConfig(), 'id') === [
             'from' => 'second@sender.com',
             'to' => 'second@recipient.com',
             'baz' => 'qux',
@@ -92,7 +93,7 @@ class SendEmailsTest extends TestCase
         $this->sendEmails($form->makeSubmission());
 
         Mail::assertSent(Email::class, 1);
-        Mail::assertSent(Email::class, fn (Email $email) => $email->getConfig() === [
+        Mail::assertSent(Email::class, fn (Email $email) => Arr::except($email->getConfig(), 'id') === [
             'from' => 'first@sender.com',
             'to' => 'first@recipient.com',
             'foo' => 'bar',
