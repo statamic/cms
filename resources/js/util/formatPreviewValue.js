@@ -92,7 +92,7 @@ export default function formatPreviewValue(value, fieldConfig, options = {}) {
 
     // Handle PreviewHtml instances
     if (value instanceof PreviewHtml) {
-        return value.html;
+        return typeof value.html === 'string' ? value.html : null;
     }
 
     const type = fieldConfig?.type;

@@ -44,12 +44,14 @@ export function buildPreviewText({
                 return true;
             })
             .map((value) => {
-                if (value instanceof PreviewHtml) return value.html;
+                if (value instanceof PreviewHtml) {
+                    return typeof value.html === 'string' ? value.html : '';
+                }
                 if (typeof value === 'string') return escapeHtml(value);
                 if (Array.isArray(value)) return escapeHtml(value.join(', '));
                 return escapeHtml(String(value));
             })
-            .filter((html) => html && html.trim() !== '');
+            .filter((html) => typeof html === 'string' && html.trim() !== '');
     } else {
         // Fallback: extract values directly from values
         const fields = Array.isArray(config.fields) ? config.fields : Object.values(config.fields || {});
@@ -64,7 +66,7 @@ export function buildPreviewText({
                 return true;
             })
             .map((field) => formatPreviewValue(values?.[field.handle], field, { escape: true }))
-            .filter((value) => value && value.trim() !== '');
+            .filter((value) => typeof value === 'string' && value.trim() !== '');
     }
 
     return previewValues.join(separator);
