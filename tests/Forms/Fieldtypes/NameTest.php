@@ -19,7 +19,9 @@ class NameTest extends TestCase
 
         $this->assertEquals([
             'type' => 'text',
+            'autocomplete' => 'name',
             'placeholder' => 'Your name',
+            'validate' => ['not_regex:/\pN/u'],
         ], $fieldtype->toFieldArray());
     }
 
@@ -34,8 +36,26 @@ class NameTest extends TestCase
 
         $this->assertEquals([
             'type' => 'text',
+            'autocomplete' => 'name',
             'placeholder' => 'Your name',
+            'validate' => ['not_regex:/\pN/u'],
             'default' => 'John',
+        ], $fieldtype->toFieldArray());
+    }
+
+    #[Test]
+    public function it_appends_to_configured_validation_rules()
+    {
+        $fieldtype = (new Name)->setField(new FormField('name', [
+            'type' => 'name',
+            'validate' => ['required'],
+        ]));
+
+        $this->assertEquals([
+            'type' => 'text',
+            'autocomplete' => 'name',
+            'placeholder' => null,
+            'validate' => ['required', 'not_regex:/\pN/u'],
         ], $fieldtype->toFieldArray());
     }
 }

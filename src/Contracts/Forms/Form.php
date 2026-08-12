@@ -9,7 +9,7 @@ interface Form extends Arrayable
     /**
      * Get or set the handle.
      *
-     * @param  string|null  $name
+     * @param  string|null  $handle
      * @return string
      */
     public function handle($handle = null);
@@ -58,14 +58,6 @@ interface Form extends Arrayable
      * @return string
      */
     public function honeypot($honeypot = null);
-
-    /**
-     * Get all the metrics.
-     *
-     * @param  array|null  $metrics
-     * @return array
-     */
-    public function metrics($metrics = null);
 
     /**
      * Get or set the email config.

@@ -129,6 +129,26 @@ class GenerateFakeSubmissionTest extends TestCase
     }
 
     #[Test]
+    public function it_generates_values_for_image_choice_fields()
+    {
+        $form = $this->makeForm('contact');
+        $user = $this->userWithConfigureFormsPermission();
+
+        $this
+            ->actingAs($user)
+            ->post(cp_route('forms.submissions.generate-fake', $form->handle()), ['mode' => 'cp_only'])
+            ->assertOk();
+
+        $submission = $form->querySubmissions()->first();
+
+        $this->assertContains($submission->get('session_type'), ['Headshots', 'Team', 'Product']);
+        $this->assertIsArray($submission->get('mood'));
+        $this->assertNotEmpty($submission->get('mood'));
+        $this->assertEmpty(array_diff($submission->get('mood'), ['happy', 'sad', 'meh']));
+        $this->assertContains($submission->get('recommend'), ['yes', 'no']);
+    }
+
+    #[Test]
     public function it_cannot_generate_fake_submissions_when_disabled_in_form_configuration()
     {
         $form = $this->makeForm('contact', false);
@@ -160,6 +180,30 @@ class GenerateFakeSubmissionTest extends TestCase
                     'a' => 'A',
                     'b' => 'B',
                     'c' => 'C',
+                ],
+            ],
+            'session_type' => [
+                'type' => 'image_choice',
+                'options' => [
+                    ['key' => 'Headshots', 'image' => 'portrait.png'],
+                    ['key' => 'Team', 'image' => 'team.png'],
+                    ['key' => 'Product', 'image' => 'product.png'],
+                ],
+            ],
+            'mood' => [
+                'type' => 'image_choice',
+                'multiple' => true,
+                'options' => [
+                    ['key' => 'happy', 'image' => 'happy.png'],
+                    ['key' => 'sad', 'image' => 'sad.png'],
+                    ['key' => 'meh', 'image' => 'meh.png'],
+                ],
+            ],
+            'recommend' => [
+                'type' => 'yes_no',
+                'options' => [
+                    'yes' => 'Yes',
+                    'no' => 'No',
                 ],
             ],
             'rich_content' => ['type' => 'bard'],

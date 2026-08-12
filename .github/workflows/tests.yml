@@ -28,17 +28,25 @@ jobs:
         laravel: [12.*, 13.*]
         stability: [prefer-lowest, prefer-stable]
         os: [ubuntu-latest]
+        shard: [1, 2, 3, 4]
+        shards: [4] # single value, so it doesn't multiply the combinations
+        # An include entry that overrides an existing matrix key (os) creates a standalone
+        # combination rather than merging, so it wouldn't inherit the shard dimension.
+        # Windows is the slowest job, so each shard has to be listed explicitly. It's split
+        # more ways than ubuntu because its tests take roughly twice as long to run.
         include:
-          - os: windows-latest
-            php: 8.5
-            laravel: 12.*
-            stability: prefer-stable
+          - { os: windows-latest, php: 8.5, laravel: '12.*', stability: prefer-stable, shard: 1, shards: 6 }
+          - { os: windows-latest, php: 8.5, laravel: '12.*', stability: prefer-stable, shard: 2, shards: 6 }
+          - { os: windows-latest, php: 8.5, laravel: '12.*', stability: prefer-stable, shard: 3, shards: 6 }
+          - { os: windows-latest, php: 8.5, laravel: '12.*', stability: prefer-stable, shard: 4, shards: 6 }
+          - { os: windows-latest, php: 8.5, laravel: '12.*', stability: prefer-stable, shard: 5, shards: 6 }
+          - { os: windows-latest, php: 8.5, laravel: '12.*', stability: prefer-stable, shard: 6, shards: 6 }
 
-    name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability }} - ${{ matrix.os }}
+    name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability }} - ${{ matrix.os }} - shard ${{ matrix.shard }}/${{ matrix.shards }}
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
@@ -101,7 +109,19 @@ jobs:
 
       - name: Execute tests
         if: steps.should-run-tests.outputs.result == 'true'
-        run: vendor/bin/phpunit
+        run: vendor/bin/pest --shard=${{ matrix.shard }}/${{ matrix.shards }} --ci # zizmor: ignore[template-injection] shard is a static list defined in the matrix above
+
+  php-tests-result:
+    name: PHP tests
+    runs-on: ubuntu-latest
+    needs: [php-tests]
+    if: always()
+    permissions: {}
+
+    steps:
+      - name: Fail if any shard failed
+        if: needs.php-tests.result != 'success' && needs.php-tests.result != 'skipped'
+        run: exit 1
 
   js-tests:
     runs-on: ubuntu-latest
@@ -113,7 +133,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
@@ -159,14 +179,14 @@ jobs:
   slack:
     name: Slack Notification
     runs-on: ubuntu-latest
-    needs: [php-tests, js-tests]
+    needs: [php-tests-result, js-tests]
     permissions:
       actions: read # required by workflow-conclusion-action to determine overall workflow status
     if: always()
     steps:
       - uses: technote-space/workflow-conclusion-action@45ce8e0eb155657ab8ccf346ade734257fd196a5 # v3.0.3
       - name: Send Slack notification
-        uses: slackapi/slack-github-action@0d95c9a7becc1e6e297d76df9bc735c44f4cbcbc # v3.0.5
+        uses: slackapi/slack-github-action@dcb1066f776dd043e64d0e8ba94ca15cc7e1875d # v4.0.0
         if: env.WORKFLOW_CONCLUSION == 'failure' && github.event_name == 'schedule'
         with:
           webhook: ${{ secrets.SLACK_WEBHOOK }}

@@ -28,6 +28,28 @@ class FormTest extends TestCase
     }
 
     #[Test]
+    public function it_falls_back_to_the_handle_for_the_title()
+    {
+        $form = Form::make('contact_us');
+
+        $this->assertEquals('Contact_us', $form->title());
+
+        $form->title('Contact Us');
+
+        $this->assertEquals('Contact Us', $form->title());
+    }
+
+    #[Test]
+    public function it_doesnt_save_the_fallback_title()
+    {
+        $form = Form::make('contact_us');
+
+        $form->save();
+
+        $this->assertStringNotContainsString('title', File::get($form->path()));
+    }
+
+    #[Test]
     public function it_saves_a_form()
     {
         Event::fake();

@@ -6,7 +6,7 @@ import { injectBuilderContext } from '@/pages/forms/Builder.vue';
 import FieldValidationBuilder from '@/components/field-validation/Builder.vue';
 import FieldConditionsBuilder from '@/components/field-conditions/Builder.vue';
 import FieldNumber from '@/components/forms/FieldNumber.vue';
-import { categories, categoryColorClasses } from './categories';
+import { categories, categoryColorClasses, collectsValue } from './categories';
 import { writeFieldConditions } from '@/composables/forms/field-conditions';
 import debounce from '@/util/debounce';
 
@@ -47,7 +47,7 @@ const modifiedFields = ref<string[]>([]);
 
 let skipNextPreviewUpdate = false;
 
-const shouldShowValidationTab = computed(() => !['structure', 'information'].includes(getFieldtypeCategory(field.value.config.type).handle));
+const shouldShowValidationTab = computed(() => collectsValue(getFieldtypeCategoryHandle(field.value.config.type)));
 
 const adjustedBlueprint = computed(() => {
     const bp = JSON.parse(JSON.stringify(blueprint.value));
@@ -152,7 +152,7 @@ const suggestableConditionFields = computed(() => {
         .flatMap((page) => page.sections)
         .flatMap((section) => section.fields)
         .filter((f) => f._id !== field.value._id)
-        .filter((f) => f.type === 'import' || !['structure', 'information'].includes(getFieldtypeCategory(f.config.type).handle))
+        .filter((f) => f.type === 'import' || collectsValue(getFieldtypeCategoryHandle(f.config.type)))
         .map((f) => ({
             handle: f.handle,
             config: {
@@ -163,11 +163,12 @@ const suggestableConditionFields = computed(() => {
         }));
 });
 
-const getFieldtypeCategory = (fieldtypeHandle: string) => {
+const getFieldtypeCategoryHandle = (fieldtypeHandle: string) => {
     const fieldtype = fieldtypes?.find((field) => field.handle === fieldtypeHandle);
-    const categoryKey = fieldtype?.categories?.[0] || 'other';
-    return categories[categoryKey] ?? categories.other;
+    return fieldtype?.categories?.[0] || 'other';
 };
+
+const getFieldtypeCategory = (fieldtypeHandle: string) => categories[getFieldtypeCategoryHandle(fieldtypeHandle)] ?? categories.other;
 
 const fieldIconClasses = (fieldtypeHandle: string) => `size-4 shrink-0 ${categoryColorClasses[getFieldtypeCategory(fieldtypeHandle)?.color]?.icon}`;
 const findSuggestableField = (handle: string) => suggestableConditionFields.value.find((f) => f.handle === handle);

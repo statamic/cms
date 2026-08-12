@@ -200,7 +200,9 @@
 }
 
 /* Page 1 of 2, etc. */
-[data-form-page-label] {
+[data-form-page-label],
+/* Next/previous page buttons */
+[data-pagination] {
     scroll-margin-top: 7rem;
 }
 

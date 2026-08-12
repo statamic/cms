@@ -46,7 +46,6 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
     protected $honeypot;
     protected $store;
     protected $email;
-    protected $metrics;
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
 
@@ -81,7 +80,12 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
      */
     public function title($title = null)
     {
-        return $this->fluentlyGetOrSet('title')->args(func_get_args());
+        return $this
+            ->fluentlyGetOrSet('title')
+            ->getter(function ($title) {
+                return $title ?? ucfirst($this->handle);
+            })
+            ->args(func_get_args());
     }
 
     public function formFields($fields = null)
@@ -365,7 +369,6 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
 
                 return Arr::removeNullValues($email);
             })->all(),
-            'metrics' => $this->metrics,
         ]))->filter()->all();
 
         if ($this->store === false) {
@@ -456,37 +459,6 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
         }
 
         return $this;
-    }
-
-    // TODO: Reimplement metrics()
-    public function metrics($metrics = null)
-    {
-        return collect();
-
-        // if (! is_null($metrics)) {
-        //     return $this->formset()->set('metrics', $metrics);
-        // }
-
-        // $metrics = [];
-
-        // foreach ($this->formset()->get('metrics', []) as $config) {
-        //     $name = Str::studly($config['type']);
-
-        //     $class = "Statamic\\Forms\\Metrics\\{$name}Metric";
-
-        //     if (! class_exists($class)) {
-        //         $class = "Statamic\\Addons\\{$name}\\{$name}Metric";
-        //     }
-
-        //     if (! class_exists($class)) {
-        //         \Log::error("Metric [{$config['type']}] does not exist.");
-        //         continue;
-        //     }
-
-        //     $metrics[] = new $class($this, $config);
-        // }
-
-        // return $metrics;
     }
 
     /**
