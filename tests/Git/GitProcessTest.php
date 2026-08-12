@@ -66,8 +66,8 @@ class GitProcessTest extends TestCase
         $this->assertTrue(Git::create($this->basePath('temp/content/taxonomies'))->isRepo());
         $this->assertTrue(Git::create($this->basePath('temp/assets'))->isRepo());
 
-        // Traversing up from the app would land inside this repo when running from a
-        // worktree, so use the system temp directory, which is never in a repo.
+        // Traversing up from the app would land inside a repo whenever this checkout is
+        // nested within one (e.g. a Claude worktree), so use the system temp directory.
         $notARepoPath = Path::resolve(sys_get_temp_dir().'/statamic-not-a-repo-'.uniqid());
 
         $this->createTempDirectory($notARepoPath);
