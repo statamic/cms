@@ -125,6 +125,8 @@ export function truncate(string, length, ending = '...') {
 }
 
 export function escapeHtml(string) {
+    if (typeof string !== 'string') return string;
+
     return string
         .replaceAll('&', '&amp;')
         .replaceAll('<', '&lt;')
