@@ -343,6 +343,7 @@ class FormsController extends CpController
                                     'display' => __('HTML view'),
                                     'instructions' => __('statamic::messages.form_configure_email_html_instructions'),
                                     'folder' => config('statamic.forms.email_view_folder'),
+                                    'clearable' => true,
                                 ],
                             ],
                             [
@@ -352,6 +353,7 @@ class FormsController extends CpController
                                     'display' => __('Text view'),
                                     'instructions' => __('statamic::messages.form_configure_email_text_instructions'),
                                     'folder' => config('statamic.forms.email_view_folder'),
+                                    'clearable' => true,
                                 ],
                             ],
                             [
