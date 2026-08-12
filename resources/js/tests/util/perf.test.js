@@ -189,6 +189,14 @@ test('snapshot and markdown/tsv exports are pasteable', () => {
     expect(tsv).toContain('interact.demo.export');
 });
 
+test('markdown export escapes backslashes before pipes in metric names', () => {
+    perf.enable();
+    perf.count('demo\\pipe|name');
+
+    const md = perf.toMarkdown();
+    expect(md).toContain('`interact.demo\\\\pipe\\|name`');
+});
+
 test('copy writes export text to the clipboard', async () => {
     const writeText = vi.fn().mockResolvedValue(undefined);
     vi.stubGlobal('navigator', { clipboard: { writeText } });
