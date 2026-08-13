@@ -95,6 +95,7 @@ use Statamic\Http\Controllers\CP\StartPageController;
 use Statamic\Http\Controllers\CP\Taxonomies\PublishedTermsController;
 use Statamic\Http\Controllers\CP\Taxonomies\ReorderTaxonomyBlueprintsController;
 use Statamic\Http\Controllers\CP\Taxonomies\ReorderTermsController;
+use Statamic\Http\Controllers\CP\Taxonomies\ScaffoldTaxonomyController;
 use Statamic\Http\Controllers\CP\Taxonomies\TaxonomiesController;
 use Statamic\Http\Controllers\CP\Taxonomies\TaxonomyBlueprintsController;
 use Statamic\Http\Controllers\CP\Taxonomies\TaxonomyTreeController;
@@ -217,6 +218,8 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     });
 
     Route::resource('taxonomies', TaxonomiesController::class);
+    Route::get('taxonomies/{taxonomy}/scaffold', [ScaffoldTaxonomyController::class, 'index'])->name('taxonomies.scaffold');
+    Route::post('taxonomies/{taxonomy}/scaffold', [ScaffoldTaxonomyController::class, 'create'])->name('taxonomies.scaffold.create');
     Route::get('taxonomies/{taxonomy}/tree', [TaxonomyTreeController::class, 'index'])->name('taxonomies.tree.index');
     Route::patch('taxonomies/{taxonomy}/tree', [TaxonomyTreeController::class, 'update'])->name('taxonomies.tree.update');
 

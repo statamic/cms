@@ -269,6 +269,8 @@ return [
     'taxonomy_next_steps_blueprints_description' => 'Manage the blueprints and fields available for this taxonomy.',
     'taxonomy_next_steps_configure_description' => 'Configure names, associate collections, define blueprints, and more.',
     'taxonomy_next_steps_create_term_description' => 'Create the first term or stub out a handful of placeholder terms—it\'s up to you.',
+    'taxonomy_next_steps_scaffold_description' => 'Generate index and detail views from the taxonomy name at the click of a button.',
+    'taxonomy_scaffold_instructions' => 'Select and configure views to generate. Any existing files will be preserved.',
     'theme_share_instructions' => 'Publish this theme through your statamic.com account to make it available to others.',
     'try_again_in_seconds' => '{0,1}Try again now.|Try again in :count seconds.',
     'try_again_in_minutes' => 'Try again in a minute.|Try again in :count minutes.',

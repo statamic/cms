@@ -45,6 +45,7 @@ export default {
         'canConfigureFields',
         'deleteUrl',
         'createLabel',
+        'scaffoldUrl',
         'structured',
         'canReorder',
         'structurePagesUrl',
@@ -250,6 +251,14 @@ export default {
             });
 
             Statamic.$commandPalette.add({
+                when: () => this.canEdit,
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Scaffold Views'),
+                icon: 'scaffold',
+                url: this.scaffoldUrl,
+            });
+
+            Statamic.$commandPalette.add({
                 when: () => this.canDelete,
                 category: Statamic.$commandPalette.category.Actions,
                 text: __('Delete Taxonomy'),
@@ -286,6 +295,7 @@ export default {
                 <DropdownMenu>
                     <DropdownItem v-if="canEdit" :text="__('Configure Taxonomy')" icon="cog" :href="taxonomyEditUrl" />
                     <DropdownItem v-if="canConfigureFields" :text="__('Edit Blueprints')" icon="blueprint-edit" :href="taxonomyBlueprintsUrl" />
+                    <DropdownItem v-if="canEdit" :text="__('Scaffold Views')" icon="scaffold" :href="scaffoldUrl" />
                     <DropdownItem v-if="canDelete" :text="__('Delete Taxonomy')" icon="trash" variant="destructive" @click="deleteTaxonomy()" />
                 </DropdownMenu>
             </Dropdown>

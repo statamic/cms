@@ -105,6 +105,7 @@ class TaxonomiesController extends CpController
             'taxonomyBlueprintsUrl' => cp_route('blueprints.taxonomies.index', $taxonomy),
             'canEdit' => User::current()->can('edit', $taxonomy),
             'canConfigureFields' => User::current()->can('configure fields'),
+            'scaffoldUrl' => cp_route('taxonomies.scaffold', $taxonomy->handle()),
         ];
 
         if ($taxonomy->hasStructure()) {
