@@ -117,7 +117,7 @@ const shouldBeIndented = (index) => {
             <ol>
                 <li v-if="conditions.length === 0">
                     <div class="flex items-center">
-                        <div class="logic-text__condition" aria-hidden="true">
+                        <div class="logic-text__condition">
                             <Combobox
                                 :model-value="when"
                                 class="min-w-34"
@@ -158,7 +158,7 @@ const shouldBeIndented = (index) => {
                     :class="{ 'ms-(--inner-indent) indented-condition': shouldBeIndented(index) }"
                 >
                     <div class="flex items-center gap-0.25">
-                        <div v-if="index === 0" class="logic-text__condition" aria-hidden="true">
+                        <div v-if="index === 0" class="logic-text__condition">
                             <Combobox
                                 :model-value="when"
                                 class="min-w-34"
