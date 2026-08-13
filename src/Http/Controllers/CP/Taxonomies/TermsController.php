@@ -18,6 +18,7 @@ use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 use Statamic\Rules\Slug;
 use Statamic\Rules\UniqueTermValue;
 use Statamic\Statamic;
+use Statamic\Support\Str;
 
 use function Statamic\trans as __;
 
@@ -138,6 +139,12 @@ class TermsController extends CpController
             'previewTargets' => $taxonomy->previewTargets()->all(),
             'itemActions' => Action::for($term, ['taxonomy' => $taxonomy->handle(), 'view' => 'form']),
             'hasTemplate' => view()->exists($term->template()),
+            'parents' => $taxonomy->hierarchical()
+                ? $term->ancestors()->map(fn ($ancestor) => [
+                    'title' => $ancestor->title(),
+                    'edit_url' => $ancestor->editUrl(),
+                ])->all()
+                : [],
         ];
 
         if ($request->wantsJson()) {
@@ -237,6 +244,7 @@ class TermsController extends CpController
             'meta' => $fields->meta(),
             'taxonomy' => $taxonomy->handle(),
             'taxonomyCreateLabel' => $taxonomy->createLabel(),
+            'parent' => $taxonomy->hasStructure() ? $request->parent : null,
             'blueprint' => $blueprint->toPublishArray(),
             'published' => $taxonomy->defaultPublishState(),
             'locale' => $site->handle(),
@@ -307,8 +315,31 @@ class TermsController extends CpController
 
         $saved = $term->updateLastModified(User::current())->save();
 
+        if ($saved && $taxonomy->hasStructure() && ($parent = $request->_parent)) {
+            $this->graftTermIntoTree($taxonomy, $term, $parent);
+        }
+
         return (new TermResource($term))
             ->additional(['saved' => $saved]);
+    }
+
+    private function graftTermIntoTree($taxonomy, $term, $parent)
+    {
+        $parent = Str::after($parent, '::');
+
+        $tree = $taxonomy->structure()->tree();
+
+        if (! $tree->find($parent)) {
+            return;
+        }
+
+        $slug = $term->inDefaultLocale()->slug();
+
+        // Repair the persisted tree (normalize entry keys / full IDs) without
+        // running read-time validation, which would append this new term at the root.
+        $raw = $taxonomy->structure()->repairTree($tree->fileData()['tree'] ?? []);
+
+        $tree->tree($raw)->appendTo($parent, $slug)->save();
     }
 
     protected function getAuthorizedSitesForTaxonomy($taxonomy)

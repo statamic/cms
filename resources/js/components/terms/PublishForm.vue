@@ -79,8 +79,16 @@
                 <PublishComponents />
 
                 <PublishTabs>
-                    <template v-if="showLivePreviewButton || showVisitUrlButton || showLocalizationSelector" #actions>
+                    <template v-if="showLivePreviewButton || showVisitUrlButton || showLocalizationSelector || showParentPath" #actions>
                         <div class="space-y-6">
+                            <div v-if="showParentPath" class="flex flex-wrap items-center gap-1 text-xs text-gray-700 dark:text-gray-400">
+                                <template v-for="(ancestor, i) in parents" :key="i">
+                                    <Link :href="ancestor.edit_url" class="hover:text-ui-accent-text" v-text="ancestor.title" />
+                                    <span class="text-gray-400 dark:text-gray-500">/</span>
+                                </template>
+                                <span v-text="formattedTitle" />
+                            </div>
+
                             <div class="flex flex-wrap gap-4" v-if="showLivePreviewButton || showVisitUrlButton">
                                 <Button
                                     :text="__('Live Preview')"
@@ -149,12 +157,13 @@ import resetValuesFromResponse from '@/util/resetValuesFromResponse.js';
 import { ref, computed } from 'vue';
 import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } from '@ui/Publish/SavePipeline.js';
 import ItemActions from '@/components/actions/ItemActions.vue';
-import { router } from '@inertiajs/vue3';
+import { Link, router } from '@inertiajs/vue3';
 
 export default {
     mixins: [HasPreferences, HasActions],
 
     components: {
+        Link,
         StatusIndicator,
         ItemActions,
         Header,
@@ -187,6 +196,8 @@ export default {
         initialOriginMeta: Object,
         initialSite: String,
         taxonomyHandle: String,
+        parent: String,
+        parents: Array,
         initialActions: Object,
         method: String,
         initialPublished: Boolean,
@@ -282,6 +293,10 @@ export default {
             return this.localizations.length > 1;
         },
 
+        showParentPath() {
+            return this.parents && this.parents.length > 0;
+        },
+
         isBase() {
             return this.publishContainer === 'base';
         },
@@ -352,6 +367,7 @@ export default {
                         _blueprint: this.fieldset.handle,
                         published: this.published,
                         _localized: this.localizedFields,
+                        _parent: this.parent,
                     }),
                     new AfterSaveHooks('term', {
                         taxonomy: this.taxonomyHandle,

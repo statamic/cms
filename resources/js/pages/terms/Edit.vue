@@ -27,6 +27,7 @@ defineProps([
     'previewTargets',
     'itemActions',
     'hasTemplate',
+    'parents',
 ]);
 </script>
 
@@ -60,5 +61,6 @@ defineProps([
         :preview-targets="previewTargets"
         :initial-item-actions="itemActions"
         :has-template="hasTemplate"
+        :parents="parents"
     />
 </template>

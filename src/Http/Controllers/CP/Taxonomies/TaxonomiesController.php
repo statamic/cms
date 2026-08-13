@@ -19,6 +19,7 @@ use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Rules\Handle;
 use Statamic\Stache\Repositories\TermRepository as StacheTermRepository;
+use Statamic\Structures\TaxonomyStructure;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
@@ -95,6 +96,16 @@ class TaxonomiesController extends CpController
             'canConfigureFields' => User::current()->can('configure fields'),
         ];
 
+        if ($taxonomy->hasStructure()) {
+            $structure = $taxonomy->structure();
+            $viewData = array_merge($viewData, [
+                'structured' => User::current()->can('reorder', $taxonomy),
+                'structurePagesUrl' => cp_route('taxonomies.tree.index', $taxonomy->handle()),
+                'structureSubmitUrl' => cp_route('taxonomies.tree.update', $taxonomy->handle()),
+                'structureMaxDepth' => $structure->maxDepth() ?? PHP_FLOAT_MAX, // "Infinity"
+            ]);
+        }
+
         if ($taxonomy->queryTerms()->count() === 0) {
             return Inertia::render('taxonomies/Empty', $viewData);
         }
@@ -161,6 +172,8 @@ class TaxonomiesController extends CpController
             'term_template' => $taxonomy->hasCustomTermTemplate() ? $taxonomy->termTemplate() : null,
             'template' => $taxonomy->hasCustomTemplate() ? $taxonomy->template() : null,
             'layout' => $taxonomy->layout(),
+            'structured' => $taxonomy->hasStructure(),
+            'max_depth' => optional($taxonomy->structure())->maxDepth(),
         ];
 
         return PublishForm::make($this->editFormBlueprint($taxonomy))
@@ -193,13 +206,48 @@ class TaxonomiesController extends CpController
             $taxonomy->sites($sites);
         }
 
+        $wasStructured = $taxonomy->hasStructure();
+
+        if (! Arr::get($values, 'structured')) {
+            if ($structure = $taxonomy->structure()) {
+                $structure->trees()->each->delete();
+            }
+            $taxonomy->structure(null);
+        } else {
+            $taxonomy->structure($this->makeStructure($taxonomy, $values['max_depth'] ?? null));
+        }
+
         $taxonomy->save();
+
+        if (! $wasStructured && $taxonomy->hasStructure()) {
+            $this->seedStructureTree($taxonomy);
+        }
 
         $this->clearStacheStore($taxonomy, $existingSites);
 
         $this->associateTaxonomyWithCollections($taxonomy, $values['collections']);
 
         return $taxonomy->toArray();
+    }
+
+    protected function makeStructure($taxonomy, $maxDepth)
+    {
+        if (! $structure = $taxonomy->structure()) {
+            $structure = new TaxonomyStructure;
+        }
+
+        return $structure->maxDepth($maxDepth);
+    }
+
+    /**
+     * Persist the tree file, seeded with all existing terms (which the
+     * tree's read-time validation appends in current sort order).
+     */
+    protected function seedStructureTree($taxonomy)
+    {
+        $tree = $taxonomy->structure()->tree();
+
+        $tree->tree($tree->tree())->save();
     }
 
     private function clearStacheStore($taxonomy, $oldSites)
@@ -299,6 +347,23 @@ class TaxonomiesController extends CpController
         }
 
         $fields = array_merge($fields, [
+            'hierarchy' => [
+                'display' => __('Ordering & Hierarchy'),
+                'fields' => [
+                    'structured' => [
+                        'display' => __('Orderable'),
+                        'instructions' => __('statamic::messages.taxonomies_orderable_instructions'),
+                        'type' => 'toggle',
+                    ],
+                    'max_depth' => [
+                        'display' => __('Max Depth'),
+                        'instructions' => __('statamic::messages.taxonomies_max_depth_instructions'),
+                        'type' => 'integer',
+                        'validate' => 'min:0',
+                        'if' => ['structured' => true],
+                    ],
+                ],
+            ],
             'routing' => [
                 'display' => __('Routing & URLs'),
                 'fields' => [

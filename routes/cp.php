@@ -96,6 +96,7 @@ use Statamic\Http\Controllers\CP\Taxonomies\PublishedTermsController;
 use Statamic\Http\Controllers\CP\Taxonomies\ReorderTaxonomyBlueprintsController;
 use Statamic\Http\Controllers\CP\Taxonomies\TaxonomiesController;
 use Statamic\Http\Controllers\CP\Taxonomies\TaxonomyBlueprintsController;
+use Statamic\Http\Controllers\CP\Taxonomies\TaxonomyTreeController;
 use Statamic\Http\Controllers\CP\Taxonomies\TermActionController;
 use Statamic\Http\Controllers\CP\Taxonomies\TermPreviewController;
 use Statamic\Http\Controllers\CP\Taxonomies\TermsController;
@@ -215,6 +216,8 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     });
 
     Route::resource('taxonomies', TaxonomiesController::class);
+    Route::get('taxonomies/{taxonomy}/tree', [TaxonomyTreeController::class, 'index'])->name('taxonomies.tree.index');
+    Route::patch('taxonomies/{taxonomy}/tree', [TaxonomyTreeController::class, 'update'])->name('taxonomies.tree.update');
 
     Route::group(['prefix' => 'taxonomies/{taxonomy}/terms'], function () {
         Route::get('/', [TermsController::class, 'index'])->name('taxonomies.terms.index');

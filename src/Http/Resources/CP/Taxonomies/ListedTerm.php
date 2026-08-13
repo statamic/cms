@@ -38,6 +38,10 @@ class ListedTerm extends JsonResource
                 'slug' => $term->slug(),
             ])),
 
+            'parent_path' => $term->taxonomy()->hierarchical()
+                ? ($term->ancestors()->map->title()->implode(' » ') ?: null)
+                : null,
+
             'permalink' => $term->absoluteUrl(),
             'edit_url' => $term->editUrl(),
             'has_template' => view()->exists($term->template()),

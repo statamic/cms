@@ -50,6 +50,68 @@ class UpdateTaxonomyTest extends TestCase
     }
 
     #[Test]
+    public function it_enables_structure_without_a_max_depth()
+    {
+        $taxonomy = tap(Taxonomy::make('test')->title('Test'))->save();
+
+        $this->assertFalse($taxonomy->hasStructure());
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->update($taxonomy, [
+                'structured' => true,
+            ])
+            ->assertOk();
+
+        $taxonomy = Taxonomy::findByHandle('test');
+
+        $this->assertTrue($taxonomy->hasStructure());
+        $this->assertNull($taxonomy->structure()->maxDepth());
+        $this->assertTrue($taxonomy->hierarchical());
+        $this->assertStringContainsString('structure:', $taxonomy->fileContents());
+    }
+
+    #[Test]
+    public function it_enables_structure_with_a_max_depth()
+    {
+        $taxonomy = tap(Taxonomy::make('test')->title('Test'))->save();
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->update($taxonomy, [
+                'structured' => true,
+                'max_depth' => 3,
+            ])
+            ->assertOk();
+
+        $taxonomy = Taxonomy::findByHandle('test');
+
+        $this->assertTrue($taxonomy->hasStructure());
+        $this->assertEquals(3, $taxonomy->structure()->maxDepth());
+    }
+
+    #[Test]
+    public function it_disables_structure()
+    {
+        $taxonomy = tap(Taxonomy::make('test')->title('Test')->structureContents([]))->save();
+        $taxonomy->structure()->tree()->tree([])->save();
+
+        $this->assertTrue($taxonomy->hasStructure());
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->update($taxonomy, [
+                'structured' => false,
+            ])
+            ->assertOk();
+
+        $taxonomy = Taxonomy::findByHandle('test');
+
+        $this->assertFalse($taxonomy->hasStructure());
+        $this->assertStringNotContainsString('structure:', $taxonomy->fileContents());
+    }
+
+    #[Test]
     public function it_associates_taxonomies_with_collections()
     {
         $taxonomy = tap(Taxonomy::make('test'))->save();
