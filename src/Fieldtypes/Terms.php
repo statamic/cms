@@ -154,8 +154,14 @@ class Terms extends Relationship
             ? Taxonomy::findByHandle($this->taxonomies()[0])
             : null;
 
+        $preload = parent::preload();
+
+        if ($taxonomy?->hierarchical() && ($this->field->get('mode') ?? 'default') === 'default') {
+            $preload['mode'] = 'select';
+        }
+
         if (! $taxonomy || ! $taxonomy->hasStructure()) {
-            return parent::preload();
+            return $preload;
         }
 
         $blueprints = $taxonomy
@@ -168,7 +174,7 @@ class Terms extends Relationship
                 ];
             })->values();
 
-        return array_merge(parent::preload(), ['tree' => [
+        return array_merge($preload, ['tree' => [
             'title' => $taxonomy->title(),
             'url' => cp_route('taxonomies.tree.index', $taxonomy->handle()),
             'showSlugs' => false,
