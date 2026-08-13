@@ -19,5 +19,5 @@ export { default as resetValuesFromResponse } from '../../util/resetValuesFromRe
 export { requireElevatedSession, requireElevatedSessionIf } from '../../components/elevated-sessions';
 export { default as clone, deepClone } from '../../util/clone.js';
 export { default as debounce } from '../../util/debounce.js';
-export { default as ConnectionList } from '../../components/forms/connections/ConnectionList.vue';
-export { default as ConnectionLogic, conditionsSummary } from '../../components/forms/connections/ConnectionLogic.vue';
+export { default as ConnectionRows, connectionRows } from '../../components/forms/connections/ConnectionRows.vue';
+export { default as ConnectionRules, conditionsSummary } from '../../components/forms/connections/ConnectionRules.vue';

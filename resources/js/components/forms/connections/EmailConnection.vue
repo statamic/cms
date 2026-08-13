@@ -1,13 +1,11 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref, watch } from 'vue';
+import { onMounted, onUnmounted, ref } from 'vue';
 import axios from 'axios';
-import { nanoid as uniqid } from 'nanoid';
 import { keys } from '@api';
 import { usePage } from '@inertiajs/vue3';
 import { Badge, Button, Icon, PublishContainer, PublishFields, PublishFieldsProvider, Subheading } from '@ui';
-import { deepClone } from '@/util/clone.js';
-import ConnectionList from './ConnectionList.vue';
-import ConnectionLogic, { conditionsSummary } from './ConnectionLogic.vue';
+import ConnectionRows, { connectionRows } from './ConnectionRows.vue';
+import ConnectionRules, { conditionsSummary } from './ConnectionRules.vue';
 
 interface Email {
     id: string;
@@ -28,41 +26,10 @@ const props = defineProps({
 
 const suggestableFields = usePage().props.suggestableFields;
 
-const dirtyKey = 'email-connection';
-
 const errors = ref<object>({});
 const saving = ref<boolean>(false);
 const saveBinding = ref<ReturnType<typeof keys.bindGlobal> | null>(null);
-
-const emails = ref<Email[]>(props.config.map((config: object): Email => ({
-    id: config.id,
-    enabled: config.enabled ?? true,
-    conditions: (config.conditions ?? []).map((condition: object) => ({ ...condition, _id: uniqid() })),
-    values: props.emails[config.id]?.values,
-    meta: props.emails[config.id]?.meta,
-})));
-
-const addEmail = (): void => emails.value.push({
-    id: uniqid(),
-    enabled: true,
-    conditions: [],
-    values: deepClone(props.defaults.values),
-    meta: deepClone(props.defaults.meta),
-});
-
-const duplicateEmail = (email: Email) => {
-    const index = emails.value.indexOf(email);
-
-    emails.value.splice(index + 1, 0, {
-        id: uniqid(),
-        enabled: email.enabled,
-        conditions: email.conditions.map((condition) => ({ ...condition, _id: uniqid() })),
-        values: deepClone(email.values),
-        meta: deepClone(email.meta),
-    });
-};
-
-const removeEmail = (email: Email) => (emails.value = emails.value.filter((item) => item !== email));
+const emails = ref<Email[]>(connectionRows(props.config, props.emails));
 
 const recipients = (to: string[] | string): string =>
     [to].flat().map((recipient) => {
@@ -95,7 +62,7 @@ const save = (): void => {
         emails: emails.value.map(({ values, meta, ...config }) => ({ ...config, ...values })),
     })
         .then(() => {
-            Statamic.$dirty.remove(dirtyKey);
+            Statamic.$dirty.remove('connection');
             Statamic.$toast.success(__('Saved'));
         })
         .catch((e) => {
@@ -109,8 +76,6 @@ const save = (): void => {
         .finally(() => (saving.value = false));
 };
 
-watch(emails, () => Statamic.$dirty.add(dirtyKey), { deep: true });
-
 onMounted(() => {
     saveBinding.value = keys.bindGlobal(['mod+s'], (e) => {
         e.preventDefault();
@@ -118,10 +83,7 @@ onMounted(() => {
     });
 });
 
-onUnmounted(() => {
-    Statamic.$dirty.remove(dirtyKey);
-    saveBinding.value?.destroy();
-});
+onUnmounted(() => saveBinding.value?.destroy());
 </script>
 
 <template>
@@ -132,17 +94,15 @@ onUnmounted(() => {
         </Button>
     </Teleport>
 
-    <ConnectionList
+    <ConnectionRows
         v-model="emails"
+        :defaults
+        :has-error
         :add-label="__('Add Email')"
         :empty-heading="__('No emails yet')"
         :empty-description="__('statamic::messages.email_connection_description')"
         :delete-heading="__('Delete Email')"
         :delete-description="__('statamic::messages.email_connection_delete_confirmation')"
-        :has-error
-        @add="addEmail"
-        @duplicate="duplicateEmail"
-        @remove="removeEmail"
     >
         <template #header="{ item: email, collapsed }">
             <Badge size="lg" pill color="white" class="px-3 text-gray-950 gap-1">
@@ -155,7 +115,7 @@ onUnmounted(() => {
         </template>
 
         <template #default="{ item: email, index }">
-            <ConnectionLogic
+            <ConnectionRules
                 v-model:conditions="email.conditions"
                 :always-label="__('Always send')"
                 :if-label="__('Send if...')"
@@ -176,7 +136,7 @@ onUnmounted(() => {
                         </PublishContainer>
                     </div>
                 </template>
-            </ConnectionLogic>
+            </ConnectionRules>
         </template>
-    </ConnectionList>
+    </ConnectionRows>
 </template>

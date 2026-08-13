@@ -1,12 +1,10 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
+import { onMounted, onUnmounted, ref } from 'vue';
 import axios from 'axios';
-import { nanoid as uniqid } from 'nanoid';
 import { keys } from '@api';
 import { Badge, Button, Field, Icon, Label, PublishContainer, PublishFields, PublishFieldsProvider, Subheading } from '@ui';
-import { deepClone } from '@/util/clone.js';
-import ConnectionList from './ConnectionList.vue';
-import ConnectionLogic, { conditionsSummary } from './ConnectionLogic.vue';
+import ConnectionRows, { connectionRows } from './ConnectionRows.vue';
+import ConnectionRules, { conditionsSummary } from './ConnectionRules.vue';
 
 interface Webhook {
     id: string;
@@ -26,42 +24,11 @@ const props = defineProps({
     examplePayload: String,
 });
 
-const dirtyKey = 'webhook-connection';
-
 const errors = ref<object>({});
 const saving = ref<boolean>(false);
 const saveBinding = ref<ReturnType<typeof keys.bindGlobal> | null>(null);
 const showExamplePayload = ref<boolean>(props.config.length === 0);
-
-const webhooks = ref<Webhook[]>(props.config.map((config: object): Webhook => ({
-    id: config.id,
-    enabled: config.enabled ?? true,
-    conditions: (config.conditions ?? []).map((condition: object) => ({ ...condition, _id: uniqid() })),
-    values: props.webhooks[config.id]?.values,
-    meta: props.webhooks[config.id]?.meta,
-})));
-
-const addWebhook = (): void => webhooks.value.push({
-    id: uniqid(),
-    enabled: true,
-    conditions: [],
-    values: deepClone(props.defaults.values),
-    meta: deepClone(props.defaults.meta),
-});
-
-const duplicateWebhook = (webhook: Webhook) => {
-    const index = webhooks.value.indexOf(webhook);
-
-    webhooks.value.splice(index + 1, 0, {
-        id: uniqid(),
-        enabled: webhook.enabled,
-        conditions: webhook.conditions.map((condition) => ({ ...condition, _id: uniqid() })),
-        values: deepClone(webhook.values),
-        meta: deepClone(webhook.meta),
-    });
-};
-
-const removeWebhook = (webhook: Webhook) => (webhooks.value = webhooks.value.filter((item) => item !== webhook));
+const webhooks = ref<Webhook[]>(connectionRows(props.config, props.webhooks));
 
 const hasError = (index: number) => Object.keys(errors.value).some((key) => key.startsWith(`webhooks.${index}.`));
 
@@ -84,7 +51,7 @@ const save = (): void => {
         webhooks: webhooks.value.map(({ values, meta, ...config }) => ({ ...config, ...values })),
     })
         .then(() => {
-            Statamic.$dirty.remove(dirtyKey);
+            Statamic.$dirty.remove('connection');
             Statamic.$toast.success(__('Saved'));
         })
         .catch((e) => {
@@ -98,8 +65,6 @@ const save = (): void => {
         .finally(() => (saving.value = false));
 };
 
-watch(webhooks, () => Statamic.$dirty.add(dirtyKey), { deep: true });
-
 onMounted(() => {
     saveBinding.value = keys.bindGlobal(['mod+s'], (e) => {
         e.preventDefault();
@@ -107,10 +72,7 @@ onMounted(() => {
     });
 });
 
-onUnmounted(() => {
-    Statamic.$dirty.remove(dirtyKey);
-    saveBinding.value?.destroy();
-});
+onUnmounted(() => saveBinding.value?.destroy());
 </script>
 
 <template>
@@ -142,17 +104,15 @@ onUnmounted(() => {
 
     <Label :text="__('Webhooks')" />
 
-    <ConnectionList
+    <ConnectionRows
         v-model="webhooks"
+        :defaults
+        :has-error
         :add-label="__('Add Webhook')"
         :empty-heading="__('No webhooks yet')"
         :empty-description="__('statamic::messages.webhook_connection_description')"
         :delete-heading="__('Delete Webhook')"
         :delete-description="__('statamic::messages.webhook_connection_delete_confirmation')"
-        :has-error
-        @add="addWebhook"
-        @duplicate="duplicateWebhook"
-        @remove="removeWebhook"
     >
         <template #header="{ item: webhook, collapsed }">
             <Badge size="lg" pill color="white" class="px-3 text-gray-950 gap-1">
@@ -165,7 +125,7 @@ onUnmounted(() => {
         </template>
 
         <template #default="{ item: webhook, index }">
-            <ConnectionLogic
+            <ConnectionRules
                 v-model:conditions="webhook.conditions"
                 :always-label="__('Always send')"
                 :if-label="__('Send if...')"
@@ -186,7 +146,7 @@ onUnmounted(() => {
                         </PublishContainer>
                     </div>
                 </template>
-            </ConnectionLogic>
+            </ConnectionRules>
         </template>
-    </ConnectionList>
+    </ConnectionRows>
 </template>

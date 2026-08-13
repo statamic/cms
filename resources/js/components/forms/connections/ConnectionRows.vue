@@ -1,14 +1,30 @@
+<script>
+import { nanoid as uniqid } from 'nanoid';
+
+export function connectionRows(config, state) {
+    return config.map((item) => ({
+        id: item.id,
+        enabled: item.enabled ?? true,
+        conditions: (item.conditions ?? []).map((condition) => ({ ...condition, _id: uniqid() })),
+        values: state[item.id]?.values,
+        meta: state[item.id]?.meta,
+    }));
+}
+</script>
+
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, onBeforeUnmount, ref, watch } from 'vue';
 import { Button, ConfirmationModal } from '@ui';
 import { SortableList } from '@/components/sortable/Sortable.js';
+import { deepClone } from '@/util/clone.js';
 import LogicEmptyState from '@/components/forms/logic/LogicEmptyState.vue';
-import ConnectionListItem from './ConnectionListItem.vue';
+import ConnectionRow from './ConnectionRow.vue';
 
-const emit = defineEmits(['add', 'duplicate', 'remove', 'update:modelValue']);
+const emit = defineEmits(['update:modelValue']);
 
 const props = defineProps({
     modelValue: { type: Array, default: () => [] },
+    defaults: Object,
     addLabel: String,
     emptyHeading: String,
     emptyDescription: String,
@@ -17,15 +33,42 @@ const props = defineProps({
     hasError: { type: Function, default: () => false },
 });
 
-const sortableItemClass = 'connection-list-item';
-const sortableHandleClass = 'connection-list-handle';
+const sortableItemClass = 'connection-row';
+const sortableHandleClass = 'connection-row-handle';
+
+const collapsed = ref([]);
+const confirmingRemoval = ref(null);
 
 const items = computed({
     get: () => props.modelValue,
     set: (value) => emit('update:modelValue', value),
 });
 
-const collapsed = ref([]);
+const add = () =>
+    (items.value = [
+        ...items.value,
+        {
+            id: uniqid(),
+            enabled: true,
+            conditions: [],
+            values: deepClone(props.defaults.values),
+            meta: deepClone(props.defaults.meta),
+        },
+    ]);
+
+const duplicate = (item) => {
+    const duplicated = [...items.value];
+
+    duplicated.splice(items.value.indexOf(item) + 1, 0, {
+        id: uniqid(),
+        enabled: item.enabled,
+        conditions: item.conditions.map((condition) => ({ ...condition, _id: uniqid() })),
+        values: deepClone(item.values),
+        meta: deepClone(item.meta),
+    });
+
+    items.value = duplicated;
+};
 
 const collapse = (id) => {
     if (!collapsed.value.includes(id)) {
@@ -35,24 +78,26 @@ const collapse = (id) => {
 
 const expand = (id) => (collapsed.value = collapsed.value.filter((itemId) => itemId !== id));
 
-const confirmingRemoval = ref(null);
-
 const remove = () => {
     const item = items.value.find((item) => item.id === confirmingRemoval.value);
 
     expand(confirmingRemoval.value);
     confirmingRemoval.value = null;
 
-    if (item) emit('remove', item);
+    if (item) items.value = items.value.filter((existing) => existing !== item);
 };
 
 const updateEnabled = (item, enabled) =>
     (items.value = items.value.map((existing) => (existing.id === item.id ? { ...existing, enabled } : existing)));
+
+watch(items, () => Statamic.$dirty.add('connection'), { deep: true });
+
+onBeforeUnmount(() => Statamic.$dirty.remove('connection'));
 </script>
 
 <template>
     <LogicEmptyState v-if="items.length === 0" :heading="emptyHeading" :description="emptyDescription">
-        <Button size="sm" :text="addLabel" icon="plus" @click="emit('add')" />
+        <Button size="sm" :text="addLabel" icon="plus" @click="add" />
     </LogicEmptyState>
 
     <template v-else>
@@ -63,16 +108,16 @@ const updateEnabled = (item, enabled) =>
             :item-class="sortableItemClass"
             :handle-class="sortableHandleClass"
         >
-            <div class="relative space-y-6 mb-0" data-connection-list>
+            <div class="relative space-y-6 mb-0" data-connection-rows>
                 <div v-for="(item, index) in items" :key="item.id" :class="sortableItemClass">
-                    <ConnectionListItem
+                    <ConnectionRow
                         :collapsed="collapsed.includes(item.id)"
                         :enabled="item.enabled !== false"
                         :has-error="hasError(index)"
                         :handle-class="sortableHandleClass"
                         @collapsed="collapse(item.id)"
                         @expanded="expand(item.id)"
-                        @duplicated="emit('duplicate', item)"
+                        @duplicated="duplicate(item)"
                         @removed="confirmingRemoval = item.id"
                         @update:enabled="updateEnabled(item, $event)"
                     >
@@ -81,14 +126,14 @@ const updateEnabled = (item, enabled) =>
                         </template>
 
                         <slot :item="item" :index="index" />
-                    </ConnectionListItem>
+                    </ConnectionRow>
                 </div>
             </div>
         </SortableList>
 
         <div class="inline-flex relative pt-6">
             <div class="absolute inset-y-0 h-full left-3.5 border-l-1 border-gray-400 dark:border-gray-600 border-dashed z-0 dark:bg-gray-850" />
-            <Button size="sm" :text="addLabel" icon="plus" class="relative" @click="emit('add')" />
+            <Button size="sm" :text="addLabel" icon="plus" class="relative" @click="add" />
         </div>
     </template>
 
@@ -104,7 +149,7 @@ const updateEnabled = (item, enabled) =>
 </template>
 
 <style scoped>
-[data-connection-list]::before {
+[data-connection-rows]::before {
     content: '';
     position: absolute;
     top: 1.5rem;
@@ -113,7 +158,7 @@ const updateEnabled = (item, enabled) =>
     border-inline-start: 1px dashed var(--color-gray-400);
 }
 
-.dark [data-connection-list]::before {
+.dark [data-connection-rows]::before {
     border-inline-start-color: var(--color-gray-600);
 }
 </style>
