@@ -51,6 +51,8 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, ContainsQ
     protected $template;
     protected $termTemplate;
     protected $layout;
+    protected $structure;
+    protected $structureContents;
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
 
@@ -180,6 +182,88 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, ContainsQ
         return $this->termBlueprints()->reject->hidden()->isNotEmpty();
     }
 
+    public function structure($structure = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('structure')
+            ->getter(function ($structure) {
+                return Blink::once("taxonomy-{$this->id()}-structure", function () use ($structure) {
+                    if (! $structure && $this->structureContents !== null) {
+                        $structure = $this->structure = $this->makeStructureFromContents();
+                    }
+
+                    return $structure;
+                });
+            })
+            ->setter(function ($structure) {
+                if ($structure) {
+                    $structure->handle($this->handle());
+                }
+
+                $this->structureContents = null;
+                Blink::forget("taxonomy-{$this->id()}-structure");
+
+                return $structure;
+            })
+            ->args(func_get_args());
+    }
+
+    public function structureContents(?array $contents = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('structureContents')
+            ->setter(function ($contents) {
+                Blink::forget("taxonomy-{$this->id()}-structure");
+                $this->structure = null;
+
+                return $contents;
+            })
+            ->getter(function ($contents) {
+                if (! $structure = $this->structure()) {
+                    return null;
+                }
+
+                // Empty arrays are stripped by ExistsAsFile::fileContents(), so
+                // keep a placeholder when there's no max depth. Collections get
+                // the same protection from their always-present `root` key.
+                return Arr::removeNullValues([
+                    'max_depth' => $structure->maxDepth(),
+                ]) ?: ['max_depth' => null];
+            })
+            ->args(func_get_args());
+    }
+
+    protected function makeStructureFromContents()
+    {
+        return (new \Statamic\Structures\TaxonomyStructure)
+            ->handle($this->handle())
+            ->maxDepth($this->structureContents['max_depth'] ?? null);
+    }
+
+    public function structureHandle()
+    {
+        if (! $this->hasStructure()) {
+            return null;
+        }
+
+        return $this->structure()->handle();
+    }
+
+    public function hasStructure()
+    {
+        return $this->structure !== null || $this->structureContents !== null;
+    }
+
+    public function orderable()
+    {
+        return optional($this->structure())->maxDepth() === 1;
+    }
+
+    public function hierarchical()
+    {
+        return $this->hasStructure() && $this->structure()->maxDepth() !== 1;
+    }
+
     public function sortField()
     {
         return $this->sortField ?? 'title';
@@ -251,6 +335,10 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, ContainsQ
 
         Facades\Taxonomy::save($this);
 
+        Blink::forget("taxonomy-{$this->id()}-structure");
+        Blink::forget("taxonomy-structure-taxonomy-{$this->handle()}");
+        Blink::forget("taxonomy-structure-tree-{$this->handle()}");
+
         if ($withEvents) {
             if ($isNew) {
                 TaxonomyCreated::dispatch($this);
@@ -276,6 +364,10 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, ContainsQ
 
         if ($withEvents && TaxonomyDeleting::dispatch($this) === false) {
             return false;
+        }
+
+        if ($this->hasStructure()) {
+            $this->structure()->trees()->each->delete();
         }
 
         $this->queryTerms()->get()->each->delete();
@@ -311,6 +403,10 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, ContainsQ
             'sort_by' => $this->sortField,
             'sort_dir' => $this->sortDirection,
         ]));
+
+        if ($this->hasStructure()) {
+            $data['structure'] = $this->structureContents();
+        }
 
         if (Site::multiEnabled()) {
             $data['sites'] = $this->sites;
@@ -614,8 +710,9 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, ContainsQ
     {
         return [
             'absoluteUrl', 'collection', 'collections', 'defaultPublishState', 'editUrl', 'handle',
-            'hasSearchIndex', 'id', 'layout', 'path', 'revisionsEnabled', 'searchIndex', 'sites',
-            'sortDirection', 'sortField', 'template', 'termTemplate', 'title', 'uri', 'url',
+            'hasSearchIndex', 'hasStructure', 'id', 'layout', 'orderable', 'path', 'revisionsEnabled',
+            'searchIndex', 'sites', 'sortDirection', 'sortField', 'structureHandle', 'template',
+            'termTemplate', 'title', 'uri', 'url',
         ];
     }
 }

@@ -161,6 +161,7 @@ class AppServiceProvider extends ServiceProvider
             \Statamic\Contracts\Structures\StructureRepository::class => \Statamic\Structures\StructureRepository::class,
             \Statamic\Contracts\Structures\CollectionTreeRepository::class => \Statamic\Stache\Repositories\CollectionTreeRepository::class,
             \Statamic\Contracts\Structures\NavTreeRepository::class => \Statamic\Stache\Repositories\NavTreeRepository::class,
+            \Statamic\Contracts\Structures\TaxonomyTreeRepository::class => \Statamic\Stache\Repositories\TaxonomyTreeRepository::class,
             \Statamic\Contracts\Structures\NavigationRepository::class => \Statamic\Stache\Repositories\NavigationRepository::class,
             \Statamic\Contracts\Assets\AssetRepository::class => \Statamic\Assets\AssetRepository::class,
             \Statamic\Contracts\Forms\FormRepository::class => \Statamic\Forms\FormRepository::class,

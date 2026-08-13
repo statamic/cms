@@ -70,6 +70,11 @@ class AugmentedTermTest extends AugmentedTestCase
             'updated_at' => ['type' => Carbon::class, 'value' => '2017-02-03 14:10'],
             'updated_by' => ['type' => UserContract::class, 'value' => 'test-user'],
             'collection' => ['type' => 'null', 'value' => null],
+            'parent' => ['type' => 'null', 'value' => null],
+            'children' => ['type' => \Illuminate\Support\Collection::class],
+            'ancestors' => ['type' => \Illuminate\Support\Collection::class],
+            'depth' => ['type' => 'null', 'value' => null],
+            'is_root' => ['type' => 'null', 'value' => null],
         ];
 
         $this->assertAugmentedCorrectly($expectations, $augmented);

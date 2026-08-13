@@ -68,6 +68,6 @@ class TaxonomyPolicy
     {
         $user = User::fromUser($user);
 
-        return $taxonomy->orderable() && $user->hasPermission("reorder {$taxonomy->handle()} terms");
+        return $taxonomy->hasStructure() && $user->hasPermission("reorder {$taxonomy->handle()} terms");
     }
 }
