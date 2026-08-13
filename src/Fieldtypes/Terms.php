@@ -681,15 +681,55 @@ class Terms extends Relationship
 
     private function graftTermIntoTree($taxonomy, string $slug, string $parentSlug): void
     {
-        $tree = $taxonomy->structure()->tree();
+        $structure = $taxonomy->structure();
+        $tree = $structure->tree();
+        $raw = $structure->repairTree($tree->fileData()['tree'] ?? []);
 
-        if (! $tree->find($parentSlug)) {
+        // Don't re-parent a term that's already somewhere in the tree.
+        if ($this->termIsInBranches($raw, $slug)) {
             return;
         }
 
-        $raw = $taxonomy->structure()->repairTree($tree->fileData()['tree'] ?? []);
+        // A parent created earlier in this path isn't in the persisted tree yet —
+        // validateTree would only append it at the root on read. Put it there
+        // ourselves so the child can actually nest under it.
+        if (! $this->termIsInBranches($raw, $parentSlug)) {
+            $raw[] = ['term' => $parentSlug];
+        }
 
-        $tree->tree($raw)->appendTo($parentSlug, $slug)->save();
+        $tree->tree($this->appendSlugToParent($raw, $parentSlug, $slug))->save();
+    }
+
+    private function termIsInBranches(array $branches, string $slug): bool
+    {
+        foreach ($branches as $branch) {
+            if (($branch['term'] ?? null) === $slug) {
+                return true;
+            }
+
+            if (isset($branch['children']) && $this->termIsInBranches($branch['children'], $slug)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function appendSlugToParent(array $branches, string $parentSlug, string $slug): array
+    {
+        foreach ($branches as &$branch) {
+            if (($branch['term'] ?? null) === $parentSlug) {
+                $branch['children'] = array_merge($branch['children'] ?? [], [['term' => $slug]]);
+
+                return $branches;
+            }
+
+            if (isset($branch['children'])) {
+                $branch['children'] = $this->appendSlugToParent($branch['children'], $parentSlug, $slug);
+            }
+        }
+
+        return $branches;
     }
 
     private function termLang()

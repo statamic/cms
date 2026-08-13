@@ -141,6 +141,28 @@ class TermsHierarchyTest extends TestCase
         $this->assertNotNull(Term::find('categories::plants'));
     }
 
+    #[Test]
+    public function processing_a_path_of_new_terms_nests_them_in_the_persisted_tree()
+    {
+        $processed = $this->fieldtype(['taxonomies' => ['categories']])->process(['plants/fern']);
+
+        $this->assertEquals(['fern'], $processed);
+        $this->assertNotNull(Term::find('categories::plants'));
+        $this->assertNotNull(Term::find('categories::fern'));
+
+        $tree = Facades\Taxonomy::findByHandle('categories')->structure()->tree()->tree();
+
+        $this->assertEquals([
+            ['term' => 'animals', 'children' => [
+                ['term' => 'cat'],
+            ]],
+            ['term' => 'furniture'],
+            ['term' => 'plants', 'children' => [
+                ['term' => 'fern'],
+            ]],
+        ], $tree);
+    }
+
     public function fieldtype($config = [], $parent = null)
     {
         $field = new Field('test', array_merge(['type' => 'terms'], $config));
