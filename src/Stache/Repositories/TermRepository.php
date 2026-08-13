@@ -88,13 +88,23 @@ class TermRepository implements RepositoryContract
 
         $uri = Str::removeLeft($uri, '/');
 
-        [$taxonomy, $slug] = array_pad(explode('/', $uri), 2, null);
+        $segments = explode('/', $uri);
+        $taxonomy = array_shift($segments);
+
+        // The term slug is the last segment. Hierarchical taxonomies may have
+        // ancestor slugs in between, which get verified against the term's
+        // canonical URI below.
+        $slug = empty($segments) ? null : end($segments);
 
         if (! $slug) {
             return null;
         }
 
         if (! $taxonomy = $this->findTaxonomyHandleByUri($taxonomy)) {
+            return null;
+        }
+
+        if (count($segments) > 1 && ! Taxonomy::find($taxonomy)->hierarchical()) {
             return null;
         }
 
@@ -109,7 +119,11 @@ class TermRepository implements RepositoryContract
         }
 
         if ($term->uri() !== '/'.$uri) {
-            return null;
+            // Hierarchical terms remain resolvable at non-canonical paths (e.g. their
+            // old flat URL). The response layer will 301 to the canonical URL.
+            if (! $term->taxonomy()->hierarchical()) {
+                return null;
+            }
         }
 
         return $term->collection($collection);
