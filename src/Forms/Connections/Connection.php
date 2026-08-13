@@ -6,20 +6,18 @@ use Illuminate\Routing\Router;
 use Statamic\Contracts\Forms\Form;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Extend\HasHandle;
+use Statamic\Extend\HasTitle;
 use Statamic\Extend\RegistersItself;
 use Statamic\Statamic;
 use Statamic\Support\Str;
 use Statamic\Support\VueComponent;
 
-use function Statamic\trans as __;
-
 abstract class Connection
 {
-    use HasHandle, RegistersItself {
+    use HasHandle, HasTitle, RegistersItself {
         handle as protected traitHandle;
     }
 
-    protected static $title;
     protected $description;
     protected $icon;
     protected $developer;
@@ -27,15 +25,6 @@ abstract class Connection
     public static function handle(): string
     {
         return Str::removeRight(static::traitHandle(), '_connection');
-    }
-
-    public function title(): string
-    {
-        if (static::$title) {
-            return static::$title;
-        }
-
-        return __(Str::title(Str::humanize(static::handle())));
     }
 
     public function description(): ?string

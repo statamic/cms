@@ -20,7 +20,6 @@ use Statamic\Facades\Stache;
 use Statamic\Facades\Token;
 use Statamic\Facades\User;
 use Statamic\Fields\FieldsetRecursionStack;
-use Statamic\Forms\Connections\ConnectionRepository;
 use Statamic\Jobs\DeletePartialFormSubmissions;
 use Statamic\Jobs\HandleEntrySchedule;
 use Statamic\Notifications\ElevatedSessionVerificationCode;
@@ -153,8 +152,6 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton(Sites::class);
-
-        $this->app->singleton(ConnectionRepository::class);
 
         collect([
             \Statamic\Contracts\Entries\EntryRepository::class => \Statamic\Stache\Repositories\EntryRepository::class,

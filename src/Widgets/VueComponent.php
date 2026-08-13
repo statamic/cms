@@ -2,7 +2,7 @@
 
 namespace Statamic\Widgets;
 
-/** @deprecated */
+/** @deprecated Use \Statamic\Support\VueComponent instead. */
 class VueComponent extends \Statamic\Support\VueComponent
 {
 }

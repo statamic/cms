@@ -17,7 +17,7 @@ class ConnectionRepositoryTest extends TestCase
         RoutedConnection::register();
 
         $this->assertInstanceOf(RoutedConnection::class, FormConnection::find('routed'));
-        $this->assertInstanceOf(RoutedConnection::class, FormConnection::all()->get('routed'));
+        $this->assertTrue(FormConnection::all()->contains(fn ($connection) => $connection instanceof RoutedConnection));
         $this->assertNull(FormConnection::find('unknown'));
     }
 

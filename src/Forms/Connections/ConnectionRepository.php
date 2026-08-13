@@ -9,12 +9,15 @@ class ConnectionRepository
 {
     public function all(): Collection
     {
-        return $this->classes()->map(fn ($class) => app($class));
+        return app('statamic.form-connections')
+            ->map(fn ($class) => app($class))
+            ->filter()
+            ->values();
     }
 
     public function find(string $handle): ?Connection
     {
-        return ($class = $this->classes()->get($handle)) ? app($class) : null;
+        return ($class = app('statamic.form-connections')->get($handle)) ? app($class) : null;
     }
 
     public function routes(): void
@@ -27,10 +30,5 @@ class ConnectionRepository
                     ->group(fn () => $connection->routes(Route::getFacadeRoot()));
             });
         });
-    }
-
-    public function classes(): Collection
-    {
-        return app('statamic.form-connections');
     }
 }
