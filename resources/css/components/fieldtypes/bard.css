@@ -258,6 +258,14 @@
     }
 }
 
+/* BARD / DRAGGING
+=================================================== */
+/* Hide set bodies synchronously (classList, not waiting on Vue) so collapse-on-drag
+   doesn't leave the pointer over empty space where the expanded set used to be. */
+.bard-dragging [data-set-body] {
+    display: none;
+}
+
 /* BARD / DROP + GAP CURSORS
 =================================================== */
 /* Unlayered so we beat ProseMirror's injected 1px black defaults. */

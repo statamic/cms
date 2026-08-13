@@ -16,7 +16,10 @@
                         @close="toggleFullscreen"
                     />
 
-                    <section :class="{ 'mt-12 p-4': fullScreenMode, 'replicator-dragging': dragging }">
+                    <section
+                        ref="sets"
+                        :class="{ 'mt-12 p-4': fullScreenMode, 'replicator-dragging': dragging }"
+                    >
                         <sortable-list
                             :model-value="value"
                             :vertical="true"
@@ -97,6 +100,7 @@ import ManagesSetMeta from './ManagesSetMeta';
 import { SortableList } from '../../sortable/Sortable';
 import { data_get } from "@/bootstrap/globals.js";
 import { createMountScheduler } from '@/util/createMountScheduler.js';
+import { keepElementUnderPointer } from '@/util/keepElementUnderPointer.js';
 
 export default {
     mixins: [Fieldtype, ManagesSetMeta],
@@ -214,14 +218,22 @@ export default {
             this.update(value);
         },
 
-        dragStarted() {
-            this.dragging = true;
+        dragStarted(event) {
+            const source = event?.source || event?.originalSource;
+            const root = this.$refs.sets;
+
+            keepElementUnderPointer(source, () => {
+                this.dragging = true;
+                root?.classList.add('replicator-dragging');
+            });
+
             this.collapseAll();
             this.$emit('focus');
         },
 
         dragEnded() {
             this.dragging = false;
+            this.$refs.sets?.classList.remove('replicator-dragging');
             this.$emit('blur');
         },
 

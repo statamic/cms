@@ -124,6 +124,7 @@ import { reveal } from '@api';
 import { useUiDirection } from '@/composables/ui-direction';
 import { createMountScheduler } from '@/util/createMountScheduler.js';
 import ShowField from '@/components/field-conditions/ShowField.js';
+import { keepElementUnderPointer } from '@/util/keepElementUnderPointer.js';
 
 export default {
     props: nodeViewProps,
@@ -375,14 +376,29 @@ export default {
             document.addEventListener('dragend', this.disableDragging, { once: true });
         },
 
-        collapseSiblingsForDrag() {
-            this.extension.options.bard.collapseAll();
+        collapseSiblingsForDrag(event) {
+            const bard = this.extension.options.bard;
+            const root = this.$el.closest('.bard-fieldtype');
+
+            keepElementUnderPointer(this.$el, () => {
+                bard.dragging = true;
+                root?.classList.add('bard-dragging');
+            });
+
+            const rect = this.$el.getBoundingClientRect();
+            event.dataTransfer?.setDragImage(this.$el, event.clientX - rect.left, event.clientY - rect.top);
+
+            bard.collapseAll();
         },
 
         disableDragging() {
             this.$el.removeEventListener('dragstart', this.collapseSiblingsForDrag);
             this.$el.setAttribute('draggable', false);
             this._draggableObserver?.observe(this.$el, { attributes: true, attributeFilter: ['draggable'] });
+
+            const bard = this.extension.options.bard;
+            bard.dragging = false;
+            this.$el.closest('.bard-fieldtype')?.classList.remove('bard-dragging');
         },
 
         preventNodeSelectionDrag(event) {

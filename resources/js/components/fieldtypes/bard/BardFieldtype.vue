@@ -7,7 +7,7 @@
             <div :class="fullScreenMode && wrapperClasses">
                 <div
                     class="bard-fieldtype antialiased with-contrast:border-gray-500 shadow-ui-sm"
-                    :class="{ 'bard-fullscreen': fullScreenMode }"
+                    :class="{ 'bard-fullscreen': fullScreenMode, 'bard-dragging': dragging }"
                     ref="container"
                     @dragstart.stop="ignorePageHeader(true)"
                     @dragend="ignorePageHeader(false)"
@@ -224,6 +224,7 @@ export default {
             escBinding: null,
             showAddSetButton: false,
             hasBeenFocused: false,
+            dragging: false,
             provide: {
                 bard: this.makeBardProvide(),
                 bardSets: this.config.sets,

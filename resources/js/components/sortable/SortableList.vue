@@ -129,8 +129,8 @@ export default {
         setupSortableList() {
             this.sortable = new Sortable(this.$el, this.computedOptions);
 
-            this.sortable.on('drag:start', () => this.$emit('dragstart'));
-            this.sortable.on('drag:stop', () => this.$emit('dragend'));
+            this.sortable.on('drag:start', (event) => this.$emit('dragstart', event));
+            this.sortable.on('drag:stop', (event) => this.$emit('dragend', event));
 
             this.sortable.on('sortable:stop', ({ oldIndex, newIndex }) => {
                 this.$emit('update:model-value', move(this.modelValue, oldIndex, newIndex));
