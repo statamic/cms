@@ -931,6 +931,88 @@ class BlueprintTest extends TestCase
     // todo: duplicate or tweak above test but make the target field not in the first section.
 
     #[Test]
+    public function it_ensures_a_field_within_an_imported_fieldset_has_config()
+    {
+        FieldsetRepository::shouldReceive('find')->with('the_partial')->andReturn(
+            (new Fieldset)->setContents(['fields' => [
+                [
+                    'handle' => 'author',
+                    'field' => ['type' => 'users', 'do_not_touch_other_config' => true],
+                ],
+                [
+                    'handle' => 'the_field',
+                    'field' => ['type' => 'text'],
+                ],
+            ]])
+        );
+
+        $blueprint = (new Blueprint)->setContents(['tabs' => [
+            'tab_one' => [
+                'sections' => [
+                    [
+                        'fields' => [
+                            ['handle' => 'title', 'field' => ['type' => 'text']],
+                        ],
+                    ],
+                    [
+                        'fields' => [
+                            ['import' => 'the_partial'],
+                        ],
+                    ],
+                ],
+            ],
+        ]]);
+
+        $fields = $blueprint
+            ->ensureFieldHasConfig('author', ['visibility' => 'read_only'])
+            ->fields();
+
+        $this->assertEquals(['type' => 'text'], $fields->get('title')->config());
+        $this->assertEquals(['type' => 'text'], $fields->get('the_field')->config());
+
+        $this->assertEquals([
+            'type' => 'users',
+            'do_not_touch_other_config' => true,
+            'visibility' => 'read_only',
+        ], $fields->get('author')->config());
+    }
+
+    #[Test]
+    public function it_ensures_a_prefixed_field_within_an_imported_fieldset_has_config()
+    {
+        FieldsetRepository::shouldReceive('find')->with('the_partial')->andReturn(
+            (new Fieldset)->setContents(['fields' => [
+                [
+                    'handle' => 'author',
+                    'field' => ['type' => 'users', 'do_not_touch_other_config' => true],
+                ],
+            ]])
+        );
+
+        $blueprint = (new Blueprint)->setContents(['tabs' => [
+            'tab_one' => [
+                'sections' => [
+                    [
+                        'fields' => [
+                            ['import' => 'the_partial', 'prefix' => 'prefixed_'],
+                        ],
+                    ],
+                ],
+            ],
+        ]]);
+
+        $fields = $blueprint
+            ->ensureFieldHasConfig('prefixed_author', ['visibility' => 'read_only'])
+            ->fields();
+
+        $this->assertEquals([
+            'type' => 'users',
+            'do_not_touch_other_config' => true,
+            'visibility' => 'read_only',
+        ], $fields->get('prefixed_author')->config());
+    }
+
+    #[Test]
     public function it_can_ensure_an_deferred_ensured_field_has_specific_config()
     {
         $blueprint = (new Blueprint)->setContents(['tabs' => [
@@ -1445,6 +1527,39 @@ class BlueprintTest extends TestCase
         $this->assertTrue($blueprint->hasField('two'));
         $this->assertFalse($blueprint->hasField('three'));
         $this->assertTrue($blueprint->hasField('four'));
+    }
+
+    #[Test]
+    public function it_leaves_fields_within_an_imported_fieldset_alone_when_removing_a_field()
+    {
+        FieldsetRepository::shouldReceive('find')->with('the_partial')->andReturn(
+            (new Fieldset)->setContents(['fields' => [
+                ['handle' => 'two', 'field' => ['type' => 'text']],
+                ['handle' => 'three', 'field' => ['type' => 'text']],
+            ]])
+        );
+
+        $blueprint = (new Blueprint)->setHandle('test')->setContents([
+            'title' => 'Test',
+            'tabs' => [
+                'tab_one' => [
+                    'sections' => [
+                        [
+                            'fields' => [
+                                ['handle' => 'one', 'field' => ['type' => 'text']],
+                                ['import' => 'the_partial'],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $blueprint->removeField('one')->removeField('two');
+
+        $this->assertFalse($blueprint->hasField('one'));
+        $this->assertTrue($blueprint->hasField('two'));
+        $this->assertTrue($blueprint->hasField('three'));
     }
 
     #[Test]
