@@ -8,11 +8,13 @@ use Statamic\Facades\Entry;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
 use Statamic\Facades\User;
+use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class TaxonomyTreeTest extends TestCase
 {
+    use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
     private function makeStructuredTaxonomy()
@@ -213,5 +215,41 @@ class TaxonomyTreeTest extends TestCase
             ->assertOk();
 
         $this->assertEquals(['furniture'], $entry->fresh()->get('categories'));
+    }
+
+    #[Test]
+    public function the_tree_is_visible_without_reorder_permission()
+    {
+        $this->makeStructuredTaxonomy();
+        $this->setTestRoles(['test' => ['access cp', 'view categories terms']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+
+        $this
+            ->actingAs($user)
+            ->get(cp_route('taxonomies.show', 'categories'))
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->component('taxonomies/Show')
+                ->where('structured', true)
+                ->where('canReorder', false)
+            );
+    }
+
+    #[Test]
+    public function the_tree_is_editable_with_reorder_permission()
+    {
+        $this->makeStructuredTaxonomy();
+        $this->setTestRoles(['test' => ['access cp', 'view categories terms', 'reorder categories terms']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+
+        $this
+            ->actingAs($user)
+            ->get(cp_route('taxonomies.show', 'categories'))
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->component('taxonomies/Show')
+                ->where('structured', true)
+                ->where('canReorder', true)
+            );
     }
 }

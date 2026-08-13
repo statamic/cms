@@ -104,7 +104,8 @@ class TaxonomiesController extends CpController
         if ($taxonomy->hasStructure()) {
             $structure = $taxonomy->structure();
             $viewData = array_merge($viewData, [
-                'structured' => User::current()->can('reorder', $taxonomy),
+                'structured' => $taxonomy->hasStructure(),
+                'canReorder' => User::current()->can('reorder', $taxonomy),
                 'structurePagesUrl' => cp_route('taxonomies.tree.index', $taxonomy->handle()),
                 'structureSubmitUrl' => cp_route('taxonomies.tree.update', $taxonomy->handle()),
                 'structureMaxDepth' => $structure->maxDepth() ?? PHP_FLOAT_MAX, // "Infinity"

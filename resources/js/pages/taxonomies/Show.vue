@@ -44,6 +44,7 @@ export default {
         'deleteUrl',
         'createLabel',
         'structured',
+        'canReorder',
         'structurePagesUrl',
         'structureSubmitUrl',
         'structureMaxDepth',
@@ -72,7 +73,7 @@ export default {
         },
 
         reorderable() {
-            return this.structured && this.structureMaxDepth === 1;
+            return this.structured && this.structureMaxDepth === 1 && this.canReorder;
         },
 
         treeIsDirty() {
@@ -375,6 +376,7 @@ export default {
             :max-depth="maxDepth"
             :expects-root="false"
             :site="site"
+            :editable="canReorder"
             :preferences-prefix="preferencesPrefix"
             @edit-page="editTerm"
             @changed="markTreeDirty"
@@ -391,9 +393,9 @@ export default {
                         :text="blueprints.length > 1 ? __(blueprint.title) : __('Create Child Term')"
                     />
                 </template>
-                <DropdownSeparator v-if="canCreate && depth < maxDepth && branch.can_delete" />
+                <DropdownSeparator v-if="canReorder && canCreate && depth < maxDepth && branch.can_delete" />
                 <DropdownItem
-                    v-if="branch.can_delete"
+                    v-if="canReorder && branch.can_delete"
                     :text="__('Delete')"
                     icon="trash"
                     variant="destructive"
