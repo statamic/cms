@@ -274,6 +274,7 @@ class ExtensionServiceProvider extends ServiceProvider
     {
         Fieldtypes\Link::extend('entry', Fieldtypes\Link\EntryLinkType::class);
         Fieldtypes\Link::extend('asset', Fieldtypes\Link\AssetLinkType::class);
+        Fieldtypes\Link::extend('term', Fieldtypes\Link\TermLinkType::class);
     }
 
     protected function registerAddonManifest()
