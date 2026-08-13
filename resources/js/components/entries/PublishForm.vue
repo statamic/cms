@@ -77,7 +77,7 @@
             :blueprint="fieldset"
             v-model="values"
             :extra-values="extraValues"
-            :meta="meta"
+            v-model:meta="meta"
             :origin-values="originValues"
             :origin-meta="originMeta"
             :errors="errors"
@@ -353,11 +353,13 @@ export default {
         previewTargets: Array,
         autosaveInterval: Number,
         parent: String,
+        initialTitleFormat: Object,
     },
 
     data() {
         return {
             actions: this.initialActions,
+            titleFormat: this.initialTitleFormat,
             localizing: false,
             trackDirtyState: true,
             fieldset: this.initialFieldset,
@@ -565,6 +567,7 @@ export default {
                         _blueprint: this.fieldset.handle,
                         _localized: this.localizedFields,
                         _parent: this.parent,
+                        _auto_slug: this.meta.slug?.auto ?? false,
                     }),
                     new AfterSaveHooks('entry', {
                         collection: this.collectionHandle,
@@ -631,6 +634,8 @@ export default {
         },
 
         generateTitle() {
+            if (!this.titleFormat) return;
+
             const values = this.titleFormatValues();
             const serialized = JSON.stringify(values);
 
@@ -642,7 +647,7 @@ export default {
 
             this.$axios
                 .post(
-                    this.actions.titleFormat,
+                    this.titleFormat.url,
                     { blueprint: this.fieldset.handle, values },
                     { signal: this.titleRequest.signal },
                 )
@@ -655,9 +660,9 @@ export default {
         },
 
         titleFormatValues() {
-            const { title, slug, ...values } = this.values;
+            const fields = this.titleFormat.fields.filter((field) => field in this.values);
 
-            return values;
+            return Object.fromEntries(fields.map((field) => [field, this.values[field]]));
         },
 
         localizationSelected(localization) {
@@ -716,6 +721,7 @@ export default {
                 this.collection = data.collection;
                 this.title = data.editing ? data.values.title : this.title;
                 this.actions = data.actions;
+                this.titleFormat = data.titleFormat;
 				this.itemActions = data.itemActions;
                 this.fieldset = data.blueprint;
                 this.permalink = data.permalink;
@@ -908,7 +914,7 @@ export default {
     created() {
         window.history.replaceState({}, document.title, document.location.href.replace('created=true', ''));
 
-        if (this.actions.titleFormat) {
+        if (this.titleFormat) {
             this.lastTitleFormatValues = JSON.stringify(this.titleFormatValues());
             this.$watch('values', debounce(() => this.generateTitle(), 300), { deep: true });
         }
