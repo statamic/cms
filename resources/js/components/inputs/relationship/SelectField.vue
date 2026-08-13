@@ -18,8 +18,12 @@
             @update:modelValue="itemsSelected"
             @search="search"
         >
-            <template #option="{ title, hint, status }">
-                <div class="flex w-full text-left items-center gap-2">
+            <template #option="{ title, hint, status, depth }">
+                <div
+                    class="flex w-full text-left items-center gap-2"
+                    :style="depth > 1 ? { paddingInlineStart: `${(depth - 1) * 1}rem` } : null"
+                >
+                    <span v-if="depth > 1" class="text-gray-400 dark:text-gray-600" aria-hidden="true">↳</span>
                     <StatusIndicator v-if="status" :status="status" />
                     <div v-text="title" class="truncate grow" />
                     <ui-badge v-if="hint" size="sm" v-text="hint" />
@@ -94,8 +98,13 @@ export default {
 
         // The `users` fieldtype falls back to displaying a user's email as their title when
         // they have no name, but doesn't show it otherwise, so it needs to be searchable too.
+        // Terms in hierarchical taxonomies expose their slug path (e.g. `animals/cat`) so
+        // searching a parent surfaces its descendants too.
         searchKeys() {
-            return this.config.type === 'users' ? ['title', 'email'] : null;
+            if (this.config.type === 'users') return ['title', 'email'];
+            if (this.config.type === 'terms') return ['title', 'path'];
+
+            return null;
         },
 
 	    cacheKey() {
@@ -186,10 +195,25 @@ export default {
                 let option = this.options.find((option) => option.id === id);
                 let existing = this.items.find((item) => item.id === id);
 
-                return existing || option || { id: id, title: id };
+                return existing || option || this.newItemFromId(id);
             });
 
             this.$emit('input', items);
+        },
+
+        // A typed term path like `animals/cat/calico` attaches the leaf, so render
+        // the badge as `calico · animals » cat` until the save normalizes it.
+        newItemFromId(id) {
+            if (this.config.type === 'terms' && typeof id === 'string' && id.includes('/')) {
+                const segments = id.split('/').filter((segment) => segment.trim().length);
+                const title = segments.pop();
+
+                if (title && segments.length) {
+                    return { id, title, hint: segments.join(' » ') };
+                }
+            }
+
+            return { id: id, title: id };
         },
 
         createOption(value) {

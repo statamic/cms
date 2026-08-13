@@ -4,6 +4,7 @@ namespace Statamic\Fieldtypes;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Collection;
+use Illuminate\Validation\ValidationException;
 use Statamic\Contracts\Data\Localization;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Term as TermContract;
@@ -144,6 +145,49 @@ class Terms extends Relationship
     public function filter()
     {
         return new TermsFilter($this);
+    }
+
+    public function preload()
+    {
+        $taxonomy = $this->usingSingleTaxonomy()
+            ? Taxonomy::findByHandle($this->taxonomies()[0])
+            : null;
+
+        if (! $taxonomy || ! $taxonomy->hasStructure()) {
+            return parent::preload();
+        }
+
+        $blueprints = $taxonomy
+            ->termBlueprints()
+            ->reject->hidden()
+            ->map(function ($blueprint) {
+                return [
+                    'handle' => $blueprint->handle(),
+                    'title' => $blueprint->title(),
+                ];
+            })->values();
+
+        return array_merge(parent::preload(), ['tree' => [
+            'title' => $taxonomy->title(),
+            'url' => cp_route('taxonomies.tree.index', $taxonomy->handle()),
+            'showSlugs' => false,
+            'expectsRoot' => false,
+            'blueprints' => $blueprints,
+        ]]);
+    }
+
+    /**
+     * The single configured taxonomy, if it's hierarchical.
+     */
+    public function hierarchicalTaxonomy()
+    {
+        if (! $this->usingSingleTaxonomy()) {
+            return null;
+        }
+
+        $taxonomy = Taxonomy::findByHandle($this->taxonomies()[0]);
+
+        return $taxonomy && $taxonomy->hierarchical() ? $taxonomy : null;
     }
 
     public function augment($values)
@@ -298,11 +342,44 @@ class Terms extends Relationship
 
         $query = $this->getIndexQuery($request);
 
+        if ($this->shouldOrderByHierarchy($request)) {
+            return $this->orderItemsByHierarchy($query->get());
+        }
+
         if ($sort = $this->getSortColumn($request)) {
             $query->orderBy($sort, $this->getSortDirection($request));
         }
 
         return $request->boolean('paginate', true) ? $query->paginate($request->filled('perPage') ? Statamic::cpPerPage($request->integer('perPage')) : 15) : $query->get();
+    }
+
+    /**
+     * Select/typeahead dropdowns for a hierarchical taxonomy should list options
+     * in tree order (so they can be indented), unless the user is searching
+     * or explicitly sorting. Paginated (stack selector) requests keep
+     * regular ordering since tree order is meaningless across pages.
+     */
+    private function shouldOrderByHierarchy($request): bool
+    {
+        return ! $request->sort
+            && ! $request->search
+            && ! $request->boolean('paginate', true)
+            && $this->hierarchicalTaxonomy() !== null;
+    }
+
+    private function orderItemsByHierarchy(Collection $items): Collection
+    {
+        $order = $this->hierarchicalTaxonomy()
+            ->structure()
+            ->tree()
+            ->flattenedPages()
+            ->map
+            ->id()
+            ->flip();
+
+        return $items
+            ->sortBy(fn ($term) => $order->get($term->inDefaultLocale()->slug(), PHP_INT_MAX))
+            ->values();
     }
 
     private function getViewableTaxonomies(array $taxonomies): Collection
@@ -518,15 +595,13 @@ class Terms extends Relationship
 
     protected function createTermFromString($string, $taxonomy)
     {
-        // The parent is the item this terms fieldtype exists on. Most commonly an
-        // entry, but could also be something else, like another taxonomy term.
-        $parent = $this->field->parent();
+        if (Str::contains($string, '/')
+            && ($hierarchical = Facades\Taxonomy::findByHandle($taxonomy))
+            && $hierarchical->hierarchical()) {
+            return $this->createTermsFromPath($string, $hierarchical);
+        }
 
-        $lang = $parent instanceof Localization
-            ? Site::get($parent->locale())->lang()
-            : Site::default()->lang();
-
-        $slug = Str::slug($string, '-', $lang);
+        $slug = Str::slug($string, '-', $this->termLang());
 
         if (! $term = Facades\Term::find("{$taxonomy}::{$slug}")) {
             $taxonomy = Facades\Taxonomy::findByHandle($taxonomy);
@@ -544,6 +619,88 @@ class Terms extends Relationship
         }
 
         return $term->id();
+    }
+
+    /**
+     * A typed value like "animals/cat/calico" on a hierarchical taxonomy creates
+     * each missing segment as a term chained under the previous one, and returns
+     * the leaf's id. Existing segments are reused in place — the fieldtype
+     * never re-parents a term that's already somewhere in the tree.
+     */
+    private function createTermsFromPath(string $path, $taxonomy)
+    {
+        $segments = collect(explode('/', $path))
+            ->map(fn ($segment) => trim($segment))
+            ->filter()
+            ->values();
+
+        if ($segments->isEmpty()) {
+            return null;
+        }
+
+        $maxDepth = $taxonomy->structure()->maxDepth();
+
+        if ($maxDepth && $segments->count() > $maxDepth) {
+            throw ValidationException::withMessages([
+                $this->field->handle() => __('statamic::validation.term_path_exceeds_max_depth', [
+                    'path' => $path,
+                    'max' => $maxDepth,
+                ]),
+            ]);
+        }
+
+        $lang = $this->termLang();
+        $parentSlug = null;
+        $id = null;
+
+        foreach ($segments as $segment) {
+            $slug = Str::slug($segment, '-', $lang);
+            $id = $taxonomy->handle().'::'.$slug;
+
+            if (! Facades\Term::find($id)) {
+                if (User::current()->cant('create', [TermContract::class, $taxonomy])) {
+                    return null;
+                }
+
+                Facades\Term::make()
+                    ->slug($slug)
+                    ->taxonomy($taxonomy)
+                    ->set('title', $segment)
+                    ->save();
+
+                if ($parentSlug) {
+                    $this->graftTermIntoTree($taxonomy, $slug, $parentSlug);
+                }
+            }
+
+            $parentSlug = $slug;
+        }
+
+        return $id;
+    }
+
+    private function graftTermIntoTree($taxonomy, string $slug, string $parentSlug): void
+    {
+        $tree = $taxonomy->structure()->tree();
+
+        if (! $tree->find($parentSlug)) {
+            return;
+        }
+
+        $raw = $taxonomy->structure()->repairTree($tree->fileData()['tree'] ?? []);
+
+        $tree->tree($raw)->appendTo($parentSlug, $slug)->save();
+    }
+
+    private function termLang()
+    {
+        // The parent is the item this terms fieldtype exists on. Most commonly an
+        // entry, but could also be something else, like another taxonomy term.
+        $parent = $this->field->parent();
+
+        return $parent instanceof Localization
+            ? Site::get($parent->locale())->lang()
+            : Site::default()->lang();
     }
 
     protected function getConfiguredTaxonomies()
@@ -592,6 +749,7 @@ class Terms extends Relationship
     {
         return collect([
             count($this->getConfiguredTaxonomies()) > 1 ? __($item->taxonomy()->title()) : null,
+            $this->hierarchicalTaxonomy() ? $item->ancestors()->map->title()->implode(' » ') : null,
         ])->filter()->implode(' • ');
     }
 

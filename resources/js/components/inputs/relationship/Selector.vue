@@ -59,7 +59,7 @@
 
                 <div v-if="view === 'tree'" class="flex flex-1 min-h-0 flex-col gap-4 p-4">
                     <div class="flex items-center justify-between gap-2 sm:gap-3 min-h-16">
-                        <Heading :text="__('Pages')" size="lg" />
+                        <Heading :text="tree.title ? __(tree.title) : __('Pages')" size="lg" />
                         <ui-toggle-group v-model="view" v-if="canUseTree">
                             <ui-toggle-item icon="hierarchy" value="tree" />
                             <ui-toggle-item icon="layout-list" value="list" />

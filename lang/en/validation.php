@@ -180,6 +180,7 @@ return [
     'parent_causes_root_children' => 'This would cause the root page to have children.',
     'parent_exceeds_max_depth' => 'This would exceed the maximum depth.',
     'reserved' => 'This is a reserved word.',
+    'term_path_exceeds_max_depth' => 'The path :path exceeds the maximum depth of :max.',
     'reserved_field_handle' => 'Field with a handle of :handle is a reserved word.',
     'unique_entry_value' => 'This value has already been taken.',
     'unique_form_handle' => 'This value has already been taken.',
