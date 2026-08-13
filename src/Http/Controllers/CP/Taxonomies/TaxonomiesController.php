@@ -9,6 +9,7 @@ use Statamic\Contracts\Taxonomies\Term as TermContract;
 use Statamic\Contracts\Taxonomies\TermRepository;
 use Statamic\CP\Column;
 use Statamic\CP\PublishForm;
+use Statamic\Exceptions\SiteNotFoundException;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Scope;
@@ -87,6 +88,8 @@ class TaxonomiesController extends CpController
             'taxonomyTitle' => $taxonomy->title(),
             'blueprints' => $blueprints,
             'site' => $site,
+            'initialSite' => $site,
+            'sites' => $this->getAuthorizedSitesForTaxonomy($taxonomy),
             'columns' => $columns,
             'filters' => Scope::filters('terms', [
                 'taxonomy' => $taxonomy->handle(),
@@ -94,6 +97,9 @@ class TaxonomiesController extends CpController
             ]),
             'canCreate' => User::current()->can('create', [TermContract::class, $taxonomy]) && $taxonomy->hasVisibleTermBlueprint(),
             'createUrl' => cp_route('taxonomies.terms.create', [$taxonomy->handle(), $site]),
+            'createUrls' => $taxonomy->sites()
+                ->mapWithKeys(fn ($handle) => [$handle => cp_route('taxonomies.terms.create', [$taxonomy->handle(), $handle])])
+                ->all(),
             'reorderUrl' => cp_route('taxonomies.terms.reorder', $taxonomy->handle()),
             'taxonomyEditUrl' => cp_route('taxonomies.edit', $taxonomy->handle()),
             'taxonomyBlueprintsUrl' => cp_route('blueprints.taxonomies.index', $taxonomy),
@@ -560,5 +566,22 @@ class TaxonomiesController extends CpController
                 ]);
             }
         }
+    }
+
+    protected function getAuthorizedSitesForTaxonomy($taxonomy)
+    {
+        return $taxonomy
+            ->sites()
+            ->mapWithKeys(fn ($handle) => [$handle => Site::get($handle)])
+            ->each(fn ($site, $handle) => throw_unless($site, new SiteNotFoundException($handle)))
+            ->filter(fn ($site) => User::current()->can('view', $site))
+            ->map(function ($site) {
+                return [
+                    'handle' => $site->handle(),
+                    'name' => $site->name(),
+                ];
+            })
+            ->values()
+            ->all();
     }
 }

@@ -254,6 +254,59 @@ class TaxonomyTreeTest extends TestCase
     }
 
     #[Test]
+    public function the_show_page_includes_sites_for_the_tree_selector()
+    {
+        $this->setSites([
+            'en' => ['url' => '/', 'locale' => 'en_US'],
+            'fr' => ['url' => '/fr/', 'locale' => 'fr_FR'],
+        ]);
+
+        tap(Taxonomy::make('categories')->title('Categories')->sites(['en', 'fr'])->structureContents([]))->save();
+        tap(Term::make('animals')->taxonomy('categories')->data(['title' => 'Animals']))->save();
+
+        Taxonomy::find('categories')->structure()->tree()->tree([
+            ['term' => 'animals'],
+        ])->save();
+
+        $this
+            ->actingAs(tap(User::make()->makeSuper())->save())
+            ->get(cp_route('taxonomies.show', 'categories'))
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->component('taxonomies/Show')
+                ->where('initialSite', 'en')
+                ->has('sites', 2)
+                ->has('createUrls.en')
+                ->has('createUrls.fr')
+            );
+    }
+
+    #[Test]
+    public function it_localizes_tree_titles_for_the_requested_site()
+    {
+        $this->setSites([
+            'en' => ['url' => '/', 'locale' => 'en_US'],
+            'fr' => ['url' => '/fr/', 'locale' => 'fr_FR'],
+        ]);
+
+        tap(Taxonomy::make('categories')->title('Categories')->sites(['en', 'fr'])->structureContents([]))->save();
+        tap(Term::make('animals')->taxonomy('categories')->data(['title' => 'Animals']))->save();
+        Term::find('categories::animals')->in('fr')->data(['title' => 'Animaux'])->save();
+
+        Taxonomy::find('categories')->structure()->tree()->tree([
+            ['term' => 'animals'],
+        ])->save();
+
+        $pages = $this
+            ->actingAs(tap(User::make()->makeSuper())->save())
+            ->get(cp_route('taxonomies.tree.index', 'categories').'?site=fr')
+            ->assertOk()
+            ->json('pages');
+
+        $this->assertEquals('Animaux', $pages[0]['entry_title']);
+    }
+
+    #[Test]
     public function it_rejects_a_tree_deeper_than_max_depth()
     {
         $taxonomy = tap(Taxonomy::make('categories')->title('Categories')->structureContents(['max_depth' => 2]))->save();

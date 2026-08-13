@@ -27,11 +27,13 @@ export default {
         'taxonomy',
         'taxonomyTitle',
         'blueprints',
-        'site',
+        'initialSite',
+        'sites',
         'columns',
         'filters',
         'canCreate',
         'createUrl',
+        'createUrls',
         'reorderUrl',
         'actionUrl',
         'sortColumn',
@@ -54,6 +56,7 @@ export default {
         return {
             preferencesPrefix: `taxonomies.${this.taxonomy}`,
             requestUrl: cp_url(`taxonomies/${this.taxonomy}/terms`),
+            site: this.initialSite,
             view: null,
             reordering: false,
             items: null,
@@ -82,6 +85,10 @@ export default {
 
         maxDepth() {
             return this.structureMaxDepth || Infinity;
+        },
+
+        currentCreateUrl() {
+            return this.createUrls?.[this.site] || this.createUrl;
         },
 
         numberOfChildrenToBeDeleted() {
@@ -179,7 +186,7 @@ export default {
         },
 
         createTerm(blueprint, parent) {
-            let url = `${this.createUrl}?blueprint=${blueprint}`;
+            let url = `${this.currentCreateUrl}?blueprint=${blueprint}`;
             if (parent) url += '&parent=' + parent;
             router.get(url);
         },
@@ -222,7 +229,7 @@ export default {
                 category: Statamic.$commandPalette.category.Actions,
                 text: __('Create Term'),
                 icon: 'taxonomies',
-                url: this.createUrl,
+                url: this.currentCreateUrl,
                 prioritize: true,
             });
 
@@ -291,6 +298,12 @@ export default {
                     @click="cancelTreeProgress"
                 />
 
+                <site-selector
+                    v-if="sites && sites.length > 1"
+                    :sites="sites"
+                    v-model="site"
+                />
+
                 <Button
                     v-if="treeIsDirty"
                     :text="__('Save Changes')"
@@ -301,6 +314,12 @@ export default {
             </template>
 
             <template v-if="view === 'list' && reorderable">
+                <site-selector
+                    v-if="sites && sites.length > 1 && reordering && site"
+                    :sites="sites"
+                    v-model="site"
+                />
+
                 <Button
                     v-if="!reordering"
                     @click="reordering = true"
@@ -320,7 +339,7 @@ export default {
 
             <create-term-button
                 v-if="!reordering && canCreate"
-                :url="createUrl"
+                :url="currentCreateUrl"
                 :text="createLabel"
                 :blueprints="blueprints"
             />
