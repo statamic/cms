@@ -103,6 +103,7 @@
                                 v-if="showLocalizationSelector"
                                 :localizations
                                 :localizing
+                                :heading="__('Current Term Localization')"
                                 @selected="localizationSelected"
                             />
                         </div>
