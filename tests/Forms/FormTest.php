@@ -510,6 +510,25 @@ class FormTest extends TestCase
     }
 
     #[Test]
+    public function saving_a_legacy_form_migrates_email_config_without_a_to_key()
+    {
+        File::put(Form::make('contact_us')->path(), YAML::dump([
+            'title' => 'Contact Us',
+            'email' => ['from' => 'foo@bar.com', 'subject' => 'Hello'],
+        ]));
+
+        $form = Form::find('contact_us');
+        $form->save();
+
+        $saved = YAML::parse(File::get($form->path()));
+
+        $this->assertCount(1, $saved['connections']['email']);
+        $this->assertNotEmpty($saved['connections']['email'][0]['id']);
+        $this->assertEquals('foo@bar.com', $saved['connections']['email'][0]['from']);
+        $this->assertArrayNotHasKey('email', $saved);
+    }
+
+    #[Test]
     public function it_omits_connections_from_yaml_when_empty()
     {
         $form = tap(Form::make('contact_us')->title('Contact Us'))->save();

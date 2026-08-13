@@ -323,14 +323,14 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
 
         is_null($emails)
             ? $connections->forget('email')
-            : $connections->put('email', $this->emailsWithIds($emails));
+            : $connections->put('email', $this->convertEmailToConnection($emails));
 
         return $this->connections($connections);
     }
 
-    private function emailsWithIds($emails): array
+    private function convertEmailToConnection(array $emails): array
     {
-        return collect(isset($emails['to']) ? [$emails] : $emails)
+        return collect(array_is_list($emails) ? $emails : [$emails])
             ->map(fn ($config) => ['id' => Str::random(8), ...$config])
             ->all();
     }
@@ -498,7 +498,7 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
             });
 
         if (! is_null($emails = Arr::get($contents, 'connections.email', $contents['email'] ?? null))) {
-            $this->connections($this->connections()->put('email', $this->emailsWithIds($emails)));
+            $this->connections($this->connections()->put('email', $this->convertEmailToConnection($emails)));
         }
 
         if (isset($contents['fields'])) {
