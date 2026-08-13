@@ -78,7 +78,11 @@ class TaxonomyTermsStore extends ChildStore
 
         [$site, $slug] = explode('::', $key);
 
-        if ($path = $this->getPath($key)) {
+        // Association indexes create extra `{site}::{slug}` keys for every site an
+        // entry uses the term. If the taxonomy isn't enabled in that site, there's
+        // no path for the key — fall back to the term's file so we don't return a
+        // title-from-slug stub that shadows the real term on save/reload.
+        if ($path = $this->getPath($key) ?? $this->pathForSlug($slug)) {
             $item = $this->makeItemFromFile($path, File::get($path))->in($site);
         } else {
             $item = Term::make($slug)
@@ -90,6 +94,13 @@ class TaxonomyTermsStore extends ChildStore
         $this->cacheItem($item);
 
         return $item;
+    }
+
+    private function pathForSlug(string $slug): ?string
+    {
+        return $this->paths()->first(
+            fn ($path, $key) => Str::after((string) $key, '::') === $slug
+        );
     }
 
     public function sync($entry, $terms)
@@ -195,10 +206,10 @@ class TaxonomyTermsStore extends ChildStore
 
         $this->writeItemToDisk($term);
 
+        $this->forgetItemsForSlug($term->inDefaultLocale()->slug());
+
         foreach ($term->localizations() as $item) {
             $key = $this->getItemKey($item);
-
-            $this->forgetItem($key);
 
             $this->setPath($key, $item->path());
 
@@ -206,6 +217,15 @@ class TaxonomyTermsStore extends ChildStore
 
             $this->cacheItem($item);
         }
+    }
+
+    private function forgetItemsForSlug(string $slug): void
+    {
+        $this->paths()->keys()
+            ->merge($this->index('title')->keys())
+            ->filter(fn ($key) => Str::after((string) $key, '::') === $slug)
+            ->unique()
+            ->each(fn ($key) => $this->forgetItem($key));
     }
 
     public function delete($term)

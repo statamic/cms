@@ -18,6 +18,10 @@ class TaxonomyTreeController extends CpController
 
         $site = $request->site ?? Site::selected()->handle();
 
+        if (! $taxonomy->sites()->contains($site)) {
+            $site = $taxonomy->sites()->first();
+        }
+
         $pages = $this->transformTree(
             $taxonomy->structure()->tree()->tree(),
             $taxonomy,

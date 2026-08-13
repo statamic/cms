@@ -78,18 +78,22 @@ class TaxonomiesController extends CpController
             ->rejectUnlisted()
             ->values();
 
+        $site = $taxonomy->sites()->contains(Site::selected()->handle())
+            ? Site::selected()->handle()
+            : $taxonomy->sites()->first();
+
         $viewData = [
             'taxonomy' => $taxonomy->handle(),
             'taxonomyTitle' => $taxonomy->title(),
             'blueprints' => $blueprints,
-            'site' => Site::selected()->handle(),
+            'site' => $site,
             'columns' => $columns,
             'filters' => Scope::filters('terms', [
                 'taxonomy' => $taxonomy->handle(),
                 'blueprints' => $blueprints->pluck('handle')->all(),
             ]),
             'canCreate' => User::current()->can('create', [TermContract::class, $taxonomy]) && $taxonomy->hasVisibleTermBlueprint(),
-            'createUrl' => cp_route('taxonomies.terms.create', [$taxonomy->handle(), Site::selected()->handle()]),
+            'createUrl' => cp_route('taxonomies.terms.create', [$taxonomy->handle(), $site]),
             'taxonomyEditUrl' => cp_route('taxonomies.edit', $taxonomy->handle()),
             'taxonomyBlueprintsUrl' => cp_route('blueprints.taxonomies.index', $taxonomy),
             'canEdit' => User::current()->can('edit', $taxonomy),
