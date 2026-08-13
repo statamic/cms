@@ -9,6 +9,8 @@ use Statamic\Facades\Entry;
 use Statamic\Http\Controllers\CP\CpController;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
+use function Statamic\trans as __;
+
 class EntryTitleFormatController extends CpController
 {
     public function create(Request $request, $collection, $site)
