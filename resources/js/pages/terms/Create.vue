@@ -18,6 +18,7 @@ defineProps([
     'listingUrl',
     'previewTargets',
     'parent',
+    'parents',
 ]);
 
 function saved(response) {
@@ -44,6 +45,7 @@ function saved(response) {
         :initial-origin-values="{}"
         :initial-site="locale"
         :parent="parent"
+        :parents="parents"
         :can-edit-blueprint="canEditBlueprint"
         :create-another-url="createAnotherUrl"
         :listing-url="listingUrl"

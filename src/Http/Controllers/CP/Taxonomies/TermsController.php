@@ -245,17 +245,18 @@ class TermsController extends CpController
             'taxonomy' => $taxonomy->handle(),
             'taxonomyCreateLabel' => $taxonomy->createLabel(),
             'parent' => $taxonomy->hasStructure() ? $request->parent : null,
+            'parents' => $this->parentBreadcrumbs($taxonomy, $request->parent, $site),
             'blueprint' => $blueprint->toPublishArray(),
             'published' => $taxonomy->defaultPublishState(),
             'locale' => $site->handle(),
-            'localizations' => $this->getAuthorizedSitesForTaxonomy($taxonomy)->map(function ($handle) use ($taxonomy, $site) {
+            'localizations' => $this->getAuthorizedSitesForTaxonomy($taxonomy)->map(function ($handle) use ($taxonomy, $site, $request) {
                 return [
                     'handle' => $handle,
                     'name' => Site::get($handle)->name(),
                     'active' => $handle === $site->handle(),
                     'exists' => false,
                     'published' => false,
-                    'url' => cp_route('taxonomies.terms.create', [$taxonomy->handle(), $handle]),
+                    'url' => cp_route('taxonomies.terms.create', [$taxonomy->handle(), $handle, 'blueprint' => $request->blueprint, 'parent' => $request->parent]),
                     'livePreviewUrl' => cp_route('taxonomies.terms.preview.create', [$taxonomy->handle(), $handle]),
                 ];
             })->values()->all(),
@@ -269,7 +270,7 @@ class TermsController extends CpController
         return Inertia::render('terms/Create', [
             ...$viewData,
             'canEditBlueprint' => User::current()->can('configure fields'),
-            'createAnotherUrl' => cp_route('taxonomies.terms.create', [$taxonomy->handle(), $site->handle()]),
+            'createAnotherUrl' => cp_route('taxonomies.terms.create', [$taxonomy->handle(), $site->handle(), 'blueprint' => $request->blueprint, 'parent' => $request->parent]),
             'listingUrl' => cp_route('taxonomies.show', $taxonomy->handle()),
         ]);
     }
@@ -343,5 +344,26 @@ class TermsController extends CpController
         return $taxonomy
             ->sites()
             ->filter(fn ($handle) => User::current()->can('view', Site::get($handle)));
+    }
+
+    private function parentBreadcrumbs($taxonomy, $parent, $site): array
+    {
+        if (! $taxonomy->hierarchical() || ! $parent) {
+            return [];
+        }
+
+        $term = Term::find($taxonomy->handle().'::'.Str::after($parent, '::'))?->in($site->handle());
+
+        if (! $term) {
+            return [];
+        }
+
+        return $term->ancestors()
+            ->push($term)
+            ->map(fn ($ancestor) => [
+                'title' => $ancestor->title(),
+                'edit_url' => $ancestor->editUrl(),
+            ])
+            ->all();
     }
 }
