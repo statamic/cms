@@ -10,7 +10,6 @@ import {
 } from '@ui';
 import FieldActions from '@/components/field-actions/FieldActions.vue';
 import ShowField from '@/components/field-conditions/ShowField.js';
-import { KEYS } from '@/components/field-conditions/Constants.js';
 
 const props = defineProps({
     config: {
@@ -145,26 +144,7 @@ const extraValues = computed(() => {
     return fieldPathPrefix.value ? data_get(containerExtraValues.value, fieldPathPrefix.value) : containerExtraValues.value;
 });
 
-const conditionHandles = computed(() => {
-    const conditionKey = KEYS.find((k) => props.config[k]);
-    if (!conditionKey) return null;
-    const conditions = props.config[conditionKey];
-    if (typeof conditions === 'string') return null;
-    // Blueprint conditions are `{ field: 'operator value' }` objects.
-    return Object.keys(conditions);
-});
-
-const hasConditions = computed(() => {
-    if (props.config.visibility === 'hidden') return false;
-    return KEYS.some((k) => props.config[k]);
-});
-
-const isCustomCondition = computed(() => {
-    const conditionKey = KEYS.find((k) => props.config[k]);
-    return conditionKey ? typeof props.config[conditionKey] === 'string' : false;
-});
-
-function evaluateShowField() {
+const shouldShowField = computed(() => {
     return new ShowField(
         values.value,
         extraValues.value,
@@ -174,47 +154,7 @@ function evaluateShowField() {
         setHiddenField,
         { container },
     ).showField(props.config, fullPath.value);
-}
-
-// Targeted watching: only re-evaluate when referenced condition handles change,
-// instead of depending on the entire values tree via a computed.
-const shouldShowField = ref(props.config.visibility !== 'hidden');
-
-if (hasConditions.value) {
-    shouldShowField.value = evaluateShowField();
-
-    watch(
-        () => {
-            if (isCustomCondition.value) return values.value;
-            const handles = conditionHandles.value;
-            if (!handles) return null;
-            const src = values.value ?? {};
-            const rootSrc = containerValues.value ?? {};
-            return handles.map((handle) => {
-                if (handle.startsWith('$root.') || handle.startsWith('root.')) {
-                    return data_get(rootSrc, handle.replace(/^\$?root\./, ''));
-                }
-                return data_get(src, handle);
-            });
-        },
-        () => {
-            shouldShowField.value = evaluateShowField();
-        },
-        { deep: isCustomCondition.value },
-    );
-
-    watch(hiddenFields, () => {
-        shouldShowField.value = evaluateShowField();
-    });
-
-    // Revealers / $parent paths / nested values may not be listed as handles —
-    // also re-evaluate when revealer values change.
-    watch(revealerValues, () => {
-        shouldShowField.value = evaluateShowField();
-    }, { deep: true });
-} else if (props.config.visibility === 'hidden') {
-    shouldShowField.value = evaluateShowField();
-}
+});
 
 // Hidden fieldtypes are mounted like any other field so they take part in field
 // conditions, but they only become visible on a form submission.
