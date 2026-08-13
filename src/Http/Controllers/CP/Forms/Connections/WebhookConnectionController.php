@@ -17,7 +17,7 @@ class WebhookConnectionController extends CpController
             'webhooks' => ['present', 'array'],
             'webhooks.*' => ['array'],
             'webhooks.*.url' => ['required', 'url:http,https'],
-            'webhooks.*.verify_ssl' => ['sometimes', 'boolean'],
+            'webhooks.*.verify_ssl' => ['nullable', 'boolean'],
             'webhooks.*.enabled' => ['nullable', 'boolean'],
             'webhooks.*.conditions' => ['nullable', 'array'],
             'webhooks.*.conditions.*' => ['array'],
