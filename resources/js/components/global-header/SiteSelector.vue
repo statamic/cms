@@ -13,15 +13,22 @@
             align="end"
             :adaptive-width="true"
             class="[&_[data-ui-combobox-trigger]]:text-white/85"
-        />
+        >
+            <template #selected-option="{ option }">
+                <div class="size-4">
+                    <Icon name="globe-arrow" class="text-gray-900 dark:text-white dark:opacity-50" />
+                </div>
+                <span class="block truncate">{{ __(':name Site', { name: option.name }) }}</span>
+            </template>
+        </Select>
     </div>
 </template>
 
 <script>
-import { Select } from '@/components/ui';
+import { Icon, Select } from '@/components/ui';
 
 export default {
-    components: { Select },
+    components: { Icon, Select },
 
     computed: {
         sites() {
