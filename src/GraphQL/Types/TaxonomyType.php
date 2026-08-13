@@ -22,6 +22,9 @@ class TaxonomyType extends \Rebing\GraphQL\Support\Type
             'title' => [
                 'type' => GraphQL::nonNull(GraphQL::string()),
             ],
+            'structure' => [
+                'type' => GraphQL::type(TaxonomyStructureType::NAME),
+            ],
         ])->map(function (array $arr) {
             $arr['resolve'] = $this->resolver();
 
@@ -33,6 +36,10 @@ class TaxonomyType extends \Rebing\GraphQL\Support\Type
     private function resolver()
     {
         return function ($taxonomy, $args, $context, $info) {
+            if ($info->fieldName === 'structure') {
+                return $taxonomy->structure();
+            }
+
             $value = $taxonomy->augmentedValue($info->fieldName);
 
             if ($value instanceof Value) {

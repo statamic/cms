@@ -10,6 +10,7 @@ use Statamic\Http\Controllers\API\NavigationTreeController;
 use Statamic\Http\Controllers\API\NotFoundController;
 use Statamic\Http\Controllers\API\TaxonomyTermEntriesController;
 use Statamic\Http\Controllers\API\TaxonomyTermsController;
+use Statamic\Http\Controllers\API\TaxonomyTreeController;
 use Statamic\Http\Controllers\API\UsersController;
 
 Route::resource('collections.entries', CollectionEntriesController::class)->only('index', 'show');
@@ -23,6 +24,7 @@ Route::name('assets.index')->get('assets/{asset_container}', [AssetsController::
 Route::name('assets.show')->get('assets/{asset_container}/{asset}', [AssetsController::class, 'show'])->where('asset', '.*');
 
 Route::get('collections/{collection}/tree', [CollectionTreeController::class, 'show']);
+Route::get('taxonomies/{taxonomy}/tree', [TaxonomyTreeController::class, 'show']);
 Route::get('navs/{nav}/tree', [NavigationTreeController::class, 'show']);
 
 Route::get('{path?}', NotFoundController::class)->where('path', '.*');
