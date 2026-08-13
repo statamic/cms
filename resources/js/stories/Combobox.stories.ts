@@ -1010,3 +1010,40 @@ export const TestShouldOpenDropdownDoesNotBlockClose: Story = {
         await expect(document.querySelector('[data-ui-combobox-content]')).toBeFalsy();
     },
 };
+
+const falsyValueOptions = [
+    { label: 'Day(s)', value: 3 },
+    { label: 'Week(s)', value: 2 },
+    { label: 'Month(s)', value: 1 },
+    { label: 'Year(s)', value: 0 },
+];
+
+export const TestFalsyModelValue: Story = {
+    tags: ['!dev', 'test'],
+    render: () => ({
+        components: { Combobox },
+        setup() {
+            const value = ref(0);
+            return { value, options: falsyValueOptions };
+        },
+        template: `<Combobox v-model="value" :options="options" clearable placeholder="Select..." />`,
+    }),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+
+        // A falsy modelValue (0) should still show its label, not the placeholder
+        const selectedOption = canvasElement.querySelector('[data-ui-combobox-selected-option]');
+        await expect(selectedOption).toBeTruthy();
+        expect(selectedOption?.textContent).toBe('Year(s)');
+
+        // The clear button should be visible for a falsy but non-null selection
+        const clearButton = canvas.getByRole('button', { name: /clear/i });
+        await expect(clearButton).toBeTruthy();
+
+        // Clearing should reset to the placeholder
+        await userEvent.click(clearButton);
+        await waitFor(() => {
+            expect(canvas.getByPlaceholderText('Select...')).toBeTruthy();
+        });
+    },
+};
