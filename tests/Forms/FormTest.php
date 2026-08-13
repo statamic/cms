@@ -445,7 +445,7 @@ class FormTest extends TestCase
     {
         $form = Form::make('contact_us');
 
-        $this->assertEquals([], $form->email());
+        $this->assertNull($form->email());
 
         $form->connections(['email' => [['to' => 'foo@bar.com']]]);
 

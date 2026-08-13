@@ -85,7 +85,7 @@ class UpdateFormTest extends TestCase
     public function it_updates_data()
     {
         $form = tap(Form::make('test'))->save();
-        $this->assertEquals([], $form->email());
+        $this->assertNull($form->email());
 
         Form::appendConfigFields('*', 'Test Config', [
             'another_config' => [
