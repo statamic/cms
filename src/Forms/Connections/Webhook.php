@@ -109,7 +109,7 @@ class Webhook extends Connection
         $latestSubmission = null;
 
         if (User::current()->can('viewSubmissions', $form)) {
-            $latestSubmission = $form->querySubmissions()->orderBy('date', 'desc')->first();
+            $latestSubmission = $form->querySubmissions()->whereNull('partial')->orderBy('date', 'desc')->first();
         }
 
         return json_encode([
