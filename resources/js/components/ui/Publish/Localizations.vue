@@ -27,7 +27,7 @@ defineEmits(['selected']);
 
 const comboboxId = useId();
 
-const panelHeading = computed(() => props.heading || __('Current Page Localization'));
+const panelHeading = computed(() => props.heading || __('Working In'));
 
 const activeLocalization = computed(() => {
     return props.localizations.find((localization) => localization.active);
