@@ -8,6 +8,8 @@ use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Facades\Term;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class EnsuresTermPaths
 {
     /**
