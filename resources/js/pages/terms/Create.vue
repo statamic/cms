@@ -18,7 +18,7 @@ defineProps([
     'listingUrl',
     'previewTargets',
     'parent',
-    'parents',
+    'extraValues',
 ]);
 
 function saved(response) {
@@ -38,6 +38,7 @@ function saved(response) {
         :taxonomy-handle="taxonomy"
         :initial-fieldset="blueprint"
         :initial-values="values"
+        :initial-extra-values="extraValues"
         :initial-meta="meta"
         :initial-published="published"
         :initial-localizations="localizations"
@@ -45,7 +46,6 @@ function saved(response) {
         :initial-origin-values="{}"
         :initial-site="locale"
         :parent="parent"
-        :parents="parents"
         :can-edit-blueprint="canEditBlueprint"
         :create-another-url="createAnotherUrl"
         :listing-url="listingUrl"

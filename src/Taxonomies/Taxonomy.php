@@ -165,6 +165,45 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, ContainsQ
         return $blueprint;
     }
 
+    /**
+     * Add the parent relationship field for the CP publish form.
+     * Cloned onto a copy so the real blueprint (and therefore augmentation) stays clean.
+     */
+    public function ensurePublishParentField($blueprint, $term = null)
+    {
+        if (! $this->hierarchical() || $blueprint->hasField('parent')) {
+            return $blueprint;
+        }
+
+        $blueprint = clone $blueprint;
+
+        $exclusions = [];
+
+        if ($term) {
+            $exclusions = collect([$term->id()]);
+
+            if ($page = $term->page()) {
+                $exclusions = $exclusions->merge(
+                    $page->flattenedPages()->map(fn ($page) => $term->taxonomyHandle().'::'.$page->id())
+                );
+            }
+
+            $exclusions = $exclusions->unique()->values()->all();
+        }
+
+        $blueprint->ensureField('parent', [
+            'type' => 'terms',
+            'taxonomies' => [$this->handle()],
+            'max_items' => 1,
+            'mode' => 'select',
+            'create' => false,
+            'localizable' => false,
+            'exclusions' => $exclusions,
+        ], 'sidebar');
+
+        return $blueprint;
+    }
+
     public function fallbackTermBlueprint()
     {
         $blueprint = (clone Blueprint::find('default'))

@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Taxonomies;
 
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Statamic\Contracts\Taxonomies\Term as TermContract;
 use Statamic\Facades\Action;
@@ -18,6 +19,7 @@ use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 use Statamic\Rules\Slug;
 use Statamic\Rules\UniqueTermValue;
 use Statamic\Statamic;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 use function Statamic\trans as __;
@@ -93,7 +95,7 @@ class TermsController extends CpController
 
         $blueprint = $term->blueprint();
 
-        [$values, $meta] = $this->extractFromFields($term, $blueprint);
+        [$values, $meta, $extraValues, $blueprint] = $this->extractFromFields($term, $blueprint);
 
         if ($hasOrigin = $term->hasOrigin()) {
             [$originValues, $originMeta] = $this->extractFromFields($term->origin(), $blueprint);
@@ -110,6 +112,7 @@ class TermsController extends CpController
                 'editBlueprint' => cp_route('blueprints.taxonomies.edit', [$taxonomy, $blueprint]),
             ],
             'values' => array_merge($values, ['id' => $term->id()]),
+            'extraValues' => $extraValues,
             'meta' => $meta,
             'taxonomy' => $taxonomy->handle(),
             'blueprint' => $blueprint->toPublishArray(),
@@ -139,12 +142,6 @@ class TermsController extends CpController
             'previewTargets' => $taxonomy->previewTargets()->all(),
             'itemActions' => Action::for($term, ['taxonomy' => $taxonomy->handle(), 'view' => 'form']),
             'hasTemplate' => view()->exists($term->template()),
-            'parents' => $taxonomy->hierarchical()
-                ? $term->ancestors()->map(fn ($ancestor) => [
-                    'title' => $ancestor->title(),
-                    'edit_url' => $ancestor->editUrl(),
-                ])->all()
-                : [],
         ];
 
         if ($request->wantsJson()) {
@@ -172,7 +169,10 @@ class TermsController extends CpController
 
         $term->term()->syncOriginal();
 
-        $fields = $term->blueprint()->fields()->addValues($request->except('id'));
+        $fields = $taxonomy
+            ->ensurePublishParentField($term->blueprint(), $term)
+            ->fields()
+            ->addValues($request->except('id'));
 
         $fields->validate([
             'title' => 'required',
@@ -189,6 +189,8 @@ class TermsController extends CpController
             $term->blueprint($explicitBlueprint);
         }
 
+        $parent = $taxonomy->hierarchical() ? $values->pull('parent') : null;
+
         $values = $values->except(['slug', 'date']);
 
         if ($term->hasOrigin()) {
@@ -203,13 +205,18 @@ class TermsController extends CpController
 
         $saved = $term->updateLastModified(User::current())->save();
 
-        [$values] = $this->extractFromFields($term, $term->blueprint());
+        if ($taxonomy->hierarchical() && $request->exists('parent')) {
+            $this->moveTermInTree($taxonomy, $term, $parent);
+        }
+
+        [$values, $meta, $extraValues] = $this->extractFromFields($term, $term->blueprint());
 
         return (new TermResource($term))
             ->additional([
                 'saved' => $saved,
                 'data' => [
                     'values' => $values,
+                    'extraValues' => $extraValues,
                 ],
             ]);
     }
@@ -224,8 +231,17 @@ class TermsController extends CpController
             throw new \Exception('A valid blueprint is required.');
         }
 
+        $blueprint = $taxonomy->ensurePublishParentField($blueprint);
+
+        $values = [];
+
+        if ($taxonomy->hierarchical() && $request->parent) {
+            $values['parent'] = Arr::wrap($request->parent);
+        }
+
         $fields = $blueprint
             ->fields()
+            ->addValues($values)
             ->preProcess();
 
         $values = $fields->values()->merge([
@@ -234,6 +250,16 @@ class TermsController extends CpController
             'published' => $taxonomy->defaultPublishState(),
         ]);
 
+        $extraValues = [
+            'depth' => 1,
+            'children' => [],
+        ];
+
+        if ($taxonomy->hierarchical() && $request->parent) {
+            $parentTerm = Term::find($taxonomy->handle().'::'.$this->termSlugFromParentValue($taxonomy, $request->parent))?->in($site->handle());
+            $extraValues['depth'] = ($parentTerm?->depth() ?? 0) + 1;
+        }
+
         $viewData = [
             'title' => $taxonomy->createLabel(),
             'actions' => [
@@ -241,11 +267,11 @@ class TermsController extends CpController
                 'editBlueprint' => cp_route('blueprints.taxonomies.edit', [$taxonomy, $blueprint]),
             ],
             'values' => $values,
+            'extraValues' => $extraValues,
             'meta' => $fields->meta(),
             'taxonomy' => $taxonomy->handle(),
             'taxonomyCreateLabel' => $taxonomy->createLabel(),
             'parent' => $taxonomy->hasStructure() ? $request->parent : null,
-            'parents' => $this->parentBreadcrumbs($taxonomy, $request->parent, $site),
             'blueprint' => $blueprint->toPublishArray(),
             'published' => $taxonomy->defaultPublishState(),
             'locale' => $site->handle(),
@@ -279,7 +305,7 @@ class TermsController extends CpController
     {
         $this->authorize('store', [TermContract::class, $taxonomy]);
 
-        $blueprint = $taxonomy->termBlueprint($request->_blueprint);
+        $blueprint = $taxonomy->ensurePublishParentField($taxonomy->termBlueprint($request->_blueprint));
 
         $fields = $blueprint->fields()->addValues($request->all());
 
@@ -289,6 +315,10 @@ class TermsController extends CpController
         ]);
 
         $values = $fields->process()->values()->except(['slug', 'blueprint']);
+
+        $parent = $taxonomy->hierarchical()
+            ? ($values->pull('parent') ?: $request->_parent)
+            : null;
 
         $term = Term::make()
             ->taxonomy($taxonomy)
@@ -316,7 +346,7 @@ class TermsController extends CpController
 
         $saved = $term->updateLastModified(User::current())->save();
 
-        if ($saved && $taxonomy->hasStructure() && ($parent = $request->_parent)) {
+        if ($saved && $taxonomy->hierarchical() && $parent) {
             $this->graftTermIntoTree($taxonomy, $term, $parent);
         }
 
@@ -326,11 +356,11 @@ class TermsController extends CpController
 
     private function graftTermIntoTree($taxonomy, $term, $parent)
     {
-        $parent = Str::after($parent, '::');
+        $parent = $this->termSlugFromParentValue($taxonomy, $parent);
 
         $tree = $taxonomy->structure()->tree();
 
-        if (! $tree->find($parent)) {
+        if (! $parent || ! $tree->find($parent)) {
             return;
         }
 
@@ -339,31 +369,75 @@ class TermsController extends CpController
         $taxonomy->structure()->graftTerm($slug, $parent);
     }
 
+    private function moveTermInTree($taxonomy, $term, $parent): void
+    {
+        $slug = $term->inDefaultLocale()->slug();
+        $parent = $this->termSlugFromParentValue($taxonomy, $parent);
+
+        if ($parent === $slug) {
+            throw ValidationException::withMessages([
+                'parent' => __('statamic::validation.parent_cannot_be_itself'),
+            ]);
+        }
+
+        $tree = $taxonomy->structure()->tree();
+        $page = $tree->find($slug);
+
+        if ($parent) {
+            $parentPage = $tree->find($parent);
+
+            if (! $parentPage) {
+                return;
+            }
+
+            $descendantIds = collect($page?->flattenedPages()?->map->id() ?? []);
+
+            if ($descendantIds->contains($parent)) {
+                throw ValidationException::withMessages([
+                    'parent' => __('statamic::validation.parent_cannot_be_descendant'),
+                ]);
+            }
+        }
+
+        $branchHeight = 1;
+
+        if ($page && ($descendants = $page->flattenedPages()) && $descendants->isNotEmpty()) {
+            $branchHeight = $descendants->max->depth() - $page->depth() + 1;
+        }
+
+        $parentDepth = $parent ? $tree->find($parent)->depth() : 0;
+
+        if (($max = $taxonomy->structure()->maxDepth()) && ($parentDepth + $branchHeight) > $max) {
+            throw ValidationException::withMessages([
+                'parent' => __('statamic::validation.parent_exceeds_max_depth'),
+            ]);
+        }
+
+        $currentParentSlug = $term->parent()?->inDefaultLocale()->slug();
+
+        if ($currentParentSlug === $parent) {
+            return;
+        }
+
+        $tree->tree($tree->tree());
+        $tree->move($slug, $parent)->save();
+    }
+
+    private function termSlugFromParentValue($taxonomy, $value): ?string
+    {
+        $value = is_array($value) ? Arr::first($value) : $value;
+
+        if (! $value) {
+            return null;
+        }
+
+        return Str::after($value, $taxonomy->handle().'::');
+    }
+
     protected function getAuthorizedSitesForTaxonomy($taxonomy)
     {
         return $taxonomy
             ->sites()
             ->filter(fn ($handle) => User::current()->can('view', Site::get($handle)));
-    }
-
-    private function parentBreadcrumbs($taxonomy, $parent, $site): array
-    {
-        if (! $taxonomy->hierarchical() || ! $parent) {
-            return [];
-        }
-
-        $term = Term::find($taxonomy->handle().'::'.Str::after($parent, '::'))?->in($site->handle());
-
-        if (! $term) {
-            return [];
-        }
-
-        return $term->ancestors()
-            ->push($term)
-            ->map(fn ($ancestor) => [
-                'title' => $ancestor->title(),
-                'edit_url' => $ancestor->editUrl(),
-            ])
-            ->all();
     }
 }

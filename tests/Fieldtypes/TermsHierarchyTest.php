@@ -3,6 +3,7 @@
 namespace Tests\Fieldtypes;
 
 use Facades\Tests\Factories\EntryFactory;
+use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades;
@@ -175,6 +176,17 @@ class TermsHierarchyTest extends TestCase
                 ['term' => 'fern'],
             ]],
         ], $tree);
+    }
+
+    #[Test]
+    public function parent_field_index_query_excludes_configured_ids()
+    {
+        $items = $this->fieldtype([
+            'taxonomies' => ['categories'],
+            'exclusions' => ['categories::animals', 'categories::cat'],
+        ])->getIndexItems(new Request(['paginate' => false]));
+
+        $this->assertEquals(['categories::furniture'], $items->map->id()->all());
     }
 
     public function fieldtype($config = [], $parent = null)

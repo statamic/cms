@@ -177,6 +177,7 @@ return [
     'options_require_keys' => 'All options must have keys.',
     'origin_cannot_be_disabled' => 'Cannot select a disabled origin.',
     'parent_cannot_be_itself' => 'Cannot be its own parent.',
+    'parent_cannot_be_descendant' => 'Cannot be nested under one of its descendants.',
     'parent_causes_root_children' => 'This would cause the root page to have children.',
     'parent_exceeds_max_depth' => 'This would exceed the maximum depth.',
     'reserved' => 'This is a reserved word.',
