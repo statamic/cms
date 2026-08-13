@@ -267,7 +267,15 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, ContainsQ
 
     public function sortField()
     {
-        return $this->sortField ?? 'title';
+        if ($this->sortField) {
+            return $this->sortField;
+        }
+
+        if ($this->orderable() || $this->hasStructure()) {
+            return 'order';
+        }
+
+        return 'title';
     }
 
     public function setSortField($field)

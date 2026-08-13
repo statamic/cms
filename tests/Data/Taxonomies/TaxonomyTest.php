@@ -259,6 +259,14 @@ class TaxonomyTest extends TestCase
         $this->assertEquals('title', $taxonomy->sortField());
         $this->assertEquals('asc', $taxonomy->sortDirection());
 
+        $ordered = (new Taxonomy)->structureContents(['max_depth' => 1]);
+        $this->assertEquals('order', $ordered->sortField());
+        $this->assertEquals('asc', $ordered->sortDirection());
+
+        $hierarchical = (new Taxonomy)->structureContents(['max_depth' => 99]);
+        $this->assertEquals('order', $hierarchical->sortField());
+        $this->assertEquals('asc', $hierarchical->sortDirection());
+
         $taxonomy->setSortField('foo');
         $this->assertEquals('foo', $taxonomy->sortField());
         $this->assertEquals('asc', $taxonomy->sortDirection());

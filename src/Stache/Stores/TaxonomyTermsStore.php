@@ -22,6 +22,7 @@ class TaxonomyTermsStore extends ChildStore
     protected $storeIndexes = [
         'slug',
         'taxonomy',
+        'order',
         'associations' => Indexes\Terms\Associations::class,
         'site' => Indexes\Terms\Site::class,
     ];

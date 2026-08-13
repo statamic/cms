@@ -23,7 +23,21 @@ class TaxonomyTree extends Tree implements TreeContract
 
     public function entryOrder($reference)
     {
-        return ($this->cachedFlattenedPageOrder ??= $this->flattenedPages()->map->id()->flip())->get($reference);
+        return ($this->cachedFlattenedPageOrder ??= $this->flattenedTermSlugs()->flip())->get($reference);
+    }
+
+    private function flattenedTermSlugs(): \Illuminate\Support\Collection
+    {
+        $flatten = function (array $branches) use (&$flatten) {
+            return collect($branches)->flatMap(function ($branch) use ($flatten) {
+                $slug = $branch['term'] ?? null;
+                $children = isset($branch['children']) ? $flatten($branch['children']) : collect();
+
+                return $slug ? $children->prepend($slug) : $children;
+            })->values();
+        };
+
+        return $flatten($this->tree);
     }
 
     public function append($entry)
@@ -103,6 +117,7 @@ class TaxonomyTree extends Tree implements TreeContract
         $saved = parent::save();
 
         if ($saved) {
+            Stache::store('terms')->store($this->handle())->index('order')->update();
             Blink::forget("taxonomy-structure-tree-{$this->handle()}");
             Blink::forget('taxonomy-structure-term-slugs-'.$this->handle());
         }

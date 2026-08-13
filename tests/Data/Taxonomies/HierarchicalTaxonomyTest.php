@@ -308,6 +308,23 @@ class HierarchicalTaxonomyTest extends TestCase
     }
 
     #[Test]
+    public function structured_taxonomies_sort_terms_by_tree_order()
+    {
+        $taxonomy = $this->makeHierarchicalTaxonomy();
+
+        $this->assertEquals('order', $taxonomy->sortField());
+        $this->assertEquals(1, Term::find('categories::animals')->order());
+        $this->assertEquals(2, Term::find('categories::cat')->order());
+        $this->assertEquals(3, Term::find('categories::calico')->order());
+        $this->assertEquals(4, Term::find('categories::furniture')->order());
+
+        $this->assertEquals(
+            ['animals', 'cat', 'calico', 'furniture'],
+            $taxonomy->queryTerms()->orderBy('order')->get()->map->slug()->all()
+        );
+    }
+
+    #[Test]
     public function validating_a_tree_rejects_branches_deeper_than_max_depth()
     {
         $taxonomy = tap(Taxonomy::make('categories')->structureContents(['max_depth' => 2]))->save();
