@@ -369,11 +369,18 @@ export default {
             this._draggableObserver?.disconnect();
             this.$el.setAttribute('draggable', true);
 
+            // dragstart fires on this.$el (the draggable wrapper), not the inner container.
+            this.$el.addEventListener('dragstart', this.collapseSiblingsForDrag, { once: true });
             document.addEventListener('mouseup', this.disableDragging, { once: true });
             document.addEventListener('dragend', this.disableDragging, { once: true });
         },
 
+        collapseSiblingsForDrag() {
+            this.extension.options.bard.collapseAll();
+        },
+
         disableDragging() {
+            this.$el.removeEventListener('dragstart', this.collapseSiblingsForDrag);
             this.$el.setAttribute('draggable', false);
             this._draggableObserver?.observe(this.$el, { attributes: true, attributeFilter: ['draggable'] });
         },

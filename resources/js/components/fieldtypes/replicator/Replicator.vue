@@ -232,6 +232,7 @@ export default {
 
         dragStarted() {
             this.dragging = true;
+            this.collapseAll();
             this.$emit('focus');
         },
 
