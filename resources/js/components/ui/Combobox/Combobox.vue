@@ -268,7 +268,7 @@ function deselect(option) {
 }
 
 function updateModelValue(value) {
-    let originalValue = props.modelValue || [];
+    let originalValue = props.modelValue === null ? [] : props.modelValue;
 
     searchQuery.value = '';
     emit('update:modelValue', value);
