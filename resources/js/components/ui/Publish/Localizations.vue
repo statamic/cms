@@ -43,7 +43,7 @@ const activeLocalization = computed(() => {
 </script>
 
 <template>
-    <Panel v-if="localizations.length > 1" :heading="panelHeading">
+    <Panel v-if="localizations.length > 1" :heading="panelHeading" :icon="heading ? 'globe-arrow' : null">
         <Card class="p-3! space-y-1">
             <template v-if="localizations.length > 5">
                 <Label
