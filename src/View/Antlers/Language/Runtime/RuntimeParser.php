@@ -379,7 +379,7 @@ class RuntimeParser implements Parser
                     /** @var AntlersNode $lastTagNode */
                     $lastTagNode = GlobalRuntimeState::$globalTagEnterStack[count(GlobalRuntimeState::$globalTagEnterStack) - 1];
 
-                    if ($lastTagNode->name->name != 'partial') {
+                    if (! in_array($lastTagNode->name->name, ['partial', 'include'])) {
                         $this->documentParser->setStartLineSeed($lastTagNode->endPosition->line);
                     }
                 }
@@ -770,9 +770,13 @@ INFO;
         GlobalRuntimeState::$isEvaluatingUserData = false;
 
         $existingView = $this->view;
+
+        $suspendedData = $this->nodeProcessor->getAllData();
+
         try {
             return $this->renderViewContent($view, $text, $data);
         } finally {
+            $this->nodeProcessor->swapData($suspendedData);
             $this->view = $existingView;
             array_pop(GlobalRuntimeState::$templateFileStack);
             GlobalRuntimeState::$currentExecutionFile = $this->view;

@@ -47,6 +47,7 @@ use Statamic\View\Antlers\Language\Nodes\Structures\StatementSeparatorNode;
 use Statamic\View\Antlers\Language\Nodes\Structures\SwitchGroup;
 use Statamic\View\Antlers\Language\Nodes\VariableNode;
 use Statamic\View\Antlers\Language\Parser\LanguageParser;
+use Statamic\View\Antlers\Language\Runtime\Concerns\ManagesIncludeSlots;
 use Statamic\View\Antlers\Language\Runtime\Debugging\GlobalDebugManager;
 use Statamic\View\Antlers\Language\Runtime\Sandbox\Environment;
 use Statamic\View\Antlers\Language\Runtime\Sandbox\RuntimeValues;
@@ -54,11 +55,14 @@ use Statamic\View\Antlers\Language\Runtime\Sandbox\TypeCoercion;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Statamic\View\Antlers\SyntaxError;
 use Statamic\View\Cascade;
+use Statamic\View\Slot;
 use Statamic\View\State\CachesOutput;
 use Throwable;
 
 class NodeProcessor
 {
+    use ManagesIncludeSlots;
+
     /**
      * @var Loader
      */
@@ -1582,6 +1586,10 @@ class NodeProcessor
                             $this->data = $lockData;
                         }
 
+                        if ($node->name->name == 'include') {
+                            $tagParameters = $this->captureIncludeSlots($node, $tagActiveData, $tagParameters);
+                        }
+
                         if ($node->name->name == 'partial' || $node->name->name == 'scope') {
                             if (array_key_exists('handle_prefix', $tagParameters)) {
                                 $handlePrefixes = $tagParameters['handle_prefix'];
@@ -1624,12 +1632,20 @@ class NodeProcessor
 
                         $suspendedData = null;
                         $capturedRuntimeState = null;
+                        $suspendedPrefixes = null;
 
                         if ($tag::$isolated) {
                             $tag->setIsolatedContext($tagActiveData);
                             $suspendedData = $this->getAllData();
                             $this->data = [];
                             $capturedRuntimeState = GlobalRuntimeState::captureAndIsolate();
+                        }
+
+                        // Other isolated tags inheriting handle prefixes is technically unintentional,
+                        // but preserved for BC. This may change in the next major version.
+                        if ($node->name->name == 'include') {
+                            $suspendedPrefixes = GlobalRuntimeState::$prefixState;
+                            GlobalRuntimeState::$prefixState = [];
                         }
 
                         if (in_array(CachesOutput::class, class_implements($tag))) {
@@ -1667,10 +1683,14 @@ class NodeProcessor
                             GlobalRuntimeState::$evaulatingTagContents = false;
                             $this->stopMeasuringTag();
 
-                            if ($suspendedData != null) {
+                            if ($capturedRuntimeState !== null) {
                                 $this->data = $suspendedData;
 
                                 GlobalRuntimeState::restoreState($capturedRuntimeState);
+                            }
+
+                            if ($suspendedPrefixes !== null) {
+                                GlobalRuntimeState::$prefixState = $suspendedPrefixes;
                             }
                         }
 
@@ -2151,6 +2171,17 @@ class NodeProcessor
 
                     if ($val instanceof Builder) {
                         $val = $val->get()->all();
+                    }
+
+                    if ($val instanceof Slot) {
+                        $val = $val->render($node->hasParameters ? $this->getSlotOutputProps($node) : []);
+                        $buffer .= $this->measureBufferAppend($node, $this->modifyBufferAppend($val));
+
+                        if ($this->isTracingEnabled()) {
+                            $this->runtimeConfiguration->traceManager->traceOnExit($node, null);
+                        }
+
+                        continue;
                     }
 
                     $executedParamModifiers = false;

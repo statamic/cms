@@ -1577,7 +1577,7 @@ class DocumentParser
             /** @var AntlersNode $lastTagNode */
             $lastTagNode = GlobalRuntimeState::$globalTagEnterStack[count(GlobalRuntimeState::$globalTagEnterStack) - 1];
 
-            if ($lastTagNode->name->name != 'partial') {
+            if (! in_array($lastTagNode->name->name, ['partial', 'include'])) {
                 $this->setStartLineSeed($lastTagNode->endPosition->line);
             }
         }
