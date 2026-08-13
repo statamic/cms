@@ -97,6 +97,7 @@ watch(view, (view: View) => preferences.set('forms.connect.view', view));
                     >
                         <Link
                             :href="connection.url"
+                            :aria-label="__(connection.title)"
                             class="relative flex mb-2 aspect-square items-center justify-center rounded-lg border border-gray-300 bg-gray-50/30 p-8 text-gray-700 hover:bg-gray-100/50 dark:border-gray-700 dark:bg-gray-950/40 dark:text-gray-300 dark:hover:bg-gray-900"
                         >
                             <span class="[&_svg]:size-12" aria-hidden="true" v-html="connection.icon" />
