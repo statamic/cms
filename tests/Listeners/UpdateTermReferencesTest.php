@@ -245,6 +245,80 @@ class UpdateTermReferencesTest extends TestCase
     }
 
     #[Test]
+    public function it_rewrites_nested_path_references_when_renaming_a_term()
+    {
+        $this->topics->structureContents([])->save();
+
+        tap(Facades\Term::make()->taxonomy('topics')->slug('events')->data(['title' => 'Events']))->save();
+        $concerts = tap(Facades\Term::make()->taxonomy('topics')->slug('concerts')->data(['title' => 'Concerts']))->save();
+        $this->topics->structure()->tree()->tree([
+            ['term' => 'events', 'children' => [
+                ['term' => 'concerts'],
+            ]],
+        ])->save();
+
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'favourites',
+                    'field' => [
+                        'type' => 'terms',
+                        'taxonomies' => ['topics'],
+                        'mode' => 'select',
+                    ],
+                ],
+            ],
+        ]);
+
+        $entry = tap(Facades\Entry::make()->collection($collection)->data([
+            'favourites' => ['events/concerts', 'hoff'],
+        ]))->save();
+
+        $concerts->slug('gigs')->save();
+
+        $this->assertEquals(['events/gigs', 'hoff'], $entry->fresh()->get('favourites'));
+    }
+
+    #[Test]
+    public function it_rewrites_nested_path_references_when_renaming_a_parent_term()
+    {
+        $this->topics->structureContents([])->save();
+
+        $events = tap(Facades\Term::make()->taxonomy('topics')->slug('events')->data(['title' => 'Events']))->save();
+        tap(Facades\Term::make()->taxonomy('topics')->slug('concerts')->data(['title' => 'Concerts']))->save();
+        $this->topics->structure()->tree()->tree([
+            ['term' => 'events', 'children' => [
+                ['term' => 'concerts'],
+            ]],
+        ])->save();
+
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'favourites',
+                    'field' => [
+                        'type' => 'terms',
+                        'taxonomies' => ['topics'],
+                        'mode' => 'select',
+                    ],
+                ],
+            ],
+        ]);
+
+        $entry = tap(Facades\Entry::make()->collection($collection)->data([
+            'favourites' => ['events/concerts', 'events'],
+        ]))->save();
+
+        $events->slug('shows')->save();
+
+        $this->assertEquals(['shows/concerts', 'shows'], $entry->fresh()->get('favourites'));
+    }
+
+    #[Test]
     public function it_updates_scoped_single_term_fields()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();

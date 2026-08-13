@@ -749,7 +749,15 @@ class Terms extends Relationship
 
     protected function replaceValue($data, $newValue, $oldValue)
     {
-        return $this->valueRefersToTerm($data, $oldValue) ? $newValue : $data;
+        if (! $this->valueRefersToTerm($data, $oldValue)) {
+            return $data;
+        }
+
+        if ($newValue === null) {
+            return null;
+        }
+
+        return $this->rewriteTermValue($data, $oldValue, $newValue);
     }
 
     protected function replaceValuesInArray($data, $newValue, $oldValue)
@@ -759,7 +767,9 @@ class Terms extends Relationship
         }
 
         $result = collect(Arr::dot($data))
-            ->map(fn ($value) => $this->valueRefersToTerm($value, $oldValue) ? $newValue : $value)
+            ->map(fn ($value) => $this->valueRefersToTerm($value, $oldValue)
+                ? ($newValue === null ? null : $this->rewriteTermValue($value, $oldValue, $newValue))
+                : $value)
             ->filter()
             ->values();
 
@@ -772,12 +782,47 @@ class Terms extends Relationship
             return true;
         }
 
-        if (! is_string($value) || ! is_string($oldValue) || ! str_contains($value, '/')) {
+        if (! is_string($value) || ! is_string($oldValue)) {
             return false;
         }
 
-        $leaf = Str::afterLast($value, '/');
+        [$path, $taxonomy] = $this->termPathAndTaxonomy($value);
+        [$oldSlug, $oldTaxonomy] = $this->termPathAndTaxonomy($oldValue);
 
-        return $leaf === $oldValue || Str::slug($leaf) === $oldValue;
+        if ($oldTaxonomy && $taxonomy !== $oldTaxonomy) {
+            return false;
+        }
+
+        return collect(explode('/', $path))->contains(
+            fn ($segment) => $segment === $oldSlug || Str::slug($segment) === $oldSlug
+        );
+    }
+
+    private function rewriteTermValue(string $value, string $oldValue, string $newValue): string
+    {
+        if ($value === $oldValue) {
+            return $newValue;
+        }
+
+        [$path, $taxonomy] = $this->termPathAndTaxonomy($value);
+        [$oldSlug] = $this->termPathAndTaxonomy($oldValue);
+        [$newSlug, $newTaxonomy] = $this->termPathAndTaxonomy($newValue);
+
+        $rewritten = collect(explode('/', $path))
+            ->map(fn ($segment) => $segment === $oldSlug || Str::slug($segment) === $oldSlug ? $newSlug : $segment)
+            ->implode('/');
+
+        $prefix = ($taxonomy ?? $newTaxonomy);
+
+        return $prefix ? $prefix.'::'.$rewritten : $rewritten;
+    }
+
+    private function termPathAndTaxonomy(string $value): array
+    {
+        if (str_contains($value, '::')) {
+            return [Str::after($value, '::'), Str::before($value, '::')];
+        }
+
+        return [$value, null];
     }
 }
