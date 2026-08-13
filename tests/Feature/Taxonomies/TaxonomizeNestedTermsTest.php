@@ -138,4 +138,17 @@ class TaxonomizeNestedTermsTest extends TestCase
             ]],
         ], Taxonomy::findByHandle('categories')->structure()->tree()->tree());
     }
+
+    #[Test]
+    public function saving_an_entry_with_a_path_deeper_than_max_depth_is_rejected()
+    {
+        Taxonomy::findByHandle('categories')->structureContents(['max_depth' => 2])->save();
+
+        $this->expectException(\Illuminate\Validation\ValidationException::class);
+
+        tap(Entry::make()->collection('blog')->slug('show')->data([
+            'title' => 'Show',
+            'categories' => ['events/concerts/jazz'],
+        ]))->save();
+    }
 }

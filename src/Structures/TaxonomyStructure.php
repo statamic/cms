@@ -2,6 +2,7 @@
 
 namespace Statamic\Structures;
 
+use Illuminate\Validation\ValidationException;
 use Statamic\Contracts\Structures\TaxonomyTree;
 use Statamic\Contracts\Structures\TaxonomyTreeRepository;
 use Statamic\Facades\Blink;
@@ -102,6 +103,9 @@ class TaxonomyStructure extends Structure
     public function validateTree(array $tree, string $locale): array
     {
         $tree = $this->repairTree($tree);
+
+        $this->assertDoesNotExceedMaxDepth($tree);
+
         $slugs = $this->getTermSlugsFromTree($tree);
 
         $existingSlugs = Blink::once('taxonomy-structure-term-slugs-'.$this->handle(), function () {
@@ -243,7 +247,58 @@ class TaxonomyStructure extends Structure
             $raw[] = ['term' => $parentSlug];
         }
 
+        $this->assertParentAllowsChild($raw, $parentSlug);
+
         $tree->tree($this->appendSlugToParent($raw, $parentSlug, $slug))->save();
+    }
+
+    public function assertDoesNotExceedMaxDepth(array $tree, int $depth = 1): void
+    {
+        if (! $max = $this->maxDepth()) {
+            return;
+        }
+
+        if ($depth > $max) {
+            throw ValidationException::withMessages([
+                'tree' => __('statamic::validation.parent_exceeds_max_depth'),
+            ]);
+        }
+
+        foreach ($tree as $branch) {
+            if (! empty($branch['children'])) {
+                $this->assertDoesNotExceedMaxDepth($branch['children'], $depth + 1);
+            }
+        }
+    }
+
+    private function assertParentAllowsChild(array $tree, string $parentSlug): void
+    {
+        if (! $max = $this->maxDepth()) {
+            return;
+        }
+
+        $parentDepth = $this->depthOfSlug($tree, $parentSlug) ?? 1;
+
+        if ($parentDepth >= $max) {
+            throw ValidationException::withMessages([
+                'parent' => __('statamic::validation.parent_exceeds_max_depth'),
+            ]);
+        }
+    }
+
+    private function depthOfSlug(array $branches, string $slug, int $depth = 1): ?int
+    {
+        foreach ($branches as $branch) {
+            if (($branch['term'] ?? null) === $slug) {
+                return $depth;
+            }
+
+            if (isset($branch['children']) && ($found = $this->depthOfSlug($branch['children'], $slug, $depth + 1)) !== null) {
+                return $found;
+            }
+        }
+
+        return null;
     }
 
     private function termIsInBranches(array $branches, string $slug): bool

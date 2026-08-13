@@ -335,11 +335,7 @@ class TermsController extends CpController
 
         $slug = $term->inDefaultLocale()->slug();
 
-        // Repair the persisted tree (normalize entry keys / full IDs) without
-        // running read-time validation, which would append this new term at the root.
-        $raw = $taxonomy->structure()->repairTree($tree->fileData()['tree'] ?? []);
-
-        $tree->tree($raw)->appendTo($parent, $slug)->save();
+        $taxonomy->structure()->graftTerm($slug, $parent);
     }
 
     protected function getAuthorizedSitesForTaxonomy($taxonomy)

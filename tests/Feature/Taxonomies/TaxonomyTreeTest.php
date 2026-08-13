@@ -252,4 +252,33 @@ class TaxonomyTreeTest extends TestCase
                 ->where('canReorder', true)
             );
     }
+
+    #[Test]
+    public function it_rejects_a_tree_deeper_than_max_depth()
+    {
+        $taxonomy = tap(Taxonomy::make('categories')->title('Categories')->structureContents(['max_depth' => 2]))->save();
+
+        foreach (['animals', 'cat', 'calico'] as $slug) {
+            tap(Term::make($slug)->taxonomy('categories')->data(['title' => ucfirst($slug)]))->save();
+        }
+
+        $taxonomy->structure()->tree()->tree([
+            ['term' => 'animals', 'children' => [
+                ['term' => 'cat'],
+            ]],
+        ])->save();
+
+        $this
+            ->actingAs(tap(User::make()->makeSuper())->save())
+            ->patchJson(cp_route('taxonomies.tree.update', 'categories'), [
+                'pages' => [
+                    ['id' => 'categories::animals', 'children' => [
+                        ['id' => 'categories::cat', 'children' => [
+                            ['id' => 'categories::calico', 'children' => []],
+                        ]],
+                    ]],
+                ],
+            ])
+            ->assertUnprocessable();
+    }
 }

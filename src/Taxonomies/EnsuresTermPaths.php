@@ -3,6 +3,7 @@
 namespace Statamic\Taxonomies;
 
 use Closure;
+use Illuminate\Validation\ValidationException;
 use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Facades\Term;
 use Statamic\Support\Str;
@@ -48,6 +49,15 @@ class EnsuresTermPaths
 
         if ($segments->isEmpty()) {
             return null;
+        }
+
+        if (($maxDepth = $taxonomy->structure()->maxDepth()) && $segments->count() > $maxDepth) {
+            throw ValidationException::withMessages([
+                'path' => __('statamic::validation.term_path_exceeds_max_depth', [
+                    'path' => $value,
+                    'max' => $maxDepth,
+                ]),
+            ]);
         }
 
         $parentSlug = null;

@@ -306,4 +306,44 @@ class HierarchicalTaxonomyTest extends TestCase
         $this->assertCount(2, $augmented['ancestors']->value());
         $this->assertCount(0, $augmented['children']->value());
     }
+
+    #[Test]
+    public function validating_a_tree_rejects_branches_deeper_than_max_depth()
+    {
+        $taxonomy = tap(Taxonomy::make('categories')->structureContents(['max_depth' => 2]))->save();
+
+        foreach (['animals', 'cat', 'calico'] as $slug) {
+            tap(Term::make($slug)->taxonomy('categories')->data(['title' => ucfirst($slug)]))->save();
+        }
+
+        $this->expectException(\Illuminate\Validation\ValidationException::class);
+
+        $taxonomy->structure()->validateTree([
+            ['term' => 'animals', 'children' => [
+                ['term' => 'cat', 'children' => [
+                    ['term' => 'calico'],
+                ]],
+            ]],
+        ], 'en');
+    }
+
+    #[Test]
+    public function grafting_a_term_rejects_a_parent_at_max_depth()
+    {
+        $taxonomy = tap(Taxonomy::make('categories')->structureContents(['max_depth' => 2]))->save();
+
+        foreach (['animals', 'cat', 'dog'] as $slug) {
+            tap(Term::make($slug)->taxonomy('categories')->data(['title' => ucfirst($slug)]))->save();
+        }
+
+        $taxonomy->structure()->tree()->tree([
+            ['term' => 'animals', 'children' => [
+                ['term' => 'cat'],
+            ]],
+        ])->save();
+
+        $this->expectException(\Illuminate\Validation\ValidationException::class);
+
+        $taxonomy->structure()->graftTerm('dog', 'cat');
+    }
 }
