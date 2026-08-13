@@ -866,6 +866,23 @@ class AssetTest extends TestCase
     }
 
     #[Test]
+    public function it_uploads_to_a_disk_that_throws_exceptions_while_the_last_modified_index_is_in_use()
+    {
+        Storage::fake('test', ['throw' => true]);
+
+        $container = Facades\AssetContainer::make('test')->disk('test')->save();
+
+        Facades\Stache::store('assets::test')->cacheIndexUsage('last_modified');
+
+        $asset = $container->makeAsset('image.jpg');
+
+        $asset->upload(UploadedFile::fake()->image('image.jpg', 30, 60));
+
+        $this->assertTrue(Storage::disk('test')->exists('.meta/image.jpg.yaml'));
+        $this->assertNotNull($asset->lastModified());
+    }
+
+    #[Test]
     public function it_generates_meta_on_demand_if_a_required_value_is_missing()
     {
         Storage::fake('test');
