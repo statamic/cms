@@ -18,6 +18,9 @@ class WebhookConnectionController extends CpController
             'webhooks.*' => ['array'],
             'webhooks.*.url' => ['required', 'url:http,https'],
             'webhooks.*.verify_ssl' => ['sometimes', 'boolean'],
+            'webhooks.*.enabled' => ['nullable', 'boolean'],
+            'webhooks.*.conditions' => ['nullable', 'array'],
+            'webhooks.*.conditions.*' => ['array'],
         ]);
 
         $fields = Webhook::blueprint($form)->fields();

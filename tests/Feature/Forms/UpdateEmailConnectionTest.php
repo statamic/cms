@@ -180,6 +180,9 @@ class UpdateEmailConnectionTest extends TestCase
             'config with an unknown field reference' => [['emails' => [['to' => ['field:unknown']]]], ['emails.0.to']],
             'config with an invalid cc' => [['emails' => [['to' => ['foo@example.com'], 'cc' => ['not-an-email']]]], ['emails.0.cc']],
             'config with an invalid sender' => [['emails' => [['to' => ['foo@example.com'], 'from' => 'not-an-email']]], ['emails.0.from']],
+            'config with a non-boolean enabled' => [['emails' => [['to' => ['foo@example.com'], 'enabled' => 'nope']]], ['emails.0.enabled']],
+            'config with non-array conditions' => [['emails' => [['to' => ['foo@example.com'], 'conditions' => 'nope']]], ['emails.0.conditions']],
+            'config with a non-array condition' => [['emails' => [['to' => ['foo@example.com'], 'conditions' => ['nope']]]], ['emails.0.conditions.0']],
         ];
     }
 

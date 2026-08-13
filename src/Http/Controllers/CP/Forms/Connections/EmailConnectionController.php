@@ -22,6 +22,9 @@ class EmailConnectionController extends CpController
             'emails.*.bcc' => [new EmailConnectionAddress($form)],
             'emails.*.from' => [new EmailConnectionAddress($form)],
             'emails.*.reply_to' => [new EmailConnectionAddress($form)],
+            'emails.*.enabled' => ['nullable', 'boolean'],
+            'emails.*.conditions' => ['nullable', 'array'],
+            'emails.*.conditions.*' => ['array'],
         ]);
 
         $fields = Email::blueprint($form)->fields();

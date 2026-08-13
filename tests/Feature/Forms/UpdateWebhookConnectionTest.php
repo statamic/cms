@@ -182,6 +182,9 @@ class UpdateWebhookConnectionTest extends TestCase
             'config with an invalid url' => [['webhooks' => [['url' => 'not a url']]], ['webhooks.0.url']],
             'config with a non-http url' => [['webhooks' => [['url' => 'ftp://example.com/hook']]], ['webhooks.0.url']],
             'config with a non-boolean verify_ssl' => [['webhooks' => [['url' => 'https://example.com/hook', 'verify_ssl' => 'nope']]], ['webhooks.0.verify_ssl']],
+            'config with a non-boolean enabled' => [['webhooks' => [['url' => 'https://example.com/hook', 'enabled' => 'nope']]], ['webhooks.0.enabled']],
+            'config with non-array conditions' => [['webhooks' => [['url' => 'https://example.com/hook', 'conditions' => 'nope']]], ['webhooks.0.conditions']],
+            'config with a non-array condition' => [['webhooks' => [['url' => 'https://example.com/hook', 'conditions' => ['nope']]]], ['webhooks.0.conditions.0']],
         ];
     }
 
