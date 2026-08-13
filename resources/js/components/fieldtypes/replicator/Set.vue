@@ -104,6 +104,16 @@ function toggleCollapsedState() {
     props.collapsed ? emit('expanded') : emit('collapsed');
 }
 
+function prewarmFields() {
+    if (hasBeenExpanded.value || !hasFields.value) return;
+    hasBeenExpanded.value = true;
+    mountScheduler.schedule(() => {
+        if (!isUnmounted) {
+            fieldsReady.value = true;
+        }
+    });
+}
+
 const deletingSet = ref(false);
 
 function destroy() {
@@ -196,8 +206,9 @@ reveal.use(rootEl, () => emit('expanded'));
             <header
                 class="group/header animate-border-color flex items-center show-focus-within rounded-[calc(var(--radius-lg)-1px)] px-1.5 antialiased duration-200 bg-gray-100/50 dark:bg-gray-925 hover:bg-gray-100 dark:hover:bg-gray-950/45 border-gray-300 dark:shadow-md"
                 :class="{
-                    'bg-gray-200/50 dark:bg-gray-950/35 rounded-b-none': !collapsed && hasFields
+                    'bg-gray-200/50 dark:bg-gray-950/35 rounded-b-none': !collapsed && hasFields && fieldsReady
                 }"
+                @pointerenter="prewarmFields"
             >
                 <Icon
                     name="handles"
@@ -256,23 +267,22 @@ reveal.use(rootEl, () => emit('expanded'));
             </header>
 
             <div
-                v-if="hasBeenExpanded && hasFields"
+                v-if="fieldsReady && hasFields"
                 v-show="!collapsed"
+                data-set-body
                 :class="{ 'contain-paint': collapsed, 'isolate': !collapsed }"
                 class="border-t border-t-gray-300! dark:border-t-white/10!"
             >
                 <div :tabindex="collapsed ? -1 : undefined" :inert="collapsed">
-                    <template v-if="fieldsReady">
-                        <FieldsProvider
-                            :fields="config.fields"
-                            :as-config="false"
-                            :read-only="readOnly"
-                            :field-path-prefix="fieldPathPrefix"
-                            :meta-path-prefix="metaPathPrefix"
-                        >
-                            <Fields class="p-4" />
-                        </FieldsProvider>
-                    </template>
+                    <FieldsProvider
+                        :fields="config.fields"
+                        :as-config="false"
+                        :read-only="readOnly"
+                        :field-path-prefix="fieldPathPrefix"
+                        :meta-path-prefix="metaPathPrefix"
+                    >
+                        <Fields class="p-4" />
+                    </FieldsProvider>
                 </div>
             </div>
         </div>
