@@ -260,7 +260,7 @@ return [
     'taxonomies_preview_target_refresh_instructions' => 'Automatically refresh the preview while editing. Disabling this will use postMessage.',
     'taxonomies_preview_targets_instructions' => 'The URLs to be viewable within Live Preview. Learn more in the [documentation](https://statamic.dev/live-preview#preview-targets).',
     'taxonomies_routes_instructions' => 'The route controls the terms URL pattern. Learn more in the [documentation](https://statamic.dev/taxonomies#routing).',
-    'taxonomies_route_instructions' => 'The URL for this taxonomy\'s index page. Term pages append `/{slug}` (and `{parent_uri}` when hierarchical).',
+    'taxonomies_route_instructions' => 'The URL pattern for term pages. Include `{slug}` (and `{parent_uri}` when nested).',
     'taxonomy_configure_handle_instructions' => 'Used to reference this taxonomy on the frontend. This cannot be easily changed later.',
     'taxonomy_configure_intro' => 'A taxonomy is a system of classifying data around a set of unique characteristics, such as categories, tags, or colors.',
     'taxonomy_configure_layout_instructions' => 'Set this taxonomy\'s default layout. Terms can override this setting with a `layout` field.',

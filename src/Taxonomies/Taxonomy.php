@@ -475,6 +475,10 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, ContainsQ
             return null;
         }
 
+        if ($this->hasCustomRoutes()) {
+            return $route;
+        }
+
         $prefix = $this->collection() ? $this->collection()->uri($site->handle()) : '/';
 
         return URL::tidy($prefix.$route);
@@ -490,7 +494,21 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, ContainsQ
         return $this->routes !== false;
     }
 
+    public function hasCustomRoutes(): bool
+    {
+        return $this->routes !== null && $this->routes !== false && $this->routes !== [];
+    }
+
     public function taxonomyRoute(?string $site = null): ?string
+    {
+        if (! $termRoute = $this->termRoute($site)) {
+            return null;
+        }
+
+        return $this->indexRouteFromPattern($termRoute);
+    }
+
+    public function termRoute(?string $site = null): ?string
     {
         if ($this->routes === false) {
             return null;
@@ -500,17 +518,15 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, ContainsQ
         $resolved = $this->routeForSite($this->routes, $site);
 
         if (is_string($resolved) && $resolved !== '') {
-            return $this->normalizeRoute($resolved);
+            return $this->normalizeCustomTermRoute($resolved);
         }
 
-        return $this->defaultTaxonomyRoute();
+        return $this->defaultTermRoute();
     }
 
-    public function termRoute(?string $site = null): ?string
+    public function defaultTermRoute(): string
     {
-        if (! $base = $this->taxonomyRoute($site)) {
-            return null;
-        }
+        $base = $this->normalizeRoute(str_replace('_', '-', $this->handle));
 
         return $this->hierarchical()
             ? $base.'/{parent_uri}/{slug}'
@@ -530,9 +546,25 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, ContainsQ
         return null;
     }
 
-    private function defaultTaxonomyRoute(): string
+    private function normalizeCustomTermRoute(string $pattern): string
     {
-        return $this->normalizeRoute(str_replace('_', '-', $this->handle));
+        $pattern = $this->normalizeRoute($pattern);
+
+        if (! Str::contains($pattern, '{slug}')) {
+            $pattern .= $this->hierarchical()
+                ? '/{parent_uri}/{slug}'
+                : '/{slug}';
+        }
+
+        return $this->normalizeRoute($pattern);
+    }
+
+    private function indexRouteFromPattern(string $pattern): string
+    {
+        $index = preg_replace('/\{\s*parent_uri\s*\}|\{\s*slug\s*\}/', '', $pattern);
+        $index = preg_replace('#/+#', '/', $index);
+
+        return $this->normalizeRoute($index === '' ? '/' : $index);
     }
 
     private function normalizeRoute(string $route): string

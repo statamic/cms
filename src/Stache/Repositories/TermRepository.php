@@ -73,6 +73,39 @@ class TermRepository implements RepositoryContract
             return $substitute;
         }
 
+        $uri = URL::tidy(Str::ensureLeft($uri, '/'));
+
+        if ($term = $this->findTermMatchingUri($uri, $site)) {
+            return $term;
+        }
+
+        [$collection, $stripped] = $this->stripCollectionPrefix($uri, $site);
+
+        if (! $collection) {
+            return null;
+        }
+
+        return $this->findTermMatchingUri($stripped, $site, automagicOnly: true)
+            ?->collection($collection);
+    }
+
+    private function findTermMatchingUri(string $uri, string $site, bool $automagicOnly = false): ?Term
+    {
+        foreach (Taxonomy::all()->sortByDesc(fn ($taxonomy) => strlen((string) $taxonomy->termRoute($site))) as $taxonomy) {
+            if ($automagicOnly && $taxonomy->hasCustomRoutes()) {
+                continue;
+            }
+
+            if ($term = $this->findTermByRoute($taxonomy, $uri, $site)) {
+                return $term;
+            }
+        }
+
+        return null;
+    }
+
+    private function stripCollectionPrefix(string $uri, string $site): array
+    {
         $collection = Collection::all()
             ->first(function ($collection) use ($uri, $site) {
                 if (Str::startsWith($uri, $collection->uri($site))) {
@@ -82,19 +115,14 @@ class TermRepository implements RepositoryContract
                 return Str::startsWith($uri.'/', '/'.$collection->handle().'/');
             });
 
-        if ($collection) {
-            $uri = Str::after($uri, $collection->uri($site) ?? $collection->handle());
+        if (! $collection) {
+            return [null, $uri];
         }
 
-        $uri = URL::tidy(Str::ensureLeft($uri, '/'));
+        $stripped = Str::after($uri, $collection->uri($site) ?? $collection->handle());
+        $stripped = URL::tidy(Str::ensureLeft($stripped, '/'));
 
-        foreach (Taxonomy::all()->sortByDesc(fn ($taxonomy) => strlen((string) $taxonomy->termRoute($site))) as $taxonomy) {
-            if ($term = $this->findTermByRoute($taxonomy, $uri, $site)) {
-                return $term->collection($collection);
-            }
-        }
-
-        return null;
+        return [$collection, $stripped];
     }
 
     private function findTermByRoute($taxonomy, string $uri, string $site): ?Term

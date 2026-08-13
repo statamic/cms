@@ -169,7 +169,7 @@ class UpdateTaxonomyTest extends TestCase
             ->actingAs($this->userWithPermission())
             ->update($taxonomy, [
                 'route_mode' => 'custom',
-                'route' => '/topics',
+                'route' => '/topics/{slug}',
             ])
             ->assertOk();
 
@@ -177,7 +177,21 @@ class UpdateTaxonomyTest extends TestCase
 
         $this->assertEquals('/topics', $taxonomy->taxonomyRoute());
         $this->assertEquals('/topics/{slug}', $taxonomy->termRoute());
-        $this->assertEquals('/topics', $taxonomy->fileData()['routes']);
+        $this->assertEquals('/topics/{slug}', $taxonomy->fileData()['routes']);
+    }
+
+    #[Test]
+    public function it_requires_slug_in_a_custom_route()
+    {
+        $taxonomy = tap(Taxonomy::make('test')->title('Test'))->save();
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->update($taxonomy, [
+                'route_mode' => 'custom',
+                'route' => '/topics',
+            ])
+            ->assertSessionHasErrors('route');
     }
 
     #[Test]

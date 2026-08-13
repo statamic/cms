@@ -521,8 +521,8 @@ class TermTest extends TestCase
         ]);
 
         tap(Taxonomy::make('tags')->sites(['en', 'fr'])->routes([
-            'en' => '/topics',
-            'fr' => '/sujets',
+            'en' => '/topics/{slug}',
+            'fr' => '/sujets/{slug}',
         ]))->save();
 
         $term = (new Term)->taxonomy('tags');
@@ -565,10 +565,16 @@ class TermTest extends TestCase
         $this->assertEquals('/categories/{parent_uri}/{slug}', $cat->route());
         $this->assertEquals('/categories/animals/cat', $cat->uri());
 
-        $taxonomy->routes('/topics')->save();
+        $taxonomy->routes('/topics/{parent_uri}/{slug}')->save();
         $cat = Facades\Term::find('categories::cat');
 
         $this->assertEquals('/topics/{parent_uri}/{slug}', $cat->route());
         $this->assertEquals('/topics/animals/cat', $cat->uri());
+
+        $taxonomy->routes('/topics/{slug}')->save();
+        $cat = Facades\Term::find('categories::cat');
+
+        $this->assertEquals('/topics/{slug}', $cat->route());
+        $this->assertEquals('/topics/cat', $cat->uri());
     }
 }

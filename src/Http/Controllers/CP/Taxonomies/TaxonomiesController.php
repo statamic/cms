@@ -175,7 +175,7 @@ class TaxonomiesController extends CpController
             'structured' => $taxonomy->hasStructure(),
             'max_depth' => optional($taxonomy->structure())->maxDepth(),
             'route_mode' => $this->routeModeForCp($taxonomy->routes()),
-            'route' => $this->routeValueForCp($taxonomy->routes()),
+            'route' => $this->routeValueForCp($taxonomy),
         ];
 
         return PublishForm::make($this->editFormBlueprint($taxonomy))
@@ -196,6 +196,8 @@ class TaxonomiesController extends CpController
         $existingSites = $taxonomy->sites();
 
         $values = $fields->process()->values()->all();
+
+        $this->assertCustomRouteContainsSlug($values['route_mode'] ?? 'automagic', $values['route'] ?? null);
 
         $taxonomy
             ->title($values['title'])
@@ -480,17 +482,25 @@ class TaxonomiesController extends CpController
         return 'custom';
     }
 
-    private function routeValueForCp($routes)
+    private function routeValueForCp($taxonomy)
     {
-        if ($routes === false || $routes === null) {
-            return null;
+        if ($taxonomy->hasCustomRoutes()) {
+            $routes = $taxonomy->routes();
+
+            if (is_array($routes) && collect($routes)->filter()->unique()->count() === 1) {
+                return $taxonomy->termRoute($taxonomy->sites()->first());
+            }
+
+            if (is_array($routes)) {
+                return collect($routes)
+                    ->map(fn ($route, $site) => $taxonomy->termRoute($site))
+                    ->all();
+            }
+
+            return $taxonomy->termRoute();
         }
 
-        if (is_array($routes) && collect($routes)->filter()->unique()->count() === 1) {
-            return collect($routes)->filter()->first();
-        }
-
-        return $routes;
+        return $taxonomy->defaultTermRoute();
     }
 
     private function routesFromCp(array $values): mixed
@@ -527,5 +537,22 @@ class TaxonomiesController extends CpController
         }
 
         return $value;
+    }
+
+    private function assertCustomRouteContainsSlug(string $mode, $route): void
+    {
+        if ($mode !== 'custom') {
+            return;
+        }
+
+        $routes = is_array($route) ? $route : [$route];
+
+        foreach ($routes as $pattern) {
+            if ($pattern && ! Str::contains((string) $pattern, '{slug}')) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'route' => __('statamic::validation.taxonomy_route_requires_slug'),
+                ]);
+            }
+        }
     }
 }

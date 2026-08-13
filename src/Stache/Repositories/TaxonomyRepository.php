@@ -76,7 +76,36 @@ class TaxonomyRepository implements RepositoryContract
     public function findByUri(string $uri, ?string $site = null): ?Taxonomy
     {
         $site = $site ?? Site::current()->handle();
+        $uri = URL::tidy(Str::ensureLeft($uri, '/'));
 
+        if ($taxonomy = $this->findByRoute($uri, $site)) {
+            return $taxonomy;
+        }
+
+        [$collection, $stripped] = $this->stripCollectionPrefix($uri, $site);
+
+        if (! $collection) {
+            return null;
+        }
+
+        return $this->findByRoute($stripped, $site, automagicOnly: true)?->collection($collection);
+    }
+
+    private function findByRoute(string $uri, string $site, bool $automagicOnly = false): ?Taxonomy
+    {
+        return $this->all()->first(function ($taxonomy) use ($uri, $site, $automagicOnly) {
+            if ($automagicOnly && $taxonomy->hasCustomRoutes()) {
+                return false;
+            }
+
+            $route = $taxonomy->taxonomyRoute($site);
+
+            return $route && URL::tidy($route) === $uri;
+        });
+    }
+
+    private function stripCollectionPrefix(string $uri, string $site): array
+    {
         $collection = Facades\Collection::all()
             ->first(function ($collection) use ($uri, $site) {
                 if (Str::startsWith($uri, $collection->uri($site))) {
@@ -86,25 +115,17 @@ class TaxonomyRepository implements RepositoryContract
                 return Str::startsWith($uri.'/', '/'.$collection->handle().'/');
             });
 
-        if ($collection) {
-            $uri = Str::after($uri, $collection->uri($site) ?? $collection->handle());
+        if (! $collection) {
+            return [null, $uri];
         }
+
+        $stripped = Str::after($uri, $collection->uri($site) ?? $collection->handle());
 
         // If the collection is mounted to the home page, the uri would have
         // the slash trimmed off at this point. We'll make sure it's there.
-        $uri = URL::tidy(Str::ensureLeft($uri, '/'));
+        $stripped = URL::tidy(Str::ensureLeft($stripped, '/'));
 
-        $taxonomy = $this->all()->first(function ($taxonomy) use ($uri, $site) {
-            $route = $taxonomy->taxonomyRoute($site);
-
-            if (! $route) {
-                return false;
-            }
-
-            return URL::tidy($route) === $uri;
-        });
-
-        return $taxonomy?->collection($collection);
+        return [$collection, $stripped];
     }
 
     public static function bindings(): array

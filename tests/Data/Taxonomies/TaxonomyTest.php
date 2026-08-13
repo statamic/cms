@@ -183,6 +183,23 @@ class TaxonomyTest extends TestCase
     }
 
     #[Test]
+    public function custom_routes_are_not_prefixed_by_a_collection()
+    {
+        $entry = $this->mock(EntryContract::class);
+        $entry->shouldReceive('in')->andReturnSelf();
+        $entry->shouldReceive('uri')->andReturn('/blog');
+        Entry::shouldReceive('find')->with('blog-page')->andReturn($entry);
+
+        $collection = tap(Collection::make('blog')->mount('blog-page'))->save();
+
+        $taxonomy = (new Taxonomy)->handle('tags')->routes('/topics/{slug}')->collection($collection);
+
+        $this->assertEquals('/topics', $taxonomy->uri());
+        $this->assertEquals('/topics', $taxonomy->url());
+        $this->assertEquals('http://localhost/topics', $taxonomy->absoluteUrl());
+    }
+
+    #[Test]
     public function it_gets_and_sets_routes()
     {
         $this->setSites([
@@ -193,28 +210,36 @@ class TaxonomyTest extends TestCase
         $taxonomy = (new Taxonomy)->handle('tags')->sites(['en', 'fr']);
 
         $this->assertTrue($taxonomy->routesEnabled());
+        $this->assertFalse($taxonomy->hasCustomRoutes());
         $this->assertEquals('/tags', $taxonomy->taxonomyRoute('en'));
         $this->assertEquals('/tags/{slug}', $taxonomy->termRoute('en'));
         $this->assertEquals('/tags', $taxonomy->uri());
         $this->assertArrayNotHasKey('routes', $taxonomy->fileData());
 
-        $taxonomy->routes('/topics');
+        $taxonomy->routes('/topics/{slug}');
 
+        $this->assertTrue($taxonomy->hasCustomRoutes());
         $this->assertEquals('/topics', $taxonomy->taxonomyRoute('en'));
         $this->assertEquals('/topics', $taxonomy->taxonomyRoute('fr'));
         $this->assertEquals('/topics/{slug}', $taxonomy->termRoute('en'));
         $this->assertEquals('/topics', $taxonomy->uri());
-        $this->assertEquals('/topics', $taxonomy->fileData()['routes']);
+        $this->assertEquals('/topics/{slug}', $taxonomy->fileData()['routes']);
 
         $taxonomy->routes([
-            'en' => '/topics',
-            'fr' => '/sujets',
+            'en' => '/topics/{slug}',
+            'fr' => '/sujets/{slug}',
         ]);
 
         $this->assertEquals('/topics', $taxonomy->taxonomyRoute('en'));
         $this->assertEquals('/sujets', $taxonomy->taxonomyRoute('fr'));
         $this->assertEquals('/topics/{slug}', $taxonomy->termRoute('en'));
         $this->assertEquals('/sujets/{slug}', $taxonomy->termRoute('fr'));
+
+        $taxonomy->routes('/topics');
+
+        $this->assertEquals('/topics', $taxonomy->taxonomyRoute('en'));
+        $this->assertEquals('/topics/{slug}', $taxonomy->termRoute('en'));
+        $this->assertEquals('/topics', $taxonomy->fileData()['routes']);
 
         $taxonomy->routes(false);
 

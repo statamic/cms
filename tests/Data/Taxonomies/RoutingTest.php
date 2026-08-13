@@ -53,7 +53,7 @@ class RoutingTest extends TestCase
     #[Test]
     public function custom_routes_are_used_and_old_urls_404()
     {
-        tap(Taxonomy::make('tags')->title('Tags')->routes('/topics'))->save();
+        tap(Taxonomy::make('tags')->title('Tags')->routes('/topics/{slug}'))->save();
         tap(Term::make('test')->taxonomy('tags')->data(['title' => 'Test']))->save();
 
         $this->viewShouldReturnRaw('tags.index', '{{ title }} index');
@@ -74,8 +74,8 @@ class RoutingTest extends TestCase
     public function localized_custom_routes_are_used()
     {
         tap(Taxonomy::make('tags')->title('Tags')->sites(['en', 'fr'])->routes([
-            'en' => '/topics',
-            'fr' => '/sujets',
+            'en' => '/topics/{slug}',
+            'fr' => '/sujets/{slug}',
         ]))->save();
 
         tap(Term::make('test')->taxonomy('tags'), function ($term) {
@@ -95,9 +95,9 @@ class RoutingTest extends TestCase
     }
 
     #[Test]
-    public function collection_scoped_urls_follow_the_taxonomy_route_setting()
+    public function automagic_routes_still_get_collection_scoped_urls()
     {
-        tap(Taxonomy::make('tags')->title('Tags')->routes('/topics'))->save();
+        tap(Taxonomy::make('tags')->title('Tags'))->save();
         tap(Term::make('test')->taxonomy('tags')->data(['title' => 'Test']))->save();
 
         Collection::make('pages')->routes('{slug}')->save();
@@ -106,9 +106,34 @@ class RoutingTest extends TestCase
 
         $this->viewShouldReturnRaw('blog.tags.index', '{{ title }} index');
         $this->viewShouldReturnRaw('blog.tags.show', 'showing {{ title }}');
+        $this->viewShouldReturnRaw('tags.index', '{{ title }} index');
+        $this->viewShouldReturnRaw('tags.show', 'showing {{ title }}');
 
-        $this->get('/the-blog/topics')->assertOk()->assertSee('Tags index');
-        $this->get('/the-blog/topics/test')->assertOk()->assertSee('showing Test');
+        $this->get('/tags')->assertOk()->assertSee('Tags index');
+        $this->get('/tags/test')->assertOk()->assertSee('showing Test');
+        $this->get('/the-blog/tags')->assertOk()->assertSee('Tags index');
+        $this->get('/the-blog/tags/test')->assertOk()->assertSee('showing Test');
+    }
+
+    #[Test]
+    public function custom_routes_do_not_get_collection_scoped_urls()
+    {
+        tap(Taxonomy::make('tags')->title('Tags')->routes('/topics/{slug}'))->save();
+        tap(Term::make('test')->taxonomy('tags')->data(['title' => 'Test']))->save();
+
+        Collection::make('pages')->routes('{slug}')->save();
+        $blog = EntryFactory::collection('pages')->slug('the-blog')->create();
+        tap(Collection::make('blog')->taxonomies(['tags'])->mount($blog->id()))->save();
+
+        $this->viewShouldReturnRaw('tags.index', '{{ title }} index');
+        $this->viewShouldReturnRaw('tags.show', 'showing {{ title }}');
+        $this->viewShouldReturnRaw('blog.tags.index', 'blog index');
+        $this->viewShouldReturnRaw('blog.tags.show', 'blog show');
+
+        $this->get('/topics')->assertOk()->assertSee('Tags index');
+        $this->get('/topics/test')->assertOk()->assertSee('showing Test');
+        $this->get('/the-blog/topics')->assertNotFound();
+        $this->get('/the-blog/topics/test')->assertNotFound();
         $this->get('/the-blog/tags')->assertNotFound();
         $this->get('/the-blog/tags/test')->assertNotFound();
     }
@@ -116,7 +141,7 @@ class RoutingTest extends TestCase
     #[Test]
     public function hierarchical_custom_routes_use_parent_uri_and_redirect_from_flat_urls()
     {
-        tap(Taxonomy::make('categories')->title('Categories')->structureContents([])->routes('/topics'))->save();
+        tap(Taxonomy::make('categories')->title('Categories')->structureContents([])->routes('/topics/{parent_uri}/{slug}'))->save();
 
         foreach (['animals', 'cat', 'calico'] as $slug) {
             tap(Term::make($slug)->taxonomy('categories')->data(['title' => ucfirst($slug)]))->save();
