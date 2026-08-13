@@ -102,7 +102,7 @@ onUnmounted(() => saveBinding.value?.destroy());
         <pre v-show="showExamplePayload" class="overflow-x-auto rounded-lg border border-gray-200 bg-gray-50 p-4 text-xs text-gray-800 dark:border-white/10 dark:bg-gray-950/40 dark:text-gray-300"><code>{{ examplePayload }}</code></pre>
     </Field>
 
-    <Label :text="__('Webhooks')" />
+    <Label v-if="webhooks.length" :text="__('Webhooks')" />
 
     <ConnectionRows
         v-model="webhooks"
@@ -110,7 +110,7 @@ onUnmounted(() => saveBinding.value?.destroy());
         :has-error
         :add-label="__('Add Webhook')"
         :empty-heading="__('No webhooks yet')"
-        :empty-description="__('statamic::messages.webhook_connection_description')"
+        :empty-description="__('statamic::messages.webhook_connection_empty_description')"
         :delete-heading="__('Delete Webhook')"
         :delete-description="__('statamic::messages.webhook_connection_delete_confirmation')"
     >

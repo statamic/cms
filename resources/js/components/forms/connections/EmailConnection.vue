@@ -100,7 +100,7 @@ onUnmounted(() => saveBinding.value?.destroy());
         :has-error
         :add-label="__('Add Email')"
         :empty-heading="__('No emails yet')"
-        :empty-description="__('statamic::messages.email_connection_description')"
+        :empty-description="__('statamic::messages.email_connection_empty_description')"
         :delete-heading="__('Delete Email')"
         :delete-description="__('statamic::messages.email_connection_delete_confirmation')"
     >
