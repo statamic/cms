@@ -195,7 +195,7 @@ class UpdateTermReferencesTest extends TestCase
         $this->assertEquals('norris', $entry->get('non_favourite'));
         $this->assertEquals(['hoff', 'norris'], $entry->get('favourites'));
 
-        $this->termHoff->delete();
+        Facades\Term::find('topics::hoff')->delete();
 
         $this->assertFalse($entry->fresh()->has('favourite'));
         $this->assertEquals('norris', $entry->fresh()->get('non_favourite'));
@@ -205,6 +205,43 @@ class UpdateTermReferencesTest extends TestCase
 
         $this->assertFalse($entry->fresh()->has('non_favourite'));
         $this->assertFalse($entry->fresh()->has('favourites'));
+    }
+
+    #[Test]
+    public function it_nullifies_nested_path_references_when_deleting_a_term()
+    {
+        $this->topics->structureContents([])->save();
+
+        tap(Facades\Term::make()->taxonomy('topics')->slug('events')->data(['title' => 'Events']))->save();
+        tap(Facades\Term::make()->taxonomy('topics')->slug('concerts')->data(['title' => 'Concerts']))->save();
+        $this->topics->structure()->tree()->tree([
+            ['term' => 'events', 'children' => [
+                ['term' => 'concerts'],
+            ]],
+        ])->save();
+
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'favourites',
+                    'field' => [
+                        'type' => 'terms',
+                        'taxonomies' => ['topics'],
+                        'mode' => 'select',
+                    ],
+                ],
+            ],
+        ]);
+
+        $entry = tap(Facades\Entry::make()->collection($collection)->data([
+            'favourites' => ['events/concerts', 'hoff'],
+        ]))->save();
+
+        Facades\Term::find('topics::concerts')->delete();
+
+        $this->assertEquals(['hoff'], $entry->fresh()->get('favourites'));
     }
 
     #[Test]

@@ -13,6 +13,7 @@ use Statamic\Stache\Indexes;
 use Statamic\Stache\Indexes\Terms\Value;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
+use Statamic\Taxonomies\EnsuresTermPaths;
 use Symfony\Component\Finder\SplFileInfo;
 
 class TaxonomyTermsStore extends ChildStore
@@ -83,13 +84,16 @@ class TaxonomyTermsStore extends ChildStore
         // no path for the key — fall back to the term's file so we don't return a
         // title-from-slug stub that shadows the real term on save/reload.
         if ($path = $this->getPath($key) ?? $this->pathForSlug($slug)) {
-            $item = $this->makeItemFromFile($path, File::get($path))->in($site);
+            $term = $this->makeItemFromFile($path, File::get($path));
         } else {
-            $item = Term::make($slug)
+            $term = Term::make($slug)
                 ->taxonomy($this->childKey())
-                ->set('title', $this->index('title')->get($key))
-                ->in($site);
+                ->set('title', $this->index('title')->get($key));
         }
+
+        $term->syncOriginal();
+
+        $item = $term->in($site);
 
         $this->cacheItem($item);
 
@@ -106,9 +110,20 @@ class TaxonomyTermsStore extends ChildStore
     public function sync($entry, $terms)
     {
         $taxonomy = $this->childKey();
+        $paths = new EnsuresTermPaths;
+        $taxonomyModel = Taxonomy::findByHandle($taxonomy);
+        $lang = $entry->site()->lang();
 
-        $terms = collect(Arr::wrap($terms))->mapWithKeys(function ($value) {
-            return [Str::slug($value) => $value];
+        $terms = collect(Arr::wrap($terms))->mapWithKeys(function ($value) use ($paths, $taxonomyModel, $lang) {
+            if ($value === null || $value === '') {
+                return [];
+            }
+
+            $slug = $taxonomyModel?->hierarchical()
+                ? $paths->ensure($taxonomyModel, (string) $value, $lang)
+                : $paths->slugFromValue($value, $lang);
+
+            return $slug ? [$slug => $value] : [];
         });
 
         $indexes = $this->resolveIndexes()->except('associations');

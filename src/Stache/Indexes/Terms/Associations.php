@@ -4,24 +4,30 @@ namespace Statamic\Stache\Indexes\Terms;
 
 use Statamic\Facades\Taxonomy;
 use Statamic\Stache\Indexes\Index;
-use Statamic\Support\Str;
+use Statamic\Taxonomies\EnsuresTermPaths;
 
 class Associations extends Index
 {
     public function getItems()
     {
-        return Taxonomy::findByHandle($handle = $this->store->childKey())
+        $taxonomy = Taxonomy::findByHandle($handle = $this->store->childKey());
+        $hierarchical = $taxonomy->hierarchical();
+
+        return $taxonomy
             ->collections()
-            ->flatMap(function ($collection) use ($handle) {
+            ->flatMap(function ($collection) use ($handle, $hierarchical) {
                 return $collection->queryEntries()
                     ->where($handle, '<>', null)
                     ->get()
-                    ->flatMap(function ($entry) use ($handle) {
+                    ->flatMap(function ($entry) use ($handle, $hierarchical) {
+                        $paths = new EnsuresTermPaths;
+                        $lang = $entry->site()->lang();
+
                         return collect($entry->value($handle))
-                            ->map(function ($value) use ($entry) {
+                            ->map(function ($value) use ($entry, $paths, $lang, $hierarchical) {
                                 return [
                                     'value' => $value,
-                                    'slug' => Str::slug($value),
+                                    'slug' => $paths->slugFromValue($value, $lang, $hierarchical),
                                     'entry' => $entry->id(),
                                     'collection' => $entry->collectionHandle(),
                                     'site' => $entry->locale(),

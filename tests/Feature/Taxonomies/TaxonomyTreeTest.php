@@ -3,6 +3,8 @@
 namespace Tests\Feature\Taxonomies;
 
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\Collection;
+use Statamic\Facades\Entry;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
 use Statamic\Facades\User;
@@ -186,5 +188,30 @@ class TaxonomyTreeTest extends TestCase
         $this->assertEquals([
             ['term' => 'furniture'],
         ], Taxonomy::findByHandle('categories')->structure()->tree()->tree());
+    }
+
+    #[Test]
+    public function deleting_a_term_from_the_tree_removes_it_from_entries()
+    {
+        $this->makeStructuredTaxonomy();
+        tap(Collection::make('articles')->taxonomies(['categories']))->save();
+
+        $entry = tap(Entry::make()->collection('articles')->data([
+            'title' => 'Show',
+            'categories' => ['animals', 'furniture'],
+        ]))->save();
+
+        $this
+            ->actingAs(tap(User::make()->makeSuper())->save())
+            ->patch(cp_route('taxonomies.tree.update', 'categories'), [
+                'deletedTerms' => ['categories::animals'],
+                'pages' => [
+                    ['id' => 'categories::cat', 'children' => []],
+                    ['id' => 'categories::furniture', 'children' => []],
+                ],
+            ])
+            ->assertOk();
+
+        $this->assertEquals(['furniture'], $entry->fresh()->get('categories'));
     }
 }

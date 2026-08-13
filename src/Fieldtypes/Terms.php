@@ -29,6 +29,7 @@ use Statamic\Query\Scopes\Filters\Fields\Terms as TermsFilter;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
+use Statamic\Taxonomies\EnsuresTermPaths;
 
 use function Statamic\trans as __;
 
@@ -252,6 +253,10 @@ class Terms extends Relationship
 
         return collect(Arr::wrap($values))->map(function ($value) use ($taxonomy) {
             if ($taxonomy) {
+                if (is_string($value) && str_contains($value, '/') && $this->hierarchicalTaxonomy()) {
+                    $value = (new EnsuresTermPaths)->slugFromValue($value, hierarchical: true);
+                }
+
                 return "{$taxonomy}::{$value}";
             } else {
                 if (! Str::contains($value, '::')) {
@@ -649,87 +654,14 @@ class Terms extends Relationship
             ]);
         }
 
-        $lang = $this->termLang();
-        $parentSlug = null;
-        $id = null;
+        $slug = (new EnsuresTermPaths)->ensure(
+            $taxonomy,
+            $path,
+            $this->termLang(),
+            fn () => User::current()->can('create', [TermContract::class, $taxonomy])
+        );
 
-        foreach ($segments as $segment) {
-            $slug = Str::slug($segment, '-', $lang);
-            $id = $taxonomy->handle().'::'.$slug;
-
-            if (! Facades\Term::find($id)) {
-                if (User::current()->cant('create', [TermContract::class, $taxonomy])) {
-                    return null;
-                }
-
-                Facades\Term::make()
-                    ->slug($slug)
-                    ->taxonomy($taxonomy)
-                    ->set('title', $segment)
-                    ->save();
-
-                if ($parentSlug) {
-                    $this->graftTermIntoTree($taxonomy, $slug, $parentSlug);
-                }
-            }
-
-            $parentSlug = $slug;
-        }
-
-        return $id;
-    }
-
-    private function graftTermIntoTree($taxonomy, string $slug, string $parentSlug): void
-    {
-        $structure = $taxonomy->structure();
-        $tree = $structure->tree();
-        $raw = $structure->repairTree($tree->fileData()['tree'] ?? []);
-
-        // Don't re-parent a term that's already somewhere in the tree.
-        if ($this->termIsInBranches($raw, $slug)) {
-            return;
-        }
-
-        // A parent created earlier in this path isn't in the persisted tree yet —
-        // validateTree would only append it at the root on read. Put it there
-        // ourselves so the child can actually nest under it.
-        if (! $this->termIsInBranches($raw, $parentSlug)) {
-            $raw[] = ['term' => $parentSlug];
-        }
-
-        $tree->tree($this->appendSlugToParent($raw, $parentSlug, $slug))->save();
-    }
-
-    private function termIsInBranches(array $branches, string $slug): bool
-    {
-        foreach ($branches as $branch) {
-            if (($branch['term'] ?? null) === $slug) {
-                return true;
-            }
-
-            if (isset($branch['children']) && $this->termIsInBranches($branch['children'], $slug)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private function appendSlugToParent(array $branches, string $parentSlug, string $slug): array
-    {
-        foreach ($branches as &$branch) {
-            if (($branch['term'] ?? null) === $parentSlug) {
-                $branch['children'] = array_merge($branch['children'] ?? [], [['term' => $slug]]);
-
-                return $branches;
-            }
-
-            if (isset($branch['children'])) {
-                $branch['children'] = $this->appendSlugToParent($branch['children'], $parentSlug, $slug);
-            }
-        }
-
-        return $branches;
+        return $slug ? $taxonomy->handle().'::'.$slug : null;
     }
 
     private function termLang()
@@ -813,5 +745,39 @@ class Terms extends Relationship
         return is_string($data)
             ? $this->replaceValue($data, $scopedNewValue, $scopedOldValue)
             : $this->replaceValuesInArray($data, $scopedNewValue, $scopedOldValue);
+    }
+
+    protected function replaceValue($data, $newValue, $oldValue)
+    {
+        return $this->valueRefersToTerm($data, $oldValue) ? $newValue : $data;
+    }
+
+    protected function replaceValuesInArray($data, $newValue, $oldValue)
+    {
+        if (! is_array($data) || ! $data) {
+            return $data;
+        }
+
+        $result = collect(Arr::dot($data))
+            ->map(fn ($value) => $this->valueRefersToTerm($value, $oldValue) ? $newValue : $value)
+            ->filter()
+            ->values();
+
+        return $result->isEmpty() ? null : $result->all();
+    }
+
+    private function valueRefersToTerm($value, $oldValue): bool
+    {
+        if ($value === $oldValue) {
+            return true;
+        }
+
+        if (! is_string($value) || ! is_string($oldValue) || ! str_contains($value, '/')) {
+            return false;
+        }
+
+        $leaf = Str::afterLast($value, '/');
+
+        return $leaf === $oldValue || Str::slug($leaf) === $oldValue;
     }
 }

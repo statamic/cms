@@ -224,6 +224,60 @@ class TaxonomyStructure extends Structure
             ->all();
     }
 
+    /**
+     * Nest $slug under $parentSlug in the persisted tree. No-op if $slug is
+     * already somewhere in the tree. If the parent isn't in the persisted
+     * tree yet (e.g. it was just created as part of the same path), it's
+     * appended at the root so the child can actually nest under it.
+     */
+    public function graftTerm(string $slug, string $parentSlug): void
+    {
+        $tree = $this->tree();
+        $raw = $this->repairTree($tree->fileData()['tree'] ?? []);
+
+        if ($this->termIsInBranches($raw, $slug)) {
+            return;
+        }
+
+        if (! $this->termIsInBranches($raw, $parentSlug)) {
+            $raw[] = ['term' => $parentSlug];
+        }
+
+        $tree->tree($this->appendSlugToParent($raw, $parentSlug, $slug))->save();
+    }
+
+    private function termIsInBranches(array $branches, string $slug): bool
+    {
+        foreach ($branches as $branch) {
+            if (($branch['term'] ?? null) === $slug) {
+                return true;
+            }
+
+            if (isset($branch['children']) && $this->termIsInBranches($branch['children'], $slug)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function appendSlugToParent(array $branches, string $parentSlug, string $slug): array
+    {
+        foreach ($branches as &$branch) {
+            if (($branch['term'] ?? null) === $parentSlug) {
+                $branch['children'] = array_merge($branch['children'] ?? [], [['term' => $slug]]);
+
+                return $branches;
+            }
+
+            if (isset($branch['children'])) {
+                $branch['children'] = $this->appendSlugToParent($branch['children'], $parentSlug, $slug);
+            }
+        }
+
+        return $branches;
+    }
+
     public function save()
     {
         $this->taxonomy()->structure($this)->save();
