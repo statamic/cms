@@ -342,6 +342,17 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, BulkAugmenta
         return $this->page()?->depth();
     }
 
+    public function order()
+    {
+        if (! $this->taxonomy()->hasStructure()) {
+            return $this->value('order');
+        }
+
+        $order = $this->taxonomy()->structure()->tree()->entryOrder($this->inDefaultLocale()->slug());
+
+        return $order === null ? null : $order + 1;
+    }
+
     public function parent()
     {
         if (! $parent = $this->page()?->parent()) {
@@ -597,7 +608,7 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, BulkAugmenta
     {
         return [
             'absoluteUrl', 'apiUrl', 'blueprint', 'editUrl', 'entriesCount', 'hasOrigin', 'id', 'isRedirect',
-            'isRoot', 'lastModified', 'lastModifiedBy', 'layout', 'locale', 'path', 'private', 'published',
+            'isRoot', 'lastModified', 'lastModifiedBy', 'layout', 'locale', 'order', 'path', 'private', 'published',
             'redirectUrl', 'reference', 'site', 'slug', 'status', 'taxonomy', 'taxonomyHandle', 'template', 'title',
             'uri', 'url', 'urlWithoutRedirect', 'values',
         ];

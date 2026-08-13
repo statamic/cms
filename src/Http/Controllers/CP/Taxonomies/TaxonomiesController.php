@@ -94,6 +94,7 @@ class TaxonomiesController extends CpController
             ]),
             'canCreate' => User::current()->can('create', [TermContract::class, $taxonomy]) && $taxonomy->hasVisibleTermBlueprint(),
             'createUrl' => cp_route('taxonomies.terms.create', [$taxonomy->handle(), $site]),
+            'reorderUrl' => cp_route('taxonomies.terms.reorder', $taxonomy->handle()),
             'taxonomyEditUrl' => cp_route('taxonomies.edit', $taxonomy->handle()),
             'taxonomyBlueprintsUrl' => cp_route('blueprints.taxonomies.index', $taxonomy),
             'canEdit' => User::current()->can('edit', $taxonomy),

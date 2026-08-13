@@ -21,6 +21,11 @@ class TaxonomyTree extends Tree implements TreeContract
         return 'term';
     }
 
+    public function entryOrder($reference)
+    {
+        return ($this->cachedFlattenedPageOrder ??= $this->flattenedPages()->map->id()->flip())->get($reference);
+    }
+
     public function append($entry)
     {
         if (is_null($entry)) {

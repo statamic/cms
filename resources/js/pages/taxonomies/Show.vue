@@ -32,6 +32,7 @@ export default {
         'filters',
         'canCreate',
         'createUrl',
+        'reorderUrl',
         'actionUrl',
         'sortColumn',
         'sortDirection',
@@ -53,6 +54,11 @@ export default {
             preferencesPrefix: `taxonomies.${this.taxonomy}`,
             requestUrl: cp_url(`taxonomies/${this.taxonomy}/terms`),
             view: null,
+            reordering: false,
+            items: null,
+            page: null,
+            perPage: null,
+            saveKeyBinding: null,
             deletedTerms: [],
             showTermDeletionConfirmation: false,
             termBeingDeleted: null,
@@ -62,7 +68,11 @@ export default {
 
     computed: {
         canUseStructureTree() {
-            return this.structured;
+            return this.structured && this.structureMaxDepth !== 1;
+        },
+
+        reorderable() {
+            return this.structured && this.structureMaxDepth === 1;
         },
 
         treeIsDirty() {
@@ -90,6 +100,19 @@ export default {
         view(view) {
             this.$preferences.set(`taxonomies.${this.taxonomy}.view`, view);
         },
+    },
+
+    created() {
+        this.saveKeyBinding = this.$keys.bindGlobal(['mod+s'], (e) => {
+            if (this.reordering) {
+                e.preventDefault();
+                this.saveOrder();
+            }
+        });
+    },
+
+    beforeUnmount() {
+        this.saveKeyBinding?.destroy();
     },
 
     mounted() {
@@ -163,6 +186,33 @@ export default {
         editTerm(term, $event) {
             const url = term.edit_url;
             $event.metaKey ? window.open(url) : router.get(url);
+        },
+
+        requestComplete({ items, parameters }) {
+            this.items = items;
+            this.page = parameters.page;
+            this.perPage = parameters.perPage;
+        },
+
+        reordered(items) {
+            this.items = items;
+        },
+
+        saveOrder() {
+            this.$axios
+                .post(this.reorderUrl, {
+                    ids: this.items.map((item) => item.id),
+                    page: this.page,
+                    perPage: this.perPage,
+                    site: this.site,
+                })
+                .then(() => {
+                    this.reordering = false;
+                    this.$toast.success(__('Terms successfully reordered'));
+                })
+                .catch(() => {
+                    this.$toast.error(__('Something went wrong'));
+                });
         },
 
         addToCommandPalette() {
@@ -249,13 +299,26 @@ export default {
                 />
             </template>
 
+            <template v-if="view === 'list' && reorderable">
+                <Button
+                    v-if="!reordering"
+                    @click="reordering = true"
+                    :text="__('Reorder')"
+                />
+
+                <template v-if="reordering">
+                    <Button @click="reordering = false" :text="__('Cancel')" />
+                    <Button @click="saveOrder" :text="__('Save Order')" variant="primary" />
+                </template>
+            </template>
+
             <ToggleGroup v-model="view" v-if="canUseStructureTree">
                 <ToggleItem icon="navigation" value="tree" />
                 <ToggleItem icon="layout-list" value="list" />
             </ToggleGroup>
 
             <create-term-button
-                v-if="canCreate"
+                v-if="!reordering && canCreate"
                 :url="createUrl"
                 :text="createLabel"
                 :blueprints="blueprints"
@@ -281,7 +344,10 @@ export default {
             :sort-direction="sortDirection"
             :preferences-prefix="preferencesPrefix"
             :filters="filters"
+            :reorderable="reordering"
             push-query
+            @request-completed="requestComplete"
+            @reordered="reordered"
         >
             <template #cell-title="{ row: term }">
                 <div class="flex items-center gap-2">
