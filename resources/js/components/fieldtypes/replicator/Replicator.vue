@@ -16,17 +16,18 @@
                         @close="toggleFullscreen"
                     />
 
-                    <section :class="{ 'mt-12 p-4': fullScreenMode }">
+                    <section :class="{ 'mt-12 p-4': fullScreenMode, 'replicator-dragging': dragging }">
                         <sortable-list
                             :model-value="value"
                             :vertical="true"
                             :item-class="sortableItemClass"
                             :handle-class="sortableHandleClass"
+                            :animate="value.length <= 20"
                             append-to="body"
                             constrain-dimensions
                             @update:model-value="sorted($event)"
-                            @dragstart="$emit('focus')"
-                            @dragend="$emit('blur')"
+                            @dragstart="dragStarted"
+                            @dragend="dragEnded"
                             v-slot="{}"
                         >
                             <div class="relative">
@@ -121,6 +122,7 @@ export default {
             errorsById: {},
             setsCache: {},
             loadingSet: null,
+            dragging: false,
         };
     },
 
@@ -226,6 +228,16 @@ export default {
             perf.measure('replicator.sorted', () => {
                 this.update(value);
             });
+        },
+
+        dragStarted() {
+            this.dragging = true;
+            this.$emit('focus');
+        },
+
+        dragEnded() {
+            this.dragging = false;
+            this.$emit('blur');
         },
 
         addSet(handle, index) {
