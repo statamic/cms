@@ -255,7 +255,6 @@ return [
     'taxonomies_blueprints_instructions' => 'Terms in this taxonomy may use any of these blueprints.',
     'taxonomies_collections_instructions' => 'The collections that use this taxonomy.',
     'taxonomies_max_depth_instructions' => 'Set the max term nesting level. A depth of 1 allows reordering without nesting, keeping URLs flat.',
-    'term_delete_with_children_confirmation' => 'Are you sure you want to delete this term? Its child terms will be moved up into its position.',
     'taxonomies_orderable_instructions' => 'Enable manual ordering and hierarchy (parent/child terms) via drag & drop. Nested terms get nested URLs.',
     'taxonomies_preview_target_refresh_instructions' => 'Automatically refresh the preview while editing. Disabling this will use postMessage.',
     'taxonomies_preview_targets_instructions' => 'The URLs to be viewable within Live Preview. Learn more in the [documentation](https://statamic.dev/live-preview#preview-targets).',

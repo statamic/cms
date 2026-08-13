@@ -138,4 +138,53 @@ class TaxonomyTreeTest extends TestCase
             ['term' => 'furniture'],
         ], Taxonomy::findByHandle('categories')->structure()->tree()->fileData()['tree']);
     }
+
+    #[Test]
+    public function it_deletes_a_term_and_promotes_its_children()
+    {
+        $taxonomy = $this->makeStructuredTaxonomy();
+        $user = tap(User::make()->makeSuper())->save();
+
+        $this
+            ->actingAs($user)
+            ->patch(cp_route('taxonomies.tree.update', 'categories'), [
+                'deletedTerms' => ['categories::animals'],
+                'pages' => [
+                    ['id' => 'categories::cat', 'children' => []],
+                    ['id' => 'categories::furniture', 'children' => []],
+                ],
+            ])
+            ->assertOk();
+
+        $this->assertNull(Term::find('categories::animals'));
+        $this->assertNotNull(Term::find('categories::cat'));
+        $this->assertEquals([
+            ['term' => 'cat'],
+            ['term' => 'furniture'],
+        ], Taxonomy::findByHandle('categories')->structure()->tree()->tree());
+    }
+
+    #[Test]
+    public function it_deletes_a_term_and_its_children()
+    {
+        $taxonomy = $this->makeStructuredTaxonomy();
+        $user = tap(User::make()->makeSuper())->save();
+
+        $this
+            ->actingAs($user)
+            ->patch(cp_route('taxonomies.tree.update', 'categories'), [
+                'deletedTerms' => ['categories::animals', 'categories::cat'],
+                'pages' => [
+                    ['id' => 'categories::furniture', 'children' => []],
+                ],
+            ])
+            ->assertOk();
+
+        $this->assertNull(Term::find('categories::animals'));
+        $this->assertNull(Term::find('categories::cat'));
+        $this->assertNotNull(Term::find('categories::furniture'));
+        $this->assertEquals([
+            ['term' => 'furniture'],
+        ], Taxonomy::findByHandle('categories')->structure()->tree()->tree());
+    }
 }

@@ -3,6 +3,7 @@ import Head from '@/pages/layout/Head.vue';
 import { Header, Dropdown, DropdownMenu, DropdownItem, DropdownLabel, DropdownSeparator, Listing, Button, ToggleGroup, ToggleItem } from '@ui';
 import { Link, router } from '@inertiajs/vue3';
 import { defineAsyncComponent } from 'vue';
+import DeleteTermConfirmation from '@/components/taxonomies/DeleteTermConfirmation.vue';
 
 export default {
     components: {
@@ -18,6 +19,7 @@ export default {
         Button,
         ToggleGroup,
         ToggleItem,
+        DeleteTermConfirmation,
         PageTree: defineAsyncComponent(() => import('@/components/structures/PageTree.vue')),
     },
 
@@ -52,7 +54,9 @@ export default {
             requestUrl: cp_url(`taxonomies/${this.taxonomy}/terms`),
             view: null,
             deletedTerms: [],
+            showTermDeletionConfirmation: false,
             termBeingDeleted: null,
+            termDeletionConfirmCallback: null,
         };
     },
 
@@ -67,6 +71,18 @@ export default {
 
         maxDepth() {
             return this.structureMaxDepth || Infinity;
+        },
+
+        numberOfChildrenToBeDeleted() {
+            let children = 0;
+            const countChildren = (term) => {
+                term.children.forEach((child) => {
+                    children++;
+                    countChildren(child);
+                });
+            };
+            countChildren(this.termBeingDeleted);
+            return children;
         },
     },
 
@@ -116,14 +132,26 @@ export default {
         },
 
         deleteTreeBranch(branch, removeFromUi) {
-            this.termBeingDeleted = { branch, removeFromUi };
+            this.showTermDeletionConfirmation = true;
+            this.termBeingDeleted = branch;
+            this.termDeletionConfirmCallback = (shouldDeleteChildren) => {
+                this.deletedTerms.push(branch.id);
+                if (shouldDeleteChildren) this.markTermsForDeletion(branch);
+                removeFromUi(shouldDeleteChildren);
+                this.showTermDeletionConfirmation = false;
+                this.termBeingDeleted = null;
+            };
         },
 
-        confirmDeleteTreeBranch() {
-            const { branch, removeFromUi } = this.termBeingDeleted;
-            this.deletedTerms.push(branch.id);
-            removeFromUi(false); // Children are kept and promoted into the deleted term's position.
-            this.termBeingDeleted = null;
+        markTermsForDeletion(branch) {
+            const addDeletableChildren = (branch) => {
+                branch.children.forEach((child) => {
+                    this.deletedTerms.push(child.id);
+                    addDeletableChildren(child);
+                });
+            };
+
+            addDeletableChildren(branch);
         },
 
         createTerm(blueprint, parent) {
@@ -308,16 +336,14 @@ export default {
             </template>
         </page-tree>
 
-        <confirmation-modal
-            :open="termBeingDeleted !== null"
-            :title="__('Delete Term')"
-            :body-text="termBeingDeleted?.branch.children.length
-                ? __('messages.term_delete_with_children_confirmation')
-                : __('Are you sure you want to delete this term?')"
-            :button-text="__('Delete')"
-            :danger="true"
-            @confirm="confirmDeleteTreeBranch"
-            @cancel="termBeingDeleted = null"
+        <delete-term-confirmation
+            v-if="showTermDeletionConfirmation"
+            :children="numberOfChildrenToBeDeleted"
+            @confirm="termDeletionConfirmCallback"
+            @cancel="
+                showTermDeletionConfirmation = false;
+                termBeingDeleted = null;
+            "
         />
     </div>
 </template>
