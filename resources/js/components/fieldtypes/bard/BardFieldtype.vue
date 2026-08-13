@@ -1086,7 +1086,11 @@ export default {
                     setConfigs: this.setConfigs,
                     addSet: this.addSet,
                 }),
-                Dropcursor,
+                Dropcursor.configure({
+                    color: false,
+                    width: 2,
+                    class: 'bard-dropcursor',
+                }),
                 Gapcursor,
                 History,
                 Paragraph,
