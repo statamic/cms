@@ -8,7 +8,7 @@
             :model-value="items.map((item) => item.id)"
             :multiple
             :options="comboboxOptions"
-            :placeholder="__(config.placeholder) || __('Choose...')"
+            :placeholder="fieldPlaceholder"
             :read-only="readOnly"
             :taggable="isTaggable"
             :close-on-select="isTaggable"
@@ -18,15 +18,33 @@
             @update:modelValue="itemsSelected"
             @search="search"
         >
-            <template #option="{ title, hint, status, depth }">
+            <template #option="{ title, hint, status, depth, id, _created }">
                 <div
+                    v-if="_created || isTypedTermPath(id)"
+                    class="flex w-full min-w-0 text-left items-center gap-1.5"
+                >
+                    <span class="text-xs text-gray-600 dark:text-gray-400 shrink-0" v-text="__('Create')" />
+                    <template v-if="isTypedTermPath(id)">
+                        <template v-for="(segment, i) in termPathSegments(title)" :key="i">
+                            <span
+                                v-if="i > 0"
+                                class="text-xs text-gray-500 dark:text-gray-400"
+                                aria-hidden="true"
+                            >→</span>
+                            <ui-badge size="sm" :text="segment" />
+                        </template>
+                    </template>
+                    <span v-else v-text="title" class="truncate" />
+                </div>
+                <div
+                    v-else
                     class="flex w-full text-left items-center gap-2"
                     :style="depth > 1 ? { paddingInlineStart: `${(depth - 1) * 1}rem` } : null"
                 >
                     <span v-if="depth > 1" class="text-gray-400 dark:text-gray-600" aria-hidden="true">↳</span>
                     <StatusIndicator v-if="status" :status="status" />
                     <div v-text="title" class="truncate grow" />
-                    <ui-badge v-if="hint" size="sm" v-text="hint" />
+                    <ui-badge v-if="hint && !(depth > 1)" size="sm" v-text="hint" />
                 </div>
             </template>
             <template #no-options>
@@ -68,6 +86,7 @@ export default {
         config: Object,
         readOnly: Boolean,
         site: String,
+        tree: Object,
     },
 
     data() {
@@ -86,6 +105,16 @@ export default {
             if (data_get(this.config, 'create') === false) return false;
 
             return this.taggable;
+        },
+
+        fieldPlaceholder() {
+            if (this.config.placeholder) return __(this.config.placeholder);
+            if (this.isTaggable && this.config.type === 'terms' && this.tree) {
+                return __('Search or create...');
+            }
+            if (this.isTaggable) return __('Search or create...');
+
+            return __('Choose...');
         },
 
         parameters() {
@@ -219,6 +248,17 @@ export default {
         createOption(value) {
             const existing = this.options.find((option) => option.title === value);
             return existing || { id: value, title: value };
+        },
+
+        isTypedTermPath(id) {
+            return this.config.type === 'terms'
+                && typeof id === 'string'
+                && id.includes('/')
+                && !id.includes('::');
+        },
+
+        termPathSegments(title) {
+            return String(title).split('/').map((segment) => segment.trim()).filter(Boolean);
         },
     },
 };

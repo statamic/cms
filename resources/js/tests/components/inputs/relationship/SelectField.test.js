@@ -17,12 +17,13 @@ const stubs = {
     StatusIndicator: true,
 };
 
-function mountSelectField({ items = [], config = {} } = {}) {
+function mountSelectField({ items = [], config = {}, extra = {} } = {}) {
     return mount(SelectField, {
         props: {
             items,
             url: '/test/select-field',
             config,
+            ...extra,
         },
         global: {
             mocks: {
@@ -61,10 +62,73 @@ describe('SelectField searchKeys', () => {
         wrapper.unmount();
     });
 
+    test('searches by title and path for the terms fieldtype', () => {
+        const wrapper = mountSelectField({ config: { type: 'terms' } });
+
+        expect(wrapper.vm.searchKeys).toEqual(['title', 'path']);
+
+        wrapper.unmount();
+    });
+
     test('is null for other relationship fieldtypes', () => {
         const wrapper = mountSelectField({ config: { type: 'entries' } });
 
         expect(wrapper.vm.searchKeys).toBeNull();
+
+        wrapper.unmount();
+    });
+});
+
+describe('SelectField placeholder', () => {
+    test('defaults to Choose... for non-taggable fields', () => {
+        const wrapper = mountSelectField({ config: { type: 'entries' } });
+
+        expect(wrapper.vm.fieldPlaceholder).toBe('Choose...');
+
+        wrapper.unmount();
+    });
+
+    test('uses a create-friendly placeholder for taggable terms', () => {
+        const wrapper = mountSelectField({
+            config: { type: 'terms' },
+            extra: { taggable: true },
+        });
+
+        expect(wrapper.vm.fieldPlaceholder).toBe('Search or create...');
+
+        wrapper.unmount();
+    });
+
+    test('uses a create-friendly placeholder for hierarchical taggable terms', () => {
+        const wrapper = mountSelectField({
+            config: { type: 'terms' },
+            extra: { taggable: true, tree: { url: '/taxonomies/categories/tree' } },
+        });
+
+        expect(wrapper.vm.fieldPlaceholder).toBe('Search or create...');
+
+        wrapper.unmount();
+    });
+
+    test('prefers a custom placeholder over the create-friendly default', () => {
+        const wrapper = mountSelectField({
+            config: { type: 'terms', placeholder: 'Pick a category' },
+            extra: { taggable: true, tree: { url: '/tree' } },
+        });
+
+        expect(wrapper.vm.fieldPlaceholder).toBe('Pick a category');
+
+        wrapper.unmount();
+    });
+});
+
+describe('SelectField typed term paths', () => {
+    test('treats a slash-separated id as a typed path, not an existing term', () => {
+        const wrapper = mountSelectField({ config: { type: 'terms' } });
+
+        expect(wrapper.vm.isTypedTermPath('animals/cat')).toBe(true);
+        expect(wrapper.vm.isTypedTermPath('categories::cat')).toBe(false);
+        expect(wrapper.vm.termPathSegments('animals/cat/calico')).toEqual(['animals', 'cat', 'calico']);
 
         wrapper.unmount();
     });

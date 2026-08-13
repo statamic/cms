@@ -15,12 +15,26 @@
 
             <template v-else>
                 <span
-                    v-if="item.hint"
-                    v-text="item.hint"
-                    :title="item.hint"
+                    v-if="hintTaxonomy"
+                    v-text="hintTaxonomy"
                     class="text-xs text-gray-400 dark:text-gray-500"
                 />
-                <span v-if="item.hint" class="text-xs text-gray-300 dark:text-gray-600" aria-hidden="true">»</span>
+                <template v-if="hintPathSegments.length">
+                    <ui-badge
+                        v-for="(segment, i) in hintPathSegments"
+                        :key="i"
+                        size="sm"
+                        :text="segment"
+                    />
+                </template>
+                <template v-else-if="item.hint">
+                    <span
+                        v-text="item.hint"
+                        :title="item.hint"
+                        class="text-xs text-gray-400 dark:text-gray-500"
+                    />
+                    <span class="text-xs text-gray-300 dark:text-gray-600" aria-hidden="true">»</span>
+                </template>
 
                 <a
                     v-if="editable"
@@ -103,6 +117,24 @@ export default {
         return {
             isEditing: false,
         };
+    },
+
+    computed: {
+        hintTaxonomy() {
+            if (!this.item.hint?.includes(' • ') || !this.item.hint.includes(' » ')) return null;
+
+            return this.item.hint.split(' • ')[0];
+        },
+
+        hintPathSegments() {
+            if (!this.item.hint?.includes(' » ')) return [];
+
+            const path = this.item.hint.includes(' • ')
+                ? this.item.hint.split(' • ').slice(1).join(' • ')
+                : this.item.hint;
+
+            return path.split(' » ');
+        },
     },
 
     methods: {
