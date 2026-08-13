@@ -20,6 +20,10 @@ class ConnectionLogic
 
     public static function passes(array $config, Submission $submission): bool
     {
+        if (($config['enabled'] ?? true) === false) {
+            return false;
+        }
+
         if (empty($config['conditions'])) {
             return true;
         }
