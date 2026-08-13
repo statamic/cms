@@ -38,10 +38,6 @@ export default {
         active() {
             return Statamic.$config.get('selectedSite');
         },
-
-        activeName() {
-            return this.sites.find((s) => s.handle === this.active).name;
-        },
     },
 
     methods: {

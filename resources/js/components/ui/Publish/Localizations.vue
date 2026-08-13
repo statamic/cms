@@ -2,10 +2,8 @@
 import {
     Label,
     Combobox,
-    Badge,
     Card,
     Panel,
-    Icon,
 } from '@ui';
 import { computed, useId } from 'vue';
 import Localization from './Localization.vue';
@@ -19,10 +17,6 @@ const props = defineProps({
         type: [Boolean, String],
         default: false,
     },
-    label: {
-        type: String,
-        default: null,
-    },
     heading: {
         type: String,
         default: null,
@@ -33,9 +27,7 @@ defineEmits(['selected']);
 
 const comboboxId = useId();
 
-const panelHeading = computed(() => props.heading || __('Sites'));
-
-const comboboxLabel = computed(() => props.label || props.heading || __('Current Localization'));
+const panelHeading = computed(() => props.heading || __('Current Page Localization'));
 
 const activeLocalization = computed(() => {
     return props.localizations.find((localization) => localization.active);
@@ -43,13 +35,13 @@ const activeLocalization = computed(() => {
 </script>
 
 <template>
-    <Panel v-if="localizations.length > 1" :heading="panelHeading" :icon="heading ? 'globe-arrow' : null">
+    <Panel v-if="localizations.length > 1" :heading="panelHeading" icon="globe-arrow">
         <Card class="p-3! space-y-1">
             <template v-if="localizations.length > 5">
                 <Label
                     :for="comboboxId"
-                    :text="comboboxLabel"
-                    :class="{ 'sr-only': heading }"
+                    :text="panelHeading"
+                    class="sr-only"
                 />
 
                 <Combobox
