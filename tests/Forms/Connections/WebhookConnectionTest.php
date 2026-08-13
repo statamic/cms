@@ -231,6 +231,10 @@ class WebhookConnectionTest extends TestCase
             'form' => 'test',
             'submission' => ['id' => $submission->id(), 'date' => $submission->date()->toJson(), 'full_name' => 'Gandalf'],
         ], $this->examplePayload($form));
+
+        tap($form->makeSubmission()->data(['full_name' => 'Saruman'])->asPartial())->save();
+
+        $this->assertEquals('Gandalf', $this->examplePayload($form)['submission']['full_name']);
     }
 
     private function examplePayload($form): array
