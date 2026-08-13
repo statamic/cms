@@ -414,8 +414,8 @@ defineExpose({
                                 data-ui-combobox-selected-option
                             >
                                 <slot v-if="selectedOption" name="selected-option" v-bind="{ option: selectedOption }">
-                                    <div v-if="icon" class="size-4">
-                                        <Icon :name="icon" class="text-gray-900 dark:text-white dark:opacity-50" />
+                                    <div v-if="selectedOption.icon || icon" class="size-4">
+                                        <Icon :name="selectedOption.icon ?? icon" class="text-gray-900 dark:text-white dark:opacity-50" />
                                     </div>
                                     <span v-if="labelHtml" v-html="getOptionLabel(selectedOption)" class="block truncate" />
                                     <span v-else v-text="getOptionLabel(selectedOption)" class="block truncate" />
@@ -504,6 +504,7 @@ defineExpose({
                                         >
                                             <slot name="option" v-bind="option">
                                                 <img v-if="option.image" :src="option.image" class="size-5 rounded-full" :alt="getOptionLabel(option)">
+                                                <Icon v-else-if="option.icon" :name="option.icon" />
                                                 <span v-if="labelHtml" class="truncate" v-html="getOptionLabel(option)" />
                                                 <span class="truncate" v-else>{{ __(getOptionLabel(option)) }}</span>
                                             </slot>
@@ -547,6 +548,7 @@ defineExpose({
                         class="sortable-item mt-2 cursor-grab active:cursor-grabbing"
                     >
                         <Badge pill size="lg" class="[&>*]:st-text-trim-ex-alphabetic">
+                            <Icon v-if="option.icon" :name="option.icon" />
                             <div v-if="labelHtml" v-html="getOptionLabel(option)"></div>
                             <div v-else>{{ __(getOptionLabel(option)) }}</div>
 
