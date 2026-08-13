@@ -529,6 +529,20 @@ class FormTest extends TestCase
     }
 
     #[Test]
+    public function it_drops_legacy_email_configs_that_arent_arrays()
+    {
+        File::put(Form::make('contact_us')->path(), YAML::dump([
+            'title' => 'Contact Us',
+            'email' => ['foo@bar.com', ['to' => 'baz@qux.com']],
+        ]));
+
+        $emails = Form::find('contact_us')->connections()->get('email');
+
+        $this->assertCount(1, $emails);
+        $this->assertEquals('baz@qux.com', $emails[0]['to']);
+    }
+
+    #[Test]
     public function it_omits_connections_from_yaml_when_empty()
     {
         $form = tap(Form::make('contact_us')->title('Contact Us'))->save();

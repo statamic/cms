@@ -328,10 +328,12 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
         return $this->connections($connections);
     }
 
-    private function convertEmailToConnection(array $emails): array
+    private function convertEmailToConnection(string|array $emails): array
     {
-        return collect(array_is_list($emails) ? $emails : [$emails])
+        return collect(is_array($emails) && array_is_list($emails) ? $emails : [$emails])
+            ->filter(fn ($config) => is_array($config))
             ->map(fn ($config) => ['id' => Str::random(8), ...$config])
+            ->values()
             ->all();
     }
 
