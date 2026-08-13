@@ -9,7 +9,7 @@ trait QueriesTaxonomizedEntries
 {
     protected $taxonomyWheres = [];
 
-    protected $expandTaxonomyDescendants = false;
+    protected $expandTaxonomyDescendants = true;
 
     public function whereTaxonomy($term)
     {
@@ -45,9 +45,9 @@ trait QueriesTaxonomizedEntries
      * Terms in taxonomy wheres will also match entries tagged with any of
      * their descendant terms (on hierarchical taxonomies).
      */
-    public function withTaxonomyDescendants()
+    public function withTaxonomyDescendants($expand = true)
     {
-        $this->expandTaxonomyDescendants = true;
+        $this->expandTaxonomyDescendants = $expand;
 
         return $this;
     }

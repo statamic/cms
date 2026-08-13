@@ -339,8 +339,8 @@ class Entries
 
     protected function queryTaxonomies($query)
     {
-        if ($this->params->bool('with_descendants')) {
-            $query->withTaxonomyDescendants();
+        if ($this->params->has('with_descendants') && ! $this->params->bool('with_descendants')) {
+            $query->withTaxonomyDescendants(false);
         }
 
         collect($this->params)->filter(function ($value, $key) {

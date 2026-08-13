@@ -37,19 +37,17 @@ class Query extends Tags
     }
 
     /**
-     * Allows `{{ entries with_descendants="true" }}` on a hierarchical taxonomy
-     * term page to include entries tagged with any descendant term.
+     * Hierarchical taxonomy filters include descendant terms unless
+     * `with_descendants="false"` is passed.
      */
     private function queryTaxonomyDescendants($query)
     {
-        if (! $this->params->bool('with_descendants')) {
-            return;
-        }
-
-        try {
-            $query->withTaxonomyDescendants();
-        } catch (\BadMethodCallException $e) {
-            // The builder doesn't query taxonomized entries. The param is a no-op.
+        if ($this->params->has('with_descendants') && ! $this->params->bool('with_descendants')) {
+            try {
+                $query->withTaxonomyDescendants(false);
+            } catch (\BadMethodCallException $e) {
+                // The builder doesn't query taxonomized entries. The param is a no-op.
+            }
         }
     }
 }

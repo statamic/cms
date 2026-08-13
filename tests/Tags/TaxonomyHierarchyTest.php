@@ -95,10 +95,23 @@ class TaxonomyHierarchyTest extends TestCase
         EntryFactory::collection('blog')->slug('about-calicos')->data(['categories' => ['calico']])->create();
         EntryFactory::collection('blog')->slug('about-couches')->data(['categories' => ['furniture']])->create();
 
-        $without = \Statamic\Facades\Entry::query()->whereTaxonomy('categories::cat')->get();
+        $without = \Statamic\Facades\Entry::query()->withTaxonomyDescendants(false)->whereTaxonomy('categories::cat')->get();
         $this->assertEquals(['about-cats'], $without->map->slug()->all());
 
-        $with = \Statamic\Facades\Entry::query()->withTaxonomyDescendants()->whereTaxonomy('categories::cat')->get();
+        $with = \Statamic\Facades\Entry::query()->whereTaxonomy('categories::cat')->get();
         $this->assertEquals(['about-calicos', 'about-cats'], $with->map->slug()->sort()->values()->all());
+    }
+
+    #[Test]
+    public function with_descendants_can_be_disabled()
+    {
+        Collection::make('blog')->taxonomies(['categories'])->save();
+
+        EntryFactory::collection('blog')->slug('about-cats')->data(['categories' => ['cat']])->create();
+        EntryFactory::collection('blog')->slug('about-calicos')->data(['categories' => ['calico']])->create();
+
+        $entries = \Statamic\Facades\Entry::query()->withTaxonomyDescendants(false)->whereTaxonomy('categories::cat')->get();
+
+        $this->assertEquals(['about-cats'], $entries->map->slug()->all());
     }
 }
