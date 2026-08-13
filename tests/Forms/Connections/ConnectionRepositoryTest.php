@@ -48,11 +48,3 @@ class RoutedConnection extends Connection
         $router->post('/', fn () => 'processed')->name('process');
     }
 }
-
-class RoutelessConnection extends Connection
-{
-    public function render($form): VueComponent
-    {
-        return VueComponent::render('routeless-connection');
-    }
-}
