@@ -1,18 +1,15 @@
 import { buildPreviewText } from '@/util/buildPreviewText';
 import formatPreviewValueUtil from '@/util/formatPreviewValue';
-import { perf } from '@api';
 
 export default {
     computed: {
         previewText() {
-            return perf.measure('replicator.previewText', () => {
-                return buildPreviewText({
-                    previews: this.previews,
-                    config: this.config,
-                    values: this.values,
-                    showFieldPreviews: this.showFieldPreviews,
-                    separator: ' / ',
-                });
+            return buildPreviewText({
+                previews: this.previews,
+                config: this.config,
+                values: this.values,
+                showFieldPreviews: this.showFieldPreviews,
+                separator: ' / ',
             });
         },
     },

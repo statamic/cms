@@ -96,7 +96,6 @@ import AddSetButton from './AddSetButton.vue';
 import ManagesSetMeta from './ManagesSetMeta';
 import { SortableList } from '../../sortable/Sortable';
 import { data_get } from "@/bootstrap/globals.js";
-import { perf } from '@api';
 import { createMountScheduler } from '@/util/createMountScheduler.js';
 
 export default {
@@ -196,38 +195,23 @@ export default {
         },
     },
 
-    mounted() {
-        perf.start('replicator.mount');
-        perf.notifyMountActivity();
-        this.$nextTick(() => {
-            perf.stop('replicator.mount');
-            perf.notifyMountActivity();
-        });
-    },
-
     methods: {
         setConfig(handle) {
             return this.setConfigs.find((c) => c.handle === handle) || {};
         },
 
         updated(index, set) {
-            perf.measure('replicator.updated', () => {
-                this.update([...this.value.slice(0, index), set, ...this.value.slice(index + 1)]);
-            });
+            this.update([...this.value.slice(0, index), set, ...this.value.slice(index + 1)]);
         },
 
         removed(set, index) {
-            perf.measure('replicator.removed', () => {
-                this.removeSetMeta(set._id);
+            this.removeSetMeta(set._id);
 
-                this.update([...this.value.slice(0, index), ...this.value.slice(index + 1)]);
-            });
+            this.update([...this.value.slice(0, index), ...this.value.slice(index + 1)]);
         },
 
         sorted(value) {
-            perf.measure('replicator.sorted', () => {
-                this.update(value);
-            });
+            this.update(value);
         },
 
         dragStarted() {
@@ -251,20 +235,18 @@ export default {
         },
 
         _addSet(handle, index, data) {
-            perf.measure('replicator.addSet', () => {
-                const set = {
-                    ...JSON.parse(JSON.stringify(data.defaults)),
-                    _id: uniqid(),
-                    type: handle,
-                    enabled: true,
-                };
+            const set = {
+                ...JSON.parse(JSON.stringify(data.defaults)),
+                _id: uniqid(),
+                type: handle,
+                enabled: true,
+            };
 
-                this.updateSetMeta(set._id, data.new);
+            this.updateSetMeta(set._id, data.new);
 
-                this.$nextTick(() => {
-                    this.update([...this.value.slice(0, index), set, ...this.value.slice(index)]);
-                    this.expandSet(set._id);
-                });
+            this.$nextTick(() => {
+                this.update([...this.value.slice(0, index), set, ...this.value.slice(index)]);
+                this.expandSet(set._id);
             });
         },
 
@@ -325,54 +307,44 @@ export default {
         duplicateSet(old_id) {
             if (!this.canAddSet) return;
 
-            perf.measure('replicator.duplicateSet', () => {
-                const index = this.value.findIndex((v) => v._id === old_id);
-                const old = this.value[index];
-                const set = {
-                    ...JSON.parse(JSON.stringify(old)),
-                    _id: uniqid(),
-                };
+            const index = this.value.findIndex((v) => v._id === old_id);
+            const old = this.value[index];
+            const set = {
+                ...JSON.parse(JSON.stringify(old)),
+                _id: uniqid(),
+            };
 
-                this.updateSetMeta(set._id, this.meta.existing[old_id]);
+            this.updateSetMeta(set._id, this.meta.existing[old_id]);
 
-                this.update([...this.value.slice(0, index + 1), set, ...this.value.slice(index + 1)]);
+            this.update([...this.value.slice(0, index + 1), set, ...this.value.slice(index + 1)]);
 
-                this.expandSet(set._id);
-            });
+            this.expandSet(set._id);
         },
 
         collapseSet(id) {
-            perf.measure('replicator.collapseSet', () => {
-                if (!this.collapsed.includes(id)) {
-                    this.collapsed.push(id);
-                }
-            });
+            if (!this.collapsed.includes(id)) {
+                this.collapsed.push(id);
+            }
         },
 
         expandSet(id) {
-            perf.measure('replicator.expandSet', () => {
-                if (this.config.collapse === 'accordion') {
-                    this.collapsed = this.value.map((v) => v._id).filter((v) => v !== id);
-                    return;
-                }
+            if (this.config.collapse === 'accordion') {
+                this.collapsed = this.value.map((v) => v._id).filter((v) => v !== id);
+                return;
+            }
 
-                if (this.collapsed.includes(id)) {
-                    var index = this.collapsed.indexOf(id);
-                    this.collapsed.splice(index, 1);
-                }
-            });
+            if (this.collapsed.includes(id)) {
+                var index = this.collapsed.indexOf(id);
+                this.collapsed.splice(index, 1);
+            }
         },
 
         collapseAll() {
-            perf.measure('replicator.collapseAll', () => {
-                this.collapsed = this.value.map((v) => v._id);
-            });
+            this.collapsed = this.value.map((v) => v._id);
         },
 
         expandAll() {
-            perf.measure('replicator.expandAll', () => {
-                this.collapsed = [];
-            });
+            this.collapsed = [];
         },
 
         toggleFullscreen() {

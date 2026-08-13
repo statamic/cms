@@ -6,7 +6,6 @@ import emits from './emits.js';
 import { UPDATE_DEBOUNCE_MS } from './constants';
 import { publishContextKey } from '@/components/ui';
 import { isRef, markRaw } from 'vue';
-import { perf } from '@api';
 
 export default {
     emits,
@@ -23,12 +22,10 @@ export default {
 
     methods: {
         update(value) {
-            perf.count(`fieldtype.update.${this.config?.type || 'unknown'}`);
             this.$emit('update:value', value);
         },
 
         updateMeta(value) {
-            perf.count(`fieldtype.updateMeta.${this.config?.type || 'unknown'}`);
             this.$emit('update:meta', value);
         },
     },

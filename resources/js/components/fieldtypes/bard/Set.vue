@@ -120,7 +120,7 @@ import {
 } from '@ui';
 import { containerContextKey } from '@/components/ui/Publish/Container.vue';
 import { watch, inject } from 'vue';
-import { reveal, perf } from '@api';
+import { reveal } from '@api';
 import { useUiDirection } from '@/composables/ui-direction';
 import { createMountScheduler } from '@/util/createMountScheduler.js';
 import ShowField from '@/components/field-conditions/ShowField.js';
@@ -403,18 +403,10 @@ export default {
         watch(
             () => data_get(this.publishContainer.values.value, this.fieldPathPrefix),
             (values) => {
-                perf.measure('bard.set.syncAttributes', () => {
-                    if (!values) return;
+				if (! values) return;
+                if (JSON.stringify(values) === JSON.stringify(this.node.attrs.values)) return;
 
-                    const unchanged = perf.measure('bard.set.stringify', () => {
-                        return JSON.stringify(values) === JSON.stringify(this.node.attrs.values);
-                    });
-
-                    if (unchanged) return;
-
-                    perf.count('bard.set.updateAttributes');
-                    this.updateAttributes({ values });
-                });
+                this.updateAttributes({ values });
             },
             { deep: true }
         );

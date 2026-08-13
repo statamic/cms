@@ -12,7 +12,6 @@ This is a guideline for contributing to Statamic, its documentation, and addons.
 - [How You Can Contribute](#how-you-can-contribute)
 - [Which Repo?](#which-repo)
 - [Bug Reports](#bug-reports)
-- [Control Panel Performance Reports](#control-panel-performance-reports)
 - [Feature Requests](#feature-requests)
 - [Security Disclosures](#security-disclosures)
 - [Core Enhancements](#core-enhancements)
@@ -55,56 +54,6 @@ Next, please search through the [open issues](https://github.com/statamic/cms/is
 If you _do_ find a similar issue, upvote it by adding a :thumbsup: [reaction](https://github.com/blog/2119-add-reactions-to-pull-requests-issues-and-comments). Only leave a comment if you have relevant information to add.
 
 If no one has filed the issue yet, feel free to [submit a new one](https://github.com/statamic/cms/issues/new?template=bug_report.yml). Please include a clear description of the issue, follow along with the issue template, and provide and as much relevant information as possible. Code examples demonstrating the issue are the best way to ensure a timely solution to the issue.
-
-### Control Panel Performance Reports
-
-If you're reporting sluggish Bard, Replicator, or publish-form behavior, please include a structured perf report when you can:
-
-1. Open the Control Panel and run this in the browser console:
-
-```js
-localStorage.setItem('statamic.perf', '1')
-```
-
-2. Reload the page (required — instrumentation starts in the **mount** phase on boot).
-3. Reproduce the issue. Useful recipes:
-   - **Slow initial render:** open the entry, wait until idle, then `Statamic.$perf.report()` — look at `phase.mount` and the `mount.*` rows.
-   - **Slow save:** click Save, wait for it to finish, then report — look at `phase.save` and `save.publish.save.*`.
-   - **Slow typing / editing:** after the form is idle, run `Statamic.$perf.reset()` to clear mount noise, reproduce the interaction, then report — look at `interact.*`.
-4. Run:
-
-```js
-Statamic.$perf.report()
-```
-
-You'll get a color-coded list grouped by phase (`mount` → `save` → `interact`). Times are **milliseconds**. Headline wall clocks: `phase.mount` (initial render) and `phase.save` (full save pipeline). Heat levels: `critical`, `hot`, `warm`, `ok`, or `count` (tally only).
-
-5. Export / paste into the GitHub issue (DevTools `console.table` is preview-only — use these):
-
-```js
-Statamic.$perf.copy('md')     // markdown table → clipboard (best for GitHub)
-Statamic.$perf.copy()         // TSV → clipboard (spreadsheets)
-Statamic.$perf.copy('json')   // versioned snapshot → clipboard
-Statamic.$perf.download()     // download snapshot JSON
-```
-
-To compare two runs over time:
-
-```js
-const before = Statamic.$perf.snapshot('before-fix')
-// …change code / reload / reproduce…
-Statamic.$perf.diff(before)           // console delta table
-Statamic.$perf.copyDiff(before)       // TSV deltas → clipboard
-```
-
-To turn instrumentation off afterward:
-
-```js
-Statamic.$perf.disable()
-// or: localStorage.removeItem('statamic.perf')
-```
-
-This uses the browser User Timing API under the hood (marks also show up in the Chrome DevTools Performance panel). Core maintainers compare changes against the Vitest browser benchmark suite — see [`benchmarks/README.md`](benchmarks/README.md).
 
 ### Feature Requests
 

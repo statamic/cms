@@ -136,7 +136,6 @@
 
 <script>
 import Fieldtype from '../Fieldtype.vue';
-import { perf } from '@api';
 import { nanoid as uniqid } from 'nanoid';
 import Emitter from 'tiny-emitter';
 import { Editor, EditorContent, NodeViewWrapper, NodeViewContent } from '@tiptap/vue-3';
@@ -420,20 +419,14 @@ export default {
         json(json, oldJson) {
             if (!this.mounted) return;
 
-            const unchanged = perf.measure('bard.json.stringify', () => {
-                return JSON.stringify(json) === JSON.stringify(oldJson);
-            });
-
-            if (unchanged) return;
+            if (JSON.stringify(json) === JSON.stringify(oldJson)) return;
 
             const shouldDebounce = this.debounceNextUpdate;
             this.debounceNextUpdate = true;
 
             if (shouldDebounce) {
-                perf.count('bard.json.updateDebounced');
                 this.updateDebounced(json);
             } else {
-                perf.count('bard.json.updateImmediate');
                 this.updateDebounced.cancel();
                 this.update(json);
             }
@@ -444,15 +437,13 @@ export default {
 
             if (this.editor.view.dom.contains(document.activeElement)) return;
 
-            perf.measure('bard.value.sync', () => {
-                const oldContent = this.editor.getJSON();
-                const content = this.valueToContent(value);
+            const oldContent = this.editor.getJSON();
+            const content = this.valueToContent(value);
 
-                if (JSON.stringify(content) !== JSON.stringify(oldContent)) {
-                    this.editor.commands.clearContent(false);
-                    this.editor.commands.setContent(content, true);
-                }
-            });
+            if (JSON.stringify(content) !== JSON.stringify(oldContent)) {
+                this.editor.commands.clearContent(false);
+                this.editor.commands.setContent(content, true);
+            }
         },
 
         readOnly(readOnly) {
@@ -544,9 +535,6 @@ export default {
             if (this._editorInitPromise) return this._editorInitPromise;
 
             this._editorInitPromise = (async () => {
-                perf.start('bard.mount');
-                perf.notifyMountActivity();
-
                 try {
                     tiptap = await importTiptap();
                     this.initEditor();
@@ -563,9 +551,6 @@ export default {
                 } catch (error) {
                     this.initError = error.message || String(error);
                     throw error;
-                } finally {
-                    perf.stop('bard.mount');
-                    perf.notifyMountActivity();
                 }
             })();
 
@@ -944,34 +929,27 @@ export default {
                     }, 1);
                 },
                 onUpdate: () => {
-                    perf.measure('bard.onUpdate', () => {
-                        const oldJson = this.json;
-                        const rawJson = perf.measure('bard.onUpdate.getJSON', () => this.editor.getJSON().content);
-                        const newJson = perf.measure('bard.onUpdate.clone', () => clone(rawJson));
+                    const oldJson = this.json;
+                    const newJson = clone(this.editor.getJSON().content);
 
-                        const countNodes = (nodes) => {
-                            if (!nodes || !Array.isArray(nodes)) return 0;
-                            let count = nodes.length;
-                            nodes.forEach(node => {
-                                if (node.content) {
-                                    count += countNodes(node.content);
-                                }
-                            });
-                            return count;
-                        };
-
-                        const nodeCountChanged = perf.measure('bard.onUpdate.countNodes', () => {
-                            return countNodes(oldJson) !== countNodes(newJson);
+                    const countNodes = (nodes) => {
+                        if (!nodes || !Array.isArray(nodes)) return 0;
+                        let count = nodes.length;
+                        nodes.forEach(node => {
+                            if (node.content) {
+                                count += countNodes(node.content);
+                            }
                         });
+                        return count;
+                    };
 
-                        if (nodeCountChanged) this.debounceNextUpdate = false;
+                    if (countNodes(oldJson) !== countNodes(newJson)) this.debounceNextUpdate = false;
 
-                        this.json = newJson;
+                    this.json = newJson;
 
-                        if (this.config.reading_time) {
-                            this.html = perf.measure('bard.onUpdate.getHTML', () => this.editor.getHTML());
-                        }
-                    });
+                    if (this.config.reading_time) {
+                        this.html = this.editor.getHTML();
+                    }
                 },
                 onCreate: ({ editor }) => {
                     const state = editor.view.state;

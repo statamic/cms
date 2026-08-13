@@ -1,6 +1,6 @@
 import axios from 'axios';
 import resetValuesFromResponse from '@/util/resetValuesFromResponse.js';
-import { reveal, perf } from '@api';
+import { reveal } from '@api';
 import { UPDATE_DEBOUNCE_MS } from '@/components/fieldtypes/constants';
 
 let container = null;
@@ -16,38 +16,24 @@ export class Pipeline {
     }
 
     async through(steps) {
-        perf.beginSave();
+        // Wait just past the fieldtype update debounce so any in-flight value updates are flushed first.
+        const initialPromise = new Promise((resolve) => setTimeout(resolve, UPDATE_DEBOUNCE_MS + 1));
 
-        try {
-            // Wait just past the fieldtype update debounce so any in-flight value updates are flushed first.
-            perf.start('publish.save.debounceWait');
-            const initialPromise = new Promise((resolve) =>
-                setTimeout(() => {
-                    perf.stop('publish.save.debounceWait');
-                    resolve();
-                }, UPDATE_DEBOUNCE_MS + 1),
-            );
+        return [new Start(), ...steps, new Finish()].reduce(async (promise, step) => {
+            const payload = await promise;
 
-            return await [new Start(), ...steps, new Finish()].reduce(async (promise, step) => {
-                const payload = await promise;
+            step = typeof step === 'function' ? step(payload) : step;
 
-                step = typeof step === 'function' ? step(payload) : step;
-
-                try {
-                    return await step.handle(payload);
-                } catch (error) {
-                    if (error instanceof PipelineStopped) {
-                        new Stopped().handle(payload);
-                        throw error;
-                    }
+            try {
+                return await step.handle(payload);
+            } catch (error) {
+                if (error instanceof PipelineStopped) {
+                    new Stopped().handle(payload);
                     throw error;
                 }
-            }, initialPromise);
-        } finally {
-            if (perf.getPhase() === 'save') {
-                perf.endSave();
+                throw error;
             }
-        }
+        }, initialPromise);
     }
 }
 
@@ -84,30 +70,19 @@ export class Request extends Step {
 
     handle(payload) {
         return new Promise((resolve, reject) => {
-            const data = perf.measure('publish.save.payload', () => ({
-                ...container.value.visibleValues,
-                ...this.#extraData,
-            }));
-
-            perf.start('publish.save.request');
+            const data = { ...container.value.visibleValues, ...this.#extraData };
 
             return axios[this.#method](this.#url, data)
                 .then((response) => {
-                    perf.stop('publish.save.request');
-
                     if (container && response.data.data?.hasOwnProperty('values')) {
-                        perf.measure('publish.save.applyResponse', () => {
-                            container.value.setValues(
-                                resetValuesFromResponse(response.data.data.values, container.value),
-                            );
-                            container.value.setExtraValues(response.data.data.extraValues);
-                        });
+                        container.value.setValues(
+                            resetValuesFromResponse(response.data.data.values, container.value),
+                        );
+                        container.value.setExtraValues(response.data.data.extraValues);
                     }
                     resolve(response);
                 })
                 .catch((e) => {
-                    perf.stop('publish.save.request');
-
                     if (e.response && e.response.status === 422) {
                         const { errors: messages, message } = e.response.data;
                         if (errors) errors.value = messages;
@@ -137,17 +112,7 @@ export class BeforeSaveHooks extends Step {
     }
     handle(payload) {
         return new Promise((resolve, reject) => {
-            perf.start('publish.save.beforeHooks');
-            return Statamic.$hooks
-                .run(`${this.#prefix}.saving`, this.#hookPayload)
-                .then(() => {
-                    perf.stop('publish.save.beforeHooks');
-                    resolve(payload);
-                })
-                .catch((error) => {
-                    perf.stop('publish.save.beforeHooks');
-                    reject(error);
-                });
+            return Statamic.$hooks.run(`${this.#prefix}.saving`, this.#hookPayload).then(() => resolve(payload));
         });
     }
 }
@@ -162,20 +127,12 @@ export class AfterSaveHooks extends Step {
     }
     handle(response) {
         return new Promise((resolve, reject) => {
-            perf.start('publish.save.afterHooks');
             return Statamic.$hooks
                 .run(`${this.#prefix}.saved`, {
                     ...this.#hookPayload,
                     response,
                 })
-                .then(() => {
-                    perf.stop('publish.save.afterHooks');
-                    resolve(response);
-                })
-                .catch((error) => {
-                    perf.stop('publish.save.afterHooks');
-                    reject(error);
-                });
+                .then(() => resolve(response));
         });
     }
 }
