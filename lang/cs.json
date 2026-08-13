@@ -9,6 +9,7 @@
     ":count\/:max selected": ":count\/:max vybraných",
     ":count\/:total characters": ":count \/ :total znaků",
     ":file uploaded": ":file nahrána",
+    ":name Site": ":name Web",
     ":start-:end of :total": ":start - :end :total",
     ":success\/:total entries were deleted": ":success \/ :total počet položek byl smazán",
     ":success\/:total entries were published": ":success \/ :total příspěvků",

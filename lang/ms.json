@@ -9,6 +9,7 @@
     ":count\/:max selected": ":count \/ :max dipilih",
     ":count\/:total characters": ":count \/ :total aksara",
     ":file uploaded": ":file dimuat naik",
+    ":name Site": ":name Tapak",
     ":start-:end of :total": ":start - :end of :total",
     ":success\/:total entries were deleted": ":success \/ :total entri telah dipadamkan",
     ":success\/:total entries were published": ":success \/ :total penyertaan telah diterbitkan",

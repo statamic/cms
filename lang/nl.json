@@ -10,6 +10,7 @@
     ":count\/:max selected": ":count\/:max geselecteerd",
     ":count\/:total characters": ":count\/:total tekens",
     ":file uploaded": ":file geüpload",
+    ":name Site": ":name Site",
     ":start-:end of :total": ":start-:end van :total",
     ":success\/:total entries were deleted": ":success \/ :total aantal items is verwijderd",
     ":success\/:total entries were published": ":success \/ :total inzendingen is gepubliceerd",

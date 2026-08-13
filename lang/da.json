@@ -9,6 +9,7 @@
     ":count\/:max selected": ":count \/ :max valgt",
     ":count\/:total characters": ":count \/ :total tegn",
     ":file uploaded": ":file uploadet",
+    ":name Site": ":name Websted",
     ":start-:end of :total": ":start - :end af :total",
     ":success\/:total entries were deleted": ":success \/ :total poster blev slettet",
     ":success\/:total entries were published": ":success \/ :total poster blev offentliggjort",

@@ -9,6 +9,7 @@
     ":count\/:max selected": ":count \/ :max yang dipilih",
     ":count\/:total characters": ":count \/ :total karakter",
     ":file uploaded": ":file diunggah",
+    ":name Site": ":name Situs",
     ":start-:end of :total": ":start - :end dari :total",
     ":success\/:total entries were deleted": ":success \/ :total entri telah dihapus",
     ":success\/:total entries were published": ":success \/ :total entri telah dipublikasikan",

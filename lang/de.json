@@ -11,6 +11,7 @@
     ":count\/:max selected": ":count\/:max ausgewählt",
     ":count\/:total characters": ":count\/:total Zeichen",
     ":file uploaded": ":file hochgeladen",
+    ":name Site": ":name Website",
     ":range of :total": ":range von :total",
     ":success\/:total entries were deleted": ":success\/:total Einträge wurden gelöscht",
     ":success\/:total entries were published": ":success\/:total Einträge wurden veröffentlicht",

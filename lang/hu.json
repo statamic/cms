@@ -9,6 +9,7 @@
     ":count\/:max selected": ":count\/:max kiválasztva",
     ":count\/:total characters": ":count \/ :total karakter",
     ":file uploaded": ":file feltöltve",
+    ":name Site": ":name Webhely",
     ":start-:end of :total": ":start - :end :total",
     ":success\/:total entries were deleted": ":success \/ :total bejegyzés törölve",
     ":success\/:total entries were published": ":success \/ :total bejegyzés megjelent",

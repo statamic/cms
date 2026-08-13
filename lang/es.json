@@ -9,6 +9,7 @@
     ":count\/:max selected": ":count \/ :max seleccionado",
     ":count\/:total characters": ":count \/ :total caracteres",
     ":file uploaded": ":file subido",
+    ":name Site": ":name Sitio",
     ":start-:end of :total": ":start - :end de :total",
     ":success\/:total entries were deleted": ":success \/ :total las entradas",
     ":success\/:total entries were published": ":success \/ :total",

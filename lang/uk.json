@@ -9,6 +9,7 @@
     ":count\/:max selected": ":count\/:max вибрано",
     ":count\/:total characters": ":count\/:total символів",
     ":file uploaded": ":file завантажено",
+    ":name Site": "Сайт :name",
     ":start-:end of :total": ":start-:end із :total",
     ":success\/:total entries were deleted": ":success \/ :total записів видалено",
     ":success\/:total entries were published": ":success \/ :total опубліковано записів",

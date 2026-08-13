@@ -9,6 +9,7 @@
     ":count\/:max selected": ":count \/ :max izbrano",
     ":count\/:total characters": ":count \/ :total znakov",
     ":file uploaded": ":file naložena",
+    ":name Site": ":name Spletna stran",
     ":start-:end of :total": ":start - :end :total",
     ":success\/:total entries were deleted": ":success \/ :total vnosi so bili izbrisani",
     ":success\/:total entries were published": ":success \/ :total objavljenih vnosov",

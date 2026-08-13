@@ -9,6 +9,7 @@
     ":count\/:max selected": ":count\/:max 个选中",
     ":count\/:total characters": ":count \/ :total字符数",
     ":file uploaded": ":文件已上传",
+    ":name Site": ":name站点",
     ":start-:end of :total": ":start - :end :total",
     ":success\/:total entries were deleted": ":success \/ :total删除了条目",
     ":success\/:total entries were published": ":success \/ :total发布条目",

@@ -9,6 +9,7 @@
     ":count\/:max selected": ":count\/:max valda",
     ":count\/:total characters": ":count \/ :total tecken",
     ":file uploaded": ":file laddades upp",
+    ":name Site": ":name Webbplats",
     ":start-:end of :total": ":start - :end på :total",
     ":success\/:total entries were deleted": ":success \/ :total poster raderades",
     ":success\/:total entries were published": ":success \/ :total poster publicerades",

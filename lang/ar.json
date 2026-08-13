@@ -9,6 +9,7 @@
     ":count\/:max selected": ":count محدد من :max",
     ":count\/:total characters": ":count حرف من :total",
     ":file uploaded": ":file تم رفعه",
+    ":name Site": "الموقع :name",
     ":start-:end of :total": ":start-:end من :total",
     ":success\/:total entries were deleted": ":success \/ :total تم حذف الإدخالات",
     ":success\/:total entries were published": ":success \/ :total تم نشر الإدخالات",

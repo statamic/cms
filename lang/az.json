@@ -9,6 +9,7 @@
     ":count\/:max selected": ":count\/:max seçildi",
     ":count\/:total characters": ":count\/:total hərf",
     ":file uploaded": ":file yükləndi",
+    ":name Site": ":name Sayt",
     ":start-:end of :total": ":start-:end :total-dən",
     ":success\/:total entries were deleted": ":success \/ :total qeydlər silindi",
     ":success\/:total entries were published": ":success \/ :total entries nəşr olundu",

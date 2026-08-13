@@ -9,6 +9,7 @@
     ":count\/:max selected": ":count \/ :maxが選択されました",
     ":count\/:total characters": ":count \/ :total文字数",
     ":file uploaded": ":fileアップロードされました",
+    ":name Site": ":nameサイト",
     ":start-:end of :total": ":start - :end :total",
     ":success\/:total entries were deleted": ":success \/ :totalエントリが削除されました",
     ":success\/:total entries were published": ":success \/ :totalエントリが公開されました",

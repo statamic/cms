@@ -12,6 +12,7 @@
     ":count\/:max selected": ":count\/:max выбрано",
     ":count\/:total characters": ":count\/:total символов",
     ":file uploaded": ":file загружен",
+    ":name Site": "Сайт :name",
     ":start-:end of :total": ":start-:end из :total",
     ":success\/:total entries were deleted": ":success \/ :total записи были удалены",
     ":success\/:total entries were published": ":success \/ :total записей было опубликовано",
