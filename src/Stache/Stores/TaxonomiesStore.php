@@ -51,7 +51,8 @@ class TaxonomiesStore extends BasicStore
             ->previewTargets($this->normalizePreviewTargets(Arr::get($data, 'preview_targets', [])))
             ->termTemplate(Arr::get($data, 'term_template', null))
             ->template(Arr::get($data, 'template', null))
-            ->layout(Arr::get($data, 'layout', null));
+            ->layout(Arr::get($data, 'layout', null))
+            ->routes(Arr::has($data, 'routes') ? Arr::get($data, 'routes') : null);
 
         if (($structure = Arr::get($data, 'structure')) !== null) {
             $taxonomy->structureContents($structure ?: []);

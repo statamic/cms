@@ -297,9 +297,11 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, BulkAugmenta
 
     public function route()
     {
-        $slug = $this->taxonomy()->hierarchical() ? '{parent_uri}/{slug}' : '{slug}';
+        $route = $this->taxonomy()->termRoute($this->locale());
 
-        $route = '/'.str_replace('_', '-', $this->taxonomyHandle()).'/'.$slug;
+        if (! $route) {
+            return null;
+        }
 
         if ($this->collection()) {
             $collectionUrl = $this->collection()->uri($this->locale()) ?? $this->collection()->handle();
@@ -385,7 +387,7 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, BulkAugmenta
 
     public function toResponse($request)
     {
-        if (! view()->exists($this->template())) {
+        if (! $this->uri() || ! view()->exists($this->template())) {
             throw new NotFoundHttpException;
         }
 

@@ -265,7 +265,7 @@ export default {
                 <span class="text-2xs font-mono">{{ term.slug }}</span>
             </template>
             <template #prepended-row-actions="{ row: term }">
-                <DropdownItem v-if="term.has_template" :text="__('Visit URL')" :href="term.permalink" target="_blank" icon="eye" />
+                <DropdownItem v-if="term.has_template && term.permalink" :text="__('Visit URL')" :href="term.permalink" target="_blank" icon="eye" />
                 <DropdownItem :text="__('Edit')" :href="term.edit_url" icon="edit" />
             </template>
         </Listing>

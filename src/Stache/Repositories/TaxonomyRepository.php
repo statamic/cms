@@ -7,6 +7,8 @@ use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Contracts\Taxonomies\TaxonomyRepository as RepositoryContract;
 use Statamic\Exceptions\TaxonomyNotFoundException;
 use Statamic\Facades;
+use Statamic\Facades\Site;
+use Statamic\Facades\URL;
 use Statamic\Stache\Stache;
 use Statamic\Support\Str;
 
@@ -73,6 +75,8 @@ class TaxonomyRepository implements RepositoryContract
 
     public function findByUri(string $uri, ?string $site = null): ?Taxonomy
     {
+        $site = $site ?? Site::current()->handle();
+
         $collection = Facades\Collection::all()
             ->first(function ($collection) use ($uri, $site) {
                 if (Str::startsWith($uri, $collection->uri($site))) {
@@ -88,13 +92,19 @@ class TaxonomyRepository implements RepositoryContract
 
         // If the collection is mounted to the home page, the uri would have
         // the slash trimmed off at this point. We'll make sure it's there.
-        $uri = Str::ensureLeft($uri, '/');
+        $uri = URL::tidy(Str::ensureLeft($uri, '/'));
 
-        if (! $key = $this->findTaxonomyHandleByUri($uri)) {
-            return null;
-        }
+        $taxonomy = $this->all()->first(function ($taxonomy) use ($uri, $site) {
+            $route = $taxonomy->taxonomyRoute($site);
 
-        return $this->findByHandle($key)->collection($collection);
+            if (! $route) {
+                return false;
+            }
+
+            return URL::tidy($route) === $uri;
+        });
+
+        return $taxonomy?->collection($collection);
     }
 
     public static function bindings(): array
@@ -102,11 +112,6 @@ class TaxonomyRepository implements RepositoryContract
         return [
             Taxonomy::class => \Statamic\Taxonomies\Taxonomy::class,
         ];
-    }
-
-    private function findTaxonomyHandleByUri($uri)
-    {
-        return $this->store->index('uri')->items()->flip()->get($uri);
     }
 
     public function addPreviewTargets($handle, $targets)

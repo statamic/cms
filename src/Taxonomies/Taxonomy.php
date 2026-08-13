@@ -53,6 +53,7 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, ContainsQ
     protected $layout;
     protected $structure;
     protected $structureContents;
+    protected $routes;
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
 
@@ -397,6 +398,7 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, ContainsQ
             'template' => $this->template,
             'term_template' => $this->termTemplate,
             'layout' => $this->layout,
+            'routes' => $this->routesForFile(),
         ];
 
         $data = Arr::removeNullValues(array_merge($data, [
@@ -444,7 +446,11 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, ContainsQ
 
     public function url()
     {
-        return URL::makeRelative($this->absoluteUrl());
+        if (! $url = $this->absoluteUrl()) {
+            return null;
+        }
+
+        return URL::makeRelative($url);
     }
 
     public function urlWithoutRedirect()
@@ -454,6 +460,10 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, ContainsQ
 
     public function absoluteUrl()
     {
+        if (! $this->uri()) {
+            return null;
+        }
+
         return URL::tidy(Site::current()->absoluteUrl().$this->uri());
     }
 
@@ -461,9 +471,86 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, ContainsQ
     {
         $site = Site::current();
 
+        if (! $route = $this->taxonomyRoute($site->handle())) {
+            return null;
+        }
+
         $prefix = $this->collection() ? $this->collection()->uri($site->handle()) : '/';
 
-        return URL::tidy($prefix.str_replace('_', '-', '/'.$this->handle));
+        return URL::tidy($prefix.$route);
+    }
+
+    public function routes($routes = null)
+    {
+        return $this->fluentlyGetOrSet('routes')->args(func_get_args());
+    }
+
+    public function routesEnabled(): bool
+    {
+        return $this->routes !== false;
+    }
+
+    public function taxonomyRoute(?string $site = null): ?string
+    {
+        if ($this->routes === false) {
+            return null;
+        }
+
+        $site = $site ?? Site::current()->handle();
+        $resolved = $this->routeForSite($this->routes, $site);
+
+        if (is_string($resolved) && $resolved !== '') {
+            return $this->normalizeRoute($resolved);
+        }
+
+        return $this->defaultTaxonomyRoute();
+    }
+
+    public function termRoute(?string $site = null): ?string
+    {
+        if (! $base = $this->taxonomyRoute($site)) {
+            return null;
+        }
+
+        return $this->hierarchical()
+            ? $base.'/{parent_uri}/{slug}'
+            : $base.'/{slug}';
+    }
+
+    private function routeForSite($configured, string $site)
+    {
+        if (is_string($configured)) {
+            return $configured;
+        }
+
+        if (is_array($configured) && array_key_exists($site, $configured)) {
+            return $configured[$site] === '' ? null : $configured[$site];
+        }
+
+        return null;
+    }
+
+    private function defaultTaxonomyRoute(): string
+    {
+        return $this->normalizeRoute(str_replace('_', '-', $this->handle));
+    }
+
+    private function normalizeRoute(string $route): string
+    {
+        return URL::tidy($route);
+    }
+
+    private function routesForFile()
+    {
+        if ($this->routes === false) {
+            return false;
+        }
+
+        if (! $this->routes) {
+            return null;
+        }
+
+        return $this->routes;
     }
 
     public function collection($collection = null)
@@ -483,7 +570,7 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, ContainsQ
 
     public function toResponse($request)
     {
-        if (! view()->exists($this->template())) {
+        if (! $this->uri() || ! view()->exists($this->template())) {
             throw new NotFoundHttpException;
         }
 

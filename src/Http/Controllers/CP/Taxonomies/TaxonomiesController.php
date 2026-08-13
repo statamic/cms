@@ -174,6 +174,8 @@ class TaxonomiesController extends CpController
             'layout' => $taxonomy->layout(),
             'structured' => $taxonomy->hasStructure(),
             'max_depth' => optional($taxonomy->structure())->maxDepth(),
+            'route_mode' => $this->routeModeForCp($taxonomy->routes()),
+            'route' => $this->routeValueForCp($taxonomy->routes()),
         ];
 
         return PublishForm::make($this->editFormBlueprint($taxonomy))
@@ -200,7 +202,8 @@ class TaxonomiesController extends CpController
             ->previewTargets($values['preview_targets'])
             ->termTemplate($values['term_template'] ?? null)
             ->template($values['template'] ?? null)
-            ->layout($values['layout'] ?? null);
+            ->layout($values['layout'] ?? null)
+            ->routes($this->routesFromCp($values));
 
         if ($sites = Arr::get($values, 'sites')) {
             $taxonomy->sites($sites);
@@ -367,6 +370,24 @@ class TaxonomiesController extends CpController
             'routing' => [
                 'display' => __('Routing & URLs'),
                 'fields' => [
+                    'route_mode' => [
+                        'display' => __('Routes'),
+                        'instructions' => __('statamic::messages.taxonomies_routes_instructions'),
+                        'type' => 'button_group',
+                        'options' => [
+                            'automagic' => __('Automagic'),
+                            'custom' => __('Custom'),
+                            'disabled' => __('Disabled'),
+                        ],
+                        'default' => 'automagic',
+                    ],
+                    'route' => [
+                        'display' => __('Route'),
+                        'instructions' => __('statamic::messages.taxonomies_route_instructions'),
+                        'type' => 'collection_routes',
+                        'if' => ['route_mode' => 'custom'],
+                        'validate' => 'required_if:route_mode,custom',
+                    ],
                     'preview_targets' => [
                         'display' => __('Preview Targets'),
                         'instructions' => __('statamic::messages.taxonomies_preview_targets_instructions'),
@@ -444,5 +465,67 @@ class TaxonomiesController extends CpController
                 ],
             ],
         ])->all());
+    }
+
+    private function routeModeForCp($routes): string
+    {
+        if ($routes === false) {
+            return 'disabled';
+        }
+
+        if ($routes === null || $routes === []) {
+            return 'automagic';
+        }
+
+        return 'custom';
+    }
+
+    private function routeValueForCp($routes)
+    {
+        if ($routes === false || $routes === null) {
+            return null;
+        }
+
+        if (is_array($routes) && collect($routes)->filter()->unique()->count() === 1) {
+            return collect($routes)->filter()->first();
+        }
+
+        return $routes;
+    }
+
+    private function routesFromCp(array $values): mixed
+    {
+        $mode = $values['route_mode'] ?? 'automagic';
+
+        if ($mode === 'disabled') {
+            return false;
+        }
+
+        if ($mode !== 'custom') {
+            return null;
+        }
+
+        return $this->emptyRouteToNull($values['route'] ?? null);
+    }
+
+    private function emptyRouteToNull($value)
+    {
+        if ($value === '' || $value === [] || $value === null) {
+            return null;
+        }
+
+        if (is_array($value)) {
+            $filtered = collect($value)
+                ->map(fn ($route) => $route === '' ? null : $route)
+                ->filter(fn ($route) => $route !== null);
+
+            if ($filtered->isEmpty()) {
+                return null;
+            }
+
+            return $filtered->all();
+        }
+
+        return $value;
     }
 }

@@ -47,6 +47,8 @@ class UpdateTaxonomyTest extends TestCase
 
         $this->assertCount(1, Taxonomy::all());
         $this->assertEquals('Updated title', $taxonomy->title());
+        $this->assertTrue($taxonomy->routesEnabled());
+        $this->assertArrayNotHasKey('routes', $taxonomy->fileData());
     }
 
     #[Test]
@@ -135,6 +137,60 @@ class UpdateTaxonomyTest extends TestCase
         $this->assertTrue($collectionOne->taxonomies()->contains($taxonomy));
         $this->assertFalse($collectionTwo->taxonomies()->contains($taxonomy));
         $this->assertTrue($collectionThree->taxonomies()->contains($taxonomy));
+    }
+
+    #[Test]
+    public function it_disables_routes()
+    {
+        $taxonomy = tap(Taxonomy::make('test')->title('Test'))->save();
+
+        $this->assertTrue($taxonomy->routesEnabled());
+        $this->assertArrayNotHasKey('routes', $taxonomy->fileData());
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->update($taxonomy, [
+                'route_mode' => 'disabled',
+            ])
+            ->assertOk();
+
+        $taxonomy = Taxonomy::findByHandle('test');
+
+        $this->assertFalse($taxonomy->routesEnabled());
+        $this->assertFalse($taxonomy->fileData()['routes']);
+    }
+
+    #[Test]
+    public function it_saves_custom_routes()
+    {
+        $taxonomy = tap(Taxonomy::make('test')->title('Test'))->save();
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->update($taxonomy, [
+                'route_mode' => 'custom',
+                'route' => '/topics',
+            ])
+            ->assertOk();
+
+        $taxonomy = Taxonomy::findByHandle('test');
+
+        $this->assertEquals('/topics', $taxonomy->taxonomyRoute());
+        $this->assertEquals('/topics/{slug}', $taxonomy->termRoute());
+        $this->assertEquals('/topics', $taxonomy->fileData()['routes']);
+    }
+
+    #[Test]
+    public function it_requires_a_route_when_using_custom_mode()
+    {
+        $taxonomy = tap(Taxonomy::make('test')->title('Test'))->save();
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->update($taxonomy, [
+                'route_mode' => 'custom',
+            ])
+            ->assertSessionHasErrors('route');
     }
 
     private function userWithoutPermission()

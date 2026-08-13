@@ -347,7 +347,8 @@ class StaticWarm extends Command
 
                     return $taxonomy->absoluteUrl();
                 });
-            });
+            })
+            ->filter();
 
         $this->line("\x1B[1A\x1B[2K<info>[✔]</info> Taxonomies");
 
@@ -367,7 +368,8 @@ class StaticWarm extends Command
                 return $term->taxonomy()->sites()->map(function ($site) use ($term) {
                     return $term->in($site)->absoluteUrl();
                 });
-            });
+            })
+            ->filter();
 
         $this->line("\x1B[1A\x1B[2K<info>[✔]</info> Taxonomy terms");
 

@@ -86,47 +86,96 @@ class TermRepository implements RepositoryContract
             $uri = Str::after($uri, $collection->uri($site) ?? $collection->handle());
         }
 
-        $uri = Str::removeLeft($uri, '/');
+        $uri = URL::tidy(Str::ensureLeft($uri, '/'));
 
-        $segments = explode('/', $uri);
-        $taxonomy = array_shift($segments);
+        foreach (Taxonomy::all()->sortByDesc(fn ($taxonomy) => strlen((string) $taxonomy->termRoute($site))) as $taxonomy) {
+            if ($term = $this->findTermByRoute($taxonomy, $uri, $site)) {
+                return $term->collection($collection);
+            }
+        }
 
-        // The term slug is the last segment. Hierarchical taxonomies may have
-        // ancestor slugs in between, which get verified against the term's
-        // canonical URI below.
-        $slug = empty($segments) ? null : end($segments);
+        return null;
+    }
 
-        if (! $slug) {
+    private function findTermByRoute($taxonomy, string $uri, string $site): ?Term
+    {
+        $pattern = $taxonomy->termRoute($site);
+
+        if (! $pattern) {
             return null;
         }
 
-        if (! $taxonomy = $this->findTaxonomyHandleByUri($taxonomy)) {
+        $pattern = URL::tidy($pattern);
+        $captures = $this->matchRoutePattern($uri, $pattern);
+
+        if ($captures === null) {
             return null;
         }
 
-        if (count($segments) > 1 && ! Taxonomy::find($taxonomy)->hierarchical()) {
-            return null;
+        if (isset($captures['slug'])) {
+            $term = $this->query()
+                ->where('slug', $captures['slug'])
+                ->where('taxonomy', $taxonomy->handle())
+                ->where('site', $site)
+                ->first();
+        } else {
+            $term = $this->query()
+                ->where('taxonomy', $taxonomy->handle())
+                ->where('site', $site)
+                ->get()
+                ->first(fn ($term) => $term->uri() === $uri);
         }
-
-        $term = $this->query()
-            ->where('slug', $slug)
-            ->where('taxonomy', $taxonomy)
-            ->where('site', $site)
-            ->first();
 
         if (! $term) {
             return null;
         }
 
-        if ($term->uri() !== '/'.$uri) {
-            // Hierarchical terms remain resolvable at non-canonical paths (e.g. their
-            // old flat URL). The response layer will 301 to the canonical URL.
-            if (! $term->taxonomy()->hierarchical()) {
-                return null;
+        if ($term->uri() !== $uri && ! $taxonomy->hierarchical()) {
+            return null;
+        }
+
+        return $term;
+    }
+
+    /**
+     * Match a URI against a route pattern like `/topics/{parent_uri}/{slug}`.
+     *
+     * `{parent_uri}` may span multiple segments and is optional (root terms
+     * tidy away the empty segment). Other placeholders match a single segment.
+     */
+    private function matchRoutePattern(string $uri, string $pattern): ?array
+    {
+        $pattern = str_replace(['{{ ', ' }}', '{{', '}}'], ['{', '}', '{', '}'], $pattern);
+
+        $tokens = [];
+        $i = 0;
+
+        $tokenized = preg_replace_callback('/\{([a-zA-Z0-9_]+)\}/', function ($match) use (&$tokens, &$i) {
+            $key = '___T'.$i.'___';
+            $tokens[$key] = $match[1];
+            $i++;
+
+            return $key;
+        }, $pattern);
+
+        $regex = preg_quote($tokenized, '#');
+
+        foreach ($tokens as $token => $name) {
+            $quoted = preg_quote($token, '#');
+
+            if ($name === 'parent_uri') {
+                $regex = str_replace($quoted.'/', '(?:(?P<parent_uri>.+)/)?', $regex);
+                $regex = str_replace($quoted, '(?P<parent_uri>.*)', $regex);
+            } else {
+                $regex = str_replace($quoted, '(?P<'.$name.'>[^/]+)', $regex);
             }
         }
 
-        return $term->collection($collection);
+        if (! preg_match('#^'.$regex.'$#', $uri, $matches)) {
+            return null;
+        }
+
+        return array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY);
     }
 
     public function findOrFail($id): Term
@@ -214,11 +263,6 @@ class TermRepository implements RepositoryContract
         return [
             Term::class => \Statamic\Taxonomies\Term::class,
         ];
-    }
-
-    private function findTaxonomyHandleByUri($uri)
-    {
-        return $this->stache->store('taxonomies')->index('uri')->items()->flip()->get(URL::tidy($uri));
     }
 
     public function substitute($item)
