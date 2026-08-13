@@ -967,7 +967,10 @@ export default {
                         if (nodeCountChanged) this.debounceNextUpdate = false;
 
                         this.json = newJson;
-                        this.html = perf.measure('bard.onUpdate.getHTML', () => this.editor.getHTML());
+
+                        if (this.config.reading_time) {
+                            this.html = perf.measure('bard.onUpdate.getHTML', () => this.editor.getHTML());
+                        }
                     });
                 },
                 onCreate: ({ editor }) => {
