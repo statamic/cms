@@ -254,6 +254,15 @@ class Sites
 
         // If multisite, nest fields in a grid
         if ($this->multiEnabled()) {
+            $tableWidths = [
+                'name' => 14,
+                'handle' => 14,
+                'url' => 14,
+                'locale' => 12,
+                'lang' => 16,
+                'attributes' => 30,
+            ];
+
             $siteFields = [
                 [
                     'handle' => 'sites',
@@ -264,7 +273,11 @@ class Sites
                         'fullscreen' => false,
                         'mode' => 'stacked',
                         'add_row' => __('Add Site'),
-                        'fields' => $siteFields,
+                        'fields' => collect($siteFields)->map(function ($field) use ($tableWidths) {
+                            $field['field']['width'] = $tableWidths[$field['handle']] ?? 16;
+
+                            return $field;
+                        })->all(),
                         'required' => true,
                     ],
                 ],
