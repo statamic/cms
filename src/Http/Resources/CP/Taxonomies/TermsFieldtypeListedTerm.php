@@ -19,14 +19,6 @@ class TermsFieldtypeListedTerm extends ListedTerm
     {
         $arr = array_merge(parent::toArray($request), $this->fieldtype->itemHierarchyMeta($this->resource));
 
-        if ($this->fieldtype->hierarchicalTaxonomy()) {
-            return $arr;
-        }
-
-        if (! in_array($this->fieldtype->config('mode'), ['select', 'typeahead'])) {
-            return $arr;
-        }
-
         if ($hint = $this->fieldtype->getItemHint($this->resource)) {
             $arr['hint'] = $hint;
         }
