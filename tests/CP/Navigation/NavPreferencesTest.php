@@ -1129,6 +1129,63 @@ class NavPreferencesTest extends TestCase
     }
 
     #[Test]
+    public function it_doesnt_show_moved_child_items_in_original_parent_when_reordering_remaining_children()
+    {
+        Facades\Collection::make('events')->title('Events')->save();
+
+        $nav = $this->buildNavWithPreferences([
+            'content' => [
+                'reorder' => true,
+                'items' => [
+                    'content::collections::pages' => '@move',
+                    'content::collections' => [
+                        'action' => '@modify',
+                        'reorder' => true,
+                        'children' => [
+                            'content::collections::events' => '@inherit',
+                            'content::collections::articles' => '@inherit',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $contentItems = $nav->get('Content')->keyBy->display();
+
+        $this->assertEquals(['Pages', 'Collections', 'Navigation', 'Taxonomies', 'Assets', 'Globals'], $contentItems->keys()->all());
+        $this->assertEquals(['Events', 'Articles'], $contentItems->get('Collections')->children()->map->display()->all());
+
+        Request::swap(Request::create('http://localhost/cp/collections/pages'));
+
+        $this->assertTrue($contentItems->get('Pages')->isActive());
+        $this->assertFalse($contentItems->get('Collections')->isActive());
+    }
+
+    #[Test]
+    public function it_doesnt_show_hidden_child_items_in_original_parent_when_reordering_remaining_children()
+    {
+        Facades\Collection::make('events')->title('Events')->save();
+
+        $nav = $this->buildNavWithPreferences([
+            'content' => [
+                'items' => [
+                    'content::collections::pages' => '@hide',
+                    'content::collections' => [
+                        'action' => '@modify',
+                        'reorder' => true,
+                        'children' => [
+                            'content::collections::events' => '@inherit',
+                            'content::collections::articles' => '@inherit',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertEquals(['Events', 'Articles'], $nav->get('Content')->keyBy->display()->get('Collections')->children()->map->display()->all());
+    }
+
+    #[Test]
     public function it_can_move_child_items_into_another_items_children()
     {
         $nav = $this->buildNavWithPreferences([
