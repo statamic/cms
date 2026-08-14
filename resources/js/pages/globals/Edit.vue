@@ -29,7 +29,7 @@ defineProps([
 </script>
 
 <template>
-    <div class="max-w-5xl 3xl:max-w-6xl mx-auto" data-max-width-wrapper>
+    <div :class="asConfig ? 'max-w-page mx-auto' : 'max-w-5xl 3xl:max-w-6xl mx-auto'" data-max-width-wrapper>
         <Head :title="__('Edit Global Set')" />
 
         <GlobalPublishForm
