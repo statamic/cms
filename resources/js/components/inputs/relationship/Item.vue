@@ -5,7 +5,7 @@
         <ui-icon name="handles" class="item-move sortable-handle size-4 shrink-0 cursor-grab text-gray-300 dark:text-gray-700" v-if="sortable" />
         <ui-status-indicator v-if="item.status" :status="item.status" class="shrink-0" />
 
-        <div class="flex min-w-0 flex-1 flex-wrap items-baseline gap-x-1.5 gap-y-0.5 text-sm text-gray-600 dark:text-gray-300">
+        <div class="flex min-w-0 flex-1 flex-wrap items-center gap-x-1 gap-y-0.5 text-sm text-gray-600 dark:text-gray-300">
             <div
                 v-if="item.invalid"
                 v-tooltip.top="__('messages.relationship_item_unavailable')"
@@ -20,27 +20,39 @@
                     class="text-xs text-gray-400 dark:text-gray-500"
                 />
                 <template v-if="hintPathSegments.length">
-                    <ui-badge
-                        v-for="(segment, i) in hintPathSegments"
-                        :key="i"
-                        size="sm"
-                        :text="segment"
+                    <template v-for="(segment, i) in hintPathSegments" :key="i">
+                        <ui-icon
+                            v-if="i > 0"
+                            name="chevron-right"
+                            class="size-3 shrink-0 text-gray-300 dark:text-gray-600"
+                            aria-hidden="true"
+                        />
+                        <ui-badge size="sm" :text="segment" />
+                    </template>
+                    <ui-icon
+                        name="chevron-right"
+                        class="size-[12px] shrink-0 text-gray-300 dark:text-gray-600"
+                        aria-hidden="true"
                     />
                 </template>
                 <template v-else-if="item.hint">
                     <span
                         v-text="item.hint"
                         :title="item.hint"
-                        class="text-xs text-gray-400 dark:text-gray-500"
+                        class="text-xs text-gray-500 dark:text-gray-400"
                     />
-                    <span class="text-xs text-gray-300 dark:text-gray-600" aria-hidden="true">»</span>
+                    <ui-icon
+                        name="chevron-right"
+                        class="size-[12px] shrink-0 text-gray-900 dark:text-gray-100"
+                        aria-hidden="true"
+                    />
                 </template>
 
                 <a
                     v-if="editable"
                     @click.prevent="edit"
                     v-text="__(item.title)"
-                    class="text-sm text-gray-600 dark:text-gray-300"
+                    class="text-xs text-gray-600 dark:text-gray-300"
                     v-tooltip="item.title"
                     :href="item.edit_url"
                 />

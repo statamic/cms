@@ -128,7 +128,7 @@ class TermsHierarchyTest extends TestCase
 
         $this->assertEquals(2, $byId['categories::cat']['depth']);
         $this->assertEquals('animals/cat', $byId['categories::cat']['path']);
-        $this->assertArrayNotHasKey('hint', $byId['categories::cat']);
+        $this->assertEquals('Animals', $byId['categories::cat']['hint']);
     }
 
     #[Test]
