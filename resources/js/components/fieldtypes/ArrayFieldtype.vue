@@ -1,99 +1,119 @@
 <template>
-    <div>
-        <ui-input-group v-if="isSingle">
-            <ui-input-group-prepend>
-                <select
-                    class="appearance-none border-0 bg-transparent text-sm shadow-none outline-hidden"
-                    @input="setKey($event.target.value)"
+    <div :class="{ 'w-full min-w-0': isCompact }">
+        <component :is="wrapperComponent" v-bind="wrapperBinds">
+            <template v-if="isCompact" #trigger>
+                <button
+                    type="button"
+                    class="w-full min-w-0 flex items-center justify-between antialiased cursor-pointer bg-linear-to-b from-white to-gray-50 text-gray-925 border border-gray-300 with-contrast:border-gray-500 shadow-ui-sm focus-within:focus-outline dark:from-gray-850 dark:to-gray-900 dark:border-gray-700 dark:text-gray-300 dark:shadow-ui-md px-4 h-10 text-base rounded-lg"
+                    :class="{ 'border-dashed': isReadOnly }"
                 >
-                    <option
-                        v-for="(element, index) in keyedData"
-                        v-text="keys[element.key] || element.key"
-                        :key="element._id"
-                        :value="element.key"
-                        :selected="element.key === selectedKey"
-                    />
-                </select>
-                <ui-icon name="chevron-down" class="size-3 ms-1" />
-            </ui-input-group-prepend>
-            <template v-for="(element, index) in keyedData">
-                <ui-input
-                    v-if="element.key === selectedKey"
-                    v-model="data[index].value"
-                    input-class="border-l-0"
-                    :key="element._id"
-                    :id="fieldId + '__' + element.key"
-                    :readonly="isReadOnly"
-                    :input-attrs="{ dir: contentDirection }"
-                />
+                    <span
+                        class="block min-w-0 flex-1 truncate text-start"
+                        :class="{ 'text-gray-500 dark:text-gray-400': !hasCompactValues }"
+                    >
+                        {{ compactTriggerText }}
+                    </span>
+                    <ui-icon name="chevron-down" class="text-gray-400 dark:text-white/40 size-4 ms-1.5 -me-1 shrink-0" />
+                </button>
             </template>
-        </ui-input-group>
 
-        <table class="table-contained" v-else-if="isKeyed">
-            <tbody>
-                <tr v-if="data" v-for="(element, index) in keyedData" :key="element._id">
-                    <th class="w-1/4">
-                        <label :for="fieldId + '__' + element.key">{{ keys[element.key] || element.key }}</label>
-                    </th>
-                    <td>
-                        <input
-                            type="text"
-                            class="w-full input-text"
-                            :id="fieldId + '__' + element.key"
+            <div ref="editor">
+                <ui-input-group v-if="isSingle">
+                    <ui-input-group-prepend>
+                        <select
+                            class="appearance-none border-0 bg-transparent text-sm shadow-none outline-hidden"
+                            @input="setKey($event.target.value)"
+                        >
+                            <option
+                                v-for="(element, index) in keyedData"
+                                v-text="keys[element.key] || element.key"
+                                :key="element._id"
+                                :value="element.key"
+                                :selected="element.key === selectedKey"
+                            />
+                        </select>
+                        <ui-icon name="chevron-down" class="size-3 ms-1" />
+                    </ui-input-group-prepend>
+                    <template v-for="(element, index) in keyedData">
+                        <ui-input
+                            v-if="element.key === selectedKey"
                             v-model="data[index].value"
+                            input-class="border-l-0"
+                            :key="element._id"
+                            :id="fieldId + '__' + element.key"
                             :readonly="isReadOnly"
-                            :dir="contentDirection"
+                            :input-attrs="{ dir: contentDirection }"
                         />
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+                    </template>
+                </ui-input-group>
 
-        <table class="table-contained" v-if="isDynamic && valueCount">
-            <thead>
-                <tr>
-                    <th class="grid-drag-handle-header" v-if="!isReadOnly"></th>
-                    <th class="w-1/4">{{ keyHeader }}</th>
-                    <th class="">{{ valueHeader }}</th>
-                    <th class="row-controls" v-if="!isReadOnly"></th>
-                </tr>
-            </thead>
+                <table class="table-contained" :class="{ 'mb-0': isCompact }" v-else-if="isKeyed">
+                    <tbody>
+                        <tr v-if="data" v-for="(element, index) in keyedData" :key="element._id">
+                            <th class="w-1/4">
+                                <label :for="fieldId + '__' + element.key">{{ keys[element.key] || element.key }}</label>
+                            </th>
+                            <td>
+                                <input
+                                    type="text"
+                                    class="w-full input-text"
+                                    :id="fieldId + '__' + element.key"
+                                    v-model="data[index].value"
+                                    :readonly="isReadOnly"
+                                    :dir="contentDirection"
+                                />
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
 
-            <sortable-list
-                v-model="data"
-                :vertical="true"
-                item-class="sortable-row"
-                handle-class="sortable-handle"
-                :mirror="false"
-            >
-                <tbody>
-                    <tr class="sortable-row" v-for="(element, index) in data" :key="element._id">
-                        <td class="sortable-handle table-drag-handle" v-if="!isReadOnly"></td>
-                        <td>
-                            <ui-input
-                                v-model="element.key"
-                                :readonly="isReadOnly"
-                                :input-attrs="{ dir: contentDirection }"
-                            />
-                        </td>
-                        <td>
-                            <ui-input
-                                v-model="element.value"
-                                :readonly="isReadOnly"
-                                :input-attrs="{ dir: contentDirection }"
-                            />
-                        </td>
-                        <td class="row-controls" v-if="!isReadOnly">
-                            <ui-button icon="x" variant="subtle" size="xs" round delete-action @click="deleteOrConfirm(index)" :aria-label="__('Delete Row')" v-tooltip="__('Delete Row')" />
-                        </td>
-                    </tr>
-                </tbody>
-            </sortable-list>
-        </table>
+                <table class="table-contained" :class="{ 'mb-0': isCompact }" v-if="isDynamic && valueCount">
+                    <thead>
+                        <tr>
+                            <th class="grid-drag-handle-header" v-if="!isReadOnly"></th>
+                            <th class="w-1/4">{{ keyHeader }}</th>
+                            <th class="">{{ valueHeader }}</th>
+                            <th class="row-controls" v-if="!isReadOnly"></th>
+                        </tr>
+                    </thead>
 
-        <div class="flex gap-2">
-            <ui-button @click="addValue" :disabled="atMax" v-if="!isReadOnly && !isSingle && !isKeyed" :text="addButton" size="sm" />
-        </div>
+                    <sortable-list
+                        v-model="data"
+                        :vertical="true"
+                        item-class="sortable-row"
+                        handle-class="sortable-handle"
+                        :mirror="false"
+                    >
+                        <tbody>
+                            <tr class="sortable-row" v-for="(element, index) in data" :key="element._id">
+                                <td class="sortable-handle table-drag-handle" v-if="!isReadOnly"></td>
+                                <td>
+                                    <ui-input
+                                        v-model="element.key"
+                                        :readonly="isReadOnly"
+                                        :input-attrs="{ dir: contentDirection }"
+                                    />
+                                </td>
+                                <td>
+                                    <ui-input
+                                        v-model="element.value"
+                                        :readonly="isReadOnly"
+                                        :input-attrs="{ dir: contentDirection }"
+                                    />
+                                </td>
+                                <td class="row-controls" v-if="!isReadOnly">
+                                    <ui-button icon="x" variant="subtle" size="xs" round delete-action @click="deleteOrConfirm(index)" :aria-label="__('Delete Row')" v-tooltip="__('Delete Row')" />
+                                </td>
+                            </tr>
+                        </tbody>
+                    </sortable-list>
+                </table>
+
+                <div class="flex gap-2" :class="{ 'mt-2': isCompact && valueCount }">
+                    <ui-button @click="addValue" :disabled="atMax" v-if="!isReadOnly && !isSingle && !isKeyed" :text="addButton" size="sm" />
+                </div>
+            </div>
+        </component>
 
         <confirmation-modal
             :open="deleting !== false"
@@ -110,7 +130,7 @@
 <script>
 import Fieldtype from './Fieldtype.vue';
 import { SortableList, SortableHelpers } from '../sortable/Sortable';
-import { Button } from '@/components/ui';
+import { Button, Popover } from '@/components/ui';
 import { useContentDirection } from '@/composables/content-direction';
 
 export default {
@@ -119,6 +139,7 @@ export default {
     components: {
         SortableList,
         Button,
+        Popover,
     },
 
     setup() {
@@ -135,6 +156,7 @@ export default {
             data: this.objectToSortable(this.value || []),
             selectedKey,
             deleting: false,
+            compactOpen: false,
         };
     },
 
@@ -169,6 +191,27 @@ export default {
             return this.config.mode === 'single';
         },
 
+        isCompact() {
+            return this.config.compact === true;
+        },
+
+        wrapperComponent() {
+            return this.isCompact ? Popover : 'div';
+        },
+
+        wrapperBinds() {
+            if (!this.isCompact) return {};
+
+            return {
+                align: 'end',
+                side: 'bottom',
+                class: 'w-[32rem]',
+                dismissible: this.deleting === false,
+                open: this.compactOpen,
+                'onUpdate:open': this.setCompactOpen,
+            };
+        },
+
         keyedData() {
             return this.data.filter((element) => this.keys.hasOwnProperty(element.key));
         },
@@ -197,6 +240,19 @@ export default {
             return __(this.config.value_header || 'Value');
         },
 
+        hasCompactValues() {
+            return this.data.some((element) => element.key || element.value);
+        },
+
+        compactTriggerText() {
+            if (!this.hasCompactValues) return this.addButton;
+
+            return this.data
+                .filter((element) => element.key || element.value)
+                .map((element) => element.key || this.valueHeader)
+                .join(', ');
+        },
+
         replicatorPreview() {
             if (!this.showFieldPreviews) return;
             if (!this.value) return '';
@@ -209,10 +265,18 @@ export default {
     },
 
     methods: {
+        setCompactOpen(open) {
+            this.compactOpen = open;
+
+            if (open && !this.valueCount && !this.isReadOnly) {
+                this.addValue();
+            }
+        },
+
         addValue() {
             this.data.push(this.newSortableValue());
             this.$nextTick(() => {
-                this.$el.querySelector('tr:last-child input').focus();
+                this.$refs.editor?.querySelector('tr:last-child input')?.focus();
             });
         },
 
