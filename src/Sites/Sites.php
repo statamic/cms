@@ -258,8 +258,8 @@ class Sites
                 'name' => 14,
                 'handle' => 14,
                 'url' => 14,
-                'locale' => 12,
-                'lang' => 16,
+                'locale' => 14,
+                'lang' => 14,
                 'attributes' => 30,
             ];
 
@@ -271,10 +271,19 @@ class Sites
                         'hide_display' => true,
                         'actions' => false,
                         'fullscreen' => false,
-                        'mode' => 'stacked',
+                        'mode' => 'table',
                         'add_row' => __('Add Site'),
                         'fields' => collect($siteFields)->map(function ($field) use ($tableWidths) {
                             $field['field']['width'] = $tableWidths[$field['handle']] ?? 16;
+
+                            if ($field['handle'] === 'attributes') {
+                                $field['field']['compact'] = true;
+                                $field['field']['classes'] = 'max-w-48 min-w-0 overflow-hidden';
+                            }
+
+                            if ($field['handle'] === 'lang') {
+                                $field['field']['classes'] = 'max-w-48 min-w-0 overflow-hidden';
+                            }
 
                             return $field;
                         })->all(),
