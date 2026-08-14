@@ -156,7 +156,7 @@ class Terms extends Relationship
 
         $preload = parent::preload();
 
-        if ($taxonomy?->hierarchical() && ($this->field->get('mode') ?? 'default') === 'default') {
+        if ($this->hasHierarchicalTaxonomy() && ($this->field->get('mode') ?? 'default') === 'default') {
             $preload['mode'] = 'select';
         }
 
@@ -195,6 +195,27 @@ class Terms extends Relationship
         $taxonomy = Taxonomy::findByHandle($this->taxonomies()[0]);
 
         return $taxonomy && $taxonomy->hierarchical() ? $taxonomy : null;
+    }
+
+    /**
+     * Hierarchical taxonomies available to this field, including when several are configured.
+     */
+    public function hierarchicalTaxonomies(): Collection
+    {
+        $handles = ! empty($this->taxonomies())
+            ? $this->taxonomies()
+            : $this->getConfiguredTaxonomies();
+
+        return collect($handles)
+            ->map(fn ($handle) => Taxonomy::findByHandle($handle))
+            ->filter()
+            ->filter->hierarchical()
+            ->values();
+    }
+
+    public function hasHierarchicalTaxonomy(): bool
+    {
+        return $this->hierarchicalTaxonomies()->isNotEmpty();
     }
 
     public function augment($values)
@@ -375,21 +396,26 @@ class Terms extends Relationship
         return ! $request->sort
             && ! $request->search
             && ! $request->boolean('paginate', true)
-            && $this->hierarchicalTaxonomy() !== null;
+            && $this->hasHierarchicalTaxonomy();
     }
 
     private function orderItemsByHierarchy(Collection $items): Collection
     {
-        $order = $this->hierarchicalTaxonomy()
-            ->structure()
-            ->tree()
-            ->flattenedPages()
-            ->map
-            ->id()
-            ->flip();
+        $orders = $this->hierarchicalTaxonomies()->mapWithKeys(function ($taxonomy) {
+            return [$taxonomy->handle() => $taxonomy->structure()->tree()->flattenedPages()->map->id()->flip()];
+        });
 
         return $items
-            ->sortBy(fn ($term) => $order->get($term->inDefaultLocale()->slug(), PHP_INT_MAX))
+            ->sortBy(function ($term) use ($orders) {
+                $handle = $term->taxonomyHandle();
+                $order = $orders->get($handle);
+
+                if (! $order) {
+                    return [$handle, PHP_INT_MAX, $term->slug()];
+                }
+
+                return [$handle, $order->get($term->inDefaultLocale()->slug(), PHP_INT_MAX)];
+            })
             ->values();
     }
 
@@ -542,6 +568,24 @@ class Terms extends Relationship
             'edit_url' => $term->editUrl(),
             'editable' => User::current()->can('edit', $term),
             'hint' => $this->getItemHint($term),
+            ...$this->itemHierarchyMeta($term),
+        ];
+    }
+
+    /**
+     * Depth and slug path for a term whose taxonomy is hierarchical.
+     */
+    public function itemHierarchyMeta($term): array
+    {
+        if (! $term->taxonomy()?->hierarchical()) {
+            return [];
+        }
+
+        $ancestorSlugs = $term->ancestors()->map->slug();
+
+        return [
+            'depth' => $term->depth() ?? 1,
+            'path' => $ancestorSlugs->push($term->slug())->implode('/'),
         ];
     }
 
@@ -733,7 +777,7 @@ class Terms extends Relationship
     {
         return collect([
             count($this->getConfiguredTaxonomies()) > 1 ? __($item->taxonomy()->title()) : null,
-            $this->hierarchicalTaxonomy() ? $item->ancestors()->map->title()->implode(' » ') : null,
+            $item->taxonomy()?->hierarchical() ? $item->ancestors()->map->title()->implode(' » ') : null,
         ])->filter()->implode(' • ');
     }
 

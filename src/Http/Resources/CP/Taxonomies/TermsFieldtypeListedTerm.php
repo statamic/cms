@@ -17,7 +17,11 @@ class TermsFieldtypeListedTerm extends ListedTerm
 
     public function toArray($request)
     {
-        $arr = parent::toArray($request);
+        $arr = array_merge(parent::toArray($request), $this->fieldtype->itemHierarchyMeta($this->resource));
+
+        if ($this->fieldtype->hierarchicalTaxonomy()) {
+            return $arr;
+        }
 
         if (! in_array($this->fieldtype->config('mode'), ['select', 'typeahead'])) {
             return $arr;
@@ -25,14 +29,6 @@ class TermsFieldtypeListedTerm extends ListedTerm
 
         if ($hint = $this->fieldtype->getItemHint($this->resource)) {
             $arr['hint'] = $hint;
-        }
-
-        if ($this->fieldtype->hierarchicalTaxonomy()) {
-            $term = $this->resource;
-            $ancestorSlugs = $term->ancestors()->map->slug();
-
-            $arr['depth'] = $term->depth() ?? 1;
-            $arr['path'] = $ancestorSlugs->push($term->slug())->implode('/');
         }
 
         return $arr;

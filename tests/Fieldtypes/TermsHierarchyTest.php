@@ -44,6 +44,7 @@ class TermsHierarchyTest extends TestCase
     {
         $this->assertNotNull($this->fieldtype(['taxonomies' => ['categories']])->hierarchicalTaxonomy());
         $this->assertNull($this->fieldtype(['taxonomies' => ['categories', 'other']])->hierarchicalTaxonomy());
+        $this->assertTrue($this->fieldtype(['taxonomies' => ['categories', 'other']])->hasHierarchicalTaxonomy());
     }
 
     #[Test]
@@ -78,6 +79,12 @@ class TermsHierarchyTest extends TestCase
         $preload = $this->fieldtype(['taxonomies' => ['categories'], 'mode' => 'typeahead'])->preload();
 
         $this->assertArrayNotHasKey('mode', $preload);
+
+        tap(Facades\Taxonomy::make('tags'))->save();
+
+        $preload = $this->fieldtype(['taxonomies' => ['categories', 'tags'], 'mode' => 'default'])->preload();
+
+        $this->assertEquals('select', $preload['mode']);
     }
 
     #[Test]
@@ -90,6 +97,73 @@ class TermsHierarchyTest extends TestCase
 
         $this->assertEquals('Animals', $fieldtype->getItemHint($cat));
         $this->assertEquals('', $fieldtype->getItemHint($animals));
+    }
+
+    #[Test]
+    public function item_data_includes_depth_and_path_for_hierarchical_terms()
+    {
+        $item = $this->fieldtype(['taxonomies' => ['categories']])->getItemData(['cat'])->first();
+
+        $this->assertEquals(2, $item['depth']);
+        $this->assertEquals('animals/cat', $item['path']);
+        $this->assertEquals('Animals', $item['hint']);
+    }
+
+    #[Test]
+    public function select_options_include_depth_and_path_even_when_mode_is_default()
+    {
+        $fieldtype = $this->fieldtype(['taxonomies' => ['categories']]);
+        $request = new Request(['paginate' => false]);
+        $items = $fieldtype->getIndexItems($request);
+        $resolved = json_decode(
+            $fieldtype->getResourceCollection($request, $items)->toResponse($request)->getContent(),
+            true
+        )['data'];
+
+        $byId = collect($resolved)->keyBy(fn ($term) => $term['id']);
+
+        $this->assertEquals(1, $byId['categories::animals']['depth']);
+        $this->assertEquals('animals', $byId['categories::animals']['path']);
+        $this->assertArrayNotHasKey('hint', $byId['categories::animals']);
+
+        $this->assertEquals(2, $byId['categories::cat']['depth']);
+        $this->assertEquals('animals/cat', $byId['categories::cat']['path']);
+        $this->assertArrayNotHasKey('hint', $byId['categories::cat']);
+    }
+
+    #[Test]
+    public function select_options_stay_nested_when_multiple_taxonomies_are_configured()
+    {
+        tap(Facades\Taxonomy::make('tags'))->save();
+        tap(Term::make('featured')->taxonomy('tags')->data(['title' => 'Featured']))->save();
+
+        $fieldtype = $this->fieldtype(['taxonomies' => ['categories', 'tags'], 'mode' => 'select']);
+        $request = new Request(['paginate' => false]);
+        $items = $fieldtype->getIndexItems($request);
+        $resolved = json_decode(
+            $fieldtype->getResourceCollection($request, $items)->toResponse($request)->getContent(),
+            true
+        )['data'];
+
+        $byId = collect($resolved)->keyBy(fn ($term) => $term['id']);
+
+        $this->assertEquals(2, $byId['categories::cat']['depth']);
+        $this->assertEquals('animals/cat', $byId['categories::cat']['path']);
+        $this->assertEquals('Categories • Animals', $byId['categories::cat']['hint']);
+        $this->assertArrayNotHasKey('depth', $byId['tags::featured']);
+        $this->assertEquals('Tags', $byId['tags::featured']['hint']);
+    }
+
+    #[Test]
+    public function item_data_includes_depth_when_multiple_taxonomies_are_configured()
+    {
+        tap(Facades\Taxonomy::make('tags'))->save();
+
+        $item = $this->fieldtype(['taxonomies' => ['categories', 'tags']])->getItemData(['categories::cat'])->first();
+
+        $this->assertEquals(2, $item['depth']);
+        $this->assertEquals('animals/cat', $item['path']);
+        $this->assertEquals('Categories • Animals', $item['hint']);
     }
 
     #[Test]
