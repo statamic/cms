@@ -1,68 +1,30 @@
 <script setup>
 import Fieldtype from '@/components/fieldtypes/fieldtype.js';
+import { StarRating } from '@/components/ui';
 import { __ } from '@/bootstrap/globals';
-import { computed, ref } from 'vue';
+import { computed } from 'vue';
 
 const emit = defineEmits(Fieldtype.emits);
 const props = defineProps(Fieldtype.props);
 const { expose, update, isReadOnly, name } = Fieldtype.use(emit, props);
 defineExpose(expose);
 
-// Hide fill until the user interacts; value still sits at min for correct thumb alignment.
-const hasInteracted = ref(Boolean(props.value));
-
 const step = computed(() => props.config.step ?? 1);
-const min = computed(() => props.config.min ?? step.value);
-const maxStars = computed(() => props.config.max_stars ?? 5);
-const isDisabled = computed(() => props.config.disabled || isReadOnly.value);
-const ariaLabel = computed(() => __(props.config.display ?? 'Star rating'));
-const isUnrated = computed(() => ! props.value && ! hasInteracted.value);
+const label = computed(() => (props.config.display ? __(props.config.display) : null));
 
-function onKeydown(event) {
-    const navigationKeys = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'];
-    if (! navigationKeys.includes(event.key)) return;
-
-    if (isUnrated.value) {
-        if (event.key === 'End') {
-            // Reveal fill but let the browser jump to max.
-            hasInteracted.value = true;
-
-            return;
-        }
-
-        // Thumb is already at min — stop the browser jumping to min + step.
-        event.preventDefault();
-        hasInteracted.value = true;
-        update(min.value);
-
-        return;
-    }
-
-    hasInteracted.value = true;
-}
+// Submissions made through a front-end form come back as strings.
+const rating = computed(() => (props.value === null || props.value === undefined || props.value === '' ? null : Number(props.value)));
 </script>
 
 <template>
-    <div class="show-focus-within w-fit rounded-xs ps-1.25 -ms-1.25" style="--focus-outline-offset: 0.1rem">
-        <input
-            type="range"
-            class="star-rating-input show-focus-within_target focus-visible:outline-hidden"
-            :class="{ 'star-rating-input--unrated': !value && !hasInteracted }"
-            data-star-rating
-            :name="name"
-            :min="min"
-            :max="maxStars"
-            :step="step"
-            :value="value || min"
-            :disabled="isDisabled"
-            :aria-label="ariaLabel"
-            :style="{
-                '--star-rating-max': maxStars,
-                '--star-rating-step': step,
-            }"
-            @keydown="onKeydown"
-            @pointerdown="hasInteracted = true"
-            @input="update(Number($event.target.value))"
-        />
-    </div>
+    <StarRating
+        :model-value="rating"
+        :name
+        :label
+        :min="config.min ?? step"
+        :max="config.max_stars ?? 5"
+        :step
+        :disabled="config.disabled || isReadOnly"
+        @update:model-value="update"
+    />
 </template>

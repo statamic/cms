@@ -1,14 +1,117 @@
+<script setup>
+import { computed, ref, useId } from 'vue';
+import { __ } from '@/bootstrap/globals.js';
+
+const props = defineProps({
+    /** Whether the rating is disabled. */
+    disabled: { type: Boolean, default: false },
+    /** ID attribute for the rating. */
+    id: { type: String, default: () => useId() },
+    /** Accessible label for the rating. */
+    label: { type: String, default: null },
+    /** The number of stars. */
+    max: { type: Number, default: 5 },
+    /** The lowest selectable rating. Defaults to a single step. */
+    min: { type: Number, default: null },
+    /** The controlled value of the rating. */
+    modelValue: { type: Number, default: null },
+    /** Name attribute for the rating. */
+    name: { type: String, default: null },
+    /** Controls the size of the stars. <br><br> Options: `sm`, `base`, `lg` */
+    size: {
+        type: String,
+        default: 'base',
+        validator: (value) => ['sm', 'base', 'lg'].includes(value),
+    },
+    /** The increment between ratings. Use `0.5` to allow half stars. */
+    step: { type: Number, default: 1 },
+});
+
+const emit = defineEmits(['update:modelValue']);
+
+// Hide the fill until the user interacts; the value still sits at min so the thumb stays aligned.
+const hasInteracted = ref(Boolean(props.modelValue));
+
+const starSizes = {
+    sm: '1.125rem',
+    base: '1.5rem',
+    lg: '2rem',
+};
+
+const min = computed(() => props.min ?? props.step);
+const isUnrated = computed(() => !props.modelValue && !hasInteracted.value);
+const ariaLabel = computed(() => props.label ?? __('Star rating'));
+
+function onKeydown(event) {
+    const navigationKeys = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'];
+    if (!navigationKeys.includes(event.key)) return;
+
+    if (isUnrated.value) {
+        if (event.key === 'End') {
+            // Reveal the fill but let the browser jump to max.
+            hasInteracted.value = true;
+
+            return;
+        }
+
+        // The thumb is already at min — stop the browser jumping to min + step.
+        event.preventDefault();
+        hasInteracted.value = true;
+        emit('update:modelValue', min.value);
+
+        return;
+    }
+
+    hasInteracted.value = true;
+}
+</script>
+
+<template>
+    <div
+        class="w-fit rounded-xs ps-1.25 -ms-1.25 has-[:focus-visible]:focus-outline"
+        style="--focus-outline-offset: 0.1rem"
+        data-ui-star-rating
+    >
+        <input
+            type="range"
+            class="focus-visible:outline-hidden"
+            data-ui-control
+            data-ui-star-rating-input
+            :data-unrated="isUnrated ? '' : null"
+            :id
+            :name
+            :min="min"
+            :max
+            :step
+            :value="modelValue ?? min"
+            :disabled
+            :aria-label="ariaLabel"
+            :style="{
+                '--s': starSizes[size],
+                '--star-rating-max': max,
+                '--star-rating-min': min,
+                '--star-rating-step': step,
+            }"
+            @keydown="onKeydown"
+            @pointerdown="hasInteracted = true"
+            @input="emit('update:modelValue', Number($event.target.value))"
+        />
+    </div>
+</template>
+
+<style>
 /* CSS-only star rating via range input — https://css-tricks.com/a-css-only-star-rating-component-and-more-part-1/ */
 
-.star-rating-input {
+[data-ui-star-rating-input] {
     --s: 1.5rem;
     --star-rating-gap: 0.4rem;
     --star-rating-max: 5;
+    --star-rating-min: 1;
     --star-rating-step: 1;
     --_cell: calc(var(--s) + var(--star-rating-gap));
-    --_pad: calc(var(--star-rating-step) * var(--_cell) / 2);
-    /* Thumb fill boundary: full steps use half a cell; half steps use half a star width. */
-    --_fill-offset: calc(var(--_cell) / 2);
+    --_gap-shift: calc(var(--star-rating-gap) / 2);
+    /* Thumb steps by half a cell; shifting by half a gap lands .5 values on the star center. */
+    --_fill-offset: calc(var(--star-rating-step) * var(--_cell) / 2);
     --_fill: var(--color-primary, goldenrod);
     --_empty: var(--color-gray-600, #52525b);
     /* viewBox width = 14 + 14 * (--star-rating-gap / --s) = 17.7333; path from resources/svg/icons/star.svg */
@@ -20,8 +123,8 @@
     width: calc(var(--_cell) * var(--star-rating-max));
     max-width: 100%;
     height: var(--s);
-    /* Symmetric padding aligns thumb centres with star slots (CSS-Tricks). */
-    padding-inline: var(--_pad);
+    padding-inline-start: calc(var(--star-rating-min) * var(--_cell) - var(--_fill-offset) - var(--_gap-shift));
+    padding-inline-end: calc(var(--_fill-offset) + var(--_gap-shift));
     box-sizing: border-box;
     appearance: none;
     cursor: pointer;
@@ -30,10 +133,6 @@
     mask-image: var(--_star-fill-mask);
     mask-size: var(--_cell) var(--s);
     mask-repeat: repeat;
-
-    &[style*='--star-rating-step: 0.5'] {
-        --_fill-offset: calc((var(--s) - var(--star-rating-gap)) / 4);
-    }
 
     &::before {
         content: '';
@@ -74,7 +173,7 @@
         border-image: conic-gradient(at calc(50% + var(--_fill-offset)), transparent 50%, var(--_fill) 0) fill 0 // var(--s) 500px;
     }
 
-    &.star-rating-input--unrated {
+    &[data-unrated] {
         &::-webkit-slider-thumb {
             border-image: conic-gradient(transparent 0) fill 0 // var(--s) 500px;
         }
@@ -98,3 +197,4 @@
         border: none;
     }
 }
+</style>
