@@ -35,6 +35,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Debounce
+    |--------------------------------------------------------------------------
+    |
+    | The number of milliseconds to wait before updating Live Preview after
+    | content changes.
+    |
+    */
+
+    'debounce_ms' => (int) env('STATAMIC_LIVE_PREVIEW_DEBOUNCE_MS', 150),
+
+    /*
+    |--------------------------------------------------------------------------
     | Force Reload Javascript Modules
     |--------------------------------------------------------------------------
     |

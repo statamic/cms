@@ -106,6 +106,8 @@ watch(
     { deep: true },
 );
 
+const livePreviewDebounceMs = Statamic.$config.get('livePreview.debounce_ms', 150);
+
 const update = debounce(() => {
     if (source) source.abort();
     source = new AbortController();
@@ -128,7 +130,7 @@ const update = debounce(() => {
             if (e.code === 'ERR_CANCELED') return;
             throw e;
         });
-}, 150);
+}, livePreviewDebounceMs);
 
 function componentUpdated(handle, value) {
     extras.value[handle] = value;
