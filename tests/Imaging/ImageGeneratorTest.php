@@ -99,6 +99,35 @@ class ImageGeneratorTest extends TestCase
     }
 
     #[Test]
+    public function it_regenerates_an_image_by_asset_when_the_cached_file_is_missing()
+    {
+        Event::fake();
+
+        Storage::fake('test');
+        $file = UploadedFile::fake()->image('foo/hoff.jpg', 30, 60);
+        Storage::disk('test')->putFileAs('foo', $file, 'hoff.jpg');
+        $container = tap(AssetContainer::make('test_container')->disk('test'))->save();
+        $asset = tap($container->makeAsset('foo/hoff.jpg'))->save();
+
+        ImageValidator::shouldReceive('isValidImage')
+            ->andReturnTrue()
+            ->times(2); // Two manipulations should happen because the cached file gets deleted.
+
+        $path = $this->makeGenerator()->generateByAsset($asset, ['w' => 100, 'h' => 100]);
+
+        // Delete the generated file, but keep the cache store entry pointing to it.
+        Glide::cacheDisk()->delete($path);
+        $this->assertCount(0, $this->generatedImagePaths());
+
+        $regeneratedPath = $this->makeGenerator()->generateByAsset($asset, ['w' => 100, 'h' => 100]);
+
+        $this->assertEquals($path, $regeneratedPath);
+        $this->assertCount(1, $paths = $this->generatedImagePaths());
+        $this->assertContains($path, $paths);
+        Event::assertDispatchedTimes(GlideImageGenerated::class, 2);
+    }
+
+    #[Test]
     public function it_throws_unable_to_read_file_when_asset_is_not_a_valid_image()
     {
         Storage::fake('test');

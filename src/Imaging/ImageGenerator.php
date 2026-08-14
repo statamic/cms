@@ -2,6 +2,7 @@
 
 namespace Statamic\Imaging;
 
+use Closure;
 use Facades\Statamic\Imaging\ImageValidator;
 use Illuminate\Support\Facades\Storage;
 use League\Flysystem\Filesystem;
@@ -82,7 +83,7 @@ class ImageGenerator
      */
     public function generateByPath($path, array $params)
     {
-        return Glide::cacheStore()->rememberForever(
+        return $this->findOrGenerate(
             'path::'.$path.'::'.md5(json_encode($params)),
             fn () => $this->doGenerateByPath($path, $params)
         );
@@ -108,7 +109,7 @@ class ImageGenerator
      */
     public function generateByUrl($url, array $params)
     {
-        return Glide::cacheStore()->rememberForever(
+        return $this->findOrGenerate(
             'url::'.$url.'::'.md5(json_encode($params)),
             fn () => $this->doGenerateByUrl($url, $params)
         );
@@ -168,7 +169,7 @@ class ImageGenerator
             collect(Glide::cacheStore()->get($manifestCacheKey, []))->push($manipulationCacheKey)->unique()->all()
         );
 
-        return Glide::cacheStore()->rememberForever(
+        return $this->findOrGenerate(
             $manipulationCacheKey,
             fn () => $this->doGenerateByAsset($asset, $params)
         );
@@ -188,6 +189,19 @@ class ImageGenerator
         $this->server->setCachePathPrefix(self::assetCachePathPrefix($this->asset).'/'.$this->asset->folder());
 
         return $this->generate($this->asset->basename());
+    }
+
+    private function findOrGenerate(string $cacheKey, Closure $callback)
+    {
+        $store = Glide::cacheStore();
+
+        if (($path = $store->get($cacheKey)) && $this->server->getCache()->fileExists($path)) {
+            return $path;
+        }
+
+        $store->forget($cacheKey);
+
+        return $store->rememberForever($cacheKey, $callback);
     }
 
     public static function assetCacheManifestKey($asset)
