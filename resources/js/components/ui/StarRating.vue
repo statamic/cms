@@ -89,6 +89,7 @@ function onKeydown(event) {
             :style="{
                 '--s': starSizes[size],
                 '--star-rating-max': max,
+                '--star-rating-min': min,
                 '--star-rating-step': step,
             }"
             @keydown="onKeydown"
@@ -105,11 +106,12 @@ function onKeydown(event) {
     --s: 1.5rem;
     --star-rating-gap: 0.4rem;
     --star-rating-max: 5;
+    --star-rating-min: 1;
     --star-rating-step: 1;
     --_cell: calc(var(--s) + var(--star-rating-gap));
-    --_pad: calc(var(--star-rating-step) * var(--_cell) / 2);
-    /* Thumb fill boundary: full steps use half a cell; half steps use half a star width. */
-    --_fill-offset: calc(var(--_cell) / 2);
+    --_gap-shift: calc(var(--star-rating-gap) / 2);
+    /* Thumb steps by half a cell; shifting by half a gap lands .5 values on the star center. */
+    --_fill-offset: calc(var(--star-rating-step) * var(--_cell) / 2);
     --_fill: var(--color-primary, goldenrod);
     --_empty: var(--color-gray-600, #52525b);
     /* viewBox width = 14 + 14 * (--star-rating-gap / --s) = 17.7333; path from resources/svg/icons/star.svg */
@@ -121,8 +123,8 @@ function onKeydown(event) {
     width: calc(var(--_cell) * var(--star-rating-max));
     max-width: 100%;
     height: var(--s);
-    /* Symmetric padding aligns thumb centres with star slots (CSS-Tricks). */
-    padding-inline: var(--_pad);
+    padding-inline-start: calc(var(--star-rating-min) * var(--_cell) - var(--_fill-offset) - var(--_gap-shift));
+    padding-inline-end: calc(var(--_fill-offset) + var(--_gap-shift));
     box-sizing: border-box;
     appearance: none;
     cursor: pointer;
@@ -131,10 +133,6 @@ function onKeydown(event) {
     mask-image: var(--_star-fill-mask);
     mask-size: var(--_cell) var(--s);
     mask-repeat: repeat;
-
-    &[style*='--star-rating-step: 0.5'] {
-        --_fill-offset: calc((var(--s) - var(--star-rating-gap)) / 4);
-    }
 
     &::before {
         content: '';
