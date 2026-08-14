@@ -18,7 +18,6 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue']);
 
 const sortableItemClass = 'rank-list-item';
-const sortableHandleClass = 'rank-list-handle';
 
 const ranked = ref([]);
 
@@ -92,7 +91,7 @@ watch(
         v-model="ranked"
         :vertical="true"
         :item-class="sortableItemClass"
-        :handle-class="sortableHandleClass"
+        :handle-class="sortableItemClass"
         :mirror="false"
         :disabled="disabled"
     >
@@ -100,16 +99,18 @@ watch(
             <li
                 v-for="row in rows"
                 :key="row.value"
-                :class="sortableItemClass"
+                :class="[
+                    sortableItemClass,
+                    { 'cursor-grab': !disabled },
+                ]"
                 class="flex items-center gap-2 rounded-lg border border-gray-300 bg-white p-2 dark:border-gray-700 dark:bg-gray-900"
             >
                 <DragHandle
                     v-if="!disabled"
-                    :class="[
-                        sortableHandleClass,
-                        hasCustomOrder ? 'text-primary! [&_svg]:opacity-100' : '[&_svg]:opacity-75 dark:[&_svg]:opacity-50',
-                    ]"
-                    class="cursor-grab"
+                    :class="
+                        hasCustomOrder ? 'text-primary! [&_svg]:opacity-100' : '[&_svg]:opacity-75 dark:[&_svg]:opacity-50'
+                    "
+                    class="pointer-events-none"
                 />
                 <input
                     v-if="!disabled"
@@ -120,6 +121,7 @@ watch(
                     step="1"
                     :value="row.index + 1"
                     :aria-label="`${__('Rank')} ${row.label}`"
+                    @pointerdown.stop
                     @change="moveToRank(row.value, $event)"
                 />
                 <span
