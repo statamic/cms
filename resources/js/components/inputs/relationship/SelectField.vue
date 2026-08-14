@@ -39,9 +39,14 @@
                 <div
                     v-else
                     class="flex w-full text-left items-center gap-2"
-                    :style="depth > 1 ? { paddingInlineStart: `${(depth - 1) * 1}rem` } : null"
+                    :style="depth > 1 ? { paddingInlineStart: `${(depth - 1) * .75}rem` } : null"
                 >
-                    <span v-if="depth > 1" class="text-gray-400 dark:text-gray-600" aria-hidden="true">↳</span>
+                    <ui-icon
+                        v-if="depth > 1"
+                        name="arrow-down-right"
+                        class="size-[14px] shrink-0 text-gray-400 dark:text-gray-600"
+                        aria-hidden="true"
+                    />
                     <StatusIndicator v-if="status" :status="status" />
                     <div v-text="title" class="truncate grow" />
                     <ui-badge v-if="hint && !(depth > 1)" size="sm" v-text="hint" />
