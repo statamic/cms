@@ -221,6 +221,18 @@ class CoreNavTest extends TestCase
         $this->assertEqualsCanonicalizing($expected, $actual);
     }
 
+    #[Test]
+    public function it_builds_the_nav_when_a_form_has_no_title()
+    {
+        Facades\Form::make('contact_us')->save();
+
+        $this->actingAs(tap(User::make()->makeSuper())->save());
+
+        $forms = $this->build()->get('Tools')->keyBy->display()->get('Forms');
+
+        $this->assertEquals(['Contact_us'], $forms->children()->map->display()->all());
+    }
+
     protected function build()
     {
         return Nav::build()->pluck('items', 'display');

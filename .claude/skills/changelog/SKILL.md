@@ -1,14 +1,19 @@
 ---
 name: changelog
 description: Generate a changelog for a release
-disable-model-invocation: true
 ---
 
 Generate a changelog entry for the CHANGELOG.md file by following these steps:
 
 ## 1. Get commits since last tag
 
-Run the following to get the list of commits:
+First, fetch tags from origin — they sit off-branch (see note below) so they don't come down with a normal `git pull`/`git fetch` on the branch:
+
+```
+git fetch origin --tags
+```
+
+Then run the following to get the list of commits:
 
 ```
 git --no-pager log $(git merge-base $(git tag --list 'v*' --sort=-v:refname | head -n1) HEAD)..HEAD --oneline --no-decorate --no-merges

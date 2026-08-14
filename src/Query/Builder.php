@@ -72,7 +72,16 @@ abstract class Builder implements Contract
 
     public function offset($value)
     {
-        $this->offset = max(0, $value);
+        $value = max(0, $value);
+
+        // A large page number can overflow the offset arithmetic in forPage()/chunk() into a
+        // float, which array_slice() rejects. Clamp an out-of-range offset to PHP_INT_MAX so it
+        // yields an empty page instead of throwing.
+        if (is_float($value)) {
+            $value = $value >= PHP_INT_MAX ? PHP_INT_MAX : (int) $value;
+        }
+
+        $this->offset = $value;
 
         return $this;
     }
