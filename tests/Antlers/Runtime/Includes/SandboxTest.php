@@ -2,6 +2,7 @@
 
 namespace Tests\Antlers\Runtime\Includes;
 
+use Statamic\Facades\Cascade;
 use Tests\Antlers\ParserTestCase;
 use Tests\FakesViews;
 
@@ -133,15 +134,16 @@ class SandboxTest extends ParserTestCase
             'SW|CALLER[S]',
             $this->render('{{ include:writer secret="S" }}|CALLER[{{ smuggled:secret }}]')
         );
+        $this->assertSame('S', Cascade::get('smuggled')['secret']);
     }
 
     public function test_a_slot_that_escapes_the_include_can_still_render_afterwards()
     {
-        $this->viewShouldReturnRaw('w', '{{ scope:smuggled }}W{{ /scope:smuggled }}');
+        $this->viewShouldReturnRaw('w', '{{ internal = "view-secret" }}{{ scope:smuggled }}W{{ /scope:smuggled }}');
 
         $this->assertSame(
-            'W|BODY:O',
-            $this->render('{{ include:w }}BODY:{{ outer }}{{ /include:w }}|{{ smuggled:slot }}', ['outer' => 'O'])
+            'W|LATER[BODY:O:]',
+            $this->render('{{ include:w }}BODY:{{ outer }}:{{ internal }}{{ /include:w }}|LATER[{{ smuggled:slot }}]', ['outer' => 'O'])
         );
     }
 }
