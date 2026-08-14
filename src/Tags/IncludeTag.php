@@ -97,11 +97,23 @@ class IncludeTag extends Tags
         $hadViews = array_key_exists('views', $cascade);
         $viewsState = $cascade['views'] ?? null;
 
+        // Suspended here rather than in the runtime's isolation so Blade-invoked includes are
+        // isolated too. Other isolated tags inheriting handle prefixes is technically
+        // unintentional, but preserved for BC. This may change in the next major version.
+        $suspendedCascade = GlobalRuntimeState::$isCascadeEnabled;
+        $suspendedPrefixes = GlobalRuntimeState::$prefixState;
+
+        GlobalRuntimeState::$isCascadeEnabled = false;
+        GlobalRuntimeState::$prefixState = [];
+
         try {
             return $view->with($scope)
                 ->withoutExtractions()
                 ->render();
         } finally {
+            GlobalRuntimeState::$isCascadeEnabled = $suspendedCascade;
+            GlobalRuntimeState::$prefixState = $suspendedPrefixes;
+
             if ($hadViews) {
                 Cascade::set('views', $viewsState);
             } elseif (Cascade::get('views') !== null) {

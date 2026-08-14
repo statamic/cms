@@ -1632,20 +1632,12 @@ class NodeProcessor
 
                         $suspendedData = null;
                         $capturedRuntimeState = null;
-                        $suspendedPrefixes = null;
 
                         if ($tag::$isolated) {
                             $tag->setIsolatedContext($tagActiveData);
                             $suspendedData = $this->getAllData();
                             $this->data = [];
                             $capturedRuntimeState = GlobalRuntimeState::captureAndIsolate();
-                        }
-
-                        // Other isolated tags inheriting handle prefixes is technically unintentional,
-                        // but preserved for BC. This may change in the next major version.
-                        if ($node->name->name == 'include') {
-                            $suspendedPrefixes = GlobalRuntimeState::$prefixState;
-                            GlobalRuntimeState::$prefixState = [];
                         }
 
                         if (in_array(CachesOutput::class, class_implements($tag))) {
@@ -1687,10 +1679,6 @@ class NodeProcessor
                                 $this->data = $suspendedData;
 
                                 GlobalRuntimeState::restoreState($capturedRuntimeState);
-                            }
-
-                            if ($suspendedPrefixes !== null) {
-                                GlobalRuntimeState::$prefixState = $suspendedPrefixes;
                             }
                         }
 

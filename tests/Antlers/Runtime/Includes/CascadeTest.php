@@ -126,6 +126,22 @@ class CascadeTest extends ParserTestCase
         $this->assertSame('B[C]', Blade::render('<s:include:b cascade="true" />'));
     }
 
+    public function test_a_blade_invoked_antlers_view_cannot_see_the_cascade()
+    {
+        $this->viewShouldReturnRaw('a', '[{{ cval }}]');
+
+        $this->assertSame('[]', Blade::render('<s:include:a />'));
+        $this->assertSame('[C]', Blade::render('<s:include:a cascade="true" />'));
+    }
+
+    public function test_an_include_inside_a_blade_view_cannot_see_the_cascade()
+    {
+        $this->viewShouldReturnRaw('shell', '<s:include:a />|<s:include:a cascade="true" />', 'blade.php');
+        $this->viewShouldReturnRaw('a', '[{{ cval }}]');
+
+        $this->assertSame('[]|[C]', view('shell')->render());
+    }
+
     public function test_runtime_state_survives_an_exception_thrown_inside_an_include()
     {
         (new class extends Tags
