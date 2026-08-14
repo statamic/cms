@@ -431,11 +431,6 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, ContainsQueryabl
         return Arr::get($this->contents, 'title', Str::humanize(Str::of($this->handle)->after('::')->afterLast('.')));
     }
 
-    public function asConfig(): bool
-    {
-        return Arr::get($this->contents, 'as_config', false);
-    }
-
     public function isNamespaced(): bool
     {
         return Facades\Blueprint::getAdditionalNamespaces()->has($this->namespace);

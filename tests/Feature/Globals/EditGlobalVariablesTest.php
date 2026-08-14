@@ -61,20 +61,17 @@ class EditGlobalVariablesTest extends TestCase
     }
 
     #[Test]
-    public function it_passes_as_config_when_the_blueprint_opts_in()
+    public function it_passes_as_config_when_the_global_set_uses_multi_column_layout()
     {
-        $blueprint = Blueprint::make()->setContents([
-            'as_config' => true,
-            'fields' => [
-                ['handle' => 'foo', 'field' => ['type' => 'text']],
-            ],
-        ]);
+        $blueprint = Blueprint::make()->setContents(['fields' => [
+            ['handle' => 'foo', 'field' => ['type' => 'text']],
+        ]]);
         Blueprint::partialMock();
         Blueprint::shouldReceive('find')->with('globals.test')->andReturn($blueprint);
         $this->setTestRoles(['test' => ['access cp', 'edit test globals']]);
         $user = User::make()->assignRole('test')->save();
 
-        $global = GlobalSet::make('test')->save();
+        $global = GlobalSet::make('test')->layoutMode('multi_column')->save();
         $global->in('en')->data(['foo' => 'bar'])->save();
 
         $this
