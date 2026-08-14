@@ -272,6 +272,7 @@ class Sites
                         'actions' => false,
                         'fullscreen' => false,
                         'mode' => 'table',
+                        'stack_at' => 925,
                         'add_row' => __('Add Site'),
                         'fields' => collect($siteFields)->map(function ($field) use ($tableWidths) {
                             $field['field']['width'] = $tableWidths[$field['handle']] ?? 16;
