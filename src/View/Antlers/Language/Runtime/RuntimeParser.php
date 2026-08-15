@@ -771,12 +771,16 @@ INFO;
 
         $existingView = $this->view;
 
-        $suspendedData = $this->nodeProcessor->getAllData();
+        $shouldSwapData = GlobalRuntimeState::$isolateViewData;
+        GlobalRuntimeState::$isolateViewData = false;
+        $suspendedData = $shouldSwapData ? $this->nodeProcessor->getAllData() : null;
 
         try {
             return $this->renderViewContent($view, $text, $data);
         } finally {
-            $this->nodeProcessor->swapData($suspendedData);
+            if ($shouldSwapData) {
+                $this->nodeProcessor->swapData($suspendedData);
+            }
             $this->view = $existingView;
             array_pop(GlobalRuntimeState::$templateFileStack);
             GlobalRuntimeState::$currentExecutionFile = $this->view;

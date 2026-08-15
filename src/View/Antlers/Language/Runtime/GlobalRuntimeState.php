@@ -219,6 +219,11 @@ class GlobalRuntimeState
 
     public static $requiresRuntimeIsolation = false;
 
+    // Scopes the parseView() data restore to renders that request it (the include tag).
+    // Views leaving data behind on the processor is arguably the real bug, but other
+    // renders keep that behavior for BC. Remove once that is fixed for everyone.
+    public static $isolateViewData = false;
+
     public static $evaulatingTagContents = false;
 
     public static $userContentEvalState = null;

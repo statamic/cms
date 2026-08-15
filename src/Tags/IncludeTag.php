@@ -105,12 +105,14 @@ class IncludeTag extends Tags
 
         GlobalRuntimeState::$isCascadeEnabled = false;
         GlobalRuntimeState::$prefixState = [];
+        GlobalRuntimeState::$isolateViewData = true;
 
         try {
             return $view->with($scope)
                 ->withoutExtractions()
                 ->render();
         } finally {
+            GlobalRuntimeState::$isolateViewData = false;
             GlobalRuntimeState::$isCascadeEnabled = $suspendedCascade;
             GlobalRuntimeState::$prefixState = $suspendedPrefixes;
 

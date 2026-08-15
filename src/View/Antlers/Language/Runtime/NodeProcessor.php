@@ -2078,6 +2078,12 @@ class NodeProcessor
                                     }
 
                                     if ($this->guardRuntime($node, $runtimeResult)) {
+                                        if ($runtimeResult instanceof Slot) {
+                                            $lockData = $this->data;
+                                            $runtimeResult = $runtimeResult->render();
+                                            $this->data = $lockData;
+                                        }
+
                                         $buffer .= $this->measureBufferAppend($node, $this->modifyBufferAppend($runtimeResult));
                                     }
 
@@ -2162,7 +2168,10 @@ class NodeProcessor
                     }
 
                     if ($val instanceof Slot) {
+                        $lockData = $this->data;
                         $val = $val->render($node->hasParameters ? $this->getSlotOutputProps($node) : []);
+                        $this->data = $lockData;
+
                         $buffer .= $this->measureBufferAppend($node, $this->modifyBufferAppend($val));
 
                         if ($this->isTracingEnabled()) {
