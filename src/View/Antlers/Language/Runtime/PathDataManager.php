@@ -33,6 +33,7 @@ use Statamic\View\Antlers\Language\Runtime\Sandbox\Environment;
 use Statamic\View\Antlers\Language\Runtime\Sandbox\RuntimeValues;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Statamic\View\Cascade;
+use Statamic\View\Slot;
 
 class PathDataManager
 {
@@ -1131,7 +1132,7 @@ class PathDataManager
         GlobalRuntimeState::$isEvaluatingUserData = true;
         GlobalRuntimeState::$isEvaluatingData = true;
 
-        if ($value instanceof Model) {
+        if ($value instanceof Model || $value instanceof Slot) {
             GlobalRuntimeState::$isEvaluatingUserData = $prevIsEvaluatingUserData;
             GlobalRuntimeState::$isEvaluatingData = $prevIsEvaluatingData;
 

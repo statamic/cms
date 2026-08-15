@@ -137,6 +137,16 @@ class SandboxTest extends ParserTestCase
         $this->assertSame('S', Cascade::get('smuggled')['secret']);
     }
 
+    public function test_an_escaped_slot_can_receive_props()
+    {
+        $this->viewShouldReturnRaw('define', '{{ scope:snippet }}{{# captured #}}{{ /scope:snippet }}');
+
+        $this->assertSame(
+            'Hello, Alice! Hello, Bob!',
+            $this->render('{{ include:define }}Hello, {{ name }}!{{ /include:define }}{{ snippet:slot name="Alice" }} {{ snippet:slot name="Bob" }}')
+        );
+    }
+
     public function test_a_slot_that_escapes_the_include_can_still_render_afterwards()
     {
         $this->viewShouldReturnRaw('w', '{{ internal = "view-secret" }}{{ scope:smuggled }}W{{ /scope:smuggled }}');

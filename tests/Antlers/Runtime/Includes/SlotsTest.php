@@ -152,6 +152,35 @@ class SlotsTest extends ParserTestCase
         $this->assertSame('NO', $this->render('{{ include:card }}{{ slot:header }}   {{ /slot:header }}{{ /include:card }}'));
     }
 
+    public function test_pipe_modifiers_can_be_applied_to_slots()
+    {
+        $this->viewShouldReturnRaw('wrapper', '<{{ slot | upper }}>');
+        $this->viewShouldReturnRaw('card', '<{{ slot:header | upper }}>');
+        $this->viewShouldReturnRaw('chained', '<{{ slot:header | reverse | upper }}>');
+
+        $this->assertSame('<BODY>', $this->render('{{ include:wrapper }}body{{ /include:wrapper }}'));
+        $this->assertSame('<HEAD>', $this->render('{{ include:card }}{{ slot:header }}head{{ /slot:header }}{{ /include:card }}'));
+        $this->assertSame('<DAEH>', $this->render('{{ include:chained }}{{ slot:header }}head{{ /slot:header }}{{ /include:chained }}'));
+    }
+
+    public function test_default_slot_params_are_passed_as_props()
+    {
+        $this->viewShouldReturnRaw('scoped', '<{{ slot :label="title" }}>');
+        $this->viewShouldReturnRaw('wrapper', '<{{ slot ensure_right="!" }}>');
+
+        $this->assertSame('<[T]>', $this->render('{{ include:scoped title="T" }}[{{ label }}]{{ /include:scoped }}'));
+        $this->assertSame('<body[!]>', $this->render('{{ include:wrapper }}body[{{ ensure_right }}]{{ /include:wrapper }}'));
+    }
+
+    public function test_named_slot_params_are_always_passed_as_props()
+    {
+        $this->viewShouldReturnRaw('row', '{{ slot:row :label="title" ensure_right="!" }}');
+        $this->viewShouldReturnRaw('card', '{{ slot:head :title="heading" }}');
+
+        $this->assertSame('[t|!]', $this->render('{{ include:row title="t" }}{{ slot:row }}[{{ label }}|{{ ensure_right }}]{{ /slot:row }}{{ /include:row }}'));
+        $this->assertSame('[H]', $this->render('{{ include:card heading="H" }}{{ slot:head }}[{{ title }}]{{ /slot:head }}{{ /include:card }}'));
+    }
+
     public function test_scoped_slot_exposes_multiple_props()
     {
         $this->viewShouldReturnRaw('row', '{{ slot:row :label="title" :n="num" }}');
