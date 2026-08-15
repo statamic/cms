@@ -19,7 +19,7 @@ trait CompilesPartials
         return $tagName === 'slot' || str($tagName)->startsWith(['slot.', 'slot:']);
     }
 
-    private function compileSlotOutput(ComponentNode $component): string
+    protected function compileSlotOutput(ComponentNode $component): string
     {
         if (! $this->isValidSlotName($name = $this->rawSlotName($component))) {
             return $this->compileComponent($component);
@@ -32,7 +32,11 @@ trait CompilesPartials
         $context = '$'.IncludeTag::CONTEXT_KEY.' ?? false';
         $output = '\Statamic\View\Slot::output('.$slot.', '.$this->compileParameters($component->parameters).')';
 
-        return '<?php if ('.$context.') { echo '.$output.'; } else { ?>'.$this->compileComponent($component).'<?php } ?>';
+        $fallback = $this->isPairedComponent($component)
+            ? $this->compile($component->innerDocumentContent)
+            : '';
+
+        return '<?php if ('.$context.') { if ('.$slot.' !== null) { echo '.$output.'; } else { ?>'.$fallback.'<?php } } else { ?>'.$this->compileComponent($component).'<?php } ?>';
     }
 
     protected function isComponentSlot(ComponentNode $parent, ComponentNode $child): bool
@@ -70,7 +74,7 @@ trait CompilesPartials
         return [$name, $compiled];
     }
 
-    private function compileIncludeSlot(ComponentNode $node): array
+    protected function compileIncludeSlot(ComponentNode $node): array
     {
         $name = $this->rawSlotName($node);
 
@@ -81,14 +85,14 @@ trait CompilesPartials
         return [$name, $this->compile($node->innerDocumentContent)];
     }
 
-    private function rawSlotName(ComponentNode $component): string
+    protected function rawSlotName(ComponentNode $component): string
     {
         $name = (string) str($component->name)->substr(5);
 
         return $name === '' ? 'slot' : $name;
     }
 
-    private function isValidSlotName(string $name): bool
+    protected function isValidSlotName(string $name): bool
     {
         return (bool) preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $name);
     }
@@ -98,12 +102,12 @@ trait CompilesPartials
         return $this->compileViewTag($component, isInclude: false);
     }
 
-    private function compileInclude(ComponentNode $component): string
+    protected function compileInclude(ComponentNode $component): string
     {
         return $this->compileViewTag($component, isInclude: true);
     }
 
-    private function compileViewTag(ComponentNode $component, bool $isInclude): string
+    protected function compileViewTag(ComponentNode $component, bool $isInclude): string
     {
         [$slots, $newContent] = $this->extractSlots($component);
         $params = $component->getParameters()->keyBy(fn (ParameterNode $param) => $param->materializedName);

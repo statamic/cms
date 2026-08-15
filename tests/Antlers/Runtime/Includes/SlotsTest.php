@@ -152,6 +152,13 @@ class SlotsTest extends ParserTestCase
         $this->assertSame('NO', $this->render('{{ include:card }}{{ slot:header }}   {{ /slot:header }}{{ /include:card }}'));
     }
 
+    public function test_a_missing_named_slot_used_as_a_pair_renders_nothing()
+    {
+        $this->viewShouldReturnRaw('card', '<h>{{ slot:header }}fallback{{ /slot:header }}</h>');
+
+        $this->assertSame('<h></h>', $this->render('{{ include:card }}body{{ /include:card }}'));
+    }
+
     public function test_pipe_modifiers_can_be_applied_to_slots()
     {
         $this->viewShouldReturnRaw('wrapper', '<{{ slot | upper }}>');

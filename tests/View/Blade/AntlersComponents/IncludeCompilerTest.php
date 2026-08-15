@@ -132,6 +132,34 @@ BLADE;
     }
 
     #[Test]
+    public function a_paired_named_slot_falls_back_to_its_body_when_the_slot_is_not_provided()
+    {
+        $this->viewShouldReturnRaw('card', '<footer><s:slot:footer>Default footer</s:slot:footer></footer>', 'blade.php');
+
+        $this->assertSame('<footer>Default footer</footer>', Blade::render('<s:include:card />'));
+    }
+
+    #[Test]
+    public function a_paired_named_slot_renders_the_provided_slot_instead_of_its_body()
+    {
+        $this->viewShouldReturnRaw('card', '<footer><s:slot:footer>Default footer</s:slot:footer></footer>', 'blade.php');
+
+        $this->assertSame(
+            '<footer>Provided</footer>',
+            Blade::render('<s:include:card><s:slot:footer>Provided</s:slot:footer></s:include:card>')
+        );
+    }
+
+    #[Test]
+    public function a_paired_default_slot_falls_back_to_its_body_when_the_slot_is_not_provided()
+    {
+        $this->viewShouldReturnRaw('card', '<div><s:slot>Default body</s:slot></div>', 'blade.php');
+
+        $this->assertSame('<div>Default body</div>', Blade::render('<s:include:card />'));
+        $this->assertSame('<div>Provided</div>', Blade::render('<s:include:card>Provided</s:include:card>'));
+    }
+
+    #[Test]
     public function it_forwards_exists_method_calls()
     {
         $template = '<s:include:exists src="alert">Yes</s:include:exists>';

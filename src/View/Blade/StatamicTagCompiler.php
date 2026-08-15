@@ -127,7 +127,7 @@ class StatamicTagCompiler
         return $component->tagName == 'partial' || str($component->tagName)->lower()->startsWith('partial:');
     }
 
-    private function isInclude(ComponentNode $component): bool
+    protected function isInclude(ComponentNode $component): bool
     {
         return $component->tagName == 'include' || str($component->tagName)->lower()->startsWith('include:');
     }
