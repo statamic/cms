@@ -230,4 +230,20 @@ class IncludeTagTest extends ParserTestCase
         $this->assertSame('', $this->render('{{ include:greeting unless="true" }}'));
         $this->assertSame('Hello', $this->render('{{ include:greeting unless="false" }}'));
     }
+
+    public function test_include_if_exists_renders_the_view_when_it_exists()
+    {
+        $this->viewShouldReturnRaw('cards.author', 'Author');
+
+        $this->assertSame('Author', $this->render('{{ include:if_exists src="cards/author" }}'));
+        $this->assertSame('', $this->render('{{ include:if_exists src="nope" }}'));
+    }
+
+    public function test_include_exists_in_a_condition()
+    {
+        $this->viewShouldReturnRaw('cards.author', 'Author');
+
+        $this->assertSame('yes', $this->render('{{ if {include:exists src="cards/author"} }}yes{{ else }}no{{ /if }}'));
+        $this->assertSame('no', $this->render('{{ if {include:exists src="nope"} }}yes{{ else }}no{{ /if }}'));
+    }
 }

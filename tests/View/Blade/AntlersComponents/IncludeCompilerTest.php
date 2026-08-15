@@ -36,6 +36,23 @@ class IncludeCompilerTest extends TestCase
     }
 
     #[Test]
+    public function it_compiles_include_tags_with_a_src_parameter()
+    {
+        $this->viewShouldReturnRaw('alert', '<div>{{ $title }}</div>', 'blade.php');
+
+        $this->assertSame('<div>The Title</div>', Blade::render('<s:include src="alert" title="The Title" />'));
+    }
+
+    #[Test]
+    public function it_compiles_a_view_named_index()
+    {
+        $this->viewShouldReturnRaw('index', 'IDX');
+
+        $this->assertSame('IDX', Blade::render('<s:include:index />'));
+        $this->assertSame('IDX', Blade::render('<s:include src="index" />'));
+    }
+
+    #[Test]
     public function it_does_not_capture_the_caller_scope()
     {
         $this->viewShouldReturnRaw('alert', '[{{ $secret ?? "none" }}][{{ $passed ?? "none" }}]');
