@@ -167,7 +167,7 @@ class IncludeTag extends Tags
 
         foreach ($slots as $name => $slot) {
             if ($slot instanceof Slot) {
-                $slot->withParams($data);
+                $slot = (clone $slot)->withParams($data)->named($name === 'slot' ? null : $name);
             }
 
             if ($name === 'slot') {

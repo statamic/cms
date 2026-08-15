@@ -159,6 +159,17 @@ class SlotsTest extends ParserTestCase
         $this->assertSame('<h></h>', $this->render('{{ include:card }}body{{ /include:card }}'));
     }
 
+    public function test_forwarding_a_slot_to_a_nested_include_does_not_clobber_the_outer_one()
+    {
+        $this->viewShouldReturnRaw('outer', '{{ include:inner tag="I" :__statamic_include_slot_body="slot:body" }}|{{ slot:body }}');
+        $this->viewShouldReturnRaw('inner', '{{ slot:body }}');
+
+        $this->assertSame(
+            '[I]|[O]',
+            $this->render('{{ include:outer tag="O" }}{{ slot:body }}[{{ params:tag }}]{{ /slot:body }}{{ /include:outer }}')
+        );
+    }
+
     public function test_pipe_modifiers_can_be_applied_to_slots()
     {
         $this->viewShouldReturnRaw('wrapper', '<{{ slot | upper }}>');
