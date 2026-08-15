@@ -36,11 +36,11 @@ class Slot implements Htmlable
     ) {
     }
 
-    public static function forAntlers(array $nodes, string $source, array $data, NodeProcessor $processor): static
+    public static function forAntlers(array $nodes, string $source, array $data, NodeProcessor $processor): self
     {
         $state = static::captureCallerState();
 
-        $slot = new static(static::antlersRenderer($nodes, $state, $processor), $data);
+        $slot = new self(static::antlersRenderer($nodes, $state, $processor), $data);
 
         $slot->source = $source;
         $slot->callerState = $state;
@@ -48,12 +48,12 @@ class Slot implements Htmlable
         return $slot;
     }
 
-    public static function forBlade(string $template, array $data): static
+    public static function forBlade(string $template, array $data): self
     {
         // Prevents Blade::render from mistaking short slot content for a view name.
         $template = '{{-- slot --}}'.$template;
 
-        $slot = new static(fn (array $slotData) => Blade::render($template, $slotData), $data);
+        $slot = new self(fn (array $slotData) => Blade::render($template, $slotData), $data);
 
         $slot->template = $template;
 
