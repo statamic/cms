@@ -5,7 +5,6 @@ namespace Statamic\View\Antlers\Language\Runtime\Concerns;
 use Statamic\Tags\IncludeTag;
 use Statamic\View\Antlers\Language\Nodes\AntlersNode;
 use Statamic\View\Antlers\Language\Nodes\LiteralNode;
-use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
 use Statamic\View\Slot;
 
 trait ManagesIncludeSlots
@@ -41,35 +40,34 @@ trait ManagesIncludeSlots
         $slots = [];
 
         if ($this->slotHasContent($defaultChildren)) {
-            $slots['slot'] = $this->makeSlot($defaultChildren, $callerData);
+            $slots['slot'] = Slot::forAntlers($defaultChildren, $this->defaultSlotSource($node, $namedSlots), $callerData, $this);
         }
 
         foreach ($namedSlots as $slotName => $slotNode) {
             if ($this->slotHasContent($slotNode->children)) {
-                $slots[$slotName] = $this->makeSlot($slotNode->children, $callerData);
+                $slots[$slotName] = Slot::forAntlers($slotNode->children, $slotNode->runtimeContent, $callerData, $this);
             }
         }
 
         return $slots;
     }
 
-    protected function makeSlot(array $nodes, array $callerData): Slot
+    protected function defaultSlotSource(AntlersNode $node, array $namedSlots): string
     {
-        $callerState = [GlobalRuntimeState::$isCascadeEnabled, GlobalRuntimeState::$prefixState];
+        if (empty($namedSlots)) {
+            return $node->runtimeContent;
+        }
 
-        $renderer = function (array $data) use ($nodes, $callerState) {
-            $tagState = [GlobalRuntimeState::$isCascadeEnabled, GlobalRuntimeState::$prefixState];
+        $parser = $node->getParser();
+        $start = $node->endPosition->index + 1;
+        $source = '';
 
-            [GlobalRuntimeState::$isCascadeEnabled, GlobalRuntimeState::$prefixState] = $callerState;
+        foreach ($namedSlots as $slotNode) {
+            $source .= $parser->getText($start, $slotNode->startPosition->index);
+            $start = ($slotNode->isClosedBy ?? $slotNode)->endPosition->index + 1;
+        }
 
-            try {
-                return $this->cloneProcessor()->setData($data)->reduce($nodes);
-            } finally {
-                [GlobalRuntimeState::$isCascadeEnabled, GlobalRuntimeState::$prefixState] = $tagState;
-            }
-        };
-
-        return new Slot($renderer, $callerData);
+        return $source.$parser->getText($start, $node->isClosedBy->startPosition->index);
     }
 
     protected function isNamedSlotNode($node): bool

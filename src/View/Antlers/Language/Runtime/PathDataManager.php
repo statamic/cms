@@ -609,9 +609,7 @@ class PathDataManager
                 }
 
                 if ($didScanSourceData == false) {
-                    if ($this->namedSlotsInScope && $pathItem->name == 'slot' &&
-                        $path->originalContent != 'slot' &&
-                        array_key_exists($path->originalContent, $data)) {
+                    if ($this->isNamedSlotReference($pathItem, $path, $data)) {
                         $this->reducedVar = $data[$path->originalContent];
                         break;
                     }
@@ -794,6 +792,14 @@ class PathDataManager
         $this->resetInternalState();
 
         return $this->reducedVar;
+    }
+
+    private function isNamedSlotReference(PathNode $pathItem, $path, $data): bool
+    {
+        return $pathItem->name == 'slot' &&
+            $path->originalContent != 'slot' &&
+            array_key_exists($path->originalContent, $data) &&
+            ($this->namedSlotsInScope || $data[$path->originalContent] instanceof Slot);
     }
 
     /**

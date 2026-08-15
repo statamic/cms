@@ -158,7 +158,7 @@ UNSET;
             $injectedParam->type = ParameterType::DynamicVariable;
 
             $injectedParam->value = $isInclude
-                ? 'new \Statamic\View\Slot(fn ($__slotData) => \Illuminate\Support\Facades\Blade::render($'.$hoistedVarName.', $__slotData), get_defined_vars())'
+                ? '\Statamic\View\Slot::forBlade($'.$hoistedVarName.', get_defined_vars())'
                 : 'new \Illuminate\Support\HtmlString(\Illuminate\Support\Facades\Blade::render($'.$hoistedVarName.', get_defined_vars()))';
 
             $hoistedSet .= Str::swap([
