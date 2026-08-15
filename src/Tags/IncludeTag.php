@@ -236,7 +236,7 @@ class IncludeTag extends Tags
             throw new RuntimeException('The [params] parameter on the include tag must be an associative array.');
         }
 
-        return Arr::except($spread, self::CONTROL);
+        return $spread;
     }
 
     protected function unprefixedAliases(array $data, mixed $prefixes): array

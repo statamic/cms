@@ -110,13 +110,35 @@ class IncludeTagTest extends ParserTestCase
         );
     }
 
-    public function test_meta_params_never_appear_as_data()
+    public function test_control_params_set_on_the_tag_never_appear_as_data()
     {
-        $this->viewShouldReturnRaw('card', '[{{ params:src }}][{{ params:when }}][{{ params:handle_prefix }}][{{ params:params }}]');
+        $this->viewShouldReturnRaw('card', '[{{ handle_prefix }}][{{ when }}][{{ params:handle_prefix }}][{{ params:when }}][{{ params:params }}]');
 
         $this->assertSame(
-            '[][][][]',
-            $this->render('{{ include:card :params="data" handle_prefix="x_" }}', ['data' => ['src' => 'sneaky', 'when' => 'sneaky']])
+            '[][][][][]',
+            $this->render('{{ include:card :params="data" handle_prefix="x_" when="true" }}', ['data' => ['title' => 'T']])
+        );
+    }
+
+    public function test_spread_keys_named_after_control_params_are_preserved_as_data()
+    {
+        $this->viewShouldReturnRaw('card', '[{{ src }}][{{ params:src }}][{{ when }}][{{ params:when }}]');
+
+        $this->assertSame(
+            '[/img.jpg][/img.jpg][W][W]',
+            $this->render('{{ include:card :params="data" }}', ['data' => ['src' => '/img.jpg', 'when' => 'W']])
+        );
+    }
+
+    public function test_an_entry_with_a_src_field_can_be_spread_into_an_include()
+    {
+        $this->viewShouldReturnRaw('card', '<video src="{{ src }}" title="{{ title }}"></video>');
+
+        $entry = ['title' => 'My Video', 'src' => 'https://example.com/video.mp4'];
+
+        $this->assertSame(
+            '<video src="https://example.com/video.mp4" title="My Video"></video>',
+            $this->render('{{ include:card :params="entry" }}', ['entry' => $entry])
         );
     }
 
