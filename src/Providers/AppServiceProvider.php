@@ -137,6 +137,8 @@ class AppServiceProvider extends ServiceProvider
 
         $this->registerElevatedSessionMacros();
 
+        $this->registerCascadeHydrationForErrorViews();
+
         if (config('statamic.system.handle_scheduled_entries')) {
             $this->app->make(Schedule::class)->job(HandleEntrySchedule::class)->everyMinute();
         }
@@ -347,6 +349,44 @@ class AppServiceProvider extends ServiceProvider
             : $sites->take(3)->map->name()->join(', ').', and '.($sites->count() - 3).' more';
 
         return $sites->count().' ('.$summary.')';
+    }
+
+    // Statamic's own exceptions hydrate the cascade themselves via RendersHttpExceptions::contents().
+    // A generic HTTP exception thrown outside Statamic's stack (e.g. Livewire's default 404) never
+    // goes through that path, so the error template's globals would be unresolved. This closes that gap.
+    private function registerCascadeHydrationForErrorViews()
+    {
+        $handler = $this->app->make(\Illuminate\Contracts\Debug\ExceptionHandler::class);
+
+        if (! method_exists($handler, 'renderable')) {
+            return;
+        }
+
+        $handler->renderable(
+            function (\Symfony\Component\HttpKernel\Exception\HttpExceptionInterface $e, Request $request) {
+                if ($request->expectsJson() || Statamic::isCpRoute() || Statamic::isApiRoute()) {
+                    return null;
+                }
+
+                $status = $e->getStatusCode();
+
+                if (! view()->exists('errors.'.$status)) {
+                    return null;
+                }
+
+                Facades\Cascade::hydrated(function ($cascade) use ($status) {
+                    $cascade->set('response_code', $status);
+                });
+
+                $layouts = collect(['errors.layout', 'layouts.layout', config('statamic.system.layout', 'layout'), 'statamic::blank']);
+                $layout = $layouts->filter()->first(fn ($layout) => view()->exists($layout));
+
+                return response(
+                    $this->app->make(\Statamic\View\View::class)->template('errors.'.$status)->layout($layout)->render(),
+                    $status
+                );
+            }
+        );
     }
 
     private function registerElevatedSessionMacros()
