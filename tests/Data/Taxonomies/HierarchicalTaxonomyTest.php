@@ -3,6 +3,8 @@
 namespace Tests\Data\Taxonomies;
 
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Contracts\Structures\TaxonomyTreeRepository;
+use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
 use Statamic\Structures\TaxonomyStructure;
@@ -57,6 +59,29 @@ class HierarchicalTaxonomyTest extends TestCase
         $this->assertEquals(3, $structure->maxDepth());
         $this->assertFalse($structure->expectsRoot());
         $this->assertInstanceOf(TaxonomyTree::class, $structure->tree());
+    }
+
+    #[Test]
+    public function an_unsaved_tree_uses_the_default_site_key_even_when_the_taxonomy_omits_it()
+    {
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => '/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => '/fr/'],
+        ]);
+
+        $taxonomy = tap(Taxonomy::make('topics')->sites(['fr'])->structureContents([]))->save();
+        tap(Term::make('foo')->taxonomy('topics')->data(['title' => 'Foo']))->save();
+
+        $tree = $taxonomy->structure()->tree();
+        $tree->tree([['term' => 'foo']]);
+
+        $this->assertEquals(Site::default()->handle(), $tree->locale());
+        $this->assertSame($tree, $taxonomy->structure()->tree());
+
+        $tree->save();
+
+        $this->assertNotNull(app(TaxonomyTreeRepository::class)->find('topics'));
+        $this->assertEquals([['term' => 'foo']], $taxonomy->structure()->tree()->tree());
     }
 
     #[Test]

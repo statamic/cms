@@ -6,6 +6,7 @@ use Illuminate\Validation\ValidationException;
 use Statamic\Contracts\Structures\TaxonomyTree;
 use Statamic\Contracts\Structures\TaxonomyTreeRepository;
 use Statamic\Facades\Blink;
+use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
 use Statamic\Support\Str;
@@ -361,7 +362,7 @@ class TaxonomyStructure extends Structure
         return Blink::once("taxonomy-structure-tree-{$this->handle()}", function () {
             $tree = app(TaxonomyTreeRepository::class)->find($this->handle());
 
-            return $tree ?? $this->makeTree($this->taxonomy()->sites()->first());
+            return $tree ?? $this->makeTree(Site::default()->handle());
         });
     }
 
