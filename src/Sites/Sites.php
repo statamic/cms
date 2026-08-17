@@ -272,6 +272,7 @@ class Sites
                         'fields' => collect($siteFields)->map(function ($field) use ($tableWidths) {
                             $field['field']['width'] = $tableWidths[$field['handle']] ?? 14;
                             $field['field']['classes'] = 'max-w-48 min-w-0 overflow-hidden';
+
                             return $field;
                         })->all(),
                         'required' => true,
