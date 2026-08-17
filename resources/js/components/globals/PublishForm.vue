@@ -74,6 +74,7 @@
             :name="publishContainer"
             :reference="reference"
             :blueprint="fieldset"
+            :as-config="asConfig"
             v-model="values"
             :meta="meta"
             :origin-values="originValues"
@@ -148,6 +149,7 @@ export default {
         canConfigure: Boolean,
         configureUrl: String,
         canEditBlueprint: Boolean,
+        asConfig: Boolean,
     },
 
     data() {
