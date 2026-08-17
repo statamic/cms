@@ -2,22 +2,23 @@
     <div :class="{ 'w-full min-w-0': isCompact }">
         <component :is="wrapperComponent" v-bind="wrapperBinds">
             <template v-if="isCompact" #trigger>
-                <button
-                    type="button"
-                    class="w-full min-w-0 flex items-center justify-between antialiased cursor-pointer bg-linear-to-b from-white to-gray-50 text-gray-925 border border-gray-300 with-contrast:border-gray-500 shadow-ui-sm focus-within:focus-outline dark:from-gray-850 dark:to-gray-900 dark:border-gray-700 dark:text-gray-300 dark:shadow-ui-md px-4 h-10 text-base rounded-lg"
-                    :class="{ 'border-dashed': isReadOnly }"
+                <ui-button
+                    class="w-full min-w-0 shrink justify-between"
+                    icon-append="chevron-down"
+                    :read-only="isReadOnly"
+                    :aria-expanded="compactOpen"
+                    aria-haspopup="dialog"
                 >
                     <span
-                        class="block min-w-0 flex-1 truncate text-start"
+                        class="block min-w-0 flex-1 truncate text-start font-normal"
                         :class="{ 'text-gray-500 dark:text-gray-400': !hasCompactValues }"
                     >
                         {{ compactTriggerText }}
                     </span>
-                    <ui-icon name="chevron-down" class="text-gray-400 dark:text-white/40 size-4 ms-1.5 -me-1 shrink-0" />
-                </button>
+                </ui-button>
             </template>
 
-            <div ref="editor">
+            <div ref="editor" @keydown.enter="closeCompactOnEnter">
                 <ui-input-group v-if="isSingle">
                     <ui-input-group-prepend>
                         <select
@@ -271,6 +272,13 @@ export default {
             if (open && !this.valueCount && !this.isReadOnly) {
                 this.addValue();
             }
+        },
+
+        closeCompactOnEnter(event) {
+            if (!this.isCompact || event.target.tagName !== 'INPUT') return;
+
+            event.preventDefault();
+            this.setCompactOpen(false);
         },
 
         addValue() {
