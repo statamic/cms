@@ -323,7 +323,7 @@ class TaxonomyTreeTest extends TestCase
     {
         $taxonomy = tap(Taxonomy::make('categories')->title('Categories')->structureContents(['max_depth' => 2]))->save();
 
-        foreach (['animals', 'cat', 'calico'] as $slug) {
+        foreach (['animals', 'cat', 'calico', 'furniture'] as $slug) {
             tap(Term::make($slug)->taxonomy('categories')->data(['title' => ucfirst($slug)]))->save();
         }
 
@@ -331,6 +331,7 @@ class TaxonomyTreeTest extends TestCase
             ['term' => 'animals', 'children' => [
                 ['term' => 'cat'],
             ]],
+            ['term' => 'furniture'],
         ])->save();
 
         $this
@@ -343,7 +344,10 @@ class TaxonomyTreeTest extends TestCase
                         ]],
                     ]],
                 ],
+                'deletedTerms' => ['categories::furniture'],
             ])
             ->assertUnprocessable();
+
+        $this->assertNotNull(Term::find('categories::furniture'));
     }
 }
