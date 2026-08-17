@@ -315,6 +315,10 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
         $withEvents = $this->withEvents;
         $this->withEvents = true;
 
+        if ($withEvents) {
+            DeleteTemporaryFiles::dispatchSync($this);
+        }
+
         FormSubmission::delete($this);
 
         if ($withEvents) {

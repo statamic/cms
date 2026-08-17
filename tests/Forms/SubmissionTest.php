@@ -276,6 +276,32 @@ class SubmissionTest extends TestCase
     }
 
     #[Test]
+    public function deleting_dispatches_delete_temporary_files()
+    {
+        Bus::fake();
+
+        $form = tap(Form::make('contact_us'))->save();
+        $submission = tap($form->makeSubmission())->save();
+
+        $submission->delete();
+
+        Bus::assertDispatchedSync(DeleteTemporaryFiles::class);
+    }
+
+    #[Test]
+    public function deleting_quietly_does_not_dispatch_delete_temporary_files()
+    {
+        Bus::fake();
+
+        $form = tap(Form::make('contact_us'))->save();
+        $submission = tap($form->makeSubmission())->save();
+
+        $submission->deleteQuietly();
+
+        Bus::assertNotDispatched(DeleteTemporaryFiles::class);
+    }
+
+    #[Test]
     public function it_determines_its_status()
     {
         $form = tap(Form::make('contact_us'))->save();

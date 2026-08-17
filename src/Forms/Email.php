@@ -6,6 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Storage;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Blueprint;
@@ -174,7 +175,9 @@ class Email extends Mailable
             : config('statamic.system.file_uploads_path', 'statamic/file-uploads');
 
         foreach ($value as $file) {
-            $this->attachFromStorageDisk($disk, $basePath.'/'.$file);
+            if (Storage::disk($disk)->exists($path = "{$basePath}/{$file}")) {
+                $this->attachFromStorageDisk($disk, $path);
+            }
         }
     }
 
