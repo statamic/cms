@@ -8,6 +8,7 @@ use Statamic\Facades\Entry;
 use Statamic\Facades\Stache;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
+use Statamic\Taxonomies\EnsuresTermPaths;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -136,6 +137,30 @@ class TaxonomizeNestedTermsTest extends TestCase
             ['term' => 'plants', 'children' => [
                 ['term' => 'fern'],
             ]],
+        ], Taxonomy::findByHandle('categories')->structure()->tree()->tree());
+    }
+
+    #[Test]
+    public function a_denied_create_permission_does_not_create_partial_paths()
+    {
+        tap(Term::make('events')->taxonomy('categories')->data(['title' => 'Events']))->save();
+
+        Taxonomy::findByHandle('categories')->structure()->tree()->tree([
+            ['term' => 'events'],
+        ])->save();
+
+        $slug = (new EnsuresTermPaths)->ensure(
+            Taxonomy::findByHandle('categories'),
+            'events/concerts/jazz',
+            'en',
+            fn () => false
+        );
+
+        $this->assertNull($slug);
+        $this->assertNull(Term::find('categories::concerts'));
+        $this->assertNull(Term::find('categories::jazz'));
+        $this->assertEquals([
+            ['term' => 'events'],
         ], Taxonomy::findByHandle('categories')->structure()->tree()->tree());
     }
 

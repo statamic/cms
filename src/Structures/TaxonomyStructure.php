@@ -236,7 +236,7 @@ class TaxonomyStructure extends Structure
      * tree yet (e.g. it was just created as part of the same path), it's
      * appended at the root so the child can actually nest under it.
      */
-    public function graftTerm(string $slug, string $parentSlug): void
+    public function graftTerm(string $slug, string $parentSlug, bool $save = true): void
     {
         $tree = $this->tree();
         $raw = $this->repairTree($tree->fileData()['tree'] ?? []);
@@ -251,7 +251,11 @@ class TaxonomyStructure extends Structure
 
         $this->assertParentAllowsChild($raw, $parentSlug);
 
-        $tree->tree($this->appendSlugToParent($raw, $parentSlug, $slug))->save();
+        $tree->tree($this->appendSlugToParent($raw, $parentSlug, $slug));
+
+        if ($save) {
+            $tree->save();
+        }
     }
 
     public function assertDoesNotExceedMaxDepth(array $tree, int $depth = 1): void

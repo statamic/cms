@@ -62,29 +62,44 @@ class EnsuresTermPaths
             ]);
         }
 
+        $resolved = $segments->map(fn ($segment) => [
+            'title' => $segment,
+            'slug' => Str::slug($segment, '-', $language ?? 'en'),
+        ]);
+
+        $missing = $resolved->filter(
+            fn ($segment) => ! Term::find($taxonomy->handle().'::'.$segment['slug'])
+        );
+
+        if ($missing->isNotEmpty() && $canCreate && ! $canCreate()) {
+            return null;
+        }
+
+        foreach ($missing as $segment) {
+            Term::make()
+                ->slug($segment['slug'])
+                ->taxonomy($taxonomy)
+                ->set('title', $segment['title'])
+                ->save();
+        }
+
         $parentSlug = null;
         $slug = null;
+        $grafted = false;
 
-        foreach ($segments as $segment) {
-            $slug = Str::slug($segment, '-', $language ?? 'en');
-
-            if (! Term::find($taxonomy->handle().'::'.$slug)) {
-                if ($canCreate && ! $canCreate()) {
-                    return null;
-                }
-
-                Term::make()
-                    ->slug($slug)
-                    ->taxonomy($taxonomy)
-                    ->set('title', $segment)
-                    ->save();
-            }
+        foreach ($resolved as $segment) {
+            $slug = $segment['slug'];
 
             if ($parentSlug) {
-                $taxonomy->structure()->graftTerm($slug, $parentSlug);
+                $taxonomy->structure()->graftTerm($slug, $parentSlug, save: false);
+                $grafted = true;
             }
 
             $parentSlug = $slug;
+        }
+
+        if ($grafted) {
+            $taxonomy->structure()->tree()->save();
         }
 
         return $slug;
