@@ -197,21 +197,25 @@ const addField = (pageId: string, sectionId: string, fieldtypeHandle: string, at
     const fieldtype = props.fieldtypes.find((f) => f.handle === fieldtypeHandle);
     if (!fieldtype) return;
 
-    const handle = uniqid({ withoutHyphens: true });
+    const _id = uniqid();
 
     const field = {
-        _id: handle,
+        _id,
         config: {
             type: fieldtypeHandle,
-            display: __(fieldtype.title),
+            display: ensureUniqueDisplay(__(fieldtype.title)),
             hidden: false,
         },
         fieldtype: fieldtypeHandle,
-        handle,
+        handle: null,
+        isNew: true,
         icon: fieldtype?.icon || 'fieldtype-generic',
         type: 'inline',
         preview: {
-            config: { ...fieldtype.preview?.config, handle },
+            config: {
+                ...fieldtype.preview?.config,
+                handle: _id,
+            },
             value: fieldtype.preview?.value,
             meta: fieldtype.preview?.meta,
         },
@@ -222,6 +226,20 @@ const addField = (pageId: string, sectionId: string, fieldtypeHandle: string, at
     dirty();
 
     setTimeout(() => document.getElementById('field_display')?.select(), 250);
+};
+
+const ensureUniqueDisplay = (display: string): string => {
+    const displays = pages.value
+        .flatMap((page) => page.sections)
+        .flatMap((section) => section.fields)
+        .map((field) => field.config?.display);
+
+    if (!displays.includes(display)) return display;
+
+    let count = 2;
+    while (displays.includes(`${display} ${count}`)) count++;
+
+    return `${display} ${count}`;
 };
 
 const onFieldtypeDrop = ({ pageId, fieldtypeHandle, sectionId, sectionIndex, fieldIndex }) => {
@@ -293,6 +311,11 @@ const save = () => {
 
     axios.patch(props.action, formFields.value)
         .then((response) => {
+            pages.value
+                .flatMap((page) => page.sections)
+                .flatMap((section) => section.fields)
+                .forEach((field) => delete field.isNew);
+
             clearDirtyState();
             Statamic.$toast.success(__('Saved'));
         })
@@ -347,6 +370,7 @@ provideBuilderContext({
     deletePage,
     clearInspector,
     dirty,
+    ensureUniqueDisplay,
     errors,
     fieldtypes: props.fieldtypes,
     fieldView,

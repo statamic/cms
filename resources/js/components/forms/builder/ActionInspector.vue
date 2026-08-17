@@ -27,6 +27,7 @@ const suggestableConditionFields = computed(() => {
         .slice(0, pageIndex.value + 1)
         .flatMap((page) => page.sections)
         .flatMap((section) => section.fields)
+        .filter((f) => f.type === 'import' || f.handle)
         .map((f) => ({
             handle: f.handle,
             config: {

@@ -159,6 +159,7 @@ return [
     'form_fake_submission_generation_disabled' => 'Generating fake submissions is disabled for this form.',
     'form_fake_submission_cancelled' => 'Fake submission was cancelled by a form event listener.',
     'form_fake_submission_generated' => 'Fake submission generated.',
+    'form_fields_handle_instructions' => 'Auto-generated from the label. It can\'t be changed after saving the form.',
     'form_fields_instructions_instructions' => 'Additional field instructions like this.',
     'form_navigation' => 'Form navigation',
     'getting_started_widget_collections' => 'Collections hold the different content types that make up your site, helping you stay organized.',

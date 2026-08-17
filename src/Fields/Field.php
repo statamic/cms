@@ -507,19 +507,7 @@ class Field implements Arrayable
 
     public static function commonFieldOptions(): Fields
     {
-        $reserved = [
-            'content_type',
-            'elseif',
-            'endif',
-            'endunless',
-            'if',
-            'length',
-            'reference',
-            'resource',
-            'status',
-            'unless',
-            'views',
-        ];
+        $reserved = static::reservedHandles();
 
         $fields = collect([
             'display' => [
@@ -634,5 +622,22 @@ class Field implements Arrayable
         ])->map(fn ($field, $handle) => compact('handle', 'field'))->values()->all();
 
         return new ConfigFields($fields);
+    }
+
+    public static function reservedHandles(): array
+    {
+        return [
+            'content_type',
+            'elseif',
+            'endif',
+            'endunless',
+            'if',
+            'length',
+            'reference',
+            'resource',
+            'status',
+            'unless',
+            'views',
+        ];
     }
 }
