@@ -114,9 +114,6 @@ export default {
 
         fieldPlaceholder() {
             if (this.config.placeholder) return __(this.config.placeholder);
-            if (this.isTaggable && this.config.type === 'terms' && this.tree) {
-                return __('Search or create...');
-            }
             if (this.isTaggable) return __('Search or create...');
 
             return __('Choose...');
