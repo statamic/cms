@@ -45,7 +45,7 @@ class User extends BaseUser
     {
         if (func_num_args() === 0) {
             $data = array_merge($this->model()->attributesToArray(), [
-                'roles' => $this->roles()->map->handle()->values()->all(),
+                'roles' => $this->explicitRoles()->map->handle()->values()->all(),
                 'groups' => $this->groups()->map->handle()->values()->all(),
             ]);
 
@@ -112,7 +112,7 @@ class User extends BaseUser
 
     protected function saveRoles()
     {
-        $roles = $this->roles()->map->id();
+        $roles = $this->explicitRoles()->map->id();
 
         (new Roles($this))->sync($roles);
     }
