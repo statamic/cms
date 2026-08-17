@@ -85,11 +85,16 @@ class SubmitForm
             }
 
             if ($this->shouldFinalize($nextPage)) {
-                throw_if(Arr::get($values, $this->form->honeypot()), new SilentFormFailureException);
+                if (Arr::get($values, $this->form->honeypot())) {
+                    $this->rejectSpamSubmission();
+                }
+
                 throw_if(FormSubmitted::dispatch($this->submission) === false, new SilentFormFailureException);
             }
         } catch (ValidationException|SilentFormFailureException $e) {
-            $this->removeUploadedAssets($uploadedAssets);
+            if (! $this->submission?->isSpam()) {
+                $this->removeUploadedAssets($uploadedAssets);
+            }
 
             throw $e;
         }
@@ -173,6 +178,18 @@ class SubmitForm
             ->flatMap(fn ($tab): array => $tab->sections()->flatMap(fn ($section) => $section->fields()->all()->keys())->all())
             ->values()
             ->all();
+    }
+
+    private function rejectSpamSubmission(): void
+    {
+        if (
+            $this->form->get('honeypot_behavior', 'ignore') === 'mark_as_spam'
+            && $this->form->store()
+        ) {
+            $this->submission->markAsSpam()->save();
+        }
+
+        throw new SilentFormFailureException;
     }
 
     /**
