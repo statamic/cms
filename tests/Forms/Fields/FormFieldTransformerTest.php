@@ -120,6 +120,23 @@ class FormFieldTransformerTest extends TestCase
     }
 
     #[Test]
+    public function it_removes_is_new_from_inline_field_config()
+    {
+        $field = FormFieldTransformer::fromVue([
+            'handle' => 'my_field',
+            'type' => 'inline',
+            'fieldtype' => 'short_answer',
+            'config' => [
+                'type' => 'short_answer',
+                'display' => 'My Field',
+                'isNew' => true,
+            ],
+        ]);
+
+        $this->assertArrayNotHasKey('isNew', $field['field']);
+    }
+
+    #[Test]
     public function it_removes_full_width_from_field_config()
     {
         $fromVue = FormFieldTransformer::fromVue([
