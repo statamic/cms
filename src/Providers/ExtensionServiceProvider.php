@@ -41,6 +41,8 @@ class ExtensionServiceProvider extends ServiceProvider
         Actions\DuplicateEntry::class,
         Actions\DuplicateForm::class,
         Actions\DuplicateTerm::class,
+        Actions\MarkAsSpam::class,
+        Actions\MarkAsNotSpam::class,
         Actions\Publish::class,
         Actions\Unpublish::class,
         Actions\SendPasswordReset::class,

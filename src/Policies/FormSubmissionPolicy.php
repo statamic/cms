@@ -15,4 +15,14 @@ class FormSubmissionPolicy
     {
         return User::fromUser($user)->can('deleteSubmissions', $submission->form());
     }
+
+    public function markAsSpam($user, $submission)
+    {
+        return User::fromUser($user)->can('viewSubmissions', $submission->form());
+    }
+
+    public function markAsNotSpam($user, $submission)
+    {
+        return User::fromUser($user)->can('viewSubmissions', $submission->form());
+    }
 }
