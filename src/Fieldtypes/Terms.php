@@ -791,21 +791,21 @@ class Terms extends Relationship
             }
 
             return is_string($data)
-                ? $this->replaceValue($data, $newValue, $oldValue)
-                : $this->replaceValuesInArray($data, $newValue, $oldValue);
+                ? $this->replaceValue($data, $newValue, $oldValue, $taxonomy)
+                : $this->replaceValuesInArray($data, $newValue, $oldValue, $taxonomy);
         }
 
         $scopedOldValue = "{$taxonomy}::{$oldValue}";
         $scopedNewValue = $newValue !== null ? "{$taxonomy}::{$newValue}" : null;
 
         return is_string($data)
-            ? $this->replaceValue($data, $scopedNewValue, $scopedOldValue)
-            : $this->replaceValuesInArray($data, $scopedNewValue, $scopedOldValue);
+            ? $this->replaceValue($data, $scopedNewValue, $scopedOldValue, $taxonomy)
+            : $this->replaceValuesInArray($data, $scopedNewValue, $scopedOldValue, $taxonomy);
     }
 
-    protected function replaceValue($data, $newValue, $oldValue)
+    protected function replaceValue($data, $newValue, $oldValue, string $taxonomy)
     {
-        if (! $this->valueRefersToTerm($data, $oldValue)) {
+        if (! $this->valueRefersToTerm($data, $oldValue, $taxonomy)) {
             return $data;
         }
 
@@ -813,18 +813,18 @@ class Terms extends Relationship
             return null;
         }
 
-        return $this->rewriteTermValue($data, $oldValue, $newValue);
+        return $this->rewriteTermValue($data, $oldValue, $newValue, $taxonomy);
     }
 
-    protected function replaceValuesInArray($data, $newValue, $oldValue)
+    protected function replaceValuesInArray($data, $newValue, $oldValue, string $taxonomy)
     {
         if (! is_array($data) || ! $data) {
             return $data;
         }
 
         $result = collect(Arr::dot($data))
-            ->map(fn ($value) => $this->valueRefersToTerm($value, $oldValue)
-                ? ($newValue === null ? null : $this->rewriteTermValue($value, $oldValue, $newValue))
+            ->map(fn ($value) => $this->valueRefersToTerm($value, $oldValue, $taxonomy)
+                ? ($newValue === null ? null : $this->rewriteTermValue($value, $oldValue, $newValue, $taxonomy))
                 : $value)
             ->filter()
             ->values();
@@ -832,7 +832,7 @@ class Terms extends Relationship
         return $result->isEmpty() ? null : $result->all();
     }
 
-    private function valueRefersToTerm($value, $oldValue): bool
+    private function valueRefersToTerm($value, $oldValue, string $taxonomyHandle): bool
     {
         if ($value === $oldValue) {
             return true;
@@ -849,12 +849,18 @@ class Terms extends Relationship
             return false;
         }
 
+        $handle = $taxonomy ?? $oldTaxonomy ?? $taxonomyHandle;
+
+        if (! $this->taxonomyIsHierarchical($handle)) {
+            return Str::slug($path) === $oldSlug;
+        }
+
         return collect(explode('/', $path))->contains(
             fn ($segment) => $segment === $oldSlug || Str::slug($segment) === $oldSlug
         );
     }
 
-    private function rewriteTermValue(string $value, string $oldValue, string $newValue): string
+    private function rewriteTermValue(string $value, string $oldValue, string $newValue, string $taxonomyHandle): string
     {
         if ($value === $oldValue) {
             return $newValue;
@@ -864,13 +870,23 @@ class Terms extends Relationship
         [$oldSlug] = $this->termPathAndTaxonomy($oldValue);
         [$newSlug, $newTaxonomy] = $this->termPathAndTaxonomy($newValue);
 
+        $handle = $taxonomy ?? $newTaxonomy ?? $taxonomyHandle;
+        $prefix = $taxonomy ?? $newTaxonomy;
+
+        if (! $this->taxonomyIsHierarchical($handle)) {
+            return $prefix ? $prefix.'::'.$newSlug : $newValue;
+        }
+
         $rewritten = collect(explode('/', $path))
             ->map(fn ($segment) => $segment === $oldSlug || Str::slug($segment) === $oldSlug ? $newSlug : $segment)
             ->implode('/');
 
-        $prefix = ($taxonomy ?? $newTaxonomy);
-
         return $prefix ? $prefix.'::'.$rewritten : $rewritten;
+    }
+
+    private function taxonomyIsHierarchical(?string $handle): bool
+    {
+        return $handle && Taxonomy::findByHandle($handle)?->hierarchical();
     }
 
     private function termPathAndTaxonomy(string $value): array

@@ -319,6 +319,44 @@ class UpdateTermReferencesTest extends TestCase
     }
 
     #[Test]
+    public function a_flat_taxonomy_does_not_treat_slashes_as_path_segments()
+    {
+        $acdc = tap(Facades\Term::make()->taxonomy('topics')->slug('acdc')->data(['title' => 'AC/DC']))->save();
+        $dc = tap(Facades\Term::make()->taxonomy('topics')->slug('dc')->data(['title' => 'DC']))->save();
+
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'favourites',
+                    'field' => [
+                        'type' => 'terms',
+                        'taxonomies' => ['topics'],
+                        'mode' => 'select',
+                    ],
+                ],
+            ],
+        ]);
+
+        $entry = tap(Facades\Entry::make()->collection($collection)->data([
+            'favourites' => ['AC/DC', 'hoff'],
+        ]))->save();
+
+        $dc->slug('dc-comics')->save();
+
+        $this->assertEquals(['AC/DC', 'hoff'], $entry->fresh()->get('favourites'));
+
+        $dc->delete();
+
+        $this->assertEquals(['AC/DC', 'hoff'], $entry->fresh()->get('favourites'));
+
+        $acdc->slug('ac-dc')->save();
+
+        $this->assertEquals(['ac-dc', 'hoff'], $entry->fresh()->get('favourites'));
+    }
+
+    #[Test]
     public function it_updates_scoped_single_term_fields()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
