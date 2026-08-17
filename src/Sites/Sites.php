@@ -276,14 +276,10 @@ class Sites
                         'add_row' => __('Add Site'),
                         'fields' => collect($siteFields)->map(function ($field) use ($tableWidths) {
                             $field['field']['width'] = $tableWidths[$field['handle']] ?? 16;
+                            $field['field']['classes'] = 'max-w-48 min-w-0 overflow-hidden';
 
                             if ($field['handle'] === 'attributes') {
                                 $field['field']['compact'] = true;
-                                $field['field']['classes'] = 'max-w-48 min-w-0 overflow-hidden';
-                            }
-
-                            if ($field['handle'] === 'lang') {
-                                $field['field']['classes'] = 'max-w-48 min-w-0 overflow-hidden';
                             }
 
                             return $field;
