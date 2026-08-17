@@ -70,9 +70,9 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
         $data = collect($data);
 
         // A full data replacement would otherwise drop the internal lifecycle
-        // keys, so carry over the existing partial and site values unless the
-        // incoming payload provides its own.
-        foreach (['partial', 'site'] as $key) {
+        // keys, so carry over the existing partial, spam, and site values
+        // unless the incoming payload provides its own.
+        foreach (['partial', 'spam', 'site'] as $key) {
             if ($this->has($key) && ! $data->has($key)) {
                 $data[$key] = $this->get($key);
             }
@@ -164,12 +164,35 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
 
     public function isPartial(): bool
     {
-        return (bool) $this->get('partial');
+        // Spam submissions aren't in progress, so they shouldn't be resumed.
+        // The "partial" key sticks around to indicate that the submission was
+        // never finalized, so marking it as not spam can finalize it as normal.
+        return $this->get('partial') && ! $this->isSpam();
+    }
+
+    public function markAsSpam(): self
+    {
+        $this->set('spam', true);
+
+        return $this;
+    }
+
+    public function markAsNotSpam(): self
+    {
+        $this->remove('spam');
+
+        return $this;
+    }
+
+    public function isSpam(): bool
+    {
+        return (bool) $this->get('spam');
     }
 
     public function status(): string
     {
         return match (true) {
+            $this->isSpam() => 'spam',
             $this->isPartial() => 'partial',
             default => 'finalized',
         };

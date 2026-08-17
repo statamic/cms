@@ -128,16 +128,17 @@ class SubmissionTest extends TestCase
     }
 
     #[Test]
-    public function setting_data_preserves_the_partial_and_site_keys()
+    public function setting_data_preserves_the_partial_spam_and_site_keys()
     {
         $form = tap(Form::make('contact_us'))->save();
 
-        $submission = $form->makeSubmission()->asPartial()->site('fr');
+        $submission = $form->makeSubmission()->asPartial()->markAsSpam()->site('fr');
 
         $submission->data(['foo' => 'bar']);
 
         $this->assertEquals('bar', $submission->get('foo'));
-        $this->assertTrue($submission->isPartial());
+        $this->assertTrue($submission->get('partial'));
+        $this->assertTrue($submission->isSpam());
         $this->assertEquals('fr', $submission->get('site'));
     }
 
@@ -284,6 +285,20 @@ class SubmissionTest extends TestCase
         $partial = $form->makeSubmission()->asPartial();
         $this->assertTrue($partial->isPartial());
         $this->assertEquals('partial', $partial->status());
+
+        $spam = $form->makeSubmission()->markAsSpam();
+        $this->assertTrue($spam->isSpam());
+        $this->assertEquals('spam', $spam->status());
+
+        // Submissions caught by spam protection keep their raw partial
+        // key, but report as spam rather than partial.
+        $partialSpam = $form->makeSubmission()->asPartial()->markAsSpam();
+        $this->assertFalse($partialSpam->isPartial());
+        $this->assertEquals('spam', $partialSpam->status());
+
+        $notSpam = $spam->markAsNotSpam();
+        $this->assertFalse($notSpam->isSpam());
+        $this->assertEquals('finalized', $notSpam->status());
     }
 
     #[Test]
