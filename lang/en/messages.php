@@ -124,6 +124,7 @@ return [
     'forgot_password_sent' => 'If an account with that email address exists, a password reset link has been sent.',
     'form_configure_blueprint_instructions' => 'Choose from existing blueprints or create a new one.',
     'form_configure_email_attachments_instructions' => 'Attach files uploaded with the submission.',
+    'form_configure_email_body_instructions' => 'You can include submitted values using [Antlers](https://statamic.dev/frontend/antlers). Leave blank to list all submitted fields instead.',
     'form_configure_email_from_instructions' => 'Leave blank to fall back to the site default.',
     'form_configure_email_views_instructions' => 'Leave both blank to use the default layout.',
     'form_configure_email_description' => 'Be sure your email settings are configured to send and receive notifications when forms are submitted.',

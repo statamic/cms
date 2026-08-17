@@ -243,6 +243,59 @@ class EmailTest extends TestCase
     }
 
     #[Test]
+    public function it_renders_the_body_in_the_automagic_email_instead_of_listing_the_fields()
+    {
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'name', 'field' => ['type' => 'short_answer']],
+            ],
+        ]))->save();
+
+        $submission = $form->makeSubmission()->data(['name' => 'Jack Black']);
+
+        $email = new Email($submission, [
+            'to' => 'test@test.com',
+            'body' => "Hello {{ name }},\nThanks for getting in touch.",
+        ], Site::default());
+
+        $body = $email->render();
+
+        $this->assertStringContainsString('Hello Jack Black,<br', $body);
+        $this->assertStringContainsString('Thanks for getting in touch.', $body);
+        $this->assertStringNotContainsString('<b>Name:</b>', $body);
+    }
+
+    #[Test]
+    public function it_escapes_submitted_values_in_the_automagic_email_body()
+    {
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'name', 'field' => ['type' => 'short_answer']],
+            ],
+        ]))->save();
+
+        $submission = $form->makeSubmission()->data(['name' => '<script>alert(1)</script>']);
+
+        $email = new Email($submission, [
+            'to' => 'test@test.com',
+            'body' => 'New submission from {{ name }}',
+        ], Site::default());
+
+        $body = $email->render();
+
+        $this->assertStringNotContainsString('<script>alert(1)</script>', $body);
+        $this->assertStringContainsString('New submission from &lt;script&gt;alert(1)&lt;/script&gt;', $body);
+    }
+
+    #[Test]
+    public function it_uses_the_custom_view_instead_of_the_body_when_one_is_configured()
+    {
+        $email = $this->makeEmailWithConfig(['body' => 'Hello {{ name }}', 'html' => 'emails.custom']);
+
+        $this->assertEquals('emails.custom', $email->view);
+    }
+
+    #[Test]
     public function it_escapes_submitted_values_in_the_automagic_email()
     {
         $form = tap(Form::make('test')->formFields([
