@@ -191,6 +191,10 @@ class TermsController extends CpController
 
         $parent = $taxonomy->hierarchical() ? $values->pull('parent') : null;
 
+        if ($taxonomy->hierarchical() && $request->exists('parent')) {
+            $this->assertValidParentMove($taxonomy, $term, $parent);
+        }
+
         $values = $values->except(['slug', 'date']);
 
         if ($term->hasOrigin()) {
@@ -369,7 +373,7 @@ class TermsController extends CpController
         $taxonomy->structure()->graftTerm($slug, $parent);
     }
 
-    private function moveTermInTree($taxonomy, $term, $parent): void
+    private function assertValidParentMove($taxonomy, $term, $parent): void
     {
         $slug = $term->inDefaultLocale()->slug();
         $parent = $this->termSlugFromParentValue($taxonomy, $parent);
@@ -412,10 +416,21 @@ class TermsController extends CpController
                 'parent' => __('statamic::validation.parent_exceeds_max_depth'),
             ]);
         }
+    }
+
+    private function moveTermInTree($taxonomy, $term, $parent): void
+    {
+        $slug = $term->inDefaultLocale()->slug();
+        $parent = $this->termSlugFromParentValue($taxonomy, $parent);
+        $tree = $taxonomy->structure()->tree();
 
         $currentParentSlug = $term->parent()?->inDefaultLocale()->slug();
 
         if ($currentParentSlug === $parent) {
+            return;
+        }
+
+        if ($parent && ! $tree->find($parent)) {
             return;
         }
 

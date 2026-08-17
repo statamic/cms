@@ -260,13 +260,15 @@ class UpdateTermTest extends TestCase
         $this
             ->actingAs($user)
             ->update($term->inDefaultLocale(), [
-                'title' => 'Cat',
+                'title' => 'Updated Cat',
                 'slug' => 'cat',
                 'parent' => ['categories::cat'],
             ])
             ->assertJsonValidationErrors('parent');
 
-        $this->assertEquals('animals', $term->fresh()->inDefaultLocale()->parent()->inDefaultLocale()->slug());
+        $term = $term->fresh()->inDefaultLocale();
+        $this->assertEquals('Cat', $term->title);
+        $this->assertEquals('animals', $term->parent()->inDefaultLocale()->slug());
     }
 
     #[Test]
@@ -292,13 +294,15 @@ class UpdateTermTest extends TestCase
         $this
             ->actingAs($user)
             ->update($term, [
-                'title' => 'Animals',
+                'title' => 'Updated Animals',
                 'slug' => 'animals',
                 'parent' => ['categories::cat'],
             ])
             ->assertJsonValidationErrors('parent');
 
-        $this->assertNull($term->fresh()->inDefaultLocale()->parent());
+        $term = $term->fresh()->inDefaultLocale();
+        $this->assertEquals('Animals', $term->title);
+        $this->assertNull($term->parent());
     }
 
     #[Test]
@@ -325,13 +329,15 @@ class UpdateTermTest extends TestCase
         $this
             ->actingAs($user)
             ->update($term, [
-                'title' => 'Furniture',
+                'title' => 'Updated Furniture',
                 'slug' => 'furniture',
                 'parent' => ['categories::cat'],
             ])
             ->assertJsonValidationErrors('parent');
 
-        $this->assertNull($term->fresh()->inDefaultLocale()->parent());
+        $term = $term->fresh()->inDefaultLocale();
+        $this->assertEquals('Furniture', $term->title);
+        $this->assertNull($term->parent());
     }
 
     private function update($term, $attrs = [])
