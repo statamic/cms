@@ -98,7 +98,23 @@ class TreeBuilder
             return $tree->find($term->inDefaultLocale()->slug());
         }
 
-        return $tree->find(Str::afterLast(trim($from, '/'), '/'));
+        $slug = Str::afterLast(trim($from, '/'), '/');
+
+        if ($page = $tree->find($slug)) {
+            return $page;
+        }
+
+        $taxonomy = $tree->structure()->taxonomy();
+
+        foreach ($tree->flattenedPages() as $page) {
+            $term = Term::find($taxonomy->handle().'::'.$page->id());
+
+            if ($term && $term->in($site)->slug() === $slug) {
+                return $page;
+            }
+        }
+
+        return null;
     }
 
     private function hydrateTaxonomyPage(Page $page, string $site): void

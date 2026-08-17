@@ -117,4 +117,33 @@ class CreateTermTest extends TestCase
             ]],
         ], Taxonomy::findByHandle('categories')->structure()->tree()->fileData()['tree']);
     }
+
+    #[Test]
+    public function creating_a_term_beyond_max_depth_does_not_persist_it()
+    {
+        tap(Taxonomy::make('categories')->title('Categories')->structureContents(['max_depth' => 2]))->save();
+
+        foreach (['animals', 'cat'] as $slug) {
+            tap(Term::make($slug)->taxonomy('categories')->data(['title' => ucfirst($slug)]))->save();
+        }
+
+        Taxonomy::findByHandle('categories')->structure()->tree()->tree([
+            ['term' => 'animals', 'children' => [
+                ['term' => 'cat'],
+            ]],
+        ])->save();
+
+        $this
+            ->actingAs(tap(User::make()->makeSuper())->save())
+            ->postJson(cp_route('taxonomies.terms.store', ['categories', 'en']), [
+                'title' => 'Calico',
+                'slug' => 'calico',
+                '_blueprint' => 'category',
+                'published' => true,
+                'parent' => ['categories::cat'],
+            ])
+            ->assertJsonValidationErrors('parent');
+
+        $this->assertNull(Term::find('categories::calico'));
+    }
 }

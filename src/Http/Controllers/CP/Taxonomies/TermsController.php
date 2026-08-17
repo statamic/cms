@@ -348,6 +348,10 @@ class TermsController extends CpController
             ->data($values)
             ->slug($slug);
 
+        if ($taxonomy->hierarchical() && $parent) {
+            $this->assertValidParentMove($taxonomy, $term, $parent);
+        }
+
         $saved = $term->updateLastModified(User::current())->save();
 
         if ($saved && $taxonomy->hierarchical() && $parent) {

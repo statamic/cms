@@ -108,4 +108,40 @@ class TaxonomyStructureTagTest extends TestCase
             '{{ structure:taxonomy:categories }}[{{ title }}]{{ /structure:taxonomy:categories }}'
         ));
     }
+
+    #[Test]
+    public function it_starts_from_a_localized_term_slug()
+    {
+        $this->setSites([
+            'en' => ['url' => '/', 'locale' => 'en_US'],
+            'fr' => ['url' => '/fr/', 'locale' => 'fr_FR'],
+        ]);
+
+        tap(Taxonomy::make('topics')->sites(['en', 'fr'])->structureContents([]))->save();
+
+        foreach ([
+            'animals' => 'animaux',
+            'cat' => 'chat',
+            'calico' => 'calico-fr',
+        ] as $en => $fr) {
+            tap(Term::make($en)->taxonomy('topics'), function ($term) use ($en, $fr) {
+                $term->in('en')->slug($en)->set('title', ucfirst($en));
+                $term->in('fr')->slug($fr)->set('title', ucfirst($fr));
+            })->save();
+        }
+
+        Taxonomy::findByHandle('topics')->structure()->tree()->tree([
+            ['term' => 'animals', 'children' => [
+                ['term' => 'cat', 'children' => [
+                    ['term' => 'calico'],
+                ]],
+            ]],
+        ])->save();
+
+        Site::setCurrent('fr');
+
+        $this->assertEquals('[Chat[Calico-fr]]', $this->parse(
+            '{{ structure:taxonomy:topics from="animaux" }}[{{ title }}{{ if children }}{{ *recursive children* }}{{ /if }}]{{ /structure:taxonomy:topics }}'
+        ));
+    }
 }
