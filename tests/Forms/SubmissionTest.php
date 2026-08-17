@@ -17,6 +17,7 @@ use Statamic\Events\SubmissionSaving;
 use Statamic\Facades\Form;
 use Statamic\Facades\Site;
 use Statamic\Forms\CreateAssetsFromFileUploads;
+use Statamic\Forms\DeleteTemporaryFiles;
 use Statamic\Forms\SendEmails;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -271,6 +272,32 @@ class SubmissionTest extends TestCase
         Event::assertNotDispatched(SubmissionDeleted::class);
 
         $this->assertTrue($return);
+    }
+
+    #[Test]
+    public function deleting_dispatches_delete_temporary_files()
+    {
+        Bus::fake();
+
+        $form = tap(Form::make('contact_us'))->save();
+        $submission = tap($form->makeSubmission())->save();
+
+        $submission->delete();
+
+        Bus::assertDispatchedSync(DeleteTemporaryFiles::class);
+    }
+
+    #[Test]
+    public function deleting_quietly_does_not_dispatch_delete_temporary_files()
+    {
+        Bus::fake();
+
+        $form = tap(Form::make('contact_us'))->save();
+        $submission = tap($form->makeSubmission())->save();
+
+        $submission->deleteQuietly();
+
+        Bus::assertNotDispatched(DeleteTemporaryFiles::class);
     }
 
     #[Test]
