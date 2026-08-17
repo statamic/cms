@@ -15,7 +15,7 @@
     max="{{ $max_stars ?? 5 }}"
     step="{{ $step ?? 1 }}"
     value="{{ $isUnrated ? $min : $ratingValue }}"
-    style="--star-rating-max: {{ $max_stars ?? 5 }}; --star-rating-step: {{ $step ?? 1 }};"
+    style="--star-rating-max: {{ $max_stars ?? 5 }}; --star-rating-min: {{ $min }}; --star-rating-step: {{ $step ?? 1 }};"
     @if (isset($js_driver)) {!! $js_attributes !!} @endif
     @required(in_array('required', $validate ?? []))
     @if (! empty($display)) aria-label="{{ $display }}" @endif
@@ -32,11 +32,11 @@
             --s: 1.5rem;
             --star-rating-gap: 0.4rem;
             --star-rating-max: 5;
+            --star-rating-min: 1;
             --star-rating-step: 1;
             --_cell: calc(var(--s) + var(--star-rating-gap));
-            --_pad: calc(var(--star-rating-step) * var(--_cell) / 2);
-            /* Thumb fill boundary: full steps use half a cell; half steps use half a star width. */
-            --_fill-offset: calc(var(--_cell) / 2);
+            --_gap-shift: calc(var(--star-rating-gap) / 2);
+            --_fill-offset: calc(var(--star-rating-step) * var(--_cell) / 2);
             --_fill: var(--color-primary, gold);
             --_empty: var(--color-gray-600, #52525b);
             /* viewBox width = 14 + 14 * (--star-rating-gap / --s) = 17.7333; path borrowed from Statamic's star icon. */
@@ -48,8 +48,8 @@
             width: calc(var(--_cell) * var(--star-rating-max)) !important;
             max-width: 100%;
             height: var(--s);
-            /* Symmetric padding aligns thumb centres with star slots (CSS-Tricks). */
-            padding-inline: var(--_pad);
+            padding-inline-start: calc(var(--star-rating-min) * var(--_cell) - var(--_fill-offset) - var(--_gap-shift));
+            padding-inline-end: calc(var(--_fill-offset) + var(--_gap-shift));
             box-sizing: border-box;
             appearance: none;
             cursor: pointer;
@@ -58,10 +58,6 @@
             mask-image: var(--_star-fill-mask);
             mask-size: var(--_cell) var(--s);
             mask-repeat: repeat;
-        }
-
-        .star-rating-input[style*='--star-rating-step: 0.5'] {
-            --_fill-offset: calc((var(--s) - var(--star-rating-gap)) / 4);
         }
 
         .star-rating-input::before {

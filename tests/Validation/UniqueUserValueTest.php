@@ -2,6 +2,7 @@
 
 namespace Tests\Validation;
 
+use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Validator;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\User;
@@ -49,5 +50,27 @@ class UniqueUserValueTest extends TestCase
             ['baz' => 'foo@bar.com'],
             ['baz' => new UniqueUserValue(column: 'email')]
         )->fails());
+    }
+
+    #[Test]
+    public function it_uses_the_app_translation_when_one_exists()
+    {
+        User::make()->email('foo@bar.com')->save();
+
+        $validator = Validator::make(
+            ['email' => 'foo@bar.com'],
+            ['email' => new UniqueUserValue]
+        );
+
+        $this->assertEquals('This value has already been taken.', $validator->errors()->first('email'));
+
+        Lang::addLines(['validation.unique_user_value' => 'This email has already been taken.'], 'en');
+
+        $validator = Validator::make(
+            ['email' => 'foo@bar.com'],
+            ['email' => new UniqueUserValue]
+        );
+
+        $this->assertEquals('This email has already been taken.', $validator->errors()->first('email'));
     }
 }

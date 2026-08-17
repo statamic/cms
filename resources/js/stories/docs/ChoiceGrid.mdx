@@ -1,0 +1,29 @@
+import { Canvas, Meta, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as ChoiceGridStories from '../ChoiceGrid.stories';
+
+<Meta of={ChoiceGridStories} />
+
+# ChoiceGrid
+A grid of image-led cards for picking between visual options. Each card is a real radio or checkbox, so selection works with the keyboard and inside a regular form.
+
+Options are objects with a `value`, and optionally a `label`, `image` and `badge`.
+<Canvas of={ChoiceGridStories._DocsIntro} sourceState={'shown'} />
+
+## Multiple
+Add `multiple` to allow more than one selection. The value becomes an array of the selected option values.
+<Canvas of={ChoiceGridStories._Multiple} sourceState={'shown'} />
+
+## Badges
+An option's `badge` is shown alongside its label. Handy for lettering or numbering the choices.
+<Canvas of={ChoiceGridStories._Badges} sourceState={'shown'} />
+
+## Columns, gaps and aspect ratios
+Use `columns` to set how many options appear per row, `gap` to control the spacing between them, and `aspect-ratio` to change the shape of each image area.
+<Canvas of={ChoiceGridStories._AspectRatio} sourceState={'shown'} />
+
+## Missing images
+Options without an `image` fall back to a placeholder, so a partially configured grid still lines up.
+<Canvas of={ChoiceGridStories._WithoutImages} sourceState={'shown'} />
+
+## Arguments
+<ArgTypes of={ChoiceGridStories} />

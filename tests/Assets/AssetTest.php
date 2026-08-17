@@ -839,6 +839,50 @@ class AssetTest extends TestCase
     }
 
     #[Test]
+    public function it_generates_meta_on_demand_if_it_doesnt_exist_on_a_disk_that_throws_exceptions()
+    {
+        Storage::fake('test', ['throw' => true]);
+
+        $file = UploadedFile::fake()->image('image.jpg', 30, 60); // creates a 723 byte image
+        Storage::disk('test')->putFileAs('foo', $file, 'image.jpg');
+        $realFilePath = Storage::disk('test')->path('foo/image.jpg');
+        touch($realFilePath, $timestamp = Carbon::parse('2021-02-22 09:41:42')->timestamp);
+
+        $container = Facades\AssetContainer::make('test')->disk('test');
+        $asset = (new Asset)->container($container)->path('foo/image.jpg');
+
+        $meta = [
+            'data' => [],
+            'size' => 723,
+            'last_modified' => $timestamp,
+            'width' => 30,
+            'height' => 60,
+            'mime_type' => 'image/jpeg',
+            'duration' => null,
+        ];
+
+        $this->assertEquals($meta, $asset->meta());
+        $this->assertEquals($meta, YAML::parse(Storage::disk('test')->get('foo/.meta/image.jpg.yaml')));
+    }
+
+    #[Test]
+    public function it_uploads_to_a_disk_that_throws_exceptions_while_the_last_modified_index_is_in_use()
+    {
+        Storage::fake('test', ['throw' => true]);
+
+        $container = Facades\AssetContainer::make('test')->disk('test')->save();
+
+        Facades\Stache::store('assets::test')->cacheIndexUsage('last_modified');
+
+        $asset = $container->makeAsset('image.jpg');
+
+        $asset->upload(UploadedFile::fake()->image('image.jpg', 30, 60));
+
+        $this->assertTrue(Storage::disk('test')->exists('.meta/image.jpg.yaml'));
+        $this->assertNotNull($asset->lastModified());
+    }
+
+    #[Test]
     public function it_generates_meta_on_demand_if_a_required_value_is_missing()
     {
         Storage::fake('test');

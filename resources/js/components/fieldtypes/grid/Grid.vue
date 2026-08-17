@@ -216,11 +216,10 @@ export default {
         },
 
         duplicate(index) {
-            const row = clone(this.value[index]);
-            const old_id = row._id;
-            row._id = uniqid();
+            const original = this.value[index];
+            const { values: row, meta } = this.duplicateValues(original, this.meta.existing[original._id]);
 
-            this.updateRowMeta(row._id, this.meta.existing[old_id]);
+            this.updateRowMeta(row._id, meta);
 
             this.update([...this.value, row]);
         },

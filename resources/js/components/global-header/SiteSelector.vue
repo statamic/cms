@@ -9,18 +9,15 @@
             option-value="handle"
             size="sm"
             variant="ghost"
-            icon="globe-arrow"
             align="end"
             :adaptive-width="true"
-            class="**:data-ui-combobox-trigger:text-white/85"
+            class="[&_[data-ui-combobox-trigger]]:text-white/85"
         >
             <template #selected-option="{ option }">
-                <div class="size-4 shrink-0">
-                    <Icon name="globe-arrow" class="text-white/85 dark:text-white dark:opacity-50" />
+                <div class="size-4">
+                    <Icon name="globe-arrow" class="text-gray-900 dark:text-white dark:opacity-50" />
                 </div>
-                <span class="hidden truncate sm:block">
-                    {{ option.name }}
-                </span>
+                <span class="block truncate">{{ __(':name Site', { name: option.name }) }}</span>
             </template>
         </Select>
     </div>
@@ -39,10 +36,6 @@ export default {
 
         active() {
             return Statamic.$config.get('selectedSite');
-        },
-
-        activeName() {
-            return this.sites.find((s) => s.handle === this.active).name;
         },
     },
 
