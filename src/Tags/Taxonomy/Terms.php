@@ -99,8 +99,8 @@ class Terms
         $tree = $taxonomy->structure()->tree();
 
         if ($parent) {
-            if (! $page = $tree->find($parent)) {
-                $query->whereIn('slug', []);
+            if (! $page = $this->findTreePage($tree, $taxonomy, $parent)) {
+                $query->whereIn('id', []);
 
                 return;
             }
@@ -111,7 +111,33 @@ class Terms
             $pages = $tree->pages()->all();
         }
 
-        $query->whereIn('slug', $this->slugsToDepth($pages, $depth)->all());
+        $ids = $this->slugsToDepth($pages, $depth)
+            ->map(fn ($slug) => $taxonomy->handle().'::'.$slug);
+
+        $query->whereIn('id', $ids->all());
+    }
+
+    private function findTreePage($tree, $taxonomy, $parent)
+    {
+        if ($page = $tree->find($parent)) {
+            return $page;
+        }
+
+        foreach ($tree->flattenedPages() as $page) {
+            $term = Term::find($taxonomy->handle().'::'.$page->id());
+
+            if (! $term) {
+                continue;
+            }
+
+            foreach ($taxonomy->sites() as $site) {
+                if ($term->in($site)->slug() === $parent) {
+                    return $page;
+                }
+            }
+        }
+
+        return null;
     }
 
     private function slugsToDepth($pages, $maxDepth, $currentDepth = 1)

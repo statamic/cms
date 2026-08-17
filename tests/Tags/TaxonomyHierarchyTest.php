@@ -76,6 +76,52 @@ class TaxonomyHierarchyTest extends TestCase
     }
 
     #[Test]
+    public function parent_and_depth_params_work_with_localized_slugs()
+    {
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => '/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => '/fr/'],
+        ]);
+
+        tap(Taxonomy::make('topics')->sites(['en', 'fr'])->structureContents([]))->save();
+
+        foreach ([
+            'animals' => 'animaux',
+            'cat' => 'chat',
+            'calico' => 'calico-fr',
+            'tabby' => 'tigre',
+            'furniture' => 'meubles',
+        ] as $en => $fr) {
+            tap(Term::make($en)->taxonomy('topics'), function ($term) use ($en, $fr) {
+                $term->in('en')->slug($en)->set('title', ucfirst($en));
+                $term->in('fr')->slug($fr)->set('title', ucfirst($fr));
+            })->save();
+        }
+
+        Taxonomy::findByHandle('topics')->structure()->tree()->tree([
+            ['term' => 'animals', 'children' => [
+                ['term' => 'cat', 'children' => [
+                    ['term' => 'calico'],
+                    ['term' => 'tabby'],
+                ]],
+            ]],
+            ['term' => 'furniture'],
+        ])->save();
+
+        $children = $this->terms(['from' => 'topics', 'parent' => 'chat', 'site' => 'fr']);
+        $this->assertEquals(['calico-fr', 'tigre'], $children->map->slug()->sort()->values()->all());
+
+        $descendants = $this->terms(['from' => 'topics', 'parent' => 'animaux', 'depth' => 2, 'site' => 'fr']);
+        $this->assertEquals(['calico-fr', 'chat', 'tigre'], $descendants->map->slug()->sort()->values()->all());
+
+        $top = $this->terms(['from' => 'topics', 'depth' => 1, 'site' => 'fr']);
+        $this->assertEquals(['animaux', 'meubles'], $top->map->slug()->sort()->values()->all());
+
+        $viaDefaultSlug = $this->terms(['from' => 'topics', 'parent' => 'cat', 'site' => 'fr']);
+        $this->assertEquals(['calico-fr', 'tigre'], $viaDefaultSlug->map->slug()->sort()->values()->all());
+    }
+
+    #[Test]
     public function parent_param_is_ignored_on_flat_taxonomies()
     {
         tap(Taxonomy::make('tags'))->save();
