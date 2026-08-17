@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Taxonomies;
 
 use Illuminate\Http\Request;
+use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Site;
 use Statamic\Facades\Term;
 use Statamic\Facades\User;
@@ -15,6 +16,8 @@ class TaxonomyTreeController extends CpController
     public function index(Request $request, $taxonomy)
     {
         $this->authorize('view', $taxonomy);
+
+        throw_unless($taxonomy->hasStructure(), new NotFoundHttpException("Taxonomy [{$taxonomy->handle()}] is not a structured taxonomy"));
 
         $site = $request->site ?? Site::selected()->handle();
 

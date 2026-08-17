@@ -36,6 +36,18 @@ class TaxonomyTreeTest extends TestCase
     }
 
     #[Test]
+    public function it_404s_when_the_taxonomy_is_not_structured()
+    {
+        tap(Taxonomy::make('tags')->title('Tags'))->save();
+        tap(Term::make('alpha')->taxonomy('tags')->data(['title' => 'Alpha']))->save();
+
+        $this
+            ->actingAs(tap(User::make()->makeSuper())->save())
+            ->get(cp_route('taxonomies.tree.index', 'tags'))
+            ->assertNotFound();
+    }
+
+    #[Test]
     public function it_gets_the_tree()
     {
         $taxonomy = $this->makeStructuredTaxonomy();
