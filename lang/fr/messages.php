@@ -235,6 +235,8 @@ return [
     'selections_item_unselected' => ':title n’est pas sélectionné. Cliquez pour le sélectionner.',
     'selections_limit_reached' => 'Limite de sélection atteinte. Impossible de sélectionner :title',
     'selections_select_all' => ':selected éléments sélectionnés sur un total de :total. Cochez la case pour sélectionner tous les éléments.',
+    'session_expiry_dismissed_banner' => 'Votre session est sur le point d’expirer. Cliquez ici pour la prolonger et rester connecté.',
+    'session_expiry_dismissed_login_banner' => 'Votre session a expiré. Cliquez ici pour vous reconnecter.',
     'session_expiry_enter_password' => 'Entrez votre mot de passe pour reprendre là où vous en étiez.',
     'session_expiry_enter_two_factor_code' => 'Entrez votre code d’authentification pour continuer.',
     'session_expiry_enter_two_factor_recovery_code' => 'Entrez un code de récupération pour continuer.',
