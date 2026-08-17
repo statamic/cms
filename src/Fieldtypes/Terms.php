@@ -573,19 +573,27 @@ class Terms extends Relationship
     }
 
     /**
-     * Depth and slug path for a term whose taxonomy is hierarchical.
+     * Depth, slug path, and structured ancestor titles for the relationship UI.
      */
     public function itemHierarchyMeta($term): array
     {
-        if (! $term->taxonomy()?->hierarchical()) {
-            return [];
+        $meta = [];
+
+        if (count($this->getConfiguredTaxonomies()) > 1) {
+            $meta['taxonomy_title'] = __($term->taxonomy()->title());
         }
 
-        $ancestorSlugs = $term->ancestors()->map->slug();
+        if (! $term->taxonomy()?->hierarchical()) {
+            return $meta;
+        }
+
+        $ancestors = $term->ancestors();
 
         return [
+            ...$meta,
             'depth' => $term->depth() ?? 1,
-            'path' => $ancestorSlugs->push($term->slug())->implode('/'),
+            'path' => $ancestors->map->slug()->push($term->slug())->implode('/'),
+            'ancestors' => $ancestors->map->title()->values()->all(),
         ];
     }
 

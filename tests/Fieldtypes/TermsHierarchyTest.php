@@ -106,6 +106,8 @@ class TermsHierarchyTest extends TestCase
 
         $this->assertEquals(2, $item['depth']);
         $this->assertEquals('animals/cat', $item['path']);
+        $this->assertEquals(['Animals'], $item['ancestors']);
+        $this->assertArrayNotHasKey('taxonomy_title', $item);
         $this->assertEquals('Animals', $item['hint']);
     }
 
@@ -124,10 +126,12 @@ class TermsHierarchyTest extends TestCase
 
         $this->assertEquals(1, $byId['categories::animals']['depth']);
         $this->assertEquals('animals', $byId['categories::animals']['path']);
+        $this->assertEquals([], $byId['categories::animals']['ancestors']);
         $this->assertArrayNotHasKey('hint', $byId['categories::animals']);
 
         $this->assertEquals(2, $byId['categories::cat']['depth']);
         $this->assertEquals('animals/cat', $byId['categories::cat']['path']);
+        $this->assertEquals(['Animals'], $byId['categories::cat']['ancestors']);
         $this->assertEquals('Animals', $byId['categories::cat']['hint']);
     }
 
@@ -149,8 +153,11 @@ class TermsHierarchyTest extends TestCase
 
         $this->assertEquals(2, $byId['categories::cat']['depth']);
         $this->assertEquals('animals/cat', $byId['categories::cat']['path']);
+        $this->assertEquals(['Animals'], $byId['categories::cat']['ancestors']);
+        $this->assertEquals('Categories', $byId['categories::cat']['taxonomy_title']);
         $this->assertEquals('Categories • Animals', $byId['categories::cat']['hint']);
         $this->assertArrayNotHasKey('depth', $byId['tags::featured']);
+        $this->assertEquals('Tags', $byId['tags::featured']['taxonomy_title']);
         $this->assertEquals('Tags', $byId['tags::featured']['hint']);
     }
 
@@ -163,6 +170,8 @@ class TermsHierarchyTest extends TestCase
 
         $this->assertEquals(2, $item['depth']);
         $this->assertEquals('animals/cat', $item['path']);
+        $this->assertEquals(['Animals'], $item['ancestors']);
+        $this->assertEquals('Categories', $item['taxonomy_title']);
         $this->assertEquals('Categories • Animals', $item['hint']);
     }
 

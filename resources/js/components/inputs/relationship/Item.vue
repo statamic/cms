@@ -35,7 +35,7 @@
                         aria-hidden="true"
                     />
                 </template>
-                <template v-else-if="item.hint">
+                <template v-else-if="showHintFallback">
                     <span
                         v-text="item.hint"
                         :title="item.hint"
@@ -133,19 +133,19 @@ export default {
 
     computed: {
         hintTaxonomy() {
-            if (!this.item.hint?.includes(' • ') || !this.item.hint.includes(' » ')) return null;
-
-            return this.item.hint.split(' • ')[0];
+            return this.item.taxonomy_title || null;
         },
 
         hintPathSegments() {
-            if (!this.item.hint?.includes(' » ')) return [];
+            return Array.isArray(this.item.ancestors) ? this.item.ancestors : [];
+        },
 
-            const path = this.item.hint.includes(' • ')
-                ? this.item.hint.split(' • ').slice(1).join(' • ')
-                : this.item.hint;
+        showHintFallback() {
+            if (this.item.taxonomy_title || Array.isArray(this.item.ancestors)) {
+                return false;
+            }
 
-            return path.split(' » ');
+            return !!this.item.hint;
         },
     },
 
