@@ -152,7 +152,9 @@ class AuthServiceProvider extends ServiceProvider
                 return null;
             }
 
-            $user = User::fromUser($user);
+            if (! $user = User::fromUser($user)) {
+                return null;
+            }
 
             if ($user->isSuper()) {
                 return true;
