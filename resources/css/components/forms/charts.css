@@ -243,7 +243,8 @@
 }
 
 .vertical-bar-chart__fill {
-    flex: 0 0 calc(var(--value) / var(--max-value) * 100%);
+    flex-grow: 0;
+    flex-shrink: 0;
     width: 100%;
     max-width: 2rem;
     border-radius: 0.25rem 0.25rem 0 0;
@@ -312,9 +313,6 @@
 
             .summary-bar-chart__fill {
                 transform-origin: left center;
-            }
-
-            .summary-bar-chart__fill {
                 animation: bar-chart-reveal 0.75s cubic-bezier(0.33, 1, 0.68, 1) forwards;
             }
         }

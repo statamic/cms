@@ -121,7 +121,6 @@ const preview: Preview = {
                 order: [
                     'Overview',
                     'Components',
-                    'Charts', ['Overview', '*'],
                     '*'
                 ],
                 method: 'alphabetical',

@@ -28,5 +28,5 @@ export default function useSummaryChartType(formHandle, widgetKey, { types = ['b
         chartType.value = type;
     }
 
-    return { chartType, setChartType, types };
+    return { chartType, setChartType };
 }
