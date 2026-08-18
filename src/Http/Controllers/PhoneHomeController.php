@@ -14,7 +14,7 @@ class PhoneHomeController
             throw new NotFoundHttpException;
         }
 
-        $radio->ping();
+        $radio->forcePing();
 
         return response()->json(['success' => true]);
     }

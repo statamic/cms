@@ -22,12 +22,22 @@ class Radio
 
     public function ping(): void
     {
-        if ($this->recentlyPinged()) {
+        if (! $this->markAsPinged()) {
             return;
         }
 
-        $this->markAsPinged();
+        $this->contactOutpost();
+    }
 
+    public function forcePing(): void
+    {
+        $this->cache()->put(self::PING_CACHE_KEY, now()->timestamp, self::PING_INTERVAL);
+
+        $this->contactOutpost();
+    }
+
+    private function contactOutpost(): void
+    {
         try {
             $this->outpost->radio();
         } catch (Throwable $e) {
@@ -35,14 +45,14 @@ class Radio
         }
     }
 
-    private function recentlyPinged(): bool
+    /**
+     * An atomic put-if-absent, so concurrent requests at marker expiry
+     * cannot herd into Outpost together. Returns false when the
+     * marker already exists and the ping should be skipped.
+     */
+    private function markAsPinged(): bool
     {
-        return $this->cache()->has(self::PING_CACHE_KEY);
-    }
-
-    private function markAsPinged(): void
-    {
-        $this->cache()->put(self::PING_CACHE_KEY, now()->timestamp, self::PING_INTERVAL);
+        return $this->cache()->add(self::PING_CACHE_KEY, now()->timestamp, self::PING_INTERVAL);
     }
 
     private function cache(): Repository
@@ -65,6 +75,10 @@ class Radio
 
     public function shouldPingDuringRequest(Request $request): bool
     {
+        if (app()->runningUnitTests()) {
+            return false;
+        }
+
         return $this->isCpRequest($request) && $this->shouldPingRequest($request);
     }
 

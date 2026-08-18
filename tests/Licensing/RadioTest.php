@@ -46,6 +46,19 @@ class RadioTest extends TestCase
     }
 
     #[Test]
+    public function force_pings_bypass_the_throttle_but_still_refresh_it()
+    {
+        $outpost = $this->mock(Outpost::class);
+        $outpost->shouldReceive('radio')->twice();
+
+        $radio = new Radio($outpost);
+
+        $radio->ping();
+        $radio->forcePing(); // Bypasses the throttle.
+        $radio->ping(); // Still throttled.
+    }
+
+    #[Test]
     public function it_swallows_outpost_exceptions()
     {
         $outpost = $this->mock(Outpost::class);
@@ -58,12 +71,13 @@ class RadioTest extends TestCase
     }
 
     #[Test]
-    public function it_pings_during_cp_requests()
+    public function it_does_not_ping_during_cp_requests_during_tests()
     {
         $request = Request::create('/cp/dashboard');
 
-        $this->assertTrue($this->radio()->shouldPingDuringRequest($request));
+        $this->assertFalse($this->radio()->shouldPingDuringRequest($request));
         $this->assertFalse($this->radio()->shouldPingAfterResponse($request));
+        $this->assertTrue($this->radio()->shouldPingRequest($request));
     }
 
     #[Test]
