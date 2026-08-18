@@ -1,5 +1,6 @@
 import { isPlainObject } from 'lodash-es';
 import ShowField from '@/components/field-conditions/ShowField.js';
+import { KEYS } from '@/components/field-conditions/Constants.js';
 
 // A Bard field that has never been scrolled into view has no editor, so it has no set
 // node views either — there is no `bard/Set.vue` to evaluate the conditions of the fields
@@ -46,9 +47,55 @@ export default function evaluateBardSetConditions({ value, setConfigs, fieldPath
         fields.forEach((field) => {
             if (!isPlainObject(field) || !field.handle) return;
 
-            showField.showField(field, `${prefix}.${field.handle}`);
+            const dottedKey = `${prefix}.${field.handle}`;
+
+            if (!conditionsResolveFromPath(field)) {
+                keepValue(container, dottedKey);
+                return;
+            }
+
+            showField.showField(field, dottedKey);
         });
     });
+}
+
+// The field path isn't only a key to write bookkeeping under, it's an input to the
+// conditions themselves: `$parent.` is resolved by walking up it. A Bard set's field path
+// carries two more segments than a Replicator's — `bard.0.attrs.values.foo` against
+// `rep.0.foo` — so the walk lands on a path that doesn't exist and the condition can never
+// pass. That's a pre-existing bug, and a mounted set gets the same wrong answer; the
+// difference is that a mounted set is on screen, whereas here the answer would be applied
+// to a field nobody has ever looked at, and would drop it from every save.
+//
+// So don't answer at all. Keeping a field the blueprint would have dropped is noise;
+// dropping one it would have kept is lost content.
+//
+// Nothing else about a set's conditions reads the field path. `$root.` reads the
+// container's values and a bare or dotted handle reads the set's own, and both are the
+// same values a mounted set would be handed.
+const PARENT_RE = /^\$parent\./;
+
+function conditionsResolveFromPath(field) {
+    return KEYS.filter((key) => field[key]).every((key) => resolvableConditions(field[key]));
+}
+
+function resolvableConditions(conditions) {
+    // A bare string is a custom condition without a target. Its callback is handed the
+    // same field path either way, so there's nothing here a mounted set resolves better.
+    if (typeof conditions === 'string') return true;
+
+    if (!isPlainObject(conditions)) return false;
+
+    return Object.keys(conditions).every((lhs) => !PARENT_RE.test(lhs));
+}
+
+function keepValue(container, dottedKey) {
+    const current = container.hiddenFields.value[dottedKey];
+
+    // Writing unconditionally would retrigger the watcher this runs from.
+    if (current && current.hidden === false && current.omitValue === false) return;
+
+    container.setHiddenField({ dottedKey, hidden: false, omitValue: false });
 }
 
 function fieldList(fields) {

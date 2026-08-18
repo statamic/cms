@@ -62,6 +62,17 @@ const setConfig = {
     ],
 };
 
+// The set's parent is the root, so `driver` being `yes` means this condition passes and
+// the field is kept — if anything could resolve it.
+const parentSetConfig = {
+    handle: 'main',
+    display: 'Main',
+    fields: [
+        { handle: 'always', type: 'text' },
+        { handle: 'parent_conditioned', type: 'text', if: { '$parent.driver': 'equals yes' } },
+    ],
+};
+
 function initialValues() {
     return {
         driver: 'no',
@@ -84,9 +95,27 @@ function initialValues() {
     };
 }
 
-function mountBard() {
-    const values = initialValues();
+function parentInitialValues() {
+    return {
+        driver: 'yes',
+        bard: [
+            {
+                type: 'set',
+                attrs: {
+                    id: 'set-1',
+                    enabled: true,
+                    values: {
+                        type: 'main',
+                        always: 'A',
+                        parent_conditioned: 'P',
+                    },
+                },
+            },
+        ],
+    };
+}
 
+function mountBard(set = setConfig, values = initialValues()) {
     return mount(Container, {
         props: {
             blueprint: { tabs: [] },
@@ -110,7 +139,7 @@ function mountBard() {
                     config: {
                         handle: 'bard',
                         type: 'bard',
-                        sets: [{ handle: 'group', sets: [setConfig] }],
+                        sets: [{ handle: 'group', sets: [set] }],
                         buttons: [],
                     },
                 }),
@@ -198,6 +227,24 @@ describe('bard set save payload when the field is never scrolled into view', () 
             always: 'A',
             local_driver: 'yes',
             local_conditioned: 'L',
+        });
+
+        wrapper.unmount();
+    });
+
+    // `$parent.` is resolved by walking up the field path, and a Bard set's path has two
+    // segments a Replicator's doesn't, so the walk misses and the condition never passes.
+    // A mounted set has the same bug, but there the field is at least on screen; here the
+    // wrong answer would quietly drop a value nobody has ever looked at. Until the
+    // resolution itself is fixed, an unresolvable condition has to keep its value.
+    test('a condition the field path cannot resolve keeps its value in the payload', async () => {
+        const wrapper = mountBard(parentSetConfig, parentInitialValues());
+        await settle();
+
+        expect(setValues(clone(wrapper.vm.visibleValues))).toEqual({
+            type: 'main',
+            always: 'A',
+            parent_conditioned: 'P',
         });
 
         wrapper.unmount();
