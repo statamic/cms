@@ -1,10 +1,12 @@
 <script setup>
-import { ref, watch, nextTick } from 'vue';
+import { ref, watch, nextTick, computed } from 'vue';
 import { Tooltip as VTooltip } from 'floating-vue';
 import DOMPurify from 'dompurify';
 import { useTooltip } from '@/composables/tooltip.js';
+import useCopy from '@/composables/copy';
 
-const { isVisible, content, html, targetEl, persist, hide } = useTooltip();
+const { isVisible, content, html, copyable, targetEl, persist, hide } = useTooltip();
+const { copySupported, copy } = useCopy();
 
 const showTooltip = ref(false);
 const wrapperStyle = ref({});
@@ -12,6 +14,8 @@ const spanStyle = ref({});
 const tooltipKey = ref(0);
 const displayContent = ref('');
 const displayHtml = ref(false);
+const displayCopyable = ref(false);
+const isInteractive = computed(() => displayHtml.value || displayCopyable.value);
 
 function updatePosition() {
     if (!targetEl.value) {
@@ -42,6 +46,7 @@ watch([isVisible, targetEl, content], async ([visible, target]) => {
     if (visible && target) {
         // Update content and position (handles both initial show and target changes)
         displayHtml.value = html.value;
+        displayCopyable.value = copyable.value;
         displayContent.value = displayHtml.value ? DOMPurify.sanitize(content.value ?? '') : content.value;
         updatePosition();
         tooltipKey.value++;
@@ -67,11 +72,20 @@ watch([isVisible, targetEl, content], async ([visible, target]) => {
                 <span :style="spanStyle" />
                 <template #popper>
                     <div
-                        :class="{ 'tooltip-popper-interactive': displayHtml }"
-                        @mouseenter="displayHtml && persist()"
-                        @mouseleave="displayHtml && hide()"
+                        :class="{ 'tooltip-popper-interactive': isInteractive }"
+                        @mouseenter="isInteractive && persist()"
+                        @mouseleave="isInteractive && hide()"
                     >
                         <div v-if="displayHtml" v-html="displayContent" />
+                        <span
+                            v-else-if="displayCopyable && copySupported"
+                            class="cursor-pointer"
+                            role="button"
+                            tabindex="0"
+                            :aria-label="__('Copy')"
+                            @click.stop="copy(displayContent)"
+                            @keydown.enter.prevent="copy(displayContent)"
+                        >{{ displayContent }}</span>
                         <template v-else>{{ displayContent }}</template>
                     </div>
                 </template>

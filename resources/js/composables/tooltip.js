@@ -3,6 +3,7 @@ import { ref, shallowRef, readonly } from 'vue';
 const isVisible = ref(false);
 const content = ref('');
 const html = ref(false);
+const copyable = ref(false);
 const targetEl = shallowRef(null);
 
 let hideTimeout = null;
@@ -14,12 +15,15 @@ function setContent(el, options) {
     if (typeof options === 'string') {
         content.value = options;
         html.value = false;
+        copyable.value = false;
     } else if (options && typeof options === 'object') {
         content.value = options.content || '';
         html.value = options.html || false;
+        copyable.value = options.copyable || false;
     } else {
         content.value = '';
         html.value = false;
+        copyable.value = false;
     }
 }
 
@@ -65,7 +69,8 @@ function hide() {
         targetEl.value = null;
         content.value = '';
         html.value = false;
-    }, html.value ? 200 : 50);
+        copyable.value = false;
+    }, html.value || copyable.value ? 200 : 50);
 }
 
 export function useTooltip() {
@@ -73,6 +78,7 @@ export function useTooltip() {
         isVisible: readonly(isVisible),
         content: readonly(content),
         html: readonly(html),
+        copyable: readonly(copyable),
         targetEl: readonly(targetEl),
         show,
         persist,

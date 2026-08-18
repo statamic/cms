@@ -284,7 +284,7 @@ const fieldtypeComponentEvents = computed(() => ({
                         />
                     </Transition>
                     <template v-if="shouldShowLabelText">
-                        <span v-tooltip="config.handle">
+                        <span v-tooltip="{ content: config.handle, copyable: true }">
                             {{ __(config.display) }}
                         </span>
                     </template>
