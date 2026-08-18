@@ -8,6 +8,7 @@ use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Glide;
 use Statamic\Facades\Path;
+use Statamic\Facades\User;
 use Statamic\Support\Str;
 
 use function Statamic\trans as __;
@@ -68,6 +69,10 @@ class MoveAsset extends Action
                     : __('statamic::messages.asset_conflict_a_newer');
 
                 if ($strategy === 'overwrite') {
+                    if ($existingAsset && ! User::current()->can('delete', $existingAsset)) {
+                        throw new \Exception(__('You are not authorized to delete this asset.'));
+                    }
+
                     if ($existingAsset) {
                         $existingAsset->delete();
                     } else {

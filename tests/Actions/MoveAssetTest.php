@@ -214,6 +214,54 @@ class MoveAssetTest extends TestCase
     }
 
     #[Test]
+    public function it_cannot_overwrite_without_delete_permission(): void
+    {
+        $this->createAsset('source/logo.svg', 'new');
+        $this->createAsset('target/logo.svg', 'existing');
+
+        $this->setTestRoles([
+            'mover' => ['access cp', 'move test_container assets'],
+        ]);
+
+        $this
+            ->actingAs(tap(User::make()->assignRole('mover'))->save())
+            ->move('source/logo.svg', 'target', 'overwrite')
+            ->assertOk()
+            ->assertJson([
+                'success' => false,
+                'message' => 'You are not authorized to delete this asset.',
+            ]);
+
+        Storage::disk('test')->assertExists('source/logo.svg');
+        Storage::disk('test')->assertExists('target/logo.svg');
+        $this->assertEquals('new', Storage::disk('test')->get('source/logo.svg'));
+        $this->assertEquals('existing', Storage::disk('test')->get('target/logo.svg'));
+    }
+
+    #[Test]
+    public function it_can_overwrite_when_user_has_move_and_delete_permissions(): void
+    {
+        $this->createAsset('source/logo.svg', 'new');
+        $this->createAsset('target/logo.svg', 'existing');
+
+        $this->setTestRoles([
+            'mover' => ['access cp', 'move test_container assets', 'delete test_container assets'],
+        ]);
+
+        $this
+            ->actingAs(tap(User::make()->assignRole('mover'))->save())
+            ->move('source/logo.svg', 'target', 'overwrite')
+            ->assertOk()
+            ->assertJson([
+                'success' => true,
+            ]);
+
+        Storage::disk('test')->assertMissing('source/logo.svg');
+        Storage::disk('test')->assertExists('target/logo.svg');
+        $this->assertEquals('new', Storage::disk('test')->get('target/logo.svg'));
+    }
+
+    #[Test]
     public function it_can_keep_both_with_timestamp_strategy(): void
     {
         Carbon::setTestNow(Carbon::createFromTimestamp(1712000000, config('app.timezone')));
