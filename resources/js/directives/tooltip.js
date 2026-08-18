@@ -1,6 +1,6 @@
 import { useTooltip } from '@/composables/tooltip.js';
 
-const { show, hide } = useTooltip();
+const { show, hide, dismissFor } = useTooltip();
 
 function getOptions(binding) {
     const value = binding.value;
@@ -19,24 +19,17 @@ function handleMouseEnter(el, binding) {
     }
 }
 
-function handleMouseLeave(event) {
-    if (event.relatedTarget?.closest?.('.v-popper__popper')) {
-        return;
-    }
-
-    hide();
-}
-
 export default {
     mounted(el, binding) {
         el._tooltipBinding = binding;
         el._tooltipMouseEnter = () => handleMouseEnter(el, el._tooltipBinding);
-        el._tooltipMouseLeave = handleMouseLeave;
+        el._tooltipMouseLeave = hide;
+        el._tooltipBlur = () => dismissFor(el);
 
         el.addEventListener('mouseenter', el._tooltipMouseEnter);
         el.addEventListener('mouseleave', el._tooltipMouseLeave);
         el.addEventListener('focus', el._tooltipMouseEnter);
-        el.addEventListener('blur', el._tooltipMouseLeave);
+        el.addEventListener('blur', el._tooltipBlur);
     },
 
     updated(el, binding) {
@@ -47,7 +40,7 @@ export default {
         el.removeEventListener('mouseenter', el._tooltipMouseEnter);
         el.removeEventListener('mouseleave', el._tooltipMouseLeave);
         el.removeEventListener('focus', el._tooltipMouseEnter);
-        el.removeEventListener('blur', el._tooltipMouseLeave);
-        hide();
+        el.removeEventListener('blur', el._tooltipBlur);
+        dismissFor(el);
     },
 };

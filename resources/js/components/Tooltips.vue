@@ -5,7 +5,7 @@ import DOMPurify from 'dompurify';
 import { useTooltip } from '@/composables/tooltip.js';
 import useCopy from '@/composables/copy';
 
-const { isVisible, content, html, copyable, targetEl, persist, hide } = useTooltip();
+const { isVisible, content, html, copyable, targetEl, registerContentEl } = useTooltip();
 const { copySupported, copy } = useCopy();
 
 const showTooltip = ref(false);
@@ -67,19 +67,18 @@ watch([isVisible, targetEl, content], async ([visible, target]) => {
                 :shown="showTooltip"
                 :triggers="[]"
                 placement="top"
-                :distance="10"
+                :distance="6"
             >
                 <span :style="spanStyle" />
                 <template #popper>
                     <div
+                        :ref="registerContentEl"
                         :class="{ 'tooltip-popper-interactive': isInteractive }"
-                        @mouseenter="isInteractive && persist()"
-                        @mouseleave="isInteractive && hide()"
                     >
                         <div v-if="displayHtml" v-html="displayContent" />
                         <span
                             v-else-if="displayCopyable && copySupported"
-                            class="cursor-pointer"
+                            class="cursor-pointer hover:underline"
                             role="button"
                             tabindex="0"
                             :aria-label="__('Copy')"
