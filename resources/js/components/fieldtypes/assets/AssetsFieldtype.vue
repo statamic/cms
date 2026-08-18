@@ -173,6 +173,8 @@
             </div>
         </uploader>
 
+        <UploadConflictModal :uploads="uploads" />
+
         <Stack v-model:open="showSelector" inset :show-close-button="false">
             <Selector
                 :container="container"
@@ -196,6 +198,7 @@ import AssetTile from './AssetTile.vue';
 import Selector from '../../assets/Selector.vue';
 import Uploader from '../../assets/Uploader.vue';
 import Uploads from '../../assets/Uploads.vue';
+import UploadConflictModal from '../../assets/UploadConflictModal.vue';
 import { SortableList } from '../../sortable/Sortable';
 import { isEqual } from 'lodash-es';
 import { Button, Dropdown, DropdownMenu, DropdownItem, Stack } from '@/components/ui';
@@ -210,6 +213,7 @@ export default {
         Selector,
         Uploader,
         Uploads,
+        UploadConflictModal,
         SortableList,
         Dropdown,
         DropdownMenu,
@@ -567,7 +571,10 @@ export default {
          */
         uploadError(upload, uploads) {
             this.uploads = uploads;
-            this.$toast.error(upload.errorMessage);
+
+            if (upload.errorStatus !== 409) {
+                this.$toast.error(upload.errorMessage);
+            }
         },
 
         /**
