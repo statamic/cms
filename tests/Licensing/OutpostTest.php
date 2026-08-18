@@ -57,6 +57,30 @@ class OutpostTest extends TestCase
     }
 
     #[Test]
+    public function it_resolves_the_host_from_the_app_url_in_console()
+    {
+        $this->assertEquals(
+            'mysite.com',
+            Outpost::resolveHost('localhost', 'https://mysite.com', inConsole: true, inTests: false)
+        );
+
+        $this->assertEquals(
+            'localhost',
+            Outpost::resolveHost('localhost', 'https://mysite.com', inConsole: true, inTests: true)
+        );
+
+        $this->assertEquals(
+            'localhost',
+            Outpost::resolveHost('localhost', 'https://mysite.com', inConsole: false, inTests: false)
+        );
+
+        $this->assertEquals(
+            'localhost',
+            Outpost::resolveHost('localhost', null, inConsole: true, inTests: false)
+        );
+    }
+
+    #[Test]
     public function it_contacts_the_outpost_and_caches_the_response()
     {
         $outpost = $this->outpostWithJsonResponse(['foo' => 'bar']);
