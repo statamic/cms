@@ -5,6 +5,7 @@ namespace Statamic\Http\Controllers\CP\Forms;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Statamic\CP\Column;
+use Statamic\CP\Columns;
 use Statamic\Events\FormSubmitted;
 use Statamic\Facades\Scope;
 use Statamic\Facades\Site;
@@ -37,6 +38,10 @@ class FormSubmissionsController extends CpController
             ->blueprint()
             ->columns()
             ->prepend(Column::make('status'), 'status')
+            ->when(
+                $form->hasUniqueInstances(),
+                fn (Columns $columns) => $columns->prepend(Column::make('entry')->fieldtype('relationship')->sortable(false), 'entry')
+            )
             ->prepend(Column::make('datestamp'), 'datestamp')
             ->setPreferred("forms.{$form->handle()}.columns")
             ->rejectUnlisted()
@@ -91,7 +96,7 @@ class FormSubmissionsController extends CpController
         $submissions = $query->paginate(Statamic::cpPerPage(request('perPage')));
 
         return (new Submissions($submissions))
-            ->blueprint($form->blueprint())
+            ->form($form)
             ->columnPreferenceKey("forms.{$form->handle()}.columns")
             ->additional(['meta' => [
                 'activeFilterBadges' => $activeFilterBadges,
