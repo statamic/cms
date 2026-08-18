@@ -70,8 +70,13 @@ export const TestRendersAccessibleChartAndScalesBars: Story = {
     play: async ({canvasElement}) => {
         const canvas = within(canvasElement);
         const chart = canvas.getByRole('img', {name: /Rating distribution/});
+        const bars = chart.querySelector('.vertical-bar-chart') as HTMLElement;
+        const fill = chart.querySelector('.vertical-bar-chart__fill') as HTMLElement;
 
         expect(chart).toBeVisible();
-        expect(chart.querySelector('.vertical-bar-chart__fill')).toHaveStyle({flexBasis: `${(10 / 35) * 100}%`});
+        expect(getComputedStyle(chart).display).toBe('grid');
+        expect(getComputedStyle(bars).display).toBe('flex');
+        expect(getComputedStyle(fill).maxWidth).toBe('32px');
+        expect(fill).toHaveStyle({flexBasis: `${(10 / 35) * 100}%`});
     },
 };

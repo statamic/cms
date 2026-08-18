@@ -49,8 +49,11 @@ export const TestRendersAccessibleChartAndImages: Story = {
     tags: ['!dev', 'test'],
     play: async ({canvasElement}) => {
         const canvas = within(canvasElement);
+        const chart = canvas.getByRole('img', {name: /Destinations/});
 
-        expect(canvas.getByRole('img', {name: /Destinations/})).toBeVisible();
+        expect(chart).toBeVisible();
         expect(canvasElement.querySelectorAll('img')).toHaveLength(2);
+        expect(getComputedStyle(chart).width).toBe('144px');
+        expect(getComputedStyle(chart.querySelector('.image-pie-chart__disc') as HTMLElement).borderRadius).toBe('50%');
     },
 };
