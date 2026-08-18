@@ -209,31 +209,10 @@
             </template>
         </Modal>
 
-        <Modal
-            :open="showUploadConflictModal"
-            :title="__('messages.asset_conflict_title')"
-            @update:open="onUploadConflictModalOpenUpdated"
-        >
-            <p>{{ uploadConflictMessage }}</p>
-
-            <template #footer>
-                <div class="flex items-center justify-between gap-2 ps-2 pt-3 pb-1">
-                    <div>
-                        <Checkbox
-                            v-if="showUploadConflictApplyToAll"
-                            :model-value="uploadConflictApplyToAll"
-                            :label="__('messages.asset_conflict_apply_to_all')"
-                            @update:model-value="uploadConflictApplyToAll = $event"
-                        />
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <Button variant="ghost" :text="__('messages.asset_conflict_cancel')" @click="resolveUploadConflict('cancel')" />
-                        <Button variant="default" :text="__('messages.asset_conflict_keep_both')" @click="resolveUploadConflict('timestamp')" />
-                        <Button variant="danger" :text="__('messages.asset_conflict_overwrite')" @click="resolveUploadConflict('overwrite')" />
-                    </div>
-                </div>
-            </template>
-        </Modal>
+        <UploadConflictModal
+            :uploads="uploads"
+            :allow-selecting-existing="allowSelectingExistingUpload"
+        />
     </div>
 </template>
 
@@ -245,6 +224,7 @@ import Table from './Table.vue';
 import HasPreferences from '../../data-list/HasPreferences';
 import Uploader from '../Uploader.vue';
 import Uploads from '../Uploads.vue';
+import UploadConflictModal from '../UploadConflictModal.vue';
 import { debounce, sortBy } from 'lodash-es';
 import {
     Header,
@@ -288,6 +268,7 @@ export default {
         AssetEditor,
         Uploader,
         Uploads,
+        UploadConflictModal,
         Grid,
         Table,
         Header,
@@ -362,12 +343,6 @@ export default {
             creatingFolder: false,
             creatingFolderError: false,
             uploads: [],
-            uploadConflictPolicy: null,
-            uploadConflictApplyToAll: false,
-            uploadConflictUploadId: null,
-            uploadConflictMessage: '',
-            showUploadConflictModal: false,
-            uploadConflictQueue: [],
             moveConflictContext: null,
             moveConflictMessage: '',
             showMoveConflictModal: false,
@@ -517,10 +492,6 @@ export default {
         showMoveConflictApplyToAll() {
             return (this.moveConflictContext?.pendingSelections?.length || 0) > 1;
         },
-
-        showUploadConflictApplyToAll() {
-            return this.uploads.filter((upload) => upload.errorStatus === 409).length > 1;
-        },
     },
 
     mounted() {
@@ -601,19 +572,6 @@ export default {
             }
 
             this.resolveMoveConflict('cancel');
-        },
-
-        onUploadConflictModalOpenUpdated(open) {
-            if (open) {
-                this.showUploadConflictModal = true;
-                return;
-            }
-
-            if (!this.showUploadConflictModal) {
-                return;
-            }
-
-            this.resolveUploadConflict('cancel');
         },
 
         filtersUpdated(filters) {
@@ -869,91 +827,11 @@ export default {
 
             if (upload.errorStatus !== 409) {
                 this.$toast.error(upload.errorMessage);
-                return;
             }
-
-            if (this.uploadConflictPolicy) {
-                this.applyUploadConflict(upload, this.uploadConflictPolicy);
-                return;
-            }
-
-            this.enqueueUploadConflict(upload.id);
-            this.openNextUploadConflictFromQueue();
         },
 
         uploadsUpdated(uploads) {
             this.uploads = uploads;
-
-            if (uploads.length === 0) {
-                this.uploadConflictPolicy = null;
-                this.uploadConflictApplyToAll = false;
-                this.uploadConflictQueue = [];
-                this.uploadConflictUploadId = null;
-                this.showUploadConflictModal = false;
-            } else {
-                const uploadIds = new Set(uploads.map((upload) => upload.id));
-                this.uploadConflictQueue = this.uploadConflictQueue.filter((id) => uploadIds.has(id));
-            }
-        },
-
-        getUploadById(id) {
-            return this.uploads.find((upload) => upload.id === id);
-        },
-
-        openUploadConflictModal(upload) {
-            this.uploadConflictUploadId = upload.id;
-            this.uploadConflictMessage = __('messages.asset_upload_conflict_message', {
-                filename: upload.basename,
-            });
-            this.showUploadConflictModal = true;
-        },
-
-        resolveUploadConflict(strategy) {
-            const currentConflictUploadId = this.uploadConflictUploadId;
-            const upload = this.getUploadById(this.uploadConflictUploadId);
-
-            if (this.uploadConflictApplyToAll) {
-                this.uploadConflictPolicy = strategy;
-
-                this.uploads
-                    .filter((item) => item.errorStatus === 409)
-                    .forEach((item) => this.applyUploadConflict(item, strategy));
-
-                this.uploadConflictQueue = [];
-                this.uploadConflictUploadId = null;
-                this.uploadConflictMessage = '';
-                this.showUploadConflictModal = false;
-            } else if (upload) {
-                this.applyUploadConflict(upload, strategy);
-                this.dequeueUploadConflict(currentConflictUploadId);
-                this.uploadConflictUploadId = null;
-                this.uploadConflictMessage = '';
-
-                // Keep the same modal open and dynamically swap to the next conflict.
-                const hasNextConflict = this.openNextUploadConflictFromQueue();
-
-                if (!hasNextConflict) {
-                    this.showUploadConflictModal = false;
-                }
-            } else {
-                this.showUploadConflictModal = false;
-            }
-
-            this.uploadConflictApplyToAll = false;
-        },
-
-        applyUploadConflict(upload, strategy) {
-            if (strategy === 'cancel') {
-                upload.skip();
-                return;
-            }
-
-            upload.retry({
-                option: strategy,
-            }, {
-                conflict: upload.conflict,
-                resolution: strategy,
-            });
         },
 
         getUploadConflictCacheBustUrls(upload) {
@@ -977,48 +855,6 @@ export default {
             }
 
             return [existingAsset.preview, existingAsset.thumbnail].filter(Boolean);
-        },
-
-        enqueueUploadConflict(id) {
-            if (!id || this.uploadConflictQueue.includes(id)) {
-                return;
-            }
-
-            this.uploadConflictQueue.push(id);
-        },
-
-        dequeueUploadConflict(id) {
-            if (!id) {
-                return;
-            }
-
-            this.uploadConflictQueue = this.uploadConflictQueue.filter((queuedId) => queuedId !== id);
-        },
-
-        openNextUploadConflictFromQueue() {
-            if (this.showUploadConflictModal || this.uploadConflictPolicy) {
-                if (!this.uploadConflictUploadId) {
-                    // Modal is visible but no active conflict selected yet.
-                    // Continue to resolve the next queued conflict.
-                } else {
-                    return false;
-                }
-            }
-
-            while (this.uploadConflictQueue.length > 0) {
-                const nextConflictId = this.uploadConflictQueue[0];
-                const nextConflict = this.getUploadById(nextConflictId);
-
-                if (!nextConflict || nextConflict.errorStatus !== 409) {
-                    this.uploadConflictQueue.shift();
-                    continue;
-                }
-
-                this.openUploadConflictModal(nextConflict);
-                return true;
-            }
-
-            return false;
         },
 
         openMoveConflictModal({ action, asset, destinationFolder, selections, message, conflict, completedMoves }) {
