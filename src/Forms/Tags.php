@@ -99,9 +99,11 @@ class Tags extends BaseTags
             $data['previous_page_url'] = $this->previousPageUrl();
         }
 
-        $data['restricted'] = $form->restricted();
-        $data['restriction_message'] = $form->restrictionMessage();
-        $data['status'] = $form->status();
+        $instance = $form->instance($form->hasUniqueInstances() ? $this->context->value('id') : null);
+
+        $data['restricted'] = $instance->restricted();
+        $data['restriction_message'] = $instance->restrictionMessage();
+        $data['status'] = $instance->status();
 
         if ($jsDriver) {
             $data['js_driver'] = $jsDriver->handle();
@@ -142,6 +144,10 @@ class Tags extends BaseTags
 
         if ($form->hasMultiplePages()) {
             $params['page'] = Arr::get($this->currentPage(), 'id');
+        }
+
+        if ($entry = $instance->entry()) {
+            $params['entry'] = $entry;
         }
 
         if (! $this->canParseContents()) {

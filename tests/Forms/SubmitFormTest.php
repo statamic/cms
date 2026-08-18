@@ -16,12 +16,14 @@ use Statamic\Exceptions\FormRestrictedException;
 use Statamic\Exceptions\SilentFormFailureException;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\Fieldset;
 use Statamic\Facades\Form;
 use Statamic\Forms\CreateAssetsFromFileUploads;
 use Statamic\Forms\SendEmails;
 use Statamic\Forms\SubmissionResult;
 use Statamic\Forms\SubmitForm;
+use Tests\Factories\EntryFactory;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -1164,6 +1166,78 @@ class SubmitFormTest extends TestCase
         $this->assertTrue($result->isFinalized());
 
         $form->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function it_attaches_the_entry_when_unique_instances_is_enabled()
+    {
+        (new EntryFactory)->collection('events')->id('event-1')->slug('event-one')->create();
+
+        $this->form->set('unique_instances', true)->save();
+
+        $result = $this->action()->entry('event-1')->submit(['email' => 'san@holo.com']);
+
+        $this->assertEquals('event-1', $result->submission->get('entry'));
+    }
+
+    #[Test]
+    public function it_rejects_the_submission_when_unique_instances_is_enabled_and_no_entry_is_provided()
+    {
+        $this->form->set('unique_instances', true)->save();
+
+        $this->expectException(ValidationException::class);
+
+        $this->action()->submit(['email' => 'san@holo.com']);
+    }
+
+    #[Test]
+    public function it_rejects_the_submission_when_the_entry_does_not_exist()
+    {
+        $this->form->set('unique_instances', true)->save();
+
+        $this->expectException(ValidationException::class);
+
+        $this->action()->entry('missing')->submit(['email' => 'san@holo.com']);
+    }
+
+    #[Test]
+    public function it_ignores_the_entry_when_unique_instances_is_disabled()
+    {
+        (new EntryFactory)->collection('events')->id('event-1')->slug('event-one')->create();
+
+        $result = $this->action()->entry('event-1')->submit(['email' => 'san@holo.com']);
+
+        $this->assertFalse($result->submission->has('entry'));
+    }
+
+    #[Test]
+    public function it_rejects_the_submission_when_an_entry_override_restricts_the_form()
+    {
+        Blueprint::make('event')->setNamespace('collections.events')->setContents(['fields' => [
+            ['handle' => 'rsvp_form', 'field' => ['type' => 'form', 'max_items' => 1]],
+        ]])->save();
+
+        (new EntryFactory)->collection('events')->id('event-1')->slug('event-one')->data([
+            'rsvp_form' => ['form' => 'contact', 'config' => ['close_date' => '2020-01-01 09:00']],
+        ])->create();
+
+        $this->form->set('unique_instances', true)->save();
+
+        $this->expectException(FormRestrictedException::class);
+
+        $this->action()->entry('event-1')->submit(['email' => 'san@holo.com']);
+    }
+
+    #[Test]
+    public function it_ignores_unique_instances_when_forms_pro_is_not_installed()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturnFalse();
+
+        $this->form->set('unique_instances', true)->save();
+
+        $result = $this->action()->submit(['email' => 'san@holo.com']);
+
+        $this->assertFalse($result->submission->has('entry'));
     }
 
     private function uploadForm(bool $honeypot = false)

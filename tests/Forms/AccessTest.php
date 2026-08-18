@@ -6,9 +6,11 @@ use Carbon\Carbon;
 use Facades\Statamic\Console\Processes\Composer;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blink;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
 use Statamic\Facades\Parse;
 use Statamic\Facades\User;
+use Tests\Factories\EntryFactory;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -50,7 +52,7 @@ class AccessTest extends TestCase
         )->save();
     }
 
-    protected function submit($form, $count = 1, $partial = false)
+    protected function submit($form, $count = 1, $partial = false, $entry = null)
     {
         for ($i = 0; $i < $count; $i++) {
             $submission = $form->makeSubmission()->id(Carbon::now()->timestamp - $this->submissionId++);
@@ -59,8 +61,22 @@ class AccessTest extends TestCase
                 $submission->set('partial', true);
             }
 
+            if ($entry) {
+                $submission->set('entry', $entry);
+            }
+
             $submission->save();
         }
+    }
+
+    private function makeEntry(string $id, array $formValue): void
+    {
+        Blueprint::make('event')->setNamespace('collections.events')->setContents(['fields' => [
+            ['handle' => 'title', 'field' => ['type' => 'text']],
+            ['handle' => 'rsvp_form', 'field' => ['type' => 'form', 'max_items' => 1]],
+        ]])->save();
+
+        (new EntryFactory)->collection('events')->id($id)->slug($id)->data(['rsvp_form' => $formValue])->create();
     }
 
     #[Test]
@@ -100,6 +116,59 @@ class AccessTest extends TestCase
         $this->submit($form, 1);
         $this->assertTrue($form->restricted());
         $this->assertEquals('This form is no longer accepting submissions.', $form->restrictionMessage());
+    }
+
+    #[Test]
+    public function the_submission_limit_is_scoped_per_entry_when_unique_instances_is_enabled()
+    {
+        $form = $this->makeForm(['submission_limit' => 2, 'unique_instances' => true]);
+
+        $this->submit($form, 2, entry: 'event-1');
+        $this->submit($form, 1, entry: 'event-2');
+
+        $this->assertTrue($form->instance('event-1')->restricted());
+        $this->assertEquals('limit_reached', $form->instance('event-1')->status());
+
+        $this->assertFalse($form->instance('event-2')->restricted());
+        $this->assertEquals('open', $form->instance('event-2')->status());
+    }
+
+    #[Test]
+    public function an_entry_can_override_the_submission_limit()
+    {
+        $form = $this->makeForm(['submission_limit' => 5, 'unique_instances' => true]);
+
+        $this->makeEntry('event-1', ['form' => 'contact', 'config' => ['submission_limit' => 1]]);
+
+        $this->submit($form, 1, entry: 'event-1');
+
+        $this->assertTrue($form->instance('event-1')->restricted());
+        $this->assertFalse($form->restricted());
+    }
+
+    #[Test]
+    public function an_entry_can_override_the_close_date_and_message()
+    {
+        $form = $this->makeForm(['unique_instances' => true]);
+
+        $this->makeEntry('event-1', ['form' => 'contact', 'config' => [
+            'close_date' => '2026-07-01 09:00',
+            'closed_message' => 'This event is full.',
+        ]]);
+
+        $this->assertTrue($form->instance('event-1')->restricted());
+        $this->assertEquals('This event is full.', $form->instance('event-1')->restrictionMessage());
+        $this->assertFalse($form->restricted());
+    }
+
+    #[Test]
+    public function overrides_from_an_entry_using_a_different_form_are_ignored()
+    {
+        $form = $this->makeForm(['unique_instances' => true]);
+
+        $this->makeEntry('event-1', ['form' => 'another_form', 'config' => ['close_date' => '2026-07-01 09:00']]);
+
+        $this->assertFalse($form->instance('event-1')->restricted());
     }
 
     #[Test]
