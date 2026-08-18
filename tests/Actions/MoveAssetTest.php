@@ -194,6 +194,26 @@ class MoveAssetTest extends TestCase
     }
 
     #[Test]
+    public function it_overwrites_a_destination_file_that_has_no_asset_record(): void
+    {
+        $this->createAsset('source/logo.svg', 'new');
+        Storage::disk('test')->put('target/logo.svg', 'existing');
+
+        $this
+            ->actingAs(tap(User::make()->makeSuper())->save())
+            ->move('source/logo.svg', 'target', 'overwrite')
+            ->assertOk()
+            ->assertJson([
+                'success' => true,
+            ]);
+
+        Storage::disk('test')->assertMissing('source/logo.svg');
+        Storage::disk('test')->assertExists('target/logo.svg');
+        $this->assertEquals('new', Storage::disk('test')->get('target/logo.svg'));
+        $this->assertSame(['test_container::target/logo.svg'], $this->container->assets('/', true)->pluck('id')->values()->all());
+    }
+
+    #[Test]
     public function it_can_keep_both_with_timestamp_strategy(): void
     {
         Carbon::setTestNow(Carbon::createFromTimestamp(1712000000, config('app.timezone')));
