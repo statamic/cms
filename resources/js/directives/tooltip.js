@@ -12,45 +12,6 @@ function getOptions(binding) {
     return value;
 }
 
-function isHtmlTooltip(binding) {
-    const options = getOptions(binding);
-
-    return !!(options && typeof options === 'object' && options.html);
-}
-
-function isNativelyFocusable(el) {
-    const tag = el.tagName;
-
-    return (
-        ['A', 'BUTTON', 'INPUT', 'SELECT', 'TEXTAREA', 'SUMMARY'].includes(tag) ||
-        el.isContentEditable
-    );
-}
-
-function wantsAddedTabIndex(el, binding) {
-    if (!isHtmlTooltip(binding)) return false;
-    if (isNativelyFocusable(el) || el.closest('label')) return false;
-    if (el.hasAttribute('tabindex') && !el._tooltipAddedTabIndex) return false;
-
-    return true;
-}
-
-function syncTabIndex(el, binding) {
-    if (wantsAddedTabIndex(el, binding)) {
-        if (el._tooltipAddedTabIndex) return;
-
-        el.tabIndex = 0;
-        el._tooltipAddedTabIndex = true;
-
-        return;
-    }
-
-    if (el._tooltipAddedTabIndex) {
-        el.removeAttribute('tabindex');
-        delete el._tooltipAddedTabIndex;
-    }
-}
-
 function handleMouseEnter(el, binding) {
     const options = getOptions(binding);
     if (options) {
@@ -65,8 +26,6 @@ export default {
         el._tooltipMouseLeave = hide;
         el._tooltipBlur = (event) => dismissFor(el, event);
 
-        syncTabIndex(el, binding);
-
         el.addEventListener('mouseenter', el._tooltipMouseEnter);
         el.addEventListener('mouseleave', el._tooltipMouseLeave);
         el.addEventListener('focus', el._tooltipMouseEnter);
@@ -75,7 +34,6 @@ export default {
 
     updated(el, binding) {
         el._tooltipBinding = binding;
-        syncTabIndex(el, binding);
     },
 
     beforeUnmount(el) {
@@ -83,10 +41,6 @@ export default {
         el.removeEventListener('mouseleave', el._tooltipMouseLeave);
         el.removeEventListener('focus', el._tooltipMouseEnter);
         el.removeEventListener('blur', el._tooltipBlur);
-        if (el._tooltipAddedTabIndex) {
-            el.removeAttribute('tabindex');
-            delete el._tooltipAddedTabIndex;
-        }
         dismissFor(el);
     },
 };
