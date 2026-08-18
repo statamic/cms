@@ -1,5 +1,5 @@
 import { test, expect, vi, beforeEach, afterEach } from 'vitest';
-import { createMountScheduler } from '../util/createMountScheduler.js';
+import { createMountScheduler, flushMountSchedulers } from '../util/createMountScheduler.js';
 import { mount } from '@vue/test-utils';
 import { nextTick, ref, h } from 'vue';
 
@@ -279,4 +279,96 @@ test('scheduler resumes cleanly after an earlier flush completes', async () => {
     scheduler.schedule(() => results.push('c'));
     await flushTick();
     expect(results).toEqual(['a', 'b', 'c']);
+});
+
+// A save reads the condition bookkeeping that deferred set bodies do when they mount, so
+// it has to be able to drain the queue on demand rather than waiting for idle. None of
+// these tests advance a timer: draining must not depend on requestIdleCallback or
+// requestAnimationFrame, neither of which a browser reliably fires in a background tab.
+
+test('flushMountSchedulers drains queued callbacks without waiting for idle', async () => {
+    const scheduler = createMountScheduler();
+    const results = [];
+
+    scheduler.schedule(() => results.push('a'));
+    scheduler.schedule(() => results.push('b'));
+
+    expect(results).toEqual([]);
+
+    await flushMountSchedulers();
+
+    expect(results).toEqual(['a', 'b']);
+});
+
+test('flushMountSchedulers drains work queued by the callbacks it runs', async () => {
+    const outer = createMountScheduler();
+    const inner = createMountScheduler();
+    const results = [];
+
+    // A set being mounted can prewarm sets nested inside it, and those use their own
+    // scheduler.
+    outer.schedule(() => {
+        results.push('outer');
+        inner.schedule(() => results.push('inner'));
+    });
+
+    await flushMountSchedulers();
+
+    expect(results).toEqual(['outer', 'inner']);
+});
+
+test('flushMountSchedulers keeps going after a callback throws', async () => {
+    const scheduler = createMountScheduler();
+    const results = [];
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    scheduler.schedule(() => { throw new Error('nope'); });
+    scheduler.schedule(() => results.push('b'));
+
+    await flushMountSchedulers();
+
+    expect(results).toEqual(['b']);
+    consoleError.mockRestore();
+});
+
+test('flushMountSchedulers ignores a callback that never settles', async () => {
+    const scheduler = createMountScheduler();
+    const results = [];
+
+    // Awaiting this would hang the save, and a locked form is worse than a stale field.
+    scheduler.schedule(() => new Promise(() => {}));
+    scheduler.schedule(() => results.push('b'));
+
+    await flushMountSchedulers();
+
+    expect(results).toEqual(['b']);
+});
+
+test('flushMountSchedulers gives up rather than hanging on a callback that keeps rescheduling', async () => {
+    const scheduler = createMountScheduler();
+    let runs = 0;
+
+    const reschedule = () => {
+        runs++;
+        scheduler.schedule(reschedule);
+    };
+    scheduler.schedule(reschedule);
+
+    const consoleWarn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    await flushMountSchedulers({ timeoutMs: 20 });
+
+    expect(runs).toBeGreaterThan(0);
+    consoleWarn.mockRestore();
+});
+
+test('a settled queue is not retained, so a later flush is a no-op', async () => {
+    const scheduler = createMountScheduler();
+    const results = [];
+
+    scheduler.schedule(() => results.push('a'));
+    await flushMountSchedulers();
+    await flushMountSchedulers();
+
+    expect(results).toEqual(['a']);
 });

@@ -2,6 +2,7 @@ import axios from 'axios';
 import resetValuesFromResponse from '@/util/resetValuesFromResponse.js';
 import { reveal } from '@api';
 import { UPDATE_DEBOUNCE_MS } from '@/components/fieldtypes/constants';
+import { flushMountSchedulers } from '@/util/createMountScheduler.js';
 
 let container = null;
 let errors = null;
@@ -16,8 +17,13 @@ export class Pipeline {
     }
 
     async through(steps) {
-        // Wait just past the fieldtype update debounce so any in-flight value updates are flushed first.
-        const initialPromise = new Promise((resolve) => setTimeout(resolve, UPDATE_DEBOUNCE_MS + 1));
+        // Wait just past the fieldtype update debounce so any in-flight value updates are flushed
+        // first, and drain any set bodies still queued for deferred mounting. Those sets do their
+        // condition bookkeeping when they mount, and the payload is built from it.
+        const initialPromise = Promise.all([
+            new Promise((resolve) => setTimeout(resolve, UPDATE_DEBOUNCE_MS + 1)),
+            flushMountSchedulers(),
+        ]).then(() => undefined);
 
         return [new Start(), ...steps, new Finish()].reduce(async (promise, step) => {
             const payload = await promise;

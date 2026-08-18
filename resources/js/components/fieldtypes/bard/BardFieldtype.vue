@@ -177,7 +177,9 @@ import readTimeEstimate from 'read-time-estimate';
 import { common, createLowlight } from 'lowlight';
 import 'highlight.js/styles/github.css';
 import importTiptap from '@/util/tiptap.js';
-import { computed } from 'vue';
+import { computed, watch } from 'vue';
+import analyzeSetConditions from '@/components/field-conditions/analyzeSetConditions.js';
+import evaluateBardSetConditions from './evaluateSetConditions.js';
 import { data_get } from "@/bootstrap/globals.js";
 import { useContentDirection } from '@/composables/content-direction';
 import extractBardText from '@/util/extractBardText';
@@ -382,6 +384,8 @@ export default {
     },
 
     mounted() {
+        this.watchSetConditionsWithoutEditor();
+
         // Preview text and value watchers work without TipTap. Defer the expensive
         // Editor construction until this field is (nearly) visible or focused.
         this.initToolbarButtons();
@@ -503,6 +507,51 @@ export default {
     },
 
     methods: {
+        // Until the editor is built, there are no set node views to do the condition
+        // bookkeeping the save payload is built from, so do it from the value. Stops for
+        // good once an editor exists — see evaluateSetConditions.js.
+        watchSetConditionsWithoutEditor() {
+            if (this.setConfigs.length === 0) return;
+
+            const container = this.injectedPublishContainer;
+
+            // Same narrow/wide split as a collapsed set: only take a dependency on the
+            // whole form when a set's conditions can actually reach outside itself.
+            const needsRootValues = this.setConfigs.some(
+                (config) => analyzeSetConditions(config).needsRootValues,
+            );
+
+            const sources = [
+                () => this.value,
+                () => this.editor,
+                () => container.revealerValues.value,
+            ];
+
+            if (needsRootValues) sources.push(() => container.visibleValues.value);
+
+            let stop = null;
+
+            stop = watch(
+                sources,
+                () => {
+                    if (this.editor) {
+                        stop?.();
+                        return;
+                    }
+
+                    evaluateBardSetConditions({
+                        value: this.value,
+                        setConfigs: this.setConfigs,
+                        fieldPathPrefix: this.setFieldPathPrefix,
+                        container,
+                    });
+                },
+                { deep: true, immediate: true },
+            );
+
+            this._stopHeadlessSetConditions = stop;
+        },
+
         setupLazyEditor() {
             const el = this.$refs.container;
             if (!el || typeof IntersectionObserver === 'undefined') {
@@ -539,6 +588,8 @@ export default {
                 try {
                     tiptap = await importTiptap();
                     this.initEditor();
+                    // The set node views take over the condition bookkeeping from here.
+                    this._stopHeadlessSetConditions?.();
                     // Seed json from the editor once. Skip getHTML() here — it's a full-doc
                     // serialize and only needed when reading-time/footer config is enabled
                     // (computed lazily via onUpdate / readingTime).
