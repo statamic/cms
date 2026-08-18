@@ -42,6 +42,10 @@ function mountSet() {
                 [containerContextKey]: {
                     values: { value: {} },
                     previews: { value: {} },
+                    visibleValues: { value: {} },
+                    revealerValues: { value: {} },
+                    hiddenFields: { value: {} },
+                    setHiddenField: vi.fn(),
                     setFieldValue: vi.fn(),
                     setFieldMeta: vi.fn(),
                 },

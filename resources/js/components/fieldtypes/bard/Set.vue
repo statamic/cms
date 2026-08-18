@@ -124,6 +124,7 @@ import { reveal } from '@api';
 import { useUiDirection } from '@/composables/ui-direction';
 import { createMountScheduler } from '@/util/createMountScheduler.js';
 import ShowField from '@/components/field-conditions/ShowField.js';
+import analyzeSetConditions from '@/components/field-conditions/analyzeSetConditions.js';
 import { keepElementUnderPointer } from '@/util/keepElementUnderPointer.js';
 
 export default {
@@ -170,6 +171,10 @@ export default {
     },
 
     computed: {
+        conditionScope() {
+            return analyzeSetConditions(this.config);
+        },
+
         fields() {
             return this.config.fields;
         },
@@ -443,10 +448,28 @@ export default {
             },
         );
 
+        // Some of what mounting used to do can't be done headlessly — nothing evaluates
+        // the conditions of fields nested inside this set's fields, and revealers only
+        // register themselves when they mount. Those sets get mounted anyway, but off
+        // the critical path.
+        if (!this.conditionScope.canDeferMount) this.prewarmFields();
+
         // Headlessly evaluate conditions for never-mounted sets so omitValue
-        // bookkeeping stays correct for the save payload.
+        // bookkeeping stays correct for the save payload. Sets whose conditions only
+        // look at their own values keep a narrow dependency; the rest have to watch
+        // the whole tree.
+        const sources = [
+            () => this.values,
+            () => this.fieldsReady,
+            () => this.publishContainer.revealerValues.value,
+        ];
+
+        if (this.conditionScope.needsRootValues) {
+            sources.push(() => this.publishContainer.visibleValues.value);
+        }
+
         watch(
-            [() => this.values, () => this.fieldsReady],
+            sources,
             () => {
                 if (this.fieldsReady || !this.hasFields) return;
 
@@ -471,9 +494,15 @@ export default {
             { deep: true, immediate: true },
         );
 
-        if (this.hasError && this.collapsed) {
-            this.expand();
-        }
+        // Auto-expand when validation errors point at this set. Errors arrive from a
+        // failed save without remounting, so mount alone isn't enough of a hook.
+        watch(
+            () => this.hasError,
+            (hasError) => {
+                if (hasError && this.collapsed) this.expand();
+            },
+            { immediate: true },
+        );
 
         reveal.mount(this.$refs.container, this.expand);
 

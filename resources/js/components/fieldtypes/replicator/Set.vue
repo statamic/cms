@@ -20,6 +20,7 @@ import { reveal } from '@api';
 import usePreviewText from '@/composables/use-preview-text';
 import { createMountScheduler } from '@/util/createMountScheduler.js';
 import ShowField from '@/components/field-conditions/ShowField.js';
+import analyzeSetConditions from '@/components/field-conditions/analyzeSetConditions.js';
 
 const emit = defineEmits(['collapsed', 'expanded', 'duplicated', 'removed']);
 
@@ -122,6 +123,7 @@ function destroy() {
 }
 
 // Defer mounting collapsed set bodies. Once expanded, keep mounted (v-show thereafter).
+const { needsRootValues, canDeferMount } = analyzeSetConditions(props.config);
 const hasBeenExpanded = ref(!props.collapsed);
 const fieldsReady = ref(!props.collapsed);
 let isUnmounted = false;
@@ -157,10 +159,18 @@ watch(
     { immediate: true },
 );
 
+// Some of what mounting used to do can't be done headlessly — nothing evaluates the
+// conditions of fields nested inside this set's fields, and revealers only register
+// themselves when they mount. Those sets get mounted anyway, but off the critical path.
+if (!canDeferMount) prewarmFields();
+
 // Headlessly evaluate conditions for never-mounted sets so omitValue bookkeeping
-// stays correct for the save payload.
+// stays correct for the save payload. Sets whose conditions only look at their own
+// values keep a narrow dependency; the rest have to watch the whole tree.
 watch(
-    [() => props.values, fieldsReady],
+    needsRootValues
+        ? [() => props.values, fieldsReady, revealerValues, visibleValues]
+        : [() => props.values, fieldsReady, revealerValues],
     () => {
         if (fieldsReady.value || !hasFields.value) return;
 
