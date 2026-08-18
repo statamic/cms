@@ -438,7 +438,7 @@ class Field implements Arrayable
     {
         $fieldtype = $this->fieldtype();
 
-        $fields = $fieldtype->configFields()->addValues($this->config);
+        $fields = $fieldtype->configFields()->addValues($fieldtype->config());
 
         return array_merge(
             self::commonFieldOptions()->all()->map->defaultValue()->all(),
