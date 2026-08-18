@@ -17,6 +17,35 @@ const displayHtml = ref(false);
 const displayCopyable = ref(false);
 const isInteractive = computed(() => displayHtml.value || displayCopyable.value);
 
+function isExternalHref(href) {
+    if (!href) return false;
+
+    try {
+        const url = new URL(href, window.location.href);
+
+        if (!['http:', 'https:'].includes(url.protocol)) return false;
+
+        return url.origin !== window.location.origin;
+    } catch {
+        return false;
+    }
+}
+
+function sanitizeHtml(html) {
+    const sanitized = DOMPurify.sanitize(html ?? '', { ADD_ATTR: ['target'] });
+    const template = document.createElement('template');
+    template.innerHTML = sanitized;
+
+    template.content.querySelectorAll('a[href]').forEach((anchor) => {
+        if (!isExternalHref(anchor.getAttribute('href'))) return;
+
+        anchor.setAttribute('target', '_blank');
+        anchor.setAttribute('rel', 'noopener noreferrer');
+    });
+
+    return template.innerHTML;
+}
+
 function updatePosition() {
     if (!targetEl.value) {
         wrapperStyle.value = { display: 'none' };
@@ -47,7 +76,7 @@ watch([isVisible, targetEl, content], async ([visible, target]) => {
         // Update content and position (handles both initial show and target changes)
         displayHtml.value = html.value;
         displayCopyable.value = copyable.value;
-        displayContent.value = displayHtml.value ? DOMPurify.sanitize(content.value ?? '') : content.value;
+        displayContent.value = displayHtml.value ? sanitizeHtml(content.value) : content.value;
         updatePosition();
         tooltipKey.value++;
         await nextTick();
