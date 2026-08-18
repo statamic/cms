@@ -95,6 +95,10 @@ class Fallback extends FormFieldtype
 
     private function equivalentFormFieldtype(): ?FormFieldtype
     {
+        if (in_array($this->wrappedFieldtype->handle(), ['assets', 'files'])) {
+            return FormFieldtypeRepository::find('upload');
+        }
+
         $class = FormFieldtypeRepository::classes()
             ->filter(fn ($class) => $class::fieldtype() === $this->wrappedFieldtype->handle())
             ->sortBy(fn ($class) => app($class)->order() ?? PHP_INT_MAX)

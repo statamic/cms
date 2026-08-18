@@ -24,7 +24,6 @@ class DeletePartialFormSubmissions implements ShouldQueue
             ->where('partial', true)
             ->where('date', '<', $threshold)
             ->get()
-            ->each
-            ->delete();
+            ->each->delete();
     }
 }

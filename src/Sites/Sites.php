@@ -39,6 +39,10 @@ class Sites
 
     public function authorized()
     {
+        if (User::current()->isSuper()) {
+            return $this->sites;
+        }
+
         return $this->sites->filter(fn ($site) => User::current()->can('view', $site));
     }
 
@@ -130,9 +134,11 @@ class Sites
 
     protected function getSavedSites()
     {
-        return File::exists($sitesPath = $this->path())
+        $sites = File::exists($sitesPath = $this->path())
             ? YAML::file($sitesPath)->parse()
-            : $this->getFallbackConfig();
+            : [];
+
+        return $sites ?: $this->getFallbackConfig();
     }
 
     protected function getFallbackConfig()

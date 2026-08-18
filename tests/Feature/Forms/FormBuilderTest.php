@@ -3,6 +3,7 @@
 namespace Tests\Feature\Forms;
 
 use Facades\Statamic\Console\Processes\Composer;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Fieldset;
 use Statamic\Facades\Form;
@@ -47,9 +48,66 @@ class FormBuilderTest extends TestCase
     }
 
     #[Test]
+    public function it_shows_the_form_builder_with_the_edit_forms_permission()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'edit forms']]);
+        $user = User::make()->assignRole('test')->save();
+        $form = tap(Form::make('test'))->save();
+
+        $this
+            ->actingAs($user)
+            ->get(cp_route('forms.builder.edit', $form->handle()))
+            ->assertSuccessful()
+            ->assertInertia(fn ($page) => $page->component('forms/Builder'));
+    }
+
+    #[Test]
+    public function it_shows_the_form_builder_with_the_edit_form_permission()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'edit test form']]);
+        $user = User::make()->assignRole('test')->save();
+        $form = tap(Form::make('test'))->save();
+
+        $this
+            ->actingAs($user)
+            ->get(cp_route('forms.builder.edit', $form->handle()))
+            ->assertSuccessful()
+            ->assertInertia(fn ($page) => $page->component('forms/Builder'));
+    }
+
+    #[Test]
+    public function it_shows_the_form_builder_with_the_configure_form_fields_permission()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'configure form fields']]);
+        $user = User::make()->assignRole('test')->save();
+        $form = tap(Form::make('test'))->save();
+
+        $this
+            ->actingAs($user)
+            ->get(cp_route('forms.builder.edit', $form->handle()))
+            ->assertSuccessful()
+            ->assertInertia(fn ($page) => $page->component('forms/Builder'));
+    }
+
+    #[Test]
     public function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+        $form = tap(Form::make('test'))->save();
+
+        $this
+            ->from('/original')
+            ->actingAs($user)
+            ->get(cp_route('forms.builder.edit', $form->handle()))
+            ->assertRedirect('/original')
+            ->assertSessionHas('error');
+    }
+
+    #[Test]
+    public function it_denies_access_with_only_submission_permissions()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'view form submissions', 'view test form submissions']]);
         $user = tap(User::make()->assignRole('test'))->save();
         $form = tap(Form::make('test'))->save();
 
@@ -350,6 +408,91 @@ class FormBuilderTest extends TestCase
     }
 
     #[Test]
+    public function it_validates_that_fields_have_a_handle()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
+        $user = User::make()->assignRole('test')->save();
+        $form = tap(Form::make('test'))->save();
+
+        $payload = [
+            'pages' => [
+                [
+                    '_id' => 'page1',
+                    'sections' => [
+                        [
+                            '_id' => 'section1',
+                            'display' => 'Section',
+                            'fields' => [
+                                [
+                                    '_id' => 'field1',
+                                    'handle' => null,
+                                    'type' => 'inline',
+                                    'fieldtype' => 'short_answer',
+                                    'config' => ['type' => 'short_answer', 'display' => 'Name'],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this
+            ->actingAs($user)
+            ->patch(cp_route('forms.builder.update', $form->handle()), $payload)
+            ->assertSessionHasErrors(['field1.handle']);
+    }
+
+    #[Test]
+    #[DataProvider('invalidHandles')]
+    public function it_validates_the_handle($handle)
+    {
+        $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
+        $user = User::make()->assignRole('test')->save();
+        $form = tap(Form::make('test'))->save();
+
+        $payload = [
+            'pages' => [
+                [
+                    '_id' => 'page1',
+                    'sections' => [
+                        [
+                            '_id' => 'section1',
+                            'display' => 'Section',
+                            'fields' => [
+                                [
+                                    '_id' => 'field1',
+                                    'handle' => $handle,
+                                    'type' => 'inline',
+                                    'fieldtype' => 'short_answer',
+                                    'config' => ['type' => 'short_answer', 'display' => 'Name'],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this
+            ->actingAs($user)
+            ->patch(cp_route('forms.builder.update', $form->handle()), $payload)
+            ->assertSessionHasErrors(['field1.handle']);
+    }
+
+    public static function invalidHandles(): array
+    {
+        return [
+            'starts with a number' => ['1invalid'],
+            'invalid characters' => ['not valid'],
+            'reserved word' => ['if'],
+            'reserved forms word: date' => ['date'],
+            'reserved forms word: message' => ['message'],
+            'reserved forms word: messages' => ['messages'],
+        ];
+    }
+
+    #[Test]
     public function it_can_update_with_multiple_pages()
     {
         Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
@@ -365,6 +508,7 @@ class FormBuilderTest extends TestCase
                     'display' => 'Personal Info',
                     'instructions' => 'Please provide your personal information.',
                     'button_label' => 'Next',
+                    'show_previous_button' => false,
                     'previous_page_label' => null,
                     'sections' => [
                         [
@@ -391,6 +535,7 @@ class FormBuilderTest extends TestCase
                     'display' => 'Contact Info',
                     'instructions' => 'How can we reach you?',
                     'button_label' => 'Submit',
+                    'show_previous_button' => true,
                     'previous_page_label' => 'Go Back',
                     'sections' => [
                         [
@@ -426,6 +571,9 @@ class FormBuilderTest extends TestCase
         $this->assertCount(2, $formFields->pages());
         $this->assertEquals('Personal Info', $formFields->pages()[0]['display']);
         $this->assertEquals('Contact Info', $formFields->pages()[1]['display']);
+        $this->assertFalse($formFields->pages()[0]['show_previous_button']);
+        $this->assertTrue($formFields->pages()[1]['show_previous_button']);
+        $this->assertEquals('Go Back', $formFields->pages()[1]['previous_page_label']);
     }
 
     #[Test]

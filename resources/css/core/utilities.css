@@ -92,9 +92,10 @@
     @apply -mx-2 sm:-mx-6 md:-mx-12 min-w-0;
 
     & > * {
-        @apply px-2 sm:px-6 md:px-12 min-w-0 pb-6;
+        @apply min-w-0 pb-6;
     }
 }
+
 /*
     When a page renders full-height, full-bleed content (e.g. the forms logic
     tree), build a definite-height flex chain from the scroll container down so
@@ -122,6 +123,37 @@
     min-height: 0;
     margin-bottom: 0;
     max-width: none !important;
+}
+
+/*
+    Show a block-start border once the page or an inner panel has scrolled.
+
+    - On the element: tracks the nearest ancestor scroll container (e.g. #main-content).
+    - On descendant .overflow-y-auto panels: tracks their own scroll (e.g. logic tree splitters).
+*/
+@utility st-separator-on-scroll {
+    &, & :where(.overflow-y-auto) {
+        border-block-start: 1px solid transparent;
+        animation: separator-on-scroll linear both;
+        animation-range: 0.5rem 100%;
+    }
+
+    animation-timeline: scroll(nearest block);
+
+    & :where(.overflow-y-auto) {
+        animation-timeline: scroll(self block);
+    }
+}
+
+@keyframes separator-on-scroll {
+    0% {
+        border-block-start-color: transparent;
+    }
+
+    0.01%,
+    100% {
+        border-block-start-color: var(--color-content-border);
+    }
 }
 
 /* UTILITIES / TEXT

@@ -2,6 +2,7 @@
 
 namespace Statamic\Forms;
 
+use Carbon\Carbon;
 use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
@@ -23,6 +24,7 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\File;
 use Statamic\Facades\Form as FormFacade;
 use Statamic\Facades\FormSubmission;
+use Statamic\Facades\User;
 use Statamic\Facades\YAML;
 use Statamic\Fields\Blueprint;
 use Statamic\Forms\Exporters\Exporter;
@@ -31,6 +33,8 @@ use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
+
+use function Statamic\trans as __;
 
 class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContract
 {
@@ -42,7 +46,6 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
     protected $honeypot;
     protected $store;
     protected $email;
-    protected $metrics;
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
 
@@ -77,7 +80,12 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
      */
     public function title($title = null)
     {
-        return $this->fluentlyGetOrSet('title')->args(func_get_args());
+        return $this
+            ->fluentlyGetOrSet('title')
+            ->getter(function ($title) {
+                return $title ?? ucfirst($this->handle);
+            })
+            ->args(func_get_args());
     }
 
     public function formFields($fields = null)
@@ -218,6 +226,15 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
         return ['sections' => $sections];
     }
 
+    public function hasMultiplePages(): bool
+    {
+        if (! Statamic::formsProInstalled()) {
+            return false;
+        }
+
+        return $this->formFields()->pages()->count() > 1;
+    }
+
     /**
      * Get the blueprint.
      *
@@ -352,7 +369,6 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
 
                 return Arr::removeNullValues($email);
             })->all(),
-            'metrics' => $this->metrics,
         ]))->filter()->all();
 
         if ($this->store === false) {
@@ -445,37 +461,6 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
         return $this;
     }
 
-    // TODO: Reimplement metrics()
-    public function metrics($metrics = null)
-    {
-        return collect();
-
-        // if (! is_null($metrics)) {
-        //     return $this->formset()->set('metrics', $metrics);
-        // }
-
-        // $metrics = [];
-
-        // foreach ($this->formset()->get('metrics', []) as $config) {
-        //     $name = Str::studly($config['type']);
-
-        //     $class = "Statamic\\Forms\\Metrics\\{$name}Metric";
-
-        //     if (! class_exists($class)) {
-        //         $class = "Statamic\\Addons\\{$name}\\{$name}Metric";
-        //     }
-
-        //     if (! class_exists($class)) {
-        //         \Log::error("Metric [{$config['type']}] does not exist.");
-        //         continue;
-        //     }
-
-        //     $metrics[] = new $class($this, $config);
-        // }
-
-        // return $metrics;
-    }
-
     /**
      * Get the submissions.
      *
@@ -489,6 +474,72 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
     public function querySubmissions(): SubmissionQueryBuilder
     {
         return FormSubmission::query()->where('form', $this->handle());
+    }
+
+    public function status(): string
+    {
+        return Blink::once('form-status-'.$this->handle(), fn () => match (true) {
+            $this->closingDateHasPassed() => 'closed',
+            $this->submissionLimitReached() => 'limit_reached',
+            default => 'open',
+        });
+    }
+
+    public function restricted(): bool
+    {
+        return $this->restrictionMessage() !== null;
+    }
+
+    public function restrictionMessage(): ?string
+    {
+        if ($this->closingDateHasPassed() || $this->submissionLimitReached()) {
+            return ($msg = $this->get('closed_message')) ? __($msg) : __('statamic::messages.form_closed_message');
+        }
+
+        if ($this->get('require_login') && ! User::current()) {
+            return ($msg = $this->get('require_login_message')) ? __($msg) : __('statamic::messages.form_require_login_message');
+        }
+
+        return null;
+    }
+
+    private function closingDateHasPassed(): bool
+    {
+        if (! $date = $this->get('close_date')) {
+            return false;
+        }
+
+        return Carbon::parse($date, config('app.timezone'))->isPast();
+    }
+
+    private function submissionLimitReached(): bool
+    {
+        if (! $limit = (int) $this->get('submission_limit')) {
+            return false;
+        }
+
+        return $this->submissionCount() >= $limit;
+    }
+
+    private function submissionCount(): int
+    {
+        $query = $this->querySubmissions()->whereNull('partial');
+
+        if ($start = $this->submissionLimitPeriodStart()) {
+            $query->where('date', '>=', $start);
+        }
+
+        return $query->count();
+    }
+
+    private function submissionLimitPeriodStart(): ?Carbon
+    {
+        return match ($this->get('submission_limit_period', 'total')) {
+            'day' => now()->startOfDay(),
+            'week' => now()->startOfWeek(),
+            'month' => now()->startOfMonth(),
+            default => null,
+        };
     }
 
     /**
@@ -565,7 +616,7 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
     public function hasFiles()
     {
         return $this->fields()->filter(function ($field) {
-            return in_array($field->fieldtype()->handle(), ['assets', 'files']);
+            return in_array($field->fieldtype()->handle(), ['assets', 'files', 'form_upload']);
         })->isNotEmpty();
     }
 

@@ -2,7 +2,9 @@
 
 namespace Statamic\Forms\Fieldtypes;
 
+use Statamic\Forms\Fields\FormField;
 use Statamic\Forms\Fields\FormFieldtype;
+use Statamic\Support\Arr;
 
 use function Statamic\trans as __;
 
@@ -22,6 +24,7 @@ class Heading extends FormFieldtype
                 'focus' => true,
                 'validate' => 'required',
             ],
+            'handle' => FormField::commonFieldOptions()->get('handle')->config(),
             'instructions' => ['type' => 'hidden'],
             'subheading' => [
                 'display' => __('Subheading'),
@@ -38,6 +41,7 @@ class Heading extends FormFieldtype
             'display' => $this->config('display'),
             'subheading' => $this->config('subheading'),
             'listable' => false,
+            ...Arr::except($this->config(), ['type', 'display', 'subheading', 'listable']),
         ];
     }
 }

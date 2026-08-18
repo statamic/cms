@@ -1221,6 +1221,17 @@ class ReplicatorTest extends TestCase
         $this->assertSame($frEntry, $frFields->all()->first()->parent());
     }
 
+    #[Test]
+    public function it_has_button_label_config()
+    {
+        $configFields = collect((new \ReflectionMethod(Replicator::class, 'configFieldItems'))->invoke(new Replicator))
+            ->flatMap(fn ($section) => $section['fields']);
+
+        $this->assertSame('text', $configFields['button_label']['type']);
+        $this->assertSame('Add Set Label', $configFields['button_label']['display']);
+        $this->assertSame('Add Set', $configFields['button_label']['placeholder']);
+    }
+
     public static function groupedSetsProvider()
     {
         return [

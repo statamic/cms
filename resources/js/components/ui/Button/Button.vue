@@ -25,6 +25,7 @@ const props = defineProps({
     inset: { type: Boolean, default: false },
     /** When `true`, the button shows an animated loading icon */
     loading: { type: Boolean, default: false },
+    readOnly: { type: Boolean, default: false },
     /** When `true`, the button will be rounded */
     round: { type: Boolean, default: false },
     /** Controls the size of the button. Options: `2xs`, `xs`, `sm`, `base`, `lg` */
@@ -44,7 +45,7 @@ const slots = useSlots();
 const hasDefaultSlot = !!slots.default;
 const tag = computed(() => {
     if (props.as) return props.as;
-    if (props.href && !props.disabled && !props.loading) {
+    if (props.href && !props.disabled && !props.loading && !props.readOnly) {
         return props.target === '_blank' ? 'a' : Link;
     }
     return 'button';
@@ -134,7 +135,7 @@ const restAttrs = computed(() => {
         :is="tag"
         v-bind="restAttrs"
         :class="buttonClasses"
-        :disabled="disabled || loading"
+        :disabled="disabled || loading || readOnly"
         :data-ui-group-target="['subtle', 'ghost'].includes(props.variant) ? null : true"
         :href
         :target

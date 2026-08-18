@@ -2,7 +2,10 @@
 
 namespace Statamic\Forms\Fieldtypes;
 
+use Statamic\Forms\Fields\FormField;
 use Statamic\Forms\Fields\FormFieldtype;
+use Statamic\Rules\Handle;
+use Statamic\Support\Arr;
 
 use function Statamic\trans as __;
 
@@ -22,6 +25,7 @@ class Banner extends FormFieldtype
                 'focus' => true,
                 'validate' => 'required',
             ],
+            'handle' => FormField::commonFieldOptions()->get('handle')->config(),
             'instructions' => ['type' => 'hidden'],
             'text' => [
                 'display' => __('Text'),
@@ -45,6 +49,7 @@ class Banner extends FormFieldtype
             'text' => $this->config('text'),
             'icon' => $this->config('icon'),
             'listable' => false,
+            ...Arr::except($this->config(), ['type', 'display', 'text', 'icon', 'listable']),
         ];
     }
 

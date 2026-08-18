@@ -6,6 +6,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str as IlluminateStr;
 use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\Fields\Field;
+use Statamic\Forms\Fields\FormField;
 use Statamic\Support\Str;
 
 class FakeSubmissionGenerator
@@ -29,7 +30,9 @@ class FakeSubmissionGenerator
         $type = $field->type();
         $default = $field->defaultValue();
 
-        if ($default !== null && ! in_array($type, ['toggle', 'checkboxes', 'select', 'radio', 'button_group'])) {
+        if ($default !== null && ! in_array($type, [
+            'toggle', 'checkboxes', 'select', 'radio', 'button_group', 'image_choice', 'yes_no', 'ranking', 'dictionary',
+        ])) {
             return $default;
         }
 
@@ -45,10 +48,18 @@ class FakeSubmissionGenerator
             'date_and_time' => $this->dateTime(),
             'email' => $this->email(),
             'link', 'url' => $this->url(),
-            'select', 'radio', 'button_group' => $this->randomOptionKey($field),
+            'select', 'radio', 'button_group', 'yes_no' => $this->randomOptionKey($field),
+            'image_choice' => $field->get('multiple')
+                ? $this->randomOptionKeys($field)
+                : $this->randomOptionKey($field),
             'checkboxes' => $this->randomOptionKeys($field),
+            'opinion_scale' => $this->opinionScaleValueFor($field),
+            'star_rating' => $this->starRatingValueFor($field),
+            'ranking' => $this->rankingValueFor($field),
+            'dictionary' => $this->dictionaryValueFor($field),
+            'group' => $this->groupValueFor($field),
             'list' => [$this->word(), $this->word(), $this->word()],
-            default => $default,
+            default => $field->fieldtype()->fakeValue() ?? $default,
         };
     }
 
@@ -88,9 +99,93 @@ class FakeSubmissionGenerator
             return array_keys($options);
         }
 
-        return array_values(array_map(function ($option) {
-            return is_array($option) ? Arr::get($option, 'value') : $option;
-        }, $options));
+        return array_values(array_filter(array_map(function ($option) {
+            if (! is_array($option)) {
+                return $option;
+            }
+
+            return Arr::get($option, 'key') ?? Arr::get($option, 'value');
+        }, $options), fn ($value) => $value !== null && $value !== ''));
+    }
+
+    private function opinionScaleValueFor(Field $field): int
+    {
+        $min = (int) ($field->get('min') ?? 0);
+        $max = (int) ($field->get('max') ?? 10);
+
+        if ($max < $min) {
+            [$min, $max] = [$max, $min];
+        }
+
+        return $this->number($min, $max);
+    }
+
+    private function starRatingValueFor(Field $field): int|float
+    {
+        $max = max(1, (int) ($field->get('max_stars') ?? 5));
+        $allowHalf = (bool) $field->get('allow_half_stars');
+
+        if (! $allowHalf) {
+            return $this->number(1, $max);
+        }
+
+        $steps = (int) ($max / 0.5);
+        $value = $this->number(1, $steps) * 0.5;
+
+        return fmod($value, 1.0) === 0.0 ? (int) $value : $value;
+    }
+
+    private function rankingValueFor(Field $field): array
+    {
+        $options = $this->normalizedOptions($field);
+
+        shuffle($options);
+
+        return array_values($options);
+    }
+
+    private function dictionaryValueFor(Field $field): mixed
+    {
+        try {
+            $options = array_keys($field->fieldtype()->dictionary()->options());
+        } catch (\Throwable) {
+            return null;
+        }
+
+        if ($options === []) {
+            return null;
+        }
+
+        $maxItems = $field->get('max_items');
+
+        if ($maxItems === 1) {
+            return $options[array_rand($options)];
+        }
+
+        shuffle($options);
+
+        $count = $maxItems
+            ? random_int(1, min((int) $maxItems, count($options)))
+            : random_int(1, min(2, count($options)));
+
+        return array_slice($options, 0, $count);
+    }
+
+    private function groupValueFor(Field $field): array
+    {
+        return collect($field->get('fields', []))
+            ->filter(fn ($config) => is_array($config) && isset($config['handle'], $config['field']))
+            ->mapWithKeys(function (array $config) {
+                $nested = $this->resolveField($config['handle'], $config['field']);
+
+                return [$nested->handle() => $this->valueForField($nested)];
+            })
+            ->all();
+    }
+
+    private function resolveField(string $handle, array $config): Field
+    {
+        return new Field($handle, (new FormField($handle, $config))->toFieldArray());
     }
 
     private function word(): string
@@ -103,6 +198,16 @@ class FakeSubmissionGenerator
     }
 
     private function textValueFor(Field $field): string
+    {
+        return match ($field->get('input_type')) {
+            'email' => $this->email(),
+            'url' => $this->url(),
+            'tel' => $this->phoneNumber(),
+            default => $this->textValueFromContext($field),
+        };
+    }
+
+    private function textValueFromContext(Field $field): string
     {
         if ($this->faker) {
             if ($this->looksLike($field, ['email', 'e-mail'])) {
@@ -121,7 +226,7 @@ class FakeSubmissionGenerator
                 return (string) $this->faker->lastName();
             }
 
-            if ($this->looksLike($field, ['full_name', 'name'])) {
+            if ($this->looksLike($field, ['full_name', 'name']) || $field->get('autocomplete') === 'name') {
                 return (string) $this->faker->name();
             }
 
@@ -264,6 +369,15 @@ class FakeSubmissionGenerator
         }
 
         return 'sample+'.Str::lower(Str::random(8)).'@example.com';
+    }
+
+    private function phoneNumber(): string
+    {
+        if ($this->faker) {
+            return (string) $this->faker->phoneNumber();
+        }
+
+        return '555-'.random_int(100, 999).'-'.random_int(1000, 9999);
     }
 
     private function url(): string

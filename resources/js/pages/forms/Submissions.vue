@@ -3,6 +3,7 @@ import { ref, computed, watch, useId } from 'vue';
 import axios from 'axios';
 import Head from '@/pages/layout/Head.vue';
 import { Header, Dropdown, DropdownMenu, DropdownItem, Button, Modal, RadioGroup, Radio, CommandPaletteItem, ToggleGroup, ToggleItem, Widget, Pagination, Icon, Switch } from '@ui';
+import FormStatusIndicator from '@/components/forms/FormStatusIndicator.vue';
 import ResourceDeleter from '@/components/ResourceDeleter.vue';
 import FormSubmissionListing from '@/components/forms/SubmissionListing.vue';
 import Layout from '@/pages/layout/Layout.vue';
@@ -16,6 +17,7 @@ defineOptions({ layout: [Layout, PanelLayout, FormsLayout] });
 
 const props = defineProps([
     'form',
+    'can',
     'columns',
     'filters',
     'actionUrl',
@@ -211,12 +213,17 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
     <Head :title="[__('Results'), __(form.title), __('Forms')]" />
 
     <div class="max-w-5xl 3xl:max-w-6xl mx-auto" data-max-width-wrapper>
-        <Header :title="__(form.title)" icon="forms">
-            <Dropdown v-if="form.canEdit || form.canDelete" placement="left-start" class="me-2">
+        <Header>
+            <template #title>
+                <FormStatusIndicator :status="form.status" />
+                {{ __(form.title) }}
+            </template>
+
+            <Dropdown v-if="can.edit || can.delete" placement="left-start" class="me-2">
                 <DropdownMenu>
-                    <DropdownItem v-if="form.canEdit" :text="__('Configure Form')" icon="cog" :href="form.editUrl" />
+                    <DropdownItem v-if="can.edit" :text="__('Configure Form')" icon="cog" :href="form.editUrl" />
                     <DropdownItem
-                        v-if="form.canDelete"
+                        v-if="can.delete"
                         :text="__('Delete Form')"
                         icon="trash"
                         variant="destructive"
@@ -240,7 +247,7 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
             />
 
             <ResourceDeleter
-                v-if="form.canDelete"
+                v-if="can.delete"
                 ref="deleter"
                 :resource-title="form.title"
                 :route="form.deleteUrl"

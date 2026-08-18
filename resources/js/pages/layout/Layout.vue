@@ -78,6 +78,7 @@ onUnmounted(() => {
                 id="main-content"
                 class="main-content scroll-smooth relative py-0! sm:p-2 h-full flex-1 flex-wrap overflow-y-auto focus:outline-none rounded-t-2xl"
                 :data-max-width-enabled="isMaxWidthEnabled"
+                scroll-region
             >
                 <div id="content-card" tabindex="-1" class="focus:outline-none relative grid sm:py-2 min-h-full mx-auto">
                     <div class="content-card">

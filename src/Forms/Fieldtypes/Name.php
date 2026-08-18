@@ -30,8 +30,10 @@ class Name extends FormFieldtype
     {
         return [
             'type' => 'text',
+            'autocomplete' => 'name',
             'placeholder' => $this->config('placeholder'),
-            ...Arr::except($this->config(), ['type', 'placeholder']),
+            'validate' => array_values(array_unique([...((array) $this->config('validate', [])), 'not_regex:/\pN/u'])),
+            ...Arr::except($this->config(), ['type', 'autocomplete', 'placeholder', 'validate']),
         ];
     }
 

@@ -94,6 +94,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\FormBanner::class,
         Fieldtypes\FormHeading::class,
         Fieldtypes\FormParagraph::class,
+        Fieldtypes\FormUpload::class,
         Fieldtypes\Hidden::class,
         Fieldtypes\Html::class,
         Fieldtypes\Icon::class,
@@ -310,6 +311,12 @@ class ExtensionServiceProvider extends ServiceProvider
         $this->registerFormJsDrivers();
         $this->registerUpdateScripts();
         $this->app->instance('statamic.hooks', collect());
+    }
+
+    public function boot()
+    {
+        Fieldtypes\Link::extend('entry', Fieldtypes\Link\EntryLinkType::class);
+        Fieldtypes\Link::extend('asset', Fieldtypes\Link\AssetLinkType::class);
     }
 
     protected function registerAddonManifest()

@@ -8,10 +8,10 @@ use Statamic\CP\Column;
 use Statamic\Events\FormSubmitted;
 use Statamic\Facades\Scope;
 use Statamic\Facades\Site;
-use Statamic\Facades\User;
 use Statamic\Forms\FakeSubmissionGenerator;
 use Statamic\Forms\SendEmails;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Http\Controllers\CP\Forms\Concerns\ProvidesFormAbilities;
 use Statamic\Http\Controllers\CP\Forms\Concerns\QueriesFormSubmissionSearch;
 use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Http\Resources\CP\Submissions\Submissions;
@@ -23,11 +23,11 @@ use function Statamic\trans as __;
 
 class FormSubmissionsController extends CpController
 {
-    use QueriesFilters, QueriesFormSubmissionSearch;
+    use ProvidesFormAbilities, QueriesFilters, QueriesFormSubmissionSearch;
 
     public function index(FilteredRequest $request, $form)
     {
-        $this->authorize('view', $form);
+        $this->authorize('viewSubmissions', $form);
 
         if ($request->wantsJson()) {
             return $this->json($request, $form);
@@ -42,17 +42,18 @@ class FormSubmissionsController extends CpController
             ->rejectUnlisted()
             ->values();
 
+        $can = $this->formAbilities($form);
+
         return Inertia::render('forms/Submissions', [
             'form' => [
                 'title' => __($form->title()),
                 'handle' => $form->handle(),
+                'status' => $form->status(),
                 'editUrl' => $form->editUrl(),
                 'deleteUrl' => $form->deleteUrl(),
-                'canEdit' => User::current()->can('edit', $form),
-                'canDelete' => User::current()->can('delete', $form),
-                'canConfigureFields' => User::current()->can('configure form fields'),
-                'canGenerateFakeSubmissions' => (bool) $form->get('generate_fake_submissions', true),
+                'canGenerateFakeSubmissions' => $can['generateFakeSubmissions'] && (bool) $form->get('generate_fake_submissions', true),
             ],
+            'can' => $can,
             'columns' => $columns,
             'filters' => Scope::filters('form-submissions', [
                 'form' => $form->handle(),
@@ -130,6 +131,7 @@ class FormSubmissionsController extends CpController
 
         return Inertia::render('forms/Submission', [
             'form' => $form,
+            'can' => $this->formAbilities($form),
             'id' => $submission->id(),
             'formTitle' => $form->title(),
             'status' => $submission->status(),
@@ -142,7 +144,7 @@ class FormSubmissionsController extends CpController
 
     public function generateFake(Request $request, $form, FakeSubmissionGenerator $generator)
     {
-        $this->authorize('view', $form);
+        $this->authorize('generateFakeSubmissions', $form);
 
         if (! $form->get('generate_fake_submissions', true)) {
             return response([

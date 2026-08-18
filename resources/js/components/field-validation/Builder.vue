@@ -55,7 +55,7 @@
                 v-model="customRule"
                 ref="customRuleInput"
                 @keydown.enter.prevent="add(customRule)"
-                @blur="add(customRule)"
+                @focusout="add(customRule)"
             />
 
             <sortable-list
@@ -120,6 +120,7 @@ export default {
 
     data() {
         return {
+            initialized: false,
             isRequired: false,
             sometimesValidate: false,
             rules: [],
@@ -188,15 +189,19 @@ export default {
             }
         },
 
-        rules(value) {
-            this.resetState();
+        rules: {
+            handler(value) {
+                this.resetState();
 
-            this.$emit('updated', value);
+                if (this.initialized) this.$emit('updated', value);
+            },
+            deep: true,
         },
     },
 
     created() {
         this.getInitial();
+        this.$nextTick(() => this.initialized = true);
     },
 
     methods: {
@@ -238,7 +243,7 @@ export default {
                 this.rules.push(rule);
             }
 
-            this.$nextTick(() => this.$refs.rulesSelect.focus());
+            this.$nextTick(() => this.$refs.rulesSelect?.focus());
         },
 
         add(rule) {
@@ -248,7 +253,7 @@ export default {
                 this.resetState();
                 this.selectedLaravelRule = rule;
                 this.customRule = rule;
-                this.$nextTick(() => this.$refs.customRuleInput.focus());
+                this.$nextTick(() => this.$refs.customRuleInput?.focus());
             } else {
                 this.ensure(rule);
             }

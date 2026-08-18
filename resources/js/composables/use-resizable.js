@@ -1,9 +1,36 @@
 import { watch, nextTick, onUnmounted } from 'vue';
 
+function getStoredWidth(key) {
+    if (!key) return null;
+
+    const stored = localStorage.getItem(key);
+    if (stored === null) return null;
+
+    const width = parseInt(stored, 10);
+
+    return Number.isFinite(width) ? width : null;
+}
+
+function setStoredWidth(key, width) {
+    if (!key) return;
+
+    localStorage.setItem(key, String(width));
+}
+
+function clearStoredWidth(key) {
+    if (!key) return;
+
+    localStorage.removeItem(key);
+}
+
 export default function useResizable() {
     const cleanupFns = [];
 
-    function makeResizable(panelRef, activeRef, { edge = 'right', minWidth = 200, maxWidth = 800, defaultWidth = null } = {}) {
+    function makeResizable(
+        panelRef,
+        activeRef,
+        { edge = 'right', minWidth = 200, maxWidth = 800, defaultWidth = null, storageKey = null } = {},
+    ) {
         let cleanup = null;
 
         watch(activeRef, (active) => {
@@ -16,11 +43,16 @@ export default function useResizable() {
                     const resolvedEdge = isRtl ? (edge === 'right' ? 'left' : 'right') : edge;
                     const resolveDefaultWidth = () =>
                         typeof defaultWidth === 'function' ? defaultWidth() : defaultWidth;
+                    const clampWidth = (width) => Math.min(maxWidth, Math.max(minWidth, width));
+                    const applyWidth = (width) => {
+                        panel.style.width = typeof width === 'string' ? width : `${clampWidth(width)}px`;
+                    };
 
-                    const initialDefaultWidth = resolveDefaultWidth();
+                    const storedWidth = getStoredWidth(storageKey);
+                    const initialWidth = storedWidth ?? resolveDefaultWidth();
 
-                    if (initialDefaultWidth !== null && initialDefaultWidth !== undefined) {
-                        panel.style.width = `${initialDefaultWidth}px`;
+                    if (initialWidth !== null && initialWidth !== undefined) {
+                        applyWidth(initialWidth);
                     }
 
                     const handle = document.createElement('div');
@@ -36,10 +68,11 @@ export default function useResizable() {
                     panel.appendChild(handle);
 
                     const resetToDefaultWidth = () => {
+                        clearStoredWidth(storageKey);
+
                         const currentDefaultWidth = resolveDefaultWidth();
                         if (currentDefaultWidth !== null && currentDefaultWidth !== undefined) {
-                            const width = Math.min(maxWidth, Math.max(minWidth, currentDefaultWidth));
-                            panel.style.width = `${width}px`;
+                            applyWidth(currentDefaultWidth);
                             return;
                         }
 
@@ -61,8 +94,7 @@ export default function useResizable() {
 
                         const onMove = (e) => {
                             const diff = resolvedEdge === 'right' ? e.clientX - startX : startX - e.clientX;
-                            const newWidth = Math.min(maxWidth, Math.max(minWidth, startWidth + diff));
-                            panel.style.width = `${newWidth}px`;
+                            applyWidth(startWidth + diff);
                         };
 
                         const onUp = () => {
@@ -70,6 +102,7 @@ export default function useResizable() {
                             document.body.style.userSelect = '';
                             document.removeEventListener('pointermove', onMove);
                             document.removeEventListener('pointerup', onUp);
+                            setStoredWidth(storageKey, panel.offsetWidth);
                         };
 
                         document.addEventListener('pointermove', onMove);

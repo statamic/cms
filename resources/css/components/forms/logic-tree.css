@@ -82,6 +82,7 @@
         width: max-content;
         margin-inline: auto;
         gap: var(--gap);
+        @apply px-2 sm:px-6 md:px-12 pb-12;
 
         .linked-list__column {
             display: flex;
@@ -148,6 +149,10 @@
                 height: var(--item-height);
                 padding-block: var(--item-padding);
                 @apply px-3 border-1 border-gray-300 rounded-md bg-white shadow-ui-xs text-xs text-gray-850 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:shadow-none;
+                &[data-field-item-selected] {
+                    /* Don't muddy the blue "selected" border layered on top */
+                    border-color: transparent;
+                }
             }
 
             /* A fieldset import <li> is a plain column; its rows carry the chrome. */
@@ -209,6 +214,16 @@
                 &::before {
                     bottom: calc(anchor(center --start-connection) + var(--buffer-top-pull));
                     left: calc(anchor(right --start-connection) + var(--gap));
+                }
+                /* When there's no adjacent cell, we don't need the extra leap connector, because we don't need to "cut" through a join */
+                &:not(.has-adjacent-cell) {
+                    &::before {
+                        bottom: anchor(center --start-connection);
+                        left: anchor(right --start-connection);
+                    }
+                    .linked-list__extra-leap-connector {
+                        display: none;
+                    }
                 }
             }
         }
@@ -295,6 +310,54 @@
             content: '';
             position: absolute;
             pointer-events: none;
+        }
+    }
+
+    /* GROUP LOGIC TREE CONNECTORS / SELECTED ITEM
+    =================================================== */
+    /* When an item is selected, highlight its connection. */
+
+    /* When an item is selected, it should be on top of the other items. */
+    [data-field-item-selected] {
+        z-index: var(--z-index-above);
+    }
+
+    .linked-list:has([data-field-item-selected]) {
+        --_border-color: var(--color-blue-200);
+        .dark & {
+            --_border-color: var(--color-blue-925);
+        }
+
+        /* When an item is selected, get all columns that don't have an end connection */
+        .linked-list__column:not(.linked-list__column--has-end-connection) {
+            /* and dim their end connection arrow too */
+            .linked-list__page-name .logic-arrow {
+                color: var(--_border-color)!important;
+            }
+        }
+    }
+
+    .linked-list:has([data-field-item-selected].linked-list__connector) {
+        /* Dim the connectors of other relationships that are not selected */
+        li:not([data-field-item-selected]) {
+            &::before {
+                border-right-color: var(--_border-color);
+                border-bottom-color: var(--_border-color);
+            }
+            &::after {
+                border-left-color: var(--_border-color);
+                border-top-color: var(--_border-color);
+            }
+            .linked-list__extra-leap-connector {
+                &::before {
+                    border-block-end-color: var(--_border-color);
+                    border-inline-end-color: var(--_border-color);
+                }
+                &::after {
+                    border-block-start-color: var(--_border-color);
+                    border-inline-start-color: var(--_border-color);
+                }
+            }
         }
     }
 

@@ -2,7 +2,8 @@
 import Layout from '@/pages/layout/Layout.vue';
 import PanelLayout from '@/pages/layout/PanelLayout.vue';
 import FormsLayout from './Layout.vue';
-import { Badge, Button, Card, DocsCallout, Header, Heading, Icon, Panel, PanelHeader, StatusIndicator, Table, TableCell, TableColumn, TableColumns, TableRow, TableRows, ToggleGroup, ToggleItem, publishContextKey } from '@ui';
+import { Badge, Button, Card, DocsCallout, Header, Heading, Icon, Panel, PanelHeader, Table, TableCell, TableColumn, TableColumns, TableRow, TableRows, ToggleGroup, ToggleItem, publishContextKey } from '@ui';
+import FormStatusIndicator from '@/components/forms/FormStatusIndicator.vue';
 import { computed, onMounted, provide, ref, watch, watchEffect } from 'vue';
 import emailNotificationsLogoRaw from '../../../svg/forms/connect/email-notifications.svg?raw';
 import zapierLogoRaw from '../../../svg/forms/connect/zapier.svg?raw';
@@ -239,13 +240,13 @@ watch(selectedIntegrationName, (integrationName) => {
     <div class="mx-auto max-w-5xl">
         <Header class="mb-2">
             <template #title>
-                <StatusIndicator status="published" />
+                <FormStatusIndicator :status="form?.status" />
                 {{ __(formTitle) }}
             </template>
             <template #actions>
                 <div class="flex items-center gap-2 sm:gap-3">
                     <Button variant="primary" href="#" icon-append="external-link">
-                        {{ __('Browse the Marketplace') }}
+                        {{ __('Explore Integrations') }}
                     </Button>
                     <ToggleGroup :model-value="mode" @update:model-value="modeChanged">
                         <ToggleItem value="grid" icon="layout-grid" />

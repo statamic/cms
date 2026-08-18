@@ -16,6 +16,8 @@ use Statamic\Events\SubmissionSaved;
 use Statamic\Events\SubmissionSaving;
 use Statamic\Facades\Form;
 use Statamic\Facades\Site;
+use Statamic\Forms\CreateAssetsFromFileUploads;
+use Statamic\Forms\DeleteTemporaryFiles;
 use Statamic\Forms\SendEmails;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -272,6 +274,32 @@ class SubmissionTest extends TestCase
     }
 
     #[Test]
+    public function deleting_dispatches_delete_temporary_files()
+    {
+        Bus::fake();
+
+        $form = tap(Form::make('contact_us'))->save();
+        $submission = tap($form->makeSubmission())->save();
+
+        $submission->delete();
+
+        Bus::assertDispatchedSync(DeleteTemporaryFiles::class);
+    }
+
+    #[Test]
+    public function deleting_quietly_does_not_dispatch_delete_temporary_files()
+    {
+        Bus::fake();
+
+        $form = tap(Form::make('contact_us'))->save();
+        $submission = tap($form->makeSubmission())->save();
+
+        $submission->deleteQuietly();
+
+        Bus::assertNotDispatched(DeleteTemporaryFiles::class);
+    }
+
+    #[Test]
     public function it_determines_its_status()
     {
         $form = tap(Form::make('contact_us'))->save();
@@ -381,9 +409,24 @@ class SubmissionTest extends TestCase
 
         Event::assertDispatched(SubmissionCreated::class, 1);
         Event::assertDispatched(SubmissionFinalized::class, 1);
+        Bus::assertDispatched(CreateAssetsFromFileUploads::class, 1);
         Bus::assertDispatched(SendEmails::class, 1);
 
         $this->assertNotNull($form->submission($submission->id()));
+    }
+
+    #[Test]
+    public function finalizing_dispatches_asset_creation_synchronously_then_sends_emails()
+    {
+        Bus::fake();
+
+        $form = tap(Form::make('contact_us'))->save();
+        $submission = $form->makeSubmission()->asPartial();
+
+        $submission->finalize();
+
+        Bus::assertDispatchedSync(CreateAssetsFromFileUploads::class);
+        Bus::assertDispatched(SendEmails::class);
     }
 
     #[Test]
@@ -403,6 +446,7 @@ class SubmissionTest extends TestCase
         // existing submission won't dispatch it again, but it does finalize and email.
         Event::assertDispatched(SubmissionCreated::class, 1);
         Event::assertDispatched(SubmissionFinalized::class, 1);
+        Bus::assertDispatched(CreateAssetsFromFileUploads::class, 1);
         Bus::assertDispatched(SendEmails::class, 1);
     }
 
@@ -419,8 +463,31 @@ class SubmissionTest extends TestCase
 
         Event::assertDispatched(SubmissionCreated::class, 1);
         Event::assertDispatched(SubmissionFinalized::class, 1);
+        Bus::assertDispatched(CreateAssetsFromFileUploads::class, 1);
         Bus::assertDispatched(SendEmails::class, 1);
         $this->assertNull($form->submission($submission->id()));
+    }
+
+    #[Test]
+    public function finalizing_a_submission_for_a_non_storing_form_deletes_it()
+    {
+        Bus::fake();
+        Event::fake([SubmissionCreated::class, SubmissionFinalized::class, SubmissionDeleted::class]);
+
+        $form = tap(Form::make('contact_us')->store(false))->save();
+
+        $submission = tap($form->makeSubmission()->set('partial', true))->save();
+        $this->assertNotNull($form->submission($submission->id()));
+
+        $submission->finalize();
+
+        $this->assertNull($form->submission($submission->id()));
+
+        Event::assertDispatched(SubmissionCreated::class, 1);
+        Event::assertDispatched(SubmissionFinalized::class, 1);
+        Bus::assertDispatched(CreateAssetsFromFileUploads::class, 1);
+        Bus::assertDispatched(SendEmails::class, 1);
+        Event::assertNotDispatched(SubmissionDeleted::class);
     }
 
     #[Test]
@@ -437,6 +504,7 @@ class SubmissionTest extends TestCase
 
         // The second call is a no-op because the submission is no longer partial.
         Event::assertDispatched(SubmissionFinalized::class, 1);
+        Bus::assertDispatched(CreateAssetsFromFileUploads::class, 1);
         Bus::assertDispatched(SendEmails::class, 1);
     }
 

@@ -17,13 +17,13 @@ use Statamic\Events\SubmissionDeleted;
 use Statamic\Events\SubmissionFinalized;
 use Statamic\Events\SubmissionSaved;
 use Statamic\Events\SubmissionSaving;
-use Statamic\Facades\Asset;
 use Statamic\Facades\File;
 use Statamic\Facades\FormSubmission;
 use Statamic\Facades\Site as Sites;
 use Statamic\Facades\Stache;
 use Statamic\Forms\Uploaders\AssetsUploader;
 use Statamic\Forms\Uploaders\FilesUploader;
+use Statamic\Forms\Uploaders\FormFileUpload;
 use Statamic\Sites\Site;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
@@ -176,7 +176,7 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
     }
 
     /**
-     * Upload files and return asset IDs.
+     * Upload files and return their storage references.
      *
      * @param  array  $uploadedFiles
      * @return array
@@ -186,9 +186,13 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
         return collect($uploadedFiles)->map(function ($files, $handle) {
             $field = $this->fields()->get($handle);
 
-            return $field['type'] === 'files'
-                ? FilesUploader::field($field)->upload($files)
-                : AssetsUploader::field($field)->upload($files);
+            if ($field['type'] === 'form_upload') {
+                return FormFileUpload::field($field, $this->id())->upload($files);
+            }
+
+            return $field['type'] === 'assets'
+                ? AssetsUploader::field($field)->upload($files)
+                : FilesUploader::field($field)->upload($files);
         })->all();
     }
 
@@ -255,14 +259,19 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
         if ($this->form()->store()) {
             $this->save();
         } else {
-            // When stored, save() dispatches the created event. We'll also fire it
-            // here when submissions aren't stored so developers may continue to
-            // listen and modify the submission as needed.
-            SubmissionCreated::dispatch($this);
+            // Fire the created event here for submissions that were never saved.
+            // The event might have been dispatched when the submission persisted,
+            // so we don't want to fire it again.
+            if (is_null($this->form()->submission($this->id()))) {
+                SubmissionCreated::dispatch($this);
+            }
+
+            $this->deleteQuietly();
         }
 
         SubmissionFinalized::dispatch($this);
 
+        CreateAssetsFromFileUploads::dispatchSync($this);
         SendEmails::dispatch($this, $this->site());
 
         return $this;
@@ -282,6 +291,10 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
     {
         $withEvents = $this->withEvents;
         $this->withEvents = true;
+
+        if ($withEvents) {
+            DeleteTemporaryFiles::dispatchSync($this);
+        }
 
         FormSubmission::delete($this);
 

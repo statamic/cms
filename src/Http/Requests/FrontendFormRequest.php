@@ -2,15 +2,22 @@
 
 namespace Statamic\Http\Requests;
 
+use Facades\Statamic\Fields\Validator as FieldValidator;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Traits\Localizable;
 use Illuminate\Validation\ValidationException;
+use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Rules\AllowedFile;
 use Statamic\Support\Arr;
 
+/**
+ * @deprecated Statamic's front-end form route no longer uses this class; validation and
+ * submission handling now goes through Statamic\Forms\SubmitForm. Kept only so that code
+ * extending or type-hinting FrontendFormRequest continues to work.
+ */
 class FrontendFormRequest extends FormRequest
 {
     use Localizable;
@@ -80,10 +87,27 @@ class FrontendFormRequest extends FormRequest
     private function extraRules($fields)
     {
         return $fields->all()
-            ->filter(fn ($field) => $field->fieldtype()->handle() === 'assets')
+            ->filter(fn ($field) => in_array($field->fieldtype()->handle(), ['assets', 'files']))
             ->mapWithKeys(function ($field) {
-                return [$field->handle().'.*' => ['file', new AllowedFile]];
+                $rules = $field->fieldtype()->handle() === 'assets'
+                    ? array_merge(['file', new AllowedFile], $this->assetContainerRules($field))
+                    : ['file', new AllowedFile($field->fieldtype()->config('allowed_extensions'))];
+
+                return [$field->handle().'.*' => $rules];
             })
+            ->all();
+    }
+
+    private function assetContainerRules($field)
+    {
+        $configured = $field->fieldtype()->config('container');
+
+        $container = $configured
+            ? AssetContainer::find($configured)
+            : (($containers = AssetContainer::all())->count() === 1 ? $containers->first() : null);
+
+        return collect($container?->validationRules())
+            ->map(fn ($rule) => FieldValidator::parse($rule))
             ->all();
     }
 

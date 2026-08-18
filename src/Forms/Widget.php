@@ -21,7 +21,7 @@ class Widget extends BaseWidget
             ]);
         }
 
-        if (! User::current()->can('view', $form)) {
+        if (! User::current()->can('viewSubmissions', $form)) {
             return;
         }
 

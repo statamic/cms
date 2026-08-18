@@ -6,12 +6,13 @@ import { injectBuilderContext } from '@/pages/forms/Builder.vue';
 import FieldValidationBuilder from '@/components/field-validation/Builder.vue';
 import FieldConditionsBuilder from '@/components/field-conditions/Builder.vue';
 import FieldNumber from '@/components/forms/FieldNumber.vue';
-import { categories, categoryColorClasses } from './categories';
+import { categories, categoryColorClasses, collectsValue } from './categories';
+import { writeFieldConditions } from '@/composables/forms/field-conditions';
 import debounce from '@/util/debounce';
 
 const cache = new Map<string, { fieldtype: any; blueprint: any; values: any; meta: any; originValues: any; originMeta: any }>();
 
-const { dirty, errors: contextErrors, fieldtypes, form, inspecting: field, pages, withoutDirtying } = injectBuilderContext();
+const { dirty, errors: contextErrors, fieldtypes, form, inspecting: field, pages, showFieldDirection, withoutDirtying } = injectBuilderContext();
 
 const errors = computed(() => {
     const result = {};
@@ -44,7 +45,13 @@ const blueprint = ref(null);
 const activeTab = ref<FieldInspectorTabs>(FieldInspectorTabs.Settings);
 const modifiedFields = ref<string[]>([]);
 
-const shouldShowValidationTab = computed(() => !['structure', 'information'].includes(getFieldtypeCategory(field.value.config.type).handle));
+let skipNextPreviewUpdate = false;
+
+const extraValues = computed(() => ({
+    isNew: !!field.value.isNew,
+}));
+
+const shouldShowValidationTab = computed(() => collectsValue(getFieldtypeCategoryHandle(field.value.config.type)));
 
 const adjustedBlueprint = computed(() => {
     const bp = JSON.parse(JSON.stringify(blueprint.value));
@@ -67,7 +74,8 @@ const load = () => {
         loading.value = false;
         fieldtype.value = cached.fieldtype;
         blueprint.value = cached.blueprint;
-        values.value = cached.values;
+        skipNextPreviewUpdate = true;
+        withoutDirtying(() => (values.value = cached.values));
         meta.value = cached.meta;
         originValues.value = cached.originValues;
         originMeta.value = cached.originMeta;
@@ -80,12 +88,16 @@ const load = () => {
         .post(cp_url(`forms/${form.handle}/builder/fields/edit`), {
             type: field.value.fieldtype,
             reference: field.value.type === 'reference' ? field.value.field_reference : false,
-            values: field.value.config,
+            values: {
+                ...field.value.config,
+                handle: field.value.handle,
+            },
         })
         .then((response) => {
             loading.value = false;
             fieldtype.value = response.data.fieldtype;
             blueprint.value = response.data.blueprint;
+            skipNextPreviewUpdate = true;
             withoutDirtying(() => (values.value = response.data.values));
             meta.value = response.data.meta;
             originValues.value = response.data.originValues;
@@ -121,11 +133,16 @@ const updatePreview = debounce(() => {
         .then((response) => {
             if (field.value._id !== fieldId) return;
 
-            field.value.config = response.data.values;
+            const { handle, ...config } = response.data.values;
+
+            field.value.config = config;
 
             if (response.data.preview) {
                 field.value.preview = {
-                    config: { ...response.data.preview.config, handle: field.value.handle },
+                    config: {
+                        ...response.data.preview.config,
+                        handle: field.value.handle ?? field.value._id,
+                    },
                     value: response.data.preview.value,
                     meta: response.data.preview.meta,
                 };
@@ -147,7 +164,8 @@ const suggestableConditionFields = computed(() => {
         .flatMap((page) => page.sections)
         .flatMap((section) => section.fields)
         .filter((f) => f._id !== field.value._id)
-        .filter((f) => f.type === 'import' || !['structure', 'information'].includes(getFieldtypeCategory(f.config.type).handle))
+        .filter((f) => f.type === 'import' || f.handle)
+        .filter((f) => f.type === 'import' || collectsValue(getFieldtypeCategoryHandle(f.config.type)))
         .map((f) => ({
             handle: f.handle,
             config: {
@@ -158,17 +176,18 @@ const suggestableConditionFields = computed(() => {
         }));
 });
 
-const getFieldtypeCategory = (fieldtypeHandle: string) => {
+const getFieldtypeCategoryHandle = (fieldtypeHandle: string) => {
     const fieldtype = fieldtypes?.find((field) => field.handle === fieldtypeHandle);
-    const categoryKey = fieldtype?.categories?.[0] || 'other';
-    return categories[categoryKey] ?? categories.other;
+    return fieldtype?.categories?.[0] || 'other';
 };
+
+const getFieldtypeCategory = (fieldtypeHandle: string) => categories[getFieldtypeCategoryHandle(fieldtypeHandle)] ?? categories.other;
 
 const fieldIconClasses = (fieldtypeHandle: string) => `size-4 shrink-0 ${categoryColorClasses[getFieldtypeCategory(fieldtypeHandle)?.color]?.icon}`;
 const findSuggestableField = (handle: string) => suggestableConditionFields.value.find((f) => f.handle === handle);
 
 const updateFieldConditions = (conditions: Record<string, any>) => {
-    Object.assign(field.value.config, conditions);
+    writeFieldConditions(field.value, conditions);
     Object.assign(values.value, conditions);
     dirty();
 };
@@ -185,8 +204,18 @@ watch(field, () => {
 
 watch(values, () => {
     dirty();
+
+    if (skipNextPreviewUpdate) {
+        skipNextPreviewUpdate = false;
+        return;
+    }
+
     updatePreview();
 }, { deep: true });
+
+watch(() => values.value?.handle, (handle: string) => {
+    if (field.value.isNew && handle !== undefined) field.value.handle = handle;
+});
 
 watch(modifiedFields, (fields) => {
     if (field.value.type === 'reference') {
@@ -218,7 +247,7 @@ onMounted(() => load());
                         </div>
                         <a :href="`#field-${field._id}`" class="inline-flex min-w-0 items-center gap-1.5 text-xl font-medium antialiased">
                             <span class="truncate">{{ field.config.display }}</span>
-                            <div class="grid *:[grid-area:1/1]">
+                            <div v-if="showFieldDirection" class="grid *:[grid-area:1/1]">
                                 <Icon name="arrow-up" data-field-direction-up aria-hidden="true" />
                                 <Icon name="arrow-down" data-field-direction-down aria-hidden="true" />
                             </div>
@@ -230,6 +259,7 @@ onMounted(() => load());
                         :blueprint="adjustedBlueprint"
                         :meta
                         :errors
+                        :extra-values
                         v-model="values"
                         v-model:modified-fields="modifiedFields"
                         :origin-values
@@ -251,7 +281,7 @@ onMounted(() => load());
                         </div>
                         <a :href="`#field-${field._id}`" class="inline-flex min-w-0 items-center gap-1.5 text-xl font-medium antialiased">
                             <span class="truncate">{{ field.config.display }}</span>
-                            <div class="grid *:[grid-area:1/1]">
+                            <div v-if="showFieldDirection" class="grid *:[grid-area:1/1]">
                                 <Icon name="arrow-up" data-field-direction-up aria-hidden="true" />
                                 <Icon name="arrow-down" data-field-direction-down aria-hidden="true" />
                             </div>
@@ -300,7 +330,7 @@ onMounted(() => load());
                         </div>
                         <a :href="`#field-${field._id}`" class="inline-flex min-w-0 items-center gap-1.5 text-xl font-medium antialiased">
                             <span class="truncate">{{ field.config.display }}</span>
-                            <div class="grid *:[grid-area:1/1]">
+                            <div v-if="showFieldDirection" class="grid *:[grid-area:1/1]">
                                 <Icon name="arrow-up" data-field-direction-up aria-hidden="true" />
                                 <Icon name="arrow-down" data-field-direction-down aria-hidden="true" />
                             </div>

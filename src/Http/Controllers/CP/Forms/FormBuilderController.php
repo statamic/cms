@@ -13,6 +13,7 @@ use Statamic\Forms\Fields\FormField;
 use Statamic\Forms\Fields\FormFieldtype;
 use Statamic\Forms\Fieldtypes\Fallback;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Http\Controllers\CP\Forms\Concerns\ProvidesFormAbilities;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
 
@@ -20,15 +21,16 @@ use function Statamic\trans as __;
 
 class FormBuilderController extends CpController
 {
-    use ManagesFormFields;
+    use ManagesFormFields, ProvidesFormAbilities;
 
     public function edit($form)
     {
-        $this->authorize('edit', $form);
+        $this->authorize('editFields', $form);
 
         return Inertia::render('forms/Builder', [
             ...$this->fieldProps(),
             'form' => $form,
+            'can' => $this->formAbilities($form),
             'initialFormFields' => $this->toVueObject($form->formFields()),
             'formsProInstalled' => Statamic::formsProInstalled(),
             'fieldtypes' => $this->fieldtypes()->map(fn (FormFieldtype $fieldtype): array => [
@@ -42,7 +44,7 @@ class FormBuilderController extends CpController
 
     public function update(Request $request, $form)
     {
-        $this->authorize('edit', $form);
+        $this->authorize('editFields', $form);
 
         $request->validate([
             'pages' => ['required', 'array', 'min:1'],
@@ -117,11 +119,14 @@ class FormBuilderController extends CpController
 
                     $fields = $blueprint
                         ->fields()
-                        ->addValues($field['config'] ?? [])
+                        ->addValues([
+                            ...$field['config'] ?? [],
+                            'handle' => $field['handle'] ?? null,
+                        ])
                         ->preProcess();
 
                     try {
-                        $fields->validate();
+                        $fields->validate([], ['handle.not_in' => __('statamic::validation.reserved')]);
                     } catch (ValidationException $e) {
                         foreach ($e->errors() as $handle => $messages) {
                             $errors["{$field['_id']}.{$handle}"] = $messages;

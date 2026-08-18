@@ -3,8 +3,10 @@
 namespace Tests\Forms;
 
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Bus;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Form;
+use Statamic\Forms\DeleteTemporaryFiles;
 use Statamic\Jobs\DeletePartialFormSubmissions;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -81,5 +83,24 @@ class DeletePartialFormSubmissionsTest extends TestCase
         (new DeletePartialFormSubmissions)->handle();
 
         $this->assertNotNull($form->submission($partial->id()));
+    }
+
+    #[Test]
+    public function it_dispatches_delete_temporary_files_for_each_abandoned_partial_submission()
+    {
+        Bus::fake();
+
+        config(['statamic.forms.delete_partial_submissions_after' => 7]);
+
+        $form = tap(Form::make('contact'))->save();
+
+        Carbon::setTestNow('2025-06-01 12:00:00');
+        tap($form->makeSubmission()->set('partial', true))->save();
+
+        Carbon::setTestNow('2025-06-30 12:00:00');
+
+        (new DeletePartialFormSubmissions)->handle();
+
+        Bus::assertDispatchedSync(DeleteTemporaryFiles::class);
     }
 }

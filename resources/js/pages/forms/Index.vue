@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 import Head from '@/pages/layout/Head.vue';
 import { Header, Button, Badge, CommandPaletteItem, EmptyStateMenu, EmptyStateItem, DocsCallout, Icon, Listing, DropdownItem } from '@ui';
-import useStatamicPageProps from '@/composables/page-props.js';
+import FormStatusIndicator from '@/components/forms/FormStatusIndicator.vue';
 import { Link, router } from '@inertiajs/vue3';
 
 const props = defineProps([
@@ -14,7 +14,6 @@ const props = defineProps([
     'configureEmailUrl',
 ]);
 
-const { isPro } = useStatamicPageProps();
 const isEmpty = computed(() => props.forms.length === 0);
 
 const reloadPage = () => router.reload();
@@ -54,7 +53,7 @@ const reloadPage = () => router.reload();
         <template v-else>
             <Header :title="__('Forms')" icon="forms">
                 <CommandPaletteItem
-                    v-if="isPro && canCreate"
+                    v-if="canCreate"
                     category="Actions"
                     :text="__('Create Form')"
                     icon="forms"
@@ -67,10 +66,14 @@ const reloadPage = () => router.reload();
 
             <Listing :items="forms" :columns="initialColumns" :action-url="actionUrl" @refreshing="reloadPage">
                 <template #cell-title="{ row: form }">
-                    <Link :href="form.show_url">{{ form.title }}</Link>
+                    <div class="flex items-center gap-2">
+                        <FormStatusIndicator :status="form.status" />
+                        <Link :href="form.show_url">{{ form.title }}</Link>
+                    </div>
                 </template>
                 <template #cell-submissions="{ row: form, value: submissions }">
                     <Badge
+                        v-if="form.can_view_submissions"
                         :href="form.submissions_url"
                         :append="String(submissions)"
                         :text="__('Results')"

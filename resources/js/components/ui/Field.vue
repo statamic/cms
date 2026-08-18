@@ -16,6 +16,8 @@ const props = defineProps({
     inline: { type: Boolean, default: false },
     /** Badge text to display next to the label. */
     badge: { type: String, default: '' },
+    /** The reading direction of the field's label, instructions, and errors. */
+    dir: { type: String, default: null },
     disabled: { type: Boolean, default: false },
     /** Error message to display below the field. */
     error: { type: String },
@@ -80,7 +82,7 @@ const hasErrors = computed(() => {
 </script>
 
 <template>
-    <div :class="[rootClasses, $attrs.class]" data-ui-input-group :data-ui-field-has-errors="hasErrors ? '' : null">
+    <div :class="[rootClasses, $attrs.class]" :dir="dir" data-ui-input-group :data-ui-field-has-errors="hasErrors ? '' : null">
         <div
             v-if="label || $slots.label || $slots.actions || (instructions && !instructionsBelow)"
             class="flex flex-col gap-1.5"

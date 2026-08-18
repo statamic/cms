@@ -24,6 +24,32 @@ class HeadingTest extends TestCase
             'subheading' => 'This is a subheading',
             'hide_display' => true,
             'listable' => false,
+            'instructions' => null,
+            'handle' => null,
+        ], $fieldtype->toFieldArray());
+    }
+
+    #[Test]
+    public function it_passes_through_extra_config()
+    {
+        $fieldtype = (new Heading)->setField(new FormField('section_heading', [
+            'type' => 'form_heading',
+            'display' => 'This is a heading',
+            'subheading' => 'This is a subheading',
+            'width' => 50,
+            'if' => ['subscribe' => 'is true'],
+        ]));
+
+        $this->assertEquals([
+            'type' => 'form_heading',
+            'display' => 'This is a heading',
+            'subheading' => 'This is a subheading',
+            'hide_display' => true,
+            'listable' => false,
+            'instructions' => null,
+            'handle' => null,
+            'width' => 50,
+            'if' => ['subscribe' => 'is true'],
         ], $fieldtype->toFieldArray());
     }
 }

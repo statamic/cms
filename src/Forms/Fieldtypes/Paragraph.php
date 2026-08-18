@@ -2,7 +2,9 @@
 
 namespace Statamic\Forms\Fieldtypes;
 
+use Statamic\Forms\Fields\FormField;
 use Statamic\Forms\Fields\FormFieldtype;
+use Statamic\Support\Arr;
 
 use function Statamic\trans as __;
 
@@ -23,10 +25,12 @@ class Paragraph extends FormFieldtype
                 'focus' => true,
                 'validate' => 'required',
             ],
+            'handle' => FormField::commonFieldOptions()->get('handle')->config(),
             'instructions' => ['type' => 'hidden'],
             'text' => [
                 'display' => __('Text'),
                 'type' => 'textarea',
+                'validate' => 'required',
             ],
         ];
     }
@@ -39,6 +43,7 @@ class Paragraph extends FormFieldtype
             'display' => $this->config('display'),
             'hide_display' => true,
             'listable' => false,
+            ...Arr::except($this->config(), ['type', 'text', 'display', 'listable']),
         ];
     }
 }

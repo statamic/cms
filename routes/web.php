@@ -8,6 +8,7 @@ use Statamic\Facades\OAuth;
 use Statamic\Facades\TwoFactor;
 use Statamic\Http\Controllers\ActivateAccountController;
 use Statamic\Http\Controllers\Auth\ElevatedSessionController;
+use Statamic\Http\Controllers\DictionaryFieldtypeController;
 use Statamic\Http\Controllers\ForgotPasswordController;
 use Statamic\Http\Controllers\FormController;
 use Statamic\Http\Controllers\FrontendController;
@@ -27,6 +28,7 @@ use Statamic\Http\Controllers\User\TwoFactorRecoveryCodesController;
 use Statamic\Http\Middleware\AuthGuard;
 use Statamic\Http\Middleware\CP\AuthGuard as CPAuthGuard;
 use Statamic\Http\Middleware\CP\HandleInertiaRequests;
+use Statamic\Http\Middleware\HandleFormPrecognitiveRequests;
 use Statamic\Http\Middleware\RedirectIfTwoFactorSetupIncomplete;
 use Statamic\Http\Middleware\RequireElevatedSession;
 use Statamic\Statamic;
@@ -36,10 +38,12 @@ use Statamic\StaticCaching\NoCache\NoCacheLocalize;
 
 Route::name('statamic.')->group(function () {
     Route::group(['prefix' => config('statamic.routes.action')], function () {
-        Route::post('forms/{form}', [FormController::class, 'submit'])->middleware([HandlePrecognitiveRequests::class, 'throttle:statamic.forms'])->name('forms.submit');
+        Route::post('forms/{form}', [FormController::class, 'submit'])->middleware([HandleFormPrecognitiveRequests::class, 'throttle:statamic.forms'])->name('forms.submit');
 
         Route::get('protect/password', [PasswordProtectController::class, 'show'])->name('protect.password.show')->middleware([HandleInertiaRequests::class]);
         Route::post('protect/password', [PasswordProtectController::class, 'store'])->name('protect.password.store');
+
+        Route::get('fieldtypes/dictionaries/{dictionary}', DictionaryFieldtypeController::class)->middleware('throttle:statamic.dictionaries')->name('dictionary-fieldtype');
 
         Route::group(['prefix' => 'auth', 'middleware' => [AuthGuard::class]], function () {
             Route::get('logout', [LoginController::class, 'logout'])->name('logout');

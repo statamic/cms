@@ -83,12 +83,7 @@ onMounted(() => {
             @keydown.space.prevent="inspectPage"
         >
             <div class="flex items-center gap-4 cursor-pointer">
-                <div class="flex items-center gap-2 flex-1">
-                    <div class="h-px min-w-0 flex-1 bg-gray-200 dark:bg-gray-700" aria-hidden="true" />
-                    <span v-if="hasLogic" v-tooltip="__('Logic attached')">
-                        <Icon data-logic-attached name="logic-tree" class="size-3.5! shrink-0 text-gray-400 dark:text-gray-500" aria-hidden="true" />
-                    </span>
-                </div>
+                <div class="h-px min-w-0 flex-1 bg-gray-200 dark:bg-gray-700" aria-hidden="true" />
                 <div
                     class="flex shrink-0 items-center gap-2 rounded-xl border border-dashed border-gray-300 px-3.5 py-2 text-sm font-medium text-gray-700 dark:border-gray-700 dark:text-gray-200 scroll-mt-[7rem]"
                     :data-editing-item="isInspectingPage ? '' : undefined"
@@ -111,15 +106,23 @@ onMounted(() => {
             >
                 <template v-if="section.fields.length && sectionIndex === (sections.length - 1)" #footer>
                     <div :id="`actions-${page._id}`" data-pagination class="mt-8">
-                        <div class="cursor-pointer flex gap-2.5" @click.prevent="inspectAction">
+                        <div class="cursor-pointer flex items-center gap-2.5" @click.prevent="inspectAction">
+                            <Icon
+                                v-if="hasLogic"
+                                data-logic-attached
+                                name="logic-tree"
+                                class="relative size-3.5! shrink-0 text-gray-400 dark:text-gray-500"
+                                :aria-label="__('Logic attached')"
+                                v-tooltip="__('Logic attached')"
+                            />
                             <Button
-                                v-if="page.previous_page_label"
+                                v-if="page.show_previous_button"
                                 variant="filled"
                                 icon="chevron-left"
                                 :data-editing-field="isInspectingAction ? '' : undefined"
                                 :data-editing-item="isInspectingAction ? '' : undefined"
                                 class="ps-3"
-                                :text="__(page.previous_page_label)"
+                                :text="page.previous_page_label?.length ? __(page.previous_page_label) : __('Previous Page')"
                             />
                             <Button
                                 variant="primary"

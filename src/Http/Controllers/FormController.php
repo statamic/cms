@@ -2,18 +2,20 @@
 
 namespace Statamic\Http\Controllers;
 
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\URL;
 use Illuminate\Support\MessageBag;
+use Illuminate\Support\Uri;
 use Illuminate\Validation\ValidationException;
 use Statamic\Contracts\Forms\Submission;
-use Statamic\Events\FormSubmitted;
+use Statamic\Exceptions\FormRestrictedException;
 use Statamic\Exceptions\SilentFormFailureException;
-use Statamic\Facades\Asset;
 use Statamic\Facades\Form;
-use Statamic\Facades\Site;
+use Statamic\Facades\URL;
 use Statamic\Forms\Exceptions\FileContentTypeRequiredException;
-use Statamic\Http\Requests\FrontendFormRequest;
+use Statamic\Forms\SubmissionResult;
+use Statamic\Forms\SubmitForm;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
@@ -21,63 +23,77 @@ use function Statamic\trans as __;
 
 class FormController extends Controller
 {
-    /**
-     * Handle a form submission request.
-     *
-     * @return mixed
-     */
-    public function submit(FrontendFormRequest $request, $form)
+    public function submit(Request $request, $form, SubmitForm $action)
     {
-        $site = Site::findByUrl(URL::previous()) ?? Site::default();
-        $fields = $form->blueprint()->fields();
         $this->validateContentType($request, $form);
-        $values = $request->all();
 
-        $values = array_merge($values, $assets = $request->assets());
-        $params = collect($request->all())->filter(function ($value, $key) {
-            return Str::startsWith($key, '_');
-        })->all();
+        $params = $this->params($request);
 
-        $fields = $fields->addValues($values);
+        $action->form($form);
 
-        $submission = $form->makeSubmission()->asPartial()->site($site);
+        if ($form->hasMultiplePages()) {
+            $action->page($form->formFields()->pages()->first()['id']);
 
-        try {
-            throw_if(Arr::get($values, $form->honeypot()), new SilentFormFailureException);
-
-            $uploadedAssets = $submission->uploadFiles($assets);
-
-            $values = array_merge($values, $uploadedAssets);
-
-            $submission->data(
-                $fields->addValues($values)->process()->values()
-            );
-
-            // If any event listeners return false, we'll do a silent failure.
-            // If they want to add validation errors, they can throw an exception.
-            throw_if(FormSubmitted::dispatch($submission) === false, new SilentFormFailureException);
-        } catch (ValidationException $e) {
-            $this->removeUploadedAssets($uploadedAssets);
-
-            return $this->formFailure($params, $e->errors(), $form->handle());
-        } catch (SilentFormFailureException $e) {
-            if (isset($uploadedAssets)) {
-                $this->removeUploadedAssets($uploadedAssets);
+            if ($partialSubmission = $this->getPartialSubmission($form)) {
+                $action->resume($partialSubmission);
             }
 
-            return $this->formSuccess($params, $submission, true);
+            if (
+                ($page = $request->input('_page')) &&
+                $form->formFields()->pages()->where('id', $page)->isNotEmpty()
+            ) {
+                $action->page($page);
+            }
         }
 
-        $submission->finalize();
+        try {
+            // We validate (scoped to the requested fields) through the action and halt
+            // without persisting, mirroring how Precognition works in Form Requests.
+            if ($request->isPrecognitive()) {
+                $action->validate($request->all(), $request->allFiles(), only: $this->precognitiveFields($request));
 
-        return $this->formSuccess($params, $submission);
+                return response()->noContent(headers: ['Precognition-Success' => 'true']);
+            }
+
+            $result = $action->submit($request->all(), $request->allFiles());
+
+            $result->isFinalized()
+                ? $this->forgetPartialSubmission($form)
+                : $this->setPartialSubmission($form, $result->submission);
+
+            return $this->formSuccess($params, $result);
+        } catch (FormRestrictedException $e) {
+            return $this->formFailure($params, ['*' => [$e->getMessage()]], $form->handle());
+        } catch (SilentFormFailureException $e) {
+            $result = new SubmissionResult(submission: $action->submission());
+
+            return $this->formSuccess($params, $result, silentFailure: true);
+        } catch (ValidationException $e) {
+            return $this->formFailure($params, $e->errors(), $form->handle());
+        }
     }
 
-    private function validateContentType($request, $form)
+    private function params(Request $request): array
+    {
+        return collect($request->all())
+            ->filter(fn ($value, string $key) => Str::startsWith($key, '_'))
+            ->all();
+    }
+
+    private function precognitiveFields(Request $request): ?array
+    {
+        if (! $request->headers->has('Precognition-Validate-Only')) {
+            return null;
+        }
+
+        return explode(',', $request->header('Precognition-Validate-Only'));
+    }
+
+    private function validateContentType(Request $request, $form): void
     {
         $type = Str::before($request->headers->get('CONTENT_TYPE'), ';');
 
-        if ($type !== 'multipart/form-data' && $form->hasFiles() && $request->assets()) {
+        if ($type !== 'multipart/form-data' && $form->hasFiles() && $request->allFiles()) {
             throw new FileContentTypeRequiredException;
         }
     }
@@ -85,12 +101,9 @@ class FormController extends Controller
     /**
      * The steps for a failed form submission.
      *
-     * @param  array  $params
-     * @param  array  $errors
-     * @param  string  $form
      * @return Response|RedirectResponse
      */
-    private function formFailure($params, $errors, $form)
+    private function formFailure(array $params, array $errors, string $form)
     {
         $request = request();
 
@@ -109,7 +122,7 @@ class FormController extends Controller
 
         $redirect = Arr::get($params, '_error_redirect');
 
-        $response = $redirect && ! \Statamic\Facades\URL::isExternalToApplication($redirect)
+        $response = $redirect && ! URL::isExternalToApplication($redirect)
             ? redirect($redirect)
             : back();
 
@@ -121,14 +134,15 @@ class FormController extends Controller
      *
      * Used for actual success and by honeypot.
      *
-     * @param  array  $params
-     * @param  Submission  $submission
-     * @param  bool  $silentFailure
      * @return Response
      */
-    private function formSuccess($params, $submission, $silentFailure = false)
+    private function formSuccess(array $params, SubmissionResult $result, bool $silentFailure = false)
     {
-        $redirect = $this->formSuccessRedirect($params, $submission);
+        $submission = $result->submission;
+
+        $redirect = $result->nextPage
+            ? Uri::of($this->previousUrl())->withQuery(['page' => $result->nextPage])->__toString()
+            : $this->formSuccessRedirect($params, $result->submission);
 
         if (request()->ajax() || request()->wantsJson()) {
             return response([
@@ -136,21 +150,31 @@ class FormController extends Controller
                 'submission_created' => ! $silentFailure,
                 'submission' => $submission->data(),
                 'redirect' => $redirect,
+                'next_page' => $result->nextPage,
             ]);
         }
 
-        $response = $redirect ? redirect($redirect) : back();
+        if (! $redirect) {
+            $redirect = Uri::of($this->previousUrl())->withoutQuery('page')->__toString();
+        }
 
-        if (! \Statamic\Facades\URL::isExternal($redirect)) {
+        if (! $result->nextPage && ! URL::isExternal($redirect)) {
             session()->flash("form.{$submission->form()->handle()}.success", __('Submission successful.'));
             session()->flash("form.{$submission->form()->handle()}.submission_created", ! $silentFailure);
             session()->flash('submission', $submission);
         }
 
-        return $response;
+        return redirect($redirect);
     }
 
-    private function formSuccessRedirect($params, $submission)
+    private function previousUrl(): string
+    {
+        $previous = url()->previous();
+
+        return URL::isExternalToApplication($previous) ? url('/') : $previous;
+    }
+
+    private function formSuccessRedirect(array $params, $submission)
     {
         if ($redirect = Form::getSubmissionRedirect($submission)) {
             return $redirect;
@@ -158,26 +182,32 @@ class FormController extends Controller
 
         $redirect = Arr::get($params, '_redirect');
 
-        if ($redirect && \Statamic\Facades\URL::isExternalToApplication($redirect)) {
+        if ($redirect && URL::isExternalToApplication($redirect)) {
             return null;
         }
 
         return $redirect;
     }
 
-    /**
-     * Remove any uploaded assets
-     *
-     * Triggered by a validation exception or silent failure
-     */
-    private function removeUploadedAssets(array $assets)
+    private function setPartialSubmission($form, $submission): void
     {
-        collect($assets)
-            ->flatten()
-            ->each(function ($id) {
-                if ($asset = Asset::find($id)) {
-                    $asset->delete();
-                }
-            });
+        session()->put("form.{$form->handle()}.partial_submission", $submission->id());
+    }
+
+    private function getPartialSubmission($form): ?Submission
+    {
+        $id = session()->get("form.{$form->handle()}.partial_submission");
+        $submission = $form->submission($id);
+
+        if ($submission && ! $submission->isPartial()) {
+            return null;
+        }
+
+        return $submission;
+    }
+
+    private function forgetPartialSubmission($form): void
+    {
+        session()->forget("form.{$form->handle()}.partial_submission");
     }
 }

@@ -4,6 +4,7 @@ namespace Tests\Forms\Fields;
 
 use Facades\Statamic\Forms\Fields\FormFieldtypeRepository;
 use Illuminate\Support\Facades\View;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Forms\Fields\FormFieldtype;
 use Tests\TestCase;
@@ -109,5 +110,37 @@ class FormFieldtypeTest extends TestCase
         };
 
         $this->assertEquals('statamic::forms.antlers.fields.default', $formFieldtype->view());
+    }
+
+    #[Test]
+    #[DataProvider('collectsValueProvider')]
+    public function it_determines_whether_it_collects_a_value($categories, $collectsValue)
+    {
+        $formFieldtype = new class($categories) extends FormFieldtype
+        {
+            public function __construct(array $categories)
+            {
+                $this->categories = $categories;
+            }
+
+            public function toFieldArray(): array
+            {
+                return ['type' => 'text'];
+            }
+        };
+
+        $this->assertEquals($collectsValue, $formFieldtype->collectsValue());
+    }
+
+    public static function collectsValueProvider()
+    {
+        return [
+            'text' => [['text'], true],
+            'contact' => [['contact'], true],
+            'information' => [['information'], false],
+            'structure' => [['structure'], false],
+            'information alongside another category' => [['text', 'information'], false],
+            'no categories' => [[], true],
+        ];
     }
 }

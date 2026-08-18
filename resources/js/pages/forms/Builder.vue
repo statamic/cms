@@ -20,7 +20,8 @@ export const [injectBuilderContext, provideBuilderContext] = createContext('Form
 </script>
 
 <script setup lang="ts">
-import { Button, Header, Icon, StatusIndicator, ToggleGroup, ToggleItem } from '@ui';
+import { Button, Header, Icon, ToggleGroup, ToggleItem } from '@ui';
+import FormStatusIndicator from '@/components/forms/FormStatusIndicator.vue';
 import { computed, nextTick, onMounted, onUnmounted, provide, ref, watch } from 'vue';
 import axios from 'axios';
 import FormsLayout from './Layout.vue';
@@ -29,6 +30,7 @@ import Layout from '@/pages/layout/Layout.vue';
 import LayoutPanel from '@/pages/layout/LayoutPanel.vue';
 import PanelLayout from '@/pages/layout/PanelLayout.vue';
 import ActionInspector from '@/components/forms/builder/ActionInspector.vue';
+import EmptyInspector from '@/components/forms/builder/EmptyInspector.vue';
 import FieldInspector from '@/components/forms/builder/FieldInspector.vue';
 import FieldsetInspector from '@/components/forms/builder/FieldsetInspector.vue';
 import FieldtypeHint from '@/components/forms/builder/FieldtypeHint.vue';
@@ -89,6 +91,7 @@ const addPage = (atIndex: number | null = null, sections = []) => {
         display: null,
         instructions: null,
         button_label: null,
+        show_previous_button: false,
         previous_page_label: null,
         rules: [],
         sections,
@@ -194,21 +197,25 @@ const addField = (pageId: string, sectionId: string, fieldtypeHandle: string, at
     const fieldtype = props.fieldtypes.find((f) => f.handle === fieldtypeHandle);
     if (!fieldtype) return;
 
-    const handle = uniqid({ withoutHyphens: true });
+    const _id = uniqid();
 
     const field = {
-        _id: handle,
+        _id,
         config: {
             type: fieldtypeHandle,
-            display: __(fieldtype.title),
+            display: ensureUniqueDisplay(__(fieldtype.title)),
             hidden: false,
         },
         fieldtype: fieldtypeHandle,
-        handle,
+        handle: null,
+        isNew: true,
         icon: fieldtype?.icon || 'fieldtype-generic',
         type: 'inline',
         preview: {
-            config: { ...fieldtype.preview?.config, handle },
+            config: {
+                ...fieldtype.preview?.config,
+                handle: _id,
+            },
             value: fieldtype.preview?.value,
             meta: fieldtype.preview?.meta,
         },
@@ -219,6 +226,20 @@ const addField = (pageId: string, sectionId: string, fieldtypeHandle: string, at
     dirty();
 
     setTimeout(() => document.getElementById('field_display')?.select(), 250);
+};
+
+const ensureUniqueDisplay = (display: string): string => {
+    const displays = pages.value
+        .flatMap((page) => page.sections)
+        .flatMap((section) => section.fields)
+        .map((field) => field.config?.display);
+
+    if (!displays.includes(display)) return display;
+
+    let count = 2;
+    while (displays.includes(`${display} ${count}`)) count++;
+
+    return `${display} ${count}`;
 };
 
 const onFieldtypeDrop = ({ pageId, fieldtypeHandle, sectionId, sectionIndex, fieldIndex }) => {
@@ -290,6 +311,11 @@ const save = () => {
 
     axios.patch(props.action, formFields.value)
         .then((response) => {
+            pages.value
+                .flatMap((page) => page.sections)
+                .flatMap((section) => section.fields)
+                .forEach((field) => delete field.isNew);
+
             clearDirtyState();
             Statamic.$toast.success(__('Saved'));
         })
@@ -344,6 +370,7 @@ provideBuilderContext({
     deletePage,
     clearInspector,
     dirty,
+    ensureUniqueDisplay,
     errors,
     fieldtypes: props.fieldtypes,
     fieldView,
@@ -356,6 +383,7 @@ provideBuilderContext({
     isLeftPanelOpen,
     isRightPanelOpen,
     pages,
+    showFieldDirection: true,
     toggleLeftPanel,
     toggleRightPanel,
     withoutDirtying,
@@ -419,7 +447,7 @@ onUnmounted(() => {
     <div class="col-span-full row-start-1 max-[1000px]:pt-14">
         <Header class="mx-auto max-w-5xl">
             <template #title>
-                <StatusIndicator status="published" />
+                <FormStatusIndicator :status="form.status" />
                 {{ __(form.title) }}
             </template>
             <template #actions>
@@ -469,6 +497,7 @@ onUnmounted(() => {
         <LinkFieldsInspector v-if="inspectorType === InspectorType.LinkFields" />
         <FieldsetInspector v-if="inspectorType === InspectorType.FieldsetImport" />
         <FieldtypeHint v-if="inspectorType === InspectorType.FieldtypeHint" />
+        <EmptyInspector v-if="!inspectorType" />
     </LayoutPanel>
 
     <div

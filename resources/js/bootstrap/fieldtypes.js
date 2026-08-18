@@ -34,6 +34,7 @@ import GroupFieldtype from '../components/fieldtypes/GroupFieldtype.vue';
 import FormBannerFieldtype from '../components/fieldtypes/FormBannerFieldtype.vue';
 import FormHeadingFieldtype from '../components/fieldtypes/FormHeadingFieldtype.vue';
 import FormParagraphFieldtype from '@/components/fieldtypes/FormParagraphFieldtype.vue';
+import FormUploadFieldtype from '@/components/fieldtypes/FormUploadFieldtype.vue';
 import HiddenFieldtype from '../components/fieldtypes/HiddenFieldtype.vue';
 import HtmlFieldtype from '../components/fieldtypes/HtmlFieldtype.vue';
 import IconFieldtype from '../components/fieldtypes/IconFieldtype.vue';
@@ -116,6 +117,7 @@ export default function registerFieldtypes(app) {
     app.component('form_banner-fieldtype', FormBannerFieldtype);
     app.component('form_heading-fieldtype', FormHeadingFieldtype);
     app.component('form_paragraph-fieldtype', FormParagraphFieldtype);
+    app.component('form_upload-fieldtype', FormUploadFieldtype);
     app.component('hidden-fieldtype', HiddenFieldtype);
     app.component('html-fieldtype', HtmlFieldtype);
     app.component('icon-fieldtype', IconFieldtype);

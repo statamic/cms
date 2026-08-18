@@ -80,6 +80,11 @@ abstract class FormFieldtype implements Arrayable
         return $this->categories;
     }
 
+    public function collectsValue(): bool
+    {
+        return ! array_intersect($this->categories(), ['information', 'structure']);
+    }
+
     public function keywords(): array
     {
         return $this->keywords;

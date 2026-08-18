@@ -2,16 +2,16 @@
 import Layout from '@/pages/layout/Layout.vue';
 import PanelLayout from '@/pages/layout/PanelLayout.vue';
 import FormsLayout from './Layout.vue';
-import { Button, Header, Icon, SplitterGroup, SplitterPanel, SplitterResizeHandle, StatusIndicator, ToggleGroup, ToggleItem } from '@ui';
+import { Button, Header, Icon, ToggleGroup, ToggleItem } from '@ui';
+import FormStatusIndicator from '@/components/forms/FormStatusIndicator.vue';
 import FieldNumberingToggle from '@/components/forms/FieldNumberingToggle.vue';
 import LogicList from '@/components/forms/logic/LogicList.vue';
 import LogicTree, { TreeDensity, SelectionType, type Selection } from '@/components/forms/logic/LogicTree.vue';
-import FieldLogicPanel from '@/components/forms/logic/FieldLogicPanel.vue';
-import PageLogicPanel from '@/components/forms/logic/PageLogicPanel.vue';
+import { provideBuilderContext } from '@/pages/forms/Builder.vue';
+import { collectsValue } from '@/components/forms/builder/categories';
 import Head from '@/pages/layout/Head.vue';
 import { useFieldNumberingPreference } from '@/composables/forms/field-numbering';
-import { writeFieldConditions } from '@/composables/forms/field-conditions';
-import { computed, onMounted, onUnmounted, provide, ref, watch } from 'vue';
+import { computed, nextTick, onMounted, onUnmounted, provide, ref, watch } from 'vue';
 import { keys, preferences } from '@api';
 import axios from 'axios';
 
@@ -32,7 +32,6 @@ const props = defineProps({
 const errors = ref({});
 const saving = ref(false);
 const saveBinding = ref(null);
-const escBinding = ref(null);
 const formFields = ref(props.formFields);
 const selected = ref<Selection>(null);
 const view = ref<View>(preferences.get('forms.logic.view', View.List));
@@ -61,7 +60,6 @@ const flattenedFields = computed(() => pages.value.flatMap((page, pageIndex) =>
 
 const selectedPage = computed(() => selected.value?.type === SelectionType.Page ? pages.value.find((page) => page._id === selected.value.id) ?? null : null);
 const selectedField = computed(() => selected.value?.type === SelectionType.Field ? findField(selected.value.id) : null);
-const selectedFieldPageIndex = computed(() => flattenedFields.value.find(({ field }) => field._id === selected.value?.id)?.pageIndex ?? 0);
 
 const { showFieldNumbers } = useFieldNumberingPreference();
 const fieldNumbers = computed(() => {
@@ -87,7 +85,7 @@ const fieldNumbers = computed(() => {
 provide('fieldNumbers', fieldNumbers);
 
 const suggestableFields = computed(() => flattenedFields.value
-    .filter(({ field }) => !['information', 'structure'].includes(fieldCategory(field)))
+    .filter(({ field }) => collectsValue(fieldCategory(field)))
     .map(({ field, pageIndex }) => ({
         handle: field.handle,
         icon: field.icon,
@@ -101,8 +99,45 @@ const suggestableFields = computed(() => flattenedFields.value
     })),
 );
 
-const dirty = () => Statamic.$dirty.add('form-logic');
+const inspecting = computed(() => selectedField.value ?? selectedPage.value);
+
+const avoidTrackingDirtyState = ref(false);
+
+const dirty = () => {
+    if (!avoidTrackingDirtyState.value) Statamic.$dirty.add('form-logic');
+};
+
 const clearDirtyState = () => Statamic.$dirty.remove('form-logic');
+
+const withoutDirtying = (callback: () => void) => {
+    const previous = avoidTrackingDirtyState.value;
+    avoidTrackingDirtyState.value = true;
+    callback();
+    nextTick(() => avoidTrackingDirtyState.value = previous);
+};
+
+const deletePage = (pageId: string) => {
+    if (pages.value.length <= 1) return;
+
+    const pageIndex = pages.value.findIndex((page) => page._id === pageId);
+    if (pageIndex === -1) return;
+
+    formFields.value.pages.splice(pageIndex, 1);
+    selected.value = null;
+    dirty();
+};
+
+provideBuilderContext({
+    deletePage,
+    dirty,
+    errors,
+    fieldtypes: props.fieldtypes,
+    form: props.form,
+    inspecting,
+    pages,
+    showFieldDirection: false,
+    withoutDirtying,
+});
 
 const save = () => {
     if (saving.value) return;
@@ -127,7 +162,11 @@ const save = () => {
 };
 
 watch(formFields, dirty, { deep: true });
-watch(view, (view: View) => preferences.set('forms.logic.view', view));
+watch(view, (view: View) => {
+    preferences.set('forms.logic.view', view);
+
+    if (view !== View.Tree) selected.value = null;
+});
 watch(treeDensity, (density: TreeDensity) => preferences.set('forms.logic.tree.density', density));
 
 onMounted(() => {
@@ -135,14 +174,11 @@ onMounted(() => {
         e.preventDefault();
         save();
     });
-
-    escBinding.value = keys.bindGlobal(['esc'], () => (selected.value = null));
 });
 
 onUnmounted(() => {
     clearDirtyState();
     saveBinding.value?.destroy();
-    escBinding.value?.destroy();
 });
 </script>
 
@@ -159,7 +195,7 @@ onUnmounted(() => {
     <div class="mx-auto w-full max-w-5xl min-w-0 shrink-0">
         <Header class="mb-2 md:py-9">
             <template #title>
-                <StatusIndicator status="published" />
+                <FormStatusIndicator :status="form.status" />
                 {{ __(form.title) }}
             </template>
             <template #actions>
@@ -195,52 +231,11 @@ onUnmounted(() => {
         />
     </div>
 
-    <div v-if="view === View.Tree" class="st-full-bleed-content flex flex-col flex-1 min-h-0">
-        <div class="flex-1 min-h-0 overflow-hidden pb-2!">
-            <SplitterGroup direction="vertical">
-                <SplitterPanel>
-                    <div class="h-full overflow-y-auto">
-                        <LogicTree
-                            v-model:pages="pages"
-                            :density="treeDensity"
-                            :selected
-                            @select="selected = $event"
-                        />
-                    </div>
-                </SplitterPanel>
-
-                <template v-if="selected">
-                    <SplitterResizeHandle class="mx-auto my-1.5 h-1.5 w-16 shrink-0 rounded-full bg-gray-300 transition-colors hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600" />
-
-                    <SplitterPanel
-                        :default-size="35"
-                        :min-size="20"
-                        collapsible
-                        class="rounded-lg border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900"
-                    >
-                        <div class="h-full overflow-y-auto">
-                            <div class="mx-auto max-w-3xl p-6">
-                                <PageLogicPanel
-                                    v-if="selectedPage"
-                                    :page="selectedPage"
-                                    v-model:pages="pages"
-                                    :suggestable-fields
-                                    :fieldtypes
-                                />
-
-                                <FieldLogicPanel
-                                    v-else-if="selectedField"
-                                    :field="selectedField"
-                                    :page-index="selectedFieldPageIndex"
-                                    :suggestable-fields
-                                    :fieldtypes
-                                    @update:conditions="writeFieldConditions(selectedField, $event)"
-                                />
-                            </div>
-                        </div>
-                    </SplitterPanel>
-                </template>
-            </SplitterGroup>
-        </div>
-    </div>
+    <LogicTree
+        v-if="view === View.Tree"
+        v-model:pages="pages"
+        :density="treeDensity"
+        :selected
+        @select="selected = $event"
+    />
 </template>

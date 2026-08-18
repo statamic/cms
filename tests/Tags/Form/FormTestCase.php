@@ -2,6 +2,7 @@
 
 namespace Tests\Tags\Form;
 
+use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Support\Facades\Blade;
 use Statamic\Facades\Form;
 use Statamic\Facades\Parse;
@@ -49,6 +50,8 @@ abstract class FormTestCase extends TestCase
     {
         parent::setUp();
 
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(false)->byDefault();
+
         $this->createForm();
         $this->clearSubmissions();
     }
@@ -94,6 +97,28 @@ abstract class FormTestCase extends TestCase
 
         Form::shouldReceive('find')->with($handle)->andReturn($form);
         Form::makePartial();
+    }
+
+    protected function createMultiPageForm($handle = 'survey')
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        $this->createForm([
+            'pages' => [
+                [
+                    'id' => 'page_one',
+                    'sections' => [
+                        ['display' => 'Section A', 'fields' => [['handle' => 'name', 'field' => ['type' => 'text']]]],
+                    ],
+                ],
+                [
+                    'id' => 'page_two',
+                    'sections' => [
+                        ['display' => 'Section B', 'fields' => [['handle' => 'email', 'field' => ['type' => 'text']]]],
+                    ],
+                ],
+            ],
+        ], $handle);
     }
 
     protected function assertFieldRendersHtml($expectedHtmlParts, $fieldConfig, $oldData = [], $extraParams = [])

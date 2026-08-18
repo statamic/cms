@@ -15,12 +15,13 @@
         "composer/semver": "^3.4",
         "guzzlehttp/guzzle": "^6.3 || ^7.0",
         "inertiajs/inertia-laravel": "^2.0",
+        "intervention/image": "^3.9.1 || ^4.0",
         "james-heinrich/getid3": "^1.9.21",
         "laravel/framework": "^12.40.0 || ^13.0",
         "laravel/prompts": "^0.3.0",
         "league/commonmark": "^2.2",
         "league/csv": "^9.1",
-        "league/glide": "^3.0",
+        "league/glide": "^3.0 || ^4.0",
         "maennchen/zipstream-php": "^3.1",
         "michelf/php-smartypants": "^1.8.1",
         "nesbot/carbon": "^3.0",
@@ -51,6 +52,7 @@
         "laravel/socialite": "^5.28",
         "mockery/mockery": "^1.6.10",
         "orchestra/testbench": "^10.8 || ^11.0",
+        "pestphp/pest": "^4.7",
         "phpstan/phpstan": "^2.2",
         "phpunit/phpunit": "^12.5.23",
         "spatie/laravel-ray": "^1.43.6"
@@ -66,7 +68,8 @@
         "preferred-install": "dist",
         "sort-packages": true,
         "allow-plugins": {
-            "composer/package-versions-deprecated": true
+            "composer/package-versions-deprecated": true,
+            "pestphp/pest-plugin": true
         }
     },
     "extra": {

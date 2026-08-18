@@ -2,6 +2,7 @@
 import { Button, Card, Heading, Icon, Panel, PanelHeader } from '@ui';
 import AddLogicRuleButton from './AddLogicRuleButton.vue';
 import FieldLogicRule from './FieldLogicRule.vue';
+import LogicEmptyState from './LogicEmptyState.vue';
 import { computed, nextTick, ref, watch } from 'vue';
 import { categories, categoryColorClasses } from '@/components/forms/builder/categories';
 import { KEYS } from '@/components/field-conditions/Constants.js';
@@ -16,17 +17,10 @@ const props = defineProps({
 
 const collapsed = ref([]);
 
-const fieldsWithLogic = computed(() => {
-    return props.fields.filter(field => {
-        return field.hidden || KEYS.some(key => field[key] && Object.keys(field[key]).length > 0);
-    });
-});
+const fieldHasLogic = (field) => field.hidden || KEYS.some(key => field[key]);
 
-const fieldsWithoutLogic = computed(() => {
-    return props.fields.filter(field => {
-        return !field.hidden && !KEYS.some(key => field[key] && Object.keys(field[key]).length > 0);
-    });
-});
+const fieldsWithLogic = computed(() => props.fields.filter(fieldHasLogic));
+const fieldsWithoutLogic = computed(() => props.fields.filter(field => !fieldHasLogic(field)));
 
 const expand = (id) => collapsed.value = collapsed.value.filter(setId => setId !== id);
 const expandAll = () => collapsed.value = [];
@@ -150,33 +144,51 @@ watch(
             </div>
         </PanelHeader>
         <Card>
-            <div v-if="fieldsWithLogic.length > 0" class="relative space-y-6 mb-0" data-logic-list>
-                <FieldLogicRule
-                    v-for="field in fieldsWithLogic"
-                    :id="field._id"
-                    :key="field._id"
-                    :config="getFieldConfig(field)"
-                    :collapsed="collapsed.includes(field._id)"
-                    :read-only="false"
-                    :enabled="true"
-                    :has-error="false"
-                    :conditions="getConditionsConfig(field)"
-                    :suggestable-fields="getSuggestableFieldsForField(field)"
-                    :fieldtypes
-                    @collapsed="collapse(field._id)"
-                    @expanded="expand(field._id)"
-                    @removed="removeCondition(field._id)"
-                    @update:conditions="updateConditions(field._id, $event)"
+            <LogicEmptyState
+                v-if="fieldsWithLogic.length === 0"
+                :heading="__('No field logic yet')"
+                :description="__('Show or hide fields based on previous answers.')"
+            >
+                <AddLogicRuleButton
+                    v-if="availableFields.length > 0"
+                    flush
+                    :items="availableFields"
+                    :show-connector="false"
+                    :label="__('Add Rule')"
+                    :search-placeholder="__('Search Fields')"
+                    @added="addCondition"
                 />
-            </div>
-            <AddLogicRuleButton
-                v-if="availableFields.length > 0"
-                :items="availableFields"
-                :show-connector="fieldsWithLogic.length > 0"
-                :label="__('Add Rule')"
-                :search-placeholder="__('Search Fields')"
-                @added="addCondition"
-            />
+            </LogicEmptyState>
+
+            <template v-else>
+                <div class="relative space-y-6 mb-0" data-logic-list>
+                    <FieldLogicRule
+                        v-for="field in fieldsWithLogic"
+                        :id="field._id"
+                        :key="field._id"
+                        :config="getFieldConfig(field)"
+                        :collapsed="collapsed.includes(field._id)"
+                        :read-only="false"
+                        :enabled="true"
+                        :has-error="false"
+                        :conditions="getConditionsConfig(field)"
+                        :suggestable-fields="getSuggestableFieldsForField(field)"
+                        :fieldtypes
+                        @collapsed="collapse(field._id)"
+                        @expanded="expand(field._id)"
+                        @removed="removeCondition(field._id)"
+                        @update:conditions="updateConditions(field._id, $event)"
+                    />
+                </div>
+                <AddLogicRuleButton
+                    v-if="availableFields.length > 0"
+                    :items="availableFields"
+                    :show-connector="fieldsWithLogic.length > 0"
+                    :label="__('Add Rule')"
+                    :search-placeholder="__('Search Fields')"
+                    @added="addCondition"
+                />
+            </template>
         </Card>
     </Panel>
 </template>

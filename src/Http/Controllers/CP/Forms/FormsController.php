@@ -10,36 +10,45 @@ use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Http\Controllers\CP\Forms\Concerns\ProvidesFormAbilities;
 use Statamic\Rules\Handle;
+use Statamic\Statamic;
 use Statamic\Support\Str;
 
 use function Statamic\trans as __;
 
 class FormsController extends CpController
 {
+    use ProvidesFormAbilities;
+
     public function index(Request $request)
     {
         $this->authorize('index', FormContract::class);
 
-        $columns = [
-            Column::make('title')->label(__('Title')),
-            Column::make('submissions')->label(__('Submissions')),
-        ];
+        $user = User::current();
 
-        $forms = Form::all()
-            ->filter(function ($form) {
-                return User::current()->can('view', $form);
-            })
-            ->map(function ($form) {
+        $columns = [Column::make('title')->label(__('Title'))];
+
+        $forms = Form::all()->filter(fn ($form) => $user->can('view', $form));
+
+        if ($forms->contains(fn ($form) => $user->can('viewSubmissions', $form))) {
+            $columns[] = Column::make('submissions')->label(__('Submissions'));
+        }
+
+        $forms = $forms
+            ->map(function ($form) use ($user) {
+                $canViewSubmissions = $user->can('viewSubmissions', $form);
+
                 return [
                     'id' => $form->handle(),
                     'title' => __($form->title()),
-                    'submissions' => $form->querySubmissions()->whereNull('partial')->count(),
+                    'status' => $form->status(),
+                    'submissions' => $canViewSubmissions ? $form->querySubmissions()->whereNull('partial')->count() : null,
                     'show_url' => $form->showUrl(),
                     'submissions_url' => $form->submissionsUrl(),
                     'edit_url' => $form->editUrl(),
-                    'can_edit' => User::current()->can('edit', $form),
-                    'can_edit_blueprint' => User::current()->can('configure form fields', $form),
+                    'can_edit' => $user->can('edit', $form),
+                    'can_view_submissions' => $canViewSubmissions,
                 ];
             })
             ->values();
@@ -48,7 +57,7 @@ class FormsController extends CpController
             'forms' => $forms,
             'initialColumns' => $columns,
             'actionUrl' => cp_route('forms.actions.run'),
-            'canCreate' => User::current()->can('create', FormContract::class),
+            'canCreate' => $user->can('create', FormContract::class) && $this->canCreateAdditionalForms(),
             'createUrl' => cp_route('forms.create'),
             'configureEmailUrl' => cp_route('utilities.email'),
         ]);
@@ -56,7 +65,14 @@ class FormsController extends CpController
 
     public function show($form)
     {
-        if ($form->querySubmissions()->count() === 0) {
+        $this->authorize('view', $form);
+
+        $user = User::current();
+
+        if (
+            $user->can('editFields', $form)
+            && ($user->cant('viewSubmissions', $form) || $form->querySubmissions()->count() === 0)
+        ) {
             return redirect()->route('statamic.cp.forms.builder.edit', $form->handle());
         }
 
@@ -65,7 +81,7 @@ class FormsController extends CpController
 
     public function create()
     {
-        $this->authorizeProIf(Form::all()->count() >= 1);
+        $this->authorizeProIf(! $this->canCreateAdditionalForms());
 
         $this->authorize('create', FormContract::class);
 
@@ -76,7 +92,7 @@ class FormsController extends CpController
 
     public function store(Request $request)
     {
-        $this->authorizeProIf(Form::all()->count() >= 1);
+        $this->authorizeProIf(! $this->canCreateAdditionalForms());
 
         $this->authorize('create', FormContract::class, __('You are not authorized to create forms.'));
 
@@ -124,6 +140,7 @@ class FormsController extends CpController
             'initialValues' => $fields->values(),
             'initialMeta' => $fields->meta(),
             'action' => cp_route('forms.update', $form->handle()),
+            'can' => $this->formAbilities($form),
         ]);
     }
 
@@ -156,6 +173,13 @@ class FormsController extends CpController
         $this->authorize('delete', $form, 'You are not authorized to delete this form.');
 
         $form->delete();
+    }
+
+    private function canCreateAdditionalForms(): bool
+    {
+        return Form::all()->isEmpty()
+            || Statamic::pro()
+            || Statamic::formsProInstalled();
     }
 
     protected function editFormBlueprint($form)
@@ -193,6 +217,61 @@ class FormsController extends CpController
                         'type' => 'toggle',
                         'default' => true,
                         'instructions' => __('statamic::messages.form_configure_generate_fake_submissions_instructions'),
+                    ],
+                ],
+            ],
+            'access' => [
+                'display' => __('Access'),
+                'fields' => [
+                    'close_date' => [
+                        'display' => __('Close Date'),
+                        'type' => 'date',
+                        'time_enabled' => true,
+                        'instructions' => __('statamic::messages.form_configure_close_date_instructions'),
+                    ],
+                    'submission_limit' => [
+                        'display' => __('Submission Limit'),
+                        'type' => 'integer',
+                        'instructions' => __('statamic::messages.form_configure_submission_limit_instructions'),
+                    ],
+                    'submission_limit_period' => [
+                        'display' => __('Submission Limit Period'),
+                        'type' => 'button_group',
+                        'default' => 'total',
+                        'options' => [
+                            'total' => __('Total'),
+                            'day' => __('Per Day'),
+                            'week' => __('Per Week'),
+                            'month' => __('Per Month'),
+                        ],
+                        'if' => [
+                            'submission_limit' => 'not empty',
+                        ],
+                        'instructions' => __('statamic::messages.form_configure_submission_limit_period_instructions'),
+                    ],
+                    'closed_message' => [
+                        'display' => __('Closed Message'),
+                        'type' => 'textarea',
+                        'if_any' => [
+                            'close_date' => 'not empty',
+                            'submission_limit' => 'not empty',
+                        ],
+                        'placeholder' => __('statamic::messages.form_closed_message'),
+                        'instructions' => __('statamic::messages.form_configure_closed_message_instructions'),
+                    ],
+                    'require_login' => [
+                        'display' => __('Require Login'),
+                        'type' => 'toggle',
+                        'instructions' => __('statamic::messages.form_configure_require_login_instructions'),
+                    ],
+                    'require_login_message' => [
+                        'display' => __('Require Login Message'),
+                        'type' => 'textarea',
+                        'if' => [
+                            'require_login' => 'equals true',
+                        ],
+                        'placeholder' => __('statamic::messages.form_require_login_message'),
+                        'instructions' => __('statamic::messages.form_configure_require_login_message_instructions'),
                     ],
                 ],
             ],
@@ -264,6 +343,7 @@ class FormsController extends CpController
                                     'display' => __('HTML view'),
                                     'instructions' => __('statamic::messages.form_configure_email_html_instructions'),
                                     'folder' => config('statamic.forms.email_view_folder'),
+                                    'clearable' => true,
                                 ],
                             ],
                             [
@@ -273,6 +353,7 @@ class FormsController extends CpController
                                     'display' => __('Text view'),
                                     'instructions' => __('statamic::messages.form_configure_email_text_instructions'),
                                     'folder' => config('statamic.forms.email_view_folder'),
+                                    'clearable' => true,
                                 ],
                             ],
                             [

@@ -38,6 +38,10 @@ class FormFieldTransformer extends FieldTransformer
 
         $field = collect($submitted['config'])
             ->reject(function ($value, $key) use ($fields) {
+                if ($key === 'isNew') {
+                    return true;
+                }
+
                 if ($key === 'icon' && ! $fields->has('icon')) {
                     return true;
                 }
