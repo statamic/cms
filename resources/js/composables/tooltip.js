@@ -12,7 +12,8 @@ let pendingEl = null;
 let tracking = false;
 let pointer = null;
 
-const EDGE = 4;
+const EDGE = 12;
+const GAP_SLACK = 16;
 
 function isInteractive() {
     return html.value || copyable.value;
@@ -46,8 +47,8 @@ export function tooltipGapRect(trigger, popper) {
 
     if (popper.bottom <= trigger.top) {
         return {
-            left: Math.min(trigger.left, popper.left),
-            right: Math.max(trigger.right, popper.right),
+            left: Math.min(trigger.left, popper.left) - GAP_SLACK,
+            right: Math.max(trigger.right, popper.right) + GAP_SLACK,
             top: popper.bottom,
             bottom: trigger.top,
         };
@@ -55,8 +56,8 @@ export function tooltipGapRect(trigger, popper) {
 
     if (popper.top >= trigger.bottom) {
         return {
-            left: Math.min(trigger.left, popper.left),
-            right: Math.max(trigger.right, popper.right),
+            left: Math.min(trigger.left, popper.left) - GAP_SLACK,
+            right: Math.max(trigger.right, popper.right) + GAP_SLACK,
             top: trigger.bottom,
             bottom: popper.top,
         };
@@ -66,8 +67,8 @@ export function tooltipGapRect(trigger, popper) {
         return {
             left: popper.right,
             right: trigger.left,
-            top: Math.min(trigger.top, popper.top),
-            bottom: Math.max(trigger.bottom, popper.bottom),
+            top: Math.min(trigger.top, popper.top) - GAP_SLACK,
+            bottom: Math.max(trigger.bottom, popper.bottom) + GAP_SLACK,
         };
     }
 
@@ -75,8 +76,8 @@ export function tooltipGapRect(trigger, popper) {
         return {
             left: trigger.right,
             right: popper.left,
-            top: Math.min(trigger.top, popper.top),
-            bottom: Math.max(trigger.bottom, popper.bottom),
+            top: Math.min(trigger.top, popper.top) - GAP_SLACK,
+            bottom: Math.max(trigger.bottom, popper.bottom) + GAP_SLACK,
         };
     }
 

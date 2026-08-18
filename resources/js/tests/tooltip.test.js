@@ -65,6 +65,11 @@ test('it treats the gap between a side-placed trigger and popper as inside', () 
     expect(isInTooltipHoverRegion(205, 210, trigger, popperRight)).toBe(true);
 });
 
+test('it treats a slight sideways drift in the gap as inside', () => {
+    expect(isInTooltipHoverRegion(208, 195, trigger, popperAbove)).toBe(true);
+    expect(isInTooltipHoverRegion(92, 195, trigger, popperAbove)).toBe(true);
+});
+
 test('it treats points outside the hover region as outside', () => {
     expect(isInTooltipHoverRegion(50, 50, trigger, popperAbove)).toBe(false);
     expect(isInTooltipHoverRegion(50, 195, trigger, popperAbove)).toBe(false);
