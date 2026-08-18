@@ -376,34 +376,42 @@ export default {
             this.$el.setAttribute('draggable', true);
 
             // dragstart fires on this.$el (the draggable wrapper), not the inner container.
-            this.$el.addEventListener('dragstart', this.collapseSiblingsForDrag, { once: true });
+            this.$el.addEventListener('dragstart', this.hideSetBodiesForDrag, { once: true });
+            // The drop recreates this node view, so dragend fires on an element that's no
+            // longer in the document and never reaches the listener below. No mouseup is
+            // dispatched during a native drag either, hence the listener on the element too.
+            this.$el.addEventListener('dragend', this.disableDragging, { once: true });
             document.addEventListener('mouseup', this.disableDragging, { once: true });
             document.addEventListener('dragend', this.disableDragging, { once: true });
         },
 
-        collapseSiblingsForDrag(event) {
+        // The .bard-dragging class hides the set bodies for the duration of the drag.
+        // Don't actually collapse the sets — that would persist to meta and leave
+        // everything collapsed after the drop.
+        hideSetBodiesForDrag(event) {
             const bard = this.extension.options.bard;
-            const root = this.$el.closest('.bard-fieldtype');
+
+            // Held onto so it can be cleaned up from a detached element.
+            this._dragRoot = this.$el.closest('.bard-fieldtype');
 
             keepElementUnderPointer(this.$el, () => {
                 bard.dragging = true;
-                root?.classList.add('bard-dragging');
+                this._dragRoot?.classList.add('bard-dragging');
             });
 
             const rect = this.$el.getBoundingClientRect();
             event.dataTransfer?.setDragImage(this.$el, event.clientX - rect.left, event.clientY - rect.top);
-
-            bard.collapseAll();
         },
 
         disableDragging() {
-            this.$el.removeEventListener('dragstart', this.collapseSiblingsForDrag);
+            this.$el.removeEventListener('dragstart', this.hideSetBodiesForDrag);
             this.$el.setAttribute('draggable', false);
             this._draggableObserver?.observe(this.$el, { attributes: true, attributeFilter: ['draggable'] });
 
             const bard = this.extension.options.bard;
             bard.dragging = false;
-            this.$el.closest('.bard-fieldtype')?.classList.remove('bard-dragging');
+            this._dragRoot?.classList.remove('bard-dragging');
+            this._dragRoot = null;
         },
 
         preventNodeSelectionDrag(event) {

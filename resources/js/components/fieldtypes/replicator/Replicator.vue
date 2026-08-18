@@ -222,12 +222,14 @@ export default {
             const source = event?.source || event?.originalSource;
             const root = this.$refs.sets;
 
+            // The .replicator-dragging class hides the set bodies for the duration of the
+            // drag. Don't actually collapse the sets — that would persist to meta and
+            // leave everything collapsed after the drop.
             keepElementUnderPointer(source, () => {
                 this.dragging = true;
                 root?.classList.add('replicator-dragging');
             });
 
-            this.collapseAll();
             this.$emit('focus');
         },
 
