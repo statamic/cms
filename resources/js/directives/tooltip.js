@@ -12,6 +12,12 @@ function getOptions(binding) {
     return value;
 }
 
+function isHtmlTooltip(binding) {
+    const options = getOptions(binding);
+
+    return !!(options && typeof options === 'object' && options.html);
+}
+
 function isNativelyFocusable(el) {
     const tag = el.tagName;
 
@@ -21,12 +27,28 @@ function isNativelyFocusable(el) {
     );
 }
 
-function shouldBecomeFocusable(el) {
-    if (el.hasAttribute('tabindex') || isNativelyFocusable(el) || el.closest('label')) {
-        return false;
-    }
+function wantsAddedTabIndex(el, binding) {
+    if (!isHtmlTooltip(binding)) return false;
+    if (isNativelyFocusable(el) || el.closest('label')) return false;
+    if (el.hasAttribute('tabindex') && !el._tooltipAddedTabIndex) return false;
 
     return true;
+}
+
+function syncTabIndex(el, binding) {
+    if (wantsAddedTabIndex(el, binding)) {
+        if (el._tooltipAddedTabIndex) return;
+
+        el.tabIndex = 0;
+        el._tooltipAddedTabIndex = true;
+
+        return;
+    }
+
+    if (el._tooltipAddedTabIndex) {
+        el.removeAttribute('tabindex');
+        delete el._tooltipAddedTabIndex;
+    }
 }
 
 function handleMouseEnter(el, binding) {
@@ -43,10 +65,7 @@ export default {
         el._tooltipMouseLeave = hide;
         el._tooltipBlur = (event) => dismissFor(el, event);
 
-        if (shouldBecomeFocusable(el)) {
-            el.tabIndex = 0;
-            el._tooltipAddedTabIndex = true;
-        }
+        syncTabIndex(el, binding);
 
         el.addEventListener('mouseenter', el._tooltipMouseEnter);
         el.addEventListener('mouseleave', el._tooltipMouseLeave);
@@ -56,6 +75,7 @@ export default {
 
     updated(el, binding) {
         el._tooltipBinding = binding;
+        syncTabIndex(el, binding);
     },
 
     beforeUnmount(el) {
