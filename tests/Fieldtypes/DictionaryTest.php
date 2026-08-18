@@ -3,6 +3,7 @@
 namespace Tests\Fieldtypes;
 
 use Facades\Statamic\Fields\FieldtypeRepository;
+use Illuminate\Auth\GenericUser;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Dictionaries\Countries;
@@ -137,6 +138,55 @@ class DictionaryTest extends TestCase
             ->getJson($this->optionsUrl('restricted'))
             ->assertOk()
             ->assertJsonStructure(['data' => [['key', 'value']]]);
+    }
+
+    #[Test]
+    public function a_cp_user_can_request_options_when_the_cp_guard_is_not_the_default_guard()
+    {
+        config([
+            'statamic.users.guards.cp' => 'cp',
+            'auth.guards.cp' => config('auth.guards.web'),
+        ]);
+
+        RestrictedDictionary::register();
+
+        $this->actingAs(User::make()->makeSuper(), 'cp');
+        $this->app['auth']->shouldUse('web');
+
+        $this
+            ->getJson($this->optionsUrl('restricted'))
+            ->assertOk()
+            ->assertJsonStructure(['data' => [['key', 'value']]]);
+    }
+
+    #[Test]
+    public function a_cp_user_can_request_options_while_a_non_statamic_user_is_authenticated_on_the_default_guard()
+    {
+        config([
+            'statamic.users.guards.cp' => 'cp',
+            'auth.guards.cp' => config('auth.guards.web'),
+        ]);
+
+        RestrictedDictionary::register();
+
+        $this->actingAs(User::make()->makeSuper(), 'cp');
+        $this->actingAs(new GenericUser(['id' => 1]), 'web');
+
+        $this
+            ->getJson($this->optionsUrl('restricted'))
+            ->assertOk()
+            ->assertJsonStructure(['data' => [['key', 'value']]]);
+    }
+
+    #[Test]
+    public function a_non_statamic_user_cannot_request_options_from_a_dictionary_that_does_not_allow_public_access()
+    {
+        RestrictedDictionary::register();
+
+        $this
+            ->actingAs(new GenericUser(['id' => 1]))
+            ->getJson($this->optionsUrl('restricted'))
+            ->assertForbidden();
     }
 
     #[Test]
