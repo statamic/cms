@@ -61,12 +61,6 @@ class MoveAsset extends Action
                 $existingAsset = $asset->container()->asset($destinationPath);
                 $sourceLastModified = $asset->disk()->lastModified($asset->path());
                 $destinationLastModified = $asset->disk()->lastModified($destinationPath);
-                $movingAge = $sourceLastModified >= $destinationLastModified
-                    ? __('statamic::messages.asset_conflict_newer')
-                    : __('statamic::messages.asset_conflict_older');
-                $existingDescriptor = $sourceLastModified >= $destinationLastModified
-                    ? __('statamic::messages.asset_conflict_an_older')
-                    : __('statamic::messages.asset_conflict_a_newer');
 
                 if ($strategy === 'overwrite') {
                     if ($existingAsset && ! User::current()->can('delete', $existingAsset)) {
@@ -104,11 +98,13 @@ class MoveAsset extends Action
                     continue;
                 }
 
+                $messageKey = $sourceLastModified >= $destinationLastModified
+                    ? 'statamic::messages.asset_conflict_message_newer_replaces_older'
+                    : 'statamic::messages.asset_conflict_message_older_replaces_newer';
+
                 throw new AssetConflictException(
-                    __('statamic::messages.asset_conflict_message', [
+                    __($messageKey, [
                         'filename' => $asset->basename(),
-                        'existing_descriptor' => $existingDescriptor,
-                        'moving_age' => $movingAge,
                     ]),
                     [
                         'conflict' => [
