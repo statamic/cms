@@ -235,6 +235,15 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
         return $this->formFields()->pages()->count() > 1;
     }
 
+    public function hasUniqueInstances(): bool
+    {
+        if (! Statamic::formsProInstalled()) {
+            return false;
+        }
+
+        return (bool) $this->get('unique_instances');
+    }
+
     /**
      * Get the blueprint.
      *

@@ -212,6 +212,13 @@ class FormsController extends CpController
                         'type' => 'toggle',
                         'instructions' => __('statamic::messages.form_configure_store_instructions'),
                     ],
+                    ...(Statamic::formsProInstalled() ? [
+                        'unique_instances' => [
+                            'display' => __('Unique Instances'),
+                            'type' => 'toggle',
+                            'instructions' => __('statamic::messages.form_configure_unique_instances_instructions'),
+                        ],
+                    ] : []),
                     'generate_fake_submissions' => [
                         'display' => __('Enable Fake Submission Generator'),
                         'type' => 'toggle',

@@ -138,6 +138,7 @@ return [
     'form_configure_mailer_instructions' => 'Choose the mailer for sending this email. Leave blank to fall back to the default mailer.',
     'form_configure_generate_fake_submissions_instructions' => 'Allow generating fake submissions and workflow testing from the submissions screen.',
     'form_configure_store_instructions' => 'Disable to stop storing submissions. Events and email notifications will still be sent.',
+    'form_configure_unique_instances_instructions' => 'Treat each entry using this form as its own instance. Submissions will be attached to the entry they were submitted from.',
     'form_configure_title_instructions' => 'Use a call to action, such as \'Contact Us\'.',
     'form_configure_close_date_instructions' => 'The form will stop accepting submissions after this date. Leave blank to never close.',
     'form_configure_submission_limit_instructions' => 'The maximum number of submissions to accept. Leave blank for no limit.',
