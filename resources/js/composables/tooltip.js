@@ -41,29 +41,74 @@ function contains(rect, x, y, pad = EDGE) {
     );
 }
 
-function gapRect(trigger, popper) {
-    const left = Math.min(trigger.left, popper.left);
-    const right = Math.max(trigger.right, popper.right);
+export function tooltipGapRect(trigger, popper) {
+    if (!trigger || !popper) return null;
 
-    if (popper.bottom <= trigger.top) return { left, right, top: popper.bottom, bottom: trigger.top };
-    if (popper.top >= trigger.bottom) return { left, right, top: trigger.bottom, bottom: popper.top };
+    if (popper.bottom <= trigger.top) {
+        return {
+            left: Math.min(trigger.left, popper.left),
+            right: Math.max(trigger.right, popper.right),
+            top: popper.bottom,
+            bottom: trigger.top,
+        };
+    }
+
+    if (popper.top >= trigger.bottom) {
+        return {
+            left: Math.min(trigger.left, popper.left),
+            right: Math.max(trigger.right, popper.right),
+            top: trigger.bottom,
+            bottom: popper.top,
+        };
+    }
+
+    if (popper.right <= trigger.left) {
+        return {
+            left: popper.right,
+            right: trigger.left,
+            top: Math.min(trigger.top, popper.top),
+            bottom: Math.max(trigger.bottom, popper.bottom),
+        };
+    }
+
+    if (popper.left >= trigger.right) {
+        return {
+            left: trigger.right,
+            right: popper.left,
+            top: Math.min(trigger.top, popper.top),
+            bottom: Math.max(trigger.bottom, popper.bottom),
+        };
+    }
 
     return null;
 }
 
-function isPointerInside(x, y) {
-    const trigger = triggerRect();
-    const popper = popperRect();
+export function isInTooltipHoverRegion(x, y, trigger, popper, edge = EDGE) {
+    if (contains(trigger, x, y, edge) || contains(popper, x, y, edge)) return true;
 
-    if (contains(trigger, x, y) || contains(popper, x, y)) return true;
+    // Popper isn't measured yet — keep the tooltip so the pointer can cross the gap.
+    if (trigger && !popper) return true;
 
-    return !!trigger && !!popper && contains(gapRect(trigger, popper), x, y, 0);
+    return !!trigger && !!popper && contains(tooltipGapRect(trigger, popper), x, y, 0);
+}
+
+function isOverInteractiveTooltip() {
+    if (pointer) {
+        return isInTooltipHoverRegion(pointer.x, pointer.y, triggerRect(), popperRect());
+    }
+
+    if (targetEl.value?.matches?.(':hover')) return true;
+    if (contentEl.value?.matches?.(':hover')) return true;
+    if (contentEl.value?.closest?.('.v-popper__popper')?.matches?.(':hover')) return true;
+
+    // Still mounting, and we have not seen a pointer yet.
+    return isVisible.value && isInteractive() && !popperRect();
 }
 
 function onPointerMove(event) {
     pointer = { x: event.clientX, y: event.clientY };
 
-    if (!isPointerInside(pointer.x, pointer.y)) dismiss();
+    if (!isOverInteractiveTooltip()) dismiss();
 }
 
 function startTracking() {
@@ -115,6 +160,7 @@ function dismiss() {
 
     isVisible.value = false;
     targetEl.value = null;
+    contentEl.value = null;
     content.value = '';
     html.value = false;
     copyable.value = false;
@@ -145,8 +191,7 @@ function show(el, options) {
 
 function hide() {
     if (isVisible.value && isInteractive()) {
-        if (pointer && !isPointerInside(pointer.x, pointer.y)) dismiss();
-        return;
+        if (isOverInteractiveTooltip()) return;
     }
 
     dismiss();
@@ -158,6 +203,10 @@ function dismissFor(el) {
 
 function registerContentEl(el) {
     contentEl.value = el ?? null;
+
+    if (el && isVisible.value && isInteractive() && !isOverInteractiveTooltip()) {
+        dismiss();
+    }
 }
 
 export function useTooltip() {

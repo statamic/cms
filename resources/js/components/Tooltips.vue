@@ -81,9 +81,10 @@ watch([isVisible, targetEl, content], async ([visible, target]) => {
                             class="cursor-pointer hover:underline"
                             role="button"
                             tabindex="0"
-                            :aria-label="__('Copy')"
+                            :aria-label="__('Copy :handle to clipboard', { handle: displayContent })"
                             @click.stop="copy(displayContent)"
                             @keydown.enter.prevent="copy(displayContent)"
+                            @keydown.space.prevent="copy(displayContent)"
                         >{{ displayContent }}</span>
                         <template v-else>{{ displayContent }}</template>
                     </div>
