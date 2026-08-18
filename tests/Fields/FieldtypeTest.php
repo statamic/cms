@@ -545,6 +545,32 @@ class FieldtypeTest extends TestCase
     }
 
     #[Test]
+    public function it_only_computes_default_values_for_config_fields_missing_from_the_raw_config()
+    {
+        FieldtypeWithCountedDefaultValue::$timesDefaultValueWasComputed = 0;
+
+        (new FieldtypeWithCountedDefaultValue)::register();
+
+        $fieldtype = (new TestFieldtypeWithCountedConfigField)->setField(new Field('test', [
+            'alfa' => 'explicitly set',
+        ]));
+
+        $this->assertEquals([
+            'alfa' => 'explicitly set',
+        ], $fieldtype->config());
+
+        $this->assertSame(0, FieldtypeWithCountedDefaultValue::$timesDefaultValueWasComputed);
+
+        $fieldtype = (new TestFieldtypeWithCountedConfigField)->setField(new Field('test', []));
+
+        $this->assertEquals([
+            'alfa' => 'default!',
+        ], $fieldtype->config());
+
+        $this->assertSame(1, FieldtypeWithCountedDefaultValue::$timesDefaultValueWasComputed);
+    }
+
+    #[Test]
     #[Group('graphql')]
     public function it_gets_the_graphql_type_of_string_by_default()
     {
@@ -742,6 +768,29 @@ class TestFieldtypeWithConfigFields extends Fieldtype
             'default' => ['hotel!'],
         ],
     ];
+}
+
+class TestFieldtypeWithCountedConfigField extends Fieldtype
+{
+    protected $configFields = [
+        'alfa' => [
+            'type' => 'counted_default',
+        ],
+    ];
+}
+
+class FieldtypeWithCountedDefaultValue extends Fieldtype
+{
+    protected static $handle = 'counted_default';
+
+    public static $timesDefaultValueWasComputed = 0;
+
+    public function defaultValue()
+    {
+        static::$timesDefaultValueWasComputed++;
+
+        return 'default!';
+    }
 }
 
 class TestMultiWordFieldtype extends Fieldtype
