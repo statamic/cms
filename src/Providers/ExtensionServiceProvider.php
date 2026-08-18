@@ -201,6 +201,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Scopes\Filters\Fields::class,
         Scopes\Filters\Blueprint::class,
         Scopes\Filters\Status::class,
+        Scopes\Filters\SubmissionEntry::class,
         Scopes\Filters\SubmissionSite::class,
         Scopes\Filters\SubmissionStatus::class,
         Scopes\Filters\Site::class,
