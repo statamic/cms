@@ -1,0 +1,21 @@
+import { Canvas, Meta, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as ImagePieChartStories from '../ImagePieChart.stories';
+
+<Meta of={ImagePieChartStories} />
+
+# ImagePieChart
+A two-segment pie chart that uses each item's image as its fill. Each item supports a label, badge, percentage, and response count.
+<Canvas of={ImagePieChartStories._DocsIntro} sourceState={'shown'} />
+
+Use this for binary image-choice results. Each item should provide `image` and `badge` alongside the shared `label`, `percent`, and `count` values.
+
+## Response counts
+Set `metric` to `count` without changing the segment proportions.
+<Canvas of={ImagePieChartStories._Counts} sourceState={'shown'} />
+
+## Inside a widget
+Add the surrounding title and field icon with `Widget`.
+<Canvas of={ImagePieChartStories._InsideAWidget} sourceState={'shown'} />
+
+## Arguments
+<ArgTypes of={ImagePieChartStories} />

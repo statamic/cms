@@ -1,0 +1,38 @@
+import { Canvas, Meta, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as HorizontalBarChartStories from '../HorizontalBarChart.stories';
+
+<Meta of={HorizontalBarChartStories} />
+
+# HorizontalBarChart
+A horizontal comparison chart for labelled response data. Pass an accessible summary because the visual rows are hidden from assistive technology.
+<Canvas of={HorizontalBarChartStories._DocsIntro} sourceState={'shown'} />
+
+Each item needs a `label` and `percent`. Add `count` when users can switch metrics, and `value` when the bar width should differ from the displayed percentage.
+
+```js
+const items = [
+    { label: 'Yes', percent: 55, count: 136 },
+    { label: 'No', percent: 35, count: 87 },
+];
+```
+
+## Response counts
+Set `metric` to `count` to show response totals instead of percentages.
+<Canvas of={HorizontalBarChartStories._Counts} sourceState={'shown'} />
+
+## Metric placement
+Move metrics to the end and hide markers for distributions where the labels should lead each row.
+<Canvas of={HorizontalBarChartStories._MetricAtEnd} sourceState={'shown'} />
+
+## Custom markers
+The `marker` slot receives the current `item` and `index`. Use it for field-specific icons, images, or badges.
+<Canvas of={HorizontalBarChartStories._CustomMarkers} sourceState={'shown'} />
+
+## Inside a widget
+Charts only render the visualization. Wrap one in a `Widget` when it needs a title, icon, actions, or card treatment.
+<Canvas of={HorizontalBarChartStories._InsideAWidget} sourceState={'shown'} />
+
+Use the `summary` slot for aggregate information above the rows. The `bar` slot receives `item`, `index`, and the calculated `width` when the fill needs custom styling.
+
+## Arguments
+<ArgTypes of={HorizontalBarChartStories} />

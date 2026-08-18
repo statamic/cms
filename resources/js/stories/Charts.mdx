@@ -1,0 +1,42 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Charts/Overview" />
+
+# Charts
+Statamic's chart components display compact response summaries without bringing a charting library into the Control Panel.
+
+## Choosing a chart
+
+- Use `HorizontalBarChart` for general comparisons and long labels.
+- Use `HorizontalLollipopChart` when order or rank is the main point.
+- Use `VerticalBarChart` for an ordered scale with short labels.
+- Use `PieChart` for two to four parts of a whole.
+- Use `ImagePieChart` for a binary image-choice result.
+
+## Data
+All charts accept an `items` array built around the same values:
+
+```js
+const items = [
+    {
+        label: 'Yes',
+        percent: 55,
+        count: 136,
+    },
+];
+```
+
+`percent` controls the visualization and percentage display. `count` is displayed when `metric="count"`. Bar and lollipop charts also accept `value` when visual size should differ from the displayed percentage.
+
+## Accessibility
+Always pass a concise `accessibleLabel` that describes the result in plain language. The chart's visual marks are hidden from assistive technology to avoid reading disconnected labels and numbers.
+
+```html
+<HorizontalBarChart
+    :items="items"
+    accessible-label="Attendance: Yes 55%, No 45%"
+/>
+```
+
+## Composition
+Charts render only the visualization. Put them inside `Widget` for a title, field icon, actions, and card layout. Use scoped slots for field-specific markers and fills.

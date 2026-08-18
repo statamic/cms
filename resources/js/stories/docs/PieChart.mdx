@@ -1,0 +1,28 @@
+import { Canvas, Meta, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as PieChartStories from '../PieChart.stories';
+
+<Meta of={PieChartStories} />
+
+# PieChart
+A pie chart for up to four segments. Legend items may be clickable, and `segments` can preserve the original pie while displaying a focused segment breakdown.
+<Canvas of={PieChartStories._DocsIntro} sourceState={'shown'} />
+
+Keep the items ordered by significance and supply an `accessibleLabel` that states the same result in plain language. Pie charts reject more than four segments; group smaller values before passing them in.
+
+## Response counts
+<Canvas of={PieChartStories._Counts} sourceState={'shown'} />
+
+## Interactive breakdown
+Set `clickable: true` on a legend item and handle `select` to reveal its detail. On the detail chart, pass the original items as `segments` and the selected zero-based index as `focusedIndex`.
+<Canvas of={PieChartStories._InteractiveBreakdown} sourceState={'shown'} />
+
+## Focused segment
+This is the detail state by itself. The original segments retain the shape of the pie while the new `items` populate its legend.
+<Canvas of={PieChartStories._FocusedSegment} sourceState={'shown'} />
+
+## Custom markers
+Replace legend swatches through the `marker` slot. It receives the current `item` and `index`.
+<Canvas of={PieChartStories._CustomMarkers} sourceState={'shown'} />
+
+## Arguments
+<ArgTypes of={PieChartStories} />
