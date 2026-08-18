@@ -36,6 +36,9 @@ class ClearAssetGlideCache extends Subscriber implements ShouldQueue
         $this->clear($event->asset);
     }
 
+    /**
+     * Clear cached transforms when uploading over an on-disk file that has no asset record.
+     */
     public function handleUploaded(AssetUploaded $event)
     {
         $this->clear($event->asset);

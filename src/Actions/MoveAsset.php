@@ -53,7 +53,7 @@ class MoveAsset extends Action
         $ids = [];
         $completedMoves = [];
 
-        foreach ($assets as $index => $asset) {
+        foreach ($assets as $asset) {
             $destinationPath = Str::removeLeft(Path::tidy($folder.'/'.$asset->basename()), '/');
             $conflicts = $asset->path() !== $destinationPath && $asset->disk()->exists($destinationPath);
 
