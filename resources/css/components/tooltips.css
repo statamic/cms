@@ -10,6 +10,10 @@
     padding: 5px 10px !important;
 }
 
+.v-popper--theme-tooltip a {
+    @apply underline;
+}
+
 .v-popper--theme-tooltip:has(.tooltip-popper-interactive),
 .v-popper--theme-tooltip:has(.tooltip-popper-interactive) .v-popper__wrapper {
     pointer-events: auto;
