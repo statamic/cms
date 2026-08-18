@@ -96,6 +96,26 @@ export default {
             return this.draggingAsset ? [this.draggingAsset] : [];
         },
 
+        invokeActionCallback(data) {
+            if (!data) {
+                return;
+            }
+
+            if (Array.isArray(data.callback) && data.callback.length) {
+                Statamic.$callbacks.call(data.callback[0], ...data.callback.slice(1));
+                return;
+            }
+
+            if (
+                data.completed_moves &&
+                typeof data.completed_moves === 'object' &&
+                !Array.isArray(data.completed_moves) &&
+                Object.keys(data.completed_moves).length
+            ) {
+                Statamic.$callbacks.call('replaceInSelections', data.completed_moves);
+            }
+        },
+
         handleFolderDrop(destinationFolder) {
             if (this.draggingAsset) {
                 let asset = this.assets.find((asset) => asset.id === this.draggingAsset);
@@ -116,6 +136,8 @@ export default {
                 this.$axios
                     .post(this.actionUrl, payload)
                     .then(({ data }) => {
+                        this.invokeActionCallback(data);
+
                         if (data.success === false && data.conflict?.type === 'asset_move') {
                             this.$emit('asset-move-conflict', {
                                 action,
@@ -153,7 +175,10 @@ export default {
 
                 this.$axios
                     .post(this.folderActionUrl, payload)
-                    .then(({ data }) => this.$emit('action-completed', data.success !== false, data))
+                    .then(({ data }) => {
+                        this.invokeActionCallback(data);
+                        this.$emit('action-completed', data.success !== false, data);
+                    })
                     .catch((error) => this.$emit('action-completed', false, error.response?.data || {}))
                     .finally(() => this.draggingFolder = null);
             }

@@ -999,6 +999,26 @@ export default {
             }
         },
 
+        invokeActionCallback(data) {
+            if (!data) {
+                return;
+            }
+
+            if (Array.isArray(data.callback) && data.callback.length) {
+                Statamic.$callbacks.call(data.callback[0], ...data.callback.slice(1));
+                return;
+            }
+
+            if (
+                data.completed_moves &&
+                typeof data.completed_moves === 'object' &&
+                !Array.isArray(data.completed_moves) &&
+                Object.keys(data.completed_moves).length
+            ) {
+                Statamic.$callbacks.call('replaceInSelections', data.completed_moves);
+            }
+        },
+
         async runMoveConflictAction(context, selections, strategy = null) {
             const idRemap = context.idRemap || {};
             const selectedAssetIds = Array.from(
@@ -1030,13 +1050,17 @@ export default {
 
             try {
                 const { data } = await this.$axios.post(this.actionUrl, payload);
+                this.invokeActionCallback(data);
 
                 return data || {};
             } catch ({ response }) {
-                return response?.data || {
+                const data = response?.data || {
                     success: false,
                     message: __('Action failed'),
                 };
+                this.invokeActionCallback(data);
+
+                return data;
             }
         },
 
