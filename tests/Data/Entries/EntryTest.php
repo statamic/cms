@@ -2867,6 +2867,36 @@ class EntryTest extends TestCase
     }
 
     #[Test]
+    public function localization_of_custom_entry_class_uses_the_origins_blueprint()
+    {
+        $this->setSites([
+            'en' => ['url' => 'http://domain.com/', 'locale' => 'en'],
+            'fr' => ['url' => 'http://domain.com/fr/', 'locale' => 'fr'],
+        ]);
+
+        BlueprintRepository::shouldReceive('in')->with('collections/custom')->andReturn(collect([
+            'default' => (new Blueprint)->setHandle('default'),
+            'another' => (new Blueprint)->setHandle('another'),
+        ]));
+
+        $collection = tap(Collection::make('custom')->sites(['en', 'fr'])->entryClass(CustomEntry::class))->save();
+
+        $origin = EntryFactory::id('origin-id')
+            ->locale('en')
+            ->collection($collection)
+            ->slug('alfa')
+            ->blueprint('another')
+            ->create();
+
+        $this->assertEquals('another', $origin->blueprint()->handle());
+
+        $localization = $origin->makeLocalization('fr');
+
+        $this->assertInstanceOf(CustomEntry::class, $localization);
+        $this->assertEquals('another', $localization->blueprint()->handle());
+    }
+
+    #[Test]
     public function it_clones_internal_collections()
     {
         $entry = EntryFactory::collection('test')->create();

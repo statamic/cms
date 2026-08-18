@@ -201,7 +201,7 @@ class Outpost
 
     private function cacheAndReturnRateLimitResponse($e)
     {
-        $seconds = (int) $e->getResponse()->getHeader('Retry-After')[0];
+        $seconds = (int) Arr::first($e->getResponse()->getHeader('Retry-After')) ?: 300;
 
         return $this->cacheResponse(now()->addSeconds($seconds), ['error' => 429]);
     }
