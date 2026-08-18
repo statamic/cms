@@ -93,14 +93,33 @@ export function isInTooltipHoverRegion(x, y, trigger, popper, edge = EDGE) {
     return !!trigger && !!popper && contains(tooltipGapRect(trigger, popper), x, y, 0);
 }
 
+function isTriggerEngaged() {
+    const el = targetEl.value;
+    if (!el?.isConnected) return false;
+
+    return (
+        el.matches(':hover') ||
+        el.matches(':focus') ||
+        el.matches(':focus-visible') ||
+        el.contains(document.activeElement)
+    );
+}
+
+function isPopperEngaged() {
+    const el = contentEl.value;
+    if (!el?.isConnected) return false;
+
+    const popper = el.closest('.v-popper__popper') ?? el;
+
+    return popper.matches(':hover') || popper.contains(document.activeElement);
+}
+
 function isOverInteractiveTooltip() {
+    if (isTriggerEngaged() || isPopperEngaged()) return true;
+
     if (pointer) {
         return isInTooltipHoverRegion(pointer.x, pointer.y, triggerRect(), popperRect());
     }
-
-    if (targetEl.value?.matches?.(':hover')) return true;
-    if (contentEl.value?.matches?.(':hover')) return true;
-    if (contentEl.value?.closest?.('.v-popper__popper')?.matches?.(':hover')) return true;
 
     // Still mounting, and we have not seen a pointer yet.
     return isVisible.value && isInteractive() && !popperRect();
@@ -198,7 +217,12 @@ function hide() {
     dismiss();
 }
 
-function dismissFor(el) {
+function dismissFor(el, event) {
+    const next = event?.relatedTarget;
+    const popper = contentEl.value?.closest?.('.v-popper__popper') ?? contentEl.value;
+
+    if (next && popper?.contains?.(next)) return;
+
     if (targetEl.value === el || pendingEl === el) dismiss();
 }
 

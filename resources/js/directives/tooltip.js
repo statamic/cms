@@ -12,6 +12,23 @@ function getOptions(binding) {
     return value;
 }
 
+function isNativelyFocusable(el) {
+    const tag = el.tagName;
+
+    return (
+        ['A', 'BUTTON', 'INPUT', 'SELECT', 'TEXTAREA', 'SUMMARY'].includes(tag) ||
+        el.isContentEditable
+    );
+}
+
+function shouldBecomeFocusable(el) {
+    if (el.hasAttribute('tabindex') || isNativelyFocusable(el) || el.closest('label')) {
+        return false;
+    }
+
+    return true;
+}
+
 function handleMouseEnter(el, binding) {
     const options = getOptions(binding);
     if (options) {
@@ -24,7 +41,12 @@ export default {
         el._tooltipBinding = binding;
         el._tooltipMouseEnter = () => handleMouseEnter(el, el._tooltipBinding);
         el._tooltipMouseLeave = hide;
-        el._tooltipBlur = () => dismissFor(el);
+        el._tooltipBlur = (event) => dismissFor(el, event);
+
+        if (shouldBecomeFocusable(el)) {
+            el.tabIndex = 0;
+            el._tooltipAddedTabIndex = true;
+        }
 
         el.addEventListener('mouseenter', el._tooltipMouseEnter);
         el.addEventListener('mouseleave', el._tooltipMouseLeave);
@@ -41,6 +63,10 @@ export default {
         el.removeEventListener('mouseleave', el._tooltipMouseLeave);
         el.removeEventListener('focus', el._tooltipMouseEnter);
         el.removeEventListener('blur', el._tooltipBlur);
+        if (el._tooltipAddedTabIndex) {
+            el.removeAttribute('tabindex');
+            delete el._tooltipAddedTabIndex;
+        }
         dismissFor(el);
     },
 };

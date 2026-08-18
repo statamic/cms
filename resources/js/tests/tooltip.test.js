@@ -24,7 +24,13 @@ function box(rect) {
         toJSON() {},
     });
     el.hovered = false;
-    el.matches = (selector) => selector === ':hover' && el.hovered;
+    el.focused = false;
+    el.matches = (selector) => {
+        if (selector === ':hover') return el.hovered;
+        if (selector === ':focus' || selector === ':focus-visible') return el.focused;
+
+        return false;
+    };
     el.closest = (selector) => (selector === '.v-popper__popper' ? el : null);
     document.body.appendChild(el);
     mounted.push(el);
@@ -151,6 +157,19 @@ test('registering the popper dismisses when the pointer is unknown and nothing i
     registerContentEl(popperEl);
 
     expect(isVisible.value).toBe(false);
+});
+
+test('an interactive tooltip stays open when the trigger is focused without a pointer', () => {
+    const { show, isVisible, registerContentEl } = useTooltip();
+    const triggerEl = box(trigger);
+    const popperEl = box(popperAbove);
+    triggerEl.focused = true;
+
+    show(triggerEl, { content: 'title', copyable: true });
+    vi.advanceTimersByTime(200);
+    registerContentEl(popperEl);
+
+    expect(isVisible.value).toBe(true);
 });
 
 test('hide dismisses an interactive tooltip when the pointer is unknown and the trigger is no longer hovered', () => {
