@@ -81,11 +81,7 @@
                 </div>
 
                 <div v-if="uploads.length" class="divide-y">
-                    <uploads
-                        :uploads="uploads"
-                        allow-selecting-existing
-                        @existing-selected="uploadSelected"
-                    />
+                    <uploads :uploads="uploads" />
                 </div>
 
                 <div v-if="isReadOnly && !expanded" class="border border-gray-300 dark:border-gray-700 border-dashed rounded-lg p-3 text-center">
@@ -173,7 +169,11 @@
             </div>
         </uploader>
 
-        <UploadConflictModal :uploads="uploads" />
+        <UploadConflictModal
+            :uploads="uploads"
+            allow-selecting-existing
+            @existing-selected="uploadSelected"
+        />
 
         <Stack v-model:open="showSelector" inset :show-close-button="false">
             <Selector
@@ -635,8 +635,6 @@ export default {
         uploadSelected(upload) {
             const path = `${this.folder}/${upload.basename}`.replace(/^\/+/, '');
             const id = `${this.container.id}::${path}`;
-
-            this.uploads.splice(this.uploads.indexOf(upload), 1);
 
             if (this.value.includes(id)) return;
 

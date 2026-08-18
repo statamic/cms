@@ -19,6 +19,12 @@
                 <div class="flex items-center gap-2">
                     <Button variant="ghost" :text="__('messages.asset_conflict_cancel')" @click="resolve('cancel')" />
                     <Button variant="default" :text="__('messages.asset_conflict_keep_both')" @click="resolve('timestamp')" />
+                    <Button
+                        v-if="allowSelectingExisting"
+                        variant="default"
+                        :text="__('messages.asset_conflict_use_existing')"
+                        @click="resolve('existing')"
+                    />
                     <Button variant="danger" :text="__('messages.asset_conflict_overwrite')" @click="resolve('overwrite')" />
                 </div>
             </div>
@@ -203,6 +209,13 @@ export default {
         apply(upload, strategy) {
             if (strategy === 'cancel') {
                 upload.skip();
+                this.$emit('resolved', upload, strategy);
+                return;
+            }
+
+            if (strategy === 'existing') {
+                upload.skip();
+                this.$emit('existing-selected', upload);
                 this.$emit('resolved', upload, strategy);
                 return;
             }

@@ -38,7 +38,6 @@ export default {
         percent: Number,
         error: String,
         errorStatus: Number,
-        allowSelectingExisting: Boolean,
     },
 
     data() {

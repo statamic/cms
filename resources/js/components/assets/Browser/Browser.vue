@@ -130,9 +130,7 @@
                             <Uploads
                                 v-if="uploads.length"
                                 :uploads="uploads"
-                                :allow-selecting-existing="allowSelectingExistingUpload"
                                 class="mb-3 rounded-lg"
-                                @existing-selected="existingUploadSelected"
                             />
 
                             <Table
@@ -212,6 +210,7 @@
         <UploadConflictModal
             :uploads="uploads"
             :allow-selecting-existing="allowSelectingExistingUpload"
+            @existing-selected="existingUploadSelected"
         />
     </div>
 </template>

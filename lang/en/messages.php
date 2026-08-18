@@ -297,6 +297,7 @@ return [
     'asset_conflict_cancel' => 'Cancel',
     'asset_conflict_keep_both' => 'Keep Both',
     'asset_conflict_overwrite' => 'Overwrite',
+    'asset_conflict_use_existing' => 'Use Existing',
     'asset_conflict_apply_to_all' => 'Do this for all remaining conflicts',
     'asset_conflict_pending' => 'Waiting for conflict decision',
     'uploader_choose_new_filename' => 'Choose new filename',
