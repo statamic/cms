@@ -19,7 +19,11 @@ function handleMouseEnter(el, binding) {
     }
 }
 
-function handleMouseLeave() {
+function handleMouseLeave(event) {
+    if (event.relatedTarget?.closest?.('.v-popper__popper')) {
+        return;
+    }
+
     hide();
 }
 

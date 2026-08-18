@@ -9,3 +9,7 @@
 .v-popper--theme-tooltip .v-popper__inner {
     padding: 5px 10px !important;
 }
+
+.v-popper--theme-tooltip:has(.tooltip-popper-interactive) {
+    pointer-events: auto;
+}

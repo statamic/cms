@@ -23,11 +23,15 @@ function setContent(el, options) {
     }
 }
 
-function show(el, options) {
+function persist() {
     if (hideTimeout) {
         clearTimeout(hideTimeout);
         hideTimeout = null;
     }
+}
+
+function show(el, options) {
+    persist();
 
     if (showTimeout) {
         clearTimeout(showTimeout);
@@ -54,12 +58,14 @@ function hide() {
         showTimeout = null;
     }
 
+    persist();
+
     hideTimeout = setTimeout(() => {
         isVisible.value = false;
         targetEl.value = null;
         content.value = '';
         html.value = false;
-    }, 50);
+    }, html.value ? 200 : 50);
 }
 
 export function useTooltip() {
@@ -69,6 +75,7 @@ export function useTooltip() {
         html: readonly(html),
         targetEl: readonly(targetEl),
         show,
+        persist,
         hide,
     };
 }

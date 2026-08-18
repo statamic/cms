@@ -4,7 +4,7 @@ import { Tooltip as VTooltip } from 'floating-vue';
 import DOMPurify from 'dompurify';
 import { useTooltip } from '@/composables/tooltip.js';
 
-const { isVisible, content, html, targetEl } = useTooltip();
+const { isVisible, content, html, targetEl, persist, hide } = useTooltip();
 
 const showTooltip = ref(false);
 const wrapperStyle = ref({});
@@ -66,8 +66,14 @@ watch([isVisible, targetEl, content], async ([visible, target]) => {
             >
                 <span :style="spanStyle" />
                 <template #popper>
-                    <div v-if="displayHtml" v-html="displayContent" />
-                    <template v-else>{{ displayContent }}</template>
+                    <div
+                        :class="{ 'tooltip-popper-interactive': displayHtml }"
+                        @mouseenter="displayHtml && persist()"
+                        @mouseleave="displayHtml && hide()"
+                    >
+                        <div v-if="displayHtml" v-html="displayContent" />
+                        <template v-else>{{ displayContent }}</template>
+                    </div>
                 </template>
             </VTooltip>
         </div>
