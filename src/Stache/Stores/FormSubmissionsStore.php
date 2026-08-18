@@ -18,6 +18,7 @@ class FormSubmissionsStore extends ChildStore
     protected $storeIndexes = [
         'form',
         'date',
+        'entry',
     ];
 
     public function getItemKey($item)

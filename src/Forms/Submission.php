@@ -17,6 +17,7 @@ use Statamic\Events\SubmissionDeleted;
 use Statamic\Events\SubmissionFinalized;
 use Statamic\Events\SubmissionSaved;
 use Statamic\Events\SubmissionSaving;
+use Statamic\Facades\Entry;
 use Statamic\Facades\File;
 use Statamic\Facades\FormSubmission;
 use Statamic\Facades\Site as Sites;
@@ -70,9 +71,9 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
         $data = collect($data);
 
         // A full data replacement would otherwise drop the internal lifecycle
-        // keys, so carry over the existing partial and site values unless the
-        // incoming payload provides its own.
-        foreach (['partial', 'site'] as $key) {
+        // keys, so carry over the existing partial, site and entry values
+        // unless the incoming payload provides its own.
+        foreach (['partial', 'site', 'entry'] as $key) {
             if ($this->has($key) && ! $data->has($key)) {
                 $data[$key] = $this->get($key);
             }
@@ -123,6 +124,16 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
         $this->set('site', $site instanceof Site ? $site->handle() : $site);
 
         return $this;
+    }
+
+    /**
+     * Get the entry this submission is attached to.
+     *
+     * @return \Statamic\Contracts\Entries\Entry|null
+     */
+    public function entry()
+    {
+        return Entry::find($this->get('entry'));
     }
 
     /**
@@ -335,7 +346,7 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
 
         return $this->form()->fields()->keys()->flip()
             ->reject(function ($field, $key) {
-                return in_array($key, ['id', 'date', 'form']);
+                return in_array($key, ['id', 'date', 'form', 'entry']);
             })
             ->map(function ($field, $key) use ($data) {
                 return $data[$key] ?? null;
@@ -344,14 +355,23 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
                 'id' => $this->id(),
                 'date' => $this->date(),
             ])
+            ->when($this->has('entry'), fn ($values) => $values->merge([
+                'entry' => $this->get('entry'),
+            ]))
             ->all();
     }
 
     public function augmentedArrayData()
     {
-        return array_merge($this->toArray(), [
+        $data = array_merge($this->toArray(), [
             'form' => $this->form,
         ]);
+
+        if ($this->has('entry')) {
+            $data['entry'] = $this->entry();
+        }
+
+        return $data;
     }
 
     public function blueprint()
