@@ -1,6 +1,6 @@
 import PreviewHtml from '@/components/fieldtypes/replicator/PreviewHtml.js';
 import extractBardText from '@/util/extractBardText';
-import { escapeHtml } from '@/bootstrap/globals.js';
+import { escapeHtml, __, __n } from '@/bootstrap/globals.js';
 
 /**
  * Normalize field options to a consistent format for lookup.
@@ -101,7 +101,7 @@ export default function formatPreviewValue(value, fieldConfig, options = {}) {
 
     // Toggle: ✓ Field Label / ✗ Field Label
     if (type === 'toggle') {
-        const display = fieldConfig.display || 'Toggle';
+        const display = __(fieldConfig.display || 'Toggle');
         const prefix = value ? '✓' : '✗';
         const result = display ? `${prefix} ${display}` : prefix;
         return escape ? escapeHtml(result) : result;
@@ -130,17 +130,17 @@ export default function formatPreviewValue(value, fieldConfig, options = {}) {
 
     // Replicator: Display: N set(s)
     if (type === 'replicator') {
-        const display = fieldConfig.display || 'Replicator';
+        const display = __(fieldConfig.display || 'Replicator');
         const count = Array.isArray(value) ? value.length : 0;
-        const result = `${display}: ${count} ${count === 1 ? 'Set' : 'Sets'}`;
+        const result = `${display}: ${__n(':count set|:count sets', count)}`;
         return escape ? escapeHtml(result) : result;
     }
 
     // Grid: Display: N row(s)
     if (type === 'grid') {
-        const display = fieldConfig.display || 'Grid';
+        const display = __(fieldConfig.display || 'Grid');
         const count = Array.isArray(value) ? value.length : 0;
-        const result = `${display}: ${count} ${count === 1 ? 'Row' : 'Rows'}`;
+        const result = `${display}: ${__n(':count row|:count rows', count)}`;
         return escape ? escapeHtml(result) : result;
     }
 
@@ -193,7 +193,7 @@ export default function formatPreviewValue(value, fieldConfig, options = {}) {
     // Entries / Terms / Users: count only
     if (type === 'entries' || type === 'terms' || type === 'users') {
         const count = Array.isArray(value) ? value.length : 0;
-        const result = `${count} ${count === 1 ? 'Item' : 'Items'}`;
+        const result = __n(':count item|:count items', count);
         return escape ? escapeHtml(result) : result;
     }
 
@@ -211,9 +211,9 @@ export default function formatPreviewValue(value, fieldConfig, options = {}) {
 
     // Bard: Display: N block(s)
     if (type === 'bard' && Array.isArray(value)) {
-        const display = fieldConfig.display || 'Content';
+        const display = __(fieldConfig.display || 'Content');
         const count = value.length;
-        const result = `${display}: ${count} ${count === 1 ? 'Block' : 'Blocks'}`;
+        const result = `${display}: ${__n(':count block|:count blocks', count)}`;
         return escape ? escapeHtml(result) : result;
     }
 
