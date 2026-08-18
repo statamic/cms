@@ -3,6 +3,8 @@
 namespace Tests\Licensing;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use RuntimeException;
@@ -12,6 +14,12 @@ use Tests\TestCase;
 
 class RadioTest extends TestCase
 {
+    public function setUp(): void
+    {
+        parent::setUp();
+        Cache::store('outpost')->flush();
+    }
+
     #[Test]
     public function it_contacts_the_outpost()
     {
@@ -22,12 +30,31 @@ class RadioTest extends TestCase
     }
 
     #[Test]
+    public function it_throttles_pings()
+    {
+        $outpost = $this->mock(Outpost::class);
+        $outpost->shouldReceive('radio')->twice();
+
+        $radio = new Radio($outpost);
+
+        $radio->ping();
+        $radio->ping(); // Throttled.
+
+        Carbon::setTestNow(now()->addSeconds(Radio::PING_INTERVAL + 1));
+
+        $radio->ping();
+    }
+
+    #[Test]
     public function it_swallows_outpost_exceptions()
     {
         $outpost = $this->mock(Outpost::class);
         $outpost->shouldReceive('radio')->once()->andThrow(new RuntimeException('nope'));
 
-        (new Radio($outpost))->ping();
+        $radio = new Radio($outpost);
+
+        $radio->ping();
+        $radio->ping(); // Still throttled after a failure.
     }
 
     #[Test]

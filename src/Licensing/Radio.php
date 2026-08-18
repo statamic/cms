@@ -2,24 +2,55 @@
 
 namespace Statamic\Licensing;
 
+use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use InvalidArgumentException;
 use Statamic\Facades\Glide;
 use Statamic\Support\Str;
 use Throwable;
 
 class Radio
 {
+    const PING_CACHE_KEY = 'statamic.outpost.pinged';
+    const PING_INTERVAL = 300; // seconds
+
     public function __construct(private Outpost $outpost)
     {
     }
 
     public function ping(): void
     {
+        if ($this->recentlyPinged()) {
+            return;
+        }
+
+        $this->markAsPinged();
+
         try {
             $this->outpost->radio();
         } catch (Throwable $e) {
             Log::debug('Error contacting Outpost: '.$e->getMessage());
+        }
+    }
+
+    private function recentlyPinged(): bool
+    {
+        return $this->cache()->has(self::PING_CACHE_KEY);
+    }
+
+    private function markAsPinged(): void
+    {
+        $this->cache()->put(self::PING_CACHE_KEY, now()->timestamp, self::PING_INTERVAL);
+    }
+
+    private function cache(): Repository
+    {
+        try {
+            return Cache::store('outpost');
+        } catch (InvalidArgumentException $e) {
+            return Cache::store();
         }
     }
 

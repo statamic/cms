@@ -57,30 +57,6 @@ class OutpostTest extends TestCase
     }
 
     #[Test]
-    public function it_resolves_the_host_from_the_app_url_in_console()
-    {
-        $this->assertEquals(
-            'mysite.com',
-            Outpost::resolveHost('localhost', 'https://mysite.com', inConsole: true, inTests: false)
-        );
-
-        $this->assertEquals(
-            'localhost',
-            Outpost::resolveHost('localhost', 'https://mysite.com', inConsole: true, inTests: true)
-        );
-
-        $this->assertEquals(
-            'localhost',
-            Outpost::resolveHost('localhost', 'https://mysite.com', inConsole: false, inTests: false)
-        );
-
-        $this->assertEquals(
-            'localhost',
-            Outpost::resolveHost('localhost', null, inConsole: true, inTests: false)
-        );
-    }
-
-    #[Test]
     public function it_contacts_the_outpost_and_caches_the_response()
     {
         $outpost = $this->outpostWithJsonResponse(['foo' => 'bar']);
@@ -113,6 +89,25 @@ class OutpostTest extends TestCase
 
         $this->assertEquals($testCachedResponse, $first);
         $this->assertSame($first, $second);
+    }
+
+    #[Test]
+    public function the_cached_response_is_used_when_only_the_environment_has_changed()
+    {
+        $outpost = $this->outpostWithJsonResponse(['newer' => 'response']);
+
+        $payload = $outpost->payload();
+        $payload['host'] = 'some-other-host.com';
+        $payload['ip'] = '9.9.9.9';
+        $payload['port'] = null;
+        $payload['php_version'] = '1.2.3';
+
+        $this->setCachedResponse($testCachedResponse = [
+            'cached' => 'response',
+            'payload' => $payload,
+        ]);
+
+        $this->assertEquals($testCachedResponse, $outpost->response());
     }
 
     #[Test]

@@ -115,7 +115,7 @@ class Outpost
     {
         return [
             'key' => config('statamic.system.license_key'),
-            'host' => $this->host(),
+            'host' => request()->getHost(),
             'ip' => request()->server('SERVER_ADDR'),
             'port' => request()->server('SERVER_PORT'),
             'statamic_version' => Statamic::version(),
@@ -124,27 +124,6 @@ class Outpost
             'laravel_version' => app()->version(),
             'packages' => $this->packagePayload(),
         ];
-    }
-
-    private function host(): ?string
-    {
-        return static::resolveHost(
-            request()->getHost(),
-            config('app.url'),
-            app()->runningInConsole(),
-            app()->runningUnitTests(),
-        );
-    }
-
-    public static function resolveHost(?string $requestHost, ?string $appUrl, bool $inConsole, bool $inTests): ?string
-    {
-        if ($inConsole && ! $inTests) {
-            $host = parse_url((string) $appUrl, PHP_URL_HOST);
-
-            return $host ?: $requestHost;
-        }
-
-        return $requestHost;
     }
 
     private function packagePayload()
@@ -180,7 +159,7 @@ class Outpost
 
     private function payloadHasChanged($previous, $current)
     {
-        $exclude = ['ip', 'php_version'];
+        $exclude = ['host', 'ip', 'port', 'php_version'];
 
         return Arr::except($previous, $exclude) !== Arr::except($current, $exclude);
     }

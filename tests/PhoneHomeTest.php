@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use Illuminate\Support\Facades\Cache;
 use Orchestra\Testbench\Attributes\DefineEnvironment;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
@@ -9,6 +10,12 @@ use Statamic\Licensing\Outpost;
 
 class PhoneHomeTest extends TestCase
 {
+    public function setUp(): void
+    {
+        parent::setUp();
+        Cache::store('outpost')->flush();
+    }
+
     #[Test]
     #[DataProvider('algorithmProvider')]
     public function it_contacts_the_outpost($algo)
