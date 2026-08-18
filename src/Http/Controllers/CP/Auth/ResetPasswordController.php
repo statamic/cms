@@ -25,6 +25,11 @@ class ResetPasswordController extends Controller
         return Password::broker($broker);
     }
 
+    public function redirectPath()
+    {
+        return cp_route('login');
+    }
+
     protected function resetFormAction()
     {
         return route('statamic.cp.password.reset.action');

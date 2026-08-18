@@ -11,6 +11,8 @@ use Statamic\Facades\Glide;
 use Statamic\Facades\Path;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class MoveAsset extends Action
 {
     protected $icon = 'move-folder';
@@ -132,6 +134,7 @@ class MoveAsset extends Action
 
         return [
             'ids' => $ids,
+            'callback' => ['replaceInSelections', $completedMoves],
         ];
     }
 

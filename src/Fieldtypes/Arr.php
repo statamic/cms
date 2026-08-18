@@ -8,6 +8,8 @@ use Statamic\Fields\Fieldtype;
 use Statamic\GraphQL\Types\ArrayType;
 use Statamic\Support\Arr as SupportArr;
 
+use function Statamic\trans as __;
+
 class Arr extends Fieldtype
 {
     protected $categories = ['structured'];

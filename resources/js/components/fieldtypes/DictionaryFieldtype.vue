@@ -33,7 +33,7 @@
                     <div
                         v-for="option in selectedOptions"
                         :key="getOptionValue(option)"
-                        class="sortable-item cursor-grab"
+                        class="sortable-item cursor-grab active:cursor-grabbing"
                     >
                         <Badge size="lg" color="white">
                             <div v-if="labelHtml" v-html="getOptionLabel(option)"></div>
@@ -43,18 +43,14 @@
                                 v-if="!disabled && !readOnly"
                                 type="button"
                                 class="-mx-3 cursor-pointer px-3 text-gray-400 hover:text-gray-700"
-                                :aria-label="__('Deselect option')"
-                                @click="deselect(option.value)"
+                                :aria-label="__('Remove :label', { label: getOptionLabel(option) })"
+                                @click="deselect(getOptionValue(option))"
                             >
                                 <span>&times;</span>
                             </button>
-                            <button
-                                v-else
-                                type="button"
-                                class="-mx-3 cursor-pointer px-3 text-gray-400 hover:text-gray-700"
-                            >
+                            <span v-else class="-mx-3 cursor-pointer px-3 text-gray-400 hover:text-gray-700">
                                 <span>&times;</span>
-                            </button>
+                            </span>
                         </Badge>
                     </div>
                 </div>
@@ -93,7 +89,17 @@ export default {
         },
 
         normalizedOptions() {
-            return this.normalizeInputOptions(this.options);
+            const options = this.normalizeInputOptions(this.options);
+
+            // Multi-select renders its selections from the slot below, so the options can be left alone.
+            if (this.multiple) return options;
+
+            // In single mode the Combobox resolves the selected label from these options, and the fetched
+            // options may not include the stored value (API-backed dictionaries only return a page of
+            // results), so merge the selected options in or it would display the raw value instead.
+            const values = new Set(options.map((option) => option.value));
+
+            return [...options, ...this.selectedOptions.filter((option) => !values.has(option.value))];
         },
 
         selectedOptions() {

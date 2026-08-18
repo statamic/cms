@@ -4,6 +4,7 @@ namespace Tests\UpdateScripts;
 
 use Illuminate\Support\Facades\File;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\GlobalSet;
 use Statamic\Facades\YAML;
 use Statamic\UpdateScripts\UpdateGlobalVariables;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -74,6 +75,32 @@ YAML;
 
         // Empty data should produce an empty array, not null
         $this->assertEquals([], YAML::parse(File::get($this->globalsPath.'/en/test.yaml')));
+
+        unlink($this->globalsPath.'/test.yaml');
+        unlink($this->globalsPath.'/en/test.yaml');
+    }
+
+    #[Test]
+    public function migrated_variables_survive_being_saved_later_in_the_same_process()
+    {
+        File::put($this->globalsPath.'/test.yaml', Yaml::dump([
+            'title' => 'Test',
+            'data' => [
+                'foo' => 'Bar',
+            ],
+        ]));
+
+        $this->runUpdateScript(UpdateGlobalVariables::class);
+
+        // Simulates an addon update script saving variables after the migration
+        $variables = GlobalSet::findByHandle('test')->inDefaultSite();
+        $variables->set('baz', 'Qux');
+        $variables->save();
+
+        $this->assertEquals(
+            ['foo' => 'Bar', 'baz' => 'Qux'],
+            YAML::parse(File::get($this->globalsPath.'/en/test.yaml'))
+        );
 
         unlink($this->globalsPath.'/test.yaml');
         unlink($this->globalsPath.'/en/test.yaml');

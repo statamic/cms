@@ -23,6 +23,8 @@ use Statamic\StaticCaching\NoCache\Session;
 use Statamic\StaticCaching\Replacer;
 use Statamic\StaticCaching\ResponseStatus;
 
+use function Statamic\trans as __;
+
 class Cache
 {
     /**
@@ -77,6 +79,12 @@ class Cache
             return $response;
         }
 
+        // Capture the real nocache session URL before rendering. While handling an
+        // error, the shared-error flow (RendersHttpExceptions::getCachedError and
+        // copyError) repoints the singleton session at /__shared-errors/... so its
+        // regions can be restored when the same error is served for other URLs.
+        $nocacheUrl = $this->nocache->url();
+
         $response = $next($request);
 
         if ($this->shouldBeCached($request, $response)) {
@@ -85,6 +93,14 @@ class Cache
             $this->makeReplacementsAndCacheResponse($request, $response);
 
             $this->nocache->write();
+
+            // The page is also cached under its real URL, and a repeat request to
+            // that same URL restores the session by its real URL. If the shared-error
+            // flow repointed the session, persist it under the real URL too so that
+            // repeat request doesn't fall through to an uncached render.
+            if ($this->nocache->url() !== $nocacheUrl) {
+                $this->nocache->setUrl($nocacheUrl)->write();
+            }
 
             if ($paginator = Blink::get('tag-paginator')) {
                 if ($paginator->hasMorePages()) {
@@ -104,13 +120,15 @@ class Cache
 
     private function copyError($request, $response)
     {
-        $status = $response->getStatusCode();
+        if ($response->isSuccessful()) {
+            return;
+        }
 
         if (! config('statamic.static_caching.share_errors')) {
             return;
         }
 
-        $request = Request::createFrom($request)->fakeStaticCacheStatus($status);
+        $request = Request::createFrom($request)->fakeStaticCacheStatus($response->getStatusCode());
 
         if (! $this->cacher->hasCachedPage($request)) {
             $this->cacher->cachePage($request, $response);
@@ -167,7 +185,7 @@ class Cache
 
     private function canBeCached($request)
     {
-        if ($request->method() !== 'GET') {
+        if (! in_array($request->method(), ['GET', 'HEAD'])) {
             return false;
         }
 
@@ -239,7 +257,7 @@ class Cache
             $store = AppCache::store('null');
         } else {
             $store = StaticCache::cacheStore();
-            $key .= '-'.$this->cacher->getUrl($request);
+            $key .= '-'.md5($this->cacher->getUrl($request));
         }
 
         return $store->lock($key, $this->lockFor);

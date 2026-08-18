@@ -3,6 +3,7 @@
 namespace Tests\Feature\Entries;
 
 use Facades\Statamic\Fields\BlueprintRepository;
+use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Facades\Event;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
@@ -341,6 +342,70 @@ class StoreEntryTest extends TestCase
             ->assertOk();
 
         $this->assertFalse($response->json('values.published'), 'Initial published value should be false when user lacks publish permission, even if collection defaults to published');
+    }
+
+    #[Test]
+    public function it_prevents_duplicate_uris_for_structured_entries_with_depth_conditional_routes()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'create test entries']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+
+        $collection = tap(
+            Collection::make('test')
+                ->routes('{{ if depth > 1 }}{{ parent_uri }}/{{ slug }}{{ else }}base/{{ slug }}{{ /if }}')
+                ->structureContents(['max_depth' => 10])
+        )->save();
+
+        EntryFactory::id('root-id')->slug('root')->collection('test')->create();
+        EntryFactory::id('child-id')->slug('child')->collection('test')->create();
+
+        $tree = $collection->structure()->in('en');
+        $tree->tree([
+            ['entry' => 'root-id', 'children' => [
+                ['entry' => 'child-id'],
+            ]],
+        ])->save();
+
+        $this
+            ->actingAs($user)
+            ->submit($collection, [
+                'title' => 'Duplicate Child',
+                'slug' => 'child',
+                '_parent' => 'root-id',
+            ])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['slug']);
+    }
+
+    #[Test]
+    public function it_prevents_duplicate_uris_when_parent_is_the_explicit_root()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'create test entries']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+
+        $collection = tap(
+            Collection::make('test')
+                ->routes('{{ if depth > 1 }}{{ parent_uri }}/{{ slug }}{{ else }}base/{{ slug }}{{ /if }}')
+                ->structureContents(['root' => true, 'max_depth' => 10])
+        )->save();
+
+        EntryFactory::id('root-id')->slug('root')->collection('test')->create();
+        EntryFactory::id('sibling-id')->slug('sibling')->collection('test')->create();
+
+        $collection->structure()->in('en')->tree([
+            ['entry' => 'root-id'],
+            ['entry' => 'sibling-id'],
+        ])->save();
+
+        $this
+            ->actingAs($user)
+            ->submit($collection, [
+                'title' => 'Duplicate Sibling',
+                'slug' => 'sibling',
+                '_parent' => 'root-id',
+            ])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['slug']);
     }
 
     private function seedUserAndCollection()

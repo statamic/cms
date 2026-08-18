@@ -131,9 +131,8 @@ function handleStackClosed() {
 </script>
 
 <template>
-    <div class="flex flex-1 items-center gap-2 sm:gap-3 overflow-x-auto py-3 rounded-r-4xl">
-
-        <div ref="filtersButtonWrapperRef" class="sticky left-0 ps-[1px] rounded-r-lg mask-bg mask-bg--left mask-bg--left-small">
+    <div class="flex flex-1 items-center gap-2 sm:gap-3 overflow-x-auto py-3 st-mask-horizontal-overflow">
+        <div ref="filtersButtonWrapperRef" class="sticky left-0 rounded-r-lg mask-bg mask-bg--left mask-bg--left-small">
             <Button icon="sliders-horizontal" class="[&_svg]:size-3.5" :disabled="reorderable" @click="open = true">
                 {{ __('Filters') }}
                 <Badge
@@ -198,7 +197,7 @@ function handleStackClosed() {
             variant="filled"
             v-for="({ filter, handle, badge }, index) in fieldFilterBadges"
             :key="`${filter}-${handle}`"
-            class="cursor-default ps-4 gap-1 text-gray-900 dark:text-gray-200 last:me-12 hover:bg-gray-950/5 dark:hover:bg-white/4"
+            class="cursor-default ps-4 gap-1 text-gray-900 dark:text-gray-200 hover:bg-gray-950/5 dark:hover:bg-white/4"
             :class="reorderable ? 'pe-4 text-gray-400 dark:text-gray-600' : 'pe-2'"
         >
             <span class="whitespace-nowrap" v-text="getFieldFilterBadgeLabel(handle, badge)" />
@@ -220,7 +219,7 @@ function handleStackClosed() {
             variant="filled"
             v-for="(badge, handle, index) in standardBadges"
             :key="handle"
-            class="cursor-default ps-4 gap-1 text-gray-900 dark:text-gray-200 last:me-12 hover:bg-gray-950/5 dark:hover:bg-white/4"
+            class="cursor-default ps-4 gap-1 text-gray-900 dark:text-gray-200 hover:bg-gray-950/5 dark:hover:bg-white/4"
             :class="reorderable ? 'pe-4 text-gray-400 dark:text-gray-600' : 'pe-2'"
         >
             <span class="whitespace-nowrap">{{ badge }}</span>

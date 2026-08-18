@@ -1,18 +1,19 @@
 <script>
-import createContext from '@/util/createContext.js';
+import { injectContainerContext, provideContainerContext, containerContextKey } from './context.js';
 
-export const [injectContainerContext, provideContainerContext, containerContextKey] = createContext('PublishContainer');
+export { injectContainerContext, provideContainerContext, containerContextKey };
 </script>
 
 <script setup>
 import { nanoid as uniqid } from 'nanoid';
-import { watch, ref, computed, toRef, nextTick } from 'vue';
+import { onMounted, onUnmounted, watch, ref, computed, toRef, nextTick } from 'vue';
 import Component from '@/components/Component.js';
 import Tabs from './Tabs.vue';
 import Values from '@/components/publish/Values.js';
 import { data_get } from '@/bootstrap/globals.js';
+import { useUiDirection } from '@/composables/ui-direction';
 
-const emit = defineEmits(['update:modelValue', 'update:visibleValues', 'update:modifiedFields']);
+const emit = defineEmits(['update:modelValue', 'update:visibleValues', 'update:modifiedFields', 'update:meta']);
 
 const props = defineProps({
     name: {
@@ -104,7 +105,8 @@ const meta = ref(props.meta);
 const previews = ref({});
 const localizedFields = ref(props.modifiedFields || []);
 const components = ref([]);
-const direction = computed(() => Statamic.$config.get('sites').find(s => s.handle === props.site)?.direction ?? document.documentElement.dir ?? 'ltr');
+const { direction: uiDirection } = useUiDirection();
+const direction = computed(() => Statamic.$config.get('sites').find(s => s.handle === props.site)?.direction ?? uiDirection.value);
 
 const visibleValues = computed(() => {
     const omittable = Object.keys(hiddenFields.value).filter(
@@ -149,6 +151,11 @@ watch(
 );
 
 watch(
+    () => props.extraValues,
+    (newExtraValues) => extraValues.value = newExtraValues,
+);
+
+watch(
     () => props.meta,
     (newMeta) => meta.value = newMeta,
 );
@@ -176,6 +183,12 @@ watch(
 watch(
     localizedFields,
     (values) => emit('update:modifiedFields', values),
+    { deep: true },
+);
+
+watch(
+    meta,
+    (meta) => emit('update:meta', meta),
     { deep: true },
 );
 
@@ -210,6 +223,10 @@ function setFieldValue(path, value) {
     data_set(values.value, path, value);
 }
 
+function setMeta(newMeta) {
+    meta.value = newMeta;
+}
+
 function setFieldMeta(path, value) {
     data_set(meta.value, path, value);
 }
@@ -236,9 +253,37 @@ function removeLocalizedField(path) {
     if (index !== -1) localizedFields.value.splice(index, 1);
 }
 
+const fieldFocus = ref({});
+
+const fieldLocks = computed(() => {
+    const locks = {};
+    for (const { handle, user } of Object.values(fieldFocus.value)) {
+        if (!locks[handle]) {
+            locks[handle] = user;
+        }
+    }
+    return locks;
+});
+
+function focusField(handle, user = Statamic.user) {
+    if (handle.includes('.')) throw new Error('focusField only supports top-level fields.');
+    if (user) fieldFocus.value[user.id] = { handle, user };
+}
+
+function blurField(handle, user = Statamic.user) {
+    if (handle.includes('.')) throw new Error('blurField only supports top-level fields.');
+    if (user && fieldFocus.value[user.id]?.handle === handle) {
+        delete fieldFocus.value[user.id];
+    }
+}
+
 function pushComponent(name, { props }) {
     const component = new Component(uniqid(), name, props);
     components.value.push(component);
+    component.destroy = () => {
+        const index = components.value.indexOf(component);
+        if (index !== -1) components.value.splice(index, 1);
+    };
     return component;
 }
 
@@ -273,11 +318,16 @@ const builtInProvides = {
     isTrackingOriginValues: computed(() => !!props.originValues),
     setValues,
     setFieldValue,
+    setMeta,
     setFieldMeta,
     setFieldPreviewValue,
     setRevealerField,
     unsetRevealerField,
     setHiddenField,
+    fieldFocus,
+    fieldLocks,
+    focusField,
+    blurField,
     isDirty,
     withoutDirtying,
 };
@@ -294,6 +344,29 @@ const provided = { ...additionalProvides, ...builtInProvides };
 
 provideContainerContext({ ...provided, container: provided });
 
+onMounted(() => {
+    Statamic.$events.$emit('publish-container-created', {
+        name: props.name,
+        reference: toRef(() => props.reference),
+        site: toRef(() => props.site),
+        values,
+        setFieldValue,
+        setValues,
+        meta,
+        setMeta,
+        setFieldMeta,
+        pushComponent,
+        fieldFocus,
+        focusField,
+        blurField,
+    });
+});
+
+onUnmounted(() => {
+    clearDirtyState();
+    Statamic.$events.$emit('publish-container-destroyed', { name: props.name });
+});
+
 defineExpose({
     name: props.name,
     values,
@@ -306,6 +379,7 @@ defineExpose({
     pushComponent,
     visibleValues,
     setValues,
+    setMeta,
     setExtraValues,
 });
 

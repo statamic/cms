@@ -5,6 +5,8 @@ namespace Statamic\Actions;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Facades;
 
+use function Statamic\trans as __;
+
 class ReplaceAsset extends Action
 {
     protected $icon = 'replace';

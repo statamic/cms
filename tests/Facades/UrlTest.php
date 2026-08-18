@@ -176,6 +176,38 @@ class UrlTest extends TestCase
     }
 
     #[Test]
+    public function it_removes_site_url_when_site_is_configured_with_a_subpath()
+    {
+        $this->setSiteValue('en', 'url', 'http://absolute-url-resolved-from-request.com/path/');
+
+        $this->assertEquals('/', URL::removeSiteUrl('http://absolute-url-resolved-from-request.com/path'));
+        $this->assertEquals('/', URL::removeSiteUrl('http://absolute-url-resolved-from-request.com/path/'));
+        $this->assertEquals('/foo', URL::removeSiteUrl('http://absolute-url-resolved-from-request.com/path/foo'));
+        $this->assertEquals('/foo/bar', URL::removeSiteUrl('http://absolute-url-resolved-from-request.com/path/foo/bar'));
+
+        $this->assertEquals('/', URL::removeSiteUrl('/path'));
+        $this->assertEquals('/', URL::removeSiteUrl('/path/'));
+        $this->assertEquals('/foo', URL::removeSiteUrl('/path/foo'));
+        $this->assertEquals('/foo/bar', URL::removeSiteUrl('/path/foo/bar'));
+
+        $this->assertEquals('http://external-site.com/foo/', URL::removeSiteUrl('http://external-site.com/foo/'));
+
+        URL::enforceTrailingSlashes();
+
+        $this->assertEquals('/', URL::removeSiteUrl('http://absolute-url-resolved-from-request.com/path'));
+        $this->assertEquals('/', URL::removeSiteUrl('http://absolute-url-resolved-from-request.com/path/'));
+        $this->assertEquals('/foo/', URL::removeSiteUrl('http://absolute-url-resolved-from-request.com/path/foo'));
+        $this->assertEquals('/foo/bar/', URL::removeSiteUrl('http://absolute-url-resolved-from-request.com/path/foo/bar'));
+
+        $this->assertEquals('/', URL::removeSiteUrl('/path'));
+        $this->assertEquals('/', URL::removeSiteUrl('/path/'));
+        $this->assertEquals('/foo/', URL::removeSiteUrl('/path/foo'));
+        $this->assertEquals('/foo/bar/', URL::removeSiteUrl('/path/foo/bar'));
+
+        $this->assertEquals('http://external-site.com/foo', URL::removeSiteUrl('http://external-site.com/foo'));
+    }
+
+    #[Test]
     public function it_determines_absolute_url()
     {
         $this->assertTrue(URL::isAbsolute('http://example.com'));
@@ -560,6 +592,26 @@ class UrlTest extends TestCase
     }
 
     #[Test]
+    public function making_urls_absolute_ignores_front_controller_in_request_root()
+    {
+        $this->setSiteValue('en', 'url', '/');
+
+        $request = \Illuminate\Http\Request::create(
+            'http://absolute-url-resolved-from-request.com/index.php',
+            'GET',
+            [],
+            [],
+            [],
+            ['SCRIPT_NAME' => '/index.php', 'SCRIPT_FILENAME' => 'index.php', 'PHP_SELF' => '/index.php']
+        );
+        $this->app->instance('request', $request);
+        \Illuminate\Support\Facades\URL::setRequest($request);
+
+        $this->assertSame('http://absolute-url-resolved-from-request.com', URL::makeAbsolute('/'));
+        $this->assertSame('http://absolute-url-resolved-from-request.com/foo', URL::makeAbsolute('/foo'));
+    }
+
+    #[Test]
     #[DataProvider('relativeProvider')]
     public function it_makes_urls_relative($url, $expected)
     {
@@ -590,6 +642,8 @@ class UrlTest extends TestCase
             'already relative nested route without trailing slash' => ['/foo/page', '/foo/page'],
             'already relative nested route with trailing slash' => ['/foo/page/', '/foo/page'],
             'already relative nested route without leading slash' => ['foo/page', '/foo/page'],
+            'duplicate leading slashes' => ['//page', '/page'],
+            'multiple duplicate leading slashes' => ['////page', '/page'],
 
             'homepage without trailing slash and query param' => ['http://example.com?bar=baz', '/?bar=baz'],
             'homepage with trailing slash and query param' => ['http://example.com/?bar=baz', '/?bar=baz'],

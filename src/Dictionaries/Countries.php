@@ -4,6 +4,8 @@ namespace Statamic\Dictionaries;
 
 use Illuminate\Support\Collection;
 
+use function Statamic\trans as __;
+
 class Countries extends BasicDictionary
 {
     protected string $valueKey = 'iso3';
@@ -340,5 +342,10 @@ class Countries extends BasicDictionary
             ['name' => __('statamic::dictionary-countries.names.ZMB'), 'iso3' => 'ZMB', 'iso2' => 'ZM', 'region' => $this->regions['africa'], 'subregion' => $this->subregions['eastern_africa'], 'emoji' => '🇿🇲'],
             ['name' => __('statamic::dictionary-countries.names.ZWE'), 'iso3' => 'ZWE', 'iso2' => 'ZW', 'region' => $this->regions['africa'], 'subregion' => $this->subregions['eastern_africa'], 'emoji' => '🇿🇼'],
         ];
+    }
+
+    public function allowsPublicAccess(): bool
+    {
+        return true;
     }
 }

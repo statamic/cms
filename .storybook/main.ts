@@ -25,6 +25,10 @@ const config: StorybookConfig = {
                 '@api': resolve(process.cwd(), 'resources/js/api.js'),
             };
         }
+        config.build = {
+            ...config.build,
+            reportCompressedSize: false,
+        };
         return config;
     },
 };

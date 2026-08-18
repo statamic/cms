@@ -14,17 +14,23 @@ export default {
             ref: 'nativeFileField',
         });
 
+        const events = this.enabled
+            ? {
+                  onDragenter: this.dragenter,
+                  onDragover: this.dragover,
+                  onDragleave: this.dragleave,
+                  onDrop: this.drop,
+              }
+            : {};
+
         return h(
             'div',
             {
                 class: 'h-full',
-                onDragenter: this.dragenter,
-                onDragover: this.dragover,
-                onDragleave: this.dragleave,
-                onDrop: this.drop,
+                ...events,
             },
             [
-                h('div', { class: { 'pointer-events-none': this.dragging } }, [
+                h('div', { class: ['h-full', { 'pointer-events-none': this.dragging }] }, [
                     fileField,
                     ...this.$slots.default({ dragging: this.enabled ? this.dragging : false }),
                 ]),

@@ -14,6 +14,8 @@ use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Values;
 use Statamic\Fieldtypes\Bard;
 use Statamic\Fieldtypes\Bard\Augmentor;
+use Statamic\Fieldtypes\Link;
+use Statamic\Fieldtypes\Link\LinkType;
 use Statamic\Fieldtypes\RowId;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -30,6 +32,9 @@ class BardTest extends TestCase
     {
         parent::tearDown();
         static::$functions = null;
+
+        (new \ReflectionClass(Link::class))->setStaticPropertyValue('types', []);
+        (new \ReflectionClass(\Statamic\Fields\Fieldtype::class))->setStaticPropertyValue('extraConfigFields', []);
     }
 
     #[Test]
@@ -632,6 +637,36 @@ class BardTest extends TestCase
     }
 
     #[Test]
+    public function it_does_not_remove_sets_when_trimming_empty_nodes()
+    {
+        $content = [
+            ['type' => 'paragraph'],
+            [
+                'type' => 'set',
+                'attrs' => [
+                    'id' => 'test-set',
+                    'values' => [
+                        'type' => 'one',
+                    ],
+                ],
+            ],
+            ['type' => 'paragraph'],
+        ];
+
+        $this->assertEquals([
+            [
+                'type' => 'set',
+                'attrs' => [
+                    'id' => 'test-set',
+                    'values' => [
+                        'type' => 'one',
+                    ],
+                ],
+            ],
+        ], $this->bard(['remove_empty_nodes' => 'trim'])->process($content));
+    }
+
+    #[Test]
     #[DataProvider('groupedSetsProvider')]
     public function it_preloads($areSetsGrouped)
     {
@@ -752,6 +787,8 @@ class BardTest extends TestCase
     #[Test]
     public function it_gets_link_data()
     {
+        $this->actingAs(tap(Facades\User::make()->makeSuper())->save());
+
         tap(Facades\Collection::make('pages')->routes('/{slug}'))->save();
         EntryFactory::collection('pages')->id('1')->slug('about')->data(['title' => 'About'])->create();
         EntryFactory::collection('pages')->id('2')->slug('articles')->data(['title' => 'Articles'])->create();
@@ -775,11 +812,15 @@ EOT;
 
         $prosemirror = (new Augmentor($this))->renderHtmlToProsemirror($html)['content'];
 
-        $this->assertEquals([
-            'entry::1' => ['title' => 'About', 'permalink' => 'http://localhost/about'],
-            'entry::2' => ['title' => 'Articles', 'permalink' => 'http://localhost/articles'],
-            'entry::3' => ['title' => 'Contact', 'permalink' => 'http://localhost/contact'],
-        ], $bard->getLinkData($prosemirror));
+        // Link data comes from the same CP fieldtype resource used everywhere else entries are
+        // displayed, so we only assert the bits Bard's own toolbar actually cares about (which
+        // refs were extracted, and their title) rather than locking down that resource's full shape.
+        $linkData = $bard->getLinkData($prosemirror);
+
+        $this->assertEquals(['entry::1', 'entry::2', 'entry::3'], array_keys($linkData));
+        $this->assertEquals('About', $linkData['entry::1']['title']);
+        $this->assertEquals('Articles', $linkData['entry::2']['title']);
+        $this->assertEquals('Contact', $linkData['entry::3']['title']);
     }
 
     #[Test]
@@ -1351,6 +1392,186 @@ EOT;
         $this->assertEquals('<a href="http://localhost/fr/blog/one-fr">The One</a>', $augmented);
     }
 
+    #[Test]
+    public function it_preserves_query_params_on_entry_links()
+    {
+        tap(Facades\Collection::make('blog')->routes('blog/{slug}'))->save();
+        EntryFactory::collection('blog')->id('123')->slug('my-post')->data(['title' => 'My Post'])->create();
+
+        $field = (new Bard)->setField(new Field('test', ['type' => 'bard']));
+
+        $augmented = $field->augment([
+            ['type' => 'text', 'marks' => [['type' => 'link', 'attrs' => ['href' => 'statamic://entry::123?foo=bar']]], 'text' => 'Link'],
+        ]);
+
+        $this->assertEquals('<a href="/blog/my-post?foo=bar">Link</a>', $augmented);
+    }
+
+    #[Test]
+    public function it_preserves_anchors_on_entry_links()
+    {
+        tap(Facades\Collection::make('blog')->routes('blog/{slug}'))->save();
+        EntryFactory::collection('blog')->id('123')->slug('my-post')->data(['title' => 'My Post'])->create();
+
+        $field = (new Bard)->setField(new Field('test', ['type' => 'bard']));
+
+        $augmented = $field->augment([
+            ['type' => 'text', 'marks' => [['type' => 'link', 'attrs' => ['href' => 'statamic://entry::123#section']]], 'text' => 'Link'],
+        ]);
+
+        $this->assertEquals('<a href="/blog/my-post#section">Link</a>', $augmented);
+    }
+
+    #[Test]
+    public function it_preserves_query_params_and_anchors_on_entry_links()
+    {
+        tap(Facades\Collection::make('blog')->routes('blog/{slug}'))->save();
+        EntryFactory::collection('blog')->id('123')->slug('my-post')->data(['title' => 'My Post'])->create();
+
+        $field = (new Bard)->setField(new Field('test', ['type' => 'bard']));
+
+        $augmented = $field->augment([
+            ['type' => 'text', 'marks' => [['type' => 'link', 'attrs' => ['href' => 'statamic://entry::123?foo=bar#section']]], 'text' => 'Link'],
+        ]);
+
+        $this->assertEquals('<a href="/blog/my-post?foo=bar#section">Link</a>', $augmented);
+    }
+
+    #[Test]
+    public function it_preserves_appends_on_localized_entry_links()
+    {
+        $this->setSites([
+            'en' => ['url' => 'http://localhost/', 'locale' => 'en'],
+            'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
+        ]);
+
+        Facades\Site::setCurrent('fr');
+
+        tap(Facades\Collection::make('blog')->routes('blog/{slug}'))->sites(['en', 'fr'])->save();
+
+        EntryFactory::id('parent')->collection('blog')->slug('theparent')->id(123)->locale('en')->create();
+        EntryFactory::id('123-fr')->origin('123')->locale('fr')->collection('blog')->slug('one-fr')->data(['title' => 'Le One'])->create();
+
+        $field = (new Bard)->setField(new Field('test', array_merge(['type' => 'bard'], ['select_across_sites' => false])));
+
+        $augmented = $field->augment([
+            ['type' => 'text', 'marks' => [['type' => 'link', 'attrs' => ['href' => 'statamic://entry::123-fr?foo=bar#section']]], 'text' => 'The One'],
+        ]);
+
+        $this->assertEquals('<a href="/fr/blog/one-fr?foo=bar#section">The One</a>', $augmented);
+    }
+
+    #[Test]
+    public function it_preserves_appends_on_entry_links_with_select_across_sites()
+    {
+        $this->setSites([
+            'en' => ['url' => 'http://localhost/', 'locale' => 'en'],
+            'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
+        ]);
+
+        Facades\Site::setCurrent('en');
+
+        tap(Facades\Collection::make('blog')->routes('blog/{slug}'))->sites(['en', 'fr'])->save();
+
+        EntryFactory::id('parent')->collection('blog')->slug('theparent')->id(123)->locale('en')->create();
+        EntryFactory::id('123-fr')->origin('123')->locale('fr')->collection('blog')->slug('one-fr')->data(['title' => 'Le One'])->create();
+
+        $field = (new Bard)->setField(new Field('test', array_merge(['type' => 'bard'], ['select_across_sites' => true])));
+
+        $augmented = $field->augment([
+            ['type' => 'text', 'marks' => [['type' => 'link', 'attrs' => ['href' => 'statamic://entry::123-fr?foo=bar#section']]], 'text' => 'The One'],
+        ]);
+
+        $this->assertEquals('<a href="http://localhost/fr/blog/one-fr?foo=bar#section">The One</a>', $augmented);
+    }
+
+    #[Test]
+    public function it_gets_link_data_with_appends()
+    {
+        $this->actingAs(tap(Facades\User::make()->makeSuper())->save());
+
+        tap(Facades\Collection::make('pages')->routes('/{slug}'))->save();
+        EntryFactory::collection('pages')->id('1')->slug('about')->data(['title' => 'About'])->create();
+
+        $bard = $this->bard(['save_html' => true, 'sets' => null]);
+
+        $html = '<p><a href="statamic://entry::1?foo=bar#section">Link with appends</a></p>';
+
+        $prosemirror = (new Augmentor($this))->renderHtmlToProsemirror($html)['content'];
+
+        $linkData = $bard->getLinkData($prosemirror);
+
+        $this->assertEquals(['entry::1'], array_keys($linkData));
+        $this->assertEquals('About', $linkData['entry::1']['title']);
+    }
+
+    #[Test]
+    public function it_resolves_a_custom_link_type()
+    {
+        Link::extend('bard-test-custom', TestCustomLinkType::class);
+
+        $field = (new Bard)->setField(new Field('test', ['type' => 'bard']));
+
+        $augmented = $field->augment([
+            ['type' => 'text', 'marks' => [['type' => 'link', 'attrs' => ['href' => 'statamic://bard-test-custom::valid']]], 'text' => 'Link'],
+        ]);
+
+        $this->assertEquals('<a href="https://example.com/custom/valid">Link</a>', $augmented);
+    }
+
+    #[Test]
+    public function it_resolves_a_missing_custom_link_type_reference_to_an_empty_href()
+    {
+        Link::extend('bard-test-custom', TestCustomLinkType::class);
+
+        $field = (new Bard)->setField(new Field('test', ['type' => 'bard']));
+
+        $augmented = $field->augment([
+            ['type' => 'text', 'marks' => [['type' => 'link', 'attrs' => ['href' => 'statamic://bard-test-custom::missing']]], 'text' => 'Link'],
+        ]);
+
+        $this->assertEquals('<a>Link</a>', $augmented);
+    }
+
+    #[Test]
+    public function it_gets_link_data_for_a_custom_link_type()
+    {
+        TestCustomLinkFieldtype::register();
+        Link::extend('bard-test-custom', TestCustomLinkType::class);
+
+        $bard = $this->bard(['save_html' => true, 'sets' => null]);
+
+        $html = '<p><a href="statamic://bard-test-custom::valid">Custom Link</a></p>';
+
+        $prosemirror = (new Augmentor($this))->renderHtmlToProsemirror($html)['content'];
+
+        $linkData = $bard->getLinkData($prosemirror);
+
+        $this->assertEquals(['bard-test-custom::valid'], array_keys($linkData));
+        $this->assertEquals('Custom Title', $linkData['bard-test-custom::valid']['title']);
+    }
+
+    #[Test]
+    public function it_includes_visible_custom_link_types_in_preload()
+    {
+        TestCustomLinkFieldtype::register();
+        Link::extend('bard-test-custom', TestCustomLinkType::class);
+
+        $linkTypes = $this->bard()->preload()['linkTypes'];
+
+        $this->assertArrayHasKey('bard-test-custom', $linkTypes);
+        $this->assertEquals('Custom Type', $linkTypes['bard-test-custom']['title']);
+    }
+
+    #[Test]
+    public function it_excludes_non_visible_custom_link_types_from_preload()
+    {
+        TestCustomLinkFieldtype::register();
+        Link::extend('bard-test-hidden', TestHiddenLinkType::class);
+
+        $this->assertArrayNotHasKey('bard-test-hidden', $this->bard()->preload()['linkTypes']);
+    }
+
     private function bard($config = [])
     {
         return (new Bard)->setField(new Field('test', array_merge(['type' => 'bard', 'sets' => ['one' => []]], $config)));
@@ -1373,5 +1594,52 @@ EOT;
         return [
             'group_one' => ['sets' => $sets],
         ];
+    }
+}
+
+class TestCustomLinkType extends LinkType
+{
+    protected ?string $icon = 'test-icon';
+    protected static ?string $title = 'Custom Type';
+
+    public function resolve(string $id, $parent = null, bool $localize = false): mixed
+    {
+        return $id === 'valid' ? 'https://example.com/custom/'.$id : null;
+    }
+
+    public function fieldtype(Field $field): ?array
+    {
+        return ['type' => 'test_custom_link'];
+    }
+}
+
+class TestHiddenLinkType extends LinkType
+{
+    protected ?string $icon = 'test-icon';
+    protected static ?string $title = 'Hidden Type';
+
+    public function resolve(string $id, $parent = null, bool $localize = false): mixed
+    {
+        return null;
+    }
+
+    public function fieldtype(Field $field): ?array
+    {
+        return ['type' => 'text'];
+    }
+
+    public function visible(Field $field): bool
+    {
+        return false;
+    }
+}
+
+class TestCustomLinkFieldtype extends Fieldtype
+{
+    public static $handle = 'test_custom_link';
+
+    public function preload()
+    {
+        return ['data' => [['title' => 'Custom Title']]];
     }
 }

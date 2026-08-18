@@ -11,6 +11,10 @@ Icons are used throughout the Control Panel to provide visual cues and improve u
 Use the `name` prop to specify which icon to display.
 <Canvas of={IconStories.Default} />
 
+## Alternate Sets
+Use the `set` prop or prefix the icon name with `set::` to render an icon from another registered set. When both are provided and they disagree, the set in the icon name wins and a warning is logged.
+<Canvas of={IconStories.AlternateSetInName} />
+
 ## Available Icons
 All icons available in the default icon set. Click to copy the icon name.
 <Canvas of={IconStories.AllIcons} />

@@ -15,7 +15,7 @@ class CurrenciesTest extends TestCase
     {
         $options = (new Currencies)->options();
 
-        $this->assertCount(114, $options);
+        $this->assertCount(154, $options);
         $option = $options['USD'];
         $this->assertEquals('US Dollar (USD)', $option);
     }
@@ -51,6 +51,16 @@ class CurrenciesTest extends TestCase
                     'USD' => 'US Dollar (USD)',
                     'BND' => 'Brunei Dollar (BND)',
                     'TWD' => 'New Taiwan Dollar (TWD)',
+                    'BBD' => 'Barbadian Dollar (BBD)',
+                    'BMD' => 'Bermudian Dollar (BMD)',
+                    'BSD' => 'Bahamian Dollar (BSD)',
+                    'FJD' => 'Fijian Dollar (FJD)',
+                    'GYD' => 'Guyanese Dollar (GYD)',
+                    'KYD' => 'Cayman Islands Dollar (KYD)',
+                    'LRD' => 'Liberian Dollar (LRD)',
+                    'SBD' => 'Solomon Islands Dollar (SBD)',
+                    'SRD' => 'Surinamese Dollar (SRD)',
+                    'XCD' => 'Eastern Caribbean Dollar (XCD)',
                 ],
             ],
             'dollar symbol' => [
@@ -80,12 +90,28 @@ class CurrenciesTest extends TestCase
                     'USD' => 'US Dollar (USD)',
                     'UYU' => 'Uruguayan Peso (UYU)',
                     'ZWG' => 'Zimbabwe Gold (ZWG)',
+                    'BBD' => 'Barbadian Dollar (BBD)',
+                    'BMD' => 'Bermudian Dollar (BMD)',
+                    'BSD' => 'Bahamian Dollar (BSD)',
+                    'CUP' => 'Cuban Peso (CUP)',
+                    'FJD' => 'Fijian Dollar (FJD)',
+                    'GYD' => 'Guyanese Dollar (GYD)',
+                    'KYD' => 'Cayman Islands Dollar (KYD)',
+                    'LRD' => 'Liberian Dollar (LRD)',
+                    'SBD' => 'Solomon Islands Dollar (SBD)',
+                    'SRD' => 'Surinamese Dollar (SRD)',
+                    'WST' => 'Samoan Tala (WST)',
+                    'XCD' => 'Eastern Caribbean Dollar (XCD)',
                 ],
             ],
             'pound symbol' => [
                 '£',
                 [
                     'GBP' => 'British Pound Sterling (GBP)',
+                    'FKP' => 'Falkland Islands Pound (FKP)',
+                    'GIP' => 'Gibraltar Pound (GIP)',
+                    'SHP' => 'Saint Helena Pound (SHP)',
+                    'SSP' => 'South Sudanese Pound (SSP)',
                 ],
             ],
         ];

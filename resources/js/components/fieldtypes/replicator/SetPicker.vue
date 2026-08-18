@@ -495,5 +495,9 @@ export default {
                 .map((result) => result.obj);
         }
     },
+
+    beforeUnmount() {
+        this.unbindKeys();
+    },
 };
 </script>

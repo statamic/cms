@@ -6,6 +6,7 @@ use ArrayAccess;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Responsable;
 use Statamic\Contracts\Data\Augmentable as AugmentableContract;
+use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Contracts\Taxonomies\Taxonomy as Contract;
 use Statamic\Data\ContainsCascadingData;
 use Statamic\Data\ContainsSupplementalData;
@@ -27,12 +28,13 @@ use Statamic\Facades\Search;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\URL;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 use function Statamic\trans as __;
 
-class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract, Responsable
+class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, ContainsQueryableValues, Contract, Responsable
 {
     use ContainsCascadingData, ContainsSupplementalData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedData;
 
@@ -43,6 +45,8 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
     protected $collection;
     protected $defaultPublishState = true;
     protected $searchIndex;
+    protected $sortField;
+    protected $sortDirection;
     protected $previewTargets = [];
     protected $template;
     protected $termTemplate;
@@ -178,12 +182,26 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
 
     public function sortField()
     {
-        return 'title'; // todo
+        return $this->sortField ?? 'title';
+    }
+
+    public function setSortField($field)
+    {
+        $this->sortField = $field;
+
+        return $this;
     }
 
     public function sortDirection()
     {
-        return 'asc'; // todo
+        return $this->sortDirection ?? 'asc';
+    }
+
+    public function setSortDirection($dir)
+    {
+        $this->sortDirection = $dir;
+
+        return $this;
     }
 
     public function queryTerms()
@@ -288,6 +306,11 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
             'term_template' => $this->termTemplate,
             'layout' => $this->layout,
         ];
+
+        $data = Arr::removeNullValues(array_merge($data, [
+            'sort_by' => $this->sortField,
+            'sort_dir' => $this->sortDirection,
+        ]));
 
         if (Site::multiEnabled()) {
             $data['sites'] = $this->sites;
@@ -442,7 +465,7 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
 
     public function createLabel()
     {
-        $key = "statamic::messages.{$this->handle()}_taxonomy_create_term";
+        $key = "messages.{$this->handle()}_taxonomy_create_term";
 
         $translation = __($key);
 
@@ -576,5 +599,23 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
                 type: $text,
                 url: $this->editBlueprintUrl($blueprint),
             ));
+    }
+
+    public function getQueryableValue(string $field)
+    {
+        if (in_array($method = Str::camel($field), $this->queryableMethods())) {
+            return $this->{$method}();
+        }
+
+        return $this->get($field);
+    }
+
+    private function queryableMethods(): array
+    {
+        return [
+            'absoluteUrl', 'collection', 'collections', 'defaultPublishState', 'editUrl', 'handle',
+            'hasSearchIndex', 'id', 'layout', 'path', 'revisionsEnabled', 'searchIndex', 'sites',
+            'sortDirection', 'sortField', 'template', 'termTemplate', 'title', 'uri', 'url',
+        ];
     }
 }

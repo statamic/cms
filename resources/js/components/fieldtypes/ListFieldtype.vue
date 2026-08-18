@@ -23,6 +23,7 @@
                                 class="!inset-shadow-none focus:!inset-shadow-none"
                                 v-model="element.value"
                                 :readonly="isReadOnly"
+                                :input-attrs="{ dir: contentDirection }"
                                 @blur="focused = false"
                                 @focus="editItemWithoutFocusing(index)"
                                 @keydown.enter.prevent="nextItem"
@@ -58,6 +59,7 @@
 import Fieldtype from './Fieldtype.vue';
 import { SortableList, SortableHelpers } from '../sortable/Sortable';
 import { Button } from '@/components/ui';
+import { useContentDirection } from '@/composables/content-direction';
 
 export default {
     mixins: [Fieldtype, SortableHelpers],
@@ -65,6 +67,12 @@ export default {
     components: {
         SortableList,
         Button,
+    },
+
+    setup() {
+        const { direction: contentDirection } = useContentDirection();
+
+        return { contentDirection };
     },
 
     data() {
@@ -114,7 +122,7 @@ export default {
 
     computed: {
         addButton() {
-            return __(this.config.add_button || 'Add Item');
+            return __(this.config.add_row) || __(this.config.add_button) || __('Add Item');
         },
     },
 

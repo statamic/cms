@@ -49,6 +49,8 @@ use Statamic\Search\Searchable;
 use Statamic\Statamic;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticatable, AuthorizableContract, CanResetPasswordContract, ContainsQueryableValues, HasLocalePreference, ResolvesValuesContract, SearchableContract, UserContract
 {
     use Authorizable, CanResetPassword, ContainsComputedData, HasAugmentedInstance, HasAvatar, HasDirtyState, Notifiable, ResolvesValues, Searchable, TracksQueriedColumns, TracksQueriedRelations;
@@ -430,7 +432,7 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
     {
         $svg = (new Writer(
             new ImageRenderer(
-                new RendererStyle(192, 0, null, null, Fill::uniformColor(new Rgb(255, 255, 255), new Rgb(45, 55, 72))),
+                new RendererStyle(size: 192, fill: Fill::uniformColor(new Rgb(255, 255, 255), new Rgb(45, 55, 72))),
                 new SvgImageBackEnd
             )
         ))->writeString($this->twoFactorQrCodeUrl());
@@ -476,7 +478,7 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
 
     public function getQueryableValue(string $field)
     {
-        if (method_exists($this, $method = Str::camel($field))) {
+        if (in_array($method = Str::camel($field), $this->queryableMethods())) {
             return $this->{$method}();
         }
 
@@ -487,5 +489,14 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
         }
 
         return $field->fieldtype()->toQueryableValue($value);
+    }
+
+    private function queryableMethods(): array
+    {
+        return [
+            'apiUrl', 'avatar', 'blueprint', 'editUrl', 'email', 'gravatarUrl', 'groups', 'hasAvatarField',
+            'id', 'initials', 'isSuper', 'isTaxonomizable', 'lastLogin', 'name', 'path', 'preferredLocale',
+            'preferredTheme', 'reference', 'roles', 'title',
+        ];
     }
 }

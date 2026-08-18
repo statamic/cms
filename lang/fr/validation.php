@@ -131,6 +131,7 @@ return [
     'date_fieldtype_time_required' => 'Horaire obligatoire.',
     'duplicate_field_handle' => 'Le champ avec l’identifiant :handle ne peut pas être utilisé plus d’une fois.',
     'duplicate_uri' => 'URI en doublon :value',
+    'elevated_session_resend_code_unavailable' => 'Le renvoi du code n’est disponible que pour la méthode de vérification par code.',
     'elevated_session_verification_code' => 'Le code de vérification est incorrect.',
     'email_available' => 'Un utilisateur possédant cet email existe déjà.',
     'fieldset_imported_recursively' => 'Le jeu de champs :handle est importé de manière récursive.',

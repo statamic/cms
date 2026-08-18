@@ -6,6 +6,8 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 use Statamic\CP\Column;
 use Statamic\Http\Resources\CP\Concerns\HasRequestedColumns;
 
+use function Statamic\trans as __;
+
 class SearchedAssetsCollection extends ResourceCollection
 {
     use HasRequestedColumns;

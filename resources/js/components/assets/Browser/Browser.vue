@@ -1,10 +1,10 @@
 <template>
     <div ref="browser" class="h-full" @keydown.shift="shiftDown" @keyup="clearShift">
         <Uploader
-            ref="uploader"
+            ref="internalUploader"
             :container="container.id"
             :path="path"
-            :enabled="!preventDragging && canUpload"
+            :enabled="!uploader && !preventDragging && canUpload"
             @updated="uploadsUpdated"
             @upload-complete="uploadCompleted"
             @error="uploadError"
@@ -329,6 +329,10 @@ export default {
             type: Array,
             default: () => [],
         },
+        uploader: {
+            type: Object,
+            default: null,
+        },
     },
 
     setup() {
@@ -484,6 +488,7 @@ export default {
                 folder: this.folder,
                 folderActionUrl: this.folderActionUrl,
                 folders: this.folders,
+                maxFiles: this.maxFiles,
                 restrictFolderNavigation: this.restrictFolderNavigation,
                 path: this.path,
                 creatingFolder: this.creatingFolder,
@@ -552,8 +557,9 @@ export default {
             this.loadAssets();
         },
 
-        path() {
+        path(path) {
             this.loadAssets();
+            this.$emit('path-changed', path);
         },
 
         searchQuery() {
@@ -784,7 +790,7 @@ export default {
         },
 
         openFileBrowser() {
-            this.$refs.uploader.browse();
+            (this.uploader || this.$refs.internalUploader).browse();
         },
 
         selectFolder(path) {

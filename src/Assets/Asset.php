@@ -8,7 +8,6 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use League\Flysystem\PathTraversalDetected;
-use Rhukster\DomSanitizer\DOMSanitizer;
 use Statamic\Assets\AssetUploader as Uploader;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
@@ -46,6 +45,7 @@ use Statamic\Search\Searchable;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
+use Statamic\Support\Svg;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Statamic\Support\Traits\Hookable;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -65,6 +65,10 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
     use ResolvesValues {
         resolveGqlValue as traitResolveGqlValue;
     }
+
+    const AUDIO_EXTENSIONS = ['aac', 'flac', 'm4a', 'mp3', 'ogg', 'wav'];
+    const IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif'];
+    const VIDEO_EXTENSIONS = ['h264', 'mp4', 'm4v', 'ogv', 'webm', 'mov'];
 
     protected $container;
     protected $path;
@@ -471,7 +475,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
      */
     public function isAudio()
     {
-        return $this->extensionIsOneOf(['aac', 'flac', 'm4a', 'mp3', 'ogg', 'wav']);
+        return $this->extensionIsOneOf(self::AUDIO_EXTENSIONS);
     }
 
     /**
@@ -504,7 +508,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
      */
     public function isImage()
     {
-        return $this->extensionIsOneOf(['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif']);
+        return $this->extensionIsOneOf(self::IMAGE_EXTENSIONS);
     }
 
     /**
@@ -524,7 +528,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
      */
     public function isVideo()
     {
-        return $this->extensionIsOneOf(['h264', 'mp4', 'm4v', 'ogv', 'webm', 'mov']);
+        return $this->extensionIsOneOf(self::VIDEO_EXTENSIONS);
     }
 
     /**
@@ -597,7 +601,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
      */
     public function lastModified()
     {
-        return Carbon::createFromTimestamp($this->meta('last_modified'), config('app.timezone'));
+        return Carbon::createFromTimestamp($this->meta('last_modified') ?? 0, config('app.timezone'));
     }
 
     /**
@@ -972,9 +976,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
 
             $this->disk()->put(
                 $this->path(),
-                (new DOMSanitizer(DOMSanitizer::SVG))->sanitize($contents, [
-                    'remove-xml-tags' => ! Str::startsWith($contents, '<?xml'),
-                ])
+                Svg::sanitize($contents)
             );
         }
 
@@ -1019,7 +1021,6 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
     /**
      * Get the blueprint.
      *
-     * @param  string|null  $blueprint
      * @return \Statamic\Fields\Blueprint
      */
     public function blueprint()
@@ -1137,7 +1138,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
 
     public function getQueryableValue(string $field)
     {
-        if (method_exists($this, $method = Str::camel($field))) {
+        if (in_array($method = Str::camel($field), $this->queryableMethods())) {
             return $this->{$method}();
         }
 
@@ -1148,6 +1149,17 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
         }
 
         return $field->fieldtype()->toQueryableValue($value);
+    }
+
+    private function queryableMethods(): array
+    {
+        return [
+            'absoluteUrl', 'apiUrl', 'basename', 'blueprint', 'containerId', 'containerHandle', 'dimensions',
+            'duration', 'editUrl', 'exists', 'extension', 'filename', 'folder', 'guessedExtension',
+            'hasDimensions', 'hasDuration', 'height', 'id', 'isAudio', 'isImage', 'isMedia', 'isPdf',
+            'isPreviewable', 'isSvg', 'isVideo', 'lastModified', 'mimeType', 'orientation', 'path', 'pdfUrl',
+            'ratio', 'reference', 'size', 'thumbnailUrl', 'title', 'url', 'width',
+        ];
     }
 
     public function getCurrentDirtyStateAttributes(): array
