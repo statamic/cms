@@ -27,6 +27,7 @@ class BannerTest extends TestCase
             'icon' => 'info',
             'listable' => false,
             'instructions' => null,
+            'handle' => null,
         ], $fieldtype->toFieldArray());
     }
 
@@ -50,6 +51,7 @@ class BannerTest extends TestCase
             'icon' => 'info',
             'listable' => false,
             'instructions' => null,
+            'handle' => null,
             'width' => 50,
             'if' => ['subscribe' => 'is true'],
         ], $fieldtype->toFieldArray());
