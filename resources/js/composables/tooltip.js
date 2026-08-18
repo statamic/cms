@@ -12,7 +12,6 @@ let pendingEl = null;
 let tracking = false;
 let pointer = null;
 
-/* Slack around each rect, for subpixel rounding and the pointer sitting on a border. */
 const EDGE = 4;
 
 function isInteractive() {
@@ -42,8 +41,6 @@ function contains(rect, x, y, pad = EDGE) {
     );
 }
 
-/* The arrow and offset leave a gap between the trigger and the popper. Bridge it with a
-   rect covering only that gap, so the pointer can travel between the two. */
 function gapRect(trigger, popper) {
     const left = Math.min(trigger.left, popper.left);
     const right = Math.max(trigger.right, popper.right);
@@ -69,16 +66,12 @@ function onPointerMove(event) {
     if (!isPointerInside(pointer.x, pointer.y)) dismiss();
 }
 
-function onPointerGone() {
-    dismiss();
-}
-
 function startTracking() {
     if (tracking) return;
     tracking = true;
     document.addEventListener('mousemove', onPointerMove, true);
-    document.addEventListener('mouseleave', onPointerGone);
-    window.addEventListener('blur', onPointerGone);
+    document.addEventListener('mouseleave', dismiss);
+    window.addEventListener('blur', dismiss);
 }
 
 function stopTracking() {
@@ -86,8 +79,8 @@ function stopTracking() {
     tracking = false;
     pointer = null;
     document.removeEventListener('mousemove', onPointerMove, true);
-    document.removeEventListener('mouseleave', onPointerGone);
-    window.removeEventListener('blur', onPointerGone);
+    document.removeEventListener('mouseleave', dismiss);
+    window.removeEventListener('blur', dismiss);
 }
 
 function setContent(el, options) {
@@ -151,8 +144,6 @@ function show(el, options) {
 }
 
 function hide() {
-    /* An interactive tooltip stays open when the pointer leaves the trigger heading for
-       the popper. The pointer tracker dismisses it once it's outside both and the gap. */
     if (isVisible.value && isInteractive()) {
         if (pointer && !isPointerInside(pointer.x, pointer.y)) dismiss();
         return;
@@ -161,8 +152,6 @@ function hide() {
     dismiss();
 }
 
-/* Only tear down when the element owning the tooltip goes away, so unrelated elements
-   unmounting can't close a tooltip the pointer is currently using. */
 function dismissFor(el) {
     if (targetEl.value === el || pendingEl === el) dismiss();
 }
@@ -180,7 +169,6 @@ export function useTooltip() {
         targetEl: readonly(targetEl),
         show,
         hide,
-        dismiss,
         dismissFor,
         registerContentEl,
     };

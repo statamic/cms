@@ -67,7 +67,7 @@ watch([isVisible, targetEl, content], async ([visible, target]) => {
                 :shown="showTooltip"
                 :triggers="[]"
                 placement="top"
-                :distance="6"
+                :distance="10"
             >
                 <span :style="spanStyle" />
                 <template #popper>

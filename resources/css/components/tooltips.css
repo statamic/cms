@@ -10,7 +10,6 @@
     padding: 5px 10px !important;
 }
 
-/* Copyable and HTML tooltips can be hovered and clicked. */
 .v-popper--theme-tooltip:has(.tooltip-popper-interactive),
 .v-popper--theme-tooltip:has(.tooltip-popper-interactive) .v-popper__wrapper {
     pointer-events: auto;
