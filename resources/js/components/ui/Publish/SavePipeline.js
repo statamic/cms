@@ -27,10 +27,7 @@ export class Pipeline {
             try {
                 return await step.handle(payload);
             } catch (error) {
-                if (error instanceof PipelineStopped) {
-                    new Stopped().handle(payload);
-                    throw error;
-                }
+                new Stopped().handle(payload);
                 throw error;
             }
         }, initialPromise);
@@ -112,7 +109,7 @@ export class BeforeSaveHooks extends Step {
     }
     handle(payload) {
         return new Promise((resolve, reject) => {
-            return Statamic.$hooks.run(`${this.#prefix}.saving`, this.#hookPayload).then(() => resolve(payload));
+            return Statamic.$hooks.run(`${this.#prefix}.saving`, this.#hookPayload).then(() => resolve(payload), reject);
         });
     }
 }
@@ -132,7 +129,7 @@ export class AfterSaveHooks extends Step {
                     ...this.#hookPayload,
                     response,
                 })
-                .then(() => resolve(response));
+                .then(() => resolve(response), reject);
         });
     }
 }

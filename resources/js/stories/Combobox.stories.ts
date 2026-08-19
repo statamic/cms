@@ -383,6 +383,50 @@ export const _IgnoreFilter: Story = {
     }),
 };
 
+const searchKeysCode = `
+<Combobox
+    placeholder="Select author..."
+    :search-keys="['label', 'email']"
+    :options="[
+        { label: 'Tyler Lyle', email: 'workhorse92@example.com', value: 'tyler' },
+        { label: 'Tim McEwan', email: 'nightowl47@example.com', value: 'tim' },
+        { label: 'Nikki Flores', email: 'skyline08@example.com', value: 'nikki' },
+    ]"
+/>
+`;
+
+export const _SearchKeys: Story = {
+    tags: ['!dev'],
+    parameters: {
+        docs: {
+            source: { code: searchKeysCode },
+            description: {
+                story: 'By default, search only matches against `optionLabel`. Use `searchKeys` to also match against other keys on the option object — useful when an option has a value that isn\'t displayed but should still be searchable, such as an email address. Try searching "nightowl" below — it only appears in Tim McEwan\'s email, not his label.',
+            },
+        },
+    },
+    render: () => ({
+        components: { Combobox },
+        setup() {
+            const value = ref(null);
+            const options = [
+                { label: 'Tyler Lyle', email: 'workhorse92@example.com', value: 'tyler' },
+                { label: 'Tim McEwan', email: 'nightowl47@example.com', value: 'tim' },
+                { label: 'Nikki Flores', email: 'skyline08@example.com', value: 'nikki' },
+            ];
+            return { value, options };
+        },
+        template: `
+            <Combobox
+                v-model="value"
+                placeholder="Select author..."
+                :search-keys="['label', 'email']"
+                :options="options"
+            />
+        `,
+    }),
+};
+
 const optionSlotsCode = `
 <Combobox 
     placeholder="Select author..." 
@@ -724,6 +768,40 @@ export const TestCanSearchOptions: Story = {
         const options = document.querySelectorAll('[data-ui-combobox-item]');
         expect(options.length).toBe(1);
         expect(options[0].getAttribute('data-ui-combobox-item')).toBe('the_midnight');
+    },
+};
+
+export const TestSearchKeysMatchesAdditionalFields: Story = {
+    tags: ['!dev', 'test'],
+    render: () => ({
+        components: { Combobox },
+        setup() {
+            const value = ref(null);
+            const options = [
+                { label: 'Tyler Lyle', email: 'workhorse92@example.com', value: 'tyler' },
+                { label: 'Tim McEwan', email: 'nightowl47@example.com', value: 'tim' },
+                { label: 'Nikki Flores', email: 'skyline08@example.com', value: 'nikki' },
+            ];
+            return { value, options };
+        },
+        template: `<Combobox v-model="value" :options="options" :search-keys="['label', 'email']" placeholder="Select..." />`,
+    }),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const trigger = canvas.getByRole('combobox');
+
+        await userEvent.click(trigger);
+
+        const input = document.querySelector('input[type="search"]') as HTMLInputElement;
+
+        // "nightowl" only appears in Tim McEwan's email, not in any label.
+        await userEvent.type(input, 'nightowl');
+
+        await new Promise((r) => setTimeout(r, 100));
+
+        const options = document.querySelectorAll('[data-ui-combobox-item]');
+        expect(options.length).toBe(1);
+        expect(options[0].getAttribute('data-ui-combobox-item')).toBe('tim');
     },
 };
 

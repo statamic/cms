@@ -470,7 +470,7 @@ class Entries extends Relationship
     {
         return empty($collections = $this->config('collections'))
             ? Collection::handles()->all()
-            : $collections;
+            : Arr::wrap($collections);
     }
 
     public function toGqlType()
@@ -516,7 +516,7 @@ class Entries extends Relationship
 
     public function relationshipQueryBuilder()
     {
-        $collections = $this->config('collections');
+        $collections = $this->getConfiguredCollections();
 
         return Entry::query()
             ->when($collections, fn ($query) => $query->whereIn('collection', $collections));

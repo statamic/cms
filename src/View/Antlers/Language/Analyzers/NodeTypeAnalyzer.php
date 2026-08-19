@@ -30,7 +30,7 @@ class NodeTypeAnalyzer
     public static function analyzeParametersForModifiers(AntlersNode $node)
     {
         foreach ($node->parameters as $parameter) {
-            $parameter->isModifierParameter = self::$environmentDetails->isModifier($parameter->name);
+            $parameter->isModifierParameter = self::environmentDetails()->isModifier($parameter->name);
         }
     }
 
@@ -42,6 +42,11 @@ class NodeTypeAnalyzer
             return;
         }
 
-        $node->isTagNode = self::$environmentDetails->isTag($node->name->name);
+        $node->isTagNode = self::environmentDetails()->isTag($node->name->name);
+    }
+
+    private static function environmentDetails(): EnvironmentDetails
+    {
+        return self::$environmentDetails ??= app(EnvironmentDetails::class);
     }
 }
