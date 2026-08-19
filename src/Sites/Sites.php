@@ -248,6 +248,7 @@ class Sites
                     'instructions' => __('statamic::messages.site_configure_attributes_instructions'),
                     'type' => 'array',
                     'add_button' => __('Add Attribute'),
+                    'compact' => true,
                 ],
             ],
         ];
@@ -272,10 +273,6 @@ class Sites
                         'fields' => collect($siteFields)->map(function ($field) use ($tableWidths) {
                             $field['field']['width'] = $tableWidths[$field['handle']] ?? 14;
                             $field['field']['classes'] = 'max-w-48 min-w-0 overflow-hidden';
-
-                            if ($field['handle'] === 'attributes') {
-                                $field['field']['compact'] = true;
-                            }
 
                             return $field;
                         })->all(),
