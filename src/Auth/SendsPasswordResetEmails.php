@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
 use Statamic\Facades\URL;
 
+use function Statamic\trans;
+use function Statamic\trans as __;
+
 /**
  * A copy of Illuminate\Auth\SendsPasswordResetEmails.
  *

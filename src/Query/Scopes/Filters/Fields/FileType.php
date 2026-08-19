@@ -5,6 +5,8 @@ namespace Statamic\Query\Scopes\Filters\Fields;
 use Illuminate\Support\Arr;
 use Statamic\Support\FileTypes;
 
+use function Statamic\trans as __;
+
 class FileType extends FieldtypeFilter
 {
     public function fieldItems()

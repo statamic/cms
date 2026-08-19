@@ -19,6 +19,7 @@
             :read-only="isReadOnly"
             :name="slug"
             :disabled="config.disabled"
+            :input-attrs="{ dir: contentDirection }"
             @focus="$emit('focus')"
             @blur="$emit('blur')"
         >
@@ -40,6 +41,7 @@
 import { data_get } from '../../bootstrap/globals';
 import Fieldtype from './Fieldtype.vue';
 import { Input, Button, Icon } from '@/components/ui';
+import { useContentDirection } from '@/composables/content-direction';
 
 export default {
     mixins: [Fieldtype],
@@ -48,6 +50,12 @@ export default {
         Input,
         Button,
         Icon,
+    },
+
+    setup() {
+        const { direction: contentDirection } = useContentDirection();
+
+        return { contentDirection };
     },
 
     data() {

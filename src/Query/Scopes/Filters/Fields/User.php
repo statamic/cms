@@ -5,6 +5,8 @@ namespace Statamic\Query\Scopes\Filters\Fields;
 use Statamic\Facades\User as Users;
 use Statamic\Support\Arr;
 
+use function Statamic\trans as __;
+
 class User extends FieldtypeFilter
 {
     public function fieldItems()

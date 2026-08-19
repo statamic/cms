@@ -127,6 +127,7 @@
                                 v-show="mode == 'preview'"
                                 v-html="markdownPreviewText"
                                 class="markdown-preview p-3 prose prose-sm @md/markdown:prose-base"
+                                :dir="contentDirection"
                             ></div>
                         </div>
                     </div>
@@ -184,6 +185,7 @@ import AssetSelector from '../../assets/Selector.vue';
 import Uploader from '../../assets/Uploader.vue';
 import Uploads from '../../assets/Uploads.vue';
 import MarkdownToolbar from './MarkdownToolbar.vue';
+import { useContentDirection } from '@/composables/content-direction';
 // Keymaps
 import 'codemirror/keymap/sublime';
 
@@ -238,6 +240,12 @@ export default {
         Uploads,
         MarkdownToolbar,
 	    Stack,
+    },
+
+    setup() {
+        const { direction: contentDirection } = useContentDirection();
+
+        return { contentDirection };
     },
 
     data() {
@@ -654,7 +662,6 @@ export default {
                     mode: 'gfm',
                     dragDrop: false,
                     keyMap: 'sublime',
-                    direction: document.querySelector('html').getAttribute('dir') ?? 'ltr',
                     lineWrapping: true,
                     viewportMargin: Infinity,
                     tabindex: 0,

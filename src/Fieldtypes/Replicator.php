@@ -3,6 +3,7 @@
 namespace Statamic\Fieldtypes;
 
 use Facades\Statamic\Fieldtypes\RowId;
+use Statamic\Contracts\Data\Localization;
 use Statamic\Data\NestedFieldUpdater;
 use Statamic\Facades\Blink;
 use Statamic\Facades\GraphQL;
@@ -14,6 +15,8 @@ use Statamic\GraphQL\Types\ReplicatorSetType;
 use Statamic\Query\Scopes\Filters\Fields\Replicator as ReplicatorFilter;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
+
+use function Statamic\trans as __;
 
 class Replicator extends Fieldtype
 {
@@ -72,6 +75,7 @@ class Replicator extends Fieldtype
                         'display' => __('Add Set Label'),
                         'instructions' => __('statamic::fieldtypes.replicator.config.button_label'),
                         'type' => 'text',
+                        'placeholder' => __('Add Set'),
                         'default' => '',
                         'width' => 50,
                     ],
@@ -133,7 +137,9 @@ class Replicator extends Fieldtype
     public function fields($set, $index = -1)
     {
         $config = Arr::get($this->flattenedSetsConfig(), "$set.fields");
-        $hash = md5($this->field->fieldPathPrefix().$index.json_encode($config));
+        $parent = $this->field->parent();
+        $locale = $parent instanceof Localization ? $parent->locale() : null;
+        $hash = md5($this->field->fieldPathPrefix().$index.json_encode($config).$locale);
 
         return Blink::once($hash, function () use ($config, $index) {
             return new Fields(

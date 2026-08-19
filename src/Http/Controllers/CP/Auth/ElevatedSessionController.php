@@ -8,6 +8,8 @@ use Inertia\Inertia;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\Auth\ElevatedSessionController as BaseController;
 
+use function Statamic\trans as __;
+
 class ElevatedSessionController extends BaseController
 {
     public function status(Request $request)

@@ -495,6 +495,20 @@ test('it can call a custom function', () => {
     expect(Fields.showField({ unless: 'custom reallyLovesAnimals' })).toBe(true);
 });
 
+test('it can call a custom function that uses `prefix` param to evaluate prefixed fields', () => {
+    setValues({
+        first_favorite_animals: ['cats', 'dogs', 'giraffes', 'lions'],
+        second_favorite_animals: ['cats', 'dogs'],
+    });
+
+    Statamic.$conditions.add('reallyLovesAnimals', function ({ prefix, values }) {
+        return values[`${prefix}favorite_animals`].length > 3;
+    });
+
+    expect(Fields.showField({ prefix: 'first_', if: 'custom reallyLovesAnimals' })).toBe(true);
+    expect(Fields.showField({ prefix: 'second_', if: 'custom reallyLovesAnimals' })).toBe(false);
+});
+
 test('it can call a custom function that uses `fieldPath` param to evaluate nested fields', () => {
     setValues({
         nested: [{ favorite_animals: ['cats', 'dogs'] }, { favorite_animals: ['cats', 'dogs', 'giraffes', 'lions'] }],

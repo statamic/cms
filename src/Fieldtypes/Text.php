@@ -5,6 +5,8 @@ namespace Statamic\Fieldtypes;
 use Statamic\Fields\Fieldtype;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class Text extends Fieldtype
 {
     protected $categories = ['text'];

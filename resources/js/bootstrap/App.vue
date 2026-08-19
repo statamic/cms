@@ -57,6 +57,10 @@ export default {
         Statamic.$callbacks.add('removeFromSelections', function (ids) {
             Statamic.$events.$emit('removeFromSelections', ids);
         });
+
+        Statamic.$callbacks.add('replaceInSelections', function (replacements) {
+            Statamic.$events.$emit('replaceInSelections', replacements);
+        });
     },
 
     methods: {

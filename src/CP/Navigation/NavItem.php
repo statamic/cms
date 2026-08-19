@@ -12,6 +12,8 @@ use Statamic\Support\Str;
 use Statamic\Support\Svg;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
+use function Statamic\trans as __;
+
 class NavItem
 {
     use FluentlyGetsAndSets;

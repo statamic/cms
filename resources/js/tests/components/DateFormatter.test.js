@@ -213,6 +213,12 @@ test('it can set the default locale via setDefaultLocale', () => {
     expect(new DateFormatter().locale).toBe('de');
 });
 
+test('it normalizes underscored locales to BCP 47 format', () => {
+    DateFormatter.defaultLocale = 'pt_BR';
+    expect(DateFormatter.defaultLocale).toBe('pt-BR');
+    expect(new DateFormatter().locale).toBe('pt-BR');
+});
+
 test.each([
     ['en', 'date', '12/25/2021'],
     ['en', 'time', '12:13 PM'],
@@ -227,6 +233,20 @@ test.each([
 
 test('an invalid preset throws an error', () => {
     expect(() => new DateFormatter().options('foo')).toThrow('Invalid date format: foo');
+});
+
+test('it can override preset options', () => {
+    expect(new DateFormatter().options({ preset: 'datetime', month: 'short' }).toString()).toBe(
+        'Dec 25, 2021, 12:13 PM',
+    );
+
+    expect(new DateFormatter().options({ preset: 'datetime', timeZone: 'Australia/Sydney' }).toString()).toBe(
+        '12/25/2021, 11:13 PM',
+    );
+});
+
+test('an invalid preset key throws an error when overriding', () => {
+    expect(() => new DateFormatter().options({ preset: 'foo', month: 'short' })).toThrow('Invalid date format: foo');
 });
 
 test.each([

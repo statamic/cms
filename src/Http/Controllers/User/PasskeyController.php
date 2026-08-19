@@ -9,6 +9,8 @@ use Statamic\Facades\User;
 use Statamic\Facades\WebAuthn;
 use Statamic\Http\Controllers\Controller;
 
+use function Statamic\trans as __;
+
 class PasskeyController extends Controller
 {
     public function create()

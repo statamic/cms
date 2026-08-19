@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Statamic\Contracts\Auth\TwoFactor\TwoFactorAuthenticationProvider;
 
+use function Statamic\trans as __;
+
 class TwoFactorChallengeRequest extends FormRequest
 {
     /**

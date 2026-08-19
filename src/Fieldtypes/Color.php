@@ -4,6 +4,8 @@ namespace Statamic\Fieldtypes;
 
 use Statamic\Fields\Fieldtype;
 
+use function Statamic\trans as __;
+
 class Color extends Fieldtype
 {
     protected $categories = ['special'];

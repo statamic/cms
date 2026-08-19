@@ -426,6 +426,7 @@ class FieldsTest extends TestCase
                 'visibility' => 'visible',
                 'read_only' => false, // deprecated
                 'always_save' => false,
+                'reserve_space_when_hidden' => false,
                 'autocomplete' => null,
                 'hide_display' => false,
                 'instructions_position' => 'above',
@@ -450,6 +451,7 @@ class FieldsTest extends TestCase
                 'visibility' => 'visible',
                 'read_only' => false, // deprecated
                 'always_save' => false,
+                'reserve_space_when_hidden' => false,
                 'hide_display' => false,
                 'instructions_position' => 'above',
                 'listable' => 'hidden',
@@ -457,6 +459,7 @@ class FieldsTest extends TestCase
                 'replicator_preview' => true,
                 'duplicate' => true,
                 'actions' => true,
+                'rows' => null,
             ],
         ], $fields->toPublishArray());
     }
@@ -515,6 +518,7 @@ class FieldsTest extends TestCase
                 'visibility' => 'visible',
                 'read_only' => false, // deprecated
                 'always_save' => false,
+                'reserve_space_when_hidden' => false,
                 'autocomplete' => null,
                 'hide_display' => false,
                 'instructions_position' => 'above',
@@ -542,6 +546,7 @@ class FieldsTest extends TestCase
                 'visibility' => 'visible',
                 'read_only' => false, // deprecated
                 'always_save' => false,
+                'reserve_space_when_hidden' => false,
                 'autocomplete' => null,
                 'hide_display' => false,
                 'instructions_position' => 'above',

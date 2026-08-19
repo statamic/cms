@@ -16,6 +16,7 @@ use Statamic\Http\Middleware\CP\RedirectIfAuthorized;
 use Statamic\OAuth\Provider;
 use Statamic\Statamic;
 
+use function Statamic\trans;
 use function Statamic\trans as __;
 
 class LoginController extends CpController
@@ -110,9 +111,13 @@ class LoginController extends CpController
 
     protected function authenticated(Request $request, $user)
     {
-        return $request->expectsJson()
-            ? response('Authenticated')
-            : redirect()->intended($this->redirectPath());
+        if ($request->expectsJson()) {
+            return response('Authenticated');
+        }
+
+        $url = redirect()->intended($this->redirectPath())->getTargetUrl();
+
+        return $request->inertia() ? Inertia::location($url) : redirect($url);
     }
 
     protected function credentials(Request $request)
