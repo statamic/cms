@@ -381,13 +381,25 @@ export default {
         },
 
         keydown(event) {
-            if ((event.metaKey || event.ctrlKey) && event.key === 'ArrowLeft') {
+            if (!event.metaKey && !event.ctrlKey) return;
+
+            if (this.isEditingText(event.target)) return;
+
+            if (event.key === 'ArrowLeft') {
                 this.navigateToPreviousAsset();
             }
 
-            if ((event.metaKey || event.ctrlKey) && event.key === 'ArrowRight') {
+            if (event.key === 'ArrowRight') {
                 this.navigateToNextAsset();
             }
+        },
+
+        isEditingText(element) {
+            if (!element) return false;
+
+            const tag = element.tagName;
+
+            return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || element.isContentEditable;
         },
 
         navigateToPreviousAsset() {

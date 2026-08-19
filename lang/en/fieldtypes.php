@@ -203,6 +203,7 @@ return [
     'text.config.input_type' => 'Set the HTML5 input type.',
     'text.config.placeholder' => 'Set placeholder text.',
     'text.config.prepend' => 'Add text before (to the left of) the input.',
+    'text.config.rows' => 'Set the number of visible text rows.',
     'text.title' => 'Text',
     'textarea.title' => 'Textarea',
     'time.config.augment_format' => 'Optionally format the output using [PHP date format](https://www.php.net/manual/en/datetime.format.php) syntax. e.g. `g:ia`.',
