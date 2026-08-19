@@ -88,6 +88,7 @@ return [
     'entry_origin_instructions' => 'The new localization will inherit values from the entry in the selected site.',
     'expect_root_instructions' => 'Consider the first page in the tree a "root" or "home" page.',
     'field_conditions_always_save_instructions' => 'Always save field value, even if the field is hidden.',
+    'field_conditions_reserve_space_when_hidden_instructions' => 'When hidden, reserve the field\'s space in the layout.',
     'field_conditions_field_instructions' => 'You may enter any field handle. You are not limited to the options in the dropdown.',
     'field_conditions_instructions' => 'When to show or hide this field.',
     'field_desynced_from_origin' => 'Desynced from origin. Click to sync and revert to the origin\'s value.',
