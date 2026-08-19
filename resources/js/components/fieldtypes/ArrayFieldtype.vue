@@ -18,7 +18,7 @@
                 </ui-button>
             </template>
 
-            <div ref="editor" @keydown.enter="closeCompactOnEnter">
+            <div ref="editor">
                 <ui-input-group v-if="isSingle">
                     <ui-input-group-prepend>
                         <select
@@ -272,13 +272,6 @@ export default {
             if (open && !this.valueCount && !this.isReadOnly) {
                 this.addValue();
             }
-        },
-
-        closeCompactOnEnter(event) {
-            if (!this.isCompact || event.target.tagName !== 'INPUT') return;
-
-            event.preventDefault();
-            this.setCompactOpen(false);
         },
 
         addValue() {
