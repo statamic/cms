@@ -1186,6 +1186,32 @@ class EntryTest extends TestCase
     }
 
     #[Test]
+    public function it_gets_the_order_from_the_collections_structure_when_the_tree_contains_a_null_item()
+    {
+        $collection = tap(Collection::make('ordered'))->save();
+
+        $one = tap((new Entry)->locale('en')->id('one')->collection($collection))->save();
+        $two = tap((new Entry)->locale('en')->id('two')->collection($collection))->save();
+        $three = tap((new Entry)->locale('en')->id('three')->collection($collection))->save();
+
+        $collection->structureContents([
+            'max_depth' => 3,
+        ])->save();
+        $collection->structure()->in('en')->tree(
+            [
+                ['entry' => 'three'],
+                null,
+                ['entry' => 'one'],
+                ['entry' => 'two'],
+            ]
+        )->save();
+
+        $this->assertEquals(2, $one->order());
+        $this->assertEquals(3, $two->order());
+        $this->assertEquals(1, $three->order());
+    }
+
+    #[Test]
     public function it_gets_the_order_from_the_data_if_not_structured()
     {
         $collection = tap(Collection::make('test'))->save();
@@ -1575,6 +1601,74 @@ class EntryTest extends TestCase
         Event::assertDispatched(EntrySaved::class, function ($event) use ($de) {
             return $event->entry === $de;
         });
+    }
+
+    #[Test]
+    public function it_resolves_descendants_with_one_query_per_level_rather_than_one_per_localization()
+    {
+        $collection = (new Collection)->handle('pages')->save();
+
+        $entry = (new Entry)->id('a')->locale('en')->collection($collection);
+
+        // Three direct localizations, all leaves (no further descendants).
+        $fr = (new Entry)->id('b')->locale('fr')->origin('a')->collection($collection);
+        $de = (new Entry)->id('c')->locale('de')->origin('a')->collection($collection);
+        $es = (new Entry)->id('d')->locale('es')->origin('a')->collection($collection);
+
+        // A flat tree is one level deep, so it should take exactly two queries
+        // (the direct descendants, then a single batched lookup for the next
+        // level which comes back empty) regardless of how many localizations
+        // exist. The previous recursive implementation issued one query per
+        // node, i.e. O(number of localizations).
+        Facades\Entry::shouldReceive('query')->times(2)->andReturn(
+            $this->fakeDescendantsQuery(collect([$fr, $de, $es])),       // direct descendants of 'a'
+            $this->fakeDescendantsQuery(collect(), ['b', 'c', 'd']),     // batched lookup for the next level
+        );
+
+        $descendants = $entry->descendants();
+
+        $this->assertEquals(['de', 'es', 'fr'], $descendants->keys()->sort()->values()->all());
+    }
+
+    #[Test]
+    public function it_includes_descendants_nested_via_an_origin_chain()
+    {
+        $collection = (new Collection)->handle('pages')->save();
+
+        $entry = (new Entry)->id('a')->locale('en')->collection($collection);
+
+        // de's origin is fr, whose origin is en: a grandchild only reachable by
+        // walking past the first level. The flattened result must include it.
+        $fr = (new Entry)->id('b')->locale('fr')->origin('a')->collection($collection);
+        $de = (new Entry)->id('c')->locale('de')->origin('b')->collection($collection);
+
+        Facades\Entry::shouldReceive('query')->times(3)->andReturn(
+            $this->fakeDescendantsQuery(collect([$fr])),         // direct descendants of en
+            $this->fakeDescendantsQuery(collect([$de]), ['b']),  // batched descendants of fr
+            $this->fakeDescendantsQuery(collect(), ['c']),       // batched descendants of de
+        );
+
+        $descendants = $entry->descendants();
+
+        $this->assertEquals(['de', 'fr'], $descendants->keys()->sort()->values()->all());
+        $this->assertSame($fr, $descendants->get('fr'));
+        $this->assertSame($de, $descendants->get('de'));
+    }
+
+    private function fakeDescendantsQuery($results, ?array $whereInOrigins = null): QueryBuilder
+    {
+        $query = Mockery::mock(QueryBuilder::class);
+        $query->shouldReceive('where')->with('collection', 'pages')->andReturnSelf();
+
+        if ($whereInOrigins === null) {
+            // directDescendants() uses where('origin', string); batched levels use whereIn.
+            $query->shouldReceive('where')->with('origin', Mockery::type('string'))->andReturnSelf();
+        }
+
+        $query->shouldReceive('whereIn')->with('origin', $whereInOrigins ?? Mockery::type('array'))->andReturnSelf();
+        $query->shouldReceive('get')->andReturn($results);
+
+        return $query;
     }
 
     #[Test]
@@ -2773,6 +2867,36 @@ class EntryTest extends TestCase
     }
 
     #[Test]
+    public function localization_of_custom_entry_class_uses_the_origins_blueprint()
+    {
+        $this->setSites([
+            'en' => ['url' => 'http://domain.com/', 'locale' => 'en'],
+            'fr' => ['url' => 'http://domain.com/fr/', 'locale' => 'fr'],
+        ]);
+
+        BlueprintRepository::shouldReceive('in')->with('collections/custom')->andReturn(collect([
+            'default' => (new Blueprint)->setHandle('default'),
+            'another' => (new Blueprint)->setHandle('another'),
+        ]));
+
+        $collection = tap(Collection::make('custom')->sites(['en', 'fr'])->entryClass(CustomEntry::class))->save();
+
+        $origin = EntryFactory::id('origin-id')
+            ->locale('en')
+            ->collection($collection)
+            ->slug('alfa')
+            ->blueprint('another')
+            ->create();
+
+        $this->assertEquals('another', $origin->blueprint()->handle());
+
+        $localization = $origin->makeLocalization('fr');
+
+        $this->assertInstanceOf(CustomEntry::class, $localization);
+        $this->assertEquals('another', $localization->blueprint()->handle());
+    }
+
+    #[Test]
     public function it_clones_internal_collections()
     {
         $entry = EntryFactory::collection('test')->create();
@@ -2788,6 +2912,30 @@ class EntryTest extends TestCase
 
         $this->assertEquals('A', $entry->getSupplement('bar'));
         $this->assertEquals('B', $clone->getSupplement('bar'));
+    }
+
+    #[Test]
+    public function using_route_data_in_computed_props_does_not_cause_infinite_loops()
+    {
+        $collection =
+            \Statamic\Facades\Collection::make('pages')
+                ->routes('{slug}')
+                ->structureContents(['root' => true])  // We need to be in a structure to create the infinite loop condition.
+                ->save();
+
+        \Statamic\Facades\Collection::computed('pages', 'custom', function ($entry) {
+            return 'Custom: '.$entry->uri();
+        });
+
+        EntryFactory::id('entry-id')
+            ->slug('entry-slug')
+            ->collection('pages')
+            ->create();
+
+        Blink::store('entry-uris')->flush();
+
+        $entry = Facades\Entry::find('entry-id');
+        $this->assertSame('Custom: /', $entry->custom);
     }
 
     #[Test]

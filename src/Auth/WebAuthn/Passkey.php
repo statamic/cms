@@ -7,6 +7,7 @@ use ParagonIE\ConstantTime\Base64UrlSafe;
 use Statamic\Contracts\Auth\Passkey as Contract;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Facades\User;
+use Webauthn\CredentialRecord;
 use Webauthn\PublicKeyCredentialSource;
 
 abstract class Passkey implements Contract
@@ -50,11 +51,14 @@ abstract class Passkey implements Contract
         return $this->credential;
     }
 
-    public function setCredential(array|PublicKeyCredentialSource $credential): Contract
+    // The interface accepts an array|PublicKeyCredentialSource, but the webauthn-lib validators
+    // hand back the parent CredentialRecord, so we accept that here and normalize it down to a
+    // PublicKeyCredentialSource. This keeps the public contract and stored format unchanged.
+    public function setCredential(array|CredentialRecord $credential): Contract
     {
-        $this->credential = $credential instanceof PublicKeyCredentialSource
-            ? $credential
-            : $this->credentialFromArray($credential);
+        $this->credential = is_array($credential)
+            ? $this->credentialFromArray($credential)
+            : PublicKeyCredentialSource::fromCredentialRecord($credential);
 
         return $this;
     }
@@ -104,6 +108,8 @@ abstract class Passkey implements Contract
 
     private function credentialFromArray(array $array): PublicKeyCredentialSource
     {
-        return app(Serializer::class)->deserialize(json_encode($array), PublicKeyCredentialSource::class, 'json');
+        return PublicKeyCredentialSource::fromCredentialRecord(
+            app(Serializer::class)->deserialize(json_encode($array), CredentialRecord::class, 'json')
+        );
     }
 }

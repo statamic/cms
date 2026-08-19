@@ -4,6 +4,7 @@ namespace Statamic\Rules;
 
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Support\Facades\Lang;
 use Statamic\Facades\Term;
 
 class UniqueTermValue implements ValidationRule
@@ -44,6 +45,10 @@ class UniqueTermValue implements ValidationRule
             return;
         }
 
-        $fail('statamic::validation.unique_term_value')->translate();
+        $key = Lang::has('validation.unique_term_value')
+            ? 'validation.unique_term_value'
+            : 'statamic::validation.unique_term_value';
+
+        $fail($key)->translate();
     }
 }

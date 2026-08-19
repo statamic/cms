@@ -15,6 +15,7 @@ import {
     DateRangePickerHeading,
     DateRangePickerNext,
     DateRangePickerPrev,
+    DateRangePickerAnchor,
     DateRangePickerContent,
     DateRangePickerField,
     DateRangePickerInput,
@@ -136,22 +137,27 @@ const hoverCardDate = computed(() => {
             close-on-select
         >
             <DateRangePickerField v-slot="{ segments }" class="w-full">
+                <DateRangePickerAnchor as-child>
                 <div
                     :class="[
                         'flex items-center w-full overflow-x-auto overflow-y-hidden bg-white dark:bg-gray-900',
                         'border border-gray-300 dark:border-gray-700',
-                        'leading-[1.375rem] text-gray-600 dark:text-gray-300',
-                        'shadow-ui-sm not-prose h-10 rounded-lg py-2 px-2.5 disabled:shadow-none',
+                        'leading-[1.375rem] text-gray-600 dark:text-gray-300 @max-xs:text-xs',
+                        'shadow-ui-sm not-prose h-10 rounded-lg px-2 disabled:shadow-none',
                         'data-invalid:border-red-500',
                         'disabled:shadow-none disabled:opacity-50',
                         readOnly ? 'border-dashed' : '',
                     ]"
                 >
-                    <DateRangePickerTrigger v-if="!inline">
-                        <Button as="div" variant="ghost" size="sm" icon="calendar" class="-ms-2" />
+                    <DateRangePickerTrigger
+                        v-if="!inline"
+                        class="flex shrink-0 items-center justify-center rounded-lg p-2 -ms-1 text-gray-500 dark:text-gray-400 outline-hidden hover:bg-gray-100 focus:bg-gray-100 dark:hover:bg-gray-900 dark:focus:bg-gray-900"
+                        :aria-label="__('Open calendar')"
+                    >
+                        <Icon name="calendar" class="size-4" />
                     </DateRangePickerTrigger>
                     <template v-for="item in segments.start" :key="item.part">
-                        <DateRangePickerInput v-if="item.part === 'literal'" :part="item.part" type="start">
+                        <DateRangePickerInput v-if="item.part === 'literal'" :part="item.part" type="start" class="whitespace-pre">
                             {{ item.value }}
                         </DateRangePickerInput>
                         <DateRangePickerInput
@@ -168,7 +174,7 @@ const hoverCardDate = computed(() => {
                     </template>
                     <span class="mx-0.75 text-gray-400 dark:text-gray-600">&ndash;</span>
                     <template v-for="item in segments.end" :key="item.part">
-                        <DateRangePickerInput v-if="item.part === 'literal'" :part="item.part" type="end">
+                        <DateRangePickerInput v-if="item.part === 'literal'" :part="item.part" type="end" class="whitespace-pre">
                             {{ item.value }}
                         </DateRangePickerInput>
                         <DateRangePickerInput
@@ -190,17 +196,17 @@ const hoverCardDate = computed(() => {
                         :additional-timezones="additionalTimezones"
                         side="top"
                     >
-                        <Text class="text-gray-600! dark:text-gray-400! ms-2.5 me-1" size="xs" :text="timeZoneLabel" />
+                        <Text class="text-gray-600! dark:text-gray-400! ms-2" size="xs" :text="timeZoneLabel" />
                     </TimezoneHoverCard>
                     <Button v-if="!readOnly" @click="emit('update:modelValue', null)" variant="subtle" size="sm" icon="x" class="-me-2" :disabled="disabled" />
                 </div>
+                </DateRangePickerAnchor>
             </DateRangePickerField>
 
             <DateRangePickerContent
                 v-if="!inline"
                 align="start"
-                :align-offset="-12"
-                :side-offset="14"
+                :side-offset="4"
                 class="data-[state=open]:data-[side=top]:animate-slideDownAndFade data-[state=open]:data-[side=right]:animate-slideLeftAndFade data-[state=open]:data-[side=bottom]:animate-slideUpAndFade data-[state=open]:data-[side=left]:animate-slideRightAndFade will-change-[transform,opacity]"
             >
                 <Card class="w-[20rem]">

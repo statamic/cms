@@ -116,13 +116,14 @@
                                 v-for="asset in assets"
                                 :key="asset.id"
                                 :asset="asset"
+                                :siblings="assets"
                                 :read-only="isReadOnly"
                                 :show-filename="config.show_filename"
                                 :show-set-alt="showSetAlt"
                                 :checkerboard-mode="checkerboardMode"
                                 @updated="assetUpdated"
                                 @removed="assetRemoved"
-                                @id-changed="idChanged(asset.id, $event)"
+                                @id-changed="idChanged"
                             >
                             </asset-tile>
                         </div>
@@ -156,12 +157,13 @@
                                         v-for="asset in assets"
                                         :key="asset.id"
                                         :asset="asset"
+                                        :siblings="assets"
                                         :read-only="isReadOnly"
                                         :show-filename="config.show_filename"
                                         :show-set-alt="showSetAlt"
                                         @updated="assetUpdated"
                                         @removed="assetRemoved"
-                                        @id-changed="idChanged(asset.id, $event)"
+                                        @id-changed="idChanged"
                                     />
                                 </tbody>
                             </sortable-list>
@@ -625,7 +627,7 @@ export default {
 
         uploadSelected(upload) {
             const path = `${this.folder}/${upload.basename}`.replace(/^\/+/, '');
-            const id = `${this.container.handle}::${path}`;
+            const id = `${this.container.id}::${path}`;
 
             this.uploads.splice(this.uploads.indexOf(upload), 1);
 

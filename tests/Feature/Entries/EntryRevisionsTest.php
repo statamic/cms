@@ -699,6 +699,57 @@ class EntryRevisionsTest extends TestCase
         );
     }
 
+    #[Test]
+    public function revision_localizations_only_includes_authorized_sites()
+    {
+        $this->setSites([
+            'en' => ['url' => 'http://localhost/', 'locale' => 'en'],
+            'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
+            'de' => ['url' => 'http://localhost/de/', 'locale' => 'de'],
+        ]);
+
+        $this->setTestBlueprint('test', ['foo' => ['type' => 'text']]);
+        $this->setTestRoles(['test' => [
+            'access cp',
+            'view blog entries',
+            'access en site',
+            'access fr site',
+            // Note: no 'access de site' permission
+        ]]);
+        $user = User::make()->id('user-1')->assignRole('test')->save();
+
+        $this->collection->sites(['en', 'fr', 'de'])->save();
+
+        $entry = EntryFactory::id('1')
+            ->slug('test')
+            ->collection('blog')
+            ->locale('en')
+            ->published(true)
+            ->date('2010-12-25')
+            ->data([
+                'blueprint' => 'test',
+                'title' => 'Original title',
+                'foo' => 'bar',
+            ])->create();
+
+        $revision = tap($entry->makeRevision(), function ($copy) {
+            $copy->message('Revision one');
+            $copy->date(Carbon::parse('2017-02-01'));
+        });
+        $revision->save();
+
+        $response = $this
+            ->actingAs($user)
+            ->getJson($entry->revisionsUrl().'/'.$revision->date()->timestamp)
+            ->assertOk();
+
+        $localizations = $response->json('localizations');
+
+        // User should only see en and fr sites, not de
+        $this->assertCount(2, $localizations);
+        $this->assertEquals(['en', 'fr'], array_column($localizations, 'handle'));
+    }
+
     private function setTestBlueprint($handle, $fields)
     {
         $blueprint = Blueprint::makeFromFields($fields)->setHandle($handle);

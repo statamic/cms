@@ -359,9 +359,9 @@ export default {
 
 <template>
     <div class="max-w-5xl 3xl:max-w-6xl mx-auto" data-max-width-wrapper>
-        <Head :title="title" />
+        <Head :title="[__(title), __('Navigation')]" />
 
-        <Header v-if="mounted" :title="title" icon="navigation">
+        <Header v-if="mounted" :title="__(title)" icon="navigation">
             <ItemActions
                 v-if="hasItemActions"
                 :url="itemActionUrl"

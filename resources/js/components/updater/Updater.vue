@@ -74,7 +74,8 @@ export default {
             gettingChangelog: true,
             changelog: [],
             currentVersion: null,
-            latestRelease: null,
+            onLatestVersion: false,
+            securityUpdateAvailable: false,
             showingUnlicensedReleases: false,
             page: 1,
             perPage: 10,
@@ -91,16 +92,6 @@ export default {
             return !this.gettingChangelog;
         },
 
-        onLatestVersion() {
-            return this.currentVersion && this.currentVersion == this.latestVersion;
-        },
-
-        securityUpdateAvailable() {
-            return this.currentVersion && this.changelog
-                .filter((release) => release.type === 'upgrade')
-                .some((release) => release.security);
-        },
-
         licensedReleases() {
             return this.changelog.filter((release) => release.licensed);
         },
@@ -111,10 +102,6 @@ export default {
 
         hasUnlicensedReleases() {
             return this.unlicensedReleases.length > 0;
-        },
-
-        latestVersion() {
-            return this.latestRelease && this.latestRelease.version;
         },
 
         link() {
@@ -145,11 +132,9 @@ export default {
                     this.gettingChangelog = false;
                     this.changelog = response.data.changelog;
                     this.currentVersion = response.data.currentVersion;
+                    this.onLatestVersion = response.data.onLatestVersion;
+                    this.securityUpdateAvailable = response.data.securityUpdateAvailable;
                     this.meta = response.data.meta;
-
-                    if (this.page === 1 && response.data.changelog.length > 0) {
-                        this.latestRelease = response.data.changelog[0];
-                    }
                 });
         },
 
