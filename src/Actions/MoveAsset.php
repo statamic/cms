@@ -6,6 +6,8 @@ use Statamic\Contracts\Assets\Asset;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blink;
 
+use function Statamic\trans as __;
+
 class MoveAsset extends Action
 {
     protected $icon = 'move-folder';

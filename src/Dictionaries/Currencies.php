@@ -2,6 +2,8 @@
 
 namespace Statamic\Dictionaries;
 
+use function Statamic\trans as __;
+
 class Currencies extends BasicDictionary
 {
     protected string $valueKey = 'code';
@@ -170,5 +172,10 @@ class Currencies extends BasicDictionary
             ['code' => 'ZMW', 'name' => __('statamic::dictionary-currencies.ZMW'), 'symbol' => 'ZK', 'decimals' => 2],
             ['code' => 'ZWG', 'name' => __('statamic::dictionary-currencies.ZWG'), 'symbol' => '$', 'decimals' => 2],
         ];
+    }
+
+    public function allowsPublicAccess(): bool
+    {
+        return true;
     }
 }

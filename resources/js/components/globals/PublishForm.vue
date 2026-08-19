@@ -48,7 +48,7 @@
                 @update:modelValue="localizationSelected"
             />
 
-            <div class="hidden items-center gap-2 sm:gap-3 md:flex">
+            <div class="items-center gap-2 sm:gap-3 md:flex">
                 <Button
                     v-if="canEdit"
                     variant="primary"
@@ -74,12 +74,14 @@
             :name="publishContainer"
             :reference="reference"
             :blueprint="fieldset"
+            :as-config="asConfig"
             v-model="values"
             :meta="meta"
             :origin-values="originValues"
             :origin-meta="originMeta"
             :errors="errors"
             :site="site"
+            :read-only="readOnly"
             v-model:modified-fields="localizedFields"
             :sync-field-confirmation-text="syncFieldConfirmationText"
             remember-tab
@@ -147,6 +149,7 @@ export default {
         canConfigure: Boolean,
         configureUrl: String,
         canEditBlueprint: Boolean,
+        asConfig: Boolean,
     },
 
     data() {
@@ -288,7 +291,7 @@ export default {
             this.localizing = localization.handle;
 
             if (this.publishContainer === 'base') {
-                window.history.replaceState({}, '', localization.url);
+                window.history.replaceState({}, '', localization.url + window.location.hash);
             }
 
             this.$axios.get(localization.url).then((response) => {

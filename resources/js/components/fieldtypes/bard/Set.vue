@@ -3,6 +3,7 @@
         <div
             ref="container"
             class="shadow-ui-sm relative w-full rounded-lg border border-gray-300 bg-white text-base dark:border-white/10 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black"
+            :dir="uiDirection"
             :class="{
                 // We’re styling a Set so that it shows a “selection outline” when selected with the mouse or keyboard.
                 // The extra `&:not(:has(:focus-within))` rule turns that outline off if any element inside the Set has focus (e.g. when editing inside a Bard field).
@@ -15,6 +16,7 @@
             @copy.stop
             @paste.stop
             @cut.stop
+            @dragstart="preventNodeSelectionDrag"
         >
             <div ref="content" hidden />
             <header
@@ -26,7 +28,7 @@
                 <span v-if="!isReadOnly" data-drag-handle class="flex cursor-grab" @mousedown="enableDragging">
                     <Icon name="handles" class="size-4 text-gray-400" />
                 </span>
-                <button type="button" class="show-focus-within_target flex flex-1 items-center gap-4 p-2 min-w-0 focus:outline-none cursor-pointer" @click="toggleCollapsedState">
+                <button type="button" class="show-focus-within_target flex flex-1 min-w-0 cursor-pointer items-center gap-4 overflow-x-auto p-2 pe-4 focus:outline-none st-mask-horizontal-overflow" @click="toggleCollapsedState">
                     <Badge size="lg" :pill="true" color="white" class="px-3">
                         <span v-if="isSetGroupVisible" class="flex items-center gap-2">
                             {{ __(setGroup.display) }}
@@ -117,9 +119,16 @@ import {
 import { containerContextKey } from '@/components/ui/Publish/Container.vue';
 import { watch } from 'vue';
 import { reveal } from '@api';
+import { useUiDirection } from '@/composables/ui-direction';
 
 export default {
     props: nodeViewProps,
+
+    setup() {
+        return {
+            uiDirection: useUiDirection().direction,
+        };
+    },
 
     components: {
         Button,
@@ -342,6 +351,19 @@ export default {
         disableDragging() {
             this.$el.setAttribute('draggable', false);
             this._draggableObserver?.observe(this.$el, { attributes: true, attributeFilter: ['draggable'] });
+        },
+
+        preventNodeSelectionDrag(event) {
+            // When the set is node-selected, an invisible DOM selection spans the whole set.
+            // Dragging from anywhere inside it (e.g. a grid row's drag handle) would natively
+            // drag that selection and dump a serialized copy of the set into the editor.
+            const target = event.target instanceof Element ? event.target : event.target.parentElement;
+            if (target?.closest('[draggable="true"]')) return;
+
+            const selection = window.getSelection();
+            if (selection?.rangeCount && selection.containsNode(this.$el, false)) {
+                event.preventDefault();
+            }
         },
     },
 

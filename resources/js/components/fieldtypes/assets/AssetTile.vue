@@ -6,12 +6,15 @@
             'is-svg': canShowSvg,
             'is-file': !isImage && !canShowSvg,
         }"
-        :title="label"
+        :title="asset.invalid ? invalidLabel : label"
     >
         <asset-editor
-            v-if="editing"
-            :id="asset.id"
+            v-if="editingId"
+            :id="editingId"
             :allow-deleting="false"
+            :show-navigation="siblings.length > 1"
+            @previous="navigateToPrevious"
+            @next="navigateToNext"
             @closed="closeEditor"
             @saved="assetSaved"
             @action-completed="actionCompleted"
@@ -44,7 +47,7 @@
                     <template v-else>
                         <img :src="thumbnail" v-if="thumbnail" :title="label" class="rounded-md relative"  />
 
-                        <file-icon v-else :extension="asset.extension" class="h-full w-full p-4 relative" />
+                        <file-icon v-else :extension="asset.extension ?? 'generic'" class="h-full w-full p-4 relative" />
                     </template>
                 </template>
 
@@ -75,7 +78,15 @@
         </div>
 
         <div class="flex items-center justify-between w-full px-1" v-if="showFilename">
-            <div class="truncate w-18 text-xs text-gray-600 dark:text-gray-400 flex-1 px-2 py-1" v-tooltip="label" :class="{ 'text-center': !needsAlt }">
+            <div
+                class="truncate w-18 text-xs flex-1 px-2 py-1"
+                :class="{
+                    'text-center': !needsAlt,
+                    'text-gray-600 dark:text-gray-300': !asset.invalid,
+                    'text-gray-500 dark:text-gray-400': asset.invalid,
+                }"
+                v-tooltip="asset.invalid ? invalidLabel : label"
+            >
                 {{ label }}
             </div>
             <ui-badge as="button" size="sm" color="sky"  @click="editOrOpen" v-if="asset.isEditable && showSetAlt && needsAlt" :text="asset.values.alt ? '✅' : __('Set Alt')" />

@@ -9,6 +9,7 @@ use Statamic\Facades\Asset;
 use Statamic\Statamic;
 use Stringable;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use function Statamic\trans as __;
 
 class MinRule implements CastableToValidationString, Stringable, ValidationRule
 {

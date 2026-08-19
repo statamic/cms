@@ -2,6 +2,7 @@
 import { computed, useTemplateRef, watch, ref, inject } from 'vue';
 import { injectContainerContext } from './Container.vue';
 import { injectFieldsContext } from './FieldsProvider.vue';
+import { useUiDirection } from '@/composables/ui-direction';
 import {
     Avatar,
     Field,
@@ -33,7 +34,7 @@ const {
     desyncField,
     isTrackingOriginValues,
     originValues: containerOriginValues,
-    asConfig,
+    asConfig: containerAsConfig,
     errors: containerErrors,
     readOnly: containerReadOnly,
     setFieldPreviewValue,
@@ -46,13 +47,19 @@ const {
     focusField,
     blurField,
     container,
-    direction,
+    direction: contentDirection,
 } = injectContainerContext();
 const {
     fieldPathPrefix: injectedFieldPathPrefix,
     metaPathPrefix: injectedMetaPathPrefix,
     readOnly: fieldsProviderReadOnly,
+    asConfig: fieldsAsConfig,
 } = injectFieldsContext();
+
+const { direction } = useUiDirection();
+const isFormSubmission = inject('isFormSubmission', false);
+
+const asConfig = computed(() => fieldsAsConfig.value ?? containerAsConfig.value ?? false);
 const fieldPathPrefix = computed(() => props.fieldPathPrefix || injectedFieldPathPrefix.value);
 const metaPathPrefix = computed(() => props.metaPathPrefix || injectedMetaPathPrefix.value);
 const handle = props.config.handle;
@@ -149,17 +156,39 @@ const shouldShowField = computed(() => {
     ).showField(props.config, fullPath.value);
 });
 
+// Only applies when hidden by conditions; blueprint "hidden" visibility still removes the field from layout.
+const reserveSpaceWhenHiddenEnabled = computed(
+    () => props.config.reserve_space_when_hidden === true && props.config.visibility !== 'hidden',
+);
+
+const shouldHideFieldVisually = computed(
+    () => reserveSpaceWhenHiddenEnabled.value && !shouldShowField.value,
+);
+
+// Hidden fieldtypes are mounted like any other field so they take part in field
+// conditions, but they only become visible on a form submission.
+const isHiddenFieldtype = computed(() => props.config.type === 'hidden' && !isFormSubmission);
+
+const shouldRenderField = computed(
+    () => !isHiddenFieldtype.value && (shouldShowField.value || reserveSpaceWhenHiddenEnabled.value),
+);
+
 const shouldShowLabelText = computed(() => !props.config.hide_display);
 
+// Whether the label renders anything visible. When it doesn't, we avoid rendering
+// the field header entirely (so it doesn't reserve space) and instead attach a
+// screen-reader-only label to the control below.
 const shouldShowLabel = computed(
     () =>
         shouldShowLabelText.value || // Need to see the text
-        props.config.hide_display || // Need label for accessibility (visually hidden)
+        isRequired.value || // Need to see the required asterisk
         isLocked.value || // Need to see the avatar
         isSyncable.value, // Need to see the icon
 );
 
 const shouldShowFieldPreviews = computed(() => {
+    if (isHiddenFieldtype.value) return false;
+
     if (! props.config.replicator_preview) return false;
 
     return inject('showReplicatorFieldPreviews', false);
@@ -229,9 +258,11 @@ const fieldtypeComponentEvents = computed(() => ({
         :shouldShowField="shouldShowField"
     >
         <Field
-            v-show="shouldShowField"
-            :class="`${config.type}-fieldtype`"
+            v-show="shouldRenderField"
+            :class="[`${config.type}-fieldtype`, { 'opacity-0 pointer-events-none': shouldHideFieldVisually }]"
+            :inert="shouldHideFieldVisually"
             :id="fieldId"
+            :dir="direction"
             :instructions="config.instructions"
             :instructions-below="config.instructions_position === 'below'"
             :required="isRequired"
@@ -267,10 +298,11 @@ const fieldtypeComponentEvents = computed(() => ({
             <template #actions v-if="shouldShowFieldActions">
                 <FieldActions :actions="fieldActions" />
             </template>
+            <label v-if="!shouldShowLabel && config.hide_display" :for="fieldId" class="sr-only">{{ __(config.display) }}</label>
             <div class="text-xs text-red-600" v-if="!fieldtypeComponentExists && fieldtypeComponent !== 'spacer-fieldtype'">
                 Component <code v-text="fieldtypeComponent"></code> does not exist.
             </div>
-            <div :dir="direction" v-if="fieldtypeComponentExists" @focusin="focused" @focusout="blurred" :class="{ 'pointer-events-none select-none': isLocked }">
+            <div v-if="fieldtypeComponentExists" @focusin="focused" @focusout="blurred" :class="{ 'pointer-events-none select-none': isLocked }">
                 <Component
                     ref="fieldtype"
                     :is="fieldtypeComponent"

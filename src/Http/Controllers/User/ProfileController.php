@@ -6,6 +6,8 @@ use Statamic\Facades\URL;
 use Statamic\Facades\User;
 use Statamic\Http\Requests\UserProfileRequest;
 
+use function Statamic\trans as __;
+
 class ProfileController
 {
     public function __invoke(UserProfileRequest $request)

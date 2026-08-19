@@ -1,0 +1,277 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Method Statamic\\Auth\\Eloquent\\User\:\:mergePreferences\(\) should return \$this\(Statamic\\Auth\\Eloquent\\User\) but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: ../src/Auth/Eloquent/User.php
+
+		-
+			message: '#^Method Statamic\\Auth\\Eloquent\\User\:\:setPreferences\(\) should return \$this\(Statamic\\Auth\\Eloquent\\User\) but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: ../src/Auth/Eloquent/User.php
+
+		-
+			message: '#^Method Statamic\\Auth\\User\:\:getAuthIdentifierName\(\) should return string but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: ../src/Auth/User.php
+
+		-
+			message: '#^Access to an undefined property Statamic\\Auth\\UserRepository\:\:\$roleRepository\.$#'
+			identifier: property.notFound
+			count: 1
+			path: ../src/Auth/UserRepository.php
+
+		-
+			message: '#^Access to an undefined property Statamic\\Auth\\UserRepository\:\:\$userGroupRepository\.$#'
+			identifier: property.notFound
+			count: 1
+			path: ../src/Auth/UserRepository.php
+
+		-
+			message: '#^Call to an undefined method Statamic\\Auth\\UserRepository\:\:query\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: ../src/Auth/UserRepository.php
+
+		-
+			message: '#^Unknown parameter \$editing in call to static method Statamic\\Facades\\CP\\Nav\:\:build\(\)\.$#'
+			identifier: argument.unknown
+			count: 1
+			path: ../src/CP/Navigation/NavTransformer.php
+
+		-
+			message: '#^Unknown parameter \$preferences in call to static method Statamic\\Facades\\CP\\Nav\:\:build\(\)\.$#'
+			identifier: argument.unknown
+			count: 1
+			path: ../src/CP/Navigation/NavTransformer.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 1
+			path: ../src/Events/Event.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 2
+			path: ../src/Events/Subscriber.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 1
+			path: ../src/Facades/Endpoint/Parse.php
+
+		-
+			message: '#^Method Illuminate\\Contracts\\Validation\\DataAwareRule@anonymous/Fieldtypes/Bard\.php\:934\:\:setData\(\) should return \$this\(Illuminate\\Contracts\\Validation\\DataAwareRule@anonymous/Fieldtypes/Bard\.php\:934\) but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: ../src/Fieldtypes/Bard.php
+
+		-
+			message: '#^Access to an undefined property Statamic\\Filesystem\\AbstractAdapter\:\:\$filesystem\.$#'
+			identifier: property.notFound
+			count: 13
+			path: ../src/Filesystem/AbstractAdapter.php
+
+		-
+			message: '#^Call to an undefined method Statamic\\Filesystem\\AbstractAdapter\:\:copyDirectory\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: ../src/Filesystem/AbstractAdapter.php
+
+		-
+			message: '#^Call to an undefined method Statamic\\Filesystem\\AbstractAdapter\:\:getFiles\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: ../src/Filesystem/AbstractAdapter.php
+
+		-
+			message: '#^Call to an undefined method Statamic\\Filesystem\\AbstractAdapter\:\:getFolders\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: ../src/Filesystem/AbstractAdapter.php
+
+		-
+			message: '#^Call to an undefined method Statamic\\Filesystem\\AbstractAdapter\:\:moveDirectory\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: ../src/Filesystem/AbstractAdapter.php
+
+		-
+			message: '#^Result of method Statamic\\Forms\\Form\:\:save\(\) \(void\) is used\.$#'
+			identifier: method.void
+			count: 1
+			path: ../src/Forms/Form.php
+
+		-
+			message: '#^Result of method Statamic\\Forms\\Submission\:\:save\(\) \(void\) is used\.$#'
+			identifier: method.void
+			count: 1
+			path: ../src/Forms/Submission.php
+
+		-
+			message: '#^Access to an undefined property Statamic\\Http\\Controllers\\API\\ApiController\:\:\$params\.$#'
+			identifier: property.notFound
+			count: 1
+			path: ../src/Http/Controllers/API/ApiController.php
+
+		-
+			message: '#^Unknown parameter \$editing in call to static method Statamic\\Facades\\CP\\Nav\:\:build\(\)\.$#'
+			identifier: argument.unknown
+			count: 1
+			path: ../src/Http/Controllers/CP/Preferences/Nav/DefaultNavController.php
+
+		-
+			message: '#^Unknown parameter \$preferences in call to static method Statamic\\Facades\\CP\\Nav\:\:build\(\)\.$#'
+			identifier: argument.unknown
+			count: 1
+			path: ../src/Http/Controllers/CP/Preferences/Nav/DefaultNavController.php
+
+		-
+			message: '#^Unknown parameter \$editing in call to static method Statamic\\Facades\\CP\\Nav\:\:build\(\)\.$#'
+			identifier: argument.unknown
+			count: 1
+			path: ../src/Http/Controllers/CP/Preferences/Nav/RoleNavController.php
+
+		-
+			message: '#^Unknown parameter \$preferences in call to static method Statamic\\Facades\\CP\\Nav\:\:build\(\)\.$#'
+			identifier: argument.unknown
+			count: 1
+			path: ../src/Http/Controllers/CP/Preferences/Nav/RoleNavController.php
+
+		-
+			message: '#^Access to an undefined property Statamic\\Imaging\\GlideManager\:\:\$cachePathPrefix\.$#'
+			identifier: property.notFound
+			count: 1
+			path: ../src/Imaging/GlideManager.php
+
+		-
+			message: '#^Access to an undefined property Statamic\\Imaging\\GlideManager\:\:\$sourcePathPrefix\.$#'
+			identifier: property.notFound
+			count: 1
+			path: ../src/Imaging/GlideManager.php
+
+		-
+			message: '#^Call to an undefined method Statamic\\Imaging\\GlideManager\:\:getAllParams\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: ../src/Imaging/GlideManager.php
+
+		-
+			message: '#^Call to an undefined method Statamic\\Imaging\\GlideManager\:\:getSourcePath\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: ../src/Imaging/GlideManager.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 1
+			path: ../src/Marketplace/Client.php
+
+		-
+			message: '#^Call to an undefined method Statamic\\Providers\\AppServiceProvider\:\:sendElevatedSessionVerificationCode\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: ../src/Providers/AppServiceProvider.php
+
+		-
+			message: '#^Access to an undefined property Statamic\\Providers\\EventServiceProvider\:\:\$listeners\.$#'
+			identifier: property.notFound
+			count: 2
+			path: ../src/Providers/EventServiceProvider.php
+
+		-
+			message: '#^Call to an undefined method Statamic\\Stache\\Indexes\\Index\:\:getItemValue\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: ../src/Stache/Indexes/Index.php
+
+		-
+			message: '#^Access to an undefined property Statamic\\Stache\\Stores\\AggregateStore\:\:\$childStore\.$#'
+			identifier: property.notFound
+			count: 1
+			path: ../src/Stache/Stores/AggregateStore.php
+
+		-
+			message: '#^Call to an undefined method Statamic\\Stache\\Stores\\Store\:\:cacheItem\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: ../src/Stache/Stores/Store.php
+
+		-
+			message: '#^Call to an undefined method Statamic\\Stache\\Stores\\Store\:\:forgetItem\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: ../src/Stache/Stores/Store.php
+
+		-
+			message: '#^Call to an undefined method Statamic\\Stache\\Stores\\Store\:\:getKeyFromPath\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: ../src/Stache/Stores/Store.php
+
+		-
+			message: '#^Call to an undefined method Statamic\\Stache\\Stores\\Store\:\:makeItemFromFile\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: ../src/Stache/Stores/Store.php
+
+		-
+			message: '#^Method Statamic\\StaticCaching\\Cachers\\NullCacher\:\:getCachedPage\(\) should return Statamic\\StaticCaching\\Page but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: ../src/StaticCaching/Cachers/NullCacher.php
+
+		-
+			message: '#^Call to an undefined method Statamic\\StaticCaching\\NoCache\\Region\:\:key\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: ../src/StaticCaching/NoCache/Region.php
+
+		-
+			message: '#^Access to an undefined property Statamic\\Structures\\StructureRepository\:\:\$store\.$#'
+			identifier: property.notFound
+			count: 2
+			path: ../src/Structures/StructureRepository.php
+
+		-
+			message: '#^Call to an undefined method Statamic\\Support\\Manager\:\:createNullDriver\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: ../src/Support/Manager.php
+
+		-
+			message: '#^Access to an undefined property Statamic\\Testing\\AddonTestCase\:\:\$fakeStacheDirectory\.$#'
+			identifier: property.notFound
+			count: 1
+			path: ../src/Testing/AddonTestCase.php
+
+		-
+			message: '#^Call to an undefined method Statamic\\Testing\\AddonTestCase\:\:deleteFakeStacheDirectory\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: ../src/Testing/AddonTestCase.php
+
+		-
+			message: '#^Call to an undefined method Statamic\\Testing\\AddonTestCase\:\:preventSavingStacheItemsToDisk\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: ../src/Testing/AddonTestCase.php
+
+		-
+			message: '#^Call to an undefined method Statamic\\View\\Scaffolding\\Emitters\\AbstractSourceEmitter\:\:getCountedVariable\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: ../src/View/Scaffolding/Emitters/AbstractSourceEmitter.php
+
+		-
+			message: '#^Call to an undefined method Statamic\\View\\Scaffolding\\Emitters\\AbstractSourceEmitter\:\:releaseCountedVariable\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: ../src/View/Scaffolding/Emitters/AbstractSourceEmitter.php

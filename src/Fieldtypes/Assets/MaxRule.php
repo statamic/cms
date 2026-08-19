@@ -9,6 +9,7 @@ use Statamic\Facades\Asset;
 use Statamic\Statamic;
 use Stringable;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use function Statamic\trans as __;
 
 class MaxRule implements CastableToValidationString, Stringable, ValidationRule
 {

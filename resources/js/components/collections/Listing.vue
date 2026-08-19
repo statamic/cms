@@ -24,28 +24,43 @@
                     <aside class="flex items-center gap-2">
                         <ItemActions
                             :url="collection.actions_url"
-                            :actions="collection.actions"
                             :item="collection.id"
                             @started="actionStarted"
                             @completed="actionCompleted"
-                            v-slot="{ actions }"
+                            v-slot="{ actions, loadActions, shouldShowSkeleton }"
                         >
-                            <Dropdown placement="left-start">
+                            <Dropdown
+                                placement="left-start"
+                                @mouseover="loadActions"
+                                @focus="loadActions"
+                                @click="loadActions"
+                            >
                                 <DropdownMenu>
                                     <DropdownItem v-if="collection.available_in_selected_site" :text="__('View')" icon="eye" :href="collection.entries_url" />
                                     <DropdownItem v-if="collection.available_in_selected_site && collection.url" :text="__('Visit URL')" icon="external-link" target="_blank" :href="collection.url" />
                                     <DropdownItem v-if="collection.editable" :text="__('Configure')" icon="cog" :href="collection.edit_url" />
                                     <DropdownItem v-if="collection.blueprint_editable" :text="__('Edit Blueprints')" icon="blueprint-edit" :href="collection.blueprints_url" />
                                     <DropdownItem v-if="collection.editable" :text="__('Scaffold Views')" icon="scaffold" :href="collection.scaffold_url" />
-                                    <DropdownSeparator v-if="actions.length" />
-                                    <DropdownItem
-                                        v-for="action in actions"
-                                        :key="action.handle"
-                                        :text="__(action.title)"
-                                        :icon="action.icon"
-                                        :variant="action.dangerous ? 'destructive' : 'default'"
-                                        @click="action.run"
-                                    />
+                                    <DropdownSeparator v-if="shouldShowSkeleton || actions.length" />
+                                    <template v-if="shouldShowSkeleton">
+                                        <div v-for="index in 3" :key="index" class="contents">
+                                            <ui-skeleton class="m-1 size-5" />
+                                            <ui-skeleton
+                                                class="mx-2 my-1.5 h-5"
+                                                :class="index === 1 ? 'w-28' : index === 2 ? 'w-36' : 'w-24'"
+                                            />
+                                        </div>
+                                    </template>
+                                    <template v-else>
+                                        <DropdownItem
+                                            v-for="action in actions"
+                                            :key="action.handle"
+                                            :text="__(action.title)"
+                                            :icon="action.icon"
+                                            :variant="action.dangerous ? 'destructive' : 'default'"
+                                            @click="action.run"
+                                        />
+                                    </template>
                                 </DropdownMenu>
                             </Dropdown>
                         </ItemActions>

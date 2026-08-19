@@ -16,6 +16,9 @@ use Statamic\Support\Str;
 
 use function Statamic\trans as __;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class Field implements Arrayable
 {
     protected $handle;
@@ -136,6 +139,11 @@ class Field implements Arrayable
         return Arr::get($this->config, 'always_save', false);
     }
 
+    public function reserveSpaceWhenHidden()
+    {
+        return Arr::get($this->config, 'reserve_space_when_hidden', false);
+    }
+
     public function rules()
     {
         $temp_rules = collect($this->addNullableRule(array_merge(
@@ -196,7 +204,7 @@ class Field implements Arrayable
         return collect($this->rules()[$this->handle])->contains('required');
     }
 
-    private function hasSometimesRule()
+    public function hasSometimesRule()
     {
         return collect($this->rules()[$this->handle])->contains('sometimes');
     }
@@ -295,6 +303,7 @@ class Field implements Arrayable
             'visibility' => $this->visibility(),
             'read_only' => $this->visibility() === 'read_only', // Deprecated: Addon fieldtypes should now reference new `visibility` state.
             'always_save' => $this->alwaysSave(),
+            'reserve_space_when_hidden' => $this->reserveSpaceWhenHidden(),
         ]);
 
         unset($array['validate']);

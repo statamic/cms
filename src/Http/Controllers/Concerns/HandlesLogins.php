@@ -11,6 +11,8 @@ use Statamic\Contracts\Auth\User;
 use Statamic\Events\TwoFactorAuthenticationChallenged;
 use Statamic\Facades\URL;
 
+use function Statamic\trans;
+
 trait HandlesLogins
 {
     use ThrottlesLogins;
@@ -20,7 +22,7 @@ trait HandlesLogins
         if ($this->hasTooManyLoginAttempts($request)) {
             $this->fireLockoutEvent($request);
 
-            return $this->sendLockoutResponse($request);
+            $this->sendLockoutResponse($request);
         }
     }
 

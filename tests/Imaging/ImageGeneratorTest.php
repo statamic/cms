@@ -308,6 +308,38 @@ class ImageGeneratorTest extends TestCase
         $this->makeGenerator()->setParams(['mark' => 'http://127.0.0.1/watermark.png']);
     }
 
+    public static function ipv4MappedIpv6Provider()
+    {
+        return [
+            'mapped loopback' => ['::ffff:127.0.0.1'],
+            'mapped loopback (hex form)' => ['::ffff:7f00:1'],
+            'mapped RFC1918' => ['::ffff:10.0.0.1'],
+            'mapped link-local metadata' => ['::ffff:169.254.169.254'],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('ipv4MappedIpv6Provider')]
+    public function it_blocks_ipv4_mapped_ipv6_addresses_via_dns($mappedIp)
+    {
+        $validator = new RemoteUrlValidator(fn ($host) => [['ipv6' => $mappedIp]]);
+
+        $this->expectException(InvalidRemoteUrlException::class);
+        $this->expectExceptionMessage('Destination IP is not publicly routable.');
+
+        $validator->validate('https://attacker.example/foo.jpg');
+    }
+
+    #[Test]
+    public function it_allows_public_ipv6_addresses()
+    {
+        $validator = new RemoteUrlValidator(fn ($host) => [['ipv6' => '2606:4700:4700::1111']]);
+
+        $validator->validate('https://example.com/foo.jpg');
+
+        $this->addToAssertionCount(1);
+    }
+
     #[Test]
     public function the_watermark_disk_is_the_public_directory_by_default()
     {

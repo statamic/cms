@@ -23,6 +23,8 @@ use Statamic\Query\Scopes\Filter;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class Assets extends Fieldtype
 {
     use UpdatesReferences;
@@ -343,11 +345,17 @@ class Assets extends Fieldtype
 
     public function getItemData($items)
     {
-        return collect($items)->map(function ($url) {
-            return ($asset = Asset::find($url))
-                ? (new AssetResource($asset))->resolve()['data']
-                : null;
-        })->filter()->values();
+        $user = User::current();
+
+        return collect($items)->map(function ($url) use ($user) {
+            $asset = Asset::find($url);
+
+            if (! $asset || ! $user->can('view', $asset)) {
+                return ['id' => $url, 'url' => $url, 'invalid' => true];
+            }
+
+            return (new AssetResource($asset))->resolve()['data'];
+        })->values();
     }
 
     public function augment($values)

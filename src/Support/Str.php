@@ -8,6 +8,8 @@ use Statamic\Facades\Compare;
 use Stringy\StaticStringy;
 use voku\helper\ASCII;
 
+use function Statamic\trans;
+
 /** @mixin \Illuminate\Support\Str */
 class Str
 {

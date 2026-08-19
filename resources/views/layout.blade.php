@@ -1,3 +1,7 @@
+@php
+    use function Statamic\trans as __;
+@endphp
+
 <!DOCTYPE html>
 <html
     lang="{{ str_replace('_', '-', Statamic::cpLocale()) }}"

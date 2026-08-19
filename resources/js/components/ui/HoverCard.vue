@@ -28,7 +28,7 @@ const props = defineProps({
 
 const HoverCardContentClasses = cva({
     base: [
-        'rounded-xl bg-white dark:bg-gray-800 outline-hidden overflow-hidden',
+        'rounded-xl bg-white dark:bg-gray-800 outline-hidden',
         'border border-gray-200 dark:border-white/10 dark:border-b-0 shadow-lg',
         'duration-100 will-change-[transform,opacity]',
         'data-[state=open]:animate-in data-[state=closed]:animate-out',
@@ -84,7 +84,7 @@ function updateOpen(value) {
                 :side
             >
                 <slot v-bind="slotProps" />
-                <HoverCardArrow v-if="arrow" class="fill-white stroke-gray-300" />
+                <HoverCardArrow v-if="arrow" class="fill-white stroke-gray-300 dark:fill-gray-800 dark:stroke-white/10" />
             </HoverCardContent>
         </HoverCardPortal>
     </HoverCardRoot>

@@ -88,6 +88,7 @@ it('exports inertia', async () => {
         'toggleArchitecturalBackground',
         'useArchitecturalBackground',
         'useForm',
+        'usePage',
         'usePoll',
     ];
 
@@ -138,6 +139,9 @@ it('exports ui', async () => {
         'CodeEditor',
         'Combobox',
         'ConfirmationModal',
+        'ContentDirection',
+        'useContentDirection',
+        'useUiDirection',
         'Context',
         'ContextFooter',
         'ContextHeader',
@@ -208,6 +212,8 @@ it('exports ui', async () => {
         'Tabs',
         'Textarea',
         'TimePicker',
+        'TimezoneHoverCard',
+        'Timezones',
         'ToggleGroup',
         'ToggleItem',
         'registerIconSet',

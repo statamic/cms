@@ -8,6 +8,8 @@ use Statamic\Fields\Fieldtype;
 use Statamic\Query\Scopes\Filters\Fields\Markdown as MarkdownFilter;
 use Statamic\Support\Html;
 
+use function Statamic\trans as __;
+
 class Markdown extends Fieldtype
 {
     use Concerns\ResolvesStatamicUrls, UpdatesReferences;

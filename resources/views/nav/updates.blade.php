@@ -1,3 +1,7 @@
+@php
+    use function Statamic\trans as __;
+@endphp
+
 <li>
     <inertia-link href="{{ $item->url() }}" class="flex items-center gap-2 sm:gap-3 {{ $item->isActive() ? 'active' : '' }}">
         @cp_svg('icons/updates', 'size-4 shrink-0')

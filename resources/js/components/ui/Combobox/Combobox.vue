@@ -55,10 +55,14 @@ const props = defineProps({
 	options: { type: Array, default: () => [] },
 	/** Key of the option's value in the option's object. */
 	optionValue: { type: String, default: 'value' },
+	/** The delimiter used to split pasted text into multiple tags. Only used when `taggable` is `true`. */
+	pasteDelimiter: { type: String, default: ',' },
 	placeholder: { type: String, default: () => __('Select...') },
 	readOnly: { type: Boolean, default: false },
 	/** When `true`, the options will be searchable. */
 	searchable: { type: Boolean, default: true },
+	/** Keys of the option object to search against. Defaults to just `optionLabel`. */
+	searchKeys: { type: Array, default: null },
 	/** Determines if the dropdown should open */
 	shouldOpenDropdown: { type: Function, default: () => true },
 	/** Controls the size of the combobox. <br><br> Options: `xs`, `sm`, `base`, `lg`, `xl` */
@@ -81,7 +85,7 @@ const wrapperAttrs = computed(() => {
     return rest;
 });
 
-const triggerClasses = cva({
+const triggerClasses = computed(() => cva({
     base: 'w-full flex items-center justify-between antialiased cursor-pointer',
     variants: {
         variant: {
@@ -113,7 +117,7 @@ const triggerClasses = cva({
     'discrete-focus-outline': props.discreteFocusOutline,
     readOnly: props.readOnly,
     disabled: props.disabled,
-});
+}));
 
 const itemClasses = cva({
     base: [
@@ -234,7 +238,7 @@ const filteredOptions = computed(() => {
         fuzzysort
             .go(searchQuery.value, props.options, {
                 all: true,
-                key: props.optionLabel,
+                ...(props.searchKeys?.length ? { keys: props.searchKeys } : { key: props.optionLabel }),
             })
             .map((result) => result.obj)
     );
@@ -315,7 +319,12 @@ function onPaste(e) {
 
     const pastedValue = e.clipboardData.getData('text');
 
-    updateModelValue([...(props.modelValue ?? []), ...pastedValue.split(',').map((v) => v.trim())]);
+    const tags = pastedValue
+        .split(props.pasteDelimiter)
+        .map((v) => v.trim())
+        .filter((v) => v !== '');
+
+    updateModelValue([...(props.modelValue ?? []), ...tags]);
 }
 
 function pushTaggableOption(e) {

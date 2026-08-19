@@ -3,6 +3,7 @@
 namespace Tests\Fieldtypes;
 
 use Facades\Statamic\Fields\FieldRepository;
+use Facades\Tests\Factories\EntryFactory;
 use Mockery\MockInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
@@ -1180,6 +1181,55 @@ class ReplicatorTest extends TestCase
             '_' => '_',
             'video_url' => null,
         ], $response->json('new'));
+    }
+
+    #[Test]
+    public function fields_blink_cache_key_is_site_aware()
+    {
+        $this->setSites([
+            'en' => ['url' => 'http://localhost/', 'locale' => 'en'],
+            'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
+        ]);
+
+        tap(Facades\Collection::make('pages')->routes('/{slug}')->sites(['en', 'fr']))->save();
+
+        $enEntry = EntryFactory::collection('pages')->slug('home')->locale('en')->create();
+        $frEntry = EntryFactory::collection('pages')->slug('accueil')->locale('fr')->create();
+
+        $fieldConfig = [
+            'type' => 'replicator',
+            'sets' => [
+                'text' => [
+                    'fields' => [
+                        ['handle' => 'words', 'field' => ['type' => 'text']],
+                    ],
+                ],
+            ],
+        ];
+
+        $enField = (new Field('content', $fieldConfig))->setParent($enEntry);
+        $enFields = $enField->fieldtype()->fields('text');
+
+        $frField = (new Field('content', $fieldConfig))->setParent($frEntry);
+        $frFields = $frField->fieldtype()->fields('text');
+
+        // Each locale must get its own Blink cache entry so the Fields instance
+        // carries the correct parent. Without the fix, $frFields would be the
+        // same cached object as $enFields (containing the en entry as parent).
+        $this->assertNotSame($enFields, $frFields);
+        $this->assertSame($enEntry, $enFields->all()->first()->parent());
+        $this->assertSame($frEntry, $frFields->all()->first()->parent());
+    }
+
+    #[Test]
+    public function it_has_button_label_config()
+    {
+        $configFields = collect((new \ReflectionMethod(Replicator::class, 'configFieldItems'))->invoke(new Replicator))
+            ->flatMap(fn ($section) => $section['fields']);
+
+        $this->assertSame('text', $configFields['button_label']['type']);
+        $this->assertSame('Add Set Label', $configFields['button_label']['display']);
+        $this->assertSame('Add Set', $configFields['button_label']['placeholder']);
     }
 
     public static function groupedSetsProvider()
