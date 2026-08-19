@@ -18,6 +18,8 @@ use function Statamic\trans as __;
 
 class Sites
 {
+    const OTHER_GROUP_KEY = 'other';
+
     protected $sites;
     protected $current;
     protected ?Closure $currentUrlCallback = null;
@@ -54,6 +56,15 @@ class Sites
     public function hasMultiple()
     {
         return $this->sites->count() > 1;
+    }
+
+    public function filterByGroup($handles, ?string $siteHandle)
+    {
+        if (! $siteHandle || ! ($site = $this->get($siteHandle)) || ! ($group = $site->group())) {
+            return collect($handles);
+        }
+
+        return collect($handles)->filter(fn ($handle) => $this->get($handle)?->group() === $group);
     }
 
     public function get($handle)
@@ -174,9 +185,90 @@ class Sites
         File::put($this->path(), YAML::dump($this->config()));
     }
 
-    public function blueprint()
+    public function blueprint(array $values = [])
     {
-        $siteFields = [
+        $siteRowFields = $this->siteRowFields();
+
+        if ($this->multiEnabled()) {
+            return Blueprint::make()->setContents([
+                'tabs' => [
+                    'main' => [
+                        'sections' => $this->multisiteBlueprintSections($siteRowFields, $values),
+                    ],
+                ],
+            ]);
+        }
+
+        return Blueprint::make()->setContents([
+            'fields' => $siteRowFields,
+        ]);
+    }
+
+    public function blueprintValues(): array
+    {
+        if (! $this->multiEnabled()) {
+            $site = $this->default();
+
+            return array_merge(['handle' => $site->handle()], $site->rawConfig());
+        }
+
+        $values = [];
+        $otherSites = [];
+
+        foreach ($this->groupedSites() as $group => $sites) {
+            $key = $this->groupSectionKey($group);
+            $mapped = $sites->map(fn (Site $site) => array_merge(
+                ['handle' => $site->handle()],
+                collect($site->rawConfig())->except('group')->all()
+            ))->values()->all();
+
+            if ($key === self::OTHER_GROUP_KEY) {
+                $otherSites = $mapped;
+
+                continue;
+            }
+
+            $values["group_{$key}_name"] = $group ?: null;
+            $values["group_{$key}_sites"] = $mapped;
+        }
+
+        $values['group_'.self::OTHER_GROUP_KEY.'_sites'] = $otherSites;
+
+        return $values;
+    }
+
+    public function configFromBlueprintValues(array $values): array
+    {
+        if (! $this->multiEnabled()) {
+            return [
+                $values['handle'] => collect($values)->except(['id', 'handle'])->filter()->all(),
+            ];
+        }
+
+        $sites = collect();
+
+        foreach ($values as $key => $groupSites) {
+            if (! is_array($groupSites) || ! preg_match('/^group_(.+)_sites$/', $key, $matches)) {
+                continue;
+            }
+
+            $groupName = $matches[1] === self::OTHER_GROUP_KEY
+                ? null
+                : ($values["group_{$matches[1]}_name"] ?? null);
+            $groupName = is_string($groupName) && $groupName !== '' ? $groupName : null;
+
+            $this->mergeSitesFromGrid($sites, $groupSites, $groupName);
+        }
+
+        return $sites
+            ->keyBy('handle')
+            ->map(fn ($site) => collect($site)->except(['id', 'handle'])->filter()->all())
+            ->all();
+    }
+
+    protected function siteRowFields(): array
+    {
+        return [
             [
                 'handle' => 'name',
                 'field' => [
@@ -251,39 +343,133 @@ class Sites
                 ],
             ],
         ];
+    }
 
-        // If multisite, nest fields in a grid
-        if ($this->multiEnabled()) {
-            $tableWidths = [
-                'attributes' => 30,
-            ];
+    protected function multisiteBlueprintSections(array $siteRowFields, array $values = []): array
+    {
+        $sections = [];
+        $seen = [];
 
-            $siteFields = [
-                [
-                    'handle' => 'sites',
-                    'field' => [
-                        'type' => 'grid',
-                        'hide_display' => true,
-                        'actions' => false,
-                        'fullscreen' => false,
-                        'mode' => 'table',
-                        'stack_at' => 925,
-                        'add_row' => __('Add Site'),
-                        'fields' => collect($siteFields)->map(function ($field) use ($tableWidths) {
-                            $field['field']['width'] = $tableWidths[$field['handle']] ?? 14;
-                            $field['field']['classes'] = 'max-w-48 min-w-0 overflow-hidden';
+        foreach ($this->groupedSites() as $group => $sites) {
+            $key = $this->groupSectionKey($group);
 
-                            return $field;
-                        })->all(),
-                        'required' => true,
-                    ],
+            if ($key === self::OTHER_GROUP_KEY) {
+                continue;
+            }
+
+            $seen[$key] = true;
+            $sections[] = $this->groupSection($key, $group ?: null, $siteRowFields);
+        }
+
+        foreach ($values as $handle => $groupSites) {
+            if (! is_array($groupSites) || ! preg_match('/^group_(.+)_sites$/', $handle, $matches)) {
+                continue;
+            }
+
+            $key = $matches[1];
+
+            if ($key === self::OTHER_GROUP_KEY || isset($seen[$key])) {
+                continue;
+            }
+
+            $name = $values["group_{$key}_name"] ?? null;
+            $name = is_string($name) && $name !== '' ? $name : null;
+            $seen[$key] = true;
+            $sections[] = $this->groupSection($key, $name, $siteRowFields);
+        }
+
+        $sections[] = $this->groupSection(self::OTHER_GROUP_KEY, null, $siteRowFields);
+
+        return $sections;
+    }
+
+    protected function groupSection(string $key, ?string $group, array $siteRowFields): array
+    {
+        $isOther = $key === self::OTHER_GROUP_KEY;
+
+        $fields = [];
+
+        if (! $isOther) {
+            $fields[] = [
+                'handle' => "group_{$key}_name",
+                'field' => [
+                    'type' => 'text',
+                    'visibility' => 'hidden',
+                    'always_save' => true,
                 ],
             ];
         }
 
-        return Blueprint::make()->setContents([
-            'fields' => $siteFields,
-        ]);
+        $fields[] = [
+            'handle' => "group_{$key}_sites",
+            'field' => $this->sitesGridField($siteRowFields, $key),
+        ];
+
+        $section = [
+            'display' => $isOther ? __('Other') : $group,
+            'fields' => $fields,
+        ];
+
+        if (! $isOther) {
+            $section['editable_title_handle'] = "group_{$key}_name";
+            $section['reorderable'] = true;
+        }
+
+        return $section;
+    }
+
+    protected function sitesGridField(array $siteRowFields, string $groupKey): array
+    {
+        $tableWidths = [
+            'attributes' => 30,
+        ];
+
+        return [
+            'type' => 'grid',
+            'hide_display' => true,
+            'actions' => false,
+            'fullscreen' => false,
+            'mode' => 'table',
+            'stack_at' => 925,
+            'reorderable' => true,
+            'headers_in_section' => true,
+            'add_row' => __('Add Site'),
+            'fields' => collect($siteRowFields)->map(function ($field) use ($tableWidths, $groupKey) {
+                $field['field']['width'] = $tableWidths[$field['handle']] ?? 14;
+                $field['field']['classes'] = 'max-w-48 min-w-0 overflow-hidden';
+
+                if ($field['handle'] === 'handle' && $groupKey !== self::OTHER_GROUP_KEY) {
+                    $field['field']['prefix_from'] = "group_{$groupKey}_name";
+                }
+
+                return $field;
+            })->all(),
+        ];
+    }
+
+    protected function groupedSites(): Collection
+    {
+        return $this->all()->groupBy(fn (Site $site) => $site->group() ?? '');
+    }
+
+    protected function groupSectionKey(?string $group): string
+    {
+        if ($group === null || $group === '') {
+            return self::OTHER_GROUP_KEY;
+        }
+
+        return Str::slug($group);
+    }
+
+    protected function mergeSitesFromGrid(Collection $sites, array $groupSites, ?string $groupName): void
+    {
+        foreach ($groupSites as $site) {
+            if ($groupName) {
+                $site['group'] = $groupName;
+            }
+
+            $sites->put($site['handle'], $site);
+        }
     }
 
     public function config(): array

@@ -2,7 +2,10 @@
 export default {
     props: ['fields', 'rows', 'meta', 'name', 'canDeleteRows', 'canAddRows', 'allowFullscreen', 'hideDisplay', 'errors', 'readOnly'],
 
-    inject: ['grid'],
+    inject: {
+        grid: 'grid',
+        sectionRowSortable: { default: null },
+    },
 
     data() {
         return {
@@ -11,12 +14,24 @@ export default {
     },
 
     computed: {
+        usesSectionRowSortable() {
+            return !!this.sectionRowSortable && this.grid.isReorderable;
+        },
+
         sortableItemClass() {
-            return `${this.name}-sortable-item`;
+            return this.usesSectionRowSortable
+                ? this.sectionRowSortable.itemClass
+                : `${this.name}-sortable-item`;
         },
 
         sortableHandleClass() {
-            return `${this.name}-drag-handle`;
+            return this.usesSectionRowSortable
+                ? this.sectionRowSortable.handleClass
+                : `${this.name}-drag-handle`;
+        },
+
+        showsHeadersInSection() {
+            return !!this.grid.config.headers_in_section;
         },
 
         fieldPathPrefix() {
@@ -56,6 +71,17 @@ export default {
                 }, {});
             },
         },
+        rows() {
+            this.$nextTick(() => this.registerSectionRowZone());
+        },
+    },
+
+    mounted() {
+        this.$nextTick(() => this.registerSectionRowZone());
+    },
+
+    unmounted() {
+        this.unregisterSectionRowZone();
     },
 
     methods: {
@@ -65,7 +91,19 @@ export default {
             }
 
             return this.errorsById.hasOwnProperty(id) && this.errorsById[id].length > 0;
-        }
+        },
+
+        registerSectionRowZone() {
+            if (!this.usesSectionRowSortable || !this.$refs.zone) return;
+
+            this.sectionRowSortable.register(this.$refs.zone, this.name);
+        },
+
+        unregisterSectionRowZone() {
+            if (!this.sectionRowSortable || !this.$refs.zone) return;
+
+            this.sectionRowSortable.unregister(this.$refs.zone);
+        },
     },
 };
 </script>

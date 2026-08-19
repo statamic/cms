@@ -36,7 +36,14 @@
                         @blur="blurred"
                     />
 
-                    <ui-button size="sm" v-if="canAddRows" v-text="__(addRowButtonLabel)" @click.prevent="addRow" />
+                    <Teleport
+                        v-if="canAddRows"
+                        :disabled="!usesExternalAddRow"
+                        defer
+                        :to="addRowTeleportTarget"
+                    >
+                        <ui-button size="sm" v-text="__(addRowButtonLabel)" @click.prevent="addRow" />
+                    </Teleport>
                 </section>
             </div>
         </element-container>
@@ -84,6 +91,10 @@ export default {
         isInGridField: true,
     },
 
+    inject: {
+        sectionAddRowTarget: { default: null },
+    },
+
     computed: {
         component() {
             const stackAt = this.config.stack_at ?? 550;
@@ -114,6 +125,16 @@ export default {
 
         addRowButtonLabel() {
             return __(this.config.add_row) || __('Add Row');
+        },
+
+        usesExternalAddRow() {
+            return !!this.sectionAddRowTarget && !!this.config.headers_in_section && !this.fullScreenMode;
+        },
+
+        addRowTeleportTarget() {
+            if (!this.usesExternalAddRow) return 'body';
+
+            return `[${this.sectionAddRowTarget}="${CSS.escape(this.handle)}"]`;
         },
 
         hasMaxRows() {
@@ -256,6 +277,7 @@ export default {
                 metaPathPrefix: { get: () => this.metaPathPrefix },
                 fullScreenMode: { get: () => this.fullScreenMode },
                 toggleFullScreen: { get: () => this.toggleFullScreen },
+                usesExternalAddRow: { get: () => this.usesExternalAddRow },
             });
             return grid;
         },

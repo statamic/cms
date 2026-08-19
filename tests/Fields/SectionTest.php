@@ -168,4 +168,40 @@ class SectionTest extends TestCase
             ],
         ], $section->toPublishArray());
     }
+
+    #[Test]
+    public function it_includes_reorderable_in_publish_array()
+    {
+        $section = new Section([
+            'display' => 'Test',
+            'reorderable' => true,
+            'fields' => [],
+        ]);
+
+        $this->assertTrue($section->toPublishArray()['reorderable']);
+    }
+
+    #[Test]
+    public function it_omits_reorderable_from_publish_array_when_false()
+    {
+        $section = new Section([
+            'display' => 'Test',
+            'reorderable' => false,
+            'fields' => [],
+        ]);
+
+        $this->assertArrayNotHasKey('reorderable', $section->toPublishArray());
+    }
+
+    #[Test]
+    public function it_includes_editable_title_handle_in_publish_array()
+    {
+        $section = new Section([
+            'display' => 'Test',
+            'editable_title_handle' => 'group_london_name',
+            'fields' => [],
+        ]);
+
+        $this->assertSame('group_london_name', $section->toPublishArray()['editable_title_handle']);
+    }
 }

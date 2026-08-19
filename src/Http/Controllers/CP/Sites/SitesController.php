@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Sites;
 
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Statamic\Facades\Site;
 use Statamic\Http\Controllers\CP\CpController;
@@ -33,46 +34,78 @@ class SitesController extends CpController
 
     private function values(): array
     {
-        $sites = collect(Site::config())
-            ->map(fn ($site, $handle) => array_merge(['handle' => $handle], $site))
-            ->values()
-            ->all();
-
-        if (! Site::multiEnabled()) {
-            return $sites[0];
-        }
-
-        return ['sites' => $sites];
+        return Site::blueprintValues();
     }
 
     public function update(Request $request)
     {
-        $blueprint = Site::blueprint();
+        $blueprint = Site::blueprint($request->all());
 
         $fields = $blueprint
             ->fields()
             ->addValues($request->all());
 
-        $fields->validate();
+        $fields->validate($this->uniqueHandleRules($request->all()));
 
-        $values = $fields
-            ->process()
-            ->values()
-            ->all();
+        $values = $this->valuesInRequestOrder(
+            $request->all(),
+            $fields->process()->values()->all()
+        );
 
-        // Normalize form values to sites config, since we always want array of sites keyed by handle, etc.
-        $sites = collect(Site::multiEnabled() ? $values['sites'] : [$values])
-            ->keyBy('handle')
-            ->transform(function ($site) {
-                return collect($site)
-                    ->except(['id', 'handle'])
-                    ->filter()
-                    ->all();
-            })
-            ->all();
+        $sites = Site::configFromBlueprintValues($values);
+
+        if (Site::multiEnabled() && empty($sites)) {
+            throw ValidationException::withMessages([
+                'group_other_sites' => [__('This field is required.')],
+            ]);
+        }
 
         Site::setSites($sites)->save();
 
         return response('', 204);
+    }
+
+    private function valuesInRequestOrder(array $request, array $values): array
+    {
+        return collect(array_keys($request))
+            ->filter(fn ($key) => array_key_exists($key, $values) || $this->isGroupNameKey($key))
+            ->mapWithKeys(fn ($key) => [$key => array_key_exists($key, $values) ? $values[$key] : $request[$key]])
+            ->union($values)
+            ->all();
+    }
+
+    private function isGroupNameKey(string $key): bool
+    {
+        return (bool) preg_match('/^group_.+_name$/', $key);
+    }
+
+    private function uniqueHandleRules(array $values): array
+    {
+        $handles = collect();
+
+        foreach ($values as $key => $sites) {
+            if (! is_array($sites) || ! preg_match('/^group_.+_sites$/', $key)) {
+                continue;
+            }
+
+            foreach ($sites as $index => $site) {
+                $handle = $site['handle'] ?? null;
+
+                if (! is_string($handle) || $handle === '') {
+                    continue;
+                }
+
+                $handles["{$key}.{$index}.handle"] = $handle;
+            }
+        }
+
+        $duplicates = $handles->countBy()->filter(fn ($count) => $count > 1)->keys();
+
+        return $handles
+            ->filter(fn ($handle) => $duplicates->contains($handle))
+            ->map(fn () => [
+                fn ($attribute, $value, $fail) => $fail(__('statamic::validation.unique')),
+            ])
+            ->all();
     }
 }
