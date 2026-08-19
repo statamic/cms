@@ -61,7 +61,7 @@ const hasOnlyOtherGroup = computed(() => usesGroupEditor.value && listedSections
 
 watch(isEditingSections, (editing) => {
     if (!editing) {
-        closeGroupEditor();
+        closeGroupEditor({ saved: true });
         return;
     }
 
@@ -76,6 +76,7 @@ const editingNewGroup = ref(false);
 const editingGroupHandle = ref(null);
 const editingGroupTitle = ref('');
 const groupTitleError = ref(null);
+const editingSection = ref(null);
 
 function renderInstructions(instructions) {
     return instructions ? markdown(__(instructions), { openLinksInNewTabs: true }) : '';
@@ -221,25 +222,32 @@ function openNewGroupEditor() {
 
     nextTick(() => {
         focusSection(section);
-        editGroup(section);
-        editingNewGroup.value = true;
+        editGroup(section, { isNew: true });
     });
 }
 
-function editGroup(section) {
+function editGroup(section, { isNew = false } = {}) {
     groupEditorOpen.value = true;
-    editingNewGroup.value = false;
+    editingNewGroup.value = isNew;
+    editingSection.value = section;
     editingGroupHandle.value = section.editable_title_handle;
     editingGroupTitle.value = values.value[section.editable_title_handle] || '';
     groupTitleError.value = null;
 }
 
-function closeGroupEditor() {
+function closeGroupEditor({ saved = false } = {}) {
+    const sectionToRemove = !saved && editingNewGroup.value ? editingSection.value : null;
+
     groupEditorOpen.value = false;
     editingNewGroup.value = false;
+    editingSection.value = null;
     editingGroupHandle.value = null;
     editingGroupTitle.value = '';
     groupTitleError.value = null;
+
+    if (sectionToRemove) {
+        removeGroup(sectionToRemove);
+    }
 }
 
 function saveGroupTitle() {
@@ -254,7 +262,7 @@ function saveGroupTitle() {
         setFieldValue(editingGroupHandle.value, title);
     }
 
-    closeGroupEditor();
+    closeGroupEditor({ saved: true });
 }
 
 function removeGroup(section) {
