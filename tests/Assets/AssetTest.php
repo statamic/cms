@@ -2397,6 +2397,7 @@ class AssetTest extends TestCase
             'spaces' => ['path/to/Image X - Whatever_17.jpg', '/path/to/Image%20X%20-%20Whatever_17.jpg'],
             'accents' => ['path/to/Dún Laoghaire_18 2.jpg', '/path/to/D%C3%BAn%20Laoghaire_18%202.jpg'],
             'spaces in folders' => ['path to/my folder/test.txt', '/path%20to/my%20folder/test.txt'],
+            'literal percent sequences' => ['path/to/photo%20one.jpg', '/path/to/photo%2520one.jpg'],
         ];
     }
 

@@ -5,6 +5,7 @@ namespace Tests\Assets;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Assets\AssetRepository;
 use Statamic\Contracts\Assets\Asset as AssetContract;
@@ -107,20 +108,29 @@ EOT;
     }
 
     #[Test]
-    public function it_finds_assets_by_an_encoded_url()
+    #[DataProvider('encodedUrlProvider')]
+    public function it_finds_assets_by_an_encoded_url($path, $expectedUrl)
     {
         Storage::fake('test', ['url' => 'test']);
-        Storage::disk('test')->put('foo/Dún Laoghaire_18 2.jpg', UploadedFile::fake()->image('bar.jpg')->getContent());
+        Storage::disk('test')->put($path, UploadedFile::fake()->image('bar.jpg')->getContent());
 
         $container = tap(AssetContainer::make('test_container')->disk('test'))->save();
-        $asset = tap($container->makeAsset('foo/Dún Laoghaire_18 2.jpg'))->save();
+        $asset = tap($container->makeAsset($path))->save();
 
-        $this->assertEquals('/test/foo/D%C3%BAn%20Laoghaire_18%202.jpg', $asset->url());
+        $this->assertEquals($expectedUrl, $asset->url());
 
         $found = Asset::findByUrl($asset->url());
 
         $this->assertInstanceOf(AssetContract::class, $found);
         $this->assertEquals($asset->id(), $found->id());
+    }
+
+    public static function encodedUrlProvider()
+    {
+        return [
+            'spaces and accents' => ['foo/Dún Laoghaire_18 2.jpg', '/test/foo/D%C3%BAn%20Laoghaire_18%202.jpg'],
+            'literal percent sequences' => ['foo/photo%20one.jpg', '/test/foo/photo%2520one.jpg'],
+        ];
     }
 
     #[Test]
