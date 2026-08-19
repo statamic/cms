@@ -1315,6 +1315,181 @@ class NavTransformerTest extends TestCase
 
         $this->assertEquals($expected, $transformed);
     }
+
+    #[Test]
+    public function it_preserves_reorder_array_when_moving_custom_section_to_first_position()
+    {
+        $transformed = $this->transform([
+            ['display_original' => 'Top Level'],
+            [
+                'display' => '⭐ Favorites',
+                'action' => '@create',
+                'items' => [
+                    [
+                        'id' => 'favorites::edit_homepage',
+                        'manipulations' => [
+                            'action' => '@create',
+                            'display' => 'Edit homepage',
+                            'url' => '/cp',
+                            'icon' => 'edit',
+                        ],
+                    ],
+                ],
+            ],
+            ['display_original' => 'Content'],
+            ['display_original' => 'Fields'],
+            ['display_original' => 'Tools'],
+            ['display_original' => 'Settings'],
+            ['display_original' => 'Users'],
+        ]);
+
+        $expected = [
+            'reorder' => [
+                'favorites',
+            ],
+            'sections' => [
+                'favorites' => [
+                    'display' => '⭐ Favorites',
+                    'action' => '@create',
+                    'items' => [
+                        'favorites::edit_homepage' => [
+                            'action' => '@create',
+                            'display' => 'Edit homepage',
+                            'url' => '/cp',
+                            'icon' => 'edit',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this->assertEquals($expected, $transformed);
+    }
+
+    #[Test]
+    public function it_preserves_reorder_array_when_inserting_custom_section_into_middle_of_list()
+    {
+        $transformed = $this->transform([
+            ['display_original' => 'Top Level'],
+            ['display_original' => 'Content'],
+            ['display_original' => 'Fields'],
+            [
+                'display' => '⭐ Favorites',
+                'action' => '@create',
+                'items' => [
+                    [
+                        'id' => 'favorites::edit_homepage',
+                        'manipulations' => [
+                            'action' => '@create',
+                            'display' => 'Edit homepage',
+                            'url' => '/cp',
+                        ],
+                    ],
+                ],
+            ],
+            ['display_original' => 'Tools'],
+            ['display_original' => 'Settings'],
+            ['display_original' => 'Users'],
+        ]);
+
+        $expected = [
+            'reorder' => [
+                'content',
+                'fields',
+                'favorites',
+            ],
+            'sections' => [
+                'favorites' => [
+                    'display' => '⭐ Favorites',
+                    'action' => '@create',
+                    'items' => [
+                        'favorites::edit_homepage' => [
+                            'action' => '@create',
+                            'display' => 'Edit homepage',
+                            'url' => '/cp',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this->assertEquals($expected, $transformed);
+    }
+
+    #[Test]
+    public function it_preserves_reorder_array_with_multiple_custom_sections_in_the_middle()
+    {
+        $transformed = $this->transform([
+            ['display_original' => 'Top Level'],
+            [
+                'display' => '⭐ Favorites',
+                'action' => '@create',
+                'items' => [
+                    [
+                        'id' => 'favorites::edit_homepage',
+                        'manipulations' => [
+                            'action' => '@create',
+                            'display' => 'Edit homepage',
+                            'url' => '/cp',
+                        ],
+                    ],
+                ],
+            ],
+            ['display_original' => 'Content'],
+            [
+                'display' => '🔖 Bookmarks',
+                'action' => '@create',
+                'items' => [
+                    [
+                        'id' => 'bookmarks::edit_about',
+                        'manipulations' => [
+                            'action' => '@create',
+                            'display' => 'Edit about',
+                            'url' => '/about',
+                        ],
+                    ],
+                ],
+            ],
+            ['display_original' => 'Fields'],
+            ['display_original' => 'Tools'],
+            ['display_original' => 'Settings'],
+            ['display_original' => 'Users'],
+        ]);
+
+        $expected = [
+            'reorder' => [
+                'favorites',
+                'content',
+                'bookmarks',
+            ],
+            'sections' => [
+                'favorites' => [
+                    'display' => '⭐ Favorites',
+                    'action' => '@create',
+                    'items' => [
+                        'favorites::edit_homepage' => [
+                            'action' => '@create',
+                            'display' => 'Edit homepage',
+                            'url' => '/cp',
+                        ],
+                    ],
+                ],
+                'bookmarks' => [
+                    'display' => '🔖 Bookmarks',
+                    'action' => '@create',
+                    'items' => [
+                        'bookmarks::edit_about' => [
+                            'action' => '@create',
+                            'display' => 'Edit about',
+                            'url' => '/about',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this->assertEquals($expected, $transformed);
+    }
 }
 
 class IncrementalIdHasher

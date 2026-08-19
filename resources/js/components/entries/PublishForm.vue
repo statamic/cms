@@ -82,6 +82,7 @@
             :origin-meta="originMeta"
             :errors="errors"
             :site="site"
+            :read-only="readOnly"
             v-model:modified-fields="localizedFields"
             :track-dirty-state="trackDirtyState"
             :sync-field-confirmation-text="syncFieldConfirmationText"
@@ -456,7 +457,7 @@ export default {
         },
 
         showLivePreviewButton() {
-            return !this.isCreating && this.isBase && this.livePreviewUrl;
+            return !this.isPreviewing && !this.readOnly && !this.isCreating && this.isBase && this.livePreviewUrl;
         },
 
         showVisitUrlButton() {
@@ -663,7 +664,7 @@ export default {
             }
 
             if (this.isBase) {
-                window.history.replaceState({}, '', localization.url);
+                window.history.replaceState({}, '', localization.url + window.location.hash);
             }
         },
 

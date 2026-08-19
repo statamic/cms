@@ -9,6 +9,8 @@ use Statamic\Events\ImpersonationStarted;
 use Statamic\Facades\CP\Toast;
 use Statamic\Facades\User;
 
+use function Statamic\trans as __;
+
 class Impersonate extends Action
 {
     public $icon = 'mask';

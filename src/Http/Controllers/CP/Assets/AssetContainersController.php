@@ -10,6 +10,8 @@ use Statamic\Facades\Blueprint;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Rules\Handle;
 
+use function Statamic\trans as __;
+
 class AssetContainersController extends CpController
 {
     public function show($container)
@@ -186,6 +188,7 @@ class AssetContainersController extends CpController
                         'type' => 'taggable',
                         'display' => __('Validation Rules'),
                         'instructions' => __('statamic::messages.asset_container_validation_rules_instructions'),
+                        'paste_delimiter' => '|',
                     ],
                 ],
             ],

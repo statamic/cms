@@ -1057,7 +1057,6 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
     /**
      * Get the blueprint.
      *
-     * @param  string|null  $blueprint
      * @return \Statamic\Fields\Blueprint
      */
     public function blueprint()

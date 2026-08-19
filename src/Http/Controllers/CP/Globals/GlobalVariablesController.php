@@ -10,6 +10,8 @@ use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 
+use function Statamic\trans as __;
+
 class GlobalVariablesController extends CpController
 {
     public function edit(Request $request, $id)
@@ -46,6 +48,7 @@ class GlobalVariablesController extends CpController
             'values' => $values,
             'meta' => $meta,
             'blueprint' => $blueprint->toPublishArray(),
+            'asConfig' => $set->layoutMode() === 'multi_column',
             'locale' => $variables->locale(),
             'localizedFields' => $variables->data()->keys()->all(),
             'hasOrigin' => $hasOrigin,

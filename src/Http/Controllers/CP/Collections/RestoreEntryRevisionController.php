@@ -7,6 +7,8 @@ use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Revisions\Revision;
 
+use function Statamic\trans as __;
+
 class RestoreEntryRevisionController extends CpController
 {
     public function __invoke(Request $request, $collection, $entry)

@@ -6,6 +6,8 @@ use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
 use Statamic\GraphQL\Types\TableRowType;
 
+use function Statamic\trans as __;
+
 class Table extends Fieldtype
 {
     protected $categories = ['structured'];

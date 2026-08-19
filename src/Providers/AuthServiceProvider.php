@@ -31,6 +31,8 @@ use Webauthn\CeremonyStep\CeremonyStepManagerFactory;
 use Webauthn\Denormalizer\WebauthnSerializerFactory;
 use Webauthn\PublicKeyCredentialRpEntity;
 
+use function Statamic\trans_choice;
+
 class AuthServiceProvider extends ServiceProvider
 {
     protected $policies = [
@@ -150,7 +152,9 @@ class AuthServiceProvider extends ServiceProvider
                 return null;
             }
 
-            $user = User::fromUser($user);
+            if (! $user = User::fromUser($user)) {
+                return null;
+            }
 
             if ($user->isSuper()) {
                 return true;
@@ -179,6 +183,14 @@ class AuthServiceProvider extends ServiceProvider
             return RateLimiter::limiter('statamic.auth')($request);
         });
 
+        RateLimiter::for('statamic.password-reset-form', function (Request $request) {
+            return Limit::perMinute(15)->by($request->ip());
+        });
+
+        RateLimiter::for('statamic.cp.password-reset-form', function (Request $request) {
+            return RateLimiter::limiter('statamic.password-reset-form')($request);
+        });
+
         RateLimiter::for('statamic.passkeys', function (Request $request) {
             return Limit::perMinute(30)->by($request->ip());
         });
@@ -188,7 +200,13 @@ class AuthServiceProvider extends ServiceProvider
         });
 
         RateLimiter::for('statamic.forms', function (Request $request) {
-            return Limit::perMinute(10)->by($request->ip());
+            return $request->isPrecognitive()
+                ? Limit::perMinute(30)->by('precognition:'.$request->ip())
+                : Limit::perMinute(10)->by('submission:'.$request->ip());
+        });
+
+        RateLimiter::for('statamic.dictionaries', function (Request $request) {
+            return Limit::perMinute(60)->by($request->ip());
         });
 
         RateLimiter::for('two-factor', function (Request $request) {

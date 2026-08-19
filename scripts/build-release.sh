@@ -10,16 +10,7 @@ npm run build
 npm run build-dev
 npm run frontend-build
 
-# Create tarballs for the Laravel package
-cd resources
-tar -czvf dist.tar.gz dist
-tar -czvf dist-dev.tar.gz dist-dev
-tar -czvf dist-frontend.tar.gz dist-frontend
-cd ..
-
-# Create a tarball for @statamic/cms
+# Populate resources/dist-package from packages/cms
 cp resources/css/ui.css packages/cms/src/ui.css
-cd packages/cms
-tar -czvf ../../resources/dist-package.tar.gz *
-cd ../..
+rsync -a --delete packages/cms/ resources/dist-package/
 

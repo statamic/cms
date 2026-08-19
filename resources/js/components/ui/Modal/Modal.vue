@@ -33,7 +33,7 @@ const props = defineProps({
 });
 
 const overlayClasses = cva({
-    base: 'fixed inset-0 z-(--z-index-portal) bg-gray-800/20 dark:bg-gray-800/50',
+    base: 'fixed inset-0 z-(--z-index-portal) bg-gray-800/20 dark:bg-gray-950/60',
     variants: {
         blur: {
             true: 'backdrop-blur-[2px]',
@@ -189,7 +189,7 @@ provide('closeModal', close);
                     <div class="relative space-y-3 rounded-xl overflow-auto max-h-[60vh] border border-gray-400/60 bg-white p-4 shadow-[0_1px_16px_-2px_rgba(63,63,71,0.2)] dark:border-none dark:bg-gray-800 dark:shadow-[0_1px_16px_-2px_rgba(0,0,0,.5)] dark:inset-shadow-2xs dark:inset-shadow-white/10">
                         <div v-if="!hasModalTitleComponent && (title || icon)" data-ui-modal-title class="flex items-center gap-2">
                             <Icon :name="icon" v-if="icon" class="size-4" />
-                            <Heading :text="title" size="lg" class="font-medium" />
+                            <Heading :text="title" size="lg" class="font-semibold text-gray-950 dark:text-gray-100" />
                         </div>
                         <slot />
                     </div>

@@ -6,9 +6,13 @@ use Illuminate\Support\Facades\Validator as LaravelValidator;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class Validator
 {
     protected $fields;
+    protected $preProcessedFields;
     protected $replacements = [];
     protected $extraRules = [];
     protected $customMessages = [];
@@ -22,8 +26,14 @@ class Validator
     public function fields($fields)
     {
         $this->fields = $fields;
+        $this->preProcessedFields = null;
 
         return $this;
+    }
+
+    protected function preProcessedFields()
+    {
+        return $this->preProcessedFields ??= $this->fields->preProcessValidatables();
     }
 
     public function withRules($rules)
@@ -66,7 +76,7 @@ class Validator
             return collect();
         }
 
-        return $this->fields->preProcessValidatables()->all()->reduce(function ($carry, $field) {
+        return $this->preProcessedFields()->all()->reduce(function ($carry, $field) {
             if (request()->isPrecognitive() && $field->type() == 'assets') {
                 return $carry;
             }
@@ -102,7 +112,7 @@ class Validator
     public function validator()
     {
         return LaravelValidator::make(
-            $this->fields->preProcessValidatables()->values()->all(),
+            $this->preProcessedFields()->values()->all(),
             $this->rules(),
             $this->customMessages,
             $this->attributes()
@@ -116,7 +126,7 @@ class Validator
 
     public function attributes()
     {
-        return $this->fields->preProcessValidatables()->all()->reduce(function ($carry, $field) {
+        return $this->preProcessedFields()->all()->reduce(function ($carry, $field) {
             return $carry->merge($field->validationAttributes());
         }, collect())->all();
     }

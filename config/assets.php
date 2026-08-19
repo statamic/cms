@@ -72,6 +72,19 @@ return [
 
         /*
         |--------------------------------------------------------------------------
+        | Crop Quality
+        |--------------------------------------------------------------------------
+        |
+        | The quality used when saving images cropped in the control panel. The
+        | user may override this per crop. When null, the quality defined in
+        | the "defaults" above will be used, otherwise it falls back to 90.
+        |
+        */
+
+        'crop_quality' => null,
+
+        /*
+        |--------------------------------------------------------------------------
         | Image Manipulation Presets
         |--------------------------------------------------------------------------
         |
@@ -193,6 +206,25 @@ return [
     */
 
     'focal_point_editor' => true,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Crop Aspect Ratios
+    |--------------------------------------------------------------------------
+    |
+    | Configure the aspect ratio presets available in the Control Panel image
+    | crop editor. Each entry may be a "W:H" string (e.g. "16:9") or an array
+    | with a custom label and ratio: ['label' => 'Wide', 'ratio' => '16:9'].
+    |
+    */
+
+    'crop_aspect_ratios' => [
+        '16:9',
+        '4:3',
+        '3:2',
+        '2:1',
+        '1:1',
+    ],
 
     /*
     |--------------------------------------------------------------------------

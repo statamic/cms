@@ -49,6 +49,8 @@ use Statamic\Search\Searchable;
 use Statamic\Statamic;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticatable, AuthorizableContract, CanResetPasswordContract, ContainsQueryableValues, HasLocalePreference, ResolvesValuesContract, SearchableContract, UserContract
 {
     use Authorizable, CanResetPassword, ContainsComputedData, HasAugmentedInstance, HasAvatar, HasDirtyState, Notifiable, ResolvesValues, Searchable, TracksQueriedColumns, TracksQueriedRelations;

@@ -7,6 +7,8 @@ use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Fieldtype;
 use Statamic\GraphQL\Types\CodeType;
 
+use function Statamic\trans as __;
+
 class Code extends Fieldtype
 {
     protected $categories = ['text'];
@@ -104,6 +106,8 @@ class Code extends Fieldtype
                             'nginx' => 'Nginx',
                             'text/x-java' => 'Java',
                             'javascript' => 'JavaScript',
+                            'application/json' => 'JSON',
+                            'application/ld+json' => 'JSON-LD',
                             'jsx' => 'JSX',
                             'text/x-objectivec' => 'Objective-C',
                             'php' => 'PHP',
@@ -161,6 +165,15 @@ class Code extends Fieldtype
 
     public function preProcessConfig($value)
     {
+        return $value;
+    }
+
+    public function preProcessValidatable($value)
+    {
+        if (is_array($value)) {
+            return $value['code'] ?? null;
+        }
+
         return $value;
     }
 

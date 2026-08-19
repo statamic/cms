@@ -5,6 +5,7 @@ namespace Statamic\Revisions;
 use Statamic\Contracts\Revisions\Revision as RevisionContract;
 use Statamic\Contracts\Revisions\RevisionQueryBuilder;
 use Statamic\Contracts\Revisions\RevisionRepository as Contract;
+use Statamic\Facades\File;
 use Statamic\Stache\Stache;
 use Statamic\Support\Str;
 
@@ -40,11 +41,13 @@ class RevisionRepository implements Contract
 
     public function findWorkingCopyByKey($key)
     {
-        return $this
-            ->query()
-            ->where('key', $key)
-            ->where('action', 'working')
-            ->first();
+        $path = $this->directory().'/'.$key.'/working.yaml';
+
+        if (! File::exists($path)) {
+            return null;
+        }
+
+        return $this->store->makeItemFromFile($path, File::get($path));
     }
 
     public function save(RevisionContract $revision)

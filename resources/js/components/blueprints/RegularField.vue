@@ -1,21 +1,21 @@
 <template>
-    <ui-card class="py-0.75! px-2! field-grid-item blueprint-section-field" :class="widthClass">
+    <ui-card class="py-0.75! px-2! field-grid-item blueprint-section-field @container" :class="widthClass">
         <div class="flex items-center gap-2">
-            <ui-icon name="handles" class="blueprint-drag-handle size-4 cursor-grab text-gray-300 dark:text-gray-600" />
-            <div class="flex flex-1 items-center justify-between">
-                <div class="flex flex-1 items-center py-2">
+            <ui-icon name="handles" class="blueprint-drag-handle size-4 shrink-0 cursor-grab text-gray-300 dark:text-gray-600" />
+            <div class="flex min-w-0 flex-1 items-center justify-between gap-2">
+                <div class="flex min-w-0 flex-1 items-center py-2">
                     <ui-icon
-                        class="size-4 me-2 text-gray-500 dark:text-gray-400"
+                        class="size-4 shrink-0 me-2 text-gray-500 dark:text-gray-400"
                         :name="field.icon"
                         v-tooltip="tooltipText"
                     />
-                    <div class="flex items-center gap-2">
-                        <button class="cursor-pointer overflow-hidden text-ellipsis text-sm hover:text-ui-accent-text text-start" type="button" v-text="__(labelText)" @click="$emit('edit')" />
-                        <ui-icon v-if="isReferenceField" name="link" class="text-gray-400" />
-                        <span v-if="isReferenceField" class="text-gray-500 font-mono text-2xs cursor-help" v-text="__('Field')" v-tooltip="__('Imported from: :reference', { reference: field.field_reference })" />
+                    <div class="flex min-w-0 items-center gap-2">
+                        <button class="cursor-pointer truncate text-sm hover:text-ui-accent-text text-start" type="button" v-text="__(labelText)" @click="$emit('edit')" />
+                        <ui-icon v-if="isReferenceField" name="link" class="shrink-0 text-gray-400 cursor-help" v-tooltip="referenceTooltipText" />
+                        <span v-if="isReferenceField" class="shrink-0 text-gray-500 font-mono text-2xs cursor-help @max-2xs:hidden" v-text="__('Field')" v-tooltip="referenceTooltipText" />
                     </div>
                 </div>
-                <div class="flex items-center gap-2">
+                <div class="flex shrink-0 items-center gap-2">
                     <width-selector v-if="!isHidden" v-model="width" />
 
                     <div
@@ -95,6 +95,10 @@ export default {
 
         isInlineField() {
             return !this.isReferenceField;
+        },
+
+        referenceTooltipText() {
+            return __('Imported from: :reference', { reference: this.field.field_reference });
         },
 
         fieldConfig() {

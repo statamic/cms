@@ -15,10 +15,12 @@ use Statamic\Query\Scopes\Filters\Fields\Date as DateFilter;
 use Statamic\Rules\DateFieldtype as ValidationRule;
 use Statamic\Support\DateFormat;
 
+use function Statamic\trans as __;
+
 class Date extends Fieldtype
 {
     protected $categories = ['special'];
-    protected $keywords = ['datetime', 'time'];
+    protected $keywords = ['datetime', 'time', 'range'];
 
     const DEFAULT_DATE_FORMAT = 'Y-m-d';
     const DEFAULT_DATETIME_FORMAT = 'Y-m-d H:i';
@@ -87,6 +89,16 @@ class Date extends Fieldtype
                         'type' => 'toggle',
                         'default' => false,
                         'width' => 50,
+                    ],
+                    'timezone' => [
+                        'display' => __('Timezone'),
+                        'instructions' => __('statamic::fieldtypes.date.config.timezone'),
+                        'type' => 'dictionary',
+                        'dictionary' => 'timezones',
+                        'placeholder' => $this->timezonePlaceholder(),
+                        'clearable' => true,
+                        'width' => 50,
+                        'max_items' => 1,
                     ],
                 ],
             ],
@@ -253,6 +265,8 @@ class Date extends Fieldtype
         $common = [
             'mode' => $this->config('mode', 'single'),
             'time_enabled' => $this->config('time_enabled'),
+            'timezone' => $this->resolvedTimezone(),
+            'format_has_time' => $this->formatHasTime(),
         ];
 
         if ($this->config('mode') === 'range') {
@@ -395,7 +409,22 @@ class Date extends Fieldtype
 
     public function preload()
     {
-        return ['formatHasTime' => $this->formatHasTime()];
+        return [
+            'formatHasTime' => $this->formatHasTime(),
+            'timezone' => $this->resolvedTimezone(),
+        ];
+    }
+
+    private function timezonePlaceholder(): string
+    {
+        $default = config('statamic.cp.default_timezone', 'auto');
+
+        return $default !== 'auto' ? $default : __('Auto');
+    }
+
+    private function resolvedTimezone(): string
+    {
+        return $this->config('timezone', config('statamic.cp.default_timezone', 'auto'));
     }
 
     public function timeEnabled()

@@ -23,7 +23,7 @@
 import Fieldtype from './Fieldtype.vue';
 import DateFormatter from '@/components/DateFormatter.js';
 import { DatePicker, DateRangePicker, Button } from '@/components/ui';
-import { CalendarDate, getLocalTimeZone, parseAbsoluteToLocal, toTimeZone, toZoned } from '@internationalized/date';
+import { CalendarDate, getLocalTimeZone, now, parseAbsolute, toTimeZone, toZoned } from '@internationalized/date';
 
 export default {
     components: {
@@ -67,6 +67,12 @@ export default {
             return this.config.inline;
         },
 
+        displayTimezone() {
+            const tz = this.meta?.timezone;
+
+            return tz && tz !== 'auto' ? tz : getLocalTimeZone();
+        },
+
         formatHasTime() {
             return this.meta?.formatHasTime ?? true;
         },
@@ -89,28 +95,39 @@ export default {
 
             if (this.isRange) {
                 return {
-                    start: parseAbsoluteToLocal(this.value.start),
-                    end: parseAbsoluteToLocal(this.value.end),
+                    start: parseAbsolute(this.value.start, this.displayTimezone),
+                    end: parseAbsolute(this.value.end, this.displayTimezone),
                 };
             }
 
-            return parseAbsoluteToLocal(this.value);
+            return parseAbsolute(this.value, this.displayTimezone);
         },
 
         datePickerGranularity() {
             return this.hasTime ? (this.hasSeconds ? 'second' : 'minute') : 'day';
         },
 
+        replicatorPreviewOptions() {
+            const preset = this.hasTime ? 'datetime' : 'date';
+
+            return {
+                preset,
+                timeZone: this.displayTimezone,
+                ...(this.formatHasTime && { timeZoneName: 'short' }),
+            };
+        },
+
         replicatorPreview() {
             if (!this.showFieldPreviews) return;
             if (!this.value) return;
 
+            const formatter = new DateFormatter().options(this.replicatorPreviewOptions);
+
             if (this.isRange) {
-                const formatter = new DateFormatter().options(this.hasTime ? 'datetime' : 'date');
                 return formatter.date(this.value.start) + ' – ' + formatter.date(this.value.end);
             }
 
-            return DateFormatter.format(this.value, this.hasTime && this.value ? 'datetime' : 'date');
+            return formatter.date(this.value).toString();
         },
     },
 
@@ -143,6 +160,10 @@ export default {
                 return this.update(null);
             }
 
+            if (this.isRange && (!value.start || !value.end)) {
+                return;
+            }
+
             if (!this.formatHasTime) {
                 if (this.isRange) {
                     return this.update({
@@ -157,7 +178,7 @@ export default {
             // Sometimes, we'll get a CalendarDateTime object, which doesn't include timezone
             // information. In that case, we need to convert it to a ZonedDateTime object.
             if (!this.isRange && !value.offset && !value.timeZone) {
-                value = toZoned(value, getLocalTimeZone());
+                value = toZoned(value, this.displayTimezone);
             }
 
             // The date picker will give us CalendarDateTimes in the local time zone.
@@ -167,13 +188,21 @@ export default {
                 let start = value.start;
                 let end = value.end;
 
+                if (!start.offset && !start.timeZone) {
+                    start = toZoned(start, this.displayTimezone);
+                }
+
+                if (!end.offset && !end.timeZone) {
+                    end = toZoned(end, this.displayTimezone);
+                }
+
                 if (!this.hasTime) {
                     end.set({ hour: 23, minute: 59, second: 59 });
                 }
 
                 return this.update({
-                    start: toZoned(start, 'UTC').toAbsoluteString(),
-                    end: toZoned(end, 'UTC').toAbsoluteString(),
+                    start: toTimeZone(start, 'UTC').toAbsoluteString(),
+                    end: toTimeZone(end, 'UTC').toAbsoluteString(),
                 });
             }
 
@@ -181,20 +210,20 @@ export default {
         },
 
         addDate() {
-            let now = new Date();
+            let zoned = now(this.displayTimezone);
 
             if (!this.formatHasTime) {
-                const str = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+                const str = this.formatDateOnly(zoned);
                 return this.update(this.isRange ? { start: str, end: str } : str);
             }
 
-            now.setMilliseconds(0);
+            zoned = zoned.set({ millisecond: 0 });
 
             if (!this.config.time_enabled) {
-                now.setHours(0, 0, 0, 0);
+                zoned = zoned.set({ hour: 0, minute: 0, second: 0 });
             }
 
-            const str = now.toISOString();
+            const str = toTimeZone(zoned, 'UTC').toAbsoluteString();
 
             this.update(this.isRange ? { start: str, end: str } : str);
         },

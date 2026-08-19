@@ -187,6 +187,7 @@ return [
     'publish_actions_publish' => 'Những thay đổi đối với bản sao làm việc sẽ được áp dụng cho mục nhập và sẽ được xuất bản ngay lập tức.',
     'publish_actions_schedule' => 'Những thay đổi đối với bản sao làm việc sẽ được áp dụng cho mục nhập và mục nhập đó sẽ được xuất bản vào ngày đã chọn.',
     'publish_actions_unpublish' => 'Bản sửa đổi hiện tại sẽ không được công bố.',
+    'relationship_item_unavailable' => 'Mục này không khả dụng. Mục có thể đã bị xóa hoặc bạn không có quyền xem.',
     'reset_password_notification_body' => 'Bạn nhận được email này vì chúng tôi đã nhận được yêu cầu đặt lại mật khẩu cho tài khoản của bạn.',
     'reset_password_notification_no_action' => 'Nếu bạn không yêu cầu đặt lại mật khẩu, bạn không cần thực hiện thêm hành động nào nữa.',
     'reset_password_notification_subject' => 'Thông báo đặt lại mật khẩu',

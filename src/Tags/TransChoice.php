@@ -2,6 +2,8 @@
 
 namespace Statamic\Tags;
 
+use function Statamic\trans_choice;
+
 class TransChoice extends Tags
 {
     /**

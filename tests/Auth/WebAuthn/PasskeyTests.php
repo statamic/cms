@@ -6,13 +6,13 @@ use Carbon\Carbon;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Auth\Passkey;
 use Statamic\Facades\User;
-use Webauthn\PublicKeyCredentialSource;
+use Webauthn\CredentialRecord;
 
 trait PasskeyTests
 {
     abstract protected function newPasskey(): Passkey;
 
-    abstract protected function createTestCredential(string $id = 'test-credential-id-123'): PublicKeyCredentialSource;
+    abstract protected function createTestCredential(string $id = 'test-credential-id-123'): CredentialRecord;
 
     #[Test]
     public function it_gets_last_login()

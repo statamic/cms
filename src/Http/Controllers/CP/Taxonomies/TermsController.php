@@ -17,6 +17,9 @@ use Statamic\Query\OrderBy;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 use Statamic\Rules\Slug;
 use Statamic\Rules\UniqueTermValue;
+use Statamic\Statamic;
+
+use function Statamic\trans as __;
 
 class TermsController extends CpController
 {
@@ -46,7 +49,7 @@ class TermsController extends CpController
             $query->orderBy($sortField, $sortDirection);
         }
 
-        $paginator = $query->paginate(request('perPage'));
+        $paginator = $query->paginate(Statamic::cpPerPage(request('perPage')));
 
         $terms = $paginator->getCollection();
 

@@ -140,7 +140,7 @@ class User extends BaseUser
     /**
      * Set the token value for the "remember me" session.
      *
-     * @param  string  $value
+     * @param  string  $token
      * @return void
      */
     public function setRememberToken($token)
