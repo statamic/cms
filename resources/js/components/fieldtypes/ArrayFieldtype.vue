@@ -115,8 +115,8 @@
                     class="flex w-full items-center gap-2"
                     :class="{ 'mt-2': isCompact && valueCount }"
                 >
-                    <ui-button @click="addValue" :disabled="atMax" v-if="!isReadOnly && !isSingle && !isKeyed" :text="addButton" size="sm" />
-                    <ui-button v-if="isCompact" class="ms-auto" size="sm" @click="setCompactOpen(false)">
+                    <ui-button @click="addValue" :disabled="atMax" v-if="!isReadOnly && !isSingle && !isKeyed" :text="addButton" size="sm" :class="compactFooterButtonClass" />
+                    <ui-button v-if="isCompact" class="ms-auto" :class="compactFooterButtonClass" size="sm" @click="setCompactOpen(false)">
                         <span class="st-text-trim-cap">{{ __('Close') }}</span>
                         <span class="ms-1.5 inline-flex h-4 min-w-4 items-center justify-center rounded bg-gray-200/50 px-1 font-semibold uppercase text-[0.625rem] text-gray-600 dark:bg-gray-900 dark:text-gray-400/85">
                             Esc
@@ -249,6 +249,12 @@ export default {
 
         valueHeader() {
             return __(this.config.value_header || 'Value');
+        },
+
+        compactFooterButtonClass() {
+            if (!this.isCompact) return;
+
+            return 'from-white to-white hover:from-white hover:to-gray-50';
         },
 
         hasCompactValues() {
