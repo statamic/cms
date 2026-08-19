@@ -89,6 +89,8 @@ const payload = computed(() => ({
 let lastPostedPayloadKey = null;
 let stopPayloadWatch = null;
 
+const livePreviewDebounceMs = Statamic.$config.get('livePreview.debounce_ms', 150);
+
 const update = debounce(() => {
     const body = payload.value;
     lastPostedPayloadKey = JSON.stringify([body, target.value]);
@@ -114,7 +116,7 @@ const update = debounce(() => {
             if (e.code === 'ERR_CANCELED') return;
             throw e;
         });
-}, 150);
+}, livePreviewDebounceMs);
 
 function componentUpdated(handle, value) {
     extras.value[handle] = value;

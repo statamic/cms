@@ -701,10 +701,9 @@ export default {
         duplicateSet(old_id, attrs, getPos) {
             const id = uniqid();
             const enabled = attrs.enabled;
-            const deepCopy = JSON.parse(JSON.stringify(attrs.values));
-            const values = Object.assign({}, deepCopy);
+            const { values, meta } = this.duplicateValues(attrs.values, this.meta.existing[old_id]);
 
-            this.updateSetMeta(id, this.meta.existing[old_id]);
+            this.updateSetMeta(id, meta);
 
             this.debounceNextUpdate = false;
 
@@ -718,13 +717,12 @@ export default {
         },
 
         async pasteSet(attrs) {
-            const old_id = attrs.id;
             const id = uniqid();
             const enabled = attrs.enabled;
-            const values = Object.assign({}, attrs.values);
+            const { values, meta } = this.duplicateValues(attrs.values, this.meta.existing[attrs.id]);
 
-            if (this.meta.existing[old_id]) {
-                this.updateSetMeta(id, this.meta.existing[old_id]);
+            if (meta) {
+                this.updateSetMeta(id, meta);
             } else {
                 const data = await this.fetchSet(values.type);
                 this.updateSetMeta(id, data.new);

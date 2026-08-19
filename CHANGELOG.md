@@ -1,5 +1,32 @@
 # Release Notes
 
+## 6.27.2 (2026-08-12)
+
+### What's fixed
+- Hash URL in static caching lock key [#15061](https://github.com/statamic/cms/issues/15061) by @david-windsock
+- Tighten get modifier [#15138](https://github.com/statamic/cms/issues/15138) by @jasonvarga
+- Harden SVG sanitization [#15137](https://github.com/statamic/cms/issues/15137) by @jasonvarga
+- Fix CP nav breaking when a form has no title [#15144](https://github.com/statamic/cms/issues/15144) by @jasonvarga
+- Fix template scanning on Windows junctions [#15145](https://github.com/statamic/cms/issues/15145) by @jasonvarga
+- Tighten Antlers variable path resolution [#15154](https://github.com/statamic/cms/issues/15154) by @jasonvarga
+- Fix page tree border radius [#15157](https://github.com/statamic/cms/issues/15157) by @jaygeorge
+- Some CSS rendering performance optimisations [#15156](https://github.com/statamic/cms/issues/15156) by @jaygeorge
+- Update `extraValues` state in `PublishContainer` when prop is updated [#15159](https://github.com/statamic/cms/issues/15159) by @duncanmcclean
+- Resolve `@statamic/cms` types under legacy module resolution [#15160](https://github.com/statamic/cms/issues/15160) by @duncanmcclean
+- Respect collection permissions in the navigation page selector [#15163](https://github.com/statamic/cms/issues/15163) by @jasonvarga
+- Fix non-localizable button group fields being editable in localizations [#15151](https://github.com/statamic/cms/issues/15151) by @lazerg
+- Serve HEAD requests from the static cache [#15168](https://github.com/statamic/cms/issues/15168) by @lazerg
+- Make form email view fields clearable [#15167](https://github.com/statamic/cms/issues/15167) by @lazerg
+- Optimize site loading with hundreds of sites [#14988](https://github.com/statamic/cms/issues/14988) by @lazerg
+- Use a unique temporary path when reading image attributes [#15171](https://github.com/statamic/cms/issues/15171) by @duncanmcclean
+- Keep marked and DOMPurify out of the front-end helpers bundle [#15174](https://github.com/statamic/cms/issues/15174) by @lazerg
+- Add min and max validation rules when configured as zero [#15175](https://github.com/statamic/cms/issues/15175) by @duncanmcclean
+- Fix count() TypeError when entries collections config is a string [#15177](https://github.com/statamic/cms/issues/15177) by @jackmcdade
+- Bump pdfjs-dist from 5.6.205 to 6.2.108 [#15141](https://github.com/statamic/cms/issues/15141) by @dependabot
+- Bump the npm_and_yarn group across 1 directory with 2 updates [#15153](https://github.com/statamic/cms/issues/15153) by @dependabot
+
+
+
 ## 6.27.1 (2026-08-07)
 
 ### What's fixed
