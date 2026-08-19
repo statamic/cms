@@ -10,7 +10,7 @@
                 >
                 </publish-field-fullscreen-header>
 
-                <section :class="{ 'mt-14 p-4': fullScreenMode }">
+                <section ref="gridBody" :class="{ 'mt-14 p-4': fullScreenMode }">
 
                     <ui-error-message v-if="hasExcessRows" :text="__('Max Rows') + ': ' + maxRows" />
                     <ui-error-message v-else-if="hasNotEnoughRows" :text="__('Min Rows') + ': ' + minRows" />
@@ -207,6 +207,7 @@ export default {
 
             this.updateRowMeta(id, this.meta.new);
             this.update([...this.value, row]);
+            this.$nextTick(() => this.$nextTick(() => this.focusNewRow()));
         },
 
         updated(index, row) {
@@ -252,6 +253,23 @@ export default {
 
         focus() {
             // TODO
+        },
+
+        focusNewRow() {
+            const root = this.$refs.gridBody;
+
+            if (!root) return;
+
+            const row =
+                root.querySelector('.grid-table tbody tr:last-child') ||
+                root.querySelector('.grid-stacked > :last-child');
+
+            const focusable = row?.querySelector(
+                'input:not([type="hidden"]):not([disabled]), textarea:not([disabled]), select:not([disabled])',
+            );
+
+            focusable?.focus();
+            row?.scrollIntoView({ block: 'nearest' });
         },
 
         blurred() {
