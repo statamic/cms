@@ -20,6 +20,7 @@ use Statamic\Http\Resources\CP\Entries\Entries;
 use Statamic\Http\Resources\CP\Entries\Entry as EntryResource;
 use Statamic\Query\OrderBy;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
+use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\Hookable;
@@ -55,7 +56,7 @@ class EntriesController extends CpController
             $query->orderBy($sortField, $sortDirection);
         }
 
-        $entries = (new EntriesIndexQuery($query, $collection))->paginate(request('perPage'));
+        $entries = (new EntriesIndexQuery($query, $collection))->paginate(Statamic::cpPerPage(request('perPage')));
 
         if (request('search') && $collection->hasSearchIndex()) {
             $entries->setCollection($entries->getCollection()->map->getSearchable());
@@ -346,7 +347,7 @@ class EntriesController extends CpController
                 ];
             })->values()->all(),
             'revisionsEnabled' => $collection->revisionsEnabled(),
-            'canManagePublishState' => User::current()->can('publish '.$collection->handle().' entries'),
+            'canManagePublishState' => User::current()->can('publish', [EntryContract::class, $collection]),
             'previewTargets' => $collection->previewTargets()->all(),
             'autosaveInterval' => $collection->autosaveInterval(),
             'parent' => $collection->hasStructure() ? $request->parent : null,

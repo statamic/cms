@@ -59,9 +59,9 @@ function exportSubmissions() {
 
 <template>
     <div class="max-w-5xl 3xl:max-w-6xl mx-auto" data-max-width-wrapper>
-        <Head :title="[form.title, __('Forms')]" />
+        <Head :title="[__(form.title), __('Forms')]" />
 
-        <Header :title="form.title" icon="forms">
+        <Header :title="__(form.title)" icon="forms">
             <Dropdown v-if="form.canEdit || form.canDelete" placement="left-start" class="me-2">
                 <DropdownMenu>
                     <DropdownItem v-if="form.canEdit" :text="__('Configure Form')" icon="cog" :href="form.editUrl" />

@@ -17,7 +17,10 @@ const hasError = ref(false);
 let currentRenderId = 0;
 let loadingTask = null;
 let pdfDocument = null;
-let pageElements = [];
+let pageStates = [];
+let observer = null;
+
+const scale = Math.min(2, window.devicePixelRatio || 2);
 
 onMounted(() => renderPdf());
 
@@ -46,14 +49,16 @@ async function renderPdf() {
         if (renderId !== currentRenderId) return;
 
         pdfDocument = pdf;
-        const { linkService, AnnotationLayerBuilder } = await initViewer(pdf);
+        const viewerContext = await initViewer(pdf);
 
+        // Create page placeholders with sized canvases for scrollable layout
         for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
             const page = await pdf.getPage(pageNumber);
 
             if (renderId !== currentRenderId) return;
 
-            const viewport = page.getViewport({ scale: 2 });
+            const viewport = page.getViewport({ scale });
+
             const pageContainer = document.createElement('div');
             pageContainer.className = 'pdf-page';
             pageContainer.dataset.pageNumber = String(pageNumber);
@@ -65,29 +70,50 @@ async function renderPdf() {
             pageContainer.appendChild(canvas);
 
             pages.value?.appendChild(pageContainer);
-            pageElements.push(pageContainer);
 
-            const canvasContext = canvas.getContext('2d');
-            if (!canvasContext) continue;
-
-            await page.render({
-                canvasContext,
+            pageStates.push({
+                pageNumber,
+                page,
                 viewport,
-            }).promise;
-
-            const annotationLayerBuilder = new AnnotationLayerBuilder({
-                pdfPage: page,
-                linkService,
-                renderForms: true,
-                onAppend: (div) => pageContainer.appendChild(div),
+                canvas,
+                container: pageContainer,
+                rendered: false,
+                rendering: false,
+                renderTask: null,
             });
-
-            await annotationLayerBuilder.render({ viewport });
-
-            if (pageNumber === 1 && renderId === currentRenderId) {
-                isLoading.value = false;
-            }
         }
+
+        // Observe pages for viewport proximity and render on demand
+        observer = new IntersectionObserver(
+            (entries) => {
+                for (const entry of entries) {
+                    if (!entry.isIntersecting) continue;
+
+                    const pageNumber = parseInt(entry.target.dataset.pageNumber, 10);
+                    const state = pageStates[pageNumber - 1];
+
+                    if (state && !state.rendered && !state.rendering) {
+                        renderPage(state, renderId, viewerContext);
+                    }
+                }
+            },
+            {
+                root: pages.value,
+                rootMargin: '200px 0px',
+            },
+        );
+
+        for (const state of pageStates) {
+            observer.observe(state.container);
+        }
+
+        if (pageStates.length > 0) {
+            await renderPage(pageStates[0], renderId, viewerContext);
+        }
+
+        if (renderId !== currentRenderId) return;
+
+        isLoading.value = false;
     } catch (error) {
         if (renderId === currentRenderId) {
             hasError.value = true;
@@ -95,9 +121,51 @@ async function renderPdf() {
         }
     } finally {
         if (renderId === currentRenderId) {
-            isLoading.value = false;
             isRendering.value = false;
         }
+    }
+}
+
+async function renderPage(state, renderId, viewerContext) {
+    if (renderId !== currentRenderId) return;
+
+    state.rendering = true;
+
+    try {
+        const { canvas, page, viewport, container } = state;
+        const { linkService, AnnotationLayerBuilder } = viewerContext;
+
+        const canvasContext = canvas.getContext('2d');
+        if (!canvasContext) return;
+
+        const task = page.render({ canvasContext, viewport });
+        state.renderTask = task;
+        await task.promise;
+
+        if (renderId !== currentRenderId) return;
+
+        await new AnnotationLayerBuilder({
+            pdfPage: page,
+            linkService,
+            renderForms: true,
+            onAppend: (div) => container.appendChild(div),
+        }).render({ viewport });
+
+        state.rendered = true;
+    } catch (error) {
+        if (renderId !== currentRenderId) return;
+        if (error?.name === 'RenderingCancelledException') return;
+
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'pdf-page-error';
+        errorDiv.textContent = __('Something went wrong');
+        state.container.appendChild(errorDiv);
+
+        console.warn(`Failed to render PDF page ${state.pageNumber}`, error);
+    } finally {
+        state.page.cleanup();
+        state.rendering = false;
+        state.renderTask = null;
     }
 }
 
@@ -130,10 +198,10 @@ async function initViewer(pdf) {
         isInPresentationMode: false,
         pageLabelToPageNumber: () => null,
         scrollPageIntoView: ({ pageNumber }) => {
-            const pageElement = pageElements[pageNumber - 1];
+            const state = pageStates[pageNumber - 1];
 
-            if (pageElement) {
-                pageElement.scrollIntoView({
+            if (state?.container) {
+                state.container.scrollIntoView({
                     behavior: 'smooth',
                     block: 'start',
                 });
@@ -152,21 +220,23 @@ function cleanup({ invalidateRender = true } = {}) {
 
     isRendering.value = false;
 
-    if (loadingTask) {
-        loadingTask.destroy();
-        loadingTask = null;
+    for (const state of pageStates) {
+        state.renderTask?.cancel();
+        state.renderTask = null;
     }
 
-    if (pdfDocument) {
-        pdfDocument.destroy();
-        pdfDocument = null;
-    }
+    observer?.disconnect();
+    observer = null;
 
-    pageElements = [];
+    loadingTask?.destroy();
+    loadingTask = null;
 
-    if (pages.value) {
-        pages.value.replaceChildren();
-    }
+    pdfDocument?.destroy();
+    pdfDocument = null;
+
+    pageStates = [];
+
+    pages.value?.replaceChildren();
 }
 </script>
 
@@ -186,6 +256,14 @@ function cleanup({ invalidateRender = true } = {}) {
 .pdf-page .annotationLayer {
     inset: 0;
 }
+
+.pdf-page-error {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 </style>
 
 <template>
@@ -195,6 +273,6 @@ function cleanup({ invalidateRender = true } = {}) {
             <div v-if="hasError" class="text-gray-500 flex gap-2" v-text="__('Something went wrong')" />
         </div>
 
-        <div ref="pages" class="pdf-pages h-full min-h-0 overflow-auto"></div>
+        <div ref="pages" class="pdf-pages h-full min-h-0 overflow-auto text-gray-500"></div>
     </div>
 </template>

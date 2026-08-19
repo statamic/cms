@@ -2,7 +2,7 @@
 import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
 import { computed, onBeforeUnmount, ref, useTemplateRef, watch } from 'vue';
-import { Button, Heading, Icon, Modal, Select, Stack } from '@ui';
+import { Button, Heading, Icon, Modal, Radio, RadioGroup, Select, Slider, Stack, Field, Subheading } from '@ui';
 import { keys, toast } from '@api';
 import wait from '@/util/wait';
 import axios from 'axios';
@@ -36,10 +36,65 @@ const animationFrameId = ref(null);
 const imageRef = useTemplateRef('image');
 const showConfirmation = ref(false);
 const uploading = ref(false);
-const pendingBlob = ref(null);
-const pendingMimeType = ref(null);
+const pendingCrop = ref(null);
+const cropDimensions = ref(null);
+const defaultQuality = Statamic.$config.get('cropQuality') || 90;
+
+function normalizeFormat(format) {
+    format = (format || '').toLowerCase();
+    return format === 'jpeg' ? 'jpg' : format;
+}
+
+// The source image's format, normalized (e.g. jpeg -> jpg).
+const sourceFormat = computed(() => normalizeFormat(props.asset.extension));
+
+// We only offer quality/conversion controls for these source types.
+const isConvertible = computed(() => ['jpg', 'png', 'webp', 'avif'].includes(sourceFormat.value));
+
+// PNG is lossless so its quality starts maxed out; lowering it implies the
+// user wants to convert to a lossy format.
+const initialQuality = () => (sourceFormat.value === 'png' ? 100 : defaultQuality);
+
+const format = ref(sourceFormat.value);
+const quality = ref(initialQuality());
+const background = ref('white');
 
 const aspectRatios = ref(Statamic.$config.get('cropAspectRatios') || []);
+
+const formatLabels = { jpg: 'JPEG', png: 'PNG', webp: 'WebP', avif: 'AVIF' };
+
+const formatOptions = computed(() => {
+    // Lossy conversion targets, plus the source format so it can be kept as-is.
+    return [...new Set([sourceFormat.value, 'jpg', 'webp'])].map((value) => ({
+        value,
+        label: formatLabels[value] ?? value.toUpperCase(),
+    }));
+});
+
+// A quality setting only applies to lossy output formats.
+const outputUsesQuality = computed(() => ['jpg', 'webp', 'avif'].includes(format.value));
+
+const showQuality = computed(() => isConvertible.value);
+
+const showFormatSelector = computed(() => isConvertible.value);
+
+// JPEG has no alpha channel, so a potentially-transparent source needs a background colour.
+const showBackground = computed(() => format.value === 'jpg' && ['png', 'webp', 'avif'].includes(sourceFormat.value));
+
+// Changing the format writes a different extension, which can't overwrite the original.
+const canReplaceOutput = computed(() => props.canReplace && format.value === sourceFormat.value);
+
+watch(format, (value) => {
+    if (value === 'png') quality.value = 100;
+});
+
+watch(quality, (value) => {
+    // Lowering a PNG's quality implies the user wants compression, so switch to
+    // WebP — it's lossy but, unlike JPEG, keeps the transparency.
+    if (sourceFormat.value === 'png' && format.value === 'png' && value < 100) {
+        format.value = 'webp';
+    }
+});
 
 watch(() => props.open, (newValue) => {
     if (newValue) {
@@ -65,8 +120,11 @@ function resetState() {
     initialCropBoxCenter.value = null;
     showConfirmation.value = false;
     uploading.value = false;
-    pendingBlob.value = null;
-    pendingMimeType.value = null;
+    pendingCrop.value = null;
+    cropDimensions.value = null;
+    quality.value = initialQuality();
+    format.value = sourceFormat.value;
+    background.value = 'white';
 }
 
 function destroyCropper() {
@@ -118,7 +176,15 @@ function createCropper(imageElement) {
         cropstart: onCropStart,
         cropmove: onCropMove,
         cropend: onCropEnd,
+        crop: onCrop,
     });
+}
+
+function onCrop(event) {
+    cropDimensions.value = {
+        width: Math.round(event.detail.width),
+        height: Math.round(event.detail.height),
+    };
 }
 
 function onCropStart() {
@@ -267,41 +333,23 @@ function expandCropBoxToFill() {
 }
 
 function crop() {
-    const cropBoxData = cropper.value.getCropBoxData();
-    const imageData = cropper.value.getImageData();
+    // Crop box coordinates relative to the original image's natural dimensions.
+    // The actual cropping happens server-side from the original file.
+    const data = cropper.value.getData(true);
 
-    const scaleX = imageData.naturalWidth / imageData.width;
-    const scaleY = imageData.naturalHeight / imageData.height;
-
-    const canvas = cropper.value.getCroppedCanvas({
-        width: cropBoxData.width * scaleX,
-        height: cropBoxData.height * scaleY,
-    });
-
-    if (!canvas) {
+    if (!data || data.width < 1 || data.height < 1) {
         toast.error(__('Failed to crop image'));
         return;
     }
 
-    const outputMimeType = props.asset.mimeType;
-    const quality = outputMimeType === 'image/jpeg' || outputMimeType === 'image/webp' ? 0.95 : undefined;
+    pendingCrop.value = {
+        x: Math.max(0, data.x),
+        y: Math.max(0, data.y),
+        width: data.width,
+        height: data.height,
+    };
 
-    canvas.toBlob((blob) => {
-        if (!blob) {
-            toast.error(__('Failed to create cropped image'));
-            return;
-        }
-
-        const extensionMap = {
-            'image/jpeg': 'jpg',
-            'image/png': 'png',
-            'image/webp': 'webp',
-        };
-        const extension = extensionMap[outputMimeType] || 'png';
-        pendingBlob.value = new File([blob], `cropped-image.${extension}`, { type: outputMimeType });
-        pendingMimeType.value = outputMimeType;
-        showConfirmation.value = true;
-    }, outputMimeType, quality);
+    showConfirmation.value = true;
 }
 
 function reset() {
@@ -366,43 +414,22 @@ function unbindKeyboardShortcuts() {
 }
 
 async function upload(replaceOriginal) {
-    if (!pendingBlob.value) return;
+    if (!pendingCrop.value) return;
 
     uploading.value = true;
 
     try {
-        const [containerHandle, assetPath] = props.asset.id.split('::');
-        const pathParts = assetPath.split('/');
-        let filename = pathParts.pop();
-        const folder = pathParts.length > 0 ? pathParts.join('/') : '/';
-
-        if (!replaceOriginal && pendingMimeType.value && pendingMimeType.value !== props.asset.mimeType) {
-            const extensionMap = { 'image/jpeg': '.jpg', 'image/png': '.png', 'image/webp': '.webp' };
-            const newExtension = extensionMap[pendingMimeType.value];
-            if (newExtension) {
-                filename = filename.replace(/\.[^/.]+$/, '') + newExtension;
-            }
-        }
-
-        const formData = new FormData();
-        const fileToUpload = filename !== pendingBlob.value.name
-            ? new File([pendingBlob.value], filename, { type: pendingBlob.value.type })
-            : pendingBlob.value;
-        formData.append('file', fileToUpload);
-        formData.append('container', containerHandle);
-        formData.append('folder', folder);
-        formData.append('_token', Statamic.$config.get('csrfToken'));
-        formData.append('option', replaceOriginal ? 'overwrite' : 'timestamp');
-
-        const url = cp_url('assets');
-        const response = await axios.post(url, formData, {
-            headers: { 'Content-Type': 'multipart/form-data' },
+        const response = await axios.post(props.asset.cropUrl, {
+            ...pendingCrop.value,
+            format: format.value,
+            quality: outputUsesQuality.value ? quality.value : null,
+            background: showBackground.value ? background.value : null,
+            replace: replaceOriginal,
         });
 
         if (response.data?.data) {
             showConfirmation.value = false;
-            pendingBlob.value = null;
-            pendingMimeType.value = null;
+            pendingCrop.value = null;
             close();
             await wait(300); // wait for this cropper stack to close.
 
@@ -423,8 +450,7 @@ async function upload(replaceOriginal) {
 
 function dismissConfirmation() {
     showConfirmation.value = false;
-    pendingBlob.value = null;
-    pendingMimeType.value = null;
+    pendingCrop.value = null;
 }
 
 function close() {
@@ -446,6 +472,13 @@ function close() {
                 <div class="h-full w-full min-h-0 flex items-center justify-center overflow-hidden">
                     <img ref="image" :src="asset.preview" :crossorigin="crossOrigin" :alt="__('Image to crop')" class="max-w-full max-h-full" @error="onImageError" />
                 </div>
+                <div
+                    v-if="cropDimensions"
+                    class="absolute top-5 end-5 z-10 rounded-md bg-gray-900/75 px-2 py-1 text-xs font-medium text-white tabular-nums pointer-events-none"
+                    :aria-label="__('Dimensions')"
+                    v-text="__('messages.width_x_height', { width: cropDimensions.width, height: cropDimensions.height })"
+                />
+
             </div>
 
             <!-- Footer -->
@@ -461,6 +494,7 @@ function close() {
                         size="sm"
                         class="w-48"
                         :aria-label="__('Select aspect ratio')"
+                        adaptive-width
                         @update:modelValue="setAspectRatio"
                     />
                     <Button
@@ -493,7 +527,52 @@ function close() {
                     <Icon name="loading" />
                 </div>
 
-                <p>{{ canReplace ? __('messages.crop_save_copy_or_replace') : __('messages.crop_save_as_copy_confirm') }}</p>
+                <p>{{ canReplaceOutput ? __('messages.crop_save_copy_or_replace') : __('messages.crop_save_as_copy_confirm') }}</p>
+
+                <div v-if="showQuality" class="mt-6 space-y-4">
+                    <div class="flex justify-between gap-4">
+                        <Field
+                            id="crop-quality"
+                            :label="__('Quality')"
+                            class="w-1/2 space-y-2"
+                        >
+                            <div class="flex items-center gap-2 bg-gray-50 dark:bg-gray-800 rounded-lg p-2 @lg:px-4 @lg:py-3 with-contrast:border with-contrast:border-gray-500">
+                                <Slider id="crop-quality" v-model="quality" :min="1" :max="100" :aria-label="__('Quality')" />
+                                <Subheading :text="`${quality}%`" class="w-14 justify-center" />
+                            </div>
+                        </Field>
+
+                        <Field
+                            v-if="showFormatSelector"
+                            class="w-1/2 space-y-2"
+                            id="crop-format"
+                            :label="__('Format')"
+                        >
+                            <Select
+                                id="crop-format"
+                                v-model="format"
+                                :options="formatOptions"
+                                option-label="label"
+                                option-value="value"
+                                size="sm"
+                                :aria-label="__('Output format')"
+                            />
+                        </Field>
+                    </div>
+
+                    <div v-if="showBackground">
+                        <Field
+                            id="crop-background"
+                            :label="__('Background')"
+                            :instructions="__('messages.crop_jpeg_background_help')"
+                        >
+                            <RadioGroup v-model="background" appearance="inline" :aria-label="__('Background colour')">
+                                <Radio value="white" :label="__('White')" />
+                                <Radio value="black" :label="__('Black')" />
+                            </RadioGroup>
+                        </Field>
+                    </div>
+                </div>
 
                 <template #footer>
                     <div class="flex items-center justify-end space-x-3 pt-3 pb-1">
@@ -504,7 +583,6 @@ function close() {
                             @click="dismissConfirmation"
                         />
                         <Button
-                            :variant="canReplace ? 'default' : 'primary'"
                             :disabled="uploading"
                             :text="__('Save as Copy')"
                             @click="upload(false)"
@@ -512,8 +590,9 @@ function close() {
                         <Button
                             v-if="canReplace"
                             variant="primary"
-                            :disabled="uploading"
+                            :disabled="uploading || !canReplaceOutput"
                             :text="__('Replace Original')"
+                            v-tooltip="canReplace && !canReplaceOutput ? __('messages.crop_replace_unavailable_format') : null"
                             @click="upload(true)"
                         />
                     </div>

@@ -55,6 +55,8 @@ test('popstate prompts the user when the form is dirty', () => {
     add('entry');
     expect(count()).toBe(1);
 
+    // Simulate the browser having already moved to the destination URL before popstate fires.
+    window.history.replaceState({ page: 'B' }, '', '/b');
     window.dispatchEvent(new PopStateEvent('popstate', { state: { page: 'A' } }));
 
     expect(confirmSpy).toHaveBeenCalledWith('statamic::messages.dirty_navigation_warning');
@@ -66,7 +68,7 @@ test('popstate prompts the user when the form is dirty', () => {
 });
 
 test('cancelling the prompt re-pushes the dirty page state and keeps form dirty', () => {
-    const { add, count } = useDirtyState();
+    const { add, remove, count } = useDirtyState();
 
     // The dirty URL/state is captured at the moment add() is called.
     window.history.replaceState({ page: 'B', url: '/b' }, '', '/b');
@@ -76,6 +78,8 @@ test('cancelling the prompt re-pushes the dirty page state and keeps form dirty'
     const pushSpy = vi.spyOn(window.history, 'pushState');
     const backSpy = vi.spyOn(window.history, 'back').mockImplementation(() => {});
 
+    // Simulate the browser having already moved to a different page before popstate fires.
+    window.history.replaceState({ page: 'A', url: '/a' }, '', '/a');
     window.dispatchEvent(new PopStateEvent('popstate', { state: { page: 'A' } }));
 
     expect(confirmSpy).toHaveBeenCalled();
@@ -86,10 +90,12 @@ test('cancelling the prompt re-pushes the dirty page state and keeps form dirty'
     confirmSpy.mockRestore();
     pushSpy.mockRestore();
     backSpy.mockRestore();
+
+    remove('entry'); // prevent dirty state from leaking into subsequent tests via accumulated listeners
 });
 
 test('popstate stops propagation so Inertia\'s listener cannot wipe form data', () => {
-    const { add } = useDirtyState();
+    const { add, remove } = useDirtyState();
     const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(false);
 
     add('entry');
@@ -98,11 +104,32 @@ test('popstate stops propagation so Inertia\'s listener cannot wipe form data', 
     const inertiaListener = () => { inertiaListenerFired = true; };
     window.addEventListener('popstate', inertiaListener);
 
+    // Simulate the browser having already moved to a different page before popstate fires.
+    window.history.replaceState({ page: 'B' }, '', '/b');
     window.dispatchEvent(new PopStateEvent('popstate', { state: { page: 'A' } }));
 
     expect(inertiaListenerFired).toBe(false);
 
     window.removeEventListener('popstate', inertiaListener);
+    confirmSpy.mockRestore();
+
+    remove('entry'); // prevent dirty state from leaking into subsequent tests via accumulated listeners
+});
+
+test('popstate is ignored for hash-only changes (e.g. tab switching)', () => {
+    const { add, count } = useDirtyState();
+    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true);
+
+    add('entry');
+    expect(count()).toBe(1);
+
+    // Simulate URL moving to a hash-only variant of the same page (tab switch)
+    window.history.replaceState({ page: 'A', url: '/a' }, '', '/a#tab-2');
+    window.dispatchEvent(new PopStateEvent('popstate', { state: { page: 'A' } }));
+
+    expect(confirmSpy).not.toHaveBeenCalled();
+    expect(count()).toBe(1); // still dirty
+
     confirmSpy.mockRestore();
 });
 
@@ -114,6 +141,8 @@ test('popstate is ignored when confirm_dirty_navigation preference is disabled',
 
     add('entry');
 
+    // Simulate the browser having already moved to a different page before popstate fires.
+    window.history.replaceState({ page: 'B' }, '', '/b');
     window.dispatchEvent(new PopStateEvent('popstate', { state: { page: 'A' } }));
 
     expect(confirmSpy).not.toHaveBeenCalled();

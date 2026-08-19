@@ -6,6 +6,7 @@
         :multiple="true"
         :options="options"
         :placeholder="__(config.placeholder)"
+        :paste-delimiter="config.paste_delimiter || ','"
         :read-only="isReadOnly"
         :taggable="true"
         :should-open-dropdown="(open) => open && options.length > 0"

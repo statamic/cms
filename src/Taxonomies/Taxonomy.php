@@ -28,6 +28,7 @@ use Statamic\Facades\Search;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\URL;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
@@ -44,6 +45,8 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, ContainsQ
     protected $collection;
     protected $defaultPublishState = true;
     protected $searchIndex;
+    protected $sortField;
+    protected $sortDirection;
     protected $previewTargets = [];
     protected $template;
     protected $termTemplate;
@@ -179,12 +182,26 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, ContainsQ
 
     public function sortField()
     {
-        return 'title'; // todo
+        return $this->sortField ?? 'title';
+    }
+
+    public function setSortField($field)
+    {
+        $this->sortField = $field;
+
+        return $this;
     }
 
     public function sortDirection()
     {
-        return 'asc'; // todo
+        return $this->sortDirection ?? 'asc';
+    }
+
+    public function setSortDirection($dir)
+    {
+        $this->sortDirection = $dir;
+
+        return $this;
     }
 
     public function queryTerms()
@@ -289,6 +306,11 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, ContainsQ
             'term_template' => $this->termTemplate,
             'layout' => $this->layout,
         ];
+
+        $data = Arr::removeNullValues(array_merge($data, [
+            'sort_by' => $this->sortField,
+            'sort_dir' => $this->sortDirection,
+        ]));
 
         if (Site::multiEnabled()) {
             $data['sites'] = $this->sites;
@@ -443,7 +465,7 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, ContainsQ
 
     public function createLabel()
     {
-        $key = "statamic::messages.{$this->handle()}_taxonomy_create_term";
+        $key = "messages.{$this->handle()}_taxonomy_create_term";
 
         $translation = __($key);
 

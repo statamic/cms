@@ -187,6 +187,7 @@ return [
     'publish_actions_publish' => 'Ændringer i arbejdskopien anvendes og den offentliggøres straks.',
     'publish_actions_schedule' => 'Ændringer i arbejdskopien anvendes og den vises offentliggjort på den valgte dato.',
     'publish_actions_unpublish' => 'Den aktuelle revision vil ikke blive offentliggjort.',
+    'relationship_item_unavailable' => 'Dette element er ikke tilgængeligt. Det er muligvis blevet slettet, eller du har måske ikke tilladelse til at se det.',
     'reset_password_notification_body' => 'Du modtager denne e-mail, fordi vi modtog en anmodning om nulstilling af adgangskode til din konto.',
     'reset_password_notification_no_action' => 'Hvis du ikke anmodede om nulstilling af adgangskode, er der ikke behov for yderligere handling.',
     'reset_password_notification_subject' => 'Nulstil adgangskode besked',

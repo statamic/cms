@@ -330,4 +330,39 @@ class StatamicTest extends TestCase
     {
         $app['config']->set('app.asset_url', 'http://test-asset-url.com');
     }
+
+    #[Test]
+    #[DataProvider('cpPerPageProvider')]
+    public function it_resolves_cp_per_page($input, $expected)
+    {
+        config(['statamic.cp.pagination_size_options' => [10, 25, 50, 100, 500]]);
+
+        $this->assertSame($expected, Statamic::cpPerPage($input));
+    }
+
+    public static function cpPerPageProvider()
+    {
+        return [
+            'in range' => [10, 10],
+            'at ceiling' => [500, 500],
+            'above ceiling' => [99999, 500],
+            'numeric string above ceiling' => ['99999', 500],
+            'null' => [null, null],
+            'empty string' => ['', null],
+            'zero' => [0, 1],
+            'negative' => [-5, 1],
+        ];
+    }
+
+    #[Test]
+    public function cp_per_page_falls_back_to_pagination_size_when_options_empty()
+    {
+        config([
+            'statamic.cp.pagination_size_options' => [],
+            'statamic.cp.pagination_size' => 50,
+        ]);
+
+        $this->assertSame(50, Statamic::cpPerPage(1000));
+        $this->assertSame(25, Statamic::cpPerPage(25));
+    }
 }

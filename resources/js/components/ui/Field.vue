@@ -16,6 +16,8 @@ const props = defineProps({
     inline: { type: Boolean, default: false },
     /** Badge text to display next to the label. */
     badge: { type: String, default: '' },
+    /** The reading direction of the field's label, instructions, and errors. */
+    dir: { type: String, default: null },
     disabled: { type: Boolean, default: false },
     /** Error message to display below the field. */
     error: { type: String },
@@ -52,25 +54,10 @@ const rootClasses = computed(() =>
             },
             inline: {
                 true: 'grid md:grid-cols-2 items-start px-4.5 py-4 gap-y-3 md:gap-y-0 md:gap-x-5!',
+                false: 'flex flex-col gap-2',
             },
             fullWidthSetting: {
-                true: 'md:grid-cols-1',
-            },
-        },
-    })({
-        ...props,
-    })),
-);
-
-const descriptionClasses = computed(() =>
-    twMerge(cva({
-        base: ['mb-2 -mt-0.5'],
-        variants: {
-            inline: {
-                true: 'mb-0',
-            },
-            fullWidthSetting: {
-                true: 'mb-3',
+                true: 'md:grid-cols-1 md:gap-y-3',
             },
         },
     })({
@@ -95,36 +82,31 @@ const hasErrors = computed(() => {
 </script>
 
 <template>
-    <div :class="[rootClasses, $attrs.class]" data-ui-input-group :data-ui-field-has-errors="hasErrors ? '' : null">
-        <div v-if="label || (instructions && !instructionsBelow) || $slots.label || $slots.actions">
+    <div :class="[rootClasses, $attrs.class]" :dir="dir" data-ui-input-group :data-ui-field-has-errors="hasErrors ? '' : null">
+        <div
+            v-if="label || $slots.label || $slots.actions || (instructions && !instructionsBelow)"
+            class="flex flex-col gap-1.5"
+            data-ui-field-header
+        >
             <div
                 v-if="$slots.actions"
-                :class="[
-                    'flex items-center gap-x-1 mb-0',
-                    props.label || $slots.label ? 'justify-between' : 'justify-end',
-                ]"
-                data-ui-field-header
+                class="flex items-center gap-x-1"
+                :class="label || $slots.label ? 'justify-between' : 'justify-end'"
             >
                 <slot name="label">
                     <Label v-if="label" v-bind="labelProps" class="flex-1" />
                 </slot>
                 <slot name="actions" />
             </div>
-            <div
-                v-if="(!$slots.actions && (label || (instructions && !instructionsBelow) || $slots.label)) || ($slots.actions && instructions && !instructionsBelow)"
-                data-ui-field-text
-                :class="inline ? 'mb-0' : 'mb-2'"
-            >
-                <slot v-if="!$slots.actions" name="label">
-                    <Label v-if="label" v-bind="labelProps" class="flex-1" />
-                </slot>
-                <Description :text="instructions" v-if="instructions && !instructionsBelow" :class="descriptionClasses" />
-            </div>
+            <slot v-else name="label">
+                <Label v-if="label" v-bind="labelProps" />
+            </slot>
+            <Description :text="instructions" v-if="instructions && !instructionsBelow" />
         </div>
         <slot />
-        <div v-if="(instructions && instructionsBelow) || hasErrors">
-            <Description :text="instructions" v-if="instructions && instructionsBelow" class="mt-2" />
-            <ErrorMessage v-if="errors" v-for="(error, i) in errors" :key="i" :text="error" class="mt-2" />
+        <div v-if="(instructions && instructionsBelow) || hasErrors" class="flex flex-col gap-2">
+            <Description :text="instructions" v-if="instructions && instructionsBelow" />
+            <ErrorMessage v-if="errors" v-for="(error, i) in errors" :key="i" :text="error" />
         </div>
     </div>
 </template>

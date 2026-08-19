@@ -61,7 +61,7 @@ function formatDate(value) {
                 <ui-description v-if="!items.length" class="flex-1 flex items-center justify-center">
                     {{ __('This form is awaiting responses') }}
                 </ui-description>
-                <div class="px-4 py-3">
+                <div class="px-4 py-3 overflow-x-auto">
                     <table class="w-full widget-table">
                         <TableHead :sr-only="!props.showTableHeader" />
                         <TableBody>

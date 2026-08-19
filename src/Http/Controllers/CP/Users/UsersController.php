@@ -9,6 +9,7 @@ use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Action;
 use Statamic\Facades\CP\Toast;
+use Statamic\Facades\OAuth;
 use Statamic\Facades\Scope;
 use Statamic\Facades\Search;
 use Statamic\Facades\TwoFactor;
@@ -22,6 +23,7 @@ use Statamic\Query\OrderBy;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 use Statamic\Rules\UniqueUserValue;
 use Statamic\Search\Result;
+use Statamic\Statamic;
 use Symfony\Component\Mailer\Exception\TransportException;
 
 use function Statamic\trans as __;
@@ -95,7 +97,7 @@ class UsersController extends CpController
             $query->orderBy($sortField, $sortDirection);
         }
 
-        $users = $query->paginate(request('perPage'));
+        $users = $query->paginate(Statamic::cpPerPage(request('perPage')));
 
         if ($users->getCollection()->first() instanceof Result) {
             $users->setCollection($users->getCollection()->map->getSearchable());
@@ -278,6 +280,7 @@ class UsersController extends CpController
                 'editBlueprint' => cp_route('blueprints.users.edit'),
             ],
             'canEditBlueprint' => User::current()->can('configure fields'),
+            'oauthEnabled' => OAuth::enabled(),
             'canEditPassword' => User::fromUser($request->user())->can('editPassword', $user),
             'requiresCurrentPassword' => $isCurrentUser = $request->user()->id === $user->id(),
             'itemActions' => Action::for($user, ['view' => 'form']),

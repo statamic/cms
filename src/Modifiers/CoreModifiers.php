@@ -899,14 +899,8 @@ class CoreModifiers extends Modifier
         // available data. Then grab the requested variable from there.
         $array = $item instanceof Augmentable ? $item->toDeferredAugmentedArray() : $item->toArray();
 
-        if ($arrayValue = Arr::get($array, $var)) {
-            return $arrayValue;
-        }
-
-        // Finally, try to call a method on the object
-        $method = Str::slug($var);
-        if (method_exists($item, $method)) {
-            return $item->$method();
+        if (Arr::has($array, $var)) {
+            return Arr::get($array, $var);
         }
 
         // If after all is said and done, there's still nothing, just show the original value.
@@ -1195,7 +1189,9 @@ class CoreModifiers extends Modifier
     /**
      * Check if an item exists in an array using "dot" notation.
      *
-     * @param  $value
+     * @param  array  $haystack
+     * @param  array  $params
+     * @param  array  $context
      * @return bool
      */
     public function inArray($haystack, $params, $context)
@@ -1526,14 +1522,18 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Returns the last $params[0] characters of a string, or the last element of an array.
+     * Returns the last $params[0] characters of a string, or the last element of an array or Collection.
      *
-     * @return string
+     * @return mixed
      */
     public function last($value, $params)
     {
         if (is_array($value)) {
             return Arr::last($value);
+        }
+
+        if ($value instanceof Collection) {
+            return $value->last();
         }
 
         return Stringy::last($value, Arr::get($params, 0));
@@ -1705,7 +1705,6 @@ class CoreModifiers extends Modifier
     /**
      * Generate an md5 hash of a value.
      *
-     * @param  $params
      * @return string
      */
     public function md5($value)
@@ -2897,7 +2896,6 @@ class CoreModifiers extends Modifier
      * Converts a Carbon instance to a timestamp.
      *
      * @param  Carbon  $value
-     * @param  array  $params
      * @return int
      */
     public function timestamp($value)

@@ -34,4 +34,18 @@ class InstalledTest extends TestCase
         $this->assertEquals('yes', $this->tag('{{ installed:hasselhoff/baywatch-embeds }}yes{{ /installed:hasselhoff/baywatch-embeds }}'));
         $this->assertEquals('', $this->tag('{{ installed:hasselhoff/lotr-embeds }}yes{{ /installed:hasselhoff/lotr-embeds }}'));
     }
+
+    #[Test]
+    public function it_can_check_if_package_is_installed_using_param()
+    {
+        $this->assertEquals('yes', $this->tag('{{ installed package="hasselhoff/baywatch-embeds" }}yes{{ /installed }}'));
+        $this->assertEquals('', $this->tag('{{ installed package="hasselhoff/lotr-embeds" }}yes{{ /installed }}'));
+    }
+
+    #[Test]
+    public function it_outputs_empty_when_passing_nothing()
+    {
+        $this->assertEquals('', $this->tag('{{ installed package="" }}yes{{ /installed }}'));
+        $this->assertEquals('', $this->tag('{{ installed :package="null" }}yes{{ /installed }}'));
+    }
 }

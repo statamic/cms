@@ -184,6 +184,7 @@ class TabTest extends TestCase
                             'type' => 'textarea',
                             'placeholder' => null,
                             'character_limit' => null,
+                            'rows' => null,
                             'default' => null,
                             'antlers' => false,
                             'component' => 'textarea',

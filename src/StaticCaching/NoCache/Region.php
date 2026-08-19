@@ -29,7 +29,8 @@ abstract class Region
     protected function filterContext(array $context)
     {
         $context = collect($context)
-            ->reject(fn ($value, $key) => in_array($key, ['__env', 'app', 'errors', 'resolve', 'resolveComponentsUsing', 'forgetComponentsResolver', 'forgetFactory', 'flushCache', 'constructor']))
+            ->reject(fn ($value, $key) => str_starts_with((string) $key, '__'))
+            ->reject(fn ($value, $key) => in_array($key, ['app', 'errors', 'resolve', 'resolveComponentsUsing', 'forgetComponentsResolver', 'forgetFactory', 'flushCache', 'constructor']))
             ->map(function ($value, $key) {
                 if ($value instanceof InvokableComponentVariable) {
                     return $value->resolveDisplayableValue();
