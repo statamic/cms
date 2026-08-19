@@ -18,7 +18,7 @@
                 </ui-button>
             </template>
 
-            <div ref="editor">
+            <div ref="editor" @keydown.enter="addRowOnEnter">
                 <ui-input-group v-if="isSingle">
                     <ui-input-group-prepend>
                         <select
@@ -274,10 +274,26 @@ export default {
             }
         },
 
-        addValue() {
-            this.data.push(this.newSortableValue());
+        addRowOnEnter(event) {
+            if (!this.isDynamic || this.isReadOnly || this.atMax) return;
+            if (event.target.tagName !== 'INPUT') return;
+
+            event.preventDefault();
+
+            const rows = [...(this.$refs.editor?.querySelectorAll('tr.sortable-row') ?? [])];
+            const current = event.target.closest('tr.sortable-row');
+            const index = rows.indexOf(current);
+
+            this.addValue(index === -1 ? this.data.length : index + 1);
+        },
+
+        addValue(index = this.data.length) {
+            this.data.splice(index, 0, this.newSortableValue());
             this.$nextTick(() => {
-                this.$refs.editor?.querySelector('tr:last-child input')?.focus();
+                this.$refs.editor
+                    ?.querySelectorAll('tr.sortable-row')[index]
+                    ?.querySelector('input')
+                    ?.focus();
             });
         },
 
