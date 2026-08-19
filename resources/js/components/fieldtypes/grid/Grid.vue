@@ -10,7 +10,7 @@
                 >
                 </publish-field-fullscreen-header>
 
-                <section ref="gridBody" :class="{ 'mt-14 p-4': fullScreenMode }">
+                <section :class="{ 'mt-14 p-4': fullScreenMode }">
 
                     <ui-error-message v-if="hasExcessRows" :text="__('Max Rows') + ': ' + maxRows" />
                     <ui-error-message v-else-if="hasNotEnoughRows" :text="__('Min Rows') + ': ' + minRows" />
@@ -207,7 +207,7 @@ export default {
 
             this.updateRowMeta(id, this.meta.new);
             this.update([...this.value, row]);
-            this.$nextTick(() => this.$nextTick(() => this.focusNewRow()));
+            this.focusNewRow(id);
         },
 
         updated(index, row) {
@@ -255,21 +255,21 @@ export default {
             // TODO
         },
 
-        focusNewRow() {
-            const root = this.$refs.gridBody;
-
-            if (!root) return;
-
-            const row =
-                root.querySelector('.grid-table tbody tr:last-child') ||
-                root.querySelector('.grid-stacked > :last-child');
-
+        focusNewRow(id, attempts = 0) {
+            const row = document.querySelector(`[data-grid-row-id="${CSS.escape(id)}"]`);
             const focusable = row?.querySelector(
                 'input:not([type="hidden"]):not([disabled]), textarea:not([disabled]), select:not([disabled])',
             );
 
-            focusable?.focus();
-            row?.scrollIntoView({ block: 'nearest' });
+            if (focusable) {
+                focusable.focus();
+                row.scrollIntoView({ block: 'nearest' });
+                return;
+            }
+
+            if (attempts < 20) {
+                requestAnimationFrame(() => this.focusNewRow(id, attempts + 1));
+            }
         },
 
         blurred() {
