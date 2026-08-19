@@ -34,26 +34,25 @@
             <ui-button icon="add-circle" :text="__('Create Field')" @click="createField" />
         </div>
 
+        <!-- Single stack for picker → settings so selecting a field type swaps content without closing/reopening (no animation). -->
         <Stack
-            v-model:open="isSelectingNewFieldtype"
-            @closed="isSelectingNewFieldtype = false"
-            :title="__('Fieldtypes')"
-            icon="cog"
+            :open="isCreateFieldStackOpen"
+            @update:open="(value) => { if (!value) closeCreateFieldStack() }"
+            @closed="closeCreateFieldStack"
+            :title="isSelectingNewFieldtype ? __('Fieldtypes') : undefined"
+            :icon="isSelectingNewFieldtype ? 'cog' : null"
+            :inset="!!pendingCreatedField"
+            :show-close-button="isSelectingNewFieldtype"
+            :wrap-slot="!pendingCreatedField"
             v-slot="{ close }"
         >
-            <fieldtype-selector @closed="close" @selected="fieldtypeSelected" />
-        </Stack>
-
-        <Stack
-            :open="pendingCreatedField != null"
-            @update:open="(value) => { if (!value) pendingCreatedField = null }"
-            @closed="pendingCreatedField = null"
-            v-slot="{ close }"
-            inset
-            :show-close-button="false"
-            :wrap-slot="false"
-        >
+            <fieldtype-selector
+                v-if="isSelectingNewFieldtype"
+                @closed="onPickerClosed"
+                @selected="fieldtypeSelected"
+            />
             <field-settings
+                v-else-if="pendingCreatedField"
                 ref="settings"
                 :type="pendingCreatedField.config.type"
                 :root="true"
@@ -61,6 +60,7 @@
                 :config="pendingCreatedField.config"
                 :suggestable-condition-fields="suggestableConditionFields"
                 :is-inside-set="isInsideSet"
+                :show-save-only-at-top-level="true"
                 @committed="fieldCreated"
                 @closed="close"
             />
@@ -69,7 +69,7 @@
 </template>
 
 <script>
-import uniqid from 'uniqid';
+import { nanoid as uniqid } from 'nanoid';
 import RegularField from './RegularField.vue';
 import ImportField from './ImportField.vue';
 import LinkFields from './LinkFields.vue';
@@ -87,7 +87,7 @@ export default {
         LinkFields,
         FieldtypeSelector,
         FieldSettings,
-	    Stack,
+        Stack,
     },
 
     props: {
@@ -109,6 +109,12 @@ export default {
             isSelectingNewFieldtype: false,
             pendingCreatedField: null,
         };
+    },
+
+    computed: {
+        isCreateFieldStackOpen() {
+            return this.isSelectingNewFieldtype || this.pendingCreatedField != null;
+        },
     },
 
     mounted() {
@@ -141,6 +147,20 @@ export default {
 
         createField() {
             this.isSelectingNewFieldtype = true;
+        },
+
+        closeCreateFieldStack() {
+            this.isSelectingNewFieldtype = false;
+            this.pendingCreatedField = null;
+        },
+
+        // FieldtypeSelector emits 'closed' after 'selected'; only close stack when user cancelled (no selection).
+        onPickerClosed() {
+            if (this.pendingCreatedField == null) {
+                this.closeCreateFieldStack();
+            } else {
+                this.isSelectingNewFieldtype = false;
+            }
         },
 
         fieldCreated(created) {

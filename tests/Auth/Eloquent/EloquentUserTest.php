@@ -14,6 +14,7 @@ use Statamic\Auth\Eloquent\User as EloquentUser;
 use Statamic\Auth\Eloquent\WebAuthnModel;
 use Statamic\Auth\File\Role;
 use Statamic\Auth\File\UserGroup;
+use Statamic\Auth\PermissionCache;
 use Statamic\Auth\WebAuthn\Serializer;
 use Statamic\Contracts\Auth\Role as RoleContract;
 use Statamic\Contracts\Auth\UserGroup as UserGroupContract;
@@ -240,6 +241,24 @@ class EloquentUserTest extends TestCase
         $this->assertSame([$user->email(), $userTwo->email(), $userThree->email(), $userFour->email()], Facades\User::query()->whereGroupIn(['a', 'b'])->orWhereGroupIn(['c'])->get()->map->email()->all());
     }
 
+    #[Test]
+    public function it_doesnt_save_roles_inherited_from_groups_to_the_role_user_table()
+    {
+        $directRole = Facades\Role::make('direct');
+        $groupRole = Facades\Role::make('grouped');
+        $group = (new UserGroup)->handle('usergroup')->assignRole($groupRole);
+
+        Facades\Role::shouldReceive('find')->with('direct')->andReturn($directRole);
+        Facades\Role::shouldReceive('find')->with('grouped')->andReturn($groupRole);
+        Facades\UserGroup::shouldReceive('find')->with('usergroup')->andReturn($group);
+
+        $user = $this->createPermissible()->assignRole($directRole)->addToGroup($group);
+        $user->save();
+
+        $this->assertSame(['direct'], \DB::table(config('statamic.users.tables.role_user', 'role_user'))->where('user_id', $user->id())->pluck('role_id')->all());
+        $this->assertSame(['usergroup'], \DB::table(config('statamic.users.tables.group_user', 'group_user'))->where('user_id', $user->id())->pluck('group_id')->all());
+    }
+
     public function makeUser()
     {
         return (new EloquentUser)
@@ -336,6 +355,34 @@ class EloquentUserTest extends TestCase
     }
 
     #[Test]
+    public function merge_does_not_set_roles_and_groups_as_model_attributes()
+    {
+        $user = $this->user();
+
+        $user->merge(['name' => 'Updated Name']);
+
+        $attributes = $user->model()->getAttributes();
+
+        $this->assertArrayNotHasKey('roles', $attributes);
+        $this->assertArrayNotHasKey('groups', $attributes);
+        $this->assertEquals('Updated Name', $attributes['name']);
+    }
+
+    #[Test]
+    public function data_does_not_set_roles_and_groups_as_model_attributes()
+    {
+        $user = $this->user();
+
+        $user->data($user->data()->merge(['name' => 'Updated Name'])->all());
+
+        $attributes = $user->model()->getAttributes();
+
+        $this->assertArrayNotHasKey('roles', $attributes);
+        $this->assertArrayNotHasKey('groups', $attributes);
+        $this->assertEquals('Updated Name', $attributes['name']);
+    }
+
+    #[Test]
     #[Group('passkeys')]
     public function it_gets_passkeys()
     {
@@ -396,5 +443,64 @@ class EloquentUserTest extends TestCase
             ->map(fn (Passkey $passkey) => [$passkey->name(), $passkey->model()->getKey()])
             ->all()
         );
+    }
+
+    #[Test]
+    public function permissions_are_cached_after_first_call()
+    {
+        $role = Facades\Role::make('editor')->addPermission('access cp');
+        Facades\Role::shouldReceive('find')->with('editor')->andReturn($role);
+
+        $user = $this->createPermissible()->assignRole($role);
+        $user->save();
+
+        $cache = app(PermissionCache::class);
+
+        $this->assertNull($cache->get($user->id()));
+
+        $user->permissions();
+
+        $this->assertNotNull($cache->get($user->id()));
+        $this->assertTrue($cache->get($user->id())->contains('access cp'));
+    }
+
+    #[Test]
+    public function permissions_are_read_from_cache_on_subsequent_calls()
+    {
+        $role = Facades\Role::make('editor')->addPermission('access cp');
+        Facades\Role::shouldReceive('find')->with('editor')->andReturn($role);
+
+        $user = $this->createPermissible()->assignRole($role);
+        $user->save();
+
+        $cache = app(PermissionCache::class);
+
+        // Seed the cache with different data to prove subsequent calls use it
+        $cache->put($user->id(), collect(['cached-permission']));
+
+        $this->assertEquals(['cached-permission'], $user->permissions()->all());
+        $this->assertTrue($user->hasPermission('cached-permission'));
+        $this->assertFalse($user->hasPermission('access cp'));
+    }
+
+    #[Test]
+    public function permissions_cache_is_invalidated_when_cleared()
+    {
+        $role = Facades\Role::make('editor')->addPermission('access cp');
+        Facades\Role::shouldReceive('find')->with('editor')->andReturn($role);
+
+        $user = $this->createPermissible()->assignRole($role);
+        $user->save();
+
+        $cache = app(PermissionCache::class);
+
+        $user->permissions();
+        $this->assertNotNull($cache->get($user->id()));
+
+        $cache->clear();
+        $this->assertNull($cache->get($user->id()));
+
+        // Recomputes correctly after cache is cleared
+        $this->assertTrue($user->permissions()->contains('access cp'));
     }
 }

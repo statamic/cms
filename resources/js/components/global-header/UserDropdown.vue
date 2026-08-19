@@ -4,7 +4,7 @@ import { Avatar, Button, DropdownHeader, Badge, Dropdown, DropdownMenu, Dropdown
 import useStatamicPageProps from '@/composables/page-props.js';
 
 const { supportUrl } = useStatamicPageProps();
-const logoutUrl = `${cp_url('auth/logout')}?redirect=${cp_url('/')}`;
+const logoutUrl = `${cp_url('auth/logout')}?redirect=${cp_url('auth/login')}`;
 const user = Statamic.user;
 const isImpersonating = computed((() => user.is_impersonating));
 </script>

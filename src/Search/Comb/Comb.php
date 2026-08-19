@@ -1009,8 +1009,12 @@ class Comb
             return $words;
         }
 
+        $lowercasedStopWords = collect($this->stop_words)
+            ->map(fn ($word) => Str::lower($word))
+            ->all();
+
         foreach ($words as $key => $word) {
-            if (in_array($word, $this->stop_words)) {
+            if (in_array(Str::lower($word), $lowercasedStopWords)) {
                 unset($words[$key]);
             }
         }

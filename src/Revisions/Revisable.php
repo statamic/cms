@@ -64,6 +64,18 @@ trait Revisable
         return $revision->toWorkingCopy();
     }
 
+    public function saveToWorkingCopy()
+    {
+        if (! $this->revisionsEnabled() || ! $this->hasWorkingCopy()) {
+            return false;
+        }
+
+        $workingCopy = $this->workingCopy();
+        $workingCopy->attributes($this->revisionAttributes());
+
+        return $workingCopy->save();
+    }
+
     public function deleteWorkingCopy()
     {
         return optional($this->workingCopy())->delete();

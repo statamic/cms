@@ -68,7 +68,7 @@ return [
 
     'pagination_size' => 50,
 
-    'pagination_size_options' => [10, 25, 50, 100, 500],
+    'pagination_size_options' => [10, 25, 50, 100],
 
     /*
     |--------------------------------------------------------------------------
@@ -86,8 +86,7 @@ return [
     | Support Link
     |--------------------------------------------------------------------------
     |
-    | Set the location of the support link in the "Useful Links" header
-    | dropdown. Use 'false' to remove it entirely.
+    | Set the location of the support link in the header.
     |
     */
 
@@ -115,6 +114,19 @@ return [
     'custom_favicon_url' => env('STATAMIC_CUSTOM_FAVICON_URL', null),
 
     'custom_css_url' => env('STATAMIC_CUSTOM_CSS_URL', null),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Default Timezone
+    |--------------------------------------------------------------------------
+    |
+    | Determines the timezone used when displaying and entering dates in the
+    | Control Panel. Can be overridden by individual date fields. Defaults to
+    | "auto" which uses the browser's local timezone.
+    |
+    */
+
+    'default_timezone' => env('STATAMIC_CP_DEFAULT_TIMEZONE', 'auto'),
 
     /*
     |--------------------------------------------------------------------------

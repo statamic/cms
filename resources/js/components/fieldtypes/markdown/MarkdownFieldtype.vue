@@ -17,7 +17,7 @@
                 <uploader
                     ref="uploader"
                     :enabled="assetsEnabled"
-                    :container="container"
+                    :container="container?.id"
                     :path="folder"
                     @updated="uploadsUpdated"
                     @upload-complete="uploadComplete"
@@ -127,6 +127,7 @@
                                 v-show="mode == 'preview'"
                                 v-html="markdownPreviewText"
                                 class="markdown-preview p-3 prose prose-sm @md/markdown:prose-base"
+                                :dir="contentDirection"
                             ></div>
                         </div>
                     </div>
@@ -159,6 +160,7 @@
 import Fieldtype from '../Fieldtype.vue';
 import { marked } from 'marked';
 import { markRaw } from 'vue';
+import DOMPurify from 'dompurify';
 import { TextRenderer as PlainTextRenderer } from '@davidenke/marked-text-renderer';
 import throttle from '@/util/throttle.js';
 import { Button, Stack } from '@/components/ui';
@@ -183,6 +185,7 @@ import AssetSelector from '../../assets/Selector.vue';
 import Uploader from '../../assets/Uploader.vue';
 import Uploads from '../../assets/Uploads.vue';
 import MarkdownToolbar from './MarkdownToolbar.vue';
+import { useContentDirection } from '@/composables/content-direction';
 // Keymaps
 import 'codemirror/keymap/sublime';
 
@@ -237,6 +240,12 @@ export default {
         Uploads,
         MarkdownToolbar,
 	    Stack,
+    },
+
+    setup() {
+        const { direction: contentDirection } = useContentDirection();
+
+        return { contentDirection };
     },
 
     data() {
@@ -640,7 +649,7 @@ export default {
         updateMarkdownPreview() {
             this.$axios
                 .post(this.meta.previewUrl, { value: this.data, config: this.config })
-                .then((response) => (this.markdownPreviewText = response.data))
+                .then((response) => (this.markdownPreviewText = DOMPurify.sanitize(response.data)))
                 .catch((e) => this.$toast.error(e.response ? e.response.data.message : __('Something went wrong')));
         },
 
@@ -653,7 +662,6 @@ export default {
                     mode: 'gfm',
                     dragDrop: false,
                     keyMap: 'sublime',
-                    direction: document.querySelector('html').getAttribute('dir') ?? 'ltr',
                     lineWrapping: true,
                     viewportMargin: Infinity,
                     tabindex: 0,
@@ -812,6 +820,7 @@ export default {
                     title: __('Toggle Fullscreen Mode'),
                     icon: ({ vm }) => (vm.fullScreenMode ? 'fullscreen-close' : 'fullscreen-open'),
                     quick: true,
+                    visible: this.config.fullscreen,
                     visibleWhenReadOnly: true,
                     run: this.toggleFullscreen,
                 },

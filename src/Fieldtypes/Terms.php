@@ -2,6 +2,7 @@
 
 namespace Statamic\Fieldtypes;
 
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Data\Localization;
 use Statamic\Contracts\Entries\Entry;
@@ -20,9 +21,11 @@ use Statamic\Facades\Term;
 use Statamic\Facades\User;
 use Statamic\GraphQL\Types\TermInterface;
 use Statamic\Http\Resources\CP\Taxonomies\TermsFieldtypeTerms as TermsResource;
+use Statamic\Query\OrderBy;
 use Statamic\Query\OrderedQueryBuilder;
 use Statamic\Query\Scopes\Filter;
 use Statamic\Query\Scopes\Filters\Fields\Terms as TermsFilter;
+use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
@@ -30,6 +33,7 @@ use function Statamic\trans as __;
 
 class Terms extends Relationship
 {
+    use UpdatesReferences;
     protected $canEdit = true;
     protected $canCreate = true;
     protected $canSearch = true;
@@ -243,8 +247,13 @@ class Terms extends Relationship
                     $id = $this->createTermFromString($id, $taxonomy);
                 }
 
+                if (! $id) {
+                    return null;
+                }
+
                 return explode('::', $id, 2)[1];
             })
+                ->filter()
                 ->unique()
                 ->values()
                 ->all();
@@ -281,37 +290,75 @@ class Terms extends Relationship
             return collect();
         }
 
+        // When the user can't view any of the configured taxonomies, return an empty result
+        // set instead of throwing. The picker treats this like the filter-to-viewable case.
+        if ($this->getViewableTaxonomies($this->getConfiguredTaxonomies())->isEmpty()) {
+            return collect();
+        }
+
         $query = $this->getIndexQuery($request);
 
         if ($sort = $this->getSortColumn($request)) {
             $query->orderBy($sort, $this->getSortDirection($request));
         }
 
-        return $request->boolean('paginate', true) ? $query->paginate() : $query->get();
+        return $request->boolean('paginate', true) ? $query->paginate($request->filled('perPage') ? Statamic::cpPerPage($request->integer('perPage')) : 15) : $query->get();
+    }
+
+    private function getViewableTaxonomies(array $taxonomies): Collection
+    {
+        $user = User::current();
+
+        return collect($taxonomies)
+            ->map(fn (string $taxonomyHandle) => Taxonomy::findByHandle($taxonomyHandle))
+            ->filter()
+            ->filter(fn ($taxonomy) => $user->can('view', $taxonomy));
     }
 
     public function getResourceCollection($request, $items)
     {
+        // Derive columns only from a taxonomy the user can view. With none viewable, return
+        // empty data and no columns rather than leaking the structure of an unviewable blueprint.
+        if (! $taxonomy = $this->getColumnTaxonomy($request)) {
+            return JsonResource::collection($items)->additional(['meta' => ['columns' => []]]);
+        }
+
         return (new TermsResource($items, $this))
-            ->blueprint($this->getBlueprint($request))
-            ->columnPreferenceKey("taxonomies.{$this->getFirstTaxonomyFromRequest($request)->handle()}.columns");
+            ->blueprint($taxonomy->termBlueprint())
+            ->columnPreferenceKey("taxonomies.{$taxonomy->handle()}.columns");
     }
 
-    protected function getBlueprint($request)
+    protected function getBlueprint($request = null)
     {
-        return $this->getFirstTaxonomyFromRequest($request)->termBlueprint();
+        return $this->getColumnTaxonomy($request)?->termBlueprint();
+    }
+
+    protected function getColumnTaxonomy($request = null)
+    {
+        $taxonomy = $this->getFirstTaxonomyFromRequest($request);
+
+        // Only derive columns from a taxonomy the user can view. If the first configured
+        // taxonomy isn't viewable, fall back to the first viewable configured taxonomy,
+        // or none at all when the user can view none of them.
+        return User::current()->can('view', $taxonomy)
+            ? $taxonomy
+            : $this->getViewableTaxonomies($this->getConfiguredTaxonomies())->first();
     }
 
     protected function getFirstTaxonomyFromRequest($request)
     {
-        return $request->taxonomies
-            ? Facades\Taxonomy::findByHandle($request->taxonomies[0])
-            : Facades\Taxonomy::all()->first();
+        $taxonomies = $this->getConfiguredTaxonomies();
+
+        $taxonomy = Taxonomy::findByHandle($taxonomyHandle = Arr::first($taxonomies));
+
+        throw_if(! $taxonomy, new TaxonomyNotFoundException($taxonomyHandle));
+
+        return $taxonomy;
     }
 
     public function getSortColumn($request)
     {
-        $column = $request->get('sort');
+        $column = OrderBy::column($request->get('sort'));
 
         if (! $column && ! $request->search) {
             $column = 'title'; // todo: get from taxonomy or config
@@ -369,6 +416,15 @@ class Terms extends Relationship
         })->all();
     }
 
+    protected function authorizeItemData($id): bool
+    {
+        if ($this->usingSingleTaxonomy() && ! Str::contains($id, '::')) {
+            $id = "{$this->taxonomies()[0]}::{$id}";
+        }
+
+        return $this->authorizeViewable(Term::find($id));
+    }
+
     protected function toItemArray($id)
     {
         if ($this->usingSingleTaxonomy() && ! Str::contains($id, '::')) {
@@ -416,9 +472,11 @@ class Terms extends Relationship
     {
         $query = Term::query();
 
-        if ($taxonomies = $request->taxonomies) {
-            $query->whereIn('taxonomy', $taxonomies);
-        }
+        $taxonomies = $this->getViewableTaxonomies($this->getConfiguredTaxonomies())
+            ->map->handle()
+            ->all();
+
+        $query->whereIn('taxonomy', $taxonomies);
 
         if ($search = $request->search) {
             $query->where('title', 'like', '%'.$search.'%');
@@ -471,9 +529,15 @@ class Terms extends Relationship
         $slug = Str::slug($string, '-', $lang);
 
         if (! $term = Facades\Term::find("{$taxonomy}::{$slug}")) {
+            $taxonomy = Facades\Taxonomy::findByHandle($taxonomy);
+
+            if (User::current()->cant('create', [TermContract::class, $taxonomy])) {
+                return null;
+            }
+
             $term = Facades\Term::make()
                 ->slug($slug)
-                ->taxonomy(Facades\Taxonomy::findByHandle($taxonomy))
+                ->taxonomy($taxonomy)
                 ->set('title', $string);
 
             $term->save();
@@ -529,5 +593,27 @@ class Terms extends Relationship
         return collect([
             count($this->getConfiguredTaxonomies()) > 1 ? __($item->taxonomy()->title()) : null,
         ])->filter()->implode(' • ');
+    }
+
+    public function replaceTermReferences($data, ?string $newValue, string $oldValue, string $taxonomy)
+    {
+        $configuredTaxonomies = Arr::wrap($this->config('taxonomies'));
+
+        if (count($configuredTaxonomies) > 0) {
+            if (! in_array($taxonomy, $configuredTaxonomies)) {
+                return $data;
+            }
+
+            return is_string($data)
+                ? $this->replaceValue($data, $newValue, $oldValue)
+                : $this->replaceValuesInArray($data, $newValue, $oldValue);
+        }
+
+        $scopedOldValue = "{$taxonomy}::{$oldValue}";
+        $scopedNewValue = $newValue !== null ? "{$taxonomy}::{$newValue}" : null;
+
+        return is_string($data)
+            ? $this->replaceValue($data, $scopedNewValue, $scopedOldValue)
+            : $this->replaceValuesInArray($data, $scopedNewValue, $scopedOldValue);
     }
 }

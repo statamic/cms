@@ -1,5 +1,5 @@
 <template>
-    <Modal :title="title" :open="open" @update:open="modalClosed">
+    <Modal :title="title" :open="open" blur @update:open="modalClosed">
         <div class="publish-fields p-2">
             <div class="form-group w-full">
                 <template v-if="method === 'password_confirmation'">

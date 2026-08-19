@@ -101,6 +101,11 @@ abstract class AddonTestCase extends OrchestraTestCase
 
         $app['config']->set('statamic.users.repository', 'file');
 
+        $app['config']->set('cache.stores.outpost', [
+            'driver' => 'file',
+            'path' => storage_path('framework/cache/outpost-data'),
+        ]);
+
         $app['config']->set('statamic.stache.watcher', false);
         $app['config']->set('statamic.stache.stores.taxonomies.directory', $directory.'/../tests/__fixtures__/content/taxonomies');
         $app['config']->set('statamic.stache.stores.terms.directory', $directory.'/../tests/__fixtures__/content/taxonomies');
@@ -114,5 +119,15 @@ abstract class AddonTestCase extends OrchestraTestCase
         $app['config']->set('statamic.stache.stores.collection-trees.directory', $directory.'/../tests/__fixtures__/content/structures/collections');
         $app['config']->set('statamic.stache.stores.form-submissions.directory', $directory.'/../tests/__fixtures__/content/submissions');
         $app['config']->set('statamic.stache.stores.users.directory', $directory.'/../tests/__fixtures__/users');
+    }
+
+    protected function getPackage(): string
+    {
+        $reflector = new ReflectionClass($this->addonServiceProvider);
+        $directory = dirname($reflector->getFileName());
+
+        $json = json_decode($this->app['files']->get($directory.'/../composer.json'), true);
+
+        return $json['name'];
     }
 }

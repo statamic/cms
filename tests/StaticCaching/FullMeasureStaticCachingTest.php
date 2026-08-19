@@ -75,10 +75,14 @@ class FullMeasureStaticCachingTest extends TestCase
 
         $region = app(Session::class)->regions()->first();
 
-        // Initial response should be dynamic and not contain javascript.
-        $this->assertEquals('<html><body>1 2</body></html>', $response->getContent());
+        // Initial response should have the placeholder and javascript, NOT the rendered content.
+        $this->assertEquals(vsprintf('<html><body>1 <span class="nocache" data-nocache="%s">%s</span>%s</body></html>', [
+            $region->key(),
+            '<svg>Loading...</svg>',
+            '<script>js here</script>',
+        ]), $response->getContent());
 
-        // The cached response should have the nocache placeholder, and the javascript.
+        // The cached response should be the same as the initial response.
         $this->assertTrue(file_exists($this->dir.'/about_.html'));
         $this->assertEquals(vsprintf('<html><body>1 <span class="nocache" data-nocache="%s">%s</span>%s</body></html>', [
             $region->key(),
@@ -150,10 +154,12 @@ class FullMeasureStaticCachingTest extends TestCase
             ->get('/about')
             ->assertOk();
 
-        // Initial response should be dynamic and not contain javascript.
-        $this->assertEquals('<html><head></head><body>'.csrf_token().'</body></html>', $response->getContent());
+        // Initial response should have the placeholder and the javascript, NOT the real token.
+        $this->assertEquals(vsprintf("<html><head>{$csrfTokenScript}</head><body>STATAMIC_CSRF_TOKEN%s</body></html>", [
+            $nocacheScript,
+        ]), $response->getContent());
 
-        // The cached response should have the token placeholder, and the javascript.
+        // The cached response should be the same as the initial response.
         $this->assertTrue(file_exists($this->dir.'/about_.html'));
         $this->assertEquals(vsprintf("<html><head>{$csrfTokenScript}</head><body>STATAMIC_CSRF_TOKEN%s</body></html>", [
             $nocacheScript,
@@ -168,5 +174,73 @@ class FullMeasureStaticCachingTest extends TestCase
 
         $this->assertEquals(app(Cacher::class)->getNocacheJs(), 'nocache');
         $this->assertEquals(app(Cacher::class)->getCsrfTokenJs(), 'csrf');
+    }
+
+    #[Test]
+    public function excluded_pages_should_have_real_csrf_token()
+    {
+        config(['statamic.static_caching.exclude' => [
+            'urls' => ['/about'],
+        ]]);
+
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('layout', '<html><body>{{ template_content }}</body></html>');
+        $this->viewShouldReturnRaw('default', '{{ csrf_token }}');
+
+        $this->createPage('about');
+
+        $response = $this
+            ->get('/about')
+            ->assertOk();
+
+        // The response should have the real CSRF token, not the placeholder.
+        $this->assertEquals('<html><body>'.csrf_token().'</body></html>', $response->getContent());
+
+        // The page should not be cached.
+        $this->assertFalse(file_exists($this->dir.'/about_.html'));
+    }
+
+    #[Test]
+    public function excluded_pages_should_have_nocache_regions_replaced()
+    {
+        config(['statamic.static_caching.exclude' => [
+            'urls' => ['/about'],
+        ]]);
+
+        app()->instance('example_count', 0);
+
+        (new class extends \Statamic\Tags\Tags
+        {
+            public static $handle = 'example_count';
+
+            public function index()
+            {
+                $count = app('example_count');
+                $count++;
+                app()->instance('example_count', $count);
+
+                return $count;
+            }
+        })::register();
+
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('layout', '<html><body>{{ template_content }}</body></html>');
+        $this->viewShouldReturnRaw('default', '{{ example_count }} {{ nocache }}{{ example_count }}{{ /nocache }}');
+
+        $this->createPage('about');
+
+        StaticCache::nocacheJs('js here');
+        StaticCache::nocachePlaceholder('<svg>Loading...</svg>');
+
+        $response = $this
+            ->get('/about')
+            ->assertOk();
+
+        // The response should have the nocache regions replaced with rendered content, no placeholders or JS.
+        $this->assertEquals('<html><body>1 2</body></html>', $response->getContent());
+        $this->assertStringNotContainsString('<script>', $response->getContent());
+
+        // The page should not be cached.
+        $this->assertFalse(file_exists($this->dir.'/about_.html'));
     }
 }

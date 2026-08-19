@@ -30,9 +30,10 @@ function manageLicenses() {
         v-if="alert"
         :title="__('Licensing Alert')"
         :open="open"
+        blur
         @update:open="snooze"
         icon="alert-alarm-bell"
-        class="[&_[data-ui-heading]]:text-red-700! [&_svg]:text-red-700 dark:[&_[data-ui-heading]]:text-red-400! dark:[&_svg]:text-red-400!"
+        class="[&_[data-ui-heading]]:text-red-600! [&_svg]:text-red-600 dark:[&_[data-ui-heading]]:text-red-400! dark:[&_svg]:text-red-400!"
         :dismissible="false"
     >
         <div class="flex items-center justify-between">

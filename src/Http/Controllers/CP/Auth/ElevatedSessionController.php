@@ -3,14 +3,14 @@
 namespace Statamic\Http\Controllers\CP\Auth;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
-use Statamic\Auth\WebAuthn\Serializer;
 use Statamic\Facades\User;
-use Statamic\Facades\WebAuthn;
+use Statamic\Http\Controllers\Auth\ElevatedSessionController as BaseController;
 
-class ElevatedSessionController
+use function Statamic\trans as __;
+
+class ElevatedSessionController extends BaseController
 {
     public function status(Request $request)
     {
@@ -29,14 +29,7 @@ class ElevatedSessionController
         return $response;
     }
 
-    public function options()
-    {
-        $options = WebAuthn::prepareAssertion();
-
-        return app(Serializer::class)->normalize($options);
-    }
-
-    public function showForm()
+    public function showForm(Request $request)
     {
         $user = User::current();
 
@@ -45,6 +38,7 @@ class ElevatedSessionController
         }
 
         return Inertia::render('auth/ConfirmPassword', [
+            'outside' => false,
             'method' => $method,
             'status' => session('status'),
             'allowPasskey' => $method !== 'verification_code' && $user->passkeys()->isNotEmpty(),
@@ -54,54 +48,27 @@ class ElevatedSessionController
         ]);
     }
 
-    public function confirm(Request $request)
+    protected function buildConfirmResponse(Request $request, $user)
     {
-        $user = User::current();
-
-        $request->validate([
-            'password' => 'required_without_all:verification_code,id',
-            'verification_code' => 'required_without_all:password,id',
-            'id' => 'required_without_all:password,verification_code',
-        ], [
-            'password.required_without_all' => __('statamic::validation.required'),
-            'verification_code.required_without_all' => __('statamic::validation.required'),
-            'id.required_without_all' => __('statamic::validation.required'),
-        ]);
-
-        if ($request->password && ! Hash::check($request->password, $user->password())) {
-            throw ValidationException::withMessages([
-                'password' => [__('statamic::validation.current_password')],
-            ]);
-        }
-
-        if ($request->verification_code && $request->verification_code !== $request->getElevatedSessionVerificationCode()) {
-            throw ValidationException::withMessages([
-                'verification_code' => [__('statamic::validation.elevated_session_verification_code')],
-            ]);
-        }
-
-        if ($request->id) {
-            $credentials = $request->only(['id', 'rawId', 'response', 'type']);
-            WebAuthn::validateAssertion($user, $credentials);
-        }
-
-        session()->elevate();
-
         $redirect = redirect()->intended(cp_route('index'));
 
-        return $request->wantsJson()
-            ? array_merge($this->status($request), ['redirect' => $redirect->getTargetUrl()])
-            : $redirect->with('success', $user->getElevatedSessionMethod() === 'password_confirmation' ? __('Password confirmed') : __('Code verified'));
-    }
-
-    public function resendCode()
-    {
-        if (User::current()->getElevatedSessionMethod() !== 'verification_code') {
-            throw ValidationException::withMessages(['method' => 'Resend code is only available for verification code method']);
+        if ($request->wantsJson()) {
+            return array_merge(
+                $this->status($request),
+                ['redirect' => $redirect->getTargetUrl()]
+            );
         }
 
-        session()->sendElevatedSessionVerificationCode();
+        return $redirect->with(
+            'success',
+            $user->getElevatedSessionMethod() === 'password_confirmation'
+                ? __('Password confirmed')
+                : __('Code verified')
+        );
+    }
 
-        return back()->with('success', __('statamic::messages.elevated_session_verification_code_sent'));
+    protected function throwValidationException(Request $request, array $errors): never
+    {
+        throw ValidationException::withMessages($errors);
     }
 }

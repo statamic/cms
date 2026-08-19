@@ -1,6 +1,18 @@
 <?php
 
 return [
+
+    /*
+    |--------------------------------------------------------------------------
+    | Validation Language Lines
+    |--------------------------------------------------------------------------
+    |
+    | The following language lines contain the default error messages used by
+    | the validator class. Some of these rules have multiple versions such
+    | as the size rules. Feel free to tweak each of these messages here.
+    |
+    */
+
     'accepted' => 'Вы должны принять :attribute.',
     'accepted_if' => 'Вы должны принять :attribute, если :other равно :value.',
     'active_url' => 'Поле :attribute содержит недействительный URL.',
@@ -13,10 +25,12 @@ return [
     'ascii' => 'Поле :attribute должно содержать только однобайтовые буквенно-цифровые символы и знаки.',
     'before' => 'В поле :attribute должна быть дата раньше :date.',
     'before_or_equal' => 'В поле :attribute должна быть дата раньше или равняться :date.',
-    'between.array' => 'Должно быть от :min до :max элементов.',
-    'between.file' => 'Должно быть от :min до :max килобайтов.',
-    'between.numeric' => 'Должно быть между :min и :max.',
-    'between.string' => 'Должно быть от :min до :max символов.',
+    'between' => [
+        'array' => 'Должно быть от :min до :max элементов.',
+        'file' => 'Должно быть от :min до :max килобайтов.',
+        'numeric' => 'Должно быть между :min и :max.',
+        'string' => 'Должно быть от :min до :max символов.',
+    ],
     'boolean' => 'Поле :attribute должно иметь значение логического типа.',
     'can' => 'Поле :attribute содержит неавторизованное значение.',
     'confirmed' => 'Поле :attribute не совпадает с подтверждением.',
@@ -40,14 +54,18 @@ return [
     'exists' => 'Выбранное значение для :attribute некорректно.',
     'file' => 'Поле :attribute должно быть файлом.',
     'filled' => 'Поле :attribute обязательно для заполнения.',
-    'gt.array' => 'Должно быть больше, чем :value элементов.',
-    'gt.file' => 'Должно быть больше, чем :value килобайтов.',
-    'gt.numeric' => 'Должно быть больше, чем :value.',
-    'gt.string' => 'Должно быть больше, чем :value символов.',
-    'gte.array' => 'Должно быть больше или равно :value элементов.',
-    'gte.file' => 'Должно быть больше или равно :value килобайтов.',
-    'gte.numeric' => 'Должно быть больше или равно :value.',
-    'gte.string' => 'Должно быть больше или равно :value символов.',
+    'gt' => [
+        'array' => 'Должно быть больше, чем :value элементов.',
+        'file' => 'Должно быть больше, чем :value килобайтов.',
+        'numeric' => 'Должно быть больше, чем :value.',
+        'string' => 'Должно быть больше, чем :value символов.',
+    ],
+    'gte' => [
+        'array' => 'Должно быть больше или равно :value элементов.',
+        'file' => 'Должно быть больше или равно :value килобайтов.',
+        'numeric' => 'Должно быть больше или равно :value.',
+        'string' => 'Должно быть больше или равно :value символов.',
+    ],
     'image' => 'Поле :attribute должно быть изображением.',
     'in' => 'Выбранное значение для :attribute ошибочно.',
     'in_array' => 'Поле :attribute не существует в :other.',
@@ -57,26 +75,34 @@ return [
     'ipv6' => 'Поле :attribute должно быть действительным IPv6-адресом.',
     'json' => 'Поле :attribute должно быть JSON строкой.',
     'lowercase' => 'Поле :attribute должно быть в нижнем регистре.',
-    'lt.array' => 'Должно быть меньше, чем :value элементов.',
-    'lt.file' => 'Должно быть меньше, чем :value килобайтов.',
-    'lt.numeric' => 'Должно быть меньше, чем :value.',
-    'lt.string' => 'Должно быть меньше, чем :value символов.',
-    'lte.array' => 'Должно быть меньше или равно :value элементов.',
-    'lte.file' => 'Должно быть меньше или равно :value килобайтов.',
-    'lte.numeric' => 'Должно быть меньше или равно :value.',
-    'lte.string' => 'Должно быть меньше или равно :value символов.',
+    'lt' => [
+        'array' => 'Должно быть меньше, чем :value элементов.',
+        'file' => 'Должно быть меньше, чем :value килобайтов.',
+        'numeric' => 'Должно быть меньше, чем :value.',
+        'string' => 'Должно быть меньше, чем :value символов.',
+    ],
+    'lte' => [
+        'array' => 'Должно быть меньше или равно :value элементов.',
+        'file' => 'Должно быть меньше или равно :value килобайтов.',
+        'numeric' => 'Должно быть меньше или равно :value.',
+        'string' => 'Должно быть меньше или равно :value символов.',
+    ],
     'mac_address' => 'Поле :attribute должно быть действительным MAC-адресом.',
-    'max.array' => 'Не может быть больше, чем :max элементов.',
-    'max.file' => 'Не может быть больше, чем :max килобайтов.',
-    'max.numeric' => 'Не может быть больше, чем :max.',
-    'max.string' => 'Не может быть больше, чем :max символов.',
+    'max' => [
+        'array' => 'Не может быть больше, чем :max элементов.',
+        'file' => 'Не может быть больше, чем :max килобайтов.',
+        'numeric' => 'Не может быть больше, чем :max.',
+        'string' => 'Не может быть больше, чем :max символов.',
+    ],
     'max_digits' => 'Поле :attribute не должно содержать более :max цифр.',
     'mimes' => 'Поле :attribute должно быть файлом одного из следующих типов: :values.',
     'mimetypes' => 'Поле :attribute должно быть файлом одного из следующих типов: :values.',
-    'min.array' => 'Не может быть меньше, чем :min элементов.',
-    'min.file' => 'Не может быть меньше, чем :min килобайтов.',
-    'min.numeric' => 'Не может быть меньше, чем :min.',
-    'min.string' => 'Не может быть меньше, чем :min символов.',
+    'min' => [
+        'array' => 'Не может быть меньше, чем :min элементов.',
+        'file' => 'Не может быть меньше, чем :min килобайтов.',
+        'numeric' => 'Не может быть меньше, чем :min.',
+        'string' => 'Не может быть меньше, чем :min символов.',
+    ],
     'min_digits' => 'Поле :attribute должно содержать не менее :min цифр.',
     'missing' => 'Поле :attribute должно отсутствовать.',
     'missing_if' => 'Поле :attribute должно отсутствовать, если :other равно :value.',
@@ -103,10 +129,12 @@ return [
     'required_without' => 'Поле :attribute обязательно для заполнения, когда :values не указано.',
     'required_without_all' => 'Поле :attribute обязательно для заполнения, когда ни одно из :values не указано.',
     'same' => 'Значения полей :attribute и :other должны совпадать.',
-    'size.array' => 'Должно содержать :size элементов.',
-    'size.file' => 'Должно быть :size килобайтов.',
-    'size.numeric' => 'Должно быть :size.',
-    'size.string' => 'Должно быть :size символов.',
+    'size' => [
+        'array' => 'Должно содержать :size элементов.',
+        'file' => 'Должно быть :size килобайтов.',
+        'numeric' => 'Должно быть :size.',
+        'string' => 'Должно быть :size символов.',
+    ],
     'starts_with' => 'Должно начинаться с :values',
     'string' => 'Поле :attribute должно быть строкой.',
     'timezone' => 'Поле :attribute должно быть действительным часовым поясом.',
@@ -116,8 +144,19 @@ return [
     'uppercase' => 'Поле :attribute должно быть в верхнем регистре.',
     'url' => 'Поле :attribute имеет ошибочный формат URL.',
     'uuid' => 'Поле :attribute должно быть действительным UUID.',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Custom Statamic Validation Language Lines
+    |--------------------------------------------------------------------------
+    |
+    | Here you may validation messages for the custom rules provided by Statamic.
+    |
+    */
+
     'arr_fieldtype' => 'Это неверно.',
     'handle' => 'Должен содержать только строчные буквы и цифры с подчеркиваниями в качестве разделителей.',
+    'handle_starts_with_number' => 'Не может начинаться с цифры.',
     'slug' => 'Должен содержать только буквы и цифры с дефисами или подчеркиваниями в качестве разделителей.',
     'code_fieldtype_rulers' => 'Это недействительно.',
     'composer_package' => 'Должно быть допустимое имя пакета композитора (например, hasselhoff/kung-fury).',
@@ -130,6 +169,7 @@ return [
     'date_fieldtype_time_required' => 'Время обязательно.',
     'duplicate_field_handle' => 'Поле с дескриптором :handle нельзя использовать более одного раза.',
     'duplicate_uri' => 'Дублирующий URI :value',
+    'elevated_session_verification_code' => 'Код подтверждения неверен.',
     'email_available' => 'Пользователь с таким адресом электронной почты уже существует.',
     'fieldset_imported_recursively' => 'Fieldset :handle импортируется рекурсивно.',
     'one_site_without_origin' => 'По крайней мере, один сайт не должен иметь источник.',
@@ -150,6 +190,38 @@ return [
     'asset_file_exists' => 'Файл с таким именем уже существует.',
     'asset_file_exists_same_content' => 'Файл с таким именем и таким же содержимым уже существует. Возможно, вам стоит удалить его, а не переименовывать.',
     'asset_file_exists_different_content' => 'Файл с таким именем уже существует, но имеет другое содержимое. Возможно, вы захотите заменить другой файл этим.',
-    'custom.attribute-name.rule-name' => 'custom-message',
+    'invalid_two_factor_code' => 'Указанный код двухфакторной аутентификации недействителен.',
+    'invalid_two_factor_recovery_code' => 'Указанный код восстановления двухфакторной аутентификации недействителен.',
+    'bard_container_required_by_button' => 'Это поле обязательно из-за кнопки на панели инструментов.',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Custom Validation Language Lines
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify custom validation messages for attributes using the
+    | convention "attribute.rule" to name the lines. This makes it quick to
+    | specify a specific custom language line for a given attribute rule.
+    |
+    */
+
+    'custom' => [
+        'attribute-name' => [
+            'rule-name' => 'custom-message',
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Custom Validation Attributes
+    |--------------------------------------------------------------------------
+    |
+    | The following language lines are used to swap attribute place-holders
+    | with something more reader friendly such as E-Mail Address instead
+    | of "email". This simply helps us make messages a little cleaner.
+    |
+    */
+
     'attributes' => [],
+
 ];

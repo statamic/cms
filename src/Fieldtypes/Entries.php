@@ -2,6 +2,7 @@
 
 namespace Statamic\Fieldtypes;
 
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Collection as SupportCollection;
 use Statamic\Contracts\Data\Localization;
 use Statamic\Contracts\Entries\Entry as EntryContract;
@@ -18,6 +19,7 @@ use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Http\Resources\CP\Entries\EntriesFieldtypeEntries;
 use Statamic\Http\Resources\CP\Entries\EntriesFieldtypeEntry as EntryResource;
+use Statamic\Query\OrderBy;
 use Statamic\Query\OrderedQueryBuilder;
 use Statamic\Query\Scopes\Filter;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
@@ -25,6 +27,7 @@ use Statamic\Query\Scopes\Filters\Fields\Entries as EntriesFilter;
 use Statamic\Query\StatusQueryBuilder;
 use Statamic\Search\Index;
 use Statamic\Search\Result;
+use Statamic\Statamic;
 use Statamic\Support\Arr;
 
 use function Statamic\trans as __;
@@ -149,12 +152,23 @@ class Entries extends Relationship
 
     public function getIndexItems($request)
     {
+        $configuredCollections = $this->getConfiguredCollections();
+
+        // When the user can't view any of the configured collections, return an empty result
+        // set instead of throwing. The picker treats this like the filter-to-viewable case.
+        if ($this->getViewableCollections($configuredCollections)->isEmpty()) {
+            return collect();
+        }
+
         $query = $this->getIndexQuery($request);
 
         $filters = $request->filters;
 
         if (! isset($filters['collection'])) {
-            $query->whereIn('collection', $this->getConfiguredCollections());
+            $query->whereIn(
+                'collection',
+                $this->getViewableCollections($configuredCollections)->map->handle()->all()
+            );
         }
 
         if ($blueprints = $this->config('blueprints')) {
@@ -167,18 +181,33 @@ class Entries extends Relationship
             $query->orderBy($sort, $this->getSortDirection($request));
         }
 
-        $results = ($paginate = $request->boolean('paginate', true)) ? $query->paginate() : $query->get();
+        $results = ($paginate = $request->boolean('paginate', true)) ? $query->paginate($request->filled('perPage') ? Statamic::cpPerPage($request->integer('perPage')) : 15) : $query->get();
 
         $items = $results->map(fn ($item) => $item instanceof Result ? $item->getSearchable() : $item);
 
         return $paginate ? $results->setCollection($items) : $items;
     }
 
+    private function getViewableCollections(array $collections): SupportCollection
+    {
+        $user = User::current();
+
+        return collect($collections)
+            ->map(fn (string $collectionHandle) => Collection::findByHandle($collectionHandle))
+            ->filter(fn ($collection) => $collection && $user->can('view', $collection));
+    }
+
     public function getResourceCollection($request, $items)
     {
+        // Derive columns only from a collection the user can view. With none viewable, return
+        // empty data and no columns rather than leaking the structure of an unviewable blueprint.
+        if (! $collection = $this->getColumnCollection($request)) {
+            return JsonResource::collection($items)->additional(['meta' => ['columns' => []]]);
+        }
+
         return (new EntriesFieldtypeEntries($items, $this))
-            ->blueprint($this->getBlueprint($request))
-            ->columnPreferenceKey("collections.{$this->getFirstCollectionFromRequest($request)->handle()}.columns")
+            ->blueprint($collection->entryBlueprint())
+            ->columnPreferenceKey("collections.{$collection->handle()}.columns")
             ->additional(['meta' => [
                 'activeFilterBadges' => $this->activeFilterBadges,
             ]]);
@@ -186,7 +215,19 @@ class Entries extends Relationship
 
     protected function getBlueprint($request = null)
     {
-        return $this->getFirstCollectionFromRequest($request)->entryBlueprint();
+        return $this->getColumnCollection($request)?->entryBlueprint();
+    }
+
+    protected function getColumnCollection($request = null)
+    {
+        $collection = $this->getFirstCollectionFromRequest($request);
+
+        // Only derive columns from a collection the user can view. If the first requested or
+        // configured collection isn't viewable, fall back to the first viewable configured
+        // collection, or none at all when the user can view none of them.
+        return User::current()->can('view', $collection)
+            ? $collection
+            : $this->getViewableCollections($this->getConfiguredCollections())->first();
     }
 
     protected function getFirstCollectionFromRequest($request)
@@ -208,7 +249,7 @@ class Entries extends Relationship
 
     public function getSortColumn($request)
     {
-        $column = $request->sort ?? 'title';
+        $column = OrderBy::column($request->sort, 'title');
 
         if (! $request->sort && ! $request->search && count($this->getConfiguredCollections()) < 2) {
             $column = $this->getFirstCollectionFromRequest($request)->sortField();
@@ -336,6 +377,11 @@ class Entries extends Relationship
         })->all();
     }
 
+    protected function authorizeItemData($id): bool
+    {
+        return $this->authorizeViewable(Entry::find($id));
+    }
+
     protected function toItemArray($id)
     {
         if (! $entry = Entry::find($id)) {
@@ -424,7 +470,7 @@ class Entries extends Relationship
     {
         return empty($collections = $this->config('collections'))
             ? Collection::handles()->all()
-            : $collections;
+            : Arr::wrap($collections);
     }
 
     public function toGqlType()
@@ -440,17 +486,21 @@ class Entries extends Relationship
 
     public function getColumns()
     {
-        if (count($this->getConfiguredCollections()) === 1) {
-            $columns = $this->getBlueprint()->columns();
+        // Don't derive columns from a blueprint the user can't view; fall back to the
+        // default columns when none of the configured collections are viewable.
+        if (! $collection = $this->getColumnCollection()) {
+            return parent::getColumns();
+        }
 
+        $columns = $collection->entryBlueprint()->columns();
+
+        if (count($this->getConfiguredCollections()) === 1) {
             $this->addColumn($columns, 'status');
 
-            $columns->setPreferred("collections.{$this->getConfiguredCollections()[0]}.columns");
+            $columns->setPreferred("collections.{$collection->handle()}.columns");
 
             return $columns->rejectUnlisted()->values();
         }
-
-        $columns = $this->getBlueprint()->columns();
 
         if ($this->canSelectAcrossSites()) {
             $this->addColumn($columns, 'site');
@@ -466,7 +516,7 @@ class Entries extends Relationship
 
     public function relationshipQueryBuilder()
     {
-        $collections = $this->config('collections');
+        $collections = $this->getConfiguredCollections();
 
         return Entry::query()
             ->when($collections, fn ($query) => $query->whereIn('collection', $collections));

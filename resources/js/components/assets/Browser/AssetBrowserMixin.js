@@ -34,8 +34,20 @@ export default {
     },
 
     methods: {
-        actionCompleted() {
+        actionCompleted(successful = null, response = {}) {
+            successful ? this.actionSuccess(response) : this.actionFailed(response);
+
             this.$emit('action-completed');
+        },
+
+        actionSuccess(response) {
+            if (response.message !== false) {
+                Statamic.$toast.success(response.message || __('Action completed'));
+            }
+        },
+
+        actionFailed(response) {
+            Statamic.$toast.error(response.message || __('Action failed'));
         },
 
         actionStarted() {

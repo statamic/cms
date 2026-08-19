@@ -9,10 +9,11 @@ use Statamic\Facades\Config;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Http\Middleware\CP\AuthenticateSession;
+use Statamic\View\State\StateManager;
 
 abstract class TestCase extends \Orchestra\Testbench\TestCase
 {
-    use WindowsHelpers;
+    use RestoresTestbenchSkeleton, WindowsHelpers;
 
     protected $shouldFakeVersion = true;
     protected $shouldPreventNavBeingBuilt = true;
@@ -20,7 +21,11 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
     protected function setUp(): void
     {
+        $this->prepareTestbenchSkeleton();
+
         parent::setUp();
+
+        StateManager::resetState();
 
         $this->withoutVite();
 
@@ -46,6 +51,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         }
 
         $this->addGqlMacros();
+        $this->addRateLimitMacros();
     }
 
     public function tearDown(): void
@@ -56,7 +62,14 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             $this->deleteFakeStacheDirectory();
         }
 
-        parent::tearDown();
+        // Mockery verifies its expectations inside parent::tearDown() and throws when they
+        // aren't met, which would otherwise skip the restore and leak the failing test's files
+        // into the next one - right when you're already trying to work out what went wrong.
+        try {
+            parent::tearDown();
+        } finally {
+            $this->restoreTestbenchSkeleton();
+        }
     }
 
     protected function getPackageProviders($app)
@@ -68,6 +81,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             \Wilderborn\Partyline\ServiceProvider::class,
             \Archetype\ServiceProvider::class,
             \Spatie\LaravelRay\RayServiceProvider::class,
+            \Laravel\Socialite\SocialiteServiceProvider::class,
         ];
     }
 
@@ -142,6 +156,11 @@ en:
 YAML);
     }
 
+    protected function getPackage(): string
+    {
+        return 'statamic/cms';
+    }
+
     protected function setSites($sites)
     {
         Site::setSites($sites);
@@ -192,6 +211,15 @@ YAML);
         }
 
         $this->assertEquals(count($items), $matches, 'Failed asserting that every item is an instance of '.$class);
+    }
+
+    protected function normalizeYaml(string $yaml): string
+    {
+        // Normalize formatting changes introduced in symfony/yaml 8.1
+        $yaml = str_replace('{  }', '{}', $yaml);
+        $yaml = preg_replace('/^( *)-\n\1  (\S)/m', '$1- $2', $yaml);
+
+        return $yaml;
     }
 
     protected function assertContainsHtml($string)
@@ -271,6 +299,21 @@ YAML);
                     "Header [{$headerName}] was found, but value [{$actual}] does not match [{$value}]."
                 );
             }
+
+            return $this;
+        });
+    }
+
+    private function addRateLimitMacros()
+    {
+        TestResponse::macro('assertRateLimited', function () {
+            Assert::assertSame(429, $this->getStatusCode(), 'Expected request to be rate limited, but it was not.');
+
+            return $this;
+        });
+
+        TestResponse::macro('assertNotRateLimited', function () {
+            Assert::assertNotSame(429, $this->getStatusCode(), 'Expected request not to be rate limited, but it was.');
 
             return $this;
         });

@@ -16,16 +16,36 @@
                 <Field :label="__('Prefix')" :instructions="__('messages.fieldset_import_prefix_instructions')" class="form-group field-w-100">
                     <Input autofocus :model-value="config.prefix" @update:model-value="updateField('prefix', $event)" />
                 </Field>
+
+                <Field
+                    v-if="fieldsetHasSections"
+                    :label="__('Section Behavior')"
+                    :instructions="sectionBehaviorInstructions"
+                    class="form-group field-w-100"
+                >
+                    <RadioGroup
+                        :model-value="sectionBehavior"
+                        @update:model-value="updateField('section_behavior', $event)"
+                    >
+                        <Radio
+                            v-for="option in sectionBehaviorOptions"
+                            :key="option.value"
+                            :label="option.label"
+                            :description="option.description"
+                            :value="option.value"
+                        />
+                    </RadioGroup>
+                </Field>
             </div>
         </CardPanel>
     </StackContent>
 </template>
 
 <script>
-import { Button, Heading, CardPanel, Field, Input, StackHeader, StackContent } from '@/components/ui';
+import { Button, Heading, CardPanel, Field, Input, StackHeader, StackContent, RadioGroup, Radio } from '@/components/ui';
 
 export default {
-    components: { StackContent, StackHeader, Heading, Button, CardPanel, Field, Input },
+    components: { StackContent, StackHeader, Heading, Button, CardPanel, Field, Input, RadioGroup, Radio },
 
     props: ['config', 'isInsideSet'],
 
@@ -46,6 +66,41 @@ export default {
         };
     },
 
+    computed: {
+        fieldsetMeta() {
+            const handle = this.values.fieldset;
+
+            return this.$page?.props?.fieldsets?.[handle] ?? null;
+        },
+
+        fieldsetHasSections() {
+            return this.fieldsetMeta?.has_sections === true;
+        },
+
+        sectionBehavior() {
+            return this.values.section_behavior ?? 'preserve';
+        },
+
+        sectionBehaviorInstructions() {
+            return __('messages.fieldset_import_section_behavior_instructions');
+        },
+
+        sectionBehaviorOptions() {
+            return [
+                {
+                    label: __('Preserve'),
+                    description: __('Keep imported sections as-is.'),
+                    value: 'preserve',
+                },
+                {
+                    label: __('Flatten'),
+                    description: __('Merge all fields into this section.'),
+                    value: 'flatten',
+                },
+            ];
+        },
+    },
+
     methods: {
         focus() {
             this.$els.display.select();
@@ -53,6 +108,10 @@ export default {
 
         updateField(handle, value) {
             this.values[handle] = value;
+
+            if (handle === 'fieldset' && ! this.fieldsetHasSections) {
+                this.values.section_behavior = 'preserve';
+            }
         },
 
         commit(shouldCommitParent = false) {

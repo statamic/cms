@@ -5,6 +5,8 @@ namespace Statamic\Query\Scopes\Filters\Fields;
 use Illuminate\Support\Carbon;
 use Statamic\Support\Arr;
 
+use function Statamic\trans as __;
+
 class Date extends FieldtypeFilter
 {
     public function fieldItems()
@@ -79,10 +81,14 @@ class Date extends FieldtypeFilter
 
     public function isComplete($values): bool
     {
-        $values = array_filter($values);
+        $values = Arr::removeNullValues($values);
 
         if (! $operator = Arr::get($values, 'operator')) {
             return false;
+        }
+
+        if (in_array($operator, ['null', 'not-null'])) {
+            return true;
         }
 
         if ($operator === 'between') {

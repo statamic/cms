@@ -53,6 +53,7 @@ export default {
                     title: __('Toggle Fullscreen Mode'),
                     icon: ({ vm }) => (vm.$refs.codeEditor.fullScreenMode ? 'fullscreen-close' : 'fullscreen-open'),
                     quick: true,
+                    visible: this.config.fullscreen,
                     visibleWhenReadOnly: true,
                     run: ({ vm }) => vm.toggleFullscreen(),
                 },

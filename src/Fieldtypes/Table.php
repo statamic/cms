@@ -6,6 +6,8 @@ use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
 use Statamic\GraphQL\Types\TableRowType;
 
+use function Statamic\trans as __;
+
 class Table extends Fieldtype
 {
     protected $categories = ['structured'];
@@ -37,6 +39,18 @@ class Table extends Fieldtype
                         'instructions' => __('statamic::fieldtypes.table.config.max_columns'),
                         'type' => 'integer',
                         'width' => '50',
+                    ],
+                ],
+            ],
+            [
+                'display' => __('Appearance'),
+                'fields' => [
+                    'fullscreen' => [
+                        'display' => __('Allow Fullscreen Mode'),
+                        'instructions' => __('statamic::fieldtypes.grid.config.fullscreen'),
+                        'type' => 'toggle',
+                        'default' => true,
+                        'width' => 50,
                     ],
                 ],
             ],

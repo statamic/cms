@@ -4,6 +4,7 @@ namespace Statamic\Routing;
 
 use Statamic\Contracts\Routing\UrlBuilder as UrlBuilderContract;
 use Statamic\Facades\Antlers;
+use Statamic\Facades\Parse;
 use Statamic\Facades\URL;
 use Statamic\Support\Str;
 
@@ -48,6 +49,8 @@ class UrlBuilder implements UrlBuilderContract
         $route = (is_array($route)) ? $route[$this->content->locale()] : $route;
 
         $route = $this->convertToAntlers($route);
+
+        $route = Parse::config($route);
 
         $url = Antlers::parse($route, $this->routeData());
 

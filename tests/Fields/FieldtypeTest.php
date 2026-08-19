@@ -12,10 +12,13 @@ use Statamic\Fields\ConfigFields;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
+use Tests\FakesViews;
 use Tests\TestCase;
 
 class FieldtypeTest extends TestCase
 {
+    use FakesViews;
+
     #[Test]
     public function it_gets_the_field()
     {
@@ -627,6 +630,120 @@ class FieldtypeTest extends TestCase
         $this->assertTrue($fieldtype->selectableInForms());
         $this->assertTrue(FieldtypeRepository::hasBeenMadeSelectableInForms('test-selectable'));
         $this->assertTrue(FieldtypeRepository::selectableInFormIsOverriden('test-selectable'));
+    }
+
+    #[Test]
+    public function form_view_returns_the_package_view_for_the_handle()
+    {
+        config(['statamic.templates.language' => 'antlers']);
+
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('statamic::forms.antlers.fields.text', '');
+
+        $fieldtype = new class extends Fieldtype
+        {
+            protected static $handle = 'text';
+        };
+
+        $this->assertEquals('statamic::forms.antlers.fields.text', $fieldtype->view());
+    }
+
+    #[Test]
+    public function form_view_returns_the_blade_package_view_when_language_is_blade()
+    {
+        config(['statamic.templates.language' => 'blade']);
+
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('statamic::forms.blade.fields.text', '', 'blade.php');
+
+        $fieldtype = new class extends Fieldtype
+        {
+            protected static $handle = 'text';
+        };
+
+        $this->assertEquals('statamic::forms.blade.fields.text', $fieldtype->view());
+    }
+
+    #[Test]
+    public function form_view_prefers_a_legacy_published_view_over_the_package_view()
+    {
+        config(['statamic.templates.language' => 'antlers']);
+
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('statamic::forms.fields.text', '');
+        $this->viewShouldReturnRaw('statamic::forms.antlers.fields.text', '');
+
+        $fieldtype = new class extends Fieldtype
+        {
+            protected static $handle = 'text';
+        };
+
+        $this->assertEquals('statamic::forms.fields.text', $fieldtype->view());
+    }
+
+    #[Test]
+    public function form_view_falls_back_to_the_package_default_when_no_handle_view_exists()
+    {
+        config(['statamic.templates.language' => 'antlers']);
+
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('statamic::forms.antlers.fields.default', '');
+
+        $fieldtype = new class extends Fieldtype
+        {
+            protected static $handle = 'unknown';
+        };
+
+        $this->assertEquals('statamic::forms.antlers.fields.default', $fieldtype->view());
+    }
+
+    #[Test]
+    public function form_view_falls_back_to_the_blade_default_when_no_handle_view_exists_and_language_is_blade()
+    {
+        config(['statamic.templates.language' => 'blade']);
+
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('statamic::forms.blade.fields.default', '', 'blade.php');
+
+        $fieldtype = new class extends Fieldtype
+        {
+            protected static $handle = 'unknown';
+        };
+
+        $this->assertEquals('statamic::forms.blade.fields.default', $fieldtype->view());
+    }
+
+    #[Test]
+    public function form_view_uses_a_legacy_published_default_view_when_no_handle_view_exists()
+    {
+        config(['statamic.templates.language' => 'antlers']);
+
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('statamic::forms.fields.default', '');
+
+        $fieldtype = new class extends Fieldtype
+        {
+            protected static $handle = 'unknown';
+        };
+
+        $this->assertEquals('statamic::forms.fields.default', $fieldtype->view());
+    }
+
+    #[Test]
+    public function form_view_prefers_a_legacy_published_default_over_the_package_default()
+    {
+        config(['statamic.templates.language' => 'antlers']);
+
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('statamic::forms.fields.default', '');
+        $this->viewShouldReturnRaw('statamic::forms.antlers.fields.default', '');
+
+        $fieldtype = new class extends Fieldtype
+        {
+            protected static $handle = 'unknown';
+        };
+
+        $this->assertEquals('statamic::forms.fields.default', $fieldtype->view());
     }
 
     #[Test]

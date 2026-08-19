@@ -1,12 +1,13 @@
 <template>
-    <Badge v-if="count" :text="String(count)" color="red" size="sm" pill />
+    <Badge v-if="count" :text="String(count)" :color="security ? 'red' : 'amber'" size="sm" pill />
 </template>
 
 <script>
 import { ref } from 'vue';
 import { Badge } from '@/components/ui';
 
-const count = ref(null);
+const countRef = ref(null);
+const securityRef = ref(false);
 const requested = ref(false);
 
 export default {
@@ -16,7 +17,10 @@ export default {
 
     computed: {
         count() {
-            return count.value;
+            return countRef.value;
+        },
+        security() {
+            return securityRef.value;
         },
     },
 
@@ -30,7 +34,10 @@ export default {
 
             this.$axios
                 .get(cp_url('updater/count'))
-                .then((response) => (count.value = !isNaN(response.data) ? response.data : 0));
+                .then((response) => {
+                    countRef.value = response.data?.count ?? 0;
+                    securityRef.value = response.data?.security ?? false;
+                });
 
             requested.value = true;
         },

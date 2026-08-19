@@ -3,11 +3,13 @@
 namespace Statamic\Stache;
 
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Concurrency;
 use Statamic\Events\StacheCleared;
 use Statamic\Events\StacheWarmed;
 use Statamic\Extensions\FileStore;
+use Statamic\Facades\Blink;
 use Statamic\Facades\File;
 use Statamic\Stache\Stores\Store;
 use Statamic\Support\Str;
@@ -17,6 +19,10 @@ use Symfony\Component\Lock\LockInterface;
 class Stache
 {
     protected $sites;
+
+    /**
+     * @var Collection<string,Store>
+     */
     protected $stores;
     protected $startTime;
     protected $updateIndexes = true;
@@ -69,6 +75,9 @@ class Stache
         return $this;
     }
 
+    /**
+     * @return Collection<string,Store>
+     */
     public function stores()
     {
         return $this->stores;
@@ -102,6 +111,9 @@ class Stache
         $this->duplicates()->clear();
 
         $this->cacheStore()->forget('stache::timing');
+
+        Blink::forget('collection-structure-tree*');
+        Blink::forget('structure-*');
 
         StacheCleared::dispatch();
 

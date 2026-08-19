@@ -46,6 +46,8 @@ const props = defineProps({
         type: [Boolean, undefined],
         default: undefined,
     },
+    /** When `true`, the modal's backdrop will be blurred */
+    blur: { type: Boolean, default: false },
 });
 
 function updateModalOpen(open) {
@@ -79,6 +81,7 @@ const shouldCloseOnSubmit = computed(() => {
         ref="modal"
         :title="__(title)"
         :open="open"
+        :blur="blur"
         :dismissible="cancellable"
         @update:open="updateModalOpen"
         @opened="emit('opened')"
@@ -90,9 +93,13 @@ const shouldCloseOnSubmit = computed(() => {
             <Icon name="loading" />
         </div>
 
-        <p v-if="bodyText" v-text="bodyText" />
+        <p
+            v-if="bodyText"
+            class="text-gray-700 dark:text-gray-200 antialiased"
+            v-text="bodyText"
+        />
         <slot v-else>
-            <p>{{ __('Are you sure?') }}</p>
+            <p class="text-gray-700 dark:text-gray-200 antialiased">{{ __('Are you sure?') }}</p>
         </slot>
 
         <template v-if="cancellable || submittable" #footer>

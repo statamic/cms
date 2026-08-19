@@ -244,20 +244,38 @@ final class Installer
      */
     protected function requireStarterKit(): self
     {
+        $error = null;
+
         spin(
-            function () {
-                $package = $this->branch
-                    ? "{$this->package}:{$this->branch}"
+            function () use (&$error) {
+                $version = $this->branch;
+
+                // Allow dev stability when installing from VCS repo without tagged releases
+                if (! $version && $this->url) {
+                    $version = '@dev';
+                }
+
+                // Allow dev stability when installing from local repo
+                if (! $version && $this->fromLocalRepo) {
+                    $version = '@dev';
+                }
+
+                $package = $version
+                    ? "{$this->package}:{$version}"
                     : $this->package;
 
                 try {
                     Composer::withoutQueue()->throwOnFailure()->require($package);
                 } catch (ProcessException $exception) {
-                    $this->rollbackWithError("Error installing starter kit [{$package}].", $exception->getMessage());
+                    $error = $exception;
                 }
             },
             "Preparing starter kit [{$this->package}]..."
         );
+
+        if ($error) {
+            $this->rollbackWithError("Error installing starter kit [{$this->package}].", $error->getMessage());
+        }
 
         return $this;
     }
@@ -453,7 +471,7 @@ final class Installer
         }
 
         if (confirm('Create a super user?', false)) {
-            $this->console->call('make:user', ['--super' => true]);
+            $this->console->call('statamic:make:user', ['--super' => true]);
         }
 
         return $this;

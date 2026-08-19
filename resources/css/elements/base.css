@@ -151,3 +151,16 @@ code:not(pre *) {
         background: hsl(from var(--theme-color-ui-accent-bg) h s 10 / 0.5);
     }
 }
+
+/**
+	Override the z-index of Reka's popper content wrapper under certain conditions.
+	We can't use a direct descendant selector because the DatePicker is inside a Portal.
+*/
+body:has(
+	[data-ui-modal-content],
+	.stack,
+	.live-preview,
+	.code-fullscreen
+) [data-reka-popper-content-wrapper] {
+    z-index: var(--z-index-portal)!important;
+}

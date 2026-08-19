@@ -2,6 +2,8 @@
 
 namespace Statamic\Auth\File;
 
+use Carbon\Carbon;
+use Illuminate\Support\Collection;
 use Statamic\Auth\WebAuthn\Passkey as BasePasskey;
 use Statamic\Auth\WebAuthn\Serializer;
 
@@ -12,7 +14,11 @@ class Passkey extends BasePasskey
         /** @var User $user */
         $user = $this->user();
 
-        $user->setPasskeys($user->passkeys()->except($this->id()));
+        $remaining = $user->passkeys()->except($this->id());
+
+        $user->setPasskeys($remaining);
+
+        $this->setLastLogins($user, $remaining);
 
         $user->save();
 
@@ -28,6 +34,8 @@ class Passkey extends BasePasskey
 
         $user->setPasskeys($passkeys);
 
+        $this->setLastLogins($user, $passkeys);
+
         $user->save();
 
         return true;
@@ -37,8 +45,28 @@ class Passkey extends BasePasskey
     {
         return [
             'name' => $this->name(),
-            'last_login' => $this->lastLogin()?->timestamp ?? null,
             'credential' => app(Serializer::class)->normalize($this->credential()),
         ];
+    }
+
+    public function lastLogin(): ?Carbon
+    {
+        if (! parent::lastLogin()) {
+            $this->setLastLogin(
+                $this->user()->getMeta('passkey_last_logins', [])[$this->id()] ?? null
+            );
+        }
+
+        return parent::lastLogin();
+    }
+
+    private function setLastLogins(User $user, Collection $passkeys): void
+    {
+        $timestamps = $passkeys
+            ->mapWithKeys(fn (Passkey $passkey) => [$passkey->id() => $passkey->lastLogin()?->timestamp])
+            ->filter()
+            ->all();
+
+        $user->setMeta('passkey_last_logins', $timestamps);
     }
 }

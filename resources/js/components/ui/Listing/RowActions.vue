@@ -4,6 +4,7 @@ import {
     DropdownItem,
     DropdownMenu,
     DropdownSeparator,
+    Skeleton,
 } from '@ui';
 import { injectListingContext } from '../Listing/Listing.vue';
 import ItemActions from '@/components/actions/ItemActions.vue';
@@ -64,20 +65,37 @@ function dropdownHovered(loadActions) {
         :actions="row.actions"
         @started="actionStarted"
         @completed="actionCompleted"
-        v-slot="{ actions, loadActions }"
+        v-slot="{ actions, loadActions, shouldShowSkeleton }"
     >
-        <Dropdown @mouseover="dropdownHovered(loadActions)" placement="left-start" class="me-3">
+        <Dropdown
+            @mouseover="dropdownHovered(loadActions)"
+            @focus="dropdownHovered(loadActions)"
+            @click="dropdownHovered(loadActions)"
+            placement="left-start"
+            class="me-3"
+        >
             <DropdownMenu>
                 <slot name="prepended-actions" :row="row" />
-                <DropdownSeparator v-if="$slots['prepended-actions'] && actions.length" />
-                <DropdownItem
-                    v-for="action in actions"
-                    :key="action.handle"
-                    :text="__(action.title)"
-                    :icon="action.icon"
-                    :variant="action.dangerous ? 'destructive' : 'default'"
-                    @click="action.run"
-                />
+                <DropdownSeparator v-if="hasPrependedActionsContent && (shouldShowSkeleton || actions.length)" />
+                <template v-if="shouldShowSkeleton">
+                    <div v-for="index in 3" :key="index" class="contents">
+                        <Skeleton class="m-1 size-5" />
+                        <Skeleton
+                            class="mx-2 my-1.5 h-5"
+                            :class="index === 1 ? 'w-28' : index === 2 ? 'w-36' : 'w-24'"
+                        />
+                    </div>
+                </template>
+                <template v-else>
+                    <DropdownItem
+                        v-for="action in actions"
+                        :key="action.handle"
+                        :text="__(action.title)"
+                        :icon="action.icon"
+                        :variant="action.dangerous ? 'destructive' : 'default'"
+                        @click="action.run"
+                    />
+                </template>
             </DropdownMenu>
         </Dropdown>
     </ItemActions>

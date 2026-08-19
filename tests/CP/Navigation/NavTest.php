@@ -4,7 +4,6 @@ namespace Tests\CP\Navigation;
 
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Str;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\CP\Navigation\NavItem;
 use Statamic\Facades;
@@ -28,9 +27,6 @@ class NavTest extends TestCase
 
         Route::any('wordpress-importer', ['as' => 'statamic.cp.wordpress-importer.index']);
         Route::any('security-droids', ['as' => 'statamic.cp.security-droids.index']);
-
-        // TODO: Other tests are leaving behind forms without titles that are causing failures here?
-        Facades\Form::shouldReceive('all')->andReturn(collect());
     }
 
     #[Test]
@@ -71,6 +67,26 @@ class NavTest extends TestCase
     }
 
     #[Test]
+    public function it_returns_the_nav_item_when_created_without_a_display_name()
+    {
+        $item = Nav::create(null);
+
+        $this->assertInstanceOf(NavItem::class, $item);
+        $this->assertNull($item->display());
+        $this->assertEquals([$item], Nav::items());
+    }
+
+    #[Test]
+    public function it_returns_the_nav_item_when_created_without_a_display_name_using_the_item_alias()
+    {
+        $item = Nav::item(null);
+
+        $this->assertInstanceOf(NavItem::class, $item);
+        $this->assertNull($item->display());
+        $this->assertEquals([$item], Nav::items());
+    }
+
+    #[Test]
     public function it_can_create_a_nav_item_with_a_more_custom_config()
     {
         Gate::policy(DroidsClass::class, DroidsPolicy::class);
@@ -106,7 +122,10 @@ class NavTest extends TestCase
         $item = $this->build()->get('Utilities')->last();
 
         $this->assertNull($item->icon());
-        $this->assertEquals(\Statamic\Statamic::svg('icons/collections', 'size-4 shrink-0'), $item->svg());
+        $svg = $item->svg();
+        $this->assertStringContainsString('class="size-4 shrink-0"', $svg);
+        $this->assertStringContainsString('viewBox="0 0 17 14"', $svg);
+        $this->assertStringStartsWith('<svg ', $svg);
     }
 
     #[Test]
@@ -115,17 +134,17 @@ class NavTest extends TestCase
         $this->actingAs(tap(User::make()->makeSuper())->save());
 
         Nav::utilities('Test')
-            ->icon('<svg><circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" /></svg>');
+            ->icon('<svg onerror="foo"><circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" /></svg>');
 
         $item = $this->build()->get('Utilities')->last();
 
-        $expected = '<svg><circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" /></svg>';
-
         // ->icon() should return the raw SVG we passed in
-        $this->assertEquals($expected, $item->icon());
+        $expectedIcon = '<svg onerror="foo"><circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" /></svg>';
+        $this->assertEquals($expectedIcon, $item->icon());
 
-        // ->svg() should return the SVG wrapped in classes for styling
-        $this->assertEquals(Str::replace('<svg>', '<svg class="size-4 shrink-0">', $expected), $item->svg());
+        // ->svg() should return the sanitized SVG with classes for styling
+        $expectedSvg = '<svg class="size-4 shrink-0"><circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red"/></svg>';
+        $this->assertEquals($expectedSvg, $item->svg());
     }
 
     #[Test]
@@ -183,6 +202,21 @@ class NavTest extends TestCase
             ->can('view death star');
 
         $this->assertNull($this->build()->get('The Empire'));
+    }
+
+    #[Test]
+    public function it_doesnt_build_unauthorized_sections_when_building_with_hidden()
+    {
+        $this->setTestRoles(['limited' => ['access cp']]);
+        $this->actingAs(tap(User::make()->assignRole('limited'))->save());
+
+        Nav::fields('Fields Management')->can('manage fields');
+        Nav::users('Users Management')->can('manage users');
+
+        $nav = Nav::build(true, true)->pluck('items', 'display');
+
+        $this->assertFalse($nav->has('Fields'));
+        $this->assertFalse($nav->has('Users'));
     }
 
     #[Test]

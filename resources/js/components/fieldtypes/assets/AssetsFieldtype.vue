@@ -20,7 +20,7 @@
                 <div
                     v-if="config.allow_uploads"
                     v-show="dragging && !showSelector"
-                    class="absolute inset-0 flex gap-2 items-center justify-center bg-white/80 border border-gray-400 border-dashed rounded-lg text-gray-700"
+                    class="absolute inset-0 z-(--z-index-above) flex gap-2 items-center justify-center bg-white/80 border border-gray-400 border-dashed rounded-lg text-gray-700"
                 >
                     <ui-icon name="upload-cloud" class="size-5" />
                     <span class="text-sm">{{ __('Drop to Upload') }}</span>
@@ -29,7 +29,7 @@
                 <div
                     v-if="!isReadOnly && showPicker"
                     data-asset-picker
-                    class="not-[.link-fieldtype_&]:p-2 not-[.link-fieldtype_&]:border border-gray-300 dark:border-gray-700 dark:bg-gray-850 rounded-xl flex flex-col @2xs:flex-row items-center gap-2 sm:gap-3 gap-y-3"
+                    class="not-[.link-fieldtype_&]:p-2 not-[.link-fieldtype_&]:border border-gray-300 dark:border-gray-700 dark:bg-gray-850 rounded-xl flex flex-col @[22rem]:flex-row gap-2 sm:gap-3 gap-y-3"
                     :class="{
                         'rounded-b-none': expanded,
                         'bard-drag-handle': isInBardField,
@@ -88,6 +88,10 @@
                     />
                 </div>
 
+                <div v-if="isReadOnly && !expanded" class="border border-gray-300 dark:border-gray-700 border-dashed rounded-lg p-3 text-center">
+                    <ui-icon name="assets" class="size-5 text-gray-300 dark:text-gray-700 mx-auto" />
+                </div>
+
                 <template v-if="expanded">
                     <sortable-list
                         v-if="expanded && displayMode === 'grid'"
@@ -97,15 +101,14 @@
                         v-model="assets"
                         :animate="false"
                         :constrain-dimensions="true"
-                        :disabled="config.disabled"
+                        :disabled="config.disabled || isReadOnly"
                         :distance="5"
-                        :read-only="isReadOnly"
                         @dragend="$emit('blur')"
                         @dragstart="$emit('focus')"
                     >
                         <div
-                            class="bg-white relative grid gap-4 2xl:gap-10 p-3 relative rounded-xl border border-gray-300 border-t-0 rounded-t-none dark:bg-gray-850 dark:border-gray-700"
-                            :class="{ 'rounded-t-none': !isReadOnly && (showPicker || uploads.length) }"
+                            class="bg-white relative grid gap-4 2xl:gap-10 p-3 relative rounded-xl border border-gray-300 dark:bg-gray-850 dark:border-gray-700"
+                            :class="{ 'border-t-0 rounded-t-none': !isReadOnly && (showPicker || uploads.length), 'border-dashed': isReadOnly }"
                             ref="assets"
                             style="grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));"
                         >
@@ -113,18 +116,24 @@
                                 v-for="asset in assets"
                                 :key="asset.id"
                                 :asset="asset"
+                                :siblings="assets"
                                 :read-only="isReadOnly"
                                 :show-filename="config.show_filename"
                                 :show-set-alt="showSetAlt"
+                                :checkerboard-mode="checkerboardMode"
                                 @updated="assetUpdated"
                                 @removed="assetRemoved"
-                                @id-changed="idChanged(asset.id, $event)"
+                                @id-changed="idChanged"
                             >
                             </asset-tile>
                         </div>
                     </sortable-list>
 
-                    <div class="relative overflow-hidden rounded-xl border border-gray-300 dark:border-gray-700 not-[.link-fieldtype_&]:border-t-0! not-[.link-fieldtype_&]:rounded-t-none" v-if="displayMode === 'list'">
+                    <div
+                        class="relative overflow-hidden rounded-xl border border-gray-300 dark:border-gray-700"
+                        :class="{ 'not-[.link-fieldtype_&]:border-t-0! not-[.link-fieldtype_&]:rounded-t-none': !isReadOnly && (showPicker || uploads.length), 'border-dashed': isReadOnly }"
+                        v-if="displayMode === 'list'"
+                    >
                         <table class="table-fixed w-full">
                             <thead class="sr-only">
                                 <tr>
@@ -136,10 +145,9 @@
                                 v-model="assets"
                                 item-class="asset-row"
                                 handle-class="asset-row"
-                                :disabled="config.disabled"
+                                :disabled="config.disabled || isReadOnly"
                                 :distance="5"
                                 :mirror="false"
-                                :read-only="isReadOnly"
                                 :vertical="true"
                             >
                                 <tbody ref="assets">
@@ -149,12 +157,13 @@
                                         v-for="asset in assets"
                                         :key="asset.id"
                                         :asset="asset"
+                                        :siblings="assets"
                                         :read-only="isReadOnly"
                                         :show-filename="config.show_filename"
                                         :show-set-alt="showSetAlt"
                                         @updated="assetUpdated"
                                         @removed="assetRemoved"
-                                        @id-changed="idChanged(asset.id, $event)"
+                                        @id-changed="idChanged"
                                     />
                                 </tbody>
                             </sortable-list>
@@ -191,6 +200,7 @@ import { SortableList } from '../../sortable/Sortable';
 import { isEqual } from 'lodash-es';
 import { Button, Dropdown, DropdownMenu, DropdownItem, Stack } from '@/components/ui';
 import ItemActions from '@/components/actions/ItemActions.vue';
+import useCheckerboard from '@/composables/checkerboard.js';
 
 export default {
     components: {
@@ -209,6 +219,15 @@ export default {
     },
 
     mixins: [Fieldtype],
+
+    setup() {
+        const checkerboard = useCheckerboard();
+        return {
+            checkerboardIcon: checkerboard.icon,
+            checkerboardMode: checkerboard.mode,
+            cycleCheckerboard: checkerboard.cycle,
+        };
+    },
 
     inject: {
         isInBardField: {
@@ -424,6 +443,13 @@ export default {
         internalFieldActions() {
             return [
                 {
+                    title: __('Transparency'),
+                    icon: this.checkerboardIcon,
+                    run: () => this.cycleCheckerboard(),
+                    visible: this.displayMode === 'grid' && (this.meta?.data ?? []).some((asset) => asset.can_be_transparent),
+                    quick: true,
+                },
+                {
                     title: __('Remove All'),
                     dangerous: true,
                     run: this.removeAll,
@@ -601,7 +627,7 @@ export default {
 
         uploadSelected(upload) {
             const path = `${this.folder}/${upload.basename}`.replace(/^\/+/, '');
-            const id = `${this.container.handle}::${path}`;
+            const id = `${this.container.id}::${path}`;
 
             this.uploads.splice(this.uploads.indexOf(upload), 1);
 

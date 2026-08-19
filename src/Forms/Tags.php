@@ -17,6 +17,7 @@ use Statamic\Support\Html;
 use Statamic\Support\Str;
 use Statamic\Tags\Concerns;
 use Statamic\Tags\Tags as BaseTags;
+use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
 
 class Tags extends BaseTags
 {
@@ -184,7 +185,7 @@ class Tags extends BaseTags
             $params = Html::attributes(['scope' => $scope]);
         }
 
-        return Antlers::parse('{{ fields '.$params.' }}'.$this->content.'{{ /fields }}', $context);
+        return Antlers::parse('{{ fields '.$params.' }}'.$this->content.'{{ /fields }}', $context, ! GlobalRuntimeState::$isEvaluatingUserData);
     }
 
     /**
@@ -389,7 +390,7 @@ class Tags extends BaseTags
      */
     protected function addToDebugBar($data, $formHandle)
     {
-        if (! function_exists('debugbar') || ! class_exists(ConfigCollector::class)) {
+        if (! function_exists('debugbar') || ! debugbar()->isEnabled() || ! class_exists(ConfigCollector::class)) {
             return;
         }
 

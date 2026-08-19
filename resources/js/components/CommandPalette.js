@@ -1,5 +1,5 @@
 import { ref } from 'vue';
-import uniqid from 'uniqid';
+import { nanoid as uniqid } from 'nanoid';
 import { CATEGORY } from './command-palette/Constants.js';
 
 const commands = ref({});
@@ -38,8 +38,18 @@ class Command {
 }
 
 export default class CommandPalette {
+    #preventIfCallbacks = [];
+
     get category() {
         return CATEGORY;
+    }
+
+    preventIf(fn) {
+        this.#preventIfCallbacks.push(fn);
+    }
+
+    shouldPreventOpening() {
+        return this.#preventIfCallbacks.some(fn => fn());
     }
 
     add(command) {

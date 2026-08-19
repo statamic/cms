@@ -7,6 +7,8 @@ use Statamic\Facades\CP\Nav;
 use Statamic\Facades\Preference;
 use Statamic\Http\Controllers\Controller;
 
+use function Statamic\trans as __;
+
 class DefaultNavController extends Controller
 {
     use Concerns\HasNavBuilder;

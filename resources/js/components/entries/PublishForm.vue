@@ -73,7 +73,7 @@
             v-if="fieldset"
             ref="container"
             :name="publishContainer"
-            :reference="initialReference"
+            :reference="reference"
             :blueprint="fieldset"
             v-model="values"
             :extra-values="extraValues"
@@ -82,10 +82,12 @@
             :origin-meta="originMeta"
             :errors="errors"
             :site="site"
+            :read-only="readOnly"
             v-model:modified-fields="localizedFields"
             :track-dirty-state="trackDirtyState"
             :sync-field-confirmation-text="syncFieldConfirmationText"
             :remember-tab="!isInline"
+            :provide="{ isWorkingCopy, revisionsEnabled }"
         >
             <LivePreview
                 :enabled="isPreviewing"
@@ -123,7 +125,7 @@
                                 <Heading :text="__('Published')" />
                                 <Switch
                                     :model-value="published"
-                                    :read-only="!canManagePublishState"
+                                    :disabled="!canManagePublishState"
                                     @update:model-value="setFieldValue('published', $event)"
                                 />
                             </Panel>
@@ -369,6 +371,7 @@ export default {
             originValues: this.initialOriginValues,
             originMeta: this.initialOriginMeta,
             site: this.initialSite,
+            reference: this.initialReference,
             selectingOrigin: false,
             selectedOrigin: null,
             isWorkingCopy: this.initialIsWorkingCopy,
@@ -454,7 +457,7 @@ export default {
         },
 
         showLivePreviewButton() {
-            return !this.isCreating && this.isBase && this.livePreviewUrl;
+            return !this.isPreviewing && !this.readOnly && !this.isCreating && this.isBase && this.livePreviewUrl;
         },
 
         showVisitUrlButton() {
@@ -507,7 +510,7 @@ export default {
         },
 
         afterSaveOption() {
-            return this.getPreference('after_save');
+            return this.getPreference('after_save') ?? 'listing';
         },
 
         originOptions() {
@@ -591,8 +594,8 @@ export default {
                         this.redirectTo(this.createAnotherUrl);
                     }
 
-                    // If the user has opted to go to listing (default/null option), redirect them there.
-                    else if (!this.isInline && nextAction === null) {
+                    // If the user has opted to go to listing, redirect them there.
+                    else if (!this.isInline && nextAction === 'listing') {
                         this.redirectTo(this.listingUrl);
                     }
 
@@ -661,7 +664,7 @@ export default {
             }
 
             if (this.isBase) {
-                window.history.replaceState({}, '', localization.url);
+                window.history.replaceState({}, '', localization.url + window.location.hash);
             }
         },
 
@@ -682,9 +685,11 @@ export default {
                 this.collection = data.collection;
                 this.title = data.editing ? data.values.title : this.title;
                 this.actions = data.actions;
+				this.itemActions = data.itemActions;
                 this.fieldset = data.blueprint;
                 this.permalink = data.permalink;
                 this.site = localization.handle;
+                this.reference = data.reference;
                 this.localizing = false;
                 this.initialPublished = data.values.published;
                 this.readOnly = data.readOnly;
@@ -759,8 +764,8 @@ export default {
                 this.redirectTo(this.createAnotherUrl);
             }
 
-            // If the user has opted to go to listing (default/null option), redirect them there.
-            else if (!this.isInline && nextAction === null) {
+            // If the user has opted to go to listing, redirect them there.
+            else if (!this.isInline && nextAction === 'listing') {
                 this.redirectTo(this.listingUrl);
             }
 

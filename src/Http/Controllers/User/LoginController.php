@@ -6,10 +6,14 @@ use Illuminate\Auth\Events\Failed;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Statamic\Facades\TwoFactor;
+use Statamic\Facades\URL;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\Concerns\HandlesLogins;
 use Statamic\Http\Controllers\Controller;
 use Statamic\Http\Requests\UserLoginRequest;
+
+use function Statamic\trans as __;
 
 class LoginController extends Controller
 {
@@ -19,20 +23,58 @@ class LoginController extends Controller
     {
         $this->handleTooManyLoginAttempts($request);
 
+        $this->checkPasskeyEnforcement($request);
+
         $user = User::fromUser($this->validateCredentials($request));
 
-        if ($user->hasEnabledTwoFactorAuthentication()) {
+        if (TwoFactor::enabled() && $user->hasEnabledTwoFactorAuthentication()) {
             return $this->twoFactorChallengeResponse($request, $user);
+        }
+
+        // An explicit form redirect overrides any URL stashed by the auth middleware.
+        if (($redirect = $request->input('_redirect')) && ! URL::isExternalToApplication($redirect)) {
+            redirect()->setIntendedUrl($redirect);
         }
 
         $this->authenticate($request, $user);
 
-        return redirect($request->input('_redirect', '/'))->withSuccess(__('Login successful.'));
+        // Preserve the intended URL for the setup flow to consume after the user completes setup.
+        if (TwoFactor::enabled() && $user->isTwoFactorAuthenticationRequired() && ! $user->hasEnabledTwoFactorAuthentication()) {
+            return redirect(redirect()->getIntendedUrl() ?? route('statamic.site'))
+                ->withSuccess(__('Login successful.'));
+        }
+
+        return redirect()->intended(route('statamic.site'))->withSuccess(__('Login successful.'));
+    }
+
+    private function checkPasskeyEnforcement(Request $request)
+    {
+        if (config('statamic.webauthn.allow_password_login_with_passkey', true)) {
+            return;
+        }
+
+        if (! $user = User::findByEmail($request->get($this->username()))) {
+            return;
+        }
+
+        if ($user->passkeys()->isEmpty()) {
+            return;
+        }
+
+        $errorRedirect = $request->input('_error_redirect');
+
+        $errorResponse = $errorRedirect && ! URL::isExternalToApplication($errorRedirect)
+            ? redirect($errorRedirect)
+            : back();
+
+        throw new HttpResponseException(
+            $errorResponse->withInput()->withErrors(__('statamic::messages.password_passkeys_only'))
+        );
     }
 
     protected function twoFactorChallengeRedirect(): string
     {
-        return route('statamic.two-factor-challenge');
+        return config('statamic.users.two_factor_challenge_url') ?? route('statamic.two-factor-challenge');
     }
 
     /**
@@ -44,7 +86,11 @@ class LoginController extends Controller
      */
     protected function throwFailedAuthenticationException(Request $request)
     {
-        $errorResponse = $request->has('_error_redirect') ? redirect($request->input('_error_redirect')) : back();
+        $errorRedirect = $request->input('_error_redirect');
+
+        $errorResponse = $errorRedirect && ! URL::isExternalToApplication($errorRedirect)
+            ? redirect($errorRedirect)
+            : back();
 
         throw new HttpResponseException($errorResponse->withInput()->withErrors(__('Invalid credentials.')));
     }
@@ -68,7 +114,13 @@ class LoginController extends Controller
     {
         Auth::logout();
 
-        return redirect(request()->get('redirect', '/'));
+        $redirect = request()->get('redirect');
+
+        $url = $redirect && ! URL::isExternalToApplication($redirect)
+            ? $redirect
+            : route('statamic.site');
+
+        return redirect($url);
     }
 
     protected function username()

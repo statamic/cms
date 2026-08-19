@@ -12,7 +12,11 @@ class MarkdownFieldtypeController extends CpController
 {
     public function preview(Request $request)
     {
-        return $this->fieldtype($request->config)->augment($request->value);
+        $config = $request->config;
+
+        abort_unless(($config['type'] ?? null) === 'markdown', 400, 'Bad Request');
+
+        return $this->fieldtype($config)->augment($request->value);
     }
 
     protected function fieldtype($config)

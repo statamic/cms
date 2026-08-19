@@ -12,6 +12,7 @@ import {
 } from '@ui';
 import { injectListingContext } from '../Listing/Listing.vue';
 import { computed, ref, watch } from 'vue';
+import { deepClone } from '@/util/clone.js';
 
 const { preferencesPrefix, activeFilters, searchQuery, setFilters, clearFilters, setSearchQuery, clearSearchQuery } =
     injectListingContext();
@@ -19,13 +20,22 @@ const preferencesKey = ref(`${preferencesPrefix.value}.filters`);
 const presets = ref(getPresets());
 const activePreset = ref(getPresetFromActiveFilters());
 const activePresetPayload = computed(() => presets.value[activePreset.value]);
+const selectedPreset = ref(activePreset.value);
+const selectedPresetPayload = computed(() => presets.value[selectedPreset.value]);
 const savingPresetName = ref(null);
 const savingPresetHandle = computed(() => snake_case(savingPresetName.value));
 const isCreating = ref(false);
 const isRenaming = ref(false);
 const isConfirmingDeletion = ref(false);
 
-watch([activeFilters, searchQuery], () => (activePreset.value = getPresetFromActiveFilters()), { deep: true });
+watch(
+    [activeFilters, searchQuery],
+    () => {
+        activePreset.value = getPresetFromActiveFilters();
+        selectedPreset.value ??= activePreset.value;
+    },
+    { deep: true },
+);
 
 function getPresets() {
     return Statamic.$preferences.get(preferencesKey.value, {});
@@ -37,13 +47,15 @@ function refreshPresets() {
 
 function viewAll() {
     activePreset.value = null;
+    selectedPreset.value = null;
     clearFilters();
     clearSearchQuery();
 }
 
 function selectPreset(handle) {
     activePreset.value = handle;
-    setFilters(activePresetPayload.value.filters);
+    selectedPreset.value = handle;
+    setFilters(deepClone(activePresetPayload.value.filters ?? {}));
     setSearchQuery(activePresetPayload.value.query);
 }
 
@@ -52,22 +64,69 @@ function createPreset() {
     isCreating.value = true;
 }
 
-function canRenamePreset(handle) {
+function canSavePreset(handle) {
     return !Statamic.$preferences.hasDefault(`${preferencesKey.value}.${handle}`);
 }
 
 function canDeletePreset(handle) {
-    return canRenamePreset(handle);
+    return canSavePreset(handle);
 }
 
 function renamePreset() {
-    savingPresetName.value = activePresetPayload.value.display;
+    savingPresetName.value = selectedPresetPayload.value.display;
     isRenaming.value = true;
 }
 
 const canSaveNewPreset = computed(() => {
-    return !activePreset.value && (Object.keys(activeFilters.value).length > 0 || (searchQuery.value ?? '') !== '');
+    if (selectedPreset.value) return isDirty.value;
+
+    return (Object.keys(activeFilters.value).length > 0 || (searchQuery.value ?? '') !== '');
 });
+
+const isDirty = computed(() => {
+    if (!selectedPreset.value || !selectedPresetPayload.value) return false;
+
+    const savedFilters = selectedPresetPayload.value.filters ?? {};
+    const savedQuery = selectedPresetPayload.value.query ?? '';
+    const currentQuery = searchQuery.value ?? '';
+
+    if (savedQuery !== currentQuery) return true;
+
+    const savedKeys = Object.keys(savedFilters);
+    const currentKeys = Object.keys(activeFilters.value);
+
+    if (savedKeys.length !== currentKeys.length) return true;
+
+    for (const key of savedKeys) {
+        if (JSON.stringify(savedFilters[key]) !== JSON.stringify(activeFilters.value[key])) {
+            return true;
+        }
+    }
+
+    return false;
+});
+
+function savePreset() {
+    const payload = { display: selectedPresetPayload.value.display };
+
+    if (searchQuery.value) payload.query = searchQuery.value;
+    if (Object.entries(activeFilters.value).length) payload.filters = deepClone(activeFilters.value);
+
+    Statamic.$preferences
+        .set(`${preferencesKey.value}.${selectedPreset.value}`, payload)
+        .then(() => {
+            Statamic.$toast.success(__('View saved'));
+            refreshPresets();
+        })
+        .catch(() => {
+            Statamic.$toast.error(__('Unable to save view'));
+        });
+}
+
+function resetPreset() {
+    setFilters(deepClone(selectedPresetPayload.value.filters ?? {}));
+    setSearchQuery(selectedPresetPayload.value.query ?? '');
+}
 
 function getPresetFromActiveFilters() {
     for (const [handle, preset] of Object.entries(presets.value)) {
@@ -88,7 +147,7 @@ function getPresetFromActiveFilters() {
 }
 
 const currentTab = computed({
-    get: () => activePreset.value || 'all',
+    get: () => selectedPreset.value || 'all',
     set: (value) => {
         if (value === 'all') {
             viewAll();
@@ -100,7 +159,7 @@ const currentTab = computed({
 
 const presetPreferencesPayload = computed(() => {
     let payload = {
-        display: savingPresetName.value || activePresetPayload.value.display || '',
+        display: savingPresetName.value || selectedPresetPayload.value?.display || '',
     };
 
     if (searchQuery.value) payload.query = searchQuery.value;
@@ -133,7 +192,7 @@ function saveExisting() {
 
     preference = Object.fromEntries(
         Object.entries(preference).map(([key, value]) => {
-            if (key === activePreset.value) {
+            if (key === selectedPreset.value) {
                 return [savingPresetHandle.value, presetPreferencesPayload.value];
             }
 
@@ -157,7 +216,7 @@ function saveExisting() {
 
 function deletePreset() {
     Statamic.$preferences
-        .remove(`${preferencesKey.value}.${activePreset.value}`)
+        .remove(`${preferencesKey.value}.${selectedPreset.value}`)
         .then((response) => {
             Statamic.$toast.success(__('View deleted'));
             isConfirmingDeletion.value = false;
@@ -182,7 +241,7 @@ function deletePreset() {
                     :name="handle"
                 >
                     {{ preset.display }}
-                    <template v-if="handle === activePreset">
+                    <template v-if="handle === selectedPreset">
                         <Dropdown class="w-48!">
                             <template #trigger>
                                 <Button class="absolute! top-0.25 -right-4 starting-style-transition starting-style-transition--slow" variant="ghost" size="xs" icon="chevron-down" />
@@ -190,7 +249,7 @@ function deletePreset() {
                             <DropdownMenu>
                                 <DropdownItem :text="__('Duplicate')" icon="duplicate" @click="createPreset" />
                                 <DropdownItem
-                                    v-if="canRenamePreset(handle)"
+                                    v-if="canSavePreset(handle)"
                                     :text="__('Rename')"
                                     icon="rename"
                                     @click="renamePreset"
@@ -208,8 +267,27 @@ function deletePreset() {
                     </template>
                 </PresetTrigger>
             </TabList>
-            <div v-if="canSaveNewPreset" class="border-b border-gray-200 dark:border-gray-700 relative -top-[2px] hover:border-transparent ps-2">
+            <div v-if="isDirty || canSaveNewPreset" class="border-b border-gray-200 dark:border-gray-700 relative -top-[2px] hover:border-transparent ps-2 flex gap-1">
                 <Button
+                    v-if="isDirty && canSavePreset(selectedPreset)"
+                    @click="savePreset"
+                    variant="ghost"
+                    size="sm"
+                    :text="__('Save')"
+                    icon="save"
+                    class="[&_svg]:size-4"
+                />
+                <Button
+                    v-if="isDirty"
+                    @click="resetPreset"
+                    variant="ghost"
+                    size="sm"
+                    :text="__('Reset')"
+                    icon="sync"
+                    class="[&_svg]:size-4"
+                />
+                <Button
+                    v-if="canSaveNewPreset"
                     @click="createPreset"
                     variant="ghost"
                     size="sm"
@@ -228,7 +306,7 @@ function deletePreset() {
         @cancel="isCreating = false"
         @confirm="saveNew"
     >
-        <Input v-model="savingPresetName" @keydown.enter="saveNew" />
+        <Input focus v-model="savingPresetName" @keydown.enter="saveNew" />
 
         <ui-error-message
             v-if="presets && Object.keys(presets).includes(savingPresetHandle)"
@@ -243,12 +321,12 @@ function deletePreset() {
         @cancel="isRenaming = false"
         @confirm="saveExisting"
     >
-        <Input v-model="savingPresetName" @keydown.enter="saveExisting" />
+        <Input focus v-model="savingPresetName" @keydown.enter="saveExisting" />
 
         <div
             v-if="
                 Object.keys(presets)
-                    .filter((preset) => preset !== activePreset)
+                    .filter((preset) => preset !== selectedPreset)
                     .includes(savingPresetHandle)
             "
         >

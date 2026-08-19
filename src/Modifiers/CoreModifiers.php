@@ -34,7 +34,12 @@ use Statamic\Support\Dumper;
 use Statamic\Support\Html;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\ChecksDumpability;
+use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
 use Stringy\StaticStringy as Stringy;
+
+use function Statamic\trans;
+use function Statamic\trans as __;
+use function Statamic\trans_choice;
 
 class CoreModifiers extends Modifier
 {
@@ -126,7 +131,9 @@ class CoreModifiers extends Modifier
      */
     public function antlers($value, $params, $context)
     {
-        return (string) Antlers::parse($value, $context);
+        $trusted = Arr::get($params, 0) === 'trusted' && ! GlobalRuntimeState::$isEvaluatingUserData;
+
+        return (string) Antlers::parse($value, $context, $trusted);
     }
 
     /**
@@ -822,6 +829,20 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Format a time string without timezone conversion.
+     *
+     * @return string
+     */
+    public function formatTime($value, $params)
+    {
+        if (! $value) {
+            return $value;
+        }
+
+        return Date::parse($value)->format(Arr::get($params, 0, 'g:ia'));
+    }
+
+    /**
      * Format a number with grouped thousands and decimal points.
      *
      * @return string
@@ -878,14 +899,8 @@ class CoreModifiers extends Modifier
         // available data. Then grab the requested variable from there.
         $array = $item instanceof Augmentable ? $item->toDeferredAugmentedArray() : $item->toArray();
 
-        if ($arrayValue = Arr::get($array, $var)) {
-            return $arrayValue;
-        }
-
-        // Finally, try to call a method on the object
-        $method = Str::slug($var);
-        if (method_exists($item, $method)) {
-            return $item->$method();
+        if (Arr::has($array, $var)) {
+            return Arr::get($array, $var);
         }
 
         // If after all is said and done, there's still nothing, just show the original value.
@@ -1174,7 +1189,9 @@ class CoreModifiers extends Modifier
     /**
      * Check if an item exists in an array using "dot" notation.
      *
-     * @param  $value
+     * @param  array  $haystack
+     * @param  array  $params
+     * @param  array  $context
      * @return bool
      */
     public function inArray($haystack, $params, $context)
@@ -1505,14 +1522,18 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Returns the last $params[0] characters of a string, or the last element of an array.
+     * Returns the last $params[0] characters of a string, or the last element of an array or Collection.
      *
-     * @return string
+     * @return mixed
      */
     public function last($value, $params)
     {
         if (is_array($value)) {
             return Arr::last($value);
+        }
+
+        if ($value instanceof Collection) {
+            return $value->last();
         }
 
         return Stringy::last($value, Arr::get($params, 0));
@@ -1684,7 +1705,6 @@ class CoreModifiers extends Modifier
     /**
      * Generate an md5 hash of a value.
      *
-     * @param  $params
      * @return string
      */
     public function md5($value)
@@ -1901,7 +1921,7 @@ class CoreModifiers extends Modifier
 
         $partial = 'partials/'.$name.'.html';
 
-        return Parse::template(File::disk('resources')->get($partial), $value);
+        return Parse::template(File::disk('resources')->get($partial), $value, trusted: true);
     }
 
     /**
@@ -2876,7 +2896,6 @@ class CoreModifiers extends Modifier
      * Converts a Carbon instance to a timestamp.
      *
      * @param  Carbon  $value
-     * @param  array  $params
      * @return int
      */
     public function timestamp($value)

@@ -6,16 +6,18 @@ use Closure;
 use Facades\Statamic\Fieldtypes\RowId;
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ValidationRule;
-use Statamic\Facades\Asset;
+use Statamic\Data\NestedFieldUpdater;
+use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
-use Statamic\Facades\Entry;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Site;
 use Statamic\Fields\Field;
+use Statamic\Fields\Fields;
 use Statamic\Fields\Value;
 use Statamic\Fieldtypes\Bard\Augmentor;
+use Statamic\Fieldtypes\Link\LinkType;
 use Statamic\GraphQL\Types\BardSetsType;
 use Statamic\GraphQL\Types\BardTextType;
 use Statamic\GraphQL\Types\ReplicatorSetType;
@@ -23,6 +25,8 @@ use Statamic\Query\Scopes\Filters\Fields\Bard as BardFilter;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\Hookable;
+
+use function Statamic\trans as __;
 
 class Bard extends Replicator
 {
@@ -617,6 +621,18 @@ class Bard extends Replicator
             return [$set['attrs']['id'] => $this->fields($values['type'], $index)->addValues($values)->meta()->put('_', '_')];
         })->toArray();
 
+        if ($this->shouldProcessNewValues()) {
+            $defaults = collect($this->flattenedSetsConfig())->map(function ($set, $handle) {
+                return $this->fields($handle)->all()->map(function ($field) {
+                    return $field->fieldtype()->preProcess($field->defaultValue());
+                })->all();
+            })->all();
+
+            $new = collect($this->flattenedSetsConfig())->map(function ($set, $handle) use ($defaults) {
+                return $this->fields($handle)->addValues($defaults[$handle])->meta()->put('_', '_');
+            })->toArray();
+        }
+
         $previews = collect($existing)->map(function ($fields) {
             return collect($fields)->map(function () {
                 return null;
@@ -631,17 +647,20 @@ class Bard extends Replicator
             $linkCollections = Blink::once('routable-collection-handles-'.$site, function () use ($site) {
                 return Collection::all()->reject(function ($collection) use ($site) {
                     return is_null($collection->route($site));
-                })->map->handle()->values();
+                })->map->handle()->values()->all();
             });
         }
 
         $data = [
             'existing' => $existing,
-            'collapsed' => [],
+            'new' => $new ?? null,
+            'defaults' => $defaults ?? null,
+            'collapsed' => $this->config('collapse') ? array_keys($existing) : [],
             'previews' => $previews,
             '__collaboration' => ['existing'],
             'linkCollections' => $linkCollections,
             'linkData' => (object) $this->getLinkData($value),
+            'linkTypes' => $this->linkTypesForToolbar(),
         ];
 
         if (
@@ -661,6 +680,17 @@ class Bard extends Replicator
         }
 
         return $this->runHooks('preload', $data);
+    }
+
+    private function shouldProcessNewValues(): bool
+    {
+        $parent = $this->field()->parent();
+
+        if (! $parent || ! method_exists($parent, 'blueprint')) {
+            return true;
+        }
+
+        return is_null($parent->blueprint()->fullyQualifiedHandle());
     }
 
     public function preProcessValidatable($value)
@@ -761,31 +791,66 @@ class Bard extends Replicator
 
     private function getLinkDataForUrl($url)
     {
-        $ref = Str::after($url, 'statamic://');
-        [$type, $id] = explode('::', $ref, 2);
+        $ref = str($url)->after('statamic://')->before('?')->before('#')->toString();
+        [$handle, $id] = explode('::', $ref, 2);
 
-        $data = null;
+        return [$ref => $this->linkDataForType($handle, $id)];
+    }
 
-        switch ($type) {
-            case 'entry':
-                if ($entry = Entry::find($id)) {
-                    $data = [
-                        'title' => $entry->get('title'),
-                        'permalink' => $entry->absoluteUrl(),
-                    ];
-                }
-                break;
-            case 'asset':
-                if ($asset = Asset::find($id)) {
-                    $data = [
-                        'basename' => $asset->basename(),
-                        'thumbnail' => $asset->thumbnailUrl(),
-                    ];
-                }
-                break;
+    private function linkDataForType(string $handle, string $id): ?array
+    {
+        if (! $linkType = Link::types()[$handle] ?? null) {
+            return null;
         }
 
-        return [$ref => $data];
+        if (! $config = $linkType->fieldtype($this->linkTypeField())) {
+            return null;
+        }
+
+        $nestedField = new Field($handle, $config);
+        $nestedField->setValue([$id]);
+
+        return $nestedField->fieldtype()->preload()['data'][0] ?? null;
+    }
+
+    private function linkTypeField(): Field
+    {
+        return new Field('link', [
+            'collections' => $this->config('link_collections'),
+            'container' => $this->config('container'),
+            'select_across_sites' => $this->config('select_across_sites'),
+        ]);
+    }
+
+    private function linkTypesForToolbar(): array
+    {
+        $field = $this->linkTypeField();
+
+        return collect(Link::types())
+            ->filter(fn (LinkType $type): bool => $type->visible($field))
+            ->map(function (LinkType $type, string $handle) use ($field): ?array {
+                if (! $config = $type->fieldtype($field)) {
+                    return null;
+                }
+
+                $nestedField = new Field($handle, $config);
+                $nestedFieldtype = $nestedField->fieldtype();
+
+                try {
+                    $meta = $nestedFieldtype->preload();
+                } catch (CollectionNotFoundException) {
+                    $meta = [];
+                }
+
+                return [
+                    'title' => $type->title(),
+                    'component' => $nestedFieldtype->component(),
+                    'config' => $nestedFieldtype->config(),
+                    'meta' => $meta,
+                ];
+            })
+            ->filter()
+            ->all();
     }
 
     private function wrapInlineValue($value)
@@ -809,6 +874,59 @@ class Bard extends Replicator
     public static function setDefaultButtons(array $buttons): void
     {
         static::$defaultButtons = $buttons;
+    }
+
+    public function replaceAssetReferences($data, ?string $newValue, string $oldValue, string $container)
+    {
+        if ($this->config('container') !== $container) {
+            return $data;
+        }
+
+        if (is_string($data)) {
+            return $data ? $this->replaceStatamicUrls($data, $newValue, $oldValue) : $data;
+        }
+
+        if (! is_array($data) || empty($data)) {
+            return $data;
+        }
+
+        $flat = collect(Arr::dot($data));
+
+        $flat->filter(fn ($value, $key) => preg_match('/(.*)\.(type)/', $key) && $value === 'image')
+            ->each(function ($value, $key) use (&$data, $newValue, $oldValue, $container) {
+                $srcKey = str_replace('.type', '.attrs.src', $key);
+
+                if (Arr::get($data, $srcKey) === "asset::{$container}::{$oldValue}") {
+                    Arr::set($data, $srcKey, $newValue === null ? '' : "asset::{$container}::{$newValue}");
+                }
+            });
+
+        $flat->filter(fn ($value, $key) => preg_match('/(.*)\.(type)/', $key) && $value === 'link')
+            ->each(function ($value, $key) use (&$data, $newValue, $oldValue, $container) {
+                $hrefKey = str_replace('.type', '.attrs.href', $key);
+
+                if (Arr::get($data, $hrefKey) === "statamic://asset::{$container}::{$oldValue}") {
+                    Arr::set($data, $hrefKey, $newValue === null ? '' : "statamic://asset::{$container}::{$newValue}");
+                }
+            });
+
+        return $data;
+    }
+
+    public function iterateReferenceFields($data, NestedFieldUpdater $updater): void
+    {
+        if (! is_array($data)) {
+            return;
+        }
+
+        collect($data)->each(function ($set, $setKey) use ($updater) {
+            $setHandle = Arr::get($set, 'attrs.values.type');
+            $fields = Arr::get($this->flattenedSetsConfig(), "{$setHandle}.fields");
+
+            if ($setHandle && $fields) {
+                $updater->update(new Fields($fields), "{$setKey}.attrs.values.");
+            }
+        });
     }
 
     private function containerRequiredRule(): ValidationRule

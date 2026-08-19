@@ -70,7 +70,7 @@ abstract class FormTestCase extends TestCase
 
     protected function tag($string, $context = [])
     {
-        return Parse::template($string, $context);
+        return Parse::template($string, $context, trusted: true);
     }
 
     protected function blade($string, $context = [])

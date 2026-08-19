@@ -4,15 +4,15 @@ import laravel from 'laravel-vite-plugin';
 import vue from '@vitejs/plugin-vue';
 import { visualizer } from 'rollup-plugin-visualizer';
 import svgLoader from 'vite-svg-loader';
-import path from 'path';
 import { playwright } from '@vitest/browser-playwright';
-import tsconfigPaths from 'vite-tsconfig-paths';
+import { storybookTest } from '@storybook/addon-vitest/vitest-plugin';
 
 export default defineConfig(({ mode, command }) => {
     const env = loadEnv(mode, process.cwd(), '');
     const isRunningBuild = command === 'build';
     const isProdBuild = isRunningBuild && mode === 'production';
     const isProdDevBuild = isRunningBuild && mode === 'development';
+    const isTesting = !!process.env.VITEST;
 
     return {
         base: './',
@@ -22,9 +22,8 @@ export default defineConfig(({ mode, command }) => {
             }
         },
         plugins: [
-            tsconfigPaths(),
             tailwindcss(),
-            laravel({
+            !isTesting && laravel({
                 valetTls: env.VALET_TLS,
                 input: ['resources/css/app.css', 'resources/js/index.js'],
                 refresh: true,
@@ -33,22 +32,28 @@ export default defineConfig(({ mode, command }) => {
             }),
             vue(),
             svgLoader(),
+            visualizer({ filename: 'bundle-stats.html' }),
         ],
         css: {
             devSourcemap: true,
         },
         resolve: {
+            tsconfigPaths: true,
             alias: {
                 vue: 'vue/dist/vue.esm-bundler.js',
             },
         },
         build: {
+            minify: isProdBuild,
             rollupOptions: {
                 output: {
-                    plugins: [visualizer({ filename: 'bundle-stats.html' })]
+                    advancedChunks: {
+                        groups: [
+                            { name: 'icons', test: /resources[\\/]svg[\\/]icons[\\/].*\.svg/ },
+                        ],
+                    },
                 },
             },
-            minify: isProdBuild
         },
         test: {
             projects: [
@@ -64,15 +69,20 @@ export default defineConfig(({ mode, command }) => {
                 },
                 {
                     extends: true,
+                    plugins: [
+                        storybookTest({
+                            configDir: '.storybook',
+                        }),
+                    ],
                     test: {
-                        name: 'browser',
-                        setupFiles: 'resources/js/tests/setup.js',
-                        include: ['resources/js/tests/browser/**/*.test.js'],
+                        name: 'storybook',
                         browser: {
                             enabled: true,
+                            headless: true,
                             provider: playwright(),
                             instances: [{ browser: 'chromium' }],
                         },
+                        setupFiles: ['.storybook/vitest.setup.ts'],
                     },
                 },
             ],

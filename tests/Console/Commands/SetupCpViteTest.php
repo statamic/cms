@@ -50,7 +50,7 @@ JSON);
             ->artisan('statamic:setup-cp-vite')
             ->expectsOutputToContain('Installed dependencies');
 
-        Process::assertRan('npm install');
+        Process::assertRan('npm install --ignore-scripts');
 
         $this->assertStringContainsString(<<<'JSON'
     "dependencies": {
@@ -60,7 +60,35 @@ JSON);
     },
     "devDependencies": {
         "postcss": "^8.4.24",
-        "vite": "^7.0.4"
+        "vite": "^8.0.0"
+    }
+JSON, $this->files->get(base_path('package.json')));
+    }
+
+    #[Test]
+    public function it_does_not_override_existing_vite_or_statamic_cms_dependencies()
+    {
+        $this->files->put(base_path('package.json'), <<<'JSON'
+{
+    "dependencies": {
+        "@statamic/cms": "file:./some/other/path"
+    },
+    "devDependencies": {
+        "vite": "^9.0.0"
+    }
+}
+JSON);
+
+        $this
+            ->artisan('statamic:setup-cp-vite')
+            ->expectsOutputToContain('Installed dependencies');
+
+        $this->assertStringContainsString(<<<'JSON'
+    "dependencies": {
+        "@statamic/cms": "file:./some/other/path"
+    },
+    "devDependencies": {
+        "vite": "^9.0.0"
     }
 JSON, $this->files->get(base_path('package.json')));
     }
@@ -87,7 +115,7 @@ JSON);
         "build": "vite build",
         "dev": "vite",
         "watch": "vite",
-        "cp:dev": "vite build --config vite-cp.config.js --watch",
+        "cp:dev": "vite --config vite-cp.config.js",
         "cp:build": "vite build --config vite-cp.config.js"
     }
 JSON, $this->files->get(base_path('package.json')));
@@ -166,6 +194,7 @@ JSON, $this->files->get(base_path('package.json')));
                 'resources/js/cp.js',
                 'resources/css/cp.css',
             ],
+            'hotFile' => public_path('cp-hot'),
             'buildDirectory' => 'vendor/app',
         ]);
 

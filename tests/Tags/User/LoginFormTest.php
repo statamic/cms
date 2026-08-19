@@ -4,25 +4,30 @@ namespace Tests\Tags\User;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
+use Mockery;
+use Orchestra\Testbench\Attributes\DefineEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\TwoFactor\RecoveryCode;
+use Statamic\Contracts\Auth\Passkey;
 use Statamic\Contracts\Auth\TwoFactor\TwoFactorAuthenticationProvider;
 use Statamic\Events\TwoFactorAuthenticationChallenged;
 use Statamic\Facades\Parse;
 use Statamic\Facades\User;
+use Statamic\Facades\WebAuthn;
 use Statamic\Statamic;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 #[Group('2fa')]
+#[Group('passkeys')]
 class LoginFormTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
     private function tag($tag)
     {
-        return Parse::template($tag, []);
+        return Parse::template($tag, trusted: true);
     }
 
     #[Test]
@@ -204,6 +209,42 @@ EOT
     }
 
     #[Test]
+    public function it_does_not_redirect_to_external_url()
+    {
+        User::make()
+            ->email('san@holo.com')
+            ->password('chewy')
+            ->save();
+
+        $this
+            ->post('/!/auth/login', [
+                'token' => 'test-token',
+                'email' => 'san@holo.com',
+                'password' => 'chewy',
+                '_redirect' => 'https://evil.com',
+            ])
+            ->assertLocation('/');
+    }
+
+    #[Test]
+    public function it_does_not_redirect_to_external_url_on_error()
+    {
+        User::make()
+            ->email('san@holo.com')
+            ->password('chewy')
+            ->save();
+
+        $this
+            ->post('/!/auth/login', [
+                'token' => 'test-token',
+                'email' => 'san@holo.com',
+                'password' => 'wrong',
+                '_error_redirect' => 'https://evil.com',
+            ])
+            ->assertLocation('/');
+    }
+
+    #[Test]
     public function it_will_use_redirect_query_param_off_url()
     {
         $this->get('/?redirect=login-successful&error_redirect=login-failure');
@@ -285,5 +326,320 @@ EOT
         $this->assertFalse(auth()->check());
 
         Event::assertDispatched(TwoFactorAuthenticationChallenged::class, fn ($event) => $event->user->id === 1);
+    }
+
+    #[Test]
+    public function it_redirects_to_configured_two_factor_challenge_url()
+    {
+        Event::fake();
+
+        config(['statamic.users.two_factor_challenge_url' => '/custom-2fa-challenge']);
+
+        User::make()
+            ->id(1)
+            ->email('san@holo.com')
+            ->password('chewy')
+            ->data([
+                'two_factor_confirmed_at' => now()->timestamp,
+                'two_factor_secret' => encrypt(app(TwoFactorAuthenticationProvider::class)->generateSecretKey()),
+                'two_factor_recovery_codes' => encrypt(json_encode(Collection::times(8, function () {
+                    return RecoveryCode::generate();
+                })->all())),
+            ])
+            ->save();
+
+        $this
+            ->assertGuest()
+            ->post('/!/auth/login', [
+                'token' => 'test-token',
+                'email' => 'san@holo.com',
+                'password' => 'chewy',
+            ])
+            ->assertRedirect('/custom-2fa-challenge')
+            ->assertSessionHas('login.id', 1);
+
+        Event::assertDispatched(TwoFactorAuthenticationChallenged::class);
+    }
+
+    #[Test]
+    public function it_stores_redirect_as_intended_url_for_two_factor_challenge()
+    {
+        User::make()
+            ->id(1)
+            ->email('san@holo.com')
+            ->password('chewy')
+            ->data([
+                'two_factor_confirmed_at' => now()->timestamp,
+                'two_factor_secret' => encrypt(app(TwoFactorAuthenticationProvider::class)->generateSecretKey()),
+                'two_factor_recovery_codes' => encrypt(json_encode(Collection::times(8, function () {
+                    return RecoveryCode::generate();
+                })->all())),
+            ])
+            ->save();
+
+        $this
+            ->post('/!/auth/login', [
+                'token' => 'test-token',
+                'email' => 'san@holo.com',
+                'password' => 'chewy',
+                '_redirect' => '/dashboard',
+            ])
+            ->assertSessionHas('url.intended', '/dashboard');
+    }
+
+    #[Test]
+    public function it_redirects_to_intended_url_when_no_redirect_param_is_provided()
+    {
+        User::make()
+            ->id(1)
+            ->email('san@holo.com')
+            ->password('chewy')
+            ->save();
+
+        $this
+            ->withSession(['url.intended' => '/protected'])
+            ->post('/!/auth/login', [
+                'token' => 'test-token',
+                'email' => 'san@holo.com',
+                'password' => 'chewy',
+            ])
+            ->assertRedirect('/protected')
+            ->assertSessionMissing('url.intended');
+    }
+
+    #[Test]
+    public function it_prefers_redirect_param_over_intended_url()
+    {
+        User::make()
+            ->id(1)
+            ->email('san@holo.com')
+            ->password('chewy')
+            ->save();
+
+        $this
+            ->withSession(['url.intended' => '/protected'])
+            ->post('/!/auth/login', [
+                'token' => 'test-token',
+                'email' => 'san@holo.com',
+                'password' => 'chewy',
+                '_redirect' => '/dashboard',
+            ])
+            ->assertRedirect('/dashboard')
+            ->assertSessionMissing('url.intended');
+    }
+
+    #[Test]
+    public function it_stashes_redirect_as_intended_url_when_two_factor_setup_is_required()
+    {
+        config()->set('statamic.users.two_factor_enforced_roles', ['*']);
+
+        User::make()
+            ->id(1)
+            ->email('san@holo.com')
+            ->password('chewy')
+            ->save();
+
+        $this
+            ->post('/!/auth/login', [
+                'token' => 'test-token',
+                'email' => 'san@holo.com',
+                'password' => 'chewy',
+                '_redirect' => '/dashboard',
+            ])
+            ->assertRedirect('/dashboard')
+            ->assertSessionHas('url.intended', '/dashboard');
+    }
+
+    #[Test]
+    #[DefineEnvironment('disableTwoFactor')]
+    public function it_skips_two_factor_challenge_when_two_factor_is_disabled()
+    {
+        Event::fake();
+
+        $this->assertFalse(auth()->check());
+
+        User::make()
+            ->id(1)
+            ->email('san@holo.com')
+            ->password('chewy')
+            ->data([
+                'two_factor_confirmed_at' => now()->timestamp,
+                'two_factor_secret' => encrypt(app(TwoFactorAuthenticationProvider::class)->generateSecretKey()),
+                'two_factor_recovery_codes' => encrypt(json_encode(Collection::times(8, function () {
+                    return RecoveryCode::generate();
+                })->all())),
+            ])
+            ->save();
+
+        $this
+            ->assertGuest()
+            ->post('/!/auth/login', [
+                'token' => 'test-token',
+                'email' => 'san@holo.com',
+                'password' => 'chewy',
+            ])
+            ->assertLocation('/');
+
+        $this->assertTrue(auth()->check());
+
+        Event::assertNotDispatched(TwoFactorAuthenticationChallenged::class);
+    }
+
+    protected function disableTwoFactor($app)
+    {
+        $app['config']->set('statamic.users.two_factor_enabled', false);
+    }
+
+    #[Test]
+    public function it_includes_passkey_data()
+    {
+        $output = $this->tag('{{ user:login_form }}{{ passkey_options_url }}|{{ passkey_verify_url }}{{ /user:login_form }}');
+
+        $this->assertStringContainsString(route('statamic.passkeys.options'), $output);
+        $this->assertStringContainsString(route('statamic.passkeys.login'), $output);
+    }
+
+    #[Test]
+    public function it_allows_password_login_when_user_has_no_passkeys()
+    {
+        $user = User::make()->id('test-user')->email('test@example.com')->password('secret');
+        $user->save();
+
+        config(['statamic.webauthn.allow_password_login_with_passkey' => false]);
+
+        $this
+            ->post('/!/auth/login', [
+                'email' => 'test@example.com',
+                'password' => 'secret',
+            ])
+            ->assertRedirect('/');
+
+        $this->assertAuthenticatedAs($user);
+    }
+
+    #[Test]
+    public function it_blocks_password_login_when_user_has_passkeys_and_enforcement_enabled()
+    {
+        $user = User::make()->id('test-user')->email('test@example.com')->password('secret');
+        $user->save();
+
+        $passkey = Mockery::mock(Passkey::class);
+        $passkey->shouldReceive('id')->andReturn('passkey-1');
+        $user->setPasskeys(collect([$passkey]));
+
+        config(['statamic.webauthn.allow_password_login_with_passkey' => false]);
+
+        $this
+            ->from('/login')
+            ->post('/!/auth/login', [
+                'email' => 'test@example.com',
+                'password' => 'secret',
+            ])
+            ->assertRedirect('/login');
+
+        $this->assertGuest();
+    }
+
+    #[Test]
+    public function it_allows_password_login_when_user_has_passkeys_and_enforcement_disabled()
+    {
+        $user = User::make()->id('test-user')->email('test@example.com')->password('secret');
+        $user->save();
+
+        $passkey = Mockery::mock(Passkey::class);
+        $passkey->shouldReceive('id')->andReturn('passkey-1');
+        $user->setPasskeys(collect([$passkey]));
+
+        config(['statamic.webauthn.allow_password_login_with_passkey' => true]);
+
+        $this
+            ->post('/!/auth/login', [
+                'email' => 'test@example.com',
+                'password' => 'secret',
+            ])
+            ->assertRedirect('/');
+
+        $this->assertAuthenticatedAs($user);
+    }
+
+    #[Test]
+    public function it_gets_passkey_login_options()
+    {
+        $response = $this->get(route('statamic.passkeys.options'));
+
+        $response->assertOk();
+
+        $data = $response->json();
+
+        $this->assertArrayHasKey('challenge', $data);
+        $this->assertArrayHasKey('userVerification', $data);
+        $this->assertEquals('required', $data['userVerification']);
+    }
+
+    #[Test]
+    public function it_logs_in_with_passkey()
+    {
+        $user = User::make()->id('test-user')->email('test@example.com')->password('secret');
+        $user->save();
+
+        WebAuthn::shouldReceive('getUserFromCredentials')->once()->andReturn($user);
+        WebAuthn::shouldReceive('validateAssertion')->once()->andReturnTrue();
+
+        $this
+            ->postJson(route('statamic.passkeys.login'))
+            ->assertOk()
+            ->assertJson(['redirect' => '/']);
+
+        $this->assertAuthenticatedAs($user);
+    }
+
+    #[Test]
+    public function it_redirects_to_provided_url_after_passkey_login()
+    {
+        $user = User::make()->id('test-user')->email('test@example.com')->password('secret');
+        $user->save();
+
+        WebAuthn::shouldReceive('getUserFromCredentials')->once()->andReturn($user);
+        WebAuthn::shouldReceive('validateAssertion')->once()->andReturnTrue();
+
+        $this
+            ->postJson(route('statamic.passkeys.login'), ['redirect' => '/dashboard'])
+            ->assertOk()
+            ->assertJson(['redirect' => '/dashboard']);
+
+        $this->assertAuthenticatedAs($user);
+    }
+
+    #[Test]
+    public function it_does_not_redirect_to_external_url_after_passkey_login()
+    {
+        $user = User::make()->id('test-user')->email('test@example.com')->password('secret');
+        $user->save();
+
+        WebAuthn::shouldReceive('getUserFromCredentials')->once()->andReturn($user);
+        WebAuthn::shouldReceive('validateAssertion')->once()->andReturnTrue();
+
+        $this
+            ->postJson(route('statamic.passkeys.login'), ['redirect' => 'https://evil.com'])
+            ->assertOk()
+            ->assertJson(['redirect' => '/']);
+
+        $this->assertAuthenticatedAs($user);
+    }
+
+    #[Test]
+    public function it_fails_passkey_login_when_validation_fails()
+    {
+        $user = User::make()->id('test-user')->email('test@example.com')->password('secret');
+        $user->save();
+
+        WebAuthn::shouldReceive('getUserFromCredentials')->once()->andReturn($user);
+        WebAuthn::shouldReceive('validateAssertion')->once()->andThrow(new \Exception('Invalid'));
+
+        $this
+            ->postJson(route('statamic.passkeys.login'))
+            ->assertStatus(500);
+
+        $this->assertGuest();
     }
 }

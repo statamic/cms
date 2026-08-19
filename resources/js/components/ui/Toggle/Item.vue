@@ -1,9 +1,11 @@
 <script setup>
-import { computed, inject, useSlots } from 'vue';
+import { computed, inject, useAttrs, useSlots } from 'vue';
 import { cva } from 'cva';
 import { twMerge } from 'tailwind-merge';
 import { ToggleGroupItem } from 'reka-ui';
 import Icon from '../Icon/Icon.vue';
+
+defineOptions({ inheritAttrs: false });
 
 const props = defineProps({
     /** Value of the toggle item */
@@ -18,6 +20,7 @@ const props = defineProps({
     ariaDescribedby: { type: String, default: null },
 });
 
+const attrs = useAttrs();
 const variant = inject('toggleVariant', 'default');
 const size = inject('toggleSize', 'base');
 
@@ -78,12 +81,18 @@ const toggleItemClasses = computed(() => {
         iconOnly: iconOnly.value,
     });
 
-    return twMerge(classes);
+    return twMerge(classes, attrs.class);
+});
+
+const restAttrs = computed(() => {
+    const { class: _, ...rest } = attrs;
+    return rest;
 });
 </script>
 
 <template>
     <ToggleGroupItem
+        v-bind="restAttrs"
         :value="value"
         :aria-label="accessibleLabel"
         :aria-describedby="ariaDescribedby"

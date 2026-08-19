@@ -5,15 +5,33 @@ import {router} from '@inertiajs/vue3';
 import {action} from 'storybook/actions';
 import './storybook.css';
 import './theme.css';
-import {translate} from '@/translations/translator';
+import {translate, translateChoice} from '@/translations/translator';
 import registerUiComponents from '@/bootstrap/ui';
 import DateFormatter from '@/components/DateFormatter';
+import NumberFormatter from '@/components/NumberFormatter';
 import cleanCodeSnippet from './clean-code-snippet';
 import PortalVue from 'portal-vue';
 import FullscreenHeader from '@/components/publish/FullscreenHeader.vue';
 import Portal from '@/components/portals/Portal.vue';
 import PortalTargets from '@/components/portals/PortalTargets.vue';
-import {keys, portals, slug, stacks} from '@api';
+import {config as statamicConfig, keys, portals, slug, stacks} from '@api';
+import useGlobalEventBus from '@/composables/global-event-bus';
+
+const storybookConfig = {
+    linkToDocs: true,
+    paginationSize: 50,
+    paginationSizeOptions: [10, 25, 50, 100, 500],
+    sites: [{
+        handle: 'default',
+        lang: 'en',
+    }],
+    selectedSite: 'default',
+    lang: 'en',
+    translationLocale: 'en',
+    displayTimezone: 'UTC',
+    asciiReplaceExtraSymbols: false,
+    charmap: { currency: {}, currency_short: {} },
+};
 
 // Intercept Inertia navigation and log to Actions tab.
 router.on('before', (event) => {
@@ -23,22 +41,13 @@ router.on('before', (event) => {
 
 setup(async (app) => {
   window.__ = translate;
+  window.__n = translateChoice;
+  statamicConfig.initialize(storybookConfig);
 
   window.Statamic = {
       $config: {
           get(key) {
-              const config = {
-                  linkToDocs: true,
-                  paginationSize: 50,
-                  paginationSizeOptions: [10, 25, 50, 100, 500],
-                  sites: [{
-                      handle: 'default',
-                      lang: 'en',
-                  }],
-                  selectedSite: 'default',
-              };
-
-              return config[key] ?? null;
+              return storybookConfig[key] ?? null;
           }
       },
       $commandPalette: {
@@ -46,15 +55,21 @@ setup(async (app) => {
               //
           }
       },
+      $events: useGlobalEventBus(),
       $progress: {
           loading(name, loading) {
               //
-          }
+          },
+          complete(name) {
+              //
+          },
       }
   };
 
   app.config.globalProperties.__ = translate;
+  app.config.globalProperties.__n = translateChoice;
   app.config.globalProperties.$date = new DateFormatter;
+  app.config.globalProperties.$number = new NumberFormatter;
   app.config.globalProperties.cp_url = (url) => url;
   app.config.globalProperties.$portals = portals;
   app.config.globalProperties.$stacks = stacks;
@@ -80,6 +95,12 @@ const preview: Preview = {
         },
 
         docs: {
+            argTypes: {
+                sort: 'alpha',
+            },
+            controls: {
+                sort: 'alpha',
+            },
             theme: createTheme({
                 base: 'light',
                 fontBase: '"Lexend", sans-serif',

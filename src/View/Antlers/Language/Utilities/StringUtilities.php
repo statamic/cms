@@ -79,15 +79,10 @@ class StringUtilities
      */
     public static function sanitizePhp($text)
     {
-        $text = str_replace('<?php', '&lt;?php', $text);
-
-        // Also replace short tags if they're enabled.
-        if (ini_get('short_open_tag')) {
-            $xmlPlaceholder = '__XML_PLACEHOLDER'.Str::uuid();
-            $text = str_replace('<?xml', $xmlPlaceholder, $text);
-            $text = str_replace('<?', '&lt;?', $text);
-            $text = str_replace($xmlPlaceholder, '<?xml', $text);
-        }
+        $xmlPlaceholder = '__XML_PLACEHOLDER'.Str::uuid();
+        $text = str_replace('<?xml', $xmlPlaceholder, $text);
+        $text = str_replace('<?', '&lt;?', $text);
+        $text = str_replace($xmlPlaceholder, '<?xml', $text);
 
         return $text;
     }

@@ -23,12 +23,12 @@ class Manager
 
     public function addType($type)
     {
-        return GraphQL::addType($type);
+        GraphQL::addType($type);
     }
 
     public function addTypes($type)
     {
-        return GraphQL::addTypes($type);
+        GraphQL::addTypes($type);
     }
 
     public function type($type)
@@ -94,5 +94,16 @@ class Manager
     public function getExtraMiddleware()
     {
         return $this->middleware;
+    }
+
+    public function introspectionEnabled(): bool
+    {
+        if (config('graphql.security.disable_introspection')) {
+            return false;
+        }
+
+        $config = config('statamic.graphql.introspection') ?? 'auto';
+
+        return $config === 'auto' ? app()->isLocal() : (bool) $config;
     }
 }

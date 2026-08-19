@@ -82,7 +82,7 @@ export default {
         // Listen for root-form-save events from child components
         // This also happens on the fieldset builder.
         this.$events.$on('root-form-save', () => {
-            this.save();
+            this.$nextTick(() => this.save());
         });
 
         if (this.isFormBlueprint) {
@@ -130,7 +130,7 @@ export default {
                 });
         },
 
-        saved(response) {
+        saved() {
             this.$toast.success(__('Saved'));
             this.errors = {};
             this.$dirty.remove('blueprints');

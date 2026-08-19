@@ -122,7 +122,7 @@ const props = defineProps([
                                 </div>
                             </TableCell>
                             <TableCell>{{ addon.version }}</TableCell>
-                            <TableCell class="text-red-700 text-end">{{ addon.invalidReason }}</TableCell>
+                            <TableCell class="text-red-600 text-end">{{ addon.invalidReason }}</TableCell>
                         </TableRow>
                     </Table>
                 </Card>

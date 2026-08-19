@@ -1,106 +1,109 @@
 <template>
     <div class="h-full rounded-s-xl">
         <div class="flex h-full min-h-0 flex-col">
-            <Listing
-                v-if="filters != null && view === 'list'"
-                :url="selectionsUrl"
-                :filters="filters"
-                :max-selections="maxSelections"
-                :sort-column="sortColumn"
-                :sort-direction="sortDirection"
-                :additional-parameters="additionalParameters"
-                v-model:selections="selections"
-                @request-completed="focusSearchInput"
-            >
-                <template #initializing>
-                    <div class="flex flex-1">
-                        <div class="absolute inset-0 z-200 flex items-center justify-center text-center">
-                            <Icon name="loading" />
+            <div class="flex flex-1 min-h-0 flex-col">
+                <Listing
+                    v-if="filters != null && view === 'list'"
+                    class="flex flex-1 flex-col min-h-0"
+                    :url="selectionsUrl"
+                    :filters="filters"
+                    :max-selections="maxSelections"
+                    :sort-column="sortColumn"
+                    :sort-direction="sortDirection"
+                    :additional-parameters="additionalParameters"
+                    v-model:selections="selections"
+                    @request-completed="focusSearchInput"
+                >
+                    <template #initializing>
+                        <div class="flex flex-1">
+                            <div class="absolute inset-0 z-200 flex items-center justify-center text-center">
+                                <Icon name="loading" />
+                            </div>
                         </div>
+                    </template>
+
+                    <div class="flex flex-1 flex-col gap-4 overflow-auto p-4">
+                        <div class="flex items-center gap-2 sm:gap-3 min-h-16">
+                            <div class="flex flex-1 items-center gap-2 sm:gap-3">
+                                <Search ref="search" />
+                                <Filters v-if="filters && filters.length" />
+                            </div>
+
+                            <ui-toggle-group v-model="view" v-if="canUseTree">
+                                <ui-toggle-item icon="hierarchy" value="tree" />
+                                <ui-toggle-item icon="layout-list" value="list" />
+                            </ui-toggle-group>
+                        </div>
+
+                        <Panel class="relative mb-0! overflow-x-auto overscroll-x-contain">
+                            <Table>
+                                <template #cell-title="{ row: entry, isColumnVisible }">
+                                    <a class="title-index-field" :href="entry.edit_url" @click.prevent="toggleSelection(entry.id)">
+                                        <StatusIndicator v-if="!isColumnVisible('status')" :status="entry.status" />
+                                        <span v-text="entry.title" />
+                                    </a>
+                                </template>
+                                <template #cell-status="{ row: entry }">
+                                    <StatusIndicator :status="entry.status" show-label :show-dot="false" />
+                                </template>
+                                <template #cell-type="{ value }">
+                                    <Badge :text="value" />
+                                </template>
+                            </Table>
+                            <PanelFooter>
+                                <Pagination />
+                            </PanelFooter>
+                        </Panel>
                     </div>
-                </template>
+                </Listing>
 
-                <div class="flex flex-1 flex-col gap-4 overflow-auto p-4">
-                    <div class="flex items-center gap-2 sm:gap-3">
-                        <div class="flex flex-1 items-center gap-2 sm:gap-3">
-                            <Search ref="search" />
-                            <Filters v-if="filters && filters.length" />
-                        </div>
-
+                <div v-if="view === 'tree'" class="flex flex-1 min-h-0 flex-col gap-4 p-4">
+                    <div class="flex items-center justify-between gap-2 sm:gap-3 min-h-16">
+                        <Heading :text="__('Pages')" size="lg" />
                         <ui-toggle-group v-model="view" v-if="canUseTree">
                             <ui-toggle-item icon="hierarchy" value="tree" />
                             <ui-toggle-item icon="layout-list" value="list" />
                         </ui-toggle-group>
                     </div>
 
-                    <Panel class="relative mb-0! overflow-x-auto overscroll-x-contain">
-                        <Table>
-                            <template #cell-title="{ row: entry, isColumnVisible }">
-                                <a class="title-index-field" :href="entry.edit_url" @click.prevent="toggleSelection(entry.id)">
-                                    <StatusIndicator v-if="!isColumnVisible('status')" :status="entry.status" />
-                                    <span v-text="entry.title" />
-                                </a>
+                    <div class="flex-1 min-h-0 overflow-auto">
+                        <page-tree
+                            ref="tree"
+                            :pages-url="tree.url"
+                            :show-slugs="tree.showSlugs"
+                            :blueprints="tree.blueprints"
+                            :expects-root="tree.expectsRoot"
+                            :site="site"
+                            :preferences-prefix="`selector-field.${name}`"
+                            :editable="false"
+                            @branch-clicked="toggleSelection($event.id)"
+                        >
+                            <template #branch-action="{ branch, index }">
+                                <div>
+                                    <Checkbox
+                                        :ref="`tree-branch-${branch.id}`"
+                                        class="mt-3 mx-3"
+                                        :value="branch.id"
+                                        :model-value="isSelected(branch.id)"
+                                        :disabled="reachedSelectionLimit && !singleSelect && !isSelected(branch.id)"
+                                        :label="getCheckboxLabel(branch)"
+                                        :description="getCheckboxDescription(branch)"
+                                        size="sm"
+                                        solo
+                                        @update:model-value="toggleSelection(branch.id)"
+                                    />
+                                </div>
                             </template>
-                            <template #cell-status="{ row: entry }">
-                                <StatusIndicator :status="entry.status" show-label :show-dot="false" />
+
+                            <template #branch-icon="{ branch }">
+                                <ui-icon name="external-link" v-if="isRedirectBranch(branch)" v-tooltip="__('Redirect')" />
                             </template>
-                            <template #cell-type="{ value }">
-                                <Badge :text="value" />
-                            </template>
-                        </Table>
-                        <PanelFooter>
-                            <Pagination />
-                        </PanelFooter>
-                    </Panel>
+                        </page-tree>
+                    </div>
                 </div>
-            </Listing>
+            </div>
 
-            <template v-if="view === 'tree'">
-                <div class="flex justify-between p-4">
-                    <Heading :text="__('Pages')" size="lg" />
-                    <ui-toggle-group v-model="view" v-if="canUseTree">
-                        <ui-toggle-item icon="hierarchy" value="tree" />
-                        <ui-toggle-item icon="layout-list" value="list" />
-                    </ui-toggle-group>
-                </div>
-
-                <div class="mx-4 flex-1 overflow-auto">
-                    <page-tree
-                        ref="tree"
-                        :pages-url="tree.url"
-                        :show-slugs="tree.showSlugs"
-                        :blueprints="tree.blueprints"
-                        :expects-root="tree.expectsRoot"
-                        :site="site"
-                        :preferences-prefix="`selector-field.${name}`"
-                        :editable="false"
-                        @branch-clicked="toggleSelection($event.id)"
-                    >
-                        <template #branch-action="{ branch, index }">
-                            <div>
-                                <Checkbox
-                                    :ref="`tree-branch-${branch.id}`"
-                                    class="mt-3 mx-3"
-                                    :value="branch.id"
-                                    :model-value="isSelected(branch.id)"
-                                    :disabled="reachedSelectionLimit && !singleSelect && !isSelected(branch.id)"
-                                    :label="getCheckboxLabel(branch)"
-                                    :description="getCheckboxDescription(branch)"
-                                    size="sm"
-                                    solo
-                                    @update:model-value="toggleSelection(branch.id)"
-                                />
-                            </div>
-                        </template>
-
-                        <template #branch-icon="{ branch }">
-                            <ui-icon name="external-link" v-if="isRedirectBranch(branch)" v-tooltip="__('Redirect')" />
-                        </template>
-                    </page-tree>
-                </div>
-            </template>
-
-            <footer class="flex items-center justify-between border-t dark:border-dark-900 bg-gray-100 dark:bg-gray-800 p-4 rounded-es-xl">
+            <footer class="flex shrink-0 items-center justify-between border-t dark:border-gray-900 bg-gray-100 dark:bg-gray-800 p-4 rounded-es-xl">
                 <ui-badge
                     v-text="
                         hasMaxSelections

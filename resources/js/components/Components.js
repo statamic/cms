@@ -1,5 +1,5 @@
 import { ref } from 'vue';
-import uniqid from 'uniqid';
+import { nanoid as uniqid } from 'nanoid';
 import Component from './Component';
 
 class Components {
