@@ -3,6 +3,7 @@ import { expect, test, vi } from 'vitest';
 import * as Globals from '@/bootstrap/globals';
 import { preferences } from '@api';
 import AssetsFieldtype from '@/components/fieldtypes/assets/AssetsFieldtype.vue';
+import { publishContextKey } from '@/components/ui';
 
 // Register the global helper functions (data_get, clone, etc.) onto the window
 // like the control panel bootstrap does, so the component can use them.
@@ -25,6 +26,9 @@ const makeField = ({ axiosPost = vi.fn(() => Promise.resolve({ data: [] })), pro
             ...props,
         },
         global: {
+            provide: {
+                [publishContextKey]: { errors: {} },
+            },
             mocks: {
                 $axios: { post: axiosPost },
                 $progress: { loading: () => {} },
