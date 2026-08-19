@@ -5,7 +5,6 @@
                 <ui-button
                     class="w-full min-w-0 shrink justify-between"
                     icon-append="chevron-down"
-                    :read-only="isReadOnly"
                     :aria-expanded="compactOpen"
                     aria-haspopup="dialog"
                 >
@@ -115,7 +114,7 @@
                     class="flex w-full items-center gap-2"
                     :class="{ 'mt-2': isCompact && valueCount }"
                 >
-                    <ui-button @click="addValue" :disabled="atMax" v-if="!isReadOnly && !isSingle && !isKeyed" :text="addButton" size="sm" :class="compactFooterButtonClass" />
+                    <ui-button @click="addValue()" :disabled="atMax" v-if="!isReadOnly && !isSingle && !isKeyed" :text="addButton" size="sm" :class="compactFooterButtonClass" />
                     <ui-button v-if="isCompact" class="ms-auto" :class="compactFooterButtonClass" size="sm" @click="setCompactOpen(false)">
                         <span class="st-text-trim-cap">{{ __('Close') }}</span>
                         <span class="ms-1.5 inline-flex h-4 min-w-4 items-center justify-center rounded bg-gray-200/50 px-1 font-semibold uppercase text-[0.625rem] text-gray-600 dark:bg-gray-900 dark:text-gray-400/85">
@@ -283,6 +282,10 @@ export default {
 
     methods: {
         setCompactOpen(open) {
+            if (!open) {
+                this.data = this.data.filter((element) => element.key || element.value);
+            }
+
             this.compactOpen = open;
 
             if (open && !this.valueCount && !this.isReadOnly) {
@@ -304,6 +307,10 @@ export default {
         },
 
         addValue(index = this.data.length) {
+            if (typeof index !== 'number' || Number.isNaN(index)) {
+                index = this.data.length;
+            }
+
             this.data.splice(index, 0, this.newSortableValue());
             this.$nextTick(() => {
                 this.$refs.editor
