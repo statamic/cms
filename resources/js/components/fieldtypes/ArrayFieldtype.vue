@@ -118,7 +118,7 @@
                     <ui-button @click="addValue" :disabled="atMax" v-if="!isReadOnly && !isSingle && !isKeyed" :text="addButton" size="sm" />
                     <ui-button v-if="isCompact" class="ms-auto" size="sm" @click="setCompactOpen(false)">
                         {{ __('Close') }}
-                        <span class="ms-1.5 inline-flex h-4 min-w-4 items-center justify-center rounded bg-gray-200/75 px-1 font-semibold uppercase text-[0.625rem] text-gray-600 dark:bg-gray-800 dark:text-gray-400">
+                        <span class="ms-1.5 inline-flex h-4 min-w-4 items-center justify-center rounded bg-gray-200/50 px-1 font-semibold uppercase text-[0.625rem] text-gray-600 dark:bg-gray-900 dark:text-gray-400/85">
                             Esc
                         </span>
                     </ui-button>
