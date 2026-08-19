@@ -177,7 +177,7 @@ let popping = false;
 let source = null;
 const searchQuery = ref(null);
 const columns = ref(initializeColumns());
-const sortColumn = ref(props.sortColumn || (columns.value.length ? columns.value[0].field : null));
+const sortColumn = ref(props.sortColumn === null ? null : (props.sortColumn || (columns.value.length ? columns.value[0].field : null)));
 const sortDirection = ref(props.sortDirection || getDefaultSortDirectionForColumn(sortColumn.value));
 const selections = ref(props.selections || []);
 const allowsSelections = computed(() => (props.selections || (props.allowBulkActions && hasActions.value)) && !props.reorderable);
@@ -206,7 +206,7 @@ const items = computed({
                 .map((result) => result.obj);
         }
 
-        if (props.sortable) {
+        if (props.sortable && sortColumn.value) {
             items = sortBy(items, (obj) => {
                 let value = obj[sortColumn.value];
                 if (typeof value === 'string') value = value.toLowerCase();
@@ -214,7 +214,7 @@ const items = computed({
             });
         }
 
-        return sortDirection.value === 'desc' ? items.reverse() : items;
+        return sortColumn.value && sortDirection.value === 'desc' ? items.reverse() : items;
     },
     set(newItems) {
         rawItems.value = newItems;

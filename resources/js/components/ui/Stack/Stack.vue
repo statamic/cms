@@ -132,13 +132,21 @@ const stackEnteringChanged = (entering) => {
     }
 };
 
+function openComboboxExists() {
+    return document.querySelector('[data-ui-combobox-content]') !== null;
+}
+
 function open() {
     if (!stack.value) stack.value = stacks.add(instance.proxy);
 
     events.$on(`stacks.${depth.value}.hit-area-mouseenter`, () => (isHovering.value = true));
     events.$on(`stacks.${depth.value}.hit-area-mouseout`, () => (isHovering.value = false));
 
-    escBinding.value = keys.bindGlobal('esc', runCloseCallback);
+    escBinding.value = keys.bindGlobal('esc', () => {
+        if (openComboboxExists()) return;
+
+        runCloseCallback();
+    });
 
     window.addEventListener('resize', windowResized);
 

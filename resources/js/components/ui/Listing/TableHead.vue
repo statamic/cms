@@ -7,6 +7,9 @@ import { computed } from 'vue';
 const { allowsSelections, reorderable, hasActions, visibleColumns, allowsMultipleSelections } = injectListingContext();
 
 const props = defineProps({
+    items: {
+        type: Array,
+    },
     srOnly: {
         type: Boolean,
         default: false,
@@ -27,7 +30,7 @@ const hasVisibleHeader = computed(() => {
                 :class="{ 'checkbox-column': !reorderable, 'handle-column': reorderable }"
                 scope="col"
             >
-                <ToggleAll v-if="allowsSelections && allowsMultipleSelections" />
+                <ToggleAll v-if="allowsSelections && allowsMultipleSelections" :items="items" />
             </th>
             <HeaderCell v-for="column in visibleColumns" :key="column.field" :column :data-column="column.field" />
             <!-- <th class="type-column" v-if="type">
