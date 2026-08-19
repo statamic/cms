@@ -63,6 +63,13 @@ class Site implements Augmentable
         return is_string($group) && $group !== '' ? $group : null;
     }
 
+    public function groupHandle(): ?string
+    {
+        $handle = $this->config['group_handle'] ?? null;
+
+        return is_string($handle) && $handle !== '' ? $handle : null;
+    }
+
     public function url()
     {
         return URL::tidy($this->config['url'], true);

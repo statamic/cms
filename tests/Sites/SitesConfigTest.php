@@ -387,6 +387,7 @@ class SitesConfigTest extends TestCase
                 'url' => '/ar/',
                 'locale' => 'ar_EG',
                 'group' => 'Middle East',
+                'group_handle' => 'middle-east',
                 'attributes' => [
                     'theme' => 'standard',
                 ],
@@ -442,7 +443,9 @@ class SitesConfigTest extends TestCase
 
         $this->assertSame(['paris', 'en'], array_keys($saved = YAML::file($this->yamlPath)->parse()));
         $this->assertSame('Paris', $saved['paris']['group']);
+        $this->assertSame('paris', $saved['paris']['group_handle']);
         $this->assertSame('London', $saved['en']['group']);
+        $this->assertSame('london', $saved['en']['group_handle']);
     }
 
     #[Test]
@@ -477,6 +480,7 @@ class SitesConfigTest extends TestCase
         $this->assertCount(1, $values['group_middle-east_sites']);
         $this->assertSame('arabic', $values['group_middle-east_sites'][0]['handle']);
         $this->assertArrayNotHasKey('group', $values['group_middle-east_sites'][0]);
+        $this->assertArrayNotHasKey('group_handle', $values['group_middle-east_sites'][0]);
     }
 
     #[Test]
@@ -541,7 +545,9 @@ class SitesConfigTest extends TestCase
         $saved = YAML::file($this->yamlPath)->parse();
 
         $this->assertSame('Paris', $saved['fr']['group']);
+        $this->assertSame('new-group', $saved['fr']['group_handle']);
         $this->assertArrayNotHasKey('group', $saved['default']);
+        $this->assertArrayNotHasKey('group_handle', $saved['default']);
     }
 
     #[Test]
@@ -658,8 +664,11 @@ class SitesConfigTest extends TestCase
         ]);
 
         $this->assertSame('London', $config['en']['group']);
+        $this->assertSame('london', $config['en']['group_handle']);
         $this->assertSame('London', $config['fr']['group']);
+        $this->assertSame('london', $config['fr']['group_handle']);
         $this->assertSame('Paris', $config['paris']['group']);
+        $this->assertSame('paris', $config['paris']['group_handle']);
         $this->assertArrayNotHasKey('group', $config['default'] ?? []);
         $this->assertSame(['en', 'fr', 'paris'], array_keys($config));
     }
@@ -816,6 +825,106 @@ class SitesConfigTest extends TestCase
             ->patchJson(cp_route('sites.update'), $data)
             ->assertStatus(422)
             ->assertJsonValidationErrors(['group_other_sites']);
+    }
+
+    #[Test]
+    public function it_validates_empty_named_groups_when_no_sites_are_submitted()
+    {
+        Config::set('statamic.system.multisite', true);
+
+        $this
+            ->actingAs(tap(User::make()->email('chew@bacca.com')->makeSuper())->save())
+            ->patchJson(cp_route('sites.update'), [
+                'group_london_name' => 'London',
+                'group_london_sites' => [],
+            ])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['group_london_sites'])
+            ->assertJsonMissingValidationErrors(['group_other_sites']);
+    }
+
+    #[Test]
+    public function groups_with_the_same_slug_stay_separate()
+    {
+        Config::set('statamic.system.multisite', true);
+
+        Site::setSites([
+            'en' => [
+                'name' => 'English',
+                'url' => '/',
+                'locale' => 'en_US',
+                'group' => 'New York',
+            ],
+            'fr' => [
+                'name' => 'French',
+                'url' => '/fr/',
+                'locale' => 'fr_FR',
+                'group' => 'new york',
+            ],
+        ]);
+
+        $values = Site::blueprintValues();
+
+        $this->assertSame('New York', $values['group_new-york_name']);
+        $this->assertSame('new york', $values['group_new-york-2_name']);
+        $this->assertSame(['en'], collect($values['group_new-york_sites'])->pluck('handle')->all());
+        $this->assertSame(['fr'], collect($values['group_new-york-2_sites'])->pluck('handle')->all());
+    }
+
+    #[Test]
+    public function a_group_named_other_does_not_merge_into_the_ungrouped_section()
+    {
+        Config::set('statamic.system.multisite', true);
+
+        Site::setSites([
+            'en' => [
+                'name' => 'English',
+                'url' => '/',
+                'locale' => 'en_US',
+                'group' => 'Other',
+            ],
+            'fr' => [
+                'name' => 'French',
+                'url' => '/fr/',
+                'locale' => 'fr_FR',
+            ],
+        ]);
+
+        $values = Site::blueprintValues();
+
+        $this->assertSame('Other', $values['group_group_name']);
+        $this->assertSame(['en'], collect($values['group_group_sites'])->pluck('handle')->all());
+        $this->assertSame(['fr'], collect($values['group_other_sites'])->pluck('handle')->all());
+    }
+
+    #[Test]
+    public function stored_group_handles_keep_groups_stable_when_names_slug_the_same()
+    {
+        Config::set('statamic.system.multisite', true);
+
+        Site::setSites([
+            'en' => [
+                'name' => 'English',
+                'url' => '/',
+                'locale' => 'en_US',
+                'group' => 'Cafe',
+                'group_handle' => 'cafe',
+            ],
+            'fr' => [
+                'name' => 'French',
+                'url' => '/fr/',
+                'locale' => 'fr_FR',
+                'group' => 'Café',
+                'group_handle' => 'cafe-2',
+            ],
+        ]);
+
+        $values = Site::blueprintValues();
+
+        $this->assertSame('Cafe', $values['group_cafe_name']);
+        $this->assertSame('Café', $values['group_cafe-2_name']);
+        $this->assertSame(['en'], collect($values['group_cafe_sites'])->pluck('handle')->all());
+        $this->assertSame(['fr'], collect($values['group_cafe-2_sites'])->pluck('handle')->all());
     }
 
     #[Test]

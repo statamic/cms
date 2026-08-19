@@ -167,7 +167,12 @@ function insertNamedSection(section) {
 }
 
 function uniqueGroupKey(title) {
-    const base = Statamic.$slug.create(title) || 'group';
+    let base = Statamic.$slug.create(title) || 'group';
+
+    if (base === 'other') {
+        base = 'group';
+    }
+
     let key = base;
     let suffix = 2;
 
@@ -246,12 +251,13 @@ function saveGroupTitle() {
 }
 
 function removeGroup(section) {
-    const moving = values.value[sitesHandleFor(section)] || [];
+    const fromHandle = sitesHandleFor(section);
+    const moving = values.value[fromHandle] || [];
     const next = { ...values.value };
 
     next.group_other_sites = [...(next.group_other_sites || []), ...moving];
     delete next[section.editable_title_handle];
-    delete next[sitesHandleFor(section)];
+    delete next[fromHandle];
 
     const index = tab.sections.findIndex((item) => sectionKey(item) === sectionKey(section));
     if (index !== -1) {
@@ -259,6 +265,9 @@ function removeGroup(section) {
     }
 
     setValues(valuesWithOtherLast(next));
+
+    moving.forEach((row) => moveRowMeta(fromHandle, 'group_other_sites', row._id));
+    unregisterSectionRowZone(fromHandle);
 }
 
 function addGroup(title) {
@@ -430,8 +439,24 @@ function moveRowBetweenZones(event) {
     scheduleRowSortableRebuild();
 }
 
+function ensureGridMeta(handle, templateHandle) {
+    if (meta.value[handle] || !templateHandle) return;
+
+    const templateMeta = meta.value[templateHandle];
+
+    if (!templateMeta) return;
+
+    setFieldMeta(handle, {
+        defaults: deepClone(templateMeta.defaults),
+        new: deepClone(templateMeta.new),
+        existing: {},
+    });
+}
+
 function moveRowMeta(fromHandle, toHandle, rowId) {
-    if (!rowId) return;
+    if (!rowId || fromHandle === toHandle) return;
+
+    ensureGridMeta(toHandle, fromHandle);
 
     const fromMeta = meta.value[fromHandle];
     const toMeta = meta.value[toHandle];
