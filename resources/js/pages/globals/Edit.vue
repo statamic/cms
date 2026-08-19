@@ -10,6 +10,7 @@ defineProps([
     'reference',
     'blueprintHandle',
     'blueprint',
+    'asConfig',
     'values',
     'localizedFields',
     'meta',
@@ -28,7 +29,7 @@ defineProps([
 </script>
 
 <template>
-    <div class="max-w-5xl 3xl:max-w-6xl mx-auto" data-max-width-wrapper>
+    <div :class="asConfig ? 'max-w-page mx-auto' : 'max-w-5xl 3xl:max-w-6xl mx-auto'" data-max-width-wrapper>
         <Head :title="__('Edit Global Set')" />
 
         <GlobalPublishForm
@@ -41,6 +42,7 @@ defineProps([
             :initial-reference="reference"
             :initial-blueprint-handle="blueprintHandle"
             :initial-fieldset="blueprint"
+            :as-config="asConfig"
             :initial-values="values"
             :initial-localized-fields="localizedFields"
             :initial-meta="meta"

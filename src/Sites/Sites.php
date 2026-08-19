@@ -273,10 +273,6 @@ class Sites
                             $field['field']['width'] = $tableWidths[$field['handle']] ?? 14;
                             $field['field']['classes'] = 'max-w-48 min-w-0 overflow-hidden';
 
-                            if ($field['handle'] === 'attributes') {
-                                $field['field']['compact'] = true;
-                            }
-
                             return $field;
                         })->all(),
                         'required' => true,
