@@ -71,53 +71,32 @@ class ApplicationCacherTest extends TestCase
     }
 
     #[Test]
-    public function caching_a_successful_page_tracks_the_url()
+    #[DataProvider('cachedResponseProvider')]
+    public function caching_a_page_tracks_the_url($status, $content)
     {
         $cache = app(Repository::class);
         $cacher = new ApplicationCacher($cache, ['base_url' => 'http://example.com']);
         $request = Request::create('http://example.com/about', 'GET');
+        $response = response($content, $status);
 
-        $cacher->cachePage($request, response('about page', 200));
-        event(new ResponsePrepared($request, response('about page', 200)));
+        $cacher->cachePage($request, $response);
+        event(new ResponsePrepared($request, $response));
 
         $this->assertEquals(['/about'], $cacher->getUrls()->values()->all());
-    }
-
-    #[Test]
-    public function caching_a_404_page_does_not_track_the_url()
-    {
-        $cache = app(Repository::class);
-        $cacher = new ApplicationCacher($cache, ['base_url' => 'http://example.com']);
-        $request = Request::create('http://example.com/this-does-not-exist', 'GET');
-        $response = response('not found', 404);
-
-        $cacher->cachePage($request, $response);
-        event(new ResponsePrepared($request, $response));
-
-        // The URL isn't tracked in the `.urls` set...
-        $this->assertEquals([], $cacher->getUrls()->all());
-
-        // ...but the 404 response is still cached and served directly by URL hash.
         $this->assertTrue($cacher->hasCachedPage($request));
-        $this->assertEquals('not found', $cacher->getCachedPage($request)->content);
+        $this->assertEquals($content, $cacher->getCachedPage($request)->content);
     }
 
-    #[Test]
-    public function caching_a_shared_error_page_is_always_tracked()
+    public static function cachedResponseProvider()
     {
-        $cache = app(Repository::class);
-        $cacher = new ApplicationCacher($cache, ['base_url' => 'http://example.com']);
-        $request = Request::createFrom(Request::create('http://example.com/'))->fakeStaticCacheStatus(404);
-        $response = response('shared not found', 404);
-
-        $cacher->cachePage($request, $response);
-        event(new ResponsePrepared($request, $response));
-
-        $this->assertEquals(['/__shared-errors/'.\Statamic\Facades\Site::current()->handle().'/404'], $cacher->getUrls()->values()->all());
+        return [
+            'successful response' => [200, 'about page'],
+            'error response' => [404, 'not found'],
+        ];
     }
 
     #[Test]
-    public function wildcard_refresh_does_not_warm_untracked_404_urls()
+    public function refreshing_a_wildcard_warms_successful_urls_and_invalidates_error_urls()
     {
         Queue::fake();
 
@@ -140,6 +119,31 @@ class ApplicationCacherTest extends TestCase
         Queue::assertNotPushed(StaticWarmJob::class, function ($job) {
             return str_contains((string) $job->request->getUri(), 'scanner-junk');
         });
+
+        // The error response is invalidated rather than warmed, so the
+        // tracked set converges to real pages.
+        $this->assertEquals(['/rail/one'], $cacher->getUrls()->values()->all());
+        $this->assertFalse($cacher->hasCachedPage($junkRequest));
+    }
+
+    #[Test]
+    public function refreshing_an_error_url_invalidates_it_instead_of_warming_it()
+    {
+        Queue::fake();
+
+        $cache = app(Repository::class);
+        $cacher = new ApplicationCacher($cache, ['base_url' => 'http://example.com']);
+        $request = Request::create('http://example.com/foo', 'GET');
+        $response = response('not found', 404);
+
+        $cacher->cachePage($request, $response);
+        event(new ResponsePrepared($request, $response));
+
+        $cacher->refreshUrls(['/foo']);
+
+        Queue::assertNothingPushed();
+        $this->assertEquals([], $cacher->getUrls()->all());
+        $this->assertFalse($cacher->hasCachedPage($request));
     }
 
     #[Test]
@@ -165,6 +169,23 @@ class ApplicationCacherTest extends TestCase
         $this->assertNull($cache->get('static-cache:responses:one'));
         $this->assertNotNull($cache->get('static-cache:responses:onemore'));
         $this->assertNotNull($cache->get('static-cache:responses:two'));
+    }
+
+    #[Test]
+    public function invalidating_a_url_removes_a_cached_error_response()
+    {
+        $cache = app(Repository::class);
+        $cacher = new ApplicationCacher($cache, ['base_url' => 'http://example.com']);
+        $request = Request::create('http://example.com/foo', 'GET');
+        $response = response('not found', 404);
+
+        $cacher->cachePage($request, $response);
+        event(new ResponsePrepared($request, $response));
+
+        $cacher->invalidateUrl('/foo');
+
+        $this->assertEquals([], $cacher->getUrls()->all());
+        $this->assertFalse($cacher->hasCachedPage($request));
     }
 
     #[Test]
@@ -305,6 +326,23 @@ class ApplicationCacherTest extends TestCase
         $this->assertNull($cache->get('static-cache:responses:four'));
         $this->assertEquals([], $cacher->getUrls('http://example.com')->all());
         $this->assertEquals([], $cacher->getUrls('http://another.com')->all());
+    }
+
+    #[Test]
+    public function flushing_removes_cached_error_responses()
+    {
+        $cache = app(Repository::class);
+        $cacher = new ApplicationCacher($cache, ['base_url' => 'http://example.com']);
+        $request = Request::create('http://example.com/foo', 'GET');
+        $response = response('not found', 404);
+
+        $cacher->cachePage($request, $response);
+        event(new ResponsePrepared($request, $response));
+
+        $cacher->flush();
+
+        $this->assertEquals([], $cacher->getUrls()->all());
+        $this->assertFalse($cacher->hasCachedPage($request));
     }
 
     #[Test]

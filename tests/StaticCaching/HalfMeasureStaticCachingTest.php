@@ -209,7 +209,7 @@ class HalfMeasureStaticCachingTest extends TestCase
     }
 
     #[Test]
-    public function it_does_not_track_404_urls()
+    public function it_caches_and_tracks_404s()
     {
         \Illuminate\Support\Facades\Cache::flush();
 
@@ -218,17 +218,34 @@ class HalfMeasureStaticCachingTest extends TestCase
 
         $this->get('/this-does-not-exist')->assertNotFound();
 
-        $cacher = app(Cacher::class);
-        $this->assertEquals([], $cacher->getUrls()->all());
+        $this->assertEquals(['/this-does-not-exist'], app(Cacher::class)->getUrls()->values()->all());
 
-        // The 404 response is still served from the cache on a repeat hit,
-        // even though it was never added to the tracked `.urls` set.
         $response = $this->get('/this-does-not-exist')->assertNotFound();
         $this->assertTrue($response->wasStaticallyCached());
     }
 
     #[Test]
-    public function wildcard_invalidation_does_not_warm_untracked_404_urls()
+    public function invalidating_a_cached_404_lets_new_content_be_served()
+    {
+        \Illuminate\Support\Facades\Cache::flush();
+
+        $this->withStandardFakeViews();
+        $this->viewShouldReturnRaw('default', '{{ title }}');
+        $this->viewShouldReturnRaw('errors.404', '404 not found');
+
+        // The URL 404s before the page exists, and the 404 gets cached.
+        $this->get('/about')->assertNotFound();
+
+        // Publishing a page at that URL invalidates the cached 404...
+        $this->createPage('about', ['with' => ['title' => 'The About Page']]);
+        app(Cacher::class)->invalidateUrls(['/about']);
+
+        // ...so the new page is served instead of the stale 404.
+        $this->get('/about')->assertOk()->assertSee('The About Page');
+    }
+
+    #[Test]
+    public function wildcard_refresh_invalidates_cached_404s_instead_of_warming_them()
     {
         \Illuminate\Support\Facades\Cache::flush();
 
@@ -256,6 +273,10 @@ class HalfMeasureStaticCachingTest extends TestCase
         Queue::assertNotPushed(StaticWarmJob::class, function ($job) {
             return str_contains((string) $job->request->getUri(), 'this-does-not-exist');
         });
+
+        // The junk URL is invalidated rather than warmed, so the tracked
+        // set converges to real pages.
+        $this->assertEquals(['/about'], app(Cacher::class)->getUrls()->values()->all());
     }
 
     #[Test]

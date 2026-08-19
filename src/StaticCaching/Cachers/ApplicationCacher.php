@@ -3,7 +3,6 @@
 namespace Statamic\StaticCaching\Cachers;
 
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Routing\Events\ResponsePrepared;
 use Illuminate\Support\Facades\Event;
 use Statamic\Events\UrlInvalidated;
@@ -39,15 +38,25 @@ class ApplicationCacher extends AbstractCacher
         // and other URL characters wouldn't work as a cache key.
         $key = $this->makeHash($url);
 
-        if ($this->shouldTrackUrl($url, $content)) {
-            // Keep track of the URL and key the response content is about to be stored within.
-            $this->cacheUrl($key, ...$this->getPathAndDomain($url));
-        }
+        // Keep track of the URL and key the response content is about to be stored within.
+        $this->cacheUrl($key, ...$this->getPathAndDomain($url));
 
         $key = $this->normalizeKey('responses:'.$key);
         $value = $this->normalizeContent($content);
 
-        Event::listen(ResponsePrepared::class, function (ResponsePrepared $event) use ($key, $value) {
+        // The listener stays registered for the lifetime of the process, so it should
+        // only handle the response for the request that's currently being cached.
+        // Otherwise, in long-running processes (e.g. Octane, tests) it would
+        // re-store this entry using later requests' statuses and headers.
+        $handled = false;
+
+        Event::listen(ResponsePrepared::class, function (ResponsePrepared $event) use ($key, $value, &$handled) {
+            if ($handled) {
+                return;
+            }
+
+            $handled = true;
+
             $headers = collect($event->response->headers->all())
                 ->reject(fn ($value, $key) => in_array($key, ['date', 'x-powered-by', 'cache-control', 'expires', 'set-cookie']))
                 ->all();
@@ -62,21 +71,6 @@ class ApplicationCacher extends AbstractCacher
                 ? $this->cache->put($key, $cacheValue, now()->addMinutes($this->getDefaultExpiration()))
                 : $this->cache->forever($key, $cacheValue);
         });
-    }
-
-    /**
-     * Determine whether a URL should be tracked in the cacher's URL set.
-     *
-     * @param  string  $url
-     * @param  mixed  $content
-     */
-    private function shouldTrackUrl($url, $content): bool
-    {
-        if (! $content instanceof Response || $content->isSuccessful()) {
-            return true;
-        }
-
-        return str_contains($url, '/__shared-errors/');
     }
 
     /**
@@ -108,6 +102,23 @@ class ApplicationCacher extends AbstractCacher
         $key = $this->makeHash($url);
 
         return $this->cache->get($this->normalizeKey('responses:'.$key));
+    }
+
+    /**
+     * Check if the cached response for a URL key is an error response.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    protected function hasCachedErrorResponse($key)
+    {
+        $cached = $this->cache->get($this->normalizeKey('responses:'.$key));
+
+        if (! is_array($cached)) {
+            return false;
+        }
+
+        return ($cached['status'] ?? 200) >= 400;
     }
 
     /**
