@@ -4,6 +4,7 @@ import { defineComponent, h, nextTick, reactive, ref } from 'vue';
 import * as ui from '@ui';
 import * as Globals from '@/bootstrap/globals';
 import TextFieldtype from '@/components/fieldtypes/TextFieldtype.vue';
+import RevealerFieldtype from '@/components/fieldtypes/RevealerFieldtype.vue';
 import Container, { injectContainerContext } from '@/components/ui/Publish/Container.vue';
 import Set from '@/components/fieldtypes/bard/Set.vue';
 
@@ -12,7 +13,9 @@ window.__ = (key) => key;
 window.$markdown = (value) => value;
 
 window.Statamic = {
-    $app: { component: (name) => (name === 'text-fieldtype' ? TextFieldtype : undefined) },
+    $app: {
+        component: (name) => ({ 'text-fieldtype': TextFieldtype, 'revealer-fieldtype': RevealerFieldtype })[name],
+    },
     $config: {
         get: (key) => (key === 'sites' ? [{ handle: 'default', direction: 'ltr' }] : undefined),
     },
@@ -61,15 +64,45 @@ function initialValues() {
     };
 }
 
+const revealerSetConfig = {
+    handle: 'main',
+    display: 'Main',
+    fields: [
+        { handle: 'always', type: 'text' },
+        { handle: 'rev', type: 'revealer' },
+        { handle: 'revealer_conditioned', type: 'text', if: { rev: 'equals true' } },
+    ],
+};
+
+function revealerInitialValues() {
+    return {
+        driver: 'no',
+        bard: [
+            {
+                type: 'set',
+                attrs: {
+                    id: 'set-1',
+                    enabled: true,
+                    values: {
+                        type: 'main',
+                        always: 'A',
+                        revealer_conditioned: 'V',
+                    },
+                },
+            },
+        ],
+    };
+}
+
 // Stands in for the Bard fieldtype: builds the tiptap node view props and the `bard`
 // vm that Set.configure({ bard: this }) hands the extension. The prosemirror editor
 // itself plays no part in condition bookkeeping, so it isn't built here.
-function createSetHost({ collapsed, hasError }) {
+function createSetHost({ collapsed, hasError, set, values }) {
     const node = reactive({
         attrs: {
             id: 'set-1',
             enabled: true,
-            values: initialValues().bard[0].attrs.values,
+            values: values().bard[0].attrs.values,
         },
     });
 
@@ -81,7 +114,7 @@ function createSetHost({ collapsed, hasError }) {
         metaPathPrefix: null,
         handle: 'bard',
         name: 'bard',
-        setConfigs: [setConfig],
+        setConfigs: [set],
         isReadOnly: false,
         hasBeenFocused: false,
         dragging: false,
@@ -121,17 +154,21 @@ function createSetHost({ collapsed, hasError }) {
     return { host, bard };
 }
 
-function mountSet({ collapsed = false, hasError = ref(false) } = {}) {
-    const { host, bard } = createSetHost({ collapsed, hasError });
+function mountSet({ collapsed = false, hasError = ref(false), set = setConfig, values = initialValues } = {}) {
+    const { host, bard } = createSetHost({ collapsed, hasError, set, values });
 
     const wrapper = mount(Container, {
         props: {
             blueprint: { tabs: [] },
-            modelValue: initialValues(),
+            modelValue: values(),
             site: 'default',
         },
         global: {
-            components: { ...uiComponents, 'text-fieldtype': TextFieldtype },
+            components: {
+                ...uiComponents,
+                'text-fieldtype': TextFieldtype,
+                'revealer-fieldtype': RevealerFieldtype,
+            },
             provide: {
                 bard,
                 bardSets: [],
@@ -220,6 +257,26 @@ describe('bard set save payload', () => {
                 always: 'A',
                 local_driver: 'no',
             });
+        });
+    });
+
+    // The payload BardUnrenderedPayload.test.js expects a never-scrolled field to produce.
+    // A set containing a revealer is never allowed to defer its mount, so this holds
+    // collapsed as well as expanded.
+    describe('a field gated on a revealer', () => {
+        test.each([false, true])('keeps its value when collapsed is %s', async (collapsed) => {
+            const { wrapper } = mountSet({ collapsed, set: revealerSetConfig, values: revealerInitialValues });
+            await settle();
+
+            expect(wrapper.findComponent(RevealerFieldtype).exists()).toBe(true);
+
+            expect(clone(wrapper.vm.visibleValues).bard[0].attrs.values).toEqual({
+                type: 'main',
+                always: 'A',
+                revealer_conditioned: 'V',
+            });
+
+            wrapper.unmount();
         });
     });
 

@@ -15,7 +15,7 @@ const CUSTOM_CONDITION_RE = /^\s*custom\s/;
 const cache = new WeakMap();
 
 export default function analyzeSetConditions(config) {
-    if (!isPlainObject(config)) return { needsRootValues: true, canDeferMount: false };
+    if (!isPlainObject(config)) return { needsRootValues: true, canDeferMount: false, hasRevealer: true };
 
     if (!cache.has(config)) cache.set(config, analyze(config));
 
@@ -25,15 +25,17 @@ export default function analyzeSetConditions(config) {
 function analyze(config) {
     const fields = fieldList(config.fields);
 
-    if (fields === null) return { needsRootValues: true, canDeferMount: false };
+    if (fields === null) return { needsRootValues: true, canDeferMount: false, hasRevealer: true };
 
     let needsRootValues = false;
     let canDeferMount = true;
+    let hasRevealer = false;
 
     fields.forEach((field) => {
         if (!isPlainObject(field)) {
             needsRootValues = true;
             canDeferMount = false;
+            hasRevealer = true;
             return;
         }
 
@@ -41,14 +43,31 @@ function analyze(config) {
 
         // Revealers register themselves with the container when they mount, and that
         // registration changes how every other field's `omitValue` is worked out.
-        if (field.type === 'revealer') canDeferMount = false;
+        if (field.type === 'revealer') {
+            canDeferMount = false;
+            hasRevealer = true;
+        }
+
+        const nested = nestedFields(field);
+
+        // An unrecognised shape could be hiding anything, including a revealer.
+        if (nested === null) {
+            canDeferMount = false;
+            hasRevealer = true;
+            return;
+        }
+
+        if (nested.some((child) => child.type === 'revealer')) {
+            canDeferMount = false;
+            hasRevealer = true;
+        }
 
         // Nothing evaluates the conditions of fields nested inside this set's fields,
         // so those only stay correct if the set actually mounts.
-        if (nestedFieldsNeedMounting(field)) canDeferMount = false;
+        if (nested.some((child) => conditionsFor(child).length > 0)) canDeferMount = false;
     });
 
-    return { needsRootValues, canDeferMount };
+    return { needsRootValues, canDeferMount, hasRevealer };
 }
 
 function conditionsFor(field) {
@@ -69,14 +88,6 @@ function dependsOutsideSet(conditions) {
 
         return !isScalar(rhs);
     });
-}
-
-function nestedFieldsNeedMounting(field) {
-    const nested = nestedFields(field);
-
-    if (nested === null) return true;
-
-    return nested.some((child) => child.type === 'revealer' || conditionsFor(child).length > 0);
 }
 
 // Every field config underneath this one, at any depth. Grids and groups keep theirs in

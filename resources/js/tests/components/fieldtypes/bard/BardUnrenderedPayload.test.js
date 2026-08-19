@@ -73,6 +73,19 @@ const parentSetConfig = {
     ],
 };
 
+// A revealer only registers itself with the container when it mounts, and that
+// registration is what keeps a field gated on it out of the omitted list. Nothing in this
+// field ever mounts, so the registration never happens.
+const revealerSetConfig = {
+    handle: 'main',
+    display: 'Main',
+    fields: [
+        { handle: 'always', type: 'text' },
+        { handle: 'rev', type: 'revealer' },
+        { handle: 'revealer_conditioned', type: 'text', if: { rev: 'equals true' } },
+    ],
+};
+
 function initialValues() {
     return {
         driver: 'no',
@@ -108,6 +121,26 @@ function parentInitialValues() {
                         type: 'main',
                         always: 'A',
                         parent_conditioned: 'P',
+                    },
+                },
+            },
+        ],
+    };
+}
+
+function revealerInitialValues() {
+    return {
+        driver: 'no',
+        bard: [
+            {
+                type: 'set',
+                attrs: {
+                    id: 'set-1',
+                    enabled: true,
+                    values: {
+                        type: 'main',
+                        always: 'A',
+                        revealer_conditioned: 'V',
                     },
                 },
             },
@@ -245,6 +278,24 @@ describe('bard set save payload when the field is never scrolled into view', () 
             type: 'main',
             always: 'A',
             parent_conditioned: 'P',
+        });
+
+        wrapper.unmount();
+    });
+
+    // A mounted set keeps `revealer_conditioned` — the revealer is registered, so the
+    // condition targeting it is filtered out before anything decides to omit the value.
+    // Here the revealer never mounts, so the condition looks like an ordinary failing one
+    // and the value would be dropped. Nothing can force a mount without an editor, so the
+    // evaluator has to decline instead.
+    test('a field gated on a revealer that never registered keeps its value in the payload', async () => {
+        const wrapper = mountBard(revealerSetConfig, revealerInitialValues());
+        await settle();
+
+        expect(setValues(clone(wrapper.vm.visibleValues))).toEqual({
+            type: 'main',
+            always: 'A',
+            revealer_conditioned: 'V',
         });
 
         wrapper.unmount();

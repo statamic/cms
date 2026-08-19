@@ -1,5 +1,6 @@
 import { isPlainObject } from 'lodash-es';
 import ShowField from '@/components/field-conditions/ShowField.js';
+import analyzeSetConditions from '@/components/field-conditions/analyzeSetConditions.js';
 import { KEYS } from '@/components/field-conditions/Constants.js';
 
 // A Bard field that has never been scrolled into view has no editor, so it has no set
@@ -20,6 +21,26 @@ import { KEYS } from '@/components/field-conditions/Constants.js';
 export default function evaluateBardSetConditions({ value, setConfigs, fieldPathPrefix, container }) {
     if (!Array.isArray(value) || !Array.isArray(setConfigs) || setConfigs.length === 0) return;
 
+    // Revealers are the other thing this path can't answer for. A field gated on one is
+    // only kept because the revealer registered itself with the container when it mounted,
+    // and the condition pointing at a registered revealer is then filtered out before
+    // anything decides to omit the value. Nothing in a field with no editor ever mounts,
+    // so its revealers never register, and every field gated on one looks like it simply
+    // failed an ordinary condition — dropped from the save.
+    //
+    // `analyzeSetConditions` handles this everywhere else by refusing to defer the set's
+    // mount. There's no mount to force here, so decline instead.
+    //
+    // The decline covers the whole field rather than only the sets that contain a
+    // revealer, and it doesn't look at what the conditions target. A narrower rule would
+    // have to trust that it recognises every way a condition can reach a revealer, and
+    // that's the trust that lost data before: a `$root.` condition can point across sets,
+    // a bare custom condition names no target at all, and `prefix` rewrites handles before
+    // they're compared. Being wrong about one of those drops content; declining too often
+    // only keeps a value the blueprint would have hidden, and only until the field is
+    // scrolled into view.
+    const declineAll = setConfigs.some((config) => analyzeSetConditions(config).hasRevealer);
+
     value.forEach((node, index) => {
         if (!isPlainObject(node) || node.type !== 'set') return;
 
@@ -34,25 +55,32 @@ export default function evaluateBardSetConditions({ value, setConfigs, fieldPath
 
         const prefix = `${fieldPathPrefix}.${index}.attrs.values`;
 
-        const showField = new ShowField(
-            values,
-            {},
-            container.visibleValues.value,
-            container.revealerValues.value,
-            container.hiddenFields.value,
-            container.setHiddenField,
-            { container: container.container },
-        );
+        let showField = null;
 
         fields.forEach((field) => {
             if (!isPlainObject(field) || !field.handle) return;
 
             const dottedKey = `${prefix}.${field.handle}`;
 
-            if (!conditionsResolveFromPath(field)) {
+            // A revealer's own value is never saved whatever its conditions resolve to,
+            // so the decline doesn't need to cover it — and covering it would write the
+            // toggle state into the entry.
+            const declining = declineAll && field.type !== 'revealer';
+
+            if (declining || !conditionsResolveFromPath(field)) {
                 keepValue(container, dottedKey);
                 return;
             }
+
+            showField ??= new ShowField(
+                values,
+                {},
+                container.visibleValues.value,
+                container.revealerValues.value,
+                container.hiddenFields.value,
+                container.setHiddenField,
+                { container: container.container },
+            );
 
             showField.showField(field, dottedKey);
         });
