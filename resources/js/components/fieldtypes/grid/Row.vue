@@ -1,5 +1,8 @@
 <template>
-    <tr :class="[sortableItemClass, { 'opacity-50': isExcessive, 'inset-ring-1 inset-ring-red': hasError }]">
+    <tr
+        :data-grid-row-id="values._id"
+        :class="[sortableItemClass, { 'opacity-50': isExcessive, 'inset-ring-1 inset-ring-red': hasError }]"
+    >
         <td v-if="grid.isReorderable" class="drag-handle" :class="sortableHandleClass"></td>
 
         <FieldsProvider

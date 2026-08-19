@@ -2,6 +2,7 @@
     <div
         class="@container/panel bg-white dark:bg-gray-850 rounded-xl ring ring-gray-300 dark:ring-x-0 dark:ring-b-0 dark:ring-gray-700 shadow-ui-md"
         :class="[sortableItemClass, { 'opacity-50': isExcessive, 'ring-red-500': hasError }]"
+        :data-grid-row-id="values._id"
         :data-error="hasError ?? undefined"
     >
         <header class="bg-gray-50 dark:bg-gray-900 rounded-t-xl border-b border-gray-300 dark:border-gray-700 ps-4 pe-2 py-1.5 flex items-center justify-between">
