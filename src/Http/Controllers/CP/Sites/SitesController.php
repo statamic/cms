@@ -55,9 +55,9 @@ class SitesController extends CpController
         $sites = Site::configFromBlueprintValues($values);
 
         if (Site::multiEnabled() && empty($sites)) {
-            throw ValidationException::withMessages([
-                'group_other_sites' => [__('This field is required.')],
-            ]);
+            throw ValidationException::withMessages(
+                $this->emptySitesError($request->all())
+            );
         }
 
         Site::setSites($sites)->save();
@@ -77,6 +77,21 @@ class SitesController extends CpController
     private function isGroupNameKey(string $key): bool
     {
         return (bool) preg_match('/^group_.+_name$/', $key);
+    }
+
+    private function emptySitesError(array $request): array
+    {
+        $keys = collect($request)
+            ->keys()
+            ->filter(fn ($key) => is_string($key) && preg_match('/^group_.+_sites$/', $key));
+
+        if ($keys->isEmpty()) {
+            $keys = collect(['group_other_sites']);
+        }
+
+        return $keys
+            ->mapWithKeys(fn ($key) => [$key => [__('This field is required.')]])
+            ->all();
     }
 
     private function uniqueHandleRules(array $values): array

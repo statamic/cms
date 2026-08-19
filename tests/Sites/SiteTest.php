@@ -93,6 +93,14 @@ class SiteTest extends TestCase
     }
 
     #[Test]
+    public function gets_group_handle()
+    {
+        $this->assertNull((new Site('en', []))->groupHandle());
+        $this->assertNull((new Site('en', ['group_handle' => '']))->groupHandle());
+        $this->assertEquals('london', (new Site('en', ['group_handle' => 'london']))->groupHandle());
+    }
+
+    #[Test]
     public function gets_is_default()
     {
         $withoutDefault = new Site('en', ['locale' => 'en_US']);

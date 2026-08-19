@@ -213,26 +213,19 @@ class Sites
         }
 
         $values = [];
-        $otherSites = [];
 
-        foreach ($this->groupedSites() as $group => $sites) {
-            $key = $this->groupSectionKey($group);
-            $mapped = $sites->map(fn (Site $site) => array_merge(
-                ['handle' => $site->handle()],
-                collect($site->rawConfig())->except('group')->all()
-            ))->values()->all();
+        foreach ($this->namedGroupSections() as $section) {
+            $key = $section['key'];
+            $mapped = $section['sites']->map(fn (Site $site) => $this->siteToBlueprintRow($site))->values()->all();
 
-            if ($key === self::OTHER_GROUP_KEY) {
-                $otherSites = $mapped;
-
-                continue;
-            }
-
-            $values["group_{$key}_name"] = $group ?: null;
+            $values["group_{$key}_name"] = $section['name'];
             $values["group_{$key}_sites"] = $mapped;
         }
 
-        $values['group_'.self::OTHER_GROUP_KEY.'_sites'] = $otherSites;
+        $values['group_'.self::OTHER_GROUP_KEY.'_sites'] = $this->otherSites()
+            ->map(fn (Site $site) => $this->siteToBlueprintRow($site))
+            ->values()
+            ->all();
 
         return $values;
     }
@@ -252,12 +245,13 @@ class Sites
                 continue;
             }
 
-            $groupName = $matches[1] === self::OTHER_GROUP_KEY
+            $groupKey = $matches[1];
+            $groupName = $groupKey === self::OTHER_GROUP_KEY
                 ? null
-                : ($values["group_{$matches[1]}_name"] ?? null);
+                : ($values["group_{$groupKey}_name"] ?? null);
             $groupName = is_string($groupName) && $groupName !== '' ? $groupName : null;
 
-            $this->mergeSitesFromGrid($sites, $groupSites, $groupName);
+            $this->mergeSitesFromGrid($sites, $groupSites, $groupName, $groupKey);
         }
 
         return $sites
@@ -350,15 +344,9 @@ class Sites
         $sections = [];
         $seen = [];
 
-        foreach ($this->groupedSites() as $group => $sites) {
-            $key = $this->groupSectionKey($group);
-
-            if ($key === self::OTHER_GROUP_KEY) {
-                continue;
-            }
-
-            $seen[$key] = true;
-            $sections[] = $this->groupSection($key, $group ?: null, $siteRowFields);
+        foreach ($this->namedGroupSections() as $section) {
+            $seen[$section['key']] = true;
+            $sections[] = $this->groupSection($section['key'], $section['name'], $siteRowFields);
         }
 
         foreach ($values as $handle => $groupSites) {
@@ -447,28 +435,101 @@ class Sites
         ];
     }
 
-    protected function groupedSites(): Collection
+    protected function siteToBlueprintRow(Site $site): array
     {
-        return $this->all()->groupBy(fn (Site $site) => $site->group() ?? '');
+        return array_merge(
+            ['handle' => $site->handle()],
+            collect($site->rawConfig())->except('group', 'group_handle')->all()
+        );
     }
 
-    protected function groupSectionKey(?string $group): string
+    protected function otherSites(): Collection
     {
-        if ($group === null || $group === '') {
-            return self::OTHER_GROUP_KEY;
-        }
-
-        return Str::slug($group);
+        return $this->all()->filter(fn (Site $site) => ! $site->group())->values();
     }
 
-    protected function mergeSitesFromGrid(Collection $sites, array $groupSites, ?string $groupName): void
+    protected function namedGroupSections(): Collection
     {
-        foreach ($groupSites as $site) {
-            if ($groupName) {
-                $site['group'] = $groupName;
+        $buckets = [];
+
+        foreach ($this->all() as $site) {
+            $name = $site->group();
+
+            if (! $name) {
+                continue;
             }
 
-            $sites->put($site['handle'], $site);
+            $storedHandle = $site->groupHandle();
+            $identity = ($storedHandle && $storedHandle !== self::OTHER_GROUP_KEY)
+                ? "handle:{$storedHandle}"
+                : "name:{$name}";
+
+            if (! isset($buckets[$identity])) {
+                $buckets[$identity] = [
+                    'name' => $name,
+                    'handle' => ($storedHandle && $storedHandle !== self::OTHER_GROUP_KEY) ? $storedHandle : null,
+                    'sites' => collect(),
+                ];
+            }
+
+            $buckets[$identity]['sites']->push($site);
+        }
+
+        $seen = [];
+        $sections = collect();
+
+        foreach ($buckets as $bucket) {
+            $key = $this->uniqueGroupSectionKey($bucket['handle'], $bucket['name'], $seen);
+            $seen[$key] = true;
+            $sections->push([
+                'key' => $key,
+                'name' => $bucket['name'],
+                'sites' => $bucket['sites'],
+            ]);
+        }
+
+        return $sections;
+    }
+
+    protected function uniqueGroupSectionKey(?string $preferred, string $name, array $seen): string
+    {
+        if ($preferred && $preferred !== self::OTHER_GROUP_KEY && ! isset($seen[$preferred])) {
+            return $preferred;
+        }
+
+        $base = Str::slug($name) ?: 'group';
+
+        if ($base === self::OTHER_GROUP_KEY) {
+            $base = 'group';
+        }
+
+        $key = $base;
+        $suffix = 2;
+
+        while (isset($seen[$key])) {
+            $key = $base.'-'.$suffix++;
+        }
+
+        return $key;
+    }
+
+    protected function mergeSitesFromGrid(Collection $sites, array $groupSites, ?string $groupName, string $groupKey): void
+    {
+        foreach ($groupSites as $site) {
+            $handle = $site['handle'] ?? null;
+
+            if (! is_string($handle) || $handle === '') {
+                continue;
+            }
+
+            if ($groupName) {
+                $site['group'] = $groupName;
+                $site['group_handle'] = $groupKey;
+            } else {
+                unset($site['group'], $site['group_handle']);
+            }
+
+            $sites->put($handle, $site);
         }
     }
 
