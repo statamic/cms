@@ -85,6 +85,14 @@ class SiteTest extends TestCase
     }
 
     #[Test]
+    public function gets_group()
+    {
+        $this->assertNull((new Site('en', []))->group());
+        $this->assertNull((new Site('en', ['group' => '']))->group());
+        $this->assertEquals('London', (new Site('en', ['group' => 'London']))->group());
+    }
+
+    #[Test]
     public function gets_is_default()
     {
         $withoutDefault = new Site('en', ['locale' => 'en_US']);

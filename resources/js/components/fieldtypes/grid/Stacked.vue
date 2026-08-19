@@ -1,10 +1,11 @@
 <template>
-    <div :class="{ 'mb-4': rows.length > 0 }">
+    <div :class="{ 'mb-4': (rows.length > 0 || usesSectionRowSortable) && !grid.usesExternalAddRow }">
         <sortable-list
             :model-value="rows"
             :vertical="true"
             :item-class="sortableItemClass"
             :handle-class="sortableHandleClass"
+            :disabled="usesSectionRowSortable"
             append-to="body"
             constrain-dimensions
             @dragstart="$emit('focus')"
@@ -13,8 +14,10 @@
             v-slot="{}"
         >
             <div
+                ref="zone"
                 class="grid-stacked space-y-8"
                 :class="{
+                    'publish-section-row-zone min-h-16': usesSectionRowSortable,
                     // 'mt-0': !allowFullscreen && hideDisplay,
                     // 'mt-4': !hideDisplay,
                 }"

@@ -44,6 +44,13 @@ class SitesConfigTest extends TestCase
         Site::swap(new Sites);
     }
 
+    private function sitesField(array $section): array
+    {
+        return collect($section['fields'])->first(
+            fn ($field) => str_ends_with($field['handle'], '_sites')
+        );
+    }
+
     #[Test]
     public function it_gets_sites_from_yaml()
     {
@@ -341,7 +348,8 @@ class SitesConfigTest extends TestCase
         $this
             ->actingAs(tap(User::make()->email('chew@bacca.com')->makeSuper())->save())
             ->patchJson(cp_route('sites.update'), [
-                'sites' => [
+                'group_other_name' => null,
+                'group_other_sites' => [
                     [
                         'id' => 'abcde', // grid fieldtypes submit id, that should get stripped out
                         'name' => 'English',
@@ -350,6 +358,9 @@ class SitesConfigTest extends TestCase
                         'locale' => 'en_US',
                         'lang' => 'slang', // testing custom lang string, because it auto-sets itself off locale
                     ],
+                ],
+                'group_middle-east_name' => 'Middle East',
+                'group_middle-east_sites' => [
                     [
                         'id' => 'fghijk', // grid fieldtypes submit id, that should get stripped out
                         'name' => 'Arabic (Egypt)',
@@ -375,6 +386,7 @@ class SitesConfigTest extends TestCase
                 'name' => 'Arabic (Egypt)',
                 'url' => '/ar/',
                 'locale' => 'ar_EG',
+                'group' => 'Middle East',
                 'attributes' => [
                     'theme' => 'standard',
                 ],
@@ -382,6 +394,294 @@ class SitesConfigTest extends TestCase
         ];
 
         $this->assertSame($expected, YAML::file($this->yamlPath)->parse());
+    }
+
+    #[Test]
+    public function it_saves_groups_in_submitted_order()
+    {
+        Config::set('statamic.system.multisite', true);
+
+        Site::setSites([
+            'en' => [
+                'name' => 'English',
+                'url' => '/',
+                'locale' => 'en_US',
+                'group' => 'London',
+            ],
+            'paris' => [
+                'name' => 'French',
+                'url' => '/paris/',
+                'locale' => 'fr_FR',
+                'group' => 'Paris',
+            ],
+        ]);
+
+        $this
+            ->actingAs(tap(User::make()->email('chew@bacca.com')->makeSuper())->save())
+            ->patchJson(cp_route('sites.update'), [
+                'group_paris_name' => 'Paris',
+                'group_paris_sites' => [
+                    [
+                        'name' => 'French',
+                        'handle' => 'paris',
+                        'url' => '/paris/',
+                        'locale' => 'fr_FR',
+                    ],
+                ],
+                'group_london_name' => 'London',
+                'group_london_sites' => [
+                    [
+                        'name' => 'English',
+                        'handle' => 'en',
+                        'url' => '/',
+                        'locale' => 'en_US',
+                    ],
+                ],
+            ])
+            ->assertSuccessful();
+
+        $this->assertSame(['paris', 'en'], array_keys($saved = YAML::file($this->yamlPath)->parse()));
+        $this->assertSame('Paris', $saved['paris']['group']);
+        $this->assertSame('London', $saved['en']['group']);
+    }
+
+    #[Test]
+    public function it_builds_grouped_blueprint_values()
+    {
+        Config::set('statamic.system.multisite', true);
+
+        Site::setSites([
+            'default' => [
+                'name' => 'English',
+                'url' => '/',
+                'locale' => 'en_US',
+            ],
+            'arabic' => [
+                'name' => 'Arabic (Egypt)',
+                'url' => '/ar/',
+                'locale' => 'ar_EG',
+                'group' => 'Middle East',
+            ],
+        ]);
+
+        $values = Site::blueprintValues();
+
+        $this->assertSame([
+            'group_middle-east_name',
+            'group_middle-east_sites',
+            'group_other_sites',
+        ], array_keys($values));
+        $this->assertCount(1, $values['group_other_sites']);
+        $this->assertSame('default', $values['group_other_sites'][0]['handle']);
+        $this->assertSame('Middle East', $values['group_middle-east_name']);
+        $this->assertCount(1, $values['group_middle-east_sites']);
+        $this->assertSame('arabic', $values['group_middle-east_sites'][0]['handle']);
+        $this->assertArrayNotHasKey('group', $values['group_middle-east_sites'][0]);
+    }
+
+    #[Test]
+    public function preprocessed_values_include_group_names()
+    {
+        Config::set('statamic.system.multisite', true);
+
+        Site::setSites([
+            'default' => [
+                'name' => 'English',
+                'url' => '/',
+                'locale' => 'en_US',
+            ],
+            'arabic' => [
+                'name' => 'Arabic (Egypt)',
+                'url' => '/ar/',
+                'locale' => 'ar_EG',
+                'group' => 'Middle East',
+            ],
+        ]);
+
+        $values = Site::blueprint()
+            ->fields()
+            ->addValues(Site::blueprintValues())
+            ->preProcess()
+            ->values()
+            ->all();
+
+        $this->assertSame('Middle East', $values['group_middle-east_name']);
+        $this->assertSame('arabic', $values['group_middle-east_sites'][0]['handle']);
+        $this->assertSame('default', $values['group_other_sites'][0]['handle']);
+    }
+
+    #[Test]
+    public function it_saves_a_newly_added_group_through_cp_endpoint()
+    {
+        Config::set('statamic.system.multisite', true);
+
+        $this
+            ->actingAs(tap(User::make()->email('chew@bacca.com')->makeSuper())->save())
+            ->patchJson(cp_route('sites.update'), [
+                'group_new-group_name' => 'Paris',
+                'group_new-group_sites' => [
+                    [
+                        'name' => 'French',
+                        'handle' => 'fr',
+                        'url' => '/fr/',
+                        'locale' => 'fr_FR',
+                    ],
+                ],
+                'group_other_sites' => [
+                    [
+                        'name' => 'English',
+                        'handle' => 'default',
+                        'url' => '/',
+                        'locale' => 'en_US',
+                    ],
+                ],
+            ])
+            ->assertSuccessful();
+
+        $saved = YAML::file($this->yamlPath)->parse();
+
+        $this->assertSame('Paris', $saved['fr']['group']);
+        $this->assertArrayNotHasKey('group', $saved['default']);
+    }
+
+    #[Test]
+    public function grouped_blueprint_sections_are_reorderable()
+    {
+        Config::set('statamic.system.multisite', true);
+
+        Site::setSites([
+            'default' => [
+                'name' => 'English',
+                'url' => '/',
+                'locale' => 'en_US',
+            ],
+            'arabic' => [
+                'name' => 'Arabic (Egypt)',
+                'url' => '/ar/',
+                'locale' => 'ar_EG',
+                'group' => 'Middle East',
+            ],
+        ]);
+
+        $sections = Site::blueprint()->contents()['tabs']['main']['sections'];
+
+        $this->assertCount(2, $sections);
+        $this->assertTrue($sections[0]['reorderable']);
+        $this->assertArrayNotHasKey('reorderable', $sections[1]);
+        $this->assertSame('group_middle-east_name', $sections[0]['editable_title_handle']);
+        $this->assertArrayNotHasKey('editable_title_handle', $sections[1]);
+        $this->assertSame('Other', $sections[1]['display']);
+        $this->assertSame('group_middle-east_name', $sections[0]['fields'][0]['handle']);
+        $this->assertSame('hidden', $sections[0]['fields'][0]['field']['visibility']);
+        $this->assertSame('group_other_sites', $this->sitesField($sections[1])['handle']);
+        $this->assertTrue($this->sitesField($sections[0])['field']['headers_in_section']);
+        $this->assertTrue($this->sitesField($sections[1])['field']['headers_in_section']);
+        $this->assertSame(
+            'group_middle-east_name',
+            collect($this->sitesField($sections[0])['field']['fields'])->firstWhere('handle', 'handle')['field']['prefix_from']
+        );
+        $this->assertArrayNotHasKey(
+            'prefix_from',
+            collect($this->sitesField($sections[1])['field']['fields'])->firstWhere('handle', 'handle')['field']
+        );
+    }
+
+    #[Test]
+    public function the_other_group_is_always_last_even_when_empty()
+    {
+        Config::set('statamic.system.multisite', true);
+
+        Site::setSites([
+            'en' => [
+                'name' => 'English',
+                'url' => '/',
+                'locale' => 'en_US',
+                'group' => 'London',
+            ],
+        ]);
+
+        $values = Site::blueprintValues();
+        $sections = Site::blueprint()->contents()['tabs']['main']['sections'];
+
+        $this->assertSame([
+            'group_london_name',
+            'group_london_sites',
+            'group_other_sites',
+        ], array_keys($values));
+        $this->assertSame([], $values['group_other_sites']);
+        $this->assertSame('group_london_name', $sections[0]['editable_title_handle']);
+        $this->assertSame('group_other_sites', $this->sitesField($sections[1])['handle']);
+        $this->assertArrayNotHasKey('reorderable', $sections[1]);
+        $this->assertArrayNotHasKey('editable_title_handle', $sections[1]);
+    }
+
+    #[Test]
+    public function it_includes_submitted_groups_in_the_blueprint()
+    {
+        Config::set('statamic.system.multisite', true);
+
+        $sections = Site::blueprint([
+            'group_other_sites' => [
+                ['name' => 'English', 'handle' => 'default', 'url' => '/', 'locale' => 'en_US'],
+            ],
+            'group_paris_name' => 'Paris',
+            'group_paris_sites' => [
+                ['name' => 'French', 'handle' => 'paris', 'url' => '/paris/', 'locale' => 'fr_FR'],
+            ],
+        ])->contents()['tabs']['main']['sections'];
+
+        $this->assertSame([
+            'group_paris_name',
+            null,
+        ], collect($sections)->pluck('editable_title_handle')->all());
+        $this->assertSame('group_paris_sites', $this->sitesField($sections[0])['handle']);
+        $this->assertSame('group_other_sites', $this->sitesField($sections[1])['handle']);
+        $this->assertSame('Other', $sections[1]['display']);
+        $this->assertArrayNotHasKey('reorderable', $sections[1]);
+    }
+
+    #[Test]
+    public function it_builds_config_from_grouped_blueprint_values()
+    {
+        Config::set('statamic.system.multisite', true);
+
+        $config = Site::configFromBlueprintValues([
+            'group_london_name' => 'London',
+            'group_london_sites' => [
+                ['name' => 'English', 'handle' => 'en', 'url' => '/', 'locale' => 'en_US'],
+                ['name' => 'French', 'handle' => 'fr', 'url' => '/fr/', 'locale' => 'fr_FR'],
+            ],
+            'group_paris_name' => 'Paris',
+            'group_paris_sites' => [
+                ['name' => 'French', 'handle' => 'paris', 'url' => '/paris/', 'locale' => 'fr_FR'],
+            ],
+        ]);
+
+        $this->assertSame('London', $config['en']['group']);
+        $this->assertSame('London', $config['fr']['group']);
+        $this->assertSame('Paris', $config['paris']['group']);
+        $this->assertArrayNotHasKey('group', $config['default'] ?? []);
+        $this->assertSame(['en', 'fr', 'paris'], array_keys($config));
+    }
+
+    #[Test]
+    public function it_preserves_group_order_from_blueprint_values()
+    {
+        Config::set('statamic.system.multisite', true);
+
+        $config = Site::configFromBlueprintValues([
+            'group_paris_name' => 'Paris',
+            'group_paris_sites' => [
+                ['name' => 'French', 'handle' => 'paris', 'url' => '/paris/', 'locale' => 'fr_FR'],
+            ],
+            'group_london_name' => 'London',
+            'group_london_sites' => [
+                ['name' => 'English', 'handle' => 'en', 'url' => '/', 'locale' => 'en_US'],
+                ['name' => 'French', 'handle' => 'fr', 'url' => '/fr/', 'locale' => 'fr_FR'],
+            ],
+        ]);
+
+        $this->assertSame(['paris', 'en', 'fr'], array_keys($config));
     }
 
     #[Test]
@@ -401,6 +701,70 @@ class SitesConfigTest extends TestCase
     }
 
     #[Test]
+    public function it_validates_handles_are_unique_across_groups()
+    {
+        Config::set('statamic.system.multisite', true);
+
+        $this
+            ->actingAs(tap(User::make()->email('chew@bacca.com')->makeSuper())->save())
+            ->patchJson(cp_route('sites.update'), [
+                'group_london_name' => 'London',
+                'group_london_sites' => [
+                    [
+                        'name' => 'English',
+                        'handle' => 'en',
+                        'url' => '/',
+                        'locale' => 'en_US',
+                    ],
+                ],
+                'group_paris_name' => 'Paris',
+                'group_paris_sites' => [
+                    [
+                        'name' => 'English',
+                        'handle' => 'en',
+                        'url' => '/paris/',
+                        'locale' => 'en_GB',
+                    ],
+                ],
+            ])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors([
+                'group_london_sites.0.handle',
+                'group_paris_sites.0.handle',
+            ]);
+    }
+
+    #[Test]
+    public function it_validates_handles_are_unique_within_a_group()
+    {
+        Config::set('statamic.system.multisite', true);
+
+        $this
+            ->actingAs(tap(User::make()->email('chew@bacca.com')->makeSuper())->save())
+            ->patchJson(cp_route('sites.update'), [
+                'group_other_sites' => [
+                    [
+                        'name' => 'English',
+                        'handle' => 'en',
+                        'url' => '/',
+                        'locale' => 'en_US',
+                    ],
+                    [
+                        'name' => 'English UK',
+                        'handle' => 'en',
+                        'url' => '/uk/',
+                        'locale' => 'en_GB',
+                    ],
+                ],
+            ])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors([
+                'group_other_sites.0.handle',
+                'group_other_sites.1.handle',
+            ]);
+    }
+
+    #[Test]
     public function it_validates_required_fields_for_multiple_sites_through_cp_endpoint()
     {
         // Multisite requires this config
@@ -409,7 +773,7 @@ class SitesConfigTest extends TestCase
         $this
             ->actingAs(tap(User::make()->email('chew@bacca.com')->makeSuper())->save())
             ->patchJson(cp_route('sites.update'), [
-                'sites' => [
+                'group_other_sites' => [
                     [
                         'handle' => 'english', // this is a required field, so there should be only 3 failures here
                     ],
@@ -421,13 +785,13 @@ class SitesConfigTest extends TestCase
             ->assertStatus(422)
             ->assertJsonCount(7, 'errors')
             ->assertJson(['errors' => [
-                'sites.0.name' => ['This field is required.'],
-                'sites.0.url' => ['This field is required.'],
-                'sites.0.locale' => ['This field is required.'],
-                'sites.1.name' => ['This field is required.'],
-                'sites.1.handle' => ['This field is required.'],
-                'sites.1.url' => ['This field is required.'],
-                'sites.1.locale' => ['This field is required.'],
+                'group_other_sites.0.name' => ['This field is required.'],
+                'group_other_sites.0.url' => ['This field is required.'],
+                'group_other_sites.0.locale' => ['This field is required.'],
+                'group_other_sites.1.name' => ['This field is required.'],
+                'group_other_sites.1.handle' => ['This field is required.'],
+                'group_other_sites.1.url' => ['This field is required.'],
+                'group_other_sites.1.locale' => ['This field is required.'],
             ]]);
     }
 
@@ -435,8 +799,8 @@ class SitesConfigTest extends TestCase
     {
         return [
             'with no sites array' => [[]],
-            'sites array with no elements' => [['sites' => []]],
-            'sites null' => [['sites' => null]],
+            'sites array with no elements' => [['group_other_sites' => []]],
+            'sites null' => [['group_other_sites' => null]],
         ];
     }
 
@@ -451,10 +815,7 @@ class SitesConfigTest extends TestCase
             ->actingAs(tap(User::make()->email('chew@bacca.com')->makeSuper())->save())
             ->patchJson(cp_route('sites.update'), $data)
             ->assertStatus(422)
-            ->assertJsonCount(1, 'errors')
-            ->assertJson(['errors' => [
-                'sites' => ['This field is required.'],
-            ]]);
+            ->assertJsonValidationErrors(['group_other_sites']);
     }
 
     #[Test]
