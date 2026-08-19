@@ -180,6 +180,94 @@ function mountBard(set = setConfig, values = initialValues()) {
     });
 }
 
+// A `$root.` condition in one bard pointing at a field in another. Neither is ever
+// scrolled into view, so neither builds an editor.
+function crossBardSets(target) {
+    return {
+        a: {
+            handle: 'main',
+            display: 'Main',
+            fields: [
+                { handle: 'always', type: 'text' },
+                { handle: 'local_driver', type: 'text' },
+                { handle: 'local_conditioned', type: 'text', if: { local_driver: 'equals yes' } },
+                { handle: 'gated', type: 'text', if: { [`$root.bard_b.0.attrs.values.${target}`]: 'equals yes' } },
+            ],
+        },
+        revealer: {
+            handle: 'other',
+            display: 'Other',
+            fields: [{ handle: 'rev', type: 'revealer' }],
+        },
+        plain: {
+            handle: 'other',
+            display: 'Other',
+            fields: [{ handle: 'flag', type: 'text' }],
+        },
+    };
+}
+
+function crossBardValues(otherValues) {
+    return {
+        bard_a: [
+            {
+                type: 'set',
+                attrs: {
+                    id: 'set-a',
+                    enabled: true,
+                    values: {
+                        type: 'main',
+                        always: 'A',
+                        local_driver: 'no',
+                        local_conditioned: 'L',
+                        gated: 'G',
+                    },
+                },
+            },
+        ],
+        bard_b: [
+            {
+                type: 'set',
+                attrs: { id: 'set-b', enabled: true, values: { type: 'other', ...otherValues } },
+            },
+        ],
+    };
+}
+
+function mountTwoBards(setA, setB, values) {
+    const bard = (handle, set, id) =>
+        h(BardFieldtype, {
+            handle,
+            value: values[handle],
+            meta: { collapsed: [], existing: { [id]: {} } },
+            config: {
+                handle,
+                type: 'bard',
+                sets: [{ handle: 'group', sets: [set] }],
+                buttons: [],
+            },
+        });
+
+    return mount(Container, {
+        props: {
+            blueprint: { tabs: [] },
+            modelValue: values,
+            site: 'default',
+        },
+        global: {
+            components: { ...uiComponents, 'text-fieldtype': TextFieldtype },
+            mocks: { $bard: { buttonCallbacks: [] } },
+            stubs: {
+                portal: { template: '<div><slot /></div>' },
+                'publish-field-fullscreen-header': true,
+            },
+        },
+        slots: {
+            default: () => [bard('bard_a', setA, 'set-a'), bard('bard_b', setB, 'set-b')],
+        },
+    });
+}
+
 // ShowField commits its bookkeeping inside a nextTick, and that commit can trigger
 // another round of evaluation, so give it a few ticks to reach a fixed point.
 async function settle() {
@@ -193,6 +281,10 @@ function clone(values) {
 
 function setValues(payload) {
     return payload.bard[0].attrs.values;
+}
+
+function setAValues(payload) {
+    return payload.bard_a[0].attrs.values;
 }
 
 describe('bard set save payload when the field is never scrolled into view', () => {
@@ -296,6 +388,61 @@ describe('bard set save payload when the field is never scrolled into view', () 
             type: 'main',
             always: 'A',
             revealer_conditioned: 'V',
+        });
+
+        wrapper.unmount();
+    });
+
+    // The same missing registration seen from the far side: the revealer is in a different
+    // field, so this one's own set configs give no sign of it. What it can see is that the
+    // condition points at a path the root values don't have — which is true of every
+    // unregistered revealer, since a revealer's own value is always omitted.
+    test('a field gated on a revealer in another never-rendered bard keeps its value', async () => {
+        const sets = crossBardSets('rev');
+        const wrapper = mountTwoBards(sets.a, sets.revealer, crossBardValues());
+        await settle();
+
+        // `local_conditioned` fails an ordinary condition and would normally be dropped.
+        // Keeping it is the accepted cost of declining for the whole field.
+        expect(setAValues(clone(wrapper.vm.visibleValues))).toEqual({
+            type: 'main',
+            always: 'A',
+            local_driver: 'no',
+            local_conditioned: 'L',
+            gated: 'G',
+        });
+
+        // Registering the revealer is what a mounted one would do, and it's what used to
+        // be the only thing keeping the value. The decline covers it either way now.
+        wrapper.vm.setRevealerField('bard_b.0.attrs.values.rev');
+        await settle();
+
+        expect(setAValues(clone(wrapper.vm.visibleValues)).gated).toBe('G');
+
+        wrapper.unmount();
+    });
+
+    // Pins that the decline turns on for an absent path, not for reaching into another
+    // field at all. `flag` is present, so everything here resolves and is evaluated.
+    test('a condition reaching a field that is present in another bard is still evaluated', async () => {
+        const sets = crossBardSets('flag');
+        const wrapper = mountTwoBards(sets.a, sets.plain, crossBardValues({ flag: 'no' }));
+        await settle();
+
+        expect(setAValues(clone(wrapper.vm.visibleValues))).toEqual({
+            type: 'main',
+            always: 'A',
+            local_driver: 'no',
+        });
+
+        wrapper.vm.setFieldValue('bard_b.0.attrs.values.flag', 'yes');
+        await settle();
+
+        expect(setAValues(clone(wrapper.vm.visibleValues))).toEqual({
+            type: 'main',
+            always: 'A',
+            local_driver: 'no',
+            gated: 'G',
         });
 
         wrapper.unmount();

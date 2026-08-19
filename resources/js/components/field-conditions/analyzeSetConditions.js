@@ -10,12 +10,15 @@ import { KEYS } from './Constants.js';
 // drops the value from the save payload.
 
 const OUTSIDE_SET_RE = /^(\$root\.|root\.|\$parent\.)/;
+const ROOT_PREFIX_RE = /^\$?root\./;
 const CUSTOM_CONDITION_RE = /^\s*custom\s/;
 
 const cache = new WeakMap();
 
 export default function analyzeSetConditions(config) {
-    if (!isPlainObject(config)) return { needsRootValues: true, canDeferMount: false, hasRevealer: true };
+    if (!isPlainObject(config)) {
+        return { needsRootValues: true, canDeferMount: false, hasRevealer: true, rootPaths: [] };
+    }
 
     if (!cache.has(config)) cache.set(config, analyze(config));
 
@@ -25,11 +28,14 @@ export default function analyzeSetConditions(config) {
 function analyze(config) {
     const fields = fieldList(config.fields);
 
-    if (fields === null) return { needsRootValues: true, canDeferMount: false, hasRevealer: true };
+    if (fields === null) {
+        return { needsRootValues: true, canDeferMount: false, hasRevealer: true, rootPaths: [] };
+    }
 
     let needsRootValues = false;
     let canDeferMount = true;
     let hasRevealer = false;
+    const rootPaths = new Set();
 
     fields.forEach((field) => {
         if (!isPlainObject(field)) {
@@ -40,6 +46,10 @@ function analyze(config) {
         }
 
         if (conditionsFor(field).some(dependsOutsideSet)) needsRootValues = true;
+
+        conditionsFor(field).forEach((conditions) => {
+            rootTargets(conditions).forEach((path) => rootPaths.add(path));
+        });
 
         // Revealers register themselves with the container when they mount, and that
         // registration changes how every other field's `omitValue` is worked out.
@@ -67,11 +77,22 @@ function analyze(config) {
         if (nested.some((child) => conditionsFor(child).length > 0)) canDeferMount = false;
     });
 
-    return { needsRootValues, canDeferMount, hasRevealer };
+    return { needsRootValues, canDeferMount, hasRevealer, rootPaths: [...rootPaths] };
 }
 
 function conditionsFor(field) {
     return KEYS.filter((key) => field[key]).map((key) => field[key]);
+}
+
+// The paths a set's conditions read out of the container's root values, with the prefix
+// stripped so they're the paths `data_get` is handed. Converter leaves `$root.`/`root.`
+// handles alone, so what's written in the blueprint is what gets resolved.
+function rootTargets(conditions) {
+    if (!isPlainObject(conditions)) return [];
+
+    return Object.keys(conditions)
+        .filter((lhs) => typeof lhs === 'string' && ROOT_PREFIX_RE.test(lhs))
+        .map((lhs) => lhs.replace(ROOT_PREFIX_RE, ''));
 }
 
 function dependsOutsideSet(conditions) {

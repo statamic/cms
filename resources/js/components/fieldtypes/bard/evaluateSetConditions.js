@@ -39,7 +39,26 @@ export default function evaluateBardSetConditions({ value, setConfigs, fieldPath
     // they're compared. Being wrong about one of those drops content; declining too often
     // only keeps a value the blueprint would have hidden, and only until the field is
     // scrolled into view.
-    const declineAll = setConfigs.some((config) => analyzeSetConditions(config).hasRevealer);
+    //
+    // A revealer in *another* never-rendered field is the same bug seen from the far side:
+    // that field's registration is missing too, and a `$root.` condition can point straight
+    // at it. Nothing here can tell whose revealer it is, so the second half of the rule is
+    // blunter — decline whenever a `$root.` condition targets a path that isn't in the root
+    // values at all. An unregistered revealer is always such a path, because a revealer's
+    // own value is omitted and so never survives into `visibleValues`.
+    //
+    // Absent has to mean genuinely missing. A field that's present and null, or present and
+    // an empty string, resolves fine and its conditions are still evaluated normally —
+    // treating those as unresolvable would switch omission off across most forms.
+    //
+    // This does catch more than revealers: a typo'd handle, or a target that some other
+    // condition has already omitted, declines too. Accepted — the alternative is guessing
+    // at what a path was meant to reach.
+    const declineAll = setConfigs.some((config) => {
+        const { hasRevealer, rootPaths } = analyzeSetConditions(config);
+
+        return hasRevealer || rootPaths.some((path) => !isPresent(container.visibleValues.value, path));
+    });
 
     value.forEach((node, index) => {
         if (!isPlainObject(node) || node.type !== 'set') return;
@@ -115,6 +134,21 @@ function resolvableConditions(conditions) {
     if (!isPlainObject(conditions)) return false;
 
     return Object.keys(conditions).every((lhs) => !PARENT_RE.test(lhs));
+}
+
+// `data_get` can't answer this: it returns its fallback for a missing path and for a null
+// one alike, and it short-circuits on any falsy step along the way.
+function isPresent(values, path) {
+    let current = values;
+
+    for (const segment of path.split('.')) {
+        if (current === null || typeof current !== 'object') return false;
+        if (!(segment in current)) return false;
+
+        current = current[segment];
+    }
+
+    return true;
 }
 
 function keepValue(container, dottedKey) {
