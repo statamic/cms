@@ -60,7 +60,14 @@ const showGroupActions = computed(() => showAddSection.value);
 const hasOnlyOtherGroup = computed(() => usesGroupEditor.value && listedSections.value.length === 0);
 
 watch(isEditingSections, (editing) => {
-    if (!editing) closeGroupEditor();
+    if (!editing) {
+        closeGroupEditor();
+        return;
+    }
+
+    if (hasOnlyOtherGroup.value && !readOnly.value) {
+        nextTick(() => openNewGroupEditor());
+    }
 });
 
 const titleSnapshots = ref({});
