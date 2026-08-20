@@ -155,4 +155,47 @@ class ManagerTest extends TestCase
         $this->assertNotNull($entry->absoluteUrl());
         $this->assertStringEndsWith('/fake-docs/getting-started', $entry->absoluteUrl());
     }
+
+    #[Test]
+    public function it_does_not_manage_collections_whose_driver_is_unavailable()
+    {
+        config(['statamic.sidecar.collections' => [
+            'docs' => [
+                'driver' => 'gone',
+                'directory' => $this->fakeStacheDirectory.'/docs',
+            ],
+        ]]);
+
+        $this->manager->boot();
+
+        $this->assertFalse($this->manager->manages('docs'));
+        $this->assertNull(CollectionAPI::findByHandle('docs'));
+    }
+
+    #[Test]
+    public function it_does_not_throw_when_resolving_uris_or_saving_entries_for_an_unbootable_collection()
+    {
+        config(['statamic.sidecar.collections' => [
+            'docs' => [
+                'driver' => 'gone',
+                'directory' => $this->fakeStacheDirectory.'/docs',
+            ],
+        ]]);
+
+        $this->manager->boot();
+
+        $collection = tap(CollectionAPI::make('docs')->directory($this->fakeStacheDirectory.'/docs'))->save();
+
+        $entry = \Statamic\Facades\Entry::make()
+            ->collection($collection)
+            ->id('doc-1')
+            ->slug('getting-started')
+            ->data(['title' => 'Getting Started']);
+
+        $this->assertNull($entry->uri());
+
+        $entry->save();
+
+        $this->assertEquals('Getting Started', $entry->fresh()->get('title'));
+    }
 }

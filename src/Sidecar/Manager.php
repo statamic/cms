@@ -98,7 +98,17 @@ class Manager
 
     public function manages(string $collectionHandle): bool
     {
-        return $this->collections()->has($collectionHandle);
+        $config = $this->getConfig($collectionHandle);
+
+        if (! $config) {
+            return false;
+        }
+
+        $driver = $config['driver'] ?? null;
+
+        // Config alone isn't enough — a removed/unregistered driver should
+        // degrade the same way boot does, not throw from uri()/save paths.
+        return $driver && $this->hasDriver($driver);
     }
 
     public function packages(): IlluminateCollection
