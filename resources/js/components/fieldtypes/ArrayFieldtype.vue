@@ -217,6 +217,7 @@ export default {
                 side: 'bottom',
                 class: 'w-[32rem]',
                 dismissible: this.deleting === false,
+                excludeZManipulation: true,
                 open: this.compactOpen,
                 'onUpdate:open': this.setCompactOpen,
             };

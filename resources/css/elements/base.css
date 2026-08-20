@@ -152,14 +152,19 @@ code:not(pre *) {
     }
 }
 
-/* Override the hardcoded z-index of Reka's popper content wrapper under certain conditions. We can't use a direct descendant selector because things like a datepicker/combobox/popover is inside a portal, so instead we'll check to see if certain conditions are present. */
+/*
+    Pull Reka poppers above modals/stacks/etc. We can't use a descendant selector
+    because poppers portal outside the overlay DOM.
+
+    Opt out with [data-ui-exclude-z-manipulation] when a popper should stay below an unrelated
+    overlay (e.g. a compact array popover open behind a confirmation modal). DOM selectors
+    can't tell us whether the popper belongs to the overlay because of portals/the virtual DOM.
+*/
 body:has(
-    /* A modal is present */
     [data-ui-modal-content],
     .stack,
     .live-preview,
-    /* Fullscreen Code Editor fieldtype */
     .code-fullscreen
-) [data-reka-popper-content-wrapper] {
+) [data-reka-popper-content-wrapper]:not(:has([data-ui-exclude-z-manipulation])) {
     z-index: var(--z-index-portal)!important;
 }
