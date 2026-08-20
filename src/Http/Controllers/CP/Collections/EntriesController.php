@@ -147,10 +147,13 @@ class EntriesController extends CpController
             'localizations' => $this->getAuthorizedSitesForCollection($collection)->map(function ($handle) use ($entry) {
                 $localized = $entry->in($handle);
                 $exists = $localized !== null;
+                $site = Site::get($handle);
 
                 return [
                     'handle' => $handle,
-                    'name' => Site::get($handle)->name(),
+                    'name' => $site->name(),
+                    'group' => $site->group(),
+                    'group_handle' => $site->groupHandle(),
                     'active' => $handle === $entry->locale(),
                     'exists' => $exists,
                     'root' => $exists ? $localized->isRoot() : false,
@@ -336,9 +339,13 @@ class EntriesController extends CpController
             'published' => $collection->defaultPublishState(),
             'locale' => $site->handle(),
             'localizations' => $this->getAuthorizedSitesForCollection($collection)->map(function ($handle) use ($collection, $site, $blueprint) {
+                $localizationSite = Site::get($handle);
+
                 return [
                     'handle' => $handle,
-                    'name' => Site::get($handle)->name(),
+                    'name' => $localizationSite->name(),
+                    'group' => $localizationSite->group(),
+                    'group_handle' => $localizationSite->groupHandle(),
                     'active' => $handle === $site->handle(),
                     'exists' => false,
                     'published' => false,

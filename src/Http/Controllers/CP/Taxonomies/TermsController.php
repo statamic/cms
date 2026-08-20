@@ -122,10 +122,13 @@ class TermsController extends CpController
             'permalink' => $term->absoluteUrl(),
             'localizations' => $this->getAuthorizedSitesForTaxonomy($taxonomy)->map(function ($handle) use ($term) {
                 $localized = $term->in($handle);
+                $site = Site::get($handle);
 
                 return [
                     'handle' => $handle,
-                    'name' => Site::get($handle)->name(),
+                    'name' => $site->name(),
+                    'group' => $site->group(),
+                    'group_handle' => $site->groupHandle(),
                     'active' => $handle === $term->locale(),
                     'exists' => true,
                     'root' => $localized->isRoot(),
@@ -241,9 +244,13 @@ class TermsController extends CpController
             'published' => $taxonomy->defaultPublishState(),
             'locale' => $site->handle(),
             'localizations' => $this->getAuthorizedSitesForTaxonomy($taxonomy)->map(function ($handle) use ($taxonomy, $site) {
+                $localizationSite = Site::get($handle);
+
                 return [
                     'handle' => $handle,
-                    'name' => Site::get($handle)->name(),
+                    'name' => $localizationSite->name(),
+                    'group' => $localizationSite->group(),
+                    'group_handle' => $localizationSite->groupHandle(),
                     'active' => $handle === $site->handle(),
                     'exists' => false,
                     'published' => false,

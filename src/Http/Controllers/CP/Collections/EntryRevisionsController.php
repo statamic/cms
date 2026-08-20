@@ -86,10 +86,13 @@ class EntryRevisionsController extends CpController
             'localizations' => $this->getAuthorizedSitesForCollection($entry->collection())->map(function ($handle) use ($entry) {
                 $localized = $entry->in($handle);
                 $exists = $localized !== null;
+                $site = Site::get($handle);
 
                 return [
                     'handle' => $handle,
-                    'name' => Site::get($handle)->name(),
+                    'name' => $site->name(),
+                    'group' => $site->group(),
+                    'group_handle' => $site->groupHandle(),
                     'active' => $handle === $entry->locale(),
                     'exists' => $exists,
                     'root' => $exists ? $localized->isRoot() : false,
