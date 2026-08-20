@@ -101,27 +101,31 @@
                 <PublishTabs>
                     <template #actions>
                         <div class="space-y-6">
-                            <!-- Live Preview / Visit URL / Copy Preview Link Buttons -->
-                            <div class="flex flex-wrap gap-3 lg:gap-4" v-if="showLivePreviewButton || showVisitUrlButton || showCopyPreviewLinkButton">
+                            <!-- Live Preview / Visit URL / Share Buttons -->
+                            <div
+                                class="flex"
+                                :class="showCopyPreviewLinkButton ? 'gap-2' : 'flex-wrap gap-3 lg:gap-4'"
+                                v-if="showLivePreviewButton || showVisitUrlButton || showCopyPreviewLinkButton"
+                            >
                                 <Button
-                                    :text="__('Live Preview')"
-                                    class="flex-1"
+                                    :text="showCopyPreviewLinkButton ? __('Preview') : __('Live Preview')"
+                                    :class="showCopyPreviewLinkButton ? 'min-w-0 flex-1 px-2!' : 'flex-1'"
                                     icon="live-preview"
                                     @click="openLivePreview"
                                     v-if="showLivePreviewButton"
                                 />
                                 <Button
                                     :href="permalink"
-                                    :text="__('Visit URL')"
-                                    class="flex-1"
+                                    :text="showCopyPreviewLinkButton ? __('Visit') : __('Visit URL')"
+                                    :class="showCopyPreviewLinkButton ? 'min-w-0 flex-1 px-2!' : 'flex-1'"
                                     icon="external-link"
                                     target="_blank"
                                     v-if="showVisitUrlButton"
                                 />
                                 <Button
-                                    :text="__('Copy Preview Link')"
-                                    class="flex-1"
-                                    icon="link"
+                                    :text="__('Share')"
+                                    class="min-w-0 flex-1 px-2!"
+                                    icon="share-link"
                                     :loading="copyingPreviewLink"
                                     @click="copyPreviewLink"
                                     v-if="showCopyPreviewLinkButton"
