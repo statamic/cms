@@ -64,7 +64,7 @@ class NavigationController extends CpController
         $values = [
             'title' => $nav->title(),
             'handle' => $nav->handle(),
-            'collections' => $nav->collections()->map->handle()->all(),
+            'collections' => Arr::wrap($nav->collections()->map->handle()->all()),
             'collections_query_scopes' => $nav->collectionsQueryScopes(),
             'root' => $nav->expectsRoot(),
             'sites' => $nav->trees()->keys()->all(),
@@ -138,7 +138,7 @@ class NavigationController extends CpController
                     'url' => $tree->showUrl(),
                 ];
             })->values()->all(),
-            'collections' => $nav->collections()->map->handle()->all(),
+            'collections' => Arr::wrap($nav->collections()->map->handle()->all()),
             'entryQueryScopes' => $nav->collectionsQueryScopes(),
             'initialMaxDepth' => $nav->maxDepth(),
             'expectsRoot' => $nav->expectsRoot(),
