@@ -40,6 +40,7 @@ const slots = useSlots();
 const usingSelectedOptionSlot = !!slots['selected-option'];
 const usingNoOptionsSlot = !!slots['no-options'];
 const usingOptionSlot = !!slots['option'];
+const usingBeforeOptionSlot = !!slots['before-option'];
 </script>
 
 <template>
@@ -66,6 +67,9 @@ const usingOptionSlot = !!slots['option'];
         </template>
         <template #no-options v-if="usingNoOptionsSlot">
             <slot name="no-options" />
+        </template>
+        <template #before-option="option" v-if="usingBeforeOptionSlot">
+            <slot name="before-option" v-bind="option" />
         </template>
         <template #option="option" v-if="usingOptionSlot">
             <slot name="option" v-bind="option" />

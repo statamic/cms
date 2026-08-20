@@ -10,6 +10,12 @@ import {
 import { computed, ref, useId, watch } from 'vue';
 import fuzzysort from 'fuzzysort';
 import Localization from './Localization.vue';
+import {
+    flatOptionsFromSiteGroups,
+    groupItemsBySiteGroup,
+    hasNamedSiteGroups,
+    selectedSiteGroupLabel,
+} from '@/util/site-groups.js';
 
 const props = defineProps({
     localizations: {
@@ -27,8 +33,6 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['selected']);
-
-const UNGROUPED_KEY = 'other';
 
 const comboboxId = useId();
 const searchQuery = ref('');
@@ -58,61 +62,21 @@ const selectedLocalization = computed(() => {
     return activeLocalization.value;
 });
 
-const localizationGroups = computed(() => {
-    const groups = [];
-    const indexByKey = new Map();
+const localizationGroups = computed(() => groupItemsBySiteGroup(props.localizations));
 
-    for (const localization of props.localizations) {
-        const isUngrouped = !localization.group && !localization.group_handle;
-        const key = isUngrouped
-            ? UNGROUPED_KEY
-            : (localization.group_handle || localization.group);
-        const label = isUngrouped ? __('Other') : localization.group;
-
-        if (!indexByKey.has(key)) {
-            indexByKey.set(key, groups.length);
-            groups.push({ key, label, localizations: [] });
-        }
-
-        groups[indexByKey.get(key)].localizations.push(localization);
-    }
-
-    const named = groups.filter((group) => group.key !== UNGROUPED_KEY);
-    const other = groups.filter((group) => group.key === UNGROUPED_KEY);
-
-    return [...named, ...other];
-});
-
-const hasNamedGroups = computed(() => localizationGroups.value.some((group) => group.key !== UNGROUPED_KEY));
+const hasNamedGroups = computed(() => hasNamedSiteGroups(localizationGroups.value));
 
 const useCombobox = computed(() => hasNamedGroups.value || props.localizations.length > 5);
 
 const comboboxOptions = computed(() => {
     const query = searchQuery.value;
-    let isFirstVisibleOption = true;
 
-    return localizationGroups.value.flatMap((group) => {
-        const localizations = query
+    return flatOptionsFromSiteGroups(localizationGroups.value, {
+        filterItems: (localizations) => query
             ? fuzzysort
-                .go(query, group.localizations, { keys: ['name', 'group', 'handle'] })
+                .go(query, localizations, { keys: ['name', 'group', 'handle'] })
                 .map((result) => result.obj)
-            : group.localizations;
-
-        if (!localizations.length) {
-            return [];
-        }
-
-        return localizations.map((localization, index) => {
-            const option = {
-                ...localization,
-                _groupLabel: index === 0 ? group.label : null,
-                _showGroupSeparator: index === 0 && !isFirstVisibleOption,
-            };
-
-            isFirstVisibleOption = false;
-
-            return option;
-        });
+            : localizations,
     });
 });
 
@@ -129,11 +93,7 @@ function handleSearch(query) {
 }
 
 function selectedGroupLabel(option) {
-    if (option.group) {
-        return __(option.group);
-    }
-
-    return hasNamedGroups.value ? __('Other') : null;
+    return selectedSiteGroupLabel(option, hasNamedGroups.value);
 }
 </script>
 
