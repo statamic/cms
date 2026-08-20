@@ -243,6 +243,14 @@
                     >
                         <template #selected-option="{ option }">
                             <span class="flex min-w-0 items-center gap-1.5">
+                                <span
+                                    class="little-dot shrink-0"
+                                    :class="{
+                                        'bg-green-600': option.published,
+                                        'bg-gray-500': !option.published,
+                                        'bg-red-500': !option.exists,
+                                    }"
+                                />
                                 <template v-if="selectedOriginGroupLabel(option)">
                                     <span class="truncate">{{ selectedOriginGroupLabel(option) }}</span>
                                     <Icon name="chevron-right" class="size-3.5! text-gray-700 dark:text-white/70" aria-hidden="true" />
@@ -263,6 +271,20 @@
                                 class="px-2.5 pb-1 pt-1.5 font-semibold uppercase tracking-wide text-gray-950 text-2xs dark:text-gray-300"
                                 :text="__(option._groupLabel)"
                             />
+                        </template>
+
+                        <template #option="option">
+                            <div class="flex min-w-0 items-center">
+                                <span
+                                    class="little-dot me-2 shrink-0"
+                                    :class="{
+                                        'bg-green-600': option.published,
+                                        'bg-gray-500': !option.published,
+                                        'bg-red-500': !option.exists,
+                                    }"
+                                />
+                                <span class="truncate">{{ __(option.label) }}</span>
+                            </div>
                         </template>
                     </Select>
                 </ui-field>
@@ -557,6 +579,8 @@ export default {
                     label: localization.name,
                     group: localization.group,
                     group_handle: localization.group_handle,
+                    published: localization.published,
+                    exists: localization.exists,
                 }));
 
             return flatOptionsFromSiteGroups(groupItemsBySiteGroup(existing));
