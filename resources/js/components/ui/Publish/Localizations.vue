@@ -135,7 +135,7 @@ function handleSearch(query) {
                         <span class="flex min-w-0 items-center gap-1.5">
                             <template v-if="option.group">
                                 <span class="truncate">{{ __(option.group) }}</span>
-                                <Icon name="chevron-right" class="size-3.5 shrink-0 text-gray-400 dark:text-white/40" aria-hidden="true" />
+                                <Icon name="chevron-right" class="size-3.5! text-gray-400 dark:text-white/40" aria-hidden="true" />
                             </template>
                             <span class="truncate">{{ __(option.name) }}</span>
                         </span>
@@ -145,13 +145,13 @@ function handleSearch(query) {
                         <div class="flex w-full min-w-0 flex-col">
                             <div
                                 v-if="option._showGroupSeparator"
-                                class="mb-1 border-t border-gray-200 dark:border-gray-700"
+                                class="mb-3 -mt-1.5 -mx-2 border-t border-gray-200 dark:border-gray-700"
                                 role="separator"
                             />
                             <Subheading
                                 v-if="option._groupLabel"
                                 size="sm"
-                                class="-mx-0.5 px-0.5 pb-1.5 pt-0.5 font-semibold uppercase tracking-wide"
+                                class="-mx-2 px-0.5 pb-3 pt-0.5 font-semibold uppercase text-gray-950 text-2xs"
                                 :text="__(option._groupLabel)"
                             />
                             <Localization :localization="option" :localizing />
