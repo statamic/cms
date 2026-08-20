@@ -126,7 +126,7 @@ function selectLocalization(localization) {
                         <ComboboxContent
                             position="popper"
                             :side-offset="5"
-                            class="z-(--z-index-above) max-h-[var(--reka-combobox-content-available-height)] min-w-[var(--reka-combobox-trigger-width)] overflow-hidden rounded-lg border border-gray-200 bg-white shadow-ui-sm dark:border-white/10 dark:bg-gray-800"
+                            class="z-(--z-index-above) w-[var(--reka-combobox-trigger-width)] max-h-[var(--reka-combobox-content-available-height)] overflow-hidden rounded-lg border border-gray-200 bg-white shadow-ui-sm dark:border-white/10 dark:bg-gray-800"
                         >
                             <ComboboxViewport class="max-h-[300px] space-y-1 overflow-y-auto py-2">
                                 <template
