@@ -550,8 +550,6 @@ onBeforeUnmount(() => {
                             />
                             <Heading :text="sectionTitle(section)" />
                             <Subheading v-if="section.instructions" :text="renderInstructions(section.instructions)" />
-                        </div>
-                        <div class="flex shrink-0 items-center">
                             <div v-if="showGroupActions && section.reorderable" class="flex shrink-0 items-center">
                                 <Button
                                     icon="pencil-line"
@@ -568,16 +566,16 @@ onBeforeUnmount(() => {
                                     @click.prevent="removeGroup(section)"
                                 />
                             </div>
-                            <div v-if="section.collapsible" class="flex shrink-0 items-center">
-                                <Button
-                                    @click="toggleSection(section)"
-                                    class="static! [&_svg]:size-3.5 rounded-xl after:content-[''] after:absolute after:inset-0"
-                                    :icon="section.collapsed ? 'expand' : 'collapse'"
-                                    size="sm"
-                                    variant="ghost"
-                                    :aria-label="__('Toggle section visibility')"
-                                />
-                            </div>
+                        </div>
+                        <div v-if="section.collapsible" class="flex shrink-0 items-center">
+                            <Button
+                                @click="toggleSection(section)"
+                                class="static! [&_svg]:size-3.5 rounded-xl after:content-[''] after:absolute after:inset-0"
+                                :icon="section.collapsed ? 'expand' : 'collapse'"
+                                size="sm"
+                                variant="ghost"
+                                :aria-label="__('Toggle section visibility')"
+                            />
                         </div>
                     </div>
 
@@ -615,8 +613,6 @@ onBeforeUnmount(() => {
                                         />
                                     </Heading>
                                     <Subheading v-if="section.instructions" :text="renderInstructions(section.instructions)" />
-                                </div>
-                                <div class="flex shrink-0 items-center">
                                     <div v-if="showGroupActions && section.reorderable" class="flex shrink-0 items-center">
                                         <Button
                                             icon="pencil-line"
@@ -633,16 +629,16 @@ onBeforeUnmount(() => {
                                             @click.prevent="removeGroup(section)"
                                         />
                                     </div>
-                                    <div v-if="section.collapsible" class="flex shrink-0 items-center">
-                                        <Button
-                                            @click="toggleSection(section)"
-                                            class="static! [&_svg]:size-3.5 rounded-xl after:content-[''] after:absolute after:inset-0"
-                                            :icon="section.collapsed ? 'expand' : 'collapse'"
-                                            size="sm"
-                                            variant="ghost"
-                                            :aria-label="__('Toggle section visibility')"
-                                        />
-                                    </div>
+                                </div>
+                                <div v-if="section.collapsible" class="flex shrink-0 items-center">
+                                    <Button
+                                        @click="toggleSection(section)"
+                                        class="static! [&_svg]:size-3.5 rounded-xl after:content-[''] after:absolute after:inset-0"
+                                        :icon="section.collapsed ? 'expand' : 'collapse'"
+                                        size="sm"
+                                        variant="ghost"
+                                        :aria-label="__('Toggle section visibility')"
+                                    />
                                 </div>
                             </div>
                         </PanelHeader>
