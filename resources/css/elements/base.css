@@ -154,8 +154,8 @@ code:not(pre *) {
 
 /* Override the hardcoded z-index of Reka's popper content wrapper under certain conditions. We can't use a direct descendant selector because things like a datepicker/combobox/popover is inside a portal, so instead we'll check to see if certain conditions are present. */
 body:has(
-    /* A modal is present, but _not_ a confirmation modal */
-    [data-ui-modal-content]&:not([data-ui-confirmation-modal]),
+    /* A modal is present */
+    [data-ui-modal-content],
     .stack,
     .live-preview,
     /* Fullscreen Code Editor fieldtype */
