@@ -163,7 +163,7 @@ function selectedGroupLabel(option) {
                         <span class="flex min-w-0 items-center gap-1.5">
                             <template v-if="selectedGroupLabel(option)">
                                 <span class="truncate">{{ selectedGroupLabel(option) }}</span>
-                                <Icon name="chevron-right" class="size-3.5! shrink-0 text-gray-400 dark:text-white/40" aria-hidden="true" />
+                                <Icon name="chevron-right" class="size-3.5! text-gray-700 dark:text-white/70" aria-hidden="true" />
                             </template>
                             <span class="truncate">{{ __(option.name) }}</span>
                         </span>
