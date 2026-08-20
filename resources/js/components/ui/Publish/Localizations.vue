@@ -144,7 +144,7 @@ function handleSearch(query) {
                     <template #before-option="option">
                         <div
                             v-if="option._showGroupSeparator"
-                            class="mx-2 mb-1 mt-1 border-t border-gray-200 dark:border-gray-700"
+                            class="mx-2 mb-2.25 mt-0.75 border-t border-gray-200 dark:border-gray-700"
                             role="separator"
                         />
                         <Subheading
