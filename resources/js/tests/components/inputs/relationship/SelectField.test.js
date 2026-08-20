@@ -17,12 +17,12 @@ const stubs = {
     StatusIndicator: true,
 };
 
-function mountSelectField({ items = [] } = {}) {
+function mountSelectField({ items = [], config = {} } = {}) {
     return mount(SelectField, {
         props: {
             items,
             url: '/test/select-field',
-            config: {},
+            config,
         },
         global: {
             mocks: {
@@ -47,6 +47,24 @@ describe('SelectField comboboxOptions', () => {
         await wrapper.setData({ options: [{ id: '1', title: 'One' }] });
 
         expect(wrapper.vm.comboboxOptions).toEqual([{ id: '1', title: 'One' }]);
+
+        wrapper.unmount();
+    });
+});
+
+describe('SelectField searchKeys', () => {
+    test('searches by title and email for the users fieldtype', () => {
+        const wrapper = mountSelectField({ config: { type: 'users' } });
+
+        expect(wrapper.vm.searchKeys).toEqual(['title', 'email']);
+
+        wrapper.unmount();
+    });
+
+    test('is null for other relationship fieldtypes', () => {
+        const wrapper = mountSelectField({ config: { type: 'entries' } });
+
+        expect(wrapper.vm.searchKeys).toBeNull();
 
         wrapper.unmount();
     });

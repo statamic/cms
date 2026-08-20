@@ -1,7 +1,7 @@
 import Converter from './Converter.js';
 import ParentResolver from './ParentResolver.js';
 import { KEYS } from './Constants.js';
-import { data_get } from '../../bootstrap/globals.js';
+import { data_get } from '../../util/data_get.js';
 import { isObject, intersection } from 'lodash-es';
 
 const NUMBER_SPECIFIC_COMPARISONS = ['>', '>=', '<', '<='];

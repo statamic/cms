@@ -168,13 +168,13 @@ class CollectionEntriesStore extends ChildStore
     {
         $indexes = collect([
             'slug',
-            'uri',
             'collectionHandle',
             'published',
             'title',
             'site' => Indexes\Site::class,
             'origin' => Indexes\Origin::class,
             'parent' => Indexes\Parents::class,
+            'uri',
         ]);
 
         if (! $collection = Collection::findByHandle($this->childKey())) {

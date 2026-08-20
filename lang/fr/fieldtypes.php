@@ -202,6 +202,7 @@ return [
     'text.config.input_type' => 'Définissez le type d’entrée HTML5.',
     'text.config.placeholder' => 'Définissez un texte d’espace réservé.',
     'text.config.prepend' => 'Ajoutez du texte avant (à gauche de) la saisie de texte.',
+    'text.config.rows' => 'Définissez le nombre de lignes de texte visibles.',
     'text.title' => 'Text',
     'textarea.title' => 'Textarea',
     'time.config.augment_format' => 'Vous pouvez éventuellement formater la valeur sur le frontal en utilisant la syntaxe [PHP date format](https://www.php.net/manual/en/datetime.format.php). Par exemple : `g:ia`.',
