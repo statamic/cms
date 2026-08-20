@@ -24,6 +24,8 @@ const props = defineProps({
     open: { type: Boolean, default: false },
     /** When `true`, clicking outside the modal will dismiss it. */
     dismissible: { type: Boolean, default: true },
+    /** When `true`, skip the elevated portal z-index while a modal/stack is open. Use when this popover can remain open behind an unrelated overlay (e.g. a confirmation modal). */
+    excludePortalZ: { type: Boolean, default: false },
 });
 
 const popoverContentClasses = cva({
@@ -65,6 +67,7 @@ function updateOpen(value) {
         <PopoverPortal>
             <PopoverContent
                 data-ui-popover-content
+                :data-ui-exclude-portal-z="excludePortalZ ? '' : undefined"
                 :class="[popoverContentClasses, $attrs.class]"
                 :align
                 :sideOffset="offset"

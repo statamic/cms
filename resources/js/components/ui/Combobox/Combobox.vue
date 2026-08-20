@@ -71,6 +71,8 @@ const props = defineProps({
 	taggable: { type: Boolean, default: false },
 	/** Controls the appearance of the combobox. <br><br> Options: `default`, `filled`, `ghost`, `subtle` */
 	variant: { type: String, default: 'default' },
+	/** When `true`, skip the elevated portal z-index while a modal/stack is open. Use when this combobox can remain open behind an unrelated overlay (e.g. a confirmation modal). */
+	excludePortalZ: { type: Boolean, default: false },
 });
 
 defineOptions({
@@ -462,6 +464,7 @@ defineExpose({
                             adaptiveWidth && 'w-max max-w-md',
                         ]"
                         data-ui-combobox-content
+                        :data-ui-exclude-portal-z="excludePortalZ ? '' : undefined"
                         @escape-key-down="focus"
                     >
                         <FocusScope
