@@ -524,24 +524,27 @@ defineExpose({
                                     <div
                                         v-for="option in filteredOptions"
                                         :key="`${getOptionValue(option)}-${isDisabled(option)}`"
-                                        class="py-1 px-2 w-full overflow-x-hidden"
+                                        class="w-full overflow-x-hidden"
                                     >
-                                        <ComboboxItem
-                                            as="button"
-                                            :value="getOptionValue(option)"
-                                            :text-value="getOptionLabel(option)"
-                                            :disabled="isDisabled(option)"
-                                            :class="itemClasses({ size: size, selected: isSelected(option) })"
-                                            :data-ui-combobox-item="getOptionValue(option)"
-                                            :title="getOptionLabel(option)"
-                                            @select="select"
-                                        >
-                                            <slot name="option" v-bind="option">
-                                                <img v-if="option.image" :src="option.image" class="size-5 rounded-full" :alt="getOptionLabel(option)">
-                                                <span v-if="labelHtml" class="truncate" v-html="getOptionLabel(option)" />
-                                                <span class="truncate" v-else>{{ __(getOptionLabel(option)) }}</span>
-                                            </slot>
-                                        </ComboboxItem>
+                                        <slot name="before-option" v-bind="option" />
+                                        <div class="py-1 px-2">
+                                            <ComboboxItem
+                                                as="button"
+                                                :value="getOptionValue(option)"
+                                                :text-value="getOptionLabel(option)"
+                                                :disabled="isDisabled(option)"
+                                                :class="itemClasses({ size: size, selected: isSelected(option) })"
+                                                :data-ui-combobox-item="getOptionValue(option)"
+                                                :title="getOptionLabel(option)"
+                                                @select="select"
+                                            >
+                                                <slot name="option" v-bind="option">
+                                                    <img v-if="option.image" :src="option.image" class="size-5 rounded-full" :alt="getOptionLabel(option)">
+                                                    <span v-if="labelHtml" class="truncate" v-html="getOptionLabel(option)" />
+                                                    <span class="truncate" v-else>{{ __(getOptionLabel(option)) }}</span>
+                                                </slot>
+                                            </ComboboxItem>
+                                        </div>
                                     </div>
                                 </template>
                             </div>

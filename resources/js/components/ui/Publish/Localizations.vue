@@ -141,21 +141,22 @@ function handleSearch(query) {
                         </span>
                     </template>
 
+                    <template #before-option="option">
+                        <div
+                            v-if="option._showGroupSeparator"
+                            class="mx-2 mb-1 mt-1 border-t border-gray-200 dark:border-gray-700"
+                            role="separator"
+                        />
+                        <Subheading
+                            v-if="option._groupLabel"
+                            size="sm"
+                            class="px-2.5 pb-1 pt-1.5 font-semibold uppercase tracking-wide text-gray-950 text-2xs dark:text-gray-300"
+                            :text="__(option._groupLabel)"
+                        />
+                    </template>
+
                     <template #option="option">
-                        <div class="flex w-full min-w-0 flex-col">
-                            <div
-                                v-if="option._showGroupSeparator"
-                                class="mb-3 -mt-1.5 -mx-2 border-t border-gray-200 dark:border-gray-700"
-                                role="separator"
-                            />
-                            <Subheading
-                                v-if="option._groupLabel"
-                                size="sm"
-                                class="-mx-2 px-0.5 pb-3 pt-0.5 font-semibold uppercase text-gray-950 text-2xs"
-                                :text="__(option._groupLabel)"
-                            />
-                            <Localization :localization="option" :localizing />
-                        </div>
+                        <Localization :localization="option" :localizing />
                     </template>
                 </Combobox>
             </template>
