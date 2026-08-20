@@ -73,6 +73,8 @@ const props = defineProps({
 	variant: { type: String, default: 'default' },
 	/** When `true`, skip the elevated z-index override while a modal/stack is open. Use when this combobox can remain open behind an unrelated overlay (e.g. a confirmation modal). */
 	excludeZManipulation: { type: Boolean, default: false },
+	/** When `false`, options are rendered without virtualization. Useful for variable-height options. */
+	virtualize: { type: Boolean, default: true },
 });
 
 defineOptions({
@@ -491,7 +493,7 @@ defineExpose({
                                 </ComboboxEmpty>
 
                                 <ComboboxVirtualizer
-                                    v-if="filteredOptions.length"
+                                    v-if="virtualize && filteredOptions.length"
                                     :estimate-size="40"
                                     :options="filteredOptions"
                                     :text-content="(opt) => getOptionLabel(opt)"
@@ -517,6 +519,31 @@ defineExpose({
                                         </ComboboxItem>
                                     </div>
                                 </ComboboxVirtualizer>
+
+                                <template v-else-if="filteredOptions.length">
+                                    <div
+                                        v-for="option in filteredOptions"
+                                        :key="`${getOptionValue(option)}-${isDisabled(option)}`"
+                                        class="py-1 px-2 w-full overflow-x-hidden"
+                                    >
+                                        <ComboboxItem
+                                            as="button"
+                                            :value="getOptionValue(option)"
+                                            :text-value="getOptionLabel(option)"
+                                            :disabled="isDisabled(option)"
+                                            :class="itemClasses({ size: size, selected: isSelected(option) })"
+                                            :data-ui-combobox-item="getOptionValue(option)"
+                                            :title="getOptionLabel(option)"
+                                            @select="select"
+                                        >
+                                            <slot name="option" v-bind="option">
+                                                <img v-if="option.image" :src="option.image" class="size-5 rounded-full" :alt="getOptionLabel(option)">
+                                                <span v-if="labelHtml" class="truncate" v-html="getOptionLabel(option)" />
+                                                <span class="truncate" v-else>{{ __(getOptionLabel(option)) }}</span>
+                                            </slot>
+                                        </ComboboxItem>
+                                    </div>
+                                </template>
                             </div>
                         </FocusScope>
                     </ComboboxContent>
