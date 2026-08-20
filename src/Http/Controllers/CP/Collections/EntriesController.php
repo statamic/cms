@@ -130,6 +130,7 @@ class EntriesController extends CpController
                 'restore' => $entry->restoreRevisionUrl(),
                 'createRevision' => $entry->createRevisionUrl(),
                 'editBlueprint' => cp_route('blueprints.collections.edit', [$collection, $blueprint]),
+                'sharedPreview' => $entry->sharedPreviewUrl(),
             ],
             'values' => array_merge($values, ['id' => $entry->id()]),
             'extraValues' => $extraValues,

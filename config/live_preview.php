@@ -69,4 +69,15 @@ return [
 
     'hot_reload_contents' => true,
 
+    /*
+    |--------------------------------------------------------------------------
+    | Shared Preview Links
+    |--------------------------------------------------------------------------
+    |
+    | How long shareable draft preview links should remain valid, in minutes.
+    |
+    */
+
+    'shared_link_expiry' => 1440,
+
 ];

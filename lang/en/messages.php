@@ -245,6 +245,7 @@ return [
     'session_expiry_logging_out_in_seconds' => 'You have been inactive for a while and will be logged out in :seconds seconds.',
     'session_expiry_new_window' => 'This will open in a new window. Return here after authenticating.',
     'set_new_password_instructions' => 'Confirm your email address and create a new password.',
+    'shared_preview_link_copied' => 'Preview link copied. Expires in :hours hours.',
     'show_slugs_instructions' => 'Show slugs in the tree view.',
     'site_configure_attributes_instructions' => 'Add arbitrary attributes to your site\'s config which can be accessed in your templates. [Learn more](https://statamic.dev/multi-site#additional-attributes).',
     'site_configure_handle_instructions' => 'A unique reference to this site. This cannot be easily changed later.',

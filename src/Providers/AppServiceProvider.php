@@ -26,6 +26,7 @@ use Statamic\Sites\Sites;
 use Statamic\Stache\Query\RevisionQueryBuilder;
 use Statamic\Statamic;
 use Statamic\Tokens\Handlers\LivePreview;
+use Statamic\Tokens\Handlers\SharedPreview;
 use Statamic\View\Scaffolding\TemplateGenerator;
 
 use function Statamic\trans as __;
@@ -125,6 +126,16 @@ class AppServiceProvider extends ServiceProvider
             $previewItem = \Facades\Statamic\CP\LivePreview::item($token);
 
             return $item && $previewItem && method_exists($item, 'reference') && $previewItem->reference() === $item->reference();
+        });
+
+        Request::macro('isSharedPreviewOf', function ($item) {
+            $token = $this->statamicToken();
+
+            if (! $token || $token->handler() !== SharedPreview::class) {
+                return false;
+            }
+
+            return $item && method_exists($item, 'reference') && $token->get('reference') === $item->reference();
         });
 
         TrimStrings::skipWhen(function (Request $request) {

@@ -138,7 +138,8 @@ class DataResponse implements Responsable
 
     private function isLivePreviewing()
     {
-        return $this->request->isLivePreviewOf($this->data);
+        return $this->request->isLivePreviewOf($this->data)
+            || $this->request->isSharedPreviewOf($this->data);
     }
 
     protected function view()
