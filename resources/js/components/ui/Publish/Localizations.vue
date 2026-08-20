@@ -81,9 +81,13 @@ const selectedLabel = computed(() => {
 
     if (!active) return '';
 
-    const name = __(active.name);
+    return __(active.name);
+});
 
-    return active.group ? `${__(active.group)} / ${name}` : name;
+const selectedGroup = computed(() => {
+    const active = activeLocalization.value;
+
+    return active?.group ? __(active.group) : null;
 });
 
 function selectLocalization(localization) {
@@ -117,7 +121,13 @@ function selectLocalization(localization) {
                             :id="comboboxId"
                             class="flex h-10 w-full cursor-pointer items-center justify-between rounded-lg border border-gray-300 bg-linear-to-b from-white to-gray-50 px-4 text-md text-gray-900 shadow-ui-sm focus-within:focus-outline dark:border-gray-700 dark:from-gray-850 dark:to-gray-900 dark:text-gray-300 dark:shadow-ui-md"
                         >
-                            <span class="block truncate text-start">{{ selectedLabel }}</span>
+                            <span class="flex min-w-0 items-center gap-1.5 text-start">
+                                <template v-if="selectedGroup">
+                                    <span class="truncate">{{ selectedGroup }}</span>
+                                    <Icon name="chevron-right" class="size-3.5 shrink-0 text-gray-400 dark:text-white/40" aria-hidden="true" />
+                                </template>
+                                <span class="truncate">{{ selectedLabel }}</span>
+                            </span>
                             <Icon name="chevron-down" class="ms-1.5 size-4 text-gray-400 dark:text-white/40" aria-hidden="true" />
                         </ComboboxTrigger>
                     </ComboboxAnchor>
