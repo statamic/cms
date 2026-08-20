@@ -190,7 +190,7 @@
 </template>
 
 <style>
-body:has(:is(.bard-fullscreen, .replicator-fullscreen)) [data-reka-popper-content-wrapper]:not(:has([data-ui-exclude-portal-z])) {
+body:has(:is(.bard-fullscreen, .replicator-fullscreen)) [data-reka-popper-content-wrapper]:not(:has([data-ui-exclude-z-manipulation])) {
     z-index: var(--z-index-portal) !important;
 }
 </style>

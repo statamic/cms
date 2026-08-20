@@ -156,7 +156,7 @@ code:not(pre *) {
     Pull Reka poppers above modals/stacks/etc. We can't use a descendant selector
     because poppers portal outside the overlay DOM.
 
-    Opt out with [data-ui-exclude-portal-z] when a popper should stay below an unrelated
+    Opt out with [data-ui-exclude-z-manipulation] when a popper should stay below an unrelated
     overlay (e.g. a compact array popover open behind a confirmation modal). DOM selectors
     can't tell us whether the popper belongs to the overlay because of portals/the virtual DOM.
 */
@@ -165,6 +165,6 @@ body:has(
     .stack,
     .live-preview,
     .code-fullscreen
-) [data-reka-popper-content-wrapper]:not(:has([data-ui-exclude-portal-z])) {
+) [data-reka-popper-content-wrapper]:not(:has([data-ui-exclude-z-manipulation])) {
     z-index: var(--z-index-portal)!important;
 }
