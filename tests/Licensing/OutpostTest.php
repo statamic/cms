@@ -250,6 +250,24 @@ class OutpostTest extends TestCase
     }
 
     #[Test]
+    public function it_caches_a_429_too_many_requests_error_for_five_minutes_when_theres_no_retry_after_header()
+    {
+        $outpost = $this->outpostWithErrorResponse(429);
+
+        $expectedResponse = [
+            'error' => 429,
+            'expiry' => now()->addMinutes(5)->timestamp,
+            'payload' => $outpost->payload(),
+        ];
+
+        $this->assertEquals($expectedResponse, $outpost->response());
+        Carbon::setTestNow(now()->addMinutes(5)->subSecond());
+        $this->assertCachedResponseEquals($expectedResponse);
+        Carbon::setTestNow(now()->addSeconds(1));
+        $this->assertResponseNotCached();
+    }
+
+    #[Test]
     public function it_caches_a_422_validation_error_for_an_hour()
     {
         $outpost = $this->outpostWithErrorResponse(422, [], [

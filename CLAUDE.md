@@ -95,6 +95,11 @@ The project uses Vite for asset compilation with separate configs:
   - Short strings (like "Submit" or "Click here") can use the translation strings as keys. 
   - Longer phrases or sentences should use keys and have their translations stored in an appropriate translation file.
   - When adding to a translation file, only English strings need to be added. Other languages will be provided by contributors.
+  - Exception messages can stay untranslated in English
+
+## Misc
+
+- Commit messages within a PR do *not* need the PR number prefix. Those are just for the PR merge commit itself.
 
 
 ## Links

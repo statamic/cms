@@ -72,6 +72,19 @@ return [
 
         /*
         |--------------------------------------------------------------------------
+        | Crop Quality
+        |--------------------------------------------------------------------------
+        |
+        | The quality used when saving images cropped in the control panel. The
+        | user may override this per crop. When null, the quality defined in
+        | the "defaults" above will be used, otherwise it falls back to 90.
+        |
+        */
+
+        'crop_quality' => null,
+
+        /*
+        |--------------------------------------------------------------------------
         | Image Manipulation Presets
         |--------------------------------------------------------------------------
         |

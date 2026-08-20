@@ -13,6 +13,8 @@ use Statamic\Search\Result;
 
 /**
  * An abstract collection of data types.
+ *
+ * @phpstan-consistent-constructor
  */
 class DataCollection extends IlluminateCollection
 {

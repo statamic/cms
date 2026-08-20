@@ -355,7 +355,30 @@ class FieldTest extends TestCase
             'required' => true,
             'read_only' => false, // deprecated
             'always_save' => false,
+            'reserve_space_when_hidden' => false,
         ], $field->toPublishArray());
+    }
+
+    #[Test]
+    public function to_publish_array_passes_through_reserve_space_when_hidden()
+    {
+        FieldtypeRepository::partialMock();
+
+        FieldtypeRepository::shouldReceive('find')
+            ->with('example')
+            ->andReturn(new class extends Fieldtype
+            {
+                protected $component = 'example';
+
+                protected $configFields = [];
+            });
+
+        $field = new Field('test', [
+            'type' => 'example',
+            'reserve_space_when_hidden' => true,
+        ]);
+
+        $this->assertTrue($field->toPublishArray()['reserve_space_when_hidden']);
     }
 
     #[Test]

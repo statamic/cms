@@ -16,7 +16,7 @@ class UpdateProductController extends CpController
     /**
      * Show product updates overview.
      *
-     * @param  string  $slug
+     * @param  string  $marketplaceProductSlug
      */
     public function show($marketplaceProductSlug)
     {
@@ -65,7 +65,7 @@ class UpdateProductController extends CpController
     /**
      * Product changelog.
      *
-     * @param  string  $slug
+     * @param  string  $marketplaceProductSlug
      */
     public function changelog(Request $request, $marketplaceProductSlug)
     {
@@ -85,6 +85,8 @@ class UpdateProductController extends CpController
         return [
             'changelog' => $paginated['data'],
             'currentVersion' => $changelog->currentVersion(),
+            'onLatestVersion' => $changelog->availableUpdatesCount() === 0,
+            'securityUpdateAvailable' => $changelog->hasSecurityUpdate(),
             'meta' => $paginated['meta'],
         ];
     }

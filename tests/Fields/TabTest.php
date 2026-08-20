@@ -168,6 +168,7 @@ class TabTest extends TestCase
                             'required' => true,
                             'read_only' => false, // deprecated
                             'always_save' => false,
+                            'reserve_space_when_hidden' => false,
                         ],
                         [
                             'display' => 'Two',
@@ -185,6 +186,7 @@ class TabTest extends TestCase
                             'type' => 'textarea',
                             'placeholder' => null,
                             'character_limit' => null,
+                            'rows' => null,
                             'default' => null,
                             'antlers' => false,
                             'component' => 'textarea',
@@ -192,6 +194,7 @@ class TabTest extends TestCase
                             'required' => false,
                             'read_only' => false, // deprecated
                             'always_save' => false,
+                            'reserve_space_when_hidden' => false,
                         ],
                     ],
                 ],

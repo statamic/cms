@@ -91,7 +91,7 @@ export default {
 
 <template>
     <div>
-        <Head :title="taxonomyTitle" />
+        <Head :title="[__(taxonomyTitle), __('Taxonomies')]" />
 
         <Header :title="__(taxonomyTitle)">
             <Dropdown>
@@ -115,7 +115,7 @@ export default {
             ref="deleter"
             :resource-title="taxonomyTitle"
             :route="deleteUrl"
-            redirect="/cp/taxonomies"
+            :redirect="cp_url('taxonomies')"
         />
 
         <Listing
