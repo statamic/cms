@@ -7,7 +7,7 @@ import {
     Subheading,
     Icon,
 } from '@ui';
-import { computed, ref, useId } from 'vue';
+import { computed, ref, useId, watch } from 'vue';
 import fuzzysort from 'fuzzysort';
 import Localization from './Localization.vue';
 
@@ -32,11 +32,30 @@ const UNGROUPED_KEY = 'other';
 
 const comboboxId = useId();
 const searchQuery = ref('');
+const pendingHandle = ref(null);
 
 const panelHeading = computed(() => props.heading || __('Working In'));
 
 const activeLocalization = computed(() => {
     return props.localizations.find((localization) => localization.active);
+});
+
+watch(
+    () => activeLocalization.value?.handle,
+    (handle) => {
+        if (handle && handle === pendingHandle.value) {
+            pendingHandle.value = null;
+        }
+    },
+);
+
+const selectedLocalization = computed(() => {
+    if (pendingHandle.value) {
+        return props.localizations.find((localization) => localization.handle === pendingHandle.value)
+            ?? activeLocalization.value;
+    }
+
+    return activeLocalization.value;
 });
 
 const localizationGroups = computed(() => {
@@ -101,11 +120,20 @@ function selectLocalization(localization) {
     if (!localization) return;
 
     searchQuery.value = '';
+    pendingHandle.value = localization.handle;
     emit('selected', localization);
 }
 
 function handleSearch(query) {
     searchQuery.value = query;
+}
+
+function selectedGroupLabel(option) {
+    if (option.group) {
+        return __(option.group);
+    }
+
+    return hasNamedGroups.value ? __('Other') : null;
 }
 </script>
 
@@ -125,7 +153,7 @@ function handleSearch(query) {
                     :options="comboboxOptions"
                     option-value="handle"
                     option-label="name"
-                    :model-value="activeLocalization?.handle"
+                    :model-value="selectedLocalization?.handle"
                     :virtualize="!hasNamedGroups"
                     ignore-filter
                     @search="handleSearch"
@@ -133,9 +161,9 @@ function handleSearch(query) {
                 >
                     <template #selected-option="{ option }">
                         <span class="flex min-w-0 items-center gap-1.5">
-                            <template v-if="option.group">
-                                <span class="truncate">{{ __(option.group) }}</span>
-                                <Icon name="chevron-right" class="size-3.5! text-gray-400 dark:text-white/40" aria-hidden="true" />
+                            <template v-if="selectedGroupLabel(option)">
+                                <span class="truncate">{{ selectedGroupLabel(option) }}</span>
+                                <Icon name="chevron-right" class="size-3.5! shrink-0 text-gray-400 dark:text-white/40" aria-hidden="true" />
                             </template>
                             <span class="truncate">{{ __(option.name) }}</span>
                         </span>
