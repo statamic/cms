@@ -47,13 +47,18 @@ const activeLocalization = computed(() => {
     return props.localizations.find((localization) => localization.active);
 });
 
+const UNGROUPED_KEY = 'other';
+
 const localizationGroups = computed(() => {
     const groups = [];
     const indexByKey = new Map();
 
     for (const localization of props.localizations) {
-        const key = localization.group_handle || localization.group || '__ungrouped__';
-        const label = localization.group || null;
+        const isUngrouped = !localization.group && !localization.group_handle;
+        const key = isUngrouped
+            ? UNGROUPED_KEY
+            : (localization.group_handle || localization.group);
+        const label = isUngrouped ? __('Other') : localization.group;
 
         if (!indexByKey.has(key)) {
             indexByKey.set(key, groups.length);
@@ -63,10 +68,13 @@ const localizationGroups = computed(() => {
         groups[indexByKey.get(key)].localizations.push(localization);
     }
 
-    return groups;
+    const named = groups.filter((group) => group.key !== UNGROUPED_KEY);
+    const other = groups.filter((group) => group.key === UNGROUPED_KEY);
+
+    return [...named, ...other];
 });
 
-const hasNamedGroups = computed(() => localizationGroups.value.some((group) => group.label));
+const hasNamedGroups = computed(() => localizationGroups.value.some((group) => group.key !== UNGROUPED_KEY));
 
 const selectedLabel = computed(() => {
     const active = activeLocalization.value;
