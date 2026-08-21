@@ -92,7 +92,10 @@ class Pages
 
         foreach ($this->all() as $page) {
             $flattened->push($page);
-            $flattened = $flattened->merge($page->flattenedPages());
+
+            foreach ($page->flattenedPages() as $descendant) {
+                $flattened->push($descendant);
+            }
         }
 
         return $flattened;

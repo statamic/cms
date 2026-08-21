@@ -11,6 +11,8 @@ use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
 use Statamic\Support\Arr;
 
+use function Statamic\trans as __;
+
 class Dictionary extends Fieldtype
 {
     protected $categories = ['controls', 'relationship'];
@@ -74,7 +76,7 @@ class Dictionary extends Fieldtype
     public function preload(): array
     {
         return [
-            'url' => cp_route('dictionary-fieldtype', $this->dictionary()->handle()),
+            'url' => route('statamic.dictionary-fieldtype', $this->dictionary()->handle()),
             'selectedOptions' => $this->getItemData($this->field->value()),
         ];
     }

@@ -10,6 +10,8 @@ use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Statamic;
 
+use function Statamic\trans as __;
+
 class PreferenceController extends CpController
 {
     public function index()

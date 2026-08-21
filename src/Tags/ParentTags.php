@@ -19,7 +19,6 @@ class ParentTags extends Tags
      * Gets a specified field value from the parent.
      *
      * @param  string  $method
-     * @param  array  $args
      * @return mixed
      */
     public function wildcard($method)

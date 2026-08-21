@@ -244,12 +244,19 @@ final class Installer
      */
     protected function requireStarterKit(): self
     {
+        $error = null;
+
         spin(
-            function () {
+            function () use (&$error) {
                 $version = $this->branch;
 
                 // Allow dev stability when installing from VCS repo without tagged releases
                 if (! $version && $this->url) {
+                    $version = '@dev';
+                }
+
+                // Allow dev stability when installing from local repo
+                if (! $version && $this->fromLocalRepo) {
                     $version = '@dev';
                 }
 
@@ -260,11 +267,15 @@ final class Installer
                 try {
                     Composer::withoutQueue()->throwOnFailure()->require($package);
                 } catch (ProcessException $exception) {
-                    $this->rollbackWithError("Error installing starter kit [{$this->package}].", $exception->getMessage());
+                    $error = $exception;
                 }
             },
             "Preparing starter kit [{$this->package}]..."
         );
+
+        if ($error) {
+            $this->rollbackWithError("Error installing starter kit [{$this->package}].", $error->getMessage());
+        }
 
         return $this;
     }

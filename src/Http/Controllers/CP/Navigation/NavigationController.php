@@ -19,6 +19,8 @@ use Statamic\Query\Scopes\Filter;
 use Statamic\Rules\Handle;
 use Statamic\Support\Arr;
 
+use function Statamic\trans as __;
+
 class NavigationController extends CpController
 {
     public function index()
@@ -95,9 +97,13 @@ class NavigationController extends CpController
 
         $collectionTree = null;
 
-        if ($nav->collections()->count() === 1 && $nav->collections()->first()->hasStructure()) {
-            $collection = $nav->collections()->first();
-
+        // Don't offer a tree for a collection the user isn't allowed to view.
+        // The selector falls back to the list.
+        if (
+            $nav->collections()->count() === 1
+            && ($collection = $nav->collections()->first())->hasStructure()
+            && User::current()->can('view', $collection)
+        ) {
             $collectionBlueprints = $collection
                 ->entryBlueprints()
                 ->reject->hidden()

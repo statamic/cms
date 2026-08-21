@@ -154,12 +154,12 @@ class Cascade
 
     protected function hydrateContent()
     {
-        if (! $this->content) {
-            return $this;
-        }
-
         if ($this->content instanceof \Closure) {
             $this->content = call_user_func($this->content);
+        }
+
+        if (! $this->content) {
+            return $this;
         }
 
         $variables = $this->content instanceof Augmentable
@@ -317,6 +317,7 @@ class Cascade
             'statamic.search.defaults',
             'statamic.search.queue',
             'statamic.search.queue_connection',
+            'statamic.search.queue_timeout',
             'statamic.search.chunk_size',
             'statamic.stache.watcher',
             'statamic.stache.cache_store',

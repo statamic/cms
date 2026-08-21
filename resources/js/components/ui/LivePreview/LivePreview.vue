@@ -106,6 +106,8 @@ watch(
     { deep: true },
 );
 
+const livePreviewDebounceMs = Statamic.$config.get('livePreview.debounce_ms', 150);
+
 const update = debounce(() => {
     if (source) source.abort();
     source = new AbortController();
@@ -128,7 +130,7 @@ const update = debounce(() => {
             if (e.code === 'ERR_CANCELED') return;
             throw e;
         });
-}, 150);
+}, livePreviewDebounceMs);
 
 function componentUpdated(handle, value) {
     extras.value[handle] = value;
@@ -271,6 +273,18 @@ function setEditorWidth(width) {
     localStorage.setItem(widthLocalStorageKey, width);
 }
 
+function onResizeEnd() {
+    editorResizing.value = false;
+
+    // Chromium doesn't recalculate iframe scroll state after the parent
+    // container is resized. Toggling a transform forces a reflow. #14540
+    const iframe = iframeContentContainer.value?.querySelector('iframe');
+    if (iframe) {
+        iframe.style.transform = 'translateZ(0)';
+        requestAnimationFrame(() => iframe.style.transform = '');
+    }
+}
+
 function close() {
     if (poppedOut.value) closePopout();
 
@@ -283,10 +297,14 @@ const keybinding = ref(
     }),
 );
 
-onUnmounted(() => keybinding.value.destroy());
+const refreshHandler = () => { if (props.enabled) update(); };
+const refreshEvent = `live-preview.${name.value}.refresh`;
 
-Statamic.$events.$on(`live-preview.${name.value}.refresh`, () => {
-    if (props.enabled) update();
+Statamic.$events.$on(refreshEvent, refreshHandler);
+
+onUnmounted(() => {
+    keybinding.value.destroy();
+    Statamic.$events.$off(refreshEvent, refreshHandler);
 });
 </script>
 
@@ -343,7 +361,7 @@ Statamic.$events.$on(`live-preview.${name.value}.refresh`, () => {
                             v-show="!poppedOut"
                             @resized="setEditorWidth"
                             @resize-start="editorResizing = true"
-                            @resize-end="editorResizing = false"
+                            @resize-end="onResizeEnd"
                             @collapsed="collapseEditor"
                         />
                     </div>

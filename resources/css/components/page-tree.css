@@ -18,6 +18,11 @@
     .page-tree-branch {
         @apply relative rounded-xl bg-white text-xs shadow;
         @apply dark:bg-gray-800;
+        /* Skip layout/paint for off-screen branches.
+          - content-visibility already applies containment while rendering / skipped
+        */
+        content-visibility: auto;
+        contain-intrinsic-size: auto 44px;
     }
 
     .page-move {
@@ -38,7 +43,12 @@
     .tree-node:has(.is-section) + .tree-node .page-tree-branch,
     /* 3rd level down */
     .tree-node:has(.page-tree-branch--has-children):has(.is-open) + .tree-node .page-tree-branch {
-        border-top-left-radius: 0;
+        border-start-start-radius: 0;
+    }
+
+    /* A section node followed by another section node should always have a rounded border. E.g. Tools + Settings */
+    .tree-node:has(.is-section) + .tree-node:has(.is-section) .page-tree-branch {
+        @apply rounded-xl;
     }
 }
 
@@ -56,7 +66,7 @@
             @apply mt-8 pt-1 bg-gray-200/45 dark:bg-gray-950 rounded-t-2xl;
         }
         &:has(+ .tree-node .is-section),
-        &:last-child {
+        &:nth-last-child(1 of .tree-node) {
             @apply pb-1 rounded-b-2xl;
         }
         &:has(.is-top-level-section-placeholder) {

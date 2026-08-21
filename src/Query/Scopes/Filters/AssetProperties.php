@@ -9,6 +9,8 @@ use Statamic\Query\Scopes\Filters\Fields\FileSize;
 use Statamic\Query\Scopes\Filters\Fields\FileType;
 use Statamic\Query\Scopes\Filters\Fields\Orientation;
 
+use function Statamic\trans as __;
+
 class AssetProperties extends Fields
 {
     public static function title()

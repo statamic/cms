@@ -14,6 +14,8 @@ use Statamic\Fields\FieldTransformer;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 trait ManagesBlueprints
 {
     use ManagesFields;

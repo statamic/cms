@@ -1,9 +1,11 @@
 <script setup>
-import { computed, useSlots } from 'vue';
+import { computed, useAttrs, useSlots } from 'vue';
 import { cva } from 'cva';
 import { twMerge } from 'tailwind-merge';
 import Icon from './Icon/Icon.vue';
 import { Link } from '@inertiajs/vue3';
+
+defineOptions({ inheritAttrs: false });
 
 const props = defineProps({
     /** Appended text */
@@ -30,6 +32,7 @@ const props = defineProps({
     text: { type: [String, Number, Boolean, null], default: null },
 });
 
+const attrs = useAttrs();
 const slots = useSlots();
 const hasDefaultSlot = !!slots.default;
 const tag = computed(() => {
@@ -49,11 +52,11 @@ const badgeClasses = computed(() => {
                 lg: 'font-medium text-sm leading-7 px-2.5 rounded-lg [&_svg]:size-4 gap-2',
             },
             color: {
-                amber: 'bg-amber-50 dark:bg-gray-800 border-amber-400 dark:border-amber-700 text-amber-700 dark:text-amber-300 [a]:hover:bg-amber-100 dark:[a]:hover:bg-gray-700 [button]:hover:bg-amber-200 dark:[button]:hover:bg-gray-700',
+                amber: 'bg-amber-50 dark:bg-gray-800 border-amber-400 dark:border-amber-700 text-amber-700 dark:text-amber-300 [a]:hover:bg-amber-100 dark:[a]:hover:bg-gray-700 [button]:hover:bg-amber-100 dark:[button]:hover:bg-gray-700',
                 black: 'bg-gray-900 dark:bg-black border-black dark:border-gray-700 text-white dark:text-gray-300 [a]:hover:bg-gray-800 dark:[a]:hover:bg-gray-800 [button]:hover:bg-gray-800 dark:[button]:hover:bg-gray-800',
                 blue: 'bg-blue-50 dark:bg-gray-800 border-blue-300 dark:border-blue-700 text-blue-700 dark:text-blue-300 [a]:hover:bg-blue-100 dark:[a]:hover:bg-gray-700 [button]:hover:bg-blue-100 dark:[button]:hover:bg-gray-700',
                 cyan: 'bg-cyan-50 dark:bg-gray-800 border-cyan-400 dark:border-cyan-700 text-cyan-700 dark:text-cyan-300 [a]:hover:bg-cyan-100 dark:[a]:hover:bg-gray-700 [button]:hover:bg-cyan-100 dark:[button]:hover:bg-gray-700',
-                default: 'bg-gray-50 dark:bg-gray-800 border-gray-300 dark:border-gray-700 dark:text-gray-100 text-gray-700 [a]:hover:bg-gray-100 dark:[a]:hover:bg-gray-700 [button]:hover:bg-gray-200 dark:[button]:hover:bg-gray-700',
+                default: 'bg-gray-50 dark:bg-gray-800 border-gray-300 dark:border-gray-700 dark:text-gray-100 text-gray-700 [a]:hover:bg-gray-100 dark:[a]:hover:bg-gray-700 [button]:hover:bg-gray-100 dark:[button]:hover:bg-gray-700',
                 emerald: 'bg-emerald-50 border-emerald-400 dark:border-emerald-700 text-emerald-700 dark:bg-gray-800 dark:text-emerald-300 [a]:hover:bg-emerald-100 dark:[a]:hover:bg-gray-700 [button]:hover:bg-emerald-100 dark:[button]:hover:bg-gray-700',
                 fuchsia: 'bg-fuchsia-50 dark:bg-gray-800 border-fuchsia-300 dark:border-fuchsia-700 text-fuchsia-700 dark:text-fuchsia-300 [a]:hover:bg-fuchsia-100 dark:[a]:hover:bg-gray-700 [button]:hover:bg-fuchsia-100 dark:[button]:hover:bg-gray-700',
                 green: 'bg-green-50 border-green-400 dark:border-green-700 text-green-700 dark:bg-gray-800 dark:text-green-300 [a]:hover:bg-green-100 dark:[a]:hover:bg-gray-700 [button]:hover:bg-green-100 dark:[button]:hover:bg-gray-700',
@@ -78,12 +81,17 @@ const badgeClasses = computed(() => {
         asButton: props.href ?? props.as == 'button' ? true : false,
     });
 
-    return twMerge(classes);
+    return twMerge(classes, attrs.class);
+});
+
+const restAttrs = computed(() => {
+    const { class: _, ...rest } = attrs;
+    return rest;
 });
 </script>
 
 <template>
-    <component :is="tag" :class="badgeClasses" :href="props.href" :target="target" data-ui-badge>
+    <component :is="tag" v-bind="restAttrs" :class="badgeClasses" :href="props.href" :target="target" data-ui-badge>
         <span v-if="props.prepend" class="font-medium border-e border-inherit ps-0.5 pe-1.5">{{ prepend }}</span>
         <Icon v-if="icon" :name="icon" />
         <slot v-if="hasDefaultSlot" />

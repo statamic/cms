@@ -49,6 +49,7 @@ const {
 const fieldPathPrefix = computed(() => `${props.fieldPath}.${props.index}`);
 const metaPathPrefix = computed(() => `${props.metaPath}.existing.${props.id}`);
 const isInvalid = computed(() => Object.keys(props.config).length === 0);
+const hasFields = computed(() => Array.isArray(props.config.fields) ? props.config.fields.length > 0 : Object.keys(props.config.fields || {}).length > 0);
 
 const setGroup = computed(() => {
     if (replicatorSets.length < 1) return null;
@@ -141,9 +142,9 @@ reveal.use(rootEl, () => emit('expanded'));
             :data-type="config.handle"
         >
             <header
-                class="group/header animate-border-color flex items-center show-focus-within rounded-[calc(var(--radius-lg)-1px)] px-1.5 antialiased duration-200 bg-gray-100/50 dark:bg-gray-925 hover:bg-gray-100 dark:hover:bg-gray-950/45 border-gray-300 dark:shadow-md border-b-1 border-b-transparent"
+                class="group/header animate-border-color flex items-center show-focus-within rounded-[calc(var(--radius-lg)-1px)] px-1.5 antialiased duration-200 bg-gray-100/50 dark:bg-gray-925 hover:bg-gray-100 dark:hover:bg-gray-950/45 border-gray-300 dark:shadow-md"
                 :class="{
-                    'bg-gray-200/50 dark:bg-gray-950/35 rounded-b-none border-b-gray-300! dark:border-b-white/10!': !collapsed
+                    'bg-gray-200/50 dark:bg-gray-950/35 rounded-b-none': !collapsed && hasFields
                 }"
             >
                 <Icon
@@ -152,7 +153,7 @@ reveal.use(rootEl, () => emit('expanded'));
                     class="size-4 cursor-grab text-gray-400"
                     v-if="!readOnly"
                 />
-                <button type="button" class="show-focus-within_target flex flex-1 items-center gap-4 p-2 py-1.75 min-w-0 focus:outline-none cursor-pointer" @click="toggleCollapsedState">
+                <button type="button" class="show-focus-within_target flex flex-1 min-w-0 cursor-pointer items-center gap-4 overflow-x-auto p-2 py-1.75 pe-4 focus:outline-none st-mask-horizontal-overflow" @click="toggleCollapsedState">
                     <Badge size="lg" pill color="white" class="px-3">
                         <span v-if="isSetGroupVisible" class="flex items-center gap-2">
                             {{ __(setGroup.display) }}
@@ -191,7 +192,7 @@ reveal.use(rootEl, () => emit('expanded'));
                                 :text="__(collapsed ? __('Expand Set') : __('Collapse Set'))"
                                 @click="toggleCollapsedState"
                             />
-                            <DropdownItem :text="__('Duplicate Set')" @click="emit('duplicated')" />
+                            <DropdownItem v-if="canAddSet" :text="__('Duplicate Set')" @click="emit('duplicated')" />
                             <DropdownItem
                                 :text="__('Delete Set')"
                                 variant="destructive"
@@ -202,11 +203,16 @@ reveal.use(rootEl, () => emit('expanded'));
                 </div>
             </header>
 
-            <div v-show="!collapsed" :class="{ 'contain-paint': collapsed, 'isolate': !collapsed }">
+            <div
+                v-show="!collapsed && hasFields"
+                :class="{ 'contain-paint': collapsed, 'isolate': !collapsed }"
+                class="border-t border-t-gray-300! dark:border-t-white/10!"
+            >
                 <div :tabindex="collapsed ? -1 : undefined" :inert="collapsed">
                     <FieldsProvider
                         :fields="config.fields"
                         :as-config="false"
+                        :read-only
                         :field-path-prefix="fieldPathPrefix"
                         :meta-path-prefix="metaPathPrefix"
                     >

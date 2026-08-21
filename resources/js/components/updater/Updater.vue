@@ -2,8 +2,10 @@
     <div class="max-w-page mx-auto">
         <ui-header :title="name" icon="updates">
             <template v-if="!gettingChangelog" #actions>
-                <ui-badge :prepend="__('Version')" :text="currentVersion" color="green" size="lg" />
-                <div v-if="onLatestVersion" v-text="__('Up to date')" />
+                {{ currentVersion }}
+                <ui-badge v-if="onLatestVersion" :text="__('Up to date')" color="green" size="lg" icon="checkmark" />
+                <ui-badge v-else-if="securityUpdateAvailable" :text="__('Security update available')" color="red" size="lg" icon="alert-warning-exclamation-mark" />
+                <ui-badge v-else :text="__('Update available')" color="amber" size="lg" icon="alert-warning-exclamation-mark" />
             </template>
         </ui-header>
 
@@ -72,7 +74,8 @@ export default {
             gettingChangelog: true,
             changelog: [],
             currentVersion: null,
-            latestRelease: null,
+            onLatestVersion: false,
+            securityUpdateAvailable: false,
             showingUnlicensedReleases: false,
             page: 1,
             perPage: 10,
@@ -89,10 +92,6 @@ export default {
             return !this.gettingChangelog;
         },
 
-        onLatestVersion() {
-            return this.currentVersion && this.currentVersion == this.latestVersion;
-        },
-
         licensedReleases() {
             return this.changelog.filter((release) => release.licensed);
         },
@@ -103,10 +102,6 @@ export default {
 
         hasUnlicensedReleases() {
             return this.unlicensedReleases.length > 0;
-        },
-
-        latestVersion() {
-            return this.latestRelease && this.latestRelease.version;
         },
 
         link() {
@@ -137,11 +132,9 @@ export default {
                     this.gettingChangelog = false;
                     this.changelog = response.data.changelog;
                     this.currentVersion = response.data.currentVersion;
+                    this.onLatestVersion = response.data.onLatestVersion;
+                    this.securityUpdateAvailable = response.data.securityUpdateAvailable;
                     this.meta = response.data.meta;
-
-                    if (this.page === 1 && response.data.changelog.length > 0) {
-                        this.latestRelease = response.data.changelog[0];
-                    }
                 });
         },
 

@@ -1,10 +1,10 @@
 <template>
     <div ref="browser" class="h-full" @keydown.shift="shiftDown" @keyup="clearShift">
         <Uploader
-            ref="uploader"
+            ref="internalUploader"
             :container="container.id"
             :path="path"
-            :enabled="!preventDragging && canUpload"
+            :enabled="!uploader && !preventDragging && canUpload"
             @updated="uploadsUpdated"
             @upload-complete="uploadCompleted"
             @error="uploadError"
@@ -98,23 +98,33 @@
                         />
 
                         <Panel v-else :class="{ 'relative overflow-x-auto overscroll-x-contain': mode === 'table' }">
-                            <PanelHeader class="flex items-center justify-between px-1!">
+                            <PanelHeader class="flex items-center justify-between gap-2 px-1!">
                                 <Breadcrumbs
                                     v-if="!restrictFolderNavigation"
                                     :path="path"
                                     @navigated="selectFolder"
                                 />
-
-                                <Slider
-                                    v-if="mode === 'grid'"
-                                    size="sm"
-                                    class="me-2 w-24!"
-                                    variant="subtle"
-                                    v-model="gridThumbnailSize"
-                                    :min="60"
-                                    :max="300"
-                                    :step="25"
-                                />
+                                <div v-if="mode === 'grid'" class="flex items-center gap-2 mr-2">
+                                    <ui-button
+                                        inset
+                                        size="sm"
+                                        variant="ghost"
+                                        icon-only
+                                        :icon="checkerboardIcon"
+                                        v-tooltip="__('Transparency')"
+                                        :aria-label="__('Transparency')"
+                                        @click="cycleCheckerboard"
+                                    />
+                                    <Slider
+                                        size="sm"
+                                        class="w-24!"
+                                        variant="subtle"
+                                        v-model="gridThumbnailSize"
+                                        :min="60"
+                                        :max="300"
+                                        :step="25"
+                                    />
+                                </div>
                             </PanelHeader>
 
                             <Uploads
@@ -144,6 +154,8 @@
                                 :action-url="actionUrl"
                                 :thumbnail-size="gridThumbnailSize"
                                 :selected-assets="selectedAssets"
+                                :show-checkerboard="showCheckerboard"
+                                :checkerboard-mode="checkerboardMode"
                                 v-bind="sharedAssetProps"
                                 v-on="sharedAssetEvents"
                             />
@@ -204,6 +216,7 @@ import {
     ToggleItem,
 } from '@ui';
 import Breadcrumbs from './Breadcrumbs.vue';
+import useCheckerboard from '@/composables/checkerboard.js';
 
 export default {
     mixins: [HasPreferences],
@@ -259,6 +272,20 @@ export default {
             type: Array,
             default: () => [],
         },
+        uploader: {
+            type: Object,
+            default: null,
+        },
+    },
+
+    setup() {
+        const checkerboard = useCheckerboard();
+        return {
+            showCheckerboard: checkerboard.enabled,
+            checkerboardIcon: checkerboard.icon,
+            checkerboardMode: checkerboard.mode,
+            cycleCheckerboard: checkerboard.cycle,
+        };
     },
 
     data() {
@@ -393,6 +420,7 @@ export default {
                 folder: this.folder,
                 folderActionUrl: this.folderActionUrl,
                 folders: this.folders,
+                maxFiles: this.maxFiles,
                 restrictFolderNavigation: this.restrictFolderNavigation,
                 path: this.path,
                 creatingFolder: this.creatingFolder,
@@ -452,8 +480,9 @@ export default {
             this.loadAssets();
         },
 
-        path() {
+        path(path) {
             this.loadAssets();
+            this.$emit('path-changed', path);
         },
 
         searchQuery() {
@@ -652,7 +681,7 @@ export default {
         },
 
         openFileBrowser() {
-            this.$refs.uploader.browse();
+            (this.uploader || this.$refs.internalUploader).browse();
         },
 
         selectFolder(path) {

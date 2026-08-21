@@ -6,6 +6,8 @@ use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
 use Statamic\Support\Arr;
 
+use function Statamic\trans as __;
+
 class Taggable extends Fieldtype
 {
     protected $categories = ['structured'];

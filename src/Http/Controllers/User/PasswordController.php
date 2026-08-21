@@ -7,6 +7,8 @@ use Statamic\Facades\URL;
 use Statamic\Facades\User;
 use Statamic\Http\Requests\UserPasswordRequest;
 
+use function Statamic\trans as __;
+
 class PasswordController
 {
     public function __invoke(UserPasswordRequest $request)

@@ -1,6 +1,7 @@
 import axios from 'axios';
 import resetValuesFromResponse from '@/util/resetValuesFromResponse.js';
 import { reveal } from '@api';
+import { UPDATE_DEBOUNCE_MS } from '@/components/fieldtypes/constants';
 
 let container = null;
 let errors = null;
@@ -15,6 +16,9 @@ export class Pipeline {
     }
 
     async through(steps) {
+        // Wait just past the fieldtype update debounce so any in-flight value updates are flushed first.
+        const initialPromise = new Promise((resolve) => setTimeout(resolve, UPDATE_DEBOUNCE_MS + 1));
+
         return [new Start(), ...steps, new Finish()].reduce(async (promise, step) => {
             const payload = await promise;
 
@@ -23,19 +27,12 @@ export class Pipeline {
             try {
                 return await step.handle(payload);
             } catch (error) {
-                if (error instanceof PipelineStopped) {
-                    new Stopped().handle(payload);
-                    throw error;
-                }
+                new Stopped().handle(payload);
                 throw error;
             }
         }, initialPromise);
     }
 }
-
-const initialPromise = new Promise((resolve) => {
-    setTimeout(() => resolve(), 151); // 150ms is the debounce time for fieldtype updates
-});
 
 export class PipelineStopped extends Error {
     constructor(payload) {
@@ -112,7 +109,7 @@ export class BeforeSaveHooks extends Step {
     }
     handle(payload) {
         return new Promise((resolve, reject) => {
-            return Statamic.$hooks.run(`${this.#prefix}.saving`, this.#hookPayload).then(() => resolve(payload));
+            return Statamic.$hooks.run(`${this.#prefix}.saving`, this.#hookPayload).then(() => resolve(payload), reject);
         });
     }
 }
@@ -132,7 +129,7 @@ export class AfterSaveHooks extends Step {
                     ...this.#hookPayload,
                     response,
                 })
-                .then(() => resolve(response));
+                .then(() => resolve(response), reject);
         });
     }
 }

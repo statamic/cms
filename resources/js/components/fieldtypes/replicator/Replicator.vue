@@ -50,7 +50,7 @@
                                     sortable-handle-class="replicator-sortable-handle"
                                     :collapsed="collapsed.includes(set._id)"
                                     :enabled="set.enabled"
-                                    :read-only
+                                    :read-only="isReadOnly"
                                     :can-add-set="canAddSet"
                                     :has-error="setHasError(set._id)"
                                     :show-field-previews="config.previews"
@@ -159,11 +159,11 @@ export default {
         },
 
         sortableItemClass() {
-            return `${this.name}-sortable-item`;
+            return `${this.fieldId}-sortable-item`;
         },
 
         sortableHandleClass() {
-            return `${this.name}-sortable-handle`;
+            return `${this.fieldId}-sortable-handle`;
         },
 
         replicatorPreview() {
@@ -278,7 +278,7 @@ export default {
                 const field = this.replicatorFieldPath();
                 const setCacheKey = `${field}.${set}`;
                 const reference = this.publishContainer.reference;
-                const blueprint = this.publishContainer.blueprint.fqh;
+                const token = this.publishContainer.blueprint.token;
 
 				if (this.meta.new?.hasOwnProperty(set)) {
 					let meta = this.meta.new[set];
@@ -293,7 +293,7 @@ export default {
                     return;
                 }
 
-                this.$axios.post(cp_url('fieldtypes/replicator/set'), { blueprint, reference, field, set })
+                this.$axios.post(cp_url('fieldtypes/replicator/set'), { token, reference, field, set })
                     .then(response => {
                         this.setsCache[setCacheKey] = response.data;
                         resolve(response.data);
@@ -328,14 +328,12 @@ export default {
         },
 
         duplicateSet(old_id) {
-            const index = this.value.findIndex((v) => v._id === old_id);
-            const old = this.value[index];
-            const set = {
-                ...JSON.parse(JSON.stringify(old)),
-                _id: uniqid(),
-            };
+            if (!this.canAddSet) return;
 
-            this.updateSetMeta(set._id, this.meta.existing[old_id]);
+            const index = this.value.findIndex((v) => v._id === old_id);
+            const { values: set, meta } = this.duplicateValues(this.value[index], this.meta.existing[old_id]);
+
+            this.updateSetMeta(set._id, meta);
 
             this.update([...this.value.slice(0, index + 1), set, ...this.value.slice(index + 1)]);
 

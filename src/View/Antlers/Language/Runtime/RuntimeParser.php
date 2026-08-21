@@ -510,7 +510,6 @@ class RuntimeParser implements Parser
         $rebuiltTrace = array_merge($rebuiltTrace, $exception->getTrace());
 
         $traceProperty = new ReflectionProperty('Exception', 'trace');
-        $traceProperty->setAccessible(true);
         $traceProperty->setValue($newException, $rebuiltTrace);
 
         $this->cleanUpTempFiles();
@@ -606,7 +605,6 @@ INFO;
 
         $ignitionException = new $exceptionClass($newMessage, 0, 1, $exceptionView, $exceptionLine, $antlersException);
         $traceProperty = new ReflectionProperty('Exception', 'trace');
-        $traceProperty->setAccessible(true);
         $traceProperty->setValue($ignitionException, $rebuiltTrace);
 
         $ignitionException->setViewData($data);

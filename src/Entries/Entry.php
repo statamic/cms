@@ -508,7 +508,9 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             return;
         }
 
-        if (empty($ids = $page->flattenedPages()->pluck('id'))) {
+        $ids = $page->flattenedPages()->pluck('id');
+
+        if ($ids->isEmpty()) {
             return;
         }
 
@@ -540,7 +542,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
                 $format .= 's';
             }
 
-            $prefix = $this->date->format($format).'.';
+            $prefix = $this->date->copy()->setTimezone(config('app.timezone'))->format($format).'.';
         }
 
         return vsprintf('%s/%s/%s%s%s.%s', [
@@ -559,10 +561,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             return $this->value('order');
         }
 
-        return $this->structure()->in($this->locale())
-            ->flattenedPages()
-            ->map->reference()
-            ->flip()->get($this->id) + 1;
+        return $this->structure()->in($this->locale())->entryOrder($this->id) + 1;
     }
 
     public function template($template = null)
@@ -581,7 +580,10 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
     protected function inferTemplateFromBlueprint()
     {
-        $template = $this->collection()->handle().'.'.$this->blueprint();
+        $handle = $this->collection()->handle();
+        $prefix = config('statamic.system.blueprint_templates.'.$handle, $handle);
+
+        $template = $prefix.'.'.$this->blueprint();
 
         $slugifiedTemplate = str_replace('_', '-', $template);
 
@@ -773,7 +775,9 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             ->slug($attrs['slug']);
 
         if ($this->collection()->dated() && ($date = Arr::get($attrs, 'date'))) {
-            $entry->date(Carbon::createFromTimestamp($date, config('app.timezone')));
+            if ($this->isRoot() || $this->blueprint()->field('date')->isLocalizable()) {
+                $entry->date(Carbon::createFromTimestamp($date, config('app.timezone')));
+            }
         }
 
         return $entry;
@@ -862,8 +866,26 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
     {
         $localizations = $this->directDescendants();
 
-        foreach ($localizations as $loc) {
-            $localizations = $localizations->merge($loc->descendants());
+        // Breadth-first: fetch each level in one batched query instead of one query per node.
+        $origins = $localizations->map->id()->values()->all();
+        $seen = array_merge($origins, [$this->id()]);
+
+        while (! empty($origins)) {
+            $children = Facades\Entry::query()
+                ->where('collection', $this->collectionHandle())
+                ->whereIn('origin', $origins)
+                ->get()
+                // Guard against cyclic or duplicate origin data, which would
+                // otherwise loop forever as the same entries reappear.
+                ->reject(fn ($entry) => in_array($entry->id(), $seen, true));
+
+            if ($children->isEmpty()) {
+                break;
+            }
+
+            $localizations = $localizations->merge($children->keyBy->locale());
+            $origins = $children->map->id()->values()->all();
+            $seen = array_merge($seen, $origins);
         }
 
         return $localizations;
@@ -877,8 +899,8 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
     public function makeLocalization($site)
     {
         $localization = Facades\Entry::make()
-            ->collection($this->collection)
             ->origin($this)
+            ->collection($this->collection)
             ->locale($site)
             ->published($this->published)
             ->slug($this->slug());
@@ -961,7 +983,12 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
     public function routeData()
     {
-        $data = $this->values()->merge([
+        // This uses the `getValues(true)` method instead of values()
+        // This is so we can wrap computed fields in Value so we
+        // can delay their execution. If the computed value
+        // triggers the routeData() method, we will end
+        // up in an infinite loop that is not fun.
+        $data = $this->getValues(true)->merge([
             'id' => $this->id(),
             'slug' => $this->slug(),
             'published' => $this->published(),
@@ -1139,7 +1166,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             Blink::store('entry-uris')->forget($this->id());
         }
 
-        if (method_exists($this, $method = Str::camel($field))) {
+        if (in_array($method = Str::camel($field), $this->queryableMethods())) {
             return $this->{$method}();
         }
 
@@ -1150,6 +1177,16 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         }
 
         return $field->fieldtype()->toQueryableValue($value);
+    }
+
+    private function queryableMethods(): array
+    {
+        return [
+            'apiUrl', 'blueprint', 'collection', 'collectionHandle', 'date', 'editUrl', 'hasDate', 'hasExplicitDate', 'hasOrigin',
+            'hasSeconds', 'hasStructure', 'hasTime', 'id', 'isRedirect', 'isRoot', 'lastModified', 'lastModifiedBy',
+            'layout', 'locale', 'order', 'path', 'private', 'published', 'redirectUrl', 'reference', 'site', 'sites', 'slug',
+            'status', 'template', 'uri', 'url', 'urlWithoutRedirect',
+        ];
     }
 
     public function getSearchValue(string $field)

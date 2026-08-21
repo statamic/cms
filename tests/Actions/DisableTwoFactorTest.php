@@ -3,6 +3,7 @@
 namespace Tests\Actions;
 
 use Mockery;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Actions\DisableTwoFactorAuthentication as Action;
 use Statamic\Auth\TwoFactor\DisableTwoFactorAuthentication;
@@ -11,6 +12,7 @@ use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
+#[Group('2fa')]
 class DisableTwoFactorTest extends TestCase
 {
     use FakesRoles;

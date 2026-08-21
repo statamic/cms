@@ -361,8 +361,6 @@ class RouteServiceProvider extends ServiceProvider
 
             if ($route->hasParameter('entry')) {
                 $content = $route->parameter('entry');
-            } elseif ($route->hasParameter('term')) {
-                $content = $route->parameter('term');
             } else {
                 throw new NotFoundHttpException;
             }

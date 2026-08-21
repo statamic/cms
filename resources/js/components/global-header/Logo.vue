@@ -5,6 +5,7 @@ import StatamicLogo from '@/../svg/statamic-mark-lime.svg';
 import ProBadge from './ProBadge.vue';
 import { Link } from '@inertiajs/vue3';
 import useStatamicPageProps from '@/composables/page-props.js';
+import { invokeCpNavToggle } from '@/components/nav/nav-toggle-channel.js';
 
 const { logos, isPro, cmsName, version } = useStatamicPageProps();
 const customLogoImage = computed(() => {
@@ -15,14 +16,21 @@ const customLogoText = computed(() => logos?.text);
 const customLogo = computed(() => customLogoImage.value || customLogoText.value);
 
 function toggleNav() {
-    Statamic.$events.$emit('nav.toggle');
+    invokeCpNavToggle();
 }
 </script>
 
 <template>
     <template v-if="customLogo">
         <div class="flex items-center gap-3 relative rounded-xs">
-            <button class="flex items-center group rounded-xs cursor-pointer" type="button" @click="toggleNav" :aria-label="__('Toggle Nav')" style="--focus-outline-offset: 0.2rem;">
+            <button
+                type="button"
+                class="flex items-center group rounded-xs cursor-pointer"
+                data-cp-global-nav-toggle
+                :aria-label="__('Toggle Nav')"
+                style="--focus-outline-offset: 0.2rem;"
+                @click.stop="toggleNav"
+            >
                 <div class="p-1 max-sm:ps-2 size-5 flex items-center justify-center lg:inset-0">
                     <Icon name="burger-menu-no-border" class="size-3.5! sm:size-3.25! opacity-75 hover:opacity-100" />
                 </div>
@@ -35,7 +43,14 @@ function toggleNav() {
     </template>
     <template v-else>
         <div class="flex items-center gap-1.5 sm:gap-2.5 relative">
-            <button class="flex items-center group rounded-xs cursor-pointer" type="button" @click="toggleNav" :aria-label="__('Toggle Nav')" style="--focus-outline-offset: 0.2rem;">
+            <button
+                type="button"
+                class="flex items-center group rounded-xs cursor-pointer"
+                data-cp-global-nav-toggle
+                :aria-label="__('Toggle Nav')"
+                style="--focus-outline-offset: 0.2rem;"
+                @click.stop="toggleNav"
+            >
                 <div class="p-1 max-sm:ps-2 size-5 flex items-center justify-center lg:inset-0">
                     <Icon name="burger-menu-no-border" class="size-3.5! sm:size-3.25! opacity-75 hover:opacity-100" />
                 </div>

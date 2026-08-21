@@ -361,7 +361,7 @@ final class Addon
             return null;
         }
 
-        return Blueprint::make()->setContents(app($binding));
+        return Blueprint::make("addons.{$this->slug()}")->setContents(app($binding));
     }
 
     public function setting($key, $default = null): mixed
@@ -419,7 +419,7 @@ final class Addon
         $version = $versionParser->normalize($this->version);
         $latestVersion = $versionParser->normalize($this->latestVersion());
 
-        return version_compare($version, $latestVersion, '=');
+        return version_compare($version, $latestVersion, '>=');
     }
 
     public function license()
