@@ -5,6 +5,8 @@ namespace Statamic\Http\Controllers\CP\Collections;
 use Illuminate\Http\Request;
 use Statamic\Http\Controllers\CP\CpController;
 
+use function Statamic\trans as __;
+
 class ReorderEntriesController extends CpController
 {
     public function __invoke(Request $request, $collection)
