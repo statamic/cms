@@ -87,7 +87,7 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Cont
             return null;
         }
 
-        return $this->selectsAcrossSites() ? $entry->absoluteUrl() : $entry->url();
+        return $this->linksToAnotherSite($entry) ? $entry->absoluteUrl() : $entry->url();
     }
 
     public function urlWithoutRedirect()
@@ -100,12 +100,16 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Cont
             return null;
         }
 
-        return $this->selectsAcrossSites() ? $entry->absoluteUrlWithoutRedirect() : $entry->urlWithoutRedirect();
+        return $this->linksToAnotherSite($entry) ? $entry->absoluteUrlWithoutRedirect() : $entry->urlWithoutRedirect();
     }
 
-    private function selectsAcrossSites()
+    private function linksToAnotherSite(Entry $entry)
     {
-        return $this->structure() instanceof Nav && $this->structure()->canSelectAcrossSites();
+        if (! $this->structure() instanceof Nav || ! $this->structure()->canSelectAcrossSites()) {
+            return false;
+        }
+
+        return $entry->site()->handle() !== $this->tree->site()->handle();
     }
 
     public function isRedirect()

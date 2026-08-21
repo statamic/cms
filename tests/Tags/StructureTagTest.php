@@ -461,13 +461,13 @@ EOT;
     {
         $this->makeCrossSiteNav();
 
-        $template = '{{ nav:test }}{{ url }}{{ /nav:test }}';
+        $template = '{{ nav:test }}[{{ id }}={{ url }}]{{ /nav:test }}';
 
-        $this->assertEquals('http://two.example.com/projects', (string) Antlers::parse($template, [], true));
+        $this->assertEquals('[link=http://two.example.com/projects][local-link=/projects]', (string) Antlers::parse($template, [], true));
     }
 
     #[Test]
-    public function it_doesnt_flag_a_nav_entry_link_on_another_site_as_current()
+    public function it_only_flags_the_local_nav_entry_link_as_current()
     {
         $this->makeCrossSiteNav();
 
@@ -475,9 +475,9 @@ EOT;
         \Statamic\Facades\URL::swap($mock);
         $mock->shouldReceive('getCurrent')->once()->andReturn('/projects');
 
-        $template = '{{ nav:test }}{{ if is_current }}current{{ else }}not-current{{ /if }}{{ /nav:test }}';
+        $template = '{{ nav:test }}[{{ id }}{{ if is_current }}=current{{ /if }}]{{ /nav:test }}';
 
-        $this->assertEquals('not-current', (string) Antlers::parse($template, [], true));
+        $this->assertEquals('[link][local-link=current]', (string) Antlers::parse($template, [], true));
     }
 
     private function makeCrossSiteNav()
@@ -497,6 +497,7 @@ EOT;
         $nav = Nav::make('test')->canSelectAcrossSites(true);
         $nav->makeTree('en', [
             ['id' => 'link', 'title' => 'Projects', 'entry' => 'projects-fr'],
+            ['id' => 'local-link', 'title' => 'Projects (local)', 'entry' => 'projects'],
         ])->save();
         $nav->save();
     }
