@@ -79,8 +79,7 @@ export function selectedSiteGroupLabel(item, namedGroupsExist) {
 
 /**
  * Prefer an existing site in the target's group as the origin.
- * Prefer the localization that entered the group from outside (or the root).
- * If the group has no existing sites, fall back to originBehavior.
+ * If the group has none yet, fall back to originBehavior.
  */
 export function preferredOriginHandle(localizations, target, originBehavior = 'root') {
     const existing = (localizations ?? []).filter((localization) => localization.exists);
@@ -95,7 +94,7 @@ export function preferredOriginHandle(localizations, target, originBehavior = 'r
         : [];
 
     if (sameGroup.length) {
-        return groupOriginHandle(sameGroup);
+        return groupOriginHandle(sameGroup, existing);
     }
 
     if (originBehavior !== 'root') {
@@ -114,26 +113,79 @@ export function preferredOriginHandle(localizations, target, originBehavior = 'r
 }
 
 /**
- * Prefer the localization that entered the group from outside, or the root.
- * If that site leaves the group, use whichever remaining site now points outside.
+ * Prefer the first localization in the group (the one that entered from outside,
+ * or the in-group root). If that site later leaves the group, follow it outside
+ * instead of promoting another in-group site to Origin.
  */
-function groupOriginHandle(sameGroup) {
-    const handles = new Set(sameGroup.map((localization) => localization.handle));
+function groupOriginHandle(sameGroup, allExisting) {
+    const inGroup = new Set(sameGroup.map((localization) => localization.handle));
+    const byHandle = new Map(allExisting.map((localization) => [localization.handle, localization]));
+
+    const chainHead = sameGroup.find((localization) => (
+        sameGroup.some((other) => other.origin_handle === localization.handle)
+    ));
+
+    if (chainHead) {
+        return chainHead.handle;
+    }
 
     const entryPoint = sameGroup.find(({ origin_handle: origin }) => {
         if (origin === undefined) return false;
 
-        return !origin || !handles.has(origin);
-    });
+        return !origin || !inGroup.has(origin);
+    }) ?? sameGroup[0];
 
-    if (entryPoint) {
+    if (!entryPoint) {
+        return null;
+    }
+
+    const parentHandle = entryPoint.origin_handle;
+
+    if (!parentHandle) {
         return entryPoint.handle;
     }
 
-    const tracked = sameGroup.find((localization) => localization.origin)
-        ?? sameGroup.find((localization) => localization.root);
+    if (inGroup.has(parentHandle)) {
+        return entryPoint.handle;
+    }
 
-    return (tracked ?? sameGroup[0]).handle;
+    const parent = byHandle.get(parentHandle);
+
+    if (!parent) {
+        return entryPoint.handle;
+    }
+
+    // Parent is outside the group. If anything exists that isn't that parent or
+    // descended from it, the parent is a former in-group origin that moved out —
+    // keep pointing at it. Otherwise this is the first localization in the group
+    // (created from the global root/default) and it stays the group origin.
+    const hasUnrelatedLocalizations = allExisting.some((localization) => (
+        localization.handle !== parentHandle
+        && !descendsFrom(localization, parentHandle, byHandle)
+    ));
+
+    return hasUnrelatedLocalizations ? parentHandle : entryPoint.handle;
+}
+
+function descendsFrom(localization, ancestorHandle, byHandle) {
+    let current = localization;
+    const seen = new Set();
+
+    while (current?.origin_handle) {
+        if (seen.has(current.handle)) {
+            return false;
+        }
+
+        seen.add(current.handle);
+
+        if (current.origin_handle === ancestorHandle) {
+            return true;
+        }
+
+        current = byHandle.get(current.origin_handle);
+    }
+
+    return false;
 }
 
 function existingInSiteOrder(existing) {
