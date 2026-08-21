@@ -71,6 +71,8 @@ const props = defineProps({
 	taggable: { type: Boolean, default: false },
 	/** Controls the appearance of the combobox. <br><br> Options: `default`, `filled`, `ghost`, `subtle` */
 	variant: { type: String, default: 'default' },
+	/** When `true`, skip the elevated z-index override while a modal/stack is open. Use when this combobox can remain open behind an unrelated overlay (e.g. a confirmation modal). */
+	excludeZManipulation: { type: Boolean, default: false },
 });
 
 defineOptions({
@@ -313,7 +315,7 @@ function onBlur(e) {
 }
 
 function onPaste(e) {
-    if (!props.taggable) return;
+    if (!props.taggable || !props.multiple) return;
 
     e.preventDefault();
 
@@ -333,14 +335,18 @@ function pushTaggableOption(e) {
 
     e.preventDefault();
 
-    if (props.modelValue?.includes(e.target.value)) {
-        searchQuery.value = '';
-        return;
+    const alreadySelected = props.multiple
+        ? props.modelValue?.includes(e.target.value)
+        : props.modelValue === e.target.value;
+
+    if (!alreadySelected) {
+        emit('added', e.target.value);
+        updateModelValue(props.multiple ? [...(props.modelValue ?? []), e.target.value] : e.target.value);
     }
 
-    emit('added', e.target.value);
+    searchQuery.value = '';
 
-    updateModelValue([...props.modelValue ?? [], e.target.value]);
+    if (!props.multiple) dropdownOpen.value = false;
 }
 
 function scrollToSelectedOption() {
@@ -458,6 +464,7 @@ defineExpose({
                             adaptiveWidth && 'w-max max-w-md',
                         ]"
                         data-ui-combobox-content
+                        :data-ui-exclude-z-manipulation="excludeZManipulation ? '' : undefined"
                         @escape-key-down="focus"
                     >
                         <FocusScope
