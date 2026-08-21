@@ -362,7 +362,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
     public function sharedPreviewUrl()
     {
-        return $this->collection()->route($this->locale())
+        return $this->id()
             ? $this->cpUrl('collections.entries.shared-preview')
             : null;
     }

@@ -91,6 +91,10 @@ class DataResponse implements Responsable
 
     protected function protect()
     {
+        if ($this->request->isSharedPreviewOf($this->data)) {
+            return $this;
+        }
+
         $protection = app(Protection::class)->setData($this->data);
 
         $protection->protect();
@@ -159,6 +163,10 @@ class DataResponse implements Responsable
             $contents = $this->versionJavascriptModules($contents);
         }
 
+        if ($this->shouldShowSharedPreviewBanner()) {
+            $contents = $this->injectSharedPreviewBanner($contents);
+        }
+
         return $contents;
     }
 
@@ -190,6 +198,48 @@ class DataResponse implements Responsable
         $this->with = $data;
 
         return $this;
+    }
+
+    private function shouldShowSharedPreviewBanner(): bool
+    {
+        if (! $this->request->isSharedPreviewOf($this->data)) {
+            return false;
+        }
+
+        $token = $this->request->statamicToken();
+
+        if ($token->get('revision')) {
+            return true;
+        }
+
+        if (method_exists($this->data, 'published') && ! $this->data->published()) {
+            return true;
+        }
+
+        if (method_exists($this->data, 'private') && $this->data->private()) {
+            return true;
+        }
+
+        return method_exists($this->data, 'hasWorkingCopy') && $this->data->hasWorkingCopy();
+    }
+
+    private function injectSharedPreviewBanner(string $contents): string
+    {
+        $token = $this->request->statamicToken();
+        $date = $token->expiry()->timezone(config('app.timezone'))->format('M j, g:ia');
+        $label = e($token->get('revision')
+            ? __('statamic::messages.shared_preview_banner_revision', ['date' => $date])
+            : __('statamic::messages.shared_preview_banner', ['date' => $date]));
+
+        $banner = <<<HTML
+<aside role="status" style="position:fixed;z-index:99999;inset-inline:0;bottom:0;display:flex;justify-content:center;padding:10px 16px;background:#1e293b;color:#f8fafc;font:13px/1.4 ui-sans-serif,system-ui,sans-serif">{$label}</aside>
+HTML;
+
+        if (str_contains($contents, '</body>')) {
+            return str_replace('</body>', $banner.'</body>', $contents);
+        }
+
+        return $contents.$banner;
     }
 
     protected function versionJavascriptModules($contents)

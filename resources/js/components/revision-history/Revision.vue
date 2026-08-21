@@ -47,6 +47,18 @@
                               }[revision.action]
                     "
                 />
+                <Button
+                    v-if="sharedPreviewUrl"
+                    icon="share-link"
+                    icon-only
+                    size="xs"
+                    variant="ghost"
+                    inset
+                    :aria-label="__('Share Revision')"
+                    v-tooltip="__('Share Revision')"
+                    :loading="copyingPreviewLink"
+                    @click.stop="copyPreviewLink"
+                />
             </div>
 
             <revision-preview
@@ -74,7 +86,7 @@
 import RestoreRevision from './Restore.vue';
 import RevisionPreview from './Preview.vue';
 import DateFormatter from '@/components/DateFormatter.js';
-import { Subheading, Badge, Avatar } from '@/components/ui';
+import { Subheading, Badge, Avatar, Button } from '@/components/ui';
 
 export default {
     components: {
@@ -83,11 +95,13 @@ export default {
         Subheading,
         Badge,
         Avatar,
+        Button,
     },
 
     props: {
         revision: Object,
         restoreUrl: String,
+        sharedPreviewUrl: String,
         reference: String,
         canRestoreRevisions: Boolean,
         isLast: Boolean,
@@ -96,6 +110,7 @@ export default {
     data() {
         return {
             showDetails: false,
+            copyingPreviewLink: false,
             componentProps: {
                 initialActions: 'actions',
                 collectionTitle: 'collection.title',
@@ -133,6 +148,28 @@ export default {
             }
 
             this.showDetails = true;
+        },
+
+        async copyPreviewLink() {
+            this.copyingPreviewLink = true;
+
+            try {
+                const payload = this.revision.action === 'working' ? {} : { revision: this.revision.date };
+                const { data } = await this.$axios.post(this.sharedPreviewUrl, payload);
+
+                try {
+                    await navigator.clipboard.writeText(data.url);
+                    this.$toast.success(
+                        __('messages.shared_preview_link_copied', { hours: data.expires_in_hours }),
+                    );
+                } catch {
+                    Statamic.$callbacks.call('copyToClipboard', data.url);
+                }
+            } catch {
+                this.$toast.error(__('Unable to copy preview link'));
+            } finally {
+                this.copyingPreviewLink = false;
+            }
         },
     },
 };

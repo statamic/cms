@@ -2,29 +2,32 @@
 
 namespace Statamic\Http\Controllers\CP\Collections;
 
-use Statamic\Facades\Token;
+use Facades\Statamic\CP\SharedPreview;
+use Illuminate\Http\Request;
+use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Http\Controllers\CP\CpController;
-use Statamic\Tokens\Handlers\SharedPreview;
 
 class EntrySharedPreviewController extends CpController
 {
-    public function store($collection, $entry)
+    public function store(Request $request, $collection, $entry)
     {
         $this->authorize('view', $entry);
 
-        $minutes = (int) config('statamic.live_preview.shared_link_expiry', 1440);
+        $revision = $request->input('revision');
 
-        $token = tap(
-            Token::make(null, SharedPreview::class, [
-                'reference' => $entry->reference(),
-            ])->expireAt(now()->addMinutes($minutes))
-        )->save();
+        if ($revision !== null) {
+            $revision = (int) $revision;
+            throw_unless(SharedPreview::findRevision($entry, $revision), new NotFoundHttpException);
+        }
 
-        $url = $entry->absoluteUrl();
+        $token = SharedPreview::tokenize($entry, $revision);
+        $url = SharedPreview::url($entry, $token, (int) $request->input('target', 0));
+
+        $minutesRemaining = max(0, now()->diffInMinutes($token->expiry(), false));
 
         return [
-            'url' => $url.(str_contains($url, '?') ? '&' : '?').'token='.$token->token(),
-            'expires_in_hours' => (int) ceil($minutes / 60),
+            'url' => $url,
+            'expires_in_hours' => max(1, (int) ceil($minutesRemaining / 60)),
         ];
     }
 }

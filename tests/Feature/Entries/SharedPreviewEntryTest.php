@@ -135,6 +135,99 @@ class SharedPreviewEntryTest extends TestCase
     }
 
     #[Test]
+    public function it_reuses_an_unexpired_token()
+    {
+        Collection::make('blog')->routes('/blog/{slug}')->save();
+
+        EntryFactory::id('the-entry')
+            ->collection('blog')
+            ->slug('the-existing-entry')
+            ->published(false)
+            ->create();
+
+        Generator::shouldReceive('generate')->once()->andReturn('test-shared-token');
+
+        $first = $this
+            ->actingAs($this->user())
+            ->postJson('/cp/collections/blog/entries/the-entry/shared-preview')
+            ->assertOk()
+            ->json();
+
+        $second = $this
+            ->actingAs($this->user())
+            ->postJson('/cp/collections/blog/entries/the-entry/shared-preview')
+            ->assertOk()
+            ->json();
+
+        $this->assertEquals($first['url'], $second['url']);
+        $this->assertEquals(1, Token::all()->count());
+    }
+
+    #[Test]
+    public function it_mints_a_pinned_revision_token()
+    {
+        config(['statamic.revisions.enabled' => true]);
+
+        Collection::make('blog')->routes('/blog/{slug}')->revisionsEnabled(true)->save();
+
+        $entry = EntryFactory::id('the-entry')
+            ->collection('blog')
+            ->slug('the-existing-entry')
+            ->published(true)
+            ->data(['title' => 'Live title'])
+            ->create();
+
+        $revision = tap($entry->makeRevision(), function ($revision) {
+            $attrs = $revision->attributes();
+            $attrs['data']['title'] = 'Revision title';
+            $revision->attributes($attrs)->date(Carbon::parse('2023-12-01 09:00:00'));
+        });
+        $revision->save();
+
+        Generator::shouldReceive('generate')->andReturn('test-shared-token');
+
+        $this
+            ->actingAs($this->user())
+            ->postJson('/cp/collections/blog/entries/the-entry/shared-preview', [
+                'revision' => $revision->date()->timestamp,
+            ])
+            ->assertOk()
+            ->assertJsonPath('url', 'http://localhost/blog/the-existing-entry?token=test-shared-token');
+
+        $token = Token::find('test-shared-token');
+
+        $this->assertEquals($revision->date()->timestamp, $token->get('revision'));
+    }
+
+    #[Test]
+    public function it_uses_a_preview_target_url()
+    {
+        Collection::make('blog')
+            ->routes('/blog/{slug}')
+            ->previewTargets([
+                ['label' => 'Entry', 'format' => '{permalink}', 'refresh' => true],
+                ['label' => 'Listing', 'format' => '/blog', 'refresh' => true],
+            ])
+            ->save();
+
+        EntryFactory::id('the-entry')
+            ->collection('blog')
+            ->slug('the-existing-entry')
+            ->published(false)
+            ->create();
+
+        Generator::shouldReceive('generate')->andReturn('test-shared-token');
+
+        $this
+            ->actingAs($this->user())
+            ->postJson('/cp/collections/blog/entries/the-entry/shared-preview', [
+                'target' => 1,
+            ])
+            ->assertOk()
+            ->assertJsonPath('url', 'http://localhost/blog?token=test-shared-token');
+    }
+
+    #[Test]
     public function guests_cannot_mint_tokens()
     {
         Collection::make('blog')->routes('/blog/{slug}')->save();

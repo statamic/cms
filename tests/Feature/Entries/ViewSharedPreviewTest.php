@@ -47,7 +47,9 @@ class ViewSharedPreviewTest extends TestCase
             ->assertOk()
             ->assertHeader('X-Statamic-Draft', true)
             ->assertHeader('X-Statamic-Shared-Preview', true)
-            ->assertSee('Draft content');
+            ->assertHeader('X-Robots-Tag', 'noindex')
+            ->assertSee('Draft content')
+            ->assertSee('Draft preview');
     }
 
     #[Test]
@@ -195,8 +197,92 @@ class ViewSharedPreviewTest extends TestCase
             ->get('/blog/about?token='.$token->token())
             ->assertOk()
             ->assertHeader('X-Statamic-Shared-Preview', true)
+            ->assertHeader('X-Robots-Tag', 'noindex')
             ->assertHeaderMissing('X-Statamic-Draft')
-            ->assertSee('Live content');
+            ->assertSee('Live content')
+            ->assertDontSee('Draft preview');
+    }
+
+    #[Test]
+    public function pinned_revisions_are_served_instead_of_current_content()
+    {
+        config(['statamic.revisions.enabled' => true]);
+
+        Collection::make('blog')
+            ->routes('/blog/{slug}')
+            ->revisionsEnabled(true)
+            ->save();
+
+        $entry = EntryFactory::id('1')
+            ->collection('blog')
+            ->slug('about')
+            ->published(true)
+            ->data(['content' => 'Published content'])
+            ->create();
+
+        $revision = tap($entry->makeRevision(), function ($revision) {
+            $attrs = $revision->attributes();
+            $attrs['data']['content'] = 'Pinned revision content';
+            $revision->attributes($attrs)->date(Carbon::parse('2023-12-01 09:00:00'));
+        });
+        $revision->save();
+
+        $token = $this->tokenFor($entry, revision: $revision->date()->timestamp);
+
+        $this
+            ->get('/blog/about?token='.$token->token())
+            ->assertOk()
+            ->assertSee('Pinned revision content')
+            ->assertDontSee('Published content')
+            ->assertSee('Revision preview');
+    }
+
+    #[Test]
+    public function missing_pinned_revisions_404()
+    {
+        $this->withStandardFakeErrorViews();
+
+        config(['statamic.revisions.enabled' => true]);
+
+        Collection::make('blog')
+            ->routes('/blog/{slug}')
+            ->revisionsEnabled(true)
+            ->save();
+
+        $entry = EntryFactory::id('1')
+            ->collection('blog')
+            ->slug('about')
+            ->published(true)
+            ->data(['content' => 'Published content'])
+            ->create();
+
+        $token = $this->tokenFor($entry, revision: 1234567890);
+
+        $this
+            ->get('/blog/about?token='.$token->token())
+            ->assertNotFound();
+    }
+
+    #[Test]
+    public function shared_preview_bypasses_protect_schemes()
+    {
+        Collection::make('blog')->routes('/blog/{slug}')->save();
+
+        $entry = EntryFactory::id('1')
+            ->collection('blog')
+            ->slug('about')
+            ->published(true)
+            ->data(['content' => 'Protected content', 'protect' => 'logged_in'])
+            ->create();
+
+        $this->get('/blog/about')->assertRedirect('/login?redirect=http://localhost/blog/about');
+
+        $token = $this->tokenFor($entry);
+
+        $this
+            ->get('/blog/about?token='.$token->token())
+            ->assertOk()
+            ->assertSee('Protected content');
     }
 
     #[Test]
@@ -222,11 +308,16 @@ class ViewSharedPreviewTest extends TestCase
             ->assertNotFound();
     }
 
-    private function tokenFor($entry, ?Carbon $expiresAt = null)
+    private function tokenFor($entry, ?Carbon $expiresAt = null, $revision = null)
     {
-        $token = Token::make(null, SharedPreview::class, [
-            'reference' => $entry->reference(),
-        ])->expireAt($expiresAt ?? Carbon::now()->addDay());
+        $data = ['reference' => $entry->reference()];
+
+        if ($revision) {
+            $data['revision'] = $revision;
+        }
+
+        $token = Token::make(null, SharedPreview::class, $data)
+            ->expireAt($expiresAt ?? Carbon::now()->addDay());
 
         $token->save();
 

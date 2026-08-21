@@ -18,6 +18,7 @@
                         :key="revision.date"
                         :revision="revision"
                         :restore-url="restoreUrl"
+                        :shared-preview-url="sharedPreviewUrl"
                         :reference="reference"
                         :can-restore-revisions="canRestoreRevisions"
                         :is-last="index === group.revisions.length - 1"
@@ -47,6 +48,7 @@ export default {
     props: {
         indexUrl: String,
         restoreUrl: String,
+        sharedPreviewUrl: String,
         reference: String,
         canRestoreRevisions: Boolean,
     },

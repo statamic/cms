@@ -217,6 +217,7 @@
             <revision-history
                 :index-url="actions.revisions"
                 :restore-url="actions.restore"
+                :shared-preview-url="actions.sharedPreview"
                 :reference="initialReference"
                 :can-restore-revisions="!readOnly"
                 @closed="$refs.revisionHistoryStack.close()"
@@ -478,7 +479,7 @@ export default {
         },
 
         showCopyPreviewLinkButton() {
-            if (this.isCreating || !this.isBase || !this.permalink || !this.actions.sharedPreview) {
+            if (this.isCreating || !this.isBase || !this.actions.sharedPreview) {
                 return false;
             }
 
