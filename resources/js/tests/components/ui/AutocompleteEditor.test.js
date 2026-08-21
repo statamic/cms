@@ -123,6 +123,48 @@ test('inserting a mention produces a node with value and label attrs', async () 
     ]);
 });
 
+function mentionBadge(wrapper) {
+    return wrapper.find('[data-ui-badge]');
+}
+
+test('a mention matching an option renders as a normal chip', async () => {
+    const wrapper = await mountEditor({
+        modelValue: [
+            { type: 'paragraph', content: [{ type: 'mention', attrs: { value: 'jesse', label: 'Jesse Leite' } }] },
+        ],
+    });
+
+    const badge = mentionBadge(wrapper);
+
+    expect(badge.text()).toBe('Jesse Leite');
+    expect(badge.classes()).not.toContain('line-through');
+    expect(badge.attributes('title')).toBeUndefined();
+});
+
+test('a mention with no matching option renders as a missing chip', async () => {
+    const wrapper = await mountEditor({
+        modelValue: [
+            { type: 'paragraph', content: [{ type: 'mention', attrs: { value: 'deleted' } }] },
+        ],
+    });
+
+    const badge = mentionBadge(wrapper);
+
+    expect(badge.text()).toBe('deleted');
+    expect(badge.classes()).toContain('line-through');
+    expect(badge.attributes('title')).toBe('This item no longer exists');
+});
+
+test('nothing is considered missing when options are loaded on demand', async () => {
+    const wrapper = await mountEditor({
+        options: [],
+        loadOptions: () => [],
+        modelValue: [{ type: 'paragraph', content: [{ type: 'mention', attrs: { value: 'deleted' } }] }],
+    });
+
+    expect(mentionBadge(wrapper).classes()).not.toContain('line-through');
+});
+
 test('update:modelValue emits the ProseMirror content array', async () => {
     const wrapper = await mountEditor();
     const { editor } = wrapper.vm;

@@ -201,6 +201,47 @@ export const _Autocomplete: Story = {
     }),
 };
 
+const missingValue = [
+    {
+        type: 'paragraph',
+        content: [
+            { type: 'text', text: 'Reach out to ' },
+            { type: 'mention', attrs: { value: 'han' } },
+            { type: 'text', text: ' or ' },
+            { type: 'mention', attrs: { value: 'chewie' } },
+            { type: 'text', text: ' about it.' },
+        ],
+    },
+];
+
+const missingCode = `
+<AutocompleteEditor
+    v-model="value"
+    :options="options"
+/>
+`;
+
+export const _MissingOptions: Story = {
+    tags: ['!dev'],
+    parameters: {
+        docs: {
+            source: { code: missingCode },
+            description: {
+                story: 'A mention whose value is no longer in `options` is struck through to show it refers to something that no longer exists. With no option to take a label from, it shows the raw value.',
+            },
+        },
+    },
+    render: () => ({
+        components: { AutocompleteEditor },
+        setup() {
+            const value = ref(missingValue);
+            const options = sampleOptions;
+            return { value, options };
+        },
+        template: missingCode,
+    }),
+};
+
 export const TestAutocompleteSelectViaEnterInlineNoBreaks: Story = {
     tags: ['!dev', 'test'],
     args: {

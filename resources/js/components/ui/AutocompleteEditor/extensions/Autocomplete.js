@@ -50,6 +50,7 @@ export const Autocomplete = Mention.extend({
         return {
             ...this.parent?.(),
             HTMLAttributes: { class: 'autocomplete-mention' },
+            isMissing: () => false,
             renderText({ node }) {
                 return node.attrs.label ?? node.attrs.value ?? '';
             },

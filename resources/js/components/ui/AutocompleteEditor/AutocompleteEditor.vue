@@ -110,6 +110,15 @@ function resolveOptions({ query }) {
     return props.options.filter((option) => (option.label ?? option.value ?? '').toLowerCase().includes(needle));
 }
 
+// A value with no matching option refers to something that's been deleted. When
+// options are loaded on demand the list is never complete, so nothing can be
+// judged missing.
+function isMissing(value) {
+    if (props.loadOptions) return false;
+
+    return !props.options.some((option) => option.value === value);
+}
+
 function keyboardExtension() {
     const disableEnter = props.inline && !props.enableLineBreaks;
 
@@ -149,7 +158,10 @@ function getExtensions() {
         History,
         Dropcursor,
         Gapcursor,
-        Autocomplete.configure({ suggestion: { char: props.trigger, items: resolveOptions } }),
+        Autocomplete.configure({
+            suggestion: { char: props.trigger, items: resolveOptions },
+            isMissing,
+        }),
         keyboardExtension(),
     ];
 
