@@ -79,12 +79,33 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Cont
 
     public function url()
     {
-        return $this->url ?? optional($this->entry())->url();
+        if ($this->url) {
+            return $this->url;
+        }
+
+        if (! $entry = $this->entry()) {
+            return null;
+        }
+
+        return $this->selectsAcrossSites() ? $entry->absoluteUrl() : $entry->url();
     }
 
     public function urlWithoutRedirect()
     {
-        return $this->url ?? optional($this->entry())->urlWithoutRedirect();
+        if ($this->url) {
+            return $this->url;
+        }
+
+        if (! $entry = $this->entry()) {
+            return null;
+        }
+
+        return $this->selectsAcrossSites() ? $entry->absoluteUrlWithoutRedirect() : $entry->urlWithoutRedirect();
+    }
+
+    private function selectsAcrossSites()
+    {
+        return $this->structure() instanceof Nav && $this->structure()->canSelectAcrossSites();
     }
 
     public function isRedirect()
