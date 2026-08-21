@@ -15,8 +15,13 @@ class AugmentedPageTest extends AugmentedTestCase
     #[Test]
     public function it_gets_page_keys()
     {
+        $blueprint = Blueprint::makeFromFields([
+            'seven' => ['type' => 'text'],
+        ])->setNamespace('navigation')->setHandle('pages');
+
         $page = Mockery::mock(Page::class);
         $page->shouldReceive('reference')->andReturnFalse();
+        $page->shouldReceive('blueprint')->andReturn($blueprint);
         $page->shouldReceive('data')->andReturn(collect(['one' => 'two', 'three' => 'four']));
         $page->shouldReceive('supplements')->andReturn(collect(['five' => 'six']));
 
@@ -32,6 +37,7 @@ class AugmentedPageTest extends AugmentedTestCase
             'one',
             'three',
             'five',
+            'seven',
         ];
 
         $actual = $augmented->keys();

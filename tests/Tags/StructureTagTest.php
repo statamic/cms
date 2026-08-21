@@ -6,6 +6,7 @@ use Facades\Tests\Factories\EntryFactory;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Entries\QueryBuilder;
 use Statamic\Facades\Antlers;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Nav;
@@ -574,6 +575,32 @@ EOT;
         $this->assertXmlStringEqualsXmlString($expected, (string) Antlers::parse($template, [
             'title' => 'outer title', // to test that cascade the page's data takes precedence over the cascading data.
         ], true));
+    }
+
+    #[Test]
+    public function it_augments_nav_blueprint_fields_on_pages_without_an_entry()
+    {
+        $blueprint = Blueprint::make()->setContents(['fields' => [
+            ['handle' => 'target_blank', 'field' => ['type' => 'toggle']],
+        ]]);
+        Blueprint::partialMock();
+        Blueprint::shouldReceive('find')->with('navigation.test')->andReturn($blueprint);
+
+        $this->makeNav([
+            [
+                'id' => '1',
+                'title' => 'Parent',
+                'url' => 'https://statamic.com',
+                'data' => ['target_blank' => true],
+                'children' => [
+                    ['id' => '1-1', 'title' => 'Child', 'url' => 'https://statamic.dev'],
+                ],
+            ],
+        ]);
+
+        $template = '{{ nav:test }}[{{ title }}={{ if target_blank }}yes{{ else }}no{{ /if }}]{{ children }}[{{ title }}={{ if target_blank }}yes{{ else }}no{{ /if }}]{{ /children }}{{ /nav:test }}';
+
+        $this->assertEquals('[Parent=yes][Child=no]', (string) Antlers::parse($template, [], true));
     }
 
     private function makeNav($tree)
