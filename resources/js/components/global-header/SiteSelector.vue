@@ -2,8 +2,9 @@
     <div v-if="sites.length > 1" class="flex h-full items-center animate-in fade-in duration-750 fill-mode-forwards" data-ui-global-site-selector>
         <Select
             :model-value="active"
-            :options="sites"
+            :options="comboboxOptions"
             :searchable="false"
+            :virtualize="!hasNamedGroups"
             @update:model-value="selected"
             option-label="name"
             option-value="handle"
@@ -25,15 +26,35 @@
                     <span class="truncate">{{ __(':name Site', { name: option.name }) }}</span>
                 </span>
             </template>
+
+            <template v-if="hasNamedGroups" #before-option="option">
+                <div
+                    v-if="option._showGroupSeparator"
+                    class="mx-2 mb-2.25 mt-0.75 border-t border-gray-200 dark:border-gray-700"
+                    role="separator"
+                />
+                <Subheading
+                    v-if="option._groupLabel"
+                    size="sm"
+                    class="px-2.5 pb-1 pt-1.5 font-semibold uppercase tracking-wide text-gray-950 text-2xs dark:text-gray-300"
+                    :text="__(option._groupLabel)"
+                />
+            </template>
         </Select>
     </div>
 </template>
 
 <script>
-import { Icon, Select } from '@/components/ui';
+import { Icon, Select, Subheading } from '@/components/ui';
+import {
+    flatOptionsFromSiteGroups,
+    groupItemsBySiteGroup,
+    hasNamedSiteGroups,
+    selectedSiteGroupLabel,
+} from '@/util/site-groups.js';
 
 export default {
-    components: { Icon, Select },
+    components: { Icon, Select, Subheading },
 
     computed: {
         sites() {
@@ -45,17 +66,21 @@ export default {
         },
 
         hasNamedGroups() {
-            return this.sites.some((site) => site.group);
+            return hasNamedSiteGroups(this.sites);
+        },
+
+        comboboxOptions() {
+            if (!this.hasNamedGroups) {
+                return this.sites;
+            }
+
+            return flatOptionsFromSiteGroups(groupItemsBySiteGroup(this.sites));
         },
     },
 
     methods: {
         groupLabel(option) {
-            if (option.group) {
-                return __(option.group);
-            }
-
-            return this.hasNamedGroups ? __('Other') : null;
+            return selectedSiteGroupLabel(option, this.hasNamedGroups);
         },
 
         selected(siteHandle) {
