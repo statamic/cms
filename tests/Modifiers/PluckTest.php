@@ -2,16 +2,12 @@
 
 namespace Tests\Modifiers;
 
-use ArrayAccess;
 use Illuminate\Support\Collection;
 use Mockery;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Query\Builder;
-use Statamic\Data\ContainsData;
-use Statamic\Data\HasOrigin;
 use Statamic\Entries\EntryCollection;
 use Statamic\Modifiers\Modify;
-use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Tests\TestCase;
 
 class PluckTest extends TestCase
@@ -166,74 +162,5 @@ class PluckTest extends TestCase
     private function modify($value, $key)
     {
         return Modify::value($value)->pluck([$key])->fetch();
-    }
-}
-
-// Represents an object that doesn't have origins and therefore wouldn't have a "value" method.
-// So a "get" method would need to be used. e.g. a form Submission.
-class Item
-{
-    use ContainsData, FluentlyGetsAndSets;
-
-    public function __construct($data)
-    {
-        $this->data($data);
-    }
-}
-
-// Represents an object that could have an origin and therefore a "value" method. e.g. an Entry.
-class ItemWithOrigin
-{
-    use ContainsData, FluentlyGetsAndSets, HasOrigin;
-
-    public function __construct($data, $origin = null)
-    {
-        $this->data($data);
-        $this->origin = $origin;
-    }
-
-    public function origin($origin = null)
-    {
-        // Bypass the logic to load the origin. Just use what was passed in.
-        return $this->origin;
-    }
-
-    public function getOriginByString($origin)
-    {
-        // Required by trait
-    }
-}
-
-class ArrayAccessType implements ArrayAccess
-{
-    private $data;
-
-    public function __construct($data)
-    {
-        $this->data = $data;
-    }
-
-    #[\ReturnTypeWillChange]
-    public function offsetGet($offset)
-    {
-        return $this->data[$offset];
-    }
-
-    #[\ReturnTypeWillChange]
-    public function offsetExists($offset)
-    {
-        return isset($this->data[$offset]);
-    }
-
-    #[\ReturnTypeWillChange]
-    public function offsetSet($offset, $value)
-    {
-        //
-    }
-
-    #[\ReturnTypeWillChange]
-    public function offsetUnset($offset)
-    {
-        //
     }
 }

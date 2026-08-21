@@ -9,10 +9,11 @@ use Statamic\Facades\Config;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Http\Middleware\CP\AuthenticateSession;
+use Statamic\View\State\StateManager;
 
 abstract class TestCase extends \Orchestra\Testbench\TestCase
 {
-    use WindowsHelpers;
+    use RestoresTestbenchSkeleton, WindowsHelpers;
 
     protected $shouldFakeVersion = true;
     protected $shouldPreventNavBeingBuilt = true;
@@ -20,7 +21,11 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
     protected function setUp(): void
     {
+        $this->prepareTestbenchSkeleton();
+
         parent::setUp();
+
+        StateManager::resetState();
 
         $this->withoutVite();
 
@@ -57,7 +62,14 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             $this->deleteFakeStacheDirectory();
         }
 
-        parent::tearDown();
+        // Mockery verifies its expectations inside parent::tearDown() and throws when they
+        // aren't met, which would otherwise skip the restore and leak the failing test's files
+        // into the next one - right when you're already trying to work out what went wrong.
+        try {
+            parent::tearDown();
+        } finally {
+            $this->restoreTestbenchSkeleton();
+        }
     }
 
     protected function getPackageProviders($app)
@@ -95,6 +107,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
     protected function getEnvironmentSetUp($app)
     {
         $app['config']->set('inertia.testing.page_paths', [statamic_path('resources/js/pages')]);
+        $app['config']->set('inertia.pages.paths', [statamic_path('resources/js/pages')]);
 
         $app['config']->set('auth.providers.users.driver', 'statamic');
         $app['config']->set('statamic.stache.watcher', false);

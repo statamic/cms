@@ -25,6 +25,8 @@ class ListTest extends TestCase
 
         $this->assertArrayHasKey('add_row', $configFields);
         $this->assertSame('text', $configFields['add_row']['type']);
+        $this->assertSame('Add Item Label', $configFields['add_row']['display']);
+        $this->assertSame('Add Item', $configFields['add_row']['placeholder']);
     }
 
     private function field($config = [])

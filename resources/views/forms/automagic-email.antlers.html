@@ -7,18 +7,18 @@
                 {{ if !last }},{{ /if }}
             {{ /value }}
         {{ elseif fieldtype == "select" && !config:multiple }}
-            {{ value:label ?? value }}
+            {{ (value:label ?? value) | sanitize }}
         {{ elseif fieldtype == "radio" }}
-            {{ value:label ?? value }}
+            {{ (value:label ?? value) | sanitize }}
         {{ elseif fieldtype == "select" || fieldtype == "checkboxes" || fieldtype == "dictionary" }}
             {{ value }}
-                {{ label ?? value }}
+                {{ (label ?? value) | sanitize }}
                 {{ if !last }},{{ /if }}
             {{ /value }}
         {{ elseif value|is_iterable }}
-            {{ value | json }}
+            {{ value | json | sanitize }}
         {{ else }}
-            {{ value | nl2br }}
+            {{ value | sanitize | nl2br }}
         {{ /if }}
     {{ /if }}
     <br>

@@ -10,6 +10,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades;
 use Statamic\Facades\Blueprint;
+use Statamic\Facades\Data;
 use Statamic\Facades\GlobalSet;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Value;
@@ -406,5 +407,18 @@ EOT;
 
         $this->assertEquals('A', $variables->getSupplement('bar'));
         $this->assertEquals('B', $clone->getSupplement('bar'));
+    }
+
+    #[Test]
+    public function it_can_be_found_via_the_data_repository_using_its_reference()
+    {
+        $global = tap(GlobalSet::make('test'))->save();
+        $variables = tap($global->inDefaultSite()->data(['foo' => 'bar']))->save();
+
+        $found = Data::find($variables->reference());
+
+        $this->assertInstanceOf(Variables::class, $found);
+        $this->assertEquals($variables->id(), $found->id());
+        $this->assertEquals('bar', $found->get('foo'));
     }
 }

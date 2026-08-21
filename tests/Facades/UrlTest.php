@@ -642,6 +642,8 @@ class UrlTest extends TestCase
             'already relative nested route without trailing slash' => ['/foo/page', '/foo/page'],
             'already relative nested route with trailing slash' => ['/foo/page/', '/foo/page'],
             'already relative nested route without leading slash' => ['foo/page', '/foo/page'],
+            'duplicate leading slashes' => ['//page', '/page'],
+            'multiple duplicate leading slashes' => ['////page', '/page'],
 
             'homepage without trailing slash and query param' => ['http://example.com?bar=baz', '/?bar=baz'],
             'homepage with trailing slash and query param' => ['http://example.com/?bar=baz', '/?bar=baz'],

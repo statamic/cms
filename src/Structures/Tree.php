@@ -55,7 +55,25 @@ abstract class Tree implements ContainsQueryableValues, Contract, Localization
                     return $this->structure()->validateTree($tree, $this->locale());
                 });
             })
+            ->setter(function ($tree) {
+                return $this->removeNullItems($tree);
+            })
             ->args(func_get_args());
+    }
+
+    protected function removeNullItems($tree)
+    {
+        return collect($tree)
+            ->reject(fn ($item) => is_null($item))
+            ->map(function ($item) {
+                if (isset($item['children'])) {
+                    $item['children'] = $this->removeNullItems($item['children']);
+                }
+
+                return $item;
+            })
+            ->values()
+            ->all();
     }
 
     public function root()
