@@ -494,6 +494,7 @@ class PageTest extends TestCase
 
         $tree = $this->mock(Tree::class);
         $tree->shouldReceive('entry')->with('test-entry')->andReturn($entry);
+        $tree->shouldReceive('locale')->andReturn('en');
         $tree->shouldReceive('structure')->andReturnNull(); // just make the blueprint method quiet for now.
 
         $page = new Page;
@@ -516,6 +517,7 @@ class PageTest extends TestCase
 
         $tree = $this->mock(Tree::class);
         $tree->shouldReceive('entry')->with('test-entry')->andReturn($entry);
+        $tree->shouldReceive('locale')->andReturn('en');
         $tree->shouldReceive('structure')->andReturnNull(); // just make the blueprint method quiet for now.
 
         $page = new Page;
@@ -558,6 +560,90 @@ class PageTest extends TestCase
         // This should be "pages" but cannot be fixed without being a breaking change.
         // This will change in v6.
         $this->assertEquals('blog', $page->collection()->handle());
+    }
+
+    #[Test]
+    public function it_gets_a_relative_url_when_the_entry_is_on_the_same_site_as_the_tree()
+    {
+        $this->setSites([
+            'museum' => ['url' => 'https://museum.test/', 'locale' => 'en'],
+            'foundation' => ['url' => 'https://foundation.test/', 'locale' => 'en'],
+        ]);
+
+        tap(Collections::make('pages')->routes('{slug}')->sites(['museum', 'foundation']))->save();
+
+        $entry = EntryFactory::id('projects')->collection('pages')->locale('museum')->slug('projects')->create();
+
+        $page = (new Page)
+            ->setTree($this->newTree()->locale('museum'))
+            ->setEntry($entry);
+
+        $this->assertEquals('/projects', $page->url());
+        $this->assertEquals('/projects', $page->urlWithoutRedirect());
+    }
+
+    #[Test]
+    public function it_gets_an_absolute_url_when_the_entry_is_on_another_site_than_the_tree()
+    {
+        $this->setSites([
+            'museum' => ['url' => 'https://museum.test/', 'locale' => 'en'],
+            'foundation' => ['url' => 'https://foundation.test/', 'locale' => 'en'],
+        ]);
+
+        tap(Collections::make('pages')->routes('{slug}')->sites(['museum', 'foundation']))->save();
+
+        $entry = EntryFactory::id('projects')->collection('pages')->locale('foundation')->slug('projects')->create();
+
+        $page = (new Page)
+            ->setTree($this->newTree()->locale('museum'))
+            ->setEntry($entry);
+
+        $this->assertEquals('https://foundation.test/projects', $page->url());
+        $this->assertEquals('https://foundation.test/projects', $page->urlWithoutRedirect());
+    }
+
+    #[Test]
+    public function it_gets_an_absolute_redirect_url_when_the_entry_is_on_another_site_than_the_tree()
+    {
+        $this->setSites([
+            'museum' => ['url' => 'https://museum.test/', 'locale' => 'en'],
+            'foundation' => ['url' => 'https://foundation.test/', 'locale' => 'en'],
+        ]);
+
+        tap(Collections::make('pages')->routes('{slug}')->sites(['museum', 'foundation']))->save();
+
+        EntryFactory::id('about')->collection('pages')->locale('foundation')->slug('about')->create();
+
+        $entry = EntryFactory::id('projects')->collection('pages')->locale('foundation')->slug('projects')
+            ->data(['redirect' => 'entry::about'])->create();
+
+        $page = (new Page)
+            ->setTree($this->newTree()->locale('museum'))
+            ->setEntry($entry);
+
+        $this->assertEquals('https://foundation.test/about', $page->url());
+        $this->assertEquals('https://foundation.test/projects', $page->urlWithoutRedirect());
+    }
+
+    #[Test]
+    public function it_gets_the_hardcoded_url_when_the_entry_is_on_another_site_than_the_tree()
+    {
+        $this->setSites([
+            'museum' => ['url' => 'https://museum.test/', 'locale' => 'en'],
+            'foundation' => ['url' => 'https://foundation.test/', 'locale' => 'en'],
+        ]);
+
+        tap(Collections::make('pages')->routes('{slug}')->sites(['museum', 'foundation']))->save();
+
+        $entry = EntryFactory::id('projects')->collection('pages')->locale('foundation')->slug('projects')->create();
+
+        $page = (new Page)
+            ->setTree($this->newTree()->locale('museum'))
+            ->setEntry($entry)
+            ->setUrl('https://statamic.com');
+
+        $this->assertEquals('https://statamic.com', $page->url());
+        $this->assertEquals('https://statamic.com', $page->urlWithoutRedirect());
     }
 
     protected function newTree()
