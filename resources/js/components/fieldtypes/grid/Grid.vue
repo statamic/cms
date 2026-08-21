@@ -207,7 +207,11 @@ export default {
 
             this.updateRowMeta(id, this.meta.new);
             this.update([...this.value, row]);
-            this.focusNewRow(id);
+
+            // Only auto-focus on Configure Sites sectioned grids, not every Grid in the CP.
+            if (this.config.headers_in_section) {
+                this.focusNewRow(id);
+            }
         },
 
         updated(index, row) {
