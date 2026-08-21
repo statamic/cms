@@ -256,6 +256,7 @@
                                     <Icon name="chevron-right" class="size-3.5! text-gray-700 dark:text-white/70" aria-hidden="true" />
                                 </template>
                                 <span class="truncate">{{ __(option.label) }}</span>
+                                <Badge v-if="option.origin" class="ms-1.5" size="sm" color="orange" :text="__('Origin')" />
                             </span>
                         </template>
 
@@ -274,16 +275,19 @@
                         </template>
 
                         <template #option="option">
-                            <div class="flex min-w-0 items-center">
-                                <span
-                                    class="little-dot me-2 shrink-0"
-                                    :class="{
-                                        'bg-green-600': option.published,
-                                        'bg-gray-500': !option.published,
-                                        'bg-red-500': !option.exists,
-                                    }"
-                                />
-                                <span class="truncate">{{ __(option.label) }}</span>
+                            <div class="flex min-w-0 items-center gap-x-2">
+                                <div class="flex min-w-0 items-center">
+                                    <span
+                                        class="little-dot me-2 shrink-0"
+                                        :class="{
+                                            'bg-green-600': option.published,
+                                            'bg-gray-500': !option.published,
+                                            'bg-red-500': !option.exists,
+                                        }"
+                                    />
+                                    <span class="truncate">{{ __(option.label) }}</span>
+                                </div>
+                                <Badge v-if="option.origin" class="ms-2" size="sm" color="orange" :text="__('Origin')" />
                             </div>
                         </template>
                     </Select>
@@ -313,6 +317,7 @@ import HasActions from '../publish/HasActions';
 import striptags from 'striptags';
 import clone from '@/util/clone.js';
 import {
+    Badge,
     Button,
     Card,
     CardPanel,
@@ -341,6 +346,7 @@ import {
     flatOptionsFromSiteGroups,
     groupItemsBySiteGroup,
     hasNamedSiteGroups,
+    preferredOriginHandle,
     selectedSiteGroupLabel,
 } from '@/util/site-groups.js';
 import { computed, ref } from 'vue';
@@ -351,6 +357,7 @@ export default {
     mixins: [HasPreferences, HasActions],
 
     components: {
+        Badge,
         Button,
         Card,
         CardPanel,
@@ -571,6 +578,14 @@ export default {
             return this.getPreference('after_save') ?? 'listing';
         },
 
+        defaultOriginHandle() {
+            return preferredOriginHandle(
+                this.localizations,
+                this.localizing || null,
+                this.originBehavior,
+            );
+        },
+
         originOptions() {
             const existing = this.localizations
                 .filter((localization) => localization.exists)
@@ -581,6 +596,7 @@ export default {
                     group_handle: localization.group_handle,
                     published: localization.published,
                     exists: localization.exists,
+                    origin: localization.handle === this.defaultOriginHandle,
                 }));
 
             return flatOptionsFromSiteGroups(groupItemsBySiteGroup(existing));
@@ -722,6 +738,11 @@ export default {
             this.$dirty.remove(this.publishContainer);
 
             this.localizing = localization;
+            this.selectedOrigin = preferredOriginHandle(
+                this.localizations,
+                localization,
+                this.originBehavior,
+            );
 
             if (localization.exists) {
                 this.editLocalization(localization);
@@ -949,10 +970,11 @@ export default {
     created() {
         window.history.replaceState({}, document.title, document.location.href.replace('created=true', ''));
 
-        this.selectedOrigin =
-            this.originBehavior === 'active'
-                ? this.localizations.find((l) => l.active)?.handle
-                : this.localizations.find((l) => l.root)?.handle;
+        this.selectedOrigin = preferredOriginHandle(
+            this.localizations,
+            this.localizations.find((localization) => localization.active),
+            this.originBehavior,
+        );
     },
 
     beforeUnmount() {
