@@ -17,6 +17,7 @@ class AugmentedPageTest extends AugmentedTestCase
     {
         $page = Mockery::mock(Page::class);
         $page->shouldReceive('reference')->andReturnFalse();
+        $page->shouldReceive('blueprint')->andReturnNull();
         $page->shouldReceive('data')->andReturn(collect(['one' => 'two', 'three' => 'four']));
         $page->shouldReceive('supplements')->andReturn(collect(['five' => 'six']));
 
@@ -32,6 +33,39 @@ class AugmentedPageTest extends AugmentedTestCase
             'one',
             'three',
             'five',
+        ];
+
+        $actual = $augmented->keys();
+
+        $this->assertEquals(
+            collect($expected)->sort()->values()->all(),
+            collect($actual)->sort()->values()->all()
+        );
+    }
+
+    #[Test]
+    public function it_gets_page_keys_from_the_blueprint_when_there_is_no_entry()
+    {
+        $pageBlueprint = Blueprint::makeFromFields([
+            'target_blank' => ['type' => 'toggle'],
+        ])->setNamespace('navs')->setHandle('main');
+
+        $page = Mockery::mock(Page::class);
+        $page->shouldReceive('reference')->andReturnFalse();
+        $page->shouldReceive('blueprint')->andReturn($pageBlueprint);
+        $page->shouldReceive('data')->andReturn(collect(['title' => 'Child', 'url' => 'https://example.com']));
+        $page->shouldReceive('supplements')->andReturn(collect());
+
+        $augmented = new AugmentedPage($page);
+
+        $expected = [
+            'id',
+            'entry_id',
+            'title',
+            'url',
+            'uri',
+            'permalink',
+            'target_blank',
         ];
 
         $actual = $augmented->keys();
