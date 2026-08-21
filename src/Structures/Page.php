@@ -105,22 +105,6 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Cont
             : $entry->urlWithoutRedirect();
     }
 
-    /**
-     * Whether the referenced entry belongs to a different site than the tree it's in.
-     *
-     * This happens on navs with select_across_sites enabled. Those urls need to keep
-     * their scheme and host, otherwise they'd resolve against the current site,
-     * which may well be on an entirely different domain.
-     */
-    private function isCrossSite(Entry $entry): bool
-    {
-        if (! $treeLocale = $this->tree?->locale()) {
-            return false;
-        }
-
-        return $entry->locale() !== $treeLocale;
-    }
-
     public function isRedirect()
     {
         return optional($this->entry())->isRedirect() ?? false;
@@ -542,6 +526,15 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Cont
         }
 
         return $this->value($field);
+    }
+
+    private function isCrossSite(Entry $entry): bool
+    {
+        if (! $treeLocale = $this->tree?->locale()) {
+            return false;
+        }
+
+        return $entry->locale() !== $treeLocale;
     }
 
     private function queryableMethods(): array
