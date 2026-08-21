@@ -290,10 +290,6 @@ export default {
         switchToLocalization(localization) {
             this.localizing = localization.handle;
 
-            if (this.publishContainer === 'base') {
-                window.history.replaceState({}, '', localization.url + window.location.hash);
-            }
-
             this.$axios.get(localization.url).then((response) => {
                 const data = response.data;
                 this.values = data.values;
@@ -309,6 +305,10 @@ export default {
                 this.localizing = false;
                 this.afterActionSuccessfullyCompleted(data);
                 this.$nextTick(() => this.$refs.container.clearDirtyState());
+
+                if (this.publishContainer === 'base' && localization.url) {
+                    window.history.replaceState({}, '', localization.url + window.location.hash);
+                }
             });
         },
 
