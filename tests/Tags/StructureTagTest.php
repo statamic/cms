@@ -9,6 +9,7 @@ use Statamic\Facades\Antlers;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Nav;
+use Statamic\Facades\Site;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -574,6 +575,41 @@ EOT;
         $this->assertXmlStringEqualsXmlString($expected, (string) Antlers::parse($template, [
             'title' => 'outer title', // to test that cascade the page's data takes precedence over the cascading data.
         ], true));
+    }
+
+    #[Test]
+    public function it_renders_absolute_urls_for_nav_items_pointing_at_entries_on_another_site()
+    {
+        $this->setSites([
+            'museum' => ['url' => 'https://museum.test/', 'locale' => 'en'],
+            'foundation' => ['url' => 'https://foundation.test/', 'locale' => 'en'],
+        ]);
+
+        tap(Collection::make('pages')->routes('{slug}')->sites(['museum', 'foundation']))->save();
+
+        EntryFactory::collection('pages')->id('exhibitions')->locale('museum')->slug('exhibitions')->data(['title' => 'Exhibitions'])->create();
+        EntryFactory::collection('pages')->id('projects')->locale('foundation')->slug('projects')->data(['title' => 'Projects'])->create();
+
+        $nav = Nav::make('test')->canSelectAcrossSites(true);
+        $nav->makeTree('museum', [
+            ['entry' => 'exhibitions'],
+            ['entry' => 'projects'],
+        ])->save();
+        $nav->save();
+
+        Site::setCurrent('museum');
+
+        // Pretend we're on the museum site's own /projects url, so we can also assert
+        // that the foundation entry isn't flagged as current just because it matches.
+        $this->get('/projects');
+
+        $template = '{{ nav:test }}[{{ title }}|{{ url }}|{{ permalink }}|{{ is_current ? "current" : "not-current" }}]{{ /nav:test }}';
+
+        $this->assertEquals(
+            '[Exhibitions|/exhibitions|https://museum.test/exhibitions|not-current]'.
+            '[Projects|https://foundation.test/projects|https://foundation.test/projects|not-current]',
+            (string) Antlers::parse($template, [], true)
+        );
     }
 
     private function makeNav($tree)

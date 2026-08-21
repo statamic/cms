@@ -70,6 +70,7 @@ class AugmentedPageTest extends AugmentedTestCase
         $page->shouldReceive('reference')->andReturn('123');
         $page->shouldReceive('referenceExists')->andReturnTrue();
         $page->shouldReceive('entry')->andReturn($entry);
+        $page->shouldReceive('url')->andReturn('/the-url');
         $page->shouldReceive('blueprint')->andReturn($pageBlueprint);
         $page->shouldReceive('data')->andReturn(collect([
             'john' => 'doe',
@@ -196,6 +197,7 @@ class AugmentedPageTest extends AugmentedTestCase
         $page->shouldReceive('reference')->andReturn('123');
         $page->shouldReceive('referenceExists')->andReturnTrue();
         $page->shouldReceive('entry')->andReturn($entry);
+        $page->shouldReceive('url')->andReturn('/the-url');
         $page->shouldReceive('blueprint')->andReturn($pageBlueprint);
         $page->shouldReceive('data')->andReturn(collect(['one' => 'dos', 'three' => 'quatro', 'five' => 'seis']));
         $page->shouldReceive('supplements')->andReturn(collect(['seven' => 'ocho']));

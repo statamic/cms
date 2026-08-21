@@ -79,6 +79,11 @@ class AugmentedPage extends AugmentedEntry
         return $this->fieldsCache = $fields;
     }
 
+    protected function url()
+    {
+        return $this->page->url();
+    }
+
     protected function id()
     {
         return $this->page->id();
