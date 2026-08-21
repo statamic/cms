@@ -478,7 +478,7 @@ defineExpose({
                                 event.preventDefault();
                             }"
                         >
-                            <div class="relative max-h-[300px] overflow-y-auto py-2 st-custom-scrollbar" data-ui-combobox-viewport>
+                            <div class="relative max-h-[300px] overflow-y-auto py-1.5 pb-2 st-custom-scrollbar" data-ui-combobox-viewport>
                                 <!-- Hidden width measurer for wide dropdown mode -->
                                 <div v-if="adaptiveWidth" aria-hidden="true" class="h-0 overflow-y-clip px-2">
                                     <div v-for="option in filteredOptions" :key="getOptionValue(option)" class="py-1.5 px-2 text-sm whitespace-nowrap">
