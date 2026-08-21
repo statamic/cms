@@ -41,18 +41,30 @@
                             :model-value="site.origin"
                             @update:model-value="site.origin = $event"
                         >
-                            <template v-if="hasNamedGroups" #before-option="option">
-                                <div
-                                    v-if="option._showGroupSeparator"
-                                    class="mx-2 mb-2.25 mt-0.75 border-t border-gray-200 dark:border-gray-700"
-                                    role="separator"
-                                />
-                                <Subheading
-                                    v-if="option._groupLabel"
-                                    size="sm"
-                                    class="px-2.5 pb-1 pt-1.5 font-semibold uppercase tracking-wide text-gray-950 text-2xs dark:text-gray-300"
-                                    :text="__(option._groupLabel)"
-                                />
+                            <template #selected-option="{ option }">
+                                <span v-if="option" class="flex min-w-0 items-center gap-1.5">
+                                    <template v-if="originGroupLabel(option)">
+                                        <span class="truncate">{{ originGroupLabel(option) }}</span>
+                                        <Icon name="chevron-right" class="size-3.5! shrink-0 text-gray-700 dark:text-white/70" aria-hidden="true" />
+                                    </template>
+                                    <span class="truncate">{{ option.label }}</span>
+                                </span>
+                            </template>
+
+                            <template #before-option="option">
+                                <template v-if="hasNamedGroups">
+                                    <div
+                                        v-if="option._showGroupSeparator"
+                                        class="mx-2 mb-2.25 mt-0.75 border-t border-gray-200 dark:border-gray-700"
+                                        role="separator"
+                                    />
+                                    <Subheading
+                                        v-if="option._groupLabel"
+                                        size="sm"
+                                        class="px-2.5 pb-1 pt-1.5 font-semibold uppercase tracking-wide text-gray-950 text-2xs dark:text-gray-300"
+                                        :text="__(option._groupLabel)"
+                                    />
+                                </template>
                             </template>
                         </Select>
                     </td>
@@ -64,17 +76,19 @@
 
 <script>
 import Fieldtype from '../fieldtypes/Fieldtype.vue';
-import { Switch, Heading, Select, Subheading } from '@/components/ui';
+import { Icon, Switch, Heading, Select, Subheading } from '@/components/ui';
 import {
     flatOptionsFromSiteGroups,
     groupItemsBySiteGroup,
     hasNamedSiteGroups,
+    selectedSiteGroupLabel,
 } from '@/util/site-groups.js';
 
 export default {
     mixins: [Fieldtype],
 
     components: {
+        Icon,
         Switch,
         Heading,
         Select,
@@ -83,7 +97,7 @@ export default {
 
     data() {
         return {
-            sites: this.value,
+            sites: this.value ?? [],
         };
     },
 
@@ -93,11 +107,15 @@ export default {
         },
 
         siteGroups() {
-            return groupItemsBySiteGroup(this.sites);
+            return groupItemsBySiteGroup(this.sites ?? []);
         },
     },
 
     watch: {
+        value(value) {
+            this.sites = value ?? [];
+        },
+
         sites: {
             deep: true,
             handler(sites) {
@@ -107,8 +125,16 @@ export default {
     },
 
     methods: {
+        originGroupLabel(option) {
+            if (!option || !this.hasNamedGroups) {
+                return null;
+            }
+
+            return selectedSiteGroupLabel(option, true);
+        },
+
         siteOriginOptions(site) {
-            const options = this.sites
+            const options = (this.sites ?? [])
                 .filter((s) => s.handle !== site.handle)
                 .map((s) => ({
                     value: s.handle,
