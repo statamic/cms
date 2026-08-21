@@ -660,7 +660,11 @@ export default {
         },
 
         titleFormatValues() {
-            const fields = this.titleFormat.fields.filter((field) => field in this.values);
+            // The server discards these, so sending them would only mean pointless
+            // requests whenever the slug gets regenerated from the title.
+            const fields = this.titleFormat.fields.filter(
+                (field) => field in this.values && !['title', 'slug'].includes(field),
+            );
 
             return Object.fromEntries(fields.map((field) => [field, this.values[field]]));
         },

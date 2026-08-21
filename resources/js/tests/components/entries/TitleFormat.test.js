@@ -87,6 +87,25 @@ test('the title is not generated when a field the format ignores changes', async
     expect(post).not.toHaveBeenCalled();
 });
 
+test('the title and slug are never submitted, even when the format references them', async () => {
+    const wrapper = mountForm(
+        { title: 'Michael', slug: 'michael', first_name: 'Michael' },
+        { url: '/title-format', fields: ['title', 'slug', 'first_name'] },
+    );
+
+    await wrapper.setData({ values: { first_name: 'Ruth' } });
+    await vi.advanceTimersByTimeAsync(300);
+
+    expect(post).toHaveBeenCalledOnce();
+    expect(post.mock.calls[0][1].values).toEqual({ first_name: 'Ruth' });
+
+    // Regenerating the slug from the new title shouldn't ask for another title.
+    await wrapper.setData({ values: { slug: 'ruth' } });
+    await vi.advanceTimersByTimeAsync(300);
+
+    expect(post).toHaveBeenCalledOnce();
+});
+
 test('the generated title does not trigger another request', async () => {
     const wrapper = mountForm(
         { title: null, slug: null, first_name: 'Michael', last_name: 'Aerni' },
