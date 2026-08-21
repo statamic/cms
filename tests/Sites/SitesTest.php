@@ -72,6 +72,15 @@ class SitesTest extends TestCase
         $this->assertEquals(['de'], $this->sites->filterByGroup($handles, 'de')->values()->all());
         $this->assertEquals(['en', 'fr', 'de', 'nl'], $this->sites->filterByGroup($handles, 'nl')->values()->all());
         $this->assertEquals(['en', 'fr', 'de', 'nl'], $this->sites->filterByGroup($handles, null)->values()->all());
+
+        $this->sites->setSites([
+            'en' => ['url' => '/', 'group' => 'London', 'group_handle' => 'london'],
+            'fr' => ['url' => '/fr', 'group' => 'London', 'group_handle' => 'paris'],
+            'de' => ['url' => '/de', 'group' => 'London', 'group_handle' => 'london'],
+        ]);
+
+        $this->assertEquals(['en', 'de'], $this->sites->filterByGroup(['en', 'fr', 'de'], 'en')->values()->all());
+        $this->assertEquals(['fr'], $this->sites->filterByGroup(['en', 'fr', 'de'], 'fr')->values()->all());
     }
 
     #[Test]

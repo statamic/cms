@@ -169,6 +169,7 @@ class Site implements Augmentable
             'permalink' => $this->absoluteUrl(),
             'direction' => $this->direction(),
             'group' => $this->group(),
+            'group_handle' => $this->groupHandle(),
             'attributes' => $this->attributes(),
         ];
     }

@@ -7,7 +7,7 @@ import {
     Subheading,
     Icon,
 } from '@ui';
-import { computed, ref, useId, watch } from 'vue';
+import { computed, ref, useId, watch, nextTick } from 'vue';
 import fuzzysort from 'fuzzysort';
 import Localization from './Localization.vue';
 import {
@@ -24,6 +24,10 @@ const props = defineProps({
     },
     localizing: {
         type: [Boolean, String],
+        default: false,
+    },
+    confirmingSwitch: {
+        type: Boolean,
         default: false,
     },
     heading: {
@@ -44,11 +48,40 @@ const activeLocalization = computed(() => {
     return props.localizations.find((localization) => localization.active);
 });
 
+function clearPendingIfStale() {
+    if (!pendingHandle.value) return;
+    if (pendingHandle.value === activeLocalization.value?.handle) {
+        pendingHandle.value = null;
+        return;
+    }
+    if (props.localizing || props.confirmingSwitch) return;
+
+    pendingHandle.value = null;
+}
+
 watch(
     () => activeLocalization.value?.handle,
     (handle) => {
         if (handle && handle === pendingHandle.value) {
             pendingHandle.value = null;
+        }
+    },
+);
+
+watch(
+    () => props.localizing,
+    (localizing, wasLocalizing) => {
+        if (wasLocalizing && !localizing) {
+            clearPendingIfStale();
+        }
+    },
+);
+
+watch(
+    () => props.confirmingSwitch,
+    (confirming, wasConfirming) => {
+        if (wasConfirming && !confirming) {
+            clearPendingIfStale();
         }
     },
 );
@@ -86,6 +119,17 @@ function selectLocalization(localization) {
     searchQuery.value = '';
     pendingHandle.value = localization.handle;
     emit('selected', localization);
+
+    // Parent may abort without starting a switch (e.g. can't create missing localization).
+    if (!localization.exists) {
+        nextTick(() => {
+            if (pendingHandle.value !== localization.handle) return;
+            if (props.localizing || props.confirmingSwitch) return;
+            if (activeLocalization.value?.handle !== localization.handle) {
+                pendingHandle.value = null;
+            }
+        });
+    }
 }
 
 function handleSearch(query) {

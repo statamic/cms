@@ -74,7 +74,6 @@ import { getActivePinia } from 'pinia';
 import InlineEditForm from './InlineEditForm.vue';
 import ItemLabel from './ItemLabel.vue';
 import { Button, Dropdown, DropdownMenu, DropdownItem, publishContextKey as containerContextKey } from '@/components/ui';
-import { selectedSiteGroupLabel } from '@/util/site-groups.js';
 
 export default {
     components: {
@@ -115,22 +114,12 @@ export default {
             return __(this.item.title);
         },
 
-        sitesHaveNamedGroups() {
-            if (this.config?.type !== 'sites') {
-                return false;
-            }
-
-            const sites = Statamic.$config.get('sites') || [];
-
-            return sites.some((site) => site.group);
-        },
-
         groupLabel() {
-            if (this.config?.type !== 'sites') {
+            if (this.config?.type !== 'sites' || !this.itemWithSiteGroup.group) {
                 return null;
             }
 
-            return selectedSiteGroupLabel(this.itemWithSiteGroup, this.sitesHaveNamedGroups);
+            return __(this.itemWithSiteGroup.group);
         },
 
         itemWithSiteGroup() {

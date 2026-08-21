@@ -76,21 +76,21 @@ class SitesController extends CpController
 
     private function isGroupNameKey(string $key): bool
     {
-        return (bool) preg_match('/^group_.+_name$/', $key);
+        return (bool) preg_match('/^group_[A-Za-z0-9_-]+_name$/', $key);
     }
 
     private function emptySitesError(array $request): array
     {
         $keys = collect($request)
             ->keys()
-            ->filter(fn ($key) => is_string($key) && preg_match('/^group_.+_sites$/', $key));
+            ->filter(fn ($key) => is_string($key) && preg_match('/^group_[A-Za-z0-9_-]+_sites$/', $key));
 
         if ($keys->isEmpty()) {
             $keys = collect(['group_other_sites']);
         }
 
         return $keys
-            ->mapWithKeys(fn ($key) => [$key => [__('This field is required.')]])
+            ->mapWithKeys(fn ($key) => [$key => [__('statamic::validation.required')]])
             ->all();
     }
 
@@ -99,7 +99,7 @@ class SitesController extends CpController
         $handles = collect();
 
         foreach ($values as $key => $sites) {
-            if (! is_array($sites) || ! preg_match('/^group_.+_sites$/', $key)) {
+            if (! is_array($sites) || ! preg_match('/^group_[A-Za-z0-9_-]+_sites$/', $key)) {
                 continue;
             }
 

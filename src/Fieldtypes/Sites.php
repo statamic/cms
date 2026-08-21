@@ -30,8 +30,15 @@ class Sites extends Relationship
 
     public function getIndexItems($request)
     {
-        return Site::all()
-            ->filter(fn ($site) => User::current()->can('view', $site))
+        $sites = Site::all()
+            ->filter(fn ($site) => User::current()->can('view', $site));
+
+        // Preserve sites.yaml order when groups exist; otherwise keep the old A–Z sort.
+        if (! $sites->contains(fn ($site) => $site->group())) {
+            $sites = $sites->sortBy->name();
+        }
+
+        return $sites
             ->map(function ($site) {
                 return [
                     'id' => $site->handle(),

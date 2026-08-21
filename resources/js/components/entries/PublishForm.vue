@@ -169,6 +169,7 @@
                                 v-if="showLocalizationSelector"
                                 :localizations
                                 :localizing="localizing !== null"
+                                :confirming-switch="!!pendingLocalization"
                                 @selected="localizationSelected"
                             />
                         </div>

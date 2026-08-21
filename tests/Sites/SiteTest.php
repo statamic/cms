@@ -282,6 +282,21 @@ class SiteTest extends TestCase
     }
 
     #[Test]
+    public function it_augments_group_and_group_handle()
+    {
+        $site = new Site('en', [
+            'name' => 'English',
+            'group' => 'London',
+            'group_handle' => 'london',
+        ]);
+
+        $values = $site->augmented()->all()->map->value()->all();
+
+        $this->assertEquals('London', $values['group']);
+        $this->assertEquals('london', $values['group_handle']);
+    }
+
+    #[Test]
     public function it_is_augmentable()
     {
         $site = new Site('test', [

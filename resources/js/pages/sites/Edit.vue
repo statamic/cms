@@ -26,10 +26,12 @@ function siteHandlesFromValues(values) {
 
 const container = useTemplateRef('container');
 const values = ref(props.initialValues);
+const blueprintState = ref(deepClone(props.blueprint));
 const errors = ref({});
 const saving = ref(false);
 const editingGroups = ref(false);
 const groupsSnapshot = ref(null);
+const blueprintSnapshot = ref(null);
 const containerKey = ref(0);
 
 const groupsDirty = computed(() => {
@@ -48,11 +50,11 @@ const initialHandleChanged = computed(() => initialSiteHandles.value.filter((han
 const initialHandleChangedWarning = computed(() => __('Warning! Changing a site handle may break existing site content!'));
 
 const hasOnlyOtherGroup = computed(() => {
-    if (! isMultisite.value || ! props.blueprint?.tabs) {
+    if (! isMultisite.value || ! blueprintState.value?.tabs) {
         return false;
     }
 
-    const sections = props.blueprint.tabs.flatMap((tab) => tab.sections ?? []);
+    const sections = blueprintState.value.tabs.flatMap((tab) => tab.sections ?? []);
 
     return sections.length > 0 && ! sections.some((section) => section.reorderable);
 });
@@ -61,23 +63,26 @@ const editSiteGroupsLabel = computed(() => hasOnlyOtherGroup.value ? __('Add Sit
 
 function startEditingGroups() {
     groupsSnapshot.value = deepClone(values.value);
+    blueprintSnapshot.value = deepClone(blueprintState.value);
     editingGroups.value = true;
 }
 
 function stopEditingGroups() {
     editingGroups.value = false;
     groupsSnapshot.value = null;
+    blueprintSnapshot.value = null;
 }
 
 function discardGroupChanges() {
     values.value = deepClone(groupsSnapshot.value);
+    blueprintState.value = deepClone(blueprintSnapshot.value);
     containerKey.value++;
     stopEditingGroups();
 }
 
 function groupNamesFromValues(formValues) {
     return Object.fromEntries(
-        Object.entries(formValues).filter(([key, value]) => /^group_.+_name$/.test(key) && typeof value === 'string'),
+        Object.entries(formValues).filter(([key, value]) => /^group_[A-Za-z0-9_-]+_name$/.test(key) && typeof value === 'string'),
     );
 }
 
@@ -166,12 +171,12 @@ onUnmounted(() => saveKeyBinding.destroy());
         </Header>
 
         <PublishContainer
-            v-if="blueprint"
+            v-if="blueprintState"
             :key="containerKey"
             ref="container"
             name="sites"
             reference="sites"
-            :blueprint
+            :blueprint="blueprintState"
             v-model="values"
             :meta
             :errors

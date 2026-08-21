@@ -10,6 +10,7 @@ export default {
     data() {
         return {
             errorsById: {},
+            sectionRowZoneEl: null,
         };
     },
 
@@ -96,13 +97,15 @@ export default {
         registerSectionRowZone() {
             if (!this.usesSectionRowSortable || !this.$refs.zone) return;
 
-            this.sectionRowSortable.register(this.$refs.zone, this.name);
+            this.sectionRowZoneEl = this.$refs.zone;
+            this.sectionRowSortable.register(this.sectionRowZoneEl, this.name);
         },
 
         unregisterSectionRowZone() {
-            if (!this.sectionRowSortable || !this.$refs.zone) return;
+            if (!this.sectionRowSortable || !this.sectionRowZoneEl) return;
 
-            this.sectionRowSortable.unregister(this.$refs.zone);
+            this.sectionRowSortable.unregister(this.sectionRowZoneEl);
+            this.sectionRowZoneEl = null;
         },
     },
 };

@@ -60,11 +60,25 @@ class Sites
 
     public function filterByGroup($handles, ?string $siteHandle)
     {
-        if (! $siteHandle || ! ($site = $this->get($siteHandle)) || ! ($group = $site->group())) {
+        if (! $siteHandle || ! ($site = $this->get($siteHandle))) {
             return collect($handles);
         }
 
-        return collect($handles)->filter(fn ($handle) => $this->get($handle)?->group() === $group);
+        $groupKey = $site->groupHandle() ?? $site->group();
+
+        if (! $groupKey) {
+            return collect($handles);
+        }
+
+        return collect($handles)->filter(function ($handle) use ($groupKey) {
+            $other = $this->get($handle);
+
+            if (! $other) {
+                return false;
+            }
+
+            return ($other->groupHandle() ?? $other->group()) === $groupKey;
+        });
     }
 
     public function get($handle)
@@ -241,7 +255,7 @@ class Sites
         $sites = collect();
 
         foreach ($values as $key => $groupSites) {
-            if (! is_array($groupSites) || ! preg_match('/^group_(.+)_sites$/', $key, $matches)) {
+            if (! is_array($groupSites) || ! preg_match('/^group_([A-Za-z0-9_-]+)_sites$/', $key, $matches)) {
                 continue;
             }
 
