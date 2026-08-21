@@ -234,6 +234,7 @@ class AugmentedPageTest extends AugmentedTestCase
         $page->shouldReceive('data')->andReturn(collect(['one' => 'dos', 'three' => 'quatro', 'five' => 'seis']));
         $page->shouldReceive('supplements')->andReturn(collect(['seven' => 'ocho']));
         $page->shouldReceive('title')->andReturn('The Page Title');
+        $page->shouldReceive('url')->andReturn('/the-url');
         $page->shouldReceive('value')->with('one')->andReturn('dos');
         $page->shouldReceive('value')->with('three')->andReturn('quatro');
         $page->shouldReceive('value')->with('five')->andReturn('seis');
