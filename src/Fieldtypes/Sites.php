@@ -20,6 +20,8 @@ class Sites extends Relationship
             return [
                 'id' => $id,
                 'title' => $site->name(),
+                'group' => $site->group(),
+                'group_handle' => $site->groupHandle(),
             ];
         }
 
@@ -30,11 +32,12 @@ class Sites extends Relationship
     {
         return Site::all()
             ->filter(fn ($site) => User::current()->can('view', $site))
-            ->sortBy('name')
             ->map(function ($site) {
                 return [
                     'id' => $site->handle(),
                     'title' => $site->name(),
+                    'group' => $site->group(),
+                    'group_handle' => $site->groupHandle(),
                 ];
             })->values();
     }
