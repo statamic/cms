@@ -29,7 +29,7 @@
                 <div
                     v-if="!isReadOnly && showPicker"
                     data-asset-picker
-                    class="not-[.link-fieldtype_&]:p-2 not-[.link-fieldtype_&]:border border-gray-300 dark:border-gray-700 dark:bg-gray-850 rounded-xl flex flex-col @[22rem]:flex-row gap-2 sm:gap-3 gap-y-3"
+                    class="not-[.link-fieldtype_&]:p-2 not-[.link-fieldtype_&]:border border-gray-300 dark:border-gray-700 dark:bg-gray-850 rounded-xl flex items-center gap-3"
                     :class="{
                         'rounded-b-none': expanded,
                         'bard-drag-handle': isInBardField,
@@ -38,23 +38,43 @@
                     <Button
                         v-if="canBrowse"
                         icon="folder-open"
+                        size="sm"
                         tabindex="0"
+                        class="shrink-0 @sm:hidden"
+                        :text="__('Browse')"
+                        :aria-label="__('Browse Assets')"
+                        @click="openSelector"
+                        @keyup.space.enter="openSelector"
+                    />
+                    <Button
+                        v-if="canBrowse"
+                        icon="folder-open"
+                        tabindex="0"
+                        class="hidden shrink-0 @sm:inline-flex"
                         :text="__('Browse Assets')"
-                        class="w-full @2xs:w-auto"
                         @click="openSelector"
                         @keyup.space.enter="openSelector"
                     />
 
-                    <div class="text-sm text-gray-600 dark:text-gray-400 flex items-center flex-1 gap-1 ms-1" v-if="canUpload">
-                        <ui-icon name="upload-cloud" class="size-5 text-gray-500 me-2" />
-                        <div class="text-xs">
-                            <span class="leading-tight" v-text="`${__('Drag & drop here or')}&nbsp;`" />
-                            <button type="button" class="text-left underline underline-offset-2 cursor-pointer hover:text-gray-925 dark:hover:text-gray-200" @click.prevent="uploadFile">
+                    <div class="min-w-0 flex-1 flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400" v-if="canUpload">
+                        <ui-icon name="upload-cloud" class="size-5 shrink-0 text-gray-500 hidden @sm:block" />
+                        <div class="min-w-0">
+                            <span class="hidden @sm:inline">{{ __('Drag & drop here or') }}&nbsp;</span>
+                            <span v-if="canBrowse" class="@sm:hidden">{{ __('or') }}&nbsp;</span>
+                            <button type="button" class="underline underline-offset-2 cursor-pointer hover:text-gray-925 dark:hover:text-gray-200" @click.prevent="uploadFile">
                                 {{ __('choose a file') }}
-                            </button>.
-                            <span class="leading-tight whitespace-nowrap" v-if="selectedFilesText" v-text="selectedFilesText" />
+                            </button><span class="hidden @sm:inline">.</span>
                         </div>
                     </div>
+
+                    <ui-badge
+                        v-if="selectedFilesText"
+                        size="sm"
+                        pill
+                        class="ms-auto shrink-0 tabular-nums px-1.5!"
+                        :text="`${assets.length}/${maxFiles}`"
+                        :aria-label="selectedFilesText"
+                    />
 
                     <div class="flex items-center justify-end" v-if="meta.rename_folder">
                         <ItemActions
