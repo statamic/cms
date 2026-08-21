@@ -35,6 +35,7 @@ class AugmentedPage extends AugmentedEntry
             : ['title', 'url', 'uri', 'permalink', 'id']);
 
         $keys = $keys
+            ->merge($this->blueprintFields()->keys())
             ->merge($this->page->data()->keys())
             ->merge($this->page->supplements()->keys())
             ->merge(['entry_id']);
