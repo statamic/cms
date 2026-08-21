@@ -37,6 +37,7 @@ class AugmentedPage extends AugmentedEntry
         $keys = $keys
             ->merge($this->page->data()->keys())
             ->merge($this->page->supplements()->keys())
+            ->merge($this->blueprintFields()->keys())
             ->merge(['entry_id']);
 
         $keys = Statamic::isApiRoute() ? $this->apiKeys($keys) : $keys;
