@@ -190,7 +190,7 @@ test('hide dismisses an interactive tooltip when the pointer is unknown and the 
     expect(isVisible.value).toBe(false);
 });
 
-test('a plain tooltip still dismisses immediately on hide', () => {
+test('a plain tooltip dismisses after a short hide delay', () => {
     const { show, hide, isVisible } = useTooltip();
     const triggerEl = box(trigger);
 
@@ -200,6 +200,39 @@ test('a plain tooltip still dismisses immediately on hide', () => {
     expect(isVisible.value).toBe(true);
 
     hide();
+
+    expect(isVisible.value).toBe(true);
+
+    vi.advanceTimersByTime(50);
+
+    expect(isVisible.value).toBe(false);
+});
+
+test('hopping between adjacent plain tooltips updates immediately', () => {
+    const { show, hide, isVisible, content } = useTooltip();
+    const first = box(trigger);
+    const second = box({ left: 210, right: 310, top: 200, bottom: 220 });
+
+    show(first, 'Bold');
+    vi.advanceTimersByTime(200);
+
+    expect(isVisible.value).toBe(true);
+    expect(content.value).toBe('Bold');
+
+    hide();
+    show(second, 'Italic');
+
+    expect(isVisible.value).toBe(true);
+    expect(content.value).toBe('Italic');
+});
+
+test('leaving a pending plain tooltip cancels the show delay', () => {
+    const { show, hide, isVisible } = useTooltip();
+    const triggerEl = box(trigger);
+
+    show(triggerEl, 'Hello');
+    hide();
+    vi.advanceTimersByTime(200);
 
     expect(isVisible.value).toBe(false);
 });

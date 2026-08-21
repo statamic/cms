@@ -8,6 +8,7 @@ const targetEl = shallowRef(null);
 const contentEl = shallowRef(null);
 
 let showTimeout = null;
+let hideTimeout = null;
 let pendingEl = null;
 let tracking = false;
 let pointer = null;
@@ -176,6 +177,11 @@ function dismiss() {
         showTimeout = null;
     }
 
+    if (hideTimeout) {
+        clearTimeout(hideTimeout);
+        hideTimeout = null;
+    }
+
     pendingEl = null;
 
     isVisible.value = false;
@@ -187,11 +193,17 @@ function dismiss() {
 }
 
 function show(el, options) {
+    // Cancel a pending hide so hopping to an adjacent trigger can keep the tooltip up.
+    if (hideTimeout) {
+        clearTimeout(hideTimeout);
+        hideTimeout = null;
+    }
+
     if (showTimeout) {
         clearTimeout(showTimeout);
     }
 
-    // If already visible, update immediately (for moving between adjacent elements)
+    // Already visible: swap content immediately instead of blinking through the show delay.
     if (isVisible.value) {
         setContent(el, options);
         return;
@@ -210,11 +222,32 @@ function show(el, options) {
 }
 
 function hide() {
-    if (isVisible.value && isInteractive()) {
-        if (isOverInteractiveTooltip()) return;
+    // Interactive tooltips (html / copyable) are kept alive by pointer tracking,
+    // so mouseleave on the trigger must not start a hide timer.
+    if (isInteractive()) {
+        if (isVisible.value && isOverInteractiveTooltip()) return;
+        dismiss();
+        return;
     }
 
-    dismiss();
+    if (showTimeout) {
+        clearTimeout(showTimeout);
+        showTimeout = null;
+        pendingEl = null;
+    }
+
+    if (!isVisible.value) return;
+
+    // Brief grace so mouseleave on A + mouseenter on B (e.g. Bard toolbar)
+    // still sees isVisible and takes the instant-swap path in show().
+    if (hideTimeout) {
+        clearTimeout(hideTimeout);
+    }
+
+    hideTimeout = setTimeout(() => {
+        hideTimeout = null;
+        dismiss();
+    }, 50);
 }
 
 function dismissFor(el, event) {
