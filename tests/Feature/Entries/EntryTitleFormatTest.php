@@ -296,6 +296,23 @@ class EntryTitleFormatTest extends TestCase
     }
 
     #[Test]
+    public function it_denies_access_when_the_collection_isnt_available_on_the_site()
+    {
+        $this->setSites([
+            'en' => ['locale' => 'en', 'url' => '/'],
+            'fr' => ['locale' => 'fr', 'url' => '/fr/'],
+        ]);
+
+        [$user, $collection] = $this->seedUserAndCollection();
+        $collection->sites(['fr'])->titleFormats('{first_name} {last_name}')->save();
+
+        $this
+            ->actingAs($user)
+            ->generateForCreate($collection, ['first_name' => 'Michael'])
+            ->assertForbidden();
+    }
+
+    #[Test]
     public function it_404s_when_the_collection_doesnt_generate_titles()
     {
         [$user, $collection] = $this->seedUserAndCollection();
