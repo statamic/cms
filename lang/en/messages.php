@@ -43,6 +43,7 @@ return [
     'collection_configure_template_instructions' => 'Set this collection\'s default template. Entries can override this setting with a `template` field.',
     'collection_configure_title_format_instructions' => 'Automatically generate titles for entries in this collection. [Read more](https://statamic.dev/collections#titles).',
     'collection_configure_title_instructions' => 'Use a plural noun, such as \'Articles\' or \'Products\'',
+    'collection_entries_reorder_out_of_date' => 'The entry listing is out of date. Refresh the page and try reordering again.',
     'collection_next_steps_blueprints_description' => 'Manage the blueprints and fields available for this collection. Keep organized with fieldsets.',
     'collection_next_steps_configure_description' => 'Configure URLs and routes, define blueprints, date behaviors, ordering and other options.',
     'collection_next_steps_create_entry_description' => 'Create the first entry or stub out a handful of placeholder entries—whatever suits your needs.',
