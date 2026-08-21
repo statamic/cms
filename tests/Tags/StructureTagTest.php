@@ -459,6 +459,29 @@ EOT;
     #[Test]
     public function it_uses_the_absolute_url_for_a_nav_entry_link_on_another_site()
     {
+        $this->makeCrossSiteNav();
+
+        $template = '{{ nav:test }}{{ url }}{{ /nav:test }}';
+
+        $this->assertEquals('http://two.example.com/projects', (string) Antlers::parse($template, [], true));
+    }
+
+    #[Test]
+    public function it_doesnt_flag_a_nav_entry_link_on_another_site_as_current()
+    {
+        $this->makeCrossSiteNav();
+
+        $mock = \Mockery::mock(\Statamic\Facades\URL::getFacadeRoot())->makePartial();
+        \Statamic\Facades\URL::swap($mock);
+        $mock->shouldReceive('getCurrent')->once()->andReturn('/projects');
+
+        $template = '{{ nav:test }}{{ if is_current }}current{{ else }}not-current{{ /if }}{{ /nav:test }}';
+
+        $this->assertEquals('not-current', (string) Antlers::parse($template, [], true));
+    }
+
+    private function makeCrossSiteNav()
+    {
         $this->setSites([
             'en' => ['url' => 'http://one.example.com/', 'locale' => 'en'],
             'fr' => ['url' => 'http://two.example.com/', 'locale' => 'fr'],
@@ -468,26 +491,14 @@ EOT;
 
         tap(Collection::make('pages')->routes('{slug}'))->sites(['en', 'fr'])->save();
 
-        EntryFactory::id('projects')->collection('pages')->locale('en')->slug('projects')->data(['title' => 'Projects'])->create();
-        EntryFactory::id('projects-fr')->origin('projects')->collection('pages')->locale('fr')->slug('projects')->data(['title' => 'Projects'])->create();
+        EntryFactory::collection('pages')->id('projects')->locale('en')->slug('projects')->data(['title' => 'Projects'])->create();
+        EntryFactory::collection('pages')->id('projects-fr')->origin('projects')->locale('fr')->slug('projects')->data(['title' => 'Projects'])->create();
 
         $nav = Nav::make('test')->canSelectAcrossSites(true);
         $nav->makeTree('en', [
             ['id' => 'link', 'title' => 'Projects', 'entry' => 'projects-fr'],
         ])->save();
         $nav->save();
-
-        $urlTemplate = '{{ nav:test }}{{ url }}{{ /nav:test }}';
-
-        $this->assertEquals('http://two.example.com/projects', (string) Antlers::parse($urlTemplate, [], true));
-
-        $mock = \Mockery::mock(\Statamic\Facades\URL::getFacadeRoot())->makePartial();
-        \Statamic\Facades\URL::swap($mock);
-        $mock->shouldReceive('getCurrent')->andReturn('/projects');
-
-        $currentTemplate = '{{ nav:test }}{{ if is_current }}current{{ else }}not-current{{ /if }}{{ /nav:test }}';
-
-        $this->assertEquals('not-current', (string) Antlers::parse($currentTemplate, [], true));
     }
 
     #[Test]
