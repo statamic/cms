@@ -9,20 +9,24 @@
             <div
                 v-if="item.invalid"
                 v-tooltip.top="__('messages.relationship_item_unavailable')"
-                v-text="__(item.title)"
                 class="line-clamp-1 text-sm text-gray-500 dark:text-gray-400"
-            />
+            >
+                <ItemLabel :item="item" :group-label="groupLabel" />
+            </div>
 
             <a
                 v-if="!item.invalid && editable"
                 @click.prevent="edit"
-                v-text="__(item.title)"
                 class="line-clamp-1 text-sm text-gray-600 dark:text-gray-300"
-                v-tooltip="item.title"
+                v-tooltip="itemTitle"
                 :href="item.edit_url"
-            />
+            >
+                <ItemLabel :item="item" :group-label="groupLabel" />
+            </a>
 
-            <div v-if="!item.invalid && !editable" v-text="__(item.title)" />
+            <div v-if="!item.invalid && !editable" class="line-clamp-1">
+                <ItemLabel :item="item" :group-label="groupLabel" />
+            </div>
 
             <inline-edit-form
                 v-if="isEditing"
@@ -68,7 +72,9 @@
 <script>
 import { getActivePinia } from 'pinia';
 import InlineEditForm from './InlineEditForm.vue';
+import ItemLabel from './ItemLabel.vue';
 import { Button, Dropdown, DropdownMenu, DropdownItem, publishContextKey as containerContextKey } from '@/components/ui';
+import { selectedSiteGroupLabel } from '@/util/site-groups.js';
 
 export default {
     components: {
@@ -77,6 +83,7 @@ export default {
         DropdownMenu,
         Dropdown,
         InlineEditForm,
+        ItemLabel,
     },
 
     inject: {
@@ -101,6 +108,48 @@ export default {
         return {
             isEditing: false,
         };
+    },
+
+    computed: {
+        itemTitle() {
+            return __(this.item.title);
+        },
+
+        sitesHaveNamedGroups() {
+            if (this.config?.type !== 'sites') {
+                return false;
+            }
+
+            const sites = Statamic.$config.get('sites') || [];
+
+            return sites.some((site) => site.group);
+        },
+
+        groupLabel() {
+            if (this.config?.type !== 'sites') {
+                return null;
+            }
+
+            return selectedSiteGroupLabel(this.itemWithSiteGroup, this.sitesHaveNamedGroups);
+        },
+
+        itemWithSiteGroup() {
+            if (this.item.group || this.item.group_handle) {
+                return this.item;
+            }
+
+            const site = (Statamic.$config.get('sites') || []).find((site) => site.handle === this.item.id);
+
+            if (!site) {
+                return this.item;
+            }
+
+            return {
+                ...this.item,
+                group: site.group,
+                group_handle: site.group_handle,
+            };
+        },
     },
 
     methods: {
