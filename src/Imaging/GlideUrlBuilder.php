@@ -25,7 +25,6 @@ class GlideUrlBuilder extends ImageUrlBuilder
      *
      * @param  \Statamic\Contracts\Assets\Asset|string  $item
      * @param  array  $params
-     * @param  string|null  $filename
      * @return string
      *
      * @throws \Exception

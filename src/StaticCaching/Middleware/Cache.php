@@ -185,7 +185,7 @@ class Cache
 
     private function canBeCached($request)
     {
-        if ($request->method() !== 'GET') {
+        if (! in_array($request->method(), ['GET', 'HEAD'])) {
             return false;
         }
 
@@ -265,7 +265,11 @@ class Cache
 
     public static function isBeingUsedOnCurrentRoute()
     {
-        return in_array(static::class, app('router')->gatherRouteMiddleware(request()->route()));
+        if (! $route = request()->route()) {
+            return false;
+        }
+
+        return in_array(static::class, app('router')->gatherRouteMiddleware($route));
     }
 
     private function outputRefreshResponse($request)

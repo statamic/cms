@@ -32,7 +32,6 @@ use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Dumper;
 use Statamic\Support\Html;
-use Statamic\Support\MethodDenylist;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\ChecksDumpability;
 use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
@@ -904,12 +903,6 @@ class CoreModifiers extends Modifier
             return Arr::get($array, $var);
         }
 
-        // Finally, try to call a method on the object
-        $method = Str::slug($var);
-        if (method_exists($item, $method) && ! MethodDenylist::blocks($method)) {
-            return $item->$method();
-        }
-
         // If after all is said and done, there's still nothing, just show the original value.
         return $value;
     }
@@ -1196,7 +1189,9 @@ class CoreModifiers extends Modifier
     /**
      * Check if an item exists in an array using "dot" notation.
      *
-     * @param  $value
+     * @param  array  $haystack
+     * @param  array  $params
+     * @param  array  $context
      * @return bool
      */
     public function inArray($haystack, $params, $context)
@@ -1710,7 +1705,6 @@ class CoreModifiers extends Modifier
     /**
      * Generate an md5 hash of a value.
      *
-     * @param  $params
      * @return string
      */
     public function md5($value)
@@ -2902,7 +2896,6 @@ class CoreModifiers extends Modifier
      * Converts a Carbon instance to a timestamp.
      *
      * @param  Carbon  $value
-     * @param  array  $params
      * @return int
      */
     public function timestamp($value)
@@ -3359,7 +3352,7 @@ class CoreModifiers extends Modifier
         }
 
         if (config('statamic.system.localize_dates_in_modifiers')) {
-            $value->setTimezone(Statamic::displayTimezone());
+            $value = $value->copy()->setTimezone(Statamic::displayTimezone());
         }
 
         return $value;

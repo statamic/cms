@@ -57,6 +57,7 @@ const {
 } = injectFieldsContext();
 
 const { direction } = useUiDirection();
+const isFormSubmission = inject('isFormSubmission', false);
 
 const asConfig = computed(() => fieldsAsConfig.value ?? containerAsConfig.value ?? false);
 const fieldPathPrefix = computed(() => props.fieldPathPrefix || injectedFieldPathPrefix.value);
@@ -155,6 +156,23 @@ const shouldShowField = computed(() => {
     ).showField(props.config, fullPath.value);
 });
 
+// Only applies when hidden by conditions; blueprint "hidden" visibility still removes the field from layout.
+const reserveSpaceWhenHiddenEnabled = computed(
+    () => props.config.reserve_space_when_hidden === true && props.config.visibility !== 'hidden',
+);
+
+const shouldHideFieldVisually = computed(
+    () => reserveSpaceWhenHiddenEnabled.value && !shouldShowField.value,
+);
+
+// Hidden fieldtypes are mounted like any other field so they take part in field
+// conditions, but they only become visible on a form submission.
+const isHiddenFieldtype = computed(() => props.config.type === 'hidden' && !isFormSubmission);
+
+const shouldRenderField = computed(
+    () => !isHiddenFieldtype.value && (shouldShowField.value || reserveSpaceWhenHiddenEnabled.value),
+);
+
 const shouldShowLabelText = computed(() => !props.config.hide_display);
 
 // Whether the label renders anything visible. When it doesn't, we avoid rendering
@@ -169,6 +187,8 @@ const shouldShowLabel = computed(
 );
 
 const shouldShowFieldPreviews = computed(() => {
+    if (isHiddenFieldtype.value) return false;
+
     if (! props.config.replicator_preview) return false;
 
     return inject('showReplicatorFieldPreviews', false);
@@ -238,8 +258,9 @@ const fieldtypeComponentEvents = computed(() => ({
         :shouldShowField="shouldShowField"
     >
         <Field
-            v-show="shouldShowField"
-            :class="`${config.type}-fieldtype`"
+            v-show="shouldRenderField"
+            :class="[`${config.type}-fieldtype`, { 'opacity-0 pointer-events-none': shouldHideFieldVisually }]"
+            :inert="shouldHideFieldVisually"
             :id="fieldId"
             :dir="direction"
             :instructions="config.instructions"
@@ -263,7 +284,7 @@ const fieldtypeComponentEvents = computed(() => ({
                         />
                     </Transition>
                     <template v-if="shouldShowLabelText">
-                        <span v-tooltip="config.handle">
+                        <span v-tooltip="{ content: config.handle, copyable: true }">
                             {{ __(config.display) }}
                         </span>
                     </template>

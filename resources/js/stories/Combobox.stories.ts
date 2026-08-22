@@ -383,6 +383,50 @@ export const _IgnoreFilter: Story = {
     }),
 };
 
+const searchKeysCode = `
+<Combobox
+    placeholder="Select author..."
+    :search-keys="['label', 'email']"
+    :options="[
+        { label: 'Tyler Lyle', email: 'workhorse92@example.com', value: 'tyler' },
+        { label: 'Tim McEwan', email: 'nightowl47@example.com', value: 'tim' },
+        { label: 'Nikki Flores', email: 'skyline08@example.com', value: 'nikki' },
+    ]"
+/>
+`;
+
+export const _SearchKeys: Story = {
+    tags: ['!dev'],
+    parameters: {
+        docs: {
+            source: { code: searchKeysCode },
+            description: {
+                story: 'By default, search only matches against `optionLabel`. Use `searchKeys` to also match against other keys on the option object — useful when an option has a value that isn\'t displayed but should still be searchable, such as an email address. Try searching "nightowl" below — it only appears in Tim McEwan\'s email, not his label.',
+            },
+        },
+    },
+    render: () => ({
+        components: { Combobox },
+        setup() {
+            const value = ref(null);
+            const options = [
+                { label: 'Tyler Lyle', email: 'workhorse92@example.com', value: 'tyler' },
+                { label: 'Tim McEwan', email: 'nightowl47@example.com', value: 'tim' },
+                { label: 'Nikki Flores', email: 'skyline08@example.com', value: 'nikki' },
+            ];
+            return { value, options };
+        },
+        template: `
+            <Combobox
+                v-model="value"
+                placeholder="Select author..."
+                :search-keys="['label', 'email']"
+                :options="options"
+            />
+        `,
+    }),
+};
+
 const optionSlotsCode = `
 <Combobox 
     placeholder="Select author..." 
@@ -727,6 +771,40 @@ export const TestCanSearchOptions: Story = {
     },
 };
 
+export const TestSearchKeysMatchesAdditionalFields: Story = {
+    tags: ['!dev', 'test'],
+    render: () => ({
+        components: { Combobox },
+        setup() {
+            const value = ref(null);
+            const options = [
+                { label: 'Tyler Lyle', email: 'workhorse92@example.com', value: 'tyler' },
+                { label: 'Tim McEwan', email: 'nightowl47@example.com', value: 'tim' },
+                { label: 'Nikki Flores', email: 'skyline08@example.com', value: 'nikki' },
+            ];
+            return { value, options };
+        },
+        template: `<Combobox v-model="value" :options="options" :search-keys="['label', 'email']" placeholder="Select..." />`,
+    }),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const trigger = canvas.getByRole('combobox');
+
+        await userEvent.click(trigger);
+
+        const input = document.querySelector('input[type="search"]') as HTMLInputElement;
+
+        // "nightowl" only appears in Tim McEwan's email, not in any label.
+        await userEvent.type(input, 'nightowl');
+
+        await new Promise((r) => setTimeout(r, 100));
+
+        const options = document.querySelectorAll('[data-ui-combobox-item]');
+        expect(options.length).toBe(1);
+        expect(options[0].getAttribute('data-ui-combobox-item')).toBe('tim');
+    },
+};
+
 export const TestSearchDisabledWhenNotSearchable: Story = {
     tags: ['!dev', 'test'],
     render: () => ({
@@ -796,6 +874,205 @@ export const TestTaggableCanAddOptions: Story = {
 
         await expect(args['onUpdate:modelValue']).toHaveBeenCalled();
         expect(args.onAdded).toHaveBeenCalledWith('new-tag');
+    },
+};
+
+export const TestTaggableCommitsOnBlur: Story = {
+    tags: ['!dev', 'test'],
+    args: {
+        'onUpdate:modelValue': fn(),
+    },
+    render: (args) => ({
+        components: { Combobox },
+        setup() {
+            const value = ref<string[]>([]);
+            return { value, options: defaultOptions, onUpdate: args['onUpdate:modelValue'] };
+        },
+        template: `<Combobox v-model="value" :options="options" multiple taggable placeholder="Add tags..." @update:modelValue="onUpdate" />`,
+    }),
+    play: async ({ canvasElement, args }) => {
+        const canvas = within(canvasElement);
+        const trigger = canvas.getByRole('combobox');
+
+        await userEvent.click(trigger);
+
+        const input = document.querySelector('input[type="search"]') as HTMLInputElement;
+        await userEvent.click(input);
+        await userEvent.type(input, 'new-tag');
+        input.blur();
+
+        await waitFor(() => expect(args['onUpdate:modelValue']).toHaveBeenCalledWith(['new-tag']));
+    },
+};
+
+export const TestTaggablePasteSplitsIntoTags: Story = {
+    tags: ['!dev', 'test'],
+    args: {
+        'onUpdate:modelValue': fn(),
+    },
+    render: (args) => ({
+        components: { Combobox },
+        setup() {
+            const value = ref<string[]>([]);
+            return { value, options: defaultOptions, onUpdate: args['onUpdate:modelValue'] };
+        },
+        template: `<Combobox v-model="value" :options="options" multiple taggable placeholder="Add tags..." @update:modelValue="onUpdate" />`,
+    }),
+    play: async ({ canvasElement, args }) => {
+        const canvas = within(canvasElement);
+        const trigger = canvas.getByRole('combobox');
+
+        await userEvent.click(trigger);
+
+        const input = document.querySelector('input[type="search"]') as HTMLInputElement;
+        await userEvent.click(input);
+        await userEvent.paste('one, two');
+
+        await waitFor(() => expect(args['onUpdate:modelValue']).toHaveBeenCalledWith(['one', 'two']));
+    },
+};
+
+export const TestTaggableSingleCanAddOption: Story = {
+    tags: ['!dev', 'test'],
+    args: {
+        'onUpdate:modelValue': fn(),
+        onAdded: fn(),
+    },
+    render: (args) => ({
+        components: { Combobox },
+        setup() {
+            const value = ref<string | null>(null);
+            return { value, options: defaultOptions, onUpdate: args['onUpdate:modelValue'], onAdded: args.onAdded };
+        },
+        template: `<Combobox v-model="value" :options="options" taggable placeholder="Add a tag..." @update:modelValue="onUpdate" @added="onAdded" />`,
+    }),
+    play: async ({ canvasElement, args }) => {
+        const canvas = within(canvasElement);
+        const trigger = canvas.getByRole('combobox');
+
+        await userEvent.click(trigger);
+
+        const input = document.querySelector('input[type="search"]') as HTMLInputElement;
+        await userEvent.click(input);
+        await userEvent.type(input, 'new-tag');
+        await userEvent.keyboard('{Enter}');
+
+        await expect(args['onUpdate:modelValue']).toHaveBeenCalledWith('new-tag');
+        expect(args.onAdded).toHaveBeenCalledWith('new-tag');
+
+        await waitFor(() => expect(document.querySelector('[data-ui-combobox-content]')).toBeFalsy());
+    },
+};
+
+export const TestTaggableSingleCommitsOnBlur: Story = {
+    tags: ['!dev', 'test'],
+    args: {
+        'onUpdate:modelValue': fn(),
+    },
+    render: (args) => ({
+        components: { Combobox },
+        setup() {
+            const value = ref<string | null>(null);
+            return { value, options: defaultOptions, onUpdate: args['onUpdate:modelValue'] };
+        },
+        template: `<Combobox v-model="value" :options="options" taggable placeholder="Add a tag..." @update:modelValue="onUpdate" />`,
+    }),
+    play: async ({ canvasElement, args }) => {
+        const canvas = within(canvasElement);
+        const trigger = canvas.getByRole('combobox');
+
+        await userEvent.click(trigger);
+
+        const input = document.querySelector('input[type="search"]') as HTMLInputElement;
+        await userEvent.click(input);
+        await userEvent.type(input, 'new-tag');
+        input.blur();
+
+        await waitFor(() => expect(args['onUpdate:modelValue']).toHaveBeenCalledWith('new-tag'));
+    },
+};
+
+export const TestTaggableSingleIgnoresDuplicateValue: Story = {
+    tags: ['!dev', 'test'],
+    args: {
+        onAdded: fn(),
+    },
+    render: (args) => ({
+        components: { Combobox },
+        setup() {
+            const value = ref('existing-tag');
+            return { value, options: defaultOptions, onAdded: args.onAdded };
+        },
+        template: `<Combobox v-model="value" :options="options" taggable placeholder="Add a tag..." @added="onAdded" />`,
+    }),
+    play: async ({ canvasElement, args }) => {
+        const canvas = within(canvasElement);
+        const trigger = canvas.getByRole('combobox');
+
+        await userEvent.click(trigger);
+
+        const input = document.querySelector('input[type="search"]') as HTMLInputElement;
+        await userEvent.click(input);
+        await userEvent.type(input, 'existing-tag');
+        await userEvent.keyboard('{Enter}');
+
+        expect(args.onAdded).not.toHaveBeenCalled();
+        await waitFor(() => expect(input.value).toBe(''));
+    },
+};
+
+export const TestTaggableSingleAllowsValueContainedInCurrentValue: Story = {
+    tags: ['!dev', 'test'],
+    args: {
+        'onUpdate:modelValue': fn(),
+    },
+    render: (args) => ({
+        components: { Combobox },
+        setup() {
+            const value = ref('abc');
+            return { value, options: defaultOptions, onUpdate: args['onUpdate:modelValue'] };
+        },
+        template: `<Combobox v-model="value" :options="options" taggable placeholder="Add a tag..." @update:modelValue="onUpdate" />`,
+    }),
+    play: async ({ canvasElement, args }) => {
+        const canvas = within(canvasElement);
+        const trigger = canvas.getByRole('combobox');
+
+        await userEvent.click(trigger);
+
+        const input = document.querySelector('input[type="search"]') as HTMLInputElement;
+        await userEvent.click(input);
+        await userEvent.type(input, 'b');
+        await userEvent.keyboard('{Enter}');
+
+        await expect(args['onUpdate:modelValue']).toHaveBeenCalledWith('b');
+    },
+};
+
+export const TestTaggableSinglePasteDoesNotCommitTags: Story = {
+    tags: ['!dev', 'test'],
+    args: {
+        'onUpdate:modelValue': fn(),
+    },
+    render: (args) => ({
+        components: { Combobox },
+        setup() {
+            const value = ref<string | null>(null);
+            return { value, options: defaultOptions, onUpdate: args['onUpdate:modelValue'] };
+        },
+        template: `<Combobox v-model="value" :options="options" taggable placeholder="Add a tag..." @update:modelValue="onUpdate" />`,
+    }),
+    play: async ({ canvasElement, args }) => {
+        const canvas = within(canvasElement);
+        const trigger = canvas.getByRole('combobox');
+
+        await userEvent.click(trigger);
+
+        const input = document.querySelector('input[type="search"]') as HTMLInputElement;
+        await userEvent.click(input);
+        await userEvent.paste('one, two');
+
+        expect(args['onUpdate:modelValue']).not.toHaveBeenCalled();
     },
 };
 
