@@ -159,7 +159,7 @@ class Outpost
 
     private function payloadHasChanged($previous, $current)
     {
-        $exclude = ['ip', 'php_version'];
+        $exclude = ['host', 'ip', 'port', 'php_version'];
 
         return Arr::except($previous, $exclude) !== Arr::except($current, $exclude);
     }
