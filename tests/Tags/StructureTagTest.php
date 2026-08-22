@@ -457,6 +457,32 @@ EOT;
     }
 
     #[Test]
+    public function it_sets_is_external_for_a_nav()
+    {
+        $this->setSiteValue('en', 'url', 'http://localhost/');
+
+        $this->makeNav([
+            ['id' => '1', 'title' => 'Entry', 'url' => '/about'],
+            ['id' => '2', 'title' => 'Homepage anchor', 'url' => '/#anchor'],
+            ['id' => '3', 'title' => 'Bare anchor', 'url' => '#anchor'],
+            ['id' => '4', 'title' => 'Page anchor', 'url' => '/about#anchor'],
+            ['id' => '5', 'title' => 'Query string', 'url' => '/about?query=1'],
+            ['id' => '6', 'title' => 'Own domain', 'url' => 'http://localhost/about'],
+            ['id' => '7', 'title' => 'External', 'url' => 'https://statamic.com'],
+            ['id' => '8', 'title' => 'Protocol relative', 'url' => '//statamic.com'],
+            ['id' => '9', 'title' => 'Email', 'url' => 'mailto:foo@statamic.com'],
+            ['id' => '10', 'title' => 'Phone', 'url' => 'tel:+441234567890'],
+        ]);
+
+        $template = '{{ nav:test }}[{{ id }}{{ if is_external }}=external{{ /if }}]{{ /nav:test }}';
+
+        $this->assertEquals(
+            '[1][2][3][4][5][6][7=external][8=external][9=external][10=external]',
+            (string) Antlers::parse($template, [], true)
+        );
+    }
+
+    #[Test]
     public function it_uses_the_absolute_url_for_a_nav_entry_link_on_another_site()
     {
         $this->makeCrossSiteNav();
