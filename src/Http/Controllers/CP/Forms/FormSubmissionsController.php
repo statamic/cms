@@ -123,7 +123,7 @@ class FormSubmissionsController extends CpController
         return response('', 204);
     }
 
-    public function show($form, $submission)
+    public function show(Request $request, $form, $submission)
     {
         if (! $submission = $form->submission($submission)) {
             return $this->pageNotFound();
@@ -134,17 +134,36 @@ class FormSubmissionsController extends CpController
         $blueprint = $form->blueprint();
         $fields = $blueprint->fields()->addValues($submission->data()->all())->preProcess();
 
-        return Inertia::render('forms/Submission', [
-            'form' => $form,
-            'can' => $this->formAbilities($form),
+        $data = [
             'id' => $submission->id(),
-            'formTitle' => $form->title(),
             'status' => $submission->status(),
             'date' => $submission->date()->toIso8601String(),
             'blueprint' => $blueprint->toPublishArray(),
             'values' => $fields->values(),
             'meta' => $fields->meta(),
-        ]);
+        ];
+
+        if ($request->wantsJson()) {
+            return $data;
+        }
+
+        if ($id = $submission->get('entry')) {
+            $entry = $submission->entry();
+
+            $entryData = [
+                'id' => $id,
+                'title' => $entry?->value('title'),
+                'edit_url' => $entry?->editUrl(),
+                'status' => $entry?->status(),
+            ];
+        }
+
+        return Inertia::render('forms/Submission', array_merge($data, [
+            'form' => $form,
+            'can' => $this->formAbilities($form),
+            'formTitle' => $form->title(),
+            'entry' => $entryData ?? null,
+        ]));
     }
 
     public function generateFake(Request $request, $form, FakeSubmissionGenerator $generator)

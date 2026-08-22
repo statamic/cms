@@ -1,7 +1,7 @@
 <script setup>
 import { computed, provide } from 'vue';
 import Head from '@/pages/layout/Head.vue';
-import { PublishForm } from '@ui';
+import { Badge, PublishForm, StatusIndicator } from '@ui';
 import { dateFormatter } from '@api';
 import Layout from '@/pages/layout/Layout.vue';
 import PanelLayout from '@/pages/layout/PanelLayout.vue';
@@ -21,6 +21,7 @@ const props = defineProps([
     'blueprint',
     'values',
     'meta',
+    'entry',
 ]);
 
 const { showFieldNumbers } = useFieldNumberingPreference();
@@ -73,6 +74,10 @@ provide('isFormSubmission', true);
                 {{ formattedDate }}
             </template>
             <template #actions>
+                <Badge v-if="entry" size="lg" :href="entry.edit_url" target="_blank">
+                    <StatusIndicator v-if="entry.status" :status="entry.status" class="h-1" />
+                    <span v-text="entry.title || __('Deleted entry')" />
+                </Badge>
                 <FieldNumberingToggle />
             </template>
         </PublishForm>
