@@ -1,5 +1,5 @@
 <template>
-    <div data-asset-browser class="@container relative w-full bg-gray-50 dark:bg-transparent rounded-xl">
+    <div data-asset-browser class="@container relative w-full bg-gray-50 dark:bg-transparent rounded-xl [.link-fieldtype_&]:bg-transparent">
         <div
             v-if="hasPendingDynamicFolder"
             class="w-full rounded-md border border-dashed px-4 py-3 text-sm text-gray-700 dark:border-gray-300 dark:text-gray-200"
@@ -56,7 +56,7 @@
                         @keyup.space.enter="openSelector"
                     />
 
-                    <div class="min-w-0 flex-1 flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400" v-if="canUpload">
+                    <div class="min-w-0 flex-1 hidden not-[.link-fieldtype_&]:flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400" v-if="canUpload">
                         <ui-icon name="upload-cloud" class="size-5 shrink-0 text-gray-500 hidden @sm:block" />
                         <div class="min-w-0">
                             <span class="hidden @sm:inline">{{ __('Drag & drop here or') }}&nbsp;</span>
@@ -150,7 +150,7 @@
                     </sortable-list>
 
                     <div
-                        class="relative overflow-hidden rounded-xl border border-gray-300 dark:border-gray-700"
+                        class="relative overflow-hidden rounded-xl border border-gray-300 dark:border-gray-700 [.link-fieldtype_&]:rounded-lg"
                         :class="{ 'not-[.link-fieldtype_&]:border-t-0! not-[.link-fieldtype_&]:rounded-t-none': !isReadOnly && (showPicker || uploads.length), 'border-dashed': isReadOnly }"
                         v-if="displayMode === 'list'"
                     >
