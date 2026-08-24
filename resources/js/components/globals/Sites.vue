@@ -274,6 +274,12 @@ export default {
         },
 
         setSiteOrigin(site, origin) {
+            if (origin && this.wouldCreateOriginCycle(site.handle, origin)) {
+                this.$toast.error(__('Origin sites cannot reference each other in a loop.'));
+
+                return;
+            }
+
             site.origin = origin;
 
             if (!origin) {
@@ -305,6 +311,19 @@ export default {
                 originSite.enabled = true;
             }
 
+            const blocked = this.sites.some(
+                (site) => selected.has(site.handle)
+                    && site.handle !== origin
+                    && this.wouldCreateOriginCycle(site.handle, origin),
+            );
+
+            if (blocked) {
+                this.$toast.error(__('Origin sites cannot reference each other in a loop.'));
+                this.massOrigin = null;
+
+                return;
+            }
+
             this.sites.forEach((site) => {
                 if (!selected.has(site.handle) || site.handle === origin) {
                     return;
@@ -316,6 +335,28 @@ export default {
 
             this.massOrigin = null;
             this.clearSelections();
+        },
+
+        wouldCreateOriginCycle(siteHandle, originHandle) {
+            const origins = Object.fromEntries(
+                (this.sites ?? []).map((site) => [site.handle, site.origin]),
+            );
+
+            origins[siteHandle] = originHandle;
+
+            const seen = {};
+            let current = siteHandle;
+
+            while (current) {
+                if (seen[current]) {
+                    return true;
+                }
+
+                seen[current] = true;
+                current = origins[current] || null;
+            }
+
+            return false;
         },
     },
 };
