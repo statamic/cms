@@ -112,6 +112,11 @@ const visibleValues = computed(() => {
     const omittable = Object.keys(hiddenFields.value).filter(
         (field) => hiddenFields.value[field].omitValue,
     );
+
+    // When nothing is omitted, hand back the live tree rather than cloning it on every
+    // keystroke. Consumers must treat visibleValues as read-only.
+    if (omittable.length === 0) return values.value;
+
     return new Values(values.value).except(omittable);
 });
 
