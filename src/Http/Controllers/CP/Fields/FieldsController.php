@@ -128,6 +128,11 @@ class FieldsController extends CpController
             $customMessages['mode.in'] = __('statamic::validation.date_fieldtype_only_single_mode_allowed');
         }
 
+        if ($request->type === 'users' && ($maxItems = Arr::get($request->values, 'max_items'))) {
+            $extraRules['default'] = ['array', 'max:'.$maxItems];
+            $customMessages['default.max'] = __('statamic::validation.users_fieldtype_default_max_items', ['max' => $maxItems]);
+        }
+
         $fields->validate($extraRules, $customMessages);
 
         $values = array_merge($request->values, $fields->process()->values()->all());

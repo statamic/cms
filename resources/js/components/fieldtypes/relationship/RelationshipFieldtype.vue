@@ -49,7 +49,15 @@ export default {
 
     computed: {
         maxItems() {
-            return this.config.max_items || Infinity;
+            if (this.config.max_items) {
+                return this.config.max_items;
+            }
+
+            if (this.publishContainer?.asConfig && this.handle === 'default') {
+                return this.publishContainer.values?.max_items || Infinity;
+            }
+
+            return Infinity;
         },
 
         columns() {
