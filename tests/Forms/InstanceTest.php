@@ -28,12 +28,12 @@ class InstanceTest extends TestCase
     {
         parent::setUp();
 
-        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true)->byDefault();
     }
 
     private function makeForm(array $data = [])
     {
-        return tap(Form::make('contact')->data($data))->save();
+        return tap(Form::make('contact')->data(array_merge(['unique_instances' => true], $data)))->save();
     }
 
     private function makeEntry(string $id, array $formValue): void
@@ -58,6 +58,24 @@ class InstanceTest extends TestCase
         $this->assertEquals('event-1', $instance->entry());
 
         $this->assertNull($form->instance()->entry());
+    }
+
+    #[Test]
+    public function the_entry_is_dropped_without_unique_instances()
+    {
+        $form = $this->makeForm(['unique_instances' => false]);
+
+        $this->assertNull($form->instance('event-1')->entry());
+    }
+
+    #[Test]
+    public function the_entry_is_dropped_without_forms_pro()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(false);
+
+        $form = $this->makeForm();
+
+        $this->assertNull($form->instance('event-1')->entry());
     }
 
     #[Test]
@@ -99,6 +117,26 @@ class InstanceTest extends TestCase
         tap(Entry::find('event-1')->makeLocalization('fr')->id('event-1-fr'))->save();
 
         $this->assertEquals(1, $form->instance('event-1-fr')->config('submission_limit'));
+    }
+
+    #[Test]
+    public function overrides_are_found_in_nested_fields()
+    {
+        $form = $this->makeForm(['submission_limit' => 5]);
+
+        Blueprint::make('event')->setNamespace('collections.events')->setContents(['fields' => [
+            ['handle' => 'blocks', 'field' => ['type' => 'replicator', 'sets' => [
+                'rsvp' => ['fields' => [
+                    ['handle' => 'rsvp_form', 'field' => ['type' => 'form', 'max_items' => 1]],
+                ]],
+            ]]],
+        ]])->save();
+
+        (new EntryFactory)->collection('events')->id('event-1')->slug('event-1')->data(['blocks' => [
+            ['type' => 'rsvp', 'rsvp_form' => ['form' => 'contact', 'config' => ['submission_limit' => 1]]],
+        ]])->create();
+
+        $this->assertEquals(1, $form->instance('event-1')->config('submission_limit'));
     }
 
     #[Test]

@@ -40,7 +40,13 @@ class FormSubmissionsController extends CpController
             ->prepend(Column::make('status'), 'status')
             ->when(
                 $form->hasUniqueInstances(),
-                fn (Columns $columns) => $columns->prepend(Column::make('entry')->fieldtype('relationship')->sortable(false), 'entry')
+                fn (Columns $columns) => $columns->prepend(
+                    Column::make('entry')
+                        ->label(__('Entry'))
+                        ->fieldtype('relationship')
+                        ->sortable(false),
+                    'entry'
+                )
             )
             ->prepend(Column::make('datestamp'), 'datestamp')
             ->setPreferred("forms.{$form->handle()}.columns")
@@ -147,7 +153,7 @@ class FormSubmissionsController extends CpController
             return $data;
         }
 
-        if ($id = $submission->get('entry')) {
+        if ($form->hasUniqueInstances() && ($id = $submission->get('entry'))) {
             $entry = $submission->entry();
 
             $entryData = [

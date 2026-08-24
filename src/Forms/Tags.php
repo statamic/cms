@@ -99,7 +99,7 @@ class Tags extends BaseTags
             $data['previous_page_url'] = $this->previousPageUrl();
         }
 
-        $instance = $form->instance($form->hasUniqueInstances() ? $this->context->value('id') : null);
+        $instance = $form->instance($this->context->value('id'));
 
         $data['restricted'] = $instance->restricted();
         $data['restriction_message'] = $instance->restrictionMessage();

@@ -483,7 +483,7 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
 
     public function instance(?string $entry = null): Instance
     {
-        return new Instance($this, $entry);
+        return new Instance($this, $entry && $this->hasUniqueInstances() ? $entry : null);
     }
 
     public function status(): string
