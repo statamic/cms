@@ -129,7 +129,7 @@ export default {
             let key = field;
 
             if (relative && this.fieldPathPrefix) {
-                let dottedPrefix = this.fieldPathPrefix.replace(new RegExp('\.' + this.handle + '$'), '');
+                let dottedPrefix = this.fieldPathPrefix.replace(new RegExp('\\.' + this.handle + '$'), '');
                 key = dottedPrefix + '.' + field;
             }
 
