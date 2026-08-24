@@ -175,13 +175,17 @@ watch(
     (values) => {
         dirty();
         emit('update:modelValue', values);
+        emit('update:visibleValues', visibleValues.value);
     },
     { deep: true },
 );
 
+// visibleValues is derived from values and hiddenFields, and the values watcher above
+// already covers the former. Watching hiddenFields here avoids a second deep traversal
+// of the whole values tree on every keystroke.
 watch(
-    visibleValues,
-    (values) => emit('update:visibleValues', values),
+    hiddenFields,
+    () => emit('update:visibleValues', visibleValues.value),
     { deep: true },
 );
 
