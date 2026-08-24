@@ -202,7 +202,7 @@ class GlobalsController extends CpController
 
         if (Site::multiEnabled()) {
             $fields['sites'] = [
-                'display' => __('Sites'),
+                'display' => __('Localization'),
                 'fields' => [
                     'sites' => [
                         'type' => 'global_set_sites',
