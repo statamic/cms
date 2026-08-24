@@ -147,6 +147,7 @@ return [
     'form_configure_require_login_instructions' => 'Only allow logged in users to submit this form.',
     'form_configure_require_login_message_instructions' => 'Shown when a logged out visitor tries to submit the form. Leave blank to use the default message.',
     'form_closed_message' => 'This form is no longer accepting submissions.',
+    'form_entry_required' => 'This form must be submitted from an entry.',
     'form_fieldtype_configure_instructions' => 'These settings override the form\'s own settings for this entry. Leave a field empty to use the form\'s setting.',
     'form_require_login_message' => 'You must be logged in to submit this form.',
     'form_create_description' => 'Get started by creating your first form.',

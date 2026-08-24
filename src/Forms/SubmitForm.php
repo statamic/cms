@@ -9,7 +9,6 @@ use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\Contracts\Forms\Form;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Events\FormSubmitted;
-use Statamic\Exceptions\EntryNotFoundException;
 use Statamic\Exceptions\FormRestrictedException;
 use Statamic\Exceptions\SilentFormFailureException;
 use Statamic\Facades\Asset;
@@ -19,6 +18,8 @@ use Statamic\Facades\Site;
 use Statamic\Forms\Logic\PageLogic;
 use Statamic\Rules\AllowedFile;
 use Statamic\Support\Arr;
+
+use function Statamic\trans as __;
 
 class SubmitForm
 {
@@ -125,11 +126,24 @@ class SubmitForm
             return null;
         }
 
-        try {
-            return Entry::findOrFail($this->entry);
-        } catch (EntryNotFoundException) {
-            throw ValidationException::withMessages(['*' => ['This form must be submitted from an entry.']]);
+        $entry = $this->entry ? Entry::find($this->entry) : null;
+
+        if (! $entry || ! $this->entryUsesForm($entry)) {
+            throw ValidationException::withMessages(['*' => [__('statamic::messages.form_entry_required')]]);
         }
+
+        return $entry;
+    }
+
+    private function entryUsesForm(EntryContract $entry): bool
+    {
+        return $entry->blueprint()->fields()->all()
+            ->filter(fn ($field) => $field->type() === 'form')
+            ->contains(function ($field) use ($entry) {
+                $handles = $field->fieldtype()->toQueryableValue($entry->value($field->handle()));
+
+                return in_array($this->form->handle(), Arr::wrap($handles), true);
+            });
     }
 
     /**

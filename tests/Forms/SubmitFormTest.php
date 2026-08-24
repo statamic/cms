@@ -1171,7 +1171,7 @@ class SubmitFormTest extends TestCase
     #[Test]
     public function it_attaches_the_entry_when_unique_instances_is_enabled()
     {
-        (new EntryFactory)->collection('events')->id('event-1')->slug('event-one')->create();
+        $this->makeEntry('event-1', ['form' => 'contact', 'config' => []]);
 
         $this->form->set('unique_instances', true)->save();
 
@@ -1201,6 +1201,18 @@ class SubmitFormTest extends TestCase
     }
 
     #[Test]
+    public function it_rejects_the_submission_when_the_entry_doesnt_use_the_form()
+    {
+        $this->makeEntry('event-1', ['form' => 'another_form', 'config' => []]);
+
+        $this->form->set('unique_instances', true)->save();
+
+        $this->expectException(ValidationException::class);
+
+        $this->action()->entry('event-1')->submit(['email' => 'san@holo.com']);
+    }
+
+    #[Test]
     public function it_ignores_the_entry_when_unique_instances_is_disabled()
     {
         (new EntryFactory)->collection('events')->id('event-1')->slug('event-one')->create();
@@ -1213,13 +1225,7 @@ class SubmitFormTest extends TestCase
     #[Test]
     public function it_rejects_the_submission_when_an_entry_override_restricts_the_form()
     {
-        Blueprint::make('event')->setNamespace('collections.events')->setContents(['fields' => [
-            ['handle' => 'rsvp_form', 'field' => ['type' => 'form', 'max_items' => 1]],
-        ]])->save();
-
-        (new EntryFactory)->collection('events')->id('event-1')->slug('event-one')->data([
-            'rsvp_form' => ['form' => 'contact', 'config' => ['close_date' => '2020-01-01 09:00']],
-        ])->create();
+        $this->makeEntry('event-1', ['form' => 'contact', 'config' => ['close_date' => '2020-01-01 09:00']]);
 
         $this->form->set('unique_instances', true)->save();
 
@@ -1238,6 +1244,15 @@ class SubmitFormTest extends TestCase
         $result = $this->action()->submit(['email' => 'san@holo.com']);
 
         $this->assertFalse($result->submission->has('entry'));
+    }
+
+    private function makeEntry(string $id, array $formValue): void
+    {
+        Blueprint::make('event')->setNamespace('collections.events')->setContents(['fields' => [
+            ['handle' => 'rsvp_form', 'field' => ['type' => 'form', 'max_items' => 1]],
+        ]])->save();
+
+        (new EntryFactory)->collection('events')->id($id)->slug($id)->data(['rsvp_form' => $formValue])->create();
     }
 
     private function uploadForm(bool $honeypot = false)
