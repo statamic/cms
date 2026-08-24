@@ -234,29 +234,39 @@ const placeholder = computed(() => {
 });
 
 const filteredOptions = computed(() => {
-    if (!props.searchable || props.ignoreFilter) {
-        return props.options;
+    let results = [...props.options];
+
+    if (props.searchable && !props.ignoreFilter) {
+        const matches = new Set(
+            fuzzysort
+                .go(searchQuery.value, props.options, {
+                    all: true,
+                    ...(props.searchKeys?.length ? { keys: props.searchKeys } : { key: props.optionLabel }),
+                })
+                .map((result) => result.obj)
+        );
+
+        results = props.options.filter((option) => matches.has(option));
     }
 
-    const matches = new Set(
-        fuzzysort
-            .go(searchQuery.value, props.options, {
-                all: true,
-                ...(props.searchKeys?.length ? { keys: props.searchKeys } : { key: props.optionLabel }),
-            })
-            .map((result) => result.obj)
-    );
-
-    const results = props.options.filter((option) => matches.has(option));
-
-    if (props.taggable && searchQuery.value && results.length === 0) {
-        results.push({
+    if (shouldShowCreateOption.value) {
+        results.unshift({
             [props.optionLabel]: searchQuery.value,
             [props.optionValue]: searchQuery.value,
+            create: true,
         });
     }
 
     return results;
+});
+
+const shouldShowCreateOption = computed(() => {
+    if (!props.taggable || !searchQuery.value) return false;
+
+    const matchesSearchQuery = (option) =>
+        getOptionLabel(option) === searchQuery.value || String(getOptionValue(option)) === searchQuery.value;
+
+    return !props.options.some(matchesSearchQuery) && !selectedOptions.value.some(matchesSearchQuery);
 });
 
 function clear() {
@@ -264,7 +274,9 @@ function clear() {
     emit('update:modelValue', null);
 }
 
-function select() {
+function select(option) {
+    if (option.create) emit('added', getOptionValue(option));
+
     dropdownOpen.value = !shouldCloseOnSelect.value;
     if (shouldCloseOnSelect.value) triggerRef.value?.$el?.focus();
 }
@@ -333,6 +345,7 @@ function onPaste(e) {
 
 function pushTaggableOption(e) {
     if (!props.taggable) return;
+    if (e.defaultPrevented) return; // Reka prevents the event's default when it selects a highlighted option.
     if (e.target.value === '') return;
 
     e.preventDefault();
@@ -509,12 +522,15 @@ defineExpose({
                                             :class="itemClasses({ size: size, selected: isSelected(option) })"
                                             :data-ui-combobox-item="getOptionValue(option)"
                                             :title="getOptionLabel(option)"
-                                            @select="select"
+                                            @select="select(option)"
                                         >
                                             <slot name="option" v-bind="option">
-                                                <img v-if="option.image" :src="option.image" class="size-5 rounded-full" :alt="getOptionLabel(option)">
-                                                <span v-if="labelHtml" class="truncate" v-html="getOptionLabel(option)" />
-                                                <span class="truncate" v-else>{{ __(getOptionLabel(option)) }}</span>
+                                                <span v-if="option.create" class="truncate">{{ __('Add ":value"', { value: getOptionLabel(option) }) }}</span>
+                                                <template v-else>
+                                                    <img v-if="option.image" :src="option.image" class="size-5 rounded-full" :alt="getOptionLabel(option)">
+                                                    <span v-if="labelHtml" class="truncate" v-html="getOptionLabel(option)" />
+                                                    <span class="truncate" v-else>{{ __(getOptionLabel(option)) }}</span>
+                                                </template>
                                             </slot>
                                         </ComboboxItem>
                                     </div>
