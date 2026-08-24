@@ -323,6 +323,45 @@ class EntryTest extends TestCase
     }
 
     #[Test]
+    public function it_rejects_saving_when_origins_form_a_cycle()
+    {
+        Collection::make('test')->sites(['en', 'fr'])->save();
+
+        $this->setSites([
+            'en' => ['locale' => 'en_US', 'url' => '/'],
+            'fr' => ['locale' => 'fr_FR', 'url' => '/fr'],
+        ]);
+
+        $english = EntryFactory::id('en-entry')->locale('en')->collection('test')->create();
+        $french = EntryFactory::id('fr-entry')->locale('fr')->collection('test')->origin($english)->create();
+
+        $english->origin($french);
+
+        $this->expectException(\Illuminate\Validation\ValidationException::class);
+
+        $english->save();
+    }
+
+    #[Test]
+    public function ancestors_stop_when_origins_form_a_cycle()
+    {
+        Collection::make('test')->sites(['en', 'fr'])->save();
+
+        $this->setSites([
+            'en' => ['locale' => 'en_US', 'url' => '/'],
+            'fr' => ['locale' => 'fr_FR', 'url' => '/fr'],
+        ]);
+
+        $english = EntryFactory::id('en-entry')->locale('en')->collection('test')->create();
+        $french = EntryFactory::id('fr-entry')->locale('fr')->collection('test')->origin($english)->create();
+
+        $english->origin($french);
+
+        $this->assertEquals(['fr-entry', 'en-entry'], $english->ancestors()->map->id()->all());
+        $this->assertEquals(['en-entry', 'fr-entry'], $french->ancestors()->map->id()->all());
+    }
+
+    #[Test]
     public function it_gets_values_from_origin_and_collection()
     {
         tap(Collection::make('test')->cascade([
