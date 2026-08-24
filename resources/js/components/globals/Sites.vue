@@ -12,7 +12,6 @@
             />
             <Select
                 class="min-w-48 max-w-xs flex-1 font-normal"
-                size="sm"
                 :options="massOriginOptions"
                 :clearable="true"
                 :virtualize="!hasNamedGroups"
