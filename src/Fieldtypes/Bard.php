@@ -13,6 +13,7 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Site;
+use Statamic\Facades\User;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Value;
@@ -837,31 +838,42 @@ class Bard extends Replicator
     {
         $field = $this->linkTypeField();
 
-        return collect(Link::types())
-            ->filter(fn (LinkType $type): bool => $type->visible($field))
-            ->map(function (LinkType $type, string $handle) use ($field): ?array {
-                if (! $config = $type->fieldtype($field)) {
-                    return null;
-                }
+        // The cached payload contains site-dependent config (an entry link type falls back
+        // to the current site's routable collections) and user-dependent meta (asset link
+        // type permissions), so both need to be part of the key.
+        $key = vsprintf('bard-link-types-%s-%s-%s', [
+            Site::current()->handle(),
+            User::current()?->id() ?? 'guest',
+            md5(json_encode($field->config())),
+        ]);
 
-                $nestedField = new Field($handle, $config);
-                $nestedFieldtype = $nestedField->fieldtype();
+        return Blink::once($key, function () use ($field) {
+            return collect(Link::types())
+                ->filter(fn (LinkType $type): bool => $type->visible($field))
+                ->map(function (LinkType $type, string $handle) use ($field): ?array {
+                    if (! $config = $type->fieldtype($field)) {
+                        return null;
+                    }
 
-                try {
-                    $meta = $nestedFieldtype->preload();
-                } catch (CollectionNotFoundException) {
-                    $meta = [];
-                }
+                    $nestedField = new Field($handle, $config);
+                    $nestedFieldtype = $nestedField->fieldtype();
 
-                return [
-                    'title' => $type->title(),
-                    'component' => $nestedFieldtype->component(),
-                    'config' => $nestedFieldtype->config(),
-                    'meta' => $meta,
-                ];
-            })
-            ->filter()
-            ->all();
+                    try {
+                        $meta = $nestedFieldtype->preload();
+                    } catch (CollectionNotFoundException) {
+                        $meta = [];
+                    }
+
+                    return [
+                        'title' => $type->title(),
+                        'component' => $nestedFieldtype->component(),
+                        'config' => $nestedFieldtype->config(),
+                        'meta' => $meta,
+                    ];
+                })
+                ->filter()
+                ->all();
+        });
     }
 
     private function wrapInlineValue($value)

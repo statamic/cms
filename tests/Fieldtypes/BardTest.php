@@ -1574,6 +1574,67 @@ EOT;
     }
 
     #[Test]
+    public function it_reuses_the_link_types_for_the_toolbar_within_a_request()
+    {
+        TestCustomLinkFieldtype::register();
+        Link::extend('bard-test-counted', TestCountedLinkType::class);
+        TestCountedLinkType::$fieldtypeCalls = 0;
+
+        $bard = $this->bard();
+
+        $first = $bard->preload()['linkTypes'];
+        $second = $bard->preload()['linkTypes'];
+
+        $this->assertEquals($first, $second);
+        $this->assertEquals(1, TestCountedLinkType::$fieldtypeCalls);
+    }
+
+    #[Test]
+    public function it_does_not_share_cached_link_types_between_sites()
+    {
+        $this->setSites([
+            'en' => ['url' => 'http://localhost/', 'locale' => 'en'],
+            'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
+        ]);
+
+        $this->actingAs(tap(Facades\User::make()->makeSuper())->save());
+
+        Facades\Collection::make('blog')->sites(['en'])->routes(['en' => 'blog/{slug}'])->save();
+        Facades\Collection::make('actus')->sites(['fr'])->routes(['fr' => 'actus/{slug}'])->save();
+
+        $bard = $this->bard();
+
+        Facades\Site::setCurrent('en');
+        $en = $bard->preload()['linkTypes']['entry']['config']['collections'];
+
+        Facades\Site::setCurrent('fr');
+        $fr = $bard->preload()['linkTypes']['entry']['config']['collections'];
+
+        $this->assertEquals(['blog'], $en);
+        $this->assertEquals(['actus'], $fr);
+    }
+
+    #[Test]
+    public function it_does_not_share_cached_link_types_between_users()
+    {
+        Facades\AssetContainer::make('main')->disk('local')->save();
+
+        $super = tap(Facades\User::make()->makeSuper())->save();
+        $peon = tap(Facades\User::make())->save();
+
+        $bard = $this->bard(['container' => 'main']);
+
+        $this->actingAs($super);
+        $superMeta = $bard->preload()['linkTypes']['asset']['meta']['container'];
+
+        $this->actingAs($peon);
+        $peonMeta = $bard->preload()['linkTypes']['asset']['meta']['container'];
+
+        $this->assertTrue($superMeta['can_upload']);
+        $this->assertFalse($peonMeta['can_upload']);
+    }
+
+    #[Test]
     public function it_gets_link_data_for_an_entry_link()
     {
         $this->actingAs(tap(Facades\User::make()->makeSuper())->save());
@@ -1753,6 +1814,25 @@ class TestCountingAssetsFieldtype extends AssetsFieldtype
         static::$preloads++;
 
         return parent::preload();
+    }
+}
+
+class TestCountedLinkType extends LinkType
+{
+    public static int $fieldtypeCalls = 0;
+
+    protected static ?string $title = 'Counted Type';
+
+    public function resolve(string $id, $parent = null, bool $localize = false): mixed
+    {
+        return null;
+    }
+
+    public function fieldtype(Field $field): ?array
+    {
+        static::$fieldtypeCalls++;
+
+        return ['type' => 'test_custom_link'];
     }
 }
 
