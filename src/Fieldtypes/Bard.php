@@ -938,6 +938,8 @@ class Bard extends Replicator
             public function setData(array $data)
             {
                 $this->data = $data;
+
+                return $this;
             }
 
             public function validate(string $attribute, mixed $value, Closure $fail): void
