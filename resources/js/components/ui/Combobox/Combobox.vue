@@ -149,6 +149,7 @@ const triggerRef = useTemplateRef('trigger');
 const searchInputRef = useTemplateRef('search');
 
 watch(searchQuery, (value) => emit('search', value, () => {}));
+
 watch(dropdownOpen, (open) => {
     if (!open) searchQuery.value = '';
 });
