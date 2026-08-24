@@ -673,9 +673,11 @@ class Bard extends Replicator
                 'folder' => $this->config('folder'),
             ]));
 
+            $assetMeta = $assetField->meta();
+
             $data['assets'] = [
-                'container' => $assetField->meta()['container'],
-                'columns' => $assetField->meta()['columns'],
+                'container' => $assetMeta['container'],
+                'columns' => $assetMeta['columns'],
             ];
         }
 

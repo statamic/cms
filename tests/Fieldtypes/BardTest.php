@@ -12,6 +12,7 @@ use Statamic\Facades;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Values;
+use Statamic\Fieldtypes\Assets\Assets as AssetsFieldtype;
 use Statamic\Fieldtypes\Bard;
 use Statamic\Fieldtypes\Bard\Augmentor;
 use Statamic\Fieldtypes\Link;
@@ -1572,6 +1573,36 @@ EOT;
         $this->assertArrayNotHasKey('bard-test-hidden', $this->bard()->preload()['linkTypes']);
     }
 
+    #[Test]
+    public function it_preloads_the_asset_container_and_columns()
+    {
+        $this->actingAs(tap(Facades\User::make()->makeSuper())->save());
+        Facades\AssetContainer::make('main')->disk('local')->save();
+
+        $assets = $this->bard(['container' => 'main'])->preload()['assets'];
+
+        $this->assertEquals(['container', 'columns'], array_keys($assets));
+        $this->assertEquals('main', $assets['container']['id']);
+        $this->assertEquals('Main', $assets['container']['title']);
+        $this->assertTrue($assets['container']['can_upload']);
+        $this->assertContains('basename', collect($assets['columns'])->map->field()->all());
+    }
+
+    #[Test]
+    public function it_only_generates_the_asset_fields_meta_once_when_preloading()
+    {
+        $this->actingAs(tap(Facades\User::make()->makeSuper())->save());
+        Facades\AssetContainer::make('main')->disk('local')->save();
+
+        TestCountingAssetsFieldtype::register();
+        TestCountingAssetsFieldtype::$preloads = 0;
+
+        $this->bard(['container' => 'main'])->preload();
+
+        // Once for the asset link type in the toolbar, once for the field's own asset meta.
+        $this->assertEquals(2, TestCountingAssetsFieldtype::$preloads);
+    }
+
     private function bard($config = [])
     {
         return (new Bard)->setField(new Field('test', array_merge(['type' => 'bard', 'sets' => ['one' => []]], $config)));
@@ -1641,5 +1672,18 @@ class TestCustomLinkFieldtype extends Fieldtype
     public function preload()
     {
         return ['data' => [['title' => 'Custom Title']]];
+    }
+}
+
+class TestCountingAssetsFieldtype extends AssetsFieldtype
+{
+    public static $handle = 'assets';
+    public static int $preloads = 0;
+
+    public function preload()
+    {
+        static::$preloads++;
+
+        return parent::preload();
     }
 }
