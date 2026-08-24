@@ -11,7 +11,6 @@ use Statamic\Sites\Sites;
  * @method static mixed authorized()
  * @method static mixed default()
  * @method static bool hasMultiple()
- * @method static \Illuminate\Support\Collection filterByGroup($handles, ?string $siteHandle)
  * @method static mixed get($handle)
  * @method static mixed findByUrl($url)
  * @method static mixed current()
