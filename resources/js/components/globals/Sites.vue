@@ -71,13 +71,22 @@
             <tbody>
                 <template v-for="group in siteGroups" :key="group.key">
                     <tr v-if="hasNamedGroups">
-                        <td class="checkbox-column bg-gray-50 ps-3 dark:bg-gray-800" aria-hidden="true" />
-                        <td colspan="2" class="bg-gray-50 dark:bg-gray-800 !py-2">
-                            <Subheading
-                                size="sm"
-                                class="font-semibold uppercase tracking-wide text-gray-950 text-2xs dark:text-gray-300"
-                                :text="__(group.label)"
-                            />
+                        <td colspan="3" class="bg-gray-50 py-2! dark:bg-gray-800">
+                            <div class="flex items-center gap-4 ps-1!">
+                                <Checkbox
+                                    size="sm"
+                                    solo
+                                    :model-value="isGroupSelected(group)"
+                                    :indeterminate="isGroupPartiallySelected(group)"
+                                    :label="__('Select :name', { name: group.label })"
+                                    @update:model-value="toggleGroupSelection(group, $event)"
+                                />
+                                <Subheading
+                                    size="sm"
+                                    class="font-semibold uppercase tracking-wide text-gray-950 text-2xs dark:text-gray-300"
+                                    :text="group.label"
+                                />
+                            </div>
                         </td>
                     </tr>
                     <tr v-for="site in group.items" :key="site.handle">
@@ -238,6 +247,38 @@ export default {
 
         isSelected(handle) {
             return this.selections.includes(handle);
+        },
+
+        groupHandles(group) {
+            return (group?.items ?? []).map((site) => site.handle);
+        },
+
+        isGroupSelected(group) {
+            const handles = this.groupHandles(group);
+
+            return handles.length > 0
+                && handles.every((handle) => this.selections.includes(handle));
+        },
+
+        isGroupPartiallySelected(group) {
+            const handles = this.groupHandles(group);
+            const selectedCount = handles.filter((handle) => this.selections.includes(handle)).length;
+
+            return selectedCount > 0 && selectedCount < handles.length;
+        },
+
+        toggleGroupSelection(group, selected) {
+            const handles = this.groupHandles(group);
+
+            if (selected) {
+                this.selections = [...new Set([...this.selections, ...handles])];
+
+                return;
+            }
+
+            const remove = new Set(handles);
+
+            this.selections = this.selections.filter((handle) => !remove.has(handle));
         },
 
         toggleSelection(handle, selected) {
