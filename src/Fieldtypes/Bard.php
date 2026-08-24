@@ -13,9 +13,11 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Site;
+use Statamic\Facades\User;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Value;
+use Statamic\Fieldtypes\Assets\Assets as AssetsFieldtype;
 use Statamic\Fieldtypes\Bard\Augmentor;
 use Statamic\Fieldtypes\Link\LinkType;
 use Statamic\GraphQL\Types\BardSetsType;
@@ -673,9 +675,11 @@ class Bard extends Replicator
                 'folder' => $this->config('folder'),
             ]));
 
+            $assetMeta = $assetField->meta();
+
             $data['assets'] = [
-                'container' => $assetField->meta()['container'],
-                'columns' => $assetField->meta()['columns'],
+                'container' => $assetMeta['container'],
+                'columns' => $assetMeta['columns'],
             ];
         }
 
@@ -809,8 +813,16 @@ class Bard extends Replicator
 
         $nestedField = new Field($handle, $config);
         $nestedField->setValue([$id]);
+        $fieldtype = $nestedField->fieldtype();
 
-        return $nestedField->fieldtype()->preload()['data'][0] ?? null;
+        // Both of these build their preload `data` from getItemData(), so we can get the
+        // item without paying for the rest of the preload payload. Anything else may only
+        // implement preload(), so it gets the original treatment.
+        if ($fieldtype instanceof Relationship || $fieldtype instanceof AssetsFieldtype) {
+            return $fieldtype->getItemData([$id])->first();
+        }
+
+        return $fieldtype->preload()['data'][0] ?? null;
     }
 
     private function linkTypeField(): Field
@@ -826,31 +838,42 @@ class Bard extends Replicator
     {
         $field = $this->linkTypeField();
 
-        return collect(Link::types())
-            ->filter(fn (LinkType $type): bool => $type->visible($field))
-            ->map(function (LinkType $type, string $handle) use ($field): ?array {
-                if (! $config = $type->fieldtype($field)) {
-                    return null;
-                }
+        // The cached payload contains site-dependent config (an entry link type falls back
+        // to the current site's routable collections) and user-dependent meta (asset link
+        // type permissions), so both need to be part of the key.
+        $key = vsprintf('bard-link-types-%s-%s-%s', [
+            Site::current()->handle(),
+            User::current()?->id() ?? 'guest',
+            md5(json_encode($field->config())),
+        ]);
 
-                $nestedField = new Field($handle, $config);
-                $nestedFieldtype = $nestedField->fieldtype();
+        return Blink::once($key, function () use ($field) {
+            return collect(Link::types())
+                ->filter(fn (LinkType $type): bool => $type->visible($field))
+                ->map(function (LinkType $type, string $handle) use ($field): ?array {
+                    if (! $config = $type->fieldtype($field)) {
+                        return null;
+                    }
 
-                try {
-                    $meta = $nestedFieldtype->preload();
-                } catch (CollectionNotFoundException) {
-                    $meta = [];
-                }
+                    $nestedField = new Field($handle, $config);
+                    $nestedFieldtype = $nestedField->fieldtype();
 
-                return [
-                    'title' => $type->title(),
-                    'component' => $nestedFieldtype->component(),
-                    'config' => $nestedFieldtype->config(),
-                    'meta' => $meta,
-                ];
-            })
-            ->filter()
-            ->all();
+                    try {
+                        $meta = $nestedFieldtype->preload();
+                    } catch (CollectionNotFoundException) {
+                        $meta = [];
+                    }
+
+                    return [
+                        'title' => $type->title(),
+                        'component' => $nestedFieldtype->component(),
+                        'config' => $nestedFieldtype->config(),
+                        'meta' => $meta,
+                    ];
+                })
+                ->filter()
+                ->all();
+        });
     }
 
     private function wrapInlineValue($value)
@@ -938,6 +961,8 @@ class Bard extends Replicator
             public function setData(array $data)
             {
                 $this->data = $data;
+
+                return $this;
             }
 
             public function validate(string $attribute, mixed $value, Closure $fail): void

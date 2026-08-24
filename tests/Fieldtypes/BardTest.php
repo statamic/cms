@@ -12,6 +12,7 @@ use Statamic\Facades;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Values;
+use Statamic\Fieldtypes\Assets\Assets as AssetsFieldtype;
 use Statamic\Fieldtypes\Bard;
 use Statamic\Fieldtypes\Bard\Augmentor;
 use Statamic\Fieldtypes\Link;
@@ -1572,6 +1573,165 @@ EOT;
         $this->assertArrayNotHasKey('bard-test-hidden', $this->bard()->preload()['linkTypes']);
     }
 
+    #[Test]
+    public function it_reuses_the_link_types_for_the_toolbar_within_a_request()
+    {
+        TestCustomLinkFieldtype::register();
+        Link::extend('bard-test-counted', TestCountedLinkType::class);
+        TestCountedLinkType::$fieldtypeCalls = 0;
+
+        $bard = $this->bard();
+
+        $first = $bard->preload()['linkTypes'];
+        $second = $bard->preload()['linkTypes'];
+
+        $this->assertEquals($first, $second);
+        $this->assertEquals(1, TestCountedLinkType::$fieldtypeCalls);
+    }
+
+    #[Test]
+    public function it_does_not_share_cached_link_types_between_sites()
+    {
+        $this->setSites([
+            'en' => ['url' => 'http://localhost/', 'locale' => 'en'],
+            'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
+        ]);
+
+        $this->actingAs(tap(Facades\User::make()->makeSuper())->save());
+
+        Facades\Collection::make('blog')->sites(['en'])->routes(['en' => 'blog/{slug}'])->save();
+        Facades\Collection::make('actus')->sites(['fr'])->routes(['fr' => 'actus/{slug}'])->save();
+
+        $bard = $this->bard();
+
+        Facades\Site::setCurrent('en');
+        $en = $bard->preload()['linkTypes']['entry']['config']['collections'];
+
+        Facades\Site::setCurrent('fr');
+        $fr = $bard->preload()['linkTypes']['entry']['config']['collections'];
+
+        $this->assertEquals(['blog'], $en);
+        $this->assertEquals(['actus'], $fr);
+    }
+
+    #[Test]
+    public function it_does_not_share_cached_link_types_between_users()
+    {
+        Facades\AssetContainer::make('main')->disk('local')->save();
+
+        $super = tap(Facades\User::make()->makeSuper())->save();
+        $peon = tap(Facades\User::make())->save();
+
+        $bard = $this->bard(['container' => 'main']);
+
+        $this->actingAs($super);
+        $superMeta = $bard->preload()['linkTypes']['asset']['meta']['container'];
+
+        $this->actingAs($peon);
+        $peonMeta = $bard->preload()['linkTypes']['asset']['meta']['container'];
+
+        $this->assertTrue($superMeta['can_upload']);
+        $this->assertFalse($peonMeta['can_upload']);
+    }
+
+    #[Test]
+    public function it_gets_link_data_for_an_entry_link()
+    {
+        $this->actingAs(tap(Facades\User::make()->makeSuper())->save());
+        tap(Facades\Collection::make('blog')->routes('blog/{slug}'))->save();
+        EntryFactory::collection('blog')->id('123')->slug('my-post')->data(['title' => 'My Post'])->create();
+
+        $linkData = $this->bard()->getLinkData([
+            ['type' => 'text', 'marks' => [['type' => 'link', 'attrs' => ['href' => 'statamic://entry::123']]], 'text' => 'Link'],
+        ]);
+
+        $this->assertEquals([
+            'entry::123' => [
+                'id' => '123',
+                'reference' => 'entry::123',
+                'title' => 'My Post',
+                'status' => 'published',
+                'edit_url' => 'http://localhost/cp/collections/blog/entries/123',
+                'editable' => true,
+                'hint' => '',
+            ],
+        ], $linkData);
+    }
+
+    #[Test]
+    public function it_gets_link_data_for_an_asset_link()
+    {
+        Storage::fake('local');
+        $this->actingAs(tap(Facades\User::make()->makeSuper())->save());
+        Facades\AssetContainer::make('main')->disk('local')->save();
+        Facades\Asset::make()->container('main')->path('foo.txt')->upload(UploadedFile::fake()->create('foo.txt'));
+
+        $linkData = $this->bard(['container' => 'main'])->getLinkData([
+            ['type' => 'text', 'marks' => [['type' => 'link', 'attrs' => ['href' => 'statamic://asset::main::foo.txt']]], 'text' => 'Link'],
+        ]);
+
+        $this->assertEquals(['asset::main::foo.txt'], array_keys($linkData));
+        $this->assertEquals('main::foo.txt', $linkData['asset::main::foo.txt']['id']);
+        $this->assertEquals('foo.txt', $linkData['asset::main::foo.txt']['basename']);
+    }
+
+    #[Test]
+    public function it_gets_link_data_for_an_asset_link_when_no_container_is_configured()
+    {
+        $this->actingAs(tap(Facades\User::make()->makeSuper())->save());
+        Facades\AssetContainer::make('one')->disk('local')->save();
+        Facades\AssetContainer::make('two')->disk('local')->save();
+
+        $linkData = $this->bard()->getLinkData([
+            ['type' => 'text', 'marks' => [['type' => 'link', 'attrs' => ['href' => 'statamic://asset::one::foo.txt']]], 'text' => 'Link'],
+        ]);
+
+        $this->assertEquals(['id' => 'one::foo.txt', 'url' => 'one::foo.txt', 'invalid' => true], $linkData['asset::one::foo.txt']);
+    }
+
+    #[Test]
+    public function it_gets_link_data_for_a_custom_link_type_with_a_non_public_get_item_data_method()
+    {
+        TestPrivateItemDataFieldtype::register();
+        Link::extend('bard-test-private', TestPrivateItemDataLinkType::class);
+
+        $linkData = $this->bard()->getLinkData([
+            ['type' => 'text', 'marks' => [['type' => 'link', 'attrs' => ['href' => 'statamic://bard-test-private::valid']]], 'text' => 'Link'],
+        ]);
+
+        $this->assertEquals(['title' => 'From Preload'], $linkData['bard-test-private::valid']);
+    }
+
+    #[Test]
+    public function it_preloads_the_asset_container_and_columns()
+    {
+        $this->actingAs(tap(Facades\User::make()->makeSuper())->save());
+        Facades\AssetContainer::make('main')->disk('local')->save();
+
+        $assets = $this->bard(['container' => 'main'])->preload()['assets'];
+
+        $this->assertEquals(['container', 'columns'], array_keys($assets));
+        $this->assertEquals('main', $assets['container']['id']);
+        $this->assertEquals('Main', $assets['container']['title']);
+        $this->assertTrue($assets['container']['can_upload']);
+        $this->assertContains('basename', collect($assets['columns'])->map->field()->all());
+    }
+
+    #[Test]
+    public function it_only_generates_the_asset_fields_meta_once_when_preloading()
+    {
+        $this->actingAs(tap(Facades\User::make()->makeSuper())->save());
+        Facades\AssetContainer::make('main')->disk('local')->save();
+
+        TestCountingAssetsFieldtype::register();
+        TestCountingAssetsFieldtype::$preloads = 0;
+
+        $this->bard(['container' => 'main'])->preload();
+
+        // Once for the asset link type in the toolbar, once for the field's own asset meta.
+        $this->assertEquals(2, TestCountingAssetsFieldtype::$preloads);
+    }
+
     private function bard($config = [])
     {
         return (new Bard)->setField(new Field('test', array_merge(['type' => 'bard', 'sets' => ['one' => []]], $config)));
@@ -1641,5 +1801,67 @@ class TestCustomLinkFieldtype extends Fieldtype
     public function preload()
     {
         return ['data' => [['title' => 'Custom Title']]];
+    }
+}
+
+class TestCountingAssetsFieldtype extends AssetsFieldtype
+{
+    public static $handle = 'assets';
+    public static int $preloads = 0;
+
+    public function preload()
+    {
+        static::$preloads++;
+
+        return parent::preload();
+    }
+}
+
+class TestCountedLinkType extends LinkType
+{
+    public static int $fieldtypeCalls = 0;
+
+    protected static ?string $title = 'Counted Type';
+
+    public function resolve(string $id, $parent = null, bool $localize = false): mixed
+    {
+        return null;
+    }
+
+    public function fieldtype(Field $field): ?array
+    {
+        static::$fieldtypeCalls++;
+
+        return ['type' => 'test_custom_link'];
+    }
+}
+
+class TestPrivateItemDataLinkType extends LinkType
+{
+    protected static ?string $title = 'Private Item Data Type';
+
+    public function resolve(string $id, $parent = null, bool $localize = false): mixed
+    {
+        return null;
+    }
+
+    public function fieldtype(Field $field): ?array
+    {
+        return ['type' => 'test_private_item_data'];
+    }
+}
+
+class TestPrivateItemDataFieldtype extends Fieldtype
+{
+    public static $handle = 'test_private_item_data';
+
+    public function preload()
+    {
+        return ['data' => $this->getItemData()];
+    }
+
+    private function getItemData()
+    {
+        return [['title' => 'From Preload']];
     }
 }
