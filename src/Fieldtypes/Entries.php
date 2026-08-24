@@ -44,7 +44,6 @@ class Entries extends Relationship
     protected $statusIcons = true;
     protected $formComponent = 'entry-publish-form';
     protected $activeFilterBadges;
-    protected array $itemCache = [];
 
     protected $formComponentProps = [
         'initialActions' => 'actions',

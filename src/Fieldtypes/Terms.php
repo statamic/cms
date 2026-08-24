@@ -38,7 +38,6 @@ class Terms extends Relationship
     protected $canCreate = true;
     protected $canSearch = true;
     protected $statusIcons = false;
-    protected array $itemCache = [];
     protected $taggable = true;
     protected $icon = 'fieldtype-taxonomy';
     protected $formComponent = 'term-publish-form';
