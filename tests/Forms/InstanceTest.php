@@ -5,6 +5,8 @@ namespace Tests\Forms;
 use Facades\Statamic\Console\Processes\Composer;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blueprint;
+use Statamic\Facades\Collection;
+use Statamic\Facades\Entry;
 use Statamic\Facades\Form;
 use Statamic\Forms\Instance;
 use Tests\Factories\EntryFactory;
@@ -78,6 +80,25 @@ class InstanceTest extends TestCase
 
         $this->assertEquals(1, $instance->config('submission_limit'));
         $this->assertEquals('Closed.', $instance->config('closed_message'));
+    }
+
+    #[Test]
+    public function a_localization_inherits_overrides_from_its_origin()
+    {
+        $this->setSites([
+            'en' => ['url' => '/', 'locale' => 'en'],
+            'fr' => ['url' => '/fr/', 'locale' => 'fr'],
+        ]);
+
+        $form = $this->makeForm(['submission_limit' => 5]);
+
+        $this->makeEntry('event-1', ['form' => 'contact', 'config' => ['submission_limit' => 1]]);
+
+        Collection::findByHandle('events')->sites(['en', 'fr'])->save();
+
+        tap(Entry::find('event-1')->makeLocalization('fr')->id('event-1-fr'))->save();
+
+        $this->assertEquals(1, $form->instance('event-1-fr')->config('submission_limit'));
     }
 
     #[Test]

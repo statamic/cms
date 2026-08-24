@@ -74,7 +74,7 @@ class Instance
 
             $value = $entry->blueprint()->fields()->all()
                 ->filter(fn ($field) => $field->type() === 'form')
-                ->map(fn ($field) => $entry->get($field->handle()))
+                ->map(fn ($field) => $entry->value($field->handle()))
                 ->first(fn ($value) => is_array($value) && Arr::get($value, 'form') === $this->form->handle());
 
             return Arr::get($value, 'config', []);
