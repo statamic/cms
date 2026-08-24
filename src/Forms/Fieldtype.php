@@ -130,6 +130,11 @@ class Fieldtype extends Relationship
         return $config ? ['form' => $form, 'config' => $config] : $form;
     }
 
+    public function preProcessValidatable($value)
+    {
+        return $this->toFormHandles($value);
+    }
+
     private function configCanBeOverridden(): bool
     {
         return $this->config('max_items') === 1;
@@ -170,11 +175,6 @@ class Fieldtype extends Relationship
                     ->all(),
             ]]]],
         ]);
-    }
-
-    public function rules(): array
-    {
-        return $this->configCanBeOverridden() ? ['array'] : parent::rules();
     }
 
     protected function getColumns()

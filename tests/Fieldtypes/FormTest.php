@@ -80,6 +80,16 @@ class FormTest extends TestCase
     }
 
     #[Test]
+    public function it_validates_against_the_form_handles()
+    {
+        $fieldtype = $this->fieldtype();
+
+        $this->assertEquals([], $fieldtype->preProcessValidatable(['form' => [], 'config' => ['closed_message' => 'Closed.']]));
+        $this->assertEquals(['contact'], $fieldtype->preProcessValidatable(['form' => ['contact'], 'config' => []]));
+        $this->assertEquals(['array', 'max:1'], $fieldtype->rules());
+    }
+
+    #[Test]
     public function it_pre_processes_both_stored_shapes()
     {
         $fromString = $this->fieldtype()->preProcess('contact');
