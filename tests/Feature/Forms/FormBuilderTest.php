@@ -3,6 +3,7 @@
 namespace Tests\Feature\Forms;
 
 use Facades\Statamic\Console\Processes\Composer;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Fieldset;
 use Statamic\Facades\Form;
@@ -404,6 +405,91 @@ class FormBuilderTest extends TestCase
         // Both field errors should be present
         $this->assertArrayHasKey('field1_id.required_option', $errors);
         $this->assertArrayHasKey('field2_id.required_option', $errors);
+    }
+
+    #[Test]
+    public function it_validates_that_fields_have_a_handle()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
+        $user = User::make()->assignRole('test')->save();
+        $form = tap(Form::make('test'))->save();
+
+        $payload = [
+            'pages' => [
+                [
+                    '_id' => 'page1',
+                    'sections' => [
+                        [
+                            '_id' => 'section1',
+                            'display' => 'Section',
+                            'fields' => [
+                                [
+                                    '_id' => 'field1',
+                                    'handle' => null,
+                                    'type' => 'inline',
+                                    'fieldtype' => 'short_answer',
+                                    'config' => ['type' => 'short_answer', 'display' => 'Name'],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this
+            ->actingAs($user)
+            ->patch(cp_route('forms.builder.update', $form->handle()), $payload)
+            ->assertSessionHasErrors(['field1.handle']);
+    }
+
+    #[Test]
+    #[DataProvider('invalidHandles')]
+    public function it_validates_the_handle($handle)
+    {
+        $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
+        $user = User::make()->assignRole('test')->save();
+        $form = tap(Form::make('test'))->save();
+
+        $payload = [
+            'pages' => [
+                [
+                    '_id' => 'page1',
+                    'sections' => [
+                        [
+                            '_id' => 'section1',
+                            'display' => 'Section',
+                            'fields' => [
+                                [
+                                    '_id' => 'field1',
+                                    'handle' => $handle,
+                                    'type' => 'inline',
+                                    'fieldtype' => 'short_answer',
+                                    'config' => ['type' => 'short_answer', 'display' => 'Name'],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this
+            ->actingAs($user)
+            ->patch(cp_route('forms.builder.update', $form->handle()), $payload)
+            ->assertSessionHasErrors(['field1.handle']);
+    }
+
+    public static function invalidHandles(): array
+    {
+        return [
+            'starts with a number' => ['1invalid'],
+            'invalid characters' => ['not valid'],
+            'reserved word' => ['if'],
+            'reserved forms word: date' => ['date'],
+            'reserved forms word: message' => ['message'],
+            'reserved forms word: messages' => ['messages'],
+        ];
     }
 
     #[Test]

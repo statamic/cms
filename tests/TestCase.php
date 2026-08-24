@@ -107,6 +107,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
     protected function getEnvironmentSetUp($app)
     {
         $app['config']->set('inertia.testing.page_paths', [statamic_path('resources/js/pages')]);
+        $app['config']->set('inertia.pages.paths', [statamic_path('resources/js/pages')]);
 
         $app['config']->set('auth.providers.users.driver', 'statamic');
         $app['config']->set('statamic.stache.watcher', false);

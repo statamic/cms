@@ -21,7 +21,9 @@ use Statamic\Facades\Token;
 use Statamic\Facades\User;
 use Statamic\Fields\FieldsetRecursionStack;
 use Statamic\Jobs\DeletePartialFormSubmissions;
+use Statamic\Http\Middleware\PingOutpost;
 use Statamic\Jobs\HandleEntrySchedule;
+use Statamic\Licensing\Radio;
 use Statamic\Notifications\ElevatedSessionVerificationCode;
 use Statamic\Sites\Sites;
 use Statamic\Stache\Query\RevisionQueryBuilder;
@@ -52,7 +54,8 @@ class AppServiceProvider extends ServiceProvider
             ->pushMiddleware(\Statamic\Http\Middleware\PoweredByHeader::class)
             ->pushMiddleware(\Statamic\Http\Middleware\CheckComposerJsonScripts::class)
             ->pushMiddleware(\Statamic\Http\Middleware\CheckMultisite::class)
-            ->pushMiddleware(\Statamic\Http\Middleware\StopImpersonating::class);
+            ->pushMiddleware(\Statamic\Http\Middleware\StopImpersonating::class)
+            ->pushMiddleware(PingOutpost::class);
 
         $this->loadViewsFrom("{$this->root}/resources/views", 'statamic');
 
@@ -143,6 +146,12 @@ class AppServiceProvider extends ServiceProvider
         }
 
         $this->app->make(Schedule::class)->job(DeletePartialFormSubmissions::class)->daily();
+
+        $this->app->make(Schedule::class)
+            ->call(fn () => app(Radio::class)->ping())
+            ->hourly()
+            ->name('statamic-outpost')
+            ->withoutOverlapping();
     }
 
     public function register()

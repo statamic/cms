@@ -119,11 +119,14 @@ class FormBuilderController extends CpController
 
                     $fields = $blueprint
                         ->fields()
-                        ->addValues($field['config'] ?? [])
+                        ->addValues([
+                            ...$field['config'] ?? [],
+                            'handle' => $field['handle'] ?? null,
+                        ])
                         ->preProcess();
 
                     try {
-                        $fields->validate();
+                        $fields->validate([], ['handle.not_in' => __('statamic::validation.reserved')]);
                     } catch (ValidationException $e) {
                         foreach ($e->errors() as $handle => $messages) {
                             $errors["{$field['_id']}.{$handle}"] = $messages;

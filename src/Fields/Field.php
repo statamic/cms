@@ -141,6 +141,11 @@ class Field implements Arrayable
         return Arr::get($this->config, 'always_save', false);
     }
 
+    public function reserveSpaceWhenHidden()
+    {
+        return Arr::get($this->config, 'reserve_space_when_hidden', false);
+    }
+
     public function rules()
     {
         $rules = [$this->handle => $this->addNullableRule(array_merge(
@@ -282,6 +287,7 @@ class Field implements Arrayable
             'visibility' => $this->visibility(),
             'read_only' => $this->visibility() === 'read_only', // Deprecated: Addon fieldtypes should now reference new `visibility` state.
             'always_save' => $this->alwaysSave(),
+            'reserve_space_when_hidden' => $this->reserveSpaceWhenHidden(),
         ]);
 
         unset($array['validate']);
@@ -507,19 +513,7 @@ class Field implements Arrayable
 
     public static function commonFieldOptions(): Fields
     {
-        $reserved = [
-            'content_type',
-            'elseif',
-            'endif',
-            'endunless',
-            'if',
-            'length',
-            'reference',
-            'resource',
-            'status',
-            'unless',
-            'views',
-        ];
+        $reserved = static::reservedHandles();
 
         $fields = collect([
             'display' => [
@@ -634,5 +628,22 @@ class Field implements Arrayable
         ])->map(fn ($field, $handle) => compact('handle', 'field'))->values()->all();
 
         return new ConfigFields($fields);
+    }
+
+    public static function reservedHandles(): array
+    {
+        return [
+            'content_type',
+            'elseif',
+            'endif',
+            'endunless',
+            'if',
+            'length',
+            'reference',
+            'resource',
+            'status',
+            'unless',
+            'views',
+        ];
     }
 }

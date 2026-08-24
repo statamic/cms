@@ -3352,7 +3352,7 @@ class CoreModifiers extends Modifier
         }
 
         if (config('statamic.system.localize_dates_in_modifiers')) {
-            $value->setTimezone(Statamic::displayTimezone());
+            $value = $value->copy()->setTimezone(Statamic::displayTimezone());
         }
 
         return $value;
