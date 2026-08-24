@@ -4,6 +4,8 @@ import { RadioGroupIndicator, RadioGroupItem } from 'reka-ui';
 import { injectRadioContext } from './Group.vue';
 
 const props = defineProps({
+    /** Optional ID for the radio button */
+    id: { type: String, default: () => useId() },
     /** Description text to display below the label */
     description: { type: String, default: null },
     disabled: { type: Boolean, default: false },
@@ -17,8 +19,6 @@ const props = defineProps({
 });
 
 const { appearance } = injectRadioContext() ?? { appearance: computed(() => 'default') };
-
-const id = useId();
 
 const hasItemSlot = !!useSlots().item;
 
@@ -40,11 +40,11 @@ const itemClasses = computed(() => {
         data-ui-radio-item
     >
         <RadioGroupItem
-            :id
+            :id="props.id"
             :value="value"
             :disabled="readOnly || disabled"
             :class="[itemClasses, itemClass]"
-            :aria-describedby="description ? `${id}-description` : undefined"
+            :aria-describedby="description ? `${props.id}-description` : undefined"
         >
             <slot name="item">
                 <RadioGroupIndicator
@@ -58,10 +58,10 @@ const itemClasses = computed(() => {
             </slot>
         </RadioGroupItem>
         <div class="flex flex-col" :class="{ 'opacity-50': disabled }">
-            <label class="text-sm font-normal antialiased cursor-pointer dark:text-gray-200 before:absolute before:inset-0 before:content-['']" :for="id">
+            <label class="text-sm font-normal antialiased cursor-pointer dark:text-gray-200 before:absolute before:inset-0 before:content-['']" :for="props.id">
                 <slot>{{ label || value }}</slot>
             </label>
-            <span v-if="description" :id="`${id}-description`" class="mt-0.5 block text-xs leading-snug text-gray-500">{{ description }}</span>
+            <span v-if="description" :id="`${props.id}-description`" class="mt-0.5 block text-xs leading-snug text-gray-500">{{ description }}</span>
         </div>
     </div>
 </template>

@@ -47,6 +47,10 @@ const modifiedFields = ref<string[]>([]);
 
 let skipNextPreviewUpdate = false;
 
+const extraValues = computed(() => ({
+    isNew: !!field.value.isNew,
+}));
+
 const shouldShowValidationTab = computed(() => collectsValue(getFieldtypeCategoryHandle(field.value.config.type)));
 
 const adjustedBlueprint = computed(() => {
@@ -84,7 +88,10 @@ const load = () => {
         .post(cp_url(`forms/${form.handle}/builder/fields/edit`), {
             type: field.value.fieldtype,
             reference: field.value.type === 'reference' ? field.value.field_reference : false,
-            values: field.value.config,
+            values: {
+                ...field.value.config,
+                handle: field.value.handle,
+            },
         })
         .then((response) => {
             loading.value = false;
@@ -126,11 +133,16 @@ const updatePreview = debounce(() => {
         .then((response) => {
             if (field.value._id !== fieldId) return;
 
-            field.value.config = response.data.values;
+            const { handle, ...config } = response.data.values;
+
+            field.value.config = config;
 
             if (response.data.preview) {
                 field.value.preview = {
-                    config: { ...response.data.preview.config, handle: field.value.handle },
+                    config: {
+                        ...response.data.preview.config,
+                        handle: field.value.handle ?? field.value._id,
+                    },
                     value: response.data.preview.value,
                     meta: response.data.preview.meta,
                 };
@@ -152,6 +164,7 @@ const suggestableConditionFields = computed(() => {
         .flatMap((page) => page.sections)
         .flatMap((section) => section.fields)
         .filter((f) => f._id !== field.value._id)
+        .filter((f) => f.type === 'import' || f.handle)
         .filter((f) => f.type === 'import' || collectsValue(getFieldtypeCategoryHandle(f.config.type)))
         .map((f) => ({
             handle: f.handle,
@@ -200,6 +213,10 @@ watch(values, () => {
     updatePreview();
 }, { deep: true });
 
+watch(() => values.value?.handle, (handle: string) => {
+    if (field.value.isNew && handle !== undefined) field.value.handle = handle;
+});
+
 watch(modifiedFields, (fields) => {
     if (field.value.type === 'reference') {
         field.value.config_overrides = fields;
@@ -242,6 +259,7 @@ onMounted(() => load());
                         :blueprint="adjustedBlueprint"
                         :meta
                         :errors
+                        :extra-values
                         v-model="values"
                         v-model:modified-fields="modifiedFields"
                         :origin-values
