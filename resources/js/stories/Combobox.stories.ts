@@ -1164,6 +1164,33 @@ export const TestTaggableEnterSelectsHighlightedOption: Story = {
     },
 };
 
+export const TestTaggableDropdownOpensOnTabFocus: Story = {
+    tags: ['!dev', 'test'],
+    render: () => ({
+        components: { Combobox },
+        setup() {
+            const value = ref<string[]>([]);
+            return { value, options: defaultOptions };
+        },
+        template: `
+            <input data-testid="before" />
+            <Combobox v-model="value" :options="options" multiple taggable placeholder="Add tags..." />
+        `,
+    }),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+
+        canvas.getByTestId('before').focus();
+        await userEvent.tab();
+
+        await new Promise((r) => setTimeout(r, 100));
+
+        const input = document.querySelector('input[type="search"]') as HTMLInputElement;
+        expect(document.activeElement).toBe(input);
+        await expect(document.querySelector('[data-ui-combobox-content]')).toBeTruthy();
+    },
+};
+
 export const TestDropdownOpensOnSpace: Story = {
     tags: ['!dev', 'test'],
     render: () => ({

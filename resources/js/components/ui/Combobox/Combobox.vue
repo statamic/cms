@@ -142,7 +142,9 @@ const itemClasses = cva({
 
 const searchQuery = ref('');
 const dropdownOpen = ref(false);
+const focusedByPointer = ref(false);
 const rootRef = useTemplateRef('root');
+const wrapperRef = useTemplateRef('wrapper');
 const triggerRef = useTemplateRef('trigger');
 const searchInputRef = useTemplateRef('search');
 
@@ -319,6 +321,23 @@ function openDropdown(e) {
     updateDropdownOpen(true);
 }
 
+function onFocus(e) {
+    const byPointer = focusedByPointer.value;
+    focusedByPointer.value = false;
+
+    if (!props.taggable || byPointer || dropdownOpen.value) return;
+    if (!focusCameFromOutside(e)) return;
+
+    updateDropdownOpen(true);
+}
+
+function focusCameFromOutside(e) {
+    if (!e.relatedTarget) return false;
+    if ('rekaCollectionItem' in e.relatedTarget.dataset) return false;
+
+    return !wrapperRef.value?.contains(e.relatedTarget);
+}
+
 function onBlur(e) {
     if (!props.taggable) return;
 
@@ -384,7 +403,13 @@ defineExpose({
 </script>
 
 <template>
-    <div :class="wrapperClasses" v-bind="wrapperAttrs">
+    <div
+        ref="wrapper"
+        :class="wrapperClasses"
+        v-bind="wrapperAttrs"
+        @pointerdown="focusedByPointer = true"
+        @click="focusedByPointer = false"
+    >
         <div class="flex w-full min-w-0">
             <ComboboxRoot
                 ref="root"
@@ -424,6 +449,7 @@ defineExpose({
                                 type="search"
                                 autocomplete="off"
                                 v-model="searchQuery"
+                                @focus="onFocus"
                                 @blur="onBlur"
                                 @paste="onPaste"
                                 @keydown.enter="pushTaggableOption"
