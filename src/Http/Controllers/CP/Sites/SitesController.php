@@ -8,6 +8,8 @@ use Inertia\Inertia;
 use Statamic\Facades\Site;
 use Statamic\Http\Controllers\CP\CpController;
 
+use function Statamic\trans as __;
+
 class SitesController extends CpController
 {
     public function __construct()
