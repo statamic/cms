@@ -25,7 +25,7 @@ class FormTest extends TestCase
     {
         parent::setUp();
 
-        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(false)->byDefault();
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true)->byDefault();
 
         Form::make('contact')->save();
     }
@@ -57,14 +57,24 @@ class FormTest extends TestCase
     }
 
     #[Test]
-    public function it_discards_the_limit_period_when_the_limit_isnt_overridden()
+    public function it_keeps_falsy_overrides()
     {
         $value = $this->fieldtype()->process(['form' => ['contact'], 'config' => [
-            'closed_message' => 'Closed.',
-            'submission_limit_period' => 'total',
+            'require_login' => false,
         ]]);
 
-        $this->assertEquals(['form' => 'contact', 'config' => ['closed_message' => 'Closed.']], $value);
+        $this->assertEquals(['form' => 'contact', 'config' => ['require_login' => false]], $value);
+    }
+
+    #[Test]
+    public function it_drops_blank_overrides()
+    {
+        $value = $this->fieldtype()->process(['form' => ['contact'], 'config' => [
+            'close_date' => null,
+            'closed_message' => '',
+        ]]);
+
+        $this->assertEquals('contact', $value);
     }
 
     #[Test]
@@ -77,6 +87,16 @@ class FormTest extends TestCase
     public function it_processes_handles_normally_when_multiple_forms_are_allowed()
     {
         $this->assertEquals(['contact', 'other'], $this->fieldtype(['max_items' => 2])->process(['contact', 'other']));
+    }
+
+    #[Test]
+    public function it_processes_to_a_plain_handle_without_forms_pro()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(false);
+
+        $value = $this->fieldtype()->process(['form' => ['contact'], 'config' => ['submission_limit' => 5]]);
+
+        $this->assertEquals('contact', $value);
     }
 
     #[Test]
@@ -96,10 +116,18 @@ class FormTest extends TestCase
         $fromArray = $this->fieldtype()->preProcess(['form' => 'contact', 'config' => ['submission_limit' => 5]]);
 
         $this->assertEquals(['contact'], $fromString['form']);
-        $this->assertNull($fromString['config']['submission_limit']);
+        $this->assertEquals([], $fromString['config']);
 
         $this->assertEquals(['contact'], $fromArray['form']);
-        $this->assertEquals(5, $fromArray['config']['submission_limit']);
+        $this->assertEquals(['submission_limit' => 5], $fromArray['config']);
+    }
+
+    #[Test]
+    public function it_pre_processes_to_handles_without_forms_pro()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(false);
+
+        $this->assertEquals(['contact'], $this->fieldtype()->preProcess(['form' => 'contact', 'config' => ['submission_limit' => 5]]));
     }
 
     #[Test]
@@ -117,7 +145,7 @@ class FormTest extends TestCase
     }
 
     #[Test]
-    public function it_uses_the_forms_values_as_override_placeholders()
+    public function it_preloads_the_forms_values_as_origin_values()
     {
         Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
 
@@ -125,12 +153,19 @@ class FormTest extends TestCase
 
         Form::find('contact')->set('unique_instances', true)->set('submission_limit', 100)->save();
 
-        $preload = (new Field('rsvp_form', ['type' => 'form', 'max_items' => 1]))->setValue('contact')->fieldtype()->preload();
+        $preload = (new Field('rsvp_form', ['type' => 'form', 'max_items' => 1]))
+            ->setValue(['form' => 'contact', 'config' => ['submission_limit' => 25]])
+            ->fieldtype()
+            ->preload();
 
-        $fields = collect($preload['configure']['blueprint']['tabs'][0]['sections'][0]['fields']);
+        $configuration = $preload['configuration'];
 
-        $this->assertEquals(100, $fields->firstWhere('handle', 'submission_limit')['placeholder']);
-        $this->assertArrayNotHasKey('placeholder', $fields->firstWhere('handle', 'close_date'));
+        $this->assertEquals(100, $configuration['originValues']['submission_limit']);
+        $this->assertEquals(25, $configuration['values']['submission_limit']);
+
+        $fields = collect($configuration['blueprint']['tabs'][0]['sections'][0]['fields']);
+
+        $this->assertTrue($fields->every(fn ($field) => $field['localizable']));
     }
 
     #[Test]

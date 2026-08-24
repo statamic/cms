@@ -16,6 +16,7 @@ use Statamic\Fieldtypes\Relationship;
 use Statamic\GraphQL\Types\FormType;
 use Statamic\Query\ItemQueryBuilder;
 use Statamic\Query\Scopes\Filter;
+use Statamic\Statamic;
 use Statamic\Support\Arr;
 
 use function Statamic\trans as __;
@@ -91,9 +92,11 @@ class Fieldtype extends Relationship
             return $this->toFormHandles($data);
         }
 
+        $config = Arr::get($data, 'config', []);
+
         return [
             'form' => $this->toFormHandles($data),
-            'config' => $this->overrideFields()->addValues(Arr::get($data, 'config', []))->preProcess()->values()->all(),
+            'config' => $this->overrideFields()->addValues($config)->preProcess()->values()->only(array_keys($config))->all(),
         ];
     }
 
@@ -101,7 +104,7 @@ class Fieldtype extends Relationship
     {
         $handles = $this->toFormHandles($data);
 
-        return $this->configCanBeOverridden() ? Arr::first($handles) : $handles;
+        return $this->config('max_items') === 1 ? Arr::first($handles) : $handles;
     }
 
     public function process($data)
@@ -114,18 +117,17 @@ class Fieldtype extends Relationship
             return null;
         }
 
+        $config = Arr::get($data, 'config', []);
+
+        // Only desynced fields are submitted, so a key's presence means it's an
+        // override. Falsy values count; an override is only "empty" when blank.
         $config = $this->overrideFields()
-            ->addValues(Arr::get($data, 'config', []))
+            ->addValues($config)
             ->process()
             ->values()
-            ->filter()
+            ->only(array_keys($config))
+            ->reject(fn ($value) => $value === null || $value === '')
             ->all();
-
-        // The limit period always comes back from the publish form since it has a
-        // default, but it's only an override when the limit itself is overridden.
-        if (empty($config['submission_limit'])) {
-            unset($config['submission_limit_period']);
-        }
 
         return $config ? ['form' => $form, 'config' => $config] : $form;
     }
@@ -137,7 +139,7 @@ class Fieldtype extends Relationship
 
     private function configCanBeOverridden(): bool
     {
-        return $this->config('max_items') === 1;
+        return Statamic::formsProInstalled() && $this->config('max_items') === 1;
     }
 
     private function toFormHandles($value): array
@@ -154,14 +156,12 @@ class Fieldtype extends Relationship
         return $this->overrideBlueprint()->fields();
     }
 
-    private function overrideBlueprint(?FormContract $form = null): Blueprint
+    private function overrideBlueprint(): Blueprint
     {
         $section = ConfigFields::fields()['access'];
 
-        $section['fields'] = collect($section['fields'])->map(function (array $field, $handle) use ($form): array {
-            if (in_array($field['type'], ['text', 'textarea', 'integer', 'float', 'select']) && $value = $form?->get($handle)) {
-                $field['placeholder'] = $value;
-            }
+        $section['fields'] = collect($section['fields'])->map(function (array $field): array {
+            $field['localizable'] = true;
 
             return $field;
         });
@@ -244,12 +244,14 @@ class Fieldtype extends Relationship
     {
         $data = parent::preload();
 
+        $data['configurable'] = $this->configCanBeOverridden();
+
         if ($submissions = $this->submissionsPreloadData()) {
             $data['submissions'] = $submissions;
         }
 
-        if ($configure = $this->configurePreloadData()) {
-            $data['configure'] = $configure;
+        if ($configuration = $this->configurationPreloadData()) {
+            $data['configuration'] = $configuration;
         }
 
         return $data;
@@ -272,7 +274,7 @@ class Fieldtype extends Relationship
         ];
     }
 
-    private function configurePreloadData(): ?array
+    private function configurationPreloadData(): ?array
     {
         if (! $this->configCanBeOverridden()) {
             return null;
@@ -282,12 +284,18 @@ class Fieldtype extends Relationship
             return null;
         }
 
-        $fields = $this->overrideFields()->addValues(Arr::get($this->field->value(), 'config', []))->preProcess();
+        $config = Arr::get($this->field->value(), 'config', []);
+
+        $origin = $this->overrideFields()->addValues($form->data()->all())->preProcess();
+        $fields = $this->overrideFields()->addValues(array_merge($form->data()->all(), $config))->preProcess();
 
         return [
             'form' => $form->handle(),
-            'blueprint' => $this->overrideBlueprint($form)->toPublishArray(),
+            'blueprint' => $this->overrideBlueprint()->toPublishArray(),
+            'values' => $fields->values()->all(),
             'meta' => $fields->meta(),
+            'originValues' => $origin->values()->all(),
+            'originMeta' => $origin->meta(),
         ];
     }
 

@@ -27,7 +27,7 @@
             />
         </Stack>
 
-        <Stack v-if="configureMeta" v-model:open="configuringForm" size="half" :title="__('Configure')">
+        <Stack v-if="configurationMeta" v-model:open="configuringForm" size="half" :title="__('Configure')">
             <p
                 class="mb-6 text-sm text-gray-600 dark:text-gray-300"
                 v-text="__('messages.form_fieldtype_configure_instructions')"
@@ -35,8 +35,12 @@
 
             <PublishContainer
                 v-model="configOverrides"
-                :blueprint="configureMeta.blueprint"
-                :meta="configureMeta.meta"
+                v-model:modified-fields="modifiedOverrides"
+                :blueprint="configurationMeta.blueprint"
+                :meta="configurationMeta.meta"
+                :origin-values="configurationMeta.originValues"
+                :origin-meta="configurationMeta.originMeta"
+                :sync-field-confirmation-text="__('messages.form_fieldtype_sync_confirmation')"
                 :track-dirty-state="false"
                 as-config
             >
@@ -52,6 +56,7 @@
 </template>
 
 <script>
+import clone from '@/util/clone.js';
 import Fieldtype from './Fieldtype.vue';
 import RelationshipFieldtype from './relationship/RelationshipFieldtype.vue';
 import InlineSubmissionForm from '@/components/forms/InlineSubmissionForm.vue';
@@ -75,7 +80,7 @@ export default {
         return {
             formFieldtypeItem: {
                 hasSubmissions: () => !!this.submissionsMeta,
-                hasConfigure: () => !!this.configureMeta,
+                hasConfigure: () => !!this.configurationMeta,
                 viewSubmissions: () => (this.viewingSubmissions = true),
                 configure: () => (this.configuringForm = true),
             },
@@ -88,12 +93,13 @@ export default {
             viewingSubmission: null,
             configuringForm: false,
             configOverrides: {},
+            modifiedOverrides: [],
         };
     },
 
     computed: {
         configurable() {
-            return this.config.max_items === 1;
+            return this.meta.configurable;
         },
 
         form() {
@@ -108,12 +114,12 @@ export default {
             return submissions;
         },
 
-        configureMeta() {
-            const configure = this.meta.configure;
+        configurationMeta() {
+            const configuration = this.meta.configuration;
 
-            if (!configure || !this.form.includes(configure.form)) return null;
+            if (!configuration || !this.form.includes(configuration.form)) return null;
 
-            return configure;
+            return configuration;
         },
 
         replicatorPreview() {
@@ -143,7 +149,12 @@ export default {
         },
 
         configuringForm(open) {
-            if (open) this.configOverrides = clone(this.value?.config ?? {});
+            if (!open) return;
+
+            const config = clone(this.value?.config ?? {});
+
+            this.configOverrides = { ...clone(this.configurationMeta.originValues), ...config };
+            this.modifiedOverrides = Object.keys(config);
         },
     },
 
@@ -162,7 +173,11 @@ export default {
         },
 
         applyConfigure() {
-            this.update({ form: this.form, config: this.configOverrides });
+            const config = Object.fromEntries(
+                Object.entries(this.configOverrides).filter(([handle]) => this.modifiedOverrides.includes(handle)),
+            );
+
+            this.update({ form: this.form, config });
             this.configuringForm = false;
         },
     },

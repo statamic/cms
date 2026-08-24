@@ -162,6 +162,17 @@ class AccessTest extends TestCase
     }
 
     #[Test]
+    public function an_entry_can_override_require_login_off()
+    {
+        $form = $this->makeForm(['require_login' => true, 'unique_instances' => true]);
+
+        $this->makeEntry('event-1', ['form' => 'contact', 'config' => ['require_login' => false]]);
+
+        $this->assertFalse($form->instance('event-1')->restricted());
+        $this->assertTrue($form->restricted());
+    }
+
+    #[Test]
     public function overrides_from_an_entry_using_a_different_form_are_ignored()
     {
         $form = $this->makeForm(['unique_instances' => true]);
