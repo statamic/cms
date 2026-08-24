@@ -1,6 +1,6 @@
 <template>
     <div class="flex flex-col gap-3">
-        <div class="flex flex-wrap items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 dark:border-gray-700 dark:bg-gray-800">
+        <div class="flex flex-wrap items-center gap-3 rounded-xl border border-gray-200 bg-gray-50 px-3 pr-2 py-2 dark:border-gray-700 dark:bg-gray-800">
             <Checkbox
                 size="sm"
                 solo
@@ -11,7 +11,7 @@
                 @update:model-value="toggleSelectAll"
             />
             <Select
-                class="min-w-48 max-w-xs flex-1 font-normal"
+                class="flex-1 font-normal"
                 :options="massOriginOptions"
                 :clearable="true"
                 :virtualize="!hasNamedGroups"
@@ -45,7 +45,7 @@
                     </template>
                 </template>
             </Select>
-            <span v-if="selections.length" class="text-sm text-gray-700 dark:text-gray-300">
+            <span v-if="selections.length" class="pe-1.5 text-sm text-gray-700 dark:text-gray-300">
                 {{ __n(':count site selected|:count sites selected', selections.length) }}
             </span>
         </div>
