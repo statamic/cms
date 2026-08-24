@@ -118,10 +118,11 @@ class Fields
 
     public function newInstance()
     {
-        // Assign items directly — setItems() would re-resolve every field, then
-        // setFields() would immediately discard that work.
+        // Assign the items directly — setItems() would re-resolve every field, then
+        // setFields() would immediately discard that work. Clone so the two instances
+        // don't share one collection, which is what setItems() would have given us.
         $instance = new static;
-        $instance->items = $this->items;
+        $instance->items = clone $this->items;
 
         return $instance
             ->setParent($this->parent)

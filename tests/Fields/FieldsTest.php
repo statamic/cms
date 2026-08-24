@@ -411,6 +411,24 @@ class FieldsTest extends TestCase
     }
 
     #[Test]
+    public function mutating_the_items_on_a_new_instance_doesnt_affect_the_original()
+    {
+        $fields = new Fields([
+            ['handle' => 'one', 'field' => ['display' => 'First']],
+        ]);
+
+        $instance = $fields->newInstance();
+
+        $this->assertNotSame($fields->items(), $instance->items());
+
+        $instance->items()->push(['handle' => 'two', 'field' => ['display' => 'Second']]);
+        $instance->items()->put(0, ['handle' => 'clobbered', 'field' => ['display' => 'Clobbered']]);
+
+        $this->assertEquals(['one'], $fields->items()->pluck('handle')->all());
+        $this->assertEquals(['clobbered', 'two'], $instance->items()->pluck('handle')->all());
+    }
+
+    #[Test]
     public function converts_to_array_suitable_for_rendering_fields_in_publish_component()
     {
         FieldRepository::shouldReceive('find')
