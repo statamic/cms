@@ -92,6 +92,25 @@ class OutpostTest extends TestCase
     }
 
     #[Test]
+    public function the_cached_response_is_used_when_only_the_environment_has_changed()
+    {
+        $outpost = $this->outpostWithJsonResponse(['newer' => 'response']);
+
+        $payload = $outpost->payload();
+        $payload['host'] = 'some-other-host.com';
+        $payload['ip'] = '9.9.9.9';
+        $payload['port'] = null;
+        $payload['php_version'] = '1.2.3';
+
+        $this->setCachedResponse($testCachedResponse = [
+            'cached' => 'response',
+            'payload' => $payload,
+        ]);
+
+        $this->assertEquals($testCachedResponse, $outpost->response());
+    }
+
+    #[Test]
     public function license_key_file_is_used_when_it_exists()
     {
         config(['statamic.system.license_key' => 'testsitekey12345']);
