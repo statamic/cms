@@ -107,6 +107,23 @@ class FormTest extends TestCase
     }
 
     #[Test]
+    public function it_uses_the_forms_values_as_override_placeholders()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        $this->actingAs(tap(User::make()->makeSuper())->save());
+
+        Form::find('contact')->set('unique_instances', true)->set('submission_limit', 100)->save();
+
+        $preload = (new Field('rsvp_form', ['type' => 'form', 'max_items' => 1]))->setValue('contact')->fieldtype()->preload();
+
+        $fields = collect($preload['configure']['blueprint']['tabs'][0]['sections'][0]['fields']);
+
+        $this->assertEquals(100, $fields->firstWhere('handle', 'submission_limit')['placeholder']);
+        $this->assertArrayNotHasKey('placeholder', $fields->firstWhere('handle', 'close_date'));
+    }
+
+    #[Test]
     public function it_augments_both_stored_shapes_to_the_form()
     {
         $this->assertEquals('contact', $this->fieldtype()->augment('contact')->handle());

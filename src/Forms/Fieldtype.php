@@ -149,9 +149,17 @@ class Fieldtype extends Relationship
         return $this->overrideBlueprint()->fields();
     }
 
-    private function overrideBlueprint(): Blueprint
+    private function overrideBlueprint(?FormContract $form = null): Blueprint
     {
         $section = ConfigFields::fields()['access'];
+
+        $section['fields'] = collect($section['fields'])->map(function (array $field, $handle) use ($form): array {
+            if (in_array($field['type'], ['text', 'textarea', 'integer', 'float', 'select']) && $value = $form?->get($handle)) {
+                $field['placeholder'] = $value;
+            }
+
+            return $field;
+        });
 
         return Facades\Blueprint::make()->setContents([
             'tabs' => ['main' => ['sections' => [[
@@ -278,7 +286,7 @@ class Fieldtype extends Relationship
 
         return [
             'form' => $form->handle(),
-            'blueprint' => $this->overrideBlueprint()->toPublishArray(),
+            'blueprint' => $this->overrideBlueprint($form)->toPublishArray(),
             'meta' => $fields->meta(),
         ];
     }
