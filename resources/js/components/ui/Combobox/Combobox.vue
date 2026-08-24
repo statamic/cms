@@ -147,7 +147,9 @@ const triggerRef = useTemplateRef('trigger');
 const searchInputRef = useTemplateRef('search');
 
 watch(searchQuery, (value) => emit('search', value, () => {}));
-watch(dropdownOpen, () => searchQuery.value = '');
+watch(dropdownOpen, (open) => {
+    if (!open) searchQuery.value = '';
+});
 
 const getOptionLabel = (option) => {
     const label = option?.[props.optionLabel];
@@ -390,7 +392,7 @@ defineExpose({
                     <ComboboxTrigger
                         as="div"
                         ref="trigger"
-                        :tabindex="disabled || readOnly ? -1 : 0"
+                        :tabindex="disabled || readOnly || shouldShowInput ? -1 : 0"
                         :class="triggerClasses"
                         data-ui-combobox-trigger
                         @keydown.enter="openDropdown"
