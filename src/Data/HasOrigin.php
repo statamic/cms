@@ -18,13 +18,13 @@ trait HasOrigin
             return $this->cachedKeys;
         }
 
-        $id = $this->id();
+        $key = $this->originVisitKey();
 
-        if (in_array($id, $visited, true)) {
+        if (in_array($key, $visited, true)) {
             return collect();
         }
 
-        $visited[] = $id;
+        $visited[] = $key;
 
         $originFallbackKeys = method_exists($this, 'getOriginFallbackValues') ? $this->getOriginFallbackValues()->keys() : collect();
 
@@ -52,13 +52,13 @@ trait HasOrigin
 
     public function getValues($wrapComputed, array $visited = [])
     {
-        $id = $this->id();
+        $key = $this->originVisitKey();
 
-        if (in_array($id, $visited, true)) {
+        if (in_array($key, $visited, true)) {
             return collect();
         }
 
-        $visited[] = $id;
+        $visited[] = $key;
 
         $originFallbackValues = method_exists($this, 'getOriginFallbackValues') ? $this->getOriginFallbackValues() : collect();
 
@@ -75,13 +75,13 @@ trait HasOrigin
 
     public function value($key, array $visited = [])
     {
-        $id = $this->id();
+        $visitKey = $this->originVisitKey();
 
-        if (in_array($id, $visited, true)) {
+        if (in_array($visitKey, $visited, true)) {
             return null;
         }
 
-        $visited[] = $id;
+        $visited[] = $visitKey;
 
         $originFallbackValue = method_exists($this, 'getOriginFallbackValue') ? $this->getOriginFallbackValue($key) : null;
 
@@ -147,15 +147,13 @@ trait HasOrigin
         $entry = $this;
 
         while ($entry->hasOrigin()) {
-            $id = $entry->id();
+            $key = $entry->originVisitKey();
 
-            if ($id !== null && isset($seen[$id])) {
+            if (isset($seen[$key])) {
                 return true;
             }
 
-            if ($id !== null) {
-                $seen[$id] = true;
-            }
+            $seen[$key] = true;
 
             $entry = $entry->origin();
 
@@ -173,19 +171,30 @@ trait HasOrigin
         $seen = [];
 
         while ($entry->hasOrigin()) {
-            $id = $entry->id();
+            $key = $entry->originVisitKey();
 
-            if ($id !== null && isset($seen[$id])) {
+            if (isset($seen[$key])) {
                 break;
             }
 
-            if ($id !== null) {
-                $seen[$id] = true;
-            }
+            $seen[$key] = true;
 
             $entry = $entry->origin();
         }
 
         return $entry;
+    }
+
+    protected function originVisitKey()
+    {
+        if (method_exists($this, 'id')) {
+            $id = $this->id();
+
+            if ($id !== null) {
+                return $id;
+            }
+        }
+
+        return 'object:'.spl_object_id($this);
     }
 }
