@@ -72,10 +72,9 @@ class Instance
                 return [];
             }
 
-            $value = $entry->blueprint()->fields()->all()
-                ->filter(fn ($field) => $field->type() === 'form')
-                ->map(fn ($field) => $entry->value($field->handle()))
-                ->first(fn ($value) => is_array($value) && Arr::get($value, 'form') === $this->form->handle());
+            $value = FormFieldValues::on($entry)
+                ->referencing($this->form->handle())
+                ->first(fn ($value) => is_array($value) && Arr::isAssoc($value));
 
             return Arr::get($value, 'config', []);
         });
@@ -116,7 +115,7 @@ class Instance
 
     private function submissionLimitPeriodStart(): ?Carbon
     {
-        return match ($this->config('submission_limit_period') ?? 'total') {
+        return match ($this->config('submission_limit_period')) {
             'day' => now()->startOfDay(),
             'week' => now()->startOfWeek(),
             'month' => now()->startOfMonth(),

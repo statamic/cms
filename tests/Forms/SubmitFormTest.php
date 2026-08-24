@@ -1213,6 +1213,28 @@ class SubmitFormTest extends TestCase
     }
 
     #[Test]
+    public function it_accepts_an_entry_referencing_the_form_from_a_nested_field()
+    {
+        Blueprint::make('event')->setNamespace('collections.events')->setContents(['fields' => [
+            ['handle' => 'blocks', 'field' => ['type' => 'replicator', 'sets' => [
+                'rsvp' => ['fields' => [
+                    ['handle' => 'rsvp_form', 'field' => ['type' => 'form', 'max_items' => 1]],
+                ]],
+            ]]],
+        ]])->save();
+
+        (new EntryFactory)->collection('events')->id('event-1')->slug('event-one')->data(['blocks' => [
+            ['type' => 'rsvp', 'rsvp_form' => ['form' => 'contact', 'config' => []]],
+        ]])->create();
+
+        $this->form->set('unique_instances', true)->save();
+
+        $result = $this->action()->entry('event-1')->submit(['email' => 'san@holo.com']);
+
+        $this->assertEquals('event-1', $result->submission->get('entry'));
+    }
+
+    #[Test]
     public function it_ignores_the_entry_when_unique_instances_is_disabled()
     {
         (new EntryFactory)->collection('events')->id('event-1')->slug('event-one')->create();

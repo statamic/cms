@@ -128,22 +128,11 @@ class SubmitForm
 
         $entry = $this->entry ? Entry::find($this->entry) : null;
 
-        if (! $entry || ! $this->entryUsesForm($entry)) {
+        if (! $entry || FormFieldValues::on($entry)->referencing($this->form->handle())->isEmpty()) {
             throw ValidationException::withMessages(['*' => [__('statamic::messages.form_entry_required')]]);
         }
 
         return $entry;
-    }
-
-    private function entryUsesForm(EntryContract $entry): bool
-    {
-        return $entry->blueprint()->fields()->all()
-            ->filter(fn ($field) => $field->type() === 'form')
-            ->contains(function ($field) use ($entry) {
-                $handles = $field->fieldtype()->toQueryableValue($entry->value($field->handle()));
-
-                return in_array($this->form->handle(), Arr::wrap($handles), true);
-            });
     }
 
     /**
