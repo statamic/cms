@@ -19,8 +19,6 @@ use Statamic\Forms\Logic\PageLogic;
 use Statamic\Rules\AllowedFile;
 use Statamic\Support\Arr;
 
-use function Statamic\trans as __;
-
 class SubmitForm
 {
     use Localizable;
@@ -129,7 +127,7 @@ class SubmitForm
         $entry = $this->entry ? Entry::find($this->entry) : null;
 
         if (! $entry || FormFieldValues::on($entry)->referencing($this->form->handle())->isEmpty()) {
-            throw ValidationException::withMessages(['*' => [__('statamic::messages.form_entry_required')]]);
+            throw ValidationException::withMessages(['*' => ['This form must be submitted from an entry.']]);
         }
 
         return $entry;
