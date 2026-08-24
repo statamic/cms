@@ -1,82 +1,148 @@
 <template>
-    <table class="grid-table">
-        <thead>
-            <tr>
-                <th scope="col">
-                    <div class="flex items-center justify-between">
-                        {{ __('Site') }}
-                    </div>
-                </th>
-                <th scope="col">
-                    <div class="flex items-center justify-between">
-                        {{ __('Origin') }}
-                    </div>
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-            <template v-for="group in siteGroups" :key="group.key">
-                <tr v-if="hasNamedGroups">
-                    <td colspan="2" class="bg-gray-50 dark:bg-gray-800 !py-2">
-                        <Subheading
-                            size="sm"
-                            class="px-1 font-semibold uppercase tracking-wide text-gray-950 text-2xs dark:text-gray-300"
-                            :text="group.label"
-                        />
-                    </td>
-                </tr>
-                <tr v-for="site in group.items" :key="site.handle">
-                    <td class="grid-cell">
-                        <div class="flex items-center gap-2">
-                            <Switch v-model="site.enabled" />
-                            <Heading :text="__(site.name)" />
-                        </div>
-                    </td>
-                    <td class="grid-cell">
-                        <Select
-                            class="w-full"
-                            :options="siteOriginOptions(site)"
-                            :clearable="true"
-                            :virtualize="!hasNamedGroups"
-                            :model-value="site.origin"
-                            @update:model-value="site.origin = $event"
-                        >
-                            <template #selected-option="{ option }">
-                                <span v-if="option" class="flex min-w-0 items-center gap-1.5">
-                                    <template v-if="originGroupLabel(option)">
-                                        <span class="truncate">{{ originGroupLabel(option) }}</span>
-                                        <Icon name="chevron-right" class="size-3.5! shrink-0 text-gray-700 dark:text-white/70" aria-hidden="true" />
-                                    </template>
-                                    <span class="truncate">{{ option.label }}</span>
-                                </span>
-                            </template>
+    <div class="flex flex-col gap-3">
+        <div class="flex flex-wrap items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 dark:border-gray-700 dark:bg-gray-800">
+            <Checkbox
+                size="sm"
+                solo
+                :model-value="allSelected"
+                :indeterminate="someSelected && !allSelected"
+                :disabled="!sites.length"
+                :label="__('Select all items')"
+                @update:model-value="toggleSelectAll"
+            />
+            <Select
+                class="min-w-48 max-w-xs flex-1 font-normal"
+                size="sm"
+                :options="massOriginOptions"
+                :clearable="true"
+                :virtualize="!hasNamedGroups"
+                :placeholder="__('Set origin to...')"
+                :model-value="massOrigin"
+                @update:model-value="applyMassOrigin"
+            >
+                <template #selected-option="{ option }">
+                    <span v-if="option" class="flex min-w-0 items-center gap-1.5">
+                        <template v-if="originGroupLabel(option)">
+                            <span class="truncate">{{ originGroupLabel(option) }}</span>
+                            <Icon name="chevron-right" class="size-3.5! shrink-0 text-gray-700 dark:text-white/70" aria-hidden="true" />
+                        </template>
+                        <span class="truncate">{{ option.label }}</span>
+                    </span>
+                </template>
 
-                            <template #before-option="option">
-                                <template v-if="hasNamedGroups">
-                                    <div
-                                        v-if="option._showGroupSeparator"
-                                        class="mx-2 mb-2.25 mt-0.75 border-t border-gray-200 dark:border-gray-700"
-                                        role="separator"
-                                    />
-                                    <Subheading
-                                        v-if="option._groupLabel"
-                                        size="sm"
-                                        class="px-2.5 pb-1 pt-1.5 font-semibold uppercase tracking-wide text-gray-950 text-2xs dark:text-gray-300"
-                                        :text="option._groupLabel"
-                                    />
-                                </template>
-                            </template>
-                        </Select>
-                    </td>
+                <template #before-option="option">
+                    <template v-if="hasNamedGroups">
+                        <div
+                            v-if="option._showGroupSeparator"
+                            class="mx-2 mb-2.25 mt-0.75 border-t border-gray-200 dark:border-gray-700"
+                            role="separator"
+                        />
+                        <Subheading
+                            v-if="option._groupLabel"
+                            size="sm"
+                            class="px-2.5 pb-1 pt-1.5 font-semibold uppercase tracking-wide text-gray-950 text-2xs dark:text-gray-300"
+                            :text="__(option._groupLabel)"
+                        />
+                    </template>
+                </template>
+            </Select>
+            <span v-if="selections.length" class="text-sm text-gray-700 dark:text-gray-300">
+                {{ __n(':count site selected|:count sites selected', selections.length) }}
+            </span>
+        </div>
+
+        <table class="grid-table">
+            <thead>
+                <tr>
+                    <th scope="col" class="checkbox-column w-8">
+                        <span class="sr-only">{{ __('Select') }}</span>
+                    </th>
+                    <th scope="col">
+                        <div class="flex items-center justify-between">
+                            {{ __('Site') }}
+                        </div>
+                    </th>
+                    <th scope="col">
+                        <div class="flex items-center justify-between">
+                            {{ __('Origin') }}
+                        </div>
+                    </th>
                 </tr>
-            </template>
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                <template v-for="group in siteGroups" :key="group.key">
+                    <tr v-if="hasNamedGroups">
+                        <td class="checkbox-column bg-gray-50 dark:bg-gray-800" aria-hidden="true" />
+                        <td colspan="2" class="bg-gray-50 dark:bg-gray-800 !py-2">
+                            <Subheading
+                                size="sm"
+                                class="font-semibold uppercase tracking-wide text-gray-950 text-2xs dark:text-gray-300"
+                                :text="__(group.label)"
+                            />
+                        </td>
+                    </tr>
+                    <tr v-for="site in group.items" :key="site.handle">
+                        <td class="checkbox-column">
+                            <Checkbox
+                                size="sm"
+                                solo
+                                :model-value="isSelected(site.handle)"
+                                :label="__('Select :name', { name: __(site.name) })"
+                                @update:model-value="toggleSelection(site.handle, $event)"
+                            />
+                        </td>
+                        <td class="grid-cell">
+                            <div class="flex items-center gap-2">
+                                <Switch v-model="site.enabled" />
+                                <Heading :text="__(site.name)" />
+                            </div>
+                        </td>
+                        <td class="grid-cell">
+                            <Select
+                                class="w-full"
+                                :options="siteOriginOptions(site)"
+                                :clearable="true"
+                                :virtualize="!hasNamedGroups"
+                                :model-value="site.origin"
+                                @update:model-value="site.origin = $event"
+                            >
+                                <template #selected-option="{ option }">
+                                    <span v-if="option" class="flex min-w-0 items-center gap-1.5">
+                                        <template v-if="originGroupLabel(option)">
+                                            <span class="truncate">{{ originGroupLabel(option) }}</span>
+                                            <Icon name="chevron-right" class="size-3.5! shrink-0 text-gray-700 dark:text-white/70" aria-hidden="true" />
+                                        </template>
+                                        <span class="truncate">{{ option.label }}</span>
+                                    </span>
+                                </template>
+
+                                <template #before-option="option">
+                                    <template v-if="hasNamedGroups">
+                                        <div
+                                            v-if="option._showGroupSeparator"
+                                            class="mx-2 mb-2.25 mt-0.75 border-t border-gray-200 dark:border-gray-700"
+                                            role="separator"
+                                        />
+                                        <Subheading
+                                            v-if="option._groupLabel"
+                                            size="sm"
+                                            class="px-2.5 pb-1 pt-1.5 font-semibold uppercase tracking-wide text-gray-950 text-2xs dark:text-gray-300"
+                                            :text="__(option._groupLabel)"
+                                        />
+                                    </template>
+                                </template>
+                            </Select>
+                        </td>
+                    </tr>
+                </template>
+            </tbody>
+        </table>
+    </div>
 </template>
 
 <script>
 import Fieldtype from '../fieldtypes/Fieldtype.vue';
-import { Icon, Switch, Heading, Select, Subheading } from '@/components/ui';
+import { Checkbox, Icon, Switch, Heading, Select, Subheading } from '@/components/ui';
 import {
     flatOptionsFromSiteGroups,
     groupItemsBySiteGroup,
@@ -88,6 +154,7 @@ export default {
     mixins: [Fieldtype],
 
     components: {
+        Checkbox,
         Icon,
         Switch,
         Heading,
@@ -98,6 +165,8 @@ export default {
     data() {
         return {
             sites: this.value ?? [],
+            selections: [],
+            massOrigin: null,
         };
     },
 
@@ -109,6 +178,19 @@ export default {
         siteGroups() {
             return groupItemsBySiteGroup(this.sites ?? []);
         },
+
+        allSelected() {
+            return this.sites.length > 0
+                && this.sites.every((site) => this.selections.includes(site.handle));
+        },
+
+        someSelected() {
+            return this.sites.some((site) => this.selections.includes(site.handle));
+        },
+
+        massOriginOptions() {
+            return this.originOptions();
+        },
     },
 
     watch: {
@@ -119,6 +201,7 @@ export default {
         sites: {
             deep: true,
             handler(sites) {
+                this.pruneSelections(sites);
                 this.update(sites);
             },
         },
@@ -133,14 +216,14 @@ export default {
             return selectedSiteGroupLabel(option, true);
         },
 
-        siteOriginOptions(site) {
+        originOptions(excludeHandle = null) {
             const options = (this.sites ?? [])
-                .filter((s) => s.handle !== site.handle)
-                .map((s) => ({
-                    value: s.handle,
-                    label: __(s.name),
-                    group: s.group,
-                    group_handle: s.group_handle,
+                .filter((site) => site.handle !== excludeHandle)
+                .map((site) => ({
+                    value: site.handle,
+                    label: __(site.name),
+                    group: site.group,
+                    group_handle: site.group_handle,
                 }));
 
             if (!this.hasNamedGroups) {
@@ -148,6 +231,70 @@ export default {
             }
 
             return flatOptionsFromSiteGroups(groupItemsBySiteGroup(options));
+        },
+
+        siteOriginOptions(site) {
+            return this.originOptions(site.handle);
+        },
+
+        isSelected(handle) {
+            return this.selections.includes(handle);
+        },
+
+        toggleSelection(handle, selected) {
+            if (selected) {
+                if (!this.selections.includes(handle)) {
+                    this.selections.push(handle);
+                }
+
+                return;
+            }
+
+            this.selections = this.selections.filter((value) => value !== handle);
+        },
+
+        toggleSelectAll(selected) {
+            if (!selected) {
+                this.clearSelections();
+
+                return;
+            }
+
+            this.selections = this.sites.map((site) => site.handle);
+        },
+
+        clearSelections() {
+            this.selections = [];
+            this.massOrigin = null;
+        },
+
+        pruneSelections(sites) {
+            const handles = new Set((sites ?? []).map((site) => site.handle));
+
+            this.selections = this.selections.filter((handle) => handles.has(handle));
+        },
+
+        applyMassOrigin(origin) {
+            this.massOrigin = origin;
+
+            if (!origin || !this.selections.length) {
+                this.massOrigin = null;
+
+                return;
+            }
+
+            const selected = new Set(this.selections);
+
+            this.sites.forEach((site) => {
+                if (!selected.has(site.handle) || site.handle === origin) {
+                    return;
+                }
+
+                site.origin = origin;
+            });
+
+            this.massOrigin = null;
+            this.clearSelections();
         },
     },
 };
