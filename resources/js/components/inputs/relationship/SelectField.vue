@@ -191,11 +191,6 @@ export default {
 
             this.$emit('input', items);
         },
-
-        createOption(value) {
-            const existing = this.options.find((option) => option.title === value);
-            return existing || { id: value, title: value };
-        },
     },
 };
 </script>
