@@ -13,9 +13,11 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Site;
+use Statamic\Facades\User;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Value;
+use Statamic\Fieldtypes\Assets\Assets as AssetsFieldtype;
 use Statamic\Fieldtypes\Bard\Augmentor;
 use Statamic\Fieldtypes\Link\LinkType;
 use Statamic\GraphQL\Types\BardSetsType;
@@ -813,9 +815,10 @@ class Bard extends Replicator
         $nestedField->setValue([$id]);
         $fieldtype = $nestedField->fieldtype();
 
-        // Relationship fieldtypes expose getItemData(); custom link types may
-        // only implement preload() with a data payload.
-        if (method_exists($fieldtype, 'getItemData')) {
+        // Both of these build their preload `data` from getItemData(), so we can get the
+        // item without paying for the rest of the preload payload. Anything else may only
+        // implement preload(), so it gets the original treatment.
+        if ($fieldtype instanceof Relationship || $fieldtype instanceof AssetsFieldtype) {
             return $fieldtype->getItemData([$id])->first();
         }
 
@@ -834,9 +837,17 @@ class Bard extends Replicator
     private function linkTypesForToolbar(): array
     {
         $field = $this->linkTypeField();
-        $config = $field->config();
 
-        return Blink::once('bard-link-types-'.md5(json_encode($config)), function () use ($field) {
+        // The cached payload contains site-dependent config (an entry link type falls back
+        // to the current site's routable collections) and user-dependent meta (asset link
+        // type permissions), so both need to be part of the key.
+        $key = vsprintf('bard-link-types-%s-%s-%s', [
+            Site::current()->handle(),
+            User::current()?->id() ?? 'guest',
+            md5(json_encode($field->config())),
+        ]);
+
+        return Blink::once($key, function () use ($field) {
             return collect(Link::types())
                 ->filter(fn (LinkType $type): bool => $type->visible($field))
                 ->map(function (LinkType $type, string $handle) use ($field): ?array {
