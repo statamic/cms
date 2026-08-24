@@ -32,7 +32,7 @@ function groupLabel(option) {
 
 <template>
     <Select
-        class="w-36"
+        class="w-60"
         :options="options"
         option-label="name"
         option-value="handle"
