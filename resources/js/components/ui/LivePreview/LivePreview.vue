@@ -82,10 +82,9 @@ const payload = computed(() => ({
     extras: extras.value,
 }));
 
-// Progressive mounting / TipTap seed can deep-watch-churn `values` without a real
-// content change. Skip identical payloads from the watch so the iframe doesn't
-// refresh on scroll/expand. Explicit update() callers (open / popout / refresh)
-// still always POST.
+// The payload is only watched while the preview is open, and a deep change that
+// serializes to the payload we last posted doesn't warrant posting again. Explicit
+// update() callers (open / popout / refresh) bypass this and always post.
 let lastPostedPayloadKey = null;
 let stopPayloadWatch = null;
 
@@ -194,6 +193,10 @@ watch(
         animateIn();
     },
 );
+
+// The watcher above only covers transitions, so a component mounted already enabled
+// needs the payload watch installed up front.
+if (props.enabled) startPayloadWatch();
 
 const canPopOut = computed(() => typeof BroadcastChannel === 'function');
 
