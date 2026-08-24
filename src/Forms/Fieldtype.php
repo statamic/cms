@@ -292,7 +292,6 @@ class Fieldtype extends Relationship
         return [
             'form' => $form->handle(),
             'blueprint' => $this->overrideBlueprint()->toPublishArray(),
-            'values' => $fields->values()->all(),
             'meta' => $fields->meta(),
             'originValues' => $origin->values()->all(),
             'originMeta' => $origin->meta(),

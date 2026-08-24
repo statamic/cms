@@ -161,7 +161,7 @@ class FormTest extends TestCase
         $configuration = $preload['configuration'];
 
         $this->assertEquals(100, $configuration['originValues']['submission_limit']);
-        $this->assertEquals(25, $configuration['values']['submission_limit']);
+        $this->assertArrayNotHasKey('values', $configuration);
 
         $fields = collect($configuration['blueprint']['tabs'][0]['sections'][0]['fields']);
 
