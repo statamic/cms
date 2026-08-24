@@ -257,6 +257,48 @@
         }
     }
 }
+
+/* BARD / DRAGGING
+=================================================== */
+/* Hide set bodies synchronously (classList, not waiting on Vue) so collapse-on-drag
+   doesn't leave the pointer over empty space where the expanded set used to be. */
+.bard-dragging [data-set-body] {
+    display: none;
+}
+
+/* BARD / DROP + GAP CURSORS
+=================================================== */
+/* Unlayered so we beat ProseMirror's injected 1px black defaults. */
+.bard-dropcursor {
+    border-radius: 999px;
+    background-color: var(--focus-outline-color, var(--color-blue-400));
+}
+
+/* Leading disc on block (horizontal) drops — Notion-style slot marker.
+   Inline (vertical) carets stay a rounded pill so they don't grow a blob. */
+.bard-dropcursor.prosemirror-dropcursor-block::before {
+    content: '';
+    position: absolute;
+    inset-inline-start: 0;
+    top: 50%;
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background-color: inherit;
+    translate: -30% -50%;
+}
+
+[dir='rtl'] .bard-dropcursor.prosemirror-dropcursor-block::before {
+    translate: 30% -50%;
+}
+
+/* Gapcursor: click-between-blocks caret. Same token as dropcursor. */
+.ProseMirror-gapcursor:after {
+    border-top: 2px solid var(--focus-outline-color, var(--color-blue-400));
+    border-radius: 999px;
+    width: 1.5rem;
+}
+
 /* BARD / FULL SCREEN
 =================================================== */
 @layer ui-states {

@@ -5,6 +5,9 @@ import { data_get } from '../../util/data_get.js';
 import { isObject, intersection } from 'lodash-es';
 
 const NUMBER_SPECIFIC_COMPARISONS = ['>', '>=', '<', '<='];
+const CUSTOM_PREFIX_RE = /^custom /;
+const ROOT_PREFIX_RE = /^\$?root\./;
+const TRAILING_FIELD_RE = /\.[^.]+$/;
 
 const isEmpty = (value) => {
     if (value === null || value === undefined) return true;
@@ -25,6 +28,7 @@ export default class {
         this.passOnAny = false;
         this.showOnPass = true;
         this.converter = new Converter();
+        this._conditionsResolved = false;
     }
 
     usingRootValues() {
@@ -56,25 +60,42 @@ export default class {
     }
 
     getConditions() {
+        // Memoized per Validator instance — field config is static for the evaluation cycle.
+        // Side-effect flags (passOnAny / showOnPass) are restored on subsequent calls.
+        if (this._conditionsResolved) {
+            this.passOnAny = this._passOnAny;
+            this.showOnPass = this._showOnPass;
+            return this._conditions;
+        }
+
+        this._conditionsResolved = true;
+        this._passOnAny = false;
+        this._showOnPass = true;
+
         let key = KEYS.filter((key) => this.field[key])[0];
 
         if (!key) {
+            this._conditions = undefined;
             return undefined;
         }
 
         if (key.includes('any')) {
             this.passOnAny = true;
+            this._passOnAny = true;
         }
 
         if (key.includes('unless') || key.includes('hide_when')) {
             this.showOnPass = false;
+            this._showOnPass = false;
         }
 
         let conditions = this.field[key];
 
-        return this.isCustomConditionWithoutTarget(conditions)
+        this._conditions = this.isCustomConditionWithoutTarget(conditions)
             ? conditions
             : this.converter.fromBlueprint(conditions, this.field.prefix);
+
+        return this._conditions;
     }
 
     isCustomConditionWithoutTarget(conditions) {
@@ -189,7 +210,7 @@ export default class {
     }
 
     prepareFunctionName(condition) {
-        return condition.replace(new RegExp('^custom '), '').split(':')[0];
+        return condition.replace(CUSTOM_PREFIX_RE, '').split(':')[0];
     }
 
     prepareParams(condition) {
@@ -204,7 +225,7 @@ export default class {
         }
 
         if (field.startsWith('$root.') || field.startsWith('root.')) {
-            return data_get(this.rootValues, field.replace(new RegExp('^\\$?root\\.'), ''));
+            return data_get(this.rootValues, field.replace(ROOT_PREFIX_RE, ''));
         }
 
         return data_get(this.values, field);
@@ -293,14 +314,14 @@ export default class {
         }
 
         if (lhs.startsWith('$root.') || lhs.startsWith('root.')) {
-            return lhs.replace(new RegExp('^\\$?root\\.'), '');
+            return lhs.replace(ROOT_PREFIX_RE, '');
         }
 
         return dottedPrefix ? dottedPrefix + '.' + lhs : lhs;
     }
 
     scopeValuesToParent() {
-        let scope = this.currentFieldPath.replace(new RegExp('\.[^\.]+$'), '');
+        let scope = this.currentFieldPath.replace(TRAILING_FIELD_RE, '');
 
         this.values = data_get(this.rootValues, scope);
 

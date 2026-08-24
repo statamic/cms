@@ -5,7 +5,10 @@ import { nextTick } from 'vue';
 export default class {
     constructor(values, extraValues, rootValues, revealerValues, hiddenFields, setHiddenField, extraPayload) {
         this.values = values;
+        // Merge once per instance — reused across showField() calls when Sections/Tabs
+        // construct a single ShowField for a filter loop.
         this.extraValues = { ...extraValues, ...revealerValues };
+        this.mergedValues = { ...values, ...this.extraValues };
         this.rootValues = rootValues;
         this.revealerValues = revealerValues;
         this.hiddenFields = hiddenFields;
@@ -31,7 +34,14 @@ export default class {
         }
 
         // Use validation to determine whether field should be shown.
-        let validator = new Validator(field, { ...this.values, ...this.extraValues }, this.rootValues, dottedFieldPath, Object.keys(this.revealerValues), this.extraPayload);
+        let validator = new Validator(
+            field,
+            this.mergedValues,
+            this.rootValues,
+            dottedFieldPath,
+            Object.keys(this.revealerValues),
+            this.extraPayload,
+        );
         let passes = validator.passesConditions();
 
         // If the field is configured to always save, never omit value.
@@ -45,12 +55,17 @@ export default class {
             return passes;
         }
 
+        // With no revealers registered, passesNonRevealerConditions === passesConditions.
+        const hasRevealers = Object.keys(this.revealerValues).length > 0;
+
         // Ensure DOM is updated to ensure all revealers are properly loaded and tracked before committing to store.
         nextTick(() => {
             this.setHiddenFieldState({
                 dottedKey: dottedFieldPath,
                 hidden: !passes,
-                omitValue: field.type === 'revealer' || !validator.passesNonRevealerConditions(dottedPrefix),
+                omitValue:
+                    field.type === 'revealer' ||
+                    (hasRevealers ? !validator.passesNonRevealerConditions(dottedPrefix) : !passes),
             });
         });
 

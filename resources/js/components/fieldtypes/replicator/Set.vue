@@ -1,5 +1,5 @@
 <script setup>
-import { computed, inject, ref } from 'vue';
+import { computed, inject, ref, watch, onBeforeUnmount } from 'vue';
 import {
     Icon,
     Switch,
@@ -14,14 +14,18 @@ import {
     PublishFieldsProvider as FieldsProvider,
     injectPublishContext as injectContainerContext,
 } from '@/components/ui';
-import PreviewHtml from '@/components/fieldtypes/replicator/PreviewHtml.js';
 import FieldAction from '@/components/field-actions/FieldAction.js';
 import toFieldActions from '@/components/field-actions/toFieldActions.js';
 import { reveal } from '@api';
+import usePreviewText from '@/composables/use-preview-text';
+import { createMountScheduler } from '@/util/createMountScheduler.js';
+import ShowField from '@/components/field-conditions/ShowField.js';
+import analyzeSetConditions from '@/components/field-conditions/analyzeSetConditions.js';
 
 const emit = defineEmits(['collapsed', 'expanded', 'duplicated', 'removed']);
 
 const replicatorSets = inject('replicatorSets');
+const mountScheduler = inject('mountScheduler', createMountScheduler());
 
 const props = defineProps({
     config: Object,
@@ -43,7 +47,13 @@ const props = defineProps({
 const {
     setFieldValue,
     setFieldMeta,
-    previews
+    previews,
+    extraValues,
+    visibleValues,
+    revealerValues,
+    hiddenFields,
+    setHiddenField,
+    container,
 } = injectContainerContext();
 const fieldPathPrefix = computed(() => `${props.fieldPath}.${props.index}`);
 const metaPathPrefix = computed(() => `${props.metaPath}.existing.${props.id}`);
@@ -79,30 +89,12 @@ const fieldActions = computed(() => {
     return toFieldActions('replicator-fieldtype-set', fieldActionPayload.value);
 });
 
-const previewText = computed(() => {
-    return Object.entries(data_get(previews.value, fieldPathPrefix.value) || {})
-        .filter(([handle, value]) => {
-            if (!handle.endsWith('_')) return false;
-            handle = handle.substr(0, handle.length - 1); // Remove the trailing underscore.
-            const config = props.config.fields.find((f) => f.handle === handle);
-            if (!config) return false;
-            return config.replicator_preview === undefined ? props.showFieldPreviews : config.replicator_preview;
-        })
-        .map(([handle, value]) => value)
-        .filter((value) => !['null', '[]', '{}', '', undefined].includes(JSON.stringify(value)))
-        .map((value) => {
-            if (value instanceof PreviewHtml) return value.html;
-
-            if (typeof value === 'string') return escapeHtml(value);
-
-            if (Array.isArray(value) && typeof value[0] === 'string') {
-                return escapeHtml(value.join(', '));
-            }
-
-            return escapeHtml(JSON.stringify(value));
-        })
-        .filter((html) => html && html.trim() !== '')
-        .join(' <span class="text-gray-400 dark:text-gray-600">/</span> ');
+const { previewText } = usePreviewText({
+    config: computed(() => props.config),
+    values: computed(() => props.values),
+    previews,
+    fieldPathPrefix,
+    showFieldPreviews: computed(() => props.showFieldPreviews),
 });
 
 function toggleEnabledState() {
@@ -113,12 +105,93 @@ function toggleCollapsedState() {
     props.collapsed ? emit('expanded') : emit('collapsed');
 }
 
+function prewarmFields() {
+    if (hasBeenExpanded.value || !hasFields.value) return;
+    hasBeenExpanded.value = true;
+    mountScheduler.schedule(() => {
+        if (!isUnmounted) {
+            fieldsReady.value = true;
+        }
+    });
+}
+
 const deletingSet = ref(false);
 
 function destroy() {
     deletingSet.value = false;
     emit('removed');
 }
+
+// Defer mounting collapsed set bodies. Once expanded, keep mounted (v-show thereafter).
+const { needsRootValues, canDeferMount } = analyzeSetConditions(props.config);
+const hasBeenExpanded = ref(!props.collapsed);
+const fieldsReady = ref(!props.collapsed);
+let isUnmounted = false;
+
+onBeforeUnmount(() => {
+    isUnmounted = true;
+});
+
+watch(
+    () => props.collapsed,
+    (collapsed) => {
+        if (!collapsed && !hasBeenExpanded.value) {
+            hasBeenExpanded.value = true;
+            mountScheduler.schedule(() => {
+                if (!isUnmounted) {
+                    fieldsReady.value = true;
+                }
+            });
+        } else if (!collapsed) {
+            fieldsReady.value = true;
+        }
+    },
+);
+
+// Auto-expand when validation errors point at this set.
+watch(
+    () => props.hasError,
+    (hasError) => {
+        if (hasError && props.collapsed) {
+            emit('expanded');
+        }
+    },
+    { immediate: true },
+);
+
+// Some of what mounting used to do can't be done headlessly — nothing evaluates the
+// conditions of fields nested inside this set's fields, and revealers only register
+// themselves when they mount. Those sets get mounted anyway, but off the critical path.
+if (!canDeferMount) prewarmFields();
+
+// Headlessly evaluate conditions for never-mounted sets so omitValue bookkeeping
+// stays correct for the save payload. Sets whose conditions only look at their own
+// values keep a narrow dependency; the rest have to watch the whole tree.
+watch(
+    needsRootValues
+        ? [() => props.values, fieldsReady, revealerValues, visibleValues]
+        : [() => props.values, fieldsReady, revealerValues],
+    () => {
+        if (fieldsReady.value || !hasFields.value) return;
+
+        const scopedValues = props.values || {};
+        const scopedExtra = data_get(extraValues.value, fieldPathPrefix.value) || {};
+        const showField = new ShowField(
+            scopedValues,
+            scopedExtra,
+            visibleValues.value,
+            revealerValues.value,
+            hiddenFields.value,
+            setHiddenField,
+            { container },
+        );
+
+        (props.config.fields || []).forEach((field) => {
+            showField.showField(field, `${fieldPathPrefix.value}.${field.handle}`);
+        });
+    },
+    { deep: true, immediate: true },
+);
 
 const rootEl = ref();
 reveal.use(rootEl, () => emit('expanded'));
@@ -143,8 +216,9 @@ reveal.use(rootEl, () => emit('expanded'));
             <header
                 class="group/header animate-border-color flex items-center show-focus-within rounded-[calc(var(--radius-lg)-1px)] px-1.5 antialiased duration-200 bg-gray-100/50 dark:bg-gray-925 hover:bg-gray-100 dark:hover:bg-gray-950/45 border-gray-300 dark:shadow-md"
                 :class="{
-                    'bg-gray-200/50 dark:bg-gray-950/35 rounded-b-none': !collapsed && hasFields
+                    'bg-gray-200/50 dark:bg-gray-950/35 rounded-b-none': !collapsed && hasFields && fieldsReady
                 }"
+                @pointerenter="prewarmFields"
             >
                 <Icon
                     name="handles"
@@ -203,7 +277,9 @@ reveal.use(rootEl, () => emit('expanded'));
             </header>
 
             <div
-                v-show="!collapsed && hasFields"
+                v-if="fieldsReady && hasFields"
+                v-show="!collapsed"
+                data-set-body
                 :class="{ 'contain-paint': collapsed, 'isolate': !collapsed }"
                 class="border-t border-t-gray-300! dark:border-t-white/10!"
             >
@@ -211,7 +287,7 @@ reveal.use(rootEl, () => emit('expanded'));
                     <FieldsProvider
                         :fields="config.fields"
                         :as-config="false"
-                        :read-only
+                        :read-only="readOnly"
                         :field-path-prefix="fieldPathPrefix"
                         :meta-path-prefix="metaPathPrefix"
                     >

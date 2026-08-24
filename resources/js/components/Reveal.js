@@ -8,6 +8,9 @@ class Reveal {
     }
 
     mount(el, callback) {
+        // Progressive set mounting can call this before the template ref exists.
+        if (!el) return;
+
         registry.set(el, callback);
 
         onBeforeUnmount(() => registry.delete(el));

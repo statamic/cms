@@ -7,9 +7,10 @@ import { containerContextKey } from '@/components/ui/Publish/Container.vue';
 Object.keys(Globals).forEach((fn) => (window[fn] = Globals[fn]));
 window.Statamic = { $fieldActions: { get: () => [] } };
 
-function mountSet() {
+function mountSet({ attachTo, bard } = {}) {
     return mount(Set, {
         shallow: true,
+        attachTo,
         props: {
             editor: {},
             node: { attrs: { id: 'set-1', enabled: true, values: { type: 'my_set' } } },
@@ -27,6 +28,7 @@ function mountSet() {
                         fieldPathPrefix: null,
                         metaPathPrefix: null,
                         setHasError: () => false,
+                        ...bard,
                     },
                 },
             },
@@ -42,6 +44,10 @@ function mountSet() {
                 [containerContextKey]: {
                     values: { value: {} },
                     previews: { value: {} },
+                    visibleValues: { value: {} },
+                    revealerValues: { value: {} },
+                    hiddenFields: { value: {} },
+                    setHiddenField: vi.fn(),
                     setFieldValue: vi.fn(),
                     setFieldMeta: vi.fn(),
                 },
@@ -89,4 +95,38 @@ test('dragging a draggable element inside the set is allowed', async () => {
     header.dispatchEvent(event);
 
     expect(event.defaultPrevented).toBe(false);
+});
+
+function startDraggingSet() {
+    const root = document.createElement('div');
+    root.classList.add('bard-fieldtype');
+    document.body.appendChild(root);
+
+    const wrapper = mountSet({ attachTo: root, bard: { dragging: false, collapseAll: vi.fn() } });
+    const bard = wrapper.props('extension').options.bard;
+
+    wrapper.find('[data-drag-handle]').element.dispatchEvent(new Event('mousedown', { bubbles: true }));
+    wrapper.element.dispatchEvent(new Event('dragstart', { bubbles: true }));
+
+    return { root, bard, wrapper };
+}
+
+test('dragging a set hides the set bodies without collapsing the sets', () => {
+    const { root, bard } = startDraggingSet();
+
+    expect(root.classList.contains('bard-dragging')).toBe(true);
+    expect(bard.dragging).toBe(true);
+    expect(bard.collapseAll).not.toHaveBeenCalled();
+});
+
+test('the dragging class is removed even when the drop recreates the set', () => {
+    const { root, wrapper } = startDraggingSet();
+
+    // The drop swaps in a new node view, so dragend fires on an element that's no longer
+    // in the document and never reaches the listener on it.
+    const element = wrapper.element;
+    element.remove();
+    element.dispatchEvent(new Event('dragend', { bubbles: true }));
+
+    expect(root.classList.contains('bard-dragging')).toBe(false);
 });

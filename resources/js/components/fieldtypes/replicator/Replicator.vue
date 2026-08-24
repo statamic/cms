@@ -16,17 +16,21 @@
                         @close="toggleFullscreen"
                     />
 
-                    <section :class="{ 'mt-12 p-4': fullScreenMode }">
+                    <section
+                        ref="sets"
+                        :class="{ 'mt-12 p-4': fullScreenMode, 'replicator-dragging': dragging }"
+                    >
                         <sortable-list
                             :model-value="value"
                             :vertical="true"
                             :item-class="sortableItemClass"
                             :handle-class="sortableHandleClass"
+                            :animate="value.length <= 20"
                             append-to="body"
                             constrain-dimensions
                             @update:model-value="sorted($event)"
-                            @dragstart="$emit('focus')"
-                            @dragend="$emit('blur')"
+                            @dragstart="dragStarted"
+                            @dragend="dragEnded"
                             v-slot="{}"
                         >
                             <div class="relative">
@@ -95,6 +99,8 @@ import AddSetButton from './AddSetButton.vue';
 import ManagesSetMeta from './ManagesSetMeta';
 import { SortableList } from '../../sortable/Sortable';
 import { data_get } from "@/bootstrap/globals.js";
+import { createMountScheduler } from '@/util/createMountScheduler.js';
+import { keepElementUnderPointer } from '@/util/keepElementUnderPointer.js';
 
 export default {
     mixins: [Fieldtype, ManagesSetMeta],
@@ -114,10 +120,12 @@ export default {
             provide: {
                 replicatorSets: this.config.sets,
                 showReplicatorFieldPreviews: this.config.previews,
+                mountScheduler: createMountScheduler(),
             },
             errorsById: {},
             setsCache: {},
             loadingSet: null,
+            dragging: false,
         };
     },
 
@@ -208,6 +216,27 @@ export default {
 
         sorted(value) {
             this.update(value);
+        },
+
+        dragStarted(event) {
+            const source = event?.source || event?.originalSource;
+            const root = this.$refs.sets;
+
+            // The .replicator-dragging class hides the set bodies for the duration of the
+            // drag. Don't actually collapse the sets — that would persist to meta and
+            // leave everything collapsed after the drop.
+            keepElementUnderPointer(source, () => {
+                this.dragging = true;
+                root?.classList.add('replicator-dragging');
+            });
+
+            this.$emit('focus');
+        },
+
+        dragEnded() {
+            this.dragging = false;
+            this.$refs.sets?.classList.remove('replicator-dragging');
+            this.$emit('blur');
         },
 
         addSet(handle, index) {

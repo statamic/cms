@@ -22,8 +22,9 @@
             <header
                 class="group/header animate-border-color show-focus-within flex items-center rounded-[calc(var(--radius-lg)-1px)] px-1.5 antialiased duration-200 bg-gray-100/50 dark:bg-gray-925 hover:bg-gray-100 dark:hover:bg-gray-950/45 border-gray-300 dark:shadow-md"
                 :class="{
-                    'bg-gray-200/50 dark:bg-gray-950/35 rounded-b-none': !collapsed && hasFields
+                    'bg-gray-200/50 dark:bg-gray-950/35 rounded-b-none': !collapsed && hasFields && fieldsReady
                 }"
+                @pointerenter="prewarmFields"
             >
                 <span v-if="!isReadOnly" data-drag-handle class="flex cursor-grab" @mousedown="enableDragging">
                     <Icon name="handles" class="size-4 text-gray-400" />
@@ -80,8 +81,9 @@
             </header>
 
             <div
-                v-if="index !== undefined && hasFields"
+                v-if="index !== undefined && hasFields && fieldsReady"
                 v-show="!collapsed"
+                data-set-body
                 :class="{ 'contain-paint': collapsed, 'isolate': !collapsed }"
                 class="border-t border-t-gray-300! dark:border-t-white/10!"
             >
@@ -117,9 +119,13 @@ import {
     PublishFields as Fields
 } from '@ui';
 import { containerContextKey } from '@/components/ui/Publish/Container.vue';
-import { watch } from 'vue';
+import { watch, inject } from 'vue';
 import { reveal } from '@api';
 import { useUiDirection } from '@/composables/ui-direction';
+import { createMountScheduler } from '@/util/createMountScheduler.js';
+import ShowField from '@/components/field-conditions/ShowField.js';
+import analyzeSetConditions from '@/components/field-conditions/analyzeSetConditions.js';
+import { keepElementUnderPointer } from '@/util/keepElementUnderPointer.js';
 
 export default {
     props: nodeViewProps,
@@ -127,6 +133,17 @@ export default {
     setup() {
         return {
             uiDirection: useUiDirection().direction,
+            mountScheduler: inject('mountScheduler', createMountScheduler()),
+        };
+    },
+
+    data() {
+        const collapsedIds = this.extension.options.bard.collapsed || [];
+        const initiallyCollapsed = collapsedIds.includes(this.node.attrs.id);
+
+        return {
+            hasBeenExpanded: !initiallyCollapsed,
+            fieldsReady: !initiallyCollapsed,
         };
     },
 
@@ -154,6 +171,10 @@ export default {
     },
 
     computed: {
+        conditionScope() {
+            return analyzeSetConditions(this.config);
+        },
+
         fields() {
             return this.config.fields;
         },
@@ -321,6 +342,16 @@ export default {
             }
         },
 
+        prewarmFields() {
+            if (this.hasBeenExpanded || !this.hasFields) return;
+            this.hasBeenExpanded = true;
+            this.mountScheduler.schedule(() => {
+                if (!this._setUnmounted) {
+                    this.fieldsReady = true;
+                }
+            });
+        },
+
         collapse() {
             // this.$events.$emit('collapsed', this.node.attrs.id);
             this.extension.options.bard.collapseSet(this.node.attrs.id);
@@ -344,13 +375,43 @@ export default {
             this._draggableObserver?.disconnect();
             this.$el.setAttribute('draggable', true);
 
+            // dragstart fires on this.$el (the draggable wrapper), not the inner container.
+            this.$el.addEventListener('dragstart', this.hideSetBodiesForDrag, { once: true });
+            // The drop recreates this node view, so dragend fires on an element that's no
+            // longer in the document and never reaches the listener below. No mouseup is
+            // dispatched during a native drag either, hence the listener on the element too.
+            this.$el.addEventListener('dragend', this.disableDragging, { once: true });
             document.addEventListener('mouseup', this.disableDragging, { once: true });
             document.addEventListener('dragend', this.disableDragging, { once: true });
         },
 
+        // The .bard-dragging class hides the set bodies for the duration of the drag.
+        // Don't actually collapse the sets — that would persist to meta and leave
+        // everything collapsed after the drop.
+        hideSetBodiesForDrag(event) {
+            const bard = this.extension.options.bard;
+
+            // Held onto so it can be cleaned up from a detached element.
+            this._dragRoot = this.$el.closest('.bard-fieldtype');
+
+            keepElementUnderPointer(this.$el, () => {
+                bard.dragging = true;
+                this._dragRoot?.classList.add('bard-dragging');
+            });
+
+            const rect = this.$el.getBoundingClientRect();
+            event.dataTransfer?.setDragImage(this.$el, event.clientX - rect.left, event.clientY - rect.top);
+        },
+
         disableDragging() {
+            this.$el.removeEventListener('dragstart', this.hideSetBodiesForDrag);
             this.$el.setAttribute('draggable', false);
             this._draggableObserver?.observe(this.$el, { attributes: true, attributeFilter: ['draggable'] });
+
+            const bard = this.extension.options.bard;
+            bard.dragging = false;
+            this._dragRoot?.classList.remove('bard-dragging');
+            this._dragRoot = null;
         },
 
         preventNodeSelectionDrag(event) {
@@ -379,6 +440,78 @@ export default {
             { deep: true }
         );
 
+        watch(
+            () => this.collapsed,
+            (collapsed) => {
+                if (!collapsed && !this.hasBeenExpanded) {
+                    this.hasBeenExpanded = true;
+                    this.mountScheduler.schedule(() => {
+                        if (!this._setUnmounted) {
+                            this.fieldsReady = true;
+                        }
+                    });
+                } else if (!collapsed) {
+                    this.fieldsReady = true;
+                }
+            },
+        );
+
+        // Some of what mounting used to do can't be done headlessly — nothing evaluates
+        // the conditions of fields nested inside this set's fields, and revealers only
+        // register themselves when they mount. Those sets get mounted anyway, but off
+        // the critical path.
+        if (!this.conditionScope.canDeferMount) this.prewarmFields();
+
+        // Headlessly evaluate conditions for never-mounted sets so omitValue
+        // bookkeeping stays correct for the save payload. Sets whose conditions only
+        // look at their own values keep a narrow dependency; the rest have to watch
+        // the whole tree.
+        const sources = [
+            () => this.values,
+            () => this.fieldsReady,
+            () => this.publishContainer.revealerValues.value,
+        ];
+
+        if (this.conditionScope.needsRootValues) {
+            sources.push(() => this.publishContainer.visibleValues.value);
+        }
+
+        watch(
+            sources,
+            () => {
+                if (this.fieldsReady || !this.hasFields) return;
+
+                const fields = Array.isArray(this.fields)
+                    ? this.fields
+                    : Object.values(this.fields || {});
+
+                const showField = new ShowField(
+                    this.values || {},
+                    {},
+                    this.publishContainer.visibleValues.value,
+                    this.publishContainer.revealerValues.value,
+                    this.publishContainer.hiddenFields.value,
+                    this.publishContainer.setHiddenField,
+                    { container: this.publishContainer.container },
+                );
+
+                fields.forEach((field) => {
+                    showField.showField(field, `${this.fieldPathPrefix}.${field.handle}`);
+                });
+            },
+            { deep: true, immediate: true },
+        );
+
+        // Auto-expand when validation errors point at this set. Errors arrive from a
+        // failed save without remounting, so mount alone isn't enough of a hook.
+        watch(
+            () => this.hasError,
+            (hasError) => {
+                if (hasError && this.collapsed) this.expand();
+            },
+            { immediate: true },
+        );
+
         reveal.mount(this.$refs.container, this.expand);
 
         // Firefox bug 739071: text selection doesn't work inside elements with a
@@ -398,6 +531,7 @@ export default {
     },
 
     beforeUnmount() {
+        this._setUnmounted = true;
         this._draggableObserver?.disconnect();
     },
 };
