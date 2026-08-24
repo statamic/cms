@@ -16,6 +16,7 @@ use Statamic\Facades\Site;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Value;
+use Statamic\Fieldtypes\Assets\Assets as AssetsFieldtype;
 use Statamic\Fieldtypes\Bard\Augmentor;
 use Statamic\Fieldtypes\Link\LinkType;
 use Statamic\GraphQL\Types\BardSetsType;
@@ -811,8 +812,16 @@ class Bard extends Replicator
 
         $nestedField = new Field($handle, $config);
         $nestedField->setValue([$id]);
+        $fieldtype = $nestedField->fieldtype();
 
-        return $nestedField->fieldtype()->preload()['data'][0] ?? null;
+        // Both of these build their preload `data` from getItemData(), so we can get the
+        // item without paying for the rest of the preload payload. Anything else may only
+        // implement preload(), so it gets the original treatment.
+        if ($fieldtype instanceof Relationship || $fieldtype instanceof AssetsFieldtype) {
+            return $fieldtype->getItemData([$id])->first();
+        }
+
+        return $fieldtype->preload()['data'][0] ?? null;
     }
 
     private function linkTypeField(): Field

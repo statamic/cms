@@ -1574,6 +1574,74 @@ EOT;
     }
 
     #[Test]
+    public function it_gets_link_data_for_an_entry_link()
+    {
+        $this->actingAs(tap(Facades\User::make()->makeSuper())->save());
+        tap(Facades\Collection::make('blog')->routes('blog/{slug}'))->save();
+        EntryFactory::collection('blog')->id('123')->slug('my-post')->data(['title' => 'My Post'])->create();
+
+        $linkData = $this->bard()->getLinkData([
+            ['type' => 'text', 'marks' => [['type' => 'link', 'attrs' => ['href' => 'statamic://entry::123']]], 'text' => 'Link'],
+        ]);
+
+        $this->assertEquals([
+            'entry::123' => [
+                'id' => '123',
+                'reference' => 'entry::123',
+                'title' => 'My Post',
+                'status' => 'published',
+                'edit_url' => 'http://localhost/cp/collections/blog/entries/123',
+                'editable' => true,
+                'hint' => '',
+            ],
+        ], $linkData);
+    }
+
+    #[Test]
+    public function it_gets_link_data_for_an_asset_link()
+    {
+        Storage::fake('local');
+        $this->actingAs(tap(Facades\User::make()->makeSuper())->save());
+        Facades\AssetContainer::make('main')->disk('local')->save();
+        Facades\Asset::make()->container('main')->path('foo.txt')->upload(UploadedFile::fake()->create('foo.txt'));
+
+        $linkData = $this->bard(['container' => 'main'])->getLinkData([
+            ['type' => 'text', 'marks' => [['type' => 'link', 'attrs' => ['href' => 'statamic://asset::main::foo.txt']]], 'text' => 'Link'],
+        ]);
+
+        $this->assertEquals(['asset::main::foo.txt'], array_keys($linkData));
+        $this->assertEquals('main::foo.txt', $linkData['asset::main::foo.txt']['id']);
+        $this->assertEquals('foo.txt', $linkData['asset::main::foo.txt']['basename']);
+    }
+
+    #[Test]
+    public function it_gets_link_data_for_an_asset_link_when_no_container_is_configured()
+    {
+        $this->actingAs(tap(Facades\User::make()->makeSuper())->save());
+        Facades\AssetContainer::make('one')->disk('local')->save();
+        Facades\AssetContainer::make('two')->disk('local')->save();
+
+        $linkData = $this->bard()->getLinkData([
+            ['type' => 'text', 'marks' => [['type' => 'link', 'attrs' => ['href' => 'statamic://asset::one::foo.txt']]], 'text' => 'Link'],
+        ]);
+
+        $this->assertEquals(['id' => 'one::foo.txt', 'url' => 'one::foo.txt', 'invalid' => true], $linkData['asset::one::foo.txt']);
+    }
+
+    #[Test]
+    public function it_gets_link_data_for_a_custom_link_type_with_a_non_public_get_item_data_method()
+    {
+        TestPrivateItemDataFieldtype::register();
+        Link::extend('bard-test-private', TestPrivateItemDataLinkType::class);
+
+        $linkData = $this->bard()->getLinkData([
+            ['type' => 'text', 'marks' => [['type' => 'link', 'attrs' => ['href' => 'statamic://bard-test-private::valid']]], 'text' => 'Link'],
+        ]);
+
+        $this->assertEquals(['title' => 'From Preload'], $linkData['bard-test-private::valid']);
+    }
+
+    #[Test]
     public function it_preloads_the_asset_container_and_columns()
     {
         $this->actingAs(tap(Facades\User::make()->makeSuper())->save());
@@ -1685,5 +1753,35 @@ class TestCountingAssetsFieldtype extends AssetsFieldtype
         static::$preloads++;
 
         return parent::preload();
+    }
+}
+
+class TestPrivateItemDataLinkType extends LinkType
+{
+    protected static ?string $title = 'Private Item Data Type';
+
+    public function resolve(string $id, $parent = null, bool $localize = false): mixed
+    {
+        return null;
+    }
+
+    public function fieldtype(Field $field): ?array
+    {
+        return ['type' => 'test_private_item_data'];
+    }
+}
+
+class TestPrivateItemDataFieldtype extends Fieldtype
+{
+    public static $handle = 'test_private_item_data';
+
+    public function preload()
+    {
+        return ['data' => $this->getItemData()];
+    }
+
+    private function getItemData()
+    {
+        return [['title' => 'From Preload']];
     }
 }
