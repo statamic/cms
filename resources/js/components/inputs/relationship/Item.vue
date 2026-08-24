@@ -119,7 +119,7 @@ export default {
                 return null;
             }
 
-            return __(this.itemWithSiteGroup.group);
+            return this.itemWithSiteGroup.group;
         },
 
         itemWithSiteGroup() {

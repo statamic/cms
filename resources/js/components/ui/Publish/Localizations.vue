@@ -183,7 +183,7 @@ function selectedGroupLabel(option) {
                             v-if="option._groupLabel"
                             size="sm"
                             class="px-2.5 pb-1 pt-1.5 font-semibold uppercase tracking-wide text-gray-950 text-2xs dark:text-gray-300"
-                            :text="__(option._groupLabel)"
+                            :text="option._groupLabel"
                         />
                     </template>
 

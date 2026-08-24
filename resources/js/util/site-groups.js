@@ -71,7 +71,7 @@ export function flatOptionsFromSiteGroups(groups, { filterItems = (items) => ite
 
 export function selectedSiteGroupLabel(item, namedGroupsExist) {
     if (item?.group) {
-        return __(item.group);
+        return item.group;
     }
 
     return namedGroupsExist ? __('Other') : null;
