@@ -103,7 +103,7 @@
                                 :clearable="true"
                                 :virtualize="!hasNamedGroups"
                                 :model-value="site.origin"
-                                @update:model-value="site.origin = $event"
+                                @update:model-value="setSiteOrigin(site, $event)"
                             >
                                 <template #selected-option="{ option }">
                                     <span v-if="option" class="flex min-w-0 items-center gap-1.5">
@@ -273,6 +273,22 @@ export default {
             this.selections = this.selections.filter((handle) => handles.has(handle));
         },
 
+        setSiteOrigin(site, origin) {
+            site.origin = origin;
+
+            if (!origin) {
+                return;
+            }
+
+            site.enabled = true;
+
+            const originSite = this.sites.find((item) => item.handle === origin);
+
+            if (originSite) {
+                originSite.enabled = true;
+            }
+        },
+
         applyMassOrigin(origin) {
             this.massOrigin = origin;
 
@@ -283,12 +299,18 @@ export default {
             }
 
             const selected = new Set(this.selections);
+            const originSite = this.sites.find((site) => site.handle === origin);
+
+            if (originSite) {
+                originSite.enabled = true;
+            }
 
             this.sites.forEach((site) => {
                 if (!selected.has(site.handle) || site.handle === origin) {
                     return;
                 }
 
+                site.enabled = true;
                 site.origin = origin;
             });
 
