@@ -5,7 +5,9 @@ namespace Tests\Query;
 use Facades\Statamic\Console\Processes\Composer;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Form;
+use Statamic\Facades\FormSubmission;
 use Statamic\Facades\Scope;
+use Tests\Factories\EntryFactory;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -50,5 +52,34 @@ class SubmissionEntryFilterTest extends TestCase
     {
         $this->assertEquals(['entry' => 'event-1'], $this->filter(['entry' => 'event-1'])->autoApply());
         $this->assertEquals([], $this->filter()->autoApply());
+    }
+
+    #[Test]
+    public function it_offers_the_entries_with_submissions_as_options()
+    {
+        (new EntryFactory)->collection('events')->id('event-1')->slug('event-one')->data(['title' => 'Event One'])->create();
+        (new EntryFactory)->collection('events')->id('event-2')->slug('event-two')->data(['title' => 'Event Two'])->create();
+        (new EntryFactory)->collection('events')->id('event-3')->slug('event-three')->data(['title' => 'Event Three'])->create();
+
+        $form = Form::find('test');
+
+        FormSubmission::make()->form($form)->id('1')->data(['entry' => 'event-1'])->save();
+        FormSubmission::make()->form($form)->id('2')->data(['entry' => 'event-1'])->save();
+        FormSubmission::make()->form($form)->id('3')->data(['entry' => 'event-2'])->save();
+        FormSubmission::make()->form($form)->id('4')->data([])->save();
+
+        $this->assertEquals([
+            'event-1' => 'Event One',
+            'event-2' => 'Event Two',
+        ], $this->filter()->fieldItems()['entry']['options']);
+    }
+
+    #[Test]
+    public function it_renders_a_badge_with_the_entrys_title()
+    {
+        (new EntryFactory)->collection('events')->id('event-1')->slug('event-one')->data(['title' => 'Event One'])->create();
+
+        $this->assertEquals('Entry: Event One', $this->filter()->badge(['entry' => 'event-1']));
+        $this->assertEquals('Entry: missing', $this->filter()->badge(['entry' => 'missing']));
     }
 }

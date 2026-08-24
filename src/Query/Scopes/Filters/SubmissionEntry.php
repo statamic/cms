@@ -42,7 +42,9 @@ class SubmissionEntry extends Filter
 
     public function badge($values)
     {
-        return __('Entry').': '.($this->options()->get($values['entry']) ?? $values['entry']);
+        $title = Entry::find($values['entry'])?->value('title');
+
+        return __('Entry').': '.($title ?? $values['entry']);
     }
 
     public function visibleTo($key)
@@ -60,15 +62,13 @@ class SubmissionEntry extends Filter
         $ids = $this->form()
             ->querySubmissions()
             ->whereNotNull('entry')
-            ->get(['entry'])
-            ->map
-            ->get('entry')
+            ->pluck('entry')
             ->unique()
             ->values();
 
         return Entry::query()
             ->whereIn('id', $ids->all())
-            ->get()
+            ->get(['id', 'title'])
             ->mapWithKeys(fn ($entry) => [$entry->id() => $entry->value('title')]);
     }
 }
