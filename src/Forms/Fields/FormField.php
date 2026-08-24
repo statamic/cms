@@ -5,6 +5,7 @@ namespace Statamic\Forms\Fields;
 use Facades\Statamic\Forms\Fields\FormFieldtypeRepository;
 use Statamic\Fields\ConfigFields;
 use Statamic\Fields\Field;
+use Statamic\Rules\Handle;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
@@ -58,12 +59,29 @@ class FormField
 
     public static function commonFieldOptions(): ConfigFields
     {
+        $reserved = [...Field::reservedHandles(), 'date', 'message', 'messages'];
+
         $fields = collect([
             'display' => [
                 'display' => __('Label'),
                 'type' => 'text',
                 'focus' => true,
                 'validate' => 'required',
+            ],
+            'handle' => [
+                'display' => __('Handle'),
+                'instructions' => __('statamic::messages.form_fields_handle_instructions'),
+                'type' => 'slug',
+                'from' => 'display',
+                'async' => false,
+                'separator' => '_',
+                'validate' => [
+                    'required',
+                    new Handle,
+                    'not_in:'.implode(',', $reserved),
+                ],
+                'show_regenerate' => true,
+                'if' => ['isNew' => 'equals true'],
             ],
             'instructions' => [
                 'display' => __('Help Text'),

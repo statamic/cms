@@ -6,7 +6,7 @@ import Condition from './Condition.vue';
 import Converter from './Converter.js';
 import { KEYS } from './Constants.js';
 
-const emit = defineEmits(['updated', 'updated-always-save']);
+const emit = defineEmits(['updated', 'updated-always-save', 'updated-reserve-space-when-hidden']);
 
 const props = defineProps({
     config: { type: Object, required: true },
@@ -23,6 +23,7 @@ const type = ref('all');
 const customMethod = ref(null);
 const conditions = ref([]);
 const alwaysSave = ref(false);
+const reserveSpaceWhenHidden = ref(false);
 
 const whenOptions = computed(() => {
     return [
@@ -114,6 +115,8 @@ const getInitialConditions = () => {
 
 const getInitialAlwaysSaveState = () => alwaysSave.value = props.config?.always_save ?? false;
 
+const getInitialReserveSpaceWhenHiddenState = () => reserveSpaceWhenHidden.value = props.config?.reserve_space_when_hidden ?? false;
+
 watch(() => props.config.hidden, (hidden) => {
     if (hidden) {
         when.value = 'always_hide';
@@ -134,10 +137,15 @@ watch(alwaysSave, (value) => {
     if (initialized.value) emit('updated-always-save', value);
 });
 
+watch(reserveSpaceWhenHidden, (value) => {
+    if (initialized.value) emit('updated-reserve-space-when-hidden', value);
+});
+
 onMounted(() => {
     getInitialWhenState();
     getInitialConditions();
     getInitialAlwaysSaveState();
+    getInitialReserveSpaceWhenHiddenState();
     if (conditions.value.length === 0) add();
     nextTick(() => initialized.value = true);
 });
@@ -248,12 +256,21 @@ onMounted(() => {
             />
         </div>
 
-        <div v-if="showAlwaysSave" data-always-save-decoration class="mt-8 mb-6 pt-4 border-t border-dashed border-gray-300 dark:border-gray-700">
+        <div v-if="showAlwaysSave" data-always-save-decoration class="mt-8 mb-6 pt-4 flex gap-6 border-t border-dashed border-gray-300 dark:border-gray-700">
             <Field
+                class="flex-1"
                 :label="__('Always Save')"
                 :instructions="__('messages.field_conditions_always_save_instructions')"
             >
                 <Switch v-model="alwaysSave" />
+            </Field>
+
+            <Field
+                class="flex-1"
+                :label="__('Reserve Space When Hidden')"
+                :instructions="__('messages.field_conditions_reserve_space_when_hidden_instructions')"
+            >
+                <Switch v-model="reserveSpaceWhenHidden" />
             </Field>
         </div>
     </div>

@@ -25,6 +25,7 @@ class ParagraphTest extends TestCase
             'display' => 'An internal field handle',
             'listable' => false,
             'instructions' => null,
+            'handle' => null,
         ], $fieldtype->toFieldArray());
     }
 
@@ -46,6 +47,7 @@ class ParagraphTest extends TestCase
             'display' => 'An internal field handle',
             'listable' => false,
             'instructions' => null,
+            'handle' => null,
             'width' => 50,
             'if' => ['subscribe' => 'is true'],
         ], $fieldtype->toFieldArray());

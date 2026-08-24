@@ -2,6 +2,7 @@
 
 namespace Statamic\Forms\Fieldtypes;
 
+use Statamic\Forms\Fields\FormField;
 use Statamic\Forms\Fields\FormFieldtype;
 use Statamic\Support\Arr;
 
@@ -23,6 +24,7 @@ class Heading extends FormFieldtype
                 'focus' => true,
                 'validate' => 'required',
             ],
+            'handle' => FormField::commonFieldOptions()->get('handle')->config(),
             'instructions' => ['type' => 'hidden'],
             'subheading' => [
                 'display' => __('Subheading'),

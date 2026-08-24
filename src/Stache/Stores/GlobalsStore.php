@@ -40,6 +40,7 @@ class GlobalsStore extends BasicStore
         return GlobalSet::make()
             ->handle($handle)
             ->title($data['title'] ?? null)
+            ->layoutMode($data['layout_mode'] ?? null)
             ->sites($data['sites'] ?? [])
             ->initialPath($path);
     }

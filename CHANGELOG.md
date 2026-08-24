@@ -1,5 +1,33 @@
 # Release Notes
 
+## 6.28.0 (2026-08-19)
+
+### What's new
+- Configurable live preview debounce duration [#15150](https://github.com/statamic/cms/issues/15150) by @FlxRobole
+- Allow multi-column config layout in user globals [#14994](https://github.com/statamic/cms/issues/14994) by @daun
+- Add option to reserve field space [#14655](https://github.com/statamic/cms/issues/14655) by @jaygeorge
+
+### What's fixed
+- Fix save button hanging forever when a save hook fails [#15194](https://github.com/statamic/cms/issues/15194) by @jasonvarga
+- Allow unique rule validation messages to be overridden at the app level [#15197](https://github.com/statamic/cms/issues/15197) by @duncanmcclean
+- Deprecate the `theme` tag [#15200](https://github.com/statamic/cms/issues/15200) by @duncanmcclean
+- Return the fallback when reading a file from a disk that throws [#15185](https://github.com/statamic/cms/issues/15185) by @duncanmcclean
+- Fix ensuring config on fields from imported fieldsets [#15187](https://github.com/statamic/cms/issues/15187) by @duncanmcclean
+- Don't save group-inherited roles as explicit roles [#15188](https://github.com/statamic/cms/issues/15188) by @duncanmcclean
+- Fix `uri` index for new entries in orderable collections [#15189](https://github.com/statamic/cms/issues/15189) by @duncanmcclean
+- Give nested sets and rows new ids when duplicating [#15190](https://github.com/statamic/cms/issues/15190) by @duncanmcclean
+- Multisite improvements - entry vs global [#15191](https://github.com/statamic/cms/issues/15191) by @jaygeorge
+- Multisite - turn stacked sites into a table view for larger viewports [#15202](https://github.com/statamic/cms/issues/15202) by @jaygeorge
+- Fix Checkbox & Radio label click capturing and useId prop binding [#15139](https://github.com/statamic/cms/issues/15139) by @ibrokemycomputer
+- Fix toasts being replayed on partial reloads [#15210](https://github.com/statamic/cms/issues/15210) by @heidkaemper
+- Resolve dictionary fieldtype permissions via the CP guard [#15209](https://github.com/statamic/cms/issues/15209) by @duncanmcclean
+- Improve info icons in grid headers [#15218](https://github.com/statamic/cms/issues/15218) by @jaygeorge
+- Allow Inertia v3 alongside v2 [#15065](https://github.com/statamic/cms/issues/15065) by @duncanmcclean
+- French translations [#15193](https://github.com/statamic/cms/issues/15193) by @ebeauchamps
+- Add Italian translations [#15195](https://github.com/statamic/cms/issues/15195) by @sbellesis
+
+
+
 ## 6.27.2 (2026-08-12)
 
 ### What's fixed

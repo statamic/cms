@@ -3,6 +3,8 @@
 namespace Tests\Antlers\Parser;
 
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\Antlers;
+use Statamic\View\Antlers\Language\Analyzers\NodeTypeAnalyzer;
 use Statamic\View\Antlers\Language\Parser\IdentifierFinder;
 use Tests\Antlers\ParserTestCase;
 
@@ -29,5 +31,13 @@ EOT;
             'the_limit',
             'title',
         ], (new IdentifierFinder)->getIdentifiers($template));
+    }
+
+    #[Test]
+    public function it_finds_identifiers_when_nothing_has_resolved_the_parser()
+    {
+        NodeTypeAnalyzer::$environmentDetails = null;
+
+        $this->assertEquals(['slug'], Antlers::identifiers('blog/{{ slug }}'));
     }
 }
