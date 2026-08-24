@@ -71,7 +71,7 @@
             <tbody>
                 <template v-for="group in siteGroups" :key="group.key">
                     <tr v-if="hasNamedGroups">
-                        <td class="checkbox-column bg-gray-50 dark:bg-gray-800" aria-hidden="true" />
+                        <td class="checkbox-column bg-gray-50 ps-3 dark:bg-gray-800" aria-hidden="true" />
                         <td colspan="2" class="bg-gray-50 dark:bg-gray-800 !py-2">
                             <Subheading
                                 size="sm"
@@ -81,7 +81,7 @@
                         </td>
                     </tr>
                     <tr v-for="site in group.items" :key="site.handle">
-                        <td class="checkbox-column">
+                        <td class="checkbox-column ps-3!">
                             <Checkbox
                                 size="sm"
                                 solo
