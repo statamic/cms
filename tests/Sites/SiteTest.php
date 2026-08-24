@@ -286,6 +286,8 @@ class SiteTest extends TestCase
     {
         $site = new Site('en', [
             'name' => 'English',
+            'url' => '/',
+            'locale' => 'en_US',
             'group' => 'London',
             'group_handle' => 'london',
         ]);
@@ -316,6 +318,8 @@ class SiteTest extends TestCase
             'url' => '/sub',
             'permalink' => 'http://absolute-url-resolved-from-request.com/sub',
             'direction' => 'ltr',
+            'group' => null,
+            'group_handle' => null,
             'attributes' => [],
         ], $values->map->value()->all());
 

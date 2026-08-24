@@ -538,8 +538,17 @@ class Sites
             }
 
             if ($groupName) {
+                unset($site['group'], $site['group_handle']);
+
+                $attributes = $site['attributes'] ?? null;
+                unset($site['attributes']);
+
                 $site['group'] = $groupName;
                 $site['group_handle'] = $groupKey;
+
+                if ($attributes !== null) {
+                    $site['attributes'] = $attributes;
+                }
             } else {
                 unset($site['group'], $site['group_handle']);
             }
