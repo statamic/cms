@@ -7,6 +7,7 @@ use Statamic\Contracts\Data\Localization;
 use Statamic\Data\NestedFieldUpdater;
 use Statamic\Facades\Blink;
 use Statamic\Facades\GraphQL;
+use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Values;
@@ -27,13 +28,18 @@ class Replicator extends Fieldtype
     protected $rules = ['array'];
     protected ?string $flattenedSetsConfigBlinkKey = null;
 
-    protected ?int $flattenedSetsConfigFieldId = null;
-
     /**
      * When a field has this many existing sets (or more), start them collapsed
      * even if the collapse config is off — unlocks deferred field-body mounting.
      */
     private const AUTO_COLLAPSE_SET_THRESHOLD = 10;
+
+    public function setField(Field $field)
+    {
+        $this->flattenedSetsConfigBlinkKey = null;
+
+        return parent::setField($field);
+    }
 
     protected function configFieldItems(): array
     {
@@ -302,20 +308,10 @@ class Replicator extends Fieldtype
 
     public function flattenedSetsConfig()
     {
-        // Fieldtype instances are shared across fields of the same type, so the
-        // Blink key must be invalidated whenever $this->field changes. Memoizing
-        // against spl_object_id avoids re-serializing config on repeated calls
-        // for the same Field object (fields()/preload()/augment() hot path).
-        $fieldId = $this->field ? spl_object_id($this->field) : null;
-
-        // When $this->field is null, $fieldId is null — same as the property's
-        // initial value — so also regenerate when the Blink key was never set.
-        if ($this->flattenedSetsConfigBlinkKey === null || $this->flattenedSetsConfigFieldId !== $fieldId) {
-            $this->flattenedSetsConfigFieldId = $fieldId;
-            $this->flattenedSetsConfigBlinkKey = md5(
-                ($this->field?->handle() ?? '').json_encode($this->field?->config())
-            );
-        }
+        // Re-serializing the config on every call is expensive on fields with lots
+        // of sets, and this gets hit repeatedly by fields(), preload() and augment().
+        // Invalidated in setField(), which is the only thing that replaces the field.
+        $this->flattenedSetsConfigBlinkKey ??= md5($this->field?->handle().json_encode($this->field?->config()));
 
         return Blink::once($this->flattenedSetsConfigBlinkKey, function () {
             $sets = collect($this->config('sets'));

@@ -1826,6 +1826,46 @@ EOT;
         $this->assertSame($ids, $field->fieldtype()->preload()['collapsed']);
     }
 
+    #[Test]
+    public function it_gets_flattened_sets_config_for_each_field_it_is_given()
+    {
+        $fieldtype = new Bard;
+
+        $fieldtype->setField($this->fieldWithSet('alpha'));
+        $this->assertSame(['alpha'], $fieldtype->flattenedSetsConfig()->keys()->all());
+
+        $fieldtype->setField($this->fieldWithSet('bravo'));
+        $this->assertSame(['bravo'], $fieldtype->flattenedSetsConfig()->keys()->all());
+    }
+
+    #[Test]
+    public function it_gets_flattened_sets_config_when_the_field_is_replaced_without_being_read()
+    {
+        $fieldtype = new Bard;
+
+        $fieldtype->setField($this->fieldWithSet('alpha'));
+        $fieldtype->flattenedSetsConfig();
+
+        $fieldtype->setField($this->fieldWithSet('bravo'));
+        $fieldtype->setField($this->fieldWithSet('charlie'));
+
+        $this->assertSame(['charlie'], $fieldtype->flattenedSetsConfig()->keys()->all());
+    }
+
+    private function fieldWithSet(string $set)
+    {
+        return new Field($set.'_field', [
+            'type' => 'bard',
+            'sets' => [
+                'main' => [
+                    'sets' => [
+                        $set => ['fields' => [['handle' => 'words', 'field' => ['type' => 'text']]]],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
     public static function groupedSetsProvider()
     {
         return [
