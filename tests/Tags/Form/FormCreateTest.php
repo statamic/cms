@@ -59,6 +59,38 @@ class FormCreateTest extends FormTestCase
     }
 
     #[Test]
+    public function it_renders_a_hidden_entry_input_when_unique_instances_is_enabled()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        Form::find('contact')->set('unique_instances', true);
+
+        $output = $this->tag('{{ form:contact }}{{ /form:contact }}', ['id' => 'event-1']);
+
+        $this->assertStringContainsString('<input type="hidden" name="_entry" value="event-1" />', $output);
+    }
+
+    #[Test]
+    public function it_doesnt_render_a_hidden_entry_input_when_unique_instances_is_disabled()
+    {
+        $output = $this->tag('{{ form:contact }}{{ /form:contact }}', ['id' => 'event-1']);
+
+        $this->assertStringNotContainsString('name="_entry"', $output);
+    }
+
+    #[Test]
+    public function it_doesnt_render_a_hidden_entry_input_outside_an_entry_context()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        Form::find('contact')->set('unique_instances', true);
+
+        $output = $this->tag('{{ form:contact }}{{ /form:contact }}');
+
+        $this->assertStringNotContainsString('name="_entry"', $output);
+    }
+
+    #[Test]
     public function it_dynamically_renders_fields()
     {
         $output = $this->normalizeHtml($this->tag(<<<'EOT'
