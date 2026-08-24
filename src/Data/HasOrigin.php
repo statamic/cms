@@ -141,6 +141,32 @@ trait HasOrigin
         return ! $this->hasOrigin();
     }
 
+    public function hasOriginCycle(): bool
+    {
+        $seen = [];
+        $entry = $this;
+
+        while ($entry->hasOrigin()) {
+            $id = $entry->id();
+
+            if ($id !== null && isset($seen[$id])) {
+                return true;
+            }
+
+            if ($id !== null) {
+                $seen[$id] = true;
+            }
+
+            $entry = $entry->origin();
+
+            if (! $entry) {
+                break;
+            }
+        }
+
+        return false;
+    }
+
     public function root()
     {
         $entry = $this;
@@ -149,11 +175,14 @@ trait HasOrigin
         while ($entry->hasOrigin()) {
             $id = $entry->id();
 
-            if (isset($seen[$id])) {
+            if ($id !== null && isset($seen[$id])) {
                 break;
             }
 
-            $seen[$id] = true;
+            if ($id !== null) {
+                $seen[$id] = true;
+            }
+
             $entry = $entry->origin();
         }
 
