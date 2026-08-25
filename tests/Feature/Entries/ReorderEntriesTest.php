@@ -6,6 +6,7 @@ use Facades\Tests\Factories\EntryFactory;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
+use Statamic\Facades\Stache;
 use Statamic\Facades\User;
 use Statamic\Structures\CollectionStructure;
 use Tests\FakesRoles;
@@ -142,6 +143,105 @@ class ReorderEntriesTest extends TestCase
         $this->assertEquals(5, Entry::find(4)->order());
         $this->assertEquals(6, Entry::find(5)->order());
         $this->assertEquals(7, Entry::find(7)->order());
+    }
+
+    #[Test]
+    public function it_reorders_paginated_entries_in_a_descending_collection()
+    {
+        $this->collection->sortDirection('desc')->save();
+
+        EntryFactory::id('1')->slug('one')->collection('test')->create();
+        EntryFactory::id('2')->slug('two')->collection('test')->create();
+        EntryFactory::id('3')->slug('three')->collection('test')->create();
+        EntryFactory::id('4')->slug('four')->collection('test')->create();
+        EntryFactory::id('5')->slug('five')->collection('test')->create();
+
+        $this->structure->in('en')->tree([
+            ['entry' => '1'],
+            ['entry' => '2'],
+            ['entry' => '3'],
+            ['entry' => '4'],
+            ['entry' => '5'],
+        ])->save();
+
+        $this->setTestRoles(['test' => ['access cp', 'reorder test entries']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+
+        // The listing shows 5, 4, 3, 2, 1. The first page contains 5, 4, 3.
+        $this
+            ->actingAs($user)
+            ->reorder(['page' => 1, 'perPage' => 3, 'ids' => [3, 5, 4]])
+            ->assertOk();
+
+        $this->assertEquals([
+            ['entry' => '1'],
+            ['entry' => '2'],
+            ['entry' => '4'],
+            ['entry' => '5'],
+            ['entry' => '3'],
+        ], $this->structure->in('en')->tree());
+    }
+
+    #[Test]
+    public function it_doesnt_reorder_when_the_submitted_entries_arent_on_the_page_being_reordered()
+    {
+        EntryFactory::id('1')->slug('one')->collection('test')->create();
+        EntryFactory::id('2')->slug('two')->collection('test')->create();
+        EntryFactory::id('3')->slug('three')->collection('test')->create();
+        EntryFactory::id('4')->slug('four')->collection('test')->create();
+
+        $tree = [
+            ['entry' => '1'],
+            ['entry' => '2'],
+            ['entry' => '3'],
+            ['entry' => '4'],
+        ];
+
+        $this->structure->in('en')->tree($tree)->save();
+
+        $this->setTestRoles(['test' => ['access cp', 'reorder test entries']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+
+        // The first page of the tree is 1, 2, 3, but the listing was showing 4 in there.
+        $this
+            ->actingAs($user)
+            ->reorder(['page' => 1, 'perPage' => 3, 'ids' => [1, 4, 2]])
+            ->assertStatus(409);
+
+        $this->assertEquals($tree, $this->structure->in('en')->tree());
+    }
+
+    #[Test]
+    public function creating_an_entry_gives_it_the_correct_order_when_the_tree_has_already_been_read()
+    {
+        EntryFactory::id('1')->slug('one')->collection('test')->create();
+        EntryFactory::id('2')->slug('two')->collection('test')->create();
+        EntryFactory::id('3')->slug('three')->collection('test')->create();
+
+        $this->structure->in('en')->tree([
+            ['entry' => '1'],
+            ['entry' => '2'],
+            ['entry' => '3'],
+        ])->save();
+
+        // Read the tree before the entry is created, so it gets cached without it.
+        $this->structure->in('en')->tree();
+
+        EntryFactory::id('4')->slug('four')->collection('test')->create();
+
+        $this->assertEquals([
+            ['entry' => '1'],
+            ['entry' => '2'],
+            ['entry' => '3'],
+            ['entry' => '4'],
+        ], $this->structure->in('en')->tree());
+
+        $this->assertEquals(4, Entry::find('4')->order());
+
+        $this->assertEquals(
+            ['1' => 1, '2' => 2, '3' => 3, '4' => 4],
+            Stache::store('entries::test')->index('order')->items()->all()
+        );
     }
 
     private function reorder($payload)
