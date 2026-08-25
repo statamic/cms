@@ -240,6 +240,10 @@ function syncField(path) {
 }
 
 function desyncField(path) {
+    // While dirty tracking is paused (e.g. after switching localizations), ignore
+    // fieldtype emissions so they don't falsely mark synced fields as localized.
+    if (!props.trackDirtyState) return;
+
     addLocalizedField(path);
     dirty();
 }
