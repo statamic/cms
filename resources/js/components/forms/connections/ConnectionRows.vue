@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { nanoid as uniqid } from 'nanoid';
 import { Button, ConfirmationModal } from '@ui';
 import { SortableList } from '@/components/sortable/Sortable.js';
@@ -46,6 +46,7 @@ const sortableHandleClass = 'connection-row-handle';
 
 const collapsed = ref<string[]>([]);
 const confirmingRemoval = ref<string | null>(null);
+const errorRowIds = ref<string[]>([]);
 
 const add = (): void => {
     emit('update:modelValue', [
@@ -98,9 +99,17 @@ const collapse = (id: string): void => {
 
 const expand = (id: string): void => (collapsed.value = collapsed.value.filter((rowId) => rowId !== id));
 
-const hasError = (index: number) => Object.keys(props.errors).some((key) => key.startsWith(`${index}.`));
+const errorIndex = (row: Row): number => errorRowIds.value.indexOf(row.id);
 
-const rowErrors = (index: number) => {
+const hasError = (row: Row): boolean => {
+    const index = errorIndex(row);
+
+    return index !== -1 && Object.keys(props.errors).some((key) => key === `${index}` || key.startsWith(`${index}.`));
+};
+
+const rowErrors = (row: Row) => {
+    const index = errorIndex(row);
+
     return Object.entries(props.errors)
         .filter(([key]) => key.startsWith(`${index}.`))
         .reduce((fields, [key, messages]) => {
@@ -109,6 +118,12 @@ const rowErrors = (index: number) => {
             return fields;
         }, {});
 };
+
+watch(
+    () => props.errors,
+    () => (errorRowIds.value = props.modelValue.map((row) => row.id)),
+    { immediate: true },
+);
 </script>
 
 <template>
@@ -130,7 +145,7 @@ const rowErrors = (index: number) => {
                     <ConnectionRow
                         :enabled="isEnabled(row)"
                         :collapsed="isCollapsed(row)"
-                        :has-error="hasError(index)"
+                        :has-error="hasError(row)"
                         :handle-class="sortableHandleClass"
                         @collapsed="collapse(row.id)"
                         @expanded="expand(row.id)"
@@ -142,7 +157,7 @@ const rowErrors = (index: number) => {
                             <slot name="header" :item="row" :index="index" :collapsed="collapsed.includes(row.id)" />
                         </template>
 
-                        <slot :item="row" :index="index" :errors="rowErrors(index)" />
+                        <slot :item="row" :index="index" :errors="rowErrors(row)" />
                     </ConnectionRow>
                 </div>
             </div>
