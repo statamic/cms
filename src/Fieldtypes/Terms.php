@@ -532,20 +532,14 @@ class Terms extends Relationship
 
     protected function authorizeItemData($id): bool
     {
-        if ($this->usingSingleTaxonomy() && ! Str::contains($id, '::')) {
-            $id = "{$this->taxonomies()[0]}::{$id}";
-        }
-
-        return $this->authorizeViewable(Term::find($id));
+        return $this->authorizeViewable($this->findTerm($id));
     }
 
     protected function toItemArray($id)
     {
-        if ($this->usingSingleTaxonomy() && ! Str::contains($id, '::')) {
-            $id = "{$this->taxonomies()[0]}::{$id}";
-        }
+        $id = $this->normalizeTermId($id);
 
-        if (! $term = Term::find($id)) {
+        if (! $term = $this->findTerm($id)) {
             return $this->invalidItemArray($id);
         }
 
@@ -595,6 +589,22 @@ class Terms extends Relationship
             'path' => $ancestors->map->slug()->push($term->slug())->implode('/'),
             'ancestors' => $ancestors->map->title()->values()->all(),
         ];
+    }
+
+    protected function normalizeTermId($id): string
+    {
+        if ($this->usingSingleTaxonomy() && ! Str::contains($id, '::')) {
+            return "{$this->taxonomies()[0]}::{$id}";
+        }
+
+        return $id;
+    }
+
+    protected function findTerm($id)
+    {
+        $id = $this->normalizeTermId($id);
+
+        return $this->itemCache[$id] ??= Term::find($id);
     }
 
     protected function getColumns()
