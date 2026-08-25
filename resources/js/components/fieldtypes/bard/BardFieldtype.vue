@@ -897,7 +897,6 @@ export default {
 
                     this.json = newJson;
 
-                    // Serializing the whole document is expensive, and reading time is the only thing that needs it.
                     if (this.config.reading_time) {
                         this.html = this.editor.getHTML();
                     }
