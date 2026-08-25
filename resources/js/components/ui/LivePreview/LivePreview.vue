@@ -66,22 +66,6 @@ const livePreviewFieldsPortal = computed(() => {
     return `live-preview-fields-${name.value}`;
 });
 
-watch(
-    () => props.enabled,
-    (enabled, wasEnabled) => {
-        if (wasEnabled && !enabled) {
-            nextTick(() => (portalEnabled.value = false));
-        } else {
-            portalEnabled.value = enabled;
-        }
-
-        if (!enabled) return;
-
-        update();
-        animateIn();
-    },
-);
-
 const tokenizedUrl = computed(() => {
     let url = props.url;
 
@@ -98,32 +82,33 @@ const payload = computed(() => ({
     extras: extras.value,
 }));
 
-watch(
-    [payload, target],
-    (payload) => {
-        if (props.enabled) update();
-    },
-    { deep: true },
-);
+// The payload is only watched while the preview is open, and a deep change that
+// serializes to the payload we last posted doesn't warrant posting again. Explicit
+// update() callers (open / popout / refresh) bypass this and always post.
+let lastPostedPayloadKey = null;
+let stopPayloadWatch = null;
 
 const livePreviewDebounceMs = Statamic.$config.get('livePreview.debounce_ms', 150);
 
 const update = debounce(() => {
+    const body = payload.value;
+    lastPostedPayloadKey = JSON.stringify([body, target.value]);
+
     if (source) source.abort();
     source = new AbortController();
 
     loading.value = true;
 
     axios
-        .post(tokenizedUrl.value, payload.value, { signal: source.signal })
+        .post(tokenizedUrl.value, body, { signal: source.signal })
         .then((response) => {
             token.value = response.data.token;
             const url = response.data.url;
             const tgt = toRaw(props.targets[target.value]);
-            const payload = { token: token.value, reference: props.reference };
+            const messagePayload = { token: token.value, reference: props.reference };
             poppedOut.value
-                ? channel.value.postMessage({ event: 'updated', url, target: tgt, payload })
-                : updateIframeContents(url, tgt, payload, setIframeAttributes);
+                ? channel.value.postMessage({ event: 'updated', url, target: tgt, payload: messagePayload })
+                : updateIframeContents(url, tgt, messagePayload, setIframeAttributes);
             loading.value = false;
         })
         .catch((e) => {
@@ -168,6 +153,50 @@ function animateOut() {
     headerVisible.value = false;
     return wait(300);
 }
+
+function startPayloadWatch() {
+    if (stopPayloadWatch) return;
+
+    stopPayloadWatch = watch(
+        [payload, target],
+        () => {
+            const key = JSON.stringify([payload.value, target.value]);
+            if (key === lastPostedPayloadKey) return;
+
+            update();
+        },
+        { deep: true },
+    );
+}
+
+function teardownPayloadWatch() {
+    stopPayloadWatch?.();
+    stopPayloadWatch = null;
+    update.cancel();
+    source?.abort();
+}
+
+watch(
+    () => props.enabled,
+    (enabled, wasEnabled) => {
+        if (wasEnabled && !enabled) {
+            teardownPayloadWatch();
+            nextTick(() => (portalEnabled.value = false));
+        } else {
+            portalEnabled.value = enabled;
+        }
+
+        if (!enabled) return;
+
+        startPayloadWatch();
+        update();
+        animateIn();
+    },
+);
+
+// The watcher above only covers transitions, so a component mounted already enabled
+// needs the payload watch installed up front.
+if (props.enabled) startPayloadWatch();
 
 const canPopOut = computed(() => typeof BroadcastChannel === 'function');
 
@@ -303,6 +332,7 @@ const refreshEvent = `live-preview.${name.value}.refresh`;
 Statamic.$events.$on(refreshEvent, refreshHandler);
 
 onUnmounted(() => {
+    teardownPayloadWatch();
     keybinding.value.destroy();
     Statamic.$events.$off(refreshEvent, refreshHandler);
 });

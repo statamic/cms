@@ -447,6 +447,13 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
         $this->ancestors()->each(fn ($entry) => Blink::forget('entry-descendants-'.$entry->id()));
 
+        if ($isNew && $this->collection()->orderable()) {
+            // The entry only gets appended to the tree when it's read, so anything that
+            // read it before now would have cached a version without this entry in it.
+            $this->collection()->structure()->flushCache($this->locale());
+            $this->collection()->updateEntryOrder([$this->id()]);
+        }
+
         $stack = InitiatorStack::entry($this)->push();
 
         $this->directDescendants()->each->{$withEvents ? 'save' : 'saveQuietly'}();

@@ -177,16 +177,23 @@ abstract class Tree implements ContainsQueryableValues, Contract, Localization
         return ($this->cachedFlattenedPageOrder ??= $this->flattenedPages()->map->reference()->flip())->get($reference);
     }
 
+    public function flushCache()
+    {
+        $this->cachedFlattenedPages = null;
+        $this->cachedFlattenedPagesById = null;
+        $this->cachedFlattenedPagesByReference = null;
+        $this->cachedFlattenedPageOrder = null;
+
+        return $this;
+    }
+
     public function save()
     {
         if ($this->dispatchSavingEvent() === false) {
             return false;
         }
 
-        $this->cachedFlattenedPages = null;
-        $this->cachedFlattenedPagesById = null;
-        $this->cachedFlattenedPagesByReference = null;
-        $this->cachedFlattenedPageOrder = null;
+        $this->flushCache();
 
         Blink::forget('collection-structure-tree*');
 
