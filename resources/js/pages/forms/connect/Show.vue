@@ -1,25 +1,72 @@
 <script setup>
+import { onMounted, onUnmounted, ref } from 'vue';
+import axios from 'axios';
+import { keys } from '@api';
 import Layout from '@/pages/layout/Layout.vue';
 import PanelLayout from '@/pages/layout/PanelLayout.vue';
 import FormsLayout from '../Layout.vue';
 import Head from '@/pages/layout/Head.vue';
-import { Card, Header, Heading, Icon, Panel, PanelHeader } from '@ui';
+import { Button, Card, Header, Heading, Icon, Panel, PanelHeader } from '@ui';
 import FormStatusIndicator from '@/components/forms/FormStatusIndicator.vue';
 import { Link } from '@inertiajs/vue3';
 
 defineOptions({ layout: [Layout, PanelLayout, FormsLayout] });
 
-defineProps({
+const props = defineProps({
     form: Object,
     connection: Object,
     component: Object,
-    config: Object,
+    value: [Array, Object],
+    action: String,
     suggestableFields: Array,
 });
+
+const errors = ref({});
+const saving = ref(false);
+const saveBinding = ref(null);
+const value = ref(props.value);
+
+const save = () => {
+    if (saving.value) return;
+
+    errors.value = {};
+    saving.value = true;
+
+    axios.patch(props.action, value.value)
+        .then(() => {
+            Statamic.$dirty.remove('connection');
+            Statamic.$toast.success(__('Saved'));
+        })
+        .catch((e) => {
+            if (e.response?.status === 422) {
+                errors.value = e.response.data.errors;
+                Statamic.$toast.error(e.response.data.message);
+            } else {
+                Statamic.$toast.error(__('Something went wrong'));
+            }
+        })
+        .finally(() => (saving.value = false));
+};
+
+onMounted(() => {
+    saveBinding.value = keys.bindGlobal(['mod+s'], (e) => {
+        e.preventDefault();
+        save();
+    });
+});
+
+onUnmounted(() => saveBinding.value?.destroy());
 </script>
 
 <template>
     <Head :title="[__(connection.title), __('Connect'), __(form.title), __('Forms')]" />
+
+    <Teleport to="#form-layout-actions">
+        <Button variant="primary" :aria-label="__('Save')" :disabled="saving" @click="save">
+            <Icon name="save" class="sm:hidden" />
+            <span class="hidden sm:inline">{{ __('Save') }}</span>
+        </Button>
+    </Teleport>
 
     <div class="mx-auto max-w-5xl">
         <Header class="mb-2">
@@ -52,7 +99,13 @@ defineProps({
                 </Heading>
             </PanelHeader>
             <Card>
-                <component :is="component.name" :form :config v-bind="component.props" />
+                <component
+                    :is="component.name"
+                    :form
+                    :errors
+                    v-model="value"
+                    v-bind="component.props"
+                />
             </Card>
         </Panel>
     </div>

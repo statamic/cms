@@ -1,88 +1,48 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from 'vue';
-import axios from 'axios';
-import { keys } from '@api';
+import { computed, ref } from 'vue';
 import { Badge, Button, Field, Icon, Label, PublishContainer, PublishFields, PublishFieldsProvider, Subheading } from '@ui';
-import ConnectionRows, { connectionRows } from './ConnectionRows.vue';
+import ConnectionRows from './ConnectionRows.vue';
 import ConnectionRules, { conditionsSummary } from './ConnectionRules.vue';
 
 interface Webhook {
     id: string;
     enabled: boolean;
     conditions: { _id: string; field: string; operator: string; value: string }[];
-    values: object;
-    meta: object;
+    [field: string]: unknown;
 }
+
+const emit = defineEmits(['update:modelValue']);
 
 const props = defineProps({
     form: Object,
-    config: Array,
-    action: String,
+    modelValue: { type: Array, default: () => [] },
+    errors: { type: Object, default: () => ({}) },
     blueprint: Object,
-    webhooks: Object,
+    meta: { type: Object, default: () => ({}) },
     defaults: Object,
     examplePayload: String,
 });
 
-const errors = ref<object>({});
-const saving = ref<boolean>(false);
-const saveBinding = ref<ReturnType<typeof keys.bindGlobal> | null>(null);
-const showExamplePayload = ref<boolean>(props.config.length === 0);
-const webhooks = ref<Webhook[]>(connectionRows(props.config, props.webhooks));
+const showExamplePayload = ref<boolean>(props.modelValue.length === 0);
 
-const hasError = (index: number) => Object.keys(errors.value).some((key) => key.startsWith(`webhooks.${index}.`));
+const webhooks = computed({
+    get: () => props.modelValue as Webhook[],
+    set: (value: Webhook[]) => emit('update:modelValue', value),
+});
+
+const hasError = (index: number) => Object.keys(props.errors).some((key) => key.startsWith(`${index}.`));
 
 const rowErrors = (index: number) =>
-    Object.entries(errors.value)
-        .filter(([key]) => key.startsWith(`webhooks.${index}.`))
+    Object.entries(props.errors)
+        .filter(([key]) => key.startsWith(`${index}.`))
         .reduce((fields, [key, messages]) => {
-            const handle = key.replace(`webhooks.${index}.`, '').split('.')[0];
+            const handle = key.replace(`${index}.`, '').split('.')[0];
             fields[handle] = [...(fields[handle] ?? []), ...messages];
             return fields;
         }, {});
-
-const save = (): void => {
-    if (saving.value) return;
-
-    errors.value = {};
-    saving.value = true;
-
-    axios.patch(props.action, {
-        webhooks: webhooks.value.map(({ values, meta, ...config }) => ({ ...config, ...values })),
-    })
-        .then(() => {
-            Statamic.$dirty.remove('connection');
-            Statamic.$toast.success(__('Saved'));
-        })
-        .catch((e) => {
-            if (e.response?.status === 422) {
-                errors.value = e.response.data.errors;
-                Statamic.$toast.error(e.response.data.message);
-            } else {
-                Statamic.$toast.error(__('Something went wrong'));
-            }
-        })
-        .finally(() => (saving.value = false));
-};
-
-onMounted(() => {
-    saveBinding.value = keys.bindGlobal(['mod+s'], (e) => {
-        e.preventDefault();
-        save();
-    });
-});
-
-onUnmounted(() => saveBinding.value?.destroy());
 </script>
 
 <template>
-    <Teleport to="#form-layout-actions">
-        <Button variant="primary" :aria-label="__('Save')" :disabled="saving" @click="save">
-            <Icon name="save" class="sm:hidden" />
-            <span class="hidden sm:inline">{{ __('Save') }}</span>
-        </Button>
-    </Teleport>
-
     <Field
         class="mb-8"
         :label="__('Example Payload')"
@@ -117,7 +77,7 @@ onUnmounted(() => saveBinding.value?.destroy());
         <template #header="{ item: webhook, collapsed }">
             <Badge size="lg" pill color="white" class="px-3 text-gray-950 gap-1">
                 <Icon name="globe-arrow" class="size-3.5 me-1 opacity-100! text-teal-600 dark:text-teal-400" aria-hidden="true" />
-                {{ webhook.values.url || __('New Webhook') }}
+                {{ webhook.url || __('New Webhook') }}
             </Badge>
             <Subheading v-show="collapsed" class="overflow-hidden text-ellipsis whitespace-nowrap gap-1.5!">
                 <span class="truncate">{{ conditionsSummary(webhook.conditions) }}</span>
@@ -135,8 +95,8 @@ onUnmounted(() => saveBinding.value?.destroy());
                         <PublishContainer
                             :name="`webhook-connection-${webhook.id}`"
                             :blueprint="blueprint"
-                            v-model="webhook.values"
-                            :meta="webhook.meta"
+                            v-model="webhooks[index]"
+                            :meta="meta[webhook.id] ?? defaults.meta"
                             :errors="rowErrors(index)"
                             :track-dirty-state="false"
                         >

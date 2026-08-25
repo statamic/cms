@@ -1,35 +1,34 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from 'vue';
-import axios from 'axios';
-import { keys } from '@api';
+import { computed } from 'vue';
 import { usePage } from '@inertiajs/vue3';
-import { Badge, Button, Icon, PublishContainer, PublishFields, PublishFieldsProvider, Subheading } from '@ui';
-import ConnectionRows, { connectionRows } from './ConnectionRows.vue';
+import { Badge, Icon, PublishContainer, PublishFields, PublishFieldsProvider, Subheading } from '@ui';
+import ConnectionRows from './ConnectionRows.vue';
 import ConnectionRules, { conditionsSummary } from './ConnectionRules.vue';
 
 interface Email {
     id: string;
     enabled: boolean;
     conditions: { _id: string; field: string; operator: string; value: string }[];
-    values: object;
-    meta: object;
+    [field: string]: unknown;
 }
+
+const emit = defineEmits(['update:modelValue']);
 
 const props = defineProps({
     form: Object,
-    config: Array,
-    action: String,
+    modelValue: { type: Array, default: () => [] },
+    errors: { type: Object, default: () => ({}) },
     blueprint: Object,
-    emails: Object,
+    meta: { type: Object, default: () => ({}) },
     defaults: Object,
 });
 
 const suggestableFields = usePage().props.suggestableFields;
 
-const errors = ref<object>({});
-const saving = ref<boolean>(false);
-const saveBinding = ref<ReturnType<typeof keys.bindGlobal> | null>(null);
-const emails = ref<Email[]>(connectionRows(props.config, props.emails));
+const emails = computed({
+    get: () => props.modelValue as Email[],
+    set: (value: Email[]) => emit('update:modelValue', value),
+});
 
 const recipients = (to: string[] | string): string =>
     [to].flat().map((recipient) => {
@@ -41,59 +40,19 @@ const recipients = (to: string[] | string): string =>
         return __(field?.config?.display ?? handle);
     }).join(', ');
 
-const hasError = (index: number) => Object.keys(errors.value).some((key) => key.startsWith(`emails.${index}.`));
+const hasError = (index: number) => Object.keys(props.errors).some((key) => key.startsWith(`${index}.`));
 
 const rowErrors = (index: number) =>
-    Object.entries(errors.value)
-        .filter(([key]) => key.startsWith(`emails.${index}.`))
+    Object.entries(props.errors)
+        .filter(([key]) => key.startsWith(`${index}.`))
         .reduce((fields, [key, messages]) => {
-            const handle = key.replace(`emails.${index}.`, '').split('.')[0];
+            const handle = key.replace(`${index}.`, '').split('.')[0];
             fields[handle] = [...(fields[handle] ?? []), ...messages];
             return fields;
         }, {});
-
-const save = (): void => {
-    if (saving.value) return;
-
-    errors.value = {};
-    saving.value = true;
-
-    axios.patch(props.action, {
-        emails: emails.value.map(({ values, meta, ...config }) => ({ ...config, ...values })),
-    })
-        .then(() => {
-            Statamic.$dirty.remove('connection');
-            Statamic.$toast.success(__('Saved'));
-        })
-        .catch((e) => {
-            if (e.response?.status === 422) {
-                errors.value = e.response.data.errors;
-                Statamic.$toast.error(e.response.data.message);
-            } else {
-                Statamic.$toast.error(__('Something went wrong'));
-            }
-        })
-        .finally(() => (saving.value = false));
-};
-
-onMounted(() => {
-    saveBinding.value = keys.bindGlobal(['mod+s'], (e) => {
-        e.preventDefault();
-        save();
-    });
-});
-
-onUnmounted(() => saveBinding.value?.destroy());
 </script>
 
 <template>
-    <Teleport to="#form-layout-actions">
-        <Button variant="primary" :aria-label="__('Save')" :disabled="saving" @click="save">
-            <Icon name="save" class="sm:hidden" />
-            <span class="hidden sm:inline">{{ __('Save') }}</span>
-        </Button>
-    </Teleport>
-
     <ConnectionRows
         v-model="emails"
         :defaults
@@ -107,10 +66,10 @@ onUnmounted(() => saveBinding.value?.destroy());
         <template #header="{ item: email, collapsed }">
             <Badge size="lg" pill color="white" class="px-3 text-gray-950 gap-1">
                 <Icon name="mail-sign-at" class="size-3.5 me-1 opacity-100! text-blue-600 dark:text-blue-400" aria-hidden="true" />
-                {{ email.values.to?.length ? __('Message sent to :email', { email: recipients(email.values.to) }) : __('New Email') }}
+                {{ email.to?.length ? __('Message sent to :email', { email: recipients(email.to) }) : __('New Email') }}
             </Badge>
             <Subheading v-show="collapsed" class="overflow-hidden text-ellipsis whitespace-nowrap gap-1.5!">
-                <span class="truncate">{{ conditionsSummary(email.conditions) ?? email.values.subject }}</span>
+                <span class="truncate">{{ conditionsSummary(email.conditions) ?? email.subject }}</span>
             </Subheading>
         </template>
 
@@ -125,8 +84,8 @@ onUnmounted(() => saveBinding.value?.destroy());
                         <PublishContainer
                             :name="`email-connection-${email.id}`"
                             :blueprint="blueprint"
-                            v-model="email.values"
-                            :meta="email.meta"
+                            v-model="emails[index]"
+                            :meta="meta[email.id] ?? defaults.meta"
                             :errors="rowErrors(index)"
                             :track-dirty-state="false"
                         >

@@ -1,19 +1,6 @@
-<script>
-import { nanoid as uniqid } from 'nanoid';
-
-export function connectionRows(config, state) {
-    return config.map((item) => ({
-        id: item.id,
-        enabled: item.enabled ?? true,
-        conditions: (item.conditions ?? []).map((condition) => ({ ...condition, _id: uniqid() })),
-        values: state[item.id]?.values,
-        meta: state[item.id]?.meta,
-    }));
-}
-</script>
-
 <script setup>
 import { computed, onBeforeUnmount, ref, watch } from 'vue';
+import { nanoid as uniqid } from 'nanoid';
 import { Button, ConfirmationModal } from '@ui';
 import { SortableList } from '@/components/sortable/Sortable.js';
 import { deepClone } from '@/util/clone.js';
@@ -44,27 +31,24 @@ const items = computed({
     set: (value) => emit('update:modelValue', value),
 });
 
-const add = () =>
-    (items.value = [
+const add = () => {
+    items.value = [
         ...items.value,
         {
             id: uniqid(),
             enabled: true,
-            conditions: [],
-            values: deepClone(props.defaults.values),
-            meta: deepClone(props.defaults.meta),
+            conditions: [], ...deepClone(props.defaults.values),
         },
-    ]);
+    ];
+};
 
 const duplicate = (item) => {
     const duplicated = [...items.value];
 
     duplicated.splice(items.value.indexOf(item) + 1, 0, {
+        ...deepClone(item),
         id: uniqid(),
-        enabled: item.enabled,
         conditions: item.conditions.map((condition) => ({ ...condition, _id: uniqid() })),
-        values: deepClone(item.values),
-        meta: deepClone(item.meta),
     });
 
     items.value = duplicated;

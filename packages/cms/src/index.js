@@ -19,7 +19,6 @@ export const {
     ConnectionRows,
     ConnectionRules,
     conditionsSummary,
-    connectionRows,
     requireElevatedSession,
     requireElevatedSessionIf,
     clone,
