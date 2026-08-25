@@ -24,6 +24,7 @@ class ViewSharedPreviewTest extends TestCase
 
         $this->withStandardFakeViews();
         $this->withStandardBlueprints();
+        $this->viewShouldReturnRaw('layout', '<html><body>{{ template_content }}</body></html>');
 
         Carbon::setTestNow(Carbon::parse('2024-01-01 12:00:00'));
     }
@@ -50,6 +51,29 @@ class ViewSharedPreviewTest extends TestCase
             ->assertHeader('X-Robots-Tag', 'noindex')
             ->assertSee('Draft content')
             ->assertSee('Draft preview');
+    }
+
+    #[Test]
+    public function the_shared_preview_banner_can_be_disabled()
+    {
+        config(['statamic.live_preview.shared_link_banner' => false]);
+
+        Collection::make('blog')->routes('/blog/{slug}')->save();
+
+        $entry = EntryFactory::id('1')
+            ->collection('blog')
+            ->slug('about')
+            ->published(false)
+            ->data(['content' => 'Draft content'])
+            ->create();
+
+        $token = $this->tokenFor($entry);
+
+        $this
+            ->get('/blog/about?token='.$token->token())
+            ->assertOk()
+            ->assertSee('Draft content')
+            ->assertDontSee('Draft preview');
     }
 
     #[Test]

@@ -75,9 +75,13 @@ return [
     |--------------------------------------------------------------------------
     |
     | How long shareable draft preview links should remain valid, in minutes.
+    | Set shared_link_banner to false to hide the "Draft preview" bar on
+    | shared frontend pages. Cascade still gets `shared_preview`.
     |
     */
 
     'shared_link_expiry' => 1440,
+
+    'shared_link_banner' => true,
 
 ];

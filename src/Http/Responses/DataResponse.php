@@ -11,6 +11,8 @@ use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Site;
 use Statamic\View\View;
 
+use function Statamic\trans as __;
+
 class DataResponse implements Responsable
 {
     protected $data;
@@ -202,6 +204,10 @@ class DataResponse implements Responsable
 
     private function shouldShowSharedPreviewBanner(): bool
     {
+        if (! config('statamic.live_preview.shared_link_banner', true)) {
+            return false;
+        }
+
         if (! $this->request->isSharedPreviewOf($this->data)) {
             return false;
         }
@@ -235,11 +241,11 @@ class DataResponse implements Responsable
 <aside role="status" style="position:fixed;z-index:99999;inset-inline:0;bottom:0;display:flex;justify-content:center;padding:10px 16px;background:#1e293b;color:#f8fafc;font:13px/1.4 ui-sans-serif,system-ui,sans-serif">{$label}</aside>
 HTML;
 
-        if (str_contains($contents, '</body>')) {
-            return str_replace('</body>', $banner.'</body>', $contents);
+        if (! str_contains($contents, '</body>')) {
+            return $contents;
         }
 
-        return $contents.$banner;
+        return str_replace('</body>', $banner.'</body>', $contents);
     }
 
     protected function versionJavascriptModules($contents)
