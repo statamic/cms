@@ -86,7 +86,7 @@ class ViewConnectionsTest extends TestCase
                 ->where('connections.0.handle', 'email')
                 ->where('connections.0.title', 'Email')
                 ->where('connections.0.count', 1)
-                ->where('connections.0.url', cp_route('forms.connect.show', [$form->handle(), 'email']))
+                ->where('connections.0.url', cp_route('forms.connect.edit', [$form->handle(), 'email']))
                 ->where('connections.1.handle', 'webhook')
                 ->where('connections.1.count', 0)
                 ->where('connections.2.handle', 'acme'));

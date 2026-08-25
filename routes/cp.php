@@ -361,7 +361,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::get('forms/{form}/logic', [FormLogicController::class, 'edit'])->name('forms.logic.edit');
     Route::patch('forms/{form}/logic', [FormLogicController::class, 'update'])->name('forms.logic.update');
     Route::get('forms/{form}/connect', [FormConnectController::class, 'index'])->name('forms.connect.index');
-    Route::get('forms/{form}/connect/{connection}', [FormConnectController::class, 'show'])->name('forms.connect.show');
+    Route::get('forms/{form}/connect/{connection}', [FormConnectController::class, 'edit'])->name('forms.connect.edit');
     Route::patch('forms/{form}/connect/{connection}', [FormConnectController::class, 'update'])->name('forms.connect.update');
     FormConnection::routes();
     Route::get('forms/{form}/export/{type}', [FormExportController::class, 'export'])->name('forms.export');

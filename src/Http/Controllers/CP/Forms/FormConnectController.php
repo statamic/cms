@@ -30,18 +30,18 @@ class FormConnectController extends CpController
                 'icon' => $connection->icon(),
                 'developer' => $connection->developer(),
                 'count' => $connection->count($form),
-                'url' => cp_route('forms.connect.show', [$form->handle(), $connection->handle()]),
+                'url' => cp_route('forms.connect.edit', [$form->handle(), $connection->handle()]),
             ])->values(),
         ]);
     }
 
-    public function show($form, string $connection)
+    public function edit($form, string $connection)
     {
         $this->authorize('edit', $form);
 
         throw_unless($connection = FormConnection::find($connection), NotFoundHttpException::class);
 
-        return Inertia::render('forms/connect/Show', [
+        return Inertia::render('forms/connect/Edit', [
             'form' => $form,
             'can' => $this->formAbilities($form),
             'connection' => [

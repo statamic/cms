@@ -32,10 +32,10 @@ class EditConnectionTest extends TestCase
 
         $this
             ->actingAs($user)
-            ->get(cp_route('forms.connect.show', [$form->handle(), 'email']))
+            ->get(cp_route('forms.connect.edit', [$form->handle(), 'email']))
             ->assertSuccessful()
             ->assertInertia(fn ($page) => $page
-                ->component('forms/connect/Show', false)
+                ->component('forms/connect/Edit', false)
                 ->where('connection.handle', 'email')
                 ->where('connection.title', 'Email')
                 ->where('component.name', 'email-connection')
@@ -58,7 +58,7 @@ class EditConnectionTest extends TestCase
 
         $this
             ->actingAs($user)
-            ->get(cp_route('forms.connect.show', [$form->handle(), 'unknown']))
+            ->get(cp_route('forms.connect.edit', [$form->handle(), 'unknown']))
             ->assertNotFound();
     }
 
@@ -72,7 +72,7 @@ class EditConnectionTest extends TestCase
         $this
             ->from('/original')
             ->actingAs($user)
-            ->get(cp_route('forms.connect.show', [$form->handle(), 'email']))
+            ->get(cp_route('forms.connect.edit', [$form->handle(), 'email']))
             ->assertRedirect('/original')
             ->assertSessionHas('error');
     }
