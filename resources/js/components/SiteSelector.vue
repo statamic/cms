@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from 'vue';
-import { Icon, Select, Subheading } from '@/components/ui';
+import { Badge, Icon, Select, Subheading } from '@/components/ui';
 import {
     flatOptionsFromSiteGroups,
     groupItemsBySiteGroup,
@@ -49,6 +49,31 @@ function groupLabel(option) {
                     <Icon name="chevron-right" class="size-3.5! shrink-0 text-gray-700 dark:text-white/70" aria-hidden="true" />
                 </template>
                 <span class="truncate">{{ __(option.name) }}</span>
+                <span
+                    v-if="option.fully_synced === true"
+                    class="inline-flex shrink-0 ps-0.5"
+                    v-tooltip="__('messages.localization_fully_synced_with_origin')"
+                >
+                    <Icon name="synced" class="size-3! text-gray-600 dark:text-gray-400" />
+                </span>
+            </span>
+        </template>
+
+        <template #option="option">
+            <span class="flex min-w-0 flex-1 items-center gap-x-2">
+                <span class="flex min-w-0 items-center gap-1.5">
+                    <span class="truncate">{{ __(option.name) }}</span>
+                    <span
+                        v-if="option.fully_synced === true"
+                        class="inline-flex shrink-0"
+                        v-tooltip="__('messages.localization_fully_synced_with_origin')"
+                    >
+                        <Icon name="synced" class="size-3! text-gray-600 dark:text-gray-400" />
+                    </span>
+                </span>
+                <Badge size="sm" color="orange" v-if="option.origin === true" :text="__('Origin')" />
+                <Badge size="sm" color="blue" v-if="option.active === true" :text="__('Active')" />
+                <Badge size="sm" color="purple" v-if="option.root === true && option.origin !== true && option.active !== true" :text="__('Root')" />
             </span>
         </template>
 

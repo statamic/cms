@@ -233,9 +233,33 @@ export default {
         saving(saving) {
             this.$progress.loading(`${this.publishContainer}-global-publish-form`, saving);
         },
+
+        localizedFields: {
+            handler() {
+                this.refreshActiveLocalizationSyncState();
+            },
+            deep: true,
+        },
+
+        hasOrigin() {
+            this.refreshActiveLocalizationSyncState();
+        },
     },
 
     methods: {
+        refreshActiveLocalizationSyncState() {
+            this.localizations = this.localizations.map((localization) => {
+                if (localization.handle !== this.site) {
+                    return localization;
+                }
+
+                return {
+                    ...localization,
+                    fully_synced: this.hasOrigin && this.localizedFields.length === 0,
+                };
+            });
+        },
+
         save() {
             if (!this.canSave) return;
 
@@ -262,6 +286,7 @@ export default {
                 .then((response) => {
                     if (!this.isCreating) this.$toast.success(__('Saved'));
 
+                    this.refreshActiveLocalizationSyncState();
                     this.$nextTick(() => this.$emit('saved', response));
                 })
                 .catch((e) => {
