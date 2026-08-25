@@ -26,7 +26,6 @@ class FileTokenRepository extends TokenRepository
 
         return File::getFilesByType(storage_path('statamic/tokens'), 'yaml')
             ->map(fn ($path) => $this->makeFromPath($path))
-            ->reject->hasExpired()
             ->values();
     }
 

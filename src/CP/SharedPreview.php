@@ -33,6 +33,7 @@ class SharedPreview
     {
         return Token::all()->first(function ($token) use ($item, $revision) {
             return $token->handler() === Handler::class
+                && ! $token->hasExpired()
                 && $token->get('reference') === $item->reference()
                 && $token->get('revision') == $revision;
         });

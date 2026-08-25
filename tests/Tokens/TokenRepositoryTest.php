@@ -162,7 +162,7 @@ YAML;
     }
 
     #[Test]
-    public function it_gets_all_non_expired_tokens()
+    public function it_gets_all_tokens()
     {
         Carbon::setTestNow(Carbon::create(2020, 1, 1, 3, 0, 0));
 
@@ -172,7 +172,7 @@ YAML;
 
         $tokens = $this->tokens->all();
 
-        $this->assertEquals(['a', 'c'], $tokens->map->token()->sort()->values()->all());
+        $this->assertEquals(['a', 'b', 'c'], $tokens->map->token()->sort()->values()->all());
     }
 
     #[Test]
