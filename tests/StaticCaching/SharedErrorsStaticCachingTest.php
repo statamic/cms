@@ -9,8 +9,19 @@ use Statamic\Facades\Site;
 use Statamic\StaticCaching\Cachers\ApplicationCacher;
 use Tests\TestCase;
 
+
+use Illuminate\Support\Facades\Cache;
+use Orchestra\Testbench\Attributes\DefineEnvironment;
+use Statamic\StaticCaching\Replacer;
+use Symfony\Component\HttpFoundation\Response;
+use Tests\FakesViews;
+use Tests\PreventSavingStacheItemsToDisk;
+
 class SharedErrorsStaticCachingTest extends TestCase
 {
+    use FakesViews;
+    use PreventSavingStacheItemsToDisk;
+
     private ApplicationCacher $cacher;
 
     protected function setUp(): void
@@ -74,5 +85,61 @@ class SharedErrorsStaticCachingTest extends TestCase
         // The cacher writes to the store on the ResponsePrepared event, which
         // the framework fires during the real response lifecycle.
         event(new ResponsePrepared($request, $response));
+    }
+
+    public function withTestReplacer($app)
+    {
+        $app['config']->set('statamic.static_caching.strategy', 'half');
+        $app['config']->set('statamic.static_caching.share_errors', true);
+        $app['config']->set('statamic.static_caching.replacers', array_merge(
+            $app['config']->get('statamic.static_caching.replacers'),
+            ['test' => SharedErrorTestReplacer::class]
+        ));
+    }
+
+    #[Test]
+    #[DefineEnvironment('withTestReplacer')]
+    public function replacers_run_when_serving_a_shared_error()
+    {
+        Cache::flush();
+
+        $this->withStandardFakeViews();
+        $this->viewShouldReturnRaw('errors.layout', '{{ template_content }}');
+        $this->viewShouldReturnRaw('errors.404', '404 LIVE_VALUE');
+
+        // First 404 renders live and seeds the shared cache. The live response
+        // itself is untouched by the prepare step - only the clone that gets
+        // cached is.
+        $this->get('/this-does-not-exist')
+            ->assertNotFound()
+            ->assertSee('404 LIVE_VALUE', false);
+
+        // A different URL that also 404s is served from the shared cache.
+        // Regression: previously this replayed whatever copyError() captured
+        // before any replacer ran, and getCachedError() never ran replacers on
+        // the way out either - so a stale value (or, for CsrfTokenReplacer in
+        // production, a frozen CSRF token from a different session) leaked to
+        // every subsequent visitor forever.
+        $this->get('/this-also-does-not-exist')
+            ->assertNotFound()
+            ->assertSee('404 REPLACED_ON_SERVE', false);
+    }
+}
+
+class SharedErrorTestReplacer implements Replacer
+{
+    const PLACEHOLDER = 'TEST_TOKEN_PLACEHOLDER';
+
+    public function prepareResponseToCache(Response $response, Response $initial)
+    {
+        // Mirrors CsrfTokenReplacer's behaviour for the "half" strategy:
+        // only the clone that gets cached is touched, not $initial (which
+        // is what's returned to this first request).
+        $response->setContent(str_replace('LIVE_VALUE', self::PLACEHOLDER, $response->getContent()));
+    }
+
+    public function replaceInCachedResponse(Response $response)
+    {
+        $response->setContent(str_replace(self::PLACEHOLDER, 'REPLACED_ON_SERVE', $response->getContent()));
     }
 }

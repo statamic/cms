@@ -88,9 +88,9 @@ class Cache
         $response = $next($request);
 
         if ($this->shouldBeCached($request, $response)) {
-            $this->copyError($request, $response);
+            $preparedResponse = $this->makeReplacementsAndCacheResponse($request, $response);
 
-            $this->makeReplacementsAndCacheResponse($request, $response);
+            $this->copyError($request, $preparedResponse);
 
             $this->nocache->write();
 
@@ -169,6 +169,8 @@ class Cache
         }
 
         $this->cacher->cachePage($request, $cachedResponse);
+
+        return $cachedResponse;
     }
 
     private function makeReplacements($response)
