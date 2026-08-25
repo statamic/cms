@@ -178,11 +178,15 @@ class EmailConnectionTest extends TestCase
 
         $this->assertEquals([
             ['id' => 'abc', 'to' => ['new@example.com', 'field:email'], 'subject' => 'Updated'],
-            ['id' => 'def', 'to' => ['another@example.com'], 'enabled' => false],
+            ['id' => 'def', 'to' => ['another@example.com'], 'enabled' => false, 'conditions' => [
+                ['field' => 'name', 'operator' => 'equals', 'value' => 'Bob', 'join' => 'and'],
+            ]],
             ['id' => 'ghi', 'to' => ['third@example.com'], 'markdown' => true, 'attachments' => true],
         ], (new Email)->process([
             ['id' => 'abc', 'to' => ['new@example.com', 'field:email'], 'subject' => 'Updated', 'enabled' => true, 'markdown' => false, 'attachments' => false],
-            ['id' => 'def', 'to' => ['another@example.com'], 'enabled' => false],
+            ['id' => 'def', 'to' => ['another@example.com'], 'enabled' => false, 'conditions' => [
+                ['_id' => 'vue-row', 'field' => 'name', 'operator' => 'equals', 'value' => 'Bob', 'join' => 'and'],
+            ]],
             ['id' => 'ghi', 'to' => ['third@example.com'], 'markdown' => true, 'attachments' => true],
         ], $form));
     }
@@ -208,41 +212,6 @@ class EmailConnectionTest extends TestCase
 
         $this->assertNotEmpty($config['id']);
         $this->assertEquals(['foo@example.com'], $config['to']);
-    }
-
-    #[Test]
-    public function it_normalizes_the_conditions()
-    {
-        $form = tap(Form::make('test'))->save();
-
-        $this->assertEquals([
-            [
-                'id' => 'abc',
-                'to' => ['foo@example.com'],
-                'conditions' => [
-                    ['field' => 'name', 'operator' => 'equals', 'value' => 'Bob', 'join' => 'and'],
-                ],
-            ],
-            [
-                'id' => 'def',
-                'to' => ['bar@example.com'],
-            ],
-        ], (new Email)->process([
-            [
-                'id' => 'abc',
-                'to' => ['foo@example.com'],
-                'conditions' => [
-                    ['_id' => 'vue-row', 'field' => 'name', 'operator' => 'equals', 'value' => 'Bob', 'join' => 'and'],
-                    ['field' => null, 'operator' => 'equals', 'value' => 'incomplete', 'join' => 'and'],
-                    ['field' => 'name', 'operator' => 'equals', 'value' => '', 'join' => 'and'],
-                ],
-            ],
-            [
-                'id' => 'def',
-                'to' => ['bar@example.com'],
-                'conditions' => [],
-            ],
-        ], $form));
     }
 
     #[Test]

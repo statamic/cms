@@ -5,10 +5,18 @@ namespace Statamic\Forms\Connections;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Forms\Logic\RuleEvaluator;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 
 class ConnectionLogic
 {
-    public static function normalize(array $conditions): ?array
+    public static function preProcess(array $conditions = []): array
+    {
+        return collect($conditions)
+            ->map(fn (array $condition): array => ['_id' => Str::random(8), ...$condition])
+            ->all();
+    }
+
+    public static function process(array $conditions): ?array
     {
         $conditions = collect($conditions)
             ->map(fn ($condition) => Arr::only($condition, ['field', 'operator', 'value', 'join']))

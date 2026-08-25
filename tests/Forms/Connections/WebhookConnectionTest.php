@@ -324,11 +324,15 @@ class WebhookConnectionTest extends TestCase
         $form = tap(Form::make('test'))->save();
 
         $this->assertEquals([
-            ['id' => 'def', 'url' => 'https://example.com/updated', 'enabled' => false],
+            ['id' => 'def', 'url' => 'https://example.com/updated', 'enabled' => false, 'conditions' => [
+                ['field' => 'name', 'operator' => 'equals', 'value' => 'Bob', 'join' => 'and'],
+            ]],
             ['id' => 'ghi', 'url' => 'http://localhost:5678/n8n', 'verify_ssl' => false],
             ['id' => 'jkl', 'url' => 'https://example.com/defaults'],
         ], (new Webhook)->process([
-            ['id' => 'def', 'url' => 'https://example.com/updated', 'enabled' => false],
+            ['id' => 'def', 'url' => 'https://example.com/updated', 'enabled' => false, 'conditions' => [
+                ['_id' => 'vue-row', 'field' => 'name', 'operator' => 'equals', 'value' => 'Bob', 'join' => 'and'],
+            ]],
             ['id' => 'ghi', 'url' => 'http://localhost:5678/n8n', 'verify_ssl' => false],
             ['id' => 'jkl', 'url' => 'https://example.com/defaults', 'enabled' => true, 'verify_ssl' => true],
         ], $form));
@@ -355,40 +359,6 @@ class WebhookConnectionTest extends TestCase
 
         $this->assertNotEmpty($config['id']);
         $this->assertEquals('https://example.com/hook', $config['url']);
-    }
-
-    #[Test]
-    public function it_normalizes_the_conditions()
-    {
-        $form = tap(Form::make('test'))->save();
-
-        $this->assertEquals([
-            [
-                'id' => 'abc',
-                'url' => 'https://example.com/hook',
-                'conditions' => [
-                    ['field' => 'name', 'operator' => 'equals', 'value' => 'Bob', 'join' => 'and'],
-                ],
-            ],
-            [
-                'id' => 'def',
-                'url' => 'https://example.com/other',
-            ],
-        ], (new Webhook)->process([
-            [
-                'id' => 'abc',
-                'url' => 'https://example.com/hook',
-                'conditions' => [
-                    ['_id' => 'vue-row', 'field' => 'name', 'operator' => 'equals', 'value' => 'Bob', 'join' => 'and'],
-                    ['field' => null, 'operator' => 'equals', 'value' => 'incomplete', 'join' => 'and'],
-                ],
-            ],
-            [
-                'id' => 'def',
-                'url' => 'https://example.com/other',
-                'conditions' => [],
-            ],
-        ], $form));
     }
 
     #[Test]

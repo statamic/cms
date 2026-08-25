@@ -66,10 +66,8 @@ class Webhook extends Connection
             ->map(fn (array $config): array => [
                 'id' => $config['id'],
                 'enabled' => Arr::get($config, 'enabled') !== false,
-                'conditions' => collect(Arr::get($config, 'conditions') ?? [])
-                    ->map(fn (array $condition): array => ['_id' => Str::random(8), ...$condition])
-                    ->all(),
-                ...$fields->addValues(Arr::except($config, ['id', 'enabled', 'conditions']))->preProcess()->values()->all(),
+                'conditions' => ConnectionLogic::preProcess(Arr::get($config, 'conditions') ?? []),
+                ...$fields->addValues($config)->preProcess()->values()->all(),
             ])
             ->values()
             ->all();
@@ -96,7 +94,7 @@ class Webhook extends Connection
                 $config = Arr::removeNullValues($config);
 
                 $values = $fields
-                    ->addValues(Arr::except($config, ['_id', 'id', 'enabled', 'conditions']))
+                    ->addValues($config)
                     ->process()
                     ->values()
                     ->all();
@@ -106,7 +104,7 @@ class Webhook extends Connection
                     ...$values,
                     'enabled' => Arr::get($config, 'enabled') === false ? false : null,
                     'verify_ssl' => Arr::get($values, 'verify_ssl') === false ? false : null,
-                    'conditions' => ConnectionLogic::normalize(Arr::get($config, 'conditions') ?? []),
+                    'conditions' => ConnectionLogic::process(Arr::get($config, 'conditions') ?? []),
                 ]);
             })
             ->values()

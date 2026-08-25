@@ -66,10 +66,8 @@ class Email extends Connection
             ->map(fn (array $config): array => [
                 'id' => $config['id'],
                 'enabled' => Arr::get($config, 'enabled') !== false,
-                'conditions' => collect(Arr::get($config, 'conditions') ?? [])
-                    ->map(fn (array $condition): array => ['_id' => Str::random(8), ...$condition])
-                    ->all(),
-                ...$fields->addValues(Arr::except($config, ['id', 'enabled', 'conditions']))->preProcess()->values()->all(),
+                'conditions' => ConnectionLogic::preProcess(Arr::get($config, 'conditions') ?? []),
+                ...$fields->addValues($config)->preProcess()->values()->all(),
             ])
             ->values()
             ->all();
@@ -110,7 +108,7 @@ class Email extends Connection
                 $config = Arr::removeNullValues($config);
 
                 $values = $fields
-                    ->addValues(Arr::except($config, ['_id', 'id', 'enabled', 'conditions']))
+                    ->addValues($config)
                     ->process()
                     ->values()
                     ->all();
@@ -121,7 +119,7 @@ class Email extends Connection
                     'enabled' => Arr::get($config, 'enabled') === false ? false : null,
                     'markdown' => Arr::get($values, 'markdown') === true ? true : null,
                     'attachments' => Arr::get($values, 'attachments') === true ? true : null,
-                    'conditions' => ConnectionLogic::normalize(Arr::get($config, 'conditions') ?? []),
+                    'conditions' => ConnectionLogic::process(Arr::get($config, 'conditions') ?? []),
                 ]);
             })
             ->values()
