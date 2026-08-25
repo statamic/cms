@@ -54,7 +54,7 @@ function groupLabel(option) {
                     class="inline-flex shrink-0 ps-0.5"
                     v-tooltip="__('messages.localization_fully_synced_with_origin')"
                 >
-                    <Icon name="synced" class="size-3! text-gray-600 dark:text-gray-400" />
+                    <Icon name="synced" class="size-3.5! text-gray-400 dark:text-gray-600" />
                 </span>
             </span>
         </template>
@@ -68,7 +68,7 @@ function groupLabel(option) {
                         class="inline-flex shrink-0"
                         v-tooltip="__('messages.localization_fully_synced_with_origin')"
                     >
-                        <Icon name="synced" class="size-3! text-gray-600 dark:text-gray-400" />
+                        <Icon name="synced" class="size-3.5! text-gray-400 dark:text-gray-600" />
                     </span>
                 </span>
                 <Badge size="sm" color="orange" v-if="option.origin === true" :text="__('Origin')" />
