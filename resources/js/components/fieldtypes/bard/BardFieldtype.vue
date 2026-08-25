@@ -893,7 +893,11 @@ export default {
                     if (countNodes(oldJson) !== countNodes(newJson)) this.debounceNextUpdate = false;
 
                     this.json = newJson;
-                    this.html = this.editor.getHTML();
+
+                    // Serializing the whole document is expensive, and reading time is the only thing that needs it.
+                    if (this.config.reading_time) {
+                        this.html = this.editor.getHTML();
+                    }
                 },
                 onCreate: ({ editor }) => {
                     const state = editor.view.state;
