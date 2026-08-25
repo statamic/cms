@@ -51,6 +51,11 @@ abstract class Connection
         return null;
     }
 
+    public function isConfigured(): bool
+    {
+        return true;
+    }
+
     public function finalized(Submission $submission): object|array
     {
         return [];

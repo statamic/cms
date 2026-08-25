@@ -53,6 +53,7 @@ class FormConnectController extends CpController
             'component' => $connection->render($form),
             'value' => $connection->preProcess($form->connections()->get($connection->handle(), []), $form),
             'action' => cp_route('forms.connect.update', [$form->handle(), $connection->handle()]),
+            'isConfigured' => $connection->isConfigured(),
             'suggestableFields' => $this->suggestableFields($form),
         ]);
     }

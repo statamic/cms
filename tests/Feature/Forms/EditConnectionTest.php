@@ -43,6 +43,7 @@ class EditConnectionTest extends TestCase
                 ->missing('config')
                 ->has('suggestableFields')
                 ->where('action', cp_route('forms.connect.update', [$form->handle(), 'email']))
+                ->where('isConfigured', true)
                 ->where('value.0.id', 'abc')
                 ->where('value.0.to', ['foo@example.com'])
                 ->where('value.0.enabled', true)

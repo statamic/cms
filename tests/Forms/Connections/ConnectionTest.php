@@ -94,6 +94,12 @@ class ConnectionTest extends TestCase
     }
 
     #[Test]
+    public function it_is_configured_by_default()
+    {
+        $this->assertTrue((new TestMultiWordConnection)->isConfigured());
+    }
+
+    #[Test]
     public function it_has_no_validation_rules_by_default()
     {
         $this->assertEquals([], (new TestMultiWordConnection)->rules(Form::make('contact')));

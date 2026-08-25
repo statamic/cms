@@ -18,6 +18,7 @@ const props = defineProps({
     component: Object,
     value: [Array, Object],
     action: String,
+    isConfigured: Boolean,
     suggestableFields: Array,
 });
 
@@ -51,6 +52,8 @@ const save = () => {
 watch(value, () => Statamic.$dirty.add('connection'), { deep: true });
 
 onMounted(() => {
+    if (!props.isConfigured) return;
+
     saveBinding.value = keys.bindGlobal(['mod+s'], (e) => {
         e.preventDefault();
         save();
@@ -66,7 +69,7 @@ onUnmounted(() => {
 <template>
     <Head :title="[__(connection.title), __('Connect'), __(form.title), __('Forms')]" />
 
-    <Teleport to="#form-layout-actions">
+    <Teleport v-if="isConfigured" to="#form-layout-actions">
         <Button variant="primary" :aria-label="__('Save')" :disabled="saving" @click="save">
             <Icon name="save" class="sm:hidden" />
             <span class="hidden sm:inline">{{ __('Save') }}</span>
