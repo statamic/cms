@@ -1,115 +1,148 @@
-<script setup>
-import { computed, onBeforeUnmount, ref, watch } from 'vue';
+<script setup lang="ts">
+import { ref } from 'vue';
 import { nanoid as uniqid } from 'nanoid';
 import { Button, ConfirmationModal } from '@ui';
 import { SortableList } from '@/components/sortable/Sortable.js';
 import { deepClone } from '@/util/clone.js';
 import LogicEmptyState from '@/components/forms/logic/LogicEmptyState.vue';
 import ConnectionRow from './ConnectionRow.vue';
+import { __ } from '@/bootstrap/globals';
+
+type ConnectionRow = {
+    id: string;
+    enabled: boolean;
+    conditions: {
+        _id: string;
+        field: string;
+        operator: string;
+        value: string;
+    }[];
+    [key: string]: unknown;
+}
 
 const emit = defineEmits(['update:modelValue']);
 
-const props = defineProps({
-    modelValue: { type: Array, default: () => [] },
-    defaults: Object,
-    addLabel: String,
-    emptyHeading: String,
-    emptyDescription: String,
-    deleteHeading: String,
-    deleteDescription: String,
-    hasError: { type: Function, default: () => false },
+const props = withDefaults(defineProps<{
+    modelValue: ConnectionRow[];
+    errors: Record<string, string[]>;
+    defaults: Record<string, unknown>;
+    addLabel: string;
+    emptyHeading: string;
+    emptyDescription?: string;
+    deleteHeading: string;
+    deleteDescription: string;
+}>(), {
+    modelValue: () => [],
+    errors: () => ({}),
+    defaults: () => ({}),
+    addLabel: __('Add Row'),
+    emptyHeading: __('No rows yet'),
+    deleteHeading: __('Delete Row'),
+    deleteDescription: __('Are you sure you want to delete this row?'),
 });
 
 const sortableItemClass = 'connection-row';
 const sortableHandleClass = 'connection-row-handle';
 
-const collapsed = ref([]);
-const confirmingRemoval = ref(null);
+const collapsed = ref<string[]>([]);
+const confirmingRemoval = ref<string>(null);
 
-const items = computed({
-    get: () => props.modelValue,
-    set: (value) => emit('update:modelValue', value),
-});
-
-const add = () => {
-    items.value = [
-        ...items.value,
+const add = (): void => {
+    emit('update:modelValue', [
+        ...props.modelValue,
         {
             id: uniqid(),
             enabled: true,
-            conditions: [], ...deepClone(props.defaults.values),
+            conditions: [],
+            ...deepClone(props.defaults.values),
         },
-    ];
+    ]);
 };
 
-const duplicate = (item) => {
-    const duplicated = [...items.value];
+const duplicate = (row: ConnectionRow): void => {
+    const duplicated = [...props.modelValue];
 
-    duplicated.splice(items.value.indexOf(item) + 1, 0, {
-        ...deepClone(item),
+    duplicated.splice(props.modelValue.indexOf(row) + 1, 0, {
+        ...deepClone(row),
         id: uniqid(),
-        conditions: item.conditions.map((condition) => ({ ...condition, _id: uniqid() })),
+        conditions: row.conditions.map((condition) => ({ ...condition, _id: uniqid() })),
     });
 
-    items.value = duplicated;
+    emit('update:modelValue', duplicated);
 };
 
-const collapse = (id) => {
+const updateEnabled = (row: ConnectionRow, enabled: boolean): void => {
+    emit(
+        'update:modelValue',
+        props.modelValue.map((existing) => (existing.id === row.id ? { ...existing, enabled } : existing))
+    );
+};
+
+const remove = (): void => {
+    const row = props.modelValue.find((item) => item.id === confirmingRemoval.value);
+
+    expand(confirmingRemoval.value);
+    confirmingRemoval.value = null;
+
+    if (row) emit('update:modelValue', props.modelValue.filter((existing) => existing !== row));
+};
+
+const isEnabled = (row: ConnectionRow): boolean => row.enabled !== false;
+const isCollapsed = (row: ConnectionRow): boolean => collapsed.value.includes(row.id);
+
+const collapse = (id: string): void => {
     if (!collapsed.value.includes(id)) {
         collapsed.value.push(id);
     }
 };
 
-const expand = (id) => (collapsed.value = collapsed.value.filter((itemId) => itemId !== id));
+const expand = (id: string): void => (collapsed.value = collapsed.value.filter((rowId) => rowId !== id));
 
-const remove = () => {
-    const item = items.value.find((item) => item.id === confirmingRemoval.value);
+const hasError = (index: string) => Object.keys(props.errors).some((key) => key.startsWith(`${index}.`));
 
-    expand(confirmingRemoval.value);
-    confirmingRemoval.value = null;
-
-    if (item) items.value = items.value.filter((existing) => existing !== item);
+const rowErrors = (index: string) => {
+    return Object.entries(props.errors)
+        .filter(([key]) => key.startsWith(`${index}.`))
+        .reduce((fields, [key, messages]) => {
+            const handle = key.replace(`${index}.`, '').split('.')[0];
+            fields[handle] = [...(fields[handle] ?? []), ...messages];
+            return fields;
+        }, {});
 };
-
-const updateEnabled = (item, enabled) =>
-    (items.value = items.value.map((existing) => (existing.id === item.id ? { ...existing, enabled } : existing)));
-
-watch(items, () => Statamic.$dirty.add('connection'), { deep: true });
-
-onBeforeUnmount(() => Statamic.$dirty.remove('connection'));
 </script>
 
 <template>
-    <LogicEmptyState v-if="items.length === 0" :heading="emptyHeading" :description="emptyDescription">
+    <LogicEmptyState v-if="modelValue.length === 0" :heading="emptyHeading" :description="emptyDescription">
         <Button size="sm" :text="addLabel" icon="plus" @click="add" />
     </LogicEmptyState>
 
     <template v-else>
         <SortableList
-            v-model="items"
             vertical
             constrain-dimensions
+            :model-value="modelValue"
             :item-class="sortableItemClass"
             :handle-class="sortableHandleClass"
+            @update:model-value="$emit('update:modelValue', $event)"
         >
             <div class="relative space-y-6 mb-0" data-connection-rows>
-                <div v-for="(item, index) in items" :key="item.id" :class="sortableItemClass">
+                <div v-for="(row, index) in modelValue" :key="row.id" :class="sortableItemClass">
                     <ConnectionRow
-                        :collapsed="collapsed.includes(item.id)"
-                        :enabled="item.enabled !== false"
+                        :enabled="isEnabled(row)"
+                        :collapsed="isCollapsed(row)"
                         :has-error="hasError(index)"
                         :handle-class="sortableHandleClass"
-                        @collapsed="collapse(item.id)"
-                        @expanded="expand(item.id)"
-                        @duplicated="duplicate(item)"
-                        @removed="confirmingRemoval = item.id"
-                        @update:enabled="updateEnabled(item, $event)"
+                        @collapsed="collapse(row.id)"
+                        @expanded="expand(row.id)"
+                        @duplicated="duplicate(row)"
+                        @removed="confirmingRemoval = row.id"
+                        @update:enabled="updateEnabled(row, $event)"
                     >
                         <template #header>
-                            <slot name="header" :item="item" :index="index" :collapsed="collapsed.includes(item.id)" />
+                            <slot name="header" :item="row" :index="index" :collapsed="collapsed.includes(row.id)" />
                         </template>
 
-                        <slot :item="item" :index="index" />
+                        <slot :item="row" :index="index" :errors="rowErrors(index)" />
                     </ConnectionRow>
                 </div>
             </div>

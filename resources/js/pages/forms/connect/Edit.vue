@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, onUnmounted, ref } from 'vue';
+import { onMounted, onUnmounted, ref, watch } from 'vue';
 import axios from 'axios';
 import { keys } from '@api';
 import Layout from '@/pages/layout/Layout.vue';
@@ -48,6 +48,8 @@ const save = () => {
         .finally(() => (saving.value = false));
 };
 
+watch(value, () => Statamic.$dirty.add('connection'), { deep: true });
+
 onMounted(() => {
     saveBinding.value = keys.bindGlobal(['mod+s'], (e) => {
         e.preventDefault();
@@ -55,7 +57,10 @@ onMounted(() => {
     });
 });
 
-onUnmounted(() => saveBinding.value?.destroy());
+onUnmounted(() => {
+    saveBinding.value?.destroy();
+    Statamic.$dirty.remove('connection');
+});
 </script>
 
 <template>

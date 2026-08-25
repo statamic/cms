@@ -1,17 +1,10 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 import { Badge, Button, Field, Icon, Label, PublishContainer, PublishFields, PublishFieldsProvider, Subheading } from '@ui';
 import ConnectionRows from './ConnectionRows.vue';
 import ConnectionRules, { conditionsSummary } from './ConnectionRules.vue';
 
-interface Webhook {
-    id: string;
-    enabled: boolean;
-    conditions: { _id: string; field: string; operator: string; value: string }[];
-    [field: string]: unknown;
-}
-
-const emit = defineEmits(['update:modelValue']);
+defineEmits(['update:modelValue']);
 
 const props = defineProps({
     form: Object,
@@ -24,22 +17,6 @@ const props = defineProps({
 });
 
 const showExamplePayload = ref<boolean>(props.modelValue.length === 0);
-
-const webhooks = computed({
-    get: () => props.modelValue as Webhook[],
-    set: (value: Webhook[]) => emit('update:modelValue', value),
-});
-
-const hasError = (index: number) => Object.keys(props.errors).some((key) => key.startsWith(`${index}.`));
-
-const rowErrors = (index: number) =>
-    Object.entries(props.errors)
-        .filter(([key]) => key.startsWith(`${index}.`))
-        .reduce((fields, [key, messages]) => {
-            const handle = key.replace(`${index}.`, '').split('.')[0];
-            fields[handle] = [...(fields[handle] ?? []), ...messages];
-            return fields;
-        }, {});
 </script>
 
 <template>
@@ -62,17 +39,18 @@ const rowErrors = (index: number) =>
         <pre v-show="showExamplePayload" class="overflow-x-auto rounded-lg border border-gray-200 bg-gray-50 p-4 text-xs text-gray-800 dark:border-white/10 dark:bg-gray-950/40 dark:text-gray-300"><code>{{ examplePayload }}</code></pre>
     </Field>
 
-    <Label v-if="webhooks.length" :text="__('Webhooks')" />
+    <Label v-if="modelValue.length" :text="__('Webhooks')" />
 
     <ConnectionRows
-        v-model="webhooks"
+        :model-value="modelValue"
+        :errors
         :defaults
-        :has-error
         :add-label="__('Add Webhook')"
         :empty-heading="__('No webhooks yet')"
         :empty-description="__('statamic::messages.webhook_connection_empty_description')"
         :delete-heading="__('Delete Webhook')"
         :delete-description="__('statamic::messages.webhook_connection_delete_confirmation')"
+        @update:model-value="$emit('update:modelValue', $event)"
     >
         <template #header="{ item: webhook, collapsed }">
             <Badge size="lg" pill color="white" class="px-3 text-gray-950 gap-1">
@@ -84,7 +62,7 @@ const rowErrors = (index: number) =>
             </Subheading>
         </template>
 
-        <template #default="{ item: webhook, index }">
+        <template #default="{ item: webhook, errors }">
             <ConnectionRules
                 v-model:conditions="webhook.conditions"
                 :always-label="__('Always send')"
@@ -93,11 +71,11 @@ const rowErrors = (index: number) =>
                 <template #then>
                     <div class="rounded-lg border border-gray-300 bg-white p-4 dark:border-gray-700 dark:bg-gray-900">
                         <PublishContainer
-                            :name="`webhook-connection-${webhook.id}`"
-                            :blueprint="blueprint"
-                            v-model="webhooks[index]"
+                            :errors
+                            :blueprint
+                            :model-value="webhook"
                             :meta="meta[webhook.id] ?? defaults.meta"
-                            :errors="rowErrors(index)"
+                            :name="`webhook-connection-${webhook.id}`"
                             :track-dirty-state="false"
                         >
                             <PublishFieldsProvider :fields="blueprint.tabs[0].sections[0].fields">
