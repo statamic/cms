@@ -1,5 +1,6 @@
 import { mount } from '@vue/test-utils';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
+import { Editor } from '@tiptap/vue-3';
 import * as Globals from '@/bootstrap/globals';
 import BardFieldtype from '@/components/fieldtypes/bard/BardFieldtype.vue';
 import { containerContextKey } from '@/components/ui/Publish/Container.vue';
@@ -66,6 +67,21 @@ beforeEach(() => {
 afterEach(() => vi.restoreAllMocks());
 
 // Serializing the whole document is expensive, and the reading time is the only thing that needs it.
+test('the document is not serialized to html on mount when reading time is disabled', async () => {
+    const getHTML = vi.spyOn(Editor.prototype, 'getHTML');
+
+    const wrapper = await mountField({ reading_time: false });
+
+    expect(getHTML).not.toHaveBeenCalled();
+    expect(wrapper.vm.html).toBe(null);
+});
+
+test('the document is serialized to html on mount when reading time is enabled', async () => {
+    const wrapper = await mountField({ reading_time: true });
+
+    expect(wrapper.vm.html).toContain('One two three four five.');
+});
+
 test('the document is not serialized to html on update when reading time is disabled', async () => {
     const wrapper = await mountField({ reading_time: false });
     const getHTML = vi.spyOn(wrapper.vm.editor, 'getHTML');

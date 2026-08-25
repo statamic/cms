@@ -397,7 +397,10 @@ export default {
         this.initEditor();
 
         this.json = this.editor.getJSON().content;
-        this.html = this.editor.getHTML();
+
+        if (this.config.reading_time) {
+            this.html = this.editor.getHTML();
+        }
 
 		this.$nextTick(() => this.mounted = true);
 
