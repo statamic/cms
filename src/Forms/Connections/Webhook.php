@@ -2,14 +2,14 @@
 
 namespace Statamic\Forms\Connections;
 
-use Illuminate\Routing\Router;
 use Statamic\Contracts\Forms\Form;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\User;
 use Statamic\Forms\Connections\Webhooks\SendWebhook;
 use Statamic\Forms\Fields\FormField;
-use Statamic\Http\Controllers\CP\Forms\Connections\WebhookConnectionController;
+use Statamic\Support\Arr;
+use Statamic\Support\Str;
 use Statamic\Support\VueComponent;
 
 use function Statamic\trans as __;
@@ -44,17 +44,11 @@ class Webhook extends Connection
         $fields = $blueprint->fields()->preProcess();
 
         return VueComponent::render('webhook-connection', [
-            'action' => cp_route('forms.connect.webhook.update', $form->handle()),
             'blueprint' => $blueprint->toPublishArray(),
-            'webhooks' => collect($form->connections()->get('webhook'))
-                ->mapWithKeys(function (array $config) use ($fields): array {
-                    $fields = $fields->addValues($config)->preProcess();
-
-                    return [$config['id'] => [
-                        'values' => $fields->values()->all(),
-                        'meta' => $fields->meta()->all(),
-                    ]];
-                })
+            'meta' => collect($form->connections()->get('webhook'))
+                ->mapWithKeys(fn (array $config): array => [
+                    $config['id'] => $fields->addValues($config)->preProcess()->meta()->all(),
+                ])
                 ->all(),
             'defaults' => [
                 'values' => $fields->values()->all(),
@@ -62,6 +56,61 @@ class Webhook extends Connection
             ],
             'examplePayload' => $this->examplePayload($form),
         ]);
+    }
+
+    public function preProcess(array $config, Form $form): array
+    {
+        $fields = static::blueprint($form)->fields();
+
+        return collect($config)
+            ->map(fn (array $config): array => [
+                'id' => $config['id'],
+                'enabled' => Arr::get($config, 'enabled') !== false,
+                'conditions' => collect(Arr::get($config, 'conditions') ?? [])
+                    ->map(fn (array $condition): array => ['_id' => Str::random(8), ...$condition])
+                    ->all(),
+                ...$fields->addValues(Arr::except($config, ['id', 'enabled', 'conditions']))->preProcess()->values()->all(),
+            ])
+            ->values()
+            ->all();
+    }
+
+    public function rules(Form $form): array
+    {
+        return [
+            '*' => ['array'],
+            '*.url' => ['required', 'url:http,https'],
+            '*.verify_ssl' => ['nullable', 'boolean'],
+            '*.enabled' => ['nullable', 'boolean'],
+            '*.conditions' => ['nullable', 'array'],
+            '*.conditions.*' => ['array'],
+        ];
+    }
+
+    public function process(array $data, Form $form): array
+    {
+        $fields = static::blueprint($form)->fields();
+
+        return collect($data)
+            ->map(function (array $config) use ($fields): array {
+                $config = Arr::removeNullValues($config);
+
+                $values = $fields
+                    ->addValues(Arr::except($config, ['_id', 'id', 'enabled', 'conditions']))
+                    ->process()
+                    ->values()
+                    ->all();
+
+                return Arr::removeNullValues([
+                    'id' => Arr::get($config, 'id') ?? Str::random(8),
+                    ...$values,
+                    'enabled' => Arr::get($config, 'enabled') === false ? false : null,
+                    'verify_ssl' => Arr::get($values, 'verify_ssl') === false ? false : null,
+                    'conditions' => ConnectionLogic::normalize(Arr::get($config, 'conditions') ?? []),
+                ]);
+            })
+            ->values()
+            ->all();
     }
 
     public static function blueprint(Form $form): \Statamic\Fields\Blueprint
@@ -97,11 +146,6 @@ class Webhook extends Connection
                 ],
             ],
         ]);
-    }
-
-    public function routes(Router $router): void
-    {
-        $router->patch('/', [WebhookConnectionController::class, 'update'])->name('update');
     }
 
     private function examplePayload(Form $form): string

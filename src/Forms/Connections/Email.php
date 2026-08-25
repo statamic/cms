@@ -2,13 +2,14 @@
 
 namespace Statamic\Forms\Connections;
 
-use Illuminate\Routing\Router;
 use Statamic\Contracts\Forms\Form;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Facades\Blueprint;
+use Statamic\Forms\Connections\Rules\EmailConnectionAddress;
 use Statamic\Forms\SendEmails;
-use Statamic\Http\Controllers\CP\Forms\Connections\EmailConnectionController;
 use Statamic\Statamic;
+use Statamic\Support\Arr;
+use Statamic\Support\Str;
 use Statamic\Support\VueComponent;
 
 use function Statamic\trans as __;
@@ -43,24 +44,11 @@ class Email extends Connection
         $fields = $blueprint->fields()->preProcess();
 
         return VueComponent::render('email-connection', [
-            'action' => cp_route('forms.connect.email.update', $form->handle()),
             'blueprint' => $blueprint->toPublishArray(),
-            'emails' => collect($form->connections()->get('email'))
-                ->mapWithKeys(function (array $config) use ($fields): array {
-                    // Convert legacy address strings to arrays.
-                    foreach (['to', 'cc', 'bcc', 'reply_to'] as $handle) {
-                        if (isset($config[$handle]) && is_string($config[$handle])) {
-                            $config[$handle] = array_map(trim(...), explode(',', $config[$handle]));
-                        }
-                    }
-
-                    $fields = $fields->addValues($config)->preProcess();
-
-                    return [$config['id'] => [
-                        'values' => $fields->values()->all(),
-                        'meta' => $fields->meta()->all(),
-                    ]];
-                })
+            'meta' => collect($form->connections()->get('email'))
+                ->mapWithKeys(fn (array $config): array => [
+                    $config['id'] => $fields->addValues($this->convertLegacyAddresses($config))->preProcess()->meta()->all(),
+                ])
                 ->all(),
             'defaults' => [
                 'values' => $fields->values()->all(),
@@ -69,9 +57,75 @@ class Email extends Connection
         ]);
     }
 
-    public function routes(Router $router): void
+    public function preProcess(array $config, Form $form): array
     {
-        $router->patch('/', [EmailConnectionController::class, 'update'])->name('update');
+        $fields = static::blueprint($form)->fields();
+
+        return collect($config)
+            ->map(fn (array $config): array => $this->convertLegacyAddresses($config))
+            ->map(fn (array $config): array => [
+                'id' => $config['id'],
+                'enabled' => Arr::get($config, 'enabled') !== false,
+                'conditions' => collect(Arr::get($config, 'conditions') ?? [])
+                    ->map(fn (array $condition): array => ['_id' => Str::random(8), ...$condition])
+                    ->all(),
+                ...$fields->addValues(Arr::except($config, ['id', 'enabled', 'conditions']))->preProcess()->values()->all(),
+            ])
+            ->values()
+            ->all();
+    }
+
+    private function convertLegacyAddresses(array $config): array
+    {
+        foreach (['to', 'cc', 'bcc', 'reply_to'] as $handle) {
+            if (isset($config[$handle]) && is_string($config[$handle])) {
+                $config[$handle] = array_map(trim(...), explode(',', $config[$handle]));
+            }
+        }
+
+        return $config;
+    }
+
+    public function rules(Form $form): array
+    {
+        return [
+            '*' => ['array'],
+            '*.to' => ['required', new EmailConnectionAddress($form)],
+            '*.cc' => [new EmailConnectionAddress($form)],
+            '*.bcc' => [new EmailConnectionAddress($form)],
+            '*.from' => [new EmailConnectionAddress($form)],
+            '*.reply_to' => [new EmailConnectionAddress($form)],
+            '*.enabled' => ['nullable', 'boolean'],
+            '*.conditions' => ['nullable', 'array'],
+            '*.conditions.*' => ['array'],
+        ];
+    }
+
+    public function process(array $data, Form $form): array
+    {
+        $fields = static::blueprint($form)->fields();
+
+        return collect($data)
+            ->map(function (array $config) use ($fields): array {
+                $config = Arr::removeNullValues($config);
+
+                $values = $fields
+                    ->addValues(Arr::except($config, ['_id', 'id', 'enabled', 'conditions']))
+                    ->process()
+                    ->values()
+                    ->all();
+
+                return Arr::removeNullValues([
+                    'id' => Arr::get($config, 'id') ?? Str::random(8),
+                    ...$values,
+                    'enabled' => Arr::get($config, 'enabled') === false ? false : null,
+                    'markdown' => Arr::get($values, 'markdown') === true ? true : null,
+                    'attachments' => Arr::get($values, 'attachments') === true ? true : null,
+                    'conditions' => ConnectionLogic::normalize(Arr::get($config, 'conditions') ?? []),
+                ]);
+            })
+            ->values()
+            ->all();
     }
 
     public static function blueprint(Form $form): \Statamic\Fields\Blueprint

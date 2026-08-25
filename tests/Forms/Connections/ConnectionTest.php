@@ -94,6 +94,28 @@ class ConnectionTest extends TestCase
     }
 
     #[Test]
+    public function it_has_no_validation_rules_by_default()
+    {
+        $this->assertEquals([], (new TestMultiWordConnection)->rules(Form::make('contact')));
+    }
+
+    #[Test]
+    public function it_processes_the_config_unchanged_by_default()
+    {
+        $config = [['id' => 'abc', 'foo' => 'bar']];
+
+        $this->assertEquals($config, (new TestMultiWordConnection)->process($config, Form::make('contact')));
+    }
+
+    #[Test]
+    public function it_pre_processes_the_config_unchanged_by_default()
+    {
+        $config = [['id' => 'abc', 'foo' => 'bar']];
+
+        $this->assertEquals($config, (new TestMultiWordConnection)->preProcess($config, Form::make('contact')));
+    }
+
+    #[Test]
     public function it_renders_a_vue_component()
     {
         $form = Form::make('contact');

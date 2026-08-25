@@ -58,6 +58,21 @@ abstract class Connection
 
     abstract public function render(Form $form): VueComponent;
 
+    public function preProcess(array $config, Form $form): array
+    {
+        return $config;
+    }
+
+    public function rules(Form $form): array
+    {
+        return [];
+    }
+
+    public function process(array $data, Form $form): array
+    {
+        return $data;
+    }
+
     public function routes(Router $router): void
     {
         //

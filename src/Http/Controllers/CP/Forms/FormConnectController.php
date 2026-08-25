@@ -2,6 +2,7 @@
 
 namespace Statamic\Http\Controllers\CP\Forms;
 
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\FormConnection;
@@ -34,11 +35,11 @@ class FormConnectController extends CpController
         ]);
     }
 
-    public function show($form, $type)
+    public function show($form, string $connection)
     {
         $this->authorize('edit', $form);
 
-        throw_unless($connection = FormConnection::find($type), NotFoundHttpException::class);
+        throw_unless($connection = FormConnection::find($connection), NotFoundHttpException::class);
 
         return Inertia::render('forms/connect/Show', [
             'form' => $form,
@@ -50,9 +51,25 @@ class FormConnectController extends CpController
                 'icon' => $connection->icon(),
             ],
             'component' => $connection->render($form),
-            'config' => $form->connections()->get($type, []),
+            'value' => $connection->preProcess($form->connections()->get($connection->handle(), []), $form),
+            'action' => cp_route('forms.connect.update', [$form->handle(), $connection->handle()]),
             'suggestableFields' => $this->suggestableFields($form),
         ]);
+    }
+
+    public function update(Request $request, $form, string $connection)
+    {
+        $this->authorize('edit', $form);
+
+        throw_unless($connection = FormConnection::find($connection), NotFoundHttpException::class);
+
+        $request->validate($connection->rules($form));
+
+        $config = $connection->process($request->all(), $form);
+
+        $form->connections($form->connections()->put($connection->handle(), $config))->save();
+
+        return $config;
     }
 
     private function suggestableFields($form): array

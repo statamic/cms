@@ -5,6 +5,7 @@ namespace Tests\Forms\Connections;
 use Illuminate\Http\Client\Request;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Validator;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
@@ -199,12 +200,8 @@ class WebhookConnectionTest extends TestCase
         $component = (new Webhook)->render($form)->toArray();
 
         $this->assertEquals('webhook-connection', $component['name']);
-        $this->assertEquals(cp_route('forms.connect.webhook.update', 'test'), $component['props']['action']);
-        $this->assertEquals(['one', 'two'], array_keys($component['props']['webhooks']));
-        $this->assertEquals('https://example.com/first', $component['props']['webhooks']['one']['values']['url']);
-        $this->assertTrue($component['props']['webhooks']['one']['values']['verify_ssl']);
-        $this->assertEquals('https://example.com/second', $component['props']['webhooks']['two']['values']['url']);
-        $this->assertFalse($component['props']['webhooks']['two']['values']['verify_ssl']);
+        $this->assertEquals(['blueprint', 'meta', 'defaults', 'examplePayload'], array_keys($component['props']));
+        $this->assertEquals(['one', 'two'], array_keys($component['props']['meta']));
         $this->assertNull($component['props']['defaults']['values']['url']);
         $this->assertArrayHasKey('meta', $component['props']['defaults']);
     }
@@ -244,5 +241,168 @@ class WebhookConnectionTest extends TestCase
         $this->assertJson($payload);
 
         return json_decode($payload, true);
+    }
+
+    #[Test]
+    public function it_pre_processes_webhook_configs()
+    {
+        $form = tap(Form::make('test')->connections(['webhook' => [
+            [
+                'id' => 'one',
+                'url' => 'https://example.com/first',
+                'conditions' => [['field' => 'name', 'operator' => 'equals', 'value' => 'Bob', 'join' => 'and']],
+            ],
+            ['id' => 'two', 'url' => 'https://example.com/second', 'verify_ssl' => false, 'enabled' => false],
+        ]]))->save();
+
+        $configs = (new Webhook)->preProcess($form->connections()->get('webhook'), $form);
+
+        $this->assertEquals('one', $configs[0]['id']);
+        $this->assertTrue($configs[0]['enabled']);
+        $this->assertEquals('https://example.com/first', $configs[0]['url']);
+        $this->assertTrue($configs[0]['verify_ssl']);
+        $this->assertNotEmpty($configs[0]['conditions'][0]['_id']);
+        $this->assertEquals('name', $configs[0]['conditions'][0]['field']);
+        $this->assertEquals('Bob', $configs[0]['conditions'][0]['value']);
+        $this->assertEquals('two', $configs[1]['id']);
+        $this->assertFalse($configs[1]['enabled']);
+        $this->assertEquals('https://example.com/second', $configs[1]['url']);
+        $this->assertFalse($configs[1]['verify_ssl']);
+        $this->assertEquals([], $configs[1]['conditions']);
+    }
+
+    #[Test]
+    public function it_validates_webhook_configs()
+    {
+        $form = tap(Form::make('test'))->save();
+
+        $validator = Validator::make([
+            [
+                'id' => 'abc',
+                'url' => 'https://example.com/hook',
+                'verify_ssl' => false,
+                'enabled' => true,
+                'conditions' => [['field' => 'name', 'operator' => 'equals', 'value' => 'Bob', 'join' => 'and']],
+            ],
+        ], (new Webhook)->rules($form));
+
+        $this->assertTrue($validator->passes());
+    }
+
+    #[Test]
+    #[DataProvider('invalidConfigs')]
+    public function it_rejects_invalid_configs($configs, $errors)
+    {
+        $form = tap(Form::make('test'))->save();
+
+        $validator = Validator::make($configs, (new Webhook)->rules($form));
+
+        $this->assertTrue($validator->fails());
+
+        foreach ($errors as $key) {
+            $this->assertTrue($validator->errors()->has($key));
+        }
+    }
+
+    public static function invalidConfigs(): array
+    {
+        return [
+            'config not an array' => [['nope'], ['0']],
+            'config without a url' => [[['enabled' => true]], ['0.url']],
+            'config with an invalid url' => [[['url' => 'not a url']], ['0.url']],
+            'config with a non-http url' => [[['url' => 'ftp://example.com/hook']], ['0.url']],
+            'config with a non-boolean verify_ssl' => [[['url' => 'https://example.com/hook', 'verify_ssl' => 'nope']], ['0.verify_ssl']],
+            'config with a non-boolean enabled' => [[['url' => 'https://example.com/hook', 'enabled' => 'nope']], ['0.enabled']],
+            'config with non-array conditions' => [[['url' => 'https://example.com/hook', 'conditions' => 'nope']], ['0.conditions']],
+            'config with a non-array condition' => [[['url' => 'https://example.com/hook', 'conditions' => ['nope']]], ['0.conditions.0']],
+        ];
+    }
+
+    #[Test]
+    public function it_processes_webhook_configs()
+    {
+        $form = tap(Form::make('test'))->save();
+
+        $this->assertEquals([
+            ['id' => 'def', 'url' => 'https://example.com/updated', 'enabled' => false],
+            ['id' => 'ghi', 'url' => 'http://localhost:5678/n8n', 'verify_ssl' => false],
+            ['id' => 'jkl', 'url' => 'https://example.com/defaults'],
+        ], (new Webhook)->process([
+            ['id' => 'def', 'url' => 'https://example.com/updated', 'enabled' => false],
+            ['id' => 'ghi', 'url' => 'http://localhost:5678/n8n', 'verify_ssl' => false],
+            ['id' => 'jkl', 'url' => 'https://example.com/defaults', 'enabled' => true, 'verify_ssl' => true],
+        ], $form));
+    }
+
+    #[Test]
+    public function it_doesnt_persist_the_client_row_state()
+    {
+        $form = tap(Form::make('test'))->save();
+
+        $this->assertEquals([
+            ['id' => 'abc', 'url' => 'https://example.com/hook'],
+        ], (new Webhook)->process([
+            ['_id' => 'vue-row', 'id' => 'abc', 'url' => 'https://example.com/hook'],
+        ], $form));
+    }
+
+    #[Test]
+    public function it_generates_an_id_for_configs_that_dont_have_one()
+    {
+        $form = tap(Form::make('test'))->save();
+
+        $config = (new Webhook)->process([['url' => 'https://example.com/hook']], $form)[0];
+
+        $this->assertNotEmpty($config['id']);
+        $this->assertEquals('https://example.com/hook', $config['url']);
+    }
+
+    #[Test]
+    public function it_normalizes_the_conditions()
+    {
+        $form = tap(Form::make('test'))->save();
+
+        $this->assertEquals([
+            [
+                'id' => 'abc',
+                'url' => 'https://example.com/hook',
+                'conditions' => [
+                    ['field' => 'name', 'operator' => 'equals', 'value' => 'Bob', 'join' => 'and'],
+                ],
+            ],
+            [
+                'id' => 'def',
+                'url' => 'https://example.com/other',
+            ],
+        ], (new Webhook)->process([
+            [
+                'id' => 'abc',
+                'url' => 'https://example.com/hook',
+                'conditions' => [
+                    ['_id' => 'vue-row', 'field' => 'name', 'operator' => 'equals', 'value' => 'Bob', 'join' => 'and'],
+                    ['field' => null, 'operator' => 'equals', 'value' => 'incomplete', 'join' => 'and'],
+                ],
+            ],
+            [
+                'id' => 'def',
+                'url' => 'https://example.com/other',
+                'conditions' => [],
+            ],
+        ], $form));
+    }
+
+    #[Test]
+    public function it_removes_null_values_from_configs()
+    {
+        $form = tap(Form::make('test'))->save();
+
+        $this->assertEquals([[
+            'id' => 'abc',
+            'url' => 'https://example.com/hook',
+        ]], (new Webhook)->process([[
+            'id' => 'abc',
+            'url' => 'https://example.com/hook',
+            'enabled' => null,
+        ]], $form));
     }
 }

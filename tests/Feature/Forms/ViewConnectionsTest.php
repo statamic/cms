@@ -11,7 +11,7 @@ use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-class FormConnectTest extends TestCase
+class ViewConnectionsTest extends TestCase
 {
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
@@ -68,7 +68,7 @@ class FormConnectTest extends TestCase
     }
 
     #[Test]
-    public function it_lists_the_registered_connection_types()
+    public function it_lists_connections()
     {
         $this->setTestRoles(['test' => ['access cp', 'edit forms']]);
         $user = tap(User::make()->assignRole('test'))->save();
@@ -136,84 +136,6 @@ class FormConnectTest extends TestCase
             ->assertRedirect('/original')
             ->assertSessionHas('error');
     }
-
-    #[Test]
-    public function it_shows_a_connection_type()
-    {
-        $this->setTestRoles(['test' => ['access cp', 'edit forms']]);
-        $user = tap(User::make()->assignRole('test'))->save();
-        $form = tap(Form::make('test')->connections([
-            'email' => [['id' => 'abc', 'to' => 'foo@example.com']],
-        ]))->save();
-
-        $this
-            ->actingAs($user)
-            ->get(cp_route('forms.connect.show', [$form->handle(), 'email']))
-            ->assertSuccessful()
-            ->assertInertia(fn ($page) => $page
-                ->component('forms/connect/Show', false)
-                ->where('connection.handle', 'email')
-                ->where('connection.title', 'Email')
-                ->where('component.name', 'email-connection')
-                ->where('component.props.action', cp_route('forms.connect.email.update', $form->handle()))
-                ->has('suggestableFields')
-                ->where('config', [['id' => 'abc', 'to' => 'foo@example.com']]));
-    }
-
-    #[Test]
-    public function it_returns_404_for_an_unknown_connection_type()
-    {
-        $this->setTestRoles(['test' => ['access cp', 'edit forms']]);
-        $user = tap(User::make()->assignRole('test'))->save();
-        $form = tap(Form::make('test'))->save();
-
-        $this
-            ->actingAs($user)
-            ->get(cp_route('forms.connect.show', [$form->handle(), 'unknown']))
-            ->assertNotFound();
-    }
-
-    #[Test]
-    public function it_denies_access_to_a_connection_type_without_permission()
-    {
-        $this->setTestRoles(['test' => ['access cp']]);
-        $user = tap(User::make()->assignRole('test'))->save();
-        $form = tap(Form::make('test'))->save();
-
-        $this
-            ->from('/original')
-            ->actingAs($user)
-            ->get(cp_route('forms.connect.show', [$form->handle(), 'email']))
-            ->assertRedirect('/original')
-            ->assertSessionHas('error');
-    }
-
-    #[Test]
-    public function custom_connection_routes_are_reachable_with_the_edit_permission()
-    {
-        $this->setTestRoles(['test' => ['access cp', 'edit forms']]);
-        $user = tap(User::make()->assignRole('test'))->save();
-        $form = tap(Form::make('test'))->save();
-
-        $this
-            ->actingAs($user)
-            ->postJson(cp_route('forms.connect.acme.process', $form->handle()))
-            ->assertOk()
-            ->assertExactJson(['processed' => true]);
-    }
-
-    #[Test]
-    public function custom_connection_routes_are_denied_without_the_edit_permission()
-    {
-        $this->setTestRoles(['test' => ['access cp']]);
-        $user = tap(User::make()->assignRole('test'))->save();
-        $form = tap(Form::make('test'))->save();
-
-        $this
-            ->actingAs($user)
-            ->postJson(cp_route('forms.connect.acme.process', $form->handle()))
-            ->assertForbidden();
-    }
 }
 
 class AcmeConnection extends Connection
@@ -221,10 +143,5 @@ class AcmeConnection extends Connection
     public function render($form): VueComponent
     {
         return VueComponent::render('acme-connection');
-    }
-
-    public function routes($router): void
-    {
-        $router->post('process', fn () => ['processed' => true])->name('process');
     }
 }
