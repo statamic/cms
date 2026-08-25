@@ -4,18 +4,16 @@ namespace Tests\StaticCaching;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Events\ResponsePrepared;
+use Illuminate\Support\Facades\Cache;
+use Orchestra\Testbench\Attributes\DefineEnvironment;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Site;
 use Statamic\StaticCaching\Cachers\ApplicationCacher;
-use Tests\TestCase;
-
-
-use Illuminate\Support\Facades\Cache;
-use Orchestra\Testbench\Attributes\DefineEnvironment;
 use Statamic\StaticCaching\Replacer;
 use Symfony\Component\HttpFoundation\Response;
 use Tests\FakesViews;
 use Tests\PreventSavingStacheItemsToDisk;
+use Tests\TestCase;
 
 class SharedErrorsStaticCachingTest extends TestCase
 {
