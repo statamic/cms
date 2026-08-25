@@ -9,7 +9,7 @@ use Statamic\Support\Str;
 
 class ConnectionLogic
 {
-    public static function preProcess(array $conditions = []): array
+    public static function preProcess(array $conditions): array
     {
         return collect($conditions)
             ->map(fn (array $condition): array => ['_id' => Str::random(8), ...$condition])

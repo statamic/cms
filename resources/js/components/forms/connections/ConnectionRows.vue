@@ -8,7 +8,7 @@ import LogicEmptyState from '@/components/forms/logic/LogicEmptyState.vue';
 import ConnectionRow from './ConnectionRow.vue';
 import { __ } from '@/bootstrap/globals';
 
-type ConnectionRow = {
+type Row = {
     id: string;
     enabled: boolean;
     conditions: {
@@ -23,7 +23,7 @@ type ConnectionRow = {
 const emit = defineEmits(['update:modelValue']);
 
 const props = withDefaults(defineProps<{
-    modelValue: ConnectionRow[];
+    modelValue: Row[];
     errors: Record<string, string[]>;
     defaults: Record<string, unknown>;
     addLabel: string;
@@ -45,7 +45,7 @@ const sortableItemClass = 'connection-row';
 const sortableHandleClass = 'connection-row-handle';
 
 const collapsed = ref<string[]>([]);
-const confirmingRemoval = ref<string>(null);
+const confirmingRemoval = ref<string | null>(null);
 
 const add = (): void => {
     emit('update:modelValue', [
@@ -59,7 +59,7 @@ const add = (): void => {
     ]);
 };
 
-const duplicate = (row: ConnectionRow): void => {
+const duplicate = (row: Row): void => {
     const duplicated = [...props.modelValue];
 
     duplicated.splice(props.modelValue.indexOf(row) + 1, 0, {
@@ -71,7 +71,7 @@ const duplicate = (row: ConnectionRow): void => {
     emit('update:modelValue', duplicated);
 };
 
-const updateEnabled = (row: ConnectionRow, enabled: boolean): void => {
+const updateEnabled = (row: Row, enabled: boolean): void => {
     emit(
         'update:modelValue',
         props.modelValue.map((existing) => (existing.id === row.id ? { ...existing, enabled } : existing))
@@ -87,8 +87,8 @@ const remove = (): void => {
     if (row) emit('update:modelValue', props.modelValue.filter((existing) => existing !== row));
 };
 
-const isEnabled = (row: ConnectionRow): boolean => row.enabled !== false;
-const isCollapsed = (row: ConnectionRow): boolean => collapsed.value.includes(row.id);
+const isEnabled = (row: Row): boolean => row.enabled !== false;
+const isCollapsed = (row: Row): boolean => collapsed.value.includes(row.id);
 
 const collapse = (id: string): void => {
     if (!collapsed.value.includes(id)) {
@@ -98,9 +98,9 @@ const collapse = (id: string): void => {
 
 const expand = (id: string): void => (collapsed.value = collapsed.value.filter((rowId) => rowId !== id));
 
-const hasError = (index: string) => Object.keys(props.errors).some((key) => key.startsWith(`${index}.`));
+const hasError = (index: number) => Object.keys(props.errors).some((key) => key.startsWith(`${index}.`));
 
-const rowErrors = (index: string) => {
+const rowErrors = (index: number) => {
     return Object.entries(props.errors)
         .filter(([key]) => key.startsWith(`${index}.`))
         .reduce((fields, [key, messages]) => {
