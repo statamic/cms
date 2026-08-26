@@ -7,7 +7,7 @@ use Statamic\Facades\User;
 
 class Sites extends Relationship
 {
-    protected $indexComponent = 'text';
+    protected $indexComponent = 'sites';
 
     protected function authorizeItemData($id): bool
     {
@@ -64,6 +64,14 @@ class Sites extends Relationship
             $items = collect([$items]);
         }
 
-        return $items->map->name()->join(', ');
+        return $items
+            ->filter()
+            ->map(fn ($site) => [
+                'title' => $site->name(),
+                'group' => $site->group(),
+                'group_handle' => $site->groupHandle(),
+            ])
+            ->values()
+            ->all();
     }
 }
