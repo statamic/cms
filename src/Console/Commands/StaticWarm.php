@@ -133,7 +133,9 @@ class StaticWarm extends Command
             return $url;
         });
 
-        $requests = $urls->map(fn (string $url) => new Request('GET', $url))->all();
+        $headers = $this->parseHeaders($this->option('header'));
+        
+        $requests = $urls->map(fn (string $url) => new Request('GET', $url, $headers))->all();
 
         $pool = new Pool($this->client(), $requests, [
             'concurrency' => $this->concurrency(),
