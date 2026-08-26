@@ -201,14 +201,6 @@ class TaxonomiesController extends CpController
             ->layout($values['layout'] ?? null);
 
         if ($sites = Arr::get($values, 'sites')) {
-            if (Site::multiEnabled()) {
-                $sites = collect($sites)
-                    ->filter(fn ($site) => $site['enabled'] ?? false)
-                    ->map(fn ($site) => $site['handle'])
-                    ->values()
-                    ->all();
-            }
-
             $taxonomy->sites($sites);
         }
 

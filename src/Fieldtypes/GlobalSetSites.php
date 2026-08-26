@@ -22,6 +22,20 @@ class GlobalSetSites extends Fieldtype
         ];
     }
 
+    public function process($data)
+    {
+        if ($this->config('origins', true)) {
+            return $data;
+        }
+
+        return collect($data ?? [])
+            ->filter(fn ($site) => is_string($site) ? filled($site) : ($site['enabled'] ?? false))
+            ->map(fn ($site) => is_string($site) ? $site : $site['handle'])
+            ->filter()
+            ->values()
+            ->all();
+    }
+
     public function rules(): array
     {
         $rules = [
@@ -42,7 +56,9 @@ class GlobalSetSites extends Fieldtype
         {
             public function passes($attribute, $value)
             {
-                return collect($value)->filter->enabled->isNotEmpty();
+                return collect($value)->contains(function ($site) {
+                    return is_string($site) ? filled($site) : ($site['enabled'] ?? false);
+                });
             }
 
             public function message()

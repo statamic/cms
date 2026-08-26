@@ -187,6 +187,32 @@ class UpdateCollectionTest extends TestCase
         $this->assertTrue($updated->propagate());
     }
 
+    #[Test]
+    public function it_updates_collection_sites_from_legacy_handle_array()
+    {
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+            'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://de.test.com/'],
+        ]);
+
+        $collection = Collection::make('test')->sites(['en', 'fr'])->save();
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->update($collection, [
+                'sites' => ['en', 'de'],
+                'origin_behavior' => 'root',
+                'propagate' => false,
+                'structured' => false,
+                'require_slugs' => true,
+                'preview_targets' => [],
+            ])
+            ->assertOk();
+
+        $this->assertEquals(['en', 'de'], Collection::findByHandle('test')->sites()->all());
+    }
+
     private function userWithoutPermission()
     {
         $this->setTestRoles(['test' => ['access cp']]);

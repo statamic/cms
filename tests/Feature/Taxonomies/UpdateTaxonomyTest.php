@@ -102,6 +102,29 @@ class UpdateTaxonomyTest extends TestCase
         $this->assertEquals(['en', 'de'], Taxonomy::findByHandle('test')->sites()->all());
     }
 
+    #[Test]
+    public function it_updates_taxonomy_sites_from_legacy_handle_array()
+    {
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+            'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://de.test.com/'],
+        ]);
+
+        $taxonomy = tap(Taxonomy::make('test')->sites(['en', 'fr']))->save();
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->update($taxonomy, [
+                'sites' => ['en', 'de'],
+                'preview_targets' => [],
+                'collections' => [],
+            ])
+            ->assertOk();
+
+        $this->assertEquals(['en', 'de'], Taxonomy::findByHandle('test')->sites()->all());
+    }
+
     private function userWithoutPermission()
     {
         $this->setTestRoles(['test' => ['access cp']]);

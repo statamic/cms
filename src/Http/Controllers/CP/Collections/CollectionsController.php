@@ -354,14 +354,6 @@ class CollectionsController extends CpController
             ->previewTargets($values['preview_targets']);
 
         if ($sites = Arr::get($values, 'sites')) {
-            if (Site::multiEnabled()) {
-                $sites = collect($sites)
-                    ->filter(fn ($site) => $site['enabled'] ?? false)
-                    ->map(fn ($site) => $site['handle'])
-                    ->values()
-                    ->all();
-            }
-
             $collection
                 ->sites($sites)
                 ->originBehavior($values['origin_behavior']);
