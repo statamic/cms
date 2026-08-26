@@ -4,6 +4,7 @@ namespace Statamic\Forms\Fields;
 
 use Facades\Statamic\Forms\Fields\FormFieldtypeRepository;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Collection;
 use Statamic\Extend\HasHandle;
 use Statamic\Extend\RegistersItself;
 use Statamic\Facades\Blink;
@@ -167,6 +168,21 @@ abstract class FormFieldtype implements Arrayable
     public function example(): ?array
     {
         return null;
+    }
+
+    public function defaultChart(): ?string
+    {
+        return null;
+    }
+
+    public function chartOptions(Collection $values): ?Collection
+    {
+        return null;
+    }
+
+    public function insights(): array
+    {
+        return [];
     }
 
     public function view(): string
