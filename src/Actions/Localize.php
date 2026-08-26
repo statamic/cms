@@ -58,7 +58,7 @@ class Localize extends Action
     public function confirmationText()
     {
         /** @translation */
-        return 'Create missing localizations for this entry? (Existing localizations will be skipped).|Create missing localizations for these :count entries? (Existing localizations will be skipped).';
+        return 'Localize this entry to the selected site? Existing localizations will be skipped.|Localize these :count entries to the selected site? Existing localizations will be skipped.';
     }
 
     public function buttonText()
