@@ -2,6 +2,7 @@
 
 namespace Statamic\Forms\Fieldtypes;
 
+use Statamic\Forms\Charts\HorizontalBar;
 use Statamic\Forms\Fields\FormFieldtype;
 use Statamic\Support\Arr;
 
@@ -33,6 +34,11 @@ class Phone extends FormFieldtype
             'input_type' => 'tel',
             ...Arr::except($this->config(), ['type', 'input_type']),
         ];
+    }
+
+    public function defaultChart(): ?string
+    {
+        return HorizontalBar::class;
     }
 
     public function example(): ?array
