@@ -142,7 +142,10 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown, true));
         :animate="{ y: 0, opacity: 1 }"
         :transition="{ duration: 0.2, ease: 'easeInOut' }"
     >
-        <div class="pointer-events-auto space-y-1 rounded-xl border border-gray-300/60 dark:border-gray-700 p-1 bg-gray-150 shadow-[0_1px_16px_-2px_rgba(63,63,71,0.2)] dark:bg-gray-800 dark:shadow-[0_10px_15px_rgba(0,0,0,.5)] dark:inset-shadow-2xs dark:inset-shadow-white/10">
+        <div
+            class="pointer-events-auto space-y-1 rounded-xl border border-gray-300/60 dark:border-gray-700 p-1 shadow-[0_1px_16px_-2px_rgba(63,63,71,0.2)] dark:bg-gray-800 dark:shadow-[0_10px_15px_rgba(0,0,0,.5)] dark:inset-shadow-2xs dark:inset-shadow-white/10"
+            :class="showSelectAllMatching ? 'bg-gray-150' : 'bg-gray-200/55'"
+        >
             <div
                 v-if="showSelectAllMatching"
                 class="flex justify-center px-2"
