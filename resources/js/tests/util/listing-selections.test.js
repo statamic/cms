@@ -71,6 +71,19 @@ test('canSelectAllMatching is false when already selecting all matching', () => 
     ).toBe(false);
 });
 
+test('canSelectAllMatching is false when selection count already covers the total', () => {
+    expect(
+        canSelectAllMatching({
+            hasUrl: true,
+            total: 50,
+            pageSize: 10,
+            pageFullySelected: true,
+            allMatchingSelected: false,
+            selectedCount: 50,
+        }),
+    ).toBe(false);
+});
+
 test('canSelectAllMatching is false when maxSelections cannot cover the total', () => {
     expect(
         canSelectAllMatching({

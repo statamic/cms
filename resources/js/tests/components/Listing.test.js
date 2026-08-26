@@ -147,3 +147,36 @@ test('allMatchingSelected clears when listing filters change', async () => {
 
     expect(listing.allMatchingSelected.value).toBe(false);
 });
+
+test('canSelectAllMatching stays hidden after perPage changes when all ids are selected', async () => {
+    axios.get.mockResolvedValue({
+        data: {
+            data: [{ id: '1' }, { id: '2' }],
+            meta: { last_page: 3, total: 5, per_page: 2, columns: [] },
+        },
+    });
+
+    const wrapper = mountListing({
+        url: '/cp/collections/test/entries',
+        items: undefined,
+        actionUrl: '/cp/collections/test/entries/actions',
+        perPage: 2,
+    });
+
+    await flushPromises();
+
+    const { listing } = wrapper.findComponent(Probe).vm;
+
+    listing.meta.value = { total: 5, per_page: 2, last_page: 3, columns: [] };
+    listing.items.value = [{ id: '1' }, { id: '2' }];
+    listing.selections.value = ['1', '2', '3', '4', '5'];
+    listing.selectedAllMatching.value = true;
+
+    expect(listing.canSelectAllMatching.value).toBe(false);
+
+    listing.setPerPage(10);
+    await flushPromises();
+
+    expect(listing.selectedAllMatching.value).toBe(true);
+    expect(listing.canSelectAllMatching.value).toBe(false);
+});

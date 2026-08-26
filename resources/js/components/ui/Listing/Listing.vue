@@ -625,15 +625,20 @@ const canSelectAllMatching = computed(() =>
         pageSize: items.value?.length ?? 0,
         pageFullySelected: pageFullySelected.value,
         allMatchingSelected: allMatchingSelected.value,
+        selectedCount: selections.value.length,
         maxSelections: props.maxSelections,
     }),
 );
 
-const matchingQueryKey = computed(() => {
-    const { page, ...rest } = parameters.value;
-
-    return JSON.stringify(rest);
-});
+// Only invalidate all-matching mode when the result set itself changes.
+const matchingQueryKey = computed(() =>
+    JSON.stringify({
+        search: parameters.value.search ?? null,
+        filters: parameters.value.filters ?? null,
+        sort: parameters.value.sort ?? null,
+        order: parameters.value.order ?? null,
+    }),
+);
 
 watch(matchingQueryKey, () => {
     selectedAllMatching.value = false;

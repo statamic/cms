@@ -48,10 +48,12 @@ export function canSelectAllMatching({
     pageSize,
     pageFullySelected,
     allMatchingSelected,
+    selectedCount = 0,
     maxSelections = Infinity,
 }) {
     if (!hasUrl || allMatchingSelected || !pageFullySelected) return false;
     if (!total || total <= pageSize) return false;
+    if (selectedCount >= total) return false;
     if (maxSelections !== Infinity && maxSelections < total) return false;
 
     return true;

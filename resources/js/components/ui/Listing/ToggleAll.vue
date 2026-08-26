@@ -17,6 +17,7 @@ const {
     clearSelections,
     reorderable,
     allMatchingSelected,
+    meta,
 } = injectListingContext();
 
 const pageFullySelected = computed(() => isPageFullySelected(items.value, selections.value));
@@ -63,7 +64,7 @@ function getAriaLabel() {
 }
 
 function getScreenReaderText() {
-    const totalItems = pageSize.value;
+    const totalItems = allMatchingSelected.value ? (meta.value?.total ?? pageSize.value) : pageSize.value;
     const selectedItems = selectedOnPageCount.value;
 
     if (indeterminate.value) {
