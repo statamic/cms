@@ -22,6 +22,7 @@ use Statamic\StaticCaching\NoCache\RegionNotFound;
 use Statamic\StaticCaching\NoCache\Session;
 use Statamic\StaticCaching\Replacer;
 use Statamic\StaticCaching\ResponseStatus;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 use function Statamic\trans as __;
 
@@ -172,7 +173,7 @@ class Cache
         }
     }
 
-    private function makeReplacementsAndCacheResponse($request, $response): Response
+    private function makeReplacementsAndCacheResponse($request, $response): SymfonyResponse
     {
         $cachedResponse = clone $response;
 
