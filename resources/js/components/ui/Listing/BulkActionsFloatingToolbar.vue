@@ -7,7 +7,7 @@
  * Delete uses the backspace icon and is triggered by Delete/Backspace only.
  */
 import { Motion } from 'motion-v';
-import { computed, onMounted, onUnmounted } from 'vue';
+import { computed, onMounted, onUnmounted, toValue } from 'vue';
 import { Button, ButtonGroup, Icon } from '@ui';
 
 // ——— Keyboard shortcut constants ———
@@ -23,9 +23,15 @@ const props = defineProps({
     visible: { type: Boolean, default: false },
     selections: { type: Array, default: () => [] },
     clearSelections: { type: Function, default: null },
+    canSelectAllMatching: { type: [Boolean, Object], default: false },
+    selectAllMatching: { type: Function, default: null },
+    selectingAllMatching: { type: [Boolean, Object], default: false },
+    matchingTotal: { type: Number, default: 0 },
 });
 
 const hasSelections = computed(() => (props.selections?.length ?? 0) > 0);
+const showSelectAllMatching = computed(() => !!toValue(props.canSelectAllMatching));
+const isSelectingAllMatching = computed(() => !!toValue(props.selectingAllMatching));
 
 /** True if this action is the built-in delete (by handle or trash icon). */
 function isDeleteAction(action) {
@@ -117,7 +123,22 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown, true));
         :animate="{ y: 0, opacity: 1 }"
         :transition="{ duration: 0.2, ease: 'easeInOut' }"
     >
-        <div class="pointer-events-auto space-y-3 rounded-xl border border-gray-300/60 dark:border-gray-700 p-1 bg-gray-200/55 shadow-[0_1px_16px_-2px_rgba(63,63,71,0.2)] dark:bg-gray-800 dark:shadow-[0_10px_15px_rgba(0,0,0,.5)] dark:inset-shadow-2xs dark:inset-shadow-white/10">
+        <div class="pointer-events-auto space-y-1 rounded-xl border border-gray-300/60 dark:border-gray-700 p-1 bg-gray-200/55 shadow-[0_1px_16px_-2px_rgba(63,63,71,0.2)] dark:bg-gray-800 dark:shadow-[0_10px_15px_rgba(0,0,0,.5)] dark:inset-shadow-2xs dark:inset-shadow-white/10">
+            <div
+                v-if="showSelectAllMatching"
+                class="flex justify-center px-2 pt-1"
+            >
+                <Button
+                    class="text-blue-500!"
+                    variant="ghost"
+                    size="sm"
+                    :loading="isSelectingAllMatching"
+                    :disabled="isSelectingAllMatching"
+                    @click="selectAllMatching?.()"
+                >
+                    {{ __('messages.selections_select_all_matching', { total: matchingTotal }) }}
+                </Button>
+            </div>
             <ButtonGroup overflow="gap" justify="center">
                 <Button
                     class="text-blue-500!"
@@ -135,7 +156,7 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown, true));
                     @click="action.run"
                 >
                     {{ __(action.title) }}
-                    <!-- Delete always shows backspace icon; other actions show their shortcut letter. -->
+                    <!-- Delete always shows the backspace icon; other actions show their shortcut letter. -->
                     <span
                         :class="[
                             shortcutKeyClasses,

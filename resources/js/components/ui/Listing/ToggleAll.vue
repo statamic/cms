@@ -2,19 +2,56 @@
 import { computed } from 'vue';
 import { injectListingContext } from '../Listing/Listing.vue';
 import { Checkbox } from '@ui';
+import {
+    isPageFullySelected,
+    isPagePartiallySelected,
+    pageItemIds,
+    removePageSelections,
+    unionPageSelections,
+} from '@/util/listing-selections.js';
 
-const { items, selections, maxSelections, clearSelections, reorderable } = injectListingContext();
-const anyItemsChecked = computed(() => selections.value.length > 0);
-const indeterminate = computed(() => anyItemsChecked.value && selections.value.length < items.value.length);
+const {
+    items,
+    selections,
+    maxSelections,
+    clearSelections,
+    reorderable,
+    allMatchingSelected,
+} = injectListingContext();
 
-function toggle() {
-    anyItemsChecked.value ? clearSelections() : checkMaximumAmountOfItems();
+const pageFullySelected = computed(() => isPageFullySelected(items.value, selections.value));
+const indeterminate = computed(() => isPagePartiallySelected(items.value, selections.value));
+const pageSize = computed(() => items.value.length);
+const selectedOnPageCount = computed(() =>
+    pageItemIds(items.value).filter((id) => selections.value.includes(id)).length,
+);
+
+function toggle(checked) {
+    if (checked) {
+        selectPageItems();
+        return;
+    }
+
+    if (allMatchingSelected.value) {
+        clearSelections();
+        return;
+    }
+
+    deselectPageItems();
 }
 
-function checkMaximumAmountOfItems() {
-    let newSelections = items.value.map((row) => row.id);
-    if (maxSelections.value) newSelections = newSelections.slice(0, maxSelections.value);
-    selections.value.splice(0, selections.value.length, ...newSelections);
+function selectPageItems() {
+    const next = unionPageSelections(
+        selections.value,
+        pageItemIds(items.value),
+        maxSelections.value ?? Infinity,
+    );
+    selections.value.splice(0, selections.value.length, ...next);
+}
+
+function deselectPageItems() {
+    const next = removePageSelections(selections.value, pageItemIds(items.value));
+    selections.value.splice(0, selections.value.length, ...next);
 }
 
 function getAriaLabel() {
@@ -22,18 +59,18 @@ function getAriaLabel() {
         return __('Select all items');
     }
 
-    return anyItemsChecked.value ? __('Deselect all items') : __('Select all items');
+    return pageFullySelected.value ? __('Deselect all items') : __('Select all items');
 }
 
 function getScreenReaderText() {
-    const totalItems = items.value.length;
-    const selectedItems = selections.value.length;
+    const totalItems = pageSize.value;
+    const selectedItems = selectedOnPageCount.value;
 
     if (indeterminate.value) {
         return __('messages.selections_select_all', { selected: selectedItems, total: totalItems });
     }
 
-    if (anyItemsChecked.value) {
+    if (pageFullySelected.value) {
         return __('messages.selections_click_to_deselect_all', { total: totalItems });
     }
 
@@ -44,7 +81,7 @@ function getScreenReaderText() {
 <template>
     <Checkbox
         v-if="!reorderable"
-        :model-value="anyItemsChecked"
+        :model-value="pageFullySelected"
         :indeterminate="indeterminate"
         :label="getAriaLabel()"
         :description="getScreenReaderText()"

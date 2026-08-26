@@ -237,6 +237,7 @@ return [
     'selections_item_unselected' => ':title is not selected. Click to select.',
     'selections_limit_reached' => 'Selection limit reached. Cannot select :title',
     'selections_select_all' => ':selected of :total items selected. Check to select all items.',
+    'selections_select_all_matching' => 'Select all :total matching',
     'session_expiry_dismissed_banner' => 'Your session is about to expire. Click here to extend it and stay signed in.',
     'session_expiry_dismissed_login_banner' => 'Your session has expired. Click here to log back in.',
     'session_expiry_enter_password' => 'Enter your password to continue.',

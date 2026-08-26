@@ -58,3 +58,19 @@ test('counts each nested field badge individually', () => {
 
     expect(listing.activeFilterBadgeCount.value).toBe(2);
 });
+
+test('exposes select-all-matching helpers on the listing context', () => {
+    const wrapper = mountListing({
+        items: [{ id: 'a' }, { id: 'b' }],
+        url: '/cp/collections/test/entries',
+    });
+    const { listing } = wrapper.findComponent(Probe).vm;
+
+    listing.meta.value = { total: 25 };
+    listing.selections.value = ['a', 'b'];
+
+    // Client `items` prop wins over url for canSelectAllMatching.
+    expect(listing.canSelectAllMatching.value).toBe(false);
+    expect(listing.allMatchingSelected.value).toBe(false);
+    expect(typeof listing.selectAllMatching).toBe('function');
+});

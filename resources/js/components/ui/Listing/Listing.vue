@@ -23,6 +23,7 @@ import Table from './Table.vue';
 import Pagination from './Pagination.vue';
 import { sortBy } from 'lodash-es';
 import fuzzysort from 'fuzzysort';
+import { canSelectAllMatching as canSelectAllMatchingHelper, isPageFullySelected } from '@/util/listing-selections.js';
 
 const emit = defineEmits([
     'update:columns',
@@ -173,8 +174,10 @@ const currentPage = ref(1);
 const perPage = ref(initializePerPage());
 const initializing = ref(true);
 const loading = ref(true);
+const selectingAllMatching = ref(false);
 let popping = false;
 let source = null;
+let selectAllMatchingSource = null;
 const searchQuery = ref(null);
 const columns = ref(initializeColumns());
 const sortColumn = ref(props.sortColumn || (columns.value.length ? columns.value[0].field : null));
@@ -322,9 +325,57 @@ const shouldRequestFirstPage = computed(() => {
     return false;
 });
 
+function abortSelectAllMatching() {
+    if (selectAllMatchingSource) {
+        selectAllMatchingSource.abort();
+        selectAllMatchingSource = null;
+    }
+    selectingAllMatching.value = false;
+}
+
+function selectAllMatching() {
+    if (!props.url || !meta.value?.total) return;
+
+    abortSelectAllMatching();
+    selectingAllMatching.value = true;
+    const controller = new AbortController();
+    selectAllMatchingSource = controller;
+
+    axios
+        .get(props.url, {
+            params: {
+                ...parameters.value,
+                page: 1,
+                perPage: meta.value.total,
+            },
+            signal: controller.signal,
+        })
+        .then((response) => {
+            if (selectAllMatchingSource !== controller) return;
+
+            let ids = Object.values(response.data.data).map((item) => item.id);
+            if (props.maxSelections !== Infinity) {
+                ids = ids.slice(0, props.maxSelections);
+            }
+            selections.value.splice(0, selections.value.length, ...ids);
+        })
+        .catch((e) => {
+            if (axios.isCancel(e) || selectAllMatchingSource !== controller) return;
+            Statamic.$toast.error(e.response ? e.response.data.message : __('Something went wrong'), {
+                duration: null,
+            });
+        })
+        .finally(() => {
+            if (selectAllMatchingSource !== controller) return;
+            selectingAllMatching.value = false;
+            selectAllMatchingSource = null;
+        });
+}
+
 function request() {
     if (props.items) return;
 
+    abortSelectAllMatching();
     loading.value = true;
 
     if (source) source.abort();
@@ -557,8 +608,28 @@ function selectRange(from, to) {
 }
 
 function clearSelections() {
+    abortSelectAllMatching();
     selections.value.splice(0, selections.value.length);
 }
+
+const pageFullySelected = computed(() => isPageFullySelected(items.value, selections.value));
+
+const allMatchingSelected = computed(() => {
+    const total = meta.value?.total ?? 0;
+
+    return total > 0 && selections.value.length >= total;
+});
+
+const canSelectAllMatching = computed(() =>
+    canSelectAllMatchingHelper({
+        hasUrl: !!props.url && !props.items,
+        total: meta.value?.total ?? 0,
+        pageSize: items.value?.length ?? 0,
+        pageFullySelected: pageFullySelected.value,
+        allMatchingSelected: allMatchingSelected.value,
+        maxSelections: props.maxSelections,
+    }),
+);
 
 function setFilters(filters) {
     activeFilters.value = filters || {};
@@ -651,6 +722,10 @@ provideListingContext({
     selectRange,
     toggleSelection,
     clearSelections,
+    selectAllMatching,
+    selectingAllMatching,
+    canSelectAllMatching,
+    allMatchingSelected,
     actionUrl: toRef(() => props.actionUrl),
     actionContext: toRef(() => props.actionContext),
     showBulkActions,
@@ -702,6 +777,8 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
     Statamic.$progress.complete(id);
+    abortSelectAllMatching();
+    if (source) source.abort();
     if (props.pushQuery) window.removeEventListener('popstate', popState);
 });
 
