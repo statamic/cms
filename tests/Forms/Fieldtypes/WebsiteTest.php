@@ -3,6 +3,7 @@
 namespace Tests\Forms\Fieldtypes;
 
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Forms\Charts\HorizontalBar;
 use Statamic\Forms\Fields\FormField;
 use Statamic\Forms\Fieldtypes\Website;
 use Tests\TestCase;
@@ -75,5 +76,14 @@ class WebsiteTest extends TestCase
             'validate' => ['url'],
             'default' => 'https://statamic.com',
         ], $fieldtype->toFieldArray());
+    }
+
+    #[Test]
+    public function it_defaults_to_a_bar_chart_counting_unique_answers()
+    {
+        $fieldtype = (new Website);
+
+        $this->assertEquals(HorizontalBar::class, $fieldtype->defaultChart());
+        $this->assertNull($fieldtype->chartOptions(collect()));
     }
 }
