@@ -56,10 +56,10 @@ function deselectPageItems() {
 
 function getAriaLabel() {
     if (indeterminate.value) {
-        return __('Select all items');
+        return __('Select items');
     }
 
-    return pageFullySelected.value ? __('Deselect all items') : __('Select all items');
+    return pageFullySelected.value ? __('Deselect items') : __('Select items');
 }
 
 function getScreenReaderText() {

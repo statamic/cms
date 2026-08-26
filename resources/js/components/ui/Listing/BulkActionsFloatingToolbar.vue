@@ -144,7 +144,7 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown, true));
                     class="text-blue-500!"
                     @click="clearSelections?.()"
                 >
-                    {{ __n(`Deselect :count item|Deselect all :count items`, selections.length) }}
+                    {{ __n(`Deselect :count item|Deselect :count items`, selections.length) }}
                     <span :class="[shortcutKeyClasses, 'text-blue-600! bg-blue-100/80! dark:text-blue-400! dark:bg-blue-950!']">
                         {{ DESELECT_SHORTCUT_LABEL }}
                     </span>
