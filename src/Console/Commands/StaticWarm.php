@@ -124,7 +124,7 @@ class StaticWarm extends Command
     private function warmPaginatedPages(string $url, int $currentPage, int $totalPages, string $pageName): void
     {
         $urls = collect(range($currentPage, $totalPages))->map(function ($page) use ($url, $pageName) {
-            $url = "{$url}?{$pageName}={$page}";
+            $url = $url.(str_contains($url, '?') ? '&' : '?')."{$pageName}={$page}";
 
             if (config('statamic.static_caching.background_recache', false)) {
                 $url = RecacheToken::addToUrl($url);
@@ -172,12 +172,14 @@ class StaticWarm extends Command
 
     public function outputSuccessLine(Response $response, $index): void
     {
-        $this->components->twoColumnDetail($this->getRelativeUri($this->uris()->get($index)), '<info>✓ Cached</info>');
+        $url = $this->uris()->get($index);
 
-        if ($response->hasHeader('X-Statamic-Pagination')) {
+        $this->components->twoColumnDetail($this->getRelativeUri($url), '<info>✓ Cached</info>');
+
+        if ($this->shouldWarmPaginatedPages($response, $url)) {
             [$currentPage, $totalPages, $pageName] = $this->paginationHeader($response);
 
-            $this->warmPaginatedPages($this->uris()->get($index), $currentPage, $totalPages, $pageName);
+            $this->warmPaginatedPages($url, $currentPage, $totalPages, $pageName);
         }
     }
 
@@ -275,6 +277,17 @@ class StaticWarm extends Command
 
         return collect($exclusions)->contains(fn ($excluded) => $this->uriMatches($uri, $excluded));
     }
+
+    private function shouldWarmPaginatedPages(Response $response, string $url): bool
+    {
+        if (! $response->hasHeader('X-Statamic-Pagination')) {
+            return false;
+        }
+
+        [$currentPage, $totalPages, $pageName] = $this->paginationHeader($response);
+
+        return ! str_contains(parse_url($url, PHP_URL_QUERY) ?? '', "{$pageName}=");
+    }    
 
     private function uriMatches($uri, $pattern): bool
     {
