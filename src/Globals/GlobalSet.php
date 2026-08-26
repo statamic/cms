@@ -28,6 +28,7 @@ class GlobalSet implements ContainsQueryableValues, Contract
 
     protected $title;
     protected $handle;
+    protected $layoutMode;
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
     private $sites = [];
@@ -50,6 +51,11 @@ class GlobalSet implements ContainsQueryableValues, Contract
                 return $title ?? ucfirst($this->handle);
             })
             ->args(func_get_args());
+    }
+
+    public function layoutMode($mode = null)
+    {
+        return $this->fluentlyGetOrSet('layoutMode')->args(func_get_args());
     }
 
     public function blueprint()
@@ -171,6 +177,7 @@ class GlobalSet implements ContainsQueryableValues, Contract
     {
         return Arr::removeNullValues([
             'title' => $this->title(),
+            'layout_mode' => $this->layoutMode === 'multi_column' ? 'multi_column' : null,
             'sites' => Site::multiEnabled() ? $this->origins()->all() : null,
         ]);
     }
