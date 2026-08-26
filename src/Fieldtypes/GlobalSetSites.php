@@ -11,12 +11,45 @@ class GlobalSetSites extends Fieldtype
 {
     protected $selectable = false;
 
-    public function rules(): array
+    protected function configFieldItems(): array
     {
         return [
-            $this->cannotAllHaveOriginsRule(),
-            $this->originsMustBeEnabledRule(),
+            'origins' => [
+                'display' => __('Origins'),
+                'type' => 'toggle',
+                'default' => true,
+            ],
         ];
+    }
+
+    public function rules(): array
+    {
+        $rules = [
+            $this->atLeastOneSiteEnabledRule(),
+        ];
+
+        if ($this->config('origins', true)) {
+            $rules[] = $this->cannotAllHaveOriginsRule();
+            $rules[] = $this->originsMustBeEnabledRule();
+        }
+
+        return $rules;
+    }
+
+    private function atLeastOneSiteEnabledRule()
+    {
+        return new class implements ValidationRule
+        {
+            public function passes($attribute, $value)
+            {
+                return collect($value)->filter->enabled->isNotEmpty();
+            }
+
+            public function message()
+            {
+                return __('statamic::validation.at_least_one_site_enabled');
+            }
+        };
     }
 
     private function cannotAllHaveOriginsRule()

@@ -60,9 +60,20 @@ export default {
         },
 
         sites() {
-            if (!this.publishContainer.values.value.sites) return [];
+            const sites = this.publishContainer.values.value.sites;
 
-            return this.publishContainer.values.value.sites.map((handle, i) => {
+            if (!sites?.length) return [];
+
+            if (typeof sites[0] === 'object') {
+                return sites
+                    .filter((site) => site.enabled)
+                    .map((site) => ({
+                        handle: site.handle,
+                        name: site.name,
+                    }));
+            }
+
+            return sites.map((handle, i) => {
                 return {
                     handle,
                     name: this.publishContainer.meta.value.sites.data[i].title,

@@ -258,7 +258,18 @@ class CollectionsController extends CpController
             'default_publish_state' => $collection->defaultPublishState(),
             'template' => $collection->template(),
             'layout' => $collection->layout(),
-            'sites' => $collection->sites()->all(),
+            'sites' => Site::multiEnabled()
+                ? Site::all()->map(function ($site) use ($collection) {
+                    return [
+                        'name' => $site->name(),
+                        'handle' => $site->handle(),
+                        'group' => $site->group(),
+                        'group_handle' => $site->groupHandle(),
+                        'enabled' => $collection->sites()->contains($site->handle()),
+                        'origin' => null,
+                    ];
+                })->values()->all()
+                : $collection->sites()->all(),
             'propagate' => $collection->propagate(),
             'routes' => $collection->routes()->unique()->count() === 1
                 ? $collection->routes()->first()
@@ -343,6 +354,14 @@ class CollectionsController extends CpController
             ->previewTargets($values['preview_targets']);
 
         if ($sites = Arr::get($values, 'sites')) {
+            if (Site::multiEnabled()) {
+                $sites = collect($sites)
+                    ->filter(fn ($site) => $site['enabled'] ?? false)
+                    ->map(fn ($site) => $site['handle'])
+                    ->values()
+                    ->all();
+            }
+
             $collection
                 ->sites($sites)
                 ->originBehavior($values['origin_behavior']);
@@ -598,8 +617,8 @@ class CollectionsController extends CpController
                 'display' => __('Localizations'),
                 'fields' => [
                     'sites' => [
-                        'type' => 'sites',
-                        'mode' => 'select',
+                        'type' => 'global_set_sites',
+                        'origins' => false,
                         'required' => true,
                     ],
                     'propagate' => [

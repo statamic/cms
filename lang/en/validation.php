@@ -174,6 +174,7 @@ return [
     'email_available' => 'A user with this email already exists.',
     'fieldset_imported_recursively' => 'Fieldset :handle is being imported recursively.',
     'one_site_without_origin' => 'At least one site must not have an origin.',
+    'at_least_one_site_enabled' => 'At least one site must be enabled.',
     'options_require_keys' => 'All options must have keys.',
     'origin_cannot_be_disabled' => 'Cannot select a disabled origin.',
     'parent_cannot_be_itself' => 'Cannot be its own parent.',

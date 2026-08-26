@@ -156,7 +156,18 @@ class TaxonomiesController extends CpController
             'title' => $taxonomy->title(),
             'blueprints' => $taxonomy->termBlueprints()->map->handle()->all(),
             'collections' => $taxonomy->collections()->map->handle()->all(),
-            'sites' => $taxonomy->sites()->all(),
+            'sites' => Site::multiEnabled()
+                ? Site::all()->map(function ($site) use ($taxonomy) {
+                    return [
+                        'name' => $site->name(),
+                        'handle' => $site->handle(),
+                        'group' => $site->group(),
+                        'group_handle' => $site->groupHandle(),
+                        'enabled' => $taxonomy->sites()->contains($site->handle()),
+                        'origin' => null,
+                    ];
+                })->values()->all()
+                : $taxonomy->sites()->all(),
             'preview_targets' => $taxonomy->basePreviewTargets(),
             'term_template' => $taxonomy->hasCustomTermTemplate() ? $taxonomy->termTemplate() : null,
             'template' => $taxonomy->hasCustomTemplate() ? $taxonomy->template() : null,
@@ -190,6 +201,14 @@ class TaxonomiesController extends CpController
             ->layout($values['layout'] ?? null);
 
         if ($sites = Arr::get($values, 'sites')) {
+            if (Site::multiEnabled()) {
+                $sites = collect($sites)
+                    ->filter(fn ($site) => $site['enabled'] ?? false)
+                    ->map(fn ($site) => $site['handle'])
+                    ->values()
+                    ->all();
+            }
+
             $taxonomy->sites($sites);
         }
 
@@ -290,8 +309,8 @@ class TaxonomiesController extends CpController
                 'display' => __('Localizations'),
                 'fields' => [
                     'sites' => [
-                        'type' => 'sites',
-                        'mode' => 'select',
+                        'type' => 'global_set_sites',
+                        'origins' => false,
                         'required' => true,
                     ],
                 ],
