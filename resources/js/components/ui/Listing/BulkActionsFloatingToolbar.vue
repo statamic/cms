@@ -144,14 +144,14 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown, true));
     >
         <div
             class="pointer-events-auto space-y-1 rounded-xl border border-gray-300/60 dark:border-gray-700 p-1 shadow-[0_1px_16px_-2px_rgba(63,63,71,0.2)] dark:bg-gray-800 dark:shadow-[0_10px_15px_rgba(0,0,0,.5)] dark:inset-shadow-2xs dark:inset-shadow-white/10"
-            :class="showSelectAllMatching ? 'bg-gray-150' : 'bg-gray-200/55'"
+            :class="showSelectAllMatching ? 'bg-white dark:bg-gray-900' : 'bg-gray-200/55'"
         >
             <div
                 v-if="showSelectAllMatching"
                 class="flex justify-center px-2"
             >
                 <Button
-                    class="text-blue-600 dark:text-blue-400 tracking-tight"
+                    class="text-blue-600 dark:text-blue-500 tracking-tight"
                     variant="ghost"
                     size="sm"
                     :loading="isSelectingAllMatching"
@@ -166,7 +166,7 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown, true));
             </div>
             <ButtonGroup overflow="gap" justify="center">
                 <Button
-                    class="text-blue-600!"
+                    class="text-blue-600! dark:text-blue-500!"
                     @click="clearSelections?.()"
                 >
                     {{ __n(`Deselect :count item|Deselect :count items`, selections.length) }}
