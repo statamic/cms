@@ -93,6 +93,7 @@
                         <td class="checkbox-column ps-3!">
                             <Checkbox
                                 size="sm"
+                                class="pt-2.5"
                                 solo
                                 :model-value="isSelected(site.handle)"
                                 :label="__('Select :name', { name: __(site.name) })"
@@ -100,7 +101,7 @@
                             />
                         </td>
                         <td class="grid-cell">
-                            <div class="flex items-center gap-2">
+                            <div class="flex pt-2 items-center gap-2">
                                 <Switch v-model="site.enabled" />
                                 <Heading :text="__(site.name)" />
                             </div>
