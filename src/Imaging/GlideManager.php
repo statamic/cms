@@ -49,7 +49,9 @@ class GlideManager
 
     private function wantsCustomFilesystem()
     {
-        return is_string(Config::get('statamic.assets.image_manipulation.cache'));
+        $cache = Config::get('statamic.assets.image_manipulation.cache');
+
+        return is_string($cache) && $cache !== 'hybrid';
     }
 
     private function localCacheFilesystem()
@@ -77,19 +79,26 @@ class GlideManager
      */
     private function cachePath()
     {
-        return $this->shouldServeDirectly()
+        return ($this->shouldServeDirectly() || $this->isUsingHybridCaching())
             ? Config::get('statamic.assets.image_manipulation.cache_path')
             : storage_path('statamic/glide');
     }
 
     public function shouldServeDirectly()
     {
-        return (bool) Config::get('statamic.assets.image_manipulation.cache');
+        $cache = Config::get('statamic.assets.image_manipulation.cache');
+
+        return $cache === true || $this->wantsCustomFilesystem();
     }
 
     public function shouldServeByHttp()
     {
-        return ! $this->shouldServeDirectly();
+        return ! $this->shouldServeDirectly() && ! $this->isUsingHybridCaching();
+    }
+
+    public function isUsingHybridCaching()
+    {
+        return Config::get('statamic.assets.image_manipulation.cache') === 'hybrid';
     }
 
     public function route()
