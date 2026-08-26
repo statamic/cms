@@ -22,7 +22,7 @@ const shortcutKeyClasses =
     'ms-1.5 inline-flex h-4 min-w-4 items-center justify-center rounded bg-gray-200/75 px-1 font-semibold uppercase text-[0.625rem] text-gray-600 dark:bg-gray-800 dark:text-gray-400';
 
 const selectAllMatchingShortcutKeyClasses =
-    'ms-1.5 inline-flex h-4 min-w-4 items-center justify-center rounded px-1 font-semibold uppercase text-[0.625rem] text-blue-600 bg-blue-100/80 dark:text-blue-400 dark:bg-blue-950';
+    'ms-1.5 inline-flex h-4 min-w-4 items-center justify-center rounded border border-blue-300/80 px-1 font-semibold uppercase text-[0.625rem] text-blue-600 bg-blue-100/80 dark:border-blue-700 dark:text-blue-400 dark:bg-blue-950';
 
 const props = defineProps({
     actions: { type: Array, default: () => [] },
