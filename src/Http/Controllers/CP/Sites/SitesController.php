@@ -41,16 +41,18 @@ class SitesController extends CpController
 
     public function update(Request $request)
     {
-        $blueprint = Site::blueprint($request->all());
+        $payload = Site::normalizeBlueprintValues($request->all());
+
+        $blueprint = Site::blueprint($payload);
 
         $fields = $blueprint
             ->fields()
-            ->addValues($request->all());
+            ->addValues($payload);
 
-        $fields->validate($this->uniqueHandleRules($request->all()));
+        $fields->validate($this->uniqueHandleRules($payload));
 
         $values = $this->valuesInRequestOrder(
-            $request->all(),
+            $payload,
             $fields->process()->values()->all()
         );
 
@@ -58,7 +60,7 @@ class SitesController extends CpController
 
         if (Site::multiEnabled() && empty($sites)) {
             throw ValidationException::withMessages(
-                $this->emptySitesError($request->all())
+                $this->emptySitesError($payload)
             );
         }
 

@@ -244,8 +244,36 @@ class Sites
         return $values;
     }
 
+    public function normalizeBlueprintValues(array $values): array
+    {
+        if (! $this->multiEnabled()) {
+            return $values;
+        }
+
+        if ($this->hasGroupedSitesKeys($values)) {
+            return $values;
+        }
+
+        if (! array_key_exists('sites', $values) || ! is_array($values['sites'])) {
+            return $values;
+        }
+
+        $sites = $values['sites'];
+        unset($values['sites']);
+
+        $values['group_'.self::OTHER_GROUP_KEY.'_sites'] = collect($sites)
+            ->filter(fn ($site) => is_array($site))
+            ->map(fn ($site) => collect($site)->except(['group', 'group_handle'])->all())
+            ->values()
+            ->all();
+
+        return $values;
+    }
+
     public function configFromBlueprintValues(array $values): array
     {
+        $values = $this->normalizeBlueprintValues($values);
+
         if (! $this->multiEnabled()) {
             return [
                 $values['handle'] => collect($values)->except(['id', 'handle'])->filter()->all(),
@@ -272,6 +300,17 @@ class Sites
             ->keyBy('handle')
             ->map(fn ($site) => collect($site)->except(['id', 'handle'])->filter()->all())
             ->all();
+    }
+
+    protected function hasGroupedSitesKeys(array $values): bool
+    {
+        foreach (array_keys($values) as $key) {
+            if (is_string($key) && preg_match('/^group_[A-Za-z0-9_-]+_sites$/', $key)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     protected function siteRowFields(): array

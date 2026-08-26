@@ -398,6 +398,50 @@ class SitesConfigTest extends TestCase
     }
 
     #[Test]
+    public function it_saves_multiple_sites_through_cp_endpoint_with_legacy_sites_array()
+    {
+        Config::set('statamic.system.multisite', true);
+
+        $this
+            ->actingAs(tap(User::make()->email('chew@bacca.com')->makeSuper())->save())
+            ->patchJson(cp_route('sites.update'), [
+                'sites' => [
+                    [
+                        'id' => 'abcde',
+                        'name' => 'English',
+                        'handle' => 'default',
+                        'url' => '/',
+                        'locale' => 'en_US',
+                        'lang' => 'slang',
+                    ],
+                    [
+                        'name' => 'French',
+                        'handle' => 'french',
+                        'url' => '/fr/',
+                        'locale' => 'fr_FR',
+                    ],
+                ],
+            ])
+            ->assertSuccessful();
+
+        $expected = [
+            'default' => [
+                'name' => 'English',
+                'url' => '/',
+                'locale' => 'en_US',
+                'lang' => 'slang',
+            ],
+            'french' => [
+                'name' => 'French',
+                'url' => '/fr/',
+                'locale' => 'fr_FR',
+            ],
+        ];
+
+        $this->assertSame($expected, YAML::file($this->yamlPath)->parse());
+    }
+
+    #[Test]
     public function it_saves_groups_in_submitted_order()
     {
         Config::set('statamic.system.multisite', true);
@@ -810,6 +854,7 @@ class SitesConfigTest extends TestCase
             'with no sites array' => [[]],
             'sites array with no elements' => [['group_other_sites' => []]],
             'sites null' => [['group_other_sites' => null]],
+            'legacy sites array with no elements' => [['sites' => []]],
         ];
     }
 

@@ -24,6 +24,7 @@ use Statamic\Sites\Sites;
  * @method static string path()
  * @method static \Statamic\Fields\Blueprint blueprint(array $values = [])
  * @method static array blueprintValues()
+ * @method static array normalizeBlueprintValues(array $values)
  * @method static array configFromBlueprintValues(array $values)
  * @method static array config()
  *
