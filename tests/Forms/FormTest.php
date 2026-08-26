@@ -15,6 +15,8 @@ use Statamic\Facades\Blueprint;
 use Statamic\Facades\File;
 use Statamic\Facades\Form;
 use Statamic\Facades\YAML;
+use Statamic\Forms\Charts\HorizontalBar;
+use Statamic\Forms\Charts\Pie;
 use Statamic\Forms\Fields\FormFields;
 use Tests\TestCase;
 
@@ -376,5 +378,111 @@ class FormTest extends TestCase
         $this->assertCount(2, $formFields->items());
         $this->assertEquals('email', $formFields->field('email')->handle());
         $this->assertEquals('name', $formFields->field('name')->handle());
+    }
+
+    #[Test]
+    public function it_saves_charts_to_yaml_and_hydrates_them_back()
+    {
+        $charts = [
+            ['field' => 'color', 'chart' => 'pie'],
+            ['field' => 'rating', 'chart' => 'horizontal_bar'],
+        ];
+
+        $form = tap(Form::make('contact_us')->charts($charts))->save();
+
+        $this->assertEquals($charts, YAML::parse(File::get($form->path()))['charts']);
+        $this->assertEquals($charts, Form::find('contact_us')->charts());
+    }
+
+    #[Test]
+    public function it_saves_an_explicitly_emptied_charts_list()
+    {
+        $form = tap(Form::make('contact_us')->charts([]))->save();
+
+        $this->assertEquals([], YAML::parse(File::get($form->path()))['charts']);
+        $this->assertEquals([], Form::find('contact_us')->charts());
+    }
+
+    #[Test]
+    public function it_doesnt_save_charts_when_never_configured()
+    {
+        $form = tap(Form::make('contact_us'))->save();
+
+        $this->assertArrayNotHasKey('charts', YAML::parse(File::get($form->path())));
+        $this->assertNull(Form::find('contact_us')->charts());
+    }
+
+    #[Test]
+    public function summary_charts_default_to_fields_with_a_default_chart()
+    {
+        $form = $this->formWithChartableFields();
+
+        $charts = $form->summaryCharts();
+
+        $this->assertEquals(['name', 'color', 'rating'], $charts->map(fn ($summary) => $summary->field()->handle())->all());
+        $this->assertInstanceOf(HorizontalBar::class, $charts[0]->chart());
+        $this->assertInstanceOf(Pie::class, $charts[1]->chart());
+        $this->assertInstanceOf(HorizontalBar::class, $charts[2]->chart());
+    }
+
+    #[Test]
+    public function summary_charts_use_the_saved_layout()
+    {
+        $form = $this->formWithChartableFields()->charts([
+            ['field' => 'rating', 'chart' => 'horizontal_bar'],
+            ['field' => 'color', 'chart' => 'horizontal_bar'],
+        ]);
+
+        $charts = $form->summaryCharts();
+
+        $this->assertEquals(['rating', 'color'], $charts->map(fn ($summary) => $summary->field()->handle())->all());
+        $this->assertInstanceOf(HorizontalBar::class, $charts[0]->chart());
+        $this->assertInstanceOf(HorizontalBar::class, $charts[1]->chart());
+    }
+
+    #[Test]
+    public function summary_charts_skip_unknown_fields_and_fall_back_on_unknown_charts()
+    {
+        $form = $this->formWithChartableFields()->charts([
+            ['field' => 'missing', 'chart' => 'pie'],
+            ['field' => 'color', 'chart' => 'line'],
+        ]);
+
+        $charts = $form->summaryCharts();
+
+        $this->assertEquals(['color'], $charts->map(fn ($summary) => $summary->field()->handle())->all());
+        $this->assertInstanceOf(Pie::class, $charts[0]->chart());
+    }
+
+    #[Test]
+    public function summary_charts_exclude_hidden_fields()
+    {
+        $form = Form::make('survey')->formFields([
+            'sections' => [
+                [
+                    'fields' => [
+                        ['handle' => 'color', 'field' => ['type' => 'multi_choice', 'options' => ['red' => 'Red'], 'hidden' => true]],
+                        ['handle' => 'rating', 'field' => ['type' => 'star_rating']],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertEquals(['rating'], $form->summaryCharts()->map(fn ($summary) => $summary->field()->handle())->all());
+    }
+
+    private function formWithChartableFields()
+    {
+        return Form::make('survey')->formFields([
+            'sections' => [
+                [
+                    'fields' => [
+                        ['handle' => 'name', 'field' => ['type' => 'short_answer']],
+                        ['handle' => 'color', 'field' => ['type' => 'multi_choice', 'options' => ['red' => 'Red', 'blue' => 'Blue']]],
+                        ['handle' => 'rating', 'field' => ['type' => 'star_rating']],
+                    ],
+                ],
+            ],
+        ]);
     }
 }
