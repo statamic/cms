@@ -287,7 +287,7 @@ class TaxonomiesController extends CpController
 
         if (Site::multiEnabled()) {
             $fields['sites'] = [
-                'display' => __('Sites'),
+                'display' => __('Localizations'),
                 'fields' => [
                     'sites' => [
                         'type' => 'sites',
