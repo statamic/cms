@@ -129,6 +129,26 @@ describe('preferredOriginHandle', () => {
         expect(preferredOriginHandle(localizations, localizations[2], 'root')).toBe('en');
     });
 
+    test('falls back to root for select behavior even when another site is active', () => {
+        const localizations = [
+            { handle: 'en', exists: true, root: true, active: false, group: 'UK', group_handle: 'uk' },
+            { handle: 'fr', exists: true, active: true, group: 'UK', group_handle: 'uk', origin_handle: 'en' },
+            { handle: 'de', exists: false, group: 'EU', group_handle: 'eu' },
+        ];
+
+        expect(preferredOriginHandle(localizations, localizations[2], 'select')).toBe('en');
+    });
+
+    test('falls back to the active site when origin behavior is active', () => {
+        const localizations = [
+            { handle: 'en', exists: true, root: true, active: false, group: 'UK', group_handle: 'uk' },
+            { handle: 'fr', exists: true, active: true, group: 'UK', group_handle: 'uk', origin_handle: 'en' },
+            { handle: 'de', exists: false, group: 'EU', group_handle: 'eu' },
+        ];
+
+        expect(preferredOriginHandle(localizations, localizations[2], 'active')).toBe('fr');
+    });
+
     test('returns null when nothing exists yet', () => {
         expect(preferredOriginHandle([{ handle: 'en', exists: false }], { handle: 'fr' })).toBeNull();
     });

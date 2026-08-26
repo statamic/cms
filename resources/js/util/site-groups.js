@@ -97,7 +97,7 @@ export function preferredOriginHandle(localizations, target, originBehavior = 'r
         return groupOriginHandle(sameGroup, existing);
     }
 
-    if (originBehavior !== 'root') {
+    if (originBehavior === 'active') {
         const active = existing.find((localization) => localization.active);
         if (active) {
             return active.handle;
