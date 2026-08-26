@@ -58,13 +58,13 @@ class Localize extends Action
     public function confirmationText()
     {
         /** @translation */
-        return 'Localize this entry?|Localize these :count entries?';
+        return 'Create missing localizations for this entry? (Existing localizations will be skipped).|Create missing localizations for these :count entries? (Existing localizations will be skipped).';
     }
 
     public function buttonText()
     {
         /** @translation */
-        return 'Localize|Localize :count entries';
+        return 'Localize|Localize :count Entries';
     }
 
     public function run($entries, $values)
@@ -96,7 +96,7 @@ class Localize extends Action
         }
 
         if ($skipped > 0) {
-            return __('Created :created localization(s), skipped :skipped.', [
+            return __('Created :created, skipped :skipped.', [
                 'created' => $created,
                 'skipped' => $skipped,
             ]);
@@ -112,8 +112,9 @@ class Localize extends Action
         return [
             'site' => [
                 'display' => __('Site'),
-                'instructions' => __('Only entries that are missing this localization will be created.'),
+                'hide_display' => true,
                 'type' => 'select',
+                'placeholder' => __('Choose a site...'),
                 'options' => $this->siteOptions(),
                 'validate' => 'required',
             ],
