@@ -116,7 +116,6 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown, true));
 <template>
     <Motion
         v-if="visible"
-        layout
         data-floating-toolbar
         class="pointer-events-none sticky inset-x-0 bottom-1 sm:bottom-6 z-(--z-index-above) flex w-full max-w-[95vw] mx-auto justify-center"
         :initial="{ y: 100, opacity: 0 }"
