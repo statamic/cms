@@ -1,8 +1,10 @@
-import { expect, test } from 'vitest';
+import { expect, test, vi } from 'vitest';
 import {
     canSelectAllMatching,
+    fetchAllMatchingIds,
     isPageFullySelected,
     isPagePartiallySelected,
+    isRequestCanceled,
     pageItemIds,
     removePageSelections,
     selectedOnPage,
@@ -92,4 +94,71 @@ test('canSelectAllMatching is false for client-side listings without a url', () 
             allMatchingSelected: false,
         }),
     ).toBe(false);
+});
+
+test('isRequestCanceled recognizes common cancel shapes', () => {
+    expect(isRequestCanceled({ code: 'ERR_CANCELED' })).toBe(true);
+    expect(isRequestCanceled({ name: 'CanceledError' })).toBe(true);
+    expect(isRequestCanceled({ name: 'AbortError' })).toBe(true);
+    expect(isRequestCanceled({ __CANCEL__: true })).toBe(true);
+    expect(isRequestCanceled({ message: 'boom' })).toBe(false);
+});
+
+test('fetchAllMatchingIds pages through results under a perPage ceiling', async () => {
+    const get = vi.fn(async (url, { params }) => {
+        const pages = {
+            1: {
+                data: [{ id: '1' }, { id: '2' }],
+                meta: { last_page: 3, total: 5 },
+            },
+            2: {
+                data: [{ id: '3' }, { id: '4' }],
+                meta: { last_page: 3, total: 5 },
+            },
+            3: {
+                data: [{ id: '5' }],
+                meta: { last_page: 3, total: 5 },
+            },
+        };
+
+        return { data: pages[params.page] };
+    });
+
+    const ids = await fetchAllMatchingIds({
+        get,
+        url: '/cp/entries',
+        parameters: { search: 'alfa', sort: 'title' },
+        total: 5,
+        pageSize: 2,
+    });
+
+    expect(ids).toEqual(['1', '2', '3', '4', '5']);
+    expect(get).toHaveBeenCalledTimes(3);
+    expect(get.mock.calls[0][1].params).toMatchObject({
+        search: 'alfa',
+        sort: 'title',
+        page: 1,
+        perPage: 2,
+    });
+    expect(get.mock.calls[2][1].params.page).toBe(3);
+});
+
+test('fetchAllMatchingIds respects maxSelections', async () => {
+    const get = vi.fn(async (url, { params }) => ({
+        data: {
+            data: [{ id: `${params.page}-a` }, { id: `${params.page}-b` }],
+            meta: { last_page: 5, total: 10 },
+        },
+    }));
+
+    const ids = await fetchAllMatchingIds({
+        get,
+        url: '/cp/entries',
+        total: 10,
+        pageSize: 2,
+        maxSelections: 3,
+    });
+
+    expect(ids).toEqual(['1-a', '1-b', '2-a']);
+    expect(get).toHaveBeenCalledTimes(2);
 });

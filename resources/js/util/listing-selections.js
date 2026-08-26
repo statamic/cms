@@ -56,3 +56,67 @@ export function canSelectAllMatching({
 
     return true;
 }
+
+export function isRequestCanceled(error) {
+    return (
+        error?.code === 'ERR_CANCELED' ||
+        error?.name === 'CanceledError' ||
+        error?.name === 'AbortError' ||
+        error?.__CANCEL__ === true
+    );
+}
+
+/**
+ * Fetch every matching listing ID by paging through results.
+ * Listing APIs clamp perPage (cpPerPage ceiling), so a single request cannot load all IDs.
+ */
+export async function fetchAllMatchingIds({
+    get,
+    url,
+    parameters = {},
+    total,
+    pageSize,
+    signal,
+    maxSelections = Infinity,
+}) {
+    const perPage = Math.max(1, pageSize || 100);
+    const ids = [];
+    let page = 1;
+    let lastPage = Math.max(1, Math.ceil(total / perPage));
+
+    while (page <= lastPage) {
+        if (signal?.aborted) {
+            const error = new Error('canceled');
+            error.code = 'ERR_CANCELED';
+            error.name = 'CanceledError';
+            throw error;
+        }
+
+        const response = await get(url, {
+            params: {
+                ...parameters,
+                page,
+                perPage,
+            },
+            signal,
+        });
+
+        const pageItems = Object.values(response?.data?.data || {});
+        ids.push(...pageItems.map((item) => item.id));
+
+        if (maxSelections !== Infinity && ids.length >= maxSelections) {
+            return ids.slice(0, maxSelections);
+        }
+
+        const responseLastPage = response?.data?.meta?.last_page;
+        if (responseLastPage) {
+            lastPage = responseLastPage;
+        }
+
+        if (pageItems.length === 0) break;
+
+        page++;
+    }
+
+    return ids;
+}

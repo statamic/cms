@@ -23,7 +23,7 @@ import Table from './Table.vue';
 import Pagination from './Pagination.vue';
 import { sortBy } from 'lodash-es';
 import fuzzysort from 'fuzzysort';
-import { canSelectAllMatching as canSelectAllMatchingHelper, isPageFullySelected } from '@/util/listing-selections.js';
+import { canSelectAllMatching as canSelectAllMatchingHelper, fetchAllMatchingIds, isPageFullySelected, isRequestCanceled } from '@/util/listing-selections.js';
 
 const emit = defineEmits([
     'update:columns',
@@ -175,6 +175,7 @@ const perPage = ref(initializePerPage());
 const initializing = ref(true);
 const loading = ref(true);
 const selectingAllMatching = ref(false);
+const selectedAllMatching = ref(false);
 let popping = false;
 let source = null;
 let selectAllMatchingSource = null;
@@ -333,7 +334,7 @@ function abortSelectAllMatching() {
     selectingAllMatching.value = false;
 }
 
-function selectAllMatching() {
+async function selectAllMatching() {
     if (!props.url || !meta.value?.total) return;
 
     abortSelectAllMatching();
@@ -341,35 +342,31 @@ function selectAllMatching() {
     const controller = new AbortController();
     selectAllMatchingSource = controller;
 
-    axios
-        .get(props.url, {
-            params: {
-                ...parameters.value,
-                page: 1,
-                perPage: meta.value.total,
-            },
+    try {
+        const ids = await fetchAllMatchingIds({
+            get: axios.get.bind(axios),
+            url: props.url,
+            parameters: parameters.value,
+            total: meta.value.total,
+            pageSize: perPage.value || meta.value.per_page || 100,
             signal: controller.signal,
-        })
-        .then((response) => {
-            if (selectAllMatchingSource !== controller) return;
-
-            let ids = Object.values(response.data.data).map((item) => item.id);
-            if (props.maxSelections !== Infinity) {
-                ids = ids.slice(0, props.maxSelections);
-            }
-            selections.value.splice(0, selections.value.length, ...ids);
-        })
-        .catch((e) => {
-            if (axios.isCancel(e) || selectAllMatchingSource !== controller) return;
-            Statamic.$toast.error(e.response ? e.response.data.message : __('Something went wrong'), {
-                duration: null,
-            });
-        })
-        .finally(() => {
-            if (selectAllMatchingSource !== controller) return;
-            selectingAllMatching.value = false;
-            selectAllMatchingSource = null;
+            maxSelections: props.maxSelections,
         });
+
+        if (selectAllMatchingSource !== controller) return;
+
+        selections.value.splice(0, selections.value.length, ...ids);
+        selectedAllMatching.value = true;
+    } catch (e) {
+        if (isRequestCanceled(e) || selectAllMatchingSource !== controller) return;
+        Statamic.$toast.error(e.response ? e.response.data.message : __('Something went wrong'), {
+            duration: null,
+        });
+    } finally {
+        if (selectAllMatchingSource !== controller) return;
+        selectingAllMatching.value = false;
+        selectAllMatchingSource = null;
+    }
 }
 
 function request() {
@@ -402,7 +399,7 @@ function request() {
             });
         })
         .catch((e) => {
-            if (axios.isCancel(e)) return;
+            if (isRequestCanceled(e) || axios.isCancel?.(e)) return;
             initializing.value = false;
             loading.value = false;
             if (e.request && !e.response) return;
@@ -609,6 +606,7 @@ function selectRange(from, to) {
 
 function clearSelections() {
     abortSelectAllMatching();
+    selectedAllMatching.value = false;
     selections.value.splice(0, selections.value.length);
 }
 
@@ -617,7 +615,7 @@ const pageFullySelected = computed(() => isPageFullySelected(items.value, select
 const allMatchingSelected = computed(() => {
     const total = meta.value?.total ?? 0;
 
-    return total > 0 && selections.value.length >= total;
+    return selectedAllMatching.value && total > 0 && selections.value.length >= total;
 });
 
 const canSelectAllMatching = computed(() =>
@@ -629,6 +627,27 @@ const canSelectAllMatching = computed(() =>
         allMatchingSelected: allMatchingSelected.value,
         maxSelections: props.maxSelections,
     }),
+);
+
+const matchingQueryKey = computed(() => {
+    const { page, ...rest } = parameters.value;
+
+    return JSON.stringify(rest);
+});
+
+watch(matchingQueryKey, () => {
+    selectedAllMatching.value = false;
+});
+
+watch(
+    selections,
+    (next) => {
+        const total = meta.value?.total ?? 0;
+        if (selectedAllMatching.value && next.length < total) {
+            selectedAllMatching.value = false;
+        }
+    },
+    { deep: true },
 );
 
 function setFilters(filters) {
@@ -726,6 +745,7 @@ provideListingContext({
     selectingAllMatching,
     canSelectAllMatching,
     allMatchingSelected,
+    selectedAllMatching,
     actionUrl: toRef(() => props.actionUrl),
     actionContext: toRef(() => props.actionContext),
     showBulkActions,
