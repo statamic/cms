@@ -140,7 +140,7 @@ class StaticWarm extends Command
             'fulfilled' => function (Response $response, $index) use ($urls) {
                 $this->components->twoColumnDetail($this->getRelativeUri($urls->get($index)), '<info>✓ Cached</info>');
             },
-            rejected' => function ($exception, $index) use ($urls) {
+            'rejected' => function ($exception, $index) use ($urls) {
                 $this->outputFailureLineFor($urls->get($index), $exception);
             },
         ]);
