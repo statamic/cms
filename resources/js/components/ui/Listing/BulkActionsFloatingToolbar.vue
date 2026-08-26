@@ -148,7 +148,7 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown, true));
                 class="flex justify-center px-2"
             >
                 <Button
-                    class="text-blue-500 dark:text-blue-400 tracking-tight"
+                    class="text-blue-600 dark:text-blue-400 tracking-tight"
                     variant="ghost"
                     size="sm"
                     :loading="isSelectingAllMatching"
@@ -163,7 +163,7 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown, true));
             </div>
             <ButtonGroup overflow="gap" justify="center">
                 <Button
-                    class="text-blue-500!"
+                    class="text-blue-600!"
                     @click="clearSelections?.()"
                 >
                     {{ __n(`Deselect :count item|Deselect :count items`, selections.length) }}
