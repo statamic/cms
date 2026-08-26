@@ -40,7 +40,7 @@ class FakeSubmissionGenerator
             'text', 'revealer', 'hidden' => $this->textValueFor($field),
             'slug' => IlluminateStr::slug($this->textValueFor($field)),
             'textarea', 'markdown' => $this->paragraph(),
-            'integer', 'range' => $this->number(1, 5000),
+            'integer', 'range' => $this->integerValueFor($field),
             'float' => $this->decimalNumber(),
             'toggle' => $this->boolean(),
             'date' => $this->date(),
@@ -61,6 +61,14 @@ class FakeSubmissionGenerator
             'list' => [$this->word(), $this->word(), $this->word()],
             default => $field->fieldtype()->fakeValue() ?? $default,
         };
+    }
+
+    private function integerValueFor(Field $field): int
+    {
+        $min = (int) ($field->get('min') ?? 1);
+        $max = (int) ($field->get('max') ?? 5000);
+
+        return $this->number(min($min, $max), max($min, $max));
     }
 
     private function randomOptionKey(Field $field): mixed
