@@ -71,7 +71,7 @@
             <tbody>
                 <template v-for="group in siteGroups" :key="group.key">
                     <tr v-if="hasNamedGroups">
-                        <td colspan="3" class="bg-gray-50 py-2! dark:bg-gray-800">
+                        <td colspan="3" class="sticky top-[calc(--spacing(7)+1px)] z-(--z-index-above) bg-gray-50 py-2! dark:bg-gray-800">
                             <div class="flex items-center gap-4 ps-1!">
                                 <Checkbox
                                     size="sm"
