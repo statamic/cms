@@ -4,10 +4,10 @@ import * as VerticalBarChartStories from '../VerticalBarChart.stories';
 <Meta of={VerticalBarChartStories} />
 
 # VerticalBarChart
-A vertical distribution chart. Bar heights scale against the largest item value unless `maxValue` is provided.
+A vertical distribution chart. Bar heights scale against the largest item's percentage unless `maxValue` is provided.
 <Canvas of={VerticalBarChartStories._DocsIntro} sourceState={'shown'} />
 
-Use vertical bars for ordered scales where the labels are short, such as ratings or scores. Each item supports `label`, `percent`, `count`, and an optional `value` used only for height.
+Use vertical bars for ordered scales where the labels are short, such as ratings or scores. Each item supports `label`, `percent`, and `count`.
 
 ## Response counts
 <Canvas of={VerticalBarChartStories._Counts} sourceState={'shown'} />

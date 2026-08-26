@@ -1,27 +1,35 @@
-<script setup>
+<script setup lang="ts">
 import { computed } from 'vue';
 import Metric from './Metric.vue';
 
-const props = defineProps({
-    /** A concise text alternative describing the chart. */
-    accessibleLabel: { type: String, required: true },
-    /** The chart columns. Each item supports `label`, `percent`, `count`, and `value`. */
-    items: { type: Array, default: () => [] },
-    /** The largest value represented by a full-height column. */
-    maxValue: { type: Number, default: null },
-    /** Whether values are displayed as percentages or response counts. */
-    metric: {
-        type: String,
-        default: 'percent',
-        validator: (value) => ['percent', 'count'].includes(value),
-    },
-});
-
-const maximum = computed(() => props.maxValue ?? Math.max(...props.items.map((item) => item.value ?? item.percent), 1));
-
-function height(item) {
-    return `${((item.value ?? item.percent) / maximum.value) * 100}%`;
+type Item = {
+    key?: string;
+    label: string;
+    count: number;
+    percent: number;
 }
+
+const props = withDefaults(
+    defineProps<{
+        /** Accessible label summarizing the chart's results. */
+        accessibleLabel: string;
+        /** The chart columns. Each item supports `label`, `percent`, and `count`. */
+        items?: Item[];
+        /** The largest value represented by a full-height column. */
+        maxValue?: number | null;
+        /** Whether values are displayed as percentages or response counts. */
+        metric?: 'percent' | 'count';
+    }>(),
+    {
+        items: () => [],
+        maxValue: null,
+        metric: 'percent',
+    },
+);
+
+const height = (item: Item): string => `${(item.percent / maximum.value) * 100}%`;
+
+const maximum = computed<number>(() => props.maxValue ?? Math.max(...props.items.map((item) => item.percent), 1));
 </script>
 
 <template>
@@ -30,7 +38,7 @@ function height(item) {
             <slot name="summary" />
         </div>
         <ol class="vertical-bar-chart" aria-hidden="true">
-            <li v-for="(item, index) in items" :key="item.id ?? item.label ?? index" class="vertical-bar-chart__bar">
+            <li v-for="item in items" :key="item.key ?? item.label" class="vertical-bar-chart__bar">
                 <div class="vertical-bar-chart__plot">
                     <Metric
                         :metric

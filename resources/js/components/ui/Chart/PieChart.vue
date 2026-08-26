@@ -1,46 +1,64 @@
-<script setup>
+<script setup lang="ts">
 import { computed } from 'vue';
 import Icon from '../Icon/Icon.vue';
 import Metric from './Metric.vue';
 
-const props = defineProps({
-    /** A concise text alternative describing the chart. */
-    accessibleLabel: { type: String, required: true },
-    /** Highlights one segment while muting the others. */
-    focusedIndex: { type: Number, default: null },
-    /** The legend items. Each item supports `label`, `percent`, `count`, `clickable`, `icon`, `image`, and `badge`. */
-    items: {
-        type: Array,
-        default: () => [],
-        validator: (items) => items.length <= 4,
+type Item = {
+    key?: string;
+    label: string;
+    count: number;
+    percent: number;
+    clickable?: boolean;
+    icon?: string;
+    image?: string;
+    badge?: string;
+}
+
+const props = withDefaults(
+    defineProps<{
+        /** Accessible label summarizing the chart's results. */
+        accessibleLabel: string;
+        /** Highlights one segment while muting the others. */
+        focusedIndex?: number | null;
+        /** Up to four legend items. Each item supports `label`, `percent`, `count`, `clickable`, `icon`, `image`, and `badge`. */
+        items?: Item[];
+        /** Whether values are displayed as percentages or response counts. */
+        metric?: 'percent' | 'count';
+        /** Optional segment data when the legend describes a focused segment. */
+        segments?: Item[] | null;
+    }>(),
+    {
+        focusedIndex: null,
+        items: () => [],
+        metric: 'percent',
+        segments: null,
     },
-    /** Whether values are displayed as percentages or response counts. */
-    metric: {
-        type: String,
-        default: 'percent',
-        validator: (value) => ['percent', 'count'].includes(value),
-    },
-    /** Optional segment data when the legend describes a focused segment. */
-    segments: {
-        type: Array,
-        default: null,
-        validator: (items) => items === null || items.length <= 4,
-    },
-});
+);
 
-const emit = defineEmits(['select']);
+const emit = defineEmits<{
+    select: [item: Item, index: number];
+}>();
 
-const slices = computed(() => props.segments ?? props.items);
-const showsImageSlices = computed(() => slices.value.length > 0 && slices.value.length <= 2 && slices.value.every((item) => item.image));
+const slices = computed<Item[]>(() => props.segments ?? props.items);
+const showsImageSlices = computed<boolean>(() => slices.value.length > 0 && slices.value.length <= 2 && slices.value.every((item) => item.image));
 
-const chartStyle = computed(() => Object.fromEntries([0, 1, 2, 3].flatMap((index) => {
-    const number = index + 1;
-    const color = props.focusedIndex === null || props.focusedIndex === index
-        ? `var(--color-chart-${number})`
-        : `hsl(from var(--color-chart-${number}) h s l / 0.1)`;
+const slicePercent = (index: number): number => slices.value[index]?.percent ?? 0;
 
-    return [[`--${number}`, slices.value[index]?.percent ?? 0], [`--slice-${number}-color`, color]];
-})));
+const sliceColor = (index: number): string =>
+    props.focusedIndex === null || props.focusedIndex === index
+        ? `var(--color-chart-${index + 1})`
+        : `hsl(from var(--color-chart-${index + 1}) h s l / 0.1)`;
+
+const chartStyle = computed(() => ({
+    '--1': slicePercent(0),
+    '--2': slicePercent(1),
+    '--3': slicePercent(2),
+    '--4': slicePercent(3),
+    '--slice-1-color': sliceColor(0),
+    '--slice-2-color': sliceColor(1),
+    '--slice-3-color': sliceColor(2),
+    '--slice-4-color': sliceColor(3),
+}));
 </script>
 
 <template>
@@ -55,7 +73,7 @@ const chartStyle = computed(() => Object.fromEntries([0, 1, 2, 3].flatMap((index
             <div class="image-pie-chart__disc" aria-hidden="true">
                 <span
                     v-for="(item, index) in slices"
-                    :key="item.id ?? item.label ?? index"
+                    :key="item.key ?? item.label"
                     :class="`image-pie-chart__slice--${index + 1}`"
                     :style="{ '--image': `url(${item.image})` }"
                     class="image-pie-chart__slice"
@@ -63,7 +81,7 @@ const chartStyle = computed(() => Object.fromEntries([0, 1, 2, 3].flatMap((index
             </div>
             <Metric
                 v-for="(item, index) in slices"
-                :key="item.id ?? item.label ?? index"
+                :key="item.key ?? item.label"
                 :metric
                 :percent="item.percent"
                 :count="item.count"
@@ -83,7 +101,7 @@ const chartStyle = computed(() => Object.fromEntries([0, 1, 2, 3].flatMap((index
             <div class="pie-chart__disc" aria-hidden="true" />
             <Metric
                 v-for="(item, index) in slices"
-                :key="item.id ?? item.label ?? index"
+                :key="item.key ?? item.label"
                 :metric
                 :percent="item.percent"
                 :count="item.count"
@@ -95,7 +113,7 @@ const chartStyle = computed(() => Object.fromEntries([0, 1, 2, 3].flatMap((index
         </div>
         <figcaption class="pie-chart-legend">
             <ol class="pie-chart-legend__list">
-                <li v-for="(item, index) in items" :key="item.id ?? item.label ?? index" class="pie-chart-legend__item">
+                <li v-for="(item, index) in items" :key="item.key ?? item.label" class="pie-chart-legend__item">
                     <component
                         :is="item.clickable ? 'button' : 'span'"
                         :type="item.clickable ? 'button' : undefined"

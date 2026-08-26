@@ -43,15 +43,17 @@ const customEndpointsCode = `
 </HorizontalLollipopChart>
 `;
 
+const countries = [
+    {label: 'Japan', percent: 40, count: 99, emoji: '🇯🇵'},
+    {label: 'Italy', percent: 35, count: 87, emoji: '🇮🇹'},
+    {label: 'France', percent: 25, count: 62, emoji: '🇫🇷'},
+];
+
 export const _CustomEndpoints: Story = {
     tags: ['!dev'],
     args: {
         accessibleLabel: 'Ranked countries: Japan 40%, Italy 35%, France 25%',
-        items: [
-            {label: 'Japan', percent: 40, count: 99, emoji: '🇯🇵'},
-            {label: 'Italy', percent: 35, count: 87, emoji: '🇮🇹'},
-            {label: 'France', percent: 25, count: 62, emoji: '🇫🇷'},
-        ],
+        items: countries,
         showMarker: false,
     },
     parameters: {docs: {source: {code: customEndpointsCode}}},
