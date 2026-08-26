@@ -287,7 +287,7 @@ class StaticWarm extends Command
         [$currentPage, $totalPages, $pageName] = $this->paginationHeader($response);
 
         return ! str_contains(parse_url($url, PHP_URL_QUERY) ?? '', "{$pageName}=");
-    }    
+    }
 
     private function uriMatches($uri, $pattern): bool
     {
