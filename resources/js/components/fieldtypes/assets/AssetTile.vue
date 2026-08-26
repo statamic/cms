@@ -13,10 +13,12 @@
             :id="editingId"
             :allow-deleting="false"
             :show-navigation="siblings.length > 1"
+            :redirect-after-crop="false"
             @previous="navigateToPrevious"
             @next="navigateToNext"
             @closed="closeEditor"
             @saved="assetSaved"
+            @created="assetCreated"
             @action-completed="actionCompleted"
         >
         </asset-editor>
