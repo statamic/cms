@@ -5,6 +5,7 @@
  * Renders the floating toolbar when items are selected in a listing, with keyboard shortcuts
  * for each action. Shortcuts are derived from the localized action title (first unused letter).
  * Delete uses the backspace icon and is triggered by Delete/Backspace only.
+ * Select-all-matching uses A when that control is visible (reserved so actions skip it).
  */
 import { Motion } from 'motion-v';
 import { computed, onMounted, onUnmounted, toValue } from 'vue';
@@ -14,9 +15,14 @@ import { Button, ButtonGroup, Icon } from '@ui';
 const DESELECT_SHORTCUT_KEY = 'Escape';
 const DESELECT_SHORTCUT_LABEL = 'Esc';
 const DELETE_SHORTCUT_KEY = 'Delete';
+const SELECT_ALL_MATCHING_SHORTCUT_KEY = 'a';
+const SELECT_ALL_MATCHING_SHORTCUT_LABEL = 'A';
 
 const shortcutKeyClasses =
     'ms-1.5 inline-flex h-4 min-w-4 items-center justify-center rounded bg-gray-200/75 px-1 font-semibold uppercase text-[0.625rem] text-gray-600 dark:bg-gray-800 dark:text-gray-400';
+
+const selectAllMatchingShortcutKeyClasses =
+    'ms-1.5 inline-flex h-4 min-w-4 items-center justify-center rounded px-1 font-semibold uppercase text-[0.625rem] text-blue-600 bg-blue-100/80 dark:text-blue-400 dark:bg-blue-950';
 
 const props = defineProps({
     actions: { type: Array, default: () => [] },
@@ -53,6 +59,9 @@ function findShortcutKey(action, used) {
 
 const actionsWithShortcuts = computed(() => {
     const used = new Set();
+    // Reserve A for select-all-matching whenever that control is visible.
+    if (showSelectAllMatching.value) used.add(SELECT_ALL_MATCHING_SHORTCUT_KEY);
+
     return (props.actions || []).map((action) => {
         // Delete always shows the backspace icon and is triggered by Delete/Backspace only; no letter.
         if (isDeleteAction(action)) {
@@ -101,6 +110,17 @@ function onKeydown(event) {
     if (event.metaKey || event.ctrlKey || event.altKey) return;
     const key = event.key?.length === 1 ? event.key.toLowerCase() : null;
     if (!key) return;
+
+    if (
+        key === SELECT_ALL_MATCHING_SHORTCUT_KEY &&
+        showSelectAllMatching.value &&
+        !isSelectingAllMatching.value
+    ) {
+        props.selectAllMatching?.();
+        event.preventDefault();
+        return;
+    }
+
     const action = actionsWithShortcuts.value.find((a) => a.shortcutKey === key);
     if (action?.run) {
         action.run();
@@ -136,6 +156,9 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown, true));
                     @click="selectAllMatching?.()"
                 >
                     {{ __('messages.selections_select_all_matching', { total: matchingTotal }) }}
+                    <span :class="selectAllMatchingShortcutKeyClasses">
+                        {{ SELECT_ALL_MATCHING_SHORTCUT_LABEL }}
+                    </span>
                 </Button>
             </div>
             <ButtonGroup overflow="gap" justify="center">
