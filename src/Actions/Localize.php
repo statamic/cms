@@ -2,6 +2,7 @@
 
 namespace Statamic\Actions;
 
+use Illuminate\Validation\Rule;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
@@ -80,12 +81,6 @@ class Localize extends Action
                 return;
             }
 
-            if (! User::current()->can('edit', $entry)) {
-                $skipped++;
-
-                return;
-            }
-
             $entry->makeLocalization($site)->store(['user' => User::current()]);
             $created++;
         });
@@ -115,8 +110,8 @@ class Localize extends Action
                 'hide_display' => true,
                 'type' => 'select',
                 'placeholder' => __('Choose a site...'),
-                'options' => $this->siteOptions(),
-                'validate' => 'required',
+                'options' => $options = $this->siteOptions(),
+                'validate' => ['required', Rule::in(array_keys($options))],
             ],
         ];
     }
