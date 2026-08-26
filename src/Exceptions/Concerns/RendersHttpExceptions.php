@@ -13,7 +13,6 @@ use Statamic\Http\Middleware\CP\HandleInertiaRequests;
 use Statamic\Statamic;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\Cachers\ApplicationCacher;
-use Statamic\StaticCaching\Replacer;
 use Statamic\View\View;
 
 trait RendersHttpExceptions
@@ -101,18 +100,7 @@ trait RendersHttpExceptions
             return null;
         }
 
-        $response = $cacher->getCachedPage($request)->toResponse($request);
-
-        $this->applyReplacers($response);
-
-        return $response;
-    }
-
-    private function applyReplacers(Response $response): void
-    {
-        collect(config('statamic.static_caching.replacers'))
-            ->map(fn ($class) => app($class))
-            ->each(fn (Replacer $replacer) => $replacer->replaceInCachedResponse($response));
+        return $cacher->getCachedPage($request)->toResponse($request);
     }
 
     public static function renderUsing(Closure $callback): void

@@ -122,6 +122,91 @@ class SharedErrorsStaticCachingTest extends TestCase
             ->assertNotFound()
             ->assertSee('404 REPLACED_ON_SERVE', false);
     }
+
+    public function shareErrorsWithHalfMeasure($app)
+    {
+        $app['config']->set('statamic.static_caching.strategy', 'half');
+        $app['config']->set('statamic.static_caching.share_errors', true);
+    }
+
+    #[Test]
+    #[DefineEnvironment('shareErrorsWithHalfMeasure')]
+    public function each_session_gets_its_own_csrf_token_on_a_shared_error()
+    {
+        Cache::flush();
+
+        $this->withStandardFakeViews();
+        $this->viewShouldReturnRaw('errors.layout', '{{ template_content }}');
+        $this->viewShouldReturnRaw('errors.404', '404 {{ csrf_token }}');
+
+        // First 404 renders live and seeds the shared cache.
+        $this->withSession(['_token' => 'session-one-token'])
+            ->get('/nope-one')
+            ->assertNotFound()
+            ->assertSee('404 session-one-token', false);
+
+        // A different URL that also 404s is served from the shared cache, but
+        // for a different session. It must get its own token, not the one
+        // frozen into the shared cache by the first visitor.
+        $this->withSession(['_token' => 'session-two-token'])
+            ->get('/nope-two')
+            ->assertNotFound()
+            ->assertSee('404 session-two-token', false)
+            ->assertDontSee('session-one-token', false);
+
+        // A repeat hit on that second URL, now cached under its own URL,
+        // must still resolve session two's current token, not a frozen one.
+        $this->withSession(['_token' => 'session-two-token'])
+            ->get('/nope-two')
+            ->assertNotFound()
+            ->assertSee('404 session-two-token', false);
+    }
+
+    #[Test]
+    #[DefineEnvironment('shareErrorsWithHalfMeasure')]
+    public function nocache_region_inside_a_shared_error_stays_dynamic_across_repeat_hits()
+    {
+        Cache::flush();
+
+        // Use a tag that outputs something dynamic. It just increments by
+        // one every time it's rendered.
+        app()->instance('example_count', 0);
+
+        (new class extends \Statamic\Tags\Tags
+        {
+            public static $handle = 'example_count';
+
+            public function index()
+            {
+                $count = app('example_count');
+                $count++;
+                app()->instance('example_count', $count);
+
+                return $count;
+            }
+        })::register();
+
+        $this->withStandardFakeViews();
+        $this->viewShouldReturnRaw('errors.layout', '{{ template_content }}');
+        $this->viewShouldReturnRaw('errors.404', '404 {{ nocache }}{{ example_count }}{{ /nocache }}');
+
+        // First 404 renders live and seeds the shared cache.
+        $this->get('/nope-one')->assertNotFound()->assertSee('404 1', false);
+
+        // A different URL that also 404s is served from the shared cache.
+        // Its nocache region must render fresh, not replay whatever the
+        // shared cache captured when it was seeded.
+        $this->get('/nope-two')->assertNotFound()->assertSee('404 2', false);
+
+        // Repeat hits to that second URL, now cached under its own URL, must
+        // keep rendering the region fresh too. Before the fix, the first
+        // request served from the shared cache baked the region's rendered
+        // output into the per-URL cache entry, so every later hit on that
+        // URL replayed the same frozen value forever - the same class of
+        // cross-visitor leak this PR fixes for CSRF tokens.
+        $this->get('/nope-two')->assertNotFound()->assertSee('404 3', false);
+        $this->get('/nope-two')->assertNotFound()->assertSee('404 4', false);
+    }
 }
 
 class SharedErrorTestReplacer implements Replacer
