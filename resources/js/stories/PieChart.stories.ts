@@ -118,6 +118,20 @@ export const _CustomMarkers: Story = {
     }),
 };
 
+const imageItems = [
+    {label: 'Cat', percent: 55, count: 136, image: 'https://picsum.photos/id/159/320/320', badge: 'A'},
+    {label: 'Dog', percent: 45, count: 112, image: 'https://picsum.photos/id/237/320/320', badge: 'B'},
+];
+
+export const _ImageSlices: Story = {
+    tags: ['!dev'],
+    args: {
+        items: imageItems,
+        accessibleLabel: 'Spirit animal: Cat 55%, Dog 45%',
+    },
+    parameters: {docs: {source: {code: `<PieChart :items="items" accessible-label="Spirit animal: Cat 55%, Dog 45%" />`}}},
+};
+
 export const TestRendersAccessibleChartAndLegend: Story = {
     tags: ['!dev', 'test'],
     play: async ({canvasElement}) => {
@@ -138,5 +152,22 @@ export const TestClickableLegendItemEmitsSelection: Story = {
         await userEvent.click(within(canvasElement).getByRole('button', {name: /Other/}));
 
         expect(args.onSelect).toHaveBeenCalled();
+    },
+};
+
+export const TestRendersImageSlicesAndBadges: Story = {
+    tags: ['!dev', 'test'],
+    args: {
+        items: imageItems,
+        accessibleLabel: 'Spirit animal: Cat 55%, Dog 45%',
+    },
+    play: async ({canvasElement}) => {
+        const canvas = within(canvasElement);
+
+        expect(canvas.getByRole('img', {name: /Spirit animal/})).toBeVisible();
+        expect(canvasElement.querySelectorAll('.image-pie-chart__slice')).toHaveLength(2);
+        expect(canvasElement.querySelector('.pie-chart__disc')).toBeNull();
+        expect(canvas.getByText('A')).toBeVisible();
+        expect(canvas.getByText('Cat')).toBeVisible();
     },
 };

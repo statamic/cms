@@ -52,7 +52,6 @@ export const {
     HorizontalLollipopChart,
     HoverCard,
     Icon,
-    ImagePieChart,
     Input,
     InputGroup,
     InputGroupAppend,

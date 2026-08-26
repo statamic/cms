@@ -11,7 +11,6 @@ export { default as CardPanel } from './Card/Panel.vue';
 export { default as CharacterCounter } from './CharacterCounter.vue';
 export { default as HorizontalBarChart } from './Chart/HorizontalBarChart.vue';
 export { default as HorizontalLollipopChart } from './Chart/HorizontalLollipopChart.vue';
-export { default as ImagePieChart } from './Chart/ImagePieChart.vue';
 export { default as PieChart } from './Chart/PieChart.vue';
 export { default as VerticalBarChart } from './Chart/VerticalBarChart.vue';
 export { default as Checkbox } from './Checkbox/Item.vue';

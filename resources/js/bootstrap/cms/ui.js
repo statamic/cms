@@ -50,7 +50,6 @@ export {
     HorizontalLollipopChart,
     HoverCard,
     Icon,
-    ImagePieChart,
     Input,
     InputGroup,
     InputGroupAppend,

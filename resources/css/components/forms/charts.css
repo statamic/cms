@@ -116,16 +116,6 @@
 
 /* GROUP CHARTS / IMAGE PIE CHART
 =================================================== */
-.image-pie-chart-figure {
-    display: grid;
-    grid-template-columns: 0.6fr 1fr;
-    @apply gap-4 p-6;
-}
-
-.image-pie-chart-legend {
-    @apply pt-4;
-}
-
 .image-pie-chart {
     --label-radius: 30%;
 

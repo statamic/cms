@@ -172,7 +172,6 @@ it('exports ui', async () => {
         'HorizontalLollipopChart',
         'HoverCard',
         'Icon',
-        'ImagePieChart',
         'Input',
         'InputGroup',
         'InputGroupAppend',
