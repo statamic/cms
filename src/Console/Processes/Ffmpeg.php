@@ -2,12 +2,15 @@
 
 namespace Statamic\Console\Processes;
 
-use Illuminate\Support\Once;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 
 class Ffmpeg extends Process
 {
     protected string $startTimestamp = '00:00:00';
+
+    private static bool $binaryResolved = false;
+
+    private static ?string $resolvedBinary = null;
 
     public function startTimestamp(string $startTimestamp): self
     {
@@ -57,7 +60,13 @@ class Ffmpeg extends Process
 
     public function ffmpegBinary(): ?string
     {
-        return once(fn () => $this->resolveFfmpegBinary());
+        if (static::$binaryResolved) {
+            return static::$resolvedBinary;
+        }
+
+        static::$binaryResolved = true;
+
+        return static::$resolvedBinary = $this->resolveFfmpegBinary();
     }
 
     private function resolveFfmpegBinary(): ?string
@@ -86,6 +95,7 @@ class Ffmpeg extends Process
 
     public static function clearBinaryCache(): void
     {
-        Once::flush();
+        static::$binaryResolved = false;
+        static::$resolvedBinary = null;
     }
 }

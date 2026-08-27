@@ -37,6 +37,23 @@ class FfmpegTest extends TestCase
         $this->assertFalse((new Ffmpeg)->available());
     }
 
+    #[Test]
+    public function it_memoizes_binary_resolution_across_instances()
+    {
+        Ffmpeg::clearBinaryCache();
+        config(['statamic.assets.ffmpeg.binary' => PHP_BINARY]);
+
+        $resolved = (new Ffmpeg)->ffmpegBinary();
+
+        config(['statamic.assets.ffmpeg.binary' => storage_path('missing-ffmpeg-binary')]);
+
+        $this->assertSame($resolved, (new Ffmpeg)->ffmpegBinary());
+
+        Ffmpeg::clearBinaryCache();
+
+        $this->assertNull((new Ffmpeg)->ffmpegBinary());
+    }
+
     private function buildCommand(...$arguments)
     {
         $method = (new \ReflectionClass(Ffmpeg::class))->getMethod('buildCommand');
