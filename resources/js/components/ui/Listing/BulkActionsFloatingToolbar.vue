@@ -5,7 +5,7 @@
  * Renders the floating toolbar when items are selected in a listing, with keyboard shortcuts
  * for each action. Shortcuts are derived from the localized action title (first unused letter).
  * Delete uses the backspace icon and is triggered by Delete/Backspace only.
- * Select-all-matching uses A when that control is visible (reserved so actions skip it).
+ * Select-all-matching uses A (always reserved so actions skip it).
  */
 import { Motion } from 'motion-v';
 import { computed, onMounted, onUnmounted, toValue } from 'vue';
@@ -59,8 +59,8 @@ function findShortcutKey(action, used) {
 
 const actionsWithShortcuts = computed(() => {
     const used = new Set();
-    // Reserve A for select-all-matching whenever that control is visible.
-    if (showSelectAllMatching.value) used.add(SELECT_ALL_MATCHING_SHORTCUT_KEY);
+    // Always reserve A so action shortcuts stay stable whether the select-all row is visible.
+    used.add(SELECT_ALL_MATCHING_SHORTCUT_KEY);
 
     return (props.actions || []).map((action) => {
         // Delete always shows the backspace icon and is triggered by Delete/Backspace only; no letter.
