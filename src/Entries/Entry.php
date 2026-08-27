@@ -38,6 +38,7 @@ use Statamic\Events\EntryDeleting;
 use Statamic\Events\EntrySaved;
 use Statamic\Events\EntrySaving;
 use Statamic\Exceptions\BlueprintNotFoundException;
+use Statamic\Exceptions\EntryOriginRecursionException;
 use Statamic\Facades;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Blink;
@@ -399,6 +400,8 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
     public function save()
     {
+        $this->ensureOriginIsNotRecursive();
+
         $isNew = is_null(Facades\Entry::find($this->id()));
 
         $withEvents = $this->withEvents;
@@ -847,16 +850,22 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
     public function ancestors()
     {
-        $ancestors = collect();
+        return collect($this->originChain());
+    }
 
-        $origin = $this->origin();
-
-        while ($origin) {
-            $ancestors->push($origin);
-            $origin = $origin->origin();
+    private function ensureOriginIsNotRecursive()
+    {
+        if (! $this->origin) {
+            return;
         }
 
-        return $ancestors;
+        $last = collect($this->originChain())->last() ?? $this;
+
+        if ($last->origin() === null) {
+            return;
+        }
+
+        throw new EntryOriginRecursionException($this->id(), $this->origin);
     }
 
     public function directDescendants()
