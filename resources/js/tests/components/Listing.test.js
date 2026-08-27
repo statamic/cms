@@ -175,6 +175,41 @@ test('allMatchingSelected clears when listing filters change', async () => {
     expect(listing.allMatchingSelected.value).toBe(false);
 });
 
+test('allMatchingSelected clears when listing url changes', async () => {
+    const wrapper = mountListing({
+        items: [{ id: 'a' }, { id: 'b' }],
+        url: '/cp/assets/browse/folders/main',
+    });
+    const { listing } = wrapper.findComponent(Probe).vm;
+
+    listing.meta.value = { total: 2 };
+    listing.selections.value = ['a', 'b'];
+    listing.selectedAllMatching.value = true;
+
+    await wrapper.setProps({ url: '/cp/assets/browse/folders/main/subfolder' });
+    await flushPromises();
+
+    expect(listing.selectedAllMatching.value).toBe(false);
+});
+
+test('allMatchingSelected clears when additionalParameters change', async () => {
+    const wrapper = mountListing({
+        items: [{ id: 'a' }, { id: 'b' }],
+        url: '/cp/users',
+        additionalParameters: { group: 'editors' },
+    });
+    const { listing } = wrapper.findComponent(Probe).vm;
+
+    listing.meta.value = { total: 2 };
+    listing.selections.value = ['a', 'b'];
+    listing.selectedAllMatching.value = true;
+
+    await wrapper.setProps({ additionalParameters: { group: 'admins' } });
+    await flushPromises();
+
+    expect(listing.selectedAllMatching.value).toBe(false);
+});
+
 test('canSelectAllMatching stays hidden after perPage changes when all ids are selected', async () => {
     axios.get.mockResolvedValue({
         data: {

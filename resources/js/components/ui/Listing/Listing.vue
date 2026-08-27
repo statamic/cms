@@ -639,6 +639,8 @@ const canSelectAllMatching = computed(() =>
 // Only invalidate all-matching mode when the result set itself changes.
 const matchingQueryKey = computed(() =>
     JSON.stringify({
+        url: props.url ?? null,
+        additionalParameters: props.additionalParameters ?? {},
         search: parameters.value.search ?? null,
         filters: parameters.value.filters ?? null,
         sort: parameters.value.sort ?? null,
