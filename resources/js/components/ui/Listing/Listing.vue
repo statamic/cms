@@ -354,9 +354,12 @@ async function selectAllMatching() {
         const ids = await fetchAllMatchingIds({
             get: axios.get.bind(axios),
             url: props.url,
-            parameters: parameters.value,
+            parameters: {
+                ...parameters.value,
+                columns: 'id',
+            },
             total: meta.value.total,
-            pageSize: perPage.value || meta.value.per_page || 100,
+            pageSize: selectAllMatchingPageSize(),
             signal: controller.signal,
             maxSelections: props.maxSelections,
         });
@@ -376,6 +379,16 @@ async function selectAllMatching() {
         selectingAllMatching.value = false;
         selectAllMatchingSource = null;
     }
+}
+
+function selectAllMatchingPageSize() {
+    const options = Statamic.$config.get('paginationSizeOptions');
+
+    if (Array.isArray(options) && options.length > 0) {
+        return Math.max(...options.map(Number));
+    }
+
+    return perPage.value || meta.value?.per_page || 100;
 }
 
 function request() {

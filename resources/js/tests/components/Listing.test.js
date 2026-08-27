@@ -15,7 +15,13 @@ vi.mock('axios', () => ({
 Object.keys(Globals).forEach((fn) => (window[fn] = Globals[fn]));
 
 window.Statamic = {
-    $config: { get: () => undefined },
+    $config: {
+        get: (key, fallback) => {
+            if (key === 'paginationSizeOptions') return [10, 25, 50, 100];
+            if (key === 'paginationSize') return 50;
+            return fallback;
+        },
+    },
     $progress: { loading: () => {}, complete: () => {} },
     $preferences: { get: () => undefined },
     $events: { $on: () => {}, $off: () => {}, $emit: () => {} },
@@ -112,7 +118,11 @@ test('canSelectAllMatching can be disabled via allowSelectAllMatching', async ()
 });
 
 test('canSelectAllMatching is hidden when total exceeds selectAllLimit', async () => {
-    window.Statamic.$config.get = (key, fallback) => (key === 'selectAllLimit' ? 3 : fallback);
+    const previousGet = window.Statamic.$config.get;
+    window.Statamic.$config.get = (key, fallback) => {
+        if (key === 'selectAllLimit') return 3;
+        return previousGet(key, fallback);
+    };
 
     axios.get.mockResolvedValue({
         data: {
@@ -138,7 +148,7 @@ test('canSelectAllMatching is hidden when total exceeds selectAllLimit', async (
 
     expect(listing.canSelectAllMatching.value).toBe(false);
 
-    window.Statamic.$config.get = () => undefined;
+    window.Statamic.$config.get = previousGet;
 });
 
 test('selectAllMatching pages through listing results past the perPage ceiling', async () => {
@@ -183,6 +193,8 @@ test('selectAllMatching pages through listing results past the perPage ceiling',
     expect(listing.allMatchingSelected.value).toBe(true);
     expect(listing.canSelectAllMatching.value).toBe(false);
     expect(axios.get.mock.calls.some((call) => call[1]?.params?.page === 3)).toBe(true);
+    expect(axios.get.mock.calls.some((call) => call[1]?.params?.perPage === 100)).toBe(true);
+    expect(axios.get.mock.calls.some((call) => call[1]?.params?.columns === 'id')).toBe(true);
 });
 
 test('selectAllMatching stays selected when fetched ids are fewer than meta.total', async () => {
