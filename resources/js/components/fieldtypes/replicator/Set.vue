@@ -18,6 +18,7 @@ import PreviewHtml from '@/components/fieldtypes/replicator/PreviewHtml.js';
 import FieldAction from '@/components/field-actions/FieldAction.js';
 import toFieldActions from '@/components/field-actions/toFieldActions.js';
 import { reveal } from '@api';
+import { field_width_class } from '@/bootstrap/globals.js';
 
 const emit = defineEmits(['collapsed', 'expanded', 'duplicated', 'removed']);
 
@@ -49,6 +50,7 @@ const fieldPathPrefix = computed(() => `${props.fieldPath}.${props.index}`);
 const metaPathPrefix = computed(() => `${props.metaPath}.existing.${props.id}`);
 const isInvalid = computed(() => Object.keys(props.config).length === 0);
 const hasFields = computed(() => Array.isArray(props.config.fields) ? props.config.fields.length > 0 : Object.keys(props.config.fields || {}).length > 0);
+const widthClass = computed(() => field_width_class(props.config.width ?? 100));
 
 const setGroup = computed(() => {
     if (replicatorSets.length < 1) return null;
@@ -125,7 +127,7 @@ reveal.use(rootEl, () => emit('expanded'));
 </script>
 
 <template>
-    <div ref="rootEl" :class="sortableItemClass">
+    <div ref="rootEl" :class="[sortableItemClass, widthClass]">
         <slot name="picker" />
         <div
             layout

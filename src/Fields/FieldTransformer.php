@@ -89,6 +89,10 @@ class FieldTransformer
                                             unset($set['hide']);
                                         }
 
+                                        if (Arr::get($set, 'width') === 100) {
+                                            unset($set['width']);
+                                        }
+
                                         return $set;
                                     })
                                     ->filter()

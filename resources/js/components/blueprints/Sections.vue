@@ -1,6 +1,12 @@
 <template>
     <div>
-        <div ref="sections" class="blueprint-sections flex flex-wrap outline-hidden" :data-tab="tabId" tabindex="-1">
+        <div
+            ref="sections"
+            class="blueprint-sections outline-hidden"
+            :class="showSectionHandleField ? 'field-grid' : 'flex flex-wrap'"
+            :data-tab="tabId"
+            tabindex="-1"
+        >
             <BlueprintSection
                 ref="section"
                 v-for="(section, i) in sections"
@@ -18,7 +24,7 @@
                 @deleted="deleteSection(i)"
             />
 
-            <div class="blueprint-add-section-container w-full">
+            <div class="blueprint-add-section-container" :class="showSectionHandleField ? 'field-w-100' : 'w-full'">
                 <button class="blueprint-add-section-button" @click="addAndEditSection">
                     <div class="flex items-center gap-2">
                         <ui-icon name="plus" class="size-4" />
@@ -114,6 +120,7 @@ export default {
                 collapsed: false,
                 icon: null,
                 hide: null,
+                width: 100,
                 handle: snake_case(this.newSectionText),
                 fields: [],
             };
