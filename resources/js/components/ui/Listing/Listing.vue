@@ -421,7 +421,7 @@ function request() {
             });
         })
         .catch((e) => {
-            if (isRequestCanceled(e) || axios.isCancel?.(e)) return;
+            if (isRequestCanceled(e) || axios.isCancel(e)) return;
             initializing.value = false;
             loading.value = false;
             if (e.request && !e.response) return;
