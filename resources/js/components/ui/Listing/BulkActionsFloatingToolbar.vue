@@ -8,7 +8,7 @@
  * Select-all-matching uses A (always reserved so actions skip it).
  */
 import { Motion } from 'motion-v';
-import { computed, onMounted, onUnmounted, toValue } from 'vue';
+import { computed, onMounted, onUnmounted } from 'vue';
 import { Button, ButtonGroup, Icon } from '@ui';
 
 // ——— Keyboard shortcut constants ———
@@ -29,15 +29,15 @@ const props = defineProps({
     visible: { type: Boolean, default: false },
     selections: { type: Array, default: () => [] },
     clearSelections: { type: Function, default: null },
-    canSelectAllMatching: { type: [Boolean, Object], default: false },
+    canSelectAllMatching: { type: Boolean, default: false },
     selectAllMatching: { type: Function, default: null },
-    selectingAllMatching: { type: [Boolean, Object], default: false },
+    selectingAllMatching: { type: Boolean, default: false },
     matchingTotal: { type: Number, default: 0 },
 });
 
 const hasSelections = computed(() => (props.selections?.length ?? 0) > 0);
-const showSelectAllMatching = computed(() => !!toValue(props.canSelectAllMatching));
-const isSelectingAllMatching = computed(() => !!toValue(props.selectingAllMatching));
+const showSelectAllMatching = computed(() => !!props.canSelectAllMatching);
+const isSelectingAllMatching = computed(() => !!props.selectingAllMatching);
 
 /** True if this action is the built-in delete (by handle or trash icon). */
 function isDeleteAction(action) {
