@@ -181,6 +181,7 @@ const initializing = ref(true);
 const loading = ref(true);
 const selectingAllMatching = ref(false);
 const selectedAllMatching = ref(false);
+const selectedAllMatchingCount = ref(0);
 const selectAllLimit = computed(() => resolveSelectAllLimit(Statamic.$config.get('selectAllLimit')));
 let popping = false;
 let source = null;
@@ -362,6 +363,7 @@ async function selectAllMatching() {
 
         if (selectAllMatchingSource !== controller) return;
 
+        selectedAllMatchingCount.value = ids.length;
         selections.value.splice(0, selections.value.length, ...ids);
         selectedAllMatching.value = true;
     } catch (e) {
@@ -614,16 +616,13 @@ function selectRange(from, to) {
 function clearSelections() {
     abortSelectAllMatching();
     selectedAllMatching.value = false;
+    selectedAllMatchingCount.value = 0;
     selections.value.splice(0, selections.value.length);
 }
 
 const pageFullySelected = computed(() => isPageFullySelected(items.value, selections.value));
 
-const allMatchingSelected = computed(() => {
-    const total = meta.value?.total ?? 0;
-
-    return selectedAllMatching.value && total > 0 && selections.value.length >= total;
-});
+const allMatchingSelected = computed(() => selectedAllMatching.value);
 
 const canSelectAllMatching = computed(() =>
     props.allowSelectAllMatching &&
@@ -653,14 +652,15 @@ const matchingQueryKey = computed(() =>
 
 watch(matchingQueryKey, () => {
     selectedAllMatching.value = false;
+    selectedAllMatchingCount.value = 0;
 });
 
 watch(
     selections,
     (next) => {
-        const total = meta.value?.total ?? 0;
-        if (selectedAllMatching.value && next.length < total) {
+        if (selectedAllMatching.value && next.length < selectedAllMatchingCount.value) {
             selectedAllMatching.value = false;
+            selectedAllMatchingCount.value = 0;
         }
     },
     { deep: true },
@@ -762,6 +762,7 @@ provideListingContext({
     canSelectAllMatching,
     allMatchingSelected,
     selectedAllMatching,
+    selectedAllMatchingCount,
     actionUrl: toRef(() => props.actionUrl),
     actionContext: toRef(() => props.actionContext),
     showBulkActions,

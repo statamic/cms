@@ -185,6 +185,64 @@ test('selectAllMatching pages through listing results past the perPage ceiling',
     expect(axios.get.mock.calls.some((call) => call[1]?.params?.page === 3)).toBe(true);
 });
 
+test('selectAllMatching stays selected when fetched ids are fewer than meta.total', async () => {
+    axios.get.mockImplementation(async (url, { params }) => {
+        const pages = {
+            1: {
+                data: [{ id: '1' }, { id: '2' }],
+                meta: { last_page: 2, total: 5, per_page: 2, columns: [] },
+            },
+            2: {
+                data: [{ id: '3' }, { id: '4' }],
+                meta: { last_page: 2, total: 5, per_page: 2, columns: [] },
+            },
+        };
+
+        return { data: pages[params.page] };
+    });
+
+    const wrapper = mountListing({
+        url: '/cp/collections/test/entries',
+        items: undefined,
+        actionUrl: '/cp/collections/test/entries/actions',
+        perPage: 2,
+    });
+
+    await flushPromises();
+
+    const { listing } = wrapper.findComponent(Probe).vm;
+
+    listing.meta.value = { total: 5, per_page: 2, last_page: 3, columns: [] };
+    listing.items.value = [{ id: '1' }, { id: '2' }];
+    listing.selections.value = ['1', '2'];
+
+    await listing.selectAllMatching();
+    await flushPromises();
+
+    expect(listing.selections.value).toEqual(['1', '2', '3', '4']);
+    expect(listing.selectedAllMatching.value).toBe(true);
+    expect(listing.allMatchingSelected.value).toBe(true);
+    expect(listing.canSelectAllMatching.value).toBe(false);
+});
+
+test('selectedAllMatching clears when a selection is removed after select-all', async () => {
+    const wrapper = mountListing({
+        items: [{ id: 'a' }, { id: 'b' }],
+        url: '/cp/collections/test/entries',
+    });
+    const { listing } = wrapper.findComponent(Probe).vm;
+
+    listing.meta.value = { total: 4 };
+    listing.selectedAllMatchingCount.value = 4;
+    listing.selections.value = ['a', 'b', 'c', 'd'];
+    listing.selectedAllMatching.value = true;
+
+    listing.selections.value.splice(3, 1);
+    await flushPromises();
+
+    expect(listing.selectedAllMatching.value).toBe(false);
+});
+
 test('allMatchingSelected clears when listing filters change', async () => {
     const wrapper = mountListing({
         items: [{ id: 'a' }, { id: 'b' }],
