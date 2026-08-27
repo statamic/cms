@@ -55,6 +55,11 @@ const props = defineProps({
         type: Boolean,
         default: true,
     },
+    /** When `true`, offers selecting all matching results across pages after the current page is selected. */
+    allowSelectAllMatching: {
+        type: Boolean,
+        default: true,
+    },
     /** The URL from which to retrieve actions. */
     actionUrl: {
         type: String,
@@ -619,6 +624,7 @@ const allMatchingSelected = computed(() => {
 });
 
 const canSelectAllMatching = computed(() =>
+    props.allowSelectAllMatching &&
     canSelectAllMatchingHelper({
         hasUrl: !!props.url && !props.items,
         total: meta.value?.total ?? 0,
