@@ -2,15 +2,12 @@
 
 namespace Statamic\Console\Processes;
 
+use Illuminate\Support\Once;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 
 class Ffmpeg extends Process
 {
     protected string $startTimestamp = '00:00:00';
-
-    private static bool $binaryResolved = false;
-
-    private static ?string $resolvedBinary = null;
 
     public function startTimestamp(string $startTimestamp): self
     {
@@ -60,14 +57,13 @@ class Ffmpeg extends Process
 
     public function ffmpegBinary(): ?string
     {
-        if (static::$binaryResolved) {
-            return static::$resolvedBinary;
-        }
+        return once(fn () => $this->resolveFfmpegBinary());
+    }
 
-        static::$binaryResolved = true;
-
+    private function resolveFfmpegBinary(): ?string
+    {
         if ($binary = config('statamic.assets.ffmpeg.binary')) {
-            return static::$resolvedBinary = is_executable($binary) ? $binary : null;
+            return is_executable($binary) ? $binary : null;
         }
 
         $output = $this->run($this->isWindows() ? 'where ffmpeg' : 'which ffmpeg');
@@ -78,19 +74,18 @@ class Ffmpeg extends Process
         }
 
         if (str($output)->lower()->contains('could not find files for the given')) {
-            return static::$resolvedBinary = null;
+            return null;
         }
 
         $resolved = str(StringUtilities::normalizeLineEndings(trim($output)))
             ->explode("\n")
             ->first();
 
-        return static::$resolvedBinary = filled($resolved) ? $resolved : null;
+        return filled($resolved) ? $resolved : null;
     }
 
     public static function clearBinaryCache(): void
     {
-        static::$binaryResolved = false;
-        static::$resolvedBinary = null;
+        Once::flush();
     }
 }

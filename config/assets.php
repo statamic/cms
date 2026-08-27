@@ -273,6 +273,7 @@ return [
     |
     | Statamic uses FFmpeg to extract thumbnails from videos to be shown in the
     | Control Panel. You may adjust the binary location and cache path here.
+    | The configured binary must exist and be executable.
     |
     */
 
