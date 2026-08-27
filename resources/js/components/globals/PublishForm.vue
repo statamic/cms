@@ -293,10 +293,6 @@ export default {
         switchToLocalization(localization) {
             this.localizing = localization.handle;
 
-            if (this.publishContainer === 'base') {
-                window.history.replaceState({}, '', localization.url + window.location.hash);
-            }
-
             this.$axios.get(localization.url).then((response) => {
                 clearTimeout(this.trackDirtyStateTimeout);
                 this.trackDirtyState = false;
@@ -315,6 +311,10 @@ export default {
                 this.reference = data.reference;
                 this.localizing = false;
                 this.afterActionSuccessfullyCompleted(data);
+
+                if (this.publishContainer === 'base' && localization.url) {
+                    window.history.replaceState({}, '', localization.url + window.location.hash);
+                }
 
                 // After any fieldtypes do a debounced update
                 this.trackDirtyStateTimeout = setTimeout(() => {
