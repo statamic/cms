@@ -8,6 +8,7 @@ use Statamic\Console\Processes\Ffmpeg;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\User;
 use Statamic\Http\Resources\CP\Assets\AssetsFieldtypeAsset;
+use Statamic\Statamic;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -54,7 +55,7 @@ class VideoThumbnailTest extends TestCase
     }
 
     #[Test]
-    public function it_returns_a_filetype_icon_when_video_thumbnail_cannot_be_generated()
+    public function it_returns_a_video_filetype_icon_when_video_thumbnail_cannot_be_generated()
     {
         $this->withoutFfmpeg();
 
@@ -67,7 +68,27 @@ class VideoThumbnailTest extends TestCase
             ->actingAs($user)
             ->get('/cp/thumbnails/'.base64_encode($asset->id()).'/small')
             ->assertSuccessful()
-            ->assertHeader('Content-Type', 'image/svg+xml');
+            ->assertHeader('Content-Type', 'image/svg+xml')
+            ->assertSee(Statamic::svg('filetypes/video'), false);
+    }
+
+    #[Test]
+    public function it_returns_a_video_filetype_icon_when_video_thumbnails_are_disabled()
+    {
+        config(['statamic.assets.video_thumbnails' => false]);
+        Ffmpeg::clearBinaryCache();
+
+        $asset = $this->createVideoAsset();
+
+        $this->setTestRoles(['test' => ['access cp', 'view test assets']]);
+        $user = User::make()->assignRole('test')->save();
+
+        $this
+            ->actingAs($user)
+            ->get('/cp/thumbnails/'.base64_encode($asset->id()).'/small')
+            ->assertSuccessful()
+            ->assertHeader('Content-Type', 'image/svg+xml')
+            ->assertSee(Statamic::svg('filetypes/video'), false);
     }
 
     private function createVideoAsset()
