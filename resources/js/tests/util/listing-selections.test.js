@@ -7,6 +7,7 @@ import {
     isRequestCanceled,
     pageItemIds,
     removePageSelections,
+    resolveSelectAllLimit,
     selectedOnPage,
     unionPageSelections,
 } from '@/util/listing-selections.js';
@@ -95,6 +96,46 @@ test('canSelectAllMatching is false when maxSelections cannot cover the total', 
             maxSelections: 20,
         }),
     ).toBe(false);
+});
+
+test('canSelectAllMatching is false when total exceeds selectAllLimit', () => {
+    expect(
+        canSelectAllMatching({
+            hasUrl: true,
+            total: 50,
+            pageSize: 10,
+            pageFullySelected: true,
+            allMatchingSelected: false,
+            selectAllLimit: 40,
+        }),
+    ).toBe(false);
+});
+
+test('canSelectAllMatching allows totals within selectAllLimit', () => {
+    expect(
+        canSelectAllMatching({
+            hasUrl: true,
+            total: 50,
+            pageSize: 10,
+            pageFullySelected: true,
+            allMatchingSelected: false,
+            selectAllLimit: 50,
+        }),
+    ).toBe(true);
+});
+
+test('resolveSelectAllLimit treats null as unlimited', () => {
+    expect(resolveSelectAllLimit(null)).toBe(Infinity);
+});
+
+test('resolveSelectAllLimit uses fallback when undefined', () => {
+    expect(resolveSelectAllLimit(undefined)).toBe(1000);
+    expect(resolveSelectAllLimit(undefined, 500)).toBe(500);
+});
+
+test('resolveSelectAllLimit coerces positive numbers', () => {
+    expect(resolveSelectAllLimit(2500)).toBe(2500);
+    expect(resolveSelectAllLimit('100')).toBe(100);
 });
 
 test('canSelectAllMatching is false for client-side listings without a url', () => {

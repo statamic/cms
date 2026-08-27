@@ -111,6 +111,36 @@ test('canSelectAllMatching can be disabled via allowSelectAllMatching', async ()
     expect(listing.canSelectAllMatching.value).toBe(false);
 });
 
+test('canSelectAllMatching is hidden when total exceeds selectAllLimit', async () => {
+    window.Statamic.$config.get = (key, fallback) => (key === 'selectAllLimit' ? 3 : fallback);
+
+    axios.get.mockResolvedValue({
+        data: {
+            data: [{ id: '1' }, { id: '2' }],
+            meta: { last_page: 3, total: 5, per_page: 2, columns: [] },
+        },
+    });
+
+    const wrapper = mountListing({
+        url: '/cp/collections/test/entries',
+        items: undefined,
+        actionUrl: '/cp/collections/test/entries/actions',
+        perPage: 2,
+    });
+
+    await flushPromises();
+
+    const { listing } = wrapper.findComponent(Probe).vm;
+
+    listing.meta.value = { total: 5, per_page: 2, last_page: 3, columns: [] };
+    listing.items.value = [{ id: '1' }, { id: '2' }];
+    listing.selections.value = ['1', '2'];
+
+    expect(listing.canSelectAllMatching.value).toBe(false);
+
+    window.Statamic.$config.get = () => undefined;
+});
+
 test('selectAllMatching pages through listing results past the perPage ceiling', async () => {
     axios.get.mockImplementation(async (url, { params }) => {
         const pages = {

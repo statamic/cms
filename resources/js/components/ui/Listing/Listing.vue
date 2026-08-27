@@ -23,7 +23,7 @@ import Table from './Table.vue';
 import Pagination from './Pagination.vue';
 import { sortBy } from 'lodash-es';
 import fuzzysort from 'fuzzysort';
-import { canSelectAllMatching as canSelectAllMatchingHelper, fetchAllMatchingIds, isPageFullySelected, isRequestCanceled } from '@/util/listing-selections.js';
+import { canSelectAllMatching as canSelectAllMatchingHelper, fetchAllMatchingIds, isPageFullySelected, isRequestCanceled, resolveSelectAllLimit } from '@/util/listing-selections.js';
 
 const emit = defineEmits([
     'update:columns',
@@ -181,6 +181,7 @@ const initializing = ref(true);
 const loading = ref(true);
 const selectingAllMatching = ref(false);
 const selectedAllMatching = ref(false);
+const selectAllLimit = computed(() => resolveSelectAllLimit(Statamic.$config.get('selectAllLimit')));
 let popping = false;
 let source = null;
 let selectAllMatchingSource = null;
@@ -341,6 +342,7 @@ function abortSelectAllMatching() {
 
 async function selectAllMatching() {
     if (!props.url || !meta.value?.total) return;
+    if (meta.value.total > selectAllLimit.value) return;
 
     abortSelectAllMatching();
     selectingAllMatching.value = true;
@@ -633,6 +635,7 @@ const canSelectAllMatching = computed(() =>
         allMatchingSelected: allMatchingSelected.value,
         selectedCount: selections.value.length,
         maxSelections: props.maxSelections,
+        selectAllLimit: selectAllLimit.value,
     }),
 );
 

@@ -50,13 +50,27 @@ export function canSelectAllMatching({
     allMatchingSelected,
     selectedCount = 0,
     maxSelections = Infinity,
+    selectAllLimit = Infinity,
 }) {
     if (!hasUrl || allMatchingSelected || !pageFullySelected) return false;
     if (!total || total <= pageSize) return false;
     if (selectedCount >= total) return false;
     if (maxSelections !== Infinity && maxSelections < total) return false;
+    if (selectAllLimit !== Infinity && total > selectAllLimit) return false;
 
     return true;
+}
+
+/**
+ * Resolve the CP select-all ceiling. `null` / falsy config means no limit.
+ */
+export function resolveSelectAllLimit(value, fallback = 1000) {
+    if (value === null) return Infinity;
+    if (value === undefined) return fallback;
+    const limit = Number(value);
+    if (!Number.isFinite(limit) || limit <= 0) return Infinity;
+
+    return limit;
 }
 
 export function isRequestCanceled(error) {
