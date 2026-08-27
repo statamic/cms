@@ -175,3 +175,29 @@ test('fetchAllMatchingIds respects maxSelections', async () => {
     expect(ids).toEqual(['1-a', '1-b', '2-a']);
     expect(get).toHaveBeenCalledTimes(2);
 });
+
+test('fetchAllMatchingIds dedupes ids across pages', async () => {
+    const get = vi.fn(async (url, { params }) => {
+        const pages = {
+            1: {
+                data: [{ id: '1' }, { id: '2' }],
+                meta: { last_page: 2, total: 3 },
+            },
+            2: {
+                data: [{ id: '2' }, { id: '3' }],
+                meta: { last_page: 2, total: 3 },
+            },
+        };
+
+        return { data: pages[params.page] };
+    });
+
+    const ids = await fetchAllMatchingIds({
+        get,
+        url: '/cp/entries',
+        total: 3,
+        pageSize: 2,
+    });
+
+    expect(ids).toEqual(['1', '2', '3']);
+});

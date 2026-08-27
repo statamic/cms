@@ -83,6 +83,7 @@ export async function fetchAllMatchingIds({
 }) {
     const perPage = Math.max(1, pageSize || 100);
     const ids = [];
+    const seen = new Set();
     let page = 1;
     let lastPage = Math.max(1, Math.ceil(total / perPage));
 
@@ -104,10 +105,16 @@ export async function fetchAllMatchingIds({
         });
 
         const pageItems = Object.values(response?.data?.data || {});
-        ids.push(...pageItems.map((item) => item.id));
 
-        if (maxSelections !== Infinity && ids.length >= maxSelections) {
-            return ids.slice(0, maxSelections);
+        for (const item of pageItems) {
+            const id = item.id;
+            if (seen.has(id)) continue;
+            seen.add(id);
+            ids.push(id);
+
+            if (maxSelections !== Infinity && ids.length >= maxSelections) {
+                return ids;
+            }
         }
 
         const responseLastPage = response?.data?.meta?.last_page;
