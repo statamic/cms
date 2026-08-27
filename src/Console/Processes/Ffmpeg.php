@@ -67,7 +67,7 @@ class Ffmpeg extends Process
         static::$binaryResolved = true;
 
         if ($binary = config('statamic.assets.ffmpeg.binary')) {
-            return static::$resolvedBinary = $binary;
+            return static::$resolvedBinary = is_executable($binary) ? $binary : null;
         }
 
         $output = $this->run($this->isWindows() ? 'where ffmpeg' : 'which ffmpeg');
