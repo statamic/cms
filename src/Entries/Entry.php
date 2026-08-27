@@ -235,7 +235,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         return array_merge([
             'collection' => $this->collectionHandle(),
             'locale' => $this->locale(),
-            'origin' => $this->hasOrigin() ? $this->origin()->id() : null,
+            'origin' => $this->origin,
             'slug' => $this->slug(),
             'date' => optional($this->date())->format('Y-m-d-Hi'),
             'published' => $this->published(),
