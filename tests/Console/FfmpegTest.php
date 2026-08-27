@@ -54,6 +54,35 @@ class FfmpegTest extends TestCase
         $this->assertNull((new Ffmpeg)->ffmpegBinary());
     }
 
+    #[Test]
+    public function it_ignores_a_path_discovered_binary_that_is_not_executable()
+    {
+        Ffmpeg::clearBinaryCache();
+        config(['statamic.assets.ffmpeg.binary' => null]);
+
+        $path = storage_path('non-executable-ffmpeg');
+        file_put_contents($path, '');
+        chmod($path, 0644);
+
+        $ffmpeg = new class($path) extends Ffmpeg
+        {
+            public function __construct(private string $discoveredPath)
+            {
+                parent::__construct();
+            }
+
+            public function run($command, $cacheKey = null)
+            {
+                return $this->discoveredPath;
+            }
+        };
+
+        $this->assertNull($ffmpeg->ffmpegBinary());
+        $this->assertFalse($ffmpeg->available());
+
+        @unlink($path);
+    }
+
     private function buildCommand(...$arguments)
     {
         $method = (new \ReflectionClass(Ffmpeg::class))->getMethod('buildCommand');

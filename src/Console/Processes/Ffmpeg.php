@@ -90,7 +90,11 @@ class Ffmpeg extends Process
             ->explode("\n")
             ->first();
 
-        return filled($resolved) ? $resolved : null;
+        if (! filled($resolved) || ! is_executable($resolved)) {
+            return null;
+        }
+
+        return $resolved;
     }
 
     public static function clearBinaryCache(): void
