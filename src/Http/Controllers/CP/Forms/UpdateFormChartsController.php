@@ -7,6 +7,8 @@ use Illuminate\Validation\ValidationException;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Statamic;
 
+use function Statamic\trans as __;
+
 class UpdateFormChartsController extends CpController
 {
     public function __invoke(Request $request, $form)
