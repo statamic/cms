@@ -132,7 +132,7 @@ reveal.use(rootEl, () => emit('expanded'));
             data-replicator-set
             class="relative w-full rounded-lg border border-gray-300 text-base dark:border-white/10 bg-white dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black shadow-ui-sm dark:[&_[data-ui-switch]]:border-gray-600 dark:[&_[data-ui-switch]]:border-1"
             :class="{
-                'border-red-500': hasError
+                'border-red-500': hasError,
             }"
             :data-collapsed="collapsed ?? undefined"
             :data-error="hasError ?? undefined"
