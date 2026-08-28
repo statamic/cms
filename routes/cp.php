@@ -49,6 +49,7 @@ use Statamic\Http\Controllers\CP\Collections\ScaffoldCollectionController;
 use Statamic\Http\Controllers\CP\CommandPaletteController;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Controllers\CP\DashboardController;
+use Statamic\Http\Controllers\CP\DashboardWidgetsController;
 use Statamic\Http\Controllers\CP\DuplicatesController;
 use Statamic\Http\Controllers\CP\FieldActionModalController;
 use Statamic\Http\Controllers\CP\Fields\AdditionalBlueprintController;
@@ -161,6 +162,9 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
 
     Route::get('/', StartPageController::class)->name('index');
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('dashboard/widgets/meta', [DashboardWidgetsController::class, 'meta'])->name('dashboard.widgets.meta');
+    Route::patch('dashboard/widgets', [DashboardWidgetsController::class, 'update'])->name('dashboard.widgets.update');
+    Route::delete('dashboard/widgets', [DashboardWidgetsController::class, 'destroy'])->name('dashboard.widgets.destroy');
 
     Route::get('select-site/{handle}', [SelectSiteController::class, 'select']);
 
