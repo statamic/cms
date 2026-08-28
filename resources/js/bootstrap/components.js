@@ -8,6 +8,10 @@ import UserPublishForm from '../components/users/PublishForm.vue';
 import EntryListing from '../components/entries/Listing.vue';
 import CollectionWidget from '../components/entries/CollectionWidget.vue';
 import FormWidget from '../components/forms/FormWidget.vue';
+import AverageInsight from '../components/forms/summary/insights/AverageInsight.vue';
+import CheckedInsight from '../components/forms/summary/insights/CheckedInsight.vue';
+import MinMaxInsight from '../components/forms/summary/insights/MinMaxInsight.vue';
+import StarRatingInsight from '../components/forms/summary/insights/StarRatingInsight.vue';
 import FileIcon from '../components/FileIcon.vue';
 
 import Slugify from '../components/slugs/Slugify.vue';
@@ -59,6 +63,12 @@ export default function registerGlobalComponents(app) {
     app.component('collection-widget', CollectionWidget);
     app.component('form-widget', FormWidget);
     app.component('updater-widget', UpdaterWidget);
+
+    // Form Summary Insights
+    app.component('average-insight', AverageInsight);
+    app.component('checked-insight', CheckedInsight);
+    app.component('min-max-insight', MinMaxInsight);
+    app.component('star-rating-insight', StarRatingInsight);
 
     // Reusable
     app.component('file-icon', FileIcon);
