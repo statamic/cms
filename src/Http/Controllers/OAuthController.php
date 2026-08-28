@@ -13,6 +13,7 @@ use Statamic\Exceptions\OAuthEmailExistsException;
 use Statamic\Facades\OAuth;
 use Statamic\Facades\TwoFactor;
 use Statamic\Facades\URL;
+use Statamic\Facades\User;
 use Statamic\Support\Str;
 
 use function Statamic\trans as __;
@@ -83,7 +84,7 @@ class OAuthController
         }
 
         if (Auth::guard($guard)->check()) {
-            return $this->connectProvider($oauth, $providerUser, Auth::guard($guard)->user());
+            return $this->connectProvider($oauth, $providerUser, User::fromUser(Auth::guard($guard)->user()));
         }
 
         if ($user = $oauth->findUser($providerUser)) {
@@ -127,7 +128,7 @@ class OAuthController
             throw new NotFoundHttpException();
         }
 
-        $oauth->forgetUser($request->user());
+        $oauth->forgetUser(User::fromUser($request->user()));
 
         if ($request->wantsJson()) {
             return new JsonResponse([], 204);
@@ -148,7 +149,7 @@ class OAuthController
 
         $existingUserId = $oauth->getUserId($providerUser->getId());
 
-        if ($existingUserId === $user->id()) {
+        if ($existingUserId === (string) $user->id()) {
             return redirect()
                 ->to($this->successRedirectUrl())
                 ->with('success', __('statamic::messages.oauth_already_connected', ['provider' => $oauth->label()]));
