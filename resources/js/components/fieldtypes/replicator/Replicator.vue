@@ -62,7 +62,7 @@
                                                     :index="index"
                                                     :enabled="canAddSet"
                                                     :is-first="index === 0"
-                                                    :show-connector="false"
+                                                    :show-connector="showCardGroupEntryConnector(group, index)"
                                                     :loading-set="loadingSet"
                                                     @added="addSet"
                                                 />
@@ -98,7 +98,7 @@
                                                 :index="group.index"
                                                 :enabled="canAddSet"
                                                 :is-first="group.index === 0"
-                                                :show-connector="!(group.index === 0 && config.hide_display)"
+                                                :show-connector="showSetConnector(group.index)"
                                                 :loading-set="loadingSet"
                                                 @added="addSet"
                                             />
@@ -264,6 +264,37 @@ export default {
             }
 
             return group.set._id;
+        },
+
+        showSetConnector(index) {
+            if (index === 0) {
+                return !this.config.hide_display;
+            }
+
+            const set = this.value[index];
+            const previous = this.value[index - 1];
+
+            if (
+                this.setConfig(set.type).card
+                && this.setConfig(previous.type).card
+                && previous.type === set.type
+            ) {
+                return false;
+            }
+
+            return true;
+        },
+
+        showCardGroupEntryConnector(group, index) {
+            if (group.items[0].index !== index) {
+                return false;
+            }
+
+            if (index === 0) {
+                return false;
+            }
+
+            return this.showSetConnector(index);
         },
 
         updated(index, set) {
