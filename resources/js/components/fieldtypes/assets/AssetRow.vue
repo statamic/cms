@@ -18,6 +18,7 @@
                     :src="thumbnail"
                     :alt="asset.basename"
                     v-if="thumbnail"
+                    @error="asset.thumbnail = null"
                 />
                 <file-icon :extension="asset.extension ?? 'generic'" v-else class="size-7" />
             </button>
