@@ -41,7 +41,7 @@ class ViewSubmissionsListingTest extends TestCase
             ->actingAs($user)
             ->get(cp_route('forms.submissions.index', $form->handle()))
             ->assertSuccessful()
-            ->assertInertia(fn ($page) => $page->component('forms/Submissions'));
+            ->assertInertia(fn ($page) => $page->component('forms/submissions/Index'));
     }
 
     #[Test]
@@ -55,7 +55,7 @@ class ViewSubmissionsListingTest extends TestCase
             ->actingAs($user)
             ->get(cp_route('forms.submissions.index', $form->handle()))
             ->assertSuccessful()
-            ->assertInertia(fn ($page) => $page->component('forms/Submissions'));
+            ->assertInertia(fn ($page) => $page->component('forms/submissions/Index'));
     }
 
     #[Test]
