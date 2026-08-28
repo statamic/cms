@@ -107,17 +107,6 @@ class FormSubmissionsController extends CpController
         return $query;
     }
 
-    public function destroy($form, $id)
-    {
-        $submission = $form->submission($id);
-
-        $this->authorize('delete', $submission);
-
-        $submission->delete();
-
-        return response('', 204);
-    }
-
     public function show($form, $submission)
     {
         if (! $submission = $form->submission($submission)) {
@@ -140,6 +129,17 @@ class FormSubmissionsController extends CpController
             'values' => $fields->values(),
             'meta' => $fields->meta(),
         ]);
+    }
+
+    public function destroy($form, $id)
+    {
+        $submission = $form->submission($id);
+
+        $this->authorize('delete', $submission);
+
+        $submission->delete();
+
+        return response('', 204);
     }
 
     public function generateFake(Request $request, $form, FakeSubmissionGenerator $generator)
