@@ -173,6 +173,8 @@ return [
     'elevated_session_verification_code' => 'The verification code is incorrect.',
     'email_available' => 'A user with this email already exists.',
     'fieldset_imported_recursively' => 'Fieldset :handle is being imported recursively.',
+    'form_chart_unknown_chart' => 'Chart :chart does not exist.',
+    'form_chart_unknown_field' => 'Field :field does not exist on this form.',
     'one_site_without_origin' => 'At least one site must not have an origin.',
     'options_require_keys' => 'All options must have keys.',
     'origin_cannot_be_disabled' => 'Cannot select a disabled origin.',
