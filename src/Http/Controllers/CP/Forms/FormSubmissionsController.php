@@ -2,14 +2,9 @@
 
 namespace Statamic\Http\Controllers\CP\Forms;
 
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Statamic\CP\Column;
-use Statamic\Events\FormSubmitted;
 use Statamic\Facades\Scope;
-use Statamic\Facades\Site;
-use Statamic\Forms\FakeSubmissionGenerator;
-use Statamic\Forms\SendEmails;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Controllers\CP\Forms\Concerns\ProvidesFormAbilities;
 use Statamic\Http\Controllers\CP\Forms\Concerns\QueriesFormSubmissionSearch;

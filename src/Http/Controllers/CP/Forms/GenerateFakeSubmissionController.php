@@ -8,6 +8,7 @@ use Statamic\Facades\Site;
 use Statamic\Forms\FakeSubmissionGenerator;
 use Statamic\Forms\SendEmails;
 use Statamic\Http\Controllers\CP\CpController;
+
 use function Statamic\trans as __;
 
 class GenerateFakeSubmissionController extends CpController
