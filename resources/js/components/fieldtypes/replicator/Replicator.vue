@@ -47,41 +47,50 @@
                                         @update:model-value="(items) => cardGroupSorted(group, items)"
                                         v-slot="{}"
                                     >
-                                        <div class="replicator-card-sets">
+                                        <div
+                                            class="replicator-card-sets"
+                                            :style="{ '--card-cols': cardGroupColumns(group.items.length) }"
+                                        >
                                             <ReplicatorSet
-                                                v-for="{ set, index } in group.items"
-                                                :key="set._id"
-                                                :id="set._id"
-                                                :index
+                                                v-for="(item, positionInGroup) in group.items"
+                                                :key="item.set._id"
+                                                :id="item.set._id"
+                                                :index="item.index"
                                                 :field-path="setFieldPathPrefix"
                                                 :meta-path="setMetaPathPrefix"
-                                                :values="set"
-                                                :config="setConfig(set.type)"
+                                                :values="item.set"
+                                                :config="setConfig(item.set.type)"
                                                 :sortable-item-class="sortableItemClass"
                                                 :sortable-handle-class="sortableHandleClass"
-                                                :collapsed="collapsed.includes(set._id)"
-                                                :enabled="set.enabled"
+                                                :collapsed="collapsed.includes(item.set._id)"
+                                                :enabled="item.set.enabled"
                                                 :read-only="isReadOnly"
                                                 :can-add-set="canAddSet"
-                                                :has-error="setHasError(set._id)"
+                                                :has-error="setHasError(item.set._id)"
                                                 :show-field-previews="config.previews"
-                                                @collapsed="collapseSet(set._id)"
-                                                @expanded="expandSet(set._id)"
-                                                @duplicated="duplicateSet(set._id)"
-                                                @removed="removed(set, index)"
+                                                @collapsed="collapseSet(item.set._id)"
+                                                @expanded="expandSet(item.set._id)"
+                                                @duplicated="duplicateSet(item.set._id)"
+                                                @removed="removed(item.set, item.index)"
                                             >
                                                 <template v-slot:picker>
-                                                    <add-set-button
-                                                        variant="between"
-                                                        :groups="groupConfigs"
-                                                        :sets="setConfigs"
-                                                        :index="index"
-                                                        :enabled="canAddSet"
-                                                        :is-first="index === 0"
-                                                        :show-connector="showCardGroupEntryConnector(group, index)"
-                                                        :loading-set="loadingSet"
-                                                        @added="addSet"
-                                                    />
+                                                    <div
+                                                        :class="{
+                                                            'replicator-card-set-inset-picker': showCardInsetPicker(group.items.length, positionInGroup),
+                                                        }"
+                                                    >
+                                                        <add-set-button
+                                                            variant="between"
+                                                            :groups="groupConfigs"
+                                                            :sets="setConfigs"
+                                                            :index="item.index"
+                                                            :enabled="canAddSet"
+                                                            :is-first="item.index === 0"
+                                                            :show-connector="showCardGroupEntryConnector(group, item.index)"
+                                                            :loading-set="loadingSet"
+                                                            @added="addSet"
+                                                        />
+                                                    </div>
                                                 </template>
                                             </ReplicatorSet>
                                         </div>
@@ -329,6 +338,26 @@ export default {
             }
 
             return this.showSetConnector(index);
+        },
+
+        cardGroupColumns(count) {
+            if (count <= 1) {
+                return 1;
+            }
+
+            if (count === 2) {
+                return 2;
+            }
+
+            return 3;
+        },
+
+        showCardInsetPicker(cardCount, positionInGroup) {
+            if (positionInGroup === 0) {
+                return false;
+            }
+
+            return positionInGroup % this.cardGroupColumns(cardCount) !== 0;
         },
 
         updated(index, set) {

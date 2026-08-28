@@ -3,38 +3,35 @@
    ========================================================================== */
 
 .replicator-card-sets {
-    /* Has at least 3 children */
-    &:has(> :nth-child(3)) {
-        display: flex;
-        flex-direction: row;
-        gap: 0.75rem;
+    display: grid;
+    grid-template-columns: repeat(var(--card-cols, 1), minmax(0, 1fr));
+    gap: 0.75rem;
 
-        > [class*='-sortable-item'] {
-            flex: 1 1 0;
-            min-width: 0;
-        }
+    > * {
+        min-width: 0;
+    }
 
-        .publish-fields {
-            /* Prevent columns and gaps exceeding the container */
-            grid-column-gap: unset;
-        }
+    .publish-fields {
+        /* Prevent columns and gaps exceeding the container */
+        grid-column-gap: unset;
+    }
+}
 
-        [class*='-sortable-item'] {
-            position: relative;
+.replicator-card-set-inset-picker {
+    position: relative;
 
-            [data-ui-popover-trigger] {
-                position: absolute;
-                left: -1.15rem;
-                height: 100%;
-                writing-mode: vertical-lr;
-                button .rounded-full {
-                    position: absolute;
-                    left: calc(0.5rem + 2px);
-                    height: 100%;
-                    width: 0.3rem;
-                    background: linear-gradient(to bottom, var(--color-gray-200) 0%, var(--color-gray-100) 50%,var(--color-gray-200) 100%);
-                }
-            }
+    [data-ui-popover-trigger] {
+        position: absolute;
+        left: -1.15rem;
+        height: 100%;
+        writing-mode: vertical-lr;
+
+        button .rounded-full {
+            position: absolute;
+            left: calc(0.5rem + 2px);
+            height: 100%;
+            width: 0.3rem;
+            background: linear-gradient(to bottom, var(--color-gray-200) 0%, var(--color-gray-100) 50%, var(--color-gray-200) 100%);
         }
     }
 }
