@@ -62,7 +62,7 @@
                                                     :index="index"
                                                     :enabled="canAddSet"
                                                     :is-first="index === 0"
-                                                    :show-connector="!(index === 0 && config.hide_display)"
+                                                    :show-connector="false"
                                                     :loading-set="loadingSet"
                                                     @added="addSet"
                                                 />
@@ -112,7 +112,7 @@
                             v-if="canAddSet"
                             :groups="groupConfigs"
                             :sets="setConfigs"
-                            :show-connector="value.length > 0"
+                            :show-connector="value.length > 0 && !setConfig(value[value.length - 1].type).card"
                             :index="value.length"
                             :label="config.button_label"
                             :is-first="value.length === 0"
