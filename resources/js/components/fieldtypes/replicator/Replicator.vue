@@ -19,7 +19,7 @@
                     <section :class="{ 'mt-12 p-4': fullScreenMode }">
                         <sortable-list
                             :model-value="value"
-                            :vertical="!hasCardLayoutSets"
+                            :vertical="true"
                             :item-class="sortableItemClass"
                             :handle-class="sortableHandleClass"
                             append-to="body"
@@ -29,7 +29,7 @@
                             @dragend="$emit('blur')"
                             v-slot="{}"
                         >
-                            <div class="replicator-sets relative" :class="{ 'field-grid': hasCardLayoutSets }">
+                            <div class="relative">
                                 <ReplicatorSet
                                     v-for="(set, index) in value"
                                     :key="set._id"
@@ -60,7 +60,7 @@
                                             :index="index"
                                             :enabled="canAddSet"
                                             :is-first="index === 0"
-                                            :show-connector="!hasCardLayoutSets && !(index === 0 && config.hide_display)"
+                                            :show-connector="!(index === 0 && config.hide_display)"
                                             :loading-set="loadingSet"
                                             @added="addSet"
                                         />
@@ -73,7 +73,7 @@
                             v-if="canAddSet"
                             :groups="groupConfigs"
                             :sets="setConfigs"
-                            :show-connector="value.length > 0 && !hasCardLayoutSets"
+                            :show-connector="value.length > 0"
                             :index="value.length"
                             :label="config.button_label"
                             :is-first="value.length === 0"
@@ -144,10 +144,6 @@ export default {
 
         groupConfigs() {
             return this.config.sets;
-        },
-
-        hasCardLayoutSets() {
-            return this.setConfigs.some((set) => set.card);
         },
 
         sortableItemClass() {
