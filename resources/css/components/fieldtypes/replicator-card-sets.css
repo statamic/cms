@@ -1,0 +1,35 @@
+/* ==========================================================================
+   REPLICATOR CARD SETS
+   ========================================================================== */
+
+.replicator-card-sets {
+    /* Has at least 3 children */
+    &:has(> :nth-child(3)) {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-gap: 0.75rem;
+
+        .publish-fields {
+            /* Prevent columns and gaps exceeding the container */
+            grid-column-gap: unset;
+        }
+
+        .field_replicator_field-sortable-item {
+            position: relative;
+
+            [data-ui-popover-trigger] {
+                position: absolute;
+                left: -1.15rem;
+                height: 100%;
+                writing-mode: vertical-lr;
+                button .rounded-full {
+                    position: absolute;
+                    left: calc(0.5rem + 2px);
+                    height: 100%;
+                    width: 0.3rem;
+                    background: linear-gradient(to bottom, var(--color-gray-200) 0%, var(--color-gray-100) 50%,var(--color-gray-200) 100%);
+                }
+            }
+        }
+    }
+}
