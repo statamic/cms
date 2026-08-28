@@ -1,5 +1,28 @@
 # Release Notes
 
+## 6.30.0 (2026-08-28)
+
+### What's new
+- Allow addon settings blueprints to be registered lazily [#15286](https://github.com/statamic/cms/issues/15286) by @jasonvarga
+- Add compact mode to the icon fieldtype [#15287](https://github.com/statamic/cms/issues/15287) by @jackmcdade
+
+### What's fixed
+- Multisite improve synced icons [#15275](https://github.com/statamic/cms/issues/15275) by @jaygeorge
+- Return a copy from AugmentedEntry::date() instead of the entry's live instance [#15273](https://github.com/statamic/cms/issues/15273) by @marcorieser
+- Fix nav:breadcrumbs including home when include_home is false [#15244](https://github.com/statamic/cms/issues/15244) by @wakqasahmed
+- Fix calendar view for date fields using a format without time [#15246](https://github.com/statamic/cms/issues/15246) by @duncanmcclean
+- Fix site URLs configured with Antlers being treated as external [#15250](https://github.com/statamic/cms/issues/15250) by @duncanmcclean
+- Fix numbers being considered empty by field conditions [#15257](https://github.com/statamic/cms/issues/15257) by @duncanmcclean
+- Skip two factor setup enforcement while impersonating [#15247](https://github.com/statamic/cms/issues/15247) by @duncanmcclean
+- Fix item actions on the term edit page [#15290](https://github.com/statamic/cms/issues/15290) by @lazerg
+- Multisite - Fix localization switch sending the browser to /entries/null [#15230](https://github.com/statamic/cms/issues/15230) by @jaygeorge
+- Multisite - Fix unsynced fields after switching sites [#15267](https://github.com/statamic/cms/issues/15267) by @jaygeorge
+- Fix video thumbnails showing as a broken image [#15291](https://github.com/statamic/cms/issues/15291) by @jaygeorge
+- Align the maximum items badge to the top [#15299](https://github.com/statamic/cms/issues/15299) by @jaygeorge
+- Rename Mounted Collection Edit link to List [#15301](https://github.com/statamic/cms/issues/15301) by @jackmcdade
+
+
+
 ## 6.29.0 (2026-08-25)
 
 ### What's new
