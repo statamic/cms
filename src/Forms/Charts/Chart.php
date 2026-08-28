@@ -29,11 +29,18 @@ abstract class Chart
 
     public function props(Collection $values, ?Collection $options = null): array
     {
+        [$items] = $this->truncatedItems($values, $options);
+
+        return ['items' => $items->all()];
+    }
+
+    protected function truncatedItems(Collection $values, ?Collection $options): array
+    {
         $total = $values->count();
         $items = $this->items($values, $options, $total);
 
         if (! $this->limit || $items->count() <= $this->limit) {
-            return ['items' => $items->values()->all()];
+            return [$items->values(), collect()];
         }
 
         $keep = $items->sortByDesc('count')->take($this->limit - 1)->pluck('key');
@@ -48,10 +55,7 @@ abstract class Chart
             'other' => true,
         ]);
 
-        return [
-            'items' => $items->values()->all(),
-            'other_items' => $other->values()->all(),
-        ];
+        return [$items->values(), $other->values()];
     }
 
     private function items(Collection $values, ?Collection $options, int $total): Collection

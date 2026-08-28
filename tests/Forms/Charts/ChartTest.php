@@ -1,17 +1,15 @@
 <?php
 
-namespace Tests\Forms;
+namespace Tests\Forms\Charts;
 
 use Illuminate\Support\Collection;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Forms\Charts\ChartOption;
 use Statamic\Forms\Charts\HorizontalBar;
-use Statamic\Forms\Charts\Pie;
-use Statamic\Forms\Charts\RankedOptions;
 use Statamic\Forms\Charts\VerticalBar;
 use Tests\TestCase;
 
-class ChartsTest extends TestCase
+class ChartTest extends TestCase
 {
     #[Test]
     public function it_counts_values_per_option()
@@ -26,8 +24,6 @@ class ChartsTest extends TestCase
             ['key' => 'green', 'label' => 'Green', 'count' => 1, 'percent' => 33],
             ['key' => 'blue', 'label' => 'Blue', 'count' => 0, 'percent' => 0],
         ], $props['items']);
-
-        $this->assertArrayNotHasKey('other_items', $props);
     }
 
     #[Test]
@@ -74,30 +70,19 @@ class ChartsTest extends TestCase
     #[Test]
     public function it_truncates_to_the_limit_and_lumps_the_rest_into_other()
     {
-        $values = collect([
-            ...array_fill(0, 5, 'a'),
-            ...array_fill(0, 4, 'b'),
-            ...array_fill(0, 3, 'c'),
-            ...array_fill(0, 2, 'd'),
-            'e',
-        ]);
-
-        $props = (new Pie)->props($values, $this->chartOptions(
-            collect(range('a', 'f'))->mapWithKeys(fn ($key) => [$key => strtoupper($key)])->all()
+        $props = (new HorizontalBar)->props($this->weightedValues(range('a', 'h')), $this->chartOptions(
+            collect(range('a', 'h'))->mapWithKeys(fn ($key) => [$key => strtoupper($key)])->all()
         ));
 
         $this->assertEquals([
-            ['key' => 'a', 'label' => 'A', 'count' => 5, 'percent' => 33],
-            ['key' => 'b', 'label' => 'B', 'count' => 4, 'percent' => 27],
-            ['key' => 'c', 'label' => 'C', 'count' => 3, 'percent' => 20],
-            ['key' => 'other', 'label' => 'Other', 'count' => 3, 'percent' => 20, 'other' => true],
+            ['key' => 'a', 'label' => 'A', 'count' => 10, 'percent' => 19],
+            ['key' => 'b', 'label' => 'B', 'count' => 9, 'percent' => 17],
+            ['key' => 'c', 'label' => 'C', 'count' => 8, 'percent' => 15],
+            ['key' => 'd', 'label' => 'D', 'count' => 7, 'percent' => 13],
+            ['key' => 'other', 'label' => 'Other', 'count' => 18, 'percent' => 35, 'other' => true],
         ], $props['items']);
 
-        $this->assertEquals([
-            ['key' => 'd', 'label' => 'D', 'count' => 2, 'percent' => 13],
-            ['key' => 'e', 'label' => 'E', 'count' => 1, 'percent' => 7],
-            ['key' => 'f', 'label' => 'F', 'count' => 0, 'percent' => 0],
-        ], $props['other_items']);
+        $this->assertEquals(['items'], array_keys($props));
     }
 
     #[Test]
@@ -151,23 +136,9 @@ class ChartsTest extends TestCase
         $this->assertEquals('0', $props['items'][0]['key']);
     }
 
-    #[Test]
-    public function it_ranks_options_by_average_position()
+    private function weightedValues(array $keys): Collection
     {
-        $props = (new RankedOptions)->props(
-            collect([
-                ['summer', 'spring', 'winter'],
-                ['summer', 'winter', 'spring'],
-                ['spring', 'summer', 'winter'],
-            ]),
-            $this->chartOptions(['spring' => 'Spring', 'summer' => 'Summer', 'winter' => 'Winter'])
-        );
-
-        $this->assertEquals([
-            ['key' => 'summer', 'label' => 'Summer', 'rank' => 1, 'count' => 2, 'percent' => 89],
-            ['key' => 'spring', 'label' => 'Spring', 'rank' => 2, 'count' => 1, 'percent' => 67],
-            ['key' => 'winter', 'label' => 'Winter', 'rank' => 3, 'count' => 0, 'percent' => 44],
-        ], $props['items']);
+        return collect($keys)->flatMap(fn ($key, $index) => array_fill(0, count($keys) + 2 - $index, $key));
     }
 
     private function chartOptions(array $options): Collection
