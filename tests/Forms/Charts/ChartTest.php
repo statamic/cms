@@ -86,6 +86,17 @@ class ChartTest extends TestCase
     }
 
     #[Test]
+    public function vertical_bars_truncate_unbounded_answers_too()
+    {
+        $props = (new VerticalBar)->props($this->weightedValues(range('a', 'n')), $this->chartOptions(
+            collect(range('a', 'n'))->mapWithKeys(fn ($key) => [$key => strtoupper($key)])->all()
+        ));
+
+        $this->assertCount(12, $props['items']);
+        $this->assertEquals('other', collect($props['items'])->last()['key']);
+    }
+
+    #[Test]
     public function it_counts_unique_values_when_there_are_no_options()
     {
         $props = (new HorizontalBar)->props(collect(['Alice', 'Alice', 'Bob']));

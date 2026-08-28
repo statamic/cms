@@ -20,27 +20,27 @@ enum View {
 const props = defineProps<{
     form: string;
     actionUrl: string;
-    summaryUrl: string;
-    chartsUpdateUrl: string;
+    summaryUrl?: string;
+    chartsUpdateUrl?: string;
     sortColumn: string;
     sortDirection: string;
-    columns: array;
-    filters: array;
-    can: object;
+    columns: any[];
+    filters: any[];
+    can: Record<string, boolean>;
 }>();
 
 const listing = useTemplateRef('listing');
 const summary = useTemplateRef('summary');
 const preferencesPrefix = `forms.${props.form}`;
 const requestUrl = cp_url(`forms/${props.form}/submissions`);
-const view = ref<View>(preferences.get(`${preferencesPrefix}.view`, View.Submissions));
+const view = ref<View>(props.summaryUrl ? preferences.get(`${preferencesPrefix}.view`, View.Submissions) : View.Submissions);
 
-const parameters = computed(() => listing.value.parameters);
+const parameters = computed(() => listing.value?.parameters);
 
 const refresh = (): void => {
     view.value === View.Submissions
-        ? listing.value.refresh()
-        : summary.value.refresh();
+        ? listing.value?.refresh()
+        : summary.value?.refresh();
 };
 
 watch(view, (view: View): void => preferences.set(`${preferencesPrefix}.view`, view));

@@ -107,6 +107,49 @@ class UpdateFormChartsTest extends TestCase
     }
 
     #[Test]
+    public function it_rejects_hidden_fields()
+    {
+        $form = tap(Form::make('survey')->formFields([
+            'sections' => [
+                [
+                    'fields' => [
+                        ['handle' => 'color', 'field' => ['type' => 'multi_choice', 'options' => ['red' => 'Red'], 'hidden' => true]],
+                    ],
+                ],
+            ],
+        ]))->save();
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->patchJson(cp_route('forms.submissions.charts.update', $form->handle()), [
+                'charts' => [['field' => 'color', 'chart' => 'pie']],
+            ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('charts');
+
+        $this->assertNull(Form::find('survey')->charts());
+    }
+
+    #[Test]
+    public function it_rejects_duplicate_fields()
+    {
+        $form = $this->makeForm();
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->patchJson(cp_route('forms.submissions.charts.update', $form->handle()), [
+                'charts' => [
+                    ['field' => 'color', 'chart' => 'pie'],
+                    ['field' => 'color', 'chart' => 'horizontal_bar'],
+                ],
+            ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('charts.0.field');
+
+        $this->assertNull(Form::find('survey')->charts());
+    }
+
+    #[Test]
     public function it_allows_any_registered_chart_for_any_field()
     {
         $form = $this->makeForm();

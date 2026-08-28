@@ -19,7 +19,7 @@ class UpdateFormChartsController extends CpController
 
         $request->validate([
             'charts' => 'present|array',
-            'charts.*.field' => 'required|string',
+            'charts.*.field' => 'required|string|distinct',
             'charts.*.chart' => 'required|string',
         ]);
 
@@ -37,9 +37,17 @@ class UpdateFormChartsController extends CpController
 
     private function validateChart($form, array $config): void
     {
-        if (! $form->formFields()->field($config['field'])) {
+        $field = $form->formFields()->field($config['field']);
+
+        if (! $field) {
             throw ValidationException::withMessages([
                 'charts' => __('statamic::validation.form_chart_unknown_field', ['field' => $config['field']]),
+            ]);
+        }
+
+        if ($field->config()['hidden'] ?? false) {
+            throw ValidationException::withMessages([
+                'charts' => __('statamic::validation.form_chart_hidden_field', ['field' => $config['field']]),
             ]);
         }
 

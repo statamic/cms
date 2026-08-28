@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref, watch } from 'vue';
 import axios from 'axios';
-import { keys } from '@api';
+import { keys, preferences } from '@api';
 import { Button, Skeleton, ToggleGroup, ToggleItem, Widget } from '@ui';
 import { injectListingContext } from '@/components/ui/Listing/Listing.vue';
 import { SortableList } from '@/components/sortable/Sortable.js';
@@ -13,7 +13,6 @@ import EditChrome from './EditChrome.vue';
 import FieldPicker from './FieldPicker.vue';
 import type { ChartConfig, MetaChart, MetaField, Summary, SummaryField } from './types';
 import { ChartMetric } from './types';
-import { preferences } from '@api';
 
 interface SummaryWidget {
     id: string;
@@ -194,7 +193,7 @@ watch(editing, (editing): void => {
 
 watch([activeFilters, searchQuery], fetchSummary, { deep: true, immediate: true });
 
-watch(metric, (metric: ChartMetric) => Statamic.$preferences.set(`${preferencesPrefix.value}.summary.chart_metric`, metric));
+watch(metric, (metric: ChartMetric) => preferences.set(`${preferencesPrefix.value}.summary.chart_metric`, metric));
 
 onBeforeUnmount(() => saveBinding?.destroy());
 
@@ -293,7 +292,7 @@ defineExpose({ refresh: fetchSummary });
                                 @remove="removeChart(index)"
                             />
                             <div class="flex h-full items-center justify-center">
-                                <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('Save to see this chart.') }}</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('statamic::messages.form_summary_save_to_see_chart') }}</p>
                             </div>
                         </div>
                     </Widget>
@@ -303,7 +302,7 @@ defineExpose({ refresh: fetchSummary });
                     class="w-full mx-3 flex min-h-61 flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-gray-300 dark:border-gray-600"
                 >
                     <p class="text-sm text-gray-500 dark:text-gray-400">
-                        {{ editing ? __('Add a chart to start summarizing responses.') : __('No charts to show.') }}
+                        {{ editing ? __('statamic::messages.form_summary_add_chart_instructions') : __('No charts to show.') }}
                     </p>
                     <FieldPicker v-if="editing" :fields="addableFields" @picked="fieldPicked" />
                 </div>

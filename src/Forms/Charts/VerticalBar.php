@@ -8,4 +8,5 @@ class VerticalBar extends Chart
 
     protected ?string $component = 'ui-vertical-bar-chart';
     protected ?string $icon = 'chart-increase';
+    protected ?int $limit = 12;
 }
