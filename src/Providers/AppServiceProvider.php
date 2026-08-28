@@ -8,9 +8,11 @@ use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Foundation\Http\Middleware\TrimStrings;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
+use Statamic\Console\Processes\Ffmpeg;
 use Statamic\CP\CarbonAsVueComponent;
 use Statamic\Facades;
 use Statamic\Facades\Addon;
@@ -48,6 +50,10 @@ class AppServiceProvider extends ServiceProvider
             Statamic::runBootedCallbacks();
             $this->loadRoutesFrom("{$this->root}/routes/routes.php");
         });
+
+        if (class_exists(\Laravel\Octane\Events\RequestReceived::class)) {
+            Event::listen(\Laravel\Octane\Events\RequestReceived::class, fn () => Ffmpeg::clearBinaryCache());
+        }
 
         $this->app[\Illuminate\Contracts\Http\Kernel::class]
             ->pushMiddleware(\Statamic\Http\Middleware\PoweredByHeader::class)

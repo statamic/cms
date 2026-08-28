@@ -128,6 +128,7 @@
                                                     'w-full p-4': asset.extension === 'svg',
                                                     'rounded-lg p-1': asset.orientation === 'square',
                                                 }"
+                                                @error="asset.thumbnail = null"
                                             />
                                             <file-icon v-else :extension="asset.extension" class="size-1/2" />
                                         </div>
