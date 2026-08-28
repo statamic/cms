@@ -19,7 +19,7 @@ abstract class Chart
 
     public function component(): string
     {
-        return $this->component ?? 'ui-'.str_replace('_', '-', static::handle()).'-chart';
+        return $this->component;
     }
 
     public function icon(): ?string

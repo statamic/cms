@@ -6,5 +6,6 @@ class VerticalBar extends Chart
 {
     protected static $title = 'Column chart';
 
+    protected ?string $component = 'ui-vertical-bar-chart';
     protected ?string $icon = 'chart-increase';
 }

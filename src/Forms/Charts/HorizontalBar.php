@@ -6,6 +6,7 @@ class HorizontalBar extends Chart
 {
     protected static $title = 'Bar chart';
 
+    protected ?string $component = 'ui-horizontal-bar-chart';
     protected ?string $icon = 'charts-bar-horizontal';
     protected ?int $limit = 5;
 }
