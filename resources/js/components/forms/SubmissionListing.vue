@@ -84,7 +84,7 @@ defineExpose({ parameters, refresh });
                     />
                 </ToggleGroup>
 
-                <CustomizeColumns v-if="allowCustomizingColumns" />
+                <CustomizeColumns v-if="allowCustomizingColumns && view === View.Submissions" />
             </div>
 
             <template v-if="view === View.Submissions">
