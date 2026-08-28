@@ -141,47 +141,4 @@ class FormSubmissionsController extends CpController
 
         return response('', 204);
     }
-
-    public function generateFake(Request $request, $form, FakeSubmissionGenerator $generator)
-    {
-        $this->authorize('generateFakeSubmissions', $form);
-
-        if (! $form->get('generate_fake_submissions', true)) {
-            return response([
-                'message' => __('statamic::messages.form_fake_submission_generation_disabled'),
-            ], 403);
-        }
-
-        $validated = $request->validate([
-            'mode' => ['required', 'in:cp_only,full_pipeline'],
-        ]);
-
-        $values = $generator->generate($form);
-        $fields = $form->blueprint()->fields()->addValues($values);
-        $submission = $form->makeSubmission();
-        $submission->data(
-            $fields->process()->values()->merge([
-                '_fake' => true,
-            ])
-        );
-
-        if ($validated['mode'] === 'full_pipeline') {
-            if (FormSubmitted::dispatch($submission) === false) {
-                return response([
-                    'message' => __('statamic::messages.form_fake_submission_cancelled'),
-                ], 422);
-            }
-        }
-
-        $submission->save();
-
-        if ($validated['mode'] === 'full_pipeline') {
-            SendEmails::dispatch($submission, Site::default());
-        }
-
-        return response([
-            'id' => $submission->id(),
-            'message' => __('statamic::messages.form_fake_submission_generated'),
-        ]);
-    }
 }
