@@ -5,16 +5,21 @@
 .replicator-card-sets {
     /* Has at least 3 children */
     &:has(> :nth-child(3)) {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        grid-gap: 0.75rem;
+        display: flex;
+        flex-direction: row;
+        gap: 0.75rem;
+
+        > [class*='-sortable-item'] {
+            flex: 1 1 0;
+            min-width: 0;
+        }
 
         .publish-fields {
             /* Prevent columns and gaps exceeding the container */
             grid-column-gap: unset;
         }
 
-        .field_replicator_field-sortable-item {
+        [class*='-sortable-item'] {
             position: relative;
 
             [data-ui-popover-trigger] {
