@@ -6,7 +6,7 @@ import {
     PanelHeader,
     Card,
     Heading,
-	Stack,
+    Stack,
 } from '@ui';
 import { injectListingContext } from '../Listing/Listing.vue';
 import { dateFormatter } from '@/api';
@@ -131,24 +131,18 @@ function handleStackClosed() {
 </script>
 
 <template>
-    <div class="flex flex-1 items-center gap-2 sm:gap-3 overflow-x-auto ps-[1px] -ms-[1px] py-3 st-mask-horizontal-overflow">
-        <div ref="filtersButtonWrapperRef" class="relative sticky left-0 rounded-r-lg mask-bg mask-bg--left mask-bg--left-small">
-            <Button
-                icon="sliders-horizontal"
-                class="[&_svg]:size-3.5"
-                content-class="max-[650px]:sr-only"
-                :disabled="reorderable"
-                @click="open = true"
-            >
+    <div class="flex flex-1 items-center gap-2 sm:gap-3 overflow-x-auto py-3 st-mask-horizontal-overflow">
+        <div ref="filtersButtonWrapperRef" class="sticky left-0 rounded-r-lg mask-bg mask-bg--left mask-bg--left-small">
+            <Button icon="sliders-horizontal" class="[&_svg]:size-3.5" :disabled="reorderable" @click="open = true">
                 {{ __('Filters') }}
+                <Badge
+                    v-if="activeFilterBadgeCount"
+                    :text="activeFilterBadgeCount"
+                    size="sm"
+                    pill
+                    class="absolute -top-1.25 -right-2.75"
+                />
             </Button>
-            <Badge
-                v-if="activeFilterBadgeCount"
-                :text="activeFilterBadgeCount"
-                size="sm"
-                pill
-                class="absolute -top-1.25 -right-2.75"
-            />
         </div>
 
         <Stack

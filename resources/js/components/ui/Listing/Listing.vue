@@ -101,11 +101,6 @@ const props = defineProps({
         type: Boolean,
         default: true,
     },
-    /** When `false`, the results table is hidden so an alternate view can be shown. */
-    showResults: {
-        type: Boolean,
-        default: true,
-    },
     /** Array of checked item IDs. */
     selections: {
         type: Array,
@@ -599,9 +594,9 @@ function autoApplyFilters() {
 }
 
 function reordered(order) {
-	if (! props.items) {
-		items.value = order;
-	}
+    if (! props.items) {
+        items.value = order;
+    }
 
     emit('reordered', order);
 }
@@ -728,37 +723,32 @@ autoApplyState();
         <slot name="initializing" v-if="shouldShowSkeleton">
             <div class="flex flex-col gap-4 justify-between mt-3 starting-style-transition starting-style-transition--delay">
                 <ui-skeleton v-if="showPresets" class="h-5 w-48" />
-                <div v-if="allowSearch || hasFilters || allowCustomizingColumns || $slots['toolbar-actions']" class="flex gap-2 sm:gap-3">
+                <div v-if="allowSearch || hasFilters || allowCustomizingColumns" class="flex gap-2 sm:gap-3">
                     <ui-skeleton v-if="allowSearch" class="h-9 w-96" />
                     <ui-skeleton v-if="hasFilters" class="h-9 w-24" />
                     <div class="flex-1" />
-                    <ui-skeleton v-if="allowCustomizingColumns || $slots['toolbar-actions']" class="size-10" />
+                    <ui-skeleton v-if="allowCustomizingColumns" class="size-10" />
                 </div>
                 <ui-skeleton class="h-48 w-full" />
             </div>
         </slot>
         <slot v-if="!initializing" :items="items" :is-column-visible="isColumnVisible" :loading="loading">
             <Presets v-if="showPresets" />
-            <div v-if="allowSearch || hasFilters || allowCustomizingColumns || $slots['toolbar-actions']" class="relative overflow-clip flex items-center gap-2 sm:gap-3 min-h-16 starting-style-transition st-overflow-clip-margin">
+            <div v-if="allowSearch || hasFilters || allowCustomizingColumns" class="relative overflow-clip flex items-center gap-2 sm:gap-3 min-h-16 starting-style-transition st-overflow-clip-margin">
                 <div class="flex flex-1 items-center gap-2 sm:gap-3 overflow-x-auto -ms-1 ps-1 py-1">
                     <Search v-if="allowSearch" />
                     <Filters v-if="hasFilters" />
                 </div>
-                <div v-if="$slots['toolbar-actions'] || allowCustomizingColumns" class="flex shrink-0 items-center gap-2 sm:gap-3">
-                    <slot name="toolbar-actions" />
-                    <CustomizeColumns v-if="allowCustomizingColumns" />
-                </div>
+                <CustomizeColumns v-if="allowCustomizingColumns" />
             </div>
 
-            <slot v-if="!showResults" name="results" />
-
             <div
-                v-else-if="!items.length"
+                v-if="!items.length"
                 class="rounded-lg border border-dashed border-gray-300 dark:border-gray-700 p-6 text-center text-gray-500"
                 v-text="__('No results')"
             />
 
-            <Panel v-else-if="showResults" class="relative overflow-x-auto" style="container-type: scroll-state;">
+            <Panel v-else class="relative overflow-x-auto" style="container-type: scroll-state;">
                 <Table>
                     <template v-for="(slot, slotName) in forwardedTableCellSlots" :key="slotName" #[slotName]="slotProps">
                         <component :is="slot" v-bind="slotProps" />

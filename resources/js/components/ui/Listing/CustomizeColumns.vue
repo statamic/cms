@@ -69,8 +69,9 @@ function reset() {
 </script>
 
 <template>
-    <Button icon="sliders-vertical" :disabled="reorderable" @click="open = true" :aria-label="__('Customize Columns')" v-tooltip="__('Customize Columns')" />
-    <Modal :title="__('Customize Columns')" v-model:open="open">
+    <div data-ui-column-customizer>
+        <Button icon="sliders-vertical" :disabled="reorderable" @click="open = true" :aria-label="__('Customize Columns')" v-tooltip="__('Customize Columns')" />
+        <Modal :title="__('Customize Columns')" v-model:open="open">
             <div class="border rounded-lg dark:border-gray-700">
                 <div class="flex">
                     <!-- Available Columns -->
@@ -131,4 +132,5 @@ function reset() {
                 </div>
             </template>
         </Modal>
+    </div>
 </template>
