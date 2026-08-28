@@ -71,7 +71,7 @@
                         v-if="selectedFilesText"
                         size="sm"
                         pill
-                        class="ms-auto shrink-0 tabular-nums px-1.5!"
+                        class="ms-auto self-start shrink-0 tabular-nums px-1.5!"
                         :text="`${assets.length}/${maxFiles}`"
                         :aria-label="selectedFilesText"
                     />
