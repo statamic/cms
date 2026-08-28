@@ -58,7 +58,7 @@ class Sets extends Fieldtype
                         'icon' => $set['icon'] ?? null,
                         'image' => $this->preProcessPreviewImage($set['image'] ?? null),
                         'hide' => $set['hide'] ?? null,
-                        'width' => $set['width'] ?? 100,
+                        'card' => $set['card'] ?? false,
                         'fields' => collect($set['fields'] ?? [])->map(function ($field, $i) use ($setId) {
                             return array_merge(FieldTransformer::toVue($field), ['_id' => $setId.'-'.$i]);
                         })->all(),
@@ -98,7 +98,7 @@ class Sets extends Fieldtype
                         return array_merge($config, [
                             'handle' => $name,
                             'id' => $name,
-                            'width' => $config['width'] ?? 100,
+                            'card' => $config['card'] ?? false,
                             'image' => $this->previewImageUrl($config['image'] ?? null),
                             'fields' => (new NestedFields)->preProcessConfig(Arr::get($config, 'fields', [])),
                         ]);
@@ -130,7 +130,7 @@ class Sets extends Fieldtype
                                 'icon' => $section['icon'] ?? null,
                                 'image' => $this->processPreviewImage($section['image'] ?? null),
                                 'hide' => $section['hide'] ?? null,
-                                'width' => $section['width'] ?? 100,
+                                'card' => $section['card'] ?? false,
                                 'fields' => collect($section['fields'])->map(function ($field) {
                                     return FieldTransformer::fromVue($field);
                                 })->all(),

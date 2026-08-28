@@ -120,7 +120,7 @@ export default {
                 collapsed: false,
                 icon: null,
                 hide: null,
-                width: 100,
+                card: false,
                 handle: snake_case(this.newSectionText),
                 fields: [],
             };

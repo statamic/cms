@@ -222,6 +222,7 @@ return [
     'publish_actions_publish' => 'Changes to the working copy will be applied to the entry and it will be published immediately.',
     'publish_actions_schedule' => 'Changes to the working copy will be applied to the entry and it will appear published on the selected date.',
     'publish_actions_unpublish' => 'The current revision will be unpublished.',
+    'replicator_set_card_layout_instructions' => 'On the publish form, multiple instances of this set display side by side instead of full width.',
     'relationship_item_unavailable' => 'This item is unavailable. It may have been deleted, or you may not have permission to view it.',
     'reset_password_notification_body' => 'You are receiving this email because we received a password reset request for your account.',
     'reset_password_notification_no_action' => 'If you did not request a password reset, no further action is required.',

@@ -1,17 +1,22 @@
 <template>
     <div
-        class="blueprint-section min-h-40 outline-hidden @container"
-        :class="showHandleField ? widthClass : 'w-full'"
+        class="blueprint-section min-h-40 outline-hidden @container w-full"
         tabindex="-1"
     >
         <ui-panel>
             <ui-panel-header class="flex items-center justify-between pl-2.75! pr-3.25!">
-                <div class="flex items-center gap-2 flex-1">
+                <div class="flex items-center gap-2 flex-1 min-w-0">
                     <ui-icon name="handles-sm" class="blueprint-section-drag-handle size-3! cursor-grab text-gray-400" />
                     <ui-icon :name="section.icon" :set="iconSet" v-if="section.icon" />
                     <ui-heading v-text="__(section.display ?? 'Section')" />
+                    <ui-badge
+                        v-if="showHandleField && card"
+                        pill
+                        icon="cards"
+                        :text="__('Card')"
+                        color="white"
+                    />
                 </div>
-                <width-selector v-if="showHandleField" v-model="width" class="me-1" />
                 <ui-button icon="pencil-line" size="sm" variant="ghost" @click="edit" />
                 <ui-button icon="trash" size="sm" variant="ghost" @click.prevent="$emit('deleted')" />
             </ui-panel-header>
@@ -75,6 +80,13 @@
                     <ui-field :label="__('Instructions')">
                         <ui-input type="text" v-model="editingSection.instructions" />
                     </ui-field>
+                    <ui-field
+                        :label="__('Card layout')"
+                        :instructions="__('messages.replicator_set_card_layout_instructions')"
+                        v-if="showHandleField"
+                    >
+                        <ui-switch v-model="editingSection.card" />
+                    </ui-field>
                     <ui-field :label="__('Collapsible')" v-if="showCollapsibleField">
                         <ui-switch v-model="editingSection.collapsible" />
                     </ui-field>
@@ -129,9 +141,6 @@
                     <ui-field :label="__('Hidden')" v-if="showHideField">
                         <ui-switch v-model="editingSection.hide" />
                     </ui-field>
-                    <ui-field :label="__('Width')" v-if="showHandleField">
-                        <width-selector v-model="editingSection.width" size="lg" />
-                    </ui-field>
                     <div class="py-6 space-x-2 -mx-6 px-6 border-t border-gray-200 dark:border-gray-700">
                         <ui-button :text="isSoloNarrowStack ? __('Save') : __('Confirm')" @click="handleSaveOrConfirm" variant="primary" />
                         <ui-button :text="__('Cancel')" @click="editCancelled" variant="ghost" />
@@ -145,9 +154,7 @@
 <script>
 import Fields from './Fields.vue';
 import CanDefineLocalizable from '../fields/CanDefineLocalizable';
-import WidthSelector from '../fields/WidthSelector.vue';
 import { Switch, Heading } from '@/components/ui';
-import { field_width_class } from '@/bootstrap/globals.js';
 
 export default {
     mixins: [CanDefineLocalizable],
@@ -160,7 +167,6 @@ export default {
         Fields,
         Switch,
         Heading,
-        WidthSelector,
     },
 
     props: {
@@ -205,17 +211,8 @@ export default {
             return stacks.length === 1 && stacks[0]?.data?.vm?.size === 'narrow';
         },
 
-        width: {
-            get() {
-                return this.section.width ?? 100;
-            },
-            set(width) {
-                this.$emit('updated', { ...this.section, width });
-            },
-        },
-
-        widthClass() {
-            return field_width_class(this.width);
+        card() {
+            return this.section.card ?? false;
         },
     },
 
@@ -293,7 +290,7 @@ export default {
                 icon: this.section.icon,
                 image: this.section.image,
                 hide: this.section.hide,
-                width: this.section.width ?? 100,
+                card: this.section.card ?? false,
                 collapsible: this.section.collapsible,
                 collapsed: this.section.collapsed,
             };
