@@ -44,7 +44,7 @@ class FormSubmissionsController extends CpController
 
         $can = $this->formAbilities($form);
 
-        return Inertia::render('forms/Submissions', [
+        return Inertia::render('forms/submissions/Index', [
             'form' => [
                 'title' => __($form->title()),
                 'handle' => $form->handle(),
@@ -129,7 +129,7 @@ class FormSubmissionsController extends CpController
         $blueprint = $form->blueprint();
         $fields = $blueprint->fields()->addValues($submission->data()->all())->preProcess();
 
-        return Inertia::render('forms/Submission', [
+        return Inertia::render('forms/submissions/Show', [
             'form' => $form,
             'can' => $this->formAbilities($form),
             'id' => $submission->id(),
