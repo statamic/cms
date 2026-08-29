@@ -6,6 +6,7 @@ use Closure;
 use Exception;
 use Illuminate\Support\Collection;
 use Statamic\Exceptions\BlueprintNotFoundException;
+use Statamic\Facades;
 use Statamic\Facades\Blink;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
@@ -22,6 +23,24 @@ class BlueprintRepository
     protected $directories = ['default' => null];
     protected $fallbacks = [];
     protected $additionalNamespaces = [];
+
+    public function all()
+    {
+        $namespaces = [
+            ...Facades\Collection::all()->map(fn ($collection) => "collections/{$collection->handle()}")->all(),
+            ...Facades\Taxonomy::all()->map(fn ($taxonomy) => "taxonomies/{$taxonomy->handle()}")->all(),
+            'navigation', 'assets', 'globals', 'forms',
+            ...$this->getAdditionalNamespaces()->keys()->all(),
+        ];
+
+        $rootLevelBlueprints = collect(['user', 'user_group'])
+            ->map(fn ($handle) => $this->find($handle))
+            ->filter();
+
+        return $rootLevelBlueprints->merge(
+            collect($namespaces)->flatMap(fn ($namespace) => $this->in($namespace)->values())
+        );
+    }
 
     public function setDirectories(string|array $directories)
     {
@@ -334,7 +353,10 @@ class BlueprintRepository
                 ->setInitialPath($path)
                 ->setNamespace($namespace ?? null)
                 ->setContents($contents);
-        });
+        // Clear any parent that may have been set on the blueprint during a previous
+        // find() call. The blink cache returns the same instance, so without this,
+        // iterating blueprints via all() could produce instances with stale parents.
+        })->setParent(null);
     }
 
     protected function getNamespaceAndHandle($blueprint)

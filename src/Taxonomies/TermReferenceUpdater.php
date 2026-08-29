@@ -65,4 +65,14 @@ class TermReferenceUpdater extends DataReferenceUpdater
 
         $this->updateNestedFieldValues($fields, $dottedPrefix);
     }
+
+    /**
+     * Update fields in blueprints and fieldsets.
+     *
+     * @return void
+     */
+    protected function updateBlueprintFields()
+    {
+        //
+    }
 }
