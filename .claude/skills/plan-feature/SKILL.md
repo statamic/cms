@@ -1,43 +1,30 @@
 ---
 name: plan-feature
 description: >-
-  Plan and build features as researched, phased, atomic work. Use when the user
-  brain-dumps a feature idea, asks to come up with a plan, wants clarifying
-  questions / gap analysis / competitive research baked into a plan, or wants
-  implementation broken into smallest testable slices on a clean branch with
-  See → Work → Deepen phase groups. Invoke for /plan-feature, "plan this",
-  "come up with a plan", or starting a new feature from a rough dump.
+  Plan new features from a brain dump: gap analysis, competitive research,
+  clarifying questions, and a phased See → Work → Deepen plan with atomic
+  slices. Use for /plan-feature, "plan this", "come up with a plan", or when
+  starting a feature from a rough dump. Does not implement — hand off to
+  /build-feature when the plan is approved.
 icon: map
 color: blue
 ---
 
 # Plan Feature
 
-Turn a rough feature dump into a researched plan, then execute it as a linear
-sequence of tiny, finishable slices. Never scaffold a whole feature up front.
+Turn a rough feature dump into a researched, phased plan with atomic slices.
+**Do not write feature code in this skill.** When the plan is approved, tell
+the user to run `/build-feature`.
 
 Read `references/phase-model.md` before writing phases.
 Read `references/plan-template.md` when drafting the plan document.
 Read `references/competitive-research.md` when doing competitor / peer research.
 
-## Modes
-
-This skill has two modes. Default to **Plan** until the user explicitly says to
-build / implement / start / go.
-
-| Mode | Trigger | Output |
-| --- | --- | --- |
-| **Plan** | Brain dump, "come up with a plan", `/plan-feature` | Questions + full plan (no code) |
-| **Build** | "Build it", "start", "go", approve a plan | Atomic slices on a clean branch |
-
-Do not mix modes. In Plan mode: no implementation. In Build mode: follow the
-approved plan slice-by-slice; do not re-litigate the plan unless blocked.
+Companion: `/build-feature` executes the approved plan.
 
 ---
 
-## Plan mode
-
-### 1. Ingest the dump
+## 1. Ingest the dump
 
 Treat the user's message(s) as raw material, not a finished spec.
 
@@ -45,7 +32,7 @@ Treat the user's message(s) as raw material, not a finished spec.
 - Do **not** start coding.
 - Do **not** ask one question at a time mid-ingest. Gather context first.
 
-### 2. Ground in this repo
+## 2. Ground in this repo
 
 Before proposing anything:
 
@@ -53,7 +40,7 @@ Before proposing anything:
 - Prefer extending established patterns over inventing parallel systems.
 - Note Eloquent / Stache / GraphQL / REST / CP / frontend touchpoints that may matter later (often Deepen-phase work).
 
-### 3. Gap analysis (things they forgot)
+## 3. Gap analysis (things they forgot)
 
 Actively hunt for omissions. Typical Statamic/CMS gaps:
 
@@ -70,7 +57,7 @@ Actively hunt for omissions. Typical Statamic/CMS gaps:
 
 List forgotten items as either **must decide**, **defer to Deepen**, or **out of scope**.
 
-### 4. Competitive / peer research
+## 4. Competitive / peer research
 
 Do lightweight but real research. Use web search / docs fetch when available.
 
@@ -81,7 +68,7 @@ Do lightweight but real research. Use web search / docs fetch when available.
 
 See `references/competitive-research.md` for who to check by domain.
 
-### 5. Clarifying questions
+## 5. Clarifying questions
 
 After research + gap analysis, ask a **single batched** set of questions.
 
@@ -94,7 +81,7 @@ Rules:
 
 Wait for answers on blockers before finalizing the plan (unless they explicitly want a draft plan with assumptions called out).
 
-### 6. Produce the plan
+## 6. Produce the plan
 
 Write the plan using `references/plan-template.md`.
 
@@ -117,59 +104,20 @@ Anti-patterns (reject these in your own draft):
 - Deepen work (Eloquent, GraphQL, …) blocking the first visible spike
 - Vague slices ("improve UX", "handle edge cases") without a verify step
 
-Present the plan. Ask for approval or edits. Do not build yet.
+## 7. Handoff
 
----
+Present the plan. Ask for approval or edits. **Do not implement.**
 
-## Build mode
+When the plan looks good (approved, or user says go / build / start), end with an
+explicit handoff — not a silent mode switch:
 
-Only after explicit go-ahead on a plan (or a clearly scoped subset).
+> Plan's ready. Run **`/build-feature`** to execute it (clean branch, one slice
+> at a time, pause at See/Work checkpoints). Say which phases to run if you
+> don't want the whole thing yet (e.g. "See only").
 
-### 0. Clean branch first
-
-Always start from a fresh branch off the current base (usually `6.x`):
-
-```bash
-git fetch origin
-git checkout <base>
-git pull origin <base>
-git checkout -b <type>/<short-feature-name>
-```
-
-- Never pile a new feature onto a dirty mixed-purpose branch.
-- If the working tree already has unrelated changes, stop and sort that out before building.
-- One feature effort → one branch (or stacked branches only if the plan says so).
-
-### 1. One slice at a time
-
-For each slice, in order:
-
-1. **Implement only that slice** — nothing speculative for later slices.
-2. **Verify** — run the slice's stated checks (PHPUnit/Vitest/manual CP poke as applicable).
-3. **Describe** — short note of what changed and how to see it (for the user / PR body).
-4. **Commit** — focused commit message matching the slice intent.
-5. **Stop if the plan says to** — especially after See / Work phase boundaries. Tell the user what to open/click/run next. Wait for "continue" unless they pre-approved running through a phase group.
-
-### 2. Progression rules
-
-- Each commit should leave the project **coherent** — not necessarily feature-complete, but not a landmine. Prefer vertical thin slices over horizontal layers.
-- See-phase code may be ugly or partial; still keep it runnable enough to inspect.
-- Work-phase slices must make the happy path actually work before Deepen starts.
-- If a slice reveals the plan is wrong, pause, propose a plan amendment, and get a nod before rewriting the roadmap.
-
-### 3. Testing bar
-
-- Prefer adding/adjusting tests in the same slice that introduces behavior.
-- Don't defer all tests to a final "Phase N: tests" dump.
-- Manual CP verification counts when UI-only; say exactly where to look.
-
-### 4. Done
-
-When the agreed phases are complete (or the user stops at a pause point):
-
-- Summarize what shipped per phase.
-- List what remains (deferred Deepen items).
-- Note how to try it.
+If they ask you to build in the same turn without invoking the build skill,
+still point them at `/build-feature` and follow that skill's instructions
+(read `.claude/skills/build-feature/SKILL.md`) before writing code.
 
 ---
 
@@ -178,4 +126,4 @@ When the agreed phases are complete (or the user stops at a pause point):
 - Treat the user as an expert. Be terse and opinionated.
 - Lead with the plan / questions, not process narration.
 - Competitive notes: sharp takeaways only.
-- During Build: say which slice you're on, then do it — no giant status essays.
+- Never drift into implementation during planning.

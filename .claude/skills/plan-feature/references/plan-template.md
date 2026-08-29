@@ -68,10 +68,14 @@ Copy this structure. Omit sections only when truly empty — prefer an explicit 
 
 ## Definition of done (for agreed scope)
 - [ ] …
+
+## Handoff
+Execute with `/build-feature` (optionally: See only / through Work / full plan).
 ```
 
 ## Writing tips
 
-- Slice IDs stay stable (`S1.2`, `W2.1`) so Build chat can say "doing W2.1".
+- Slice IDs stay stable (`S1.2`, `W2.1`) so `/build-feature` can say "doing W2.1".
 - Verify column must be concrete: `./vendor/bin/phpunit --filter FooTest`, "CP → Foo → create → save", etc.
 - If competitive research found nothing useful, say so in one line — don't pad.
+- Always close the plan by pointing at `/build-feature`.
