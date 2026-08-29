@@ -1127,6 +1127,72 @@ class ReplicatorTest extends TestCase
     }
 
     #[Test]
+    public function it_can_return_set_defaults_for_replicator_inside_custom_fieldtype()
+    {
+        $this->partialMock(RowId::class, function (MockInterface $mock) {
+            $mock->shouldReceive('generate')->andReturn('random-string-1', 'random-string-2');
+        });
+
+        $blueprint = Facades\Blueprint::make()->setHandle('default')->setNamespace('collections.pages');
+        $blueprint->setContents([
+            'sections' => [
+                'main' => [
+                    'fields' => [
+                        [
+                            'handle' => 'stuff',
+                            'field' => [
+                                'type' => 'custom_fieldtype',
+                                'fields' => [
+                                    [
+                                        'handle' => 'content_blocks',
+                                        'field' => [
+                                            'type' => 'replicator',
+                                            'sets' => [
+                                                'text' => [
+                                                    'fields' => [
+                                                        [
+                                                            'handle' => 'body',
+                                                            'field' => [
+                                                                'type' => 'textarea',
+                                                                'default' => 'the default',
+                                                            ],
+                                                        ],
+                                                    ],
+                                                ],
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        Facades\Blueprint::partialMock();
+        Facades\Blueprint::shouldReceive('find')->with('collections.pages.default')->andReturn($blueprint);
+
+        $response = $this
+            ->actingAs(tap(Facades\User::make()->makeSuper())->save())
+            ->postJson(cp_route('replicator-fieldtype.set'), [
+                'blueprint' => 'collections.pages.default',
+                'field' => 'stuff.content_blocks',
+                'set' => 'text',
+            ])
+            ->assertOk();
+
+        $this->assertEquals([
+            'body' => 'the default',
+        ], $response->json('defaults'));
+
+        $this->assertEquals([
+            '_' => '_',
+            'body' => null,
+        ], $response->json('new'));
+    }
+
+    #[Test]
     public function it_can_return_set_defaults_when_sets_are_stored_in_legacy_format()
     {
         $this->partialMock(RowId::class, function (MockInterface $mock) {
