@@ -28,7 +28,7 @@ class Item extends LabeledValue implements \ArrayAccess
 
     public function offsetGet(mixed $offset): mixed
     {
-        return $this->data()[$offset];
+        return $this->extra[$offset] ?? '';
     }
 
     public function offsetSet(mixed $offset, mixed $value): void
