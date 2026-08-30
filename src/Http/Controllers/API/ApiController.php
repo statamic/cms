@@ -20,6 +20,7 @@ class ApiController extends Controller
     protected $resourceConfigKey;
     protected $routeResourceKey;
     protected $filterPublished = false;
+    protected $siteConstrained = false;
 
     /**
      * Abort if item is unpublished.
@@ -87,10 +88,40 @@ class ApiController extends Controller
     protected function updateAndPaginate($query)
     {
         return $this
+            ->applySiteConstraint($query)
             ->filter($query)
             ->sort($query)
             ->scope($query)
             ->paginate($query);
+    }
+
+    /**
+     * Limit the query to an explicit ?site= handle.
+     *
+     * Unlike queryParam('site'), this does not default to the default site,
+     * so omitting the param keeps existing "all sites" list behavior.
+     */
+    protected function applySiteConstraint($query)
+    {
+        if ($this->siteConstrained && $site = $this->requestedSite()) {
+            $query->where('site', $site);
+        }
+
+        return $this;
+    }
+
+    protected function requestedSite(): ?string
+    {
+        return request()->has('site') ? request()->input('site') : null;
+    }
+
+    protected function localize($item)
+    {
+        if (! $item || ! $site = $this->requestedSite()) {
+            return $item;
+        }
+
+        return $item->in($site);
     }
 
     /**

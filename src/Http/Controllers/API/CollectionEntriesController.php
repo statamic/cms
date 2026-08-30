@@ -17,6 +17,7 @@ class CollectionEntriesController extends ApiController
     protected $resourceConfigKey = 'collections';
     protected $routeResourceKey = 'collection';
     protected $filterPublished = true;
+    protected $siteConstrained = true;
     protected $collectionHandle;
 
     public function index($collection)
@@ -38,7 +39,7 @@ class CollectionEntriesController extends ApiController
     {
         $this->abortIfDisabled();
 
-        $entry = Entry::find($handle);
+        $entry = $this->localize(Entry::find($handle));
 
         $this->abortIfInvalid($entry, $collection);
         $this->abortIfUnpublished($entry);
