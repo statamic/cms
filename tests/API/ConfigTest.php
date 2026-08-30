@@ -289,6 +289,9 @@ class ConfigTest extends TestCase
 
         Facades\Config::set('statamic.api.resources.assets', true);
 
+        $this->assertEndpointSuccessful('/api/asset-containers');
+        $this->assertEndpointSuccessful('/api/asset-containers/main');
+        $this->assertEndpointSuccessful('/api/asset-containers/avatars');
         $this->assertEndpointSuccessful('/api/assets/main');
         $this->assertEndpointSuccessful('/api/assets/avatars');
 
@@ -304,6 +307,8 @@ class ConfigTest extends TestCase
 
         Facades\Config::set('statamic.api.resources.assets', false);
 
+        $this->assertEndpointNotFound('/api/asset-containers');
+        $this->assertEndpointNotFound('/api/asset-containers/main');
         $this->assertEndpointNotFound('/api/assets/main');
         $this->assertEndpointNotFound('/api/assets/avatars');
 
@@ -319,6 +324,9 @@ class ConfigTest extends TestCase
 
         Facades\Config::set('statamic.api.resources.assets', ['avatars']);
 
+        $this->assertEndpointSuccessful('/api/asset-containers');
+        $this->assertEndpointNotFound('/api/asset-containers/main');
+        $this->assertEndpointSuccessful('/api/asset-containers/avatars');
         $this->assertEndpointNotFound('/api/assets/main');
         $this->assertEndpointSuccessful('/api/assets/avatars');
 

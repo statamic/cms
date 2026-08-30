@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Statamic\Http\Controllers\API\AssetContainersController;
 use Statamic\Http\Controllers\API\AssetsController;
 use Statamic\Http\Controllers\API\CollectionEntriesController;
 use Statamic\Http\Controllers\API\CollectionsController;
@@ -28,6 +29,7 @@ Route::resource('users', UsersController::class)->only('index', 'show');
 Route::resource('sites', SitesController::class)->only('index');
 Route::resource('navs', NavsController::class)->only('index', 'show');
 
+Route::resource('asset-containers', AssetContainersController::class)->only('index', 'show')->parameters(['asset-containers' => 'asset_container']);
 Route::name('assets.index')->get('assets/{asset_container}', [AssetsController::class, 'index']);
 Route::name('assets.show')->get('assets/{asset_container}/{asset}', [AssetsController::class, 'show'])->where('asset', '.*');
 

@@ -13,6 +13,7 @@ class Resource
      * @var array
      */
     const STATAMIC_RESOURCES = [
+        AssetContainerResource::class,
         AssetResource::class,
         CollectionResource::class,
         EntryResource::class,

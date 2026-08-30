@@ -224,6 +224,58 @@ class APITest extends TestCase
     }
 
     #[Test]
+    public function it_queries_asset_container_metadata()
+    {
+        Facades\Config::set('statamic.api.resources.assets', true);
+
+        Facades\AssetContainer::make('main')->title('Main')->save();
+        Facades\AssetContainer::make('avatars')->title('Avatars')->save();
+
+        $this
+            ->get('/api/asset-containers')
+            ->assertSuccessful()
+            ->assertExactJson(['data' => [
+                [
+                    'handle' => 'main',
+                    'title' => 'Main',
+                    'api_url' => 'http://localhost/api/asset-containers/main',
+                ],
+                [
+                    'handle' => 'avatars',
+                    'title' => 'Avatars',
+                    'api_url' => 'http://localhost/api/asset-containers/avatars',
+                ],
+            ]]);
+
+        $this
+            ->get('/api/asset-containers/main')
+            ->assertSuccessful()
+            ->assertExactJson(['data' => [
+                'handle' => 'main',
+                'title' => 'Main',
+                'api_url' => 'http://localhost/api/asset-containers/main',
+            ]]);
+    }
+
+    #[Test]
+    public function it_only_queries_allowed_asset_containers()
+    {
+        Facades\Config::set('statamic.api.resources.assets', ['avatars']);
+
+        Facades\AssetContainer::make('main')->save();
+        Facades\AssetContainer::make('avatars')->title('Avatars')->save();
+
+        $this
+            ->get('/api/asset-containers')
+            ->assertSuccessful()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.handle', 'avatars');
+
+        $this->assertEndpointNotFound('/api/asset-containers/main');
+        $this->assertEndpointSuccessful('/api/asset-containers/avatars');
+    }
+
+    #[Test]
     public function it_pongs_when_pinged()
     {
         $this
