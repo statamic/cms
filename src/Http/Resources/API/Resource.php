@@ -18,6 +18,7 @@ class Resource
         EntryResource::class,
         FormResource::class,
         GlobalSetResource::class,
+        NavResource::class,
         SiteResource::class,
         TaxonomyResource::class,
         TermResource::class,

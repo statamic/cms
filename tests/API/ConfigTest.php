@@ -142,6 +142,9 @@ class ConfigTest extends TestCase
 
         Facades\Config::set('statamic.api.resources.navs', true);
 
+        $this->assertEndpointSuccessful('/api/navs');
+        $this->assertEndpointSuccessful('/api/navs/footer');
+        $this->assertEndpointSuccessful('/api/navs/docs');
         $this->assertEndpointSuccessful('/api/navs/footer/tree');
         $this->assertEndpointSuccessful('/api/navs/docs/tree');
     }
@@ -154,6 +157,8 @@ class ConfigTest extends TestCase
 
         Facades\Config::set('statamic.api.resources.navs', false);
 
+        $this->assertEndpointNotFound('/api/navs');
+        $this->assertEndpointNotFound('/api/navs/footer');
         $this->assertEndpointNotFound('/api/navs/footer/tree');
         $this->assertEndpointNotFound('/api/navs/docs/tree');
     }
@@ -166,6 +171,9 @@ class ConfigTest extends TestCase
 
         Facades\Config::set('statamic.api.resources.navs', ['footer']);
 
+        $this->assertEndpointSuccessful('/api/navs');
+        $this->assertEndpointSuccessful('/api/navs/footer');
+        $this->assertEndpointNotFound('/api/navs/docs');
         $this->assertEndpointSuccessful('/api/navs/footer/tree');
         $this->assertEndpointNotFound('/api/navs/docs/tree');
     }

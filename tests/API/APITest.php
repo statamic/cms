@@ -166,6 +166,64 @@ class APITest extends TestCase
     }
 
     #[Test]
+    public function it_queries_nav_metadata()
+    {
+        Facades\Config::set('statamic.api.resources.navs', true);
+
+        Facades\Nav::make('footer')->title('Footer')->maxDepth(2)->expectsRoot(false)->save();
+        Facades\Nav::make('docs')->title('Docs')->save();
+
+        $this
+            ->get('/api/navs')
+            ->assertSuccessful()
+            ->assertExactJson(['data' => [
+                [
+                    'handle' => 'footer',
+                    'title' => 'Footer',
+                    'max_depth' => 2,
+                    'expects_root' => false,
+                    'api_url' => 'http://localhost/api/navs/footer',
+                ],
+                [
+                    'handle' => 'docs',
+                    'title' => 'Docs',
+                    'max_depth' => null,
+                    'expects_root' => false,
+                    'api_url' => 'http://localhost/api/navs/docs',
+                ],
+            ]]);
+
+        $this
+            ->get('/api/navs/footer')
+            ->assertSuccessful()
+            ->assertExactJson(['data' => [
+                'handle' => 'footer',
+                'title' => 'Footer',
+                'max_depth' => 2,
+                'expects_root' => false,
+                'api_url' => 'http://localhost/api/navs/footer',
+            ]]);
+    }
+
+    #[Test]
+    public function it_only_queries_allowed_navs()
+    {
+        Facades\Config::set('statamic.api.resources.navs', ['footer']);
+
+        Facades\Nav::make('footer')->save();
+        Facades\Nav::make('docs')->save();
+
+        $this
+            ->get('/api/navs')
+            ->assertSuccessful()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.handle', 'footer');
+
+        $this->assertEndpointSuccessful('/api/navs/footer');
+        $this->assertEndpointNotFound('/api/navs/docs');
+    }
+
+    #[Test]
     public function it_pongs_when_pinged()
     {
         $this
