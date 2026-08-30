@@ -19,6 +19,15 @@ class APITest extends TestCase
     use PreventSavingStacheItemsToDisk;
 
     #[Test]
+    public function it_pongs_when_pinged()
+    {
+        $this
+            ->get('/api/ping')
+            ->assertSuccessful()
+            ->assertExactJson(['ping' => 'pong']);
+    }
+
+    #[Test]
     public function not_found_responses_are_formatted_with_json()
     {
         $this
