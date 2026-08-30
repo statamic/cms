@@ -771,9 +771,9 @@ class APITest extends TestCase
         Facades\Entry::make()->collection('pages')->id('jazz')->slug('jazz')->published(true)->save();
 
         $this
-            ->get('/api/collections/pages/entries?limit=2&sort=-date&filter[published]=true&unknown=param')
-            ->assertJsonPath('links.first', 'http://localhost/api/collections/pages/entries?filter%5Bpublished%5D=true&limit=2&sort=-date&page=1')
-            ->assertJsonPath('links.next', 'http://localhost/api/collections/pages/entries?filter%5Bpublished%5D=true&limit=2&sort=-date&page=2');
+            ->get('/api/collections/pages/entries?limit=2&sort=-date&filter[published]=true&fields=id,title&site=en&unknown=param')
+            ->assertJsonPath('links.first', 'http://localhost/api/collections/pages/entries?filter%5Bpublished%5D=true&limit=2&sort=-date&fields=id%2Ctitle&site=en&page=1')
+            ->assertJsonPath('links.next', 'http://localhost/api/collections/pages/entries?filter%5Bpublished%5D=true&limit=2&sort=-date&fields=id%2Ctitle&site=en&page=2');
     }
 
     #[Test]
