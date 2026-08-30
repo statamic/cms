@@ -180,6 +180,9 @@ class ConfigTest extends TestCase
 
         Facades\Config::set('statamic.api.resources.taxonomies', true);
 
+        $this->assertEndpointSuccessful('/api/taxonomies');
+        $this->assertEndpointSuccessful('/api/taxonomies/topics');
+        $this->assertEndpointSuccessful('/api/taxonomies/colours');
         $this->assertEndpointSuccessful('/api/taxonomies/topics/terms');
         $this->assertEndpointSuccessful('/api/taxonomies/colours/terms');
 
@@ -197,6 +200,8 @@ class ConfigTest extends TestCase
 
         Facades\Config::set('statamic.api.resources.taxonomies', false);
 
+        $this->assertEndpointNotFound('/api/taxonomies');
+        $this->assertEndpointNotFound('/api/taxonomies/topics');
         $this->assertEndpointNotFound('/api/taxonomies/topics/terms');
         $this->assertEndpointNotFound('/api/taxonomies/colours/terms');
 
@@ -214,6 +219,9 @@ class ConfigTest extends TestCase
 
         Facades\Config::set('statamic.api.resources.taxonomies', ['topics']);
 
+        $this->assertEndpointSuccessful('/api/taxonomies');
+        $this->assertEndpointSuccessful('/api/taxonomies/topics');
+        $this->assertEndpointNotFound('/api/taxonomies/colours');
         $this->assertEndpointSuccessful('/api/taxonomies/topics/terms');
         $this->assertEndpointNotFound('/api/taxonomies/colours/terms');
 

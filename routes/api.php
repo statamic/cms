@@ -11,12 +11,14 @@ use Statamic\Http\Controllers\API\NavigationTreeController;
 use Statamic\Http\Controllers\API\NotFoundController;
 use Statamic\Http\Controllers\API\PingController;
 use Statamic\Http\Controllers\API\SitesController;
+use Statamic\Http\Controllers\API\TaxonomiesController;
 use Statamic\Http\Controllers\API\TaxonomyTermEntriesController;
 use Statamic\Http\Controllers\API\TaxonomyTermsController;
 use Statamic\Http\Controllers\API\UsersController;
 
 Route::resource('collections', CollectionsController::class)->only('index', 'show');
 Route::resource('collections.entries', CollectionEntriesController::class)->only('index', 'show');
+Route::resource('taxonomies', TaxonomiesController::class)->only('index', 'show');
 Route::resource('taxonomies.terms', TaxonomyTermsController::class)->only('index', 'show');
 Route::resource('taxonomies.terms.entries', TaxonomyTermEntriesController::class)->only('index');
 Route::resource('globals', GlobalsController::class)->only('index', 'show');

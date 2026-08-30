@@ -114,6 +114,58 @@ class APITest extends TestCase
     }
 
     #[Test]
+    public function it_queries_taxonomy_metadata()
+    {
+        Facades\Config::set('statamic.api.resources.taxonomies', true);
+
+        Facades\Taxonomy::make('topics')->title('Topics')->save();
+        Facades\Taxonomy::make('tags')->title('Tags')->save();
+
+        $this
+            ->get('/api/taxonomies')
+            ->assertSuccessful()
+            ->assertExactJson(['data' => [
+                [
+                    'handle' => 'topics',
+                    'title' => 'Topics',
+                    'api_url' => 'http://localhost/api/taxonomies/topics',
+                ],
+                [
+                    'handle' => 'tags',
+                    'title' => 'Tags',
+                    'api_url' => 'http://localhost/api/taxonomies/tags',
+                ],
+            ]]);
+
+        $this
+            ->get('/api/taxonomies/topics')
+            ->assertSuccessful()
+            ->assertExactJson(['data' => [
+                'handle' => 'topics',
+                'title' => 'Topics',
+                'api_url' => 'http://localhost/api/taxonomies/topics',
+            ]]);
+    }
+
+    #[Test]
+    public function it_only_queries_allowed_taxonomies()
+    {
+        Facades\Config::set('statamic.api.resources.taxonomies', ['tags']);
+
+        Facades\Taxonomy::make('topics')->save();
+        Facades\Taxonomy::make('tags')->title('Tags')->save();
+
+        $this
+            ->get('/api/taxonomies')
+            ->assertSuccessful()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.handle', 'tags');
+
+        $this->assertEndpointNotFound('/api/taxonomies/topics');
+        $this->assertEndpointSuccessful('/api/taxonomies/tags');
+    }
+
+    #[Test]
     public function it_pongs_when_pinged()
     {
         $this

@@ -19,6 +19,7 @@ class Resource
         FormResource::class,
         GlobalSetResource::class,
         SiteResource::class,
+        TaxonomyResource::class,
         TermResource::class,
         UserResource::class,
         TreeResource::class,
