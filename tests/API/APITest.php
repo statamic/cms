@@ -460,6 +460,37 @@ class APITest extends TestCase
         ];
     }
 
+    #[Test]
+    public function it_resolves_entries_by_slug()
+    {
+        Facades\Config::set('statamic.api.resources.collections', true);
+
+        Facades\Collection::make('pages')->save();
+        Facades\Entry::make()->collection('pages')->id('123')->slug('about')->published(true)->data(['title' => 'About'])->save();
+
+        $this
+            ->get('/api/collections/pages/entries/about')
+            ->assertSuccessful()
+            ->assertJsonPath('data.id', '123')
+            ->assertJsonPath('data.slug', 'about');
+    }
+
+    #[Test]
+    public function it_prefers_entry_id_over_slug()
+    {
+        Facades\Config::set('statamic.api.resources.collections', true);
+
+        Facades\Collection::make('pages')->save();
+        Facades\Entry::make()->collection('pages')->id('about')->slug('about-page')->published(true)->data(['title' => 'By ID'])->save();
+        Facades\Entry::make()->collection('pages')->id('other')->slug('about')->published(true)->data(['title' => 'By Slug'])->save();
+
+        $this
+            ->get('/api/collections/pages/entries/about')
+            ->assertSuccessful()
+            ->assertJsonPath('data.id', 'about')
+            ->assertJsonPath('data.title', 'By ID');
+    }
+
     public static function exampleFiltersProvider()
     {
         return [['status:is'], ['published:is'], ['title:is']];
