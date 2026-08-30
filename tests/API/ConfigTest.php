@@ -37,6 +37,9 @@ class ConfigTest extends TestCase
 
         Facades\Config::set('statamic.api.resources.collections', true);
 
+        $this->assertEndpointSuccessful('/api/collections');
+        $this->assertEndpointSuccessful('/api/collections/pages');
+        $this->assertEndpointSuccessful('/api/collections/articles');
         $this->assertEndpointSuccessful('/api/collections/pages/tree');
         $this->assertEndpointSuccessful('/api/collections/pages/entries');
         $this->assertEndpointSuccessful('/api/collections/articles/entries');
@@ -55,6 +58,8 @@ class ConfigTest extends TestCase
 
         Facades\Config::set('statamic.api.resources.collections', false);
 
+        $this->assertEndpointNotFound('/api/collections');
+        $this->assertEndpointNotFound('/api/collections/pages');
         $this->assertEndpointNotFound('/api/collections/pages/tree');
         $this->assertEndpointNotFound('/api/collections/pages/entries');
         $this->assertEndpointNotFound('/api/collections/articles/entries');
@@ -118,6 +123,9 @@ class ConfigTest extends TestCase
 
         Facades\Config::set('statamic.api.resources.collections', ['pages']);
 
+        $this->assertEndpointSuccessful('/api/collections');
+        $this->assertEndpointSuccessful('/api/collections/pages');
+        $this->assertEndpointNotFound('/api/collections/articles');
         $this->assertEndpointSuccessful('/api/collections/pages/tree');
         $this->assertEndpointSuccessful('/api/collections/pages/entries');
         $this->assertEndpointNotFound('/api/collections/articles/entries');

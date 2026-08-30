@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Statamic\Http\Controllers\API\AssetsController;
 use Statamic\Http\Controllers\API\CollectionEntriesController;
+use Statamic\Http\Controllers\API\CollectionsController;
 use Statamic\Http\Controllers\API\CollectionTreeController;
 use Statamic\Http\Controllers\API\FormsController;
 use Statamic\Http\Controllers\API\GlobalsController;
@@ -14,6 +15,7 @@ use Statamic\Http\Controllers\API\TaxonomyTermEntriesController;
 use Statamic\Http\Controllers\API\TaxonomyTermsController;
 use Statamic\Http\Controllers\API\UsersController;
 
+Route::resource('collections', CollectionsController::class)->only('index', 'show');
 Route::resource('collections.entries', CollectionEntriesController::class)->only('index', 'show');
 Route::resource('taxonomies.terms', TaxonomyTermsController::class)->only('index', 'show');
 Route::resource('taxonomies.terms.entries', TaxonomyTermEntriesController::class)->only('index');

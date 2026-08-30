@@ -46,6 +46,74 @@ class APITest extends TestCase
     }
 
     #[Test]
+    public function it_cannot_query_collections_by_default()
+    {
+        Facades\Collection::make('pages')->save();
+
+        $this->assertEndpointNotFound('/api/collections');
+        $this->assertEndpointNotFound('/api/collections/pages');
+    }
+
+    #[Test]
+    public function it_queries_collection_metadata()
+    {
+        Facades\Config::set('statamic.api.resources.collections', true);
+
+        Facades\Collection::make('pages')->title('Pages')->structureContents(['expects_root' => false])->mount('home')->save();
+        Facades\Entry::make()->collection('pages')->id('home')->slug('home')->published(true)->save();
+        Facades\Collection::make('articles')->title('Articles')->save();
+
+        $this
+            ->get('/api/collections')
+            ->assertSuccessful()
+            ->assertExactJson(['data' => [
+                [
+                    'handle' => 'pages',
+                    'title' => 'Pages',
+                    'structure' => 'pages',
+                    'mount' => 'home',
+                    'api_url' => 'http://localhost/api/collections/pages',
+                ],
+                [
+                    'handle' => 'articles',
+                    'title' => 'Articles',
+                    'structure' => null,
+                    'mount' => null,
+                    'api_url' => 'http://localhost/api/collections/articles',
+                ],
+            ]]);
+
+        $this
+            ->get('/api/collections/pages')
+            ->assertSuccessful()
+            ->assertExactJson(['data' => [
+                'handle' => 'pages',
+                'title' => 'Pages',
+                'structure' => 'pages',
+                'mount' => 'home',
+                'api_url' => 'http://localhost/api/collections/pages',
+            ]]);
+    }
+
+    #[Test]
+    public function it_only_queries_allowed_collections()
+    {
+        Facades\Config::set('statamic.api.resources.collections', ['articles']);
+
+        Facades\Collection::make('pages')->save();
+        Facades\Collection::make('articles')->title('Articles')->save();
+
+        $this
+            ->get('/api/collections')
+            ->assertSuccessful()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.handle', 'articles');
+
+        $this->assertEndpointNotFound('/api/collections/pages');
+        $this->assertEndpointSuccessful('/api/collections/articles');
+    }
+
+    #[Test]
     public function it_pongs_when_pinged()
     {
         $this
