@@ -347,6 +347,23 @@ class ConfigTest extends TestCase
     }
 
     #[Test]
+    public function config_can_enable_sites()
+    {
+        Facades\Config::set('statamic.api.resources.sites', true);
+
+        $this->assertEndpointSuccessful('/api/sites');
+        $this->assertEndpointDataCount('/api/sites', 1);
+    }
+
+    #[Test]
+    public function config_can_disable_sites()
+    {
+        Facades\Config::set('statamic.api.resources.sites', false);
+
+        $this->assertEndpointNotFound('/api/sites');
+    }
+
+    #[Test]
     public function config_can_enable_all_users()
     {
         Facades\User::make()->id('one')->save();
