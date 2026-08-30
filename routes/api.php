@@ -8,6 +8,7 @@ use Statamic\Http\Controllers\API\FormsController;
 use Statamic\Http\Controllers\API\GlobalsController;
 use Statamic\Http\Controllers\API\NavigationTreeController;
 use Statamic\Http\Controllers\API\NotFoundController;
+use Statamic\Http\Controllers\API\PingController;
 use Statamic\Http\Controllers\API\TaxonomyTermEntriesController;
 use Statamic\Http\Controllers\API\TaxonomyTermsController;
 use Statamic\Http\Controllers\API\UsersController;
@@ -24,5 +25,7 @@ Route::name('assets.show')->get('assets/{asset_container}/{asset}', [AssetsContr
 
 Route::get('collections/{collection}/tree', [CollectionTreeController::class, 'show']);
 Route::get('navs/{nav}/tree', [NavigationTreeController::class, 'show']);
+
+Route::get('ping', PingController::class);
 
 Route::get('{path?}', NotFoundController::class)->where('path', '.*');
