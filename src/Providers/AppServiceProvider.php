@@ -293,6 +293,8 @@ class AppServiceProvider extends ServiceProvider
             \Statamic\Structures\NavTree::class,
             \Statamic\Structures\CollectionTree::class,
             \Statamic\Structures\CollectionStructure::class,
+            \Statamic\Structures\TaxonomyTree::class,
+            \Statamic\Structures\TaxonomyStructure::class,
             \Statamic\Taxonomies\Taxonomy::class,
             \Statamic\Taxonomies\LocalizedTerm::class,
             \Statamic\Taxonomies\Term::class,
