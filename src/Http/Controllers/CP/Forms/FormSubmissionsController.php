@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Statamic\CP\Column;
 use Statamic\CP\Columns;
-use Statamic\Events\FormSubmitted;
 use Statamic\Facades\Scope;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Controllers\CP\Forms\Concerns\ProvidesFormAbilities;
