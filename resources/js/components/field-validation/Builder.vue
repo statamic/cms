@@ -256,8 +256,9 @@ export default {
 
         ifSearchNotFoundAddCustom() {
             let rulesSelect = this.$refs.rulesSelect;
-            let rule = rulesSelect.searchQuery.value;
+            let rule = rulesSelect?.searchQuery;
 
+            if (!rule) return;
             if (this.searchNotFound(rulesSelect) || this.hasUnfinishedParameters(rule)) return;
 
             this.add(rule);
@@ -272,7 +273,7 @@ export default {
         },
 
         searchNotFound(rulesSelect) {
-            return rulesSelect.searchQuery.value?.length === 0 || rulesSelect?.filteredOptions.length === 0;
+            return rulesSelect.filteredOptions.length === 0;
         },
 
         updated(rules) {

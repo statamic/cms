@@ -1076,6 +1076,121 @@ export const TestTaggableSinglePasteDoesNotCommitTags: Story = {
     },
 };
 
+export const TestTaggableShowsAddOptionAlongsideMatches: Story = {
+    tags: ['!dev', 'test'],
+    render: () => ({
+        components: { Combobox },
+        setup() {
+            const value = ref<string[]>([]);
+            return { value, options: defaultOptions };
+        },
+        template: `<Combobox v-model="value" :options="options" multiple taggable placeholder="Add tags..." />`,
+    }),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const trigger = canvas.getByRole('combobox');
+
+        await userEvent.click(trigger);
+
+        const input = document.querySelector('input[type="search"]') as HTMLInputElement;
+        await userEvent.type(input, 'the');
+
+        await new Promise((r) => setTimeout(r, 100));
+
+        const options = document.querySelectorAll('[data-ui-combobox-item]');
+        expect(options.length).toBe(3);
+        expect(options[0].getAttribute('data-ui-combobox-item')).toBe('the');
+        expect(options[0].textContent).toContain('Add "the"');
+    },
+};
+
+export const TestTaggableHidesAddOptionWhenQueryMatchesExistingOption: Story = {
+    tags: ['!dev', 'test'],
+    render: () => ({
+        components: { Combobox },
+        setup() {
+            const value = ref<string[]>([]);
+            return { value, options: defaultOptions };
+        },
+        template: `<Combobox v-model="value" :options="options" multiple taggable placeholder="Add tags..." />`,
+    }),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const trigger = canvas.getByRole('combobox');
+
+        await userEvent.click(trigger);
+
+        const input = document.querySelector('input[type="search"]') as HTMLInputElement;
+        await userEvent.type(input, 'The Midnight');
+
+        await new Promise((r) => setTimeout(r, 100));
+
+        const options = document.querySelectorAll('[data-ui-combobox-item]');
+        expect(options.length).toBe(1);
+        expect(options[0].getAttribute('data-ui-combobox-item')).toBe('the_midnight');
+    },
+};
+
+export const TestTaggableEnterSelectsHighlightedOption: Story = {
+    tags: ['!dev', 'test'],
+    args: {
+        'onUpdate:modelValue': fn(),
+        onAdded: fn(),
+    },
+    render: (args) => ({
+        components: { Combobox },
+        setup() {
+            const value = ref<string[]>([]);
+            return { value, options: defaultOptions, onUpdate: args['onUpdate:modelValue'], onAdded: args.onAdded };
+        },
+        template: `<Combobox v-model="value" :options="options" multiple taggable placeholder="Add tags..." @update:modelValue="onUpdate" @added="onAdded" />`,
+    }),
+    play: async ({ canvasElement, args }) => {
+        const canvas = within(canvasElement);
+        const trigger = canvas.getByRole('combobox');
+
+        await userEvent.click(trigger);
+
+        const input = document.querySelector('input[type="search"]') as HTMLInputElement;
+        await userEvent.type(input, 'the');
+
+        await new Promise((r) => setTimeout(r, 100));
+
+        await userEvent.keyboard('{ArrowDown}');
+        await userEvent.keyboard('{Enter}');
+
+        await expect(args['onUpdate:modelValue']).toHaveBeenCalledWith(['the_midnight']);
+        expect(args.onAdded).not.toHaveBeenCalled();
+    },
+};
+
+export const TestTaggableDropdownOpensOnTabFocus: Story = {
+    tags: ['!dev', 'test'],
+    render: () => ({
+        components: { Combobox },
+        setup() {
+            const value = ref<string[]>([]);
+            return { value, options: defaultOptions };
+        },
+        template: `
+            <input data-testid="before" />
+            <Combobox v-model="value" :options="options" multiple taggable placeholder="Add tags..." />
+        `,
+    }),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+
+        canvas.getByTestId('before').focus();
+        await userEvent.tab();
+
+        await new Promise((r) => setTimeout(r, 100));
+
+        const input = document.querySelector('input[type="search"]') as HTMLInputElement;
+        expect(document.activeElement).toBe(input);
+        await expect(document.querySelector('[data-ui-combobox-content]')).toBeTruthy();
+    },
+};
+
 export const TestDropdownOpensOnSpace: Story = {
     tags: ['!dev', 'test'],
     render: () => ({

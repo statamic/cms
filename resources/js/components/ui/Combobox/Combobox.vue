@@ -142,12 +142,17 @@ const itemClasses = cva({
 
 const searchQuery = ref('');
 const dropdownOpen = ref(false);
+const focusedByPointer = ref(false);
 const rootRef = useTemplateRef('root');
+const wrapperRef = useTemplateRef('wrapper');
 const triggerRef = useTemplateRef('trigger');
 const searchInputRef = useTemplateRef('search');
 
 watch(searchQuery, (value) => emit('search', value, () => {}));
-watch(dropdownOpen, () => searchQuery.value = '');
+
+watch(dropdownOpen, (open) => {
+    if (!open) searchQuery.value = '';
+});
 
 const getOptionLabel = (option) => {
     const label = option?.[props.optionLabel];
@@ -232,29 +237,39 @@ const placeholder = computed(() => {
 });
 
 const filteredOptions = computed(() => {
-    if (!props.searchable || props.ignoreFilter) {
-        return props.options;
+    let results = [...props.options];
+
+    if (props.searchable && !props.ignoreFilter) {
+        const matches = new Set(
+            fuzzysort
+                .go(searchQuery.value, props.options, {
+                    all: true,
+                    ...(props.searchKeys?.length ? { keys: props.searchKeys } : { key: props.optionLabel }),
+                })
+                .map((result) => result.obj)
+        );
+
+        results = props.options.filter((option) => matches.has(option));
     }
 
-    const matches = new Set(
-        fuzzysort
-            .go(searchQuery.value, props.options, {
-                all: true,
-                ...(props.searchKeys?.length ? { keys: props.searchKeys } : { key: props.optionLabel }),
-            })
-            .map((result) => result.obj)
-    );
-
-    const results = props.options.filter((option) => matches.has(option));
-
-    if (props.taggable && searchQuery.value && results.length === 0) {
-        results.push({
+    if (shouldShowCreateOption.value) {
+        results.unshift({
             [props.optionLabel]: searchQuery.value,
             [props.optionValue]: searchQuery.value,
+            create: true,
         });
     }
 
     return results;
+});
+
+const shouldShowCreateOption = computed(() => {
+    if (!props.taggable || !searchQuery.value) return false;
+
+    const matchesSearchQuery = (option) =>
+        getOptionLabel(option) === searchQuery.value || String(getOptionValue(option)) === searchQuery.value;
+
+    return !props.options.some(matchesSearchQuery) && !selectedOptions.value.some(matchesSearchQuery);
 });
 
 function clear() {
@@ -262,7 +277,9 @@ function clear() {
     emit('update:modelValue', null);
 }
 
-function select() {
+function select(option) {
+    if (option.create) emit('added', getOptionValue(option));
+
     dropdownOpen.value = !shouldCloseOnSelect.value;
     if (shouldCloseOnSelect.value) triggerRef.value?.$el?.focus();
 }
@@ -305,6 +322,23 @@ function openDropdown(e) {
     updateDropdownOpen(true);
 }
 
+function onFocus(e) {
+    const byPointer = focusedByPointer.value;
+    focusedByPointer.value = false;
+
+    if (!props.taggable || byPointer || dropdownOpen.value) return;
+    if (!focusCameFromOutside(e)) return;
+
+    updateDropdownOpen(true);
+}
+
+function focusCameFromOutside(e) {
+    if (!e.relatedTarget) return false;
+    if ('rekaCollectionItem' in e.relatedTarget.dataset) return false;
+
+    return !wrapperRef.value?.contains(e.relatedTarget);
+}
+
 function onBlur(e) {
     if (!props.taggable) return;
 
@@ -331,6 +365,7 @@ function onPaste(e) {
 
 function pushTaggableOption(e) {
     if (!props.taggable) return;
+    if (e.defaultPrevented) return; // Reka prevents the event's default when it selects a highlighted option.
     if (e.target.value === '') return;
 
     e.preventDefault();
@@ -369,7 +404,13 @@ defineExpose({
 </script>
 
 <template>
-    <div :class="wrapperClasses" v-bind="wrapperAttrs">
+    <div
+        ref="wrapper"
+        :class="wrapperClasses"
+        v-bind="wrapperAttrs"
+        @pointerdown="focusedByPointer = true"
+        @click="focusedByPointer = false"
+    >
         <div class="flex w-full min-w-0">
             <ComboboxRoot
                 ref="root"
@@ -390,7 +431,7 @@ defineExpose({
                     <ComboboxTrigger
                         as="div"
                         ref="trigger"
-                        :tabindex="disabled || readOnly ? -1 : 0"
+                        :tabindex="disabled || readOnly || shouldShowInput ? -1 : 0"
                         :class="triggerClasses"
                         data-ui-combobox-trigger
                         @keydown.enter="openDropdown"
@@ -409,6 +450,7 @@ defineExpose({
                                 type="search"
                                 autocomplete="off"
                                 v-model="searchQuery"
+                                @focus="onFocus"
                                 @blur="onBlur"
                                 @paste="onPaste"
                                 @keydown.enter="pushTaggableOption"
@@ -507,12 +549,15 @@ defineExpose({
                                             :class="itemClasses({ size: size, selected: isSelected(option) })"
                                             :data-ui-combobox-item="getOptionValue(option)"
                                             :title="getOptionLabel(option)"
-                                            @select="select"
+                                            @select="select(option)"
                                         >
                                             <slot name="option" v-bind="option">
-                                                <img v-if="option.image" :src="option.image" class="size-5 rounded-full" :alt="getOptionLabel(option)">
-                                                <span v-if="labelHtml" class="truncate" v-html="getOptionLabel(option)" />
-                                                <span class="truncate" v-else>{{ __(getOptionLabel(option)) }}</span>
+                                                <span v-if="option.create" class="truncate">{{ __('Add ":value"', { value: getOptionLabel(option) }) }}</span>
+                                                <template v-else>
+                                                    <img v-if="option.image" :src="option.image" class="size-5 rounded-full" :alt="getOptionLabel(option)">
+                                                    <span v-if="labelHtml" class="truncate" v-html="getOptionLabel(option)" />
+                                                    <span class="truncate" v-else>{{ __(getOptionLabel(option)) }}</span>
+                                                </template>
                                             </slot>
                                         </ComboboxItem>
                                     </div>
