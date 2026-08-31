@@ -279,18 +279,17 @@ export default {
 
         fieldActionPayload() {
             return {
-                // vm: this,
-                // fieldVm: this.fieldVm,
-                // fieldPathPrefix: this.fieldVm.fieldPathPrefix || this.fieldVm.handle,
+                fieldPathPrefix: this.fieldPathPrefix,
                 index: this.index,
                 values: this.values,
                 config: this.config,
-                // meta: this.meta,
+                meta: this.meta,
                 update: (handle, value) =>
                     this.publishContainer.setFieldValue(`${this.fieldPathPrefix}.${handle}`, value),
                 updateMeta: (handle, value) =>
                     this.publishContainer.setFieldMeta(`${this.metaPathPrefix}.${handle}`, value),
                 isReadOnly: this.isReadOnly,
+                container: this.publishContainer,
             };
         },
 

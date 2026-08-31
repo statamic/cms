@@ -18,6 +18,7 @@ import PreviewHtml from '@/components/fieldtypes/replicator/PreviewHtml.js';
 import FieldAction from '@/components/field-actions/FieldAction.js';
 import toFieldActions from '@/components/field-actions/toFieldActions.js';
 import { reveal } from '@api';
+import { data_get } from "@/bootstrap/globals.js";
 
 const emit = defineEmits(['collapsed', 'expanded', 'duplicated', 'removed']);
 
@@ -43,7 +44,9 @@ const props = defineProps({
 const {
     setFieldValue,
     setFieldMeta,
-    previews
+    previews,
+    container,
+    meta
 } = injectContainerContext();
 const fieldPathPrefix = computed(() => `${props.fieldPath}.${props.index}`);
 const metaPathPrefix = computed(() => `${props.metaPath}.existing.${props.id}`);
@@ -63,16 +66,15 @@ const setGroup = computed(() => {
 const isSetGroupVisible = computed(() => replicatorSets.length > 1 && setGroup.value.display);
 
 const fieldActionPayload = computed(() => ({
-    // vm: this,
-    // fieldVm: this.fieldVm,
-    // fieldPathPrefix: this.fieldPathPrefix,
+    fieldPathPrefix: fieldPathPrefix.value,
     index: props.index,
     values: props.values,
     config: props.config,
-    // meta: this.meta,
+    meta: data_get(meta.value, metaPathPrefix.value),
     update: (handle, value) => setFieldValue(`${fieldPathPrefix.value}.${handle}`, value),
     updateMeta: (handle, value) => setFieldMeta(`${metaPathPrefix.value}.${handle}`, value),
     isReadOnly: props.readOnly,
+    container,
 }));
 
 const fieldActions = computed(() => {
