@@ -182,6 +182,39 @@ class FakeSubmissionGeneratorTest extends TestCase
     }
 
     #[Test]
+    public function it_respects_number_min_and_max()
+    {
+        $form = $this->makeForm('ages', [
+            ['handle' => 'age', 'field' => [
+                'type' => 'number',
+                'display' => 'Age',
+                'min' => 16,
+                'max' => 80,
+            ]],
+        ]);
+
+        foreach (range(1, 20) as $_) {
+            $value = (new FakeSubmissionGenerator)->generate($form)['age'];
+            $this->assertGreaterThanOrEqual(16, $value);
+            $this->assertLessThanOrEqual(80, $value);
+        }
+    }
+
+    #[Test]
+    public function it_generates_numbers_without_min_and_max()
+    {
+        $form = $this->makeForm('quantities', [
+            ['handle' => 'quantity', 'field' => ['type' => 'number', 'display' => 'Quantity']],
+        ]);
+
+        $value = (new FakeSubmissionGenerator)->generate($form)['quantity'];
+
+        $this->assertIsInt($value);
+        $this->assertGreaterThanOrEqual(1, $value);
+        $this->assertLessThanOrEqual(5000, $value);
+    }
+
+    #[Test]
     public function it_respects_star_rating_half_steps()
     {
         $form = $this->makeForm('stars', [

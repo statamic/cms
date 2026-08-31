@@ -2,15 +2,11 @@
 
 namespace Statamic\Http\Controllers\CP\Forms;
 
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Statamic\CP\Column;
 use Statamic\CP\Columns;
 use Statamic\Events\FormSubmitted;
 use Statamic\Facades\Scope;
-use Statamic\Facades\Site;
-use Statamic\Forms\FakeSubmissionGenerator;
-use Statamic\Forms\SendEmails;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Controllers\CP\Forms\Concerns\ProvidesFormAbilities;
 use Statamic\Http\Controllers\CP\Forms\Concerns\QueriesFormSubmissionSearch;
@@ -55,7 +51,7 @@ class FormSubmissionsController extends CpController
 
         $can = $this->formAbilities($form);
 
-        return Inertia::render('forms/Submissions', [
+        return Inertia::render('forms/submissions/Index', [
             'form' => [
                 'title' => __($form->title()),
                 'handle' => $form->handle(),
@@ -118,17 +114,6 @@ class FormSubmissionsController extends CpController
         return $query;
     }
 
-    public function destroy($form, $id)
-    {
-        $submission = $form->submission($id);
-
-        $this->authorize('delete', $submission);
-
-        $submission->delete();
-
-        return response('', 204);
-    }
-
     public function show(Request $request, $form, $submission)
     {
         if (! $submission = $form->submission($submission)) {
@@ -164,7 +149,7 @@ class FormSubmissionsController extends CpController
             ];
         }
 
-        return Inertia::render('forms/Submission', array_merge($data, [
+        return Inertia::render('forms/submissions/Show', array_merge($data, [
             'form' => $form,
             'can' => $this->formAbilities($form),
             'formTitle' => $form->title(),
@@ -172,46 +157,14 @@ class FormSubmissionsController extends CpController
         ]));
     }
 
-    public function generateFake(Request $request, $form, FakeSubmissionGenerator $generator)
+    public function destroy($form, $id)
     {
-        $this->authorize('generateFakeSubmissions', $form);
+        $submission = $form->submission($id);
 
-        if (! $form->get('generate_fake_submissions', true)) {
-            return response([
-                'message' => __('statamic::messages.form_fake_submission_generation_disabled'),
-            ], 403);
-        }
+        $this->authorize('delete', $submission);
 
-        $validated = $request->validate([
-            'mode' => ['required', 'in:cp_only,full_pipeline'],
-        ]);
+        $submission->delete();
 
-        $values = $generator->generate($form);
-        $fields = $form->blueprint()->fields()->addValues($values);
-        $submission = $form->makeSubmission();
-        $submission->data(
-            $fields->process()->values()->merge([
-                '_fake' => true,
-            ])
-        );
-
-        if ($validated['mode'] === 'full_pipeline') {
-            if (FormSubmitted::dispatch($submission) === false) {
-                return response([
-                    'message' => __('statamic::messages.form_fake_submission_cancelled'),
-                ], 422);
-            }
-        }
-
-        $submission->save();
-
-        if ($validated['mode'] === 'full_pipeline') {
-            SendEmails::dispatch($submission, Site::default());
-        }
-
-        return response([
-            'id' => $submission->id(),
-            'message' => __('statamic::messages.form_fake_submission_generated'),
-        ]);
+        return response('', 204);
     }
 }
