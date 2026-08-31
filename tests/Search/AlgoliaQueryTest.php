@@ -15,7 +15,7 @@ class AlgoliaQueryTest extends TestCase
     {
         $index = Mockery::mock(Index::class);
         $index->shouldReceive('name');
-        $index->shouldReceive('searchUsingApi')->with('foo')->once()->andReturn(collect([
+        $index->shouldReceive('searchUsingApi')->with('foo', null, [])->once()->andReturn(collect([
             ['reference' => 'a'],
             ['reference' => 'b'],
             ['reference' => 'c'],
