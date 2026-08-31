@@ -71,7 +71,7 @@ class Upload extends FormFieldtype
     {
         return [
             'config' => [
-                'display' => __('Upload your resume'),
+                'display' => 'Upload your resume',
                 'store' => false,
             ],
         ];

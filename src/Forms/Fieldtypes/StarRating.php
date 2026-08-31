@@ -57,7 +57,7 @@ class StarRating extends FormFieldtype
     {
         return [
             'config' => [
-                'display' => __('How would you rate your experience?'),
+                'display' => 'How would you rate your experience?',
                 'max_stars' => 5,
                 'allow_half_stars' => true,
             ],

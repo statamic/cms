@@ -71,11 +71,11 @@ class OpinionScale extends FormFieldtype
     {
         return [
             'config' => [
-                'display' => __('How likely are you to recommend us?'),
+                'display' => 'How likely are you to recommend us?',
                 'min' => 0,
                 'max' => 5,
-                'low_label' => __('Not likely'),
-                'high_label' => __('Very likely'),
+                'low_label' => 'Not likely',
+                'high_label' => 'Very likely',
             ],
             'value' => 8,
         ];

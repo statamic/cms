@@ -106,29 +106,29 @@ class ImageChoice extends FormFieldtype
     {
         return [
             'config' => [
-                'display' => __('Pick your favorite season'),
+                'display' => 'Pick your favorite season',
                 'columns' => 2,
                 'gap' => 2,
                 'aspect_ratio' => '4/3',
                 'options' => [
                     [
                         'key' => 'spring',
-                        'label' => __('Spring'),
+                        'label' => 'Spring',
                         'image' => 'https://picsum.photos/seed/image-choice-spring/640/480',
                     ],
                     [
                         'key' => 'summer',
-                        'label' => __('Summer'),
+                        'label' => 'Summer',
                         'image' => 'https://picsum.photos/seed/image-choice-summer/640/480',
                     ],
                     [
                         'key' => 'autumn',
-                        'label' => __('Autumn'),
+                        'label' => 'Autumn',
                         'image' => 'https://picsum.photos/seed/image-choice-autumn/640/480',
                     ],
                     [
                         'key' => 'winter',
-                        'label' => __('Winter'),
+                        'label' => 'Winter',
                         'image' => 'https://picsum.photos/seed/image-choice-winter/640/480',
                     ],
                 ],
