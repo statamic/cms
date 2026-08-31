@@ -172,6 +172,7 @@ const isFieldInLastRow = (index): boolean => index >= rowBoundaries.value.lastRo
                     icon="pencil-line"
                     size="sm"
                     variant="ghost"
+                    :aria-label="__('Edit section')"
                     @click.stop="editSection"
                 />
                 <Button
@@ -180,6 +181,7 @@ const isFieldInLastRow = (index): boolean => index >= rowBoundaries.value.lastRo
                     icon="trash"
                     size="sm"
                     variant="ghost"
+                    :aria-label="__('Delete section')"
                     @click.stop="confirmDelete"
                 />
                 <Button

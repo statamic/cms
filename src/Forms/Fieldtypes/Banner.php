@@ -56,8 +56,8 @@ class Banner extends FormFieldtype
     {
         return [
             'config' => [
-                'display' => __('Important'),
-                'text' => __('Please review the following information before continuing.'),
+                'display' => 'Important',
+                'text' => 'Please review the following information before continuing.',
                 'icon' => 'lightbulb-idea',
             ],
         ];

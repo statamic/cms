@@ -44,7 +44,7 @@ const operatorLabels = {
 };
 
 const getOperatorLabel = (operator) => operatorLabels[operator] ?? operator ?? __('Equals');
-const getFieldDisplay = (handle) => props.suggestableFields.find(field => field.handle === handle)?.config?.display || handle;
+const getFieldDisplay = (handle) => __(props.suggestableFields.find(field => field.handle === handle)?.config?.display) || handle;
 
 const hasConditions = computed(() => props.conditions.if || props.conditions.unless || props.conditions.if_any || props.conditions.unless_any);
 const isHideCondition = computed(() => props.conditions.unless || props.conditions.unless_any);

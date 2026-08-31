@@ -21,7 +21,7 @@ class FormFieldtypeTest extends TestCase
 
             public function toFieldArray(): array
             {
-                // TODO: Implement toFieldArray() method.
+                return [];
             }
         };
 
@@ -44,7 +44,7 @@ class FormFieldtypeTest extends TestCase
 
             public function toFieldArray(): array
             {
-                // TODO: Implement toFieldArray() method.
+                return [];
             }
         };
 

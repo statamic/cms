@@ -39,7 +39,7 @@ abstract class FormFieldtype implements Arrayable
             return __(static::$title);
         }
 
-        $translation = __($key = 'statamic::form-fields.'.static::handle().'.title');
+        $translation = __($key = 'statamic::form-fieldtypes.'.static::handle().'.title');
 
         if ($translation !== $key) {
             return $translation;
