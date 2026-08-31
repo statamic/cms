@@ -1,5 +1,7 @@
+import DOMPurify from 'dompurify';
+
 export default class PreviewHtml {
     constructor(html) {
-        this.html = html;
+        this.html = DOMPurify.sanitize(html ?? '');
     }
 }

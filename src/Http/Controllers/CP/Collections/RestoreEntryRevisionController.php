@@ -5,7 +5,9 @@ namespace Statamic\Http\Controllers\CP\Collections;
 use Illuminate\Http\Request;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
-use Statamic\Revisions\WorkingCopy;
+use Statamic\Revisions\Revision;
+
+use function Statamic\trans as __;
 
 class RestoreEntryRevisionController extends CpController
 {
@@ -15,13 +17,14 @@ class RestoreEntryRevisionController extends CpController
             abort(403);
         }
 
+        /** @var $target Revision */
         if (! $target = $entry->revision($request->revision)) {
             dd('no such revision', $request->revision);
             // todo: handle invalid revision reference
         }
 
         if ($entry->published()) {
-            WorkingCopy::fromRevision($target)->date(now())->save();
+            $target->toWorkingCopy()->date(now())->save();
         } else {
             $entry->makeFromRevision($target)->published(false)->save();
         }

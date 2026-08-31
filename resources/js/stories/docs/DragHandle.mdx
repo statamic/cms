@@ -1,0 +1,12 @@
+import { Canvas, Meta, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as DragHandleStories from '../DragHandle.stories';
+
+<Meta of={DragHandleStories} />
+
+# DragHandle
+
+A button component that displays a drag handle icon for reorderable lists. Uses the `data-drag-handle` attribute for integration with drag-and-drop libraries.
+<Canvas of={DragHandleStories._DocsIntro} sourceState={'shown'} />
+
+## Arguments
+<ArgTypes of={DragHandleStories} />

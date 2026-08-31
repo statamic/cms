@@ -13,6 +13,8 @@ use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Structures\TreeBuilder;
 use Statamic\Support\Arr;
 
+use function Statamic\trans;
+
 class CollectionTreeController extends CpController
 {
     public function index(Request $request, Collection $collection)

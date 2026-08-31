@@ -53,8 +53,9 @@ class ViewFieldsetListingTest extends TestCase
             ->actingAs($user)
             ->get(cp_route('fieldsets.index'))
             ->assertSuccessful()
-            ->assertViewHas('fieldsets', collect([
-                'My Fieldsets' => collect([
+            ->assertInertia(fn ($page) => $page
+                ->has('fieldsets', 2)
+                ->where('fieldsets.My Fieldsets', [
                     [
                         'id' => 'foo',
                         'handle' => 'foo',
@@ -65,7 +66,7 @@ class ViewFieldsetListingTest extends TestCase
                         'reset_url' => 'http://localhost/cp/fields/fieldsets/foo/reset',
                         'is_deletable' => true,
                         'is_resettable' => false,
-                        'imported_by' => collect(),
+                        'imported_by' => [],
                     ],
                     [
                         'id' => 'bar',
@@ -77,10 +78,10 @@ class ViewFieldsetListingTest extends TestCase
                         'reset_url' => 'http://localhost/cp/fields/fieldsets/bar/reset',
                         'is_deletable' => true,
                         'is_resettable' => false,
-                        'imported_by' => collect(),
+                        'imported_by' => [],
                     ],
-                ]),
-                'Baz' => collect([
+                ])
+                ->where('fieldsets.Baz', [
                     [
                         'id' => 'baz::foo',
                         'handle' => 'baz::foo',
@@ -91,7 +92,7 @@ class ViewFieldsetListingTest extends TestCase
                         'reset_url' => 'http://localhost/cp/fields/fieldsets/baz::foo/reset',
                         'is_deletable' => false,
                         'is_resettable' => false,
-                        'imported_by' => collect(),
+                        'imported_by' => [],
                     ],
                     [
                         'id' => 'baz::bar',
@@ -103,11 +104,10 @@ class ViewFieldsetListingTest extends TestCase
                         'reset_url' => 'http://localhost/cp/fields/fieldsets/baz::bar/reset',
                         'is_deletable' => false,
                         'is_resettable' => false,
-                        'imported_by' => collect(),
+                        'imported_by' => [],
                     ],
-                ]),
-            ]))
-            ->assertDontSee('no-results');
+                ])
+            );
     }
 
     #[Test]

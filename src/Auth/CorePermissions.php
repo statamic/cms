@@ -2,6 +2,7 @@
 
 namespace Statamic\Auth;
 
+use Statamic\Facades\Addon;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Form;
@@ -23,7 +24,6 @@ class CorePermissions
             $this->register('configure sites');
             $this->register('configure fields');
             $this->register('configure form fields');
-            $this->register('configure addons');
             $this->register('manage preferences');
         });
 
@@ -63,6 +63,10 @@ class CorePermissions
             $this->registerForms();
         });
 
+        $this->group('addons', function () {
+            $this->registerAddons();
+        });
+
         $this->group('utilities', function () {
             $this->registerUtilities();
         });
@@ -91,7 +95,7 @@ class CorePermissions
         $this->register('configure collections');
 
         $this->register('view {collection} entries', function ($permission) {
-            $this->permission($permission)->children([
+            $this->permission($permission)->hiddenBy('configure collections')->children([
                 $this->permission('edit {collection} entries')->children([
                     $this->permission('create {collection} entries'),
                     $this->permission('delete {collection} entries'),
@@ -117,7 +121,7 @@ class CorePermissions
         $this->register('configure navs');
 
         $this->register('view {nav} nav', function ($permission) {
-            $this->permission($permission)->children([
+            $this->permission($permission)->hiddenBy('configure navs')->children([
                 $this->permission('edit {nav} nav'),
             ])->replacements('nav', function () {
                 return Nav::all()->map(function ($nav) {
@@ -132,7 +136,7 @@ class CorePermissions
         $this->register('configure globals');
 
         $this->register('edit {global} globals', function ($permission) {
-            $permission->replacements('global', function () {
+            $permission->hiddenBy('configure globals')->replacements('global', function () {
                 return GlobalSet::all()->map(function ($global) {
                     return ['value' => $global->handle(), 'label' => __($global->title())];
                 });
@@ -145,7 +149,7 @@ class CorePermissions
         $this->register('configure taxonomies');
 
         $this->register('view {taxonomy} terms', function ($permission) {
-            $this->permission($permission)->children([
+            $this->permission($permission)->hiddenBy('configure taxonomies')->children([
                 $this->permission('edit {taxonomy} terms')->children([
                     $this->permission('create {taxonomy} terms'),
                     $this->permission('delete {taxonomy} terms'),
@@ -163,20 +167,15 @@ class CorePermissions
         $this->register('configure asset containers');
 
         $this->register('view {container} assets', function ($permission) {
-            $childPermissions = [
+            $this->permission($permission)->hiddenBy('configure asset containers')->children([
                 $this->permission('upload {container} assets'),
+                $this->permission('edit {container} folders'),
                 $this->permission('edit {container} assets')->children([
                     $this->permission('move {container} assets'),
                     $this->permission('rename {container} assets'),
                     $this->permission('delete {container} assets'),
                 ]),
-            ];
-
-            if (config('statamic.assets.v6_permissions')) {
-                $childPermissions[] = $this->permission('edit {container} folders');
-            }
-
-            $this->permission($permission)->children($childPermissions)->replacements('container', function () {
+            ])->replacements('container', function () {
                 return AssetContainer::all()->map(function ($container) {
                     return ['value' => $container->handle(), 'label' => __($container->title())];
                 });
@@ -213,7 +212,7 @@ class CorePermissions
         $this->register('configure forms');
 
         $this->register('view {form} form submissions', function ($permission) {
-            $this->permission($permission)->children([
+            $this->permission($permission)->hiddenBy('configure forms')->children([
                 $this->permission('delete {form} form submissions'),
             ])->replacements('form', function () {
                 return Form::all()->map(function ($form) {
@@ -221,6 +220,20 @@ class CorePermissions
                 });
             });
         });
+    }
+
+    protected function registerAddons()
+    {
+        $this->register('configure addons');
+
+        Addon::all()
+            ->filter->hasSettingsBlueprint()
+            ->each(function ($addon) {
+                Permission::register("edit {$addon->package()} settings", function ($permission) use ($addon) {
+                    return $permission
+                        ->label(__('statamic::permissions.edit_addon_settings', ['addon' => __($addon->name())]));
+                });
+            });
     }
 
     protected function registerUtilities()
@@ -256,6 +269,6 @@ class CorePermissions
 
     protected function group($name, $callback)
     {
-        return Permission::group($name, __('statamic::permissions.group_'.$name), $callback);
+        Permission::group($name, __('statamic::permissions.group_'.$name), $callback);
     }
 }

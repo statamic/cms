@@ -14,6 +14,7 @@ use Statamic\Contracts\Structures\Nav;
 use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Facades\Site;
+use Statamic\Facades\URL;
 use Statamic\Globals\Variables;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\DefaultInvalidator as Invalidator;
@@ -25,6 +26,13 @@ use Tests\TestCase;
 
 class DefaultInvalidatorTest extends TestCase
 {
+    public function tearDown(): void
+    {
+        URL::enforceTrailingSlashes(false);
+        URL::clearUrlCache();
+        parent::tearDown();
+    }
+
     #[Test]
     public function specifying_all_as_invalidation_rule_will_just_flush_the_cache()
     {
@@ -181,6 +189,9 @@ class DefaultInvalidatorTest extends TestCase
                         '/blog/one',
                         '/blog/two',
                         'http://test.com/blog/three',
+                        '/test/{test}',
+                        '{{ if favourite_color == "purple" }}/purple{{ /if }}',
+                        '{{ if favourite_color == "red" }}/red{{ /if }}',
                     ],
                 ],
             ],
@@ -222,6 +233,9 @@ class DefaultInvalidatorTest extends TestCase
                         '/blog/one',
                         '/blog/two',
                         'http://localhost/blog/three',
+                        '/test/{test}',
+                        '{{ if favourite_color == "purple" }}/purple{{ /if }}',
+                        '{{ if favourite_color == "red" }}/red{{ /if }}',
                     ],
                 ],
             ],
@@ -268,6 +282,9 @@ class DefaultInvalidatorTest extends TestCase
                         '/blog/one',
                         '/blog/two',
                         'http://localhost/blog/three',
+                        '/test/{test}',
+                        '{{ if favourite_color == "purple" }}/purple{{ /if }}',
+                        '{{ if favourite_color == "red" }}/red{{ /if }}',
                     ],
                 ],
             ],
@@ -285,6 +302,8 @@ class DefaultInvalidatorTest extends TestCase
                 'http://localhost/blog/three',
                 'http://localhost/blog/one',
                 'http://localhost/blog/two',
+                'http://localhost/test/foo',
+                'http://localhost/purple',
             ])->once();
         });
 
@@ -294,6 +313,15 @@ class DefaultInvalidatorTest extends TestCase
             $m->shouldReceive('collectionHandle')->andReturn('blog');
             $m->shouldReceive('descendants')->andReturn(collect());
             $m->shouldReceive('site')->andReturn(Site::default());
+            $m->shouldReceive('parent')->andReturnNull();
+            $m->shouldReceive('toAugmentedCollection')
+                ->andReturnSelf()
+                ->shouldReceive('merge')
+                ->andReturn(collect([
+                    'parent_uri' => '/my/test',
+                    'test' => 'foo',
+                    'favourite_color' => 'purple',
+                ]));
         });
 
         $invalidator = new Invalidator($cacher, [
@@ -303,6 +331,9 @@ class DefaultInvalidatorTest extends TestCase
                         '/blog/one',
                         '/blog/two',
                         'http://localhost/blog/three',
+                        '/test/{test}',
+                        '{{ if favourite_color == "purple" }}/purple{{ /if }}',
+                        '{{ if favourite_color == "red" }}/red{{ /if }}',
                     ],
                 ],
             ],
@@ -325,6 +356,8 @@ class DefaultInvalidatorTest extends TestCase
                 'http://test.com/blog/three',
                 'http://test.fr/blog/one',
                 'http://test.fr/blog/two',
+                'http://test.fr/test/foo',
+                'http://test.fr/purple',
             ])->once();
         });
 
@@ -334,6 +367,15 @@ class DefaultInvalidatorTest extends TestCase
             $m->shouldReceive('collectionHandle')->andReturn('blog');
             $m->shouldReceive('descendants')->andReturn(collect());
             $m->shouldReceive('site')->andReturn(Site::get('fr'));
+            $m->shouldReceive('parent')->andReturnNull();
+            $m->shouldReceive('toAugmentedCollection')
+                ->andReturnSelf()
+                ->shouldReceive('merge')
+                ->andReturn(collect([
+                    'parent_uri' => '/my/test',
+                    'test' => 'foo',
+                    'favourite_color' => 'purple',
+                ]));
         });
 
         $invalidator = new Invalidator($cacher, [
@@ -343,6 +385,53 @@ class DefaultInvalidatorTest extends TestCase
                         '/blog/one',
                         '/blog/two',
                         'http://test.com/blog/three',
+                        '/test/{test}',
+                        '{{ if favourite_color == "purple" }}/purple{{ /if }}',
+                        '{{ if favourite_color == "red" }}/red{{ /if }}',
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertNull($invalidator->invalidate($entry));
+    }
+
+    #[Test]
+    public function invalidation_urls_respect_trailing_slash_enforcement()
+    {
+        URL::enforceTrailingSlashes();
+
+        $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
+            $cacher->shouldReceive('invalidateUrls')->with([
+                'http://test.com/my/test/entry/',
+                'http://localhost/blog/three/',
+                'http://localhost/blog/one/',
+                'http://localhost/blog/two/',
+            ])->once();
+        });
+
+        $entry = tap(Mockery::mock(Entry::class), function ($m) {
+            $m->shouldReceive('isRedirect')->andReturn(false);
+            $m->shouldReceive('absoluteUrl')->andReturn('http://test.com/my/test/entry/');
+            $m->shouldReceive('collectionHandle')->andReturn('blog');
+            $m->shouldReceive('descendants')->andReturn(collect());
+            $m->shouldReceive('site')->andReturn(Site::default());
+            $m->shouldReceive('parent')->andReturnNull();
+            $m->shouldReceive('toAugmentedCollection')
+                ->andReturnSelf()
+                ->shouldReceive('merge')
+                ->andReturn(collect([
+                    'parent_uri' => '/my/test/',
+                ]));
+        });
+
+        $invalidator = new Invalidator($cacher, [
+            'collections' => [
+                'blog' => [
+                    'urls' => [
+                        '/blog/one',
+                        '/blog/two',
+                        'http://localhost/blog/three/',
                     ],
                 ],
             ],
@@ -366,7 +455,14 @@ class DefaultInvalidatorTest extends TestCase
             $m->shouldReceive('absoluteUrl')->andReturn('http://test.com/my/test/entry');
             $m->shouldReceive('collectionHandle')->andReturn('blog');
             $m->shouldReceive('descendants')->andReturn(collect());
+            $m->shouldReceive('parent')->andReturnNull();
             $m->shouldReceive('site')->andReturn(Site::default());
+            $m->shouldReceive('toAugmentedCollection')
+                ->andReturnSelf()
+                ->shouldReceive('merge')
+                ->andReturn(collect([
+                    'parent_uri' => null,
+                ]));
         });
 
         $invalidator = new Invalidator($cacher, [
@@ -393,6 +489,8 @@ class DefaultInvalidatorTest extends TestCase
                 'http://localhost/tags/three',
                 'http://localhost/tags/one',
                 'http://localhost/tags/two',
+                'http://localhost/test/foo',
+                'http://localhost/purple',
             ])->once();
         });
 
@@ -409,6 +507,11 @@ class DefaultInvalidatorTest extends TestCase
             $m->shouldReceive('taxonomyHandle')->andReturn('tags');
             $m->shouldReceive('taxonomy')->andReturn($taxonomy);
             $m->shouldReceive('collection')->andReturn($m);
+            $m->shouldReceive('toAugmentedCollection')
+                ->andReturn(collect([
+                    'test' => 'foo',
+                    'favourite_color' => 'purple',
+                ]));
             $m->shouldReceive('site')->andReturn(Site::default());
             $m->shouldReceive('absoluteUrl')->andReturn('http://localhost/my/test/term', 'http://localhost/my/collection/tags/term');
         });
@@ -420,6 +523,9 @@ class DefaultInvalidatorTest extends TestCase
                         '/tags/one',
                         '/tags/two',
                         'http://localhost/tags/three',
+                        '/test/{test}',
+                        '{{ if favourite_color == "purple" }}/purple{{ /if }}',
+                        '{{ if favourite_color == "red" }}/red{{ /if }}',
                     ],
                 ],
             ],
@@ -443,6 +549,8 @@ class DefaultInvalidatorTest extends TestCase
                 'http://test.com/tags/three',
                 'http://test.fr/tags/one',
                 'http://test.fr/tags/two',
+                'http://test.fr/test/foo',
+                'http://test.fr/purple',
             ])->once();
         });
 
@@ -459,6 +567,11 @@ class DefaultInvalidatorTest extends TestCase
             $m->shouldReceive('taxonomyHandle')->andReturn('tags');
             $m->shouldReceive('taxonomy')->andReturn($taxonomy);
             $m->shouldReceive('collection')->andReturn($m);
+            $m->shouldReceive('toAugmentedCollection')
+                ->andReturn(collect([
+                    'test' => 'foo',
+                    'favourite_color' => 'purple',
+                ]));
             $m->shouldReceive('site')->andReturn(Site::get('fr'));
             $m->shouldReceive('absoluteUrl')->andReturn('http://test.fr/my/test/term', 'http://test.fr/my/collection/tags/term');
         });
@@ -470,6 +583,9 @@ class DefaultInvalidatorTest extends TestCase
                         '/tags/one',
                         '/tags/two',
                         'http://test.com/tags/three',
+                        '/test/{test}',
+                        '{{ if favourite_color == "purple" }}/purple{{ /if }}',
+                        '{{ if favourite_color == "red" }}/red{{ /if }}',
                     ],
                 ],
             ],
@@ -486,12 +602,19 @@ class DefaultInvalidatorTest extends TestCase
                 'http://localhost/three',
                 'http://localhost/one',
                 'http://localhost/two',
+                'http://localhost/test/foo',
+                'http://localhost/purple',
             ])->once();
         });
 
         $nav = tap(Mockery::mock(Nav::class), function ($m) {
             $m->shouldReceive('handle')->andReturn('links');
             $m->shouldReceive('sites')->andReturn(collect(['en']));
+            $m->shouldReceive('toAugmentedCollection')
+                ->andReturn(collect([
+                    'test' => 'foo',
+                    'favourite_color' => 'purple',
+                ]));
         });
 
         $invalidator = new Invalidator($cacher, [
@@ -501,6 +624,9 @@ class DefaultInvalidatorTest extends TestCase
                         '/one',
                         '/two',
                         'http://localhost/three',
+                        '/test/{test}',
+                        '{{ if favourite_color == "purple" }}/purple{{ /if }}',
+                        '{{ if favourite_color == "red" }}/red{{ /if }}',
                     ],
                 ],
             ],
@@ -523,14 +649,23 @@ class DefaultInvalidatorTest extends TestCase
                 'http://test.com/three',
                 'http://test.com/one',
                 'http://test.com/two',
+                'http://test.com/test/foo',
+                'http://test.com/purple',
                 'http://test.fr/one',
                 'http://test.fr/two',
+                'http://test.fr/test/foo',
+                'http://test.fr/purple',
             ])->once();
         });
 
         $nav = tap(Mockery::mock(Nav::class), function ($m) {
             $m->shouldReceive('handle')->andReturn('links');
             $m->shouldReceive('sites')->andReturn(collect(['en', 'fr']));
+            $m->shouldReceive('toAugmentedCollection')
+                ->andReturn(collect([
+                    'test' => 'foo',
+                    'favourite_color' => 'purple',
+                ]));
         });
 
         $invalidator = new Invalidator($cacher, [
@@ -540,6 +675,9 @@ class DefaultInvalidatorTest extends TestCase
                         '/one',
                         '/two',
                         'http://test.com/three',
+                        '/test/{test}',
+                        '{{ if favourite_color == "purple" }}/purple{{ /if }}',
+                        '{{ if favourite_color == "red" }}/red{{ /if }}',
                     ],
                 ],
             ],
@@ -556,11 +694,18 @@ class DefaultInvalidatorTest extends TestCase
                 'http://localhost/three',
                 'http://localhost/one',
                 'http://localhost/two',
+                'http://localhost/test/foo',
+                'http://localhost/purple',
             ])->once();
         });
 
         $nav = tap(Mockery::mock(Nav::class), function ($m) {
             $m->shouldReceive('handle')->andReturn('links');
+            $m->shouldReceive('toAugmentedCollection')
+                ->andReturn(collect([
+                    'test' => 'foo',
+                    'favourite_color' => 'purple',
+                ]));
         });
 
         $tree = tap(Mockery::mock(NavTree::class), function ($m) use ($nav) {
@@ -575,6 +720,9 @@ class DefaultInvalidatorTest extends TestCase
                         '/one',
                         '/two',
                         'http://localhost/three',
+                        '/test/{test}',
+                        '{{ if favourite_color == "purple" }}/purple{{ /if }}',
+                        '{{ if favourite_color == "red" }}/red{{ /if }}',
                     ],
                 ],
             ],
@@ -596,11 +744,18 @@ class DefaultInvalidatorTest extends TestCase
                 'http://test.com/three',
                 'http://test.fr/one',
                 'http://test.fr/two',
+                'http://test.fr/test/foo',
+                'http://test.fr/purple',
             ])->once();
         });
 
         $nav = tap(Mockery::mock(Nav::class), function ($m) {
             $m->shouldReceive('handle')->andReturn('links');
+            $m->shouldReceive('toAugmentedCollection')
+                ->andReturn(collect([
+                    'test' => 'foo',
+                    'favourite_color' => 'purple',
+                ]));
         });
 
         $tree = tap(Mockery::mock(NavTree::class), function ($m) use ($nav) {
@@ -615,6 +770,9 @@ class DefaultInvalidatorTest extends TestCase
                         '/one',
                         '/two',
                         'http://test.com/three',
+                        '/test/{test}',
+                        '{{ if favourite_color == "purple" }}/purple{{ /if }}',
+                        '{{ if favourite_color == "red" }}/red{{ /if }}',
                     ],
                 ],
             ],
@@ -631,6 +789,8 @@ class DefaultInvalidatorTest extends TestCase
                 'http://localhost/three',
                 'http://localhost/one',
                 'http://localhost/two',
+                'http://localhost/test/foo',
+                'http://localhost/purple',
             ])->once();
         });
 
@@ -641,6 +801,11 @@ class DefaultInvalidatorTest extends TestCase
         $variables = tap(Mockery::mock(Variables::class), function ($m) use ($set) {
             $m->shouldReceive('globalSet')->andReturn($set);
             $m->shouldReceive('site')->andReturn(Site::default());
+            $m->shouldReceive('toAugmentedCollection')
+                ->andReturn(collect([
+                    'test' => 'foo',
+                    'favourite_color' => 'purple',
+                ]));
         });
 
         $invalidator = new Invalidator($cacher, [
@@ -650,6 +815,9 @@ class DefaultInvalidatorTest extends TestCase
                         '/one',
                         '/two',
                         'http://localhost/three',
+                        '/test/{test}',
+                        '{{ if favourite_color == "purple" }}/purple{{ /if }}',
+                        '{{ if favourite_color == "red" }}/red{{ /if }}',
                     ],
                 ],
             ],
@@ -671,6 +839,8 @@ class DefaultInvalidatorTest extends TestCase
                 'http://test.com/three',
                 'http://test.fr/one',
                 'http://test.fr/two',
+                'http://test.fr/test/foo',
+                'http://test.fr/purple',
             ])->once();
         });
 
@@ -681,6 +851,11 @@ class DefaultInvalidatorTest extends TestCase
         $variables = tap(Mockery::mock(Variables::class), function ($m) use ($set) {
             $m->shouldReceive('globalSet')->andReturn($set);
             $m->shouldReceive('site')->andReturn(Site::get('fr'));
+            $m->shouldReceive('toAugmentedCollection')
+                ->andReturn(collect([
+                    'test' => 'foo',
+                    'favourite_color' => 'purple',
+                ]));
         });
 
         $invalidator = new Invalidator($cacher, [
@@ -690,6 +865,9 @@ class DefaultInvalidatorTest extends TestCase
                         '/one',
                         '/two',
                         'http://test.com/three',
+                        '/test/{test}',
+                        '{{ if favourite_color == "purple" }}/purple{{ /if }}',
+                        '{{ if favourite_color == "red" }}/red{{ /if }}',
                     ],
                 ],
             ],
@@ -763,5 +941,106 @@ class DefaultInvalidatorTest extends TestCase
         ]);
 
         $this->assertNull($invalidator->invalidate($form));
+    }
+
+    #[Test]
+    public function it_doesnt_recache_when_background_recache_token_is_disabled()
+    {
+        $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
+            $cacher->shouldReceive('refreshUrls')->never();
+            $cacher->shouldReceive('invalidateUrls')->once()->with([
+                'http://localhost/blog/one',
+                'http://localhost/blog/two',
+            ]);
+        });
+
+        $entry = tap(Mockery::mock(Entry::class), function ($m) {
+            $m->shouldReceive('isRedirect')->andReturn(true);
+            $m->shouldReceive('absoluteUrl')->andReturn('http://test.com/my/test/entry');
+            $m->shouldReceive('collectionHandle')->andReturn('blog');
+            $m->shouldReceive('descendants')->andReturn(collect());
+            $m->shouldReceive('site')->andReturn(Site::default());
+            $m->shouldReceive('parent')->andReturnNull();
+            $m->shouldReceive('toAugmentedCollection')
+                ->andReturnSelf()
+                ->shouldReceive('merge')
+                ->andReturn(collect(['parent_uri' => null]));
+        });
+
+        $invalidator = new Invalidator($cacher, [
+            'collections' => [
+                'blog' => [
+                    'urls' => [
+                        '/blog/one',
+                        '/blog/two',
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertNull($invalidator->refresh($entry));
+    }
+
+    #[Test]
+    public function it_recaches_when_background_recache_token_is_enabled()
+    {
+        config()->set('statamic.static_caching.background_recache', true);
+
+        $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
+            $cacher->shouldReceive('invalidateUrls')->never();
+            $cacher->shouldReceive('refreshUrls')->once()->with([
+                'http://localhost/blog/one',
+                'http://localhost/blog/two',
+            ]);
+        });
+
+        $entry = tap(Mockery::mock(Entry::class), function ($m) {
+            $m->shouldReceive('isRedirect')->andReturn(true);
+            $m->shouldReceive('absoluteUrl')->andReturn('http://test.com/my/test/entry');
+            $m->shouldReceive('collectionHandle')->andReturn('blog');
+            $m->shouldReceive('descendants')->andReturn(collect());
+            $m->shouldReceive('site')->andReturn(Site::default());
+            $m->shouldReceive('parent')->andReturnNull();
+            $m->shouldReceive('toAugmentedCollection')
+                ->andReturnSelf()
+                ->shouldReceive('merge')
+                ->andReturn(collect(['parent_uri' => null]));
+        });
+
+        $invalidator = new Invalidator($cacher, [
+            'collections' => [
+                'blog' => [
+                    'urls' => [
+                        '/blog/one',
+                        '/blog/two',
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertNull($invalidator->refresh($entry));
+    }
+
+    #[Test]
+    public function it_calls_the_custom_invalidate_method_when_background_recache_is_enabled()
+    {
+        config()->set('statamic.static_caching.background_recache', true);
+
+        $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
+            $cacher->shouldReceive('refreshUrls')->never();
+            $cacher->shouldReceive('invalidateUrls')->once()->with([
+                'http://localhost/custom',
+            ]);
+        });
+
+        $invalidator = new class($cacher, []) extends Invalidator
+        {
+            public function invalidate($item)
+            {
+                $this->cacher->invalidateUrls(['http://localhost/custom']);
+            }
+        };
+
+        $invalidator->refresh(new \stdClass);
     }
 }

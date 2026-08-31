@@ -10,6 +10,7 @@ use Statamic\Contracts\Data\Localization;
 use Statamic\Contracts\Globals\GlobalSet;
 use Statamic\Contracts\Globals\Variables as Contract;
 use Statamic\Contracts\GraphQL\ResolvesValues as ResolvesValuesContract;
+use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedInstance;
@@ -27,9 +28,10 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\GraphQL\ResolvesValues;
+use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Variables implements Arrayable, ArrayAccess, Augmentable, Contract, Localization, ResolvesValuesContract
+class Variables implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableValues, Contract, Localization, ResolvesValuesContract
 {
     use ContainsData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedInstance, HasOrigin, ResolvesValues, TracksQueriedRelations;
 
@@ -83,7 +85,7 @@ class Variables implements Arrayable, ArrayAccess, Augmentable, Contract, Locali
     {
         return vsprintf('%s/%s%s.%s', [
             rtrim(Stache::store('global-variables')->directory(), '/'),
-            Site::multiEnabled() ? $this->locale().'/' : '',
+            $this->locale().'/',
             $this->handle(),
             'yaml',
         ]);
@@ -158,6 +160,8 @@ class Variables implements Arrayable, ArrayAccess, Augmentable, Contract, Locali
             GlobalVariablesSaved::dispatch($this);
         }
 
+        Blink::forget('global-set-localizations-'.$this->globalSet()->id());
+
         return $this;
     }
 
@@ -223,6 +227,7 @@ class Variables implements Arrayable, ArrayAccess, Augmentable, Contract, Locali
             });
 
         return (new \Statamic\Fields\Blueprint)->setContents([
+            'title' => $this->globalSet()->title(),
             'tabs' => [
                 'main' => [
                     'fields' => array_values($fields->all()),
@@ -233,13 +238,18 @@ class Variables implements Arrayable, ArrayAccess, Augmentable, Contract, Locali
 
     public function fileData()
     {
-        $data = $this->data()->all();
+        return $this->data()->all();
+    }
 
-        if ($this->hasOrigin()) {
-            $data['origin'] = $this->origin()->locale();
+    public function origin($origin = null)
+    {
+        if (func_num_args() === 0) {
+            return $this->getOriginByString(
+                $this->globalSet()->origins()->get($this->locale())
+            );
         }
 
-        return $data;
+        throw new \Exception('The origin cannot be set directly. It must be defined on the global set.');
     }
 
     protected function shouldRemoveNullsFromFileData()
@@ -280,5 +290,27 @@ class Variables implements Arrayable, ArrayAccess, Augmentable, Contract, Locali
     public function fresh()
     {
         return Facades\GlobalSet::find($this->handle())->in($this->locale);
+    }
+
+    public function getQueryableValue(string $field)
+    {
+        if (in_array($method = Str::camel($field), $this->queryableMethods())) {
+            return $this->{$method}();
+        }
+
+        $value = $this->value($field);
+
+        if (! $field = $this->blueprint()->field($field)) {
+            return $value;
+        }
+
+        return $field->fieldtype()->toQueryableValue($value);
+    }
+
+    private function queryableMethods(): array
+    {
+        return [
+            'blueprint', 'editUrl', 'handle', 'id', 'locale', 'path', 'reference', 'site', 'sites', 'title',
+        ];
     }
 }

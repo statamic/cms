@@ -6,10 +6,16 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use ParagonIE\ConstantTime\Base64UrlSafe;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Auth\Eloquent\Passkey;
 use Statamic\Auth\Eloquent\User as EloquentUser;
+use Statamic\Auth\Eloquent\WebAuthnModel;
 use Statamic\Auth\File\Role;
 use Statamic\Auth\File\UserGroup;
+use Statamic\Auth\PermissionCache;
+use Statamic\Auth\WebAuthn\Serializer;
 use Statamic\Contracts\Auth\Role as RoleContract;
 use Statamic\Contracts\Auth\UserGroup as UserGroupContract;
 use Statamic\Facades;
@@ -18,7 +24,9 @@ use Tests\Auth\PermissibleContractTests;
 use Tests\Auth\UserContractTests;
 use Tests\Preferences\HasPreferencesTests;
 use Tests\TestCase;
+use Webauthn\PublicKeyCredentialSource;
 
+#[Group('2fa')]
 class EloquentUserTest extends TestCase
 {
     use HasPreferencesTests, PermissibleContractTests, UserContractTests, WithFaker;
@@ -233,6 +241,24 @@ class EloquentUserTest extends TestCase
         $this->assertSame([$user->email(), $userTwo->email(), $userThree->email(), $userFour->email()], Facades\User::query()->whereGroupIn(['a', 'b'])->orWhereGroupIn(['c'])->get()->map->email()->all());
     }
 
+    #[Test]
+    public function it_doesnt_save_roles_inherited_from_groups_to_the_role_user_table()
+    {
+        $directRole = Facades\Role::make('direct');
+        $groupRole = Facades\Role::make('grouped');
+        $group = (new UserGroup)->handle('usergroup')->assignRole($groupRole);
+
+        Facades\Role::shouldReceive('find')->with('direct')->andReturn($directRole);
+        Facades\Role::shouldReceive('find')->with('grouped')->andReturn($groupRole);
+        Facades\UserGroup::shouldReceive('find')->with('usergroup')->andReturn($group);
+
+        $user = $this->createPermissible()->assignRole($directRole)->addToGroup($group);
+        $user->save();
+
+        $this->assertSame(['direct'], \DB::table(config('statamic.users.tables.role_user', 'role_user'))->where('user_id', $user->id())->pluck('role_id')->all());
+        $this->assertSame(['usergroup'], \DB::table(config('statamic.users.tables.group_user', 'group_user'))->where('user_id', $user->id())->pluck('group_id')->all());
+    }
+
     public function makeUser()
     {
         return (new EloquentUser)
@@ -326,5 +352,155 @@ class EloquentUserTest extends TestCase
 
         $this->assertArrayNotHasKey('null_field', $attributes);
         $this->assertFalse($attributes['not_null_field']);
+    }
+
+    #[Test]
+    public function merge_does_not_set_roles_and_groups_as_model_attributes()
+    {
+        $user = $this->user();
+
+        $user->merge(['name' => 'Updated Name']);
+
+        $attributes = $user->model()->getAttributes();
+
+        $this->assertArrayNotHasKey('roles', $attributes);
+        $this->assertArrayNotHasKey('groups', $attributes);
+        $this->assertEquals('Updated Name', $attributes['name']);
+    }
+
+    #[Test]
+    public function data_does_not_set_roles_and_groups_as_model_attributes()
+    {
+        $user = $this->user();
+
+        $user->data($user->data()->merge(['name' => 'Updated Name'])->all());
+
+        $attributes = $user->model()->getAttributes();
+
+        $this->assertArrayNotHasKey('roles', $attributes);
+        $this->assertArrayNotHasKey('groups', $attributes);
+        $this->assertEquals('Updated Name', $attributes['name']);
+    }
+
+    #[Test]
+    #[Group('passkeys')]
+    public function it_gets_passkeys()
+    {
+        $user = $this->user();
+        $this->assertCount(0, $user->passkeys());
+
+        $mockCredentialA = \Mockery::mock(PublicKeyCredentialSource::class);
+        $mockCredentialA->publicKeyCredentialId = 'key-a';
+        $mockCredentialB = \Mockery::mock(PublicKeyCredentialSource::class);
+        $mockCredentialB->publicKeyCredentialId = 'key-b';
+        $mockCredentialC = \Mockery::mock(PublicKeyCredentialSource::class);
+        $mockCredentialC->publicKeyCredentialId = 'key-c';
+
+        app()->instance(Serializer::class, new class($mockCredentialA, $mockCredentialB, $mockCredentialC)
+        {
+            public function __construct(public $mockCredentialA, public $mockCredentialB, public $mockCredentialC)
+            {
+            }
+
+            public function deserialize($data)
+            {
+                return match ($key = json_decode($data, true)['mock']) {
+                    'key-a' => $this->mockCredentialA,
+                    'key-b' => $this->mockCredentialB,
+                    'key-c' => $this->mockCredentialC,
+                    default => throw new \Exception("Unknown key: {$key}"),
+                };
+            }
+        });
+
+        $modelA = WebAuthnModel::create([
+            'id' => Base64UrlSafe::encodeUnpadded('key-a'),
+            'user_id' => $user->id(),
+            'name' => 'Passkey A',
+            'credential' => ['mock' => 'key-a'],
+        ]);
+
+        $modelB = WebAuthnModel::create([
+            'id' => Base64UrlSafe::encodeUnpadded('key-b'),
+            'user_id' => $user->id(),
+            'name' => 'Passkey B',
+            'credential' => ['mock' => 'key-b'],
+        ]);
+
+        $modelC = WebAuthnModel::create([
+            'id' => Base64UrlSafe::encodeUnpadded('key-c'),
+            'user_id' => 2, // Different user
+            'name' => 'Another users passkey',
+            'credential' => ['mock' => 'key-c'],
+        ]);
+
+        $this->assertCount(2, $passkeys = $user->passkeys());
+        $this->assertEveryItemIsInstanceOf(Passkey::class, $passkeys);
+        $this->assertEquals([
+            Base64UrlSafe::encodeUnpadded('key-a') => ['Passkey A', $modelA->getKey()],
+            Base64UrlSafe::encodeUnpadded('key-b') => ['Passkey B', $modelB->getKey()],
+        ], $passkeys
+            ->map(fn (Passkey $passkey) => [$passkey->name(), $passkey->model()->getKey()])
+            ->all()
+        );
+    }
+
+    #[Test]
+    public function permissions_are_cached_after_first_call()
+    {
+        $role = Facades\Role::make('editor')->addPermission('access cp');
+        Facades\Role::shouldReceive('find')->with('editor')->andReturn($role);
+
+        $user = $this->createPermissible()->assignRole($role);
+        $user->save();
+
+        $cache = app(PermissionCache::class);
+
+        $this->assertNull($cache->get($user->id()));
+
+        $user->permissions();
+
+        $this->assertNotNull($cache->get($user->id()));
+        $this->assertTrue($cache->get($user->id())->contains('access cp'));
+    }
+
+    #[Test]
+    public function permissions_are_read_from_cache_on_subsequent_calls()
+    {
+        $role = Facades\Role::make('editor')->addPermission('access cp');
+        Facades\Role::shouldReceive('find')->with('editor')->andReturn($role);
+
+        $user = $this->createPermissible()->assignRole($role);
+        $user->save();
+
+        $cache = app(PermissionCache::class);
+
+        // Seed the cache with different data to prove subsequent calls use it
+        $cache->put($user->id(), collect(['cached-permission']));
+
+        $this->assertEquals(['cached-permission'], $user->permissions()->all());
+        $this->assertTrue($user->hasPermission('cached-permission'));
+        $this->assertFalse($user->hasPermission('access cp'));
+    }
+
+    #[Test]
+    public function permissions_cache_is_invalidated_when_cleared()
+    {
+        $role = Facades\Role::make('editor')->addPermission('access cp');
+        Facades\Role::shouldReceive('find')->with('editor')->andReturn($role);
+
+        $user = $this->createPermissible()->assignRole($role);
+        $user->save();
+
+        $cache = app(PermissionCache::class);
+
+        $user->permissions();
+        $this->assertNotNull($cache->get($user->id()));
+
+        $cache->clear();
+        $this->assertNull($cache->get($user->id()));
+
+        // Recomputes correctly after cache is cleared
+        $this->assertTrue($user->permissions()->contains('access cp'));
     }
 }

@@ -7,6 +7,8 @@ use Facades\Statamic\Preferences\CorePreferences;
 use Illuminate\Support\Arr;
 use Statamic\Facades\User;
 
+use function Statamic\trans as __;
+
 class Preferences
 {
     protected $dotted = [];
@@ -43,14 +45,15 @@ class Preferences
      */
     public function all()
     {
-        if (auth()->guest()) {
-            return [];
+        $this->resetState();
+
+        if (User::current()) {
+            $this
+                ->mergeDottedUserPreferences()
+                ->mergeDottedRolePreferences();
         }
 
         return $this
-            ->resetState()
-            ->mergeDottedUserPreferences()
-            ->mergeDottedRolePreferences()
             ->mergeDottedDefaultPreferences()
             ->getMultiDimensionalPreferences();
     }
@@ -132,14 +135,35 @@ class Preferences
         $preserve = [];
 
         foreach ($this->preventMergingChildren as $dottedKey) {
-            $childData = Arr::pull($array, $dottedKey);
-
-            if (! is_null($childData)) {
-                $preserve[$dottedKey] = $childData;
+            if (Arr::has($array, $dottedKey)) {
+                $preserve[$dottedKey] = Arr::pull($array, $dottedKey);
             }
         }
 
-        return array_merge(Arr::dot($array), $preserve);
+        return array_merge($this->dotPreferences($array), $preserve);
+    }
+
+    /**
+     * Flatten preferences into dotted keys, like `Arr::dot()`, but treating list values
+     * as leaves so they get replaced by higher precedence levels instead of merged.
+     *
+     * @param  array  $array
+     * @param  string  $prepend
+     * @return array
+     */
+    protected function dotPreferences($array, $prepend = '')
+    {
+        $results = [];
+
+        foreach ($array as $key => $value) {
+            if (is_array($value) && ! empty($value) && ! array_is_list($value)) {
+                $results = array_merge($results, $this->dotPreferences($value, $prepend.$key.'.'));
+            } else {
+                $results[$prepend.$key] = $value;
+            }
+        }
+
+        return $results;
     }
 
     /**

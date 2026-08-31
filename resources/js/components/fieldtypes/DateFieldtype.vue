@@ -1,90 +1,62 @@
 <template>
     <div class="datetime min-w-[145px]">
+        <Button :text="__('Add Date')" icon="calendar" v-if="!isReadOnly && !isInline && !hasDate" @click="addDate" />
 
-        <button type="button" class="btn flex mb-2 md:mb-0 items-center rtl:pr-3 ltr:pl-3" v-if="!isReadOnly && config.inline === false && !hasDate" @click="addDate" tabindex="0">
-            <svg-icon name="light/calendar" class="w-4 h-4 rtl:ml-2 ltr:mr-2"></svg-icon>
-    		{{ __('Add Date') }}
-    	</button>
-
-        <div v-if="hasDate || config.inline"
-            class="date-time-container flex flex-col @sm:flex-row gap-2"
-        >
-            <component
-                :is="pickerComponent"
-                v-bind="pickerProps"
-                @input="setDate"
-                @focus="focusedField = $event"
-                @blur="focusedField = null"
-            />
-
-            <div v-if="config.time_enabled && !isRange" class="time-container time-fieldtype">
-				<time-fieldtype
-                    v-if="hasTime"
-                    ref="time"
-                    handle=""
-                    :value="value.time"
-                    :required="config.time_enabled"
-                    :show-seconds="config.time_seconds_enabled"
-                    :read-only="isReadOnly"
-                    :config="{}"
-                    @input="setTime"
-                />
-			</div>
-        </div>
+        <Component
+            v-if="hasDate || isInline"
+            :disabled="config.disabled"
+            :granularity="datePickerGranularity"
+            :inline="isInline"
+            :is="pickerComponent"
+            :max="config.latest_date"
+            :min="config.earliest_date"
+            :model-value="datePickerValue"
+            :number-of-months="config.number_of_months"
+            :read-only="isReadOnly"
+            :clearable="config.clearable"
+            @update:model-value="datePickerUpdated"
+        />
     </div>
-
 </template>
 
 <script>
-import SinglePopover from './date/SinglePopover.vue';
-import SingleInline from './date/SingleInline.vue';
-import RangePopover from './date/RangePopover.vue';
-import RangeInline from './date/RangeInline.vue';
+import Fieldtype from './Fieldtype.vue';
+import DateFormatter from '@/components/DateFormatter.js';
+import { DatePicker, DateRangePicker, Button } from '@/components/ui';
+import { CalendarDate, getLocalTimeZone, now, parseAbsolute, toTimeZone, toZoned } from '@internationalized/date';
 
 export default {
-
     components: {
-        SinglePopover,
-        SingleInline,
-        RangePopover,
-        RangeInline,
+        DatePicker,
+        DateRangePicker,
+        Button,
     },
 
     mixins: [Fieldtype],
 
-    inject: ['storeName'],
-
     data() {
         return {
             containerWidth: null,
-            focusedField: null
-        }
+            focusedField: null,
+            localValue: null,
+        };
     },
 
     computed: {
-
         pickerComponent() {
-            if (this.isRange) {
-                return this.usesPopover ? 'RangePopover' : 'RangeInline';
-            }
-
-            return this.usesPopover ? 'SinglePopover' : 'SingleInline';
+            return this.isRange ? DateRangePicker : DatePicker;
         },
 
         hasDate() {
-            return this.config.required || this.value.date;
+            return this.config.required || (this.value && this.value !== 'now');
         },
 
         hasTime() {
-            return this.config.time_enabled && !this.isRange;
+            return this.config.time_enabled;
         },
 
         hasSeconds() {
-            return this.config.time_has_seconds;
-        },
-
-        isSingle() {
-            return !this.isRange;
+            return this.config.time_seconds_enabled;
         },
 
         isRange() {
@@ -95,129 +67,175 @@ export default {
             return this.config.inline;
         },
 
-        usesPopover() {
-            return !this.isInline;
+        displayTimezone() {
+            const tz = this.meta?.timezone;
+
+            return tz && tz !== 'auto' ? tz : getLocalTimeZone();
         },
 
-        pickerProps() {
-            return {
-                isReadOnly: this.isReadOnly,
-                bindings: this.commonDatePickerBindings,
-            }
+        formatHasTime() {
+            return this.meta?.formatHasTime ?? true;
         },
 
         datePickerValue() {
-            if (this.isRange) return this.value.date;
+            if (!this.value || this.value === 'now') {
+                return null;
+            }
 
-            // The calendar component will do `new Date(datePickerValue)` under the hood.
-            // If you pass a date without a time, it will treat it as UTC. By adding a time,
-            // it will behave as local time. The date that comes from the server will be what
-            // we expect. The time is handled separately by the nested time fieldtype.
-            // https://github.com/statamic/cms/pull/6688
-            return this.value.date+'T00:00:00';
+            if (!this.formatHasTime) {
+                if (this.isRange) {
+                    return {
+                        start: this.parseDateOnly(this.value.start),
+                        end: this.parseDateOnly(this.value.end),
+                    };
+                }
+
+                return this.parseDateOnly(this.value);
+            }
+
+            if (this.isRange) {
+                return {
+                    start: parseAbsolute(this.value.start, this.displayTimezone),
+                    end: parseAbsolute(this.value.end, this.displayTimezone),
+                };
+            }
+
+            return parseAbsolute(this.value, this.displayTimezone);
         },
 
-        commonDatePickerBindings() {
+        datePickerGranularity() {
+            return this.hasTime ? (this.hasSeconds ? 'second' : 'minute') : 'day';
+        },
+
+        replicatorPreviewOptions() {
+            const preset = this.hasTime ? 'datetime' : 'date';
+
             return {
-                attributes: [
-                    {
-                        key: 'today',
-                        dot: true,
-                        popover: {
-                            label: __('Today'),
-                        },
-                        dates: new Date()
-                    }
-                ],
-                columns: this.$screens({ default: 1, lg: this.config.columns }),
-                rows: this.$screens({ default: 1, lg: this.config.rows }),
-                isExpanded: this.name === 'date' || this.config.full_width,
-                isRequired: this.config.required,
-                locale: this.$config.get('locale').replace('_', '-'),
-                masks: { input: [this.displayFormat] },
-                minDate: this.config.earliest_date.date,
-                maxDate: this.config.latest_date.date,
-                modelConfig: { type: 'string', mask: this.format },
-                updateOnInput: false,
-                value: this.datePickerValue,
+                preset,
+                timeZone: this.displayTimezone,
+                ...(this.formatHasTime && { timeZoneName: 'short' }),
             };
-        },
-
-        datePickerEvents() {
-            return {
-                input: this.setDate
-            };
-        },
-
-        format() {
-            return 'YYYY-MM-DD';
-        },
-
-        displayFormat() {
-            return this.meta.displayFormat;
         },
 
         replicatorPreview() {
-            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
-            if (! this.value.date) return;
+            if (!this.showFieldPreviews) return;
+            if (!this.value) return;
+
+            const formatter = new DateFormatter().options(this.replicatorPreviewOptions);
 
             if (this.isRange) {
-                return Vue.moment(this.value.date.start).format(this.displayFormat) + ' – ' + Vue.moment(this.value.date.end).format(this.displayFormat);
+                return formatter.date(this.value.start) + ' – ' + formatter.date(this.value.end);
             }
 
-            let preview = Vue.moment(this.value.date).format(this.displayFormat);
-
-            if (this.hasTime && this.value.time) {
-                preview += ` ${this.value.time}`;
-            }
-
-            return preview;
+            return formatter.date(this.value).toString();
         },
-
     },
 
     created() {
-        if (this.value.time === 'now') {
-            // Probably shouldn't be modifying a prop, but luckily it all works nicely, without
-            // needing to create an "update value without triggering dirty state" flow yet.
-            this.value.time = Vue.moment().format(this.hasSeconds ? 'HH:mm:ss' : 'HH:mm');
+        this.$events.$on(`container.${this.publishContainer.name}.saving`, this.triggerChangeOnFocusedField);
+
+        if (this.value === 'now') {
+            this.injectedPublishContainer.withoutDirtying(() => this.addDate());
         }
-
-        this.$events.$on(`container.${this.storeName}.saving`, this.triggerChangeOnFocusedField);
     },
 
-    destroyed() {
-        this.$events.$off(`container.${this.storeName}.saving`, this.triggerChangeOnFocusedField);
+    unmounted() {
+        this.$events.$off(`container.${this.publishContainer.name}.saving`, this.triggerChangeOnFocusedField);
     },
-
 
     methods: {
-
         triggerChangeOnFocusedField() {
             if (!this.focusedField) return;
 
             this.focusedField.dispatchEvent(new Event('change'));
         },
 
-        setDate(date) {
-            if (!date) {
-                this.update({ date: null, time: null });
+        datePickerUpdated(value) {
+	        // Clearing the date on a required Date field should set the date/time to now.
+	        if (!value && !this.isRange && this.config.required) {
+				return this.addDate();
+	        }
+
+            if (!value) {
+                return this.update(null);
+            }
+
+            if (this.isRange && (!value.start || !value.end)) {
                 return;
             }
 
-            this.update({ ...this.value, date });
-        },
+            if (!this.formatHasTime) {
+                if (this.isRange) {
+                    return this.update({
+                        start: this.formatDateOnly(value.start),
+                        end: this.formatDateOnly(value.end),
+                    });
+                }
 
-        setTime(time) {
-            this.update({ ...this.value, time });
+                return this.update(this.formatDateOnly(value));
+            }
+
+            // Sometimes, we'll get a CalendarDateTime object, which doesn't include timezone
+            // information. In that case, we need to convert it to a ZonedDateTime object.
+            if (!this.isRange && !value.offset && !value.timeZone) {
+                value = toZoned(value, this.displayTimezone);
+            }
+
+            // The date picker will give us CalendarDateTimes in the local time zone.
+            // We want them in UTC.
+
+            if (this.isRange) {
+                let start = value.start;
+                let end = value.end;
+
+                if (!start.offset && !start.timeZone) {
+                    start = toZoned(start, this.displayTimezone);
+                }
+
+                if (!end.offset && !end.timeZone) {
+                    end = toZoned(end, this.displayTimezone);
+                }
+
+                if (!this.hasTime) {
+                    end.set({ hour: 23, minute: 59, second: 59 });
+                }
+
+                return this.update({
+                    start: toTimeZone(start, 'UTC').toAbsoluteString(),
+                    end: toTimeZone(end, 'UTC').toAbsoluteString(),
+                });
+            }
+
+            return this.update(toTimeZone(value, 'UTC').toAbsoluteString());
         },
 
         addDate() {
-            const now = Vue.moment().format(this.format);
-            const date = this.isRange ? { start: now, end: now } : now;
-            this.update({ date, time: null });
+            let zoned = now(this.displayTimezone);
+
+            if (!this.formatHasTime) {
+                const str = this.formatDateOnly(zoned);
+                return this.update(this.isRange ? { start: str, end: str } : str);
+            }
+
+            zoned = zoned.set({ millisecond: 0 });
+
+            if (!this.config.time_enabled) {
+                zoned = zoned.set({ hour: 0, minute: 0, second: 0 });
+            }
+
+            const str = toTimeZone(zoned, 'UTC').toAbsoluteString();
+
+            this.update(this.isRange ? { start: str, end: str } : str);
         },
 
+        parseDateOnly(value) {
+            const [year, month, day] = value.split('-').map(Number);
+            return new CalendarDate(year, month, day);
+        },
+
+        formatDateOnly(value) {
+            return `${value.year}-${String(value.month).padStart(2, '0')}-${String(value.day).padStart(2, '0')}`;
+        },
     },
 };
 </script>

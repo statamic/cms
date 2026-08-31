@@ -65,13 +65,21 @@ class ThumbnailController extends Controller
         $this->orientation = $orientation;
         $this->asset = $this->asset($asset);
 
+        $this->authorize('view', $this->asset);
+
         if ($placeholder = $this->getPlaceholderResponse()) {
             return $placeholder;
         }
 
+        $path = $this->generate();
+
+        if (! $path) {
+            return $this->getUnavailableThumbnailResponse();
+        }
+
         return $this->server->getResponseFactory()->create(
             $this->server->getCache(),
-            $this->generate()
+            $path
         );
     }
 
@@ -186,5 +194,19 @@ class ThumbnailController extends Controller
         }
 
         return response(Statamic::svg('filetypes/picture'))->header('Content-Type', 'image/svg+xml');
+    }
+
+    /**
+     * When thumbnail generation fails (e.g. FFmpeg missing for videos), show a filetype icon.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    private function getUnavailableThumbnailResponse()
+    {
+        $svg = $this->asset->isVideo()
+            ? Statamic::svg('filetypes/video')
+            : Statamic::svg('filetypes/picture');
+
+        return response($svg)->header('Content-Type', 'image/svg+xml');
     }
 }

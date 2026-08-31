@@ -3,7 +3,10 @@
 namespace Statamic\Fieldtypes;
 
 use Statamic\Facades\AssetContainer;
+use Statamic\Facades\User;
 use Statamic\Support\Str;
+
+use function Statamic\trans as __;
 
 class AssetFolder extends Relationship
 {
@@ -17,14 +20,19 @@ class AssetFolder extends Relationship
     {
         return [
             [
-                'display' => __('Appearance & Behavior'),
+                'display' => __('Input Behavior'),
                 'fields' => [
-                    'max_items' => [
-                        'display' => __('Max Items'),
-                        'instructions' => __('statamic::messages.max_items_instructions'),
-                        'min' => 1,
-                        'type' => 'integer',
+                    'container' => [
+                        'display' => __('Container'),
+                        'instructions' => __('statamic::fieldtypes.asset_folders.config.container'),
+                        'type' => 'asset_container',
+                        'max_items' => 1,
                     ],
+                ],
+            ],
+            [
+                'display' => __('Appearance'),
+                'fields' => [
                     'mode' => [
                         'display' => __('UI Mode'),
                         'instructions' => __('statamic::fieldtypes.relationship.config.mode'),
@@ -36,15 +44,32 @@ class AssetFolder extends Relationship
                             'typeahead' => __('Typeahead Field'),
                         ],
                     ],
-                    'container' => [
-                        'display' => __('Container'),
-                        'instructions' => __('statamic::fieldtypes.asset_folders.config.container'),
-                        'type' => 'asset_container',
-                        'max_items' => 1,
+                ],
+            ],
+            [
+                'display' => __('Boundaries & Limits'),
+                'fields' => [
+                    'max_items' => [
+                        'display' => __('Max Items'),
+                        'instructions' => __('statamic::messages.max_items_instructions'),
+                        'min' => 1,
+                        'type' => 'integer',
                     ],
                 ],
             ],
         ];
+    }
+
+    protected function authorizeItemData($id): bool
+    {
+        // No static container configured (dynamic/sibling-container mode); the by-id value
+        // only echoes the submitted folder path back, so there is nothing to authorize.
+        // Folder enumeration is gated separately, on the runtime container, in getIndexItems().
+        if (! $container = $this->config('container')) {
+            return true;
+        }
+
+        return $this->authorizeViewable(AssetContainer::find($container));
     }
 
     protected function toItemArray($id, $site = null)
@@ -54,7 +79,14 @@ class AssetFolder extends Relationship
 
     public function getIndexItems($request)
     {
-        return AssetContainer::find($request->container)
+        $container = AssetContainer::find($request->container);
+
+        // No/unviewable container: return an empty folder list rather than throwing.
+        if (! $container || ! User::current()->can('view', $container)) {
+            return collect();
+        }
+
+        return $container
             ->folders()
             ->map(function ($folder) {
                 return ['id' => $folder, 'title' => $folder];

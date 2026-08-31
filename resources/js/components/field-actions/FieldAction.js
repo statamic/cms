@@ -3,6 +3,7 @@ import modal from './modal';
 export default class FieldAction {
     #payload;
     #run;
+    #disabled;
     #visible;
     #visibleWhenReadOnly;
     #icon;
@@ -14,6 +15,7 @@ export default class FieldAction {
         this.#payload = payload;
         this.#run = action.run;
         this.#confirm = action.confirm;
+        this.#disabled = action.disabled ?? false;
         this.#visible = action.visible ?? true;
         this.#visibleWhenReadOnly = action.visibleWhenReadOnly ?? false;
         this.#icon = action.icon ?? 'image';
@@ -30,6 +32,10 @@ export default class FieldAction {
         return typeof this.#visible === 'function' ? this.#visible(this.#payload) : this.#visible;
     }
 
+    get disabled() {
+        return typeof this.#disabled === 'function' ? this.#disabled(this.#payload) : this.#disabled;
+    }
+
     get quick() {
         return typeof this.#quick === 'function' ? this.#quick(this.#payload) : this.#quick;
     }
@@ -43,12 +49,12 @@ export default class FieldAction {
     }
 
     async run() {
-        let payload = {...this.#payload};
+        let payload = { ...this.#payload };
 
         if (this.#confirm) {
             const confirmation = await modal(this.#modalProps());
             if (!confirmation.confirmed) return;
-            payload = {...payload, confirmation};
+            payload = { ...payload, confirmation };
         }
 
         const response = this.#run(payload);
@@ -62,9 +68,9 @@ export default class FieldAction {
     }
 
     #modalProps() {
-        let props = this.#confirm === true ? {} : {...this.#confirm};
+        let props = this.#confirm === true ? {} : { ...this.#confirm };
 
-        if (! props.title) {
+        if (!props.title) {
             props.title = this.title;
         }
 

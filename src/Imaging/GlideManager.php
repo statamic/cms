@@ -9,6 +9,7 @@ use League\Glide\ServerFactory;
 use Statamic\Events\GlideAssetCacheCleared;
 use Statamic\Facades\Config;
 use Statamic\Facades\Image;
+use Statamic\Facades\URL;
 use Statamic\Imaging\ResponseFactory as LaravelResponseFactory;
 use Statamic\Support\Str;
 
@@ -100,9 +101,9 @@ class GlideManager
     {
         $url = $this->wantsCustomFilesystem()
             ? self::cacheDisk()->url('/')
-            : Str::start(self::route(), '/');
+            : self::route();
 
-        return Str::removeRight($url, '/');
+        return URL::tidy($url, withTrailingSlash: false, external: true);
     }
 
     public function cacheStore()

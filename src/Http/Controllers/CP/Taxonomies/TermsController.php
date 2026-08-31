@@ -3,10 +3,9 @@
 namespace Statamic\Http\Controllers\CP\Taxonomies;
 
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Statamic\Contracts\Taxonomies\Term as TermContract;
-use Statamic\CP\Breadcrumbs;
 use Statamic\Facades\Action;
-use Statamic\Facades\Asset;
 use Statamic\Facades\Site;
 use Statamic\Facades\Term;
 use Statamic\Facades\User;
@@ -14,9 +13,13 @@ use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Http\Resources\CP\Taxonomies\Term as TermResource;
 use Statamic\Http\Resources\CP\Taxonomies\Terms;
+use Statamic\Query\OrderBy;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 use Statamic\Rules\Slug;
 use Statamic\Rules\UniqueTermValue;
+use Statamic\Statamic;
+
+use function Statamic\trans as __;
 
 class TermsController extends CpController
 {
@@ -34,7 +37,7 @@ class TermsController extends CpController
             'blueprints' => $taxonomy->termBlueprints()->map->handle(),
         ]);
 
-        $sortField = request('sort');
+        $sortField = OrderBy::column(request('sort'));
         $sortDirection = request('order', 'asc');
 
         if (! $sortField && ! request('search')) {
@@ -46,7 +49,7 @@ class TermsController extends CpController
             $query->orderBy($sortField, $sortDirection);
         }
 
-        $paginator = $query->paginate(request('perPage'));
+        $paginator = $query->paginate(Statamic::cpPerPage(request('perPage')));
 
         $terms = $paginator->getCollection();
 
@@ -87,8 +90,6 @@ class TermsController extends CpController
     {
         $this->authorize('view', $term);
 
-        $term = $term->fromWorkingCopy();
-
         $blueprint = $term->blueprint();
 
         [$values, $meta] = $this->extractFromFields($term, $blueprint);
@@ -105,10 +106,7 @@ class TermsController extends CpController
                 'save' => $term->updateUrl(),
                 'publish' => $term->publishUrl(),
                 'unpublish' => $term->unpublishUrl(),
-                'revisions' => $term->revisionsUrl(),
-                'restore' => $term->restoreRevisionUrl(),
-                'createRevision' => $term->createRevisionUrl(),
-                'editBlueprint' => cp_route('taxonomies.blueprints.edit', [$taxonomy, $blueprint]),
+                'editBlueprint' => cp_route('blueprints.taxonomies.edit', [$taxonomy, $blueprint]),
             ],
             'values' => array_merge($values, ['id' => $term->id()]),
             'meta' => $meta,
@@ -118,7 +116,6 @@ class TermsController extends CpController
             'published' => $term->published(),
             'locale' => $term->locale(),
             'localizedFields' => $term->data()->keys()->all(),
-            'isRoot' => $term->isRoot(),
             'hasOrigin' => $hasOrigin,
             'originValues' => $originValues ?? null,
             'originMeta' => $originMeta ?? null,
@@ -137,11 +134,7 @@ class TermsController extends CpController
                     'url' => $localized->editUrl(),
                     'livePreviewUrl' => $localized->livePreviewUrl(),
                 ];
-            })->all(),
-            'hasWorkingCopy' => $term->hasWorkingCopy(),
-            'preloadedAssets' => $this->extractAssetsFromValues($values),
-            'revisionsEnabled' => $term->revisionsEnabled(),
-            'breadcrumbs' => $this->breadcrumbs($taxonomy),
+            })->values()->all(),
             'previewTargets' => $taxonomy->previewTargets()->all(),
             'itemActions' => Action::for($term, ['taxonomy' => $taxonomy->handle(), 'view' => 'form']),
             'hasTemplate' => view()->exists($term->template()),
@@ -155,9 +148,13 @@ class TermsController extends CpController
             session()->now('success', __('Term created'));
         }
 
-        return view('statamic::terms.edit', array_merge($viewData, [
-            'term' => $term,
-        ]));
+        return Inertia::render('terms/Edit', [
+            ...$viewData,
+            'canEditBlueprint' => User::current()->can('configure fields'),
+            'createAnotherUrl' => cp_route('taxonomies.terms.create', [$taxonomy->handle(), $term->locale()]),
+            'listingUrl' => cp_route('taxonomies.show', $taxonomy->handle()),
+            'itemActionUrl' => cp_route('taxonomies.terms.actions.run', $taxonomy->handle()),
+        ]);
     }
 
     public function update(Request $request, $taxonomy, $term, $site)
@@ -165,8 +162,6 @@ class TermsController extends CpController
         $term = $term->in($site->handle());
 
         $this->authorize('update', $term);
-
-        $term = $term->fromWorkingCopy();
 
         $term->term()->syncOriginal();
 
@@ -197,18 +192,9 @@ class TermsController extends CpController
 
         $term->slug($request->slug);
 
-        if ($term->revisionsEnabled() && $term->published()) {
-            $term
-                ->makeWorkingCopy()
-                ->user(User::current())
-                ->save();
-        } else {
-            if (! $term->revisionsEnabled()) {
-                $term->published($request->published);
-            }
+        $term->published($request->published);
 
-            $saved = $term->updateLastModified(User::current())->save();
-        }
+        $saved = $term->updateLastModified(User::current())->save();
 
         [$values] = $this->extractFromFields($term, $term->blueprint());
 
@@ -245,7 +231,7 @@ class TermsController extends CpController
             'title' => $taxonomy->createLabel(),
             'actions' => [
                 'save' => cp_route('taxonomies.terms.store', [$taxonomy->handle(), $site->handle()]),
-                'editBlueprint' => cp_route('taxonomies.blueprints.edit', [$taxonomy, $blueprint]),
+                'editBlueprint' => cp_route('blueprints.taxonomies.edit', [$taxonomy, $blueprint]),
             ],
             'values' => $values,
             'meta' => $fields->meta(),
@@ -265,7 +251,6 @@ class TermsController extends CpController
                     'livePreviewUrl' => cp_route('taxonomies.terms.preview.create', [$taxonomy->handle(), $handle]),
                 ];
             })->values()->all(),
-            'breadcrumbs' => $this->breadcrumbs($taxonomy),
             'previewTargets' => $taxonomy->previewTargets()->all(),
         ];
 
@@ -273,7 +258,12 @@ class TermsController extends CpController
             return $viewData;
         }
 
-        return view('statamic::terms.create', $viewData);
+        return Inertia::render('terms/Create', [
+            ...$viewData,
+            'canEditBlueprint' => User::current()->can('configure fields'),
+            'createAnotherUrl' => cp_route('taxonomies.terms.create', [$taxonomy->handle(), $site->handle()]),
+            'listingUrl' => cp_route('taxonomies.show', $taxonomy->handle()),
+        ]);
     }
 
     public function store(Request $request, $taxonomy, $site)
@@ -315,51 +305,10 @@ class TermsController extends CpController
             ->data($values)
             ->slug($slug);
 
-        if ($term->revisionsEnabled()) {
-            $term->store([
-                'message' => $request->message,
-                'user' => User::current(),
-            ]);
-        } else {
-            $saved = $term->updateLastModified(User::current())->save();
-        }
+        $saved = $term->updateLastModified(User::current())->save();
 
         return (new TermResource($term))
             ->additional(['saved' => $saved]);
-    }
-
-    protected function extractAssetsFromValues($values)
-    {
-        return collect($values)
-            ->filter(function ($value) {
-                return is_string($value);
-            })
-            ->map(function ($value) {
-                preg_match_all('/"asset::([^"]+)"/', $value, $matches);
-
-                return str_replace('\/', '/', $matches[1]) ?? null;
-            })
-            ->flatten(2)
-            ->unique()
-            ->map(function ($id) {
-                return Asset::find($id);
-            })
-            ->filter()
-            ->values();
-    }
-
-    protected function breadcrumbs($taxonomy)
-    {
-        return new Breadcrumbs([
-            [
-                'text' => __('Taxonomies'),
-                'url' => cp_route('taxonomies.index'),
-            ],
-            [
-                'text' => $taxonomy->title(),
-                'url' => $taxonomy->breadcrumbUrl(),
-            ],
-        ]);
     }
 
     protected function getAuthorizedSitesForTaxonomy($taxonomy)

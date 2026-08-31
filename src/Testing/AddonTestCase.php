@@ -3,11 +3,11 @@
 namespace Statamic\Testing;
 
 use Facades\Statamic\Version;
-use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
 use ReflectionClass;
+use Statamic\Addons\Manifest;
 use Statamic\Console\Processes\Composer;
-use Statamic\Extend\Manifest;
+use Statamic\Facades\Path;
 use Statamic\Providers\StatamicServiceProvider;
 use Statamic\Statamic;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
@@ -26,18 +26,16 @@ abstract class AddonTestCase extends OrchestraTestCase
         $uses = array_flip(class_uses_recursive(static::class));
 
         if (isset($uses[PreventsSavingStacheItemsToDisk::class])) {
-            $reflection = new ReflectionClass($this);
-            $this->fakeStacheDirectory = Str::before(dirname($reflection->getFileName()), DIRECTORY_SEPARATOR.'tests').'/tests/__fixtures__/dev-null';
+            $reflector = new ReflectionClass($this->addonServiceProvider);
+            $this->fakeStacheDirectory = Path::resolve(dirname($reflector->getFileName()).'/../tests/__fixtures__/dev-null');
 
             $this->preventSavingStacheItemsToDisk();
         }
 
-        Version::shouldReceive('get')->zeroOrMoreTimes()->andReturn(Composer::create(__DIR__.'/../')->installedVersion(Statamic::PACKAGE));
-        $this->addToAssertionCount(-1);
+        Version::shouldReceive('get')->andReturn(Composer::create(__DIR__.'/../')->installedVersion(Statamic::PACKAGE));
 
-        \Statamic\Facades\CP\Nav::shouldReceive('build')->zeroOrMoreTimes()->andReturn(collect());
-        \Statamic\Facades\CP\Nav::shouldReceive('clearCachedUrls')->zeroOrMoreTimes();
-        $this->addToAssertionCount(-2); // Dont want to assert this
+        \Statamic\Facades\CP\Nav::shouldReceive('build')->andReturn(collect());
+        \Statamic\Facades\CP\Nav::shouldReceive('clearCachedUrls');
     }
 
     protected function tearDown(): void
@@ -55,6 +53,7 @@ abstract class AddonTestCase extends OrchestraTestCase
     {
         $serviceProviders = [
             StatamicServiceProvider::class,
+            \Inertia\ServiceProvider::class,
             $this->addonServiceProvider,
         ];
 
@@ -97,7 +96,15 @@ abstract class AddonTestCase extends OrchestraTestCase
             ],
         ];
 
+        $app['config']->set('inertia.testing.ensure_pages_exist', false);
+        $app['config']->set('inertia.testing.page_paths', [$directory.'/../resources/js/pages']);
+
         $app['config']->set('statamic.users.repository', 'file');
+
+        $app['config']->set('cache.stores.outpost', [
+            'driver' => 'file',
+            'path' => storage_path('framework/cache/outpost-data'),
+        ]);
 
         $app['config']->set('statamic.stache.watcher', false);
         $app['config']->set('statamic.stache.stores.taxonomies.directory', $directory.'/../tests/__fixtures__/content/taxonomies');
@@ -112,5 +119,15 @@ abstract class AddonTestCase extends OrchestraTestCase
         $app['config']->set('statamic.stache.stores.collection-trees.directory', $directory.'/../tests/__fixtures__/content/structures/collections');
         $app['config']->set('statamic.stache.stores.form-submissions.directory', $directory.'/../tests/__fixtures__/content/submissions');
         $app['config']->set('statamic.stache.stores.users.directory', $directory.'/../tests/__fixtures__/users');
+    }
+
+    protected function getPackage(): string
+    {
+        $reflector = new ReflectionClass($this->addonServiceProvider);
+        $directory = dirname($reflector->getFileName());
+
+        $json = json_decode($this->app['files']->get($directory.'/../composer.json'), true);
+
+        return $json['name'];
     }
 }

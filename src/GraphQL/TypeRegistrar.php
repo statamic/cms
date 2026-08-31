@@ -17,6 +17,7 @@ use Statamic\GraphQL\Types\FormType;
 use Statamic\GraphQL\Types\GlobalSetInterface;
 use Statamic\GraphQL\Types\JsonArgument;
 use Statamic\GraphQL\Types\LabeledValueType;
+use Statamic\GraphQL\Types\LinkValueType;
 use Statamic\GraphQL\Types\NavPageInterface;
 use Statamic\GraphQL\Types\NavTreeBranchType;
 use Statamic\GraphQL\Types\NavType;
@@ -65,6 +66,7 @@ class TypeRegistrar
         GraphQL::addType(GlobalSetInterface::class);
         GraphQL::addType(FieldType::class);
         GraphQL::addType(SectionType::class);
+        GraphQL::addType(LinkValueType::class);
 
         PageInterface::addTypes();
         EntryInterface::addTypes();

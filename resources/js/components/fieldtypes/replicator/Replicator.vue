@@ -1,102 +1,102 @@
 <template>
-
-<portal name="replicator-fullscreen" :disabled="!fullScreenMode" :provide="provide">
-<!-- These wrappers allow any css that expected the field to
+    <portal name="replicator-fullscreen" :disabled="!fullScreenMode" :provide="provide">
+        <!-- These wrappers allow any css that expected the field to
      be within the context of a publish form to continue working
      once it has been portaled out. -->
-<div :class="{ 'publish-fields': fullScreenMode }">
-<div :class="{ wrapperClasses: fullScreenMode }">
-<div class="replicator-fieldtype-container" :class="{'replicator-fullscreen bg-gray-200 dark:bg-dark-700': fullScreenMode }">
-
-    <publish-field-fullscreen-header
-        v-if="fullScreenMode"
-        :title="config.display"
-        :field-actions="fieldActions"
-        @close="toggleFullscreen"
-    />
-
-    <section :class="{'mt-14 p-4 bg-gray-200 dark:bg-dark-700': fullScreenMode}">
-
-        <sortable-list
-            :value="value"
-            :vertical="true"
-            :item-class="sortableItemClass"
-            :handle-class="sortableHandleClass"
-            append-to="body"
-            constrain-dimensions
-            @input="sorted($event)"
-            @dragstart="$emit('focus')"
-            @dragend="$emit('blur')"
-        >
-            <div slot-scope="{}" class="replicator-set-container">
-                <replicator-set
-                    v-for="(set, index) in value"
-                    :key="set._id"
-                    :index="index"
-                    :values="set"
-                    :meta="meta.existing[set._id]"
-                    :config="setConfig(set.type)"
-                    :parent-name="name"
-                    :sortable-item-class="sortableItemClass"
-                    :sortable-handle-class="sortableHandleClass"
-                    :is-read-only="isReadOnly"
-                    :collapsed="collapsed.includes(set._id)"
-                    :field-path-prefix="fieldPathPrefix || handle"
-                    :has-error="setHasError(index)"
-                    :previews="previews[set._id]"
-                    :show-field-previews="config.previews"
-                    :can-add-set="canAddSet"
-                    @collapsed="collapseSet(set._id)"
-                    @expanded="expandSet(set._id)"
-                    @duplicated="duplicateSet(set._id)"
-                    @updated="updated"
-                    @meta-updated="updateSetMeta(set._id, $event)"
-                    @removed="removed(set, index)"
-                    @focus="focused = true"
-                    @blur="blurred"
-                    @previews-updated="updateSetPreviews(set._id, $event)"
+        <div :class="{ 'publish-fields': fullScreenMode }">
+            <div :class="{ wrapperClasses: fullScreenMode }">
+                <div
+                    class="replicator-fieldtype-container"
+                    :class="{ 'replicator-fullscreen fixed inset-0 min-h-screen overflow-scroll rounded-none bg-gray-100 dark:bg-gray-800': fullScreenMode }"
                 >
-                    <template v-slot:picker>
+                    <publish-field-fullscreen-header
+                        v-if="fullScreenMode"
+                        :title="config.display"
+                        :field-actions="fieldActions"
+                        @close="toggleFullscreen"
+                    />
+
+                    <section :class="{ 'mt-12 p-4': fullScreenMode }">
+                        <sortable-list
+                            :model-value="value"
+                            :vertical="true"
+                            :item-class="sortableItemClass"
+                            :handle-class="sortableHandleClass"
+                            append-to="body"
+                            constrain-dimensions
+                            @update:model-value="sorted($event)"
+                            @dragstart="$emit('focus')"
+                            @dragend="$emit('blur')"
+                            v-slot="{}"
+                        >
+                            <div class="relative">
+                                <ReplicatorSet
+                                    v-for="(set, index) in value"
+                                    :key="set._id"
+                                    :id="set._id"
+                                    :index
+                                    :field-path="setFieldPathPrefix"
+                                    :meta-path="setMetaPathPrefix"
+                                    :values="set"
+                                    :config="setConfig(set.type)"
+                                    :sortable-item-class="sortableItemClass"
+                                    :sortable-handle-class="sortableHandleClass"
+                                    :collapsed="collapsed.includes(set._id)"
+                                    :enabled="set.enabled"
+                                    :read-only="isReadOnly"
+                                    :can-add-set="canAddSet"
+                                    :has-error="setHasError(set._id)"
+                                    :show-field-previews="config.previews"
+                                    @collapsed="collapseSet(set._id)"
+                                    @expanded="expandSet(set._id)"
+                                    @duplicated="duplicateSet(set._id)"
+                                    @removed="removed(set, index)"
+                                >
+                                    <template v-slot:picker>
+                                        <add-set-button
+                                            variant="between"
+                                            :groups="groupConfigs"
+                                            :sets="setConfigs"
+                                            :index="index"
+                                            :enabled="canAddSet"
+                                            :is-first="index === 0"
+                                            :show-connector="!(index === 0 && config.hide_display)"
+                                            :loading-set="loadingSet"
+                                            @added="addSet"
+                                        />
+                                    </template>
+                                </ReplicatorSet>
+                            </div>
+                        </sortable-list>
+
                         <add-set-button
-                            class="between"
+                            v-if="canAddSet"
                             :groups="groupConfigs"
                             :sets="setConfigs"
-                            :index="index"
-                            :enabled="canAddSet"
-                            @added="addSet" />
-                    </template>
-                </replicator-set>
+                            :show-connector="value.length > 0"
+                            :index="value.length"
+                            :label="config.button_label"
+                            :is-first="value.length === 0"
+                            :loading-set="loadingSet"
+                            @added="addSet"
+                        />
+                    </section>
+                </div>
             </div>
-        </sortable-list>
-
-        <add-set-button v-if="canAddSet"
-            class="mt-3"
-            :last="true"
-            :groups="groupConfigs"
-            :sets="setConfigs"
-            :index="value.length"
-            :label="config.button_label"
-            @added="addSet" />
-
-    </section>
-
-</div>
-</div>
-</div>
-</portal>
-
+        </div>
+    </portal>
 </template>
 
 <script>
-import uniqid from 'uniqid';
+import Fieldtype from '../Fieldtype.vue';
+import { nanoid as uniqid } from 'nanoid';
 import ReplicatorSet from './Set.vue';
 import AddSetButton from './AddSetButton.vue';
 import ManagesSetMeta from './ManagesSetMeta';
 import { SortableList } from '../../sortable/Sortable';
-import reduce from 'underscore/modules/reduce';
+import { data_get } from "@/bootstrap/globals.js";
 
 export default {
-
     mixins: [Fieldtype, ManagesSetMeta],
 
     components: {
@@ -105,22 +105,30 @@ export default {
         AddSetButton,
     },
 
-    inject: ['storeName'],
-
     data() {
         return {
             focused: false,
             collapsed: clone(this.meta.collapsed),
-            previews: this.meta.previews,
             fullScreenMode: false,
+            escBinding: null,
             provide: {
-                storeName: this.storeName,
-                replicatorSets: this.config.sets
-            }
-        }
+                replicatorSets: this.config.sets,
+                showReplicatorFieldPreviews: this.config.previews,
+            },
+            errorsById: {},
+            setsCache: {},
+            loadingSet: null,
+        };
     },
 
     computed: {
+        setFieldPathPrefix() {
+            return this.fieldPathPrefix ? `${this.fieldPathPrefix}.${this.handle}` : this.handle;
+        },
+
+        setMetaPathPrefix() {
+            return this.metaPathPrefix ? `${this.metaPathPrefix}.${this.handle}` : this.handle;
+        },
 
         canAddSet() {
             if (this.isReadOnly) return false;
@@ -129,7 +137,7 @@ export default {
         },
 
         setConfigs() {
-            return reduce(this.groupConfigs, (sets, group) => {
+            return this.groupConfigs.reduce((sets, group) => {
                 return sets.concat(group.sets);
             }, []);
         },
@@ -139,19 +147,15 @@ export default {
         },
 
         sortableItemClass() {
-            return `${this.name}-sortable-item`;
+            return `${this.fieldId}-sortable-item`;
         },
 
         sortableHandleClass() {
-            return `${this.name}-sortable-handle`;
-        },
-
-        storeState() {
-            return this.$store.state.publish[this.storeName] || {};
+            return `${this.fieldId}-sortable-handle`;
         },
 
         replicatorPreview() {
-            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+            if (!this.showFieldPreviews) return;
 
             return `${__(this.config.display)}: ${__n(':count set|:count sets', this.value.length)}`;
         },
@@ -160,22 +164,26 @@ export default {
             return [
                 {
                     title: __('Expand All Sets'),
-                    icon: 'arrows-horizontal-expand',
+                    icon: 'expand',
                     quick: true,
+                    disabled: () => this.collapsed.length === 0,
+                    visible: this.config.collapse !== 'accordion',
                     visibleWhenReadOnly: true,
                     run: this.expandAll,
                 },
                 {
                     title: __('Collapse All Sets'),
-                    icon: 'arrows-horizontal-collapse',
+                    icon: 'collapse',
                     quick: true,
+                    disabled: () =>this.collapsed.length === this.value.length,
                     visibleWhenReadOnly: true,
                     run: this.collapseAll,
                 },
                 {
                     title: __('Toggle Fullscreen Mode'),
-                    icon: ({ vm }) => vm.fullScreenMode ? 'shrink-all' : 'expand-bold',
+                    icon: ({ vm }) => (vm.fullScreenMode ? 'fullscreen-close' : 'fullscreen-open'),
                     quick: true,
+                    visible: this.config.fullscreen,
                     visibleWhenReadOnly: true,
                     run: this.toggleFullscreen,
                 },
@@ -184,9 +192,8 @@ export default {
     },
 
     methods: {
-
         setConfig(handle) {
-            return _.find(this.setConfigs, { handle }) || {};
+            return this.setConfigs.find((c) => c.handle === handle) || {};
         },
 
         updated(index, set) {
@@ -204,60 +211,106 @@ export default {
         },
 
         addSet(handle, index) {
+            this.loadingSet = handle;
+
+            this.fetchSet(handle)
+                .then(data => this._addSet(handle, index, data))
+                .catch(() => this.$toast.error(__('Something went wrong')))
+                .finally(() => this.loadingSet = null);
+        },
+
+        _addSet(handle, index, data) {
             const set = {
-                ...JSON.parse(JSON.stringify(this.meta.defaults[handle])),
+                ...JSON.parse(JSON.stringify(data.defaults)),
                 _id: uniqid(),
                 type: handle,
                 enabled: true,
             };
 
-            this.updateSetPreviews(set._id, {});
+            this.updateSetMeta(set._id, data.new);
 
-            this.updateSetMeta(set._id, this.meta.new[handle]);
+            this.$nextTick(() => {
+                this.update([...this.value.slice(0, index), set, ...this.value.slice(index)]);
+                this.expandSet(set._id);
+            });
+        },
 
-            this.update([
-                ...this.value.slice(0, index),
-                set,
-                ...this.value.slice(index)
-            ]);
+        async fetchSet(set) {
+            return new Promise(async (resolve, reject) => {
+                const field = this.replicatorFieldPath();
+                const setCacheKey = `${field}.${set}`;
+                const reference = this.publishContainer.reference;
+                const token = this.publishContainer.blueprint.token;
 
-            this.expandSet(set._id);
+				if (this.meta.new?.hasOwnProperty(set)) {
+					let meta = this.meta.new[set];
+					let defaults = this.meta.defaults[set];
+
+					resolve({ new: meta, defaults });
+					return;
+				}
+
+                if (this.setsCache[setCacheKey]) {
+                    resolve(this.setsCache[setCacheKey]);
+                    return;
+                }
+
+                this.$axios.post(cp_url('fieldtypes/replicator/set'), { token, reference, field, set })
+                    .then(response => {
+                        this.setsCache[setCacheKey] = response.data;
+                        resolve(response.data);
+                    })
+                    .catch(error => reject(error));
+            });
+        },
+
+        /**
+         * Returns the path to the Replicator field, replacing any set indexes with handles.
+         */
+        replicatorFieldPath() {
+            if (!this.fieldPathPrefix) {
+                return this.handle;
+            }
+
+            return this.fieldPathKeys
+                .map((key, index) => {
+					if (['attrs', 'values'].includes(key)) return;
+
+                    if (Number.isInteger(parseInt(key))) {
+	                    let setValues =  data_get(this.publishContainer.values, this.fieldPathKeys.slice(0, index + 1).join('.'));
+
+	                    return setValues.attrs?.values.type || setValues.type;
+                    }
+
+                    return key;
+                })
+                .filter((key) => key !== undefined)
+                .concat(this.handle)
+                .join('.');
         },
 
         duplicateSet(old_id) {
-            const index = this.value.findIndex(v => v._id === old_id);
-            const old = this.value[index];
-            const set = {
-                ...JSON.parse(JSON.stringify(old)),
-                _id: uniqid(),
-            };
+            if (!this.canAddSet) return;
 
-            this.updateSetPreviews(set._id, {});
+            const index = this.value.findIndex((v) => v._id === old_id);
+            const { values: set, meta } = this.duplicateValues(this.value[index], this.meta.existing[old_id]);
 
-            this.updateSetMeta(set._id, this.meta.existing[old_id]);
+            this.updateSetMeta(set._id, meta);
 
-            this.update([
-                ...this.value.slice(0, index + 1),
-                set,
-                ...this.value.slice(index + 1)
-            ]);
+            this.update([...this.value.slice(0, index + 1), set, ...this.value.slice(index + 1)]);
 
             this.expandSet(set._id);
-        },
-
-        updateSetPreviews(id, previews) {
-            this.previews[id] = previews;
         },
 
         collapseSet(id) {
             if (!this.collapsed.includes(id)) {
-                this.collapsed.push(id)
+                this.collapsed.push(id);
             }
         },
 
         expandSet(id) {
             if (this.config.collapse === 'accordion') {
-                this.collapsed = this.value.map(v => v._id).filter(v => v !== id);
+                this.collapsed = this.value.map((v) => v._id).filter((v) => v !== id);
                 return;
             }
 
@@ -268,7 +321,7 @@ export default {
         },
 
         collapseAll() {
-            this.collapsed = _.pluck(this.value, '_id');
+            this.collapsed = this.value.map((v) => v._id);
         },
 
         expandAll() {
@@ -277,6 +330,15 @@ export default {
 
         toggleFullscreen() {
             this.fullScreenMode = !this.fullScreenMode;
+
+            if (this.fullScreenMode) {
+                this.escBinding = this.$keys.bindGlobal('esc', this.toggleFullscreen);
+            } else {
+                if (this.escBinding) {
+                    this.escBinding.destroy();
+                    this.escBinding = null;
+                }
+            }
         },
 
         blurred() {
@@ -287,19 +349,16 @@ export default {
             }, 1);
         },
 
-        setHasError(index) {
-            const prefix = `${this.fieldPathPrefix || this.handle}.${index}.`;
+        setHasError(id) {
+            if (Object.keys(this.errorsById).length === 0) {
+                return false;
+            }
 
-            return Object.keys(this.storeState.errors ?? []).some(handle => handle.startsWith(prefix));
+            return this.errorsById.hasOwnProperty(id) && this.errorsById[id].length > 0;
         },
     },
 
-    mounted() {
-        if (this.config.collapse) this.collapseAll();
-    },
-
     watch: {
-
         focused(focused, oldFocused) {
             if (focused === oldFocused) return;
 
@@ -316,19 +375,30 @@ export default {
             this.updateMeta({ ...this.meta, collapsed: clone(collapsed) });
         },
 
-        previews: {
-            deep: true,
-            handler(value) {
-                if (JSON.stringify(this.meta.previews) === JSON.stringify(value)) {
-                    return
-                }
-                const meta = this.meta;
-                meta.previews = value;
-                this.updateMeta(meta);
-            }
+        loadingSet(loading) {
+            this.$progress.loading('replicator-set', !!loading);
         },
 
-    }
+        'publishContainer.errors': {
+            immediate: true,
+            handler(errors) {
+                this.errorsById = Object.entries(errors).reduce((acc, [key, value]) => {
+                    if (!key.startsWith(this.setFieldPathPrefix)) {
+                        return acc;
+                    }
 
-}
+                    const subKey = key.replace(`${this.setFieldPathPrefix}.`, '');
+                    const setIndex = subKey.split('.').shift();
+                    const setId = this.value[setIndex]?._id;
+
+                    if (setId) {
+                        acc[setId] = value;
+                    }
+
+                    return acc;
+                }, {});
+            },
+        },
+    },
+};
 </script>

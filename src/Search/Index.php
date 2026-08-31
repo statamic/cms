@@ -4,12 +4,12 @@ namespace Statamic\Search;
 
 use Closure;
 use Statamic\Contracts\Search\Searchable;
-use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 abstract class Index
 {
     protected $name;
+    protected $handle;
     protected $locale;
     protected $config;
     protected static ?Closure $nameCallback = null;
@@ -20,12 +20,14 @@ abstract class Index
 
     abstract public function exists();
 
-    abstract protected function insertDocuments(Documents $documents);
+    abstract public function insertDocuments(Documents $documents);
 
     abstract protected function deleteIndex();
 
     public function __construct($name, array $config, ?string $locale = null)
     {
+        $this->handle = $name;
+
         $this->name = static::$nameCallback
             ? call_user_func(static::$nameCallback, $name, $locale)
             : ($locale ? $name.'_'.$locale : $name);
@@ -37,6 +39,11 @@ abstract class Index
     public function name()
     {
         return $this->name;
+    }
+
+    public function handle()
+    {
+        return $this->handle;
     }
 
     public static function resolveNameUsing(?Closure $callback)
@@ -84,18 +91,25 @@ abstract class Index
 
     public function insert($document)
     {
-        return $this->insertMultiple(Arr::wrap($document));
+        return $this->insertMultiple(collect($document));
     }
 
     public function insertMultiple($documents)
     {
-        $documents = (new Documents($documents))->mapWithKeys(function (Searchable $item) {
-            return [$item->getSearchReference() => $this->searchables()->fields($item)];
-        });
-
-        $this->insertDocuments($documents);
+        $documents
+            ->chunk(config('statamic.search.chunk_size'))
+            ->each(fn ($documents) => InsertMultipleJob::dispatch(
+                name: $this->handle,
+                locale: $this->locale,
+                documents: $documents
+            ));
 
         return $this;
+    }
+
+    public function fields(Searchable $searchable)
+    {
+        return $this->searchables()->fields($searchable);
     }
 
     public function shouldIndex($searchable)

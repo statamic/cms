@@ -35,26 +35,11 @@ return [
         |--------------------------------------------------------------------------
         |
         | The driver that will be used under the hood for image manipulation.
-        | Supported: "gd" or "imagick" (if installed on your server)
+        | Supported: "gd", "imagick" or a class name of a custom driver.
         |
         */
 
         'driver' => 'gd',
-
-        /*
-        |--------------------------------------------------------------------------
-        | Additional Image Extensions
-        |--------------------------------------------------------------------------
-        |
-        | Define any additional image file extensions you would like Statamic to
-        | process. You should ensure that both your server and the selected
-        | image manipulation driver properly supports these extensions.
-        |
-        */
-
-        'additional_extensions' => [
-            // 'heic',
-        ],
 
         /*
         |--------------------------------------------------------------------------
@@ -84,6 +69,19 @@ return [
         'defaults' => [
             // 'quality' => 50,
         ],
+
+        /*
+        |--------------------------------------------------------------------------
+        | Crop Quality
+        |--------------------------------------------------------------------------
+        |
+        | The quality used when saving images cropped in the control panel. The
+        | user may override this per crop. When null, the quality defined in
+        | the "defaults" above will be used, otherwise it falls back to 90.
+        |
+        */
+
+        'crop_quality' => null,
 
         /*
         |--------------------------------------------------------------------------
@@ -147,6 +145,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Control Panel Video Thumbnails
+    |--------------------------------------------------------------------------
+    |
+    | When enabled, Statamic will generate thumbnails for videos when FFmpeg
+    | is available. Generated thumbnails are displayed in the Control Panel.
+    | Without FFmpeg, videos fall back to a filetype icon.
+    |
+    */
+
+    'video_thumbnails' => true,
+
+    /*
+    |--------------------------------------------------------------------------
     | File Previews with Google Docs
     |--------------------------------------------------------------------------
     |
@@ -187,6 +198,25 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Crop Aspect Ratios
+    |--------------------------------------------------------------------------
+    |
+    | Configure the aspect ratio presets available in the Control Panel image
+    | crop editor. Each entry may be a "W:H" string (e.g. "16:9") or an array
+    | with a custom label and ratio: ['label' => 'Wide', 'ratio' => '16:9'].
+    |
+    */
+
+    'crop_aspect_ratios' => [
+        '16:9',
+        '4:3',
+        '3:2',
+        '2:1',
+        '1:1',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Enforce Lowercase Filenames
     |--------------------------------------------------------------------------
     |
@@ -212,6 +242,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Additional Filename Character Replacements
+    |--------------------------------------------------------------------------
+    |
+    | When uploading files, certain characters in filenames will be replaced
+    | to ensure a safe filename. You may configure additional replacements.
+    | These are in addition to the native ones. They are not overridable.
+    |
+    */
+
+    'additional_filename_replacements' => [],
+
+    /*
+    |--------------------------------------------------------------------------
     | SVG Sanitization
     |--------------------------------------------------------------------------
     |
@@ -225,14 +268,34 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Use V6 Permissions
+    | FFmpeg
     |--------------------------------------------------------------------------
     |
-    | This allows you to opt in to the asset permissions that will become the
-    | default behavior in Statamic 6. This will be removed in Statamic 6.
+    | Statamic uses FFmpeg to extract thumbnails from videos to be shown in the
+    | Control Panel. You may adjust the binary location and cache path here.
+    | The configured binary must exist and be executable.
     |
     */
 
-    'v6_permissions' => false,
+    'ffmpeg' => [
+        'binary' => null,
+        'cache_path' => storage_path('statamic/glide/ffmpeg'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Replicator and Bard Set Preview Images
+    |--------------------------------------------------------------------------
+    |
+    | Replicator and Bard sets may have preview images to give users a visual
+    | representation of the content within. Here you may specify the asset
+    | container and folder where these preview images are to be stored.
+    |
+    */
+
+    'set_preview_images' => [
+        'container' => 'assets',
+        'folder' => 'set-previews',
+    ],
 
 ];

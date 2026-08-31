@@ -3,8 +3,10 @@
 </template>
 
 <script>
-export default {
+import IndexFieldtype from './IndexFieldtype.vue';
+import DOMPurify from 'dompurify';
 
+export default {
     mixins: [IndexFieldtype],
 
     computed: {
@@ -12,7 +14,10 @@ export default {
             if (!this.value) {
                 return null;
             }
-            return this.value.join(', ');
+
+            return DOMPurify.sanitize(this.value.join(', '), {
+                USE_PROFILES: { html: true, svg: true },
+            });
         },
     },
 };

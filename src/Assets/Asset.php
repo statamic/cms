@@ -45,14 +45,16 @@ use Statamic\Search\Searchable;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
+use Statamic\Support\Svg;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
+use Statamic\Support\Traits\Hookable;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Mime\MimeTypes;
 
 class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, ContainsQueryableValues, ResolvesValuesContract, SearchableContract
 {
     use ContainsData, FluentlyGetsAndSets, HasAugmentedInstance, HasDirtyState,
-        Searchable,
+        Hookable, Searchable,
         TracksQueriedColumns, TracksQueriedRelations {
             set as traitSet;
             get as traitGet;
@@ -63,6 +65,10 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
     use ResolvesValues {
         resolveGqlValue as traitResolveGqlValue;
     }
+
+    const AUDIO_EXTENSIONS = ['aac', 'flac', 'm4a', 'mp3', 'ogg', 'wav'];
+    const IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif'];
+    const VIDEO_EXTENSIONS = ['h264', 'mp4', 'm4v', 'ogv', 'webm', 'mov'];
 
     protected $container;
     protected $path;
@@ -411,7 +417,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
             return null;
         }
 
-        return URL::assemble($this->container()->url(), $this->path());
+        return URL::assemble($this->container()->url(), $this->encodedPath());
     }
 
     public function absoluteUrl()
@@ -420,7 +426,12 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
             return null;
         }
 
-        return URL::assemble($this->container()->absoluteUrl(), $this->path());
+        return URL::assemble($this->container()->absoluteUrl(), $this->encodedPath());
+    }
+
+    private function encodedPath()
+    {
+        return implode('/', array_map('rawurlencode', explode('/', $this->path())));
     }
 
     public function thumbnailUrl($preset = null)
@@ -469,7 +480,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
      */
     public function isAudio()
     {
-        return $this->extensionIsOneOf(['aac', 'flac', 'm4a', 'mp3', 'ogg', 'wav']);
+        return $this->extensionIsOneOf(self::AUDIO_EXTENSIONS);
     }
 
     /**
@@ -502,7 +513,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
      */
     public function isImage()
     {
-        return $this->extensionIsOneOf(['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif']);
+        return $this->extensionIsOneOf(self::IMAGE_EXTENSIONS);
     }
 
     /**
@@ -522,7 +533,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
      */
     public function isVideo()
     {
-        return $this->extensionIsOneOf(['h264', 'mp4', 'm4v', 'ogv', 'webm', 'mov']);
+        return $this->extensionIsOneOf(self::VIDEO_EXTENSIONS);
     }
 
     /**
@@ -595,7 +606,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
      */
     public function lastModified()
     {
-        return Carbon::createFromTimestamp($this->meta('last_modified'), config('app.timezone'));
+        return Carbon::createFromTimestamp($this->meta('last_modified') ?? 0, config('app.timezone'));
     }
 
     /**
@@ -617,7 +628,8 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
      */
     public function save()
     {
-        $isNew = is_null($this->container()->asset($this->path()));
+        $pathHasChanged = $this->getOriginal('path') !== $this->path();
+        $isNew = $pathHasChanged ? false : is_null($this->container()->asset($this->path()));
 
         $withEvents = $this->withEvents;
         $this->withEvents = true;
@@ -742,7 +754,9 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
      */
     public function rename($filename, $unique = false)
     {
-        $filename = $unique ? $this->ensureUniqueFilename($this->folder(), $filename) : $filename;
+        if ($unique) {
+            return $this->moveUnique($this->folder(), $filename);
+        }
 
         return $this->move($this->folder(), $filename);
     }
@@ -773,6 +787,21 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
         $this->disk()->rename($oldMetaPath, $this->metaPath());
 
         return $this;
+    }
+
+    /**
+     * Move the asset to a different location with a unique filename.
+     *
+     * @param  string  $folder  The folder relative to the container.
+     * @param  string|null  $filename  The new filename, if renaming.
+     * @return $this
+     */
+    public function moveUnique($folder, $filename = null)
+    {
+        $filename = Uploader::getSafeFilename($filename ?: $this->filename());
+        $filename = $this->ensureUniqueFilename($folder, $filename);
+
+        return $this->move($folder, $filename);
     }
 
     public function moveQuietly($folder, $filename = null)
@@ -945,6 +974,15 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
 
         $file->writeTo($this->disk()->filesystem(), $this->path());
 
+        if ($this->isSvg() && config('statamic.assets.svg_sanitization_on_upload', true)) {
+            $contents = $this->disk()->get($this->path());
+
+            $this->disk()->put(
+                $this->path(),
+                Svg::sanitize($contents)
+            );
+        }
+
         $this->clearCaches();
         $this->writeMeta($this->generateMeta());
 
@@ -986,7 +1024,6 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
     /**
      * Get the blueprint.
      *
-     * @param  string|null  $blueprint
      * @return \Statamic\Fields\Blueprint
      */
     public function blueprint()
@@ -1104,7 +1141,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
 
     public function getQueryableValue(string $field)
     {
-        if (method_exists($this, $method = Str::camel($field))) {
+        if (in_array($method = Str::camel($field), $this->queryableMethods())) {
             return $this->{$method}();
         }
 
@@ -1115,6 +1152,17 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
         }
 
         return $field->fieldtype()->toQueryableValue($value);
+    }
+
+    private function queryableMethods(): array
+    {
+        return [
+            'absoluteUrl', 'apiUrl', 'basename', 'blueprint', 'containerId', 'containerHandle', 'dimensions',
+            'duration', 'editUrl', 'exists', 'extension', 'filename', 'folder', 'guessedExtension',
+            'hasDimensions', 'hasDuration', 'height', 'id', 'isAudio', 'isImage', 'isMedia', 'isPdf',
+            'isPreviewable', 'isSvg', 'isVideo', 'lastModified', 'mimeType', 'orientation', 'path', 'pdfUrl',
+            'ratio', 'reference', 'size', 'thumbnailUrl', 'title', 'url', 'width',
+        ];
     }
 
     public function getCurrentDirtyStateAttributes(): array
@@ -1130,6 +1178,11 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
         return $this->container()->title();
     }
 
+    public function getCpSearchResultIcon()
+    {
+        return 'assets';
+    }
+
     public function warmPresets()
     {
         if (! $this->isImage()) {
@@ -1140,7 +1193,9 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
             'cp_thumbnail_small_'.$this->orientation(),
         ] : [];
 
-        return array_merge($this->container->warmPresets(), $cpPresets);
+        $presets = array_merge($this->container->warmPresets(), $cpPresets);
+
+        return $this->runHooks('warm-presets', $presets);
     }
 
     public function cacheStore()

@@ -251,6 +251,29 @@ class APITest extends TestCase
     }
 
     #[Test]
+    public function it_gets_origin_id_in_nav_route_when_an_item_is_not_linked_to_an_entry()
+    {
+        Facades\Config::set('statamic.api.resources.navs', true);
+
+        Facades\Collection::make('pages')->save();
+
+        $nav = Facades\Nav::make('footer');
+        $nav->makeTree('en', [
+            ['entry' => 'one'],
+            ['title' => 'Balki Bartokomous', 'url' => 'https://balki.com'],
+        ])->save();
+        $nav->save();
+
+        Facades\Entry::make()->collection('pages')->id('one')->slug('one')->published(true)->save();
+
+        $this
+            ->get('/api/navs/footer/tree?fields=title,origin_id')
+            ->assertSuccessful()
+            ->assertJsonPath('data.1.page.title', 'Balki Bartokomous')
+            ->assertJsonPath('data.1.page.origin_id', null);
+    }
+
+    #[Test]
     public function it_filters_by_taxonomy_terms()
     {
         Facades\Config::set('statamic.api.resources.collections.test', [
@@ -495,6 +518,21 @@ class APITest extends TestCase
         ]);
 
         Token::make('test-token', FakeTokenHandler::class)->save();
+
+        $this->get('/api/collections/pages/entries/dance?token=test-token')->assertJson([
+            'message' => 'Not found.',
+        ]);
+    }
+
+    #[Test]
+    public function live_preview_token_for_different_entry_doesnt_bypass_status_check()
+    {
+        Facades\Config::set('statamic.api.resources.collections', true);
+        Facades\Collection::make('pages')->save();
+        tap(Facades\Entry::make()->collection('pages')->id('dance')->published(false)->set('title', 'Dance')->slug('dance'))->save();
+        $otherEntry = tap(Facades\Entry::make()->collection('pages')->id('sing')->published(true)->set('title', 'Sing')->slug('sing'))->save();
+
+        LivePreview::tokenize('test-token', $otherEntry);
 
         $this->get('/api/collections/pages/entries/dance?token=test-token')->assertJson([
             'message' => 'Not found.',

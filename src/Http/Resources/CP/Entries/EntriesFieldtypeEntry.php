@@ -21,6 +21,7 @@ class EntriesFieldtypeEntry extends JsonResource
     {
         $data = [
             'id' => $this->resource->id(),
+            'reference' => $this->resource->reference(),
             'title' => $this->resource->value('title'),
             'status' => $this->resource->status(),
             'edit_url' => $this->resource->editUrl(),

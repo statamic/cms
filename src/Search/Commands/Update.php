@@ -6,7 +6,6 @@ use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
 use Statamic\Events\SearchIndexUpdated;
 use Statamic\Facades\Search;
-use Statamic\Support\Str;
 
 use function Laravel\Prompts\select;
 
@@ -35,7 +34,7 @@ class Update extends Command
 
     private function getIndexes()
     {
-        if ($requestedIndex = $this->getRequestedIndex()) {
+        if (! is_null($requestedIndex = $this->getRequestedIndex())) {
             return $requestedIndex;
         }
 
@@ -71,10 +70,10 @@ class Update extends Command
             return [$this->indexes()->get($arg)];
         }
 
-        // They might have entered a name as it appears in the config, but if it
+        // They might have entered a handle as it appears in the config, but if it
         // should be localized we'll get all of the localized versions.
-        if (collect(config('statamic.search.indexes'))->has($arg)) {
-            return $this->indexes()->filter(fn ($index) => Str::startsWith($index->name(), $arg))->all();
+        if ($indexes = $this->indexes()->filter(fn ($index) => $index->handle() === $arg)->all()) {
+            return $indexes;
         }
 
         throw new \InvalidArgumentException("Index [$arg] does not exist.");

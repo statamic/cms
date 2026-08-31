@@ -52,6 +52,7 @@ use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
+use Statamic\View\Cascade;
 
 class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, ContainsQueryableValues, Contract, Localization, Protectable, ResolvesValuesContract, Responsable, SearchableContract
 {
@@ -148,9 +149,38 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         }
 
         $this->computedCallbackCache = null;
-        $this->collection = $collection instanceof \Statamic\Contracts\Entries\Collection ? $collection->handle() : $collection;
 
-        return $this;
+        if ($collection instanceof \Statamic\Contracts\Entries\Collection) {
+            $this->collection = $collection->handle();
+            $customClass = $collection->entryClass();
+        } else {
+            $this->collection = $collection;
+            $customClass = Collection::findByHandle($this->collection)->entryClass();
+        }
+
+        if (is_null($customClass)) {
+            return $this;
+        }
+
+        if ($this instanceof $customClass) {
+            return $this;
+        }
+
+        $entry = app($customClass)
+            ->blueprint($this->blueprint())
+            ->collection($this->collection())
+            ->data($this->data())
+            ->id($this->id())
+            ->origin($this->origin())
+            ->locale($this->site())
+            ->published($this->published())
+            ->slug($this->slug());
+
+        if ($this->hasDate()) {
+            $entry->date($this->date());
+        }
+
+        return $entry;
     }
 
     public function blueprint($blueprint = null)
@@ -410,13 +440,20 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
         $this->ancestors()->each(fn ($entry) => Blink::forget('entry-descendants-'.$entry->id()));
 
+        if ($isNew && $this->collection()->orderable()) {
+            // The entry only gets appended to the tree when it's read, so anything that
+            // read it before now would have cached a version without this entry in it.
+            $this->collection()->structure()->flushCache($this->locale());
+            $this->collection()->updateEntryOrder([$this->id()]);
+        }
+
         $stack = InitiatorStack::entry($this)->push();
 
         $this->directDescendants()->each->{$withEvents ? 'save' : 'saveQuietly'}();
 
         $this->taxonomize();
 
-        if ($this->isDirty('slug')) {
+        if ($this->shouldUpdateUris()) {
             optional(Collection::findByMount($this))->updateEntryUris();
             $this->updateChildPageUris();
         }
@@ -448,6 +485,21 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         return true;
     }
 
+    private function shouldUpdateUris(): bool
+    {
+        if (! $this->route()) {
+            return false;
+        }
+
+        $antlersRoute = preg_replace_callback('/(?<!{){\s*([a-zA-Z0-9_\-]+)\s*}(?!})/', function ($match) {
+            return "{{ {$match[1]} }}";
+        }, $this->route());
+
+        return collect(Antlers::identifiers($antlersRoute))
+            ->filter(fn (string $identifier) => $this->isDirty($identifier))
+            ->isNotEmpty();
+    }
+
     private function updateChildPageUris()
     {
         $collection = $this->collection();
@@ -463,7 +515,9 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             return;
         }
 
-        if (empty($ids = $page->flattenedPages()->pluck('id'))) {
+        $ids = $page->flattenedPages()->pluck('id');
+
+        if ($ids->isEmpty()) {
             return;
         }
 
@@ -486,14 +540,16 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
         if ($this->hasDate() && $this->date) {
             $format = 'Y-m-d';
+
             if ($this->hasTime()) {
                 $format .= '-Hi';
-                if ($this->hasSeconds()) {
-                    $format .= 's';
-                }
             }
 
-            $prefix = $this->date->format($format).'.';
+            if ($this->hasSeconds()) {
+                $format .= 's';
+            }
+
+            $prefix = $this->date->copy()->setTimezone(config('app.timezone'))->format($format).'.';
         }
 
         return vsprintf('%s/%s/%s%s%s.%s', [
@@ -512,10 +568,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             return $this->value('order');
         }
 
-        return $this->structure()->in($this->locale())
-            ->flattenedPages()
-            ->map->reference()
-            ->flip()->get($this->id) + 1;
+        return $this->structure()->in($this->locale())->entryOrder($this->id) + 1;
     }
 
     public function template($template = null)
@@ -534,7 +587,10 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
     protected function inferTemplateFromBlueprint()
     {
-        $template = $this->collection()->handle().'.'.$this->blueprint();
+        $handle = $this->collection()->handle();
+        $prefix = config('statamic.system.blueprint_templates.'.$handle, $handle);
+
+        $template = $prefix.'.'.$this->blueprint();
 
         $slugifiedTemplate = str_replace('_', '-', $template);
 
@@ -567,17 +623,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
                     return null;
                 }
 
-                $date = $date ?? optional($this->origin())->date() ?? $this->lastModified();
-
-                if (! $this->hasTime()) {
-                    $date->startOfDay();
-                }
-
-                if (! $this->hasSeconds()) {
-                    $date->startOfMinute();
-                }
-
-                return $date;
+                return $date ?? optional($this->origin())->date() ?? $this->adjustDateTimeBasedOnSettings($this->lastModified());
             })
             ->setter(function ($date) {
                 if (! $this->collection()?->dated()) {
@@ -589,20 +635,40 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
                 }
 
                 if ($date instanceof \Carbon\CarbonInterface) {
-                    return $date;
+                    return $date->utc();
                 }
 
-                if (strlen($date) === 10) {
-                    return Carbon::createFromFormat('Y-m-d', $date)->startOfDay();
-                }
+                $date = $this->parseDateFromString($date);
 
-                if (strlen($date) === 15) {
-                    return Carbon::createFromFormat('Y-m-d-Hi', $date)->startOfMinute();
-                }
-
-                return Carbon::createFromFormat('Y-m-d-His', $date);
+                return $this->adjustDateTimeBasedOnSettings($date);
             })
             ->args(func_get_args());
+    }
+
+    private function parseDateFromString($date)
+    {
+        if (strlen($date) === 10) {
+            return Carbon::createFromFormat('Y-m-d', $date)->startOfDay();
+        }
+
+        if (strlen($date) === 15) {
+            return Carbon::createFromFormat('Y-m-d-Hi', $date)->startOfMinute();
+        }
+
+        return Carbon::createFromFormat('Y-m-d-His', $date);
+    }
+
+    private function adjustDateTimeBasedOnSettings($date)
+    {
+        if (! $this->hasTime()) {
+            $date->startOfDay();
+        }
+
+        if (! $this->hasSeconds()) {
+            $date->startOfMinute();
+        }
+
+        return $date;
     }
 
     public function hasDate()
@@ -616,7 +682,13 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             return false;
         }
 
-        $timeEnabled = $this->blueprint()->field('date')->fieldtype()->timeEnabled();
+        $timeEnabled = (function () {
+            if ($this->blueprint()->field('date')->fieldtype()->timeEnabled()) {
+                return true;
+            }
+
+            return $this->date && ! $this->date->isStartOfDay();
+        })();
 
         if ($this->origin && ! $this->origin()) {
             Blink::forget("entry-{$this->id()}-blueprint");
@@ -710,7 +782,9 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             ->slug($attrs['slug']);
 
         if ($this->collection()->dated() && ($date = Arr::get($attrs, 'date'))) {
-            $entry->date(Carbon::createFromTimestamp($date, config('app.timezone')));
+            if ($this->isRoot() || $this->blueprint()->field('date')->isLocalizable()) {
+                $entry->date(Carbon::createFromTimestamp($date, config('app.timezone')));
+            }
         }
 
         return $entry;
@@ -799,8 +873,26 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
     {
         $localizations = $this->directDescendants();
 
-        foreach ($localizations as $loc) {
-            $localizations = $localizations->merge($loc->descendants());
+        // Breadth-first: fetch each level in one batched query instead of one query per node.
+        $origins = $localizations->map->id()->values()->all();
+        $seen = array_merge($origins, [$this->id()]);
+
+        while (! empty($origins)) {
+            $children = Facades\Entry::query()
+                ->where('collection', $this->collectionHandle())
+                ->whereIn('origin', $origins)
+                ->get()
+                // Guard against cyclic or duplicate origin data, which would
+                // otherwise loop forever as the same entries reappear.
+                ->reject(fn ($entry) => in_array($entry->id(), $seen, true));
+
+            if ($children->isEmpty()) {
+                break;
+            }
+
+            $localizations = $localizations->merge($children->keyBy->locale());
+            $origins = $children->map->id()->values()->all();
+            $seen = array_merge($seen, $origins);
         }
 
         return $localizations;
@@ -811,19 +903,11 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         return $this->in($locale) !== null;
     }
 
-    /** @deprecated */
-    public function addLocalization($entry)
-    {
-        $entry->origin($this);
-
-        return $this;
-    }
-
     public function makeLocalization($site)
     {
         $localization = Facades\Entry::make()
-            ->collection($this->collection)
             ->origin($this)
+            ->collection($this->collection)
             ->locale($site)
             ->published($this->published)
             ->slug($this->slug());
@@ -906,7 +990,12 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
     public function routeData()
     {
-        $data = $this->values()->merge([
+        // This uses the `getValues(true)` method instead of values()
+        // This is so we can wrap computed fields in Value so we
+        // can delay their execution. If the computed value
+        // triggers the routeData() method, we will end
+        // up in an infinite loop that is not fun.
+        $data = $this->getValues(true)->merge([
             'id' => $this->id(),
             'slug' => $this->slug(),
             'published' => $this->published(),
@@ -914,11 +1003,13 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         ]);
 
         if ($this->hasDate()) {
+            $date = $this->date()->copy()->setTimezone(Statamic::displayTimezone());
+
             $data = $data->merge([
-                'date' => $this->date(),
-                'year' => $this->date()->format('Y'),
-                'month' => $this->date()->format('m'),
-                'day' => $this->date()->format('d'),
+                'date' => $date,
+                'year' => $date->format('Y'),
+                'month' => $date->format('m'),
+                'day' => $date->format('d'),
             ]);
         }
 
@@ -1025,7 +1116,11 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
         // Since the slug is generated from the title, we'll avoid augmenting
         // the slug which could result in an infinite loop in some cases.
-        $title = $this->withLocale($this->site()->lang(), fn () => (string) Antlers::parse($format, $this->augmented()->except('slug')->all()));
+        $title = $this->withLocale($this->site()->lang(), function () use ($format) {
+            $format = Facades\Parse::config($format);
+
+            return (string) Antlers::parse($format, $this->augmented()->except('slug')->all());
+        });
 
         return trim($title);
     }
@@ -1049,8 +1144,10 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             }, $format);
         }
 
+        $format = Facades\Parse::config($format);
+
         return (string) Antlers::parse($format, array_merge($this->routeData(), [
-            'config' => config()->all(),
+            'config' => Cascade::config(),
             'site' => $this->site(),
             'uri' => $this->uri(),
             'url' => $this->url(),
@@ -1076,7 +1173,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             Blink::store('entry-uris')->forget($this->id());
         }
 
-        if (method_exists($this, $method = Str::camel($field))) {
+        if (in_array($method = Str::camel($field), $this->queryableMethods())) {
             return $this->{$method}();
         }
 
@@ -1087,6 +1184,16 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         }
 
         return $field->fieldtype()->toQueryableValue($value);
+    }
+
+    private function queryableMethods(): array
+    {
+        return [
+            'apiUrl', 'blueprint', 'collection', 'collectionHandle', 'date', 'editUrl', 'hasDate', 'hasExplicitDate', 'hasOrigin',
+            'hasSeconds', 'hasStructure', 'hasTime', 'id', 'isRedirect', 'isRoot', 'lastModified', 'lastModifiedBy',
+            'layout', 'locale', 'order', 'path', 'private', 'published', 'redirectUrl', 'reference', 'site', 'sites', 'slug',
+            'status', 'template', 'uri', 'url', 'urlWithoutRedirect',
+        ];
     }
 
     public function getSearchValue(string $field)

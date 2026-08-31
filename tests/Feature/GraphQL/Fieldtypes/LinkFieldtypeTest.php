@@ -23,7 +23,10 @@ class LinkFieldtypeTest extends FieldtypeTestCase
 
         ResolveRedirect::shouldReceive('item')->never();
 
-        $this->assertGqlEntryHas('link', ['link' => null]);
+        $this->assertGqlEntryHas('link { url, title }', ['link' => [
+            'url' => null,
+            'title' => null,
+        ]]);
     }
 
     #[Test]
@@ -38,7 +41,10 @@ class LinkFieldtypeTest extends FieldtypeTestCase
 
         ResolveRedirect::shouldReceive('item')->once()->with('/hardcoded', $entry, true)->andReturn('/hardcoded');
 
-        $this->assertGqlEntryHas('link', ['link' => '/hardcoded']);
+        $this->assertGqlEntryHas('link { url, title }', ['link' => [
+            'url' => '/hardcoded',
+            'title' => null,
+        ]]);
     }
 
     #[Test]
@@ -52,11 +58,17 @@ class LinkFieldtypeTest extends FieldtypeTestCase
         ]);
 
         $another = Mockery::mock(Entry::class);
-        $another->shouldReceive('url')->once()->andReturn('/the-entry-url');
+        $another->shouldReceive('toAugmentedArray')->andReturn([
+            'url' => '/the-entry-url',
+            'title' => 'The Entry Title',
+        ]);
 
         ResolveRedirect::shouldReceive('item')->once()->with('entry::123', $entry, true)->andReturn($another);
 
-        $this->assertGqlEntryHas('link', ['link' => '/the-entry-url']);
+        $this->assertGqlEntryHas('link { url, title }', ['link' => [
+            'url' => '/the-entry-url',
+            'title' => 'The Entry Title',
+        ]]);
     }
 
     #[Test]
@@ -70,11 +82,17 @@ class LinkFieldtypeTest extends FieldtypeTestCase
         ]);
 
         $another = Mockery::mock(Entry::class);
-        $another->shouldReceive('url')->once()->andReturn('/the-first-child');
+        $another->shouldReceive('toAugmentedArray')->andReturn([
+            'url' => '/the-first-child',
+            'title' => 'The First Child',
+        ]);
 
         ResolveRedirect::shouldReceive('item')->once()->with('@child', $entry, true)->andReturn($another);
 
-        $this->assertGqlEntryHas('link', ['link' => '/the-first-child']);
+        $this->assertGqlEntryHas('link { url, title }', ['link' => [
+            'url' => '/the-first-child',
+            'title' => 'The First Child',
+        ]]);
     }
 
     #[Test]
@@ -89,6 +107,9 @@ class LinkFieldtypeTest extends FieldtypeTestCase
 
         ResolveRedirect::shouldReceive('item')->once()->with('entry::unknown', $entry, true)->andReturnNull();
 
-        $this->assertGqlEntryHas('link', ['link' => null]);
+        $this->assertGqlEntryHas('link { url, title }', ['link' => [
+            'url' => null,
+            'title' => null,
+        ]]);
     }
 }

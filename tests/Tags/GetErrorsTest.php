@@ -13,7 +13,7 @@ class GetErrorsTest extends TestCase
 {
     private function tag($tag, $data = [])
     {
-        return (string) Parse::template($tag, $data);
+        return (string) Parse::template($tag, $data, trusted: true);
     }
 
     #[Test]

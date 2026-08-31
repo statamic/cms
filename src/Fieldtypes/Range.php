@@ -5,6 +5,8 @@ namespace Statamic\Fieldtypes;
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
 
+use function Statamic\trans as __;
+
 class Range extends Fieldtype
 {
     protected $categories = ['controls'];
@@ -13,32 +15,34 @@ class Range extends Fieldtype
     {
         return [
             [
-                'display' => __('Behavior'),
+                'display' => __('Input Behavior'),
                 'fields' => [
                     'min' => [
                         'display' => __('Min'),
                         'instructions' => __('statamic::fieldtypes.range.config.min'),
-                        'type' => 'integer',
+                        'type' => 'text',
+                        'input_type' => 'number',
+                        'validate' => ['numeric'],
                         'default' => 0,
+                        'width' => 50,
                     ],
                     'max' => [
                         'display' => __('Max'),
                         'instructions' => __('statamic::fieldtypes.range.config.max'),
-                        'type' => 'integer',
+                        'type' => 'text',
+                        'input_type' => 'number',
+                        'validate' => ['numeric'],
                         'default' => 100,
+                        'width' => 50,
                     ],
                     'step' => [
                         'display' => __('Step'),
                         'instructions' => __('statamic::fieldtypes.range.config.step'),
-                        'type' => 'integer',
-                        'default' => 1,
-                    ],
-                    'default' => [
-                        'display' => __('Default Value'),
-                        'instructions' => __('statamic::messages.fields_default_instructions'),
                         'type' => 'text',
                         'input_type' => 'number',
-                        'default' => null,
+                        'validate' => ['numeric'],
+                        'default' => 1,
+                        'width' => 50,
                     ],
                 ],
             ],
@@ -49,11 +53,25 @@ class Range extends Fieldtype
                         'display' => __('Prepend'),
                         'instructions' => __('statamic::fieldtypes.range.config.prepend'),
                         'type' => 'text',
+                        'width' => 50,
                     ],
                     'append' => [
                         'display' => __('Append'),
                         'instructions' => __('statamic::fieldtypes.range.config.append'),
                         'type' => 'text',
+                        'width' => 50,
+                    ],
+                ],
+            ],
+            [
+                'display' => __('Data & Format'),
+                'fields' => [
+                    'default' => [
+                        'display' => __('Default Value'),
+                        'instructions' => __('statamic::messages.fields_default_instructions'),
+                        'type' => 'text',
+                        'input_type' => 'number',
+                        'default' => null,
                     ],
                 ],
             ],
@@ -62,11 +80,33 @@ class Range extends Fieldtype
 
     public function process($data)
     {
+        if ($this->usesDecimals()) {
+            return (float) $data;
+        }
+
         return (int) $data;
+    }
+
+    protected function usesDecimals(): bool
+    {
+        $step = $this->config('step', 1);
+        $min = $this->config('min', 0);
+        $max = $this->config('max', 100);
+
+        return $this->isDecimal($step) || $this->isDecimal($min) || $this->isDecimal($max);
+    }
+
+    protected function isDecimal($value): bool
+    {
+        if (! is_numeric($value)) {
+            return false;
+        }
+
+        return floor((float) $value) != (float) $value;
     }
 
     public function toGqlType()
     {
-        return GraphQL::int();
+        return $this->usesDecimals() ? GraphQL::float() : GraphQL::int();
     }
 }

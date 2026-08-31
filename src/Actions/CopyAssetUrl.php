@@ -4,8 +4,12 @@ namespace Statamic\Actions;
 
 use Statamic\Contracts\Assets\Asset;
 
+use function Statamic\trans as __;
+
 class CopyAssetUrl extends Action
 {
+    protected $icon = 'clipboard';
+
     protected $confirm = false;
 
     public static function title()

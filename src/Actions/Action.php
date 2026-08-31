@@ -19,6 +19,8 @@ abstract class Action implements Arrayable
     protected $dangerous = false;
     protected $fields = [];
     protected $context = [];
+    protected $runnable = true;
+    protected $component;
 
     public function __construct()
     {
@@ -91,6 +93,21 @@ abstract class Action implements Arrayable
         return false;
     }
 
+    public function icon(): string
+    {
+        return $this->icon ?? '';
+    }
+
+    public function component(): ?string
+    {
+        return $this->component;
+    }
+
+    public function runnable(): bool
+    {
+        return $this->runnable;
+    }
+
     public function buttonText()
     {
         /** @translation */
@@ -119,17 +136,31 @@ abstract class Action implements Arrayable
         return false;
     }
 
+    public function triggersFullPageRefresh(): bool
+    {
+        return false;
+    }
+
+    public function requiresElevatedSession(): bool
+    {
+        return false;
+    }
+
     public function toArray()
     {
         return [
             'handle' => $this->handle(),
             'title' => $this->title(),
+            'icon' => $this->icon(),
+            'component' => $this->component(),
+            'runnable' => $this->runnable(),
             'confirm' => $this->confirm,
             'buttonText' => $this->buttonText(),
             'confirmationText' => $this->confirmationText(),
             'warningText' => $this->warningText(),
             'dirtyWarningText' => $this->dirtyWarningText(),
             'bypassesDirtyWarning' => $this->bypassesDirtyWarning(),
+            'requiresElevatedSession' => $this->requiresElevatedSession(),
             'dangerous' => $this->dangerous,
             'fields' => $this->fields()->toPublishArray(),
             'values' => $this->fields()->preProcess()->values(),

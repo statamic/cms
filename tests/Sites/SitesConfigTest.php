@@ -84,6 +84,19 @@ class SitesConfigTest extends TestCase
     }
 
     #[Test]
+    public function it_gets_default_site_with_empty_yaml()
+    {
+        File::put($this->yamlPath, '');
+
+        // Ensure new sites instance in container, so that it attempts to read the empty yaml file
+        Site::swap(new Sites);
+
+        $this->assertCount(1, Site::all());
+        $this->assertSame('default', Site::default()->handle());
+        $this->assertSame('default', Site::current()->handle());
+    }
+
+    #[Test]
     public function it_sets_sites_at_runtime()
     {
         Site::setSites([
@@ -133,6 +146,7 @@ class SitesConfigTest extends TestCase
         ]);
 
         Config::set('statamic.some_addon.theme', 'sunset');
+        Config::set('statamic.system.view_config_allowlist', ['@default', 'app.faker_locale', 'statamic.some_addon.theme']);
 
         Site::setSites([
             'default' => [

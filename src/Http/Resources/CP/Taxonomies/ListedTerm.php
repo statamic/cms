@@ -3,7 +3,6 @@
 namespace Statamic\Http\Resources\CP\Taxonomies;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use Statamic\Facades\Action;
 use Statamic\Facades\User;
 
 class ListedTerm extends JsonResource
@@ -28,7 +27,6 @@ class ListedTerm extends JsonResource
     public function toArray($request)
     {
         $term = $this->resource;
-        $taxonomy = $term->taxonomy();
 
         return [
             'id' => $term->id(),
@@ -42,10 +40,10 @@ class ListedTerm extends JsonResource
 
             'permalink' => $term->absoluteUrl(),
             'edit_url' => $term->editUrl(),
+            'has_template' => view()->exists($term->template()),
             'taxonomy' => $term->taxonomy()->toArray(),
             'viewable' => User::current()->can('view', $term),
             'editable' => User::current()->can('edit', $term),
-            'actions' => Action::for($term, ['taxonomy' => $taxonomy->handle()]),
         ];
     }
 
@@ -55,7 +53,7 @@ class ListedTerm extends JsonResource
             $key = $column->field;
             $field = $this->blueprint->field($key);
 
-            if ($key == 'taxonomy') {
+            if ($key == 'type') {
                 return [$key => $this->resource->taxonomy()->title()];
             } else {
                 $value = $extra[$key] ?? $this->resource->value($key) ?? $field?->defaultValue();

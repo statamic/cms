@@ -31,7 +31,7 @@ class Entries extends ResourceCollection
         return $this;
     }
 
-    private function setColumns()
+    protected function setColumns()
     {
         $columns = $this->blueprint->columns();
 

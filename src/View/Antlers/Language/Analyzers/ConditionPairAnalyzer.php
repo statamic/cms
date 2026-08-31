@@ -7,6 +7,7 @@ use Statamic\View\Antlers\Language\Errors\ErrorFactory;
 use Statamic\View\Antlers\Language\Exceptions\SyntaxErrorException;
 use Statamic\View\Antlers\Language\Nodes\AbstractNode;
 use Statamic\View\Antlers\Language\Nodes\AntlersNode;
+use Statamic\View\Antlers\Language\Nodes\DirectiveNode;
 use Statamic\View\Antlers\Language\Utilities\NodeHelpers;
 
 class ConditionPairAnalyzer
@@ -19,6 +20,10 @@ class ConditionPairAnalyzer
      */
     public static function isConditionalStructure(AntlersNode $node)
     {
+        if ($node instanceof DirectiveNode) {
+            return false;
+        }
+
         if ($node->isComment) {
             return false;
         }

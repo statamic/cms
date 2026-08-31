@@ -3,10 +3,13 @@
 namespace Statamic\Http\Controllers\CP;
 
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Statamic\Events\DuplicateIdRegenerated;
 use Statamic\Facades\File;
 use Statamic\Facades\Stache;
 use Statamic\Support\Str;
+
+use function Statamic\trans as __;
 
 class DuplicatesController extends CpController
 {
@@ -14,8 +17,9 @@ class DuplicatesController extends CpController
     {
         $this->authorize('resolve duplicate ids');
 
-        return view('statamic::duplicates', [
+        return Inertia::render('Duplicates', [
             'duplicates' => $this->getDuplicates(),
+            'regenerateUrl' => cp_route('duplicates.regenerate'),
         ]);
     }
 

@@ -7,6 +7,7 @@ use Statamic\Fields\Field;
 use Statamic\Fields\Value;
 use Statamic\Tags\Context;
 use Statamic\Tags\Parameters;
+use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
 use Tests\TestCase;
 
 class ParametersTest extends TestCase
@@ -63,6 +64,13 @@ class ParametersTest extends TestCase
                 (clone $fieldtype)->setField(new Field('nonAntlersValue', ['antlers' => false]))
             ),
         ], $context);
+    }
+
+    public function tearDown(): void
+    {
+        GlobalRuntimeState::$isEvaluatingUserData = true;
+
+        parent::tearDown();
     }
 
     #[Test]
@@ -243,6 +251,9 @@ class ParametersTest extends TestCase
     #[Test]
     public function it_can_use_modifiers()
     {
+        // Equivalent to "trusted = true" for runtime evaluation.
+        GlobalRuntimeState::$isEvaluatingUserData = false;
+
         $context = new Context(['foo' => 'bar']);
 
         $params = Parameters::make([

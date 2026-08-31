@@ -10,12 +10,15 @@ class RoleModel extends Eloquent
 
     protected $table = 'roles';
 
-    protected $casts = [
-        'permissions' => 'json',
-        'preferences' => 'json',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'permissions' => 'json',
+            'preferences' => 'json',
+            'created_at' => 'datetime',
+            'updated_at' => 'datetime',
+        ];
+    }
 
     public function __construct(array $attributes = [])
     {

@@ -45,6 +45,18 @@ trait QueriesEntryStatus
             return;
         }
 
+        if ($status === 'scheduled' && $collection->futureDateBehavior() !== 'private') {
+            $query->where('date', 'invalid'); // intentionally trigger no results.
+
+            return;
+        }
+
+        if ($status === 'expired' && $collection->pastDateBehavior() !== 'private') {
+            $query->where('date', 'invalid'); // intentionally trigger no results.
+
+            return;
+        }
+
         if ($collection->futureDateBehavior() === 'private') {
             $status === 'scheduled'
                 ? $query->where('date', '>', now())

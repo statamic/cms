@@ -7,6 +7,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use InvalidArgumentException;
 use Statamic\Contracts\Data\Augmentable as AugmentableContract;
 use Statamic\Contracts\Entries\Collection as Contract;
+use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Data\ContainsCascadingData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedData;
@@ -35,7 +36,7 @@ use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 use function Statamic\trans as __;
 
-class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contract
+class Collection implements Arrayable, ArrayAccess, AugmentableContract, ContainsQueryableValues, Contract
 {
     use ContainsCascadingData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedData, HasDirtyState;
 
@@ -44,6 +45,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
     private $cachedRoutes = null;
     protected $mount;
     protected $title;
+    protected $icon;
     protected $template;
     protected $layout;
     protected $sites;
@@ -67,6 +69,8 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
     protected $previewTargets = [];
     protected $autosave;
     protected $withEvents = true;
+
+    protected $entryClass;
 
     public function __construct()
     {
@@ -116,6 +120,11 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
     public function requiresSlugs($require = null)
     {
         return $this->fluentlyGetOrSet('requiresSlugs')->args(func_get_args());
+    }
+
+    public function entryClass($class = null)
+    {
+        return $this->fluentlyGetOrSet('entryClass')->args(func_get_args());
     }
 
     public function titleFormats($formats = null)
@@ -230,6 +239,16 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
             ->args(func_get_args());
     }
 
+    public function icon($icon = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('icon')
+            ->getter(function ($icon) {
+                return $icon ?? 'collections';
+            })
+            ->args(func_get_args());
+    }
+
     public function absoluteUrl($site = null)
     {
         if (! $mount = $this->mount()) {
@@ -268,14 +287,6 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
         return cp_route('collections.show', $this->handle());
     }
 
-    public function breadcrumbUrl()
-    {
-        $referer = request()->header('referer');
-        $showUrl = $this->showUrl();
-
-        return $referer && Str::before($referer, '?') === $showUrl ? $referer : $showUrl;
-    }
-
     public function editUrl()
     {
         return cp_route('collections.edit', $this->handle());
@@ -291,6 +302,11 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
         $site = $site ?? $this->sites()->first();
 
         return cp_route('collections.entries.create', [$this->handle(), $site]);
+    }
+
+    public function editBlueprintUrl($blueprint)
+    {
+        return cp_route('blueprints.collections.edit', [$this, $blueprint]);
     }
 
     public function queryEntries()
@@ -385,16 +401,6 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
 
         if ($this->dated()) {
             $blueprint->ensureField('date', ['type' => 'date', 'required' => true, 'default' => 'now'], 'sidebar');
-        }
-
-        if ($this->hasStructure() && ! $this->orderable()) {
-            $blueprint->ensureField('parent', [
-                'type' => 'entries',
-                'collections' => [$this->handle()],
-                'max_items' => 1,
-                'listable' => false,
-                'localizable' => true,
-            ], 'sidebar');
         }
 
         foreach ($this->taxonomies() as $taxonomy) {
@@ -569,6 +575,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
         $formerlyToArray = [
             'title' => $this->title,
             'handle' => $this->handle,
+            'icon' => $this->icon,
             'routes' => $this->routes,
             'dated' => $this->dated,
             'past_date_behavior' => $this->pastDateBehavior(),
@@ -588,6 +595,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
             'revisions' => $this->revisions,
             'title_format' => $this->titleFormats,
             'autosave' => $this->autosave,
+            'entry_class' => $this->entryClass,
         ];
 
         $array = Arr::except($formerlyToArray, [
@@ -930,6 +938,18 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
         File::delete(dirname($this->path()).'/'.$this->handle);
     }
 
+    public function entryBlueprintCommandPaletteLinks()
+    {
+        $text = [__('Collections'), __($this->title())];
+
+        return $this
+            ->entryBlueprints()
+            ->map(fn ($blueprint) => $blueprint->commandPaletteLink(
+                type: $text,
+                url: $this->editBlueprintUrl($blueprint),
+            ));
+    }
+
     public static function __callStatic($method, $parameters)
     {
         return Facades\Collection::{$method}(...$parameters);
@@ -945,6 +965,24 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
         return [
             'title' => $this->title(),
             'handle' => $this->handle(),
+        ];
+    }
+
+    public function getQueryableValue(string $field)
+    {
+        if (in_array($method = Str::camel($field), $this->queryableMethods())) {
+            return $this->{$method}();
+        }
+
+        return null;
+    }
+
+    private function queryableMethods(): array
+    {
+        return [
+            'dated', 'defaultPublishState', 'editUrl', 'handle', 'hasStructure', 'id', 'layout', 'mount',
+            'orderable', 'path', 'requiresSlugs', 'revisionsEnabled', 'sites', 'sortDirection', 'sortField',
+            'structureHandle', 'taxonomies', 'template', 'title', 'url', 'uri',
         ];
     }
 

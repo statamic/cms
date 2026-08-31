@@ -5,6 +5,8 @@ namespace Statamic\Query\Scopes\Filters\Fields;
 use Statamic\Facades;
 use Statamic\Support\Arr;
 
+use function Statamic\trans as __;
+
 class Terms extends FieldtypeFilter
 {
     public function fieldItems()
@@ -61,8 +63,23 @@ class Terms extends FieldtypeFilter
             ? $this->fieldtype->taxonomies()[0].'::'.$values['term']
             : $values['term'];
 
-        $term = Facades\Term::find($id)->title();
+        $term = Facades\Term::find($id)->in(Facades\Site::selected()->handle())->title();
 
         return $field.': '.$term;
+    }
+
+    public function isComplete($values): bool
+    {
+        $values = Arr::removeNullValues($values);
+
+        if (! $operator = Arr::get($values, 'operator')) {
+            return false;
+        }
+
+        if (in_array($operator, ['null', 'not-null'])) {
+            return true;
+        }
+
+        return Arr::has($values, 'term');
     }
 }

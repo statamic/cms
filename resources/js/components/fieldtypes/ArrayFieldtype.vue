@@ -1,46 +1,73 @@
 <template>
-    <div class="array-fieldtype-container">
+    <div :class="{ 'w-full min-w-0': isCompact }">
+        <component :is="wrapperComponent" v-bind="wrapperBinds">
+            <template v-if="isCompact" #trigger>
+                <ui-button
+                    class="w-full min-w-0 shrink justify-between"
+                    icon-append="chevron-down"
+                    :aria-expanded="compactOpen"
+                    aria-haspopup="dialog"
+                >
+                    <span
+                        class="block min-w-0 flex-1 truncate text-start font-normal"
+                        :class="{ 'text-gray-500 dark:text-gray-400': !hasCompactValues }"
+                    >
+                        {{ compactTriggerText }}
+                    </span>
+                </ui-button>
+            </template>
 
-        <div v-if="isSingle" class="flex items-center">
-            <div class="input-group">
-                <div class="input-group-prepend flex items-center">
-                     <select class="bg-transparent appearance-none shadow-none outline-none border-0 text-sm" @input="setKey($event.target.value)">
-                        <option
-                            v-for="(element, index) in keyedData"
-                            v-text="keys[element.key] || element.key"
+            <div ref="editor" @keydown.enter="addRowOnEnter">
+                <ui-input-group v-if="isSingle">
+                    <ui-input-group-prepend>
+                        <select
+                            class="appearance-none border-0 bg-transparent text-sm shadow-none outline-hidden"
+                            @input="setKey($event.target.value)"
+                        >
+                            <option
+                                v-for="(element, index) in keyedData"
+                                v-text="keys[element.key] || element.key"
+                                :key="element._id"
+                                :value="element.key"
+                                :selected="element.key === selectedKey"
+                            />
+                        </select>
+                        <ui-icon name="chevron-down" class="size-3 ms-1" />
+                    </ui-input-group-prepend>
+                    <template v-for="(element, index) in keyedData">
+                        <ui-input
+                            v-if="element.key === selectedKey"
+                            v-model="data[index].value"
+                            input-class="border-l-0"
                             :key="element._id"
-                            :value="element.key"
-                            :selected="element.key === selectedKey" />
-                    </select>
-                    <svg-icon name="micro/chevron-down-xs" class="w-2 rtl:mr-2 ltr:ml-2" />
-                </div>
-                    <input
-                        type="text"
-                        class="input-text"
-                        v-for="(element, index) in keyedData"
-                        :key="element._id"
-                        v-if="element.key === selectedKey"
-                        :id="fieldId+'__'+element.key" v-model="data[index].value" :readonly="isReadOnly"
-                    />
-            </div>
-        </div>
+                            :id="fieldId + '__' + element.key"
+                            :readonly="isReadOnly"
+                            :input-attrs="{ dir: contentDirection }"
+                        />
+                    </template>
+                </ui-input-group>
 
-        <div v-else-if="isKeyed" class="array-table-wrapper">
-            <table class="array-table">
-                <tbody>
-                    <tr v-if="data" v-for="(element, index) in keyedData" :key="element._id">
-                        <th class="w-1/4"><label :for="fieldId+'__'+element.key">{{ keys[element.key] || element.key }}</label></th>
-                        <td>
-                            <input type="text" class="input-text-minimal" :id="fieldId+'__'+element.key" v-model="data[index].value" :readonly="isReadOnly" />
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+                <table class="table-contained" :class="{ 'mb-0': isCompact }" v-else-if="isKeyed">
+                    <tbody>
+                        <tr v-if="data" v-for="(element, index) in keyedData" :key="element._id">
+                            <th class="w-1/4">
+                                <label :for="fieldId + '__' + element.key">{{ keys[element.key] || element.key }}</label>
+                            </th>
+                            <td>
+                                <input
+                                    type="text"
+                                    class="w-full input-text"
+                                    :id="fieldId + '__' + element.key"
+                                    v-model="data[index].value"
+                                    :readonly="isReadOnly"
+                                    :dir="contentDirection"
+                                />
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
 
-        <template v-else-if="isDynamic">
-            <div class="table-field">
-                <table class="table-fieldtype-table" v-if="valueCount">
+                <table class="table-contained" :class="{ 'mb-0': isCompact }" v-if="isDynamic && valueCount">
                     <thead>
                         <tr>
                             <th class="grid-drag-handle-header" v-if="!isReadOnly"></th>
@@ -61,71 +88,100 @@
                             <tr class="sortable-row" v-for="(element, index) in data" :key="element._id">
                                 <td class="sortable-handle table-drag-handle" v-if="!isReadOnly"></td>
                                 <td>
-                                    <input type="text" class="input-text font-bold" v-model="element.key" :readonly="isReadOnly" />
+                                    <ui-input
+                                        v-model="element.key"
+                                        :readonly="isReadOnly"
+                                        :input-attrs="{ dir: contentDirection }"
+                                    />
                                 </td>
                                 <td>
-                                    <input type="text" class="input-text" v-model="element.value" :readonly="isReadOnly" />
+                                    <ui-input
+                                        v-model="element.value"
+                                        :readonly="isReadOnly"
+                                        :input-attrs="{ dir: contentDirection }"
+                                    />
                                 </td>
                                 <td class="row-controls" v-if="!isReadOnly">
-                                    <a @click="deleteOrConfirm(index)" class="inline opacity-25 text-lg antialiased hover:opacity-75">&times;</a>
+                                    <ui-button icon="x" variant="subtle" size="xs" round delete-action @click="deleteOrConfirm(index)" :aria-label="__('Delete Row')" v-tooltip="__('Delete Row')" />
                                 </td>
                             </tr>
                         </tbody>
                     </sortable-list>
                 </table>
 
-                <button class="btn" @click="addValue" :disabled="atMax" v-if="!isReadOnly">
-                    {{ addButton }}
-                </button>
-
-                <confirmation-modal
-                    v-if="deleting !== false"
-                    :title="__('Delete Value')"
-                    :bodyText="__('Are you sure you want to delete this value?')"
-                    :buttonText="__('Delete')"
-                    :danger="true"
-                    @confirm="deleteValue(deleting)"
-                    @cancel="deleteCancelled"
+                <div
+                    v-if="(!isReadOnly && !isSingle && !isKeyed) || isCompact"
+                    class="flex w-full items-center gap-2"
+                    :class="{ 'mt-2': isCompact && valueCount }"
                 >
-                </confirmation-modal>
+                    <ui-button @click="addValue()" :disabled="atMax" v-if="!isReadOnly && !isSingle && !isKeyed" :text="addButton" size="sm" :class="compactFooterButtonClass" />
+                    <ui-button v-if="isCompact" class="ms-auto" :class="compactFooterButtonClass" size="sm" @click="setCompactOpen(false)">
+                        <span class="st-text-trim-cap">{{ __('Close') }}</span>
+                        <span class="ms-1.5 inline-flex h-4 min-w-4 items-center justify-center rounded bg-gray-200/50 px-1 font-semibold uppercase text-[0.625rem] text-gray-600 dark:bg-gray-900 dark:text-gray-400/85">
+                            Esc
+                        </span>
+                    </ui-button>
+                </div>
             </div>
-        </template>
+        </component>
 
+        <confirmation-modal
+            :open="deleting !== false"
+            :title="__('Delete Row')"
+            :bodyText="__('Are you sure you want to delete this row?')"
+            :buttonText="__('Delete')"
+            :danger="true"
+            @confirm="deleteValue(deleting)"
+            @cancel="deleteCancelled"
+        />
     </div>
 </template>
 
 <script>
-import { SortableList, SortableItem, SortableHelpers } from '../sortable/Sortable';
+import Fieldtype from './Fieldtype.vue';
+import { SortableList, SortableHelpers } from '../sortable/Sortable';
+import { Button, Popover } from '@/components/ui';
+import { useContentDirection } from '@/composables/content-direction';
 
 export default {
-
     mixins: [Fieldtype, SortableHelpers],
 
     components: {
         SortableList,
-        SortableItem
+        Button,
+        Popover,
+    },
+
+    setup() {
+        const { direction: contentDirection } = useContentDirection();
+
+        return { contentDirection };
     },
 
     data() {
+        const keys = Object.keys(this.value || {});
+        const selectedKey = keys.length > 0 ? keys[0] : null;
+
         return {
             data: this.objectToSortable(this.value || []),
-            selectedKey:  Object.keys(this.value)[0],
-            deleting: false
-        }
+            selectedKey,
+            deleting: false,
+            compactOpen: false,
+        };
     },
 
     watch: {
         data: {
             deep: true,
-            handler (data) {
+            handler(data) {
                 this.updateDebounced(this.sortableToObject(data));
-            }
+            },
         },
 
         value(value) {
             if (JSON.stringify(value) == JSON.stringify(this.sortableToObject(this.data))) return;
             this.data = this.objectToSortable(value);
-        }
+        },
     },
 
     computed: {
@@ -138,15 +194,37 @@ export default {
         },
 
         isDynamic() {
-            return ! this.isKeyed;
+            return !this.isKeyed;
         },
 
         isSingle() {
             return this.config.mode === 'single';
         },
 
+        isCompact() {
+            return this.config.compact === true;
+        },
+
+        wrapperComponent() {
+            return this.isCompact ? Popover : 'div';
+        },
+
+        wrapperBinds() {
+            if (!this.isCompact) return {};
+
+            return {
+                align: 'end',
+                side: 'bottom',
+                class: 'w-[32rem]',
+                dismissible: this.deleting === false,
+                excludeZManipulation: true,
+                open: this.compactOpen,
+                'onUpdate:open': this.setCompactOpen,
+            };
+        },
+
         keyedData() {
-            return this.data.filter(element => this.keys.hasOwnProperty(element.key));
+            return this.data.filter((element) => this.keys.hasOwnProperty(element.key));
         },
 
         maxItems() {
@@ -173,22 +251,73 @@ export default {
             return __(this.config.value_header || 'Value');
         },
 
-        replicatorPreview() {
-            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+        compactFooterButtonClass() {
+            if (!this.isCompact) return;
 
-            return _.reduce(this.value, (carry, value, key) => {
-                let str = `${key}: ${value}`;
-                if (carry) str = carry + ', ' + str;
-                return str;
-            }, '');
-        }
+            return 'from-white to-white hover:from-white hover:to-gray-50';
+        },
+
+        hasCompactValues() {
+            return this.data.some((element) => element.key || element.value);
+        },
+
+        compactTriggerText() {
+            if (!this.hasCompactValues) return this.addButton;
+
+            return this.data
+                .filter((element) => element.key || element.value)
+                .map((element) => element.key || this.valueHeader)
+                .join(', ');
+        },
+
+        replicatorPreview() {
+            if (!this.showFieldPreviews) return;
+            if (!this.value) return '';
+
+            return Object.entries(this.value)
+                .map(([key, value]) => `${key}: ${value}`)
+                .filter(Boolean)
+                .join(', ');
+        },
     },
 
     methods: {
-        addValue() {
-            this.data.push(this.newSortableValue());
+        setCompactOpen(open) {
+            if (!open) {
+                this.data = this.data.filter((element) => element.key || element.value);
+            }
+
+            this.compactOpen = open;
+
+            if (open && !this.valueCount && !this.isReadOnly) {
+                this.addValue();
+            }
+        },
+
+        addRowOnEnter(event) {
+            if (!this.isDynamic || this.isReadOnly || this.atMax) return;
+            if (event.target.tagName !== 'INPUT') return;
+
+            event.preventDefault();
+
+            const rows = [...(this.$refs.editor?.querySelectorAll('tr.sortable-row') ?? [])];
+            const current = event.target.closest('tr.sortable-row');
+            const index = rows.indexOf(current);
+
+            this.addValue(index === -1 ? this.data.length : index + 1);
+        },
+
+        addValue(index = this.data.length) {
+            if (typeof index !== 'number' || Number.isNaN(index)) {
+                index = this.data.length;
+            }
+
+            this.data.splice(index, 0, this.newSortableValue());
             this.$nextTick(() => {
-                this.$el.querySelector('tr:last-child input').focus();
+                this.$refs.editor
+                    ?.querySelectorAll('tr.sortable-row')[index]
+                    ?.querySelector('input')
+                    ?.focus();
             });
         },
 
@@ -215,9 +344,8 @@ export default {
         },
 
         setKey(key) {
-            this.selectedKey = key
-        }
-    }
-
-}
+            this.selectedKey = key;
+        },
+    },
+};
 </script>

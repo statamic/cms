@@ -22,7 +22,7 @@ class NullIndex extends Index
         return true;
     }
 
-    protected function insertDocuments(Documents $documents)
+    public function insertDocuments(Documents $documents)
     {
         //
     }
@@ -34,6 +34,6 @@ class NullIndex extends Index
 
     public function searchables()
     {
-        return new NullSearchables($this);
+        return new NullSearchables();
     }
 }

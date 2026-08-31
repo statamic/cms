@@ -4,16 +4,20 @@ namespace Statamic\Forms;
 
 use DebugBar\DataCollector\ConfigCollector;
 use DebugBar\DebugBarException;
+use Illuminate\Support\Collection;
 use Statamic\Contracts\Forms\Form as FormContract;
+use Statamic\Facades\Antlers;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
 use Statamic\Facades\URL;
 use Statamic\Forms\JsDrivers\JsDriver;
 use Statamic\Support\Arr;
+use Statamic\Support\Html;
 use Statamic\Support\Str;
 use Statamic\Tags\Concerns;
 use Statamic\Tags\Tags as BaseTags;
+use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
 
 class Tags extends BaseTags
 {
@@ -69,7 +73,7 @@ class Tags extends BaseTags
         $jsDriver = $this->parseJsParamDriverAndOptions($this->params->get('js'), $form);
 
         $data['form_config'] = ($configFields = Form::extraConfigFor($form->handle()))
-            ? Blueprint::makeFromTabs($configFields)->fields()->addValues($form->data()->all())->values()->all()
+            ? Blueprint::makeFromTabs($configFields)->fields()->addValues($form->data()->all())->augment()->values()->all()
             : [];
 
         $data['sections'] = $this->getSections($this->sessionHandle(), $jsDriver);
@@ -102,6 +106,7 @@ class Tags extends BaseTags
         if ($jsDriver) {
             $attrs = array_merge($attrs, $jsDriver->addToFormAttributes($form));
         }
+
         $attrs = $this->runHooks('attrs', ['attrs' => $attrs, 'data' => $data])['attrs'];
 
         $params = [];
@@ -136,6 +141,51 @@ class Tags extends BaseTags
         }
 
         return $html;
+    }
+
+    /**
+     * Maps to {{ form:fields }}.
+     *
+     * @return string
+     */
+    public function fields()
+    {
+        $isBlade = $this->isAntlersBladeComponent();
+
+        $scope = $this->params->get('scope');
+
+        $slot = new RenderableFieldSlot(
+            html: $this->content,
+            scope: $scope,
+            isBlade: $isBlade,
+        );
+
+        collect($this->context['fields'])
+            ->each(fn ($field) => $field['field']->slot($slot));
+
+        $context = $this->context->all();
+
+        $fields = Arr::get($context, 'fields', []);
+
+        if ($handle = $this->params->get('get')) {
+            $context['fields'] = $this->dottedContextFields($fields, recursive: true)->only($handle)->values()->all();
+        } elseif ($only = $this->params->get('only')) {
+            $context['fields'] = $this->dottedContextFields($fields)->only(explode('|', $only))->values()->all();
+        } elseif ($except = $this->params->get('except')) {
+            $context['fields'] = $this->dottedContextFields($fields)->except(explode('|', $except))->values()->all();
+        }
+
+        if ($isBlade) {
+            return $this->tagRenderer->render('@foreach($fields as $field)'.$this->content.'@endforeach', $context);
+        }
+
+        $params = '';
+
+        if ($scope) {
+            $params = Html::attributes(['scope' => $scope]);
+        }
+
+        return Antlers::parse('{{ fields '.$params.' }}'.$this->content.'{{ /fields }}', $context, ! GlobalRuntimeState::$isEvaluatingUserData);
     }
 
     /**
@@ -340,7 +390,7 @@ class Tags extends BaseTags
      */
     protected function addToDebugBar($data, $formHandle)
     {
-        if (! function_exists('debugbar') || ! class_exists(ConfigCollector::class)) {
+        if (! function_exists('debugbar') || ! debugbar()->isEnabled() || ! class_exists(ConfigCollector::class)) {
             return;
         }
 
@@ -390,5 +440,18 @@ class Tags extends BaseTags
         return URL::prependSiteUrl(
             config('statamic.routes.action').'/form/'.$url
         );
+    }
+
+    private function dottedContextFields(array $fields, $recursive = false, array &$dotted = []): Collection
+    {
+        foreach ($fields as $field) {
+            $dotted[$field['handle']] = $field;
+
+            if ($recursive && $fields = Arr::get($field, 'fields')) {
+                $this->dottedContextFields($fields, $recursive, $dotted);
+            }
+        }
+
+        return collect($dotted);
     }
 }

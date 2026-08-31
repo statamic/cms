@@ -10,6 +10,6 @@ class ClearState
     public function handle()
     {
         StateManager::resetState();
-        URL::clearExternalUrlCache();
+        URL::clearUrlCache();
     }
 }

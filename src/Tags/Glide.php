@@ -4,6 +4,7 @@ namespace Statamic\Tags;
 
 use Facades\Statamic\Imaging\Attributes;
 use Facades\Statamic\Imaging\ImageValidator;
+use Illuminate\Support\Facades\Log;
 use League\Glide\Server;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Data\Augmentable;
@@ -25,7 +26,6 @@ class Glide extends Tags
      * Where `field` is the variable containing the image ID
      *
      * @param  string  $method
-     * @param  array  $args
      * @return string
      */
     public function wildcard($method)
@@ -147,7 +147,7 @@ class Glide extends Tags
 
                 return $data;
             } catch (\Exception $e) {
-                \Log::error($e->getMessage());
+                Log::error($e->getMessage());
             }
         })->filter()->all();
 
@@ -172,7 +172,7 @@ class Glide extends Tags
         $params = $this->getGlideParams($item);
 
         if (is_string($item) && Str::isUrl($item)) {
-            return Str::startsWith($item, ['http://', 'https://'])
+            return URL::isAbsolute($item)
                 ? $this->getGenerator()->generateByUrl($item, $params)
                 : $this->getGenerator()->generateByPath($item, $params);
         }
@@ -206,7 +206,7 @@ class Glide extends Tags
         try {
             $url = $this->isValidExtension($item) ? $this->getManipulator($item)->build() : $this->normalizeItem($item);
         } catch (\Exception $e) {
-            \Log::error($e->getMessage());
+            Log::error($e->getMessage());
 
             return;
         }
@@ -231,7 +231,7 @@ class Glide extends Tags
             $source = $cache->read($path);
             $url = 'data:'.$cache->mimeType($path).';base64,'.base64_encode($source);
         } catch (\Exception $e) {
-            \Log::error($e->getMessage());
+            Log::error($e->getMessage());
 
             return;
         }
@@ -284,7 +284,7 @@ class Glide extends Tags
         }
 
         // External URLs are already fine as-is.
-        if (Str::startsWith($item, ['http://', 'https://'])) {
+        if (URL::isAbsolute($item)) {
             return $item;
         }
 
@@ -358,10 +358,10 @@ class Glide extends Tags
 
     private function useAbsoluteUrls(string $url): bool
     {
-        if (! $this->isValidExtension($url) && Str::startsWith($url, ['http://', 'https://'])) {
+        if (! $this->isValidExtension($url) && URL::isAbsolute($url)) {
             return true;
         }
 
-        return Str::startsWith(GlideManager::url(), ['http://', 'https://']);
+        return URL::isAbsolute(GlideManager::url());
     }
 }

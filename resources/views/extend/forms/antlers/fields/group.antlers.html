@@ -1,0 +1,5 @@
+<div {{ if js_driver }}{{ js_attributes }}{{ /if }}>
+    {{ fields scope="__field" }}
+        {{ slot:addContext(__field) }}
+    {{ /fields }}
+</div>

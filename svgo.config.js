@@ -1,9 +1,9 @@
 module.exports = {
     plugins: [
-      {
-        name: 'preset-default',
-      },
-      'sortAttrs',
-      'removeDimensions',
+        {
+            name: 'preset-default',
+        },
+        'sortAttrs',
+        'removeDimensions',
     ],
-  };
+};

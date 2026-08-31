@@ -40,6 +40,9 @@ class SlugTest extends TestCase
             'german characters' => ['Björn Müller', '-', 'de', 'bjoern-mueller'],
             'arabic characters' => ['صباح الخير', '-', 'ar', 'sbah-alkhyr'],
             'alternate separator' => ['one two three', '_', 'en', 'one_two_three'],
+            'null string' => ['null', '-', 'en', 'null'],
+            'zero string' => ['0', '-', 'en', '0'],
+            'false string' => ['false', '-', 'en', 'false'],
         ];
     }
 }

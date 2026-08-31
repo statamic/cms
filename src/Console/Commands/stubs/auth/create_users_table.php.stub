@@ -10,5 +10,8 @@ Schema::create('USERS_TABLE', function (Blueprint $table) {
             $table->string('avatar')->nullable();
             $table->json('preferences')->nullable();
             $table->timestamp('last_login')->nullable();
+            $table->text('two_factor_secret')->nullable();
+            $table->text('two_factor_recovery_codes')->nullable();
+            $table->timestamp('two_factor_confirmed_at')->nullable();
             $table->string('password')->nullable()->change();
         });

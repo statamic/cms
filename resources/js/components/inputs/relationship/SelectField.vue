@@ -1,71 +1,57 @@
 <template>
-
     <div>
-        <v-select
-            ref="input"
-            label="title"
-            append-to-body
-            :calculate-position="positionOptions"
-            :close-on-select="!multiple"
-            :disabled="readOnly"
-            :multiple="multiple"
-            :options="options"
-            :get-option-key="(option) => option.id"
-            :get-option-label="(option) => __(option.title)"
-            :create-option="(value) => createOption(value)"
+        <Combobox
+            searchable
+            :disabled="config.disabled"
+            :ignore-filter="typeahead"
+            :max-selections="maxSelections"
+            :model-value="items.map((item) => item.id)"
+            :multiple
+            :options="comboboxOptions"
             :placeholder="__(config.placeholder) || __('Choose...')"
-            :searchable="true"
+            :read-only="readOnly"
             :taggable="isTaggable"
-            :value="items"
-            @input="input"
+            :close-on-select="isTaggable"
+            :search-keys="searchKeys"
+            option-label="title"
+            option-value="id"
+            @update:modelValue="itemsSelected"
             @search="search"
-            @search:focus="$emit('focus')"
-            @search:blur="$emit('blur')"
         >
             <template #option="{ title, hint, status }">
-                <div class="flex justify-between items-center">
-                    <div class="flex items-center">
-                        <div v-if="status" class="little-dot rtl:ml-2 ltr:mr-2 hidden@sm:block" :class="status" />
-                        <div v-text="title" />
-                    </div>
-                    <div v-if="hint" class="text-4xs text-gray-600 uppercase whitespace-nowrap" v-text="hint" />
+                <div class="flex w-full text-left items-center gap-2">
+                    <StatusIndicator v-if="status" :status="status" />
+                    <div v-text="title" class="truncate grow" />
+                    <ui-badge v-if="hint" size="sm" v-text="hint" />
                 </div>
             </template>
-            <template #selected-option-container v-if="multiple"><i class="hidden"></i></template>
-            <template #search="{ events, attributes }" v-if="multiple">
-                <input
-                    :placeholder="__(config.placeholder) || __('Choose...')"
-                    class="vs__search"
-                    type="search"
-                    v-on="events"
-                    v-bind="attributes"
-                >
+            <template #no-options>
+                <div v-text="noOptionsText" />
             </template>
-             <template #no-options>
-                <div class="text-sm text-gray-700 rtl:text-right ltr:text-left py-2 px-4" v-text="noOptionsText" />
+            <template #selected-option>
+                <span v-if="items.length === 1" v-text="items[0].title" class="truncate"></span>
             </template>
-        </v-select>
+            <template #selected-options>
+                <!-- We don't want to display the selected options here. The RelationshipInput component does that for us. -->
+                <div></div>
+            </template>
+        </Combobox>
     </div>
-
 </template>
 
-<style scoped>
-    .draggable-source--is-dragging {
-        @apply opacity-75 bg-transparent border-dashed
-    }
-</style>
-
 <script>
-import PositionsSelectOptions from '../../../mixins/PositionsSelectOptions';
-import { SortableList, SortableItem } from '../../sortable/Sortable';
+import { Combobox, StatusIndicator } from '@/components/ui';
+import { ref, watch } from 'vue';
+import { router } from '@inertiajs/vue3';
+import axios from 'axios';
+
+const optionsCache = ref({});
+const loaders = ref({});
 
 export default {
-
-    mixins: [PositionsSelectOptions],
-
     components: {
-        SortableList,
-        SortableItem,
+        StatusIndicator,
+        Combobox,
     },
 
     props: {
@@ -74,6 +60,7 @@ export default {
         typeahead: Boolean,
         multiple: Boolean,
         taggable: Boolean,
+        maxSelections: Number,
         config: Object,
         readOnly: Boolean,
         site: String,
@@ -83,8 +70,12 @@ export default {
         return {
             requested: false,
             options: [],
-        }
+            abortController: null,
+            removeNavigationListener: null,
+        };
     },
+
+    emits: ['input'],
 
     computed: {
         isTaggable() {
@@ -98,52 +89,105 @@ export default {
                 site: this.site,
                 paginate: false,
                 columns: 'title,id',
-            }
+            };
+        },
+
+        // The `users` fieldtype falls back to displaying a user's email as their title when
+        // they have no name, but doesn't show it otherwise, so it needs to be searchable too.
+        searchKeys() {
+            return this.config.type === 'users' ? ['title', 'email'] : null;
+        },
+
+	    cacheKey() {
+			return JSON.stringify({ ...this.parameters, url: this.url });
+	    },
+
+        comboboxOptions() {
+            // Combobox resolves the selected label from this list, so a selected item missing
+            // from it (e.g. a just-created term) would otherwise display as its raw id.
+            const missing = this.items.filter((item) => !this.options.some((option) => option.id === item.id));
+
+            return [...this.options, ...missing];
         },
 
         noOptionsText() {
-            return this.typeahead && !this.requested
-                ? __('Start typing to search.')
-                : __('No options to choose from.');
-        }
+            return this.typeahead && !this.requested ? __('Start typing to search.') : __('No options to choose from.');
+        },
     },
 
     created() {
-        // Get the items via ajax.
-        // TODO: To save on requests, this should probably be done in the preload step and sent via meta.
-        if (! this.typeahead) this.request();
+        if (!this.typeahead) this.request();
+
+		watch(
+			() => loaders.value[this.cacheKey],
+			(loading) => {
+				this.options = optionsCache[this.cacheKey];
+				this.requested = true;
+			}
+		);
+
+        this.removeNavigationListener = router.on('before', () => {
+            if (this.abortController) this.abortController.abort();
+        });
+    },
+
+    beforeUnmount() {
+        if (this.abortController) this.abortController.abort();
+        if (this.removeNavigationListener) this.removeNavigationListener();
     },
 
     watch: {
         parameters(params) {
-            if (! this.typeahead) this.request();
-        }
+            if (!this.typeahead) this.request();
+        },
     },
 
     methods: {
-
         request(params = {}) {
-            params = {...this.parameters, ...params};
+			if (!Object.keys(params).length && loaders.value[this.cacheKey]) return Promise.resolve();
 
-            return this.$axios.get(this.url, { params }).then(response => {
-                this.options = response.data.data;
-                this.requested = true;
-                return Promise.resolve(response);
-            });
+            params = { ...this.parameters, ...params };
+
+			loaders.value = {...loaders.value, [this.cacheKey]: true};
+
+            if (this.abortController) this.abortController.abort();
+            this.abortController = new AbortController();
+
+            return this.$axios.get(this.url, { params, signal: this.abortController.signal })
+	            .then((response) => {
+	                this.options = response.data.data;
+	                this.requested = true;
+		            optionsCache[this.cacheKey] = this.options;
+	                return Promise.resolve(response);
+	            })
+	            .catch((e) => {
+	                if (axios.isCancel(e)) return;
+	                throw e;
+	            })
+	            .finally(() => {
+					loaders.value = {...loaders.value, [this.cacheKey]: false};
+	            });
         },
 
         search(search, loading) {
-            if (! this.typeahead) return;
+            if (!this.typeahead) return;
 
             loading(true);
 
-            this.request({ search }).then(response => loading(false));
+            this.request({ search }).then((response) => loading(false));
         },
 
-        input(items) {
-            if (! this.multiple) {
+        itemsSelected(items) {
+            if (!this.multiple) {
                 items = items === null ? [] : [items];
             }
+
+            items = items.map((id) => {
+                let option = this.options.find((option) => option.id === id);
+                let existing = this.items.find((item) => item.id === id);
+
+                return existing || option || { id: id, title: id };
+            });
 
             this.$emit('input', items);
         },
@@ -152,8 +196,6 @@ export default {
             const existing = this.options.find((option) => option.title === value);
             return existing || { id: value, title: value };
         },
-
-    }
-
-}
+    },
+};
 </script>

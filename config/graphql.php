@@ -29,6 +29,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Authentication
+    |--------------------------------------------------------------------------
+    |
+    | By default, the GraphQL API will be publicly accessible. However, you
+    | may define an API token here which will be used to authenticate requests.
+    |
+    */
+
+    'auth_token' => env('STATAMIC_GRAPHQL_AUTH_TOKEN'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Queries
     |--------------------------------------------------------------------------
     |
@@ -87,5 +99,18 @@ return [
     'cache' => [
         'expiry' => 60,
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Introspection
+    |--------------------------------------------------------------------------
+    |
+    | Introspection queries allow a user to see the schema and will power
+    | development tools. This is "auto" by default, which will enable
+    | it locally and keep it disabled everywhere else for security.
+    |
+    */
+
+    'introspection' => env('STATAMIC_GRAPHQL_INTROSPECTION_ENABLED', 'auto'),
 
 ];

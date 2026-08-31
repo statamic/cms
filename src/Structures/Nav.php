@@ -2,6 +2,7 @@
 
 namespace Statamic\Structures;
 
+use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Contracts\Structures\Nav as Contract;
 use Statamic\Contracts\Structures\NavTree;
 use Statamic\Contracts\Structures\NavTreeRepository;
@@ -19,13 +20,15 @@ use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
+use Statamic\Support\Str;
 
-class Nav extends Structure implements Contract
+class Nav extends Structure implements ContainsQueryableValues, Contract
 {
     use ExistsAsFile;
 
     protected $collections;
     protected $canSelectAcrossSites = false;
+    protected $collectionsQueryScopes = [];
     private $blueprintCache;
 
     public function save()
@@ -77,6 +80,7 @@ class Nav extends Structure implements Contract
         return [
             'title' => $this->title,
             'collections' => $this->collections,
+            'collections_query_scopes' => empty($this->collectionsQueryScopes) ? null : $this->collectionsQueryScopes,
             'select_across_sites' => $this->canSelectAcrossSites ? true : null,
             'max_depth' => $this->maxDepth,
             'root' => $this->expectsRoot ?: null,
@@ -112,6 +116,11 @@ class Nav extends Structure implements Contract
         return cp_route('navigation.destroy', $this->handle());
     }
 
+    public function editBlueprintUrl()
+    {
+        return cp_route('blueprints.navigation.edit', $this->handle());
+    }
+
     public function newTreeInstance()
     {
         return app(NavTree::class);
@@ -136,7 +145,7 @@ class Nav extends Structure implements Contract
 
     public function existsIn($site)
     {
-        return $this->trees()->has($site);
+        return Site::all()->has($site) && $this->in($site) !== null;
     }
 
     public function blueprint()
@@ -159,10 +168,54 @@ class Nav extends Structure implements Contract
         return $blueprint;
     }
 
+    public function blueprintCommandPaletteLink()
+    {
+        return $this->blueprint()?->commandPaletteLink(
+            type: 'Navigation',
+            url: $this->editBlueprintUrl(),
+        );
+    }
+
     public function canSelectAcrossSites($canSelect = null)
     {
         return $this
             ->fluentlyGetOrSet('canSelectAcrossSites')
             ->args(func_get_args());
+    }
+
+    public function collectionsQueryScopes($scopes = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('collectionsQueryScopes')
+            ->setter(function ($scopes) {
+                if (empty($scopes)) {
+                    return [];
+                }
+
+                return collect($scopes)
+                    ->filter()
+                    ->map(fn ($scope) => Str::snake($scope))
+                    ->unique()
+                    ->values()
+                    ->all();
+            })
+            ->args(func_get_args());
+    }
+
+    public function getQueryableValue(string $field)
+    {
+        if (in_array($method = Str::camel($field), $this->queryableMethods())) {
+            return $this->{$method}();
+        }
+
+        return null;
+    }
+
+    private function queryableMethods(): array
+    {
+        return [
+            'blueprint', 'collections', 'editUrl', 'expectsRoot', 'handle', 'id',
+            'maxDepth', 'path', 'showUrl', 'sites', 'title', 'trees',
+        ];
     }
 }

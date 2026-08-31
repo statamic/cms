@@ -19,7 +19,7 @@ class ViteTest extends TestCase
     {
         $this->withFakeVite();
 
-        return (string) Parse::template($tag, $data);
+        return (string) Parse::template($tag, $data, trusted: true);
     }
 
     #[Test]

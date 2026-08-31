@@ -5,6 +5,7 @@ namespace Tests\Assets;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Assets\AssetRepository;
 use Statamic\Contracts\Assets\Asset as AssetContract;
@@ -36,7 +37,7 @@ class AssetRepositoryTest extends TestCase
 
         $disk->assertExists($path = 'foo/.meta/image.jpg.yaml');
         $contents = <<<EOT
-data: {  }
+data: {}
 size: 723
 last_modified: $timestamp
 width: 30
@@ -45,7 +46,7 @@ mime_type: image/jpeg
 duration: null
 
 EOT;
-        $this->assertEquals($contents, $disk->get($path));
+        $this->assertEquals($contents, $this->normalizeYaml($disk->get($path)));
     }
 
     #[Test]
@@ -76,11 +77,11 @@ EOT;
 
         $foundAssetShortUrl = Asset::findByUrl($assetShortUrl->url());
         $this->assertInstanceOf(\Statamic\Contracts\Assets\Asset::class, $foundAssetShortUrl);
-        $this->assertEquals('test/foo/image_in_short.jpg', $foundAssetShortUrl->url());
+        $this->assertEquals('/test/foo/image_in_short.jpg', $foundAssetShortUrl->url());
 
         $foundAssetLongUrl = Asset::findByUrl($assetLongUrl->url());
         $this->assertInstanceOf(\Statamic\Contracts\Assets\Asset::class, $foundAssetLongUrl);
-        $this->assertEquals('test_long_url_same_beginning/foo/image_in_long.jpg', $foundAssetLongUrl->url());
+        $this->assertEquals('/test_long_url_same_beginning/foo/image_in_long.jpg', $foundAssetLongUrl->url());
     }
 
     #[Test]
@@ -104,6 +105,47 @@ EOT;
 
         $this->assertInstanceOf(AssetContract::class, $asset);
         $this->assertEquals($assetShortUrl->id(), $asset->id());
+    }
+
+    #[Test]
+    #[DataProvider('encodedUrlProvider')]
+    public function it_finds_assets_by_an_encoded_url($path, $expectedUrl)
+    {
+        Storage::fake('test', ['url' => 'test']);
+        Storage::disk('test')->put($path, UploadedFile::fake()->image('bar.jpg')->getContent());
+
+        $container = tap(AssetContainer::make('test_container')->disk('test'))->save();
+        $asset = tap($container->makeAsset($path))->save();
+
+        $this->assertEquals($expectedUrl, $asset->url());
+
+        $found = Asset::findByUrl($asset->url());
+
+        $this->assertInstanceOf(AssetContract::class, $found);
+        $this->assertEquals($asset->id(), $found->id());
+    }
+
+    public static function encodedUrlProvider()
+    {
+        return [
+            'spaces and accents' => ['foo/Dún Laoghaire_18 2.jpg', '/test/foo/D%C3%BAn%20Laoghaire_18%202.jpg'],
+            'literal percent sequences' => ['foo/photo%20one.jpg', '/test/foo/photo%2520one.jpg'],
+        ];
+    }
+
+    #[Test]
+    public function it_finds_assets_by_id_when_the_path_contains_windows_separators()
+    {
+        Storage::fake('test');
+        Storage::disk('test')->put('foo/bar.jpg', UploadedFile::fake()->image('bar.jpg')->getContent());
+
+        $container = tap(AssetContainer::make('test_container')->disk('test'))->save();
+        $asset = tap($container->makeAsset('foo/bar.jpg'))->save();
+
+        $found = (new AssetRepository)->find('test_container::foo\\bar.jpg');
+
+        $this->assertInstanceOf(AssetContract::class, $found);
+        $this->assertEquals($asset->id(), $found->id());
     }
 
     #[Test]

@@ -5,7 +5,11 @@ namespace Statamic\Exceptions\Concerns;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Inertia\Inertia;
+use Statamic\Exceptions\AuthenticationException;
 use Statamic\Facades\Cascade;
+use Statamic\Facades\User;
+use Statamic\Http\Middleware\CP\HandleInertiaRequests;
 use Statamic\Statamic;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\Cachers\ApplicationCacher;
@@ -22,7 +26,14 @@ trait RendersHttpExceptions
         }
 
         if (Statamic::isCpRoute()) {
-            return response()->view('statamic::errors.'.$this->getStatusCode(), [], $this->getStatusCode());
+            if (! User::current()) {
+                return (new AuthenticationException)->toResponse($request);
+            }
+
+            return Inertia::render('errors/'.$this->getStatusCode())
+                ->rootView(HandleInertiaRequests::ROOT_VIEW)
+                ->toResponse(request())
+                ->setStatusCode($this->getStatusCode());
         }
 
         if (Statamic::isApiRoute()) {
