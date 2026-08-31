@@ -62,21 +62,20 @@ class CollectionsController extends CpController
                 || User::current()->can('view', $collection)
                 && $collection->sites()->contains(Site::selected()->handle());
         })->map(function ($collection) {
-            $entriesCount = $collection->queryEntries()
+            $entriesQuery = fn () => $collection->queryEntries()
                 ->where('site', Site::selected())
                 ->when(
                     User::current()->cant('view-other-authors-entries', [EntryContract::class, $collection]),
                     fn ($query) => $this->queryAuthorEntries($query, $collection)
-                )
-                ->count();
+                );
 
             return [
                 'id' => $collection->handle(),
                 'title' => $collection->title(),
-                'entries_count' => $entriesCount,
-                'published_entries_count' => $collection->queryEntries()->where('site', Site::selected())->whereStatus('published')->count(),
-                'draft_entries_count' => $collection->queryEntries()->where('site', Site::selected())->whereStatus('draft')->count(),
-                'scheduled_entries_count' => $collection->queryEntries()->where('site', Site::selected())->whereStatus('scheduled')->count(),
+                'entries_count' => $entriesQuery()->count(),
+                'published_entries_count' => $entriesQuery()->whereStatus('published')->count(),
+                'draft_entries_count' => $entriesQuery()->whereStatus('draft')->count(),
+                'scheduled_entries_count' => $entriesQuery()->whereStatus('scheduled')->count(),
                 'blueprints' => $collection->entryBlueprints()->reject->hidden()
                     ->map(fn ($blueprint) => [
                         ...$blueprint->toArray(),
