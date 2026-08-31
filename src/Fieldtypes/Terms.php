@@ -280,7 +280,7 @@ class Terms extends Relationship
 
         return collect(Arr::wrap($values))->map(function ($value) use ($taxonomy) {
             if ($taxonomy) {
-                if (is_string($value) && str_contains($value, '/') && $this->hierarchicalTaxonomy()) {
+                if (is_string($value) && str_contains($value, EnsuresTermPaths::DELIMITER) && $this->hierarchicalTaxonomy()) {
                     $value = (new EnsuresTermPaths)->slugFromValue($value, hierarchical: true);
                 }
 
@@ -586,7 +586,7 @@ class Terms extends Relationship
         return [
             ...$meta,
             'depth' => $term->depth() ?? 1,
-            'path' => $ancestors->map->slug()->push($term->slug())->implode('/'),
+            'path' => $ancestors->map->slug()->push($term->slug())->implode(EnsuresTermPaths::DELIMITER),
             'ancestors' => $ancestors->map->title()->values()->all(),
         ];
     }
@@ -674,7 +674,7 @@ class Terms extends Relationship
 
     protected function createTermFromString($string, $taxonomy)
     {
-        if (Str::contains($string, '/')
+        if (Str::contains($string, EnsuresTermPaths::DELIMITER)
             && ($hierarchical = Facades\Taxonomy::findByHandle($taxonomy))
             && $hierarchical->hierarchical()) {
             return $this->createTermsFromPath($string, $hierarchical);
@@ -708,7 +708,7 @@ class Terms extends Relationship
      */
     private function createTermsFromPath(string $path, $taxonomy)
     {
-        $segments = collect(explode('/', $path))
+        $segments = collect(explode(EnsuresTermPaths::DELIMITER, $path))
             ->map(fn ($segment) => trim($segment))
             ->filter()
             ->values();
@@ -873,7 +873,7 @@ class Terms extends Relationship
             return Str::slug($path) === $oldSlug;
         }
 
-        return collect(explode('/', $path))->contains(
+        return collect(explode(EnsuresTermPaths::DELIMITER, $path))->contains(
             fn ($segment) => $segment === $oldSlug || Str::slug($segment) === $oldSlug
         );
     }
@@ -895,9 +895,9 @@ class Terms extends Relationship
             return $prefix ? $prefix.'::'.$newSlug : $newValue;
         }
 
-        $rewritten = collect(explode('/', $path))
+        $rewritten = collect(explode(EnsuresTermPaths::DELIMITER, $path))
             ->map(fn ($segment) => $segment === $oldSlug || Str::slug($segment) === $oldSlug ? $newSlug : $segment)
-            ->implode('/');
+            ->implode(EnsuresTermPaths::DELIMITER);
 
         return $prefix ? $prefix.'::'.$rewritten : $rewritten;
     }

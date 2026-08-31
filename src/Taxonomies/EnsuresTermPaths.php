@@ -13,6 +13,11 @@ use function Statamic\trans as __;
 class EnsuresTermPaths
 {
     /**
+     * The character that separates segments in a typed term path, e.g. "animals/cat".
+     */
+    const DELIMITER = '/';
+
+    /**
      * Association/lookup slug for an entry value. Nested paths like
      * "events/concerts" resolve to the leaf slug ("concerts") when the
      * taxonomy is hierarchical; otherwise the whole value is slugified.
@@ -21,8 +26,8 @@ class EnsuresTermPaths
     {
         $value = (string) $value;
 
-        if ($hierarchical && str_contains($value, '/')) {
-            $value = collect(explode('/', $value))
+        if ($hierarchical && str_contains($value, self::DELIMITER)) {
+            $value = collect(explode(self::DELIMITER, $value))
                 ->map(fn ($segment) => trim($segment))
                 ->filter()
                 ->last() ?? $value;
@@ -40,11 +45,11 @@ class EnsuresTermPaths
      */
     public function ensure(Taxonomy $taxonomy, string $value, ?string $language = null, ?Closure $canCreate = null): ?string
     {
-        if (! $taxonomy->hierarchical() || ! str_contains($value, '/')) {
+        if (! $taxonomy->hierarchical() || ! str_contains($value, self::DELIMITER)) {
             return $this->slugFromValue($value, $language);
         }
 
-        $segments = collect(explode('/', $value))
+        $segments = collect(explode(self::DELIMITER, $value))
             ->map(fn ($segment) => trim($segment))
             ->filter()
             ->values();
