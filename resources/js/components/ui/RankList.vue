@@ -120,7 +120,7 @@ watch(
                     :max="rows.length"
                     step="1"
                     :value="row.index + 1"
-                    :aria-label="`${__('Rank')} ${row.label}`"
+                    :aria-label="__('Rank :label', { label: row.label })"
                     @pointerdown.stop
                     @change="moveToRank(row.value, $event)"
                 />
