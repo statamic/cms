@@ -35,7 +35,7 @@ class Submissions extends ResourceCollection
     {
         $columns = $this->blueprint
             ->columns()
-            ->ensurePrepended(Column::make('datestamp')->label('Date'));
+            ->ensurePrepended(Column::make('datestamp')->label(__('Date')));
 
         $status = Column::make('status')
             ->label(__('Status'))
