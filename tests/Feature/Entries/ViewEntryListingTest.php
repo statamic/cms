@@ -5,6 +5,7 @@ namespace Tests\Feature\Entries;
 use Facades\Tests\Factories\EntryFactory;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Entries\Collection;
+use Statamic\Facades\Search;
 use Statamic\Facades\User;
 use Statamic\Fields\Blueprint;
 use Tests\FakesRoles;
@@ -15,6 +16,17 @@ class ViewEntryListingTest extends TestCase
 {
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
+
+    private $searchPath;
+
+    public function tearDown(): void
+    {
+        if ($this->searchPath) {
+            app('files')->deleteDirectory($this->searchPath);
+        }
+
+        parent::tearDown();
+    }
 
     #[Test]
     public function it_shows_entries_index()
@@ -42,31 +54,6 @@ class ViewEntryListingTest extends TestCase
         $entries = collect($response->getData()->data);
 
         $this->assertEquals(['one', 'two', 'three'], $entries->pluck('slug')->all());
-    }
-
-    #[Test]
-    public function it_can_search_entries_without_viewing_other_authors_entries()
-    {
-        $handle = 'view-other-authors-search';
-
-        $this->setTestRole('view-own-entries', [
-            'access cp',
-            "view {$handle} entries",
-        ]);
-
-        $user = tap(User::make()->assignRole('view-own-entries'))->save();
-
-        Blueprint::make('with-author')
-            ->setNamespace("collections/{$handle}")
-            ->ensureField('author', ['type' => 'users'])
-            ->save();
-
-        tap(Collection::make($handle)->searchIndex('default'))->save();
-
-        $this
-            ->actingAs($user)
-            ->get(cp_route('collections.entries.index', ['collection' => $handle, 'search' => 'entry']))
-            ->assertOk();
     }
 
     #[Test]
@@ -195,5 +182,70 @@ class ViewEntryListingTest extends TestCase
         ];
 
         $this->assertEquals($expected, $entries->pluck('slug')->all());
+    }
+
+    #[Test]
+    public function it_shows_only_entries_in_index_the_user_can_access_when_searching()
+    {
+        $collectionHandle = 'view-other-authors-search';
+        $this->searchPath = storage_path('statamic/search/view-other-authors-search');
+
+        config([
+            'statamic.search.indexes.default.driver' => 'local',
+            'statamic.search.drivers.local.path' => $this->searchPath,
+        ]);
+
+        $this->setTestRole('view-own-entries', [
+            'access cp',
+            "view {$collectionHandle} entries",
+        ]);
+
+        $user = tap(User::make()->assignRole('view-own-entries'))->save();
+        $otherUser = tap(User::make())->save();
+
+        Blueprint::make('with-author')
+            ->setNamespace("collections/{$collectionHandle}")
+            ->ensureField('author', ['type' => 'users'])
+            ->save();
+
+        $collection = tap(Collection::make($collectionHandle)->searchIndex('default'))->save();
+
+        EntryFactory::collection($collection)
+            ->slug('entry-user-one')
+            ->data([
+                'blueprint' => 'with-author',
+                'author' => $user->id(),
+                'title' => 'Searchable entry',
+            ])
+            ->create();
+
+        EntryFactory::collection($collection)
+            ->slug('entry-user-two')
+            ->data([
+                'blueprint' => 'with-author',
+                'author' => $otherUser->id(),
+                'title' => 'Searchable entry',
+            ])
+            ->create();
+
+        EntryFactory::collection($collection)
+            ->slug('entry-with-multiple-authors')
+            ->data([
+                'blueprint' => 'with-author',
+                'author' => [$user->id(), $otherUser->id()],
+                'title' => 'Searchable entry',
+            ])
+            ->create();
+
+        Search::index('default')->update();
+
+        $response = $this
+            ->actingAs($user)
+            ->get(cp_route('collections.entries.index', ['collection' => $collectionHandle, 'search' => 'searchable']))
+            ->assertOk();
+
+        $entries = collect($response->getData()->data);
+
+        $this->assertEquals(['entry-user-one', 'entry-with-multiple-authors'], $entries->pluck('slug')->all());
     }
 }
