@@ -23,7 +23,10 @@ class EmailConnectionTest extends TestCase
             ['id' => 'two', 'to' => ['second@example.com']],
         ]]))->save();
 
-        $this->assertInstanceOf(SendEmails::class, (new Email)->finalized($form->makeSubmission()));
+        $this->assertInstanceOf(
+            SendEmails::class,
+            (new Email)->setConfig($form->connections()->get('email'))->finalized($form->makeSubmission())
+        );
     }
 
     #[Test]

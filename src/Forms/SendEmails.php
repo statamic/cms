@@ -14,13 +14,8 @@ class SendEmails implements ShouldQueue
 {
     use Dispatchable, Queueable, SerializesModels;
 
-    protected $submission;
-    protected $site;
-
-    public function __construct(Submission $submission, Site $site)
+    public function __construct(protected Submission $submission, protected Site $site, protected ?array $config = null)
     {
-        $this->submission = $submission;
-        $this->site = $site;
     }
 
     public function handle(): void
@@ -28,8 +23,12 @@ class SendEmails implements ShouldQueue
         $class = config('statamic.forms.send_email_job');
         $submission = $this->submission->form()->submission($this->submission->id()) ?? $this->submission;
 
+        // Falls back to reading the form's own connections for anyone dispatching this
+        // job directly without the $config argument. Remove the fallback in v7.
+        $emailConfigs = $this->config ?? $submission->form()->connections()->get('email', []);
+
         $this->prependToChain(
-            collect($submission->form()->connections()->get('email', []))
+            collect($emailConfigs)
                 ->filter(fn (array $config) => ConnectionLogic::passes($config, $submission))
                 ->map(fn (array $config) => new $class($submission, $this->site, $config))
                 ->values()

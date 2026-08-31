@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Forms;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\FormConnection;
@@ -64,11 +65,13 @@ class FormConnectController extends CpController
 
         throw_unless($connection = FormConnection::find($connection), NotFoundHttpException::class);
 
-        $request->validate($connection->rules($form));
+        Validator::make($request->except('_save'), $connection->rules($form))->validate();
 
-        $config = $connection->process($request->all(), $form);
+        $config = $connection->process($request->except('_save'), $form);
 
-        $form->connections($form->connections()->put($connection->handle(), $config))->save();
+        if ($request->boolean('_save', true)) {
+            $form->connections($form->connections()->put($connection->handle(), $config))->save();
+        }
 
         return $config;
     }

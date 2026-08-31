@@ -31,7 +31,7 @@ class Webhook extends Connection
 
     public function finalized(Submission $submission): object|array
     {
-        return collect($submission->form()->connections()->get('webhook'))
+        return collect($this->config())
             ->filter(fn (array $config) => ConnectionLogic::passes($config, $submission))
             ->map(fn (array $config) => new SendWebhook($submission, $submission->site(), $config))
             ->values()

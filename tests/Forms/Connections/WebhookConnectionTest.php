@@ -29,7 +29,7 @@ class WebhookConnectionTest extends TestCase
             ['url' => 'https://example.com/second'],
         ]]))->save();
 
-        $jobs = (new Webhook)->finalized($form->makeSubmission());
+        $jobs = (new Webhook)->setConfig($form->connections()->get('webhook'))->finalized($form->makeSubmission());
 
         $this->assertCount(2, $jobs);
         $this->assertContainsOnlyInstancesOf(SendWebhook::class, $jobs);
@@ -45,7 +45,7 @@ class WebhookConnectionTest extends TestCase
             ['url' => 'https://example.com/enabled', 'enabled' => true],
         ]]))->save();
 
-        $jobs = array_values((new Webhook)->finalized($form->makeSubmission()));
+        $jobs = array_values((new Webhook)->setConfig($form->connections()->get('webhook'))->finalized($form->makeSubmission()));
 
         $this->assertCount(1, $jobs);
         $this->assertEquals('https://example.com/enabled', $jobs[0]->config['url']);
@@ -65,7 +65,7 @@ class WebhookConnectionTest extends TestCase
 
         $submission = $form->makeSubmission()->data(['how_did_you_hear' => $value]);
 
-        $this->assertCount($shouldDispatch ? 1 : 0, (new Webhook)->finalized($submission));
+        $this->assertCount($shouldDispatch ? 1 : 0, (new Webhook)->setConfig($form->connections()->get('webhook'))->finalized($submission));
     }
 
     public static function webhookConditionsProvider(): array

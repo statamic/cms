@@ -52,6 +52,31 @@ class UpdateConnectionTest extends TestCase
     }
 
     #[Test]
+    public function it_validates_and_processes_without_saving_when_save_is_false()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'edit forms']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+        $form = tap(Form::make('test')->connections([
+            'email' => [['id' => 'abc', 'to' => ['old@example.com']]],
+        ]))->save();
+
+        $this
+            ->actingAs($user)
+            ->patchJson(cp_route('forms.connect.update', [$form->handle(), 'email']).'?_save=false', [
+                ['id' => 'abc', 'to' => ['new@example.com'], 'subject' => 'Updated'],
+            ])
+            ->assertOk()
+            ->assertExactJson([
+                ['id' => 'abc', 'to' => ['new@example.com'], 'subject' => 'Updated'],
+            ]);
+
+        $this->assertEquals(
+            [['id' => 'abc', 'to' => ['old@example.com']]],
+            Form::find('test')->connections()->get('email')
+        );
+    }
+
+    #[Test]
     public function it_clears_the_connections_config_when_saving_an_empty_array()
     {
         $this->setTestRoles(['test' => ['access cp', 'edit forms']]);

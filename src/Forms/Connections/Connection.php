@@ -21,10 +21,23 @@ abstract class Connection
     protected $description;
     protected $icon;
     protected $developer;
+    protected $config = [];
 
     public static function handle(): string
     {
         return Str::removeRight(static::traitHandle(), '_connection');
+    }
+
+    public function setConfig(array $config): static
+    {
+        $this->config = $config;
+
+        return $this;
+    }
+
+    public function config(): array
+    {
+        return $this->config;
     }
 
     public function description(): ?string
