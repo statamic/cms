@@ -71,13 +71,75 @@ class AugmentedTermTest extends AugmentedTestCase
             'updated_by' => ['type' => UserContract::class, 'value' => 'test-user'],
             'collection' => ['type' => 'null', 'value' => null],
             'parent' => ['type' => 'null', 'value' => null],
-            'children' => ['type' => \Illuminate\Support\Collection::class],
-            'ancestors' => ['type' => \Illuminate\Support\Collection::class],
+            'children' => ['type' => 'null', 'value' => null],
+            'ancestors' => ['type' => 'null', 'value' => null],
             'depth' => ['type' => 'null', 'value' => null],
             'is_root' => ['type' => 'null', 'value' => null],
         ];
 
         $this->assertAugmentedCorrectly($expectations, $augmented);
+    }
+
+    #[Test]
+    public function flat_taxonomy_blueprint_fields_with_reserved_hierarchy_handles_are_not_shadowed()
+    {
+        $blueprint = Blueprint::makeFromFields([
+            'parent' => ['type' => 'text'],
+            'children' => ['type' => 'text'],
+            'ancestors' => ['type' => 'text'],
+            'depth' => ['type' => 'integer'],
+            'is_root' => ['type' => 'toggle'],
+        ])->setHandle('test');
+        Blueprint::shouldReceive('in')->with('taxonomies/test')->andReturn(collect(['test' => $blueprint]));
+
+        tap(Taxonomy::make('test'))->save();
+
+        $term = Term::make()
+            ->taxonomy('test')
+            ->blueprint('test')
+            ->in('en')
+            ->slug('term-slug')
+            ->data([
+                'parent' => 'the parent field value',
+                'children' => 'the children field value',
+                'ancestors' => 'the ancestors field value',
+                'depth' => 5,
+                'is_root' => true,
+            ]);
+
+        $augmented = new AugmentedTerm($term);
+
+        $this->assertEquals('the parent field value', $augmented->get('parent')->value());
+        $this->assertEquals('the children field value', $augmented->get('children')->value());
+        $this->assertEquals('the ancestors field value', $augmented->get('ancestors')->value());
+        $this->assertEquals(5, $augmented->get('depth')->value());
+        $this->assertTrue($augmented->get('is_root')->value());
+    }
+
+    #[Test]
+    public function hierarchical_taxonomy_returns_structural_values_even_when_blueprint_defines_those_fields()
+    {
+        $blueprint = Blueprint::makeFromFields([
+            'parent' => ['type' => 'text'],
+        ])->setHandle('test');
+        Blueprint::shouldReceive('in')->with('taxonomies/test')->andReturn(collect(['test' => $blueprint]));
+
+        $taxonomy = tap(Taxonomy::make('test')->structureContents([]))->save();
+
+        $root = tap(Term::make('animals')->taxonomy('test')->blueprint('test')->data(['title' => 'Animals', 'parent' => 'ignored field value']))->save();
+        $child = tap(Term::make('cat')->taxonomy('test')->blueprint('test')->data(['title' => 'Cat', 'parent' => 'ignored field value']))->save();
+
+        $taxonomy->structure()->tree()->tree([
+            ['term' => 'animals', 'children' => [
+                ['term' => 'cat'],
+            ]],
+        ])->save();
+
+        $augmented = new AugmentedTerm($child->in('en'));
+
+        $this->assertEquals(2, $augmented->get('depth')->value());
+        $this->assertFalse($augmented->get('is_root')->value());
+        $this->assertEquals('test::animals', $augmented->get('parent')->value()->id());
     }
 
     #[Test]

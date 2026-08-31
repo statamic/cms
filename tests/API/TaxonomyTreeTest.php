@@ -2,8 +2,10 @@
 
 namespace Tests\API;
 
+use Facades\Statamic\Fields\BlueprintRepository;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -89,5 +91,31 @@ class TaxonomyTreeTest extends TestCase
         $this->assertEquals(1, $root['depth']);
         $this->assertTrue($root['is_root']);
         $this->assertNull($root['parent']);
+    }
+
+    #[Test]
+    public function flat_taxonomy_exposes_user_defined_fields_with_reserved_hierarchy_handles()
+    {
+        $blueprint = Blueprint::makeFromFields([
+            'parent' => ['type' => 'text'],
+            'children' => ['type' => 'text'],
+            'ancestors' => ['type' => 'text'],
+        ])->setHandle('tags');
+        BlueprintRepository::shouldReceive('in')->with('taxonomies/tags')->andReturn(collect(['tags' => $blueprint]));
+
+        tap(Taxonomy::make('tags'))->save();
+
+        tap(Term::make('red')->taxonomy('tags')->blueprint('tags')->data([
+            'title' => 'Red',
+            'parent' => 'Colours',
+            'children' => 'Crimson, Scarlet',
+            'ancestors' => 'Warm colours',
+        ]))->save();
+
+        $term = $this->get('/api/taxonomies/tags/terms/red')->assertSuccessful()->json('data');
+
+        $this->assertEquals('Colours', $term['parent']);
+        $this->assertEquals('Crimson, Scarlet', $term['children']);
+        $this->assertEquals('Warm colours', $term['ancestors']);
     }
 }
