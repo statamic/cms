@@ -213,6 +213,27 @@ class SendEmailsTest extends TestCase
         ];
     }
 
+    #[Test]
+    public function it_uses_the_configured_configs_instead_of_the_forms_own_when_set()
+    {
+        Mail::fake();
+
+        $form = tap(FacadesForm::make('test')->email([
+            ['from' => 'form@sender.com', 'to' => 'form@recipient.com'],
+        ]))->save();
+
+        $submission = $form->makeSubmission();
+
+        Bus::chain([
+            new SendEmails($submission, Site::default(), [
+                ['id' => 'override', 'from' => 'override@sender.com', 'to' => 'override@recipient.com'],
+            ]),
+        ])->dispatch();
+
+        Mail::assertSent(Email::class, 1);
+        Mail::assertSent(Email::class, fn (Email $email) => $email->getConfig()['to'] === 'override@recipient.com');
+    }
+
     private function sendEmails(Submission $submission): void
     {
         Bus::chain([new SendEmails($submission, Site::default())])->dispatch();

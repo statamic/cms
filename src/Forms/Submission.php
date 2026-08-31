@@ -279,7 +279,7 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
         CreateAssetsFromFileUploads::dispatchSync($this);
 
         $jobsFromConnections = $this->form()->connections()
-            ->map(fn ($config, $connection) => FormConnection::find($connection)?->finalized($this))
+            ->map(fn ($config, $connection) => FormConnection::find($connection)?->setConfig($config)->finalized($this))
             ->flatten();
 
         $jobs = array_filter([

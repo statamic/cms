@@ -35,7 +35,7 @@ class Email extends Connection
 
     public function finalized(Submission $submission): object|array
     {
-        return new SendEmails($submission, $submission->site());
+        return new SendEmails($submission, $submission->site(), $this->config());
     }
 
     public function render(Form $form): VueComponent
