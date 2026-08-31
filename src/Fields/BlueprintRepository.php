@@ -356,7 +356,7 @@ class BlueprintRepository
             });
 
         if ($namespace === 'default') {
-            return $this->getNamespaceAndHandle(Str::after(Str::before($path, '.yaml'), $this->directory().'/'));
+            return $this->getNamespaceAndHandle(Str::after(Str::after(Str::before($path, '.yaml'), $this->directory().'/'), 'vendor/'));
         }
 
         $directory = $this->directories[$namespace];
