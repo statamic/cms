@@ -93,7 +93,7 @@ const measureAdjacentRightCells = () => {
     adjacentRightCells.value = adjacent;
 };
 
-const pageTitle = (page, pageIndex) => page.display || __('Page :number', { number: pageIndex + 1 });
+const pageTitle = (page, pageIndex) => __(page.display) || __('Page :number', { number: pageIndex + 1 });
 
 const fieldConnection = (field) => (field.type === 'import' ? null : fieldConnections.value[field.handle] ?? null);
 const isConnectorDestination = (pageIndex) => connectorDestinationPageIndices.value.has(pageIndex);
@@ -264,8 +264,8 @@ onUnmounted(() => {
                                 :key="section._id"
                                 class="linked-list__section"
                             >
-                                <div class="linked-list__section-marker" :aria-label="section.display">
-                                    <span class="linked-list__section-marker-label line-clamp-2 text-center">{{ section.display }}</span>
+                                <div class="linked-list__section-marker" :aria-label="__(section.display)">
+                                    <span class="linked-list__section-marker-label line-clamp-2 text-center">{{ __(section.display) }}</span>
                                 </div>
                                 <ul class="field-sort-container" :data-sort-section="section._id">
                                     <div v-if="! section.fields.length" class="linked-list__empty-section">
