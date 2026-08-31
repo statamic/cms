@@ -588,6 +588,33 @@ EOT
             ])
             ->assertRedirect('/login');
 
+        $this->assertEquals([__('statamic::messages.password_passkeys_only')], session('errors')->all());
+
+        $this->assertGuest();
+    }
+
+    #[Test]
+    public function it_doesnt_reveal_passkey_enforcement_when_the_password_is_wrong()
+    {
+        $user = User::make()->id('test-user')->email('test@example.com')->password('secret');
+        $user->save();
+
+        $passkey = Mockery::mock(Passkey::class);
+        $passkey->shouldReceive('id')->andReturn('passkey-1');
+        $user->setPasskeys(collect([$passkey]));
+
+        config(['statamic.webauthn.allow_password_login_with_passkey' => false]);
+
+        $this
+            ->from('/login')
+            ->post('/!/auth/login', [
+                'email' => 'test@example.com',
+                'password' => 'not-the-password',
+            ])
+            ->assertRedirect('/login');
+
+        $this->assertEquals([__('Invalid credentials.')], session('errors')->all());
+
         $this->assertGuest();
     }
 
