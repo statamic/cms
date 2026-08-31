@@ -4,6 +4,7 @@ namespace Statamic\Tags;
 
 use ArrayIterator;
 use Statamic\Support\Str;
+use Statamic\View\Antlers\Language\Analyzers\TagIdentifierAnalyzer;
 use Traversable;
 
 class FluentTag implements \ArrayAccess, \IteratorAggregate
@@ -109,15 +110,10 @@ class FluentTag implements \ArrayAccess, \IteratorAggregate
             return $this->fetched;
         }
 
-        $name = $this->name;
+        [$name, $methodPart] = TagIdentifierAnalyzer::splitNameAndMethodPart($this->name);
 
-        if ($pos = strpos($name, ':')) {
-            $originalMethod = substr($name, $pos + 1);
-            $method = Str::camel($originalMethod);
-            $name = substr($name, 0, $pos);
-        } else {
-            $method = $originalMethod = 'index';
-        }
+        $originalMethod = $methodPart ?: 'index';
+        $method = Str::camel($originalMethod);
 
         $tagName = $name.':'.$originalMethod;
         $profileTagName = 'tag_'.$tagName.microtime();
