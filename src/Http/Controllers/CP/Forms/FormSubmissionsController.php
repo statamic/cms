@@ -2,6 +2,7 @@
 
 namespace Statamic\Http\Controllers\CP\Forms;
 
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Statamic\CP\Column;
 use Statamic\CP\Columns;
