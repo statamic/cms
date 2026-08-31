@@ -8,6 +8,13 @@ use Tests\TestCase;
 
 class FfmpegTest extends TestCase
 {
+    public function tearDown(): void
+    {
+        Ffmpeg::clearBinaryCache();
+
+        parent::tearDown();
+    }
+
     #[Test]
     public function it_builds_a_thumbnail_command_that_only_writes_errors_to_stderr()
     {
@@ -18,6 +25,62 @@ class FfmpegTest extends TestCase
         $this->assertStringContainsString('-frames:v 1', $command);
         $this->assertStringContainsString('-update 1', $command);
         $this->assertStringNotContainsString('-vframes', $command);
+    }
+
+    #[Test]
+    public function it_ignores_a_configured_binary_that_is_not_executable()
+    {
+        Ffmpeg::clearBinaryCache();
+        config(['statamic.assets.ffmpeg.binary' => storage_path('missing-ffmpeg-binary')]);
+
+        $this->assertNull((new Ffmpeg)->ffmpegBinary());
+        $this->assertFalse((new Ffmpeg)->available());
+    }
+
+    #[Test]
+    public function it_memoizes_binary_resolution_across_instances()
+    {
+        Ffmpeg::clearBinaryCache();
+        config(['statamic.assets.ffmpeg.binary' => PHP_BINARY]);
+
+        $resolved = (new Ffmpeg)->ffmpegBinary();
+
+        config(['statamic.assets.ffmpeg.binary' => storage_path('missing-ffmpeg-binary')]);
+
+        $this->assertSame($resolved, (new Ffmpeg)->ffmpegBinary());
+
+        Ffmpeg::clearBinaryCache();
+
+        $this->assertNull((new Ffmpeg)->ffmpegBinary());
+    }
+
+    #[Test]
+    public function it_ignores_a_path_discovered_binary_that_is_not_executable()
+    {
+        Ffmpeg::clearBinaryCache();
+        config(['statamic.assets.ffmpeg.binary' => null]);
+
+        $path = storage_path('non-executable-ffmpeg');
+        file_put_contents($path, '');
+        chmod($path, 0644);
+
+        $ffmpeg = new class($path) extends Ffmpeg
+        {
+            public function __construct(private string $discoveredPath)
+            {
+                parent::__construct();
+            }
+
+            public function run($command, $cacheKey = null)
+            {
+                return $this->discoveredPath;
+            }
+        };
+
+        $this->assertNull($ffmpeg->ffmpegBinary());
+        $this->assertFalse($ffmpeg->available());
+
+        @unlink($path);
     }
 
     private function buildCommand(...$arguments)
