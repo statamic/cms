@@ -662,10 +662,6 @@ export default {
             } else {
                 this.createLocalization(localization);
             }
-
-            if (this.isBase) {
-                window.history.replaceState({}, '', localization.url + window.location.hash);
-            }
         },
 
         editLocalization(localization) {
@@ -693,6 +689,10 @@ export default {
                 this.localizing = false;
                 this.initialPublished = data.values.published;
                 this.readOnly = data.readOnly;
+
+                if (this.isBase && localization.url) {
+                    window.history.replaceState({}, '', localization.url + window.location.hash);
+                }
 
                 this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 500); // after any fieldtypes do a debounced update
             });

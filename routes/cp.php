@@ -73,6 +73,7 @@ use Statamic\Http\Controllers\CP\Forms\FormFieldsetPreviewsController;
 use Statamic\Http\Controllers\CP\Forms\FormLogicController;
 use Statamic\Http\Controllers\CP\Forms\FormsController;
 use Statamic\Http\Controllers\CP\Forms\FormSubmissionsController;
+use Statamic\Http\Controllers\CP\Forms\GenerateFakeSubmissionController;
 use Statamic\Http\Controllers\CP\Forms\SubmissionActionController;
 use Statamic\Http\Controllers\CP\Globals\GlobalsBlueprintController;
 use Statamic\Http\Controllers\CP\Globals\GlobalsController;
@@ -348,7 +349,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::post('forms/actions/list', [FormActionController::class, 'bulkActions'])->name('forms.actions.bulk');
     Route::post('forms/{form}/submissions/actions', [SubmissionActionController::class, 'run'])->name('forms.submissions.actions.run');
     Route::post('forms/{form}/submissions/actions/list', [SubmissionActionController::class, 'bulkActions'])->name('forms.submissions.actions.bulk');
-    Route::post('forms/{form}/submissions/generate-fake', [FormSubmissionsController::class, 'generateFake'])->name('forms.submissions.generate-fake');
+    Route::post('forms/{form}/submissions/generate-fake', GenerateFakeSubmissionController::class)->name('forms.submissions.generate-fake');
     Route::resource('forms', FormsController::class);
     Route::get('forms/{form}/submissions', [FormSubmissionsController::class, 'index'])->name('forms.submissions.index');
     Route::get('forms/{form}/submissions/{submission}', [FormSubmissionsController::class, 'show'])->name('forms.submissions.show');

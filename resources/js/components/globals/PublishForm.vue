@@ -83,6 +83,7 @@
             :site="site"
             :read-only="readOnly"
             v-model:modified-fields="localizedFields"
+            :track-dirty-state="trackDirtyState"
             :sync-field-confirmation-text="syncFieldConfirmationText"
             remember-tab
         />
@@ -171,6 +172,8 @@ export default {
             readOnly: this.initialReadOnly,
             syncFieldConfirmationText: __('messages.sync_entry_field_confirmation_text'),
             pendingLocalization: null,
+            trackDirtyState: true,
+            trackDirtyStateTimeout: null,
         };
     },
 
@@ -290,14 +293,14 @@ export default {
         switchToLocalization(localization) {
             this.localizing = localization.handle;
 
-            if (this.publishContainer === 'base') {
-                window.history.replaceState({}, '', localization.url + window.location.hash);
-            }
-
             this.$axios.get(localization.url).then((response) => {
+                clearTimeout(this.trackDirtyStateTimeout);
+                this.trackDirtyState = false;
+
                 const data = response.data;
                 this.values = data.values;
                 this.originValues = data.originValues;
+                this.originMeta = data.originMeta || {};
                 this.meta = data.meta;
                 this.localizations = data.localizations;
                 this.localizedFields = data.localizedFields;
@@ -308,7 +311,16 @@ export default {
                 this.reference = data.reference;
                 this.localizing = false;
                 this.afterActionSuccessfullyCompleted(data);
-                this.$nextTick(() => this.$refs.container.clearDirtyState());
+
+                if (this.publishContainer === 'base' && localization.url) {
+                    window.history.replaceState({}, '', localization.url + window.location.hash);
+                }
+
+                // After any fieldtypes do a debounced update
+                this.trackDirtyStateTimeout = setTimeout(() => {
+                    this.trackDirtyState = true;
+                    this.$refs.container?.clearDirtyState();
+                }, 500);
             });
         },
 
@@ -362,6 +374,10 @@ export default {
 
     created() {
         window.history.replaceState({}, document.title, document.location.href.replace('created=true', ''));
+    },
+
+    beforeUnmount() {
+        clearTimeout(this.trackDirtyStateTimeout);
     },
 };
 </script>

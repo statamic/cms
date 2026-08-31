@@ -154,12 +154,6 @@ export default {
             return blueprint;
         },
 
-        selectedWidth: function () {
-            var width = this.config.width || 100;
-            var found = this.widths.find((w) => w.value === width);
-            return found.text;
-        },
-
         fieldtypeConfig() {
             return this.fieldtype.config;
         },
