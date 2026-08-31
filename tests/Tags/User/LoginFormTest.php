@@ -4,6 +4,7 @@ namespace Tests\Tags\User;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Sleep;
 use Mockery;
 use Orchestra\Testbench\Attributes\DefineEnvironment;
 use PHPUnit\Framework\Attributes\Group;
@@ -483,6 +484,56 @@ EOT
         $this->assertTrue(auth()->check());
 
         Event::assertNotDispatched(TwoFactorAuthenticationChallenged::class);
+    }
+
+    #[Test]
+    public function it_pads_failed_logins_so_unknown_emails_cant_be_distinguished_from_known_ones()
+    {
+        User::make()->email('san@holo.com')->password('chewy')->save();
+
+        Sleep::fake();
+
+        $this
+            ->post('/!/auth/login', [
+                'email' => 'nobody@holo.com',
+                'password' => 'chewy',
+            ])
+            ->assertLocation('/');
+
+        Sleep::assertSleptTimes(1);
+
+        Sleep::fake();
+
+        $this
+            ->post('/!/auth/login', [
+                'email' => 'san@holo.com',
+                'password' => 'leya',
+            ])
+            ->assertLocation('/');
+
+        Sleep::assertSleptTimes(1);
+
+        $this->assertFalse(auth()->check());
+    }
+
+    #[Test]
+    public function it_doesnt_pad_a_successful_login()
+    {
+        $user = User::make()->email('san@holo.com')->password('chewy');
+        $user->save();
+
+        Sleep::fake();
+
+        $this
+            ->post('/!/auth/login', [
+                'email' => 'san@holo.com',
+                'password' => 'chewy',
+            ])
+            ->assertLocation('/');
+
+        Sleep::assertNeverSlept();
+
+        $this->assertAuthenticatedAs($user);
     }
 
     protected function disableTwoFactor($app)

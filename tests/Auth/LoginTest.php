@@ -4,6 +4,7 @@ namespace Tests\Auth;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Sleep;
 use Orchestra\Testbench\Attributes\DefineEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
@@ -69,6 +70,51 @@ class LoginTest extends TestCase
             ->assertSessionHasErrors(['email']);
 
         $this->assertGuest();
+    }
+
+    #[Test]
+    public function it_pads_failed_logins_so_unknown_emails_cant_be_distinguished_from_known_ones()
+    {
+        $user = $this->user();
+
+        Sleep::fake();
+
+        $this
+            ->post(cp_route('login'), [
+                'email' => 'nobody@hasselhoff.com',
+                'password' => 'secret',
+            ])
+            ->assertSessionHasErrors(['email']);
+
+        Sleep::assertSleptTimes(1);
+
+        Sleep::fake();
+
+        $this
+            ->post(cp_route('login'), [
+                'email' => $user->email(),
+                'password' => 'invalid-password',
+            ])
+            ->assertSessionHasErrors(['email']);
+
+        Sleep::assertSleptTimes(1);
+    }
+
+    #[Test]
+    public function it_doesnt_pad_a_successful_login()
+    {
+        $user = $this->user();
+
+        Sleep::fake();
+
+        $this
+            ->post(cp_route('login'), [
+                'email' => $user->email(),
+                'password' => 'secret',
+            ])
+            ->assertRedirect(cp_route('index'));
+
+        Sleep::assertNeverSlept();
     }
 
     #[Test]
