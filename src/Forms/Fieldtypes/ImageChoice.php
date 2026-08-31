@@ -58,14 +58,14 @@ class ImageChoice extends FormFieldtype
             ],
             'multiple' => [
                 'display' => __('Allow Multiple'),
-                'instructions' => __('Allow multiple selections.'),
+                'instructions' => __('statamic::fieldtypes.select.config.multiple'),
                 'type' => 'toggle',
                 'default' => false,
                 'width' => 50,
             ],
             'columns' => [
                 'display' => __('Columns'),
-                'instructions' => __('How many options appear per row.'),
+                'instructions' => __('statamic::form-fieldtypes.image_choice.config.columns.instructions'),
                 'type' => 'integer',
                 'default' => 3,
                 'min' => 1,
@@ -74,7 +74,7 @@ class ImageChoice extends FormFieldtype
             ],
             'aspect_ratio' => [
                 'display' => __('Aspect Ratio'),
-                'instructions' => __('Shape of the image area for each option.'),
+                'instructions' => __('statamic::form-fieldtypes.image_choice.config.aspect_ratio.instructions'),
                 'type' => 'select',
                 'default' => '16/9',
                 'options' => [

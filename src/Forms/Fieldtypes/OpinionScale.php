@@ -36,17 +36,17 @@ class OpinionScale extends FormFieldtype
             ],
             'low_label' => [
                 'display' => __('Low Label'),
-                'instructions' => __('Shown below the lowest value.'),
+                'instructions' => __('statamic::form-fieldtypes.opinion_scale.config.low_label.instructions'),
                 'type' => 'text',
             ],
             'middle_label' => [
                 'display' => __('Middle Label'),
-                'instructions' => __('Shown below the middle value.'),
+                'instructions' => __('statamic::form-fieldtypes.opinion_scale.config.middle_label.instructions'),
                 'type' => 'text',
             ],
             'high_label' => [
                 'display' => __('High Label'),
-                'instructions' => __('Shown below the highest value.'),
+                'instructions' => __('statamic::form-fieldtypes.opinion_scale.config.high_label.instructions'),
                 'type' => 'text',
             ],
         ];

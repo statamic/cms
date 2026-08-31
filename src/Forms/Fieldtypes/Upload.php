@@ -20,13 +20,13 @@ class Upload extends FormFieldtype
         return [
             'store' => [
                 'display' => __('Store Files'),
-                'instructions' => __('Store uploaded files permanently in an asset container.'),
+                'instructions' => __('statamic::form-fieldtypes.upload.config.store.instructions'),
                 'type' => 'toggle',
                 'default' => false,
             ],
             'container' => [
                 'display' => __('Container'),
-                'instructions' => __('Select which asset container to store the uploaded files.'),
+                'instructions' => __('statamic::form-fieldtypes.upload.config.container.instructions'),
                 'type' => 'asset_container',
                 'max_items' => 1,
                 'mode' => 'select',
@@ -34,20 +34,20 @@ class Upload extends FormFieldtype
             ],
             'folder' => [
                 'display' => __('Folder'),
-                'instructions' => __('The folder within the container to upload files to.'),
+                'instructions' => __('statamic::form-fieldtypes.upload.config.folder.instructions'),
                 'type' => 'asset_folder',
                 'max_items' => 1,
                 'if' => ['store' => true],
             ],
             'min_files' => [
                 'display' => __('Min Files'),
-                'instructions' => __('The minimum number of files that must be uploaded.'),
+                'instructions' => __('statamic::form-fieldtypes.upload.config.min_files.instructions'),
                 'type' => 'integer',
                 'min' => 1,
             ],
             'max_files' => [
                 'display' => __('Max Files'),
-                'instructions' => __('The maximum number of files that may be uploaded.'),
+                'instructions' => __('statamic::form-fieldtypes.upload.config.max_files.instructions'),
                 'type' => 'integer',
                 'min' => 1,
             ],
