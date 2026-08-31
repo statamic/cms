@@ -70,7 +70,7 @@
                                 ref="newFolderInput"
                                 v-model:modelValue="newFolderName"
                                 :start-with-edit-mode="true"
-                                submit-mode="enter"
+                                submit-mode="both"
                                 :placeholder="__('Name')"
                                 :class="[
                                     'placeholder:lowercase',
