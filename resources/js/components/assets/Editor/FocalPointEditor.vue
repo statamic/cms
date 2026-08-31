@@ -55,7 +55,7 @@
                     :x="x"
                     :y="y"
                     :z="z"
-                    :image-url="image"
+                    :image-url="thumbnail || image"
                     :image-dimensions="imageDimensions"
                 />
             </div>
@@ -84,6 +84,7 @@ export default {
     props: [
         'data', // The initial focus point data stored in the asset, if applicable.
         'image', // The url of the image.
+        'thumbnail',
     ],
 
     data() {
