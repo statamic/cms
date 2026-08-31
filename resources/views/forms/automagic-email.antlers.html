@@ -1,25 +1,29 @@
-{{ fields }}
-    <b>{{ display }}:</b>
-    {{ if value }}
-        {{ if (fieldtype == "form_upload" && config:store) || fieldtype == "assets" }}
-            {{ value }}
-                {{ permalink }}
-                {{ if !last }},{{ /if }}
-            {{ /value }}
-        {{ elseif fieldtype == "select" && !config:multiple }}
-            {{ (value:label ?? value) | sanitize }}
-        {{ elseif fieldtype == "radio" }}
-            {{ (value:label ?? value) | sanitize }}
-        {{ elseif fieldtype == "select" || fieldtype == "checkboxes" || fieldtype == "dictionary" }}
-            {{ value }}
-                {{ (label ?? value) | sanitize }}
-                {{ if !last }},{{ /if }}
-            {{ /value }}
-        {{ elseif value|is_iterable }}
-            {{ value | json | sanitize }}
-        {{ else }}
-            {{ value | sanitize | nl2br }}
+{{ if email_config:body }}
+    {{ email_config:body | sanitize | nl2br }}
+{{ else }}
+    {{ fields }}
+        <b>{{ display }}:</b>
+        {{ if value }}
+            {{ if (fieldtype == "form_upload" && config:store) || fieldtype == "assets" }}
+                {{ value }}
+                    {{ permalink }}
+                    {{ if !last }},{{ /if }}
+                {{ /value }}
+            {{ elseif fieldtype == "select" && !config:multiple }}
+                {{ (value:label ?? value) | sanitize }}
+            {{ elseif fieldtype == "radio" }}
+                {{ (value:label ?? value) | sanitize }}
+            {{ elseif fieldtype == "select" || fieldtype == "checkboxes" || fieldtype == "dictionary" }}
+                {{ value }}
+                    {{ (label ?? value) | sanitize }}
+                    {{ if !last }},{{ /if }}
+                {{ /value }}
+            {{ elseif value|is_iterable }}
+                {{ value | json | sanitize }}
+            {{ else }}
+                {{ value | sanitize | nl2br }}
+            {{ /if }}
         {{ /if }}
-    {{ /if }}
-    <br>
-{{ /fields }}
+        <br>
+    {{ /fields }}
+{{ /if }}

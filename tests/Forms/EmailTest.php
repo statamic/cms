@@ -69,6 +69,26 @@ class EmailTest extends TestCase
         $this->assertEquals($expected, $email->bcc);
     }
 
+    #[Test]
+    public function it_sanitizes_field_values_used_as_addresses()
+    {
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'email', 'field' => ['type' => 'email']],
+            ],
+        ]))->save();
+
+        $submission = $form->makeSubmission()->data([
+            'email' => "evil@example.com\r\nBcc: victim@example.com",
+        ]);
+
+        $email = tap(new Email($submission, [
+            'to' => ['safe@example.com', 'field:email'],
+        ], Site::default()))->build();
+
+        $this->assertEquals([['address' => 'safe@example.com', 'name' => null]], $email->to);
+    }
+
     public static function singleAddressProvider()
     {
         return [
@@ -89,6 +109,12 @@ class EmailTest extends TestCase
             ]],
             'single email with name from global set using antlers' => ['{{ company_information:name }} <{{ company_information:email }}>', [
                 ['address' => 'info@example.com', 'name' => 'Example Company'],
+            ]],
+            'array with single email' => [['foo@bar.com'], [
+                ['address' => 'foo@bar.com', 'name' => null],
+            ]],
+            'array with single field reference' => [['field:email'], [
+                ['address' => 'foo@bar.com', 'name' => null],
             ]],
         ];
     }
@@ -111,6 +137,27 @@ class EmailTest extends TestCase
             'multiple emails with name using antlers' => ['{{ name }} <{{ email }}>, Baz Qux <baz@qux.com>', [
                 ['address' => 'foo@bar.com', 'name' => 'Foo Bar'],
                 ['address' => 'baz@qux.com', 'name' => 'Baz Qux'],
+            ]],
+            'array of emails' => [['foo@bar.com', 'baz@qux.com'], [
+                ['address' => 'foo@bar.com', 'name' => null],
+                ['address' => 'baz@qux.com', 'name' => null],
+            ]],
+            'array of emails with name using antlers' => [['{{ name }} <{{ email }}>', 'Baz Qux <baz@qux.com>'], [
+                ['address' => 'foo@bar.com', 'name' => 'Foo Bar'],
+                ['address' => 'baz@qux.com', 'name' => 'Baz Qux'],
+            ]],
+            'array with an antlers value that resolves empty' => [['{{ nonexistent_field }}', 'foo@bar.com'], [
+                ['address' => 'foo@bar.com', 'name' => null],
+            ]],
+            'array with a field reference and an email' => [['field:email', 'baz@qux.com'], [
+                ['address' => 'foo@bar.com', 'name' => null],
+                ['address' => 'baz@qux.com', 'name' => null],
+            ]],
+            'array with a field reference to a non-email value' => [['field:name', 'foo@bar.com'], [
+                ['address' => 'foo@bar.com', 'name' => null],
+            ]],
+            'array with a field reference to a missing field' => [['field:nonexistent', 'foo@bar.com'], [
+                ['address' => 'foo@bar.com', 'name' => null],
             ]],
         ]);
     }
@@ -174,6 +221,78 @@ class EmailTest extends TestCase
         $this->assertEquals($submission->id(), $email->viewData['id']);
         $this->assertEquals($form, $email->viewData['form']->value());
         $this->assertEquals('Statamic', (string) $email->viewData['company']['company_name']);
+    }
+
+    #[Test]
+    public function it_excludes_informational_and_structural_fields_from_the_fields_data()
+    {
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'name', 'field' => ['type' => 'short_answer']],
+                ['handle' => 'intro', 'field' => ['type' => 'heading']],
+                ['handle' => 'gap', 'field' => ['type' => 'spacer']],
+                ['handle' => 'blurb', 'field' => ['type' => 'paragraph']],
+            ],
+        ]))->save();
+
+        $submission = $form->makeSubmission()->data(['name' => 'Foo Bar']);
+
+        $email = tap(new Email($submission, ['to' => 'test@test.com'], Site::default()))->build();
+
+        $this->assertEquals(['name'], collect($email->viewData['fields'])->pluck('handle')->all());
+    }
+
+    #[Test]
+    public function it_renders_the_body_in_the_automagic_email_instead_of_listing_the_fields()
+    {
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'name', 'field' => ['type' => 'short_answer']],
+            ],
+        ]))->save();
+
+        $submission = $form->makeSubmission()->data(['name' => 'Jack Black']);
+
+        $email = new Email($submission, [
+            'to' => 'test@test.com',
+            'body' => "Hello {{ name }},\nThanks for getting in touch.",
+        ], Site::default());
+
+        $body = $email->render();
+
+        $this->assertStringContainsString('Hello Jack Black,<br', $body);
+        $this->assertStringContainsString('Thanks for getting in touch.', $body);
+        $this->assertStringNotContainsString('<b>Name:</b>', $body);
+    }
+
+    #[Test]
+    public function it_escapes_submitted_values_in_the_automagic_email_body()
+    {
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'name', 'field' => ['type' => 'short_answer']],
+            ],
+        ]))->save();
+
+        $submission = $form->makeSubmission()->data(['name' => '<script>alert(1)</script>']);
+
+        $email = new Email($submission, [
+            'to' => 'test@test.com',
+            'body' => 'New submission from {{ name }}',
+        ], Site::default());
+
+        $body = $email->render();
+
+        $this->assertStringNotContainsString('<script>alert(1)</script>', $body);
+        $this->assertStringContainsString('New submission from &lt;script&gt;alert(1)&lt;/script&gt;', $body);
+    }
+
+    #[Test]
+    public function it_uses_the_custom_view_instead_of_the_body_when_one_is_configured()
+    {
+        $email = $this->makeEmailWithConfig(['body' => 'Hello {{ name }}', 'html' => 'emails.custom']);
+
+        $this->assertEquals('emails.custom', $email->view);
     }
 
     #[Test]

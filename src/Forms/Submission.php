@@ -3,6 +3,7 @@
 namespace Statamic\Forms;
 
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Bus;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Forms\Submission as SubmissionContract;
 use Statamic\Contracts\Query\ContainsQueryableValues;
@@ -19,9 +20,11 @@ use Statamic\Events\SubmissionSaved;
 use Statamic\Events\SubmissionSaving;
 use Statamic\Facades\Entry;
 use Statamic\Facades\File;
+use Statamic\Facades\FormConnection;
 use Statamic\Facades\FormSubmission;
 use Statamic\Facades\Site as Sites;
 use Statamic\Facades\Stache;
+use Statamic\Fields\Field;
 use Statamic\Forms\Uploaders\AssetsUploader;
 use Statamic\Forms\Uploaders\FilesUploader;
 use Statamic\Forms\Uploaders\FormFileUpload;
@@ -282,10 +285,30 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
 
         SubmissionFinalized::dispatch($this);
 
+        // Assets need to exist before anything reads the submission, so this stays
+        // synchronous. The connection jobs are chained behind each other instead.
         CreateAssetsFromFileUploads::dispatchSync($this);
-        SendEmails::dispatch($this, $this->site());
+
+        $jobsFromConnections = $this->form()->connections()
+            ->map(fn ($config, $connection) => FormConnection::find($connection)?->finalized($this))
+            ->flatten();
+
+        $jobs = array_filter([
+            ...$jobsFromConnections,
+            $this->shouldDeleteTemporaryFiles() ? new DeleteTemporaryFiles($this) : null,
+        ]);
+
+        if ($jobs) {
+            Bus::chain($jobs)->dispatch();
+        }
 
         return $this;
+    }
+
+    private function shouldDeleteTemporaryFiles(): bool
+    {
+        return $this->form()->blueprint()->fields()->all()
+            ->contains(fn (Field $field) => in_array($field->type(), ['files', 'form_upload']));
     }
 
     public function deleteQuietly()

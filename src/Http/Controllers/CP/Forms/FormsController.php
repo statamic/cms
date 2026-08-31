@@ -7,6 +7,7 @@ use Inertia\Inertia;
 use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\CP\Column;
 use Statamic\Facades\Form;
+use Statamic\Facades\FormConnection;
 use Statamic\Facades\User;
 use Statamic\Forms\ConfigFields;
 use Statamic\Http\Controllers\CP\CpController;
@@ -35,19 +36,26 @@ class FormsController extends CpController
             $columns[] = Column::make('submissions')->label(__('Submissions'));
         }
 
+        if ($forms->contains(fn ($form) => $user->can('edit', $form))) {
+            $columns[] = Column::make('connections')->label(__('Connections'));
+        }
+
         $forms = $forms
             ->map(function ($form) use ($user) {
                 $canViewSubmissions = $user->can('viewSubmissions', $form);
+                $canEdit = $user->can('edit', $form);
 
                 return [
                     'id' => $form->handle(),
                     'title' => __($form->title()),
                     'status' => $form->status(),
                     'submissions' => $canViewSubmissions ? $form->querySubmissions()->whereNull('partial')->count() : null,
+                    'connections' => $canEdit ? FormConnection::all()->sum(fn ($connection) => $connection->count($form) ?? 0) : null,
                     'show_url' => $form->showUrl(),
                     'submissions_url' => $form->submissionsUrl(),
+                    'connect_url' => cp_route('forms.connect.index', $form->handle()),
                     'edit_url' => $form->editUrl(),
-                    'can_edit' => $user->can('edit', $form),
+                    'can_edit' => $canEdit,
                     'can_view_submissions' => $canViewSubmissions,
                 ];
             })
@@ -125,7 +133,6 @@ class FormsController extends CpController
             'title' => __($form->title()),
             'honeypot' => $form->honeypot(),
             'store' => $form->store(),
-            'email' => $form->email(),
             'generate_fake_submissions' => (bool) $form->get('generate_fake_submissions', true),
         ]);
 
@@ -154,13 +161,12 @@ class FormsController extends CpController
 
         $values = $fields->process()->values()->all();
 
-        $data = collect($values)->except(['title', 'honeypot', 'store', 'email']);
+        $data = collect($values)->except(['title', 'honeypot', 'store']);
 
         $form
             ->title($values['title'])
             ->honeypot($values['honeypot'])
             ->store($values['store'])
-            ->email($values['email'])
             ->merge($data);
 
         $form->save();

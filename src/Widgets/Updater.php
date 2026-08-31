@@ -6,6 +6,7 @@ use Facades\Statamic\Marketplace\Marketplace;
 use Facades\Statamic\Updater\UpdatesOverview;
 use Statamic\Facades\Addon;
 use Statamic\Facades\User;
+use Statamic\Support\VueComponent;
 
 class Updater extends Widget
 {

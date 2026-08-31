@@ -170,7 +170,6 @@ class SubmitFormTest extends TestCase
         Event::assertDispatched(SubmissionCreated::class);
         Event::assertDispatched(SubmissionFinalized::class);
         Bus::assertDispatched(CreateAssetsFromFileUploads::class);
-        Bus::assertDispatched(SendEmails::class);
     }
 
     #[Test]
@@ -1113,7 +1112,6 @@ class SubmitFormTest extends TestCase
         Event::assertNotDispatched(SubmissionCreated::class);
         Event::assertDispatched(SubmissionFinalized::class, 1);
         Bus::assertDispatched(CreateAssetsFromFileUploads::class, 1);
-        Bus::assertDispatched(SendEmails::class, 1);
 
         $form->submissions()->each->delete();
     }

@@ -4,6 +4,7 @@ namespace Tests\Forms;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Facades\Event;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\FormCreated;
 use Statamic\Events\FormCreating;
@@ -16,6 +17,7 @@ use Statamic\Facades\File;
 use Statamic\Facades\Form;
 use Statamic\Facades\YAML;
 use Statamic\Forms\Fields\FormFields;
+use Statamic\Support\Arr;
 use Tests\TestCase;
 
 class FormTest extends TestCase
@@ -376,5 +378,177 @@ class FormTest extends TestCase
         $this->assertCount(2, $formFields->items());
         $this->assertEquals('email', $formFields->field('email')->handle());
         $this->assertEquals('name', $formFields->field('name')->handle());
+    }
+
+    #[Test]
+    #[DataProvider('connectionsProvider')]
+    public function it_gets_and_sets_connections($connections)
+    {
+        $form = Form::make('contact_us');
+
+        $this->assertEquals(collect(), $form->connections());
+
+        $form->connections($connections);
+
+        $this->assertEquals([
+            'email' => [['to' => 'foo@bar.com']],
+            'webhook' => [['url' => 'https://example.com/hook']],
+        ], $form->connections()->all());
+    }
+
+    public static function connectionsProvider()
+    {
+        $connections = [
+            'email' => [['to' => 'foo@bar.com']],
+            'webhook' => [['url' => 'https://example.com/hook']],
+        ];
+
+        return [
+            'array' => [$connections],
+            'collection' => [collect($connections)],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('legacyEmailProvider')]
+    public function it_projects_legacy_email_config_into_connections($legacy, $expected)
+    {
+        File::put(Form::make('contact_us')->path(), YAML::dump([
+            'title' => 'Contact Us',
+            'email' => $legacy,
+        ]));
+
+        $form = Form::find('contact_us');
+
+        $emails = collect($form->connections()->get('email'));
+
+        $this->assertEquals($expected, $emails->map(fn ($email) => Arr::except($email, 'id'))->all());
+        $this->assertCount($emails->count(), $emails->pluck('id')->filter()->unique());
+    }
+
+    public static function legacyEmailProvider()
+    {
+        return [
+            'list of configs' => [
+                [['to' => 'foo@bar.com'], ['to' => 'baz@qux.com']],
+                [['to' => 'foo@bar.com'], ['to' => 'baz@qux.com']],
+            ],
+            'single config' => [
+                ['to' => 'foo@bar.com'],
+                [['to' => 'foo@bar.com']],
+            ],
+        ];
+    }
+
+    #[Test]
+    public function it_gets_email_configs_from_connections()
+    {
+        $form = Form::make('contact_us');
+
+        $this->assertNull($form->email());
+
+        $form->connections(['email' => [['to' => 'foo@bar.com']]]);
+
+        $this->assertEquals([['to' => 'foo@bar.com']], $form->email());
+    }
+
+    #[Test]
+    public function it_sets_email_configs_into_connections()
+    {
+        $form = Form::make('contact_us')->connections(['webhook' => [['url' => 'https://example.com/hook']]]);
+
+        $form->email([['to' => 'foo@bar.com']]);
+
+        $this->assertEquals(['webhook', 'email'], $form->connections()->keys()->all());
+        $this->assertEquals([['url' => 'https://example.com/hook']], $form->connections()->get('webhook'));
+        $this->assertEquals([['to' => 'foo@bar.com']], collect($form->email())->map(fn ($config) => Arr::except($config, 'id'))->all());
+    }
+
+    #[Test]
+    public function it_gives_email_configs_an_id_when_setting()
+    {
+        $form = Form::make('contact_us')->email([['to' => 'foo@bar.com'], ['to' => 'baz@qux.com']]);
+
+        $ids = collect($form->email())->pluck('id');
+
+        $this->assertCount(2, $ids->filter()->unique());
+    }
+
+    #[Test]
+    public function it_keeps_existing_email_ids_when_setting()
+    {
+        $form = Form::make('contact_us')->email([['id' => 'abc', 'to' => 'foo@bar.com']]);
+
+        $this->assertEquals('abc', $form->email()[0]['id']);
+    }
+
+    #[Test]
+    public function it_wraps_a_single_email_config_when_setting()
+    {
+        $form = Form::make('contact_us')->email(['to' => 'foo@bar.com']);
+
+        $this->assertEquals([['to' => 'foo@bar.com']], collect($form->email())->map(fn ($config) => Arr::except($config, 'id'))->all());
+    }
+
+    #[Test]
+    public function saving_a_legacy_form_migrates_email_config_to_connections()
+    {
+        File::put(Form::make('contact_us')->path(), YAML::dump([
+            'title' => 'Contact Us',
+            'email' => ['to' => 'foo@bar.com'],
+        ]));
+
+        $form = Form::find('contact_us');
+        $form->save();
+
+        $saved = YAML::parse(File::get($form->path()));
+
+        $this->assertCount(1, $saved['connections']['email']);
+        $this->assertNotEmpty($saved['connections']['email'][0]['id']);
+        $this->assertEquals('foo@bar.com', $saved['connections']['email'][0]['to']);
+        $this->assertArrayNotHasKey('email', $saved);
+    }
+
+    #[Test]
+    public function saving_a_legacy_form_migrates_email_config_without_a_to_key()
+    {
+        File::put(Form::make('contact_us')->path(), YAML::dump([
+            'title' => 'Contact Us',
+            'email' => ['from' => 'foo@bar.com', 'subject' => 'Hello'],
+        ]));
+
+        $form = Form::find('contact_us');
+        $form->save();
+
+        $saved = YAML::parse(File::get($form->path()));
+
+        $this->assertCount(1, $saved['connections']['email']);
+        $this->assertNotEmpty($saved['connections']['email'][0]['id']);
+        $this->assertEquals('foo@bar.com', $saved['connections']['email'][0]['from']);
+        $this->assertArrayNotHasKey('email', $saved);
+    }
+
+    #[Test]
+    public function it_drops_legacy_email_configs_that_arent_arrays()
+    {
+        File::put(Form::make('contact_us')->path(), YAML::dump([
+            'title' => 'Contact Us',
+            'email' => ['foo@bar.com', ['to' => 'baz@qux.com']],
+        ]));
+
+        $emails = Form::find('contact_us')->connections()->get('email');
+
+        $this->assertCount(1, $emails);
+        $this->assertEquals('baz@qux.com', $emails[0]['to']);
+    }
+
+    #[Test]
+    public function it_omits_connections_from_yaml_when_empty()
+    {
+        $form = tap(Form::make('contact_us')->title('Contact Us'))->save();
+
+        $saved = YAML::parse(File::get($form->path()));
+
+        $this->assertArrayNotHasKey('connections', $saved);
     }
 }
