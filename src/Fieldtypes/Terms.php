@@ -674,28 +674,35 @@ class Terms extends Relationship
 
     protected function createTermFromString($string, $taxonomy)
     {
+        $slug = Str::slug($string, '-', $this->termLang());
+
+        // An existing term matching the full string wins over path parsing. This lets a term
+        // whose title contains the delimiter (e.g. "AC/DC", created through the CP term form)
+        // be matched by typing it, instead of always being split into a path. The trade-off is
+        // that typing a path like "animals/cat" could match an unrelated existing term (e.g.
+        // "animalscat") instead of creating the nested path — accepted as low-probability.
+        if ($term = Facades\Term::find("{$taxonomy}::{$slug}")) {
+            return $term->id();
+        }
+
         if (Str::contains($string, EnsuresTermPaths::DELIMITER)
             && ($hierarchical = Facades\Taxonomy::findByHandle($taxonomy))
             && $hierarchical->hierarchical()) {
             return $this->createTermsFromPath($string, $hierarchical);
         }
 
-        $slug = Str::slug($string, '-', $this->termLang());
+        $taxonomy = Facades\Taxonomy::findByHandle($taxonomy);
 
-        if (! $term = Facades\Term::find("{$taxonomy}::{$slug}")) {
-            $taxonomy = Facades\Taxonomy::findByHandle($taxonomy);
-
-            if (User::current()->cant('create', [TermContract::class, $taxonomy])) {
-                return null;
-            }
-
-            $term = Facades\Term::make()
-                ->slug($slug)
-                ->taxonomy($taxonomy)
-                ->set('title', $string);
-
-            $term->save();
+        if (User::current()->cant('create', [TermContract::class, $taxonomy])) {
+            return null;
         }
+
+        $term = Facades\Term::make()
+            ->slug($slug)
+            ->taxonomy($taxonomy)
+            ->set('title', $string);
+
+        $term->save();
 
         return $term->id();
     }

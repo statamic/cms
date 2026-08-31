@@ -262,6 +262,61 @@ class TermsHierarchyTest extends TestCase
     }
 
     #[Test]
+    public function processing_a_string_matching_an_existing_term_selects_it_instead_of_creating_a_path()
+    {
+        tap(Term::make('acdc')->taxonomy('categories')->data(['title' => 'AC/DC']))->save();
+
+        $processed = $this->fieldtype(['taxonomies' => ['categories']])->process(['AC/DC']);
+
+        $this->assertEquals(['acdc'], $processed);
+        $this->assertNull(Term::find('categories::ac'));
+        $this->assertNull(Term::find('categories::dc'));
+    }
+
+    #[Test]
+    public function processing_a_path_with_no_matching_term_still_creates_the_nested_path()
+    {
+        $processed = $this->fieldtype(['taxonomies' => ['categories']])->process(['animals/kitten']);
+
+        $this->assertEquals(['kitten'], $processed);
+
+        $tree = Facades\Taxonomy::findByHandle('categories')->structure()->tree()->tree();
+
+        $this->assertEquals([
+            ['term' => 'animals', 'children' => [
+                ['term' => 'cat'],
+                ['term' => 'kitten'],
+            ]],
+            ['term' => 'furniture'],
+        ], $tree);
+    }
+
+    #[Test]
+    public function processing_a_path_matching_an_unrelated_existing_term_selects_it_instead_of_creating_the_path()
+    {
+        // Documents the accepted trade-off: an existing whole-string slug match wins over path
+        // parsing, even when the typed value looks like a path. Here "animals/cat" slugifies to
+        // "animalscat" (the slash is stripped, not converted to a separator), which happens to
+        // already exist as an unrelated term, so it's selected instead of creating a nested path.
+        tap(Term::make('animalscat')->taxonomy('categories')->data(['title' => 'Animals Cat']))->save();
+
+        $processed = $this->fieldtype(['taxonomies' => ['categories']])->process(['animals/cat']);
+
+        $this->assertEquals(['animalscat'], $processed);
+    }
+
+    #[Test]
+    public function flat_taxonomy_terms_containing_the_delimiter_are_unaffected_by_path_lookup_order()
+    {
+        tap(Facades\Taxonomy::make('tags'))->save();
+
+        $processed = $this->fieldtype(['taxonomies' => ['tags']])->process(['AC/DC']);
+
+        $this->assertEquals(['acdc'], $processed);
+        $this->assertEquals('AC/DC', Term::find('tags::acdc')->title());
+    }
+
+    #[Test]
     public function parent_field_index_query_excludes_configured_ids()
     {
         $items = $this->fieldtype([
