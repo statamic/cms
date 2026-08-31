@@ -289,7 +289,7 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
         // synchronous. The connection jobs are chained behind each other instead.
         CreateAssetsFromFileUploads::dispatchSync($this);
 
-        $jobsFromConnections = $this->form()->connections()
+        $jobsFromConnections = $this->form()->instance($this->entry()?->id())->connections()
             ->map(fn ($config, $connection) => FormConnection::find($connection)?->setConfig($config)->finalized($this))
             ->flatten();
 

@@ -92,11 +92,17 @@ class Fieldtype extends Relationship
             return $this->toFormHandles($data);
         }
 
+        $handles = $this->toFormHandles($data);
+
+        if (! $form = Facades\Form::find(Arr::first($handles))) {
+            return ['form' => $handles, 'config' => []];
+        }
+
         $config = Arr::get($data, 'config', []);
 
         return [
-            'form' => $this->toFormHandles($data),
-            'config' => $this->overrideFields()->addValues($config)->preProcess()->values()->only(array_keys($config))->all(),
+            'form' => $handles,
+            'config' => $this->overrideFields($form)->addValues($config)->preProcess()->values()->only(array_keys($config))->all(),
         ];
     }
 
@@ -113,15 +119,19 @@ class Fieldtype extends Relationship
             return parent::process($this->toFormHandles($data));
         }
 
-        if (! $form = Arr::first($this->toFormHandles($data))) {
+        if (! $handle = Arr::first($this->toFormHandles($data))) {
             return null;
+        }
+
+        if (! $form = Facades\Form::find($handle)) {
+            return $handle;
         }
 
         $config = Arr::get($data, 'config', []);
 
         // Only desynced fields are submitted, so a key's presence means it's an
         // override. Falsy values count; an override is only "empty" when blank.
-        $config = $this->overrideFields()
+        $config = $this->overrideFields($form)
             ->addValues($config)
             ->process()
             ->values()
@@ -129,7 +139,7 @@ class Fieldtype extends Relationship
             ->reject(fn ($value) => $value === null || $value === '')
             ->all();
 
-        return $config ? ['form' => $form, 'config' => $config] : $form;
+        return $config ? ['form' => $handle, 'config' => $config] : $handle;
     }
 
     public function preProcessValidatable($value)
@@ -151,30 +161,49 @@ class Fieldtype extends Relationship
         return array_values(array_filter(Arr::wrap($value)));
     }
 
-    private function overrideFields(): Fields
+    private function overrideFields(FormContract $form): Fields
     {
-        return $this->overrideBlueprint()->fields();
+        return $this->overrideBlueprint($form)->fields();
     }
 
-    private function overrideBlueprint(): Blueprint
+    private function overrideBlueprint(FormContract $form): Blueprint
     {
-        $section = ConfigFields::fields()['access'];
+        $access = ConfigFields::fields()['access'];
+        $access['fields'] = collect($access['fields'])->map(fn (array $field): array => [
+            ...$field,
+            'localizable' => true,
+        ]);
 
-        $section['fields'] = collect($section['fields'])->map(function (array $field): array {
-            $field['localizable'] = true;
-
-            return $field;
-        });
+        $connections = [
+            'display' => __('Connections'),
+            'fields' => [
+                'connections' => [
+                    'type' => 'form_connections',
+                    'display' => __('Connections'),
+                    'instructions' => __('statamic::messages.form_fieldtype_connections_instructions'),
+                    'localizable' => true,
+                    'form' => $form->handle(),
+                ],
+            ],
+        ];
 
         return Facades\Blueprint::make()->setContents([
-            'tabs' => ['main' => ['sections' => [[
-                'display' => $section['display'],
-                'fields' => collect($section['fields'])
-                    ->map(fn ($field, $handle) => ['handle' => $handle, 'field' => $field])
-                    ->values()
-                    ->all(),
-            ]]]],
+            'tabs' => ['main' => ['sections' => [
+                $this->toBlueprintSection($access),
+                $this->toBlueprintSection($connections),
+            ]]],
         ]);
+    }
+
+    private function toBlueprintSection(array $section): array
+    {
+        return [
+            'display' => $section['display'],
+            'fields' => collect($section['fields'])
+                ->map(fn (array $field, string $handle): array => ['handle' => $handle, 'field' => $field])
+                ->values()
+                ->all(),
+        ];
     }
 
     protected function getColumns()
@@ -250,8 +279,8 @@ class Fieldtype extends Relationship
             $data['submissions'] = $submissions;
         }
 
-        if ($configuration = $this->configurationPreloadData()) {
-            $data['configuration'] = $configuration;
+        if ($configureMeta = $this->configureMetaPreloadData()) {
+            $data['configureMeta'] = $configureMeta;
         }
 
         return $data;
@@ -274,7 +303,7 @@ class Fieldtype extends Relationship
         ];
     }
 
-    private function configurationPreloadData(): ?array
+    private function configureMetaPreloadData(): ?array
     {
         if (! $this->configCanBeOverridden()) {
             return null;
@@ -286,12 +315,14 @@ class Fieldtype extends Relationship
 
         $config = Arr::get($this->field->value(), 'config', []);
 
-        $origin = $this->overrideFields()->addValues($form->data()->all())->preProcess();
-        $fields = $this->overrideFields()->addValues(array_merge($form->data()->all(), $config))->preProcess();
+        $formData = [...$form->data()->all(), 'connections' => $form->connections()->all()];
+
+        $origin = $this->overrideFields($form)->addValues($formData)->preProcess();
+        $fields = $this->overrideFields($form)->addValues(array_merge($formData, $config))->preProcess();
 
         return [
             'form' => $form->handle(),
-            'blueprint' => $this->overrideBlueprint()->toPublishArray(),
+            'blueprint' => $this->overrideBlueprint($form)->toPublishArray(),
             'meta' => $fields->meta(),
             'originValues' => $origin->values()->all(),
             'originMeta' => $origin->meta(),

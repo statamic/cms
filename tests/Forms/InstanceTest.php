@@ -160,6 +160,38 @@ class InstanceTest extends TestCase
     }
 
     #[Test]
+    public function an_entry_instance_prefers_the_entrys_connection_overrides()
+    {
+        $form = tap($this->makeForm()->connections([
+            'webhook' => [['url' => 'https://example.com/form']],
+        ]))->save();
+
+        $this->makeEntry('event-1', ['form' => 'contact', 'config' => [
+            'connections' => ['webhook' => [['url' => 'https://example.com/entry']]],
+        ]]);
+
+        $this->assertEquals(
+            ['webhook' => [['url' => 'https://example.com/entry']]],
+            $form->instance('event-1')->connections()->all()
+        );
+    }
+
+    #[Test]
+    public function an_unconfigured_entry_falls_back_to_the_forms_connections()
+    {
+        $form = tap($this->makeForm()->connections([
+            'webhook' => [['url' => 'https://example.com/form']],
+        ]))->save();
+
+        $this->makeEntry('event-1', ['form' => 'contact', 'config' => []]);
+
+        $this->assertEquals(
+            ['webhook' => [['url' => 'https://example.com/form']]],
+            $form->instance('event-1')->connections()->all()
+        );
+    }
+
+    #[Test]
     public function the_form_delegates_to_its_default_instance()
     {
         $form = $this->makeForm(['close_date' => '2020-01-01 09:00']);

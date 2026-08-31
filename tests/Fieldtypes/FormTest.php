@@ -158,14 +158,35 @@ class FormTest extends TestCase
             ->fieldtype()
             ->preload();
 
-        $configuration = $preload['configuration'];
+        $configureMeta = $preload['configureMeta'];
 
-        $this->assertEquals(100, $configuration['originValues']['submission_limit']);
-        $this->assertArrayNotHasKey('values', $configuration);
+        $this->assertEquals(100, $configureMeta['originValues']['submission_limit']);
+        $this->assertArrayNotHasKey('values', $configureMeta);
 
-        $fields = collect($configuration['blueprint']['tabs'][0]['sections'][0]['fields']);
+        $fields = collect($configureMeta['blueprint']['tabs'][0]['sections'][0]['fields']);
 
         $this->assertTrue($fields->every(fn ($field) => $field['localizable']));
+    }
+
+    #[Test]
+    public function it_preloads_the_forms_own_connections_as_origin_values()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        $this->actingAs(tap(User::make()->makeSuper())->save());
+
+        Form::find('contact')->set('unique_instances', true)->connections([
+            'webhook' => [['id' => 'abc', 'url' => 'https://example.com/webhook']],
+        ])->save();
+
+        $preload = (new Field('rsvp_form', ['type' => 'form', 'max_items' => 1]))
+            ->setValue(['form' => 'contact', 'config' => []])
+            ->fieldtype()
+            ->preload();
+
+        $originConnections = $preload['configureMeta']['originValues']['connections'];
+
+        $this->assertEquals('https://example.com/webhook', $originConnections['webhook'][0]['url']);
     }
 
     #[Test]

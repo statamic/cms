@@ -150,6 +150,8 @@ return [
     'form_closed_message' => 'This form is no longer accepting submissions.',
     'form_fieldtype_configure_instructions' => 'Edit a field to override the form\'s setting for this entry. Synced fields keep following the form.',
     'form_fieldtype_sync_confirmation' => 'Are you sure? This override will be removed and the field will follow the form\'s setting again.',
+    'form_connect_unique_instances_warning' => 'Unique Instances are enabled for this form. This means that the form\'s connections may be overridden on a per-entry basis.',
+    'form_fieldtype_connections_instructions' => 'Override the form\'s connections for this entry.',
     'form_require_login_message' => 'You must be logged in to submit this form.',
     'form_create_description' => 'Get started by creating your first form.',
     'form_builder' => 'Form Builder',

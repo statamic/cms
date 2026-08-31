@@ -36,6 +36,7 @@ import FormFieldtype from '../components/fieldtypes/FormFieldtype.vue';
 import FormIndexFieldtype from '../components/fieldtypes/FormIndexFieldtype.vue';
 import FormRelatedItem from '../components/fieldtypes/FormRelatedItem.vue';
 import FormFieldsFieldtype from '../components/fieldtypes/FormFieldsFieldtype.vue';
+import FormConnectionsFieldtype from '../components/fieldtypes/FormConnectionsFieldtype.vue';
 import FormHeadingFieldtype from '../components/fieldtypes/FormHeadingFieldtype.vue';
 import FormParagraphFieldtype from '@/components/fieldtypes/FormParagraphFieldtype.vue';
 import FormUploadFieldtype from '@/components/fieldtypes/FormUploadFieldtype.vue';
@@ -123,6 +124,7 @@ export default function registerFieldtypes(app) {
     app.component('form-related-item', FormRelatedItem);
     app.component('form_banner-fieldtype', FormBannerFieldtype);
     app.component('form_fields-fieldtype', FormFieldsFieldtype);
+    app.component('form_connections-fieldtype', FormConnectionsFieldtype);
     app.component('form_heading-fieldtype', FormHeadingFieldtype);
     app.component('form_paragraph-fieldtype', FormParagraphFieldtype);
     app.component('form_upload-fieldtype', FormUploadFieldtype);

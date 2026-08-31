@@ -6,8 +6,9 @@ import Layout from '@/pages/layout/Layout.vue';
 import PanelLayout from '@/pages/layout/PanelLayout.vue';
 import FormsLayout from '../Layout.vue';
 import Head from '@/pages/layout/Head.vue';
-import { Button, Card, Header, Heading, Icon, Panel, PanelHeader } from '@ui';
+import { Alert, Button, Card, Header, Heading, Icon, Panel, PanelHeader } from '@ui';
 import FormStatusIndicator from '@/components/forms/FormStatusIndicator.vue';
+import ConnectionEditor from '@/components/forms/connections/ConnectionEditor.vue';
 import { Link } from '@inertiajs/vue3';
 
 defineOptions({ layout: [Layout, PanelLayout, FormsLayout] });
@@ -20,6 +21,7 @@ const props = defineProps({
     action: String,
     isConfigured: Boolean,
     suggestableFields: Array,
+    uniqueInstancesEnabled: Boolean,
 });
 
 const errors = ref({});
@@ -77,12 +79,19 @@ onUnmounted(() => {
     </Teleport>
 
     <div class="mx-auto max-w-5xl">
-        <Header class="mb-2">
+        <Header>
             <template #title>
                 <FormStatusIndicator :status="form.status" />
                 {{ __(form.title) }}
             </template>
         </Header>
+
+        <Alert
+            v-if="uniqueInstancesEnabled"
+            variant="warning"
+            class="mb-6"
+            :text="__('messages.form_connect_unique_instances_warning')"
+        />
 
         <Panel>
             <PanelHeader>
@@ -107,13 +116,7 @@ onUnmounted(() => {
                 </Heading>
             </PanelHeader>
             <Card>
-                <component
-                    :is="component.name"
-                    :form
-                    :errors
-                    v-model="value"
-                    v-bind="component.props"
-                />
+                <ConnectionEditor :form :component :errors v-model="value" />
             </Card>
         </Panel>
     </div>

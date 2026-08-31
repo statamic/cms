@@ -3,6 +3,7 @@
 namespace Statamic\Forms;
 
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Entry;
@@ -59,6 +60,15 @@ class Instance
     public function config(string $key): mixed
     {
         return $this->overrides()[$key] ?? $this->form->get($key);
+    }
+
+    public function connections(): Collection
+    {
+        if ($overrides = $this->overrides()['connections'] ?? null) {
+            return collect($overrides);
+        }
+
+        return $this->form->connections();
     }
 
     private function overrides(): array

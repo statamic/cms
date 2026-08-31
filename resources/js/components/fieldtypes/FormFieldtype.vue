@@ -27,21 +27,21 @@
             />
         </Stack>
 
-        <Stack v-if="configurationMeta" v-model:open="configuringForm" size="half" :title="__('Configure')">
+        <Stack v-if="configureMeta" v-model:open="configuringForm" size="half" :title="__('Configure')">
             <p
                 class="mb-6 text-sm text-gray-600 dark:text-gray-300"
                 v-text="__('messages.form_fieldtype_configure_instructions')"
             />
 
             <PublishContainer
+                ref="configureContainer"
                 v-model="configOverrides"
                 v-model:modified-fields="modifiedOverrides"
-                :blueprint="configurationMeta.blueprint"
-                :meta="configurationMeta.meta"
-                :origin-values="configurationMeta.originValues"
-                :origin-meta="configurationMeta.originMeta"
+                :blueprint="configureMeta.blueprint"
+                :meta="configureMeta.meta"
+                :origin-values="configureMeta.originValues"
+                :origin-meta="configureMeta.originMeta"
                 :sync-field-confirmation-text="__('messages.form_fieldtype_sync_confirmation')"
-                :track-dirty-state="false"
                 as-config
             >
                 <PublishTabs />
@@ -80,7 +80,7 @@ export default {
         return {
             formFieldtypeItem: {
                 hasSubmissions: () => !!this.submissionsMeta,
-                hasConfigure: () => !!this.configurationMeta,
+                hasConfigure: () => !!this.configureMeta,
                 viewSubmissions: () => (this.viewingSubmissions = true),
                 configure: () => (this.configuringForm = true),
             },
@@ -114,12 +114,12 @@ export default {
             return submissions;
         },
 
-        configurationMeta() {
-            const configuration = this.meta.configuration;
+        configureMeta() {
+            const meta = this.meta.configureMeta;
 
-            if (!configuration || !this.form.includes(configuration.form)) return null;
+            if (!meta || !this.form.includes(meta.form)) return null;
 
-            return configuration;
+            return meta;
         },
 
         replicatorPreview() {
@@ -149,11 +149,14 @@ export default {
         },
 
         configuringForm(open) {
-            if (!open) return;
+            if (!open) {
+                this.$refs.configureContainer?.clearDirtyState?.();
+                return;
+            }
 
             const config = clone(this.value?.config ?? {});
 
-            this.configOverrides = { ...clone(this.configurationMeta.originValues), ...config };
+            this.configOverrides = { ...clone(this.configureMeta.originValues), ...config };
             this.modifiedOverrides = Object.keys(config);
         },
     },

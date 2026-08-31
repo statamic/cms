@@ -56,7 +56,7 @@ test('only modified fields are persisted as overrides', async () => {
         meta: {
             configurable: true,
             data: [],
-            configuration: {
+            configureMeta: {
                 form: 'contact',
                 blueprint: {},
                 values: {},
@@ -87,7 +87,7 @@ test('synced fields are dropped from the overrides', async () => {
         meta: {
             configurable: true,
             data: [],
-            configuration: {
+            configureMeta: {
                 form: 'contact',
                 blueprint: {},
                 values: {},

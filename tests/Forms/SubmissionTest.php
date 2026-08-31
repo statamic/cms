@@ -3,6 +3,7 @@
 namespace Tests\Forms;
 
 use Carbon\Carbon;
+use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;
@@ -15,6 +16,7 @@ use Statamic\Events\SubmissionDeleted;
 use Statamic\Events\SubmissionFinalized;
 use Statamic\Events\SubmissionSaved;
 use Statamic\Events\SubmissionSaving;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
 use Statamic\Facades\Site;
 use Statamic\Forms\Connections\Webhooks\SendWebhook;
@@ -489,6 +491,48 @@ class SubmissionTest extends TestCase
             SendWebhook::class,
             DeleteTemporaryFiles::class,
         ]);
+    }
+
+    #[Test]
+    #[DataProvider('connectionOverrideProvider')]
+    public function finalizing_resolves_the_entrys_connection_override($rsvpFormValue, string $expectedUrl)
+    {
+        Bus::fake();
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        $form = tap(Form::make('contact_us')->data(['unique_instances' => true])->connections([
+            'webhook' => [['url' => 'https://example.com/form-webhook']],
+        ]))->save();
+
+        Blueprint::make('event')->setNamespace('collections.events')->setContents(['fields' => [
+            ['handle' => 'rsvp_form', 'field' => ['type' => 'form', 'max_items' => 1]],
+        ]])->save();
+
+        (new EntryFactory)->collection('events')->id('event-1')->slug('event-1')->data([
+            'rsvp_form' => $rsvpFormValue,
+        ])->create();
+
+        $form->makeSubmission()->set('entry', 'event-1')->asPartial()->finalize();
+
+        Bus::assertChained([
+            fn (SendWebhook $job) => $job->config['url'] === $expectedUrl,
+        ]);
+    }
+
+    public static function connectionOverrideProvider(): array
+    {
+        return [
+            'entry overrides the connection' => [
+                ['form' => 'contact_us', 'config' => [
+                    'connections' => ['webhook' => [['url' => 'https://example.com/entry-webhook']]],
+                ]],
+                'https://example.com/entry-webhook',
+            ],
+            'entry has no override' => [
+                'contact_us',
+                'https://example.com/form-webhook',
+            ],
+        ];
     }
 
     #[Test]
