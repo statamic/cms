@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades;
+use Statamic\Facades\Antlers;
 use Statamic\Facades\Term;
 use Statamic\Facades\User;
 use Statamic\Fields\Field;
@@ -105,7 +106,7 @@ class TermsHierarchyTest extends TestCase
         $item = $this->fieldtype(['taxonomies' => ['categories']])->getItemData(['cat'])->first();
 
         $this->assertEquals(2, $item['depth']);
-        $this->assertEquals('animals/cat', $item['path']);
+        $this->assertEquals('animals>cat', $item['path']);
         $this->assertEquals(['Animals'], $item['ancestors']);
         $this->assertArrayNotHasKey('taxonomy_title', $item);
         $this->assertEquals('Animals', $item['hint']);
@@ -130,7 +131,7 @@ class TermsHierarchyTest extends TestCase
         $this->assertArrayNotHasKey('hint', $byId['categories::animals']);
 
         $this->assertEquals(2, $byId['categories::cat']['depth']);
-        $this->assertEquals('animals/cat', $byId['categories::cat']['path']);
+        $this->assertEquals('animals>cat', $byId['categories::cat']['path']);
         $this->assertEquals(['Animals'], $byId['categories::cat']['ancestors']);
         $this->assertEquals('Animals', $byId['categories::cat']['hint']);
     }
@@ -152,7 +153,7 @@ class TermsHierarchyTest extends TestCase
         $byId = collect($resolved)->keyBy(fn ($term) => $term['id']);
 
         $this->assertEquals(2, $byId['categories::cat']['depth']);
-        $this->assertEquals('animals/cat', $byId['categories::cat']['path']);
+        $this->assertEquals('animals>cat', $byId['categories::cat']['path']);
         $this->assertEquals(['Animals'], $byId['categories::cat']['ancestors']);
         $this->assertEquals('Categories', $byId['categories::cat']['taxonomy_title']);
         $this->assertEquals('Categories • Animals', $byId['categories::cat']['hint']);
@@ -169,7 +170,7 @@ class TermsHierarchyTest extends TestCase
         $item = $this->fieldtype(['taxonomies' => ['categories', 'tags']])->getItemData(['categories::cat'])->first();
 
         $this->assertEquals(2, $item['depth']);
-        $this->assertEquals('animals/cat', $item['path']);
+        $this->assertEquals('animals>cat', $item['path']);
         $this->assertEquals(['Animals'], $item['ancestors']);
         $this->assertEquals('Categories', $item['taxonomy_title']);
         $this->assertEquals('Categories • Animals', $item['hint']);
@@ -180,7 +181,7 @@ class TermsHierarchyTest extends TestCase
     {
         $fieldtype = $this->fieldtype(['taxonomies' => ['categories']]);
 
-        $processed = $fieldtype->process(['animals/cat/calico']);
+        $processed = $fieldtype->process(['animals > cat > calico']);
 
         $this->assertEquals(['calico'], $processed);
 
@@ -206,7 +207,7 @@ class TermsHierarchyTest extends TestCase
         $fieldtype = $this->fieldtype(['taxonomies' => ['categories']]);
 
         // "cat" already lives under "animals" and shouldn't get re-parented under "furniture".
-        $processed = $fieldtype->process(['furniture/cat']);
+        $processed = $fieldtype->process(['furniture > cat']);
 
         $this->assertEquals(['cat'], $processed);
 
@@ -227,7 +228,7 @@ class TermsHierarchyTest extends TestCase
 
         $this->expectException(ValidationException::class);
 
-        $this->fieldtype(['taxonomies' => ['categories']])->process(['animals/cat/calico']);
+        $this->fieldtype(['taxonomies' => ['categories']])->process(['animals > cat > calico']);
     }
 
     #[Test]
@@ -242,7 +243,7 @@ class TermsHierarchyTest extends TestCase
     #[Test]
     public function processing_a_path_of_new_terms_nests_them_in_the_persisted_tree()
     {
-        $processed = $this->fieldtype(['taxonomies' => ['categories']])->process(['plants/fern']);
+        $processed = $this->fieldtype(['taxonomies' => ['categories']])->process(['plants > fern']);
 
         $this->assertEquals(['fern'], $processed);
         $this->assertNotNull(Term::find('categories::plants'));
@@ -264,19 +265,30 @@ class TermsHierarchyTest extends TestCase
     #[Test]
     public function processing_a_string_matching_an_existing_term_selects_it_instead_of_creating_a_path()
     {
-        tap(Term::make('acdc')->taxonomy('categories')->data(['title' => 'AC/DC']))->save();
+        tap(Term::make('ages-21')->taxonomy('categories')->data(['title' => 'Ages > 21']))->save();
 
+        $processed = $this->fieldtype(['taxonomies' => ['categories']])->process(['Ages > 21']);
+
+        $this->assertEquals(['ages-21'], $processed);
+        $this->assertNull(Term::find('categories::ages'));
+        $this->assertNull(Term::find('categories::21'));
+    }
+
+    #[Test]
+    public function a_slash_no_longer_creates_a_path_since_it_is_not_the_delimiter()
+    {
         $processed = $this->fieldtype(['taxonomies' => ['categories']])->process(['AC/DC']);
 
         $this->assertEquals(['acdc'], $processed);
         $this->assertNull(Term::find('categories::ac'));
         $this->assertNull(Term::find('categories::dc'));
+        $this->assertEquals('AC/DC', Term::find('categories::acdc')->title());
     }
 
     #[Test]
     public function processing_a_path_with_no_matching_term_still_creates_the_nested_path()
     {
-        $processed = $this->fieldtype(['taxonomies' => ['categories']])->process(['animals/kitten']);
+        $processed = $this->fieldtype(['taxonomies' => ['categories']])->process(['animals > kitten']);
 
         $this->assertEquals(['kitten'], $processed);
 
@@ -295,12 +307,12 @@ class TermsHierarchyTest extends TestCase
     public function processing_a_path_matching_an_unrelated_existing_term_selects_it_instead_of_creating_the_path()
     {
         // Documents the accepted trade-off: an existing whole-string slug match wins over path
-        // parsing, even when the typed value looks like a path. Here "animals/cat" slugifies to
-        // "animalscat" (the slash is stripped, not converted to a separator), which happens to
-        // already exist as an unrelated term, so it's selected instead of creating a nested path.
+        // parsing, even when the typed value looks like a path. Here "animals>cat" slugifies to
+        // "animalscat" (the delimiter is stripped, not converted to a separator), which happens
+        // to already exist as an unrelated term, so it's selected instead of creating a nested path.
         tap(Term::make('animalscat')->taxonomy('categories')->data(['title' => 'Animals Cat']))->save();
 
-        $processed = $this->fieldtype(['taxonomies' => ['categories']])->process(['animals/cat']);
+        $processed = $this->fieldtype(['taxonomies' => ['categories']])->process(['animals>cat']);
 
         $this->assertEquals(['animalscat'], $processed);
     }
@@ -310,10 +322,33 @@ class TermsHierarchyTest extends TestCase
     {
         tap(Facades\Taxonomy::make('tags'))->save();
 
-        $processed = $this->fieldtype(['taxonomies' => ['tags']])->process(['AC/DC']);
+        $processed = $this->fieldtype(['taxonomies' => ['tags']])->process(['Ages > 21']);
 
-        $this->assertEquals(['acdc'], $processed);
-        $this->assertEquals('AC/DC', Term::find('tags::acdc')->title());
+        $this->assertEquals(['ages-21'], $processed);
+        $this->assertEquals('Ages > 21', Term::find('tags::ages-21')->title());
+    }
+
+    #[Test]
+    public function a_raw_stored_path_value_augments_and_renders_correctly()
+    {
+        // Simulates a value written programmatically (not through the CP fieldtype form),
+        // e.g. `$entry->set('categories', ['animals > cat'])->save()`, which persists the
+        // raw path string rather than the resolved leaf slug.
+        $entry = EntryFactory::collection('blog')->id('augment-test')->create();
+
+        $fieldtype = $this->fieldtype(['taxonomies' => ['categories']], $entry);
+
+        $augmented = $fieldtype->augment(['animals > cat'])->get();
+
+        $this->assertCount(1, $augmented);
+        $this->assertEquals('categories::cat', $augmented->first()->id());
+        $this->assertEquals('Cat', $augmented->first()->title());
+
+        $rendered = Antlers::parse('{{ categories }}{{ title }}{{ /categories }}', [
+            'categories' => $augmented,
+        ]);
+
+        $this->assertEquals('Cat', (string) $rendered);
     }
 
     #[Test]

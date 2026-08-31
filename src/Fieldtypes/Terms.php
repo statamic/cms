@@ -677,10 +677,11 @@ class Terms extends Relationship
         $slug = Str::slug($string, '-', $this->termLang());
 
         // An existing term matching the full string wins over path parsing. This lets a term
-        // whose title contains the delimiter (e.g. "AC/DC", created through the CP term form)
-        // be matched by typing it, instead of always being split into a path. The trade-off is
-        // that typing a path like "animals/cat" could match an unrelated existing term (e.g.
-        // "animalscat") instead of creating the nested path — accepted as low-probability.
+        // whose title contains the delimiter (e.g. "Ages > 21", created through the CP term
+        // form) be matched by typing it, instead of always being split into a path. The
+        // trade-off is that typing a path like "animals > cat" could match an unrelated
+        // existing term (e.g. "animalscat") instead of creating the nested path — accepted
+        // as low-probability.
         if ($term = Facades\Term::find("{$taxonomy}::{$slug}")) {
             return $term->id();
         }
@@ -708,7 +709,7 @@ class Terms extends Relationship
     }
 
     /**
-     * A typed value like "animals/cat/calico" on a hierarchical taxonomy creates
+     * A typed value like "animals > cat > calico" on a hierarchical taxonomy creates
      * each missing segment as a term chained under the previous one, and returns
      * the leaf's id. Existing segments are reused in place — the fieldtype
      * never re-parents a term that's already somewhere in the tree.

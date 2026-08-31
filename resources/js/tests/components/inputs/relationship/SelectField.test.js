@@ -123,12 +123,26 @@ describe('SelectField placeholder', () => {
 });
 
 describe('SelectField typed term paths', () => {
-    test('treats a slash-separated id as a typed path, not an existing term', () => {
+    test('treats a delimiter-separated id as a typed path, not an existing term', () => {
         const wrapper = mountSelectField({ config: { type: 'terms' } });
 
-        expect(wrapper.vm.isTypedTermPath('animals/cat')).toBe(true);
+        expect(wrapper.vm.isTypedTermPath('animals>cat')).toBe(true);
         expect(wrapper.vm.isTypedTermPath('categories::cat')).toBe(false);
-        expect(wrapper.vm.termPathSegments('animals/cat/calico')).toEqual(['animals', 'cat', 'calico']);
+        expect(wrapper.vm.termPathSegments('animals>cat>calico')).toEqual(['animals', 'cat', 'calico']);
+
+        wrapper.unmount();
+    });
+
+    test('trims whitespace around segments in the spaced form', () => {
+        const wrapper = mountSelectField({ config: { type: 'terms' } });
+
+        expect(wrapper.vm.isTypedTermPath('Animals > Cat')).toBe(true);
+        expect(wrapper.vm.termPathSegments('Animals > Cat > Calico')).toEqual(['Animals', 'Cat', 'Calico']);
+        expect(wrapper.vm.newItemFromId('Animals > Cat > Calico')).toEqual({
+            id: 'Animals > Cat > Calico',
+            title: 'Calico',
+            hint: 'Animals » Cat',
+        });
 
         wrapper.unmount();
     });

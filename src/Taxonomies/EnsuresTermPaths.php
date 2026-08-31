@@ -13,13 +13,13 @@ use function Statamic\trans as __;
 class EnsuresTermPaths
 {
     /**
-     * The character that separates segments in a typed term path, e.g. "animals/cat".
+     * The character that separates segments in a typed term path, e.g. "animals > cat".
      */
-    const DELIMITER = '/';
+    const DELIMITER = '>';
 
     /**
      * Association/lookup slug for an entry value. Nested paths like
-     * "events/concerts" resolve to the leaf slug ("concerts") when the
+     * "events > concerts" resolve to the leaf slug ("concerts") when the
      * taxonomy is hierarchical; otherwise the whole value is slugified.
      */
     public function slugFromValue(mixed $value, ?string $language = null, bool $hierarchical = false): string

@@ -29,7 +29,7 @@ class TaxonomizeNestedTermsTest extends TestCase
     {
         $entry = tap(Entry::make()->collection('blog')->slug('show')->data([
             'title' => 'Show',
-            'categories' => ['events/concerts'],
+            'categories' => ['events > concerts'],
         ]))->save();
 
         $this->assertNotNull(Term::find('categories::events'));
@@ -49,7 +49,7 @@ class TaxonomizeNestedTermsTest extends TestCase
             fn ($association) => $association['slug'] === 'concerts' && $association['entry'] === $entry->id()
         ));
         $this->assertFalse($associations->contains(
-            fn ($association) => $association['slug'] === 'eventsconcerts'
+            fn ($association) => $association['slug'] === 'events-concerts'
         ));
     }
 
@@ -58,7 +58,7 @@ class TaxonomizeNestedTermsTest extends TestCase
     {
         tap(Entry::make()->collection('blog')->slug('show')->data([
             'title' => 'Show',
-            'categories' => ['events/concerts/jazz'],
+            'categories' => ['events > concerts > jazz'],
         ]))->save();
 
         $this->assertEquals([
@@ -86,7 +86,7 @@ class TaxonomizeNestedTermsTest extends TestCase
 
         tap(Entry::make()->collection('blog')->slug('show')->data([
             'title' => 'Show',
-            'categories' => ['animals/cat', 'furniture/sofa'],
+            'categories' => ['animals > cat', 'furniture > sofa'],
         ]))->save();
 
         $this->assertNotNull(Term::find('categories::sofa'));
@@ -102,14 +102,14 @@ class TaxonomizeNestedTermsTest extends TestCase
     }
 
     #[Test]
-    public function a_flat_taxonomy_does_not_create_a_hierarchy_from_slashes()
+    public function a_flat_taxonomy_does_not_create_a_hierarchy_from_the_delimiter()
     {
         tap(Taxonomy::make('tags'))->save();
         Collection::findByHandle('blog')->taxonomies(['categories', 'tags'])->save();
 
         tap(Entry::make()->collection('blog')->slug('show')->data([
             'title' => 'Show',
-            'tags' => ['events/concerts'],
+            'tags' => ['events > concerts'],
         ]))->save();
 
         $this->assertNull(Term::find('tags::concerts'));
@@ -118,7 +118,27 @@ class TaxonomizeNestedTermsTest extends TestCase
         $associations = Stache::store('terms')->store('tags')->index('associations')->items();
 
         $this->assertTrue($associations->contains(
-            fn ($association) => $association['slug'] === 'eventsconcerts'
+            fn ($association) => $association['slug'] === 'events-concerts'
+        ));
+    }
+
+    #[Test]
+    public function a_slash_is_now_an_ordinary_character_in_a_typed_term_value()
+    {
+        $entry = tap(Entry::make()->collection('blog')->slug('show')->data([
+            'title' => 'Show',
+            'categories' => ['AC/DC'],
+        ]))->save();
+
+        // A slash is no longer the delimiter, so this doesn't create a nested "ac" -> "dc" path.
+        $this->assertNull(Term::find('categories::ac'));
+        $this->assertNull(Term::find('categories::dc'));
+        $this->assertNotNull(Term::find('categories::acdc'));
+
+        $associations = Stache::store('terms')->store('categories')->index('associations')->items();
+
+        $this->assertTrue($associations->contains(
+            fn ($association) => $association['slug'] === 'acdc' && $association['entry'] === $entry->id()
         ));
     }
 
@@ -129,7 +149,7 @@ class TaxonomizeNestedTermsTest extends TestCase
             'title' => 'Show',
         ]))->save();
 
-        $entry->set('categories', ['plants/fern'])->save();
+        $entry->set('categories', ['plants > fern'])->save();
 
         $this->assertNotNull(Term::find('categories::plants'));
         $this->assertNotNull(Term::find('categories::fern'));
@@ -151,7 +171,7 @@ class TaxonomizeNestedTermsTest extends TestCase
 
         $slug = (new EnsuresTermPaths)->ensure(
             Taxonomy::findByHandle('categories'),
-            'events/concerts/jazz',
+            'events > concerts > jazz',
             'en',
             fn () => false
         );
@@ -173,7 +193,7 @@ class TaxonomizeNestedTermsTest extends TestCase
 
         tap(Entry::make()->collection('blog')->slug('show')->data([
             'title' => 'Show',
-            'categories' => ['events/concerts/jazz'],
+            'categories' => ['events > concerts > jazz'],
         ]))->save();
     }
 }

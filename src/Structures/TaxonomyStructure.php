@@ -51,7 +51,7 @@ class TaxonomyStructure extends Structure
     }
 
     /**
-     * Get the localized ancestor slug path for a term (e.g. "animals/cat"), or an
+     * Get the localized ancestor URI path for a term (e.g. "animals/cat"), or an
      * empty string for root-level terms. Returns null for terms not in the tree.
      */
     public function termParentUri($term): ?string

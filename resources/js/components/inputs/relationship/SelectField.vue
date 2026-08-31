@@ -129,7 +129,7 @@ export default {
 
         // The `users` fieldtype falls back to displaying a user's email as their title when
         // they have no name, but doesn't show it otherwise, so it needs to be searchable too.
-        // Terms in hierarchical taxonomies expose their slug path (e.g. `animals/cat`) so
+        // Terms in hierarchical taxonomies expose their slug path (e.g. `animals>cat`) so
         // searching a parent surfaces its descendants too.
         searchKeys() {
             if (this.config.type === 'users') return ['title', 'email'];
@@ -232,11 +232,11 @@ export default {
             this.$emit('input', items);
         },
 
-        // A typed term path like `animals/cat/calico` attaches the leaf, so render
+        // A typed term path like `animals > cat > calico` attaches the leaf, so render
         // the badge as `calico · animals » cat` until the save normalizes it.
         newItemFromId(id) {
-            if (this.config.type === 'terms' && typeof id === 'string' && id.includes('/')) {
-                const segments = id.split('/').filter((segment) => segment.trim().length);
+            if (this.config.type === 'terms' && typeof id === 'string' && id.includes('>')) {
+                const segments = id.split('>').map((segment) => segment.trim()).filter(Boolean);
                 const title = segments.pop();
 
                 if (title && segments.length) {
@@ -255,12 +255,12 @@ export default {
         isTypedTermPath(id) {
             return this.config.type === 'terms'
                 && typeof id === 'string'
-                && id.includes('/')
+                && id.includes('>')
                 && !id.includes('::');
         },
 
         termPathSegments(title) {
-            return String(title).split('/').map((segment) => segment.trim()).filter(Boolean);
+            return String(title).split('>').map((segment) => segment.trim()).filter(Boolean);
         },
     },
 };
