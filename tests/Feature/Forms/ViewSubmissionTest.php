@@ -41,7 +41,7 @@ class ViewSubmissionTest extends TestCase
             ->get(cp_route('forms.submissions.show', [$form->handle(), $submission->id()]))
             ->assertSuccessful()
             ->assertInertia(fn ($page) => $page
-                ->component('forms/Submission')
+                ->component('forms/submissions/Show')
                 ->where('entry', null));
     }
 
@@ -61,7 +61,7 @@ class ViewSubmissionTest extends TestCase
             ->get(cp_route('forms.submissions.show', [$form->handle(), $submission->id()]))
             ->assertSuccessful()
             ->assertInertia(fn ($page) => $page
-                ->component('forms/Submission')
+                ->component('forms/submissions/Show')
                 ->where('entry.id', 'event-1')
                 ->where('entry.title', 'Event One')
                 ->where('entry.edit_url', $entry->editUrl())
@@ -82,7 +82,7 @@ class ViewSubmissionTest extends TestCase
             ->get(cp_route('forms.submissions.show', [$form->handle(), $submission->id()]))
             ->assertSuccessful()
             ->assertInertia(fn ($page) => $page
-                ->component('forms/Submission')
+                ->component('forms/submissions/Show')
                 ->where('entry', null));
     }
 
