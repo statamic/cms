@@ -6,6 +6,7 @@ use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Facades\User;
 use Statamic\Fields\Blueprint;
+use Statamic\Search\QueryBuilder as SearchQueryBuilder;
 
 trait QueriesAuthorEntries
 {
@@ -21,10 +22,20 @@ trait QueriesAuthorEntries
             // Exclude entries from other collections (for entries fieldtypes with multiple collections)
             ->whereNotIn('collectionHandle', [$collection->handle()])
             // Include entries with blueprints where the current user is the author
-            ->orWhere(fn ($query) => $query
-                ->whereIn('blueprint', $blueprintsWithAuthor)
-                ->whereHas('author', fn ($query) => $query->where('id', User::current()->id()))
-            )
+            ->orWhere(function ($query) use ($collection, $blueprintsWithAuthor) {
+                $query->whereIn('blueprint', $blueprintsWithAuthor);
+
+                if ($query instanceof SearchQueryBuilder) {
+                    $ids = $collection->queryEntries()
+                        ->whereHas('author', fn ($query) => $query->where('id', User::current()->id()))
+                        ->pluck('id')
+                        ->all();
+
+                    return $query->whereIn('id', $ids);
+                }
+
+                return $query->whereHas('author', fn ($query) => $query->where('id', User::current()->id()));
+            })
             // Include entries with blueprints that don't have an author
             ->orWhereIn('blueprint', $this->blueprintsWithoutAuthor($collection))
         );

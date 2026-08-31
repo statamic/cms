@@ -45,6 +45,31 @@ class ViewEntryListingTest extends TestCase
     }
 
     #[Test]
+    public function it_can_search_entries_without_viewing_other_authors_entries()
+    {
+        $handle = 'view-other-authors-search';
+
+        $this->setTestRole('view-own-entries', [
+            'access cp',
+            "view {$handle} entries",
+        ]);
+
+        $user = tap(User::make()->assignRole('view-own-entries'))->save();
+
+        Blueprint::make('with-author')
+            ->setNamespace("collections/{$handle}")
+            ->ensureField('author', ['type' => 'users'])
+            ->save();
+
+        tap(Collection::make($handle)->searchIndex('default'))->save();
+
+        $this
+            ->actingAs($user)
+            ->get(cp_route('collections.entries.index', ['collection' => $handle, 'search' => 'entry']))
+            ->assertOk();
+    }
+
+    #[Test]
     public function it_shows_only_entries_in_index_for_sites_user_can_access()
     {
         $this->setSites([
