@@ -93,13 +93,10 @@ class Cache
 
             // The clone above is what gets cached, and keeps any replacer placeholders
             // (e.g. nocache regions, CSRF tokens) intact for future requests to expand
-            // per-visitor. Under the ApplicationCacher, prepareResponseToCache() leaves
-            // those placeholders in the live response untouched too (it's the FileCacher
-            // that needs them left in place, for client-side JS to resolve), so they need
-            // expanding here - normally a no-op, except when this content came from a
-            // shared error cache (see RendersHttpExceptions::getCachedError), whose
-            // placeholders were never expanded on the way out.
-            if ($this->cacher instanceof ApplicationCacher) {
+            // per-visitor. This response was served straight out of the shared error
+            // cache though, so it still has those placeholders in it and they need
+            // expanding before it goes out.
+            if (Blink::get('static-cache.shared-error')) {
                 $this->makeReplacements($response);
             }
 
