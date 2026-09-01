@@ -69,6 +69,9 @@ class ManagerTest extends TestCase
             'cp_thumbnail_small_landscape' => ['w' => '400', 'h' => '400', 'fit' => 'contain'],
             'cp_thumbnail_small_portrait' => ['h' => '400', 'fit' => 'contain'],
             'cp_thumbnail_small_square' => ['w' => '400', 'h' => '400'],
+            'cp_thumbnail_large_landscape' => ['w' => '1600', 'h' => '1600', 'fit' => 'contain'],
+            'cp_thumbnail_large_portrait' => ['h' => '1600', 'fit' => 'contain'],
+            'cp_thumbnail_large_square' => ['w' => '1600', 'h' => '1600'],
         ], $this->manager->cpManipulationPresets());
 
         $this->manager->registerCustomManipulationPresets([
@@ -87,6 +90,9 @@ class ManagerTest extends TestCase
             'cp_thumbnail_small_landscape' => ['w' => '400', 'h' => '400', 'fit' => 'contain'],
             'cp_thumbnail_small_portrait' => ['h' => '400', 'fit' => 'contain'],
             'cp_thumbnail_small_square' => ['w' => '400', 'h' => '400'],
+            'cp_thumbnail_large_landscape' => ['w' => '1600', 'h' => '1600', 'fit' => 'contain'],
+            'cp_thumbnail_large_portrait' => ['h' => '1600', 'fit' => 'contain'],
+            'cp_thumbnail_large_square' => ['w' => '1600', 'h' => '1600'],
             'og_image' => ['w' => 1146, 'h' => 600],
             'twitter_image' => ['w' => 1200, 'h' => 600],
         ], $this->manager->manipulationPresets());
