@@ -9,6 +9,7 @@ use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Form;
 use Statamic\Forms\Instance;
+use Statamic\Support\Arr;
 use Tests\Factories\EntryFactory;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -187,7 +188,7 @@ class InstanceTest extends TestCase
 
         $this->assertEquals(
             ['webhook' => [['url' => 'https://example.com/form']]],
-            $form->instance('event-1')->connections()->all()
+            $form->instance('event-1')->connections()->map(fn ($configs) => array_map(fn ($config) => Arr::except($config, 'id'), $configs))->all()
         );
     }
 
