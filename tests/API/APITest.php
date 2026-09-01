@@ -309,6 +309,14 @@ class APITest extends TestCase
             ->assertJsonPath('data.id', 'about')
             ->assertJsonPath('data.title', 'About')
             ->assertJsonMissingPath('data.slug');
+
+        $arrayForm = $this
+            ->get('/api/collections/pages/entries/about?fields[]=id&fields[]=title')
+            ->assertSuccessful()
+            ->json('data');
+
+        $this->assertArrayHasKey('title', $arrayForm);
+        $this->assertArrayHasKey('slug', $arrayForm);
     }
 
     #[Test]

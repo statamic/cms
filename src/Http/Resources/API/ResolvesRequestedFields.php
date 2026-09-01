@@ -12,7 +12,7 @@ trait ResolvesRequestedFields
 
         $fields = $request->input('fields');
 
-        if (! $fields || $fields === '*') {
+        if (! is_string($fields) || $fields === '*') {
             return null;
         }
 
