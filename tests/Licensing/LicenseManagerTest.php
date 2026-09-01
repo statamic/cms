@@ -187,6 +187,41 @@ class LicenseManagerTest extends TestCase
         });
     }
 
+    #[Test]
+    public function licensing_alert_distinguishes_identity_from_license()
+    {
+        config(['statamic.system.site_key' => 'site_abcdefghijklmnopqrstuvwxyz']);
+
+        $alert = $this->managerWithResponse([
+            'public' => false,
+            'statamic' => ['valid' => false, 'reason' => 'unlicensed'],
+            'packages' => [],
+        ])->licensingAlert();
+
+        $this->assertTrue($alert['testing']);
+        $this->assertTrue($alert['hasSiteKey']);
+        $this->assertStringContainsString('Site key found', $alert['message']);
+        $this->assertStringContainsString('trial mode', $alert['message']);
+    }
+
+    #[Test]
+    public function licensing_alert_notes_a_missing_site_key()
+    {
+        config([
+            'statamic.system.site_key' => null,
+            'statamic.system.license_key' => null,
+        ]);
+
+        $alert = $this->managerWithResponse([
+            'public' => true,
+            'statamic' => ['valid' => false, 'reason' => 'unlicensed'],
+            'packages' => [],
+        ])->licensingAlert();
+
+        $this->assertFalse($alert['hasSiteKey']);
+        $this->assertStringContainsString('does not have a site key', $alert['message']);
+    }
+
     private function managerWithResponse(array $response)
     {
         $outpost = $this->mock(Outpost::class);

@@ -143,7 +143,13 @@ class LicenseManager
         return [
             'testing' => $isTestDomain = $this->isOnTestDomain(),
             'message' => $this->invalidLicenseMessage($isTestDomain),
+            'hasSiteKey' => $this->hasSiteKey(),
         ];
+    }
+
+    public function hasSiteKey(): bool
+    {
+        return (bool) $this->site()->key();
     }
 
     public function requestFailureMessage()
@@ -169,28 +175,29 @@ class LicenseManager
     {
         if ($isTestDomain) {
             if ($this->onlyAddonsAreInvalid()) {
-                return __('statamic::messages.licensing_trial_mode_alert_addons');
+                $message = __('statamic::messages.licensing_trial_mode_alert_addons');
+            } elseif ($this->onlyStatamicIsInvalid()) {
+                $message = __('statamic::messages.licensing_trial_mode_alert_statamic');
+            } else {
+                $message = __('statamic::messages.licensing_trial_mode_alert');
             }
-
-            if ($this->onlyStatamicIsInvalid()) {
-                return __('statamic::messages.licensing_trial_mode_alert_statamic');
-            }
-
-            return __('statamic::messages.licensing_trial_mode_alert');
+        } elseif ($this->onlyAddonsAreInvalid()) {
+            $message = __('statamic::messages.licensing_production_alert_addons');
+        } elseif ($this->onlyStatamicIsInvalid()) {
+            $message = $this->statamicNeedsRenewal()
+                ? __('statamic::messages.licensing_production_alert_renew_statamic')
+                : __('statamic::messages.licensing_production_alert_statamic');
+        } else {
+            $message = __('statamic::messages.licensing_production_alert');
         }
 
-        if ($this->onlyAddonsAreInvalid()) {
-            return __('statamic::messages.licensing_production_alert_addons');
-        }
+        return $message.' '.$this->identityMessage();
+    }
 
-        if ($this->onlyStatamicIsInvalid()) {
-            if ($this->statamicNeedsRenewal()) {
-                return __('statamic::messages.licensing_production_alert_renew_statamic');
-            }
-
-            return __('statamic::messages.licensing_production_alert_statamic');
-        }
-
-        return __('statamic::messages.licensing_production_alert');
+    private function identityMessage(): string
+    {
+        return $this->hasSiteKey()
+            ? __('statamic::messages.licensing_site_key_found')
+            : __('statamic::messages.licensing_site_key_missing');
     }
 }
