@@ -19,6 +19,42 @@ class APITest extends TestCase
     use PreventSavingStacheItemsToDisk;
 
     #[Test]
+    public function it_cannot_query_sites_by_default()
+    {
+        $this->assertEndpointNotFound('/api/sites');
+    }
+
+    #[Test]
+    public function it_queries_sites()
+    {
+        Facades\Config::set('statamic.api.resources.sites', true);
+
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+            'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
+        ]);
+
+        $this
+            ->get('/api/sites')
+            ->assertSuccessful()
+            ->assertExactJson(['data' => [
+                ['handle' => 'en', 'name' => 'English', 'locale' => 'en_US', 'short_locale' => 'en', 'url' => 'http://test.com'],
+                ['handle' => 'fr', 'name' => 'French', 'locale' => 'fr_FR', 'short_locale' => 'fr', 'url' => 'http://fr.test.com'],
+                ['handle' => 'de', 'name' => 'German', 'locale' => 'de_DE', 'short_locale' => 'de', 'url' => 'http://test.com/de'],
+            ]]);
+    }
+
+    #[Test]
+    public function it_pongs_when_pinged()
+    {
+        $this
+            ->get('/api/ping')
+            ->assertSuccessful()
+            ->assertExactJson(['ping' => 'pong']);
+    }
+
+    #[Test]
     public function not_found_responses_are_formatted_with_json()
     {
         $this
