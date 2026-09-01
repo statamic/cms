@@ -94,12 +94,14 @@ class SiteLicenseTest extends TestCase
         config(['statamic.system.license_key' => 'test-key']);
 
         $this->assertEquals('https://statamic.com/account/sites/test-key', $this->license()->url());
+        $this->assertEquals('https://statamic.com/licensing/handoff?key=test-key', $this->license()->handoffUrl());
     }
 
     #[Test]
     public function it_gets_the_edit_url_without_a_key()
     {
         $this->assertEquals('https://statamic.com/account/sites/create', $this->license()->url());
+        $this->assertNull($this->license()->handoffUrl());
     }
 
     #[Test]

@@ -21,6 +21,13 @@ const props = defineProps([
 
         <Header :title="__('Licensing')" icon="license">
             <Button
+                v-if="site.handoffUrl"
+                :href="site.handoffUrl"
+                target="_blank"
+                variant="primary"
+                :text="__('License this site')"
+            />
+            <Button
                 :href="site.url"
                 target="_blank"
                 :text="__('Manage on statamic.com')"

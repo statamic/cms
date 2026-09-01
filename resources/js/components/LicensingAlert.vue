@@ -9,6 +9,7 @@ const { alert } = licensing;
 const message = ref(alert?.message);
 const testing = ref(alert?.testing);
 const manageUrl = ref(alert?.manageUrl);
+const handoffUrl = ref(alert?.handoffUrl);
 const key = 'statamic.snooze_license_banner';
 const open = ref(localStorage.getItem(key) < new Date().valueOf());
 const snoozeMinutes = computed(() => testing.value ? (24 * 60) : 5);
@@ -42,6 +43,7 @@ function manageLicenses() {
         <template #footer>
             <div class="flex items-center justify-end space-x-3 pt-3 pb-1">
                 <Button @click="snooze" :text="__('Snooze')" variant="ghost" tabindex="-1" />
+                <Button v-if="handoffUrl" :href="handoffUrl" target="_blank" :text="__('License this site')" />
                 <Button v-if="manageUrl" @click="manageLicenses" :text="__('Manage Licenses')" />
             </div>
         </template>

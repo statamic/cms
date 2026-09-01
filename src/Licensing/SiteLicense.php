@@ -64,4 +64,13 @@ class SiteLicense extends License
 
         return $url;
     }
+
+    public function handoffUrl(): ?string
+    {
+        if (! $key = $this->key()) {
+            return null;
+        }
+
+        return 'https://statamic.com/licensing/handoff?'.http_build_query(['key' => $key]);
+    }
 }

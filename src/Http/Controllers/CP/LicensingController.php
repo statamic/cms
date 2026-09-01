@@ -19,6 +19,7 @@ class LicensingController extends CpController
             'requestError' => $licenses->requestFailed(),
             'site' => [
                 'url' => $site->url(),
+                'handoffUrl' => $site->handoffUrl(),
                 'key' => $site->key(),
                 'valid' => $site->valid(),
                 'domain' => $site->domain(),

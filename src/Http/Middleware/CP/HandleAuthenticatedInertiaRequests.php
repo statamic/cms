@@ -82,6 +82,7 @@ class HandleAuthenticatedInertiaRequests
             'alert' => ($alert = $licenses->licensingAlert()) ? [
                 ...$alert,
                 'manageUrl' => User::current()->can('access licensing utility') ? cp_route('utilities.licensing') : null,
+                'handoffUrl' => $licenses->site()->handoffUrl(),
             ] : null,
         ];
     }
