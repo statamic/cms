@@ -4,6 +4,7 @@ namespace Tests\API;
 
 use Facades\Statamic\CP\LivePreview;
 use Facades\Statamic\Fields\BlueprintRepository;
+use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades;
@@ -279,6 +280,80 @@ class APITest extends TestCase
 
         $this->assertEndpointNotFound('/api/asset-containers/main');
         $this->assertEndpointSuccessful('/api/asset-containers/avatars');
+    }
+
+    #[Test]
+    public function it_selects_entry_fields()
+    {
+        Facades\Config::set('statamic.api.resources.collections', true);
+
+        Facades\Collection::make('pages')->save();
+        Facades\Entry::make()->collection('pages')->id('about')->slug('about')->published(true)->data(['title' => 'About'])->save();
+
+        $full = $this->get('/api/collections/pages/entries/about')->assertSuccessful()->json('data');
+
+        $this->assertArrayHasKey('title', $full);
+        $this->assertArrayHasKey('slug', $full);
+        $this->assertGreaterThan(2, count($full));
+
+        $this
+            ->get('/api/collections/pages/entries?fields=id,title')
+            ->assertSuccessful()
+            ->assertJsonPath('data.0.id', 'about')
+            ->assertJsonPath('data.0.title', 'About')
+            ->assertJsonMissingPath('data.0.slug');
+
+        $this
+            ->get('/api/collections/pages/entries/about?fields=id,title')
+            ->assertSuccessful()
+            ->assertJsonPath('data.id', 'about')
+            ->assertJsonPath('data.title', 'About')
+            ->assertJsonMissingPath('data.slug');
+
+        $arrayForm = $this
+            ->get('/api/collections/pages/entries/about?fields[]=id&fields[]=title')
+            ->assertSuccessful()
+            ->json('data');
+
+        $this->assertArrayHasKey('title', $arrayForm);
+        $this->assertArrayHasKey('slug', $arrayForm);
+    }
+
+    #[Test]
+    public function it_selects_asset_fields()
+    {
+        Facades\Config::set('statamic.api.resources.assets', true);
+
+        config(['filesystems.disks.test' => [
+            'driver' => 'local',
+            'root' => __DIR__.'/tmp',
+        ]]);
+
+        Storage::fake('test');
+        Storage::disk('test')->put('foo.jpg', '');
+
+        Facades\AssetContainer::make('main')->disk('test')->save();
+        Facades\Asset::make()->container('main')->path('foo.jpg')->data(['alt' => 'A picture'])->save();
+
+        $full = $this->get('/api/assets/main/foo.jpg')->assertSuccessful()->json('data');
+
+        $this->assertArrayHasKey('alt', $full);
+        $this->assertArrayHasKey('url', $full);
+        $this->assertGreaterThan(2, count($full));
+
+        $this
+            ->get('/api/assets/main?fields=id,alt')
+            ->assertSuccessful()
+            ->assertJsonPath('data.0.id', 'main::foo.jpg')
+            ->assertJsonPath('data.0.alt', 'A picture')
+            ->assertJsonMissingPath('data.0.url');
+
+        $this
+            ->get('/api/assets/main/foo.jpg?fields=id,alt')
+            ->assertSuccessful()
+            ->assertJsonPath('data.id', 'main::foo.jpg')
+            ->assertJsonPath('data.alt', 'A picture')
+            ->assertJsonMissingPath('data.url');
     }
 
     #[Test]
