@@ -76,7 +76,7 @@
                                                 :index="index"
                                                 :enabled="canAddSet"
                                                 :is-first="index === 0"
-                                                :show-connector="showCardEntryConnector(index)"
+                                                :show-connector="showPickerConnector(index)"
                                                 :loading-set="loadingSet"
                                                 @added="addSet"
                                             />
@@ -289,6 +289,18 @@ export default {
             }
 
             return this.showSetConnector(index);
+        },
+
+        showPickerConnector(index) {
+            if (this.showCardEntryConnector(index)) {
+                return true;
+            }
+
+            const layout = this.cardLayouts[index];
+
+            return layout.isCard
+                && layout.groupSize > 1
+                && layout.positionInGroup !== 0;
         },
 
         cardGroupColumns(count) {

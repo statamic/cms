@@ -17,6 +17,7 @@
             >
                 <div
                     v-if="showConnector"
+                    data-replicator-connector
                     class="absolute group-focus-within:opacity-0 transition-opacity group-focus-within:transition-none delay-10 duration-250 inset-y-0 left-3.5 border-l-1 border-gray-400 dark:border-gray-600 border-dashed z-0 dark:bg-gray-850"
                     :class="{
                         'group-hover:opacity-0': enabled,

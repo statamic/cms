@@ -1,5 +1,26 @@
 /* GROUP REPLICATOR CARD SETS
 =================================================== */
+.replicator-card-set-row-start {
+    --pull: 1.5rem;
+
+    &:not(.replicator-card-set-has-entry-connector) {
+        [data-ui-popover-trigger] {
+            position: absolute;
+            z-index: var(--z-index-above);
+            transform: translateY(calc(0% - var(--pull)));
+            width: 100%;
+        }
+    }
+
+    &.replicator-card-set-has-entry-connector {
+        [data-ui-popover-trigger] {
+            position: relative;
+            z-index: var(--z-index-above);
+            width: 100%;
+        }
+    }
+}
+
 @container panel (width > 635px) {
     .replicator-set-list {
         display: flex;
@@ -41,6 +62,10 @@
         position: relative;
         margin-block-start: 1.5rem;
 
+        [data-replicator-connector] {
+            display: none;
+        }
+
         [data-ui-popover-trigger] {
             position: absolute;
             inset: 0;
@@ -65,32 +90,13 @@
         }
     }
 
-    .replicator-card-set-row-start {
-        --pull: 1.5rem;
-
-        &:not(.replicator-card-set-has-entry-connector) {
-            [data-ui-popover-trigger] {
-                position: absolute;
-                z-index: var(--z-index-above);
-                transform: translateY(calc(0% - var(--pull)));
-                width: 100%;
-            }
+    .replicator-card-set-row-start.replicator-card-set-has-entry-connector {
+        &.replicator-set-slot--card-cols-2 [data-ui-popover-trigger] {
+            width: calc(200% + 0.75rem);
         }
 
-        &.replicator-card-set-has-entry-connector {
-            [data-ui-popover-trigger] {
-                position: relative;
-                z-index: var(--z-index-above);
-                width: 100%;
-            }
-
-            &.replicator-set-slot--card-cols-2 [data-ui-popover-trigger] {
-                width: calc(200% + 0.75rem);
-            }
-
-            &.replicator-set-slot--card-cols-3 [data-ui-popover-trigger] {
-                width: calc(300% + 1.5rem);
-            }
+        &.replicator-set-slot--card-cols-3 [data-ui-popover-trigger] {
+            width: calc(300% + 1.5rem);
         }
     }
 }
