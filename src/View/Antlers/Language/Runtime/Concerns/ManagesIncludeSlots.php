@@ -2,6 +2,7 @@
 
 namespace Statamic\View\Antlers\Language\Runtime\Concerns;
 
+use RuntimeException;
 use Statamic\Tags\IncludeTag;
 use Statamic\View\Antlers\Language\Nodes\AntlersNode;
 use Statamic\View\Antlers\Language\Nodes\LiteralNode;
@@ -29,7 +30,11 @@ trait ManagesIncludeSlots
             }
 
             if ($this->isNamedSlotNode($child)) {
-                $namedSlots[$child->name->methodPart] = $child;
+                if (array_key_exists($name = $child->name->methodPart, $namedSlots)) {
+                    throw new RuntimeException("The include tag cannot define the [{$name}] slot more than once.");
+                }
+
+                $namedSlots[$name] = $child;
 
                 continue;
             }

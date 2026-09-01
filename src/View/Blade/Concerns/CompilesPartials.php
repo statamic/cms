@@ -131,6 +131,18 @@ trait CompilesPartials
             $slots
         );
 
+        if ($isInclude) {
+            $seen = [];
+
+            foreach ($compiledSlots as [$name]) {
+                if (isset($seen[$name])) {
+                    throw new InvalidArgumentException("The include tag cannot define the [{$name}] slot more than once.");
+                }
+
+                $seen[$name] = true;
+            }
+        }
+
         if ($isInclude && Str::snake($method) !== 'exists') {
             if (trim($newContent) !== '') {
                 $compiledSlots[] = ['slot', $this->compile($newContent)];

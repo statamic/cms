@@ -120,6 +120,26 @@ EXPECTED;
     }
 
     #[Test]
+    public function it_rejects_duplicate_named_slots()
+    {
+        $this->viewShouldReturnRaw('w', '<d>{{ $slot }}</d>', 'blade.php');
+
+        $template = <<<'BLADE'
+<s:include:w>
+    <s:slot:a>AAA</s:slot:a>D1
+    <s:slot:b>BBB</s:slot:b>D2
+    <s:slot:c>CCC</s:slot:c>D3
+    <s:slot:a>AAA2</s:slot:a>
+</s:include:w>
+BLADE;
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The include tag cannot define the [a] slot more than once.');
+
+        Blade::render($template);
+    }
+
+    #[Test]
     public function it_compiles_scoped_slots()
     {
         $this->viewShouldReturnRaw('list', "@foreach(\$rows as \$person)<s:slot:row :name=\"\$person['name']\" :index=\"\$loop->iteration\" />@endforeach", 'blade.php');

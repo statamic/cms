@@ -3,6 +3,7 @@
 namespace Tests\Antlers\Runtime\Includes;
 
 use Illuminate\Support\Facades\Blade;
+use RuntimeException;
 use Statamic\Tags\Tags;
 use Tests\Antlers\ParserTestCase;
 use Tests\FakesViews;
@@ -157,6 +158,43 @@ class SlotsTest extends ParserTestCase
         $this->viewShouldReturnRaw('card', '<h>{{ slot:header }}fallback{{ /slot:header }}</h>');
 
         $this->assertSame('<h></h>', $this->render('{{ include:card }}body{{ /include:card }}'));
+    }
+
+    public function test_named_slots_interleaved_with_default_content_render_in_document_order()
+    {
+        $this->viewShouldReturnRaw('w', '<a>{{ slot:a }}</a><b>{{ slot:b }}</b><c>{{ slot:c }}</c><d>{{ slot }}</d>');
+
+        $template = <<<'ANTLERS'
+{{ include:w }}
+    {{ slot:a }}AAA{{ /slot:a }}D1
+    {{ slot:b }}BBB{{ /slot:b }}D2
+    {{ slot:c }}CCC{{ /slot:c }}D3
+{{ /include:w }}
+ANTLERS;
+
+        $this->assertSame(
+            '<a>AAA</a><b>BBB</b><c>CCC</c><d>D1D2D3</d>',
+            preg_replace('/\s+/', '', $this->render($template))
+        );
+    }
+
+    public function test_a_named_slot_cannot_be_defined_more_than_once()
+    {
+        $this->viewShouldReturnRaw('w', '<d>{{ nocache }}{{ slot }}{{ /nocache }}</d>');
+
+        $template = <<<'ANTLERS'
+{{ include:w }}
+    {{ slot:a }}AAA{{ /slot:a }}D1
+    {{ slot:b }}BBB{{ /slot:b }}D2
+    {{ slot:c }}CCC{{ /slot:c }}D3
+    {{ slot:a }}AAA2{{ /slot:a }}
+{{ /include:w }}
+ANTLERS;
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The include tag cannot define the [a] slot more than once.');
+
+        $this->render($template);
     }
 
     public function test_forwarding_a_slot_to_a_nested_include_does_not_clobber_the_outer_one()
