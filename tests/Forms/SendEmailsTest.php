@@ -155,7 +155,7 @@ class SendEmailsTest extends TestCase
             'to' => 'first@recipient.com',
         ]))->save();
 
-        $form->blueprint()->ensureField('attachments', ['type' => 'files'])->save();
+        $form->blueprint()->ensureField('attachments', ['type' => 'files']);
 
         $submission = $form->makeSubmission()->data(['attachments' => ['1234567/file.txt']]);
 
