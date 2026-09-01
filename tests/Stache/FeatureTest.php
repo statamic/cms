@@ -313,6 +313,32 @@ class FeatureTest extends TestCase
     }
 
     #[Test]
+    public function it_excludes_deleted_entries_when_building_a_value_index()
+    {
+        config(['statamic.stache.watcher' => false]);
+
+        $entry = tap(Entry::make()
+            ->locale('en')
+            ->id('stale-entry')
+            ->collection(Collection::findByHandle('blog'))
+            ->slug('stale-entry')
+            ->date('2017-07-04')
+            ->data(['title' => 'Stale Entry', 'foo' => 'bar'])
+        )->save();
+
+        $path = $entry->path();
+
+        Entry::all();
+
+        File::delete($path);
+        $this->stache->cacheStore()->forget('stache::items::entries::blog::'.$entry->id());
+
+        $entries = Entry::query()->where('foo', 'bar')->get();
+
+        $this->assertCount(0, $entries);
+    }
+
+    #[Test]
     public function saving_an_entry_with_a_closure_based_slug_resolves_it_before_writing_to_file()
     {
         $entry = tap(Entry::make()
