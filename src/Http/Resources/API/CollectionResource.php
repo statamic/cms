@@ -18,7 +18,10 @@ class CollectionResource extends JsonResource
         return [
             'handle' => $this->resource->handle(),
             'title' => $this->resource->title(),
-            'structure' => $this->resource->structureHandle(),
+            'structure' => $this->resource->hasStructure() ? [
+                'max_depth' => $this->resource->structure()->maxDepth(),
+                'expects_root' => (bool) $this->resource->structure()->expectsRoot(),
+            ] : null,
             'mount' => $this->resource->mount()?->id(),
             'api_url' => Statamic::apiRoute('collections.show', [$this->resource->handle()]),
         ];

@@ -59,7 +59,7 @@ class APITest extends TestCase
     {
         Facades\Config::set('statamic.api.resources.collections', true);
 
-        Facades\Collection::make('pages')->title('Pages')->structureContents(['expects_root' => false])->mount('home')->save();
+        Facades\Collection::make('pages')->title('Pages')->structureContents(['root' => true, 'max_depth' => 3])->mount('home')->save();
         Facades\Entry::make()->collection('pages')->id('home')->slug('home')->published(true)->save();
         Facades\Collection::make('articles')->title('Articles')->save();
 
@@ -70,7 +70,10 @@ class APITest extends TestCase
                 [
                     'handle' => 'pages',
                     'title' => 'Pages',
-                    'structure' => 'pages',
+                    'structure' => [
+                        'max_depth' => 3,
+                        'expects_root' => true,
+                    ],
                     'mount' => 'home',
                     'api_url' => 'http://localhost/api/collections/pages',
                 ],
@@ -89,7 +92,10 @@ class APITest extends TestCase
             ->assertExactJson(['data' => [
                 'handle' => 'pages',
                 'title' => 'Pages',
-                'structure' => 'pages',
+                'structure' => [
+                    'max_depth' => 3,
+                    'expects_root' => true,
+                ],
                 'mount' => 'home',
                 'api_url' => 'http://localhost/api/collections/pages',
             ]]);
