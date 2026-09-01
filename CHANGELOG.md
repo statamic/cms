@@ -1,5 +1,10 @@
 # Release Notes
 
+## Unreleased
+
+### What's new
+- Generate a `STATAMIC_SITE_KEY` on install to identify a project across environments. A site key is not a license — attach one with `php please license` or the Control Panel.
+
 ## 6.30.0 (2026-08-28)
 
 ### What's new
