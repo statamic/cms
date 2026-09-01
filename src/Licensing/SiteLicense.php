@@ -14,7 +14,13 @@ class SiteLicense extends License
 
     public function usesIncorrectKeyFormat()
     {
-        return ! preg_match('/^[a-zA-Z0-9]{16}$/', $this->key());
+        $key = $this->key();
+
+        if (! $key) {
+            return false;
+        }
+
+        return ! preg_match('/^(?:site_[a-zA-Z0-9]{26}|[a-zA-Z0-9]{16})$/', $key);
     }
 
     public function hasDomains()

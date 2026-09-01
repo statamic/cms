@@ -168,7 +168,7 @@ return [
     'licensing_error_outside_license_range' => 'License valid for versions :start and :end',
     'licensing_error_unknown_site' => 'Unknown site',
     'licensing_error_unlicensed' => 'Unlicensed',
-    'licensing_incorrect_key_format_body' => 'Your site key format is incorrect. Site keys are 16-character alphanumeric strings. Get your current key from your account at <a href="https://statamic.com" class="underline">statamic.com</a>. Do not use legacy UUID license keys.',
+    'licensing_incorrect_key_format_body' => 'Your site key format is incorrect. Site keys look like <code>site_</code> followed by 26 characters, or a legacy 16-character alphanumeric key. Get your current key from your account at <a href="https://statamic.com" class="underline">statamic.com</a>. Do not use UUID license keys.',
     'licensing_incorrect_key_format_heading' => 'Incorrect site key format',
     'licensing_production_alert' => 'This site is running Statamic Pro and commercial addons on a production domain. To continue using these features, please ensure you have valid licenses.',
     'licensing_production_alert_addons' => 'This site is using commercial addons on a production domain. To continue using these features, please ensure you have valid licenses.',

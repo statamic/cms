@@ -62,6 +62,33 @@ class SiteLicenseTest extends TestCase
     }
 
     #[Test]
+    public function it_accepts_the_site_key_format()
+    {
+        config(['statamic.system.site_key' => 'site_abcdefghijklmnopqrstuvwxyz']);
+
+        $this->assertFalse($this->license()->usesIncorrectKeyFormat());
+    }
+
+    #[Test]
+    public function it_rejects_a_truncated_site_key()
+    {
+        config(['statamic.system.site_key' => 'site_tooshort']);
+
+        $this->assertTrue($this->license()->usesIncorrectKeyFormat());
+    }
+
+    #[Test]
+    public function it_does_not_flag_a_missing_key_as_incorrect_format()
+    {
+        config([
+            'statamic.system.site_key' => null,
+            'statamic.system.license_key' => null,
+        ]);
+
+        $this->assertFalse($this->license()->usesIncorrectKeyFormat());
+    }
+
+    #[Test]
     public function it_gets_the_url_with_a_key()
     {
         config(['statamic.system.license_key' => 'test-key']);
