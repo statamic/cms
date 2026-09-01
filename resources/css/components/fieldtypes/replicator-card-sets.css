@@ -23,12 +23,14 @@
     min-width: 0;
 }
 
-.replicator-set-slot--full .publish-fields,
-.replicator-set-slot--card-cols-1 .publish-fields,
-.replicator-set-slot--card-cols-2 .publish-fields,
-.replicator-set-slot--card-cols-3 .publish-fields {
-    /* Prevent columns and gaps exceeding the container */
-    grid-column-gap: unset;
+.replicator-set-slot--full,
+.replicator-set-slot--card-cols-1,
+.replicator-set-slot--card-cols-2,
+.replicator-set-slot--card-cols-3 {
+    .publish-fields {
+        /* Prevent columns and gaps exceeding the container */
+        grid-column-gap: unset;
+    }
 }
 
 .replicator-card-set-inset-picker:not(.replicator-card-set-row-start) {
@@ -52,31 +54,31 @@
     }
 }
 
-.replicator-card-set-row-start:not(.replicator-card-set-has-entry-connector) {
+.replicator-card-set-row-start {
     --pull: 1.5rem;
 
-    [data-ui-popover-trigger] {
-        position: absolute;
-        z-index: var(--z-index-above);
-        transform: translateY(calc(0% - var(--pull)));
-        width: 100%;
+    &:not(.replicator-card-set-has-entry-connector) {
+        [data-ui-popover-trigger] {
+            position: absolute;
+            z-index: var(--z-index-above);
+            transform: translateY(calc(0% - var(--pull)));
+            width: 100%;
+        }
     }
-}
 
-.replicator-card-set-row-start.replicator-card-set-has-entry-connector {
-    --pull: 1.5rem;
+    &.replicator-card-set-has-entry-connector {
+        [data-ui-popover-trigger] {
+            position: relative;
+            z-index: var(--z-index-above);
+            width: 100%;
+        }
 
-    [data-ui-popover-trigger] {
-        position: relative;
-        z-index: var(--z-index-above);
-        width: 100%;
+        &.replicator-set-slot--card-cols-2 [data-ui-popover-trigger] {
+            width: calc(200% + 0.75rem);
+        }
+
+        &.replicator-set-slot--card-cols-3 [data-ui-popover-trigger] {
+            width: calc(300% + 1.5rem);
+        }
     }
-}
-
-.replicator-set-slot--card-cols-2.replicator-card-set-row-start.replicator-card-set-has-entry-connector [data-ui-popover-trigger] {
-    width: calc(200% + 0.75rem);
-}
-
-.replicator-set-slot--card-cols-3.replicator-card-set-row-start.replicator-card-set-has-entry-connector [data-ui-popover-trigger] {
-    width: calc(300% + 1.5rem);
 }
