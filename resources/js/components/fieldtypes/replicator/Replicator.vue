@@ -30,7 +30,7 @@
                             @dragend="$emit('blur')"
                             v-slot="{}"
                         >
-                            <div class="replicator-set-list relative">
+                            <div ref="setList" class="replicator-set-list relative">
                                 <div
                                     v-for="(set, index) in value"
                                     :key="set._id"
@@ -441,21 +441,22 @@ export default {
         },
 
         collapseSet(id) {
-            if (!this.collapsed.includes(id)) {
-                this.collapsed.push(id);
-            }
+            const collapsed = new Set(this.collapsed);
+
+            this.cardGroupMemberIds(id).forEach((setId) => collapsed.add(setId));
+
+            this.collapsed = [...collapsed];
         },
 
         expandSet(id) {
+            const ids = this.cardGroupMemberIds(id);
+
             if (this.config.collapse === 'accordion') {
-                this.collapsed = this.value.map((v) => v._id).filter((v) => v !== id);
+                this.collapsed = this.value.map((v) => v._id).filter((v) => !ids.includes(v));
                 return;
             }
 
-            if (this.collapsed.includes(id)) {
-                var index = this.collapsed.indexOf(id);
-                this.collapsed.splice(index, 1);
-            }
+            this.collapsed = this.collapsed.filter((setId) => !ids.includes(setId));
         },
 
         collapseAll() {
@@ -493,6 +494,42 @@ export default {
             }
 
             return this.errorsById.hasOwnProperty(id) && this.errorsById[id].length > 0;
+        },
+
+        cardGroupMemberIds(id) {
+            const index = this.value.findIndex((set) => set._id === id);
+
+            if (index === -1) {
+                return [id];
+            }
+
+            const layout = this.cardLayouts[index];
+
+            if (!layout.isCard || layout.groupSize <= 1) {
+                return [id];
+            }
+
+            const groupStart = index - layout.positionInGroup;
+
+            if (!this.cardsAreDisplayedInParallelRow(groupStart)) {
+                return [id];
+            }
+
+            return this.value
+                .slice(groupStart, groupStart + layout.groupSize)
+                .map((set) => set._id);
+        },
+
+        cardsAreDisplayedInParallelRow(groupStart) {
+            const list = this.$refs.setList;
+            const slot = list?.children[groupStart];
+
+            if (!slot || !list?.clientWidth) {
+                return false;
+            }
+
+            // Stacked cards span the full list width; side-by-side cards are narrower.
+            return slot.offsetWidth < list.clientWidth * 0.85;
         },
     },
 
