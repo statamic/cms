@@ -48,8 +48,15 @@
             top: 0;
             left: calc(0.5rem + 2px);
             height: 100%;
-            width: 0.3rem;
+            width: 0.325rem;
             background: linear-gradient(to bottom, var(--color-gray-200) 0%, var(--color-gray-100) 50%, var(--color-gray-200) 100%);
+        }
+    }
+
+    /* Nudge to account for rounding error / subpixel positioning */
+    &:nth-child(3n + 1) [data-ui-popover-trigger] {
+        [data-insert-handle] {
+            left: calc(0.5rem + 1.5px);
         }
     }
 }
