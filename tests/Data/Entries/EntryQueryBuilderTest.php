@@ -189,6 +189,19 @@ class EntryQueryBuilderTest extends TestCase
     }
 
     #[Test]
+    public function entries_are_found_using_where_date_when_the_app_timezone_is_not_utc()
+    {
+        config()->set('app.timezone', 'Europe/Zurich');
+
+        $this->createWhereDateTestEntries();
+
+        $entries = Entry::query()->whereDate('test_date', Carbon::parse('2021-11-15', 'Europe/Zurich'))->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['Post 1', 'Post 3'], $entries->map->title->all());
+    }
+
+    #[Test]
     public function entries_are_found_using_where_month()
     {
         $this->createWhereDateTestEntries();
@@ -276,6 +289,19 @@ class EntryQueryBuilderTest extends TestCase
         $value = Carbon::create(2021, 11, 13, 12, 0, 0, 'Europe/Moscow');
 
         $entries = Entry::query()->whereTime('test_date', $value)->get();
+
+        $this->assertCount(1, $entries);
+        $this->assertEquals(['Post 2'], $entries->map->title->all());
+    }
+
+    #[Test]
+    public function entries_are_found_using_where_time_when_the_app_timezone_is_not_utc()
+    {
+        config()->set('app.timezone', 'Europe/Zurich');
+
+        $this->createWhereDateTestEntries();
+
+        $entries = Entry::query()->whereTime('test_date', Carbon::parse('2021-11-13 09:00', 'Europe/Zurich'))->get();
 
         $this->assertCount(1, $entries);
         $this->assertEquals(['Post 2'], $entries->map->title->all());

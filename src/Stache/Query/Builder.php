@@ -206,7 +206,7 @@ abstract class Builder extends BaseBuilder
                 return false;
             }
 
-            return $value->copy()->startOfDay()->$method($where['value']);
+            return $value->copy()->setTimezone(config('app.timezone'))->startOfDay()->$method($where['value']);
         });
     }
 
@@ -257,6 +257,8 @@ abstract class Builder extends BaseBuilder
             if (is_null($value)) {
                 return false;
             }
+
+            $value = $value->copy()->setTimezone(config('app.timezone'));
 
             $compareValue = $value->copy()->setTimeFromTimeString($where['value']);
 
