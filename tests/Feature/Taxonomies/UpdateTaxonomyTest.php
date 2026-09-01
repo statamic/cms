@@ -75,6 +75,56 @@ class UpdateTaxonomyTest extends TestCase
         $this->assertTrue($collectionThree->taxonomies()->contains($taxonomy));
     }
 
+    #[Test]
+    public function it_updates_taxonomy_sites_from_enabled_rows_and_ignores_origins()
+    {
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+            'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://de.test.com/'],
+        ]);
+
+        $taxonomy = tap(Taxonomy::make('test')->sites(['en', 'fr']))->save();
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->update($taxonomy, [
+                'sites' => [
+                    ['name' => 'English', 'handle' => 'en', 'enabled' => true, 'origin' => null],
+                    ['name' => 'French', 'handle' => 'fr', 'enabled' => false, 'origin' => 'en'],
+                    ['name' => 'German', 'handle' => 'de', 'enabled' => true, 'origin' => 'en'],
+                ],
+                'preview_targets' => [],
+                'collections' => [],
+            ])
+            ->assertOk();
+
+        $this->assertEquals(['en', 'de'], Taxonomy::findByHandle('test')->sites()->all());
+    }
+
+    #[Test]
+    public function it_updates_taxonomy_sites_from_legacy_handle_array()
+    {
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+            'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://de.test.com/'],
+        ]);
+
+        $taxonomy = tap(Taxonomy::make('test')->sites(['en', 'fr']))->save();
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->update($taxonomy, [
+                'sites' => ['en', 'de'],
+                'preview_targets' => [],
+                'collections' => [],
+            ])
+            ->assertOk();
+
+        $this->assertEquals(['en', 'de'], Taxonomy::findByHandle('test')->sites()->all());
+    }
+
     private function userWithoutPermission()
     {
         $this->setTestRoles(['test' => ['access cp']]);

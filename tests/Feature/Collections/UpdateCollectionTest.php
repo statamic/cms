@@ -153,6 +153,66 @@ class UpdateCollectionTest extends TestCase
         $this->assertEquals(['test', 'link'], $blueprints->map->handle()->values()->all());
     }
 
+    #[Test]
+    public function it_updates_collection_sites_from_enabled_rows_and_ignores_origins()
+    {
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+            'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://de.test.com/'],
+        ]);
+
+        $collection = Collection::make('test')->sites(['en', 'fr'])->save();
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->update($collection, [
+                'sites' => [
+                    ['name' => 'English', 'handle' => 'en', 'enabled' => true, 'origin' => null],
+                    ['name' => 'French', 'handle' => 'fr', 'enabled' => false, 'origin' => 'en'],
+                    ['name' => 'German', 'handle' => 'de', 'enabled' => true, 'origin' => 'en'],
+                ],
+                'origin_behavior' => 'root',
+                'propagate' => true,
+                'structured' => false,
+                'require_slugs' => true,
+                'preview_targets' => [],
+            ])
+            ->assertOk();
+
+        $updated = Collection::findByHandle('test');
+
+        $this->assertEquals(['en', 'de'], $updated->sites()->all());
+        $this->assertEquals('root', $updated->originBehavior());
+        $this->assertTrue($updated->propagate());
+    }
+
+    #[Test]
+    public function it_updates_collection_sites_from_legacy_handle_array()
+    {
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+            'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://de.test.com/'],
+        ]);
+
+        $collection = Collection::make('test')->sites(['en', 'fr'])->save();
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->update($collection, [
+                'sites' => ['en', 'de'],
+                'origin_behavior' => 'root',
+                'propagate' => false,
+                'structured' => false,
+                'require_slugs' => true,
+                'preview_targets' => [],
+            ])
+            ->assertOk();
+
+        $this->assertEquals(['en', 'de'], Collection::findByHandle('test')->sites()->all());
+    }
+
     private function userWithoutPermission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
