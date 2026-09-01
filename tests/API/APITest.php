@@ -357,6 +357,65 @@ class APITest extends TestCase
     }
 
     #[Test]
+    public function it_filters_entries_by_site_query_param()
+    {
+        Facades\Config::set('statamic.api.resources.collections', true);
+
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://localhost/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://localhost/fr/'],
+        ]);
+
+        Facades\Collection::make('pages')->sites(['en', 'fr'])->save();
+        Facades\Entry::make()->collection('pages')->locale('en')->id('about')->slug('about')->published(true)->data(['title' => 'About'])->save();
+        Facades\Entry::make()->collection('pages')->locale('fr')->origin('about')->id('about-fr')->slug('a-propos')->published(true)->data(['title' => 'A propos'])->save();
+
+        $this->assertEndpointDataCount('/api/collections/pages/entries', 2);
+        $this->assertEndpointDataCount('/api/collections/pages/entries?site=fr', 1);
+
+        $this
+            ->get('/api/collections/pages/entries?site=fr')
+            ->assertSuccessful()
+            ->assertJsonPath('data.0.id', 'about-fr')
+            ->assertJsonPath('data.0.title', 'A propos');
+
+        $this
+            ->get('/api/collections/pages/entries/about?site=fr')
+            ->assertSuccessful()
+            ->assertJsonPath('data.id', 'about-fr')
+            ->assertJsonPath('data.title', 'A propos');
+
+        $this->assertEndpointNotFound('/api/collections/pages/entries/about?site=bogus');
+    }
+
+    #[Test]
+    public function it_filters_terms_by_site_query_param()
+    {
+        Facades\Config::set('statamic.api.resources.taxonomies', true);
+
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://localhost/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://localhost/fr/'],
+        ]);
+
+        Facades\Taxonomy::make('topics')->sites(['en', 'fr'])->save();
+        Facades\Term::make()->taxonomy('topics')->slug('dance')->dataForLocale('en', ['title' => 'Dance'])->save();
+        Facades\Term::find('topics::dance')->in('fr')->data(['title' => 'Danse'])->save();
+
+        $this
+            ->get('/api/taxonomies/topics/terms?site=fr')
+            ->assertSuccessful()
+            ->assertJsonPath('data.0.title', 'Danse');
+
+        $this
+            ->get('/api/taxonomies/topics/terms/dance?site=fr')
+            ->assertSuccessful()
+            ->assertJsonPath('data.title', 'Danse');
+
+        $this->assertEndpointNotFound('/api/taxonomies/topics/terms/dance?site=bogus');
+    }
+
+    #[Test]
     public function it_pongs_when_pinged()
     {
         $this
@@ -716,9 +775,9 @@ class APITest extends TestCase
         Facades\Entry::make()->collection('pages')->id('jazz')->slug('jazz')->published(true)->save();
 
         $this
-            ->get('/api/collections/pages/entries?limit=2&sort=-date&filter[published]=true&unknown=param')
-            ->assertJsonPath('links.first', 'http://localhost/api/collections/pages/entries?filter%5Bpublished%5D=true&limit=2&sort=-date&page=1')
-            ->assertJsonPath('links.next', 'http://localhost/api/collections/pages/entries?filter%5Bpublished%5D=true&limit=2&sort=-date&page=2');
+            ->get('/api/collections/pages/entries?limit=2&sort=-date&filter[published]=true&fields=id,title&site=en&unknown=param')
+            ->assertJsonPath('links.first', 'http://localhost/api/collections/pages/entries?filter%5Bpublished%5D=true&limit=2&sort=-date&fields=id%2Ctitle&site=en&page=1')
+            ->assertJsonPath('links.next', 'http://localhost/api/collections/pages/entries?filter%5Bpublished%5D=true&limit=2&sort=-date&fields=id%2Ctitle&site=en&page=2');
     }
 
     #[Test]
