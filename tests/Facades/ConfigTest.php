@@ -66,6 +66,20 @@ class ConfigTest extends TestCase
     }
 
     #[Test]
+    public function gets_license_key_prefers_site_key()
+    {
+        config([
+            'statamic.system.site_key' => 'site_abcdefghijklmnopqrstuvwxyz',
+            'statamic.system.license_key' => 'legacy',
+        ]);
+
+        $this->assertEquals('site_abcdefghijklmnopqrstuvwxyz', Config::getLicenseKey());
+
+        config(['statamic.system.site_key' => '']);
+        $this->assertEquals('legacy', Config::getLicenseKey());
+    }
+
+    #[Test]
     public function gets_site()
     {
         $this->fakeSiteConfig();

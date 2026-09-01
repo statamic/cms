@@ -24,6 +24,28 @@ class SiteLicenseTest extends TestCase
     }
 
     #[Test]
+    public function it_prefers_the_site_key_over_the_legacy_license_key()
+    {
+        config([
+            'statamic.system.site_key' => 'site_abcdefghijklmnopqrstuvwxyz',
+            'statamic.system.license_key' => 'aRadLicenseKey42',
+        ]);
+
+        $this->assertEquals('site_abcdefghijklmnopqrstuvwxyz', $this->license()->key());
+    }
+
+    #[Test]
+    public function it_falls_back_to_the_legacy_license_key()
+    {
+        config([
+            'statamic.system.site_key' => null,
+            'statamic.system.license_key' => 'aRadLicenseKey42',
+        ]);
+
+        $this->assertEquals('aRadLicenseKey42', $this->license()->key());
+    }
+
+    #[Test]
     public function it_checks_for_incorrect_key_format()
     {
         config(['statamic.system.license_key' => 'test-key']);

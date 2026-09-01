@@ -2,13 +2,14 @@
 
 namespace Statamic\Licensing;
 
+use Statamic\Facades\Config;
 use Statamic\Support\Arr;
 
 class SiteLicense extends License
 {
     public function key()
     {
-        return config('statamic.system.license_key');
+        return Config::getLicenseKey();
     }
 
     public function usesIncorrectKeyFormat()

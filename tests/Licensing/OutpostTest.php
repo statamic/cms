@@ -57,6 +57,17 @@ class OutpostTest extends TestCase
     }
 
     #[Test]
+    public function the_payload_key_prefers_the_site_key()
+    {
+        config([
+            'statamic.system.site_key' => 'site_abcdefghijklmnopqrstuvwxyz',
+            'statamic.system.license_key' => 'legacy-license',
+        ]);
+
+        $this->assertEquals('site_abcdefghijklmnopqrstuvwxyz', $this->outpost()->payload()['key']);
+    }
+
+    #[Test]
     public function it_contacts_the_outpost_and_caches_the_response()
     {
         $outpost = $this->outpostWithJsonResponse(['foo' => 'bar']);

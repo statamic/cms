@@ -18,6 +18,7 @@ use InvalidArgumentException;
 use RuntimeException;
 use Statamic\Facades;
 use Statamic\Facades\Addon;
+use Statamic\Facades\Config;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
 
@@ -114,7 +115,7 @@ class Outpost
     public function payload()
     {
         return [
-            'key' => config('statamic.system.license_key'),
+            'key' => Config::getLicenseKey(),
             'host' => request()->getHost(),
             'ip' => request()->server('SERVER_ADDR'),
             'port' => request()->server('SERVER_PORT'),

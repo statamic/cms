@@ -53,19 +53,23 @@ class Config
     }
 
     /**
-     * Get the license key.
+     * Get the effective site/license key.
+     *
+     * Prefers STATAMIC_SITE_KEY, then the legacy STATAMIC_LICENSE_KEY.
      *
      * @return string|null
      */
     public function getLicenseKey()
     {
-        $key = $this->get('statamic.system.license_key');
+        foreach (['statamic.system.site_key', 'statamic.system.license_key'] as $configKey) {
+            $key = $this->get($configKey);
 
-        if (! $key || $key == '') {
-            return null;
+            if ($key) {
+                return $key;
+            }
         }
 
-        return $key;
+        return null;
     }
 
     public function getSite($locale = null)
