@@ -301,8 +301,20 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
     {
         return $this->fluentlyGetOrSet('connections')
             ->getter(fn ($connections) => collect($connections))
-            ->setter(fn ($connections) => collect($connections))
+            ->setter(fn ($connections) => collect($connections)->map(fn ($config) => $this->ensureConnectionIds($config)))
             ->args(func_get_args());
+    }
+
+    private function ensureConnectionIds($config)
+    {
+        if (! is_array($config) || ! array_is_list($config)) {
+            return $config;
+        }
+
+        return array_map(
+            fn ($row) => is_array($row) ? ['id' => Str::random(8), ...$row] : $row,
+            $config
+        );
     }
 
     /**
@@ -332,7 +344,6 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
     {
         return collect(is_array($emails) && array_is_list($emails) ? $emails : [$emails])
             ->filter(fn ($config) => is_array($config))
-            ->map(fn ($config) => ['id' => Str::random(8), ...$config])
             ->values()
             ->all();
     }

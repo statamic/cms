@@ -393,7 +393,7 @@ class FormTest extends TestCase
         $this->assertEquals([
             'email' => [['to' => 'foo@bar.com']],
             'webhook' => [['url' => 'https://example.com/hook']],
-        ], $form->connections()->all());
+        ], $form->connections()->map(fn ($configs) => array_map(fn ($config) => Arr::except($config, 'id'), $configs))->all());
     }
 
     public static function connectionsProvider()
@@ -407,6 +407,37 @@ class FormTest extends TestCase
             'array' => [$connections],
             'collection' => [collect($connections)],
         ];
+    }
+
+    #[Test]
+    public function it_assigns_ids_to_connection_rows_when_setting()
+    {
+        $form = Form::make('contact_us')->connections([
+            'webhook' => [['url' => 'https://example.com/hook'], ['id' => 'abc', 'url' => 'https://example.com/other']],
+            'acme' => ['token' => 'secret'],
+        ]);
+
+        $webhooks = $form->connections()->get('webhook');
+
+        $this->assertNotEmpty($webhooks[0]['id']);
+        $this->assertEquals('abc', $webhooks[1]['id']);
+        $this->assertEquals(['token' => 'secret'], $form->connections()->get('acme'));
+    }
+
+    #[Test]
+    public function it_assigns_ids_to_connection_rows_when_hydrating()
+    {
+        File::put(Form::make('contact_us')->path(), YAML::dump([
+            'title' => 'Contact Us',
+            'connections' => [
+                'webhook' => [['url' => 'https://example.com/hook']],
+            ],
+        ]));
+
+        $webhooks = Form::find('contact_us')->connections()->get('webhook');
+
+        $this->assertNotEmpty($webhooks[0]['id']);
+        $this->assertEquals('https://example.com/hook', $webhooks[0]['url']);
     }
 
     #[Test]
@@ -449,7 +480,7 @@ class FormTest extends TestCase
 
         $form->connections(['email' => [['to' => 'foo@bar.com']]]);
 
-        $this->assertEquals([['to' => 'foo@bar.com']], $form->email());
+        $this->assertEquals([['to' => 'foo@bar.com']], collect($form->email())->map(fn ($config) => Arr::except($config, 'id'))->all());
     }
 
     #[Test]
@@ -460,7 +491,7 @@ class FormTest extends TestCase
         $form->email([['to' => 'foo@bar.com']]);
 
         $this->assertEquals(['webhook', 'email'], $form->connections()->keys()->all());
-        $this->assertEquals([['url' => 'https://example.com/hook']], $form->connections()->get('webhook'));
+        $this->assertEquals([['url' => 'https://example.com/hook']], array_map(fn ($config) => Arr::except($config, 'id'), $form->connections()->get('webhook')));
         $this->assertEquals([['to' => 'foo@bar.com']], collect($form->email())->map(fn ($config) => Arr::except($config, 'id'))->all());
     }
 
