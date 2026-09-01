@@ -17,7 +17,7 @@ class FormConnections extends Fieldtype
         $form = $this->form();
 
         return [
-            'form' => ['handle' => $form->handle(), 'title' => $form->title()],
+            'form' => ['handle' => $form->handle(), 'title' => __($form->title())],
             'types' => FormConnection::all()->map(fn (Connection $connection): array => [
                 'handle' => $connection->handle(),
                 'title' => $connection->title(),
