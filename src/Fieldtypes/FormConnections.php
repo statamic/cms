@@ -8,6 +8,8 @@ use Statamic\Facades\FormConnection;
 use Statamic\Fields\Fieldtype;
 use Statamic\Forms\Connections\Connection;
 
+use function Statamic\trans as __;
+
 class FormConnections extends Fieldtype
 {
     protected $selectable = false;
