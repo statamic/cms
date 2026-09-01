@@ -9,6 +9,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Traits\Localizable;
+use Illuminate\Validation\ValidationException;
 use LogicException;
 use Statamic\Contracts\Auth\Protect\Protectable;
 use Statamic\Contracts\Data\Augmentable;
@@ -53,6 +54,8 @@ use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Statamic\View\Cascade;
+
+use function Statamic\trans as __;
 
 class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, ContainsQueryableValues, Contract, Localization, Protectable, ResolvesValuesContract, Responsable, SearchableContract
 {
@@ -399,6 +402,12 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
     public function save()
     {
+        if ($this->hasOriginCycle()) {
+            throw ValidationException::withMessages([
+                'origin' => __('Origin sites cannot reference each other in a loop.'),
+            ]);
+        }
+
         $isNew = is_null(Facades\Entry::find($this->id()));
 
         $withEvents = $this->withEvents;
@@ -848,10 +857,21 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
     public function ancestors()
     {
         $ancestors = collect();
+        $seen = [];
 
         $origin = $this->origin();
 
         while ($origin) {
+            $id = $origin->id();
+
+            if ($id !== null && isset($seen[$id])) {
+                break;
+            }
+
+            if ($id !== null) {
+                $seen[$id] = true;
+            }
+
             $ancestors->push($origin);
             $origin = $origin->origin();
         }

@@ -74,17 +74,15 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
     protected function getPackageProviders($app)
     {
-        return array_values(array_filter([
+        return [
             \Statamic\Providers\StatamicServiceProvider::class,
             \Inertia\ServiceProvider::class,
             \Rebing\GraphQL\GraphQLServiceProvider::class,
             \Wilderborn\Partyline\ServiceProvider::class,
             \Archetype\ServiceProvider::class,
             \Spatie\LaravelRay\RayServiceProvider::class,
-            class_exists(\Laravel\Socialite\SocialiteServiceProvider::class)
-                ? \Laravel\Socialite\SocialiteServiceProvider::class
-                : null,
-        ]));
+            \Laravel\Socialite\SocialiteServiceProvider::class,
+        ];
     }
 
     protected function getPackageAliases($app)
