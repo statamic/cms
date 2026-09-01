@@ -4,6 +4,7 @@ import Head from '@/pages/layout/Head.vue';
 
 defineProps([
     'actions',
+    'titleFormat',
     'collection',
     'title',
     'reference',
@@ -39,6 +40,7 @@ defineProps([
     <EntryPublishForm
         publish-container="base"
         :initial-actions="actions"
+        :initial-title-format="titleFormat"
         method="patch"
         :collection-handle="collection"
         :initial-title="title"

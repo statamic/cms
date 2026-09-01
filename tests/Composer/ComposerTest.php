@@ -106,6 +106,7 @@ class ComposerTest extends TestCase
         $this->assertInstanceOf(\Illuminate\Support\Collection::class, $installed);
         $this->assertEmpty($installed);
         $this->assertNull(Composer::installedVersion('statamic/composer-test-example-dependency'));
+        $this->assertFalse(Composer::isInstalled('statamic/composer-test-example-dependency'));
     }
 
     #[Group('integration')]
