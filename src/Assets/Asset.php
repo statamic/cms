@@ -417,7 +417,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
             return null;
         }
 
-        return URL::assemble($this->container()->url(), $this->path());
+        return URL::assemble($this->container()->url(), $this->encodedPath());
     }
 
     public function absoluteUrl()
@@ -426,7 +426,12 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
             return null;
         }
 
-        return URL::assemble($this->container()->absoluteUrl(), $this->path());
+        return URL::assemble($this->container()->absoluteUrl(), $this->encodedPath());
+    }
+
+    private function encodedPath()
+    {
+        return implode('/', array_map('rawurlencode', explode('/', $this->path())));
     }
 
     public function thumbnailUrl($preset = null)
@@ -1019,7 +1024,6 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
     /**
      * Get the blueprint.
      *
-     * @param  string|null  $blueprint
      * @return \Statamic\Fields\Blueprint
      */
     public function blueprint()

@@ -30,6 +30,18 @@ class FormatTest extends TestCase
         $this->assertSame('1st January 2025 4:45pm', $this->modify(Carbon::parse('2025-01-01 15:45'), 'jS F Y g:ia'));
     }
 
+    #[Test]
+    public function it_does_not_mutate_the_original_date_when_localizing()
+    {
+        config()->set('statamic.system.localize_dates_in_modifiers', true);
+
+        $date = Carbon::parse('2025-01-01 15:45');
+
+        $this->modify($date, 'g:ia');
+
+        $this->assertSame('UTC', $date->timezone->getName());
+    }
+
     public function modify($value, $format)
     {
         return Modify::value($value)->format($format)->fetch();

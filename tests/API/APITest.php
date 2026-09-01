@@ -4,6 +4,7 @@ namespace Tests\API;
 
 use Facades\Statamic\CP\LivePreview;
 use Facades\Statamic\Fields\BlueprintRepository;
+use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades;
@@ -17,6 +18,411 @@ use Tests\TestCase;
 class APITest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
+
+    #[Test]
+    public function it_cannot_query_sites_by_default()
+    {
+        $this->assertEndpointNotFound('/api/sites');
+    }
+
+    #[Test]
+    public function it_queries_sites()
+    {
+        Facades\Config::set('statamic.api.resources.sites', true);
+
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+            'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
+        ]);
+
+        $this
+            ->get('/api/sites')
+            ->assertSuccessful()
+            ->assertExactJson(['data' => [
+                ['handle' => 'en', 'name' => 'English', 'locale' => 'en_US', 'short_locale' => 'en', 'url' => 'http://test.com'],
+                ['handle' => 'fr', 'name' => 'French', 'locale' => 'fr_FR', 'short_locale' => 'fr', 'url' => 'http://fr.test.com'],
+                ['handle' => 'de', 'name' => 'German', 'locale' => 'de_DE', 'short_locale' => 'de', 'url' => 'http://test.com/de'],
+            ]]);
+    }
+
+    #[Test]
+    public function it_cannot_query_collections_by_default()
+    {
+        Facades\Collection::make('pages')->save();
+
+        $this->assertEndpointNotFound('/api/collections');
+        $this->assertEndpointNotFound('/api/collections/pages');
+    }
+
+    #[Test]
+    public function it_queries_collection_metadata()
+    {
+        Facades\Config::set('statamic.api.resources.collections', true);
+
+        Facades\Collection::make('pages')->title('Pages')->structureContents(['root' => true, 'max_depth' => 3])->mount('home')->save();
+        Facades\Entry::make()->collection('pages')->id('home')->slug('home')->published(true)->save();
+        Facades\Collection::make('articles')->title('Articles')->save();
+
+        $this
+            ->get('/api/collections')
+            ->assertSuccessful()
+            ->assertExactJson(['data' => [
+                [
+                    'handle' => 'pages',
+                    'title' => 'Pages',
+                    'structure' => [
+                        'max_depth' => 3,
+                        'expects_root' => true,
+                    ],
+                    'mount' => 'home',
+                    'api_url' => 'http://localhost/api/collections/pages',
+                ],
+                [
+                    'handle' => 'articles',
+                    'title' => 'Articles',
+                    'structure' => null,
+                    'mount' => null,
+                    'api_url' => 'http://localhost/api/collections/articles',
+                ],
+            ]]);
+
+        $this
+            ->get('/api/collections/pages')
+            ->assertSuccessful()
+            ->assertExactJson(['data' => [
+                'handle' => 'pages',
+                'title' => 'Pages',
+                'structure' => [
+                    'max_depth' => 3,
+                    'expects_root' => true,
+                ],
+                'mount' => 'home',
+                'api_url' => 'http://localhost/api/collections/pages',
+            ]]);
+    }
+
+    #[Test]
+    public function it_only_queries_allowed_collections()
+    {
+        Facades\Config::set('statamic.api.resources.collections', ['articles']);
+
+        Facades\Collection::make('pages')->save();
+        Facades\Collection::make('articles')->title('Articles')->save();
+
+        $this
+            ->get('/api/collections')
+            ->assertSuccessful()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.handle', 'articles');
+
+        $this->assertEndpointNotFound('/api/collections/pages');
+        $this->assertEndpointSuccessful('/api/collections/articles');
+    }
+
+    #[Test]
+    public function it_queries_taxonomy_metadata()
+    {
+        Facades\Config::set('statamic.api.resources.taxonomies', true);
+
+        Facades\Taxonomy::make('topics')->title('Topics')->save();
+        Facades\Taxonomy::make('tags')->title('Tags')->save();
+
+        $this
+            ->get('/api/taxonomies')
+            ->assertSuccessful()
+            ->assertExactJson(['data' => [
+                [
+                    'handle' => 'topics',
+                    'title' => 'Topics',
+                    'api_url' => 'http://localhost/api/taxonomies/topics',
+                ],
+                [
+                    'handle' => 'tags',
+                    'title' => 'Tags',
+                    'api_url' => 'http://localhost/api/taxonomies/tags',
+                ],
+            ]]);
+
+        $this
+            ->get('/api/taxonomies/topics')
+            ->assertSuccessful()
+            ->assertExactJson(['data' => [
+                'handle' => 'topics',
+                'title' => 'Topics',
+                'api_url' => 'http://localhost/api/taxonomies/topics',
+            ]]);
+    }
+
+    #[Test]
+    public function it_only_queries_allowed_taxonomies()
+    {
+        Facades\Config::set('statamic.api.resources.taxonomies', ['tags']);
+
+        Facades\Taxonomy::make('topics')->save();
+        Facades\Taxonomy::make('tags')->title('Tags')->save();
+
+        $this
+            ->get('/api/taxonomies')
+            ->assertSuccessful()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.handle', 'tags');
+
+        $this->assertEndpointNotFound('/api/taxonomies/topics');
+        $this->assertEndpointSuccessful('/api/taxonomies/tags');
+    }
+
+    #[Test]
+    public function it_queries_nav_metadata()
+    {
+        Facades\Config::set('statamic.api.resources.navs', true);
+
+        Facades\Nav::make('footer')->title('Footer')->maxDepth(2)->expectsRoot(false)->save();
+        Facades\Nav::make('docs')->title('Docs')->save();
+
+        $this
+            ->get('/api/navs')
+            ->assertSuccessful()
+            ->assertExactJson(['data' => [
+                [
+                    'handle' => 'footer',
+                    'title' => 'Footer',
+                    'max_depth' => 2,
+                    'expects_root' => false,
+                    'api_url' => 'http://localhost/api/navs/footer',
+                ],
+                [
+                    'handle' => 'docs',
+                    'title' => 'Docs',
+                    'max_depth' => null,
+                    'expects_root' => false,
+                    'api_url' => 'http://localhost/api/navs/docs',
+                ],
+            ]]);
+
+        $this
+            ->get('/api/navs/footer')
+            ->assertSuccessful()
+            ->assertExactJson(['data' => [
+                'handle' => 'footer',
+                'title' => 'Footer',
+                'max_depth' => 2,
+                'expects_root' => false,
+                'api_url' => 'http://localhost/api/navs/footer',
+            ]]);
+    }
+
+    #[Test]
+    public function it_only_queries_allowed_navs()
+    {
+        Facades\Config::set('statamic.api.resources.navs', ['footer']);
+
+        Facades\Nav::make('footer')->save();
+        Facades\Nav::make('docs')->save();
+
+        $this
+            ->get('/api/navs')
+            ->assertSuccessful()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.handle', 'footer');
+
+        $this->assertEndpointSuccessful('/api/navs/footer');
+        $this->assertEndpointNotFound('/api/navs/docs');
+    }
+
+    #[Test]
+    public function it_queries_asset_container_metadata()
+    {
+        Facades\Config::set('statamic.api.resources.assets', true);
+
+        Facades\AssetContainer::make('main')->title('Main')->save();
+        Facades\AssetContainer::make('avatars')->title('Avatars')->save();
+
+        $this
+            ->get('/api/asset-containers')
+            ->assertSuccessful()
+            ->assertExactJson(['data' => [
+                [
+                    'handle' => 'main',
+                    'title' => 'Main',
+                    'api_url' => 'http://localhost/api/asset-containers/main',
+                ],
+                [
+                    'handle' => 'avatars',
+                    'title' => 'Avatars',
+                    'api_url' => 'http://localhost/api/asset-containers/avatars',
+                ],
+            ]]);
+
+        $this
+            ->get('/api/asset-containers/main')
+            ->assertSuccessful()
+            ->assertExactJson(['data' => [
+                'handle' => 'main',
+                'title' => 'Main',
+                'api_url' => 'http://localhost/api/asset-containers/main',
+            ]]);
+    }
+
+    #[Test]
+    public function it_only_queries_allowed_asset_containers()
+    {
+        Facades\Config::set('statamic.api.resources.assets', ['avatars']);
+
+        Facades\AssetContainer::make('main')->save();
+        Facades\AssetContainer::make('avatars')->title('Avatars')->save();
+
+        $this
+            ->get('/api/asset-containers')
+            ->assertSuccessful()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.handle', 'avatars');
+
+        $this->assertEndpointNotFound('/api/asset-containers/main');
+        $this->assertEndpointSuccessful('/api/asset-containers/avatars');
+    }
+
+    #[Test]
+    public function it_selects_entry_fields()
+    {
+        Facades\Config::set('statamic.api.resources.collections', true);
+
+        Facades\Collection::make('pages')->save();
+        Facades\Entry::make()->collection('pages')->id('about')->slug('about')->published(true)->data(['title' => 'About'])->save();
+
+        $full = $this->get('/api/collections/pages/entries/about')->assertSuccessful()->json('data');
+
+        $this->assertArrayHasKey('title', $full);
+        $this->assertArrayHasKey('slug', $full);
+        $this->assertGreaterThan(2, count($full));
+
+        $this
+            ->get('/api/collections/pages/entries?fields=id,title')
+            ->assertSuccessful()
+            ->assertJsonPath('data.0.id', 'about')
+            ->assertJsonPath('data.0.title', 'About')
+            ->assertJsonMissingPath('data.0.slug');
+
+        $this
+            ->get('/api/collections/pages/entries/about?fields=id,title')
+            ->assertSuccessful()
+            ->assertJsonPath('data.id', 'about')
+            ->assertJsonPath('data.title', 'About')
+            ->assertJsonMissingPath('data.slug');
+
+        $arrayForm = $this
+            ->get('/api/collections/pages/entries/about?fields[]=id&fields[]=title')
+            ->assertSuccessful()
+            ->json('data');
+
+        $this->assertArrayHasKey('title', $arrayForm);
+        $this->assertArrayHasKey('slug', $arrayForm);
+    }
+
+    #[Test]
+    public function it_selects_asset_fields()
+    {
+        Facades\Config::set('statamic.api.resources.assets', true);
+
+        config(['filesystems.disks.test' => [
+            'driver' => 'local',
+            'root' => __DIR__.'/tmp',
+        ]]);
+
+        Storage::fake('test');
+        Storage::disk('test')->put('foo.jpg', '');
+
+        Facades\AssetContainer::make('main')->disk('test')->save();
+        Facades\Asset::make()->container('main')->path('foo.jpg')->data(['alt' => 'A picture'])->save();
+
+        $full = $this->get('/api/assets/main/foo.jpg')->assertSuccessful()->json('data');
+
+        $this->assertArrayHasKey('alt', $full);
+        $this->assertArrayHasKey('url', $full);
+        $this->assertGreaterThan(2, count($full));
+
+        $this
+            ->get('/api/assets/main?fields=id,alt')
+            ->assertSuccessful()
+            ->assertJsonPath('data.0.id', 'main::foo.jpg')
+            ->assertJsonPath('data.0.alt', 'A picture')
+            ->assertJsonMissingPath('data.0.url');
+
+        $this
+            ->get('/api/assets/main/foo.jpg?fields=id,alt')
+            ->assertSuccessful()
+            ->assertJsonPath('data.id', 'main::foo.jpg')
+            ->assertJsonPath('data.alt', 'A picture')
+            ->assertJsonMissingPath('data.url');
+    }
+
+    #[Test]
+    public function it_filters_entries_by_site_query_param()
+    {
+        Facades\Config::set('statamic.api.resources.collections', true);
+
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://localhost/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://localhost/fr/'],
+        ]);
+
+        Facades\Collection::make('pages')->sites(['en', 'fr'])->save();
+        Facades\Entry::make()->collection('pages')->locale('en')->id('about')->slug('about')->published(true)->data(['title' => 'About'])->save();
+        Facades\Entry::make()->collection('pages')->locale('fr')->origin('about')->id('about-fr')->slug('a-propos')->published(true)->data(['title' => 'A propos'])->save();
+
+        $this->assertEndpointDataCount('/api/collections/pages/entries', 2);
+        $this->assertEndpointDataCount('/api/collections/pages/entries?site=fr', 1);
+
+        $this
+            ->get('/api/collections/pages/entries?site=fr')
+            ->assertSuccessful()
+            ->assertJsonPath('data.0.id', 'about-fr')
+            ->assertJsonPath('data.0.title', 'A propos');
+
+        $this
+            ->get('/api/collections/pages/entries/about?site=fr')
+            ->assertSuccessful()
+            ->assertJsonPath('data.id', 'about-fr')
+            ->assertJsonPath('data.title', 'A propos');
+
+        $this->assertEndpointNotFound('/api/collections/pages/entries/about?site=bogus');
+    }
+
+    #[Test]
+    public function it_filters_terms_by_site_query_param()
+    {
+        Facades\Config::set('statamic.api.resources.taxonomies', true);
+
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://localhost/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://localhost/fr/'],
+        ]);
+
+        Facades\Taxonomy::make('topics')->sites(['en', 'fr'])->save();
+        Facades\Term::make()->taxonomy('topics')->slug('dance')->dataForLocale('en', ['title' => 'Dance'])->save();
+        Facades\Term::find('topics::dance')->in('fr')->data(['title' => 'Danse'])->save();
+
+        $this
+            ->get('/api/taxonomies/topics/terms?site=fr')
+            ->assertSuccessful()
+            ->assertJsonPath('data.0.title', 'Danse');
+
+        $this
+            ->get('/api/taxonomies/topics/terms/dance?site=fr')
+            ->assertSuccessful()
+            ->assertJsonPath('data.title', 'Danse');
+
+        $this->assertEndpointNotFound('/api/taxonomies/topics/terms/dance?site=bogus');
+    }
+
+    #[Test]
+    public function it_pongs_when_pinged()
+    {
+        $this
+            ->get('/api/ping')
+            ->assertSuccessful()
+            ->assertExactJson(['ping' => 'pong']);
+    }
 
     #[Test]
     public function not_found_responses_are_formatted_with_json()
@@ -52,6 +458,64 @@ class APITest extends TestCase
             'invalid entry id' => ['/api/collections/pages/entries/dance', false],
             'valid entry id but wrong collection' => ['/api/collections/articles/entries/about', false],
         ];
+    }
+
+    #[Test]
+    public function it_resolves_entries_by_slug()
+    {
+        Facades\Config::set('statamic.api.resources.collections', true);
+
+        Facades\Collection::make('pages')->save();
+        Facades\Entry::make()->collection('pages')->id('123')->slug('about')->published(true)->data(['title' => 'About'])->save();
+
+        $this
+            ->get('/api/collections/pages/entries/about')
+            ->assertSuccessful()
+            ->assertJsonPath('data.id', '123')
+            ->assertJsonPath('data.slug', 'about');
+    }
+
+    #[Test]
+    public function it_prefers_entry_id_over_slug()
+    {
+        Facades\Config::set('statamic.api.resources.collections', true);
+
+        Facades\Collection::make('pages')->save();
+        Facades\Entry::make()->collection('pages')->id('about')->slug('about-page')->published(true)->data(['title' => 'By ID'])->save();
+        Facades\Entry::make()->collection('pages')->id('other')->slug('about')->published(true)->data(['title' => 'By Slug'])->save();
+
+        $this
+            ->get('/api/collections/pages/entries/about')
+            ->assertSuccessful()
+            ->assertJsonPath('data.id', 'about')
+            ->assertJsonPath('data.title', 'By ID');
+    }
+
+    #[Test]
+    public function it_resolves_duplicate_slugs_to_the_first_collection_site()
+    {
+        Facades\Config::set('statamic.api.resources.collections', true);
+
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://localhost/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://localhost/fr/'],
+        ]);
+
+        Facades\Collection::make('pages')->sites(['en', 'fr'])->save();
+        Facades\Entry::make()->collection('pages')->locale('en')->id('about-en')->slug('about')->published(true)->data(['title' => 'About'])->save();
+        Facades\Entry::make()->collection('pages')->locale('fr')->id('about-fr')->slug('about')->published(true)->data(['title' => 'A propos'])->save();
+
+        $this
+            ->get('/api/collections/pages/entries/about')
+            ->assertSuccessful()
+            ->assertJsonPath('data.id', 'about-en')
+            ->assertJsonPath('data.title', 'About');
+
+        $this
+            ->get('/api/collections/pages/entries/about?site=fr')
+            ->assertSuccessful()
+            ->assertJsonPath('data.id', 'about-fr')
+            ->assertJsonPath('data.title', 'A propos');
     }
 
     public static function exampleFiltersProvider()
@@ -251,6 +715,29 @@ class APITest extends TestCase
     }
 
     #[Test]
+    public function it_gets_origin_id_in_nav_route_when_an_item_is_not_linked_to_an_entry()
+    {
+        Facades\Config::set('statamic.api.resources.navs', true);
+
+        Facades\Collection::make('pages')->save();
+
+        $nav = Facades\Nav::make('footer');
+        $nav->makeTree('en', [
+            ['entry' => 'one'],
+            ['title' => 'Balki Bartokomous', 'url' => 'https://balki.com'],
+        ])->save();
+        $nav->save();
+
+        Facades\Entry::make()->collection('pages')->id('one')->slug('one')->published(true)->save();
+
+        $this
+            ->get('/api/navs/footer/tree?fields=title,origin_id')
+            ->assertSuccessful()
+            ->assertJsonPath('data.1.page.title', 'Balki Bartokomous')
+            ->assertJsonPath('data.1.page.origin_id', null);
+    }
+
+    #[Test]
     public function it_filters_by_taxonomy_terms()
     {
         Facades\Config::set('statamic.api.resources.collections.test', [
@@ -346,9 +833,9 @@ class APITest extends TestCase
         Facades\Entry::make()->collection('pages')->id('jazz')->slug('jazz')->published(true)->save();
 
         $this
-            ->get('/api/collections/pages/entries?limit=2&sort=-date&filter[published]=true&unknown=param')
-            ->assertJsonPath('links.first', 'http://localhost/api/collections/pages/entries?filter%5Bpublished%5D=true&limit=2&sort=-date&page=1')
-            ->assertJsonPath('links.next', 'http://localhost/api/collections/pages/entries?filter%5Bpublished%5D=true&limit=2&sort=-date&page=2');
+            ->get('/api/collections/pages/entries?limit=2&sort=-date&filter[published]=true&fields=id,title&site=en&unknown=param')
+            ->assertJsonPath('links.first', 'http://localhost/api/collections/pages/entries?filter%5Bpublished%5D=true&limit=2&sort=-date&fields=id%2Ctitle&site=en&page=1')
+            ->assertJsonPath('links.next', 'http://localhost/api/collections/pages/entries?filter%5Bpublished%5D=true&limit=2&sort=-date&fields=id%2Ctitle&site=en&page=2');
     }
 
     #[Test]

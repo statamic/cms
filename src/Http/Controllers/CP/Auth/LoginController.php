@@ -52,7 +52,7 @@ class LoginController extends CpController
 
     private function oauthProviders()
     {
-        $redirect = parse_url(cp_route('index'))['path'];
+        $redirect = parse_url(cp_route('index'))['path'] ?? '/';
 
         return OAuth::providers()->map(fn (Provider $provider) => [
             'name' => $provider->name(),

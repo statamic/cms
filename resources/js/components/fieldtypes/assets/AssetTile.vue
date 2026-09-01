@@ -13,10 +13,12 @@
             :id="editingId"
             :allow-deleting="false"
             :show-navigation="siblings.length > 1"
+            :redirect-after-crop="false"
             @previous="navigateToPrevious"
             @next="navigateToNext"
             @closed="closeEditor"
             @saved="assetSaved"
+            @created="assetCreated"
             @action-completed="actionCompleted"
         >
         </asset-editor>
@@ -36,7 +38,7 @@
                     <img v-if="canShowSvg" :src="asset.url" :title="label" class="p-4 w-full relative" />
 
                     <template v-else>
-                        <img :src="thumbnail" v-if="thumbnail" :title="label" class="rounded-md relative"  />
+                        <img :src="thumbnail" v-if="thumbnail" :title="label" class="rounded-md relative" @error="asset.thumbnail = null" />
 
                         <file-icon v-else :extension="asset.extension ?? 'generic'" class="h-full w-full p-4 relative" />
                     </template>
