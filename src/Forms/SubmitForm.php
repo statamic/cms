@@ -128,7 +128,7 @@ class SubmitForm
 
         $entry = $this->entry ? Entry::find($this->entry) : null;
 
-        if (! $entry || FormFieldValues::on($entry)->referencing($this->form->handle())->isEmpty()) {
+        if (! $entry || ! FormFieldValues::on($entry)->references($this->form->handle())) {
             throw ValidationException::withMessages(['*' => [__('statamic::validation.form_must_be_submitted_from_an_entry')]]);
         }
 

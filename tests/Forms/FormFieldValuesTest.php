@@ -88,6 +88,9 @@ class FormFieldValuesTest extends TestCase
         $this->assertCount(2, FormFieldValues::on($entry)->referencing('contact'));
         $this->assertCount(1, FormFieldValues::on($entry)->referencing('feedback'));
         $this->assertCount(0, FormFieldValues::on($entry)->referencing('missing'));
+
+        $this->assertTrue(FormFieldValues::on($entry)->references('contact'));
+        $this->assertFalse(FormFieldValues::on($entry)->references('missing'));
     }
 
     #[Test]

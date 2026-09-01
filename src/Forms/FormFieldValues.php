@@ -31,6 +31,11 @@ class FormFieldValues
             ->values();
     }
 
+    public function references(string $form): bool
+    {
+        return $this->referencing($form)->isNotEmpty();
+    }
+
     private function fromFields(Fields $fields, array $values): Collection
     {
         return $fields->all()->values()->flatMap(
