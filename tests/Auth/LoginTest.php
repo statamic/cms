@@ -223,6 +223,31 @@ class LoginTest extends TestCase
         $this->assertGuest();
     }
 
+    #[Test]
+    #[DefineEnvironment('cpOnTopLevel')]
+    #[DefineEnvironment('addOauthProvider')]
+    public function it_shows_oauth_providers_even_if_cp_is_on_top_level()
+    {
+        $this
+            ->get(cp_route('login'))
+            ->assertInertia(fn ($page) => $page
+                ->component('auth/Login')
+                ->has('providers', 1)
+                ->where('oauthEnabled', true)
+            );
+    }
+
+    protected function cpOnTopLevel($app)
+    {
+        $app['config']->set('statamic.cp.route', '');
+    }
+
+    protected function addOauthProvider($app)
+    {
+        $app['config']->set('statamic.oauth.enabled', true);
+        $app['config']->set('statamic.oauth.providers', ['github']);
+    }
+
     protected function disableTwoFactor($app)
     {
         $app['config']->set('statamic.users.two_factor_enabled', false);

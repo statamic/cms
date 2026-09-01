@@ -67,12 +67,6 @@ parameters:
 			path: ../src/Facades/Endpoint/Parse.php
 
 		-
-			message: '#^Method Illuminate\\Contracts\\Validation\\DataAwareRule@anonymous/Fieldtypes/Bard\.php\:934\:\:setData\(\) should return \$this\(Illuminate\\Contracts\\Validation\\DataAwareRule@anonymous/Fieldtypes/Bard\.php\:934\) but return statement is missing\.$#'
-			identifier: return.missing
-			count: 1
-			path: ../src/Fieldtypes/Bard.php
-
-		-
 			message: '#^Access to an undefined property Statamic\\Filesystem\\AbstractAdapter\:\:\$filesystem\.$#'
 			identifier: property.notFound
 			count: 13
