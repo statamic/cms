@@ -62,7 +62,7 @@ const props = defineProps([
                             <TableCell class="w-64 font-bold">
                                 <div class="flex gap-2 sm:gap-3">
                                     <span class="little-dot mt-[0.45rem]" :class="site.valid ? 'bg-green-500' : 'bg-red-500 dark:bg-red-600'" />
-                                    {{ site.key ?? __('No license key') }}
+                                    {{ site.key ?? __('No site key') }}
                                 </div>
                             </TableCell>
                             <TableCell class="relative">
