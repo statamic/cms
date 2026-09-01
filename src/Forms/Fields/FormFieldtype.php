@@ -2,6 +2,7 @@
 
 namespace Statamic\Forms\Fields;
 
+use Facades\Statamic\Fields\FieldtypeRepository;
 use Facades\Statamic\Forms\Fields\FormFieldtypeRepository;
 use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Extend\HasHandle;
@@ -23,6 +24,7 @@ abstract class FormFieldtype implements Arrayable
 
     protected static $title;
     protected static $fieldtype;
+    protected static $extraConfigFields = [];
 
     protected $field;
     protected $selectable = true;
@@ -121,9 +123,8 @@ abstract class FormFieldtype implements Arrayable
             return $cached;
         }
 
-        $fields = collect($this->configFieldItems());
-
-        $fields = $fields
+        $fields = collect($this->configFieldItems())
+            ->merge($this->extraConfigFieldItems())
             ->map(function ($field, $handle) {
                 return compact('handle', 'field');
             });
@@ -140,6 +141,41 @@ abstract class FormFieldtype implements Arrayable
         return $this->configFields;
     }
 
+    public function extraConfigFieldItems(): array
+    {
+        return array_merge(
+            $this->configFieldItemsFromWrappedFieldtype(),
+            self::$extraConfigFields[static::class] ?? [],
+            self::$extraConfigFields[FormFieldtype::class] ?? [],
+        );
+    }
+
+    // TODO: Remove this bridge in v7, once addons have migrated to FormFieldtype::appendConfigField.
+    private function configFieldItemsFromWrappedFieldtype(): array
+    {
+        if (! $handle = static::fieldtype()) {
+            return [];
+        }
+
+        if (! $class = FieldtypeRepository::classes()->get($handle)) {
+            return [];
+        }
+
+        return app($class)->extraConfigFieldItems();
+    }
+
+    public static function appendConfigFields(array $config): void
+    {
+        $existingConfig = self::$extraConfigFields[static::class] ?? [];
+
+        self::$extraConfigFields[static::class] = array_merge($existingConfig, $config);
+    }
+
+    public static function appendConfigField(string $field, array $config): void
+    {
+        self::appendConfigFields([$field => $config]);
+    }
+
     public function configBlueprint(): Blueprint
     {
         return (new Blueprint)->setContents([
@@ -148,6 +184,7 @@ abstract class FormFieldtype implements Arrayable
                     'sections' => [
                         [
                             'fields' => collect($this->configFieldItems())
+                                ->merge($this->extraConfigFieldItems())
                                 ->map(fn ($field, $handle) => compact('handle', 'field'))
                                 ->values()->all(),
                         ],
