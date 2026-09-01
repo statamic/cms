@@ -43,7 +43,7 @@ class FormsController extends CpController
                     'id' => $form->handle(),
                     'title' => __($form->title()),
                     'status' => $form->status(),
-                    'submissions' => $canViewSubmissions ? $form->querySubmissions()->whereNull('partial')->whereNull('spam')->count() : null,
+                    'submissions' => $canViewSubmissions ? $form->querySubmissions()->whereStatus('finalized')->count() : null,
                     'show_url' => $form->showUrl(),
                     'submissions_url' => $form->submissionsUrl(),
                     'edit_url' => $form->editUrl(),

@@ -21,8 +21,7 @@ class DeletePartialFormSubmissions implements ShouldQueue
         $threshold = now()->subDays($days);
 
         FormSubmission::query()
-            ->where('partial', true)
-            ->whereNull('spam')
+            ->whereStatus('partial')
             ->where('date', '<', $threshold)
             ->get()
             ->each->delete();
