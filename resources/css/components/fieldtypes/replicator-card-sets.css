@@ -32,23 +32,38 @@
 }
 
 .replicator-card-set-inset-picker {
-    position: relative;
-    @apply mt-6;
-
-    [data-ui-popover-trigger] {
-        position: absolute;
-        inset: 0;
-        left: -1.15rem;
-        writing-mode: vertical-lr;
-
-        [data-insert-handle] {
-            width: 1rem;
+    &:nth-child(1 of &) {
+        --pull: 1.5rem;
+        /* Since the popover trigger is now absolutely positioned we need to compensate for the space it took up */
+        margin-block-start: var(--pull);
+        [data-ui-popover-trigger] {
             position: absolute;
-            top: 0;
-            left: calc(0.5rem + 2px);
-            height: 100%;
-            width: 0.3rem;
-            background: linear-gradient(to bottom, var(--color-gray-200) 0%, var(--color-gray-100) 50%, var(--color-gray-200) 100%);
+            z-index: var(--z-index-above);
+            transform: translateY(calc(0% - var(--pull)));
+            width: 100%;
+        }
+    }
+
+    &:not(:nth-child(1 of &)) {
+        /* Don't use position: relative; on the first-child, so we can break out of the container to make the "+" control full-width */
+        position: relative;
+        margin-block-start: 1.5rem;
+
+        [data-ui-popover-trigger] {
+            position: absolute;
+            inset: 0;
+            left: -1.15rem;
+            writing-mode: vertical-lr;
+
+            [data-insert-handle] {
+                width: 1rem;
+                position: absolute;
+                top: 0;
+                left: calc(0.5rem + 2px);
+                height: 100%;
+                width: 0.3rem;
+                background: linear-gradient(to bottom, var(--color-gray-200) 0%, var(--color-gray-100) 50%, var(--color-gray-200) 100%);
+            }
         }
     }
 }
