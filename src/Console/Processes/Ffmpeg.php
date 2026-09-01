@@ -75,6 +75,10 @@ class Ffmpeg extends Process
             return is_executable($binary) ? $binary : null;
         }
 
+        if (! $this->procOpenAvailable()) {
+            return null;
+        }
+
         $output = $this->run($this->isWindows() ? 'where ffmpeg' : 'which ffmpeg');
 
         // Laravel Herd doesn't inherit the user's PATH, so we need to check the Homebrew path manually
@@ -95,6 +99,11 @@ class Ffmpeg extends Process
         }
 
         return $resolved;
+    }
+
+    protected function procOpenAvailable(): bool
+    {
+        return function_exists('proc_open');
     }
 
     public static function clearBinaryCache(): void
