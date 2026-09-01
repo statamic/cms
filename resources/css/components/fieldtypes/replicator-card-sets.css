@@ -46,10 +46,6 @@
             width: calc((100% - 1.5rem) / 3);
             min-width: 0;
         }
-
-        .replicator-card-set-third-column [data-ui-popover-trigger] [data-insert-handle] {
-            left: calc(0.5rem + 1.5px);
-        }
     }
 
     .replicator-set-slot--full,
@@ -90,6 +86,12 @@
             }
         }
 
+        /* Nudge to account for rounding error / subpixel positioning */
+        &:nth-child(3n + 1) [data-ui-popover-trigger] {
+            [data-insert-handle] {
+                left: calc(0.5rem + 1.5px);
+            }
+        }
     }
 
     .replicator-card-set-row-start.replicator-card-set-has-entry-connector {
