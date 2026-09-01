@@ -46,6 +46,242 @@ class APITest extends TestCase
     }
 
     #[Test]
+    public function it_cannot_query_collections_by_default()
+    {
+        Facades\Collection::make('pages')->save();
+
+        $this->assertEndpointNotFound('/api/collections');
+        $this->assertEndpointNotFound('/api/collections/pages');
+    }
+
+    #[Test]
+    public function it_queries_collection_metadata()
+    {
+        Facades\Config::set('statamic.api.resources.collections', true);
+
+        Facades\Collection::make('pages')->title('Pages')->structureContents(['root' => true, 'max_depth' => 3])->mount('home')->save();
+        Facades\Entry::make()->collection('pages')->id('home')->slug('home')->published(true)->save();
+        Facades\Collection::make('articles')->title('Articles')->save();
+
+        $this
+            ->get('/api/collections')
+            ->assertSuccessful()
+            ->assertExactJson(['data' => [
+                [
+                    'handle' => 'pages',
+                    'title' => 'Pages',
+                    'structure' => [
+                        'max_depth' => 3,
+                        'expects_root' => true,
+                    ],
+                    'mount' => 'home',
+                    'api_url' => 'http://localhost/api/collections/pages',
+                ],
+                [
+                    'handle' => 'articles',
+                    'title' => 'Articles',
+                    'structure' => null,
+                    'mount' => null,
+                    'api_url' => 'http://localhost/api/collections/articles',
+                ],
+            ]]);
+
+        $this
+            ->get('/api/collections/pages')
+            ->assertSuccessful()
+            ->assertExactJson(['data' => [
+                'handle' => 'pages',
+                'title' => 'Pages',
+                'structure' => [
+                    'max_depth' => 3,
+                    'expects_root' => true,
+                ],
+                'mount' => 'home',
+                'api_url' => 'http://localhost/api/collections/pages',
+            ]]);
+    }
+
+    #[Test]
+    public function it_only_queries_allowed_collections()
+    {
+        Facades\Config::set('statamic.api.resources.collections', ['articles']);
+
+        Facades\Collection::make('pages')->save();
+        Facades\Collection::make('articles')->title('Articles')->save();
+
+        $this
+            ->get('/api/collections')
+            ->assertSuccessful()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.handle', 'articles');
+
+        $this->assertEndpointNotFound('/api/collections/pages');
+        $this->assertEndpointSuccessful('/api/collections/articles');
+    }
+
+    #[Test]
+    public function it_queries_taxonomy_metadata()
+    {
+        Facades\Config::set('statamic.api.resources.taxonomies', true);
+
+        Facades\Taxonomy::make('topics')->title('Topics')->save();
+        Facades\Taxonomy::make('tags')->title('Tags')->save();
+
+        $this
+            ->get('/api/taxonomies')
+            ->assertSuccessful()
+            ->assertExactJson(['data' => [
+                [
+                    'handle' => 'topics',
+                    'title' => 'Topics',
+                    'api_url' => 'http://localhost/api/taxonomies/topics',
+                ],
+                [
+                    'handle' => 'tags',
+                    'title' => 'Tags',
+                    'api_url' => 'http://localhost/api/taxonomies/tags',
+                ],
+            ]]);
+
+        $this
+            ->get('/api/taxonomies/topics')
+            ->assertSuccessful()
+            ->assertExactJson(['data' => [
+                'handle' => 'topics',
+                'title' => 'Topics',
+                'api_url' => 'http://localhost/api/taxonomies/topics',
+            ]]);
+    }
+
+    #[Test]
+    public function it_only_queries_allowed_taxonomies()
+    {
+        Facades\Config::set('statamic.api.resources.taxonomies', ['tags']);
+
+        Facades\Taxonomy::make('topics')->save();
+        Facades\Taxonomy::make('tags')->title('Tags')->save();
+
+        $this
+            ->get('/api/taxonomies')
+            ->assertSuccessful()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.handle', 'tags');
+
+        $this->assertEndpointNotFound('/api/taxonomies/topics');
+        $this->assertEndpointSuccessful('/api/taxonomies/tags');
+    }
+
+    #[Test]
+    public function it_queries_nav_metadata()
+    {
+        Facades\Config::set('statamic.api.resources.navs', true);
+
+        Facades\Nav::make('footer')->title('Footer')->maxDepth(2)->expectsRoot(false)->save();
+        Facades\Nav::make('docs')->title('Docs')->save();
+
+        $this
+            ->get('/api/navs')
+            ->assertSuccessful()
+            ->assertExactJson(['data' => [
+                [
+                    'handle' => 'footer',
+                    'title' => 'Footer',
+                    'max_depth' => 2,
+                    'expects_root' => false,
+                    'api_url' => 'http://localhost/api/navs/footer',
+                ],
+                [
+                    'handle' => 'docs',
+                    'title' => 'Docs',
+                    'max_depth' => null,
+                    'expects_root' => false,
+                    'api_url' => 'http://localhost/api/navs/docs',
+                ],
+            ]]);
+
+        $this
+            ->get('/api/navs/footer')
+            ->assertSuccessful()
+            ->assertExactJson(['data' => [
+                'handle' => 'footer',
+                'title' => 'Footer',
+                'max_depth' => 2,
+                'expects_root' => false,
+                'api_url' => 'http://localhost/api/navs/footer',
+            ]]);
+    }
+
+    #[Test]
+    public function it_only_queries_allowed_navs()
+    {
+        Facades\Config::set('statamic.api.resources.navs', ['footer']);
+
+        Facades\Nav::make('footer')->save();
+        Facades\Nav::make('docs')->save();
+
+        $this
+            ->get('/api/navs')
+            ->assertSuccessful()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.handle', 'footer');
+
+        $this->assertEndpointSuccessful('/api/navs/footer');
+        $this->assertEndpointNotFound('/api/navs/docs');
+    }
+
+    #[Test]
+    public function it_queries_asset_container_metadata()
+    {
+        Facades\Config::set('statamic.api.resources.assets', true);
+
+        Facades\AssetContainer::make('main')->title('Main')->save();
+        Facades\AssetContainer::make('avatars')->title('Avatars')->save();
+
+        $this
+            ->get('/api/asset-containers')
+            ->assertSuccessful()
+            ->assertExactJson(['data' => [
+                [
+                    'handle' => 'main',
+                    'title' => 'Main',
+                    'api_url' => 'http://localhost/api/asset-containers/main',
+                ],
+                [
+                    'handle' => 'avatars',
+                    'title' => 'Avatars',
+                    'api_url' => 'http://localhost/api/asset-containers/avatars',
+                ],
+            ]]);
+
+        $this
+            ->get('/api/asset-containers/main')
+            ->assertSuccessful()
+            ->assertExactJson(['data' => [
+                'handle' => 'main',
+                'title' => 'Main',
+                'api_url' => 'http://localhost/api/asset-containers/main',
+            ]]);
+    }
+
+    #[Test]
+    public function it_only_queries_allowed_asset_containers()
+    {
+        Facades\Config::set('statamic.api.resources.assets', ['avatars']);
+
+        Facades\AssetContainer::make('main')->save();
+        Facades\AssetContainer::make('avatars')->title('Avatars')->save();
+
+        $this
+            ->get('/api/asset-containers')
+            ->assertSuccessful()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.handle', 'avatars');
+
+        $this->assertEndpointNotFound('/api/asset-containers/main');
+        $this->assertEndpointSuccessful('/api/asset-containers/avatars');
+    }
+
+    #[Test]
     public function it_pongs_when_pinged()
     {
         $this

@@ -13,11 +13,15 @@ class Resource
      * @var array
      */
     const STATAMIC_RESOURCES = [
+        AssetContainerResource::class,
         AssetResource::class,
+        CollectionResource::class,
         EntryResource::class,
         FormResource::class,
         GlobalSetResource::class,
+        NavResource::class,
         SiteResource::class,
+        TaxonomyResource::class,
         TermResource::class,
         UserResource::class,
         TreeResource::class,
