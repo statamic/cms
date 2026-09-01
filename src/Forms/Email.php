@@ -185,14 +185,9 @@ class Email extends Mailable
     {
         $augmented = $this->submission->toAugmentedArray();
         $form = $this->submission->form();
-        $excludedFields = $form->formFields()->fields()
-            ->reject(fn (FormField $field) => $field->fieldtype()->collectsValue())
-            ->keys();
-        $fields = $this->getRenderableFieldData(Arr::except($augmented, ['id', 'date', 'form']))
-            ->reject(fn ($field) => $excludedFields->contains($field['handle']))
-            ->when(Arr::has($this->config, 'attachments'), function ($fields) {
-                return $fields->reject(fn ($field) => in_array($field['fieldtype'], ['assets', 'files', 'form_upload']));
-            });
+        $pages = $this->getRenderablePageData($form, $augmented);
+        $sections = collect($pages)->flatMap->sections;
+        $fields = $sections->flatMap->fields;
         $formConfig = ($configFields = Form::extraConfigFor($form->handle()))
             ? Blueprint::makeFromTabs($configFields)->fields()->addValues($form->data()->all())->values()->all()
             : [];
@@ -202,6 +197,8 @@ class Email extends Mailable
             'email_config' => $this->config,
             'config' => Cascade::config(),
             'fields' => $fields,
+            'sections' => $sections->all(),
+            'pages' => $pages,
             'site_url' => Config::getSiteUrl(),
             'date' => now(),
             'now' => now(),
@@ -211,6 +208,36 @@ class Email extends Mailable
         ]);
 
         return $this->with($data);
+    }
+
+    private function getRenderablePageData($form, array $augmented): array
+    {
+        $excludedFields = $form->formFields()->fields()
+            ->reject(fn (FormField $field) => $field->fieldtype()->collectsValue())
+            ->keys();
+
+        $fields = $this->getRenderableFieldData(Arr::except($augmented, ['id', 'date', 'form']))
+            ->reject(fn ($field) => $excludedFields->contains($field['handle']))
+            ->when(Arr::has($this->config, 'attachments'), function ($fields) {
+                return $fields->reject(fn ($field) => in_array($field['fieldtype'], ['assets', 'files', 'form_upload']));
+            });
+
+        return $form->blueprint()->tabs()
+            ->map(fn ($tab) => [
+                'display' => $tab->display(),
+                'instructions' => $tab->instructions(),
+                'sections' => $tab->sections()->map(fn ($section) => [
+                    'display' => $section->display(),
+                    'instructions' => $section->instructions(),
+                    'fields' => $section->fields()->all()->keys()
+                        ->map(fn ($handle) => $fields->firstWhere('handle', $handle))
+                        ->filter()
+                        ->values()
+                        ->all(),
+                ])->values()->all(),
+            ])
+            ->values()
+            ->all();
     }
 
     protected function getRenderableFieldData($values)

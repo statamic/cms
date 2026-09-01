@@ -9,6 +9,7 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Facades\Form as FacadesForm;
 use Statamic\Facades\Site;
+use Statamic\Facades\Stache;
 use Statamic\Forms\Email;
 use Statamic\Forms\SendEmails;
 use Statamic\Support\Arr;
@@ -223,6 +224,54 @@ class SendEmailsTest extends TestCase
         ]))->save();
 
         $submission = $form->makeSubmission();
+
+        Bus::chain([
+            new SendEmails($submission, Site::default(), [
+                ['id' => 'override', 'from' => 'override@sender.com', 'to' => 'override@recipient.com'],
+            ]),
+        ])->dispatch();
+
+        Mail::assertSent(Email::class, 1);
+        Mail::assertSent(Email::class, fn (Email $email) => $email->getConfig()['to'] === 'override@recipient.com');
+    }
+
+    #[Test]
+    public function it_reads_connections_from_the_dispatched_submissions_form_instance()
+    {
+        Mail::fake();
+
+        $form = tap(FacadesForm::make('test')->email([
+            ['from' => 'saved@sender.com', 'to' => 'saved@recipient.com'],
+        ]))->save();
+
+        $submission = tap($form->makeSubmission())->save();
+
+        Stache::clear();
+
+        $form->email([
+            ['from' => 'changed@sender.com', 'to' => 'changed@recipient.com'],
+        ]);
+
+        $this->sendEmails($submission);
+
+        Mail::assertSent(Email::class, 1);
+        Mail::assertSent(Email::class, fn (Email $email) => $email->getConfig()['to'] === 'changed@recipient.com');
+    }
+
+    #[Test]
+    public function it_uses_the_configured_configs_even_when_the_forms_connections_were_changed_in_memory()
+    {
+        Mail::fake();
+
+        $form = tap(FacadesForm::make('test')->email([
+            ['from' => 'saved@sender.com', 'to' => 'saved@recipient.com'],
+        ]))->save();
+
+        $submission = tap($form->makeSubmission())->save();
+
+        $form->email([
+            ['from' => 'changed@sender.com', 'to' => 'changed@recipient.com'],
+        ]);
 
         Bus::chain([
             new SendEmails($submission, Site::default(), [

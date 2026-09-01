@@ -2,6 +2,7 @@
 
 namespace Tests\Forms;
 
+use Facades\Statamic\Console\Processes\Composer;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -212,6 +213,8 @@ class EmailTest extends TestCase
             'fields',
             'locale',
             'now',
+            'pages',
+            'sections',
             'site',
             'site_url',
             'today',
@@ -221,6 +224,82 @@ class EmailTest extends TestCase
         $this->assertEquals($submission->id(), $email->viewData['id']);
         $this->assertEquals($form, $email->viewData['form']->value());
         $this->assertEquals('Statamic', (string) $email->viewData['company']['company_name']);
+    }
+
+    #[Test]
+    public function it_adds_page_data_to_the_view()
+    {
+        $email = $this->makeEmailForMultiPageForm();
+
+        $pages = $email->viewData['pages'];
+
+        $this->assertEquals(['Your Details', 'Your Message'], collect($pages)->pluck('display')->all());
+        $this->assertEquals('Tell us about yourself.', $pages[0]['instructions']);
+        $this->assertEquals(['Name', 'Contact'], collect($pages[0]['sections'])->pluck('display')->all());
+        $this->assertEquals('What should we call you?', $pages[0]['sections'][0]['instructions']);
+        $this->assertEquals(['name'], collect($pages[0]['sections'][0]['fields'])->pluck('handle')->all());
+        $this->assertEquals(['email'], collect($pages[0]['sections'][1]['fields'])->pluck('handle')->all());
+        $this->assertEquals(['message'], collect($pages[1]['sections'][0]['fields'])->pluck('handle')->all());
+        $this->assertEquals('Jack Black', $pages[0]['sections'][0]['fields'][0]['value']->value());
+    }
+
+    #[Test]
+    public function it_adds_section_data_to_the_view()
+    {
+        $email = $this->makeEmailForMultiPageForm();
+
+        $sections = $email->viewData['sections'];
+
+        $this->assertEquals(['Name', 'Contact', null], collect($sections)->pluck('display')->all());
+        $this->assertEquals(['message'], collect($sections[2]['fields'])->pluck('handle')->all());
+    }
+
+    private function makeEmailForMultiPageForm(): Email
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        $form = tap(Form::make('test')->formFields([
+            'pages' => [
+                [
+                    'display' => 'Your Details',
+                    'instructions' => 'Tell us about yourself.',
+                    'sections' => [
+                        [
+                            'display' => 'Name',
+                            'instructions' => 'What should we call you?',
+                            'fields' => [
+                                ['handle' => 'intro', 'field' => ['type' => 'heading']],
+                                ['handle' => 'name', 'field' => ['type' => 'short_answer']],
+                            ],
+                        ],
+                        [
+                            'display' => 'Contact',
+                            'fields' => [
+                                ['handle' => 'email', 'field' => ['type' => 'email']],
+                            ],
+                        ],
+                    ],
+                ],
+                [
+                    'display' => 'Your Message',
+                    'sections' => [
+                        [
+                            'fields' => [
+                                ['handle' => 'message', 'field' => ['type' => 'long_answer']],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]))->save();
+
+        $submission = $form->makeSubmission()->data([
+            'name' => 'Jack Black',
+            'email' => 'jack@black.com',
+            'message' => 'Hello there.',
+        ]);
+
+        return $this->makeEmailWithSubmission($submission);
     }
 
     #[Test]
