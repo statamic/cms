@@ -34,7 +34,16 @@
                                 <div
                                     v-for="(set, index) in value"
                                     :key="set._id"
-                                    :class="[sortableItemClass, cardLayouts[index].className]"
+                                    :class="[
+                                        sortableItemClass,
+                                        cardLayouts[index].className,
+                                        {
+                                            'replicator-card-set-inset-picker': showCardInsetPicker(
+                                                cardLayouts[index].groupSize,
+                                                cardLayouts[index].positionInGroup,
+                                            ),
+                                        },
+                                    ]"
                                 >
                                     <ReplicatorSet
                                         :id="set._id"
@@ -57,26 +66,17 @@
                                         @removed="removed(set, index)"
                                     >
                                         <template v-slot:picker>
-                                            <div
-                                                :class="{
-                                                    'replicator-card-set-inset-picker': showCardInsetPicker(
-                                                        cardLayouts[index].groupSize,
-                                                        cardLayouts[index].positionInGroup,
-                                                    ),
-                                                }"
-                                            >
-                                                <add-set-button
-                                                    variant="between"
-                                                    :groups="groupConfigs"
-                                                    :sets="setConfigs"
-                                                    :index="index"
-                                                    :enabled="canAddSet"
-                                                    :is-first="index === 0"
-                                                    :show-connector="showCardEntryConnector(index)"
-                                                    :loading-set="loadingSet"
-                                                    @added="addSet"
-                                                />
-                                            </div>
+                                            <add-set-button
+                                                variant="between"
+                                                :groups="groupConfigs"
+                                                :sets="setConfigs"
+                                                :index="index"
+                                                :enabled="canAddSet"
+                                                :is-first="index === 0"
+                                                :show-connector="showCardEntryConnector(index)"
+                                                :loading-set="loadingSet"
+                                                @added="addSet"
+                                            />
                                         </template>
                                     </ReplicatorSet>
                                 </div>

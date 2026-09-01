@@ -1,7 +1,5 @@
-/* ==========================================================================
-   REPLICATOR CARD SETS
-   ========================================================================== */
-
+/* GROUP REPLICATOR CARD SETS
+=================================================== */
 .replicator-set-list {
     display: flex;
     flex-wrap: wrap;
@@ -38,12 +36,14 @@
 
     [data-ui-popover-trigger] {
         position: absolute;
+        inset: 0;
         left: -1.15rem;
-        height: 100%;
         writing-mode: vertical-lr;
 
-        button .rounded-full {
+        [data-insert-handle] {
+            width: 1rem;
             position: absolute;
+            top: 0;
             left: calc(0.5rem + 2px);
             height: 100%;
             width: 0.3rem;
