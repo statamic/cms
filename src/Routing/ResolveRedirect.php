@@ -2,11 +2,9 @@
 
 namespace Statamic\Routing;
 
-use Statamic\Contracts\Data\Localization;
 use Statamic\Contracts\Entries\Entry;
-use Statamic\Facades;
-use Statamic\Facades\Site;
 use Statamic\Fields\Values;
+use Statamic\Fieldtypes\Link;
 use Statamic\Fieldtypes\Link\ArrayableLink;
 use Statamic\Structures\Page;
 use Statamic\Support\Str;
@@ -54,36 +52,17 @@ class ResolveRedirect
             return $redirect->url->value();
         }
 
-        if (Str::startsWith($redirect, 'entry::')) {
-            $id = Str::after($redirect, 'entry::');
-
-            return $this->findEntry($id, $parent, $localize);
-        }
-
-        if (Str::startsWith($redirect, 'asset::')) {
-            $id = Str::after($redirect, 'asset::');
-
-            return Facades\Asset::find($id);
+        foreach (Link::types() as $linkType) {
+            if (Str::startsWith($redirect, "{$linkType->handle()}::")) {
+                return $linkType->resolve(
+                    id: Str::after($redirect, "{$linkType->handle()}::"),
+                    parent: $parent,
+                    localize: $localize
+                );
+            }
         }
 
         return is_numeric($redirect) ? (int) $redirect : $redirect;
-    }
-
-    private function findEntry($id, $parent, $localize)
-    {
-        if (! ($entry = Facades\Entry::find($id))) {
-            return null;
-        }
-
-        if (! $localize) {
-            return $entry;
-        }
-
-        $site = $parent instanceof Localization
-            ? $parent->locale()
-            : Site::current()->handle();
-
-        return $entry->in($site) ?? $entry;
     }
 
     private function firstChild($parent)

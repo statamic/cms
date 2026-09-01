@@ -77,7 +77,7 @@
             :blueprint="fieldset"
             v-model="values"
             :extra-values="extraValues"
-            :meta="meta"
+            v-model:meta="meta"
             :origin-values="originValues"
             :origin-meta="originMeta"
             :errors="errors"
@@ -285,6 +285,7 @@ import {
 	Stack,
 } from '@ui';
 import resetValuesFromResponse from '@/util/resetValuesFromResponse.js';
+import debounce from '@/util/debounce.js';
 import { computed, ref } from 'vue';
 import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } from '@ui/Publish/SavePipeline.js';
 import { router } from '@inertiajs/vue3';
@@ -352,11 +353,13 @@ export default {
         previewTargets: Array,
         autosaveInterval: Number,
         parent: String,
+        initialTitleFormat: Object,
     },
 
     data() {
         return {
             actions: this.initialActions,
+            titleFormat: this.initialTitleFormat,
             localizing: false,
             trackDirtyState: true,
             fieldset: this.initialFieldset,
@@ -457,7 +460,7 @@ export default {
         },
 
         showLivePreviewButton() {
-            return !this.readOnly && !this.isCreating && this.isBase && this.livePreviewUrl;
+            return !this.isPreviewing && !this.readOnly && !this.isCreating && this.isBase && this.livePreviewUrl;
         },
 
         showVisitUrlButton() {
@@ -564,6 +567,7 @@ export default {
                         _blueprint: this.fieldset.handle,
                         _localized: this.localizedFields,
                         _parent: this.parent,
+                        _auto_slug: this.meta.slug?.auto ?? false,
                     }),
                     new AfterSaveHooks('entry', {
                         collection: this.collectionHandle,
@@ -629,6 +633,42 @@ export default {
             }
         },
 
+        generateTitle() {
+            if (!this.titleFormat) return;
+
+            const values = this.titleFormatValues();
+            const serialized = JSON.stringify(values);
+
+            if (serialized === this.lastTitleFormatValues) return;
+            this.lastTitleFormatValues = serialized;
+
+            this.titleRequest?.abort();
+            this.titleRequest = new AbortController();
+
+            this.$axios
+                .post(
+                    this.titleFormat.url,
+                    { blueprint: this.fieldset.handle, values },
+                    { signal: this.titleRequest.signal },
+                )
+                .then(({ data }) => {
+                    if (data.title !== this.values.title) this.$refs.container.setFieldValue('title', data.title);
+                })
+                .catch((e) => {
+                    if (e.code !== 'ERR_CANCELED') throw e;
+                });
+        },
+
+        titleFormatValues() {
+            // The server discards these, so sending them would only mean pointless
+            // requests whenever the slug gets regenerated from the title.
+            const fields = this.titleFormat.fields.filter(
+                (field) => field in this.values && !['title', 'slug'].includes(field),
+            );
+
+            return Object.fromEntries(fields.map((field) => [field, this.values[field]]));
+        },
+
         localizationSelected(localization) {
             if (!this.canSave) {
                 if (localization.exists) this.editLocalization(localization);
@@ -662,10 +702,6 @@ export default {
             } else {
                 this.createLocalization(localization);
             }
-
-            if (this.isBase) {
-                window.history.replaceState({}, '', localization.url + window.location.hash);
-            }
         },
 
         editLocalization(localization) {
@@ -685,6 +721,7 @@ export default {
                 this.collection = data.collection;
                 this.title = data.editing ? data.values.title : this.title;
                 this.actions = data.actions;
+                this.titleFormat = data.titleFormat;
 				this.itemActions = data.itemActions;
                 this.fieldset = data.blueprint;
                 this.permalink = data.permalink;
@@ -693,6 +730,10 @@ export default {
                 this.localizing = false;
                 this.initialPublished = data.values.published;
                 this.readOnly = data.readOnly;
+
+                if (this.isBase && localization.url) {
+                    window.history.replaceState({}, '', localization.url + window.location.hash);
+                }
 
                 this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 500); // after any fieldtypes do a debounced update
             });
@@ -876,6 +917,11 @@ export default {
 
     created() {
         window.history.replaceState({}, document.title, document.location.href.replace('created=true', ''));
+
+        if (this.titleFormat) {
+            this.lastTitleFormatValues = JSON.stringify(this.titleFormatValues());
+            this.$watch('values', debounce(() => this.generateTitle(), 300), { deep: true });
+        }
 
         this.selectedOrigin =
             this.originBehavior === 'active'

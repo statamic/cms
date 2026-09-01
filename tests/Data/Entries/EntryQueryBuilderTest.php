@@ -174,6 +174,21 @@ class EntryQueryBuilderTest extends TestCase
     }
 
     #[Test]
+    public function entries_are_found_using_where_date_with_a_carbon_instance_in_a_different_timezone()
+    {
+        $this->createWhereDateTestEntries();
+
+        // 2021-11-15 02:00 in Moscow (+03:00) is 2021-11-14 23:00 in the app's (UTC) timezone,
+        // so it should match Post 2 (stored as 2021-11-14) and not Post 1 or Post 3 (2021-11-15).
+        $value = Carbon::create(2021, 11, 15, 2, 0, 0, 'Europe/Moscow');
+
+        $entries = Entry::query()->whereDate('test_date', $value)->get();
+
+        $this->assertCount(1, $entries);
+        $this->assertEquals(['Post 2'], $entries->map->title->all());
+    }
+
+    #[Test]
     public function entries_are_found_using_where_month()
     {
         $this->createWhereDateTestEntries();
@@ -247,6 +262,21 @@ class EntryQueryBuilderTest extends TestCase
         $this->assertEquals(['Post 2'], $entries->map->title->all());
 
         $entries = Entry::query()->whereTime('test_date', Carbon::createFromFormat('Y-m-d H:i', '2021-11-13 09:00'))->get();
+        $this->assertCount(1, $entries);
+        $this->assertEquals(['Post 2'], $entries->map->title->all());
+    }
+
+    #[Test]
+    public function entries_are_found_using_where_time_with_a_carbon_instance_in_a_different_timezone()
+    {
+        $this->createWhereDateTestEntries();
+
+        // 2021-11-13 12:00 in Moscow (+03:00) is 09:00 in the app's (UTC) timezone,
+        // matching Post 2's stored time.
+        $value = Carbon::create(2021, 11, 13, 12, 0, 0, 'Europe/Moscow');
+
+        $entries = Entry::query()->whereTime('test_date', $value)->get();
+
         $this->assertCount(1, $entries);
         $this->assertEquals(['Post 2'], $entries->map->title->all());
     }
@@ -827,6 +857,18 @@ class EntryQueryBuilderTest extends TestCase
 
         $this->assertCount(2, $entries);
         $this->assertEquals(['Post 2', 'Post 3'], $entries->map->title->all());
+    }
+
+    #[Test]
+    public function it_returns_an_empty_page_when_the_offset_overflows()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        // A page number large enough to overflow the offset arithmetic used to crash
+        // array_slice() with a float; it should just yield an empty page.
+        $entries = Entry::query()->forPage(PHP_INT_MAX, 6)->get();
+
+        $this->assertCount(0, $entries);
     }
 
     #[Test]

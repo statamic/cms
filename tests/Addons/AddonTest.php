@@ -227,6 +227,14 @@ class AddonTest extends TestCase
     }
 
     #[Test]
+    public function it_checks_if_addon_has_settings_blueprint_without_resolving_it()
+    {
+        $this->app->bind('statamic.addons.test-addon.settings_blueprint', fn () => $this->fail('The blueprint should not have been resolved.'));
+
+        $this->assertTrue($this->makeFromPackage(['slug' => 'test-addon'])->hasSettingsBlueprint());
+    }
+
+    #[Test]
     public function it_gets_the_settings_blueprint()
     {
         $this->app->bind('statamic.addons.test-addon.settings_blueprint', fn () => [
@@ -342,6 +350,11 @@ class AddonTest extends TestCase
             ['2.0.0', '2.0.0', true],
             ['1.0', '1.0.0', true],
             ['1.0', '1.0.1', false],
+
+            // Installed version is newer than the marketplace's indexed latest version
+            ['1.0.2', '1.0.1', true],
+            ['2.0.0', '1.0.0', true],
+            ['7.12.1', '7.12.0', true],
         ];
     }
 

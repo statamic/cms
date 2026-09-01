@@ -246,6 +246,28 @@ class PrecedenceTest extends TestCase
     }
 
     #[Test]
+    public function it_replaces_list_preferences_instead_of_merging_them()
+    {
+        $this->actingAs(User::make()->preferences([
+            'collections' => [
+                'orders' => [
+                    'columns' => ['date', 'title', 'customer'],
+                ],
+            ],
+        ]));
+
+        Preference::default()->set([
+            'collections' => [
+                'orders' => [
+                    'columns' => ['date', 'title', 'customer', 'grand_total', 'order_status'],
+                ],
+            ],
+        ])->save();
+
+        $this->assertEquals(['date', 'title', 'customer'], Preference::get('collections.orders.columns'));
+    }
+
+    #[Test]
     public function it_merges_preferences_at_every_level_unless_otherwise_configured()
     {
         $this->actingAs(User::make()->assignRole('rabbit')->assignRole('bear')->preferences([

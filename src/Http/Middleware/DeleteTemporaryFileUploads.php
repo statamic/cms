@@ -22,10 +22,11 @@ class DeleteTemporaryFileUploads
 
     private function deleteFilesOverAnHourOld()
     {
-        $disk = File::disk('local');
+        $disk = File::disk(config('statamic.system.file_uploads_disk', 'local'));
+        $directory = config('statamic.system.file_uploads_path', 'statamic/file-uploads');
 
         $disk
-            ->getFilesRecursively($dir = 'statamic/file-uploads')
+            ->getFilesRecursively($directory)
             ->filter(function ($path) {
                 $bits = explode('/', $path);
                 $timestamp = $bits[count($bits) - 2];
@@ -34,7 +35,7 @@ class DeleteTemporaryFileUploads
             })
             ->each(fn ($path) => $disk->delete($path));
 
-        $disk->deleteEmptySubfolders($dir);
+        $disk->deleteEmptySubfolders($directory);
     }
 
     private function deleteAbandonedChunks()
