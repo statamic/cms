@@ -82,6 +82,8 @@ class CollectionEntriesController extends ApiController
 
         if ($site = $this->requestedSite()) {
             $query->where('site', $site);
+        } elseif ($collection->sites()->count() > 1) {
+            $query->where('site', $collection->sites()->first());
         }
 
         return $query->first();
