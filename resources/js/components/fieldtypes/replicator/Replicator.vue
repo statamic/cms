@@ -18,166 +18,65 @@
 
                     <section :class="{ 'mt-12 p-4': fullScreenMode }">
                         <sortable-list
-                            :model-value="setGroups"
+                            :model-value="value"
                             :vertical="true"
-                            :item-class="sortableRowClass"
+                            :item-class="sortableItemClass"
                             :handle-class="sortableRowHandleClass"
                             append-to="body"
                             constrain-dimensions
-                            @update:model-value="groupsSorted"
+                            :animate="false"
+                            @update:model-value="sorted"
                             @dragstart="$emit('focus')"
                             @dragend="$emit('blur')"
                             v-slot="{}"
                         >
-                            <div class="relative">
+                            <div class="replicator-set-list relative">
                                 <div
-                                    v-for="group in setGroups"
-                                    :key="groupKey(group)"
-                                    :class="sortableRowClass"
+                                    v-for="(set, index) in value"
+                                    :key="set._id"
+                                    :class="[sortableItemClass, cardLayouts[index].className]"
                                 >
-                                    <template v-if="group.type === 'card-group'">
-                                        <div
-                                            v-if="group.items.length === 1"
-                                            class="replicator-card-sets"
-                                            :style="{ '--card-cols': 1 }"
-                                        >
-                                            <ReplicatorSet
-                                                :id="group.items[0].set._id"
-                                                :index="group.items[0].index"
-                                                :field-path="setFieldPathPrefix"
-                                                :meta-path="setMetaPathPrefix"
-                                                :values="group.items[0].set"
-                                                :config="setConfig(group.items[0].set.type)"
-                                                :sortable-item-class="''"
-                                                :sortable-handle-class="sortableRowHandleClass"
-                                                :collapsed="collapsed.includes(group.items[0].set._id)"
-                                                :enabled="group.items[0].set.enabled"
-                                                :read-only="isReadOnly"
-                                                :can-add-set="canAddSet"
-                                                :has-error="setHasError(group.items[0].set._id)"
-                                                :show-field-previews="config.previews"
-                                                @collapsed="collapseSet(group.items[0].set._id)"
-                                                @expanded="expandSet(group.items[0].set._id)"
-                                                @duplicated="duplicateSet(group.items[0].set._id)"
-                                                @removed="removed(group.items[0].set, group.items[0].index)"
-                                            >
-                                                <template v-slot:picker>
-                                                    <add-set-button
-                                                        variant="between"
-                                                        :groups="groupConfigs"
-                                                        :sets="setConfigs"
-                                                        :index="group.items[0].index"
-                                                        :enabled="canAddSet"
-                                                        :is-first="group.items[0].index === 0"
-                                                        :show-connector="showCardGroupEntryConnector(group, group.items[0].index)"
-                                                        :loading-set="loadingSet"
-                                                        @added="addSet"
-                                                    />
-                                                </template>
-                                            </ReplicatorSet>
-                                        </div>
-                                        <div v-else class="replicator-card-group-row">
-                                            <Icon
-                                                v-if="!isReadOnly"
-                                                name="handles"
-                                                :class="sortableRowHandleClass"
-                                                class="replicator-card-group-handle size-4 shrink-0 cursor-grab text-gray-400"
-                                            />
-                                            <sortable-list
-                                                :model-value="group.items"
-                                                :vertical="false"
-                                                :item-class="sortableItemClass"
-                                                :handle-class="sortableHandleClass"
-                                                :options="cardSortableOptions"
-                                                append-to="body"
-                                                constrain-dimensions
-                                                class="min-w-0 flex-1"
-                                                @update:model-value="(items) => cardGroupSorted(group, items)"
-                                                v-slot="{}"
-                                            >
-                                                <div
-                                                    class="replicator-card-sets"
-                                                    :style="{ '--card-cols': cardGroupColumns(group.items.length) }"
-                                                >
-                                                    <ReplicatorSet
-                                                        v-for="(item, positionInGroup) in group.items"
-                                                        :key="item.set._id"
-                                                        :id="item.set._id"
-                                                        :index="item.index"
-                                                        :field-path="setFieldPathPrefix"
-                                                        :meta-path="setMetaPathPrefix"
-                                                        :values="item.set"
-                                                        :config="setConfig(item.set.type)"
-                                                        :sortable-item-class="sortableItemClass"
-                                                        :sortable-handle-class="sortableHandleClass"
-                                                        :collapsed="collapsed.includes(item.set._id)"
-                                                        :enabled="item.set.enabled"
-                                                        :read-only="isReadOnly"
-                                                        :can-add-set="canAddSet"
-                                                        :has-error="setHasError(item.set._id)"
-                                                        :show-field-previews="config.previews"
-                                                        @collapsed="collapseSet(item.set._id)"
-                                                        @expanded="expandSet(item.set._id)"
-                                                        @duplicated="duplicateSet(item.set._id)"
-                                                        @removed="removed(item.set, item.index)"
-                                                    >
-                                                        <template v-slot:picker>
-                                                            <div
-                                                                :class="{
-                                                                    'replicator-card-set-inset-picker': showCardInsetPicker(group.items.length, positionInGroup),
-                                                                }"
-                                                            >
-                                                                <add-set-button
-                                                                    variant="between"
-                                                                    :groups="groupConfigs"
-                                                                    :sets="setConfigs"
-                                                                    :index="item.index"
-                                                                    :enabled="canAddSet"
-                                                                    :is-first="item.index === 0"
-                                                                    :show-connector="showCardGroupEntryConnector(group, item.index)"
-                                                                    :loading-set="loadingSet"
-                                                                    @added="addSet"
-                                                                />
-                                                            </div>
-                                                        </template>
-                                                    </ReplicatorSet>
-                                                </div>
-                                            </sortable-list>
-                                        </div>
-                                    </template>
                                     <ReplicatorSet
-                                        v-else
-                                        :id="group.set._id"
-                                        :index="group.index"
+                                        :id="set._id"
+                                        :index="index"
                                         :field-path="setFieldPathPrefix"
                                         :meta-path="setMetaPathPrefix"
-                                        :values="group.set"
-                                        :config="setConfig(group.set.type)"
+                                        :values="set"
+                                        :config="setConfig(set.type)"
                                         :sortable-item-class="''"
                                         :sortable-handle-class="sortableRowHandleClass"
-                                        :collapsed="collapsed.includes(group.set._id)"
-                                        :enabled="group.set.enabled"
+                                        :collapsed="collapsed.includes(set._id)"
+                                        :enabled="set.enabled"
                                         :read-only="isReadOnly"
                                         :can-add-set="canAddSet"
-                                        :has-error="setHasError(group.set._id)"
+                                        :has-error="setHasError(set._id)"
                                         :show-field-previews="config.previews"
-                                        @collapsed="collapseSet(group.set._id)"
-                                        @expanded="expandSet(group.set._id)"
-                                        @duplicated="duplicateSet(group.set._id)"
-                                        @removed="removed(group.set, group.index)"
+                                        @collapsed="collapseSet(set._id)"
+                                        @expanded="expandSet(set._id)"
+                                        @duplicated="duplicateSet(set._id)"
+                                        @removed="removed(set, index)"
                                     >
                                         <template v-slot:picker>
-                                            <add-set-button
-                                                variant="between"
-                                                :groups="groupConfigs"
-                                                :sets="setConfigs"
-                                                :index="group.index"
-                                                :enabled="canAddSet"
-                                                :is-first="group.index === 0"
-                                                :show-connector="showSetConnector(group.index)"
-                                                :loading-set="loadingSet"
-                                                @added="addSet"
-                                            />
+                                            <div
+                                                :class="{
+                                                    'replicator-card-set-inset-picker': showCardInsetPicker(
+                                                        cardLayouts[index].groupSize,
+                                                        cardLayouts[index].positionInGroup,
+                                                    ),
+                                                }"
+                                            >
+                                                <add-set-button
+                                                    variant="between"
+                                                    :groups="groupConfigs"
+                                                    :sets="setConfigs"
+                                                    :index="index"
+                                                    :enabled="canAddSet"
+                                                    :is-first="index === 0"
+                                                    :show-connector="showCardEntryConnector(index)"
+                                                    :loading-set="loadingSet"
+                                                    @added="addSet"
+                                                />
+                                            </div>
                                         </template>
                                     </ReplicatorSet>
                                 </div>
@@ -209,7 +108,6 @@ import ReplicatorSet from './Set.vue';
 import AddSetButton from './AddSetButton.vue';
 import ManagesSetMeta from './ManagesSetMeta';
 import { SortableList } from '../../sortable/Sortable';
-import { Icon } from '@/components/ui';
 import { data_get } from "@/bootstrap/globals.js";
 
 export default {
@@ -219,7 +117,6 @@ export default {
         ReplicatorSet,
         SortableList,
         AddSetButton,
-        Icon,
     },
 
     data() {
@@ -263,52 +160,49 @@ export default {
             return this.config.sets;
         },
 
-        setGroups() {
-            const groups = [];
-            let current = null;
-
-            this.value.forEach((set, index) => {
-                if (this.setConfig(set.type).card) {
-                    if (current?.setType === set.type) {
-                        current.items.push({ set, index });
-                        return;
-                    }
-
-                    current = { setType: set.type, items: [{ set, index }] };
-                    groups.push({ type: 'card-group', ...current });
-                    return;
-                }
-
-                current = null;
-                groups.push({ type: 'set', set, index });
-            });
-
-            return groups;
-        },
-
         sortableItemClass() {
             return `${this.fieldId}-sortable-item`;
-        },
-
-        sortableRowClass() {
-            return `${this.fieldId}-sortable-row`;
         },
 
         sortableRowHandleClass() {
             return `${this.fieldId}-sortable-row-handle`;
         },
 
-        sortableHandleClass() {
-            return `${this.fieldId}-sortable-handle`;
-        },
+        cardLayouts() {
+            return this.value.map((set, index) => {
+                if (!this.setConfig(set.type).card) {
+                    return {
+                        isCard: false,
+                        groupSize: 1,
+                        positionInGroup: 0,
+                        columns: 1,
+                        className: 'replicator-set-slot--full',
+                    };
+                }
 
-        cardSortableOptions() {
-            return {
-                mirror: {
-                    constrainDimensions: true,
-                    yAxis: false,
-                },
-            };
+                let groupStart = index;
+
+                while (groupStart > 0 && this.isSameCardGroup(this.value[groupStart - 1], set)) {
+                    groupStart--;
+                }
+
+                let groupEnd = index;
+
+                while (groupEnd < this.value.length - 1 && this.isSameCardGroup(this.value[groupEnd + 1], set)) {
+                    groupEnd++;
+                }
+
+                const groupSize = groupEnd - groupStart + 1;
+                const columns = this.cardGroupColumns(groupSize);
+
+                return {
+                    isCard: true,
+                    groupSize,
+                    positionInGroup: index - groupStart,
+                    columns,
+                    className: `replicator-set-slot--card-cols-${columns}`,
+                };
+            });
         },
 
         replicatorPreview() {
@@ -353,12 +247,12 @@ export default {
             return this.setConfigs.find((c) => c.handle === handle) || {};
         },
 
-        groupKey(group) {
-            if (group.type === 'card-group') {
-                return `card-group-${group.setType}-${group.items[0].set._id}`;
-            }
-
-            return group.set._id;
+        isSameCardGroup(a, b) {
+            return (
+                this.setConfig(a.type).card
+                && this.setConfig(b.type).card
+                && a.type === b.type
+            );
         },
 
         showSetConnector(index) {
@@ -380,8 +274,10 @@ export default {
             return true;
         },
 
-        showCardGroupEntryConnector(group, index) {
-            if (group.items[0].index !== index) {
+        showCardEntryConnector(index) {
+            const layout = this.cardLayouts[index];
+
+            if (layout.isCard && layout.positionInGroup !== 0) {
                 return false;
             }
 
@@ -423,28 +319,22 @@ export default {
         },
 
         sorted(value) {
-            this.update(value);
-        },
+            const ids = new Set();
 
-        groupsSorted(groups) {
-            this.update(groups.flatMap((group) => {
-                if (group.type === 'card-group') {
-                    return group.items.map((item) => item.set);
+            const unique = value.filter((set) => {
+                if (ids.has(set._id)) {
+                    return false;
                 }
 
-                return [group.set];
-            }));
-        },
+                ids.add(set._id);
+                return true;
+            });
 
-        cardGroupSorted(group, items) {
-            const startIndex = group.items[0].index;
-            const endIndex = group.items[group.items.length - 1].index + 1;
+            if (unique.length !== this.value.length) {
+                return;
+            }
 
-            this.update([
-                ...this.value.slice(0, startIndex),
-                ...items.map((item) => item.set),
-                ...this.value.slice(endIndex),
-            ]);
+            this.update(unique);
         },
 
         addSet(handle, index) {
