@@ -22,14 +22,15 @@
 }
 
 @container panel (width > 635px) {
-    .publish-fields * {
-        --col-span: 12;
-    }
     .replicator-set-list {
         display: flex;
         flex-wrap: wrap;
         column-gap: 0.75rem;
         align-items: start;
+
+        .publish-fields * {
+            --col-span: 12;
+        }
     }
 
     .replicator-set-slot--full,
