@@ -162,6 +162,20 @@ YAML;
     }
 
     #[Test]
+    public function it_gets_all_tokens()
+    {
+        Carbon::setTestNow(Carbon::create(2020, 1, 1, 3, 0, 0));
+
+        $this->tokens->make('a', 'test')->save();
+        $this->tokens->make('b', 'test')->expireAt(Carbon::now()->subMinute())->save();
+        $this->tokens->make('c', 'test')->expireAt(Carbon::now()->addHour())->save();
+
+        $tokens = $this->tokens->all();
+
+        $this->assertEquals(['a', 'b', 'c'], $tokens->map->token()->sort()->values()->all());
+    }
+
+    #[Test]
     public function it_deletes_expired_tokens()
     {
         Carbon::setTestNow(Carbon::create(2020, 1, 1, 3, 0, 0));

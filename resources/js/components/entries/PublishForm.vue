@@ -101,22 +101,34 @@
                 <PublishTabs>
                     <template #actions>
                         <div class="space-y-6">
-                            <!-- Live Preview / Visit URL Buttons -->
-                            <div class="flex flex-wrap gap-3 lg:gap-4" v-if="showLivePreviewButton || showVisitUrlButton">
+                            <!-- Live Preview / Visit URL / Share Buttons -->
+                            <div
+                                class="flex"
+                                :class="showCopyPreviewLinkButton ? 'gap-2' : 'flex-wrap gap-3 lg:gap-4'"
+                                v-if="showLivePreviewButton || showVisitUrlButton || showCopyPreviewLinkButton"
+                            >
                                 <Button
-                                    :text="__('Live Preview')"
-                                    class="flex-1"
+                                    :text="showCopyPreviewLinkButton ? __('Preview') : __('Live Preview')"
+                                    :class="showCopyPreviewLinkButton ? 'min-w-0 flex-1 px-2!' : 'flex-1'"
                                     icon="live-preview"
                                     @click="openLivePreview"
                                     v-if="showLivePreviewButton"
                                 />
                                 <Button
                                     :href="permalink"
-                                    :text="__('Visit URL')"
-                                    class="flex-1"
+                                    :text="showCopyPreviewLinkButton ? __('Visit') : __('Visit URL')"
+                                    :class="showCopyPreviewLinkButton ? 'min-w-0 flex-1 px-2!' : 'flex-1'"
                                     icon="external-link"
                                     target="_blank"
                                     v-if="showVisitUrlButton"
+                                />
+                                <Button
+                                    :text="__('Share')"
+                                    class="min-w-0 flex-1 px-2!"
+                                    icon="share-link"
+                                    :loading="copyingPreviewLink"
+                                    @click="copyPreviewLink"
+                                    v-if="showCopyPreviewLinkButton"
                                 />
                             </div>
 
@@ -205,6 +217,7 @@
             <revision-history
                 :index-url="actions.revisions"
                 :restore-url="actions.restore"
+                :shared-preview-url="actions.sharedPreview"
                 :reference="initialReference"
                 :can-restore-revisions="!readOnly"
                 @closed="$refs.revisionHistoryStack.close()"
@@ -390,6 +403,7 @@ export default {
             confirmingPublish: false,
             readOnly: this.initialReadOnly,
             permalink: this.initialPermalink,
+            copyingPreviewLink: false,
 
             saveKeyBinding: null,
             quickSaveKeyBinding: null,
@@ -462,6 +476,20 @@ export default {
 
         showVisitUrlButton() {
             return !!this.permalink;
+        },
+
+        showCopyPreviewLinkButton() {
+            if (this.isCreating || !this.isBase || !this.actions.sharedPreview) {
+                return false;
+            }
+
+            if (this.isWorkingCopy) {
+                return true;
+            }
+
+            const status = this.activeLocalization?.status;
+
+            return this.isDraft || status === 'scheduled' || status === 'expired';
         },
 
         showLocalizationSelector() {
@@ -740,6 +768,27 @@ export default {
                     return this.$wait(300);
                 })
                 .then(() => (this.tabsVisible = true));
+        },
+
+        async copyPreviewLink() {
+            this.copyingPreviewLink = true;
+
+            try {
+                const { data } = await this.$axios.post(this.actions.sharedPreview);
+
+                try {
+                    await navigator.clipboard.writeText(data.url);
+                    this.$toast.success(
+                        __('messages.shared_preview_link_copied', { hours: data.expires_in_hours }),
+                    );
+                } catch {
+                    Statamic.$callbacks.call('copyToClipboard', data.url);
+                }
+            } catch {
+                this.$toast.error(__('Unable to copy preview link'));
+            } finally {
+                this.copyingPreviewLink = false;
+            }
         },
 
         closeLivePreview() {

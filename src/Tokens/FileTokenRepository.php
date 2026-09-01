@@ -18,6 +18,17 @@ class FileTokenRepository extends TokenRepository
         return app()->makeWith(TokenContract::class, compact('token', 'handler', 'data'));
     }
 
+    public function all(): \Illuminate\Support\Collection
+    {
+        if (! File::exists(storage_path('statamic/tokens'))) {
+            return collect();
+        }
+
+        return File::getFilesByType(storage_path('statamic/tokens'), 'yaml')
+            ->map(fn ($path) => $this->makeFromPath($path))
+            ->values();
+    }
+
     public function find(string $token): ?TokenContract
     {
         if (! $this->isValidTokenName($token)) {

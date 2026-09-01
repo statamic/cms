@@ -40,6 +40,7 @@ use Statamic\Http\Controllers\CP\Collections\EntriesController;
 use Statamic\Http\Controllers\CP\Collections\EntryActionController;
 use Statamic\Http\Controllers\CP\Collections\EntryPreviewController;
 use Statamic\Http\Controllers\CP\Collections\EntryRevisionsController;
+use Statamic\Http\Controllers\CP\Collections\EntrySharedPreviewController;
 use Statamic\Http\Controllers\CP\Collections\LocalizeEntryController;
 use Statamic\Http\Controllers\CP\Collections\PublishedEntriesController;
 use Statamic\Http\Controllers\CP\Collections\ReorderCollectionBlueprintsController;
@@ -209,6 +210,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
             Route::post('restore-revision', RestoreEntryRevisionController::class)->name('collections.entries.restore-revision');
             Route::post('preview', [EntryPreviewController::class, 'edit'])->name('collections.entries.preview.edit');
             Route::get('preview', [EntryPreviewController::class, 'show'])->name('collections.entries.preview.popout');
+            Route::post('shared-preview', [EntrySharedPreviewController::class, 'store'])->name('collections.entries.shared-preview');
             Route::patch('/', [EntriesController::class, 'update'])->name('collections.entries.update');
             Route::get('{slug}', fn ($collection, $entry, $slug) => redirect($entry->editUrl()));
         });
