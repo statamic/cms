@@ -3,7 +3,7 @@
 .replicator-set-list {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.75rem;
+    column-gap: 0.75rem;
     align-items: start;
 }
 
@@ -33,6 +33,7 @@
 
 .replicator-card-set-inset-picker {
     position: relative;
+    @apply mt-6;
 
     [data-ui-popover-trigger] {
         position: absolute;
