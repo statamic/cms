@@ -24,6 +24,7 @@ abstract class FormFieldtype implements Arrayable
 
     protected static $title;
     protected static $fieldtype;
+    protected static $extraConfigFields = [];
 
     protected $field;
     protected $selectable = true;
@@ -140,8 +141,17 @@ abstract class FormFieldtype implements Arrayable
         return $this->configFields;
     }
 
-    // TODO: Remove in v7. Only exists so config fields appended to the wrapped fieldtype keep working.
     public function extraConfigFieldItems(): array
+    {
+        return array_merge(
+            $this->configFieldItemsFromWrappedFieldtype(),
+            self::$extraConfigFields[static::class] ?? [],
+            self::$extraConfigFields[FormFieldtype::class] ?? [],
+        );
+    }
+
+    // TODO: Remove this bridge in v7, once addons have migrated to FormFieldtype::appendConfigField.
+    private function configFieldItemsFromWrappedFieldtype(): array
     {
         if (! $handle = static::fieldtype()) {
             return [];
@@ -152,6 +162,18 @@ abstract class FormFieldtype implements Arrayable
         }
 
         return app($class)->extraConfigFieldItems();
+    }
+
+    public static function appendConfigFields(array $config): void
+    {
+        $existingConfig = self::$extraConfigFields[static::class] ?? [];
+
+        self::$extraConfigFields[static::class] = array_merge($existingConfig, $config);
+    }
+
+    public static function appendConfigField(string $field, array $config): void
+    {
+        self::appendConfigFields([$field => $config]);
     }
 
     public function configBlueprint(): Blueprint
