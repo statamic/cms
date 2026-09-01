@@ -460,6 +460,64 @@ class APITest extends TestCase
         ];
     }
 
+    #[Test]
+    public function it_resolves_entries_by_slug()
+    {
+        Facades\Config::set('statamic.api.resources.collections', true);
+
+        Facades\Collection::make('pages')->save();
+        Facades\Entry::make()->collection('pages')->id('123')->slug('about')->published(true)->data(['title' => 'About'])->save();
+
+        $this
+            ->get('/api/collections/pages/entries/about')
+            ->assertSuccessful()
+            ->assertJsonPath('data.id', '123')
+            ->assertJsonPath('data.slug', 'about');
+    }
+
+    #[Test]
+    public function it_prefers_entry_id_over_slug()
+    {
+        Facades\Config::set('statamic.api.resources.collections', true);
+
+        Facades\Collection::make('pages')->save();
+        Facades\Entry::make()->collection('pages')->id('about')->slug('about-page')->published(true)->data(['title' => 'By ID'])->save();
+        Facades\Entry::make()->collection('pages')->id('other')->slug('about')->published(true)->data(['title' => 'By Slug'])->save();
+
+        $this
+            ->get('/api/collections/pages/entries/about')
+            ->assertSuccessful()
+            ->assertJsonPath('data.id', 'about')
+            ->assertJsonPath('data.title', 'By ID');
+    }
+
+    #[Test]
+    public function it_resolves_duplicate_slugs_to_the_first_collection_site()
+    {
+        Facades\Config::set('statamic.api.resources.collections', true);
+
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://localhost/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://localhost/fr/'],
+        ]);
+
+        Facades\Collection::make('pages')->sites(['en', 'fr'])->save();
+        Facades\Entry::make()->collection('pages')->locale('en')->id('about-en')->slug('about')->published(true)->data(['title' => 'About'])->save();
+        Facades\Entry::make()->collection('pages')->locale('fr')->id('about-fr')->slug('about')->published(true)->data(['title' => 'A propos'])->save();
+
+        $this
+            ->get('/api/collections/pages/entries/about')
+            ->assertSuccessful()
+            ->assertJsonPath('data.id', 'about-en')
+            ->assertJsonPath('data.title', 'About');
+
+        $this
+            ->get('/api/collections/pages/entries/about?site=fr')
+            ->assertSuccessful()
+            ->assertJsonPath('data.id', 'about-fr')
+            ->assertJsonPath('data.title', 'A propos');
+    }
+
     public static function exampleFiltersProvider()
     {
         return [['status:is'], ['published:is'], ['title:is']];
