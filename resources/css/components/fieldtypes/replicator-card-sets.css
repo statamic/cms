@@ -22,6 +22,9 @@
 }
 
 @container panel (width > 635px) {
+    .publish-fields * {
+        --col-span: 12;
+    }
     .replicator-set-list {
         display: flex;
         flex-wrap: wrap;
