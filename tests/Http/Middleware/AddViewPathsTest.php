@@ -78,6 +78,37 @@ class AddViewPathsTest extends TestCase
         $this->assertEquals($originalHints, Arr::get(view()->getFinder()->getHints(), 'foo'));
     }
 
+    #[Test]
+    public function doesnt_add_view_paths_when_theres_only_one_site()
+    {
+        $this->setSites([
+            'english' => ['url' => 'http://localhost/', 'locale' => 'en'],
+        ]);
+
+        view()->getFinder()->setPaths($originalPaths = [
+            '/path/to/views',
+            '/path/to/other/views',
+        ]);
+
+        view()->getFinder()->replaceNamespace('foo', $originalHints = [
+            '/path/to/views',
+            '/path/to/other',
+        ]);
+
+        $request = $this->createRequest('/test');
+        $handled = false;
+
+        (new AddViewPaths())->handle($request, function () use ($originalPaths, $originalHints, &$handled) {
+            $this->assertEquals($originalPaths, view()->getFinder()->getPaths());
+            $this->assertEquals($originalHints, Arr::get(view()->getFinder()->getHints(), 'foo'));
+            $handled = true;
+
+            return new Response;
+        });
+
+        $this->assertTrue($handled);
+    }
+
     private function setCurrentSiteBasedOnUrl($requestUrl)
     {
         $url = 'http://localhost'.Str::removeLeft($requestUrl, '/amp');

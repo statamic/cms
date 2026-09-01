@@ -14,6 +14,10 @@ class AddViewPaths
 
     public function handle($request, Closure $next)
     {
+        if (! Site::hasMultiple()) {
+            return $next($request);
+        }
+
         $this->update();
 
         $response = $next($request);
