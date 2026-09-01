@@ -13,7 +13,7 @@ export function conditionsSummary(conditions) {
 
     const fieldDisplay = (handle) => {
         const field = suggestableFields.find((field) => field.handle === handle);
-        return field?.config?.display ?? handle;
+        return __(field?.config?.display ?? handle);
     };
 
     const filtered = (conditions ?? []).filter((condition) => condition.field);
