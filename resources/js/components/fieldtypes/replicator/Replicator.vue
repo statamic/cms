@@ -34,6 +34,7 @@
                                 <div
                                     v-for="(set, index) in value"
                                     :key="set._id"
+                                    :data-set-id="set._id"
                                     :class="[
                                         sortableItemClass,
                                         cardLayouts[index].className,
@@ -45,6 +46,8 @@
                                                 && cardLayouts[index].positionInGroup === 0
                                                 && cardLayouts[index].groupSize > 1,
                                             'replicator-card-set-has-entry-connector': showCardEntryConnector(index),
+                                            'replicator-card-set-third-column': cardLayouts[index].columns === 3
+                                                && cardLayouts[index].positionInGroup === 2,
                                         },
                                     ]"
                                 >
@@ -112,6 +115,13 @@ import AddSetButton from './AddSetButton.vue';
 import ManagesSetMeta from './ManagesSetMeta';
 import { SortableList } from '../../sortable/Sortable';
 import { data_get } from "@/bootstrap/globals.js";
+import {
+    buildCardLayouts,
+    getCardGroupMemberIds,
+    shouldShowPickerConnector,
+} from './cardLayouts.js';
+
+const CARD_MULTI_COLUMN_MIN_WIDTH = 635;
 
 export default {
     mixins: [Fieldtype, ManagesSetMeta],
@@ -135,6 +145,8 @@ export default {
             errorsById: {},
             setsCache: {},
             loadingSet: null,
+            cardMultiColumnLayout: false,
+            cardLayoutObserver: null,
         };
     },
 
@@ -172,40 +184,11 @@ export default {
         },
 
         cardLayouts() {
-            return this.value.map((set, index) => {
-                if (!this.setConfig(set.type).card) {
-                    return {
-                        isCard: false,
-                        groupSize: 1,
-                        positionInGroup: 0,
-                        columns: 1,
-                        className: 'replicator-set-slot--full',
-                    };
-                }
-
-                let groupStart = index;
-
-                while (groupStart > 0 && this.isSameCardGroup(this.value[groupStart - 1], set)) {
-                    groupStart--;
-                }
-
-                let groupEnd = index;
-
-                while (groupEnd < this.value.length - 1 && this.isSameCardGroup(this.value[groupEnd + 1], set)) {
-                    groupEnd++;
-                }
-
-                const groupSize = groupEnd - groupStart + 1;
-                const columns = this.cardGroupColumns(groupSize);
-
-                return {
-                    isCard: true,
-                    groupSize,
-                    positionInGroup: index - groupStart,
-                    columns,
-                    className: `replicator-set-slot--card-cols-${columns}`,
-                };
-            });
+            return buildCardLayouts(
+                this.value,
+                (type) => this.setConfig(type).card,
+                (a, b) => this.isSameCardGroup(a, b),
+            );
         },
 
         replicatorPreview() {
@@ -292,27 +275,11 @@ export default {
         },
 
         showPickerConnector(index) {
-            if (this.showCardEntryConnector(index)) {
-                return true;
-            }
-
-            const layout = this.cardLayouts[index];
-
-            return layout.isCard
-                && layout.groupSize > 1
-                && layout.positionInGroup !== 0;
-        },
-
-        cardGroupColumns(count) {
-            if (count <= 1) {
-                return 1;
-            }
-
-            if (count === 2) {
-                return 2;
-            }
-
-            return 3;
+            return shouldShowPickerConnector({
+                index,
+                layouts: this.cardLayouts,
+                showCardEntryConnector: (i) => this.showCardEntryConnector(i),
+            });
         },
 
         showCardInsetPicker(cardCount) {
@@ -330,22 +297,36 @@ export default {
         },
 
         sorted(value) {
-            const ids = new Set();
+            const byId = new Map(this.value.map((set) => [set._id, set]));
+            const seen = new Set();
+            const unique = [];
 
-            const unique = value.filter((set) => {
-                if (ids.has(set._id)) {
-                    return false;
+            for (const set of value) {
+                if (seen.has(set._id)) {
+                    continue;
                 }
 
-                ids.add(set._id);
-                return true;
-            });
+                seen.add(set._id);
 
-            if (unique.length !== this.value.length) {
+                const existing = byId.get(set._id);
+
+                if (!existing) {
+                    return;
+                }
+
+                unique.push(existing);
+            }
+
+            if (unique.length === this.value.length) {
+                this.update(unique);
                 return;
             }
 
-            this.update(unique);
+            const fromDom = this.sortedValueFromDom(byId);
+
+            if (fromDom) {
+                this.update(fromDom);
+            }
         },
 
         addSet(handle, index) {
@@ -503,34 +484,61 @@ export default {
                 return [id];
             }
 
-            const layout = this.cardLayouts[index];
-
-            if (!layout.isCard || layout.groupSize <= 1) {
-                return [id];
-            }
-
-            const groupStart = index - layout.positionInGroup;
-
-            if (!this.cardsAreDisplayedInParallelRow(groupStart)) {
-                return [id];
-            }
-
-            return this.value
-                .slice(groupStart, groupStart + layout.groupSize)
-                .map((set) => set._id);
+            return getCardGroupMemberIds({
+                index,
+                value: this.value,
+                layouts: this.cardLayouts,
+                multiColumn: this.cardMultiColumnLayout,
+            });
         },
 
-        cardsAreDisplayedInParallelRow(groupStart) {
+        sortedValueFromDom(byId) {
             const list = this.$refs.setList;
-            const slot = list?.children[groupStart];
 
-            if (!slot || !list?.clientWidth) {
-                return false;
+            if (!list) {
+                return null;
             }
 
-            // Stacked cards span the full list width; side-by-side cards are narrower.
-            return slot.offsetWidth < list.clientWidth * 0.85;
+            const ordered = [...list.children]
+                .map((element) => byId.get(element.dataset.setId))
+                .filter(Boolean);
+
+            if (ordered.length !== this.value.length) {
+                return null;
+            }
+
+            return ordered;
         },
+
+        observeCardLayoutContainer() {
+            this.cardLayoutObserver?.disconnect();
+            this.cardLayoutObserver = null;
+
+            const root = this.$refs.setList;
+            const panel = root?.closest('[data-ui-panel]')
+                ?? root?.closest('[class*="container/panel"]');
+
+            if (!panel) {
+                this.cardMultiColumnLayout = false;
+                return;
+            }
+
+            const update = () => {
+                this.cardMultiColumnLayout = panel.clientWidth > CARD_MULTI_COLUMN_MIN_WIDTH;
+            };
+
+            update();
+            this.cardLayoutObserver = new ResizeObserver(update);
+            this.cardLayoutObserver.observe(panel);
+        },
+    },
+
+    mounted() {
+        this.$nextTick(() => this.observeCardLayoutContainer());
+    },
+
+    beforeUnmount() {
+        this.cardLayoutObserver?.disconnect();
     },
 
     watch: {
@@ -544,6 +552,10 @@ export default {
                     this.$emit('blur');
                 }
             }, 1);
+        },
+
+        fullScreenMode() {
+            this.$nextTick(() => this.observeCardLayoutContainer());
         },
 
         collapsed(collapsed) {
