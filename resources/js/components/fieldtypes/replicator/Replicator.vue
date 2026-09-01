@@ -40,7 +40,6 @@
                                         {
                                             'replicator-card-set-inset-picker': showCardInsetPicker(
                                                 cardLayouts[index].groupSize,
-                                                cardLayouts[index].positionInGroup,
                                             ),
                                         },
                                     ]"
@@ -281,6 +280,10 @@ export default {
                 return false;
             }
 
+            if (layout.isCard && layout.groupSize > 1) {
+                return false;
+            }
+
             if (index === 0) {
                 return false;
             }
@@ -300,12 +303,8 @@ export default {
             return 3;
         },
 
-        showCardInsetPicker(cardCount, positionInGroup) {
-            if (positionInGroup === 0) {
-                return false;
-            }
-
-            return positionInGroup % this.cardGroupColumns(cardCount) !== 0;
+        showCardInsetPicker(cardCount) {
+            return cardCount > 1;
         },
 
         updated(index, set) {
