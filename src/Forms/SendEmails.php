@@ -24,8 +24,9 @@ class SendEmails implements ShouldQueue
         $submission = $this->submission->form()->submission($this->submission->id()) ?? $this->submission;
 
         // Falls back to reading the form's own connections for anyone dispatching this
-        // job directly without the $config argument. Remove the fallback in v7.
-        $emailConfigs = $this->config ?? $submission->form()->connections()->get('email', []);
+        // job directly without the $config argument, using the dispatched submission's
+        // form instance so in-memory changes are respected. Remove the fallback in v7.
+        $emailConfigs = $this->config ?? $this->submission->form()->connections()->get('email', []);
 
         $this->prependToChain(
             collect($emailConfigs)
