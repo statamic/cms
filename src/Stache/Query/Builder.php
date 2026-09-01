@@ -206,7 +206,9 @@ abstract class Builder extends BaseBuilder
                 return false;
             }
 
-            return $value->copy()->setTimezone(config('app.timezone'))->startOfDay()->$method($where['value']);
+            $value = $value->copy()->setTimezone(config('app.timezone'));
+
+            return $value->startOfDay()->$method($where['value']);
         });
     }
 

@@ -195,6 +195,8 @@ class EntryQueryBuilderTest extends TestCase
 
         $this->createWhereDateTestEntries();
 
+        // The entries are indexed in UTC, so Post 3 (2021-11-15 00:00 in Zurich) is stored
+        // as 2021-11-14 23:00. It should still be found when querying for the 15th.
         $entries = Entry::query()->whereDate('test_date', Carbon::parse('2021-11-15', 'Europe/Zurich'))->get();
 
         $this->assertCount(2, $entries);
@@ -301,6 +303,8 @@ class EntryQueryBuilderTest extends TestCase
 
         $this->createWhereDateTestEntries();
 
+        // Post 2's 09:00 in Zurich (+01:00) is indexed as 08:00 in UTC, so it should
+        // still be found when querying for 09:00.
         $entries = Entry::query()->whereTime('test_date', Carbon::parse('2021-11-13 09:00', 'Europe/Zurich'))->get();
 
         $this->assertCount(1, $entries);
