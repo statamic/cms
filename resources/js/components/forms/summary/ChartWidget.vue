@@ -41,7 +41,7 @@ const accessibleLabel = computed(() => {
         .join(', ');
 
     return showingDrilldown.value
-        ? __(':field: Other breakdown: :values', { field: __(props.field.display), values })
+        ? __('statamic::messages.form_summary_other_breakdown', { field: __(props.field.display), values })
         : `${__(props.field.display)}: ${values}`;
 });
 
@@ -68,7 +68,7 @@ watch(chart, () => (showingDrilldown.value = false));
         </template>
         <div class="relative flex-1 overflow-hidden rounded-b-xl">
             <slot name="chrome" />
-            <p v-if="hasDrilldown" class="sr-only" aria-live="polite">{{ accessibleLabel }}</p>
+            <p v-if="hasDrilldown" class="sr-only" aria-live="polite">{{ showingDrilldown ? accessibleLabel : '' }}</p>
             <component :is="chart.component" v-bind="chartProps" @select="showingDrilldown = true">
                 <template v-if="field.insights.length" #summary>
                     <div class="flex flex-wrap gap-2.5 pb-5 -ms-1">
