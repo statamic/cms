@@ -54,7 +54,7 @@ class SiteLicense extends License
 
     public function url()
     {
-        $url = 'https://statamic.com/account/sites';
+        $url = rtrim(config('statamic.system.licensing_url', 'https://statamic.com'), '/').'/account/sites';
 
         if ($key = $this->key()) {
             $url .= '/'.$key;
@@ -71,6 +71,16 @@ class SiteLicense extends License
             return null;
         }
 
-        return 'https://statamic.com/licensing/handoff?'.http_build_query(['key' => $key]);
+        return rtrim(config('statamic.system.licensing_url', 'https://statamic.com'), '/').'/licensing/handoff?'.http_build_query(['key' => $key]);
+    }
+
+    public function hasSharedKey(): bool
+    {
+        return (bool) Arr::get($this->response, 'shared_key');
+    }
+
+    public function wasRotated(): bool
+    {
+        return (bool) Arr::get($this->response, 'key_rotated');
     }
 }

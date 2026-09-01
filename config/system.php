@@ -33,6 +33,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Licensing Endpoints
+    |--------------------------------------------------------------------------
+    |
+    | Override these in local/dev to point at a statamic.com worktree.
+    |
+    */
+
+    'licensing_url' => env('STATAMIC_LICENSING_URL', 'https://statamic.com'),
+
+    'outpost_url' => env('STATAMIC_OUTPOST_URL', 'https://outpost.statamic.com/v3/query'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Enable Multi-site
     |--------------------------------------------------------------------------
     |

@@ -219,7 +219,25 @@ class LicenseManagerTest extends TestCase
         ])->licensingAlert();
 
         $this->assertFalse($alert['hasSiteKey']);
+        $this->assertFalse($alert['sharedKey']);
         $this->assertStringContainsString('does not have a site key', $alert['message']);
+        $this->assertStringNotContainsString('site:fresh-key', $alert['message']);
+    }
+
+    #[Test]
+    public function licensing_alert_suggests_fresh_key_only_when_shared()
+    {
+        config(['statamic.system.site_key' => 'site_abcdefghijklmnopqrstuvwxyz']);
+
+        $alert = $this->managerWithResponse([
+            'public' => true,
+            'site' => ['valid' => true, 'shared_key' => true],
+            'statamic' => ['valid' => false, 'reason' => 'unlicensed'],
+            'packages' => [],
+        ])->licensingAlert();
+
+        $this->assertTrue($alert['sharedKey']);
+        $this->assertStringContainsString('php please site:fresh-key', $alert['message']);
     }
 
     private function managerWithResponse(array $response)

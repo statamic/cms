@@ -4,6 +4,7 @@
 
 ### What's new
 - Generate a `STATAMIC_SITE_KEY` on install to identify a project across environments. A site key is not a license — attach one with `php please license` or the Control Panel.
+- Add `php please site:fresh-key` and `php please site:rotate-key` for cloned templates and key rotation.
 
 ## 6.30.0 (2026-08-28)
 

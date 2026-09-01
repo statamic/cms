@@ -62,6 +62,10 @@ const props = defineProps([
                 <p class="text-gray-700 text-sm" v-html="__('statamic::messages.licensing_incorrect_key_format_body')" />
             </CardPanel>
 
+            <CardPanel v-if="site.hasSharedKey" :heading="__('Shared site key')">
+                <p class="text-gray-700 text-sm" v-html="__('statamic::messages.licensing_shared_key')" />
+            </CardPanel>
+
             <Panel :heading="__('Site')">
                 <Card class="py-0!">
                     <Table class="w-full">

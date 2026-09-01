@@ -50,7 +50,9 @@ class Install extends Command
     {
         $key = app(SiteKey::class)->ensure();
 
-        $this->laravel['config']['statamic.system.site_key'] = $key;
+        if ($key) {
+            $this->laravel['config']['statamic.system.site_key'] = $key;
+        }
 
         return $this;
     }

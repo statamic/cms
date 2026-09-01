@@ -62,6 +62,22 @@ class SiteKeyTest extends TestCase
     }
 
     #[Test]
+    public function it_does_not_mint_in_ci()
+    {
+        $_SERVER['STATAMIC_TEST_CI'] = 'true';
+
+        try {
+            File::put($env = $this->dir.'/.env', "APP_NAME=Statamic\n");
+            File::put($example = $this->dir.'/.env.example', "APP_NAME=Statamic\n");
+
+            $this->assertNull((new SiteKey)->ensure($env, $example));
+            $this->assertStringNotContainsString('STATAMIC_SITE_KEY=', File::get($env));
+        } finally {
+            unset($_SERVER['STATAMIC_TEST_CI']);
+        }
+    }
+
+    #[Test]
     public function write_overwrites_both_files()
     {
         File::put($env = $this->dir.'/.env', "STATAMIC_SITE_KEY=site_abcdefghijklmnopqrstuvwxyz\n");

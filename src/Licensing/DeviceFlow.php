@@ -16,7 +16,7 @@ class DeviceFlow
      */
     public function start(string $key, string $host): array
     {
-        $response = Http::acceptJson()->asJson()->timeout(10)->post(self::START_URL, [
+        $response = Http::acceptJson()->asJson()->timeout(10)->post($this->startUrl(), [
             'key' => $key,
             'host' => $host,
         ]);
@@ -38,7 +38,7 @@ class DeviceFlow
      */
     public function poll(string $deviceCode): array
     {
-        $response = Http::acceptJson()->asJson()->timeout(10)->post(self::POLL_URL, [
+        $response = Http::acceptJson()->asJson()->timeout(10)->post($this->pollUrl(), [
             'device_code' => $deviceCode,
         ]);
 
@@ -49,5 +49,15 @@ class DeviceFlow
         return [
             'status' => $response->json('status', 'pending'),
         ];
+    }
+
+    public function startUrl(): string
+    {
+        return rtrim(config('statamic.system.licensing_url', 'https://statamic.com'), '/').'/licensing/device';
+    }
+
+    public function pollUrl(): string
+    {
+        return $this->startUrl().'/poll';
     }
 }

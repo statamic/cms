@@ -27,6 +27,7 @@ class LicensingController extends CpController
                 'additionalDomainCount' => $site->additionalDomainCount(),
                 'invalidReason' => $site->invalidReason(),
                 'usesIncorrectKeyFormat' => $site->key() && $site->usesIncorrectKeyFormat(),
+                'hasSharedKey' => $site->hasSharedKey(),
             ],
             'statamic' => [
                 'valid' => $statamic->valid(),

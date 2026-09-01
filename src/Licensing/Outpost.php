@@ -82,7 +82,7 @@ class Outpost
             return $this->licenseKeyFileResponse();
         }
 
-        $response = $this->client->request('POST', self::ENDPOINT, [
+        $response = $this->client->request('POST', $this->endpoint(), [
             'headers' => ['accept' => 'application/json'],
             'json' => $this->payload(),
             'timeout' => self::REQUEST_TIMEOUT,
@@ -237,6 +237,11 @@ class Outpost
     public function usingLicenseKeyFile()
     {
         return File::exists($this->licenseKeyPath());
+    }
+
+    private function endpoint(): string
+    {
+        return config('statamic.system.outpost_url', self::ENDPOINT);
     }
 
     private function licenseKeyPath()

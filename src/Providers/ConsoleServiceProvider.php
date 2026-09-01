@@ -60,6 +60,7 @@ class ConsoleServiceProvider extends ServiceProvider
         Commands\ImportUsers::class,
         Commands\ProEnable::class,
         Commands\SiteFreshKey::class,
+        Commands\SiteRotateKey::class,
     ];
 
     public function boot()

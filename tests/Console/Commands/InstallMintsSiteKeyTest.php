@@ -63,4 +63,21 @@ class InstallMintsSiteKeyTest extends TestCase
         $this->assertStringContainsString('STATAMIC_SITE_KEY=site_abcdefghijklmnopqrstuvwxyz', $this->files->get($this->envPath));
         $this->assertEquals('site_abcdefghijklmnopqrstuvwxyz', config('statamic.system.site_key'));
     }
+
+    #[Test]
+    public function it_does_not_mint_in_ci()
+    {
+        $_SERVER['STATAMIC_TEST_CI'] = 'true';
+
+        try {
+            $command = $this->app->make(Install::class);
+            $command->setLaravel($this->app);
+            $command->mintSiteKey();
+
+            $this->assertStringNotContainsString('STATAMIC_SITE_KEY=', $this->files->get($this->envPath));
+            $this->assertMatchesRegularExpression('/^STATAMIC_SITE_KEY=\s*$/m', $this->files->get($this->examplePath));
+        } finally {
+            unset($_SERVER['STATAMIC_TEST_CI']);
+        }
+    }
 }

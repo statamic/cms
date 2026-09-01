@@ -27,14 +27,28 @@ class SiteKey
         return (bool) preg_match('/^'.preg_quote(self::PREFIX, '/').'[a-zA-Z0-9]{'.self::ENTROPY_LENGTH.'}$/', (string) $key);
     }
 
+    public function runningInCi(): bool
+    {
+        if (app()->runningUnitTests()) {
+            return filter_var($_SERVER['STATAMIC_TEST_CI'] ?? false, FILTER_VALIDATE_BOOLEAN);
+        }
+
+        return filter_var($_SERVER['CI'] ?? $_ENV['CI'] ?? getenv('CI'), FILTER_VALIDATE_BOOLEAN);
+    }
+
     public function ensure(?string $envPath = null, ?string $examplePath = null): ?string
     {
         $envPath ??= base_path('.env');
         $examplePath ??= base_path('.env.example');
 
-        $key = $this->populatedValue($envPath)
-            ?? $this->populatedValue($examplePath)
-            ?? $this->generate();
+        $existing = $this->populatedValue($envPath)
+            ?? $this->populatedValue($examplePath);
+
+        if ($this->runningInCi()) {
+            return $existing;
+        }
+
+        $key = $existing ?? $this->generate();
 
         $this->fillIfBlank($envPath, $key);
         $this->fillIfBlank($examplePath, $key);
