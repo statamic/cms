@@ -41,6 +41,10 @@
                                             'replicator-card-set-inset-picker': showCardInsetPicker(
                                                 cardLayouts[index].groupSize,
                                             ),
+                                            'replicator-card-set-row-start': cardLayouts[index].isCard
+                                                && cardLayouts[index].positionInGroup === 0
+                                                && cardLayouts[index].groupSize > 1,
+                                            'replicator-card-set-has-entry-connector': showCardEntryConnector(index),
                                         },
                                     ]"
                                 >
@@ -277,10 +281,6 @@ export default {
             const layout = this.cardLayouts[index];
 
             if (layout.isCard && layout.positionInGroup !== 0) {
-                return false;
-            }
-
-            if (layout.isCard && layout.groupSize > 1) {
                 return false;
             }
 
