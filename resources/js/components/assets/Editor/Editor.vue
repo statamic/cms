@@ -168,7 +168,6 @@
                 v-if="showFocalPointEditor && isFocalPointEditorEnabled"
                 :data="values.focus"
                 :image="asset.preview"
-                :thumbnail="asset.thumbnail"
                 @selected="selectFocalPoint"
                 @closed="closeFocalPointEditor"
             />
