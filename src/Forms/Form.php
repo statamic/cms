@@ -246,7 +246,7 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
             return Blink::get($blink);
         }
 
-        $blueprint = $this->formFields()->toBlueprint();
+        $blueprint = $this->formFields()->toBlueprint()->setHandle($this->handle());
 
         Blink::put($blink, $blueprint);
 
