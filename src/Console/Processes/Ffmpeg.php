@@ -71,12 +71,12 @@ class Ffmpeg extends Process
 
     private function resolveFfmpegBinary(): ?string
     {
-        if ($binary = config('statamic.assets.ffmpeg.binary')) {
-            return is_executable($binary) ? $binary : null;
-        }
-
         if (! $this->procOpenAvailable()) {
             return null;
+        }
+
+        if ($binary = config('statamic.assets.ffmpeg.binary')) {
+            return is_executable($binary) ? $binary : null;
         }
 
         $output = $this->run($this->isWindows() ? 'where ffmpeg' : 'which ffmpeg');

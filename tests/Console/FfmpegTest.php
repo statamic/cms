@@ -78,6 +78,29 @@ class FfmpegTest extends TestCase
     }
 
     #[Test]
+    public function it_treats_ffmpeg_as_unavailable_when_proc_open_is_disabled_even_with_a_configured_binary()
+    {
+        Ffmpeg::clearBinaryCache();
+        config(['statamic.assets.ffmpeg.binary' => PHP_BINARY]);
+
+        $ffmpeg = new class extends Ffmpeg
+        {
+            protected function procOpenAvailable(): bool
+            {
+                return false;
+            }
+
+            public function run($command, $cacheKey = null)
+            {
+                throw new \LogicException('The Process class relies on proc_open, which is not available on your PHP installation.');
+            }
+        };
+
+        $this->assertNull($ffmpeg->ffmpegBinary());
+        $this->assertFalse($ffmpeg->available());
+    }
+
+    #[Test]
     public function it_ignores_a_path_discovered_binary_that_is_not_executable()
     {
         Ffmpeg::clearBinaryCache();
