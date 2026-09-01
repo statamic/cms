@@ -23,8 +23,8 @@ const hasDrilldown = computed<boolean>(() => Boolean(drilldown.value));
 
 const title = computed((): string => {
     return props.showNumber && props.field.number
-        ? `${props.field.number}. ${props.field.display}`
-        : props.field.display;
+        ? `${props.field.number}. ${__(props.field.display)}`
+        : __(props.field.display);
 });
 
 const items = computed<ChartItem[]>(() => {
@@ -41,8 +41,8 @@ const accessibleLabel = computed(() => {
         .join(', ');
 
     return showingDrilldown.value
-        ? __(':field: Other breakdown: :values', { field: props.field.display, values })
-        : `${props.field.display}: ${values}`;
+        ? __(':field: Other breakdown: :values', { field: __(props.field.display), values })
+        : `${__(props.field.display)}: ${values}`;
 });
 
 const chartProps = computed(() => ({

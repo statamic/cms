@@ -277,7 +277,7 @@ defineExpose({ refresh: fetchSummary });
                     </ChartWidget>
                     <Widget
                         v-else
-                        :title="chartableField(widget.config.field)?.display ?? widget.config.field"
+                        :title="__(chartableField(widget.config.field)?.display ?? widget.config.field)"
                         title-tag="h2"
                         class="h-full"
                         :icon="chartableField(widget.config.field)?.icon"

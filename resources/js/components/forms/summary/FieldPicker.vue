@@ -21,7 +21,7 @@ const emit = defineEmits<{
                 v-for="field in fields"
                 :key="field.handle"
                 :icon="field.icon"
-                :text="field.display"
+                :text="__(field.display)"
                 @click="emit('picked', field)"
             />
         </DropdownMenu>
