@@ -94,6 +94,7 @@ return [
     'field_conditions_instructions' => 'When to show or hide this field.',
     'field_desynced_from_origin' => 'Desynced from origin. Click to sync and revert to the origin\'s value.',
     'field_synced_with_origin' => 'Synced with origin. Click or edit the field to desync.',
+    'localization_fully_synced_with_origin' => 'All fields synced with origin.',
     'field_validation_advanced_instructions' => 'Add more advanced validation to this field.',
     'field_validation_required_instructions' => 'Make this field required or optional.',
     'field_validation_sometimes_instructions' => 'Only validate when this field is visible or submitted.',
