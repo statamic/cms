@@ -34,7 +34,11 @@ class TaxonomyTermsController extends ApiController
     {
         $this->abortIfDisabled();
 
-        $term = $this->localize(Term::find($taxonomy.'::'.$term));
+        if ($site = $this->requestedSite()) {
+            throw_unless($taxonomy->sites()->contains($site), new NotFoundHttpException);
+        }
+
+        $term = $this->localize(Term::find($taxonomy->handle().'::'.$term));
 
         throw_unless($term, new NotFoundHttpException);
 

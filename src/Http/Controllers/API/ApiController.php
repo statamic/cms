@@ -112,7 +112,15 @@ class ApiController extends Controller
 
     protected function requestedSite(): ?string
     {
-        return request()->has('site') ? request()->input('site') : null;
+        if (! request()->has('site')) {
+            return null;
+        }
+
+        $site = request()->input('site');
+
+        throw_unless(Site::get($site), new NotFoundHttpException);
+
+        return $site;
     }
 
     protected function localize($item)

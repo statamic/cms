@@ -384,6 +384,8 @@ class APITest extends TestCase
             ->assertSuccessful()
             ->assertJsonPath('data.id', 'about-fr')
             ->assertJsonPath('data.title', 'A propos');
+
+        $this->assertEndpointNotFound('/api/collections/pages/entries/about?site=bogus');
     }
 
     #[Test]
@@ -409,6 +411,8 @@ class APITest extends TestCase
             ->get('/api/taxonomies/topics/terms/dance?site=fr')
             ->assertSuccessful()
             ->assertJsonPath('data.title', 'Danse');
+
+        $this->assertEndpointNotFound('/api/taxonomies/topics/terms/dance?site=bogus');
     }
 
     #[Test]
