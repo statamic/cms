@@ -101,6 +101,58 @@
         }
     }
 
+    /* GRID FIELDTYPE / SECTIONED MODIFIER
+    =================================================== */
+    /* Grid whose column headers double as the enclosing publish section's header.
+      - e.g. A site group in `cp/sites`
+      - the table and its headers go transparent so the headers sit on the section background
+      - the rows take over the card background, border and corners
+      - headers stay real table headers, so they keep aligning with their columns
+    */
+    .grid-table--sectioned {
+        @apply rounded-none border-0 bg-transparent shadow-none dark:bg-transparent;
+
+        thead th {
+            @apply static border-b-0 bg-transparent dark:bg-transparent;
+            &:first-child {
+                @apply rounded-ss-none;
+            }
+            &:last-child {
+                @apply rounded-se-none;
+            }
+        }
+
+        > tbody > tr {
+            > td {
+                @apply bg-white dark:bg-gray-900;
+
+                &:first-child {
+                    @apply border-s dark:border-s-gray-700;
+                }
+
+                &:last-child {
+                    @apply border-e dark:border-e-gray-700;
+                }
+            }
+
+            &:first-child > td {
+                @apply border-t dark:border-t-gray-700;
+
+                &:first-child {
+                    @apply rounded-ss-[7px];
+                }
+
+                &:last-child {
+                    @apply rounded-se-[7px];
+                }
+            }
+
+            &:last-child > td {
+                @apply border-b dark:border-b-gray-700;
+            }
+        }
+    }
+
     .grid-item-header {
         @apply flex cursor-move items-center justify-between border-b bg-gray-200 px-4 py-2 text-sm outline-hidden;
     }

@@ -132,9 +132,13 @@ class NavigationController extends CpController
             'blueprintUrl' => cp_route('blueprints.navigation.edit', $nav->handle()),
             'site' => $site,
             'sites' => $this->getAuthorizedTreesForNav($nav)->map(function ($tree) {
+                $site = $tree->site();
+
                 return [
                     'handle' => $tree->locale(),
-                    'name' => $tree->site()->name(),
+                    'name' => $site->name(),
+                    'group' => $site->group(),
+                    'group_handle' => $site->groupHandle(),
                     'url' => $tree->showUrl(),
                 ];
             })->values()->all(),

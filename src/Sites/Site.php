@@ -56,6 +56,20 @@ class Site implements Augmentable
         return $this->config['lang'] ?? $this->shortLocale();
     }
 
+    public function group(): ?string
+    {
+        $group = $this->config['group'] ?? null;
+
+        return is_string($group) && $group !== '' ? $group : null;
+    }
+
+    public function groupHandle(): ?string
+    {
+        $handle = $this->config['group_handle'] ?? null;
+
+        return is_string($handle) && $handle !== '' ? $handle : null;
+    }
+
     public function url()
     {
         return URL::tidy($this->config['url'], true);
@@ -154,6 +168,8 @@ class Site implements Augmentable
             'url' => $this->url(),
             'permalink' => $this->absoluteUrl(),
             'direction' => $this->direction(),
+            'group' => $this->group(),
+            'group_handle' => $this->groupHandle(),
             'attributes' => $this->attributes(),
         ];
     }

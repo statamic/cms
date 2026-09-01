@@ -74,15 +74,17 @@ export default {
         source() {
             if (!this.generate) return;
 
-            const field = this.config.from || 'title';
-            let key = field;
+            const from = this.valueFrom(this.config.from || 'title', { relative: true });
 
-            if (this.fieldPathPrefix) {
-                let dottedPrefix = this.fieldPathPrefix.replace(new RegExp('\.' + this.handle + '$'), '');
-                key = dottedPrefix + '.' + field;
-            }
+            if (!from) return from;
 
-            return data_get(this.publishContainer?.values, key);
+            const prefix = this.config.prefix_from
+                ? this.valueFrom(this.config.prefix_from, { relative: false })
+                : null;
+
+            if (!prefix) return from;
+
+            return `${prefix} ${from}`;
         },
 
         language() {
@@ -121,6 +123,17 @@ export default {
             if (this.handle === 'slug' && container.name === this.publishContainer.name && this.config.localizable) {
                 this.$refs.slugify.reset();
             }
+        },
+
+        valueFrom(field, { relative }) {
+            let key = field;
+
+            if (relative && this.fieldPathPrefix) {
+                let dottedPrefix = this.fieldPathPrefix.replace(new RegExp('\\.' + this.handle + '$'), '');
+                key = dottedPrefix + '.' + field;
+            }
+
+            return data_get(this.publishContainer?.values, key);
         },
 
         sync() {

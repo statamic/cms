@@ -714,6 +714,8 @@ class CollectionsController extends CpController
                 return [
                     'handle' => $site->handle(),
                     'name' => $site->name(),
+                    'group' => $site->group(),
+                    'group_handle' => $site->groupHandle(),
                 ];
             })
             ->values()

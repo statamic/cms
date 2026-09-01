@@ -55,9 +55,13 @@ class GlobalVariablesController extends CpController
             'originValues' => $originValues ?? null,
             'originMeta' => $originMeta ?? null,
             'localizations' => $this->getAuthorizedLocalizationsForVariables($variables)->map(function ($localized) use ($variables) {
+                $site = $localized->site();
+
                 return [
                     'handle' => $localized->locale(),
-                    'name' => $localized->site()->name(),
+                    'name' => $site->name(),
+                    'group' => $site->group(),
+                    'group_handle' => $site->groupHandle(),
                     'active' => $localized->locale() === $variables->locale(),
                     'origin' => ! $localized->hasOrigin(),
                     'url' => $localized->editUrl(),

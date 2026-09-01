@@ -50,6 +50,8 @@ class Section
             'instructions' => $this->instructions(),
             'collapsible' => $this->collapsible() ?: null,
             'collapsed' => $this->collapsed() ?: null,
+            'editable_title_handle' => Arr::get($this->contents, 'editable_title_handle'),
+            'reorderable' => Arr::get($this->contents, 'reorderable') ?: null,
         ]) + [
             'fields' => $this->fields()->toPublishArray(),
         ];

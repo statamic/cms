@@ -73,6 +73,8 @@ const props = defineProps({
 	variant: { type: String, default: 'default' },
 	/** When `true`, skip the elevated z-index override while a modal/stack is open. Use when this combobox can remain open behind an unrelated overlay (e.g. a confirmation modal). */
 	excludeZManipulation: { type: Boolean, default: false },
+	/** When `false`, options are rendered without virtualization. Useful for variable-height options. */
+	virtualize: { type: Boolean, default: true },
 });
 
 defineOptions({
@@ -459,7 +461,7 @@ defineExpose({
                         :side-offset="5"
                         position="popper"
                         :class="[
-                            'shadow-ui-sm z-(--z-index-above) rounded-lg border border-gray-200 bg-white dark:border-white/10 dark:bg-gray-800',
+                            'shadow-ui-sm z-(--z-index-above) rounded-md !rounded-se-sm border border-gray-200 bg-white dark:border-white/10 dark:bg-gray-800',
                             'max-h-[var(--reka-combobox-content-available-height)] min-w-[var(--reka-combobox-trigger-width)] overflow-hidden',
                             adaptiveWidth && 'w-max max-w-md',
                         ]"
@@ -476,7 +478,7 @@ defineExpose({
                                 event.preventDefault();
                             }"
                         >
-                            <div class="relative max-h-[300px] overflow-y-auto py-2" data-ui-combobox-viewport>
+                            <div class="relative max-h-[300px] overflow-y-auto py-1.5 pb-2 st-custom-scrollbar" data-ui-combobox-viewport>
                                 <!-- Hidden width measurer for wide dropdown mode -->
                                 <div v-if="adaptiveWidth" aria-hidden="true" class="h-0 overflow-y-clip px-2">
                                     <div v-for="option in filteredOptions" :key="getOptionValue(option)" class="py-1.5 px-2 text-sm whitespace-nowrap">
@@ -491,7 +493,7 @@ defineExpose({
                                 </ComboboxEmpty>
 
                                 <ComboboxVirtualizer
-                                    v-if="filteredOptions.length"
+                                    v-if="virtualize && filteredOptions.length"
                                     :estimate-size="40"
                                     :options="filteredOptions"
                                     :text-content="(opt) => getOptionLabel(opt)"
@@ -517,6 +519,34 @@ defineExpose({
                                         </ComboboxItem>
                                     </div>
                                 </ComboboxVirtualizer>
+
+                                <template v-else-if="filteredOptions.length">
+                                    <div
+                                        v-for="option in filteredOptions"
+                                        :key="`${getOptionValue(option)}-${isDisabled(option)}`"
+                                        class="w-full overflow-x-hidden"
+                                    >
+                                        <slot name="before-option" v-bind="option" />
+                                        <div class="py-1 px-2">
+                                            <ComboboxItem
+                                                as="button"
+                                                :value="getOptionValue(option)"
+                                                :text-value="getOptionLabel(option)"
+                                                :disabled="isDisabled(option)"
+                                                :class="itemClasses({ size: size, selected: isSelected(option) })"
+                                                :data-ui-combobox-item="getOptionValue(option)"
+                                                :title="getOptionLabel(option)"
+                                                @select="select"
+                                            >
+                                                <slot name="option" v-bind="option">
+                                                    <img v-if="option.image" :src="option.image" class="size-5 rounded-full" :alt="getOptionLabel(option)">
+                                                    <span v-if="labelHtml" class="truncate" v-html="getOptionLabel(option)" />
+                                                    <span class="truncate" v-else>{{ __(getOptionLabel(option)) }}</span>
+                                                </slot>
+                                            </ComboboxItem>
+                                        </div>
+                                    </div>
+                                </template>
                             </div>
                         </FocusScope>
                     </ComboboxContent>

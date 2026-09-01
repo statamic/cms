@@ -85,6 +85,22 @@ class SiteTest extends TestCase
     }
 
     #[Test]
+    public function gets_group()
+    {
+        $this->assertNull((new Site('en', []))->group());
+        $this->assertNull((new Site('en', ['group' => '']))->group());
+        $this->assertEquals('London', (new Site('en', ['group' => 'London']))->group());
+    }
+
+    #[Test]
+    public function gets_group_handle()
+    {
+        $this->assertNull((new Site('en', []))->groupHandle());
+        $this->assertNull((new Site('en', ['group_handle' => '']))->groupHandle());
+        $this->assertEquals('london', (new Site('en', ['group_handle' => 'london']))->groupHandle());
+    }
+
+    #[Test]
     public function gets_is_default()
     {
         $withoutDefault = new Site('en', ['locale' => 'en_US']);
@@ -266,6 +282,23 @@ class SiteTest extends TestCase
     }
 
     #[Test]
+    public function it_augments_group_and_group_handle()
+    {
+        $site = new Site('en', [
+            'name' => 'English',
+            'url' => '/',
+            'locale' => 'en_US',
+            'group' => 'London',
+            'group_handle' => 'london',
+        ]);
+
+        $values = $site->augmented()->all()->map->value()->all();
+
+        $this->assertEquals('London', $values['group']);
+        $this->assertEquals('london', $values['group_handle']);
+    }
+
+    #[Test]
     public function it_is_augmentable()
     {
         $site = new Site('test', [
@@ -285,6 +318,8 @@ class SiteTest extends TestCase
             'url' => '/sub',
             'permalink' => 'http://absolute-url-resolved-from-request.com/sub',
             'direction' => 'ltr',
+            'group' => null,
+            'group_handle' => null,
             'attributes' => [],
         ], $values->map->value()->all());
 

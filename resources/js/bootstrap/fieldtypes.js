@@ -28,6 +28,7 @@ import FieldsFieldtype from '../components/fieldtypes/grid/FieldsFieldtype.vue';
 import FilesFieldtype from '../components/fieldtypes/FilesFieldtype.vue';
 import FloatFieldtype from '../components/fieldtypes/FloatFieldtype.vue';
 import Sites from '../components/globals/Sites.vue';
+import SitesIndexFieldtype from '../components/fieldtypes/SitesIndexFieldtype.vue';
 import Grid from '../components/fieldtypes/grid/Grid.vue';
 import GridIndex from '../components/fieldtypes/grid/GridIndex.vue';
 import GroupFieldtype from '../components/fieldtypes/GroupFieldtype.vue';
@@ -102,6 +103,7 @@ export default function registerFieldtypes(app) {
     app.component('files-fieldtype', FilesFieldtype);
     app.component('float-fieldtype', FloatFieldtype);
     app.component('global_set_sites-fieldtype', Sites);
+    app.component('sites-fieldtype-index', SitesIndexFieldtype);
     app.component('grid-fieldtype', Grid);
     app.component('grid-fieldtype-index', GridIndex);
     app.component('group-fieldtype', GroupFieldtype);

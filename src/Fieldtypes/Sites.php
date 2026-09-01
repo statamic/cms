@@ -7,7 +7,7 @@ use Statamic\Facades\User;
 
 class Sites extends Relationship
 {
-    protected $indexComponent = 'text';
+    protected $indexComponent = 'sites';
 
     protected function authorizeItemData($id): bool
     {
@@ -20,6 +20,8 @@ class Sites extends Relationship
             return [
                 'id' => $id,
                 'title' => $site->name(),
+                'group' => $site->group(),
+                'group_handle' => $site->groupHandle(),
             ];
         }
 
@@ -28,13 +30,21 @@ class Sites extends Relationship
 
     public function getIndexItems($request)
     {
-        return Site::all()
-            ->filter(fn ($site) => User::current()->can('view', $site))
-            ->sortBy('name')
+        $sites = Site::all()
+            ->filter(fn ($site) => User::current()->can('view', $site));
+
+        // Preserve sites.yaml order when groups exist; otherwise keep the old A–Z sort.
+        if (! $sites->contains(fn ($site) => $site->group())) {
+            $sites = $sites->sortBy->name();
+        }
+
+        return $sites
             ->map(function ($site) {
                 return [
                     'id' => $site->handle(),
                     'title' => $site->name(),
+                    'group' => $site->group(),
+                    'group_handle' => $site->groupHandle(),
                 ];
             })->values();
     }
@@ -54,6 +64,14 @@ class Sites extends Relationship
             $items = collect([$items]);
         }
 
-        return $items->map->name()->join(', ');
+        return $items
+            ->filter()
+            ->map(fn ($site) => [
+                'title' => $site->name(),
+                'group' => $site->group(),
+                'group_handle' => $site->groupHandle(),
+            ])
+            ->values()
+            ->all();
     }
 }

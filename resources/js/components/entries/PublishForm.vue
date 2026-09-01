@@ -169,6 +169,7 @@
                                 v-if="showLocalizationSelector"
                                 :localizations
                                 :localizing="localizing !== null"
+                                :confirming-switch="!!pendingLocalization"
                                 @selected="localizationSelected"
                             />
                         </div>
@@ -234,7 +235,63 @@
         >
             <div class="publish-fields">
                 <ui-field class="form-group field-w-100" :label="__('Origin')" :instructions="__('messages.entry_origin_instructions')">
-                    <Select class="w-full" v-model="selectedOrigin" :options="originOptions" placeholder="" />
+                    <Select
+                        class="w-full"
+                        v-model="selectedOrigin"
+                        :options="originOptions"
+                        :virtualize="!originHasNamedGroups"
+                        placeholder=""
+                    >
+                        <template #selected-option="{ option }">
+                            <span class="flex min-w-0 items-center gap-1.5">
+                                <span
+                                    class="little-dot shrink-0"
+                                    :class="{
+                                        'bg-green-600': option.published,
+                                        'bg-gray-500': !option.published,
+                                        'bg-red-500': !option.exists,
+                                    }"
+                                />
+                                <template v-if="selectedOriginGroupLabel(option)">
+                                    <span class="truncate">{{ selectedOriginGroupLabel(option) }}</span>
+                                    <Icon name="chevron-right" class="size-3.5! text-gray-700 dark:text-white/70" aria-hidden="true" />
+                                </template>
+                                <span class="truncate">{{ __(option.label) }}</span>
+                                <Badge v-if="option.origin" class="ms-1.5" size="sm" color="orange" :text="__('Origin')" />
+                            </span>
+                        </template>
+
+                        <template #before-option="option">
+                            <div
+                                v-if="option._showGroupSeparator"
+                                class="mx-2 mb-2.25 mt-0.75 border-t border-gray-200 dark:border-gray-700"
+                                role="separator"
+                            />
+                            <Subheading
+                                v-if="option._groupLabel"
+                                size="sm"
+                                class="px-2.5 pb-1 pt-1.5 font-semibold uppercase tracking-wide text-gray-950 text-2xs dark:text-gray-300"
+                                :text="option._groupLabel"
+                            />
+                        </template>
+
+                        <template #option="option">
+                            <div class="flex min-w-0 items-center gap-x-2">
+                                <div class="flex min-w-0 items-center">
+                                    <span
+                                        class="little-dot me-2 shrink-0"
+                                        :class="{
+                                            'bg-green-600': option.published,
+                                            'bg-gray-500': !option.published,
+                                            'bg-red-500': !option.exists,
+                                        }"
+                                    />
+                                    <span class="truncate">{{ __(option.label) }}</span>
+                                </div>
+                                <Badge v-if="option.origin" class="ms-2" size="sm" color="orange" :text="__('Origin')" />
+                            </div>
+                        </template>
+                    </Select>
                 </ui-field>
             </div>
         </confirmation-modal>
@@ -261,6 +318,7 @@ import HasActions from '../publish/HasActions';
 import striptags from 'striptags';
 import clone from '@/util/clone.js';
 import {
+    Badge,
     Button,
     Card,
     CardPanel,
@@ -285,6 +343,13 @@ import {
 	Stack,
 } from '@ui';
 import resetValuesFromResponse from '@/util/resetValuesFromResponse.js';
+import {
+    flatOptionsFromSiteGroups,
+    groupItemsBySiteGroup,
+    hasNamedSiteGroups,
+    preferredOriginHandle,
+    selectedSiteGroupLabel,
+} from '@/util/site-groups.js';
 import { computed, ref } from 'vue';
 import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } from '@ui/Publish/SavePipeline.js';
 import { router } from '@inertiajs/vue3';
@@ -293,6 +358,7 @@ export default {
     mixins: [HasPreferences, HasActions],
 
     components: {
+        Badge,
         Button,
         Card,
         CardPanel,
@@ -513,13 +579,32 @@ export default {
             return this.getPreference('after_save') ?? 'listing';
         },
 
+        defaultOriginHandle() {
+            return preferredOriginHandle(
+                this.localizations,
+                this.localizing || null,
+                this.originBehavior,
+            );
+        },
+
         originOptions() {
-            return this.localizations
+            const existing = this.localizations
                 .filter((localization) => localization.exists)
                 .map((localization) => ({
                     value: localization.handle,
                     label: localization.name,
+                    group: localization.group,
+                    group_handle: localization.group_handle,
+                    published: localization.published,
+                    exists: localization.exists,
+                    origin: localization.handle === this.defaultOriginHandle,
                 }));
+
+            return flatOptionsFromSiteGroups(groupItemsBySiteGroup(existing));
+        },
+
+        originHasNamedGroups() {
+            return hasNamedSiteGroups(this.originOptions);
         },
 
         direction() {
@@ -654,6 +739,11 @@ export default {
             this.$dirty.remove(this.publishContainer);
 
             this.localizing = localization;
+            this.selectedOrigin = preferredOriginHandle(
+                this.localizations,
+                localization,
+                this.originBehavior,
+            );
 
             if (localization.exists) {
                 this.editLocalization(localization);
@@ -722,6 +812,10 @@ export default {
         cancelLocalization() {
             this.selectingOrigin = false;
             this.localizing = false;
+        },
+
+        selectedOriginGroupLabel(option) {
+            return selectedSiteGroupLabel(option, this.originHasNamedGroups);
         },
 
         localizationStatusText(localization) {
@@ -877,10 +971,11 @@ export default {
     created() {
         window.history.replaceState({}, document.title, document.location.href.replace('created=true', ''));
 
-        this.selectedOrigin =
-            this.originBehavior === 'active'
-                ? this.localizations.find((l) => l.active)?.handle
-                : this.localizations.find((l) => l.root)?.handle;
+        this.selectedOrigin = preferredOriginHandle(
+            this.localizations,
+            this.localizations.find((localization) => localization.active),
+            this.originBehavior,
+        );
     },
 
     beforeUnmount() {
