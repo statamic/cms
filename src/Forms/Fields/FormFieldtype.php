@@ -2,6 +2,7 @@
 
 namespace Statamic\Forms\Fields;
 
+use Facades\Statamic\Fields\FieldtypeRepository;
 use Facades\Statamic\Forms\Fields\FormFieldtypeRepository;
 use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Extend\HasHandle;
@@ -121,9 +122,8 @@ abstract class FormFieldtype implements Arrayable
             return $cached;
         }
 
-        $fields = collect($this->configFieldItems());
-
-        $fields = $fields
+        $fields = collect($this->configFieldItems())
+            ->merge($this->extraConfigFieldItems())
             ->map(function ($field, $handle) {
                 return compact('handle', 'field');
             });
@@ -140,6 +140,20 @@ abstract class FormFieldtype implements Arrayable
         return $this->configFields;
     }
 
+    // TODO: Remove in v7. Only exists so config fields appended to the wrapped fieldtype keep working.
+    public function extraConfigFieldItems(): array
+    {
+        if (! $handle = static::fieldtype()) {
+            return [];
+        }
+
+        if (! $class = FieldtypeRepository::classes()->get($handle)) {
+            return [];
+        }
+
+        return app($class)->extraConfigFieldItems();
+    }
+
     public function configBlueprint(): Blueprint
     {
         return (new Blueprint)->setContents([
@@ -148,6 +162,7 @@ abstract class FormFieldtype implements Arrayable
                     'sections' => [
                         [
                             'fields' => collect($this->configFieldItems())
+                                ->merge($this->extraConfigFieldItems())
                                 ->map(fn ($field, $handle) => compact('handle', 'field'))
                                 ->values()->all(),
                         ],
