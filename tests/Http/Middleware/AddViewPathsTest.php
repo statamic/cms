@@ -107,6 +107,8 @@ class AddViewPathsTest extends TestCase
         });
 
         $this->assertTrue($handled);
+        $this->assertEquals($originalPaths, view()->getFinder()->getPaths());
+        $this->assertEquals($originalHints, Arr::get(view()->getFinder()->getHints(), 'foo'));
     }
 
     private function setCurrentSiteBasedOnUrl($requestUrl)
