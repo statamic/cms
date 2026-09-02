@@ -639,6 +639,10 @@ class Field implements Arrayable
                 'type' => 'toggle',
                 'validate' => 'boolean',
                 'default' => true,
+                'unless' => [
+                    'visibility' => 'equals computed',
+                ],
+                'width' => 50,
             ],
         ])->map(fn ($field, $handle) => compact('handle', 'field'))->values()->all();
 
