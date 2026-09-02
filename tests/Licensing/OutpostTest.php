@@ -42,6 +42,7 @@ class OutpostTest extends TestCase
 
         $this->assertEquals([
             'key' => 'test-key',
+            'name' => config('app.name'),
             'host' => 'localhost',
             'ip' => '123.123.123.123',
             'port' => 123,

@@ -200,8 +200,14 @@ class LicenseManagerTest extends TestCase
 
         $this->assertTrue($alert['testing']);
         $this->assertTrue($alert['hasSiteKey']);
-        $this->assertStringContainsString('Site key found', $alert['message']);
+        $this->assertStringContainsString('isn\'t connected to a statamic.com account', $alert['message']);
         $this->assertStringContainsString('trial mode', $alert['message']);
+        $this->assertEquals('connect', $this->managerWithResponse([
+            'public' => false,
+            'site' => ['claimed' => false],
+            'statamic' => ['valid' => false, 'reason' => 'unlicensed'],
+            'packages' => [],
+        ])->primaryAction());
     }
 
     #[Test]
@@ -222,6 +228,62 @@ class LicenseManagerTest extends TestCase
         $this->assertFalse($alert['sharedKey']);
         $this->assertStringContainsString('does not have a site key', $alert['message']);
         $this->assertStringNotContainsString('site:fresh-key', $alert['message']);
+    }
+
+    #[Test]
+    public function licensing_alert_notes_a_connected_site_without_a_license()
+    {
+        config(['statamic.system.site_key' => 'site_abcdefghijklmnopqrstuvwxyz']);
+
+        $alert = $this->managerWithResponse([
+            'public' => true,
+            'site' => ['claimed' => true],
+            'statamic' => ['valid' => false, 'reason' => 'unlicensed'],
+            'packages' => [],
+        ])->licensingAlert();
+
+        $this->assertStringContainsString('connected to statamic.com but has no license', $alert['message']);
+        $this->assertStringNotContainsString('php please license', $alert['message']);
+    }
+
+    #[Test]
+    public function primary_action_follows_connection_state()
+    {
+        config([
+            'statamic.system.site_key' => null,
+            'statamic.system.license_key' => null,
+        ]);
+
+        $this->assertEquals('mint', $this->managerWithResponse([
+            'statamic' => ['valid' => true],
+            'packages' => [],
+        ])->primaryAction());
+
+        config(['statamic.system.site_key' => 'site_abcdefghijklmnopqrstuvwxyz']);
+
+        $this->assertEquals('connect', $this->managerWithResponse([
+            'site' => ['claimed' => false],
+            'statamic' => ['valid' => false],
+            'packages' => [],
+        ])->primaryAction());
+
+        $this->assertEquals('domain', $this->managerWithResponse([
+            'site' => ['claimed' => true, 'reason' => 'invalid_domain', 'valid' => false],
+            'statamic' => ['valid' => false],
+            'packages' => [],
+        ])->primaryAction());
+
+        $this->assertEquals('buy', $this->managerWithResponse([
+            'site' => ['claimed' => true, 'valid' => true],
+            'statamic' => ['valid' => false, 'reason' => 'unlicensed'],
+            'packages' => [],
+        ])->primaryAction());
+
+        $this->assertNull($this->managerWithResponse([
+            'site' => ['claimed' => true, 'valid' => true],
+            'statamic' => ['valid' => true],
+            'packages' => [],
+        ])->primaryAction());
     }
 
     #[Test]

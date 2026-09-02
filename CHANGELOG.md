@@ -5,6 +5,9 @@
 ### What's new
 - Generate a `STATAMIC_SITE_KEY` on install to identify a project across environments. A site key is not a license — attach one with `php please license` or the Control Panel.
 - Add `php please site:fresh-key` and `php please site:rotate-key` for cloned templates and key rotation.
+- Generate a missing site key from the Control Panel Licensing utility.
+- Clarify Licensing purchase actions with a checkout summary modal.
+- Drive the Licensing utility from a single primary action (generate / connect / buy / add domain) based on whether the site is connected to a statamic.com account.
 
 ## 6.30.0 (2026-08-28)
 

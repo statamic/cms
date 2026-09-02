@@ -48,7 +48,7 @@ class License extends Command
         }
 
         $licenses->refresh();
-        $this->components->info('Site claimed. License status will refresh on the next Outpost check.');
+        $this->components->info('Site connected. License status will refresh on the next Outpost check.');
 
         return self::SUCCESS;
     }

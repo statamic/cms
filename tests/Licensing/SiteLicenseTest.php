@@ -94,7 +94,10 @@ class SiteLicenseTest extends TestCase
         config(['statamic.system.license_key' => 'test-key']);
 
         $this->assertEquals('https://statamic.com/account/sites/test-key', $this->license()->url());
-        $this->assertEquals('https://statamic.com/licensing/handoff?key=test-key', $this->license()->handoffUrl());
+        $this->assertEquals('https://statamic.com/account/licensing/handoff?'.http_build_query([
+            'key' => 'test-key',
+            'name' => config('app.name'),
+        ]), $this->license()->handoffUrl());
     }
 
     #[Test]
@@ -102,6 +105,28 @@ class SiteLicenseTest extends TestCase
     {
         $this->assertEquals('https://statamic.com/account/sites/create', $this->license()->url());
         $this->assertNull($this->license()->handoffUrl());
+    }
+
+    #[Test]
+    public function it_gets_the_registered_site_name()
+    {
+        $this->assertNull($this->license()->name());
+        $this->assertEquals('Wayne Enterprises', $this->license(['name' => 'Wayne Enterprises'])->name());
+    }
+
+    #[Test]
+    public function it_knows_whether_the_site_is_connected()
+    {
+        $this->assertFalse($this->license()->isConnected());
+        $this->assertFalse($this->license(['claimed' => false])->isConnected());
+        $this->assertTrue($this->license(['claimed' => true])->isConnected());
+    }
+
+    #[Test]
+    public function it_knows_whether_the_domain_is_invalid()
+    {
+        $this->assertFalse($this->license()->hasInvalidDomain());
+        $this->assertTrue($this->license(['reason' => 'invalid_domain'])->hasInvalidDomain());
     }
 
     #[Test]

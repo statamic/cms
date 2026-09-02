@@ -195,14 +195,37 @@ class LicenseManager
         return $message.' '.$this->identityMessage();
     }
 
+    public function primaryAction(): ?string
+    {
+        $site = $this->site();
+
+        if (! $site->key()) {
+            return 'mint';
+        }
+
+        if (! $site->isConnected()) {
+            return 'connect';
+        }
+
+        if ($site->hasInvalidDomain()) {
+            return 'domain';
+        }
+
+        return $this->invalid() ? 'buy' : null;
+    }
+
     private function identityMessage(): string
     {
         if ($this->site()->hasSharedKey()) {
             return __('statamic::messages.licensing_shared_key');
         }
 
-        return $this->hasSiteKey()
-            ? __('statamic::messages.licensing_site_key_found')
-            : __('statamic::messages.licensing_site_key_missing');
+        if (! $this->hasSiteKey()) {
+            return __('statamic::messages.licensing_site_key_missing');
+        }
+
+        return $this->site()->isConnected()
+            ? __('statamic::messages.licensing_connected_unlicensed')
+            : __('statamic::messages.licensing_not_connected');
     }
 }

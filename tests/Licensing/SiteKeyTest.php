@@ -78,6 +78,24 @@ class SiteKeyTest extends TestCase
     }
 
     #[Test]
+    public function mint_writes_even_in_ci()
+    {
+        $_SERVER['STATAMIC_TEST_CI'] = 'true';
+
+        try {
+            File::put($env = $this->dir.'/.env', "APP_NAME=Statamic\n");
+            File::put($example = $this->dir.'/.env.example', "APP_NAME=Statamic\nSTATAMIC_SITE_KEY=\n");
+
+            $key = (new SiteKey)->mint($env, $example);
+
+            $this->assertTrue((new SiteKey)->isValid($key));
+            $this->assertStringContainsString('STATAMIC_SITE_KEY='.$key, File::get($env));
+        } finally {
+            unset($_SERVER['STATAMIC_TEST_CI']);
+        }
+    }
+
+    #[Test]
     public function write_overwrites_both_files()
     {
         File::put($env = $this->dir.'/.env', "STATAMIC_SITE_KEY=site_abcdefghijklmnopqrstuvwxyz\n");

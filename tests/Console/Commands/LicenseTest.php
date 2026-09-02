@@ -35,6 +35,7 @@ class LicenseTest extends TestCase
             ->assertSuccessful();
 
         Http::assertSent(fn ($request) => $request->url() === DeviceFlow::START_URL
-            && $request['key'] === 'site_abcdefghijklmnopqrstuvwxyz');
+            && $request['key'] === 'site_abcdefghijklmnopqrstuvwxyz'
+            && $request['name'] === config('app.name'));
     }
 }

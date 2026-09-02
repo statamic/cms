@@ -83,6 +83,15 @@ class HandleAuthenticatedInertiaRequests
                 ...$alert,
                 'manageUrl' => User::current()->can('access licensing utility') ? cp_route('utilities.licensing') : null,
                 'handoffUrl' => $licenses->site()->handoffUrl(),
+                'siteUrl' => $licenses->site()->url(),
+                'refreshUrl' => User::current()->can('access licensing utility')
+                    ? cp_route('utilities.licensing.refresh')
+                    : null,
+                'primaryAction' => $licenses->primaryAction(),
+                'connected' => $licenses->site()->isConnected(),
+                'mintUrl' => $licenses->primaryAction() === 'mint' && User::current()->can('access licensing utility')
+                    ? cp_route('utilities.licensing.mint')
+                    : null,
             ] : null,
         ];
     }

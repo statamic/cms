@@ -12,6 +12,21 @@ class SiteLicense extends License
         return Config::getLicenseKey();
     }
 
+    public function name(): ?string
+    {
+        return Arr::get($this->response, 'name');
+    }
+
+    public function isConnected(): bool
+    {
+        return (bool) Arr::get($this->response, 'claimed', false);
+    }
+
+    public function hasInvalidDomain(): bool
+    {
+        return Arr::get($this->response, 'reason') === 'invalid_domain';
+    }
+
     public function usesIncorrectKeyFormat()
     {
         $key = $this->key();
@@ -71,7 +86,10 @@ class SiteLicense extends License
             return null;
         }
 
-        return rtrim(config('statamic.system.licensing_url', 'https://statamic.com'), '/').'/licensing/handoff?'.http_build_query(['key' => $key]);
+        return rtrim(config('statamic.system.licensing_url', 'https://statamic.com'), '/').'/account/licensing/handoff?'.http_build_query(array_filter([
+            'key' => $key,
+            'name' => config('app.name'),
+        ]));
     }
 
     public function hasSharedKey(): bool

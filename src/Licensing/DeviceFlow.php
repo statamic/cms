@@ -19,6 +19,7 @@ class DeviceFlow
         $response = Http::acceptJson()->asJson()->timeout(10)->post($this->startUrl(), [
             'key' => $key,
             'host' => $host,
+            'name' => config('app.name'),
         ]);
 
         if (! $response->successful()) {

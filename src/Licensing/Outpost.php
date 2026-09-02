@@ -116,6 +116,7 @@ class Outpost
     {
         return [
             'key' => Config::getLicenseKey(),
+            'name' => config('app.name'),
             'host' => request()->getHost(),
             'ip' => request()->server('SERVER_ADDR'),
             'port' => request()->server('SERVER_PORT'),

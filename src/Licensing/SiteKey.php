@@ -41,14 +41,22 @@ class SiteKey
         $envPath ??= base_path('.env');
         $examplePath ??= base_path('.env.example');
 
-        $existing = $this->populatedValue($envPath)
-            ?? $this->populatedValue($examplePath);
-
         if ($this->runningInCi()) {
-            return $existing;
+            return $this->populatedValue($envPath)
+                ?? $this->populatedValue($examplePath);
         }
 
-        $key = $existing ?? $this->generate();
+        return $this->mint($envPath, $examplePath);
+    }
+
+    public function mint(?string $envPath = null, ?string $examplePath = null): string
+    {
+        $envPath ??= base_path('.env');
+        $examplePath ??= base_path('.env.example');
+
+        $key = $this->populatedValue($envPath)
+            ?? $this->populatedValue($examplePath)
+            ?? $this->generate();
 
         $this->fillIfBlank($envPath, $key);
         $this->fillIfBlank($examplePath, $key);
