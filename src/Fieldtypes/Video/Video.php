@@ -14,8 +14,8 @@ class Video implements Arrayable
     {
         if (Str::startsWith($url, 'cloudflare:')) {
             $id = Str::after($url, 'cloudflare:');
-            $embedUrl = "https://iframe.cloudflarestream.com/{$id}";
-            $iframe = "<iframe src='$embedUrl' frameborder='0' allow='fullscreen' style='height: 100%; width: 100%;'></iframe>";
+            $embedUrl = 'https://iframe.cloudflarestream.com/'.e($id);
+            $iframe = "<iframe src=\"{$embedUrl}\" frameborder=\"0\" allow=\"fullscreen\" style=\"height: 100%; width: 100%;\"></iframe>";
 
             return new self(id: $id, provider: 'Cloudflare', embed: $iframe);
         }

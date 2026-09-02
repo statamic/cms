@@ -26,4 +26,16 @@ class VideoTest extends TestCase
             ['Cloudflare', '1234', 'cloudflare:1234'],
         ];
     }
+
+    #[Test]
+    public function it_escapes_the_cloudflare_id_in_the_embed()
+    {
+        $video = Video::fromUrl('cloudflare:1234"></iframe><script>alert(1)</script>');
+
+        $this->assertStringNotContainsString('<script>', $video->embed);
+        $this->assertStringContainsString(
+            'src="https://iframe.cloudflarestream.com/1234&quot;&gt;&lt;/iframe&gt;&lt;script&gt;alert(1)&lt;/script&gt;"',
+            $video->embed
+        );
+    }
 }
