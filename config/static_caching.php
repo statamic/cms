@@ -144,6 +144,23 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Script Delivery
+    |--------------------------------------------------------------------------
+    |
+    | Full measure static caching injects small <script> snippets into cached
+    | pages to swap CSRF tokens and hydrate nocache regions. By default these
+    | are inlined. Sites with a Content Security Policy that disallows inline
+    | scripts may set this to "external" to have the snippets served from
+    | dedicated routes and referenced with a <script src> tag instead.
+    |
+    | Supported: "inline", "external"
+    |
+    */
+
+    'script_delivery' => env('STATAMIC_STATIC_CACHING_SCRIPT_DELIVERY', 'inline'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Warm Queue
     |--------------------------------------------------------------------------
     |
