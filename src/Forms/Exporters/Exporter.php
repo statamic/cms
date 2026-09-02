@@ -17,6 +17,7 @@ abstract class Exporter
     protected string $handle;
     protected Form $form;
     protected ?Collection $submissions = null;
+    protected ?array $columns = null;
 
     abstract public function export(): string;
 
@@ -56,6 +57,29 @@ abstract class Exporter
     protected function submissions(): Collection
     {
         return $this->submissions ?? $this->form->submissions();
+    }
+
+    public function setColumns(?array $columns)
+    {
+        $this->columns = $columns;
+
+        return $this;
+    }
+
+    protected function columns(): Collection
+    {
+        $available = $this->form->fields()->keys()->push('date');
+
+        if ($this->columns === null) {
+            return $available;
+        }
+
+        return $available->intersect($this->columns)->values();
+    }
+
+    public function supportsColumnSelection(): bool
+    {
+        return true;
     }
 
     public function contentType(): string
