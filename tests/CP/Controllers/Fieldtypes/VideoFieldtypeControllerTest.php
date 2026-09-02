@@ -30,7 +30,11 @@ class VideoFieldtypeControllerTest extends TestCase
         return [
             [[], ['embed' => null, 'id' => null, 'provider' => 'Not Supported']],
             [['url' => 'https://www.youtube.com/watch?v=FK3dav4bA4s'], ['id' => null, 'provider' => 'Youtube']],
-            [['id' => 'cloudflare:1234'], ['id' => '1234', 'provider' => 'Cloudflare']],
+            [['url' => 'cloudflare:1234'], [
+                'embed' => '<iframe src="https://iframe.cloudflarestream.com/1234" frameborder="0" allow="fullscreen" style="height: 100%; width: 100%;"></iframe>',
+                'id' => '1234',
+                'provider' => 'Cloudflare',
+            ]],
         ];
     }
 }

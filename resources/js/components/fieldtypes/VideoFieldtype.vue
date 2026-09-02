@@ -80,7 +80,7 @@ export default {
             this.videoId = id;
             this.url = null;
 
-            this.getVideoData({type: this.provider, id: this.videoId});
+            this.getVideoData();
         },
 
         detailsFromUrl(url) {
@@ -90,12 +90,12 @@ export default {
             this.videoId = null;
             this.url = url;
 
-            this.getVideoData({url: url});
+            this.getVideoData();
         },
 
-        getVideoData(params) {
+        getVideoData() {
             this.$axios
-                .get(this.meta.url, { params: params })
+                .get(this.meta.url, { params: { url: this.savedValue } })
                 .then((response) => response.data)
                 .then((data) => {
                     this.embed = data.embed;
