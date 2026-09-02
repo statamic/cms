@@ -55,7 +55,12 @@ class GitPathMapper
             $remainder = Str::after($absolutePath, $collectionsDir.'/');
             // Only match files directly in the directory (not subdirectories = entry files)
             if (! Str::contains($remainder, '/') && Str::endsWith($remainder, '.yaml')) {
-                return [$this->makeAction($status, 'collections', $absolutePath, $relativePath)];
+                $handle = pathinfo($remainder, PATHINFO_FILENAME);
+
+                return [
+                    $this->makeAction($status, 'collections', $absolutePath, $relativePath),
+                    $this->warmStoreAction('entries::'.$handle, $relativePath),
+                ];
             }
         }
 
@@ -77,7 +82,12 @@ class GitPathMapper
         if (Str::startsWith($absolutePath, $taxonomiesDir.'/')) {
             $remainder = Str::after($absolutePath, $taxonomiesDir.'/');
             if (! Str::contains($remainder, '/') && Str::endsWith($remainder, '.yaml')) {
-                return [$this->makeAction($status, 'taxonomies', $absolutePath, $relativePath)];
+                $handle = pathinfo($remainder, PATHINFO_FILENAME);
+
+                return [
+                    $this->makeAction($status, 'taxonomies', $absolutePath, $relativePath),
+                    $this->warmStoreAction('terms::'.$handle, $relativePath),
+                ];
             }
         }
 
@@ -102,7 +112,13 @@ class GitPathMapper
         // --- Collection trees: content/trees/collections/...
         $collectionTreesDir = rtrim($storeDirectories['collection-trees'] ?? $basePath.'/content/trees/collections', '/');
         if (Str::startsWith($absolutePath, $collectionTreesDir.'/')) {
-            return [$this->makeAction($status, 'collection-trees', $absolutePath, $relativePath)];
+            $remainder = Str::after($absolutePath, $collectionTreesDir.'/');
+            $handle = pathinfo($remainder, PATHINFO_FILENAME);
+
+            return [
+                $this->makeAction($status, 'collection-trees', $absolutePath, $relativePath),
+                $this->warmStoreAction('entries::'.$handle, $relativePath),
+            ];
         }
 
         // --- Nav trees: content/trees/navigation/...
@@ -150,17 +166,17 @@ class GitPathMapper
 
         // resources/blueprints/collections/{collection}/...  → warm entries::{collection} store
         if (isset($parts[0]) && $parts[0] === 'collections' && isset($parts[1])) {
-            return ['type' => 'warm-store', 'storeKey' => 'entries::'.$parts[1], 'absolutePath' => null, 'displayPath' => $relativePath];
+            return $this->warmStoreAction('entries::'.$parts[1], $relativePath);
         }
 
         // resources/blueprints/taxonomies/{taxonomy}/...  → warm terms::{taxonomy} store
         if (isset($parts[0]) && $parts[0] === 'taxonomies' && isset($parts[1])) {
-            return ['type' => 'warm-store', 'storeKey' => 'terms::'.$parts[1], 'absolutePath' => null, 'displayPath' => $relativePath];
+            return $this->warmStoreAction('terms::'.$parts[1], $relativePath);
         }
 
         // resources/blueprints/assets/...  → warm asset-containers store
         if (isset($parts[0]) && $parts[0] === 'assets') {
-            return ['type' => 'warm-store', 'storeKey' => 'asset-containers', 'absolutePath' => null, 'displayPath' => $relativePath];
+            return $this->warmStoreAction('asset-containers', $relativePath);
         }
 
         // Any other blueprint change (e.g. user.yaml, default.yaml) → full refresh
@@ -170,6 +186,11 @@ class GitPathMapper
     private function fullRefreshAction(string $displayPath): array
     {
         return ['type' => 'full-refresh', 'storeKey' => null, 'absolutePath' => null, 'displayPath' => $displayPath];
+    }
+
+    private function warmStoreAction(string $storeKey, string $displayPath): array
+    {
+        return ['type' => 'warm-store', 'storeKey' => $storeKey, 'absolutePath' => null, 'displayPath' => $displayPath];
     }
 
     private function makeAction(string $gitStatus, string $storeKey, string $absolutePath, string $displayPath): array

@@ -80,27 +80,59 @@ class GitPathMapperTest extends TestCase
     }
 
     #[Test]
-    public function it_maps_a_collection_config_yaml_to_collections_store()
+    public function it_maps_a_collection_config_yaml_to_collections_store_and_warms_entries()
     {
         $actions = $this->map([
             ['status' => 'M', 'path' => 'content/collections/blog.yaml'],
         ]);
 
-        $this->assertCount(1, $actions);
+        $this->assertCount(2, $actions);
         $this->assertEquals('update-item', $actions[0]['type']);
         $this->assertEquals('collections', $actions[0]['storeKey']);
+        $this->assertEquals('warm-store', $actions[1]['type']);
+        $this->assertEquals('entries::blog', $actions[1]['storeKey']);
     }
 
     #[Test]
-    public function it_maps_a_taxonomy_config_yaml_to_taxonomies_store()
+    public function it_maps_a_deleted_collection_config_yaml_to_forget_item_and_warms_entries()
+    {
+        $actions = $this->map([
+            ['status' => 'D', 'path' => 'content/collections/blog.yaml'],
+        ]);
+
+        $this->assertCount(2, $actions);
+        $this->assertEquals('forget-item', $actions[0]['type']);
+        $this->assertEquals('collections', $actions[0]['storeKey']);
+        $this->assertEquals('warm-store', $actions[1]['type']);
+        $this->assertEquals('entries::blog', $actions[1]['storeKey']);
+    }
+
+    #[Test]
+    public function it_maps_a_taxonomy_config_yaml_to_taxonomies_store_and_warms_terms()
     {
         $actions = $this->map([
             ['status' => 'M', 'path' => 'content/taxonomies/tags.yaml'],
         ]);
 
-        $this->assertCount(1, $actions);
+        $this->assertCount(2, $actions);
         $this->assertEquals('update-item', $actions[0]['type']);
         $this->assertEquals('taxonomies', $actions[0]['storeKey']);
+        $this->assertEquals('warm-store', $actions[1]['type']);
+        $this->assertEquals('terms::tags', $actions[1]['storeKey']);
+    }
+
+    #[Test]
+    public function it_maps_a_deleted_taxonomy_config_yaml_to_forget_item_and_warms_terms()
+    {
+        $actions = $this->map([
+            ['status' => 'D', 'path' => 'content/taxonomies/tags.yaml'],
+        ]);
+
+        $this->assertCount(2, $actions);
+        $this->assertEquals('forget-item', $actions[0]['type']);
+        $this->assertEquals('taxonomies', $actions[0]['storeKey']);
+        $this->assertEquals('warm-store', $actions[1]['type']);
+        $this->assertEquals('terms::tags', $actions[1]['storeKey']);
     }
 
     #[Test]
@@ -164,15 +196,17 @@ class GitPathMapperTest extends TestCase
     }
 
     #[Test]
-    public function it_maps_collection_tree_to_collection_trees_store()
+    public function it_maps_collection_tree_to_collection_trees_store_and_warms_entries()
     {
         $actions = $this->map([
             ['status' => 'M', 'path' => 'content/trees/collections/pages.yaml'],
         ]);
 
-        $this->assertCount(1, $actions);
+        $this->assertCount(2, $actions);
         $this->assertEquals('update-item', $actions[0]['type']);
         $this->assertEquals('collection-trees', $actions[0]['storeKey']);
+        $this->assertEquals('warm-store', $actions[1]['type']);
+        $this->assertEquals('entries::pages', $actions[1]['storeKey']);
     }
 
     #[Test]

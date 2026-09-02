@@ -621,6 +621,23 @@ EOT;
     }
 
     #[Test]
+    public function it_treats_an_empty_stache_ref_file_as_null()
+    {
+        $refFile = storage_path('statamic/.stache-git-ref');
+        $dir = dirname($refFile);
+
+        if (! is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+
+        file_put_contents($refFile, "  \n");
+
+        $this->assertNull(Git::getStacheRef());
+
+        unlink($refFile);
+    }
+
+    #[Test]
     public function it_returns_null_stache_diff_when_no_ref_file_exists()
     {
         $refFile = storage_path('statamic/.stache-git-ref');

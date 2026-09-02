@@ -324,7 +324,13 @@ class Git
     {
         $path = $this->stacheRefFilePath();
 
-        return file_exists($path) ? trim(file_get_contents($path)) : null;
+        if (! file_exists($path)) {
+            return null;
+        }
+
+        $sha = trim((string) file_get_contents($path));
+
+        return $sha === '' ? null : $sha;
     }
 
     /**

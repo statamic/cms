@@ -265,4 +265,60 @@ class StacheRefreshTest extends TestCase
             ->expectsOutputToContain('selectively groomed')
             ->assertExitCode(0);
     }
+
+    #[Test]
+    public function it_writes_the_stache_ref_after_a_full_refresh_when_in_a_git_repo()
+    {
+        $git = $this->mockGit([
+            'isRepo' => true,
+            'currentSha' => 'abc1234',
+        ]);
+        $git->shouldReceive('setStacheRef')->once()->with('abc1234');
+
+        Stache::shouldReceive('exclude')->never()
+            ->shouldReceive('clear')->once()
+            ->shouldReceive('warm')->once();
+
+        $this->artisan(StacheRefresh::class);
+    }
+
+    #[Test]
+    public function it_does_not_write_the_stache_ref_after_a_full_refresh_when_not_in_a_git_repo()
+    {
+        $git = $this->mockGit(['isRepo' => false]);
+        $git->shouldReceive('setStacheRef')->never();
+        $git->shouldReceive('currentSha')->never();
+
+        Stache::shouldReceive('exclude')->never()
+            ->shouldReceive('clear')->once()
+            ->shouldReceive('warm')->once();
+
+        $this->artisan(StacheRefresh::class);
+    }
+
+    #[Test]
+    public function it_skips_targeted_actions_for_excluded_stores()
+    {
+        $path = '/var/www/site/content/collections/blog/post.md';
+        $actions = collect([
+            ['type' => 'update-item', 'storeKey' => 'entries::blog', 'absolutePath' => $path, 'displayPath' => 'content/collections/blog/post.md'],
+        ]);
+
+        $git = $this->mockGit([
+            'isRepo' => true,
+            'getStacheRef' => 'abc1234',
+            'stacheDiff' => $actions,
+            'currentSha' => 'def5678',
+        ]);
+        $git->shouldReceive('setStacheRef')->once()->with('def5678');
+
+        Stache::shouldReceive('exclude')->once()->with('entries')->andReturn();
+        Stache::shouldReceive('store')->never();
+        Stache::shouldReceive('clear')->never();
+        Stache::shouldReceive('warm')->never();
+
+        $this->artisan('statamic:stache:refresh', ['--git' => true, '--exclude' => 'entries'])
+            ->expectsOutputToContain('selectively groomed')
+            ->assertExitCode(0);
+    }
 }

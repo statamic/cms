@@ -297,17 +297,18 @@ abstract class Store
      */
     public function updateItemFromPath(string $path): void
     {
-        $item = $this->makeItemFromFile($path, File::get($path));
-        $key = $this->getItemKey($item);
+        foreach (Arr::wrap($this->getItemFromModifiedPath($path)) as $item) {
+            $key = $this->getItemKey($item);
 
-        $this->forgetItem($key);
-        $this->setPath($key, $item->path());
-        $this->cacheItem($item);
-        $this->handleModifiedItem($item);
+            $this->forgetItem($key);
+            $this->setPath($key, $item->path());
+            $this->cacheItem($item);
+            $this->handleModifiedItem($item);
 
-        $this->resolveIndexes()->filter->isCached()->each(function ($index) use ($item) {
-            $index->updateItem($item);
-        });
+            $this->resolveIndexes()->filter->isCached()->each(function ($index) use ($item) {
+                $index->updateItem($item);
+            });
+        }
     }
 
     /**
