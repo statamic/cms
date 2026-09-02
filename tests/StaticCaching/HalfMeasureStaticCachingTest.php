@@ -3,8 +3,11 @@
 namespace Tests\StaticCaching;
 
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Queue;
 use Orchestra\Testbench\Attributes\DefineEnvironment;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Console\Commands\StaticWarmJob;
+use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\Replacer;
 use Symfony\Component\HttpFoundation\Response;
 use Tests\FakesContent;
@@ -254,6 +257,77 @@ class HalfMeasureStaticCachingTest extends TestCase
             $store->get('nocache::session.'.md5('/__shared-errors/en/404')),
             'Expected nocache session to be stored under the shared-errors URL.'
         );
+    }
+
+    #[Test]
+    public function it_caches_and_tracks_404s()
+    {
+        \Illuminate\Support\Facades\Cache::flush();
+
+        $this->withStandardFakeViews();
+        $this->viewShouldReturnRaw('errors.404', '404 not found');
+
+        $this->get('/this-does-not-exist')->assertNotFound();
+
+        $this->assertEquals(['/this-does-not-exist'], app(Cacher::class)->getUrls()->values()->all());
+
+        $response = $this->get('/this-does-not-exist')->assertNotFound();
+        $this->assertTrue($response->wasStaticallyCached());
+    }
+
+    #[Test]
+    public function invalidating_a_cached_404_lets_new_content_be_served()
+    {
+        \Illuminate\Support\Facades\Cache::flush();
+
+        $this->withStandardFakeViews();
+        $this->viewShouldReturnRaw('default', '{{ title }}');
+        $this->viewShouldReturnRaw('errors.404', '404 not found');
+
+        // The URL 404s before the page exists, and the 404 gets cached.
+        $this->get('/about')->assertNotFound();
+
+        // Publishing a page at that URL invalidates the cached 404...
+        $this->createPage('about', ['with' => ['title' => 'The About Page']]);
+        app(Cacher::class)->invalidateUrls(['/about']);
+
+        // ...so the new page is served instead of the stale 404.
+        $this->get('/about')->assertOk()->assertSee('The About Page');
+    }
+
+    #[Test]
+    public function wildcard_refresh_invalidates_cached_404s_instead_of_warming_them()
+    {
+        \Illuminate\Support\Facades\Cache::flush();
+
+        Queue::fake();
+
+        $this->withStandardFakeViews();
+        $this->viewShouldReturnRaw('default', '{{ title }}');
+        $this->viewShouldReturnRaw('errors.404', '404 not found');
+
+        $this->createPage('about', ['with' => ['title' => 'The About Page']]);
+
+        // A real page, matching the wildcard `/about*` rule below.
+        $this->get('/about')->assertOk();
+
+        // A junk URL that also matches the wildcard prefix, but doesn't resolve
+        // to real content (e.g. a bot/scanner probe under the same path).
+        $this->get('/about-this-does-not-exist')->assertNotFound();
+
+        app(Cacher::class)->refreshUrls(['/about*']);
+
+        Queue::assertPushed(StaticWarmJob::class, function ($job) {
+            return str_contains((string) $job->request->getUri(), '/about')
+                && ! str_contains((string) $job->request->getUri(), 'this-does-not-exist');
+        });
+        Queue::assertNotPushed(StaticWarmJob::class, function ($job) {
+            return str_contains((string) $job->request->getUri(), 'this-does-not-exist');
+        });
+
+        // The junk URL is invalidated rather than warmed, so the tracked
+        // set converges to real pages.
+        $this->assertEquals(['/about'], app(Cacher::class)->getUrls()->values()->all());
     }
 
     #[Test]

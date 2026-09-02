@@ -13,20 +13,22 @@
             :id="editingId"
             :allow-deleting="false"
             :show-navigation="siblings.length > 1"
+            :redirect-after-crop="false"
             @previous="navigateToPrevious"
             @next="navigateToNext"
             @closed="closeEditor"
             @saved="assetSaved"
+            @created="assetCreated"
             @action-completed="actionCompleted"
         >
         </asset-editor>
 
         <div class="flex h-full w-full justify-center rounded-b-md relative" :class="[
-            { 'border-b dark:border-gray-700': showFilename },
+            { '@min-[300px]:border-b dark:border-gray-700': showFilename },
             canBeTransparent && checkerboardMode !== 'transparent' ? `bg-checkerboard bg-checkerboard-${checkerboardMode} rounded-lg` : '',
             canBeTransparent && checkerboardMode === 'transparent' ? `bg-checkerboard before:opacity-0 hover:before:opacity-100 rounded-lg` : '',
         ]">
-            <div class="p-1 flex flex-col items-center justify-center h-full">
+            <div class="pb-1 @min-[300px]:p-1 flex flex-col items-center justify-center h-full">
                 <!-- Solo Bard -->
                 <template v-if="isImage && isInBardField && !isInAssetBrowser">
                     <img :src="asset.url" />
