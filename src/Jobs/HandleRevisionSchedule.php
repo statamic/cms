@@ -7,9 +7,11 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Collection;
-use Statamic\Entries\MinuteRevisions;
+use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\Revisions\Revision;
 use Statamic\Events\EntryScheduleReached;
-use Statamic\Revisions\Revision;
+use Statamic\Facades\Entry as Entries;
+use Statamic\Facades\Revision as Revisions;
 
 class HandleRevisionSchedule implements ShouldQueue
 {
@@ -18,20 +20,19 @@ class HandleRevisionSchedule implements ShouldQueue
     public function handle()
     {
         $this
-            ->revisions()
-            ->each(fn (Revision $revision) => EntryScheduleReached::dispatch(
-                tap($revision->entry()->makeFromRevision($revision))->save()
-            ));
+            ->dueRevisions()
+            ->map(fn (Revision $revision) => Entries::find($revision->attribute('id'))?->publishRevision($revision))
+            ->filter()
+            ->each(fn (Entry $entry) => EntryScheduleReached::dispatch($entry));
     }
 
-    private function revisions(): Collection
+    private function dueRevisions(): Collection
     {
-        // We want to target the PREVIOUS minute because we can be sure that any entries that
-        // were scheduled for then would now be considered published. If we were targeting
-        // the current minute and the entry has defined a time with seconds later in the
-        // same minute, it may still be considered scheduled when it gets dispatched.
-        $minute = now()->subMinute();
-
-        return (new MinuteRevisions($minute))();
+        return Revisions::query()
+            ->where('action', '!=', 'working')
+            ->whereNotNull('publish_at')
+            ->where('publish_at', '<=', now())
+            ->get()
+            ->sortBy->publishAt();
     }
 }
