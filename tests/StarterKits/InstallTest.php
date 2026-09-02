@@ -119,6 +119,20 @@ class InstallTest extends TestCase
     }
 
     #[Test]
+    public function it_loads_installed_config_files_into_the_running_app()
+    {
+        $this->files->put($this->preparePath($this->kitRepoPath('config/statamic/hockey.php')), "<?php\n\nreturn ['rink' => 'calgary'];");
+
+        $this->assertNull(config('filesystems.disks.bobsled_pics'));
+        $this->assertNull(config('statamic.hockey'));
+
+        $this->installCoolRunnings();
+
+        $this->assertEquals('local', config('filesystems.disks.bobsled_pics.driver'));
+        $this->assertEquals('calgary', config('statamic.hockey.rink'));
+    }
+
+    #[Test]
     public function it_installs_from_github()
     {
         $this->assertFileDoesNotExist($this->kitVendorPath());
