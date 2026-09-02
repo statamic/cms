@@ -162,7 +162,7 @@ class DuplicateEntry extends Action
         $slug .= '-'.$attempt;
 
         // If the slug we've just built already exists, we'll try again, recursively.
-        if ($entry->collection()->queryEntries()->where('locale', $entry->locale())->where('slug', $slug)->count()) {
+        if ($entry->collection()->queryEntries()->where('site', $entry->locale())->where('slug', $slug)->count()) {
             [$title, $slug] = $this->generateTitleAndSlug($entry, $attempt + 1);
         }
 

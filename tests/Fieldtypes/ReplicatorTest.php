@@ -1221,6 +1221,72 @@ class ReplicatorTest extends TestCase
         $this->assertSame($frEntry, $frFields->all()->first()->parent());
     }
 
+    #[Test]
+    public function it_has_button_label_config()
+    {
+        $configFields = collect((new \ReflectionMethod(Replicator::class, 'configFieldItems'))->invoke(new Replicator))
+            ->flatMap(fn ($section) => $section['fields']);
+
+        $this->assertSame('text', $configFields['button_label']['type']);
+        $this->assertSame('Add Set Label', $configFields['button_label']['display']);
+        $this->assertSame('Add Set', $configFields['button_label']['placeholder']);
+    }
+
+    #[Test]
+    public function it_gets_flattened_sets_config_for_each_field_it_is_given()
+    {
+        $fieldtype = new Replicator;
+
+        $fieldtype->setField($this->fieldWithSet('alpha'));
+        $this->assertSame(['alpha'], $fieldtype->flattenedSetsConfig()->keys()->all());
+
+        $fieldtype->setField($this->fieldWithSet('bravo'));
+        $this->assertSame(['bravo'], $fieldtype->flattenedSetsConfig()->keys()->all());
+    }
+
+    #[Test]
+    public function it_gets_flattened_sets_config_when_the_field_is_replaced_without_being_read()
+    {
+        // The field is cloned into the fieldtype, so replacing it frees the previous
+        // clone and its spl_object_id becomes available to the next one.
+        $fieldtype = new Replicator;
+
+        $fieldtype->setField($this->fieldWithSet('alpha'));
+        $fieldtype->flattenedSetsConfig();
+
+        $fieldtype->setField($this->fieldWithSet('bravo'));
+        $fieldtype->setField($this->fieldWithSet('charlie'));
+
+        $this->assertSame(['charlie'], $fieldtype->flattenedSetsConfig()->keys()->all());
+    }
+
+    #[Test]
+    public function it_doesnt_use_another_fields_flattened_sets_config_when_cloned()
+    {
+        $fieldtype = new Replicator;
+        $fieldtype->setField($this->fieldWithSet('alpha'));
+        $fieldtype->flattenedSetsConfig();
+
+        $clone = (clone $fieldtype)->setField($this->fieldWithSet('bravo'));
+
+        $this->assertSame(['bravo'], $clone->flattenedSetsConfig()->keys()->all());
+        $this->assertSame(['alpha'], $fieldtype->flattenedSetsConfig()->keys()->all());
+    }
+
+    private function fieldWithSet(string $set)
+    {
+        return new Field($set.'_field', [
+            'type' => 'replicator',
+            'sets' => [
+                'main' => [
+                    'sets' => [
+                        $set => ['fields' => [['handle' => 'words', 'field' => ['type' => 'text']]]],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
     public static function groupedSetsProvider()
     {
         return [

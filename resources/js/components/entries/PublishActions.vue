@@ -47,9 +47,9 @@ import { Heading, Button, Select, DatePicker, Textarea, Icon, Subheading, Stack 
 import { parseAbsoluteToLocal } from '@internationalized/date';
 
 export default {
-    emits: ['saving', 'saved', 'failed'],
-
     components: { Heading, Button, Select, DatePicker, Textarea, Icon, Subheading, Stack },
+
+    emits: ['closed', 'saving', 'saved', 'failed'],
 
     props: {
         actions: Object,

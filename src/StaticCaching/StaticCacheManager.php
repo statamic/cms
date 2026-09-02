@@ -2,7 +2,6 @@
 
 namespace Statamic\StaticCaching;
 
-use Illuminate\Cache\Repository;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Events\StaticCacheCleared;
 use Statamic\Facades\Site;
@@ -37,7 +36,7 @@ class StaticCacheManager extends Manager
 
     public function createApplicationDriver(array $config)
     {
-        return new ApplicationCacher($this->app[Repository::class], $config);
+        return new ApplicationCacher($this->cacheStore(), $config);
     }
 
     public function cacheStore()

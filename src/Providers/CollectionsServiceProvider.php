@@ -7,6 +7,9 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\ServiceProvider;
 use Statamic\Contracts\Data\Augmentable;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class CollectionsServiceProvider extends ServiceProvider
 {
     /**
@@ -16,31 +19,10 @@ class CollectionsServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->getOrPut();
         $this->keyByWithKey();
         $this->l10n();
-        $this->pipe();
         $this->transpose();
         $this->toAugmentedArray();
-    }
-
-    /**
-     * Get a key from a collection if it exists,
-     * otherwise put a value in there and return it.
-     *
-     * @return void
-     */
-    private function getOrPut()
-    {
-        Collection::macro('getOrPut', function ($key, $put) {
-            if ($this->has($key)) {
-                return $this->get($key);
-            }
-
-            $this->put($key, $put);
-
-            return $put;
-        });
     }
 
     /**
@@ -81,7 +63,7 @@ class CollectionsServiceProvider extends ServiceProvider
          * @param  string  $prefix  This is for prefixing the keys for our addons.
          */
         Collection::macro('localize', function ($prefix = null) {
-            return collect($this->items)
+            return collect($this->all())
                 ->filter(function ($item) {
                     return pathinfo($item, PATHINFO_EXTENSION) == 'php';
                 })
@@ -91,18 +73,6 @@ class CollectionsServiceProvider extends ServiceProvider
                 ->map(function ($item) {
                     return require base_path($item);
                 });
-        });
-    }
-
-    /**
-     * Backport of the pipe method from 5.2.
-     *
-     * @return void
-     */
-    private function pipe()
-    {
-        Collection::macro('pipe', function (callable $callback) {
-            return $callback($this);
         });
     }
 
@@ -160,7 +130,7 @@ class CollectionsServiceProvider extends ServiceProvider
                 }
 
                 return $value instanceof Arrayable ? $value->toArray() : $value;
-            }, $this->items);
+            }, $this->all());
         });
 
         Collection::macro('toDeferredAugmentedArray', function ($keys = null) {
@@ -170,7 +140,7 @@ class CollectionsServiceProvider extends ServiceProvider
                 }
 
                 return $value instanceof Arrayable ? $value->toArray() : $value;
-            }, $this->items);
+            }, $this->all());
         });
 
         Collection::macro('toAugmentedCollection', function ($keys = null) {
@@ -180,7 +150,7 @@ class CollectionsServiceProvider extends ServiceProvider
                 }
 
                 return $value instanceof Arrayable ? $value->toArray() : $value;
-            }, $this->items);
+            }, $this->all());
         });
 
         Collection::macro('toEvaluatedAugmentedArray', function ($keys = null) {
@@ -190,7 +160,7 @@ class CollectionsServiceProvider extends ServiceProvider
                 }
 
                 return $value instanceof Arrayable ? $value->toArray() : $value;
-            }, $this->items);
+            }, $this->all());
         });
     }
 }
