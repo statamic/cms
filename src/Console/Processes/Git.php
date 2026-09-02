@@ -2,6 +2,7 @@
 
 namespace Statamic\Console\Processes;
 
+use Statamic\Console\Processes\Exceptions\ProcessException;
 use Statamic\Support\Str;
 
 class Git extends Process
@@ -58,7 +59,7 @@ class Git extends Process
      */
     public function diff(string $from, string $to = 'HEAD')
     {
-        return $this->runGitCommand('diff', '--name-status', $from, $to);
+        return $this->runRequiredGitCommand('diff', '--name-status', $from, $to);
     }
 
     /**
@@ -68,7 +69,7 @@ class Git extends Process
      */
     public function diffDirty()
     {
-        return $this->runGitCommand('diff', '--name-status', 'HEAD');
+        return $this->runRequiredGitCommand('diff', '--name-status', 'HEAD');
     }
 
     /**
@@ -78,7 +79,17 @@ class Git extends Process
      */
     public function diffStaged()
     {
-        return $this->runGitCommand('diff', '--name-status', '--cached', 'HEAD');
+        return $this->runRequiredGitCommand('diff', '--name-status', '--cached', 'HEAD');
+    }
+
+    /**
+     * List untracked files, excluding ignored paths.
+     *
+     * @return string
+     */
+    public function untrackedFiles()
+    {
+        return $this->runRequiredGitCommand('ls-files', '--others', '--exclude-standard');
     }
 
     /**
@@ -100,6 +111,42 @@ class Git extends Process
     private function runGitCommand(...$parts)
     {
         return $this->run($this->prepareProcessArguments($parts));
+    }
+
+    /**
+     * Run a git command that must succeed. Throw when git writes to stderr or exits non-zero.
+     *
+     * @param  mixed  $parts
+     * @return mixed
+     *
+     * @throws ProcessException
+     */
+    private function runRequiredGitCommand(...$parts)
+    {
+        $this->throwOnFailure = true;
+
+        try {
+            $output = $this->runGitCommand(...$parts);
+        } catch (ProcessException $e) {
+            throw new ProcessException($this->failedGitCommandMessage($e), 0, $e);
+        } finally {
+            $this->throwOnFailure = false;
+        }
+
+        if ($this->hasErrorOutput()) {
+            throw new ProcessException($this->failedGitCommandMessage());
+        }
+
+        return $output;
+    }
+
+    private function failedGitCommandMessage(?ProcessException $e = null): string
+    {
+        $detail = $this->hasErrorOutput()
+            ? collect($this->errorOutput)->implode("\n")
+            : ($e?->getMessage() ?: 'unknown error');
+
+        return 'Git command failed: '.$detail;
     }
 
     /**

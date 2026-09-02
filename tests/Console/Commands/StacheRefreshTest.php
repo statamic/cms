@@ -5,6 +5,7 @@ namespace Tests\Console\Commands;
 use Mockery;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Console\Commands\StacheRefresh;
+use Statamic\Console\Processes\Exceptions\ProcessException;
 use Statamic\Facades\Stache;
 use Statamic\Git\Git;
 use Statamic\Stache\Stores\ChildStore;
@@ -126,10 +127,10 @@ class StacheRefreshTest extends TestCase
     }
 
     #[Test]
-    public function it_falls_back_to_full_refresh_for_unrecognized_files()
+    public function it_falls_back_to_full_refresh_when_an_action_requires_it()
     {
         $actions = collect([
-            ['type' => 'full-refresh', 'storeKey' => null, 'absolutePath' => null, 'displayPath' => 'resources/views/some-template.antlers.html'],
+            ['type' => 'full-refresh', 'storeKey' => null, 'absolutePath' => null, 'displayPath' => 'resources/fieldsets/common.yaml'],
         ]);
 
         $git = $this->mockGit([
@@ -187,6 +188,81 @@ class StacheRefreshTest extends TestCase
 
         $this->artisan('statamic:stache:refresh', ['--git' => true, '--include-dirty' => true])
             ->expectsOutputToContain('No changes detected')
+            ->assertExitCode(0);
+    }
+
+    #[Test]
+    public function it_fails_when_git_diff_throws_and_does_not_update_the_ref()
+    {
+        $git = $this->mockGit([
+            'isRepo' => true,
+            'getStacheRef' => 'abc1234',
+        ]);
+        $git->shouldReceive('stacheDiff')->once()->andThrow(new ProcessException('Git command failed: fatal: bad object'));
+        $git->shouldReceive('setStacheRef')->never();
+        $git->shouldReceive('currentSha')->never();
+
+        Stache::shouldReceive('clear')->never();
+        Stache::shouldReceive('warm')->never();
+
+        $this->artisan('statamic:stache:refresh', ['--git' => true])
+            ->expectsOutputToContain('Unable to diff git changes')
+            ->assertExitCode(1);
+    }
+
+    #[Test]
+    public function it_updates_an_item_from_path_for_update_item_actions()
+    {
+        $path = '/var/www/site/content/collections/blog/post.md';
+        $actions = collect([
+            ['type' => 'update-item', 'storeKey' => 'entries::blog', 'absolutePath' => $path, 'displayPath' => 'content/collections/blog/post.md'],
+        ]);
+
+        $git = $this->mockGit([
+            'isRepo' => true,
+            'getStacheRef' => 'abc1234',
+            'stacheDiff' => $actions,
+            'currentSha' => 'def5678',
+        ]);
+        $git->shouldReceive('setStacheRef')->once()->with('def5678');
+
+        $storeMock = Mockery::mock(ChildStore::class);
+        $storeMock->shouldReceive('updateItemFromPath')->once()->with($path);
+
+        Stache::shouldReceive('store')->with('entries::blog')->andReturn($storeMock);
+        Stache::shouldReceive('clear')->never();
+        Stache::shouldReceive('warm')->never();
+
+        $this->artisan('statamic:stache:refresh', ['--git' => true])
+            ->expectsOutputToContain('selectively groomed')
+            ->assertExitCode(0);
+    }
+
+    #[Test]
+    public function it_forgets_an_item_by_path_for_forget_item_actions()
+    {
+        $path = '/var/www/site/content/collections/blog/post.md';
+        $actions = collect([
+            ['type' => 'forget-item', 'storeKey' => 'entries::blog', 'absolutePath' => $path, 'displayPath' => 'content/collections/blog/post.md'],
+        ]);
+
+        $git = $this->mockGit([
+            'isRepo' => true,
+            'getStacheRef' => 'abc1234',
+            'stacheDiff' => $actions,
+            'currentSha' => 'def5678',
+        ]);
+        $git->shouldReceive('setStacheRef')->once()->with('def5678');
+
+        $storeMock = Mockery::mock(ChildStore::class);
+        $storeMock->shouldReceive('forgetItemByPath')->once()->with($path);
+
+        Stache::shouldReceive('store')->with('entries::blog')->andReturn($storeMock);
+        Stache::shouldReceive('clear')->never();
+        Stache::shouldReceive('warm')->never();
+
+        $this->artisan('statamic:stache:refresh', ['--git' => true])
+            ->expectsOutputToContain('selectively groomed')
             ->assertExitCode(0);
     }
 }

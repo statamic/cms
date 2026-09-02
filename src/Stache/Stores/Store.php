@@ -3,6 +3,7 @@
 namespace Statamic\Stache\Stores;
 
 use Facades\Statamic\Stache\Traverser;
+use Illuminate\Support\Enumerable;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\Facades\Stache;
@@ -315,12 +316,49 @@ abstract class Store
      */
     public function forgetItemByPath(string $path): void
     {
-        collect($this->getKeyFromPath($path))->each(function ($key) use ($path) {
+        $key = $this->getKeyFromPathVariants($path);
+
+        collect($key)->each(function ($key) use ($path) {
             $this->forgetItem($key);
             $this->forgetPath($key);
             $this->resolveIndexes()->filter->isCached()->each->forgetItem($key);
             $this->handleDeletedItem($path, $key);
         });
+    }
+
+    protected function getKeyFromPathVariants(string $path)
+    {
+        foreach ($this->pathLookupVariants($path) as $candidate) {
+            $key = $this->getKeyFromPath($candidate);
+
+            if ($key instanceof Enumerable) {
+                if ($key->isNotEmpty()) {
+                    return $key;
+                }
+
+                continue;
+            }
+
+            if ($key !== null && $key !== false && $key !== '') {
+                return $key;
+            }
+        }
+
+        return null;
+    }
+
+    protected function pathLookupVariants(string $path): array
+    {
+        $tidy = Path::tidy($path);
+        $resolved = Path::resolve($path);
+
+        return array_values(array_unique(array_filter([
+            $path,
+            $tidy,
+            rtrim($tidy, '/'),
+            $resolved,
+            rtrim($resolved, '/'),
+        ])));
     }
 
     protected function handleModifiedItem($item)

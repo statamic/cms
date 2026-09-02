@@ -7,6 +7,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Queue;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Console\Processes\Exceptions\ProcessException;
 use Statamic\Console\Processes\Git as GitProcess;
 use Statamic\Console\Processes\Process;
 use Statamic\Facades\Config;
@@ -571,6 +572,29 @@ EOT;
     }
 
     #[Test]
+    public function it_normalizes_copy_lines_into_add_of_the_new_path()
+    {
+        $output = "C100\tcontent/collections/blog/original.md\tcontent/collections/blog/copy.md";
+
+        $changes = Git::parseDiffOutput($output);
+
+        $this->assertCount(1, $changes);
+        $this->assertEquals(['status' => 'A', 'path' => 'content/collections/blog/copy.md'], $changes[0]);
+    }
+
+    #[Test]
+    public function it_parses_untracked_output_as_added_paths()
+    {
+        $output = "content/collections/blog/new.md\ncontent/collections/news/other.md";
+
+        $changes = Git::parseUntrackedOutput($output);
+
+        $this->assertCount(2, $changes);
+        $this->assertEquals(['status' => 'A', 'path' => 'content/collections/blog/new.md'], $changes[0]);
+        $this->assertEquals(['status' => 'A', 'path' => 'content/collections/news/other.md'], $changes[1]);
+    }
+
+    #[Test]
     public function it_returns_empty_collection_for_empty_diff_output()
     {
         $this->assertCount(0, Git::parseDiffOutput(''));
@@ -622,6 +646,48 @@ EOT;
         $this->assertCount(0, $actions);
 
         unlink(storage_path('statamic/.stache-git-ref'));
+    }
+
+    #[Test]
+    public function stache_diff_throws_when_git_diff_fails()
+    {
+        $refFile = storage_path('statamic/.stache-git-ref');
+
+        Git::setStacheRef('not-a-valid-sha');
+
+        try {
+            Git::stacheDiff();
+            $this->fail('Expected a ProcessException when git diff fails.');
+        } catch (ProcessException $e) {
+            $this->assertMatchesRegularExpression('/Git command failed/', $e->getMessage());
+        } finally {
+            if (file_exists($refFile)) {
+                unlink($refFile);
+            }
+        }
+    }
+
+    #[Test]
+    public function stache_diff_includes_untracked_files_when_include_dirty_is_true()
+    {
+        $process = \Mockery::mock(GitProcess::class);
+        $process->shouldReceive('diff')->once()->with('abc1234', 'HEAD')->andReturn('');
+        $process->shouldReceive('diffDirty')->once()->andReturn('');
+        $process->shouldReceive('diffStaged')->once()->andReturn('');
+        $process->shouldReceive('untrackedFiles')->once()->andReturn('content/collections/blog/new-post.md');
+
+        $git = \Mockery::mock(\Statamic\Git\Git::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $git->shouldReceive('getStacheRef')->andReturn('abc1234');
+        $git->shouldReceive('stacheGitProcess')->andReturn($process);
+
+        config(['statamic.stache.stores.entries.directory' => base_path('content/collections')]);
+
+        $actions = $git->stacheDiff(true);
+
+        $this->assertCount(1, $actions);
+        $this->assertEquals('update-item', $actions[0]['type']);
+        $this->assertEquals('entries::blog', $actions[0]['storeKey']);
+        $this->assertEquals('content/collections/blog/new-post.md', $actions[0]['displayPath']);
     }
 
     private function showLastCommit($path)

@@ -18,6 +18,7 @@ use Statamic\Contracts\Auth\User as UserContract;
  * @method static string|null getStacheRef()
  * @method static void setStacheRef(string $sha)
  * @method static \Illuminate\Support\Collection parseDiffOutput(?string $output)
+ * @method static \Illuminate\Support\Collection parseUntrackedOutput(?string $output)
  * @method static \Illuminate\Support\Collection|null stacheDiff(bool $includeDirty = false)
  *
  * @see \Statamic\Git\Git

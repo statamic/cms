@@ -4,6 +4,7 @@ namespace Statamic\Console\Commands;
 
 use Illuminate\Console\Command;
 use Statamic\Console\Commands\Concerns\HasStacheExcludes;
+use Statamic\Console\Processes\Exceptions\ProcessException;
 use Statamic\Console\RunsInPlease;
 use Statamic\Facades\Stache;
 use Statamic\Git\Git;
@@ -60,7 +61,15 @@ class StacheRefresh extends Command
         }
 
         $includeDirty = (bool) $this->option('include-dirty');
-        $actions = $git->stacheDiff($includeDirty);
+
+        try {
+            $actions = $git->stacheDiff($includeDirty);
+        } catch (ProcessException $e) {
+            $this->components->error('Unable to diff git changes. Stache ref was not updated.');
+            $this->components->error($e->getMessage());
+
+            return self::FAILURE;
+        }
 
         if ($actions->isEmpty()) {
             $this->components->info('No changes detected since last stache refresh.');
@@ -69,10 +78,9 @@ class StacheRefresh extends Command
             return self::SUCCESS;
         }
 
-        // Any unrecognized file triggers a full refresh fallback.
         if ($actions->contains(fn ($a) => $a['type'] === 'full-refresh')) {
             if ($this->getOutput()->isVerbose()) {
-                $this->components->warn('Unrecognized file(s) detected. Falling back to full refresh.');
+                $this->components->warn('A change requires a full stache refresh.');
                 $this->output->listing(
                     $actions->filter(fn ($a) => $a['type'] === 'full-refresh')->pluck('displayPath')->all()
                 );

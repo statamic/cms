@@ -363,6 +363,7 @@ class Git
      *
      * Each item is an array with keys: 'status' (A|M|D) and 'path' (relative to git root).
      * Rename lines (R100\told\tnew) are normalized into a delete + add pair.
+     * Copy lines (C100\told\tnew) are normalized into an add of the new path.
      *
      * @return Collection<array{status: string, path: string}>
      */
@@ -374,6 +375,12 @@ class Git
                 if (preg_match('/^R\d*\t(.+)\t(.+)$/', $line, $m)) {
                     return [
                         ['status' => 'D', 'path' => $m[1]],
+                        ['status' => 'A', 'path' => $m[2]],
+                    ];
+                }
+
+                if (preg_match('/^C\d*\t(.+)\t(.+)$/', $line, $m)) {
+                    return [
                         ['status' => 'A', 'path' => $m[2]],
                     ];
                 }
@@ -410,7 +417,7 @@ class Git
             return null;
         }
 
-        $process = GitProcess::create(base_path());
+        $process = $this->stacheGitProcess();
 
         $changes = $this->parseDiffOutput($process->diff($fromSha, 'HEAD'));
 
@@ -418,6 +425,7 @@ class Git
             $changes = $changes
                 ->merge($this->parseDiffOutput($process->diffDirty()))
                 ->merge($this->parseDiffOutput($process->diffStaged()))
+                ->merge($this->parseUntrackedOutput($process->untrackedFiles()))
                 ->unique(fn ($c) => $c['status'].':'.$c['path']);
         }
 
@@ -431,5 +439,23 @@ class Git
             ->all();
 
         return (new GitPathMapper)->map($changes, base_path(), $storeDirectories);
+    }
+
+    /**
+     * Parse git ls-files --others output into added changes.
+     *
+     * @return Collection<array{status: string, path: string}>
+     */
+    public function parseUntrackedOutput(?string $output): Collection
+    {
+        return collect(explode("\n", trim((string) $output)))
+            ->filter()
+            ->map(fn ($path) => ['status' => 'A', 'path' => $path])
+            ->values();
+    }
+
+    protected function stacheGitProcess(): GitProcess
+    {
+        return GitProcess::create(base_path());
     }
 }
