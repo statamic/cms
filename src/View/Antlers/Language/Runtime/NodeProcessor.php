@@ -1137,7 +1137,7 @@ class NodeProcessor
         $namedSlots = [];
 
         foreach ($node->children as $child) {
-            if ($child instanceof AntlersNode && ! $child->isComment && $child->name->name == 'slot') {
+            if ($child instanceof AntlersNode && ! $child->isComment && $child->isPaired() && $child->name->name == 'slot') {
                 $namedSlots[$child->name->methodPart] = $child;
             }
         }
