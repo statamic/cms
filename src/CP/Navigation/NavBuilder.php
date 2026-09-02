@@ -582,7 +582,27 @@ class NavBuilder
             }
         }
 
-        return $items->get($id);
+        return $items->get($id) ?? $this->findItemByLegacyId($id);
+    }
+
+    /**
+     * Find existing nav item by the ID it would have been given before child IDs
+     * were generated from handles, so that preferences saved against the older
+     * display-based IDs continue to work.
+     *
+     * @param  string  $id
+     * @return \Statamic\CP\Navigation\NavItem|null
+     */
+    protected function findItemByLegacyId($id)
+    {
+        if (! $parent = $this->findParentItem($id)) {
+            return null;
+        }
+
+        return $parent
+            ->resolveChildren()
+            ->children()
+            ?->first(fn ($child) => $parent->id().'::'.NavItem::snakeCase($child->display()) === $id);
     }
 
     /**
