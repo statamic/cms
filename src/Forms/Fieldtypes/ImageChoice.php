@@ -58,14 +58,14 @@ class ImageChoice extends FormFieldtype
             ],
             'multiple' => [
                 'display' => __('Allow Multiple'),
-                'instructions' => __('Allow multiple selections.'),
+                'instructions' => __('statamic::fieldtypes.select.config.multiple'),
                 'type' => 'toggle',
                 'default' => false,
                 'width' => 50,
             ],
             'columns' => [
                 'display' => __('Columns'),
-                'instructions' => __('How many options appear per row.'),
+                'instructions' => __('statamic::form-fieldtypes.image_choice.config.columns.instructions'),
                 'type' => 'integer',
                 'default' => 3,
                 'min' => 1,
@@ -74,7 +74,7 @@ class ImageChoice extends FormFieldtype
             ],
             'aspect_ratio' => [
                 'display' => __('Aspect Ratio'),
-                'instructions' => __('Shape of the image area for each option.'),
+                'instructions' => __('statamic::form-fieldtypes.image_choice.config.aspect_ratio.instructions'),
                 'type' => 'select',
                 'default' => '16/9',
                 'options' => [
@@ -106,29 +106,29 @@ class ImageChoice extends FormFieldtype
     {
         return [
             'config' => [
-                'display' => __('Pick your favorite season'),
+                'display' => 'Pick your favorite season',
                 'columns' => 2,
                 'gap' => 2,
                 'aspect_ratio' => '4/3',
                 'options' => [
                     [
                         'key' => 'spring',
-                        'label' => __('Spring'),
+                        'label' => 'Spring',
                         'image' => 'https://picsum.photos/seed/image-choice-spring/640/480',
                     ],
                     [
                         'key' => 'summer',
-                        'label' => __('Summer'),
+                        'label' => 'Summer',
                         'image' => 'https://picsum.photos/seed/image-choice-summer/640/480',
                     ],
                     [
                         'key' => 'autumn',
-                        'label' => __('Autumn'),
+                        'label' => 'Autumn',
                         'image' => 'https://picsum.photos/seed/image-choice-autumn/640/480',
                     ],
                     [
                         'key' => 'winter',
-                        'label' => __('Winter'),
+                        'label' => 'Winter',
                         'image' => 'https://picsum.photos/seed/image-choice-winter/640/480',
                     ],
                 ],

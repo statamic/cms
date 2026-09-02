@@ -28,4 +28,31 @@ class ItemTest extends TestCase
             'label' => '🍎 Apple',
         ], $item->toArray());
     }
+
+    #[Test]
+    public function it_gets_the_icon()
+    {
+        $item = new Item('apple', 'Apple', [
+            'icon' => 'apple',
+            'color' => 'red',
+        ]);
+
+        $this->assertEquals('apple', $item->icon());
+        $this->assertEquals(['color' => 'red'], $item->data());
+        $this->assertEquals([
+            'key' => 'apple',
+            'value' => 'apple',
+            'icon' => 'apple',
+            'color' => 'red',
+            'label' => 'Apple',
+        ], $item->toArray());
+    }
+
+    #[Test]
+    public function icon_is_null_when_not_set()
+    {
+        $item = new Item('apple', 'Apple', ['color' => 'red']);
+
+        $this->assertNull($item->icon());
+    }
 }

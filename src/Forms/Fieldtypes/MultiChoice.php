@@ -59,7 +59,7 @@ class MultiChoice extends FormFieldtype
                 'options' => [
                     'traffic' => 'Traffic was bad',
                     'alarm' => "My alarm didn't go off",
-                    'racoon' => 'A racoon stole my keys',
+                    'racoon' => 'A raccoon stole my keys',
                 ],
             ],
             'value' => 'racoon',

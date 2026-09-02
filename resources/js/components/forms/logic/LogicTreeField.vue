@@ -33,7 +33,7 @@ const iconClass = computed(() => {
     />
     <span class="linked-list__field-name min-w-0 flex-1">
         <FieldNumber :field-key="field.handle" />
-        {{ field.config?.display ?? field.handle }}
+        {{ __(field.config?.display) || field.handle }}
     </span>
     <span
         v-if="field.config?.hidden"

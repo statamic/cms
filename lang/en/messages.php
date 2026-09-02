@@ -95,6 +95,7 @@ return [
     'field_conditions_reserve_space_when_hidden_instructions' => 'When hidden, reserve the field\'s space in the layout.',
     'field_conditions_field_instructions' => 'You may enter any field handle. You are not limited to the options in the dropdown.',
     'field_conditions_instructions' => 'When to show or hide this field.',
+    'field_conditions_reserve_space_when_hidden_instructions' => 'When hidden, reserve the field\'s space in the layout.',
     'field_desynced_from_origin' => 'Desynced from origin. Click to sync and revert to the origin\'s value.',
     'field_synced_with_origin' => 'Synced with origin. Click or edit the field to desync.',
     'field_validation_advanced_instructions' => 'Add more advanced validation to this field.',
