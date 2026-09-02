@@ -2,7 +2,9 @@
 
 namespace Tests\Search\Commands;
 
+use Mockery;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\Search;
 use Statamic\Search\Commands\Update;
 use Statamic\Search\Index;
 use Tests\TestCase;
@@ -15,6 +17,17 @@ class UpdateTest extends TestCase
         Index::resolveNameUsing(null);
 
         parent::tearDown();
+    }
+
+    private function fakeIndex()
+    {
+        $index = Mockery::mock(Index::class);
+        $index->shouldReceive('name')->andReturn('test');
+        $index->shouldReceive('update')->once();
+
+        Search::shouldReceive('indexes')->andReturn(collect(['test' => $index]));
+
+        return $index;
     }
 
     private function setUpIndexes()
@@ -58,6 +71,24 @@ class UpdateTest extends TestCase
             ->expectsOutputToContain('Index local_test_fr updated.')
             ->doesntExpectOutputToContain('Index local_cp_ updated.')
             ->assertExitCode(0);
+    }
+
+    #[Test]
+    public function it_queues_the_indexing_by_default()
+    {
+        $index = $this->fakeIndex();
+        $index->shouldReceive('withoutQueue')->never();
+
+        $this->artisan(Update::class, ['index' => 'test'])->assertExitCode(0);
+    }
+
+    #[Test]
+    public function it_indexes_immediately_when_using_the_sync_option()
+    {
+        $index = $this->fakeIndex();
+        $index->shouldReceive('withoutQueue')->once()->andReturnSelf();
+
+        $this->artisan(Update::class, ['index' => 'test', '--sync' => true])->assertExitCode(0);
     }
 
     #[Test]

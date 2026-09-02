@@ -12,6 +12,7 @@ abstract class Index
     protected $handle;
     protected $locale;
     protected $config;
+    protected bool $shouldQueue = true;
     protected static ?Closure $nameCallback = null;
 
     abstract public function search($query);
@@ -98,11 +99,22 @@ abstract class Index
     {
         $documents
             ->chunk(config('statamic.search.chunk_size'))
-            ->each(fn ($documents) => InsertMultipleJob::dispatch(
-                name: $this->handle,
-                locale: $this->locale,
-                documents: $documents
-            ));
+            ->each(function ($documents) {
+                $job = new InsertMultipleJob(
+                    name: $this->handle,
+                    locale: $this->locale,
+                    documents: $documents
+                );
+
+                $this->shouldQueue ? dispatch($job) : dispatch_sync($job);
+            });
+
+        return $this;
+    }
+
+    public function withoutQueue()
+    {
+        $this->shouldQueue = false;
 
         return $this;
     }

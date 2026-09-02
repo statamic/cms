@@ -70,4 +70,19 @@ trait IndexTests
             fn (InsertMultipleJob $job) => $job->name === 'test' && $job->locale === 'en'
         );
     }
+
+    #[Test]
+    public function it_dispatches_the_insert_job_synchronously_when_queueing_is_disabled()
+    {
+        Bus::fake();
+
+        $index = $this->getIndex('test', [], 'en');
+
+        $index->withoutQueue()->insertMultiple(collect(['foo::bar']));
+
+        Bus::assertDispatchedSync(
+            InsertMultipleJob::class,
+            fn (InsertMultipleJob $job) => $job->name === 'test' && $job->locale === 'en'
+        );
+    }
 }
