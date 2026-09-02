@@ -5,6 +5,7 @@ namespace Tests\Feature\Entries;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Carbon;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
@@ -374,10 +375,10 @@ class EntryRevisionsTest extends TestCase
         $this->assertFalse($entry->published());
         $this->assertCount(0, $entry->revisions());
 
-        $publishAt = Carbon::parse('2010-12-29 11:00am')->toIso8601String();
+        $publishAt = now()->addDay()->startOfMinute();
         $this
             ->actingAs($user)
-            ->post($entry->createRevisionUrl(), ['message' => 'Test!', 'publish_at' => $publishAt])
+            ->post($entry->createRevisionUrl(), ['message' => 'Test!', 'publish_at' => $publishAt->toIso8601String()])
             ->assertOk();
 
         $entry = Entry::find($entry->id());
@@ -402,9 +403,41 @@ class EntryRevisionsTest extends TestCase
         ], $revision->attributes());
         $this->assertEquals('user-1', $revision->user()->id());
         $this->assertEquals('Test!', $revision->message());
-        $this->assertEquals(1293620400, $revision->publishAt()->timestamp);
+        $this->assertEquals($publishAt->timestamp, $revision->publishAt()->timestamp);
         $this->assertEquals('revision', $revision->action());
         $this->assertTrue($entry->hasWorkingCopy());
+    }
+
+    #[Test]
+    #[DataProvider('invalidPublishAtProvider')]
+    public function it_validates_publish_at_when_creating_a_revision($publishAt)
+    {
+        $this->setTestBlueprint('test', ['foo' => ['type' => 'text']]);
+        $this->setTestRoles(['test' => ['access cp', 'edit blog entries']]);
+        $user = User::make()->id('user-1')->assignRole('test')->save();
+
+        $entry = EntryFactory::id('1')
+            ->slug('test')
+            ->collection('blog')
+            ->data(['blueprint' => 'test', 'title' => 'Title'])
+            ->create();
+
+        $this
+            ->actingAs($user)
+            ->postJson($entry->createRevisionUrl(), ['publish_at' => $publishAt])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('publish_at');
+
+        $this->assertCount(0, $entry->revisions());
+    }
+
+    public static function invalidPublishAtProvider()
+    {
+        return [
+            'not a date' => ['nope'],
+            'array' => [['2030-01-01']],
+            'in the past' => ['2010-12-29T11:00:00Z'],
+        ];
     }
 
     #[Test]

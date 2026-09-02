@@ -3,7 +3,6 @@
 namespace Statamic\Http\Controllers\CP\Collections;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
@@ -46,16 +45,15 @@ class EntryRevisionsController extends CpController
     {
         $this->authorize('edit', $entry);
 
-        $data = [
+        $request->validate(['publish_at' => 'nullable|date|after:now']);
+
+        $entry->createRevision([
             'message' => $request->message,
             'user' => User::fromUser($request->user()),
-        ];
+            'publish_at' => $request->date('publish_at'),
+        ]);
 
-        if (! is_null($dateTime = $request->publish_at)) {
-            $data['publish_at'] = Carbon::parse($dateTime);
-        }
-
-        return new EntryResource($entry->createRevision($data));
+        return new EntryResource($entry);
     }
 
     public function show(Request $request, $collection, $entry, $revision)
