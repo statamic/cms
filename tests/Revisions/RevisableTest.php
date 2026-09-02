@@ -7,22 +7,13 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Entries\Entry;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
-use Statamic\Revisions\RevisionRepository;
+use Statamic\Revisions\Revision;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class RevisableTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
-
-    private $repo;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-        config(['statamic.revisions.path' => __DIR__.'/__fixtures__']);
-        $this->repo = app(RevisionRepository::class);
-    }
 
     #[Test]
     public function it_gets_non_revisable_fields()
@@ -70,13 +61,20 @@ class RevisableTest extends TestCase
         Collection::make('blog')->save();
 
         $entry = (new Entry)->collection('blog')->id('123');
-        $entry->set('revisable', 'override me')->set('non_revisable', "don't override me");
+        $entry
+            ->set('revisable', 'override me')
+            ->set('non_revisable', "don't override me")
+            ->set('stale', 'not in the revision, so drop me');
 
-        $revision = $this->repo->whereKey('123')->first();
+        $revision = (new Revision)->attributes([
+            'published' => true,
+            'slug' => 'the-slug',
+            'data' => ['revisable' => 'overridden'],
+        ]);
 
         $this->assertEquals(
             collect([
-                'revisable' => 'override me',
+                'revisable' => 'overridden',
                 'non_revisable' => "don't override me",
             ]),
             $entry->makeFromRevision($revision)->data()
