@@ -254,7 +254,7 @@ abstract class AbstractCacher implements Cacher
     /**
      * Refresh an individual URL.
      *
-     * @param  string  $path
+     * @param  string  $url
      * @param  string|null  $domain
      * @return void
      */
@@ -262,7 +262,15 @@ abstract class AbstractCacher implements Cacher
     {
         $this->getUrls($domain)->filter(function ($value) use ($url) {
             return $value === $url || Str::startsWith($value, $url.'?');
-        })->each(function ($url) use ($domain) {
+        })->each(function ($url, $key) use ($domain) {
+            // Warming an error response would just fail with the same error,
+            // so invalidate it and let the next request cache a fresh copy.
+            if ($this->hasCachedErrorResponse($key)) {
+                $this->invalidateUrl($url, $domain);
+
+                return;
+            }
+
             $url = ($domain ?: $this->getBaseUrl()).$url;
 
             $url = RecacheToken::addToUrl($url);
@@ -273,6 +281,17 @@ abstract class AbstractCacher implements Cacher
                 ->onConnection(config('statamic.static_caching.warm_queue_connection') ?? config('queue.default'))
                 ->onQueue(config('statamic.static_caching.warm_queue'));
         });
+    }
+
+    /**
+     * Check if the cached response for a URL key is an error response.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    protected function hasCachedErrorResponse($key)
+    {
+        return false;
     }
 
     /**

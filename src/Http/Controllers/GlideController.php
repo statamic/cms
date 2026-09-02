@@ -82,7 +82,7 @@ class GlideController extends Controller
     /**
      * Generate a manipulated image by an asset reference.
      *
-     * @param  string  $ref
+     * @param  string  $encoded
      * @return mixed
      *
      * @throws \Exception

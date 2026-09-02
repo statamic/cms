@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Inertia\Inertia;
 use Statamic\Auth\Passwords\PasswordReset;
+use Statamic\Auth\Passwords\TokenRepository;
 use Statamic\Auth\ResetsPasswords;
 use Statamic\Contracts\Auth\User;
 use Statamic\Facades\URL;
@@ -27,14 +28,33 @@ class ResetPasswordController extends Controller
 
     public function showResetForm(Request $request, $token = null)
     {
+        $emailFromRequest = $request->email;
+        $email = $emailFromRequest ?: $this->emailForToken($token);
+
         return Inertia::render('auth/passwords/Reset', [
             'loginUrl' => cp_route('login'),
             'token' => $token,
-            'email' => $request->email,
+            'email' => $email,
+            'emailReadonly' => $email && ! $emailFromRequest,
             'action' => $this->resetFormAction(),
             'redirect' => $request->redirect,
             'title' => $this->resetFormTitle(),
         ]);
+    }
+
+    protected function emailForToken(?string $token): ?string
+    {
+        if (! $token) {
+            return null;
+        }
+
+        $repository = $this->broker()->getRepository();
+
+        if (! $repository instanceof TokenRepository) {
+            return null;
+        }
+
+        return $repository->findEmailByToken($token);
     }
 
     protected function resetFormAction()

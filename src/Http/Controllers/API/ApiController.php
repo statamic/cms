@@ -20,6 +20,7 @@ class ApiController extends Controller
     protected $resourceConfigKey;
     protected $routeResourceKey;
     protected $filterPublished = false;
+    protected $siteConstrained = false;
 
     /**
      * Abort if item is unpublished.
@@ -87,10 +88,48 @@ class ApiController extends Controller
     protected function updateAndPaginate($query)
     {
         return $this
+            ->applySiteConstraint($query)
             ->filter($query)
             ->sort($query)
             ->scope($query)
             ->paginate($query);
+    }
+
+    /**
+     * Limit the query to an explicit ?site= handle.
+     *
+     * Unlike queryParam('site'), this does not default to the default site,
+     * so omitting the param keeps existing "all sites" list behavior.
+     */
+    protected function applySiteConstraint($query)
+    {
+        if ($this->siteConstrained && $site = $this->requestedSite()) {
+            $query->where('site', $site);
+        }
+
+        return $this;
+    }
+
+    protected function requestedSite(): ?string
+    {
+        if (! request()->has('site')) {
+            return null;
+        }
+
+        $site = request()->input('site');
+
+        throw_unless(Site::get($site), new NotFoundHttpException);
+
+        return $site;
+    }
+
+    protected function localize($item)
+    {
+        if (! $item || ! $site = $this->requestedSite()) {
+            return $item;
+        }
+
+        return $item->in($site);
     }
 
     /**
@@ -269,7 +308,7 @@ class ApiController extends Controller
 
         return $query
             ->paginate(request()->input('limit', config('statamic.api.pagination_size')), $columns)
-            ->appends(request()->only(['filter', 'limit', 'page', 'sort']));
+            ->appends(request()->only(['filter', 'limit', 'page', 'sort', 'query_scope', 'fields', 'site']));
     }
 
     /**

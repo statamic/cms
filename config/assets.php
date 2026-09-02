@@ -72,6 +72,19 @@ return [
 
         /*
         |--------------------------------------------------------------------------
+        | Crop Quality
+        |--------------------------------------------------------------------------
+        |
+        | The quality used when saving images cropped in the control panel. The
+        | user may override this per crop. When null, the quality defined in
+        | the "defaults" above will be used, otherwise it falls back to 90.
+        |
+        */
+
+        'crop_quality' => null,
+
+        /*
+        |--------------------------------------------------------------------------
         | Image Manipulation Presets
         |--------------------------------------------------------------------------
         |
@@ -135,8 +148,9 @@ return [
     | Control Panel Video Thumbnails
     |--------------------------------------------------------------------------
     |
-    | When enabled, Statamic will generate thumbnails for videos.
-    | Generated thumbnails are displayed in the Control Panel.
+    | When enabled, Statamic will generate thumbnails for videos when FFmpeg
+    | is available. Generated thumbnails are displayed in the Control Panel.
+    | Without FFmpeg, videos fall back to a filetype icon.
     |
     */
 
@@ -259,6 +273,7 @@ return [
     |
     | Statamic uses FFmpeg to extract thumbnails from videos to be shown in the
     | Control Panel. You may adjust the binary location and cache path here.
+    | The configured binary must exist and be executable.
     |
     */
 

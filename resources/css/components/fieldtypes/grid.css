@@ -7,10 +7,6 @@
         border-spacing: 0;
         table-layout: auto;
 
-        [data-ui-field-text] {
-            @apply sr-only;
-        }
-
         thead th {
             @apply sticky -top-2 table-cell z-(--z-index-above) border-b bg-gray-50 p-2 text-sm font-medium text-gray-900 dark:border-gray-700 dark:bg-gray-925 dark:text-gray-100;
             /* Prevent the sticky toolbar from hitting the very end of container, which causes it to overlap the container's border-radius */
@@ -86,6 +82,15 @@
             }
 
             .grid-cell :is([data-ui-field-header], [data-ui-label], [data-ui-description]) {
+                @apply hidden;
+            }
+
+            .grid-cell :is(.replicator-fieldtype, .bard-fieldtype, .group-fieldtype) :is([data-ui-field-header], [data-ui-label], [data-ui-description]) {
+                @apply block;
+            }
+
+            /* ...unless that container fieldtype has its own nested Grid cell, whose direct labels should stay hidden per the rule above. */
+            .grid-cell :is(.replicator-fieldtype, .bard-fieldtype, .group-fieldtype) .grid-cell :is([data-ui-field-header], [data-ui-label], [data-ui-description]) {
                 @apply hidden;
             }
         }

@@ -56,6 +56,24 @@ class RateLimitingTest extends TestCase
     }
 
     #[Test]
+    public function forms_precognitive_requests_have_a_higher_limit()
+    {
+        collect(range(1, 30))->each(fn () => $this->withPrecognition()->post('/!/forms/contact')->assertNotRateLimited());
+        $this->withPrecognition()->post('/!/forms/contact')->assertRateLimited();
+    }
+
+    #[Test]
+    public function forms_precognition_and_submission_buckets_are_independent()
+    {
+        // Exhaust the submission bucket...
+        collect(range(1, 10))->each(fn () => $this->post('/!/forms/contact')->assertNotRateLimited());
+        $this->post('/!/forms/contact')->assertRateLimited();
+
+        // ...precognitive validation should still be allowed.
+        $this->withPrecognition()->post('/!/forms/contact')->assertNotRateLimited();
+    }
+
+    #[Test]
     public function cp_login_endpoint_is_rate_limited()
     {
         collect(range(1, 4))->each(fn () => $this->post('/cp/auth/login')->assertNotRateLimited());
@@ -199,6 +217,29 @@ class RateLimitingTest extends TestCase
         $this->post('/!/auth/login')->assertRateLimited();
 
         $this->post('/!/auth/passkeys/auth')->assertNotRateLimited();
+    }
+
+    #[Test]
+    public function dictionary_fieldtype_endpoint_is_rate_limited()
+    {
+        $config = base64_encode(json_encode(['type' => 'dictionary', 'dictionary' => 'countries']));
+        $url = route('statamic.dictionary-fieldtype', 'countries').'?config='.$config;
+
+        collect(range(1, 60))->each(fn () => $this->getJson($url)->assertNotRateLimited());
+        $this->getJson($url)->assertRateLimited();
+    }
+
+    #[Test]
+    public function dictionary_fieldtype_rate_limiter_can_be_overridden()
+    {
+        RateLimiter::for('statamic.dictionaries', fn ($request) => Limit::perMinute(2)->by($request->ip()));
+
+        $config = base64_encode(json_encode(['type' => 'dictionary', 'dictionary' => 'countries']));
+        $url = route('statamic.dictionary-fieldtype', 'countries').'?config='.$config;
+
+        $this->getJson($url)->assertNotRateLimited();
+        $this->getJson($url)->assertNotRateLimited();
+        $this->getJson($url)->assertRateLimited();
     }
 
     #[Test]
