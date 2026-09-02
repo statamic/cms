@@ -59,7 +59,13 @@ class FormType extends \Rebing\GraphQL\Support\Type
             'sections' => [
                 'type' => GraphQL::listOf(GraphQL::type(SectionType::NAME)),
                 'resolve' => function ($form, $args, $context, $info) {
-                    return $form->blueprint()->tabs()->first()->sections()->all();
+                    return $form->sections()->all();
+                },
+            ],
+            'pages' => [
+                'type' => GraphQL::listOf(GraphQL::type(FormPageType::NAME)),
+                'resolve' => function ($form, $args, $context, $info) {
+                    return $form->pages()->all();
                 },
             ],
         ])->map(function (array $arr) {

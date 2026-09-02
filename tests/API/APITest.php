@@ -2,6 +2,7 @@
 
 namespace Tests\API;
 
+use Facades\Statamic\Console\Processes\Composer;
 use Facades\Statamic\CP\LivePreview;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Illuminate\Support\Facades\Storage;
@@ -280,6 +281,120 @@ class APITest extends TestCase
 
         $this->assertEndpointNotFound('/api/asset-containers/main');
         $this->assertEndpointSuccessful('/api/asset-containers/avatars');
+    }
+
+    #[Test]
+    public function it_queries_form_sections()
+    {
+        Facades\Config::set('statamic.api.resources.forms', true);
+
+        Facades\Form::make('contact')->title('Contact Us')->formFields([
+            'sections' => [
+                [
+                    'display' => 'Your Details',
+                    'instructions' => 'Tell us who you are',
+                    'fields' => [
+                        ['handle' => 'name', 'field' => ['type' => 'short_answer', 'display' => 'Your Name']],
+                    ],
+                ],
+                [
+                    'fields' => [
+                        ['handle' => 'message', 'field' => ['type' => 'long_answer', 'display' => 'Message', 'width' => 50]],
+                    ],
+                ],
+            ],
+        ])->save();
+
+        $this
+            ->get('/api/forms/contact')
+            ->assertSuccessful()
+            ->assertJsonPath('data.sections', [
+                [
+                    'display' => 'Your Details',
+                    'instructions' => 'Tell us who you are',
+                    'fields' => [
+                        'name' => ['type' => 'text', 'display' => 'Your Name', 'handle' => 'name', 'width' => 100],
+                    ],
+                ],
+                [
+                    'display' => null,
+                    'instructions' => null,
+                    'fields' => [
+                        'message' => ['type' => 'textarea', 'display' => 'Message', 'width' => 50, 'handle' => 'message'],
+                    ],
+                ],
+            ]);
+    }
+
+    #[Test]
+    public function it_queries_form_pages()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        Facades\Config::set('statamic.api.resources.forms', true);
+
+        Facades\Form::make('contact')->title('Contact Us')->formFields([
+            'pages' => [
+                [
+                    'id' => 'about_you',
+                    'display' => 'About You',
+                    'instructions' => 'Tell us who you are',
+                    'sections' => [
+                        [
+                            'display' => 'Your Details',
+                            'fields' => [
+                                ['handle' => 'name', 'field' => ['type' => 'short_answer', 'display' => 'Your Name']],
+                            ],
+                        ],
+                    ],
+                ],
+                [
+                    'id' => 'your_message',
+                    'sections' => [
+                        [
+                            'fields' => [
+                                ['handle' => 'message', 'field' => ['type' => 'long_answer', 'display' => 'Message']],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ])->save();
+
+        $this
+            ->get('/api/forms/contact')
+            ->assertSuccessful()
+            ->assertJsonPath('data.pages', [
+                [
+                    'id' => 'about_you',
+                    'display' => 'About You',
+                    'instructions' => 'Tell us who you are',
+                    'sections' => [
+                        [
+                            'display' => 'Your Details',
+                            'instructions' => null,
+                            'fields' => [
+                                'name' => ['type' => 'text', 'display' => 'Your Name', 'handle' => 'name', 'width' => 100],
+                            ],
+                        ],
+                    ],
+                ],
+                [
+                    'id' => 'your_message',
+                    'display' => 'Page 2 of 2',
+                    'instructions' => null,
+                    'sections' => [
+                        [
+                            'display' => null,
+                            'instructions' => null,
+                            'fields' => [
+                                'message' => ['type' => 'textarea', 'display' => 'Message', 'handle' => 'message', 'width' => 100],
+                            ],
+                        ],
+                    ],
+                ],
+            ])
+            ->assertJsonPath('data.sections.*.display', ['Your Details', null]);
     }
 
     #[Test]

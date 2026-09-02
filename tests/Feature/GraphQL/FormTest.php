@@ -3,6 +3,7 @@
 namespace Tests\Feature\GraphQL;
 
 use Facades\Statamic\API\ResourceAuthorizer;
+use Facades\Statamic\Console\Processes\Composer;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\GraphQL\CastableToValidationString;
@@ -308,6 +309,106 @@ GQL;
                                     'instructions' => null,
                                     'width' => 33,
                                     'config' => [],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ]]);
+    }
+
+    #[Test]
+    public function it_queries_the_pages()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        Form::make('contact')->title('Contact Us')->formFields([
+            'pages' => [
+                [
+                    'id' => 'about_you',
+                    'display' => 'About You',
+                    'instructions' => 'Tell us who you are',
+                    'sections' => [
+                        [
+                            'display' => 'Your Details',
+                            'fields' => [
+                                ['handle' => 'name', 'field' => ['type' => 'short_answer', 'display' => 'Your Name']],
+                            ],
+                        ],
+                    ],
+                ],
+                [
+                    'id' => 'your_message',
+                    'sections' => [
+                        [
+                            'fields' => [
+                                ['handle' => 'message', 'field' => ['type' => 'long_answer', 'display' => 'Message']],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ])->save();
+
+        $query = <<<'GQL'
+{
+    form(handle: "contact") {
+        sections {
+            display
+        }
+        pages {
+            id
+            display
+            instructions
+            sections {
+                display
+                instructions
+                fields {
+                    handle
+                    type
+                }
+            }
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => [
+                'form' => [
+                    'sections' => [
+                        ['display' => 'Your Details'],
+                        ['display' => null],
+                    ],
+                    'pages' => [
+                        [
+                            'id' => 'about_you',
+                            'display' => 'About You',
+                            'instructions' => 'Tell us who you are',
+                            'sections' => [
+                                [
+                                    'display' => 'Your Details',
+                                    'instructions' => null,
+                                    'fields' => [
+                                        ['handle' => 'name', 'type' => 'text'],
+                                    ],
+                                ],
+                            ],
+                        ],
+                        [
+                            'id' => 'your_message',
+                            'display' => 'Page 2 of 2',
+                            'instructions' => null,
+                            'sections' => [
+                                [
+                                    'display' => null,
+                                    'instructions' => null,
+                                    'fields' => [
+                                        ['handle' => 'message', 'type' => 'textarea'],
+                                    ],
                                 ],
                             ],
                         ],
