@@ -432,6 +432,25 @@ class TermTest extends TestCase
     }
 
     #[Test]
+    public function it_gets_the_template_when_scoped_to_a_collection()
+    {
+        $taxonomy = tap(Taxonomy::make('tags'))->save();
+        $collection = tap(Facades\Collection::make('blog'))->save();
+        $term = (new Term)->taxonomy('tags')->collection($collection);
+
+        // defaults to collection.taxonomy.show
+        $this->assertEquals('blog.tags.show', $term->template());
+
+        // a custom taxonomy level template is used as-is
+        $taxonomy->termTemplate('foo');
+        $this->assertEquals('foo', $term->template());
+
+        // term level overrides the origin
+        $term->template('baz');
+        $this->assertEquals('baz', $term->template());
+    }
+
+    #[Test]
     public function it_fires_a_deleting_event()
     {
         Event::fake();
