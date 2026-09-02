@@ -30,6 +30,12 @@ class FormType extends \Rebing\GraphQL\Support\Type
             'status' => [
                 'type' => GraphQL::nonNull(GraphQL::string()),
             ],
+            'require_login' => [
+                'type' => GraphQL::nonNull(GraphQL::boolean()),
+            ],
+            'restriction_message' => [
+                'type' => GraphQL::string(),
+            ],
             'fields' => [
                 'type' => GraphQL::listOf(GraphQL::type(FieldType::NAME)),
                 'resolve' => function ($form, $args, $context, $info) {

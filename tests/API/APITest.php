@@ -5,6 +5,7 @@ namespace Tests\API;
 use Facades\Statamic\Console\Processes\Composer;
 use Facades\Statamic\CP\LivePreview;
 use Facades\Statamic\Fields\BlueprintRepository;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
@@ -395,6 +396,40 @@ class APITest extends TestCase
                 ],
             ])
             ->assertJsonPath('data.sections.*.display', ['Your Details', null]);
+    }
+
+    #[Test]
+    public function it_queries_form_access_restrictions()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+        Carbon::setTestNow('2026-07-06 12:00:00');
+
+        Facades\Config::set('statamic.api.resources.forms', true);
+
+        Facades\Form::make('contact')->save();
+        Facades\Form::make('members')->data(['require_login' => true])->save();
+        Facades\Form::make('applications')->data(['close_date' => '2026-07-01 09:00', 'closed_message' => 'Applications have closed.'])->save();
+
+        $this
+            ->get('/api/forms/contact')
+            ->assertSuccessful()
+            ->assertJsonPath('data.status', 'open')
+            ->assertJsonPath('data.require_login', false)
+            ->assertJsonPath('data.restriction_message', null);
+
+        $this
+            ->get('/api/forms/members')
+            ->assertSuccessful()
+            ->assertJsonPath('data.status', 'open')
+            ->assertJsonPath('data.require_login', true)
+            ->assertJsonPath('data.restriction_message', null);
+
+        $this
+            ->get('/api/forms/applications')
+            ->assertSuccessful()
+            ->assertJsonPath('data.status', 'closed')
+            ->assertJsonPath('data.require_login', false)
+            ->assertJsonPath('data.restriction_message', 'Applications have closed.');
     }
 
     #[Test]

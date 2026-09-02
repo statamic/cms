@@ -4,6 +4,7 @@ namespace Tests\Feature\GraphQL;
 
 use Facades\Statamic\API\ResourceAuthorizer;
 use Facades\Statamic\Console\Processes\Composer;
+use Illuminate\Support\Carbon;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\GraphQL\CastableToValidationString;
@@ -413,6 +414,40 @@ GQL;
                             ],
                         ],
                     ],
+                ],
+            ]]);
+    }
+
+    #[Test]
+    public function it_queries_the_access_restrictions()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+        Carbon::setTestNow('2026-07-06 12:00:00');
+
+        Form::make('contact')->save();
+        Form::make('members')->data(['require_login' => true])->save();
+        Form::make('applications')->data(['close_date' => '2026-07-01 09:00', 'closed_message' => 'Applications have closed.'])->save();
+
+        $query = <<<'GQL'
+{
+    forms {
+        handle
+        status
+        require_login
+        restriction_message
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => [
+                'forms' => [
+                    ['handle' => 'applications', 'status' => 'closed', 'require_login' => false, 'restriction_message' => 'Applications have closed.'],
+                    ['handle' => 'contact', 'status' => 'open', 'require_login' => false, 'restriction_message' => null],
+                    ['handle' => 'members', 'status' => 'open', 'require_login' => true, 'restriction_message' => null],
                 ],
             ]]);
     }

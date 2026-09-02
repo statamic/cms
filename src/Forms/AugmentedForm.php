@@ -11,7 +11,7 @@ class AugmentedForm extends AbstractAugmented
 {
     public function keys()
     {
-        $keys = ['handle', 'title', 'fields', 'sections', 'pages', 'status', 'api_url'];
+        $keys = ['handle', 'title', 'fields', 'sections', 'pages', 'status', 'require_login', 'restriction_message', 'api_url'];
 
         if (! Statamic::isApiRoute()) {
             $keys[] = 'honeypot';
@@ -44,5 +44,15 @@ class AugmentedForm extends AbstractAugmented
             'instructions' => $section->instructions(),
             'fields' => $section->fields()->all()->map->toArray()->all(),
         ];
+    }
+
+    public function requireLogin(): bool
+    {
+        return (bool) $this->data->get('require_login');
+    }
+
+    public function restrictionMessage(): ?string
+    {
+        return $this->data->status() === 'open' ? null : $this->data->restrictionMessage();
     }
 }
