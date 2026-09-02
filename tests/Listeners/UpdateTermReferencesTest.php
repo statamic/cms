@@ -208,117 +208,6 @@ class UpdateTermReferencesTest extends TestCase
     }
 
     #[Test]
-    public function it_nullifies_nested_path_references_when_deleting_a_term()
-    {
-        $this->topics->structureContents([])->save();
-
-        tap(Facades\Term::make()->taxonomy('topics')->slug('events')->data(['title' => 'Events']))->save();
-        tap(Facades\Term::make()->taxonomy('topics')->slug('concerts')->data(['title' => 'Concerts']))->save();
-        $this->topics->structure()->tree()->tree([
-            ['term' => 'events', 'children' => [
-                ['term' => 'concerts'],
-            ]],
-        ])->save();
-
-        $collection = tap(Facades\Collection::make('articles'))->save();
-
-        $this->setInBlueprints('collections/articles', [
-            'fields' => [
-                [
-                    'handle' => 'favourites',
-                    'field' => [
-                        'type' => 'terms',
-                        'taxonomies' => ['topics'],
-                        'mode' => 'select',
-                    ],
-                ],
-            ],
-        ]);
-
-        $entry = tap(Facades\Entry::make()->collection($collection)->data([
-            'favourites' => ['events/concerts', 'hoff'],
-        ]))->save();
-
-        Facades\Term::find('topics::concerts')->delete();
-
-        $this->assertEquals(['hoff'], $entry->fresh()->get('favourites'));
-    }
-
-    #[Test]
-    public function it_rewrites_nested_path_references_when_renaming_a_term()
-    {
-        $this->topics->structureContents([])->save();
-
-        tap(Facades\Term::make()->taxonomy('topics')->slug('events')->data(['title' => 'Events']))->save();
-        $concerts = tap(Facades\Term::make()->taxonomy('topics')->slug('concerts')->data(['title' => 'Concerts']))->save();
-        $this->topics->structure()->tree()->tree([
-            ['term' => 'events', 'children' => [
-                ['term' => 'concerts'],
-            ]],
-        ])->save();
-
-        $collection = tap(Facades\Collection::make('articles'))->save();
-
-        $this->setInBlueprints('collections/articles', [
-            'fields' => [
-                [
-                    'handle' => 'favourites',
-                    'field' => [
-                        'type' => 'terms',
-                        'taxonomies' => ['topics'],
-                        'mode' => 'select',
-                    ],
-                ],
-            ],
-        ]);
-
-        $entry = tap(Facades\Entry::make()->collection($collection)->data([
-            'favourites' => ['events/concerts', 'hoff'],
-        ]))->save();
-
-        $concerts->slug('gigs')->save();
-
-        $this->assertEquals(['events/gigs', 'hoff'], $entry->fresh()->get('favourites'));
-    }
-
-    #[Test]
-    public function it_rewrites_nested_path_references_when_renaming_a_parent_term()
-    {
-        $this->topics->structureContents([])->save();
-
-        $events = tap(Facades\Term::make()->taxonomy('topics')->slug('events')->data(['title' => 'Events']))->save();
-        tap(Facades\Term::make()->taxonomy('topics')->slug('concerts')->data(['title' => 'Concerts']))->save();
-        $this->topics->structure()->tree()->tree([
-            ['term' => 'events', 'children' => [
-                ['term' => 'concerts'],
-            ]],
-        ])->save();
-
-        $collection = tap(Facades\Collection::make('articles'))->save();
-
-        $this->setInBlueprints('collections/articles', [
-            'fields' => [
-                [
-                    'handle' => 'favourites',
-                    'field' => [
-                        'type' => 'terms',
-                        'taxonomies' => ['topics'],
-                        'mode' => 'select',
-                    ],
-                ],
-            ],
-        ]);
-
-        $entry = tap(Facades\Entry::make()->collection($collection)->data([
-            'favourites' => ['events/concerts', 'events'],
-        ]))->save();
-
-        $events->slug('shows')->save();
-
-        $this->assertEquals(['shows/concerts', 'shows'], $entry->fresh()->get('favourites'));
-    }
-
-    #[Test]
     public function a_flat_taxonomy_does_not_treat_slashes_as_path_segments()
     {
         $acdc = tap(Facades\Term::make()->taxonomy('topics')->slug('acdc')->data(['title' => 'AC/DC']))->save();
@@ -354,6 +243,53 @@ class UpdateTermReferencesTest extends TestCase
         $acdc->slug('ac-dc')->save();
 
         $this->assertEquals(['ac-dc', 'hoff'], $entry->fresh()->get('favourites'));
+    }
+
+    #[Test]
+    public function a_hierarchical_taxonomy_does_not_treat_the_delimiter_as_path_segments()
+    {
+        $this->topics->structureContents([])->save();
+
+        tap(Facades\Term::make()->taxonomy('topics')->slug('events')->data(['title' => 'Events']))->save();
+        $concerts = tap(Facades\Term::make()->taxonomy('topics')->slug('concerts')->data(['title' => 'Concerts']))->save();
+        $eventsConcerts = tap(Facades\Term::make()->taxonomy('topics')->slug('events-concerts')->data(['title' => 'Events > Concerts']))->save();
+
+        $this->topics->structure()->tree()->tree([
+            ['term' => 'events', 'children' => [
+                ['term' => 'concerts'],
+            ]],
+            ['term' => 'events-concerts'],
+        ])->save();
+
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'favourites',
+                    'field' => [
+                        'type' => 'terms',
+                        'taxonomies' => ['topics'],
+                        'mode' => 'select',
+                    ],
+                ],
+            ],
+        ]);
+
+        $entry = tap(Facades\Entry::make()->collection($collection)->data([
+            'favourites' => ['events > concerts', 'hoff'],
+        ]))->save();
+
+        // The delimiter is a CP input convention, not a storage format. A stored value naming
+        // one segment isn't a reference to that segment's term, so renaming it changes nothing.
+        $concerts->slug('gigs')->save();
+
+        $this->assertEquals(['events > concerts', 'hoff'], $entry->fresh()->get('favourites'));
+
+        // The whole value slugs to "events-concerts", so that's the term it actually refers to.
+        $eventsConcerts->slug('shows')->save();
+
+        $this->assertEquals(['shows', 'hoff'], $entry->fresh()->get('favourites'));
     }
 
     #[Test]

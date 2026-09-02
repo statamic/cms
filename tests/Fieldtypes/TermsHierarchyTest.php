@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades;
-use Statamic\Facades\Antlers;
 use Statamic\Facades\Term;
 use Statamic\Facades\User;
 use Statamic\Fields\Field;
@@ -326,29 +325,6 @@ class TermsHierarchyTest extends TestCase
 
         $this->assertEquals(['ages-21'], $processed);
         $this->assertEquals('Ages > 21', Term::find('tags::ages-21')->title());
-    }
-
-    #[Test]
-    public function a_raw_stored_path_value_augments_and_renders_correctly()
-    {
-        // Simulates a value written programmatically (not through the CP fieldtype form),
-        // e.g. `$entry->set('categories', ['animals > cat'])->save()`, which persists the
-        // raw path string rather than the resolved leaf slug.
-        $entry = EntryFactory::collection('blog')->id('augment-test')->create();
-
-        $fieldtype = $this->fieldtype(['taxonomies' => ['categories']], $entry);
-
-        $augmented = $fieldtype->augment(['animals > cat'])->get();
-
-        $this->assertCount(1, $augmented);
-        $this->assertEquals('categories::cat', $augmented->first()->id());
-        $this->assertEquals('Cat', $augmented->first()->title());
-
-        $rendered = Antlers::parse('{{ categories }}{{ title }}{{ /categories }}', [
-            'categories' => $augmented,
-        ]);
-
-        $this->assertEquals('Cat', (string) $rendered);
     }
 
     #[Test]

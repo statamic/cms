@@ -280,10 +280,6 @@ class Terms extends Relationship
 
         return collect(Arr::wrap($values))->map(function ($value) use ($taxonomy) {
             if ($taxonomy) {
-                if (is_string($value) && str_contains($value, EnsuresTermPaths::DELIMITER) && $this->hierarchicalTaxonomy()) {
-                    $value = (new EnsuresTermPaths)->slugFromValue($value, hierarchical: true);
-                }
-
                 return "{$taxonomy}::{$value}";
             } else {
                 if (! Str::contains($value, '::')) {
@@ -817,21 +813,21 @@ class Terms extends Relationship
             }
 
             return is_string($data)
-                ? $this->replaceValue($data, $newValue, $oldValue, $taxonomy)
-                : $this->replaceValuesInArray($data, $newValue, $oldValue, $taxonomy);
+                ? $this->replaceValue($data, $newValue, $oldValue)
+                : $this->replaceValuesInArray($data, $newValue, $oldValue);
         }
 
         $scopedOldValue = "{$taxonomy}::{$oldValue}";
         $scopedNewValue = $newValue !== null ? "{$taxonomy}::{$newValue}" : null;
 
         return is_string($data)
-            ? $this->replaceValue($data, $scopedNewValue, $scopedOldValue, $taxonomy)
-            : $this->replaceValuesInArray($data, $scopedNewValue, $scopedOldValue, $taxonomy);
+            ? $this->replaceValue($data, $scopedNewValue, $scopedOldValue)
+            : $this->replaceValuesInArray($data, $scopedNewValue, $scopedOldValue);
     }
 
-    protected function replaceValue($data, $newValue, $oldValue, string $taxonomy)
+    protected function replaceValue($data, $newValue, $oldValue)
     {
-        if (! $this->valueRefersToTerm($data, $oldValue, $taxonomy)) {
+        if (! $this->valueRefersToTerm($data, $oldValue)) {
             return $data;
         }
 
@@ -839,18 +835,18 @@ class Terms extends Relationship
             return null;
         }
 
-        return $this->rewriteTermValue($data, $oldValue, $newValue, $taxonomy);
+        return $this->rewriteTermValue($data, $oldValue, $newValue);
     }
 
-    protected function replaceValuesInArray($data, $newValue, $oldValue, string $taxonomy)
+    protected function replaceValuesInArray($data, $newValue, $oldValue)
     {
         if (! is_array($data) || ! $data) {
             return $data;
         }
 
         $result = collect(Arr::dot($data))
-            ->map(fn ($value) => $this->valueRefersToTerm($value, $oldValue, $taxonomy)
-                ? ($newValue === null ? null : $this->rewriteTermValue($value, $oldValue, $newValue, $taxonomy))
+            ->map(fn ($value) => $this->valueRefersToTerm($value, $oldValue)
+                ? ($newValue === null ? null : $this->rewriteTermValue($value, $oldValue, $newValue))
                 : $value)
             ->filter()
             ->values();
@@ -858,7 +854,7 @@ class Terms extends Relationship
         return $result->isEmpty() ? null : $result->all();
     }
 
-    private function valueRefersToTerm($value, $oldValue, string $taxonomyHandle): bool
+    private function valueRefersToTerm($value, $oldValue): bool
     {
         if ($value === $oldValue) {
             return true;
@@ -875,44 +871,21 @@ class Terms extends Relationship
             return false;
         }
 
-        $handle = $taxonomy ?? $oldTaxonomy ?? $taxonomyHandle;
-
-        if (! $this->taxonomyIsHierarchical($handle)) {
-            return Str::slug($path) === $oldSlug;
-        }
-
-        return collect(explode(EnsuresTermPaths::DELIMITER, $path))->contains(
-            fn ($segment) => $segment === $oldSlug || Str::slug($segment) === $oldSlug
-        );
+        return Str::slug($path) === $oldSlug;
     }
 
-    private function rewriteTermValue(string $value, string $oldValue, string $newValue, string $taxonomyHandle): string
+    private function rewriteTermValue(string $value, string $oldValue, string $newValue): string
     {
         if ($value === $oldValue) {
             return $newValue;
         }
 
-        [$path, $taxonomy] = $this->termPathAndTaxonomy($value);
-        [$oldSlug] = $this->termPathAndTaxonomy($oldValue);
+        [, $taxonomy] = $this->termPathAndTaxonomy($value);
         [$newSlug, $newTaxonomy] = $this->termPathAndTaxonomy($newValue);
 
-        $handle = $taxonomy ?? $newTaxonomy ?? $taxonomyHandle;
         $prefix = $taxonomy ?? $newTaxonomy;
 
-        if (! $this->taxonomyIsHierarchical($handle)) {
-            return $prefix ? $prefix.'::'.$newSlug : $newValue;
-        }
-
-        $rewritten = collect(explode(EnsuresTermPaths::DELIMITER, $path))
-            ->map(fn ($segment) => $segment === $oldSlug || Str::slug($segment) === $oldSlug ? $newSlug : $segment)
-            ->implode(EnsuresTermPaths::DELIMITER);
-
-        return $prefix ? $prefix.'::'.$rewritten : $rewritten;
-    }
-
-    private function taxonomyIsHierarchical(?string $handle): bool
-    {
-        return $handle && Taxonomy::findByHandle($handle)?->hierarchical();
+        return $prefix ? $prefix.'::'.$newSlug : $newValue;
     }
 
     private function termPathAndTaxonomy(string $value): array
