@@ -24,7 +24,7 @@
                             :focus="true"
                         />
 
-                        <Button variant="primary" :text="submitButtonText" @click="submit" />
+                        <Button variant="primary" :text="submitButtonText" :disabled="!canSubmit" @click="submit" />
 
                         <div class="flex">
                             <Icon name="info" class="size-4 shrink-0 me-2" />
@@ -44,7 +44,6 @@
 
 <script>
 import { Heading, Button, Select, DatePicker, Textarea, Icon, Subheading, Stack } from '@/components/ui';
-import { parseAbsoluteToLocal } from '@internationalized/date';
 
 export default {
     components: { Heading, Button, Select, DatePicker, Textarea, Icon, Subheading, Stack },
@@ -63,7 +62,7 @@ export default {
     data() {
         return {
             action: this.canManagePublishState ? 'publish' : 'revision',
-            publishRevisionAt: parseAbsoluteToLocal((new Date).toISOString()),
+            publishRevisionAt: null,
             revisionMessage: null,
             saving: false,
         };
@@ -107,10 +106,13 @@ export default {
         submitButtonText() {
             return this.options.find((o) => o.value === this.action).label;
         },
+
+        canSubmit() {
+            return this.action !== 'publishLater' || !!this.publishRevisionAt;
+        },
     },
 
     methods: {
-
         submit() {
             this.saving = true;
             this.$emit('saving');
@@ -206,11 +208,14 @@ export default {
                 payload.publish_at = publishRevisionAt.toAbsoluteString();
             }
 
-            this.$axios.post(this.actions.createRevision, payload).then(response => {
-                this.$toast.success(__('Revision created'));
-                this.revisionMessage = null;
-                this.$emit('saved', { isWorkingCopy: true, response });
-            }).catch(e => this.handleAxiosError(e));
+            this.$axios
+                .post(this.actions.createRevision, payload)
+                .then((response) => {
+                    this.$toast.success(__('Revision created'));
+                    this.revisionMessage = null;
+                    this.$emit('saved', { isWorkingCopy: true, response });
+                })
+                .catch((e) => this.handleAxiosError(e));
         },
 
         handleAxiosError(e) {
