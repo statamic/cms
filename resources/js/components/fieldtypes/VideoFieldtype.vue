@@ -1,11 +1,12 @@
 <template>
     <div class="flex flex-col space-y-3 p-1.5 bg-gray-100 border border-gray-300 dark:bg-gray-900 dark:border-gray-700 rounded-xl">
         <ui-combobox
-            v-model="provider"
+            :model-value="provider"
             :options="providers"
             option-label="provider"
             option-value="provider"
             :placeholder="__('Provider...')"
+            @update:model-value="changeProvider"
         />
 
         <ui-input
@@ -29,6 +30,8 @@
             :model-value="videoId"
             :prepend="__('ID')"
             @update:model-value="detailsFromCloudflare"
+            @focus="$emit('focus')"
+            @blur="$emit('blur')"
         />
 
         <div v-if="shouldShowPreview" v-html="embed"></div>
@@ -55,7 +58,7 @@ export default {
 
     computed: {
         shouldShowPreview() {
-            return this.embed;
+            return this.isVisible && !!this.embed;
         },
 
         providers() {
@@ -63,16 +66,13 @@ export default {
         }
     },
 
-    watch: {
-        provider(newProvider, oldProvider) {
-            if (newProvider != oldProvider) {
-                this.embed = null;
-                this.url = null;
-            }
-        }
-    },
-
     methods: {
+        changeProvider(provider) {
+            this.provider = provider;
+            this.embed = null;
+            this.url = null;
+        },
+
         detailsFromCloudflare(id) {
             if (id == null) return;
 
@@ -100,6 +100,10 @@ export default {
                 .then((data) => {
                     this.embed = data.embed;
                     this.provider = data.provider;
+                })
+                .catch((e) => {
+                    this.embed = null;
+                    this.$toast.error(e.response ? e.response.data.message : __('Something went wrong'));
                 });
 
             this.update(this.savedValue);
