@@ -416,24 +416,14 @@ abstract class Store
 
     /**
      * Pass 1 of the 2-pass warm. Loads every file once and accumulates values for
-     * all Value-based indexes in a single loop, then writes each index to Redis in
-     * one shot. This ensures entries' taxonomy indexes (e.g. `categories`) are in
-     * Redis before Pass 2 runs, so Terms\Associations can use the fast path.
+     * all per-item value indexes in a single loop, then writes each index to the
+     * cache in one shot. This ensures entries' taxonomy indexes (e.g. `categories`)
+     * are cached before Pass 2 runs, so Terms\Associations can build from them.
      */
     public function warmValueIndexes()
     {
-        $valueIndexes = $this
-            ->resolveIndexes()
-            ->filter(
-                fn ($index) => method_exists($index, 'getItemValue')
-            );
+        $valueIndexes = $this->resolveIndexes()->filter(fn ($index) => $this->isPerItemValueIndex($index));
 
-        /*
-            This sets up a structure like ['fieldName' => [], 'anotherField' => []] before the loop below
-            it iterates over every item in the store. Each inner array then gets populated with $key => $value
-            pairs as items are processed, so all items are batched by index rather than writing to cache one at a time.
-            It's a performance optimization — collect everything first, then flush each index to cache in one shot on line 449.
-        */
         $accumulated = $valueIndexes->map(fn () => [])->all();
 
         foreach ($this->paths()->keys() as $key) {
@@ -451,14 +441,19 @@ abstract class Store
 
     /**
      * Pass 2 of the 2-pass warm. Runs after all stores have completed Pass 1, so
-     * non-Value indexes (e.g. Terms\Associations) can read from Redis instead of
-     * loading Entry objects from disk.
+     * indexes that depend on other indexes (e.g. Terms\Associations) can read
+     * them from the cache instead of loading Entry objects from disk.
      */
     public function warmOtherIndexes()
     {
+        $this->shouldCacheFileItems = true;
+
         $this->resolveIndexes()
-            ->filter(fn ($index) => ! method_exists($index, 'getItemValue'))
+            ->reject(fn ($index) => $this->isPerItemValueIndex($index))
             ->each->update();
+
+        $this->shouldCacheFileItems = false;
+        $this->fileItems = null;
     }
 
     public function keys()
@@ -468,5 +463,16 @@ abstract class Store
         }
 
         return $this->keys = (new Keys($this))->load();
+    }
+
+    /**
+     * Whether an index can be built purely by mapping getItemValue() over each item.
+     * Subclasses of Value that override getItems() (e.g. Terms\Value, which merges in
+     * on-the-fly terms) need their own build logic and belong in Pass 2.
+     */
+    private function isPerItemValueIndex(Index $index): bool
+    {
+        return $index instanceof Indexes\Value
+            && (new \ReflectionMethod($index, 'getItems'))->getDeclaringClass()->getName() === Indexes\Value::class;
     }
 }

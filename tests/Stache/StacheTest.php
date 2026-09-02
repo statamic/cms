@@ -226,4 +226,26 @@ class StacheTest extends TestCase
             ['value' => 'bravo', 'slug' => 'bravo', 'entry' => '2', 'collection' => 'blog', 'site' => 'en'],
         ], StacheFacade::store('terms')->store('tags')->index('associations')->items()->all());
     }
+
+    #[Test]
+    public function warming_includes_on_the_fly_terms_in_term_value_indexes()
+    {
+        Taxonomy::make('tags')->save();
+        CollectionFacade::make('blog')->taxonomies(['tags'])->save();
+        Term::make('alfa')->taxonomy('tags')->data(['title' => 'Alfa'])->save();
+        EntryFactory::collection('blog')->id('1')->slug('one')->data(['tags' => ['alfa', 'bravo']])->create();
+
+        StacheFacade::clear();
+        StacheFacade::warm();
+
+        $store = StacheFacade::store('terms')->store('tags');
+
+        $this->assertEquals([
+            ['value' => 'alfa', 'slug' => 'alfa', 'entry' => '1', 'collection' => 'blog', 'site' => 'en'],
+            ['value' => 'bravo', 'slug' => 'bravo', 'entry' => '1', 'collection' => 'blog', 'site' => 'en'],
+        ], $store->index('associations')->items()->all());
+
+        $this->assertEquals(['en::alfa' => 'alfa', 'en::bravo' => 'bravo'], $store->index('slug')->items()->all());
+        $this->assertEquals(['en::alfa' => 'en', 'en::bravo' => 'en'], $store->index('site')->items()->all());
+    }
 }
