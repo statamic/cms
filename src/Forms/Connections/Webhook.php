@@ -8,6 +8,7 @@ use Statamic\Facades\Blueprint;
 use Statamic\Facades\User;
 use Statamic\Forms\Connections\Webhooks\SendWebhook;
 use Statamic\Forms\Fields\FormField;
+use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\VueComponent;
@@ -16,12 +17,16 @@ use function Statamic\trans as __;
 
 class Webhook extends Connection
 {
-    protected $icon = 'globe-arrow';
     protected $developer = 'Statamic';
 
     public function description(): ?string
     {
         return __('statamic::messages.webhook_connection_description');
+    }
+
+    public function icon(): ?string
+    {
+        return Statamic::svg('forms/connect/webhook');
     }
 
     public function count(Form $form): ?int
