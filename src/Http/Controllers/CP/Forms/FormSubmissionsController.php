@@ -33,7 +33,7 @@ class FormSubmissionsController extends CpController
         $columns = $form
             ->blueprint()
             ->columns()
-            ->prepend(Column::make('status'), 'status')
+            ->prepend(Column::make('status')->label(__('Status'), 'status')
             ->when(
                 $form->hasUniqueInstances(),
                 fn (Columns $columns) => $columns->prepend(
@@ -44,7 +44,7 @@ class FormSubmissionsController extends CpController
                     'entry'
                 )
             )
-            ->prepend(Column::make('datestamp'), 'datestamp')
+            ->prepend(Column::make('datestamp')->label(__('Date'), 'datestamp')
             ->setPreferred("forms.{$form->handle()}.columns")
             ->rejectUnlisted()
             ->values();

@@ -152,7 +152,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="w-full">
+    <div class="w-full @container">
         <div data-logic-text class="logic-text group/rule">
             <ol>
                 <li v-for="(condition, index) in conditions" :key="condition._id">
@@ -222,7 +222,6 @@ onMounted(() => {
                     <ol v-if="hasConditions && !isCustom">
                         <Condition
                             v-model:condition="conditions[index]"
-                            :conditions="conditions"
                             :suggestable-fields="suggestableFields"
                             :exclude-handle="config?.handle"
                             :size
@@ -256,9 +255,9 @@ onMounted(() => {
             />
         </div>
 
-        <div v-if="showAlwaysSave" data-always-save-decoration class="mt-8 mb-6 pt-4 flex gap-6 border-t border-dashed border-gray-300 dark:border-gray-700">
+        <div v-if="showAlwaysSave" data-always-save-decoration class="mt-8 mb-6 pt-4 flex flex-col gap-4 @md:flex-row @md:gap-6 border-t border-dashed border-gray-300 dark:border-gray-700">
             <Field
-                class="flex-1"
+                class="@md:flex-1"
                 :label="__('Always Save')"
                 :instructions="__('messages.field_conditions_always_save_instructions')"
             >
@@ -266,7 +265,7 @@ onMounted(() => {
             </Field>
 
             <Field
-                class="flex-1"
+                class="@md:flex-1"
                 :label="__('Reserve Space When Hidden')"
                 :instructions="__('messages.field_conditions_reserve_space_when_hidden_instructions')"
             >

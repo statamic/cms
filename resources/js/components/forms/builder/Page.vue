@@ -130,7 +130,7 @@ onMounted(() => {
                                 :data-editing-item="isInspectingAction ? '' : undefined"
                                 class="border-0! dark:border-0! ring-0! shadow-none!"
                                 style="--theme-color-primary: var(--theme-color-gray-950)"
-                                :text="page.button_label?.length ? page.button_label : (isLastPage ? __('Submit') : __('Next Page'))"
+                                :text="page.button_label?.length ? __(page.button_label) : (isLastPage ? __('Submit') : __('Next Page'))"
                             />
                         </div>
                     </div>

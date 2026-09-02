@@ -39,7 +39,7 @@ class Submissions extends ResourceCollection
             ->when($this->form->hasUniqueInstances(), fn ($columns) => $columns->ensurePrepended(
                 Column::make('entry')->label(__('Entry'))->fieldtype('relationship')->sortable(false)
             ))
-            ->ensurePrepended(Column::make('datestamp')->label('Date'));
+            ->ensurePrepended(Column::make('datestamp')->label(__('Date')));
 
         $status = Column::make('status')
             ->label(__('Status'))

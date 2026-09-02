@@ -150,7 +150,6 @@ const shouldBeIndented = (index) => {
                     <ol>
                         <Condition
                             :condition="condition"
-                            :conditions="conditions"
                             :suggestable-fields="suggestableFields"
                             :exclude-operators="['custom']"
                             size="sm"

@@ -41,6 +41,7 @@ use Statamic\Http\Controllers\CP\Collections\EntriesController;
 use Statamic\Http\Controllers\CP\Collections\EntryActionController;
 use Statamic\Http\Controllers\CP\Collections\EntryPreviewController;
 use Statamic\Http\Controllers\CP\Collections\EntryRevisionsController;
+use Statamic\Http\Controllers\CP\Collections\EntryTitleFormatController;
 use Statamic\Http\Controllers\CP\Collections\LocalizeEntryController;
 use Statamic\Http\Controllers\CP\Collections\PublishedEntriesController;
 use Statamic\Http\Controllers\CP\Collections\ReorderCollectionBlueprintsController;
@@ -195,6 +196,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::post('actions/list', [EntryActionController::class, 'bulkActions'])->name('collections.entries.actions.bulk');
         Route::get('create/{site}', [EntriesController::class, 'create'])->name('collections.entries.create');
         Route::post('create/{site}/preview', [EntryPreviewController::class, 'create'])->name('collections.entries.preview.create');
+        Route::post('create/{site}/title-format', [EntryTitleFormatController::class, 'create'])->name('collections.entries.title-format.create');
         Route::post('reorder', ReorderEntriesController::class)->name('collections.entries.reorder');
         Route::post('{site}', [EntriesController::class, 'store'])->name('collections.entries.store');
 
@@ -216,6 +218,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
             Route::post('restore-revision', RestoreEntryRevisionController::class)->name('collections.entries.restore-revision');
             Route::post('preview', [EntryPreviewController::class, 'edit'])->name('collections.entries.preview.edit');
             Route::get('preview', [EntryPreviewController::class, 'show'])->name('collections.entries.preview.popout');
+            Route::post('title-format', [EntryTitleFormatController::class, 'edit'])->name('collections.entries.title-format.edit');
             Route::patch('/', [EntriesController::class, 'update'])->name('collections.entries.update');
             Route::get('{slug}', fn ($collection, $entry, $slug) => redirect($entry->editUrl()));
         });
