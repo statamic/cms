@@ -81,7 +81,6 @@ class CpServiceProvider extends ServiceProvider
             \Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class,
             \Statamic\Http\Middleware\CP\HandleInertiaRequests::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
-            \Statamic\Http\Middleware\CP\ContactOutpost::class,
             \Statamic\Http\Middleware\CP\AuthGuard::class,
             \Statamic\Http\Middleware\CP\AddToasts::class,
             \Statamic\Http\Middleware\CP\TrimStrings::class,

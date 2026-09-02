@@ -12,6 +12,7 @@ class TaxonomyTermsController extends ApiController
 {
     protected $resourceConfigKey = 'taxonomies';
     protected $routeResourceKey = 'taxonomy';
+    protected $siteConstrained = true;
     protected $taxonomyHandle;
 
     public function index($taxonomy)
@@ -33,7 +34,11 @@ class TaxonomyTermsController extends ApiController
     {
         $this->abortIfDisabled();
 
-        $term = Term::find($taxonomy.'::'.$term);
+        if ($site = $this->requestedSite()) {
+            throw_unless($taxonomy->sites()->contains($site), new NotFoundHttpException);
+        }
+
+        $term = $this->localize(Term::find($taxonomy->handle().'::'.$term));
 
         throw_unless($term, new NotFoundHttpException);
 

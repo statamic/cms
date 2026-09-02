@@ -284,15 +284,15 @@ const fieldtypeComponentEvents = computed(() => ({
                         />
                     </Transition>
                     <template v-if="shouldShowLabelText">
-                        <span v-tooltip="config.handle">
+                        <span v-tooltip="{ content: config.handle, copyable: true }">
                             {{ __(config.display) }}
                         </span>
                     </template>
                     <template v-else-if="config.hide_display">
                         <span class="sr-only">{{ __(config.display) }}</span>
                     </template>
-                    <ui-button size="xs" inset icon="synced" variant="ghost" v-tooltip="__('messages.field_synced_with_origin')" v-if="!isReadOnly && isSyncable" v-show="isSynced" @click="desync" />
-                    <ui-button size="xs" inset icon="unsynced" variant="ghost" v-tooltip="__('messages.field_desynced_from_origin')" v-if="!isReadOnly && isSyncable" v-show="!isSynced" @click="sync" />
+                    <ui-button size="sm" class="[&_svg]:translate-y-0.5" inset icon="synced" variant="ghost" v-tooltip="__('messages.field_synced_with_origin')" v-if="!isReadOnly && isSyncable" v-show="isSynced" @click="desync" />
+                    <ui-button size="sm" class="[&_svg]:translate-y-0.5" inset icon="unsynced" variant="ghost" v-tooltip="__('messages.field_desynced_from_origin')" v-if="!isReadOnly && isSyncable" v-show="!isSynced" @click="sync" />
                 </Label>
             </template>
             <template #actions v-if="shouldShowFieldActions">

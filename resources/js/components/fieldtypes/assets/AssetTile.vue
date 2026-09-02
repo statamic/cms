@@ -13,20 +13,22 @@
             :id="editingId"
             :allow-deleting="false"
             :show-navigation="siblings.length > 1"
+            :redirect-after-crop="false"
             @previous="navigateToPrevious"
             @next="navigateToNext"
             @closed="closeEditor"
             @saved="assetSaved"
+            @created="assetCreated"
             @action-completed="actionCompleted"
         >
         </asset-editor>
 
         <div class="flex h-full w-full justify-center rounded-b-md relative" :class="[
-            { 'border-b dark:border-gray-700': showFilename },
+            { '@min-[300px]:border-b dark:border-gray-700': showFilename },
             canBeTransparent && checkerboardMode !== 'transparent' ? `bg-checkerboard bg-checkerboard-${checkerboardMode} rounded-lg` : '',
             canBeTransparent && checkerboardMode === 'transparent' ? `bg-checkerboard before:opacity-0 hover:before:opacity-100 rounded-lg` : '',
         ]">
-            <div class="p-1 flex flex-col items-center justify-center h-full">
+            <div class="pb-1 @min-[300px]:p-1 flex flex-col items-center justify-center h-full">
                 <template v-if="errors.length">
                     <div class="absolute z-10 inset-0 bg-white/75 dark:bg-dark-800/90 flex flex-col gap-2 items-center justify-center px-1 py-2">
                         <small
@@ -45,7 +47,7 @@
                     <img v-if="canShowSvg" :src="asset.url" :title="label" class="p-4 w-full relative" />
 
                     <template v-else>
-                        <img :src="thumbnail" v-if="thumbnail" :title="label" class="rounded-md relative"  />
+                        <img :src="thumbnail" v-if="thumbnail" :title="label" class="rounded-md relative" @error="asset.thumbnail = null" />
 
                         <file-icon v-else :extension="asset.extension ?? 'generic'" class="h-full w-full p-4 relative" />
                     </template>

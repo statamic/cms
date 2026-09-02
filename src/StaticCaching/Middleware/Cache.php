@@ -22,6 +22,7 @@ use Statamic\StaticCaching\NoCache\RegionNotFound;
 use Statamic\StaticCaching\NoCache\Session;
 use Statamic\StaticCaching\Replacer;
 use Statamic\StaticCaching\ResponseStatus;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 use function Statamic\trans as __;
 
@@ -88,9 +89,18 @@ class Cache
         $response = $next($request);
 
         if ($this->shouldBeCached($request, $response)) {
-            $this->copyError($request, $response);
+            $preparedResponse = $this->makeReplacementsAndCacheResponse($request, $response);
 
-            $this->makeReplacementsAndCacheResponse($request, $response);
+            // The clone above is what gets cached, and keeps any replacer placeholders
+            // (e.g. nocache regions, CSRF tokens) intact for future requests to expand
+            // per-visitor. This response was served straight out of the shared error
+            // cache though, so it still has those placeholders in it and they need
+            // expanding before it goes out.
+            if (Blink::get('static-cache.shared-error')) {
+                $this->makeReplacements($response);
+            }
+
+            $this->copyError($request, $preparedResponse);
 
             $this->nocache->write();
 
@@ -160,7 +170,7 @@ class Cache
         }
     }
 
-    private function makeReplacementsAndCacheResponse($request, $response)
+    private function makeReplacementsAndCacheResponse($request, $response): SymfonyResponse
     {
         $cachedResponse = clone $response;
 
@@ -169,6 +179,8 @@ class Cache
         }
 
         $this->cacher->cachePage($request, $cachedResponse);
+
+        return $cachedResponse;
     }
 
     private function makeReplacements($response)
@@ -265,7 +277,11 @@ class Cache
 
     public static function isBeingUsedOnCurrentRoute()
     {
-        return in_array(static::class, app('router')->gatherRouteMiddleware(request()->route()));
+        if (! $route = request()->route()) {
+            return false;
+        }
+
+        return in_array(static::class, app('router')->gatherRouteMiddleware($route));
     }
 
     private function outputRefreshResponse($request)
