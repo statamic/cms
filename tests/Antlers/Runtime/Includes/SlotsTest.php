@@ -3,6 +3,7 @@
 namespace Tests\Antlers\Runtime\Includes;
 
 use Illuminate\Support\Facades\Blade;
+use PHPUnit\Framework\Attributes\DataProvider;
 use RuntimeException;
 use Statamic\Tags\Tags;
 use Tests\Antlers\ParserTestCase;
@@ -195,6 +196,35 @@ ANTLERS;
         $this->expectExceptionMessage('The include tag cannot define the [a] slot more than once.');
 
         $this->render($template);
+    }
+
+    public function test_a_slot_named_slot_can_be_defined_once()
+    {
+        $this->viewShouldReturnRaw('w', '<d>{{ slot }}</d>');
+
+        $this->assertSame('<d>EXPLICIT</d>', $this->render('{{ include:w }}{{ slot:slot }}EXPLICIT{{ /slot:slot }}{{ /include:w }}'));
+        $this->assertSame('<d>EXPLICIT</d>', $this->render("{{ include:w }}\n  {{ slot:slot }}EXPLICIT{{ /slot:slot }}\n{{ /include:w }}"));
+    }
+
+    #[DataProvider('duplicateDefaultSlotProvider')]
+    public function test_the_default_slot_cannot_be_defined_more_than_once($template)
+    {
+        $this->viewShouldReturnRaw('w', '<d>{{ slot }}</d>');
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The include tag cannot define the [slot] slot more than once.');
+
+        $this->render($template);
+    }
+
+    public static function duplicateDefaultSlotProvider()
+    {
+        return [
+            'two slots named slot' => ['{{ include:w }}{{ slot:slot }}ONE{{ /slot:slot }}{{ slot:slot }}TWO{{ /slot:slot }}{{ /include:w }}'],
+            'slot named slot then loose content' => ['{{ include:w }}{{ slot:slot }}EXPLICIT{{ /slot:slot }}LOOSE{{ /include:w }}'],
+            'loose content then slot named slot' => ['{{ include:w }}LOOSE{{ slot:slot }}EXPLICIT{{ /slot:slot }}{{ /include:w }}'],
+            'named slot, slot named slot, then loose content' => ['{{ include:w }}{{ slot:a }}A{{ /slot:a }}{{ slot:slot }}EXPLICIT{{ /slot:slot }}LOOSE{{ /include:w }}'],
+        ];
     }
 
     public function test_forwarding_a_slot_to_a_nested_include_does_not_clobber_the_outer_one()

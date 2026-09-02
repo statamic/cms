@@ -5,6 +5,7 @@ namespace Tests\View\Blade\AntlersComponents;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Tags\Tags;
@@ -137,6 +138,38 @@ BLADE;
         $this->expectExceptionMessage('The include tag cannot define the [a] slot more than once.');
 
         Blade::render($template);
+    }
+
+    #[Test]
+    public function an_explicit_default_slot_can_be_defined_once()
+    {
+        $this->viewShouldReturnRaw('w', '<d>{{ $slot }}</d>', 'blade.php');
+
+        $this->assertSame('<d>EXPLICIT</d>', Blade::render('<s:include:w><s:slot>EXPLICIT</s:slot></s:include:w>'));
+        $this->assertSame('<d>EXPLICIT</d>', Blade::render("<s:include:w>\n  <s:slot>EXPLICIT</s:slot>\n</s:include:w>"));
+    }
+
+    #[Test]
+    #[DataProvider('duplicateDefaultSlotProvider')]
+    public function it_rejects_a_default_slot_defined_more_than_once($template)
+    {
+        $this->viewShouldReturnRaw('w', '<d>{{ $slot }}</d>', 'blade.php');
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The include tag cannot define the [slot] slot more than once.');
+
+        Blade::render($template);
+    }
+
+    public static function duplicateDefaultSlotProvider()
+    {
+        return [
+            'two explicit slots' => ['<s:include:w><s:slot>ONE</s:slot><s:slot>TWO</s:slot></s:include:w>'],
+            'explicit slot then loose content' => ['<s:include:w><s:slot>EXPLICIT</s:slot>LOOSE</s:include:w>'],
+            'loose content then explicit slot' => ['<s:include:w>LOOSE<s:slot>EXPLICIT</s:slot></s:include:w>'],
+            'named slot, explicit slot, then loose content' => ['<s:include:w><s:slot:a>A</s:slot:a><s:slot>EXPLICIT</s:slot>LOOSE</s:include:w>'],
+            'slot named slot then loose content' => ['<s:include:w><s:slot:slot>EXPLICIT</s:slot:slot>LOOSE</s:include:w>'],
+        ];
     }
 
     #[Test]

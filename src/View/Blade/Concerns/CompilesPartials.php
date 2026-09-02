@@ -131,6 +131,14 @@ trait CompilesPartials
             $slots
         );
 
+        if ($isInclude && Str::snake($method) !== 'exists') {
+            if (trim($newContent) !== '') {
+                $compiledSlots[] = ['slot', $this->compile($newContent)];
+            }
+
+            $newContent = '';
+        }
+
         if ($isInclude) {
             $seen = [];
 
@@ -141,14 +149,6 @@ trait CompilesPartials
 
                 $seen[$name] = true;
             }
-        }
-
-        if ($isInclude && Str::snake($method) !== 'exists') {
-            if (trim($newContent) !== '') {
-                $compiledSlots[] = ['slot', $this->compile($newContent)];
-            }
-
-            $newContent = '';
         }
 
         // The label is randomized so slot content containing the terminator cannot break out of the nowdoc.

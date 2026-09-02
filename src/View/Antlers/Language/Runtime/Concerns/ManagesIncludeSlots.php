@@ -45,6 +45,10 @@ trait ManagesIncludeSlots
         $slots = [];
 
         if ($this->slotHasContent($defaultChildren)) {
+            if (array_key_exists('slot', $namedSlots)) {
+                throw new RuntimeException('The include tag cannot define the [slot] slot more than once.');
+            }
+
             $slots['slot'] = Slot::forAntlers($defaultChildren, $this->defaultSlotSource($node, $namedSlots), $callerData, $this);
         }
 
