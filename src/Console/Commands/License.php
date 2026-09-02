@@ -17,13 +17,19 @@ class License extends Command
     protected $signature = 'statamic:license
         { --poll-once : Check status once and exit (for tests) }';
 
-    protected $description = 'Claim this site and attach a Statamic license';
+    protected $description = 'Connect this site to a statamic.com account';
 
     public function handle(DeviceFlow $flow, SiteKey $siteKey, LicenseManager $licenses): int
     {
         $key = Config::getLicenseKey() ?: $siteKey->ensure();
 
         $this->laravel['config']['statamic.system.site_key'] = $key;
+
+        $licenses->refresh();
+
+        if (($exit = $this->exitIfAlreadyResolved($licenses)) !== null) {
+            return $exit;
+        }
 
         try {
             $session = $flow->start($key, $this->host());
@@ -49,6 +55,37 @@ class License extends Command
 
         $licenses->refresh();
         $this->components->info('Site connected. License status will refresh on the next Outpost check.');
+
+        return self::SUCCESS;
+    }
+
+    private function exitIfAlreadyResolved(LicenseManager $licenses): ?int
+    {
+        if ($licenses->usingLicenseKeyFile()) {
+            $this->components->info('This site is using an offline license key file.');
+
+            return self::SUCCESS;
+        }
+
+        if ($licenses->requestFailed()) {
+            return null;
+        }
+
+        return match ($licenses->primaryAction()) {
+            null => $this->alreadyResolved('This site is already licensed.'),
+            'buy' => $this->alreadyResolved('This site is already connected.', $licenses->site()->url()),
+            'domain' => $this->alreadyResolved('This site is connected, but this domain is not on the site record.', $licenses->site()->url()),
+            default => null,
+        };
+    }
+
+    private function alreadyResolved(string $message, ?string $url = null): int
+    {
+        $this->components->info($message);
+
+        if ($url) {
+            $this->line($url);
+        }
 
         return self::SUCCESS;
     }
