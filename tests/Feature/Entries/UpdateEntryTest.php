@@ -461,6 +461,117 @@ class UpdateEntryTest extends TestCase
     }
 
     #[Test]
+    public function non_revisable_fields_are_saved_with_raw_values()
+    {
+        [$user, $collection] = $this->seedUserAndCollection(true);
+
+        $this->seedBlueprintFields($collection, [
+            'related' => ['type' => 'entries', 'revisable' => false],
+            'when' => ['type' => 'date', 'format' => 'Y-m-d', 'revisable' => false],
+        ]);
+
+        $entry = EntryFactory::id('1')
+            ->slug('test')
+            ->collection('test')
+            ->published(true)
+            ->data(['title' => 'Test'])
+            ->create();
+
+        $this
+            ->actingAs($user)
+            ->update($entry, [
+                'related' => ['2', '3'],
+                'when' => '2024-03-04',
+            ])
+            ->assertOk();
+
+        $entry = Entry::find($entry->id());
+        $this->assertSame(['2', '3'], $entry->get('related'));
+        $this->assertSame('2024-03-04', $entry->get('when'));
+    }
+
+    #[Test]
+    public function published_entry_without_non_revisable_fields_is_not_saved()
+    {
+        [$user, $collection] = $this->seedUserAndCollection(true);
+
+        $this->seedBlueprintFields($collection, [
+            'foo' => ['type' => 'text'],
+        ]);
+
+        $entry = EntryFactory::id('1')
+            ->slug('test')
+            ->collection('test')
+            ->published(true)
+            ->data(['title' => 'Test'])
+            ->create();
+
+        Event::fake([EntrySaving::class]);
+
+        $this
+            ->actingAs($user)
+            ->update($entry, ['foo' => 'bar'])
+            ->assertOk();
+
+        Event::assertNotDispatched(EntrySaving::class);
+        $this->assertTrue($entry->fresh()->hasWorkingCopy());
+    }
+
+    #[Test]
+    public function synced_non_revisable_fields_are_not_saved_to_the_localization()
+    {
+        $this->setSites([
+            'en' => ['locale' => 'en', 'url' => '/'],
+            'fr' => ['locale' => 'fr', 'url' => '/fr/'],
+        ]);
+
+        [$user, $collection] = $this->seedUserAndCollection(true);
+        $collection->sites(['en', 'fr'])->save();
+
+        $this->seedBlueprintFields($collection, [
+            'foo' => ['type' => 'text', 'revisable' => false],
+        ]);
+
+        $origin = EntryFactory::collection($collection)
+            ->locale('en')
+            ->slug('origin')
+            ->published(true)
+            ->data(['title' => 'Origin', 'foo' => 'bar'])
+            ->create();
+
+        $localization = EntryFactory::collection($collection)
+            ->locale('fr')
+            ->origin($origin)
+            ->slug('localization')
+            ->published(true)
+            ->create();
+
+        $this
+            ->actingAs($user)
+            ->update($localization, [
+                'foo' => 'bar',
+                '_localized' => [],
+            ])
+            ->assertOk();
+
+        $localization = $localization->fresh();
+        $this->assertFalse($localization->has('foo'));
+        $this->assertEquals('bar', $localization->foo);
+
+        $this
+            ->actingAs($user)
+            ->update($localization, [
+                'foo' => 'le bar',
+                '_localized' => ['foo'],
+            ])
+            ->assertOk();
+
+        $localization = $localization->fresh();
+        $this->assertEquals('le bar', $localization->get('foo'));
+        $this->assertEquals('bar', $origin->fresh()->get('foo'));
+    }
+
+    #[Test]
     public function it_can_validate_against_published_value()
     {
         [$user, $collection] = $this->seedUserAndCollection();

@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Statamic\Contracts\Entries\Entry as EntryContract;
-use Statamic\Entries\Entry as EntriesEntry;
 use Statamic\Exceptions\BlueprintNotFoundException;
 use Statamic\Facades\Action;
 use Statamic\Facades\Blink;
@@ -14,7 +13,6 @@ use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\User;
-use Statamic\Fields\Field;
 use Statamic\Hooks\CP\EntriesIndexQuery;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Requests\FilteredRequest;
@@ -534,15 +532,14 @@ class EntriesController extends CpController
         }
     }
 
-    private function saveNonRevisableFields(EntriesEntry $entry): void
+    private function saveNonRevisableFields(EntryContract $entry): void
     {
-        /** @var EntriesEntry */
-        $savedVersion = $entry->fresh();
+        $values = $entry->data()->only($entry->nonRevisableFields());
 
-        $entry->blueprint()->fields()->all()
-            ->reject(fn (Field $field) => $field->isRevisable())
-            ->each(fn ($ignore, string $fieldHandle) => $savedVersion->set($fieldHandle, $entry->{$fieldHandle}));
+        if ($values->isEmpty()) {
+            return;
+        }
 
-        $savedVersion->save();
+        $entry->fresh()->merge($values)->save();
     }
 }
