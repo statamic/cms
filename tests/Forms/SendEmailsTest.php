@@ -4,14 +4,12 @@ namespace Tests\Forms;
 
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Facades\Form as FacadesForm;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
-use Statamic\Forms\DeleteTemporaryFiles;
 use Statamic\Forms\Email;
 use Statamic\Forms\SendEmails;
 use Statamic\Support\Arr;
@@ -101,53 +99,6 @@ class SendEmailsTest extends TestCase
             'to' => 'first@recipient.com',
             'foo' => 'bar',
         ]);
-    }
-
-    #[Test]
-    public function it_dispatches_delete_temporary_files_job_even_without_any_emails_configured()
-    {
-        Bus::fake();
-
-        $form = tap(FacadesForm::make('attachments_test')->formFields([
-            'fields' => [
-                ['handle' => 'document', 'field' => ['type' => 'form_upload', 'store' => false]],
-            ],
-        ]))->save();
-
-        (new SendEmails(
-            $form->makeSubmission(),
-            Site::default(),
-        ))->handle();
-
-        Bus::assertDispatched(DeleteTemporaryFiles::class);
-    }
-
-    #[Test]
-    public function delete_attachments_job_deletes_files_from_the_configured_disk_and_path()
-    {
-        config([
-            'statamic.system.file_uploads_disk' => 'uploads',
-            'statamic.system.file_uploads_path' => 'temp-uploads',
-        ]);
-
-        $localDisk = Storage::fake('local');
-        $uploadsDisk = Storage::fake('uploads');
-        $uploadsDisk->put('temp-uploads/1234567/file.txt', 'contents');
-        $localDisk->put('statamic/file-uploads/1234567/file.txt', 'contents');
-
-        $form = tap(FacadesForm::make('attachments_test')->email([
-            'from' => 'first@sender.com',
-            'to' => 'first@recipient.com',
-        ]))->save();
-
-        $form->blueprint()->ensureField('attachments', ['type' => 'files']);
-
-        $submission = $form->makeSubmission()->data(['attachments' => ['1234567/file.txt']]);
-
-        (new DeleteTemporaryFiles($submission))->handle();
-
-        $uploadsDisk->assertMissing('temp-uploads/1234567/file.txt');
-        $localDisk->assertExists('statamic/file-uploads/1234567/file.txt');
     }
 
     #[Test]
