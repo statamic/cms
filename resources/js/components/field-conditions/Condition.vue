@@ -7,7 +7,6 @@ const emit = defineEmits(['update:condition']);
 
 const props = defineProps({
     condition: Object,
-    conditions: Array,
     suggestableFields: Array,
     excludeHandle: String,
     excludeOperators: { type: Array, default: () => [] },
@@ -31,16 +30,8 @@ const operatorOptions = computed(() => [
 const selectedField = computed(() => props.suggestableFields.find((field) => field.handle === props.condition.field));
 
 const fieldOptions = computed(() => {
-    const conditionFields = props.conditions.map((condition) => condition.field);
-
     return props.suggestableFields
-        .filter((field) => {
-            return !(
-                field.handle === props.excludeHandle ||
-                props.condition.field === field.handle ||
-                conditionFields.includes(field.handle)
-            );
-        })
+        .filter((field) => field.handle !== props.excludeHandle && field.handle !== props.condition.field)
         .map((field) => {
             let display = field.config.display;
 

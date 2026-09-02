@@ -68,7 +68,7 @@ class Dictionary extends FormFieldtype
     {
         return [
             'config' => [
-                'display' => 'Where have you went on vacation recently?',
+                'display' => 'Where have you been on vacation recently?',
                 'dictionary' => 'countries',
             ],
             'value' => ['GBR', 'USA', 'NLD', 'DEU'],

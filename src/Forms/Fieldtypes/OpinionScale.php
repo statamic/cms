@@ -40,17 +40,17 @@ class OpinionScale extends FormFieldtype
             ],
             'low_label' => [
                 'display' => __('Low Label'),
-                'instructions' => __('Shown below the lowest value.'),
+                'instructions' => __('statamic::form-fieldtypes.opinion_scale.config.low_label.instructions'),
                 'type' => 'text',
             ],
             'middle_label' => [
                 'display' => __('Middle Label'),
-                'instructions' => __('Shown below the middle value.'),
+                'instructions' => __('statamic::form-fieldtypes.opinion_scale.config.middle_label.instructions'),
                 'type' => 'text',
             ],
             'high_label' => [
                 'display' => __('High Label'),
-                'instructions' => __('Shown below the highest value.'),
+                'instructions' => __('statamic::form-fieldtypes.opinion_scale.config.high_label.instructions'),
                 'type' => 'text',
             ],
         ];
@@ -93,11 +93,11 @@ class OpinionScale extends FormFieldtype
     {
         return [
             'config' => [
-                'display' => __('How likely are you to recommend us?'),
+                'display' => 'How likely are you to recommend us?',
                 'min' => 0,
                 'max' => 5,
-                'low_label' => __('Not likely'),
-                'high_label' => __('Very likely'),
+                'low_label' => 'Not likely',
+                'high_label' => 'Very likely',
             ],
             'value' => 8,
         ];

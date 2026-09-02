@@ -31,8 +31,8 @@ class FormSubmissionsController extends CpController
         $columns = $form
             ->blueprint()
             ->columns()
-            ->prepend(Column::make('status'), 'status')
-            ->prepend(Column::make('datestamp'), 'datestamp')
+            ->prepend(Column::make('status')->label(__('Status')), 'status')
+            ->prepend(Column::make('datestamp')->label(__('Date')), 'datestamp')
             ->setPreferred("forms.{$form->handle()}.columns")
             ->rejectUnlisted()
             ->values();
@@ -119,7 +119,7 @@ class FormSubmissionsController extends CpController
             'form' => $form,
             'can' => $this->formAbilities($form),
             'id' => $submission->id(),
-            'formTitle' => $form->title(),
+            'formTitle' => __($form->title()),
             'status' => $submission->status(),
             'date' => $submission->date()->toIso8601String(),
             'blueprint' => $blueprint->toPublishArray(),
