@@ -8,7 +8,7 @@ class Providers extends SlimProviderCollection
 {
     public static function get(): array
     {
-        return collect((new static())->providers)
+        return collect((new self)->providers)
             ->unique()
             ->values()
             ->map(fn (string $class) => ['provider' => class_basename($class)])
