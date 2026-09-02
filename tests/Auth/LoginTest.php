@@ -4,10 +4,13 @@ namespace Tests\Auth;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Sleep;
+use Mockery;
 use Orchestra\Testbench\Attributes\DefineEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\TwoFactor\RecoveryCode;
+use Statamic\Contracts\Auth\Passkey;
 use Statamic\Contracts\Auth\TwoFactor\TwoFactorAuthenticationProvider;
 use Statamic\Events\TwoFactorAuthenticationChallenged;
 use Statamic\Facades\User;
@@ -69,6 +72,102 @@ class LoginTest extends TestCase
             ->assertSessionHasErrors(['email']);
 
         $this->assertGuest();
+    }
+
+    #[Test]
+    public function it_pads_failed_logins_so_unknown_emails_cant_be_distinguished_from_known_ones()
+    {
+        $user = $this->user();
+
+        Sleep::fake();
+
+        $this
+            ->post(cp_route('login'), [
+                'email' => 'nobody@hasselhoff.com',
+                'password' => 'secret',
+            ])
+            ->assertSessionHasErrors(['email']);
+
+        Sleep::assertSleptTimes(1);
+
+        Sleep::fake();
+
+        $this
+            ->post(cp_route('login'), [
+                'email' => $user->email(),
+                'password' => 'invalid-password',
+            ])
+            ->assertSessionHasErrors(['email']);
+
+        Sleep::assertSleptTimes(1);
+    }
+
+    #[Test]
+    public function it_doesnt_pad_a_successful_login()
+    {
+        $user = $this->user();
+
+        Sleep::fake();
+
+        $this
+            ->post(cp_route('login'), [
+                'email' => $user->email(),
+                'password' => 'secret',
+            ])
+            ->assertRedirect(cp_route('index'));
+
+        Sleep::assertNeverSlept();
+    }
+
+    #[Test]
+    public function it_blocks_password_login_when_user_has_passkeys_and_enforcement_enabled()
+    {
+        config(['statamic.webauthn.allow_password_login_with_passkey' => false]);
+
+        $user = $this->userWithPasskey();
+
+        $this
+            ->post(cp_route('login'), [
+                'email' => $user->email(),
+                'password' => 'secret',
+            ])
+            ->assertSessionHasErrors(['email' => __('statamic::messages.password_passkeys_only')]);
+
+        $this->assertGuest();
+    }
+
+    #[Test]
+    public function it_doesnt_reveal_passkey_enforcement_when_the_password_is_wrong()
+    {
+        config(['statamic.webauthn.allow_password_login_with_passkey' => false]);
+
+        $user = $this->userWithPasskey();
+
+        $this
+            ->post(cp_route('login'), [
+                'email' => $user->email(),
+                'password' => 'invalid-password',
+            ])
+            ->assertSessionHasErrors(['email' => __('auth.failed')]);
+
+        $this->assertGuest();
+    }
+
+    #[Test]
+    public function it_allows_password_login_when_user_has_passkeys_and_enforcement_disabled()
+    {
+        config(['statamic.webauthn.allow_password_login_with_passkey' => true]);
+
+        $user = $this->userWithPasskey();
+
+        $this
+            ->post(cp_route('login'), [
+                'email' => $user->email(),
+                'password' => 'secret',
+            ])
+            ->assertRedirect(cp_route('index'));
+
+        $this->assertAuthenticatedAs($user);
     }
 
     #[Test]
@@ -223,6 +322,31 @@ class LoginTest extends TestCase
         $this->assertGuest();
     }
 
+    #[Test]
+    #[DefineEnvironment('cpOnTopLevel')]
+    #[DefineEnvironment('addOauthProvider')]
+    public function it_shows_oauth_providers_even_if_cp_is_on_top_level()
+    {
+        $this
+            ->get(cp_route('login'))
+            ->assertInertia(fn ($page) => $page
+                ->component('auth/Login')
+                ->has('providers', 1)
+                ->where('oauthEnabled', true)
+            );
+    }
+
+    protected function cpOnTopLevel($app)
+    {
+        $app['config']->set('statamic.cp.route', '');
+    }
+
+    protected function addOauthProvider($app)
+    {
+        $app['config']->set('statamic.oauth.enabled', true);
+        $app['config']->set('statamic.oauth.providers', ['github']);
+    }
+
     protected function disableTwoFactor($app)
     {
         $app['config']->set('statamic.users.two_factor_enabled', false);
@@ -231,6 +355,14 @@ class LoginTest extends TestCase
     private function user()
     {
         return tap(User::make()->makeSuper()->email('david@hasselhoff.com')->password('secret'))->save();
+    }
+
+    private function userWithPasskey()
+    {
+        $passkey = Mockery::mock(Passkey::class);
+        $passkey->shouldReceive('id')->andReturn('passkey-1');
+
+        return tap($this->user())->setPasskeys(collect([$passkey]));
     }
 
     private function userWithTwoFactorEnabled()

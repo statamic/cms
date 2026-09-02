@@ -248,6 +248,7 @@ class Sites
                     'instructions' => __('statamic::messages.site_configure_attributes_instructions'),
                     'type' => 'array',
                     'add_button' => __('Add Attribute'),
+                    'compact' => true,
                 ],
             ],
         ];
