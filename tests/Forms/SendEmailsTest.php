@@ -4,6 +4,7 @@ namespace Tests\Forms;
 
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Forms\Submission;
