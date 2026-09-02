@@ -59,7 +59,7 @@ abstract class Exporter
         return $this->submissions ?? $this->form->submissions();
     }
 
-    public function setColumns(?array $columns)
+    public function setColumns(array $columns): static
     {
         $this->columns = $columns;
 

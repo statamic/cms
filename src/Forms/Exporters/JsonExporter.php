@@ -14,7 +14,6 @@ class JsonExporter extends Exporter
 
         $submissions = $this->submissions()
             ->map(fn ($submission) => Arr::only($submission->toArray(), $columns))
-            ->values()
             ->all();
 
         return json_encode($submissions);
