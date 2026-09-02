@@ -11,6 +11,7 @@ use Statamic\Contracts\Forms\Submission;
 use Statamic\Facades\Form as FacadesForm;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
+use Statamic\Forms\DeleteTemporaryFiles;
 use Statamic\Forms\Email;
 use Statamic\Forms\SendEmails;
 use Statamic\Support\Arr;
