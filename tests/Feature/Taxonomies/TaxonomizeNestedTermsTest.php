@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Taxonomies;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
@@ -25,101 +26,35 @@ class TaxonomizeNestedTermsTest extends TestCase
     }
 
     #[Test]
-    public function saving_an_entry_with_a_nested_path_creates_terms_and_nests_them_in_the_tree()
-    {
-        $entry = tap(Entry::make()->collection('blog')->slug('show')->data([
-            'title' => 'Show',
-            'categories' => ['events > concerts'],
-        ]))->save();
-
-        $this->assertNotNull(Term::find('categories::events'));
-        $this->assertNotNull(Term::find('categories::concerts'));
-        $this->assertEquals('events', Term::find('categories::events')->title());
-        $this->assertEquals('concerts', Term::find('categories::concerts')->title());
-
-        $this->assertEquals([
-            ['term' => 'events', 'children' => [
-                ['term' => 'concerts'],
-            ]],
-        ], Taxonomy::findByHandle('categories')->structure()->tree()->tree());
-
-        $associations = Stache::store('terms')->store('categories')->index('associations')->items();
-
-        $this->assertTrue($associations->contains(
-            fn ($association) => $association['slug'] === 'concerts' && $association['entry'] === $entry->id()
-        ));
-        $this->assertFalse($associations->contains(
-            fn ($association) => $association['slug'] === 'events-concerts'
-        ));
-    }
-
-    #[Test]
-    public function saving_an_entry_with_a_three_level_path_nests_the_full_chain()
-    {
-        tap(Entry::make()->collection('blog')->slug('show')->data([
-            'title' => 'Show',
-            'categories' => ['events > concerts > jazz'],
-        ]))->save();
-
-        $this->assertEquals([
-            ['term' => 'events', 'children' => [
-                ['term' => 'concerts', 'children' => [
-                    ['term' => 'jazz'],
-                ]],
-            ]],
-        ], Taxonomy::findByHandle('categories')->structure()->tree()->tree());
-    }
-
-    #[Test]
-    public function existing_segments_are_reused_and_not_reparented()
-    {
-        foreach (['animals', 'cat', 'furniture'] as $slug) {
-            tap(Term::make($slug)->taxonomy('categories')->data(['title' => ucfirst($slug)]))->save();
-        }
-
-        Taxonomy::findByHandle('categories')->structure()->tree()->tree([
-            ['term' => 'animals', 'children' => [
-                ['term' => 'cat'],
-            ]],
-            ['term' => 'furniture'],
-        ])->save();
-
-        tap(Entry::make()->collection('blog')->slug('show')->data([
-            'title' => 'Show',
-            'categories' => ['animals > cat', 'furniture > sofa'],
-        ]))->save();
-
-        $this->assertNotNull(Term::find('categories::sofa'));
-
-        $this->assertEquals([
-            ['term' => 'animals', 'children' => [
-                ['term' => 'cat'],
-            ]],
-            ['term' => 'furniture', 'children' => [
-                ['term' => 'sofa'],
-            ]],
-        ], Taxonomy::findByHandle('categories')->structure()->tree()->tree());
-    }
-
-    #[Test]
-    public function a_flat_taxonomy_does_not_create_a_hierarchy_from_the_delimiter()
+    #[DataProvider('taxonomyProvider')]
+    public function a_stored_value_never_creates_a_hierarchy_from_the_delimiter($handle, $expectedTree)
     {
         tap(Taxonomy::make('tags'))->save();
         Collection::findByHandle('blog')->taxonomies(['categories', 'tags'])->save();
 
-        tap(Entry::make()->collection('blog')->slug('show')->data([
+        $entry = tap(Entry::make()->collection('blog')->slug('show')->data([
             'title' => 'Show',
-            'tags' => ['events > concerts'],
+            $handle => ['events > concerts'],
         ]))->save();
 
-        $this->assertNull(Term::find('tags::concerts'));
-        $this->assertNull(Term::find('tags::events'));
+        $this->assertNull(Term::find($handle.'::concerts'));
+        $this->assertNull(Term::find($handle.'::events'));
+        $this->assertEquals($expectedTree, Taxonomy::findByHandle($handle)->structure()?->tree()->tree() ?? []);
 
-        $associations = Stache::store('terms')->store('tags')->index('associations')->items();
+        $associations = Stache::store('terms')->store($handle)->index('associations')->items();
 
         $this->assertTrue($associations->contains(
-            fn ($association) => $association['slug'] === 'events-concerts'
+            fn ($association) => $association['slug'] === 'events-concerts' && $association['entry'] === $entry->id()
         ));
+    }
+
+    public static function taxonomyProvider()
+    {
+        return [
+            // The stub gets absorbed into the tree as a single flat branch, not as "events" > "concerts".
+            'hierarchical' => ['categories', [['term' => 'events-concerts']]],
+            'flat' => ['tags', []],
+        ];
     }
 
     #[Test]
@@ -140,24 +75,6 @@ class TaxonomizeNestedTermsTest extends TestCase
         $this->assertTrue($associations->contains(
             fn ($association) => $association['slug'] === 'acdc' && $association['entry'] === $entry->id()
         ));
-    }
-
-    #[Test]
-    public function watcher_taxonomize_creates_nested_terms_from_modified_entries()
-    {
-        $entry = tap(Entry::make()->collection('blog')->slug('show')->data([
-            'title' => 'Show',
-        ]))->save();
-
-        $entry->set('categories', ['plants > fern'])->save();
-
-        $this->assertNotNull(Term::find('categories::plants'));
-        $this->assertNotNull(Term::find('categories::fern'));
-        $this->assertEquals([
-            ['term' => 'plants', 'children' => [
-                ['term' => 'fern'],
-            ]],
-        ], Taxonomy::findByHandle('categories')->structure()->tree()->tree());
     }
 
     #[Test]
@@ -182,18 +99,5 @@ class TaxonomizeNestedTermsTest extends TestCase
         $this->assertEquals([
             ['term' => 'events'],
         ], Taxonomy::findByHandle('categories')->structure()->tree()->tree());
-    }
-
-    #[Test]
-    public function saving_an_entry_with_a_path_deeper_than_max_depth_is_rejected()
-    {
-        Taxonomy::findByHandle('categories')->structureContents(['max_depth' => 2])->save();
-
-        $this->expectException(\Illuminate\Validation\ValidationException::class);
-
-        tap(Entry::make()->collection('blog')->slug('show')->data([
-            'title' => 'Show',
-            'categories' => ['events > concerts > jazz'],
-        ]))->save();
     }
 }

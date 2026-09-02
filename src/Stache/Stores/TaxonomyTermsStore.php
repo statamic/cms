@@ -112,17 +112,14 @@ class TaxonomyTermsStore extends ChildStore
     {
         $taxonomy = $this->childKey();
         $paths = new EnsuresTermPaths;
-        $taxonomyModel = Taxonomy::findByHandle($taxonomy);
         $lang = $entry->site()->lang();
 
-        $terms = collect(Arr::wrap($terms))->mapWithKeys(function ($value) use ($paths, $taxonomyModel, $lang) {
+        $terms = collect(Arr::wrap($terms))->mapWithKeys(function ($value) use ($paths, $lang) {
             if ($value === null || $value === '') {
                 return [];
             }
 
-            $slug = $taxonomyModel?->hierarchical()
-                ? $paths->ensure($taxonomyModel, (string) $value, $lang)
-                : $paths->slugFromValue($value, $lang);
+            $slug = $paths->slugFromValue($value, $lang);
 
             return $slug ? [$slug => $value] : [];
         });

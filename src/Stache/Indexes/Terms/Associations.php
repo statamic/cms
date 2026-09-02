@@ -11,23 +11,22 @@ class Associations extends Index
     public function getItems()
     {
         $taxonomy = Taxonomy::findByHandle($handle = $this->store->childKey());
-        $hierarchical = $taxonomy->hierarchical();
 
         return $taxonomy
             ->collections()
-            ->flatMap(function ($collection) use ($handle, $hierarchical) {
+            ->flatMap(function ($collection) use ($handle) {
                 return $collection->queryEntries()
                     ->where($handle, '<>', null)
                     ->get()
-                    ->flatMap(function ($entry) use ($handle, $hierarchical) {
+                    ->flatMap(function ($entry) use ($handle) {
                         $paths = new EnsuresTermPaths;
                         $lang = $entry->site()->lang();
 
                         return collect($entry->value($handle))
-                            ->map(function ($value) use ($entry, $paths, $lang, $hierarchical) {
+                            ->map(function ($value) use ($entry, $paths, $lang) {
                                 return [
                                     'value' => $value,
-                                    'slug' => $paths->slugFromValue($value, $lang, $hierarchical),
+                                    'slug' => $paths->slugFromValue($value, $lang),
                                     'entry' => $entry->id(),
                                     'collection' => $entry->collectionHandle(),
                                     'site' => $entry->locale(),

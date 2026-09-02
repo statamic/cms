@@ -18,22 +18,13 @@ class EnsuresTermPaths
     const DELIMITER = '>';
 
     /**
-     * Association/lookup slug for an entry value. Nested paths like
-     * "events > concerts" resolve to the leaf slug ("concerts") when the
-     * taxonomy is hierarchical; otherwise the whole value is slugified.
+     * Association/lookup slug for a stored value. The delimiter is an input
+     * convention for the CP terms field only — in a stored value it's an
+     * ordinary character, so the whole value is slugified either way.
      */
-    public function slugFromValue(mixed $value, ?string $language = null, bool $hierarchical = false): string
+    public function slugFromValue(mixed $value, ?string $language = null): string
     {
-        $value = (string) $value;
-
-        if ($hierarchical && str_contains($value, self::DELIMITER)) {
-            $value = collect(explode(self::DELIMITER, $value))
-                ->map(fn ($segment) => trim($segment))
-                ->filter()
-                ->last() ?? $value;
-        }
-
-        return Str::slug($value, '-', $language ?? 'en');
+        return Str::slug((string) $value, '-', $language ?? 'en');
     }
 
     /**
