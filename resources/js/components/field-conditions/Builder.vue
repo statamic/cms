@@ -222,7 +222,6 @@ onMounted(() => {
                     <ol v-if="hasConditions && !isCustom">
                         <Condition
                             v-model:condition="conditions[index]"
-                            :conditions="conditions"
                             :suggestable-fields="suggestableFields"
                             :exclude-handle="config?.handle"
                             :size
