@@ -137,7 +137,7 @@ class Revision implements Arrayable, ContainsQueryableValues, Contract
             'date' => $this->date()->timestamp,
             'user' => $user,
             'message' => $this->message,
-            'publish_at' => $this->publishAt,
+            'publish_at' => $this->publishAt?->timestamp,
             'attributes' => $this->attributes,
         ];
     }

@@ -86,6 +86,14 @@ class RevisionsTest extends TestCase
             ->date(now())
             ->publishAt(now());
 
-        $this->assertEquals(now(), $revision->toArray()['publish_at']);
+        $this->assertEquals(now()->timestamp, $revision->toArray()['publish_at']);
+    }
+
+    #[Test]
+    public function outputs_null_publish_at_when_to_array()
+    {
+        $revision = (new Revision)->date(now());
+
+        $this->assertNull($revision->toArray()['publish_at']);
     }
 }
