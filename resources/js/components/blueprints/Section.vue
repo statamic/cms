@@ -10,7 +10,7 @@
                     <ui-icon :name="section.icon" :set="iconSet" v-if="section.icon" />
                     <ui-heading v-text="__(section.display ?? 'Section')" />
                     <ui-badge
-                        v-if="showHandleField && card"
+                        v-if="showCardField && card"
                         pill
                         icon="cards"
                         :text="__('Card')"
@@ -83,7 +83,7 @@
                     <ui-field
                         :label="__('Card layout')"
                         :instructions="__('messages.replicator_set_card_layout_instructions')"
-                        v-if="showHandleField"
+                        v-if="showCardField"
                     >
                         <ui-switch v-model="editingSection.card" />
                     </ui-field>
@@ -173,6 +173,7 @@ export default {
         tabId: { type: String },
         section: { type: Object, required: true },
         showHandleField: { type: Boolean, default: false },
+        showCardField: { type: Boolean, default: false },
 	    showCollapsibleField: { type: Boolean, default: false },
         showHideField: { type: Boolean, default: false },
         editText: { type: String },

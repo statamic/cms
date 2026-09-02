@@ -47,6 +47,10 @@ export function buildCardLayouts(value, isCardSet, isSameCardGroup) {
     });
 }
 
+function setId(set) {
+    return set._id ?? set.id;
+}
+
 export function getCardGroupMemberIds({ index, value, layouts, multiColumn }) {
     const set = value[index];
 
@@ -57,14 +61,14 @@ export function getCardGroupMemberIds({ index, value, layouts, multiColumn }) {
     const layout = layouts[index];
 
     if (!multiColumn || !layout.isCard || layout.groupSize <= 1) {
-        return [set._id];
+        return [setId(set)];
     }
 
     const groupStart = index - layout.positionInGroup;
 
     return value
         .slice(groupStart, groupStart + layout.groupSize)
-        .map((item) => item._id);
+        .map((item) => setId(item));
 }
 
 export function shouldShowPickerConnector({ index, layouts, showCardEntryConnector }) {

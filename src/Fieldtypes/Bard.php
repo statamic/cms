@@ -547,6 +547,15 @@ class Bard extends Replicator
         return $this->runHooks('extra-validation-attributes', $attributes);
     }
 
+    public function flattenedSetsConfig()
+    {
+        return parent::flattenedSetsConfig()->map(function ($set) {
+            unset($set['card']);
+
+            return $set;
+        });
+    }
+
     public function isLegacyData($value)
     {
         if (is_string($value)) {

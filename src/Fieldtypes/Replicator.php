@@ -47,6 +47,7 @@ class Replicator extends Fieldtype
                         'type' => 'sets',
                         'hide_display' => true,
                         'full_width_setting' => true,
+                        'show_card_layout_field' => true,
                     ],
                 ],
             ],

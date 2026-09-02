@@ -15,6 +15,7 @@
                 :can-define-localizable="canDefineLocalizable"
                 :tab-id="tabId"
                 :show-handle-field="showSectionHandleField"
+                :show-card-field="showSectionCardField"
                 :show-collapsible-field="showSectionCollapsibleField"
                 :show-hide-field="showSectionHideField"
                 :exclude-fieldset="excludeFieldset"
@@ -77,6 +78,10 @@ export default {
             default: true,
         },
         showSectionHandleField: {
+            type: Boolean,
+            default: false,
+        },
+        showSectionCardField: {
             type: Boolean,
             default: false,
         },
