@@ -2,12 +2,8 @@
 
 namespace Statamic\Contracts\Revisions;
 
-use Statamic\Entries\Entry;
-
 interface Revision
 {
-    public function entry(): Entry;
-
     public function id();
 
     public function message($message = null);

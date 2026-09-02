@@ -9,12 +9,10 @@ use Statamic\Contracts\Revisions\Revision as Contract;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\TracksQueriedColumns;
 use Statamic\Data\TracksQueriedRelations;
-use Statamic\Entries\Entry;
 use Statamic\Events\RevisionDeleted;
 use Statamic\Events\RevisionSaved;
 use Statamic\Events\RevisionSaving;
 use Statamic\Facades;
-use Statamic\Facades\Entry as EntryFacade;
 use Statamic\Facades\Revision as Revisions;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
@@ -33,11 +31,6 @@ class Revision implements Arrayable, ContainsQueryableValues, Contract
     protected $publishAt;
     protected $action = 'revision';
     protected $attributes = [];
-
-    public function entry(): Entry
-    {
-        return EntryFacade::find($this->attribute('id'));
-    }
 
     public function id()
     {

@@ -58,26 +58,6 @@ class RevisionsTest extends TestCase
     }
 
     #[Test]
-    public function can_get_its_entry()
-    {
-        config(['statamic.revisions.path' => '/path/to']);
-
-        Carbon::setTestNow($now = Carbon::parse('2019-03-25 13:15'));
-
-        $entry = EntryFactory::id('123')
-            ->collection(tap(Collection::make('test')->dated(true))->save())
-            ->slug('my-entry')
-            ->data(['foo' => 'bar'])
-            ->date('2016-12-25')
-            ->make();
-
-        $entry->save();
-        $revision = $entry->makeRevision();
-
-        $this->assertEquals($entry->id(), $revision->entry()->id());
-    }
-
-    #[Test]
     public function converts_publish_at_to_timestamp_when_saving()
     {
         Carbon::setTestNow(now());
