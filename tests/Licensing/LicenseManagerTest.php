@@ -247,6 +247,28 @@ class LicenseManagerTest extends TestCase
     }
 
     #[Test]
+    public function licensing_alert_notes_a_connected_site_that_needs_renewal()
+    {
+        config(['statamic.system.site_key' => 'site_abcdefghijklmnopqrstuvwxyz']);
+
+        $alert = $this->managerWithResponse([
+            'public' => true,
+            'site' => ['claimed' => true],
+            'statamic' => ['valid' => false, 'reason' => 'outside_license_range', 'range' => ['5', '5']],
+            'packages' => [],
+        ])->licensingAlert();
+
+        $this->assertStringContainsString('needs to be renewed', $alert['message']);
+        $this->assertStringNotContainsString('has no license attached', $alert['message']);
+        $this->assertEquals('renew', $this->managerWithResponse([
+            'public' => true,
+            'site' => ['claimed' => true, 'valid' => true],
+            'statamic' => ['valid' => false, 'reason' => 'outside_license_range'],
+            'packages' => [],
+        ])->primaryAction());
+    }
+
+    #[Test]
     public function primary_action_follows_connection_state()
     {
         config([
@@ -277,6 +299,20 @@ class LicenseManagerTest extends TestCase
             'site' => ['claimed' => true, 'valid' => true],
             'statamic' => ['valid' => false, 'reason' => 'unlicensed'],
             'packages' => [],
+        ])->primaryAction());
+
+        $this->assertEquals('renew', $this->managerWithResponse([
+            'site' => ['claimed' => true, 'valid' => true],
+            'statamic' => ['valid' => false, 'reason' => 'outside_license_range'],
+            'packages' => [],
+        ])->primaryAction());
+
+        $this->assertEquals('buy', $this->managerWithResponse([
+            'site' => ['claimed' => true, 'valid' => true],
+            'statamic' => ['valid' => false, 'reason' => 'outside_license_range'],
+            'packages' => [
+                'foo/bar' => ['valid' => false],
+            ],
         ])->primaryAction());
 
         $this->assertNull($this->managerWithResponse([

@@ -180,6 +180,8 @@ return [
     'licensing_site_key_missing' => 'This site does not have a site key yet. Generate one from the Licensing utility.',
     'licensing_not_connected' => 'This site key isn\'t connected to a statamic.com account yet.',
     'licensing_connected_unlicensed' => 'This site is connected to statamic.com but has no license attached.',
+    'licensing_connected_needs_renewal' => 'This site\'s Statamic Pro license needs to be renewed.',
+    'licensing_renew_pro_description' => 'Your Statamic Pro license does not cover this version. Renew to keep using it, or downgrade to a version in range.',
     'licensing_refresh_instructions' => 'License data refreshes from statamic.com hourly. Use Refresh after you make changes there.',
     'licensing_shared_key' => 'This site key is being used on unrelated production domains. Run `php please site:fresh-key` so this project gets its own identity.',
     'licensing_buy_addon_detail' => ':author',

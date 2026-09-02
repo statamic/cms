@@ -73,7 +73,7 @@ class License extends Command
 
         return match ($licenses->primaryAction()) {
             null => $this->alreadyResolved('This site is already licensed.'),
-            'buy' => $this->alreadyResolved('This site is already connected.', $licenses->site()->url()),
+            'buy', 'renew' => $this->alreadyResolved('This site is already connected.', $licenses->site()->url()),
             'domain' => $this->alreadyResolved('This site is connected, but this domain is not on the site record.', $licenses->site()->url()),
             default => null,
         };

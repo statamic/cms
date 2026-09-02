@@ -220,7 +220,8 @@ class AddToCartUrlTest extends TestCase
             collect()
         );
 
-        $this->assertEquals('Renew Statamic Pro', $purchase['label']);
+        $this->assertEquals('Renew License', $purchase['label']);
+        $this->assertEquals('Your Statamic Pro license does not cover this version. Renew to keep using it, or downgrade to a version in range.', $purchase['description']);
     }
 
     private function site(?string $name = null, bool $connected = true): object

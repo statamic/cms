@@ -211,6 +211,10 @@ class LicenseManager
             return 'domain';
         }
 
+        if ($this->statamicNeedsRenewal() && $this->onlyStatamicIsInvalid()) {
+            return 'renew';
+        }
+
         return $this->invalid() ? 'buy' : null;
     }
 
@@ -222,6 +226,10 @@ class LicenseManager
 
         if (! $this->hasSiteKey()) {
             return __('statamic::messages.licensing_site_key_missing');
+        }
+
+        if ($this->site()->isConnected() && $this->statamicNeedsRenewal()) {
+            return __('statamic::messages.licensing_connected_needs_renewal');
         }
 
         return $this->site()->isConnected()

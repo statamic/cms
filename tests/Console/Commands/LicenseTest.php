@@ -74,6 +74,23 @@ class LicenseTest extends TestCase
     }
 
     #[Test]
+    public function it_skips_the_device_flow_when_the_license_needs_renewal()
+    {
+        config(['statamic.system.site_key' => 'site_abcdefghijklmnopqrstuvwxyz']);
+
+        $this->mockLicenses('renew');
+
+        Http::fake();
+
+        $this->artisan('statamic:license', ['--poll-once' => true])
+            ->expectsOutputToContain('already connected')
+            ->expectsOutputToContain('https://statamic.com/account/sites/site_abcdefghijklmnopqrstuvwxyz')
+            ->assertSuccessful();
+
+        Http::assertNothingSent();
+    }
+
+    #[Test]
     public function it_skips_the_device_flow_when_the_domain_is_invalid()
     {
         config(['statamic.system.site_key' => 'site_abcdefghijklmnopqrstuvwxyz']);

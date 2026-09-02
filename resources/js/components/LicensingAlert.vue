@@ -114,6 +114,12 @@ onUnmounted(() => {
                     @click="manageLicenses"
                 />
                 <Button
+                    v-if="primaryAction === 'renew' && manageUrl"
+                    variant="primary"
+                    :text="__('Renew License')"
+                    @click="manageLicenses"
+                />
+                <Button
                     v-if="primaryAction === 'domain'"
                     :href="siteUrl"
                     target="_blank"

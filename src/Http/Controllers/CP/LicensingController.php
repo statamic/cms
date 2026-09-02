@@ -128,8 +128,10 @@ class LicensingController extends CpController
             ]);
         }
 
+        $needsRenewal = $needsStatamic && $unlicensedAddons->isEmpty() && $statamic->needsRenewal();
+
         $label = match (true) {
-            $needsStatamic && $unlicensedAddons->isEmpty() && method_exists($statamic, 'needsRenewal') && $statamic->needsRenewal() => __('Renew Statamic Pro'),
+            $needsRenewal => __('Renew License'),
             $needsStatamic && $unlicensedAddons->isEmpty() => __('Buy Statamic Pro'),
             ! $needsStatamic => __('Buy Addon Licenses'),
             default => __('Buy Licenses'),
@@ -137,6 +139,7 @@ class LicensingController extends CpController
 
         $siteLabel = $siteName ?? __('this site');
         $description = match (true) {
+            $needsRenewal => __('statamic::messages.licensing_renew_pro_description'),
             $needsStatamic && $unlicensedAddons->isEmpty() => __('statamic::messages.licensing_buy_pro_description'),
             ! $needsStatamic => __('statamic::messages.licensing_buy_addons_description', ['site' => $siteLabel]),
             default => __('statamic::messages.licensing_buy_mixed_description', ['site' => $siteLabel]),

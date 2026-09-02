@@ -102,7 +102,7 @@ onUnmounted(() => {
                 @click="markOutbound"
             />
             <Button
-                v-if="primaryAction === 'buy'"
+                v-if="primaryAction === 'buy' || primaryAction === 'renew'"
                 variant="primary"
                 :text="purchase.label"
                 @click="buyModalOpen = true"
