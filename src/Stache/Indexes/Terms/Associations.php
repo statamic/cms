@@ -5,74 +5,37 @@ namespace Statamic\Stache\Indexes\Terms;
 use Statamic\Facades\Stache;
 use Statamic\Facades\Taxonomy;
 use Statamic\Stache\Indexes\Index;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 class Associations extends Index
 {
     /**
-     * Builds the term→entry association map for a taxonomy.
+     * Builds the term→entry association map for a taxonomy from the entries
+     * stores' value indexes rather than by loading every Entry from disk.
      *
-     * This index is the reason warm() runs in two passes. Associations needs to know
-     * which entries reference each term, but the only way to find that (without loading
-     * every Entry from disk) is to read the entries' already-warmed taxonomy index from
-     * the cache. The 2-pass warm guarantees that index exists before this method is called.
-     *
-     * Fast path (used during stache:warm): reads the flat `[entryId => termValue]` and
-     * `[entryId => site]` arrays directly from the cache — no Entry objects are constructed.
-     *
-     * Cold path (used outside of stache:warm, e.g. on-demand index builds): queries
-     * entries via Eloquent as before. Slower but always correct.
+     * During stache:warm those indexes are already cached (Pass 1 runs before
+     * this index is built in Pass 2). Outside of warming they'll be built on
+     * demand, which costs the same as the old query-based approach did.
      */
     public function getItems()
     {
         return Taxonomy::findByHandle($handle = $this->store->childKey())
             ->collections()
             ->flatMap(function ($collection) use ($handle) {
-                $entriesStore = Stache::store('entries')->store($collection->handle());
-                $collectionHandle = $collection->handle();
+                $entries = Stache::store('entries')->store($collection->handle());
+                $ids = $entries->index('id');
+                $sites = $entries->index('site');
 
-                $storeKey = $entriesStore->key();
-
-                // array of [entry_id => [term]]
-                $taxonomyData = collect(Stache::cacheStore()->get("stache::indexes::{$storeKey}::{$handle}"));
-
-                if ($taxonomyData->isNotEmpty()) {
-                    // Fast path: entries' value indexes are already in the cache (Pass 1 ran first).
-                    $sites = collect(Stache::cacheStore()->get("stache::indexes::{$storeKey}::site"));
-
-                    return $taxonomyData
-                        ->filter(fn (?array $entryTerms): bool => ! empty($entryTerms))
-                        ->flatMap(function (array $terms, string|int $entryId) use ($collectionHandle, $entriesStore, $sites) {
-                            $site = $sites->isNotEmpty()
-                                ? $sites->get($entryId)
-                                : $entriesStore->getItem($entryId)?->locale();
-
-                            return collect($terms)->map(fn (string $term) => [
-                                'value' => $term,
-                                'slug' => Str::slug($term),
-                                'entry' => $entryId,
-                                'collection' => $collectionHandle,
-                                'site' => $site,
-                            ]);
-                        });
-                }
-
-                // Cold path: Redis miss — fall back to querying entries directly.
-                return $collection->queryEntries()
-                    ->where($handle, '<>', null)
-                    ->get()
-                    ->flatMap(function ($entry) use ($handle) {
-                        return collect($entry->value($handle))
-                            ->map(function ($value) use ($entry) {
-                                return [
-                                    'value' => $value,
-                                    'slug' => Str::slug($value),
-                                    'entry' => $entry->id(),
-                                    'collection' => $entry->collectionHandle(),
-                                    'site' => $entry->locale(),
-                                ];
-                            });
-                    })->all();
+                return $entries->index($handle)->items()
+                    ->filter()
+                    ->flatMap(fn ($terms, $key) => collect(Arr::wrap($terms))->map(fn ($term) => [
+                        'value' => $term,
+                        'slug' => Str::slug($term),
+                        'entry' => $ids->get($key),
+                        'collection' => $collection->handle(),
+                        'site' => $sites->get($key),
+                    ]));
             })->all();
     }
 
