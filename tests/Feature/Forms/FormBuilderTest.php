@@ -487,8 +487,12 @@ class FormBuilderTest extends TestCase
             'invalid characters' => ['not valid'],
             'reserved word' => ['if'],
             'reserved forms word: date' => ['date'],
+            'reserved forms word: entry' => ['entry'],
             'reserved forms word: message' => ['message'],
             'reserved forms word: messages' => ['messages'],
+            'reserved forms word: partial' => ['partial'],
+            'reserved forms word: site' => ['site'],
+            'reserved forms word: spam' => ['spam'],
         ];
     }
 

@@ -33,7 +33,8 @@
         @apply bg-green-200 text-green-900 dark:bg-green-300/6 dark:text-green-300;
     }
 
-    &.status-scheduled {
+    &.status-scheduled,
+    &.status-spam {
         @apply bg-amber-200 text-amber-900 dark:bg-amber-300/6 dark:text-amber-300;
     }
 }
