@@ -132,7 +132,7 @@
 
 .asset-tile {
     @apply relative flex min-w-0 cursor-pointer flex-col items-center justify-between rounded-lg;
-    @container (width > 350px) {
+    @container (width > 300px) {
         @apply outline outline-gray-300 dark:outline-gray-700
     }
     /* Localize selection/hover layout work; avoid paint so selection outlines aren't clipped. */
