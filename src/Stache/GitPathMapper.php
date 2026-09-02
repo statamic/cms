@@ -129,8 +129,18 @@ class GitPathMapper
             return [$this->mapBlueprintChange($status, $absolutePath, $relativePath, $blueprintsDir)];
         }
 
-        // --- Anything else is unrecognized → trigger full refresh
-        return [['type' => 'full-refresh', 'storeKey' => null, 'absolutePath' => null, 'displayPath' => $relativePath]];
+        $fieldsetsDir = $basePath.'/resources/fieldsets';
+        if (Str::startsWith($absolutePath, $fieldsetsDir.'/')) {
+            return [$this->fullRefreshAction($relativePath)];
+        }
+
+        $configDir = $basePath.'/config/statamic';
+        if (Str::startsWith($absolutePath, $configDir.'/')) {
+            return [$this->fullRefreshAction($relativePath)];
+        }
+
+        // Unmapped paths are not stache stores. Ignore them so a mixed deploy stays targeted.
+        return [];
     }
 
     private function mapBlueprintChange(string $status, string $absolutePath, string $relativePath, string $blueprintsDir): array
@@ -153,8 +163,13 @@ class GitPathMapper
             return ['type' => 'warm-store', 'storeKey' => 'asset-containers', 'absolutePath' => null, 'displayPath' => $relativePath];
         }
 
-        // Any other blueprint change (e.g. user.yaml, default.yaml, fieldsets) → full refresh
-        return ['type' => 'full-refresh', 'storeKey' => null, 'absolutePath' => null, 'displayPath' => $relativePath];
+        // Any other blueprint change (e.g. user.yaml, default.yaml) → full refresh
+        return $this->fullRefreshAction($relativePath);
+    }
+
+    private function fullRefreshAction(string $displayPath): array
+    {
+        return ['type' => 'full-refresh', 'storeKey' => null, 'absolutePath' => null, 'displayPath' => $displayPath];
     }
 
     private function makeAction(string $gitStatus, string $storeKey, string $absolutePath, string $displayPath): array

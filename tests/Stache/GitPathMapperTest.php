@@ -260,14 +260,60 @@ class GitPathMapperTest extends TestCase
     }
 
     #[Test]
-    public function it_maps_unrecognized_files_to_full_refresh()
+    public function it_maps_unrecognized_files_to_no_actions()
     {
         $actions = $this->map([
             ['status' => 'M', 'path' => 'resources/views/some-template.antlers.html'],
         ]);
 
+        $this->assertCount(0, $actions);
+    }
+
+    #[Test]
+    public function it_ignores_php_src_changes()
+    {
+        $actions = $this->map([
+            ['status' => 'M', 'path' => 'src/Foo.php'],
+        ]);
+
+        $this->assertCount(0, $actions);
+    }
+
+    #[Test]
+    public function it_maps_fieldset_changes_to_full_refresh()
+    {
+        $actions = $this->map([
+            ['status' => 'M', 'path' => 'resources/fieldsets/common.yaml'],
+        ]);
+
         $this->assertCount(1, $actions);
         $this->assertEquals('full-refresh', $actions[0]['type']);
+        $this->assertNull($actions[0]['storeKey']);
+    }
+
+    #[Test]
+    public function it_maps_statamic_config_changes_to_full_refresh()
+    {
+        $actions = $this->map([
+            ['status' => 'M', 'path' => 'config/statamic/stache.php'],
+        ]);
+
+        $this->assertCount(1, $actions);
+        $this->assertEquals('full-refresh', $actions[0]['type']);
+    }
+
+    #[Test]
+    public function it_maps_mixed_src_and_entry_changes_to_only_the_entry_action()
+    {
+        $actions = $this->map([
+            ['status' => 'M', 'path' => 'src/Foo.php'],
+            ['status' => 'M', 'path' => 'content/collections/blog/my-post.md'],
+        ]);
+
+        $this->assertCount(1, $actions);
+        $this->assertEquals('update-item', $actions[0]['type']);
+        $this->assertEquals('entries::blog', $actions[0]['storeKey']);
+        $this->assertEquals('content/collections/blog/my-post.md', $actions[0]['displayPath']);
     }
 
     #[Test]
