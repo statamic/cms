@@ -109,6 +109,28 @@ class RuleEvaluatorTest extends TestCase
     }
 
     #[Test]
+    public function multiple_conditions_can_target_the_same_field()
+    {
+        $evaluator = new RuleEvaluator;
+
+        $range = [
+            $this->condition('>', '18', field: 'age'),
+            $this->condition('<', '65', field: 'age', join: 'and'),
+        ];
+
+        $this->assertTrue($evaluator->passes($range, ['age' => 30]));
+        $this->assertFalse($evaluator->passes($range, ['age' => 70]));
+
+        $either = [
+            $this->condition('equals', 'published', field: 'status'),
+            $this->condition('equals', 'archived', field: 'status', join: 'or'),
+        ];
+
+        $this->assertTrue($evaluator->passes($either, ['status' => 'archived']));
+        $this->assertFalse($evaluator->passes($either, ['status' => 'draft']));
+    }
+
+    #[Test]
     public function and_binds_tighter_than_or()
     {
         // a OR b AND c  =>  a OR (b AND c)

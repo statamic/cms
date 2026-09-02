@@ -6,6 +6,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class AssetResource extends JsonResource
 {
+    use ResolvesRequestedFields;
+
     /**
      * Transform the resource into an array.
      *
@@ -19,7 +21,7 @@ class AssetResource extends JsonResource
             ->filter->isRelationship()->keys()->all();
 
         return $this->resource
-            ->toAugmentedCollection()
+            ->toAugmentedCollection($this->requestedFields($request))
             ->withRelations($with)
             ->withShallowNesting()
             ->toArray();

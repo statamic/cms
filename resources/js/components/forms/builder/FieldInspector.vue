@@ -246,7 +246,7 @@ onMounted(() => load());
                             <Icon :name="field.icon" class="size-4 text-gray-500 dark:text-gray-300" />
                         </div>
                         <a :href="`#field-${field._id}`" class="inline-flex min-w-0 items-center gap-1.5 text-xl font-medium antialiased">
-                            <span class="truncate">{{ field.config.display }}</span>
+                            <span class="truncate">{{ __(field.config.display) }}</span>
                             <div v-if="showFieldDirection" class="grid *:[grid-area:1/1]">
                                 <Icon name="arrow-up" data-field-direction-up aria-hidden="true" />
                                 <Icon name="arrow-down" data-field-direction-down aria-hidden="true" />
@@ -280,7 +280,7 @@ onMounted(() => load());
                             <Icon :name="field.icon" class="size-4 text-gray-500 dark:text-gray-300" />
                         </div>
                         <a :href="`#field-${field._id}`" class="inline-flex min-w-0 items-center gap-1.5 text-xl font-medium antialiased">
-                            <span class="truncate">{{ field.config.display }}</span>
+                            <span class="truncate">{{ __(field.config.display) }}</span>
                             <div v-if="showFieldDirection" class="grid *:[grid-area:1/1]">
                                 <Icon name="arrow-up" data-field-direction-up aria-hidden="true" />
                                 <Icon name="arrow-down" data-field-direction-down aria-hidden="true" />
@@ -329,7 +329,7 @@ onMounted(() => load());
                             <Icon :name="field.icon" class="size-4 text-gray-500 dark:text-gray-300" />
                         </div>
                         <a :href="`#field-${field._id}`" class="inline-flex min-w-0 items-center gap-1.5 text-xl font-medium antialiased">
-                            <span class="truncate">{{ field.config.display }}</span>
+                            <span class="truncate">{{ __(field.config.display) }}</span>
                             <div v-if="showFieldDirection" class="grid *:[grid-area:1/1]">
                                 <Icon name="arrow-up" data-field-direction-up aria-hidden="true" />
                                 <Icon name="arrow-down" data-field-direction-down aria-hidden="true" />

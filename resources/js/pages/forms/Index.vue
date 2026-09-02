@@ -68,7 +68,7 @@ const reloadPage = () => router.reload();
                 <template #cell-title="{ row: form }">
                     <div class="flex items-center gap-2">
                         <FormStatusIndicator :status="form.status" />
-                        <Link :href="form.show_url">{{ form.title }}</Link>
+                        <Link :href="form.show_url">{{ __(form.title) }}</Link>
                     </div>
                 </template>
                 <template #cell-submissions="{ row: form, value: submissions }">
