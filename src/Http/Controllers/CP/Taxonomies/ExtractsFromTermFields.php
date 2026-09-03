@@ -6,17 +6,11 @@ trait ExtractsFromTermFields
 {
     protected function extractFromFields($term, $blueprint)
     {
-        $blueprint = $term->taxonomy()->ensurePublishParentField($blueprint, $term);
-
         // The values should only be data merged with the origin data.
         // We don't want injected taxonomy values, which $term->values() would have given us.
         $values = $term->inDefaultLocale()->data()->merge(
             $term->data()
         )->all();
-
-        if ($term->taxonomy()->hierarchical()) {
-            $values['parent'] = array_filter([optional($term->parent())->id()]);
-        }
 
         $fields = $blueprint
             ->setParent($term)
@@ -34,6 +28,6 @@ trait ExtractsFromTermFields
             'children' => $term->page()?->flattenedPages()->pluck('id')->all(),
         ];
 
-        return [$values->all(), $fields->meta(), $extraValues, $blueprint];
+        return [$values->all(), $fields->meta(), $extraValues];
     }
 }

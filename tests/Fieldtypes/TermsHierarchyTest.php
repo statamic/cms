@@ -327,17 +327,6 @@ class TermsHierarchyTest extends TestCase
         $this->assertEquals('Ages > 21', Term::find('tags::ages-21')->title());
     }
 
-    #[Test]
-    public function parent_field_index_query_excludes_configured_ids()
-    {
-        $items = $this->fieldtype([
-            'taxonomies' => ['categories'],
-            'exclusions' => ['categories::animals', 'categories::cat'],
-        ])->getIndexItems(new Request(['paginate' => false]));
-
-        $this->assertEquals(['categories::furniture'], $items->map->id()->all());
-    }
-
     public function fieldtype($config = [], $parent = null)
     {
         $field = new Field('test', array_merge(['type' => 'terms'], $config));

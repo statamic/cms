@@ -632,14 +632,8 @@ class Terms extends Relationship
             $query->where('site', $site);
         }
 
-        $exclusions = collect($request->exclusions ?? [])
-            ->merge($this->config('exclusions', []))
-            ->filter()
-            ->unique()
-            ->all();
-
-        if ($exclusions) {
-            $query->whereNotIn('id', $exclusions);
+        if ($request->exclusions) {
+            $query->whereNotIn('id', $request->exclusions);
         }
 
         $this->applyIndexQueryScopes($query, $request->all());

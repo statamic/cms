@@ -122,45 +122,6 @@ class TaxonomyTest extends TestCase
     }
 
     #[Test]
-    public function it_ensures_a_parent_field_when_hierarchical()
-    {
-        $taxonomy = Taxonomy::make('categories')->structureContents([]);
-        $blueprint = (new Blueprint)->setHandle('category')->setContents(['title' => 'Category']);
-
-        $blueprint = $taxonomy->ensurePublishParentField($blueprint);
-
-        $field = $blueprint->field('parent');
-        $this->assertEquals('terms', $field->get('type'));
-        $this->assertEquals(['categories'], $field->get('taxonomies'));
-        $this->assertEquals(1, $field->get('max_items'));
-        $this->assertEquals('select', $field->get('mode'));
-        $this->assertFalse($field->get('create'));
-        $this->assertFalse($field->get('localizable'));
-    }
-
-    #[Test]
-    public function it_does_not_ensure_a_parent_field_when_max_depth_is_one()
-    {
-        $taxonomy = Taxonomy::make('categories')->structureContents(['max_depth' => 1]);
-        $blueprint = (new Blueprint)->setHandle('category')->setContents(['title' => 'Category']);
-
-        $blueprint = $taxonomy->ensurePublishParentField($blueprint);
-
-        $this->assertNull($blueprint->field('parent'));
-    }
-
-    #[Test]
-    public function it_does_not_ensure_a_parent_field_when_not_structured()
-    {
-        $taxonomy = Taxonomy::make('tags');
-        $blueprint = (new Blueprint)->setHandle('tag')->setContents(['title' => 'Tag']);
-
-        $blueprint = $taxonomy->ensurePublishParentField($blueprint);
-
-        $this->assertNull($blueprint->field('parent'));
-    }
-
-    #[Test]
     public function it_does_not_add_a_parent_field_to_the_real_term_blueprint()
     {
         $taxonomy = tap(Taxonomy::make('categories')->structureContents([]))->save();

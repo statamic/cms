@@ -95,7 +95,7 @@ class TermsController extends CpController
 
         $blueprint = $term->blueprint();
 
-        [$values, $meta, $extraValues, $blueprint] = $this->extractFromFields($term, $blueprint);
+        [$values, $meta, $extraValues] = $this->extractFromFields($term, $blueprint);
 
         if ($hasOrigin = $term->hasOrigin()) {
             [$originValues, $originMeta] = $this->extractFromFields($term->origin(), $blueprint);
@@ -169,10 +169,7 @@ class TermsController extends CpController
 
         $term->term()->syncOriginal();
 
-        $fields = $taxonomy
-            ->ensurePublishParentField($term->blueprint(), $term)
-            ->fields()
-            ->addValues($request->except('id'));
+        $fields = $term->blueprint()->fields()->addValues($request->except('id'));
 
         $fields->validate([
             'title' => 'required',
@@ -189,12 +186,6 @@ class TermsController extends CpController
             $term->blueprint($explicitBlueprint);
         }
 
-        $parent = $taxonomy->hierarchical() ? $values->pull('parent') : null;
-
-        if ($taxonomy->hierarchical() && $request->exists('parent')) {
-            $this->assertValidParentMove($taxonomy, $term, $parent);
-        }
-
         $values = $values->except(['slug', 'date']);
 
         if ($term->hasOrigin()) {
@@ -208,10 +199,6 @@ class TermsController extends CpController
         $term->published($request->published);
 
         $saved = $term->updateLastModified(User::current())->save();
-
-        if ($taxonomy->hierarchical() && $request->exists('parent')) {
-            $this->moveTermInTree($taxonomy, $term, $parent);
-        }
 
         [$values, $meta, $extraValues] = $this->extractFromFields($term, $term->blueprint());
 
@@ -235,17 +222,8 @@ class TermsController extends CpController
             throw new \Exception('A valid blueprint is required.');
         }
 
-        $blueprint = $taxonomy->ensurePublishParentField($blueprint);
-
-        $values = [];
-
-        if ($taxonomy->hierarchical() && $request->parent) {
-            $values['parent'] = Arr::wrap($request->parent);
-        }
-
         $fields = $blueprint
             ->fields()
-            ->addValues($values)
             ->preProcess();
 
         $values = $fields->values()->merge([
@@ -309,7 +287,7 @@ class TermsController extends CpController
     {
         $this->authorize('store', [TermContract::class, $taxonomy]);
 
-        $blueprint = $taxonomy->ensurePublishParentField($taxonomy->termBlueprint($request->_blueprint));
+        $blueprint = $taxonomy->termBlueprint($request->_blueprint);
 
         $fields = $blueprint->fields()->addValues($request->all());
 
@@ -320,9 +298,7 @@ class TermsController extends CpController
 
         $values = $fields->process()->values()->except(['slug', 'blueprint']);
 
-        $parent = $taxonomy->hierarchical()
-            ? ($values->pull('parent') ?: $request->_parent)
-            : null;
+        $parent = $taxonomy->hierarchical() ? $request->_parent : null;
 
         $term = Term::make()
             ->taxonomy($taxonomy)
@@ -349,7 +325,7 @@ class TermsController extends CpController
             ->slug($slug);
 
         if ($taxonomy->hierarchical() && $parent) {
-            $this->assertValidParentMove($taxonomy, $term, $parent);
+            $this->assertParentAllowsChild($taxonomy, $parent);
         }
 
         $saved = $term->updateLastModified(User::current())->save();
@@ -377,69 +353,24 @@ class TermsController extends CpController
         $taxonomy->structure()->graftTerm($slug, $parent);
     }
 
-    private function assertValidParentMove($taxonomy, $term, $parent): void
+    /**
+     * The tree itself would reject the graft, but only once the term has been saved.
+     */
+    private function assertParentAllowsChild($taxonomy, $parent): void
     {
-        $slug = $term->inDefaultLocale()->slug();
+        if (! $max = $taxonomy->structure()->maxDepth()) {
+            return;
+        }
+
         $parent = $this->termSlugFromParentValue($taxonomy, $parent);
 
-        if ($parent === $slug) {
-            throw ValidationException::withMessages([
-                'parent' => __('statamic::validation.parent_cannot_be_itself'),
-            ]);
-        }
+        $page = $taxonomy->structure()->tree()->find($parent);
 
-        $tree = $taxonomy->structure()->tree();
-        $page = $tree->find($slug);
-
-        if ($parent) {
-            $parentPage = $tree->find($parent);
-
-            if (! $parentPage) {
-                return;
-            }
-
-            $descendantIds = collect($page?->flattenedPages()?->map->id() ?? []);
-
-            if ($descendantIds->contains($parent)) {
-                throw ValidationException::withMessages([
-                    'parent' => __('statamic::validation.parent_cannot_be_descendant'),
-                ]);
-            }
-        }
-
-        $branchHeight = 1;
-
-        if ($page && ($descendants = $page->flattenedPages()) && $descendants->isNotEmpty()) {
-            $branchHeight = $descendants->max->depth() - $page->depth() + 1;
-        }
-
-        $parentDepth = $parent ? $tree->find($parent)->depth() : 0;
-
-        if (($max = $taxonomy->structure()->maxDepth()) && ($parentDepth + $branchHeight) > $max) {
+        if ($page && $page->depth() >= $max) {
             throw ValidationException::withMessages([
                 'parent' => __('statamic::validation.parent_exceeds_max_depth'),
             ]);
         }
-    }
-
-    private function moveTermInTree($taxonomy, $term, $parent): void
-    {
-        $slug = $term->inDefaultLocale()->slug();
-        $parent = $this->termSlugFromParentValue($taxonomy, $parent);
-        $tree = $taxonomy->structure()->tree();
-
-        $currentParentSlug = $term->parent()?->inDefaultLocale()->slug();
-
-        if ($currentParentSlug === $parent) {
-            return;
-        }
-
-        if ($parent && ! $tree->find($parent)) {
-            return;
-        }
-
-        $tree->tree($tree->tree());
-        $tree->move($slug, $parent)->save();
     }
 
     private function termSlugFromParentValue($taxonomy, $value): ?string

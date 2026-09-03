@@ -31,7 +31,7 @@ class CreateTermTest extends TestCase
     }
 
     #[Test]
-    public function creating_a_child_term_prefills_the_parent_field()
+    public function creating_a_child_term_passes_the_parent_through()
     {
         $this->makeHierarchicalTaxonomy();
 
@@ -42,8 +42,6 @@ class CreateTermTest extends TestCase
             ->assertInertia(fn ($page) => $page
                 ->component('terms/Create')
                 ->where('parent', 'categories::cat')
-                ->where('values.parent', ['categories::cat'])
-                ->missing('parents')
             );
     }
 
@@ -59,13 +57,11 @@ class CreateTermTest extends TestCase
             ->assertInertia(fn ($page) => $page
                 ->component('terms/Create')
                 ->where('parent', null)
-                ->where('values.parent', [])
-                ->missing('parents')
             );
     }
 
     #[Test]
-    public function creating_a_term_with_a_parent_field_grafts_it_into_the_tree()
+    public function creating_a_term_with_a_parent_grafts_it_into_the_tree()
     {
         $this->makeHierarchicalTaxonomy();
 
@@ -76,7 +72,7 @@ class CreateTermTest extends TestCase
                 'slug' => 'dog',
                 '_blueprint' => 'category',
                 'published' => true,
-                'parent' => ['categories::animals'],
+                '_parent' => 'categories::animals',
             ])
             ->assertOk();
 
@@ -140,7 +136,7 @@ class CreateTermTest extends TestCase
                 'slug' => 'calico',
                 '_blueprint' => 'category',
                 'published' => true,
-                'parent' => ['categories::cat'],
+                '_parent' => 'categories::cat',
             ])
             ->assertJsonValidationErrors('parent');
 

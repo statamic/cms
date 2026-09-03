@@ -2,12 +2,15 @@
 
 namespace Tests\Feature\Taxonomies;
 
+use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
 use Statamic\Facades\User;
+use Statamic\Fields\Blueprint;
+use Tests\Fakes\FakeBlueprintRepository;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -135,40 +138,20 @@ class UpdateTermTest extends TestCase
     }
 
     #[Test]
-    public function editing_a_term_hydrates_the_parent_field()
+    public function a_blueprint_can_declare_its_own_parent_field()
     {
+        BlueprintRepository::swap(new FakeBlueprintRepository(BlueprintRepository::getFacadeRoot()));
+
         $this->setTestRoles(['test' => ['access cp', 'edit categories terms']]);
         $user = tap(User::make()->assignRole('test'))->save();
 
         $taxonomy = tap(Taxonomy::make('categories')->structureContents([]))->save();
 
-        tap(Term::make('animals')->taxonomy('categories')->data(['title' => 'Animals']))->save();
-        $term = tap(Term::make('cat')->taxonomy('categories')->data(['title' => 'Cat']))->save();
-
-        $taxonomy->structure()->tree()->tree([
-            ['term' => 'animals', 'children' => [
-                ['term' => 'cat'],
-            ]],
+        (new Blueprint)->setHandle('category')->setNamespace('taxonomies.categories')->setContents([
+            'fields' => [
+                ['handle' => 'parent', 'field' => ['type' => 'text']],
+            ],
         ])->save();
-
-        $this
-            ->actingAs($user)
-            ->get($term->inDefaultLocale()->editUrl())
-            ->assertOk()
-            ->assertInertia(fn ($page) => $page
-                ->component('terms/Edit')
-                ->where('values.parent', ['categories::animals'])
-                ->missing('parents')
-            );
-    }
-
-    #[Test]
-    public function a_term_can_be_reparented()
-    {
-        $this->setTestRoles(['test' => ['access cp', 'edit categories terms']]);
-        $user = tap(User::make()->assignRole('test'))->save();
-
-        $taxonomy = tap(Taxonomy::make('categories')->structureContents([]))->save();
 
         foreach (['animals', 'cat', 'furniture'] as $slug) {
             tap(Term::make($slug)->taxonomy('categories')->data(['title' => ucfirst($slug)]))->save();
@@ -188,156 +171,14 @@ class UpdateTermTest extends TestCase
             ->update($term, [
                 'title' => 'Cat',
                 'slug' => 'cat',
-                'parent' => ['categories::furniture'],
+                'parent' => 'furniture',
             ])
             ->assertOk();
 
         $term = $term->fresh()->inDefaultLocale();
 
-        $this->assertEquals('furniture', $term->parent()->inDefaultLocale()->slug());
-        $this->assertArrayNotHasKey('parent', $term->data()->all());
-        $this->assertEquals([
-            ['term' => 'animals'],
-            ['term' => 'furniture', 'children' => [
-                ['term' => 'cat'],
-            ]],
-        ], Taxonomy::findByHandle('categories')->structure()->tree()->fileData()['tree']);
-    }
-
-    #[Test]
-    public function a_term_can_be_moved_to_the_root()
-    {
-        $this->setTestRoles(['test' => ['access cp', 'edit categories terms']]);
-        $user = tap(User::make()->assignRole('test'))->save();
-
-        $taxonomy = tap(Taxonomy::make('categories')->structureContents([]))->save();
-
-        tap(Term::make('animals')->taxonomy('categories')->data(['title' => 'Animals']))->save();
-        $term = tap(Term::make('cat')->taxonomy('categories')->data(['title' => 'Cat']))->save();
-
-        $taxonomy->structure()->tree()->tree([
-            ['term' => 'animals', 'children' => [
-                ['term' => 'cat'],
-            ]],
-        ])->save();
-
-        $this
-            ->actingAs($user)
-            ->update($term->inDefaultLocale(), [
-                'title' => 'Cat',
-                'slug' => 'cat',
-                'parent' => [],
-            ])
-            ->assertOk();
-
-        $term = $term->fresh()->inDefaultLocale();
-
-        $this->assertNull($term->parent());
-        $this->assertArrayNotHasKey('parent', $term->data()->all());
-        $this->assertEquals([
-            ['term' => 'animals'],
-            ['term' => 'cat'],
-        ], Taxonomy::findByHandle('categories')->structure()->tree()->fileData()['tree']);
-    }
-
-    #[Test]
-    public function a_term_cannot_be_its_own_parent()
-    {
-        $this->setTestRoles(['test' => ['access cp', 'edit categories terms']]);
-        $user = tap(User::make()->assignRole('test'))->save();
-
-        $taxonomy = tap(Taxonomy::make('categories')->structureContents([]))->save();
-
-        tap(Term::make('animals')->taxonomy('categories')->data(['title' => 'Animals']))->save();
-        $term = tap(Term::make('cat')->taxonomy('categories')->data(['title' => 'Cat']))->save();
-
-        $taxonomy->structure()->tree()->tree([
-            ['term' => 'animals', 'children' => [
-                ['term' => 'cat'],
-            ]],
-        ])->save();
-
-        $this
-            ->actingAs($user)
-            ->update($term->inDefaultLocale(), [
-                'title' => 'Updated Cat',
-                'slug' => 'cat',
-                'parent' => ['categories::cat'],
-            ])
-            ->assertJsonValidationErrors('parent');
-
-        $term = $term->fresh()->inDefaultLocale();
-        $this->assertEquals('Cat', $term->title);
+        $this->assertEquals('furniture', $term->get('parent'));
         $this->assertEquals('animals', $term->parent()->inDefaultLocale()->slug());
-    }
-
-    #[Test]
-    public function a_term_cannot_be_nested_under_a_descendant()
-    {
-        $this->setTestRoles(['test' => ['access cp', 'edit categories terms']]);
-        $user = tap(User::make()->assignRole('test'))->save();
-
-        $taxonomy = tap(Taxonomy::make('categories')->structureContents([]))->save();
-
-        foreach (['animals', 'cat'] as $slug) {
-            tap(Term::make($slug)->taxonomy('categories')->data(['title' => ucfirst($slug)]))->save();
-        }
-
-        $taxonomy->structure()->tree()->tree([
-            ['term' => 'animals', 'children' => [
-                ['term' => 'cat'],
-            ]],
-        ])->save();
-
-        $term = Term::find('categories::animals')->inDefaultLocale();
-
-        $this
-            ->actingAs($user)
-            ->update($term, [
-                'title' => 'Updated Animals',
-                'slug' => 'animals',
-                'parent' => ['categories::cat'],
-            ])
-            ->assertJsonValidationErrors('parent');
-
-        $term = $term->fresh()->inDefaultLocale();
-        $this->assertEquals('Animals', $term->title);
-        $this->assertNull($term->parent());
-    }
-
-    #[Test]
-    public function a_term_cannot_be_moved_beyond_max_depth()
-    {
-        $this->setTestRoles(['test' => ['access cp', 'edit categories terms']]);
-        $user = tap(User::make()->assignRole('test'))->save();
-
-        $taxonomy = tap(Taxonomy::make('categories')->structureContents(['max_depth' => 2]))->save();
-
-        foreach (['animals', 'cat', 'furniture'] as $slug) {
-            tap(Term::make($slug)->taxonomy('categories')->data(['title' => ucfirst($slug)]))->save();
-        }
-
-        $taxonomy->structure()->tree()->tree([
-            ['term' => 'animals', 'children' => [
-                ['term' => 'cat'],
-            ]],
-            ['term' => 'furniture'],
-        ])->save();
-
-        $term = Term::find('categories::furniture')->inDefaultLocale();
-
-        $this
-            ->actingAs($user)
-            ->update($term, [
-                'title' => 'Updated Furniture',
-                'slug' => 'furniture',
-                'parent' => ['categories::cat'],
-            ])
-            ->assertJsonValidationErrors('parent');
-
-        $term = $term->fresh()->inDefaultLocale();
-        $this->assertEquals('Furniture', $term->title);
-        $this->assertNull($term->parent());
     }
 
     private function update($term, $attrs = [])
