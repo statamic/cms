@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Statamic\Facades\FormConnection;
 use Statamic\Facades\OAuth;
 use Statamic\Facades\TwoFactor;
 use Statamic\Facades\Utility;
@@ -363,7 +364,10 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::post('forms/{form}/builder/fieldset-previews', FormFieldsetPreviewsController::class)->name('forms.builder.fieldset-previews');
     Route::get('forms/{form}/logic', [FormLogicController::class, 'edit'])->name('forms.logic.edit');
     Route::patch('forms/{form}/logic', [FormLogicController::class, 'update'])->name('forms.logic.update');
-    Route::get('forms/{form}/connect', FormConnectController::class)->name('forms.connect.index');
+    Route::get('forms/{form}/connect', [FormConnectController::class, 'index'])->name('forms.connect.index');
+    Route::get('forms/{form}/connect/{connection}', [FormConnectController::class, 'edit'])->name('forms.connect.edit');
+    Route::patch('forms/{form}/connect/{connection}', [FormConnectController::class, 'update'])->name('forms.connect.update');
+    FormConnection::routes();
     Route::get('forms/{form}/export/{type}', [FormExportController::class, 'export'])->name('forms.export');
 
     Route::post('users/actions', [UserActionController::class, 'run'])->name('users.actions.run');

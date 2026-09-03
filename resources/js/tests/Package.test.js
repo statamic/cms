@@ -17,6 +17,8 @@ it('exports modules', async () => {
 
 it('exports core', async () => {
     const expected = [
+        'ConnectionRows',
+        'ConnectionRules',
         'DateFormatter',
         'Fieldtype',
         'FieldtypeMixin',
@@ -35,6 +37,7 @@ it('exports core', async () => {
         'SaveButtonOptions',
         'SortableList',
         'clone',
+        'conditionsSummary',
         'debounce',
         'deepClone',
         'requireElevatedSession',

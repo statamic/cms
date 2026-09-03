@@ -172,6 +172,7 @@ return [
     'elevated_session_resend_code_unavailable' => 'Resend code is only available for verification code method.',
     'elevated_session_verification_code' => 'The verification code is incorrect.',
     'email_available' => 'A user with this email already exists.',
+    'email_field_reference' => "References a field that doesn't exist on this form.",
     'fieldset_imported_recursively' => 'Fieldset :handle is being imported recursively.',
     'one_site_without_origin' => 'At least one site must not have an origin.',
     'options_require_keys' => 'All options must have keys.',

@@ -2,7 +2,9 @@
 
 namespace Statamic\Forms;
 
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
@@ -12,9 +14,9 @@ use Statamic\Fields\Field;
 use Statamic\Forms\Uploaders\AssetsUploader;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class CreateAssetsFromFileUploads
+class CreateAssetsFromFileUploads implements ShouldQueue
 {
-    use Dispatchable, SerializesModels;
+    use Dispatchable, Queueable, SerializesModels;
 
     public function __construct(public Submission $submission)
     {

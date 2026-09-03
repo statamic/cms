@@ -92,6 +92,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Grid::class,
         Fieldtypes\Group::class,
         Fieldtypes\FormBanner::class,
+        Fieldtypes\FormFields::class,
         Fieldtypes\FormHeading::class,
         Fieldtypes\FormParagraph::class,
         Fieldtypes\FormUpload::class,
@@ -139,6 +140,11 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Yaml::class,
         Fieldtypes\YesNo::class,
         \Statamic\Forms\Fieldtype::class,
+    ];
+
+    protected $formConnections = [
+        Forms\Connections\Email::class,
+        Forms\Connections\Webhook::class,
     ];
 
     protected $formFieldtypes = [
@@ -353,6 +359,11 @@ class ExtensionServiceProvider extends ServiceProvider
                 'class' => Fieldtype::class,
                 'directory' => 'Fieldtypes',
                 'extensions' => $this->fieldtypes,
+            ],
+            'form-connections' => [
+                'class' => Forms\Connections\Connection::class,
+                'directory' => 'FormConnections',
+                'extensions' => $this->formConnections,
             ],
             'form-fieldtypes' => [
                 'class' => FormFieldtype::class,
