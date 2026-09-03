@@ -108,6 +108,7 @@ class SiteLicenseTest extends TestCase
         $this->assertEquals('https://statamic.com/account/licensing/handoff?'.http_build_query([
             'key' => 'test-key',
             'name' => config('app.name'),
+            'host' => request()->getHost(),
             'return' => url(cp_route('utilities.licensing')),
         ]), $this->license()->handoffUrl());
     }

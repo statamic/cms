@@ -112,6 +112,7 @@ class SiteLicense extends License
         return rtrim(config('statamic.system.licensing_url', 'https://statamic.com'), '/').'/account/licensing/handoff?'.http_build_query(array_filter([
             'key' => $key,
             'name' => config('app.name'),
+            'host' => request()->getHost(),
             'return' => url(cp_route('utilities.licensing')),
         ]));
     }
