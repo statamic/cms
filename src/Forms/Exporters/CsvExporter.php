@@ -61,6 +61,11 @@ class CsvExporter extends Exporter
         $this->writer->insertAll($data);
     }
 
+    public function supportsColumnSelection(): bool
+    {
+        return true;
+    }
+
     public function extension(): string
     {
         return 'csv';

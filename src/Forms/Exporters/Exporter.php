@@ -79,7 +79,7 @@ abstract class Exporter
 
     public function supportsColumnSelection(): bool
     {
-        return true;
+        return false;
     }
 
     public function contentType(): string

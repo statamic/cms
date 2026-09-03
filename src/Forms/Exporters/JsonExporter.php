@@ -19,6 +19,11 @@ class JsonExporter extends Exporter
         return json_encode($submissions);
     }
 
+    public function supportsColumnSelection(): bool
+    {
+        return true;
+    }
+
     public function contentType(): string
     {
         return 'application/json';
