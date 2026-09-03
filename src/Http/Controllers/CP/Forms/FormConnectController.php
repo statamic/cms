@@ -50,6 +50,7 @@ class FormConnectController extends CpController
                 'title' => $connection->title(),
                 'description' => $connection->description(),
                 'icon' => $connection->breadcrumbIcon(),
+                'iconColor' => $connection->breadcrumbIconColor(),
             ],
             'component' => $connection->render($form),
             'value' => $connection->preProcess($form->connections()->get($connection->handle(), []), $form),

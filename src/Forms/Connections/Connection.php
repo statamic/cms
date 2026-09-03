@@ -59,6 +59,11 @@ abstract class Connection
         return $this->icon();
     }
 
+    public function breadcrumbIconColor(): ?string
+    {
+        return null;
+    }
+
     public function developer(): ?string
     {
         return $this->developer;
