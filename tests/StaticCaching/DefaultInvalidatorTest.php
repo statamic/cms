@@ -13,12 +13,14 @@ use Statamic\Contracts\Globals\GlobalSet;
 use Statamic\Contracts\Structures\Nav;
 use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Facades\Entry as EntryFacade;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Globals\Variables;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\DefaultInvalidator as Invalidator;
 use Statamic\Structures\CollectionTree;
+use Statamic\Structures\CollectionTreeDiff;
 use Statamic\Structures\NavTree;
 use Statamic\Structures\Structure;
 use Statamic\Taxonomies\LocalizedTerm;
@@ -224,6 +226,7 @@ class DefaultInvalidatorTest extends TestCase
             $m->shouldReceive('structure')->andReturn($structure);
             $m->shouldReceive('collection')->andReturn($collection);
             $m->shouldReceive('site')->andReturn(Site::default());
+            $m->shouldReceive('diff')->andReturn(new CollectionTreeDiff);
         });
 
         $invalidator = new Invalidator($cacher, [
@@ -273,6 +276,7 @@ class DefaultInvalidatorTest extends TestCase
             $m->shouldReceive('structure')->andReturn($structure);
             $m->shouldReceive('collection')->andReturn($collection);
             $m->shouldReceive('site')->andReturn(Site::get('fr'));
+            $m->shouldReceive('diff')->andReturn(new CollectionTreeDiff);
         });
 
         $invalidator = new Invalidator($cacher, [
@@ -285,6 +289,56 @@ class DefaultInvalidatorTest extends TestCase
                         '/test/{test}',
                         '{{ if favourite_color == "purple" }}/purple{{ /if }}',
                         '{{ if favourite_color == "red" }}/red{{ /if }}',
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertNull($invalidator->invalidate($tree));
+    }
+
+    #[Test]
+    public function moved_entry_urls_can_be_invalidated_by_a_tree()
+    {
+        $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
+            $cacher->shouldReceive('invalidateUrls')->with([
+                'http://localhost/parent/child',
+                'http://localhost/blog/one',
+            ])->once();
+        });
+
+        $movedEntry = tap(Mockery::mock(Entry::class), function ($m) {
+            $m->shouldReceive('isRedirect')->andReturn(false);
+            $m->shouldReceive('absoluteUrl')->andReturn('http://localhost/parent/child');
+        });
+
+        $redirectEntry = tap(Mockery::mock(Entry::class), function ($m) {
+            $m->shouldReceive('isRedirect')->andReturn(true);
+        });
+
+        EntryFacade::shouldReceive('find')->with('child')->andReturn($movedEntry);
+        EntryFacade::shouldReceive('find')->with('redirect')->andReturn($redirectEntry);
+        EntryFacade::shouldReceive('find')->with('missing')->andReturnNull();
+
+        $diff = tap(Mockery::mock(CollectionTreeDiff::class), function ($m) {
+            $m->shouldReceive('ancestryChanged')->andReturn(['child', 'redirect', 'missing']);
+        });
+
+        $collection = tap(Mockery::mock(Collection::class), function ($m) {
+            $m->shouldReceive('handle')->andReturn('blog');
+        });
+
+        $tree = tap(Mockery::mock(CollectionTree::class), function ($m) use ($collection, $diff) {
+            $m->shouldReceive('collection')->andReturn($collection);
+            $m->shouldReceive('site')->andReturn(Site::default());
+            $m->shouldReceive('diff')->andReturn($diff);
+        });
+
+        $invalidator = new Invalidator($cacher, [
+            'collections' => [
+                'blog' => [
+                    'urls' => [
+                        '/blog/one',
                     ],
                 ],
             ],
