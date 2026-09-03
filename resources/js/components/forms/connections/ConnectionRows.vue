@@ -127,16 +127,13 @@ watch(
 </script>
 
 <template>
-    <LogicEmptyState
-        v-if="modelValue.length === 0"
-        :heading="emptyHeading"
-        :description="emptyDescription"
-    >
+    <Description v-if="emptyDescription" :text="emptyDescription" class="mb-4" />
+
+    <div v-if="modelValue.length === 0">
         <Button size="sm" :text="addLabel" icon="plus" @click="add" />
-    </LogicEmptyState>
+    </div>
 
     <template v-else>
-        <Description v-if="emptyDescription" :text="emptyDescription" class="mb-4" />
 
         <SortableList
             vertical
