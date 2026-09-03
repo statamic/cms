@@ -20,25 +20,6 @@ const showExamplePayload = ref<boolean>(props.modelValue.length === 0);
 </script>
 
 <template>
-    <Field
-        class="mb-8"
-        :label="__('Example Payload')"
-        :instructions="__('statamic::messages.webhook_connection_payload_instructions')"
-    >
-        <template #actions>
-            <Button
-                variant="subtle"
-                size="xs"
-                :icon-append="showExamplePayload ? 'chevron-up' : 'chevron-down'"
-                :text="showExamplePayload ? __('Hide') : __('Show')"
-                :aria-expanded="showExamplePayload"
-                @click="showExamplePayload = !showExamplePayload"
-            />
-        </template>
-
-        <pre v-show="showExamplePayload" class="overflow-x-auto rounded-lg border border-gray-200 bg-gray-50 p-4 text-xs text-gray-800 dark:border-white/10 dark:bg-gray-950/40 dark:text-gray-300"><code>{{ examplePayload }}</code></pre>
-    </Field>
-
     <Label v-if="modelValue.length" :text="__('Webhooks')" />
 
     <ConnectionRows
@@ -87,4 +68,23 @@ const showExamplePayload = ref<boolean>(props.modelValue.length === 0);
             </ConnectionRules>
         </template>
     </ConnectionRows>
+
+    <Field
+        class="mt-8"
+        :label="__('Example Payload')"
+        :instructions="__('statamic::messages.webhook_connection_payload_instructions')"
+    >
+        <template #actions>
+            <Button
+                variant="subtle"
+                size="xs"
+                :icon-append="showExamplePayload ? 'chevron-up' : 'chevron-down'"
+                :text="showExamplePayload ? __('Hide') : __('Show')"
+                :aria-expanded="showExamplePayload"
+                @click="showExamplePayload = !showExamplePayload"
+            />
+        </template>
+
+        <pre v-show="showExamplePayload" class="overflow-x-auto rounded-lg border border-gray-200 bg-gray-50 p-4 text-xs text-gray-800 dark:border-white/10 dark:bg-gray-950/40 dark:text-gray-300"><code>{{ examplePayload }}</code></pre>
+    </Field>
 </template>
