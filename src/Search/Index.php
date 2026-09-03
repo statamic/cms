@@ -12,7 +12,7 @@ abstract class Index
     protected $handle;
     protected $locale;
     protected $config;
-    protected bool $shouldQueue = true;
+    protected ?string $queueConnection = null;
     protected static ?Closure $nameCallback = null;
 
     abstract public function search($query);
@@ -106,15 +106,19 @@ abstract class Index
                     documents: $documents
                 );
 
-                $this->shouldQueue ? dispatch($job) : dispatch_sync($job);
+                if ($this->queueConnection) {
+                    $job->onConnection($this->queueConnection);
+                }
+
+                dispatch($job);
             });
 
         return $this;
     }
 
-    public function withoutQueue()
+    public function onConnection(string $connection)
     {
-        $this->shouldQueue = false;
+        $this->queueConnection = $connection;
 
         return $this;
     }

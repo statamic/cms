@@ -16,7 +16,7 @@ class Update extends Command
     protected $signature = 'statamic:search:update
         { index? : The handle of the index to update. }
         { --all : Update all indexes. }
-        { --sync : Index the documents immediately instead of queueing them. }';
+        { --queue= : The queue connection used for indexing jobs. }';
 
     protected $description = 'Update a search index';
 
@@ -25,8 +25,8 @@ class Update extends Command
     public function handle()
     {
         foreach ($this->getIndexes() as $index) {
-            if ($this->option('sync')) {
-                $index->withoutQueue();
+            if ($queue = $this->option('queue')) {
+                $index->onConnection($queue);
             }
 
             $index->update();

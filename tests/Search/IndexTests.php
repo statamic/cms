@@ -72,17 +72,17 @@ trait IndexTests
     }
 
     #[Test]
-    public function it_dispatches_the_insert_job_synchronously_when_queueing_is_disabled()
+    public function it_dispatches_the_insert_job_on_the_given_queue_connection()
     {
         Bus::fake();
 
         $index = $this->getIndex('test', [], 'en');
 
-        $index->withoutQueue()->insertMultiple(collect(['foo::bar']));
+        $index->onConnection('sync')->insertMultiple(collect(['foo::bar']));
 
-        Bus::assertDispatchedSync(
+        Bus::assertDispatched(
             InsertMultipleJob::class,
-            fn (InsertMultipleJob $job) => $job->name === 'test' && $job->locale === 'en'
+            fn (InsertMultipleJob $job) => $job->name === 'test' && $job->locale === 'en' && $job->connection === 'sync'
         );
     }
 }

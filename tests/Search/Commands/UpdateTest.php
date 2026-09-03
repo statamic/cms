@@ -74,21 +74,21 @@ class UpdateTest extends TestCase
     }
 
     #[Test]
-    public function it_queues_the_indexing_by_default()
+    public function it_uses_the_configured_queue_connection_by_default()
     {
         $index = $this->fakeIndex();
-        $index->shouldReceive('withoutQueue')->never();
+        $index->shouldReceive('onConnection')->never();
 
         $this->artisan(Update::class, ['index' => 'test'])->assertExitCode(0);
     }
 
     #[Test]
-    public function it_indexes_immediately_when_using_the_sync_option()
+    public function it_uses_the_queue_connection_from_the_queue_option()
     {
         $index = $this->fakeIndex();
-        $index->shouldReceive('withoutQueue')->once()->andReturnSelf();
+        $index->shouldReceive('onConnection')->once()->with('sync')->andReturnSelf();
 
-        $this->artisan(Update::class, ['index' => 'test', '--sync' => true])->assertExitCode(0);
+        $this->artisan(Update::class, ['index' => 'test', '--queue' => 'sync'])->assertExitCode(0);
     }
 
     #[Test]
