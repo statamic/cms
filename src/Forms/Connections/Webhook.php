@@ -29,6 +29,11 @@ class Webhook extends Connection
         return Statamic::svg('forms/connect/webhook');
     }
 
+    public function breadcrumbIcon(): ?string
+    {
+        return Statamic::svg('forms/connect/webhook-flat');
+    }
+
     public function count(Form $form): ?int
     {
         return count($form->connections()->get('webhook', []));
