@@ -9,6 +9,7 @@ use Statamic\Contracts\Assets\Asset;
 use Statamic\Events\AssetDeleted;
 use Statamic\Events\AssetReuploaded;
 use Statamic\Events\AssetSaved;
+use Statamic\Events\AssetUploaded;
 use Statamic\Facades\Glide;
 use Statamic\Imaging\PresetGenerator;
 use Statamic\Listeners\ClearAssetGlideCache;
@@ -20,9 +21,10 @@ class ClearAssetGlideCacheTest extends TestCase
     public function it_subscribes()
     {
         $events = Mockery::mock(Dispatcher::class);
-        $events->shouldReceive('listen')->with(AssetReuploaded::class, [ClearAssetGlideCache::class, 'handleReuploaded'])->once();
-        $events->shouldReceive('listen')->with(AssetDeleted::class, [ClearAssetGlideCache::class, 'handleDeleted'])->once();
         $events->shouldReceive('listen')->with(AssetSaved::class, [ClearAssetGlideCache::class, 'handleSaved'])->once();
+        $events->shouldReceive('listen')->with(AssetDeleted::class, [ClearAssetGlideCache::class, 'handleDeleted'])->once();
+        $events->shouldReceive('listen')->with(AssetReuploaded::class, [ClearAssetGlideCache::class, 'handleReuploaded'])->once();
+        $events->shouldReceive('listen')->with(AssetUploaded::class, [ClearAssetGlideCache::class, 'handleUploaded'])->once();
 
         app(ClearAssetGlideCache::class)->subscribe($events);
     }

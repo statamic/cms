@@ -7,6 +7,7 @@ use Statamic\Contracts\Assets\Asset;
 use Statamic\Events\AssetDeleted;
 use Statamic\Events\AssetReuploaded;
 use Statamic\Events\AssetSaved;
+use Statamic\Events\AssetUploaded;
 use Statamic\Events\Subscriber;
 use Statamic\Facades\Glide;
 use Statamic\Imaging\PresetGenerator;
@@ -22,6 +23,7 @@ class ClearAssetGlideCache extends Subscriber implements ShouldQueue
         AssetSaved::class => 'handleSaved',
         AssetDeleted::class => 'handleDeleted',
         AssetReuploaded::class => 'handleReuploaded',
+        AssetUploaded::class => 'handleUploaded',
     ];
 
     public function __construct(PresetGenerator $generator)
@@ -30,6 +32,14 @@ class ClearAssetGlideCache extends Subscriber implements ShouldQueue
     }
 
     public function handleReuploaded(AssetReuploaded $event)
+    {
+        $this->clear($event->asset);
+    }
+
+    /**
+     * Clear cached transforms when uploading over an on-disk file that has no asset record.
+     */
+    public function handleUploaded(AssetUploaded $event)
     {
         $this->clear($event->asset);
     }
