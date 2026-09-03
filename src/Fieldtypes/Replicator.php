@@ -269,6 +269,9 @@ class Replicator extends Fieldtype
             'new' => $new ?? null,
             'defaults' => $defaults ?? null,
             'collapsed' => $this->config('collapse') ? array_keys($existing) : [],
+            'setConfigHashes' => $this->flattenedSetsConfig()
+                ->map(fn ($set) => $set['hash'])
+                ->all(),
         ];
     }
 
@@ -304,9 +307,16 @@ class Replicator extends Fieldtype
                 ]);
             }
 
-            return $sets->flatMap(function ($section) {
-                return $section['sets'];
-            });
+            return $sets
+                ->flatMap(function ($section) {
+                    return $section['sets'];
+                })
+                ->map(function ($config, $handle) {
+                    return [
+                        ...$config,
+                        'hash' => md5($handle.json_encode($config)),
+                    ];
+                });
         });
     }
 
