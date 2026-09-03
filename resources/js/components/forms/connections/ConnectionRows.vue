@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import { nanoid as uniqid } from 'nanoid';
-import { Button, ConfirmationModal } from '@ui';
+import { Button, ConfirmationModal, Description } from '@ui';
 import { SortableList } from '@/components/sortable/Sortable.js';
 import { deepClone } from '@/util/clone.js';
 import LogicEmptyState from '@/components/forms/logic/LogicEmptyState.vue';
@@ -127,11 +127,17 @@ watch(
 </script>
 
 <template>
-    <LogicEmptyState v-if="modelValue.length === 0" :heading="emptyHeading" :description="emptyDescription">
+    <LogicEmptyState
+        v-if="modelValue.length === 0"
+        :heading="emptyHeading"
+        :description="emptyDescription"
+    >
         <Button size="sm" :text="addLabel" icon="plus" @click="add" />
     </LogicEmptyState>
 
     <template v-else>
+        <Description v-if="emptyDescription" :text="emptyDescription" class="mb-4" />
+
         <SortableList
             vertical
             constrain-dimensions

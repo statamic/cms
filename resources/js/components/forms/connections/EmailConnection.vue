@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { usePage } from '@inertiajs/vue3';
-import { Badge, Icon, PublishContainer, PublishFields, PublishFieldsProvider, Subheading } from '@ui';
+import { Badge, Icon, Label, PublishContainer, PublishFields, PublishFieldsProvider, Subheading } from '@ui';
 import ConnectionRows from './ConnectionRows.vue';
 import ConnectionRules, { conditionsSummary } from './ConnectionRules.vue';
+import { __n } from '@/bootstrap/globals';
 
 defineEmits(['update:modelValue']);
 
@@ -29,6 +30,13 @@ const recipients = (to: string[] | string): string =>
 </script>
 
 <template>
+    <Label v-if="modelValue.length">
+        <span class="inline-flex items-center gap-2">
+            <Badge size="lg" pill color="white">{{ modelValue.length }}</Badge>
+            <span>{{ __n(':count Email Configured|:count Emails Configured', modelValue.length) }}</span>
+        </span>
+    </Label>
+
     <ConnectionRows
         :model-value="modelValue"
         :errors
