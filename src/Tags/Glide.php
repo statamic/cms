@@ -15,6 +15,7 @@ use Statamic\Facades\Glide as GlideManager;
 use Statamic\Facades\Image;
 use Statamic\Facades\Path;
 use Statamic\Facades\URL;
+use Statamic\Imaging\AssetNotFoundException;
 use Statamic\Imaging\ImageGenerator;
 use Statamic\Support\Str;
 
@@ -177,7 +178,15 @@ class Glide extends Tags
                 : $this->getGenerator()->generateByPath($item, $params);
         }
 
-        return $this->getGenerator()->generateByAsset(Asset::find($item), $params);
+        $asset = $item instanceof AssetContract ? $item : Asset::find((string) $item);
+
+        if (! $asset) {
+            throw new AssetNotFoundException(
+                sprintf('Could not generate a manipulated image from asset [%s]', $item)
+            );
+        }
+
+        return $this->getGenerator()->generateByAsset($asset, $params);
     }
 
     /**

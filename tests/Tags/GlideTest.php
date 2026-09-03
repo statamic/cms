@@ -56,6 +56,26 @@ class GlideTest extends TestCase
     }
 
     #[Test]
+    public function it_doesnt_error_when_an_asset_url_cannot_be_resolved()
+    {
+        $tag = <<<'EOT'
+{{ glide src="http://external.com/bar (1).jpg" width="100" }}{{ url }}{{ /glide }}
+EOT;
+
+        $this->assertSame('', (string) Parse::template($tag, trusted: true));
+    }
+
+    #[Test]
+    public function it_doesnt_error_when_an_asset_id_cannot_be_resolved()
+    {
+        $tag = <<<'EOT'
+{{ glide src="test::bar.jpg" width="100" }}{{ url }}{{ /glide }}
+EOT;
+
+        $this->assertSame('', (string) Parse::template($tag, trusted: true));
+    }
+
+    #[Test]
     public function it_outputs_a_data_url()
     {
         $this->createImageInPublicDirectory();
