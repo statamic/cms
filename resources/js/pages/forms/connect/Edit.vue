@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, onUnmounted, ref, watch } from 'vue';
+import { onMounted, onUnmounted, provide, reactive, ref, watch } from 'vue';
 import axios from 'axios';
 import { keys } from '@api';
 import Layout from '@/pages/layout/Layout.vue';
@@ -21,6 +21,9 @@ const props = defineProps({
     isConfigured: Boolean,
     suggestableFields: Array,
 });
+
+const connectionRowsApi = reactive({ expandAll: null, collapseAll: null, allCollapsed: false, count: 0 });
+provide('connectionRowsApi', connectionRowsApi);
 
 const errors = ref({});
 const saving = ref(false);
@@ -86,6 +89,7 @@ onUnmounted(() => {
 
         <Panel>
             <PanelHeader>
+                <div class="flex items-center justify-between gap-3">
                 <Heading>
                     <Link
                         :href="cp_url(`forms/${form.handle}/connect`)"
@@ -108,6 +112,16 @@ onUnmounted(() => {
                         </Badge>
                     </span>
                 </Heading>
+                <div v-if="connectionRowsApi.count > 1" class="flex items-center gap-2">
+                    <Button
+                        size="xs"
+                        variant="ghost"
+                        :icon="connectionRowsApi.allCollapsed ? 'expand' : 'collapse'"
+                        :aria-label="connectionRowsApi.allCollapsed ? __('Expand all') : __('Collapse all')"
+                        @click="connectionRowsApi.allCollapsed ? connectionRowsApi.expandAll() : connectionRowsApi.collapseAll()"
+                    />
+                </div>
+                </div>
             </PanelHeader>
             <Card>
                 <component

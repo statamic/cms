@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { computed, inject, ref, watch } from 'vue';
 import { nanoid as uniqid } from 'nanoid';
 import { Button, ConfirmationModal, Description } from '@ui';
 import { SortableList } from '@/components/sortable/Sortable.js';
@@ -98,6 +98,21 @@ const collapse = (id: string): void => {
 };
 
 const expand = (id: string): void => (collapsed.value = collapsed.value.filter((rowId) => rowId !== id));
+
+const expandAll = (): void => { collapsed.value = []; };
+const collapseAll = (): void => { collapsed.value = props.modelValue.map((row) => row.id); };
+const allCollapsed = computed(() => props.modelValue.length > 0 && collapsed.value.length === props.modelValue.length);
+
+const connectionRowsApi = inject('connectionRowsApi', null);
+
+watch([allCollapsed, () => props.modelValue.length], ([collapsed, count]) => {
+    if (connectionRowsApi) {
+        connectionRowsApi.expandAll = expandAll;
+        connectionRowsApi.collapseAll = collapseAll;
+        connectionRowsApi.allCollapsed = collapsed;
+        connectionRowsApi.count = count;
+    }
+}, { immediate: true });
 
 const errorIndex = (row: Row): number => errorRowIds.value.indexOf(row.id);
 
