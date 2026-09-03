@@ -58,11 +58,22 @@ class OutpostTest extends TestCase
     }
 
     #[Test]
-    public function the_payload_key_prefers_the_site_key()
+    public function the_payload_key_prefers_a_legacy_license_key_over_the_site_key()
     {
         config([
             'statamic.system.site_key' => 'site_abcdefghijklmnopqrstuvwxyz',
             'statamic.system.license_key' => 'legacy-license',
+        ]);
+
+        $this->assertEquals('legacy-license', $this->outpost()->payload()['key']);
+    }
+
+    #[Test]
+    public function the_payload_key_falls_back_to_the_site_key()
+    {
+        config([
+            'statamic.system.site_key' => 'site_abcdefghijklmnopqrstuvwxyz',
+            'statamic.system.license_key' => null,
         ]);
 
         $this->assertEquals('site_abcdefghijklmnopqrstuvwxyz', $this->outpost()->payload()['key']);
@@ -109,7 +120,6 @@ class OutpostTest extends TestCase
         $outpost = $this->outpostWithJsonResponse(['newer' => 'response']);
 
         $payload = $outpost->payload();
-        $payload['host'] = 'some-other-host.com';
         $payload['ip'] = '9.9.9.9';
         $payload['port'] = null;
         $payload['php_version'] = '1.2.3';
@@ -120,6 +130,22 @@ class OutpostTest extends TestCase
         ]);
 
         $this->assertEquals($testCachedResponse, $outpost->response());
+    }
+
+    #[Test]
+    public function the_cached_response_is_not_reused_when_the_host_has_changed()
+    {
+        $outpost = $this->outpostWithJsonResponse(['newer' => 'response']);
+
+        $payload = $outpost->payload();
+        $payload['host'] = 'some-other-host.com';
+
+        $this->setCachedResponse([
+            'cached' => 'response',
+            'payload' => $payload,
+        ]);
+
+        $this->assertArraySubset(['newer' => 'response'], $outpost->response());
     }
 
     #[Test]

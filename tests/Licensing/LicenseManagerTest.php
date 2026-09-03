@@ -200,7 +200,7 @@ class LicenseManagerTest extends TestCase
 
         $this->assertTrue($alert['testing']);
         $this->assertTrue($alert['hasSiteKey']);
-        $this->assertStringContainsString('isn\'t connected to a statamic.com account', $alert['message']);
+        $this->assertStringContainsString('isn\'t linked to a statamic.com account', $alert['message']);
         $this->assertStringContainsString('trial mode', $alert['message']);
         $this->assertEquals('connect', $this->managerWithResponse([
             'public' => false,
@@ -225,9 +225,8 @@ class LicenseManagerTest extends TestCase
         ])->licensingAlert();
 
         $this->assertFalse($alert['hasSiteKey']);
-        $this->assertFalse($alert['sharedKey']);
+        $this->assertArrayNotHasKey('sharedKey', $alert);
         $this->assertStringContainsString('does not have a site key', $alert['message']);
-        $this->assertStringNotContainsString('site:fresh-key', $alert['message']);
     }
 
     #[Test]
@@ -242,7 +241,7 @@ class LicenseManagerTest extends TestCase
             'packages' => [],
         ])->licensingAlert();
 
-        $this->assertStringContainsString('connected to statamic.com but has no license', $alert['message']);
+        $this->assertStringContainsString('linked to a statamic.com account but has no license', $alert['message']);
         $this->assertStringNotContainsString('php please license', $alert['message']);
     }
 
@@ -320,22 +319,6 @@ class LicenseManagerTest extends TestCase
             'statamic' => ['valid' => true],
             'packages' => [],
         ])->primaryAction());
-    }
-
-    #[Test]
-    public function licensing_alert_suggests_fresh_key_only_when_shared()
-    {
-        config(['statamic.system.site_key' => 'site_abcdefghijklmnopqrstuvwxyz']);
-
-        $alert = $this->managerWithResponse([
-            'public' => true,
-            'site' => ['valid' => true, 'shared_key' => true],
-            'statamic' => ['valid' => false, 'reason' => 'unlicensed'],
-            'packages' => [],
-        ])->licensingAlert();
-
-        $this->assertTrue($alert['sharedKey']);
-        $this->assertStringContainsString('php please site:fresh-key', $alert['message']);
     }
 
     private function managerWithResponse(array $response)

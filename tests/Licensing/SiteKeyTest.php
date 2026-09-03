@@ -78,6 +78,28 @@ class SiteKeyTest extends TestCase
     }
 
     #[Test]
+    public function it_does_not_mint_when_a_legacy_license_key_is_in_use()
+    {
+        File::put($env = $this->dir.'/.env', "APP_NAME=Statamic\nSTATAMIC_LICENSE_KEY=aRadLicenseKey42\n");
+        File::put($example = $this->dir.'/.env.example', "APP_NAME=Statamic\nSTATAMIC_SITE_KEY=\n");
+
+        $this->assertTrue((new SiteKey)->hasLegacyLicenseKey($env));
+        $this->assertNull((new SiteKey)->ensure($env, $example));
+        $this->assertStringNotContainsString('STATAMIC_SITE_KEY=', File::get($env));
+        $this->assertMatchesRegularExpression('/^STATAMIC_SITE_KEY=\s*$/m', File::get($example));
+    }
+
+    #[Test]
+    public function a_blank_legacy_license_key_does_not_block_minting()
+    {
+        File::put($env = $this->dir.'/.env', "APP_NAME=Statamic\nSTATAMIC_LICENSE_KEY=\n");
+        File::put($example = $this->dir.'/.env.example', "APP_NAME=Statamic\n");
+
+        $this->assertFalse((new SiteKey)->hasLegacyLicenseKey($env));
+        $this->assertTrue((new SiteKey)->isValid((new SiteKey)->ensure($env, $example)));
+    }
+
+    #[Test]
     public function mint_writes_even_in_ci()
     {
         $_SERVER['STATAMIC_TEST_CI'] = 'true';

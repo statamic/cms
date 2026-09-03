@@ -17,13 +17,15 @@ class License extends Command
     protected $signature = 'statamic:license
         { --poll-once : Check status once and exit (for tests) }';
 
-    protected $description = 'Connect this site to a statamic.com account';
+    protected $description = 'Link this site to a statamic.com account';
 
     public function handle(DeviceFlow $flow, SiteKey $siteKey, LicenseManager $licenses): int
     {
         $key = Config::getLicenseKey() ?: $siteKey->ensure();
 
-        $this->laravel['config']['statamic.system.site_key'] = $key;
+        if ($siteKey->isValid($key)) {
+            $this->laravel['config']['statamic.system.site_key'] = $key;
+        }
 
         $licenses->refresh();
 
@@ -54,7 +56,7 @@ class License extends Command
         }
 
         $licenses->refresh();
-        $this->components->info('Site connected. License status will refresh on the next Outpost check.');
+        $this->components->info('Site linked to your account. License status will refresh on the next Outpost check.');
 
         return self::SUCCESS;
     }
@@ -73,8 +75,8 @@ class License extends Command
 
         return match ($licenses->primaryAction()) {
             null => $this->alreadyResolved('This site is already licensed.'),
-            'buy', 'renew' => $this->alreadyResolved('This site is already connected.', $licenses->site()->url()),
-            'domain' => $this->alreadyResolved('This site is connected, but this domain is not on the site record.', $licenses->site()->url()),
+            'buy', 'renew' => $this->alreadyResolved('This site is already linked to a statamic.com account.', $licenses->site()->url()),
+            'domain' => $this->alreadyResolved('This site is linked to a statamic.com account, but this domain is not on the site record.', $licenses->site()->url()),
             default => null,
         };
     }

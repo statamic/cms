@@ -65,6 +65,20 @@ class InstallMintsSiteKeyTest extends TestCase
     }
 
     #[Test]
+    public function it_does_not_mint_for_a_site_with_a_legacy_license_key()
+    {
+        $this->files->put($this->envPath, "APP_NAME=Statamic\nSTATAMIC_LICENSE_KEY=aRadLicenseKey42\n");
+
+        $command = $this->app->make(Install::class);
+        $command->setLaravel($this->app);
+        $command->mintSiteKey();
+
+        $this->assertStringNotContainsString('STATAMIC_SITE_KEY=', $this->files->get($this->envPath));
+        $this->assertMatchesRegularExpression('/^STATAMIC_SITE_KEY=\s*$/m', $this->files->get($this->examplePath));
+        $this->assertNull(config('statamic.system.site_key'));
+    }
+
+    #[Test]
     public function it_does_not_mint_in_ci()
     {
         $_SERVER['STATAMIC_TEST_CI'] = 'true';

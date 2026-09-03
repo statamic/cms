@@ -144,7 +144,6 @@ class LicenseManager
             'testing' => $isTestDomain = $this->isOnTestDomain(),
             'message' => $this->invalidLicenseMessage($isTestDomain),
             'hasSiteKey' => $this->hasSiteKey(),
-            'sharedKey' => $this->site()->hasSharedKey(),
         ];
     }
 
@@ -220,10 +219,6 @@ class LicenseManager
 
     private function identityMessage(): string
     {
-        if ($this->site()->hasSharedKey()) {
-            return __('statamic::messages.licensing_shared_key');
-        }
-
         if (! $this->hasSiteKey()) {
             return __('statamic::messages.licensing_site_key_missing');
         }

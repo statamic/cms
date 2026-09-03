@@ -55,13 +55,14 @@ class Config
     /**
      * Get the effective site/license key.
      *
-     * Prefers STATAMIC_SITE_KEY, then the legacy STATAMIC_LICENSE_KEY.
+     * A legacy STATAMIC_LICENSE_KEY is a private, paid credential and always wins.
+     * STATAMIC_SITE_KEY is the public project identifier used when no legacy key is set.
      *
      * @return string|null
      */
     public function getLicenseKey()
     {
-        foreach (['statamic.system.site_key', 'statamic.system.license_key'] as $configKey) {
+        foreach (['statamic.system.license_key', 'statamic.system.site_key'] as $configKey) {
             $key = $this->get($configKey);
 
             if ($key) {

@@ -3,6 +3,7 @@ import { Modal, Description, Button } from '@/components/ui';
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 import useStatamicPageProps from '@/composables/page-props.js';
 import { router } from '@inertiajs/vue3';
+import statamicMark from '@/../svg/statamic-mark-lime.svg?raw';
 
 const { licensing } = useStatamicPageProps();
 const { alert } = licensing;
@@ -104,7 +105,9 @@ onUnmounted(() => {
                     :href="handoffUrl"
                     target="_blank"
                     variant="primary"
-                    :text="__('Connect to statamic.com')"
+                    :icon="statamicMark"
+                    :text="__('Link to Account')"
+                    class="[&>svg]:opacity-100!"
                     @click="markOutbound"
                 />
                 <Button

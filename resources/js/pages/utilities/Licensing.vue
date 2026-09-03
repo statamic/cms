@@ -3,6 +3,7 @@ import { onMounted, onUnmounted, ref } from 'vue';
 import { router } from '@inertiajs/vue3';
 import Head from '@/pages/layout/Head.vue';
 import { Header, Button, Card, CardPanel, Panel, Heading, Badge, DocsCallout, Modal, ModalClose, Description } from '@ui';
+import statamicMark from '@/../svg/statamic-mark-lime.svg?raw';
 
 const props = defineProps([
     'requestError',
@@ -16,9 +17,28 @@ const props = defineProps([
     'usingLicenseKeyFile',
     'refreshUrl',
     'mintUrl',
+    'freshUrl',
 ]);
 
 const minting = ref(false);
+const refreshingKey = ref(false);
+
+function freshKey() {
+    if (!props.freshUrl || refreshingKey.value) {
+        return;
+    }
+
+    if (!confirm(__('statamic::messages.licensing_fresh_key_confirm'))) {
+        return;
+    }
+
+    refreshingKey.value = true;
+    router.post(props.freshUrl, {}, {
+        onFinish: () => {
+            refreshingKey.value = false;
+        },
+    });
+}
 const buyModalOpen = ref(false);
 const awaitingReturn = ref(false);
 const checking = ref(false);
@@ -98,7 +118,9 @@ onUnmounted(() => {
                 :href="site.handoffUrl"
                 target="_blank"
                 variant="primary"
-                :text="__('Connect to Statamic.com')"
+                :icon="statamicMark"
+                :text="__('Link to Account')"
+                class="[&>svg]:opacity-100!"
                 @click="markOutbound"
             />
             <Button
@@ -133,10 +155,6 @@ onUnmounted(() => {
                 <p class="text-gray-700 text-sm" v-html="__('statamic::messages.licensing_incorrect_key_format_body')" />
             </CardPanel>
 
-            <CardPanel v-if="site.hasSharedKey" :heading="__('Shared site key')">
-                <p class="text-gray-700 text-sm" v-html="__('statamic::messages.licensing_shared_key')" />
-            </CardPanel>
-
             <Panel :heading="__('Site')">
                 <Card class="py-0!">
                     <div class="divide-y divide-gray-200 text-sm dark:divide-gray-700">
@@ -147,7 +165,7 @@ onUnmounted(() => {
                                     {{ site.name || site.key || __('No site key') }}
                                 </a>
                                 <Badge v-if="site.key" :color="site.connected ? 'green' : 'amber'" size="sm">
-                                    {{ site.connected ? __('Connected') : __('Not connected') }}
+                                    {{ site.connected ? __('Linked') : __('Not linked') }}
                                 </Badge>
                             </div>
                             <div class="shrink-0 text-end">
@@ -171,6 +189,17 @@ onUnmounted(() => {
                                     {{ domain.environment === 'production' ? __('Production') : __('Testing') }}
                                 </Badge>
                             </div>
+                        </div>
+                        <div v-if="freshUrl" class="flex items-center gap-4 px-3 py-3">
+                            <p class="min-w-0 flex-1 text-gray-700 dark:text-gray-400">
+                                {{ __('statamic::messages.licensing_fresh_key_prompt') }}
+                            </p>
+                            <Button
+                                size="sm"
+                                :text="__('Generate new key')"
+                                :disabled="refreshingKey"
+                                @click="freshKey"
+                            />
                         </div>
                     </div>
                 </Card>

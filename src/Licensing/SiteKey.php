@@ -36,17 +36,30 @@ class SiteKey
         return filter_var($_SERVER['CI'] ?? $_ENV['CI'] ?? getenv('CI'), FILTER_VALIDATE_BOOLEAN);
     }
 
+    /**
+     * Make sure this install has a site key, minting one if needed.
+     *
+     * Nothing is minted in CI, or when the install already uses a legacy
+     * STATAMIC_LICENSE_KEY (those sites opt in to site keys from statamic.com).
+     */
     public function ensure(?string $envPath = null, ?string $examplePath = null): ?string
     {
         $envPath ??= base_path('.env');
         $examplePath ??= base_path('.env.example');
 
-        if ($this->runningInCi()) {
+        if ($this->runningInCi() || $this->hasLegacyLicenseKey($envPath)) {
             return $this->populatedValue($envPath)
                 ?? $this->populatedValue($examplePath);
         }
 
         return $this->mint($envPath, $examplePath);
+    }
+
+    public function hasLegacyLicenseKey(?string $envPath = null): bool
+    {
+        $envPath ??= base_path('.env');
+
+        return (bool) $this->populatedValue($envPath, 'STATAMIC_LICENSE_KEY');
     }
 
     public function mint(?string $envPath = null, ?string $examplePath = null): string
@@ -75,13 +88,13 @@ class SiteKey
         return $key;
     }
 
-    private function populatedValue(string $path): ?string
+    private function populatedValue(string $path, string $variable = 'STATAMIC_SITE_KEY'): ?string
     {
         if (! File::exists($path)) {
             return null;
         }
 
-        if (! preg_match('/^STATAMIC_SITE_KEY=(.+)$/m', File::get($path), $matches)) {
+        if (! preg_match('/^'.preg_quote($variable, '/').'=(.+)$/m', File::get($path), $matches)) {
             return null;
         }
 

@@ -32,7 +32,6 @@ class LicensingController extends CpController
                 'domains' => $site->domains()->values()->all(),
                 'invalidReason' => $site->invalidReason(),
                 'usesIncorrectKeyFormat' => $site->key() && $site->usesIncorrectKeyFormat(),
-                'hasSharedKey' => $site->hasSharedKey(),
             ],
             'statamic' => [
                 'valid' => $statamic->valid(),
@@ -58,7 +57,42 @@ class LicensingController extends CpController
             'usingLicenseKeyFile' => $licenses->usingLicenseKeyFile(),
             'refreshUrl' => cp_route('utilities.licensing.refresh'),
             'mintUrl' => $site->key() ? null : cp_route('utilities.licensing.mint'),
+            'freshUrl' => $this->canMintFreshKey($licenses) ? cp_route('utilities.licensing.fresh') : null,
         ]);
+    }
+
+    /**
+     * Replace this project's site key with a brand new one.
+     *
+     * The escape hatch for when a public repo was cloned and someone else linked
+     * the original key first. Only available before this key has been linked.
+     */
+    public function fresh(SiteKey $siteKey, Licenses $licenses)
+    {
+        if (! $this->canMintFreshKey($licenses)) {
+            return redirect()
+                ->cpRoute('utilities.licensing')
+                ->with('error', __('statamic::messages.licensing_fresh_key_unavailable'));
+        }
+
+        $key = $siteKey->write($siteKey->generate());
+        config(['statamic.system.site_key' => $key]);
+        $licenses->refresh();
+
+        return redirect()
+            ->cpRoute('utilities.licensing')
+            ->with('success', __('statamic::messages.licensing_site_key_generated'));
+    }
+
+    private function canMintFreshKey(Licenses $licenses): bool
+    {
+        if (config('statamic.system.license_key') || $licenses->usingLicenseKeyFile()) {
+            return false;
+        }
+
+        $site = $licenses->site();
+
+        return app(SiteKey::class)->isValid($site->key()) && ! $site->isConnected();
     }
 
     public function mint(SiteKey $siteKey, Licenses $licenses)

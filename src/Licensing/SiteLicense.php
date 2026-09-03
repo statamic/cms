@@ -91,14 +91,4 @@ class SiteLicense extends License
             'name' => config('app.name'),
         ]));
     }
-
-    public function hasSharedKey(): bool
-    {
-        return (bool) Arr::get($this->response, 'shared_key');
-    }
-
-    public function wasRotated(): bool
-    {
-        return (bool) Arr::get($this->response, 'key_rotated');
-    }
 }

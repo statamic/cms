@@ -66,7 +66,7 @@ class LicenseTest extends TestCase
         Http::fake();
 
         $this->artisan('statamic:license', ['--poll-once' => true])
-            ->expectsOutputToContain('already connected')
+            ->expectsOutputToContain('already linked')
             ->expectsOutputToContain('https://statamic.com/account/sites/site_abcdefghijklmnopqrstuvwxyz')
             ->assertSuccessful();
 
@@ -83,7 +83,7 @@ class LicenseTest extends TestCase
         Http::fake();
 
         $this->artisan('statamic:license', ['--poll-once' => true])
-            ->expectsOutputToContain('already connected')
+            ->expectsOutputToContain('already linked')
             ->expectsOutputToContain('https://statamic.com/account/sites/site_abcdefghijklmnopqrstuvwxyz')
             ->assertSuccessful();
 
