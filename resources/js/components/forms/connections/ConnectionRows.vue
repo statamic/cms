@@ -4,6 +4,7 @@ import { nanoid as uniqid } from 'nanoid';
 import { Button, ConfirmationModal, Description } from '@ui';
 import { SortableList } from '@/components/sortable/Sortable.js';
 import { deepClone } from '@/util/clone.js';
+import { preferences } from '@api';
 import LogicEmptyState from '@/components/forms/logic/LogicEmptyState.vue';
 import ConnectionRow from './ConnectionRow.vue';
 import { __ } from '@/bootstrap/globals';
@@ -44,7 +45,8 @@ const props = withDefaults(defineProps<{
 const sortableItemClass = 'connection-row';
 const sortableHandleClass = 'connection-row-handle';
 
-const collapsed = ref<string[]>([]);
+const userPreference = ref<'collapsed' | 'expanded'>(preferences.get('forms.connect.rows_view', 'collapsed'));
+const collapsed = ref<string[]>(userPreference.value === 'collapsed' ? props.modelValue.map((row) => row.id) : []);
 const confirmingRemoval = ref<string | null>(null);
 const errorRowIds = ref<string[]>([]);
 
@@ -99,8 +101,8 @@ const collapse = (id: string): void => {
 
 const expand = (id: string): void => (collapsed.value = collapsed.value.filter((rowId) => rowId !== id));
 
-const expandAll = (): void => { collapsed.value = []; };
-const collapseAll = (): void => { collapsed.value = props.modelValue.map((row) => row.id); };
+const expandAll = (): void => { collapsed.value = []; userPreference.value = 'expanded'; preferences.set('forms.connect.rows_view', 'expanded'); };
+const collapseAll = (): void => { collapsed.value = props.modelValue.map((row) => row.id); userPreference.value = 'collapsed'; preferences.set('forms.connect.rows_view', 'collapsed'); };
 const allCollapsed = computed(() => props.modelValue.length > 0 && collapsed.value.length === props.modelValue.length);
 
 const connectionRowsApi = inject('connectionRowsApi', null);
@@ -133,6 +135,17 @@ const rowErrors = (row: Row) => {
             return fields;
         }, {});
 };
+
+watch(
+    () => props.modelValue.map((row) => row.id),
+    (newIds, oldIds) => {
+        const added = newIds.filter((id) => !oldIds?.includes(id));
+
+        if (userPreference.value !== 'expanded' && added.length) {
+            collapsed.value = [...collapsed.value, ...added];
+        }
+    },
+);
 
 watch(
     () => props.errors,
