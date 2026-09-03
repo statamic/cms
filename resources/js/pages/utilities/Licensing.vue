@@ -107,34 +107,39 @@ onUnmounted(() => {
                 v-tooltip="__('statamic::messages.licensing_refresh_instructions')"
             />
             <Button
-                v-if="primaryAction === 'mint'"
+                v-if="site.key && !site.connected && purchase"
+                :text="purchase.label"
+                @click="buyModalOpen = true"
+            />
+            <Button
+                v-if="!site.key && mintUrl"
                 variant="primary"
                 :text="__('Generate site key')"
                 :disabled="minting"
                 @click="mint"
             />
             <Button
-                v-if="primaryAction === 'connect'"
+                v-if="site.connected && (primaryAction === 'buy' || primaryAction === 'renew')"
+                variant="primary"
+                :text="purchase.label"
+                @click="buyModalOpen = true"
+            />
+            <Button
+                v-if="site.connected && primaryAction === 'domain'"
+                :href="site.url"
+                target="_blank"
+                variant="primary"
+                :text="__('Add domain on Statamic.com')"
+                @click="markOutbound"
+            />
+            <Button
+                v-if="site.key && !site.connected && site.handoffUrl"
                 :href="site.handoffUrl"
                 target="_blank"
                 variant="primary"
                 :icon="statamicMark"
                 :text="__('Link to Account')"
                 class="[&>svg]:opacity-100!"
-                @click="markOutbound"
-            />
-            <Button
-                v-if="primaryAction === 'buy' || primaryAction === 'renew'"
-                variant="primary"
-                :text="purchase.label"
-                @click="buyModalOpen = true"
-            />
-            <Button
-                v-if="primaryAction === 'domain'"
-                :href="site.url"
-                target="_blank"
-                variant="primary"
-                :text="__('Add domain on Statamic.com')"
                 @click="markOutbound"
             />
         </Header>
@@ -168,7 +173,7 @@ onUnmounted(() => {
                                     {{ site.connected ? __('Linked') : __('Not linked') }}
                                 </Badge>
                             </div>
-                            <div class="shrink-0 text-end">
+                            <div class="flex shrink-0 items-center justify-end gap-2">
                                 <ui-badge color="green" :prepend="__('Site Key')" v-if="site.key">{{ site.key }}</ui-badge>
                                 <Badge v-if="site.invalidReason" color="red">
                                     {{ site.invalidReason }}

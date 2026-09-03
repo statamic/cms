@@ -22,9 +22,32 @@ class SiteLicense extends License
         return (bool) Arr::get($this->response, 'claimed', false);
     }
 
+    public function valid()
+    {
+        if ($this->shouldHideUnlinkedDomainReason()) {
+            return true;
+        }
+
+        return parent::valid();
+    }
+
+    public function invalidReason()
+    {
+        if ($this->shouldHideUnlinkedDomainReason()) {
+            return;
+        }
+
+        return parent::invalidReason();
+    }
+
     public function hasInvalidDomain(): bool
     {
         return Arr::get($this->response, 'reason') === 'invalid_domain';
+    }
+
+    private function shouldHideUnlinkedDomainReason(): bool
+    {
+        return ! $this->isConnected() && Arr::get($this->response, 'reason') === 'no_domains';
     }
 
     public function usesIncorrectKeyFormat()
@@ -89,6 +112,7 @@ class SiteLicense extends License
         return rtrim(config('statamic.system.licensing_url', 'https://statamic.com'), '/').'/account/licensing/handoff?'.http_build_query(array_filter([
             'key' => $key,
             'name' => config('app.name'),
+            'return' => url(cp_route('utilities.licensing')),
         ]));
     }
 }

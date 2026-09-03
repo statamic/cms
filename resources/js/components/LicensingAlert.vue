@@ -15,6 +15,7 @@ const siteUrl = ref(alert?.siteUrl);
 const refreshUrl = ref(alert?.refreshUrl);
 const mintUrl = ref(alert?.mintUrl);
 const primaryAction = ref(alert?.primaryAction);
+const connected = ref(alert?.connected);
 const minting = ref(false);
 const awaitingReturn = ref(false);
 const key = 'statamic.snooze_license_banner';
@@ -94,6 +95,11 @@ onUnmounted(() => {
                 <Button @click="snooze" :text="__('Snooze')" variant="ghost" tabindex="-1" />
                 <Button v-if="manageUrl" @click="manageLicenses" :text="__('View details')" variant="ghost" />
                 <Button
+                    v-if="!connected && manageUrl"
+                    :text="__('Buy Licenses')"
+                    @click="manageLicenses"
+                />
+                <Button
                     v-if="primaryAction === 'mint'"
                     :disabled="minting"
                     variant="primary"
@@ -101,33 +107,33 @@ onUnmounted(() => {
                     @click="mint"
                 />
                 <Button
-                    v-if="primaryAction === 'connect'"
+                    v-if="connected && primaryAction === 'buy' && manageUrl"
+                    variant="primary"
+                    :text="__('Buy Licenses')"
+                    @click="manageLicenses"
+                />
+                <Button
+                    v-if="connected && primaryAction === 'renew' && manageUrl"
+                    variant="primary"
+                    :text="__('Renew License')"
+                    @click="manageLicenses"
+                />
+                <Button
+                    v-if="connected && primaryAction === 'domain'"
+                    :href="siteUrl"
+                    target="_blank"
+                    variant="primary"
+                    :text="__('Add domain on statamic.com')"
+                    @click="markOutbound"
+                />
+                <Button
+                    v-if="handoffUrl && !connected"
                     :href="handoffUrl"
                     target="_blank"
                     variant="primary"
                     :icon="statamicMark"
                     :text="__('Link to Account')"
                     class="[&>svg]:opacity-100!"
-                    @click="markOutbound"
-                />
-                <Button
-                    v-if="primaryAction === 'buy' && manageUrl"
-                    variant="primary"
-                    :text="__('Buy Licenses')"
-                    @click="manageLicenses"
-                />
-                <Button
-                    v-if="primaryAction === 'renew' && manageUrl"
-                    variant="primary"
-                    :text="__('Renew License')"
-                    @click="manageLicenses"
-                />
-                <Button
-                    v-if="primaryAction === 'domain'"
-                    :href="siteUrl"
-                    target="_blank"
-                    variant="primary"
-                    :text="__('Add domain on statamic.com')"
                     @click="markOutbound"
                 />
             </div>

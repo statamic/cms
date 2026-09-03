@@ -100,6 +100,32 @@ class SiteKeyTest extends TestCase
     }
 
     #[Test]
+    public function it_copies_a_site_key_from_example_on_ensure()
+    {
+        File::put($env = $this->dir.'/.env', "APP_NAME=Statamic\n");
+        File::put($example = $this->dir.'/.env.example', "STATAMIC_SITE_KEY=site_abcdefghijklmnopqrstuvwxyz\n");
+
+        $key = (new SiteKey)->ensure($env, $example);
+
+        $this->assertEquals('site_abcdefghijklmnopqrstuvwxyz', $key);
+        $this->assertStringContainsString('STATAMIC_SITE_KEY=site_abcdefghijklmnopqrstuvwxyz', File::get($env));
+    }
+
+    #[Test]
+    public function mint_ignores_a_key_in_example_and_generates_a_fresh_one()
+    {
+        File::put($env = $this->dir.'/.env', "APP_NAME=Statamic\n");
+        File::put($example = $this->dir.'/.env.example', "STATAMIC_SITE_KEY=site_abcdefghijklmnopqrstuvwxyz\n");
+
+        $key = (new SiteKey)->mint($env, $example);
+
+        $this->assertNotEquals('site_abcdefghijklmnopqrstuvwxyz', $key);
+        $this->assertTrue((new SiteKey)->isValid($key));
+        $this->assertStringContainsString('STATAMIC_SITE_KEY='.$key, File::get($env));
+        $this->assertStringContainsString('STATAMIC_SITE_KEY='.$key, File::get($example));
+    }
+
+    #[Test]
     public function mint_writes_even_in_ci()
     {
         $_SERVER['STATAMIC_TEST_CI'] = 'true';

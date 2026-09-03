@@ -108,6 +108,7 @@ class SiteLicenseTest extends TestCase
         $this->assertEquals('https://statamic.com/account/licensing/handoff?'.http_build_query([
             'key' => 'test-key',
             'name' => config('app.name'),
+            'return' => url(cp_route('utilities.licensing')),
         ]), $this->license()->handoffUrl());
     }
 
@@ -131,6 +132,20 @@ class SiteLicenseTest extends TestCase
         $this->assertFalse($this->license()->isConnected());
         $this->assertFalse($this->license(['claimed' => false])->isConnected());
         $this->assertTrue($this->license(['claimed' => true])->isConnected());
+    }
+
+    #[Test]
+    public function it_hides_missing_domains_until_the_site_is_linked()
+    {
+        $unlinked = $this->license(['valid' => false, 'reason' => 'no_domains', 'claimed' => false]);
+
+        $this->assertTrue($unlinked->valid());
+        $this->assertNull($unlinked->invalidReason());
+
+        $linked = $this->license(['valid' => false, 'reason' => 'no_domains', 'claimed' => true]);
+
+        $this->assertFalse($linked->valid());
+        $this->assertEquals(__('statamic::messages.licensing_error_no_domains'), $linked->invalidReason());
     }
 
     #[Test]

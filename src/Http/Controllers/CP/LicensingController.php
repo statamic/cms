@@ -19,6 +19,9 @@ class LicensingController extends CpController
         $site = $licenses->site();
         $statamic = $licenses->statamic();
         $addons = $licenses->addons()->filter->existsOnMarketplace();
+        $alreadyLinked = $this->alreadyLinkedConflict();
+        $connected = $alreadyLinked ? false : $site->isConnected();
+        $primaryAction = $alreadyLinked ? 'connect' : $licenses->primaryAction();
 
         return Inertia::render('utilities/Licensing', [
             'requestError' => $licenses->requestFailed(),
@@ -28,7 +31,7 @@ class LicensingController extends CpController
                 'key' => $site->key(),
                 'name' => $site->name(),
                 'valid' => $site->valid(),
-                'connected' => $site->isConnected(),
+                'connected' => $connected,
                 'domains' => $site->domains()->values()->all(),
                 'invalidReason' => $site->invalidReason(),
                 'usesIncorrectKeyFormat' => $site->key() && $site->usesIncorrectKeyFormat(),
@@ -52,12 +55,12 @@ class LicensingController extends CpController
                 'version' => $addon->version(),
             ])->values(),
             'configCached' => app()->configurationIsCached(),
-            'purchase' => $site->isConnected() ? $this->purchase($site, $statamic, $addons) : null,
-            'primaryAction' => $licenses->primaryAction(),
+            'purchase' => $this->purchase($site, $statamic, $addons),
+            'primaryAction' => $primaryAction,
             'usingLicenseKeyFile' => $licenses->usingLicenseKeyFile(),
             'refreshUrl' => cp_route('utilities.licensing.refresh'),
             'mintUrl' => $site->key() ? null : cp_route('utilities.licensing.mint'),
-            'freshUrl' => $this->canMintFreshKey($licenses) ? cp_route('utilities.licensing.fresh') : null,
+            'freshUrl' => $this->shouldOfferFreshKey($licenses) ? cp_route('utilities.licensing.fresh') : null,
         ]);
     }
 
@@ -78,10 +81,25 @@ class LicensingController extends CpController
         $key = $siteKey->write($siteKey->generate());
         config(['statamic.system.site_key' => $key]);
         $licenses->refresh();
+        session()->forget('licensing.already_linked');
 
         return redirect()
             ->cpRoute('utilities.licensing')
             ->with('success', __('statamic::messages.licensing_site_key_generated'));
+    }
+
+    private function shouldOfferFreshKey(Licenses $licenses): bool
+    {
+        return $this->alreadyLinkedConflict() && $this->canMintFreshKey($licenses);
+    }
+
+    private function alreadyLinkedConflict(): bool
+    {
+        if (request()->boolean('already_linked')) {
+            session(['licensing.already_linked' => true]);
+        }
+
+        return (bool) session('licensing.already_linked');
     }
 
     private function canMintFreshKey(Licenses $licenses): bool
@@ -92,7 +110,11 @@ class LicensingController extends CpController
 
         $site = $licenses->site();
 
-        return app(SiteKey::class)->isValid($site->key()) && ! $site->isConnected();
+        if (! app(SiteKey::class)->isValid($site->key())) {
+            return false;
+        }
+
+        return $this->alreadyLinkedConflict() || ! $site->isConnected();
     }
 
     public function mint(SiteKey $siteKey, Licenses $licenses)
@@ -123,10 +145,6 @@ class LicensingController extends CpController
 
     public function purchase($site, $statamic, $addons): ?array
     {
-        if (! $site?->isConnected()) {
-            return null;
-        }
-
         $unlicensedAddons = $addons->reject->valid();
         $needsStatamic = ! $statamic->valid();
 

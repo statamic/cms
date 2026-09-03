@@ -52,6 +52,18 @@ class SiteKey
                 ?? $this->populatedValue($examplePath);
         }
 
+        $envPath ??= base_path('.env');
+        $examplePath ??= base_path('.env.example');
+
+        $existing = $this->populatedValue($envPath) ?? $this->populatedValue($examplePath);
+
+        if ($existing) {
+            $this->fillIfBlank($envPath, $existing);
+            $this->fillIfBlank($examplePath, $existing);
+
+            return $existing;
+        }
+
         return $this->mint($envPath, $examplePath);
     }
 
@@ -62,19 +74,25 @@ class SiteKey
         return (bool) $this->populatedValue($envPath, 'STATAMIC_LICENSE_KEY');
     }
 
+    /**
+     * Mint a site key for this install.
+     *
+     * Only reads STATAMIC_SITE_KEY from .env — never .env.example. Cloned repos
+     * pick up a shared key through ensure(), but an explicit mint always creates
+     * a fresh identity so "Generate site key" does not resurrect a claimed example key.
+     */
     public function mint(?string $envPath = null, ?string $examplePath = null): string
     {
         $envPath ??= base_path('.env');
         $examplePath ??= base_path('.env.example');
 
-        $key = $this->populatedValue($envPath)
-            ?? $this->populatedValue($examplePath)
-            ?? $this->generate();
+        if ($key = $this->populatedValue($envPath)) {
+            $this->fillIfBlank($examplePath, $key);
 
-        $this->fillIfBlank($envPath, $key);
-        $this->fillIfBlank($examplePath, $key);
+            return $key;
+        }
 
-        return $key;
+        return $this->write($this->generate(), $envPath, $examplePath);
     }
 
     public function write(string $key, ?string $envPath = null, ?string $examplePath = null): string

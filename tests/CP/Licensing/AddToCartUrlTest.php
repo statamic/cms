@@ -202,13 +202,16 @@ class AddToCartUrlTest extends TestCase
     }
 
     #[Test]
-    public function purchase_is_null_when_the_site_is_not_connected()
+    public function purchase_is_available_when_the_site_is_not_connected()
     {
-        $this->assertNull($this->controller()->purchase(
+        $purchase = $this->controller()->purchase(
             $this->site(connected: false),
             $this->statamic(valid: false),
             collect([$this->unlicensedAddon()])
-        ));
+        );
+
+        $this->assertEquals('Buy Licenses', $purchase['label']);
+        $this->assertCount(2, $purchase['items']);
     }
 
     #[Test]

@@ -179,7 +179,7 @@ return [
     'licensing_site_key_generated' => 'Site key generated. Commit .env.example so other environments pick it up.',
     'licensing_site_key_missing' => 'This site does not have a site key yet. Generate one from the Licensing utility.',
     'licensing_fresh_key_unavailable' => 'A new site key can only be generated before this key has been linked to an account.',
-    'licensing_fresh_key_prompt' => 'Did someone else link this key first? Cloned a public repo? Generate a new key and this project gets its own identity.',
+    'licensing_fresh_key_prompt' => 'This site key is already linked to a different account. Generate a new key so this project gets its own identity.',
     'licensing_fresh_key_confirm' => 'Generate a new site key? Any other environment using the old key will need to be updated.',
     'licensing_not_connected' => 'This site key isn\'t linked to a statamic.com account yet.',
     'licensing_connected_unlicensed' => 'This site is linked to a statamic.com account but has no license attached.',

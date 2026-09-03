@@ -83,6 +83,25 @@ class FreshSiteKeyTest extends TestCase
     }
 
     #[Test]
+    public function it_allows_a_fresh_key_after_a_failed_claim_even_if_outpost_says_claimed()
+    {
+        $this->fakeOutpost(['site' => ['claimed' => true]]);
+
+        $this
+            ->actingAs(User::make()->makeSuper()->save())
+            ->withSession(['licensing.already_linked' => true])
+            ->post(cp_route('utilities.licensing.fresh'))
+            ->assertRedirect(cp_route('utilities.licensing'))
+            ->assertSessionHas('success')
+            ->assertSessionMissing('licensing.already_linked');
+
+        preg_match('/^STATAMIC_SITE_KEY=(.+)$/m', $this->files->get($this->envPath), $matches);
+
+        $this->assertTrue((new SiteKey)->isValid($matches[1] ?? null));
+        $this->assertNotEquals($this->oldKey, $matches[1]);
+    }
+
+    #[Test]
     public function it_refuses_when_a_legacy_license_key_is_in_use()
     {
         config(['statamic.system.license_key' => 'aRadLicenseKey42']);
