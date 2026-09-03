@@ -20,10 +20,14 @@ class DashboardController extends CpController
     public function index(Loader $loader)
     {
         $widgets = $this->getDisplayableWidgets($loader);
+        $hasLicenseKey = filled(config('statamic.system.license_key'));
 
         return Inertia::render('Dashboard', [
             'widgets' => $widgets,
             'pro' => Statamic::pro(),
+            'canEnablePro' => User::current()->isSuper(),
+            'hasLicenseKey' => $hasLicenseKey,
+            'enableProUrl' => cp_route('enable-pro'),
             'blueprintsUrl' => cp_route('blueprints.index'),
             'collectionsCreateUrl' => cp_route('collections.create'),
             'navigationCreateUrl' => cp_route('navigation.create'),

@@ -308,4 +308,21 @@ STATAMIC_PRO_ENABLED=true
 STATAMIC_LICENSE_KEY=
 ENV, $this->files->get($this->envPath));
     }
+
+    #[Test]
+    public function it_can_set_license_key_via_option()
+    {
+        $this
+            ->artisan('statamic:pro:enable', [
+                '--license-key' => 'test-license-key',
+                '--no-interaction' => true,
+            ]);
+
+        $this->assertEquals(<<<'ENV'
+APP_NAME=Statamic
+STATAMIC_PRO_ENABLED=true
+STATAMIC_LICENSE_KEY=test-license-key
+ENV, $this->files->get($this->envPath));
+        $this->assertEquals('test-license-key', config('statamic.system.license_key'));
+    }
 }

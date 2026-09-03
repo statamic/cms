@@ -52,9 +52,19 @@ class Statamic
         return config('statamic.editions.pro');
     }
 
-    public static function enablePro()
+    public static function enablePro(?string $licenseKey = null)
     {
-        Artisan::call('statamic:pro:enable', ['--update-config' => true]);
+        $parameters = [
+            '--update-config' => true,
+            '--force' => true,
+            '--no-interaction' => true,
+        ];
+
+        if ($licenseKey) {
+            $parameters['--license-key'] = $licenseKey;
+        }
+
+        Artisan::call('statamic:pro:enable', $parameters);
     }
 
     public static function availableScripts(Request $request)
