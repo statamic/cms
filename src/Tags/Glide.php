@@ -178,7 +178,7 @@ class Glide extends Tags
                 : $this->getGenerator()->generateByPath($item, $params);
         }
 
-        $asset = $item instanceof AssetContract ? $item : Asset::find((string) $item);
+        $asset = $item instanceof AssetContract ? $item : Asset::find($item);
 
         if (! $asset) {
             throw new AssetNotFoundException(
@@ -299,7 +299,7 @@ class Glide extends Tags
 
         // Double colons indicate an asset ID.
         if (Str::contains($item, '::')) {
-            return Asset::find($item);
+            return Asset::find($item) ?? $item;
         }
 
         // In a subfolder installation, the subfolder will likely be passed in
