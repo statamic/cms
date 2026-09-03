@@ -78,6 +78,7 @@ class UpdateTest extends TestCase
     {
         $index = $this->fakeIndex();
         $index->shouldReceive('onConnection')->never();
+        $index->shouldReceive('onQueue')->never();
 
         $this->artisan(Update::class, ['index' => 'test'])->assertExitCode(0);
     }
@@ -89,6 +90,25 @@ class UpdateTest extends TestCase
         $index->shouldReceive('onConnection')->once()->with('sync')->andReturnSelf();
 
         $this->artisan(Update::class, ['index' => 'test', '--connection' => 'sync'])->assertExitCode(0);
+    }
+
+    #[Test]
+    public function it_uses_the_queue_from_the_queue_option()
+    {
+        $index = $this->fakeIndex();
+        $index->shouldReceive('onQueue')->once()->with('indexing')->andReturnSelf();
+
+        $this->artisan(Update::class, ['index' => 'test', '--queue' => 'indexing'])->assertExitCode(0);
+    }
+
+    #[Test]
+    public function it_uses_the_connection_and_queue_together()
+    {
+        $index = $this->fakeIndex();
+        $index->shouldReceive('onConnection')->once()->with('redis')->andReturnSelf();
+        $index->shouldReceive('onQueue')->once()->with('indexing')->andReturnSelf();
+
+        $this->artisan(Update::class, ['index' => 'test', '--connection' => 'redis', '--queue' => 'indexing'])->assertExitCode(0);
     }
 
     #[Test]
