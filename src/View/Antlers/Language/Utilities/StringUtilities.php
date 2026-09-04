@@ -21,15 +21,11 @@ class StringUtilities
         }
     }
 
-    protected static $methodCache = [];
-
     protected static function getMethod($text)
     {
-        if (! array_key_exists($text, self::$methodCache)) {
-            self::$methodCache[$text] = mb_strlen($text, 'utf-8') < strlen($text);
-        }
-
-        return self::$methodCache[$text];
+        // Not memoized: hashing the text as an array key costs as much as
+        // counting its characters, and a per-string cache grew without bound.
+        return mb_strlen($text, 'utf-8') < strlen($text);
     }
 
     public static function substr($string, $start = null, $length = null)
