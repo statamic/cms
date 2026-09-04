@@ -27,6 +27,7 @@ trait HasThumbnails
             'is_image' => true,
             'preview' => $this->previewUrl(),
             'thumbnail' => $this->thumbnailUrl('small'),
+            'large_thumbnail' => $this->thumbnailUrl('large'),
             'can_be_transparent' => $this->isSvg() || $this->extensionIsOneOf(['svg', 'png', 'webp', 'avif']),
             'alt' => $this->alt,
             'orientation' => $this->orientation(),
