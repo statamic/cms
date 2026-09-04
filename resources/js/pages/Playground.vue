@@ -321,12 +321,14 @@ defineProps(['icons']);
                 <ui-heading size="lg">Alerts</ui-heading>
 
                 <Alert variant="default" text="This is a default alert message" />
+                <Alert variant="tip" text="This is a helpful tip" />
                 <Alert variant="warning" text="This is a warning alert message" />
                 <Alert variant="error" text="This is an error alert message" />
                 <Alert variant="success" text="This is a success alert message" />
                 <Alert variant="warning" icon="git" text="This alert has a custom icon" />
 
                 <Alert variant="default" heading="Alert Heading" text="This is a default alert message" />
+                <Alert variant="tip" heading="Alert Heading" text="This is a helpful tip" />
                 <Alert variant="warning" heading="Alert Heading" text="This is a warning alert message" />
                 <Alert variant="error" heading="Alert Heading" text="This is an error alert message" />
                 <Alert variant="success" heading="Alert Heading" text="This is a success alert message" />
