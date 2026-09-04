@@ -68,6 +68,7 @@ watch(chart, () => (showingDrilldown.value = false));
         :title="title"
         title-tag="h2"
         class="h-full"
+        :class="{ 'shadow-none! ring-0!': editing }"
         :header-class="editingHeaderClass"
         :icon="field.icon"
         icon-class="hidden @xs/widget:block size-4 text-gray-500"

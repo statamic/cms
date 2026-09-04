@@ -281,6 +281,7 @@ defineExpose({ refresh: fetchSummary });
                         :title="__(chartableField(widget.config.field)?.display ?? widget.config.field)"
                         title-tag="h2"
                         class="h-full"
+                        :class="{ 'shadow-none! ring-0!': editing }"
                         :header-class="editing ? 'summary-chart-handle cursor-grab rounded-t-xl border border-dashed border-gray-400 dark:border-gray-700' : undefined"
                         :icon="chartableField(widget.config.field)?.icon"
                         icon-class="hidden @xs/widget:block size-4 text-gray-500"

@@ -19,7 +19,7 @@ const currentChart = computed(() => props.charts.find((chart) => chart.handle ==
 <template>
     <div
         data-summary-edit-chrome
-        class="summary-chart-handle absolute inset-0 z-2 flex flex-col cursor-grab items-center justify-center gap-5 bg-white/80 px-4 backdrop-blur-[2px] border border-dashed border-gray-400 dark:border-gray-700 shadow-sm active:cursor-grabbing dark:bg-gray-900/85"
+        class="summary-chart-handle absolute inset-0 z-2 flex flex-col cursor-grab items-center justify-center gap-5 bg-white/80 px-4 backdrop-blur-[2px] border border-dashed border-gray-400 dark:border-gray-700 active:cursor-grabbing dark:bg-gray-900/85"
     >
         <div class="flex shrink-0 items-center gap-2" @mousedown.stop @click.stop>
             <Dropdown align="start">
