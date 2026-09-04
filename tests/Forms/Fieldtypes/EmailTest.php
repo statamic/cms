@@ -3,7 +3,6 @@
 namespace Tests\Forms\Fieldtypes;
 
 use PHPUnit\Framework\Attributes\Test;
-use Statamic\Forms\Charts\HorizontalBar;
 use Statamic\Forms\Fields\FormField;
 use Statamic\Forms\Fieldtypes\Email;
 use Tests\TestCase;
@@ -70,14 +69,5 @@ class EmailTest extends TestCase
             'validate' => ['email'],
             'append' => '@example.com',
         ], $fieldtype->toFieldArray());
-    }
-
-    #[Test]
-    public function it_defaults_to_a_bar_chart_counting_unique_answers()
-    {
-        $fieldtype = (new Email);
-
-        $this->assertEquals(HorizontalBar::class, $fieldtype->defaultChart());
-        $this->assertNull($fieldtype->chartOptions(collect()));
     }
 }

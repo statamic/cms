@@ -2,7 +2,6 @@
 
 namespace Statamic\Forms\Fieldtypes;
 
-use Statamic\Forms\Charts\HorizontalBar;
 use Statamic\Forms\Fields\FormFieldtype;
 use Statamic\Support\Arr;
 
@@ -37,11 +36,6 @@ class Website extends FormFieldtype
             'validate' => array_values(array_unique([...((array) $this->config('validate', [])), 'url'])),
             ...Arr::except($this->config(), ['type', 'input_type', 'placeholder', 'validate']),
         ];
-    }
-
-    public function defaultChart(): ?string
-    {
-        return HorizontalBar::class;
     }
 
     public function example(): ?array
