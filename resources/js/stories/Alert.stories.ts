@@ -8,7 +8,7 @@ const meta = {
     argTypes: {
         variant: {
             control: 'select',
-            options: ['default', 'warning', 'error', 'success'],
+            options: ['default', 'tip', 'warning', 'error', 'success'],
         },
         icon: {
             control: 'select',
@@ -46,6 +46,7 @@ export const _DocsIntro: Story = {
 
 const variantsCode = `
 <Alert variant="default" text="This is a default alert message" />
+<Alert variant="tip" text="This is a helpful tip" />
 <Alert variant="warning" text="This is a warning alert message" />
 <Alert variant="error" text="This is an error alert message" />
 <Alert variant="success" text="This is a success alert message" />
@@ -69,6 +70,7 @@ export const Variants: Story = {
         template: `
             <div class="space-y-3">
                 <Alert variant="default" text="This is a default alert message" />
+                <Alert variant="tip" text="This is a helpful tip" />
                 <Alert variant="warning" text="This is a warning alert message" />
                 <Alert variant="error" text="This is an error alert message" />
                 <Alert variant="success" text="This is a success alert message" />
@@ -265,6 +267,13 @@ export const RichContent: Story = {
     }),
 };
 
+export const Tip: Story = {
+    args: {
+        text: 'This is a helpful tip',
+        variant: 'tip',
+    },
+};
+
 export const Warning: Story = {
     args: {
         text: 'This is a warning alert message',
@@ -333,4 +342,3 @@ export const WithHeadingAndDescription: Story = {
         template: headingAndDescriptionCode,
     }),
 };
-
