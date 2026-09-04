@@ -17,18 +17,6 @@ const props = withDefaults(
     },
 );
 
-const editingHeaderClass = computed(() =>
-    props.editing
-        ? 'summary-chart-handle cursor-grab rounded-t-xl border border-dashed border-gray-400 dark:border-gray-700'
-        : undefined,
-);
-
-const editingBodyClass = computed(() =>
-    props.editing
-        ? 'summary-chart-handle cursor-grab border border-t-0 border-dashed border-gray-400 dark:border-gray-700 active:cursor-grabbing'
-        : undefined,
-);
-
 const page = ref(1);
 
 const chart = computed(() => props.field.chart);
@@ -80,8 +68,7 @@ watch([chart, () => props.editing], () => (page.value = 1));
         :title="title"
         title-tag="h2"
         class="h-full"
-        :class="{ 'shadow-none! ring-0!': editing }"
-        :header-class="editingHeaderClass"
+        :class="{ 'summary-chart-editing summary-chart-handle cursor-grab active:cursor-grabbing ring-0! shadow-none! border border-dashed border-gray-400 dark:border-gray-700': editing }"
         :icon="field.icon"
         icon-class="hidden @xs/widget:block size-4 text-gray-500"
     >
@@ -97,7 +84,7 @@ watch([chart, () => props.editing], () => (page.value = 1));
                 @page-selected="page = $event"
             />
         </template>
-        <div class="relative flex-1 overflow-hidden rounded-b-xl" :class="editingBodyClass">
+        <div class="relative flex-1 overflow-hidden rounded-b-xl">
             <p v-if="hasDrilldown" class="sr-only" aria-live="polite">{{ showingDrilldown ? accessibleLabel : '' }}</p>
             <component :is="chart.component" v-bind="chartProps" @select="page = 2">
                 <template v-if="field.insights.length" #summary>

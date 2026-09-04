@@ -9,7 +9,6 @@ const props = defineProps({
     iconClass: { type: String, default: 'hidden! size-5 text-gray-500 @xs/widget:block!' },
     titleTag: { type: String, default: 'span' },
     href: { type: String },
-    headerClass: { type: String },
 });
 
 const slots = useSlots();
@@ -20,11 +19,7 @@ const hasHeader = computed(() => Boolean(props.title || props.icon || slots.acti
 <template>
     <Card inset class="@container/widget min-h-54" v-cloak>
         <div class="flex h-full min-h-54 flex-col">
-            <header
-                v-if="hasHeader"
-                class="flex items-center min-h-[49px] justify-between px-4.5 py-2"
-                :class="headerClass ?? 'border-b border-gray-200 dark:border-gray-700'"
-            >
+            <header v-if="hasHeader" class="flex items-center min-h-[49px] justify-between border-b border-gray-200 px-4.5 py-2 dark:border-gray-700">
                 <component :is="href ? Link : 'div'" class="flex items-center gap-2 sm:gap-3" :href>
                     <Icon v-if="icon" :name="icon" :class="iconClass" :aria-hidden="title ? true : undefined" />
                     <component :is="titleTag" v-if="title" class="m-0 font-[inherit] text-inherit text-[0.97rem]" v-text="title" />

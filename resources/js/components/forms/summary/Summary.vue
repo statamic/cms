@@ -304,8 +304,7 @@ defineExpose({ refresh: fetchSummary });
                         :title="__(chartableField(widget.config.field)?.display ?? widget.config.field)"
                         title-tag="h2"
                         class="h-full"
-                        :class="{ 'shadow-none! ring-0!': editing }"
-                        :header-class="editing ? 'summary-chart-handle cursor-grab rounded-t-xl border border-dashed border-gray-400 dark:border-gray-700' : undefined"
+                        :class="{ 'summary-chart-editing summary-chart-handle cursor-grab active:cursor-grabbing ring-0! shadow-none! border border-dashed border-gray-400 dark:border-gray-700': editing }"
                         :icon="chartableField(widget.config.field)?.icon"
                         icon-class="hidden @xs/widget:block size-4 text-gray-500"
                     >
@@ -318,14 +317,7 @@ defineExpose({ refresh: fetchSummary });
                                 @remove="removeChart(index)"
                             />
                         </template>
-                        <div
-                            class="relative flex-1 overflow-hidden rounded-b-xl"
-                            :class="
-                                editing
-                                    ? 'summary-chart-handle cursor-grab border border-t-0 border-dashed border-gray-400 dark:border-gray-700 active:cursor-grabbing'
-                                    : undefined
-                            "
-                        >
+                        <div class="relative flex-1 overflow-hidden rounded-b-xl">
                             <Skeleton class="h-full w-full" />
                         </div>
                     </Widget>

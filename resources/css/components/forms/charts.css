@@ -249,6 +249,14 @@
 
 
 
+/* GROUP CHARTS / SUMMARY / EDITING
+=================================================== */
+.summary-chart-editing header {
+    @apply border-dashed border-gray-400 dark:border-gray-700;
+}
+
+
+
 /* GROUP CHARTS / SUMMARY BAR CHART / ICON STROKES
 =================================================== */
 /* Note: This is used to style the checkbox icons in the summary bar chart depending on the background contrast. */
