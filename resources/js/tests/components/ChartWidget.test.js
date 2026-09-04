@@ -1,7 +1,7 @@
 import { mount } from '@vue/test-utils';
 import { beforeEach, expect, test, vi } from 'vitest';
 import ChartWidget from '@/components/forms/summary/ChartWidget.vue';
-import { PieChart } from '@ui';
+import { Pagination, PieChart } from '@ui';
 
 beforeEach(() => {
     vi.stubGlobal('__', (key, replacements = {}) => {
@@ -48,6 +48,12 @@ function mountCard(props = {}) {
     });
 }
 
+function paginationButtons(wrapper) {
+    const [previous, next] = wrapper.findComponent(Pagination).findAll('button');
+
+    return { previous, next };
+}
+
 test('it renders the chart items', () => {
     const wrapper = mountCard();
 
@@ -57,20 +63,33 @@ test('it renders the chart items', () => {
     expect(wrapper.text()).not.toContain('Bohemian Rhapsody');
 });
 
-test('the other slice drills down into the truncated items and back again', async () => {
+test('the pagination pages between the items and the other breakdown', async () => {
+    const wrapper = mountCard();
+    const { previous, next } = paginationButtons(wrapper);
+
+    expect(previous.attributes('disabled')).toBeDefined();
+
+    await next.trigger('click');
+
+    expect(wrapper.text()).toContain('Bohemian Rhapsody');
+    expect(wrapper.text()).not.toContain('Before you Go Go');
+    expect(next.attributes('disabled')).toBeDefined();
+
+    await previous.trigger('click');
+
+    expect(wrapper.text()).toContain('Before you Go Go');
+});
+
+test('the other slice drills down into the truncated items', async () => {
     const wrapper = mountCard();
 
     await wrapper.find('.pie-chart-legend__link').trigger('click');
 
     expect(wrapper.text()).toContain('Bohemian Rhapsody');
     expect(wrapper.text()).not.toContain('Before you Go Go');
-
-    await wrapper.findAll('button').find((button) => button.text() === 'Back').trigger('click');
-
-    expect(wrapper.text()).toContain('Before you Go Go');
 });
 
-test('charts without drilldown props dont make the other item clickable', () => {
+test('charts without drilldown props dont paginate or make the other item clickable', () => {
     const wrapper = mountCard({
         field: {
             ...field,
@@ -78,6 +97,7 @@ test('charts without drilldown props dont make the other item clickable', () => 
         },
     });
 
+    expect(wrapper.findComponent(Pagination).exists()).toBe(false);
     expect(wrapper.find('.pie-chart-legend__link').exists()).toBe(false);
 });
 
