@@ -168,7 +168,6 @@ return [
     'form_summary_add_chart_instructions' => 'Add a chart to start summarizing responses.',
     'form_summary_checked_insight' => 'of users checked the toggle',
     'form_summary_other_breakdown' => ':field: Other breakdown: :values',
-    'form_summary_save_to_see_chart' => 'Save to see this chart.',
     'getting_started_widget_collections' => 'Collections hold the different content types that make up your site, helping you stay organized.',
     'getting_started_widget_docs' => 'Discover everything Statamic can do, and learn how to use its powerful features the right way.',
     'getting_started_widget_header' => 'Getting Started with Statamic',

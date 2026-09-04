@@ -1,6 +1,7 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
+import {ref} from 'vue';
 import {expect, within} from 'storybook/test';
-import {HorizontalBarChart, Icon, Widget} from '@ui';
+import {Button, HorizontalBarChart, Icon, Widget} from '@ui';
 
 const items = [
     {label: 'Yes', percent: 55, count: 136},
@@ -67,6 +68,62 @@ const customMarkersCode = `
     </template>
 </HorizontalBarChart>
 `;
+
+const breakdownCode = `
+<HorizontalBarChart
+    v-if="!showBreakdown"
+    :items="items"
+    accessible-label="Favourite season"
+    @select="showBreakdown = true"
+/>
+<HorizontalBarChart
+    v-else
+    :items="breakdown"
+    :focused-index="4"
+    accessible-label="Other seasons"
+/>
+`;
+
+export const _Breakdown: Story = {
+    tags: ['!dev'],
+    parameters: {docs: {source: {code: breakdownCode}}},
+    render: () => ({
+        components: {Button, HorizontalBarChart},
+        setup() {
+            const showBreakdown = ref(false);
+            const seasons = [
+                {label: 'Summer', percent: 40, count: 99},
+                {label: 'Autumn', percent: 25, count: 62},
+                {label: 'Spring', percent: 15, count: 37},
+                {label: 'Winter', percent: 10, count: 25},
+                {label: 'Other', percent: 10, count: 25, clickable: true},
+            ];
+            const breakdown = [
+                {label: 'Monsoon', percent: 6, count: 15},
+                {label: 'Dry season', percent: 4, count: 10},
+            ];
+
+            return {breakdown, seasons, showBreakdown};
+        },
+        template: `
+            <div class="space-y-3">
+                <Button v-if="showBreakdown" text="Back to all seasons" size="sm" @click="showBreakdown = false" />
+                <HorizontalBarChart
+                    v-if="!showBreakdown"
+                    :items="seasons"
+                    accessible-label="Favourite season: Summer 40%, Autumn 25%, Spring 15%, Winter 10%, Other 10%"
+                    @select="showBreakdown = true"
+                />
+                <HorizontalBarChart
+                    v-else
+                    :items="breakdown"
+                    :focused-index="4"
+                    accessible-label="Other seasons: Monsoon 6%, Dry season 4%"
+                />
+            </div>
+        `,
+    }),
+};
 
 export const _CustomMarkers: Story = {
     tags: ['!dev'],

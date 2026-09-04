@@ -29,9 +29,17 @@ abstract class Chart
 
     public function props(Collection $values, ?Collection $options = null): array
     {
-        [$items] = $this->truncatedItems($values, $options);
+        [$items, $other] = $this->truncatedItems($values, $options);
 
-        return ['items' => $items->all()];
+        $props = ['items' => $items->all()];
+
+        if ($other->isEmpty()) {
+            return $props;
+        }
+
+        $props['drilldown'] = $this->drilldown($items, $other, $values->count());
+
+        return $props;
     }
 
     protected function truncatedItems(Collection $values, ?Collection $options): array
@@ -127,6 +135,33 @@ abstract class Chart
         }
 
         return (string) $value;
+    }
+
+    protected function drilldown(Collection $items, Collection $other, int $total): array
+    {
+        return [
+            'items' => $this->cappedItems($other, $total)->all(),
+            'focusedIndex' => $items->search(fn (array $item): bool => $item['other'] ?? false),
+        ];
+    }
+
+    private function cappedItems(Collection $other, int $total): Collection
+    {
+        if ($other->count() <= $this->limit) {
+            return $other;
+        }
+
+        $rest = $other->slice($this->limit - 1);
+
+        return $other
+            ->take($this->limit - 1)
+            ->push([
+                'key' => 'more',
+                'label' => __('+:count more', ['count' => $rest->count()]),
+                'count' => $count = $rest->sum('count'),
+                'percent' => $this->percent($count, $total),
+            ])
+            ->values();
     }
 
     protected function percent(int $count, int $total): int

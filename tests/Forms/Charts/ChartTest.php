@@ -81,6 +81,15 @@ class ChartTest extends TestCase
             ['key' => 'd', 'label' => 'D', 'count' => 7, 'percent' => 13],
             ['key' => 'other', 'label' => 'Other', 'count' => 18, 'percent' => 35, 'other' => true],
         ], $props['items']);
+    }
+
+    #[Test]
+    public function it_doesnt_drill_down_when_everything_fits()
+    {
+        $props = (new HorizontalBar)->props(
+            collect(['red', 'red', 'green']),
+            $this->chartOptions(['red' => 'Red', 'green' => 'Green'])
+        );
 
         $this->assertEquals(['items'], array_keys($props));
     }
@@ -94,6 +103,34 @@ class ChartTest extends TestCase
 
         $this->assertEquals('star-filled', collect($props['items'])->last()['icon']);
         $this->assertTrue(collect($props['items'])->last()['other']);
+    }
+
+    #[Test]
+    public function it_drills_down_into_the_items_lumped_into_other()
+    {
+        $props = (new HorizontalBar)->props($this->weightedValues(range('a', 'h')), $this->chartOptions(
+            collect(range('a', 'h'))->mapWithKeys(fn ($key) => [$key => strtoupper($key)])->all()
+        ));
+
+        $this->assertEquals([
+            ['key' => 'e', 'label' => 'E', 'count' => 6, 'percent' => 12],
+            ['key' => 'f', 'label' => 'F', 'count' => 5, 'percent' => 10],
+            ['key' => 'g', 'label' => 'G', 'count' => 4, 'percent' => 8],
+            ['key' => 'h', 'label' => 'H', 'count' => 3, 'percent' => 6],
+        ], $props['drilldown']['items']);
+
+        $this->assertEquals(4, $props['drilldown']['focusedIndex']);
+    }
+
+    #[Test]
+    public function it_caps_the_drilldown_items_and_summarizes_the_rest()
+    {
+        $props = (new HorizontalBar)->props($this->weightedValues(range('a', 'l')), $this->chartOptions(
+            collect(range('a', 'l'))->mapWithKeys(fn ($key) => [$key => strtoupper($key)])->all()
+        ));
+
+        $this->assertCount(5, $props['drilldown']['items']);
+        $this->assertEquals('+4 more', collect($props['drilldown']['items'])->last()['label']);
     }
 
     #[Test]

@@ -40,8 +40,9 @@ const { activeFilters, searchQuery, preferencesPrefix } = injectListingContext()
 
 const summary = ref<Summary | null>(null);
 const editing = ref<boolean>(false);
-const draftCharts = ref<ChartConfig[]>([]);
+const draftLayout = ref<ChartConfig[]>([]);
 const saving = ref<boolean>(false);
+const loadingPreviews = ref<string[]>([]);
 const isDragging = ref<boolean>(false);
 const metric = ref<ChartMetric>(preferences.get(`${preferencesPrefix.value}.summary.chart_metric`, ChartMetric.Percent));
 
@@ -62,7 +63,7 @@ const availableCharts = computed<MetaChart[]>(() => summary.value?.meta?.charts 
 const chartableFields = computed<MetaField[]>(() => summary.value?.meta?.fields ?? []);
 
 const addableFields = computed<MetaField[]>(() => {
-    const used = draftCharts.value.map((item) => item.field);
+    const used = draftLayout.value.map((item) => item.field);
 
     return chartableFields.value.filter((field) => !used.includes(field.handle));
 });
@@ -76,38 +77,27 @@ const widgets = computed<SummaryWidget[]>(() => {
         }));
     }
 
-    return draftCharts.value.map((item) => ({
+    return draftLayout.value.map((item) => ({
         id: item.field,
         config: item,
-        field: draftField(item),
+        field: summarizedField(item.field) ?? null,
     }));
 });
+
+const missingPreviews = computed<ChartConfig[]>(() =>
+    draftLayout.value.filter((item) => !isSummarized(item) && !loadingPreviews.value.includes(item.field)),
+);
 
 function chartableField(handle: string): MetaField | undefined {
     return chartableFields.value.find((field) => field.handle === handle);
 }
 
-function draftField(config: ChartConfig): SummaryField | null {
-    const field = summary.value?.fields.find((field) => field.handle === config.field);
+function summarizedField(handle: string): SummaryField | undefined {
+    return summary.value?.fields.find((field) => field.handle === handle);
+}
 
-    if (!field) {
-        return null;
-    }
-
-    const chart = availableCharts.value.find((chart) => chart.handle === config.chart);
-
-    if (!chart || chart.handle === field.chart.handle) {
-        return field;
-    }
-
-    return {
-        ...field,
-        chart: {
-            ...field.chart,
-            handle: chart.handle,
-            component: chart.component
-        },
-    };
+function isSummarized(config: ChartConfig): boolean {
+    return summarizedField(config.field)?.chart.handle === config.chart;
 }
 
 function parameters(): object {
@@ -115,6 +105,7 @@ function parameters(): object {
 
     if (searchQuery.value) params.search = searchQuery.value;
     if (Object.keys(activeFilters.value).length) params.filters = utf8btoa(JSON.stringify(activeFilters.value));
+    if (editing.value) params.charts = draftLayout.value;
 
     return params;
 }
@@ -136,8 +127,28 @@ async function fetchSummary() {
     }
 }
 
+async function fetchPreviews(charts: ChartConfig[]) {
+    const handles = charts.map((item) => item.field);
+
+    loadingPreviews.value.push(...handles);
+
+    try {
+        const response = await axios.get(props.summaryUrl, { params: { ...parameters(), charts } });
+        const previews: SummaryField[] = response.data.fields;
+
+        summary.value!.fields = [
+            ...summary.value!.fields.filter((field) => !previews.some((preview) => preview.handle === field.handle)),
+            ...previews,
+        ];
+    } catch (error) {
+        Statamic.$toast.error(error?.response?.data?.message ?? __('Something went wrong'));
+    } finally {
+        loadingPreviews.value = loadingPreviews.value.filter((handle) => !handles.includes(handle));
+    }
+}
+
 function startEditing() {
-    draftCharts.value = (summary.value?.fields ?? []).map((field) => ({
+    draftLayout.value = (summary.value?.fields ?? []).map((field) => ({
         field: field.handle,
         chart: field.chart.handle,
     }));
@@ -147,19 +158,20 @@ function startEditing() {
 
 function cancelEditing() {
     editing.value = false;
-    draftCharts.value = [];
+    draftLayout.value = [];
+    fetchSummary();
 }
 
-const fieldPicked = (field: MetaField) => draftCharts.value.push({ field: field.handle, chart: field.default_chart });
+const fieldPicked = (field: MetaField) => draftLayout.value.push({ field: field.handle, chart: field.default_chart });
 
-const setChart = (index: number, chart: string) => draftCharts.value.splice(index, 1, { ...draftCharts.value[index], chart });
+const setChart = (index: number, chart: string) => draftLayout.value.splice(index, 1, { ...draftLayout.value[index], chart });
 
-const removeChart = (index: number) => draftCharts.value.splice(index, 1);
+const removeChart = (index: number) => draftLayout.value.splice(index, 1);
 
 function onSort(sortedWidgets: SummaryWidget[]) {
     if (!editing.value) return;
 
-    draftCharts.value = sortedWidgets.map((widget) => clone(widget.config!));
+    draftLayout.value = sortedWidgets.map((widget) => clone(widget.config!));
 }
 
 async function save() {
@@ -168,7 +180,7 @@ async function save() {
     saving.value = true;
 
     try {
-        await axios.patch(props.chartsUpdateUrl, { charts: draftCharts.value });
+        await axios.patch(props.chartsUpdateUrl, { charts: draftLayout.value });
         editing.value = false;
         Statamic.$toast.success(__('Saved'));
         await fetchSummary();
@@ -192,6 +204,8 @@ watch(editing, (editing): void => {
 });
 
 watch([activeFilters, searchQuery], fetchSummary, { deep: true, immediate: true });
+
+watch(missingPreviews, (missing) => editing.value && missing.length && fetchPreviews(missing));
 
 watch(metric, (metric: ChartMetric) => preferences.set(`${preferencesPrefix.value}.summary.chart_metric`, metric));
 
@@ -270,6 +284,7 @@ defineExpose({ refresh: fetchSummary });
                             <EditChrome
                                 :config="widget.config"
                                 :charts="availableCharts"
+                                :loading="loadingPreviews.includes(widget.config.field)"
                                 @update:chart="setChart(index, $event)"
                                 @remove="removeChart(index)"
                             />
@@ -289,6 +304,7 @@ defineExpose({ refresh: fetchSummary });
                             <EditChrome
                                 :config="widget.config"
                                 :charts="availableCharts"
+                                :loading="loadingPreviews.includes(widget.config.field)"
                                 @update:chart="setChart(index, $event)"
                                 @remove="removeChart(index)"
                             />
@@ -301,9 +317,7 @@ defineExpose({ refresh: fetchSummary });
                                     : undefined
                             "
                         >
-                            <div class="flex h-full items-center justify-center">
-                                <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('statamic::messages.form_summary_save_to_see_chart') }}</p>
-                            </div>
+                            <Skeleton class="h-full w-full" />
                         </div>
                     </Widget>
                 </div>

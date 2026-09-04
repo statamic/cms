@@ -24,6 +24,10 @@ Set `metric` to `count` to show response totals instead of percentages.
 Move metrics to the end and hide markers for distributions where the labels should lead each row.
 <Canvas of={HorizontalBarChartStories._MetricAtEnd} sourceState={'shown'} />
 
+## Breaking down "other"
+Mark an item `clickable` and listen for `select` to break it down. Pass `focused-index` to colour the breakdown rows as the item they came from.
+<Canvas of={HorizontalBarChartStories._Breakdown} sourceState={'shown'} />
+
 ## Custom markers
 The `marker` slot receives the current `item` and `index`. Use it for field-specific icons, images, or badges.
 <Canvas of={HorizontalBarChartStories._CustomMarkers} sourceState={'shown'} />

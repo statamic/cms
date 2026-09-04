@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
-import { Button, Widget } from '@ui';
+import { Pagination, Widget } from '@ui';
 import type { ChartItem, ChartMetric, SummaryField } from './types';
 
 const props = withDefaults(
@@ -29,11 +29,13 @@ const editingBodyClass = computed(() =>
         : undefined,
 );
 
-const showingDrilldown = ref(false);
+const page = ref(1);
 
 const chart = computed(() => props.field.chart);
 const drilldown = computed(() => chart.value.props.drilldown);
 const hasDrilldown = computed<boolean>(() => Boolean(drilldown.value));
+const showingDrilldown = computed<boolean>(() => page.value === 2);
+const pagination = computed(() => ({ current_page: page.value, last_page: 2 }));
 
 const title = computed((): string => {
     return props.showNumber && props.field.number
@@ -46,7 +48,11 @@ const items = computed<ChartItem[]>(() => {
         return drilldown.value!.items;
     }
 
-    return chart.value.props.items.map((item) => (item.other && hasDrilldown.value ? { ...item, clickable: true } : item));
+    if (props.editing || !hasDrilldown.value) {
+        return chart.value.props.items;
+    }
+
+    return chart.value.props.items.map((item) => (item.other ? { ...item, clickable: true } : item));
 });
 
 const accessibleLabel = computed(() => {
@@ -66,7 +72,7 @@ const chartProps = computed(() => ({
     accessibleLabel: accessibleLabel.value,
 }));
 
-watch(chart, () => (showingDrilldown.value = false));
+watch([chart, () => props.editing], () => (page.value = 1));
 </script>
 
 <template>
@@ -79,19 +85,21 @@ watch(chart, () => (showingDrilldown.value = false));
         :icon="field.icon"
         icon-class="hidden @xs/widget:block size-4 text-gray-500"
     >
-        <template #actions>
+        <template v-if="editing || hasDrilldown" #actions>
             <slot v-if="editing" name="chrome" />
-            <Button
-                v-else-if="showingDrilldown"
-                size="sm"
-                icon="arrow-left"
-                :text="__('Back')"
-                @click="showingDrilldown = false"
+            <Pagination
+                v-else
+                :resource-meta="pagination"
+                :show-totals="false"
+                :show-page-links="false"
+                :show-per-page-selector="false"
+                :scroll-to-top="false"
+                @page-selected="page = $event"
             />
         </template>
         <div class="relative flex-1 overflow-hidden rounded-b-xl" :class="editingBodyClass">
             <p v-if="hasDrilldown" class="sr-only" aria-live="polite">{{ showingDrilldown ? accessibleLabel : '' }}</p>
-            <component :is="chart.component" v-bind="chartProps" @select="showingDrilldown = true">
+            <component :is="chart.component" v-bind="chartProps" @select="page = 2">
                 <template v-if="field.insights.length" #summary>
                     <div class="flex flex-wrap gap-2.5 pb-5 -ms-1">
                         <component

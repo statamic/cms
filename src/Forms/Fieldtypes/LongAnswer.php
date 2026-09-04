@@ -2,7 +2,6 @@
 
 namespace Statamic\Forms\Fieldtypes;
 
-use Statamic\Forms\Charts\HorizontalBar;
 use Statamic\Forms\Fields\FormFieldtype;
 use Statamic\Support\Arr;
 
@@ -35,11 +34,6 @@ class LongAnswer extends FormFieldtype
             'placeholder' => $this->config('placeholder'),
             ...Arr::except($this->config(), ['type', 'placeholder']),
         ];
-    }
-
-    public function defaultChart(): ?string
-    {
-        return HorizontalBar::class;
     }
 
     public function example(): ?array
