@@ -13,6 +13,8 @@ const props = withDefaults(
     defineProps<{
         /** Accessible label summarizing the chart's results. */
         accessibleLabel: string;
+        /** Accepted for parity with the other charts. Columns all share one colour, so it has no visual effect. */
+        focusedIndex?: number | null;
         /** The chart columns. Each item supports `label`, `percent`, and `count`. */
         items?: Item[];
         /** The largest value represented by a full-height column. */
@@ -21,6 +23,7 @@ const props = withDefaults(
         metric?: 'percent' | 'count';
     }>(),
     {
+        focusedIndex: null,
         items: () => [],
         maxValue: null,
         metric: 'percent',
