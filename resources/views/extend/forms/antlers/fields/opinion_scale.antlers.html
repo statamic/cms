@@ -1,0 +1,28 @@
+{{ foreach:scale_values as="scale_value" }}
+    {{ middle_index = "{{ total_results | subtract:1 | divide:2 | floor }}" }}
+
+    <label>
+        <input
+            id="{{ id }}-{{ scale_value }}-option"
+            type="radio"
+            name="{{ name }}"
+            value="{{ scale_value }}"
+            {{ if js_driver }}{{ js_attributes }}{{ /if }}
+            {{ if value == scale_value }}checked{{ /if }}
+            {{ if validate|contains:required }}required{{ /if }}
+            {{ if error }}
+                aria-invalid="true" aria-describedby="{{ id }}-error"
+            {{ elseif instructions }}
+                aria-describedby="{{ id }}-instructions"
+            {{ /if }}
+        >
+        {{ scale_value }}
+        {{ if first && low_label }}
+            - {{ low_label }}
+        {{ elseif index == middle_index && middle_label }}
+            - {{ middle_label }}
+        {{ elseif last && high_label }}
+            - {{ high_label }}
+        {{ /if }}
+    </label>
+{{ /foreach:scale_values }}

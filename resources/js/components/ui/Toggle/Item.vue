@@ -106,10 +106,10 @@ const restAttrs = computed(() => {
             class="text-gray-400"
             :aria-hidden="!iconOnly"
         />
-        <span v-if="hasDefaultSlot">
+        <span v-if="hasDefaultSlot" class="-mt-[1px]">
             <slot />
         </span>
-        <span v-else-if="label">
+        <span v-else-if="label" class="-mt-[1px]">
             {{ label }}
         </span>
     </ToggleGroupItem>

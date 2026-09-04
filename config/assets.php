@@ -298,4 +298,19 @@ return [
         'folder' => 'set-previews',
     ],
 
+    /*
+     *--------------------------------------------------------------------------
+     * Image Choice Images
+     *--------------------------------------------------------------------------
+     *
+     * The Image Choice fieldtype on forms allows you to present images for a
+     * visitor to choose from. Here you may specify the asset container and
+     * folder where these images are stored.
+     */
+
+    'image_choice_images' => [
+        'container' => 'assets',
+        'folder' => null,
+    ],
+
 ];

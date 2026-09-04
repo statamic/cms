@@ -3,6 +3,7 @@
 namespace Statamic;
 
 use Closure;
+use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Artisan;
@@ -55,6 +56,11 @@ class Statamic
     public static function enablePro()
     {
         Artisan::call('statamic:pro:enable', ['--update-config' => true]);
+    }
+
+    public static function formsProInstalled(): bool
+    {
+        return Composer::isInstalled('statamic/forms-pro');
     }
 
     public static function availableScripts(Request $request)

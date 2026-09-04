@@ -12,6 +12,8 @@ const props = defineProps({
     variant: { type: String, default: 'default' },
     /** Icon name to display. [Browse available icons](/?path=/story/components-icon--all-icons) */
     icon: { type: String, default: null },
+    /** When `false`, no icon is shown unless the `icon` prop is set. */
+    iconFallback: { type: Boolean, default: true },
 });
 
 const alertRole = computed(() => {
@@ -28,14 +30,14 @@ const ariaLive = computed(() => {
 const alertClasses = computed(() => {
     return cva({
         base: [
-            'relative flex items-start gap-3 rounded-xl border p-4 [&:has(p)]:py-5 [&:has([data-ui-description])]:py-5 text-sm',
-            '[&_h1]:mb-1 [&_h1]:font-bold',
-            '[&_h2]:mb-1 [&_h2]:font-bold',
-            '[&_h3]:mb-1 [&_h3]:font-bold',
-            '[&_h4]:mb-1 [&_h4]:font-bold',
-            '[&_h5]:mb-1 [&_h5]:font-bold',
-            '[&_h6]:mb-1 [&_h6]:font-bold',
-            '[&_[data-ui-heading]]:mb-1 [&_[data-ui-heading]]:font-bold',
+            'relative flex items-start gap-3 rounded-xl border p-4 pb-3 [&:has(p)]:py-5 [&:has([data-ui-description])]:py-5 text-sm',
+            '[&_h1:not(:last-of-type)]:mb-1 [&_h1]:font-bold',
+            '[&_h2:not(:last-of-type)]:mb-1 [&_h2]:font-bold',
+            '[&_h3:not(:last-of-type)]:mb-1 [&_h3]:font-bold',
+            '[&_h4:not(:last-of-type)]:mb-1 [&_h4]:font-bold',
+            '[&_h5:not(:last-of-type)]:mb-1 [&_h5]:font-bold',
+            '[&_h6:not(:last-of-type)]:mb-1 [&_h6]:font-bold',
+            '[&_[data-ui-heading]:not(:last-of-type)]:mb-1 [&_[data-ui-heading]]:font-bold',
             '[&_h1]:text-inherit! [&_h2]:text-inherit! [&_h3]:text-inherit! [&_h4]:text-inherit! [&_h5]:text-inherit! [&_h6]:text-inherit! [&_[data-ui-heading]]:text-inherit!',
             '[&_[data-ui-heading]]:-mt-0.5',
             '[&_[data-ui-heading].text-lg]:-mt-1',
@@ -72,8 +74,9 @@ const alertClasses = computed(() => {
     })({ variant: props.variant });
 });
 
-const defaultIcon = computed(() => {
+const resolvedIcon = computed(() => {
     if (props.icon) return props.icon;
+    if (!props.iconFallback) return null;
 
     switch (props.variant) {
         case 'warning':
@@ -97,8 +100,8 @@ const defaultIcon = computed(() => {
         :data-variant="variant"
     >
         <Icon
-            v-if="defaultIcon"
-            :name="defaultIcon"
+            v-if="resolvedIcon"
+            :name="resolvedIcon"
             class="size-5 shrink-0 opacity-70"
             aria-hidden="true"
         />

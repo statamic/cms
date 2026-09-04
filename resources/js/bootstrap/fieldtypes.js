@@ -31,16 +31,23 @@ import Sites from '../components/globals/Sites.vue';
 import Grid from '../components/fieldtypes/grid/Grid.vue';
 import GridIndex from '../components/fieldtypes/grid/GridIndex.vue';
 import GroupFieldtype from '../components/fieldtypes/GroupFieldtype.vue';
+import FormBannerFieldtype from '../components/fieldtypes/FormBannerFieldtype.vue';
+import FormHeadingFieldtype from '../components/fieldtypes/FormHeadingFieldtype.vue';
+import FormParagraphFieldtype from '@/components/fieldtypes/FormParagraphFieldtype.vue';
+import FormUploadFieldtype from '@/components/fieldtypes/FormUploadFieldtype.vue';
 import HiddenFieldtype from '../components/fieldtypes/HiddenFieldtype.vue';
 import HtmlFieldtype from '../components/fieldtypes/HtmlFieldtype.vue';
 import IconFieldtype from '../components/fieldtypes/IconFieldtype.vue';
+import ImageChoiceFieldtype from '../components/fieldtypes/ImageChoiceFieldtype.vue';
 import IntegerFieldtype from '../components/fieldtypes/IntegerFieldtype.vue';
 import LinkFieldtype from '../components/fieldtypes/LinkFieldtype.vue';
 import LinkIndexFieldtype from '../components/fieldtypes/LinkIndexFieldtype.vue';
 import ListFieldtype from '../components/fieldtypes/ListFieldtype.vue';
 import ListIndexFieldtype from '../components/fieldtypes/ListIndexFieldtype.vue';
 import MarkdownButtonsSettingFieldtype from '../components/fieldtypes/markdown/MarkdownButtonsSettingFieldtype.vue';
+import OpinionScaleFieldtype from '../components/fieldtypes/OpinionScaleFieldtype.vue';
 import RadioFieldtype from '../components/fieldtypes/RadioFieldtype.vue';
+import RankingFieldtype from '../components/fieldtypes/RankingFieldtype.vue';
 import RangeFieldtype from '../components/fieldtypes/RangeFieldtype.vue';
 import RelationshipFieldtype from '../components/fieldtypes/relationship/RelationshipFieldtype.vue';
 import RelationshipIndexFieldtype from '../components/fieldtypes/relationship/RelationshipIndexFieldtype.vue';
@@ -59,8 +66,10 @@ import ToggleIndexFieldtype from '../components/fieldtypes/ToggleIndexFieldtype.
 import WidthFieldtype from '../components/fieldtypes/WidthFieldtype.vue';
 import VideoFieldtype from '../components/fieldtypes/VideoFieldtype.vue';
 import SetPicker from '../components/fieldtypes/replicator/SetPicker.vue';
+import StarRatingFieldtype from '../components/fieldtypes/StarRatingFieldtype.vue';
 import TimeFieldtype from '../components/fieldtypes/TimeFieldtype.vue';
 import ThemeFieldtype from '../components/fieldtypes/ThemeFieldtype.vue';
+import YesNoFieldtype from '@/components/fieldtypes/YesNoFieldtype.vue';
 
 export default function registerFieldtypes(app) {
     app.component('relationship-input', RelationshipInput);
@@ -105,9 +114,14 @@ export default function registerFieldtypes(app) {
     app.component('grid-fieldtype', Grid);
     app.component('grid-fieldtype-index', GridIndex);
     app.component('group-fieldtype', GroupFieldtype);
+    app.component('form_banner-fieldtype', FormBannerFieldtype);
+    app.component('form_heading-fieldtype', FormHeadingFieldtype);
+    app.component('form_paragraph-fieldtype', FormParagraphFieldtype);
+    app.component('form_upload-fieldtype', FormUploadFieldtype);
     app.component('hidden-fieldtype', HiddenFieldtype);
     app.component('html-fieldtype', HtmlFieldtype);
     app.component('icon-fieldtype', IconFieldtype);
+    app.component('image_choice-fieldtype', ImageChoiceFieldtype);
     app.component('integer-fieldtype', IntegerFieldtype);
     app.component('link-fieldtype', LinkFieldtype);
     app.component('link-fieldtype-index', LinkIndexFieldtype);
@@ -118,7 +132,9 @@ export default function registerFieldtypes(app) {
         defineAsyncComponent(() => import('../components/fieldtypes/markdown/MarkdownFieldtype.vue')),
     );
     app.component('markdown_buttons_setting-fieldtype', MarkdownButtonsSettingFieldtype);
+    app.component('opinion_scale-fieldtype', OpinionScaleFieldtype);
     app.component('radio-fieldtype', RadioFieldtype);
+    app.component('ranking-fieldtype', RankingFieldtype);
     app.component('range-fieldtype', RangeFieldtype);
     app.component('relationship-fieldtype', RelationshipFieldtype);
     app.component('relationship-fieldtype-index', RelationshipIndexFieldtype);
@@ -128,6 +144,7 @@ export default function registerFieldtypes(app) {
     app.component('section-fieldtype', SectionFieldtype);
     app.component('select-fieldtype', SelectFieldtype);
     app.component('sets-fieldtype', SetsFieldtype);
+    app.component('star_rating-fieldtype', StarRatingFieldtype);
     app.component('table-fieldtype', TableFieldtype);
     app.component('tags-fieldtype', TagsFieldtype);
     app.component('tags-fieldtype-index', TagsIndexFieldtype);
@@ -146,4 +163,5 @@ export default function registerFieldtypes(app) {
     app.component('revealer-fieldtype', RevealerFieldtype);
     app.component('template-fieldtype', TemplateFieldtype);
     app.component('theme-fieldtype', ThemeFieldtype);
+    app.component('yes_no-fieldtype', YesNoFieldtype);
 }

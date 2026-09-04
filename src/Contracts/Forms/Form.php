@@ -60,14 +60,6 @@ interface Form extends Arrayable
     public function honeypot($honeypot = null);
 
     /**
-     * Get all the metrics.
-     *
-     * @param  array|null  $metrics
-     * @return array
-     */
-    public function metrics($metrics = null);
-
-    /**
      * Get or set the email config.
      *
      * @param  array|null  $email

@@ -17,7 +17,7 @@ use function Statamic\trans as __;
 class Files extends Fieldtype
 {
     protected $selectable = false;
-    protected $selectableInForms = true;
+    protected $selectableInForms = false;
     protected $categories = ['media'];
 
     protected function configFieldItems(): array

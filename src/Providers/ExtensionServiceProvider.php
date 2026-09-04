@@ -12,6 +12,8 @@ use Statamic\Dictionaries;
 use Statamic\Dictionaries\Dictionary;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fieldtypes;
+use Statamic\Forms;
+use Statamic\Forms\Fields\FormFieldtype;
 use Statamic\Forms\JsDrivers;
 use Statamic\Modifiers\CoreModifiers;
 use Statamic\Modifiers\Modifier;
@@ -30,6 +32,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Actions\CopyAssetUrl::class,
         Actions\CopyPasswordResetLink::class,
         Actions\Delete::class,
+        Actions\DeleteFakeSubmissions::class,
         Actions\DeleteMultisiteEntry::class,
         Actions\DisableTwoFactorAuthentication::class,
         Actions\DownloadAsset::class,
@@ -88,9 +91,14 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\GlobalSetSites::class,
         Fieldtypes\Grid::class,
         Fieldtypes\Group::class,
+        Fieldtypes\FormBanner::class,
+        Fieldtypes\FormHeading::class,
+        Fieldtypes\FormParagraph::class,
+        Fieldtypes\FormUpload::class,
         Fieldtypes\Hidden::class,
         Fieldtypes\Html::class,
         Fieldtypes\Icon::class,
+        Fieldtypes\ImageChoice::class,
         Fieldtypes\Integer::class,
         Fieldtypes\Link::class,
         Fieldtypes\Lists::class,
@@ -98,7 +106,9 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Markdown\Buttons::class,
         Fieldtypes\Navs::class,
         Fieldtypes\NestedFields::class,
+        Fieldtypes\OpinionScale::class,
         Fieldtypes\Radio::class,
+        Fieldtypes\Ranking::class,
         Fieldtypes\Range::class,
         Fieldtypes\Replicator::class,
         Fieldtypes\Revealer::class,
@@ -109,6 +119,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Structures::class,
         Fieldtypes\Slug::class,
         Fieldtypes\Spacer::class,
+        Fieldtypes\StarRating::class,
         Fieldtypes\Table::class,
         Fieldtypes\Taggable::class,
         Fieldtypes\Terms::class,
@@ -126,7 +137,37 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Width::class,
         Fieldtypes\Video::class,
         Fieldtypes\Yaml::class,
+        Fieldtypes\YesNo::class,
         \Statamic\Forms\Fieldtype::class,
+    ];
+
+    protected $formFieldtypes = [
+        Forms\Fieldtypes\Banner::class,
+        Forms\Fieldtypes\Checkboxes::class,
+        Forms\Fieldtypes\Currency::class,
+        Forms\Fieldtypes\DatePicker::class,
+        Forms\Fieldtypes\Dictionary::class,
+        Forms\Fieldtypes\Dropdown::class,
+        Forms\Fieldtypes\Email::class,
+        Forms\Fieldtypes\Group::class,
+        Forms\Fieldtypes\Heading::class,
+        Forms\Fieldtypes\ImageChoice::class,
+        Forms\Fieldtypes\LongAnswer::class,
+        Forms\Fieldtypes\MultiChoice::class,
+        Forms\Fieldtypes\Name::class,
+        Forms\Fieldtypes\Number::class,
+        Forms\Fieldtypes\OpinionScale::class,
+        Forms\Fieldtypes\Paragraph::class,
+        Forms\Fieldtypes\Phone::class,
+        Forms\Fieldtypes\Ranking::class,
+        Forms\Fieldtypes\ShortAnswer::class,
+        Forms\Fieldtypes\Spacer::class,
+        Forms\Fieldtypes\StarRating::class,
+        Forms\Fieldtypes\TimePicker::class,
+        Forms\Fieldtypes\Toggle::class,
+        Forms\Fieldtypes\Upload::class,
+        Forms\Fieldtypes\Website::class,
+        Forms\Fieldtypes\YesNo::class,
     ];
 
     protected $modifierAliases = [
@@ -160,6 +201,8 @@ class ExtensionServiceProvider extends ServiceProvider
         Scopes\Filters\Fields::class,
         Scopes\Filters\Blueprint::class,
         Scopes\Filters\Status::class,
+        Scopes\Filters\SubmissionSite::class,
+        Scopes\Filters\SubmissionStatus::class,
         Scopes\Filters\Site::class,
         Scopes\Filters\UserRole::class,
         Scopes\Filters\UserGroup::class,
@@ -311,6 +354,11 @@ class ExtensionServiceProvider extends ServiceProvider
                 'class' => Fieldtype::class,
                 'directory' => 'Fieldtypes',
                 'extensions' => $this->fieldtypes,
+            ],
+            'form-fieldtypes' => [
+                'class' => FormFieldtype::class,
+                'directory' => 'FormFieldtypes',
+                'extensions' => $this->formFieldtypes,
             ],
             'modifiers' => [
                 'class' => Modifier::class,

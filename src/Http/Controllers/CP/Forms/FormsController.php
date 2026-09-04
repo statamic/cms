@@ -6,42 +6,49 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\CP\Column;
-use Statamic\CP\PublishForm;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
-use Statamic\Facades\Scope;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Http\Controllers\CP\Forms\Concerns\ProvidesFormAbilities;
 use Statamic\Rules\Handle;
+use Statamic\Statamic;
 use Statamic\Support\Str;
 
 use function Statamic\trans as __;
 
 class FormsController extends CpController
 {
+    use ProvidesFormAbilities;
+
     public function index(Request $request)
     {
         $this->authorize('index', FormContract::class);
 
-        $columns = [
-            Column::make('title')->label(__('Title')),
-            Column::make('submissions')->label(__('Submissions')),
-        ];
+        $user = User::current();
 
-        $forms = Form::all()
-            ->filter(function ($form) {
-                return User::current()->can('view', $form);
-            })
-            ->map(function ($form) {
+        $columns = [Column::make('title')->label(__('Title'))];
+
+        $forms = Form::all()->filter(fn ($form) => $user->can('view', $form));
+
+        if ($forms->contains(fn ($form) => $user->can('viewSubmissions', $form))) {
+            $columns[] = Column::make('submissions')->label(__('Submissions'));
+        }
+
+        $forms = $forms
+            ->map(function ($form) use ($user) {
+                $canViewSubmissions = $user->can('viewSubmissions', $form);
+
                 return [
                     'id' => $form->handle(),
                     'title' => __($form->title()),
-                    'submissions' => $form->querySubmissions()->count(),
+                    'status' => $form->status(),
+                    'submissions' => $canViewSubmissions ? $form->querySubmissions()->whereNull('partial')->count() : null,
                     'show_url' => $form->showUrl(),
+                    'submissions_url' => $form->submissionsUrl(),
                     'edit_url' => $form->editUrl(),
-                    'blueprint_url' => cp_route('blueprints.forms.edit', $form->handle()),
-                    'can_edit' => User::current()->can('edit', $form),
-                    'can_edit_blueprint' => User::current()->can('configure form fields', $form),
+                    'can_edit' => $user->can('edit', $form),
+                    'can_view_submissions' => $canViewSubmissions,
                 ];
             })
             ->values();
@@ -50,7 +57,7 @@ class FormsController extends CpController
             'forms' => $forms,
             'initialColumns' => $columns,
             'actionUrl' => cp_route('forms.actions.run'),
-            'canCreate' => User::current()->can('create', FormContract::class),
+            'canCreate' => $user->can('create', FormContract::class) && $this->canCreateAdditionalForms(),
             'createUrl' => cp_route('forms.create'),
             'configureEmailUrl' => cp_route('utilities.email'),
         ]);
@@ -60,72 +67,21 @@ class FormsController extends CpController
     {
         $this->authorize('view', $form);
 
-        $columns = $form
-            ->blueprint()
-            ->columns()
-            ->prepend(Column::make('datestamp'), 'datestamp')
-            ->setPreferred("forms.{$form->handle()}.columns")
-            ->rejectUnlisted()
-            ->values();
+        $user = User::current();
 
-        return Inertia::render('forms/Show', [
-            'form' => [
-                'title' => __($form->title()),
-                'handle' => $form->handle(),
-                'editUrl' => $form->editUrl(),
-                'deleteUrl' => $form->deleteUrl(),
-                'blueprintUrl' => cp_route('blueprints.forms.edit', $form->handle()),
-                'canEdit' => User::current()->can('edit', $form),
-                'canDelete' => User::current()->can('delete', $form),
-                'canConfigureFields' => User::current()->can('configure form fields'),
-            ],
-            'columns' => $columns,
-            'filters' => Scope::filters('form-submissions', [
-                'form' => $form->handle(),
-            ]),
-            'actionUrl' => cp_route('forms.submissions.actions.run', $form->handle()),
-            'exporters' => $form->exporters()->map(fn ($exporter) => [
-                'handle' => $exporter->handle(),
-                'title' => $exporter->title(),
-                'downloadUrl' => $exporter->downloadUrl(),
-            ])->values(),
-            'redirectUrl' => cp_route('forms.index'),
-        ]);
-    }
-
-    /**
-     * Get the metrics array ready to be injected into a Grid field.
-     *
-     * @param  Form  $form
-     * @return array
-     */
-    private function preProcessMetrics($form)
-    {
-        $metrics = [];
-
-        foreach ($form->formset()->get('metrics', []) as $params) {
-            $metric = [
-                'type' => $params['type'],
-                'label' => $params['label'],
-            ];
-            unset($params['type'], $params['label']);
-
-            foreach ($params as $key => $value) {
-                $metric['params'][] = [
-                    'value' => $key,
-                    'text' => $value,
-                ];
-            }
-
-            $metrics[] = $metric;
+        if (
+            $user->can('editFields', $form)
+            && ($user->cant('viewSubmissions', $form) || $form->querySubmissions()->count() === 0)
+        ) {
+            return redirect()->route('statamic.cp.forms.builder.edit', $form->handle());
         }
 
-        return $metrics;
+        return redirect()->route('statamic.cp.forms.submissions.index', $form->handle());
     }
 
     public function create()
     {
-        $this->authorizeProIf(Form::all()->count() >= 1);
+        $this->authorizeProIf(! $this->canCreateAdditionalForms());
 
         $this->authorize('create', FormContract::class);
 
@@ -136,7 +92,7 @@ class FormsController extends CpController
 
     public function store(Request $request)
     {
-        $this->authorizeProIf(Form::all()->count() >= 1);
+        $this->authorizeProIf(! $this->canCreateAdditionalForms());
 
         $this->authorize('create', FormContract::class, __('You are not authorized to create forms.'));
 
@@ -155,12 +111,14 @@ class FormsController extends CpController
 
         session()->flash('success', __('Form created'));
 
-        return ['redirect' => $form->editUrl()];
+        return ['redirect' => $form->showUrl()];
     }
 
     public function edit($form)
     {
         $this->authorize('edit', $form);
+
+        $blueprint = $this->editFormBlueprint($form);
 
         $values = array_merge($form->data()->all(), [
             'handle' => $form->handle(),
@@ -168,13 +126,22 @@ class FormsController extends CpController
             'honeypot' => $form->honeypot(),
             'store' => $form->store(),
             'email' => $form->email(),
+            'generate_fake_submissions' => (bool) $form->get('generate_fake_submissions', true),
         ]);
 
-        return PublishForm::make($this->editFormBlueprint($form))
-            ->title(__('Configure Form'))
-            ->values($values)
-            ->asConfig()
-            ->submittingTo(cp_route('forms.update', $form->handle()));
+        $fields = $blueprint
+            ->fields()
+            ->addValues($values)
+            ->preProcess();
+
+        return Inertia::render('forms/Edit', [
+            'form' => $form,
+            'blueprint' => $blueprint->toPublishArray(),
+            'initialValues' => $fields->values(),
+            'initialMeta' => $fields->meta(),
+            'action' => cp_route('forms.update', $form->handle()),
+            'can' => $this->formAbilities($form),
+        ]);
     }
 
     public function update($form, Request $request)
@@ -208,6 +175,13 @@ class FormsController extends CpController
         $form->delete();
     }
 
+    private function canCreateAdditionalForms(): bool
+    {
+        return Form::all()->isEmpty()
+            || Statamic::pro()
+            || Statamic::formsProInstalled();
+    }
+
     protected function editFormBlueprint($form)
     {
         $fields = [
@@ -224,18 +198,6 @@ class FormsController extends CpController
             'fields' => [
                 'display' => __('Fields'),
                 'fields' => [
-                    'blueprint' => [
-                        'display' => __('Blueprint'),
-                        'instructions' => __('statamic::messages.form_configure_blueprint_instructions'),
-                        'type' => 'blueprints',
-                        'options' => [
-                            [
-                                'handle' => 'default',
-                                'title' => __('Edit Blueprint'),
-                                'edit_url' => cp_route('blueprints.forms.edit', $form->handle()),
-                            ],
-                        ],
-                    ],
                     'honeypot' => [
                         'type' => 'text',
                         'instructions' => __('statamic::messages.form_configure_honeypot_instructions'),
@@ -249,6 +211,67 @@ class FormsController extends CpController
                         'display' => __('Store Submissions'),
                         'type' => 'toggle',
                         'instructions' => __('statamic::messages.form_configure_store_instructions'),
+                    ],
+                    'generate_fake_submissions' => [
+                        'display' => __('Enable Fake Submission Generator'),
+                        'type' => 'toggle',
+                        'default' => true,
+                        'instructions' => __('statamic::messages.form_configure_generate_fake_submissions_instructions'),
+                    ],
+                ],
+            ],
+            'access' => [
+                'display' => __('Access'),
+                'fields' => [
+                    'close_date' => [
+                        'display' => __('Close Date'),
+                        'type' => 'date',
+                        'time_enabled' => true,
+                        'instructions' => __('statamic::messages.form_configure_close_date_instructions'),
+                    ],
+                    'submission_limit' => [
+                        'display' => __('Submission Limit'),
+                        'type' => 'integer',
+                        'instructions' => __('statamic::messages.form_configure_submission_limit_instructions'),
+                    ],
+                    'submission_limit_period' => [
+                        'display' => __('Submission Limit Period'),
+                        'type' => 'button_group',
+                        'default' => 'total',
+                        'options' => [
+                            'total' => __('Total'),
+                            'day' => __('Per Day'),
+                            'week' => __('Per Week'),
+                            'month' => __('Per Month'),
+                        ],
+                        'if' => [
+                            'submission_limit' => 'not empty',
+                        ],
+                        'instructions' => __('statamic::messages.form_configure_submission_limit_period_instructions'),
+                    ],
+                    'closed_message' => [
+                        'display' => __('Closed Message'),
+                        'type' => 'textarea',
+                        'if_any' => [
+                            'close_date' => 'not empty',
+                            'submission_limit' => 'not empty',
+                        ],
+                        'placeholder' => __('statamic::messages.form_closed_message'),
+                        'instructions' => __('statamic::messages.form_configure_closed_message_instructions'),
+                    ],
+                    'require_login' => [
+                        'display' => __('Require Login'),
+                        'type' => 'toggle',
+                        'instructions' => __('statamic::messages.form_configure_require_login_instructions'),
+                    ],
+                    'require_login_message' => [
+                        'display' => __('Require Login Message'),
+                        'type' => 'textarea',
+                        'if' => [
+                            'require_login' => 'equals true',
+                        ],
+                        'placeholder' => __('statamic::messages.form_require_login_message'),
+                        'instructions' => __('statamic::messages.form_configure_require_login_message_instructions'),
                     ],
                 ],
             ],
@@ -362,10 +385,6 @@ class FormsController extends CpController
                     ],
                 ],
             ],
-
-            // metrics
-            // ...
-
         ];
 
         foreach (Form::extraConfigFor($form->handle()) as $handle => $config) {

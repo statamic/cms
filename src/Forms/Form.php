@@ -2,6 +2,7 @@
 
 namespace Statamic\Forms;
 
+use Carbon\Carbon;
 use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
@@ -18,17 +19,22 @@ use Statamic\Events\FormDeleted;
 use Statamic\Events\FormDeleting;
 use Statamic\Events\FormSaved;
 use Statamic\Events\FormSaving;
-use Statamic\Facades\Blueprint;
+use Statamic\Facades;
+use Statamic\Facades\Blink;
 use Statamic\Facades\File;
 use Statamic\Facades\Form as FormFacade;
 use Statamic\Facades\FormSubmission;
+use Statamic\Facades\User;
 use Statamic\Facades\YAML;
-use Statamic\Forms\Exceptions\BlueprintUndefinedException;
+use Statamic\Fields\Blueprint;
 use Statamic\Forms\Exporters\Exporter;
+use Statamic\Forms\Fields\FormFields;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
+
+use function Statamic\trans as __;
 
 class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContract
 {
@@ -36,11 +42,10 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
 
     protected $handle;
     protected $title;
-    protected $blueprint;
+    protected $fields;
     protected $honeypot;
     protected $store;
     protected $email;
-    protected $metrics;
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
 
@@ -83,6 +88,153 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
             ->args(func_get_args());
     }
 
+    public function formFields($fields = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('fields')
+            ->getter(function ($fields) {
+                if (empty($fields) && $blueprint = Facades\Blueprint::find("forms.{$this->handle()}")) {
+                    $fields = $this->convertFieldsFromBlueprint($blueprint);
+                }
+
+                return new FormFields($fields ?? []);
+            })
+            ->setter(function ($fields) {
+                Blink::forget('form-blueprint-'.$this->handle());
+
+                if (isset($fields['tabs'])) {
+                    $fields = [
+                        'sections' => collect($fields['tabs'])->flatMap(fn ($tab) => $tab['sections'])->all(),
+                    ];
+                }
+
+                if (isset($fields['fields'])) {
+                    $fields = [
+                        'sections' => [
+                            ['fields' => $fields['fields']],
+                        ],
+                    ];
+                }
+
+                return $fields;
+            })
+            ->args(func_get_args());
+    }
+
+    private function convertFieldsFromBlueprint(Blueprint $blueprint): array
+    {
+        $sections = collect($blueprint->contents()['tabs'] ?? [])->flatMap(function (array $tab): array {
+            return collect($tab['sections'] ?? [])->map(function (array $section): array {
+                return [
+                    ...$section,
+                    'fields' => collect($section['fields'] ?? [])->map(function (array $field): array {
+                        $validate = Arr::get($field, 'field.validate');
+                        $validateRules = is_string($validate) ? explode('|', $validate) : ($validate ?? []);
+
+                        $isEmailRule = fn ($rule) => is_string($rule) && ($rule === 'email' || str_starts_with($rule, 'email:'));
+
+                        if (Arr::get($field, 'field.type') === 'text' && collect($validateRules)->contains($isEmailRule)) {
+                            Arr::set($field, 'field.type', 'email');
+                            Arr::pull($field, 'field.input_type');
+
+                            $remainingValidationRules = collect($validateRules)
+                                ->reject($isEmailRule)
+                                ->values();
+
+                            if ($remainingValidationRules->isEmpty()) {
+                                unset($field['field']['validate']);
+                            } else {
+                                $field['field']['validate'] = $remainingValidationRules->all();
+                            }
+                        }
+
+                        $isUrlRule = fn ($rule) => is_string($rule) && ($rule === 'url' || str_starts_with($rule, 'url:'));
+
+                        if (Arr::get($field, 'field.type') === 'text' && collect($validateRules)->contains($isUrlRule)) {
+                            Arr::set($field, 'field.type', 'website');
+                            Arr::pull($field, 'field.input_type');
+
+                            $remainingValidationRules = collect($validateRules)
+                                ->reject($isUrlRule)
+                                ->values();
+
+                            if ($remainingValidationRules->isEmpty()) {
+                                unset($field['field']['validate']);
+                            } else {
+                                $field['field']['validate'] = $remainingValidationRules->all();
+                            }
+                        }
+
+                        if (Arr::get($field, 'field.type') === 'text' && Arr::get($field, 'field.input_type') === 'tel') {
+                            Arr::set($field, 'field.type', 'phone');
+                            Arr::pull($field, 'field.input_type');
+                        }
+
+                        if (
+                            Arr::get($field, 'field.type') === 'text'
+                            && (! Arr::has($field, 'field.input_type') || Arr::get($field, 'field.input_type') === 'text')
+                        ) {
+                            Arr::set($field, 'field.type', 'short_answer');
+                            Arr::pull($field, 'field.input_type');
+                        }
+
+                        if (Arr::get($field, 'field.type') === 'textarea') {
+                            Arr::set($field, 'field.type', 'long_answer');
+                        }
+
+                        if (Arr::get($field, 'field.type') === 'time') {
+                            Arr::set($field, 'field.type', 'time_picker');
+                        }
+
+                        if (Arr::get($field, 'field.type') === 'integer') {
+                            Arr::set($field, 'field.type', 'number');
+                        }
+
+                        if (Arr::get($field, 'field.type') === 'radio') {
+                            Arr::set($field, 'field.type', 'multi_choice');
+                        }
+
+                        if (Arr::get($field, 'field.type') === 'select') {
+                            Arr::set($field, 'field.type', 'dropdown');
+
+                            if (Arr::get($field, 'field.multiple') === true) {
+                                if ($maxItems = Arr::pull($field, 'field.max_items')) {
+                                    Arr::set($field, 'field.max_selections', $maxItems);
+                                }
+                            } else {
+                                Arr::pull($field, 'field.multiple');
+                                Arr::pull($field, 'field.max_items');
+                            }
+                        }
+
+                        if (Arr::get($field, 'field.type') === 'assets') {
+                            Arr::set($field, 'field.type', 'upload');
+                            Arr::set($field, 'field.store', true);
+                        }
+
+                        if (Arr::get($field, 'field.type') === 'files') {
+                            Arr::set($field, 'field.type', 'upload');
+                            Arr::set($field, 'field.store', false);
+                        }
+
+                        return $field;
+                    })->all(),
+                ];
+            })->all();
+        })->all();
+
+        return ['sections' => $sections];
+    }
+
+    public function hasMultiplePages(): bool
+    {
+        if (! Statamic::formsProInstalled()) {
+            return false;
+        }
+
+        return $this->formFields()->pages()->count() > 1;
+    }
+
     /**
      * Get the blueprint.
      *
@@ -90,20 +242,17 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
      */
     public function blueprint()
     {
-        $blueprint = Blueprint::find('forms.'.$this->handle())
-            ?? Blueprint::makeFromFields([])->setHandle($this->handle())->setNamespace('forms');
+        if (Blink::has($blink = 'form-blueprint-'.$this->handle())) {
+            return Blink::get($blink);
+        }
+
+        $blueprint = $this->formFields()->toBlueprint()->setHandle($this->handle());
+
+        Blink::put($blink, $blueprint);
 
         FormBlueprintFound::dispatch($blueprint, $this);
 
         return $blueprint;
-    }
-
-    public function blueprintCommandPaletteLink()
-    {
-        return $this->blueprint()?->commandPaletteLink(
-            type: 'Forms',
-            url: $this->editBlueprintUrl(),
-        );
     }
 
     /**
@@ -160,11 +309,7 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
      */
     public function fields()
     {
-        if (! $blueprint = $this->blueprint()) {
-            throw BlueprintUndefinedException::create($this);
-        }
-
-        return $blueprint->fields()->all();
+        return $this->blueprint()->fields()->all();
     }
 
     /**
@@ -216,6 +361,7 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
 
         $data = $this->data->merge(collect([
             'title' => $this->title,
+            'fields' => $this->formFields()->contents(),
             'honeypot' => $this->honeypot,
             'email' => collect(isset($this->email['to']) ? [$this->email] : $this->email)->map(function ($email) {
                 $email['markdown'] = Arr::get($email, 'markdown') === true ? true : null;
@@ -223,14 +369,21 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
 
                 return Arr::removeNullValues($email);
             })->all(),
-            'metrics' => $this->metrics,
         ]))->filter()->all();
 
         if ($this->store === false) {
             $data['store'] = false;
         }
 
+        if ($this->get('generate_fake_submissions') === false) {
+            $data['generate_fake_submissions'] = false;
+        }
+
         File::put($this->path(), YAML::dump($data));
+
+        if ($blueprint = Facades\Blueprint::find("forms.{$this->handle()}")) {
+            $blueprint->delete();
+        }
 
         foreach ($afterSaveCallbacks as $callback) {
             $callback($this);
@@ -291,7 +444,7 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
             'email',
         ];
 
-        $this->merge(collect($contents)->except($methods));
+        $this->merge(collect($contents)->except([...$methods, 'fields']));
 
         collect($contents)
             ->filter(function ($value, $property) use ($methods) {
@@ -301,38 +454,11 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
                 $this->{$property}($value);
             });
 
+        if (isset($contents['fields'])) {
+            $this->formFields($contents['fields']);
+        }
+
         return $this;
-    }
-
-    // TODO: Reimplement metrics()
-    public function metrics($metrics = null)
-    {
-        return collect();
-
-        // if (! is_null($metrics)) {
-        //     return $this->formset()->set('metrics', $metrics);
-        // }
-
-        // $metrics = [];
-
-        // foreach ($this->formset()->get('metrics', []) as $config) {
-        //     $name = Str::studly($config['type']);
-
-        //     $class = "Statamic\\Forms\\Metrics\\{$name}Metric";
-
-        //     if (! class_exists($class)) {
-        //         $class = "Statamic\\Addons\\{$name}\\{$name}Metric";
-        //     }
-
-        //     if (! class_exists($class)) {
-        //         \Log::error("Metric [{$config['type']}] does not exist.");
-        //         continue;
-        //     }
-
-        //     $metrics[] = new $class($this, $config);
-        // }
-
-        // return $metrics;
     }
 
     /**
@@ -348,6 +474,72 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
     public function querySubmissions(): SubmissionQueryBuilder
     {
         return FormSubmission::query()->where('form', $this->handle());
+    }
+
+    public function status(): string
+    {
+        return Blink::once('form-status-'.$this->handle(), fn () => match (true) {
+            $this->closingDateHasPassed() => 'closed',
+            $this->submissionLimitReached() => 'limit_reached',
+            default => 'open',
+        });
+    }
+
+    public function restricted(): bool
+    {
+        return $this->restrictionMessage() !== null;
+    }
+
+    public function restrictionMessage(): ?string
+    {
+        if ($this->closingDateHasPassed() || $this->submissionLimitReached()) {
+            return ($msg = $this->get('closed_message')) ? __($msg) : __('statamic::messages.form_closed_message');
+        }
+
+        if ($this->get('require_login') && ! User::current()) {
+            return ($msg = $this->get('require_login_message')) ? __($msg) : __('statamic::messages.form_require_login_message');
+        }
+
+        return null;
+    }
+
+    private function closingDateHasPassed(): bool
+    {
+        if (! $date = $this->get('close_date')) {
+            return false;
+        }
+
+        return Carbon::parse($date, config('app.timezone'))->isPast();
+    }
+
+    private function submissionLimitReached(): bool
+    {
+        if (! $limit = (int) $this->get('submission_limit')) {
+            return false;
+        }
+
+        return $this->submissionCount() >= $limit;
+    }
+
+    private function submissionCount(): int
+    {
+        $query = $this->querySubmissions()->whereNull('partial');
+
+        if ($start = $this->submissionLimitPeriodStart()) {
+            $query->where('date', '>=', $start);
+        }
+
+        return $query->count();
+    }
+
+    private function submissionLimitPeriodStart(): ?Carbon
+    {
+        return match ($this->get('submission_limit_period', 'total')) {
+            'day' => now()->startOfDay(),
+            'week' => now()->startOfWeek(),
+            'month' => now()->startOfMonth(),
+            default => null,
+        };
     }
 
     /**
@@ -376,13 +568,23 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
     }
 
     /**
-     * The URL to view form submissions in the CP.
+     * The URL to view the form in the CP.
      *
      * @return string
      */
     public function showUrl()
     {
         return cp_route('forms.show', $this->handle());
+    }
+
+    /**
+     * The URL to view form submissions in the CP.
+     *
+     * @return string
+     */
+    public function submissionsUrl()
+    {
+        return cp_route('forms.submissions.index', $this->handle());
     }
 
     /**
@@ -405,15 +607,16 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
         return cp_route('forms.destroy', $this->handle());
     }
 
+    /** @deprecated */
     public function editBlueprintUrl()
     {
-        return cp_route('blueprints.forms.edit', $this->handle());
+        return cp_route('forms.show', $this->handle());
     }
 
     public function hasFiles()
     {
         return $this->fields()->filter(function ($field) {
-            return in_array($field->fieldtype()->handle(), ['assets', 'files']);
+            return in_array($field->fieldtype()->handle(), ['assets', 'files', 'form_upload']);
         })->isNotEmpty();
     }
 

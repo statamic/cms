@@ -5,10 +5,8 @@ namespace Tests\StaticCaching;
 use Mockery;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Entries\Entry;
-use Statamic\Events\BlueprintSaved;
 use Statamic\Events\CollectionTreeEntriesMovedOrRemoved;
 use Statamic\Facades\Entry as EntryFacade;
-use Statamic\Facades\Form;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\Invalidate;
 use Statamic\StaticCaching\Invalidator;
@@ -18,22 +16,6 @@ use Tests\TestCase;
 class InvalidateTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
-
-    #[Test]
-    public function it_invalidates_a_form_when_its_blueprint_is_saved()
-    {
-        $form = tap(Form::make('contact'))->save();
-
-        $event = new BlueprintSaved($form->blueprint());
-
-        $invalidator = Mockery::mock(Invalidator::class)->shouldReceive('invalidate')->once()->withArgs(function ($form) {
-            return $form->handle() === 'contact';
-        })->getMock();
-
-        $invalidate = new Invalidate($invalidator, Mockery::mock(Cacher::class));
-
-        $invalidate->invalidateByBlueprint($event);
-    }
 
     private function mockEntry(string $url): Entry
     {

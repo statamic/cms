@@ -32,7 +32,7 @@ trait ManagesFields
                 'sections_count' => $fieldset->hasSections() ? $fieldset->sections()->count() : 0,
                 'fields' => $fields->map(function ($field) {
                     return FieldTransformer::toVue($field);
-                })->sortBy('config.display')->values()->all(),
+                })->values()->all(),
             ]];
         })->sortBy('title');
     }

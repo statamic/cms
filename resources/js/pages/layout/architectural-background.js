@@ -1,14 +1,17 @@
 import { nextTick, onMounted, onUnmounted } from 'vue';
 
 const className = 'bg-architectural-lines';
-const id = 'content-card';
+
+function target() {
+    return document.querySelector('#content-card .content-card') ?? document.getElementById('content-card');
+}
 
 function add() {
-    nextTick(() => document.getElementById(id).classList.add(className));
+    nextTick(() => target()?.classList.add(className));
 }
 
 function remove() {
-    nextTick(() => document.getElementById(id).classList.remove(className));
+    nextTick(() => target()?.classList.remove(className));
 }
 
 export default function useArchitecturalBackground() {

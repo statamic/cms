@@ -32,7 +32,65 @@ class EditFormTest extends TestCase
             ->actingAs($user)
             ->get(cp_route('forms.edit', $form->handle()))
             ->assertSuccessful()
-            ->assertSee('Configure Form');
+            ->assertInertia(fn ($page) => $page->component('forms/Edit'));
+    }
+
+    #[Test]
+    public function it_shows_the_edit_page_with_the_edit_forms_permission()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'edit forms']]);
+        $user = User::make()->assignRole('test')->save();
+        $form = tap(Form::make('test'))->save();
+
+        $this
+            ->actingAs($user)
+            ->get(cp_route('forms.edit', $form->handle()))
+            ->assertSuccessful()
+            ->assertInertia(fn ($page) => $page->component('forms/Edit'));
+    }
+
+    #[Test]
+    public function it_shows_the_edit_page_with_the_edit_form_permission()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'edit test form']]);
+        $user = User::make()->assignRole('test')->save();
+        $form = tap(Form::make('test'))->save();
+
+        $this
+            ->actingAs($user)
+            ->get(cp_route('forms.edit', $form->handle()))
+            ->assertSuccessful()
+            ->assertInertia(fn ($page) => $page->component('forms/Edit'));
+    }
+
+    #[Test]
+    public function it_denies_access_with_only_submission_permissions()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'view form submissions', 'view test form submissions']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+        $form = tap(Form::make('test'))->save();
+
+        $this
+            ->from('/original')
+            ->actingAs($user)
+            ->get(cp_route('forms.edit', $form->handle()))
+            ->assertRedirect('/original')
+            ->assertSessionHas('error');
+    }
+
+    #[Test]
+    public function it_denies_access_with_only_the_configure_form_fields_permission()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'configure form fields']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+        $form = tap(Form::make('test'))->save();
+
+        $this
+            ->from('/original')
+            ->actingAs($user)
+            ->get(cp_route('forms.edit', $form->handle()))
+            ->assertRedirect('/original')
+            ->assertSessionHas('error');
     }
 
     #[Test]
@@ -72,7 +130,6 @@ class EditFormTest extends TestCase
             ->assertSuccessful()
             ->assertSeeInOrder([
                 'Title',
-                'Blueprint',
                 'Honeypot',
                 'First injected into fields section',
                 'Second injected into fields section',

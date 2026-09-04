@@ -10,7 +10,7 @@ use Statamic\Facades\AssetContainer;
 class FormUploadValidationTest extends FormTestCase
 {
     #[Test]
-    public function it_rejects_disallowed_extensions_uploaded_to_a_files_field()
+    public function it_enforces_default_allowed_extensions_on_a_files_field()
     {
         Storage::fake('local');
 
@@ -28,7 +28,7 @@ class FormUploadValidationTest extends FormTestCase
     }
 
     #[Test]
-    public function it_allows_permitted_extensions_uploaded_to_a_files_field()
+    public function it_allows_uploads_permitted_by_the_default_allowed_extensions()
     {
         Storage::fake('local');
 
@@ -41,6 +41,42 @@ class FormUploadValidationTest extends FormTestCase
         $this
             ->post('/!/forms/survey', [
                 'document' => UploadedFile::fake()->create('notes.txt', 10),
+            ])
+            ->assertSessionHasNoErrors();
+    }
+
+    #[Test]
+    public function it_enforces_allowed_extensions_on_a_files_field()
+    {
+        Storage::fake('local');
+
+        $this->createForm([
+            'fields' => [
+                ['handle' => 'document', 'field' => ['type' => 'files', 'allowed_extensions' => ['pdf']]],
+            ],
+        ], 'survey');
+
+        $this
+            ->post('/!/forms/survey', [
+                'document' => UploadedFile::fake()->create('notes.txt', 10),
+            ])
+            ->assertSessionHasErrors('document.0', null, 'form.survey');
+    }
+
+    #[Test]
+    public function it_allows_uploads_permitted_by_the_allowed_extensions()
+    {
+        Storage::fake('local');
+
+        $this->createForm([
+            'fields' => [
+                ['handle' => 'document', 'field' => ['type' => 'files', 'allowed_extensions' => ['pdf']]],
+            ],
+        ], 'survey');
+
+        $this
+            ->post('/!/forms/survey', [
+                'document' => UploadedFile::fake()->create('notes.pdf', 10),
             ])
             ->assertSessionHasNoErrors();
     }

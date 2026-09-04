@@ -7,6 +7,11 @@
     grid-template-columns: repeat(var(--grid-columns), 1fr);
     @apply gap-x-3 gap-6 @lg/panel:gap-8;
 
+    &[data-fields-collapsed="true"] {
+        /* Collapse the grid further on Forms > Someform > Edit, when we're in the collapsed view */
+        @apply gap-2;
+    }
+
     aside & {
         @apply gap-x-2 gap-y-6;
     }

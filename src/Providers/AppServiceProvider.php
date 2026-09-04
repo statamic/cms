@@ -23,6 +23,7 @@ use Statamic\Facades\Token;
 use Statamic\Facades\User;
 use Statamic\Fields\FieldsetRecursionStack;
 use Statamic\Http\Middleware\PingOutpost;
+use Statamic\Jobs\DeletePartialFormSubmissions;
 use Statamic\Jobs\HandleEntrySchedule;
 use Statamic\Licensing\Radio;
 use Statamic\Notifications\ElevatedSessionVerificationCode;
@@ -149,6 +150,8 @@ class AppServiceProvider extends ServiceProvider
         if (config('statamic.system.handle_scheduled_entries')) {
             $this->app->make(Schedule::class)->job(HandleEntrySchedule::class)->everyMinute();
         }
+
+        $this->app->make(Schedule::class)->job(DeletePartialFormSubmissions::class)->daily();
 
         $this->app->make(Schedule::class)
             ->call(fn () => app(Radio::class)->ping())

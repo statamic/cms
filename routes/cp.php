@@ -65,9 +65,15 @@ use Statamic\Http\Controllers\CP\Fieldtypes\RelationshipFieldtypeController;
 use Statamic\Http\Controllers\CP\Fieldtypes\ReplicatorSetController;
 use Statamic\Http\Controllers\CP\Forms\ActionController as FormActionController;
 use Statamic\Http\Controllers\CP\Forms\FormBlueprintController;
+use Statamic\Http\Controllers\CP\Forms\FormBuilderController;
+use Statamic\Http\Controllers\CP\Forms\FormConnectController;
 use Statamic\Http\Controllers\CP\Forms\FormExportController;
+use Statamic\Http\Controllers\CP\Forms\FormFieldsController;
+use Statamic\Http\Controllers\CP\Forms\FormFieldsetPreviewsController;
+use Statamic\Http\Controllers\CP\Forms\FormLogicController;
 use Statamic\Http\Controllers\CP\Forms\FormsController;
 use Statamic\Http\Controllers\CP\Forms\FormSubmissionsController;
+use Statamic\Http\Controllers\CP\Forms\GenerateFakeSubmissionController;
 use Statamic\Http\Controllers\CP\Forms\SubmissionActionController;
 use Statamic\Http\Controllers\CP\Globals\GlobalsBlueprintController;
 use Statamic\Http\Controllers\CP\Globals\GlobalsController;
@@ -307,8 +313,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
             Route::get('asset-containers/{asset_container}/edit', [AssetContainerBlueprintController::class, 'edit'])->name('asset-containers.edit');
             Route::patch('asset-containers/{asset_container}', [AssetContainerBlueprintController::class, 'update'])->name('asset-containers.update');
 
-            Route::get('forms/{form}/edit', [FormBlueprintController::class, 'edit'])->name('forms.edit');
-            Route::patch('forms/{form}', [FormBlueprintController::class, 'update'])->name('forms.update');
+            Route::get('forms/{form}/edit', FormBlueprintController::class)->name('forms.edit');
 
             Route::get('globals/{global_set}/edit', [GlobalsBlueprintController::class, 'edit'])->name('globals.edit');
             Route::patch('globals/{global_set}', [GlobalsBlueprintController::class, 'update'])->name('globals.update');
@@ -346,8 +351,19 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::post('forms/actions/list', [FormActionController::class, 'bulkActions'])->name('forms.actions.bulk');
     Route::post('forms/{form}/submissions/actions', [SubmissionActionController::class, 'run'])->name('forms.submissions.actions.run');
     Route::post('forms/{form}/submissions/actions/list', [SubmissionActionController::class, 'bulkActions'])->name('forms.submissions.actions.bulk');
+    Route::post('forms/{form}/submissions/generate-fake', GenerateFakeSubmissionController::class)->name('forms.submissions.generate-fake');
     Route::resource('forms', FormsController::class);
-    Route::resource('forms.submissions', FormSubmissionsController::class);
+    Route::get('forms/{form}/submissions', [FormSubmissionsController::class, 'index'])->name('forms.submissions.index');
+    Route::get('forms/{form}/submissions/{submission}', [FormSubmissionsController::class, 'show'])->name('forms.submissions.show');
+    Route::delete('forms/{form}/submissions/{submission}', [FormSubmissionsController::class, 'destroy'])->name('forms.submissions.destroy');
+    Route::get('forms/{form}/builder', [FormBuilderController::class, 'edit'])->name('forms.builder.edit');
+    Route::patch('forms/{form}/builder', [FormBuilderController::class, 'update'])->name('forms.builder.update');
+    Route::post('forms/{form}/builder/fields/edit', [FormFieldsController::class, 'edit'])->name('forms.builder.fields.edit');
+    Route::post('forms/{form}/builder/fields/update', [FormFieldsController::class, 'update'])->name('forms.builder.fields.update');
+    Route::post('forms/{form}/builder/fieldset-previews', FormFieldsetPreviewsController::class)->name('forms.builder.fieldset-previews');
+    Route::get('forms/{form}/logic', [FormLogicController::class, 'edit'])->name('forms.logic.edit');
+    Route::patch('forms/{form}/logic', [FormLogicController::class, 'update'])->name('forms.logic.update');
+    Route::get('forms/{form}/connect', FormConnectController::class)->name('forms.connect.index');
     Route::get('forms/{form}/export/{type}', [FormExportController::class, 'export'])->name('forms.export');
 
     Route::post('users/actions', [UserActionController::class, 'run'])->name('users.actions.run');
