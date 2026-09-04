@@ -34,6 +34,7 @@ use Statamic\Exceptions\FileExtensionMismatch;
 use Statamic\Facades;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\File;
+use Statamic\Facades\Stache;
 use Statamic\Facades\YAML;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\Fieldtype;
@@ -60,10 +61,12 @@ class AssetTest extends TestCase
         config(['cache.default' => 'file']);
         Cache::clear();
 
-        config(['filesystems.disks.test' => [
-            'driver' => 'local',
-            'root' => __DIR__.'/tmp',
-        ]]);
+        config([
+            'filesystems.disks.test' => [
+                'driver' => 'local',
+                'root' => __DIR__.'/tmp',
+            ],
+        ]);
 
         $this->container = (new AssetContainer)
             ->handle('test_container')
@@ -353,11 +356,13 @@ class AssetTest extends TestCase
             'by calling set method' => [fn ($asset) => $asset->set('one', 'new-foo')],
             'by calling data method' => [fn ($asset) => $asset->data(['one' => 'new-foo', 'two' => 'bar', 'three' => 'qux'])],
             'by calling merge method' => [fn ($asset) => $asset->merge(['one' => 'new-foo', 'three' => 'qux'])],
-            'by calling __set() magically via property' => [function ($asset) {
-                $asset->one = 'new-foo';
+            'by calling __set() magically via property' => [
+                function ($asset) {
+                    $asset->one = 'new-foo';
 
-                return $asset;
-            }],
+                    return $asset;
+                },
+            ],
         ];
     }
 
@@ -636,8 +641,33 @@ class AssetTest extends TestCase
     public function it_checks_if_it_can_be_previewed_in_google_docs_previewer()
     {
         $extensions = [
-            'doc', 'docx', 'pages', 'txt', 'ai', 'psd', 'eps', 'ps', 'css', 'html', 'php', 'c', 'cpp', 'h', 'hpp', 'js',
-            'ppt', 'pptx', 'flv', 'tiff', 'ttf', 'dxf', 'xps', 'zip', 'rar', 'xls', 'xlsx',
+            'doc',
+            'docx',
+            'pages',
+            'txt',
+            'ai',
+            'psd',
+            'eps',
+            'ps',
+            'css',
+            'html',
+            'php',
+            'c',
+            'cpp',
+            'h',
+            'hpp',
+            'js',
+            'ppt',
+            'pptx',
+            'flv',
+            'tiff',
+            'ttf',
+            'dxf',
+            'xps',
+            'zip',
+            'rar',
+            'xls',
+            'xlsx',
         ];
 
         foreach ($extensions as $ext) {
@@ -724,6 +754,29 @@ class AssetTest extends TestCase
         // After we ask for meta, we should see it in cache as well...
         $this->assertEquals($expected, $asset->meta());
         $this->assertEquals($expected, Cache::get($asset->metaCacheKey()));
+    }
+
+    #[Test]
+    public function it_gets_existing_meta_data_as_content()
+    {
+        config()->set('statamic.assets.meta_as_content', true);
+        $relativePath = 'foo/test.txt';
+        $metaFilePath = Stache::store('assets')->directory()."/test/{$relativePath}.yaml";
+
+        Storage::fake('test');
+        Storage::disk('test')->put($relativePath, '');
+
+        File::makeDirectory(dirname($metaFilePath), 0755, true);
+        File::put($metaFilePath, YAML::dump($data = [
+            'data' => ['foo' => 'bar'],
+            'size' => 123,
+        ]));
+
+        $container = tap(Facades\AssetContainer::make('test')->disk('test'))->save();
+        $asset = (new Asset)->container($container)->path($relativePath);
+
+        $this->assertEquals($metaFilePath, $asset->metaPath());
+        $this->assertEquals($data, $asset->meta());
     }
 
     #[Test]
@@ -1318,6 +1371,36 @@ class AssetTest extends TestCase
         $this->assertEquals([
             'new/do-NOT-lowercase-THIS-file.txt',
         ], $container->assets('/', true)->map->path()->all());
+    }
+
+    #[Test]
+    public function it_can_be_moved_to_another_folder_and_renamed_when_meta_as_content()
+    {
+        config()->set('statamic.assets.meta_as_content', true);
+
+        Storage::fake('test');
+        $disk = Storage::disk('test');
+        $disk->put('old/asset.txt', 'The asset contents');
+
+        $container = tap(Facades\AssetContainer::make('test')->disk('test'))->save();
+        $asset = tap($container->makeAsset('old/asset.txt')->data(['foo' => 'bar']))->save();
+        $meta = $asset->meta();
+
+        $metaPath = Stache::store('assets')->directory().'/'.$container->handle();
+
+        $this->assertFileExists("{$metaPath}/old/asset.txt.yaml");
+        $this->assertEquals(YAML::dump($asset->meta()), File::get("{$metaPath}/old/asset.txt.yaml"));
+        $this->assertEquals(['old/asset.txt'], $container->files()->all());
+
+        $return = $asset->move('new', 'asset2');
+
+        $this->assertEquals($return, $asset);
+        $disk->assertMissing('old/asset.txt');
+        $this->assertFileDoesNotExist("{$metaPath}/old/asset.txt.yaml");
+        $disk->assertExists('new/asset2.txt');
+        $this->assertFileExists($newMetaPath = "{$metaPath}/new/asset2.txt.yaml");
+        $this->assertEquals(YAML::dump($meta), File::get($newMetaPath));
+        $this->assertEquals(['new/asset2.txt'], $container->files()->all());
     }
 
     #[Test]
@@ -1981,10 +2064,12 @@ class AssetTest extends TestCase
     {
         Event::fake();
 
-        config(['statamic.assets.image_manipulation.presets.small' => [
-            'w' => '15',
-            'h' => '15',
-        ]]);
+        config([
+            'statamic.assets.image_manipulation.presets.small' => [
+                'w' => '15',
+                'h' => '15',
+            ],
+        ]);
 
         $this->container->sourcePreset('small');
 
@@ -2027,9 +2112,11 @@ class AssetTest extends TestCase
     {
         Event::fake();
 
-        config(['statamic.assets.image_manipulation.presets.enforce_png' => [
-            $formatParam => 'png',
-        ]]);
+        config([
+            'statamic.assets.image_manipulation.presets.enforce_png' => [
+                $formatParam => 'png',
+            ],
+        ]);
 
         $this->container->sourcePreset('enforce_png');
 
@@ -2063,9 +2150,11 @@ class AssetTest extends TestCase
     {
         Event::fake();
 
-        config(['statamic.assets.image_manipulation.presets.progressive' => [
-            'fm' => 'pjpg',
-        ]]);
+        config([
+            'statamic.assets.image_manipulation.presets.progressive' => [
+                'fm' => 'pjpg',
+            ],
+        ]);
 
         $this->container->sourcePreset('progressive');
 
@@ -2192,10 +2281,12 @@ class AssetTest extends TestCase
     {
         Event::fake();
 
-        config(['statamic.assets.image_manipulation.presets.small' => [
-            'w' => '15',
-            'h' => '15',
-        ]]);
+        config([
+            'statamic.assets.image_manipulation.presets.small' => [
+                'w' => '15',
+                'h' => '15',
+            ],
+        ]);
 
         $this->container->sourcePreset('small');
 
@@ -2534,10 +2625,21 @@ class AssetTest extends TestCase
     private function toArrayKeysWhenFileExists()
     {
         return [
-            'size', 'size_bytes', 'size_kilobytes', 'size_megabytes', 'size_gigabytes',
-            'size_b', 'size_kb', 'size_mb', 'size_gb',
-            'last_modified', 'last_modified_timestamp', 'last_modified_instance',
-            'focus', 'focus_css', 'mime_type',
+            'size',
+            'size_bytes',
+            'size_kilobytes',
+            'size_megabytes',
+            'size_gigabytes',
+            'size_b',
+            'size_kb',
+            'size_mb',
+            'size_gb',
+            'last_modified',
+            'last_modified_timestamp',
+            'last_modified_instance',
+            'focus',
+            'focus_css',
+            'mime_type',
         ];
     }
 
