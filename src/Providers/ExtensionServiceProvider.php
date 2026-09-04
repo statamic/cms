@@ -91,6 +91,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Hidden::class,
         Fieldtypes\Html::class,
         Fieldtypes\Icon::class,
+        Fieldtypes\Info::class,
         Fieldtypes\Integer::class,
         Fieldtypes\Link::class,
         Fieldtypes\Lists::class,
