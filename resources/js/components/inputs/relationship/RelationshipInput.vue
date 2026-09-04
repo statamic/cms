@@ -11,7 +11,6 @@
             :read-only="readOnly"
             :url="selectionsUrl"
             :site="site"
-            :tree="tree"
             @input="selectFieldSelected"
             @focus="$emit('focus')"
             @blur="$emit('blur')"

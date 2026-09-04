@@ -91,7 +91,6 @@ export default {
         config: Object,
         readOnly: Boolean,
         site: String,
-        tree: Object,
     },
 
     data() {
