@@ -268,7 +268,6 @@ defineExpose({ refresh: fetchSummary });
                     >
                         <template v-if="editing" #chrome>
                             <EditChrome
-                                class="rounded-b-xl border-t-0"
                                 :config="widget.config"
                                 :charts="availableCharts"
                                 @update:chart="setChart(index, $event)"
@@ -286,14 +285,22 @@ defineExpose({ refresh: fetchSummary });
                         :icon="chartableField(widget.config.field)?.icon"
                         icon-class="hidden @xs/widget:block size-4 text-gray-500"
                     >
-                        <div class="relative flex-1 overflow-hidden rounded-b-xl">
+                        <template v-if="editing" #actions>
                             <EditChrome
-                                class="rounded-b-xl border-t-0"
                                 :config="widget.config"
                                 :charts="availableCharts"
                                 @update:chart="setChart(index, $event)"
                                 @remove="removeChart(index)"
                             />
+                        </template>
+                        <div
+                            class="relative flex-1 overflow-hidden rounded-b-xl"
+                            :class="
+                                editing
+                                    ? 'summary-chart-handle cursor-grab border border-t-0 border-dashed border-gray-400 dark:border-gray-700 active:cursor-grabbing'
+                                    : undefined
+                            "
+                        >
                             <div class="flex h-full items-center justify-center">
                                 <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('statamic::messages.form_summary_save_to_see_chart') }}</p>
                             </div>

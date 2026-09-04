@@ -23,6 +23,12 @@ const editingHeaderClass = computed(() =>
         : undefined,
 );
 
+const editingBodyClass = computed(() =>
+    props.editing
+        ? 'summary-chart-handle cursor-grab border border-t-0 border-dashed border-gray-400 dark:border-gray-700 active:cursor-grabbing'
+        : undefined,
+);
+
 const showingDrilldown = ref(false);
 
 const chart = computed(() => props.field.chart);
@@ -73,11 +79,17 @@ watch(chart, () => (showingDrilldown.value = false));
         :icon="field.icon"
         icon-class="hidden @xs/widget:block size-4 text-gray-500"
     >
-        <template v-if="showingDrilldown" #actions>
-            <Button size="sm" icon="arrow-left" :text="__('Back')" @click="showingDrilldown = false" />
+        <template #actions>
+            <slot v-if="editing" name="chrome" />
+            <Button
+                v-else-if="showingDrilldown"
+                size="sm"
+                icon="arrow-left"
+                :text="__('Back')"
+                @click="showingDrilldown = false"
+            />
         </template>
-        <div class="relative flex-1 overflow-hidden rounded-b-xl">
-            <slot name="chrome" />
+        <div class="relative flex-1 overflow-hidden rounded-b-xl" :class="editingBodyClass">
             <p v-if="hasDrilldown" class="sr-only" aria-live="polite">{{ showingDrilldown ? accessibleLabel : '' }}</p>
             <component :is="chart.component" v-bind="chartProps" @select="showingDrilldown = true">
                 <template v-if="field.insights.length" #summary>
