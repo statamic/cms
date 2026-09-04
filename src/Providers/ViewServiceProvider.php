@@ -425,7 +425,7 @@ PHP;
 
     public function boot()
     {
-        ViewFactory::addNamespace('compiled__views', storage_path('framework/views'));
+        ViewFactory::addNamespace('compiled__views', storage_path('statamic/tmp/nocache'));
 
         Region::preserveContextKeys(IncludeTag::VIEW_DATA_KEYS);
 
