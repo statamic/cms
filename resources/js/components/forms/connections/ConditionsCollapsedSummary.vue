@@ -99,7 +99,7 @@ const collapsedSummary = computed(() => {
     <Badge v-if="filteredConditions.length" pill size="sm" color="white" class="ms-1 font-medium text-gray-800 dark:text-gray-200">
         {{ __('If') }}
     </Badge>
-    <Badge v-if="firstFieldConfig" size="lg" pill color="white" class="px-3 text-gray-950 gap-1">
+    <Badge v-if="firstFieldConfig" pill color="white" class="ps-1.5 py-1 text-gray-950 gap-1">
         <FieldNumber :field-key="firstFieldConfig.handle" class="me-0.5" />
         <Icon
             :name="firstFieldConfig.icon"
@@ -107,7 +107,7 @@ const collapsedSummary = computed(() => {
             :class="firstFieldConfig.iconClass"
             aria-hidden="true"
         />
-        {{ firstFieldConfig.display }}
+        <span class="st-text-trim-cap">{{ firstFieldConfig.display }}</span>
     </Badge>
     <Subheading class="overflow-hidden text-ellipsis whitespace-nowrap text-xs flex items-center gap-1">
         <template v-if="collapsedSummary">
