@@ -28,6 +28,7 @@ class Revision implements Arrayable, ContainsQueryableValues, Contract
     protected $user;
     protected $userId;
     protected $message;
+    protected $publishAt;
     protected $action = 'revision';
     protected $attributes = [];
 
@@ -64,6 +65,11 @@ class Revision implements Arrayable, ContainsQueryableValues, Contract
     public function message($message = null)
     {
         return $this->fluentlyGetOrSet('message')->args(func_get_args());
+    }
+
+    public function publishAt($dateTime = null)
+    {
+        return $this->fluentlyGetOrSet('publishAt')->args(func_get_args());
     }
 
     public function attributes($attributes = null)
@@ -108,6 +114,7 @@ class Revision implements Arrayable, ContainsQueryableValues, Contract
             'date' => $this->date->timestamp,
             'user' => $this->userId ?: null,
             'message' => $this->message ?: null,
+            'publish_at' => $this->publishAt?->timestamp,
             'attributes' => $this->attributes,
         ];
     }
@@ -130,6 +137,7 @@ class Revision implements Arrayable, ContainsQueryableValues, Contract
             'date' => $this->date()->timestamp,
             'user' => $user,
             'message' => $this->message,
+            'publish_at' => $this->publishAt?->timestamp,
             'attributes' => $this->attributes,
         ];
     }
@@ -179,6 +187,7 @@ class Revision implements Arrayable, ContainsQueryableValues, Contract
             'date' => $this->date(),
             'user' => $this->userId,
             'message' => $this->message(),
+            'publish_at' => $this->publishAt(),
             'path' => $this->path(),
             default => throw new \Exception('Field ['.$field.'] is not queryable on Revision.'),
         };
