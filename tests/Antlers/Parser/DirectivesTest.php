@@ -31,6 +31,40 @@ EXECTED;
         );
     }
 
+    public function test_directives_are_detected_after_multibyte_content()
+    {
+        $template = <<<'EOT'
+café
+@props(['title' => 'Default'])
+{{ title }}
+EOT;
+
+        $expected = <<<'EOT'
+café
+
+The Title
+EOT;
+
+        $this->assertSame($expected, $this->renderString($template, ['title' => 'The Title']));
+    }
+
+    public function test_directives_are_detected_after_an_escaped_directive()
+    {
+        $template = <<<'EOT'
+@@props
+@props(['title' => 'Default'])
+{{ title }}
+EOT;
+
+        $expected = <<<'EOT'
+@props
+
+The Title
+EOT;
+
+        $this->assertSame($expected, $this->renderString($template, ['title' => 'The Title']));
+    }
+
     public function test_directives_args_must_be_finished()
     {
         $this->expectExceptionMessage('Incomplete arguments for @props directive');

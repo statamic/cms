@@ -364,13 +364,11 @@ class DocumentParser
                 if (in_array($antlersRegion, ['@props', '@aware', '@cascade'])) {
                     $offset = mb_strpos($this->content, $antlersRegion, $lastAntlersOffset);
 
-                    if ($antlersMatch[1] > 0) {
-                        if (mb_substr($this->content, $antlersMatch[1] - 1, 1) === '@') {
-                            $lastAntlersOffset = mb_strpos($this->content, $antlersRegion, $lastAntlersOffset);
-                            $lastWasEscaped = true;
+                    if ($antlersMatch[1] > 0 && $this->content[$antlersMatch[1] - 1] === '@') {
+                        $lastAntlersOffset = $offset + mb_strlen($antlersRegion);
+                        $lastWasEscaped = false;
 
-                            continue;
-                        }
+                        continue;
                     }
 
                     if (in_array($antlersRegion, ['@props', '@aware'])) {
