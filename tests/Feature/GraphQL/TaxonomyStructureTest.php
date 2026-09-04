@@ -100,6 +100,39 @@ GQL;
     }
 
     #[Test]
+    public function it_localizes_the_tree_terms_using_the_site_argument()
+    {
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://test.com/fr/'],
+        ]);
+
+        Taxonomy::findByHandle('categories')->sites(['en', 'fr'])->save();
+
+        Term::find('categories::animals')->in('fr')->data(['title' => 'Animaux'])->save();
+
+        $query = <<<'GQL'
+{
+    taxonomy(handle: "categories") {
+        structure {
+            tree(site: "fr") {
+                term {
+                    title
+                }
+            }
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertJsonPath('data.taxonomy.structure.tree.0.term.title', 'Animaux');
+    }
+
+    #[Test]
     public function structure_is_null_on_flat_taxonomies()
     {
         tap(Taxonomy::make('tags')->title('Tags'))->save();
