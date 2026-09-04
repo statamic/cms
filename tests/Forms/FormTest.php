@@ -419,10 +419,9 @@ class FormTest extends TestCase
 
         $charts = $form->summaryCharts();
 
-        $this->assertEquals(['name', 'color', 'rating'], $charts->map(fn ($summary) => $summary->field()->handle())->all());
-        $this->assertInstanceOf(HorizontalBar::class, $charts[0]->chart());
-        $this->assertInstanceOf(Pie::class, $charts[1]->chart());
-        $this->assertInstanceOf(HorizontalBar::class, $charts[2]->chart());
+        $this->assertEquals(['color', 'rating'], $charts->map(fn ($summary) => $summary->field()->handle())->all());
+        $this->assertInstanceOf(Pie::class, $charts[0]->chart());
+        $this->assertInstanceOf(HorizontalBar::class, $charts[1]->chart());
     }
 
     #[Test]

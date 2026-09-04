@@ -85,25 +85,23 @@ class FormSummaryTest extends TestCase
             ->getJson(cp_route('forms.submissions.summary', $form->handle()))
             ->assertOk()
             ->assertJsonPath('total', 3)
-            ->assertJsonPath('fields.0.handle', 'name')
-            ->assertJsonPath('fields.1.handle', 'color')
-            ->assertJsonPath('fields.1.fieldtype', 'multi_choice')
-            ->assertJsonPath('fields.1.responses', 3)
-            ->assertJsonPath('fields.1.chart.handle', 'pie')
-            ->assertJsonPath('fields.1.chart.component', 'ui-pie-chart')
-            ->assertJsonPath('fields.2.handle', 'rating')
-            ->assertJsonPath('fields.2.responses', 2)
-            ->assertJsonPath('fields.2.insights.0.handle', 'star_rating')
-            ->assertJsonPath('fields.2.insights.0.component', 'star-rating-insight')
-            ->assertJsonPath('fields.2.insights.0.props.average', 4.5)
-            ->assertJsonPath('fields.2.insights.0.props.total', 5);
+            ->assertJsonCount(2, 'fields')
+            ->assertJsonPath('fields.0.handle', 'color')
+            ->assertJsonPath('fields.0.fieldtype', 'multi_choice')
+            ->assertJsonPath('fields.0.responses', 3)
+            ->assertJsonPath('fields.0.chart.handle', 'pie')
+            ->assertJsonPath('fields.0.chart.component', 'ui-pie-chart')
+            ->assertJsonPath('fields.1.handle', 'rating')
+            ->assertJsonPath('fields.1.responses', 2)
+            ->assertJsonPath('fields.1.insights.0.handle', 'star_rating')
+            ->assertJsonPath('fields.1.insights.0.component', 'star-rating-insight')
+            ->assertJsonPath('fields.1.insights.0.props.average', 4.5)
+            ->assertJsonPath('fields.1.insights.0.props.total', 5);
 
         $this->assertEquals([
             ['key' => 'red', 'label' => 'Red', 'count' => 2, 'percent' => 67],
             ['key' => 'blue', 'label' => 'Blue', 'count' => 1, 'percent' => 33],
-        ], $response->json('fields.1.chart.props.items'));
-
-        $this->assertCount(3, $response->json('fields'));
+        ], $response->json('fields.0.chart.props.items'));
     }
 
     #[Test]
@@ -159,8 +157,8 @@ class FormSummaryTest extends TestCase
             ->getJson(cp_route('forms.submissions.summary', $form->handle()).'?search=alice')
             ->assertOk()
             ->assertJsonPath('total', 1)
-            ->assertJsonPath('fields.1.chart.props.items.0.count', 1)
-            ->assertJsonPath('fields.1.chart.props.items.1.count', 0);
+            ->assertJsonPath('fields.0.chart.props.items.0.count', 1)
+            ->assertJsonPath('fields.0.chart.props.items.1.count', 0);
     }
 
     #[Test]
@@ -174,10 +172,10 @@ class FormSummaryTest extends TestCase
             ->assertJsonCount(5, 'meta.charts')
             ->assertJsonPath('meta.charts.0.handle', 'horizontal_bar')
             ->assertJsonPath('meta.charts.0.component', 'ui-horizontal-bar-chart')
-            ->assertJsonPath('meta.fields.0.handle', 'name')
-            ->assertJsonPath('meta.fields.1.handle', 'color')
-            ->assertJsonPath('meta.fields.1.default_chart', 'pie')
-            ->assertJsonPath('meta.fields.2.handle', 'rating');
+            ->assertJsonCount(2, 'meta.fields')
+            ->assertJsonPath('meta.fields.0.handle', 'color')
+            ->assertJsonPath('meta.fields.0.default_chart', 'pie')
+            ->assertJsonPath('meta.fields.1.handle', 'rating');
 
         $this->setTestRoles(['test' => ['access cp', 'view form submissions']]);
         $user = tap(User::make()->assignRole('test'))->save();
