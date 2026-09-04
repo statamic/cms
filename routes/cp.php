@@ -63,6 +63,7 @@ use Statamic\Http\Controllers\CP\Fieldtypes\IconFieldtypeController;
 use Statamic\Http\Controllers\CP\Fieldtypes\MarkdownFieldtypeController;
 use Statamic\Http\Controllers\CP\Fieldtypes\RelationshipFieldtypeController;
 use Statamic\Http\Controllers\CP\Fieldtypes\ReplicatorSetController;
+use Statamic\Http\Controllers\CP\Fieldtypes\VideoFieldtypeController;
 use Statamic\Http\Controllers\CP\Forms\ActionController as FormActionController;
 use Statamic\Http\Controllers\CP\Forms\FormBlueprintController;
 use Statamic\Http\Controllers\CP\Forms\FormExportController;
@@ -388,6 +389,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::post('markdown', [MarkdownFieldtypeController::class, 'preview'])->name('markdown.preview');
         Route::post('files/upload', [FilesFieldtypeController::class, 'upload'])->name('files.upload');
         Route::post('icons', IconFieldtypeController::class)->name('icon-fieldtype');
+        Route::get('video/details', [VideoFieldtypeController::class, 'details'])->name('video.details');
         Route::post('replicator/set', ReplicatorSetController::class)->name('replicator-fieldtype.set');
     });
 
