@@ -13,7 +13,9 @@ use Statamic\Dictionaries\Dictionary;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fieldtypes;
 use Statamic\Forms;
+use Statamic\Forms\Charts\Chart;
 use Statamic\Forms\Fields\FormFieldtype;
+use Statamic\Forms\Insights\Insight;
 use Statamic\Forms\JsDrivers;
 use Statamic\Modifiers\CoreModifiers;
 use Statamic\Modifiers\Modifier;
@@ -168,6 +170,21 @@ class ExtensionServiceProvider extends ServiceProvider
         Forms\Fieldtypes\Upload::class,
         Forms\Fieldtypes\Website::class,
         Forms\Fieldtypes\YesNo::class,
+    ];
+
+    protected $formCharts = [
+        Forms\Charts\HorizontalBar::class,
+        Forms\Charts\Lollipop::class,
+        Forms\Charts\Pie::class,
+        Forms\Charts\RankedOptions::class,
+        Forms\Charts\VerticalBar::class,
+    ];
+
+    protected $formInsights = [
+        Forms\Insights\Average::class,
+        Forms\Insights\Checked::class,
+        Forms\Insights\MinMax::class,
+        Forms\Insights\StarRating::class,
     ];
 
     protected $modifierAliases = [
@@ -358,6 +375,16 @@ class ExtensionServiceProvider extends ServiceProvider
                 'class' => FormFieldtype::class,
                 'directory' => 'FormFieldtypes',
                 'extensions' => $this->formFieldtypes,
+            ],
+            'form-charts' => [
+                'class' => Chart::class,
+                'directory' => 'FormCharts',
+                'extensions' => $this->formCharts,
+            ],
+            'form-insights' => [
+                'class' => Insight::class,
+                'directory' => 'FormInsights',
+                'extensions' => $this->formInsights,
             ],
             'modifiers' => [
                 'class' => Modifier::class,

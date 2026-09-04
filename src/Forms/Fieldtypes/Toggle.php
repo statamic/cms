@@ -2,7 +2,11 @@
 
 namespace Statamic\Forms\Fieldtypes;
 
+use Illuminate\Support\Collection;
+use Statamic\Forms\Charts\ChartOption;
+use Statamic\Forms\Charts\HorizontalBar;
 use Statamic\Forms\Fields\FormFieldtype;
+use Statamic\Forms\Insights\Checked;
 use Statamic\Support\Arr;
 
 use function Statamic\trans as __;
@@ -34,6 +38,24 @@ class Toggle extends FormFieldtype
             'inline_label' => $this->config('inline_label'),
             ...Arr::except($this->config(), ['type', 'inline_label']),
         ];
+    }
+
+    public function defaultChart(): ?string
+    {
+        return HorizontalBar::class;
+    }
+
+    public function chartOptions(Collection $values): ?Collection
+    {
+        return collect([
+            new ChartOption('true', __('Yes'), icon: 'checkmark-circle-filled'),
+            new ChartOption('false', __('No'), icon: 'delete-circle-filled'),
+        ]);
+    }
+
+    public function insights(): array
+    {
+        return [new Checked];
     }
 
     public function example(): ?array

@@ -1,0 +1,321 @@
+/* GROUP CHARTS / PIE CHART
+=================================================== */
+.pie-chart-figure {
+    display: grid;
+    grid-template-columns: 0.6fr 1fr;
+    @apply gap-4 p-6;
+}
+
+.pie-chart-legend {
+    @apply pt-4;
+}
+
+.pie-chart-legend__list {
+    @apply grid gap-2.25 text-xs text-gray-700 dark:text-gray-50;
+}
+
+.pie-chart-legend__item {
+    @apply flex items-center gap-2.25;
+}
+
+.pie-chart-legend__value {
+    @apply min-w-7 text-end text-[0.785rem] font-medium;
+}
+
+.pie-chart-legend__swatch {
+    @apply size-2.5 shrink-0 rounded-full;
+}
+
+.pie-chart-legend__swatch--1 { @apply bg-chart-1-legend; }
+.pie-chart-legend__swatch--2 { @apply bg-chart-2-legend; }
+.pie-chart-legend__swatch--3 { @apply bg-chart-3-legend; }
+.pie-chart-legend__swatch--4 { @apply bg-chart-4-legend; }
+.pie-chart-legend__swatch--5 { @apply bg-chart-5-legend; }
+
+.pie-chart-legend__link,
+.summary-bar-chart__link {
+    @apply contents cursor-pointer text-inherit text-start;
+}
+
+.pie-chart {
+    --label-radius: 30%;
+
+    position: relative;
+    width: 9rem;
+    aspect-ratio: 1 / 1;
+
+    /* Slice sizes as unitless numbers (percent of circle). */
+    --end1: calc(var(--1) * 1%);
+    --end2: calc((var(--1) + var(--2)) * 1%);
+    --end3: calc((var(--1) + var(--2) + var(--3)) * 1%);
+    --end4: 100%;
+
+    /* Midpoint angle for each slice (100% = 360deg). */
+    --angle1: calc(var(--1) * 3.6deg / 2);
+    --angle2: calc((var(--1) + var(--2) / 2) * 3.6deg);
+    --angle3: calc((var(--1) + var(--2) + var(--3) / 2) * 3.6deg);
+    --angle4: calc((var(--1) + var(--2) + var(--3) + var(--4) / 2) * 3.6deg);
+
+    &:hover {
+        .pie-chart__label {
+            opacity: unset;
+        }
+    }
+}
+
+.pie-chart__disc {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background-image: conic-gradient(
+        var(--slice-1-color, var(--color-chart-1)) 0% var(--end1),
+        var(--slice-2-color, var(--color-chart-2)) var(--end1) var(--end2),
+        var(--slice-3-color, var(--color-chart-3)) var(--end2) var(--end3),
+        var(--slice-4-color, var(--color-chart-4)) var(--end3) var(--end4)
+    );
+}
+
+.pie-chart__label {
+    --angle: 0deg;
+    opacity: 0;
+    transition: opacity 0.2s ease-in 0s;
+
+    padding: 0.075rem 0.15rem;
+    border-radius: 0.25rem;
+
+    position: absolute;
+    left: calc(50% + var(--label-radius) * sin(var(--angle)));
+    top: calc(50% - var(--label-radius) * cos(var(--angle)));
+    transform: translate(-50%, -50%);
+
+    @apply text-xs font-semibold tabular-nums text-white pointer-events-none;
+}
+
+.pie-chart__label--1 { --angle: var(--angle1); background-color: var(--color-chart-1-label-bg); }
+.pie-chart__label--2 { --angle: var(--angle2); background-color: var(--color-chart-2-label-bg); }
+.pie-chart__label--3 { --angle: var(--angle3); background-color: var(--color-chart-3-label-bg); }
+/* Kick the radius out a bit because the label segment is smaller, and it might overlap with the preceding segment. */
+.pie-chart__label--4 { --angle: var(--angle4); background-color: var(--color-chart-4-label-bg); --label-radius: 39%; }
+
+
+/* GROUP CHARTS / PIE CHART / MODIFIERS
+=================================================== */
+.pie-chart--focused {
+    .pie-chart__label,
+    &.pie-chart:hover .pie-chart__label {
+        opacity: 0;
+    }
+
+    .pie-chart__label[data-focused],
+    &.pie-chart:hover .pie-chart__label[data-focused] {
+        opacity: 1;
+        border: 2px solid black;
+    }
+}
+
+
+
+/* GROUP CHARTS / IMAGE PIE CHART
+=================================================== */
+.image-pie-chart {
+    --label-radius: 30%;
+
+    position: relative;
+    width: 9rem;
+    aspect-ratio: 1 / 1;
+
+    /* Midpoint angle for each slice (100% = 360deg). */
+    --angle1: calc(var(--1) * 3.6deg / 2);
+    --angle2: calc((var(--1) + var(--2) / 2) * 3.6deg);
+
+    &:hover {
+        .image-pie-chart__label {
+            opacity: unset;
+        }
+    }
+}
+
+.image-pie-chart__disc {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    overflow: hidden;
+
+    @apply bg-gray-200 dark:bg-gray-700;
+}
+
+.image-pie-chart__slice {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background-image: var(--image);
+    background-size: cover;
+    background-position: center;
+}
+
+.image-pie-chart__slice--1 {
+    --slice-size: calc(var(--1) * 3.6deg);
+
+    -webkit-mask-image: conic-gradient(from 0deg, #000 0deg var(--slice-size), transparent var(--slice-size));
+    mask-image: conic-gradient(from 0deg, #000 0deg var(--slice-size), transparent var(--slice-size));
+}
+
+.image-pie-chart__slice--2 {
+    --slice-start: calc(var(--1) * 3.6deg);
+    --slice-size: calc(var(--2) * 3.6deg);
+
+    -webkit-mask-image: conic-gradient(from var(--slice-start), #000 0deg var(--slice-size), transparent var(--slice-size));
+    mask-image: conic-gradient(from var(--slice-start), #000 0deg var(--slice-size), transparent var(--slice-size));
+}
+
+.image-pie-chart__label {
+    --angle: 0deg;
+    opacity: 0;
+    transition: opacity 0.2s ease-in 0s;
+
+    padding: 0.075rem 0.15rem;
+    border-radius: 0.25rem;
+
+    position: absolute;
+    left: calc(50% + var(--label-radius) * sin(var(--angle)));
+    top: calc(50% - var(--label-radius) * cos(var(--angle)));
+    transform: translate(-50%, -50%);
+
+    @apply text-xs font-medium tabular-nums text-white pointer-events-none;
+}
+
+.image-pie-chart__label--1 { --angle: var(--angle1); background-color: hsl(0 0% 0% / 0.55); }
+.image-pie-chart__label--2 { --angle: var(--angle2); background-color: hsl(0 0% 0% / 0.55); }
+
+
+
+/* GROUP CHARTS / VERTICAL BAR CHART
+=================================================== */
+.vertical-bar-chart-figure {
+    display: grid;
+    height: 100%;
+    @apply py-3 px-3;
+}
+
+.vertical-bar-chart {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 0.1rem;
+    height: 100%;
+    list-style: none;
+    padding: 0;
+}
+
+.vertical-bar-chart__bar {
+    display: grid;
+    flex: 1;
+    grid-template-rows: 1fr auto;
+    align-items: end;
+    justify-items: center;
+    gap: 0.5rem;
+    min-width: 0;
+    height: 100%;
+}
+
+.vertical-bar-chart__plot {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+}
+
+.vertical-bar-chart__value {
+    @apply mb-1.5 text-[0.785rem] font-medium tabular-nums text-gray-800 dark:text-gray-100;
+}
+
+.vertical-bar-chart__fill {
+    flex-grow: 0;
+    flex-shrink: 0;
+    width: 100%;
+    max-width: 2rem;
+    border-radius: 0.25rem 0.25rem 0 0;
+    background-color: var(--color-chart-1);
+}
+
+.vertical-bar-chart__scale-label {
+    @apply min-w-8 rounded-md border border-gray-200 shadow-ui-xs px-1.5 py-0.5 text-center text-[0.785rem] font-medium tabular-nums text-gray-700 dark:border-gray-700 dark:text-gray-300;
+}
+
+
+
+/* GROUP CHARTS / SUMMARY / EDITING
+=================================================== */
+.summary-chart-editing header {
+    @apply border-dashed border-gray-400 dark:border-gray-700;
+}
+
+
+
+/* GROUP CHARTS / SUMMARY BAR CHART / ICON STROKES
+=================================================== */
+/* Note: This is used to style the checkbox icons in the summary bar chart depending on the background contrast. */
+.summary-bar-chart__icon-stroke {
+    color: var(--chart-tick-color);
+}
+
+.summary-bar-chart__icon-stroke path:not(:first-child) {
+    stroke: white;
+}
+
+@supports (color: contrast-color(red)) {
+    .dark .summary-bar-chart__icon-stroke path:not(:first-child) {
+        stroke: contrast-color(var(--chart-tick-color));
+    }
+}
+
+.summary-bar-chart__icon-stroke--1 { --chart-tick-color: var(--color-chart-1-legend); }
+.summary-bar-chart__icon-stroke--2 { --chart-tick-color: var(--color-chart-2-legend); }
+.summary-bar-chart__icon-stroke--3 { --chart-tick-color: var(--color-chart-3-legend); }
+.summary-bar-chart__icon-stroke--4 { --chart-tick-color: var(--color-chart-4-legend); }
+.summary-bar-chart__icon-stroke--5 { --chart-tick-color: var(--color-chart-5-legend); }
+
+
+
+/* GROUP CHARTS / ANIMATIONS / PIE CHART
+=================================================== */
+@media (prefers-reduced-motion: no-preference) {
+    /* These animations are triggered when switching chart types */
+    @property --pie-reveal {
+        syntax: '<angle>';
+        inherits: false;
+        initial-value: 0deg;
+    }
+
+    @keyframes pie-chart-reveal {
+        from { --pie-reveal: 0deg; }
+        to { --pie-reveal: 360deg; }
+    }
+
+    @keyframes bar-chart-reveal {
+        from { transform: scaleX(0); }
+        to { transform: scaleX(1); }
+    }
+
+    .content-card:has([data-submission-summary]) {
+        [data-ui-card]:has([data-ui-toggle-group-interacted]) {
+            .pie-chart__disc,
+            .image-pie-chart__disc {
+                -webkit-mask-image: conic-gradient(from 0deg, #000 0deg, #000 var(--pie-reveal), transparent var(--pie-reveal));
+                mask-image: conic-gradient(from 0deg, #000 0deg, #000 var(--pie-reveal), transparent var(--pie-reveal));
+                --pie-reveal: 0deg;
+                animation: pie-chart-reveal 0.75s cubic-bezier(0.33, 1, 0.68, 1) forwards;
+            }
+
+            .summary-bar-chart__fill {
+                transform-origin: left center;
+                animation: bar-chart-reveal 0.75s cubic-bezier(0.33, 1, 0.68, 1) forwards;
+            }
+        }
+    }
+}

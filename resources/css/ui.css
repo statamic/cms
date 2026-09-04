@@ -30,6 +30,21 @@
     --color-ui-accent-bg: var(--theme-color-ui-accent-bg);
     --color-ui-accent-text: var(--theme-color-ui-accent-text);
     --color-switch-bg: var(--theme-color-switch-bg);
+    --color-chart-1: var(--theme-color-chart-1);
+    --color-chart-2: var(--theme-color-chart-2);
+    --color-chart-3: var(--theme-color-chart-3);
+    --color-chart-4: var(--theme-color-chart-4);
+    --color-chart-5: var(--theme-color-chart-5);
+    --color-chart-1-label-bg: var(--theme-color-chart-1-label-bg);
+    --color-chart-2-label-bg: var(--theme-color-chart-2-label-bg);
+    --color-chart-3-label-bg: var(--theme-color-chart-3-label-bg);
+    --color-chart-4-label-bg: var(--theme-color-chart-4-label-bg);
+    --color-chart-5-label-bg: var(--theme-color-chart-5-label-bg);
+    --color-chart-1-legend: var(--theme-color-chart-1-legend);
+    --color-chart-2-legend: var(--theme-color-chart-2-legend);
+    --color-chart-3-legend: var(--theme-color-chart-3-legend);
+    --color-chart-4-legend: var(--theme-color-chart-4-legend);
+    --color-chart-5-legend: var(--theme-color-chart-5-legend);
 
     /* Custom color shades for all Tailwind color families */
     --color-slate-150: oklch(0.9485 0.01 251.702);

@@ -21,7 +21,9 @@ use Statamic\Facades\Fieldset;
 use Statamic\Facades\Path;
 use Statamic\Facades\YAML;
 use Statamic\Fields\Fieldtype;
+use Statamic\Forms\Charts\Chart;
 use Statamic\Forms\Fields\FormFieldtype;
+use Statamic\Forms\Insights\Insight;
 use Statamic\Forms\JsDrivers\JsDriver;
 use Statamic\Modifiers\Modifier;
 use Statamic\Query\Scopes\Scope;
@@ -75,6 +77,16 @@ abstract class AddonServiceProvider extends ServiceProvider
      * @var list<class-string<FormFieldtype>>
      */
     protected $formFieldtypes = [];
+
+    /**
+     * @var list<class-string<Chart>>
+     */
+    protected $formCharts = [];
+
+    /**
+     * @var list<class-string<Insight>>
+     */
+    protected $formInsights = [];
 
     /**
      * @var list<class-string<Modifier>>
@@ -210,6 +222,8 @@ abstract class AddonServiceProvider extends ServiceProvider
                 ->bootDictionaries()
                 ->bootFieldtypes()
                 ->bootFormFieldtypes()
+                ->bootFormCharts()
+                ->bootFormInsights()
                 ->bootModifiers()
                 ->bootWidgets()
                 ->bootFormJsDrivers()
@@ -375,6 +389,32 @@ abstract class AddonServiceProvider extends ServiceProvider
             ->unique();
 
         foreach ($formFieldtypes as $class) {
+            $class::register();
+        }
+
+        return $this;
+    }
+
+    protected function bootFormCharts()
+    {
+        $formCharts = collect($this->formCharts)
+            ->merge($this->autoloadFilesFromFolder('FormCharts', Chart::class))
+            ->unique();
+
+        foreach ($formCharts as $class) {
+            $class::register();
+        }
+
+        return $this;
+    }
+
+    protected function bootFormInsights()
+    {
+        $formInsights = collect($this->formInsights)
+            ->merge($this->autoloadFilesFromFolder('FormInsights', Insight::class))
+            ->unique();
+
+        foreach ($formInsights as $class) {
             $class::register();
         }
 

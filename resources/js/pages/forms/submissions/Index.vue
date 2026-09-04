@@ -1,14 +1,25 @@
-<script setup>
-import { ref, computed } from 'vue';
+<script setup lang="ts">
+import { ref, computed, watch } from 'vue';
 import axios from 'axios';
 import Head from '@/pages/layout/Head.vue';
-import { Header, Dropdown, DropdownMenu, DropdownItem, Button, Modal, RadioGroup, Radio, CommandPaletteItem } from '@ui';
+import {
+    Button,
+    CommandPaletteItem,
+    Dropdown,
+    DropdownItem,
+    DropdownMenu,
+    Header,
+    Modal,
+    Radio,
+    RadioGroup,
+} from '@ui';
 import FormStatusIndicator from '@/components/forms/FormStatusIndicator.vue';
 import ResourceDeleter from '@/components/ResourceDeleter.vue';
 import FormSubmissionListing from '@/components/forms/SubmissionListing.vue';
 import Layout from '@/pages/layout/Layout.vue';
 import PanelLayout from '@/pages/layout/PanelLayout.vue';
 import FormsLayout from '@/pages/forms/Layout.vue';
+import { preferences } from '@api';
 
 defineOptions({ layout: [Layout, PanelLayout, FormsLayout] });
 
@@ -19,6 +30,8 @@ const props = defineProps([
     'filters',
     'actionUrl',
     'generateFakeSubmissionUrl',
+    'summaryUrl',
+    'chartsUpdateUrl',
     'exporters',
     'redirectUrl',
 ]);
@@ -230,24 +243,27 @@ function exportSubmissions() {
         <FormSubmissionListing
             ref="submissionListing"
             :form="form.handle"
-            :action-url="actionUrl"
+            :action-url
+            :summary-url
+            :charts-update-url
             sort-column="datestamp"
             sort-direction="desc"
-            :columns="columns"
-            :filters="filters"
+            :columns
+            :filters
+            :can
         />
 
         <Modal :open="exportModalOpen" @update:open="exportModalOpen = $event" :title="__('Export Submissions')">
             <div class="space-y-4">
                 <div>
-                    <label class="text-sm font-medium mb-1.5 block">{{ __('Format') }}</label>
+                    <label class="block mb-1.5 text-sm font-medium">{{ __('Format') }}</label>
                     <RadioGroup v-model="exportFormat" inline>
                         <Radio v-for="format in exporters" :key="format.handle" :value="format.handle" :label="format.title" />
                     </RadioGroup>
                 </div>
 
                 <div>
-                    <label class="text-sm font-medium mb-1.5 block">{{ __('Submissions') }}</label>
+                    <label class="block mb-1.5 text-sm font-medium">{{ __('Submissions') }}</label>
                     <RadioGroup v-model="exportScope">
                         <Radio value="all" :label="__('All Submissions')" />
                         <Radio value="filtered" :label="__('Filtered Submissions')" :description="__('statamic::messages.form_export_filtered_description')" :disabled="!hasFilteredScope" />

@@ -5,6 +5,7 @@
 @import '../resources/css/ui.css';
 @import '../resources/css/core/utilities.css';
 @import '../resources/css/elements/tables.css';
+@import '../resources/css/components/forms/charts.css';
 @import '../resources/css/components/stacks.css';
 @custom-variant dark (&:where(.dark, .dark *));
 
