@@ -145,6 +145,47 @@ class FormSummaryTest extends TestCase
     }
 
     #[Test]
+    public function it_skips_unknown_fields_and_falls_back_on_unknown_charts()
+    {
+        $form = $this->makeForm();
+        $form->charts([
+            ['field' => 'missing', 'chart' => 'pie'],
+            ['field' => 'color', 'chart' => 'line'],
+        ])->save();
+
+        $this
+            ->actingAs($this->superUser())
+            ->getJson(cp_route('forms.submissions.summary', $form->handle()))
+            ->assertOk()
+            ->assertJsonCount(1, 'fields')
+            ->assertJsonPath('fields.0.handle', 'color')
+            ->assertJsonPath('fields.0.chart.handle', 'pie');
+    }
+
+    #[Test]
+    public function it_excludes_hidden_fields()
+    {
+        $form = tap(Form::make('survey')->formFields([
+            'sections' => [
+                [
+                    'fields' => [
+                        ['handle' => 'color', 'field' => ['type' => 'multi_choice', 'options' => ['red' => 'Red'], 'hidden' => true]],
+                        ['handle' => 'rating', 'field' => ['type' => 'star_rating']],
+                    ],
+                ],
+            ],
+        ]))->save();
+
+        $this
+            ->actingAs($this->superUser())
+            ->getJson(cp_route('forms.submissions.summary', $form->handle()))
+            ->assertOk()
+            ->assertJsonCount(1, 'fields')
+            ->assertJsonPath('fields.0.handle', 'rating')
+            ->assertJsonCount(1, 'meta.fields');
+    }
+
+    #[Test]
     public function it_scopes_counts_to_the_search_query()
     {
         $form = $this->makeForm();

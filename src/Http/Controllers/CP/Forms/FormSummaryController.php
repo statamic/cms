@@ -5,6 +5,7 @@ namespace Statamic\Http\Controllers\CP\Forms;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Forms\SubmissionQueryBuilder;
 use Statamic\Facades\User;
+use Statamic\Forms\Charts\Chart;
 use Statamic\Forms\Charts\SummaryChart;
 use Statamic\Forms\Fields\FormField;
 use Statamic\Forms\Insights\Insight;
@@ -13,6 +14,7 @@ use Statamic\Http\Controllers\CP\Forms\Concerns\QueriesFormSubmissionSearch;
 use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 use Statamic\Statamic;
+use Statamic\Support\Arr;
 
 class FormSummaryController extends CpController
 {
@@ -24,8 +26,8 @@ class FormSummaryController extends CpController
 
         $this->authorize('viewSubmissions', $form);
 
-        $charts = $form->summaryCharts();
         $numbers = $this->fieldNumbers($form);
+        $charts = $this->resolveCharts($request, $form);
 
         [$total, $values] = $this->collectValues($this->query($request, $form), $charts);
 
@@ -42,10 +44,50 @@ class FormSummaryController extends CpController
         ];
     }
 
-    private function fieldNumbers($form): Collection
+    private function resolveCharts(FilteredRequest $request, $form): Collection
+    {
+        $fields = $this->visibleFields($form);
+        $layout = $request->input('charts') ?? $form->charts();
+
+        if (is_null($layout)) {
+            return $fields
+                ->filter(fn (FormField $field): bool => $field->fieldtype()->defaultChart() !== null)
+                ->map(fn (FormField $field): SummaryChart => new SummaryChart($field, app($field->fieldtype()->defaultChart())))
+                ->values();
+        }
+
+        return collect($layout)
+            ->map(function ($config) use ($fields): ?SummaryChart {
+                if (! $field = $fields->get(Arr::get($config, 'field'))) {
+                    return null;
+                }
+
+                if (! $chart = $this->resolveChart($field, Arr::get($config, 'chart'))) {
+                    return null;
+                }
+
+                return new SummaryChart($field, $chart);
+            })
+            ->filter()
+            ->values();
+    }
+
+    private function visibleFields($form): Collection
     {
         return $form->formFields()->fields()
-            ->reject(fn (FormField $field): bool => $field->config()['hidden'] ?? false)
+            ->reject(fn (FormField $field): bool => $field->config()['hidden'] ?? false);
+    }
+
+    private function resolveChart(FormField $field, ?string $handle): ?Chart
+    {
+        $class = app('statamic.form-charts')->get($handle) ?? $field->fieldtype()->defaultChart();
+
+        return $class ? app($class) : null;
+    }
+
+    private function fieldNumbers($form): Collection
+    {
+        return $this->visibleFields($form)
             ->filter(fn (FormField $field): bool => $field->fieldtype()->collectsValue())
             ->values()
             ->mapWithKeys(fn (FormField $field, int $index): array => [$field->handle() => $index + 1]);
@@ -127,8 +169,7 @@ class FormSummaryController extends CpController
                     ];
                 })
                 ->values(),
-            'fields' => $form->formFields()->fields()
-                ->reject(fn (FormField $field): bool => $field->config()['hidden'] ?? false)
+            'fields' => $this->visibleFields($form)
                 ->filter(fn (FormField $field): bool => $field->fieldtype()->defaultChart() !== null)
                 ->map(fn (FormField $field): array => [
                     'handle' => $field->handle(),

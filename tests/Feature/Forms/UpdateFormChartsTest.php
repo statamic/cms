@@ -87,7 +87,6 @@ class UpdateFormChartsTest extends TestCase
             ->assertNoContent();
 
         $this->assertEquals([], Form::find('survey')->charts());
-        $this->assertCount(0, Form::find('survey')->summaryCharts());
     }
 
     #[Test]

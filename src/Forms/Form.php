@@ -4,7 +4,6 @@ namespace Statamic\Forms;
 
 use Carbon\Carbon;
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Support\Collection;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Contracts\Forms\Form as FormContract;
@@ -28,10 +27,7 @@ use Statamic\Facades\FormSubmission;
 use Statamic\Facades\User;
 use Statamic\Facades\YAML;
 use Statamic\Fields\Blueprint;
-use Statamic\Forms\Charts\Chart;
-use Statamic\Forms\Charts\SummaryChart;
 use Statamic\Forms\Exporters\Exporter;
-use Statamic\Forms\Fields\FormField;
 use Statamic\Forms\Fields\FormFields;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
@@ -316,44 +312,6 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
     public function charts($charts = null)
     {
         return $this->fluentlyGetOrSet('charts')->args(func_get_args());
-    }
-
-    /**
-     * Get the resolved charts for the submission summary.
-     */
-    public function summaryCharts(): Collection
-    {
-        $fields = $this->formFields()->fields()
-            ->reject(fn (FormField $field): bool => $field->config()['hidden'] ?? false);
-
-        if (is_null($this->charts)) {
-            return $fields
-                ->filter(fn (FormField $field): bool => $field->fieldtype()->defaultChart() !== null)
-                ->map(fn (FormField $field): SummaryChart => new SummaryChart($field, app($field->fieldtype()->defaultChart())))
-                ->values();
-        }
-
-        return collect($this->charts)
-            ->map(function ($config) use ($fields): ?SummaryChart {
-                if (! $field = $fields->get(Arr::get($config, 'field'))) {
-                    return null;
-                }
-
-                if (! $chart = $this->resolveChart($field, Arr::get($config, 'chart'))) {
-                    return null;
-                }
-
-                return new SummaryChart($field, $chart);
-            })
-            ->filter()
-            ->values();
-    }
-
-    private function resolveChart(FormField $field, ?string $handle): ?Chart
-    {
-        $class = app('statamic.form-charts')->get($handle) ?? $field->fieldtype()->defaultChart();
-
-        return $class ? app($class) : null;
     }
 
     /**
