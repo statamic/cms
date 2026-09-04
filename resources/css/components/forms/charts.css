@@ -34,7 +34,7 @@
 
 .pie-chart-legend__link,
 .summary-bar-chart__link {
-    @apply contents cursor-pointer text-inherit;
+    @apply contents cursor-pointer text-inherit text-start;
 }
 
 .pie-chart {
