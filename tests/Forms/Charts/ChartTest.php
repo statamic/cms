@@ -86,6 +86,17 @@ class ChartTest extends TestCase
     }
 
     #[Test]
+    public function other_inherits_a_shared_icon_from_truncated_options()
+    {
+        $options = collect(range(1, 8))->map(fn ($stars) => new ChartOption((string) $stars, icon: 'star-filled'));
+
+        $props = (new HorizontalBar)->props($this->weightedValues(range(1, 8)), $options);
+
+        $this->assertEquals('star-filled', collect($props['items'])->last()['icon']);
+        $this->assertTrue(collect($props['items'])->last()['other']);
+    }
+
+    #[Test]
     public function vertical_bars_truncate_unbounded_answers_too()
     {
         $props = (new VerticalBar)->props($this->weightedValues(range('a', 'n')), $this->chartOptions(
