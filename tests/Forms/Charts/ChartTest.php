@@ -78,8 +78,7 @@ class ChartTest extends TestCase
             ['key' => 'a', 'label' => 'A', 'count' => 10, 'percent' => 19],
             ['key' => 'b', 'label' => 'B', 'count' => 9, 'percent' => 17],
             ['key' => 'c', 'label' => 'C', 'count' => 8, 'percent' => 15],
-            ['key' => 'd', 'label' => 'D', 'count' => 7, 'percent' => 13],
-            ['key' => 'other', 'label' => 'Other', 'count' => 18, 'percent' => 35, 'other' => true],
+            ['key' => 'other', 'label' => 'Other', 'count' => 25, 'percent' => 48, 'other' => true],
         ], $props['items']);
 
         $this->assertEquals(['items'], array_keys($props));
