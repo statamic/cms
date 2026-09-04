@@ -11,6 +11,7 @@ use Statamic\Contracts\Forms\Submission;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
+use Statamic\Facades\Entry;
 use Statamic\Facades\Form;
 use Statamic\Fields\Tab;
 use Statamic\Forms\JsDrivers\AbstractJsDriver;
@@ -99,9 +100,11 @@ class Tags extends BaseTags
             $data['previous_page_url'] = $this->previousPageUrl();
         }
 
-        $data['restricted'] = $form->restricted();
-        $data['restriction_message'] = $form->restrictionMessage();
-        $data['status'] = $form->status();
+        $instance = $form->instance($this->context->value('id'));
+
+        $data['restricted'] = $instance->restricted();
+        $data['restriction_message'] = $instance->restrictionMessage();
+        $data['status'] = $instance->status();
 
         if ($jsDriver) {
             $data['js_driver'] = $jsDriver->handle();
@@ -144,6 +147,10 @@ class Tags extends BaseTags
             $params['page'] = Arr::get($this->currentPage(), 'id');
         }
 
+        if ($entry = $this->submittableEntry($instance)) {
+            $params['entry'] = $entry;
+        }
+
         if (! $this->canParseContents()) {
             return array_merge([
                 'attrs' => $this->formAttrs($action, $method, $knownParams, $attrs),
@@ -166,6 +173,19 @@ class Tags extends BaseTags
         }
 
         return $html;
+    }
+
+    private function submittableEntry(Instance $instance): ?string
+    {
+        if (! $id = $instance->entry()) {
+            return null;
+        }
+
+        if (! $entry = Entry::find($id)) {
+            return null;
+        }
+
+        return FormFieldValues::on($entry)->references($instance->form()->handle()) ? $id : null;
     }
 
     /**

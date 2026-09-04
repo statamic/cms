@@ -2,8 +2,10 @@
 
 namespace Statamic\Http\Controllers\CP\Forms;
 
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Statamic\CP\Column;
+use Statamic\CP\Columns;
 use Statamic\Facades\Scope;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Controllers\CP\Forms\Concerns\ProvidesFormAbilities;
@@ -32,6 +34,16 @@ class FormSubmissionsController extends CpController
             ->blueprint()
             ->columns()
             ->prepend(Column::make('status')->label(__('Status')), 'status')
+            ->when(
+                $form->hasUniqueInstances(),
+                fn (Columns $columns) => $columns->prepend(
+                    Column::make('entry')
+                        ->label(__('Entry'))
+                        ->fieldtype('relationship')
+                        ->sortable(false),
+                    'entry'
+                )
+            )
             ->prepend(Column::make('datestamp')->label(__('Date')), 'datestamp')
             ->setPreferred("forms.{$form->handle()}.columns")
             ->rejectUnlisted()
@@ -86,7 +98,7 @@ class FormSubmissionsController extends CpController
         $submissions = $query->paginate(Statamic::cpPerPage(request('perPage')));
 
         return (new Submissions($submissions))
-            ->blueprint($form->blueprint())
+            ->form($form)
             ->columnPreferenceKey("forms.{$form->handle()}.columns")
             ->additional(['meta' => [
                 'activeFilterBadges' => $activeFilterBadges,
@@ -102,7 +114,7 @@ class FormSubmissionsController extends CpController
         return $query;
     }
 
-    public function show($form, $submission)
+    public function show(Request $request, $form, $submission)
     {
         if (! $submission = $form->submission($submission)) {
             return $this->pageNotFound();
@@ -113,17 +125,36 @@ class FormSubmissionsController extends CpController
         $blueprint = $form->blueprint();
         $fields = $blueprint->fields()->addValues($submission->data()->all())->preProcess();
 
-        return Inertia::render('forms/submissions/Show', [
-            'form' => $form,
-            'can' => $this->formAbilities($form),
+        $data = [
             'id' => $submission->id(),
-            'formTitle' => __($form->title()),
             'status' => $submission->status(),
             'date' => $submission->date()->toIso8601String(),
             'blueprint' => $blueprint->toPublishArray(),
             'values' => $fields->values(),
             'meta' => $fields->meta(),
-        ]);
+        ];
+
+        if ($request->wantsJson()) {
+            return $data;
+        }
+
+        if ($form->hasUniqueInstances() && ($id = $submission->get('entry'))) {
+            $entry = $submission->entry();
+
+            $entryData = [
+                'id' => $id,
+                'title' => $entry?->value('title'),
+                'edit_url' => $entry?->editUrl(),
+                'status' => $entry?->status(),
+            ];
+        }
+
+        return Inertia::render('forms/submissions/Show', array_merge($data, [
+            'form' => $form,
+            'can' => $this->formAbilities($form),
+            'formTitle' => $form->title(),
+            'entry' => $entryData ?? null,
+        ]));
     }
 
     public function destroy($form, $id)

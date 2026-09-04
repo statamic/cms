@@ -174,6 +174,7 @@ return [
     'email_available' => 'A user with this email already exists.',
     'email_field_reference' => "References a field that doesn't exist on this form.",
     'fieldset_imported_recursively' => 'Fieldset :handle is being imported recursively.',
+    'form_must_be_submitted_from_an_entry' => 'This form must be submitted from an entry.',
     'one_site_without_origin' => 'At least one site must not have an origin.',
     'options_require_keys' => 'All options must have keys.',
     'origin_cannot_be_disabled' => 'Cannot select a disabled origin.',

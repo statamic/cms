@@ -24,6 +24,7 @@ class FormConnectController extends CpController
         return Inertia::render('forms/connect/Index', [
             'form' => $form,
             'can' => $this->formAbilities($form),
+            'uniqueInstancesEnabled' => $form->hasUniqueInstances(),
             'connections' => FormConnection::all()->map(fn (Connection $connection): array => [
                 'handle' => $connection->handle(),
                 'title' => $connection->title(),
@@ -45,6 +46,7 @@ class FormConnectController extends CpController
         return Inertia::render('forms/connect/Edit', [
             'form' => $form,
             'can' => $this->formAbilities($form),
+            'uniqueInstancesEnabled' => $form->hasUniqueInstances(),
             'connection' => [
                 'handle' => $connection->handle(),
                 'title' => $connection->title(),
