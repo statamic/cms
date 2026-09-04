@@ -232,7 +232,7 @@ defineExpose({ refresh: fetchSummary });
             </p>
             <div class="ms-auto flex items-center gap-2">
                 <template v-if="editing">
-                    <FieldPicker :fields="addableFields" @picked="fieldPicked" />
+                    <FieldPicker v-if="addableFields.length" :fields="addableFields" @picked="fieldPicked" />
                     <Button size="sm" :text="__('Cancel')" @click="cancelEditing" />
                     <Button size="sm" :text="__('Save')" variant="primary" :disabled="saving" @click="save" />
                 </template>
@@ -328,7 +328,7 @@ defineExpose({ refresh: fetchSummary });
                     <p class="text-sm text-gray-500 dark:text-gray-400">
                         {{ editing ? __('statamic::messages.form_summary_add_chart_instructions') : __('No charts to show.') }}
                     </p>
-                    <FieldPicker v-if="editing" :fields="addableFields" @picked="fieldPicked" />
+                    <FieldPicker v-if="editing && addableFields.length" :fields="addableFields" @picked="fieldPicked" />
                 </div>
             </div>
         </SortableList>

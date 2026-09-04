@@ -12,7 +12,7 @@ const emit = defineEmits<{
 </script>
 
 <template>
-    <Dropdown v-if="fields.length" align="start">
+    <Dropdown align="start">
         <template #trigger>
             <Button size="sm" :text="__('Add Chart')" icon="plus" />
         </template>
