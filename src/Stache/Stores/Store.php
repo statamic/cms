@@ -15,16 +15,27 @@ use Statamic\Support\Str;
 abstract class Store
 {
     protected $directory;
+
     protected $valueIndex = Indexes\Value::class;
+
     protected $customIndexes = [];
+
     protected $defaultIndexes = ['id', 'path'];
+
     protected $storeIndexes = [];
+
     protected $usedIndexes;
+
     protected $fileChangesHandled = false;
+
     protected $paths;
+
     protected $fileItems;
+
     protected $shouldCacheFileItems = false;
+
     protected $modified;
+
     protected $keys;
 
     /**
