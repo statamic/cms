@@ -8,11 +8,19 @@ const props = withDefaults(
         field: SummaryField;
         metric?: ChartMetric;
         showNumber?: boolean;
+        editing?: boolean;
     }>(),
     {
         metric: 'percent',
         showNumber: false,
+        editing: false,
     },
+);
+
+const editingHeaderClass = computed(() =>
+    props.editing
+        ? 'summary-chart-handle cursor-grab rounded-t-xl border border-dashed border-gray-400 dark:border-gray-700'
+        : undefined,
 );
 
 const showingDrilldown = ref(false);
@@ -60,6 +68,7 @@ watch(chart, () => (showingDrilldown.value = false));
         :title="title"
         title-tag="h2"
         class="h-full"
+        :header-class="editingHeaderClass"
         :icon="field.icon"
         icon-class="hidden @xs/widget:block size-4 text-gray-500"
     >

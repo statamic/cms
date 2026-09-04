@@ -264,10 +264,11 @@ defineExpose({ refresh: fetchSummary });
                         :field="widget.field"
                         :metric="metric"
                         :show-number="showFieldNumbers"
+                        :editing="editing"
                     >
                         <template v-if="editing" #chrome>
                             <EditChrome
-                                class="rounded-b-xl"
+                                class="rounded-b-xl border-t-0"
                                 :config="widget.config"
                                 :charts="availableCharts"
                                 @update:chart="setChart(index, $event)"
@@ -280,12 +281,13 @@ defineExpose({ refresh: fetchSummary });
                         :title="__(chartableField(widget.config.field)?.display ?? widget.config.field)"
                         title-tag="h2"
                         class="h-full"
+                        :header-class="editing ? 'summary-chart-handle cursor-grab rounded-t-xl border border-dashed border-gray-400 dark:border-gray-700' : undefined"
                         :icon="chartableField(widget.config.field)?.icon"
                         icon-class="hidden @xs/widget:block size-4 text-gray-500"
                     >
                         <div class="relative flex-1 overflow-hidden rounded-b-xl">
                             <EditChrome
-                                class="rounded-b-xl"
+                                class="rounded-b-xl border-t-0"
                                 :config="widget.config"
                                 :charts="availableCharts"
                                 @update:chart="setChart(index, $event)"
