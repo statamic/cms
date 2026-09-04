@@ -91,7 +91,7 @@ defineExpose(expose);
     <div class="flex justify-end">
         <Button icon="connection" @click="open = true">
             {{ __('Configure Connections') }}
-            <Badge v-if="totalConfigured" size="sm" pill>{{ totalConfigured }}</Badge>
+            <Badge v-if="totalConfigured" size="sm" pill class="ms-1.5">{{ totalConfigured }}</Badge>
         </Button>
     </div>
 
