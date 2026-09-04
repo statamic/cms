@@ -186,6 +186,28 @@ class FormSummaryTest extends TestCase
     }
 
     #[Test]
+    public function it_previews_an_unsaved_chart_layout()
+    {
+        $form = $this->makeForm();
+        $form->charts([['field' => 'rating', 'chart' => 'horizontal_bar']])->save();
+
+        $this->submit($form, ['color' => 'red']);
+
+        $this
+            ->actingAs($this->superUser())
+            ->getJson(cp_route('forms.submissions.summary', $form->handle()).'?'.http_build_query([
+                'charts' => [['field' => 'color', 'chart' => 'horizontal_bar']],
+            ]))
+            ->assertOk()
+            ->assertJsonCount(1, 'fields')
+            ->assertJsonPath('fields.0.handle', 'color')
+            ->assertJsonPath('fields.0.chart.handle', 'horizontal_bar')
+            ->assertJsonPath('fields.0.chart.props.items.0.count', 1);
+
+        $this->assertEquals([['field' => 'rating', 'chart' => 'horizontal_bar']], Form::find('survey')->charts());
+    }
+
+    #[Test]
     public function it_scopes_counts_to_the_search_query()
     {
         $form = $this->makeForm();

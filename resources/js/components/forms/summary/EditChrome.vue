@@ -3,10 +3,16 @@ import { computed } from 'vue';
 import { Button, Dropdown, DropdownItem, DropdownMenu } from '@ui';
 import type { ChartConfig, MetaChart } from './types';
 
-const props = defineProps<{
-    config: ChartConfig;
-    charts: MetaChart[];
-}>();
+const props = withDefaults(
+    defineProps<{
+        config: ChartConfig;
+        charts: MetaChart[];
+        loading?: boolean;
+    }>(),
+    {
+        loading: false,
+    },
+);
 
 const emit = defineEmits<{
     'update:chart': [chart: string];
@@ -24,7 +30,7 @@ const currentChart = computed(() => props.charts.find((chart) => chart.handle ==
         <div class="flex shrink-0 items-center gap-2" @mousedown.stop @click.stop>
             <Dropdown align="start">
                 <template #trigger>
-                    <Button size="sm" :icon="currentChart?.icon" :text="currentChart?.title ?? config.chart" />
+                    <Button size="sm" :icon="currentChart?.icon" :text="currentChart?.title ?? config.chart" :loading />
                 </template>
                 <DropdownMenu>
                     <DropdownItem
