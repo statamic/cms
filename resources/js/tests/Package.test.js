@@ -19,6 +19,7 @@ it('exports core', async () => {
     const expected = [
         'ConnectionRows',
         'ConnectionRules',
+        'ConditionsCollapsedSummary',
         'DateFormatter',
         'Fieldtype',
         'FieldtypeMixin',

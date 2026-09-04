@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { Badge, Button, Field, Icon, Label, PublishContainer, PublishFields, PublishFieldsProvider, Subheading } from '@ui';
+import { Badge, Button, Field, Icon, Label, PublishContainer, PublishFields, PublishFieldsProvider } from '@ui';
 import ConnectionRows from './ConnectionRows.vue';
-import ConnectionRules, { conditionsSummary } from './ConnectionRules.vue';
+import ConnectionRules from './ConnectionRules.vue';
+import ConditionsCollapsedSummary from './ConditionsCollapsedSummary.vue';
 
 defineEmits(['update:modelValue']);
 
@@ -38,9 +39,10 @@ const showExamplePayload = ref<boolean>(props.modelValue.length === 0);
                 <Icon name="globe-setting" class="size-3.5 me-1 opacity-100! text-purple-600 dark:text-purple-400" aria-hidden="true" />
                 {{ webhook.url || __('New Webhook') }}
             </Badge>
-            <Subheading v-show="collapsed" class="overflow-hidden text-ellipsis whitespace-nowrap gap-1.5!">
-                <span class="truncate">{{ conditionsSummary(webhook.conditions) }}</span>
-            </Subheading>
+            <ConditionsCollapsedSummary
+                v-show="collapsed"
+                :conditions="webhook.conditions"
+            />
         </template>
 
         <template #default="{ item: webhook, errors }">
