@@ -8,5 +8,5 @@ class HorizontalBar extends Chart
 
     protected ?string $component = 'ui-horizontal-bar-chart';
     protected ?string $icon = 'charts-bar-horizontal';
-    protected ?int $limit = 4;
+    protected ?int $limit = 5;
 }
