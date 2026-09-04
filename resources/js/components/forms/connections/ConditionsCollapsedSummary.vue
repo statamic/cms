@@ -96,7 +96,7 @@ const collapsedSummary = computed(() => {
 </script>
 
 <template>
-    <Badge v-if="filteredConditions.length" pill size="sm" color="white" class="ms-1 font-medium text-gray-800 dark:text-gray-200">
+    <Badge v-if="filteredConditions.length" pill size="sm" color="white" class="font-medium text-gray-800 dark:text-gray-200">
         {{ __('If') }}
     </Badge>
     <Badge v-if="firstFieldConfig" pill color="white" class="ps-1.5 py-1 text-gray-950 gap-1">
