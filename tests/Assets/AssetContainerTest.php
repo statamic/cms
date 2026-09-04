@@ -187,6 +187,28 @@ class AssetContainerTest extends TestCase
     }
 
     #[Test]
+    public function it_gets_and_sets_whether_chunked_uploads_are_enabled()
+    {
+        $container = new AssetContainer;
+        $this->assertNull($container->chunkedUploads());
+
+        $return = $container->chunkedUploads(true);
+
+        $this->assertEquals($container, $return);
+        $this->assertTrue($container->chunkedUploads());
+    }
+
+    #[Test]
+    public function it_only_saves_chunked_uploads_to_file_when_enabled()
+    {
+        $container = (new AssetContainer)->handle('test')->chunkedUploads(true);
+        $this->assertTrue($container->fileData()['chunked_uploads']);
+
+        $container->chunkedUploads(null);
+        $this->assertArrayNotHasKey('chunked_uploads', $container->fileData());
+    }
+
+    #[Test]
     public function it_gets_and_sets_glide_source_preset_for_upload_processing()
     {
         $container = new AssetContainer;

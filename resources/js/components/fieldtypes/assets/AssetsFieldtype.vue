@@ -9,6 +9,10 @@
         <uploader
             ref="uploader"
             :container="container.id"
+            :chunked-uploads="container.chunked_uploads"
+            :chunk-size="container.chunk_size"
+            :max-filesize="container.max_filesize"
+            :chunk-upload-url="container.chunk_upload_url"
             :enabled="canUpload"
             :path="folder"
             @updated="uploadsUpdated"

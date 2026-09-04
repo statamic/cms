@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;
 use Inertia\Inertia;
 use Statamic\Assets\AssetFolder;
+use Statamic\Assets\ChunkUploads;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\CP\Column;
 use Statamic\Exceptions\AuthorizationException;
@@ -89,6 +90,10 @@ class BrowserController extends CpController
                 'can_create_folders' => User::current()->can('create', [\Statamic\Contracts\Assets\AssetFolder::class, $container]),
                 'sort_field' => $container->sortField(),
                 'sort_direction' => $container->sortDirection(),
+                'chunked_uploads' => ChunkUploads::enabledForContainer($container),
+                'chunk_size' => ChunkUploads::chunkSize(),
+                'chunk_upload_url' => cp_route('assets.chunks.store'),
+                'max_filesize' => ChunkUploads::maxFilesizeBytes($container->validationRules()),
             ],
             'folder' => $path,
             'columns' => $this->columns,

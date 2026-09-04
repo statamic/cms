@@ -49,6 +49,7 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
     protected $sortField;
     protected $sortDirection;
     protected $validation;
+    protected $chunkedUploads;
 
     public function id($id = null)
     {
@@ -111,6 +112,11 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
             ->fluentlyGetOrSet('validation')
             ->getter(fn ($rules) => $rules ?? [])
             ->args(func_get_args());
+    }
+
+    public function chunkedUploads($enabled = null)
+    {
+        return $this->fluentlyGetOrSet('chunkedUploads')->args(func_get_args());
     }
 
     public function diskPath()
@@ -573,6 +579,7 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
             'source_preset' => $this->sourcePreset,
             'warm_presets' => $this->warmPresets,
             'validate' => $this->validation,
+            'chunked_uploads' => $this->chunkedUploads,
         ];
 
         $array = Arr::removeNullValues(array_merge($array, [
