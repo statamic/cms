@@ -107,6 +107,7 @@ return [
     'fields_instructions_position_instructions' => 'Show instructions above or below the field.',
     'fields_listable_instructions' => 'Control the listing column visibility.',
     'fields_replicator_preview_instructions' => 'Control preview visibility in Replicator/Bard sets.',
+    'fields_revisable_instructions' => 'Include this field in revisions. When disabled, changes are saved straight to the published entry instead of a working copy. Only applies to collection entries.',
     'fields_sortable_instructions' => 'Control if the field should be sortable in listing views.',
     'fields_visibility_instructions' => 'Control field visibility on publish forms.',
     'fieldset_import_fieldset_instructions' => 'The fieldset to be imported.',

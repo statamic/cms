@@ -256,6 +256,9 @@ class EntriesController extends CpController
                 ->user(User::current())
                 ->save();
 
+            // have to save in case there are non-revisable fields
+            $this->saveNonRevisableFields($entry);
+
             // catch any changes through RevisionSaving event
             $entry = $entry->fromWorkingCopy();
         } else {
@@ -527,5 +530,16 @@ class EntriesController extends CpController
         if (Site::multiEnabled() && ! $collection->sites()->contains($site->handle())) {
             return redirect()->back()->with('error', __('Collection is not available on site ":handle".', ['handle' => $site->handle]));
         }
+    }
+
+    private function saveNonRevisableFields(EntryContract $entry): void
+    {
+        $values = $entry->data()->only($entry->nonRevisableFields());
+
+        if ($values->isEmpty()) {
+            return;
+        }
+
+        $entry->fresh()->merge($values)->save();
     }
 }
