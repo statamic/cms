@@ -21,6 +21,7 @@ class ConsoleServiceProvider extends ServiceProvider
         Commands\InstallEloquentDriver::class,
         Commands\InstallSsg::class,
         Commands\FlatCamp::class,
+        Commands\License::class,
         Commands\LicenseSet::class,
         Commands\MakeAction::class,
         Commands\MakeAddon::class,
@@ -58,6 +59,7 @@ class ConsoleServiceProvider extends ServiceProvider
         Commands\ImportRoles::class,
         Commands\ImportUsers::class,
         Commands\ProEnable::class,
+        Commands\SiteFreshKey::class,
     ];
 
     public function boot()

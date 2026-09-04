@@ -294,7 +294,8 @@ ENV, $this->files->get($this->envPath));
         $this
             ->artisan('statamic:pro:enable')
             ->expectsQuestion('If you have a Statamic license key, paste it now', '')
-            ->expectsOutputToContain('Add `STATAMIC_LICENSE_KEY=...` to your `.env` before or when your site goes live.');
+            ->expectsOutputToContain('php please license')
+            ->expectsOutputToContain('STATAMIC_LICENSE_KEY=...');
     }
 
     #[Test]

@@ -70,6 +70,8 @@ class CoreUtilities
             ->docsUrl(Statamic::docsUrl('licensing'))
             ->routes(function ($router) {
                 $router->get('refresh', [LicensingController::class, 'refresh'])->name('refresh');
+                $router->post('mint', [LicensingController::class, 'mint'])->name('mint');
+                $router->post('fresh', [LicensingController::class, 'fresh'])->name('fresh');
             });
 
         if (config('statamic.git.enabled') && Statamic::pro()) {

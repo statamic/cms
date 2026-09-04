@@ -18,6 +18,7 @@ use InvalidArgumentException;
 use RuntimeException;
 use Statamic\Facades;
 use Statamic\Facades\Addon;
+use Statamic\Facades\Config;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
 
@@ -81,7 +82,7 @@ class Outpost
             return $this->licenseKeyFileResponse();
         }
 
-        $response = $this->client->request('POST', self::ENDPOINT, [
+        $response = $this->client->request('POST', $this->endpoint(), [
             'headers' => ['accept' => 'application/json'],
             'json' => $this->payload(),
             'timeout' => self::REQUEST_TIMEOUT,
@@ -114,7 +115,8 @@ class Outpost
     public function payload()
     {
         return [
-            'key' => config('statamic.system.license_key'),
+            'key' => Config::getLicenseKey(),
+            'name' => config('app.name'),
             'host' => request()->getHost(),
             'ip' => request()->server('SERVER_ADDR'),
             'port' => request()->server('SERVER_PORT'),
@@ -159,7 +161,7 @@ class Outpost
 
     private function payloadHasChanged($previous, $current)
     {
-        $exclude = ['host', 'ip', 'port', 'php_version'];
+        $exclude = ['ip', 'port', 'php_version'];
 
         return Arr::except($previous, $exclude) !== Arr::except($current, $exclude);
     }
@@ -236,6 +238,11 @@ class Outpost
     public function usingLicenseKeyFile()
     {
         return File::exists($this->licenseKeyPath());
+    }
+
+    private function endpoint(): string
+    {
+        return config('statamic.system.outpost_url', self::ENDPOINT);
     }
 
     private function licenseKeyPath()

@@ -8,6 +8,7 @@ use Illuminate\Console\Command;
 use Statamic\Console\Composer\Json as ComposerJson;
 use Statamic\Console\RunsInPlease;
 use Statamic\Facades\File;
+use Statamic\Licensing\SiteKey;
 use Statamic\Statamic;
 
 class Install extends Command
@@ -35,13 +36,25 @@ class Install extends Command
      */
     public function handle()
     {
-        $this->addons()
+        $this->mintSiteKey()
+            ->addons()
             ->createFiles()
             ->publish()
             ->runCallbacks()
             ->clearViews()
             ->clearCache()
             ->runUpdateScripts();
+    }
+
+    public function mintSiteKey(): self
+    {
+        $key = app(SiteKey::class)->ensure();
+
+        if ($key) {
+            $this->laravel['config']['statamic.system.site_key'] = $key;
+        }
+
+        return $this;
     }
 
     protected function addons()

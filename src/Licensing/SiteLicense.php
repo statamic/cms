@@ -2,18 +2,63 @@
 
 namespace Statamic\Licensing;
 
+use Statamic\Facades\Config;
 use Statamic\Support\Arr;
 
 class SiteLicense extends License
 {
     public function key()
     {
-        return config('statamic.system.license_key');
+        return Config::getLicenseKey();
+    }
+
+    public function name(): ?string
+    {
+        return Arr::get($this->response, 'name');
+    }
+
+    public function isConnected(): bool
+    {
+        return (bool) Arr::get($this->response, 'claimed', false);
+    }
+
+    public function valid()
+    {
+        if ($this->shouldHideUnlinkedDomainReason()) {
+            return true;
+        }
+
+        return parent::valid();
+    }
+
+    public function invalidReason()
+    {
+        if ($this->shouldHideUnlinkedDomainReason()) {
+            return;
+        }
+
+        return parent::invalidReason();
+    }
+
+    public function hasInvalidDomain(): bool
+    {
+        return Arr::get($this->response, 'reason') === 'invalid_domain';
+    }
+
+    private function shouldHideUnlinkedDomainReason(): bool
+    {
+        return ! $this->isConnected() && Arr::get($this->response, 'reason') === 'no_domains';
     }
 
     public function usesIncorrectKeyFormat()
     {
-        return ! preg_match('/^[a-zA-Z0-9]{16}$/', $this->key());
+        $key = $this->key();
+
+        if (! $key) {
+            return false;
+        }
+
+        return ! preg_match('/^(?:site_[a-zA-Z0-9]{26}|[a-zA-Z0-9]{16})$/', $key);
     }
 
     public function hasDomains()
@@ -47,7 +92,7 @@ class SiteLicense extends License
 
     public function url()
     {
-        $url = 'https://statamic.com/account/sites';
+        $url = rtrim(config('statamic.system.licensing_url', 'https://statamic.com'), '/').'/account/sites';
 
         if ($key = $this->key()) {
             $url .= '/'.$key;
@@ -56,5 +101,19 @@ class SiteLicense extends License
         }
 
         return $url;
+    }
+
+    public function handoffUrl(): ?string
+    {
+        if (! $key = $this->key()) {
+            return null;
+        }
+
+        return rtrim(config('statamic.system.licensing_url', 'https://statamic.com'), '/').'/account/licensing/handoff?'.http_build_query(array_filter([
+            'key' => $key,
+            'name' => config('app.name'),
+            'host' => request()->getHost(),
+            'return' => url(cp_route('utilities.licensing')),
+        ]));
     }
 }

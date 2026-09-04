@@ -1,5 +1,14 @@
 # Release Notes
 
+## Unreleased
+
+### What's new
+- Generate a `STATAMIC_SITE_KEY` on install to identify a project across environments. A site key is not a license — attach one with `php please license` or the Control Panel. Sites with a `STATAMIC_LICENSE_KEY` are left alone.
+- Add `php please site:fresh-key` for cloned templates, plus a matching "Generate new key" action in the Licensing utility for when someone else linked your key first.
+- Generate a missing site key from the Control Panel Licensing utility.
+- Clarify Licensing purchase actions with a checkout summary modal.
+- Drive the Licensing utility from a single primary action (generate / link / buy / add domain) based on whether the site is linked to a statamic.com account.
+
 ## 6.31.0 (2026-09-01)
 
 ### What's new
@@ -35,7 +44,6 @@
 - Prefilled Alpine.js forms from field values [#14706](https://github.com/statamic/cms/issues/14706) by @godismyjudge95
 - Tidy up login credential handling [#15335](https://github.com/statamic/cms/issues/15335) by @jasonvarga
 - French translations [#15303](https://github.com/statamic/cms/issues/15303) by @ebeauchamps
-
 
 
 ## 6.30.0 (2026-08-28)

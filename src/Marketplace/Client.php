@@ -38,8 +38,8 @@ class Client
      */
     public function __construct()
     {
-        if ($domain = env('STATAMIC_DOMAIN')) {
-            $this->domain = $domain;
+        if ($domain = env('STATAMIC_DOMAIN') ?: $this->customLicensingUrl()) {
+            $this->domain = $this->normalizeDomain($domain);
             $this->verifySsl = false;
         }
     }
@@ -88,6 +88,24 @@ class Client
     public function requestEndpoint(string $endpoint): string
     {
         return collect([$this->domain, self::API_PREFIX, $endpoint])->implode('/');
+    }
+
+    private function customLicensingUrl(): ?string
+    {
+        $url = rtrim((string) config('statamic.system.licensing_url'), '/');
+
+        return $url && $url !== 'https://statamic.com' ? $url : null;
+    }
+
+    private function normalizeDomain(string $domain): string
+    {
+        $domain = rtrim($domain, '/');
+
+        if (! preg_match('#^https?://#', $domain)) {
+            $domain = 'https://'.$domain;
+        }
+
+        return $domain;
     }
 
     private function requestCacheKey(string $endpoint, array $params = []): string
