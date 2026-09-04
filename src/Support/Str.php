@@ -258,6 +258,11 @@ class Str
         return $string;
     }
 
+    /**
+     * @deprecated Widths are resolved by the control panel stylesheet now. Render
+     * `field-w-{$width}` or `widget-w-{$width}` instead. Will be removed in a
+     * future major version.
+     */
     public static function tailwindWidthClass($width)
     {
         $sizes = [
