@@ -35,6 +35,31 @@ class PhpDisabledTest extends TestCase
         $this->assertSame('Before &lt;?php echo "hello"; ?> After', $result);
     }
 
+    public function test_php_nodes_inside_interpolated_parameters_are_not_evaluated_when_disabled()
+    {
+        (new class extends \Statamic\Tags\Tags
+        {
+            protected static $handle = 'php_param_echo';
+
+            public function index()
+            {
+                return '['.$this->params->get('value').']';
+            }
+        })::register();
+
+        $data = ['title' => 'The Title', 'items' => ['a', 'b']];
+        $template = '{{ php_param_echo value="{{$ strtoupper($title) $}}" }}';
+        $loop = '{{ items }}<li>{{ php_param_echo value="{{ value }}:{{$ strtoupper($value) $}}" }}</li>{{ /items }}';
+
+        $this->assertSame('[THE TITLE]', (string) Antlers::parse($template, $data, true));
+        $this->assertSame('<li>[a:A]</li><li>[b:B]</li>', (string) Antlers::parse($loop, $data, true));
+
+        $this->assertSame('', (string) Antlers::parse($template, $data, false));
+        $this->assertSame('', (string) Antlers::parse($template, $data));
+        $this->assertSame('<li></li><li></li>', (string) Antlers::parse($loop, $data, false));
+        $this->assertSame('', (string) Antlers::parse('{{ php_param_echo value="a{{? $x = 1; ?}}b" }}', $data, false));
+    }
+
     public function test_it_allows_inline_echo_blocks_when_enabled()
     {
         $result = (string) Antlers::parse('Before {{$ "hello" $}} After', [], true);

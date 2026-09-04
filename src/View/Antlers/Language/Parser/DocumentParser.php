@@ -735,14 +735,19 @@ class DocumentParser
                     $docParser->setIsInterpolatedParser(true);
 
                     $parseResults = $docParser->parse($content);
+                    $interpolationNode = null;
 
-                    if (count($parseResults) > 1 && $parseResults[1] instanceof AntlersNode) {
-                        $parseResults = [$parseResults[1]];
-                    } elseif (count($parseResults) == 1 && ($parseResults[0] instanceof AntlersNode) == false) {
-                        $parseResults = [];
+                    foreach ($parseResults as $parseResult) {
+                        if ($parseResult instanceof DirectiveNode) {
+                            continue;
+                        }
+
+                        if ($parseResult instanceof AntlersNode || $parseResult instanceof PhpExecutionNode) {
+                            $interpolationNode = $parseResult;
+                        }
                     }
 
-                    $node->processedInterpolationRegions[$varName] = $parseResults;
+                    $node->processedInterpolationRegions[$varName] = $interpolationNode === null ? [] : [$interpolationNode];
                 }
                 $node->hasProcessedInterpolationRegions = true;
             }
