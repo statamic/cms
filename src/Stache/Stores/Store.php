@@ -410,9 +410,47 @@ abstract class Store
 
     public function warm()
     {
+        $this->warmValueIndexes();
+        $this->warmOtherIndexes();
+    }
+
+    /**
+     * Pass 1 of the 2-pass warm. Loads every file once and accumulates values for
+     * all per-item value indexes in a single loop, then writes each index to the
+     * cache in one shot. This ensures entries' taxonomy indexes (e.g. `categories`)
+     * are cached before Pass 2 runs, so Terms\Associations can build from them.
+     */
+    public function warmValueIndexes()
+    {
+        $valueIndexes = $this->resolveIndexes()->filter(fn ($index) => $this->isPerItemValueIndex($index));
+
+        $accumulated = $valueIndexes->map(fn () => [])->all();
+
+        foreach ($this->paths()->keys() as $key) {
+            $item = $this->getItem($key);
+
+            foreach ($valueIndexes as $name => $index) {
+                $accumulated[$name][$key] = $index->getItemValue($item);
+            }
+        }
+
+        $valueIndexes->each(function ($index, $name) use ($accumulated) {
+            $index->setItems($accumulated[$name])->cache();
+        });
+    }
+
+    /**
+     * Pass 2 of the 2-pass warm. Runs after all stores have completed Pass 1, so
+     * indexes that depend on other indexes (e.g. Terms\Associations) can read
+     * them from the cache instead of loading Entry objects from disk.
+     */
+    public function warmOtherIndexes()
+    {
         $this->shouldCacheFileItems = true;
 
-        $this->resolveIndexes()->each->update();
+        $this->resolveIndexes()
+            ->reject(fn ($index) => $this->isPerItemValueIndex($index))
+            ->each->update();
 
         $this->shouldCacheFileItems = false;
         $this->fileItems = null;
@@ -425,5 +463,16 @@ abstract class Store
         }
 
         return $this->keys = (new Keys($this))->load();
+    }
+
+    /**
+     * Whether an index can be built purely by mapping getItemValue() over each item.
+     * Subclasses of Value that override getItems() (e.g. Terms\Value, which merges in
+     * on-the-fly terms) need their own build logic and belong in Pass 2.
+     */
+    private function isPerItemValueIndex(Index $index): bool
+    {
+        return $index instanceof Indexes\Value
+            && (new \ReflectionMethod($index, 'getItems'))->getDeclaringClass()->getName() === Indexes\Value::class;
     }
 }

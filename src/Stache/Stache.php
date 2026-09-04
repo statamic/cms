@@ -137,7 +137,12 @@ class Stache
         if ($this->shouldUseParallelWarming($stores)) {
             $this->warmInParallel($stores);
         } else {
-            $stores->each->warm();
+            // Two-pass warm: Pass 1 caches all per-item value indexes (including entries'
+            // taxonomy indexes) across every store before Pass 2 runs. This lets
+            // Terms\Associations read from the cache in Pass 2 instead of loading all
+            // Entry objects from disk, which was the main source of slow warm times.
+            $stores->each->warmValueIndexes();
+            $stores->each->warmOtherIndexes();
         }
 
         $this->stopTimer();
