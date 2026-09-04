@@ -30,10 +30,11 @@
 .pie-chart-legend__swatch--2 { @apply bg-chart-2-legend; }
 .pie-chart-legend__swatch--3 { @apply bg-chart-3-legend; }
 .pie-chart-legend__swatch--4 { @apply bg-chart-4-legend; }
+.pie-chart-legend__swatch--5 { @apply bg-chart-5-legend; }
 
 .pie-chart-legend__link,
 .summary-bar-chart__link {
-    @apply contents cursor-pointer text-inherit;
+    @apply contents cursor-pointer text-inherit text-start;
 }
 
 .pie-chart {
@@ -248,6 +249,14 @@
 
 
 
+/* GROUP CHARTS / SUMMARY / EDITING
+=================================================== */
+.summary-chart-editing header {
+    @apply border-dashed border-gray-400 dark:border-gray-700;
+}
+
+
+
 /* GROUP CHARTS / SUMMARY BAR CHART / ICON STROKES
 =================================================== */
 /* Note: This is used to style the checkbox icons in the summary bar chart depending on the background contrast. */
@@ -269,6 +278,7 @@
 .summary-bar-chart__icon-stroke--2 { --chart-tick-color: var(--color-chart-2-legend); }
 .summary-bar-chart__icon-stroke--3 { --chart-tick-color: var(--color-chart-3-legend); }
 .summary-bar-chart__icon-stroke--4 { --chart-tick-color: var(--color-chart-4-legend); }
+.summary-bar-chart__icon-stroke--5 { --chart-tick-color: var(--color-chart-5-legend); }
 
 
 

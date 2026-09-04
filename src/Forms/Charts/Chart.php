@@ -55,13 +55,16 @@ abstract class Chart
 
         [$items, $other] = $items->partition(fn ($item): bool => $keep->contains($item['key']));
 
-        $items->push([
+        $icons = $other->pluck('icon')->filter()->unique();
+
+        $items->push(array_filter([
             'key' => 'other',
             'label' => __('Other'),
             'count' => $count = $other->sum('count'),
             'percent' => $this->percent($count, $total),
+            'icon' => $icons->count() === 1 ? $icons->first() : null,
             'other' => true,
-        ]);
+        ], fn ($value) => $value !== null));
 
         return [$items->values(), $other->values()];
     }

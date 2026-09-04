@@ -35,14 +35,17 @@ manually copy them here.
     --theme-color-chart-2: oklch(0.274 0.006 286.033);
     --theme-color-chart-3: oklch(0.768 0.233 130.85);
     --theme-color-chart-4: oklch(0.87 0.065 274.039);
+    --theme-color-chart-5: oklch(0.87 0.065 274.039);
     --theme-color-chart-1-label-bg: oklch(0.511 0.262 276.966);
     --theme-color-chart-2-label-bg: transparent;
     --theme-color-chart-3-label-bg: oklch(0.648 0.2 131.684);
     --theme-color-chart-4-label-bg: oklch(0.673 0.182 276.935);
+    --theme-color-chart-5-label-bg: oklch(0.87 0.065 274.039);
     --theme-color-chart-1-legend: oklch(0.585 0.233 277.117);
     --theme-color-chart-2-legend: oklch(0.274 0.006 286.033);
     --theme-color-chart-3-legend: oklch(0.768 0.233 130.85);
     --theme-color-chart-4-legend: oklch(0.785 0.115 274.713);
+    --theme-color-chart-5-legend: oklch(0.87 0.065 274.039);
 
     --z-index-below: -1;
     --z-index-above: 1;
@@ -61,14 +64,17 @@ manually copy them here.
         --theme-color-chart-2: oklch(0.87 0.065 274.039);
         --theme-color-chart-3: oklch(0.768 0.233 130.85);
         --theme-color-chart-4: oklch(0.141 0.005 285.823);
+        --theme-color-chart-5: oklch(0.87 0.065 274.039);
         --theme-color-chart-1-label-bg: oklch(0.457 0.24 277.023);
         --theme-color-chart-2-label-bg: oklch(0.673 0.182 276.935);
         --theme-color-chart-3-label-bg: oklch(0.648 0.2 131.684);
         --theme-color-chart-4-label-bg: oklch(0.37 0.013 285.805);
+        --theme-color-chart-5-label-bg: oklch(0.87 0.065 274.039);
         --theme-color-chart-1-legend: oklch(0.511 0.262 276.966);
         --theme-color-chart-2-legend: oklch(0.87 0.065 274.039);
         --theme-color-chart-3-legend: oklch(0.768 0.233 130.85);
         --theme-color-chart-4-legend: oklch(0.141 0.005 285.823);
+        --theme-color-chart-5-legend: oklch(0.87 0.065 274.039);
     }
 }
 

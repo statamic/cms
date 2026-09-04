@@ -14,7 +14,7 @@ const emit = defineEmits<{
 <template>
     <Dropdown align="start">
         <template #trigger>
-            <Button size="sm" :text="__('Add Chart')" icon="plus" :disabled="!fields.length" />
+            <Button size="sm" :text="__('Add Chart')" icon="plus" />
         </template>
         <DropdownMenu>
             <DropdownItem

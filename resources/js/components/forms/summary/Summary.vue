@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref, watch } from 'vue';
 import axios from 'axios';
-import { keys, preferences } from '@api';
+import { dirty, keys, preferences } from '@api';
 import { Button, Skeleton, ToggleGroup, ToggleItem, Widget } from '@ui';
 import { injectListingContext } from '@/components/ui/Listing/Listing.vue';
 import { SortableList } from '@/components/sortable/Sortable.js';
@@ -41,6 +41,7 @@ const { activeFilters, searchQuery, preferencesPrefix } = injectListingContext()
 const summary = ref<Summary | null>(null);
 const editing = ref<boolean>(false);
 const draftLayout = ref<ChartConfig[]>([]);
+const savedLayout = ref<ChartConfig[]>([]);
 const saving = ref<boolean>(false);
 const loadingPreviews = ref<string[]>([]);
 const isDragging = ref<boolean>(false);
@@ -83,6 +84,8 @@ const widgets = computed<SummaryWidget[]>(() => {
         field: summarizedField(item.field) ?? null,
     }));
 });
+
+const isDirty = computed<boolean>(() => editing.value && JSON.stringify(draftLayout.value) !== JSON.stringify(savedLayout.value));
 
 const missingPreviews = computed<ChartConfig[]>(() =>
     draftLayout.value.filter((item) => !isSummarized(item) && !loadingPreviews.value.includes(item.field)),
@@ -148,11 +151,12 @@ async function fetchPreviews(charts: ChartConfig[]) {
 }
 
 function startEditing() {
-    draftLayout.value = (summary.value?.fields ?? []).map((field) => ({
+    savedLayout.value = (summary.value?.fields ?? []).map((field) => ({
         field: field.handle,
         chart: field.chart.handle,
     }));
 
+    draftLayout.value = clone(savedLayout.value);
     editing.value = true;
 }
 
@@ -209,13 +213,18 @@ watch(missingPreviews, (missing) => editing.value && missing.length && fetchPrev
 
 watch(metric, (metric: ChartMetric) => preferences.set(`${preferencesPrefix.value}.summary.chart_metric`, metric));
 
-onBeforeUnmount(() => saveBinding?.destroy());
+watch(isDirty, (isDirty: boolean) => dirty.state('form-summary-charts', isDirty));
+
+onBeforeUnmount(() => {
+    saveBinding?.destroy();
+    dirty.remove('form-summary-charts');
+});
 
 defineExpose({ refresh: fetchSummary });
 </script>
 
 <template>
-    <div data-submission-summary class="mt-3 pb-8">
+    <div data-submission-summary class="mt-1.5 pb-8">
         <div class="flex w-full items-center gap-2 mb-3">
             <FieldNumberingToggle />
             <ToggleGroup v-model="metric" size="xs">
@@ -232,7 +241,7 @@ defineExpose({ refresh: fetchSummary });
             </p>
             <div class="ms-auto flex items-center gap-2">
                 <template v-if="editing">
-                    <FieldPicker :fields="addableFields" @picked="fieldPicked" />
+                    <FieldPicker v-if="addableFields.length" :fields="addableFields" @picked="fieldPicked" />
                     <Button size="sm" :text="__('Cancel')" @click="cancelEditing" />
                     <Button size="sm" :text="__('Save')" variant="primary" :disabled="saving" @click="save" />
                 </template>
@@ -278,10 +287,10 @@ defineExpose({ refresh: fetchSummary });
                         :field="widget.field"
                         :metric="metric"
                         :show-number="showFieldNumbers"
+                        :editing="editing"
                     >
                         <template v-if="editing" #chrome>
                             <EditChrome
-                                class="rounded-b-xl"
                                 :config="widget.config"
                                 :charts="availableCharts"
                                 :loading="loadingPreviews.includes(widget.config.field)"
@@ -295,18 +304,20 @@ defineExpose({ refresh: fetchSummary });
                         :title="__(chartableField(widget.config.field)?.display ?? widget.config.field)"
                         title-tag="h2"
                         class="h-full"
+                        :class="{ 'summary-chart-editing summary-chart-handle cursor-grab active:cursor-grabbing ring-0! shadow-none! border border-dashed border-gray-400 dark:border-gray-700': editing }"
                         :icon="chartableField(widget.config.field)?.icon"
                         icon-class="hidden @xs/widget:block size-4 text-gray-500"
                     >
-                        <div class="relative flex-1 overflow-hidden rounded-b-xl">
+                        <template v-if="editing" #actions>
                             <EditChrome
-                                class="rounded-b-xl"
                                 :config="widget.config"
                                 :charts="availableCharts"
                                 :loading="loadingPreviews.includes(widget.config.field)"
                                 @update:chart="setChart(index, $event)"
                                 @remove="removeChart(index)"
                             />
+                        </template>
+                        <div class="relative flex-1 overflow-hidden rounded-b-xl">
                             <Skeleton class="h-full w-full" />
                         </div>
                     </Widget>
@@ -318,7 +329,7 @@ defineExpose({ refresh: fetchSummary });
                     <p class="text-sm text-gray-500 dark:text-gray-400">
                         {{ editing ? __('statamic::messages.form_summary_add_chart_instructions') : __('No charts to show.') }}
                     </p>
-                    <FieldPicker v-if="editing" :fields="addableFields" @picked="fieldPicked" />
+                    <FieldPicker v-if="editing && addableFields.length" :fields="addableFields" @picked="fieldPicked" />
                 </div>
             </div>
         </SortableList>

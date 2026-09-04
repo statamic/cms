@@ -64,7 +64,7 @@ defineExpose({ parameters, refresh });
         <template #default="{ items, showPresets, allowSearch, allowCustomizingColumns, hasFilters, meta }">
             <Presets v-if="showPresets" />
             <div v-if="allowSearch || hasFilters || allowCustomizingColumns" class="relative overflow-clip flex items-center gap-2 sm:gap-3 min-h-16 starting-style-transition st-overflow-clip-margin">
-                <div class="flex flex-1 items-center gap-2 sm:gap-3 overflow-x-auto -ms-1 ps-1 py-1">
+                <div class="flex flex-1 items-center gap-2 sm:gap-3 overflow-x-auto -ms-1 ps-1 pt-1">
                     <Search v-if="allowSearch" />
                     <Filters v-if="hasFilters" />
                 </div>

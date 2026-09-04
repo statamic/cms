@@ -8,10 +8,12 @@ const props = withDefaults(
         field: SummaryField;
         metric?: ChartMetric;
         showNumber?: boolean;
+        editing?: boolean;
     }>(),
     {
         metric: 'percent',
         showNumber: false,
+        editing: false,
     },
 );
 
@@ -34,7 +36,11 @@ const items = computed<ChartItem[]>(() => {
         return drilldown.value!.items;
     }
 
-    return chart.value.props.items.map((item) => (item.other && hasDrilldown.value ? { ...item, clickable: true } : item));
+    if (props.editing || !hasDrilldown.value) {
+        return chart.value.props.items;
+    }
+
+    return chart.value.props.items.map((item) => (item.other ? { ...item, clickable: true } : item));
 });
 
 const accessibleLabel = computed(() => {
@@ -54,7 +60,7 @@ const chartProps = computed(() => ({
     accessibleLabel: accessibleLabel.value,
 }));
 
-watch(chart, () => (page.value = 1));
+watch([chart, () => props.editing], () => (page.value = 1));
 </script>
 
 <template>
@@ -62,11 +68,14 @@ watch(chart, () => (page.value = 1));
         :title="title"
         title-tag="h2"
         class="h-full"
+        :class="{ 'summary-chart-editing summary-chart-handle cursor-grab active:cursor-grabbing ring-0! shadow-none! border border-dashed border-gray-400 dark:border-gray-700': editing }"
         :icon="field.icon"
         icon-class="hidden @xs/widget:block size-4 text-gray-500"
     >
-        <template v-if="hasDrilldown" #actions>
+        <template v-if="editing || hasDrilldown" #actions>
+            <slot v-if="editing" name="chrome" />
             <Pagination
+                v-else
                 :resource-meta="pagination"
                 :show-totals="false"
                 :show-page-links="false"
@@ -76,7 +85,6 @@ watch(chart, () => (page.value = 1));
             />
         </template>
         <div class="relative flex-1 overflow-hidden rounded-b-xl">
-            <slot name="chrome" />
             <p v-if="hasDrilldown" class="sr-only" aria-live="polite">{{ showingDrilldown ? accessibleLabel : '' }}</p>
             <component :is="chart.component" v-bind="chartProps" @select="page = 2">
                 <template v-if="field.insights.length" #summary>
