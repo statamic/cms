@@ -95,4 +95,27 @@ EOT;
 
         $this->assertSame('FILTERhi<slot>KEEPME</slot>', $this->renderString($template, [], true));
     }
+
+    public function test_named_slots_render_inside_a_nested_partial_that_uses_the_default_slot()
+    {
+        $template = <<<'EOT'
+{{ partial:accordion index="1" }}
+    {{ slot:title }}<h2>The Title</h2>{{ /slot:title }}
+    {{ slot:icon }}<button>+</button>{{ /slot:icon }}
+    {{ slot:body }}<p>The Body</p>{{ /slot:body }}
+{{ /partial:accordion }}
+EOT;
+
+        $accordion = <<<'EOT'
+<div id="accordion-{{ index }}">{{ partial:flex_column class="p-6" }}<div class="header">{{ slot:title }}{{ slot:icon }}</div><div class="content">{{ slot:body }}</div>{{ /partial:flex_column }}</div>
+EOT;
+
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('accordion', $accordion);
+        $this->viewShouldReturnRaw('flex_column', '<div class="flex flex-col {{ class }}">{{ slot }}</div>');
+
+        $expected = '<div id="accordion-1"><div class="flex flex-col p-6"><div class="header"><h2>The Title</h2><button>+</button></div><div class="content"><p>The Body</p></div></div></div>';
+
+        $this->assertSame($expected, $this->renderString($template, [], true));
+    }
 }
