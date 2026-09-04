@@ -12,6 +12,7 @@ use Statamic\View\Antlers\Language\Nodes\Operators\LogicalOrOperator;
 use Statamic\View\Antlers\Language\Nodes\Paths\PathNode;
 use Statamic\View\Antlers\Language\Nodes\Paths\VariableReference;
 use Statamic\View\Antlers\Language\Nodes\Structures\LogicGroup;
+use Statamic\View\Antlers\Language\Nodes\Structures\PhpExecutionNode;
 use Statamic\View\Antlers\Language\Nodes\Structures\SemanticGroup;
 use Statamic\View\Antlers\Language\Nodes\VariableNode;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
@@ -29,6 +30,36 @@ class BasicNodeTest extends ParserTestCase
         $this->assertInstanceOf(LiteralNode::class, $nodes[1]);
         $this->assertInstanceOf(AntlersNode::class, $nodes[2]);
         $this->assertInstanceOf(LiteralNode::class, $nodes[3]);
+    }
+
+    public function test_interpolations_after_a_directive_skip_the_directive_node()
+    {
+        $nodes = $this->parseNodes("@props(['a' => 1])\n{{ tag x=\"{{ y }}\" }}");
+
+        $regions = array_values($nodes[2]->processedInterpolationRegions);
+        $this->assertCount(1, $regions[0]);
+        $first = $regions[0][0];
+        $this->assertInstanceOf(AntlersNode::class, $first);
+        $this->assertSame('int_c', $first->content);
+        $this->assertSame(27, $first->startPosition->offset);
+        $this->assertSame(2, $first->startPosition->line);
+        $this->assertSame(9, $first->startPosition->char);
+
+        $inner = array_values($first->processedInterpolationRegions)[0][0];
+        $this->assertSame(' y ', $inner->content);
+        $this->assertSame(27, $inner->startPosition->offset);
+    }
+
+    public function test_php_nodes_inside_interpolations_are_kept()
+    {
+        $nodes = $this->parseNodes('<div>{{ tag value="{{$ \'hi\' $}}" }}</div>');
+
+        $outer = array_values($nodes[1]->processedInterpolationRegions)[0][0];
+        $php = array_values($outer->processedInterpolationRegions)[0][0];
+
+        $this->assertInstanceOf(PhpExecutionNode::class, $php);
+        $this->assertSame(" 'hi' ", $php->content);
+        $this->assertTrue($php->isEchoNode);
     }
 
     public function test_it_doesnt_trim_off_content_start()

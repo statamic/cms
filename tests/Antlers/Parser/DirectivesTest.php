@@ -65,6 +65,71 @@ EOT;
         $this->assertSame($expected, $this->renderString($template, ['title' => 'The Title']));
     }
 
+    public function test_interpolated_parameters_after_directives_receive_their_values()
+    {
+        (new class extends \Statamic\Tags\Tags
+        {
+            protected static $handle = 'directive_param_echo';
+
+            public function index()
+            {
+                return '['.$this->params->get('value').']';
+            }
+        })::register();
+
+        $templates = [
+            "@props(['a' => 1])\n<div>{{ directive_param_echo value=\"{{ title }}\" }}</div>",
+            "@@props\n@props(['a' => 1])\n<div>{{ directive_param_echo value=\"{{ title }}\" }}</div>",
+            "@props(['a' => 1])\n@props(['b' => 2])\n<div>{{ directive_param_echo value=\"{{ title | upper }}\" }}</div>",
+            "café\n@props(['a' => 1])\n<div>{{ directive_param_echo value=\"{{ title }}\" }}</div>",
+        ];
+
+        $expected = [
+            "\n<div>[The Title]</div>",
+            "@props\n\n<div>[The Title]</div>",
+            "\n\n<div>[THE TITLE]</div>",
+            "café\n\n<div>[The Title]</div>",
+        ];
+
+        foreach ($templates as $index => $template) {
+            $this->assertSame(
+                $expected[$index],
+                $this->renderString($template, ['title' => 'The Title'], true),
+                "Template #{$index}"
+            );
+        }
+    }
+
+    public function test_templates_with_interpolated_parameters_render_after_directives()
+    {
+        (new class extends \Statamic\Tags\Tags
+        {
+            protected static $handle = 'directive_param_echo';
+
+            public function index()
+            {
+                return '['.$this->params->get('value').']';
+            }
+        })::register();
+
+        $template = <<<'EOT'
+@props(['heading' => 'Default'])
+<h1>{{ heading }}</h1>
+{{ items }}<li class="{{ if value == "{{ selected }}" }}on{{ else }}off{{ /if }}">{{ directive_param_echo value="{{ value | upper }}" }}</li>{{ /items }}
+EOT;
+
+        $expected = <<<'EOT'
+
+<h1>Default</h1>
+<li class="off">[A]</li><li class="on">[B]</li>
+EOT;
+
+        $this->assertSame(
+            $expected,
+            $this->renderString($template, ['items' => ['a', 'b'], 'selected' => 'b'], true)
+        );
+    }
+
     public function test_directives_args_must_be_finished()
     {
         $this->expectExceptionMessage('Incomplete arguments for @props directive');
