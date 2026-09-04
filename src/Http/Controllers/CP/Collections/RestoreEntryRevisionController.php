@@ -19,8 +19,7 @@ class RestoreEntryRevisionController extends CpController
 
         /** @var $target Revision */
         if (! $target = $entry->revision($request->revision)) {
-            dd('no such revision', $request->revision);
-            // todo: handle invalid revision reference
+            abort(404, "Revision [{$request->revision}] not found.");
         }
 
         if ($entry->published()) {

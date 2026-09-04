@@ -22,7 +22,7 @@ class EntryRevisionsController extends CpController
             ->each(fn ($revision) => $revision->attribute('item_url', cp_route('collections.entries.revisions.show', [
                 'collection' => $collection,
                 'entry' => $entry->id(),
-                'revision' => $revision->date()->timestamp,
+                'revision' => $revision->reference(),
             ])))
             ->prepend($this->workingCopy($entry))
             ->filter();

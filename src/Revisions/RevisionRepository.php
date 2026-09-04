@@ -36,7 +36,7 @@ class RevisionRepository implements Contract
             ->where('key', $key)
             ->where('action', '!=', 'working')
             ->get()
-            ->keyBy(fn ($revision) => $revision->date()->timestamp);
+            ->keyBy(fn ($revision) => $revision->reference());
     }
 
     public function findWorkingCopyByKey($key)

@@ -6,9 +6,11 @@ use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Contracts\Revisions\Revision as RevisionContract;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Folder;
+use Statamic\Facades\Revision as Revisions;
 use Statamic\Facades\User;
 use Statamic\Fields\Blueprint;
 use Statamic\Revisions\Revision;
@@ -535,6 +537,52 @@ class EntryRevisionsTest extends TestCase
         $this->assertCount(1, $entry->revisions());
     }
 
+    #[Test]
+    public function it_restores_a_revision_referenced_by_something_other_than_its_timestamp()
+    {
+        $this->app->bind(RevisionContract::class, RevisionWithCustomReference::class);
+
+        $this->setTestBlueprint('test', ['foo' => ['type' => 'text']]);
+        $this->setTestRoles(['test' => ['access cp', 'view blog entries', 'edit blog entries']]);
+        $user = User::make()->id('user-1')->assignRole('test')->save();
+
+        tap(Revisions::make()
+            ->key('collections/blog/en/123')
+            ->date(Carbon::createFromTimestamp('1553546421', config('app.timezone')))
+            ->attributes([
+                'published' => true,
+                'slug' => 'existing-slug',
+                'data' => ['foo' => 'existing foo'],
+            ]))->save();
+
+        $entry = EntryFactory::id('123')
+            ->slug('test')
+            ->collection('blog')
+            ->published(false)
+            ->data([
+                'blueprint' => 'test',
+                'title' => 'Title',
+                'foo' => 'bar',
+            ])->create();
+
+        $this
+            ->actingAs($user)
+            ->get($entry->revisionsUrl())
+            ->assertOk()
+            ->assertJsonPath('0.revisions.0.reference', 'uuid-1553546421')
+            ->assertJsonPath('0.revisions.0.attributes.item_url', 'http://localhost/cp/collections/blog/entries/123/revisions/uuid-1553546421');
+
+        $this
+            ->actingAs($user)
+            ->restore($entry, ['revision' => 'uuid-1553546421'])
+            ->assertOk()
+            ->assertSessionHas('success');
+
+        $entry = Entry::find($entry->id());
+        $this->assertEquals('existing-slug', $entry->slug());
+        $this->assertEquals('existing foo', $entry->get('foo'));
+    }
+
     private function publish($entry, $payload)
     {
         return $this->post($entry->publishUrl(), $payload);
@@ -757,5 +805,13 @@ class EntryRevisionsTest extends TestCase
         BlueprintRepository::partialMock();
         BlueprintRepository::shouldReceive('find')->with('test')->andReturn($blueprint);
         BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect(['test' => $blueprint]));
+    }
+}
+
+class RevisionWithCustomReference extends Revision
+{
+    public function reference()
+    {
+        return $this->isWorkingCopy() ? 'working' : 'uuid-'.$this->date()->timestamp;
     }
 }
