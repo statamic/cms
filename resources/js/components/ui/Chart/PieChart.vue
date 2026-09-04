@@ -44,10 +44,15 @@ const showsImageSlices = computed<boolean>(() => slices.value.length > 0 && slic
 
 const slicePercent = (index: number): number => slices.value[index]?.percent ?? 0;
 
-const sliceColor = (index: number): string =>
-    props.focusedIndex === null || props.focusedIndex === index
-        ? `var(--color-chart-${index + 1})`
-        : `hsl(from var(--color-chart-${index + 1}) h s l / 0.1)`;
+const sliceColor = (index: number): string => {
+    const tone = Math.min(index + 1, 5);
+
+    return props.focusedIndex === null || props.focusedIndex === index
+        ? `var(--color-chart-${tone})`
+        : `hsl(from var(--color-chart-${tone}) h s l / 0.1)`;
+};
+
+const chartTone = (index: number): number => Math.min(index + 1, 5);
 
 const chartStyle = computed(() => ({
     '--1': slicePercent(0),
@@ -128,8 +133,8 @@ const chartStyle = computed(() => ({
                                 <img class="size-10 shrink-0 object-cover rounded-full" :src="item.image" alt="" />
                                 <span v-if="item.badge" class="flex size-6 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-white text-xs font-bold text-gray-800 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200">{{ item.badge }}</span>
                             </template>
-                            <Icon v-else-if="item.icon" :name="item.icon" :class="`summary-bar-chart__icon-stroke--${index + 1}`" class="summary-bar-chart__icon-stroke size-3.5 shrink-0" />
-                            <span v-else :class="`pie-chart-legend__swatch--${focusedIndex === null ? index + 1 : focusedIndex + 1}`" class="pie-chart-legend__swatch" />
+                            <Icon v-else-if="item.icon" :name="item.icon" :class="`summary-bar-chart__icon-stroke--${chartTone(index)}`" class="summary-bar-chart__icon-stroke size-3.5 shrink-0" />
+                            <span v-else :class="`pie-chart-legend__swatch--${chartTone(focusedIndex === null ? index : focusedIndex)}`" class="pie-chart-legend__swatch" />
                         </slot>
                         <span>{{ item.label }}</span>
                     </component>

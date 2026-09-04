@@ -53,8 +53,9 @@ const columns = computed<string>(() => {
     return columns.join(' ');
 });
 
-const chartClasses = ['bg-chart-1', 'bg-chart-2', 'bg-chart-3', 'bg-chart-4-legend'];
+const chartClasses = ['bg-chart-1', 'bg-chart-2', 'bg-chart-3', 'bg-chart-4-legend', 'bg-chart-5'];
 const chartClass = (index: number): string => chartClasses[Math.min(index, chartClasses.length - 1)];
+const chartTone = (index: number): number => Math.min(index + 1, 5);
 </script>
 
 <template>
@@ -71,14 +72,14 @@ const chartClass = (index: number): string => chartClasses[Math.min(index, chart
                 />
                 <span v-if="showMarker && markerPosition === 'before-label'" class="flex items-center gap-2">
                     <slot name="marker" :item="item" :index="index">
-                        <Icon v-if="item.icon" :name="item.icon" :class="`summary-bar-chart__icon-stroke--${index + 1}`" class="summary-bar-chart__icon-stroke size-3.5 shrink-0" />
+                        <Icon v-if="item.icon" :name="item.icon" :class="`summary-bar-chart__icon-stroke--${chartTone(index)}`" class="summary-bar-chart__icon-stroke size-3.5 shrink-0" />
                         <span v-else :class="chartClass(index)" class="size-2.5 rounded-xs" />
                     </slot>
                 </span>
                 <span v-if="showLabel" class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-50">{{ item.label }}</span>
                 <span v-if="showMarker && markerPosition === 'after-label'" class="flex items-center gap-2">
                     <slot name="marker" :item="item" :index="index">
-                        <Icon v-if="item.icon" :name="item.icon" :class="`summary-bar-chart__icon-stroke--${index + 1}`" class="summary-bar-chart__icon-stroke size-3.5 shrink-0" />
+                        <Icon v-if="item.icon" :name="item.icon" :class="`summary-bar-chart__icon-stroke--${chartTone(index)}`" class="summary-bar-chart__icon-stroke size-3.5 shrink-0" />
                         <span v-else :class="chartClass(index)" class="size-2.5 rounded-xs" />
                     </slot>
                 </span>

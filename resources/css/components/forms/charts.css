@@ -30,6 +30,7 @@
 .pie-chart-legend__swatch--2 { @apply bg-chart-2-legend; }
 .pie-chart-legend__swatch--3 { @apply bg-chart-3-legend; }
 .pie-chart-legend__swatch--4 { @apply bg-chart-4-legend; }
+.pie-chart-legend__swatch--5 { @apply bg-chart-5-legend; }
 
 .pie-chart-legend__link {
     @apply contents cursor-pointer text-inherit;
@@ -268,6 +269,7 @@
 .summary-bar-chart__icon-stroke--2 { --chart-tick-color: var(--color-chart-2-legend); }
 .summary-bar-chart__icon-stroke--3 { --chart-tick-color: var(--color-chart-3-legend); }
 .summary-bar-chart__icon-stroke--4 { --chart-tick-color: var(--color-chart-4-legend); }
+.summary-bar-chart__icon-stroke--5 { --chart-tick-color: var(--color-chart-5-legend); }
 
 
 

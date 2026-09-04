@@ -32,7 +32,7 @@ const columns = computed<string>(() => props.showMarker
     ? 'grid-cols-[auto_auto_max-content_1fr]'
     : 'grid-cols-[auto_max-content_1fr]');
 
-const chartClasses = ['bg-chart-1', 'bg-chart-2', 'bg-chart-3', 'bg-chart-4-legend'];
+const chartClasses = ['bg-chart-1', 'bg-chart-2', 'bg-chart-3', 'bg-chart-4-legend', 'bg-chart-5'];
 const chartClass = (index: number): string => chartClasses[Math.min(index, chartClasses.length - 1)];
 </script>
 
