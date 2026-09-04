@@ -14,7 +14,7 @@ class TaxonomyTreeBranchType extends TreeBranchType
             'term' => [
                 'type' => GraphQL::type(TermInterface::NAME),
                 'resolve' => function ($branch) {
-                    return $branch['term'];
+                    return $branch['term'] ?? null;
                 },
             ],
         ]);

@@ -80,15 +80,21 @@ class TreeBuilder
                 return null;
             }
 
-            if ($page->structure() instanceof TaxonomyStructure) {
-                $this->hydrateTaxonomyPage($page, $params['site']);
-            }
+            $isTaxonomy = $page->structure() instanceof TaxonomyStructure;
 
-            return [
+            $term = $isTaxonomy ? $this->hydrateTaxonomyPage($page, $params['site']) : null;
+
+            $branch = [
                 'page' => $page->selectedQueryColumns($fields),
                 'depth' => $depth,
                 'children' => $this->toTree($page->pages()->all(), $params, $depth + 1),
             ];
+
+            if ($isTaxonomy) {
+                $branch['term'] = $term;
+            }
+
+            return $branch;
         })->filter()->values()->all();
     }
 
@@ -117,16 +123,18 @@ class TreeBuilder
         return null;
     }
 
-    private function hydrateTaxonomyPage(Page $page, string $site): void
+    private function hydrateTaxonomyPage(Page $page, string $site)
     {
         $term = Term::find($page->structure()->handle().'::'.$page->id())?->in($site);
 
         if (! $term) {
-            return;
+            return null;
         }
 
         $page->setTitle($term->title());
         $page->setUrl($term->url());
+
+        return $term;
     }
 
     public function buildForController($params)
