@@ -229,6 +229,30 @@ export const _TextPrependAppend: Story = {
     }),
 };
 
+const inlineSubtlePrependCode = `
+<Input
+    prepend="$"
+    prepend-variant="inline-subtle"
+    read-only
+    copyable
+    model-value="base64 -i service-account.json"
+    class="font-mono text-xs"
+/>
+`;
+
+export const _InlineSubtlePrepend: Story = {
+    tags: ['!dev'],
+    parameters: {
+        docs: {
+            source: { code: inlineSubtlePrependCode }
+        }
+    },
+    render: () => ({
+        components: { Input },
+        template: inlineSubtlePrependCode,
+    }),
+};
+
 const characterLimitCode = `
 <Input
     name="toot"

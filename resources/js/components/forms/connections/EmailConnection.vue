@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { usePage } from '@inertiajs/vue3';
-import { Badge, Icon, PublishContainer, PublishFields, PublishFieldsProvider, Subheading } from '@ui';
+import { Badge, Icon, Label, PublishContainer, PublishFields, PublishFieldsProvider } from '@ui';
 import ConnectionRows from './ConnectionRows.vue';
-import ConnectionRules, { conditionsSummary } from './ConnectionRules.vue';
+import ConnectionRules from './ConnectionRules.vue';
+import ConditionsCollapsedSummary from './ConditionsCollapsedSummary.vue';
 
 defineEmits(['update:modelValue']);
 
@@ -29,6 +30,8 @@ const recipients = (to: string[] | string): string =>
 </script>
 
 <template>
+    <Label :text="__('Emails')" class="mb-2" />
+
     <ConnectionRows
         :model-value="modelValue"
         :errors
@@ -45,9 +48,11 @@ const recipients = (to: string[] | string): string =>
                 <Icon name="mail-sign-at" class="size-3.5 me-1 opacity-100! text-blue-600 dark:text-blue-400" aria-hidden="true" />
                 {{ email.to?.length ? __('Message sent to :email', { email: recipients(email.to) }) : __('New Email') }}
             </Badge>
-            <Subheading v-show="collapsed" class="overflow-hidden text-ellipsis whitespace-nowrap gap-1.5!">
-                <span class="truncate">{{ conditionsSummary(email.conditions) ?? email.subject }}</span>
-            </Subheading>
+            <ConditionsCollapsedSummary
+                v-show="collapsed"
+                :conditions="email.conditions"
+                :fallback="email.subject"
+            />
         </template>
 
         <template #default="{ item: email, errors }">

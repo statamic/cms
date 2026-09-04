@@ -1,12 +1,12 @@
 <script setup>
-import { onMounted, onUnmounted, ref, watch } from 'vue';
+import { onMounted, onUnmounted, provide, reactive, ref, watch } from 'vue';
 import axios from 'axios';
 import { keys } from '@api';
 import Layout from '@/pages/layout/Layout.vue';
 import PanelLayout from '@/pages/layout/PanelLayout.vue';
 import FormsLayout from '../Layout.vue';
 import Head from '@/pages/layout/Head.vue';
-import { Button, Card, Header, Heading, Icon, Panel, PanelHeader } from '@ui';
+import { Badge, Button, Card, Header, Heading, Icon, Panel, PanelHeader } from '@ui';
 import FormStatusIndicator from '@/components/forms/FormStatusIndicator.vue';
 import { Link } from '@inertiajs/vue3';
 
@@ -21,6 +21,9 @@ const props = defineProps({
     isConfigured: Boolean,
     suggestableFields: Array,
 });
+
+const connectionRowsApi = reactive({ expandAll: null, collapseAll: null, allCollapsed: false, count: 0 });
+provide('connectionRowsApi', connectionRowsApi);
 
 const errors = ref({});
 const saving = ref(false);
@@ -86,6 +89,7 @@ onUnmounted(() => {
 
         <Panel>
             <PanelHeader>
+                <div class="flex items-center justify-between gap-3">
                 <Heading>
                     <Link
                         :href="cp_url(`forms/${form.handle}/connect`)"
@@ -95,16 +99,29 @@ onUnmounted(() => {
                         {{ __('Connect') }}
                     </Link>
                     <Icon name="chevron-right" class="size-3.5 text-gray-400 dark:text-gray-500" aria-hidden="true" />
-                    <span class="inline-flex items-center gap-1.5">
+                    <span class="relative inline-flex items-center gap-1.5">
                         <span
                             v-if="connection.icon"
-                            class="size-4 text-gray-700 dark:text-gray-300 [&_svg]:size-4"
+                            :class="[connection.iconColor || 'text-gray-700 dark:text-gray-300', 'size-4 [&_svg]:size-4']"
                             aria-hidden="true"
                             v-html="connection.icon"
                         />
                         <span>{{ __(connection.title) }}</span>
+                        <Badge v-if="Array.isArray(value)" pill class="absolute start-full top-1/2 ms-1.5 size-6 -translate-y-1/2">
+                            {{ value.length }}
+                        </Badge>
                     </span>
                 </Heading>
+                <div v-if="connectionRowsApi.count > 1" class="flex items-center gap-2">
+                    <Button
+                        size="xs"
+                        variant="ghost"
+                        :icon="connectionRowsApi.allCollapsed ? 'expand' : 'collapse'"
+                        :aria-label="connectionRowsApi.allCollapsed ? __('Expand all') : __('Collapse all')"
+                        @click="connectionRowsApi.allCollapsed ? connectionRowsApi.expandAll() : connectionRowsApi.collapseAll()"
+                    />
+                </div>
+                </div>
             </PanelHeader>
             <Card>
                 <component

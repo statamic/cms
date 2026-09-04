@@ -21,3 +21,4 @@ export { default as clone, deepClone } from '../../util/clone.js';
 export { default as debounce } from '../../util/debounce.js';
 export { default as ConnectionRows } from '../../components/forms/connections/ConnectionRows.vue';
 export { default as ConnectionRules, conditionsSummary } from '../../components/forms/connections/ConnectionRules.vue';
+export { default as ConditionsCollapsedSummary } from '../../components/forms/connections/ConditionsCollapsedSummary.vue';

@@ -54,9 +54,19 @@ abstract class Connection
         return Str::startsWith($this->icon, '<svg') ? $this->icon : Statamic::svg('icons/'.$this->icon);
     }
 
+    public function darkIcon(): ?string
+    {
+        return null;
+    }
+
     public function breadcrumbIcon(): ?string
     {
         return $this->icon();
+    }
+
+    public function breadcrumbIconColor(): ?string
+    {
+        return null;
     }
 
     public function developer(): ?string
