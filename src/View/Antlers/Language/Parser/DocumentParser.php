@@ -328,24 +328,19 @@ class DocumentParser
         $this->inputLen = mb_strlen($this->content);
 
         // The document content was normalized, so we can search for "\n".
-        preg_match_all('/\n/', $this->content, $documentNewLines, PREG_OFFSET_CAPTURE);
-        $newLineCountLen = count($documentNewLines[0]);
-
         $currentLine = $this->seedStartLine;
-        $lastOffset = null;
-        for ($i = 0; $i < $newLineCountLen; $i++) {
-            $thisNewLine = $documentNewLines[0][$i];
-            $thisIndex = $thisNewLine[1];
-            $indexChar = $thisIndex;
+        $lastOffset = -1;
+        $thisIndex = -1;
 
-            if ($lastOffset != null) {
-                $indexChar = $thisIndex - $lastOffset;
-            } else {
-                $indexChar = $indexChar + 1;
+        foreach (explode("\n", $this->content) as $line) {
+            $thisIndex += mb_strlen($line) + 1;
+
+            if ($thisIndex >= $this->inputLen) {
+                break;
             }
 
             $this->documentOffsets[$thisIndex] = [
-                self::K_CHAR => $indexChar,
+                self::K_CHAR => $thisIndex - $lastOffset,
                 self::K_LINE => $currentLine,
             ];
 

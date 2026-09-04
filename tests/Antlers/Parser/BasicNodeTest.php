@@ -31,6 +31,39 @@ class BasicNodeTest extends ParserTestCase
         $this->assertInstanceOf(LiteralNode::class, $nodes[3]);
     }
 
+    public function test_multibyte_literals_keep_character_based_region_boundaries_and_lines()
+    {
+        $nodes = $this->parseNodes("caf\u{00E9}\n\u{65E5}\u{672C} {{ first }}\n\u{1F389} {{ second }} tail");
+
+        $this->assertSame("caf\u{00E9}\n\u{65E5}\u{672C} ", $nodes[0]->content);
+        $this->assertSame(' first ', $nodes[1]->content);
+        $this->assertSame("\n\u{1F389} ", $nodes[2]->content);
+        $this->assertSame(' second ', $nodes[3]->content);
+        $this->assertSame(' tail', $nodes[4]->content);
+
+        $this->assertSame(8, $nodes[1]->startPosition->offset);
+        $this->assertSame(2, $nodes[1]->startPosition->line);
+        $this->assertSame(4, $nodes[1]->startPosition->char);
+        $this->assertSame(22, $nodes[3]->startPosition->offset);
+        $this->assertSame(3, $nodes[3]->startPosition->line);
+        $this->assertSame(3, $nodes[3]->startPosition->char);
+    }
+
+    public function test_columns_are_correct_after_a_document_initial_newline()
+    {
+        foreach (["\n", "\r", "\r\n"] as $newline) {
+            $nodes = $this->parseNodes($newline."\u{65E5}\u{672C}{{ first }}".$newline.'ab{{ second }}');
+
+            $this->assertSame(3, $nodes[1]->startPosition->offset);
+            $this->assertSame(2, $nodes[1]->startPosition->line);
+            $this->assertSame(3, $nodes[1]->startPosition->char);
+
+            $this->assertSame(17, $nodes[3]->startPosition->offset);
+            $this->assertSame(3, $nodes[3]->startPosition->line);
+            $this->assertSame(3, $nodes[3]->startPosition->char);
+        }
+    }
+
     public function test_it_doesnt_trim_off_content_start()
     {
         $nodes = $this->parseNodes('{{ meta_title ?? title ?? "No Title Set" }}');
