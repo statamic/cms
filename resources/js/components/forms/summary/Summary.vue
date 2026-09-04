@@ -201,7 +201,7 @@ defineExpose({ refresh: fetchSummary });
 </script>
 
 <template>
-    <div data-submission-summary class="mt-3 pb-8">
+    <div data-submission-summary class="mt-1.5 pb-8">
         <div class="flex w-full items-center gap-2 mb-3">
             <FieldNumberingToggle />
             <ToggleGroup v-model="metric" size="xs">
