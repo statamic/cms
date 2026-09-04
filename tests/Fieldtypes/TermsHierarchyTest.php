@@ -53,7 +53,6 @@ class TermsHierarchyTest extends TestCase
         $preload = $this->fieldtype(['taxonomies' => ['categories']])->preload();
 
         $this->assertArrayHasKey('tree', $preload);
-        $this->assertEquals('select', $preload['mode']);
         $this->assertEquals('http://localhost/cp/taxonomies/categories/tree', $preload['tree']['url']);
         $this->assertFalse($preload['tree']['expectsRoot']);
     }
@@ -66,25 +65,6 @@ class TermsHierarchyTest extends TestCase
         $preload = $this->fieldtype(['taxonomies' => ['tags']])->preload();
 
         $this->assertArrayNotHasKey('tree', $preload);
-        $this->assertArrayNotHasKey('mode', $preload);
-    }
-
-    #[Test]
-    public function preload_respects_an_explicit_mode()
-    {
-        $preload = $this->fieldtype(['taxonomies' => ['categories'], 'mode' => 'default'])->preload();
-
-        $this->assertEquals('select', $preload['mode']);
-
-        $preload = $this->fieldtype(['taxonomies' => ['categories'], 'mode' => 'typeahead'])->preload();
-
-        $this->assertArrayNotHasKey('mode', $preload);
-
-        tap(Facades\Taxonomy::make('tags'))->save();
-
-        $preload = $this->fieldtype(['taxonomies' => ['categories', 'tags'], 'mode' => 'default'])->preload();
-
-        $this->assertEquals('select', $preload['mode']);
     }
 
     #[Test]

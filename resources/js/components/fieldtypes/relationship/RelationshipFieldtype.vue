@@ -3,7 +3,7 @@
         ref="input"
         :name="name"
         :value="value"
-        :mode="mode"
+        :mode="config.mode"
         :can-edit="canEdit"
         :config="config"
         :can-create="canCreate"
@@ -48,10 +48,6 @@ export default {
     },
 
     computed: {
-        mode() {
-            return this.meta?.mode || this.config.mode;
-        },
-
         maxItems() {
             return this.config.max_items || Infinity;
         },

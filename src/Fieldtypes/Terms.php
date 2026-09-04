@@ -156,10 +156,6 @@ class Terms extends Relationship
 
         $preload = parent::preload();
 
-        if ($this->hasHierarchicalTaxonomy() && ($this->field->get('mode') ?? 'default') === 'default') {
-            $preload['mode'] = 'select';
-        }
-
         if (! $taxonomy || ! $taxonomy->hasStructure()) {
             return $preload;
         }
