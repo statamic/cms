@@ -54,10 +54,23 @@ class PhpDisabledTest extends TestCase
         $this->assertSame('[THE TITLE]', (string) Antlers::parse($template, $data, true));
         $this->assertSame('<li>[a:A]</li><li>[b:B]</li>', (string) Antlers::parse($loop, $data, true));
 
-        $this->assertSame('', (string) Antlers::parse($template, $data, false));
-        $this->assertSame('', (string) Antlers::parse($template, $data));
-        $this->assertSame('<li></li><li></li>', (string) Antlers::parse($loop, $data, false));
-        $this->assertSame('', (string) Antlers::parse('{{ php_param_echo value="a{{? $x = 1; ?}}b" }}', $data, false));
+        $condition = '{{ if title == "{{$ \'The Title\' $}}" }}yes{{ else }}no{{ /if }}';
+        $phpBlockCondition = '{{ if title == "{{? echo \'The Title\'; ?}}" }}yes{{ else }}no{{ /if }}';
+        $modifier = '{{ title | ensure_right:"{{$ \'!\' $}}" }}';
+        $loopCondition = '{{ items }}{{ if value == "{{$ strtolower($value) $}}" }}y{{ else }}n{{ /if }}{{ /items }}';
+
+        $this->assertSame('yes', (string) Antlers::parse($condition, $data, true));
+        $this->assertSame('no', (string) Antlers::parse($condition, $data, false));
+        $this->assertSame('no', (string) Antlers::parse($condition, $data));
+
+        $this->assertSame('yes', (string) Antlers::parse($phpBlockCondition, $data, true));
+        $this->assertSame('no', (string) Antlers::parse($phpBlockCondition, $data, false));
+
+        $this->assertSame('The Title!', (string) Antlers::parse($modifier, $data, true));
+        $this->assertSame('The Title', (string) Antlers::parse($modifier, $data, false));
+
+        $this->assertSame('yy', (string) Antlers::parse($loopCondition, $data, true));
+        $this->assertSame('nn', (string) Antlers::parse($loopCondition, $data, false));
     }
 
     public function test_it_allows_inline_echo_blocks_when_enabled()
