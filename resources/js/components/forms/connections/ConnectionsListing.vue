@@ -40,8 +40,8 @@ defineEmits<{
 </style>
 
 <template>
-    <div>
-        <div v-if="view === View.Grid" class="grid gap-4 grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+    <div class="@container">
+        <div v-if="view === View.Grid" class="grid gap-4 grid-cols-2 @sm:grid-cols-3 @lg:grid-cols-4 @3xl:grid-cols-6 @6xl:grid-cols-8 @7xl:grid-cols-10">
             <div
                 v-for="connection in connections"
                 :key="connection.handle"
