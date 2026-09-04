@@ -7,13 +7,6 @@ use Statamic\View\Antlers\Language\Nodes\LiteralNode;
 use Statamic\View\Antlers\Language\Parser\DocumentParser;
 use Tests\Antlers\ParserTestCase;
 
-/**
- * Interpolated parameters are parsed by a sub-parser that is handed the document
- * prefix (braces neutralized) followed by the interpolated content so that the
- * resulting node positions line up with the document. These tests pin the
- * positions and the sub-parser's document text, which must not change when the
- * sub-parser inherits the parent's newline table instead of rescanning the prefix.
- */
 class InterpolationRegionTest extends ParserTestCase
 {
     private function assertPosition(string $expected, $node)
@@ -126,9 +119,6 @@ class InterpolationRegionTest extends ParserTestCase
 
     public function test_nested_interpolations_keep_their_own_line_numbering_under_a_seeded_parser()
     {
-        // RuntimeParser seeds the document parser for views with front matter. The
-        // document's own nodes follow the seed; interpolation sub-parsers have always
-        // numbered from line 1, at every nesting level.
         $parser = new DocumentParser();
         $parser->setStartLineSeed(5);
         $parser->parse("a\n\n\n{{ tag a=\"{{ b c=\"{{ d }}\" }}\" }}");
@@ -148,8 +138,6 @@ class InterpolationRegionTest extends ParserTestCase
 
     public function test_single_brace_interpolation_at_the_document_start()
     {
-        // The prefix handed to the sub-parser is cut before the interpolation start,
-        // which is negative here; the multibyte tail must not change the result.
         foreach (["{{{abcdefghi}}} \u{00E9}", '{{{abcdefghi}}} e'] as $template) {
             $nodes = $this->parseNodes($template);
 
@@ -165,8 +153,6 @@ class InterpolationRegionTest extends ParserTestCase
 
     public function test_directive_like_text_inside_comments_does_not_break_interpolations()
     {
-        // The sub-parser sees a neutralized copy of the document prefix, in which a
-        // "@props(" inside a comment or noparse region used to be parsed as a directive.
         foreach ([
             '{{# @props( #}}<div>{{ tag x="{{ y }}" }}</div>',
             '{{ noparse }}@props(<b>{{ /noparse }}<div>{{ tag x="{{ y }}" }}</div>',
@@ -181,15 +167,10 @@ class InterpolationRegionTest extends ParserTestCase
 
     public function test_an_at_sign_just_before_an_interpolation_escapes_it()
     {
-        // Pre-existing behavior kept for compatibility: the prefix handed to the
-        // sub-parser is cut a few characters before the interpolation, so an "@"
-        // that lands right before the cut makes the sub-parser treat the
-        // interpolation's braces as escaped and the region resolves to nothing.
         $nodes = $this->parseNodes('{{ tag @a="{{ v }}" }}');
 
         $this->assertSame([], array_values($nodes[0]->processedInterpolationRegions)[0]);
 
-        // An "@" further away is unaffected.
         $nodes = $this->parseNodes('{{ tag x="{{ v }}" @a="{{ w }}" }}');
         $this->assertSame(' v ', $this->interpolation($this->interpolation($nodes[0]))->content);
         $this->assertSame(' w ', $this->interpolation($this->interpolation($nodes[0], 1))->content);

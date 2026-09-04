@@ -65,13 +65,11 @@ class CharacterOffsetsTest extends TestCase
 
     public function test_byte_offsets_can_be_counted_from_a_known_anchor()
     {
-        // Anchor: byte 6 is character 3 (the emoji). Offsets before it still count from the start.
         $this->assertSame(
             [1 => 1, 6 => 3, 10 => 4, 11 => 5],
             CharacterOffsets::toCharacters(self::MIXED, [1, 6, 10, 11], true, 6, 3)
         );
 
-        // A wrong anchor is trusted, which is what makes it an anchor.
         $this->assertSame([10 => 41], CharacterOffsets::toCharacters(self::MIXED, [10], true, 6, 40));
     }
 
@@ -91,11 +89,9 @@ class CharacterOffsetsTest extends TestCase
 
     public function test_invalid_utf8_counts_lead_bytes_without_failing()
     {
-        // A stray continuation byte attaches to nothing, so "a" is character 0.
         $this->assertSame([0 => 1, 1 => 2, 2 => 4], CharacterOffsets::toBytes("\xA9a\u{00E9}", [0, 1, 2]));
         $this->assertSame([0 => 0, 1 => 0, 2 => 1, 4 => 2], CharacterOffsets::toCharacters("\xA9a\u{00E9}", [0, 1, 2, 4]));
 
-        // A truncated sequence still counts as one character.
         $this->assertSame([0 => 0, 1 => 2, 2 => 3], CharacterOffsets::toBytes("\xE6\x97{{", [0, 1, 2]));
         $this->assertSame([0 => 0, 2 => 1, 3 => 2], CharacterOffsets::toCharacters("\xE6\x97{{", [0, 2, 3]));
     }

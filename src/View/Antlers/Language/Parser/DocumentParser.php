@@ -64,31 +64,13 @@ class DocumentParser
 
     private $interpolationRegions = [];
 
-    /**
-     * Character length of each neutralized document prefix handed to an interpolation
-     * sub-parser, keyed by the prefix's byte length, so the sub-parse loop can recover
-     * it from the region text without recounting the prefix.
-     *
-     * @var array<int, int>
-     */
+    /** @var array<int, int> */
     private $prefixCharacterLengths = [];
 
-    /**
-     * The document content with every "{" replaced by "~", built on first use and
-     * released once the interpolation regions have been parsed. The replacement is
-     * byte-for-byte, which is what lets a prefix of it share the document's offsets.
-     *
-     * @var string|null
-     */
+    /** @var string|null */
     private $neutralizedContent = null;
 
-    /**
-     * Added to every line number read from the newline table. Non-zero only in an
-     * interpolation sub-parser whose inherited table was numbered from a different
-     * seed line than its own.
-     *
-     * @var int
-     */
+    /** @var int */
     private $lineShift = 0;
 
     /**
@@ -118,12 +100,6 @@ class DocumentParser
     private $isInterpolatedParser = false;
 
     private $inputLen = 0;
-    /**
-     * The newline table: character offset of each "\n" => [K_CHAR => column, K_LINE => line],
-     * and the same offsets as a sorted list for binary searching. An interpolation
-     * sub-parser shares its parent's arrays and only the first $newlineCount entries
-     * belong to its own document, so every reader goes through that bound.
-     */
     private $documentOffsets = [];
     private $documentOffsetKeys = [];
     private $newlineCount = 0;
@@ -140,12 +116,7 @@ class DocumentParser
     private $currentChunkOffset = 0;
     private $nextChunkOffset = 0;
 
-    /**
-     * Character offset => byte offset for every offset the scanner has touched.
-     * Only maintained for multibyte content; otherwise the two are equal.
-     *
-     * @var array<int, int>
-     */
+    /** @var array<int, int> */
     private $sourceByteOffsets = [];
     private $isMultibyteContent = false;
     private $jumpToIndex = null;
@@ -204,10 +175,6 @@ class DocumentParser
     }
 
     /**
-     * Extracts characters from the content by character offset, with mb_substr()
-     * semantics: a negative start counts from the end, a negative length omits that
-     * many characters from the end, and an empty range yields an empty string.
-     *
      * @param  int  $start
      * @param  int|null  $length
      * @return string
@@ -240,9 +207,6 @@ class DocumentParser
     }
 
     /**
-     * Returns the byte offset of a character offset, resolving and memoizing it
-     * when the scanner has not touched that offset yet.
-     *
      * @param  int  $character
      * @return int
      */
@@ -441,7 +405,6 @@ class DocumentParser
 
     /**
      * @param  string  $input
-     * @param  array|null  $prefix  Set when parsing an interpolation region for a parent parser; see interpolatedRegionPrefix().
      * @return bool
      */
     private function processInputText($input, ?array $prefix)
@@ -450,10 +413,6 @@ class DocumentParser
             $this->content = StringUtilities::normalizeLineEndings($input);
             $this->inputLen = mb_strlen($this->content);
         } else {
-            // Interpolation sub-parse: the input is the parent's already-normalized
-            // document prefix (braces neutralized) followed by the interpolated tail.
-            // The prefix's newline table is inherited from the parent below, so only
-            // the tail is scanned.
             $this->content = $input;
             $this->inputLen = $prefix['characters'] + $prefix['tailCharacters'];
         }
@@ -473,9 +432,6 @@ class DocumentParser
         if ($prefix !== null) {
             $this->sourceByteOffsets[$prefix['characters']] = $prefix['bytes'];
 
-            // The parent's table is shared as-is (only the first $newlineCount entries
-            // fall inside the prefix) and stays numbered from the parent's seed line;
-            // the difference from this parser's seed is applied on read.
             $this->documentOffsets = $prefix['newlineOffsets'];
             $this->documentOffsetKeys = $prefix['newlineKeys'];
             $newlineCount = $prefix['newlineCount'];
@@ -498,7 +454,6 @@ class DocumentParser
         );
 
         if ($prefix !== null && $newLineByteOffsets !== []) {
-            // The tail adds entries, so this parser needs its own copy cut at the prefix.
             $this->documentOffsets = array_slice($this->documentOffsets, 0, $newlineCount, true);
             $this->documentOffsetKeys = array_slice($this->documentOffsetKeys, 0, $newlineCount);
         }
@@ -519,12 +474,6 @@ class DocumentParser
 
         $this->newlineCount = $newlineCount;
 
-        // An inherited prefix contains no "{" and any directive in it would be discarded
-        // by the sub-parse loop, so only the tail is scanned for candidates. The byte
-        // before the tail is included so that an "@" ending the prefix still escapes
-        // the tail's braces exactly as a scan of the whole text would; that loses the
-        // interpolation (a pre-existing quirk kept for compatibility, see
-        // InterpolationRegionTest::test_an_at_sign_just_before_an_interpolation_escapes_it).
         $candidateScanFromByte = $scanFromByte;
 
         if ($candidateScanFromByte > 0 && $this->content[$candidateScanFromByte - 1] === self::AtChar) {
@@ -602,8 +551,6 @@ class DocumentParser
                 continue;
             }
 
-            // A "{{" sitting exactly where the last escaped region ended overlaps it
-            // (as in "@{{{"), and every "{{" after it is skipped until the next escape.
             if ($lastWasEscaped && substr($this->content, $lastAntlersByteOffset, 2) === '{{') {
                 continue;
             }
@@ -617,13 +564,7 @@ class DocumentParser
         return true;
     }
 
-    /**
-     * Returns the document content with every left brace replaced by "~". This is
-     * the prefix handed to interpolation sub-parsers so their positions line up
-     * with the document without the prefix producing Antlers nodes.
-     *
-     * @return string
-     */
+    /** @return string */
     private function neutralizedContent()
     {
         if ($this->neutralizedContent === null) {
@@ -634,21 +575,13 @@ class DocumentParser
     }
 
     /**
-     * Describes the document prefix inside an interpolation region's text so that
-     * the sub-parser can inherit this parser's newline table for it instead of
-     * rescanning it: the prefix's lengths, and the table entries that fall inside it.
-     *
      * @param  string  $regionText
      * @return array|null
      */
     private function interpolatedRegionPrefix($regionText)
     {
-        // The prefix is brace-neutralized, so the first "{" is where the tail starts.
         $prefixBytes = strpos($regionText, self::LeftBrace);
 
-        // Regions this parser did not build (a DirectiveNode carries the regions of
-        // the parser that handled its arguments) belong to another document and are
-        // parsed from scratch, as are any this parser has no record of.
         if ($prefixBytes === false
             || ! isset($this->prefixCharacterLengths[$prefixBytes])
             || strncmp($regionText, $this->neutralizedContent(), $prefixBytes) !== 0) {
@@ -660,10 +593,7 @@ class DocumentParser
         return [
             'characters' => $prefixCharacters,
             'bytes' => $prefixBytes,
-            // The tail is short; counting it directly keeps a region whose prefix is
-            // empty independent of this parser's own encoding flag.
             'tailCharacters' => mb_strlen(substr($regionText, $prefixBytes)),
-            // The line the table is numbered from, which may itself be inherited.
             'startLine' => $this->seedStartLine - $this->lineShift,
             'newlineCount' => $this->newlineCountBefore($prefixCharacters),
             'newlineKeys' => $this->documentOffsetKeys,
@@ -672,8 +602,6 @@ class DocumentParser
     }
 
     /**
-     * Counts the newline offsets of this document that fall before $offset.
-     *
      * @param  int  $offset
      * @return int
      */
@@ -726,7 +654,6 @@ class DocumentParser
 
     /**
      * @param  string  $text
-     * @param  array|null  $interpolationPrefix  Set when $text is an interpolation region of a parent parser: its neutralized document prefix followed by the interpolated tail. See interpolatedRegionPrefix().
      * @return array
      */
     private function parseDocument($text, ?array $interpolationPrefix)
@@ -757,9 +684,6 @@ class DocumentParser
                 $this->seedOffset = $offset;
 
                 if ($i == 0 && $offset > 0 && $interpolationPrefix === null) {
-                    // Create a literal node representing the start of the document. In an
-                    // interpolation sub-parse it would be the neutralized prefix, which the
-                    // parent discards, so it is not built at all.
                     $node = new LiteralNode();
                     $node->isVirtual = $this->isVirtual;
                     $node->content = $this->prepareLiteralContent($this->sourceSubstr(0, $offset));
@@ -1015,10 +939,6 @@ class DocumentParser
 
                     $parseResults = $docParser->parseDocument($content, $this->interpolatedRegionPrefix($content));
 
-                    // The interpolated content is parsed with the document prefix in front of it so
-                    // positions line up. The interpolation itself is the final Antlers or PHP node;
-                    // a region that could not be prefixed (parsed from scratch) may also yield the
-                    // prefix's literal and directive nodes, which are skipped.
                     $interpolationNode = null;
 
                     foreach ($parseResults as $parseResult) {
@@ -1039,7 +959,6 @@ class DocumentParser
             }
         }
 
-        // Only the interpolation sub-parses need these; the nodes keep their own copies.
         $this->neutralizedContent = null;
         $this->prefixCharacterLengths = [];
 
@@ -1396,10 +1315,6 @@ class DocumentParser
             $varContent .= str_repeat('x', $padLen);
         }
 
-        // The sub-parser is handed the document prefix (braces neutralized) followed by
-        // the interpolated content so that its node positions line up with the document.
-        // The cut is chunk-aligned and can fall before the document start, in which case
-        // it counts from the end like mb_substr() would.
         $prefixLength = $this->currentChunkOffset - $origLen;
 
         if ($prefixLength < 0) {
@@ -1768,7 +1683,6 @@ class DocumentParser
             $nearestIndex = $this->newlineCountBefore($offset);
 
             if ($nearestIndex === $this->newlineCount) {
-                // Past the last newline.
                 $lastOffsetKey = $this->documentOffsetKeys[$nearestIndex - 1];
                 $lastOffset = $this->documentOffsets[$lastOffsetKey];
                 $lineToUse = $lastOffset[self::K_LINE] + 1 + $this->lineShift;
@@ -1778,7 +1692,6 @@ class DocumentParser
                 $nearestOffset = $this->documentOffsets[$nearestOffsetIndex];
 
                 if ($nearestOffsetIndex === $offset) {
-                    // Exactly on a newline.
                     $lineToUse = $nearestOffset[self::K_LINE] + $this->lineShift;
                     $charToUse = $nearestOffset[self::K_CHAR];
                 } elseif ($isRelativeOffset) {
