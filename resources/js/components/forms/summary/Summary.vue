@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref, watch } from 'vue';
 import axios from 'axios';
-import { keys, preferences } from '@api';
+import { dirty, keys, preferences } from '@api';
 import { Button, Skeleton, ToggleGroup, ToggleItem, Widget } from '@ui';
 import { injectListingContext } from '@/components/ui/Listing/Listing.vue';
 import { SortableList } from '@/components/sortable/Sortable.js';
@@ -41,6 +41,7 @@ const { activeFilters, searchQuery, preferencesPrefix } = injectListingContext()
 const summary = ref<Summary | null>(null);
 const editing = ref<boolean>(false);
 const draftLayout = ref<ChartConfig[]>([]);
+const savedLayout = ref<ChartConfig[]>([]);
 const saving = ref<boolean>(false);
 const loadingPreviews = ref<string[]>([]);
 const isDragging = ref<boolean>(false);
@@ -83,6 +84,8 @@ const widgets = computed<SummaryWidget[]>(() => {
         field: summarizedField(item.field) ?? null,
     }));
 });
+
+const isDirty = computed<boolean>(() => editing.value && JSON.stringify(draftLayout.value) !== JSON.stringify(savedLayout.value));
 
 const missingPreviews = computed<ChartConfig[]>(() =>
     draftLayout.value.filter((item) => !isSummarized(item) && !loadingPreviews.value.includes(item.field)),
@@ -148,11 +151,12 @@ async function fetchPreviews(charts: ChartConfig[]) {
 }
 
 function startEditing() {
-    draftLayout.value = (summary.value?.fields ?? []).map((field) => ({
+    savedLayout.value = (summary.value?.fields ?? []).map((field) => ({
         field: field.handle,
         chart: field.chart.handle,
     }));
 
+    draftLayout.value = clone(savedLayout.value);
     editing.value = true;
 }
 
@@ -209,7 +213,12 @@ watch(missingPreviews, (missing) => editing.value && missing.length && fetchPrev
 
 watch(metric, (metric: ChartMetric) => preferences.set(`${preferencesPrefix.value}.summary.chart_metric`, metric));
 
-onBeforeUnmount(() => saveBinding?.destroy());
+watch(isDirty, (isDirty: boolean) => dirty.state('form-summary-charts', isDirty));
+
+onBeforeUnmount(() => {
+    saveBinding?.destroy();
+    dirty.remove('form-summary-charts');
+});
 
 defineExpose({ refresh: fetchSummary });
 </script>
