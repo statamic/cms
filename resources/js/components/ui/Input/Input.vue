@@ -40,7 +40,7 @@ const props = defineProps({
     placeholder: { type: String, default: null },
     /** Prepended text */
     prepend: { type: String, default: null },
-    /** Controls how prepended text is displayed. Options: `default` (input group addon), `inline` (inside the field) */
+    /** Controls how prepended text is displayed. Options: `default` (input group addon), `inline-subtle` (muted text inside the field) */
     prependVariant: { type: String, default: 'default' },
     required: { type: Boolean, default: false },
     /** Controls the size of the input. Options: `xs`, `sm`, `base`, `lg` */
@@ -94,8 +94,8 @@ const inputAttrs = computed(() => {
     return { ...result, ...normalizedInputAttrs.value };
 });
 
-const hasInlinePrepend = computed(() => !!props.prepend && props.prependVariant === 'inline');
-const hasPrependedIcon = computed(() => !!props.iconPrepend || !!props.icon || !!slots.prepend || hasInlinePrepend.value);
+const hasInlineSubtlePrepend = computed(() => !!props.prepend && props.prependVariant === 'inline-subtle');
+const hasPrependedIcon = computed(() => !!props.iconPrepend || !!props.icon || !!slots.prepend || hasInlineSubtlePrepend.value);
 const hasAppendedIcon = computed(() => !!props.iconAppend || !!slots.append || clearable.value || props.viewable || canCopy.value || props.loading);
 const wrapperClasses = computed(() => ([
     'group/input relative block w-full',
@@ -126,12 +126,12 @@ const inputClasses = computed(() => {
             },
         },
         compoundVariants: [
-            { hasPrependedIcon: true, hasInlinePrepend: false, size: 'base', class: 'ps-9' },
-            { hasPrependedIcon: true, hasInlinePrepend: false, size: 'sm', class: 'ps-8' },
-            { hasPrependedIcon: true, hasInlinePrepend: false, size: 'xs', class: 'ps-6' },
-            { hasInlinePrepend: true, size: 'base', class: 'ps-7' },
-            { hasInlinePrepend: true, size: 'sm', class: 'ps-6' },
-            { hasInlinePrepend: true, size: 'xs', class: 'ps-5' },
+            { hasPrependedIcon: true, hasInlineSubtlePrepend: false, size: 'base', class: 'ps-9' },
+            { hasPrependedIcon: true, hasInlineSubtlePrepend: false, size: 'sm', class: 'ps-8' },
+            { hasPrependedIcon: true, hasInlineSubtlePrepend: false, size: 'xs', class: 'ps-6' },
+            { hasInlineSubtlePrepend: true, size: 'base', class: 'ps-7' },
+            { hasInlineSubtlePrepend: true, size: 'sm', class: 'ps-6' },
+            { hasInlineSubtlePrepend: true, size: 'xs', class: 'ps-5' },
             { hasAppendedIcon: true, size: 'base', class: 'pe-10' },
             { hasAppendedIcon: true, size: 'sm', class: 'pe-8' },
             { hasAppendedIcon: true, size: 'xs', class: 'pe-6' },
@@ -139,7 +139,7 @@ const inputClasses = computed(() => {
     })({
         ...props,
         hasPrependedIcon: hasPrependedIcon.value,
-        hasInlinePrepend: hasInlinePrepend.value,
+        hasInlineSubtlePrepend: hasInlineSubtlePrepend.value,
         hasAppendedIcon: hasAppendedIcon.value,
         hasLimit: !!props.limit,
     });
@@ -226,8 +226,8 @@ defineExpose({ focus, select });
         <div :class="wrapperClasses" data-ui-input>
             <div v-if="hasPrependedIcon" :class="prependedIconClasses">
                 <span
-                    v-if="hasInlinePrepend"
-                    class="select-none font-mono text-gray-400 dark:text-gray-500"
+                    v-if="hasInlineSubtlePrepend"
+                    class="font-mono text-sm text-gray-400 select-none dark:text-gray-500"
                     aria-hidden="true"
                 >{{ prepend }}</span>
                 <slot v-else name="prepend">

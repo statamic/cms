@@ -229,10 +229,10 @@ export const _TextPrependAppend: Story = {
     }),
 };
 
-const inlinePrependCode = `
+const inlineSubtlePrependCode = `
 <Input
     prepend="$"
-    prepend-variant="inline"
+    prepend-variant="inline-subtle"
     read-only
     copyable
     model-value="base64 -i service-account.json"
@@ -240,16 +240,16 @@ const inlinePrependCode = `
 />
 `;
 
-export const _InlinePrepend: Story = {
+export const _InlineSubtlePrepend: Story = {
     tags: ['!dev'],
     parameters: {
         docs: {
-            source: { code: inlinePrependCode }
+            source: { code: inlineSubtlePrependCode }
         }
     },
     render: () => ({
         components: { Input },
-        template: inlinePrependCode,
+        template: inlineSubtlePrependCode,
     }),
 };
 
