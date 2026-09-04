@@ -17,12 +17,9 @@ class TermsFieldtypeListedTerm extends ListedTerm
 
     public function toArray($request)
     {
-        $arr = parent::toArray($request);
+        $arr = array_merge(parent::toArray($request), $this->fieldtype->itemHierarchyMeta($this->resource));
 
-        if (
-            in_array($this->fieldtype->config('mode'), ['select', 'typeahead'])
-            && ($hint = $this->fieldtype->getItemHint($this->resource))
-        ) {
+        if ($hint = $this->fieldtype->getItemHint($this->resource)) {
             $arr['hint'] = $hint;
         }
 

@@ -220,6 +220,12 @@ const shouldShowInput = computed(() => {
 });
 
 const placeholder = computed(() => {
+    // Taggable inputs keep the search/create prompt even when items are
+    // selected — those selections are listed separately, not in the field.
+    if (props.taggable) {
+        return props.placeholder;
+    }
+
     if (props.multiple && selectedOptions.value.length > 0) {
         return __n(':count item selected|:count items selected', selectedOptions.value.length);
     }
@@ -251,6 +257,7 @@ const filteredOptions = computed(() => {
         results.push({
             [props.optionLabel]: searchQuery.value,
             [props.optionValue]: searchQuery.value,
+            _created: true,
         });
     }
 
@@ -492,12 +499,12 @@ defineExpose({
 
                                 <ComboboxVirtualizer
                                     v-if="filteredOptions.length"
-                                    :estimate-size="40"
+                                    :estimate-size="34"
                                     :options="filteredOptions"
                                     :text-content="(opt) => getOptionLabel(opt)"
                                     v-slot="{ option }"
                                 >
-                                    <div class="py-1 px-2 w-full overflow-x-hidden">
+                                    <div class="py-px px-2 w-full overflow-x-hidden">
                                         <ComboboxItem
                                             as="button"
                                             :key="`${getOptionValue(option)}-${isDisabled(option)}`"

@@ -2,27 +2,63 @@
     <div
         class="shadow-ui-sm relative z-(--z-index-above) flex w-full h-full items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 [&:has(.cursor-grab)]:px-1.5 py-1.5 mb-1.5 last:mb-0 text-base dark:border-gray-700 dark:with-contrast:border-gray-500 dark:bg-gray-900"
     >
-        <ui-icon name="handles" class="item-move sortable-handle size-4 cursor-grab text-gray-300 dark:text-gray-700" v-if="sortable" />
-        <div class="flex flex-1 items-center line-clamp-1 text-sm text-gray-600 dark:text-gray-300">
-            <ui-status-indicator v-if="item.status" :status="item.status" class="me-2" />
+        <ui-icon name="handles" class="item-move sortable-handle size-4 shrink-0 cursor-grab text-gray-300 dark:text-gray-700" v-if="sortable" />
+        <ui-status-indicator v-if="item.status" :status="item.status" class="shrink-0" />
 
+        <div class="flex min-w-0 flex-1 flex-wrap items-center gap-x-1 gap-y-0.5 text-sm text-gray-600 dark:text-gray-300">
             <div
                 v-if="item.invalid"
                 v-tooltip.top="__('messages.relationship_item_unavailable')"
                 v-text="__(item.title)"
-                class="line-clamp-1 text-sm text-gray-500 dark:text-gray-400"
+                class="text-sm text-gray-500 dark:text-gray-400"
             />
 
-            <a
-                v-if="!item.invalid && editable"
-                @click.prevent="edit"
-                v-text="__(item.title)"
-                class="line-clamp-1 text-sm text-gray-600 dark:text-gray-300"
-                v-tooltip="item.title"
-                :href="item.edit_url"
-            />
+            <template v-else>
+                <span
+                    v-if="hintTaxonomy"
+                    v-text="hintTaxonomy"
+                    class="text-xs text-gray-400 dark:text-gray-500"
+                />
+                <template v-if="hintPathSegments.length">
+                    <template v-for="(segment, i) in hintPathSegments" :key="i">
+                        <ui-icon
+                            v-if="i > 0"
+                            name="chevron-right"
+                            class="size-3 shrink-0 text-gray-300 dark:text-gray-600"
+                            aria-hidden="true"
+                        />
+                        <ui-badge size="sm" :text="segment" />
+                    </template>
+                    <ui-icon
+                        name="chevron-right"
+                        class="size-[12px] shrink-0 text-gray-300 dark:text-gray-600"
+                        aria-hidden="true"
+                    />
+                </template>
+                <template v-else-if="showHintFallback">
+                    <span
+                        v-text="item.hint"
+                        :title="item.hint"
+                        class="text-xs text-gray-500 dark:text-gray-400"
+                    />
+                    <ui-icon
+                        name="chevron-right"
+                        class="size-[12px] shrink-0 text-gray-900 dark:text-gray-100"
+                        aria-hidden="true"
+                    />
+                </template>
 
-            <div v-if="!item.invalid && !editable" v-text="__(item.title)" />
+                <a
+                    v-if="editable"
+                    @click.prevent="edit"
+                    v-text="__(item.title)"
+                    class="text-xs text-gray-600 dark:text-gray-300"
+                    v-tooltip="item.title"
+                    :href="item.edit_url"
+                />
+
+                <div v-else v-text="__(item.title)" />
+            </template>
 
             <inline-edit-form
                 v-if="isEditing"
@@ -33,34 +69,26 @@
                 @updated="itemUpdated"
                 @closed="isEditing = false"
             />
+        </div>
 
-            <div class="flex flex-1 items-center justify-end">
-                <div
-                    v-if="item.hint"
-                    v-text="item.hint"
-                    class="text-2xs tracking-tight me-2 hidden whitespace-nowrap text-gray-500 @sm:block"
-                />
-
-                <div class="flex items-center" v-if="!readOnly">
-                    <Dropdown>
-                        <template #trigger>
-                            <Button icon="dots" variant="ghost" size="xs" v-bind="$attrs" :aria-label="__('Open dropdown menu')" />
-                        </template>
-                        <DropdownMenu>
-                            <DropdownItem
-                                v-if="editable"
-                                :text="__('Edit')"
-                                @click="edit"
-                            />
-                            <DropdownItem
-                                :text="__('Unlink')"
-                                variant="destructive"
-                                @click="$emit('removed')"
-                            />
-                        </DropdownMenu>
-                    </Dropdown>
-                </div>
-            </div>
+        <div class="flex shrink-0 items-center" v-if="!readOnly">
+            <Dropdown>
+                <template #trigger>
+                    <Button icon="dots" variant="ghost" size="xs" v-bind="$attrs" :aria-label="__('Open dropdown menu')" />
+                </template>
+                <DropdownMenu>
+                    <DropdownItem
+                        v-if="editable"
+                        :text="__('Edit')"
+                        @click="edit"
+                    />
+                    <DropdownItem
+                        :text="__('Unlink')"
+                        variant="destructive"
+                        @click="$emit('removed')"
+                    />
+                </DropdownMenu>
+            </Dropdown>
         </div>
     </div>
 </template>
@@ -101,6 +129,24 @@ export default {
         return {
             isEditing: false,
         };
+    },
+
+    computed: {
+        hintTaxonomy() {
+            return this.item.taxonomy_title || null;
+        },
+
+        hintPathSegments() {
+            return Array.isArray(this.item.ancestors) ? this.item.ancestors : [];
+        },
+
+        showHintFallback() {
+            if (this.item.taxonomy_title || Array.isArray(this.item.ancestors)) {
+                return false;
+            }
+
+            return !!this.item.hint;
+        },
     },
 
     methods: {

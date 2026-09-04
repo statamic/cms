@@ -96,6 +96,39 @@ class FieldtypeFilterTest extends TestCase
     }
 
     #[Test]
+    public function it_applies_the_terms_filter_to_a_taxonomy_branch()
+    {
+        Taxonomy::make('categories')->structureContents([])->save();
+
+        foreach (['animals', 'cat', 'furniture'] as $slug) {
+            Term::make($slug)->taxonomy('categories')->data(['title' => ucfirst($slug)])->save();
+        }
+
+        Taxonomy::find('categories')->structure()->tree()->tree([
+            ['term' => 'animals', 'children' => [
+                ['term' => 'cat'],
+            ]],
+            ['term' => 'furniture'],
+        ])->save();
+
+        Collection::make('blog')->taxonomies(['categories'])->save();
+
+        (new EntryFactory)->collection('blog')->id('1')->slug('one')->data(['categories' => ['animals']])->create();
+        (new EntryFactory)->collection('blog')->id('2')->slug('two')->data(['categories' => ['cat']])->create();
+        (new EntryFactory)->collection('blog')->id('3')->slug('three')->data(['categories' => ['furniture']])->create();
+        (new EntryFactory)->collection('blog')->id('4')->slug('four')->create();
+
+        $filter = (new TermsFieldtype)
+            ->setField(new Field('categories', ['type' => 'terms', 'taxonomies' => 'categories']))
+            ->filter();
+
+        $query = Entry::query()->where('collection', 'blog');
+        $filter->apply($query, 'categories', ['operator' => 'like', 'term' => 'animals']);
+
+        $this->assertEquals(['1', '2'], $query->get()->map->id()->sort()->values()->all());
+    }
+
+    #[Test]
     #[DataProvider('entriesFilterProvider')]
     public function it_applies_the_entries_filter($maxItems, $values, $expected)
     {

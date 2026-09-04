@@ -44,7 +44,45 @@ class AugmentedTerm extends AbstractAugmented
             'collection',
             'updated_at',
             'updated_by',
+            'parent',
+            'children',
+            'ancestors',
+            'depth',
+            'is_root',
         ];
+    }
+
+    protected function parent()
+    {
+        return $this->data->taxonomy()->hasStructure() ? $this->data->parent() : $this->getFromData('parent');
+    }
+
+    protected function children()
+    {
+        return $this->data->taxonomy()->hasStructure() ? $this->data->children() : $this->getFromData('children');
+    }
+
+    protected function ancestors()
+    {
+        return $this->data->taxonomy()->hasStructure() ? $this->data->ancestors() : $this->getFromData('ancestors');
+    }
+
+    protected function depth()
+    {
+        return $this->data->taxonomy()->hasStructure() ? $this->data->depth() : $this->getFromData('depth');
+    }
+
+    protected function isRoot()
+    {
+        if (! $this->data->taxonomy()->hasStructure()) {
+            return $this->getFromData('is_root');
+        }
+
+        if (! $depth = $this->data->depth()) {
+            return null;
+        }
+
+        return $depth === 1;
     }
 
     protected function updatedBy()

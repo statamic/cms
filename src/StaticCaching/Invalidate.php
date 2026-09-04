@@ -23,6 +23,8 @@ use Statamic\Events\NavDeleted;
 use Statamic\Events\NavSaved;
 use Statamic\Events\NavTreeDeleted;
 use Statamic\Events\NavTreeSaved;
+use Statamic\Events\TaxonomyTreeDeleted;
+use Statamic\Events\TaxonomyTreeSaved;
 use Statamic\Facades\Form;
 
 class Invalidate implements ShouldQueue
@@ -49,6 +51,8 @@ class Invalidate implements ShouldQueue
         CollectionTreeDeleted::class => 'invalidateCollectionByTree',
         NavTreeSaved::class => 'refreshNavByTree',
         NavTreeDeleted::class => 'invalidateNavByTree',
+        TaxonomyTreeSaved::class => 'invalidateTaxonomyByTree',
+        TaxonomyTreeDeleted::class => 'invalidateTaxonomyByTree',
         BlueprintSaved::class => 'refreshByBlueprint',
         BlueprintDeleted::class => 'invalidateByBlueprint',
     ];
@@ -151,6 +155,11 @@ class Invalidate implements ShouldQueue
     public function refreshNavByTree($event)
     {
         $this->invalidator->refresh($event->tree->structure());
+    }
+
+    public function invalidateTaxonomyByTree($event)
+    {
+        $this->invalidator->invalidate($event->tree);
     }
 
     public function invalidateByBlueprint($event)

@@ -9,6 +9,7 @@ use Statamic\Contracts\Taxonomies\Term as TermContract;
 use Statamic\Contracts\Taxonomies\TermRepository;
 use Statamic\CP\Column;
 use Statamic\CP\PublishForm;
+use Statamic\Exceptions\SiteNotFoundException;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Scope;
@@ -19,6 +20,7 @@ use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Rules\Handle;
 use Statamic\Stache\Repositories\TermRepository as StacheTermRepository;
+use Statamic\Structures\TaxonomyStructure;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
@@ -77,23 +79,45 @@ class TaxonomiesController extends CpController
             ->rejectUnlisted()
             ->values();
 
+        $site = $taxonomy->sites()->contains(Site::selected()->handle())
+            ? Site::selected()->handle()
+            : $taxonomy->sites()->first();
+
         $viewData = [
             'taxonomy' => $taxonomy->handle(),
             'taxonomyTitle' => $taxonomy->title(),
             'blueprints' => $blueprints,
-            'site' => Site::selected()->handle(),
+            'site' => $site,
+            'initialSite' => $site,
+            'sites' => $this->getAuthorizedSitesForTaxonomy($taxonomy),
             'columns' => $columns,
             'filters' => Scope::filters('terms', [
                 'taxonomy' => $taxonomy->handle(),
                 'blueprints' => $blueprints->pluck('handle')->all(),
             ]),
             'canCreate' => User::current()->can('create', [TermContract::class, $taxonomy]) && $taxonomy->hasVisibleTermBlueprint(),
-            'createUrl' => cp_route('taxonomies.terms.create', [$taxonomy->handle(), Site::selected()->handle()]),
+            'createUrl' => cp_route('taxonomies.terms.create', [$taxonomy->handle(), $site]),
+            'createUrls' => $taxonomy->sites()
+                ->mapWithKeys(fn ($handle) => [$handle => cp_route('taxonomies.terms.create', [$taxonomy->handle(), $handle])])
+                ->all(),
+            'reorderUrl' => cp_route('taxonomies.terms.reorder', $taxonomy->handle()),
             'taxonomyEditUrl' => cp_route('taxonomies.edit', $taxonomy->handle()),
             'taxonomyBlueprintsUrl' => cp_route('blueprints.taxonomies.index', $taxonomy),
             'canEdit' => User::current()->can('edit', $taxonomy),
             'canConfigureFields' => User::current()->can('configure fields'),
+            'scaffoldUrl' => cp_route('taxonomies.scaffold', $taxonomy->handle()),
         ];
+
+        if ($taxonomy->hasStructure()) {
+            $structure = $taxonomy->structure();
+            $viewData = array_merge($viewData, [
+                'structured' => $taxonomy->hasStructure(),
+                'canReorder' => User::current()->can('reorder', $taxonomy),
+                'structurePagesUrl' => cp_route('taxonomies.tree.index', $taxonomy->handle()),
+                'structureSubmitUrl' => cp_route('taxonomies.tree.update', $taxonomy->handle()),
+                'structureMaxDepth' => $structure->maxDepth() ?? PHP_FLOAT_MAX, // "Infinity"
+            ]);
+        }
 
         if ($taxonomy->queryTerms()->count() === 0) {
             return Inertia::render('taxonomies/Empty', $viewData);
@@ -161,6 +185,10 @@ class TaxonomiesController extends CpController
             'term_template' => $taxonomy->hasCustomTermTemplate() ? $taxonomy->termTemplate() : null,
             'template' => $taxonomy->hasCustomTemplate() ? $taxonomy->template() : null,
             'layout' => $taxonomy->layout(),
+            'structured' => $taxonomy->hasStructure(),
+            'max_depth' => optional($taxonomy->structure())->maxDepth(),
+            'route_mode' => $this->routeModeForCp($taxonomy->routes()),
+            'route' => $this->routeValueForCp($taxonomy),
         ];
 
         return PublishForm::make($this->editFormBlueprint($taxonomy))
@@ -182,24 +210,62 @@ class TaxonomiesController extends CpController
 
         $values = $fields->process()->values()->all();
 
+        $this->assertCustomRouteContainsSlug($values['route_mode'] ?? 'automagic', $values['route'] ?? null);
+
         $taxonomy
             ->title($values['title'])
             ->previewTargets($values['preview_targets'])
             ->termTemplate($values['term_template'] ?? null)
             ->template($values['template'] ?? null)
-            ->layout($values['layout'] ?? null);
+            ->layout($values['layout'] ?? null)
+            ->routes($this->routesFromCp($values));
 
         if ($sites = Arr::get($values, 'sites')) {
             $taxonomy->sites($sites);
         }
 
+        $wasStructured = $taxonomy->hasStructure();
+
+        if (! Arr::get($values, 'structured')) {
+            if ($structure = $taxonomy->structure()) {
+                $structure->trees()->each->delete();
+            }
+            $taxonomy->structure(null);
+        } else {
+            $taxonomy->structure($this->makeStructure($taxonomy, $values['max_depth'] ?? null));
+        }
+
         $taxonomy->save();
+
+        if (! $wasStructured && $taxonomy->hasStructure()) {
+            $this->seedStructureTree($taxonomy);
+        }
 
         $this->clearStacheStore($taxonomy, $existingSites);
 
         $this->associateTaxonomyWithCollections($taxonomy, $values['collections']);
 
         return $taxonomy->toArray();
+    }
+
+    protected function makeStructure($taxonomy, $maxDepth)
+    {
+        if (! $structure = $taxonomy->structure()) {
+            $structure = new TaxonomyStructure;
+        }
+
+        return $structure->maxDepth($maxDepth);
+    }
+
+    /**
+     * Persist the tree file, seeded with all existing terms (which the
+     * tree's read-time validation appends in current sort order).
+     */
+    protected function seedStructureTree($taxonomy)
+    {
+        $tree = $taxonomy->structure()->tree();
+
+        $tree->tree($tree->tree())->save();
     }
 
     private function clearStacheStore($taxonomy, $oldSites)
@@ -299,9 +365,44 @@ class TaxonomiesController extends CpController
         }
 
         $fields = array_merge($fields, [
+            'hierarchy' => [
+                'display' => __('Ordering & Hierarchy'),
+                'fields' => [
+                    'structured' => [
+                        'display' => __('Orderable'),
+                        'instructions' => __('statamic::messages.taxonomies_orderable_instructions'),
+                        'type' => 'toggle',
+                    ],
+                    'max_depth' => [
+                        'display' => __('Max Depth'),
+                        'instructions' => __('statamic::messages.taxonomies_max_depth_instructions'),
+                        'type' => 'integer',
+                        'validate' => 'min:0',
+                        'if' => ['structured' => true],
+                    ],
+                ],
+            ],
             'routing' => [
                 'display' => __('Routing & URLs'),
                 'fields' => [
+                    'route_mode' => [
+                        'display' => __('Routes'),
+                        'instructions' => __('statamic::messages.taxonomies_routes_instructions'),
+                        'type' => 'button_group',
+                        'options' => [
+                            'automagic' => __('Automagic'),
+                            'custom' => __('Custom'),
+                            'disabled' => __('Disabled'),
+                        ],
+                        'default' => 'automagic',
+                    ],
+                    'route' => [
+                        'display' => __('Route'),
+                        'instructions' => __('statamic::messages.taxonomies_route_instructions'),
+                        'type' => 'collection_routes',
+                        'if' => ['route_mode' => 'custom'],
+                        'validate' => 'required_if:route_mode,custom',
+                    ],
                     'preview_targets' => [
                         'display' => __('Preview Targets'),
                         'instructions' => __('statamic::messages.taxonomies_preview_targets_instructions'),
@@ -379,5 +480,109 @@ class TaxonomiesController extends CpController
                 ],
             ],
         ])->all());
+    }
+
+    private function routeModeForCp($routes): string
+    {
+        if ($routes === false) {
+            return 'disabled';
+        }
+
+        if ($routes === null || $routes === []) {
+            return 'automagic';
+        }
+
+        return 'custom';
+    }
+
+    private function routeValueForCp($taxonomy)
+    {
+        if ($taxonomy->hasCustomRoutes()) {
+            $routes = $taxonomy->routes();
+
+            if (is_array($routes) && collect($routes)->filter()->unique()->count() === 1) {
+                return $taxonomy->termRoute($taxonomy->sites()->first());
+            }
+
+            if (is_array($routes)) {
+                return collect($routes)
+                    ->map(fn ($route, $site) => $taxonomy->termRoute($site))
+                    ->all();
+            }
+
+            return $taxonomy->termRoute();
+        }
+
+        return $taxonomy->defaultTermRoute();
+    }
+
+    private function routesFromCp(array $values): mixed
+    {
+        $mode = $values['route_mode'] ?? 'automagic';
+
+        if ($mode === 'disabled') {
+            return false;
+        }
+
+        if ($mode !== 'custom') {
+            return null;
+        }
+
+        return $this->emptyRouteToNull($values['route'] ?? null);
+    }
+
+    private function emptyRouteToNull($value)
+    {
+        if ($value === '' || $value === [] || $value === null) {
+            return null;
+        }
+
+        if (is_array($value)) {
+            $filtered = collect($value)
+                ->map(fn ($route) => $route === '' ? null : $route)
+                ->filter(fn ($route) => $route !== null);
+
+            if ($filtered->isEmpty()) {
+                return null;
+            }
+
+            return $filtered->all();
+        }
+
+        return $value;
+    }
+
+    private function assertCustomRouteContainsSlug(string $mode, $route): void
+    {
+        if ($mode !== 'custom') {
+            return;
+        }
+
+        $routes = is_array($route) ? $route : [$route];
+
+        foreach ($routes as $pattern) {
+            if ($pattern && ! Str::contains((string) $pattern, '{slug}')) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'route' => __('statamic::validation.taxonomy_route_requires_slug'),
+                ]);
+            }
+        }
+    }
+
+    protected function getAuthorizedSitesForTaxonomy($taxonomy)
+    {
+        return $taxonomy
+            ->sites()
+            ->mapWithKeys(fn ($handle) => [$handle => Site::get($handle)])
+            ->each(fn ($site, $handle) => throw_unless($site, new SiteNotFoundException($handle)))
+            ->filter(fn ($site) => User::current()->can('view', $site))
+            ->map(function ($site) {
+                return [
+                    'handle' => $site->handle(),
+                    'name' => $site->name(),
+                ];
+            })
+            ->values()
+            ->all();
     }
 }

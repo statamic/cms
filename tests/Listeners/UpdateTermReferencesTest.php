@@ -195,7 +195,7 @@ class UpdateTermReferencesTest extends TestCase
         $this->assertEquals('norris', $entry->get('non_favourite'));
         $this->assertEquals(['hoff', 'norris'], $entry->get('favourites'));
 
-        $this->termHoff->delete();
+        Facades\Term::find('topics::hoff')->delete();
 
         $this->assertFalse($entry->fresh()->has('favourite'));
         $this->assertEquals('norris', $entry->fresh()->get('non_favourite'));
@@ -205,6 +205,91 @@ class UpdateTermReferencesTest extends TestCase
 
         $this->assertFalse($entry->fresh()->has('non_favourite'));
         $this->assertFalse($entry->fresh()->has('favourites'));
+    }
+
+    #[Test]
+    public function a_flat_taxonomy_does_not_treat_slashes_as_path_segments()
+    {
+        $acdc = tap(Facades\Term::make()->taxonomy('topics')->slug('acdc')->data(['title' => 'AC/DC']))->save();
+        $dc = tap(Facades\Term::make()->taxonomy('topics')->slug('dc')->data(['title' => 'DC']))->save();
+
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'favourites',
+                    'field' => [
+                        'type' => 'terms',
+                        'taxonomies' => ['topics'],
+                        'mode' => 'select',
+                    ],
+                ],
+            ],
+        ]);
+
+        $entry = tap(Facades\Entry::make()->collection($collection)->data([
+            'favourites' => ['AC/DC', 'hoff'],
+        ]))->save();
+
+        $dc->slug('dc-comics')->save();
+
+        $this->assertEquals(['AC/DC', 'hoff'], $entry->fresh()->get('favourites'));
+
+        $dc->delete();
+
+        $this->assertEquals(['AC/DC', 'hoff'], $entry->fresh()->get('favourites'));
+
+        $acdc->slug('ac-dc')->save();
+
+        $this->assertEquals(['ac-dc', 'hoff'], $entry->fresh()->get('favourites'));
+    }
+
+    #[Test]
+    public function a_hierarchical_taxonomy_does_not_treat_the_delimiter_as_path_segments()
+    {
+        $this->topics->structureContents([])->save();
+
+        tap(Facades\Term::make()->taxonomy('topics')->slug('events')->data(['title' => 'Events']))->save();
+        $concerts = tap(Facades\Term::make()->taxonomy('topics')->slug('concerts')->data(['title' => 'Concerts']))->save();
+        $eventsConcerts = tap(Facades\Term::make()->taxonomy('topics')->slug('events-concerts')->data(['title' => 'Events > Concerts']))->save();
+
+        $this->topics->structure()->tree()->tree([
+            ['term' => 'events', 'children' => [
+                ['term' => 'concerts'],
+            ]],
+            ['term' => 'events-concerts'],
+        ])->save();
+
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'favourites',
+                    'field' => [
+                        'type' => 'terms',
+                        'taxonomies' => ['topics'],
+                        'mode' => 'select',
+                    ],
+                ],
+            ],
+        ]);
+
+        $entry = tap(Facades\Entry::make()->collection($collection)->data([
+            'favourites' => ['events > concerts', 'hoff'],
+        ]))->save();
+
+        // The delimiter is a CP input convention, not a storage format. A stored value naming
+        // one segment isn't a reference to that segment's term, so renaming it changes nothing.
+        $concerts->slug('gigs')->save();
+
+        $this->assertEquals(['events > concerts', 'hoff'], $entry->fresh()->get('favourites'));
+
+        // The whole value slugs to "events-concerts", so that's the term it actually refers to.
+        $eventsConcerts->slug('shows')->save();
+
+        $this->assertEquals(['shows', 'hoff'], $entry->fresh()->get('favourites'));
     }
 
     #[Test]

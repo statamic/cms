@@ -44,4 +44,26 @@ class TermsStoreTest extends TestCase
 
         $this->assertEquals($path, $this->parent->store('tags')->paths()->get('en::test'));
     }
+
+    #[Test]
+    public function it_loads_the_term_file_for_association_keys_in_other_sites()
+    {
+        $this->setSites([
+            'en' => ['url' => '/'],
+            'de' => ['url' => '/de/'],
+        ]);
+
+        Facades\Taxonomy::make('tags')->sites(['en'])->save();
+
+        $term = Facades\Term::make('concerts')->taxonomy('tags')->data(['title' => 'Concerts']);
+        $this->parent->store('tags')->save($term);
+
+        $loaded = $this->parent->store('tags')->getItem('de::concerts');
+
+        $this->assertEquals('Concerts', $loaded->in('en')->title());
+        $this->assertEquals('Concerts', $loaded->title());
+
+        @unlink($this->directory.'/tags/concerts.yaml');
+        file_put_contents($this->directory.'/tags.yaml', "title: Tags\n");
+    }
 }

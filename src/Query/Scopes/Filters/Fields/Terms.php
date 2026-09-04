@@ -4,6 +4,7 @@ namespace Statamic\Query\Scopes\Filters\Fields;
 
 use Statamic\Facades;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 
 use function Statamic\trans as __;
 
@@ -40,12 +41,65 @@ class Terms extends FieldtypeFilter
         $operator = $values['operator'];
 
         match ($operator) {
-            'like' => $this->fieldtype->config('max_items') === 1
-                ? $query->where($handle, 'like', "%{$values['term']}%")
-                : $query->whereJsonContains($handle, $values['term']),
+            'like' => $this->applyContains($query, $handle, $values['term']),
             'null' => $query->whereNull($handle),
             'not-null' => $query->whereNotNull($handle),
         };
+    }
+
+    private function applyContains($query, $handle, $term): void
+    {
+        $values = $this->expandTermFilterValues($term);
+
+        if ($this->fieldtype->config('max_items') === 1) {
+            $query->where(function ($query) use ($handle, $values) {
+                foreach ($values as $value) {
+                    $query->orWhere($handle, $value)
+                        ->orWhere($handle, 'like', '%'.$value.'%');
+                }
+            });
+
+            return;
+        }
+
+        $query->where(function ($query) use ($handle, $values) {
+            foreach ($values as $value) {
+                $query->orWhereJsonContains($handle, $value);
+            }
+        });
+    }
+
+    private function expandTermFilterValues(string $term): array
+    {
+        $slug = Str::after($term, '::');
+        $handle = $this->fieldtype->usingSingleTaxonomy()
+            ? $this->fieldtype->taxonomies()[0]
+            : Str::before($term, '::');
+
+        $leaf = str_contains($slug, '/') ? Str::afterLast($slug, '/') : $slug;
+        $fallback = array_values(array_unique(array_filter([$term, $slug, $leaf])));
+
+        if (! $handle || ! ($taxonomy = Facades\Taxonomy::findByHandle($handle)) || ! $taxonomy->hierarchical()) {
+            return $fallback;
+        }
+
+        if (! $page = $taxonomy->structure()->tree()->find($leaf)) {
+            return $fallback;
+        }
+
+        $values = collect();
+        $parentPath = implode('/', $taxonomy->structure()->ancestorsOf($page));
+
+        $walk = function ($page, $path) use (&$walk, $values) {
+            $slug = $page->id();
+            $full = $path === '' ? $slug : $path.'/'.$slug;
+            $values->push($slug, $full);
+            $page->pages()->all()->each(fn ($child) => $walk($child, $full));
+        };
+
+        $walk($page, $parentPath);
+
+        return $values->merge($fallback)->unique()->values()->all();
     }
 
     public function badge($values)

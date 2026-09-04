@@ -10,11 +10,12 @@ trait ExtractsFromTermFields
         // We don't want injected taxonomy values, which $term->values() would have given us.
         $values = $term->inDefaultLocale()->data()->merge(
             $term->data()
-        );
+        )->all();
 
         $fields = $blueprint
+            ->setParent($term)
             ->fields()
-            ->addValues($values->all())
+            ->addValues($values)
             ->preProcess();
 
         $values = $fields->values()->merge([
@@ -22,6 +23,11 @@ trait ExtractsFromTermFields
             'slug' => $term->slug(),
         ]);
 
-        return [$values->all(), $fields->meta()];
+        $extraValues = [
+            'depth' => $term->page()?->depth(),
+            'children' => $term->page()?->flattenedPages()->pluck('id')->all(),
+        ];
+
+        return [$values->all(), $fields->meta(), $extraValues];
     }
 }

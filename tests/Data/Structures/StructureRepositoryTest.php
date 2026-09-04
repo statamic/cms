@@ -6,8 +6,10 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Structures\Structure as StructureContract;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Nav;
+use Statamic\Facades\Taxonomy;
 use Statamic\Structures\CollectionStructure;
 use Statamic\Structures\StructureRepository;
+use Statamic\Structures\TaxonomyStructure;
 use Tests\TestCase;
 
 class StructureRepositoryTest extends TestCase
@@ -36,6 +38,8 @@ class StructureRepositoryTest extends TestCase
             Collection::make('collection-structure-b')->structure(new CollectionStructure),
         ]);
         Collection::shouldReceive('whereStructured')->andReturn($collections);
+
+        Taxonomy::shouldReceive('all')->andReturn(collect());
 
         $structures = $this->repo->all();
 
@@ -71,6 +75,18 @@ class StructureRepositoryTest extends TestCase
         Nav::shouldReceive('find')->never();
 
         $this->assertSame($structure, $this->repo->find('collection::test'));
+    }
+
+    #[Test]
+    public function it_gets_a_taxonomy_structure_by_handle()
+    {
+        $structure = new TaxonomyStructure;
+        $taxonomy = \Statamic\Taxonomies\Taxonomy::make('test')->structure($structure);
+        Taxonomy::shouldReceive('findByHandle')->with('test')->once()->andReturn($taxonomy);
+        Nav::shouldReceive('find')->never();
+        Collection::shouldReceive('find')->never();
+
+        $this->assertSame($structure, $this->repo->find('taxonomy::test'));
     }
 
     #[Test]

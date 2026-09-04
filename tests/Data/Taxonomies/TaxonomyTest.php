@@ -122,6 +122,17 @@ class TaxonomyTest extends TestCase
     }
 
     #[Test]
+    public function it_does_not_add_a_parent_field_to_the_real_term_blueprint()
+    {
+        $taxonomy = tap(Taxonomy::make('categories')->structureContents([]))->save();
+        $blueprint = (new Blueprint)->setHandle('category')->setContents(['title' => 'Category']);
+
+        $taxonomy->ensureTermBlueprintFields($blueprint);
+
+        $this->assertNull($blueprint->field('parent'));
+    }
+
+    #[Test]
     public function it_dispatches_an_event_when_getting_entry_blueprint()
     {
         Event::fake();
@@ -183,11 +194,89 @@ class TaxonomyTest extends TestCase
     }
 
     #[Test]
+    public function custom_routes_are_not_prefixed_by_a_collection()
+    {
+        $entry = $this->mock(EntryContract::class);
+        $entry->shouldReceive('in')->andReturnSelf();
+        $entry->shouldReceive('uri')->andReturn('/blog');
+        Entry::shouldReceive('find')->with('blog-page')->andReturn($entry);
+
+        $collection = tap(Collection::make('blog')->mount('blog-page'))->save();
+
+        $taxonomy = (new Taxonomy)->handle('tags')->routes('/topics/{slug}')->collection($collection);
+
+        $this->assertEquals('/topics', $taxonomy->uri());
+        $this->assertEquals('/topics', $taxonomy->url());
+        $this->assertEquals('http://localhost/topics', $taxonomy->absoluteUrl());
+    }
+
+    #[Test]
+    public function it_gets_and_sets_routes()
+    {
+        $this->setSites([
+            'en' => ['url' => 'http://domain.com/'],
+            'fr' => ['url' => 'http://domain.com/fr/'],
+        ]);
+
+        $taxonomy = (new Taxonomy)->handle('tags')->sites(['en', 'fr']);
+
+        $this->assertTrue($taxonomy->routesEnabled());
+        $this->assertFalse($taxonomy->hasCustomRoutes());
+        $this->assertEquals('/tags', $taxonomy->taxonomyRoute('en'));
+        $this->assertEquals('/tags/{slug}', $taxonomy->termRoute('en'));
+        $this->assertEquals('/tags', $taxonomy->uri());
+        $this->assertArrayNotHasKey('routes', $taxonomy->fileData());
+
+        $taxonomy->routes('/topics/{slug}');
+
+        $this->assertTrue($taxonomy->hasCustomRoutes());
+        $this->assertEquals('/topics', $taxonomy->taxonomyRoute('en'));
+        $this->assertEquals('/topics', $taxonomy->taxonomyRoute('fr'));
+        $this->assertEquals('/topics/{slug}', $taxonomy->termRoute('en'));
+        $this->assertEquals('/topics', $taxonomy->uri());
+        $this->assertEquals('/topics/{slug}', $taxonomy->fileData()['routes']);
+
+        $taxonomy->routes([
+            'en' => '/topics/{slug}',
+            'fr' => '/sujets/{slug}',
+        ]);
+
+        $this->assertEquals('/topics', $taxonomy->taxonomyRoute('en'));
+        $this->assertEquals('/sujets', $taxonomy->taxonomyRoute('fr'));
+        $this->assertEquals('/topics/{slug}', $taxonomy->termRoute('en'));
+        $this->assertEquals('/sujets/{slug}', $taxonomy->termRoute('fr'));
+
+        $taxonomy->routes('/topics');
+
+        $this->assertEquals('/topics', $taxonomy->taxonomyRoute('en'));
+        $this->assertEquals('/topics/{slug}', $taxonomy->termRoute('en'));
+        $this->assertEquals('/topics', $taxonomy->fileData()['routes']);
+
+        $taxonomy->routes(false);
+
+        $this->assertFalse($taxonomy->routesEnabled());
+        $this->assertNull($taxonomy->taxonomyRoute('en'));
+        $this->assertNull($taxonomy->termRoute('en'));
+        $this->assertNull($taxonomy->uri());
+        $this->assertNull($taxonomy->url());
+        $this->assertNull($taxonomy->absoluteUrl());
+        $this->assertFalse($taxonomy->fileData()['routes']);
+    }
+
+    #[Test]
     public function it_gets_sort_field_and_direction()
     {
         $taxonomy = new Taxonomy;
         $this->assertEquals('title', $taxonomy->sortField());
         $this->assertEquals('asc', $taxonomy->sortDirection());
+
+        $ordered = (new Taxonomy)->structureContents(['max_depth' => 1]);
+        $this->assertEquals('order', $ordered->sortField());
+        $this->assertEquals('asc', $ordered->sortDirection());
+
+        $hierarchical = (new Taxonomy)->structureContents(['max_depth' => 99]);
+        $this->assertEquals('order', $hierarchical->sortField());
+        $this->assertEquals('asc', $hierarchical->sortDirection());
 
         $taxonomy->setSortField('foo');
         $this->assertEquals('foo', $taxonomy->sortField());

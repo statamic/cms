@@ -13,6 +13,7 @@ use Statamic\Fields\Field;
 use Statamic\Fieldtypes\Link;
 use Statamic\Fieldtypes\Link\EntryLinkType;
 use Statamic\Fieldtypes\Link\LinkType;
+use Statamic\Fieldtypes\Link\TermLinkType;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -116,6 +117,31 @@ class LinkTest extends TestCase
         $config = (new EntryLinkType)->fieldtype($field);
 
         $this->assertEquals(['pages'], $config['collections']);
+    }
+
+    #[Test]
+    public function it_wraps_a_string_taxonomies_config_into_an_array_for_the_term_link_type()
+    {
+        $field = new Field('test', ['type' => 'link', 'taxonomies' => 'tags']);
+        $config = (new TermLinkType)->fieldtype($field);
+
+        $this->assertEquals(['tags'], $config['taxonomies']);
+    }
+
+    #[Test]
+    public function it_pre_processes_term_reference_for_index()
+    {
+        $term = Mockery::mock(\Statamic\Contracts\Taxonomies\Term::class);
+        $term->shouldReceive('url')->once()->andReturn('/the-term-url');
+
+        Facades\Term::shouldReceive('find')->with('tags::rad')->once()->andReturn($term);
+
+        $fieldtype = (new Link)->setField(new Field('test', ['type' => 'link']));
+
+        $this->assertEquals(
+            ['type' => 'term', 'url' => '/the-term-url', 'icon' => 'taxonomies'],
+            $fieldtype->preProcessIndex('term::tags::rad')
+        );
     }
 
     #[Test]

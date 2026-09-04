@@ -25,6 +25,7 @@ class Resource
         TermResource::class,
         UserResource::class,
         TreeResource::class,
+        TaxonomyTreeResource::class,
     ];
 
     /**

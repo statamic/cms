@@ -7,6 +7,7 @@ use Statamic\Contracts\Structures\Structure;
 use Statamic\Contracts\Structures\StructureRepository as RepositoryContract;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Nav;
+use Statamic\Facades\Taxonomy;
 use Statamic\Support\Str;
 
 class StructureRepository implements RepositoryContract
@@ -14,7 +15,8 @@ class StructureRepository implements RepositoryContract
     public function all(): IlluminateCollection
     {
         return Nav::all()
-            ->merge(Collection::whereStructured()->map->structure());
+            ->merge(Collection::whereStructured()->map->structure())
+            ->merge(Taxonomy::all()->filter->hasStructure()->map->structure());
     }
 
     public function find($id): ?Structure
@@ -26,6 +28,10 @@ class StructureRepository implements RepositoryContract
     {
         if (Str::startsWith($handle, 'collection::')) {
             return Collection::find(Str::after($handle, 'collection::'))?->structure();
+        }
+
+        if (Str::startsWith($handle, 'taxonomy::')) {
+            return Taxonomy::findByHandle(Str::after($handle, 'taxonomy::'))?->structure();
         }
 
         return Nav::find($handle);

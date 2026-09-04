@@ -53,6 +53,7 @@ class EntriesQuery extends Query
             'query_scope' => GraphQL::type(JsonArgument::NAME),
             'sort' => GraphQL::listOf(GraphQL::string()),
             'site' => GraphQL::string(),
+            'with_descendants' => GraphQL::boolean(),
         ];
     }
 
@@ -61,6 +62,10 @@ class EntriesQuery extends Query
         $query = Entry::query();
 
         $query->whereIn('collection', $args['collection'] ?? $this->allowedSubResources());
+
+        if (array_key_exists('with_descendants', $args) && ! $args['with_descendants']) {
+            $query->withTaxonomyDescendants(false);
+        }
 
         if ($site = $args['site'] ?? null) {
             $query->where('site', $site);

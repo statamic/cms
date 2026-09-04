@@ -95,8 +95,11 @@ use Statamic\Http\Controllers\CP\SlugController;
 use Statamic\Http\Controllers\CP\StartPageController;
 use Statamic\Http\Controllers\CP\Taxonomies\PublishedTermsController;
 use Statamic\Http\Controllers\CP\Taxonomies\ReorderTaxonomyBlueprintsController;
+use Statamic\Http\Controllers\CP\Taxonomies\ReorderTermsController;
+use Statamic\Http\Controllers\CP\Taxonomies\ScaffoldTaxonomyController;
 use Statamic\Http\Controllers\CP\Taxonomies\TaxonomiesController;
 use Statamic\Http\Controllers\CP\Taxonomies\TaxonomyBlueprintsController;
+use Statamic\Http\Controllers\CP\Taxonomies\TaxonomyTreeController;
 use Statamic\Http\Controllers\CP\Taxonomies\TermActionController;
 use Statamic\Http\Controllers\CP\Taxonomies\TermPreviewController;
 use Statamic\Http\Controllers\CP\Taxonomies\TermsController;
@@ -218,9 +221,14 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     });
 
     Route::resource('taxonomies', TaxonomiesController::class);
+    Route::get('taxonomies/{taxonomy}/scaffold', [ScaffoldTaxonomyController::class, 'index'])->name('taxonomies.scaffold');
+    Route::post('taxonomies/{taxonomy}/scaffold', [ScaffoldTaxonomyController::class, 'create'])->name('taxonomies.scaffold.create');
+    Route::get('taxonomies/{taxonomy}/tree', [TaxonomyTreeController::class, 'index'])->name('taxonomies.tree.index');
+    Route::patch('taxonomies/{taxonomy}/tree', [TaxonomyTreeController::class, 'update'])->name('taxonomies.tree.update');
 
     Route::group(['prefix' => 'taxonomies/{taxonomy}/terms'], function () {
         Route::get('/', [TermsController::class, 'index'])->name('taxonomies.terms.index');
+        Route::post('reorder', ReorderTermsController::class)->name('taxonomies.terms.reorder');
         Route::post('actions', [TermActionController::class, 'run'])->name('taxonomies.terms.actions.run');
         Route::post('actions/list', [TermActionController::class, 'bulkActions'])->name('taxonomies.terms.actions.bulk');
         Route::get('create/{site}', [TermsController::class, 'create'])->name('taxonomies.terms.create');

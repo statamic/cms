@@ -59,6 +59,7 @@
             :reference="reference"
             :blueprint="fieldset"
             v-model="values"
+            :extra-values="extraValues"
             :meta="meta"
             :origin-values="originValues"
             :origin-meta="originMeta"
@@ -178,6 +179,7 @@ export default {
         initialReference: String,
         initialFieldset: Object,
         initialValues: Object,
+        initialExtraValues: Object,
         initialMeta: Object,
         initialTitle: String,
         initialLocalizations: Array,
@@ -187,6 +189,7 @@ export default {
         initialOriginMeta: Object,
         initialSite: String,
         taxonomyHandle: String,
+        parent: String,
         initialActions: Object,
         method: String,
         initialPublished: Boolean,
@@ -209,6 +212,7 @@ export default {
             title: this.initialTitle,
             values: clone(this.initialValues),
             visibleValues: {},
+            extraValues: clone(this.initialExtraValues ?? {}),
             meta: clone(this.initialMeta),
             localizations: clone(this.initialLocalizations),
             localizedFields: this.initialLocalizedFields,
@@ -352,6 +356,7 @@ export default {
                         _blueprint: this.fieldset.handle,
                         published: this.published,
                         _localized: this.localizedFields,
+                        _parent: this.parent,
                     }),
                     new AfterSaveHooks('term', {
                         taxonomy: this.taxonomyHandle,
@@ -361,6 +366,9 @@ export default {
                 .then((response) => {
                     this.title = response.data.data.title;
                     this.permalink = response.data.data.permalink;
+                    if (response.data.data.extraValues) {
+                        this.extraValues = response.data.data.extraValues;
+                    }
                     if (!this.isCreating) this.$toast.success(__('Saved'));
 
                     let nextAction = this.quickSave ? 'continue_editing' : this.afterSaveOption;
