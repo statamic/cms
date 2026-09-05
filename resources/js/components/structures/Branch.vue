@@ -55,18 +55,26 @@
 
                 <slot name="branch-icon" :branch="page" />
 
-	            <template v-if="editable">
-	                <Dropdown placement="left-start" :class="{ invisible: isRoot }">
-	                    <DropdownMenu>
-	                        <slot
-	                            name="branch-options"
-	                            :branch="page"
-	                            :depth="depth"
-	                            :remove-branch="remove"
-	                        />
-	                    </DropdownMenu>
-	                </Dropdown>
-	            </template>
+                <template v-if="editable">
+                    <slot
+                        name="branch-options-dropdown"
+                        :branch="page"
+                        :depth="depth"
+                        :remove-branch="remove"
+                        :is-root="isRoot"
+                    >
+                        <Dropdown placement="left-start" :class="{ invisible: isRoot }">
+                            <DropdownMenu>
+                                <slot
+                                    name="branch-options"
+                                    :branch="page"
+                                    :depth="depth"
+                                    :remove-branch="remove"
+                                />
+                            </DropdownMenu>
+                        </Dropdown>
+                    </slot>
+                </template>
             </div>
         </div>
     </div>
