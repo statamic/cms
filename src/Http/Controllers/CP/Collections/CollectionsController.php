@@ -26,6 +26,8 @@ use function Statamic\trans as __;
 
 class CollectionsController extends CpController
 {
+    use QueriesAuthorEntries;
+
     public function index(Request $request)
     {
         $this->authorize('index', CollectionContract::class, __('You are not authorized to view collections.'));
@@ -60,13 +62,20 @@ class CollectionsController extends CpController
                 || User::current()->can('view', $collection)
                 && $collection->sites()->contains(Site::selected()->handle());
         })->map(function ($collection) {
+            $entriesQuery = fn () => $collection->queryEntries()
+                ->where('site', Site::selected())
+                ->when(
+                    User::current()->cant('view-other-authors-entries', [EntryContract::class, $collection]),
+                    fn ($query) => $this->queryAuthorEntries($query, $collection)
+                );
+
             return [
                 'id' => $collection->handle(),
                 'title' => $collection->title(),
-                'entries_count' => $collection->queryEntries()->where('site', Site::selected())->count(),
-                'published_entries_count' => $collection->queryEntries()->where('site', Site::selected())->whereStatus('published')->count(),
-                'draft_entries_count' => $collection->queryEntries()->where('site', Site::selected())->whereStatus('draft')->count(),
-                'scheduled_entries_count' => $collection->queryEntries()->where('site', Site::selected())->whereStatus('scheduled')->count(),
+                'entries_count' => $entriesQuery()->count(),
+                'published_entries_count' => $entriesQuery()->whereStatus('published')->count(),
+                'draft_entries_count' => $entriesQuery()->whereStatus('draft')->count(),
+                'scheduled_entries_count' => $entriesQuery()->whereStatus('scheduled')->count(),
                 'blueprints' => $collection->entryBlueprints()->reject->hidden()
                     ->map(fn ($blueprint) => [
                         ...$blueprint->toArray(),
