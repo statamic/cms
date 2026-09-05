@@ -12,6 +12,7 @@
             :new-section-text="__('New Set')"
             show-tab-instructions-field
             show-section-handle-field
+            :show-section-card-field="showCardLayoutField"
             show-section-hide-field
             @updated="tabsUpdated"
         />
@@ -23,6 +24,17 @@ import Fieldtype from '../Fieldtype.vue';
 import SuggestsConditionalFields from '../../blueprints/SuggestsConditionalFields';
 import Tabs from '../../blueprints/Tabs.vue';
 
+function stripCardLayout(tabs) {
+    return tabs.map((tab) => ({
+        ...tab,
+        sections: tab.sections.map((section) => {
+            const { card, ...rest } = section;
+
+            return rest;
+        }),
+    }));
+}
+
 export default {
     mixins: [Fieldtype, SuggestsConditionalFields],
 
@@ -30,9 +42,15 @@ export default {
         Tabs,
     },
 
+    computed: {
+        showCardLayoutField() {
+            return this.config.show_card_layout_field === true;
+        },
+    },
+
     data() {
         return {
-            tabs: this.value,
+            tabs: this.config.show_card_layout_field === true ? this.value : stripCardLayout(this.value),
         };
     },
 
@@ -42,7 +60,7 @@ export default {
 
     methods: {
         tabsUpdated(tabs) {
-            this.update(tabs);
+            this.update(this.showCardLayoutField ? tabs : stripCardLayout(tabs));
         },
 
         getSectionFieldsForConditionSuggestions(vm = null) {

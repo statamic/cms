@@ -132,7 +132,7 @@ reveal.use(rootEl, () => emit('expanded'));
             data-replicator-set
             class="relative w-full rounded-lg border border-gray-300 text-base dark:border-white/10 bg-white dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black shadow-ui-sm dark:[&_[data-ui-switch]]:border-gray-600 dark:[&_[data-ui-switch]]:border-1"
             :class="{
-                'border-red-500': hasError
+                'border-red-500': hasError,
             }"
             :data-collapsed="collapsed ?? undefined"
             :data-error="hasError ?? undefined"
@@ -173,12 +173,27 @@ reveal.use(rootEl, () => emit('expanded'));
                     />
                 </button>
                 <div class="flex items-center gap-2" v-if="!readOnly">
-                    <Switch size="xs" :model-value="enabled" @update:model-value="toggleEnabledState" v-tooltip="enabled ? __('Included in output') : __('Hidden from output')" />
+                    <Switch
+                        v-if="!config.card"
+                        size="xs"
+                        :model-value="enabled"
+                        @update:model-value="toggleEnabledState"
+                        v-tooltip="enabled ? __('Included in output') : __('Hidden from output')"
+                    />
                     <Dropdown>
                         <template #trigger>
                             <Button icon="dots" variant="ghost" size="xs" :aria-label="__('Open dropdown menu')" />
                         </template>
                         <DropdownMenu>
+                            <div
+                                v-if="config.card"
+                                class="col-span-2 flex items-center justify-between gap-4 rounded-lg px-3 py-1.5 text-sm text-gray-700 dark:text-gray-300"
+                                @pointerdown.stop
+                            >
+                                <span>{{ __('Visible') }}</span>
+                                <Switch size="xs" :model-value="enabled" @update:model-value="toggleEnabledState" />
+                            </div>
+                            <DropdownSeparator v-if="config.card" />
                             <DropdownItem
                                 v-if="fieldActions.length"
                                 v-for="action in fieldActions"

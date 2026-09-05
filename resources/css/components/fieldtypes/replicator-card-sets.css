@@ -1,0 +1,106 @@
+/* GROUP REPLICATOR CARD SETS
+=================================================== */
+.replicator-card-set-row-start {
+    --pull: 1.5rem;
+
+    &:not(.replicator-card-set-has-entry-connector) {
+        [data-ui-popover-trigger] {
+            position: absolute;
+            z-index: var(--z-index-above);
+            transform: translateY(calc(0% - var(--pull)));
+            width: 100%;
+        }
+    }
+
+    &.replicator-card-set-has-entry-connector {
+        [data-ui-popover-trigger] {
+            position: relative;
+            z-index: var(--z-index-above);
+            width: 100%;
+        }
+    }
+}
+
+@container panel (width > 635px) {
+    .replicator-set-list {
+        display: flex;
+        flex-wrap: wrap;
+        column-gap: 0.75rem;
+        align-items: start;
+    }
+
+    .replicator-set-slot--full,
+    .replicator-set-slot--card-cols-1 {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .replicator-set-slot--card-cols-2,
+    .replicator-set-slot--card-cols-3 {
+        width: calc((100% - 0.75rem) / 2);
+        min-width: 0;
+    }
+
+    @container panel (width > 935px) {
+        .replicator-set-slot--card-cols-3 {
+            width: calc((100% - 1.5rem) / 3);
+            min-width: 0;
+        }
+    }
+
+    .replicator-set-slot--full,
+    .replicator-set-slot--card-cols-1,
+    .replicator-set-slot--card-cols-2,
+    .replicator-set-slot--card-cols-3 {
+        .publish-fields {
+            /* Prevent columns and gaps exceeding the container */
+            grid-column-gap: unset;
+
+            * {
+                --col-span: 12;
+            }
+        }
+    }
+
+    .replicator-card-set-inset-picker:not(.replicator-card-set-row-start) {
+        position: relative;
+        margin-block-start: 1.5rem;
+
+        [data-replicator-connector] {
+            display: none;
+        }
+
+        [data-ui-popover-trigger] {
+            position: absolute;
+            inset: 0;
+            left: -1.15rem;
+            writing-mode: vertical-lr;
+
+            [data-insert-handle] {
+                position: absolute;
+                top: 0;
+                left: calc(0.5rem + 2px);
+                height: 100%;
+                width: 0.325rem;
+                background: linear-gradient(to bottom, var(--color-gray-200) 0%, var(--color-gray-100) 50%, var(--color-gray-200) 100%);
+            }
+        }
+
+        /* Nudge to account for rounding error / subpixel positioning */
+        &:nth-child(3n + 1) [data-ui-popover-trigger] {
+            [data-insert-handle] {
+                left: calc(0.5rem + 1.5px);
+            }
+        }
+    }
+
+    .replicator-card-set-row-start.replicator-card-set-has-entry-connector {
+        &.replicator-set-slot--card-cols-2 [data-ui-popover-trigger] {
+            width: calc(200% + 0.75rem);
+        }
+
+        &.replicator-set-slot--card-cols-3 [data-ui-popover-trigger] {
+            width: calc(300% + 1.5rem);
+        }
+    }
+}
