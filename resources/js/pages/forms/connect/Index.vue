@@ -36,7 +36,6 @@ type Connection = {
     title: string;
     description: string;
     icon: string;
-    darkIcon: string;
     developer: string;
     count: number | null;
     url: string;
@@ -101,9 +100,7 @@ watch(view, (view: View) => preferences.set('forms.connect.view', view));
                             :aria-label="__(connection.title)"
                             class="relative flex mb-2 aspect-square items-center justify-center rounded-lg border border-gray-300 bg-gray-50/30 p-8 text-gray-700 hover:bg-gray-100/50 dark:border-gray-700 dark:bg-gray-950/40 dark:text-gray-300 dark:hover:bg-gray-900"
                         >
-                            <span v-if="!connection.darkIcon" class="[&_svg]:size-12" aria-hidden="true" v-html="connection.icon" />
-                            <span v-if="connection.darkIcon" class="[&_svg]:size-12 dark:hidden" aria-hidden="true" v-html="connection.icon" />
-                            <span v-if="connection.darkIcon" class="[&_svg]:size-12 hidden dark:block" aria-hidden="true" v-html="connection.darkIcon" />
+                            <span class="[&_svg]:size-12" aria-hidden="true" v-html="connection.icon" />
                         </Link>
                         <div class="flex items-center justify-center gap-1.5 text-gray-800 dark:text-gray-200">
                             <Badge v-if="connection.count" size="sm" color="white" pill>
@@ -129,9 +126,7 @@ watch(view, (view: View) => preferences.set('forms.connect.view', view));
                         <ListingTable>
                             <template #cell-title="{ row: connection }">
                                 <Link :href="connection.url" class="flex min-w-0 items-center gap-2">
-                                    <span v-if="!connection.darkIcon" class="size-7 flex items-center justify-center text-gray-700 dark:text-gray-300 [&_svg]:size-5" aria-hidden="true" v-html="connection.icon" />
-                                    <span v-if="connection.darkIcon" class="size-7 flex items-center justify-center text-gray-700 dark:text-gray-300 [&_svg]:size-5 dark:hidden" aria-hidden="true" v-html="connection.icon" />
-                                    <span v-if="connection.darkIcon" class="size-7 flex items-center justify-center text-gray-700 dark:text-gray-300 [&_svg]:size-5 hidden dark:flex" aria-hidden="true" v-html="connection.darkIcon" />
+                                    <span class="size-7 flex items-center justify-center text-gray-700 dark:text-gray-300 [&_svg]:size-5" aria-hidden="true" v-html="connection.icon" />
                                     <Badge v-if="connection.count" size="sm" color="white" pill>
                                         {{ connection.count }}
                                     </Badge>
