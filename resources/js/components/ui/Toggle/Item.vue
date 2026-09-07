@@ -52,7 +52,7 @@ const toggleItemClasses = computed(() => {
                     'dark:from-white dark:to-gray-200 dark:hover:from-gray-200 dark:text-gray-900 dark:border-0 dark:data-[state=on]:from-gray-300 dark:data-[state=on]:to-gray-300',
                 ],
                 filled: 'bg-gray-100 hover:bg-gray-200 dark:bg-gray-700/80 dark:hover:bg-gray-700 data-[state=on]:bg-gray-300 data-[state=on]:border-gray-500 dark:data-[state=on]:bg-gray-925',
-                ghost: 'bg-transparent rounded-lg hover:bg-gray-400/10 text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:bg-gray-700/80 dark:hover:text-gray-200 data-[state=on]:bg-gray-400/20 data-[state=on]:text-gray-700 dark:data-[state=on]:bg-gray-700/80 dark:data-[state=on]:text-white',
+                ghost: 'bg-transparent rounded-lg hover:bg-gray-400/10 text-gray-600 hover:text-gray-700 dark:text-gray-300 dark:hover:bg-gray-700/80 dark:hover:text-gray-200 data-[state=on]:bg-gray-400/20 data-[state=on]:text-gray-700 dark:data-[state=on]:bg-gray-700/80 dark:data-[state=on]:text-white',
             },
             size: {
                 base: 'px-3 h-10 text-sm [&_svg]:size-3.5',
