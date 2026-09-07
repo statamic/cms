@@ -341,8 +341,8 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, BulkAugmenta
 
             $template = $this->taxonomy()->termTemplate();
 
-            if ($collection = $this->collection()) {
-                $template = $collection->handle().'.'.$template;
+            if ($this->collection() && ! $this->taxonomy()->hasCustomTermTemplate()) {
+                $template = $this->collection()->handle().'.'.$template;
             }
 
             return $template;

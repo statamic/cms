@@ -17,7 +17,7 @@
 .stacks-on-stacks {
     body:has(&) {
         /* Reka poppers should be on top of open stacks. Reka's popper z-index in this case is set to auto and we can't control it through Reka. We also can't use a direct descendant selector because the popper is inside a portal, so instead we'll check to see if certain conditions are present. */
-        [data-reka-popper-content-wrapper] {
+        [data-reka-popper-content-wrapper]:not(:has([data-ui-exclude-z-manipulation])) {
             z-index: var(--z-index-portal)!important;
         }
     }
@@ -36,6 +36,11 @@
     }
 
     .stack-content {
+        /* Isolate stack layout from the rest of the CP.
+          - layout-only: no paint/size
+          - keeps shadows, focus rings, and portaled menus intact
+        */
+        contain: layout;
         @apply relative h-[calc(100svh-1rem)];
     }
 

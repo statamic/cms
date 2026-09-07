@@ -33,6 +33,7 @@ use Statamic\View\Antlers\Language\Runtime\Sandbox\Environment;
 use Statamic\View\Antlers\Language\Runtime\Sandbox\RuntimeValues;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Statamic\View\Cascade;
+use Statamic\View\Slot;
 
 class PathDataManager
 {
@@ -608,9 +609,7 @@ class PathDataManager
                 }
 
                 if ($didScanSourceData == false) {
-                    if ($this->namedSlotsInScope && $pathItem->name == 'slot' &&
-                        $path->originalContent != 'slot' &&
-                        array_key_exists($path->originalContent, $data)) {
+                    if ($this->isNamedSlotReference($pathItem, $path, $data)) {
                         $this->reducedVar = $data[$path->originalContent];
                         break;
                     }
@@ -795,6 +794,14 @@ class PathDataManager
         return $this->reducedVar;
     }
 
+    private function isNamedSlotReference(PathNode $pathItem, $path, $data): bool
+    {
+        return $pathItem->name == 'slot' &&
+            $path->originalContent != 'slot' &&
+            array_key_exists($path->originalContent, $data) &&
+            ($this->namedSlotsInScope || $data[$path->originalContent] instanceof Slot);
+    }
+
     /**
      * Sets the parser instance to use when reducing content values.
      *
@@ -863,9 +870,11 @@ class PathDataManager
         }
 
         if (is_object($this->reducedVar) && method_exists($this->reducedVar, $method = Str::camel($varPath)) && (new \ReflectionMethod($this->reducedVar, $method))->isPublic()) {
-            if (MethodDenylist::blocks($method)) {
-                // The method name derives from user-influenceable data, so never
-                // dispatch to methods that mutate or destroy data. Resolve to null.
+            // The method name derives from user-influenceable data, so never dispatch to
+            // methods that mutate or destroy data. Writing `{{ object.method }}` without
+            // parentheses calls the method just like `{{ object:method() }}` does, so both
+            // forms honor the `statamic.antlers.allowMethodsInContent` setting.
+            if (MethodDenylist::blocks($method) || (GlobalRuntimeState::$isEvaluatingUserData && ! GlobalRuntimeState::$allowMethodsInContent)) {
                 $this->reducedVar = null;
                 $this->didFind = false;
                 $this->doBreak = true;
@@ -1129,7 +1138,7 @@ class PathDataManager
         GlobalRuntimeState::$isEvaluatingUserData = true;
         GlobalRuntimeState::$isEvaluatingData = true;
 
-        if ($value instanceof Model) {
+        if ($value instanceof Model || $value instanceof Slot) {
             GlobalRuntimeState::$isEvaluatingUserData = $prevIsEvaluatingUserData;
             GlobalRuntimeState::$isEvaluatingData = $prevIsEvaluatingData;
 

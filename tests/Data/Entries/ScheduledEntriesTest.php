@@ -4,10 +4,13 @@ namespace Tests\Data\Entries;
 
 use Carbon\Carbon;
 use Facades\Tests\Factories\EntryFactory;
+use Illuminate\Console\Scheduling\Schedule;
+use Orchestra\Testbench\Attributes\DefineEnvironment;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Entries\MinuteEntries;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
+use Statamic\Jobs\HandleEntrySchedule;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -90,5 +93,32 @@ class ScheduledEntriesTest extends TestCase
         $this->assertEquals(['07', '08', '09', '18'], $this->getEntryIdsForMinute('2023-09-13 12:14:00'));
         $this->assertEquals(['07', '08', '09', '18'], $this->getEntryIdsForMinute('2023-09-13 12:14:25'));
         $this->assertEquals(['22'], $this->getEntryIdsForMinute('2023-09-13 00:00:00'));
+    }
+
+    #[Test]
+    public function it_schedules_the_job_every_minute()
+    {
+        $events = $this->scheduledJobEvents();
+
+        $this->assertCount(1, $events);
+        $this->assertEquals('* * * * *', $events->first()->expression);
+    }
+
+    #[Test]
+    #[DefineEnvironment('disableHandlingOfScheduledEntries')]
+    public function it_doesnt_schedule_the_job_when_handling_scheduled_entries_is_disabled()
+    {
+        $this->assertCount(0, $this->scheduledJobEvents());
+    }
+
+    public function disableHandlingOfScheduledEntries($app)
+    {
+        $app['config']->set('statamic.system.handle_scheduled_entries', false);
+    }
+
+    private function scheduledJobEvents()
+    {
+        return collect($this->app->make(Schedule::class)->events())
+            ->filter(fn ($event) => $event->description === HandleEntrySchedule::class);
     }
 }

@@ -109,6 +109,35 @@ class PasswordProtectionTest extends PageProtectionTestCase
     }
 
     #[Test]
+    public function password_form_falls_back_to_default_site_when_url_doesnt_match_a_site()
+    {
+        $this->viewShouldReturnRendered('statamic::auth.protect.password', '');
+
+        $this->setSites([
+            'en' => ['name' => 'EN', 'locale' => 'en_US', 'lang' => 'en', 'url' => 'http://localhost/en/'],
+            'fr' => ['name' => 'FR', 'locale' => 'fr_FR', 'lang' => 'fr', 'url' => 'http://localhost/fr/'],
+        ]);
+
+        config(['statamic.protect.default' => 'password-scheme']);
+        config(['statamic.protect.schemes.password-scheme' => [
+            'driver' => 'password',
+            'allowed' => ['test'],
+        ]]);
+
+        Token::shouldReceive('generate')->andReturn('test-token');
+
+        $this
+            ->get('/')
+            ->assertRedirect('http://localhost/!/protect/password?token=test-token');
+
+        $this
+            ->get('/!/protect/password?token=test-token')
+            ->assertOk();
+
+        $this->assertEquals('en', app()->getLocale());
+    }
+
+    #[Test]
     public function custom_password_form_url_is_unprotected()
     {
         $this->viewShouldReturnRendered('password-entry', 'Password form template');

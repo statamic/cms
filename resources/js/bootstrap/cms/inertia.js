@@ -3,6 +3,7 @@ export {
     Link,
     router,
     useForm,
+    usePage,
     usePoll,
 } from '@inertiajs/vue3';
 

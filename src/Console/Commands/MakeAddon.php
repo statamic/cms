@@ -3,6 +3,7 @@
 namespace Statamic\Console\Commands;
 
 use Facades\Statamic\Console\Processes\Composer;
+use Statamic\Console\Composer\Json as ComposerJson;
 use Statamic\Console\EnhancesCommands;
 use Statamic\Console\Processes\Exceptions\ProcessException;
 use Statamic\Console\RunsInPlease;
@@ -226,7 +227,7 @@ class MakeAddon extends GeneratorCommand
      */
     protected function addRepositoryPath()
     {
-        $decoded = json_decode($this->files->get(base_path('composer.json')), true);
+        $decoded = json_decode($this->files->get(ComposerJson::path()), true);
 
         $decoded['repositories'][] = [
             'type' => 'path',
@@ -235,7 +236,7 @@ class MakeAddon extends GeneratorCommand
 
         $json = json_encode($decoded, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
 
-        $this->files->put(base_path('composer.json'), $json);
+        $this->files->put(ComposerJson::path(), $json);
 
         $this->components->info("Repository added to your app's composer.json.");
         $this->components->bulletList([

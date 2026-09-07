@@ -379,16 +379,21 @@ class Entries extends Relationship
 
     protected function authorizeItemData($id): bool
     {
-        return $this->authorizeViewable(Entry::find($id));
+        return $this->authorizeViewable($this->findEntry($id));
     }
 
     protected function toItemArray($id)
     {
-        if (! $entry = Entry::find($id)) {
+        if (! $entry = $this->findEntry($id)) {
             return $this->invalidItemArray($id);
         }
 
         return (new EntryResource($entry, $this))->resolve()['data'];
+    }
+
+    protected function findEntry($id)
+    {
+        return $this->itemCache[$id] ??= Entry::find($id);
     }
 
     protected function collect($value)
@@ -470,7 +475,7 @@ class Entries extends Relationship
     {
         return empty($collections = $this->config('collections'))
             ? Collection::handles()->all()
-            : $collections;
+            : Arr::wrap($collections);
     }
 
     public function toGqlType()
@@ -516,7 +521,7 @@ class Entries extends Relationship
 
     public function relationshipQueryBuilder()
     {
-        $collections = $this->config('collections');
+        $collections = $this->getConfiguredCollections();
 
         return Entry::query()
             ->when($collections, fn ($query) => $query->whereIn('collection', $collections));

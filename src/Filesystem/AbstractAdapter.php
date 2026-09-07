@@ -3,6 +3,7 @@
 namespace Statamic\Filesystem;
 
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use League\Flysystem\UnableToReadFile;
 use Statamic\Support\FileCollection;
 use Statamic\Support\Str;
 
@@ -12,7 +13,7 @@ abstract class AbstractAdapter implements Filesystem
     {
         try {
             return $this->filesystem->get($this->normalizePath($path)) ?: $fallback;
-        } catch (FileNotFoundException $e) {
+        } catch (FileNotFoundException|UnableToReadFile $e) {
             return $fallback;
         }
     }

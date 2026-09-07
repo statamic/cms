@@ -3,8 +3,10 @@
 namespace Tests\Fieldtypes;
 
 use Facades\Statamic\Fields\FieldtypeRepository;
+use Illuminate\Auth\GenericUser;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Dictionaries\BasicDictionary;
 use Statamic\Dictionaries\Countries;
 use Statamic\Dictionaries\Dictionary;
 use Statamic\Dictionaries\Item;
@@ -137,6 +139,55 @@ class DictionaryTest extends TestCase
             ->getJson($this->optionsUrl('restricted'))
             ->assertOk()
             ->assertJsonStructure(['data' => [['key', 'value']]]);
+    }
+
+    #[Test]
+    public function a_cp_user_can_request_options_when_the_cp_guard_is_not_the_default_guard()
+    {
+        config([
+            'statamic.users.guards.cp' => 'cp',
+            'auth.guards.cp' => config('auth.guards.web'),
+        ]);
+
+        RestrictedDictionary::register();
+
+        $this->actingAs(User::make()->makeSuper(), 'cp');
+        $this->app['auth']->shouldUse('web');
+
+        $this
+            ->getJson($this->optionsUrl('restricted'))
+            ->assertOk()
+            ->assertJsonStructure(['data' => [['key', 'value']]]);
+    }
+
+    #[Test]
+    public function a_cp_user_can_request_options_while_a_non_statamic_user_is_authenticated_on_the_default_guard()
+    {
+        config([
+            'statamic.users.guards.cp' => 'cp',
+            'auth.guards.cp' => config('auth.guards.web'),
+        ]);
+
+        RestrictedDictionary::register();
+
+        $this->actingAs(User::make()->makeSuper(), 'cp');
+        $this->actingAs(new GenericUser(['id' => 1]), 'web');
+
+        $this
+            ->getJson($this->optionsUrl('restricted'))
+            ->assertOk()
+            ->assertJsonStructure(['data' => [['key', 'value']]]);
+    }
+
+    #[Test]
+    public function a_non_statamic_user_cannot_request_options_from_a_dictionary_that_does_not_allow_public_access()
+    {
+        RestrictedDictionary::register();
+
+        $this
+            ->actingAs(new GenericUser(['id' => 1]))
+            ->getJson($this->optionsUrl('restricted'))
+            ->assertForbidden();
     }
 
     #[Test]
@@ -322,6 +373,44 @@ class DictionaryTest extends TestCase
     }
 
     #[Test]
+    public function it_includes_icons_in_preload_data_when_present()
+    {
+        IconDictionary::register();
+
+        $field = (new Field('test', ['type' => 'dictionary', 'dictionary' => 'icon']));
+        $field->setValue(['AL', 'AK']);
+
+        $fieldtype = FieldtypeRepository::find('dictionary');
+        $fieldtype->setField($field);
+
+        $preload = $fieldtype->preload();
+
+        $this->assertEquals([
+            ['value' => 'AL', 'label' => 'Alabama', 'icon' => 'map-pin', 'invalid' => false],
+            ['value' => 'AK', 'label' => 'Alaska', 'invalid' => false],
+        ], $preload['selectedOptions']);
+    }
+
+    #[Test]
+    public function the_options_api_returns_icons_when_present()
+    {
+        IconDictionary::register();
+
+        $config = base64_encode(json_encode(['type' => 'dictionary', 'dictionary' => 'icon']));
+
+        $this
+            ->actingAs(User::make()->makeSuper())
+            ->getJson(route('statamic.dictionary-fieldtype', 'icon').'?config='.$config)
+            ->assertOk()
+            ->assertExactJson([
+                'data' => [
+                    ['key' => 'AL', 'value' => 'Alabama', 'icon' => 'map-pin'],
+                    ['key' => 'AK', 'value' => 'Alaska'],
+                ],
+            ]);
+    }
+
+    #[Test]
     public function it_returns_extra_renderable_field_data()
     {
         $field = (new Field('test', ['type' => 'dictionary', 'dictionary' => 'countries']));
@@ -356,5 +445,21 @@ class RestrictedDictionary extends Dictionary
     public function get(string $key): ?Item
     {
         return new Item($key, $this->options()[$key], []);
+    }
+}
+
+class IconDictionary extends BasicDictionary
+{
+    protected static $handle = 'icon';
+
+    protected string $valueKey = 'abbr';
+    protected string $labelKey = 'name';
+
+    protected function getItems(): array
+    {
+        return [
+            ['name' => 'Alabama', 'abbr' => 'AL', 'icon' => 'map-pin'],
+            ['name' => 'Alaska', 'abbr' => 'AK'],
+        ];
     }
 }

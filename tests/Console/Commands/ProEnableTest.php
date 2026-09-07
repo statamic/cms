@@ -63,7 +63,7 @@ ENV;
 
         $this
             ->artisan('statamic:pro:enable')
-            ->expectsQuestion('If you have a Statamic license key, paste it now (leave blank to add later)', '');
+            ->expectsQuestion('If you have a Statamic license key, paste it now', '');
 
         $this->assertTrue(Statamic::pro());
         $this->assertEquals($this->defaultEditionsContents, $this->files->get($this->editionsPath));
@@ -87,7 +87,7 @@ ENV);
 
         $this
             ->artisan('statamic:pro:enable')
-            ->expectsQuestion('If you have a Statamic license key, paste it now (leave blank to add later)', '');
+            ->expectsQuestion('If you have a Statamic license key, paste it now', '');
 
         $this->assertTrue(Statamic::pro());
         $this->assertEquals($this->defaultEditionsContents, $this->files->get($this->editionsPath));
@@ -109,7 +109,7 @@ ENV);
 
         $this
             ->artisan('statamic:pro:enable')
-            ->expectsQuestion('If you have a Statamic license key, paste it now (leave blank to add later)', '');
+            ->expectsQuestion('If you have a Statamic license key, paste it now', '');
 
         $this->assertEquals(<<<'ENV'
 APP_NAME=Statamic
@@ -140,7 +140,7 @@ EDITIONS);
 
         $this
             ->artisan('statamic:pro:enable')
-            ->expectsQuestion('If you have a Statamic license key, paste it now (leave blank to add later)', '')
+            ->expectsQuestion('If you have a Statamic license key, paste it now', '')
             ->expectsOutput('Please re-run this command with the `--update-config` option.');
 
         // Though it should still update .env
@@ -186,7 +186,7 @@ EDITIONS);
 
         $this
             ->artisan('statamic:pro:enable', ['--update-config' => true])
-            ->expectsQuestion('If you have a Statamic license key, paste it now (leave blank to add later)', '');
+            ->expectsQuestion('If you have a Statamic license key, paste it now', '');
 
         $this->assertTrue(Statamic::pro());
         $this->assertEquals($this->defaultEditionsContents, $this->files->get($this->editionsPath));
@@ -219,8 +219,8 @@ EDITIONS);
 
         $this
             ->artisan('statamic:pro:enable', ['--update-config' => true])
-            ->expectsQuestion('If you have a Statamic license key, paste it now (leave blank to add later)', '')
-            ->expectsOutput(PHP_EOL.'For this setting to take effect, please modify your [config/statamic/editions.php] as follows:')
+            ->expectsQuestion('If you have a Statamic license key, paste it now', '')
+            ->expectsOutput('For this setting to take effect, please modify your [config/statamic/editions.php] as follows:')
             ->expectsOutput("'pro' => env('STATAMIC_PRO_ENABLED', false)");
 
         // Though it should still update .env
@@ -239,7 +239,7 @@ ENV, $this->files->get($this->envPath));
     {
         $this
             ->artisan('statamic:pro:enable')
-            ->expectsQuestion('If you have a Statamic license key, paste it now (leave blank to add later)', 'test-license-key');
+            ->expectsQuestion('If you have a Statamic license key, paste it now', 'test-license-key');
 
         $this->assertEquals(<<<'ENV'
 APP_NAME=Statamic
@@ -259,7 +259,7 @@ ENV);
 
         $this
             ->artisan('statamic:pro:enable')
-            ->expectsQuestion('If you have a Statamic license key, paste it now (leave blank to add later)', 'test-license-key');
+            ->expectsQuestion('If you have a Statamic license key, paste it now', 'test-license-key');
 
         $this->assertEquals(<<<'ENV'
 APP_NAME=Statamic
@@ -279,7 +279,7 @@ ENV);
 
         $this
             ->artisan('statamic:pro:enable')
-            ->expectsQuestion('If you have a Statamic license key, paste it now (leave blank to add later)', 'test-license-key');
+            ->expectsQuestion('If you have a Statamic license key, paste it now', 'test-license-key');
 
         $this->assertEquals(<<<'ENV'
 APP_NAME=Statamic
@@ -293,8 +293,8 @@ ENV, $this->files->get($this->envPath));
     {
         $this
             ->artisan('statamic:pro:enable')
-            ->expectsQuestion('If you have a Statamic license key, paste it now (leave blank to add later)', '')
-            ->expectsOutput('Add `STATAMIC_LICENSE_KEY=...` to your `.env` before or when your site goes live.');
+            ->expectsQuestion('If you have a Statamic license key, paste it now', '')
+            ->expectsOutputToContain('Add `STATAMIC_LICENSE_KEY=...` to your `.env` before or when your site goes live.');
     }
 
     #[Test]

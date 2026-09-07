@@ -7,6 +7,7 @@
             loading="lazy"
             :draggable="false"
             :class="{ 'h-8 w-8 object-cover': square }"
+            @error="asset.thumbnail = null"
         />
         <img
             v-else-if="asset.is_svg"

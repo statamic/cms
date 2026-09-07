@@ -50,6 +50,23 @@ class SiteTest extends TestCase
     }
 
     #[Test]
+    public function resolves_antlers_syntax_in_config_values()
+    {
+        $site = new Site('en', ['locale' => '{{ config:app.locale }}']);
+
+        $this->assertNotEmpty($site->locale());
+        $this->assertStringNotContainsString('{{', $site->locale());
+    }
+
+    #[Test]
+    public function sanitizes_php_tags_in_config_values()
+    {
+        $site = new Site('en', ['name' => '<?php echo "hacked"; ?>']);
+
+        $this->assertEquals('&lt;?php echo "hacked"; ?>', $site->name());
+    }
+
+    #[Test]
     public function gets_short_locale()
     {
         $this->assertEquals('en', (new Site('en', ['locale' => 'en']))->shortLocale());

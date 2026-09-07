@@ -75,7 +75,7 @@ function handleDelete() {
             ref="deleter"
             :resource-title="group.title"
             :route="group.deleteUrl"
-            redirect="/cp/user-groups"
+            :redirect="cp_url('user-groups')"
         />
     </div>
 </template>

@@ -71,6 +71,7 @@ import { NodeViewWrapper } from '@tiptap/vue-3';
 import Selector from '../../assets/Selector.vue';
 import { Input, Button, Stack } from '@ui';
 import { containerContextKey } from '@/components/ui/Publish/Container.vue';
+import { dedupeInFlight } from '@/util/dedupeInFlight.js';
 
 export default {
     mixins: [Asset],
@@ -184,13 +185,13 @@ export default {
                 return;
             }
 
-            this.$axios
-                .post(cp_url('assets-fieldtype'), {
-                    assets: [id],
-                })
-                .then((response) => {
-                    this.setAsset(response.data[0]);
-                });
+            const cacheKey = JSON.stringify([id]);
+
+            dedupeInFlight('assets-fieldtype', cacheKey, () =>
+                this.$axios.post(cp_url('assets-fieldtype'), { assets: [id] }),
+            ).then((response) => {
+                this.setAsset(response.data[0]);
+            });
         },
 
         setAsset(asset) {

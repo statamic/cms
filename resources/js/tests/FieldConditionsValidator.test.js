@@ -5,6 +5,7 @@ import { data_get } from '../bootstrap/globals';
 import FieldConditions from '@/components/FieldConditions';
 import PublishContainer from '@ui/Publish/Container.vue';
 import ShowField from '@/components/field-conditions/ShowField.js';
+import Validator from '@/components/field-conditions/Validator.js';
 
 // Even though there's no Store anymore, this variable is named Store so that all the
 // assertions don't need to be changed. This is now a reference to the PublishContainer component.
@@ -226,6 +227,8 @@ test('it can check if value is empty', () => {
         last_name: 'HasselHoff',
         user: { email: 'david@hasselhoff.com' },
         favorite_foods: ['lasagna'],
+        age: 43,
+        zero: 0,
         empty_string: '',
         empty_array: [],
         empty_object: {},
@@ -237,6 +240,9 @@ test('it can check if value is empty', () => {
     expect(showFieldIf({ last_name: 'not empty' })).toBe(true);
     expect(showFieldIf({ user: 'empty' })).toBe(false);
     expect(showFieldIf({ favorite_foods: 'empty' })).toBe(false);
+    expect(showFieldIf({ age: 'empty' })).toBe(false);
+    expect(showFieldIf({ age: 'not empty' })).toBe(true);
+    expect(showFieldIf({ zero: 'empty' })).toBe(false);
     expect(showFieldIf({ empty_string: 'empty' })).toBe(true);
     expect(showFieldIf({ empty_array: 'empty' })).toBe(true);
     expect(showFieldIf({ empty_object: 'empty' })).toBe(true);
@@ -260,6 +266,21 @@ test('it only shows when multiple conditions are met', () => {
 
     expect(showFieldIf({ first_name: 'is San', last_name: 'is Holo', age: '!= 20' })).toBe(true);
     expect(showFieldIf({ first_name: 'is San', last_name: 'is Holo', age: '> 40' })).toBe(false);
+});
+
+test('it supports multiple conditions targeting the same field', () => {
+    setValues({
+        status: 'published',
+        audience: 'members',
+        age: 22,
+    });
+
+    expect(Fields.showField({ if_any: { status: ['is archived', 'is published'], audience: 'is guests' } })).toBe(true);
+    expect(Fields.showField({ if_any: { status: ['is archived', 'is draft'], audience: 'is guests' } })).toBe(false);
+    expect(Fields.showField({ if: { age: ['> 18', '< 65'], audience: 'is members' } })).toBe(true);
+    expect(Fields.showField({ if: { age: ['> 18', '< 21'], audience: 'is members' } })).toBe(false);
+    expect(Fields.showField({ unless_any: { status: ['is archived', 'is draft'], audience: 'is guests' } })).toBe(true);
+    expect(Fields.showField({ hide_when_any: { status: ['is archived', 'is published'], audience: 'is guests' } })).toBe(false);
 });
 
 test('it shows or hides with parent key variants', () => {
@@ -1073,4 +1094,87 @@ test('it can use extra values in conditions', () => {
 
     expect(showFieldIf({ hello: 'world' })).toBe(true);
     expect(showFieldIf({ hello: 'there' })).toBe(false);
+});
+
+test('it memoizes conditions without losing the flags getConditions() sets', () => {
+    // getConditions() isn't a pure getter. It also sets passOnAny and showOnPass, and it
+    // gets called more than once per validator (passesNonRevealerConditions calls it twice).
+    // Repeat calls must leave the instance in the same state as the first one.
+    const cases = {
+        if: { passOnAny: false, showOnPass: true },
+        if_any: { passOnAny: true, showOnPass: true },
+        show_when: { passOnAny: false, showOnPass: true },
+        show_when_any: { passOnAny: true, showOnPass: true },
+        unless: { passOnAny: false, showOnPass: false },
+        unless_any: { passOnAny: true, showOnPass: false },
+        hide_when: { passOnAny: false, showOnPass: false },
+        hide_when_any: { passOnAny: true, showOnPass: false },
+    };
+
+    Object.entries(cases).forEach(([key, expected]) => {
+        const validator = new Validator({ handle: 'test', [key]: { first_name: 'is Rincess' } }, {}, {}, 'test', [], {});
+
+        const first = validator.getConditions();
+        expect({ passOnAny: validator.passOnAny, showOnPass: validator.showOnPass }).toEqual(expected);
+
+        const second = validator.getConditions();
+        expect({ passOnAny: validator.passOnAny, showOnPass: validator.showOnPass }).toEqual(expected);
+
+        const third = validator.getConditions();
+        expect({ passOnAny: validator.passOnAny, showOnPass: validator.showOnPass }).toEqual(expected);
+
+        expect(second).toEqual(first);
+        expect(third).toEqual(first);
+    });
+});
+
+test('it memoizes a field with no conditions without touching the flags', () => {
+    const validator = new Validator({ handle: 'test' }, {}, {}, 'test', [], {});
+
+    expect(validator.getConditions()).toBe(undefined);
+    expect(validator.getConditions()).toBe(undefined);
+    expect(validator.passOnAny).toBe(false);
+    expect(validator.showOnPass).toBe(true);
+});
+
+test('it gives the same answer whether conditions are evaluated once or twice', () => {
+    // passesConditions() reads passOnAny/showOnPass that getConditions() sets, so a
+    // validator that has already resolved its conditions must still evaluate the same.
+    setValues({ first_name: 'Rincess', last_name: 'Pleia' });
+
+    const configs = [
+        { unless: { first_name: 'is Rincess' } },
+        { if_any: { first_name: 'is Rincess', last_name: 'is Holo' } },
+        { unless_any: { first_name: 'is San', last_name: 'is Holo' } },
+        { hide_when: { first_name: 'is Rincess' } },
+    ];
+
+    configs.forEach((config) => {
+        const validator = new Validator({ handle: 'test', ...config }, Store.values, Store.values, 'test', [], {});
+
+        expect(validator.passesConditions()).toBe(validator.passesConditions());
+    });
+});
+
+test('it does not let evaluation mutate the memoized conditions', () => {
+    // The memoized array is now handed out to every caller, so nothing downstream is
+    // allowed to write to it. passesNonRevealerConditions() in particular filters it and
+    // re-evaluates, and 'empty' comparisons rewrite the condition they're given.
+    setValues({ first_name: 'Rincess', favorite_animals: [] });
+
+    const validator = new Validator(
+        { handle: 'test', if: { first_name: 'is Rincess', favorite_animals: 'is empty' } },
+        Store.values,
+        Store.values,
+        'test',
+        [],
+        {},
+    );
+
+    const before = JSON.parse(JSON.stringify(validator.getConditions()));
+
+    validator.passesConditions();
+    validator.passesNonRevealerConditions('');
+
+    expect(validator.getConditions()).toEqual(before);
 });

@@ -49,6 +49,22 @@ class NoCacheSessionTest extends TestCase
     }
 
     #[Test]
+    public function when_pushing_a_region_it_will_filter_out_private_variables()
+    {
+        $session = new Session('/');
+
+        $region = $session->pushRegion('', [
+            'foo' => 'bar',
+            '__env' => 'env value',
+            '__blaze' => fn () => 'a closure',
+        ], '');
+
+        $this->assertEquals([
+            'foo' => 'bar',
+        ], $region->context());
+    }
+
+    #[Test]
     public function it_gets_the_fragment_data()
     {
         // fragment data should be the context,

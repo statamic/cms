@@ -187,6 +187,12 @@ export default {
                     this.title = response.data.title;
 
                     this.$nextTick(() => this.$emit('saved', response));
+                })
+                .catch((e) => {
+                    if (!(e instanceof PipelineStopped)) {
+                        this.$toast.error(__('Something went wrong'));
+                        console.error(e);
+                    }
                 });
         },
 

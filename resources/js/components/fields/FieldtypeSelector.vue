@@ -28,7 +28,7 @@
                             <ui-description :text="group.description" />
                         </ui-panel-header>
                         <div class="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-1.5">
-                        <div v-for="fieldtype in group.fieldtypes" :key="fieldtype.handle">
+                        <div v-for="fieldtype in group.fieldtypes" :key="fieldtype.handle" class="contain-layout">
                             <button
                                 class="flex items-center gap-2 w-full px-3 py-2.5 group bg-white dark:bg-gray-850 shadow-ui-sm rounded-xl border border-gray-200 dark:border-x-0 dark:border-b-0 dark:border-gray-700 cursor-pointer"
                                 type="button"

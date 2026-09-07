@@ -115,7 +115,7 @@ export default {
             ref="deleter"
             :resource-title="taxonomyTitle"
             :route="deleteUrl"
-            redirect="/cp/taxonomies"
+            :redirect="cp_url('taxonomies')"
         />
 
         <Listing

@@ -125,6 +125,33 @@ class AugmentedEntryTest extends AugmentedTestCase
     }
 
     #[Test]
+    public function augmented_date_is_not_the_entrys_live_date_instance()
+    {
+        Blueprint::makeFromFields([
+            'date' => ['type' => 'date'],
+        ])->setHandle('test')->save();
+
+        tap(Collection::make('test')->dated(true))->save();
+
+        $entry = EntryFactory::id('entry-id')
+            ->collection('test')
+            ->slug('entry-slug')
+            ->create();
+
+        $entry->date('2018-01-03');
+
+        $augmented = new AugmentedEntry($entry);
+
+        // Mutating the augmented value (e.g. what a modifier like `setTimezone` would do
+        // when evaluated while rendering `title_format` during save) must not mutate the
+        // entry's own date, since that's read again afterwards to build the file path.
+        $augmented->get('date')->value()->setTimezone('Europe/Zurich')->addDay();
+
+        $this->assertEquals('2018-01-03 00:00:00', $entry->date()->format('Y-m-d H:i:s'));
+        $this->assertEquals('UTC', $entry->date()->timezone->getName());
+    }
+
+    #[Test]
     public function it_gets_the_mount_from_the_value_first_if_it_exists()
     {
         $mount = tap(Collection::make('a'))->save();

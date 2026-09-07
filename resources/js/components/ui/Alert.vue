@@ -8,7 +8,7 @@ const props = defineProps({
     text: { type: [String, Number, Boolean, null], default: null },
     /** The alert heading to display */
     heading: { type: [String, null], default: null },
-    /** Controls the appearance of the alert. <br><br> Options: `default`, `warning`, `error`, `success` */
+    /** Controls the appearance of the alert. <br><br> Options: `default`, `tip`, `warning`, `error`, `success` */
     variant: { type: String, default: 'default' },
     /** Icon name to display. [Browse available icons](/?path=/story/components-icon--all-icons) */
     icon: { type: String, default: null },
@@ -52,6 +52,11 @@ const alertClasses = computed(() => {
                     '[&_code]:bg-gray-200! dark:[&_code]:bg-gray-800!',
                     'dark:[&_svg]:text-gray-400',
                 ],
+                tip: [
+                    'bg-blue-50 dark:bg-blue-300/6 border-blue-200 dark:border-blue-400/25 text-blue-800 dark:text-blue-200',
+                    '[&_code]:bg-blue-200/50! dark:[&_code]:bg-blue-300/8!',
+                    'dark:[&_svg]:text-blue-300',
+                ],
                 warning: [
                     'bg-amber-50 dark:bg-amber-300/6 border-amber-200 dark:border-amber-400/25 text-amber-800 dark:text-amber-200',
                     '[&_code]:bg-amber-200/50! dark:[&_code]:bg-amber-300/8!',
@@ -76,6 +81,8 @@ const defaultIcon = computed(() => {
     if (props.icon) return props.icon;
 
     switch (props.variant) {
+        case 'tip':
+            return 'lightbulb-idea';
         case 'warning':
             return 'warning-diamond';
         case 'error':

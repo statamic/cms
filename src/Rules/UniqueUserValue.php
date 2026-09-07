@@ -4,6 +4,7 @@ namespace Statamic\Rules;
 
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Support\Facades\Lang;
 use Statamic\Facades\User;
 
 class UniqueUserValue implements ValidationRule
@@ -35,6 +36,10 @@ class UniqueUserValue implements ValidationRule
             return;
         }
 
-        $fail('statamic::validation.unique_user_value')->translate();
+        $key = Lang::has('validation.unique_user_value')
+            ? 'validation.unique_user_value'
+            : 'statamic::validation.unique_user_value';
+
+        $fail($key)->translate();
     }
 }

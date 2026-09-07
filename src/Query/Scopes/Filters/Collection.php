@@ -6,6 +6,7 @@ use Statamic\Exceptions\AuthorizationException;
 use Statamic\Facades;
 use Statamic\Facades\User;
 use Statamic\Query\Scopes\Filter;
+use Statamic\Support\Arr;
 
 use function Statamic\trans as __;
 
@@ -45,7 +46,7 @@ class Collection extends Filter
 
     public function visibleTo($key)
     {
-        return $key === 'entries-fieldtype' && count($this->context['collections']) > 1;
+        return $key === 'entries-fieldtype' && count(Arr::wrap($this->context['collections'] ?? [])) > 1;
     }
 
     protected function options()

@@ -5,12 +5,13 @@ namespace Tests\Fieldtypes;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\File;
 use Statamic\Facades\User;
+use Tests\DeletesDirectories;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class TemplatesTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk;
+    use DeletesDirectories, PreventSavingStacheItemsToDisk;
 
     private string $dir;
 
@@ -25,7 +26,7 @@ class TemplatesTest extends TestCase
 
     public function tearDown(): void
     {
-        app('files')->deleteDirectory($this->dir);
+        $this->deleteDirectory($this->dir);
 
         parent::tearDown();
     }

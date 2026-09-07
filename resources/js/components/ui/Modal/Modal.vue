@@ -32,6 +32,11 @@ const props = defineProps({
     dismissible: { type: Boolean, default: true },
 });
 
+const restAttrs = computed(() => {
+    const { class: _, ...rest } = attrs;
+    return rest;
+});
+
 const overlayClasses = cva({
     base: 'fixed inset-0 z-(--z-index-portal) bg-gray-800/20 dark:bg-gray-950/60',
     variants: {
@@ -185,7 +190,7 @@ provide('closeModal', close);
                 leave-from-class="opacity-100 scale-100"
                 leave-to-class="opacity-0 scale-95"
             >
-                <div ref="modalContent" v-if="visible" :class="[modalClasses, attrs.class]" data-ui-modal-content>
+                <div ref="modalContent" v-if="visible" v-bind="restAttrs" :class="[modalClasses, attrs.class]" data-ui-modal-content>
                     <div class="relative space-y-3 rounded-xl overflow-auto max-h-[60vh] border border-gray-400/60 bg-white p-4 shadow-[0_1px_16px_-2px_rgba(63,63,71,0.2)] dark:border-none dark:bg-gray-800 dark:shadow-[0_1px_16px_-2px_rgba(0,0,0,.5)] dark:inset-shadow-2xs dark:inset-shadow-white/10">
                         <div v-if="!hasModalTitleComponent && (title || icon)" data-ui-modal-title class="flex items-center gap-2">
                             <Icon :name="icon" v-if="icon" class="size-4" />

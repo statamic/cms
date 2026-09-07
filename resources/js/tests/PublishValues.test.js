@@ -563,6 +563,68 @@ test('it properly sets keys that javascript considers having numeric separators'
     expect(newValues).toEqual(expected);
 });
 
+test('it never mutates the values it was constructed from', () => {
+    let values = {
+        first_name: 'Han',
+        ship: {
+            name: 'Falcon',
+            junk: true,
+        },
+        bffs: JSON.stringify([{ name: 'Chewy', type: 'Wookie' }]),
+    };
+
+    let original = JSON.parse(JSON.stringify(values));
+    let instance = new Values(values, ['bffs']);
+
+    instance.get('bffs.0.name');
+    instance.set('ship.name', 'Junker');
+    instance.set('bffs.0.type', 'Beast');
+    instance.jsonDecode();
+    instance.forgetValue('first_name');
+    instance.jsonEncode();
+    instance.except(['ship.junk']);
+
+    expect(values).toEqual(original);
+});
+
+test('it does not mutate the instance it merges dotted keys from', () => {
+    let source = new Values({ id: 'abc', title: 'Falcon' });
+    let target = new Values({ id: 'xyz', title: 'X-Wing' });
+
+    target.mergeDottedKeys(['id'], source);
+
+    expect(target.all()).toEqual({ id: 'abc', title: 'X-Wing' });
+    expect(source.all()).toEqual({ id: 'abc', title: 'Falcon' });
+});
+
+test('it does not mutate values when checking for a missing one', () => {
+    let instance = new Values({ ship: { name: 'Falcon' } });
+
+    expect(instance.missingValue('ship.crew')).toBe(true);
+    expect(instance.missingValue('ship.name')).toBe(false);
+    expect(instance.all()).toEqual({ ship: { name: 'Falcon' } });
+});
+
+test('it decodes and encodes a single json value in place', () => {
+    let instance = new Values({ bffs: JSON.stringify([{ name: 'Chewy' }]) }, ['bffs']);
+
+    instance.jsonDecodeValue('bffs');
+    expect(instance.all()).toEqual({ bffs: [{ name: 'Chewy' }] });
+
+    instance.jsonEncodeValue('bffs');
+    expect(instance.all()).toEqual({ bffs: JSON.stringify([{ name: 'Chewy' }]) });
+});
+
+test('it leaves values alone when decoding, encoding or forgetting a missing key', () => {
+    let instance = new Values({ ship: { name: 'Falcon' } });
+
+    instance.jsonDecodeValue('ship.crew');
+    instance.jsonEncodeValue('ship.crew');
+    instance.forgetValue('ship.crew');
+
+    expect(instance.all()).toEqual({ ship: { name: 'Falcon' } });
+});
+
 test('it does not throw when rejecting a value nested under a null node', () => {
     let values = {
         first_name: 'Han',

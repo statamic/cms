@@ -82,7 +82,7 @@ const hasErrors = computed(() => {
 </script>
 
 <template>
-    <div :class="[rootClasses, $attrs.class]" :dir="dir" data-ui-input-group :data-ui-field-has-errors="hasErrors ? '' : null">
+    <div :class="[rootClasses, $attrs.class]" :dir="dir" :inert="$attrs.inert" data-ui-input-group :data-ui-field-has-errors="hasErrors ? '' : null">
         <div
             v-if="label || $slots.label || $slots.actions || (instructions && !instructionsBelow)"
             class="flex flex-col gap-1.5"

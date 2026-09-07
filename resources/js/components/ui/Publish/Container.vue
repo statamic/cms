@@ -151,6 +151,11 @@ watch(
 );
 
 watch(
+    () => props.extraValues,
+    (newExtraValues) => extraValues.value = newExtraValues,
+);
+
+watch(
     () => props.meta,
     (newMeta) => meta.value = newMeta,
 );
@@ -235,6 +240,8 @@ function syncField(path) {
 }
 
 function desyncField(path) {
+    if (!trackingDirtyState.value) return;
+
     addLocalizedField(path);
     dirty();
 }

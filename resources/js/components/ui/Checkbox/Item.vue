@@ -1,6 +1,6 @@
 <script setup>
-import { CheckboxIndicator, CheckboxRoot, useId } from 'reka-ui';
-import { computed, useAttrs } from 'vue';
+import { CheckboxIndicator, CheckboxRoot } from 'reka-ui';
+import { computed, useAttrs, useId, useSlots } from 'vue';
 import { cva } from 'cva';
 import { twMerge } from 'tailwind-merge';
 import { injectCheckboxContext } from './Group.vue';
@@ -8,8 +8,11 @@ import { injectCheckboxContext } from './Group.vue';
 defineOptions({ inheritAttrs: false });
 
 const attrs = useAttrs();
+const slots = useSlots();
 
 const props = defineProps({
+    /** Optional ID for the checkbox input */
+    id: { type: String, default: () => useId() },
     /** Controls the vertical alignment of the checkbox with its label. Options: `start`, `center` */
     align: { type: String, default: 'start', validator: (value) => ['start', 'center'].includes(value) },
     /** Description text to display below the label */
@@ -36,8 +39,6 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue', 'keydown']);
 
 const { appearance } = injectCheckboxContext() ?? { appearance: computed(() => 'default') };
-
-const id = useId();
 
 const handleKeydown = (event) => {
     emit('keydown', event);
@@ -97,10 +98,11 @@ const conditionalProps = computed(() => {
 
     // Only add aria-describedby if description exists AND it's not a solo checkbox
     if (props.description && !props.solo) {
-        props_obj['aria-describedby'] = `${id}-description`;
+        props_obj['aria-describedby'] = `${props.id}-description`;
     }
 
-    if (props.solo && (props.label || props.value)) {
+    // Providing the name ourselves stops Reka from deriving it from the label's innerText, which forces a layout.
+    if ((props.solo || !slots.default) && (props.label || props.value)) {
         props_obj['aria-label'] = props.label || props.value;
     }
 
@@ -112,7 +114,7 @@ const conditionalProps = computed(() => {
     <div :class="containerClasses" data-ui-checkbox-item>
         <CheckboxRoot
             :disabled="readOnly || disabled"
-            :id
+            :id="props.id"
             :name="name"
             :value="value"
             v-bind="conditionalProps"
@@ -132,10 +134,10 @@ const conditionalProps = computed(() => {
             </span>
         </CheckboxRoot>
         <div class="flex flex-col" v-if="!solo">
-            <label class="text-sm font-normal antialiased cursor-pointer dark:text-gray-200 before:absolute before:inset-0 before:content-['']" :for="id">
+            <label class="text-sm font-normal antialiased cursor-pointer dark:text-gray-200 before:absolute before:inset-0 before:content-['']" :for="props.id">
                 <slot>{{ label || value }}</slot>
             </label>
-            <p v-if="description" :id="`${id}-description`" class="mt-0.5 block text-xs leading-snug text-gray-500 dark:text-gray-200">{{ description }}</p>
+            <p v-if="description" :id="`${props.id}-description`" class="mt-0.5 block text-xs leading-snug text-gray-500 dark:text-gray-200">{{ description }}</p>
         </div>
     </div>
 </template>

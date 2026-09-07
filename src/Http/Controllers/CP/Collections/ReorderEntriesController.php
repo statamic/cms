@@ -5,6 +5,8 @@ namespace Statamic\Http\Controllers\CP\Collections;
 use Illuminate\Http\Request;
 use Statamic\Http\Controllers\CP\CpController;
 
+use function Statamic\trans as __;
+
 class ReorderEntriesController extends CpController
 {
     public function __invoke(Request $request, $collection)
@@ -20,29 +22,41 @@ class ReorderEntriesController extends CpController
 
         $tree = $collection->structure()->in($request->site);
 
-        $contents = collect($tree->tree())->keyBy('entry');
+        $branches = collect($tree->tree())->keyBy('entry');
 
-        $reorderPayload = $request->ids;
+        // A descending collection lists the tree in reverse. Work in the order the
+        // listing was in, then flip it back before saving.
+        $descending = $collection->sortDirection() === 'desc';
 
-        if ($collection->sortDirection() === 'desc') {
-            $reorderPayload = array_reverse($reorderPayload);
+        $ids = $descending
+            ? $branches->keys()->reverse()->values()
+            : $branches->keys();
+
+        $offset = ($request->page - 1) * $request->perPage;
+
+        $submitted = collect($request->ids)->map(fn ($id) => (string) $id);
+        $current = $ids->slice($offset, $request->perPage)->map(fn ($id) => (string) $id);
+
+        // If the submitted ids aren't a rearrangement of the page being reordered, the
+        // listing was out of date. Continuing would duplicate and drop entries.
+        if ($submitted->sort()->values()->all() !== $current->sort()->values()->all()) {
+            abort(409, __('statamic::messages.collection_entries_reorder_out_of_date'));
         }
 
-        $reorderedEntries = clone $contents;
+        $reordered = $ids->values()->all();
 
-        $contents
-            ->keys()
-            ->forPage($request->page, $request->perPage)
-            ->zip($reorderPayload)
-            ->each(function ($operation) use ($contents, &$reorderedEntries) {
-                $reorderedEntries->put(
-                    $operation[0],
-                    $contents->get($operation[1])
-                );
-            });
+        foreach ($request->ids as $index => $id) {
+            $reordered[$offset + $index] = $id;
+        }
+
+        $reordered = collect($reordered);
+
+        if ($descending) {
+            $reordered = $reordered->reverse();
+        }
 
         $tree
-            ->tree($reorderedEntries->values()->all())
+            ->tree($reordered->map(fn ($id) => $branches->get($id))->values()->all())
             ->save();
     }
 }
