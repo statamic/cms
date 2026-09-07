@@ -5,7 +5,6 @@ import { Button, ConfirmationModal, Description } from '@ui';
 import { SortableList } from '@/components/sortable/Sortable.js';
 import { deepClone } from '@/util/clone.js';
 import { preferences } from '@api';
-import LogicEmptyState from '@/components/forms/logic/LogicEmptyState.vue';
 import ConnectionRow from './ConnectionRow.vue';
 import { __ } from '@/bootstrap/globals';
 
@@ -28,7 +27,6 @@ const props = withDefaults(defineProps<{
     errors: Record<string, string[]>;
     defaults: Record<string, unknown>;
     addLabel: string;
-    emptyHeading: string;
     emptyDescription?: string;
     deleteHeading: string;
     deleteDescription: string;
@@ -37,7 +35,6 @@ const props = withDefaults(defineProps<{
     errors: () => ({}),
     defaults: () => ({}),
     addLabel: __('Add Row'),
-    emptyHeading: __('No rows yet'),
     deleteHeading: __('Delete Row'),
     deleteDescription: __('Are you sure you want to delete this row?'),
 });
@@ -151,7 +148,6 @@ watch(
     </div>
 
     <template v-else>
-
         <SortableList
             vertical
             constrain-dimensions

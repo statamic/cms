@@ -28,7 +28,6 @@ const showExamplePayload = ref<boolean>(props.modelValue.length === 0);
         :errors
         :defaults
         :add-label="__('Add Webhook')"
-        :empty-heading="__('No webhooks yet')"
         :empty-description="__('statamic::messages.webhook_connection_empty_description')"
         :delete-heading="__('Delete Webhook')"
         :delete-description="__('statamic::messages.webhook_connection_delete_confirmation')"
