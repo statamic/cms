@@ -13,108 +13,81 @@ const props = defineProps({
 
 const suggestableFields = usePage().props.suggestableFields ?? [];
 
-const getFieldConfig = (handle) => suggestableFields.find((field) => field.handle === handle);
-const getFieldDisplay = (handle) => __(getFieldConfig(handle)?.config?.display) || handle;
-const getIconClass = (category) => {
-    const color = categories[category]?.color || 'gray';
+const findField = (handle) => suggestableFields.find((field) => field.handle === handle);
+const fieldDisplay = (handle) => __(findField(handle)?.config?.display) || handle;
+
+const fieldIconClass = (field) => {
+    const color = categories[field?.category]?.color || 'gray';
+
     return categoryColorClasses[color]?.icon || 'text-gray-600 dark:text-gray-400';
 };
 
-const filteredConditions = computed(() => (props.conditions ?? []).filter((condition) => condition.field));
+const conditions = computed(() => props.conditions.filter((condition) => condition.field));
 
-const firstFieldConfig = computed(() => {
-    const firstCondition = filteredConditions.value[0];
-    if (!firstCondition?.field) return null;
+const firstField = computed(() => {
+    const handle = conditions.value[0]?.field;
 
-    const field = getFieldConfig(firstCondition.field);
+    if (!handle) return null;
+
+    const field = findField(handle);
 
     return {
-        handle: firstCondition.field,
-        display: __(field?.config?.display) || firstCondition.field,
+        handle,
+        display: fieldDisplay(handle),
         icon: field?.icon || 'generic-field',
-        iconClass: getIconClass(field?.category),
+        iconClass: fieldIconClass(field),
     };
 });
 
-const previewParts = computed(() => {
-    if (filteredConditions.value.length === 0) return null;
+const hasValue = (condition) => condition.value !== null && condition.value !== undefined && condition.value !== '';
+const displayValue = (condition) => (Array.isArray(condition.value) ? condition.value.join(', ') : String(condition.value));
 
-    const parts = [];
+const previewParts = computed(() =>
+    conditions.value.flatMap((condition, index) => {
+        const parts = [];
 
-    filteredConditions.value.forEach((condition, index) => {
-        if (index === 0) {
-            parts.push({ type: 'operator', text: operatorLabel(condition.operator) });
-
-            if (condition.value !== null && condition.value !== undefined && condition.value !== '') {
-                const displayValue = Array.isArray(condition.value)
-                    ? condition.value.join(', ')
-                    : String(condition.value);
-                parts.push({ type: 'value', text: displayValue });
-            }
-
-            return;
+        if (index > 0) {
+            parts.push({ type: 'join', text: condition.join === 'or' ? __('or') : __('and') });
+            parts.push({ type: 'field', text: fieldDisplay(condition.field) });
         }
 
-        parts.push({ type: 'join', text: condition.join === 'or' ? __('or') : __('and') });
-        parts.push({ type: 'field-plain', text: getFieldDisplay(condition.field) });
         parts.push({ type: 'operator', text: operatorLabel(condition.operator) });
 
-        if (condition.value !== null && condition.value !== undefined && condition.value !== '') {
-            const displayValue = Array.isArray(condition.value)
-                ? condition.value.join(', ')
-                : String(condition.value);
-            parts.push({ type: 'value', text: displayValue });
+        if (hasValue(condition)) {
+            parts.push({ type: 'value', text: displayValue(condition) });
         }
-    });
 
-    return parts.length ? parts : null;
-});
-
-const collapsedSummary = computed(() => {
-    if (filteredConditions.value.length === 0) {
-        return props.fallback || __('Always');
-    }
-
-    if (!previewParts.value) return __('Configure conditions');
-
-    return null;
-});
+        return parts;
+    }),
+);
 </script>
 
 <template>
-    <Badge v-if="filteredConditions.length" pill size="sm" color="white" class="font-medium text-gray-800 dark:text-gray-200">
+    <Badge v-if="conditions.length" pill size="sm" color="white" class="font-medium text-gray-800 dark:text-gray-200">
         {{ __('If') }}
     </Badge>
-    <Badge v-if="firstFieldConfig" pill color="white" class="ps-1.5 py-1 text-gray-950 gap-1">
-        <FieldNumber :field-key="firstFieldConfig.handle" class="me-0.5" />
+    <Badge v-if="firstField" pill color="white" class="ps-1.5 py-1 text-gray-950 gap-1">
+        <FieldNumber :field-key="firstField.handle" class="me-0.5" />
         <Icon
-            :name="firstFieldConfig.icon"
+            :name="firstField.icon"
             class="size-3.5 me-1 rounded-sm opacity-100!"
-            :class="firstFieldConfig.iconClass"
+            :class="firstField.iconClass"
             aria-hidden="true"
         />
-        <span class="st-text-trim-cap">{{ firstFieldConfig.display }}</span>
+        <span class="st-text-trim-cap">{{ firstField.display }}</span>
     </Badge>
     <Subheading class="overflow-hidden text-ellipsis whitespace-nowrap text-xs flex items-center gap-1">
-        <template v-if="collapsedSummary">
-            <span class="lowercase">{{ collapsedSummary }}</span>
-        </template>
-        <template v-else-if="previewParts">
+        <span v-if="conditions.length === 0" class="lowercase">{{ fallback || __('Always') }}</span>
+        <template v-else>
             <template v-for="(part, index) in previewParts" :key="index">
                 <Badge
-                    v-if="part.type === 'operator'"
+                    v-if="part.type === 'operator' || part.type === 'join'"
                     class="inline-block px-1 py-1.5 font-medium st-text-trim-ex-alphabetic lowercase bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300"
                 >
                     {{ part.text }}
                 </Badge>
                 <span v-else-if="part.type === 'value'" class="font-mono text-gray-900 dark:text-gray-100">{{ part.text }}</span>
-                <Badge
-                    v-else-if="part.type === 'join'"
-                    class="inline-block px-1 py-1.5 font-medium st-text-trim-ex-alphabetic lowercase bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300"
-                >
-                    {{ part.text }}
-                </Badge>
-                <span v-else-if="part.type === 'field-plain'" class="text-gray-700 dark:text-gray-300">{{ part.text }}</span>
+                <span v-else class="text-gray-700 dark:text-gray-300">{{ part.text }}</span>
             </template>
         </template>
     </Subheading>
