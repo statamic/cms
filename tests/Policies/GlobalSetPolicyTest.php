@@ -5,6 +5,7 @@ namespace Tests\Policies;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Globals\GlobalSet;
 use Statamic\Facades\GlobalSet as GlobalSets;
+use Statamic\Facades\Site;
 
 class GlobalSetPolicyTest extends PolicyTestCase
 {
@@ -47,6 +48,24 @@ class GlobalSetPolicyTest extends PolicyTestCase
 
         $this->assertTrue($userWithEnPermission->can('index', GlobalSet::class));
         $this->assertFalse($userWithDePermission->can('index', GlobalSet::class));
+    }
+
+    #[Test]
+    public function index_is_allowed_for_a_site_if_any_set_is_viewable_in_that_site()
+    {
+        $this->withSites(['en', 'fr']);
+
+        $user = $this->userWithPermissions([
+            'edit test globals',
+            'access en site',
+            'access fr site',
+        ]);
+
+        $global = GlobalSets::make('test')->sites(['en' => null])->save();
+        $global->in('en')->save();
+
+        $this->assertTrue($user->can('index', [GlobalSet::class, Site::get('en')]));
+        $this->assertFalse($user->can('index', [GlobalSet::class, Site::get('fr')]));
     }
 
     #[Test]
