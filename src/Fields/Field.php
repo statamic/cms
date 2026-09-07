@@ -264,6 +264,15 @@ class Field implements Arrayable
         return (bool) $this->get('filterable');
     }
 
+    public function isRevisable()
+    {
+        if ($this->visibility() === 'computed') {
+            return true;
+        }
+
+        return (bool) $this->get('revisable', true);
+    }
+
     public function shouldBeDuplicated()
     {
         if (is_null($this->get('duplicate'))) {
@@ -286,6 +295,7 @@ class Field implements Arrayable
             'read_only' => $this->visibility() === 'read_only', // Deprecated: Addon fieldtypes should now reference new `visibility` state.
             'always_save' => $this->alwaysSave(),
             'reserve_space_when_hidden' => $this->reserveSpaceWhenHidden(),
+            'revisable' => $this->isRevisable(),
         ]);
 
         unset($array['validate']);
@@ -622,6 +632,17 @@ class Field implements Arrayable
                 'default' => true,
                 'width' => 50,
 
+            ],
+            'revisable' => [
+                'display' => __('Revisable'),
+                'instructions' => __('statamic::messages.fields_revisable_instructions'),
+                'type' => 'toggle',
+                'validate' => 'boolean',
+                'default' => true,
+                'unless' => [
+                    'visibility' => 'equals computed',
+                ],
+                'width' => 50,
             ],
         ])->map(fn ($field, $handle) => compact('handle', 'field'))->values()->all();
 

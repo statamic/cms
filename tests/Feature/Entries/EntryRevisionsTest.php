@@ -22,6 +22,7 @@ class EntryRevisionsTest extends TestCase
     use PreventSavingStacheItemsToDisk;
 
     private $dir;
+
     private $collection;
 
     public function setUp(): void
@@ -43,8 +44,17 @@ class EntryRevisionsTest extends TestCase
     {
         $now = Carbon::parse('2017-02-03');
         Carbon::setTestNow($now);
-        $this->setTestBlueprint('test', ['foo' => ['type' => 'text']]);
-        $this->setTestRoles(['test' => ['access cp', 'view blog entries', 'publish blog entries']]);
+        $this->setTestBlueprint(
+            'test',
+            [
+                'foo' => ['type' => 'text'],
+                'bar' => [
+                    'type' => 'text',
+                    'revisable' => false,
+                ],
+            ]
+        );
+        $this->setTestRoles(['test' => ['access cp', 'view blog entries']]);
         $user = User::make()->id('user-1')->assignRole('test')->save();
 
         $entry = EntryFactory::id('1')
@@ -56,6 +66,7 @@ class EntryRevisionsTest extends TestCase
                 'blueprint' => 'test',
                 'title' => 'Original title',
                 'foo' => 'bar',
+                'bar' => 'foo',
             ])->create();
 
         tap($entry->makeRevision(), function ($copy) {
@@ -83,6 +94,7 @@ class EntryRevisionsTest extends TestCase
             ->assertJsonPath('0.revisions.0.message', 'Revision one')
             ->assertJsonPath('0.revisions.0.attributes.data.title', 'Original title')
             ->assertJsonPath('0.revisions.0.attributes.item_url', 'http://localhost/cp/collections/blog/entries/1/revisions/'.Carbon::parse('2017-02-01')->timestamp)
+            ->assertJsonPath('0.revisions.0.attributes.data.bar', null)
 
             ->assertJsonPath('1.revisions.0.action', 'working')
             ->assertJsonPath('1.revisions.0.message', null)
@@ -203,7 +215,16 @@ class EntryRevisionsTest extends TestCase
     {
         $now = Carbon::parse('2017-02-03');
         Carbon::setTestNow($now);
-        $this->setTestBlueprint('test', ['foo' => ['type' => 'text']]);
+        $this->setTestBlueprint(
+            'test',
+            [
+                'foo' => ['type' => 'text'],
+                'bar' => [
+                    'type' => 'text',
+                    'revisable' => false,
+                ],
+            ]
+        );
         $this->setTestRoles(['test' => ['access cp', 'publish blog entries']]);
         $user = User::make()->id('user-1')->assignRole('test')->save();
 
@@ -216,6 +237,7 @@ class EntryRevisionsTest extends TestCase
                 'blueprint' => 'test',
                 'title' => 'Title',
                 'foo' => 'bar',
+                'bar' => 'foo',
             ])->create();
 
         tap($entry->makeWorkingCopy(), function ($copy) {
@@ -238,6 +260,7 @@ class EntryRevisionsTest extends TestCase
             'blueprint' => 'test',
             'title' => 'Title',
             'foo' => 'foo modified in working copy',
+            'bar' => 'foo',
             'updated_at' => $now->timestamp,
             'updated_by' => $user->id(),
         ], $entry->data()->all());
@@ -267,7 +290,16 @@ class EntryRevisionsTest extends TestCase
     {
         $now = Carbon::parse('2017-02-03');
         Carbon::setTestNow($now);
-        $this->setTestBlueprint('test', ['foo' => ['type' => 'text']]);
+        $this->setTestBlueprint(
+            'test',
+            [
+                'foo' => ['type' => 'text'],
+                'bar' => [
+                    'type' => 'text',
+                    'revisable' => false,
+                ],
+            ]
+        );
         $this->setTestRoles(['test' => ['access cp', 'publish blog entries']]);
         $user = User::make()->id('user-1')->assignRole('test')->save();
 
@@ -280,6 +312,7 @@ class EntryRevisionsTest extends TestCase
                 'blueprint' => 'test',
                 'title' => 'Title',
                 'foo' => 'bar',
+                'bar' => 'foo',
             ])->create();
 
         $this->assertTrue($entry->published());
@@ -295,6 +328,7 @@ class EntryRevisionsTest extends TestCase
             'blueprint' => 'test',
             'title' => 'Title',
             'foo' => 'bar',
+            'bar' => 'foo',
             'updated_at' => $now->timestamp,
             'updated_by' => $user->id(),
         ], $entry->data()->all());
@@ -350,7 +384,16 @@ class EntryRevisionsTest extends TestCase
     #[Test]
     public function it_creates_a_revision()
     {
-        $this->setTestBlueprint('test', ['foo' => ['type' => 'text']]);
+        $this->setTestBlueprint(
+            'test',
+            [
+                'foo' => ['type' => 'text'],
+                'bar' => [
+                    'type' => 'text',
+                    'revisable' => false,
+                ],
+            ]
+        );
         $this->setTestRoles(['test' => ['access cp', 'edit blog entries']]);
         $user = User::make()->id('user-1')->assignRole('test')->save();
 
@@ -363,6 +406,7 @@ class EntryRevisionsTest extends TestCase
                 'blueprint' => 'test',
                 'title' => 'Title',
                 'foo' => 'bar',
+                'bar' => 'foo',
             ])->create();
 
         tap($entry->makeWorkingCopy(), function ($copy) {
@@ -384,6 +428,7 @@ class EntryRevisionsTest extends TestCase
             'blueprint' => 'test',
             'title' => 'Title',
             'foo' => 'bar',
+            'bar' => 'foo',
         ], $entry->data()->all());
         $this->assertFalse($entry->published());
         $this->assertCount(1, $entry->revisions());
@@ -533,6 +578,48 @@ class EntryRevisionsTest extends TestCase
         $this->assertEquals('existing foo', $entry->get('foo'));
         $this->assertFalse($entry->published()); // everything except publish state gets restored
         $this->assertCount(1, $entry->revisions());
+    }
+
+    #[Test]
+    public function it_keeps_non_revisable_fields_when_restoring_an_unpublished_entrys_contents()
+    {
+        $this->setTestBlueprint('test', [
+            'foo' => ['type' => 'text'],
+            'bar' => ['type' => 'text', 'revisable' => false],
+        ]);
+        $this->setTestRoles(['test' => ['access cp', 'edit blog entries']]);
+        $user = User::make()->id('user-1')->assignRole('test')->save();
+
+        tap((new Revision)
+            ->key('collections/blog/en/123')
+            ->date(Carbon::createFromTimestamp('1553546421', config('app.timezone')))
+            ->attributes([
+                'published' => true,
+                'slug' => 'existing-slug',
+                'data' => ['foo' => 'existing foo'],
+            ]))->save();
+
+        $entry = EntryFactory::id('123')
+            ->slug('test')
+            ->collection('blog')
+            ->published(false)
+            ->data([
+                'blueprint' => 'test',
+                'foo' => 'bar',
+                'bar' => 'not tracked by revisions',
+                'stale' => 'not in the revision',
+            ])->create();
+
+        $this
+            ->actingAs($user)
+            ->restore($entry, ['revision' => '1553546421'])
+            ->assertOk()
+            ->assertSessionHas('success');
+
+        $entry = Entry::find($entry->id());
+        $this->assertEquals('existing foo', $entry->get('foo'));
+        $this->assertEquals('not tracked by revisions', $entry->get('bar'));
+        $this->assertFalse($entry->has('stale'));
     }
 
     private function publish($entry, $payload)
