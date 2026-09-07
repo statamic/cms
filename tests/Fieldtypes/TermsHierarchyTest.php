@@ -121,11 +121,10 @@ class TermsHierarchyTest extends TestCase
     }
 
     #[Test]
-    public function item_data_includes_depth_search_titles_and_path_for_hierarchical_terms()
+    public function item_data_includes_search_titles_and_path_for_hierarchical_terms()
     {
         $item = $this->fieldtype(['taxonomies' => ['categories']])->getItemData(['cat'])->first();
 
-        $this->assertEquals(2, $item['depth']);
         $this->assertEquals('Animals > Cat', $item['search_titles']);
         $this->assertEquals(['Animals'], $item['path']);
         $this->assertArrayNotHasKey('taxonomy_title', $item);
@@ -133,17 +132,20 @@ class TermsHierarchyTest extends TestCase
     }
 
     #[Test]
+    public function item_data_has_no_depth_since_selected_items_are_never_a_tree_ordered_list()
+    {
+        $item = $this->fieldtype(['taxonomies' => ['categories']])->getItemData(['cat'])->first();
+
+        $this->assertArrayNotHasKey('depth', $item);
+    }
+
+    #[Test]
     public function select_options_include_depth_search_titles_and_path_even_when_mode_is_default()
     {
-        $fieldtype = $this->fieldtype(['taxonomies' => ['categories']]);
-        $request = new Request(['paginate' => false]);
-        $items = $fieldtype->getIndexItems($request);
-        $resolved = json_decode(
-            $fieldtype->getResourceCollection($request, $items)->toResponse($request)->getContent(),
-            true
-        )['data'];
-
-        $byId = collect($resolved)->keyBy(fn ($term) => $term['id']);
+        $byId = $this->resolvedOptions(
+            $this->fieldtype(['taxonomies' => ['categories']]),
+            new Request(['paginate' => false])
+        );
 
         $this->assertEquals(1, $byId['categories::animals']['depth']);
         $this->assertEquals('Animals', $byId['categories::animals']['search_titles']);
@@ -157,20 +159,54 @@ class TermsHierarchyTest extends TestCase
     }
 
     #[Test]
+    public function searched_options_get_a_path_instead_of_a_depth()
+    {
+        $byId = $this->resolvedOptions(
+            $this->fieldtype(['taxonomies' => ['categories']]),
+            new Request(['paginate' => false, 'search' => 'cat'])
+        );
+
+        $this->assertArrayNotHasKey('depth', $byId['categories::cat']);
+        $this->assertEquals(['Animals'], $byId['categories::cat']['path']);
+        $this->assertEquals('Animals > Cat', $byId['categories::cat']['search_titles']);
+    }
+
+    #[Test]
+    public function explicitly_sorted_options_get_a_path_instead_of_a_depth()
+    {
+        $byId = $this->resolvedOptions(
+            $this->fieldtype(['taxonomies' => ['categories']]),
+            new Request(['paginate' => false, 'sort' => 'title'])
+        );
+
+        $this->assertArrayNotHasKey('depth', $byId['categories::cat']);
+        $this->assertEquals(['Animals'], $byId['categories::cat']['path']);
+        $this->assertEquals('Animals > Cat', $byId['categories::cat']['search_titles']);
+    }
+
+    #[Test]
+    public function paginated_options_get_a_path_instead_of_a_depth()
+    {
+        $byId = $this->resolvedOptions(
+            $this->fieldtype(['taxonomies' => ['categories']]),
+            new Request(['paginate' => true])
+        );
+
+        $this->assertArrayNotHasKey('depth', $byId['categories::cat']);
+        $this->assertEquals(['Animals'], $byId['categories::cat']['path']);
+        $this->assertEquals('Animals > Cat', $byId['categories::cat']['search_titles']);
+    }
+
+    #[Test]
     public function select_options_stay_nested_when_multiple_taxonomies_are_configured()
     {
         tap(Facades\Taxonomy::make('tags'))->save();
         tap(Term::make('featured')->taxonomy('tags')->data(['title' => 'Featured']))->save();
 
-        $fieldtype = $this->fieldtype(['taxonomies' => ['categories', 'tags'], 'mode' => 'select']);
-        $request = new Request(['paginate' => false]);
-        $items = $fieldtype->getIndexItems($request);
-        $resolved = json_decode(
-            $fieldtype->getResourceCollection($request, $items)->toResponse($request)->getContent(),
-            true
-        )['data'];
-
-        $byId = collect($resolved)->keyBy(fn ($term) => $term['id']);
+        $byId = $this->resolvedOptions(
+            $this->fieldtype(['taxonomies' => ['categories', 'tags'], 'mode' => 'select']),
+            new Request(['paginate' => false])
+        );
 
         $this->assertEquals(2, $byId['categories::cat']['depth']);
         $this->assertEquals('Animals > Cat', $byId['categories::cat']['search_titles']);
@@ -183,13 +219,13 @@ class TermsHierarchyTest extends TestCase
     }
 
     #[Test]
-    public function item_data_includes_depth_when_multiple_taxonomies_are_configured()
+    public function item_data_includes_the_path_when_multiple_taxonomies_are_configured()
     {
         tap(Facades\Taxonomy::make('tags'))->save();
 
         $item = $this->fieldtype(['taxonomies' => ['categories', 'tags']])->getItemData(['categories::cat'])->first();
 
-        $this->assertEquals(2, $item['depth']);
+        $this->assertArrayNotHasKey('depth', $item);
         $this->assertEquals('Animals > Cat', $item['search_titles']);
         $this->assertEquals(['Animals'], $item['path']);
         $this->assertArrayNotHasKey('taxonomy_title', $item);
@@ -346,6 +382,22 @@ class TermsHierarchyTest extends TestCase
 
         $this->assertEquals(['ages-21'], $processed);
         $this->assertEquals('Ages > 21', Term::find('tags::ages-21')->title());
+    }
+
+    private function resolvedOptions($fieldtype, $request)
+    {
+        // A resource resolves its request out of the container rather than the one handed to
+        // toResponse(), which in a real CP request is the same one the items were queried with.
+        $this->app->instance('request', $request);
+
+        $items = $fieldtype->getIndexItems($request);
+
+        $resolved = json_decode(
+            $fieldtype->getResourceCollection($request, $items)->toResponse($request)->getContent(),
+            true
+        )['data'];
+
+        return collect($resolved)->keyBy(fn ($term) => $term['id']);
     }
 
     public function fieldtype($config = [], $parent = null)

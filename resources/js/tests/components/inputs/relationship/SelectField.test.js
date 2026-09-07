@@ -1,4 +1,4 @@
-import { mount } from '@vue/test-utils';
+import { flushPromises, mount } from '@vue/test-utils';
 import { describe, expect, test, vi } from 'vitest';
 
 vi.mock('@inertiajs/vue3', () => ({
@@ -17,7 +17,19 @@ const stubs = {
     StatusIndicator: true,
 };
 
-function mountSelectField({ items = [], config = {}, extra = {} } = {}) {
+// Renders the option slot the real combobox would, so the option row can be asserted on.
+const optionRenderingStubs = {
+    Combobox: {
+        name: 'Combobox',
+        props: ['options'],
+        template: '<div><div v-for="option in options" class="option"><slot name="option" v-bind="option" /></div></div>',
+    },
+    StatusIndicator: true,
+    'ui-icon': { props: ['name'], template: '<i :data-icon="name"></i>' },
+    'ui-badge': { props: ['text'], template: '<span class="badge">{{ text }}</span>' },
+};
+
+function mountSelectField({ items = [], config = {}, extra = {}, stubs: overrides = stubs, options = [] } = {}) {
     return mount(SelectField, {
         props: {
             items,
@@ -27,11 +39,18 @@ function mountSelectField({ items = [], config = {}, extra = {} } = {}) {
         },
         global: {
             mocks: {
-                $axios: { get: () => Promise.resolve({ data: { data: [] } }) },
+                $axios: { get: () => Promise.resolve({ data: { data: options } }) },
             },
-            stubs,
+            stubs: overrides,
         },
     });
+}
+
+async function mountOptions(options) {
+    const wrapper = mountSelectField({ stubs: optionRenderingStubs, options });
+    await flushPromises();
+
+    return wrapper;
 }
 
 describe('SelectField comboboxOptions', () => {
@@ -104,6 +123,45 @@ describe('SelectField placeholder', () => {
         });
 
         expect(wrapper.vm.fieldPlaceholder).toBe('Pick a category');
+
+        wrapper.unmount();
+    });
+});
+
+describe('SelectField option hierarchy', () => {
+    test('indents an option that came from a tree ordered list', async () => {
+        const wrapper = await mountOptions([{ id: '1', title: 'Cat', depth: 2 }]);
+
+        const option = wrapper.get('.option > div');
+
+        expect(option.attributes('style')).toContain('padding-inline-start: 0.75rem');
+        expect(option.find('[data-icon="arrow-down-right"]').exists()).toBe(true);
+        expect(option.findAll('.badge')).toHaveLength(0);
+
+        wrapper.unmount();
+    });
+
+    test('renders a breadcrumb on an option that did not', async () => {
+        const wrapper = await mountOptions([{ id: '1', title: 'Cat', path: ['Animals'] }]);
+
+        const option = wrapper.get('.option > div');
+
+        expect(option.attributes('style')).toBeUndefined();
+        expect(option.find('[data-icon="arrow-down-right"]').exists()).toBe(false);
+        expect(option.findAll('.badge').map((badge) => badge.text())).toEqual(['Animals']);
+        expect(option.findAll('[data-icon="chevron-right"]')).toHaveLength(1);
+
+        wrapper.unmount();
+    });
+
+    test('renders neither for an option with no hierarchy at all', async () => {
+        const wrapper = await mountOptions([{ id: '1', title: 'Featured' }]);
+
+        const option = wrapper.get('.option > div');
+
+        expect(option.find('[data-icon="arrow-down-right"]').exists()).toBe(false);
+        expect(option.findAll('.badge')).toHaveLength(0);
+        expect(option.text()).toContain('Featured');
 
         wrapper.unmount();
     });

@@ -18,7 +18,7 @@
             @update:modelValue="itemsSelected"
             @search="search"
         >
-            <template #option="{ title, hint, status, depth, _created }">
+            <template #option="{ title, hint, status, depth, path, _created }">
                 <div
                     v-if="_created"
                     class="flex w-full min-w-0 text-left items-center gap-1.5"
@@ -26,6 +26,11 @@
                     <span class="text-xs text-gray-600 dark:text-gray-400 shrink-0" v-text="__('Create')" />
                     <span v-text="title" class="truncate" />
                 </div>
+                <!--
+                    A depth means the list is in tree order, so the ancestors are listed above and an
+                    indent locates the option against them. Without one they aren't, so the option
+                    carries its own breadcrumb instead.
+                -->
                 <div
                     v-else
                     class="flex w-full text-left items-center gap-2"
@@ -38,6 +43,7 @@
                         aria-hidden="true"
                     />
                     <StatusIndicator v-if="status" :status="status" />
+                    <ItemPath v-if="!depth" :path="path" />
                     <div v-text="title" class="truncate grow" />
                     <ui-badge v-if="hint && !(depth > 1)" size="sm" v-text="hint" />
                 </div>
@@ -58,6 +64,7 @@
 
 <script>
 import { Combobox, StatusIndicator } from '@/components/ui';
+import ItemPath from './ItemPath.vue';
 import { ref, watch } from 'vue';
 import { router } from '@inertiajs/vue3';
 import axios from 'axios';
@@ -69,6 +76,7 @@ export default {
     components: {
         StatusIndicator,
         Combobox,
+        ItemPath,
     },
 
     props: {

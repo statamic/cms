@@ -574,9 +574,11 @@ class Terms extends Relationship
     }
 
     /**
-     * Depth, searchable ancestry, and the ancestor path for the relationship UI.
+     * The ancestor path and searchable ancestry for the relationship UI, plus the depth to
+     * indent by — but only for a list in tree order, since an indent means nothing without
+     * the ancestors it steps in from listed above it.
      */
-    public function itemHierarchyMeta($term): array
+    public function itemHierarchyMeta($term, $request = null): array
     {
         if (! $term->taxonomy()?->hierarchical()) {
             return [];
@@ -585,9 +587,9 @@ class Terms extends Relationship
         $path = $this->getItemPath($term);
 
         return [
-            'depth' => $term->depth() ?? 1,
-            'search_titles' => collect($path)->push($term->title())->implode(' '.EnsuresTermPaths::DELIMITER.' '),
             'path' => $path,
+            'search_titles' => collect($path)->push($term->title())->implode(' '.EnsuresTermPaths::DELIMITER.' '),
+            ...($request && $this->shouldOrderByHierarchy($request) ? ['depth' => $term->depth() ?? 1] : []),
         ];
     }
 

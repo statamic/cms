@@ -14,14 +14,7 @@
             />
 
             <template v-else>
-                <template v-for="(segment, i) in path" :key="i">
-                    <ui-badge size="sm" :text="__(segment)" />
-                    <ui-icon
-                        name="chevron-right"
-                        class="size-3 shrink-0 text-gray-300 dark:text-gray-600"
-                        aria-hidden="true"
-                    />
-                </template>
+                <ItemPath :path="item.path" />
 
                 <a
                     v-if="editable"
@@ -77,6 +70,7 @@
 <script>
 import { getActivePinia } from 'pinia';
 import InlineEditForm from './InlineEditForm.vue';
+import ItemPath from './ItemPath.vue';
 import { Button, Dropdown, DropdownMenu, DropdownItem, publishContextKey as containerContextKey } from '@/components/ui';
 
 export default {
@@ -86,6 +80,7 @@ export default {
         DropdownMenu,
         Dropdown,
         InlineEditForm,
+        ItemPath,
     },
 
     inject: {
@@ -110,12 +105,6 @@ export default {
         return {
             isEditing: false,
         };
-    },
-
-    computed: {
-        path() {
-            return this.item.path ?? [];
-        },
     },
 
     methods: {
