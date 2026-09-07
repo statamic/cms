@@ -566,6 +566,13 @@ class Terms extends Relationship
         return ['title', 'search_titles'];
     }
 
+    protected function pathDelimiter(): ?string
+    {
+        // Typing a path creates the terms it names, so the field needs to know how to split
+        // what was typed into the same segments the save will.
+        return $this->hasHierarchicalTaxonomy() ? EnsuresTermPaths::DELIMITER : null;
+    }
+
     /**
      * Depth, searchable ancestry, and the ancestor path for the relationship UI.
      */

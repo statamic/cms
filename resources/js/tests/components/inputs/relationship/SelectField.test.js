@@ -97,21 +97,10 @@ describe('SelectField placeholder', () => {
         wrapper.unmount();
     });
 
-    test('uses a create-friendly placeholder for hierarchical taggable terms', () => {
-        const wrapper = mountSelectField({
-            config: { type: 'terms' },
-            extra: { taggable: true, tree: { url: '/taxonomies/categories/tree' } },
-        });
-
-        expect(wrapper.vm.fieldPlaceholder).toBe('Search or create...');
-
-        wrapper.unmount();
-    });
-
     test('prefers a custom placeholder over the create-friendly default', () => {
         const wrapper = mountSelectField({
             config: { type: 'terms', placeholder: 'Pick a category' },
-            extra: { taggable: true, tree: { url: '/tree' } },
+            extra: { taggable: true },
         });
 
         expect(wrapper.vm.fieldPlaceholder).toBe('Pick a category');
@@ -120,26 +109,46 @@ describe('SelectField placeholder', () => {
     });
 });
 
-describe('SelectField typed term paths', () => {
-    test('treats a delimiter-separated id as a typed path, not an existing term', () => {
-        const wrapper = mountSelectField({ config: { type: 'terms' } });
+describe('SelectField typed paths', () => {
+    test('splits a typed path into a leaf title and its ancestors', () => {
+        const wrapper = mountSelectField({ extra: { pathDelimiter: '>' } });
 
-        expect(wrapper.vm.isTypedTermPath('animals>cat')).toBe(true);
-        expect(wrapper.vm.isTypedTermPath('categories::cat')).toBe(false);
-        expect(wrapper.vm.termPathSegments('animals>cat>calico')).toEqual(['animals', 'cat', 'calico']);
+        expect(wrapper.vm.newItemFromId('animals>cat>calico')).toEqual({
+            id: 'animals>cat>calico',
+            title: 'calico',
+            path: ['animals', 'cat'],
+        });
 
         wrapper.unmount();
     });
 
     test('trims whitespace around segments in the spaced form', () => {
-        const wrapper = mountSelectField({ config: { type: 'terms' } });
+        const wrapper = mountSelectField({ extra: { pathDelimiter: '>' } });
 
-        expect(wrapper.vm.isTypedTermPath('Animals > Cat')).toBe(true);
-        expect(wrapper.vm.termPathSegments('Animals > Cat > Calico')).toEqual(['Animals', 'Cat', 'Calico']);
         expect(wrapper.vm.newItemFromId('Animals > Cat > Calico')).toEqual({
             id: 'Animals > Cat > Calico',
             title: 'Calico',
-            hint: 'Animals » Cat',
+            path: ['Animals', 'Cat'],
+        });
+
+        wrapper.unmount();
+    });
+
+    test('has no path when nothing was typed around the delimiter', () => {
+        const wrapper = mountSelectField({ extra: { pathDelimiter: '>' } });
+
+        expect(wrapper.vm.newItemFromId('Calico')).toEqual({ id: 'Calico', title: 'Calico' });
+        expect(wrapper.vm.newItemFromId('>Calico')).toEqual({ id: '>Calico', title: '>Calico' });
+
+        wrapper.unmount();
+    });
+
+    test('leaves the delimiter alone when the fieldtype did not ask for one', () => {
+        const wrapper = mountSelectField();
+
+        expect(wrapper.vm.newItemFromId('animals>cat')).toEqual({
+            id: 'animals>cat',
+            title: 'animals>cat',
         });
 
         wrapper.unmount();

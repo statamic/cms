@@ -18,23 +18,13 @@
             @update:modelValue="itemsSelected"
             @search="search"
         >
-            <template #option="{ title, hint, status, depth, id, _created }">
+            <template #option="{ title, hint, status, depth, _created }">
                 <div
-                    v-if="_created || isTypedTermPath(id)"
+                    v-if="_created"
                     class="flex w-full min-w-0 text-left items-center gap-1.5"
                 >
                     <span class="text-xs text-gray-600 dark:text-gray-400 shrink-0" v-text="__('Create')" />
-                    <template v-if="isTypedTermPath(id)">
-                        <template v-for="(segment, i) in termPathSegments(title)" :key="i">
-                            <span
-                                v-if="i > 0"
-                                class="text-xs text-gray-500 dark:text-gray-400"
-                                aria-hidden="true"
-                            >→</span>
-                            <ui-badge size="sm" :text="segment" />
-                        </template>
-                    </template>
-                    <span v-else v-text="title" class="truncate" />
+                    <span v-text="title" class="truncate" />
                 </div>
                 <div
                     v-else
@@ -92,6 +82,7 @@ export default {
         readOnly: Boolean,
         site: String,
         searchKeys: { type: Array, default: null },
+        pathDelimiter: { type: String, default: null },
     },
 
     data() {
@@ -221,15 +212,15 @@ export default {
             this.$emit('input', items);
         },
 
-        // A typed term path like `animals > cat > calico` attaches the leaf, so render
-        // the badge as `calico · animals » cat` until the save normalizes it.
+        // A typed path like `animals > cat > calico` attaches the leaf, so give it the same
+        // ancestor breadcrumb a saved item gets until the save fills one in for real.
         newItemFromId(id) {
-            if (this.config.type === 'terms' && typeof id === 'string' && id.includes('>')) {
-                const segments = id.split('>').map((segment) => segment.trim()).filter(Boolean);
+            if (this.pathDelimiter && typeof id === 'string' && id.includes(this.pathDelimiter)) {
+                const segments = id.split(this.pathDelimiter).map((segment) => segment.trim()).filter(Boolean);
                 const title = segments.pop();
 
                 if (title && segments.length) {
-                    return { id, title, hint: segments.join(' » ') };
+                    return { id, title, path: segments };
                 }
             }
 
@@ -239,17 +230,6 @@ export default {
         createOption(value) {
             const existing = this.options.find((option) => option.title === value);
             return existing || { id: value, title: value };
-        },
-
-        isTypedTermPath(id) {
-            return this.config.type === 'terms'
-                && typeof id === 'string'
-                && id.includes('>')
-                && !id.includes('::');
-        },
-
-        termPathSegments(title) {
-            return String(title).split('>').map((segment) => segment.trim()).filter(Boolean);
         },
     },
 };

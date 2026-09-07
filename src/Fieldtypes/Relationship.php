@@ -156,10 +156,16 @@ abstract class Relationship extends Fieldtype
             'initialSortColumn' => $this->initialSortColumn(),
             'initialSortDirection' => $this->initialSortDirection(),
             'searchKeys' => $this->searchKeys(),
+            'pathDelimiter' => $this->pathDelimiter(),
         ];
     }
 
     protected function searchKeys(): ?array
+    {
+        return null;
+    }
+
+    protected function pathDelimiter(): ?string
     {
         return null;
     }

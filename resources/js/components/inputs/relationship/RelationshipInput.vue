@@ -12,6 +12,7 @@
             :url="selectionsUrl"
             :site="site"
             :search-keys="searchKeys"
+            :path-delimiter="pathDelimiter"
             @input="selectFieldSelected"
             @focus="$emit('focus')"
             @blur="$emit('blur')"
@@ -144,6 +145,7 @@ export default {
         maxItems: { type: Number },
         mode: { type: String, default: 'default' },
         name: { type: String },
+        pathDelimiter: { type: String, default: null },
         readOnly: { type: Boolean },
         search: { type: Boolean },
         searchKeys: { type: Array, default: null },
