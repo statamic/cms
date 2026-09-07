@@ -13,13 +13,12 @@ const props = defineProps({
 const suggestableFields = usePage().props.suggestableFields ?? [];
 
 const operatorLabels = {
-    '': __('equals'),
     equals: __('equals'),
     not: __('does not equal'),
     contains: __('contains'),
     contains_any: __('contains any of'),
-    '==': __('equals'),
-    '!=': __('does not equal'),
+    '===': __('equals'),
+    '!==': __('does not equal'),
     '>': __('is greater than'),
     '<': __('is less than'),
     '>=': __('is at least'),
