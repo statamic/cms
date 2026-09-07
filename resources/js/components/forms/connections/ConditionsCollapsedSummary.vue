@@ -4,6 +4,7 @@ import { usePage } from '@inertiajs/vue3';
 import { Badge, Icon, Subheading } from '@ui';
 import FieldNumber from '@/components/forms/FieldNumber.vue';
 import { categories, categoryColorClasses } from '@/components/forms/builder/categories';
+import { operatorLabel } from '@/components/forms/logic/operatorLabels';
 
 const props = defineProps({
     conditions: { type: Array, default: () => [] },
@@ -12,20 +13,6 @@ const props = defineProps({
 
 const suggestableFields = usePage().props.suggestableFields ?? [];
 
-const operatorLabels = {
-    equals: __('equals'),
-    not: __('does not equal'),
-    contains: __('contains'),
-    contains_any: __('contains any of'),
-    '===': __('equals'),
-    '!==': __('does not equal'),
-    '>': __('is greater than'),
-    '<': __('is less than'),
-    '>=': __('is at least'),
-    '<=': __('is at most'),
-};
-
-const getOperatorLabel = (operator) => operatorLabels[operator] || operator || __('equals');
 const getFieldConfig = (handle) => suggestableFields.find((field) => field.handle === handle);
 const getFieldDisplay = (handle) => __(getFieldConfig(handle)?.config?.display) || handle;
 const getIconClass = (category) => {
@@ -56,7 +43,7 @@ const previewParts = computed(() => {
 
     filteredConditions.value.forEach((condition, index) => {
         if (index === 0) {
-            parts.push({ type: 'operator', text: getOperatorLabel(condition.operator) });
+            parts.push({ type: 'operator', text: operatorLabel(condition.operator) });
 
             if (condition.value !== null && condition.value !== undefined && condition.value !== '') {
                 const displayValue = Array.isArray(condition.value)
@@ -70,7 +57,7 @@ const previewParts = computed(() => {
 
         parts.push({ type: 'join', text: condition.join === 'or' ? __('or') : __('and') });
         parts.push({ type: 'field-plain', text: getFieldDisplay(condition.field) });
-        parts.push({ type: 'operator', text: getOperatorLabel(condition.operator) });
+        parts.push({ type: 'operator', text: operatorLabel(condition.operator) });
 
         if (condition.value !== null && condition.value !== undefined && condition.value !== '') {
             const displayValue = Array.isArray(condition.value)
