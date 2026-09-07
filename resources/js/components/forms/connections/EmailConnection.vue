@@ -37,7 +37,7 @@ const recipients = (to: string[] | string): string =>
         :errors
         :defaults
         :add-label="__('Add Email')"
-        :empty-description="__('statamic::messages.email_connection_empty_description')"
+        :description="__('statamic::messages.email_connection_instructions')"
         :delete-heading="__('Delete Email')"
         :delete-description="__('statamic::messages.email_connection_delete_confirmation')"
         @update:model-value="$emit('update:modelValue', $event)"

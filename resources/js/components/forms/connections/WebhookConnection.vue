@@ -21,14 +21,14 @@ const showExamplePayload = ref<boolean>(props.modelValue.length === 0);
 </script>
 
 <template>
-    <Label v-if="modelValue.length" :text="__('Webhooks')" />
+    <Label :text="__('Webhooks')" class="mb-2" />
 
     <ConnectionRows
         :model-value="modelValue"
         :errors
         :defaults
         :add-label="__('Add Webhook')"
-        :empty-description="__('statamic::messages.webhook_connection_empty_description')"
+        :description="__('statamic::messages.webhook_connection_instructions')"
         :delete-heading="__('Delete Webhook')"
         :delete-description="__('statamic::messages.webhook_connection_delete_confirmation')"
         @update:model-value="$emit('update:modelValue', $event)"

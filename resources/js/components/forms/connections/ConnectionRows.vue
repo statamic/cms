@@ -26,7 +26,7 @@ const props = withDefaults(defineProps<{
     errors: Record<string, string[]>;
     defaults: Record<string, unknown>;
     addLabel: string;
-    emptyDescription?: string;
+    description?: string;
     deleteHeading: string;
     deleteDescription: string;
 }>(), {
@@ -138,7 +138,7 @@ watch(
         />
     </Teleport>
 
-    <Description v-if="emptyDescription" :text="emptyDescription" class="mb-4" />
+    <Description v-if="description" :text="description" class="mb-4" />
 
     <div v-if="modelValue.length === 0">
         <Button size="sm" :text="addLabel" icon="plus" @click="add" />
