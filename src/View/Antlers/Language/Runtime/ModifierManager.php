@@ -12,6 +12,7 @@ use Statamic\View\Antlers\Language\Errors\ErrorFactory;
 use Statamic\View\Antlers\Language\Nodes\Modifiers\ModifierChainNode;
 use Statamic\View\Antlers\Language\Nodes\Parameters\ParameterNode;
 use Statamic\View\Antlers\Language\Runtime\Sandbox\Environment;
+use Statamic\View\Slot;
 
 class ModifierManager
 {
@@ -102,6 +103,10 @@ class ModifierManager
 
         if ($value === null) {
             return null;
+        }
+
+        if ($value instanceof Slot) {
+            $value = (string) $value;
         }
 
         $returnValue = $value;

@@ -268,6 +268,21 @@ test('it only shows when multiple conditions are met', () => {
     expect(showFieldIf({ first_name: 'is San', last_name: 'is Holo', age: '> 40' })).toBe(false);
 });
 
+test('it supports multiple conditions targeting the same field', () => {
+    setValues({
+        status: 'published',
+        audience: 'members',
+        age: 22,
+    });
+
+    expect(Fields.showField({ if_any: { status: ['is archived', 'is published'], audience: 'is guests' } })).toBe(true);
+    expect(Fields.showField({ if_any: { status: ['is archived', 'is draft'], audience: 'is guests' } })).toBe(false);
+    expect(Fields.showField({ if: { age: ['> 18', '< 65'], audience: 'is members' } })).toBe(true);
+    expect(Fields.showField({ if: { age: ['> 18', '< 21'], audience: 'is members' } })).toBe(false);
+    expect(Fields.showField({ unless_any: { status: ['is archived', 'is draft'], audience: 'is guests' } })).toBe(true);
+    expect(Fields.showField({ hide_when_any: { status: ['is archived', 'is published'], audience: 'is guests' } })).toBe(false);
+});
+
 test('it shows or hides with parent key variants', () => {
     setValues({
         first_name: 'Rincess',

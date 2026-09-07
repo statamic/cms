@@ -32,6 +32,42 @@ class PhpEnabledTest extends ParserTestCase
         );
     }
 
+    public function test_php_nodes_inside_interpolated_parameters_are_evaluated()
+    {
+        (new class extends \Statamic\Tags\Tags
+        {
+            protected static $handle = 'php_param_echo';
+
+            public function index()
+            {
+                return '['.$this->params->get('value').']';
+            }
+        })::register();
+
+        $data = ['title' => 'The Title', 'items' => ['a', 'b']];
+
+        $templates = [
+            '<div>{{ php_param_echo value="{{$ \'hi\' $}}" }}</div>' => '<div>[hi]</div>',
+            '<div>{{ php_param_echo value="a-{{$ \'hi\' $}}-b" }}</div>' => '<div>[a-hi-b]</div>',
+            "caf\u{00E9} <div>{{ php_param_echo value=\"{{\$ strtoupper('hi') \$}}\" }}</div>" => "caf\u{00E9} <div>[HI]</div>",
+            '{{ php_param_echo value="{{$ $title $}}" }}' => '[The Title]',
+            '{{ php_param_echo value="{{$ strtoupper($title) $}}" }}' => '[THE TITLE]',
+            '{{ php_param_echo value="{{ title }}-{{$ \'x\' $}}-{{ title | upper }}" }}' => '[The Title-x-THE TITLE]',
+            '{{ php_param_echo value="a{{? $x = 1; ?}}b" }}' => '[ab]',
+            '{{ items }}{{ php_param_echo value="{{ value }}:{{$ strtoupper($value) $}}" }}{{ /items }}' => '[a:A][b:B]',
+            '{{ if title == "{{$ \'The Title\' $}}" }}yes{{ else }}no{{ /if }}' => 'yes',
+            "@props(['a' => 1])\n".'{{ php_param_echo value="{{$ strtoupper(\'hi\') $}}" }}' => "\n[HI]",
+        ];
+
+        foreach ($templates as $template => $expected) {
+            $this->assertSame(
+                $expected,
+                (string) $this->parser($data, true, true)->allowPhp()->parse($template, $data),
+                $template
+            );
+        }
+    }
+
     public function test_php_can_be_used_to_output_evaluated_antlers()
     {
         // This test covers existing Antlers + PHP behavior.

@@ -155,7 +155,7 @@ class ImageGenerator
      */
     public function generateByAsset($asset, array $params)
     {
-        if (ThumbnailExtractor::available() && $asset->isVideo()) {
+        if ($asset->isVideo() && ThumbnailExtractor::available()) {
             return $this->generateVideoThumbnail($asset, $params);
         }
 

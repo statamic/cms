@@ -307,6 +307,53 @@ class UpdateEntryTest extends TestCase
     }
 
     #[Test]
+    public function submitted_title_is_ignored_when_generating_the_slug_from_a_title_format()
+    {
+        [$user, $collection] = $this->seedUserAndCollection();
+        $collection->titleFormats('Auto {foo}')->save();
+        $this->seedBlueprintFields($collection, ['foo' => ['type' => 'text']]);
+
+        $entry = EntryFactory::collection($collection)
+            ->slug('existing-entry')
+            ->data(['title' => 'Existing Entry', 'foo' => 'bar'])
+            ->create();
+
+        $this
+            ->actingAs($user)
+            ->update($entry, ['title' => 'Auto stale', 'slug' => '', 'foo' => 'baz'])
+            ->assertOk();
+
+        $entry = $entry->fresh();
+        $this->assertEquals('Auto baz', $entry->value('title'));
+        $this->assertEquals('auto-baz', $entry->slug());
+    }
+
+    #[Test]
+    public function submitted_slug_is_ignored_when_it_is_still_being_auto_generated()
+    {
+        // The browser generates the slug asynchronously, so what it submits can lag
+        // behind the values it was generated from. We regenerate it here instead.
+
+        [$user, $collection] = $this->seedUserAndCollection();
+        $collection->titleFormats('Auto {foo}')->save();
+        $this->seedBlueprintFields($collection, ['foo' => ['type' => 'text']]);
+
+        $entry = EntryFactory::collection($collection)
+            ->slug('existing-entry')
+            ->data(['title' => 'Existing Entry', 'foo' => 'bar'])
+            ->create();
+
+        $this
+            ->actingAs($user)
+            ->update($entry, ['title' => 'Auto bar', 'slug' => 'auto-bar', 'foo' => 'baz', '_auto_slug' => true])
+            ->assertOk();
+
+        $entry = $entry->fresh();
+        $this->assertEquals('Auto baz', $entry->value('title'));
+        $this->assertEquals('auto-baz', $entry->slug());
+    }
+
+    #[Test]
     public function slug_and_auto_title_get_generated_after_save()
     {
         // We want addons to be able to add/modify data that the auto title could rely on.

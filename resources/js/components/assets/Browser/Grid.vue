@@ -64,7 +64,7 @@
                         ref="newFolderInput"
                         v-model:modelValue="newFolderName"
                         :start-with-edit-mode="true"
-                        submit-mode="enter"
+                        submit-mode="both"
                         :placeholder="__('Name')"
                         :class="[
                             'flex w-[80px] items-center placeholder:lowercase justify-center overflow-hidden mt-2 text-center text-xs text-ellipsis whitespace-nowrap placeholder:text-gray-400 dark:placeholder:text-gray-500 text-gray-500',

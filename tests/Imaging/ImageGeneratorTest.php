@@ -99,6 +99,30 @@ class ImageGeneratorTest extends TestCase
     }
 
     #[Test]
+    public function it_does_not_check_ffmpeg_availability_for_non_video_assets()
+    {
+        // Regression test: non-video assets shouldn't trigger ffmpeg detection, since
+        // that shells out via Symfony Process and can throw on hosts where proc_open
+        // is disabled, breaking every image request instead of just video thumbnails.
+        $this->mock(\Statamic\Console\Processes\Ffmpeg::class, function ($mock) {
+            $mock->shouldNotReceive('available');
+            $mock->shouldNotReceive('ffmpegBinary');
+        });
+
+        Storage::fake('test');
+        $file = UploadedFile::fake()->image('foo/hoff.jpg', 30, 60);
+        Storage::disk('test')->putFileAs('foo', $file, 'hoff.jpg');
+        $container = tap(AssetContainer::make('test_container')->disk('test'))->save();
+        $asset = tap($container->makeAsset('foo/hoff.jpg'))->save();
+
+        ImageValidator::shouldReceive('isValidImage')->andReturnTrue();
+
+        $this->makeGenerator()->generateByAsset($asset, ['w' => 100]);
+
+        $this->addToAssertionCount(1);
+    }
+
+    #[Test]
     public function it_throws_unable_to_read_file_when_asset_is_not_a_valid_image()
     {
         Storage::fake('test');

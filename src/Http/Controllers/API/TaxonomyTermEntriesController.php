@@ -13,6 +13,7 @@ use Statamic\Http\Resources\API\EntryResource;
 class TaxonomyTermEntriesController extends ApiController
 {
     protected $filterPublished = true;
+    protected $siteConstrained = true;
     protected $allowedCollections;
 
     protected function abortIfDisabled()

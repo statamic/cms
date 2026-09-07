@@ -26,6 +26,7 @@ abstract class Tree implements ContainsQueryableValues, Contract, Localization
     protected $cachedFlattenedPagesByReference;
     protected $cachedFlattenedPageOrder;
     protected $withEntries = false;
+    protected $withEvents = true;
     protected $uriCacheEnabled = true;
 
     public function idKey()
@@ -189,7 +190,10 @@ abstract class Tree implements ContainsQueryableValues, Contract, Localization
 
     public function save()
     {
-        if ($this->dispatchSavingEvent() === false) {
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
+        if ($withEvents && $this->dispatchSavingEvent() === false) {
             return false;
         }
 
@@ -199,22 +203,43 @@ abstract class Tree implements ContainsQueryableValues, Contract, Localization
 
         $this->repository()->save($this);
 
-        $this->dispatchSavedEvent();
+        if ($withEvents) {
+            $this->dispatchSavedEvent();
+        }
 
         $this->syncOriginal();
 
         return true;
     }
 
+    public function saveQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->save();
+    }
+
     public function delete()
     {
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
         Blink::forget('collection-structure-tree*');
 
         $this->repository()->delete($this);
 
-        $this->dispatchDeletedEvent();
+        if ($withEvents) {
+            $this->dispatchDeletedEvent();
+        }
 
         return true;
+    }
+
+    public function deleteQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->delete();
     }
 
     abstract protected function repository();
