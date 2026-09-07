@@ -82,7 +82,7 @@
                 left: calc(0.5rem + 2px);
                 height: 100%;
                 width: 0.325rem;
-                background: linear-gradient(to bottom, var(--color-gray-200) 0%, var(--color-gray-100) 50%, var(--color-gray-200) 100%);
+                background: linear-gradient(to bottom, var(--color-gray-100) 0%, var(--color-gray-200) 50%, var(--color-gray-100) 100%);
             }
         }
 
