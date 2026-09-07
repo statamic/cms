@@ -11,6 +11,7 @@ use Statamic\Console\Composer\Lock;
 class ComposerLockBackupTest extends \PHPUnit\Framework\TestCase
 {
     protected $lockPath = './composer.lock';
+    protected $envLockPath = './composer.testing.lock';
     protected $customLockPath = './custom/composer.lock';
     protected $backupLockPath = './storage/statamic/updater/composer.lock.bak';
     protected $customBackupLockPath = './custom/storage/statamic/updater/composer.lock.bak';
@@ -26,6 +27,8 @@ class ComposerLockBackupTest extends \PHPUnit\Framework\TestCase
     {
         $this->removeLockFiles();
 
+        unset($_ENV['COMPOSER']);
+
         parent::tearDown();
     }
 
@@ -36,6 +39,20 @@ class ComposerLockBackupTest extends \PHPUnit\Framework\TestCase
 
         $this->assertFileExists($this->lockPath);
         $this->assertFileDoesNotExist($this->backupLockPath);
+
+        Lock::backup();
+
+        $this->assertFileExists($this->backupLockPath);
+        $this->assertEquals($content, file_get_contents($this->backupLockPath));
+    }
+
+    #[Test]
+    public function it_backs_up_the_lock_file_named_by_the_composer_env_var()
+    {
+        $_ENV['COMPOSER'] = 'composer.testing.json';
+
+        file_put_contents($this->lockPath, 'default lock file content');
+        file_put_contents($this->envLockPath, $content = 'env lock file content');
 
         Lock::backup();
 
@@ -73,6 +90,7 @@ class ComposerLockBackupTest extends \PHPUnit\Framework\TestCase
     {
         $files = [
             $this->lockPath,
+            $this->envLockPath,
             $this->customLockPath,
             $this->backupLockPath,
             $this->customBackupLockPath,
