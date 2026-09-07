@@ -10,6 +10,7 @@ use JsonSerializable;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Query\Builder as StatamicQueryBuilder;
 use Statamic\Fields\Value;
+use Statamic\Fieldtypes\Link\ArrayableLink;
 
 class AugmentedCollection extends Collection
 {
@@ -78,6 +79,10 @@ class AugmentedCollection extends Collection
 
             if ($this->shouldEvaluate && $value instanceof Value) {
                 $value = $value->value();
+            }
+
+            if ($this->shouldEvaluate && $value instanceof ArrayableLink) {
+                $value = $value->toShallowArray();
             }
 
             if ($this->isQueryBuilder($value)) {

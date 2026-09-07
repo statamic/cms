@@ -2,6 +2,7 @@
 
 namespace Tests\Fieldtypes;
 
+use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Statamic\Routing\ResolveRedirect;
 use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -44,6 +45,7 @@ class LinkTest extends TestCase
         $this->assertInstanceOf(ArrayableString::class, $augmented);
         $this->assertEquals('/foo', $augmented->value());
         $this->assertEquals(['url' => '/foo'], $augmented->toArray());
+        $this->assertEquals(['url' => '/foo'], $augmented->toShallowArray());
     }
 
     #[Test]
@@ -52,6 +54,7 @@ class LinkTest extends TestCase
         $entry = Mockery::mock();
         $entry->shouldReceive('url')->once()->andReturn('/the-entry-url');
         $entry->shouldReceive('toAugmentedArray')->once()->andReturn('augmented entry array');
+        $entry->shouldReceive('toShallowAugmentedArray')->once()->andReturn('shallow augmented entry array');
 
         ResolveRedirect::shouldReceive('item')
             ->with('entry::test', $parent = new Entry, true)
@@ -67,6 +70,33 @@ class LinkTest extends TestCase
         $this->assertEquals($entry, $augmented->value());
         $this->assertEquals('/the-entry-url', (string) $augmented);
         $this->assertEquals('augmented entry array', $augmented->toArray());
+        $this->assertEquals('shallow augmented entry array', $augmented->toShallowArray());
+    }
+
+    #[Test]
+    public function it_evaluates_entries_linking_to_each_other_in_a_cycle()
+    {
+        $blueprint = Facades\Blueprint::makeFromFields(['link' => ['type' => 'link']]);
+        BlueprintRepository::shouldReceive('in')->with('collections/pages')->andReturn(collect(['page' => $blueprint]));
+        Facades\Collection::make('pages')->routes('{slug}')->save();
+
+        $a = tap(Facades\Entry::make()->collection('pages')->id('a')->slug('a')->data(['title' => 'A', 'link' => 'entry::b']))->save();
+        tap(Facades\Entry::make()->collection('pages')->id('b')->slug('b')->data(['title' => 'B', 'link' => 'entry::c']))->save();
+        tap(Facades\Entry::make()->collection('pages')->id('c')->slug('c')->data(['title' => 'C', 'link' => 'entry::a']))->save();
+
+        $this->assertEquals('/b', $a->toAugmentedArray()['link']->value()['url']);
+        $this->assertEquals('B', $a->toAugmentedArray()['link']->value()['title']);
+        $this->assertEquals('/c', $a->toAugmentedArray()['link']->value()['link']->value()['url']);
+
+        $this->assertEquals([
+            'id' => 'b',
+            'title' => 'B',
+            'url' => '/b',
+            'permalink' => 'http://localhost/b',
+            'api_url' => 'http://localhost/api/collections/pages/entries/b',
+        ], $a->toArray()['link']);
+
+        $this->assertEquals($a->toArray()['link'], json_decode(json_encode($a), true)['link']);
     }
 
     #[Test]

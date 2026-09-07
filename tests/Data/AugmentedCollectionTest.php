@@ -13,6 +13,7 @@ use Statamic\Contracts\Query\Builder as StatamicQueryBuilder;
 use Statamic\Data\AugmentedCollection;
 use Statamic\Data\HasAugmentedData;
 use Statamic\Fields\Value;
+use Statamic\Fieldtypes\Link\ArrayableLink;
 use Tests\TestCase;
 
 class AugmentedCollectionTest extends TestCase
@@ -114,6 +115,24 @@ class AugmentedCollectionTest extends TestCase
             ],
             'golf',
         ], $results);
+    }
+
+    #[Test]
+    public function links_get_converted_to_their_shallow_array_with_flag()
+    {
+        $entry = m::mock(Augmentable::class);
+        $entry->shouldReceive('toShallowAugmentedArray')->andReturn(['id' => '1', 'title' => new Value('The Entry')]);
+        $entry->shouldReceive('toAugmentedArray')->never();
+
+        $c = new AugmentedCollection([
+            new Value(new ArrayableLink($entry)),
+            new Value(new ArrayableLink('/hardcoded')),
+        ]);
+
+        $this->assertEquals([
+            ['id' => '1', 'title' => 'The Entry'],
+            ['url' => '/hardcoded'],
+        ], $c->withEvaluation()->toArray());
     }
 
     #[Test]
