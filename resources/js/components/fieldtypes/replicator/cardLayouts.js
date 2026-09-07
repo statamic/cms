@@ -1,16 +1,27 @@
-export function cardGroupColumns(count) {
+export function fieldCount(fields) {
+    if (Array.isArray(fields)) {
+        return fields.length;
+    }
+
+    return Object.keys(fields || {}).length;
+}
+
+/** Sets with more fields than this stay at most two columns so cards don't get too cramped. */
+export const MAX_FIELDS_FOR_THREE_COLUMNS = 5;
+
+export function cardGroupColumns(count, fields = 0) {
     if (count <= 1) {
         return 1;
     }
 
-    if (count === 2) {
+    if (count === 2 || fieldCount(fields) > MAX_FIELDS_FOR_THREE_COLUMNS) {
         return 2;
     }
 
     return 3;
 }
 
-export function buildCardLayouts(value, isCardSet, isSameCardGroup) {
+export function buildCardLayouts(value, isCardSet, isSameCardGroup, fieldsForSet = () => 0) {
     return value.map((set, index) => {
         if (!isCardSet(set.type)) {
             return {
@@ -35,7 +46,7 @@ export function buildCardLayouts(value, isCardSet, isSameCardGroup) {
         }
 
         const groupSize = groupEnd - groupStart + 1;
-        const columns = cardGroupColumns(groupSize);
+        const columns = cardGroupColumns(groupSize, fieldsForSet(set.type));
 
         return {
             isCard: true,

@@ -188,6 +188,7 @@ export default {
                 this.value,
                 (type) => this.setConfig(type).card,
                 (a, b) => this.isSameCardGroup(a, b),
+                (type) => this.setConfig(type).fields,
             );
         },
 

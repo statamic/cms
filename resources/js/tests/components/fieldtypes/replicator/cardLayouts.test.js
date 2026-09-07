@@ -3,6 +3,7 @@ import {
     buildCardLayouts,
     cardGroupColumns,
     getCardGroupMemberIds,
+    MAX_FIELDS_FOR_THREE_COLUMNS,
     shouldShowPickerConnector,
 } from '@/components/fieldtypes/replicator/cardLayouts.js';
 
@@ -11,6 +12,8 @@ test('cardGroupColumns returns expected column counts', () => {
     expect(cardGroupColumns(2)).toBe(2);
     expect(cardGroupColumns(3)).toBe(3);
     expect(cardGroupColumns(5)).toBe(3);
+    expect(cardGroupColumns(3, Array.from({ length: MAX_FIELDS_FOR_THREE_COLUMNS + 1 }, () => ({})))).toBe(2);
+    expect(cardGroupColumns(5, Array.from({ length: MAX_FIELDS_FOR_THREE_COLUMNS }, () => ({})))).toBe(3);
 });
 
 test('buildCardLayouts groups consecutive card sets', () => {
@@ -22,8 +25,9 @@ test('buildCardLayouts groups consecutive card sets', () => {
     ];
     const isCardSet = (type) => type === 'team';
     const isSameCardGroup = (a, b) => isCardSet(a.type) && isCardSet(b.type) && a.type === b.type;
+    const fieldsForSet = () => [{}, {}];
 
-    const layouts = buildCardLayouts(value, isCardSet, isSameCardGroup);
+    const layouts = buildCardLayouts(value, isCardSet, isSameCardGroup, fieldsForSet);
 
     expect(layouts[0].className).toBe('replicator-set-slot--full');
     expect(layouts[1].groupSize).toBe(3);
@@ -32,6 +36,26 @@ test('buildCardLayouts groups consecutive card sets', () => {
     expect(layouts[3].positionInGroup).toBe(2);
     expect(layouts[3].columns).toBe(3);
     expect(layouts[3].className).toBe('replicator-set-slot--card-cols-3');
+});
+
+test('buildCardLayouts caps at two columns when a set has too many fields', () => {
+    const value = [
+        { _id: '1', type: 'team' },
+        { _id: '2', type: 'team' },
+        { _id: '3', type: 'team' },
+    ];
+    const fieldsForSet = () => Array.from({ length: MAX_FIELDS_FOR_THREE_COLUMNS + 1 }, () => ({}));
+
+    const layouts = buildCardLayouts(
+        value,
+        () => true,
+        (a, b) => a.type === b.type,
+        fieldsForSet,
+    );
+
+    expect(layouts[0].columns).toBe(2);
+    expect(layouts[0].className).toBe('replicator-set-slot--card-cols-2');
+    expect(layouts[2].columns).toBe(2);
 });
 
 test('getCardGroupMemberIds returns the whole row in multi-column layout', () => {
