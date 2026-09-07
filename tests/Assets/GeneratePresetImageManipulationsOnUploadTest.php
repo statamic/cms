@@ -13,7 +13,7 @@ use Statamic\Imaging\PresetGenerator;
 use Statamic\Listeners\GeneratePresetImageManipulations;
 use Tests\TestCase;
 
-class GeneratePresetImageManipulationsOnUpload extends TestCase
+class GeneratePresetImageManipulationsOnUploadTest extends TestCase
 {
     #[Test]
     public function it_subscribes()
