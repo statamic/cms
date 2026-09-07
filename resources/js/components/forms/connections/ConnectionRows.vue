@@ -140,9 +140,7 @@ watch(
 
     <Description v-if="description" :text="description" class="mb-4" />
 
-    <div v-if="modelValue.length === 0">
-        <Button size="sm" :text="addLabel" icon="plus" @click="add" />
-    </div>
+    <Button v-if="modelValue.length === 0" size="sm" :text="addLabel" icon="plus" @click="add" />
 
     <template v-else>
         <SortableList

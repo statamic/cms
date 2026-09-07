@@ -109,7 +109,7 @@ onUnmounted(() => {
                             </Badge>
                         </span>
                     </Heading>
-                    <div id="connection-rows-actions" class="flex items-center gap-2" />
+                    <div id="connection-rows-actions" />
                 </div>
             </PanelHeader>
             <Card>
