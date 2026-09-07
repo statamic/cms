@@ -6,6 +6,7 @@ return [
     'addon_has_more_releases_beyond_license_body' => 'You may update, but will need to upgrade or purchase a new license.',
     'addon_has_more_releases_beyond_license_heading' => 'This addon has more releases beyond your licensed limit.',
     'asset_container_blueprint_instructions' => 'Blueprints define custom fields available when editing assets.',
+    'asset_container_chunked_uploads_instructions' => 'Split large uploads into chunks to get past PHP and proxy upload size limits. The maximum size is set by your validation rules.',
     'asset_container_disk_instructions' => 'Filesystem disks specify where files are stored (locally or remotely like Amazon S3). Configure in `config/filesystems.php`',
     'asset_container_handle_instructions' => 'Used to reference this container on the frontend. This cannot be easily changed later.',
     'asset_container_intro' => 'Media and document files are stored in folders on the server or other storage services. Each storage location is called a container.',

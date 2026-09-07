@@ -1,6 +1,7 @@
 import { mount } from '@vue/test-utils';
 import { expect, test } from 'vitest';
 import { computed, ref } from 'vue';
+import { createPinia } from 'pinia';
 import * as Globals from '@/bootstrap/globals';
 import MarkdownFieldtype from '@/components/fieldtypes/markdown/MarkdownFieldtype.vue';
 import { containerContextKey } from '@/components/ui/Publish/Container.vue';
@@ -17,6 +18,7 @@ function mountField(direction) {
             config: { buttons: [] },
         },
         global: {
+            plugins: [createPinia()],
             stubs: {
                 'publish-field-fullscreen-header': true,
                 'ui-icon': true,

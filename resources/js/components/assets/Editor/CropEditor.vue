@@ -413,6 +413,7 @@ function unbindKeyboardShortcuts() {
     isAdjustingCropBox.value = false;
 }
 
+// Cropped output is small, so it uses the single-request endpoint rather than chunked uploads.
 async function upload(replaceOriginal) {
     if (!pendingCrop.value) return;
 
