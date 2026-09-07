@@ -6,7 +6,7 @@ import Layout from '@/pages/layout/Layout.vue';
 import PanelLayout from '@/pages/layout/PanelLayout.vue';
 import FormsLayout from '../Layout.vue';
 import Head from '@/pages/layout/Head.vue';
-import { Button, Card, Header, Heading, Icon, Panel, PanelHeader } from '@ui';
+import { Badge, Button, Card, Header, Heading, Icon, Panel, PanelHeader } from '@ui';
 import FormStatusIndicator from '@/components/forms/FormStatusIndicator.vue';
 import { Link } from '@inertiajs/vue3';
 
@@ -86,25 +86,31 @@ onUnmounted(() => {
 
         <Panel>
             <PanelHeader>
-                <Heading>
-                    <Link
-                        :href="cp_url(`forms/${form.handle}/connect`)"
-                        class="inline-flex items-center gap-2 text-inherit my-0! cursor-pointer hover:opacity-80"
-                    >
-                        <Icon name="connection" class="size-4! opacity-60! text-gray-925 dark:text-white" aria-hidden="true" />
-                        {{ __('Connect') }}
-                    </Link>
-                    <Icon name="chevron-right" class="size-3.5 text-gray-400 dark:text-gray-500" aria-hidden="true" />
-                    <span class="inline-flex items-center gap-1.5">
-                        <span
-                            v-if="connection.icon"
-                            class="size-4 text-gray-700 dark:text-gray-300 [&_svg]:size-4"
-                            aria-hidden="true"
-                            v-html="connection.icon"
-                        />
-                        <span>{{ __(connection.title) }}</span>
-                    </span>
-                </Heading>
+                <div class="flex items-center justify-between gap-3">
+                    <Heading>
+                        <Link
+                            :href="cp_url(`forms/${form.handle}/connect`)"
+                            class="inline-flex items-center gap-2 text-inherit my-0! cursor-pointer hover:opacity-80"
+                        >
+                            <Icon name="connection" class="size-4! opacity-60! text-gray-925 dark:text-white" aria-hidden="true" />
+                            {{ __('Connect') }}
+                        </Link>
+                        <Icon name="chevron-right" class="size-3.5 text-gray-400 dark:text-gray-500" aria-hidden="true" />
+                        <span class="relative inline-flex items-center gap-1.5">
+                            <span
+                                v-if="connection.icon"
+                                class="size-4 text-gray-700 dark:text-gray-300 [&_svg]:size-4"
+                                aria-hidden="true"
+                                v-html="connection.icon"
+                            />
+                            <span>{{ __(connection.title) }}</span>
+                            <Badge v-if="Array.isArray(value)" pill class="absolute start-full top-1/2 ms-1.5 size-6 -translate-y-1/2">
+                                {{ value.length }}
+                            </Badge>
+                        </span>
+                    </Heading>
+                    <div id="connection-rows-actions" />
+                </div>
             </PanelHeader>
             <Card>
                 <component

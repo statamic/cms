@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { usePage } from '@inertiajs/vue3';
-import { Badge, Icon, PublishContainer, PublishFields, PublishFieldsProvider, Subheading } from '@ui';
+import { Badge, Icon, Label, PublishContainer, PublishFields, PublishFieldsProvider } from '@ui';
 import ConnectionRows from './ConnectionRows.vue';
-import ConnectionRules, { conditionsSummary } from './ConnectionRules.vue';
+import ConnectionRules from './ConnectionRules.vue';
+import ConnectionRowSummary from './ConnectionRowSummary.vue';
 
 defineEmits(['update:modelValue']);
 
@@ -29,13 +30,14 @@ const recipients = (to: string[] | string): string =>
 </script>
 
 <template>
+    <Label :text="__('Emails')" class="mb-2" />
+
     <ConnectionRows
         :model-value="modelValue"
         :errors
         :defaults
         :add-label="__('Add Email')"
-        :empty-heading="__('No emails yet')"
-        :empty-description="__('statamic::messages.email_connection_empty_description')"
+        :description="__('statamic::messages.email_connection_instructions')"
         :delete-heading="__('Delete Email')"
         :delete-description="__('statamic::messages.email_connection_delete_confirmation')"
         @update:model-value="$emit('update:modelValue', $event)"
@@ -45,9 +47,11 @@ const recipients = (to: string[] | string): string =>
                 <Icon name="mail-sign-at" class="size-3.5 me-1 opacity-100! text-blue-600 dark:text-blue-400" aria-hidden="true" />
                 {{ email.to?.length ? __('Message sent to :email', { email: recipients(email.to) }) : __('New Email') }}
             </Badge>
-            <Subheading v-show="collapsed" class="overflow-hidden text-ellipsis whitespace-nowrap gap-1.5!">
-                <span class="truncate">{{ conditionsSummary(email.conditions) ?? email.subject }}</span>
-            </Subheading>
+            <ConnectionRowSummary
+                v-show="collapsed"
+                :conditions="email.conditions"
+                :fallback="email.subject"
+            />
         </template>
 
         <template #default="{ item: email, errors }">

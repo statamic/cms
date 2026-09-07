@@ -12,6 +12,7 @@ import {
 import FieldNumber from '@/components/forms/FieldNumber.vue';
 import FieldConditions from './FieldConditions.vue';
 import Converter from '@/components/field-conditions/Converter.js';
+import { operatorLabel } from './operatorLabels';
 
 const converter = new Converter();
 
@@ -29,21 +30,6 @@ const props = defineProps({
     fieldtypes: Array,
 });
 
-const operatorLabels = {
-    equals: __('Equals'),
-    not: __('Does not equal'),
-    contains: __('Contains'),
-    contains_any: __('Contains Any'),
-    '===': '===',
-    '!==': '!==',
-    '>': '>',
-    '>=': '>=',
-    '<': '<',
-    '<=': '<=',
-    custom: __('Custom'),
-};
-
-const getOperatorLabel = (operator) => operatorLabels[operator] ?? operator ?? __('Equals');
 const getFieldDisplay = (handle) => __(props.suggestableFields.find(field => field.handle === handle)?.config?.display) || handle;
 
 const hasConditions = computed(() => props.conditions.if || props.conditions.unless || props.conditions.if_any || props.conditions.unless_any);
@@ -63,7 +49,7 @@ const previewParts = computed(() => {
 
     const { operator, value } = converter.splitRhs(fieldHandle, rawValue);
 
-    parts.push({ type: 'operator', text: getOperatorLabel(operator) });
+    parts.push({ type: 'operator', text: operatorLabel(operator) });
 
     if (value && value !== 'empty') {
         parts.push({ type: 'value', text: String(value) });

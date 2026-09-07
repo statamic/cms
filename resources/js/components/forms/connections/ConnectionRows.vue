@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { nanoid as uniqid } from 'nanoid';
-import { Button, ConfirmationModal } from '@ui';
+import { Button, ConfirmationModal, Description } from '@ui';
 import { SortableList } from '@/components/sortable/Sortable.js';
 import { deepClone } from '@/util/clone.js';
-import LogicEmptyState from '@/components/forms/logic/LogicEmptyState.vue';
+import { preferences } from '@api';
 import ConnectionRow from './ConnectionRow.vue';
 import { __ } from '@/bootstrap/globals';
 
@@ -27,8 +27,7 @@ const props = withDefaults(defineProps<{
     errors: Record<string, string[]>;
     defaults: Record<string, unknown>;
     addLabel: string;
-    emptyHeading: string;
-    emptyDescription?: string;
+    description?: string;
     deleteHeading: string;
     deleteDescription: string;
 }>(), {
@@ -36,7 +35,6 @@ const props = withDefaults(defineProps<{
     errors: () => ({}),
     defaults: () => ({}),
     addLabel: __('Add Row'),
-    emptyHeading: __('No rows yet'),
     deleteHeading: __('Delete Row'),
     deleteDescription: __('Are you sure you want to delete this row?'),
 });
@@ -44,7 +42,8 @@ const props = withDefaults(defineProps<{
 const sortableItemClass = 'connection-row';
 const sortableHandleClass = 'connection-row-handle';
 
-const collapsed = ref<string[]>([]);
+const collapseByDefault = ref<boolean>(preferences.get('forms.connect.collapse_rows', true));
+const collapsed = ref<string[]>(collapseByDefault.value ? props.modelValue.map((row) => row.id) : []);
 const confirmingRemoval = ref<string | null>(null);
 const errorRowIds = ref<string[]>([]);
 
@@ -99,6 +98,18 @@ const collapse = (id: string): void => {
 
 const expand = (id: string): void => (collapsed.value = collapsed.value.filter((rowId) => rowId !== id));
 
+const expandAll = (): void => {
+    collapsed.value = [];
+    collapseByDefault.value = false;
+};
+
+const collapseAll = (): void => {
+    collapsed.value = props.modelValue.map((row) => row.id);
+    collapseByDefault.value = true;
+};
+
+const allCollapsed = computed(() => collapsed.value.length === props.modelValue.length);
+
 const errorIndex = (row: Row): number => errorRowIds.value.indexOf(row.id);
 
 const hasError = (row: Row): boolean => {
@@ -119,6 +130,8 @@ const rowErrors = (row: Row) => {
         }, {});
 };
 
+watch(collapseByDefault, (collapse: boolean) => preferences.set('forms.connect.collapse_rows', collapse));
+
 watch(
     () => props.errors,
     () => (errorRowIds.value = props.modelValue.map((row) => row.id)),
@@ -127,9 +140,19 @@ watch(
 </script>
 
 <template>
-    <LogicEmptyState v-if="modelValue.length === 0" :heading="emptyHeading" :description="emptyDescription">
-        <Button size="sm" :text="addLabel" icon="plus" @click="add" />
-    </LogicEmptyState>
+    <Teleport v-if="modelValue.length > 1" defer to="#connection-rows-actions">
+        <Button
+            size="xs"
+            variant="ghost"
+            :icon="allCollapsed ? 'expand' : 'collapse'"
+            :aria-label="allCollapsed ? __('Expand all') : __('Collapse all')"
+            @click="allCollapsed ? expandAll() : collapseAll()"
+        />
+    </Teleport>
+
+    <Description v-if="description" :text="description" class="mb-4" />
+
+    <Button v-if="modelValue.length === 0" size="sm" :text="addLabel" icon="plus" @click="add" />
 
     <template v-else>
         <SortableList

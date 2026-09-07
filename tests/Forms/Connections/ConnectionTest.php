@@ -5,6 +5,7 @@ namespace Tests\Forms\Connections;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Form;
 use Statamic\Forms\Connections\Connection;
+use Statamic\Statamic;
 use Statamic\Support\VueComponent;
 use Tests\TestCase;
 
@@ -70,6 +71,41 @@ class ConnectionTest extends TestCase
 
         $this->assertEquals('Send submissions to Acme.', $connection->description());
         $this->assertEquals('Acme Inc', $connection->developer());
+    }
+
+    #[Test]
+    public function the_small_icon_falls_back_to_the_icon()
+    {
+        $connection = new class extends Connection
+        {
+            protected $icon = 'globe-arrow';
+
+            public function render(\Statamic\Contracts\Forms\Form $form): VueComponent
+            {
+                return VueComponent::render('nothing');
+            }
+        };
+
+        $this->assertEquals(Statamic::svg('icons/globe-arrow'), $connection->icon());
+        $this->assertEquals(Statamic::svg('icons/globe-arrow'), $connection->smallIcon());
+    }
+
+    #[Test]
+    public function small_icon_can_be_defined_as_a_property()
+    {
+        $connection = new class extends Connection
+        {
+            protected $icon = 'globe-arrow';
+            protected $smallIcon = '<svg><circle r="1" /></svg>';
+
+            public function render(\Statamic\Contracts\Forms\Form $form): VueComponent
+            {
+                return VueComponent::render('nothing');
+            }
+        };
+
+        $this->assertEquals(Statamic::svg('icons/globe-arrow'), $connection->icon());
+        $this->assertEquals('<svg><circle r="1" /></svg>', $connection->smallIcon());
     }
 
     #[Test]
