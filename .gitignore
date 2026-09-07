@@ -1,6 +1,5 @@
 .idea
 .vscode
-*.code-workspace
 /vendor
 node_modules
 .DS_Store
