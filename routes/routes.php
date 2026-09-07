@@ -11,8 +11,8 @@ use Statamic\Http\Middleware\RequireStatamicPro;
 if (config('statamic.api.enabled')) {
     Route::middleware([
         RequireStatamicPro::class,
-        ...Arr::wrap(config('statamic.api.middleware')),
         HandleAuthentication::class,
+        ...Arr::wrap(config('statamic.api.middleware')),
         Cache::class,
     ])
         ->name('statamic.api.')
