@@ -2,21 +2,30 @@
 
 namespace Tests\Stache;
 
+use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blink;
+use Statamic\Facades\Blueprint;
+use Statamic\Facades\Collection as CollectionFacade;
+use Statamic\Facades\Stache as StacheFacade;
+use Statamic\Facades\Taxonomy;
+use Statamic\Facades\Term;
 use Statamic\Stache\NullLockStore;
 use Statamic\Stache\Stache;
 use Statamic\Stache\Stores\ChildStore;
 use Statamic\Stache\Stores\CollectionsStore;
 use Statamic\Stache\Stores\EntriesStore;
 use Symfony\Component\Lock\LockFactory;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class StacheTest extends TestCase
 {
+    use PreventSavingStacheItemsToDisk;
+
     protected $stache;
 
     public function setUp(): void
@@ -194,5 +203,49 @@ class StacheTest extends TestCase
             ['local', 'config' => null, 'expected' => false],
             ['production', 'config' => null, 'expected' => false],
         ];
+    }
+
+    #[Test]
+    public function warming_builds_term_associations_for_single_item_taxonomy_fields()
+    {
+        Taxonomy::make('tags')->save();
+        CollectionFacade::make('blog')->taxonomies(['tags'])->save();
+        Blueprint::make('blog')->setNamespace('collections.blog')->setContents(['fields' => [
+            ['handle' => 'tags', 'field' => ['type' => 'terms', 'taxonomies' => ['tags'], 'max_items' => 1]],
+        ]])->save();
+        Term::make('alfa')->taxonomy('tags')->data(['title' => 'Alfa'])->save();
+        EntryFactory::collection('blog')->id('1')->slug('one')->data(['tags' => 'alfa'])->create();
+        EntryFactory::collection('blog')->id('2')->slug('two')->data(['tags' => 'bravo'])->create();
+        EntryFactory::collection('blog')->id('3')->slug('three')->data([])->create();
+
+        StacheFacade::clear();
+        StacheFacade::warm();
+
+        $this->assertEquals([
+            ['value' => 'alfa', 'slug' => 'alfa', 'entry' => '1', 'collection' => 'blog', 'site' => 'en'],
+            ['value' => 'bravo', 'slug' => 'bravo', 'entry' => '2', 'collection' => 'blog', 'site' => 'en'],
+        ], StacheFacade::store('terms')->store('tags')->index('associations')->items()->all());
+    }
+
+    #[Test]
+    public function warming_includes_on_the_fly_terms_in_term_value_indexes()
+    {
+        Taxonomy::make('tags')->save();
+        CollectionFacade::make('blog')->taxonomies(['tags'])->save();
+        Term::make('alfa')->taxonomy('tags')->data(['title' => 'Alfa'])->save();
+        EntryFactory::collection('blog')->id('1')->slug('one')->data(['tags' => ['alfa', 'bravo']])->create();
+
+        StacheFacade::clear();
+        StacheFacade::warm();
+
+        $store = StacheFacade::store('terms')->store('tags');
+
+        $this->assertEquals([
+            ['value' => 'alfa', 'slug' => 'alfa', 'entry' => '1', 'collection' => 'blog', 'site' => 'en'],
+            ['value' => 'bravo', 'slug' => 'bravo', 'entry' => '1', 'collection' => 'blog', 'site' => 'en'],
+        ], $store->index('associations')->items()->all());
+
+        $this->assertEquals(['en::alfa' => 'alfa', 'en::bravo' => 'bravo'], $store->index('slug')->items()->all());
+        $this->assertEquals(['en::alfa' => 'en', 'en::bravo' => 'en'], $store->index('site')->items()->all());
     }
 }
