@@ -124,7 +124,7 @@ class LoginController extends Controller
     {
         $guard = request()->query('guard');
 
-        if ($guard === null || $guard === '') {
+        if (! $guard) {
             return null;
         }
 

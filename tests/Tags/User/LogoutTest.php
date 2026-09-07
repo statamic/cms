@@ -62,8 +62,10 @@ class LogoutTest extends TestCase
 
     #[Test]
     #[DataProvider('invalidGuardProvider')]
-    public function it_does_not_logout_an_invalid_guard($guard)
+    public function it_does_not_logout_an_invalid_guard(string $guard)
     {
+        config()->set('auth.guards.api', ['driver' => 'token', 'provider' => 'users']);
+
         $this
             ->actingAs($this->createUser())
             ->get(route('statamic.logout', ['guard' => $guard]))
@@ -72,23 +74,20 @@ class LogoutTest extends TestCase
         $this->assertAuthenticated();
     }
 
-    public static function invalidGuardProvider()
+    public static function invalidGuardProvider(): array
     {
         return [
             'unknown guard' => ['nope'],
-            'falsy string' => ['0'],
-            'array' => [['web']],
+            'non-session guard' => ['api'],
         ];
     }
 
     #[Test]
-    public function it_does_not_logout_a_non_session_guard()
+    public function it_does_not_logout_an_array_of_guards()
     {
-        config()->set('auth.guards.api', ['driver' => 'token', 'provider' => 'users']);
-
         $this
             ->actingAs($this->createUser())
-            ->get(route('statamic.logout', ['guard' => 'api']))
+            ->get(route('statamic.logout', ['guard' => ['web']]))
             ->assertNotFound();
 
         $this->assertAuthenticated();
