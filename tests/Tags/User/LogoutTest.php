@@ -2,6 +2,7 @@
 
 namespace Tests\Tags\User;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -60,11 +61,34 @@ class LogoutTest extends TestCase
     }
 
     #[Test]
-    public function it_does_not_logout_an_unknown_guard()
+    #[DataProvider('invalidGuardProvider')]
+    public function it_does_not_logout_an_invalid_guard($guard)
     {
         $this
             ->actingAs($this->createUser())
-            ->get(route('statamic.logout', ['guard' => 'nope']))
+            ->get(route('statamic.logout', ['guard' => $guard]))
+            ->assertNotFound();
+
+        $this->assertAuthenticated();
+    }
+
+    public static function invalidGuardProvider()
+    {
+        return [
+            'unknown guard' => ['nope'],
+            'falsy string' => ['0'],
+            'array' => [['web']],
+        ];
+    }
+
+    #[Test]
+    public function it_does_not_logout_a_non_session_guard()
+    {
+        config()->set('auth.guards.api', ['driver' => 'token', 'provider' => 'users']);
+
+        $this
+            ->actingAs($this->createUser())
+            ->get(route('statamic.logout', ['guard' => 'api']))
             ->assertNotFound();
 
         $this->assertAuthenticated();
