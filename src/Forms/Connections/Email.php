@@ -28,14 +28,9 @@ class Email extends Connection
         return Statamic::svg('forms/connect/email-notifications');
     }
 
-    public function breadcrumbIcon(): ?string
+    public function smallIcon(): ?string
     {
-        return Statamic::svg('forms/connect/email-notifications-flat');
-    }
-
-    public function breadcrumbIconColor(): ?string
-    {
-        return 'text-blue-600 dark:text-blue-400';
+        return Statamic::svg('forms/connect/email-notifications-small');
     }
 
     public function count(Form $form): ?int

@@ -99,7 +99,7 @@ onUnmounted(() => {
                         <span class="relative inline-flex items-center gap-1.5">
                             <span
                                 v-if="connection.icon"
-                                :class="[connection.iconColor || 'text-gray-700 dark:text-gray-300', 'size-4 [&_svg]:size-4']"
+                                class="size-4 text-gray-700 dark:text-gray-300 [&_svg]:size-4"
                                 aria-hidden="true"
                                 v-html="connection.icon"
                             />
