@@ -94,6 +94,21 @@ class LogoutTest extends TestCase
         $this->assertAuthenticated();
     }
 
+    #[Test]
+    public function it_ignores_the_guard_param_on_the_cp_logout_route()
+    {
+        config()->set('auth.guards.statamic', config('auth.guards.web'));
+
+        $this
+            ->actingAs($this->createUser(), 'statamic')
+            ->actingAs(User::make()->id('web-user')->email('web@example.com')->save(), 'web')
+            ->get(cp_route('logout', ['guard' => 'statamic']))
+            ->assertRedirect('/');
+
+        $this->assertAuthenticated('statamic');
+        $this->assertGuest('web');
+    }
+
     private function createUser()
     {
         return tap(User::make()->id('test-user')->email('test@example.com')->password('secret'))->save();
