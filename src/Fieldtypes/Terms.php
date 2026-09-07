@@ -567,27 +567,20 @@ class Terms extends Relationship
     }
 
     /**
-     * Depth, searchable ancestry, and structured ancestor titles for the relationship UI.
+     * Depth, searchable ancestry, and the ancestor path for the relationship UI.
      */
     public function itemHierarchyMeta($term): array
     {
-        $meta = [];
-
-        if (count($this->getConfiguredTaxonomies()) > 1) {
-            $meta['taxonomy_title'] = __($term->taxonomy()->title());
-        }
-
         if (! $term->taxonomy()?->hierarchical()) {
-            return $meta;
+            return [];
         }
 
-        $ancestors = $term->ancestors();
+        $path = $this->getItemPath($term);
 
         return [
-            ...$meta,
             'depth' => $term->depth() ?? 1,
-            'search_titles' => $ancestors->map->title()->push($term->title())->implode(' '.EnsuresTermPaths::DELIMITER.' '),
-            'ancestors' => $ancestors->map->title()->values()->all(),
+            'search_titles' => collect($path)->push($term->title())->implode(' '.EnsuresTermPaths::DELIMITER.' '),
+            'path' => $path,
         ];
     }
 
@@ -797,8 +790,14 @@ class Terms extends Relationship
     {
         return collect([
             count($this->getConfiguredTaxonomies()) > 1 ? __($item->taxonomy()->title()) : null,
-            $item->taxonomy()?->hierarchical() ? $item->ancestors()->map->title()->implode(' » ') : null,
         ])->filter()->implode(' • ');
+    }
+
+    public function getItemPath($item): ?array
+    {
+        return $item->taxonomy()?->hierarchical()
+            ? $item->ancestors()->map->title()->values()->all()
+            : null;
     }
 
     public function replaceTermReferences($data, ?string $newValue, string $oldValue, string $taxonomy)

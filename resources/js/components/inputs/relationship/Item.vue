@@ -14,36 +14,11 @@
             />
 
             <template v-else>
-                <span
-                    v-if="hintTaxonomy"
-                    v-text="hintTaxonomy"
-                    class="text-xs text-gray-400 dark:text-gray-500"
-                />
-                <template v-if="hintPathSegments.length">
-                    <template v-for="(segment, i) in hintPathSegments" :key="i">
-                        <ui-icon
-                            v-if="i > 0"
-                            name="chevron-right"
-                            class="size-3 shrink-0 text-gray-300 dark:text-gray-600"
-                            aria-hidden="true"
-                        />
-                        <ui-badge size="sm" :text="segment" />
-                    </template>
+                <template v-for="(segment, i) in path" :key="i">
+                    <ui-badge size="sm" :text="__(segment)" />
                     <ui-icon
                         name="chevron-right"
-                        class="size-[12px] shrink-0 text-gray-300 dark:text-gray-600"
-                        aria-hidden="true"
-                    />
-                </template>
-                <template v-else-if="showHintFallback">
-                    <span
-                        v-text="item.hint"
-                        :title="item.hint"
-                        class="text-xs text-gray-500 dark:text-gray-400"
-                    />
-                    <ui-icon
-                        name="chevron-right"
-                        class="size-[12px] shrink-0 text-gray-900 dark:text-gray-100"
+                        class="size-3 shrink-0 text-gray-300 dark:text-gray-600"
                         aria-hidden="true"
                     />
                 </template>
@@ -70,6 +45,12 @@
                 @closed="isEditing = false"
             />
         </div>
+
+        <div
+            v-if="item.hint"
+            v-text="item.hint"
+            class="text-2xs tracking-tight hidden whitespace-nowrap text-gray-500 @sm:block"
+        />
 
         <div class="flex shrink-0 items-center" v-if="!readOnly">
             <Dropdown>
@@ -132,20 +113,8 @@ export default {
     },
 
     computed: {
-        hintTaxonomy() {
-            return this.item.taxonomy_title || null;
-        },
-
-        hintPathSegments() {
-            return Array.isArray(this.item.ancestors) ? this.item.ancestors : [];
-        },
-
-        showHintFallback() {
-            if (this.item.taxonomy_title || Array.isArray(this.item.ancestors)) {
-                return false;
-            }
-
-            return !!this.item.hint;
+        path() {
+            return this.item.path ?? [];
         },
     },
 

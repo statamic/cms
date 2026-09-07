@@ -76,31 +76,50 @@ class TermsHierarchyTest extends TestCase
     }
 
     #[Test]
-    public function the_item_hint_is_the_ancestor_path()
+    public function the_item_hint_is_only_the_taxonomy_when_more_than_one_is_configured()
     {
-        $fieldtype = $this->fieldtype(['taxonomies' => ['categories']]);
+        tap(Facades\Taxonomy::make('tags'))->save();
 
         $cat = Term::find('categories::cat')->in('en');
-        $animals = Term::find('categories::animals')->in('en');
 
-        $this->assertEquals('Animals', $fieldtype->getItemHint($cat));
-        $this->assertEquals('', $fieldtype->getItemHint($animals));
+        $this->assertEquals('', $this->fieldtype(['taxonomies' => ['categories']])->getItemHint($cat));
+        $this->assertEquals('Categories', $this->fieldtype(['taxonomies' => ['categories', 'tags']])->getItemHint($cat));
     }
 
     #[Test]
-    public function item_data_includes_depth_and_search_titles_for_hierarchical_terms()
+    public function the_item_path_is_the_ancestor_titles()
+    {
+        $fieldtype = $this->fieldtype(['taxonomies' => ['categories']]);
+
+        $this->assertEquals(['Animals'], $fieldtype->getItemPath(Term::find('categories::cat')->in('en')));
+        $this->assertEquals([], $fieldtype->getItemPath(Term::find('categories::animals')->in('en')));
+    }
+
+    #[Test]
+    public function there_is_no_item_path_for_a_flat_taxonomy()
+    {
+        tap(Facades\Taxonomy::make('tags'))->save();
+        tap(Term::make('featured')->taxonomy('tags')->data(['title' => 'Featured']))->save();
+
+        $fieldtype = $this->fieldtype(['taxonomies' => ['tags']]);
+
+        $this->assertNull($fieldtype->getItemPath(Term::find('tags::featured')->in('en')));
+    }
+
+    #[Test]
+    public function item_data_includes_depth_search_titles_and_path_for_hierarchical_terms()
     {
         $item = $this->fieldtype(['taxonomies' => ['categories']])->getItemData(['cat'])->first();
 
         $this->assertEquals(2, $item['depth']);
         $this->assertEquals('Animals > Cat', $item['search_titles']);
-        $this->assertEquals(['Animals'], $item['ancestors']);
+        $this->assertEquals(['Animals'], $item['path']);
         $this->assertArrayNotHasKey('taxonomy_title', $item);
-        $this->assertEquals('Animals', $item['hint']);
+        $this->assertEquals('', $item['hint']);
     }
 
     #[Test]
-    public function select_options_include_depth_and_search_titles_even_when_mode_is_default()
+    public function select_options_include_depth_search_titles_and_path_even_when_mode_is_default()
     {
         $fieldtype = $this->fieldtype(['taxonomies' => ['categories']]);
         $request = new Request(['paginate' => false]);
@@ -114,13 +133,13 @@ class TermsHierarchyTest extends TestCase
 
         $this->assertEquals(1, $byId['categories::animals']['depth']);
         $this->assertEquals('Animals', $byId['categories::animals']['search_titles']);
-        $this->assertEquals([], $byId['categories::animals']['ancestors']);
+        $this->assertEquals([], $byId['categories::animals']['path']);
         $this->assertArrayNotHasKey('hint', $byId['categories::animals']);
 
         $this->assertEquals(2, $byId['categories::cat']['depth']);
         $this->assertEquals('Animals > Cat', $byId['categories::cat']['search_titles']);
-        $this->assertEquals(['Animals'], $byId['categories::cat']['ancestors']);
-        $this->assertEquals('Animals', $byId['categories::cat']['hint']);
+        $this->assertEquals(['Animals'], $byId['categories::cat']['path']);
+        $this->assertArrayNotHasKey('hint', $byId['categories::cat']);
     }
 
     #[Test]
@@ -141,11 +160,11 @@ class TermsHierarchyTest extends TestCase
 
         $this->assertEquals(2, $byId['categories::cat']['depth']);
         $this->assertEquals('Animals > Cat', $byId['categories::cat']['search_titles']);
-        $this->assertEquals(['Animals'], $byId['categories::cat']['ancestors']);
-        $this->assertEquals('Categories', $byId['categories::cat']['taxonomy_title']);
-        $this->assertEquals('Categories • Animals', $byId['categories::cat']['hint']);
+        $this->assertEquals(['Animals'], $byId['categories::cat']['path']);
+        $this->assertArrayNotHasKey('taxonomy_title', $byId['categories::cat']);
+        $this->assertEquals('Categories', $byId['categories::cat']['hint']);
         $this->assertArrayNotHasKey('depth', $byId['tags::featured']);
-        $this->assertEquals('Tags', $byId['tags::featured']['taxonomy_title']);
+        $this->assertArrayNotHasKey('path', $byId['tags::featured']);
         $this->assertEquals('Tags', $byId['tags::featured']['hint']);
     }
 
@@ -158,9 +177,9 @@ class TermsHierarchyTest extends TestCase
 
         $this->assertEquals(2, $item['depth']);
         $this->assertEquals('Animals > Cat', $item['search_titles']);
-        $this->assertEquals(['Animals'], $item['ancestors']);
-        $this->assertEquals('Categories', $item['taxonomy_title']);
-        $this->assertEquals('Categories • Animals', $item['hint']);
+        $this->assertEquals(['Animals'], $item['path']);
+        $this->assertArrayNotHasKey('taxonomy_title', $item);
+        $this->assertEquals('Categories', $item['hint']);
     }
 
     #[Test]

@@ -280,6 +280,11 @@ abstract class Relationship extends Fieldtype
         return null;
     }
 
+    public function getItemPath($item): ?array
+    {
+        return null;
+    }
+
     abstract protected function toItemArray($id);
 
     protected function invalidItemArray($id)
