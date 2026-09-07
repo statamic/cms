@@ -164,7 +164,41 @@ trait Revisable
             ->makeRevision()
             ->user($options['user'] ?? null)
             ->message($options['message'] ?? null)
+            ->publishAt($options['publish_at'] ?? null)
             ->save();
+    }
+
+    public function publishRevision($revision)
+    {
+        $item = $this->makeFromRevision($revision);
+
+        $saved = $item
+            ->published(true)
+            ->updateLastModified($user = $revision->user())
+            ->save();
+
+        if (! $saved) {
+            return false;
+        }
+
+        $item
+            ->makeRevision()
+            ->user($user)
+            ->message($revision->message())
+            ->action('publish')
+            ->save();
+
+        $revision->publishAt(null)->save();
+
+        if ($item->workingCopy()?->attributes() == $revision->attributes()) {
+            $item->deleteWorkingCopy();
+        }
+
+        if ($item instanceof Entry) {
+            $item->blueprint()->setParent($item);
+        }
+
+        return $item;
     }
 
     public function revisionsEnabled()
