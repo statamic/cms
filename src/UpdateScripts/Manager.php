@@ -40,7 +40,7 @@ class Manager
      */
     public function runUpdatesForSpecificPackageVersion($package, $oldVersion, $console = null)
     {
-        Lock::backup(base_path('composer.lock'));
+        Lock::backup(Lock::file()->path());
 
         $newLockFile = Lock::file();
         $oldLockFile = Lock::file(UpdateScript::BACKUP_PATH)->overridePackageVersion($package, $oldVersion);
