@@ -267,10 +267,6 @@ export default {
                 return false;
             }
 
-            if (index === 0) {
-                return false;
-            }
-
             return this.showSetConnector(index);
         },
 

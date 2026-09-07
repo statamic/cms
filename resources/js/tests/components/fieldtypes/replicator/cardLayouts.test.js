@@ -91,6 +91,12 @@ test('shouldShowPickerConnector shows inset connectors for non-row-start cards',
     })).toBe(false);
 
     expect(shouldShowPickerConnector({
+        index: 0,
+        layouts,
+        showCardEntryConnector: () => true,
+    })).toBe(true);
+
+    expect(shouldShowPickerConnector({
         index: 1,
         layouts,
         showCardEntryConnector: () => false,
