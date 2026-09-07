@@ -40,6 +40,7 @@ const label = computed(() => {
 <template>
     <span class="flex items-center gap-2">
         <span v-if="showDot" class="size-2 rounded-full" :class="statusClass" v-tooltip="label" />
+        <span v-if="showDot && !showLabel" class="sr-only" v-text="label" />
         <span v-if="showLabel" class="status-index-field select-none" :class="`status-${status}`" v-text="label" />
     </span>
 </template>
