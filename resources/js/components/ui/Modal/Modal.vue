@@ -65,7 +65,7 @@ const escBinding = ref(null);
 const instance = getCurrentInstance();
 const hasModalTitleComponent = hasComponent('ModalTitle');
 const titleId = useId();
-const labelledBy = computed(() => (hasModalTitleComponent.value || props.title) ? titleId : undefined);
+const labelledBy = computed(() => hasModalTitleComponent.value || props.title ? titleId : undefined);
 const isUsingOpenProp = computed(() => instance?.vnode.props?.hasOwnProperty('open'));
 const portal = computed(() => modal.value ? `#portal-target-${modal.value.id}` : null);
 const isTopPortal = computed(() => portals.all()[portals.all().length - 1].id === modal.value.id);

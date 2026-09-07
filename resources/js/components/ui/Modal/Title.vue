@@ -5,7 +5,7 @@ defineOptions({
     name: 'ModalTitle',
 });
 
-const titleId = inject('modalTitleId', undefined);
+const titleId = inject('modalTitleId', null);
 </script>
 
 <template>
