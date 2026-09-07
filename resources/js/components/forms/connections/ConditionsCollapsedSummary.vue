@@ -1,22 +1,45 @@
-<script setup>
+<script setup lang="ts">
 import { computed } from 'vue';
 import { usePage } from '@inertiajs/vue3';
 import { Badge, Icon, Subheading } from '@ui';
 import FieldNumber from '@/components/forms/FieldNumber.vue';
 import { categories, categoryColorClasses } from '@/components/forms/builder/categories';
 import { operatorLabel } from '@/components/forms/logic/operatorLabels';
+import { __ } from '@/bootstrap/globals';
 
-const props = defineProps({
-    conditions: { type: Array, default: () => [] },
-    fallback: { type: String, default: null },
+type Condition = {
+    field: string | null;
+    operator: string;
+    value: unknown;
+    join?: 'and' | 'or';
+};
+
+type SuggestableField = {
+    handle: string;
+    icon?: string;
+    category?: string;
+    config?: { display?: string };
+};
+
+type SummaryPart = {
+    type: 'join' | 'field' | 'operator' | 'value';
+    text: string;
+};
+
+const props = withDefaults(defineProps<{
+    conditions?: Condition[];
+    fallback?: string | null;
+}>(), {
+    conditions: () => [],
+    fallback: null,
 });
 
-const suggestableFields = usePage().props.suggestableFields ?? [];
+const suggestableFields = (usePage().props.suggestableFields ?? []) as SuggestableField[];
 
-const findField = (handle) => suggestableFields.find((field) => field.handle === handle);
-const fieldDisplay = (handle) => __(findField(handle)?.config?.display) || handle;
+const findField = (handle: string): SuggestableField | undefined => suggestableFields.find((field) => field.handle === handle);
+const fieldDisplay = (handle: string): string => __(findField(handle)?.config?.display) || handle;
 
-const fieldIconClass = (field) => {
+const fieldIconClass = (field?: SuggestableField): string => {
     const color = categories[field?.category]?.color || 'gray';
 
     return categoryColorClasses[color]?.icon || 'text-gray-600 dark:text-gray-400';
@@ -39,12 +62,12 @@ const firstField = computed(() => {
     };
 });
 
-const hasValue = (condition) => condition.value !== null && condition.value !== undefined && condition.value !== '';
-const displayValue = (condition) => (Array.isArray(condition.value) ? condition.value.join(', ') : String(condition.value));
+const hasValue = (condition: Condition): boolean => condition.value !== null && condition.value !== undefined && condition.value !== '';
+const displayValue = (condition: Condition): string => (Array.isArray(condition.value) ? condition.value.join(', ') : String(condition.value));
 
-const previewParts = computed(() =>
+const previewParts = computed<SummaryPart[]>(() =>
     conditions.value.flatMap((condition, index) => {
-        const parts = [];
+        const parts: SummaryPart[] = [];
 
         if (index > 0) {
             parts.push({ type: 'join', text: condition.join === 'or' ? __('or') : __('and') });
