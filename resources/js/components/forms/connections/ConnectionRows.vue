@@ -4,6 +4,7 @@ import { nanoid as uniqid } from 'nanoid';
 import { Button, ConfirmationModal, Description } from '@ui';
 import { SortableList } from '@/components/sortable/Sortable.js';
 import { deepClone } from '@/util/clone.js';
+import { preferences } from '@api';
 import ConnectionRow from './ConnectionRow.vue';
 import { __ } from '@/bootstrap/globals';
 
@@ -41,7 +42,8 @@ const props = withDefaults(defineProps<{
 const sortableItemClass = 'connection-row';
 const sortableHandleClass = 'connection-row-handle';
 
-const collapsed = ref<string[]>([]);
+const collapseByDefault = ref<boolean>(preferences.get('forms.connect.collapse_rows', true));
+const collapsed = ref<string[]>(collapseByDefault.value ? props.modelValue.map((row) => row.id) : []);
 const confirmingRemoval = ref<string | null>(null);
 const errorRowIds = ref<string[]>([]);
 
@@ -96,8 +98,16 @@ const collapse = (id: string): void => {
 
 const expand = (id: string): void => (collapsed.value = collapsed.value.filter((rowId) => rowId !== id));
 
-const expandAll = (): void => (collapsed.value = []);
-const collapseAll = (): void => (collapsed.value = props.modelValue.map((row) => row.id));
+const expandAll = (): void => {
+    collapsed.value = [];
+    collapseByDefault.value = false;
+};
+
+const collapseAll = (): void => {
+    collapsed.value = props.modelValue.map((row) => row.id);
+    collapseByDefault.value = true;
+};
+
 const allCollapsed = computed(() => collapsed.value.length === props.modelValue.length);
 
 const errorIndex = (row: Row): number => errorRowIds.value.indexOf(row.id);
@@ -119,6 +129,8 @@ const rowErrors = (row: Row) => {
             return fields;
         }, {});
 };
+
+watch(collapseByDefault, (collapse: boolean) => preferences.set('forms.connect.collapse_rows', collapse));
 
 watch(
     () => props.errors,
