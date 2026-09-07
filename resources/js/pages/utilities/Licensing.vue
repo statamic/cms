@@ -90,7 +90,7 @@ const props = defineProps([
                                     <span class="little-dot mt-[0.45rem]" :class="statamic.valid ? 'bg-green-500' : 'bg-red-500'" />
                                     <span>
                                     {{ __('Statamic') }}
-                                    <span v-if="statamic.pro" class="text-pink">{{ __('Pro') }}</span>
+                                    <span v-if="statamic.pro" class="text-pink-dark dark:text-pink">{{ __('Pro') }}</span>
                                     <template v-else>{{ __('Free') }}</template>
                                 </span>
                                 </div>
