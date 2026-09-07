@@ -38,7 +38,6 @@ it('exports core', async () => {
         'SaveButtonOptions',
         'SortableList',
         'clone',
-        'conditionsSummary',
         'debounce',
         'deepClone',
         'requireElevatedSession',
