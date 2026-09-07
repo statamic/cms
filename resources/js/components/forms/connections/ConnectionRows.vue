@@ -137,17 +137,6 @@ const rowErrors = (row: Row) => {
 };
 
 watch(
-    () => props.modelValue.map((row) => row.id),
-    (newIds, oldIds) => {
-        const added = newIds.filter((id) => !oldIds?.includes(id));
-
-        if (userPreference.value !== 'expanded' && added.length) {
-            collapsed.value = [...collapsed.value, ...added];
-        }
-    },
-);
-
-watch(
     () => props.errors,
     () => (errorRowIds.value = props.modelValue.map((row) => row.id)),
     { immediate: true },
