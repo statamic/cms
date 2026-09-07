@@ -1,11 +1,21 @@
 <template>
-    <div class="blueprint-section min-h-40 w-full outline-hidden @container" tabindex="-1">
+    <div
+        class="blueprint-section min-h-40 outline-hidden @container w-full"
+        tabindex="-1"
+    >
         <ui-panel>
             <ui-panel-header class="flex items-center justify-between pl-2.75! pr-3.25!">
-                <div class="flex items-center gap-2 flex-1">
+                <div class="flex items-center gap-2 flex-1 min-w-0">
                     <ui-icon name="handles-sm" class="blueprint-section-drag-handle size-3! cursor-grab text-gray-400" />
                     <ui-icon :name="section.icon" :set="iconSet" v-if="section.icon" />
                     <ui-heading v-text="__(section.display ?? 'Section')" />
+                    <ui-badge
+                        v-if="showCardField && card"
+                        pill
+                        icon="cards"
+                        :text="__('Card')"
+                        color="white"
+                    />
                 </div>
                 <ui-button icon="pencil-line" size="sm" variant="ghost" @click="edit" />
                 <ui-button icon="trash" size="sm" variant="ghost" @click.prevent="$emit('deleted')" />
@@ -69,6 +79,13 @@
                     </ui-field>
                     <ui-field :label="__('Instructions')">
                         <ui-input type="text" v-model="editingSection.instructions" />
+                    </ui-field>
+                    <ui-field
+                        :label="__('Card layout')"
+                        :instructions="__('messages.replicator_set_card_layout_instructions')"
+                        v-if="showCardField"
+                    >
+                        <ui-switch v-model="editingSection.card" />
                     </ui-field>
                     <ui-field :label="__('Collapsible')" v-if="showCollapsibleField">
                         <ui-switch v-model="editingSection.collapsible" />
@@ -156,6 +173,7 @@ export default {
         tabId: { type: String },
         section: { type: Object, required: true },
         showHandleField: { type: Boolean, default: false },
+        showCardField: { type: Boolean, default: false },
 	    showCollapsibleField: { type: Boolean, default: false },
         showHideField: { type: Boolean, default: false },
         editText: { type: String },
@@ -192,6 +210,10 @@ export default {
         isSoloNarrowStack() {
             const stacks = this.$stacks.stacks();
             return stacks.length === 1 && stacks[0]?.data?.vm?.size === 'narrow';
+        },
+
+        card() {
+            return this.section.card ?? false;
         },
     },
 
@@ -269,6 +291,7 @@ export default {
                 icon: this.section.icon,
                 image: this.section.image,
                 hide: this.section.hide,
+                card: this.section.card ?? false,
                 collapsible: this.section.collapsible,
                 collapsed: this.section.collapsed,
             };

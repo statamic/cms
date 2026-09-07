@@ -1,6 +1,12 @@
 <template>
     <div>
-        <div ref="sections" class="blueprint-sections flex flex-wrap outline-hidden" :data-tab="tabId" tabindex="-1">
+        <div
+            ref="sections"
+            class="blueprint-sections outline-hidden"
+            :class="showSectionHandleField ? 'field-grid' : 'flex flex-wrap'"
+            :data-tab="tabId"
+            tabindex="-1"
+        >
             <BlueprintSection
                 ref="section"
                 v-for="(section, i) in sections"
@@ -9,6 +15,7 @@
                 :can-define-localizable="canDefineLocalizable"
                 :tab-id="tabId"
                 :show-handle-field="showSectionHandleField"
+                :show-card-field="showSectionCardField"
                 :show-collapsible-field="showSectionCollapsibleField"
                 :show-hide-field="showSectionHideField"
                 :exclude-fieldset="excludeFieldset"
@@ -18,7 +25,7 @@
                 @deleted="deleteSection(i)"
             />
 
-            <div class="blueprint-add-section-container w-full">
+            <div class="blueprint-add-section-container" :class="showSectionHandleField ? 'field-w-100' : 'w-full'">
                 <button class="blueprint-add-section-button" @click="addAndEditSection">
                     <div class="flex items-center gap-2">
                         <ui-icon name="plus" class="size-4" />
@@ -74,6 +81,10 @@ export default {
             type: Boolean,
             default: false,
         },
+        showSectionCardField: {
+            type: Boolean,
+            default: false,
+        },
 	    showSectionCollapsibleField: {
 			type: Boolean,
 		    default: false,
@@ -114,6 +125,7 @@ export default {
                 collapsed: false,
                 icon: null,
                 hide: null,
+                card: false,
                 handle: snake_case(this.newSectionText),
                 fields: [],
             };

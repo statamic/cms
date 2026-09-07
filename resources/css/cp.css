@@ -35,6 +35,7 @@
 @import './components/fieldtypes/markdown.css';
 @import './components/fieldtypes/partial.css';
 @import './components/fieldtypes/relationship.css';
+@import './components/fieldtypes/replicator-card-sets.css';
 @import './components/fieldtypes/section.css';
 @import './components/fieldtypes/table.css';
 @import './components/fieldtypes/width.css';
