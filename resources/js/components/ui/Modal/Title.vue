@@ -1,11 +1,15 @@
 <script setup>
+import { inject } from 'vue';
+
 defineOptions({
     name: 'ModalTitle',
 });
+
+const titleId = inject('modalTitleId', undefined);
 </script>
 
 <template>
-    <div data-ui-modal-title>
+    <div :id="titleId" data-ui-modal-title>
         <slot />
     </div>
 </template>
