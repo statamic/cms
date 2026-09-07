@@ -53,6 +53,16 @@ class CustomMiddlewareTest extends TestCase
     {
         $app['config']->set('statamic.graphql.middleware', [CountRequests::class]);
     }
+
+    #[Test]
+    #[DefineEnvironment('addCustomMiddlewareWithMethod')]
+    public function custom_middleware_runs_before_the_cached_response_is_returned()
+    {
+        $this->post('/graphql', ['query' => '{ping}']);
+        $this->post('/graphql', ['query' => '{ping}']);
+
+        $this->assertEquals(2, app('request-count'));
+    }
 }
 
 class CountRequests
