@@ -186,6 +186,7 @@ class ExtensionServiceProvider extends ServiceProvider
         'get_site' => Tags\GetSite::class,
         'glide' => Tags\Glide::class,
         'in' => Tags\In::class,
+        'include' => Tags\IncludeTag::class,
         'increment' => Tags\Increment::class,
         'installed' => Tags\Installed::class,
         'is' => Tags\Is::class,

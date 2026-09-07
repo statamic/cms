@@ -11,6 +11,13 @@ abstract class Region
     protected $context = [];
     protected $session;
 
+    protected static $preservedContextKeys = [];
+
+    public static function preserveContextKeys(array $keys): void
+    {
+        static::$preservedContextKeys = array_unique(array_merge(static::$preservedContextKeys, $keys));
+    }
+
     public function setSession(Session $session)
     {
         $this->session = $session;
@@ -26,21 +33,18 @@ abstract class Region
         return $this->context;
     }
 
+    public static function filterCacheable(array $context): array
+    {
+        return collect($context)
+            ->reject(fn ($value, $key) => str_starts_with((string) $key, '__') && ! in_array($key, static::$preservedContextKeys))
+            ->reject(fn ($value, $key) => in_array($key, ['app', 'errors', 'obLevel', 'resolve', 'resolveComponentsUsing', 'forgetComponentsResolver', 'forgetFactory', 'flushCache', 'constructor']))
+            ->map(fn ($value) => $value instanceof InvokableComponentVariable ? $value->resolveDisplayableValue() : $value)
+            ->all();
+    }
+
     protected function filterContext(array $context)
     {
-        $context = collect($context)
-            ->reject(fn ($value, $key) => str_starts_with((string) $key, '__'))
-            ->reject(fn ($value, $key) => in_array($key, ['app', 'errors', 'resolve', 'resolveComponentsUsing', 'forgetComponentsResolver', 'forgetFactory', 'flushCache', 'constructor']))
-            ->map(function ($value, $key) {
-                if ($value instanceof InvokableComponentVariable) {
-                    return $value->resolveDisplayableValue();
-                }
-
-                return $value;
-            })
-            ->all();
-
-        return $this->arrayRecursiveDiff($context, $this->session->cascade());
+        return $this->arrayRecursiveDiff(static::filterCacheable($context), $this->session->cascade());
     }
 
     public function fragmentData(): array
