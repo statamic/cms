@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { computed, inject, ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { nanoid as uniqid } from 'nanoid';
 import { Button, ConfirmationModal, Description } from '@ui';
 import { SortableList } from '@/components/sortable/Sortable.js';
 import { deepClone } from '@/util/clone.js';
-import { preferences } from '@api';
 import ConnectionRow from './ConnectionRow.vue';
 import { __ } from '@/bootstrap/globals';
 
@@ -42,8 +41,7 @@ const props = withDefaults(defineProps<{
 const sortableItemClass = 'connection-row';
 const sortableHandleClass = 'connection-row-handle';
 
-const userPreference = ref<'collapsed' | 'expanded'>(preferences.get('forms.connect.rows_view', 'collapsed'));
-const collapsed = ref<string[]>(userPreference.value === 'collapsed' ? props.modelValue.map((row) => row.id) : []);
+const collapsed = ref<string[]>([]);
 const confirmingRemoval = ref<string | null>(null);
 const errorRowIds = ref<string[]>([]);
 
@@ -98,20 +96,9 @@ const collapse = (id: string): void => {
 
 const expand = (id: string): void => (collapsed.value = collapsed.value.filter((rowId) => rowId !== id));
 
-const expandAll = (): void => { collapsed.value = []; userPreference.value = 'expanded'; preferences.set('forms.connect.rows_view', 'expanded'); };
-const collapseAll = (): void => { collapsed.value = props.modelValue.map((row) => row.id); userPreference.value = 'collapsed'; preferences.set('forms.connect.rows_view', 'collapsed'); };
-const allCollapsed = computed(() => props.modelValue.length > 0 && collapsed.value.length === props.modelValue.length);
-
-const connectionRowsApi = inject('connectionRowsApi', null);
-
-watch([allCollapsed, () => props.modelValue.length], ([collapsed, count]) => {
-    if (connectionRowsApi) {
-        connectionRowsApi.expandAll = expandAll;
-        connectionRowsApi.collapseAll = collapseAll;
-        connectionRowsApi.allCollapsed = collapsed;
-        connectionRowsApi.count = count;
-    }
-}, { immediate: true });
+const expandAll = (): void => (collapsed.value = []);
+const collapseAll = (): void => (collapsed.value = props.modelValue.map((row) => row.id));
+const allCollapsed = computed(() => collapsed.value.length === props.modelValue.length);
 
 const errorIndex = (row: Row): number => errorRowIds.value.indexOf(row.id);
 
@@ -141,6 +128,16 @@ watch(
 </script>
 
 <template>
+    <Teleport v-if="modelValue.length > 1" defer to="#connection-rows-actions">
+        <Button
+            size="xs"
+            variant="ghost"
+            :icon="allCollapsed ? 'expand' : 'collapse'"
+            :aria-label="allCollapsed ? __('Expand all') : __('Collapse all')"
+            @click="allCollapsed ? expandAll() : collapseAll()"
+        />
+    </Teleport>
+
     <Description v-if="emptyDescription" :text="emptyDescription" class="mb-4" />
 
     <div v-if="modelValue.length === 0">
