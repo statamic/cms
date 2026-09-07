@@ -11,6 +11,7 @@
             :read-only="readOnly"
             :url="selectionsUrl"
             :site="site"
+            :search-keys="searchKeys"
             @input="selectFieldSelected"
             @focus="$emit('focus')"
             @blur="$emit('blur')"
@@ -145,6 +146,7 @@ export default {
         name: { type: String },
         readOnly: { type: Boolean },
         search: { type: Boolean },
+        searchKeys: { type: Array, default: null },
         selectionsUrl: { type: String },
         site: { type: String },
         buttonSize: { type: String, default: 'sm' },

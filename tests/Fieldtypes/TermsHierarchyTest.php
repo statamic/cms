@@ -68,6 +68,14 @@ class TermsHierarchyTest extends TestCase
     }
 
     #[Test]
+    public function preload_asks_for_ancestor_titles_to_be_searchable()
+    {
+        $preload = $this->fieldtype(['taxonomies' => ['categories']])->preload();
+
+        $this->assertEquals(['title', 'search_titles'], $preload['searchKeys']);
+    }
+
+    #[Test]
     public function the_item_hint_is_the_ancestor_path()
     {
         $fieldtype = $this->fieldtype(['taxonomies' => ['categories']]);
@@ -80,19 +88,19 @@ class TermsHierarchyTest extends TestCase
     }
 
     #[Test]
-    public function item_data_includes_depth_and_path_for_hierarchical_terms()
+    public function item_data_includes_depth_and_search_titles_for_hierarchical_terms()
     {
         $item = $this->fieldtype(['taxonomies' => ['categories']])->getItemData(['cat'])->first();
 
         $this->assertEquals(2, $item['depth']);
-        $this->assertEquals('animals>cat', $item['path']);
+        $this->assertEquals('Animals > Cat', $item['search_titles']);
         $this->assertEquals(['Animals'], $item['ancestors']);
         $this->assertArrayNotHasKey('taxonomy_title', $item);
         $this->assertEquals('Animals', $item['hint']);
     }
 
     #[Test]
-    public function select_options_include_depth_and_path_even_when_mode_is_default()
+    public function select_options_include_depth_and_search_titles_even_when_mode_is_default()
     {
         $fieldtype = $this->fieldtype(['taxonomies' => ['categories']]);
         $request = new Request(['paginate' => false]);
@@ -105,12 +113,12 @@ class TermsHierarchyTest extends TestCase
         $byId = collect($resolved)->keyBy(fn ($term) => $term['id']);
 
         $this->assertEquals(1, $byId['categories::animals']['depth']);
-        $this->assertEquals('animals', $byId['categories::animals']['path']);
+        $this->assertEquals('Animals', $byId['categories::animals']['search_titles']);
         $this->assertEquals([], $byId['categories::animals']['ancestors']);
         $this->assertArrayNotHasKey('hint', $byId['categories::animals']);
 
         $this->assertEquals(2, $byId['categories::cat']['depth']);
-        $this->assertEquals('animals>cat', $byId['categories::cat']['path']);
+        $this->assertEquals('Animals > Cat', $byId['categories::cat']['search_titles']);
         $this->assertEquals(['Animals'], $byId['categories::cat']['ancestors']);
         $this->assertEquals('Animals', $byId['categories::cat']['hint']);
     }
@@ -132,7 +140,7 @@ class TermsHierarchyTest extends TestCase
         $byId = collect($resolved)->keyBy(fn ($term) => $term['id']);
 
         $this->assertEquals(2, $byId['categories::cat']['depth']);
-        $this->assertEquals('animals>cat', $byId['categories::cat']['path']);
+        $this->assertEquals('Animals > Cat', $byId['categories::cat']['search_titles']);
         $this->assertEquals(['Animals'], $byId['categories::cat']['ancestors']);
         $this->assertEquals('Categories', $byId['categories::cat']['taxonomy_title']);
         $this->assertEquals('Categories • Animals', $byId['categories::cat']['hint']);
@@ -149,7 +157,7 @@ class TermsHierarchyTest extends TestCase
         $item = $this->fieldtype(['taxonomies' => ['categories', 'tags']])->getItemData(['categories::cat'])->first();
 
         $this->assertEquals(2, $item['depth']);
-        $this->assertEquals('animals>cat', $item['path']);
+        $this->assertEquals('Animals > Cat', $item['search_titles']);
         $this->assertEquals(['Animals'], $item['ancestors']);
         $this->assertEquals('Categories', $item['taxonomy_title']);
         $this->assertEquals('Categories • Animals', $item['hint']);

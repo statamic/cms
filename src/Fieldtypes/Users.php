@@ -107,6 +107,13 @@ class Users extends Relationship
         return $this->authorizeViewable($this->findUser($id));
     }
 
+    protected function searchKeys(): ?array
+    {
+        // A user with no name falls back to displaying their email as their title, but it's
+        // otherwise hidden, so it needs to be searchable to be found by it either way.
+        return ['title', 'email'];
+    }
+
     protected function toItemArray($id, $site = null)
     {
         if ($user = $this->findUser($id)) {

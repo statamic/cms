@@ -558,8 +558,16 @@ class Terms extends Relationship
         ];
     }
 
+    protected function searchKeys(): ?array
+    {
+        // Terms in a hierarchical taxonomy are also matched on their breadcrumb, so searching a
+        // parent surfaces its descendants. Titles rather than slugs, so what's typed can match
+        // what's on screen.
+        return ['title', 'search_titles'];
+    }
+
     /**
-     * Depth, slug path, and structured ancestor titles for the relationship UI.
+     * Depth, searchable ancestry, and structured ancestor titles for the relationship UI.
      */
     public function itemHierarchyMeta($term): array
     {
@@ -578,7 +586,7 @@ class Terms extends Relationship
         return [
             ...$meta,
             'depth' => $term->depth() ?? 1,
-            'path' => $ancestors->map->slug()->push($term->slug())->implode(EnsuresTermPaths::DELIMITER),
+            'search_titles' => $ancestors->map->title()->push($term->title())->implode(' '.EnsuresTermPaths::DELIMITER.' '),
             'ancestors' => $ancestors->map->title()->values()->all(),
         ];
     }

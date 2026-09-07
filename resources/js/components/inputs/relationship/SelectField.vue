@@ -91,6 +91,7 @@ export default {
         config: Object,
         readOnly: Boolean,
         site: String,
+        searchKeys: { type: Array, default: null },
     },
 
     data() {
@@ -124,17 +125,6 @@ export default {
                 paginate: false,
                 columns: 'title,id',
             };
-        },
-
-        // The `users` fieldtype falls back to displaying a user's email as their title when
-        // they have no name, but doesn't show it otherwise, so it needs to be searchable too.
-        // Terms in hierarchical taxonomies expose their slug path (e.g. `animals>cat`) so
-        // searching a parent surfaces its descendants too.
-        searchKeys() {
-            if (this.config.type === 'users') return ['title', 'email'];
-            if (this.config.type === 'terms') return ['title', 'path'];
-
-            return null;
         },
 
 	    cacheKey() {

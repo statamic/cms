@@ -54,26 +54,24 @@ describe('SelectField comboboxOptions', () => {
 });
 
 describe('SelectField searchKeys', () => {
-    test('searches by title and email for the users fieldtype', () => {
-        const wrapper = mountSelectField({ config: { type: 'users' } });
+    test('passes the keys the fieldtype asked for through to the combobox', () => {
+        const wrapper = mountSelectField({
+            config: { type: 'terms' },
+            extra: { searchKeys: ['title', 'search_titles'] },
+        });
 
-        expect(wrapper.vm.searchKeys).toEqual(['title', 'email']);
-
-        wrapper.unmount();
-    });
-
-    test('searches by title and path for the terms fieldtype', () => {
-        const wrapper = mountSelectField({ config: { type: 'terms' } });
-
-        expect(wrapper.vm.searchKeys).toEqual(['title', 'path']);
+        expect(wrapper.findComponent({ name: 'Combobox' }).props('searchKeys')).toEqual([
+            'title',
+            'search_titles',
+        ]);
 
         wrapper.unmount();
     });
 
-    test('is null for other relationship fieldtypes', () => {
+    test('is null when the fieldtype did not ask for any', () => {
         const wrapper = mountSelectField({ config: { type: 'entries' } });
 
-        expect(wrapper.vm.searchKeys).toBeNull();
+        expect(wrapper.findComponent({ name: 'Combobox' }).props('searchKeys')).toBeNull();
 
         wrapper.unmount();
     });

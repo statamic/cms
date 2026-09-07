@@ -155,7 +155,13 @@ abstract class Relationship extends Fieldtype
             'taggable' => $this->getTaggable(),
             'initialSortColumn' => $this->initialSortColumn(),
             'initialSortDirection' => $this->initialSortDirection(),
+            'searchKeys' => $this->searchKeys(),
         ];
+    }
+
+    protected function searchKeys(): ?array
+    {
+        return null;
     }
 
     protected function canCreate()
