@@ -108,7 +108,11 @@ class LoginController extends Controller
 
     public function logout()
     {
-        Auth::logout();
+        if ($guard = request()->get('guard')) {
+            abort_unless(array_key_exists($guard, config('auth.guards')), 404);
+        }
+
+        Auth::guard($guard)->logout();
 
         $redirect = request()->get('redirect');
 
