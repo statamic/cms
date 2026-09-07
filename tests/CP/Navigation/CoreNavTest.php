@@ -222,6 +222,84 @@ class CoreNavTest extends TestCase
     }
 
     #[Test]
+    public function it_doesnt_build_collections_item_when_the_user_cant_view_any_collections_in_the_selected_site()
+    {
+        $this->setSites([
+            'en' => ['url' => '/', 'locale' => 'en_US', 'name' => 'English'],
+            'fr' => ['url' => '/', 'locale' => 'fr_FR', 'name' => 'French'],
+        ]);
+
+        Facades\Collection::make('only_english')->sites(['en'])->save();
+
+        $this->setTestRoles(['test' => [
+            'access cp',
+            'view only_english entries',
+            'access en site',
+            'access fr site',
+        ]]);
+
+        $this->actingAs(tap(User::make()->assignRole('test'))->save());
+
+        Facades\Site::setSelected('en');
+        $this->assertContains('Collections', $this->build()->get('Content', collect())->map->display()->all());
+
+        Facades\Site::setSelected('fr');
+        $this->assertNotContains('Collections', $this->build()->get('Content', collect())->map->display()->all());
+    }
+
+    #[Test]
+    public function it_doesnt_build_navigation_item_when_the_user_cant_view_any_navs_in_the_selected_site()
+    {
+        $this->setSites([
+            'en' => ['url' => '/', 'locale' => 'en_US', 'name' => 'English'],
+            'fr' => ['url' => '/', 'locale' => 'fr_FR', 'name' => 'French'],
+        ]);
+
+        tap(Facades\Nav::make()->handle('only_english'))->save()->makeTree('en')->save();
+
+        $this->setTestRoles(['test' => [
+            'access cp',
+            'view only_english nav',
+            'access en site',
+            'access fr site',
+        ]]);
+
+        $this->actingAs(tap(User::make()->assignRole('test'))->save());
+
+        Facades\Site::setSelected('en');
+        $this->assertContains('Navigation', $this->build()->get('Content', collect())->map->display()->all());
+
+        Facades\Site::setSelected('fr');
+        $this->assertNotContains('Navigation', $this->build()->get('Content', collect())->map->display()->all());
+    }
+
+    #[Test]
+    public function it_doesnt_build_globals_item_when_the_user_cant_view_any_globals_in_the_selected_site()
+    {
+        $this->setSites([
+            'en' => ['url' => '/', 'locale' => 'en_US', 'name' => 'English'],
+            'fr' => ['url' => '/', 'locale' => 'fr_FR', 'name' => 'French'],
+        ]);
+
+        Facades\GlobalSet::make('only_english')->sites(['en'])->save();
+
+        $this->setTestRoles(['test' => [
+            'access cp',
+            'edit only_english globals',
+            'access en site',
+            'access fr site',
+        ]]);
+
+        $this->actingAs(tap(User::make()->assignRole('test'))->save());
+
+        Facades\Site::setSelected('en');
+        $this->assertContains('Globals', $this->build()->get('Content', collect())->map->display()->all());
+
+        Facades\Site::setSelected('fr');
+        $this->assertNotContains('Globals', $this->build()->get('Content', collect())->map->display()->all());
+    }
+
+    #[Test]
     public function it_builds_the_nav_when_a_form_has_no_title()
     {
         Facades\Form::make('contact_us')->save();
