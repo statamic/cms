@@ -127,7 +127,7 @@
                         @dragstart="$emit('focus')"
                     >
                         <div
-                            class="bg-white relative grid @min-[300px]:grid-cols-[repeat(auto-fill,minmax(110px,1fr))] gap-4 2xl:gap-10 p-3 relative rounded-xl border border-gray-300 dark:bg-gray-850 dark:border-gray-700"
+                            class="bg-white relative grid @min-[300px]:grid-cols-[repeat(auto-fill,minmax(110px,1fr))] gap-4 2xl:gap-10 p-2.5 @min-[300px]:p-3 relative rounded-xl border border-gray-300 dark:bg-gray-850 dark:border-gray-700"
                             :class="{ 'border-t-0 rounded-t-none': !isReadOnly && (showPicker || uploads.length), 'border-dashed': isReadOnly }"
                             ref="assets"
                         >
