@@ -32,6 +32,7 @@ const label = computed(() => {
         scheduled: __('Scheduled'),
         expired: __('Expired'),
         draft: __('Draft'),
+        hidden: __('Hidden'),
     };
     return labels[props.status];
 });

@@ -19,3 +19,11 @@ test('the label is not duplicated when it is shown', () => {
 
     expect(wrapper.text()).toBe('Draft');
 });
+
+test('the hidden status has a label', () => {
+    const wrapper = mount(StatusIndicator, {
+        props: { status: 'hidden' },
+    });
+
+    expect(wrapper.text()).toBe('Hidden');
+});
