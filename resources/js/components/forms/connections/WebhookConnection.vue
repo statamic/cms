@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import { Badge, Button, Field, Icon, Label, PublishContainer, PublishFields, PublishFieldsProvider } from '@ui';
 import ConnectionRows from './ConnectionRows.vue';
 import ConnectionRules from './ConnectionRules.vue';
-import ConditionsCollapsedSummary from './ConditionsCollapsedSummary.vue';
+import ConnectionRowSummary from './ConnectionRowSummary.vue';
 
 defineEmits(['update:modelValue']);
 
@@ -38,7 +38,7 @@ const showExamplePayload = ref<boolean>(props.modelValue.length === 0);
                 <Icon name="globe-setting" class="size-3.5 me-1 opacity-100! text-purple-600 dark:text-purple-400" aria-hidden="true" />
                 {{ webhook.url || __('New Webhook') }}
             </Badge>
-            <ConditionsCollapsedSummary
+            <ConnectionRowSummary
                 v-show="collapsed"
                 :conditions="webhook.conditions"
             />

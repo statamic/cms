@@ -18,7 +18,7 @@ export const {
     SortableList,
     ConnectionRows,
     ConnectionRules,
-    ConditionsCollapsedSummary,
+    ConnectionRowSummary,
     requireElevatedSession,
     requireElevatedSessionIf,
     clone,

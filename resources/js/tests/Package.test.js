@@ -17,7 +17,7 @@ it('exports modules', async () => {
 
 it('exports core', async () => {
     const expected = [
-        'ConditionsCollapsedSummary',
+        'ConnectionRowSummary',
         'ConnectionRows',
         'ConnectionRules',
         'DateFormatter',

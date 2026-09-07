@@ -3,7 +3,7 @@ import { usePage } from '@inertiajs/vue3';
 import { Badge, Icon, Label, PublishContainer, PublishFields, PublishFieldsProvider } from '@ui';
 import ConnectionRows from './ConnectionRows.vue';
 import ConnectionRules from './ConnectionRules.vue';
-import ConditionsCollapsedSummary from './ConditionsCollapsedSummary.vue';
+import ConnectionRowSummary from './ConnectionRowSummary.vue';
 
 defineEmits(['update:modelValue']);
 
@@ -47,7 +47,7 @@ const recipients = (to: string[] | string): string =>
                 <Icon name="mail-sign-at" class="size-3.5 me-1 opacity-100! text-blue-600 dark:text-blue-400" aria-hidden="true" />
                 {{ email.to?.length ? __('Message sent to :email', { email: recipients(email.to) }) : __('New Email') }}
             </Badge>
-            <ConditionsCollapsedSummary
+            <ConnectionRowSummary
                 v-show="collapsed"
                 :conditions="email.conditions"
                 :fallback="email.subject"
