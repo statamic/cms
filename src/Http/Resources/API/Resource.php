@@ -50,16 +50,9 @@ class Resource
      */
     public static function mapDefaults()
     {
-        $resources = collect(static::STATAMIC_RESOURCES)
-            ->reject(function ($resource) {
-                return app()->has($resource);
-            })
-            ->keyBy(function ($resource) {
-                return $resource;
-            })
-            ->all();
-
-        static::map($resources);
+        collect(static::STATAMIC_RESOURCES)
+            ->reject(fn ($resource) => app()->has($resource))
+            ->each(fn ($resource) => app()->bind($resource, fn () => $resource));
     }
 
     /**
