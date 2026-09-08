@@ -170,6 +170,17 @@ describe('SelectField option hierarchy', () => {
 
         wrapper.unmount();
     });
+
+    test('keeps the hint on a nested option, where a multi-taxonomy field most needs it', async () => {
+        const wrapper = await mountOptions([{ id: '1', title: 'Cat', depth: 2, hint: 'Animals' }]);
+
+        const option = wrapper.get('.option > div');
+
+        expect(option.find('[data-icon="arrow-down-right"]').exists()).toBe(true);
+        expect(option.findAll('.badge').map((badge) => badge.text())).toEqual(['Animals']);
+
+        wrapper.unmount();
+    });
 });
 
 describe('SelectField option hierarchy while filtering', () => {

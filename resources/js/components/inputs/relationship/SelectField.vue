@@ -46,7 +46,7 @@
                     <StatusIndicator v-if="status" :status="status" />
                     <ItemPath v-if="isFiltering || !depth" :path="path" />
                     <div v-text="title" class="truncate grow" />
-                    <ui-badge v-if="hint && !(depth > 1)" size="sm" v-text="hint" />
+                    <ui-badge v-if="hint" size="sm" v-text="hint" />
                 </div>
             </template>
             <template #no-options>
