@@ -219,6 +219,12 @@ const shouldShowInput = computed(() => {
     return dropdownOpen.value || props.modelValue === null || (props.multiple && props.placeholder);
 });
 
+// The search input is the combobox whenever it's rendered, so the trigger wrapping it has to give up
+// the role, the tab stop and the popup attributes that reka-ui puts on every trigger.
+const triggerAttrs = computed(() => shouldShowInput.value
+    ? { 'aria-label': undefined, 'aria-haspopup': undefined, 'aria-expanded': undefined }
+    : { role: 'combobox', tabindex: props.disabled || props.readOnly ? -1 : 0 });
+
 const placeholder = computed(() => {
     // Taggable inputs keep the search/create prompt even when items are
     // selected — those selections are listed separately, not in the field.
@@ -397,7 +403,7 @@ defineExpose({
                     <ComboboxTrigger
                         as="div"
                         ref="trigger"
-                        :tabindex="disabled || readOnly ? -1 : 0"
+                        v-bind="triggerAttrs"
                         :class="triggerClasses"
                         data-ui-combobox-trigger
                         @keydown.enter="openDropdown"
