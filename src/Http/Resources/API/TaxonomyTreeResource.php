@@ -82,7 +82,7 @@ class TaxonomyTreeResource extends JsonResource
             }
 
             return [
-                'term' => (new TermResource($term))->resolve($request),
+                'term' => app(TermResource::class)::make($term)->resolve($request),
                 'depth' => $depth,
                 'children' => $this->buildTree($page->pages()->all(), $request, $depth + 1),
             ];
