@@ -419,17 +419,31 @@ trait UserContractTests
         $this->assertTrue($this->user()->blueprint()->hasField('email'));
         $this->assertEquals('Email Address', $this->user()->blueprint()->fields()->get('email')->display());
         $this->assertEquals('email', $this->user()->blueprint()->fields()->get('email')->get('input_type'));
+        $this->assertEquals('email', $this->user()->blueprint()->fields()->get('email')->get('autocomplete'));
     }
 
     #[Test]
     public function it_allows_email_field_customizations_in_blueprint()
     {
-        $blueprint = Blueprint::makeFromFields(['email' => ['display' => 'Custom Email Display']]);
+        $blueprint = Blueprint::makeFromFields(['email' => ['display' => 'Custom Email Display', 'autocomplete' => 'off']]);
         Blueprint::shouldReceive('find')->with('user')->andReturn($blueprint);
 
         $this->assertTrue($this->user()->blueprint()->hasField('email'));
         $this->assertEquals('Custom Email Display', $this->user()->blueprint()->fields()->get('email')->display());
         $this->assertEquals('email', $this->user()->blueprint()->fields()->get('email')->get('input_type'));
+        $this->assertEquals('off', $this->user()->blueprint()->fields()->get('email')->get('autocomplete'));
+    }
+
+    #[Test]
+    public function it_provides_name_and_email_fields_when_no_blueprint_is_defined()
+    {
+        Blueprint::partialMock()->shouldReceive('find')->with('user')->andReturnNull();
+
+        $fields = $this->user()->blueprint()->fields();
+
+        $this->assertEquals('name', $fields->get('name')->get('autocomplete'));
+        $this->assertEquals('email', $fields->get('email')->get('autocomplete'));
+        $this->assertEquals('email', $fields->get('email')->get('input_type'));
     }
 
     #[Test]
