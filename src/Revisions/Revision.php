@@ -33,7 +33,12 @@ class Revision implements Arrayable, ContainsQueryableValues, Contract
 
     public function id()
     {
-        return $this->key.'/'.($this->isWorkingCopy() ? 'working' : $this->date()->timestamp);
+        return $this->key.'/'.$this->reference();
+    }
+
+    public function reference()
+    {
+        return $this->isWorkingCopy() ? 'working' : (string) $this->date()->timestamp;
     }
 
     public function user($user = null)
@@ -97,7 +102,7 @@ class Revision implements Arrayable, ContainsQueryableValues, Contract
         return vsprintf('%s/%s/%s.yaml', [
             Revisions::directory(),
             $this->key(),
-            $this->isWorkingCopy() ? 'working' : $this->date()->timestamp,
+            $this->reference(),
         ]);
     }
 
@@ -126,6 +131,7 @@ class Revision implements Arrayable, ContainsQueryableValues, Contract
 
         return [
             'id' => $this->id(),
+            'reference' => $this->reference(),
             'action' => $this->action,
             'date' => $this->date()->timestamp,
             'user' => $user,

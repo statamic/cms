@@ -6,6 +6,9 @@ interface Revision
 {
     public function id();
 
+    // TODO: Uncomment for v7
+    // public function reference();
+
     public function message($message = null);
 
     public function attributes($attributes = null);

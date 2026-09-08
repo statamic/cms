@@ -15,7 +15,7 @@
                     <div class="absolute inset-y-0 left-6 top-3 border-l-1 border-gray-400 dark:border-gray-600 border-dashed" />
                     <revision
                         v-for="(revision, index) in group.revisions"
-                        :key="revision.date"
+                        :key="revision.reference"
                         :revision="revision"
                         :restore-url="restoreUrl"
                         :reference="reference"
