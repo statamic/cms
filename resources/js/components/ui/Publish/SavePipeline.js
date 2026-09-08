@@ -77,6 +77,9 @@ export class Request extends Step {
                         );
                         container.value.setExtraValues(response.data.data.extraValues);
                     }
+                    if (container && response.data.data?.hasOwnProperty('meta')) {
+                        container.value.setMeta(response.data.data.meta);
+                    }
                     resolve(response);
                 })
                 .catch((e) => {
