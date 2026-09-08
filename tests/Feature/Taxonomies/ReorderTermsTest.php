@@ -25,9 +25,9 @@ class ReorderTermsTest extends TestCase
 
         $this->structure = (new TaxonomyStructure)->maxDepth(1);
 
-        $this->taxonomy = Taxonomy::make('test')
+        $this->taxonomy = tap(Taxonomy::make('test')
             ->sites(['en'])
-            ->structure($this->structure)
+            ->structure($this->structure))
             ->save();
 
         $this->structure->tree()->save();
@@ -135,6 +135,155 @@ class ReorderTermsTest extends TestCase
         $this->assertEquals(5, Term::find('test::four')->order());
         $this->assertEquals(6, Term::find('test::five')->order());
         $this->assertEquals(7, Term::find('test::seven')->order());
+    }
+
+    #[Test]
+    public function it_reorders_paginated_terms_in_a_descending_taxonomy()
+    {
+        $this->taxonomy->setSortDirection('desc')->save();
+
+        foreach (['one', 'two', 'three', 'four', 'five'] as $slug) {
+            tap(Term::make($slug)->taxonomy('test')->data(['title' => ucfirst($slug)]))->save();
+        }
+
+        $this->structure->tree()->tree([
+            ['term' => 'one'],
+            ['term' => 'two'],
+            ['term' => 'three'],
+            ['term' => 'four'],
+            ['term' => 'five'],
+        ])->save();
+
+        $this->setTestRoles(['test' => ['access cp', 'reorder test terms']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+
+        // The listing shows five, four, three, two, one. The first page contains five, four, three.
+        $this
+            ->actingAs($user)
+            ->reorder(['page' => 1, 'perPage' => 3, 'ids' => ['test::three', 'test::five', 'test::four']])
+            ->assertOk();
+
+        $this->assertEquals([
+            ['term' => 'one'],
+            ['term' => 'two'],
+            ['term' => 'four'],
+            ['term' => 'five'],
+            ['term' => 'three'],
+        ], $this->structure->tree()->tree());
+    }
+
+    #[Test]
+    public function it_doesnt_reorder_when_the_submitted_terms_arent_on_the_page_being_reordered()
+    {
+        [$user, $tree] = $this->seedFourTerms();
+
+        // The first page of the tree is one, two, three, but the listing was showing four in there.
+        $this
+            ->actingAs($user)
+            ->reorder(['page' => 1, 'perPage' => 3, 'ids' => ['test::one', 'test::four', 'test::two']])
+            ->assertStatus(409);
+
+        $this->assertEquals($tree, $this->structure->tree()->tree());
+    }
+
+    #[Test]
+    public function it_doesnt_reorder_when_fewer_terms_are_submitted_than_the_page_holds()
+    {
+        [$user, $tree] = $this->seedFourTerms();
+
+        $this
+            ->actingAs($user)
+            ->reorder(['page' => 1, 'perPage' => 4, 'ids' => ['test::four', 'test::three']])
+            ->assertStatus(409);
+
+        $this->assertEquals($tree, $this->structure->tree()->tree());
+    }
+
+    #[Test]
+    public function it_doesnt_reorder_when_a_submitted_term_isnt_in_the_tree()
+    {
+        [$user, $tree] = $this->seedFourTerms();
+
+        $this
+            ->actingAs($user)
+            ->reorder(['page' => 1, 'perPage' => 4, 'ids' => ['test::nope', 'test::two', 'test::three', 'test::four']])
+            ->assertStatus(409);
+
+        $this->assertEquals($tree, $this->structure->tree()->tree());
+    }
+
+    #[Test]
+    public function it_doesnt_reorder_when_a_term_is_submitted_twice()
+    {
+        [$user, $tree] = $this->seedFourTerms();
+
+        $this
+            ->actingAs($user)
+            ->reorder(['page' => 1, 'perPage' => 4, 'ids' => ['test::one', 'test::one', 'test::three', 'test::four']])
+            ->assertStatus(409);
+
+        $this->assertEquals($tree, $this->structure->tree()->tree());
+    }
+
+    #[Test]
+    public function it_doesnt_reorder_when_the_page_is_out_of_range()
+    {
+        [$user, $tree] = $this->seedFourTerms();
+
+        $this
+            ->actingAs($user)
+            ->reorder(['page' => 99, 'perPage' => 4, 'ids' => ['test::four', 'test::three']])
+            ->assertStatus(409);
+
+        $this->assertEquals($tree, $this->structure->tree()->tree());
+    }
+
+    #[Test]
+    public function it_doesnt_reorder_when_the_page_is_zero()
+    {
+        [$user, $tree] = $this->seedFourTerms();
+
+        // A zero page would otherwise give a negative offset, which slices the last
+        // terms off the tree and then writes negative keys back onto it.
+        $this
+            ->actingAs($user)
+            ->reorder(['page' => 0, 'perPage' => 2, 'ids' => ['test::four', 'test::three']])
+            ->assertSessionHasErrors('page');
+
+        $this->assertEquals($tree, $this->structure->tree()->tree());
+    }
+
+    #[Test]
+    public function it_doesnt_reorder_when_the_per_page_is_zero()
+    {
+        [$user, $tree] = $this->seedFourTerms();
+
+        $this
+            ->actingAs($user)
+            ->reorder(['page' => 1, 'perPage' => 0, 'ids' => ['test::four', 'test::three']])
+            ->assertSessionHasErrors('perPage');
+
+        $this->assertEquals($tree, $this->structure->tree()->tree());
+    }
+
+    private function seedFourTerms()
+    {
+        foreach (['one', 'two', 'three', 'four'] as $slug) {
+            tap(Term::make($slug)->taxonomy('test')->data(['title' => ucfirst($slug)]))->save();
+        }
+
+        $tree = [
+            ['term' => 'one'],
+            ['term' => 'two'],
+            ['term' => 'three'],
+            ['term' => 'four'],
+        ];
+
+        $this->structure->tree()->tree($tree)->save();
+
+        $this->setTestRoles(['test' => ['access cp', 'reorder test terms']]);
+
+        return [tap(User::make()->assignRole('test'))->save(), $tree];
     }
 
     private function reorder($payload)

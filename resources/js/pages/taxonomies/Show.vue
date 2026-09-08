@@ -219,8 +219,8 @@ export default {
                     this.reordering = false;
                     this.$toast.success(__('Terms successfully reordered'));
                 })
-                .catch(() => {
-                    this.$toast.error(__('Something went wrong'));
+                .catch((e) => {
+                    this.$toast.error(e.response?.data?.message || __('Something went wrong'));
                 });
         },
 

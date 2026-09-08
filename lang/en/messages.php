@@ -274,6 +274,7 @@ return [
     'taxonomy_next_steps_create_term_description' => 'Create the first term or stub out a handful of placeholder terms—it\'s up to you.',
     'taxonomy_next_steps_scaffold_description' => 'Generate index and detail views from the taxonomy name at the click of a button.',
     'taxonomy_scaffold_instructions' => 'Select and configure views to generate. Any existing files will be preserved.',
+    'taxonomy_terms_reorder_out_of_date' => 'The term listing is out of date. Refresh the page and try reordering again.',
     'theme_share_instructions' => 'Publish this theme through your statamic.com account to make it available to others.',
     'try_again_in_seconds' => '{0,1}Try again now.|Try again in :count seconds.',
     'try_again_in_minutes' => 'Try again in a minute.|Try again in :count minutes.',

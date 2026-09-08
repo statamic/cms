@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class ReorderTermsController extends CpController
 {
     public function __invoke(Request $request, $taxonomy)
@@ -16,38 +18,50 @@ class ReorderTermsController extends CpController
 
         $request->validate([
             'ids' => 'required|array',
-            'page' => 'required|integer',
-            'perPage' => 'required|integer',
+            // Without min:1, page 0 gives a negative offset, which slices from the end
+            // of the tree and then writes negative keys onto it.
+            'page' => 'required|integer|min:1',
+            'perPage' => 'required|integer|min:1',
             'site' => 'required',
         ]);
 
         $tree = $taxonomy->structure()->tree();
 
-        $contents = collect($tree->tree())->keyBy('term');
+        $branches = collect($tree->tree())->keyBy('term');
 
-        $reorderPayload = collect($request->ids)
-            ->map(fn ($id) => Str::after($id, '::'))
-            ->all();
+        // A descending taxonomy lists the tree in reverse. Work in the order the
+        // listing was in, then flip it back before saving.
+        $descending = $taxonomy->sortDirection() === 'desc';
 
-        if ($taxonomy->sortDirection() === 'desc') {
-            $reorderPayload = array_reverse($reorderPayload);
+        $slugs = $descending
+            ? $branches->keys()->reverse()->values()
+            : $branches->keys();
+
+        $offset = ($request->page - 1) * $request->perPage;
+
+        $submitted = collect($request->ids)->map(fn ($id) => Str::after($id, '::'))->values();
+        $current = $slugs->slice($offset, $request->perPage)->values();
+
+        // If the submitted ids aren't a rearrangement of the page being reordered, the
+        // listing was out of date. Continuing would duplicate and drop terms.
+        if ($submitted->sort()->values()->all() !== $current->sort()->values()->all()) {
+            abort(409, __('statamic::messages.taxonomy_terms_reorder_out_of_date'));
         }
 
-        $reorderedTerms = clone $contents;
+        $reordered = $slugs->values()->all();
 
-        $contents
-            ->keys()
-            ->forPage($request->page, $request->perPage)
-            ->zip($reorderPayload)
-            ->each(function ($operation) use ($contents, &$reorderedTerms) {
-                $reorderedTerms->put(
-                    $operation[0],
-                    $contents->get($operation[1])
-                );
-            });
+        foreach ($submitted as $index => $slug) {
+            $reordered[$offset + $index] = $slug;
+        }
+
+        $reordered = collect($reordered);
+
+        if ($descending) {
+            $reordered = $reordered->reverse();
+        }
 
         $tree
-            ->tree($reorderedTerms->values()->all())
+            ->tree($reordered->map(fn ($slug) => $branches->get($slug))->values()->all())
             ->save();
     }
 }
