@@ -29,7 +29,7 @@ const optionRenderingStubs = {
     'ui-badge': { props: ['text'], template: '<span class="badge">{{ text }}</span>' },
 };
 
-function mountSelectField({ items = [], config = {}, extra = {}, stubs: overrides = stubs, options = [] } = {}) {
+function mountSelectField({ items = [], config = {}, extra = {}, stubs: overrides = stubs, options = [], get = null } = {}) {
     return mount(SelectField, {
         props: {
             items,
@@ -39,7 +39,7 @@ function mountSelectField({ items = [], config = {}, extra = {}, stubs: override
         },
         global: {
             mocks: {
-                $axios: { get: () => Promise.resolve({ data: { data: options } }) },
+                $axios: { get: get ?? (() => Promise.resolve({ data: { data: options } })) },
             },
             stubs: overrides,
         },
@@ -51,6 +51,11 @@ async function mountOptions(options) {
     await flushPromises();
 
     return wrapper;
+}
+
+async function type(wrapper, query) {
+    wrapper.findComponent({ name: 'Combobox' }).vm.$emit('search', query, () => {});
+    await flushPromises();
 }
 
 describe('SelectField comboboxOptions', () => {
@@ -162,6 +167,66 @@ describe('SelectField option hierarchy', () => {
         expect(option.find('[data-icon="arrow-down-right"]').exists()).toBe(false);
         expect(option.findAll('.badge')).toHaveLength(0);
         expect(option.text()).toContain('Featured');
+
+        wrapper.unmount();
+    });
+});
+
+describe('SelectField option hierarchy while filtering', () => {
+    test('swaps the indent for a breadcrumb while a query filters the list', async () => {
+        const wrapper = await mountOptions([{ id: '1', title: 'Cat', depth: 2, path: ['Animals'] }]);
+
+        await type(wrapper, 'cat');
+
+        const option = wrapper.get('.option > div');
+
+        expect(option.attributes('style')).toBeUndefined();
+        expect(option.find('[data-icon="arrow-down-right"]').exists()).toBe(false);
+        expect(option.findAll('.badge').map((badge) => badge.text())).toEqual(['Animals']);
+
+        wrapper.unmount();
+    });
+
+    test('puts the indent back when the query is cleared', async () => {
+        const wrapper = await mountOptions([{ id: '1', title: 'Cat', depth: 2, path: ['Animals'] }]);
+
+        await type(wrapper, 'cat');
+        await type(wrapper, '');
+
+        const option = wrapper.get('.option > div');
+
+        expect(option.attributes('style')).toContain('padding-inline-start: 0.75rem');
+        expect(option.find('[data-icon="arrow-down-right"]').exists()).toBe(true);
+        expect(option.findAll('.badge')).toHaveLength(0);
+
+        wrapper.unmount();
+    });
+
+    test('does not request anything when typing in select mode', async () => {
+        const get = vi.fn(() => Promise.resolve({ data: { data: [] } }));
+        const wrapper = mountSelectField({ get });
+        await flushPromises();
+
+        expect(get).toHaveBeenCalledTimes(1);
+
+        await type(wrapper, 'cat');
+
+        expect(get).toHaveBeenCalledTimes(1);
+
+        wrapper.unmount();
+    });
+
+    test('still searches on the server in typeahead mode', async () => {
+        const get = vi.fn(() => Promise.resolve({ data: { data: [] } }));
+        const wrapper = mountSelectField({ extra: { typeahead: true }, get });
+        await flushPromises();
+
+        expect(get).not.toHaveBeenCalled();
+
+        await type(wrapper, 'cat');
+
+        expect(get).toHaveBeenCalledTimes(1);
+        expect(get.mock.calls[0][1].params).toMatchObject({ search: 'cat' });
 
         wrapper.unmount();
     });

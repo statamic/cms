@@ -28,22 +28,23 @@
                 </div>
                 <!--
                     A depth means the list is in tree order, so the ancestors are listed above and an
-                    indent locates the option against them. Without one they aren't, so the option
-                    carries its own breadcrumb instead.
+                    indent locates the option against them. Without one they aren't, and neither are
+                    they while a query is filtering ancestors back out, so the option carries its own
+                    breadcrumb instead.
                 -->
                 <div
                     v-else
                     class="flex w-full text-left items-center gap-2"
-                    :style="depth > 1 ? { paddingInlineStart: `${(depth - 1) * .75}rem` } : null"
+                    :style="!isFiltering && depth > 1 ? { paddingInlineStart: `${(depth - 1) * .75}rem` } : null"
                 >
                     <ui-icon
-                        v-if="depth > 1"
+                        v-if="!isFiltering && depth > 1"
                         name="arrow-down-right"
                         class="size-[14px] shrink-0 text-gray-400 dark:text-gray-600"
                         aria-hidden="true"
                     />
                     <StatusIndicator v-if="status" :status="status" />
-                    <ItemPath v-if="!depth" :path="path" />
+                    <ItemPath v-if="isFiltering || !depth" :path="path" />
                     <div v-text="title" class="truncate grow" />
                     <ui-badge v-if="hint && !(depth > 1)" size="sm" v-text="hint" />
                 </div>
@@ -96,6 +97,7 @@ export default {
     data() {
         return {
             requested: false,
+            query: '',
             options: [],
             abortController: null,
             removeNavigationListener: null,
@@ -136,6 +138,13 @@ export default {
             const missing = this.items.filter((item) => !this.options.some((option) => option.id === item.id));
 
             return [...this.options, ...missing];
+        },
+
+        // In select mode the combobox filters the fetched list itself, which can leave an option's
+        // ancestors out of it. The server only knows to drop the depth when it can see the query,
+        // which it never does in that mode, so the depth is suppressed here instead.
+        isFiltering() {
+            return this.query !== '';
         },
 
         noOptionsText() {
@@ -197,7 +206,11 @@ export default {
 	            });
         },
 
+        // The combobox emits this on every query change, including in select mode where it
+        // filters client-side and there is nothing to request.
         search(search, loading) {
+            this.query = search;
+
             if (!this.typeahead) return;
 
             loading(true);
