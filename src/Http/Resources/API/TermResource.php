@@ -6,6 +6,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class TermResource extends JsonResource
 {
+    use ResolvesRequestedFields;
+
     /**
      * Transform the resource into an array.
      *
@@ -14,29 +16,37 @@ class TermResource extends JsonResource
      */
     public function toArray($request)
     {
-        $fields = collect($this->resource->selectedQueryColumns() ?? $this->resource->augmented()->keys());
-
-        // Don't want these variables in API requests. The hierarchy term objects
-        // are excluded since serializing them in full would recurse; a shallow
-        // parent is appended below instead. Flat taxonomies keep these fields, since
-        // they may be user-defined blueprint fields rather than hierarchy data.
-        $hierarchyFields = $this->resource->taxonomy()->hierarchical() ? ['parent', 'children', 'ancestors'] : [];
-        $fields = $fields->reject(fn ($field) => in_array($field, ['entries', 'collection', ...$hierarchyFields]));
-
         $with = $this->blueprint()
             ->fields()->all()
             ->filter->isRelationship()->keys()->all();
 
-        $data = $this->resource
-            ->toAugmentedCollection($fields->all())
+        return $this->resource
+            ->toAugmentedCollection($this->fields($request))
             ->withRelations($with)
             ->withShallowNesting()
             ->toArray();
+    }
 
-        if ($this->resource->taxonomy()->hierarchical()) {
-            $data['parent'] = $this->resource->parent()?->toShallowAugmentedCollection()->toArray();
+    private function fields($request)
+    {
+        // Don't want these variables in API requests.
+        $excluded = ['entries', 'collection'];
+
+        $requested = collect($this->requestedFields($request))
+            ->reject(fn ($field) => in_array($field, $excluded));
+
+        if ($requested->isNotEmpty()) {
+            return $requested->all();
         }
 
-        return $data;
+        // Hierarchy fields are opt-in, the same way an entry's parent is. On a flat
+        // taxonomy they may be user-defined blueprint fields, so leave them alone.
+        if ($this->resource->taxonomy()->hasStructure()) {
+            $excluded = [...$excluded, 'parent', 'children', 'ancestors', 'depth', 'is_root'];
+        }
+
+        return collect($this->resource->augmented()->keys())
+            ->reject(fn ($field) => in_array($field, $excluded))
+            ->all();
     }
 }

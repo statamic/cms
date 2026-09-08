@@ -4,6 +4,7 @@ namespace Tests\Tags;
 
 use Facades\Tests\Factories\EntryFactory;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\Antlers;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
@@ -159,5 +160,34 @@ class TaxonomyHierarchyTest extends TestCase
         $entries = \Statamic\Facades\Entry::query()->withTaxonomyDescendants(false)->whereTaxonomy('categories::cat')->get();
 
         $this->assertEquals(['about-cats'], $entries->map->slug()->all());
+    }
+
+    #[Test]
+    public function hierarchy_fields_are_available_in_a_taxonomy_loop()
+    {
+        // The REST API keeps its term output flat, but that's done by checking for an
+        // API route, so templates should still be able to traverse a structure.
+        config(['statamic.api.enabled' => true]);
+
+        $this->assertEquals('[Animals:Cat,][Calico:][Cat:Calico,Tabby,][Furniture:][Tabby:]', $this->parse(
+            '{{ taxonomy:categories }}[{{ title }}:{{ children }}{{ title }},{{ /children }}]{{ /taxonomy:categories }}'
+        ));
+
+        $this->assertEquals('[Animals:][Calico:Animals,Cat,][Cat:Animals,][Furniture:][Tabby:Animals,Cat,]', $this->parse(
+            '{{ taxonomy:categories }}[{{ title }}:{{ ancestors }}{{ title }},{{ /ancestors }}]{{ /taxonomy:categories }}'
+        ));
+
+        $this->assertEquals('[Animals:1:yes][Calico:3:no][Cat:2:no][Furniture:1:yes][Tabby:3:no]', $this->parse(
+            '{{ taxonomy:categories }}[{{ title }}:{{ depth }}:{{ is_root ? "yes" : "no" }}]{{ /taxonomy:categories }}'
+        ));
+
+        $this->assertEquals('[Animals:][Calico:Cat][Cat:Animals][Furniture:][Tabby:Cat]', $this->parse(
+            '{{ taxonomy:categories }}[{{ title }}:{{ parent:title }}]{{ /taxonomy:categories }}'
+        ));
+    }
+
+    private function parse(string $template): string
+    {
+        return (string) Antlers::parse($template, [], true);
     }
 }

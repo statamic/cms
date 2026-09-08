@@ -126,6 +126,60 @@ GQL;
     }
 
     #[Test]
+    public function it_queries_the_hierarchy_of_a_term()
+    {
+        // The REST API keeps its term output flat, but that's done by checking for an
+        // API route, so GraphQL should still be able to traverse a structure.
+        config(['statamic.api.enabled' => true]);
+
+        tap(Taxonomy::make('categories')->structureContents([]))->save();
+
+        foreach (['animals', 'cat', 'calico'] as $slug) {
+            tap(Term::make($slug)->taxonomy('categories')->data(['title' => ucfirst($slug)]))->save();
+        }
+
+        Taxonomy::findByHandle('categories')->structure()->tree()->tree([
+            ['term' => 'animals', 'children' => [
+                ['term' => 'cat', 'children' => [
+                    ['term' => 'calico'],
+                ]],
+            ]],
+        ])->save();
+
+        $query = <<<'GQL'
+{
+    term(id: "categories::cat") {
+        title
+        depth
+        is_root
+        parent { title }
+        children { title }
+        ancestors { title }
+    }
+}
+GQL;
+
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'taxonomies')->andReturnTrue()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'taxonomies')->andReturn(Taxonomy::all()->map->handle()->all())->once();
+        ResourceAuthorizer::makePartial();
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => [
+                'term' => [
+                    'title' => 'Cat',
+                    'depth' => 2,
+                    'is_root' => false,
+                    'parent' => ['title' => 'Animals'],
+                    'children' => [['title' => 'Calico']],
+                    'ancestors' => [['title' => 'Animals']],
+                ],
+            ]]);
+    }
+
+    #[Test]
     public function it_can_add_custom_fields_to_interface()
     {
         GraphQL::addField('TermInterface', 'one', function () {

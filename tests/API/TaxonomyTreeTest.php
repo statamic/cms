@@ -76,21 +76,48 @@ class TaxonomyTreeTest extends TestCase
     }
 
     #[Test]
-    public function terms_include_parent_and_depth()
+    public function terms_include_parent_and_depth_when_requested()
     {
         $this->makeHierarchicalTaxonomy();
 
-        $term = $this->get('/api/taxonomies/categories/terms/cat')->assertSuccessful()->json('data');
+        $url = '/api/taxonomies/categories/terms/%s?fields=depth,is_root,parent';
+
+        $term = $this->get(sprintf($url, 'cat'))->assertSuccessful()->json('data');
 
         $this->assertEquals(2, $term['depth']);
         $this->assertFalse($term['is_root']);
         $this->assertEquals('categories::animals', $term['parent']['id']);
 
-        $root = $this->get('/api/taxonomies/categories/terms/animals')->assertSuccessful()->json('data');
+        $root = $this->get(sprintf($url, 'animals'))->assertSuccessful()->json('data');
 
         $this->assertEquals(1, $root['depth']);
         $this->assertTrue($root['is_root']);
         $this->assertNull($root['parent']);
+    }
+
+    #[Test]
+    public function tree_terms_dont_repeat_the_hierarchy_the_tree_already_describes()
+    {
+        $this->makeHierarchicalTaxonomy();
+
+        $tree = $this->get('/api/taxonomies/categories/tree')->assertSuccessful()->json('data');
+
+        foreach (['parent', 'children', 'ancestors', 'depth', 'is_root'] as $field) {
+            $this->assertArrayNotHasKey($field, $tree[0]['term']);
+            $this->assertArrayNotHasKey($field, $tree[0]['children'][0]['term']);
+        }
+    }
+
+    #[Test]
+    public function it_selects_fields_on_tree_terms()
+    {
+        $this->makeHierarchicalTaxonomy();
+
+        $tree = $this->get('/api/taxonomies/categories/tree?fields=title')->assertSuccessful()->json('data');
+
+        $this->assertEquals(['title' => 'Animals'], $tree[0]['term']);
+        $this->assertEquals(['title' => 'Cat'], $tree[0]['children'][0]['term']);
+        $this->assertEquals(2, $tree[0]['children'][0]['depth']);
     }
 
     #[Test]
