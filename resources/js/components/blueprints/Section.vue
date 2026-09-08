@@ -124,6 +124,14 @@
                     <ui-field :label="__('Hidden')" v-if="showHideField">
                         <ui-switch v-model="editingSection.hide" />
                     </ui-field>
+                    <ui-publish-container
+                        v-if="editingSection && setConfig?.fields.length"
+                        v-model="editingSection.extraConfig.values"
+                        v-model:meta="editingSection.extraConfig.meta"
+                        :blueprint="setConfigBlueprint"
+                        :errors="setConfigErrors?.(section._id) || {}"
+                        :track-dirty-state="false"
+                    />
                     <div class="py-6 space-x-2 -mx-6 px-6 border-t border-gray-200 dark:border-gray-700">
                         <ui-button :text="isSoloNarrowStack ? __('Save') : __('Confirm')" @click="handleSaveOrConfirm" variant="primary" />
                         <ui-button :text="__('Cancel')" @click="editCancelled" variant="ghost" />
@@ -144,6 +152,8 @@ export default {
 
     inject: {
         suggestableConditionFieldsProvider: { default: null },
+        setConfig: { default: null },
+        setConfigErrors: { default: null },
     },
 
     components: {
@@ -173,6 +183,12 @@ export default {
     },
 
     computed: {
+        setConfigBlueprint() {
+            return {
+                tabs: [{ handle: 'main', sections: [{ fields: this.setConfig?.fields || [] }] }],
+            };
+        },
+
         suggestableConditionFields() {
             return this.suggestableConditionFieldsProvider?.suggestableFields(this) || [];
         },
@@ -271,6 +287,9 @@ export default {
                 hide: this.section.hide,
                 collapsible: this.section.collapsible,
                 collapsed: this.section.collapsed,
+                ...(this.setConfig?.fields.length || this.section.extraConfig ? {
+                    extraConfig: clone(this.section.extraConfig || this.setConfig.defaults),
+                } : {}),
             };
         },
 
