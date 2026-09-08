@@ -5,7 +5,7 @@ import debounce from '@/util/debounce.js';
 import { useId, useTemplateRef } from 'vue';
 
 defineProps({
-    /** Accessible label for the search field. Pass the listing's own noun, e.g. "Search assets". */
+    /** Accessible label for the search field. Already translated, e.g. `:label="__('Search assets')"`. */
     label: { type: String, default: null },
 });
 
@@ -21,7 +21,7 @@ defineExpose({ focus });
 
 <template>
     <div class="flex-1 max-w-sm" :class="{ 'max-w-60!': activeFilterBadgeCount > 2 }">
-        <label :for="id" class="sr-only">{{ label ? __(label) : __('Search') }}</label>
+        <label :for="id" class="sr-only">{{ label || __('Search') }}</label>
         <Input
             :focus="true"
             ref="input"

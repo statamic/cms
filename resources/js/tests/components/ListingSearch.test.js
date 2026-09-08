@@ -25,6 +25,8 @@ test('the search label defaults to a listing-agnostic string', () => {
 });
 
 test('the search label can be set per listing', () => {
+    // Labels are translated at the call site, e.g. :label="__('Search assets')",
+    // so the component renders the string it is given without translating again.
     const wrapper = mountInListing(h(Search, { label: 'Search assets' }));
 
     expect(wrapper.find('label').text()).toBe('Search assets');
