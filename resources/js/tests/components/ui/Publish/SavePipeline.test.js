@@ -1,7 +1,12 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { ref } from 'vue';
+import axios from 'axios';
 import Hooks from '@/components/Hooks.js';
-import { AfterSaveHooks, BeforeSaveHooks, Pipeline, PipelineStopped } from '@/components/ui/Publish/SavePipeline.js';
+import { AfterSaveHooks, BeforeSaveHooks, Pipeline, PipelineStopped, Request } from '@/components/ui/Publish/SavePipeline.js';
+
+vi.mock('axios', () => ({
+    default: { patch: vi.fn() },
+}));
 
 let saving;
 let errors;
@@ -34,8 +39,43 @@ function throwingStep(error) {
 beforeEach(() => {
     saving = ref(false);
     errors = ref({});
-    container = ref({ saving: vi.fn(), saved: vi.fn() });
+    container = ref({
+        saving: vi.fn(),
+        saved: vi.fn(),
+        visibleValues: {},
+        values: { id: 'the-id' },
+        revealerFields: [],
+        setValues: vi.fn(),
+        setExtraValues: vi.fn(),
+        setMeta: vi.fn(),
+    });
     global.Statamic = { $hooks: new Hooks() };
+});
+
+test('the request applies the values, extra values and meta from the response', async () => {
+    axios.patch.mockResolvedValue({
+        data: {
+            data: {
+                values: { title: 'Saved' },
+                extraValues: { depth: 1 },
+                meta: { tags: { data: [{ id: 'tags::alfa', title: 'Alfa' }] } },
+            },
+        },
+    });
+
+    await pipeline([new Request('/entries/1', 'PATCH', {})]);
+
+    expect(container.value.setValues).toHaveBeenCalledWith({ id: 'the-id', title: 'Saved' });
+    expect(container.value.setExtraValues).toHaveBeenCalledWith({ depth: 1 });
+    expect(container.value.setMeta).toHaveBeenCalledWith({ tags: { data: [{ id: 'tags::alfa', title: 'Alfa' }] } });
+});
+
+test('the request leaves the meta alone when the response has none', async () => {
+    axios.patch.mockResolvedValue({ data: { data: { values: { title: 'Saved' } } } });
+
+    await pipeline([new Request('/entries/1', 'PATCH', {})]);
+
+    expect(container.value.setMeta).not.toHaveBeenCalled();
 });
 
 test('it runs the steps and finishes', async () => {
