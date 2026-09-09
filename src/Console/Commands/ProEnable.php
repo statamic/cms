@@ -135,7 +135,8 @@ class ProEnable extends Command
         ));
 
         if ($licenseKey === '') {
-            $this->components->warn('Add `STATAMIC_LICENSE_KEY=...` to your `.env` before or when your site goes live.');
+            $this->components->info('Link this site to your statamic.com account anytime with `php please license`.');
+            $this->components->warn('Or add `STATAMIC_LICENSE_KEY=...` to your `.env` before or when your site goes live.');
 
             return;
         }

@@ -4,17 +4,45 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Site Key
+    |--------------------------------------------------------------------------
+    |
+    | Identifies this project across environments. Generated on install.
+    | A site key is not a license — attach a license on statamic.com.
+    |
+    | https://statamic.dev/licensing
+    |
+    */
+
+    'site_key' => env('STATAMIC_SITE_KEY'),
+
+    /*
+    |--------------------------------------------------------------------------
     | License Key
     |--------------------------------------------------------------------------
     |
     | The license key for the corresponding domain from your Statamic account.
     | Without a key entered, your app will be considered to be in Trial Mode.
+    | Legacy alias for site_key — still accepted.
     |
     | https://statamic.dev/licensing#trial-mode
     |
     */
 
     'license_key' => env('STATAMIC_LICENSE_KEY'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Licensing Endpoints
+    |--------------------------------------------------------------------------
+    |
+    | Override these in local/dev to point at a statamic.com worktree.
+    |
+    */
+
+    'licensing_url' => env('STATAMIC_LICENSING_URL', 'https://statamic.com'),
+
+    'outpost_url' => env('STATAMIC_OUTPOST_URL', 'https://outpost.statamic.com/v3/query'),
 
     /*
     |--------------------------------------------------------------------------
