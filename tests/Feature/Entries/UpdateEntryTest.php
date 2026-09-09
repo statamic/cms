@@ -414,6 +414,44 @@ class UpdateEntryTest extends TestCase
     }
 
     #[Test]
+    public function localized_fields_saved_empty_stay_empty()
+    {
+        $this->setSites([
+            'en' => ['locale' => 'en', 'url' => '/'],
+            'fr' => ['locale' => 'fr', 'url' => '/fr/'],
+        ]);
+
+        [$user, $collection] = $this->seedUserAndCollection();
+        $collection->sites(['en', 'fr'])->save();
+        $this->seedBlueprintFields($collection, [
+            'nutrition_table' => [
+                'type' => 'grid',
+                'default' => [['name' => 'Sugar'], ['name' => 'Salt']],
+                'fields' => [['handle' => 'name', 'field' => ['type' => 'text']]],
+            ],
+        ]);
+
+        $origin = EntryFactory::collection($collection)
+            ->locale('en')
+            ->slug('origin')
+            ->data(['title' => 'Origin', 'nutrition_table' => [['name' => 'Fat']]])
+            ->create();
+
+        $localization = EntryFactory::collection($collection)
+            ->locale('fr')
+            ->origin($origin)
+            ->slug('localization')
+            ->create();
+
+        $response = $this
+            ->actingAs($user)
+            ->update($localization, ['nutrition_table' => [], '_localized' => ['nutrition_table']])
+            ->assertOk();
+
+        $this->assertSame([], $response->json('data.values.nutrition_table'));
+    }
+
+    #[Test]
     public function meta_reflects_values_changed_while_saving()
     {
         [$user, $collection] = $this->seedUserAndCollection();

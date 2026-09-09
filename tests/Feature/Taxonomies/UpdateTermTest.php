@@ -106,6 +106,41 @@ class UpdateTermTest extends TestCase
     }
 
     #[Test]
+    public function localized_fields_saved_empty_stay_empty()
+    {
+        $this->setSites([
+            'en' => ['locale' => 'en', 'url' => '/'],
+            'fr' => ['locale' => 'fr', 'url' => '/fr'],
+        ]);
+        $this->setTestRoles(['test' => ['access cp', 'edit tags terms', 'access fr site']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+
+        Taxonomy::make('tags')->save();
+        $this->seedBlueprintFields('tags', [
+            'nutrition_table' => [
+                'type' => 'grid',
+                'default' => [['name' => 'Sugar'], ['name' => 'Salt']],
+                'fields' => [['handle' => 'name', 'field' => ['type' => 'text']]],
+            ],
+        ]);
+        $term = tap(Term::make()->taxonomy('tags')->slug('alfa')
+            ->dataForLocale('en', ['title' => 'alfa', 'nutrition_table' => [['name' => 'Fat']]])
+            ->dataForLocale('fr', ['title' => 'le alfa'])
+        )->save();
+
+        $response = $this
+            ->actingAs($user)
+            ->update($term->in('fr'), [
+                'title' => 'le alfa',
+                'nutrition_table' => [],
+                '_localized' => ['title', 'nutrition_table'],
+            ])
+            ->assertOk();
+
+        $this->assertSame([], $response->json('data.values.nutrition_table'));
+    }
+
+    #[Test]
     public function meta_reflects_values_changed_while_saving()
     {
         $this->setTestRoles(['test' => ['access cp', 'edit tags terms', 'view topics terms']]);
