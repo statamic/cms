@@ -43,7 +43,7 @@ test('renders sanitized markdown with links and lists', () => {
 });
 
 test('uses a configured icon', () => {
-    const wrapper = mountField({ content: 'Hello', icon: 'lightbulb-idea' });
+    const wrapper = mountField({ content: 'Hello', alert_icon: 'lightbulb-idea' });
 
     expect(wrapper.findComponent(Icon).props('name')).toBe('lightbulb-idea');
 });
