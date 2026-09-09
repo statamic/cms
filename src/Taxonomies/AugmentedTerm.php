@@ -48,7 +48,6 @@ class AugmentedTerm extends AbstractAugmented
             'children',
             'ancestors',
             'depth',
-            'is_root',
         ];
     }
 
@@ -90,19 +89,6 @@ class AugmentedTerm extends AbstractAugmented
         return $this->data->taxonomy()->hasStructure()
             ? $this->data->depth()
             : $this->wrapValue($this->getFromData('depth'), 'depth');
-    }
-
-    protected function isRoot()
-    {
-        if (! $this->data->taxonomy()->hasStructure()) {
-            return $this->wrapValue($this->getFromData('is_root'), 'is_root');
-        }
-
-        if (! $depth = $this->data->depth()) {
-            return null;
-        }
-
-        return $depth === 1;
     }
 
     protected function updatedBy()

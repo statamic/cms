@@ -167,7 +167,6 @@ GQL;
     term(id: "categories::cat") {
         id
         depth
-        is_root
         parent {
             id
         }
@@ -189,7 +188,6 @@ GQL;
                 'term' => [
                     'id' => 'categories::cat',
                     'depth' => 2,
-                    'is_root' => false,
                     'parent' => ['id' => 'categories::animals'],
                     'ancestors' => [['id' => 'categories::animals']],
                     'children' => [],

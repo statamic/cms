@@ -15,7 +15,7 @@ class TaxonomyTermsFieldsTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    private $hierarchyFields = ['parent', 'children', 'ancestors', 'depth', 'is_root'];
+    private $hierarchyFields = ['parent', 'children', 'ancestors', 'depth'];
 
     public function setUp(): void
     {
@@ -171,10 +171,10 @@ class TaxonomyTermsFieldsTest extends TestCase
     {
         $this->makeHierarchicalTaxonomy();
 
-        $term = $this->get('/api/taxonomies/categories/terms/calico?fields=depth,is_root')
+        $term = $this->get('/api/taxonomies/categories/terms/calico?fields=depth')
             ->assertSuccessful()->json('data');
 
-        $this->assertEquals(['depth' => 3, 'is_root' => false], $term);
+        $this->assertEquals(['depth' => 3], $term);
     }
 
     #[Test]
@@ -185,7 +185,6 @@ class TaxonomyTermsFieldsTest extends TestCase
             'children' => ['type' => 'text'],
             'ancestors' => ['type' => 'text'],
             'depth' => ['type' => 'text'],
-            'is_root' => ['type' => 'text'],
         ])->setHandle('tags');
         BlueprintRepository::shouldReceive('in')->with('taxonomies/tags')->andReturn(collect(['tags' => $blueprint]));
 
@@ -197,7 +196,6 @@ class TaxonomyTermsFieldsTest extends TestCase
             'children' => 'Crimson, Scarlet',
             'ancestors' => 'Warm colours',
             'depth' => 'Quite deep',
-            'is_root' => 'Nope',
         ]))->save();
 
         $term = $this->get('/api/taxonomies/tags/terms/red')->assertSuccessful()->json('data');
@@ -206,6 +204,5 @@ class TaxonomyTermsFieldsTest extends TestCase
         $this->assertEquals('Crimson, Scarlet', $term['children']);
         $this->assertEquals('Warm colours', $term['ancestors']);
         $this->assertEquals('Quite deep', $term['depth']);
-        $this->assertEquals('Nope', $term['is_root']);
     }
 }

@@ -177,8 +177,8 @@ class TaxonomyHierarchyTest extends TestCase
             '{{ taxonomy:categories }}[{{ title }}:{{ ancestors }}{{ title }},{{ /ancestors }}]{{ /taxonomy:categories }}'
         ));
 
-        $this->assertEquals('[Animals:1:yes][Calico:3:no][Cat:2:no][Furniture:1:yes][Tabby:3:no]', $this->parse(
-            '{{ taxonomy:categories }}[{{ title }}:{{ depth }}:{{ is_root ? "yes" : "no" }}]{{ /taxonomy:categories }}'
+        $this->assertEquals('[Animals:1][Calico:3][Cat:2][Furniture:1][Tabby:3]', $this->parse(
+            '{{ taxonomy:categories }}[{{ title }}:{{ depth }}]{{ /taxonomy:categories }}'
         ));
 
         $this->assertEquals('[Animals:][Calico:Cat][Cat:Animals][Furniture:][Tabby:Cat]', $this->parse(

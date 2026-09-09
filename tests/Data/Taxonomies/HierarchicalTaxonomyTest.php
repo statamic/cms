@@ -323,11 +323,10 @@ class HierarchicalTaxonomyTest extends TestCase
     {
         $this->makeHierarchicalTaxonomy();
 
-        $augmented = Term::find('categories::calico')->in('en')->toAugmentedArray(['parent', 'ancestors', 'children', 'depth', 'is_root']);
+        $augmented = Term::find('categories::calico')->in('en')->toAugmentedArray(['parent', 'ancestors', 'children', 'depth']);
 
         $this->assertEquals('categories::cat', $augmented['parent']->value()->id());
         $this->assertEquals(3, $augmented['depth']->value());
-        $this->assertFalse($augmented['is_root']->value());
         $this->assertCount(2, $augmented['ancestors']->value());
         $this->assertCount(0, $augmented['children']->value());
     }

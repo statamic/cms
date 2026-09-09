@@ -80,18 +80,16 @@ class TaxonomyTreeTest extends TestCase
     {
         $this->makeHierarchicalTaxonomy();
 
-        $url = '/api/taxonomies/categories/terms/%s?fields=depth,is_root,parent';
+        $url = '/api/taxonomies/categories/terms/%s?fields=depth,parent';
 
         $term = $this->get(sprintf($url, 'cat'))->assertSuccessful()->json('data');
 
         $this->assertEquals(2, $term['depth']);
-        $this->assertFalse($term['is_root']);
         $this->assertEquals('categories::animals', $term['parent']['id']);
 
         $root = $this->get(sprintf($url, 'animals'))->assertSuccessful()->json('data');
 
         $this->assertEquals(1, $root['depth']);
-        $this->assertTrue($root['is_root']);
         $this->assertNull($root['parent']);
     }
 
@@ -102,7 +100,7 @@ class TaxonomyTreeTest extends TestCase
 
         $tree = $this->get('/api/taxonomies/categories/tree')->assertSuccessful()->json('data');
 
-        foreach (['parent', 'children', 'ancestors', 'depth', 'is_root'] as $field) {
+        foreach (['parent', 'children', 'ancestors', 'depth'] as $field) {
             $this->assertArrayNotHasKey($field, $tree[0]['term']);
             $this->assertArrayNotHasKey($field, $tree[0]['children'][0]['term']);
         }

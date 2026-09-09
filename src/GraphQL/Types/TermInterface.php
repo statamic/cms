@@ -55,9 +55,6 @@ class TermInterface extends InterfaceType
             'depth' => [
                 'type' => GraphQL::int(),
             ],
-            'is_root' => [
-                'type' => GraphQL::boolean(),
-            ],
         ];
 
         foreach (GraphQL::getExtraTypeFields(static::NAME) as $field => $closure) {

@@ -42,7 +42,7 @@ class TermResource extends JsonResource
         // Hierarchy fields are opt-in, the same way an entry's parent is. On a flat
         // taxonomy they may be user-defined blueprint fields, so leave them alone.
         if ($this->resource->taxonomy()->hasStructure()) {
-            $excluded = [...$excluded, 'parent', 'children', 'ancestors', 'depth', 'is_root'];
+            $excluded = [...$excluded, 'parent', 'children', 'ancestors', 'depth'];
         }
 
         return collect($this->resource->augmented()->keys())

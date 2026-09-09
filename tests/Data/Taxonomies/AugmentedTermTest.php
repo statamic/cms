@@ -16,7 +16,6 @@ use Statamic\Facades\User;
 use Statamic\Fields\Value;
 use Statamic\Fieldtypes\Integer as IntegerFieldtype;
 use Statamic\Fieldtypes\Terms as TermsFieldtype;
-use Statamic\Fieldtypes\Toggle as ToggleFieldtype;
 use Statamic\Taxonomies\AugmentedTerm;
 use Tests\Data\AugmentedTestCase;
 
@@ -77,7 +76,6 @@ class AugmentedTermTest extends AugmentedTestCase
             'children' => ['type' => 'null', 'value' => null],
             'ancestors' => ['type' => 'null', 'value' => null],
             'depth' => ['type' => 'null', 'value' => null],
-            'is_root' => ['type' => 'null', 'value' => null],
         ];
 
         $this->assertAugmentedCorrectly($expectations, $augmented);
@@ -91,7 +89,6 @@ class AugmentedTermTest extends AugmentedTestCase
             'children' => ['type' => 'text'],
             'ancestors' => ['type' => 'text'],
             'depth' => ['type' => 'integer'],
-            'is_root' => ['type' => 'toggle'],
         ])->setHandle('test');
         Blueprint::shouldReceive('in')->with('taxonomies/test')->andReturn(collect(['test' => $blueprint]));
 
@@ -107,7 +104,6 @@ class AugmentedTermTest extends AugmentedTestCase
                 'children' => 'the children field value',
                 'ancestors' => 'the ancestors field value',
                 'depth' => 5,
-                'is_root' => true,
             ]);
 
         $augmented = new AugmentedTerm($term);
@@ -116,7 +112,6 @@ class AugmentedTermTest extends AugmentedTestCase
         $this->assertEquals('the children field value', $augmented->get('children')->value());
         $this->assertEquals('the ancestors field value', $augmented->get('ancestors')->value());
         $this->assertEquals(5, $augmented->get('depth')->value());
-        $this->assertTrue($augmented->get('is_root')->value());
     }
 
     #[Test]
@@ -127,7 +122,6 @@ class AugmentedTermTest extends AugmentedTestCase
             'children' => ['type' => 'terms', 'taxonomies' => ['test']],
             'ancestors' => ['type' => 'terms', 'taxonomies' => ['test']],
             'depth' => ['type' => 'integer'],
-            'is_root' => ['type' => 'toggle'],
             'control' => ['type' => 'terms', 'taxonomies' => ['test']],
         ])->setHandle('test');
         Blueprint::shouldReceive('in')->with('taxonomies/test')->andReturn(collect(['test' => $blueprint]));
@@ -143,7 +137,6 @@ class AugmentedTermTest extends AugmentedTestCase
             'children' => ['alfa', 'bravo'],
             'ancestors' => ['alfa'],
             'depth' => 5,
-            'is_root' => false,
             'control' => ['alfa', 'bravo'],
         ]))->save();
 
@@ -154,7 +147,6 @@ class AugmentedTermTest extends AugmentedTestCase
         }
 
         $this->assertInstanceOf(IntegerFieldtype::class, $augmented->get('depth')->fieldtype());
-        $this->assertInstanceOf(ToggleFieldtype::class, $augmented->get('is_root')->fieldtype());
     }
 
     #[Test]
@@ -222,7 +214,6 @@ class AugmentedTermTest extends AugmentedTestCase
         $augmented = new AugmentedTerm($child->in('en'));
 
         $this->assertEquals(2, $augmented->get('depth')->value());
-        $this->assertFalse($augmented->get('is_root')->value());
         $this->assertEquals('test::animals', $augmented->get('parent')->value()->id());
     }
 
