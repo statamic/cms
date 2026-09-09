@@ -1237,6 +1237,18 @@ class EntryQueryBuilderTest extends TestCase
     }
 
     #[Test]
+    public function entries_are_sorted_naturally()
+    {
+        Collection::make('headings')->save();
+        EntryFactory::id('a')->slug('heading-10')->collection('headings')->data(['title' => 'Heading 10'])->create();
+        EntryFactory::id('b')->slug('heading-2')->collection('headings')->data(['title' => 'Heading 2'])->create();
+        EntryFactory::id('c')->slug('heading-1')->collection('headings')->data(['title' => 'Heading 1'])->create();
+
+        $this->assertSame(['heading-1', 'heading-2', 'heading-10'], Entry::query()->where('collection', 'headings')->orderBy('title')->get()->map->slug()->all());
+        $this->assertSame(['heading-10', 'heading-2', 'heading-1'], Entry::query()->where('collection', 'headings')->orderBy('title', 'desc')->get()->map->slug()->all());
+    }
+
+    #[Test]
     public function filtering_using_where_status_column_throws_exception()
     {
         $this->withoutDeprecationHandling();

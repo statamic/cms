@@ -10,16 +10,6 @@ use Statamic\Imaging\PresetGenerator;
 class GeneratePresetImageManipulations implements ShouldQueue
 {
     /**
-     * @var PresetGenerator
-     */
-    private $generator;
-
-    public function __construct(PresetGenerator $generator)
-    {
-        $this->generator = $generator;
-    }
-
-    /**
      * Register the listeners for the subscriber.
      *
      * @param  \Illuminate\Events\Dispatcher  $events
@@ -47,6 +37,6 @@ class GeneratePresetImageManipulations implements ShouldQueue
             return;
         }
 
-        $this->generator->generate($asset);
+        app(PresetGenerator::class)->generate($asset);
     }
 }
