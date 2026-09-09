@@ -3,9 +3,11 @@
 namespace Tests\Composer;
 
 use Illuminate\Filesystem\Filesystem;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Console\Composer\Json;
 use Statamic\Console\Composer\Scripts;
+use Symfony\Component\Process\Process;
 use Tests\TestCase;
 
 class ComposerJsonTest extends TestCase
@@ -75,6 +77,57 @@ class ComposerJsonTest extends TestCase
         ]));
 
         $this->assertFalse(Json::isMissingPreUpdateCmd());
+    }
+
+    #[Test]
+    #[DataProvider('composerScriptContextProvider')]
+    public function it_resolves_the_filenames_in_a_composer_script_context($composerEnv, $expected)
+    {
+        $this->assertEquals($expected, $this->runInComposerScriptContext($composerEnv));
+    }
+
+    public static function composerScriptContextProvider()
+    {
+        return [
+            'without the env var' => [false, "composer.json\ncomposer.lock\n"],
+            'with the env var' => ['composer.testing.json', "composer.testing.json\ncomposer.testing.lock\n"],
+        ];
+    }
+
+    /**
+     * When Composer runs a script event, it registers the class autoloader but never runs the
+     * `autoload.files` entries, so none of Laravel's helper functions exist. Replicate that
+     * in a subprocess to ensure we don't reach for anything that depends on them.
+     */
+    private function runInComposerScriptContext($composerEnv)
+    {
+        $script = <<<'EOT'
+require 'vendor/composer/ClassLoader.php';
+
+$loader = new Composer\Autoload\ClassLoader;
+
+foreach (require 'vendor/composer/autoload_psr4.php' as $namespace => $paths) {
+    $loader->setPsr4($namespace, $paths);
+}
+
+$loader->addClassMap(require 'vendor/composer/autoload_classmap.php');
+$loader->register();
+
+echo Statamic\Console\Composer\Json::filename()."\n";
+echo Statamic\Console\Composer\Lock::filename()."\n";
+EOT;
+
+        $process = new Process(
+            ['php', '-r', $script],
+            realpath(__DIR__.'/../..'),
+            ['COMPOSER' => $composerEnv],
+        );
+
+        $process->run();
+
+        $this->assertTrue($process->isSuccessful(), $process->getErrorOutput());
+
+        return $process->getOutput();
     }
 
     #[Test]
