@@ -55,7 +55,7 @@ class AugmentedTerm extends AbstractAugmented
     protected function parent()
     {
         if (! $this->data->taxonomy()->hasStructure()) {
-            return $this->getFromData('parent');
+            return $this->wrapValue($this->getFromData('parent'), 'parent');
         }
 
         $parent = $this->data->parent();
@@ -68,7 +68,7 @@ class AugmentedTerm extends AbstractAugmented
     protected function children()
     {
         if (! $this->data->taxonomy()->hasStructure()) {
-            return $this->getFromData('children');
+            return $this->wrapValue($this->getFromData('children'), 'children');
         }
 
         // The terms endpoints are intentionally flat, like the entries ones. The tree
@@ -79,7 +79,7 @@ class AugmentedTerm extends AbstractAugmented
     protected function ancestors()
     {
         if (! $this->data->taxonomy()->hasStructure()) {
-            return $this->getFromData('ancestors');
+            return $this->wrapValue($this->getFromData('ancestors'), 'ancestors');
         }
 
         return Statamic::isApiRoute() ? null : $this->data->ancestors();
@@ -87,13 +87,15 @@ class AugmentedTerm extends AbstractAugmented
 
     protected function depth()
     {
-        return $this->data->taxonomy()->hasStructure() ? $this->data->depth() : $this->getFromData('depth');
+        return $this->data->taxonomy()->hasStructure()
+            ? $this->data->depth()
+            : $this->wrapValue($this->getFromData('depth'), 'depth');
     }
 
     protected function isRoot()
     {
         if (! $this->data->taxonomy()->hasStructure()) {
-            return $this->getFromData('is_root');
+            return $this->wrapValue($this->getFromData('is_root'), 'is_root');
         }
 
         if (! $depth = $this->data->depth()) {

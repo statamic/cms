@@ -14,6 +14,9 @@ use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
 use Statamic\Facades\User;
 use Statamic\Fields\Value;
+use Statamic\Fieldtypes\Integer as IntegerFieldtype;
+use Statamic\Fieldtypes\Terms as TermsFieldtype;
+use Statamic\Fieldtypes\Toggle as ToggleFieldtype;
 use Statamic\Taxonomies\AugmentedTerm;
 use Tests\Data\AugmentedTestCase;
 
@@ -114,6 +117,87 @@ class AugmentedTermTest extends AugmentedTestCase
         $this->assertEquals('the ancestors field value', $augmented->get('ancestors')->value());
         $this->assertEquals(5, $augmented->get('depth')->value());
         $this->assertTrue($augmented->get('is_root')->value());
+    }
+
+    #[Test]
+    public function flat_taxonomy_blueprint_fields_with_reserved_hierarchy_handles_keep_their_fieldtypes()
+    {
+        $blueprint = Blueprint::makeFromFields([
+            'parent' => ['type' => 'terms', 'taxonomies' => ['test'], 'max_items' => 1],
+            'children' => ['type' => 'terms', 'taxonomies' => ['test']],
+            'ancestors' => ['type' => 'terms', 'taxonomies' => ['test']],
+            'depth' => ['type' => 'integer'],
+            'is_root' => ['type' => 'toggle'],
+            'control' => ['type' => 'terms', 'taxonomies' => ['test']],
+        ])->setHandle('test');
+        Blueprint::shouldReceive('in')->with('taxonomies/test')->andReturn(collect(['test' => $blueprint]));
+
+        tap(Taxonomy::make('test'))->save();
+
+        tap(Term::make('alfa')->taxonomy('test')->blueprint('test')->data(['title' => 'Alfa']))->save();
+        tap(Term::make('bravo')->taxonomy('test')->blueprint('test')->data(['title' => 'Bravo']))->save();
+
+        $term = tap(Term::make('charlie')->taxonomy('test')->blueprint('test')->data([
+            'title' => 'Charlie',
+            'parent' => 'alfa',
+            'children' => ['alfa', 'bravo'],
+            'ancestors' => ['alfa'],
+            'depth' => 5,
+            'is_root' => false,
+            'control' => ['alfa', 'bravo'],
+        ]))->save();
+
+        $augmented = new AugmentedTerm($term->in('en'));
+
+        foreach (['parent', 'children', 'ancestors', 'control'] as $handle) {
+            $this->assertInstanceOf(TermsFieldtype::class, $augmented->get($handle)->fieldtype(), "Key '{$handle}' did not keep its fieldtype.");
+        }
+
+        $this->assertInstanceOf(IntegerFieldtype::class, $augmented->get('depth')->fieldtype());
+        $this->assertInstanceOf(ToggleFieldtype::class, $augmented->get('is_root')->fieldtype());
+    }
+
+    #[Test]
+    public function flat_taxonomy_blueprint_fields_with_reserved_hierarchy_handles_are_augmented_by_their_fieldtypes()
+    {
+        $blueprint = Blueprint::makeFromFields([
+            'parent' => ['type' => 'terms', 'taxonomies' => ['test'], 'max_items' => 1],
+            'children' => ['type' => 'terms', 'taxonomies' => ['test']],
+            'ancestors' => ['type' => 'terms', 'taxonomies' => ['test']],
+            'control' => ['type' => 'terms', 'taxonomies' => ['test']],
+        ])->setHandle('test');
+        Blueprint::shouldReceive('in')->with('taxonomies/test')->andReturn(collect(['test' => $blueprint]));
+
+        tap(Taxonomy::make('test'))->save();
+
+        tap(Term::make('alfa')->taxonomy('test')->blueprint('test')->data(['title' => 'Alfa']))->save();
+        tap(Term::make('bravo')->taxonomy('test')->blueprint('test')->data(['title' => 'Bravo']))->save();
+
+        $term = tap(Term::make('charlie')->taxonomy('test')->blueprint('test')->data([
+            'title' => 'Charlie',
+            'parent' => 'alfa',
+            'children' => ['alfa', 'bravo'],
+            'ancestors' => ['alfa'],
+            'control' => ['alfa', 'bravo'],
+        ]))->save();
+
+        $augmented = new AugmentedTerm($term->in('en'));
+
+        // The control field proves what an untouched terms field of the same shape does on
+        // this object, so the hierarchy handles can be compared against it rather than
+        // against an assumption about how the terms fieldtype augments.
+        $this->assertEquals(
+            ['Alfa', 'Bravo'],
+            $augmented->get('control')->value()->get()->map->title()->all()
+        );
+
+        foreach (['children', 'ancestors'] as $handle) {
+            $this->assertInstanceOf(BuilderContract::class, $augmented->get($handle)->value(), "Key '{$handle}' was not augmented into a query builder.");
+        }
+
+        $this->assertEquals(['Alfa', 'Bravo'], $augmented->get('children')->value()->get()->map->title()->all());
+        $this->assertEquals(['Alfa'], $augmented->get('ancestors')->value()->get()->map->title()->all());
+        $this->assertEquals('Alfa', $augmented->get('parent')->value()->title());
     }
 
     #[Test]
