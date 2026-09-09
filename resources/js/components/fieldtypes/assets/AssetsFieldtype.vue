@@ -56,7 +56,7 @@
                         @keyup.space.enter="openSelector"
                     />
 
-                    <div class="min-w-0 grow hidden not-[.link-fieldtype_&]:flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400" v-if="canUpload">
+                    <div class="min-w-0 grow basis-[min-content] hidden not-[.link-fieldtype_&]:flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400" v-if="canUpload">
                         <ui-icon name="upload-cloud" class="size-5 shrink-0 text-gray-500 hidden @sm:block" />
                         <div class="min-w-0">
                             <span class="hidden @sm:inline">{{ __('Drag & drop here or') }}&nbsp;</span>
