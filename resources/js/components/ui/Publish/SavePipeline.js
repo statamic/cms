@@ -1,5 +1,6 @@
 import axios from 'axios';
 import resetValuesFromResponse from '@/util/resetValuesFromResponse.js';
+import resetMetaFromResponse from '@/util/resetMetaFromResponse.js';
 import { reveal } from '@api';
 import { UPDATE_DEBOUNCE_MS } from '@/components/fieldtypes/constants';
 
@@ -78,7 +79,7 @@ export class Request extends Step {
                         container.value.setExtraValues(response.data.data.extraValues);
                     }
                     if (container && response.data.data?.hasOwnProperty('meta')) {
-                        container.value.setMeta(response.data.data.meta);
+                        container.value.setMeta(resetMetaFromResponse(response.data.data.meta, container.value));
                     }
                     resolve(response);
                 })

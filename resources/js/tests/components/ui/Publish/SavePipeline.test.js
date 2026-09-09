@@ -44,6 +44,7 @@ beforeEach(() => {
         saved: vi.fn(),
         visibleValues: {},
         values: { id: 'the-id' },
+        meta: {},
         revealerFields: [],
         setValues: vi.fn(),
         setExtraValues: vi.fn(),
@@ -68,6 +69,25 @@ test('the request applies the values, extra values and meta from the response', 
     expect(container.value.setValues).toHaveBeenCalledWith({ id: 'the-id', title: 'Saved' });
     expect(container.value.setExtraValues).toHaveBeenCalledWith({ depth: 1 });
     expect(container.value.setMeta).toHaveBeenCalledWith({ tags: { data: [{ id: 'tags::alfa', title: 'Alfa' }] } });
+});
+
+test('the request keeps whether the slug is automatic when refreshing the meta', async () => {
+    container.value.meta = { slug: { auto: true }, tags: { data: [] } };
+    axios.patch.mockResolvedValue({
+        data: {
+            data: {
+                values: { title: 'Saved' },
+                meta: { slug: null, tags: { data: [{ id: 'tags::alfa', title: 'Alfa' }] } },
+            },
+        },
+    });
+
+    await pipeline([new Request('/entries/1', 'PATCH', {})]);
+
+    expect(container.value.setMeta).toHaveBeenCalledWith({
+        slug: { auto: true },
+        tags: { data: [{ id: 'tags::alfa', title: 'Alfa' }] },
+    });
 });
 
 test('the request leaves the meta alone when the response has none', async () => {
