@@ -5,6 +5,7 @@ namespace Statamic\View\Antlers\Language\Nodes;
 use Illuminate\Support\Str;
 use Statamic\Facades\Antlers;
 use Statamic\Tags\TagNotFoundException;
+use Statamic\View\Antlers\Language\Analyzers\Html\AntlersNode as HtmlAntlersNode;
 use Statamic\View\Antlers\Language\Exceptions\RuntimeException;
 use Statamic\View\Antlers\Language\Exceptions\SyntaxErrorException;
 use Statamic\View\Antlers\Language\Nodes\Parameters\ParameterNode;
@@ -39,6 +40,12 @@ class AntlersNode extends AbstractNode
      */
     protected $parser = null;
 
+    /** @var HtmlAntlersNode|null */
+    protected $htmlGraphNode = null;
+
+    /** @var AntlersNode|null */
+    protected $htmlContextOwner = null;
+
     /**
      * The parsed runtime content.
      *
@@ -66,6 +73,90 @@ class AntlersNode extends AbstractNode
     public function getParser()
     {
         return $this->parser;
+    }
+
+    /**
+     * @internal
+     *
+     * @return HtmlAntlersNode|null
+     */
+    public function htmlNode()
+    {
+        if ($this->htmlContextOwner !== null) {
+            return $this->htmlContextOwner->htmlNode();
+        }
+
+        if ($this->htmlGraphNode === null && $this->describesCurrentParse()) {
+            $this->htmlGraphNode = $this->parser->html()->node($this);
+        }
+
+        return $this->htmlGraphNode;
+    }
+
+    /** @return bool */
+    protected function describesCurrentParse()
+    {
+        if ($this->parser === null || $this->parserGeneration === null) {
+            return false;
+        }
+
+        return $this->parserGeneration === $this->parser->generation();
+    }
+
+    /** @internal */
+    public function withHtmlContextOwner(AntlersNode $owner)
+    {
+        $this->htmlContextOwner = $owner;
+
+        foreach ($this->processedInterpolationRegions as $nodes) {
+            foreach ($nodes as $node) {
+                if ($node instanceof AntlersNode) {
+                    $node->withHtmlContextOwner($owner);
+                }
+            }
+        }
+
+        return $this;
+    }
+
+    /** @internal */
+    public function withHtmlNode(HtmlAntlersNode $node)
+    {
+        $this->htmlGraphNode = $node;
+
+        return $this;
+    }
+
+    /** @internal */
+    public function parentElement()
+    {
+        return $this->htmlNode()?->parentElement();
+    }
+
+    /** @internal */
+    public function htmlContext()
+    {
+        if ($this->htmlContextOwner !== null) {
+            return $this->htmlContextOwner->htmlContext();
+        }
+
+        if ($this->htmlContext === null && $this->describesCurrentParse()) {
+            $this->parser->scanHtmlContext();
+        }
+
+        return $this->htmlContext;
+    }
+
+    /** @internal */
+    public function previousHtmlSibling()
+    {
+        return $this->htmlNode()?->previousSibling();
+    }
+
+    /** @internal */
+    public function nextHtmlSibling()
+    {
+        return $this->htmlNode()?->nextSibling();
     }
 
     /**
@@ -314,6 +405,9 @@ class AntlersNode extends AbstractNode
         $instance->endPosition = $this->endPosition;
         $instance->interpolationRegions = $this->interpolationRegions;
         $instance->processedInterpolationRegions = $this->processedInterpolationRegions;
+        $instance->htmlContextOwner = $this->htmlContextOwner;
+        $instance->htmlContext = $this->htmlContext;
+        $instance->parserGeneration = $this->parserGeneration;
 
         return $instance;
     }
@@ -606,6 +700,35 @@ class AntlersNode extends AbstractNode
         }
 
         return true;
+    }
+
+    /** @return ParameterNode|null */
+    public function parameter($name)
+    {
+        foreach ($this->parameters as $parameter) {
+            if (strcasecmp($parameter->name, $name) === 0) {
+                return $parameter;
+            }
+        }
+
+        return null;
+    }
+
+    public function staticParameterValue($name, $default = null)
+    {
+        $parameter = $this->parameter($name);
+
+        if ($parameter === null) {
+            return $default;
+        }
+
+        if (! $parameter->isStatic()) {
+            throw new \InvalidArgumentException(
+                sprintf('The [%s] Antlers parameter must be static.', $name)
+            );
+        }
+
+        return $parameter->value;
     }
 
     public function getNodeDocumentText()

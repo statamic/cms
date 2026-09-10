@@ -55,6 +55,7 @@ use Statamic\View\Antlers\Language\Runtime\Sandbox\TypeCoercion;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Statamic\View\Antlers\SyntaxError;
 use Statamic\View\Cascade;
+use Statamic\View\Instrumentation\InstrumentationState;
 use Statamic\View\Slot;
 use Statamic\View\State\CachesOutput;
 use Throwable;
@@ -207,6 +208,9 @@ class NodeProcessor
      * @var AbstractNode|AntlersNode
      */
     private $activeNode = null;
+
+    /** @var int */
+    private $traceReduceDepth = 0;
 
     /**
      * A list of all valid PHP opening tags.
@@ -376,6 +380,18 @@ class NodeProcessor
         $this->isProvidingParameterContent = $isParameter;
 
         return $this;
+    }
+
+    /** @return bool */
+    public function triggerRenderStart()
+    {
+        if (! $this->isTracingEnabled()) {
+            return false;
+        }
+
+        $this->runtimeConfiguration->traceManager->traceRenderStart();
+
+        return true;
     }
 
     /**
@@ -1178,6 +1194,39 @@ class NodeProcessor
      */
     public function reduce($processNodes)
     {
+        $processorDepth = ++$this->traceReduceDepth;
+        $renderFailure = null;
+
+        try {
+            return $this->reduceNodes($processNodes);
+        } catch (Throwable $throwable) {
+            $renderFailure = $throwable;
+
+            throw $throwable;
+        } finally {
+            $cleanupFailure = null;
+
+            if ($this->runtimeConfiguration?->traceManager !== null) {
+                try {
+                    $this->runtimeConfiguration->traceManager
+                        ->traceProcessorScopeComplete($this, $processorDepth);
+                } catch (Throwable $throwable) {
+                    if ($renderFailure === null) {
+                        $cleanupFailure = $throwable;
+                    }
+                }
+            }
+
+            $this->traceReduceDepth--;
+
+            if ($cleanupFailure !== null) {
+                throw $cleanupFailure;
+            }
+        }
+    }
+
+    protected function reduceNodes($processNodes)
+    {
         $buffer = '';
         $processStack = [[$processNodes, 0]];
 
@@ -1200,12 +1249,20 @@ class NodeProcessor
                 $this->activeNode = $node;
 
                 if ($this->isTracingEnabled()) {
-                    $this->runtimeConfiguration->traceManager->traceOnEnter($node);
+                    $this->runtimeConfiguration->traceManager->traceOnEnter(
+                        $node,
+                        $this,
+                        $this->traceReduceDepth
+                    );
                 }
 
                 if ($node instanceof AntlersNode) {
                     if ($node->name != null) {
                         if ($node->name->name == 'elseif' || $node->name->name == 'if') {
+                            if ($this->isTracingEnabled()) {
+                                $this->runtimeConfiguration->traceManager->traceOnExit($node, null);
+                            }
+
                             continue;
                         }
 
@@ -1367,6 +1424,10 @@ class NodeProcessor
 
                         continue;
                     } else {
+                        if ($this->isTracingEnabled()) {
+                            $this->runtimeConfiguration->traceManager->traceOnExit($node, null);
+                        }
+
                         if ($result instanceof ExecutionBranch) {
                             $processStack[] = [$nodes, $i + 1];
                             $processStack[] = [$result->nodes, 0];
@@ -1437,6 +1498,7 @@ class NodeProcessor
 
                             $recursiveProcessor = $this->cloneProcessor();
                             $recursiveProcessor->setRuntimeAssignments($this->runtimeAssignments);
+                            $recursiveBuffer = '';
 
                             // Substitute the current node with the original parent.
                             foreach ($children as $childData) {
@@ -1484,12 +1546,10 @@ class NodeProcessor
                                     }
                                 }
 
-                                $buffer .= $this->measureBufferAppend($node, $result);
-
-                                if ($this->isTracingEnabled()) {
-                                    $this->runtimeConfiguration->traceManager->traceOnExit($node, $result);
-                                }
+                                $recursiveBuffer .= $result;
                             }
+
+                            $buffer .= $this->measureBufferAppend($node, $recursiveBuffer);
 
                             $recursiveParent->activeDepth -= 1;
                             RecursiveNodeManager::releaseRecursiveNode($node);
@@ -1663,7 +1723,14 @@ class NodeProcessor
                         }
 
                         try {
-                            $output = call_user_func([$tag, $methodToCall], ...$args);
+                            if ($this->antlersParser instanceof RuntimeParser && $this->antlersParser->hasHtmlInstrumentation()) {
+                                $output = InstrumentationState::whileRenderingInContext(
+                                    $node->htmlContext(),
+                                    fn () => call_user_func([$tag, $methodToCall], ...$args)
+                                );
+                            } else {
+                                $output = call_user_func([$tag, $methodToCall], ...$args);
+                            }
 
                             if ($isCacheTag) {
                                 GlobalRuntimeState::$isCacheEnabled = false;
@@ -1920,10 +1987,6 @@ class NodeProcessor
 
                         $buffer .= $this->measureBufferAppend($node, $results);
 
-                        if ($this->isTracingEnabled()) {
-                            $this->runtimeConfiguration->traceManager->traceOnExit($node, $results);
-                        }
-
                         continue;
                     }
 
@@ -2085,9 +2148,7 @@ class NodeProcessor
                                         }
 
                                         $buffer .= $this->measureBufferAppend($node, $this->modifyBufferAppend($runtimeResult));
-                                    }
-
-                                    if ($this->isTracingEnabled()) {
+                                    } elseif ($this->isTracingEnabled()) {
                                         $this->runtimeConfiguration->traceManager->traceOnExit($node, null);
                                     }
 
@@ -2461,9 +2522,7 @@ class NodeProcessor
 
                                     $buffer .= $this->measureBufferAppend($node, $loopBuffer);
                                 }
-                            }
-
-                            if ($this->isTracingEnabled()) {
+                            } elseif ($this->isTracingEnabled()) {
                                 $this->runtimeConfiguration->traceManager->traceOnExit($node, null);
                             }
 
@@ -2491,9 +2550,6 @@ class NodeProcessor
 
                     $buffer .= $this->measureBufferAppend($node, $this->modifyBufferAppend($val));
 
-                    if ($this->isTracingEnabled()) {
-                        $this->runtimeConfiguration->traceManager->traceOnExit($node, null);
-                    }
                     $this->data = $lockData;
 
                     continue;

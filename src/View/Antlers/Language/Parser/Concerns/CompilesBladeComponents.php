@@ -9,6 +9,20 @@ use Stillat\BladeParser\Nodes\Components\ParameterType;
 
 trait CompilesBladeComponents
 {
+    public const COMPONENT_PROXY_PREFIX = '%component_proxy:';
+
+    /**
+     * @param  string  $content
+     * @return bool
+     */
+    public static function isComponentProxyContent($content)
+    {
+        $content = ltrim($content);
+
+        return str_starts_with($content, self::COMPONENT_PROXY_PREFIX)
+            || str_starts_with($content, '/'.self::COMPONENT_PROXY_PREFIX);
+    }
+
     protected function getComponentName(ComponentNode $componentNode)
     {
         $name = $componentNode->name;
@@ -34,19 +48,21 @@ trait CompilesBladeComponents
             $params .= ' component_name___="'.$name.'"';
         }
 
+        $proxy = self::COMPONENT_PROXY_PREFIX;
+
         if ($component->isClosingTag && ! $component->isSelfClosing) {
-            return "{{ /%component_proxy:{$tagMethod} }}";
+            return $this->mapComponentMarkup($component, "{{ /{$proxy}{$tagMethod} }}");
         }
 
         if ($component->isSelfClosing) {
-            return "{{ %component_proxy:$tagMethod $params /}}";
+            return $this->mapComponentMarkup($component, "{{ {$proxy}$tagMethod $params /}}");
         }
 
-        $open = "{{ %component_proxy:$tagMethod $params }}";
+        $open = $this->mapComponentMarkup($component, "{{ {$proxy}$tagMethod $params }}");
 
         $innerContent = $this->compileNodes($component->getNodes());
 
-        $close = "{{ /%component_proxy:$tagMethod }}";
+        $close = $this->mapComponentMarkup($component->isClosedBy, "{{ /{$proxy}$tagMethod }}");
 
         return $open.$innerContent.$close;
     }

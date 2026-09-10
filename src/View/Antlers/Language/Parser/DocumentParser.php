@@ -3,6 +3,7 @@
 namespace Statamic\View\Antlers\Language\Parser;
 
 use Statamic\Support\Str;
+use Statamic\View\Antlers\Language\Analyzers\Html\Document;
 use Statamic\View\Antlers\Language\Analyzers\RecursiveParentAnalyzer;
 use Statamic\View\Antlers\Language\Analyzers\TagPairAnalyzer;
 use Statamic\View\Antlers\Language\Errors\AntlersErrorCodes;
@@ -22,6 +23,7 @@ use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
 use Statamic\View\Antlers\Language\Runtime\Tracing\NodeVisitorContract;
 use Statamic\View\Antlers\Language\Utilities\CharacterOffsets;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
+use Statamic\View\Instrumentation\Antlers\ContextScanner;
 
 class DocumentParser
 {
@@ -97,7 +99,24 @@ class DocumentParser
     private $nodes = [];
     private $renderNodes = [];
 
+    /** @var Document|null */
+    private $htmlDocument = null;
+
+    /** @var int */
+    private $generation = 0;
+
+    /** @var bool */
+    private $htmlContextScanned = false;
+
+    /** @var bool */
+    private $annotateHtmlContext = false;
+
     private $isInterpolatedParser = false;
+
+    /** @var string */
+    private $originalContent = '';
+
+    private $inheritRuntimeLineSeed = true;
 
     private $inputLen = 0;
     private $documentOffsets = [];
@@ -138,6 +157,9 @@ class DocumentParser
      */
     protected $visitors = [];
 
+    /** @var NodeVisitorContract[] */
+    private $runtimeVisitors = [];
+
     public function __construct()
     {
         $this->nodeParser = new AntlersNodeParser();
@@ -172,6 +194,78 @@ class DocumentParser
     public function setIsVirtual($isVirtual)
     {
         $this->isVirtual = $isVirtual;
+    }
+
+    public function inheritRuntimeLineSeed($inherit = true)
+    {
+        $this->inheritRuntimeLineSeed = $inherit;
+
+        return $this;
+    }
+
+    /**
+     * @internal
+     *
+     * @param  bool  $annotate
+     * @return $this
+     */
+    public function annotateHtmlContext($annotate = true)
+    {
+        $this->annotateHtmlContext = $annotate;
+
+        return $this;
+    }
+
+    /** @internal */
+    public function annotatesHtmlContext(): bool
+    {
+        return $this->annotateHtmlContext || ContextScanner::$enabled;
+    }
+
+    /**
+     * @internal
+     *
+     * @return int
+     */
+    public function generation()
+    {
+        return $this->generation;
+    }
+
+    /**
+     * @internal
+     *
+     * @return void
+     */
+    public function scanHtmlContext()
+    {
+        if ($this->htmlContextScanned) {
+            return;
+        }
+
+        $this->htmlContextScanned = true;
+
+        (new ContextScanner)->annotate($this->nodes, $this);
+    }
+
+    /** @internal */
+    public function html()
+    {
+        if ($this->htmlDocument === null) {
+            $this->htmlDocument = Document::fromParser($this);
+        }
+
+        return $this->htmlDocument;
+    }
+
+    /**
+     * @internal
+     *
+     * @return string
+     */
+    public function getOriginalContent()
+    {
+        return $this->originalContent;
     }
 
     /**
@@ -409,6 +503,8 @@ class DocumentParser
      */
     private function processInputText($input, ?array $prefix)
     {
+        $this->originalContent = $input;
+
         if ($prefix === null) {
             $this->content = StringUtilities::normalizeLineEndings($input);
             $this->inputLen = mb_strlen($this->content);
@@ -954,6 +1050,12 @@ class DocumentParser
                     $parseResults = $interpolationNode === null ? [] : [$interpolationNode];
 
                     $node->processedInterpolationRegions[$varName] = $parseResults;
+
+                    foreach ($parseResults as $interpolationNode) {
+                        if ($interpolationNode instanceof AntlersNode) {
+                            $interpolationNode->withHtmlContextOwner($node);
+                        }
+                    }
                 }
                 $node->hasProcessedInterpolationRegions = true;
             }
@@ -992,6 +1094,8 @@ class DocumentParser
         }
 
         foreach ($this->nodes as $node) {
+            $node->parserGeneration = $this->generation;
+
             if ($node instanceof AntlersNode) {
                 $node->isInterpolationNode = $this->isInterpolatedParser;
             }
@@ -1017,11 +1121,21 @@ class DocumentParser
             }
         }
 
-        if (! empty($this->visitors)) {
-            foreach ($this->visitors as $visitor) {
-                foreach ($this->renderNodes as $node) {
-                    $visitor->visit($node);
-                }
+        if ($this->annotatesHtmlContext()) {
+            $this->scanHtmlContext();
+        }
+
+        $visitors = $this->visitors;
+
+        foreach ($this->runtimeVisitors as $visitor) {
+            if (! in_array($visitor, $visitors, true)) {
+                $visitors[] = $visitor;
+            }
+        }
+
+        foreach ($visitors as $visitor) {
+            foreach ($this->renderNodes as $node) {
+                $visitor->visit($node);
             }
         }
 
@@ -1035,7 +1149,23 @@ class DocumentParser
      */
     public function addVisitor(NodeVisitorContract $visitor)
     {
+        foreach ($this->visitors as $registered) {
+            if ($registered === $visitor) {
+                return;
+            }
+        }
+
         $this->visitors[] = $visitor;
+    }
+
+    /**
+     * @internal
+     *
+     * @param  NodeVisitorContract[]  $visitors
+     */
+    public function setRuntimeVisitors(array $visitors): void
+    {
+        $this->runtimeVisitors = $visitors;
     }
 
     /**
@@ -1044,6 +1174,7 @@ class DocumentParser
     public function clearVisitors()
     {
         $this->visitors = [];
+        $this->runtimeVisitors = [];
     }
 
     private function scanToEndOfPhpRegion($checkChar)
@@ -1765,6 +1896,9 @@ class DocumentParser
 
     public function resetState()
     {
+        $this->htmlDocument = null;
+        $this->htmlContextScanned = false;
+        $this->generation++;
         $this->charLen = 0;
         $this->antlersStartIndex = [];
         $this->antlersStartPositionIndex = [];
@@ -1773,7 +1907,7 @@ class DocumentParser
         $this->renderNodes = [];
         $this->nodes = [];
 
-        if (! empty(GlobalRuntimeState::$globalTagEnterStack)) {
+        if ($this->inheritRuntimeLineSeed && ! empty(GlobalRuntimeState::$globalTagEnterStack)) {
             /** @var AntlersNode $lastTagNode */
             $lastTagNode = GlobalRuntimeState::$globalTagEnterStack[count(GlobalRuntimeState::$globalTagEnterStack) - 1];
 

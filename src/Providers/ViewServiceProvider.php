@@ -27,6 +27,7 @@ use Statamic\View\Blade\StatamicTagCompiler;
 use Statamic\View\Cascade;
 use Statamic\View\Debugbar\AntlersProfiler\PerformanceCollector;
 use Statamic\View\Debugbar\AntlersProfiler\PerformanceTracer;
+use Statamic\View\Instrumentation\InstrumentationManager;
 use Statamic\View\Interop\Stacks;
 
 class ViewServiceProvider extends ServiceProvider
@@ -83,6 +84,8 @@ class ViewServiceProvider extends ServiceProvider
         $this->app->singleton(PerformanceTracer::class, function () {
             return new PerformanceTracer();
         });
+
+        $this->app->singleton(InstrumentationManager::class);
 
         $this->app->bind(ParserContract::class, function ($app) {
             /** @var RuntimeParser $parser */
@@ -158,6 +161,8 @@ class ViewServiceProvider extends ServiceProvider
 
                 $runtimeConfig->traceManager->registerTracer(app(PerformanceTracer::class));
             }
+
+            $app->make(InstrumentationManager::class)->applyTo($runtimeConfig);
 
             $parser->isolateRuntimes(GlobalRuntimeState::$requiresRuntimeIsolation)
                 ->setRuntimeConfiguration($runtimeConfig);

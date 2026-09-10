@@ -31,6 +31,8 @@ use Statamic\View\Antlers\Language\Parser\PathParser;
 use Statamic\View\Antlers\Language\Runtime\Debugging\GlobalDebugManager;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Statamic\View\Cascade;
+use Statamic\View\Instrumentation\HtmlInstrumentation;
+use Statamic\View\Instrumentation\InstrumentationState;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Throwable;
 
@@ -68,6 +70,12 @@ class RuntimeParser implements Parser
      * @var bool
      */
     private $allowPhp = false;
+
+    /** @var RuntimeConfiguration|null */
+    protected $runtimeConfiguration;
+
+    /** @var \Statamic\View\Antlers\Language\Runtime\Tracing\NodeVisitorContract[] */
+    protected $syncedVisitors = [];
 
     /**
      * A list of pre-parsers.
@@ -138,6 +146,7 @@ class RuntimeParser implements Parser
      */
     public function setRuntimeConfiguration(RuntimeConfiguration $configuration)
     {
+        $this->runtimeConfiguration = $configuration;
         GlobalRuntimeState::$allowPhpInContent = $configuration->allowPhpInUserContent;
         GlobalRuntimeState::$allowMethodsInContent = $configuration->allowMethodsInUserContent;
         GlobalRuntimeState::$throwErrorOnAccessViolation = $configuration->throwErrorOnAccessViolation;
@@ -150,15 +159,8 @@ class RuntimeParser implements Parser
         GlobalRuntimeState::$bannedContentModifierPaths = $configuration->guardedContentModifiers;
         GlobalRuntimeState::$allowedContentModifierPaths = $configuration->allowedContentModifiers;
 
+        $this->documentParser->annotateHtmlContext($configuration->annotateHtmlContext);
         $this->nodeProcessor->setRuntimeConfiguration($configuration);
-
-        foreach ($configuration->getPreparsers() as $preparser) {
-            $this->preparse($preparser);
-        }
-
-        foreach ($configuration->getVisitors() as $visitor) {
-            $this->documentParser->addVisitor($visitor);
-        }
 
         return $this;
     }
@@ -170,6 +172,15 @@ class RuntimeParser implements Parser
      */
     public function resetRuntimeConfiguration()
     {
+        $this->documentParser->annotateHtmlContext(false);
+
+        if ($this->syncedVisitors !== []) {
+            static::clearRenderNodeCache();
+        }
+
+        $this->documentParser->setRuntimeVisitors([]);
+        $this->syncedVisitors = [];
+        $this->runtimeConfiguration = null;
         $this->nodeProcessor->resetRuntimeConfiguration();
 
         return $this;
@@ -203,12 +214,67 @@ class RuntimeParser implements Parser
     protected function runPreParserCallbacks($text)
     {
         $value = $text;
+        $instrumenters = [];
 
-        foreach ($this->preParsers as $preParser) {
+        foreach ($this->mergeConfigurationCallbacks($this->preParsers, 'getPreparsers') as $preParser) {
+            if ($preParser instanceof HtmlInstrumentation) {
+                $instrumenters[] = $preParser;
+
+                continue;
+            }
+
+            $value = HtmlInstrumentation::instrumentTogether($value, $instrumenters);
+            $instrumenters = [];
             $value = call_user_func($preParser, $value);
         }
 
-        return $value;
+        return HtmlInstrumentation::instrumentTogether($value, $instrumenters);
+    }
+
+    /** @internal */
+    public function hasHtmlInstrumentation(): bool
+    {
+        foreach ($this->mergeConfigurationCallbacks($this->preParsers, 'getPreparsers') as $preparser) {
+            if ($preparser instanceof HtmlInstrumentation) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param  callable[]  $local
+     * @param  string  $accessor
+     * @return callable[]
+     */
+    private function mergeConfigurationCallbacks(array $local, $accessor)
+    {
+        if ($this->runtimeConfiguration === null) {
+            return $local;
+        }
+
+        $callbacks = $this->runtimeConfiguration->{$accessor}();
+
+        foreach ($local as $callback) {
+            if (! in_array($callback, $callbacks, true)) {
+                $callbacks[] = $callback;
+            }
+        }
+
+        return $callbacks;
+    }
+
+    protected function syncRuntimeVisitors()
+    {
+        if ($this->runtimeConfiguration === null) {
+            return;
+        }
+
+        $visitors = $this->runtimeConfiguration->getVisitors();
+
+        $this->documentParser->setRuntimeVisitors($visitors);
+        $this->syncedVisitors = $visitors;
     }
 
     /**
@@ -341,31 +407,49 @@ class RuntimeParser implements Parser
      */
     protected function renderText($text, $data = [])
     {
-        $text = $this->componentCompiler->compile($text);
-
         $this->parseStack += 1;
-        $text = $this->runPreParserCallbacks($text);
-
-        if (! $this->canPossiblyParseAntlers($text)) {
-            $text = $this->sanitizePhp($text);
-
-            $this->parseStack -= 1;
-
-            if ($text == null) {
-                return new AntlersString('', $this);
-            }
-
-            return new AntlersString($text, $this);
-        }
-
-        $newLineStyle = StringUtilities::detectNewLineStyle($text);
-        $bufferContent = '';
+        $parseStackReleased = false;
 
         try {
+            $text = $this->componentCompiler->compile($text, $this->hasHtmlInstrumentation());
+            $text = InstrumentationState::withSourceMap(
+                $this->componentCompiler->sourceMap(),
+                fn () => $this->runPreParserCallbacks($text)
+            );
+
+            if (! $this->canPossiblyParseAntlers($text)) {
+                $text = $this->sanitizePhp($text);
+
+                $this->parseStack -= 1;
+                $parseStackReleased = true;
+
+                if ($text == null) {
+                    return new AntlersString('', $this);
+                }
+
+                return new AntlersString($text, $this);
+            }
+
+            $newLineStyle = StringUtilities::detectNewLineStyle($text);
+            $bufferContent = '';
             $parseText = $this->sanitizePhp($text);
+            if ($this->runtimeConfiguration !== null) {
+                $this->documentParser->annotateHtmlContext($this->runtimeConfiguration->annotateHtmlContext);
+            }
             $cacheSlug = md5($parseText);
+            if ($this->documentParser->annotatesHtmlContext()) {
+                $cacheSlug .= ':html';
+            }
+            $this->syncRuntimeVisitors();
 
             if (! array_key_exists($cacheSlug, self::$standardRenderNodeCache) || ! $this->shouldCacheRenderNodes($text)) {
+                $previousParser = clone $this->documentParser;
+                foreach ($previousParser->getNodes() as $node) {
+                    if ($node instanceof AntlersNode) {
+                        $node->withParser($previousParser);
+                    }
+                }
+
                 $this->documentParser->setIsVirtual($this->view == '');
 
                 if (strlen($this->view) > 0) {
@@ -393,9 +477,42 @@ class RuntimeParser implements Parser
             $this->nodeProcessor->cascade($this->cascade);
 
             $this->nodeProcessor->mergeRuntimeAssignments(GlobalRuntimeState::$tracedRuntimeAssignments);
-            $bufferContent = $this->nodeProcessor->render($renderNodes);
 
-            $this->nodeProcessor->triggerRenderComplete();
+            $initialTraceManager = $this->runtimeConfiguration?->traceManager;
+            $initialTraceDepth = $initialTraceManager?->renderDepth() ?? 0;
+            $this->nodeProcessor->triggerRenderStart();
+            $renderCompleted = false;
+
+            try {
+                $bufferContent = $this->nodeProcessor->render($renderNodes);
+
+                if ($newLineStyle != "\n") {
+                    if (Str::contains($bufferContent, "\r\n") == false) {
+                        $bufferContent = str_replace("\n", "\r\n", $bufferContent);
+                    }
+                }
+
+                $this->parseStack -= 1;
+                $parseStackReleased = true;
+
+                if ($this->parseStack == 0 && GlobalRuntimeState::$containsLayout == false) {
+                    $bufferContent = LiteralReplacementManager::processReplacements($bufferContent);
+                    $bufferContent = StackReplacementManager::processReplacements($bufferContent);
+
+                    $bufferContent = str_replace(DocumentParser::getLeftBraceEscape(), DocumentParser::LeftBrace, $bufferContent);
+                    $bufferContent = str_replace(DocumentParser::getRightBraceEscape(), DocumentParser::RightBrace, $bufferContent);
+                }
+
+                if (GlobalRuntimeState::$containsLayout && $this->view == GlobalRuntimeState::$shareVariablesTemplateTrigger) {
+                    GlobalRuntimeState::$layoutVariables = $this->nodeProcessor->getRuntimeAssignments();
+                }
+
+                $renderCompleted = true;
+
+                return new AntlersString($bufferContent, $this);
+            } finally {
+                $this->completeRenderTracing($initialTraceManager, $initialTraceDepth, $renderCompleted);
+            }
         } catch (AntlersException $antlersException) {
             if ($this->isIgnitionInstalled()) {
                 throw $this->buildAntlersExceptionError($antlersException, $text, $data);
@@ -432,30 +549,44 @@ class RuntimeParser implements Parser
             }
 
             throw $this->addAntlersErrorDetails($throwable, $text, $data);
+        } finally {
+            if (! $parseStackReleased) {
+                $this->parseStack -= 1;
+            }
+        }
+    }
+
+    private function completeRenderTracing(?Tracing\TraceManager $initialManager, int $initialDepth, bool $renderCompleted): void
+    {
+        $currentManager = $this->runtimeConfiguration?->traceManager;
+        $managers = [];
+
+        if ($initialManager !== null && $initialManager->renderDepth() > $initialDepth) {
+            $managers[] = $initialManager;
         }
 
-        if ($newLineStyle != "\n") {
-            if (Str::contains($bufferContent, "\r\n") == false) {
-                $bufferContent = str_replace("\n", "\r\n", $bufferContent);
+        if ($currentManager !== null
+            && $currentManager !== $initialManager
+            && $currentManager->renderDepth() > 0) {
+            $managers[] = $currentManager;
+        }
+
+        $failure = null;
+
+        foreach ($managers as $manager) {
+            try {
+                $manager->traceRenderComplete();
+            } catch (Throwable $throwable) {
+
+                if ($renderCompleted) {
+                    $failure ??= $throwable;
+                }
             }
         }
 
-        $this->parseStack -= 1;
-
-        if ($this->parseStack == 0 && GlobalRuntimeState::$containsLayout == false) {
-            $bufferContent = LiteralReplacementManager::processReplacements($bufferContent);
-            $bufferContent = StackReplacementManager::processReplacements($bufferContent);
-
-            $bufferContent = str_replace(DocumentParser::getLeftBraceEscape(), DocumentParser::LeftBrace, $bufferContent);
-            $bufferContent = str_replace(DocumentParser::getRightBraceEscape(), DocumentParser::RightBrace, $bufferContent);
+        if ($failure !== null) {
+            throw $failure;
         }
-
-        if (GlobalRuntimeState::$containsLayout && $this->view == GlobalRuntimeState::$shareVariablesTemplateTrigger) {
-            // Force the root runtime assignments to be merged into the global state.
-            GlobalRuntimeState::$layoutVariables = $this->nodeProcessor->getRuntimeAssignments();
-        }
-
-        return new AntlersString($bufferContent, $this);
     }
 
     private function cleanUpTempFiles()
@@ -694,6 +825,9 @@ INFO;
             $this->nodeProcessor->cloneProcessor(),
             $this->antlersLexer, $this->antlersParser
         ))->allowPhp($this->allowPhp);
+
+        $parser->runtimeConfiguration = $this->runtimeConfiguration;
+        $parser->syncedVisitors = &$this->syncedVisitors;
 
         foreach ($this->preParsers as $preParser) {
             $parser->preparse($preParser);

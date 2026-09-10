@@ -133,6 +133,9 @@ class RuntimeConfiguration
      */
     public $allowMethodsInUserContent = false;
 
+    /** @var bool */
+    public $annotateHtmlContext = false;
+
     /**
      * Registers a new Antlers preparser callback.
      *
@@ -140,7 +143,20 @@ class RuntimeConfiguration
      */
     public function preparse(callable $callable)
     {
+        if (in_array($callable, $this->preparsers, true)) {
+            return;
+        }
+
         $this->preparsers[] = $callable;
+    }
+
+    /** @return void */
+    public function removePreparser(callable $callable)
+    {
+        $this->preparsers = array_values(array_filter(
+            $this->preparsers,
+            fn ($preparser) => $preparser !== $callable
+        ));
     }
 
     /**
@@ -153,6 +169,32 @@ class RuntimeConfiguration
         return $this->preparsers;
     }
 
+    /** @return bool */
+    public function hasRegisteredTracers()
+    {
+        if ($this->traceManager === null) {
+            return false;
+        }
+
+        if ($this->traceManager->tracers() !== []) {
+            return true;
+        }
+
+        return $this->traceManager->spanTracers() !== [];
+    }
+
+    /** @return TraceManager */
+    public function enableTracing()
+    {
+        if ($this->traceManager === null) {
+            $this->traceManager = new TraceManager();
+        }
+
+        $this->isTracingEnabled = true;
+
+        return $this->traceManager;
+    }
+
     /**
      * Registers a new NodeVisitorContract instance.
      *
@@ -160,7 +202,12 @@ class RuntimeConfiguration
      */
     public function addVisitor(NodeVisitorContract $visitor)
     {
+        if (in_array($visitor, $this->visitors, true)) {
+            return;
+        }
+
         $this->visitors[] = $visitor;
+        RuntimeParser::clearRenderNodeCache();
     }
 
     /**

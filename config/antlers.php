@@ -15,6 +15,17 @@ return [
 
     'debugbar' => env('STATAMIC_ANTLERS_DEBUGBAR', true),
 
+    'tracing' => env('STATAMIC_ANTLERS_TRACING', false),
+
+    'tracers' => [],
+
+    'instrumentation' => [
+        'enabled' => env('STATAMIC_ANTLERS_INSTRUMENTATION', false),
+        'comments' => true,
+        'prefix' => 'antlers',
+        'attributes' => [],
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Guarded Variables

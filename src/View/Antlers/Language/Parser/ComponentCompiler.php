@@ -4,6 +4,7 @@ namespace Statamic\View\Antlers\Language\Parser;
 
 use Illuminate\Support\Str;
 use Statamic\View\Antlers\Language\Parser\Concerns\CompilesBladeComponents;
+use Statamic\View\Instrumentation\Antlers\ComponentSourceMap;
 use Stillat\BladeParser\Nodes\Components\ComponentNode;
 use Stillat\BladeParser\Parser\DocumentParser;
 
@@ -13,10 +14,22 @@ class ComponentCompiler
 
     protected array $statamicTags = ['statamic', 's', 'flux'];
 
-    public function compile($template)
+    protected ?ComponentSourceMap $sourceMap = null;
+
+    public function sourceMap(): ?ComponentSourceMap
     {
+        return $this->sourceMap;
+    }
+
+    public function compile($template, bool $mapSource = false)
+    {
+        $this->sourceMap = null;
         if (! Str::contains($template, ['<s-', '<s:', '<statamic-', '<statamic:', '<x:', '<x-'])) {
             return $template;
+        }
+
+        if ($mapSource) {
+            $this->sourceMap = new ComponentSourceMap($template);
         }
 
         return (new DocumentParser())
@@ -56,11 +69,22 @@ class ComponentCompiler
     protected function compileComponent(ComponentNode $component)
     {
         if ($component->isSelfClosing) {
-            return "{{ %$component->innerContent /}}";
+            return $this->mapComponentMarkup($component, "{{ %$component->innerContent /}}");
         }
 
         $innerContent = $this->compileNodes($component->getNodes());
 
-        return "{{ %$component->innerContent }}$innerContent{{ /%$component->innerContent }}";
+        return $this->mapComponentMarkup($component, "{{ %$component->innerContent }}")
+            .$innerContent
+            .$this->mapComponentMarkup($component->isClosedBy, "{{ /%$component->innerContent }}");
+    }
+
+    protected function mapComponentMarkup(?ComponentNode $node, string $compiled): string
+    {
+        if ($node?->position !== null) {
+            $this->sourceMap?->replace($node->position->startOffset, $node->position->endOffset + 1, $compiled);
+        }
+
+        return $compiled;
     }
 }
