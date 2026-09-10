@@ -9,30 +9,41 @@
         :sort-direction="sortDirection"
         :preferences-prefix="preferencesPrefix"
         :filters="filters"
-        push-query
+        :allow-presets="false"
+        :push-query="!viewInStack"
     >
         <template #cell-datestamp="{ row: submission, value, isColumnVisible }">
-            <Link class="title-index-field" :href="submission.url" @click.stop>
+            <component
+                :is="viewInStack ? 'a' : 'Link'"
+                class="title-index-field"
+                :href="submission.url"
+                @click.stop="view($event, submission)"
+            >
                 <SubmissionStatusIndicator v-if="!isColumnVisible('status')" :status="submission.status" />
                 <span><date-time :of="value" /></span>
-            </Link>
+            </component>
         </template>
         <template #cell-status="{ row: submission }">
             <SubmissionStatusIndicator :status="submission.status" show-label :show-dot="false" />
         </template>
         <template #prepended-row-actions="{ row: submission }">
-            <DropdownItem :text="__('View')" :href="submission.url" icon="eye" />
+            <DropdownItem
+                :text="__('View')"
+                icon="eye"
+                :href="viewInStack ? undefined : submission.url"
+                @click="view($event, submission)"
+            />
         </template>
     </Listing>
 </template>
 
 <script>
-import { Listing, DropdownItem, Badge } from '@/components/ui';
+import { Listing, DropdownItem } from '@/components/ui';
 import { Link } from '@inertiajs/vue3';
 import SubmissionStatusIndicator from '@/components/forms/SubmissionStatusIndicator.vue';
 
 export default {
-    components: { SubmissionStatusIndicator, Link, DropdownItem, Listing, Badge },
+    components: { SubmissionStatusIndicator, DropdownItem, Link, Listing },
 
     props: {
         form: String,
@@ -41,7 +52,10 @@ export default {
         sortDirection: String,
         columns: Array,
         filters: Array,
+        viewInStack: { type: Boolean, default: false },
     },
+
+    emits: ['view'],
 
     data() {
         return {
@@ -59,6 +73,11 @@ export default {
     methods: {
         refresh() {
             this.$refs.listing?.refresh();
+        },
+
+        view(event, submission) {
+            if (this.viewInStack) event.preventDefault();
+            this.$emit('view', submission);
         },
     },
 

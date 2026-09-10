@@ -4,6 +4,7 @@ namespace Statamic\Http\Resources\CP\Submissions;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use Statamic\Facades\User;
+use Statamic\Fields\Field;
 
 class ListedSubmission extends JsonResource
 {
@@ -46,6 +47,16 @@ class ListedSubmission extends JsonResource
 
             if ($key === 'status') {
                 return ['status' => $this->resource->status()];
+            }
+
+            if ($key === 'entry') {
+                $entry = (new Field('entry', ['type' => 'entries']))
+                    ->setValue($this->resource->get('entry'))
+                    ->setParent($this->resource)
+                    ->preProcessIndex()
+                    ->value();
+
+                return ['entry' => $entry];
             }
 
             $value = $extra[$key] ?? $this->resource->get($key);

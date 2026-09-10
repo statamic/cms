@@ -18,6 +18,7 @@ use Statamic\Facades\Site;
 use Statamic\Forms\Email;
 use Statamic\Forms\Submission;
 use Statamic\Forms\Uploaders\FormFileUpload;
+use Tests\Factories\EntryFactory;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -319,6 +320,25 @@ class EmailTest extends TestCase
         $email = tap(new Email($submission, ['to' => 'test@test.com'], Site::default()))->build();
 
         $this->assertEquals(['name'], collect($email->viewData['fields'])->pluck('handle')->all());
+    }
+
+    #[Test]
+    public function it_excludes_the_entry_from_the_fields_data()
+    {
+        (new EntryFactory)->collection('events')->id('event-1')->slug('event-one')->create();
+
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'name', 'field' => ['type' => 'short_answer']],
+            ],
+        ]))->save();
+
+        $submission = $form->makeSubmission()->data(['name' => 'Foo Bar'])->set('entry', 'event-1');
+
+        $email = tap(new Email($submission, ['to' => 'test@test.com'], Site::default()))->build();
+
+        $this->assertEquals(['name'], collect($email->viewData['fields'])->pluck('handle')->all());
+        $this->assertEquals('event-1', $email->viewData['entry']->value()->id());
     }
 
     #[Test]
