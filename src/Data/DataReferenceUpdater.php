@@ -85,9 +85,23 @@ abstract class DataReferenceUpdater
      */
     protected function getTopLevelFields()
     {
-        // The blueprint, and its fields, may be shared between items. Point them at the item
-        // being updated so fieldtypes can resolve things like its site from the parent.
-        return $this->item->blueprint()->fields()->setParent($this->item)->all();
+        return $this->fieldsWithItemAsParent($this->item->blueprint()->fields());
+    }
+
+    /**
+     * While updating references, the parent of every field is the item being updated.
+     *
+     * Blueprints hand back a Fields instance that's cached globally by handle, and nested fields
+     * are constructed without a parent at all, so neither can be relied upon to have the right
+     * one. The fields are cloned rather than mutated in place, otherwise the item would leak
+     * into every other consumer of that blueprint for the rest of the request.
+     *
+     * @param  \Statamic\Fields\Fields  $fields
+     * @return \Illuminate\Support\Collection
+     */
+    private function fieldsWithItemAsParent($fields)
+    {
+        return $fields->all()->map(fn ($field) => (clone $field)->setParent($this->item));
     }
 
     /**
@@ -122,7 +136,7 @@ abstract class DataReferenceUpdater
      */
     public function processNestedFields($fields, $dottedPrefix): void
     {
-        $this->recursivelyUpdateFields($fields->setParent($this->item)->all(), $dottedPrefix);
+        $this->recursivelyUpdateFields($this->fieldsWithItemAsParent($fields), $dottedPrefix);
     }
 
     /**
