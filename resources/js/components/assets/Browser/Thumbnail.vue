@@ -3,6 +3,7 @@
         <img
             v-if="asset.thumbnail"
             :src="asset.thumbnail"
+            :alt="alt"
             class="asset-thumbnail mx-auto max-h-8 max-w-full rounded-sm"
             loading="lazy"
             :draggable="false"
@@ -12,6 +13,7 @@
         <img
             v-else-if="asset.is_svg"
             :src="asset.url"
+            :alt="alt"
             class="asset-thumbnail mx-auto h-8 max-w-full rounded-sm"
             loading="lazy"
             :draggable="false"
@@ -24,6 +26,13 @@
 export default {
     props: {
         asset: Object,
+        // Empty by default: the browser renders the filename alongside the
+        // thumbnail, so the image is decorative there. Pass a value when the
+        // thumbnail appears without an adjacent accessible name.
+        alt: {
+            default: '',
+            type: String,
+        },
         square: {
             default: false,
             type: Boolean,

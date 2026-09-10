@@ -15,8 +15,8 @@ class ReorderEntriesController extends CpController
 
         $request->validate([
             'ids' => 'required|array',
-            'page' => 'required|integer',
-            'perPage' => 'required|integer',
+            'page' => 'required|integer|min:1',
+            'perPage' => 'required|integer|min:1',
             'site' => 'required',
         ]);
 
