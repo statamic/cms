@@ -3,6 +3,7 @@
 namespace Tests\Forms\Fieldtypes;
 
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Forms\Charts\HorizontalBar;
 use Statamic\Forms\Fields\FormField;
 use Statamic\Forms\Fieldtypes\YesNo;
 use Tests\TestCase;
@@ -43,5 +44,21 @@ class YesNoTest extends TestCase
             ],
             'display' => 'Would you recommend this product?',
         ], $fieldtype->toFieldArray());
+    }
+
+    #[Test]
+    public function it_defaults_to_a_bar_chart()
+    {
+        $this->assertEquals(HorizontalBar::class, (new YesNo)->defaultChart());
+    }
+
+    #[Test]
+    public function it_returns_yes_and_no_chart_options()
+    {
+        $options = (new YesNo)->setField(new FormField('pint', ['type' => 'yes_no']))->chartOptions(collect());
+
+        $this->assertEquals(['yes', 'no'], $options->map->key->all());
+        $this->assertEquals(['Yes', 'No'], $options->map->label->all());
+        $this->assertEquals(['checkmark-circle-filled', 'delete-circle-filled'], $options->map->icon->all());
     }
 }

@@ -36,6 +36,8 @@ const props = defineProps({
     type: { type: String, default: 'button' },
     /** Controls the appearance of the button. Options: `default`, `primary`, `danger`, `filled`, `ghost`, `ghost-pressed`, `subtle`, `pressed` */
     variant: { type: String, default: 'default' },
+    /** Additional classes for the inner content wrapper around the default slot or text */
+    contentClass: { type: String, default: null },
 });
 
 const attrs = useAttrs();
@@ -116,6 +118,12 @@ const buttonClasses = computed(() => {
     return twMerge(classes, attrs.class);
 });
 
+const contentClasses = computed(() => twMerge(
+    'flex content-center items-center',
+    props.size !== 'xs' && props.size !== 'sm' ? 'st-text-trim-start' : null,
+    props.contentClass,
+));
+
 const restAttrs = computed(() => {
     const { class: _, ...rest } = attrs;
     return rest;
@@ -136,7 +144,7 @@ const restAttrs = computed(() => {
         <Icon v-if="icon" :name="icon" />
         <Icon v-if="loading" name="loading" :size />
 
-        <div :class="{ 'st-text-trim-start': size !== 'xs' && size !== 'sm' }" class="flex content-center items-center">
+        <div :class="contentClasses">
             <slot v-if="hasDefaultSlot" />
             <template v-else>{{ text }}</template>
         </div>

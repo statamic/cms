@@ -2,7 +2,11 @@
 
 namespace Statamic\Forms\Fieldtypes;
 
+use Illuminate\Support\Collection;
+use Statamic\Forms\Charts\ChartOption;
+use Statamic\Forms\Charts\HorizontalBar;
 use Statamic\Forms\Fields\FormFieldtype;
+use Statamic\Forms\Insights\StarRating as StarRatingInsight;
 use Statamic\Support\Arr;
 
 use function Statamic\trans as __;
@@ -51,6 +55,38 @@ class StarRating extends FormFieldtype
             'step' => $allowHalfStars ? 0.5 : 1,
             ...Arr::except($this->config(), ['type', 'max_stars', 'allow_half_stars']),
         ];
+    }
+
+    public function defaultChart(): ?string
+    {
+        return HorizontalBar::class;
+    }
+
+    public function chartOptions(Collection $values): ?Collection
+    {
+        $options = collect();
+        $step = $this->config('allow_half_stars') ? 0.5 : 1;
+
+        for ($stars = $this->maxStars(); $stars >= $step; $stars -= $step) {
+            $options->push(new ChartOption($this->starKey($stars), icon: 'star-filled'));
+        }
+
+        return $options;
+    }
+
+    private function starKey(float $stars): string
+    {
+        return $stars == (int) $stars ? (string) (int) $stars : (string) $stars;
+    }
+
+    private function maxStars(): int
+    {
+        return max(1, min(10, (int) $this->config('max_stars', 5)));
+    }
+
+    public function insights(): array
+    {
+        return [new StarRatingInsight(total: $this->maxStars())];
     }
 
     public function example(): ?array
