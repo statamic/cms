@@ -21,10 +21,10 @@ function toggleCollapsedState() {
         :class="{ 'border-red-500': hasError }"
     >
         <header
-            class="group/header animate-border-color flex items-center show-focus-within rounded-[calc(var(--radius-lg)-1px)] px-1.5 antialiased duration-200 dark:bg-gray-925 border-gray-300 dark:shadow-md"
+            class="group/header animate-border-color flex items-center show-focus-within rounded-[calc(var(--radius-lg)-1px)] px-1.5 antialiased duration-200 border-gray-300 dark:shadow-md"
             :class="{
                 'bg-white dark:bg-gray-900': collapsed,
-                'bg-gray-200/50 dark:bg-gray-950/35 rounded-b-none': !collapsed,
+                'bg-gray-100 dark:bg-gray-925 rounded-b-none': !collapsed,
             }"
         >
             <DragHandle :class="handleClass" class="ms-1 cursor-grab [&_svg]:opacity-75 dark:[&_svg]:opacity-50" />

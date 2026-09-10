@@ -20,6 +20,7 @@ abstract class Connection
 
     protected $description;
     protected $icon;
+    protected $smallIcon;
     protected $developer;
     protected $config = [];
 
@@ -52,6 +53,15 @@ abstract class Connection
         }
 
         return Str::startsWith($this->icon, '<svg') ? $this->icon : Statamic::svg('icons/'.$this->icon);
+    }
+
+    public function smallIcon(): ?string
+    {
+        if (! $this->smallIcon) {
+            return $this->icon();
+        }
+
+        return Str::startsWith($this->smallIcon, '<svg') ? $this->smallIcon : Statamic::svg('icons/'.$this->smallIcon);
     }
 
     public function developer(): ?string
