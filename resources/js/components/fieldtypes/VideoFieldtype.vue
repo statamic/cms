@@ -1,28 +1,40 @@
 <template>
     <div class="flex flex-col space-y-3 p-1.5 bg-gray-100 border border-gray-300 dark:bg-gray-900 dark:border-gray-700 rounded-xl">
-        <ui-input-group>
-            <ui-input-group-prepend :text="__('URL')" />
-            <ui-input
-                :model-value="value"
-                :isReadOnly="isReadOnly"
-                :placeholder="__(config.placeholder) || 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'"
-                :aria-label="__('Video URL')"
-                @update:model-value="update"
-                @focus="$emit('focus')"
-                @blur="$emit('blur')"
-                input-class="border-s-0"
-            />
-        </ui-input-group>
-        <ui-description v-if="isInvalid" class="text-red-600">{{ __('statamic::validation.url') }}</ui-description>
-        <iframe
-            v-if="shouldShowPreview"
-            ref="iframe"
-            :src="isVisible ? embedUrl : null"
-            frameborder="0"
-            allow="fullscreen"
-            class="aspect-video rounded-lg"
-            loading="lazy"
-        ></iframe>
+        <ui-combobox
+            :model-value="provider"
+            :options="providers"
+            option-label="provider"
+            option-value="provider"
+            :placeholder="__('Provider...')"
+            @update:model-value="changeProvider"
+        />
+
+        <ui-input
+            v-if="provider != 'Cloudflare'"
+            :aria-label="__('Video URL')"
+            input-class="border-s-0"
+            :isReadOnly="isReadOnly"
+            :model-value="url"
+            :placeholder="__(config.placeholder) || 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'"
+            :prepend="__('URL')"
+            @update:model-value="detailsFromUrl"
+            @focus="$emit('focus')"
+            @blur="$emit('blur')"
+        />
+
+        <ui-input
+            v-else
+            :aria-label="__('Video ID')"
+            input-class="border-s-0"
+            :isReadOnly="isReadOnly"
+            :model-value="videoId"
+            :prepend="__('ID')"
+            @update:model-value="detailsFromCloudflare"
+            @focus="$emit('focus')"
+            @blur="$emit('blur')"
+        />
+
+        <div v-if="shouldShowPreview" v-html="embed"></div>
     </div>
 </template>
 
@@ -34,70 +46,81 @@ export default {
 
     data() {
         return {
+            embed: this.meta.embed,
             isVisible: false,
             observer: null,
+            provider: this.meta.provider,
+            savedValue: null,
+            url: null,
+            videoId: null,
         };
     },
 
     computed: {
         shouldShowPreview() {
-            return !this.isInvalid && (this.isEmbeddable || this.isVideo);
+            return this.isVisible && !!this.embed;
         },
 
-        embedUrl() {
-            let embed_url = this.value || '';
+        providers() {
+            return this.meta.providers;
+        }
+    },
 
-            if (embed_url.includes('youtube')) {
-                embed_url = embed_url.includes('shorts/')
-                    ? embed_url.replace('shorts/', 'embed/')
-                    : embed_url.replace('watch?v=', 'embed/');
+    methods: {
+        changeProvider(provider) {
+            this.provider = provider;
+            this.embed = null;
+            this.url = null;
+        },
+
+        detailsFromCloudflare(id) {
+            if (id == null) return;
+
+            this.savedValue = `cloudflare:${id}`;
+            this.videoId = id;
+            this.url = null;
+
+            this.getVideoData();
+        },
+
+        detailsFromUrl(url) {
+            if (url == null) return;
+
+            this.savedValue = url;
+            this.videoId = null;
+            this.url = url;
+
+            this.getVideoData();
+        },
+
+        getVideoData() {
+            this.$axios
+                .get(this.meta.url, { params: { url: this.savedValue } })
+                .then((response) => response.data)
+                .then((data) => {
+                    this.embed = data.embed;
+                    this.provider = data.provider;
+                })
+                .catch((e) => {
+                    this.embed = null;
+                    this.$toast.error(e.response ? e.response.data.message : __('Something went wrong'));
+                });
+
+            this.update(this.savedValue);
+        },
+
+        setUrlOrId() {
+            if (this.value?.startsWith('cloudflare:')) {
+                this.videoId = this.value.replace('cloudflare:','');
+                return;
             }
 
-            if (embed_url.includes('youtu.be')) {
-                embed_url = embed_url.replace('youtu.be', 'www.youtube.com/embed');
-            }
-
-            if (embed_url.includes('vimeo')) {
-                embed_url = embed_url.replace('/vimeo.com', '/player.vimeo.com/video');
-
-                if (!this.value.includes('progressive_redirect') && embed_url.split('/').length > 5) {
-                    let hash = embed_url.substr(embed_url.lastIndexOf('/') + 1);
-                    embed_url = embed_url.substr(0, embed_url.lastIndexOf('/')) + '?h=' + hash.replace('?', '&');
-                }
-            }
-
-            if (embed_url.includes('&') && !embed_url.includes('?')) {
-                embed_url = embed_url.replace('&', '?');
-            }
-
-            return embed_url;
-        },
-
-        isEmbeddable() {
-            const url = this.value || '';
-            const isYoutube = url.includes('youtube') || url.includes('youtu.be');
-            const isVimeo = url.includes('vimeo');
-            return isYoutube || isVimeo;
-        },
-
-        isInvalid() {
-            let htmlRegex = new RegExp(/<([A-Z][A-Z0-9]*)\b[^>]*>.*?<\/\1>|<([A-Z][A-Z0-9]*)\b[^\/]*\/>/i);
-            return htmlRegex.test(this.value || '');
-        },
-
-        isUrl() {
-            const url = this.value || '';
-            return url.startsWith('http://') || url.startsWith('https://');
-        },
-
-        isVideo() {
-            const url = this.value || '';
-            const isVideo = url.includes('.mp4') || url.includes('.ogv') || url.includes('.mov') || url.includes('.webm');
-            return !this.isEmbeddable && isVideo;
-        },
+            this.url = this.value;
+        }
     },
 
     mounted() {
+        this.setUrlOrId();
         this.observer = new IntersectionObserver(
             (entries) => {
                 entries.forEach((entry) => {
