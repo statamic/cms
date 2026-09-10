@@ -2,11 +2,13 @@
 
 namespace Statamic\Forms\Connections;
 
+use Illuminate\Routing\Router;
 use Statamic\Contracts\Forms\Form;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Facades\Blueprint;
 use Statamic\Forms\Connections\Rules\EmailConnectionAddress;
 use Statamic\Forms\SendEmails;
+use Statamic\Http\Controllers\CP\Forms\EmailConnectionPreviewController;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -59,6 +61,7 @@ class Email extends Connection
                 'values' => $fields->values()->all(),
                 'meta' => $fields->meta()->all(),
             ],
+            'previewUrl' => cp_route('forms.connect.email.preview', $form->handle()),
         ]);
     }
 
@@ -129,6 +132,11 @@ class Email extends Connection
             })
             ->values()
             ->all();
+    }
+
+    public function routes(Router $router): void
+    {
+        $router->post('preview', EmailConnectionPreviewController::class)->name('preview');
     }
 
     public static function blueprint(Form $form): \Statamic\Fields\Blueprint
