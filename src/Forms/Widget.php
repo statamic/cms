@@ -4,7 +4,7 @@ namespace Statamic\Forms;
 
 use Statamic\Facades\Form;
 use Statamic\Facades\User;
-use Statamic\Widgets\VueComponent;
+use Statamic\Support\VueComponent;
 use Statamic\Widgets\Widget as BaseWidget;
 
 class Widget extends BaseWidget

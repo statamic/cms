@@ -32,6 +32,7 @@ import Grid from '../components/fieldtypes/grid/Grid.vue';
 import GridIndex from '../components/fieldtypes/grid/GridIndex.vue';
 import GroupFieldtype from '../components/fieldtypes/GroupFieldtype.vue';
 import FormBannerFieldtype from '../components/fieldtypes/FormBannerFieldtype.vue';
+import FormFieldsFieldtype from '../components/fieldtypes/FormFieldsFieldtype.vue';
 import FormHeadingFieldtype from '../components/fieldtypes/FormHeadingFieldtype.vue';
 import FormParagraphFieldtype from '@/components/fieldtypes/FormParagraphFieldtype.vue';
 import FormUploadFieldtype from '@/components/fieldtypes/FormUploadFieldtype.vue';
@@ -115,6 +116,7 @@ export default function registerFieldtypes(app) {
     app.component('grid-fieldtype-index', GridIndex);
     app.component('group-fieldtype', GroupFieldtype);
     app.component('form_banner-fieldtype', FormBannerFieldtype);
+    app.component('form_fields-fieldtype', FormFieldsFieldtype);
     app.component('form_heading-fieldtype', FormHeadingFieldtype);
     app.component('form_paragraph-fieldtype', FormParagraphFieldtype);
     app.component('form_upload-fieldtype', FormUploadFieldtype);

@@ -45,7 +45,7 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
     protected $fields;
     protected $honeypot;
     protected $store;
-    protected $email;
+    protected $connections;
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
 
@@ -292,14 +292,60 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
     }
 
     /**
+     * Get or set the connection configs.
+     *
+     * @param  mixed  $connections
+     * @return mixed
+     */
+    public function connections($connections = null)
+    {
+        return $this->fluentlyGetOrSet('connections')
+            ->getter(fn ($connections) => collect($connections))
+            ->setter(fn ($connections) => collect($connections)->map(fn ($config) => $this->ensureConnectionIds($config)))
+            ->args(func_get_args());
+    }
+
+    private function ensureConnectionIds($config)
+    {
+        if (! is_array($config) || ! array_is_list($config)) {
+            return $config;
+        }
+
+        return array_map(
+            fn ($row) => is_array($row) ? ['id' => Str::random(8), ...$row] : $row,
+            $config
+        );
+    }
+
+    /**
      * Get or set the email field.
+     *
+     * @deprecated Use connections() instead.
      *
      * @param  mixed  $emails
      * @return mixed
      */
     public function email($emails = null)
     {
-        return $this->fluentlyGetOrSet('email')->args(func_get_args());
+        if (func_num_args() === 0) {
+            return $this->connections()->get('email');
+        }
+
+        $connections = $this->connections();
+
+        is_null($emails)
+            ? $connections->forget('email')
+            : $connections->put('email', $this->convertEmailToConnection($emails));
+
+        return $this->connections($connections);
+    }
+
+    private function convertEmailToConnection(string|array $emails): array
+    {
+        return collect(is_array($emails) && array_is_list($emails) ? $emails : [$emails])
+            ->filter(fn ($config) => is_array($config))
+            ->values()
+            ->all();
     }
 
     /**
@@ -363,12 +409,7 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
             'title' => $this->title,
             'fields' => $this->formFields()->contents(),
             'honeypot' => $this->honeypot,
-            'email' => collect(isset($this->email['to']) ? [$this->email] : $this->email)->map(function ($email) {
-                $email['markdown'] = Arr::get($email, 'markdown') === true ? true : null;
-                $email['attachments'] = Arr::get($email, 'attachments') === true ? true : null;
-
-                return Arr::removeNullValues($email);
-            })->all(),
+            'connections' => $this->connectionsFileData(),
         ]))->filter()->all();
 
         if ($this->store === false) {
@@ -396,6 +437,21 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
 
             FormSaved::dispatch($this);
         }
+    }
+
+    private function connectionsFileData(): array
+    {
+        return $this->connections()
+            ->map(function ($config) {
+                if (! is_array($config)) {
+                    return $config;
+                }
+
+                return array_is_list($config)
+                    ? array_map(fn ($item) => is_array($item) ? Arr::removeNullValues($item) : $item, $config)
+                    : Arr::removeNullValues($config);
+            })
+            ->all();
     }
 
     public function deleteQuietly()
@@ -441,10 +497,10 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
             'title',
             'honeypot',
             'store',
-            'email',
+            'connections',
         ];
 
-        $this->merge(collect($contents)->except([...$methods, 'fields']));
+        $this->merge(collect($contents)->except([...$methods, 'email', 'fields']));
 
         collect($contents)
             ->filter(function ($value, $property) use ($methods) {
@@ -453,6 +509,10 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
             ->each(function ($value, $property) {
                 $this->{$property}($value);
             });
+
+        if (! is_null($emails = Arr::get($contents, 'connections.email', $contents['email'] ?? null))) {
+            $this->connections($this->connections()->put('email', $this->convertEmailToConnection($emails)));
+        }
 
         if (isset($contents['fields'])) {
             $this->formFields($contents['fields']);

@@ -2,61 +2,38 @@
 
 namespace Statamic\Forms;
 
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Bus;
 use Statamic\Contracts\Forms\Submission;
-use Statamic\Fields\Field;
+use Statamic\Forms\Connections\ConnectionLogic;
 use Statamic\Sites\Site;
 
-class SendEmails
+class SendEmails implements ShouldQueue
 {
-    use Dispatchable, SerializesModels;
+    use Dispatchable, Queueable, SerializesModels;
 
-    protected $submission;
-    protected $site;
-
-    public function __construct(Submission $submission, Site $site)
+    public function __construct(protected Submission $submission, protected Site $site, protected ?array $config = null)
     {
-        $this->submission = $submission;
-        $this->site = $site;
     }
 
     public function handle(): void
     {
-        $jobs = $this->jobs();
+        $class = config('statamic.forms.send_email_job');
+        $submission = $this->submission->form()->submission($this->submission->id()) ?? $this->submission;
 
-        if ($jobs->isNotEmpty()) {
-            Bus::chain($jobs)->dispatch();
-        }
-    }
+        // Falls back to reading the form's own connections for anyone dispatching this
+        // job directly without the $config argument, using the dispatched submission's
+        // form instance so in-memory changes are respected. Remove the fallback in v7.
+        $emailConfigs = $this->config ?? $this->submission->form()->connections()->get('email', []);
 
-    private function jobs(): Collection
-    {
-        return $this->emailConfigs($this->submission)
-            ->map(function ($config) {
-                $class = config('statamic.forms.send_email_job');
-
-                return new $class($this->submission, $this->site, $config);
-            })
-            ->when($this->shouldDeleteTemporaryFiles(), function ($jobs) {
-                $jobs->push(new DeleteTemporaryFiles($this->submission));
-            });
-    }
-
-    private function emailConfigs($submission)
-    {
-        $config = $submission->form()->email();
-
-        $config = isset($config['to']) ? [$config] : $config;
-
-        return collect($config);
-    }
-
-    private function shouldDeleteTemporaryFiles(): bool
-    {
-        return $this->submission->form()->blueprint()->fields()->all()
-            ->contains(fn (Field $field) => in_array($field->type(), ['files', 'form_upload']));
+        $this->prependToChain(
+            collect($emailConfigs)
+                ->filter(fn (array $config) => ConnectionLogic::passes($config, $submission))
+                ->map(fn (array $config) => new $class($submission, $this->site, $config))
+                ->values()
+                ->all()
+        );
     }
 }

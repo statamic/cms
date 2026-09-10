@@ -141,7 +141,69 @@ class ViewFormListingTest extends TestCase
             ->assertSuccessful()
             ->assertInertia(fn ($page) => $page
                 ->component('forms/Index')
-                ->count('initialColumns', 1)
+                ->count('initialColumns', 2)
+                ->where('initialColumns.0.field', 'title')
+                ->where('initialColumns.1.field', 'connections')
+            );
+    }
+
+    #[Test]
+    public function it_hides_the_connections_column_when_the_user_cannot_edit_any_forms()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'view form submissions']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+        Form::make('test')->save();
+
+        $this
+            ->actingAs($user)
+            ->get(cp_route('forms.index'))
+            ->assertSuccessful()
+            ->assertInertia(fn ($page) => $page
+                ->component('forms/Index')
+                ->count('initialColumns', 2)
+                ->where('initialColumns.0.field', 'title')
+                ->where('initialColumns.1.field', 'submissions')
+            );
+    }
+
+    #[Test]
+    public function it_includes_the_connection_count_when_the_user_can_edit_the_form()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'edit forms']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+        Form::make('test')->connections([
+            'email' => [['id' => 'abc', 'to' => 'foo@example.com'], ['id' => 'def', 'to' => 'bar@example.com']],
+            'webhook' => [['id' => 'ghi', 'url' => 'https://example.com/hook']],
+        ])->save();
+
+        $this
+            ->actingAs($user)
+            ->get(cp_route('forms.index'))
+            ->assertSuccessful()
+            ->assertInertia(fn ($page) => $page
+                ->component('forms/Index')
+                ->where('forms.0.can_edit', true)
+                ->where('forms.0.connections', 3)
+            );
+    }
+
+    #[Test]
+    public function it_excludes_the_connection_count_when_the_user_cannot_edit_the_form()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'view form submissions']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+        Form::make('test')->connections([
+            'email' => [['id' => 'abc', 'to' => 'foo@example.com']],
+        ])->save();
+
+        $this
+            ->actingAs($user)
+            ->get(cp_route('forms.index'))
+            ->assertSuccessful()
+            ->assertInertia(fn ($page) => $page
+                ->component('forms/Index')
+                ->where('forms.0.can_edit', false)
+                ->where('forms.0.connections', null)
             );
     }
 
