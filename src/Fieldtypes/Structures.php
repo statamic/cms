@@ -6,6 +6,7 @@ use Statamic\CP\Column;
 use Statamic\Facades\Structure;
 use Statamic\Facades\User;
 use Statamic\Structures\CollectionStructure;
+use Statamic\Structures\TaxonomyStructure;
 
 class Structures extends Relationship
 {
@@ -26,6 +27,10 @@ class Structures extends Relationship
 
         if ($structure instanceof CollectionStructure) {
             return User::current()->can('view', $structure->collection());
+        }
+
+        if ($structure instanceof TaxonomyStructure) {
+            return User::current()->can('view', $structure->taxonomy());
         }
 
         return User::current()->can('view', $structure);
@@ -73,6 +78,8 @@ class Structures extends Relationship
 
         if ($structure instanceof CollectionStructure) {
             $id = 'collection::'.$id;
+        } elseif ($structure instanceof TaxonomyStructure) {
+            $id = 'taxonomy::'.$id;
         }
 
         return $id;

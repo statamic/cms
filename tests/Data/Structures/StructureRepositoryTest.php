@@ -39,20 +39,27 @@ class StructureRepositoryTest extends TestCase
         ]);
         Collection::shouldReceive('whereStructured')->andReturn($collections);
 
-        Taxonomy::shouldReceive('all')->andReturn(collect());
+        $taxonomies = collect([
+            \Statamic\Taxonomies\Taxonomy::make('taxonomy-structure-a')->structure(new TaxonomyStructure),
+            \Statamic\Taxonomies\Taxonomy::make('taxonomy-structure-b')->structure(new TaxonomyStructure),
+            \Statamic\Taxonomies\Taxonomy::make('flat-taxonomy'),
+        ]);
+        Taxonomy::shouldReceive('all')->andReturn($taxonomies);
 
         $structures = $this->repo->all();
 
         $this->assertInstanceOf(\Illuminate\Support\Collection::class, $structures);
-        $this->assertCount(5, $structures);
+        $this->assertCount(7, $structures);
         $this->assertEveryItemIsInstanceOf(StructureContract::class, $structures);
-        $this->assertEquals([0, 1, 2, 3, 4], $structures->keys()->all());
+        $this->assertEquals([0, 1, 2, 3, 4, 5, 6], $structures->keys()->all());
         $this->assertEquals([
             'nav-a',
             'nav-b',
             'nav-c',
             'collection-structure-a',
             'collection-structure-b',
+            'taxonomy-structure-a',
+            'taxonomy-structure-b',
         ], $structures->map->handle()->all());
     }
 
