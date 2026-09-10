@@ -32,6 +32,7 @@ function toggleCollapsedState() {
                 <slot name="header" />
             </button>
             <div class="flex items-center gap-2">
+                <slot name="header-actions" />
                 <Switch
                     size="xs"
                     :model-value="enabled"
@@ -43,7 +44,6 @@ function toggleCollapsedState() {
                         <Button icon="dots" variant="ghost" size="xs" class="me-2" :aria-label="__('Open row actions')" />
                     </template>
                     <DropdownMenu>
-                        <slot name="actions" />
                         <DropdownItem
                             :text="__('Duplicate')"
                             icon="duplicate"

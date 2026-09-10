@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { usePage } from '@inertiajs/vue3';
-import { Badge, DropdownItem, Icon, Label, PublishContainer, PublishFields, PublishFieldsProvider } from '@ui';
+import { Badge, Button, Icon, Label, PublishContainer, PublishFields, PublishFieldsProvider } from '@ui';
 import ConnectionRows from './ConnectionRows.vue';
 import ConnectionRules from './ConnectionRules.vue';
 import ConnectionRowSummary from './ConnectionRowSummary.vue';
@@ -59,12 +59,8 @@ const recipients = (to: string[] | string): string =>
             />
         </template>
 
-        <template #actions="{ item: email }">
-            <DropdownItem
-                :text="__('Preview')"
-                icon="eye"
-                @click="previewing = email"
-            />
+        <template #header-actions="{ item: email }">
+            <Button icon="eye" size="xs" :text="__('Preview')" @click="previewing = email" />
         </template>
 
         <template #default="{ item: email, errors }">
