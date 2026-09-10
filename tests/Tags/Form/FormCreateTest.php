@@ -2,13 +2,18 @@
 
 namespace Tests\Tags\Form;
 
+use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\AssetContainer;
+use Statamic\Facades\Fieldset as FieldsetRepository;
 use Statamic\Facades\Form;
+use Statamic\Fields\Fieldset;
+use Statamic\Forms\SendEmails;
 use Statamic\Statamic;
 
 class FormCreateTest extends FormTestCase
@@ -673,14 +678,14 @@ EOT
     }
 
     #[Test]
-    public function it_dynamically_renders_asset_field()
+    public function it_dynamically_renders_upload_field()
     {
         $this->assertFieldRendersHtml([
             '<input id="[[form-handle]]-form-cat-selfie-field" type="file" name="cat_selfie">',
         ], [
             'handle' => 'cat_selfie',
             'field' => [
-                'type' => 'assets',
+                'type' => 'upload',
                 'display' => 'Cat Selfie',
                 'max_files' => 1,
             ],
@@ -688,14 +693,14 @@ EOT
     }
 
     #[Test]
-    public function it_dynamically_renders_multiple_assets_field()
+    public function it_dynamically_renders_multiple_upload_field()
     {
         $this->assertFieldRendersHtml([
             '<input id="[[form-handle]]-form-cat-selfies-field" type="file" name="cat_selfies[]" multiple>',
         ], [
             'handle' => 'cat_selfies',
             'field' => [
-                'type' => 'assets',
+                'type' => 'upload',
                 'display' => 'Cat Selfies',
             ],
         ]);
@@ -723,6 +728,151 @@ EOT
         ], [
             'custom' => 'fall back to default partial',
         ]);
+    }
+
+    #[Test]
+    public function it_dynamically_renders_pages_array()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        $this->createForm([
+            'pages' => [
+                [
+                    'id' => 'page_one',
+                    'display' => 'Page One',
+                    'instructions' => 'Page One Instructions',
+                    'sections' => [
+                        ['display' => 'Section A', 'fields' => [['handle' => 'name', 'field' => ['type' => 'text']]]],
+                    ],
+                ],
+                [
+                    'id' => 'page_two',
+                    'display' => 'Page Two',
+                    'previous_page_label' => 'Back',
+                    'sections' => [
+                        ['display' => 'Section B', 'fields' => [['handle' => 'email', 'field' => ['type' => 'text']]]],
+                    ],
+                ],
+            ],
+        ], 'survey');
+
+        $output = $this->normalizeHtml($this->tag(<<<'EOT'
+{{ form:survey }}
+    {{ pages }}
+        <div class="page">{{ id }} - {{ display }}{{ if instructions }} ({{ instructions }}){{ /if }}{{ if previous_page_label }} - back:{{ previous_page_label }}{{ /if }} - button:{{ button_label }} - {{ sections }}[{{ display }}:{{ fields }}{{ handle }},{{ /fields }}]{{ /sections }}</div>
+    {{ /pages }}
+{{ /form:survey }}
+EOT
+        ));
+
+        // button_label should default to "Next", then "Submit" on the last page.
+        // The back button is output when a previous_page_label is set or show_previous_button is true.
+        $this->assertStringContainsString('<div class="page">page_one - Page One (Page One Instructions) - button:Next - [Section A:name,]</div>', $output);
+        $this->assertStringContainsString('<div class="page">page_two - Page Two - back:Back - button:Submit - [Section B:email,]</div>', $output);
+    }
+
+    #[Test]
+    public function it_outputs_previous_page_label_when_show_previous_button_is_enabled()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        $this->createForm([
+            'pages' => [
+                [
+                    'id' => 'page_one',
+                    'sections' => [
+                        ['display' => 'Section A', 'fields' => [['handle' => 'name', 'field' => ['type' => 'text']]]],
+                    ],
+                ],
+                [
+                    'id' => 'page_two',
+                    'show_previous_button' => true,
+                    'sections' => [
+                        ['display' => 'Section B', 'fields' => [['handle' => 'email', 'field' => ['type' => 'text']]]],
+                    ],
+                ],
+            ],
+        ], 'survey');
+
+        $output = $this->normalizeHtml($this->tag(<<<'EOT'
+{{ form:survey }}
+    {{ pages }}
+        <div class="page">{{ id }}{{ if previous_page_label }} - back:{{ previous_page_label }}{{ /if }} - button:{{ button_label }}</div>
+    {{ /pages }}
+{{ /form:survey }}
+EOT
+        ));
+
+        $this->assertStringContainsString('<div class="page">page_one - button:Next</div>', $output);
+        $this->assertStringContainsString('<div class="page">page_two - back:Previous Page - button:Submit</div>', $output);
+    }
+
+    #[Test]
+    public function it_dynamically_renders_simplified_pages_array_when_forms_pro_is_not_installed()
+    {
+        // When forms-pro isn't installed, sections will be collapsed under a single page.
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(false);
+
+        $this->createForm([
+            'sections' => [
+                ['display' => 'Section A', 'fields' => [['handle' => 'name', 'field' => ['type' => 'text']]]],
+                ['display' => 'Section B', 'fields' => [['handle' => 'email', 'field' => ['type' => 'text']]]],
+            ],
+        ], 'survey');
+
+        $output = $this->normalizeHtml($this->tag(<<<'EOT'
+{{ form:survey }}
+    {{ pages }}
+        <div class="page">{{ id }}{{ if previous_page_label }} - back:{{ previous_page_label }}{{ /if }} - button:{{ button_label }} - {{ sections }}[{{ display }}:{{ fields }}{{ handle }},{{ /fields }}]{{ /sections }}</div>
+    {{ /pages }}
+    <div class="all-sections">{{ sections }}{{ display }},{{ /sections }}</div>
+{{ /form:survey }}
+EOT
+        ));
+
+        $this->assertStringContainsString('<div class="page">main - button:Submit - [Section A:name,][Section B:email,]</div>', $output);
+    }
+
+    #[Test]
+    public function it_outputs_the_current_page()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        $this->createForm([
+            'pages' => [
+                [
+                    'id' => 'page_one',
+                    'display' => 'Page One',
+                    'instructions' => 'Page One Instructions',
+                    'sections' => [
+                        ['fields' => [['handle' => 'name', 'field' => ['type' => 'text']]]],
+                    ],
+                ],
+                [
+                    'id' => 'page_two',
+                    'display' => 'Page Two',
+                    'previous_page_label' => 'Back',
+                    'sections' => [
+                        ['fields' => [['handle' => 'email', 'field' => ['type' => 'text']]]],
+                    ],
+                ],
+            ],
+        ], 'survey');
+
+        $template = <<<'EOT'
+{{ form:survey }}
+    <div class="page">{{ page:id }} - {{ page:display }}{{ if page:instructions }} ({{ page:instructions }}){{ /if }}{{ if page:previous_page_label }} - back:{{ page:previous_page_label }}{{ /if }} - button:{{ page:button_label }}</div>
+{{ /form:survey }}
+EOT;
+
+        // Defaults to the first page; its button label is "Next" and there's no back button.
+        $output = $this->normalizeHtml($this->tag($template));
+        $this->assertStringContainsString('<div class="page">page_one - Page One (Page One Instructions) - button:Next</div>', $output);
+
+        // Reflects the page query param; the last page's button label becomes "Submit".
+        request()->merge(['page' => 'page_two']);
+        $output = $this->normalizeHtml($this->tag($template));
+        $this->assertStringContainsString('<div class="page">page_two - Page Two - back:Back - button:Submit</div>', $output);
     }
 
     #[Test]
@@ -924,6 +1074,155 @@ EOT
     }
 
     #[Test]
+    public function it_only_outputs_the_success_message_after_the_final_page()
+    {
+        $this->createMultiPageForm();
+        Form::find('survey')->save();
+
+        $template = <<<'EOT'
+{{ form:survey }}
+    <p class="success">{{ success }}</p>
+{{ /form:survey }}
+EOT;
+
+        // Submitting a non-final page advances without outputting the success message.
+        $this
+            ->post('/!/forms/survey', ['_page' => 'page_one', 'name' => 'Olaf'])
+            ->assertSessionHasNoErrors();
+
+        preg_match_all('/<p class="success">(.+)<\/p>/U', $this->tag($template), $success);
+        $this->assertEmpty($success[1]);
+
+        // Submitting the final page outputs the success message.
+        $this
+            ->post('/!/forms/survey', ['_page' => 'page_two', 'email' => 'olaf@example.com'])
+            ->assertSessionHasNoErrors();
+
+        preg_match_all('/<p class="success">(.+)<\/p>/U', $this->tag($template), $success);
+        $this->assertEquals(['Submission successful.'], $success[1]);
+
+        Form::find('survey')->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function it_follows_page_logic_to_a_rules_destination_on_submit()
+    {
+        $this->createMultiPageFormWithLogic();
+        Form::find('survey')->save();
+
+        // name=Olaf satisfies page one's rule, jumping straight to page three.
+        $this
+            ->from('/survey')
+            ->post('/!/forms/survey', ['_page' => 'page_one', 'name' => 'Olaf'])
+            ->assertSessionHasNoErrors()
+            ->assertRedirectContains('page=page_three');
+
+        Form::find('survey')->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function it_sends_you_back_to_the_first_page_when_jumping_straight_past_a_required_field()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        $this->createForm([
+            'pages' => [
+                [
+                    'id' => 'page_one',
+                    'sections' => [['fields' => [['handle' => 'name', 'field' => ['type' => 'text', 'validate' => 'required']]]]],
+                ],
+                [
+                    'id' => 'page_two',
+                    'sections' => [['fields' => [['handle' => 'email', 'field' => ['type' => 'text']]]]],
+                ],
+            ],
+        ], 'survey');
+        Form::find('survey')->save();
+
+        // Jump straight to the final page, skipping page one's required field.
+        $this
+            ->from('/survey')
+            ->post('/!/forms/survey', ['_page' => 'page_two', 'email' => 'olaf@example.com'])
+            ->assertSessionHasNoErrors()
+            ->assertRedirectContains('page=page_one');
+
+        // The submission wasn't finalized; it's still partial.
+        $submissions = Form::find('survey')->submissions();
+        $this->assertCount(1, $submissions);
+        $this->assertTrue($submissions->first()->isPartial());
+
+        Form::find('survey')->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function it_does_not_redirect_to_an_external_url_from_the_referrer_between_pages()
+    {
+        $this->createMultiPageForm();
+        Form::find('survey')->save();
+
+        // A forged referrer pointing off-site must not become the next-page redirect target.
+        $response = $this
+            ->from('https://evil.example/phishing')
+            ->post('/!/forms/survey', ['_page' => 'page_one', 'name' => 'Olaf'])
+            ->assertSessionHasNoErrors();
+
+        $this->assertStringNotContainsString('evil.example', $response->headers->get('Location'));
+        $response->assertRedirectContains('page=page_two');
+
+        Form::find('survey')->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function the_previous_page_url_follows_the_path_taken_through_page_logic()
+    {
+        $this->createMultiPageFormWithLogic();
+
+        $form = Form::find('survey');
+        $form->save();
+
+        // The user reached page three by jumping from page one (skipping page two).
+        $submission = tap($form->makeSubmission()->data(['name' => 'Olaf'])->asPartial())->save();
+        session()->put('form.survey.partial_submission', $submission->id());
+
+        request()->merge(['page' => 'page_three']);
+
+        $output = $this->tag('{{ form:survey }}{{ previous_page_url }}{{ /form:survey }}');
+
+        // "Back" returns to page one — the page actually visited — not page two.
+        $this->assertStringContainsString('page=page_one', $output);
+        $this->assertStringNotContainsString('page=page_two', $output);
+
+        $form->submissions()->each->delete();
+    }
+
+    private function createMultiPageFormWithLogic($handle = 'survey')
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        $this->createForm([
+            'pages' => [
+                [
+                    'id' => 'page_one',
+                    'rules' => [[
+                        'conditions' => [['field' => 'name', 'operator' => 'equals', 'value' => 'Olaf']],
+                        'destination' => 'page_three',
+                    ]],
+                    'sections' => [['fields' => [['handle' => 'name', 'field' => ['type' => 'text']]]]],
+                ],
+                [
+                    'id' => 'page_two',
+                    'sections' => [['fields' => [['handle' => 'colour', 'field' => ['type' => 'text']]]]],
+                ],
+                [
+                    'id' => 'page_three',
+                    'previous_page_label' => 'Back',
+                    'sections' => [['fields' => [['handle' => 'email', 'field' => ['type' => 'text']]]]],
+                ],
+            ],
+        ], $handle);
+    }
+
+    #[Test]
     public function it_will_submit_form_and_follow_custom_redirect_with_success()
     {
         $this->assertEmpty(Form::find('contact')->submissions());
@@ -1013,6 +1312,24 @@ EOT
         $this->assertEmpty($errors[1]);
         $this->assertEquals(['Submission successful.'], $success[1]);
         $this->assertStringNotContainsString('<div class="analytics"></div>', $output);
+    }
+
+    #[Test]
+    public function it_will_render_fake_success_when_a_listener_throws_a_bare_silent_failure_exception()
+    {
+        Event::listen(\Statamic\Events\FormSubmitted::class, function () {
+            throw new \Statamic\Exceptions\SilentFormFailureException;
+        });
+
+        $this
+            ->post('/!/forms/contact', [
+                'email' => 'san@holo.com',
+                'message' => 'hello',
+            ])
+            ->assertSessionHasNoErrors()
+            ->assertLocation('/');
+
+        $this->assertCount(0, Form::find('contact')->submissions());
     }
 
     #[Test]
@@ -1270,6 +1587,154 @@ EOT
     }
 
     #[Test]
+    public function it_renders_file_input_for_assets_and_files_fields_imported_from_a_fieldset()
+    {
+        $fieldset = (new Fieldset)->setHandle('uploads')->setContents([
+            'fields' => [
+                ['handle' => 'photo', 'field' => ['type' => 'assets']],
+                ['handle' => 'attachment', 'field' => ['type' => 'files']],
+            ],
+        ]);
+
+        FieldsetRepository::shouldReceive('find')->with('uploads')->andReturn($fieldset);
+
+        $this->createForm([
+            'sections' => [
+                ['fields' => [['import' => 'uploads']]],
+            ],
+        ], 'survey');
+
+        $output = $this->tag('{{ form:survey }}{{ form:fields }}{{ field }}{{ /form:fields }}{{ /form:survey }}');
+
+        $this->assertStringContainsString('type="file"', $output);
+        $this->assertStringContainsString('name="photo[]"', $output);
+        $this->assertStringContainsString('name="attachment[]"', $output);
+        $this->assertStringContainsString('multiple', $output);
+    }
+
+    #[Test]
+    public function it_renders_the_first_pages_sections_by_default()
+    {
+        $this->createMultiPageForm();
+
+        $output = $this->normalizeHtml($this->tag(<<<'EOT'
+{{ form:survey }}
+    {{ sections }}<div class="section">{{ display }}:{{ fields }}{{ handle }},{{ /fields }}</div>{{ /sections }}
+{{ /form:survey }}
+EOT
+        ));
+
+        // Only the first page's section is rendered.
+        $this->assertStringContainsString('<div class="section">Section A:name,</div>', $output);
+        $this->assertStringNotContainsString('Section B', $output);
+        $this->assertStringNotContainsString('email', $output);
+    }
+
+    #[Test]
+    public function it_renders_a_specific_pages_sections_based_on_the_page_query_param()
+    {
+        $this->createMultiPageForm();
+
+        request()->merge(['page' => 'page_two']);
+
+        $output = $this->normalizeHtml($this->tag(<<<'EOT'
+{{ form:survey }}
+    {{ sections }}<div class="section">{{ display }}:{{ fields }}{{ handle }},{{ /fields }}</div>{{ /sections }}
+{{ /form:survey }}
+EOT
+        ));
+
+        $this->assertStringContainsString('<div class="section">Section B:email,</div>', $output);
+        $this->assertStringNotContainsString('Section A', $output);
+        $this->assertStringNotContainsString('>name,', $output);
+    }
+
+    #[Test]
+    public function it_falls_back_to_the_first_page_when_the_page_query_param_is_invalid()
+    {
+        $this->createMultiPageForm();
+
+        request()->merge(['page' => 'page_nope']);
+
+        $output = $this->normalizeHtml($this->tag(<<<'EOT'
+{{ form:survey }}
+    {{ sections }}<div class="section">{{ display }}:{{ fields }}{{ handle }},{{ /fields }}</div>{{ /sections }}
+{{ /form:survey }}
+EOT
+        ));
+
+        $this->assertStringContainsString('<div class="section">Section A:name,</div>', $output);
+        $this->assertStringNotContainsString('Section B', $output);
+    }
+
+    #[Test]
+    public function it_outputs_a_hidden_page_input_for_multi_page_forms()
+    {
+        $this->createMultiPageForm();
+
+        // The current page defaults to the first.
+        $output = $this->tag('{{ form:survey }}{{ /form:survey }}');
+        $this->assertStringContainsString('<input type="hidden" name="_page" value="page_one" />', $output);
+
+        // It reflects the page query param.
+        request()->merge(['page' => 'page_two']);
+        $output = $this->tag('{{ form:survey }}{{ /form:survey }}');
+        $this->assertStringContainsString('<input type="hidden" name="_page" value="page_two" />', $output);
+    }
+
+    #[Test]
+    public function it_does_not_output_a_hidden_page_input_for_single_page_forms()
+    {
+        // The default contact form (forms-pro disabled) is a single page.
+        $output = $this->tag('{{ form:contact }}{{ /form:contact }}');
+
+        $this->assertStringNotContainsString('name="_page"', $output);
+    }
+
+    #[Test]
+    public function it_populates_fields_from_the_session_partial_submission()
+    {
+        $this->createMultiPageForm();
+
+        $form = Form::find('survey');
+        $form->save();
+        $submission = tap($form->makeSubmission()->data(['name' => 'Olaf', 'email' => 'olaf@example.com'])->asPartial())->save();
+
+        session()->put('form.survey.partial_submission', $submission->id());
+
+        // The first page's field is populated with the stored value.
+        $pageOne = $this->normalizeHtml($this->tag('{{ form:survey }}{{ fields }}{{ handle }}={{ value }},{{ /fields }}{{ /form:survey }}'));
+        $this->assertStringContainsString('name=Olaf,', $pageOne);
+
+        // Navigating to the second page populates its field too.
+        request()->merge(['page' => 'page_two']);
+        $pageTwo = $this->normalizeHtml($this->tag('{{ form:survey }}{{ fields }}{{ handle }}={{ value }},{{ /fields }}{{ /form:survey }}'));
+        $this->assertStringContainsString('email=olaf@example.com,', $pageTwo);
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function it_does_not_populate_fields_from_a_finalized_submission()
+    {
+        $this->createMultiPageForm();
+
+        $form = Form::find('survey');
+        $form->save();
+        $submission = tap($form->makeSubmission()->data(['name' => 'Olaf'])->asPartial())->save();
+        $submission->finalize();
+
+        session()->put('form.survey.partial_submission', $submission->id());
+
+        $output = $this->normalizeHtml($this->tag('{{ form:survey }}{{ fields }}{{ handle }}={{ value }},{{ /fields }}{{ /form:survey }}'));
+
+        // The submission is no longer partial, so its values aren't loaded back in.
+        $this->assertStringContainsString('name=,', $output);
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
     public function it_renders_exceptions_thrown_during_json_requests_as_standard_laravel_errors()
     {
         Event::listen(function (\Statamic\Events\FormSubmitted $event) {
@@ -1312,6 +1777,24 @@ EOT
         $this->assertArrayHasKey('error', $json);
         $this->assertArrayHasKey('errors', $json);
         $this->assertSame($json['error'], ['some' => 'error']);
+    }
+
+    #[Test]
+    public function a_precognitive_success_does_not_persist_a_submission()
+    {
+        Bus::fake();
+
+        $this->assertEmpty(Form::find('contact')->submissions());
+
+        $this
+            ->withPrecognition()
+            ->withHeaders(['Precognition-Validate-Only' => 'email'])
+            ->postJson('/!/forms/contact', ['email' => 'test@example.com'])
+            ->assertNoContent()
+            ->assertHeader('Precognition-Success', 'true');
+
+        $this->assertEmpty(Form::find('contact')->submissions());
+        Bus::assertNotDispatched(SendEmails::class);
     }
 
     #[Test]

@@ -12,6 +12,8 @@ use Statamic\Dictionaries;
 use Statamic\Dictionaries\Dictionary;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fieldtypes;
+use Statamic\Forms;
+use Statamic\Forms\Fields\FormFieldtype;
 use Statamic\Forms\JsDrivers;
 use Statamic\Modifiers\CoreModifiers;
 use Statamic\Modifiers\Modifier;
@@ -30,6 +32,7 @@ class ExtensionServiceProvider extends ServiceProvider
         'copy_asset_url' => Actions\CopyAssetUrl::class,
         'copy_password_reset_link' => Actions\CopyPasswordResetLink::class,
         'delete' => Actions\Delete::class,
+        'delete_fake_submissions' => Actions\DeleteFakeSubmissions::class,
         'delete_multisite_entry' => Actions\DeleteMultisiteEntry::class,
         'disable_two_factor_authentication' => Actions\DisableTwoFactorAuthentication::class,
         'download_asset' => Actions\DownloadAsset::class,
@@ -88,9 +91,14 @@ class ExtensionServiceProvider extends ServiceProvider
         'global_set_sites' => Fieldtypes\GlobalSetSites::class,
         'grid' => Fieldtypes\Grid::class,
         'group' => Fieldtypes\Group::class,
+        'form_banner' => Fieldtypes\FormBanner::class,
+        'form_heading' => Fieldtypes\FormHeading::class,
+        'form_paragraph' => Fieldtypes\FormParagraph::class,
+        'form_upload' => Fieldtypes\FormUpload::class,
         'hidden' => Fieldtypes\Hidden::class,
         'html' => Fieldtypes\Html::class,
         'icon' => Fieldtypes\Icon::class,
+        'image_choice' => Fieldtypes\ImageChoice::class,
         'integer' => Fieldtypes\Integer::class,
         'link' => Fieldtypes\Link::class,
         'list' => Fieldtypes\Lists::class,
@@ -98,7 +106,9 @@ class ExtensionServiceProvider extends ServiceProvider
         'markdown_buttons_setting' => Fieldtypes\Markdown\Buttons::class,
         'navs' => Fieldtypes\Navs::class,
         'fields' => Fieldtypes\NestedFields::class,
+        'opinion_scale' => Fieldtypes\OpinionScale::class,
         'radio' => Fieldtypes\Radio::class,
+        'ranking' => Fieldtypes\Ranking::class,
         'range' => Fieldtypes\Range::class,
         'replicator' => Fieldtypes\Replicator::class,
         'revealer' => Fieldtypes\Revealer::class,
@@ -109,6 +119,7 @@ class ExtensionServiceProvider extends ServiceProvider
         'structures' => Fieldtypes\Structures::class,
         'slug' => Fieldtypes\Slug::class,
         'spacer' => Fieldtypes\Spacer::class,
+        'star_rating' => Fieldtypes\StarRating::class,
         'table' => Fieldtypes\Table::class,
         'taggable' => Fieldtypes\Taggable::class,
         'terms' => Fieldtypes\Terms::class,
@@ -126,7 +137,37 @@ class ExtensionServiceProvider extends ServiceProvider
         'width' => Fieldtypes\Width::class,
         'video' => Fieldtypes\Video::class,
         'yaml' => Fieldtypes\Yaml::class,
+        'yes_no' => Fieldtypes\YesNo::class,
         'form' => \Statamic\Forms\Fieldtype::class,
+    ];
+
+    protected $formFieldtypes = [
+        'banner' => Forms\Fieldtypes\Banner::class,
+        'checkboxes' => Forms\Fieldtypes\Checkboxes::class,
+        'currency' => Forms\Fieldtypes\Currency::class,
+        'date_picker' => Forms\Fieldtypes\DatePicker::class,
+        'dictionary' => Forms\Fieldtypes\Dictionary::class,
+        'dropdown' => Forms\Fieldtypes\Dropdown::class,
+        'email' => Forms\Fieldtypes\Email::class,
+        'group' => Forms\Fieldtypes\Group::class,
+        'heading' => Forms\Fieldtypes\Heading::class,
+        'image_choice' => Forms\Fieldtypes\ImageChoice::class,
+        'long_answer' => Forms\Fieldtypes\LongAnswer::class,
+        'multi_choice' => Forms\Fieldtypes\MultiChoice::class,
+        'name' => Forms\Fieldtypes\Name::class,
+        'number' => Forms\Fieldtypes\Number::class,
+        'opinion_scale' => Forms\Fieldtypes\OpinionScale::class,
+        'paragraph' => Forms\Fieldtypes\Paragraph::class,
+        'phone' => Forms\Fieldtypes\Phone::class,
+        'ranking' => Forms\Fieldtypes\Ranking::class,
+        'short_answer' => Forms\Fieldtypes\ShortAnswer::class,
+        'spacer' => Forms\Fieldtypes\Spacer::class,
+        'star_rating' => Forms\Fieldtypes\StarRating::class,
+        'time_picker' => Forms\Fieldtypes\TimePicker::class,
+        'toggle' => Forms\Fieldtypes\Toggle::class,
+        'upload' => Forms\Fieldtypes\Upload::class,
+        'website' => Forms\Fieldtypes\Website::class,
+        'yes_no' => Forms\Fieldtypes\YesNo::class,
     ];
 
     protected $modifierAliases = [
@@ -160,6 +201,8 @@ class ExtensionServiceProvider extends ServiceProvider
         'fields' => Scopes\Filters\Fields::class,
         'blueprint' => Scopes\Filters\Blueprint::class,
         'status' => Scopes\Filters\Status::class,
+        'submission_site' => Scopes\Filters\SubmissionSite::class,
+        'submission_status' => Scopes\Filters\SubmissionStatus::class,
         'site' => Scopes\Filters\Site::class,
         'user_role' => Scopes\Filters\UserRole::class,
         'user_group' => Scopes\Filters\UserGroup::class,
@@ -317,6 +360,11 @@ class ExtensionServiceProvider extends ServiceProvider
                 'class' => Fieldtype::class,
                 'directory' => 'Fieldtypes',
                 'extensions' => $this->fieldtypes,
+            ],
+            'form-fieldtypes' => [
+                'class' => FormFieldtype::class,
+                'directory' => 'FormFieldtypes',
+                'extensions' => $this->formFieldtypes,
             ],
             'modifiers' => [
                 'class' => Modifier::class,

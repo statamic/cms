@@ -1,7 +1,7 @@
 {{ fields }}
     <b>{{ display }}:</b>
     {{ if value }}
-        {{ if fieldtype == "assets" }}
+        {{ if (fieldtype == "form_upload" && config:store) || fieldtype == "assets" }}
             {{ value }}
                 {{ permalink }}
                 {{ if !last }},{{ /if }}

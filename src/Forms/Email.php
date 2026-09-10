@@ -5,6 +5,7 @@ namespace Statamic\Forms;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Storage;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Blueprint;
@@ -116,10 +117,14 @@ class Email extends Mailable
         }
 
         $this->getRenderableFieldData(Arr::except($this->submissionData, ['id', 'date', 'form']))
-            ->filter(fn ($field) => in_array($field['fieldtype'], ['assets', 'files']))
+            ->filter(fn ($field) => in_array($field['fieldtype'], ['assets', 'files', 'form_upload']))
             ->each(function ($field) {
                 $field['value'] = $field['value']->value();
-                $field['fieldtype'] === 'assets' ? $this->attachAssets($field) : $this->attachFiles($field);
+
+                $isStoredAsAsset = $field['fieldtype'] === 'assets'
+                    || ($field['fieldtype'] === 'form_upload' && Arr::get($field, 'config.store'));
+
+                $isStoredAsAsset ? $this->attachAssets($field) : $this->attachFiles($field);
             });
 
         return $this;
@@ -151,10 +156,15 @@ class Email extends Mailable
         }
 
         $disk = config('statamic.system.file_uploads_disk', 'local');
-        $basePath = config('statamic.system.file_uploads_path', 'statamic/file-uploads');
+
+        $basePath = $field['fieldtype'] === 'form_upload'
+            ? config('statamic.forms.file_uploads_path', 'statamic/form-uploads')
+            : config('statamic.system.file_uploads_path', 'statamic/file-uploads');
 
         foreach ($value as $file) {
-            $this->attachFromStorageDisk($disk, $basePath.'/'.$file);
+            if (Storage::disk($disk)->exists($path = "{$basePath}/{$file}")) {
+                $this->attachFromStorageDisk($disk, $path);
+            }
         }
     }
 
@@ -165,7 +175,7 @@ class Email extends Mailable
         $fields = $this->getRenderableFieldData(Arr::except($augmented, ['id', 'date', 'form']))
             ->reject(fn ($field) => $field['fieldtype'] === 'spacer')
             ->when(Arr::has($this->config, 'attachments'), function ($fields) {
-                return $fields->reject(fn ($field) => in_array($field['fieldtype'], ['assets', 'files']));
+                return $fields->reject(fn ($field) => in_array($field['fieldtype'], ['assets', 'files', 'form_upload']));
             });
         $formConfig = ($configFields = Form::extraConfigFor($form->handle()))
             ? Blueprint::makeFromTabs($configFields)->fields()->addValues($form->data()->all())->values()->all()

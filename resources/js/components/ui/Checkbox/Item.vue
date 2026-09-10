@@ -80,7 +80,7 @@ const containerClasses = computed(() => {
         },
     })({ ...props });
 
-    const chipsClass = 'mb-0 items-center gap-1.5 rounded-xl border border-gray-300 bg-linear-to-b from-white to-white p-2 py-2 pe-4 shadow-ui-sm transition-[background] hover:bg-gray-50 hover:to-gray-50 with-contrast:border-gray-500 dark:border-gray-700/80 dark:from-gray-850 dark:to-gray-900 dark:shadow-ui-md dark:hover:bg-gray-900 dark:hover:to-gray-850 [&_button]:mt-0';
+    const chipsClass = 'mb-0 items-center gap-1.5 rounded-xl border border-gray-300 bg-linear-to-b from-white to-white p-2 py-2 pe-4 shadow-ui-sm transition-[background] hover:bg-gray-50 hover:to-gray-50 with-contrast:border-gray-500 dark:border-gray-700/80 dark:from-gray-850 dark:to-gray-900 dark:shadow-ui-md dark:hover:bg-gray-900 dark:hover:to-gray-850 bg-white dark:bg-gray-925 [&_button]:mt-0';
 
     return twMerge(classes, appearance.value === 'chips' ? chipsClass : null, attrs.class);
 });

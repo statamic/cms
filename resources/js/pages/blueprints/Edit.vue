@@ -10,7 +10,6 @@ defineProps({
 	canDefineLocalizable: { type: Boolean, default: undefined },
 	resetRoute: String,
 	isResettable: Boolean,
-	isFormBlueprint: Boolean,
 });
 </script>
 
@@ -24,7 +23,6 @@ defineProps({
             :initial-blueprint="blueprint"
             :use-tabs="useTabs"
             :can-define-localizable="canDefineLocalizable"
-            :is-form-blueprint="isFormBlueprint"
         >
             <template v-if="isResettable" #actions>
                 <ui-dropdown>

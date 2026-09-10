@@ -12,7 +12,7 @@ class CanManageBlueprints
     {
         $user = User::current();
 
-        if ($user->cant('configure fields') && $user->cant('configure form fields')) {
+        if ($user->cant('configure fields')) {
             throw new AuthorizationException('Unauthorized.');
         }
 

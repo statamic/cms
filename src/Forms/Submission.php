@@ -14,20 +14,25 @@ use Statamic\Data\TracksQueriedRelations;
 use Statamic\Events\SubmissionCreated;
 use Statamic\Events\SubmissionCreating;
 use Statamic\Events\SubmissionDeleted;
+use Statamic\Events\SubmissionFinalized;
 use Statamic\Events\SubmissionSaved;
 use Statamic\Events\SubmissionSaving;
-use Statamic\Facades\Asset;
 use Statamic\Facades\File;
 use Statamic\Facades\FormSubmission;
+use Statamic\Facades\Site as Sites;
 use Statamic\Facades\Stache;
 use Statamic\Forms\Uploaders\AssetsUploader;
 use Statamic\Forms\Uploaders\FilesUploader;
+use Statamic\Forms\Uploaders\FormFileUpload;
+use Statamic\Sites\Site;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class Submission implements Augmentable, ContainsQueryableValues, SubmissionContract
 {
-    use ContainsData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedData, TracksQueriedColumns, TracksQueriedRelations;
+    use ContainsData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedData, TracksQueriedColumns, TracksQueriedRelations {
+        data as traitData;
+    }
 
     /**
      * @var string
@@ -56,6 +61,26 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
         $this->supplements = clone $this->supplements;
     }
 
+    public function data($data = null)
+    {
+        if (func_num_args() === 0) {
+            return $this->traitData();
+        }
+
+        $data = collect($data);
+
+        // A full data replacement would otherwise drop the internal lifecycle
+        // keys, so carry over the existing partial and site values unless the
+        // incoming payload provides its own.
+        foreach (['partial', 'site'] as $key) {
+            if ($this->has($key) && ! $data->has($key)) {
+                $data[$key] = $this->get($key);
+            }
+        }
+
+        return $this->traitData($data);
+    }
+
     /**
      * Get or set the ID.
      *
@@ -82,6 +107,22 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
     public function form($form = null)
     {
         return $this->fluentlyGetOrSet('form')->args(func_get_args());
+    }
+
+    /**
+     * Get or set the site.
+     *
+     * @return Site|$this
+     */
+    public function site(Site|string|null $site = null): Site|static
+    {
+        if (func_num_args() === 0) {
+            return Sites::get($this->get('site')) ?? Sites::default();
+        }
+
+        $this->set('site', $site instanceof Site ? $site->handle() : $site);
+
+        return $this;
     }
 
     /**
@@ -114,8 +155,28 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
         return Carbon::createFromTimestamp($this->id());
     }
 
+    public function asPartial(): self
+    {
+        $this->set('partial', true);
+
+        return $this;
+    }
+
+    public function isPartial(): bool
+    {
+        return (bool) $this->get('partial');
+    }
+
+    public function status(): string
+    {
+        return match (true) {
+            $this->isPartial() => 'partial',
+            default => 'finalized',
+        };
+    }
+
     /**
-     * Upload files and return asset IDs.
+     * Upload files and return their storage references.
      *
      * @param  array  $uploadedFiles
      * @return array
@@ -125,9 +186,13 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
         return collect($uploadedFiles)->map(function ($files, $handle) {
             $field = $this->fields()->get($handle);
 
-            return $field['type'] === 'files'
-                ? FilesUploader::field($field)->upload($files)
-                : AssetsUploader::field($field)->upload($files);
+            if ($field['type'] === 'form_upload') {
+                return FormFileUpload::field($field, $this->id())->upload($files);
+            }
+
+            return $field['type'] === 'assets'
+                ? AssetsUploader::field($field)->upload($files)
+                : FilesUploader::field($field)->upload($files);
         })->all();
     }
 
@@ -183,6 +248,35 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
         }
     }
 
+    public function finalize()
+    {
+        if (! $this->isPartial()) {
+            return $this;
+        }
+
+        $this->remove('partial');
+
+        if ($this->form()->store()) {
+            $this->save();
+        } else {
+            // Fire the created event here for submissions that were never saved.
+            // The event might have been dispatched when the submission persisted,
+            // so we don't want to fire it again.
+            if (is_null($this->form()->submission($this->id()))) {
+                SubmissionCreated::dispatch($this);
+            }
+
+            $this->deleteQuietly();
+        }
+
+        SubmissionFinalized::dispatch($this);
+
+        CreateAssetsFromFileUploads::dispatchSync($this);
+        SendEmails::dispatch($this, $this->site());
+
+        return $this;
+    }
+
     public function deleteQuietly()
     {
         $this->withEvents = false;
@@ -197,6 +291,10 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
     {
         $withEvents = $this->withEvents;
         $this->withEvents = true;
+
+        if ($withEvents) {
+            DeleteTemporaryFiles::dispatchSync($this);
+        }
 
         FormSubmission::delete($this);
 
@@ -268,6 +366,10 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
 
     public function getQueryableValue(string $field)
     {
+        if ($field === 'status') {
+            return null;
+        }
+
         if (in_array($method = Str::camel($field), $this->queryableMethods())) {
             return $this->{$method}();
         }
@@ -284,7 +386,7 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
     private function queryableMethods(): array
     {
         return [
-            'blueprint', 'date', 'form', 'formattedDate', 'id', 'path',
+            'blueprint', 'date', 'form', 'formattedDate', 'id', 'path', 'site',
         ];
     }
 

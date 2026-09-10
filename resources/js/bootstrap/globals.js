@@ -109,8 +109,14 @@ export function utf8atob(stringToDecode) {
     );
 }
 
-export function uniqid() {
-    return uid();
+export function uniqid(options = {}) {
+    let uniqid = uid();
+
+    if (options.withoutHyphens) {
+        uniqid = uniqid.replaceAll('-', '');
+    }
+
+    return uniqid;
 }
 
 export function truncate(string, length, ending = '...') {

@@ -27,6 +27,9 @@ class FormType extends \Rebing\GraphQL\Support\Type
             'honeypot' => [
                 'type' => GraphQL::string(),
             ],
+            'status' => [
+                'type' => GraphQL::nonNull(GraphQL::string()),
+            ],
             'fields' => [
                 'type' => GraphQL::listOf(GraphQL::type(FieldType::NAME)),
                 'resolve' => function ($form, $args, $context, $info) {

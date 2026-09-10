@@ -13,6 +13,11 @@ use Statamic\Facades\URL;
 use Statamic\Rules\AllowedFile;
 use Statamic\Support\Arr;
 
+/**
+ * @deprecated Statamic's front-end form route no longer uses this class; validation and
+ * submission handling now goes through Statamic\Forms\SubmitForm. Kept only so that code
+ * extending or type-hinting FrontendFormRequest continues to work.
+ */
 class FrontendFormRequest extends FormRequest
 {
     use Localizable;

@@ -56,7 +56,6 @@ export default {
         initialBlueprint: Object,
         showTitle: Boolean,
         useTabs: { type: Boolean, default: true },
-        isFormBlueprint: { type: Boolean, default: false },
     },
 
     data() {
@@ -84,15 +83,9 @@ export default {
         this.$events.$on('root-form-save', () => {
             this.$nextTick(() => this.save());
         });
-
-        if (this.isFormBlueprint) {
-            Statamic.$config.set('isFormBlueprint', true);
-        }
     },
 
     beforeUnmount() {
-		Statamic.$config.set('isFormBlueprint', false);
-
         this.$events.$off('root-form-save');
 
 		this.saveKeyBinding.destroy();

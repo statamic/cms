@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+  <g id="calendar-note">
+    <path id="Intersect" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="M0.922871 10.5516c0.165949 1.4253 1.369349 2.5569 2.857439 2.6259 1.02855 0.0477 2.07925 0.0725 3.21959 0.0725 1.14035 0 2.19104 -0.0248 3.2196 -0.0725 1.4881 -0.069 2.6915 -1.2006 2.8574 -2.6259 0.2305 -1.97953 0.2305 -3.6653 0 -5.64487 -0.1659 -1.42526 -1.3693 -2.55689 -2.8574 -2.62588 -1.02855 -0.04769 -2.07925 -0.07248 -3.2196 -0.07248 -1.14034 0 -2.19104 0.02479 -3.21959 0.07248 -1.48809 0.06899 -2.69149 1.20062 -2.857439 2.62588 -0.230495 1.97957 -0.230494 3.66534 0 5.64487Z" stroke-width="1"></path>
+    <path id="Line 3" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="m4.25195 0.75 0 2.75" stroke-width="1"></path>
+    <path id="Line 4" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="m9.74805 0.75 0 2.75" stroke-width="1"></path>
+    <path id="Vector 1955" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="M4 6.78394h6" stroke-width="1"></path>
+    <path id="Vector 1956" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="M4 9.78394h3" stroke-width="1"></path>
+  </g>
+</svg>

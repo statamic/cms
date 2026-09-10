@@ -39,21 +39,33 @@ class FieldtypeRepository
         });
     }
 
+    /**
+     * @deprecated Use FormFieldtype::makeSelectable() instead.
+     */
     public function makeSelectableInForms($handle)
     {
         $this->selectableInForms[$handle] = true;
     }
 
+    /**
+     * @deprecated Use FormFieldtype::makeUnselectable() instead.
+     */
     public function makeUnselectableInForms($handle)
     {
         $this->selectableInForms[$handle] = false;
     }
 
+    /**
+     * @deprecated Use FormFieldtype::isSelectable() instead.
+     */
     public function hasBeenMadeSelectableInForms($handle)
     {
         return $this->selectableInForms[$handle] ?? false;
     }
 
+    /**
+     * @deprecated Use FormFieldtype::isSelectable() instead.
+     */
     public function selectableInFormIsOverriden($handle)
     {
         return array_key_exists($handle, $this->selectableInForms);

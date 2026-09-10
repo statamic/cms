@@ -41,9 +41,45 @@ class DeleteFormTest extends TestCase
     }
 
     #[Test]
+    public function it_denies_access_with_only_the_edit_forms_permission()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'edit forms']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+
+        $form = tap(Form::make('test'))->save();
+        $this->assertCount(1, Form::all());
+
+        $this
+            ->from('/original')
+            ->actingAs($user)
+            ->delete(cp_route('forms.destroy', $form->handle()))
+            ->assertRedirect('/original')
+            ->assertSessionHas('error');
+
+        $this->assertCount(1, Form::all());
+    }
+
+    #[Test]
     public function it_deletes_the_form()
     {
         $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+
+        $form = tap(Form::make('test'))->save();
+        $this->assertCount(1, Form::all());
+
+        $this
+            ->actingAs($user)
+            ->delete(cp_route('forms.destroy', $form->handle()))
+            ->assertOk();
+
+        $this->assertCount(0, Form::all());
+    }
+
+    #[Test]
+    public function it_deletes_the_form_with_the_delete_forms_permission()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'delete forms']]);
         $user = tap(User::make()->assignRole('test'))->save();
 
         $form = tap(Form::make('test'))->save();

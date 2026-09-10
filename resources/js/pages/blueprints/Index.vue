@@ -4,7 +4,7 @@ import { Link } from '@inertiajs/vue3';
 import Head from '@/pages/layout/Head.vue';
 import { Header, Dropdown, DropdownMenu, DropdownLabel, DropdownItem, Button, Subheading, Panel, DocsCallout, Icon, StatusIndicator } from '@ui';
 
-defineProps(['collections', 'taxonomies', 'navs', 'assetContainers', 'globals', 'forms', 'userBlueprint', 'groupBlueprint', 'additional']);
+defineProps(['collections', 'taxonomies', 'navs', 'assetContainers', 'globals', 'userBlueprint', 'groupBlueprint', 'additional']);
 
 const resetters = ref({});
 </script>
@@ -171,29 +171,6 @@ const resetters = ref({});
                                 <div class="flex items-center gap-2">
                                     <Icon name="globals" class="text-gray-500 me-1" />
                                     <Link :href="global.edit_url" v-text="__(global.title)" />
-                                </div>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </Panel>
-            </template>
-
-            <template v-if="forms.length">
-                <Subheading size="lg" class="mb-2" :text="__('Forms')" />
-                <Panel>
-                    <table class="data-table">
-                        <thead>
-                        <tr>
-                            <th class="text-start!">{{ __('Blueprint') }}</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr v-for="form in forms" :key="form.handle">
-                            <td>
-                                <div class="flex items-center gap-2">
-                                    <Icon name="forms" class="text-gray-500 me-1" />
-                                    <Link :href="form.edit_url" v-text="__(form.title)" />
                                 </div>
                             </td>
                         </tr>

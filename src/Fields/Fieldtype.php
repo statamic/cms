@@ -29,6 +29,9 @@ abstract class Fieldtype implements Arrayable
     protected $validatable = true;
     protected $defaultable = true;
     protected $selectable = true;
+    /**
+     * @deprecated Register a FormFieldtype instead.
+     */
     protected $selectableInForms = false;
     protected $relationship = false;
     protected $categories = [];
@@ -102,6 +105,9 @@ abstract class Fieldtype implements Arrayable
         return $this->selectable;
     }
 
+    /**
+     * @deprecated Use FormFieldtype::isSelectable() instead.
+     */
     public function selectableInForms(): bool
     {
         if (FieldtypeRepository::selectableInFormIsOverriden($this->handle())) {
@@ -111,11 +117,17 @@ abstract class Fieldtype implements Arrayable
         return $this->selectableInForms;
     }
 
+    /**
+     * @deprecated Use FormFieldtype::makeSelectable() instead.
+     */
     public static function makeSelectableInForms()
     {
         FieldtypeRepository::makeSelectableInForms(self::handle());
     }
 
+    /**
+     * @deprecated Use FormFieldtype::makeUnselectable() instead.
+     */
     public static function makeUnselectableInForms()
     {
         FieldtypeRepository::makeUnselectableInForms(self::handle());
@@ -306,7 +318,7 @@ abstract class Fieldtype implements Arrayable
         return $this->configFields;
     }
 
-    protected function extraConfigFieldItems(): array
+    public function extraConfigFieldItems(): array
     {
         return array_merge(
             self::$extraConfigFields[static::class] ?? [],
@@ -341,6 +353,16 @@ abstract class Fieldtype implements Arrayable
         return $data;
     }
 
+    /**
+     * Generate a fake value for form submission testing.
+     *
+     * Return null to fall back to FakeSubmissionGenerator's built-in handling.
+     */
+    public function fakeValue(): mixed
+    {
+        return null;
+    }
+
     public function preProcessConfig($data)
     {
         return $this->preProcess($data);
@@ -356,6 +378,9 @@ abstract class Fieldtype implements Arrayable
         return $data;
     }
 
+    /**
+     * @deprecated Implement FormFieldtype::view() instead.
+     */
     public function view()
     {
         $language = config('statamic.templates.language', 'antlers');

@@ -3,15 +3,20 @@
 namespace Tests\Forms;
 
 use Facades\Statamic\Fields\BlueprintRepository;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\Asset;
+use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Site;
 use Statamic\Forms\Email;
 use Statamic\Forms\Submission;
+use Statamic\Forms\Uploaders\FormFileUpload;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -121,20 +126,23 @@ class EmailTest extends TestCase
     #[Test]
     public function it_adds_data_to_the_view()
     {
-        $social = Blueprint::makeFromFields(['twitter' => ['type' => 'text']])->setHandle('social')->setNamespace('globals');
-        $company = Blueprint::makeFromFields(['company_name' => ['type' => 'text']])->setHandle('company')->setNamespace('globals');
-        $formBlueprint = Blueprint::makeFromFields(['foo' => ['type' => 'text']]);
+        $socialBlueprint = Blueprint::makeFromFields(['twitter' => ['type' => 'text']])->setHandle('social')->setNamespace('globals');
+        $companyBlueprint = Blueprint::makeFromFields(['company_name' => ['type' => 'text']])->setHandle('company')->setNamespace('globals');
 
-        BlueprintRepository::shouldReceive('find')->with('globals.social')->andReturn($social);
-        BlueprintRepository::shouldReceive('find')->with('globals.company')->andReturn($company);
-        BlueprintRepository::shouldReceive('find')->with('forms.test')->andReturn($formBlueprint);
+        BlueprintRepository::partialMock();
+        BlueprintRepository::shouldReceive('find')->with('globals.social')->andReturn($socialBlueprint);
+        BlueprintRepository::shouldReceive('find')->with('globals.company')->andReturn($companyBlueprint);
 
         $social = tap(GlobalSet::make('social'))->save();
         $social->inDefaultSite()->data(['twitter' => '@statamic'])->save();
         $company = tap(GlobalSet::make('company'))->save();
         $company->inDefaultSite()->data(['company_name' => 'Statamic'])->save();
 
-        $form = tap(Form::make('test'))->save();
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'foo', 'field' => ['type' => 'short_answer']],
+            ],
+        ]))->save();
         $submission = $form->makeSubmission()->data(['foo' => 'bar']);
 
         $email = $this->makeEmailWithSubmission($submission);
@@ -171,25 +179,23 @@ class EmailTest extends TestCase
     #[Test]
     public function it_escapes_submitted_values_in_the_automagic_email()
     {
-        $formBlueprint = Blueprint::makeFromFields([
-            'name' => ['type' => 'text'],
-            'message' => ['type' => 'textarea'],
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'name', 'field' => ['type' => 'short_answer']],
+                ['handle' => 'message', 'field' => ['type' => 'long_answer']],
 
-            // The select/radio/checkboxes branches emit `label ?? value`, and the label
-            // falls back to the raw value when there's no matching option. The raw value
-            // is attacker-controlled, so it must be escaped. The option label is author
-            // controlled (it lives in the blueprint), so it's not really exploitable, but
-            // we escape it too for consistency. Both situations are asserted below.
-            'select_labelled' => ['type' => 'select', 'options' => ['a' => '<script>select-label</script>']],
-            'select_raw' => ['type' => 'select'],
-            'radio_labelled' => ['type' => 'radio', 'options' => ['b' => '<script>radio-label</script>']],
-            'radio_raw' => ['type' => 'radio'],
-            'checkboxes' => ['type' => 'checkboxes', 'options' => ['c' => '<script>checkbox-label</script>']],
-        ]);
-
-        BlueprintRepository::shouldReceive('find')->with('forms.test')->andReturn($formBlueprint);
-
-        $form = tap(Form::make('test'))->save();
+                // The select/radio/checkboxes branches emit `label ?? value`, and the label
+                // falls back to the raw value when there's no matching option. The raw value
+                // is attacker-controlled, so it must be escaped. The option label is author
+                // controlled (it lives in the form), so it's not really exploitable, but
+                // we escape it too for consistency. Both situations are asserted below.
+                ['handle' => 'select_labelled', 'field' => ['type' => 'dropdown', 'options' => ['a' => '<script>select-label</script>']]],
+                ['handle' => 'select_raw', 'field' => ['type' => 'dropdown']],
+                ['handle' => 'radio_labelled', 'field' => ['type' => 'multi_choice', 'options' => ['b' => '<script>radio-label</script>']]],
+                ['handle' => 'radio_raw', 'field' => ['type' => 'multi_choice']],
+                ['handle' => 'checkboxes', 'field' => ['type' => 'checkboxes', 'options' => ['c' => '<script>checkbox-label</script>']]],
+            ],
+        ]))->save();
 
         $submission = $form->makeSubmission()->data([
             'name' => '<img src=x onerror=alert(1)>',
@@ -235,7 +241,159 @@ class EmailTest extends TestCase
     #[Test]
     public function attachments_are_added()
     {
-        $this->markTestIncomplete();
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        // "store: true" means that the uploaded file is now an asset.
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'avatar', 'field' => ['type' => 'upload', 'store' => true, 'container' => 'avatars', 'max_files' => 1]],
+            ],
+        ]))->save();
+
+        tap(Asset::make()->container('avatars')->path('avatar.jpg'))->save();
+
+        $submission = $form->makeSubmission()->data(['avatar' => 'avatar.jpg']);
+
+        $email = tap(new Email($submission, ['to' => 'test@test.com', 'attachments' => true], Site::default()))->build();
+
+        $this->assertTrue($email->hasAttachmentFromStorageDisk('avatars', 'avatar.jpg'));
+    }
+
+    #[Test]
+    public function it_attaches_temporary_file_upload()
+    {
+        Storage::fake('local');
+
+        // "store: false" means that the uploaded file is temporary.
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'document', 'field' => ['type' => 'upload', 'store' => false, 'max_files' => 1]],
+            ],
+        ]))->save();
+
+        $submission = $form->makeSubmission();
+        $path = FormFileUpload::field(['handle' => 'document', 'max_files' => 1], $submission->id())
+            ->upload([UploadedFile::fake()->create('resume.pdf', 10)]);
+        $submission->data(['document' => $path]);
+
+        $email = tap(new Email($submission, ['to' => 'test@test.com', 'attachments' => true], Site::default()))->build();
+
+        $this->assertTrue($email->hasAttachmentFromStorageDisk('local', 'statamic/form-uploads/'.$path));
+    }
+
+    #[Test]
+    public function it_attaches_temporary_file_upload_from_the_configured_disk_and_path()
+    {
+        config([
+            'statamic.system.file_uploads_disk' => 'uploads',
+            'statamic.forms.file_uploads_path' => 'temp-form-uploads',
+        ]);
+
+        Storage::fake('local');
+        Storage::fake('uploads');
+
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'document', 'field' => ['type' => 'upload', 'store' => false, 'max_files' => 1]],
+            ],
+        ]))->save();
+
+        $submission = $form->makeSubmission();
+        $path = FormFileUpload::field(['handle' => 'document', 'max_files' => 1], $submission->id())
+            ->upload([UploadedFile::fake()->create('resume.pdf', 10)]);
+        $submission->data(['document' => $path]);
+
+        $email = tap(new Email($submission, ['to' => 'test@test.com', 'attachments' => true], Site::default()))->build();
+
+        $this->assertTrue($email->hasAttachmentFromStorageDisk('uploads', 'temp-form-uploads/'.$path));
+    }
+
+    #[Test]
+    public function it_attaches_files_from_assets_field()
+    {
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'avatar', 'field' => ['type' => 'assets', 'container' => 'avatars', 'max_files' => 1]],
+            ],
+        ]))->save();
+
+        tap(Asset::make()->container('avatars')->path('avatar.jpg'))->save();
+
+        $submission = $form->makeSubmission()->data(['avatar' => 'avatar.jpg']);
+
+        $email = tap(new Email($submission, ['to' => 'test@test.com', 'attachments' => true], Site::default()))->build();
+
+        $this->assertTrue($email->hasAttachmentFromStorageDisk('avatars', 'avatar.jpg'));
+    }
+
+    #[Test]
+    public function it_attaches_files_from_files_field()
+    {
+        Storage::fake('local');
+
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'document', 'field' => ['type' => 'files', 'max_files' => 1]],
+            ],
+        ]))->save();
+
+        $documentPath = now()->timestamp.'/resume.pdf';
+        Storage::disk('local')->put('statamic/file-uploads/'.$documentPath, 'contents');
+
+        $submission = $form->makeSubmission()->data(['document' => $documentPath]);
+
+        $email = tap(new Email($submission, ['to' => 'test@test.com', 'attachments' => true], Site::default()))->build();
+
+        $this->assertTrue($email->hasAttachmentFromStorageDisk('local', 'statamic/file-uploads/'.$documentPath));
+    }
+
+    #[Test]
+    public function it_skips_attachments_whose_temporary_files_no_longer_exist()
+    {
+        Storage::fake('local');
+
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'document', 'field' => ['type' => 'files', 'max_files' => 1]],
+            ],
+        ]))->save();
+
+        $submission = $form->makeSubmission()->data(['document' => now()->timestamp.'/resume.pdf']);
+
+        $email = tap(new Email($submission, ['to' => 'test@test.com', 'attachments' => true], Site::default()))->build();
+
+        $this->assertEmpty($email->attachments);
+    }
+
+    #[Test]
+    public function it_attaches_files_from_files_field_on_the_configured_disk_and_path()
+    {
+        config([
+            'statamic.system.file_uploads_disk' => 'uploads',
+            'statamic.system.file_uploads_path' => 'temp-uploads',
+        ]);
+
+        Storage::fake('local');
+        $uploadsDisk = Storage::fake('uploads');
+
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'document', 'field' => ['type' => 'files', 'max_files' => 1]],
+            ],
+        ]))->save();
+
+        $documentPath = now()->timestamp.'/resume.pdf';
+        $uploadsDisk->put('temp-uploads/'.$documentPath, 'contents');
+
+        $submission = $form->makeSubmission()->data(['document' => $documentPath]);
+
+        $email = tap(new Email($submission, ['to' => 'test@test.com', 'attachments' => true], Site::default()))->build();
+
+        $this->assertTrue($email->hasAttachmentFromStorageDisk('uploads', 'temp-uploads/'.$documentPath));
     }
 
     #[Test]
@@ -257,20 +415,20 @@ class EmailTest extends TestCase
             'email' => 'info@example.com',
         ])->save();
 
-        $formBlueprint = Blueprint::makeFromFields([
-            'name' => ['type' => 'text'],
-            'email' => ['type' => 'text'],
-        ]);
-
         $companyInformationBlueprint = Blueprint::makeFromFields([
             'name' => ['type' => 'text'],
             'email' => ['type' => 'text'],
         ]);
 
-        BlueprintRepository::shouldReceive('find')->with('forms.test')->andReturn($formBlueprint);
+        BlueprintRepository::partialMock();
         BlueprintRepository::shouldReceive('find')->with('globals.company_information')->andReturn($companyInformationBlueprint);
 
-        $form = tap(Form::make('test'))->save();
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'name', 'field' => ['type' => 'short_answer']],
+                ['handle' => 'email', 'field' => ['type' => 'email']],
+            ],
+        ]))->save();
 
         $submission = $form->makeSubmission()->data([
             'name' => 'Foo Bar',

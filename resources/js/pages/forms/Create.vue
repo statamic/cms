@@ -3,7 +3,7 @@ import Head from '@/pages/layout/Head.vue';
 import { CreateForm } from '@ui';
 import useArchitecturalBackground from '@/pages/layout/architectural-background.js';
 
-defineProps(['submitUrl']);
+defineProps(['submitUrl', 'formsIndexUrl']);
 useArchitecturalBackground();
 </script>
 
