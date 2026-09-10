@@ -4,6 +4,9 @@ namespace Statamic\Events;
 
 use Statamic\Contracts\Forms\Submission;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class FormSubmitted extends Event
 {
     public function __construct(public Submission $submission)

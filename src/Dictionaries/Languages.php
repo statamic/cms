@@ -2,6 +2,8 @@
 
 namespace Statamic\Dictionaries;
 
+use function Statamic\trans as __;
+
 class Languages extends BasicDictionary
 {
     protected string $valueKey = 'code';
@@ -106,5 +108,10 @@ class Languages extends BasicDictionary
             ['code' => 'ca', 'name' => __('statamic::dictionary-languages.ca')],
             ['code' => 'gl', 'name' => __('statamic::dictionary-languages.gl')],
         ];
+    }
+
+    public function allowsPublicAccess(): bool
+    {
+        return true;
     }
 }

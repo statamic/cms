@@ -47,6 +47,7 @@ use Statamic\View\Antlers\Language\Nodes\Structures\StatementSeparatorNode;
 use Statamic\View\Antlers\Language\Nodes\Structures\SwitchGroup;
 use Statamic\View\Antlers\Language\Nodes\VariableNode;
 use Statamic\View\Antlers\Language\Parser\LanguageParser;
+use Statamic\View\Antlers\Language\Runtime\Concerns\ManagesIncludeSlots;
 use Statamic\View\Antlers\Language\Runtime\Debugging\GlobalDebugManager;
 use Statamic\View\Antlers\Language\Runtime\Sandbox\Environment;
 use Statamic\View\Antlers\Language\Runtime\Sandbox\RuntimeValues;
@@ -54,11 +55,14 @@ use Statamic\View\Antlers\Language\Runtime\Sandbox\TypeCoercion;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Statamic\View\Antlers\SyntaxError;
 use Statamic\View\Cascade;
+use Statamic\View\Slot;
 use Statamic\View\State\CachesOutput;
 use Throwable;
 
 class NodeProcessor
 {
+    use ManagesIncludeSlots;
+
     /**
      * @var Loader
      */
@@ -1078,10 +1082,34 @@ class NodeProcessor
     public function guardRuntimeTag($tagCheck)
     {
         if (GlobalRuntimeState::$isEvaluatingUserData) {
+            $allowList = GlobalRuntimeState::$allowedContentTagPaths;
             $guardList = GlobalRuntimeState::$bannedContentTagPaths;
-        } else {
-            $guardList = GlobalRuntimeState::$bannedTagPaths;
+
+            $isAllowed = Str::is($allowList, $tagCheck);
+            $isBlocked = ! empty($guardList) && Str::is($guardList, $tagCheck);
+
+            if (! $isAllowed || $isBlocked) {
+                Log::warning('Runtime Access Violation: '.$tagCheck, [
+                    'tag' => $tagCheck,
+                    'file' => GlobalRuntimeState::$currentExecutionFile,
+                    'trace' => GlobalRuntimeState::$templateFileStack,
+                ]);
+
+                if (GlobalRuntimeState::$throwErrorOnAccessViolation) {
+                    throw ErrorFactory::makeRuntimeError(
+                        AntlersErrorCodes::RUNTIME_PROTECTED_TAG_ACCESS,
+                        null,
+                        'Protected tag access.'
+                    );
+                }
+
+                return false;
+            }
+
+            return true;
         }
+
+        $guardList = GlobalRuntimeState::$bannedTagPaths;
 
         if (empty($guardList)) {
             return true;
@@ -1113,7 +1141,7 @@ class NodeProcessor
         $namedSlots = [];
 
         foreach ($node->children as $child) {
-            if ($child instanceof AntlersNode && ! $child->isComment && $child->name->name == 'slot') {
+            if ($child instanceof AntlersNode && ! $child->isComment && $child->isPaired() && $child->name->name == 'slot') {
                 $namedSlots[$child->name->methodPart] = $child;
             }
         }
@@ -1558,6 +1586,10 @@ class NodeProcessor
                             $this->data = $lockData;
                         }
 
+                        if ($node->name->name == 'include') {
+                            $tagParameters = $this->captureIncludeSlots($node, $tagActiveData, $tagParameters);
+                        }
+
                         if ($node->name->name == 'partial' || $node->name->name == 'scope') {
                             if (array_key_exists('handle_prefix', $tagParameters)) {
                                 $handlePrefixes = $tagParameters['handle_prefix'];
@@ -1643,7 +1675,7 @@ class NodeProcessor
                             GlobalRuntimeState::$evaulatingTagContents = false;
                             $this->stopMeasuringTag();
 
-                            if ($suspendedData != null) {
+                            if ($capturedRuntimeState !== null) {
                                 $this->data = $suspendedData;
 
                                 GlobalRuntimeState::restoreState($capturedRuntimeState);
@@ -2046,6 +2078,12 @@ class NodeProcessor
                                     }
 
                                     if ($this->guardRuntime($node, $runtimeResult)) {
+                                        if ($runtimeResult instanceof Slot) {
+                                            $lockData = $this->data;
+                                            $runtimeResult = $runtimeResult->render();
+                                            $this->data = $lockData;
+                                        }
+
                                         $buffer .= $this->measureBufferAppend($node, $this->modifyBufferAppend($runtimeResult));
                                     }
 
@@ -2127,6 +2165,20 @@ class NodeProcessor
 
                     if ($val instanceof Builder) {
                         $val = $val->get()->all();
+                    }
+
+                    if ($val instanceof Slot) {
+                        $lockData = $this->data;
+                        $val = $val->render($node->hasParameters ? $this->getSlotOutputProps($node) : []);
+                        $this->data = $lockData;
+
+                        $buffer .= $this->measureBufferAppend($node, $this->modifyBufferAppend($val));
+
+                        if ($this->isTracingEnabled()) {
+                            $this->runtimeConfiguration->traceManager->traceOnExit($node, null);
+                        }
+
+                        continue;
                     }
 
                     $executedParamModifiers = false;
@@ -2565,7 +2617,7 @@ class NodeProcessor
                 foreach ($___antlersVarAfter as $___varKey => $___varValue) {
                     if (
                         str_starts_with($___varKey, '___') ||
-                        (isset($___antlersVarBefore[$___varKey]) && $___antlersVarBefore[$___varKey] === $___varValue)
+                        (array_key_exists($___varKey, $___antlersVarBefore) && $___antlersVarBefore[$___varKey] === $___varValue)
                     ) {
                         continue;
                     }

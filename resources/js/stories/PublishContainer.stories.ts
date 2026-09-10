@@ -27,7 +27,7 @@ const meta = {
     parameters: {
         docs: {
             description: {
-                component: 'The PublishContainer component is used to create publish forms in the Control Panel. For full documentation including backend setup, visit the [Publish Forms documentation](https://v6.statamic.dev/control-panel/publish-forms).',
+                component: 'The PublishContainer component is used to create publish forms in the Control Panel. For full documentation including backend setup, visit the [Publish Forms documentation](https://statamic.dev/control-panel/publish-forms).',
             },
         },
     },
@@ -64,7 +64,7 @@ export const _DocsIntro: Story = {
     parameters: {
         docs: {
             source: {
-                code: 'For complete documentation and examples, please visit:\nhttps://v6.statamic.dev/control-panel/publish-forms',
+                code: 'For complete documentation and examples, please visit:\nhttps://statamic.dev/control-panel/publish-forms',
             },
         },
     },
@@ -75,8 +75,8 @@ export const _DocsIntro: Story = {
                 <p class="text-gray-600 dark:text-gray-400 mb-4">
                     The PublishContainer component requires backend configuration and blueprint setup.
                 </p>
-                <a 
-                    href="https://v6.statamic.dev/control-panel/publish-forms" 
+                <a
+                    href="https://statamic.dev/control-panel/publish-forms"
                     target="_blank"
                     class="inline-flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
                 >

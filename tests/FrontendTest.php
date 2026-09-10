@@ -253,6 +253,21 @@ class FrontendTest extends TestCase
     }
 
     #[Test]
+    public function drafts_are_not_visible_if_using_live_preview_token_for_different_entry()
+    {
+        $this->withStandardFakeErrorViews();
+
+        $page = tap($this->createPage('about')->published(false)->set('content', 'Testing 123'))->save();
+        $other = $this->createPage('other');
+
+        LivePreview::tokenize('test-token', $other);
+
+        $this
+            ->get('/about?token=test-token')
+            ->assertStatus(404);
+    }
+
+    #[Test]
     public function drafts_dont_get_statically_cached()
     {
         $this->markTestIncomplete();
@@ -719,6 +734,26 @@ class FrontendTest extends TestCase
         $this->get('/about')->assertSee('21/10/2022');
 
         $this->assertDefaultCarbonFormat();
+    }
+
+    #[Test]
+    public function outputting_a_date_does_not_localize_it_for_the_rest_of_the_template()
+    {
+        config([
+            'statamic.system.date_format' => 'H:i',
+            'statamic.system.display_timezone' => 'Europe/Zurich', // +1 hour
+            'statamic.system.localize_dates_in_modifiers' => false,
+        ]);
+
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+        $this->viewShouldReturnRaw('some_template', '<p>{{ date }}</p><p>{{ date format="H:i" }}</p>');
+
+        tap($this->makeCollection()->dated(true))->save();
+        tap($this->makePage('about', ['with' => ['template' => 'some_template']])->date(Carbon::parse('2025-01-01 18:25')))->save();
+
+        $this->get('/about')
+            ->assertSee('<p>19:25</p>', false)
+            ->assertSee('<p>18:25</p>', false);
     }
 
     #[Test]

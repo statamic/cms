@@ -3,8 +3,8 @@
 namespace Statamic\Http\Controllers\CP\API;
 
 use RecursiveCallbackFilterIterator;
-use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
+use Statamic\Filesystem\RecursiveDirectoryIterator;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Support\Str;
 

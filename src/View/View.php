@@ -59,6 +59,7 @@ class View
     public function gatherData()
     {
         return array_merge($this->cascade(), $this->data, [
+            'config' => config()->all(),
             'current_template' => $this->template(),
             'current_layout' => $this->layout(),
         ]);

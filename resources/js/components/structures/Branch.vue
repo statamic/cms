@@ -39,7 +39,7 @@
                     <div>
                         <Link :href="page.collection.create_url" v-text="__('Add')" class="hover:text-ui-accent-text" />
                         <span class="mx-1 text-gray-400 dark:text-gray-500">/</span>
-                        <Link :href="page.collection.edit_url" v-text="__('Edit')" class="hover:text-ui-accent-text" />
+                        <Link :href="page.collection.edit_url" v-text="__('List')" class="hover:text-ui-accent-text" />
                     </div>
                 </div>
             </div>

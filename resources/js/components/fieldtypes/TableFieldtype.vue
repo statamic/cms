@@ -43,6 +43,7 @@
                                     <ui-input
                                         v-model="row.value.cells[cellIndex]"
                                         :readonly="isReadOnly"
+                                        :input-attrs="{ dir: contentDirection }"
                                     />
                                 </td>
                                 <td class="row-controls" v-if="canDeleteRows">
@@ -88,12 +89,19 @@
 <script>
 import Fieldtype from './Fieldtype.vue';
 import { SortableList, SortableHelpers } from '../sortable/Sortable';
+import { useContentDirection } from '@/composables/content-direction';
 
 export default {
     mixins: [Fieldtype, SortableHelpers],
 
     components: {
         SortableList,
+    },
+
+    setup() {
+        const { direction: contentDirection } = useContentDirection();
+
+        return { contentDirection };
     },
 
     data: function () {

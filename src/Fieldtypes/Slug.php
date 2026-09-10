@@ -2,6 +2,8 @@
 
 namespace Statamic\Fieldtypes;
 
+use function Statamic\trans as __;
+
 class Slug extends Text
 {
     protected $categories = ['special'];

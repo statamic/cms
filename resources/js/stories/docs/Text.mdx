@@ -1,0 +1,27 @@
+import { Canvas, Meta, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as TextStories from '../Text.stories';
+
+<Meta of={TextStories} />
+
+# Text
+A utility component for styling inline and block text with consistent variants and sizes. Useful inside tables, widgets, cards, and anywhere you need to quickly apply text styles without reaching for utility classes.
+<Canvas of={TextStories._DocsIntro} sourceState={'shown'} />
+
+## Variants
+Use the `variant` prop to control the visual style of the text.
+<Canvas of={TextStories.Variants} sourceState={'shown'} />
+
+## Sizes
+Use the `size` prop to control the text size.
+<Canvas of={TextStories.Sizes} sourceState={'shown'} />
+
+## Inline Composition
+Since `Text` renders as a `span` by default, you can nest variants inline.
+<Canvas of={TextStories._InlineDocs} sourceState={'shown'} />
+
+## As Paragraph
+Use the `as` prop to render as a `p` or any other element.
+<Canvas of={TextStories._AsParagraph} sourceState={'shown'} />
+
+## Arguments
+<ArgTypes of={TextStories} />

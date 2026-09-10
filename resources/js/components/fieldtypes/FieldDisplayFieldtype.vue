@@ -36,7 +36,7 @@ export default {
             return this.getFieldSettingsValue('hide_display');
         },
         hideDisplayTooltip() {
-            return this.hidden ? __('Show Display label') : __('Hide Display Label');
+            return this.hidden ? __('Show Display Label') : __('Hide Display Label');
         },
     },
 

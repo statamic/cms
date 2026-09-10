@@ -15,10 +15,10 @@
                 <template #no-options><div class="hidden" /></template>
                 <template #option="option">
                     <div class="flex items-center">
-                        <span v-text="option.label" />
+                        <span class="flex-shrink-0 truncate" v-text="option.label" />
                         <span
                             v-text="option.value"
-                            class="font-mono text-2xs text-gray-500 dark:text-gray-300"
+                            class="font-mono text-2xs text-gray-500 dark:text-gray-300 truncate"
                             :class="{ 'ml-2': option.label }"
                         />
                     </div>
@@ -29,7 +29,7 @@
             </Combobox>
         </div>
 
-        <div class="w-auto min-w-32">
+        <div class="w-auto min-w-40">
             <Select
                 class="w-full"
                 :model-value="condition.operator"
@@ -130,15 +130,12 @@ export default {
         },
 
         fieldOptions() {
-            const conditions = this.conditions.map((condition) => condition.field);
-
             return this.suggestableFields
                 .filter((field) => {
                     return !(
                         field.handle === this.config.handle || // Exclude the field you're adding a condition to.
-                        this.condition.field === field.handle || // Exclude the field being used in the current condition.
-                        conditions.includes(field.handle)
-                    ); // Exclude fields already used in other conditions.
+                        this.condition.field === field.handle // Exclude the field being used in the current condition.
+                    );
                 })
                 .map((field) => {
                     let display = field.config.display;

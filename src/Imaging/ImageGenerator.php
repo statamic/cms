@@ -155,8 +155,12 @@ class ImageGenerator
      */
     public function generateByAsset($asset, array $params)
     {
-        if (ThumbnailExtractor::enabled() && $asset->isVideo()) {
+        if ($asset->isVideo() && ThumbnailExtractor::available()) {
             return $this->generateVideoThumbnail($asset, $params);
+        }
+
+        if ($asset->isVideo()) {
+            return '';
         }
 
         $manipulationCacheKey = 'asset::'.$asset->id().'::'.md5(json_encode($params));
@@ -351,12 +355,6 @@ class ImageGenerator
 
     private function parseUrl($url)
     {
-        $parsed = parse_url($url);
-
-        return [
-            'path' => Str::after($parsed['path'], '/'),
-            'base' => $parsed['scheme'].'://'.$parsed['host'],
-            'query' => $parsed['query'] ?? null,
-        ];
+        return app(RemoteUrlValidator::class)->parse($url);
     }
 }

@@ -17,6 +17,7 @@ use Statamic\Contracts\View\Antlers\Parser;
 use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Value;
 use Statamic\Fields\Values;
+use Statamic\Support\MethodDenylist;
 use Statamic\View\Antlers\AntlersString;
 use Statamic\View\Antlers\Language\Errors\AntlersErrorCodes;
 use Statamic\View\Antlers\Language\Errors\ErrorFactory;
@@ -32,6 +33,7 @@ use Statamic\View\Antlers\Language\Runtime\Sandbox\Environment;
 use Statamic\View\Antlers\Language\Runtime\Sandbox\RuntimeValues;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Statamic\View\Cascade;
+use Statamic\View\Slot;
 
 class PathDataManager
 {
@@ -607,9 +609,7 @@ class PathDataManager
                 }
 
                 if ($didScanSourceData == false) {
-                    if ($this->namedSlotsInScope && $pathItem->name == 'slot' &&
-                        $path->originalContent != 'slot' &&
-                        array_key_exists($path->originalContent, $data)) {
+                    if ($this->isNamedSlotReference($pathItem, $path, $data)) {
                         $this->reducedVar = $data[$path->originalContent];
                         break;
                     }
@@ -700,7 +700,7 @@ class PathDataManager
 
                 if ($this->reducedVar instanceof Model) {
                     $this->reducedVar = $this->reducedVar->{$pathItem->name};
-                } elseif (is_object($this->reducedVar) && property_exists($this->reducedVar, $pathItem->name)) {
+                } elseif (is_object($this->reducedVar) && property_exists($this->reducedVar, $pathItem->name) && (new \ReflectionProperty($this->reducedVar, $pathItem->name))->isPublic()) {
                     $this->reducedVar = $this->reducedVar->{$pathItem->name};
                 } else {
                     $this->reduceVar($pathItem, $data);
@@ -794,6 +794,14 @@ class PathDataManager
         return $this->reducedVar;
     }
 
+    private function isNamedSlotReference(PathNode $pathItem, $path, $data): bool
+    {
+        return $pathItem->name == 'slot' &&
+            $path->originalContent != 'slot' &&
+            array_key_exists($path->originalContent, $data) &&
+            ($this->namedSlotsInScope || $data[$path->originalContent] instanceof Slot);
+    }
+
     /**
      * Sets the parser instance to use when reducing content values.
      *
@@ -861,9 +869,34 @@ class PathDataManager
             $this->unlockData();
         }
 
-        if (is_object($this->reducedVar) && method_exists($this->reducedVar, Str::camel($varPath))) {
-            $this->reducedVar = call_user_func_array([$this->reducedVar, Str::camel($varPath)], []);
-            $this->resolvedPath[] = '{method:'.$varPath.'}';
+        if (is_object($this->reducedVar) && method_exists($this->reducedVar, $method = Str::camel($varPath)) && (new \ReflectionMethod($this->reducedVar, $method))->isPublic()) {
+            // The method name derives from user-influenceable data, so never dispatch to
+            // methods that mutate or destroy data. Writing `{{ object.method }}` without
+            // parentheses calls the method just like `{{ object:method() }}` does, so both
+            // forms honor the `statamic.antlers.allowMethodsInContent` setting.
+            if (MethodDenylist::blocks($method) || (GlobalRuntimeState::$isEvaluatingUserData && ! GlobalRuntimeState::$allowMethodsInContent)) {
+                $this->reducedVar = null;
+                $this->didFind = false;
+                $this->doBreak = true;
+            } else {
+                $this->reducedVar = call_user_func_array([$this->reducedVar, $method], []);
+                $this->resolvedPath[] = '{method:'.$varPath.'}';
+
+                if ($doCompact) {
+                    $this->compact($path->isFinal);
+                }
+            }
+        } elseif (is_object($this->reducedVar) && property_exists($this->reducedVar, $camelVar = Str::camel($varPath)) && (new \ReflectionProperty($this->reducedVar, $camelVar))->isPublic()) {
+            $this->reducedVar = $this->reducedVar->{$camelVar};
+            $this->resolvedPath[] = '{property:'.$varPath.'}';
+
+            if ($doCompact) {
+                $this->compact($path->isFinal);
+            }
+        } elseif (is_object($this->reducedVar)) {
+            $this->reducedVar = null;
+            $this->didFind = false;
+            $this->doBreak = true;
 
             if ($doCompact) {
                 $this->compact($path->isFinal);
@@ -1105,7 +1138,10 @@ class PathDataManager
         GlobalRuntimeState::$isEvaluatingUserData = true;
         GlobalRuntimeState::$isEvaluatingData = true;
 
-        if ($value instanceof Model) {
+        if ($value instanceof Model || $value instanceof Slot) {
+            GlobalRuntimeState::$isEvaluatingUserData = $prevIsEvaluatingUserData;
+            GlobalRuntimeState::$isEvaluatingData = $prevIsEvaluatingData;
+
             return $value;
         }
 

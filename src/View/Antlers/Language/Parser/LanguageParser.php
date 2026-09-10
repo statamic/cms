@@ -2545,6 +2545,7 @@ class LanguageParser
                 $nullCoalescenceGroup = new NullCoalescenceGroup();
                 $nullCoalescenceGroup->left = $left;
                 $nullCoalescenceGroup->right = $right;
+                $nullCoalescenceGroup->strict = $node->strict;
                 $newTokens[] = $nullCoalescenceGroup;
 
                 $i += 1;

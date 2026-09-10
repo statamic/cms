@@ -92,6 +92,88 @@ class MigrateDatesToUtcTest extends TestCase
     }
 
     #[Test]
+    public function it_skips_localized_entries_that_inherit_date_from_origin()
+    {
+        $this->setSites([
+            'en' => ['url' => '/', 'locale' => 'en_US', 'name' => 'English'],
+            'fr' => ['url' => '/fr/', 'locale' => 'fr_FR', 'name' => 'French'],
+            'it' => ['url' => '/it/', 'locale' => 'it_IT', 'name' => 'Italian'],
+        ]);
+
+        $collection = tap(Collection::make('articles')->dated(true)->sites(['en', 'fr', 'it']))->save();
+
+        $collection->entryBlueprint()->setContents([
+            'fields' => [
+                ['handle' => 'date', 'field' => ['type' => 'date', 'time_enabled' => true]],
+            ],
+        ])->save();
+
+        $origin = Entry::make()->id('origin')->locale('en')->collection('articles')->date('2025-01-01-1200');
+        $origin->save();
+
+        $french = Entry::make()->id('fr-entry')->locale('fr')->collection('articles')->origin($origin);
+        $french->save();
+
+        $italian = Entry::make()->id('it-entry')->locale('it')->collection('articles')->origin($origin);
+        $italian->save();
+
+        // All entries should have the same date before migration
+        $this->assertEquals('2025-01-01T12:00:00+00:00', $origin->date()->toIso8601String());
+        $this->assertEquals('2025-01-01T12:00:00+00:00', $french->date()->toIso8601String());
+        $this->assertEquals('2025-01-01T12:00:00+00:00', $italian->date()->toIso8601String());
+
+        $this->migrateDatesToUtc();
+
+        $origin = Entry::find('origin');
+        $french = Entry::find('fr-entry');
+        $italian = Entry::find('it-entry');
+
+        // Origin should be migrated
+        $this->assertEquals('2025-01-01T17:00:00+00:00', $origin->date()->toIso8601String());
+
+        // Localized entries should still have the same date as origin (inherited)
+        $this->assertEquals('2025-01-01T17:00:00+00:00', $french->date()->toIso8601String());
+        $this->assertEquals('2025-01-01T17:00:00+00:00', $italian->date()->toIso8601String());
+
+        $this->assertFalse($french->hasExplicitDate());
+        $this->assertFalse($italian->hasExplicitDate());
+    }
+
+    #[Test]
+    public function it_migrates_localized_entries_that_have_their_own_date()
+    {
+        $this->setSites([
+            'en' => ['url' => '/', 'locale' => 'en_US', 'name' => 'English'],
+            'fr' => ['url' => '/fr/', 'locale' => 'fr_FR', 'name' => 'French'],
+        ]);
+
+        $collection = tap(Collection::make('articles')->dated(true)->sites(['en', 'fr']))->save();
+
+        $collection->entryBlueprint()->setContents([
+            'fields' => [
+                ['handle' => 'date', 'field' => ['type' => 'date', 'time_enabled' => true]],
+            ],
+        ])->save();
+
+        $origin = Entry::make()->id('origin')->locale('en')->collection('articles')->date('2025-01-01-1200');
+        $origin->save();
+
+        $french = Entry::make()->id('fr-entry')->locale('fr')->collection('articles')->origin($origin)->date('2025-01-02-1400');
+        $french->save();
+
+        $this->assertTrue($french->hasExplicitDate());
+
+        $this->migrateDatesToUtc();
+
+        $origin = Entry::find('origin');
+        $french = Entry::find('fr-entry');
+
+        // Both should be migrated
+        $this->assertEquals('2025-01-01T17:00:00+00:00', $origin->date()->toIso8601String());
+        $this->assertEquals('2025-01-02T19:00:00+00:00', $french->date()->toIso8601String());
+    }
+
+    #[Test]
     #[DataProvider('dateFieldsProvider')]
     public function it_converts_date_fields_in_terms(string $fieldHandle, array $field, $original, $expected)
     {

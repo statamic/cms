@@ -30,6 +30,24 @@ class FormSubmissionStoreTest extends TestCase
     }
 
     #[Test]
+    public function it_has_handle_in_key()
+    {
+        Facades\Form::make('contact_form')->save();
+        Facades\Form::make('other_form')->save();
+        $contactSubmission = $this->parent->store('contact_form')->makeItemFromFile(
+            Path::tidy($this->directory).'/contact_form/1631083591.2832.yaml',
+            "name: John Smith\nmessage: Hello"
+        );
+        $otherSubmission = $this->parent->store('other_form')->makeItemFromFile(
+            Path::tidy($this->directory).'/other_form/1631083591.2832.yaml',
+            "name: John Smith\nmessage: Hello"
+        );
+
+        $this->assertEquals('contact_form::1631083591.2832', $this->parent->store('contact_form')->getItemKey($contactSubmission));
+        $this->assertEquals('other_form::1631083591.2832', $this->parent->store('other_form')->getItemKey($otherSubmission));
+    }
+
+    #[Test]
     public function it_makes_entry_instances_from_files()
     {
         $item = $this->parent->store('contact_form')->makeItemFromFile(
@@ -45,6 +63,21 @@ class FormSubmissionStoreTest extends TestCase
     }
 
     #[Test]
+    public function it_sanitizes_non_utf8_data()
+    {
+        $item = $this->parent->store('contact_form')->makeItemFromFile(
+            Path::tidy($this->directory).'/contact_form/1631083591.2832.yaml',
+            "name: 'Test User'\nmessage: !!binary dGVzdCBtZXNzYWdlIHdpdGggYmFkIGJ5dGVzOiDtoL3tsYk="
+        );
+
+        $this->assertInstanceOf(Submission::class, $item);
+        $this->assertEquals('Test User', $item->get('name'));
+        $this->assertStringContainsString('test message with bad bytes:', $item->get('message'));
+        $this->assertTrue(mb_check_encoding($item->get('message'), 'UTF-8'));
+        $this->assertNotNull(json_encode($item->data()->all()));
+    }
+
+    #[Test]
     public function it_saves_to_disk()
     {
         $form = tap(Facades\Form::make('test_form'))->save();
@@ -57,6 +90,6 @@ class FormSubmissionStoreTest extends TestCase
         @unlink($path);
         $this->assertFileDoesNotExist($path);
 
-        $this->assertEquals($path, $this->parent->store('test_form')->paths()->get($submission->id()));
+        $this->assertEquals($path, $this->parent->store('test_form')->paths()->get('test_form::'.$submission->id()));
     }
 }

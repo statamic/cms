@@ -2,6 +2,7 @@
 
 namespace Statamic\Tags;
 
+use Illuminate\Support\Str;
 use Illuminate\View\AnonymousComponent;
 use Illuminate\View\Compilers\BladeCompiler;
 use Illuminate\View\Compilers\ComponentTagCompiler;
@@ -51,12 +52,22 @@ class ComponentProxy extends Tags
             }
 
             if ($constructor = (new ReflectionClass($className))->getConstructor()) {
-                $constructorParameters = collect($constructor->getParameters())->map->getName()->all();
-                $attributes = $attributes->except($constructorParameters);
-                $constructorParameters = collect($scopeData)->only($constructorParameters)->all();
+                $parameterNames = collect($constructor->getParameters())->map->getName()->all();
+
+                // Kebab-cased attributes (e.g. :some-prop) should bind to camelCase
+                // constructor parameters ($someProp), mirroring Laravel's native behavior.
+                $attributes = $attributes->filter(fn ($value, $key) => ! in_array(Str::camel($key), $parameterNames));
+
+                $constructorParameters = collect($scopeData)
+                    ->mapWithKeys(fn ($value, $key) => [Str::camel($key) => $value])
+                    ->only($parameterNames)
+                    ->all();
             }
 
             if ($isAnonymous) {
+                // Camel-case data keys so kebab-cased attributes resolve to the
+                // component's @props (e.g. :some-prop -> $someProp), as Laravel does.
+                $data = collect($data)->mapWithKeys(fn ($value, $key) => [Str::camel($key) => $value])->all();
                 $constructorParameters = array_merge($constructorParameters, $data, ['view' => $anonymousViewName, 'data' => $data]);
             }
 

@@ -58,4 +58,52 @@ trait HasSelectOptionsTests
             ],
         ];
     }
+
+    #[Test]
+    #[DataProvider('preProcessIndexProvider')]
+    public function it_preprocesses_index_values($options, $value, $expected)
+    {
+        $field = $this->field(['options' => $options]);
+
+        $this->assertSame($expected, $field->preProcessIndex($value));
+    }
+
+    public static function preProcessIndexProvider()
+    {
+        return [
+            'list' => [
+                ['one', 'two', 'three'],
+                'two',
+                ['two'],
+            ],
+            'associative with labels' => [
+                ['one' => 'One', 'two' => 'Two', 'three' => 'Three'],
+                'two',
+                ['Two'],
+            ],
+            'associative without labels' => [
+                ['one' => null, 'two' => null, 'three' => null],
+                'two',
+                ['two'],
+            ],
+            'multidimensional with labels' => [
+                [
+                    ['key' => 'one', 'value' => 'One'],
+                    ['key' => 'two', 'value' => 'Two'],
+                    ['key' => 'three', 'value' => 'Three'],
+                ],
+                'two',
+                ['Two'],
+            ],
+            'multidimensional without labels' => [
+                [
+                    ['key' => 'one', 'value' => null],
+                    ['key' => 'two', 'value' => null],
+                    ['key' => 'three', 'value' => null],
+                ],
+                'two',
+                ['two'],
+            ],
+        ];
+    }
 }

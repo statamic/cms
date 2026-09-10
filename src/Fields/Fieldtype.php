@@ -22,6 +22,7 @@ abstract class Fieldtype implements Arrayable
 
     protected static $title;
     protected static $binding = 'fieldtypes';
+    protected static $preloadable = null;
 
     protected $field;
     protected $localizable = true;
@@ -209,46 +210,57 @@ abstract class Fieldtype implements Arrayable
     private function configSections()
     {
         $fields = $this->configFieldItems();
-        $extras = $this->extraConfigFieldItems();
-
-        if (empty($fields) && empty($extras)) {
-            return [];
-        }
-
-        $extras = collect($extras)
+        $extras = collect($this->extraConfigFieldItems());
+        $extraSections = $extras->filter(fn ($_, $key) => is_int($key));
+        $extraFields = $extras
+            ->reject(fn ($_, $key) => is_int($key))
             ->map(fn ($field, $handle) => compact('handle', 'field'))
             ->values()->all();
 
-        if (! $this->configFieldsUseSections()) {
-            return [
-                [
-                    'fields' => collect($fields)
-                        ->map(fn ($field, $handle) => compact('handle', 'field'))
-                        ->merge($extras)
-                        ->values()->all(),
-                ],
-            ];
+        if (empty($fields) && $extras->isEmpty()) {
+            return [];
         }
 
-        $sections = collect($fields)->map(function ($section) {
-            $section['fields'] = collect($section['fields'])
+        if (! $this->configFieldsUseSections()) {
+            $sections = [];
+
+            if (! empty($fields) || ! empty($extraFields)) {
+                $sections[] = [
+                    'fields' => collect($fields)
+                        ->map(fn ($field, $handle) => compact('handle', 'field'))
+                        ->merge($extraFields)
+                        ->values()->all(),
+                ];
+            }
+        } else {
+            $sections = collect($fields)->map(function ($section) {
+                $section['fields'] = collect($section['fields'])
+                    ->map(fn ($field, $handle) => compact('handle', 'field'))
+                    ->values()->all();
+
+                return $section;
+            });
+
+            if (! empty($extraFields)) {
+                if ($sections->containsOneItem()) {
+                    $section = $sections[0];
+                    $section['fields'] = array_merge($section['fields'], $extraFields);
+                    $sections[0] = $section;
+                } else {
+                    $sections[] = ['fields' => $extraFields];
+                }
+            }
+
+            $sections = $sections->all();
+        }
+
+        return array_merge($sections, $extraSections->map(function ($section) {
+            $section['fields'] = collect($section['fields'] ?? [])
                 ->map(fn ($field, $handle) => compact('handle', 'field'))
                 ->values()->all();
 
             return $section;
-        });
-
-        if (! empty($extras)) {
-            if ($sections->containsOneItem()) {
-                $section = $sections[0];
-                $section['fields'] = array_merge($section['fields'], $extras);
-                $sections[0] = $section;
-            } else {
-                $sections[] = ['fields' => $extras];
-            }
-        }
-
-        return $sections->all();
+        })->values()->all());
     }
 
     private function configFieldsUseSections()
@@ -267,13 +279,17 @@ abstract class Fieldtype implements Arrayable
         }
 
         $fields = collect($this->configFieldItems());
+        $extras = collect($this->extraConfigFieldItems());
+        $extraSections = $extras->filter(fn ($_, $key) => is_int($key));
+        $extraFields = $extras->reject(fn ($_, $key) => is_int($key));
 
         if ($this->configFieldsUseSections()) {
             $fields = $fields->flatMap(fn ($section) => $section['fields']);
         }
 
         $fields = $fields
-            ->merge($this->extraConfigFieldItems())
+            ->merge($extraSections->flatMap(fn ($section) => $section['fields'] ?? []))
+            ->merge($extraFields)
             ->map(function ($field, $handle) {
                 return compact('handle', 'field');
             });
@@ -330,6 +346,11 @@ abstract class Fieldtype implements Arrayable
         return $this->preProcess($data);
     }
 
+    public function migrateConfig(array $values): array
+    {
+        return $values;
+    }
+
     public function preProcessIndex($data)
     {
         return $data;
@@ -337,11 +358,17 @@ abstract class Fieldtype implements Arrayable
 
     public function view()
     {
-        $default = 'statamic::forms.fields.'.$this->handle();
+        $language = config('statamic.templates.language', 'antlers');
+        $handle = $this->handle();
 
-        return view()->exists($default)
-            ? $default
-            : 'statamic::forms.fields.default';
+        $views = [
+            "statamic::forms.fields.{$handle}",
+            "statamic::forms.{$language}.fields.{$handle}",
+            'statamic::forms.fields.default',
+            "statamic::forms.{$language}.fields.default",
+        ];
+
+        return collect($views)->first(fn ($view) => view()->exists($view));
     }
 
     public function config(?string $key = null, $fallback = null)

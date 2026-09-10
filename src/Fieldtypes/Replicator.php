@@ -3,8 +3,11 @@
 namespace Statamic\Fieldtypes;
 
 use Facades\Statamic\Fieldtypes\RowId;
+use Statamic\Contracts\Data\Localization;
+use Statamic\Data\NestedFieldUpdater;
 use Statamic\Facades\Blink;
 use Statamic\Facades\GraphQL;
+use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Values;
@@ -14,13 +17,23 @@ use Statamic\Query\Scopes\Filters\Fields\Replicator as ReplicatorFilter;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class Replicator extends Fieldtype
 {
-    use AddsEntryValidationReplacements;
+    use AddsEntryValidationReplacements, UpdatesReferences;
 
     protected $categories = ['structured'];
     protected $keywords = ['builder', 'page builder', 'content'];
     protected $rules = ['array'];
+    protected ?string $flattenedSetsConfigBlinkKey = null;
+
+    public function setField(Field $field)
+    {
+        $this->flattenedSetsConfigBlinkKey = null;
+
+        return parent::setField($field);
+    }
 
     protected function configFieldItems(): array
     {
@@ -71,6 +84,7 @@ class Replicator extends Fieldtype
                         'display' => __('Add Set Label'),
                         'instructions' => __('statamic::fieldtypes.replicator.config.button_label'),
                         'type' => 'text',
+                        'placeholder' => __('Add Set'),
                         'default' => '',
                         'width' => 50,
                     ],
@@ -132,7 +146,9 @@ class Replicator extends Fieldtype
     public function fields($set, $index = -1)
     {
         $config = Arr::get($this->flattenedSetsConfig(), "$set.fields");
-        $hash = md5($this->field->fieldPathPrefix().$index.json_encode($config));
+        $parent = $this->field->parent();
+        $locale = $parent instanceof Localization ? $parent->locale() : null;
+        $hash = md5($this->field->fieldPathPrefix().$index.json_encode($config).$locale);
 
         return Blink::once($hash, function () use ($config, $index) {
             return new Fields(
@@ -269,9 +285,12 @@ class Replicator extends Fieldtype
 
     public function flattenedSetsConfig()
     {
-        $blink = md5($this->field?->handle().json_encode($this->field?->config()));
+        // Re-serializing the config on every call is expensive on fields with lots
+        // of sets, and this gets hit repeatedly by fields(), preload() and augment().
+        // Invalidated in setField(), which is the only thing that replaces the field.
+        $this->flattenedSetsConfigBlinkKey ??= md5($this->field?->handle().json_encode($this->field?->config()));
 
-        return Blink::once($blink, function () {
+        return Blink::once($this->flattenedSetsConfigBlinkKey, function () {
             $sets = collect($this->config('sets'));
 
             // If the first set doesn't have a nested "set" key, it would be the legacy format.
@@ -351,5 +370,21 @@ class Replicator extends Fieldtype
     public function toQueryableValue($value)
     {
         return empty($value) ? null : $value;
+    }
+
+    public function iterateReferenceFields($data, NestedFieldUpdater $updater): void
+    {
+        if (! is_array($data)) {
+            return;
+        }
+
+        collect($data)->each(function ($set, $setKey) use ($updater) {
+            $setHandle = Arr::get($set, 'type');
+            $fields = Arr::get($this->flattenedSetsConfig(), "{$setHandle}.fields");
+
+            if ($setHandle && $fields) {
+                $updater->update(new Fields($fields), "{$setKey}.");
+            }
+        });
     }
 }

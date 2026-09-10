@@ -21,7 +21,9 @@ class SvgController extends Controller
 
         $this->authorize('view', $asset);
 
-        return response($contents)->header('Content-Type', 'image/svg+xml');
+        return response($contents)
+            ->header('Content-Type', 'image/svg+xml')
+            ->header('Content-Security-Policy', "script-src 'none'");
     }
 
     /**

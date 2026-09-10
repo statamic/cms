@@ -1,6 +1,7 @@
 <script setup>
 import { computed, ref, watch } from 'vue';
 import { getIconSet } from './registry.js';
+import DOMPurify from 'dompurify';
 
 const props = defineProps({
     /** Icon name */
@@ -11,17 +12,38 @@ const props = defineProps({
 
 const svgContent = ref('');
 const iconComponent = computed(() => ({ template: svgContent.value }));
+const delimiter = '::';
+
+const icon = computed(() => {
+    const delimiterIndex = props.name.indexOf(delimiter);
+    const hasSetInName = delimiterIndex > 0 && delimiterIndex < props.name.length - delimiter.length;
+
+    if (! hasSetInName) {
+        return { name: props.name, set: props.set, setFromName: null };
+    }
+
+    const set = props.name.substring(0, delimiterIndex);
+    const name = props.name.substring(delimiterIndex + delimiter.length);
+
+    return { name, set, setFromName: set };
+});
 
 const loadIcon = async () => {
     if (props.name.startsWith('<svg')) {
-        svgContent.value = props.name;
+        svgContent.value = DOMPurify.sanitize(props.name);
         return;
     }
 
-    const iconSet = getIconSet(props.set);
+    const { name, set, setFromName } = icon.value;
+
+    if (setFromName && props.set !== 'default' && props.set !== setFromName) {
+        console.warn(`Icon name [${props.name}] includes set [${setFromName}], ignoring set prop [${props.set}]`);
+    }
+
+    const iconSet = getIconSet(set);
 
     if (!iconSet) {
-        console.warn(`Icon set [${props.set}] not registered`);
+        console.warn(`Icon set [${set}] not registered`);
         svgContent.value = ''
         return
     }
@@ -29,15 +51,15 @@ const loadIcon = async () => {
     let rawSvg = '';
 
     if (iconSet.type === 'strings') {
-        rawSvg = loadFromStringSet(iconSet.data, props.name);
+        rawSvg = loadFromStringSet(iconSet.data, name);
     } else if (iconSet.type === 'glob') {
-        rawSvg = await loadFromGlobSet(iconSet.data, props.name);
+        rawSvg = await loadFromGlobSet(iconSet.data, name);
     }
 
     if (!rawSvg) {
-        console.warn(props.set === 'default'
-            ? `Icon [${props.name}] not found`
-            : `Icon [${props.name}] not found in set [${props.set}]`);
+        console.warn(set === 'default'
+            ? `Icon [${name}] not found`
+            : `Icon [${name}] not found in set [${set}]`);
         svgContent.value = ''
         return
     }

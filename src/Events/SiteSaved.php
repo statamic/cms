@@ -5,6 +5,8 @@ namespace Statamic\Events;
 use Statamic\Contracts\Git\ProvidesCommitMessage;
 use Statamic\Sites\Site;
 
+use function Statamic\trans as __;
+
 class SiteSaved extends Event implements ProvidesCommitMessage
 {
     public function __construct(public Site $site)

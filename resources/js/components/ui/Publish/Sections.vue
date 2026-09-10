@@ -43,6 +43,7 @@ function renderInstructions(instructions) {
 
 function toggleSection(section) {
     if (section.collapsible) {
+        section.collapsibleInteracted = true;
         section.collapsed = !section.collapsed;
     }
 }
@@ -66,7 +67,7 @@ function toggleSection(section) {
                 <Button
                     @click="toggleSection(section)"
                     v-if="section.collapsible"
-                    class="static! [&_svg]:size-4.5 rounded-xl after:content-[''] after:absolute after:inset-0"
+                    class="static! [&_svg]:size-3.5 rounded-xl after:content-[''] after:absolute after:inset-0"
                     :icon="section.collapsed ? 'expand' : 'collapse'"
                     size="sm"
                     variant="ghost"
@@ -74,18 +75,68 @@ function toggleSection(section) {
                 />
             </PanelHeader>
             <div
-                style="--tw-ease: ease;"
-                class="h-auto visible transition-[height,visibility] duration-[250ms,2s]"
-                :class="{ 'h-0! invisible! overflow-clip': section.collapsed }"
+                class="publish-section-collapsible grid"
+                :class="[
+                    section.collapsed ? 'publish-section-collapsible--collapsed' : 'publish-section-collapsible--expanded',
+                    { 'publish-section-collapsible--interacted': section.collapsibleInteracted },
+                ]"
             >
-                <Card :class="{ 'p-0!': asConfig }">
-                    <FieldsProvider :fields="section.fields">
-                        <slot :section="section">
-                            <Fields />
-                        </slot>
-                    </FieldsProvider>
-                </Card>
+                <div class="publish-section-collapsible__inner min-h-0">
+                    <Card :class="{ 'p-0!': asConfig }">
+                        <FieldsProvider :fields="section.fields">
+                            <slot :section="section">
+                                <Fields />
+                            </slot>
+                        </FieldsProvider>
+                    </Card>
+                </div>
             </div>
         </Panel>
     </div>
 </template>
+
+<style scoped>
+.publish-section-collapsible {
+    --timing: ease;
+    /* No animation on load; enable once the user has toggled this section. */
+    --speed: 0ms;
+
+    /* Only setting the animation speed when the section is interacted with. Prevents the animation triggering on page load. */
+    &.publish-section-collapsible--interacted {
+        --speed: 250ms;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        --speed: 0ms;
+    }
+}
+
+.publish-section-collapsible--expanded {
+    /* We can animate collapse/expand using grid rows */
+    animation: expand-rows var(--speed) var(--timing) forwards;
+
+    .publish-section-collapsible__inner {
+        animation: calc(var(--speed) * 2) var(--timing) section-fade-in both;
+        overflow: clip;
+        /* We need to increase the clip margin here vs regular collapsible sections because we have things appearing outside the section such as the logic indicator icon. */
+        overflow-clip-margin: 2.5rem;
+    }
+}
+
+.publish-section-collapsible--collapsed {
+    animation: collapse-rows var(--speed) var(--timing) forwards;
+
+    .publish-section-collapsible__inner {
+        animation:
+            clip-overflow 0ms var(--speed) forwards,
+            make-invisible 0ms var(--speed) forwards;
+        overflow: clip;
+    }
+}
+
+@keyframes section-fade-in { from { opacity: 0%; } to { opacity: 100%; } }
+@keyframes make-invisible { from { visibility: visible; } to { visibility: hidden; } }
+@keyframes collapse-rows  { from { grid-template-rows: 1fr; } to { grid-template-rows: 0fr; } }
+@keyframes expand-rows    { from { grid-template-rows: 0fr; } to { grid-template-rows: 1fr; } }
+@keyframes clip-overflow  { to { overflow: clip; } }
+</style>

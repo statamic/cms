@@ -6,9 +6,11 @@ use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Concurrency;
+use Illuminate\Support\Facades\Log;
 use Statamic\Events\StacheCleared;
 use Statamic\Events\StacheWarmed;
 use Statamic\Extensions\FileStore;
+use Statamic\Facades\Blink;
 use Statamic\Facades\File;
 use Statamic\Stache\Stores\Store;
 use Statamic\Support\Str;
@@ -110,6 +112,9 @@ class Stache
         $this->duplicates()->clear();
 
         $this->cacheStore()->forget('stache::timing');
+
+        Blink::forget('collection-structure-tree*');
+        Blink::forget('structure-*');
 
         StacheCleared::dispatch();
 
@@ -267,7 +272,7 @@ class Stache
         // Disable parallel processing if using Redis cache (serialization issues)
         $cacheDriver = config('statamic.stache.cache_store', config('cache.default'));
         if ($cacheDriver === 'redis') {
-            \Log::info('Parallel warming disabled due to Redis cache driver');
+            Log::info('Parallel warming disabled due to Redis cache driver');
 
             return false;
         }
@@ -299,12 +304,12 @@ class Stache
             $driver = $config['concurrency_driver'] ?? 'process';
 
             if (empty($closures)) {
-                \Log::info('Closures are empty, skipping parallel warming');
+                Log::info('Closures are empty, skipping parallel warming');
             }
 
             Concurrency::driver($driver)->run($closures);
         } catch (\Exception $e) {
-            \Log::warning('Parallel warming failed, falling back to sequential: '.$e->getMessage());
+            Log::warning('Parallel warming failed, falling back to sequential: '.$e->getMessage());
             $stores->each->warm();
         }
     }

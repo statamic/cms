@@ -16,11 +16,13 @@ use League\Glide\Server;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\GlideImageGenerated;
+use Statamic\Exceptions\InvalidRemoteUrlException;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\File;
 use Statamic\Facades\Glide;
 use Statamic\Imaging\GuzzleAdapter;
 use Statamic\Imaging\ImageGenerator;
+use Statamic\Imaging\RemoteUrlValidator;
 use Statamic\Support\Str;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -34,6 +36,16 @@ class ImageGeneratorTest extends TestCase
         parent::setUp();
 
         $this->clearGlideCache();
+
+        $this->app->bind(RemoteUrlValidator::class, function () {
+            return new RemoteUrlValidator(function ($host) {
+                return match ($host) {
+                    'example.com' => [['ip' => '93.184.216.34']],
+                    'internal.test' => [['ip' => '127.0.0.1']],
+                    default => [],
+                };
+            });
+        });
     }
 
     #[Test]
@@ -84,6 +96,30 @@ class ImageGeneratorTest extends TestCase
         $this->assertEquals($expectedCacheManifest, Glide::cacheStore()->get($manifestCacheKey));
         $this->assertEquals($expectedPath, Glide::cacheStore()->get($manipulationCacheKey));
         Event::assertDispatchedTimes(GlideImageGenerated::class, 1);
+    }
+
+    #[Test]
+    public function it_does_not_check_ffmpeg_availability_for_non_video_assets()
+    {
+        // Regression test: non-video assets shouldn't trigger ffmpeg detection, since
+        // that shells out via Symfony Process and can throw on hosts where proc_open
+        // is disabled, breaking every image request instead of just video thumbnails.
+        $this->mock(\Statamic\Console\Processes\Ffmpeg::class, function ($mock) {
+            $mock->shouldNotReceive('available');
+            $mock->shouldNotReceive('ffmpegBinary');
+        });
+
+        Storage::fake('test');
+        $file = UploadedFile::fake()->image('foo/hoff.jpg', 30, 60);
+        Storage::disk('test')->putFileAs('foo', $file, 'hoff.jpg');
+        $container = tap(AssetContainer::make('test_container')->disk('test'))->save();
+        $asset = tap($container->makeAsset('foo/hoff.jpg'))->save();
+
+        ImageValidator::shouldReceive('isValidImage')->andReturnTrue();
+
+        $this->makeGenerator()->generateByAsset($asset, ['w' => 100]);
+
+        $this->addToAssertionCount(1);
     }
 
     #[Test]
@@ -279,6 +315,56 @@ class ImageGeneratorTest extends TestCase
     }
 
     #[Test]
+    public function it_blocks_external_urls_that_target_non_public_ip_ranges()
+    {
+        $this->expectException(InvalidRemoteUrlException::class);
+        $this->expectExceptionMessage('Destination IP is not publicly routable.');
+
+        $this->makeGenerator()->generateByUrl('http://169.254.169.254/latest/meta-data/', ['w' => 100]);
+    }
+
+    #[Test]
+    public function it_blocks_watermark_urls_that_target_non_public_ip_ranges()
+    {
+        $this->expectException(InvalidRemoteUrlException::class);
+        $this->expectExceptionMessage('Destination IP is not publicly routable.');
+
+        $this->makeGenerator()->setParams(['mark' => 'http://127.0.0.1/watermark.png']);
+    }
+
+    public static function ipv4MappedIpv6Provider()
+    {
+        return [
+            'mapped loopback' => ['::ffff:127.0.0.1'],
+            'mapped loopback (hex form)' => ['::ffff:7f00:1'],
+            'mapped RFC1918' => ['::ffff:10.0.0.1'],
+            'mapped link-local metadata' => ['::ffff:169.254.169.254'],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('ipv4MappedIpv6Provider')]
+    public function it_blocks_ipv4_mapped_ipv6_addresses_via_dns($mappedIp)
+    {
+        $validator = new RemoteUrlValidator(fn ($host) => [['ipv6' => $mappedIp]]);
+
+        $this->expectException(InvalidRemoteUrlException::class);
+        $this->expectExceptionMessage('Destination IP is not publicly routable.');
+
+        $validator->validate('https://attacker.example/foo.jpg');
+    }
+
+    #[Test]
+    public function it_allows_public_ipv6_addresses()
+    {
+        $validator = new RemoteUrlValidator(fn ($host) => [['ipv6' => '2606:4700:4700::1111']]);
+
+        $validator->validate('https://example.com/foo.jpg');
+
+        $this->addToAssertionCount(1);
+    }
+
+    #[Test]
     public function the_watermark_disk_is_the_public_directory_by_default()
     {
         $generator = $this->makeGenerator();
@@ -415,7 +501,6 @@ class ImageGeneratorTest extends TestCase
     {
         $reflection = new \ReflectionClass($adapter);
         $property = $reflection->getProperty('prefixer');
-        $property->setAccessible(true);
         $prefixer = $property->getValue($adapter);
 
         return $prefixer->prefixPath('');
@@ -425,7 +510,6 @@ class ImageGeneratorTest extends TestCase
     {
         $reflection = new \ReflectionClass($filesystem);
         $property = $reflection->getProperty('adapter');
-        $property->setAccessible(true);
 
         return $property->getValue($filesystem);
     }

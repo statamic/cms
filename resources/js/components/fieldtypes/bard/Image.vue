@@ -14,12 +14,12 @@
             <div
                 class="flex flex-wrap items-center justify-center gap-2 border-t px-2 py-2 text-center text-2xs text-white @container/toolbar dark:border-gray-900 dark:text-gray-300"
             >
-                <Button v-if="!src" size="sm" icon="folder-photos" :text="__('Choose Image')" @click="openSelector" />
+                <Button v-if="!src" size="sm" icon="folder-photos" :text="__('Choose Image')" @mousedown.prevent @click="openSelector" />
 
-                <Button v-if="src" size="sm" icon="edit" :text="__('Edit Image')" @click="edit" />
-                <Button v-if="src" size="sm" icon="rename" :text="__('Override Alt')" :class="{ active: showingAltEdit }" @click="toggleAltEditor" />
-                <Button v-if="src" size="sm" icon="replace" :text="__('Replace')" @click="openSelector" />
-                <Button v-if="src" size="sm" icon="trash" :text="__('Remove')" @click="deleteNode" />
+                <Button v-if="src" size="sm" icon="edit" :text="__('Edit Image')" @mousedown.prevent @click="edit" />
+                <Button v-if="src" size="sm" icon="rename" :text="__('Override Alt')" :class="{ active: showingAltEdit }" @mousedown.prevent @click="toggleAltEditor" />
+                <Button v-if="src" size="sm" icon="replace" :text="__('Replace')" @mousedown.prevent @click="openSelector" />
+                <Button v-if="src" size="sm" icon="trash" :text="__('Remove')" @mousedown.prevent @click="deleteNode" />
             </div>
 
             <div
@@ -55,6 +55,7 @@
                 :id="assetId"
                 :showToolbar="false"
                 :allow-deleting="false"
+                :show-navigation="false"
                 @closed="closeEditor"
                 @saved="editorAssetSaved"
                 @actionCompleted="actionCompleted"
@@ -70,6 +71,7 @@ import { NodeViewWrapper } from '@tiptap/vue-3';
 import Selector from '../../assets/Selector.vue';
 import { Input, Button, Stack } from '@ui';
 import { containerContextKey } from '@/components/ui/Publish/Container.vue';
+import { dedupeInFlight } from '@/util/dedupeInFlight.js';
 
 export default {
     mixins: [Asset],
@@ -183,13 +185,13 @@ export default {
                 return;
             }
 
-            this.$axios
-                .post(cp_url('assets-fieldtype'), {
-                    assets: [id],
-                })
-                .then((response) => {
-                    this.setAsset(response.data[0]);
-                });
+            const cacheKey = JSON.stringify([id]);
+
+            dedupeInFlight('assets-fieldtype', cacheKey, () =>
+                this.$axios.post(cp_url('assets-fieldtype'), { assets: [id] }),
+            ).then((response) => {
+                this.setAsset(response.data[0]);
+            });
         },
 
         setAsset(asset) {

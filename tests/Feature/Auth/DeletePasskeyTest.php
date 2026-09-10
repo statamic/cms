@@ -38,7 +38,7 @@ class DeletePasskeyTest extends TestCase
         $this
             ->actingAs($user)
             ->deleteRequest('passkey-123')
-            ->assertStatus(201);
+            ->assertStatus(204);
     }
 
     #[Test]

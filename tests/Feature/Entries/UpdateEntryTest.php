@@ -307,6 +307,53 @@ class UpdateEntryTest extends TestCase
     }
 
     #[Test]
+    public function submitted_title_is_ignored_when_generating_the_slug_from_a_title_format()
+    {
+        [$user, $collection] = $this->seedUserAndCollection();
+        $collection->titleFormats('Auto {foo}')->save();
+        $this->seedBlueprintFields($collection, ['foo' => ['type' => 'text']]);
+
+        $entry = EntryFactory::collection($collection)
+            ->slug('existing-entry')
+            ->data(['title' => 'Existing Entry', 'foo' => 'bar'])
+            ->create();
+
+        $this
+            ->actingAs($user)
+            ->update($entry, ['title' => 'Auto stale', 'slug' => '', 'foo' => 'baz'])
+            ->assertOk();
+
+        $entry = $entry->fresh();
+        $this->assertEquals('Auto baz', $entry->value('title'));
+        $this->assertEquals('auto-baz', $entry->slug());
+    }
+
+    #[Test]
+    public function submitted_slug_is_ignored_when_it_is_still_being_auto_generated()
+    {
+        // The browser generates the slug asynchronously, so what it submits can lag
+        // behind the values it was generated from. We regenerate it here instead.
+
+        [$user, $collection] = $this->seedUserAndCollection();
+        $collection->titleFormats('Auto {foo}')->save();
+        $this->seedBlueprintFields($collection, ['foo' => ['type' => 'text']]);
+
+        $entry = EntryFactory::collection($collection)
+            ->slug('existing-entry')
+            ->data(['title' => 'Existing Entry', 'foo' => 'bar'])
+            ->create();
+
+        $this
+            ->actingAs($user)
+            ->update($entry, ['title' => 'Auto bar', 'slug' => 'auto-bar', 'foo' => 'baz', '_auto_slug' => true])
+            ->assertOk();
+
+        $entry = $entry->fresh();
+        $this->assertEquals('Auto baz', $entry->value('title'));
+        $this->assertEquals('auto-baz', $entry->slug());
+    }
+
+    #[Test]
     public function slug_and_auto_title_get_generated_after_save()
     {
         // We want addons to be able to add/modify data that the auto title could rely on.
@@ -467,6 +514,41 @@ class UpdateEntryTest extends TestCase
             ->actingAs($user)
             ->update($entry, ['title' => 'Existing Entry', 'slug' => 'existing-entry', 'parent' => ['team']]) // Since we have no max depth set, this should be fine.
             ->assertOk();
+    }
+
+    #[Test]
+    public function it_prevents_duplicate_uris_for_structured_entries_with_depth_conditional_routes()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'edit test entries', 'access en site']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+
+        $collection = tap(
+            Collection::make('test')
+                ->routes('{{ if depth > 1 }}{{ parent_uri }}/{{ slug }}{{ else }}base/{{ slug }}{{ /if }}')
+                ->structureContents(['max_depth' => 10])
+        )->save();
+
+        EntryFactory::id('root-id')->slug('root')->collection('test')->create();
+        EntryFactory::id('child-id')->slug('child')->collection('test')->create();
+
+        $entry = EntryFactory::id('other-child-id')
+            ->slug('other-child')
+            ->collection('test')
+            ->data(['title' => 'Other Child'])
+            ->create();
+
+        $collection->structure()->in('en')->tree([
+            ['entry' => 'root-id', 'children' => [
+                ['entry' => 'child-id'],
+                ['entry' => 'other-child-id'],
+            ]],
+        ])->save();
+
+        $this
+            ->actingAs($user)
+            ->update($entry, ['title' => 'Other Child', 'slug' => 'child'])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['slug']);
     }
 
     private function seedUserAndCollection()

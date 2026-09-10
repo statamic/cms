@@ -3,6 +3,7 @@
 namespace Tests\Feature\Entries;
 
 use Facades\Statamic\Fields\BlueprintRepository;
+use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Facades\Event;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
@@ -177,6 +178,70 @@ class StoreEntryTest extends TestCase
     }
 
     #[Test]
+    public function submitted_title_is_ignored_when_generating_the_slug_from_a_title_format()
+    {
+        [$user, $collection] = $this->seedUserAndCollection();
+        $collection->titleFormats('Auto {foo}')->save();
+        $this->seedBlueprintFields($collection, ['foo' => ['type' => 'text']]);
+
+        $this
+            ->actingAs($user)
+            ->submit($collection, [
+                'title' => 'Auto stale',
+                'slug' => '',
+                'foo' => 'bar',
+            ])->assertOk();
+
+        $entry = Entry::all()->first();
+        $this->assertEquals('Auto bar', $entry->value('title'));
+        $this->assertEquals('auto-bar', $entry->slug());
+    }
+
+    #[Test]
+    public function submitted_slug_is_ignored_when_it_is_still_being_auto_generated()
+    {
+        // The browser generates the slug asynchronously, so what it submits can lag
+        // behind the values it was generated from. We regenerate it here instead.
+
+        [$user, $collection] = $this->seedUserAndCollection();
+
+        $this
+            ->actingAs($user)
+            ->submit($collection, [
+                'title' => 'Michael Aerni',
+                'slug' => 'michael',
+                '_auto_slug' => true,
+            ])->assertOk();
+
+        $this->assertEquals('michael-aerni', Entry::all()->first()->slug());
+    }
+
+    #[Test]
+    public function submitted_title_and_slug_are_ignored_when_using_title_format_and_the_slug_is_still_being_auto_generated()
+    {
+        [$user, $collection] = $this->seedUserAndCollection();
+        $collection->titleFormats('{first_name} {last_name}')->save();
+        $this->seedBlueprintFields($collection, [
+            'first_name' => ['type' => 'text'],
+            'last_name' => ['type' => 'text'],
+        ]);
+
+        $this
+            ->actingAs($user)
+            ->submit($collection, [
+                'title' => 'Michael',
+                'slug' => 'michael',
+                'first_name' => 'Michael',
+                'last_name' => 'Aerni',
+                '_auto_slug' => true,
+            ])->assertOk();
+
+        $entry = Entry::all()->first();
+        $this->assertEquals('Michael Aerni', $entry->value('title'));
+        $this->assertEquals('michael-aerni', $entry->slug());
+    }
+
+    #[Test]
     public function slug_and_auto_title_get_generated_after_save()
     {
         // We want addons to be able to add/modify data that the auto title could rely on.
@@ -201,6 +266,49 @@ class StoreEntryTest extends TestCase
         $this->assertEquals('Auto Avada Kedavra', $entry->value('title'));
         $this->assertEquals('auto-avada-kedavra', $entry->slug());
         $this->assertEquals('auto-avada-kedavra.md', pathinfo($entry->path(), PATHINFO_BASENAME));
+    }
+
+    #[Test]
+    public function date_is_saved_correctly_when_app_timezone_is_utc()
+    {
+        config()->set('app.timezone', 'UTC');
+
+        [$user, $collection] = $this->seedUserAndCollection();
+        $collection->dated(true)->save();
+
+        $this->assertCount(0, Entry::all());
+
+        $this
+            ->actingAs($user)
+            ->submit($collection, ['title' => 'My Entry', 'slug' => 'my-entry', 'date' => '2026-03-23T16:30:00.000Z'])
+            ->assertOk();
+
+        $this->assertCount(1, Entry::all());
+        $entry = Entry::all()->first();
+        $this->assertStringContainsString('2026-03-23-1630.my-entry.md', $entry->buildPath());
+    }
+
+    /**
+     * @see https://github.com/statamic/cms/issues/14251
+     **/
+    #[Test]
+    public function date_is_saved_correctly_when_app_timezone_is_not_utc()
+    {
+        config()->set('app.timezone', 'Europe/Zurich');
+
+        [$user, $collection] = $this->seedUserAndCollection();
+        $collection->dated(true)->save();
+
+        $this->assertCount(0, Entry::all());
+
+        $this
+            ->actingAs($user)
+            ->submit($collection, ['title' => 'My Entry', 'slug' => 'my-entry', 'date' => '2026-03-23T16:30:00.000Z']) // 16:30 UTC is 17:30 in Zurich
+            ->assertOk();
+
+        $this->assertCount(1, Entry::all());
+        $entry = Entry::all()->first();
+        $this->assertStringContainsString('2026-03-23-1730.my-entry.md', $entry->buildPath()); // Should be saved in Europe/Zurich, so 17:30.
     }
 
     #[Test]
@@ -298,6 +406,70 @@ class StoreEntryTest extends TestCase
             ->assertOk();
 
         $this->assertFalse($response->json('values.published'), 'Initial published value should be false when user lacks publish permission, even if collection defaults to published');
+    }
+
+    #[Test]
+    public function it_prevents_duplicate_uris_for_structured_entries_with_depth_conditional_routes()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'create test entries']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+
+        $collection = tap(
+            Collection::make('test')
+                ->routes('{{ if depth > 1 }}{{ parent_uri }}/{{ slug }}{{ else }}base/{{ slug }}{{ /if }}')
+                ->structureContents(['max_depth' => 10])
+        )->save();
+
+        EntryFactory::id('root-id')->slug('root')->collection('test')->create();
+        EntryFactory::id('child-id')->slug('child')->collection('test')->create();
+
+        $tree = $collection->structure()->in('en');
+        $tree->tree([
+            ['entry' => 'root-id', 'children' => [
+                ['entry' => 'child-id'],
+            ]],
+        ])->save();
+
+        $this
+            ->actingAs($user)
+            ->submit($collection, [
+                'title' => 'Duplicate Child',
+                'slug' => 'child',
+                '_parent' => 'root-id',
+            ])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['slug']);
+    }
+
+    #[Test]
+    public function it_prevents_duplicate_uris_when_parent_is_the_explicit_root()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'create test entries']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+
+        $collection = tap(
+            Collection::make('test')
+                ->routes('{{ if depth > 1 }}{{ parent_uri }}/{{ slug }}{{ else }}base/{{ slug }}{{ /if }}')
+                ->structureContents(['root' => true, 'max_depth' => 10])
+        )->save();
+
+        EntryFactory::id('root-id')->slug('root')->collection('test')->create();
+        EntryFactory::id('sibling-id')->slug('sibling')->collection('test')->create();
+
+        $collection->structure()->in('en')->tree([
+            ['entry' => 'root-id'],
+            ['entry' => 'sibling-id'],
+        ])->save();
+
+        $this
+            ->actingAs($user)
+            ->submit($collection, [
+                'title' => 'Duplicate Sibling',
+                'slug' => 'sibling',
+                '_parent' => 'root-id',
+            ])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['slug']);
     }
 
     private function seedUserAndCollection()

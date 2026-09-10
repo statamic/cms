@@ -6,6 +6,7 @@ use Facades\Statamic\Structures\CollectionTreeDiff;
 use Statamic\Contracts\Structures\CollectionTree as TreeContract;
 use Statamic\Contracts\Structures\CollectionTreeRepository;
 use Statamic\Events\CollectionTreeDeleted;
+use Statamic\Events\CollectionTreeEntriesMovedOrRemoved;
 use Statamic\Events\CollectionTreeSaved;
 use Statamic\Events\CollectionTreeSaving;
 use Statamic\Facades\Blink;
@@ -48,7 +49,17 @@ class CollectionTree extends Tree implements TreeContract
 
     protected function dispatchSavingEvent()
     {
-        return CollectionTreeSaving::dispatch($this);
+        if (CollectionTreeSaving::dispatch($this) === false) {
+            return false;
+        }
+
+        $diff = $this->diff();
+        $removed = $diff->removed();
+        $moved = $diff->ancestryChanged();
+
+        if ($removed || $moved) {
+            CollectionTreeEntriesMovedOrRemoved::dispatch($removed, $moved);
+        }
     }
 
     protected function dispatchDeletedEvent()

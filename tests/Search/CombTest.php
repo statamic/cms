@@ -281,6 +281,22 @@ EOT;
         $this->assertEquals(['Chicken & Sweetcorn Soup'], collect($results['data'] ?? [])->pluck('data.title')->all());
     }
 
+    #[Test]
+    public function it_handles_stop_words_case_insensitive()
+    {
+        $comb = new Comb([
+            ['title' => 'One two three'],
+            ['title' => 'Three four five'],
+            ['title' => 'Five four three'],
+        ]);
+
+        $comb->setSettings(['stop_words' => ['Three']]);
+
+        $results = $comb->lookUp('One two three');
+
+        $this->assertEquals(['One two three'], collect($results['data'] ?? [])->pluck('data.title')->all());
+    }
+
     public static function searchesProvider()
     {
         return [

@@ -10,6 +10,7 @@ use Illuminate\Support\Collection;
 use Statamic\CommandPalette\Category;
 use Statamic\CommandPalette\Link;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Contracts\Query\QueryableValue;
 use Statamic\CP\Column;
 use Statamic\CP\Columns;
@@ -27,12 +28,13 @@ use Statamic\Facades;
 use Statamic\Facades\Blink;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
+use Statamic\Facades\User;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 use function Statamic\trans as __;
 
-class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
+class Blueprint implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableValues, QueryableValue
 {
     use ExistsAsFile, HasAugmentedData;
 
@@ -279,8 +281,7 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
             }
         }
 
-        $targetSectionIndex = $existingField['section']
-            ?? ($prepend ? 0 : count($contents['tabs'][$tab]['sections'] ?? []) - 1);
+        $targetSectionIndex = $existingField['section'] ?? 0;
 
         $fields = collect($tabs[$tab]['sections'][$targetSectionIndex]['fields'] ?? [])->keyBy(function ($field) {
             return (isset($field['import'])) ? 'import:'.($field['prefix'] ?? null).$field['import'] : $field['handle'];
@@ -291,6 +292,7 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
                 $importKey = 'import:'.$importedField['partial'];
                 $field = $allFields->get($importKey);
                 $tab = $field['tab'];
+                $targetSectionIndex = $field['section'];
                 $fields = collect($tabs[$tab]['sections'][$targetSectionIndex]['fields'])->keyBy(function ($field) {
                     return (isset($field['import'])) ? 'import:'.($field['prefix'] ?? null).$field['import'] : $field['handle'];
                 });
@@ -453,6 +455,10 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
             'tabs' => $this->tabs()->map->toPublishArray()->values()->all(),
             'empty' => $this->isEmpty(),
             'fqh' => $this->fullyQualifiedHandle(),
+            'token' => encrypt([
+                'fqh' => $this->fullyQualifiedHandle(),
+                'user_id' => User::current()?->id(),
+            ]),
         ];
     }
 
@@ -626,6 +632,12 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
             return $this;
         }
 
+        // A field from an imported fieldset can't be removed on its
+        // own, since it would take the rest of the fieldset with it.
+        if (isset($fields[$handle]['import'])) {
+            return $this;
+        }
+
         $fieldKey = $fields[$handle]['fieldIndex'];
         $sectionIndex = $fields[$handle]['sectionIndex'];
 
@@ -638,10 +650,18 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
     private function getTabFields($tab)
     {
         return collect($this->contents['tabs'][$tab]['sections'])->flatMap(function ($section, $sectionIndex) {
-            return collect($section['fields'] ?? [])->map(function ($field, $fieldIndex) use ($sectionIndex) {
-                return $field + ['fieldIndex' => $fieldIndex, 'sectionIndex' => $sectionIndex];
+            return collect($section['fields'] ?? [])->flatMap(function ($field, $fieldIndex) use ($sectionIndex) {
+                $indexes = ['fieldIndex' => $fieldIndex, 'sectionIndex' => $sectionIndex];
+
+                // An imported fieldset is a single entry in the contents, but may
+                // contain any number of fields, each pointing back at the import.
+                if (isset($field['import'])) {
+                    return (new Fields([$field]))->all()->map(fn () => $field + $indexes)->all();
+                }
+
+                return [$field['handle'] => $field + $indexes];
             });
-        })->keyBy('handle');
+        });
     }
 
     protected function ensureFieldInTabHasConfig($handle, $tab, $config)
@@ -663,10 +683,13 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
 
         $field = $this->contents['tabs'][$tab]['sections'][$sectionKey]['fields'][$fieldKey];
 
-        $fieldValue = Arr::get($field, 'field');
-        $isImportedField = is_string($fieldValue);
-
-        if ($isImportedField) {
+        if (isset($field['import'])) {
+            // An import keeps its overrides in a `config` array keyed by the
+            // field handles within the fieldset, before any prefix is applied.
+            $importedHandle = Str::after($handle, $field['prefix'] ?? '');
+            $existingConfig = Arr::get($field, "config.{$importedHandle}", []);
+            $this->contents['tabs'][$tab]['sections'][$sectionKey]['fields'][$fieldKey]['config'][$importedHandle] = array_merge($existingConfig, $config);
+        } elseif (is_string(Arr::get($field, 'field'))) {
             $existingConfig = Arr::get($field, 'config', []);
             $this->contents['tabs'][$tab]['sections'][$sectionKey]['fields'][$fieldKey]['config'] = array_merge($existingConfig, $config);
         } else {
@@ -815,5 +838,22 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
         return (new Link($text, Category::Fields))
             ->url($url)
             ->icon('blueprints');
+    }
+
+    public function getQueryableValue(string $field)
+    {
+        if (in_array($method = Str::camel($field), $this->queryableMethods())) {
+            return $this->{$method}();
+        }
+
+        return null;
+    }
+
+    private function queryableMethods(): array
+    {
+        return [
+            'columns', 'fields', 'handle', 'hidden', 'isEmpty', 'isDeletable', 'isResettable',
+            'namespace', 'order', 'path', 'tabs', 'title',
+        ];
     }
 }

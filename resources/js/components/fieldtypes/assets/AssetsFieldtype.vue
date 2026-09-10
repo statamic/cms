@@ -1,5 +1,5 @@
 <template>
-    <div data-asset-browser class="@container relative w-full bg-gray-50 dark:bg-transparent rounded-xl">
+    <div data-asset-browser class="@container relative w-full bg-gray-50 dark:bg-transparent rounded-xl [.link-fieldtype_&]:bg-transparent">
         <div
             v-if="hasPendingDynamicFolder"
             class="w-full rounded-md border border-dashed px-4 py-3 text-sm text-gray-700 dark:border-gray-300 dark:text-gray-200"
@@ -20,7 +20,7 @@
                 <div
                     v-if="config.allow_uploads"
                     v-show="dragging && !showSelector"
-                    class="absolute inset-0 flex gap-2 items-center justify-center bg-white/80 border border-gray-400 border-dashed rounded-lg text-gray-700"
+                    class="absolute inset-0 z-(--z-index-above) flex gap-2 items-center justify-center bg-white/80 border border-gray-400 border-dashed rounded-lg text-gray-700"
                 >
                     <ui-icon name="upload-cloud" class="size-5" />
                     <span class="text-sm">{{ __('Drop to Upload') }}</span>
@@ -29,7 +29,7 @@
                 <div
                     v-if="!isReadOnly && showPicker"
                     data-asset-picker
-                    class="not-[.link-fieldtype_&]:p-2 not-[.link-fieldtype_&]:border border-gray-300 dark:border-gray-700 dark:bg-gray-850 rounded-xl flex flex-col @2xs:flex-row items-center gap-2 sm:gap-3 gap-y-3"
+                    class="not-[.link-fieldtype_&]:p-2 not-[.link-fieldtype_&]:border border-gray-300 dark:border-gray-700 dark:bg-gray-850 rounded-xl flex flex-wrap items-center gap-y-1 gap-x-3"
                     :class="{
                         'rounded-b-none': expanded,
                         'bard-drag-handle': isInBardField,
@@ -38,23 +38,43 @@
                     <Button
                         v-if="canBrowse"
                         icon="folder-open"
+                        size="sm"
                         tabindex="0"
+                        class="shrink-0 @sm:hidden"
+                        :text="__('Browse')"
+                        :aria-label="__('Browse Assets')"
+                        @click="openSelector"
+                        @keyup.space.enter="openSelector"
+                    />
+                    <Button
+                        v-if="canBrowse"
+                        icon="folder-open"
+                        tabindex="0"
+                        class="hidden shrink-0 @sm:inline-flex"
                         :text="__('Browse Assets')"
-                        class="w-full @2xs:w-auto"
                         @click="openSelector"
                         @keyup.space.enter="openSelector"
                     />
 
-                    <div class="text-sm text-gray-600 dark:text-gray-400 flex items-center flex-1 gap-1 ms-1" v-if="canUpload">
-                        <ui-icon name="upload-cloud" class="size-5 text-gray-500 me-2" />
-                        <div class="text-xs">
-                            <span class="leading-tight" v-text="`${__('Drag & drop here or')}&nbsp;`" />
-                            <button type="button" class="text-left underline underline-offset-2 cursor-pointer hover:text-gray-925 dark:hover:text-gray-200" @click.prevent="uploadFile">
+                    <div class="min-w-0 grow basis-[min-content] hidden not-[.link-fieldtype_&]:flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400" v-if="canUpload">
+                        <ui-icon name="upload-cloud" class="size-5 shrink-0 text-gray-500 hidden @sm:block" />
+                        <div class="min-w-0">
+                            <span class="hidden @sm:inline">{{ __('Drag & drop here or') }}&nbsp;</span>
+                            <span v-if="canBrowse" class="@sm:hidden">{{ __('or') }}&nbsp;</span>
+                            <button type="button" class="underline underline-offset-2 cursor-pointer hover:text-gray-925 dark:hover:text-gray-200" @click.prevent="uploadFile">
                                 {{ __('choose a file') }}
-                            </button>.
-                            <span class="leading-tight whitespace-nowrap" v-if="selectedFilesText" v-text="selectedFilesText" />
+                            </button><span class="hidden @sm:inline">.</span>
                         </div>
                     </div>
+
+                    <ui-badge
+                        v-if="selectedFilesText"
+                        size="sm"
+                        pill
+                        class="ms-auto self-start shrink-0 tabular-nums px-1.5!"
+                        :text="`${assets.length}/${maxFiles}`"
+                        :aria-label="selectedFilesText"
+                    />
 
                     <div class="flex items-center justify-end" v-if="meta.rename_folder">
                         <ItemActions
@@ -88,6 +108,10 @@
                     />
                 </div>
 
+                <div v-if="isReadOnly && !expanded" class="border border-gray-300 dark:border-gray-700 border-dashed rounded-lg p-3 text-center">
+                    <ui-icon name="assets" class="size-5 text-gray-300 dark:text-gray-700 mx-auto" />
+                </div>
+
                 <template v-if="expanded">
                     <sortable-list
                         v-if="expanded && displayMode === 'grid'"
@@ -97,34 +121,38 @@
                         v-model="assets"
                         :animate="false"
                         :constrain-dimensions="true"
-                        :disabled="config.disabled"
+                        :disabled="config.disabled || isReadOnly"
                         :distance="5"
-                        :read-only="isReadOnly"
                         @dragend="$emit('blur')"
                         @dragstart="$emit('focus')"
                     >
                         <div
-                            class="bg-white relative grid gap-4 2xl:gap-10 p-3 relative rounded-xl border border-gray-300 border-t-0 rounded-t-none dark:bg-gray-850 dark:border-gray-700"
-                            :class="{ 'rounded-t-none': !isReadOnly && (showPicker || uploads.length) }"
+                            class="bg-white relative grid @min-[300px]:grid-cols-[repeat(auto-fill,minmax(110px,1fr))] gap-4 2xl:gap-10 p-3 relative rounded-xl border border-gray-300 dark:bg-gray-850 dark:border-gray-700"
+                            :class="{ 'border-t-0 rounded-t-none': !isReadOnly && (showPicker || uploads.length), 'border-dashed': isReadOnly }"
                             ref="assets"
-                            style="grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));"
                         >
                             <asset-tile
                                 v-for="asset in assets"
                                 :key="asset.id"
                                 :asset="asset"
+                                :siblings="assets"
                                 :read-only="isReadOnly"
                                 :show-filename="config.show_filename"
                                 :show-set-alt="showSetAlt"
+                                :checkerboard-mode="checkerboardMode"
                                 @updated="assetUpdated"
                                 @removed="assetRemoved"
-                                @id-changed="idChanged(asset.id, $event)"
+                                @id-changed="idChanged"
                             >
                             </asset-tile>
                         </div>
                     </sortable-list>
 
-                    <div class="relative overflow-hidden rounded-xl border border-gray-300 dark:border-gray-700 not-[.link-fieldtype_&]:border-t-0! not-[.link-fieldtype_&]:rounded-t-none" v-if="displayMode === 'list'">
+                    <div
+                        class="relative overflow-hidden rounded-xl border border-gray-300 dark:border-gray-700 [.link-fieldtype_&]:rounded-lg"
+                        :class="{ 'not-[.link-fieldtype_&]:border-t-0! not-[.link-fieldtype_&]:rounded-t-none': !isReadOnly && (showPicker || uploads.length), 'border-dashed': isReadOnly }"
+                        v-if="displayMode === 'list'"
+                    >
                         <table class="table-fixed w-full">
                             <thead class="sr-only">
                                 <tr>
@@ -136,10 +164,9 @@
                                 v-model="assets"
                                 item-class="asset-row"
                                 handle-class="asset-row"
-                                :disabled="config.disabled"
+                                :disabled="config.disabled || isReadOnly"
                                 :distance="5"
                                 :mirror="false"
-                                :read-only="isReadOnly"
                                 :vertical="true"
                             >
                                 <tbody ref="assets">
@@ -149,12 +176,13 @@
                                         v-for="asset in assets"
                                         :key="asset.id"
                                         :asset="asset"
+                                        :siblings="assets"
                                         :read-only="isReadOnly"
                                         :show-filename="config.show_filename"
                                         :show-set-alt="showSetAlt"
                                         @updated="assetUpdated"
                                         @removed="assetRemoved"
-                                        @id-changed="idChanged(asset.id, $event)"
+                                        @id-changed="idChanged"
                                     />
                                 </tbody>
                             </sortable-list>
@@ -191,6 +219,8 @@ import { SortableList } from '../../sortable/Sortable';
 import { isEqual } from 'lodash-es';
 import { Button, Dropdown, DropdownMenu, DropdownItem, Stack } from '@/components/ui';
 import ItemActions from '@/components/actions/ItemActions.vue';
+import useCheckerboard from '@/composables/checkerboard.js';
+import { dedupeInFlight } from '@/util/dedupeInFlight.js';
 
 export default {
     components: {
@@ -209,6 +239,15 @@ export default {
     },
 
     mixins: [Fieldtype],
+
+    setup() {
+        const checkerboard = useCheckerboard();
+        return {
+            checkerboardIcon: checkerboard.icon,
+            checkerboardMode: checkerboard.mode,
+            cycleCheckerboard: checkerboard.cycle,
+        };
+    },
 
     inject: {
         isInBardField: {
@@ -424,6 +463,13 @@ export default {
         internalFieldActions() {
             return [
                 {
+                    title: __('Transparency'),
+                    icon: this.checkerboardIcon,
+                    run: () => this.cycleCheckerboard(),
+                    visible: this.displayMode === 'grid' && (this.meta?.data ?? []).some((asset) => asset.can_be_transparent),
+                    quick: true,
+                },
+                {
                     title: __('Remove All'),
                     dangerous: true,
                     run: this.removeAll,
@@ -470,14 +516,16 @@ export default {
 
             this.loading = true;
 
-            this.$axios
-                .post(cp_url('assets-fieldtype'), {
-                    assets,
-                })
-                .then((response) => {
-                    this.assets = response.data;
-                    this.loading = false;
-                });
+            const cacheKey = JSON.stringify([...assets].slice().sort());
+
+            dedupeInFlight('assets-fieldtype', cacheKey, () =>
+                this.$axios.post(cp_url('assets-fieldtype'), { assets }),
+            ).then((response) => {
+                // Clone so mutations on one field's asset rows don't bleed into others
+                // sharing the same in-flight response.
+                this.assets = clone(response.data);
+                this.loading = false;
+            });
         },
 
         /**
@@ -601,7 +649,7 @@ export default {
 
         uploadSelected(upload) {
             const path = `${this.folder}/${upload.basename}`.replace(/^\/+/, '');
-            const id = `${this.container.handle}::${path}`;
+            const id = `${this.container.id}::${path}`;
 
             this.uploads.splice(this.uploads.indexOf(upload), 1);
 

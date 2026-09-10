@@ -15,6 +15,8 @@ use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Rules\Handle;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class GlobalsController extends CpController
 {
     public function index()
@@ -65,6 +67,7 @@ class GlobalsController extends CpController
         $values = [
             'title' => $set->title(),
             'blueprint' => optional($set->blueprint())->handle(),
+            'layout_mode' => $set->layoutMode(),
             'sites' => Site::all()->map(function ($site) use ($set) {
                 return [
                     'name' => $site->name(),
@@ -98,7 +101,7 @@ class GlobalsController extends CpController
 
         $set
             ->title($values['title'])
-            ->blueprint($values['blueprint']);
+            ->layoutMode($values['layout_mode']);
 
         if (Site::multiEnabled()) {
             $sites = collect($values['sites'])
@@ -179,6 +182,16 @@ class GlobalsController extends CpController
                                 'title' => __('Edit Blueprint'),
                                 'edit_url' => cp_route('blueprints.globals.edit', $set->handle()),
                             ],
+                        ],
+                    ],
+                    'layout_mode' => [
+                        'display' => __('Layout Mode'),
+                        'instructions' => __('statamic::messages.globals_configure_layout_mode_instructions'),
+                        'type' => 'button_group',
+                        'default' => 'default',
+                        'options' => [
+                            'default' => __('Default'),
+                            'multi_column' => __('Multi-column'),
                         ],
                     ],
                 ],

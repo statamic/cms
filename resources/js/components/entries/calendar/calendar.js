@@ -1,8 +1,11 @@
-import { CalendarDate, CalendarDateTime, fromDate, getLocalTimeZone, startOfWeek, endOfWeek } from '@internationalized/date';
+import { CalendarDate, CalendarDateTime, fromDate, getLocalTimeZone, parseAbsoluteToLocal, parseDate, startOfWeek, endOfWeek } from '@internationalized/date';
 import DateFormatter from '@/components/DateFormatter.js';
 
-export function formatDateString(date) {
-    return new Date(date.year, date.month - 1, date.day).toISOString().split('T')[0];
+export function getEntryDate(entry) {
+    const date = entry.date?.date || entry.date;
+
+    // Fields using a format without a time save a plain date string, which can't be parsed as an absolute datetime.
+    return date.includes('T') ? parseAbsoluteToLocal(date) : parseDate(date);
 }
 
 export function getWeekDates(currentDate) {

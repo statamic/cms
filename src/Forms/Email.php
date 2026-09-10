@@ -150,8 +150,11 @@ class Email extends Mailable
             return;
         }
 
+        $disk = config('statamic.system.file_uploads_disk', 'local');
+        $basePath = config('statamic.system.file_uploads_path', 'statamic/file-uploads');
+
         foreach ($value as $file) {
-            $this->attachFromStorageDisk('local', 'statamic/file-uploads/'.$file);
+            $this->attachFromStorageDisk($disk, $basePath.'/'.$file);
         }
     }
 
@@ -245,7 +248,9 @@ class Email extends Mailable
         return collect($config)->map(function ($value) {
             $value = Parse::env($value); // deprecated
 
-            return (string) Antlers::parseUserContent($value, array_merge(
+            $value = Parse::config($value);
+
+            return (string) Antlers::parse($value, array_merge(
                 ['config' => Cascade::config()],
                 $this->getGlobalsData(),
                 $this->submissionData,

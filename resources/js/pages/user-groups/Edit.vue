@@ -36,7 +36,7 @@ const props = defineProps({
 
 <template>
     <div>
-        <Head :title="`${__('Edit')} ${title}`" />
+        <Head :title="`${__('Edit')} ${__(title)}`" />
 
         <PublishForm
             publish-container="base"

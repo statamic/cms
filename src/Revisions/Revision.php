@@ -16,6 +16,9 @@ use Statamic\Facades;
 use Statamic\Facades\Revision as Revisions;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class Revision implements Arrayable, ContainsQueryableValues, Contract
 {
     use ExistsAsFile, FluentlyGetsAndSets, TracksQueriedColumns, TracksQueriedRelations;
@@ -115,7 +118,7 @@ class Revision implements Arrayable, ContainsQueryableValues, Contract
             $user = [
                 'id' => $user->id(),
                 'email' => $user->email(),
-                'name' => $user->name(),
+                'name' => $user->name() ?? $user->email(),
                 'avatar' => $user->avatar(),
                 'initials' => $user->initials(),
             ];

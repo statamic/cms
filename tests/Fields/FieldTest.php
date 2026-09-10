@@ -5,6 +5,7 @@ namespace Tests\Fields;
 use Facades\Statamic\Fields\FieldtypeRepository;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\Field as Fields;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Value;
@@ -294,6 +295,7 @@ class FieldTest extends TestCase
             ->andReturn(new class extends Fieldtype
             {
                 protected $component = 'example';
+
                 protected $configFields = [
                     'a_config_field_with_pre_processing' => ['type' => 'with_processing'],
                     'a_config_field_without_pre_processing' => ['type' => 'without_processing'],
@@ -352,7 +354,30 @@ class FieldTest extends TestCase
             'required' => true,
             'read_only' => false, // deprecated
             'always_save' => false,
+            'reserve_space_when_hidden' => false,
         ], $field->toPublishArray());
+    }
+
+    #[Test]
+    public function to_publish_array_passes_through_reserve_space_when_hidden()
+    {
+        FieldtypeRepository::partialMock();
+
+        FieldtypeRepository::shouldReceive('find')
+            ->with('example')
+            ->andReturn(new class extends Fieldtype
+            {
+                protected $component = 'example';
+
+                protected $configFields = [];
+            });
+
+        $field = new Field('test', [
+            'type' => 'example',
+            'reserve_space_when_hidden' => true,
+        ]);
+
+        $this->assertTrue($field->toPublishArray()['reserve_space_when_hidden']);
     }
 
     #[Test]
@@ -472,6 +497,31 @@ class FieldTest extends TestCase
         $field = (new Field('test', ['type' => 'fieldtype']));
 
         $this->assertEquals('fieldtype defined default preprocessed', $field->preProcess()->value());
+    }
+
+    #[Test]
+    public function preprocessing_a_field_with_no_value_and_computed_default_value_will_use_the_computed_function()
+    {
+        FieldtypeRepository::shouldReceive('find')
+            ->with('fieldtype')
+            ->andReturn(new class extends Fieldtype
+            {
+                public function preProcess($data)
+                {
+                    return $data.' preprocessed';
+                }
+
+                public function defaultValue()
+                {
+                    return 'fieldtype defined default';
+                }
+            });
+
+        Fields::computedDefault('computed-value', fn () => 'computed defined default');
+
+        $field = (new Field('test', ['default' => 'computed:computed-value', 'type' => 'fieldtype']));
+
+        $this->assertEquals('computed defined default preprocessed', $field->preProcess()->value());
     }
 
     #[Test]

@@ -81,7 +81,7 @@ trait MakesVueComponents
 
         $this->files->makeDirectory($addonPath.'/resources/dist', 0777, true, true);
 
-        Process::path(base_path())->run('npm install', function (string $type, string $buffer) {
+        Process::path(base_path())->run('npm install --ignore-scripts', function (string $type, string $buffer) {
             echo $buffer;
         });
 

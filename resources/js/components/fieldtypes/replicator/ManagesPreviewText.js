@@ -7,7 +7,8 @@ export default {
                 .filter(([handle, value]) => {
                     if (!handle.endsWith('_')) return false;
                     handle = handle.substr(0, handle.length - 1); // Remove the trailing underscore.
-                    const config = this.config.fields.find((f) => f.handle === handle) || {};
+                    const config = this.config.fields.find((f) => f.handle === handle);
+                    if (!config) return false;
                     return config.replicator_preview === undefined ? this.showFieldPreviews : config.replicator_preview;
                 })
                 .map(([handle, value]) => value)

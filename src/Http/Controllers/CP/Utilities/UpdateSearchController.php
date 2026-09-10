@@ -8,6 +8,8 @@ use Statamic\Facades\Search;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class UpdateSearchController extends CpController
 {
     public function update(Request $request)

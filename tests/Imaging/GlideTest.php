@@ -174,12 +174,10 @@ class GlideTest extends TestCase
 
         $reflection = new \ReflectionClass($adapter);
         $visibilityConverter = $reflection->getProperty('visibility');
-        $visibilityConverter->setAccessible(true);
         $visibilityConverter = $visibilityConverter->getValue($adapter);
 
         $reflection = new \ReflectionClass($visibilityConverter);
         $visibility = $reflection->getProperty('defaultForDirectories');
-        $visibility->setAccessible(true);
 
         return $visibility->getValue($visibilityConverter);
     }
@@ -188,7 +186,6 @@ class GlideTest extends TestCase
     {
         $reflection = new \ReflectionClass($filesystem);
         $property = $reflection->getProperty('adapter');
-        $property->setAccessible(true);
 
         return $property->getValue($filesystem);
     }
@@ -197,7 +194,6 @@ class GlideTest extends TestCase
     {
         $reflection = new \ReflectionClass($adapter);
         $property = $reflection->getProperty('prefixer');
-        $property->setAccessible(true);
         $prefixer = $property->getValue($adapter);
 
         return $prefixer->prefixPath('');

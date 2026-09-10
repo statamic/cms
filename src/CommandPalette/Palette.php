@@ -11,6 +11,8 @@ use Statamic\Facades\User;
 use Statamic\Fields\Fieldset;
 use Statamic\Support\Arr;
 
+use function Statamic\trans as __;
+
 class Palette
 {
     protected $items;

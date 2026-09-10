@@ -69,6 +69,26 @@ class StoreRoleTest extends TestCase
     }
 
     #[Test]
+    public function it_allows_storing_a_role_without_elevated_session_when_elevated_sessions_are_disabled()
+    {
+        config(['statamic.users.elevated_sessions_enabled' => false]);
+
+        $this
+            ->actingAsUserWithPermissions(['edit roles'])
+            ->store([
+                'title' => 'No Elevated Session',
+                'handle' => 'no_elevated_session',
+                'permissions' => ['one', 'two'],
+            ])
+            ->assertOk()
+            ->assertJson(['redirect' => cp_route('roles.index')]);
+
+        $role = Role::find('no_elevated_session');
+        $this->assertEquals('No Elevated Session', $role->title());
+        $this->assertEquals(['one', 'two'], $role->permissions()->all());
+    }
+
+    #[Test]
     public function it_stores_a_role()
     {
         $this

@@ -9,18 +9,24 @@ use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Action;
 use Statamic\Facades\CP\Toast;
+use Statamic\Facades\OAuth;
 use Statamic\Facades\Scope;
 use Statamic\Facades\Search;
+use Statamic\Facades\TwoFactor;
 use Statamic\Facades\User;
 use Statamic\Facades\UserGroup;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Http\Resources\CP\Users\Users;
 use Statamic\Notifications\ActivateAccount;
+use Statamic\Query\OrderBy;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 use Statamic\Rules\UniqueUserValue;
 use Statamic\Search\Result;
+use Statamic\Statamic;
 use Symfony\Component\Mailer\Exception\TransportException;
+
+use function Statamic\trans as __;
 
 class UsersController extends CpController
 {
@@ -79,7 +85,7 @@ class UsersController extends CpController
             'blueprints' => ['user'],
         ]);
 
-        $sortField = request('sort');
+        $sortField = OrderBy::column(request('sort'));
         $sortDirection = request('order', 'asc');
 
         if (! $sortField && ! request('search')) {
@@ -91,7 +97,7 @@ class UsersController extends CpController
             $query->orderBy($sortField, $sortDirection);
         }
 
-        $users = $query->paginate(request('perPage'));
+        $users = $query->paginate(Statamic::cpPerPage(request('perPage')));
 
         if ($users->getCollection()->first() instanceof Result) {
             $users->setCollection($users->getCollection()->map->getSearchable());
@@ -154,7 +160,7 @@ class UsersController extends CpController
             ->keys();
 
         $viewData = [
-            'values' => (object) $fields->values()->only($additional)->all(),
+            'initialValues' => (object) $fields->values()->only($additional)->all(),
             'meta' => (object) $fields->meta()->all(),
             'fields' => collect($blueprint->fields()->toPublishArray())->filter(fn ($field) => $additional->contains($field['handle']))->values()->all(),
             'blueprint' => $blueprint->toPublishArray(),
@@ -274,10 +280,11 @@ class UsersController extends CpController
                 'editBlueprint' => cp_route('blueprints.users.edit'),
             ],
             'canEditBlueprint' => User::current()->can('configure fields'),
+            'oauthEnabled' => OAuth::enabled(),
             'canEditPassword' => User::fromUser($request->user())->can('editPassword', $user),
             'requiresCurrentPassword' => $isCurrentUser = $request->user()->id === $user->id(),
             'itemActions' => Action::for($user, ['view' => 'form']),
-            'twoFactor' => $isCurrentUser ? [
+            'twoFactor' => $isCurrentUser && TwoFactor::enabled() ? [
                 'isEnforced' => $user->isTwoFactorAuthenticationRequired(),
                 'wasSetup' => $user->hasEnabledTwoFactorAuthentication(),
                 'routes' => [

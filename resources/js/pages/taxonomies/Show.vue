@@ -91,7 +91,7 @@ export default {
 
 <template>
     <div>
-        <Head :title="taxonomyTitle" />
+        <Head :title="[__(taxonomyTitle), __('Taxonomies')]" />
 
         <Header :title="__(taxonomyTitle)">
             <Dropdown>
@@ -115,7 +115,7 @@ export default {
             ref="deleter"
             :resource-title="taxonomyTitle"
             :route="deleteUrl"
-            redirect="/cp/taxonomies"
+            :redirect="cp_url('taxonomies')"
         />
 
         <Listing
@@ -139,7 +139,7 @@ export default {
                 <span class="text-2xs font-mono">{{ term.slug }}</span>
             </template>
             <template #prepended-row-actions="{ row: term }">
-                <DropdownItem :text="__('Visit URL')" :href="term.permalink" target="_blank" icon="eye" />
+                <DropdownItem v-if="term.has_template" :text="__('Visit URL')" :href="term.permalink" target="_blank" icon="eye" />
                 <DropdownItem :text="__('Edit')" :href="term.edit_url" icon="edit" />
             </template>
         </Listing>

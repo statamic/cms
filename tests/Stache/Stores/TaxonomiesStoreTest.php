@@ -68,6 +68,21 @@ class TaxonomiesStoreTest extends TestCase
     }
 
     #[Test]
+    public function it_hydrates_sort_field_and_direction()
+    {
+        $contents = <<<'YAML'
+title: Tags
+sort_by: foo
+sort_dir: desc
+YAML;
+
+        $item = $this->store->makeItemFromFile($this->tempDir.'/tags.yaml', $contents);
+
+        $this->assertEquals('foo', $item->sortField());
+        $this->assertEquals('desc', $item->sortDirection());
+    }
+
+    #[Test]
     public function it_normalizes_preview_target_url_into_format()
     {
         // it's just nicer to write "url" into yaml than "format".

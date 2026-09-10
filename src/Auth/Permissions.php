@@ -4,6 +4,8 @@ namespace Statamic\Auth;
 
 use Facades\Statamic\Auth\CorePermissions;
 
+use function Statamic\trans as __;
+
 class Permissions
 {
     protected $extensions = [];

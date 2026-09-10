@@ -2,11 +2,13 @@
 
 namespace Statamic\Fields;
 
+use Closure;
 use Statamic\Support\Str;
 
 class FieldRepository
 {
     protected $fieldsets;
+    protected $computedDefaultCallbacks = [];
 
     public function __construct(FieldsetRepository $fieldsets)
     {
@@ -27,5 +29,19 @@ class FieldRepository
         }
 
         return $fieldset->field($handle);
+    }
+
+    public function computedDefault(string $key, Closure $callback): void
+    {
+        $this->computedDefaultCallbacks[$key] = $callback;
+    }
+
+    public function resolveComputedDefault(string $key, mixed $payload = null): mixed
+    {
+        if (! array_key_exists($key, $this->computedDefaultCallbacks)) {
+            throw new \RuntimeException("No computed default registered for key [{$key}].");
+        }
+
+        return $this->computedDefaultCallbacks[$key]();
     }
 }

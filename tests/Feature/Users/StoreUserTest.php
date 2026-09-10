@@ -35,6 +35,8 @@ class StoreUserTest extends TestCase
             ->actingAsWithElevatedSession($me)
             ->store()
             ->assertOk();
+
+        $this->assertFalse(User::findByEmail('test@domain.com')->isSuper());
     }
 
     #[Test]
@@ -47,5 +49,33 @@ class StoreUserTest extends TestCase
             ->actingAs($me)
             ->store()
             ->assertElevatedSessionRequiredJsonResponse();
+    }
+
+    #[Test]
+    public function super_users_can_create_a_super_user()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'create users']]);
+        $me = tap(User::make()->email('admin@domain.com')->assignRole('test')->makeSuper())->save();
+
+        $this
+            ->actingAsWithElevatedSession($me)
+            ->store(['super' => true])
+            ->assertOk();
+
+        $this->assertTrue(User::findByEmail('test@domain.com')->isSuper());
+    }
+
+    #[Test]
+    public function non_super_users_cannot_create_a_super_user()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'create users']]);
+        $me = tap(User::make()->email('admin@domain.com')->assignRole('test'))->save();
+
+        $this
+            ->actingAsWithElevatedSession($me)
+            ->store(['super' => true])
+            ->assertOk();
+
+        $this->assertFalse(User::findByEmail('test@domain.com')->isSuper());
     }
 }

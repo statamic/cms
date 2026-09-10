@@ -9,6 +9,8 @@ use Statamic\Http\Resources\CP\Concerns\HasRequestedColumns;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
 
+use function Statamic\trans as __;
+
 class Users extends ResourceCollection
 {
     use HasRequestedColumns;

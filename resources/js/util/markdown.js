@@ -15,6 +15,7 @@ export default function (markdown, options = {}) {
     }
 
     return DOMPurify.sanitize(
-        marked.parse(markdown, { renderer })
+        marked.parse(markdown, { renderer }),
+        { ADD_ATTR: ['target'] }
     );
 }

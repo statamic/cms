@@ -44,6 +44,7 @@ class BasicStoreTest extends TestCase
     public function items_are_different_instances_every_time()
     {
         config(['cache.default' => 'file']); // Doesn't work when they're arrays since the object is stored in memory.
+        config()->set('cache.serializable_classes', [TestBasicStoreItem::class]);
         \Illuminate\Support\Facades\Cache::clear();
 
         file_put_contents($this->tempDir.'/foo.yaml', '');

@@ -12,10 +12,13 @@ use Statamic\Fields\ConfigFields;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
+use Tests\FakesViews;
 use Tests\TestCase;
 
 class FieldtypeTest extends TestCase
 {
+    use FakesViews;
+
     #[Test]
     public function it_gets_the_field()
     {
@@ -310,6 +313,229 @@ class FieldtypeTest extends TestCase
     }
 
     #[Test]
+    public function it_appends_config_sections_to_linear_fieldtypes()
+    {
+        $fieldtype = new class extends Fieldtype
+        {
+            protected $configFields = [
+                'foo' => ['type' => 'textarea'],
+                'max_items' => ['type' => 'integer'],
+            ];
+        };
+
+        $fieldtype::appendConfigFields([
+            [
+                'display' => 'Extra section',
+                'fields' => [
+                    'more_options' => ['type' => 'array'],
+                    'extra_html_class' => ['type' => 'textarea'],
+                ],
+            ],
+        ]);
+
+        $this->assertEquals([
+            [
+                'fields' => [
+                    ['handle' => 'foo', 'field' => ['type' => 'textarea']],
+                    ['handle' => 'max_items', 'field' => ['type' => 'integer']],
+                ],
+            ],
+            [
+                'display' => 'Extra section',
+                'fields' => [
+                    ['handle' => 'more_options', 'field' => ['type' => 'array']],
+                    ['handle' => 'extra_html_class', 'field' => ['type' => 'textarea']],
+                ],
+            ],
+        ], $fieldtype->configBlueprint()->contents()['tabs']['main']['sections']);
+
+        $this->assertEquals([
+            'foo' => 'textarea',
+            'max_items' => 'integer',
+            'more_options' => 'array',
+            'extra_html_class' => 'textarea',
+        ], $fieldtype->configFields()->all()->map(fn ($field) => $field->type())->all());
+    }
+
+    #[Test]
+    public function it_appends_multiple_config_sections()
+    {
+        $fieldtype = new class extends Fieldtype
+        {
+            protected $configFields = [
+                'foo' => ['type' => 'textarea'],
+                'max_items' => ['type' => 'integer'],
+            ];
+        };
+
+        $fieldtype::appendConfigFields([
+            [
+                'display' => 'Extra section',
+                'fields' => [
+                    'more_options' => ['type' => 'array'],
+                ],
+            ],
+            [
+                'display' => 'New extra section',
+                'fields' => [
+                    'extra_html_class' => ['type' => 'textarea'],
+                ],
+            ],
+        ]);
+
+        $this->assertEquals([
+            [
+                'fields' => [
+                    ['handle' => 'foo', 'field' => ['type' => 'textarea']],
+                    ['handle' => 'max_items', 'field' => ['type' => 'integer']],
+                ],
+            ],
+            [
+                'display' => 'Extra section',
+                'fields' => [
+                    ['handle' => 'more_options', 'field' => ['type' => 'array']],
+                ],
+            ],
+            [
+                'display' => 'New extra section',
+                'fields' => [
+                    ['handle' => 'extra_html_class', 'field' => ['type' => 'textarea']],
+                ],
+            ],
+        ], $fieldtype->configBlueprint()->contents()['tabs']['main']['sections']);
+
+        $this->assertEquals([
+            'foo' => 'textarea',
+            'max_items' => 'integer',
+            'more_options' => 'array',
+            'extra_html_class' => 'textarea',
+        ], $fieldtype->configFields()->all()->map(fn ($field) => $field->type())->all());
+    }
+
+    #[Test]
+    public function it_appends_config_sections_to_sectioned_fieldtypes()
+    {
+        $fieldtype = new class extends Fieldtype
+        {
+            protected $configFields = [
+                [
+                    'display' => 'Main',
+                    'fields' => [
+                        'foo' => ['type' => 'textarea'],
+                    ],
+                ],
+                [
+                    'display' => 'More',
+                    'fields' => [
+                        'max_items' => ['type' => 'integer'],
+                    ],
+                ],
+            ];
+        };
+
+        $fieldtype::appendConfigFields([
+            [
+                'display' => 'Extra section',
+                'fields' => [
+                    'more_options' => ['type' => 'array'],
+                ],
+            ],
+        ]);
+
+        $this->assertEquals([
+            [
+                'display' => 'Main',
+                'fields' => [
+                    ['handle' => 'foo', 'field' => ['type' => 'textarea']],
+                ],
+            ],
+            [
+                'display' => 'More',
+                'fields' => [
+                    ['handle' => 'max_items', 'field' => ['type' => 'integer']],
+                ],
+            ],
+            [
+                'display' => 'Extra section',
+                'fields' => [
+                    ['handle' => 'more_options', 'field' => ['type' => 'array']],
+                ],
+            ],
+        ], $fieldtype->configBlueprint()->contents()['tabs']['main']['sections']);
+    }
+
+    #[Test]
+    public function it_appends_fields_and_sections_together()
+    {
+        $fieldtype = new class extends Fieldtype
+        {
+            protected $configFields = [
+                'foo' => ['type' => 'textarea'],
+            ];
+        };
+
+        $fieldtype::appendConfigFields([
+            'group' => ['type' => 'text'],
+            [
+                'display' => 'Extra section',
+                'fields' => [
+                    'more_options' => ['type' => 'array'],
+                ],
+            ],
+        ]);
+
+        $this->assertEquals([
+            [
+                'fields' => [
+                    ['handle' => 'foo', 'field' => ['type' => 'textarea']],
+                    ['handle' => 'group', 'field' => ['type' => 'text']],
+                ],
+            ],
+            [
+                'display' => 'Extra section',
+                'fields' => [
+                    ['handle' => 'more_options', 'field' => ['type' => 'array']],
+                ],
+            ],
+        ], $fieldtype->configBlueprint()->contents()['tabs']['main']['sections']);
+    }
+
+    #[Test]
+    public function appending_a_grid_config_field_is_not_treated_as_a_section()
+    {
+        $grid = [
+            'type' => 'grid',
+            'display' => 'Columns',
+            'fields' => [
+                ['handle' => 'label', 'field' => ['type' => 'text']],
+            ],
+        ];
+
+        $fieldtype = new class extends Fieldtype
+        {
+            protected $configFields = [
+                'foo' => ['type' => 'textarea'],
+            ];
+        };
+
+        $fieldtype::appendConfigFields([
+            'columns' => $grid,
+        ]);
+
+        $this->assertEquals([
+            [
+                'fields' => [
+                    ['handle' => 'foo', 'field' => ['type' => 'textarea']],
+                    ['handle' => 'columns', 'field' => $grid],
+                ],
+            ],
+        ], $fieldtype->configBlueprint()->contents()['tabs']['main']['sections']);
+
+        $this->assertEquals('grid', $fieldtype->configFields()->get('columns')->type());
+        $this->assertNull($fieldtype->configFields()->get('label'));
+    }
+
+    #[Test]
     public function it_wont_override_previously_appended_config_fields()
     {
         TestAppendConfigFields::appendConfigFields([
@@ -566,6 +792,120 @@ class FieldtypeTest extends TestCase
         $this->assertTrue($fieldtype->selectableInForms());
         $this->assertTrue(FieldtypeRepository::hasBeenMadeSelectableInForms('test-selectable'));
         $this->assertTrue(FieldtypeRepository::selectableInFormIsOverriden('test-selectable'));
+    }
+
+    #[Test]
+    public function form_view_returns_the_package_view_for_the_handle()
+    {
+        config(['statamic.templates.language' => 'antlers']);
+
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('statamic::forms.antlers.fields.text', '');
+
+        $fieldtype = new class extends Fieldtype
+        {
+            protected static $handle = 'text';
+        };
+
+        $this->assertEquals('statamic::forms.antlers.fields.text', $fieldtype->view());
+    }
+
+    #[Test]
+    public function form_view_returns_the_blade_package_view_when_language_is_blade()
+    {
+        config(['statamic.templates.language' => 'blade']);
+
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('statamic::forms.blade.fields.text', '', 'blade.php');
+
+        $fieldtype = new class extends Fieldtype
+        {
+            protected static $handle = 'text';
+        };
+
+        $this->assertEquals('statamic::forms.blade.fields.text', $fieldtype->view());
+    }
+
+    #[Test]
+    public function form_view_prefers_a_legacy_published_view_over_the_package_view()
+    {
+        config(['statamic.templates.language' => 'antlers']);
+
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('statamic::forms.fields.text', '');
+        $this->viewShouldReturnRaw('statamic::forms.antlers.fields.text', '');
+
+        $fieldtype = new class extends Fieldtype
+        {
+            protected static $handle = 'text';
+        };
+
+        $this->assertEquals('statamic::forms.fields.text', $fieldtype->view());
+    }
+
+    #[Test]
+    public function form_view_falls_back_to_the_package_default_when_no_handle_view_exists()
+    {
+        config(['statamic.templates.language' => 'antlers']);
+
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('statamic::forms.antlers.fields.default', '');
+
+        $fieldtype = new class extends Fieldtype
+        {
+            protected static $handle = 'unknown';
+        };
+
+        $this->assertEquals('statamic::forms.antlers.fields.default', $fieldtype->view());
+    }
+
+    #[Test]
+    public function form_view_falls_back_to_the_blade_default_when_no_handle_view_exists_and_language_is_blade()
+    {
+        config(['statamic.templates.language' => 'blade']);
+
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('statamic::forms.blade.fields.default', '', 'blade.php');
+
+        $fieldtype = new class extends Fieldtype
+        {
+            protected static $handle = 'unknown';
+        };
+
+        $this->assertEquals('statamic::forms.blade.fields.default', $fieldtype->view());
+    }
+
+    #[Test]
+    public function form_view_uses_a_legacy_published_default_view_when_no_handle_view_exists()
+    {
+        config(['statamic.templates.language' => 'antlers']);
+
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('statamic::forms.fields.default', '');
+
+        $fieldtype = new class extends Fieldtype
+        {
+            protected static $handle = 'unknown';
+        };
+
+        $this->assertEquals('statamic::forms.fields.default', $fieldtype->view());
+    }
+
+    #[Test]
+    public function form_view_prefers_a_legacy_published_default_over_the_package_default()
+    {
+        config(['statamic.templates.language' => 'antlers']);
+
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('statamic::forms.fields.default', '');
+        $this->viewShouldReturnRaw('statamic::forms.antlers.fields.default', '');
+
+        $fieldtype = new class extends Fieldtype
+        {
+            protected static $handle = 'unknown';
+        };
+
+        $this->assertEquals('statamic::forms.fields.default', $fieldtype->view());
     }
 
     #[Test]

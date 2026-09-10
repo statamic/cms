@@ -14,6 +14,8 @@ class EntryRevisionsController extends CpController
 
     public function index(Request $request, $collection, $entry)
     {
+        $this->authorize('view', $entry);
+
         $revisions = $entry
             ->revisions()
             ->reverse()
@@ -41,6 +43,8 @@ class EntryRevisionsController extends CpController
 
     public function store(Request $request, $collection, $entry)
     {
+        $this->authorize('edit', $entry);
+
         $entry->createRevision([
             'message' => $request->message,
             'user' => User::fromUser($request->user()),
@@ -51,6 +55,8 @@ class EntryRevisionsController extends CpController
 
     public function show(Request $request, $collection, $entry, $revision)
     {
+        $this->authorize('view', $entry);
+
         $entry = $entry->makeFromRevision($revision);
 
         // TODO: Most of this is duplicated with EntriesController@edit. DRY it off.
@@ -77,7 +83,7 @@ class EntryRevisionsController extends CpController
             'readOnly' => true,
             'published' => $entry->published(),
             'locale' => $entry->locale(),
-            'localizations' => $entry->collection()->sites()->map(function ($handle) use ($entry) {
+            'localizations' => $this->getAuthorizedSitesForCollection($entry->collection())->map(function ($handle) use ($entry) {
                 $localized = $entry->in($handle);
                 $exists = $localized !== null;
 
@@ -113,5 +119,12 @@ class EntryRevisionsController extends CpController
             'title' => $collection->title(),
             'url' => cp_route('collections.show', $collection->handle()),
         ];
+    }
+
+    private function getAuthorizedSitesForCollection($collection)
+    {
+        return $collection
+            ->sites()
+            ->filter(fn ($handle) => User::current()->can('view', Site::get($handle)));
     }
 }

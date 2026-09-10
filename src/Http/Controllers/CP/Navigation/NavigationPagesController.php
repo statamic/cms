@@ -8,6 +8,8 @@ use Statamic\Fields\Blueprint;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Structures\Page;
 
+use function Statamic\trans as __;
+
 class NavigationPagesController extends CpController
 {
     /**
@@ -18,6 +20,8 @@ class NavigationPagesController extends CpController
     {
         $nav = Nav::find($nav);
 
+        $this->authorize('view', $nav->in($request->site));
+
         $blueprint = $nav->blueprint();
 
         $page = (new Page)
@@ -27,6 +31,8 @@ class NavigationPagesController extends CpController
         [$values, $meta] = $this->extractValuesAndMeta($page, $blueprint);
 
         if ($entry = $page->entry()) {
+            $this->authorize('view', $entry);
+
             [$originValues, $originMeta] = $this->extractValuesAndMeta($entry, $entry->blueprint());
             $values = collect($originValues)->merge($values)->all();
         }
@@ -48,6 +54,8 @@ class NavigationPagesController extends CpController
     {
         $nav = Nav::find($nav);
 
+        $this->authorize('view', $nav->in($request->site));
+
         $blueprint = $nav->blueprint();
 
         $page = $nav->in($request->site)->find($page);
@@ -55,6 +63,8 @@ class NavigationPagesController extends CpController
         [$values, $meta, $extraValues] = $this->extractValuesAndMeta($page, $blueprint);
 
         if ($entry = $page->entry()) {
+            $this->authorize('view', $entry);
+
             [$originValues, $originMeta] = $this->extractValuesAndMeta($entry, $entry->blueprint());
             $values = collect($originValues)->merge($values)->all();
         }
@@ -144,6 +154,8 @@ class NavigationPagesController extends CpController
         $request->validate(['type' => 'required|in:url,entry']);
 
         $nav = Nav::find($nav);
+
+        $this->authorize('view', $nav);
 
         $blueprint = $this->ensureFields($nav->blueprint(), $request);
 

@@ -299,16 +299,36 @@ defineProps(['icons']);
                 </div>
             </section>
 
+            <section class="space-y-4">
+                <ui-heading size="lg">Button Sizes</ui-heading>
+                <div class="mb-4 flex flex-wrap gap-2 sm:gap-3 items-end">
+                    <ui-button text="Large" size="lg" />
+                    <ui-button text="Base" size="base" />
+                    <ui-button text="Small" size="sm" />
+                    <ui-button text="Extra Small" size="xs" />
+                    <ui-button text="2XS" size="2xs" />
+                </div>
+                <div class="mb-4 flex flex-wrap gap-2 sm:gap-3 items-end">
+                    <ui-button icon="save" size="lg" />
+                    <ui-button icon="save" size="base" />
+                    <ui-button icon="save" size="sm" />
+                    <ui-button icon="save" size="xs" />
+                    <ui-button icon="save" size="2xs" />
+                </div>
+            </section>
+
             <section class="mb-10 space-y-3">
                 <ui-heading size="lg">Alerts</ui-heading>
 
                 <Alert variant="default" text="This is a default alert message" />
+                <Alert variant="tip" text="This is a helpful tip" />
                 <Alert variant="warning" text="This is a warning alert message" />
                 <Alert variant="error" text="This is an error alert message" />
                 <Alert variant="success" text="This is a success alert message" />
                 <Alert variant="warning" icon="git" text="This alert has a custom icon" />
 
                 <Alert variant="default" heading="Alert Heading" text="This is a default alert message" />
+                <Alert variant="tip" heading="Alert Heading" text="This is a helpful tip" />
                 <Alert variant="warning" heading="Alert Heading" text="This is a warning alert message" />
                 <Alert variant="error" heading="Alert Heading" text="This is an error alert message" />
                 <Alert variant="success" heading="Alert Heading" text="This is a success alert message" />

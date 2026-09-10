@@ -87,7 +87,15 @@ class OrderedQueryBuilder implements Builder
 
     public function offset($value)
     {
-        $this->offset = max(0, $value);
+        $value = max(0, $value);
+
+        // Mirrors the overflow guard in Query\Builder::offset() - an out-of-range offset
+        // shouldn't reach Collection::skip() as a float.
+        if (is_float($value)) {
+            $value = $value >= PHP_INT_MAX ? PHP_INT_MAX : (int) $value;
+        }
+
+        $this->offset = $value;
 
         return $this;
     }

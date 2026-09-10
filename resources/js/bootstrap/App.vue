@@ -43,11 +43,23 @@ export default {
             }
         });
 
-        Statamic.$callbacks.add('bustAndReloadImageCaches', function (urls) {
-            urls.forEach(async (url) => {
+        Statamic.$callbacks.add('bustAndReloadImageCaches', async function (urls) {
+            for (const url of urls) {
+                if (!url) continue;
                 await fetch(url, { cache: 'reload', mode: 'no-cors' });
-                document.body.querySelectorAll(`img[src='${url}']`).forEach((img) => (img.src = url));
-            });
+                document.body.querySelectorAll(`img[src='${url}']`).forEach((img) => {
+                    img.removeAttribute('src');
+                    img.src = url;
+                });
+            }
+        });
+
+        Statamic.$callbacks.add('removeFromSelections', function (ids) {
+            Statamic.$events.$emit('removeFromSelections', ids);
+        });
+
+        Statamic.$callbacks.add('replaceInSelections', function (replacements) {
+            Statamic.$events.$emit('replaceInSelections', replacements);
         });
     },
 

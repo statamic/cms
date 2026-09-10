@@ -4,6 +4,8 @@ namespace Statamic\Actions;
 
 use Statamic\Contracts\Auth\User;
 
+use function Statamic\trans as __;
+
 class DisableTwoFactorAuthentication extends Action
 {
     protected $dangerous = true;

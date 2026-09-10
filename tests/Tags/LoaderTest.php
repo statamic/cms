@@ -25,7 +25,7 @@ class LoaderTest extends TestCase
             return $next($payload);
         });
 
-        $this->assertEquals('bar', (string) Antlers::parse('{{ test :variable="foo" }}', ['foo' => 'bar']));
+        $this->assertEquals('bar', (string) Antlers::parse('{{ test :variable="foo" }}', ['foo' => 'bar'], true));
         $this->assertEquals(['variable' => 'bar', 'alfa' => 'bravo'], $tag->params->all());
     }
 }

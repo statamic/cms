@@ -14,7 +14,7 @@ class IconTest extends TestCase
     #[Test]
     public function it_finds_default_icons()
     {
-        $result = (string) Antlers::parse('{{ svg src="{test|raw}" }}', ['test' => new Value('add-circle', $this->fieldtype())]);
+        $result = (string) Antlers::parse('{{ svg src="{test|raw}" }}', ['test' => new Value('add-circle', $this->fieldtype())], true);
 
         $this->assertStringContainsString('<svg', $result);
     }
@@ -22,9 +22,15 @@ class IconTest extends TestCase
     #[Test]
     public function it_accepts_svg_strings()
     {
-        $result = (string) Antlers::parse('{{ svg :src="test" class="w-4 h-4" sanitize="false" }}', ['test' => new Value('add-circle', $this->fieldtype())]);
+        $result = (string) Antlers::parse('{{ svg :src="test" class="w-4 h-4" sanitize="false" }}', ['test' => new Value('add-circle', $this->fieldtype())], true);
 
         $this->assertStringContainsString('<svg class="w-4 h-4"', $result);
+    }
+
+    #[Test]
+    public function it_augments_a_missing_icon_to_null()
+    {
+        $this->assertNull($this->fieldtype()->augment('this-icon-does-not-exist'));
     }
 
     private function fieldtype($config = [])

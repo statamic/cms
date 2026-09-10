@@ -42,6 +42,18 @@ class FlysystemAdapterTest extends TestCase
     }
 
     #[Test]
+    public function gets_fallback_if_file_doesnt_exist_on_a_disk_that_throws_exceptions()
+    {
+        $adapter = new FlysystemAdapter(Storage::build([
+            'driver' => 'local',
+            'root' => $this->tempDir,
+            'throw' => true,
+        ]));
+
+        $this->assertEquals('Hello World', $adapter->get('filename.txt', 'Hello World'));
+    }
+
+    #[Test]
     public function it_normalizes_relative_paths()
     {
         $this->assertEquals('bar.txt', $this->adapter->normalizePath('bar.txt'));

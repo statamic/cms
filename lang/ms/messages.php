@@ -187,6 +187,7 @@ return [
     'publish_actions_publish' => 'Perubahan pada salinan kerja akan digunakan pada penyertaan dan ia akan diterbitkan serta-merta.',
     'publish_actions_schedule' => 'Perubahan pada salinan kerja akan digunakan pada penyertaan dan ia akan dipaparkan pada tarikh yang dipilih.',
     'publish_actions_unpublish' => 'Semakan semasa akan dinyahterbitkan.',
+    'relationship_item_unavailable' => 'Item ini tidak tersedia. Ia mungkin telah dipadam, atau anda mungkin tidak mempunyai kebenaran untuk melihatnya.',
     'reset_password_notification_body' => 'Anda menerima e-mel ini kerana kami menerima permintaan tetapan semula kata laluan untuk akaun anda.',
     'reset_password_notification_no_action' => 'Jika anda tidak meminta tetapan semula kata laluan, tiada tindakan lanjut diperlukan.e menerima permintaan tetapan semula kata laluan untuk akaun anda.',
     'reset_password_notification_subject' => 'Tetapkan Semula Pemberitahuan Kata Laluan',

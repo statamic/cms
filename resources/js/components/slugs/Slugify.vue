@@ -89,7 +89,10 @@ export default {
                         this.slug = slug;
                         resolve(slug);
                     })
-                    .catch((error) => reject(error));
+                    .catch((error) => {
+                        if (error.name === 'CanceledError') return;
+                        reject(error);
+                    });
             });
         },
     },

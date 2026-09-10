@@ -69,6 +69,11 @@
     tbody {
         @apply text-sm shadow-sm-b rounded-xl outline-none;
 
+        > tr {
+            /* Localize row updates; layout-only so cell focus rings / shadows aren't clipped. */
+            contain: layout;
+        }
+
         tr {
             &:last-child {
                 @apply border-none;
@@ -160,6 +165,41 @@
 .data-table[data-has-selections] {
     tbody tr[data-row="selected"] td {
         @apply bg-gray-100 dark:bg-gray-925;
+    }
+}
+
+.widget-table {
+    @apply w-full max-w-full outline-hidden min-w-full overflow-x-auto text-start;
+
+    thead {
+        th {
+            @apply text-sm font-medium text-start;
+            @apply p-0.75;
+        }
+
+        th[data-column="date"],
+        th[data-column="datestamp"] {
+            @apply text-end;
+        }
+    }
+
+    tbody {
+        @apply text-sm;
+
+        tr {
+            td {
+                @apply p-0.75 text-sm;
+            }
+
+        }
+
+        .type-column {
+            @apply text-end;
+        }
+    }
+
+    .date-index-field {
+        @apply whitespace-nowrap;
     }
 }
 

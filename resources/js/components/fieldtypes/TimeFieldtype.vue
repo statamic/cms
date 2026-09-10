@@ -1,11 +1,13 @@
 <template>
-	<Button :text="__('Set Time')" icon="fieldtype-time" v-if="!isReadOnly && !hasTime" @click="addTime" />
+	<Button :text="__('Set Time')" icon="fieldtype-time" v-if="!isReadOnly && !config.disabled && !hasTime" @click="addTime" />
 
     <TimePicker
 	    v-if="hasTime"
         ref="time"
         :model-value="timePickerValue"
         :granularity="useSeconds ? 'second' : 'minute'"
+        :disabled="config.disabled"
+        :read-only="isReadOnly"
         @update:model-value="timePickerUpdated"
     />
 </template>

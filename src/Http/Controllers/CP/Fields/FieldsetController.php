@@ -112,9 +112,7 @@ class FieldsetController extends CpController
         $vue = [
             'title' => $fieldset->title(),
             'handle' => $fieldset->handle(),
-            'fields' => collect(Arr::get($fieldset->contents(), 'fields'))->map(function ($field, $i) {
-                return array_merge(FieldTransformer::toVue($field), ['_id' => $i]);
-            })->all(),
+            'sections' => $this->sectionsToVue($fieldset),
         ];
 
         return Inertia::render('fieldsets/Edit', [
@@ -130,15 +128,30 @@ class FieldsetController extends CpController
 
         $request->validate([
             'title' => 'required',
+            'sections' => 'array',
             'fields' => 'array',
         ]);
 
-        $fieldset->setContents(array_merge($fieldset->contents(), [
-            'title' => $request->title,
-            'fields' => collect($request->fields)->map(function ($field) {
-                return FieldTransformer::fromVue($field);
-            })->all(),
-        ]));
+        $base = array_merge(
+            Arr::except($fieldset->contents(), ['fields', 'sections']),
+            ['title' => $request->title],
+        );
+
+        if ($request->has('sections')) {
+            $sections = $this->sectionsFromVueRequest($request->sections);
+
+            $fieldset->setContents(
+                $this->shouldStoreAsFlatFields($sections)
+                    ? $base + ['fields' => Arr::get($sections, '0.fields', [])]
+                    : $base + ['sections' => $sections]
+            );
+        } else {
+            $fieldset->setContents($base + [
+                'fields' => collect($request->fields)
+                    ->map(fn ($field) => FieldTransformer::fromVue($field))
+                    ->all(),
+            ]);
+        }
 
         $fieldset->validateRecursion();
 
@@ -216,5 +229,59 @@ class FieldsetController extends CpController
         }
 
         return __('My Fieldsets');
+    }
+
+    private function sectionsFromVueRequest(array $sections): array
+    {
+        return collect($sections)->map(function ($section) {
+            return Arr::removeNullValues([
+                'display' => Arr::get($section, 'display'),
+                'instructions' => Arr::get($section, 'instructions'),
+                'collapsible' => ($collapsible = Arr::get($section, 'collapsible')) ?: null,
+                'collapsed' => ($collapsible && Arr::get($section, 'collapsed')) ?: null,
+                'fields' => collect(Arr::get($section, 'fields', []))
+                    ->map(fn ($field) => FieldTransformer::fromVue($field))
+                    ->all(),
+            ]);
+        })->all();
+    }
+
+    private function sectionsToVue(Fieldset $fieldset): array
+    {
+        $sections = $fieldset->hasSections()
+            ? Arr::get($fieldset->contents(), 'sections', [])
+            : [[
+                'display' => __('Fields'),
+                'fields' => Arr::get($fieldset->contents(), 'fields', []),
+            ]];
+
+        return collect($sections)->map(function ($section, $sectionIndex) {
+            return Arr::removeNullValues([
+                '_id' => "section-{$sectionIndex}",
+                'display' => Arr::get($section, 'display'),
+                'instructions' => Arr::get($section, 'instructions'),
+                'collapsible' => Arr::get($section, 'collapsible'),
+                'collapsed' => Arr::get($section, 'collapsed'),
+            ]) + [
+                'fields' => collect(Arr::get($section, 'fields', []))->map(function ($field, $fieldIndex) use ($sectionIndex) {
+                    return array_merge(FieldTransformer::toVue($field), ['_id' => "section-{$sectionIndex}-{$fieldIndex}"]);
+                })->all(),
+            ];
+        })->all();
+    }
+
+    private function shouldStoreAsFlatFields(array $sections): bool
+    {
+        if (count($sections) !== 1) {
+            return false;
+        }
+
+        $section = $sections[0];
+        $display = Arr::get($section, 'display');
+
+        return in_array($display, [null, '', __('Fields')], true)
+            && Arr::get($section, 'instructions') === null
+            && Arr::get($section, 'collapsible') !== true
+            && Arr::get($section, 'collapsed') !== true;
     }
 }

@@ -12,8 +12,12 @@ use Statamic\Contracts\View\Antlers\Parser;
 use Statamic\Facades\Compare;
 use Statamic\Support\Str;
 use Statamic\View\Antlers\Language\Parser\DocumentTransformer;
+use Statamic\View\Cascade;
 use Traversable;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class Value implements ArrayAccess, IteratorAggregate, JsonSerializable
 {
     private $resolver;
@@ -158,6 +162,10 @@ class Value implements ArrayAccess, IteratorAggregate, JsonSerializable
             }
 
             $value = (new DocumentTransformer())->correct($value);
+
+            if (isset($variables['config'])) {
+                $variables['config'] = Cascade::config();
+            }
 
             $parsed = $parser->parse($value, $variables);
 

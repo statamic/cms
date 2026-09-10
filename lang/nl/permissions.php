@@ -12,6 +12,8 @@ return [
     'configure_fields_desc' => 'De mogelijkheid om blueprints, fieldsets en andere velden te wijzigen.',
     'configure_addons' => 'Configureer add-ons',
     'configure_addons_desc' => 'Toegang tot addons, met de mogelijkheid om addons te installeren en te verwijderen.',
+    'edit_addon_settings' => 'Instellingen voor :addon',
+    'group_addons' => 'Add-ons',
     'manage_preferences' => 'Beheer Instellingen',
     'manage_preferences_desc' => 'Mogelijkheid om globale en rol specifieke voorkeuren aan te passen.',
     'group_sites' => 'Sites',

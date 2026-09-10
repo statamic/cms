@@ -6,6 +6,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\Blink;
 use Statamic\Stache\NullLockStore;
 use Statamic\Stache\Stache;
 use Statamic\Stache\Stores\ChildStore;
@@ -133,6 +134,22 @@ class StacheTest extends TestCase
     public function it_clears_its_cache()
     {
         $this->markTestIncomplete();
+    }
+
+    #[Test]
+    public function clearing_forgets_the_cached_collection_structure_trees()
+    {
+        Blink::put('collection-structure-tree-pages-en', 'cached');
+        Blink::put('collection-structure-tree-entries::pages::en', 'cached');
+        Blink::put('structure-pages-en-d751713988987e9331980363e24189ce', 'cached');
+        Blink::put('unrelated-cache', 'kept');
+
+        $this->stache->clear();
+
+        $this->assertFalse(Blink::has('collection-structure-tree-pages-en'));
+        $this->assertFalse(Blink::has('collection-structure-tree-entries::pages::en'));
+        $this->assertFalse(Blink::has('structure-pages-en-d751713988987e9331980363e24189ce'));
+        $this->assertTrue(Blink::has('unrelated-cache'));
     }
 
     #[Test]

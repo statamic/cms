@@ -27,6 +27,7 @@ let recentItems = ref(getRecentItems());
 let keyboardBindings = ref([]);
 
 Statamic.$keys.bindGlobal(['mod+k'], (e) => {
+    if (Statamic.$commandPalette.shouldPreventOpening()) return;
     e.preventDefault();
     open.value = true;
 });

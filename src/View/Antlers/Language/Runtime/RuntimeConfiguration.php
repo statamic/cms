@@ -85,6 +85,13 @@ class RuntimeConfiguration
     public $guardedContentTagPatterns = [];
 
     /**
+     * A list of all allowed content tag patterns.
+     *
+     * @var string[]
+     */
+    public $allowedContentTagPatterns = [];
+
+    /**
      * A list of all invalid modifier patterns.
      *
      * @var string[]
@@ -97,6 +104,13 @@ class RuntimeConfiguration
      * @var string[]
      */
     public $guardedContentModifiers = [];
+
+    /**
+     * A list of all allowed content modifier patterns.
+     *
+     * @var string[]
+     */
+    public $allowedContentModifiers = [];
 
     /**
      * Indicates if PHP Code should be evaluated in user content.

@@ -1,6 +1,6 @@
 <script setup>
 import CodeMirror from 'codemirror';
-import { computed, markRaw, nextTick, onMounted, ref, useAttrs, useTemplateRef, watch } from 'vue';
+import { computed, markRaw, nextTick, onBeforeUnmount, onMounted, ref, useAttrs, useTemplateRef, watch } from 'vue';
 import Select from './Select/Select.vue';
 import { colorMode as colorModeApi } from '@api';
 
@@ -51,7 +51,7 @@ const props = defineProps({
     lineNumbers: { type: Boolean, default: true },
     /** When `true`, long lines will wrap */
     lineWrapping: { type: Boolean, default: true },
-    /** The syntax highlighting mode. Options: `clike`, `css`, `diff`, `go`, `haml`, `handlebars`, `htmlmixed`, `less`, `markdown`, `gfm`, `nginx`, `text/x-java`, `javascript`, `jsx`, `text/x-objectivec`, `php`, `python`, `ruby`, `scss`, `shell`, `sql`, `twig`, `vue`, `xml`, `yaml-frontmatter` */
+    /** The syntax highlighting mode. Options: `clike`, `css`, `diff`, `go`, `haml`, `handlebars`, `htmlmixed`, `less`, `markdown`, `gfm`, `nginx`, `text/x-java`, `javascript`, `application/json`, `application/ld+json`, `jsx`, `text/x-objectivec`, `php`, `python`, `ruby`, `scss`, `shell`, `sql`, `twig`, `vue`, `xml`, `yaml-frontmatter` */
     mode: { type: String, default: 'javascript' },
     /** The controlled value of the code editor */
     modelValue: { type: String, default: '' },
@@ -82,6 +82,8 @@ const modes = ref([
     { value: 'nginx', label: 'Nginx' },
     { value: 'text/x-java', label: 'Java' },
     { value: 'javascript', label: 'JavaScript' },
+    { value: 'application/json', label: 'JSON' },
+    { value: 'application/ld+json', label: 'JSON-LD' },
     { value: 'jsx', label: 'JSX' },
     { value: 'text/x-objectivec', label: 'Objective-C' },
     { value: 'php', label: 'PHP' },
@@ -99,6 +101,7 @@ const modes = ref([
 const codemirror = ref(null);
 const codemirrorElement = useTemplateRef('codemirrorElement');
 const fullScreenMode = ref(false);
+const visibilityObserver = ref(null);
 
 defineOptions({
     inheritAttrs: false,
@@ -110,7 +113,19 @@ defineExpose({
 });
 
 onMounted(() => {
-    nextTick(() => initCodeMirror());
+    nextTick(() => {
+        initCodeMirror();
+        initVisibilityObserver();
+    });
+});
+
+onBeforeUnmount(() => {
+    visibilityObserver.value?.disconnect();
+
+    if (codemirror.value) {
+        codemirror.value.getWrapperElement().remove();
+        codemirror.value = null;
+    }
 });
 
 function initCodeMirror() {
@@ -147,6 +162,21 @@ function initCodeMirror() {
             codemirror.value.getInputField().blur();
         }
     });
+}
+
+function initVisibilityObserver() {
+    visibilityObserver.value = new IntersectionObserver(
+        (entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    codemirror.value?.refresh();
+                }
+            });
+        },
+        { threshold: 0.01 },
+    );
+
+    visibilityObserver.value.observe(codemirrorElement.value);
 }
 
 watch(
@@ -260,6 +290,7 @@ watch(
                     v-if="allowModeSelection"
                     :options="modes"
                     :disabled="disabled"
+                    :adaptive-width="true"
                     :model-value="mode"
                     @update:modelValue="$emit('update:mode', $event)"
                 />
@@ -277,6 +308,7 @@ watch(
                         v-if="allowModeSelection"
                         :options="modes"
                         :disabled="disabled"
+                        :adaptive-width="true"
                         :model-value="mode"
                         searchable
                         @update:modelValue="$emit('update:mode', $event)"

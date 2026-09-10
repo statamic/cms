@@ -15,6 +15,8 @@ defineEmits(['update:modelValue']);
         :options="sites"
         option-label="name"
         option-value="handle"
+        align="end"
+        :adaptive-width="true"
         :model-value="modelValue"
         @update:model-value="$emit('update:modelValue', $event)"
     />

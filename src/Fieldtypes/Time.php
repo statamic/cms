@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Date;
 use Statamic\Fields\Fieldtype;
 use Statamic\Rules\TimeFieldtype as ValidationRule;
 
+use function Statamic\trans as __;
+
 class Time extends Fieldtype
 {
     protected $categories = ['special'];

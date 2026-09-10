@@ -22,7 +22,7 @@ class UserTagsTest extends TestCase
 
     private function tag($tag, $params = [])
     {
-        return Parse::template($tag, $params);
+        return Parse::template($tag, $params, trusted: true);
     }
 
     #[Test]

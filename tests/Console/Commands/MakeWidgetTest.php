@@ -111,7 +111,7 @@ PHP
             ->artisan('statamic:make:widget', ['name' => 'Sloth'])
             ->expectsQuestion("It doesn't look like Vite is setup for the Control Panel. Would you like to run `php please setup-cp-vite`?", true);
 
-        Process::assertRan('npm install');
+        Process::assertRan('npm install --ignore-scripts');
 
         $this->assertFileExists($widget);
         $this->assertStringContainsString('namespace App\Widgets;', $this->files->get($widget));

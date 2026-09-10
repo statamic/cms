@@ -8,6 +8,8 @@ use Statamic\Contracts\Entries\Collection as CollectionContract;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\View\Scaffolding\TemplateGenerator;
 
+use function Statamic\trans as __;
+
 class ScaffoldCollectionController extends CpController
 {
     public function index($collection)

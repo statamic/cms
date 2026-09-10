@@ -25,6 +25,9 @@ use Statamic\Facades\UserGroup as UserGroupAPI;
 use Statamic\Facades\Utility;
 use Statamic\Statamic;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class CoreNav
 {
     /**

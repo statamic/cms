@@ -5,6 +5,7 @@ namespace Statamic\Fieldtypes;
 use Statamic\CP\Column;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Nav;
+use Statamic\Facades\User;
 use Statamic\GraphQL\Types\NavType;
 
 class Navs extends Relationship
@@ -15,6 +16,11 @@ class Navs extends Relationship
     protected $canSearch = false;
     protected $statusIcons = false;
     protected $icon = 'fieldtype-structures';
+
+    protected function authorizeItemData($id): bool
+    {
+        return $this->authorizeViewable(Nav::findByHandle($id));
+    }
 
     protected function toItemArray($id, $site = null)
     {
@@ -30,12 +36,15 @@ class Navs extends Relationship
 
     public function getIndexItems($request)
     {
-        return Nav::all()->sortBy('title')->map(function ($nav) {
-            return [
-                'id' => $nav->handle(),
-                'title' => $nav->title(),
-            ];
-        })->values();
+        return Nav::all()
+            ->filter(fn ($nav) => User::current()->can('view', $nav))
+            ->sortBy('title')
+            ->map(function ($nav) {
+                return [
+                    'id' => $nav->handle(),
+                    'title' => $nav->title(),
+                ];
+            })->values();
     }
 
     protected function getColumns()

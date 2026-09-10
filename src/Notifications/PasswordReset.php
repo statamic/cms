@@ -7,6 +7,8 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Statamic\Auth\Passwords\PasswordReset as PasswordResetManager;
 
+use function Statamic\trans as __;
+
 class PasswordReset extends Notification
 {
     use Queueable;

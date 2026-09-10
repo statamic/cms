@@ -175,7 +175,7 @@ abstract class EloquentQueryBuilder implements Builder
 
         if ($operator !== null && strtolower($operator) == 'like') {
             $grammar = $this->builder->getConnection()->getQueryGrammar();
-            $this->builder->whereRaw('LOWER('.$grammar->wrap($this->column($column)).') LIKE ?', strtolower($value), $boolean);
+            $this->builder->whereRaw('LOWER('.$grammar->wrap($this->column($column)).') LIKE ?', mb_strtolower($value), $boolean);
 
             return $this;
         }

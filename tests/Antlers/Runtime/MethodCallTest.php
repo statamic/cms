@@ -33,10 +33,10 @@ class MethodCallTest extends ParserTestCase
 
         $this->assertSame('Value: hello', $this->renderString('{{ object:method("hello"):methodTwo() }}', [
             'object' => $object,
-        ]));
+        ], false, true));
         $this->assertSame('String: hello', $this->renderString('{{ object:method("hello") }}', [
             'object' => $object,
-        ]));
+        ], false, true));
     }
 
     public function test_chained_methods_colon_syntax()
@@ -45,7 +45,7 @@ class MethodCallTest extends ParserTestCase
 
         $this->assertSame('Value: hello', $this->renderString('{{ object:method("hello"):methodTwo() }}', [
             'object' => $object,
-        ]));
+        ], false, true));
     }
 
     public function test_chained_methods_dot_syntax()
@@ -54,7 +54,7 @@ class MethodCallTest extends ParserTestCase
 
         $this->assertSame('Value: hello', $this->renderString('{{ object.method("hello").methodTwo() }}', [
             'object' => $object,
-        ]));
+        ], false, true));
     }
 
     public function test_chained_methods_mixed_syntax()
@@ -63,7 +63,7 @@ class MethodCallTest extends ParserTestCase
 
         $this->assertSame('Value: hello', $this->renderString('{{ object:method("hello").methodTwo() }}', [
             'object' => $object,
-        ]));
+        ], false, true));
     }
 
     public function test_method_calls_can_be_used_within_conditions_without_explicit_logic_groups()
@@ -78,7 +78,7 @@ class MethodCallTest extends ParserTestCase
 {{ if title && title:length() < 15 }}Yes{{ else }}No{{ endif }}
 EOT;
 
-        $this->assertSame('Yes', $this->renderString($template, $data));
+        $this->assertSame('Yes', $this->renderString($template, $data, false, true));
     }
 
     public function test_method_calls_can_be_used_within_conditions_without_explicit_logic_groups_dot_syntax()
@@ -93,7 +93,7 @@ EOT;
 {{ if title && title.length() < 15 }}Yes{{ else }}No{{ endif }}
 EOT;
 
-        $this->assertSame('Yes', $this->renderString($template, $data));
+        $this->assertSame('Yes', $this->renderString($template, $data, false, true));
     }
 
     public function test_method_calls_can_be_used_within_conditions_without_explicit_logic_groups_arrow_syntax()
@@ -108,7 +108,7 @@ EOT;
 {{ if title && title->length() < 15 }}Yes{{ else }}No{{ endif }}
 EOT;
 
-        $this->assertSame('Yes', $this->renderString($template, $data));
+        $this->assertSame('Yes', $this->renderString($template, $data, false, true));
     }
 
     public function test_method_calls_can_be_used_within_conditions_without_explicit_logic_groups_arrow_syntax_with_strict_var()
@@ -123,7 +123,7 @@ EOT;
 {{ if title && $title->length() < 15 }}Yes{{ else }}No{{ endif }}
 EOT;
 
-        $this->assertSame('Yes', $this->renderString($template, $data));
+        $this->assertSame('Yes', $this->renderString($template, $data, false, true));
     }
 
     public function test_method_calls_can_have_modifiers_applied()
@@ -234,7 +234,7 @@ EOT;
 2012-11-05 00:00:00
 EOT;
 
-        $this->assertSame($expected, trim($this->renderString($template, $data, true)));
+        $this->assertSame($expected, trim($this->renderString($template, $data, true, true)));
     }
 
     public function test_method_calls_not_get_called_more_than_declared()
@@ -245,7 +245,7 @@ EOT;
 {{ counter:increment():increment():increment() }}
 EOT;
 
-        $this->assertSame('Count: 3', $this->renderString($template, ['counter' => $counter]));
+        $this->assertSame('Count: 3', $this->renderString($template, ['counter' => $counter], false, true));
     }
 
     public function test_dangling_chained_method_calls()
@@ -257,7 +257,7 @@ EOT;
             toAtomString()
 }}
 ANTLERS;
-        $result = $this->renderString($template, ['datetime' => new TestDateTime]);
+        $result = $this->renderString($template, ['datetime' => new TestDateTime], false, true);
 
         $this->assertSame('2001-10-22T00:00:00+00:00', $result);
     }
@@ -281,7 +281,7 @@ ANTLERS;
         $result = $this->renderString('{{ text_field }}', [
             'text_field' => $value,
             'object' => $object,
-        ]);
+        ], false, true);
 
         $this->assertSame('', $result);
     }
@@ -303,7 +303,7 @@ ANTLERS;
         $result = $this->renderString('{{ text_field }}', [
             'text_field' => $value,
             'object' => $object,
-        ]);
+        ], false, true);
 
         $this->assertSame('String: hello', $result);
 
@@ -329,7 +329,7 @@ ANTLERS;
         $this->renderString('{{ text_field }}', [
             'text_field' => $value,
             'object' => $object,
-        ]);
+        ], false, true);
 
         GlobalRuntimeState::$throwErrorOnAccessViolation = false;
     }
@@ -340,7 +340,61 @@ ANTLERS;
 
         $this->assertSame('String: hello', $this->renderString('{{ object:method("hello") }}', [
             'object' => $object,
-        ]));
+        ], false, true));
+    }
+
+    public function test_implicit_method_calls_blocked_in_user_content()
+    {
+        $counter = new CallCounter();
+
+        // Resolving a variable path to a zero-argument method is still a method
+        // call, so it honors the same setting as the explicit `:method()` syntax.
+        $this->assertSame('', $this->renderUserContent('{{ counter.increment }}', ['counter' => $counter]));
+        $this->assertSame('', $this->renderUserContent('{{ counter:increment }}', ['counter' => $counter]));
+
+        // Str::camel() maps a snake_case path onto a camelCase method.
+        $this->assertSame('', $this->renderUserContent('{{ counter.increment_twice }}', ['counter' => $counter]));
+
+        $this->assertSame('Count: 0', (string) $counter);
+    }
+
+    public function test_implicit_method_calls_allowed_in_user_content_when_configured()
+    {
+        GlobalRuntimeState::$allowMethodsInContent = true;
+
+        $object = new StringLengthObject('Hello');
+
+        $this->assertSame('5', $this->renderUserContent('{{ object.length }}', ['object' => $object]));
+
+        GlobalRuntimeState::$allowMethodsInContent = false;
+    }
+
+    public function test_implicit_method_calls_still_work_in_templates()
+    {
+        $object = new StringLengthObject('Hello');
+
+        $this->assertSame('5', $this->renderString('{{ object.length }}', [
+            'object' => $object,
+        ], false, true));
+
+        $this->assertSame('5', $this->renderString('{{ object:length }}', [
+            'object' => $object,
+        ], false, true));
+    }
+
+    private function renderUserContent($content, $data)
+    {
+        $textFieldtype = new Text();
+        $field = new Field('text_field', [
+            'type' => 'text',
+            'antlers' => true,
+        ]);
+
+        $textFieldtype->setField($field);
+
+        return $this->renderString('{{ text_field }}', array_merge($data, [
+            'text_field' => new Value($content, 'text_field', $textFieldtype),
+        ]), false, true);
     }
 
     public function test_nested_value_does_not_reset_user_data_flag()
@@ -372,7 +426,7 @@ ANTLERS;
             'outer_field' => $outerValue,
             'nested_field' => $nestedValue,
             'object' => $object,
-        ]);
+        ], false, true);
 
         $this->assertSame('Hello', $result);
     }

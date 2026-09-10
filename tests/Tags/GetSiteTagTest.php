@@ -24,12 +24,12 @@ class GetSiteTagTest extends TestCase
     {
         $this->assertEquals(
             'English',
-            Antlers::parse('{{ get_site handle="english" }}{{ name }}{{ /get_site }}')
+            Antlers::parse('{{ get_site handle="english" }}{{ name }}{{ /get_site }}', [], true)
         );
 
         $this->assertEquals(
             'French',
-            Antlers::parse('{{ get_site:french }}{{ name }}{{ /get_site:french }}')
+            Antlers::parse('{{ get_site:french }}{{ name }}{{ /get_site:french }}', [], true)
         );
     }
 
@@ -38,7 +38,7 @@ class GetSiteTagTest extends TestCase
     {
         $this->assertEquals(
             'en_US',
-            Antlers::parse('{{ get_site:english:locale }}')
+            Antlers::parse('{{ get_site:english:locale }}', [], true)
         );
     }
 
@@ -47,7 +47,7 @@ class GetSiteTagTest extends TestCase
     {
         $this->expectExceptionMessage('A site handle is required.');
 
-        Antlers::parse('{{ get_site }}{{ name }}{{ /get_site }}');
+        Antlers::parse('{{ get_site }}{{ name }}{{ /get_site }}', [], true);
     }
 
     #[Test]
@@ -55,6 +55,6 @@ class GetSiteTagTest extends TestCase
     {
         $this->expectExceptionMessage('Site [nonexistent] does not exist.');
 
-        Antlers::parse('{{ get_site handle="nonexistent" }}{{ name }}{{ /get_site }}');
+        Antlers::parse('{{ get_site handle="nonexistent" }}{{ name }}{{ /get_site }}', [], true);
     }
 }

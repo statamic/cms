@@ -10,6 +10,8 @@ use Statamic\Facades\Blueprint;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Rules\Handle;
 
+use function Statamic\trans as __;
+
 class AssetContainersController extends CpController
 {
     public function show($container)
@@ -186,6 +188,7 @@ class AssetContainersController extends CpController
                         'type' => 'taggable',
                         'display' => __('Validation Rules'),
                         'instructions' => __('statamic::messages.asset_container_validation_rules_instructions'),
+                        'paste_delimiter' => '|',
                     ],
                 ],
             ],
@@ -257,7 +260,7 @@ class AssetContainersController extends CpController
 
         $params = collect($params)
             ->map(function ($value, $param) {
-                return sprintf('<code class="hidden-outside">%s: %s</code>', $param, $value);
+                return sprintf('<code class="hidden-outside me-1.5 rounded-xs">%s:&hairsp;%s</code>', $param, $value);
             })
             ->implode(' ');
 

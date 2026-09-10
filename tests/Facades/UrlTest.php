@@ -176,6 +176,38 @@ class UrlTest extends TestCase
     }
 
     #[Test]
+    public function it_removes_site_url_when_site_is_configured_with_a_subpath()
+    {
+        $this->setSiteValue('en', 'url', 'http://absolute-url-resolved-from-request.com/path/');
+
+        $this->assertEquals('/', URL::removeSiteUrl('http://absolute-url-resolved-from-request.com/path'));
+        $this->assertEquals('/', URL::removeSiteUrl('http://absolute-url-resolved-from-request.com/path/'));
+        $this->assertEquals('/foo', URL::removeSiteUrl('http://absolute-url-resolved-from-request.com/path/foo'));
+        $this->assertEquals('/foo/bar', URL::removeSiteUrl('http://absolute-url-resolved-from-request.com/path/foo/bar'));
+
+        $this->assertEquals('/', URL::removeSiteUrl('/path'));
+        $this->assertEquals('/', URL::removeSiteUrl('/path/'));
+        $this->assertEquals('/foo', URL::removeSiteUrl('/path/foo'));
+        $this->assertEquals('/foo/bar', URL::removeSiteUrl('/path/foo/bar'));
+
+        $this->assertEquals('http://external-site.com/foo/', URL::removeSiteUrl('http://external-site.com/foo/'));
+
+        URL::enforceTrailingSlashes();
+
+        $this->assertEquals('/', URL::removeSiteUrl('http://absolute-url-resolved-from-request.com/path'));
+        $this->assertEquals('/', URL::removeSiteUrl('http://absolute-url-resolved-from-request.com/path/'));
+        $this->assertEquals('/foo/', URL::removeSiteUrl('http://absolute-url-resolved-from-request.com/path/foo'));
+        $this->assertEquals('/foo/bar/', URL::removeSiteUrl('http://absolute-url-resolved-from-request.com/path/foo/bar'));
+
+        $this->assertEquals('/', URL::removeSiteUrl('/path'));
+        $this->assertEquals('/', URL::removeSiteUrl('/path/'));
+        $this->assertEquals('/foo/', URL::removeSiteUrl('/path/foo'));
+        $this->assertEquals('/foo/bar/', URL::removeSiteUrl('/path/foo/bar'));
+
+        $this->assertEquals('http://external-site.com/foo', URL::removeSiteUrl('http://external-site.com/foo'));
+    }
+
+    #[Test]
     public function it_determines_absolute_url()
     {
         $this->assertTrue(URL::isAbsolute('http://example.com'));
@@ -207,10 +239,20 @@ class UrlTest extends TestCase
         $this->assertTrue(URL::isExternal('http://external-site.com/some-slug'));
         $this->assertTrue(URL::isExternal('http://external-site.com/some-slug?foo'));
         $this->assertTrue(URL::isExternal('http://external-site.com/some-slug#anchor'));
+        $this->assertTrue(URL::isExternal('//external-site.com'));
+        $this->assertTrue(URL::isExternal('mailto:foo@external-site.com'));
+        $this->assertTrue(URL::isExternal('tel:+441234567890'));
         $this->assertFalse(URL::isExternal('http://this-site.com'));
         $this->assertFalse(URL::isExternal('http://this-site.com/'));
         $this->assertFalse(URL::isExternal('http://this-site.com/some-slug'));
+        $this->assertFalse(URL::isExternal('http://this-site.com#anchor'));
+        $this->assertFalse(URL::isExternal('http://this-site.com/#anchor'));
+        $this->assertFalse(URL::isExternal('http://this-site.com?query=1'));
+        $this->assertFalse(URL::isExternal('http://this-site.com/some-slug#anchor'));
         $this->assertFalse(URL::isExternal('/foo'));
+        $this->assertFalse(URL::isExternal('/#anchor'));
+        $this->assertFalse(URL::isExternal('/foo#anchor'));
+        $this->assertFalse(URL::isExternal('?query=1'));
         $this->assertFalse(URL::isExternal('#anchor'));
         $this->assertFalse(URL::isExternal(''));
         $this->assertFalse(URL::isExternal(null));
@@ -228,7 +270,9 @@ class UrlTest extends TestCase
         $this->assertFalse(URL::isExternal('http://absolute-url-resolved-from-request.com'));
         $this->assertFalse(URL::isExternal('http://absolute-url-resolved-from-request.com/'));
         $this->assertFalse(URL::isExternal('http://absolute-url-resolved-from-request.com/some-slug'));
+        $this->assertFalse(URL::isExternal('http://absolute-url-resolved-from-request.com#anchor'));
         $this->assertFalse(URL::isExternal('/foo'));
+        $this->assertFalse(URL::isExternal('/#anchor'));
         $this->assertFalse(URL::isExternal('#anchor'));
         $this->assertFalse(URL::isExternal(''));
         $this->assertFalse(URL::isExternal(null));
@@ -248,13 +292,61 @@ class UrlTest extends TestCase
     }
 
     #[Test]
-    public function it_determines_if_external_url_to_application_when_only_current_request_domain_matches()
+    public function it_determines_if_external_url_to_application_when_only_current_request_domain_matches_when_theres_a_relative_site_url()
     {
         $this->setSites([
             'a' => ['name' => 'A', 'locale' => 'en_US', 'url' => 'http://this-site.com/'],
+            'b' => ['name' => 'B', 'locale' => 'en_GB', 'url' => '/'],
         ]);
 
         $this->assertFalse(URL::isExternalToApplication('http://absolute-url-resolved-from-request.com/some-slug'));
+    }
+
+    #[Test]
+    public function it_does_not_trust_current_request_domain_when_no_sites_are_relative()
+    {
+        $this->setSites([
+            'a' => ['name' => 'A', 'locale' => 'en_US', 'url' => 'http://this-site.com/'],
+            'b' => ['name' => 'B', 'locale' => 'en_US', 'url' => 'http://subdomain.this-site.com/'],
+        ]);
+
+        $this->assertTrue(URL::isExternalToApplication('http://absolute-url-resolved-from-request.com/'));
+        $this->assertFalse(URL::isExternalToApplication('http://this-site.com/'));
+    }
+
+    #[Test]
+    public function it_determines_external_url_to_application_when_site_urls_are_configured_with_antlers()
+    {
+        config(['app.frontend_url' => 'http://frontend-site.com']);
+
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => '{{ config:app:frontend_url }}'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => '{{ config:app:frontend_url }}/fr'],
+        ]);
+
+        $this->assertFalse(URL::isExternalToApplication('http://frontend-site.com/'));
+        $this->assertFalse(URL::isExternalToApplication('http://frontend-site.com/fr/'));
+        $this->assertTrue(URL::isExternalToApplication('http://external-site.com/'));
+    }
+
+    #[Test]
+    public function it_tidies_urls_on_site_hosts_configured_with_antlers()
+    {
+        config(['app.frontend_url' => 'http://frontend-site.com']);
+
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => '{{ config:app:frontend_url }}'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => '{{ config:app:frontend_url }}/fr'],
+        ]);
+
+        $this->assertSame('http://frontend-site.com', URL::tidy('http://frontend-site.com/'));
+        $this->assertSame('http://frontend-site.com/fr', URL::tidy('http://frontend-site.com/fr/'));
+        $this->assertSame('http://external-site.com/page/', URL::tidy('http://external-site.com/page/'));
+
+        URL::enforceTrailingSlashes();
+
+        $this->assertSame('http://frontend-site.com/fr/', URL::tidy('http://frontend-site.com/fr'));
+        $this->assertSame('http://external-site.com/page', URL::tidy('http://external-site.com/page'));
     }
 
     #[Test]
@@ -547,6 +639,36 @@ class UrlTest extends TestCase
     }
 
     #[Test]
+    public function it_leaves_urls_pointing_elsewhere_alone_when_making_them_absolute()
+    {
+        $this->setSiteValue('en', 'url', 'http://this-site.com/');
+
+        $this->assertSame('mailto:foo@external-site.com', URL::makeAbsolute('mailto:foo@external-site.com'));
+        $this->assertSame('tel:+441234567890', URL::makeAbsolute('tel:+441234567890'));
+        $this->assertSame('//external-site.com', URL::makeAbsolute('//external-site.com'));
+    }
+
+    #[Test]
+    public function making_urls_absolute_ignores_front_controller_in_request_root()
+    {
+        $this->setSiteValue('en', 'url', '/');
+
+        $request = \Illuminate\Http\Request::create(
+            'http://absolute-url-resolved-from-request.com/index.php',
+            'GET',
+            [],
+            [],
+            [],
+            ['SCRIPT_NAME' => '/index.php', 'SCRIPT_FILENAME' => 'index.php', 'PHP_SELF' => '/index.php']
+        );
+        $this->app->instance('request', $request);
+        \Illuminate\Support\Facades\URL::setRequest($request);
+
+        $this->assertSame('http://absolute-url-resolved-from-request.com', URL::makeAbsolute('/'));
+        $this->assertSame('http://absolute-url-resolved-from-request.com/foo', URL::makeAbsolute('/foo'));
+    }
+
+    #[Test]
     #[DataProvider('relativeProvider')]
     public function it_makes_urls_relative($url, $expected)
     {
@@ -577,6 +699,8 @@ class UrlTest extends TestCase
             'already relative nested route without trailing slash' => ['/foo/page', '/foo/page'],
             'already relative nested route with trailing slash' => ['/foo/page/', '/foo/page'],
             'already relative nested route without leading slash' => ['foo/page', '/foo/page'],
+            'duplicate leading slashes' => ['//page', '/page'],
+            'multiple duplicate leading slashes' => ['////page', '/page'],
 
             'homepage without trailing slash and query param' => ['http://example.com?bar=baz', '/?bar=baz'],
             'homepage with trailing slash and query param' => ['http://example.com/?bar=baz', '/?bar=baz'],

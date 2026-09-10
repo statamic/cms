@@ -11,6 +11,8 @@ use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Resources\CP\Assets\Folder;
 use Statamic\Rules\AlphaDashSpace;
 
+use function Statamic\trans as __;
+
 class FoldersController extends CpController
 {
     public function store(Request $request, $container)

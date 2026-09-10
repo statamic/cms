@@ -43,12 +43,46 @@ class EditFieldsetTest extends TestCase
     {
         $this->withoutExceptionHandling();
         $user = Facades\User::make()->makeSuper()->save();
-        $fieldset = (new Fieldset)->setHandle('test')->setContents(['title' => 'Test'])->save();
+        $fieldset = (new Fieldset)->setHandle('test')->setContents([
+            'title' => 'Test',
+            'fields' => [
+                ['handle' => 'title', 'field' => ['type' => 'text']],
+            ],
+        ])->save();
 
         $this
             ->actingAs($user)
             ->get($fieldset->editUrl())
             ->assertStatus(200)
-            ->assertInertia(fn ($page) => $page->where('initialFieldset.handle', $fieldset->handle()));
+            ->assertInertia(fn ($page) => $page
+                ->where('initialFieldset.handle', $fieldset->handle())
+                ->where('initialFieldset.sections.0.fields.0.handle', 'title')
+            );
+    }
+
+    #[Test]
+    public function it_provides_sectioned_fieldsets()
+    {
+        $user = Facades\User::make()->makeSuper()->save();
+        $fieldset = (new Fieldset)->setHandle('test')->setContents([
+            'title' => 'Test',
+            'sections' => [
+                [
+                    'display' => 'SEO',
+                    'fields' => [
+                        ['handle' => 'meta_title', 'field' => ['type' => 'text']],
+                    ],
+                ],
+            ],
+        ])->save();
+
+        $this
+            ->actingAs($user)
+            ->get($fieldset->editUrl())
+            ->assertStatus(200)
+            ->assertInertia(fn ($page) => $page
+                ->where('initialFieldset.sections.0.display', 'SEO')
+                ->where('initialFieldset.sections.0.fields.0.handle', 'meta_title')
+            );
     }
 }

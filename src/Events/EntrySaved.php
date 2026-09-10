@@ -5,6 +5,8 @@ namespace Statamic\Events;
 use Facades\Statamic\Entries\InitiatorStack;
 use Statamic\Contracts\Git\ProvidesCommitMessage;
 
+use function Statamic\trans as __;
+
 class EntrySaved extends Event implements ProvidesCommitMessage
 {
     public $initiator;

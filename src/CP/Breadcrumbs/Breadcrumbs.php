@@ -7,6 +7,8 @@ use Statamic\CP\Navigation\NavItem;
 use Statamic\Facades\CP\Nav;
 use Statamic\Statamic;
 
+use function Statamic\trans as __;
+
 class Breadcrumbs
 {
     public static $pushed = [];

@@ -6,6 +6,8 @@ use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
 use Statamic\Query\Scopes\Filters\Fields\Toggle as ToggleFilter;
 
+use function Statamic\trans as __;
+
 class Toggle extends Fieldtype
 {
     protected $categories = ['controls'];

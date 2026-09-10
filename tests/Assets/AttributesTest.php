@@ -152,6 +152,61 @@ class AttributesTest extends TestCase
         $this->assertEquals(['width' => 300, 'height' => 150], $this->attributes->asset($this->svgAsset('<svg height="100"></svg>'))->get());
     }
 
+    #[Test]
+    #[DataProvider('exifOrientationProvider')]
+    public function it_respects_exif_orientation_when_getting_image_dimensions($orientation, $expectedWidth, $expectedHeight)
+    {
+        $asset = (new Asset)
+            ->container(AssetContainer::make('test-container')->disk('test'))
+            ->path('path/to/asset.jpg');
+
+        $jpeg = $this->createJpegWithOrientation(4032, 3024, $orientation);
+        Storage::disk('test')->put('path/to/asset.jpg', $jpeg);
+
+        $attributes = $this->attributes->asset($asset)->get();
+
+        $this->assertEquals($expectedWidth, $attributes['width']);
+        $this->assertEquals($expectedHeight, $attributes['height']);
+    }
+
+    public static function exifOrientationProvider()
+    {
+        return [
+            'orientation 1 (normal)' => [1, 4032, 3024],
+            'orientation 2 (flip horizontal)' => [2, 4032, 3024],
+            'orientation 3 (rotate 180)' => [3, 4032, 3024],
+            'orientation 4 (flip vertical)' => [4, 4032, 3024],
+            'orientation 5 (transpose)' => [5, 3024, 4032],
+            'orientation 6 (rotate 90 CW)' => [6, 3024, 4032],
+            'orientation 7 (transverse)' => [7, 3024, 4032],
+            'orientation 8 (rotate 90 CCW)' => [8, 3024, 4032],
+        ];
+    }
+
+    private function createJpegWithOrientation(int $width, int $height, int $orientation): string
+    {
+        $img = imagecreatetruecolor($width, $height);
+        ob_start();
+        imagejpeg($img);
+        $jpeg = ob_get_clean();
+        imagedestroy($img);
+
+        $tiff = pack('A2', 'II')
+            .pack('v', 42)
+            .pack('V', 8)
+            .pack('v', 1)
+            .pack('v', 0x0112)
+            .pack('v', 3)
+            .pack('V', 1)
+            .pack('v', $orientation)."\x00\x00"
+            .pack('V', 0);
+
+        $app1 = "Exif\x00\x00".$tiff;
+        $app1Segment = "\xFF\xE1".pack('n', strlen($app1) + 2).$app1;
+
+        return substr($jpeg, 0, 2).$app1Segment.substr($jpeg, 2);
+    }
+
     private function svgAsset($svg)
     {
         $asset = (new Asset)

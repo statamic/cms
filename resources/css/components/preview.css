@@ -40,7 +40,7 @@
 }
 
 .live-preview .publish-tabs {
-    @apply ltr:pl-4 @-4xl/live-preview:ltr:pl-6 rtl:pr-4 @-4xl/live-preview:rtl:pr-6;
+    @apply ltr:pl-4 @4xl/live-preview:ltr:pl-6 rtl:pr-4 @4xl/live-preview:rtl:pr-6;
 }
 
 .live-preview .publish-sections-section {

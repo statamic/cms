@@ -176,10 +176,27 @@ return [
     | Users may be required to reauthorize before performing certain
     | sensitive actions. This is called an elevated session. Here
     | you may configure the duration of the session in minutes.
+    | You may also disable the elevated session entirely.
     |
     */
 
+    'elevated_sessions_enabled' => env('STATAMIC_ELEVATED_SESSIONS_ENABLED', true),
+
     'elevated_session_duration' => 15,
+
+    'elevated_sessions_url' => null,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Two-Factor Authentication
+    |--------------------------------------------------------------------------
+    |
+    | Here you may disable two-factor authentication entirely. This can be
+    | useful on local or staging environments, or when using OAuth.
+    |
+    */
+
+    'two_factor_enabled' => env('STATAMIC_TWO_FACTOR_ENABLED', true),
 
     /*
     |--------------------------------------------------------------------------
@@ -193,6 +210,22 @@ return [
     */
 
     'two_factor_enforced_roles' => [],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Two-Factor Authentication URLs
+    |--------------------------------------------------------------------------
+    |
+    | When users log in to the frontend and need to verify a two-factor code
+    | or set up two-factor authentication, they will be redirected to these
+    | URLs. Leave null to use the built-in pages. Control panel flows are
+    | unaffected and always use their own pages.
+    |
+    */
+
+    'two_factor_challenge_url' => null,
+
+    'two_factor_setup_url' => null,
 
     /*
     |--------------------------------------------------------------------------

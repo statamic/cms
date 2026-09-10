@@ -3,6 +3,7 @@ export { default as IndexFieldtype } from '../../components/fieldtypes/index-fie
 export { default as FieldtypeMixin } from '../../components/fieldtypes/Fieldtype.vue';
 export { default as IndexFieldtypeMixin } from '../../components/fieldtypes/IndexFieldtype.vue';
 export { default as DateFormatter } from '../../components/DateFormatter.js';
+export { default as NumberFormatter } from '../../components/NumberFormatter.js';
 export { default as ItemActions } from '../../components/actions/ItemActions.vue';
 export { default as InlineEditForm } from '../../components/inputs/relationship/InlineEditForm.vue';
 export { default as RelatedItem } from '../../components/inputs/relationship/Item.vue';
@@ -17,3 +18,4 @@ export { default as HasActionsMixin } from '../../components/publish/HasActions.
 export { default as resetValuesFromResponse } from '../../util/resetValuesFromResponse.js';
 export { requireElevatedSession, requireElevatedSessionIf } from '../../components/elevated-sessions';
 export { default as clone, deepClone } from '../../util/clone.js';
+export { default as debounce } from '../../util/debounce.js';

@@ -3,6 +3,7 @@ import HasFieldActions from '../field-actions/HasFieldActions';
 import debounce from '@/util/debounce.js';
 import props from './props.js';
 import emits from './emits.js';
+import { UPDATE_DEBOUNCE_MS } from './constants';
 import { publishContextKey } from '@/components/ui';
 import { isRef, markRaw } from 'vue';
 
@@ -32,7 +33,7 @@ export default {
     created() {
         this.updateDebounced = markRaw(debounce((value) => {
             this.update(value);
-        }, 150));
+        }, UPDATE_DEBOUNCE_MS));
     },
 
     computed: {

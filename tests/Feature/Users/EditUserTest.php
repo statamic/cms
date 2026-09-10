@@ -3,6 +3,7 @@
 namespace Tests\Feature\Users;
 
 use Inertia\Testing\AssertableInertia as Assert;
+use Orchestra\Testbench\Attributes\DefineEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\User;
@@ -74,6 +75,23 @@ class EditUserTest extends TestCase
     }
 
     #[Test]
+    #[DefineEnvironment('disableTwoFactor')]
+    public function it_doesnt_provide_2fa_data_when_two_factor_is_disabled()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'edit users']]);
+        $me = tap(User::make()->email('admin@domain.com')->assignRole('test'))->save();
+
+        $this
+            ->actingAsWithElevatedSession($me)
+            ->get($me->editUrl())
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('users/Edit')
+                ->where('twoFactor', null)
+            );
+    }
+
+    #[Test]
     public function it_doesnt_provide_2fa_data_when_editing_someone_else()
     {
         $this->setTestRoles(['test' => ['access cp', 'edit users']]);
@@ -84,6 +102,14 @@ class EditUserTest extends TestCase
             ->actingAsWithElevatedSession($me)
             ->get($user->editUrl())
             ->assertOk()
-            ->assertViewHas('twoFactor', fn ($twoFactor) => $twoFactor === null);
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('users/Edit')
+                ->where('twoFactor', null)
+            );
+    }
+
+    protected function disableTwoFactor($app)
+    {
+        $app['config']->set('statamic.users.two_factor_enabled', false);
     }
 }

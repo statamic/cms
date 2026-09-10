@@ -22,6 +22,7 @@
 @import './tailwind-animate.css';
 
 @source inline('bg-{slate,gray,zinc,neutral,stone,red,orange,amber,yellow,lime,green,emerald,teal,cyan,sky,blue,indigo,violet,purple,fuchsia,pink,rose}-{50,150,850,925,950,{100..900..100}}');
+@source inline('bg-checkerboard-{light,dark}');
 
 @custom-variant dark (&:where(.dark, .dark *));
 

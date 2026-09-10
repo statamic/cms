@@ -21,7 +21,8 @@ const props = defineProps({
 
 const dropdownContentClasses = cva({
     base: [
-        'rounded-xl min-w-64 bg-gray-50 dark:bg-gray-800 outline-hidden overflow-hidden group z-50',
+        'rounded-xl min-w-64 bg-gray-50 dark:bg-gray-800 outline-hidden overflow-y-auto group z-50',
+        'max-h-[calc(var(--reka-dropdown-menu-content-available-height,300px)-16px)]',
         'border border-gray-200 dark:border-black shadow-lg popoverAnimation',
     ],
 })({});

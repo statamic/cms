@@ -33,12 +33,14 @@ class UpdaterController extends CpController
             'statamic' => [
                 'currentVersion' => $changelog->currentVersion(),
                 'availableUpdatesCount' => $changelog->availableUpdatesCount(),
+                'security' => $changelog->hasSecurityUpdate(),
             ],
             'addons' => $addons->filter->existsOnMarketplace()->map(fn ($addon) => [
                 'name' => $addon->name(),
                 'slug' => $addon->slug(),
                 'version' => $addon->version(),
                 'availableUpdatesCount' => $addon->changelog()->availableUpdatesCount(),
+                'security' => $addon->changelog()->hasSecurityUpdate(),
             ])->values()->all(),
         ]);
     }
@@ -50,6 +52,6 @@ class UpdaterController extends CpController
     {
         $this->authorize('view updates');
 
-        return UpdatesOverview::count();
+        return UpdatesOverview::badge();
     }
 }

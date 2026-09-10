@@ -8,6 +8,7 @@ export const {
     IndexFieldtypeMixin,
     InlineEditForm,
     DateFormatter,
+    NumberFormatter,
     ItemActions,
     RelatedItem,
     RestoreRevision,
@@ -18,6 +19,7 @@ export const {
     requireElevatedSession,
     requireElevatedSessionIf,
     clone,
+    debounce,
     deepClone,
     resetValuesFromResponse,
 } = __STATAMIC__.core;

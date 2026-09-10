@@ -154,12 +154,12 @@ class Cascade
 
     protected function hydrateContent()
     {
-        if (! $this->content) {
-            return $this;
-        }
-
         if ($this->content instanceof \Closure) {
             $this->content = call_user_func($this->content);
+        }
+
+        if (! $this->content) {
+            return $this;
         }
 
         $variables = $this->content instanceof Augmentable
@@ -183,8 +183,14 @@ class Cascade
             'xml_header' => '<?xml version="1.0" encoding="utf-8" ?>', // @TODO remove and document new best practice
             'csrf_token' => csrf_token(),
             'csrf_field' => csrf_field(),
-            'config' => static::config(),
             'response_code' => 200,
+
+            /**
+             * Full config is merged in at View level.
+             *
+             * @see \Statamic\View\View
+             */
+            'config' => static::config(),
 
             // Auth
             'logged_in' => $loggedIn = auth(config('statamic.users.guards.web', 'web'))->check(),
@@ -311,6 +317,7 @@ class Cascade
             'statamic.search.defaults',
             'statamic.search.queue',
             'statamic.search.queue_connection',
+            'statamic.search.queue_timeout',
             'statamic.search.chunk_size',
             'statamic.stache.watcher',
             'statamic.stache.cache_store',

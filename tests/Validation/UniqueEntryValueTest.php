@@ -3,6 +3,7 @@
 namespace Tests\Validation;
 
 use Facades\Tests\Factories\EntryFactory;
+use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Validator;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Rules\UniqueEntryValue;
@@ -82,5 +83,27 @@ class UniqueEntryValueTest extends TestCase
             ['slug' => 'foo'],
             ['slug' => new UniqueEntryValue(collection: 'collection-one', site: 'site-two')]
         )->passes());
+    }
+
+    #[Test]
+    public function it_uses_the_app_translation_when_one_exists()
+    {
+        EntryFactory::id('123')->slug('foo')->collection('collection-one')->create();
+
+        $validator = Validator::make(
+            ['slug' => 'foo'],
+            ['slug' => new UniqueEntryValue]
+        );
+
+        $this->assertEquals('This value has already been taken.', $validator->errors()->first('slug'));
+
+        Lang::addLines(['validation.unique_entry_value' => 'This slug has already been taken.'], 'en');
+
+        $validator = Validator::make(
+            ['slug' => 'foo'],
+            ['slug' => new UniqueEntryValue]
+        );
+
+        $this->assertEquals('This slug has already been taken.', $validator->errors()->first('slug'));
     }
 }

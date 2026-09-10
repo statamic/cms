@@ -2,7 +2,6 @@
 import Head from '@/pages/layout/Head.vue';
 import Outside from '@/pages/layout/Outside.vue';
 import { AuthCard, Button } from '@ui';
-import { Link } from '@inertiajs/vue3';
 
 defineOptions({ layout: Outside });
 
@@ -19,7 +18,7 @@ defineProps(['isLoggedIn', 'loginUrl', 'logoutUrl']);
     >
         <div class="flex justify-center">
             <Button
-                :as="Link"
+                as="a"
                 variant="primary"
                 :href="isLoggedIn ? logoutUrl : loginUrl"
                 class="w-full"

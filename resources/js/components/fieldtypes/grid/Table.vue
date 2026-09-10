@@ -32,6 +32,7 @@
                     :can-delete="canDeleteRows"
                     :can-add-rows="canAddRows"
                     :has-error="rowHasError(row._id)"
+                    :read-only
                     @updated="(row, value) => $emit('updated', row, value)"
                     @meta-updated="$emit('meta-updated', row._id, $event)"
                     @duplicate="(row) => $emit('duplicate', row)"

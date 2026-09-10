@@ -717,6 +717,17 @@ abstract class AddonServiceProvider extends ServiceProvider
         Statamic::externalStyle($url);
     }
 
+    protected function registerSerializableClasses(array $classes)
+    {
+        $existing = $this->app['config']->get('cache.serializable_classes');
+
+        if ($existing === null || $existing === true) {
+            return;
+        }
+
+        $this->app['config']->set('cache.serializable_classes', array_merge(is_array($existing) ? $existing : [], $classes));
+    }
+
     protected function schedule(Schedule $schedule)
     {
         //
@@ -804,9 +815,12 @@ abstract class AddonServiceProvider extends ServiceProvider
         return $this;
     }
 
-    protected function registerSettingsBlueprint(array $blueprint): self
+    protected function registerSettingsBlueprint(array|Closure $blueprint): self
     {
-        $this->app->bind("statamic.addons.{$this->getAddon()->slug()}.settings_blueprint", fn () => $blueprint);
+        $this->app->scoped(
+            "statamic.addons.{$this->getAddon()->slug()}.settings_blueprint",
+            fn () => $blueprint instanceof Closure ? $blueprint() : $blueprint
+        );
 
         return $this;
     }
@@ -818,7 +832,7 @@ abstract class AddonServiceProvider extends ServiceProvider
         }
 
         if (file_exists($path = "{$this->getAddon()->directory()}resources/blueprints/settings.yaml")) {
-            $this->registerSettingsBlueprint(YAML::file($path)->parse());
+            $this->registerSettingsBlueprint(fn () => YAML::file($path)->parse());
         }
 
         return $this;

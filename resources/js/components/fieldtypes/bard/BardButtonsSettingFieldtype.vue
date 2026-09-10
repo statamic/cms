@@ -6,6 +6,7 @@
                 :key="button.name"
                 v-tooltip="button.text"
                 :class="{ active: enabled(button.name) }"
+                @mousedown.prevent
                 @click="toggleButton(button.name)"
             >
                 <ui-icon :name="button.svg" v-if="button.svg" />

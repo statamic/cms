@@ -5,8 +5,11 @@ namespace Statamic\Http\Controllers\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Statamic\Auth\TwoFactor\GenerateNewRecoveryCodes;
+use Statamic\Facades\URL;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
+
+use function Statamic\trans as __;
 
 class TwoFactorRecoveryCodesController extends CpController
 {
@@ -21,7 +24,11 @@ class TwoFactorRecoveryCodesController extends CpController
 
         $generateRecoveryCodes($user);
 
-        return ['recovery_codes' => $user->twoFactorRecoveryCodes()];
+        if ($request->expectsJson()) {
+            return ['recovery_codes' => $user->twoFactorRecoveryCodes()];
+        }
+
+        return $this->formSuccessRedirect($request, __('Recovery codes regenerated.'), 'user.two_factor_reset_recovery_codes');
     }
 
     public function download(Request $request)
@@ -36,5 +43,16 @@ class TwoFactorRecoveryCodesController extends CpController
             'Content-Type' => 'text/plain',
             'Content-Disposition' => 'attachment; filename="'.$filename.'"',
         ]);
+    }
+
+    private function formSuccessRedirect(Request $request, string $message, string $formName)
+    {
+        $redirect = $request->input('_redirect');
+
+        $url = $redirect && ! URL::isExternalToApplication($redirect)
+            ? $redirect
+            : back()->getTargetUrl();
+
+        return redirect($url)->with("{$formName}.success", $message);
     }
 }

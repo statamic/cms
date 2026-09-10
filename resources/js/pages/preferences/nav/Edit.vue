@@ -86,6 +86,8 @@
                     :indent="24"
                     :dir="direction"
                     :stat-handler="statHandler"
+                    :i18n="treeDraggableI18n"
+                    :aria-label="__('Tree Structure')"
                     keep-placeholder
                     trigger-class="page-move"
                     :each-droppable="eachDroppable"
@@ -292,6 +294,12 @@ export default {
     },
 
     computed: {
+        treeDraggableI18n() {
+            return {
+                instructions: __('messages.tree_aria_instructions'),
+            };
+        },
+
         isDirty() {
             return this.changed;
         },

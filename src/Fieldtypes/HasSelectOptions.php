@@ -138,7 +138,7 @@ trait HasSelectOptions
 
         $option = collect($this->getOptions())->filter(fn ($option) => $option['value'] === $value)->first();
 
-        return $option ? $option['label'] : $actualValue;
+        return $option ? ($option['label'] ?? $option['value']) : $actualValue;
     }
 
     private function castToBoolean($value)

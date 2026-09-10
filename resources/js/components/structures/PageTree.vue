@@ -29,10 +29,11 @@
                     :node-key="(stat) => stat.data.id"
                     :dragOverThrottleInterval="30"
                     :each-droppable="eachDroppable"
-                    :root-droppable="rootDroppable"
                     :max-level="maxDepth"
                     :stat-handler="statHandler"
-                    @after-drop="treeUpdated"
+                    :i18n="treeDraggableI18n"
+                    :aria-label="__('Tree Structure')"
+                    @after-drop="afterDrop"
                     @open:node="nodeOpened"
                     @close:node="nodeClosed"
                 >
@@ -128,6 +129,7 @@ export default {
             collapsedState: [],
             discardingChanges: false,
             ready: false,
+            saveKeyBinding: null,
         };
     },
 
@@ -142,6 +144,12 @@ export default {
 
         direction() {
             return this.$config.get('direction', 'ltr');
+        },
+
+        treeDraggableI18n() {
+            return {
+                instructions: __('messages.tree_aria_instructions'),
+            };
         },
     },
 
@@ -167,14 +175,22 @@ export default {
             this.initialPages = clone(this.pages);
         });
 
-        this.$keys.bindGlobal(['mod+s'], (e) => {
-            e.preventDefault();
-            this.save();
-        });
+        // A read-only tree can't be saved, so binding the shortcut would only take it away
+        // from whatever is behind it. e.g. an entry being edited under a selector stack.
+        if (this.editable) {
+            this.saveKeyBinding = this.$keys.bindGlobal(['mod+s'], (e) => {
+                e.preventDefault();
+                this.save();
+            });
+        }
     },
 
     mounted() {
         setTimeout(() => this.ready = true, 500); // arbitrary delay after initial transitions
+    },
+
+    beforeUnmount() {
+        this.saveKeyBinding?.destroy();
     },
 
     methods: {
@@ -201,6 +217,19 @@ export default {
         treeUpdated() {
             this.pages = this.$refs.tree.getData();
             this.$emit('changed', this.pages);
+        },
+
+        afterDrop() {
+            const root = this.$refs.tree.getData()[0];
+
+            // Prevent items with children being moved to the root position
+            if (this.expectsRoot && root.id !== this.pages[0].id && root.children?.length > 0) {
+                const { dragNode, parent, indexBeforeDrop } = dragContext.startInfo;
+                this.$refs.tree.move(dragNode, parent, indexBeforeDrop);
+                return;
+            }
+
+            this.treeUpdated();
         },
 
         cleanPagesForSubmission(pages) {
@@ -303,14 +332,6 @@ export default {
             this.updateTreeData();
             this.$emit('canceled');
             this.discardingChanges = false;
-        },
-
-        rootDroppable() {
-            if (!this.expectsRoot) {
-                return true;
-            }
-
-            return true;
         },
 
         eachDroppable(targetStat) {

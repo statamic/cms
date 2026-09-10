@@ -18,6 +18,17 @@ class ListTest extends TestCase
         );
     }
 
+    #[Test]
+    public function it_has_add_row_config()
+    {
+        $configFields = (new \ReflectionMethod(Lists::class, 'configFieldItems'))->invoke(new Lists);
+
+        $this->assertArrayHasKey('add_row', $configFields);
+        $this->assertSame('text', $configFields['add_row']['type']);
+        $this->assertSame('Add Item Label', $configFields['add_row']['display']);
+        $this->assertSame('Add Item', $configFields['add_row']['placeholder']);
+    }
+
     private function field($config = [])
     {
         $ft = new Lists;

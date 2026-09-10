@@ -3,7 +3,6 @@
 namespace Tests\Antlers\Runtime;
 
 use Illuminate\Support\Facades\Log;
-use PHPUnit\Framework\Attributes\Test;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Value;
@@ -29,8 +28,44 @@ class PhpEnabledTest extends ParserTestCase
 
         $this->assertEquals(
             'Hello wildernessWILDERNESS!',
-            (string) $this->parser($data)->allowPhp()->parse('Hello {{ string }}<?php echo strtoupper($string); echo "!"; ?>', $data)
+            (string) $this->parser($data, false, true)->allowPhp()->parse('Hello {{ string }}<?php echo strtoupper($string); echo "!"; ?>', $data)
         );
+    }
+
+    public function test_php_nodes_inside_interpolated_parameters_are_evaluated()
+    {
+        (new class extends \Statamic\Tags\Tags
+        {
+            protected static $handle = 'php_param_echo';
+
+            public function index()
+            {
+                return '['.$this->params->get('value').']';
+            }
+        })::register();
+
+        $data = ['title' => 'The Title', 'items' => ['a', 'b']];
+
+        $templates = [
+            '<div>{{ php_param_echo value="{{$ \'hi\' $}}" }}</div>' => '<div>[hi]</div>',
+            '<div>{{ php_param_echo value="a-{{$ \'hi\' $}}-b" }}</div>' => '<div>[a-hi-b]</div>',
+            "caf\u{00E9} <div>{{ php_param_echo value=\"{{\$ strtoupper('hi') \$}}\" }}</div>" => "caf\u{00E9} <div>[HI]</div>",
+            '{{ php_param_echo value="{{$ $title $}}" }}' => '[The Title]',
+            '{{ php_param_echo value="{{$ strtoupper($title) $}}" }}' => '[THE TITLE]',
+            '{{ php_param_echo value="{{ title }}-{{$ \'x\' $}}-{{ title | upper }}" }}' => '[The Title-x-THE TITLE]',
+            '{{ php_param_echo value="a{{? $x = 1; ?}}b" }}' => '[ab]',
+            '{{ items }}{{ php_param_echo value="{{ value }}:{{$ strtoupper($value) $}}" }}{{ /items }}' => '[a:A][b:B]',
+            '{{ if title == "{{$ \'The Title\' $}}" }}yes{{ else }}no{{ /if }}' => 'yes',
+            "@props(['a' => 1])\n".'{{ php_param_echo value="{{$ strtoupper(\'hi\') $}}" }}' => "\n[HI]",
+        ];
+
+        foreach ($templates as $template => $expected) {
+            $this->assertSame(
+                $expected,
+                (string) $this->parser($data, true, true)->allowPhp()->parse($template, $data),
+                $template
+            );
+        }
     }
 
     public function test_php_can_be_used_to_output_evaluated_antlers()
@@ -54,7 +89,7 @@ EOT;
 
         $data = ['title' => 'Hello, there!'];
         $expected = StringUtilities::normalizeLineEndings($expected);
-        $result = StringUtilities::normalizeLineEndings((string) $this->parser($data)->allowPhp()->parse($template, $data));
+        $result = StringUtilities::normalizeLineEndings((string) $this->parser($data, false, true)->allowPhp()->parse($template, $data));
 
         $this->assertSame($expected, $result);
     }
@@ -91,7 +126,7 @@ Hello, world!
 </ul>
 EOT;
         $expected = StringUtilities::normalizeLineEndings($expected);
-        $result = StringUtilities::normalizeLineEndings((string) $this->parser($data)->allowPhp()->parse($template, $data));
+        $result = StringUtilities::normalizeLineEndings((string) $this->parser($data, false, true)->allowPhp()->parse($template, $data));
 
         $this->assertSame($expected, $result);
     }
@@ -142,7 +177,7 @@ EOT;
         $expected = StringUtilities::normalizeLineEndings($expected);
 
         $results = StringUtilities::normalizeLineEndings(
-            (string) $this->parser($data)->setRuntimeConfiguration($config)->allowPhp()->parse($template, $data)
+            (string) $this->parser($data, false, true)->setRuntimeConfiguration($config)->allowPhp()->parse($template, $data)
         );
 
         $this->assertSame($expected, $results);
@@ -190,7 +225,7 @@ EOT;
         $expected = StringUtilities::normalizeLineEndings($expected);
 
         $results = StringUtilities::normalizeLineEndings(
-            (string) $this->parser($data)->setRuntimeConfiguration($config)->allowPhp()->parse($template, $data)
+            (string) $this->parser($data, false, true)->setRuntimeConfiguration($config)->allowPhp()->parse($template, $data)
         );
 
         $this->assertSame($expected, $results);
@@ -319,7 +354,7 @@ EOT;
         }
 
         $results = StringUtilities::normalizeLineEndings(
-            (string) $this->parser($data)->allowPhp()->parse($template, $data)
+            (string) $this->parser($data, false, true)->allowPhp()->parse($template, $data)
         );
 
         $expected = StringUtilities::normalizeLineEndings($expected);
@@ -448,7 +483,7 @@ EOT;
         }
 
         $results = StringUtilities::normalizeLineEndings(
-            (string) $this->parser($data)->allowPhp()->parse($template, $data)
+            (string) $this->parser($data, false, true)->allowPhp()->parse($template, $data)
         );
 
         $expected = StringUtilities::normalizeLineEndings($expected);
@@ -462,7 +497,7 @@ EOT;
 {{? $var_1 = 'blog'; $var_2 = 'news'; ?}}ABC{{ var_2 }}
 EOT;
 
-        $this->assertSame('ABCnews', $this->renderString($template));
+        $this->assertSame('ABCnews', $this->renderString($template, [], false, true));
     }
 
     public function test_antlers_php_echo_node()
@@ -472,7 +507,7 @@ EOT;
 <p>Literal Content. {{$ $var $}}<END></p>
 EOT;
 
-        $this->assertSame('<p>Literal Content. hi!<END></p>', trim($this->renderString($template)));
+        $this->assertSame('<p>Literal Content. hi!<END></p>', trim($this->renderString($template, [], false, true)));
     }
 
     public function test_php_node_assignments_within_loops()
@@ -513,7 +548,7 @@ EOT;
 <five><1>
 EOT;
 
-        $this->assertSame($expected, trim($this->renderString($template, $data)));
+        $this->assertSame($expected, trim($this->renderString($template, $data, false, true)));
     }
 
     public function test_assignments_from_php_nodes()
@@ -535,7 +570,7 @@ EOT;
 <value_two: {{ value_two }}>
 EOT;
 
-        $result = $this->renderString($template, [], true);
+        $result = $this->renderString($template, [], true, true);
         $this->assertStringContainsString('<value_one: 1125>', $result);
         $this->assertStringContainsString('<value_two: 1025>', $result);
     }
@@ -708,5 +743,20 @@ TEXT;
         $this->assertSame('Text: HELLO, WORLD.', $result);
 
         GlobalRuntimeState::$allowPhpInContent = false;
+    }
+
+    public function test_sanitize_php_is_case_insensitive()
+    {
+        $this->assertSame('&lt;?php echo "test"; ?>', StringUtilities::sanitizePhp('<?php echo "test"; ?>'));
+        $this->assertSame('&lt;?PHP echo "test"; ?>', StringUtilities::sanitizePhp('<?PHP echo "test"; ?>'));
+        $this->assertSame('&lt;?Php echo "test"; ?>', StringUtilities::sanitizePhp('<?Php echo "test"; ?>'));
+        $this->assertSame('&lt;?pHp echo "test"; ?>', StringUtilities::sanitizePhp('<?pHp echo "test"; ?>'));
+    }
+
+    public function test_sanitize_php_handles_short_tags()
+    {
+        $this->assertSame('&lt;?= $var ?>', StringUtilities::sanitizePhp('<?= $var ?>'));
+        $this->assertSame('&lt;?="test"?>', StringUtilities::sanitizePhp('<?="test"?>'));
+        $this->assertSame("&lt;? echo 'test' ?>", StringUtilities::sanitizePhp("<? echo 'test' ?>"));
     }
 }

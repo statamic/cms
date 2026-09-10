@@ -1,8 +1,9 @@
 <script setup>
 import axios from 'axios';
+import fuzzysort from 'fuzzysort';
 import Fieldtype from '@/components/fieldtypes/fieldtype.js';
 import { computed, ref, watch } from 'vue';
-import { Combobox, Icon } from '@/components/ui';
+import { Button, Combobox, Icon, Input, Modal } from '@/components/ui';
 
 const emit = defineEmits(Fieldtype.emits);
 const props = defineProps(Fieldtype.props);
@@ -13,11 +14,14 @@ const loading = ref(true);
 const loaders = ref({});
 const iconsCache = ref({});
 const cacheKey = computed(() => props.config.set ?? '__default__');
+const isCompact = computed(() => props.config.mode === 'compact');
+const isOpen = ref(false);
+const search = ref('');
 
 const options = computed(() => {
     let options = [];
 
-    for (let [name, html] of Object.entries(icons.value)) {
+    for (let [name, html] of Object.entries(icons.value || {})) {
         options.push({
             value: name,
             label: name,
@@ -26,6 +30,23 @@ const options = computed(() => {
     }
 
     return options;
+});
+
+const selectedOption = computed(() => {
+    return options.value.find((option) => option.value === props.value) ?? null;
+});
+
+const noneOption = { value: null, label: 'No Icon', none: true };
+
+const filteredOptions = computed(() => {
+    const matches = fuzzysort
+        .go(search.value, options.value, {
+            all: true,
+            key: 'label',
+        })
+        .map((result) => result.obj);
+
+    return search.value ? matches : [noneOption, ...matches];
 });
 
 function request() {
@@ -50,6 +71,20 @@ function comboboxUpdated(value) {
     update(value || null);
 }
 
+function openPicker() {
+    if (isReadOnly.value || props.config.disabled) return;
+
+    isOpen.value = true;
+}
+
+function selectIcon(name) {
+    if (isReadOnly.value || props.config.disabled) return;
+
+    update(name);
+    isOpen.value = false;
+    search.value = '';
+}
+
 watch(
     () => loaders.value[cacheKey.value],
     (loadingState) => {
@@ -58,12 +93,16 @@ watch(
     }
 );
 
+watch(isOpen, (open) => {
+    if (!open) search.value = '';
+});
+
 request();
 </script>
 
 <template>
     <Combobox
-        v-if="!loading"
+        v-if="!loading && !isCompact"
         clearable
         :disabled="config.disabled"
         :model-value="value"
@@ -95,4 +134,65 @@ request();
             </div>
         </template>
     </Combobox>
+
+    <div v-else-if="!loading" class="flex items-center">
+        <Button
+            icon-only
+            size="base"
+            :aria-label="value || __('Select Icon')"
+            :disabled="config.disabled"
+            :read-only="isReadOnly"
+            :title="value || undefined"
+            @click="openPicker"
+        >
+            <Icon v-if="selectedOption && !selectedOption.html" :name="selectedOption.label" />
+            <div
+                v-else-if="selectedOption?.html"
+                v-html="selectedOption.html"
+                class="flex items-center justify-center [&>svg]:size-4.5"
+            />
+            <Icon v-else name="plus" class="opacity-40" />
+        </Button>
+
+        <Modal
+            v-model:open="isOpen"
+            :blur="false"
+            :title="__('Select Icon')"
+            class="xl:max-w-3xl 2xl:max-w-page"
+        >
+            <Input
+                v-model="search"
+                :placeholder="__('Search...')"
+                icon-prepend="magnifying-glass"
+                size="sm"
+                type="text"
+            />
+
+            <div class="st-custom-scrollbar max-h-[40vh] overflow-auto">
+                <div class="grid grid-cols-6 gap-1 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12">
+                    <button
+                        v-for="option in filteredOptions"
+                        :key="option.none ? '__none__' : option.value"
+                        type="button"
+                        class="flex size-9 items-center justify-center rounded-lg"
+                        :aria-label="__(option.label)"
+                        :aria-pressed="option.value === value"
+                        :class="{
+                            'bg-gray-100 dark:bg-gray-900': option.value === value,
+                            'hover:bg-gray-100 dark:hover:bg-gray-900': option.value !== value,
+                        }"
+                        :title="__(option.label)"
+                        @click="selectIcon(option.value)"
+                    >
+                        <Icon v-if="option.none" name="x" class="size-3.5 opacity-40" />
+                        <Icon v-else-if="!option.html" :name="option.label" class="size-5" />
+                        <div v-else v-html="option.html" class="[&>svg]:size-5" />
+                    </button>
+                </div>
+                <div v-if="filteredOptions.length === 0" class="p-3 text-center text-xs text-gray-600">
+                    {{ search ? __('No results') : __('No icons available') }}
+                </div>
+            </div>
+        </Modal>
+    </div>
 </template>

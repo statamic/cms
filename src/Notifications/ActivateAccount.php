@@ -5,6 +5,8 @@ namespace Statamic\Notifications;
 use Illuminate\Notifications\Messages\MailMessage;
 use Statamic\Auth\Passwords\PasswordReset as PasswordResetManager;
 
+use function Statamic\trans as __;
+
 class ActivateAccount extends PasswordReset
 {
     public static $subject;

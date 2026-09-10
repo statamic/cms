@@ -22,6 +22,7 @@ class DefaultInvalidator implements Invalidator
 {
     protected $cacher;
     protected $rules;
+    protected $refreshing = false;
 
     public function __construct(Cacher $cacher, $rules = [])
     {
@@ -32,14 +33,18 @@ class DefaultInvalidator implements Invalidator
     public function invalidate($item)
     {
         if ($this->rules === 'all') {
-            $this->cacher->flush();
+            $this->refreshing
+                ? $this->cacher->refreshUrls($this->cacher->getUrls()->all())
+                : $this->cacher->flush();
 
             return;
         }
 
         $urls = $this->getItemUrls($item);
 
-        $this->cacher->invalidateUrls($urls);
+        $this->refreshing
+            ? $this->cacher->refreshUrls($urls)
+            : $this->cacher->invalidateUrls($urls);
     }
 
     public function refresh($item)
@@ -50,15 +55,14 @@ class DefaultInvalidator implements Invalidator
             return;
         }
 
-        if ($this->rules === 'all') {
-            $this->cacher->refreshUrls($this->cacher->getUrls()->all());
+        $previous = $this->refreshing;
+        $this->refreshing = true;
 
-            return;
+        try {
+            $this->invalidate($item);
+        } finally {
+            $this->refreshing = $previous;
         }
-
-        $urls = $this->getItemUrls($item);
-
-        $this->cacher->refreshUrls($urls);
     }
 
     protected function getItemUrls($item)
@@ -97,7 +101,7 @@ class DefaultInvalidator implements Invalidator
         $prefixedRelativeUrls = Site::all()->map(function ($site) use ($rules) {
             return $rules
                 ->reject(fn (string $rule) => URL::isAbsolute($rule))
-                ->map(fn (string $rule) => URL::tidy($site->url().'/'.$rule, withTrailingSlash: false));
+                ->map(fn (string $rule) => URL::tidy($site->url().'/'.$rule));
         })->flatten()->all();
 
         return [
@@ -115,7 +119,7 @@ class DefaultInvalidator implements Invalidator
         $prefixedRelativeUrls = Site::all()->map(function ($site) use ($rules) {
             return $rules
                 ->reject(fn (string $rule) => URL::isAbsolute($rule))
-                ->map(fn (string $rule) => URL::tidy($site->url().'/'.$rule, withTrailingSlash: false));
+                ->map(fn (string $rule) => URL::tidy($site->url().'/'.$rule));
         })->flatten()->all();
 
         return [
@@ -141,7 +145,7 @@ class DefaultInvalidator implements Invalidator
 
         $prefixedRelativeUrls = $rules
             ->reject(fn (string $rule) => URL::isAbsolute($rule))
-            ->map(fn (string $rule) => URL::tidy($entry->site()->url().'/'.$rule, withTrailingSlash: false))
+            ->map(fn (string $rule) => URL::tidy($entry->site()->url().'/'.$rule))
             ->all();
 
         return [
@@ -170,7 +174,7 @@ class DefaultInvalidator implements Invalidator
 
         $prefixedRelativeUrls = $rules
             ->reject(fn (string $rule) => URL::isAbsolute($rule))
-            ->map(fn (string $rule) => URL::tidy($term->site()->url().'/'.$rule, withTrailingSlash: false))
+            ->map(fn (string $rule) => URL::tidy($term->site()->url().'/'.$rule))
             ->all();
 
         return [
@@ -192,7 +196,7 @@ class DefaultInvalidator implements Invalidator
         $prefixedRelativeUrls = $nav->sites()->map(function ($site) use ($rules) {
             return $rules
                 ->reject(fn (string $rule) => URL::isAbsolute($rule))
-                ->map(fn (string $rule) => URL::tidy(Site::get($site)->url().'/'.$rule, withTrailingSlash: false));
+                ->map(fn (string $rule) => URL::tidy(Site::get($site)->url().'/'.$rule));
         })->flatten()->all();
 
         return [
@@ -212,7 +216,7 @@ class DefaultInvalidator implements Invalidator
 
         $prefixedRelativeUrls = $rules
             ->reject(fn (string $rule) => URL::isAbsolute($rule))
-            ->map(fn (string $rule) => URL::tidy($tree->site()->url().'/'.$rule, withTrailingSlash: false))
+            ->map(fn (string $rule) => URL::tidy($tree->site()->url().'/'.$rule))
             ->all();
 
         return [
@@ -232,7 +236,7 @@ class DefaultInvalidator implements Invalidator
 
         $prefixedRelativeUrls = $rules
             ->reject(fn (string $rule) => URL::isAbsolute($rule))
-            ->map(fn (string $rule) => URL::tidy($variables->site()->url().'/'.$rule, withTrailingSlash: false))
+            ->map(fn (string $rule) => URL::tidy($variables->site()->url().'/'.$rule))
             ->all();
 
         return [
@@ -252,7 +256,7 @@ class DefaultInvalidator implements Invalidator
         $prefixedRelativeUrls = $collection->sites()->map(function ($site) use ($rules) {
             return $rules
                 ->reject(fn (string $rule) => URL::isAbsolute($rule))
-                ->map(fn (string $rule) => URL::tidy(Site::get($site)->url().'/'.$rule, withTrailingSlash: false));
+                ->map(fn (string $rule) => URL::tidy(Site::get($site)->url().'/'.$rule));
         })->flatten()->all();
 
         return [
@@ -270,7 +274,7 @@ class DefaultInvalidator implements Invalidator
 
         $prefixedRelativeUrls = $rules
             ->reject(fn (string $rule) => URL::isAbsolute($rule))
-            ->map(fn (string $rule) => URL::tidy($tree->site()->url().'/'.$rule, withTrailingSlash: false))
+            ->map(fn (string $rule) => URL::tidy($tree->site()->url().'/'.$rule))
             ->all();
 
         return [

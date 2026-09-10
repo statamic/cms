@@ -1194,8 +1194,14 @@ class Environment
             $leftVal = $leftVal->value();
         }
 
-        if ($leftVal != null) {
-            return $leftVal;
+        if ($group->strict) {
+            if ($leftVal !== null) {
+                return $leftVal;
+            }
+        } else {
+            if ($leftVal != null) {
+                return $leftVal;
+            }
         }
 
         return $this->getValue($group->right);
@@ -1393,24 +1399,28 @@ class Environment
         if ($value instanceof Value) {
             $prevIsEvaluatingUserData = GlobalRuntimeState::$isEvaluatingUserData;
             GlobalRuntimeState::$isEvaluatingUserData = true;
-            if ($value->shouldParseAntlers()) {
-                if (! $hasModifiers || ($modifierChain != null && $modifierChain[0]->nameNode->name != 'raw')) {
-                    GlobalRuntimeState::$userContentEvalState = [
-                        $value,
-                        $this->nodeProcessor->getActiveNode(),
-                    ];
-                    try {
-                        $value = $value->antlersValue($this->nodeProcessor->getAntlersParser(), $this->data);
-                    } finally {
-                        GlobalRuntimeState::$userContentEvalState = null;
+
+            try {
+                if ($value->shouldParseAntlers()) {
+                    if (! $hasModifiers || ($modifierChain != null && $modifierChain[0]->nameNode->name != 'raw')) {
+                        GlobalRuntimeState::$userContentEvalState = [
+                            $value,
+                            $this->nodeProcessor->getActiveNode(),
+                        ];
+                        try {
+                            $value = $value->antlersValue($this->nodeProcessor->getAntlersParser(), $this->data);
+                        } finally {
+                            GlobalRuntimeState::$userContentEvalState = null;
+                        }
+                    }
+                } else {
+                    if (! $hasModifiers) {
+                        $value = $value->value();
                     }
                 }
-            } else {
-                if (! $hasModifiers) {
-                    $value = $value->value();
-                }
+            } finally {
+                GlobalRuntimeState::$isEvaluatingUserData = $prevIsEvaluatingUserData;
             }
-            GlobalRuntimeState::$isEvaluatingUserData = $prevIsEvaluatingUserData;
         }
 
         return $value;

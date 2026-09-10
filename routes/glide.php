@@ -7,7 +7,7 @@ use Statamic\Facades\URL;
 use Statamic\Http\Controllers\GlideController;
 
 Site::all()->map(function ($site) {
-    return URL::makeRelative($site->url());
+    return trim(URL::makeRelative($site->url()), '/');
 })->unique()->each(function ($sitePrefix) {
     Route::group(['prefix' => $sitePrefix.'/'.Glide::route()], function () {
         Route::get('/asset/{container}/{path?}', [GlideController::class, 'generateByAsset'])->where('path', '.*');

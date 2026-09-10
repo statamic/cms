@@ -1,0 +1,50 @@
+includes:
+  - vendor/larastan/larastan/extension.neon
+  - .phpstan/baseline.neon
+
+parameters:
+  level: 0
+  paths:
+    - src
+
+  # Symbol-only stubs for optional runtime integrations that this package
+  # never requires as real dependencies (see .phpstan/stubs/debugbar.php).
+  scanFiles:
+    - .phpstan/stubs/debugbar.php
+
+  ignoreErrors:
+    -
+      identifier: class.notFound
+      message: '#^(Class|Instantiated class) Spatie\\LaravelIgnition\\Exceptions\\(ViewException|ViewExceptionWithSolution) not found\.$#'
+      path: src/View/Antlers/Language/Runtime/RuntimeParser.php
+
+    # composer/composer is an optional runtime integration (composer update hooks), not a real dependency.
+    -
+      identifier: class.notFound
+      message: '#^Parameter \$event of method Statamic\\Console\\Composer\\Scripts::preUpdateCmd\(\) has invalid type Composer\\Script\\Event\.$#'
+      path: src/Console/Composer/Scripts.php
+
+    # barryvdh/laravel-debugbar is an optional runtime integration, guarded by class_exists()/isEnabled() checks.
+    -
+      identifier: class.notFound
+      message: '#^Caught class DebugBar\\DebugBarException not found\.$#'
+      path: src/Forms/Tags.php
+    -
+      identifier: function.notFound
+      message: '#^Function debug not found\.$#'
+      path: src/Modifiers/CoreModifiers.php
+
+    # spatie/laravel-ignition is an optional runtime integration; ddd() is one of its helpers.
+    -
+      identifier: function.notFound
+      message: '#^Function ddd not found\.$#'
+      path: src/Modifiers/CoreModifiers.php
+
+    # self::this() inside the Carbon::macro() closure resolves to Carbon\Traits\Mixin::this(),
+    # a protected static method Carbon rebinds into scope for macros registered via Mixin -
+    # see vendor/nesbot/carbon/src/Carbon/Traits/Mixin.php. PHPStan can't follow the
+    # static-closure scope rebinding, so it thinks this() is being called on this class.
+    -
+      identifier: staticMethod.notFound
+      message: '#^Call to an undefined static method Statamic\\Providers\\AppServiceProvider::this\(\)\.$#'
+      path: src/Providers/AppServiceProvider.php

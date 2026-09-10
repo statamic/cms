@@ -7,8 +7,12 @@ use Illuminate\Filesystem\Filesystem;
 use Statamic\Exceptions\ComposerLockFileNotFoundException;
 use Statamic\Exceptions\ComposerLockPackageNotFoundException;
 use Statamic\Facades\Path;
+use Statamic\Support\Str;
 use Statamic\UpdateScripts\UpdateScript;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class Lock
 {
     protected $files;
@@ -17,11 +21,25 @@ class Lock
     /**
      * Instantiate lock file helper.
      */
-    public function __construct(string $file = 'composer.lock')
+    public function __construct(?string $file = null)
     {
+        $file ??= static::filename();
+
         $this->files = app(Filesystem::class);
 
         $this->path = Path::isAbsolute($file) ? $file : base_path($file);
+    }
+
+    /**
+     * Get the lock filename Composer derives from its configured composer.json filename.
+     */
+    public static function filename(): string
+    {
+        $json = Json::filename();
+
+        return Str::endsWith($json, '.json')
+            ? Str::replaceLast('.json', '.lock', $json)
+            : $json.'.lock';
     }
 
     /**
@@ -29,16 +47,26 @@ class Lock
      *
      * @return static
      */
-    public static function file(string $file = 'composer.lock')
+    public static function file(?string $file = null)
     {
         return new static($file);
     }
 
     /**
+     * Get the resolved lock file path.
+     */
+    public function path(): string
+    {
+        return $this->path;
+    }
+
+    /**
      * Backup lock file, using vanilla PHP so that this can be run in a Composer hook.
      */
-    public static function backup(string $file = 'composer.lock')
+    public static function backup(?string $file = null)
     {
+        $file ??= static::filename();
+
         if (! is_file($file)) {
             return;
         }

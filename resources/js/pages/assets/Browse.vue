@@ -8,13 +8,23 @@ export default {
         DocsCallout,
     },
 
-    props: ['container', 'folder', 'columns', 'canCreateContainers', 'createContainerUrl', 'editing'],
+    props: ['container', 'folder', 'columns', 'filters', 'canCreateContainers', 'createContainerUrl', 'editing'],
 
     data() {
         return {
             path: this.folder,
             selectedAssets: [],
         };
+    },
+
+    computed: {
+        headTitle() {
+            const title = __(this.container.title);
+            const section = __('Assets');
+
+            // Avoid duplicating when the container is named "Assets".
+            return title === section ? section : [title, section];
+        },
     },
 
     mounted() {
@@ -91,7 +101,7 @@ export default {
 
 <template>
     <div class="h-full" v-cloak>
-        <Head :title="container.title" />
+        <Head :title="headTitle" />
 
         <asset-browser
             ref="browser"
@@ -103,6 +113,7 @@ export default {
             :selected-path="path"
             :selected-assets="selectedAssets"
             :initial-columns="columns"
+            :filters="filters"
             @navigated="navigate"
             @selections-updated="updateSelections"
             @edit-asset="editAsset"

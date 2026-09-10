@@ -6,7 +6,7 @@ import { Button } from '@ui';
 import {
     isToday,
     getCreateUrlDateParam,
-    formatDateString,
+    getEntryDate,
 } from './calendar.js';
 import DateFormatter from '@/components/DateFormatter.js';
 
@@ -25,14 +25,13 @@ const $date = new DateFormatter;
 const visibleHours = Array.from({ length: 24 }, (_, i) => i);
 
 function getEntriesForHour(date, hour) {
-    const dateStr = formatDateString(date);
+    const dateStr = date.toString();
     return props.entries.filter(entry => {
-        const entryDate = new Date(entry.date?.date || entry.date);
-        const entryDateStr = entryDate.toISOString().split('T')[0];
+        const entryDate = getEntryDate(entry);
+        const entryDateStr = entryDate.toString().split('T')[0];
         if (entryDateStr !== dateStr) return false;
 
-        const entryHour = entryDate.getHours();
-        return entryHour === hour;
+        return (entryDate.hour ?? 0) === hour;
     });
 }
 
