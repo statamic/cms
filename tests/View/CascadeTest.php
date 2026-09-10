@@ -525,6 +525,60 @@ class CascadeTest extends TestCase
     }
 
     #[Test]
+    public function a_hydrated_once_callback_only_runs_on_the_next_hydration()
+    {
+        $cascade = $this->cascade();
+
+        $cascade->hydratedOnce(function ($cascade) {
+            $cascade->set('response_code', 404);
+        });
+
+        // The callback runs during this hydration...
+        $this->assertEquals(404, $cascade->hydrate()->toArray()['response_code']);
+
+        // ...but not on subsequent ones, so the value falls back to its default.
+        $this->assertEquals(200, $cascade->hydrate()->toArray()['response_code']);
+    }
+
+    #[Test]
+    public function hydrated_once_callbacks_do_not_accumulate_across_hydrations()
+    {
+        $cascade = $this->cascade();
+
+        $runs = 0;
+        $register = function () use ($cascade, &$runs) {
+            $cascade->hydratedOnce(function () use (&$runs) {
+                $runs++;
+            });
+        };
+
+        // Simulate two error renders on the same long-lived process.
+        $register();
+        $cascade->hydrate();
+        $register();
+        $cascade->hydrate();
+
+        // Two registrations, two runs — not three (which is what accumulation would cause).
+        $this->assertEquals(2, $runs);
+    }
+
+    #[Test]
+    public function persistent_hydrated_callbacks_still_run_every_hydration()
+    {
+        $cascade = $this->cascade();
+
+        $runs = 0;
+        $cascade->hydrated(function () use (&$runs) {
+            $runs++;
+        });
+
+        $cascade->hydrate();
+        $cascade->hydrate();
+
+        $this->assertEquals(2, $runs);
+    }
+
+    #[Test]
     public function page_data_overrides_globals()
     {
         Event::fake(); // prevents taxonomy term tracker from kicking in.
