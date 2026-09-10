@@ -43,6 +43,7 @@ function toggleCollapsedState() {
                         <Button icon="dots" variant="ghost" size="xs" class="me-2" :aria-label="__('Open row actions')" />
                     </template>
                     <DropdownMenu>
+                        <slot name="actions" />
                         <DropdownItem
                             :text="__('Duplicate')"
                             icon="duplicate"

@@ -1,9 +1,11 @@
 <script setup lang="ts">
+import { ref } from 'vue';
 import { usePage } from '@inertiajs/vue3';
-import { Badge, Icon, Label, PublishContainer, PublishFields, PublishFieldsProvider } from '@ui';
+import { Badge, DropdownItem, Icon, Label, PublishContainer, PublishFields, PublishFieldsProvider } from '@ui';
 import ConnectionRows from './ConnectionRows.vue';
 import ConnectionRules from './ConnectionRules.vue';
 import ConnectionRowSummary from './ConnectionRowSummary.vue';
+import EmailPreview from './EmailPreview.vue';
 
 defineEmits(['update:modelValue']);
 
@@ -14,9 +16,12 @@ defineProps({
     blueprint: Object,
     meta: { type: Object, default: () => ({}) },
     defaults: Object,
+    previewUrl: String,
 });
 
 const suggestableFields = usePage().props.suggestableFields;
+
+const previewing = ref<Record<string, unknown> | null>(null);
 
 const recipients = (to: string[] | string): string =>
     [to].flat().map((recipient) => {
@@ -54,6 +59,14 @@ const recipients = (to: string[] | string): string =>
             />
         </template>
 
+        <template #actions="{ item: email }">
+            <DropdownItem
+                :text="__('Preview')"
+                icon="eye"
+                @click="previewing = email"
+            />
+        </template>
+
         <template #default="{ item: email, errors }">
             <ConnectionRules
                 v-model:conditions="email.conditions"
@@ -79,4 +92,6 @@ const recipients = (to: string[] | string): string =>
             </ConnectionRules>
         </template>
     </ConnectionRows>
+
+    <EmailPreview v-model="previewing" :url="previewUrl" />
 </template>

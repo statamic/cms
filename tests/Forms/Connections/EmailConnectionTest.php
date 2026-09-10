@@ -2,18 +2,32 @@
 
 namespace Tests\Forms\Connections;
 
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Form;
+use Statamic\Facades\FormConnection;
+use Statamic\Facades\User;
 use Statamic\Forms\Connections\Email;
 use Statamic\Forms\SendEmails;
+use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class EmailConnectionTest extends TestCase
 {
+    use FakesRoles;
     use PreventSavingStacheItemsToDisk;
+
+    protected function resolveApplicationConfiguration($app)
+    {
+        parent::resolveApplicationConfiguration($app);
+
+        $app['config']['statamic.forms.forms'] = $this->fakeStacheDirectory.'/forms';
+        $app['config']['mail.from'] = ['address' => 'default@example.com', 'name' => 'Default Sender'];
+    }
 
     #[Test]
     public function it_returns_a_job_that_sends_the_emails()
@@ -58,10 +72,233 @@ class EmailConnectionTest extends TestCase
         $component = (new Email)->render($form)->toArray();
 
         $this->assertEquals('email-connection', $component['name']);
-        $this->assertEquals(['blueprint', 'meta', 'defaults'], array_keys($component['props']));
+        $this->assertEquals(['blueprint', 'meta', 'defaults', 'previewUrl'], array_keys($component['props']));
         $this->assertEquals(['one', 'two'], array_keys($component['props']['meta']));
         $this->assertEquals([], $component['props']['defaults']['values']['to']);
         $this->assertArrayHasKey('meta', $component['props']['defaults']);
+        $this->assertEquals(cp_route('forms.connect.email.preview', 'test'), $component['props']['previewUrl']);
+    }
+
+    #[Test]
+    public function it_registers_a_preview_route()
+    {
+        FormConnection::routes();
+
+        $route = collect(Route::getRoutes())->first(fn ($route) => $route->getName() === 'forms.connect.email.preview');
+
+        $this->assertNotNull($route);
+        $this->assertEquals('forms/{form}/connect/email/preview', $route->uri());
+        $this->assertContains('POST', $route->methods());
+        $this->assertContains('can:edit,form', $route->middleware());
+    }
+
+    #[Test]
+    public function it_previews_an_email_using_a_sample_submission()
+    {
+        $form = $this->makeForm();
+
+        $response = $this
+            ->actingAs($this->userWithEditPermission())
+            ->postJson(cp_route('forms.connect.email.preview', $form->handle()), [
+                'id' => 'abc',
+                'to' => ['field:email', 'Team <team@example.com>'],
+                'from' => ['sender@example.com'],
+                'reply_to' => ['field:email'],
+                'subject' => 'Hello {{ name }}',
+            ])
+            ->assertOk()
+            ->assertJson([
+                'from' => ['sender@example.com'],
+                'format' => 'html',
+                'cc' => [],
+                'bcc' => [],
+                'sample' => true,
+            ]);
+
+        $this->assertStringStartsWith('Hello ', $response->json('subject'));
+        $this->assertNotEquals('Hello ', $response->json('subject'));
+        $this->assertNotFalse(filter_var($response->json('to.0'), FILTER_VALIDATE_EMAIL));
+        $this->assertEquals('Team <team@example.com>', $response->json('to.1'));
+        $this->assertEquals($response->json('to.0'), $response->json('reply_to.0'));
+        $this->assertStringContainsString('<b>Name:</b>', $response->json('body'));
+        $this->assertStringContainsString('<b>Email:</b>', $response->json('body'));
+        $this->assertEquals(0, $form->querySubmissions()->count());
+    }
+
+    #[Test]
+    public function it_previews_using_the_latest_submission_when_the_user_can_view_submissions()
+    {
+        $form = $this->makeForm();
+        $this->makeSubmission($form, ['name' => 'Older', 'email' => 'older@example.com'], '2026-01-01 10:00');
+        $this->makeSubmission($form, ['name' => 'Latest', 'email' => 'latest@example.com'], '2026-02-01 10:00');
+        $this->makeSubmission($form, ['name' => 'Partial', 'email' => 'partial@example.com'], '2026-03-01 10:00', partial: true);
+
+        $this->setTestRoles(['test' => ['access cp', 'edit forms', 'view test form submissions']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+
+        $this
+            ->actingAs($user)
+            ->postJson(cp_route('forms.connect.email.preview', $form->handle()), [
+                'id' => 'abc',
+                'to' => ['field:email'],
+                'subject' => 'Hello {{ name }}',
+            ])
+            ->assertOk()
+            ->assertJson([
+                'subject' => 'Hello Latest',
+                'to' => ['latest@example.com'],
+                'sample' => false,
+            ]);
+    }
+
+    #[Test]
+    public function it_previews_using_sample_data_when_the_user_cannot_view_submissions()
+    {
+        $form = $this->makeForm();
+        $this->makeSubmission($form, ['name' => 'Latest', 'email' => 'latest@example.com'], '2026-02-01 10:00');
+
+        $response = $this
+            ->actingAs($this->userWithEditPermission())
+            ->postJson(cp_route('forms.connect.email.preview', $form->handle()), [
+                'id' => 'abc',
+                'to' => ['field:email'],
+                'subject' => 'Hello {{ name }}',
+            ])
+            ->assertOk()
+            ->assertJson(['sample' => true]);
+
+        $this->assertNotEquals('Hello Latest', $response->json('subject'));
+        $this->assertNotEquals(['latest@example.com'], $response->json('to'));
+    }
+
+    #[Test]
+    public function it_previews_with_the_default_sender_when_none_is_configured()
+    {
+        $form = $this->makeForm();
+
+        $this
+            ->actingAs($this->userWithEditPermission())
+            ->postJson(cp_route('forms.connect.email.preview', $form->handle()), [
+                'id' => 'abc',
+                'to' => ['recipient@example.com'],
+            ])
+            ->assertOk()
+            ->assertJson(['from' => ['Default Sender <default@example.com>']]);
+    }
+
+    #[Test]
+    public function it_previews_a_custom_html_view()
+    {
+        $form = $this->makeForm();
+
+        $response = $this
+            ->actingAs($this->userWithEditPermission())
+            ->postJson(cp_route('forms.connect.email.preview', $form->handle()), [
+                'id' => 'abc',
+                'to' => ['recipient@example.com'],
+                'html' => 'emails.preview',
+            ])
+            ->assertOk()
+            ->assertJson(['format' => 'html']);
+
+        $this->assertStringStartsWith('<h1>Hello ', trim($response->json('body')));
+    }
+
+    #[Test]
+    public function it_previews_a_markdown_view()
+    {
+        $form = $this->makeForm();
+
+        $response = $this
+            ->actingAs($this->userWithEditPermission())
+            ->postJson(cp_route('forms.connect.email.preview', $form->handle()), [
+                'id' => 'abc',
+                'to' => ['recipient@example.com'],
+                'html' => 'emails.preview-markdown',
+                'markdown' => true,
+            ])
+            ->assertOk()
+            ->assertJson(['format' => 'html']);
+
+        $this->assertMatchesRegularExpression('/<h1[^>]*>Hello \S+/', $response->json('body'));
+    }
+
+    #[Test]
+    public function it_previews_a_text_only_view_as_text()
+    {
+        $form = $this->makeForm();
+
+        $response = $this
+            ->actingAs($this->userWithEditPermission())
+            ->postJson(cp_route('forms.connect.email.preview', $form->handle()), [
+                'id' => 'abc',
+                'to' => ['recipient@example.com'],
+                'text' => 'emails.preview-text',
+            ])
+            ->assertOk()
+            ->assertJson(['format' => 'text']);
+
+        $this->assertStringStartsWith('Hello ', trim($response->json('body')));
+    }
+
+    #[Test]
+    #[DataProvider('previewAttachmentsProvider')]
+    public function it_previews_whether_files_will_be_attached(array $fields, bool $enabled, bool $expected)
+    {
+        $form = $this->makeForm($fields);
+
+        $this
+            ->actingAs($this->userWithEditPermission())
+            ->postJson(cp_route('forms.connect.email.preview', $form->handle()), [
+                'id' => 'abc',
+                'to' => ['recipient@example.com'],
+                'attachments' => $enabled,
+            ])
+            ->assertOk()
+            ->assertJson(['attachments' => $expected]);
+    }
+
+    public static function previewAttachmentsProvider(): array
+    {
+        $upload = [['handle' => 'cv', 'field' => ['type' => 'upload']]];
+
+        return [
+            'enabled with an upload field' => [$upload, true, true],
+            'disabled with an upload field' => [$upload, false, false],
+            'enabled without an upload field' => [[], true, false],
+        ];
+    }
+
+    #[Test]
+    public function it_returns_the_error_when_the_preview_cannot_be_rendered()
+    {
+        $form = $this->makeForm();
+
+        $this
+            ->actingAs($this->userWithEditPermission())
+            ->postJson(cp_route('forms.connect.email.preview', $form->handle()), [
+                'id' => 'abc',
+                'to' => ['recipient@example.com'],
+                'html' => 'emails.missing',
+            ])
+            ->assertStatus(422)
+            ->assertJson(['message' => 'View [emails.missing] not found.']);
+    }
+
+    #[Test]
+    public function it_denies_the_preview_if_you_dont_have_permission()
+    {
+        $form = $this->makeForm();
+
+        $this->setTestRoles(['test' => ['access cp']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+
+        $this
+            ->from('/original')
+            ->actingAs($user)
+            ->post(cp_route('forms.connect.email.preview', $form->handle()), ['id' => 'abc'])
+            ->assertRedirect('/original')
+            ->assertSessionHas('error');
     }
 
     #[Test]
@@ -254,5 +491,34 @@ class EmailConnectionTest extends TestCase
                 ['value' => 'field:email_address', 'label' => 'Email Address', 'icon' => 'mail-sign-at', 'category' => 'contact'],
             ], $meta->get($handle)['options']);
         }
+    }
+
+    private function makeForm(array $extraFields = [])
+    {
+        return tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'name', 'field' => ['type' => 'short_answer', 'display' => 'Name']],
+                ['handle' => 'email', 'field' => ['type' => 'email', 'display' => 'Email']],
+                ...$extraFields,
+            ],
+        ]))->save();
+    }
+
+    private function makeSubmission($form, array $data, string $date, bool $partial = false)
+    {
+        $submission = $form->makeSubmission()->id(Carbon::parse($date)->timestamp)->data($data);
+
+        if ($partial) {
+            $submission->asPartial();
+        }
+
+        return tap($submission)->save();
+    }
+
+    private function userWithEditPermission()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'edit forms']]);
+
+        return tap(User::make()->assignRole('test'))->save();
     }
 }

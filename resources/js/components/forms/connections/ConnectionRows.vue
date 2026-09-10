@@ -180,6 +180,10 @@ watch(
                             <slot name="header" :item="row" :index="index" :collapsed="collapsed.includes(row.id)" />
                         </template>
 
+                        <template #actions>
+                            <slot name="actions" :item="row" :index="index" />
+                        </template>
+
                         <slot :item="row" :index="index" :errors="rowErrors(row)" />
                     </ConnectionRow>
                 </div>
