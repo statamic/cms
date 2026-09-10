@@ -76,28 +76,24 @@ class Terms extends FieldtypeFilter
             ? $this->fieldtype->taxonomies()[0]
             : Str::before($term, '::');
 
-        $leaf = str_contains($slug, '/') ? Str::afterLast($slug, '/') : $slug;
-        $fallback = array_values(array_unique(array_filter([$term, $slug, $leaf])));
+        $fallback = array_values(array_unique(array_filter([$term, $slug])));
 
         if (! $handle || ! ($taxonomy = Facades\Taxonomy::findByHandle($handle)) || ! $taxonomy->hierarchical()) {
             return $fallback;
         }
 
-        if (! $page = $taxonomy->structure()->tree()->find($leaf)) {
+        if (! $page = $taxonomy->structure()->tree()->find($slug)) {
             return $fallback;
         }
 
         $values = collect();
-        $parentPath = implode('/', $taxonomy->structure()->ancestorsOf($page));
 
-        $walk = function ($page, $path) use (&$walk, $values) {
-            $slug = $page->id();
-            $full = $path === '' ? $slug : $path.'/'.$slug;
-            $values->push($slug, $full);
-            $page->pages()->all()->each(fn ($child) => $walk($child, $full));
+        $walk = function ($page) use (&$walk, $values) {
+            $values->push($page->id());
+            $page->pages()->all()->each(fn ($child) => $walk($child));
         };
 
-        $walk($page, $parentPath);
+        $walk($page);
 
         return $values->merge($fallback)->unique()->values()->all();
     }
