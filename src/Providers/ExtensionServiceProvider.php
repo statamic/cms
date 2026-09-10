@@ -41,6 +41,8 @@ class ExtensionServiceProvider extends ServiceProvider
         'duplicate_entry' => Actions\DuplicateEntry::class,
         'duplicate_form' => Actions\DuplicateForm::class,
         'duplicate_term' => Actions\DuplicateTerm::class,
+        'mark_as_spam' => Actions\MarkAsSpam::class,
+        'mark_as_not_spam' => Actions\MarkAsNotSpam::class,
         'publish' => Actions\Publish::class,
         'unpublish' => Actions\Unpublish::class,
         'send_password_reset' => Actions\SendPasswordReset::class,

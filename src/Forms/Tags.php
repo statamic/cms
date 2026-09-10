@@ -272,11 +272,21 @@ class Tags extends BaseTags
     {
         $query = $this->form()->querySubmissions();
 
+        $this->queryStatus($query);
         $this->queryConditions($query);
         $this->queryScopes($query);
         $this->queryOrderBys($query);
 
         return $this->output($this->results($query));
+    }
+
+    protected function queryStatus($query)
+    {
+        if ($this->isQueryingCondition('status')) {
+            return;
+        }
+
+        return $query->whereStatus('finalized');
     }
 
     /**

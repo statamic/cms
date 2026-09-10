@@ -1315,6 +1315,51 @@ EOT
     }
 
     #[Test]
+    public function it_will_store_the_submission_as_spam_when_the_honeypot_is_filled_and_configured_to_do_so()
+    {
+        Form::find('contact')->data(['honeypot_behavior' => 'mark_as_spam'])->save();
+
+        $this
+            ->post('/!/forms/contact', [
+                'email' => 'san@holo.com',
+                'message' => 'hello',
+                'winnie' => 'the pooh',
+            ])
+            ->assertSessionHasNoErrors()
+            ->assertLocation('/');
+
+        $submissions = Form::find('contact')->submissions();
+
+        $this->assertCount(1, $submissions);
+        $this->assertEquals('spam', $submissions->first()->status());
+    }
+
+    #[Test]
+    public function it_forgets_the_partial_submission_when_it_is_stored_as_spam()
+    {
+        $this->createMultiPageForm();
+        Form::find('survey')->data(['honeypot_behavior' => 'mark_as_spam'])->save();
+
+        $this
+            ->post('/!/forms/survey', ['_page' => 'page_one', 'name' => 'Olaf'])
+            ->assertSessionHas('form.survey.partial_submission');
+
+        // Tripping the honeypot on the final page stores the submission as spam, and the
+        // session ends up in the same state as a successful submission would leave it.
+        $this
+            ->post('/!/forms/survey', ['_page' => 'page_two', 'email' => 'olaf@example.com', 'winnie' => 'the pooh'])
+            ->assertSessionHasNoErrors()
+            ->assertSessionMissing('form.survey.partial_submission');
+
+        $submissions = Form::find('survey')->submissions();
+
+        $this->assertCount(1, $submissions);
+        $this->assertEquals('spam', $submissions->first()->status());
+
+        Form::find('survey')->submissions()->each->delete();
+    }
+
+    #[Test]
     public function it_will_render_fake_success_when_a_listener_throws_a_bare_silent_failure_exception()
     {
         Event::listen(\Statamic\Events\FormSubmitted::class, function () {

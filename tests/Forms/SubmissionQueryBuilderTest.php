@@ -3,6 +3,7 @@
 namespace Tests\Forms;
 
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Facades\Form;
@@ -460,5 +461,38 @@ class SubmissionQueryBuilderTest extends TestCase
 
         $submissions = FormSubmission::query()->offset(1)->get();
         $this->assertEquals(['b', 'c'], $submissions->map->get('id')->all());
+    }
+
+    #[Test]
+    #[DataProvider('filterByStatusProvider')]
+    public function it_filters_by_status(string $status, array $expected)
+    {
+        $form = tap(Form::make('test'))->save();
+        FormSubmission::make()->form($form)->data(['id' => 'finalized'])->save();
+        FormSubmission::make()->form($form)->data(['id' => 'partial'])->asPartial()->save();
+        FormSubmission::make()->form($form)->data(['id' => 'spam'])->markAsSpam()->save();
+        FormSubmission::make()->form($form)->data(['id' => 'spam-partial'])->asPartial()->markAsSpam()->save();
+
+        $submissions = FormSubmission::query()->whereStatus($status)->get();
+
+        $this->assertEquals($expected, $submissions->map->get('id')->sort()->values()->all());
+    }
+
+    public static function filterByStatusProvider(): array
+    {
+        return [
+            'any' => ['any', ['finalized', 'partial', 'spam', 'spam-partial']],
+            'finalized' => ['finalized', ['finalized']],
+            'partial' => ['partial', ['partial']],
+            'spam' => ['spam', ['spam', 'spam-partial']],
+        ];
+    }
+
+    #[Test]
+    public function filtering_by_unexpected_status_throws_exception()
+    {
+        $this->expectExceptionMessage('Invalid status [foo]');
+
+        FormSubmission::query()->whereStatus('foo')->get();
     }
 }

@@ -69,6 +69,27 @@ class DeletePartialFormSubmissionsTest extends TestCase
     }
 
     #[Test]
+    public function it_does_not_delete_partial_submissions_marked_as_spam()
+    {
+        config(['statamic.forms.delete_partial_submissions_after' => 7]);
+
+        $form = tap(Form::make('contact'))->save();
+
+        Carbon::setTestNow('2025-06-01 12:00:00');
+        $partial = tap($form->makeSubmission()->set('partial', true))->save();
+
+        Carbon::setTestNow('2025-06-02 12:00:00');
+        $spam = tap($form->makeSubmission()->set('partial', true)->markAsSpam())->save();
+
+        Carbon::setTestNow('2025-06-30 12:00:00');
+
+        (new DeletePartialFormSubmissions)->handle();
+
+        $this->assertNull($form->submission($partial->id()));
+        $this->assertNotNull($form->submission($spam->id()));
+    }
+
+    #[Test]
     public function it_does_not_delete_anything_when_disabled()
     {
         config(['statamic.forms.delete_partial_submissions_after' => null]);

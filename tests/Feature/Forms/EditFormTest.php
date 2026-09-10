@@ -115,9 +115,9 @@ class EditFormTest extends TestCase
         $user = User::make()->assignRole('test')->save();
         $form = tap(Form::make('test'))->save();
 
-        Form::appendConfigFields('*', 'Fields', [
-            'a' => ['type' => 'text', 'display' => 'First injected into fields section'],
-            'b' => ['type' => 'text', 'display' => 'Second injected into fields section'],
+        Form::appendConfigFields('*', 'Honeypot', [
+            'a' => ['type' => 'text', 'display' => 'First injected into honeypot section'],
+            'b' => ['type' => 'text', 'display' => 'Second injected into honeypot section'],
         ]);
         Form::appendConfigFields('*', 'Additional Section', [
             'c' => ['type' => 'text', 'display' => 'First injected into additional section'],
@@ -131,8 +131,8 @@ class EditFormTest extends TestCase
             ->assertSeeInOrder([
                 'Title',
                 'Honeypot',
-                'First injected into fields section',
-                'Second injected into fields section',
+                'First injected into honeypot section',
+                'Second injected into honeypot section',
                 'Store Submissions',
                 'Additional Section',
                 'First injected into additional section',
