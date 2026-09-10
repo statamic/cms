@@ -32,7 +32,6 @@ function toggleCollapsedState() {
                 <slot name="header" />
             </button>
             <div class="flex items-center gap-2">
-                <slot name="header-actions" />
                 <Switch
                     size="xs"
                     :model-value="enabled"

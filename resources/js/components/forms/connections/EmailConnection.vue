@@ -48,19 +48,21 @@ const recipients = (to: string[] | string): string =>
         @update:model-value="$emit('update:modelValue', $event)"
     >
         <template #header="{ item: email, collapsed }">
-            <Badge size="lg" pill color="white" class="px-3 text-gray-950 gap-1">
-                <Icon name="mail-sign-at" class="size-3.5 me-1 opacity-100! text-blue-600 dark:text-blue-400" aria-hidden="true" />
-                {{ email.to?.length ? __('Message sent to :email', { email: recipients(email.to) }) : __('New Email') }}
-            </Badge>
-            <ConnectionRowSummary
-                v-show="collapsed"
-                :conditions="email.conditions"
-                :fallback="email.subject"
-            />
-        </template>
+            <div class="flex items-center justify-between w-full gap-2 me-1">
+                <div class="flex items-center gap-1.75">
+                    <Badge size="lg" pill color="white" class="px-3 text-gray-950 gap-1">
+                        <Icon name="mail-sign-at" class="size-3.5 me-1 opacity-100! text-blue-600 dark:text-blue-400" aria-hidden="true" />
+                        {{ email.to?.length ? __('Message sent to :email', { email: recipients(email.to) }) : __('New Email') }}
+                    </Badge>
+                    <ConnectionRowSummary
+                        v-show="collapsed"
+                        :conditions="email.conditions"
+                        :fallback="email.subject"
+                    />
+                </div>
 
-        <template #header-actions="{ item: email }">
-            <Button icon="eye" size="xs" :text="__('Preview')" @click="previewing = email" />
+                <Button icon="eye" size="xs" :text="__('Preview')" @click.stop="previewing = email" />
+            </div>
         </template>
 
         <template #default="{ item: email, errors }">
