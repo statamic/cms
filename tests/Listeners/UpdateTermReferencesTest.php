@@ -25,6 +25,7 @@ class UpdateTermReferencesTest extends TestCase
         $this->setSites([
             'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
             'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+            'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://de.test.com/'],
         ]);
 
         $this->topics = tap(Facades\Taxonomy::make('topics'))->save();
@@ -290,6 +291,98 @@ class UpdateTermReferencesTest extends TestCase
         $eventsConcerts->slug('shows')->save();
 
         $this->assertEquals(['shows', 'hoff'], $entry->fresh()->get('favourites'));
+    }
+
+    #[Test]
+    public function it_slugs_stored_values_using_the_items_language()
+    {
+        $buecher = tap(Facades\Term::make()->taxonomy('topics')->slug('buecher')->data(['title' => 'Bücher']))->save();
+
+        $collection = tap(Facades\Collection::make('articles')->sites(['en', 'de']))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'favourites',
+                    'field' => [
+                        'type' => 'terms',
+                        'taxonomies' => ['topics'],
+                        'mode' => 'select',
+                    ],
+                ],
+            ],
+        ]);
+
+        $german = tap(Facades\Entry::make()->collection($collection)->locale('de')->data([
+            'favourites' => ['Bücher', 'hoff'],
+        ]))->save();
+
+        $english = tap(Facades\Entry::make()->collection($collection)->locale('en')->data([
+            'favourites' => ['Bücher', 'hoff'],
+        ]))->save();
+
+        $buecher->slug('literatur')->save();
+
+        // German transliterates "ü" to "ue", so the value slugs to "buecher" and refers to the term.
+        $this->assertEquals(['literatur', 'hoff'], $german->fresh()->get('favourites'));
+
+        // English transliterates it to "u", so the value slugs to "bucher" and refers to nothing.
+        $this->assertEquals(['Bücher', 'hoff'], $english->fresh()->get('favourites'));
+    }
+
+    #[Test]
+    public function it_slugs_nested_stored_values_using_the_items_language()
+    {
+        $buecher = tap(Facades\Term::make()->taxonomy('topics')->slug('buecher')->data(['title' => 'Bücher']))->save();
+
+        $collection = tap(Facades\Collection::make('articles')->sites(['en', 'de']))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'reppy',
+                    'field' => [
+                        'type' => 'replicator',
+                        'sets' => [
+                            'set_one' => [
+                                'fields' => [
+                                    [
+                                        'handle' => 'favourites',
+                                        'field' => [
+                                            'type' => 'terms',
+                                            'taxonomies' => ['topics'],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $german = tap(Facades\Entry::make()->collection($collection)->locale('de')->data([
+            'reppy' => [
+                [
+                    'type' => 'set_one',
+                    'favourites' => ['Bücher', 'hoff'],
+                ],
+            ],
+        ]))->save();
+
+        $english = tap(Facades\Entry::make()->collection($collection)->locale('en')->data([
+            'reppy' => [
+                [
+                    'type' => 'set_one',
+                    'favourites' => ['Bücher', 'hoff'],
+                ],
+            ],
+        ]))->save();
+
+        $buecher->slug('literatur')->save();
+
+        $this->assertEquals(['literatur', 'hoff'], Arr::get($german->fresh()->data(), 'reppy.0.favourites'));
+        $this->assertEquals(['Bücher', 'hoff'], Arr::get($english->fresh()->data(), 'reppy.0.favourites'));
     }
 
     #[Test]

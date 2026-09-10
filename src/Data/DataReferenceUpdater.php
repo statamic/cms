@@ -85,7 +85,9 @@ abstract class DataReferenceUpdater
      */
     protected function getTopLevelFields()
     {
-        return $this->item->blueprint()->fields()->all();
+        // The blueprint, and its fields, may be shared between items. Point them at the item
+        // being updated so fieldtypes can resolve things like its site from the parent.
+        return $this->item->blueprint()->fields()->setParent($this->item)->all();
     }
 
     /**
@@ -120,7 +122,7 @@ abstract class DataReferenceUpdater
      */
     public function processNestedFields($fields, $dottedPrefix): void
     {
-        $this->recursivelyUpdateFields($fields->all(), $dottedPrefix);
+        $this->recursivelyUpdateFields($fields->setParent($this->item)->all(), $dottedPrefix);
     }
 
     /**

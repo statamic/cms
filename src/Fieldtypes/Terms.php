@@ -877,7 +877,7 @@ class Terms extends Relationship
             return false;
         }
 
-        return Str::slug($path) === $oldSlug;
+        return (new EnsuresTermPaths)->slugFromValue($path, $this->termLang()) === $oldSlug;
     }
 
     private function rewriteTermValue(string $value, string $oldValue, string $newValue): string
