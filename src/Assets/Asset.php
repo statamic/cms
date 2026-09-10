@@ -68,7 +68,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
 
     const AUDIO_EXTENSIONS = ['aac', 'flac', 'm4a', 'mp3', 'ogg', 'wav'];
     const IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif'];
-    const VIDEO_EXTENSIONS = ['h264', 'mp4', 'm4v', 'ogv', 'webm', 'mov'];
+    const VIDEO_EXTENSIONS = ['h264', 'mp4', 'm4v', 'ogv', 'webm', 'mov', 'mpeg', 'mpg', 'mkv'];
 
     protected $container;
     protected $path;
