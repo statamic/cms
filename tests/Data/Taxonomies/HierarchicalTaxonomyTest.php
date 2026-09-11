@@ -4,6 +4,7 @@ namespace Tests\Data\Taxonomies;
 
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Structures\TaxonomyTreeRepository;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
@@ -349,7 +350,7 @@ class HierarchicalTaxonomyTest extends TestCase
     }
 
     #[Test]
-    public function validating_a_tree_rejects_branches_deeper_than_max_depth()
+    public function asserting_max_depth_rejects_branches_deeper_than_max_depth()
     {
         $taxonomy = tap(Taxonomy::make('categories')->structureContents(['max_depth' => 2]))->save();
 
@@ -359,13 +360,32 @@ class HierarchicalTaxonomyTest extends TestCase
 
         $this->expectException(\Illuminate\Validation\ValidationException::class);
 
-        $taxonomy->structure()->validateTree([
+        $taxonomy->structure()->assertDoesNotExceedMaxDepth([
             ['term' => 'animals', 'children' => [
                 ['term' => 'cat', 'children' => [
                     ['term' => 'calico'],
                 ]],
             ]],
-        ], 'en');
+        ]);
+    }
+
+    #[Test]
+    public function lowering_max_depth_below_the_existing_tree_does_not_break_reading_it()
+    {
+        $taxonomy = $this->makeHierarchicalTaxonomy();
+
+        tap($taxonomy->structureContents(['max_depth' => 2]))->save();
+
+        Blink::flush();
+
+        $this->assertEquals([
+            ['term' => 'animals', 'children' => [
+                ['term' => 'cat', 'children' => [
+                    ['term' => 'calico'],
+                ]],
+            ]],
+            ['term' => 'furniture'],
+        ], Taxonomy::findByHandle('categories')->structure()->tree()->tree());
     }
 
     #[Test]

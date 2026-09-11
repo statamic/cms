@@ -107,8 +107,6 @@ class TaxonomyStructure extends Structure
     {
         $tree = $this->repairTree($tree);
 
-        $this->assertDoesNotExceedMaxDepth($tree);
-
         $slugs = $this->getTermSlugsFromTree($tree);
 
         $existingSlugs = Blink::once('taxonomy-structure-term-slugs-'.$this->handle(), function () {
@@ -250,7 +248,7 @@ class TaxonomyStructure extends Structure
             $raw[] = ['term' => $parentSlug];
         }
 
-        $this->assertParentAllowsChild($raw, $parentSlug);
+        $this->assertCanNest($parentSlug);
 
         $tree->tree($this->appendSlugToParent($raw, $parentSlug, $slug));
 
@@ -278,19 +276,30 @@ class TaxonomyStructure extends Structure
         }
     }
 
-    private function assertParentAllowsChild(array $tree, string $parentSlug): void
+    /**
+     * Assert that a child may be nested under $parentSlug. A parent that isn't in
+     * the persisted tree yet would be grafted in at the root, so it counts as
+     * depth 1. This is the only max-depth rule for nesting a single term.
+     */
+    public function assertCanNest(string $parentSlug): void
     {
         if (! $max = $this->maxDepth()) {
             return;
         }
 
-        $parentDepth = $this->depthOfSlug($tree, $parentSlug) ?? 1;
-
-        if ($parentDepth >= $max) {
+        if (($this->depthOfTerm($parentSlug) ?? 1) >= $max) {
             throw ValidationException::withMessages([
                 'parent' => __('statamic::validation.parent_exceeds_max_depth'),
             ]);
         }
+    }
+
+    /**
+     * The depth a term sits at in the persisted tree, or null if it isn't in it.
+     */
+    public function depthOfTerm(string $slug): ?int
+    {
+        return $this->depthOfSlug($this->repairTree($this->tree()->fileData()['tree'] ?? []), $slug);
     }
 
     private function depthOfSlug(array $branches, string $slug, int $depth = 1): ?int
