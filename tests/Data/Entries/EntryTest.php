@@ -29,6 +29,7 @@ use Statamic\Events\EntryDeleted;
 use Statamic\Events\EntryDeleting;
 use Statamic\Events\EntrySaved;
 use Statamic\Events\EntrySaving;
+use Statamic\Exceptions\EntryOriginRecursionException;
 use Statamic\Facades;
 use Statamic\Facades\Blink;
 use Statamic\Fields\Blueprint;
@@ -1655,6 +1656,109 @@ class EntryTest extends TestCase
         $this->assertSame($de, $descendants->get('de'));
     }
 
+    #[Test]
+    public function the_root_of_an_entry_in_an_origin_cycle_does_not_recurse()
+    {
+        $collection = tap(Collection::make('test'))->save();
+
+        $a = (new CyclicOriginEntry)->id('a')->locale('en')->collection($collection);
+        $b = (new CyclicOriginEntry)->id('b')->locale('fr')->collection($collection);
+
+        CyclicOriginEntry::$entries = ['a' => $a, 'b' => $b];
+
+        $a->origin('b');
+        $b->origin('a');
+
+        // The walk stops where the cycle closes rather than looping forever.
+        $this->assertSame($b, $a->root());
+        $this->assertSame($a, $b->root());
+    }
+
+    #[Test]
+    public function it_walks_a_valid_origin_chain_to_the_root()
+    {
+        $collection = tap(Collection::make('test'))->save();
+
+        $a = (new CyclicOriginEntry)->id('a')->locale('en')->collection($collection);
+        $b = (new CyclicOriginEntry)->id('b')->locale('fr')->collection($collection);
+        $c = (new CyclicOriginEntry)->id('c')->locale('de')->collection($collection);
+
+        CyclicOriginEntry::$entries = ['a' => $a, 'b' => $b, 'c' => $c];
+
+        // a -> b -> c, no cycle.
+        $a->origin('b');
+        $b->origin('c');
+
+        $this->assertSame($c, $a->root());
+        $this->assertSame([$b, $c], $a->ancestors()->all());
+    }
+
+    #[Test]
+    public function it_cannot_be_saved_with_an_origin_that_points_back_at_it()
+    {
+        tap(Collection::make('test')->sites(['en', 'fr']))->save();
+
+        $a = EntryFactory::id('a')->collection('test')->locale('en')->create();
+        $b = EntryFactory::id('b')->collection('test')->locale('fr')->origin('a')->create();
+
+        $this->expectException(EntryOriginRecursionException::class);
+        $this->expectExceptionMessage('Entry [a] cannot use origin [b] because it would create a loop.');
+
+        $a->origin($b)->save();
+    }
+
+    #[Test]
+    public function it_cannot_be_saved_with_an_origin_further_up_its_own_chain()
+    {
+        tap(Collection::make('test')->sites(['en', 'fr', 'de']))->save();
+
+        $a = EntryFactory::id('a')->collection('test')->locale('en')->create();
+        $b = EntryFactory::id('b')->collection('test')->locale('fr')->origin('a')->create();
+        $c = EntryFactory::id('c')->collection('test')->locale('de')->origin('b')->create();
+
+        $this->expectException(EntryOriginRecursionException::class);
+
+        $a->origin($c)->save();
+    }
+
+    #[Test]
+    public function it_cannot_be_saved_with_itself_as_origin()
+    {
+        tap(Collection::make('test')->sites(['en']))->save();
+
+        $a = EntryFactory::id('a')->collection('test')->locale('en')->create();
+
+        $this->expectException(EntryOriginRecursionException::class);
+
+        $a->origin('a')->save();
+    }
+
+    #[Test]
+    public function it_can_be_saved_when_an_origin_further_up_the_chain_no_longer_exists()
+    {
+        tap(Collection::make('test')->sites(['en', 'fr', 'de']))->save();
+
+        $b = EntryFactory::id('b')->collection('test')->locale('fr')->origin('missing')->create();
+        $c = EntryFactory::id('c')->collection('test')->locale('de')->create();
+
+        $c->origin($b)->save();
+
+        $this->assertSame('b', $c->origin()->id());
+    }
+
+    #[Test]
+    public function it_can_be_saved_with_an_origin_that_does_not_loop()
+    {
+        tap(Collection::make('test')->sites(['en', 'fr']))->save();
+
+        $a = EntryFactory::id('a')->collection('test')->locale('en')->create();
+        $b = EntryFactory::id('b')->collection('test')->locale('fr')->create();
+
+        $b->origin($a)->save();
+
+        $this->assertSame($a->id(), $b->origin()->id());
+    }
+
     private function fakeDescendantsQuery($results, ?array $whereInOrigins = null): QueryBuilder
     {
         $query = Mockery::mock(QueryBuilder::class);
@@ -2975,6 +3079,16 @@ class EntryTest extends TestCase
         $unserialized = unserialize($serialized);
 
         $this->assertSame('entry-slug', $unserialized->slug);
+    }
+}
+
+class CyclicOriginEntry extends Entry
+{
+    public static $entries = [];
+
+    protected function getOriginByString($origin)
+    {
+        return static::$entries[$origin] ?? null;
     }
 }
 
