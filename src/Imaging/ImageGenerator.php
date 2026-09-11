@@ -150,11 +150,15 @@ class ImageGenerator
     /**
      * Generate a manipulated image by an asset.
      *
-     * @param  \Statamic\Contracts\Assets\Asset  $asset
+     * @param  \Statamic\Contracts\Assets\Asset|null  $asset
      * @return mixed
      */
     public function generateByAsset($asset, array $params)
     {
+        if (! $asset) {
+            return '';
+        }
+
         if (ThumbnailExtractor::enabled() && $asset->isVideo()) {
             return $this->generateVideoThumbnail($asset, $params);
         }

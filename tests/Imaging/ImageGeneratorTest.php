@@ -99,6 +99,12 @@ class ImageGeneratorTest extends TestCase
     }
 
     #[Test]
+    public function it_does_not_generate_an_image_for_a_missing_asset()
+    {
+        $this->assertSame('', $this->makeGenerator()->generateByAsset(null, ['w' => 100]));
+    }
+
+    #[Test]
     public function it_throws_unable_to_read_file_when_asset_is_not_a_valid_image()
     {
         Storage::fake('test');
