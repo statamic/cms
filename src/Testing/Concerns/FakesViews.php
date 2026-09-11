@@ -19,6 +19,12 @@ trait FakesViews
         $this->fakeView = app(FakeViewEngine::class);
         $this->fakeViewFinder = new FakeViewFinder($this->app['files'], config('view.paths'));
 
+        // Keep real namespace hints (e.g. `statamic::`) resolving so that faking
+        // the frontend views doesn't break package views rendered as a side effect.
+        foreach ($originalFactory->getFinder()->getHints() as $namespace => $paths) {
+            $this->fakeViewFinder->addNamespace($namespace, $paths);
+        }
+
         $this->fakeViewFactory = new FakeViewFactory($this->app['view.engine.resolver'], $this->fakeViewFinder, $this->app['events']);
         $this->fakeViewFactory->setFakeEngine($this->fakeView);
         foreach (array_reverse($originalFactory->getExtensions()) as $ext => $engine) {

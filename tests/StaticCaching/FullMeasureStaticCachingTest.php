@@ -177,6 +177,22 @@ class FullMeasureStaticCachingTest extends TestCase
     }
 
     #[Test]
+    public function the_injected_script_tag_comes_from_a_publishable_view()
+    {
+        // Inline: the body is embedded.
+        $this->assertEquals(
+            '<script>alert(1)</script>',
+            trim(view('statamic::static-caching.script', ['inline' => true, 'src' => null, 'contents' => 'alert(1)'])->render())
+        );
+
+        // External: the body is referenced.
+        $this->assertEquals(
+            '<script src="/foo.js"></script>',
+            trim(view('statamic::static-caching.script', ['inline' => false, 'src' => '/foo.js', 'contents' => null])->render())
+        );
+    }
+
+    #[Test]
     public function excluded_pages_should_have_real_csrf_token()
     {
         config(['statamic.static_caching.exclude' => [

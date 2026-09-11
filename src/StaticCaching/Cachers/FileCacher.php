@@ -248,102 +248,16 @@ class FileCacher extends AbstractCacher
 
     public function getCsrfTokenJs(): string
     {
-        $csrfPlaceholder = CsrfTokenReplacer::REPLACEMENT;
-
-        $default = <<<EOT
-(function() {
-    fetch('/!/csrf', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-    })
-    .then((response) => response.json())
-    .then((data) => {
-        for (const input of document.querySelectorAll('input[value="$csrfPlaceholder"]')) {
-            input.value = data.csrf;
-        }
-
-        for (const meta of document.querySelectorAll('meta[content="$csrfPlaceholder"]')) {
-            meta.content = data.csrf;
-        }
-
-        for (const input of document.querySelectorAll('script[data-csrf="$csrfPlaceholder"]')) {
-            input.setAttribute('data-csrf', data.csrf);
-        }
-
-        if (window.hasOwnProperty('livewire_token')) {
-            window.livewire_token = data.csrf
-        }
-
-        if (window.livewireScriptConfig) {
-            // Replaces token if Livewire is already available. Usually on fast networks.
-            window.livewireScriptConfig.csrf = data.csrf;
-        } else {
-            // Delays replacing the token until Livewire is initialized. Usually on slow networks.
-            document.addEventListener('livewire:init', () => window.livewireScriptConfig.csrf = data.csrf);
-        }
-
-        document.dispatchEvent(new CustomEvent('statamic:csrf.replaced', { detail: data }));
-    });
-})();
-EOT;
-
-        return $this->csrfTokenJs ?? $default;
+        return $this->csrfTokenJs ?? trim(view('statamic::static-caching.csrf-js', [
+            'csrfPlaceholder' => CsrfTokenReplacer::REPLACEMENT,
+        ])->render());
     }
 
     public function getNocacheJs(): string
     {
-        $nocacheUrl = URL::makeRelative(route('statamic.nocache'));
-
-        $default = <<<EOT
-(function() {
-    function createMap() {
-        var map = {};
-        var els = document.getElementsByClassName('nocache');
-        for (var i = 0; i < els.length; i++) {
-            var section = els[i].getAttribute('data-nocache');
-            map[section] = els[i];
-        }
-        return map;
-    }
-
-    function replaceElement(el, html) {
-        const tmp = document.createElement('div');
-        const fragment = document.createDocumentFragment();
-
-        tmp.setHTMLUnsafe(html);
-
-        while (tmp.firstChild) {
-            fragment.appendChild(tmp.firstChild);
-        }
-
-        el.replaceWith(fragment);
-    }
-
-    var map = createMap();
-
-    fetch('{$nocacheUrl}', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            url: window.location.href.split('#')[0],
-            sections: Object.keys(map)
-        })
-    })
-    .then((response) => response.json())
-    .then((data) => {
-        map = createMap();
-
-        const regions = data.regions;
-        for (var key in regions) {
-            if (map[key]) replaceElement(map[key], regions[key]);
-        }
-
-        document.dispatchEvent(new CustomEvent('statamic:nocache.replaced', { detail: data }));
-    });
-})();
-EOT;
-
-        return $this->nocacheJs ?? $default;
+        return $this->nocacheJs ?? trim(view('statamic::static-caching.nocache-js', [
+            'nocacheUrl' => URL::makeRelative(route('statamic.nocache')),
+        ])->render());
     }
 
     public function shouldOutputJs(): bool
