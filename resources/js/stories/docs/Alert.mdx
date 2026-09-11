@@ -35,5 +35,10 @@ All heading levels (h1–h6) are styled identically, so choose the heading level
 
 <Canvas of={AlertStories.RichContent} sourceState={'shown'} />
 
+## Live Regions
+By default, alerts are live regions so screen readers announce them when they appear. `warning` and `error` alerts are announced immediately, while other variants are announced politely.
+
+If the alert is static content that is present when the page loads, such as instructions in a form, set `:live="false"` so it isn't announced every time the page renders.
+
 ## Arguments
 <ArgTypes of={AlertStories} />

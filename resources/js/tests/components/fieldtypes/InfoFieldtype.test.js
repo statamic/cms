@@ -27,6 +27,14 @@ describe.each([
 
         expect(wrapper.get('[data-ui-alert]').attributes('data-variant')).toBe(variant);
     });
+
+    test('is not announced as a live region', () => {
+        const wrapper = mountField({ state, content: 'Something happened.' });
+        const alert = wrapper.get('[data-ui-alert]');
+
+        expect(alert.attributes('role')).toBeUndefined();
+        expect(alert.attributes('aria-live')).toBeUndefined();
+    });
 });
 
 test('renders sanitized markdown with links and lists', () => {

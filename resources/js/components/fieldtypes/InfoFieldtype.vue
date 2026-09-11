@@ -20,7 +20,7 @@ const html = computed(() => markdown(__(props.config.content), { openLinksInNewT
 </script>
 
 <template>
-    <Alert :variant="variant" :icon="config.icon">
+    <Alert :variant="variant" :icon="config.icon" :live="false">
         <div
             class="st-text-trim-start [&_a]:font-medium [&_a]:underline [&_ol]:list-decimal [&_ol]:ps-5 [&_ul]:list-disc [&_ul]:ps-5"
             v-html="html"
