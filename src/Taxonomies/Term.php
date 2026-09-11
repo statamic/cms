@@ -160,6 +160,18 @@ class Term implements ContainsQueryableValues, TermContract
         });
     }
 
+    public function hasLocalization($site)
+    {
+        return $this->data->has($site);
+    }
+
+    public function removeLocalization($site)
+    {
+        $this->data->forget($site);
+
+        return $this;
+    }
+
     public function collection($collection = null)
     {
         return $this->fluentlyGetOrSet('collection')->args(func_get_args());
