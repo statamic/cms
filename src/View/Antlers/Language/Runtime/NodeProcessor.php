@@ -57,6 +57,7 @@ use Statamic\View\Antlers\SyntaxError;
 use Statamic\View\Cascade;
 use Statamic\View\Slot;
 use Statamic\View\State\CachesOutput;
+use Stringable;
 use Throwable;
 
 class NodeProcessor
@@ -1802,7 +1803,9 @@ class NodeProcessor
                                 $output = RuntimeValues::resolveWithRuntimeIsolation($output);
                             }
 
-                            $output = PathDataManager::reduceForAntlers($output, $this->antlersParser, $this->getActiveData(), $node->isClosedBy != null);
+                            if (! $this->interpolatingAugmentable($output)) {
+                                $output = PathDataManager::reduceForAntlers($output, $this->antlersParser, $this->getActiveData(), $node->isClosedBy != null);
+                            }
                         }
 
                         if ($this->isInterpolationProcessor) {
@@ -2510,6 +2513,13 @@ class NodeProcessor
         }
 
         return $buffer;
+    }
+
+    private function interpolatingAugmentable($output): bool
+    {
+        return $this->isInterpolationProcessor
+            && $output instanceof Augmentable
+            && $output instanceof Stringable;
     }
 
     /**
