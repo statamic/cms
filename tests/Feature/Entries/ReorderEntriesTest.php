@@ -212,6 +212,64 @@ class ReorderEntriesTest extends TestCase
     }
 
     #[Test]
+    public function it_doesnt_reorder_when_the_page_is_zero()
+    {
+        EntryFactory::id('1')->slug('one')->collection('test')->create();
+        EntryFactory::id('2')->slug('two')->collection('test')->create();
+        EntryFactory::id('3')->slug('three')->collection('test')->create();
+        EntryFactory::id('4')->slug('four')->collection('test')->create();
+
+        $tree = [
+            ['entry' => '1'],
+            ['entry' => '2'],
+            ['entry' => '3'],
+            ['entry' => '4'],
+        ];
+
+        $this->structure->in('en')->tree($tree)->save();
+
+        $this->setTestRoles(['test' => ['access cp', 'reorder test entries']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+
+        // A zero page would otherwise give a negative offset, which slices the last
+        // entries off the tree and then writes negative keys back onto it.
+        $this
+            ->actingAs($user)
+            ->reorder(['page' => 0, 'perPage' => 2, 'ids' => [4, 3]])
+            ->assertSessionHasErrors('page');
+
+        $this->assertEquals($tree, $this->structure->in('en')->tree());
+    }
+
+    #[Test]
+    public function it_doesnt_reorder_when_the_per_page_is_zero()
+    {
+        EntryFactory::id('1')->slug('one')->collection('test')->create();
+        EntryFactory::id('2')->slug('two')->collection('test')->create();
+        EntryFactory::id('3')->slug('three')->collection('test')->create();
+        EntryFactory::id('4')->slug('four')->collection('test')->create();
+
+        $tree = [
+            ['entry' => '1'],
+            ['entry' => '2'],
+            ['entry' => '3'],
+            ['entry' => '4'],
+        ];
+
+        $this->structure->in('en')->tree($tree)->save();
+
+        $this->setTestRoles(['test' => ['access cp', 'reorder test entries']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+
+        $this
+            ->actingAs($user)
+            ->reorder(['page' => 1, 'perPage' => 0, 'ids' => [4, 3]])
+            ->assertSessionHasErrors('perPage');
+
+        $this->assertEquals($tree, $this->structure->in('en')->tree());
+    }
+
+    #[Test]
     public function creating_an_entry_gives_it_the_correct_order_when_the_tree_has_already_been_read()
     {
         EntryFactory::id('1')->slug('one')->collection('test')->create();
