@@ -12,6 +12,8 @@ const props = defineProps({
     variant: { type: String, default: 'default' },
     /** Icon name to display. [Browse available icons](/?path=/story/components-icon--all-icons) */
     icon: { type: String, default: null },
+    /** Announce the alert to screen readers as a live region. Disable for static content that is present when the page loads. */
+    live: { type: Boolean, default: true },
 });
 
 const alertRole = computed(() => {
@@ -98,8 +100,8 @@ const defaultIcon = computed(() => {
 <template>
     <div
         :class="alertClasses"
-        :role="alertRole"
-        :aria-live="ariaLive"
+        :role="live ? alertRole : undefined"
+        :aria-live="live ? ariaLive : undefined"
         data-ui-alert
         :data-variant="variant"
     >

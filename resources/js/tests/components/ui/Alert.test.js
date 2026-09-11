@@ -24,3 +24,18 @@ test('tip variant is blue and uses the tip icon', () => {
     });
     expect(wrapper.findComponent(Icon).props('name')).toBe('lightbulb-idea');
 });
+
+test('live region attributes can be disabled', () => {
+    const wrapper = mount(Alert, {
+        props: {
+            text: 'This is a static warning',
+            variant: 'warning',
+            live: false,
+        },
+    });
+
+    const alert = wrapper.get('[data-ui-alert]');
+
+    expect(alert.attributes('role')).toBeUndefined();
+    expect(alert.attributes('aria-live')).toBeUndefined();
+});
