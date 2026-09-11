@@ -35,6 +35,26 @@ class FormExportTest extends TestCase
     }
 
     #[Test]
+    public function it_exports_only_the_requested_columns()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'view form submissions']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'name', 'field' => ['type' => 'short_answer']],
+                ['handle' => 'email', 'field' => ['type' => 'short_answer']],
+            ],
+        ]))->save();
+
+        $this
+            ->actingAs($user)
+            ->get(cp_route('forms.export', ['form' => $form->handle(), 'type' => 'csv', 'columns' => 'name,date']))
+            ->assertSuccessful()
+            ->assertSee("name,date\n", false)
+            ->assertDontSee('email');
+    }
+
+    #[Test]
     public function it_exports_with_the_per_form_view_submissions_permission()
     {
         $this->setTestRoles(['test' => ['access cp', 'view test form submissions']]);
