@@ -83,6 +83,24 @@ class UpdateCollectionTest extends TestCase
     }
 
     #[Test]
+    public function it_preserves_revisions_when_the_field_is_hidden()
+    {
+        config(['statamic.revisions.enabled' => true]);
+        $collection = tap(Collection::make('test')->revisionsEnabled(true))->save();
+
+        config(['statamic.revisions.enabled' => false]);
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->update($collection)
+            ->assertOk();
+
+        config(['statamic.revisions.enabled' => true]);
+
+        $this->assertTrue(Collection::find('test')->revisionsEnabled());
+    }
+
+    #[Test]
     public function setting_links_to_true_will_create_a_blueprint_if_it_doesnt_already_exist()
     {
         BlueprintRepository::swap(new FakeBlueprintRepository(BlueprintRepository::getFacadeRoot()));
