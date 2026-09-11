@@ -206,6 +206,7 @@ class TermsController extends CpController
                 'saved' => $saved,
                 'data' => [
                     'values' => $values,
+                    'meta' => $meta,
                     'extraValues' => $extraValues,
                 ],
             ]);
