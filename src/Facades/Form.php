@@ -13,7 +13,7 @@ use Statamic\Forms\Exporters\ExporterRepository;
  * @method static \Illuminate\Support\Collection all()
  * @method static int count()
  * @method static \Statamic\Contracts\Forms\Form make(string $handle = null)
- * @method static void appendConfigFields(mixed $handles, string $display, array $fields)
+ * @method static void appendConfigFields(mixed $handles, string $display, array $fields, ?string $before = null, ?string $after = null)
  * @method static array extraConfigFor(string $handle)
  * @method static self redirect(string $form, \Closure $callback)
  * @method static \Closure getSubmissionRedirect(Submission $submission)

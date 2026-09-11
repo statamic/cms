@@ -139,4 +139,95 @@ class EditFormTest extends TestCase
                 'Second injected into additional section',
             ]);
     }
+
+    #[Test]
+    public function fields_can_be_added_before_an_existing_field()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
+        $user = User::make()->assignRole('test')->save();
+        $form = tap(Form::make('test'))->save();
+
+        Form::appendConfigFields('*', 'Fields', [
+            'recaptcha' => ['type' => 'text', 'display' => 'Injected before honeypot'],
+        ], before: 'honeypot');
+
+        $this
+            ->actingAs($user)
+            ->get(cp_route('forms.edit', $form->handle()))
+            ->assertSuccessful()
+            ->assertSeeInOrder([
+                'Title',
+                'Injected before honeypot',
+                'Honeypot',
+                'Store Submissions',
+            ]);
+    }
+
+    #[Test]
+    public function fields_can_be_added_after_an_existing_field()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
+        $user = User::make()->assignRole('test')->save();
+        $form = tap(Form::make('test'))->save();
+
+        Form::appendConfigFields('*', 'Submissions', [
+            'webhook' => ['type' => 'text', 'display' => 'Injected after store'],
+        ], after: 'store');
+
+        $this
+            ->actingAs($user)
+            ->get(cp_route('forms.edit', $form->handle()))
+            ->assertSuccessful()
+            ->assertSeeInOrder([
+                'Store Submissions',
+                'Injected after store',
+                'Enable Fake Submission Generator',
+            ]);
+    }
+
+    #[Test]
+    public function sections_can_be_added_before_an_existing_section()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
+        $user = User::make()->assignRole('test')->save();
+        $form = tap(Form::make('test'))->save();
+
+        Form::appendConfigFields('*', 'Automagic Forms', [
+            'automagic_form' => ['type' => 'toggle', 'display' => 'Enable Automagic Form'],
+        ], before: 'submissions');
+
+        $this
+            ->actingAs($user)
+            ->get(cp_route('forms.edit', $form->handle()))
+            ->assertSuccessful()
+            ->assertSeeInOrder([
+                'Honeypot',
+                'Automagic Forms',
+                'Enable Automagic Form',
+                'Store Submissions',
+            ]);
+    }
+
+    #[Test]
+    public function sections_can_be_added_after_an_existing_section()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
+        $user = User::make()->assignRole('test')->save();
+        $form = tap(Form::make('test'))->save();
+
+        Form::appendConfigFields('*', 'Automagic Forms', [
+            'automagic_form' => ['type' => 'toggle', 'display' => 'Enable Automagic Form'],
+        ], after: 'fields');
+
+        $this
+            ->actingAs($user)
+            ->get(cp_route('forms.edit', $form->handle()))
+            ->assertSuccessful()
+            ->assertSeeInOrder([
+                'Honeypot',
+                'Automagic Forms',
+                'Enable Automagic Form',
+                'Store Submissions',
+            ]);
+    }
 }

@@ -85,12 +85,18 @@ class FormRepository implements Contract
         return $form;
     }
 
-    public function appendConfigFields($handles, string $display, array $fields)
+    public function appendConfigFields($handles, string $display, array $fields, ?string $before = null, ?string $after = null)
     {
+        if ($before && $after) {
+            throw new \InvalidArgumentException('Pass only before or after, not both.');
+        }
+
         $this->configs[] = [
             'display' => $display,
             'handles' => Arr::wrap($handles),
             'fields' => $fields,
+            'before' => $before,
+            'after' => $after,
         ];
     }
 
@@ -103,14 +109,15 @@ class FormRepository implements Contract
                 return in_array('*', $config['handles']) || in_array($handle, $config['handles']);
             })
             ->flatMap(function ($config) use ($reserved) {
-
                 return [
-                    Str::snake($config['display']) => [
+                    Str::snake($config['display']) => array_filter([
                         'display' => $config['display'],
                         'fields' => collect($config['fields'])
                             ->filter(fn ($field, $index) => ! in_array($field['handle'] ?? $index, $reserved))
                             ->all(),
-                    ],
+                        'before' => $config['before'] ?? null,
+                        'after' => $config['after'] ?? null,
+                    ], fn ($value) => ! is_null($value)),
                 ];
             })
             ->all();
