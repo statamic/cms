@@ -9,6 +9,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Route;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\Protect\ProtectorManager;
@@ -17,9 +18,11 @@ use Statamic\Events\ResponseCreated;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Cascade;
 use Statamic\Facades\Collection;
+use Statamic\Facades\GlobalSet;
 use Statamic\Facades\User;
 use Statamic\Tags\Tags;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException as SymfonyNotFoundHttpException;
 
 class FrontendTest extends TestCase
 {
@@ -696,6 +699,27 @@ class FrontendTest extends TestCase
         $this->assertEquals(404, Cascade::get('response_code'));
 
         // todo: test cascade vars are in the debugbar
+    }
+
+    #[Test]
+    public function it_hydrates_the_cascade_for_a_404_thrown_outside_of_statamics_own_exception_stack()
+    {
+        // Simulates something like Livewire's default 404 handling, which throws Symfony's
+        // stock NotFoundHttpException rather than Statamic's own subclass. See GH-14167.
+        Route::get('/non-statamic-404', function () {
+            throw new SymfonyNotFoundHttpException;
+        });
+
+        $global = GlobalSet::make('site_settings')->save();
+        $global->in('en')->data(['site_name' => 'Test Site'])->save();
+
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+        $this->viewShouldReturnRaw('errors.404', 'Not found: {{ site_settings:site_name }}');
+
+        $this->get('/non-statamic-404')
+            ->assertNotFound()
+            ->assertSee('Not found: Test Site');
     }
 
     #[Test]
