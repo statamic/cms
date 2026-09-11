@@ -67,12 +67,90 @@ class Terms
         }
 
         $this->querySite($query);
+        $this->queryHierarchy($query);
         $this->queryConditions($query);
         $this->queryScopes($query);
         $this->queryOrderBys($query);
         $this->queryMinimumEntries($query);
 
         return $query;
+    }
+
+    /**
+     * On hierarchical taxonomies, `parent="slug"` limits results to children of
+     * that term, and `depth` limits how many levels deep to include. With a
+     * parent and no depth, only direct children are returned.
+     */
+    protected function queryHierarchy($query)
+    {
+        $parent = $this->params->get('parent');
+        $depth = $this->params->int('depth');
+
+        if (! $parent && ! $depth) {
+            return;
+        }
+
+        $taxonomy = $this->taxonomies->count() === 1 ? $this->taxonomies->first() : null;
+
+        if (! $taxonomy || ! $taxonomy->hierarchical()) {
+            return;
+        }
+
+        $tree = $taxonomy->structure()->tree();
+
+        if ($parent) {
+            if (! $page = $this->findTreePage($tree, $taxonomy, $parent)) {
+                $query->whereIn('id', []);
+
+                return;
+            }
+
+            $pages = $page->pages()->all();
+            $depth = $depth ?: 1;
+        } else {
+            $pages = $tree->pages()->all();
+        }
+
+        $ids = $this->slugsToDepth($pages, $depth)
+            ->map(fn ($slug) => $taxonomy->handle().'::'.$slug);
+
+        $query->whereIn('id', $ids->all());
+    }
+
+    private function findTreePage($tree, $taxonomy, $parent)
+    {
+        if ($page = $tree->find($parent)) {
+            return $page;
+        }
+
+        foreach ($tree->flattenedPages() as $page) {
+            $term = Term::find($taxonomy->handle().'::'.$page->id());
+
+            if (! $term) {
+                continue;
+            }
+
+            foreach ($taxonomy->sites() as $site) {
+                if ($term->in($site)->slug() === $parent) {
+                    return $page;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private function slugsToDepth($pages, $maxDepth, $currentDepth = 1)
+    {
+        return collect($pages)->flatMap(function ($page) use ($maxDepth, $currentDepth) {
+            $slugs = collect([$page->id()]);
+
+            if (! $maxDepth || $currentDepth < $maxDepth) {
+                $slugs = $slugs->merge($this->slugsToDepth($page->pages()->all(), $maxDepth, $currentDepth + 1));
+            }
+
+            return $slugs;
+        });
     }
 
     protected function parseParameters($params)

@@ -62,7 +62,20 @@ class TermRepository implements RepositoryContract
 
     public function find($id): ?Term
     {
-        return $this->query()->where('id', $id)->first();
+        $query = $this->query()->where('id', $id);
+
+        // Association indexes add keys for every site an entry uses the term.
+        // Prefer the taxonomy's own default site so we load the term file
+        // instead of a stub from another site's association.
+        if (is_string($id) && str_contains($id, '::')) {
+            $taxonomy = Taxonomy::findByHandle(Str::before($id, '::'));
+
+            if ($taxonomy && $site = $taxonomy->sites()->first()) {
+                $query->where('site', $site);
+            }
+        }
+
+        return $query->first();
     }
 
     public function findByUri(string $uri, ?string $site = null): ?Term
@@ -73,6 +86,39 @@ class TermRepository implements RepositoryContract
             return $substitute;
         }
 
+        $uri = URL::tidy(Str::ensureLeft($uri, '/'));
+
+        if ($term = $this->findTermMatchingUri($uri, $site)) {
+            return $term;
+        }
+
+        [$collection, $stripped] = $this->stripCollectionPrefix($uri, $site);
+
+        if (! $collection) {
+            return null;
+        }
+
+        return $this->findTermMatchingUri($stripped, $site, automagicOnly: true)
+            ?->collection($collection);
+    }
+
+    private function findTermMatchingUri(string $uri, string $site, bool $automagicOnly = false): ?Term
+    {
+        foreach (Taxonomy::all()->sortByDesc(fn ($taxonomy) => strlen((string) $taxonomy->termRoute($site))) as $taxonomy) {
+            if ($automagicOnly && $taxonomy->hasCustomRoutes()) {
+                continue;
+            }
+
+            if ($term = $this->findTermByRoute($taxonomy, $uri, $site)) {
+                return $term;
+            }
+        }
+
+        return null;
+    }
+
+    private function stripCollectionPrefix(string $uri, string $site): array
+    {
         $collection = Collection::all()
             ->first(function ($collection) use ($uri, $site) {
                 if (Str::startsWith($uri, $collection->uri($site))) {
@@ -82,37 +128,95 @@ class TermRepository implements RepositoryContract
                 return Str::startsWith($uri.'/', '/'.$collection->handle().'/');
             });
 
-        if ($collection) {
-            $uri = Str::after($uri, $collection->uri($site) ?? $collection->handle());
+        if (! $collection) {
+            return [null, $uri];
         }
 
-        $uri = Str::removeLeft($uri, '/');
+        $stripped = Str::after($uri, $collection->uri($site) ?? $collection->handle());
+        $stripped = URL::tidy(Str::ensureLeft($stripped, '/'));
 
-        [$taxonomy, $slug] = array_pad(explode('/', $uri), 2, null);
+        return [$collection, $stripped];
+    }
 
-        if (! $slug) {
+    private function findTermByRoute($taxonomy, string $uri, string $site): ?Term
+    {
+        $pattern = $taxonomy->termRoute($site);
+
+        if (! $pattern) {
             return null;
         }
 
-        if (! $taxonomy = $this->findTaxonomyHandleByUri($taxonomy)) {
+        $pattern = URL::tidy($pattern);
+        $captures = $this->matchRoutePattern($uri, $pattern);
+
+        if ($captures === null) {
             return null;
         }
 
-        $term = $this->query()
-            ->where('slug', $slug)
-            ->where('taxonomy', $taxonomy)
-            ->where('site', $site)
-            ->first();
+        if (isset($captures['slug'])) {
+            $term = $this->query()
+                ->where('slug', $captures['slug'])
+                ->where('taxonomy', $taxonomy->handle())
+                ->where('site', $site)
+                ->first();
+        } else {
+            $term = $this->query()
+                ->where('taxonomy', $taxonomy->handle())
+                ->where('site', $site)
+                ->get()
+                ->first(fn ($term) => $term->uri() === $uri);
+        }
 
         if (! $term) {
             return null;
         }
 
-        if ($term->uri() !== '/'.$uri) {
+        if ($term->uri() !== $uri && ! $taxonomy->hierarchical()) {
             return null;
         }
 
-        return $term->collection($collection);
+        return $term;
+    }
+
+    /**
+     * Match a URI against a route pattern like `/topics/{parent_uri}/{slug}`.
+     *
+     * `{parent_uri}` may span multiple segments and is optional (root terms
+     * tidy away the empty segment). Other placeholders match a single segment.
+     */
+    private function matchRoutePattern(string $uri, string $pattern): ?array
+    {
+        $pattern = str_replace(['{{ ', ' }}', '{{', '}}'], ['{', '}', '{', '}'], $pattern);
+
+        $tokens = [];
+        $i = 0;
+
+        $tokenized = preg_replace_callback('/\{([a-zA-Z0-9_]+)\}/', function ($match) use (&$tokens, &$i) {
+            $key = '___T'.$i.'___';
+            $tokens[$key] = $match[1];
+            $i++;
+
+            return $key;
+        }, $pattern);
+
+        $regex = preg_quote($tokenized, '#');
+
+        foreach ($tokens as $token => $name) {
+            $quoted = preg_quote($token, '#');
+
+            if ($name === 'parent_uri') {
+                $regex = str_replace($quoted.'/', '(?:(?P<parent_uri>.+)/)?', $regex);
+                $regex = str_replace($quoted, '(?P<parent_uri>.*)', $regex);
+            } else {
+                $regex = str_replace($quoted, '(?P<'.$name.'>[^/]+)', $regex);
+            }
+        }
+
+        if (! preg_match('#^'.$regex.'$#', $uri, $matches)) {
+            return null;
+        }
+
+        return array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY);
     }
 
     public function findOrFail($id): Term
@@ -200,11 +304,6 @@ class TermRepository implements RepositoryContract
         return [
             Term::class => \Statamic\Taxonomies\Term::class,
         ];
-    }
-
-    private function findTaxonomyHandleByUri($uri)
-    {
-        return $this->stache->store('taxonomies')->index('uri')->items()->flip()->get(URL::tidy($uri));
     }
 
     public function substitute($item)

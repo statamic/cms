@@ -6,8 +6,10 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Structures\Structure as StructureContract;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Nav;
+use Statamic\Facades\Taxonomy;
 use Statamic\Structures\CollectionStructure;
 use Statamic\Structures\StructureRepository;
+use Statamic\Structures\TaxonomyStructure;
 use Tests\TestCase;
 
 class StructureRepositoryTest extends TestCase
@@ -37,18 +39,27 @@ class StructureRepositoryTest extends TestCase
         ]);
         Collection::shouldReceive('whereStructured')->andReturn($collections);
 
+        $taxonomies = collect([
+            \Statamic\Taxonomies\Taxonomy::make('taxonomy-structure-a')->structure(new TaxonomyStructure),
+            \Statamic\Taxonomies\Taxonomy::make('taxonomy-structure-b')->structure(new TaxonomyStructure),
+            \Statamic\Taxonomies\Taxonomy::make('flat-taxonomy'),
+        ]);
+        Taxonomy::shouldReceive('all')->andReturn($taxonomies);
+
         $structures = $this->repo->all();
 
         $this->assertInstanceOf(\Illuminate\Support\Collection::class, $structures);
-        $this->assertCount(5, $structures);
+        $this->assertCount(7, $structures);
         $this->assertEveryItemIsInstanceOf(StructureContract::class, $structures);
-        $this->assertEquals([0, 1, 2, 3, 4], $structures->keys()->all());
+        $this->assertEquals([0, 1, 2, 3, 4, 5, 6], $structures->keys()->all());
         $this->assertEquals([
             'nav-a',
             'nav-b',
             'nav-c',
             'collection-structure-a',
             'collection-structure-b',
+            'taxonomy-structure-a',
+            'taxonomy-structure-b',
         ], $structures->map->handle()->all());
     }
 
@@ -71,6 +82,18 @@ class StructureRepositoryTest extends TestCase
         Nav::shouldReceive('find')->never();
 
         $this->assertSame($structure, $this->repo->find('collection::test'));
+    }
+
+    #[Test]
+    public function it_gets_a_taxonomy_structure_by_handle()
+    {
+        $structure = new TaxonomyStructure;
+        $taxonomy = \Statamic\Taxonomies\Taxonomy::make('test')->structure($structure);
+        Taxonomy::shouldReceive('findByHandle')->with('test')->once()->andReturn($taxonomy);
+        Nav::shouldReceive('find')->never();
+        Collection::shouldReceive('find')->never();
+
+        $this->assertSame($structure, $this->repo->find('taxonomy::test'));
     }
 
     #[Test]

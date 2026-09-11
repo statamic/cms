@@ -151,6 +151,7 @@ class CorePermissions
                 $this->permission('edit {taxonomy} terms')->children([
                     $this->permission('create {taxonomy} terms'),
                     $this->permission('delete {taxonomy} terms'),
+                    $this->permission('reorder {taxonomy} terms'),
                 ]),
             ])->replacements('taxonomy', function () {
                 return Taxonomy::all()->map(function ($taxonomy) {

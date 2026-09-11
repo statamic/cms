@@ -27,6 +27,8 @@
         :tree="meta.tree"
         :initial-sort-column="meta.initialSortColumn"
         :initial-sort-direction="meta.initialSortDirection"
+        :search-keys="meta.searchKeys"
+        :path-delimiter="meta.pathDelimiter"
         @focus="$emit('focus')"
         @blur="$emit('blur')"
         @input="update"

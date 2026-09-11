@@ -6,9 +6,11 @@ use Statamic\Contracts\Structures\Structure as StructureContract;
 use Statamic\Data\BulkAugmentor;
 use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Exceptions\NavigationNotFoundException;
+use Statamic\Exceptions\TaxonomyNotFoundException;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Nav;
 use Statamic\Facades\Site;
+use Statamic\Facades\Taxonomy;
 use Statamic\Facades\URL;
 use Statamic\Query\ItemQueryBuilder;
 use Statamic\Structures\TreeBuilder;
@@ -74,6 +76,13 @@ class Structure extends Tags
         if (Str::startsWith($handle, 'collection::')) {
             $collection = Str::after($handle, 'collection::');
             throw_unless(Collection::findByHandle($collection), new CollectionNotFoundException($collection));
+
+            return;
+        }
+
+        if (Str::startsWith($handle, 'taxonomy::')) {
+            $taxonomy = Str::after($handle, 'taxonomy::');
+            throw_unless(Taxonomy::findByHandle($taxonomy), new TaxonomyNotFoundException($taxonomy));
 
             return;
         }

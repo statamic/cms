@@ -8,7 +8,7 @@
             :model-value="items.map((item) => item.id)"
             :multiple
             :options="comboboxOptions"
-            :placeholder="__(config.placeholder) || __('Choose...')"
+            :placeholder="fieldPlaceholder"
             :read-only="readOnly"
             :taggable="isTaggable"
             :close-on-select="isTaggable"
@@ -18,9 +18,33 @@
             @update:modelValue="itemsSelected"
             @search="search"
         >
-            <template #option="{ title, hint, status }">
-                <div class="flex w-full text-left items-center gap-2">
+            <template #option="{ title, hint, status, depth, path, _created }">
+                <div
+                    v-if="_created"
+                    class="flex w-full min-w-0 text-left items-center gap-1.5"
+                >
+                    <span class="text-xs text-gray-600 dark:text-gray-400 shrink-0" v-text="__('Create')" />
+                    <span v-text="title" class="truncate" />
+                </div>
+                <!--
+                    A depth means the list is in tree order, so the ancestors are listed above and an
+                    indent locates the option against them. Without one they aren't, and neither are
+                    they while a query is filtering ancestors back out, so the option carries its own
+                    breadcrumb instead.
+                -->
+                <div
+                    v-else
+                    class="flex w-full text-left items-center gap-2"
+                    :style="!isFiltering && depth > 1 ? { paddingInlineStart: `${(depth - 1) * .75}rem` } : null"
+                >
+                    <ui-icon
+                        v-if="!isFiltering && depth > 1"
+                        name="arrow-down-right"
+                        class="size-[14px] shrink-0 text-gray-400 dark:text-gray-600"
+                        aria-hidden="true"
+                    />
                     <StatusIndicator v-if="status" :status="status" />
+                    <ItemPath v-if="isFiltering || !depth" :path="path" />
                     <div v-text="title" class="truncate grow" />
                     <ui-badge v-if="hint" size="sm" v-text="hint" />
                 </div>
@@ -41,6 +65,7 @@
 
 <script>
 import { Combobox, StatusIndicator } from '@/components/ui';
+import ItemPath from './ItemPath.vue';
 import { ref, watch } from 'vue';
 import { router } from '@inertiajs/vue3';
 import axios from 'axios';
@@ -52,6 +77,7 @@ export default {
     components: {
         StatusIndicator,
         Combobox,
+        ItemPath,
     },
 
     props: {
@@ -64,11 +90,14 @@ export default {
         config: Object,
         readOnly: Boolean,
         site: String,
+        searchKeys: { type: Array, default: null },
+        pathDelimiter: { type: String, default: null },
     },
 
     data() {
         return {
             requested: false,
+            query: '',
             options: [],
             abortController: null,
             removeNavigationListener: null,
@@ -84,18 +113,19 @@ export default {
             return this.taggable;
         },
 
+        fieldPlaceholder() {
+            if (this.config.placeholder) return __(this.config.placeholder);
+            if (this.isTaggable) return __('Search or create...');
+
+            return __('Choose...');
+        },
+
         parameters() {
             return {
                 site: this.site,
                 paginate: false,
                 columns: 'title,id',
             };
-        },
-
-        // The `users` fieldtype falls back to displaying a user's email as their title when
-        // they have no name, but doesn't show it otherwise, so it needs to be searchable too.
-        searchKeys() {
-            return this.config.type === 'users' ? ['title', 'email'] : null;
         },
 
 	    cacheKey() {
@@ -108,6 +138,13 @@ export default {
             const missing = this.items.filter((item) => !this.options.some((option) => option.id === item.id));
 
             return [...this.options, ...missing];
+        },
+
+        // In select mode the combobox filters the fetched list itself, which can leave an option's
+        // ancestors out of it. The server only knows to drop the depth when it can see the query,
+        // which it never does in that mode, so the depth is suppressed here instead.
+        isFiltering() {
+            return this.query !== '';
         },
 
         noOptionsText() {
@@ -169,7 +206,11 @@ export default {
 	            });
         },
 
+        // The combobox emits this on every query change, including in select mode where it
+        // filters client-side and there is nothing to request.
         search(search, loading) {
+            this.query = search;
+
             if (!this.typeahead) return;
 
             loading(true);
@@ -186,10 +227,25 @@ export default {
                 let option = this.options.find((option) => option.id === id);
                 let existing = this.items.find((item) => item.id === id);
 
-                return existing || option || { id: id, title: id };
+                return existing || option || this.newItemFromId(id);
             });
 
             this.$emit('input', items);
+        },
+
+        // A typed path like `animals > cat > calico` attaches the leaf, so give it the same
+        // ancestor breadcrumb a saved item gets until the save fills one in for real.
+        newItemFromId(id) {
+            if (this.pathDelimiter && typeof id === 'string' && id.includes(this.pathDelimiter)) {
+                const segments = id.split(this.pathDelimiter).map((segment) => segment.trim()).filter(Boolean);
+                const title = segments.pop();
+
+                if (title && segments.length) {
+                    return { id, title, path: segments };
+                }
+            }
+
+            return { id: id, title: id };
         },
 
         createOption(value) {

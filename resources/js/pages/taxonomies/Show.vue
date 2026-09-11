@@ -1,28 +1,42 @@
 <script>
 import Head from '@/pages/layout/Head.vue';
-import { Header, Dropdown, DropdownMenu, DropdownItem, Listing } from '@ui';
-import { Link } from '@inertiajs/vue3';
+import { Header, Dropdown, DropdownMenu, DropdownItem, DropdownLabel, DropdownSeparator, Listing, Button, ToggleGroup, ToggleItem } from '@ui';
+import { Link, router } from '@inertiajs/vue3';
+import { defineAsyncComponent } from 'vue';
+import DeleteTermConfirmation from '@/components/taxonomies/DeleteTermConfirmation.vue';
+import SiteSelector from '@/components/SiteSelector.vue';
 
 export default {
     components: {
         Link,
         Head,
         Header,
+        SiteSelector,
         Dropdown,
         DropdownMenu,
         DropdownItem,
+        DropdownLabel,
+        DropdownSeparator,
         Listing,
+        Button,
+        ToggleGroup,
+        ToggleItem,
+        DeleteTermConfirmation,
+        PageTree: defineAsyncComponent(() => import('@/components/structures/PageTree.vue')),
     },
 
     props: [
         'taxonomy',
         'taxonomyTitle',
         'blueprints',
-        'site',
+        'initialSite',
+        'sites',
         'columns',
         'filters',
         'canCreate',
         'createUrl',
+        'createUrls',
+        'reorderUrl',
         'actionUrl',
         'sortColumn',
         'sortDirection',
@@ -33,22 +47,182 @@ export default {
         'canConfigureFields',
         'deleteUrl',
         'createLabel',
+        'scaffoldUrl',
+        'structured',
+        'canReorder',
+        'structurePagesUrl',
+        'structureSubmitUrl',
+        'structureMaxDepth',
     ],
 
     data() {
         return {
             preferencesPrefix: `taxonomies.${this.taxonomy}`,
             requestUrl: cp_url(`taxonomies/${this.taxonomy}/terms`),
+            site: this.initialSite,
+            view: null,
+            reordering: false,
+            items: null,
+            page: null,
+            perPage: null,
+            saveKeyBinding: null,
+            deletedTerms: [],
+            showTermDeletionConfirmation: false,
+            termBeingDeleted: null,
+            termDeletionConfirmCallback: null,
         };
     },
 
+    computed: {
+        canUseStructureTree() {
+            return this.structured && this.structureMaxDepth !== 1;
+        },
+
+        reorderable() {
+            return this.structured && this.structureMaxDepth === 1 && this.canReorder;
+        },
+
+        treeIsDirty() {
+            return this.$dirty.has('page-tree');
+        },
+
+        maxDepth() {
+            return this.structureMaxDepth || Infinity;
+        },
+
+        currentCreateUrl() {
+            return this.createUrls?.[this.site] || this.createUrl;
+        },
+
+        numberOfChildrenToBeDeleted() {
+            let children = 0;
+            const countChildren = (term) => {
+                term.children.forEach((child) => {
+                    children++;
+                    countChildren(child);
+                });
+            };
+            countChildren(this.termBeingDeleted);
+            return children;
+        },
+    },
+
+    watch: {
+        view(view) {
+            this.$preferences.set(`taxonomies.${this.taxonomy}.view`, view);
+        },
+    },
+
+    created() {
+        this.saveKeyBinding = this.$keys.bindGlobal(['mod+s'], (e) => {
+            if (this.reordering) {
+                e.preventDefault();
+                this.saveOrder();
+            }
+        });
+    },
+
+    beforeUnmount() {
+        this.saveKeyBinding?.destroy();
+    },
+
     mounted() {
+        this.view = this.initialView();
+
         this.addToCommandPalette();
     },
 
     methods: {
+        initialView() {
+            if (!this.canUseStructureTree) return 'list';
+
+            const savedView = this.$preferences.get(`taxonomies.${this.taxonomy}.view`);
+
+            return savedView === 'list' ? 'list' : 'tree';
+        },
+
         deleteTaxonomy() {
             this.$refs.deleter.confirm();
+        },
+
+        cancelTreeProgress() {
+            this.$refs.tree.cancel();
+            this.deletedTerms = [];
+        },
+
+        saveTree() {
+            this.$refs.tree
+                .save()
+                .then(() => (this.deletedTerms = []))
+                .catch(() => {});
+        },
+
+        markTreeDirty() {
+            this.$dirty.add('page-tree');
+        },
+
+        markTreeClean() {
+            this.$dirty.remove('page-tree');
+        },
+
+        deleteTreeBranch(branch, removeFromUi) {
+            this.showTermDeletionConfirmation = true;
+            this.termBeingDeleted = branch;
+            this.termDeletionConfirmCallback = (shouldDeleteChildren) => {
+                this.deletedTerms.push(branch.id);
+                if (shouldDeleteChildren) this.markTermsForDeletion(branch);
+                removeFromUi(shouldDeleteChildren);
+                this.showTermDeletionConfirmation = false;
+                this.termBeingDeleted = null;
+            };
+        },
+
+        markTermsForDeletion(branch) {
+            const addDeletableChildren = (branch) => {
+                branch.children.forEach((child) => {
+                    this.deletedTerms.push(child.id);
+                    addDeletableChildren(child);
+                });
+            };
+
+            addDeletableChildren(branch);
+        },
+
+        createTerm(blueprint, parent) {
+            let url = `${this.currentCreateUrl}?blueprint=${blueprint}`;
+            if (parent) url += '&parent=' + parent;
+            router.get(url);
+        },
+
+        editTerm(term, $event) {
+            const url = term.edit_url;
+            $event.metaKey ? window.open(url) : router.get(url);
+        },
+
+        requestComplete({ items, parameters }) {
+            this.items = items;
+            this.page = parameters.page;
+            this.perPage = parameters.perPage;
+        },
+
+        reordered(items) {
+            this.items = items;
+        },
+
+        saveOrder() {
+            this.$axios
+                .post(this.reorderUrl, {
+                    ids: this.items.map((item) => item.id),
+                    page: this.page,
+                    perPage: this.perPage,
+                })
+                .then(() => {
+                    this.reordering = false;
+                    this.$toast.success(__('Terms successfully reordered'));
+                })
+                .catch((e) => {
+                    this.$toast.error(e.response?.data?.message || __('Something went wrong'));
+                });
         },
 
         addToCommandPalette() {
@@ -57,7 +231,7 @@ export default {
                 category: Statamic.$commandPalette.category.Actions,
                 text: __('Create Term'),
                 icon: 'taxonomies',
-                url: this.createUrl,
+                url: this.currentCreateUrl,
                 prioritize: true,
             });
 
@@ -78,11 +252,35 @@ export default {
             });
 
             Statamic.$commandPalette.add({
+                when: () => this.canEdit,
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Scaffold Views'),
+                icon: 'scaffold',
+                url: this.scaffoldUrl,
+            });
+
+            Statamic.$commandPalette.add({
                 when: () => this.canDelete,
                 category: Statamic.$commandPalette.category.Actions,
                 text: __('Delete Taxonomy'),
                 icon: 'trash',
                 action: () => this.deleteTaxonomy(),
+            });
+
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Switch to List Layout'),
+                icon: 'layout-list',
+                when: () => this.canUseStructureTree && this.view !== 'list',
+                action: () => (this.view = 'list'),
+            });
+
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Switch to Tree Layout'),
+                icon: 'navigation',
+                when: () => this.canUseStructureTree && this.view !== 'tree',
+                action: () => (this.view = 'tree'),
             });
         },
     },
@@ -98,13 +296,55 @@ export default {
                 <DropdownMenu>
                     <DropdownItem v-if="canEdit" :text="__('Configure Taxonomy')" icon="cog" :href="taxonomyEditUrl" />
                     <DropdownItem v-if="canConfigureFields" :text="__('Edit Blueprints')" icon="blueprint-edit" :href="taxonomyBlueprintsUrl" />
+                    <DropdownItem v-if="canEdit" :text="__('Scaffold Views')" icon="scaffold" :href="scaffoldUrl" />
                     <DropdownItem v-if="canDelete" :text="__('Delete Taxonomy')" icon="trash" variant="destructive" @click="deleteTaxonomy()" />
                 </DropdownMenu>
             </Dropdown>
 
+            <template v-if="view === 'tree'">
+                <Button
+                    v-if="treeIsDirty"
+                    variant="filled"
+                    :text="__('Discard Changes')"
+                    @click="cancelTreeProgress"
+                />
+
+                <site-selector
+                    v-if="sites && sites.length > 1"
+                    :sites="sites"
+                    v-model="site"
+                />
+
+                <Button
+                    v-if="treeIsDirty"
+                    :text="__('Save Changes')"
+                    :variant="deletedTerms.length ? 'danger' : 'default'"
+                    @click="saveTree"
+                    v-tooltip="deletedTerms.length ? __n('A term will be deleted|:count terms will be deleted', deletedTerms.length) : null"
+                />
+            </template>
+
+            <template v-if="view === 'list' && reorderable">
+                <Button
+                    v-if="!reordering"
+                    @click="reordering = true"
+                    :text="__('Reorder')"
+                />
+
+                <template v-if="reordering">
+                    <Button @click="reordering = false" :text="__('Cancel')" />
+                    <Button @click="saveOrder" :text="__('Save Order')" variant="primary" />
+                </template>
+            </template>
+
+            <ToggleGroup v-model="view" v-if="canUseStructureTree">
+                <ToggleItem icon="navigation" value="tree" />
+                <ToggleItem icon="layout-list" value="list" />
+            </ToggleGroup>
+
             <create-term-button
-                v-if="canCreate"
-                :url="createUrl"
+                v-if="!reordering && canCreate"
+                :url="currentCreateUrl"
                 :text="createLabel"
                 :blueprints="blueprints"
             />
@@ -119,6 +359,7 @@ export default {
         />
 
         <Listing
+            v-if="view === 'list'"
             ref="listing"
             :url="requestUrl"
             :columns="columns"
@@ -128,20 +369,74 @@ export default {
             :sort-direction="sortDirection"
             :preferences-prefix="preferencesPrefix"
             :filters="filters"
+            :reorderable="reordering"
             push-query
+            @request-completed="requestComplete"
+            @reordered="reordered"
         >
             <template #cell-title="{ row: term }">
-                <div class="flex items-center">
+                <div class="flex items-center gap-2">
                     <Link :href="term.edit_url">{{ term.title }}</Link>
+                    <span v-if="term.parent_path" class="text-2xs text-gray-500 dark:text-gray-400" v-text="term.parent_path" />
                 </div>
             </template>
             <template #cell-slug="{ row: term }">
                 <span class="text-2xs font-mono">{{ term.slug }}</span>
             </template>
             <template #prepended-row-actions="{ row: term }">
-                <DropdownItem v-if="term.has_template" :text="__('Visit URL')" :href="term.permalink" target="_blank" icon="eye" />
+                <DropdownItem v-if="term.has_template && term.permalink" :text="__('Visit URL')" :href="term.permalink" target="_blank" icon="eye" />
                 <DropdownItem :text="__('Edit')" :href="term.edit_url" icon="edit" />
             </template>
         </Listing>
+
+        <page-tree
+            v-if="canUseStructureTree && view === 'tree'"
+            ref="tree"
+            :blueprints="blueprints"
+            :create-url="createUrl"
+            :pages-url="structurePagesUrl"
+            :submit-url="structureSubmitUrl"
+            :submit-parameters="{ deletedTerms }"
+            :max-depth="maxDepth"
+            :expects-root="false"
+            :site="site"
+            :submit-site="false"
+            :editable="canReorder"
+            :preferences-prefix="preferencesPrefix"
+            @edit-page="editTerm"
+            @changed="markTreeDirty"
+            @saved="markTreeClean"
+        >
+            <template #branch-options="{ branch, removeBranch, depth }">
+                <template v-if="canCreate && depth < maxDepth">
+                    <DropdownLabel :text="__('Create Child Term')" v-if="blueprints.length > 1" />
+                    <DropdownItem
+                        v-for="blueprint in blueprints"
+                        @click="createTerm(blueprint.handle, branch.id)"
+                        :icon="blueprint.icon || 'taxonomies'"
+                        :key="blueprint.handle"
+                        :text="blueprints.length > 1 ? __(blueprint.title) : __('Create Child Term')"
+                    />
+                </template>
+                <DropdownSeparator v-if="canReorder && canCreate && depth < maxDepth && branch.can_delete" />
+                <DropdownItem
+                    v-if="canReorder && branch.can_delete"
+                    :text="__('Delete')"
+                    icon="trash"
+                    variant="destructive"
+                    @click="deleteTreeBranch(branch, removeBranch)"
+                />
+            </template>
+        </page-tree>
+
+        <delete-term-confirmation
+            v-if="showTermDeletionConfirmation"
+            :children="numberOfChildrenToBeDeleted"
+            @confirm="termDeletionConfirmCallback"
+            @cancel="
+                showTermDeletionConfirmation = false;
+                termBeingDeleted = null;
+            "
+        />
     </div>
 </template>

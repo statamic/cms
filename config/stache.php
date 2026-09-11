@@ -76,6 +76,11 @@ return [
             'directory' => base_path('content/trees/navigation'),
         ],
 
+        'taxonomy-trees' => [
+            'class' => Stores\TaxonomyTreeStore::class,
+            'directory' => base_path('content/trees/taxonomies'),
+        ],
+
         'globals' => [
             'class' => Stores\GlobalsStore::class,
             'directory' => base_path('content/globals'),

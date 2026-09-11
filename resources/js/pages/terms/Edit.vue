@@ -9,6 +9,7 @@ defineProps([
     'reference',
     'blueprint',
     'values',
+    'extraValues',
     'meta',
     'localizedFields',
     'published',
@@ -43,6 +44,7 @@ defineProps([
         :initial-reference="reference"
         :initial-fieldset="blueprint"
         :initial-values="values"
+        :initial-extra-values="extraValues"
         :initial-meta="meta"
         :initial-localized-fields="localizedFields"
         :initial-published="published"

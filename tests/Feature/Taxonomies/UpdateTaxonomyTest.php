@@ -47,6 +47,70 @@ class UpdateTaxonomyTest extends TestCase
 
         $this->assertCount(1, Taxonomy::all());
         $this->assertEquals('Updated title', $taxonomy->title());
+        $this->assertTrue($taxonomy->routesEnabled());
+        $this->assertArrayNotHasKey('routes', $taxonomy->fileData());
+    }
+
+    #[Test]
+    public function it_enables_structure_without_a_max_depth()
+    {
+        $taxonomy = tap(Taxonomy::make('test')->title('Test'))->save();
+
+        $this->assertFalse($taxonomy->hasStructure());
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->update($taxonomy, [
+                'structured' => true,
+            ])
+            ->assertOk();
+
+        $taxonomy = Taxonomy::findByHandle('test');
+
+        $this->assertTrue($taxonomy->hasStructure());
+        $this->assertNull($taxonomy->structure()->maxDepth());
+        $this->assertTrue($taxonomy->hierarchical());
+        $this->assertStringContainsString('structure:', $taxonomy->fileContents());
+    }
+
+    #[Test]
+    public function it_enables_structure_with_a_max_depth()
+    {
+        $taxonomy = tap(Taxonomy::make('test')->title('Test'))->save();
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->update($taxonomy, [
+                'structured' => true,
+                'max_depth' => 3,
+            ])
+            ->assertOk();
+
+        $taxonomy = Taxonomy::findByHandle('test');
+
+        $this->assertTrue($taxonomy->hasStructure());
+        $this->assertEquals(3, $taxonomy->structure()->maxDepth());
+    }
+
+    #[Test]
+    public function it_disables_structure()
+    {
+        $taxonomy = tap(Taxonomy::make('test')->title('Test')->structureContents([]))->save();
+        $taxonomy->structure()->tree()->tree([])->save();
+
+        $this->assertTrue($taxonomy->hasStructure());
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->update($taxonomy, [
+                'structured' => false,
+            ])
+            ->assertOk();
+
+        $taxonomy = Taxonomy::findByHandle('test');
+
+        $this->assertFalse($taxonomy->hasStructure());
+        $this->assertStringNotContainsString('structure:', $taxonomy->fileContents());
     }
 
     #[Test]
@@ -73,6 +137,74 @@ class UpdateTaxonomyTest extends TestCase
         $this->assertTrue($collectionOne->taxonomies()->contains($taxonomy));
         $this->assertFalse($collectionTwo->taxonomies()->contains($taxonomy));
         $this->assertTrue($collectionThree->taxonomies()->contains($taxonomy));
+    }
+
+    #[Test]
+    public function it_disables_routes()
+    {
+        $taxonomy = tap(Taxonomy::make('test')->title('Test'))->save();
+
+        $this->assertTrue($taxonomy->routesEnabled());
+        $this->assertArrayNotHasKey('routes', $taxonomy->fileData());
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->update($taxonomy, [
+                'route_mode' => 'disabled',
+            ])
+            ->assertOk();
+
+        $taxonomy = Taxonomy::findByHandle('test');
+
+        $this->assertFalse($taxonomy->routesEnabled());
+        $this->assertFalse($taxonomy->fileData()['routes']);
+    }
+
+    #[Test]
+    public function it_saves_custom_routes()
+    {
+        $taxonomy = tap(Taxonomy::make('test')->title('Test'))->save();
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->update($taxonomy, [
+                'route_mode' => 'custom',
+                'route' => '/topics/{slug}',
+            ])
+            ->assertOk();
+
+        $taxonomy = Taxonomy::findByHandle('test');
+
+        $this->assertEquals('/topics', $taxonomy->taxonomyRoute());
+        $this->assertEquals('/topics/{slug}', $taxonomy->termRoute());
+        $this->assertEquals('/topics/{slug}', $taxonomy->fileData()['routes']);
+    }
+
+    #[Test]
+    public function it_requires_slug_in_a_custom_route()
+    {
+        $taxonomy = tap(Taxonomy::make('test')->title('Test'))->save();
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->update($taxonomy, [
+                'route_mode' => 'custom',
+                'route' => '/topics',
+            ])
+            ->assertSessionHasErrors('route');
+    }
+
+    #[Test]
+    public function it_requires_a_route_when_using_custom_mode()
+    {
+        $taxonomy = tap(Taxonomy::make('test')->title('Test'))->save();
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->update($taxonomy, [
+                'route_mode' => 'custom',
+            ])
+            ->assertSessionHasErrors('route');
     }
 
     private function userWithoutPermission()

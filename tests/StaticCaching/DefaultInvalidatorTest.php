@@ -11,6 +11,7 @@ use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Forms\Form;
 use Statamic\Contracts\Globals\GlobalSet;
 use Statamic\Contracts\Structures\Nav;
+use Statamic\Contracts\Structures\TaxonomyTree;
 use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Facades\Site;
@@ -592,6 +593,81 @@ class DefaultInvalidatorTest extends TestCase
         ]);
 
         $this->assertNull($invalidator->invalidate($localized));
+    }
+
+    #[Test]
+    public function taxonomy_urls_can_be_invalidated_by_a_tree()
+    {
+        $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
+            $cacher->shouldReceive('invalidateUrls')->with([
+                'http://localhost/topics',
+                'http://localhost/topics/*',
+                'http://localhost/tags/three',
+                'http://localhost/tags/one',
+                'http://localhost/tags/two',
+            ])->once();
+        });
+
+        $taxonomy = tap(Mockery::mock(Taxonomy::class), function ($m) {
+            $m->shouldReceive('handle')->andReturn('tags');
+            $m->shouldReceive('sites')->andReturn(collect(['en']));
+            $m->shouldReceive('taxonomyRoute')->with('en')->andReturn('/topics');
+            $m->shouldReceive('hasCustomRoutes')->andReturn(true);
+        });
+
+        $tree = tap(Mockery::mock(TaxonomyTree::class), function ($m) use ($taxonomy) {
+            $m->shouldReceive('taxonomy')->andReturn($taxonomy);
+            $m->shouldReceive('site')->andReturn(Site::default());
+        });
+
+        $invalidator = new Invalidator($cacher, [
+            'taxonomies' => [
+                'tags' => [
+                    'urls' => [
+                        '/tags/one',
+                        '/tags/two',
+                        'http://localhost/tags/three',
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertNull($invalidator->invalidate($tree));
+    }
+
+    #[Test]
+    public function taxonomy_tree_invalidation_includes_collection_scoped_urls_for_default_routes()
+    {
+        $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
+            $cacher->shouldReceive('invalidateUrls')->with([
+                'http://localhost/categories',
+                'http://localhost/categories/*',
+                'http://localhost/blog/categories',
+                'http://localhost/blog/categories/*',
+            ])->once();
+        });
+
+        $collection = tap(Mockery::mock(Collection::class), function ($m) {
+            $m->shouldReceive('uri')->with('en')->andReturn('/blog');
+            $m->shouldReceive('handle')->andReturn('blog');
+        });
+
+        $taxonomy = tap(Mockery::mock(Taxonomy::class), function ($m) use ($collection) {
+            $m->shouldReceive('handle')->andReturn('categories');
+            $m->shouldReceive('sites')->andReturn(collect(['en']));
+            $m->shouldReceive('taxonomyRoute')->with('en')->andReturn('/categories');
+            $m->shouldReceive('hasCustomRoutes')->andReturn(false);
+            $m->shouldReceive('collections')->andReturn(collect([$collection]));
+        });
+
+        $tree = tap(Mockery::mock(TaxonomyTree::class), function ($m) use ($taxonomy) {
+            $m->shouldReceive('taxonomy')->andReturn($taxonomy);
+            $m->shouldReceive('site')->andReturn(Site::default());
+        });
+
+        $invalidator = new Invalidator($cacher, []);
+
+        $this->assertNull($invalidator->invalidate($tree));
     }
 
     #[Test]

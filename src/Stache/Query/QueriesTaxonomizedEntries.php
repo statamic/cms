@@ -3,10 +3,13 @@
 namespace Statamic\Stache\Query;
 
 use Statamic\Facades\Stache;
+use Statamic\Facades\Taxonomy;
 
 trait QueriesTaxonomizedEntries
 {
     protected $taxonomyWheres = [];
+
+    protected $expandTaxonomyDescendants = true;
 
     public function whereTaxonomy($term)
     {
@@ -38,13 +41,28 @@ trait QueriesTaxonomizedEntries
         return $this;
     }
 
+    /**
+     * Terms in taxonomy wheres will also match entries tagged with any of
+     * their descendant terms (on hierarchical taxonomies).
+     */
+    public function withTaxonomyDescendants($expand = true)
+    {
+        $this->expandTaxonomyDescendants = $expand;
+
+        return $this;
+    }
+
     protected function addTaxonomyWheres()
     {
         if (empty($this->taxonomyWheres)) {
             return;
         }
 
-        $entryIds = collect($this->taxonomyWheres)
+        $wheres = $this->expandTaxonomyDescendants
+            ? $this->expandTaxonomyWheres($this->taxonomyWheres)
+            : $this->taxonomyWheres;
+
+        $entryIds = collect($wheres)
             ->reject(function ($where) {
                 return $where['type'] === 'NotIn';
             })
@@ -55,7 +73,7 @@ trait QueriesTaxonomizedEntries
                 return $ids ? $ids->intersect($keys)->values() : $keys;
             });
 
-        $excludedEntryIds = collect($this->taxonomyWheres)
+        $excludedEntryIds = collect($wheres)
             ->filter(function ($where) {
                 return $where['type'] === 'NotIn';
             })
@@ -72,6 +90,40 @@ trait QueriesTaxonomizedEntries
         if ($excludedEntryIds) {
             $this->whereNotIn('id', $excludedEntryIds->all());
         }
+    }
+
+    private function expandTaxonomyWheres($wheres)
+    {
+        return collect($wheres)->map(function ($where) {
+            $values = $where['type'] === 'Basic' ? [$where['value']] : $where['values'];
+
+            $values = collect($values)
+                ->flatMap(fn ($id) => $this->taxonomyTermWithDescendants($id))
+                ->unique()
+                ->values()
+                ->all();
+
+            return [
+                'type' => $where['type'] === 'NotIn' ? 'NotIn' : 'In',
+                'values' => $values,
+            ];
+        })->all();
+    }
+
+    private function taxonomyTermWithDescendants($id)
+    {
+        [$handle, $slug] = explode('::', $id);
+
+        $taxonomy = Taxonomy::findByHandle($handle);
+
+        if (! $taxonomy || ! $taxonomy->hierarchical() || ! ($page = $taxonomy->structure()->tree()->find($slug))) {
+            return [$id];
+        }
+
+        return $page->flattenedPages()
+            ->map(fn ($descendant) => $handle.'::'.$descendant->id())
+            ->prepend($id)
+            ->all();
     }
 
     private function getKeysForTaxonomyWhereBasic($where)

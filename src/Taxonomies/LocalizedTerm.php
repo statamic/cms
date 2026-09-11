@@ -29,6 +29,7 @@ use Statamic\Facades;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Site;
+use Statamic\Facades\URL;
 use Statamic\GraphQL\ResolvesValues;
 use Statamic\Http\Responses\DataResponse;
 use Statamic\Routing\Routable;
@@ -296,9 +297,13 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, BulkAugmenta
 
     public function route()
     {
-        $route = '/'.str_replace('_', '-', $this->taxonomyHandle()).'/{slug}';
+        $route = $this->taxonomy()->termRoute($this->locale());
 
-        if ($this->collection()) {
+        if (! $route) {
+            return null;
+        }
+
+        if ($this->collection() && ! $this->taxonomy()->hasCustomRoutes()) {
             $collectionUrl = $this->collection()->uri($this->locale()) ?? $this->collection()->handle();
             $route = $collectionUrl.$route;
         }
@@ -308,10 +313,82 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, BulkAugmenta
 
     public function routeData()
     {
-        return $this->values()->merge([
+        $data = $this->values()->merge([
             'id' => $this->id(),
             'slug' => $this->slug(),
-        ])->all();
+        ]);
+
+        if ($this->taxonomy()->hierarchical()) {
+            $data->put('parent_uri', $this->taxonomy()->structure()->termParentUri($this) ?? '');
+        }
+
+        return $data->all();
+    }
+
+    /**
+     * The term's page in the taxonomy's structure tree, if it has one.
+     */
+    public function page()
+    {
+        if (! $this->taxonomy()->hasStructure()) {
+            return null;
+        }
+
+        return $this->taxonomy()->structure()->tree()->find($this->inDefaultLocale()->slug());
+    }
+
+    public function depth()
+    {
+        return $this->page()?->depth();
+    }
+
+    public function order()
+    {
+        if (! $this->taxonomy()->hasStructure()) {
+            return $this->value('order');
+        }
+
+        $order = $this->taxonomy()->structure()->tree()->entryOrder($this->inDefaultLocale()->slug());
+
+        return $order === null ? null : $order + 1;
+    }
+
+    public function parent()
+    {
+        if (! $parent = $this->page()?->parent()) {
+            return null;
+        }
+
+        return $this->termFromSlug($parent->id());
+    }
+
+    public function ancestors()
+    {
+        if (! $page = $this->page()) {
+            return collect();
+        }
+
+        return collect($this->taxonomy()->structure()->ancestorsOf($page))
+            ->map(fn ($slug) => $this->termFromSlug($slug))
+            ->filter()
+            ->values();
+    }
+
+    public function children()
+    {
+        if (! $page = $this->page()) {
+            return collect();
+        }
+
+        return $page->pages()->all()
+            ->map(fn ($child) => $this->termFromSlug($child->id()))
+            ->filter()
+            ->values();
+    }
+
+    private function termFromSlug($slug)
+    {
+        return Facades\Term::find($this->taxonomyHandle().'::'.$slug)?->in($this->locale);
     }
 
     public function status()
@@ -321,7 +398,7 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, BulkAugmenta
 
     public function toResponse($request)
     {
-        if (! view()->exists($this->template())) {
+        if (! $this->uri() || ! view()->exists($this->template())) {
             throw new NotFoundHttpException;
         }
 
@@ -329,7 +406,36 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, BulkAugmenta
             throw new NotFoundHttpException;
         }
 
+        if ($redirect = $this->canonicalUriRedirect($request)) {
+            return $redirect;
+        }
+
         return (new DataResponse($this))->toResponse($request);
+    }
+
+    /**
+     * Hierarchical terms are resolvable by their slug at any path within the taxonomy
+     * (e.g. their old flat URL), but should permanently redirect to the canonical
+     * nested URL to avoid serving duplicate content.
+     */
+    private function canonicalUriRedirect($request)
+    {
+        if (! $this->taxonomy()->hierarchical()) {
+            return null;
+        }
+
+        $requested = URL::tidy($request->url(), withTrailingSlash: false);
+        $canonical = URL::tidy($this->absoluteUrl(), withTrailingSlash: false);
+
+        if (! $canonical || $requested === $canonical) {
+            return null;
+        }
+
+        if ($query = $request->getQueryString()) {
+            $canonical .= '?'.$query;
+        }
+
+        return redirect($canonical, 301);
     }
 
     public function template($template = null)
@@ -502,7 +608,7 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, BulkAugmenta
     {
         return [
             'absoluteUrl', 'apiUrl', 'blueprint', 'editUrl', 'entriesCount', 'hasOrigin', 'id', 'isRedirect',
-            'isRoot', 'lastModified', 'lastModifiedBy', 'layout', 'locale', 'path', 'private', 'published',
+            'isRoot', 'lastModified', 'lastModifiedBy', 'layout', 'locale', 'order', 'path', 'private', 'published',
             'redirectUrl', 'reference', 'site', 'slug', 'status', 'taxonomy', 'taxonomyHandle', 'template', 'title',
             'uri', 'url', 'urlWithoutRedirect', 'values',
         ];

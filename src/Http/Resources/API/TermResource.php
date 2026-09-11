@@ -6,6 +6,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class TermResource extends JsonResource
 {
+    use ResolvesRequestedFields;
+
     /**
      * Transform the resource into an array.
      *
@@ -14,19 +16,37 @@ class TermResource extends JsonResource
      */
     public function toArray($request)
     {
-        $fields = collect($this->resource->selectedQueryColumns() ?? $this->resource->augmented()->keys());
-
-        // Don't want these variables in API requests.
-        $fields = $fields->reject(fn ($field) => in_array($field, ['entries', 'collection']));
-
         $with = $this->blueprint()
             ->fields()->all()
             ->filter->isRelationship()->keys()->all();
 
         return $this->resource
-            ->toAugmentedCollection($fields->all())
+            ->toAugmentedCollection($this->fields($request))
             ->withRelations($with)
             ->withShallowNesting()
             ->toArray();
+    }
+
+    private function fields($request)
+    {
+        // Don't want these variables in API requests.
+        $excluded = ['entries', 'collection'];
+
+        $requested = collect($this->requestedFields($request))
+            ->reject(fn ($field) => in_array($field, $excluded));
+
+        if ($requested->isNotEmpty()) {
+            return $requested->all();
+        }
+
+        // Hierarchy fields are opt-in, the same way an entry's parent is. On a flat
+        // taxonomy they may be user-defined blueprint fields, so leave them alone.
+        if ($this->resource->taxonomy()->hasStructure()) {
+            $excluded = [...$excluded, 'parent', 'children', 'ancestors', 'depth'];
+        }
+
+        return collect($this->resource->augmented()->keys())
+            ->reject(fn ($field) => in_array($field, $excluded))
+            ->all();
     }
 }

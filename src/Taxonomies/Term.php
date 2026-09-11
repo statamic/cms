@@ -315,7 +315,7 @@ class Term implements ContainsQueryableValues, TermContract
     private function queryableMethods(): array
     {
         return [
-            'blueprint', 'collection', 'entriesCount', 'id', 'path', 'reference',
+            'blueprint', 'collection', 'entriesCount', 'id', 'order', 'path', 'reference',
             'slug', 'taxonomy', 'taxonomyHandle', 'title',
         ];
     }

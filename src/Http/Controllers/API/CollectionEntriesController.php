@@ -54,6 +54,10 @@ class CollectionEntriesController extends ApiController
 
     protected function filter($query)
     {
+        if (request()->has('with_descendants') && ! request()->boolean('with_descendants')) {
+            $query->withTaxonomyDescendants(false);
+        }
+
         parent::filter($query);
 
         collect(request()->filter ?? [])

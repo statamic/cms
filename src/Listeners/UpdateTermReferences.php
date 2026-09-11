@@ -50,7 +50,7 @@ class UpdateTermReferences extends Subscriber implements ShouldQueue
     public function handleDeleted(TermDeleted $event)
     {
         $term = $event->term;
-        $originalSlug = $term->getOriginal('slug');
+        $originalSlug = $term->getOriginal('slug') ?: $term->slug();
         $newSlug = null;
 
         $this->replaceReferences($term, $originalSlug, $newSlug);

@@ -1,0 +1,411 @@
+<?php
+
+namespace Tests\Fieldtypes;
+
+use Facades\Tests\Factories\EntryFactory;
+use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
+use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades;
+use Statamic\Facades\Term;
+use Statamic\Facades\User;
+use Statamic\Fields\Field;
+use Tests\PreventSavingStacheItemsToDisk;
+use Tests\TestCase;
+
+class TermsHierarchyTest extends TestCase
+{
+    use PreventSavingStacheItemsToDisk;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        Facades\Collection::make('blog')->taxonomies(['categories'])->save();
+
+        tap(Facades\Taxonomy::make('categories')->structureContents([]))->save();
+
+        foreach (['animals', 'cat', 'furniture'] as $slug) {
+            tap(Term::make($slug)->taxonomy('categories')->data(['title' => ucfirst($slug)]))->save();
+        }
+
+        Facades\Taxonomy::findByHandle('categories')->structure()->tree()->tree([
+            ['term' => 'animals', 'children' => [
+                ['term' => 'cat'],
+            ]],
+            ['term' => 'furniture'],
+        ])->save();
+
+        $this->actingAs(tap(User::make()->makeSuper())->save());
+    }
+
+    #[Test]
+    public function it_identifies_the_hierarchical_taxonomy()
+    {
+        $this->assertNotNull($this->fieldtype(['taxonomies' => ['categories']])->hierarchicalTaxonomy());
+        $this->assertNull($this->fieldtype(['taxonomies' => ['categories', 'other']])->hierarchicalTaxonomy());
+        $this->assertTrue($this->fieldtype(['taxonomies' => ['categories', 'other']])->hasHierarchicalTaxonomy());
+    }
+
+    #[Test]
+    public function preload_includes_tree_meta_for_a_hierarchical_taxonomy()
+    {
+        $preload = $this->fieldtype(['taxonomies' => ['categories']])->preload();
+
+        $this->assertArrayHasKey('tree', $preload);
+        $this->assertEquals('http://localhost/cp/taxonomies/categories/tree', $preload['tree']['url']);
+        $this->assertFalse($preload['tree']['expectsRoot']);
+    }
+
+    #[Test]
+    public function preload_has_no_tree_meta_for_a_flat_taxonomy()
+    {
+        tap(Facades\Taxonomy::make('tags'))->save();
+
+        $preload = $this->fieldtype(['taxonomies' => ['tags']])->preload();
+
+        $this->assertArrayNotHasKey('tree', $preload);
+    }
+
+    #[Test]
+    public function preload_asks_for_ancestor_titles_to_be_searchable()
+    {
+        $preload = $this->fieldtype(['taxonomies' => ['categories']])->preload();
+
+        $this->assertEquals(['title', 'search_titles'], $preload['searchKeys']);
+    }
+
+    #[Test]
+    public function preload_ships_the_path_delimiter_for_a_hierarchical_taxonomy()
+    {
+        $this->assertEquals('>', $this->fieldtype(['taxonomies' => ['categories']])->preload()['pathDelimiter']);
+    }
+
+    #[Test]
+    public function preload_has_no_path_delimiter_for_a_flat_taxonomy()
+    {
+        tap(Facades\Taxonomy::make('tags'))->save();
+
+        $this->assertNull($this->fieldtype(['taxonomies' => ['tags']])->preload()['pathDelimiter']);
+    }
+
+    #[Test]
+    public function the_item_hint_is_only_the_taxonomy_when_more_than_one_is_configured()
+    {
+        tap(Facades\Taxonomy::make('tags'))->save();
+
+        $cat = Term::find('categories::cat')->in('en');
+
+        $this->assertEquals('', $this->fieldtype(['taxonomies' => ['categories']])->getItemHint($cat));
+        $this->assertEquals('Categories', $this->fieldtype(['taxonomies' => ['categories', 'tags']])->getItemHint($cat));
+    }
+
+    #[Test]
+    public function the_item_path_is_the_ancestor_titles()
+    {
+        $fieldtype = $this->fieldtype(['taxonomies' => ['categories']]);
+
+        $this->assertEquals(['Animals'], $fieldtype->getItemPath(Term::find('categories::cat')->in('en')));
+        $this->assertEquals([], $fieldtype->getItemPath(Term::find('categories::animals')->in('en')));
+    }
+
+    #[Test]
+    public function there_is_no_item_path_for_a_flat_taxonomy()
+    {
+        tap(Facades\Taxonomy::make('tags'))->save();
+        tap(Term::make('featured')->taxonomy('tags')->data(['title' => 'Featured']))->save();
+
+        $fieldtype = $this->fieldtype(['taxonomies' => ['tags']]);
+
+        $this->assertNull($fieldtype->getItemPath(Term::find('tags::featured')->in('en')));
+    }
+
+    #[Test]
+    public function item_data_includes_search_titles_and_path_for_hierarchical_terms()
+    {
+        $item = $this->fieldtype(['taxonomies' => ['categories']])->getItemData(['cat'])->first();
+
+        $this->assertEquals('Animals > Cat', $item['search_titles']);
+        $this->assertEquals(['Animals'], $item['path']);
+        $this->assertArrayNotHasKey('taxonomy_title', $item);
+        $this->assertEquals('', $item['hint']);
+    }
+
+    #[Test]
+    public function item_data_has_no_depth_since_selected_items_are_never_a_tree_ordered_list()
+    {
+        $item = $this->fieldtype(['taxonomies' => ['categories']])->getItemData(['cat'])->first();
+
+        $this->assertArrayNotHasKey('depth', $item);
+    }
+
+    #[Test]
+    public function select_options_include_depth_search_titles_and_path_even_when_mode_is_default()
+    {
+        $byId = $this->resolvedOptions(
+            $this->fieldtype(['taxonomies' => ['categories']]),
+            new Request(['paginate' => false])
+        );
+
+        $this->assertEquals(1, $byId['categories::animals']['depth']);
+        $this->assertEquals('Animals', $byId['categories::animals']['search_titles']);
+        $this->assertEquals([], $byId['categories::animals']['path']);
+        $this->assertArrayNotHasKey('hint', $byId['categories::animals']);
+
+        $this->assertEquals(2, $byId['categories::cat']['depth']);
+        $this->assertEquals('Animals > Cat', $byId['categories::cat']['search_titles']);
+        $this->assertEquals(['Animals'], $byId['categories::cat']['path']);
+        $this->assertArrayNotHasKey('hint', $byId['categories::cat']);
+    }
+
+    #[Test]
+    public function searched_options_get_a_path_instead_of_a_depth()
+    {
+        $byId = $this->resolvedOptions(
+            $this->fieldtype(['taxonomies' => ['categories']]),
+            new Request(['paginate' => false, 'search' => 'cat'])
+        );
+
+        $this->assertArrayNotHasKey('depth', $byId['categories::cat']);
+        $this->assertEquals(['Animals'], $byId['categories::cat']['path']);
+        $this->assertEquals('Animals > Cat', $byId['categories::cat']['search_titles']);
+    }
+
+    #[Test]
+    public function explicitly_sorted_options_get_a_path_instead_of_a_depth()
+    {
+        $byId = $this->resolvedOptions(
+            $this->fieldtype(['taxonomies' => ['categories']]),
+            new Request(['paginate' => false, 'sort' => 'title'])
+        );
+
+        $this->assertArrayNotHasKey('depth', $byId['categories::cat']);
+        $this->assertEquals(['Animals'], $byId['categories::cat']['path']);
+        $this->assertEquals('Animals > Cat', $byId['categories::cat']['search_titles']);
+    }
+
+    #[Test]
+    public function paginated_options_get_a_path_instead_of_a_depth()
+    {
+        $byId = $this->resolvedOptions(
+            $this->fieldtype(['taxonomies' => ['categories']]),
+            new Request(['paginate' => true])
+        );
+
+        $this->assertArrayNotHasKey('depth', $byId['categories::cat']);
+        $this->assertEquals(['Animals'], $byId['categories::cat']['path']);
+        $this->assertEquals('Animals > Cat', $byId['categories::cat']['search_titles']);
+    }
+
+    #[Test]
+    public function select_options_stay_nested_when_multiple_taxonomies_are_configured()
+    {
+        tap(Facades\Taxonomy::make('tags'))->save();
+        tap(Term::make('featured')->taxonomy('tags')->data(['title' => 'Featured']))->save();
+
+        $byId = $this->resolvedOptions(
+            $this->fieldtype(['taxonomies' => ['categories', 'tags'], 'mode' => 'select']),
+            new Request(['paginate' => false])
+        );
+
+        $this->assertEquals(2, $byId['categories::cat']['depth']);
+        $this->assertEquals('Animals > Cat', $byId['categories::cat']['search_titles']);
+        $this->assertEquals(['Animals'], $byId['categories::cat']['path']);
+        $this->assertArrayNotHasKey('taxonomy_title', $byId['categories::cat']);
+        $this->assertEquals('Categories', $byId['categories::cat']['hint']);
+        $this->assertArrayNotHasKey('depth', $byId['tags::featured']);
+        $this->assertArrayNotHasKey('path', $byId['tags::featured']);
+        $this->assertEquals('Tags', $byId['tags::featured']['hint']);
+    }
+
+    #[Test]
+    public function item_data_includes_the_path_when_multiple_taxonomies_are_configured()
+    {
+        tap(Facades\Taxonomy::make('tags'))->save();
+
+        $item = $this->fieldtype(['taxonomies' => ['categories', 'tags']])->getItemData(['categories::cat'])->first();
+
+        $this->assertArrayNotHasKey('depth', $item);
+        $this->assertEquals('Animals > Cat', $item['search_titles']);
+        $this->assertEquals(['Animals'], $item['path']);
+        $this->assertArrayNotHasKey('taxonomy_title', $item);
+        $this->assertEquals('Categories', $item['hint']);
+    }
+
+    #[Test]
+    public function processing_a_path_creates_missing_terms_and_grafts_them_into_the_tree()
+    {
+        $fieldtype = $this->fieldtype(['taxonomies' => ['categories']]);
+
+        $processed = $fieldtype->process(['animals > cat > calico']);
+
+        $this->assertEquals(['calico'], $processed);
+
+        $calico = Term::find('categories::calico');
+        $this->assertNotNull($calico);
+        $this->assertEquals('calico', $calico->title());
+
+        $tree = Facades\Taxonomy::findByHandle('categories')->structure()->tree()->tree();
+
+        $this->assertEquals([
+            ['term' => 'animals', 'children' => [
+                ['term' => 'cat', 'children' => [
+                    ['term' => 'calico'],
+                ]],
+            ]],
+            ['term' => 'furniture'],
+        ], $tree);
+    }
+
+    #[Test]
+    public function processing_a_path_reuses_existing_terms_in_place()
+    {
+        $fieldtype = $this->fieldtype(['taxonomies' => ['categories']]);
+
+        // "cat" already lives under "animals" and shouldn't get re-parented under "furniture".
+        $processed = $fieldtype->process(['furniture > cat']);
+
+        $this->assertEquals(['cat'], $processed);
+
+        $tree = Facades\Taxonomy::findByHandle('categories')->structure()->tree()->tree();
+
+        $this->assertEquals([
+            ['term' => 'animals', 'children' => [
+                ['term' => 'cat'],
+            ]],
+            ['term' => 'furniture'],
+        ], $tree);
+    }
+
+    #[Test]
+    public function processing_a_path_deeper_than_max_depth_fails_validation()
+    {
+        tap(Facades\Taxonomy::findByHandle('categories')->structureContents(['max_depth' => 2]))->save();
+
+        $this->expectException(ValidationException::class);
+
+        $this->fieldtype(['taxonomies' => ['categories']])->process(['animals > cat > calico']);
+    }
+
+    #[Test]
+    public function processing_a_plain_value_still_creates_a_root_term()
+    {
+        $processed = $this->fieldtype(['taxonomies' => ['categories']])->process(['Plants']);
+
+        $this->assertEquals(['plants'], $processed);
+        $this->assertNotNull(Term::find('categories::plants'));
+    }
+
+    #[Test]
+    public function processing_a_path_of_new_terms_nests_them_in_the_persisted_tree()
+    {
+        $processed = $this->fieldtype(['taxonomies' => ['categories']])->process(['plants > fern']);
+
+        $this->assertEquals(['fern'], $processed);
+        $this->assertNotNull(Term::find('categories::plants'));
+        $this->assertNotNull(Term::find('categories::fern'));
+
+        $tree = Facades\Taxonomy::findByHandle('categories')->structure()->tree()->tree();
+
+        $this->assertEquals([
+            ['term' => 'animals', 'children' => [
+                ['term' => 'cat'],
+            ]],
+            ['term' => 'furniture'],
+            ['term' => 'plants', 'children' => [
+                ['term' => 'fern'],
+            ]],
+        ], $tree);
+    }
+
+    #[Test]
+    public function processing_a_string_matching_an_existing_term_selects_it_instead_of_creating_a_path()
+    {
+        tap(Term::make('ages-21')->taxonomy('categories')->data(['title' => 'Ages > 21']))->save();
+
+        $processed = $this->fieldtype(['taxonomies' => ['categories']])->process(['Ages > 21']);
+
+        $this->assertEquals(['ages-21'], $processed);
+        $this->assertNull(Term::find('categories::ages'));
+        $this->assertNull(Term::find('categories::21'));
+    }
+
+    #[Test]
+    public function a_slash_no_longer_creates_a_path_since_it_is_not_the_delimiter()
+    {
+        $processed = $this->fieldtype(['taxonomies' => ['categories']])->process(['AC/DC']);
+
+        $this->assertEquals(['acdc'], $processed);
+        $this->assertNull(Term::find('categories::ac'));
+        $this->assertNull(Term::find('categories::dc'));
+        $this->assertEquals('AC/DC', Term::find('categories::acdc')->title());
+    }
+
+    #[Test]
+    public function processing_a_path_with_no_matching_term_still_creates_the_nested_path()
+    {
+        $processed = $this->fieldtype(['taxonomies' => ['categories']])->process(['animals > kitten']);
+
+        $this->assertEquals(['kitten'], $processed);
+
+        $tree = Facades\Taxonomy::findByHandle('categories')->structure()->tree()->tree();
+
+        $this->assertEquals([
+            ['term' => 'animals', 'children' => [
+                ['term' => 'cat'],
+                ['term' => 'kitten'],
+            ]],
+            ['term' => 'furniture'],
+        ], $tree);
+    }
+
+    #[Test]
+    public function processing_a_path_matching_an_unrelated_existing_term_selects_it_instead_of_creating_the_path()
+    {
+        // Documents the accepted trade-off: an existing whole-string slug match wins over path
+        // parsing, even when the typed value looks like a path. Here "animals>cat" slugifies to
+        // "animalscat" (the delimiter is stripped, not converted to a separator), which happens
+        // to already exist as an unrelated term, so it's selected instead of creating a nested path.
+        tap(Term::make('animalscat')->taxonomy('categories')->data(['title' => 'Animals Cat']))->save();
+
+        $processed = $this->fieldtype(['taxonomies' => ['categories']])->process(['animals>cat']);
+
+        $this->assertEquals(['animalscat'], $processed);
+    }
+
+    #[Test]
+    public function flat_taxonomy_terms_containing_the_delimiter_are_unaffected_by_path_lookup_order()
+    {
+        tap(Facades\Taxonomy::make('tags'))->save();
+
+        $processed = $this->fieldtype(['taxonomies' => ['tags']])->process(['Ages > 21']);
+
+        $this->assertEquals(['ages-21'], $processed);
+        $this->assertEquals('Ages > 21', Term::find('tags::ages-21')->title());
+    }
+
+    private function resolvedOptions($fieldtype, $request)
+    {
+        // A resource resolves its request out of the container rather than the one handed to
+        // toResponse(), which in a real CP request is the same one the items were queried with.
+        $this->app->instance('request', $request);
+
+        $items = $fieldtype->getIndexItems($request);
+
+        $resolved = json_decode(
+            $fieldtype->getResourceCollection($request, $items)->toResponse($request)->getContent(),
+            true
+        )['data'];
+
+        return collect($resolved)->keyBy(fn ($term) => $term['id']);
+    }
+
+    public function fieldtype($config = [], $parent = null)
+    {
+        $field = new Field('test', array_merge(['type' => 'terms'], $config));
+
+        $field->setParent($parent ?? EntryFactory::collection('blog')->create());
+
+        return (new \Statamic\Fieldtypes\Terms)->setField($field);
+    }
+}

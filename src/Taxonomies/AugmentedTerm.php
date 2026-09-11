@@ -44,7 +44,51 @@ class AugmentedTerm extends AbstractAugmented
             'collection',
             'updated_at',
             'updated_by',
+            'parent',
+            'children',
+            'ancestors',
+            'depth',
         ];
+    }
+
+    protected function parent()
+    {
+        if (! $this->data->taxonomy()->hasStructure()) {
+            return $this->wrapValue($this->getFromData('parent'), 'parent');
+        }
+
+        $parent = $this->data->parent();
+
+        return Statamic::isApiRoute()
+            ? optional($parent)->toShallowAugmentedCollection()
+            : $parent;
+    }
+
+    protected function children()
+    {
+        if (! $this->data->taxonomy()->hasStructure()) {
+            return $this->wrapValue($this->getFromData('children'), 'children');
+        }
+
+        // The terms endpoints are intentionally flat, like the entries ones. The tree
+        // endpoint is where a structure gets traversed, with its own depth control.
+        return Statamic::isApiRoute() ? null : $this->data->children();
+    }
+
+    protected function ancestors()
+    {
+        if (! $this->data->taxonomy()->hasStructure()) {
+            return $this->wrapValue($this->getFromData('ancestors'), 'ancestors');
+        }
+
+        return Statamic::isApiRoute() ? null : $this->data->ancestors();
+    }
+
+    protected function depth()
+    {
+        return $this->data->taxonomy()->hasStructure()
+            ? $this->data->depth()
+            : $this->wrapValue($this->getFromData('depth'), 'depth');
     }
 
     protected function updatedBy()
