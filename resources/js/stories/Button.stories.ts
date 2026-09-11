@@ -3,6 +3,9 @@ import {Button, ButtonGroup} from '@ui';
 import {computed} from 'vue';
 import {icons} from './icons';
 
+/**
+ * @import import { Button } from '@statamic/cms/ui';
+ */
 const meta = {
     title: 'Forms/Button',
     component: Button,

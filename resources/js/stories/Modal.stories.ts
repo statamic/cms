@@ -2,6 +2,9 @@ import type {Meta, StoryObj} from '@storybook/vue3';
 import {Button, Field, Input, Modal, ModalClose, ModalTitle} from '@ui';
 import PortalTargets from "@/components/portals/PortalTargets.vue";
 
+/**
+ * @import import { Modal } from '@statamic/cms/ui';
+ */
 const meta = {
     title: 'Overlays/Modal',
     component: Modal,

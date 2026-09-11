@@ -1,6 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/vue3';
 import { MiddleEllipsis } from '@ui';
 
+/**
+ * @import import { MiddleEllipsis } from '@statamic/cms/ui';
+ */
 const meta = {
     title: 'Components/MiddleEllipsis',
     component: MiddleEllipsis,

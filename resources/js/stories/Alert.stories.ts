@@ -2,6 +2,9 @@ import type {Meta, StoryObj} from '@storybook/vue3';
 import {Alert, Heading, Description} from '@ui';
 import {icons} from './icons';
 
+/**
+ * @import import { Alert } from '@statamic/cms/ui';
+ */
 const meta = {
     title: 'Components/Alert',
     component: Alert,

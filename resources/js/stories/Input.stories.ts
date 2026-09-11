@@ -2,6 +2,9 @@ import type {Meta, StoryObj} from '@storybook/vue3';
 import {Button, Description, Field, Input, Label} from '@ui';
 import {icons} from "@/stories/icons";
 
+/**
+ * @import import { Input } from '@statamic/cms/ui';
+ */
 const meta = {
     title: 'Forms/Input',
     component: Input,

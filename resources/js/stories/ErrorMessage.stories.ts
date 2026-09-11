@@ -1,6 +1,9 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
 import {ErrorMessage} from '@ui';
 
+/**
+ * @import import { ErrorMessage } from '@statamic/cms/ui';
+ */
 const meta = {
     title: 'Forms/ErrorMessage',
     component: ErrorMessage,

@@ -1,6 +1,9 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
 import {Separator} from '@ui';
 
+/**
+ * @import import { Separator } from '@statamic/cms/ui';
+ */
 const meta = {
     title: 'Layout/Separator',
     component: Separator,

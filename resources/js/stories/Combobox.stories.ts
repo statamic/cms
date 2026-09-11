@@ -4,6 +4,9 @@ import {Combobox} from '@ui';
 import {ref} from 'vue';
 import {icons} from "@/stories/icons";
 
+/**
+ * @import import { Combobox } from '@statamic/cms/ui';
+ */
 const meta = {
     title: 'Forms/Combobox',
     component: Combobox,

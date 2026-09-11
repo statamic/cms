@@ -2,6 +2,9 @@ import type {Meta, StoryObj} from '@storybook/vue3';
 import {Text} from '@ui';
 import {computed} from 'vue';
 
+/**
+ * @import import { Text } from '@statamic/cms/ui';
+ */
 const meta = {
     title: 'Components/Text',
     component: Text,

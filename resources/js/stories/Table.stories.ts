@@ -1,6 +1,9 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
 import {Badge, Table, TableCell, TableColumn, TableColumns, TableRow, TableRows} from '@ui';
 
+/**
+ * @import import { Table } from '@statamic/cms/ui';
+ */
 const meta = {
     title: 'Layout/Table',
     component: Table,
