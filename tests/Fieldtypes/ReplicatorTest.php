@@ -1173,10 +1173,15 @@ class ReplicatorTest extends TestCase
         Facades\Blueprint::partialMock();
         Facades\Blueprint::shouldReceive('find')->with('collections.pages.default')->andReturn($blueprint);
 
+        $user = tap(Facades\User::make()->makeSuper())->save();
+
         $response = $this
-            ->actingAs(tap(Facades\User::make()->makeSuper())->save())
+            ->actingAs($user)
             ->postJson(cp_route('replicator-fieldtype.set'), [
-                'blueprint' => 'collections.pages.default',
+                'token' => encrypt([
+                    'fqh' => 'collections.pages.default',
+                    'user_id' => $user->id(),
+                ]),
                 'field' => 'stuff.content_blocks',
                 'set' => 'text',
             ])
