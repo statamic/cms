@@ -74,9 +74,14 @@ class Terms extends FieldtypeFilter
         $slug = Str::after($term, '::');
         $handle = $this->fieldtype->usingSingleTaxonomy()
             ? $this->fieldtype->taxonomies()[0]
-            : Str::before($term, '::');
+            : (Str::contains($term, '::') ? Str::before($term, '::') : null);
 
-        $fallback = array_values(array_unique(array_filter([$term, $slug])));
+        // Single taxonomy fields store bare slugs, multiple taxonomy fields store
+        // prefixed ones. Expanded values have to be in the same shape or they'll
+        // match another taxonomy's identically slugged term, or nothing at all.
+        $prefix = $this->fieldtype->usingSingleTaxonomy() || ! $handle ? '' : $handle.'::';
+
+        $fallback = array_values(array_filter([$prefix.$slug]));
 
         if (! $handle || ! ($taxonomy = Facades\Taxonomy::findByHandle($handle)) || ! $taxonomy->hierarchical()) {
             return $fallback;
@@ -88,8 +93,8 @@ class Terms extends FieldtypeFilter
 
         $values = collect();
 
-        $walk = function ($page) use (&$walk, $values) {
-            $values->push($page->id());
+        $walk = function ($page) use (&$walk, $values, $prefix) {
+            $values->push($prefix.$page->id());
             $page->pages()->all()->each(fn ($child) => $walk($child));
         };
 
