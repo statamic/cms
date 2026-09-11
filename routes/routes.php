@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Route;
 use Statamic\API\Middleware\Cache;
 use Statamic\API\Middleware\HandleAuthentication;
@@ -11,13 +12,12 @@ if (config('statamic.api.enabled')) {
     Route::middleware([
         RequireStatamicPro::class,
         HandleAuthentication::class,
+        ...Arr::wrap(config('statamic.api.middleware')),
         Cache::class,
-    ])->group(function () {
-        Route::middleware(config('statamic.api.middleware'))
-            ->name('statamic.api.')
-            ->prefix(config('statamic.api.route'))
-            ->group(__DIR__.'/api.php');
-    });
+    ])
+        ->name('statamic.api.')
+        ->prefix(config('statamic.api.route'))
+        ->group(__DIR__.'/api.php');
 }
 
 if (config('statamic.cp.enabled')) {
