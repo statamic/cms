@@ -4,7 +4,6 @@ namespace Statamic\Fieldtypes;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Collection;
-use Illuminate\Validation\ValidationException;
 use Statamic\Contracts\Data\Localization;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Term as TermContract;
@@ -712,31 +711,19 @@ class Terms extends Relationship
      */
     private function createTermsFromPath(string $path, $taxonomy)
     {
-        $segments = collect(explode(EnsuresTermPaths::DELIMITER, $path))
-            ->map(fn ($segment) => trim($segment))
-            ->filter()
-            ->values();
+        $paths = new EnsuresTermPaths;
 
-        if ($segments->isEmpty()) {
+        if ($paths->segments($path)->isEmpty()) {
             return null;
         }
 
-        $maxDepth = $taxonomy->structure()->maxDepth();
-
-        if ($maxDepth && $segments->count() > $maxDepth) {
-            throw ValidationException::withMessages([
-                $this->field->handle() => __('statamic::validation.term_path_exceeds_max_depth', [
-                    'path' => $path,
-                    'max' => $maxDepth,
-                ]),
-            ]);
-        }
-
-        $slug = (new EnsuresTermPaths)->ensure(
+        // The error goes under the field handle so the publish form can attach it to the field.
+        $slug = $paths->ensure(
             $taxonomy,
             $path,
             $this->termLang(),
-            fn () => User::current()->can('create', [TermContract::class, $taxonomy])
+            fn () => User::current()->can('create', [TermContract::class, $taxonomy]),
+            $this->field->handle()
         );
 
         return $slug ? $taxonomy->handle().'::'.$slug : null;

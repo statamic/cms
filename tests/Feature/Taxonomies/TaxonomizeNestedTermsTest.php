@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Taxonomies;
 
+use Illuminate\Validation\ValidationException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Collection;
@@ -99,5 +100,97 @@ class TaxonomizeNestedTermsTest extends TestCase
         $this->assertEquals([
             ['term' => 'events'],
         ], Taxonomy::findByHandle('categories')->structure()->tree()->tree());
+    }
+
+    #[Test]
+    public function an_over_deep_path_is_rejected_before_any_terms_are_created()
+    {
+        tap(Taxonomy::make('categories')->structureContents(['max_depth' => 2]))->save();
+
+        foreach (['animals', 'cat'] as $slug) {
+            tap(Term::make($slug)->taxonomy('categories')->data(['title' => ucfirst($slug)]))->save();
+        }
+
+        Taxonomy::findByHandle('categories')->structure()->tree()->tree([
+            ['term' => 'animals', 'children' => [
+                ['term' => 'cat'],
+            ]],
+        ])->save();
+
+        // Two typed segments, but "cat" already sits at depth 2, so the leaf would land at 3.
+        try {
+            (new EnsuresTermPaths)->ensure(Taxonomy::findByHandle('categories'), 'Cat > Kitten');
+            $this->fail('Expected a validation exception.');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('path', $e->errors());
+        }
+
+        $this->assertNull(Term::find('categories::kitten'));
+        $this->assertEquals([
+            ['term' => 'animals', 'children' => [
+                ['term' => 'cat'],
+            ]],
+        ], Taxonomy::findByHandle('categories')->structure()->tree()->fileData()['tree']);
+    }
+
+    #[Test]
+    public function an_over_deep_path_puts_the_error_under_the_given_key()
+    {
+        tap(Taxonomy::make('categories')->structureContents(['max_depth' => 2]))->save();
+
+        foreach (['animals', 'cat'] as $slug) {
+            tap(Term::make($slug)->taxonomy('categories')->data(['title' => ucfirst($slug)]))->save();
+        }
+
+        Taxonomy::findByHandle('categories')->structure()->tree()->tree([
+            ['term' => 'animals', 'children' => [
+                ['term' => 'cat'],
+            ]],
+        ])->save();
+
+        try {
+            (new EnsuresTermPaths)->ensure(Taxonomy::findByHandle('categories'), 'Cat > Kitten', null, null, 'my_field');
+            $this->fail('Expected a validation exception.');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('my_field', $e->errors());
+        }
+
+        $this->assertNull(Term::find('categories::kitten'));
+    }
+
+    #[Test]
+    public function a_path_that_fits_under_an_existing_branch_is_still_allowed()
+    {
+        tap(Taxonomy::make('categories')->structureContents(['max_depth' => 3]))->save();
+
+        foreach (['animals', 'cat'] as $slug) {
+            tap(Term::make($slug)->taxonomy('categories')->data(['title' => ucfirst($slug)]))->save();
+        }
+
+        Taxonomy::findByHandle('categories')->structure()->tree()->tree([
+            ['term' => 'animals', 'children' => [
+                ['term' => 'cat'],
+            ]],
+        ])->save();
+
+        $slug = (new EnsuresTermPaths)->ensure(Taxonomy::findByHandle('categories'), 'Cat > Kitten');
+
+        $this->assertEquals('kitten', $slug);
+        $this->assertEquals([
+            ['term' => 'animals', 'children' => [
+                ['term' => 'cat', 'children' => [
+                    ['term' => 'kitten'],
+                ]],
+            ]],
+        ], Taxonomy::findByHandle('categories')->structure()->tree()->fileData()['tree']);
+    }
+
+    #[Test]
+    public function it_splits_a_typed_path_into_segments()
+    {
+        $this->assertEquals(
+            ['animals', 'cat'],
+            (new EnsuresTermPaths)->segments(' animals >  cat > ')->all()
+        );
     }
 }
