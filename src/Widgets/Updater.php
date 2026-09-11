@@ -9,6 +9,11 @@ use Statamic\Facades\User;
 
 class Updater extends Widget
 {
+    public static function icon(): string
+    {
+        return 'updates';
+    }
+
     public function component()
     {
         if (! User::current()->can('view updates')) {

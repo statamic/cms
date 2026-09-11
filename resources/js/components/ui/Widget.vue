@@ -11,7 +11,6 @@ const props = defineProps({
 
 const slots = useSlots();
 const hasHeader = computed(() => Boolean(props.title || props.icon || slots.actions));
-
 </script>
 
 <template>

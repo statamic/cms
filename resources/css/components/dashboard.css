@@ -1,0 +1,40 @@
+/* ==========================================================================
+   DASHBOARD WIDGET EDITING
+   ========================================================================== */
+
+.dashboard-widget-inner {
+    @apply @container/widget relative rounded-xl;
+}
+
+/* Hide the chrome on the dragging source — the mirror is what the user sees */
+.dashboard-widget-sortable.draggable-source--is-dragging .dashboard-widget-inner {
+    @apply opacity-50;
+}
+
+.dashboard-widget-sortable.draggable-source--is-dragging [data-widget-edit-chrome] {
+    @apply opacity-0;
+}
+
+.dashboard-widget-sortable.draggable-source--is-dragging .dashboard-widget-inner::after {
+    content: '';
+    @apply pointer-events-none absolute inset-0 rounded-xl border-2 border-dashed border-ui-accent-bg/40 bg-ui-accent-bg/5 dark:bg-ui-accent-bg/10;
+}
+
+/* Mirror — the floating element that follows the cursor while dragging */
+body > .draggable-mirror.dashboard-widget-mirror {
+    @apply rounded-xl shadow-ui-lg ring-1 ring-black/5 dark:ring-white/10;
+    transition: none !important;
+    will-change: transform;
+}
+
+body > .draggable-mirror.dashboard-widget-mirror [data-widget-edit-chrome] {
+    @apply bg-white/95 dark:bg-gray-850/95;
+}
+
+.dashboard-widget-placeholder {
+    @apply flex min-h-54 flex-col items-center justify-center gap-3 rounded-xl bg-gray-50 px-6 py-10 text-center ring-1 ring-black/5 dark:bg-gray-900/40 dark:ring-white/10;
+}
+
+.dashboard-widget-empty {
+    @apply flex min-h-64 flex-col items-center justify-center gap-4 rounded-xl bg-gray-50 px-8 py-16 text-center ring-1 ring-black/5 dark:bg-gray-900/30 dark:ring-white/10;
+}
