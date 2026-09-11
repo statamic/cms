@@ -2,8 +2,14 @@
 import { injectListingContext } from '../Listing/Listing.vue';
 import { Input } from '@ui';
 import debounce from '@/util/debounce.js';
-import { useTemplateRef } from 'vue';
+import { useId, useTemplateRef } from 'vue';
 
+defineProps({
+    /** Accessible label for the search field. Pass the listing's own noun, e.g. "Search assets". */
+    label: { type: String, default: null },
+});
+
+const id = useId();
 const { activeFilterBadgeCount, searchQuery, setSearchQuery, reorderable } = injectListingContext();
 const searchQueryUpdated = debounce((value) => setSearchQuery(value), 300);
 
@@ -15,12 +21,12 @@ defineExpose({ focus });
 
 <template>
     <div class="flex-1 max-w-sm" :class="{ 'max-w-60!': activeFilterBadgeCount > 2 }">
-        <label for="listings-search" class="sr-only">{{ __('Search entries') }}</label>
+        <label :for="id" class="sr-only">{{ label ? __(label) : __('Search') }}</label>
         <Input
             :focus="true"
             ref="input"
             icon="magnifying-glass"
-            id="listings-search"
+            :id="id"
             variant="light"
             clearable
             :placeholder="__('Search...')"
