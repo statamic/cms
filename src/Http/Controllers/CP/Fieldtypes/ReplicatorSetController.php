@@ -85,7 +85,7 @@ class ReplicatorSetController extends CpController
 
     private function getConfig(array $config, array $remainingFieldPathComponents): array
     {
-        $isGroupOrGrid = isset($config['fields']);
+        $isGroupOrGrid = isset($config['type']) && isset($config['fields']);
         $isReplicator = isset($config['type']) && in_array($config['type'], ['bard', 'replicator']);
 
         if ($isReplicator) {
