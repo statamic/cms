@@ -449,18 +449,20 @@ export default {
             }
         },
 
-        value(value, oldValue) {
+        value(value) {
             if (!this.editor) return;
-
-            if (this.editor.view.dom.contains(document.activeElement)) return;
 
             const oldContent = this.editor.getJSON();
             const content = this.valueToContent(value);
 
-            if (JSON.stringify(content) !== JSON.stringify(oldContent)) {
-                this.editor.commands.clearContent(false);
-                this.editor.commands.setContent(content, true);
-            }
+            if (JSON.stringify(content) === JSON.stringify(oldContent)) return;
+
+            // Sets sync their own values into the editor, so while it's focused those changes
+            // don't need a rebuild, which would destroy the field being typed in.
+            if (this.editorIsFocused() && this.onlySetValuesDiffer(value, oldContent.content ?? [])) return;
+
+            this.editor.commands.clearContent(false);
+            this.editor.commands.setContent(content, true);
         },
 
         readOnly(readOnly) {
@@ -950,6 +952,24 @@ export default {
 
         valueToContent(value) {
             return value.length ? { type: 'doc', content: value } : null;
+        },
+
+        editorIsFocused() {
+            return this.editor.view.dom.contains(document.activeElement);
+        },
+
+        onlySetValuesDiffer(nodes, oldNodes) {
+            return JSON.stringify(this.withoutSetValues(nodes)) === JSON.stringify(this.withoutSetValues(oldNodes));
+        },
+
+        withoutSetValues(nodes) {
+            return nodes.map((node) => {
+                if (node.type === 'set') return { ...node, attrs: { ...node.attrs, values: null } };
+
+                if (node.content) return { ...node, content: this.withoutSetValues(node.content) };
+
+                return node;
+            });
         },
 
         getExtensions() {
