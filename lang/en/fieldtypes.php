@@ -118,7 +118,7 @@ return [
     'icon.config.set' => 'Default CP icons, or a set registered with `Icons::register()`.',
     'icon.title' => 'Icon',
     'info.config.content' => 'The information to display. Markdown is supported, including links and lists.',
-    'info.config.alert_icon' => 'Choose an icon, or leave empty to use the state\'s default icon.',
+    'info.config.icon' => 'Choose an icon, or leave empty to use the state\'s default icon.',
     'info.config.state' => 'Choose the visual importance of the information.',
     'info.title' => 'Info',
     'integer.config.max' => 'The maximum allowed value.',

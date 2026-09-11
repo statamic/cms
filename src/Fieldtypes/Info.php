@@ -45,9 +45,9 @@ class Info extends Fieldtype
                         ],
                         'width' => 50,
                     ],
-                    'alert_icon' => [
+                    'icon' => [
                         'display' => __('Icon'),
-                        'instructions' => __('statamic::fieldtypes.info.config.alert_icon'),
+                        'instructions' => __('statamic::fieldtypes.info.config.icon'),
                         'type' => 'icon',
                         'set' => 'default',
                         'mode' => 'compact',
