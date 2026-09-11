@@ -319,6 +319,42 @@ class TaxonomyTreeTest extends TestCase
     }
 
     #[Test]
+    public function the_tree_is_shared_between_sites()
+    {
+        $this->setSites([
+            'en' => ['url' => '/', 'locale' => 'en_US'],
+            'fr' => ['url' => '/fr/', 'locale' => 'fr_FR'],
+        ]);
+
+        $taxonomy = tap(Taxonomy::make('categories')->title('Categories')->sites(['en', 'fr'])->structureContents([]))->save();
+
+        foreach (['animals', 'furniture'] as $slug) {
+            tap(Term::make($slug)->taxonomy('categories')->data(['title' => ucfirst($slug)]))->save();
+        }
+
+        $taxonomy->structure()->tree()->tree([
+            ['term' => 'animals'],
+            ['term' => 'furniture'],
+        ])->save();
+
+        // The tree isn't localized, so no site is submitted when saving it.
+        $this
+            ->actingAs(tap(User::make()->makeSuper())->save())
+            ->patch(cp_route('taxonomies.tree.update', 'categories'), [
+                'pages' => [
+                    ['id' => 'categories::furniture', 'children' => []],
+                    ['id' => 'categories::animals', 'children' => []],
+                ],
+            ])
+            ->assertOk();
+
+        $expected = [['term' => 'furniture'], ['term' => 'animals']];
+
+        $this->assertEquals($expected, $taxonomy->structure()->in('en')->tree());
+        $this->assertEquals($expected, $taxonomy->structure()->in('fr')->tree());
+    }
+
+    #[Test]
     public function it_rejects_a_tree_deeper_than_max_depth()
     {
         $taxonomy = tap(Taxonomy::make('categories')->title('Categories')->structureContents(['max_depth' => 2]))->save();

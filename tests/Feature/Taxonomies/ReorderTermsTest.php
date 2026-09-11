@@ -288,6 +288,6 @@ class ReorderTermsTest extends TestCase
 
     private function reorder($payload)
     {
-        return $this->post(cp_route('taxonomies.terms.reorder', 'test'), array_merge(['site' => 'en'], $payload));
+        return $this->post(cp_route('taxonomies.terms.reorder', 'test'), $payload);
     }
 }

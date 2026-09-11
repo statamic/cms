@@ -4,12 +4,14 @@ import { Header, Dropdown, DropdownMenu, DropdownItem, DropdownLabel, DropdownSe
 import { Link, router } from '@inertiajs/vue3';
 import { defineAsyncComponent } from 'vue';
 import DeleteTermConfirmation from '@/components/taxonomies/DeleteTermConfirmation.vue';
+import SiteSelector from '@/components/SiteSelector.vue';
 
 export default {
     components: {
         Link,
         Head,
         Header,
+        SiteSelector,
         Dropdown,
         DropdownMenu,
         DropdownItem,
@@ -213,7 +215,6 @@ export default {
                     ids: this.items.map((item) => item.id),
                     page: this.page,
                     perPage: this.perPage,
-                    site: this.site,
                 })
                 .then(() => {
                     this.reordering = false;
@@ -324,12 +325,6 @@ export default {
             </template>
 
             <template v-if="view === 'list' && reorderable">
-                <site-selector
-                    v-if="sites && sites.length > 1 && reordering && site"
-                    :sites="sites"
-                    v-model="site"
-                />
-
                 <Button
                     v-if="!reordering"
                     @click="reordering = true"
@@ -405,6 +400,7 @@ export default {
             :max-depth="maxDepth"
             :expects-root="false"
             :site="site"
+            :submit-site="false"
             :editable="canReorder"
             :preferences-prefix="preferencesPrefix"
             @edit-page="editTerm"

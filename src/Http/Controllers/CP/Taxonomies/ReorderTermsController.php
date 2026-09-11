@@ -22,7 +22,6 @@ class ReorderTermsController extends CpController
             // of the tree and then writes negative keys onto it.
             'page' => 'required|integer|min:1',
             'perPage' => 'required|integer|min:1',
-            'site' => 'required',
         ]);
 
         $tree = $taxonomy->structure()->tree();
