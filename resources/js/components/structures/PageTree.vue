@@ -71,6 +71,10 @@
                             <template #branch-options="props">
                                 <slot name="branch-options" v-bind="{ ...props, stat }" />
                             </template>
+
+                            <template #branch-options-dropdown="props">
+                                <slot name="branch-options-dropdown" v-bind="{ ...props, stat }" />
+                            </template>
                         </tree-branch>
                     </template>
                 </Draggable>
