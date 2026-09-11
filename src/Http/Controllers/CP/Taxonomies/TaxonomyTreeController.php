@@ -39,13 +39,13 @@ class TaxonomyTreeController extends CpController
         $this->authorize('reorder', $taxonomy);
 
         $structure = $taxonomy->structure();
-        $proposed = $structure->repairTree($this->toTree($request->pages));
-        $structure->assertDoesNotExceedMaxDepth($proposed);
+        $submitted = $this->toTree($request->pages);
+        $structure->assertDoesNotExceedMaxDepth($structure->repairTree($submitted));
 
         $this->deleteTerms($request, $taxonomy);
 
         $tree = $structure->tree();
-        $contents = $structure->validateTree($this->toTree($request->pages), $tree->locale());
+        $contents = $structure->validateTree($submitted, $tree->locale());
 
         return [
             'saved' => $tree->tree($contents)->save(),
