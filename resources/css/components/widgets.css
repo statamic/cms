@@ -1,0 +1,22 @@
+/* GROUP DASHBOARD WIDGETS
+=================================================== */
+
+.widgets {
+    display: grid;
+    --grid-columns: 12;
+    grid-template-columns: repeat(var(--grid-columns), 1fr);
+    @apply gap-6;
+
+    > * {
+        /*
+         * Stacked, until the dashboard is wide enough for the arrangement to
+         * hold up. One threshold for every widget, so there are only ever two
+         * layouts: the one that was configured, or everything in order.
+         */
+        grid-column: span var(--grid-columns);
+
+        @variant @2xl/widgets {
+            grid-column: span var(--col-span, var(--grid-columns));
+        }
+    }
+}

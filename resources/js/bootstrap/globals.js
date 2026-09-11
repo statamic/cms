@@ -49,6 +49,10 @@ export function clone(value) {
     return JSON.parse(JSON.stringify(value));
 }
 
+/**
+ * @deprecated Widths are resolved by the stylesheet now. Emit `field-w-${width}`
+ * or `widget-w-${width}` instead. Will be removed in a future major version.
+ */
 export function tailwind_width_class(width) {
     const widths = {
         25: 'w-full @lg:w-1/4',
@@ -62,6 +66,11 @@ export function tailwind_width_class(width) {
     return `${widths[width] || 'w-full'}`;
 }
 
+/**
+ * @deprecated Widths are resolved by the stylesheet now, which understands column
+ * spans as well as these six percentages. Emit `field-w-${width}` instead.
+ * Will be removed in a future major version.
+ */
 export function field_width_class(width) {
     const widths = {
         25: 'field-w-25',
