@@ -12,6 +12,8 @@ use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Role;
+use Statamic\Facades\Taxonomy;
+use Statamic\Facades\Term;
 use Statamic\Facades\User;
 use Statamic\Structures\CollectionStructure;
 use Tests\FakesRoles;
@@ -384,6 +386,99 @@ class UpdateEntryTest extends TestCase
         $this->assertEquals('Auto Avada Kedavra', $entry->value('title'));
         $this->assertEquals('auto-avada-kedavra', $entry->slug());
         $this->assertEquals('auto-avada-kedavra.md', pathinfo($entry->path(), PATHINFO_BASENAME));
+    }
+
+    #[Test]
+    public function default_values_are_returned_for_fields_saved_empty()
+    {
+        [$user, $collection] = $this->seedUserAndCollection();
+        $this->seedBlueprintFields($collection, [
+            'nutrition_table' => [
+                'type' => 'grid',
+                'default' => [['name' => 'Sugar'], ['name' => 'Salt']],
+                'fields' => [['handle' => 'name', 'field' => ['type' => 'text']]],
+            ],
+        ]);
+
+        $entry = EntryFactory::collection($collection)
+            ->slug('existing-entry')
+            ->data(['title' => 'Existing Entry'])
+            ->create();
+
+        $response = $this
+            ->actingAs($user)
+            ->update($entry)
+            ->assertOk();
+
+        $this->assertEquals(['Sugar', 'Salt'], collect($response->json('data.values.nutrition_table'))->pluck('name')->all());
+    }
+
+    #[Test]
+    public function localized_fields_saved_empty_stay_empty()
+    {
+        $this->setSites([
+            'en' => ['locale' => 'en', 'url' => '/'],
+            'fr' => ['locale' => 'fr', 'url' => '/fr/'],
+        ]);
+
+        [$user, $collection] = $this->seedUserAndCollection();
+        $collection->sites(['en', 'fr'])->save();
+        $this->seedBlueprintFields($collection, [
+            'nutrition_table' => [
+                'type' => 'grid',
+                'default' => [['name' => 'Sugar'], ['name' => 'Salt']],
+                'fields' => [['handle' => 'name', 'field' => ['type' => 'text']]],
+            ],
+        ]);
+
+        $origin = EntryFactory::collection($collection)
+            ->locale('en')
+            ->slug('origin')
+            ->data(['title' => 'Origin', 'nutrition_table' => [['name' => 'Fat']]])
+            ->create();
+
+        $localization = EntryFactory::collection($collection)
+            ->locale('fr')
+            ->origin($origin)
+            ->slug('localization')
+            ->create();
+
+        $response = $this
+            ->actingAs($user)
+            ->update($localization, ['nutrition_table' => [], '_localized' => ['nutrition_table']])
+            ->assertOk();
+
+        $this->assertSame([], $response->json('data.values.nutrition_table'));
+    }
+
+    #[Test]
+    public function meta_reflects_values_changed_while_saving()
+    {
+        [$user, $collection] = $this->seedUserAndCollection();
+        $this->seedBlueprintFields($collection, [
+            'tags' => ['type' => 'terms', 'taxonomies' => ['tags']],
+        ]);
+
+        Role::find('test')->addPermission('view tags terms');
+        Taxonomy::make('tags')->save();
+        Term::make()->taxonomy('tags')->inDefaultLocale()->slug('alfa')->data(['title' => 'Alfa'])->save();
+
+        Event::listen(EntrySaving::class, function (EntrySaving $event) {
+            $event->entry->set('tags', ['alfa']);
+        });
+
+        $entry = EntryFactory::collection($collection)
+            ->slug('existing-entry')
+            ->data(['title' => 'Existing Entry'])
+            ->create();
+
+        $response = $this
+            ->actingAs($user)
+            ->update($entry)
+            ->assertOk();
+
+        $this->assertEquals(['tags::alfa'], $response->json('data.values.tags'));
+        $this->assertEquals('Alfa', $response->json('data.meta.tags.data.0.title'));
     }
 
     #[Test]
