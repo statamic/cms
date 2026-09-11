@@ -89,7 +89,7 @@ class CreateTermTest extends TestCase
     }
 
     #[Test]
-    public function creating_a_term_without_a_parent_stays_at_the_root()
+    public function creating_a_term_without_a_parent_appends_it_to_the_root_of_the_tree()
     {
         $this->makeHierarchicalTaxonomy();
 
@@ -111,6 +111,31 @@ class CreateTermTest extends TestCase
             ['term' => 'animals', 'children' => [
                 ['term' => 'cat'],
             ]],
+            ['term' => 'dog'],
+        ], Taxonomy::findByHandle('categories')->structure()->tree()->fileData()['tree']);
+    }
+
+    #[Test]
+    public function creating_a_term_with_a_parent_that_is_not_in_the_tree_appends_it_to_the_root()
+    {
+        $this->makeHierarchicalTaxonomy();
+
+        $this
+            ->actingAs(tap(User::make()->makeSuper())->save())
+            ->post(cp_route('taxonomies.terms.store', ['categories', 'en']), [
+                'title' => 'Dog',
+                'slug' => 'dog',
+                '_blueprint' => 'category',
+                'published' => true,
+                '_parent' => 'categories::nonexistent',
+            ])
+            ->assertOk();
+
+        $this->assertEquals([
+            ['term' => 'animals', 'children' => [
+                ['term' => 'cat'],
+            ]],
+            ['term' => 'dog'],
         ], Taxonomy::findByHandle('categories')->structure()->tree()->fileData()['tree']);
     }
 

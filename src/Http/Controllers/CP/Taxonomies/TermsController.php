@@ -3,7 +3,6 @@
 namespace Statamic\Http\Controllers\CP\Taxonomies;
 
 use Illuminate\Http\Request;
-use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Statamic\Contracts\Taxonomies\Term as TermContract;
 use Statamic\Facades\Action;
@@ -298,7 +297,9 @@ class TermsController extends CpController
 
         $values = $fields->process()->values()->except(['slug', 'blueprint']);
 
-        $parent = $taxonomy->hierarchical() ? $request->_parent : null;
+        $parent = $taxonomy->hierarchical()
+            ? $this->termSlugFromParentValue($taxonomy, $request->_parent)
+            : null;
 
         $term = Term::make()
             ->taxonomy($taxonomy)
@@ -324,53 +325,36 @@ class TermsController extends CpController
             ->data($values)
             ->slug($slug);
 
-        if ($taxonomy->hierarchical() && $parent) {
-            $this->assertParentAllowsChild($taxonomy, $parent);
+        // The tree would reject the graft too, but only once the term has been saved.
+        if ($parent) {
+            $taxonomy->structure()->assertCanNest($parent);
         }
 
         $saved = $term->updateLastModified(User::current())->save();
 
-        if ($saved && $taxonomy->hierarchical() && $parent) {
-            $this->graftTermIntoTree($taxonomy, $term, $parent);
+        if ($saved && $taxonomy->hierarchical()) {
+            $this->addTermToTree($taxonomy, $term, $parent);
         }
 
         return (new TermResource($term))
             ->additional(['saved' => $saved]);
     }
 
-    private function graftTermIntoTree($taxonomy, $term, $parent)
+    private function addTermToTree($taxonomy, $term, ?string $parent)
     {
-        $parent = $this->termSlugFromParentValue($taxonomy, $parent);
-
-        $tree = $taxonomy->structure()->tree();
-
-        if (! $parent || ! $tree->find($parent)) {
-            return;
-        }
-
+        $structure = $taxonomy->structure();
+        $tree = $structure->tree();
         $slug = $term->inDefaultLocale()->slug();
 
-        $taxonomy->structure()->graftTerm($slug, $parent);
-    }
+        // Grafting has to happen first. Appending at the root would put the slug
+        // in the tree, and the graft would then see it and bail.
+        if ($parent && $tree->find($parent)) {
+            $structure->graftTerm($slug, $parent);
 
-    /**
-     * The tree itself would reject the graft, but only once the term has been saved.
-     */
-    private function assertParentAllowsChild($taxonomy, $parent): void
-    {
-        if (! $max = $taxonomy->structure()->maxDepth()) {
             return;
         }
 
-        $parent = $this->termSlugFromParentValue($taxonomy, $parent);
-
-        $page = $taxonomy->structure()->tree()->find($parent);
-
-        if ($page && $page->depth() >= $max) {
-            throw ValidationException::withMessages([
-                'parent' => __('statamic::validation.parent_exceeds_max_depth'),
-            ]);
-        }
+        $tree->appendTo(null, $slug)->save();
     }
 
     private function termSlugFromParentValue($taxonomy, $value): ?string
