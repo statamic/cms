@@ -221,6 +221,33 @@ class ElevatedSessionTest extends TestCase
     }
 
     #[Test]
+    public function it_can_get_elevated_session_status_when_two_factor_setup_is_incomplete()
+    {
+        config(['statamic.users.two_factor_enforced_roles' => ['*']]);
+
+        $this
+            ->actingAs($this->user)
+            ->getJson('/cp/elevated-session')
+            ->assertOk()
+            ->assertJson([
+                'elevated' => false,
+                'method' => 'password_confirmation',
+            ]);
+    }
+
+    #[Test]
+    public function it_can_start_an_elevated_session_when_two_factor_setup_is_incomplete()
+    {
+        config(['statamic.users.two_factor_enforced_roles' => ['*']]);
+
+        $this
+            ->actingAs($this->user)
+            ->postJson('/cp/elevated-session', ['password' => 'secret'])
+            ->assertOk()
+            ->assertSessionHas('statamic_elevated_session', now()->timestamp);
+    }
+
+    #[Test]
     public function it_cannot_start_elevated_session_with_incorrect_password()
     {
         $this
