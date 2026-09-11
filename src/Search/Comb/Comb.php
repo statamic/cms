@@ -1077,13 +1077,13 @@ class Comb
             [, $before, $chunk, $after] = $match;
             $before = $surplus.$before;
             $surplus = '';
-            $half = floor(($length - Str::length($chunk)) / 2);
+            $half = max(0, floor(($length - Str::length($chunk)) / 2));
             if (Str::length($after) < $half) {
                 $snippet = $chunk.$after;
-                $snippet = Str::safeTruncateReverse($before, $length - Str::length($snippet)).$snippet;
+                $snippet = Str::safeTruncateReverse($before, max(0, $length - Str::length($snippet))).$snippet;
             } else {
                 $snippet = Str::safeTruncateReverse($before, $half).$chunk;
-                $trimmed = Str::safeTruncate($after, $length - Str::length($snippet));
+                $trimmed = Str::safeTruncate($after, max(0, $length - Str::length($snippet)));
                 $surplus = Str::substr($after, Str::length($trimmed));
                 $snippet = $snippet.$trimmed;
             }
