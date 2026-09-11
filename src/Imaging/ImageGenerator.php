@@ -3,6 +3,7 @@
 namespace Statamic\Imaging;
 
 use Facades\Statamic\Imaging\ImageValidator;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use League\Flysystem\Filesystem;
 use League\Flysystem\UnableToReadFile;
@@ -156,11 +157,17 @@ class ImageGenerator
     public function generateByAsset($asset, array $params)
     {
         if (! $asset) {
+            Log::error('Cannot generate an image for a missing asset.');
+
             return '';
         }
 
-        if (ThumbnailExtractor::enabled() && $asset->isVideo()) {
+        if ($asset->isVideo() && ThumbnailExtractor::available()) {
             return $this->generateVideoThumbnail($asset, $params);
+        }
+
+        if ($asset->isVideo()) {
+            return '';
         }
 
         $manipulationCacheKey = 'asset::'.$asset->id().'::'.md5(json_encode($params));

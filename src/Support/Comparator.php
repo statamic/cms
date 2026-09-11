@@ -8,6 +8,7 @@ use Statamic\Facades\Site;
 class Comparator
 {
     protected $locale;
+    private ?Collator $collator = null;
     private static bool $canUseCollator;
 
     public function __construct()
@@ -22,6 +23,7 @@ class Comparator
     public function locale($locale)
     {
         $this->locale = $locale;
+        $this->collator = null;
     }
 
     /**
@@ -94,10 +96,22 @@ class Comparator
         $two = mb_strtolower($two);
 
         if (! self::$canUseCollator) {
-            return strcmp($one, $two);
+            return strnatcmp($one, $two);
         }
 
-        return (new Collator($this->locale))->compare($one, $two);
+        return $this->collator()->compare($one, $two);
+    }
+
+    private function collator(): Collator
+    {
+        if ($this->collator) {
+            return $this->collator;
+        }
+
+        $collator = new Collator($this->locale);
+        $collator->setAttribute(Collator::NUMERIC_COLLATION, Collator::ON);
+
+        return $this->collator = $collator;
     }
 
     /**

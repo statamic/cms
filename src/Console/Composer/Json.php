@@ -3,13 +3,31 @@
 namespace Statamic\Console\Composer;
 
 use Statamic\Facades\File;
+use Statamic\Facades\Path;
 use Statamic\Support\Arr;
 
 class Json
 {
+    public static function filename(): string
+    {
+        // Read the env var using vanilla PHP so that this can be run in a Composer hook, where
+        // Composer registers the class autoloader but never runs the `autoload.files` entries.
+        // That means Laravel's helper functions don't exist, and `Env::get()` relies on `value()`.
+        $filename = $_ENV['COMPOSER'] ?? $_SERVER['COMPOSER'] ?? getenv('COMPOSER');
+
+        return trim((string) $filename) ?: 'composer.json';
+    }
+
+    public static function path(): string
+    {
+        $filename = static::filename();
+
+        return Path::isAbsolute($filename) ? $filename : base_path($filename);
+    }
+
     public static function isMissingPreUpdateCmd()
     {
-        $composerJson = json_decode(File::get(base_path('composer.json')), true);
+        $composerJson = json_decode(File::get(static::path()), true);
 
         $scripts = Arr::get($composerJson, 'scripts.pre-update-cmd', []);
 
@@ -22,7 +40,7 @@ class Json
             return false;
         }
 
-        $composerJson = File::get($path = base_path('composer.json'));
+        $composerJson = File::get($path = static::path());
 
         $preUpdateCmdScript = str_replace('\\', '\\\\\\', Scripts::class.'::preUpdateCmd');
 

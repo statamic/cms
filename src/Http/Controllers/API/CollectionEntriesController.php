@@ -17,6 +17,7 @@ class CollectionEntriesController extends ApiController
     protected $resourceConfigKey = 'collections';
     protected $routeResourceKey = 'collection';
     protected $filterPublished = true;
+    protected $siteConstrained = true;
     protected $collectionHandle;
 
     public function index($collection)
@@ -38,7 +39,7 @@ class CollectionEntriesController extends ApiController
     {
         $this->abortIfDisabled();
 
-        $entry = Entry::find($handle);
+        $entry = $this->resolveEntry($collection, $handle);
 
         $this->abortIfInvalid($entry, $collection);
         $this->abortIfUnpublished($entry);
@@ -69,6 +70,23 @@ class CollectionEntriesController extends ApiController
         $values = collect(explode(',', $terms))->map(fn ($term) => "$taxonomy::$term");
 
         $this->queryTaxonomyTerms($query, $modifier, $values);
+    }
+
+    private function resolveEntry($collection, $handle)
+    {
+        if ($entry = Entry::find($handle)) {
+            return $this->localize($entry);
+        }
+
+        $query = $collection->queryEntries()->where('slug', $handle);
+
+        if ($site = $this->requestedSite()) {
+            $query->where('site', $site);
+        } elseif ($collection->sites()->count() > 1) {
+            $query->where('site', $collection->sites()->first());
+        }
+
+        return $query->first();
     }
 
     private function abortIfInvalid($entry, $collection)

@@ -35,6 +35,30 @@ class TwoFactorSetupTest extends TestCase
     }
 
     #[Test]
+    public function it_redirects_when_impersonating()
+    {
+        $impersonator = $this->user();
+
+        $this
+            ->actingAs($this->user())
+            ->withSession(['statamic_impersonated_by' => $impersonator->id()])
+            ->get(cp_route('two-factor-setup'))
+            ->assertRedirect(cp_route('index'));
+    }
+
+    #[Test]
+    public function it_redirects_when_impersonating_on_frontend_route()
+    {
+        $impersonator = $this->user();
+
+        $this
+            ->actingAs($this->user())
+            ->withSession(['statamic_impersonated_by' => $impersonator->id()])
+            ->get(route('statamic.two-factor-setup'))
+            ->assertRedirect(route('statamic.site'));
+    }
+
+    #[Test]
     public function redirect_url_is_intended_url()
     {
         $this

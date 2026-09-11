@@ -29,7 +29,7 @@
                 <div
                     v-if="!isReadOnly && showPicker"
                     data-asset-picker
-                    class="not-[.link-fieldtype_&]:p-2 not-[.link-fieldtype_&]:border border-gray-300 dark:border-gray-700 dark:bg-gray-850 rounded-xl flex items-center gap-3"
+                    class="not-[.link-fieldtype_&]:p-2 not-[.link-fieldtype_&]:border border-gray-300 dark:border-gray-700 dark:bg-gray-850 rounded-xl flex flex-wrap items-center gap-y-1 gap-x-3"
                     :class="{
                         'rounded-b-none': expanded,
                         'bard-drag-handle': isInBardField,
@@ -56,7 +56,7 @@
                         @keyup.space.enter="openSelector"
                     />
 
-                    <div class="min-w-0 flex-1 hidden not-[.link-fieldtype_&]:flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400" v-if="canUpload">
+                    <div class="min-w-0 grow basis-[min-content] hidden not-[.link-fieldtype_&]:flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400" v-if="canUpload">
                         <ui-icon name="upload-cloud" class="size-5 shrink-0 text-gray-500 hidden @sm:block" />
                         <div class="min-w-0">
                             <span class="hidden @sm:inline">{{ __('Drag & drop here or') }}&nbsp;</span>
@@ -71,7 +71,7 @@
                         v-if="selectedFilesText"
                         size="sm"
                         pill
-                        class="ms-auto shrink-0 tabular-nums px-1.5!"
+                        class="ms-auto self-start shrink-0 tabular-nums px-1.5!"
                         :text="`${assets.length}/${maxFiles}`"
                         :aria-label="selectedFilesText"
                     />
@@ -127,10 +127,9 @@
                         @dragstart="$emit('focus')"
                     >
                         <div
-                            class="bg-white relative grid gap-4 2xl:gap-10 p-3 relative rounded-xl border border-gray-300 dark:bg-gray-850 dark:border-gray-700"
+                            class="bg-white relative grid @min-[300px]:grid-cols-[repeat(auto-fill,minmax(110px,1fr))] gap-4 2xl:gap-10 p-3 relative rounded-xl border border-gray-300 dark:bg-gray-850 dark:border-gray-700"
                             :class="{ 'border-t-0 rounded-t-none': !isReadOnly && (showPicker || uploads.length), 'border-dashed': isReadOnly }"
                             ref="assets"
-                            style="grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));"
                         >
                             <asset-tile
                                 v-for="asset in assets"
@@ -221,6 +220,7 @@ import { isEqual } from 'lodash-es';
 import { Button, Dropdown, DropdownMenu, DropdownItem, Stack } from '@/components/ui';
 import ItemActions from '@/components/actions/ItemActions.vue';
 import useCheckerboard from '@/composables/checkerboard.js';
+import { dedupeInFlight } from '@/util/dedupeInFlight.js';
 
 export default {
     components: {
@@ -516,14 +516,16 @@ export default {
 
             this.loading = true;
 
-            this.$axios
-                .post(cp_url('assets-fieldtype'), {
-                    assets,
-                })
-                .then((response) => {
-                    this.assets = response.data;
-                    this.loading = false;
-                });
+            const cacheKey = JSON.stringify([...assets].slice().sort());
+
+            dedupeInFlight('assets-fieldtype', cacheKey, () =>
+                this.$axios.post(cp_url('assets-fieldtype'), { assets }),
+            ).then((response) => {
+                // Clone so mutations on one field's asset rows don't bleed into others
+                // sharing the same in-flight response.
+                this.assets = clone(response.data);
+                this.loading = false;
+            });
         },
 
         /**
