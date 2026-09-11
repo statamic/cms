@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Queue;
 use Orchestra\Testbench\Attributes\DefineEnvironment;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Console\Commands\StaticWarmJob;
+use Statamic\Facades\Collection;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\Replacer;
 use Symfony\Component\HttpFoundation\Response;
@@ -293,6 +294,31 @@ class HalfMeasureStaticCachingTest extends TestCase
 
         // ...so the new page is served instead of the stale 404.
         $this->get('/about')->assertOk()->assertSee('The About Page');
+    }
+
+    #[Test]
+    public function moving_an_entry_in_the_tree_invalidates_the_cached_404_at_its_new_url()
+    {
+        \Illuminate\Support\Facades\Cache::flush();
+
+        $this->withStandardFakeViews();
+        $this->viewShouldReturnRaw('default', '{{ title }}');
+        $this->viewShouldReturnRaw('errors.404', '404 not found');
+
+        $collection = tap(Collection::make('pages')->routes('{parent_uri}/{slug}')->template('default'))->save();
+        $this->createPage('parent', ['with' => ['title' => 'The Parent Page']]);
+        $this->createPage('child', ['with' => ['title' => 'The Child Page']]);
+        $collection->structureContents(['root' => false])->save();
+        $collection->structure()->makeTree('en', [['entry' => 'parent'], ['entry' => 'child']])->save();
+
+        // Both pages are top level, so this URL 404s and the 404 gets cached.
+        $this->get('/parent/child')->assertNotFound();
+
+        // Moving the child page below the parent page makes the URL valid...
+        $collection->structure()->in('en')->tree([['entry' => 'parent', 'children' => [['entry' => 'child']]]])->save();
+
+        // ...so the page is served instead of the stale 404.
+        $this->get('/parent/child')->assertOk()->assertSee('The Child Page');
     }
 
     #[Test]
