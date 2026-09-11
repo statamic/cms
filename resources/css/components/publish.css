@@ -3,9 +3,14 @@
 .publish-fields,
 .field-grid {
     display: grid;
-    --grid-columns: 12;
+    --grid-columns: 1;
+    --col-span: initial;
     grid-template-columns: repeat(var(--grid-columns), 1fr);
     @apply gap-x-3 gap-6 @lg/panel:gap-8;
+
+    @variant @lg/panel {
+        --grid-columns: 12;
+    }
 
     aside & {
         @apply gap-x-2 gap-y-6;
@@ -41,40 +46,6 @@
 .field-grid {
     > * {
         grid-column: span var(--col-span, var(--grid-columns));
-    }
-}
-
-
-/* GROUP PUBLISH COMPONENT / FIELDS / FLUID
-=================================================== */
-/* =Jay. Use this class if the fields should be fluid and fill the remaining space e.g. /cp/collections/pages/edit.
-Here flexbox is much better suited to create a layout that grows to fill space. */
-.publish-fields-fluid {
-    @apply gap-2;
-
-    display: flex;
-    flex-wrap: wrap;
-    > * {
-        flex-grow: 1;
-    }
-
-    @variant lg {
-        /* Here we have to cut short the proper width very slightly to account for the gap value. Because we're using flex-grow it should be pretty unnoticeable */
-        .field-w-25  { flex-basis: 24.5%; }
-        .field-w-33  { flex-basis: 32.5%; }
-        .field-w-50  { flex-basis: 49.4%; }
-        .field-w-66  { flex-basis: 66.1%; }
-        .field-w-75  { flex-basis: 74.5%; }
-        .field-w-undefined, .field-w-100 { flex-basis: 100%; }
-    }
-}
-
-.publish-fields-fluid--xl-only {
-    /* A modifier that prevents the fields from being fluid on smaller screens to help legibility, for example on the Blueprints builder */
-    @media (width < 1400px) {
-        [class*="field-w-"] {
-            flex-basis: 100%;
-        }
     }
 }
 

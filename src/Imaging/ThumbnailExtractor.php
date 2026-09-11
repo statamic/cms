@@ -20,6 +20,11 @@ class ThumbnailExtractor
         );
     }
 
+    public static function available()
+    {
+        return static::enabled() && app(Ffmpeg::class)->available();
+    }
+
     public static function cachePath()
     {
         return config(

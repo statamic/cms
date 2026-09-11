@@ -70,7 +70,7 @@
                                 ref="newFolderInput"
                                 v-model:modelValue="newFolderName"
                                 :start-with-edit-mode="true"
-                                submit-mode="enter"
+                                submit-mode="both"
                                 :placeholder="__('Name')"
                                 :class="[
                                     'placeholder:lowercase',
@@ -99,6 +99,7 @@
                 >
                     <asset-thumbnail
                         :asset="asset"
+                        alt=""
                         :square="true"
                         class="size-8 cursor-pointer"
                         @click.native.stop="$emit('edit-asset', asset)"

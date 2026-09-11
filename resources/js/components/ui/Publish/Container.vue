@@ -240,6 +240,8 @@ function syncField(path) {
 }
 
 function desyncField(path) {
+    if (!trackingDirtyState.value) return;
+
     addLocalizedField(path);
     dirty();
 }

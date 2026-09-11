@@ -2,6 +2,8 @@
 
 namespace Statamic\Support;
 
+use Statamic\Assets\Asset;
+
 class FileTypes
 {
     public static function media(): array
@@ -23,7 +25,7 @@ class FileTypes
 
     public static function rasterImage(): array
     {
-        return ['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif'];
+        return Asset::IMAGE_EXTENSIONS;
     }
 
     public static function vectorImage(): array
@@ -33,12 +35,12 @@ class FileTypes
 
     public static function video(): array
     {
-        return ['h264', 'mp4', 'm4v', 'ogv', 'webm', 'mov'];
+        return Asset::VIDEO_EXTENSIONS;
     }
 
     public static function audio(): array
     {
-        return ['aac', 'flac', 'm4a', 'mp3', 'ogg', 'wav'];
+        return Asset::AUDIO_EXTENSIONS;
     }
 
     public static function document(): array

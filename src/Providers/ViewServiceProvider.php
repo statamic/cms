@@ -10,6 +10,8 @@ use Illuminate\View\View;
 use Statamic\Contracts\View\Antlers\Parser as ParserContract;
 use Statamic\Facades\Site;
 use Statamic\Statamic;
+use Statamic\StaticCaching\NoCache\Region;
+use Statamic\Tags\IncludeTag;
 use Statamic\View\Antlers\Engine;
 use Statamic\View\Antlers\Language\Analyzers\NodeTypeAnalyzer;
 use Statamic\View\Antlers\Language\Runtime\Debugging\GlobalDebugManager;
@@ -424,6 +426,8 @@ PHP;
     public function boot()
     {
         ViewFactory::addNamespace('compiled__views', storage_path('framework/views'));
+
+        Region::preserveContextKeys(IncludeTag::VIEW_DATA_KEYS);
 
         $this->registerBladeDirectives();
 

@@ -397,7 +397,10 @@ export default {
         this.initEditor();
 
         this.json = this.editor.getJSON().content;
-        this.html = this.editor.getHTML();
+
+        if (this.config.reading_time) {
+            this.html = this.editor.getHTML();
+        }
 
 		this.$nextTick(() => this.mounted = true);
 
@@ -893,7 +896,10 @@ export default {
                     if (countNodes(oldJson) !== countNodes(newJson)) this.debounceNextUpdate = false;
 
                     this.json = newJson;
-                    this.html = this.editor.getHTML();
+
+                    if (this.config.reading_time) {
+                        this.html = this.editor.getHTML();
+                    }
                 },
                 onCreate: ({ editor }) => {
                     const state = editor.view.state;

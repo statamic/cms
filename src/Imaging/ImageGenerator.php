@@ -155,8 +155,12 @@ class ImageGenerator
      */
     public function generateByAsset($asset, array $params)
     {
-        if (ThumbnailExtractor::enabled() && $asset->isVideo()) {
+        if ($asset->isVideo() && ThumbnailExtractor::available()) {
             return $this->generateVideoThumbnail($asset, $params);
+        }
+
+        if ($asset->isVideo()) {
+            return '';
         }
 
         $manipulationCacheKey = 'asset::'.$asset->id().'::'.md5(json_encode($params));

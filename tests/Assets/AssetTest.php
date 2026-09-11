@@ -616,7 +616,7 @@ class AssetTest extends TestCase
     #[Test]
     public function it_checks_if_its_a_video_file()
     {
-        $extensions = ['h264', 'mp4', 'm4v', 'ogv', 'webm'];
+        $extensions = ['h264', 'mp4', 'm4v', 'ogv', 'webm', 'mov', 'mpeg', 'mpg', 'mkv'];
 
         foreach ($extensions as $ext) {
             $this->assertTrue((new Asset)->path("path/to/asset.$ext")->isVideo());
@@ -2554,6 +2554,32 @@ class AssetTest extends TestCase
         $asset = (new Asset)->container($container)->path('path/to/test.txt');
 
         $this->assertEquals('http://example.com/path/to/test.txt', $asset->absoluteUrl());
+    }
+
+    #[Test]
+    #[DataProvider('urlEncodingProvider')]
+    public function it_encodes_the_url($path, $expected)
+    {
+        $container = $this->mock(AssetContainer::class);
+        $container->shouldReceive('private')->andReturnFalse();
+        $container->shouldReceive('url')->andReturn('http://example.com/container');
+        $container->shouldReceive('absoluteUrl')->andReturn('http://example.com/container');
+        $asset = (new Asset)->container($container)->path($path);
+
+        $this->assertEquals('http://example.com/container'.$expected, $asset->url());
+        $this->assertEquals('http://example.com/container'.$expected, $asset->absoluteUrl());
+        $this->assertEquals('http://example.com/container'.$expected, (string) $asset);
+    }
+
+    public static function urlEncodingProvider()
+    {
+        return [
+            'nothing to encode' => ['path/to/test.txt', '/path/to/test.txt'],
+            'spaces' => ['path/to/Image X - Whatever_17.jpg', '/path/to/Image%20X%20-%20Whatever_17.jpg'],
+            'accents' => ['path/to/Dún Laoghaire_18 2.jpg', '/path/to/D%C3%BAn%20Laoghaire_18%202.jpg'],
+            'spaces in folders' => ['path to/my folder/test.txt', '/path%20to/my%20folder/test.txt'],
+            'literal percent sequences' => ['path/to/photo%20one.jpg', '/path/to/photo%2520one.jpg'],
+        ];
     }
 
     #[Test]

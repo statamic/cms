@@ -34,6 +34,7 @@ import GroupFieldtype from '../components/fieldtypes/GroupFieldtype.vue';
 import HiddenFieldtype from '../components/fieldtypes/HiddenFieldtype.vue';
 import HtmlFieldtype from '../components/fieldtypes/HtmlFieldtype.vue';
 import IconFieldtype from '../components/fieldtypes/IconFieldtype.vue';
+import InfoFieldtype from '../components/fieldtypes/InfoFieldtype.vue';
 import IntegerFieldtype from '../components/fieldtypes/IntegerFieldtype.vue';
 import LinkFieldtype from '../components/fieldtypes/LinkFieldtype.vue';
 import LinkIndexFieldtype from '../components/fieldtypes/LinkIndexFieldtype.vue';
@@ -108,6 +109,7 @@ export default function registerFieldtypes(app) {
     app.component('hidden-fieldtype', HiddenFieldtype);
     app.component('html-fieldtype', HtmlFieldtype);
     app.component('icon-fieldtype', IconFieldtype);
+    app.component('info-fieldtype', InfoFieldtype);
     app.component('integer-fieldtype', IntegerFieldtype);
     app.component('link-fieldtype', LinkFieldtype);
     app.component('link-fieldtype-index', LinkIndexFieldtype);

@@ -26,6 +26,7 @@ abstract class Tree implements ContainsQueryableValues, Contract, Localization
     protected $cachedFlattenedPagesByReference;
     protected $cachedFlattenedPageOrder;
     protected $withEntries = false;
+    protected $withEvents = true;
     protected $uriCacheEnabled = true;
 
     public function idKey()
@@ -177,37 +178,68 @@ abstract class Tree implements ContainsQueryableValues, Contract, Localization
         return ($this->cachedFlattenedPageOrder ??= $this->flattenedPages()->map->reference()->flip())->get($reference);
     }
 
-    public function save()
+    public function flushCache()
     {
-        if ($this->dispatchSavingEvent() === false) {
-            return false;
-        }
-
         $this->cachedFlattenedPages = null;
         $this->cachedFlattenedPagesById = null;
         $this->cachedFlattenedPagesByReference = null;
         $this->cachedFlattenedPageOrder = null;
 
+        return $this;
+    }
+
+    public function save()
+    {
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
+        if ($withEvents && $this->dispatchSavingEvent() === false) {
+            return false;
+        }
+
+        $this->flushCache();
+
         Blink::forget('collection-structure-tree*');
 
         $this->repository()->save($this);
 
-        $this->dispatchSavedEvent();
+        if ($withEvents) {
+            $this->dispatchSavedEvent();
+        }
 
         $this->syncOriginal();
 
         return true;
     }
 
+    public function saveQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->save();
+    }
+
     public function delete()
     {
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
         Blink::forget('collection-structure-tree*');
 
         $this->repository()->delete($this);
 
-        $this->dispatchDeletedEvent();
+        if ($withEvents) {
+            $this->dispatchDeletedEvent();
+        }
 
         return true;
+    }
+
+    public function deleteQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->delete();
     }
 
     abstract protected function repository();
