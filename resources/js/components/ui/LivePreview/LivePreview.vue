@@ -21,6 +21,9 @@ import axios from 'axios';
 import wait from '@/util/wait.js';
 import { mapValues } from 'lodash-es';
 import { useIframeManager } from './ManagesIframes.js';
+import { findPublishField } from './FieldSync.js';
+import { reveal } from '@api';
+import { nanoid } from 'nanoid';
 
 const props = defineProps({
     enabled: {
@@ -50,6 +53,8 @@ const editorWidth = ref(localStorage.getItem(widthLocalStorageKey) || 400);
 const editorResizing = ref(false);
 const editorCollapsed = ref(false);
 const channel = ref(null);
+const channelName = `livepreview-${nanoid()}`;
+let popoutTimer;
 const poppedOut = ref(false);
 const popoutWindow = ref(null);
 const popoutResponded = ref(false);
@@ -58,9 +63,44 @@ const extras = ref({});
 const token = ref(null);
 const target = ref(0);
 const iframeContentContainer = useTemplateRef('contents');
+const editorFields = useTemplateRef('editorFields');
+const selectingFields = ref(false);
 let source;
 
-const { updateIframeContents } = useIframeManager(iframeContentContainer);
+const { updateIframeContents, selectFields, highlightField, dispose: disposeIframe } = useIframeManager(iframeContentContainer, selectField);
+
+function selectField(field) {
+    if (!props.enabled || !Array.isArray(field?.path)) return;
+
+    if (editorCollapsed.value) setEditorWidth(localStorage.getItem(widthLocalStorageKey) || 400);
+
+    const element = findPublishField(editorFields.value, field.path);
+    if (!element) return;
+
+    reveal.element(element);
+
+    nextTick(() => {
+        const input = element.querySelector('input:not([type="hidden"]):not([disabled]), textarea:not([disabled]), [contenteditable="true"]')
+            ?? element.querySelector('button:not([disabled]), [tabindex="0"]');
+        input?.focus({ preventScroll: true });
+    });
+}
+
+function highlightEditorField(event) {
+    const path = event.target.closest('[data-preview-field-path]')?.dataset.previewFieldPath;
+    if (!path) return;
+
+    if (poppedOut.value) {
+        channel.value?.postMessage({ event: 'field.highlight', path });
+    } else {
+        highlightField(path);
+    }
+}
+
+watch(selectingFields, enabled => {
+    selectFields(enabled);
+    channel.value?.postMessage({ event: 'field.selecting', enabled });
+});
 
 const livePreviewFieldsPortal = computed(() => {
     return `live-preview-fields-${name.value}`;
@@ -105,7 +145,7 @@ const update = debounce(() => {
             token.value = response.data.token;
             const url = response.data.url;
             const tgt = toRaw(props.targets[target.value]);
-            const messagePayload = { token: token.value, reference: props.reference };
+            const messagePayload = { token: token.value, selectingFields: selectingFields.value };
             poppedOut.value
                 ? channel.value.postMessage({ event: 'updated', url, target: tgt, payload: messagePayload })
                 : updateIframeContents(url, tgt, messagePayload, setIframeAttributes);
@@ -181,6 +221,8 @@ watch(
     (enabled, wasEnabled) => {
         if (wasEnabled && !enabled) {
             teardownPayloadWatch();
+            disposeIframe?.();
+            selectingFields.value = false;
             nextTick(() => (portalEnabled.value = false));
         } else {
             portalEnabled.value = enabled;
@@ -202,9 +244,12 @@ const canPopOut = computed(() => typeof BroadcastChannel === 'function');
 
 function popout() {
     poppedOut.value = true;
-    channel.value = channel.value || new BroadcastChannel('livepreview');
+    channel.value = channel.value || new BroadcastChannel(channelName);
     channel.value.onmessage = (e) => {
         switch (e.data.event) {
+            case 'field.selected':
+                selectField(e.data.field);
+                break;
             case 'popout.opened':
                 listenForPopoutClose();
                 update();
@@ -223,12 +268,15 @@ function popout() {
     const width = iframeContentContainer.value.clientWidth;
     const height = iframeContentContainer.value.clientHeight;
     const left = screen.width - width;
-    popoutWindow.value = window.open(props.url, 'livepreview', `width=${width},height=${height},top=0,left=${left}`);
+    const popoutUrl = new URL(props.url, window.location.href);
+    popoutUrl.searchParams.set('preview-session', channelName);
+    popoutWindow.value = window.open(popoutUrl.href, channelName, `width=${width},height=${height},top=0,left=${left}`);
 }
 
 function listenForPopoutClose() {
     channel.value.postMessage({ event: 'ping' });
-    setTimeout(() => {
+    clearTimeout(popoutTimer);
+    popoutTimer = setTimeout(() => {
         if (popoutResponded.value) {
             listenForPopoutClose();
         } else {
@@ -333,6 +381,9 @@ Statamic.$events.$on(refreshEvent, refreshHandler);
 
 onUnmounted(() => {
     teardownPayloadWatch();
+    disposeIframe?.();
+    clearTimeout(popoutTimer);
+    channel.value?.close();
     keybinding.value.destroy();
     Statamic.$events.$off(refreshEvent, refreshHandler);
 });
@@ -351,6 +402,10 @@ onUnmounted(() => {
                         {{ __('Live Preview') }}
                     </div>
                     <div class="flex items-center gap-x-2">
+                        <!-- TODO: Need to remove/tweak this later. This is temporary UI to more easily test the reverse of Control Panel -> live preview field syncing. -->
+                        <Button size="sm" :variant="selectingFields ? 'pressed' : 'default'" :aria-pressed="selectingFields" @click="selectingFields = !selectingFields">
+                            {{ __('Select field') }}
+                        </Button>
                         <Button v-if="canPopOut && !poppedOut" size="sm" icon="maximize" @click="popout">
                             {{ __('Pop out') }}
                         </Button>
@@ -383,7 +438,7 @@ onUnmounted(() => {
                         class="live-preview-editor @container/live-preview"
                         :style="{ width: poppedOut ? '100%' : `${editorWidth}px` }"
                     >
-                        <div class="live-preview-fields h-full flex-1 overflow-scroll px-4 pt-2">
+                        <div ref="editorFields" class="live-preview-fields h-full flex-1 overflow-scroll px-4 pt-2" @focusin="highlightEditorField">
                             <portal-target :name="livePreviewFieldsPortal" />
                         </div>
 

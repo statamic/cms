@@ -9,7 +9,7 @@
                     @close="toggleFullscreen"
                 >
                 </publish-field-fullscreen-header>
-                <section :class="{ 'mt-14 p-4': fullScreenMode }">
+                <section ref="fieldsContainer" :class="{ 'mt-14 p-4': fullScreenMode }">
                     <div class="@container/panel" :class="{
                         'bg-white dark:bg-gray-800 dark:border-gray-900 rounded-lg border': config.border,
                         'hidden' : isCollapsed && !fullScreenMode
@@ -33,11 +33,17 @@
 <script>
 import Fieldtype from './Fieldtype.vue';
 import ManagesPreviewText from './replicator/ManagesPreviewText';
-import {PublishFields as Fields, PublishFieldsProvider as FieldsProvider} from '@ui';
+import { PublishFields as Fields, PublishFieldsProvider as FieldsProvider } from '@ui';
+import { reveal } from '@api';
 
 export default {
     mixins: [Fieldtype, ManagesPreviewText],
-    components: {Fields, FieldsProvider },
+    components: { Fields, FieldsProvider },
+    mounted() {
+        reveal.mount(this.$refs.fieldsContainer, () => {
+            this.isCollapsed = false;
+        });
+    },
     data() {
         return {
             containerWidth: null,
