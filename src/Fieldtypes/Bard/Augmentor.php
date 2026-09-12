@@ -16,6 +16,8 @@ class Augmentor
     public static $currentBardConfig = [];
     protected $fieldtype;
     protected $sets = [];
+    protected $setSourceIndexes = [];
+    protected $trackFieldSources = false;
     protected $includeDisabledSets = false;
     protected $augmentSets = true;
     protected $withStatamicImageUrls = false;
@@ -36,6 +38,10 @@ class Augmentor
 
     public function augment($value, $shallow = false)
     {
+        $this->trackFieldSources = Value::isObservingReads();
+        $this->sets = [];
+        $this->setSourceIndexes = [];
+
         $hasSets = (bool) $this->fieldtype->config('sets');
 
         if (! $value) {
@@ -50,11 +56,18 @@ class Augmentor
             return $this->convertToHtml($value);
         }
 
+        if ($this->trackFieldSources) {
+            $value = $this->addSetIndexes($value);
+        }
+
         if (! $this->includeDisabledSets) {
             $value = $this->removeDisabledSets($value);
         }
 
-        $value = $this->addSetIndexes($value);
+        if (! $this->trackFieldSources) {
+            $value = $this->addSetIndexes($value);
+        }
+
         $value = $this->convertToHtml($value);
         $value = $this->convertToSets($value);
 
@@ -130,8 +143,12 @@ class Augmentor
     {
         $arr = preg_split('/(<set>index-\d+<\/set>)/', $html, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
 
-        return collect($arr)->map(function ($html) {
+        return collect($arr)->map(function ($html, $index) {
             if (preg_match('/^<set>index-(\d+)<\/set>/', $html, $matches)) {
+                if ($this->trackFieldSources) {
+                    $this->setSourceIndexes[$index] = (int) $matches[1];
+                }
+
                 return $this->sets[$matches[1]];
             }
 
@@ -145,7 +162,13 @@ class Augmentor
             'antlers' => $this->fieldtype->config('antlers'),
         ]));
 
-        return new Value($value, 'text', $fieldtype);
+        $value = new Value($value, 'text', $fieldtype);
+
+        if ($this->trackFieldSources) {
+            $value->setSourceField($this->fieldtype->field());
+        }
+
+        return $value;
     }
 
     protected function augmentSets($value, $shallow)
@@ -157,7 +180,15 @@ class Augmentor
                 return $set;
             }
 
-            $values = $this->fieldtype->fields($set['type'], $index)->addValues($set)->{$augmentMethod}()->values()->all();
+            $fields = $this->fieldtype->fields($set['type'], $index)->addValues($set);
+
+            if ($this->trackFieldSources) {
+                $path = [...$this->fieldtype->field()->sourcePathKeys(), $this->setSourceIndexes[$index], 'attrs', 'values'];
+
+                $fields->all()->each(fn ($field) => $field->setSourcePath([...$path, $field->handle()]));
+            }
+
+            $values = $fields->{$augmentMethod}()->values()->all();
 
             return array_merge($values, [RowId::handle() => $set[RowId::handle()] ?? null, 'type' => $set['type']]);
         })->all();

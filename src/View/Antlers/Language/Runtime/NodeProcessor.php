@@ -55,6 +55,7 @@ use Statamic\View\Antlers\Language\Runtime\Sandbox\TypeCoercion;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Statamic\View\Antlers\SyntaxError;
 use Statamic\View\Cascade;
+use Statamic\View\Instrumentation\FieldDomTracer;
 use Statamic\View\Instrumentation\InstrumentationState;
 use Statamic\View\Slot;
 use Statamic\View\State\CachesOutput;
@@ -1247,6 +1248,12 @@ class NodeProcessor
                 $node = $nodes[$i];
 
                 $this->activeNode = $node;
+
+                if ($node instanceof AntlersNode && $node->name?->name === '___internal_field') {
+                    $buffer .= FieldDomTracer::execute((int) $node->name->methodPart);
+
+                    continue;
+                }
 
                 if ($this->isTracingEnabled()) {
                     $this->runtimeConfiguration->traceManager->traceOnEnter(

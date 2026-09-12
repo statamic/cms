@@ -20,6 +20,8 @@ use Traversable;
  */
 class Value implements ArrayAccess, IteratorAggregate, JsonSerializable
 {
+    private static ?\Closure $readObserver = null;
+    protected ?Field $sourceField = null;
     private $resolver;
     protected $raw;
     protected $handle;
@@ -49,6 +51,10 @@ class Value implements ArrayAccess, IteratorAggregate, JsonSerializable
     {
         $this->resolve();
 
+        if (self::$readObserver !== null) {
+            (self::$readObserver)($this);
+        }
+
         return $this->raw;
     }
 
@@ -64,6 +70,7 @@ class Value implements ArrayAccess, IteratorAggregate, JsonSerializable
 
         if ($value instanceof Value) {
             $this->fieldtype = $value->fieldtype();
+            $this->sourceField ??= $value->sourceField;
             $this->raw = $value->raw();
         } else {
             $this->raw = $value;
@@ -75,6 +82,10 @@ class Value implements ArrayAccess, IteratorAggregate, JsonSerializable
     public function value()
     {
         $this->resolve();
+
+        if (self::$readObserver !== null) {
+            (self::$readObserver)($this);
+        }
 
         $raw = $this->raw;
 
@@ -94,6 +105,41 @@ class Value implements ArrayAccess, IteratorAggregate, JsonSerializable
         return $this->shallow
             ? $this->fieldtype->shallowAugment($raw)
             : $this->fieldtype->augment($raw);
+    }
+
+    /** @internal */
+    public static function isObservingReads(): bool
+    {
+        return self::$readObserver !== null;
+    }
+
+    /** @internal */
+    public static function withReadObserver(\Closure $observer, callable $callback): mixed
+    {
+        $previous = self::$readObserver;
+        self::$readObserver = $observer;
+
+        try {
+            return $callback();
+        } finally {
+            self::$readObserver = $previous;
+        }
+    }
+
+    /** @internal */
+    public function sourceField(): ?Field
+    {
+        $this->resolve();
+
+        return $this->sourceField ?? $this->fieldtype?->field();
+    }
+
+    /** @internal */
+    public function setSourceField(Field $field)
+    {
+        $this->sourceField = $field;
+
+        return $this;
     }
 
     private function iteratorValue()
@@ -223,7 +269,10 @@ class Value implements ArrayAccess, IteratorAggregate, JsonSerializable
     {
         $this->resolve();
 
-        return new static($this->raw, $this->handle, $this->fieldtype, $this->augmentable, true);
+        $value = new static($this->raw, $this->handle, $this->fieldtype, $this->augmentable, true);
+        $value->sourceField = $this->sourceField;
+
+        return $value;
     }
 
     public function isRelationship(): bool

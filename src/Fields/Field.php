@@ -28,6 +28,7 @@ class Field implements Arrayable
     protected $parent;
     protected $parentField;
     protected $parentIndex;
+    protected ?array $sourcePath = null;
     protected $validationContext;
     protected ?Form $form = null;
 
@@ -42,6 +43,7 @@ class Field implements Arrayable
         return (new static($this->handle, $this->config))
             ->setParent($this->parent)
             ->setParentField($this->parentField, $this->parentIndex)
+            ->setSourcePath($this->sourcePath)
             ->setValue($this->value);
     }
 
@@ -82,6 +84,32 @@ class Field implements Arrayable
     public function fieldPathPrefix()
     {
         return implode('.', $this->fieldPathKeys());
+    }
+
+    /** @internal */
+    public function sourcePathKeys(): array
+    {
+        if ($this->sourcePath !== null) {
+            return $this->sourcePath;
+        }
+
+        $path = $this->parentField ? $this->parentField->sourcePathKeys() : [];
+
+        if (isset($this->parentIndex)) {
+            $path[] = $this->parentIndex;
+        }
+
+        $path[] = $this->handle();
+
+        return $path;
+    }
+
+    /** @internal */
+    public function setSourcePath(?array $path)
+    {
+        $this->sourcePath = $path;
+
+        return $this;
     }
 
     public function setPrefix($prefix)
