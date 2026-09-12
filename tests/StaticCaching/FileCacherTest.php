@@ -346,6 +346,59 @@ class FileCacherTest extends TestCase
     }
 
     #[Test]
+    public function invalidating_multiple_urls_deletes_files_and_removes_entries_for_exact_and_wildcard_urls()
+    {
+        Event::fake();
+
+        $writer = \Mockery::spy(Writer::class);
+        $cache = app(Repository::class);
+        $cacher = $this->fileCacher(['base_url' => 'http://example.com'], $writer, $cache);
+
+        // Put it in the container so that the event can resolve it.
+        $this->instance(Cacher::class, $cacher);
+
+        $cache->forever($this->cacheKey('http://example.com'), [
+            'one' => '/one',
+            'oneqs' => '/one?foo=bar',
+            'blogone' => '/blog/one',
+            'blogtwo' => '/blog/two',
+            'other' => '/other',
+        ]);
+
+        $cacher->invalidateUrls(['/one', '/blog/*']);
+
+        $writer->shouldHaveReceived('delete')->with($cacher->getFilePath('/one'))->once();
+        $writer->shouldHaveReceived('delete')->with($cacher->getFilePath('/one?foo=bar'))->once();
+        $writer->shouldHaveReceived('delete')->with($cacher->getFilePath('/blog/one'))->once();
+        $writer->shouldHaveReceived('delete')->with($cacher->getFilePath('/blog/two'))->once();
+        $this->assertEquals(['other' => '/other'], $cacher->getUrls('http://example.com')->all());
+
+        Event::assertDispatched(UrlInvalidated::class, fn ($event) => $event->url === 'http://example.com/one');
+        Event::assertDispatched(UrlInvalidated::class, fn ($event) => $event->url === 'http://example.com/blog/one');
+        Event::assertDispatched(UrlInvalidated::class, fn ($event) => $event->url === 'http://example.com/blog/two');
+    }
+
+    #[Test]
+    public function invalidating_urls_not_in_the_map_still_dispatches_events()
+    {
+        Event::fake();
+
+        $writer = \Mockery::spy(Writer::class);
+        $cache = app(Repository::class);
+        $cacher = $this->fileCacher(['base_url' => 'http://example.com'], $writer, $cache);
+
+        $this->instance(Cacher::class, $cacher);
+
+        $cacher->invalidateUrls(['/missing']);
+
+        $writer->shouldNotHaveReceived('delete');
+
+        // Listeners like CDN purgers rely on the event firing regardless of
+        // whether the url was tracked in the local map.
+        Event::assertDispatched(UrlInvalidated::class, fn ($event) => $event->url === 'http://example.com/missing');
+    }
+
+    #[Test]
     public function recaching_a_url_will_trigger_a_recache_job()
     {
         Queue::fake();
