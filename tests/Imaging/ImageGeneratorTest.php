@@ -99,6 +99,12 @@ class ImageGeneratorTest extends TestCase
     }
 
     #[Test]
+    public function it_does_not_generate_an_image_for_a_missing_asset()
+    {
+        $this->assertSame('', $this->makeGenerator()->generateByAsset(null, ['w' => 100]));
+    }
+
+    #[Test]
     public function it_does_not_check_ffmpeg_availability_for_non_video_assets()
     {
         // Regression test: non-video assets shouldn't trigger ffmpeg detection, since
