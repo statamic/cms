@@ -1,6 +1,9 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
 import { Button, Badge, ConfirmationModal, Icon } from '@ui';
 
+/**
+ * @import import { ConfirmationModal } from '@statamic/cms/ui';
+ */
 const meta = {
     title: 'Overlays/ConfirmationModal',
     component: ConfirmationModal,

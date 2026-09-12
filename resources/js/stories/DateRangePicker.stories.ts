@@ -3,6 +3,9 @@ import {ref} from 'vue';
 import {DateRangePicker} from '@ui';
 import {parseDate} from '@internationalized/date';
 
+/**
+ * @import import { DateRangePicker } from '@statamic/cms/ui';
+ */
 const meta = {
     title: 'Forms/DateRangePicker',
     component: DateRangePicker,

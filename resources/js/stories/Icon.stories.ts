@@ -31,6 +31,9 @@ registerIconSetFromStrings('storybook', {
     `,
 });
 
+/**
+ * @import import { Icon } from '@statamic/cms/ui';
+ */
 const meta = {
     title: 'Components/Icon',
     component: Icon,

@@ -3,6 +3,9 @@ import {ref} from 'vue';
 import {DatePicker} from '@ui';
 import {parseDate} from '@internationalized/date';
 
+/**
+ * @import import { DatePicker } from '@statamic/cms/ui';
+ */
 const meta = {
     title: 'Forms/DatePicker',
     component: DatePicker,

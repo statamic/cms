@@ -2,6 +2,9 @@ import type {Meta, StoryObj} from '@storybook/vue3';
 import {Editable} from '@ui';
 import {ref} from 'vue';
 
+/**
+ * @import import { Editable } from '@statamic/cms/ui';
+ */
 const meta = {
     title: 'Components/Editable',
     component: Editable,

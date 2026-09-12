@@ -89,6 +89,17 @@ The project uses Vite for asset compilation with separate configs:
 - The node module is defined in `packages/cms` and resolves everything through the `window` object.
 - Code needs to be in the `window` object to prevent addon bundles from re-including our code, and from needing to recompile our source files.
 
+## UI Components & Storybook
+
+- UI components live in `resources/js/components/ui/` and are available to addons via `@statamic/cms/ui`. They are documented with Storybook at [ui.statamic.dev](https://ui.statamic.dev).
+- Stories live in `resources/js/stories/*.stories.ts`, their docs pages in `resources/js/stories/docs/*.mdx`.
+- `npm run storybook` starts Storybook along with its MCP server at `http://localhost:6006/mcp` (configured in `.mcp.json`).
+  - Use its documentation tools to look up a component's props, stories and usage before using or changing a UI component.
+  - After changing components or stories, run the story tests through the MCP server or with `npx vitest run --project storybook`.
+- Storybook generates component manifests for AI agents from stories, MDX docs and component source. Inspect them at `http://localhost:6006/manifests/components.html`.
+  - Document props with JSDoc comments. They end up in the manifest.
+  - Every story file's `meta` needs a JSDoc `@import` tag with the public import path, e.g. `@import import { Button } from '@statamic/cms/ui';`. Otherwise snippets use the internal `@ui` alias.
+
 ## For PR Reviews
 
 - All user-facing strings should be localized.

@@ -4,6 +4,9 @@ import {Timezones, TimezoneHoverCard} from '@ui';
 const exampleDate = '2026-05-05T12:00:00.000Z';
 const exampleRange = { start: '2026-05-05T12:00:00.000Z', end: '2026-05-08T17:30:00.000Z' };
 
+/**
+ * @import import { Timezones } from '@statamic/cms/ui';
+ */
 const meta = {
     title: 'Overlays/Timezones',
     component: Timezones,

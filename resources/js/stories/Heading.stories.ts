@@ -2,6 +2,9 @@ import type {Meta, StoryObj} from '@storybook/vue3';
 import {Heading, Subheading} from '@ui';
 import {icons} from "@/stories/icons";
 
+/**
+ * @import import { Heading } from '@statamic/cms/ui';
+ */
 const meta = {
     title: 'Components/Heading',
     component: Heading,

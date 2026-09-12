@@ -2,6 +2,9 @@ import type {Meta, StoryObj} from '@storybook/vue3';
 import {ref} from 'vue';
 import {TimePicker} from '@ui';
 
+/**
+ * @import import { TimePicker } from '@statamic/cms/ui';
+ */
 const meta = {
     title: 'Forms/TimePicker',
     component: TimePicker,

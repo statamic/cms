@@ -1,6 +1,9 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
 import {Calendar, Card} from '@ui';
 
+/**
+ * @import import { Calendar } from '@statamic/cms/ui';
+ */
 const meta = {
     title: 'Forms/Calendar',
     component: Calendar,
