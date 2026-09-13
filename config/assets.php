@@ -268,6 +268,25 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Chunked Uploads
+    |--------------------------------------------------------------------------
+    |
+    | Large Control Panel uploads can be split into chunks to get past PHP and
+    | proxy upload size limits. Chunks are staged on the local "disk" and
+    | assembled server-side; "max_chunk_size" caps the per-request size.
+    |
+    */
+
+    'chunked_upload' => [
+        'enabled' => true,
+        'max_chunk_size' => 10 * 1024 * 1024,
+        'chunk_overhead' => 64 * 1024,
+        'disk' => 'local',
+        'directory' => 'statamic/chunks',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | FFmpeg
     |--------------------------------------------------------------------------
     |

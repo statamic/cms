@@ -3,6 +3,10 @@
         <Uploader
             ref="internalUploader"
             :container="container.id"
+            :chunked-uploads="container.chunked_uploads"
+            :chunk-size="container.chunk_size"
+            :max-filesize="container.max_filesize"
+            :chunk-upload-url="container.chunk_upload_url"
             :path="path"
             :enabled="!uploader && !preventDragging && canUpload"
             @updated="uploadsUpdated"

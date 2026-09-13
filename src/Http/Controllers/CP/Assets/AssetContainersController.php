@@ -31,6 +31,7 @@ class AssetContainersController extends CpController
             'warm_intelligent' => $intelligent = $container->warmsPresetsIntelligently(),
             'warm_presets' => $intelligent ? [] : $container->warmPresets(),
             'validation' => $container->validationRules(),
+            'chunked_uploads' => (bool) $container->chunkedUploads(),
         ];
 
         return PublishForm::make($this->formBlueprint($container))
@@ -55,7 +56,8 @@ class AssetContainersController extends CpController
             ->disk($values['disk'])
             ->sourcePreset($values['source_preset'])
             ->warmPresets($values['warm_intelligent'] ? null : $values['warm_presets'])
-            ->validationRules($values['validation'] ?? null);
+            ->validationRules($values['validation'] ?? null)
+            ->chunkedUploads(($values['chunked_uploads'] ?? false) ? true : null);
 
         $container->save();
 
@@ -70,7 +72,7 @@ class AssetContainersController extends CpController
 
         return PublishForm::make($this->formBlueprint())
             ->title(__('Create Asset Container'))
-            ->values(['disk' => $this->disks()->first()])
+            ->values(['disk' => $this->disks()->first(), 'chunked_uploads' => true])
             ->asConfig()
             ->submittingTo(cp_route('asset-containers.store'), 'POST');
     }
@@ -93,7 +95,8 @@ class AssetContainersController extends CpController
             ->title($values['title'])
             ->disk($values['disk'])
             ->sourcePreset($values['source_preset'])
-            ->warmPresets($values['warm_intelligent'] ? null : $values['warm_presets']);
+            ->warmPresets($values['warm_intelligent'] ? null : $values['warm_presets'])
+            ->chunkedUploads(($values['chunked_uploads'] ?? false) ? true : null);
 
         $container->save();
 
@@ -189,6 +192,11 @@ class AssetContainersController extends CpController
                         'display' => __('Validation Rules'),
                         'instructions' => __('statamic::messages.asset_container_validation_rules_instructions'),
                         'paste_delimiter' => '|',
+                    ],
+                    'chunked_uploads' => [
+                        'type' => 'toggle',
+                        'display' => __('Chunked Uploads'),
+                        'instructions' => __('statamic::messages.asset_container_chunked_uploads_instructions'),
                     ],
                 ],
             ],
