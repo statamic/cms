@@ -4,6 +4,7 @@ namespace Statamic\Forms;
 
 use Carbon\Carbon;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Collection;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Contracts\Forms\Form as FormContract;
@@ -27,6 +28,7 @@ use Statamic\Facades\FormSubmission;
 use Statamic\Facades\User;
 use Statamic\Facades\YAML;
 use Statamic\Fields\Blueprint;
+use Statamic\Fields\Tab;
 use Statamic\Forms\Exporters\Exporter;
 use Statamic\Forms\Fields\FormFields;
 use Statamic\Statamic;
@@ -302,14 +304,19 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
         return $this->fluentlyGetOrSet('email')->args(func_get_args());
     }
 
-    /**
-     * Get the form fields off the blueprint.
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    public function fields()
+    public function fields(): Collection
     {
         return $this->blueprint()->fields()->all();
+    }
+
+    public function sections(): Collection
+    {
+        return $this->pages()->flatMap(fn (Tab $page) => $page->sections());
+    }
+
+    public function pages(): Collection
+    {
+        return $this->blueprint()->tabs()->values();
     }
 
     /**
