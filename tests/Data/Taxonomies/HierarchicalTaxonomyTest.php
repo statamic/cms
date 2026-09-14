@@ -10,6 +10,7 @@ use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
 use Statamic\Structures\TaxonomyStructure;
 use Statamic\Structures\TaxonomyTree;
+use Statamic\Taxonomies\EnsuresTermPaths;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -187,6 +188,163 @@ class HierarchicalTaxonomyTest extends TestCase
         ], 'en');
 
         $this->assertNotContains('nonexistent', collect($tree)->pluck('term')->all());
+    }
+
+    #[Test]
+    public function validating_a_tree_promotes_the_children_of_a_non_existent_term()
+    {
+        $taxonomy = $this->makeHierarchicalTaxonomy();
+
+        $tree = $taxonomy->structure()->validateTree([
+            ['term' => 'ghost', 'children' => [
+                ['term' => 'cat'],
+            ]],
+            ['term' => 'animals'],
+            ['term' => 'calico'],
+            ['term' => 'furniture'],
+        ], 'en');
+
+        // 'cat' sits where 'ghost' was, ahead of 'animals'. If it had been dropped and
+        // re-appended as a missing term it would be last, and nowhere near this index.
+        $this->assertEquals([
+            ['term' => 'cat'],
+            ['term' => 'animals'],
+            ['term' => 'calico'],
+            ['term' => 'furniture'],
+        ], $tree);
+    }
+
+    #[Test]
+    public function validating_a_tree_promotes_the_children_of_a_nested_non_existent_term()
+    {
+        $taxonomy = $this->makeHierarchicalTaxonomy();
+
+        $tree = $taxonomy->structure()->validateTree([
+            ['term' => 'animals', 'children' => [
+                ['term' => 'ghost', 'children' => [
+                    ['term' => 'cat'],
+                ]],
+                ['term' => 'calico'],
+            ]],
+            ['term' => 'furniture'],
+        ], 'en');
+
+        // 'cat' stays nested under 'animals', in 'ghost's position. The missing term
+        // re-append only ever adds branches at the root, so it cannot produce this.
+        $this->assertEquals([
+            ['term' => 'animals', 'children' => [
+                ['term' => 'cat'],
+                ['term' => 'calico'],
+            ]],
+            ['term' => 'furniture'],
+        ], $tree);
+    }
+
+    #[Test]
+    public function a_non_existent_term_in_the_persisted_tree_does_not_swallow_its_children()
+    {
+        $taxonomy = $this->makeHierarchicalTaxonomy();
+
+        $taxonomy->structure()->tree()->tree([
+            ['term' => 'ghost', 'children' => [
+                ['term' => 'cat', 'children' => [
+                    ['term' => 'calico'],
+                ]],
+            ]],
+            ['term' => 'animals'],
+            ['term' => 'furniture'],
+        ])->save();
+
+        $this->assertEquals([
+            ['term' => 'cat', 'children' => [
+                ['term' => 'calico'],
+            ]],
+            ['term' => 'animals'],
+            ['term' => 'furniture'],
+        ], $taxonomy->structure()->tree()->tree());
+    }
+
+    #[Test]
+    public function the_depth_of_a_term_ignores_non_existent_ancestors()
+    {
+        $taxonomy = $this->makeHierarchicalTaxonomy();
+
+        $taxonomy->structure()->tree()->tree([
+            ['term' => 'ghost', 'children' => [
+                ['term' => 'cat'],
+            ]],
+            ['term' => 'animals'],
+            ['term' => 'calico'],
+            ['term' => 'furniture'],
+        ])->save();
+
+        $structure = $taxonomy->structure();
+
+        // 'cat' is at the root of the rendered tree, so the max depth rules
+        // need to see it at depth 1 rather than counting the ghost branch.
+        $this->assertEquals([
+            ['term' => 'cat'],
+            ['term' => 'animals'],
+            ['term' => 'calico'],
+            ['term' => 'furniture'],
+        ], $structure->tree()->tree());
+
+        $this->assertEquals(1, $structure->depthOfTerm('cat'));
+    }
+
+    #[Test]
+    public function grafting_under_a_term_whose_ancestor_is_missing_is_not_rejected_as_too_deep()
+    {
+        $taxonomy = tap(Taxonomy::make('categories')->structureContents(['max_depth' => 2]))->save();
+
+        foreach (['cat', 'kitten'] as $slug) {
+            tap(Term::make($slug)->taxonomy('categories')->data(['title' => ucfirst($slug)]))->save();
+        }
+
+        $taxonomy->structure()->tree()->tree([
+            ['term' => 'ghost', 'children' => [
+                ['term' => 'cat'],
+            ]],
+        ])->save();
+
+        $structure = $taxonomy->structure();
+
+        // The tree shows 'cat' at the root, so nesting under it stays within max_depth 2.
+        // ('kitten' isn't in the tree yet, so it gets appended at the root for now.)
+        $this->assertEquals([['term' => 'cat'], ['term' => 'kitten']], $structure->tree()->tree());
+
+        $structure->graftTerm('kitten', 'cat');
+
+        $this->assertEquals([
+            ['term' => 'cat', 'children' => [
+                ['term' => 'kitten'],
+            ]],
+        ], $taxonomy->structure()->tree()->tree());
+
+        $this->assertEquals(2, $structure->depthOfTerm('kitten'));
+    }
+
+    #[Test]
+    public function a_term_path_is_not_rejected_because_of_a_non_existent_ancestor()
+    {
+        $taxonomy = tap(Taxonomy::make('categories')->structureContents(['max_depth' => 2]))->save();
+
+        tap(Term::make('cat')->taxonomy('categories')->data(['title' => 'Cat']))->save();
+
+        $taxonomy->structure()->tree()->tree([
+            ['term' => 'ghost', 'children' => [
+                ['term' => 'cat'],
+            ]],
+        ])->save();
+
+        $slug = (new EnsuresTermPaths)->ensure($taxonomy, 'Cat > Kitten');
+
+        $this->assertEquals('kitten', $slug);
+        $this->assertEquals([
+            ['term' => 'cat', 'children' => [
+                ['term' => 'kitten'],
+            ]],
+        ], Taxonomy::findByHandle('categories')->structure()->tree()->tree());
     }
 
     #[Test]

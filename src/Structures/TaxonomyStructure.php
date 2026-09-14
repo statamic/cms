@@ -105,26 +105,37 @@ class TaxonomyStructure extends Structure
 
     public function validateTree(array $tree, string $locale): array
     {
-        $tree = $this->repairTree($tree);
+        $tree = $this->removeNonExistentTermsFromTree($this->repairTree($tree));
 
-        $slugs = $this->getTermSlugsFromTree($tree);
+        $missingTerms = $this->existingTermSlugs()->diff($this->getTermSlugsFromTree($tree))->map(function ($slug) {
+            return ['term' => $slug];
+        })->values()->all();
 
-        $existingSlugs = Blink::once('taxonomy-structure-term-slugs-'.$this->handle(), function () {
+        return array_merge($tree, $missingTerms);
+    }
+
+    /**
+     * Drop branches referencing terms that no longer exist, promoting their
+     * children into place. Unlike validateTree() this doesn't append terms
+     * that are missing from the tree, so it can measure the persisted tree.
+     */
+    protected function removeNonExistentTermsFromTree(array $tree): array
+    {
+        $nonExistent = $this->getTermSlugsFromTree($tree)->diff($this->existingTermSlugs());
+
+        return $nonExistent->isEmpty()
+            ? $tree
+            : $this->removeTermReferencesFromTree($tree, $nonExistent);
+    }
+
+    protected function existingTermSlugs()
+    {
+        return Blink::once('taxonomy-structure-term-slugs-'.$this->handle(), function () {
             return Term::query()
                 ->where('taxonomy', $this->handle())
                 ->get()
                 ->map(fn ($term) => $term->inDefaultLocale()->slug());
         });
-
-        if (($nonExistent = $slugs->diff($existingSlugs))->isNotEmpty()) {
-            $tree = $this->removeTermReferencesFromTree($tree, $nonExistent);
-        }
-
-        $missingTerms = $existingSlugs->diff($slugs)->map(function ($slug) {
-            return ['term' => $slug];
-        })->values()->all();
-
-        return array_merge($tree, $missingTerms);
     }
 
     /**
@@ -208,25 +219,30 @@ class TaxonomyStructure extends Structure
             ->filter();
     }
 
+    /**
+     * Drop the branches for the given slugs, promoting their children into their
+     * position rather than taking the whole subtree down with them. Matches what
+     * removeDuplicateTermsFromTree() and deleting a term both already do.
+     */
     protected function removeTermReferencesFromTree($tree, $slugs)
     {
-        return collect($tree)
-            ->reject(function ($branch) use ($slugs) {
-                return $slugs->contains($branch['term'] ?? null);
-            })
-            ->map(function ($branch) use ($slugs) {
-                if (isset($branch['children'])) {
-                    $branch['children'] = $this->removeTermReferencesFromTree($branch['children'], $slugs);
+        return collect($tree)->flatMap(function ($branch) use ($slugs) {
+            $children = isset($branch['children'])
+                ? $this->removeTermReferencesFromTree($branch['children'], $slugs)
+                : [];
 
-                    if (empty($branch['children'])) {
-                        unset($branch['children']);
-                    }
-                }
+            if ($slugs->contains($branch['term'] ?? null)) {
+                return $children;
+            }
 
-                return $branch;
-            })
-            ->values()
-            ->all();
+            if ($children) {
+                $branch['children'] = $children;
+            } else {
+                unset($branch['children']);
+            }
+
+            return [$branch];
+        })->values()->all();
     }
 
     /**
@@ -296,10 +312,16 @@ class TaxonomyStructure extends Structure
 
     /**
      * The depth a term sits at in the persisted tree, or null if it isn't in it.
+     *
+     * References to terms that no longer exist are dropped first, since they
+     * don't render either. Otherwise the max depth rules would count levels
+     * that aren't in the tree the user sees.
      */
     public function depthOfTerm(string $slug): ?int
     {
-        return $this->depthOfSlug($this->repairTree($this->tree()->fileData()['tree'] ?? []), $slug);
+        $tree = $this->removeNonExistentTermsFromTree($this->repairTree($this->tree()->fileData()['tree'] ?? []));
+
+        return $this->depthOfSlug($tree, $slug);
     }
 
     private function depthOfSlug(array $branches, string $slug, int $depth = 1): ?int
