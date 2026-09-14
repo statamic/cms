@@ -265,6 +265,25 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, ContainsQ
         return $this->hasStructure() && $this->structure()->maxDepth() !== 1;
     }
 
+    /**
+     * A term's slug, followed by the slugs of every term beneath it in the
+     * tree. On a flat taxonomy, or for a term that isn't in the tree, it's
+     * just the slug on its own.
+     */
+    public function termWithDescendants(string $slug): array
+    {
+        if (! $this->hierarchical() || ! ($page = $this->structure()->tree()->find($slug))) {
+            return [$slug];
+        }
+
+        return $page->flattenedPages()
+            ->map->id()
+            ->prepend($slug)
+            ->unique()
+            ->values()
+            ->all();
+    }
+
     public function sortField()
     {
         if ($this->sortField) {

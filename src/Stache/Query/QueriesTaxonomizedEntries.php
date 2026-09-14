@@ -114,15 +114,12 @@ trait QueriesTaxonomizedEntries
     {
         [$handle, $slug] = explode('::', $id);
 
-        $taxonomy = Taxonomy::findByHandle($handle);
-
-        if (! $taxonomy || ! $taxonomy->hierarchical() || ! ($page = $taxonomy->structure()->tree()->find($slug))) {
+        if (! $taxonomy = Taxonomy::findByHandle($handle)) {
             return [$id];
         }
 
-        return $page->flattenedPages()
-            ->map(fn ($descendant) => $handle.'::'.$descendant->id())
-            ->prepend($id)
+        return collect($taxonomy->termWithDescendants($slug))
+            ->map(fn ($descendant) => $handle.'::'.$descendant)
             ->all();
     }
 

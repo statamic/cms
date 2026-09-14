@@ -268,10 +268,17 @@ class TermRepository implements RepositoryContract
 
     public function entriesCount(Term $term, ?string $status = null): int
     {
+        // Entries tagged with a descendant term count towards their ancestors, to
+        // match what querying for the term's entries returns. On a flat taxonomy
+        // there are no descendants, so this is just the term's own slug.
+        $slug = $term->inDefaultLocale()->slug();
+
+        $slugs = $term->taxonomy()?->termWithDescendants($slug) ?? [$slug];
+
         $items = $this->store->store($term->taxonomyHandle())
             ->index('associations')
             ->items()
-            ->where('value', $term->inDefaultLocale()->slug());
+            ->whereIn('value', $slugs);
 
         if ($term instanceof LocalizedTerm) {
             $items = $items->where('site', $term->locale());
@@ -279,6 +286,12 @@ class TermRepository implements RepositoryContract
 
         if ($collection = $term->collection()) {
             $items = $items->where('collection', $collection->handle());
+        }
+
+        // An entry tagged with both a term and one of its descendants has an
+        // association for each, but should only be counted once.
+        if (count($slugs) > 1) {
+            $items = $items->unique('entry');
         }
 
         if ($status) {
