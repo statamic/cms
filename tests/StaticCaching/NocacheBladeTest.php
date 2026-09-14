@@ -18,6 +18,37 @@ class NocacheBladeTest extends TestCase
         $this->assertSame('<p>region</p>', trim(Blade::render('@nocache("nocache-probe")')));
     }
 
+    #[Test]
+    public function it_preserves_php_blocks_inside_a_nocache_region()
+    {
+        $this->artisan('view:clear');
+
+        $template = <<<'BLADE'
+<statamic:nocache>
+@php
+$text = 'text';
+@endphp
+@if($text)
+<p>{{ $text }}</p>
+@endif
+</statamic:nocache>
+BLADE;
+
+        $this->assertSame('<p>text</p>', trim(Blade::render($template)));
+    }
+
+    #[Test]
+    public function it_preserves_verbatim_blocks_inside_a_nocache_region()
+    {
+        $this->artisan('view:clear');
+
+        $template = <<<'BLADE'
+<statamic:nocache>@verbatim<p>{{ text }}</p>@endverbatim</statamic:nocache>
+BLADE;
+
+        $this->assertSame('<p>{{ text }}</p>', trim(Blade::render($template)));
+    }
+
     public function bladeViewPaths($app)
     {
         $app['config']->set('view.paths', [
