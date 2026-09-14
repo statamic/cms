@@ -32,7 +32,7 @@ class VideoTest extends TestCase
     public static function augmentProvider()
     {
         return [
-            'url' => ['https://vimeo.com/22439234', 'vimeo', null, 'https://player.vimeo.com/video/22439234?dnt=1'],
+            'url' => ['https://vimeo.com/22439234', 'Vimeo', null, 'https://player.vimeo.com/video/22439234'],
             'cloudflare' => ['cloudflare:1234', 'cloudflare', '1234', 'https://iframe.cloudflarestream.com/1234'],
             'file' => ['https://example.com/clip.mp4', 'file', null, 'https://example.com/clip.mp4'],
             'unsupported' => ['https://example.com/nope', 'unsupported', null, null],
@@ -53,10 +53,9 @@ class VideoTest extends TestCase
     {
         $meta = $this->fieldtype('cloudflare:1234')->preload();
 
-        $this->assertSame([
-            ['value' => 'url', 'label' => 'URL'],
-            ['value' => 'cloudflare', 'label' => 'Cloudflare Stream'],
-        ], $meta['providers']);
+        $this->assertSame(['value' => 'url', 'label' => 'URL'], $meta['providers'][0]);
+        $this->assertContains(['value' => 'Youtube', 'label' => 'Youtube'], $meta['providers']);
+        $this->assertContains(['value' => 'cloudflare', 'label' => 'Cloudflare Stream'], $meta['providers']);
 
         $this->assertSame('cloudflare', $meta['video']['provider']);
         $this->assertSame('https://iframe.cloudflarestream.com/1234', $meta['video']['embed_url']);

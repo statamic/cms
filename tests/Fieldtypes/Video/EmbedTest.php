@@ -2,6 +2,7 @@
 
 namespace Tests\Fieldtypes\Video;
 
+use Illuminate\Support\Facades\Http;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Fieldtypes\Video\Embed;
@@ -23,10 +24,10 @@ class EmbedTest extends TestCase
     public static function valuesProvider()
     {
         return [
-            'youtube' => ['https://www.youtube.com/watch?v=FK3dav4bA4s', 'youtube', null, 'https://www.youtube-nocookie.com/embed/FK3dav4bA4s'],
-            'youtube shorts' => ['https://www.youtube.com/shorts/FK3dav4bA4s', 'youtube', null, 'https://www.youtube-nocookie.com/embed/FK3dav4bA4s'],
-            'youtu.be' => ['https://youtu.be/FK3dav4bA4s', 'youtube', null, 'https://www.youtube-nocookie.com/embed/FK3dav4bA4s'],
-            'vimeo' => ['https://vimeo.com/22439234', 'vimeo', null, 'https://player.vimeo.com/video/22439234?dnt=1'],
+            'youtube' => ['https://www.youtube.com/watch?v=FK3dav4bA4s', 'Youtube', null, 'https://www.youtube.com/embed/FK3dav4bA4s?feature=oembed'],
+            'youtube shorts' => ['https://www.youtube.com/shorts/FK3dav4bA4s', 'Youtube', null, 'https://www.youtube.com/embed/FK3dav4bA4s?feature=oembed'],
+            'youtu.be' => ['https://youtu.be/FK3dav4bA4s', 'Youtube', null, 'https://www.youtube.com/embed/FK3dav4bA4s?feature=oembed'],
+            'vimeo' => ['https://vimeo.com/22439234', 'Vimeo', null, 'https://player.vimeo.com/video/22439234'],
             'cloudflare' => ['cloudflare:1234', 'cloudflare', '1234', 'https://iframe.cloudflarestream.com/1234'],
             'cloudflare without an id' => ['cloudflare:', 'unsupported', null, null],
             'cloudflare with a malformed id' => ['cloudflare:1234"></iframe><script>alert(1)</script>', 'unsupported', null, null],
@@ -38,6 +39,66 @@ class EmbedTest extends TestCase
             'empty' => ['', 'unsupported', null, null],
             'null' => [null, 'unsupported', null, null],
         ];
+    }
+
+    #[Test]
+    public function it_does_not_make_http_requests_for_offline_providers()
+    {
+        Http::preventStrayRequests();
+
+        $this->assertSame('Youtube', Embed::fromValue('https://www.youtube.com/watch?v=FK3dav4bA4s')->provider);
+        $this->assertSame('Vimeo', Embed::fromValue('https://vimeo.com/22439234')->provider);
+    }
+
+    #[Test]
+    public function it_returns_an_embed_url_rather_than_provider_supplied_markup()
+    {
+        Http::fake(['*' => Http::response([
+            'html' => '<img src=x onerror="alert(1)"><iframe src="https://fast.wistia.net/embed/iframe/abc"></iframe>',
+        ])]);
+
+        $video = Embed::fromValue('https://wistia.com/medias/abc');
+
+        $this->assertSame('https://fast.wistia.net/embed/iframe/abc', $video->embedUrl);
+        $this->assertStringNotContainsString('onerror', $video->embedUrl);
+    }
+
+    #[Test]
+    public function it_rejects_an_embed_that_is_not_a_valid_url()
+    {
+        Http::fake(['*' => Http::response(['html' => '<iframe src="javascript:alert(1)"></iframe>'])]);
+
+        $this->assertFalse(Embed::fromValue('https://wistia.com/medias/abc')->isSupported());
+    }
+
+    #[Test]
+    public function it_upgrades_an_insecure_embed_url_to_https()
+    {
+        Http::fake(['*' => Http::response(['html' => '<iframe src="http://fast.wistia.net/embed/iframe/abc"></iframe>'])]);
+
+        $this->assertSame(
+            'https://fast.wistia.net/embed/iframe/abc',
+            Embed::fromValue('https://wistia.com/medias/abc')->embedUrl,
+        );
+    }
+
+    #[Test]
+    public function it_is_not_supported_when_the_lookup_fails()
+    {
+        Http::fake(['*' => Http::response(status: 500)]);
+
+        $this->assertFalse(Embed::fromValue('https://wistia.com/medias/abc')->isSupported());
+    }
+
+    #[Test]
+    public function it_caches_lookups_that_require_a_request()
+    {
+        Http::fake(['*' => Http::response(['html' => '<iframe src="https://fast.wistia.net/embed/iframe/abc"></iframe>'])]);
+
+        Embed::fromValue('https://wistia.com/medias/abc');
+        Embed::fromValue('https://wistia.com/medias/abc');
+
+        Http::assertSentCount(1);
     }
 
     #[Test]

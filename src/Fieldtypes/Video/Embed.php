@@ -3,16 +3,21 @@
 namespace Statamic\Fieldtypes\Video;
 
 use ArrayAccess;
+use Embera\Embera;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use JsonSerializable;
 use Statamic\Contracts\Support\Boolable;
 use Statamic\Support\FileTypes;
+use Throwable;
 
 use function Statamic\trans as __;
 
 class Embed implements Arrayable, ArrayAccess, Boolable, JsonSerializable
 {
+    const CACHE_TTL = 3600;
     const CLOUDFLARE = 'cloudflare';
     const CLOUDFLARE_EMBED_URL = 'https://iframe.cloudflarestream.com/';
     const CLOUDFLARE_ID_PATTERN = '/^[a-zA-Z0-9]+$/';
@@ -37,8 +42,8 @@ class Embed implements Arrayable, ArrayAccess, Boolable, JsonSerializable
                 : static::unsupported($value);
         }
 
-        if ($provider = static::oembedProvider($value)) {
-            return new self($provider, $value, static::embedUrl($value));
+        if ($video = static::fromOembed($value)) {
+            return $video;
         }
 
         if (static::isVideoFile($value)) {
@@ -50,10 +55,13 @@ class Embed implements Arrayable, ArrayAccess, Boolable, JsonSerializable
 
     public static function options(): array
     {
-        return [
-            ['value' => self::URL, 'label' => __('URL')],
-            ['value' => self::CLOUDFLARE, 'label' => __('Cloudflare Stream')],
-        ];
+        return collect(Providers::names())
+            ->map(fn (string $provider) => ['value' => $provider, 'label' => $provider])
+            ->sortBy('label')
+            ->prepend(['value' => self::URL, 'label' => __('URL')])
+            ->push(['value' => self::CLOUDFLARE, 'label' => __('Cloudflare Stream')])
+            ->values()
+            ->all();
     }
 
     public static function unsupported(?string $value = null): self
@@ -191,17 +199,59 @@ class Embed implements Arrayable, ArrayAccess, Boolable, JsonSerializable
         return in_array(strtolower(pathinfo($path, PATHINFO_EXTENSION)), FileTypes::video());
     }
 
-    protected static function oembedProvider(string $url): ?string
+    protected static function fromOembed(string $url): ?self
     {
-        if (Str::contains($url, self::VIMEO)) {
-            return self::VIMEO;
+        if ($video = static::lookup($url, Embera::ONLY_FAKE_RESPONSES)) {
+            return $video;
         }
 
-        if (Str::contains($url, ['youtu.be', 'youtube'])) {
-            return self::YOUTUBE;
+        return Cache::remember(
+            'statamic::video-fieldtype.'.md5($url),
+            self::CACHE_TTL,
+            fn () => static::lookup($url, Embera::DISABLE_FAKE_RESPONSES),
+        );
+    }
+
+    protected static function lookup(string $url, int $fakeResponses): ?self
+    {
+        try {
+            $response = (new Embera(
+                ['fake_responses' => $fakeResponses],
+                new Providers,
+                new HttpClient,
+            ))->getUrlData($url);
+        } catch (Throwable) {
+            return null;
         }
 
-        return null;
+        if (empty($response) || blank($embedUrl = static::embedUrlFromHtml($first = Arr::first($response)))) {
+            return null;
+        }
+
+        return new self(Arr::get($first, 'embera_provider_name', self::UNSUPPORTED), $url, $embedUrl);
+    }
+
+    protected static function embedUrlFromHtml(array $response): ?string
+    {
+        if (blank($html = Arr::get($response, 'html'))) {
+            return null;
+        }
+
+        if (! preg_match('/<iframe[^>]+src=["\']([^"\']+)["\']/i', $html, $matches)) {
+            return null;
+        }
+
+        $url = html_entity_decode($matches[1], ENT_QUOTES);
+
+        if (! filter_var($url, FILTER_VALIDATE_URL)) {
+            return null;
+        }
+
+        return match (parse_url($url, PHP_URL_SCHEME)) {
+            'https' => $url,
+            'http' => Str::replaceStart('http://', 'https://', $url),
+            default => null,
+        };
     }
 
     // Unlisted vimeo urls are in the form vimeo.com/id/hash, but embeds pass the hash as a get param.

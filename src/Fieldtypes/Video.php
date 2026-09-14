@@ -23,6 +23,7 @@ class Video extends Fieldtype
     public function preload()
     {
         return [
+            'detailsUrl' => cp_route('video.details'),
             'providers' => Embed::options(),
             'video' => Embed::fromValue($this->field()->value())->toArray(),
         ];

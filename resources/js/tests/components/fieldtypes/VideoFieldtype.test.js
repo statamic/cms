@@ -1,4 +1,4 @@
-import { mount } from '@vue/test-utils';
+import { flushPromises, mount } from '@vue/test-utils';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 import VideoFieldtype from '@/components/fieldtypes/VideoFieldtype.vue';
 import { publishContextKey } from '@/components/ui';
@@ -6,9 +6,14 @@ import { publishContextKey } from '@/components/ui';
 window.__ = (key) => key;
 
 let intersect;
+let axios;
+let toast;
 
 beforeEach(() => {
     vi.useFakeTimers();
+
+    axios = { get: vi.fn().mockResolvedValue({ data: {} }) };
+    toast = { error: vi.fn() };
 
     window.IntersectionObserver = class {
         constructor(callback) {
@@ -37,9 +42,10 @@ const stub = (tag) => ({
 
 const mountVideoField = (value = null, video = null) => {
     return mount(VideoFieldtype, {
-        props: { handle: 'video', config: {}, meta: { providers, video }, value },
+        props: { handle: 'video', config: {}, meta: { providers, video, detailsUrl: '/cp/video/details' }, value },
         global: {
             provide: { [publishContextKey]: {} },
+            mocks: { $axios: axios, $toast: toast },
             stubs: {
                 'ui-combobox': stub('select'),
                 'ui-input': stub('input'),
@@ -125,4 +131,70 @@ test('it debounces updates while typing', async () => {
 
     expect(wrapper.emitted('update:value')).toHaveLength(1);
     expect(wrapper.emitted('update:value')[0]).toEqual(['https://www.youtube.com/watch?v=123']);
+});
+
+test('it looks up details for a url value', async () => {
+    axios.get.mockResolvedValue({
+        data: { provider: 'Youtube', url: 'https://www.youtube.com/watch?v=1234', embed_url: 'https://www.youtube.com/embed/1234' },
+    });
+
+    const wrapper = mountVideoField('https://www.youtube.com/watch?v=1234');
+    intersect();
+    await flushPromises();
+
+    expect(axios.get).toHaveBeenCalledWith('/cp/video/details', expect.objectContaining({
+        params: { value: 'https://www.youtube.com/watch?v=1234' },
+    }));
+    expect(wrapper.find('iframe').attributes('src')).toBe('https://www.youtube.com/embed/1234');
+});
+
+test('it does not look up a cloudflare value', async () => {
+    mountVideoField('cloudflare:abc123');
+    await flushPromises();
+
+    expect(axios.get).not.toHaveBeenCalled();
+});
+
+test('it discards a response that resolves after the value moved on', async () => {
+    let resolveStale;
+    axios.get
+        .mockImplementationOnce(() => new Promise((resolve) => (resolveStale = resolve)))
+        .mockResolvedValueOnce({
+            data: { provider: 'Vimeo', url: 'https://vimeo.com/2', embed_url: 'https://player.vimeo.com/video/2' },
+        });
+
+    const wrapper = mountVideoField('https://www.youtube.com/watch?v=1');
+    intersect();
+
+    await wrapper.setProps({ value: 'https://vimeo.com/2' });
+    await flushPromises();
+
+    resolveStale({ data: { provider: 'Youtube', url: 'https://www.youtube.com/watch?v=1', embed_url: 'https://www.youtube.com/embed/1' } });
+    await flushPromises();
+
+    expect(wrapper.find('iframe').attributes('src')).toBe('https://player.vimeo.com/video/2');
+});
+
+test('a failed lookup shows an error', async () => {
+    axios.get.mockRejectedValue({ response: { data: { message: 'Nope' } } });
+
+    const wrapper = mountVideoField('https://www.youtube.com/watch?v=1234');
+    intersect();
+    await flushPromises();
+
+    expect(wrapper.find('iframe').exists()).toBe(false);
+    expect(toast.error).toHaveBeenCalledWith('Nope');
+});
+
+test('it renders a direct video file in a video element', async () => {
+    axios.get.mockResolvedValue({
+        data: { provider: 'file', url: 'https://example.com/clip.mp4', embed_url: 'https://example.com/clip.mp4' },
+    });
+
+    const wrapper = mountVideoField('https://example.com/clip.mp4');
+    intersect();
+    await flushPromises();
+
+    expect(wrapper.find('video').attributes('src')).toBe('https://example.com/clip.mp4');
+    expect(wrapper.find('iframe').exists()).toBe(false);
 });
