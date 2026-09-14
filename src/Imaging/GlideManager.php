@@ -9,6 +9,7 @@ use League\Glide\ServerFactory;
 use Statamic\Events\GlideAssetCacheCleared;
 use Statamic\Facades\Config;
 use Statamic\Facades\Image;
+use Statamic\Facades\Path;
 use Statamic\Facades\URL;
 use Statamic\Imaging\ResponseFactory as LaravelResponseFactory;
 use Statamic\Support\Str;
@@ -104,6 +105,20 @@ class GlideManager
     public function route()
     {
         return Config::get('statamic.assets.image_manipulation.route');
+    }
+
+    public function cachePathIsServedByRoute()
+    {
+        $publicPath = Path::tidy(public_path());
+        $cachePath = Path::tidy(Config::get('statamic.assets.image_manipulation.cache_path'));
+
+        if (! Str::startsWith($cachePath, $publicPath)) {
+            return false;
+        }
+
+        $servedPath = trim(Str::after($cachePath, $publicPath), '/');
+
+        return $servedPath === trim(URL::makeRelative($this->route()), '/');
     }
 
     public function url()

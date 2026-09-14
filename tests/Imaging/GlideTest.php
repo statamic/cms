@@ -5,12 +5,14 @@ namespace Tests\Imaging;
 use Illuminate\Cache\FileStore;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use InvalidArgumentException;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use League\Glide\Server;
 use Orchestra\Testbench\Attributes\DefineEnvironment;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Imaging\UrlBuilder;
 use Statamic\Facades\Asset;
@@ -24,6 +26,7 @@ use Statamic\Imaging\GlideUrlBuilder;
 use Statamic\Imaging\HybridUrlBuilder;
 use Statamic\Imaging\ImageGenerator;
 use Statamic\Imaging\StaticUrlBuilder;
+use Statamic\Providers\GlideServiceProvider;
 use Statamic\Support\Str;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -36,7 +39,7 @@ class GlideTest extends TestCase
     {
         $this->clearGlideCache();
 
-        if (file_exists($path = storage_path('glide-test-cache'))) {
+        if (file_exists($path = public_path('img'))) {
             File::delete($path);
         }
 
@@ -120,6 +123,59 @@ class GlideTest extends TestCase
         $this->assertTrue(Glide::isUsingHybridCaching());
         $this->assertFalse(Glide::shouldServeDirectly());
         $this->assertFalse(Glide::shouldServeByHttp());
+    }
+
+    #[Test]
+    #[DataProvider('cachePathServedByRouteProvider')]
+    public function hybrid_caching_knows_when_the_cache_path_is_served_by_the_route($route, $cachePath, $expected)
+    {
+        config([
+            'statamic.assets.image_manipulation.cache' => 'hybrid',
+            'statamic.assets.image_manipulation.route' => $route,
+            'statamic.assets.image_manipulation.cache_path' => $cachePath(),
+        ]);
+
+        $this->assertSame($expected, Glide::cachePathIsServedByRoute());
+    }
+
+    public static function cachePathServedByRouteProvider()
+    {
+        return [
+            'matching' => ['img', fn () => public_path('img'), true],
+            'matching with slashes' => ['/img/', fn () => public_path('img/'), true],
+            'matching absolute route' => ['http://localhost/img', fn () => public_path('img'), true],
+            'matching nested' => ['assets/img', fn () => public_path('assets/img'), true],
+            'different directory' => ['img', fn () => public_path('imgcache'), false],
+            'outside public' => ['img', fn () => storage_path('img'), false],
+        ];
+    }
+
+    #[Test]
+    public function hybrid_caching_warns_when_the_cache_path_is_not_served_by_the_route()
+    {
+        config([
+            'statamic.assets.image_manipulation.cache' => 'hybrid',
+            'statamic.assets.image_manipulation.route' => 'img',
+            'statamic.assets.image_manipulation.cache_path' => public_path('imgcache'),
+        ]);
+
+        Log::shouldReceive('warning')->once()->withArgs(fn ($message) => str_contains($message, 'hybrid'));
+
+        (new GlideServiceProvider($this->app))->boot();
+    }
+
+    #[Test]
+    public function hybrid_caching_does_not_warn_when_the_cache_path_is_served_by_the_route()
+    {
+        config([
+            'statamic.assets.image_manipulation.cache' => 'hybrid',
+            'statamic.assets.image_manipulation.route' => 'img',
+            'statamic.assets.image_manipulation.cache_path' => public_path('img'),
+        ]);
+
+        Log::shouldReceive('warning')->never();
+
+        (new GlideServiceProvider($this->app))->boot();
     }
 
     #[Test]
@@ -528,7 +584,7 @@ class GlideTest extends TestCase
     protected function hybridCaching($app)
     {
         $app['config']->set('statamic.assets.image_manipulation.cache', 'hybrid');
-        $app['config']->set('statamic.assets.image_manipulation.cache_path', storage_path('glide-test-cache'));
+        $app['config']->set('statamic.assets.image_manipulation.cache_path', public_path('img'));
         $app['config']->set('statamic.assets.image_manipulation.route', 'img');
     }
 }

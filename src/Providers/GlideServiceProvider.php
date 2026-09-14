@@ -2,6 +2,7 @@
 
 namespace Statamic\Providers;
 
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
 use League\Glide\Server;
 use Statamic\Contracts\Imaging\ImageManipulator;
@@ -47,6 +48,13 @@ class GlideServiceProvider extends ServiceProvider
         $this->app->bind(ImageValidator::class, function () {
             return new ImageValidator(Intervention::driver());
         });
+    }
+
+    public function boot()
+    {
+        if (Glide::isUsingHybridCaching() && ! Glide::cachePathIsServedByRoute()) {
+            Log::warning('Glide hybrid caching: the image_manipulation.cache_path must live at the image_manipulation.route inside the public directory, otherwise cached images are never served directly by the web server.');
+        }
     }
 
     private function getBuilder()
