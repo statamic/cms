@@ -28,7 +28,7 @@ class Associations extends Index
                 $sites = $entries->index('site');
 
                 return $entries->index($handle)->items()
-                    ->filter()
+                    ->reject(fn ($terms) => is_null($terms))
                     ->flatMap(fn ($terms, $key) => collect(Arr::wrap($terms))->map(fn ($term) => [
                         'value' => $term,
                         'slug' => Str::slug($term),
