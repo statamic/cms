@@ -10,8 +10,11 @@ Site::all()->map(function ($site) {
     return trim(URL::makeRelative($site->url()), '/');
 })->unique()->each(function ($sitePrefix) {
     Route::group(['prefix' => $sitePrefix.'/'.Glide::route()], function () {
-        Route::get('/asset/{container}/{path?}', [GlideController::class, 'generateByAsset'])->where('path', '.*');
-        Route::get('/http/{url}/{filename?}', [GlideController::class, 'generateByUrl']);
+        if (! Glide::isUsingHybridCaching()) {
+            Route::get('/asset/{container}/{path?}', [GlideController::class, 'generateByAsset'])->where('path', '.*');
+            Route::get('/http/{url}/{filename?}', [GlideController::class, 'generateByUrl']);
+        }
+
         Route::get('{path}', [GlideController::class, 'generateByPath'])->where('path', '.*');
     });
 });

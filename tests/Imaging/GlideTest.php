@@ -5,6 +5,7 @@ namespace Tests\Imaging;
 use Illuminate\Cache\FileStore;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use InvalidArgumentException;
 use League\Flysystem\Local\LocalFilesystemAdapter;
@@ -14,6 +15,7 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Imaging\UrlBuilder;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
+use Statamic\Facades\Config;
 use Statamic\Facades\File;
 use Statamic\Facades\Glide;
 use Statamic\Facades\Path;
@@ -291,6 +293,28 @@ class GlideTest extends TestCase
         $this->assertTrue(Glide::cacheDisk()->exists($expectedPath));
 
         @unlink(public_path($imagePath));
+    }
+
+    #[Test]
+    #[DefineEnvironment('hybridCaching')]
+    public function hybrid_caching_only_registers_the_cache_path_route()
+    {
+        Storage::fake('test');
+        $file = UploadedFile::fake()->image('hoff.jpg', 30, 60);
+        Storage::disk('test')->putFileAs('foo', $file, 'hoff.jpg');
+        $container = tap(AssetContainer::make('test_container')->disk('test'))->save();
+        tap($container->makeAsset('foo/hoff.jpg'))->save();
+
+        $uris = collect(Route::getRoutes()->getRoutes())->map->uri();
+
+        $this->assertContains('img/{path}', $uris->all());
+        $this->assertNotContains('img/asset/{container}/{path?}', $uris->all());
+        $this->assertNotContains('img/http/{url}/{filename?}', $uris->all());
+
+        $asset = Asset::find('test_container::foo/hoff.jpg');
+        $signedUrl = (new GlideUrlBuilder(['key' => Config::getAppKey(), 'route' => '/img']))->build($asset, ['w' => 100]);
+
+        $this->get($signedUrl)->assertNotFound();
     }
 
     #[Test]
