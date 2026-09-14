@@ -39,11 +39,13 @@ class IncludeNocacheTest extends TestCase
 
     private function setUpBladeViews(array $views)
     {
+        app('files')->cleanDirectory(config('view.compiled'));
+
         foreach ($views as $name => $contents) {
             $this->viewShouldReturnRaw($name, $contents, 'blade.php');
         }
 
-        view()->addNamespace('compiled__views', storage_path('framework/views'));
+        view()->addNamespace('compiled__views', storage_path('statamic/tmp/nocache'));
     }
 
     private function renderTwice(string $layout, array $views): array
