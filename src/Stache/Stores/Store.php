@@ -427,7 +427,9 @@ abstract class Store
         $accumulated = $valueIndexes->map(fn () => [])->all();
 
         foreach ($this->paths()->keys() as $key) {
-            $item = $this->getItem($key);
+            if (! $item = $this->getItem($key)) {
+                continue;
+            }
 
             foreach ($valueIndexes as $name => $index) {
                 $accumulated[$name][$key] = $index->getItemValue($item);
