@@ -62,4 +62,29 @@ class SearchTest extends TestCase
             )
         );
     }
+
+    #[Test]
+    public function it_passes_along_arguments()
+    {
+        $entryA = EntryFactory::id('a')->collection('test')->data(['title' => 'entry a'])->create();
+        $entryB = EntryFactory::id('b')->collection('test')->data(['title' => 'entry b'])->create();
+
+        $builder = $this->mock(QueryBuilder::class)->makePartial();
+        $builder->shouldReceive('ensureExists', 'search', 'withData', 'limit', 'offset', 'where')->andReturnSelf();
+        $builder->shouldReceive('get')->andReturn(collect([$entryA, $entryB]));
+
+        Search::shouldReceive('index')->with(null)->once()->andReturn($builder);
+
+        $this->get('/whatever?q=foo'); // just a way to get a query param into the request(). the url is irrelevant.
+
+        $this->assertEquals(
+            '<entry a><entry b>',
+            $this->tag(
+                '{{ search:results :with:filters="get:filters" :with:sort="get:sort" }}<{{ title }}>{{ /search:results }}',
+                ['get' => ['q' => 'foo', 'filters' => ['category' => 'A'], 'sort' => 'distance:asc']]
+            )
+        );
+
+        $this->assertEquals(['filters' => ['category' => 'A'], 'sort' => 'distance:asc'], $builder->arguments());
+    }
 }
