@@ -733,6 +733,14 @@ class FieldTest extends TestCase
     }
 
     #[Test]
+    public function it_defaults_to_revisable_when_null()
+    {
+        $field = new Field('test', ['type' => 'text', 'revisable' => null]);
+
+        $this->assertTrue($field->isRevisable());
+    }
+
+    #[Test]
     public function it_gets_revisable()
     {
         $field = new Field('test', ['type' => 'text', 'revisable' => false]);

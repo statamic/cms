@@ -270,7 +270,11 @@ class Field implements Arrayable
             return true;
         }
 
-        return (bool) $this->get('revisable', true);
+        if (is_null($this->get('revisable'))) {
+            return true;
+        }
+
+        return (bool) $this->get('revisable');
     }
 
     public function shouldBeDuplicated()
