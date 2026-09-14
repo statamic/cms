@@ -4,6 +4,7 @@ namespace Tests\Feature\Forms;
 
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Form;
+use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -167,6 +168,32 @@ class ViewFormListingTest extends TestCase
     }
 
     #[Test]
+    public function it_only_counts_submissions_in_the_selected_site()
+    {
+        $this->setSites([
+            'en' => ['url' => 'http://localhost/', 'locale' => 'en'],
+            'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
+        ]);
+        Site::setSelected('fr');
+
+        $this->setTestRoles(['test' => ['access cp', 'view form submissions']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+        $form = tap(Form::make('test'))->save();
+        $this->makeSubmission($form, 'en');
+        $this->makeSubmission($form, 'en');
+        $this->makeSubmission($form, 'fr');
+
+        $this
+            ->actingAs($user)
+            ->get(cp_route('forms.index'))
+            ->assertSuccessful()
+            ->assertInertia(fn ($page) => $page
+                ->component('forms/Index')
+                ->where('forms.0.submissions', 1)
+            );
+    }
+
+    #[Test]
     public function it_excludes_the_submission_count_when_the_user_cannot_view_submissions()
     {
         $this->setTestRoles(['test' => ['access cp', 'edit test form']]);
@@ -187,9 +214,9 @@ class ViewFormListingTest extends TestCase
             );
     }
 
-    private function makeSubmission($form)
+    private function makeSubmission($form, $site = null)
     {
-        $submission = $form->makeSubmission();
+        $submission = $form->makeSubmission()->site($site);
         $submission->data(['name' => 'John Doe']);
         $submission->save();
     }

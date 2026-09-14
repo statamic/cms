@@ -372,6 +372,7 @@ onUnmounted(() => {
 defineExpose({
     name: props.name,
     values,
+    meta,
     saving,
     saved,
     revealerFields,

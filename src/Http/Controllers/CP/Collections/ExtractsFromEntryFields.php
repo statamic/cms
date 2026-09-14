@@ -2,6 +2,8 @@
 
 namespace Statamic\Http\Controllers\CP\Collections;
 
+use Statamic\Support\Arr;
+
 trait ExtractsFromEntryFields
 {
     protected function extractFromFields($entry, $blueprint)
@@ -11,7 +13,8 @@ trait ExtractsFromEntryFields
         $values = collect();
         $target = $entry;
         while ($target) {
-            $values = $target->data()->merge($target->computedData())->merge($values);
+            $data = $target->isRoot() ? collect(Arr::removeNullValues($target->data()->all())) : $target->data();
+            $values = $data->merge($target->computedData())->merge($values);
             $target = $target->origin();
         }
         $values = $values->all();
