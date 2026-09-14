@@ -415,6 +415,16 @@ abstract class Store
     }
 
     /**
+     * Whether this store provides its own warm() implementation. Such stores are warmed
+     * by calling warm() directly rather than through the two-pass split, so third-party
+     * overrides registered via Stache::registerStore() keep being honoured.
+     */
+    public function overridesWarm(): bool
+    {
+        return (new \ReflectionMethod($this, 'warm'))->getDeclaringClass()->getName() !== self::class;
+    }
+
+    /**
      * Pass 1 of the 2-pass warm. Loads every file once and accumulates values for
      * all per-item value indexes in a single loop, then writes each index to the
      * cache in one shot. This ensures entries' taxonomy indexes (e.g. `categories`)

@@ -87,6 +87,16 @@ abstract class AggregateStore extends Store
         $this->discoverStores()->each->warm();
     }
 
+    /**
+     * AggregateStore's own warm() just fans out to child stores, which is exactly what
+     * warmValueIndexes()/warmOtherIndexes() do too, so it can still take the two-pass
+     * path. Subclasses that define their own warm() are reported as overriding it.
+     */
+    public function overridesWarm(): bool
+    {
+        return (new \ReflectionMethod($this, 'warm'))->getDeclaringClass()->getName() !== self::class;
+    }
+
     public function resetMemoizedState()
     {
         parent::resetMemoizedState();

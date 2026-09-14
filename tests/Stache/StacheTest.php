@@ -248,4 +248,35 @@ class StacheTest extends TestCase
         $this->assertEquals(['en::alfa' => 'alfa', 'en::bravo' => 'bravo'], $store->index('slug')->items()->all());
         $this->assertEquals(['en::alfa' => 'en', 'en::bravo' => 'en'], $store->index('site')->items()->all());
     }
+
+    #[Test]
+    public function warming_calls_warm_on_stores_that_override_it()
+    {
+        $store = new class($this->stache, \Mockery::mock(Filesystem::class)) extends CollectionsStore
+        {
+            public $warmed = false;
+
+            public function warm()
+            {
+                $this->warmed = true;
+            }
+
+            public function warmValueIndexes()
+            {
+                throw new \Exception('Should not be called on a store that overrides warm().');
+            }
+
+            public function warmOtherIndexes()
+            {
+                throw new \Exception('Should not be called on a store that overrides warm().');
+            }
+        };
+
+        $this->stache->registerStore($store);
+        $this->stache->setLockFactory(new LockFactory(new NullLockStore));
+
+        $this->stache->warm();
+
+        $this->assertTrue($store->warmed);
+    }
 }
