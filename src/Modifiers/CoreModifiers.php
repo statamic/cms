@@ -28,6 +28,7 @@ use Statamic\Fields\Values;
 use Statamic\Fieldtypes\Bard;
 use Statamic\Fieldtypes\Bard\Augmentor;
 use Statamic\Fieldtypes\Link\ArrayableLink;
+use Statamic\Fieldtypes\Video\Video as VideoValue;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Dumper;
@@ -3199,6 +3200,10 @@ class CoreModifiers extends Modifier
      */
     public function embedUrl($url)
     {
+        if ($url instanceof VideoValue) {
+            return $url->embedUrl;
+        }
+
         if (Str::contains($url, 'vimeo')) {
             $url = str_replace('/vimeo.com', '/player.vimeo.com/video', $url);
 
@@ -3264,6 +3269,10 @@ class CoreModifiers extends Modifier
      */
     public function trackableEmbedUrl($url)
     {
+        if ($url instanceof VideoValue) {
+            return $url->embedUrl;
+        }
+
         if (Str::contains($url, 'vimeo')) {
             return str_replace('/vimeo.com', '/player.vimeo.com/video', $url);
         }
@@ -3296,6 +3305,10 @@ class CoreModifiers extends Modifier
      */
     public function isEmbeddable($url)
     {
+        if ($url instanceof VideoValue) {
+            return $url->isSupported();
+        }
+
         return Str::contains($url, ['youtu.be', 'youtube', 'vimeo']);
     }
 

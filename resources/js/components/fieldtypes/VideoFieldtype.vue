@@ -1,99 +1,154 @@
 <template>
     <div class="flex flex-col space-y-3 p-1.5 bg-gray-100 border border-gray-300 dark:bg-gray-900 dark:border-gray-700 rounded-xl">
-        <ui-input-group>
-            <ui-input-group-prepend :text="__('URL')" />
-            <ui-input
-                :model-value="value"
-                :isReadOnly="isReadOnly"
-                :placeholder="__(config.placeholder) || 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'"
-                :aria-label="__('Video URL')"
-                @update:model-value="update"
-                @focus="$emit('focus')"
-                @blur="$emit('blur')"
-                input-class="border-s-0"
-            />
-        </ui-input-group>
-        <ui-description v-if="isInvalid" class="text-red-600">{{ __('statamic::validation.url') }}</ui-description>
-        <iframe
-            v-if="shouldShowPreview"
-            ref="iframe"
-            :src="isVisible ? embedUrl : null"
-            frameborder="0"
-            allow="fullscreen"
-            class="aspect-video rounded-lg"
-            loading="lazy"
-        ></iframe>
+        <ui-combobox
+            :model-value="provider"
+            :options="providers"
+            option-label="label"
+            option-value="value"
+            :placeholder="__('Provider...')"
+            @update:model-value="changeProvider"
+        />
+
+        <ui-input
+            v-if="isCloudflare"
+            :aria-label="__('Video ID')"
+            input-class="border-s-0"
+            :isReadOnly="isReadOnly"
+            :model-value="videoId"
+            :prepend="__('ID')"
+            @update:model-value="updateCloudflareId"
+            @focus="$emit('focus')"
+            @blur="$emit('blur')"
+        />
+
+        <ui-input
+            v-else
+            :aria-label="__('Video URL')"
+            input-class="border-s-0"
+            :isReadOnly="isReadOnly"
+            :model-value="url"
+            :placeholder="__(config.placeholder) || 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'"
+            :prepend="__('URL')"
+            @update:model-value="updateUrl"
+            @focus="$emit('focus')"
+            @blur="$emit('blur')"
+        />
+
+        <video v-if="shouldShowPreview && isFile" :src="embedUrl" controls class="w-full rounded-md"></video>
+
+        <div v-else-if="shouldShowPreview" class="video-fieldtype-embed">
+            <iframe
+                :src="embedUrl"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen
+            ></iframe>
+        </div>
+
+        <ui-description v-else-if="isUnsupported" class="text-red-500">
+            {{ __('This video URL is not supported.') }}
+        </ui-description>
     </div>
 </template>
 
 <script>
+import axios from 'axios';
 import Fieldtype from './Fieldtype.vue';
+
+const CLOUDFLARE = 'cloudflare';
+const FILE = 'file';
+const UNSUPPORTED = 'unsupported';
+const CLOUDFLARE_PREFIX = 'cloudflare:';
 
 export default {
     mixins: [Fieldtype],
 
     data() {
         return {
+            abortController: null,
+            embedUrl: this.meta.video?.embed_url ?? null,
             isVisible: false,
             observer: null,
+            provider: this.meta.video?.provider ?? null,
         };
     },
 
     computed: {
+        isCloudflare() {
+            return this.provider === CLOUDFLARE || !!this.value?.startsWith(CLOUDFLARE_PREFIX);
+        },
+
+        isFile() {
+            return this.provider === FILE;
+        },
+
+        isUnsupported() {
+            return this.provider === UNSUPPORTED && !!this.value;
+        },
+
+        providers() {
+            return this.meta.providers;
+        },
+
         shouldShowPreview() {
-            return !this.isInvalid && (this.isEmbeddable || this.isVideo);
+            return this.isVisible && !!this.embedUrl;
         },
 
-        embedUrl() {
-            let embed_url = this.value || '';
+        url() {
+            return this.value?.startsWith(CLOUDFLARE_PREFIX) ? null : this.value;
+        },
 
-            if (embed_url.includes('youtube')) {
-                embed_url = embed_url.includes('shorts/')
-                    ? embed_url.replace('shorts/', 'embed/')
-                    : embed_url.replace('watch?v=', 'embed/');
+        videoId() {
+            return this.value?.startsWith(CLOUDFLARE_PREFIX) ? this.value.slice(CLOUDFLARE_PREFIX.length) : null;
+        },
+    },
+
+    watch: {
+        value(value) {
+            this.lookup(value);
+        },
+    },
+
+    methods: {
+        changeProvider(provider) {
+            this.provider = provider;
+            this.embedUrl = null;
+            this.update(null);
+        },
+
+        lookup(value) {
+            if (this.abortController) this.abortController.abort();
+
+            if (!value) {
+                this.embedUrl = null;
+                return;
             }
 
-            if (embed_url.includes('youtu.be')) {
-                embed_url = embed_url.replace('youtu.be', 'www.youtube.com/embed');
-            }
+            this.abortController = new AbortController();
 
-            if (embed_url.includes('vimeo')) {
-                embed_url = embed_url.replace('/vimeo.com', '/player.vimeo.com/video');
+            this.$axios
+                .get(this.meta.url, { params: { value }, signal: this.abortController.signal })
+                .then((response) => {
+                    if (value !== this.value) return;
 
-                if (!this.value.includes('progressive_redirect') && embed_url.split('/').length > 5) {
-                    let hash = embed_url.substr(embed_url.lastIndexOf('/') + 1);
-                    embed_url = embed_url.substr(0, embed_url.lastIndexOf('/')) + '?h=' + hash.replace('?', '&');
-                }
-            }
+                    this.embedUrl = response.data.embed_url;
+                    this.provider = response.data.provider;
+                })
+                .catch((e) => {
+                    if (axios.isCancel(e)) return;
+                    if (value !== this.value) return;
 
-            if (embed_url.includes('&') && !embed_url.includes('?')) {
-                embed_url = embed_url.replace('&', '?');
-            }
-
-            return embed_url;
+                    this.embedUrl = null;
+                    this.$toast.error(e.response ? e.response.data.message : __('Something went wrong'));
+                });
         },
 
-        isEmbeddable() {
-            const url = this.value || '';
-            const isYoutube = url.includes('youtube') || url.includes('youtu.be');
-            const isVimeo = url.includes('vimeo');
-            return isYoutube || isVimeo;
+        updateCloudflareId(id) {
+            this.updateDebounced(id ? `${CLOUDFLARE_PREFIX}${id}` : null);
         },
 
-        isInvalid() {
-            let htmlRegex = new RegExp(/<([A-Z][A-Z0-9]*)\b[^>]*>.*?<\/\1>|<([A-Z][A-Z0-9]*)\b[^\/]*\/>/i);
-            return htmlRegex.test(this.value || '');
-        },
-
-        isUrl() {
-            const url = this.value || '';
-            return url.startsWith('http://') || url.startsWith('https://');
-        },
-
-        isVideo() {
-            const url = this.value || '';
-            const isVideo = url.includes('.mp4') || url.includes('.ogv') || url.includes('.mov') || url.includes('.webm');
-            return !this.isEmbeddable && isVideo;
+        updateUrl(url) {
+            this.updateDebounced(url || null);
         },
     },
 
@@ -107,7 +162,7 @@ export default {
                     }
                 });
             },
-            { threshold: 0.01 }
+            { threshold: 0.01 },
         );
 
         if (this.$el) {
@@ -118,6 +173,10 @@ export default {
     beforeUnmount() {
         if (this.observer) {
             this.observer.disconnect();
+        }
+
+        if (this.abortController) {
+            this.abortController.abort();
         }
     },
 };
