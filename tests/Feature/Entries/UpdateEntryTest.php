@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Event;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\EntrySaving;
+use Statamic\Events\RevisionSaving;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
@@ -586,6 +587,32 @@ class UpdateEntryTest extends TestCase
     }
 
     #[Test]
+    public function non_revisable_fields_are_not_saved_when_the_revision_is_cancelled()
+    {
+        [$user, $collection] = $this->seedUserAndCollection(true);
+
+        $this->seedBlueprintFields($collection, [
+            'foo' => ['type' => 'text', 'revisable' => false],
+        ]);
+
+        $entry = EntryFactory::id('1')
+            ->slug('test')
+            ->collection('test')
+            ->published(true)
+            ->data(['title' => 'Test', 'foo' => 'bar'])
+            ->create();
+
+        Event::listen(RevisionSaving::class, fn () => false);
+
+        $this
+            ->actingAs($user)
+            ->update($entry, ['foo' => 'not bar'])
+            ->assertOk();
+
+        $this->assertEquals('bar', $entry->fresh()->get('foo'));
+    }
+
+    #[Test]
     public function non_revisable_fields_are_not_removed_from_an_entry_without_an_origin()
     {
         [$user, $collection] = $this->seedUserAndCollection(true);
@@ -710,7 +737,6 @@ class UpdateEntryTest extends TestCase
         $this->assertFalse($localization->has('foo'));
         $this->assertEquals('bar', $localization->foo);
     }
-
 
     #[Test]
     public function it_can_validate_against_published_value()

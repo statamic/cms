@@ -259,7 +259,9 @@ class EntriesController extends CpController
                 ->save();
 
             // have to save in case there are non-revisable fields
-            $this->saveNonRevisableFields($entry, $request->input('_localized'));
+            if ($saved) {
+                $this->saveNonRevisableFields($entry, $request->input('_localized'));
+            }
 
             // catch any changes through RevisionSaving event
             $entry = $entry->fromWorkingCopy();
