@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use League\Flysystem\PathTraversalDetected;
 use League\Flysystem\UnableToReadFile;
 use League\Glide\Server;
 use League\Glide\Signatures\SignatureException;
@@ -93,7 +94,7 @@ class GlideController extends Controller
      */
     private function generateOnDemand(string $path)
     {
-        if (Glide::cacheDisk()->exists($path)) {
+        if ($this->existsInCache($path)) {
             Log::debug('Glide hybrid cache loaded ['.$path.'] If you are seeing this, your server rewrite rules have not been set up correctly.');
 
             return $this->createResponse($path);
@@ -113,6 +114,15 @@ class GlideController extends Controller
         };
 
         return $this->createResponse($this->ensureGenerated($type, $item, $params));
+    }
+
+    private function existsInCache(string $path): bool
+    {
+        try {
+            return Glide::cacheDisk()->exists($path);
+        } catch (PathTraversalDetected $e) {
+            throw new NotFoundHttpException;
+        }
     }
 
     /**

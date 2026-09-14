@@ -221,6 +221,15 @@ class GlideTest extends TestCase
 
     #[Test]
     #[DefineEnvironment('hybridCaching')]
+    public function hybrid_caching_returns_404_when_path_traverses_outside_the_cache()
+    {
+        $response = $this->get('/img/../../.env');
+
+        $response->assertNotFound();
+    }
+
+    #[Test]
+    #[DefineEnvironment('hybridCaching')]
     public function hybrid_caching_regenerates_when_file_deleted_but_mapping_exists()
     {
         Storage::fake('test');
