@@ -2,19 +2,44 @@
 
 namespace Statamic\Fieldtypes\Video;
 
-use Embera\ProviderCollection\SlimProviderCollection;
+use Embera\ProviderCollection\ProviderCollectionAdapter;
 
-class Providers extends SlimProviderCollection
+class Providers extends ProviderCollectionAdapter
 {
-    public static function get(): array
+    const CLOUDFLARE = 'cloudflare';
+    const FILE = 'file';
+    const UNSUPPORTED = 'unsupported';
+
+    protected static array $oembed = [
+        'Bunny',
+        'Coub',
+        'DailyMotion',
+        'Loom',
+        'Rumble',
+        'SproutVideo',
+        'Streamable',
+        'Ted',
+        'TikTok',
+        'Vidyard',
+        'Vimeo',
+        'Wistia',
+        'Youtube',
+    ];
+
+    public function __construct(array $config = [])
     {
-        return collect((new self)->providers)
-            ->unique()
-            ->values()
-            ->map(fn (string $class) => ['provider' => class_basename($class)])
-            ->add(['provider' => 'Cloudflare'])
-            ->sortBy('provider')
-            ->add(['provider' => 'Not Supported'])
+        parent::__construct($config);
+
+        $this->registerProvider(static::$oembed);
+    }
+
+    public static function options(): array
+    {
+        return collect(static::$oembed)
+            ->map(fn (string $provider) => ['value' => $provider, 'label' => $provider])
+            ->push(['value' => self::CLOUDFLARE, 'label' => __('Cloudflare Stream')])
+            ->push(['value' => self::FILE, 'label' => __('Video File')])
+            ->sortBy('label')
             ->values()
             ->all();
     }
