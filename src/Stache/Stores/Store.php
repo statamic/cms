@@ -424,6 +424,10 @@ abstract class Store
     {
         $valueIndexes = $this->resolveIndexes()->filter(fn ($index) => $this->isPerItemValueIndex($index));
 
+        if ($valueIndexes->isEmpty()) {
+            return;
+        }
+
         $accumulated = $valueIndexes->map(fn () => [])->all();
 
         foreach ($this->paths()->keys() as $key) {
