@@ -44,7 +44,7 @@ class FormsController extends CpController
                     'id' => $form->handle(),
                     'title' => __($form->title()),
                     'status' => $form->status(),
-                    'submissions' => $canViewSubmissions ? $form->querySubmissions()->where('site', Site::selected())->whereNull('partial')->count() : null,
+                    'submissions' => $canViewSubmissions ? $form->querySubmissions()->where('site', Site::selected())->whereStatus('finalized')->count() : null,
                     'show_url' => $form->showUrl(),
                     'submissions_url' => $form->submissionsUrl(),
                     'edit_url' => $form->editUrl(),
@@ -196,12 +196,22 @@ class FormsController extends CpController
                     ],
                 ],
             ],
-            'fields' => [
-                'display' => __('Fields'),
+            'honeypot' => [
+                'display' => __('Honeypot'),
                 'fields' => [
                     'honeypot' => [
                         'type' => 'text',
                         'instructions' => __('statamic::messages.form_configure_honeypot_instructions'),
+                    ],
+                    'honeypot_behavior' => [
+                        'display' => __('Honeypot Behavior'),
+                        'type' => 'button_group',
+                        'default' => 'ignore',
+                        'options' => [
+                            'ignore' => __('Ignore'),
+                            'mark_as_spam' => __('Save as Spam'),
+                        ],
+                        'instructions' => __('statamic::messages.form_configure_honeypot_behavior_instructions'),
                     ],
                 ],
             ],
