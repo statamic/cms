@@ -347,6 +347,10 @@ export default {
             this.$emit('changed', this.pages);
         },
 
+        depthOf(page) {
+            return this.$refs.tree.getStat(page).level;
+        },
+
         expandAll() {
             this.$refs.tree.openAll();
             this.collapsedState = [];

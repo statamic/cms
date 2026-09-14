@@ -14,6 +14,8 @@ const props = defineProps({
     icon: { type: String, default: null },
     /** When `false`, no icon is shown unless the `icon` prop is set. */
     iconFallback: { type: Boolean, default: true },
+    /** Announce the alert to screen readers as a live region. Disable for static content that is present when the page loads. */
+    live: { type: Boolean, default: true },
 });
 
 const alertRole = computed(() => {
@@ -101,8 +103,8 @@ const resolvedIcon = computed(() => {
 <template>
     <div
         :class="alertClasses"
-        :role="alertRole"
-        :aria-live="ariaLive"
+        :role="live ? alertRole : undefined"
+        :aria-live="live ? ariaLive : undefined"
         data-ui-alert
         :data-variant="variant"
     >
