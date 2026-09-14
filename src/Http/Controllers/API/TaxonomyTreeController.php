@@ -16,6 +16,10 @@ class TaxonomyTreeController extends ApiController
 
         throw_unless($taxonomy->hasStructure(), new NotFoundHttpException("Taxonomy [{$taxonomy->handle()}] is not a structured taxonomy"));
 
+        if ($site = $this->requestedSite()) {
+            throw_unless($taxonomy->sites()->contains($site), new NotFoundHttpException("Taxonomy [{$taxonomy->handle()}] not found in [{$site}] site"));
+        }
+
         return app(TaxonomyTreeResource::class)::make($taxonomy)
             ->fields($this->queryParam('fields'))
             ->maxDepth($this->queryParam('max_depth'))

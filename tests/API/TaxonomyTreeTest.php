@@ -23,9 +23,9 @@ class TaxonomyTreeTest extends TestCase
         Facades\Config::set('statamic.api.resources.taxonomies', true);
     }
 
-    private function makeHierarchicalTaxonomy()
+    private function makeHierarchicalTaxonomy($sites = ['en'])
     {
-        tap(Taxonomy::make('categories')->structureContents([]))->save();
+        tap(Taxonomy::make('categories')->sites($sites)->structureContents([]))->save();
 
         foreach (['animals', 'cat', 'furniture'] as $slug) {
             tap(Term::make($slug)->taxonomy('categories')->data(['title' => ucfirst($slug)]))->save();
@@ -73,6 +73,31 @@ class TaxonomyTreeTest extends TestCase
         tap(Taxonomy::make('tags'))->save();
 
         $this->get('/api/taxonomies/tags/tree')->assertNotFound();
+    }
+
+    #[Test]
+    public function it_404s_when_the_requested_site_doesnt_exist()
+    {
+        $this->makeHierarchicalTaxonomy();
+
+        $this->get('/api/taxonomies/categories/tree?site=en')->assertSuccessful();
+
+        $this->get('/api/taxonomies/categories/tree?site=totally-bogus')->assertNotFound();
+    }
+
+    #[Test]
+    public function it_404s_when_the_taxonomy_isnt_available_in_the_requested_site()
+    {
+        $this->setSites([
+            'en' => ['name' => 'English', 'url' => 'http://localhost/', 'locale' => 'en_US'],
+            'de' => ['name' => 'German', 'url' => 'http://localhost/de/', 'locale' => 'de_DE'],
+        ]);
+
+        $this->makeHierarchicalTaxonomy(['en']);
+
+        $this->get('/api/taxonomies/categories/tree?site=en')->assertSuccessful();
+
+        $this->get('/api/taxonomies/categories/tree?site=de')->assertNotFound();
     }
 
     #[Test]
