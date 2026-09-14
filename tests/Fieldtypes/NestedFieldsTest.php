@@ -23,6 +23,7 @@ class NestedFieldsTest extends TestCase
             ->andReturn(new class extends Fieldtype
             {
                 protected $component = 'assets';
+
                 protected $configFields = [
                     'max_files' => ['type' => 'integer'],
                     'container' => ['type' => 'plain'],
@@ -85,6 +86,7 @@ class NestedFieldsTest extends TestCase
                 'replicator_preview' => true,
                 'duplicate' => true,
                 'actions' => true,
+                'revisable' => true,
                 'type' => 'assets',
                 'max_files' => 2,
                 'container' => 'main',
