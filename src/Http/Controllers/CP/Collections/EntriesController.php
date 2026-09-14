@@ -558,6 +558,6 @@ class EntriesController extends CpController
 
         $removed->each(fn ($handle) => $fresh->remove($handle));
 
-        $fresh->save();
+        $fresh->updateLastModified(User::current())->save();
     }
 }
