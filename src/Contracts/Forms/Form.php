@@ -59,8 +59,18 @@ interface Form extends Arrayable
      */
     public function honeypot($honeypot = null);
 
+    //     /**
+    //      * Get or set the connection configs.
+    //      *
+    //      * @param  mixed  $connections
+    //      * @return \Illuminate\Support\Collection
+    //      */
+    //     public function connections($connections = null);
+
     /**
      * Get or set the email config.
+     *
+     * @deprecated Use connections() instead.
      *
      * @param  array|null  $email
      * @return array
