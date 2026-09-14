@@ -42,10 +42,6 @@ class FormFieldTransformer extends FieldTransformer
                     return true;
                 }
 
-                if ($key === 'icon' && ! $fields->has('icon')) {
-                    return true;
-                }
-
                 if ($key === 'hidden' && $value === false) {
                     return true;
                 }

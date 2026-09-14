@@ -9,6 +9,7 @@ use Statamic\CP\Column;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
 use Statamic\Facades\FormConnection;
+use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Controllers\CP\Forms\Concerns\ProvidesFormAbilities;
@@ -49,7 +50,7 @@ class FormsController extends CpController
                     'id' => $form->handle(),
                     'title' => __($form->title()),
                     'status' => $form->status(),
-                    'submissions' => $canViewSubmissions ? $form->querySubmissions()->whereNull('partial')->count() : null,
+                    'submissions' => $canViewSubmissions ? $form->querySubmissions()->where('site', Site::selected())->whereNull('partial')->count() : null,
                     'connections' => $canEdit ? FormConnection::all()->sum(fn ($connection) => $connection->count($form) ?? 0) : null,
                     'show_url' => $form->showUrl(),
                     'submissions_url' => $form->submissionsUrl(),

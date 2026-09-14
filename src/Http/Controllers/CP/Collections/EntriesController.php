@@ -271,6 +271,7 @@ class EntriesController extends CpController
         return [
             'data' => array_merge((new EntryResource($entry->fresh()))->resolve()['data'], [
                 'values' => $values,
+                'meta' => $meta,
                 'extraValues' => $extraValues,
             ]),
             'saved' => $saved,

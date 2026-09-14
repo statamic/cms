@@ -93,6 +93,7 @@ export default {
         blueprint: Object,
         handle: String,
         editEntryUrl: String,
+        depth: Number,
         creating: Boolean,
         readOnly: Boolean,
     },
@@ -284,7 +285,7 @@ export default {
             this.originValues = info.originValues;
             this.meta = info.meta;
             this.originMeta = info.originMeta;
-            this.extraValues = info.extraValues;
+            this.extraValues = { ...info.extraValues, depth: this.depth };
             this.localizedFields = info.localizedFields;
         },
 
