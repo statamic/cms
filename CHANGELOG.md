@@ -1,5 +1,44 @@
 # Release Notes
 
+## 6.32.0 (2026-09-09)
+
+### What's new
+- Include Tag [#15182](https://github.com/statamic/cms/issues/15182) by @JohnathonKoster
+- Add `tip` Alert variant [#15367](https://github.com/statamic/cms/issues/15367) by @joshuablum
+- Add video asset extensions [#15378](https://github.com/statamic/cms/issues/15378) by @daun
+
+### What's fixed
+- Trim asset border in small spaces [#15348](https://github.com/statamic/cms/issues/15348) by @jaygeorge
+- Fix taxonomy min_count parameter calculation [#15344](https://github.com/statamic/cms/issues/15344) by @ryanmitchell
+- Fix "Can't clear fields on user when storing users in a database" [#15346](https://github.com/statamic/cms/issues/15346) by @ryanmitchell
+- Add missing validation messages from laravel [#15345](https://github.com/statamic/cms/issues/15345) by @ryanmitchell
+- Fix custom term templates on collection-scoped term URLs [#15351](https://github.com/statamic/cms/issues/15351) by @duncanmcclean
+- Fix `whereDate()` and `whereTime()` when the app timezone is not UTC [#15338](https://github.com/statamic/cms/issues/15338) by @lazerg
+- Honour the COMPOSER env var when locating composer.json and its lock file [#15362](https://github.com/statamic/cms/issues/15362) by @duncanmcclean
+- Fix Antlers directives being ignored after multibyte text/escape sequences [#15374](https://github.com/statamic/cms/issues/15374) by @JohnathonKoster
+- Fix Antlers interpolation selection [#15375](https://github.com/statamic/cms/issues/15375) by @JohnathonKoster
+- Antlers Parser Performance Improvements [#15377](https://github.com/statamic/cms/issues/15377) by @JohnathonKoster
+- Update npm dependencies [#15380](https://github.com/statamic/cms/issues/15380) by @jasonvarga
+- Prevent server error when renaming asset that doesn't exist [#15340](https://github.com/statamic/cms/issues/15340) by @ryanmitchell
+- Fix named slots rendering empty inside nested partials [#15341](https://github.com/statamic/cms/issues/15341) by @duncanmcclean
+- Sort strings naturally [#15383](https://github.com/statamic/cms/issues/15383) by @duncanmcclean
+- Reduce class autoloading during boot [#15381](https://github.com/statamic/cms/issues/15381) by @duncanmcclean
+- Fix nested `<li>` in the CP nav [#15402](https://github.com/statamic/cms/issues/15402) by @bpmore
+- Give modals a dialog role and accessible name [#15414](https://github.com/statamic/cms/issues/15414) by @lazerg
+- Add a text alternative to the status indicator dot [#15413](https://github.com/statamic/cms/issues/15413) by @lazerg
+- Fix ARIA roles on the combobox trigger [#15405](https://github.com/statamic/cms/issues/15405) by @lazerg
+- Add alt to asset browser thumbnails [#15404](https://github.com/statamic/cms/issues/15404) by @bpmore
+- Expose aria-sort on sortable listing column headers [#15403](https://github.com/statamic/cms/issues/15403) by @bpmore
+- Increase the hit area of the breadcrumb options button [#15417](https://github.com/statamic/cms/issues/15417) by @lazerg
+- Fix `page: 0` corrupting the collection tree in ReorderEntriesController [#15429](https://github.com/statamic/cms/issues/15429) by @jasonvarga
+- Fix Composer script events crashing when locating composer.json [#15434](https://github.com/statamic/cms/issues/15434) by @jasonvarga
+- Stop asset field controls overflowing in narrow fields [#15436](https://github.com/statamic/cms/issues/15436) by @lazerg
+- Fix fields overflowing narrow groups [#15420](https://github.com/statamic/cms/issues/15420) by @eminos
+- French translations [#15379](https://github.com/statamic/cms/issues/15379) by @ebeauchamps
+- German Translations [#15339](https://github.com/statamic/cms/issues/15339) by @helloDanuk
+
+
+
 ## 6.31.0 (2026-09-01)
 
 ### What's new
