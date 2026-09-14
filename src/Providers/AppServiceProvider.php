@@ -60,7 +60,10 @@ class AppServiceProvider extends ServiceProvider
             ->pushMiddleware(\Statamic\Http\Middleware\CheckComposerJsonScripts::class)
             ->pushMiddleware(\Statamic\Http\Middleware\CheckMultisite::class)
             ->pushMiddleware(\Statamic\Http\Middleware\StopImpersonating::class)
-            ->pushMiddleware(PingOutpost::class);
+            ->pushMiddleware(PingOutpost::class)
+            // Prepended so the snapshot runs before any middleware that could
+            // throw and render a page (which would register json variables).
+            ->prependMiddleware(\Statamic\Http\Middleware\SnapshotJsonVariables::class);
 
         $this->loadViewsFrom("{$this->root}/resources/views", 'statamic');
 

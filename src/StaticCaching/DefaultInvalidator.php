@@ -11,6 +11,7 @@ use Statamic\Contracts\Globals\Variables;
 use Statamic\Contracts\Structures\Nav;
 use Statamic\Contracts\Structures\NavTree;
 use Statamic\Contracts\Structures\TaxonomyTree;
+use Statamic\Facades;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
@@ -273,6 +274,8 @@ class DefaultInvalidator implements Invalidator
     {
         $rules = $this->parseInvalidationRules(Arr::get($this->rules, "collections.{$tree->collection()->handle()}.urls", []));
 
+        $urls = $this->getMovedEntryUrls($tree);
+
         $absoluteUrls = $rules->filter(fn (string $rule) => URL::isAbsolute($rule))->all();
 
         $prefixedRelativeUrls = $rules
@@ -281,9 +284,22 @@ class DefaultInvalidator implements Invalidator
             ->all();
 
         return [
+            ...$urls,
             ...$absoluteUrls,
             ...$prefixedRelativeUrls,
         ];
+    }
+
+    private function getMovedEntryUrls($tree)
+    {
+        return collect($tree->diff()->ancestryChanged())
+            ->map(fn ($id) => Facades\Entry::find($id))
+            ->filter()
+            ->reject(fn ($entry) => $entry->isRedirect())
+            ->map->absoluteUrl()
+            ->filter()
+            ->values()
+            ->all();
     }
 
     protected function getTaxonomyTreeUrls($tree)
