@@ -62,6 +62,10 @@ class GlideCachePathResolver
 
     private function resolve(string $image, array $params, string $sourcePathPrefix, string $cachePathPrefix, ?Asset $asset = null): string
     {
+        if (isset($params['mark'])) {
+            $params['mark'] = ImageGenerator::watermarkParam($params['mark']);
+        }
+
         $origSourcePrefix = $this->server->getSourcePathPrefix();
         $origCachePrefix = $this->server->getCachePathPrefix();
         $origDefaults = $this->server->getDefaults();

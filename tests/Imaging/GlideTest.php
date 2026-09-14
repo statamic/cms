@@ -176,6 +176,29 @@ class GlideTest extends TestCase
 
     #[Test]
     #[DefineEnvironment('hybridCaching')]
+    public function hybrid_caching_generates_watermarked_image_at_the_predicted_path()
+    {
+        Storage::fake('test');
+        Storage::disk('test')->putFileAs('foo', UploadedFile::fake()->image('hoff.jpg', 30, 60), 'hoff.jpg');
+        Storage::disk('test')->putFileAs('foo', UploadedFile::fake()->image('mark.png', 10, 10), 'mark.png');
+        $container = tap(AssetContainer::make('test_container')->disk('test'))->save();
+        $asset = tap($container->makeAsset('foo/hoff.jpg'))->save();
+        $watermark = tap($container->makeAsset('foo/mark.png'))->save();
+
+        $url = $this->app->make(UrlBuilder::class)->build($asset, ['w' => 100, 'mark' => $watermark]);
+        $expectedPath = Str::after($url, '/img/');
+
+        $this->assertFalse(Glide::cacheDisk()->exists($expectedPath));
+
+        $response = $this->get($url);
+
+        $response->assertOk();
+        $response->streamedContent();
+        $this->assertTrue(Glide::cacheDisk()->exists($expectedPath));
+    }
+
+    #[Test]
+    #[DefineEnvironment('hybridCaching')]
     public function hybrid_caching_serves_existing_cached_file()
     {
         $fakePath = 'containers/test/fake-hash/image.jpg';

@@ -6,7 +6,6 @@ use Statamic\Contracts\Assets\Asset;
 use Statamic\Facades\Asset as Assets;
 use Statamic\Facades\Glide;
 use Statamic\Facades\URL;
-use Statamic\Support\Str;
 
 class HybridUrlBuilder extends ImageUrlBuilder
 {
@@ -37,14 +36,9 @@ class HybridUrlBuilder extends ImageUrlBuilder
             $this->item = $this->findAsset($item);
         }
 
-        if (isset($params['mark']) && $params['mark'] instanceof Asset) {
-            $asset = $params['mark'];
-            $params['mark'] = 'asset::'.Str::toBase64Url($asset->containerId().'/'.$asset->path());
-        }
-
         $cachePath = $this->resolver->resolveForItem($this->item, $params);
 
-        $this->cacheSource($cachePath, $params);
+        $this->cacheSource($cachePath, $this->withEncodedWatermark($params));
 
         $urlPath = URL::tidy($this->options['route'].'/'.$cachePath, withTrailingSlash: false);
 

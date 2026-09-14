@@ -227,32 +227,54 @@ class ImageGenerator
 
     private function setUpWatermark($watermark): string
     {
-        [$filesystem, $param] = $this->getWatermarkFilesystemAndParam($watermark);
+        $watermark = static::decodeWatermark($watermark);
 
-        $this->updateWatermarkFilesystem($filesystem);
+        $this->updateWatermarkFilesystem($this->watermarkFilesystem($watermark));
 
-        return $param;
+        return static::watermarkParam($watermark);
     }
 
-    private function getWatermarkFilesystemAndParam($item)
+    /**
+     * The `mark` param as Glide will see it, which is what the cache path is hashed from.
+     */
+    public static function watermarkParam($watermark): string
     {
-        if (is_string($item) && Str::startsWith($item, 'asset::')) {
-            $decoded = Str::fromBase64Url(Str::after($item, 'asset::'));
-            [$container, $path] = explode('/', $decoded, 2);
-            $item = Assets::find($container.'::'.$path);
+        $watermark = static::decodeWatermark($watermark);
+
+        if ($watermark instanceof Asset) {
+            return $watermark->path();
         }
 
-        if ($item instanceof Asset) {
-            return [$item->disk()->filesystem()->getDriver(), $item->path()];
+        if (URL::isAbsolute($watermark)) {
+            return app(RemoteUrlValidator::class)->parse($watermark)['path'];
         }
 
-        if (URL::isAbsolute($item)) {
-            $parsed = $this->parseUrl($item);
+        return $watermark;
+    }
 
-            return [$this->guzzleSourceFilesystem($parsed['base']), $parsed['path']];
+    private static function decodeWatermark($watermark)
+    {
+        if (! is_string($watermark) || ! Str::startsWith($watermark, 'asset::')) {
+            return $watermark;
         }
 
-        return [$this->pathSourceFilesystem(), $item];
+        $decoded = Str::fromBase64Url(Str::after($watermark, 'asset::'));
+        [$container, $path] = explode('/', $decoded, 2);
+
+        return Assets::find($container.'::'.$path);
+    }
+
+    private function watermarkFilesystem($watermark)
+    {
+        if ($watermark instanceof Asset) {
+            return $watermark->disk()->filesystem()->getDriver();
+        }
+
+        if (URL::isAbsolute($watermark)) {
+            return $this->guzzleSourceFilesystem($this->parseUrl($watermark)['base']);
+        }
+
+        return $this->pathSourceFilesystem();
     }
 
     private function updateWatermarkFilesystem($filesystem)
