@@ -473,7 +473,6 @@ class GlideTest extends TestCase
     {
         $app['config']->set('statamic.assets.image_manipulation.cache', 'hybrid');
         $app['config']->set('statamic.assets.image_manipulation.cache_path', storage_path('glide-test-cache'));
-        $app['config']->set('statamic.assets.image_manipulation.secure', false);
         $app['config']->set('statamic.assets.image_manipulation.route', 'img');
     }
 }
