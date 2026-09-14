@@ -18,6 +18,7 @@ class Video implements Arrayable, ArrayAccess, Boolable, JsonSerializable
     const CACHE_TTL = 3600;
     const CLOUDFLARE_PREFIX = 'cloudflare:';
     const CLOUDFLARE_EMBED_URL = 'https://iframe.cloudflarestream.com/';
+    const CLOUDFLARE_ID_PATTERN = '/^[a-zA-Z0-9]+$/';
 
     public static function fromValue(?string $value): self
     {
@@ -28,9 +29,9 @@ class Video implements Arrayable, ArrayAccess, Boolable, JsonSerializable
         if (Str::startsWith($value, self::CLOUDFLARE_PREFIX)) {
             $id = Str::after($value, self::CLOUDFLARE_PREFIX);
 
-            return blank($id)
-                ? static::unsupported($value)
-                : new self(Providers::CLOUDFLARE, $value, self::CLOUDFLARE_EMBED_URL.$id, $id);
+            return preg_match(self::CLOUDFLARE_ID_PATTERN, $id)
+                ? new self(Providers::CLOUDFLARE, $value, self::CLOUDFLARE_EMBED_URL.$id, $id)
+                : static::unsupported($value);
         }
 
         if (static::isVideoFile($value)) {

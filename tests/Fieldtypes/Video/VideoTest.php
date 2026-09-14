@@ -29,6 +29,8 @@ class VideoTest extends TestCase
             'vimeo' => ['https://vimeo.com/22439234', 'Vimeo', null, 'https://player.vimeo.com/video/22439234'],
             'cloudflare' => ['cloudflare:1234', 'cloudflare', '1234', 'https://iframe.cloudflarestream.com/1234'],
             'cloudflare without an id' => ['cloudflare:', 'unsupported', null, null],
+            'cloudflare with a malformed id' => ['cloudflare:1234"></iframe><script>alert(1)</script>', 'unsupported', null, null],
+            'cloudflare with a path traversal id' => ['cloudflare:../../evil', 'unsupported', null, null],
             'mp4 file' => ['https://example.com/clip.mp4', 'file', null, 'https://example.com/clip.mp4'],
             'uppercase file extension' => ['https://example.com/clip.MOV', 'file', null, 'https://example.com/clip.MOV'],
             'file with a query string' => ['https://example.com/clip.webm?t=1', 'file', null, 'https://example.com/clip.webm?t=1'],
