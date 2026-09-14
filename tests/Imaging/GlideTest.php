@@ -2,6 +2,9 @@
 
 namespace Tests\Imaging;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\Psr7\Response;
 use Illuminate\Cache\FileStore;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\UploadedFile;
@@ -25,6 +28,7 @@ use Statamic\Imaging\GlideCachePathResolver;
 use Statamic\Imaging\GlideUrlBuilder;
 use Statamic\Imaging\HybridUrlBuilder;
 use Statamic\Imaging\ImageGenerator;
+use Statamic\Imaging\RemoteUrlValidator;
 use Statamic\Imaging\StaticUrlBuilder;
 use Statamic\Providers\GlideServiceProvider;
 use Statamic\Support\Str;
@@ -206,6 +210,35 @@ class GlideTest extends TestCase
     }
 
     #[Test]
+    #[DataProvider('remoteUrlProvider')]
+    public function hybrid_caching_predicted_path_matches_generated_path_for_a_url($url)
+    {
+        config(['statamic.assets.image_manipulation.cache' => false]);
+
+        $this->bindRemoteImage();
+
+        $server = $this->app->make(Server::class);
+        $resolver = new GlideCachePathResolver($server);
+
+        $params = ['w' => 100, 'h' => 50];
+
+        $predictedPath = $resolver->resolveForUrl($url, $params);
+
+        $generator = new ImageGenerator($server);
+        $generatedPath = $generator->generateByUrl($url, $params);
+
+        $this->assertEquals($generatedPath, $predictedPath);
+    }
+
+    public static function remoteUrlProvider()
+    {
+        return [
+            'plain' => ['https://example.com/foo/hoff.jpg'],
+            'with query string' => ['https://example.com/foo/hoff.jpg?query=david'],
+        ];
+    }
+
+    #[Test]
     #[DefineEnvironment('hybridCaching')]
     public function hybrid_caching_generates_image_on_first_request()
     {
@@ -351,6 +384,34 @@ class GlideTest extends TestCase
         $expectedPath = $resolver->resolveForAsset($asset, ['w' => 100]);
 
         $this->assertFalse(Glide::cacheDisk()->exists($expectedPath));
+
+        $response = $this->get($url);
+
+        $response->assertOk();
+        $response->assertHeader('content-type', 'image/jpeg');
+        $this->assertTrue(Glide::cacheDisk()->exists($expectedPath));
+    }
+
+    #[Test]
+    #[DefineEnvironment('hybridCaching')]
+    public function hybrid_caching_generates_image_on_first_request_by_url()
+    {
+        $this->app->bind(RemoteUrlValidator::class, fn () => new RemoteUrlValidator(function () {
+            throw new \Exception('The host should not be resolved when building a URL.');
+        }));
+
+        $url = $this->app->make(UrlBuilder::class)->build('https://example.com/foo/hoff.jpg', ['w' => 100]);
+        $expectedPath = Str::after($url, '/img/');
+
+        $this->assertStringStartsWith('/img/http/foo/hoff.jpg/', $url);
+        $this->assertSame([
+            'type' => 'url',
+            'url' => 'https://example.com/foo/hoff.jpg',
+            'params' => ['w' => 100],
+        ], Glide::cacheStore()->get('hybrid::'.$expectedPath));
+        $this->assertFalse(Glide::cacheDisk()->exists($expectedPath));
+
+        $this->bindRemoteImage();
 
         $response = $this->get($url);
 
@@ -579,6 +640,18 @@ class GlideTest extends TestCase
         }
 
         return collect(array_merge([$manifestCacheKey], $manifest));
+    }
+
+    private function bindRemoteImage()
+    {
+        $this->app->bind(RemoteUrlValidator::class, fn () => new RemoteUrlValidator(fn () => [['ip' => '93.184.216.34']]));
+
+        $this->app->bind('statamic.imaging.guzzle', function () {
+            $file = UploadedFile::fake()->image('', 30, 60);
+            $response = new Response(200, [], file_get_contents($file->getPathname()));
+
+            return new Client(['handler' => new MockHandler([$response, $response, $response])]);
+        });
     }
 
     protected function hybridCaching($app)
