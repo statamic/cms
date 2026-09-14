@@ -3,6 +3,7 @@
 namespace Tests\Modifiers;
 
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Fieldtypes\Video\Video;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
@@ -110,6 +111,20 @@ class EmbedUrlTest extends TestCase
             'https://www.youtube-nocookie.com/embed/hyJ7CBs_2RQ?start=2&pp=player_params',
             $this->embed('https://www.youtube.com/watch?v=hyJ7CBs_2RQ&t=2&pp=player_params'),
             'It transforms the start time parameter of full youtube links with additional query string params'
+        );
+    }
+
+    #[Test]
+    public function it_gets_the_embed_url_from_an_augmented_video_value()
+    {
+        $this->assertEquals(
+            'https://iframe.cloudflarestream.com/1234',
+            $this->embed(Video::fromValue('cloudflare:1234')),
+        );
+
+        $this->assertEquals(
+            'https://player.vimeo.com/video/22439234',
+            $this->embed(Video::fromValue('https://vimeo.com/22439234')),
         );
     }
 

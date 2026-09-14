@@ -18,27 +18,18 @@ class Video extends Fieldtype
             return null;
         }
 
-        if (str($value)->isUrl()) {
-            return $value;
-        }
-
-        //otherwise assume it's a Cloudflare ID
-        return str($value)->afterLast(':')->value();
+        return VideoDetails::fromValue($value);
     }
 
     public function preload()
     {
         $meta = [
-            'providers' => Providers::get(),
+            'providers' => Providers::options(),
             'url' => cp_route('video.details'),
         ];
 
-        if (! is_null($url = $this->field()->value())) {
-            $video = VideoDetails::fromUrl($url);
-
-            /** @todo Fetch these from some repository so folks can add their own */
-            $meta['embed'] = $video->embed;
-            $meta['provider'] = $video->provider;
+        if (! is_null($value = $this->field()->value())) {
+            $meta['video'] = VideoDetails::fromValue($value)->toArray();
         }
 
         return $meta;
