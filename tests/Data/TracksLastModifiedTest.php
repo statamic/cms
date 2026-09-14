@@ -38,6 +38,8 @@ class TracksLastModifiedTest extends TestCase
     #[Test]
     public function it_gets_last_updated_at_from_file()
     {
+        $this->freezeTime();
+
         $this->assertFalse($this->entry->has('updated_at'));
         $this->assertEquals($this->entry->fileLastModified()->timestamp, $this->entry->lastModified()->timestamp);
     }

@@ -2,6 +2,8 @@
 
 namespace Statamic\Tags;
 
+use function Statamic\trans as __;
+
 class Trans extends Tags
 {
     /**

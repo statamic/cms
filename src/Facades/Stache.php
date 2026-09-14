@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static mixed defaultSite()
  * @method static self registerStore(\Statamic\Stache\Stores\Store $store)
  * @method static self registerStores(array $stores)
- * @method static mixed stores()
+ * @method static \Illuminate\Support\Collection<string, \Statamic\Stache\Stores\Store> stores()
  * @method static mixed store($key)
  * @method static \Illuminate\Contracts\Cache\Store cacheStore()
  * @method static string generateId()

@@ -5,6 +5,8 @@ namespace Statamic\Query\Scopes\Filters\Fields;
 use Illuminate\Support\Carbon;
 use Statamic\Support\Arr;
 
+use function Statamic\trans as __;
+
 class Date extends FieldtypeFilter
 {
     public function fieldItems()
@@ -23,22 +25,20 @@ class Date extends FieldtypeFilter
             ],
             'value' => [
                 'type' => 'date',
-                'inline' => true,
                 'full_width' => true,
+                'clearable' => false,
                 'if' => [
                     'operator' => 'contains_any >, <',
                 ],
-                'required' => false,
             ],
             'range_value' => [
                 'type' => 'date',
-                'inline' => true,
                 'mode' => 'range',
                 'full_width' => true,
+                'clearable' => false,
                 'if' => [
                     'operator' => 'between',
                 ],
-                'required' => false,
             ],
         ];
     }
@@ -67,12 +67,34 @@ class Date extends FieldtypeFilter
     {
         $field = $this->fieldtype->field()->display();
         $operator = $values['operator'];
-        $translatedOperator = Arr::get($this->fieldItems(), "operator.options.{$operator}");
+        $translatedOperator = strtolower(Arr::get($this->fieldItems(), "operator.options.{$operator}"));
 
-        if ($operator == 'between') {
-            return $field.' '.strtolower($translatedOperator).' '.$values['range_value']['start'].' '.__('and').' '.$values['range_value']['end'];
+        $value = ($operator == 'between')
+            ? [
+                'start' => Carbon::parse($values['range_value']['start'])->toIso8601ZuluString('millisecond'),
+                'end' => Carbon::parse($values['range_value']['end'])->toIso8601ZuluString('millisecond'),
+            ]
+            : Carbon::parse(Arr::get($values, 'value'))->toIso8601ZuluString('millisecond');
+
+        return compact('field', 'operator', 'translatedOperator', 'value');
+    }
+
+    public function isComplete($values): bool
+    {
+        $values = Arr::removeNullValues($values);
+
+        if (! $operator = Arr::get($values, 'operator')) {
+            return false;
         }
 
-        return $field.' '.strtolower($translatedOperator).' '.$values['value'];
+        if (in_array($operator, ['null', 'not-null'])) {
+            return true;
+        }
+
+        if ($operator === 'between') {
+            return Arr::has($values, 'range_value.start') && Arr::has($values, 'range_value.end');
+        }
+
+        return Arr::has($values, 'value');
     }
 }

@@ -79,12 +79,16 @@ class Duplicates
 
     public function find()
     {
+        $lock = tap($this->stache->lock('stache-warming'))->acquire(true);
+
         $this->stache->stores()->flatMap(function ($store) {
             return $store instanceof AggregateStore ? $store->discoverStores() : [$store];
         })->each(function ($store) {
             $store->clearCachedPaths();
             $store->paths();
         });
+
+        $lock->release();
 
         return $this;
     }

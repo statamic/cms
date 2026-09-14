@@ -8,7 +8,7 @@ class JsonExporter extends Exporter
 
     public function export(): string
     {
-        $submissions = $this->form->submissions()->toArray();
+        $submissions = $this->submissions()->toArray();
 
         return json_encode($submissions);
     }

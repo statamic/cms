@@ -35,7 +35,7 @@ export default function choose(message, number, locale) {
     return messageParts[pluralForm];
 }
 
-const getPluralForm = function(count, locale) {
+const getPluralForm = function (count, locale) {
     // For regional locales with dashes, we just need the main part of the locale
     // e.g. For de_CH we just want de.
     if (locale.includes('_')) {
@@ -110,9 +110,7 @@ const getPluralForm = function(count, locale) {
         case 'tk':
         case 'ur':
         case 'zu':
-            return (count == 1)
-                ? 0
-                : 1;
+            return count == 1 ? 0 : 1;
 
         case 'am':
         case 'bh':
@@ -127,9 +125,7 @@ const getPluralForm = function(count, locale) {
         case 'xbr':
         case 'ti':
         case 'wa':
-            return ((count === 0) || (count === 1))
-                ? 0
-                : 1;
+            return count === 0 || count === 1 ? 0 : 1;
 
         case 'be':
         case 'bs':
@@ -137,99 +133,69 @@ const getPluralForm = function(count, locale) {
         case 'ru':
         case 'sr':
         case 'uk':
-            return ((count % 10 == 1) && (count % 100 != 11))
+            return count % 10 == 1 && count % 100 != 11
                 ? 0
-                : (((count % 10 >= 2) && (count % 10 <= 4) && ((count % 100 < 10) || (count % 100 >= 20)))
-                    ? 1
-                    : 2);
+                : count % 10 >= 2 && count % 10 <= 4 && (count % 100 < 10 || count % 100 >= 20)
+                  ? 1
+                  : 2;
 
         case 'cs':
         case 'sk':
-            return (count == 1)
-                ? 0
-                : (((count >= 2) && (count <= 4))
-                    ? 1
-                    : 2);
+            return count == 1 ? 0 : count >= 2 && count <= 4 ? 1 : 2;
 
         case 'ga':
-            return (count == 1)
-                ? 0
-                : ((count == 2)
-                    ? 1
-                    : 2);
+            return count == 1 ? 0 : count == 2 ? 1 : 2;
 
         case 'lt':
-            return ((count % 10 == 1) && (count % 100 != 11))
+            return count % 10 == 1 && count % 100 != 11
                 ? 0
-                : (((count % 10 >= 2) && ((count % 100 < 10) || (count % 100 >= 20)))
-                    ? 1
-                    : 2);
+                : count % 10 >= 2 && (count % 100 < 10 || count % 100 >= 20)
+                  ? 1
+                  : 2;
 
         case 'sl':
-            return (count % 100 == 1)
-                ? 0
-                : ((count % 100 == 2)
-                    ? 1
-                    : (((count % 100 == 3) || (count % 100 == 4))
-                        ? 2
-                        : 3));
+            return count % 100 == 1 ? 0 : count % 100 == 2 ? 1 : count % 100 == 3 || count % 100 == 4 ? 2 : 3;
 
         case 'mk':
-            return (count % 10 == 1)
-                ? 0
-                : 1;
+            return count % 10 == 1 ? 0 : 1;
 
         case 'mt':
-            return (count == 1)
+            return count == 1
                 ? 0
-                : (((count === 0) || ((count % 100 > 1) && (count % 100 < 11)))
-                    ? 1
-                    : (((count % 100 > 10) && (count % 100 < 20))
-                        ? 2
-                        : 3));
+                : count === 0 || (count % 100 > 1 && count % 100 < 11)
+                  ? 1
+                  : count % 100 > 10 && count % 100 < 20
+                    ? 2
+                    : 3;
 
         case 'lv':
-            return (count === 0)
-                ? 0
-                : (((count % 10 == 1) && (count % 100 != 11))
-                    ? 1
-                    : 2);
+            return count === 0 ? 0 : count % 10 == 1 && count % 100 != 11 ? 1 : 2;
 
         case 'pl':
-            return (count == 1)
+            return count == 1
                 ? 0
-                : (((count % 10 >= 2) && (count % 10 <= 4) && ((count % 100 < 12) || (count % 100 > 14)))
-                    ? 1
-                    : 2);
+                : count % 10 >= 2 && count % 10 <= 4 && (count % 100 < 12 || count % 100 > 14)
+                  ? 1
+                  : 2;
 
         case 'cy':
-            return (count == 1)
-                ? 0
-                : ((count == 2)
-                    ? 1
-                    : (((count == 8) || (count == 11))
-                        ? 2
-                        : 3));
+            return count == 1 ? 0 : count == 2 ? 1 : count == 8 || count == 11 ? 2 : 3;
 
         case 'ro':
-            return (count == 1)
-                ? 0
-                : (((count === 0) || ((count % 100 > 0) && (count % 100 < 20)))
-                    ? 1
-                    : 2);
+            return count == 1 ? 0 : count === 0 || (count % 100 > 0 && count % 100 < 20) ? 1 : 2;
 
         case 'ar':
-            return (count === 0)
+            return count === 0
                 ? 0
-                : ((count == 1)
-                    ? 1
-                    : ((count == 2)
-                        ? 2
-                        : (((count % 100 >= 3) && (count % 100 <= 10))
-                            ? 3
-                            : (((count % 100 >= 11) && (count % 100 <= 99))
-                                ? 4
-                                : 5))));
+                : count == 1
+                  ? 1
+                  : count == 2
+                    ? 2
+                    : count % 100 >= 3 && count % 100 <= 10
+                      ? 3
+                      : count % 100 >= 11 && count % 100 <= 99
+                        ? 4
+                        : 5;
 
         default:
             return 0;

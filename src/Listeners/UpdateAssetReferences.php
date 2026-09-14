@@ -97,6 +97,19 @@ class UpdateAssetReferences extends Subscriber implements ShouldQueue
                 if ($updated) {
                     $hasUpdatedItems = true;
                 }
+
+                if (method_exists($item, 'hasWorkingCopy') && $item->hasWorkingCopy()) {
+                    $workingCopyEntry = $item->makeFromRevision($item->workingCopy());
+
+                    $workingCopyUpdated = AssetReferenceUpdater::item($workingCopyEntry)
+                        ->filterByContainer($container)
+                        ->withoutSaving()
+                        ->updateReferences($originalPath, $newPath);
+
+                    if ($workingCopyUpdated) {
+                        $workingCopyEntry->saveToWorkingCopy();
+                    }
+                }
             });
 
         if ($hasUpdatedItems) {

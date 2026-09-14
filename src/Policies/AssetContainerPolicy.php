@@ -9,7 +9,9 @@ class AssetContainerPolicy
 {
     public function before($user, $ability)
     {
-        if (User::fromUser($user)->hasPermission('configure asset containers')) {
+        $user = User::fromUser($user);
+
+        if ($user->isSuper() || $user->hasPermission('configure asset containers')) {
             return true;
         }
     }

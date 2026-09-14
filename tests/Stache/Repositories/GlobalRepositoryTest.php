@@ -22,7 +22,7 @@ class GlobalRepositoryTest extends TestCase
     {
         parent::setUp();
 
-        $stache = (new Stache)->sites(['en', 'fr']);
+        $stache = (new Stache)->sites(['en']);
         $this->app->instance(Stache::class, $stache);
         $this->directory = __DIR__.'/../__fixtures__/content/globals';
         $stache->registerStore((new GlobalsStore($stache, app('files')))->directory($this->directory));
@@ -89,18 +89,13 @@ class GlobalRepositoryTest extends TestCase
     #[Test]
     public function it_saves_a_global_to_the_stache_and_to_a_file()
     {
-        $global = GlobalSetAPI::make('new');
-
-        $global->addLocalization(
-            $global->makeLocalization('en')->data(['foo' => 'bar', 'baz' => 'qux'])
-        );
+        $global = GlobalSetAPI::make('new')->sites(['en' => null, 'fr' => null]);
 
         $this->assertNull($this->repo->findByHandle('new'));
 
         $this->repo->save($global);
 
         $this->assertNotNull($item = $this->repo->find('new'));
-        $this->assertEquals(['foo' => 'bar', 'baz' => 'qux'], $item->in('en')->data()->all());
         $this->assertFileExists($this->directory.'/new.yaml');
         @unlink($this->directory.'/new.yaml');
     }

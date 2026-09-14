@@ -50,8 +50,8 @@ class GlobalVariablesStoreTest extends TestCase
 
         $dir = Path::tidy($this->tempDir);
         $this->assertEquals([
-            $dir.'/one.yaml' => 1234567890,
-            $dir.'/two.yaml' => 1234567890,
+            $dir.'/subdirectory/nested-one.yaml' => 1234567890,
+            $dir.'/subdirectory/nested-two.yaml' => 1234567890,
         ], $files->all());
 
         // Sanity check. Make sure the file is there but wasn't included.
@@ -68,6 +68,17 @@ class GlobalVariablesStoreTest extends TestCase
         $this->assertInstanceOf(Variables::class, $item);
         $this->assertEquals('example::en', $item->id());
         $this->assertEquals('example', $item->handle());
+    }
+
+    #[Test]
+    public function it_makes_global_variable_instances_from_files_with_null_contents()
+    {
+        $item = $this->store->makeItemFromFile(Path::tidy($this->tempDir.'/en/example.yaml'), 'null');
+
+        $this->assertInstanceOf(Variables::class, $item);
+        $this->assertEquals('example::en', $item->id());
+        $this->assertEquals('example', $item->handle());
+        $this->assertEquals([], $item->data()->all());
     }
 
     #[Test]

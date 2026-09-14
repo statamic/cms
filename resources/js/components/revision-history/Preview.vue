@@ -2,11 +2,10 @@
 import InlinePublishForm from '../inputs/relationship/InlinePublishForm.vue';
 
 export default {
-
     mixins: [InlinePublishForm],
 
     props: {
-        revision: Object
+        revision: Object,
     },
 
     data() {
@@ -16,22 +15,19 @@ export default {
             method: 'patch',
             action: 'update',
             itemUrl: this.revision.attributes.item_url,
-        }
+        };
     },
 
     computed: {
         title() {
             return this.revision.attributes.data?.title ?? '';
-        }
+        },
     },
 
     methods: {
-
         saved(response) {
             //
-        }
-
-    }
-
-}
+        },
+    },
+};
 </script>

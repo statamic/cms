@@ -4,15 +4,23 @@ namespace Statamic\Auth;
 
 use Facades\Statamic\Auth\CorePermissions;
 
+use function Statamic\trans as __;
+
 class Permissions
 {
     protected $extensions = [];
     protected $permissions = [];
     protected $groups = [];
     protected $pendingGroup = null;
+    protected $booted = false;
+    private $flattened;
 
     public function boot()
     {
+        if ($this->booted) {
+            return $this;
+        }
+
         $early = $this->permissions;
         $this->permissions = [];
 
@@ -23,6 +31,9 @@ class Permissions
         }
 
         $this->permissions = array_merge($this->permissions, $early);
+        $this->booted = true;
+
+        return $this;
     }
 
     public function extend($callback)
@@ -124,5 +135,10 @@ class Permissions
         $permissions();
 
         $this->pendingGroup = null;
+    }
+
+    public function flattened()
+    {
+        return $this->flattened ??= collect($this->permissions)->flatMap->flattened();
     }
 }

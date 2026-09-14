@@ -153,10 +153,10 @@ EOT;
     public function test_equals_followed_by_space_is_not_parameter()
     {
         /** @var AntlersNode $node */
-        $node = $this->parseNodes("{{ is_current || is_parent ?= 'font-medium text-gray-800' }}")[0];
+        $node = $this->parseNodes("{{ is_current || is_parent ?= 'font-medium text-gray-900' }}")[0];
 
         $this->assertCount(0, $node->parameters);
-        $this->assertSame(" is_current || is_parent ?= 'font-medium text-gray-800' ", $node->getContent());
+        $this->assertSame(" is_current || is_parent ?= 'font-medium text-gray-900' ", $node->getContent());
     }
 
     public function test_equals_followed_by_invalid_char_is_not_parameter()

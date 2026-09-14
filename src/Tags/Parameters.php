@@ -8,8 +8,10 @@ use Statamic\Support\Str;
 
 class Parameters extends ArrayAccessor
 {
-    public static function make($items = [], $context = null)
+    public static function make($items = [], ...$args)
     {
+        $context = $args[0] ?? null;
+
         if (! $context) {
             throw new \InvalidArgumentException('A Context object is expected.');
         }

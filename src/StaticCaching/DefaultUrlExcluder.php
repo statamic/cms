@@ -2,6 +2,7 @@
 
 namespace Statamic\StaticCaching;
 
+use Statamic\Facades\URL;
 use Statamic\Support\Str;
 
 class DefaultUrlExcluder implements UrlExcluder
@@ -27,19 +28,14 @@ class DefaultUrlExcluder implements UrlExcluder
 
     public function isExcluded(string $url): bool
     {
-        // Query strings should be ignored.
-        $url = explode('?', $url)[0];
+        $url = URL::removeQueryAndFragment($url);
 
         $url = Str::removeLeft($url, $this->baseUrl);
 
         foreach ($this->exclusions as $excluded) {
-            if (Str::endsWith($excluded, '*')) {
-                $prefix = Str::removeRight($excluded, '*');
-
-                if (Str::startsWith($url, $prefix) && ! (Str::endsWith($prefix, '/') && $url === $prefix)) {
-                    return true;
-                }
-            } elseif (Str::removeRight($url, '/') === Str::removeRight($excluded, '/')) {
+            if (Str::endsWith($excluded, '*') && Str::startsWith($url, Str::removeRight($excluded, '*'))) {
+                return true;
+            } elseif (URL::tidy($url) === URL::tidy($excluded)) {
                 return true;
             }
         }

@@ -183,6 +183,21 @@ class TaxonomyTest extends TestCase
     }
 
     #[Test]
+    public function it_gets_sort_field_and_direction()
+    {
+        $taxonomy = new Taxonomy;
+        $this->assertEquals('title', $taxonomy->sortField());
+        $this->assertEquals('asc', $taxonomy->sortDirection());
+
+        $taxonomy->setSortField('foo');
+        $this->assertEquals('foo', $taxonomy->sortField());
+        $this->assertEquals('asc', $taxonomy->sortDirection());
+
+        $taxonomy->setSortDirection('desc');
+        $this->assertEquals('desc', $taxonomy->sortDirection());
+    }
+
+    #[Test]
     public function it_gets_evaluated_augmented_value_using_magic_property()
     {
         $taxonomy = (new Taxonomy)->handle('tags');
@@ -306,6 +321,30 @@ class TaxonomyTest extends TestCase
 
         $this->assertCount(9, $taxonomy->queryTerms()->get());
         $this->assertEquals(3, $taxonomy->queryTerms()->pluck('slug')->unique()->count());
+    }
+
+    #[Test]
+    public function it_has_file_data()
+    {
+        $taxonomy = (new Taxonomy)
+            ->handle('tags')
+            ->title('Tags');
+
+        $this->assertEquals([
+            'title' => 'Tags',
+            'inject' => [],
+        ], $taxonomy->fileData());
+
+        $taxonomy
+            ->setSortField('foo')
+            ->setSortDirection('desc');
+
+        $this->assertEquals([
+            'title' => 'Tags',
+            'sort_by' => 'foo',
+            'sort_dir' => 'desc',
+            'inject' => [],
+        ], $taxonomy->fileData());
     }
 
     #[Test]

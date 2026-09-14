@@ -8,6 +8,8 @@ use Statamic\Facades\Asset;
 use Statamic\Statamic;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
+use function Statamic\trans as __;
+
 class DimensionsRule implements CastableToValidationString, Rule
 {
     protected $parameters;

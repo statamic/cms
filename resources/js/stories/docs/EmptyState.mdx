@@ -1,0 +1,27 @@
+import { Canvas, Meta, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as EmptyStateStories from '../EmptyState.stories';
+
+<Meta of={EmptyStateStories} />
+
+# Empty State
+Display helpful options and actions when a section has no content yet. Empty states guide users toward creating their first items with descriptive cards that explain each option.
+<Canvas of={EmptyStateStories._DocsIntro} sourceState={'shown'} />
+
+We recommend using the empty state components alongside the `useArchitecturalBackground()` composable:
+
+```js
+import { useArchitecturalBackground } from '@statamic/cms/inertia';
+
+useArchitecturalBackground();
+```
+
+## With Slot
+Use the default slot in `EmptyStateItem` for custom content instead of the description prop.
+<Canvas of={EmptyStateStories._WithSlot} sourceState={'shown'} />
+
+## No Links
+Items can be rendered as buttons instead of links by omitting the `href` prop. When using the default slot, items are rendered as non-interactive divs.
+<Canvas of={EmptyStateStories._NoLinks} sourceState={'shown'} />
+
+## Arguments
+<ArgTypes of={EmptyStateStories} />

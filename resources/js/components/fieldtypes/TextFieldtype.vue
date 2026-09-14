@@ -1,52 +1,58 @@
 <template>
-    <text-input
+    <Input
         ref="input"
-        :value="value"
+        :model-value="value"
         :classes="config.classes"
         :focus="shouldFocus"
         :autocomplete="config.autocomplete"
         :autoselect="config.autoselect"
         :type="config.input_type"
-        :isReadOnly="isReadOnly"
+        :read-only="isReadOnly"
         :prepend="__(config.prepend)"
         :append="__(config.append)"
         :limit="config.character_limit"
         :placeholder="__(config.placeholder)"
         :name="name"
-        :id="fieldId"
-        :direction="config.direction"
-        @input="inputUpdated"
+        :id="id"
+        :input-attrs="{ dir: contentDirection }"
+        @update:model-value="inputUpdated"
         @focus="$emit('focus')"
         @blur="$emit('blur')"
     />
 </template>
 
-<script>
-import Fieldtype from './Fieldtype.vue';
+<script setup>
+import Fieldtype from '@/components/fieldtypes/fieldtype.js';
+import { Input } from '@/components/ui';
+import { computed } from 'vue';
+import { useContentDirection } from '@/composables/content-direction';
 
-export default {
+const emit = defineEmits(Fieldtype.emits);
+const props = defineProps(Fieldtype.props);
+const {
+    name,
+    isReadOnly,
+    update,
+    updateDebounced,
+    expose
+} = Fieldtype.use(emit, props);
 
-    mixins: [Fieldtype],
+const { direction: contentDirection } = useContentDirection();
 
-    computed: {
-        shouldFocus() {
-            if (this.config.focus === false) {
-                return false;
-            }
-
-            return this.config.focus || this.name === 'title' || this.name === 'alt';
-        }
-    },
-
-    methods: {
-        inputUpdated(value) {
-            if (! this.config.debounce) {
-                return this.update(value)
-            }
-
-            this.updateDebounced(value)
-        }
+const shouldFocus = computed(() => {
+    if (props.config.focus === false || props.config.focus === true) {
+        return props.config.focus;
     }
+    
+    const isRootField = !props.fieldPathPrefix;
+    const isImplicitAutofocusField = name.value === 'title' || name.value === 'alt';
 
+    return isRootField && isImplicitAutofocusField;
+});
+
+function inputUpdated(value) {
+    return !props.config.debounce ? update(value) : updateDebounced(value);
 }
+
+defineExpose(expose);
 </script>

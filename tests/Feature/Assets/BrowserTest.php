@@ -229,24 +229,90 @@ class BrowserTest extends TestCase
             ->actingAs($this->userWithPermission())
             ->getJson('/cp/assets/browse/search/one?search=asset')
             ->assertSuccessful()
-            ->assertJsonCount(3, 'data.assets')
-            ->assertJsonPath('data.assets.0.id', 'one::asset-one.txt')
-            ->assertJsonPath('data.assets.1.id', 'one::nested/asset-two.txt')
-            ->assertJsonPath('data.assets.2.id', 'one::nested/subdirectory/asset-three.txt');
+            ->assertJsonCount(3, 'data')
+            ->assertJsonPath('data.0.id', 'one::asset-one.txt')
+            ->assertJsonPath('data.1.id', 'one::nested/asset-two.txt')
+            ->assertJsonPath('data.2.id', 'one::nested/subdirectory/asset-three.txt');
 
         $this
             ->actingAs($this->userWithPermission())
             ->getJson('/cp/assets/browse/search/one/nested?search=asset')
             ->assertSuccessful()
-            ->assertJsonCount(1, 'data.assets')
-            ->assertJsonPath('data.assets.0.id', 'one::nested/asset-two.txt');
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.id', 'one::nested/asset-two.txt');
 
         $this
             ->actingAs($this->userWithPermission())
             ->getJson('/cp/assets/browse/search/one/nested/subdirectory?search=asset')
             ->assertSuccessful()
-            ->assertJsonCount(1, 'data.assets')
-            ->assertJsonPath('data.assets.0.id', 'one::nested/subdirectory/asset-three.txt');
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.id', 'one::nested/subdirectory/asset-three.txt');
+    }
+
+    #[Test]
+    public function it_filters_assets()
+    {
+        $containerOne = AssetContainer::make('one')->disk('test')->save();
+        $containerTwo = AssetContainer::make('two')->disk('test')->save();
+
+        $containerOne
+            ->makeAsset('asset-one.txt')
+            ->upload(UploadedFile::fake()->create('asset-one.txt'));
+        $containerOne
+            ->makeAsset('asset-two.jpg')
+            ->upload(UploadedFile::fake()->image('asset-two.jpg', 100, 200));
+        $containerOne
+            ->makeAsset('nested/asset-three.jpg')
+            ->upload(UploadedFile::fake()->image('asset-three.jpg', 200, 100));
+        $containerTwo
+            ->makeAsset('asset-four.txt')
+            ->upload(UploadedFile::fake()->create('asset-four.txt'));
+        $containerTwo
+            ->makeAsset('nested/asset-five.jpg')
+            ->upload(UploadedFile::fake()->image('asset-five.jpg', 200, 100))
+            ->set('alt', 'An image')
+            ->save();
+
+        $txtFilter = ['asset_properties' => ['extension' => ['operator' => '=', 'value' => 'txt']]];
+        $imageFilter = ['asset_properties' => ['type' => ['operator' => '=', 'value' => 'image']]];
+        $widthFilter = ['asset_properties' => ['dimensions' => ['dimension' => 'width', 'operator' => '>', 'value' => 100]]];
+        $altFilter = ['fields' => ['alt' => ['operator' => 'like', 'value' => 'image']]];
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->getJson('/cp/assets/browse/search/one?filters='.base64_encode(json_encode($txtFilter)))
+            ->assertSuccessful()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.id', 'one::asset-one.txt');
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->getJson('/cp/assets/browse/search/one?filters='.base64_encode(json_encode($imageFilter)))
+            ->assertSuccessful()
+            ->assertJsonCount(2, 'data')
+            ->assertJsonPath('data.0.id', 'one::asset-two.jpg')
+            ->assertJsonPath('data.1.id', 'one::nested/asset-three.jpg');
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->getJson('/cp/assets/browse/search/one?filters='.base64_encode(json_encode($widthFilter)))
+            ->assertSuccessful()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.id', 'one::nested/asset-three.jpg');
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->getJson('/cp/assets/browse/search/one/nested?filters='.base64_encode(json_encode($imageFilter)))
+            ->assertSuccessful()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.id', 'one::nested/asset-three.jpg');
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->getJson('/cp/assets/browse/search/two?filters='.base64_encode(json_encode($altFilter)))
+            ->assertSuccessful()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.id', 'two::nested/asset-five.jpg');
     }
 
     #[Test]
@@ -264,7 +330,7 @@ class BrowserTest extends TestCase
             ->actingAs($user)
             ->getJson('/cp/assets/browse/test/one.txt/edit')
             ->assertSuccessful()
-            ->assertViewIs('statamic::assets.browse');
+            ->assertInertia(fn ($page) => $page->component('assets/Browse'));
     }
 
     #[Test]
@@ -315,13 +381,12 @@ class BrowserTest extends TestCase
     private function jsonStructure()
     {
         return [
-            'meta',
             'links' => ['folder_action', 'asset_action'],
             'data' => [
-                'assets' => [
-                    ['id', 'size_formatted', 'last_modified_relative', 'actions'],
-                    ['id', 'size_formatted', 'last_modified_relative', 'actions', 'thumbnail'],
-                ],
+                ['id', 'size_formatted', 'last_modified_relative', 'actions'],
+                ['id', 'size_formatted', 'last_modified_relative', 'actions', 'thumbnail'],
+            ],
+            'meta' => [
                 'folder' => [
                     'title', 'path', 'parent_path', 'actions', 'folders',
                 ],

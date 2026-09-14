@@ -3,7 +3,6 @@
 namespace Statamic\Http\Resources\CP\Submissions;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use Statamic\Facades\Action;
 use Statamic\Facades\User;
 
 class ListedSubmission extends JsonResource
@@ -32,11 +31,10 @@ class ListedSubmission extends JsonResource
         return [
             'id' => $this->resource->id(),
             $this->merge($this->values([
-                'datestamp' => $this->resource->date()->format($form->dateFormat()),
+                'datestamp' => $this->resource->date()->tz(config('app.timezone'))->toIso8601String(),
             ])),
             'url' => cp_route('forms.submissions.show', [$form->handle(), $this->resource->id()]),
             'deleteable' => User::current()->can('delete', $this->resource),
-            'actions' => Action::for($this->resource),
         ];
     }
 

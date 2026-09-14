@@ -426,8 +426,8 @@ class TreeTest extends TestCase
         $structure = $this->mock(Structure::class);
         $structure->shouldReceive('handle')->andReturn('test');
 
-        $firstContents = ['first' => 'time'];
-        $secondContents = ['second' => 'time'];
+        $firstContents = [['entry' => 'first']];
+        $secondContents = [['entry' => 'second']];
 
         $structure->shouldReceive('validateTree')->with($firstContents, 'the-locale')->once()->andReturn($firstContents);
         $structure->shouldReceive('validateTree')->with($secondContents, 'the-locale')->once()->andReturn($secondContents);
@@ -449,6 +449,40 @@ class TreeTest extends TestCase
         $tree->tree($secondContents);
         $tree->tree();
         $tree->tree();
+    }
+
+    #[Test]
+    public function it_removes_null_items_when_setting_the_tree()
+    {
+        $tree = $this->tree([
+            [
+                'id' => 'pages-home',
+            ],
+            null,
+            [
+                'id' => 'pages-about',
+                'children' => [
+                    [
+                        'id' => 'pages-board',
+                    ],
+                    null,
+                ],
+            ],
+        ]);
+
+        $this->assertEquals([
+            [
+                'id' => 'pages-home',
+            ],
+            [
+                'id' => 'pages-about',
+                'children' => [
+                    [
+                        'id' => 'pages-board',
+                    ],
+                ],
+            ],
+        ], $tree->tree());
     }
 
     #[Test]

@@ -8,5 +8,5 @@ class Spacer extends Fieldtype
 {
     protected $categories = ['special'];
     protected $selectableInForms = true;
-    protected $icon = 'width';
+    protected $icon = 'fieldtype-width';
 }

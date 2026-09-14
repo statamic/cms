@@ -2,15 +2,24 @@
 
 namespace Statamic\Fieldtypes;
 
+use Closure;
 use Facades\Statamic\Fieldtypes\RowId;
-use Statamic\Facades\Asset;
+use Illuminate\Contracts\Validation\DataAwareRule;
+use Illuminate\Contracts\Validation\ValidationRule;
+use Statamic\Data\NestedFieldUpdater;
+use Statamic\Exceptions\CollectionNotFoundException;
+use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
-use Statamic\Facades\Entry;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Site;
+use Statamic\Facades\User;
+use Statamic\Fields\Field;
+use Statamic\Fields\Fields;
 use Statamic\Fields\Value;
+use Statamic\Fieldtypes\Assets\Assets as AssetsFieldtype;
 use Statamic\Fieldtypes\Bard\Augmentor;
+use Statamic\Fieldtypes\Link\LinkType;
 use Statamic\GraphQL\Types\BardSetsType;
 use Statamic\GraphQL\Types\BardTextType;
 use Statamic\GraphQL\Types\ReplicatorSetType;
@@ -18,6 +27,8 @@ use Statamic\Query\Scopes\Filters\Fields\Bard as BardFilter;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\Hookable;
+
+use function Statamic\trans as __;
 
 class Bard extends Replicator
 {
@@ -43,9 +54,17 @@ class Bard extends Replicator
 
     protected function configFieldItems(): array
     {
+        $containers = AssetContainer::all();
+
+        $defaultButtons = $containers->isEmpty()
+            ? collect(static::$defaultButtons)
+                ->reject(fn ($value) => $value === 'image')
+                ->values()->all()
+            : static::$defaultButtons;
+
         return [
             [
-                'display' => __('Editor'),
+                'display' => __('Editor Settings'),
                 'instructions' => __('statamic::fieldtypes.bard.config.section.editor.instructions'),
                 'fields' => [
                     'buttons' => [
@@ -53,30 +72,7 @@ class Bard extends Replicator
                         'instructions' => __('statamic::fieldtypes.bard.config.buttons'),
                         'type' => 'bard_buttons_setting',
                         'full_width_setting' => true,
-                        'default' => static::$defaultButtons,
-                    ],
-                    'smart_typography' => [
-                        'display' => __('Smart Typography'),
-                        'instructions' => __('statamic::fieldtypes.bard.config.smart_typography'),
-                        'type' => 'toggle',
-                        'default' => false,
-                    ],
-                    'save_html' => [
-                        'display' => __('Save as HTML'),
-                        'instructions' => __('statamic::fieldtypes.bard.config.save_html'),
-                        'type' => 'toggle',
-                    ],
-                    'inline' => [
-                        'display' => __('Inline'),
-                        'instructions' => __('statamic::fieldtypes.bard.config.inline'),
-                        'type' => 'select',
-                        'cast_booleans' => true,
-                        'options' => [
-                            'false' => __('statamic::fieldtypes.bard.config.inline.disabled'),
-                            'true' => __('statamic::fieldtypes.bard.config.inline.enabled'),
-                            'break' => __('statamic::fieldtypes.bard.config.inline.break'),
-                        ],
-                        'default' => false,
+                        'default' => $defaultButtons,
                     ],
                     'toolbar_mode' => [
                         'display' => __('Toolbar Mode'),
@@ -87,30 +83,14 @@ class Bard extends Replicator
                             'fixed' => __('Fixed'),
                             'floating' => __('Floating'),
                         ],
+                        'width' => 50,
                     ],
-                    'reading_time' => [
-                        'display' => __('Show Reading Time'),
-                        'instructions' => __('statamic::fieldtypes.bard.config.reading_time'),
+                    'smart_typography' => [
+                        'display' => __('Smart Typography'),
+                        'instructions' => __('statamic::fieldtypes.bard.config.smart_typography'),
                         'type' => 'toggle',
                         'default' => false,
-                    ],
-                    'word_count' => [
-                        'display' => __('Show Word Count'),
-                        'instructions' => __('statamic::fieldtypes.bard.config.word_count'),
-                        'type' => 'toggle',
-                        'default' => false,
-                    ],
-                    'fullscreen' => [
-                        'display' => __('Allow Fullscreen Mode'),
-                        'instructions' => __('statamic::fieldtypes.bard.config.fullscreen'),
-                        'type' => 'toggle',
-                        'default' => true,
-                    ],
-                    'allow_source' => [
-                        'display' => __('Allow Source Mode'),
-                        'instructions' => __('statamic::fieldtypes.bard.config.allow_source'),
-                        'type' => 'toggle',
-                        'default' => true,
+                        'width' => 50,
                     ],
                     'enable_input_rules' => [
                         'display' => __('Enable Input Rules'),
@@ -118,39 +98,52 @@ class Bard extends Replicator
                         'type' => 'toggle',
                         'default' => true,
                         'validate' => 'accepted_if:smart_typography,true',
+                        'width' => 50,
                     ],
                     'enable_paste_rules' => [
                         'display' => __('Enable Paste Rules'),
                         'instructions' => __('statamic::fieldtypes.bard.config.enable_paste_rules'),
                         'type' => 'toggle',
                         'default' => true,
-                    ],
-                    'remove_empty_nodes' => [
-                        'display' => __('Remove Empty Nodes'),
-                        'instructions' => __('statamic::fieldtypes.bard.config.remove_empty_nodes'),
-                        'type' => 'select',
-                        'cast_booleans' => true,
-                        'options' => [
-                            'false' => __("Don't remove empty nodes"),
-                            'true' => __('Remove all empty nodes'),
-                            'trim' => __('Remove empty nodes at the start and end'),
-                        ],
-                        'default' => 'false',
+                        'width' => 50,
                     ],
                     'placeholder' => [
                         'display' => __('Placeholder'),
                         'instructions' => __('statamic::fieldtypes.text.config.placeholder'),
                         'type' => 'text',
+                        'width' => 50,
                     ],
                     'character_limit' => [
                         'display' => __('Character Limit'),
                         'instructions' => __('statamic::fieldtypes.text.config.character_limit'),
                         'type' => 'integer',
+                        'width' => 50,
                     ],
-                    'antlers' => [
-                        'display' => 'Antlers',
-                        'instructions' => __('statamic::fieldtypes.any.config.antlers'),
+                ],
+            ],
+            [
+                'display' => __('Appearance'),
+                'fields' => [
+                    'reading_time' => [
+                        'display' => __('Show Reading Time'),
+                        'instructions' => __('statamic::fieldtypes.bard.config.reading_time'),
                         'type' => 'toggle',
+                        'default' => false,
+                        'width' => 50,
+                    ],
+                    'word_count' => [
+                        'display' => __('Show Word Count'),
+                        'instructions' => __('statamic::fieldtypes.bard.config.word_count'),
+                        'type' => 'toggle',
+                        'default' => false,
+                        'width' => 50,
+                    ],
+                    'fullscreen' => [
+                        'display' => __('Allow Fullscreen Mode'),
+                        'instructions' => __('statamic::fieldtypes.bard.config.fullscreen'),
+                        'type' => 'toggle',
+                        'default' => true,
+                        'width' => 50,
                     ],
                 ],
             ],
@@ -163,29 +156,34 @@ class Bard extends Replicator
                         'instructions' => __('statamic::fieldtypes.bard.config.link_noopener'),
                         'type' => 'toggle',
                         'default' => false,
+                        'width' => 50,
                     ],
                     'link_noreferrer' => [
                         'display' => __('Link Noreferrer'),
                         'instructions' => __('statamic::fieldtypes.bard.config.link_noreferrer'),
                         'type' => 'toggle',
                         'default' => false,
+                        'width' => 50,
                     ],
                     'target_blank' => [
                         'display' => __('Target Blank'),
                         'type' => 'toggle',
                         'default' => false,
                         'instructions' => __('statamic::fieldtypes.bard.config.target_blank'),
+                        'width' => 50,
                     ],
                     'link_collections' => [
                         'display' => __('Link Collections'),
                         'instructions' => __('statamic::fieldtypes.bard.config.link_collections'),
                         'type' => 'collections',
                         'mode' => 'select',
+                        'width' => 50,
                     ],
                     'select_across_sites' => [
                         'display' => __('Select Across Sites'),
                         'instructions' => __('statamic::fieldtypes.bard.config.select_across_sites'),
                         'type' => 'toggle',
+                        'width' => 50,
                     ],
                     'container' => [
                         'display' => __('Container'),
@@ -195,6 +193,12 @@ class Bard extends Replicator
                         'max_items' => 1,
                         'if' => [
                             'buttons' => 'contains_any anchor, image',
+                        ],
+                        'width' => 50,
+                        'default' => $containers->count() == 1 ? $containers->first()->handle() : null,
+                        'force_in_config' => true,
+                        'validate' => [
+                            $this->containerRequiredRule(),
                         ],
                     ],
                 ],
@@ -220,6 +224,7 @@ class Bard extends Replicator
                         'instructions' => __('statamic::fieldtypes.bard.config.always_show_set_button'),
                         'type' => 'toggle',
                         'default' => false,
+                        'width' => 50,
                     ],
                     'collapse' => [
                         'display' => __('Collapse'),
@@ -232,12 +237,59 @@ class Bard extends Replicator
                             'accordion' => __('statamic::fieldtypes.replicator.config.collapse.accordion'),
                         ],
                         'default' => false,
+                        'width' => 50,
                     ],
                     'previews' => [
                         'display' => __('Field Previews'),
                         'instructions' => __('statamic::fieldtypes.bard.config.previews'),
                         'type' => 'toggle',
                         'default' => true,
+                        'width' => 50,
+                    ],
+                ],
+            ],
+            [
+                'display' => __('Advanced'),
+                'fields' => [
+                    'save_html' => [
+                        'display' => __('Save as HTML'),
+                        'instructions' => __('statamic::fieldtypes.bard.config.save_html'),
+                        'type' => 'toggle',
+                        'width' => 50,
+                    ],
+                    'remove_empty_nodes' => [
+                        'display' => __('Remove Empty Nodes'),
+                        'instructions' => __('statamic::fieldtypes.bard.config.remove_empty_nodes'),
+                        'type' => 'select',
+                        'cast_booleans' => true,
+                        'options' => [
+                            'false' => __("Don't remove empty nodes"),
+                            'true' => __('Remove all empty nodes'),
+                            'trim' => __('Remove empty nodes at the start and end'),
+                        ],
+                        'default' => 'false',
+                        'width' => 50,
+                    ],
+                    'inline' => [
+                        'display' => __('Inline Only Mode'),
+                        'instructions' => __('statamic::fieldtypes.bard.config.inline'),
+                        'type' => 'toggle',
+                        'default' => false,
+                        'width' => 50,
+                    ],
+                    'inline_hard_breaks' => [
+                        'display' => __('Allow Line Breaks'),
+                        'instructions' => __('statamic::fieldtypes.bard.config.inline_hard_breaks'),
+                        'type' => 'toggle',
+                        'default' => false,
+                        'width' => 50,
+                        'if' => ['inline' => 'equals true'],
+                    ],
+                    'antlers' => [
+                        'display' => 'Antlers',
+                        'instructions' => __('statamic::fieldtypes.any.config.antlers'),
+                        'type' => 'toggle',
+                        'width' => 50,
                     ],
                 ],
             ],
@@ -571,15 +623,17 @@ class Bard extends Replicator
             return [$set['attrs']['id'] => $this->fields($values['type'], $index)->addValues($values)->meta()->put('_', '_')];
         })->toArray();
 
-        $defaults = collect($this->flattenedSetsConfig())->map(function ($set, $handle) {
-            return $this->fields($handle)->all()->map(function ($field) {
-                return $field->fieldtype()->preProcess($field->defaultValue());
+        if ($this->shouldProcessNewValues()) {
+            $defaults = collect($this->flattenedSetsConfig())->map(function ($set, $handle) {
+                return $this->fields($handle)->all()->map(function ($field) {
+                    return $field->fieldtype()->preProcess($field->defaultValue());
+                })->all();
             })->all();
-        })->all();
 
-        $new = collect($this->flattenedSetsConfig())->map(function ($set, $handle) use ($defaults) {
-            return $this->fields($handle)->addValues($defaults[$handle])->meta()->put('_', '_');
-        })->toArray();
+            $new = collect($this->flattenedSetsConfig())->map(function ($set, $handle) use ($defaults) {
+                return $this->fields($handle)->addValues($defaults[$handle])->meta()->put('_', '_');
+            })->toArray();
+        }
 
         $previews = collect($existing)->map(function ($fields) {
             return collect($fields)->map(function () {
@@ -595,22 +649,52 @@ class Bard extends Replicator
             $linkCollections = Blink::once('routable-collection-handles-'.$site, function () use ($site) {
                 return Collection::all()->reject(function ($collection) use ($site) {
                     return is_null($collection->route($site));
-                })->map->handle()->values();
+                })->map->handle()->values()->all();
             });
         }
 
         $data = [
             'existing' => $existing,
-            'new' => $new,
-            'defaults' => $defaults,
-            'collapsed' => [],
+            'new' => $new ?? null,
+            'defaults' => $defaults ?? null,
+            'collapsed' => $this->config('collapse') ? array_keys($existing) : [],
             'previews' => $previews,
             '__collaboration' => ['existing'],
             'linkCollections' => $linkCollections,
             'linkData' => (object) $this->getLinkData($value),
+            'linkTypes' => $this->linkTypesForToolbar(),
         ];
 
+        if (
+            $this->config('container')
+            && $container = \Statamic\Facades\AssetContainer::find($this->config('container'))
+        ) {
+            $assetField = (new Field('asset', [
+                'type' => 'assets',
+                'container' => $container->handle(),
+                'folder' => $this->config('folder'),
+            ]));
+
+            $assetMeta = $assetField->meta();
+
+            $data['assets'] = [
+                'container' => $assetMeta['container'],
+                'columns' => $assetMeta['columns'],
+            ];
+        }
+
         return $this->runHooks('preload', $data);
+    }
+
+    private function shouldProcessNewValues(): bool
+    {
+        $parent = $this->field()->parent();
+
+        if (! $parent || ! method_exists($parent, 'blueprint')) {
+            return true;
+        }
+
+        return is_null($parent->blueprint()->fullyQualifiedHandle());
     }
 
     public function preProcessValidatable($value)
@@ -711,31 +795,85 @@ class Bard extends Replicator
 
     private function getLinkDataForUrl($url)
     {
-        $ref = Str::after($url, 'statamic://');
-        [$type, $id] = explode('::', $ref, 2);
+        $ref = str($url)->after('statamic://')->before('?')->before('#')->toString();
+        [$handle, $id] = explode('::', $ref, 2);
 
-        $data = null;
+        return [$ref => $this->linkDataForType($handle, $id)];
+    }
 
-        switch ($type) {
-            case 'entry':
-                if ($entry = Entry::find($id)) {
-                    $data = [
-                        'title' => $entry->get('title'),
-                        'permalink' => $entry->absoluteUrl(),
-                    ];
-                }
-                break;
-            case 'asset':
-                if ($asset = Asset::find($id)) {
-                    $data = [
-                        'basename' => $asset->basename(),
-                        'thumbnail' => $asset->thumbnailUrl(),
-                    ];
-                }
-                break;
+    private function linkDataForType(string $handle, string $id): ?array
+    {
+        if (! $linkType = Link::types()[$handle] ?? null) {
+            return null;
         }
 
-        return [$ref => $data];
+        if (! $config = $linkType->fieldtype($this->linkTypeField())) {
+            return null;
+        }
+
+        $nestedField = new Field($handle, $config);
+        $nestedField->setValue([$id]);
+        $fieldtype = $nestedField->fieldtype();
+
+        // Both of these build their preload `data` from getItemData(), so we can get the
+        // item without paying for the rest of the preload payload. Anything else may only
+        // implement preload(), so it gets the original treatment.
+        if ($fieldtype instanceof Relationship || $fieldtype instanceof AssetsFieldtype) {
+            return $fieldtype->getItemData([$id])->first();
+        }
+
+        return $fieldtype->preload()['data'][0] ?? null;
+    }
+
+    private function linkTypeField(): Field
+    {
+        return new Field('link', [
+            'collections' => $this->config('link_collections'),
+            'container' => $this->config('container'),
+            'select_across_sites' => $this->config('select_across_sites'),
+        ]);
+    }
+
+    private function linkTypesForToolbar(): array
+    {
+        $field = $this->linkTypeField();
+
+        // The cached payload contains site-dependent config (an entry link type falls back
+        // to the current site's routable collections) and user-dependent meta (asset link
+        // type permissions), so both need to be part of the key.
+        $key = vsprintf('bard-link-types-%s-%s-%s', [
+            Site::current()->handle(),
+            User::current()?->id() ?? 'guest',
+            md5(json_encode($field->config())),
+        ]);
+
+        return Blink::once($key, function () use ($field) {
+            return collect(Link::types())
+                ->filter(fn (LinkType $type): bool => $type->visible($field))
+                ->map(function (LinkType $type, string $handle) use ($field): ?array {
+                    if (! $config = $type->fieldtype($field)) {
+                        return null;
+                    }
+
+                    $nestedField = new Field($handle, $config);
+                    $nestedFieldtype = $nestedField->fieldtype();
+
+                    try {
+                        $meta = $nestedFieldtype->preload();
+                    } catch (CollectionNotFoundException) {
+                        $meta = [];
+                    }
+
+                    return [
+                        'title' => $type->title(),
+                        'component' => $nestedFieldtype->component(),
+                        'config' => $nestedFieldtype->config(),
+                        'meta' => $meta,
+                    ];
+                })
+                ->filter()
+                ->all();
+        });
     }
 
     private function wrapInlineValue($value)
@@ -759,5 +897,80 @@ class Bard extends Replicator
     public static function setDefaultButtons(array $buttons): void
     {
         static::$defaultButtons = $buttons;
+    }
+
+    public function replaceAssetReferences($data, ?string $newValue, string $oldValue, string $container)
+    {
+        if ($this->config('container') !== $container) {
+            return $data;
+        }
+
+        if (is_string($data)) {
+            return $data ? $this->replaceStatamicUrls($data, $newValue, $oldValue) : $data;
+        }
+
+        if (! is_array($data) || empty($data)) {
+            return $data;
+        }
+
+        $flat = collect(Arr::dot($data));
+
+        $flat->filter(fn ($value, $key) => preg_match('/(.*)\.(type)/', $key) && $value === 'image')
+            ->each(function ($value, $key) use (&$data, $newValue, $oldValue, $container) {
+                $srcKey = str_replace('.type', '.attrs.src', $key);
+
+                if (Arr::get($data, $srcKey) === "asset::{$container}::{$oldValue}") {
+                    Arr::set($data, $srcKey, $newValue === null ? '' : "asset::{$container}::{$newValue}");
+                }
+            });
+
+        $flat->filter(fn ($value, $key) => preg_match('/(.*)\.(type)/', $key) && $value === 'link')
+            ->each(function ($value, $key) use (&$data, $newValue, $oldValue, $container) {
+                $hrefKey = str_replace('.type', '.attrs.href', $key);
+
+                if (Arr::get($data, $hrefKey) === "statamic://asset::{$container}::{$oldValue}") {
+                    Arr::set($data, $hrefKey, $newValue === null ? '' : "statamic://asset::{$container}::{$newValue}");
+                }
+            });
+
+        return $data;
+    }
+
+    public function iterateReferenceFields($data, NestedFieldUpdater $updater): void
+    {
+        if (! is_array($data)) {
+            return;
+        }
+
+        collect($data)->each(function ($set, $setKey) use ($updater) {
+            $setHandle = Arr::get($set, 'attrs.values.type');
+            $fields = Arr::get($this->flattenedSetsConfig(), "{$setHandle}.fields");
+
+            if ($setHandle && $fields) {
+                $updater->update(new Fields($fields), "{$setKey}.attrs.values.");
+            }
+        });
+    }
+
+    private function containerRequiredRule(): ValidationRule
+    {
+        return new class implements DataAwareRule, ValidationRule
+        {
+            private $data;
+
+            public function setData(array $data)
+            {
+                $this->data = $data;
+
+                return $this;
+            }
+
+            public function validate(string $attribute, mixed $value, Closure $fail): void
+            {
+                if (empty($value) && in_array('image', $this->data['buttons'])) {
+                    $fail('statamic::validation.bard_container_required_by_button')->translate();
+                }
+            }
+        };
     }
 }

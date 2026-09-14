@@ -10,6 +10,7 @@ use Illuminate\Support\Collection;
  * Toasts are either sent along with the next JSON response or in the next view.
  *
  * @see \Statamic\Http\Middleware\CP\AddToasts
+ * @see \Statamic\Http\Middleware\CP\HandleInertiaRequests
  * @see \Statamic\Http\View\Composers\JavascriptComposer
  */
 class Manager

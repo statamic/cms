@@ -1,0 +1,19 @@
+import { Canvas, Meta, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as DateRangePickerStories from '../DateRangePicker.stories';
+
+<Meta of={DateRangePickerStories} />
+
+# DateRangePicker
+A date range picker component for selecting a start and end date. Perfect for campaigns, bookings, and time-based filters.
+<Canvas of={DateRangePickerStories._DocsIntro} sourceState={'shown'} />
+
+## Min and Max Dates
+Restrict selectable dates using the `min` and `max` props.
+<Canvas of={DateRangePickerStories._MinMax} sourceState={'shown'} />
+
+## Inline
+Display the calendar inline instead of in a popover.
+<Canvas of={DateRangePickerStories._Inline} sourceState={'shown'} />
+
+## Arguments
+<ArgTypes of={DateRangePickerStories} />

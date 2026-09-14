@@ -2,6 +2,9 @@
 
 namespace Statamic\Query\Dumper\Concerns;
 
+use DateTimeInterface;
+use Illuminate\Support\Carbon;
+
 trait DumpsQueryValues
 {
     protected function dumpQueryArrayValues($array): string
@@ -17,6 +20,10 @@ trait DumpsQueryValues
 
     protected function dumpQueryValue($value): string
     {
+        if ($value instanceof DateTimeInterface) {
+            $value = Carbon::instance($value)->setTimezone(config('app.timezone'));
+        }
+
         $this->bindings[] = $value;
 
         return '?';

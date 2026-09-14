@@ -4,14 +4,21 @@ namespace Statamic\Fieldtypes;
 
 use FilesystemIterator;
 use RecursiveCallbackFilterIterator;
-use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
+use Statamic\Filesystem\RecursiveDirectoryIterator;
 use Statamic\Support\Str;
 
 class TemplateFolder extends Relationship
 {
     protected $component = 'template_folder';
     protected $selectable = false;
+
+    // Intentionally ungated. Both funnels expose only relative template-folder
+    // names, and there is no permission concept for templates to authorize against.
+    protected function authorizeItemData($id): bool
+    {
+        return true;
+    }
 
     protected function toItemArray($id, $site = null)
     {
@@ -20,6 +27,7 @@ class TemplateFolder extends Relationship
 
     public function getIndexItems($request)
     {
+        // Intentionally ungated. See authorizeItemData().
         return collect(config('view.paths'))->flatMap(function ($path) {
             return collect(new RecursiveIteratorIterator(
                 new RecursiveCallbackFilterIterator(

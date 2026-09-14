@@ -4,6 +4,9 @@ namespace Statamic\Mixins;
 
 use Statamic\Http\Controllers\FrontendController;
 
+/**
+ * @mixin \Illuminate\Routing\Router
+ */
 class Router
 {
     public function statamic()

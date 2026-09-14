@@ -26,7 +26,9 @@ class Nav
      */
     public function create($name)
     {
-        $item = (new NavItem)->display($name);
+        $item = new NavItem;
+
+        $item->display($name);
 
         $this->items[] = $item;
 
@@ -128,19 +130,11 @@ class Nav
      * @param  mixed  $preferences
      * @return \Illuminate\Support\Collection
      */
-    public function build($preferences = true, $withHidden = false)
+    public function build($preferences = true, bool $editing = false)
     {
-        return (new NavBuilder($this->makeBaseItems(), $withHidden))->build($preferences);
-    }
-
-    /**
-     * Build navigation without applying preferences.
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    public function buildWithoutPreferences($withHidden = false)
-    {
-        return $this->build(false, $withHidden);
+        return (new NavBuilder($this->makeBaseItems()))
+            ->withHidden($editing)
+            ->build($preferences);
     }
 
     /**

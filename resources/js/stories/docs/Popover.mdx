@@ -1,0 +1,19 @@
+import { Canvas, Meta, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as PopoverStories from '../Popover.stories';
+
+<Meta of={PopoverStories} />
+
+# Popover
+Display rich content in a portal, triggered by a button.
+<Canvas of={PopoverStories._DocsIntro} sourceState={'shown'} />
+
+## Controlling Width
+Use standard Tailwind classes with important (!) to control the size of the popover. By default, popovers are 4.5 rems (288px) wide.
+<Canvas of={PopoverStories._Width} sourceState={'shown'} />
+
+## Direction
+Popovers can pop out in any direction – `top`, `bottom`, `left`, and `right`. Set that direction with the `side` prop.
+<Canvas of={PopoverStories._Direction} sourceState={'shown'} />
+
+## Arguments
+<ArgTypes of={PopoverStories} />

@@ -238,7 +238,7 @@ abstract class IteratorBuilder extends Builder
                 return false;
             }
 
-            return ! empty(array_intersect($value, $where['values']));
+            return count(array_intersect($value, $where['values'])) == count($where['values']);
         });
     }
 
@@ -251,7 +251,7 @@ abstract class IteratorBuilder extends Builder
                 return true;
             }
 
-            return empty(array_intersect($value, $where['values']));
+            return count(array_intersect($value, $where['values'])) != count($where['values']);
         });
     }
 
@@ -315,7 +315,9 @@ abstract class IteratorBuilder extends Builder
                 return false;
             }
 
-            return $value->copy()->startOfDay()->$method($where['value']);
+            $value = $value->copy()->setTimezone(config('app.timezone'));
+
+            return $value->startOfDay()->$method($where['value']);
         });
     }
 
@@ -374,6 +376,8 @@ abstract class IteratorBuilder extends Builder
             if (is_null($value)) {
                 return false;
             }
+
+            $value = $value->copy()->setTimezone(config('app.timezone'));
 
             $compareValue = $value->copy()->setTimeFromTimeString($where['value']);
 

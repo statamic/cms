@@ -22,6 +22,7 @@ use Statamic\GraphQL\Manager;
  * @method static array getExtraQueries()
  * @method static void addMiddleware($middleware)
  * @method static array getExtraMiddleware()
+ * @method static bool introspectionEnabled()
  *
  * @see \Statamic\GraphQL\Manager
  */

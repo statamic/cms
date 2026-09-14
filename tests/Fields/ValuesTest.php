@@ -187,6 +187,20 @@ class ValuesTest extends TestCase
     }
 
     #[Test]
+    public function to_raw_array()
+    {
+        $values = new Values([
+            'alfa' => 'bravo',
+            'charlie' => $value = new Value('delta', null, $this->fieldtype),
+        ]);
+
+        $this->assertEquals([
+            'alfa' => 'bravo',
+            'charlie' => 'delta',
+        ], $values->toRawArray());
+    }
+
+    #[Test]
     #[DataProvider('queryBuilderProvider')]
     public function it_gets_a_query($builder)
     {

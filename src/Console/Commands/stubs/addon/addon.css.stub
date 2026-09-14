@@ -1,0 +1,4 @@
+@import '@statamic/cms/tailwind.css';
+@source '../js';
+
+/** Your custom styles go here */

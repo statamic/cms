@@ -8,6 +8,7 @@ use Facades\Statamic\StarterKits\Hook;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Http;
+use Statamic\Console\Composer\Json as ComposerJson;
 use Statamic\Console\NullConsole;
 use Statamic\Console\Please\Application as PleaseApplication;
 use Statamic\Console\Processes\Exceptions\ProcessException;
@@ -184,7 +185,7 @@ final class Installer
      */
     protected function backupComposerJson(): self
     {
-        $this->files->copy(base_path('composer.json'), base_path('composer.json.bak'));
+        $this->files->copy(ComposerJson::path(), ComposerJson::path().'.bak');
 
         return $this;
     }
@@ -222,7 +223,7 @@ final class Installer
             return $this;
         }
 
-        $composerJson = json_decode($this->files->get(base_path('composer.json')), true);
+        $composerJson = json_decode($this->files->get(ComposerJson::path()), true);
 
         $composerJson['repositories'][] = [
             'type' => 'vcs',
@@ -230,7 +231,7 @@ final class Installer
         ];
 
         $this->files->put(
-            base_path('composer.json'),
+            ComposerJson::path(),
             json_encode($composerJson, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT)
         );
 
@@ -244,20 +245,38 @@ final class Installer
      */
     protected function requireStarterKit(): self
     {
+        $error = null;
+
         spin(
-            function () {
-                $package = $this->branch
-                    ? "{$this->package}:{$this->branch}"
+            function () use (&$error) {
+                $version = $this->branch;
+
+                // Allow dev stability when installing from VCS repo without tagged releases
+                if (! $version && $this->url) {
+                    $version = '@dev';
+                }
+
+                // Allow dev stability when installing from local repo
+                if (! $version && $this->fromLocalRepo) {
+                    $version = '@dev';
+                }
+
+                $package = $version
+                    ? "{$this->package}:{$version}"
                     : $this->package;
 
                 try {
                     Composer::withoutQueue()->throwOnFailure()->require($package);
                 } catch (ProcessException $exception) {
-                    $this->rollbackWithError("Error installing starter kit [{$package}].", $exception->getMessage());
+                    $error = $exception;
                 }
             },
             "Preparing starter kit [{$this->package}]..."
         );
+
+        if ($error) {
+            $this->rollbackWithError("Error installing starter kit [{$this->package}].", $error->getMessage());
+        }
 
         return $this;
     }
@@ -453,7 +472,7 @@ final class Installer
         }
 
         if (confirm('Create a super user?', false)) {
-            $this->console->call('make:user', ['--super' => true]);
+            $this->console->call('statamic:make:user', ['--super' => true]);
         }
 
         return $this;
@@ -570,7 +589,7 @@ EOT;
      */
     protected function removeComposerJsonBackup(): self
     {
-        $this->files->delete(base_path('composer.json.bak'));
+        $this->files->delete(ComposerJson::path().'.bak');
 
         return $this;
     }
@@ -594,7 +613,7 @@ EOT;
             return $this;
         }
 
-        $composerJson = json_decode($this->files->get(base_path('composer.json')), true);
+        $composerJson = json_decode($this->files->get(ComposerJson::path()), true);
 
         $repositories = collect($composerJson['repositories'])->reject(function ($repository) {
             return isset($repository['url']) && $repository['url'] === $this->url;
@@ -607,7 +626,7 @@ EOT;
         }
 
         $this->files->put(
-            base_path('composer.json'),
+            ComposerJson::path(),
             json_encode($composerJson, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT)
         );
 
@@ -619,7 +638,7 @@ EOT;
      */
     protected function restoreComposerJson(): self
     {
-        $this->files->copy(base_path('composer.json.bak'), base_path('composer.json'));
+        $this->files->copy(ComposerJson::path().'.bak', ComposerJson::path());
 
         return $this;
     }

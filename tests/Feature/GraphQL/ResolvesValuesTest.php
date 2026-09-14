@@ -5,10 +5,10 @@ namespace Tests\Feature\GraphQL;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Statamic\Fields\FieldtypeRepository;
 use Facades\Tests\Factories\EntryFactory;
-use Facades\Tests\Factories\GlobalFactory;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blueprint;
+use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
 use Statamic\Facades\User;
@@ -89,8 +89,8 @@ class ResolvesValuesTest extends TestCase
     {
         BlueprintRepository::shouldReceive('find')->with('globals.test')->andReturn($this->blueprint);
 
-        $set = GlobalFactory::handle('test')->data(['foo' => 'bar'])->create();
-        $vars = $set->in('en');
+        $set = tap(GlobalSet::make('test'))->save();
+        $vars = $set->in('en')->data(['foo' => 'bar']);
 
         $this->assertEquals('bar', $vars->value('foo'));
         $this->assertEquals('BAR', $vars->resolveGqlValue('foo'));

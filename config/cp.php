@@ -53,25 +53,8 @@ return [
     */
 
     'widgets' => [
-        'getting_started',
+        //
     ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Date Format
-    |--------------------------------------------------------------------------
-    |
-    | When a date is encountered throughout the Control Panel, it will be
-    | rendered in the following format unless overridden in specific
-    | fields, and so on. Any PHP date variables are permitted.
-    |
-    | This takes precedence over the date_format in system.php.
-    |
-    | https://www.php.net/manual/en/function.date.php
-    |
-    */
-
-    'date_format' => 'Y-m-d',
 
     /*
     |--------------------------------------------------------------------------
@@ -85,7 +68,7 @@ return [
 
     'pagination_size' => 50,
 
-    'pagination_size_options' => [10, 25, 50, 100, 500],
+    'pagination_size_options' => [10, 25, 50, 100],
 
     /*
     |--------------------------------------------------------------------------
@@ -103,24 +86,11 @@ return [
     | Support Link
     |--------------------------------------------------------------------------
     |
-    | Set the location of the support link in the "Useful Links" header
-    | dropdown. Use 'false' to remove it entirely.
+    | Set the location of the support link in the header.
     |
     */
 
     'support_url' => env('STATAMIC_SUPPORT_URL', 'https://statamic.com/support'),
-
-    /*
-    |--------------------------------------------------------------------------
-    | Theme
-    |--------------------------------------------------------------------------
-    |
-    | Optionally spice up the login and other outside-the-control-panel
-    | screens. You may choose between "rad" or "business" themes.
-    |
-    */
-
-    'theme' => env('STATAMIC_THEME', 'rad'),
 
     /*
     |--------------------------------------------------------------------------
@@ -147,6 +117,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Default Timezone
+    |--------------------------------------------------------------------------
+    |
+    | Determines the timezone used when displaying and entering dates in the
+    | Control Panel. Can be overridden by individual date fields. Defaults to
+    | "auto" which uses the browser's local timezone.
+    |
+    */
+
+    'default_timezone' => env('STATAMIC_CP_DEFAULT_TIMEZONE', 'auto'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Thumbnails
     |--------------------------------------------------------------------------
     |
@@ -157,4 +140,5 @@ return [
     'thumbnail_presets' => [
         // 'medium' => 800,
     ],
+
 ];

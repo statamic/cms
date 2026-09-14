@@ -4,11 +4,12 @@ namespace Statamic\CP\Toasts;
 
 use Exception;
 use Illuminate\Contracts\Support\Arrayable;
+use JsonSerializable;
 
 /**
  * Holds information about a toast message to show to the user.
  */
-class Toast implements Arrayable
+class Toast implements Arrayable, JsonSerializable
 {
     private const TYPES = ['error', 'success', 'info'];
     private $message;
@@ -41,6 +42,11 @@ class Toast implements Arrayable
             'type' => $this->type,
             'duration' => $this->duration,
         ];
+    }
+
+    public function jsonSerialize(): array
+    {
+        return $this->toArray();
     }
 
     /**

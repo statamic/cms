@@ -203,6 +203,36 @@ EOT;
     }
 
     #[Test]
+    public function it_extracts_snippets_when_the_term_is_longer_than_the_snippet_length()
+    {
+        // https://github.com/statamic/cms/issues/12951
+        $content = <<<'EOT'
+        We know, it was a long wait, but now we finally have it, support for OpenID
+        Connect front and back-channel logout. The backchannel_logout_session_required
+        flag can be set on a client. See backchannel_logout_uri too. The
+        frontchannel_logout_session_required flag is the front-channel equivalent, and
+        backchannel_logout_session_required appears once more right here.
+        EOT;
+
+        $comb = new Comb([
+            ['content' => $content],
+        ], ['snippet_length' => 30]);
+
+        try {
+            $results = $comb->lookUp('backchannel_logout_session_required');
+        } catch (NoResultsFound $e) {
+            $results = [];
+        }
+
+        $expected = [[
+            'backchannel_logout_session_required',
+            'backchannel_logout_session_required',
+        ]];
+
+        $this->assertEquals($expected, collect($results['data'] ?? [])->pluck('snippets.content')->all());
+    }
+
+    #[Test]
     public function it_can_search_for_plus_signs()
     {
         $comb = new Comb([
@@ -279,6 +309,22 @@ EOT;
         $results = $comb->lookUp('soup -tomato');
 
         $this->assertEquals(['Chicken & Sweetcorn Soup'], collect($results['data'] ?? [])->pluck('data.title')->all());
+    }
+
+    #[Test]
+    public function it_handles_stop_words_case_insensitive()
+    {
+        $comb = new Comb([
+            ['title' => 'One two three'],
+            ['title' => 'Three four five'],
+            ['title' => 'Five four three'],
+        ]);
+
+        $comb->setSettings(['stop_words' => ['Three']]);
+
+        $results = $comb->lookUp('One two three');
+
+        $this->assertEquals(['One two three'], collect($results['data'] ?? [])->pluck('data.title')->all());
     }
 
     public static function searchesProvider()

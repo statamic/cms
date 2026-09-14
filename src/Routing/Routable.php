@@ -103,11 +103,6 @@ trait Routable
             return $url;
         }
 
-        $url = vsprintf('%s/%s', [
-            rtrim($this->site()->absoluteUrl(), '/'),
-            ltrim($url, '/'),
-        ]);
-
-        return $url === '/' ? $url : rtrim($url, '/');
+        return URL::tidy($this->site()->absoluteUrl().'/'.$url);
     }
 }

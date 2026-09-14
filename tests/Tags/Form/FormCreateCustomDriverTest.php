@@ -57,9 +57,9 @@ EOT
     {
         $output = $this->tag(<<<'EOT'
 {{ form:contact js="custom_driver" }}
-    {{ fields }}
+    {{ form:fields }}
         <script>{{ custom_field_js }}</script>
-    {{ /fields }}
+    {{ /form:fields }}
 {{ /form:contact }}
 EOT
         );
@@ -74,9 +74,9 @@ EOT
     {
         $output = $this->normalizeHtml($this->tag(<<<'EOT'
 {{ form:contact js="custom_driver" }}
-    {{ fields }}
+    {{ form:fields }}
         {{ field }}
-    {{ /fields }}
+    {{ /form:fields }}
 {{ /form:contact }}
 EOT
         ));
@@ -100,9 +100,9 @@ EOT
     {
         $output = $this->tag(<<<'EOT'
 {{ form:contact js="custom_driver" }}
-    {{ fields }}
+    {{ form:fields }}
         <script>{{ show_field }}</script>
-    {{ /fields }}
+    {{ /form:fields }}
 {{ /form:contact }}
 EOT
         );

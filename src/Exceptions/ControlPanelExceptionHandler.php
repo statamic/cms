@@ -19,6 +19,11 @@ class ControlPanelExceptionHandler extends Handler
         return $this->renderException($request, $e);
     }
 
+    protected function shouldReturnJson($request, Throwable $e)
+    {
+        return $request->expectsJson();
+    }
+
     protected function convertValidationExceptionToResponse(ValidationException $e, $request)
     {
         $e = $this->newStatamicValidationException($e);

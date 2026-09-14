@@ -80,20 +80,21 @@ class NestedFieldsTest extends TestCase
                 'instructions' => 'Some instructions',
                 'instructions_position' => 'above',
                 'listable' => 'hidden',
-                'sortable' => true,
                 'visibility' => 'visible',
+                'sortable' => true,
                 'replicator_preview' => true,
                 'duplicate' => true,
+                'actions' => true,
                 'type' => 'assets',
                 'max_files' => 2,
                 'container' => 'main',
                 'foo' => 'bar',
-                'validate' => 'required',
                 'component' => 'assets',
                 'prefix' => null,
                 'required' => true,
                 'read_only' => false, // deprecated
                 'always_save' => false,
+                'reserve_space_when_hidden' => false,
             ],
         ], $actual);
     }
@@ -142,7 +143,7 @@ class NestedFieldsTest extends TestCase
                     'localizable' => false,
                 ],
                 'fieldtype' => 'text',
-                'icon' => 'text',
+                'icon' => 'fieldtype-text',
                 '_id' => 0,
             ],
             [
@@ -157,7 +158,7 @@ class NestedFieldsTest extends TestCase
                 ],
                 'config_overrides' => ['width', 'display'],
                 'fieldtype' => 'text',
-                'icon' => 'text',
+                'icon' => 'fieldtype-text',
                 '_id' => 1,
             ],
             [

@@ -5,7 +5,7 @@
             executionTimeGood: 2,
             executionTimeWarning: 3,
             executionTimeStrongWarning: 4,
-            executionTimeDanger: 5
+            executionTimeDanger: 5,
         },
         colors = {
             hotCode: '#f6eec7',
@@ -71,16 +71,16 @@
 
     function formatBytes(bytes) {
         if (bytes < 1024) {
-            return bytes + " bytes";
+            return bytes + ' bytes';
         } else if (bytes < 1024 * 1024) {
-            return (bytes / 1024).toFixed(2) + " KB";
+            return (bytes / 1024).toFixed(2) + ' KB';
         } else if (bytes < 1024 * 1024 * 1024) {
-            return (bytes / (1024 * 1024)).toFixed(2) + " MB";
+            return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
         } else if (bytes < 1024 * 1024 * 1024 * 1024) {
-            return (bytes / (1024 * 1024 * 1024)).toFixed(2) + " GB";
+            return (bytes / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
         }
 
-        return (bytes / (1024 * 1024 * 1024 * 1024)).toFixed(2) + " TB";
+        return (bytes / (1024 * 1024 * 1024 * 1024)).toFixed(2) + ' TB';
     }
 
     function makeEditorLink(data) {
@@ -96,23 +96,25 @@
                 delete obj.children;
             }
         }
-    };
+    }
 
-    var AntlersWidget = PhpDebugBar.Widgets.StatamicAntlersWidget = PhpDebugBar.Widget.extend({
+    var AntlersWidget = (PhpDebugBar.Widgets.StatamicAntlersWidget = PhpDebugBar.Widget.extend({
         className: csscls('antlers'),
 
         render: function () {
-            this.bindAttr('data', function (data) {
-                var debugWarningLabel = '';
+            this.bindAttr(
+                'data',
+                function (data) {
+                    var debugWarningLabel = '';
 
-                if (data.had_active_debug_sessions) {
-                    debugWarningLabel = `<div id="antlers-trace-debugger-warning" class="antlers-trace-metric" title="An Antlers debugger was active and may influence results." style="display:none">
+                    if (data.had_active_debug_sessions) {
+                        debugWarningLabel = `<div id="antlers-trace-debugger-warning" class="antlers-trace-metric" title="An Antlers debugger was active and may influence results." style="display:none">
     <span id="antlers-trace-debugger-symbol"></span>
     <span>Debugger Attached</span>
 </div>`;
-                }
+                    }
 
-                var $content = $(`
+                    var $content = $(`
 <div id="antlers-trace-toolbar">
     <h2>Antlers Profiler [Experimental]</h2>
     <div id="antlers-trace-metrics">
@@ -156,478 +158,479 @@
 </div>
 `);
 
-                this.$el.empty().append($content);
+                    this.$el.empty().append($content);
 
-                var btnCallGraph = document.getElementById('btn-antlers-trace-view-graph'),
-                    btnSourceGraph = document.getElementById('btn-antlers-trace-source-graph'),
-                    btnNodeGraph = document.getElementById('btn-antlers-trace-expression-graph'),
-                    btnCloseProperties = document.getElementById('btn-antlers-trace-close-properties'),
-                    tabCallGraph = document.getElementById('antlers-trace-call-report'),
-                    tabSourceGraph = document.getElementById('antlers-trace-source-graph'),
-                    $sourceGraph = $(tabSourceGraph),
-                    metricsContainer = document.getElementById('antlers-trace-metrics'),
-                    $metricsContainer = $(metricsContainer),
-                    antlersTracePanel = document.querySelector('.phpdebugbar-widgets-antlers'),
-                    debugBarPanel = antlersTracePanel.closest('.phpdebugbar-panel'),
-                    debugBarBody = document.querySelector('.phpdebugbar-body'),
-                    reportViewElement = document.getElementById('antlers-trace-reports'),
-                    propertiesView = document.getElementById('antlers-trace-properties'),
-                    reportTable = document.getElementById('antlers-trace-call-table'),
-                    propertiesContent = document.getElementById('antlers-trace-properties-content'),
-                    $propertiesContent = $(propertiesContent);
+                    var btnCallGraph = document.getElementById('btn-antlers-trace-view-graph'),
+                        btnSourceGraph = document.getElementById('btn-antlers-trace-source-graph'),
+                        btnNodeGraph = document.getElementById('btn-antlers-trace-expression-graph'),
+                        btnCloseProperties = document.getElementById('btn-antlers-trace-close-properties'),
+                        tabCallGraph = document.getElementById('antlers-trace-call-report'),
+                        tabSourceGraph = document.getElementById('antlers-trace-source-graph'),
+                        $sourceGraph = $(tabSourceGraph),
+                        metricsContainer = document.getElementById('antlers-trace-metrics'),
+                        $metricsContainer = $(metricsContainer),
+                        antlersTracePanel = document.querySelector('.phpdebugbar-widgets-antlers'),
+                        debugBarPanel = antlersTracePanel.closest('.phpdebugbar-panel'),
+                        debugBarBody = document.querySelector('.phpdebugbar-body'),
+                        reportViewElement = document.getElementById('antlers-trace-reports'),
+                        propertiesView = document.getElementById('antlers-trace-properties'),
+                        reportTable = document.getElementById('antlers-trace-call-table'),
+                        propertiesContent = document.getElementById('antlers-trace-properties-content'),
+                        $propertiesContent = $(propertiesContent);
 
-                function hidePropertiesWindow() {
-                    propertiesView.style.display = 'none';
-                }
-
-
-                function openPropertiesWindow(obj) {
-                    var objProperties = [],
-                        properties = '';
-                    objProperties.push({
-                        label: 'Expression Content',
-                        value: `<span style="font-family:monospace">${obj.escapedNodeContent}</span>`,
-                        help: '',
-                    });
-
-                    objProperties.push({
-                        label: 'Source File',
-                        value: `<span style="font-family:monospace">${obj.path}</span>`,
-                        help: '',
-                    });
-
-                    if (obj.line > 0) {
-                        objProperties.push({
-                            label: 'Line Number',
-                            value: `<span style="font-family:monospace">${obj.line}</span>`,
-                            help: ''
-                        });
+                    function hidePropertiesWindow() {
+                        propertiesView.style.display = 'none';
                     }
 
-                    objProperties.push({
-                        label: 'Self Execution Time',
-                        value: obj.clientSelfTimeDisplay,
-                        help: 'The time spent evaluating this Antlers expression.'
-                    });
-
-                    objProperties.push({
-                        label: 'Total Execution Time',
-                        value: obj.clientTotalTimeDisplay,
-                        help: 'The time spent evaluating the Antlers expression, and all child expressions.'
-                    });
-
-                    objProperties.push({
-                        label: 'Execution Time %',
-                        value: obj.percentOfExecutionTime,
-                        help: 'The percent of rendering time attributable to this Antlers expression.'
-                    });
-
-                    objProperties.push({
-                        label: '# of Executions',
-                        value: obj.executionCount,
-                        help: 'The total number of times this Antlers expression was evaluated.'
-                    });
-
-                    objProperties.push({
-                        label: 'Cumulative Memory',
-                        value: formatBytes(obj.cumulativeMemorySamples),
-                        help: 'The relative amount of memory consumed while this Antlers expression was being evaluated.'
-                    });
-
-                    if (obj.escapedSourceContent.trim().length > 0) {
+                    function openPropertiesWindow(obj) {
+                        var objProperties = [],
+                            properties = '';
                         objProperties.push({
-                            label: 'Inner Expression Content',
-                            value: `<span style="font-family:monospace">${obj.escapedSourceContent}</span>`,
-                            help: ''
+                            label: 'Expression Content',
+                            value: `<span style="font-family:monospace">${obj.escapedNodeContent}</span>`,
+                            help: '',
                         });
-                    }
 
-                    objProperties.forEach((prop) => {
-                        var helpText = '';
+                        objProperties.push({
+                            label: 'Source File',
+                            value: `<span style="font-family:monospace">${obj.path}</span>`,
+                            help: '',
+                        });
 
-                        if (prop.help.length > 0) {
-                            helpText = `<span class="antlers-trace-property-desc">${prop.help}</span>`
+                        if (obj.line > 0) {
+                            objProperties.push({
+                                label: 'Line Number',
+                                value: `<span style="font-family:monospace">${obj.line}</span>`,
+                                help: '',
+                            });
                         }
 
-                        properties += `<div class="antlers-trace-property">
+                        objProperties.push({
+                            label: 'Self Execution Time',
+                            value: obj.clientSelfTimeDisplay,
+                            help: 'The time spent evaluating this Antlers expression.',
+                        });
+
+                        objProperties.push({
+                            label: 'Total Execution Time',
+                            value: obj.clientTotalTimeDisplay,
+                            help: 'The time spent evaluating the Antlers expression, and all child expressions.',
+                        });
+
+                        objProperties.push({
+                            label: 'Execution Time %',
+                            value: obj.percentOfExecutionTime,
+                            help: 'The percent of rendering time attributable to this Antlers expression.',
+                        });
+
+                        objProperties.push({
+                            label: '# of Executions',
+                            value: obj.executionCount,
+                            help: 'The total number of times this Antlers expression was evaluated.',
+                        });
+
+                        objProperties.push({
+                            label: 'Cumulative Memory',
+                            value: formatBytes(obj.cumulativeMemorySamples),
+                            help: 'The relative amount of memory consumed while this Antlers expression was being evaluated.',
+                        });
+
+                        if (obj.escapedSourceContent.trim().length > 0) {
+                            objProperties.push({
+                                label: 'Inner Expression Content',
+                                value: `<span style="font-family:monospace">${obj.escapedSourceContent}</span>`,
+                                help: '',
+                            });
+                        }
+
+                        objProperties.forEach((prop) => {
+                            var helpText = '';
+
+                            if (prop.help.length > 0) {
+                                helpText = `<span class="antlers-trace-property-desc">${prop.help}</span>`;
+                            }
+
+                            properties += `<div class="antlers-trace-property">
     <span class="antlers-trace-property-key">${prop.label}</span>
     <span class="antlers-trace-property-value">${prop.value}</span>
     ${helpText}
 </div>
 `;
+                        });
+
+                        var template = `<div class="antlers-trace-properties-window">${properties}</div>`;
+
+                        $propertiesContent.empty().append($(template));
+
+                        propertiesView.style.display = 'initial';
+                    }
+
+                    btnCloseProperties.addEventListener('click', function () {
+                        hidePropertiesWindow();
                     });
 
-                    var template = `<div class="antlers-trace-properties-window">${properties}</div>`;
+                    function matchHeights() {
+                        var targetHeight = debugBarBody.offsetHeight - 28;
+                        reportViewElement.style.height = targetHeight + 'px';
+                        propertiesView.style.height = targetHeight - 3 + 'px';
 
-                    $propertiesContent.empty().append($(template));
+                        var chartHeight = chartContainer.offsetHeight;
 
-                    propertiesView.style.display = 'initial';
-                }
+                        reportTable.style.height = targetHeight - chartHeight - 4 + 'px';
+                    }
 
-                btnCloseProperties.addEventListener('click', function () {
-                    hidePropertiesWindow();
-                });
+                    debugBarPanel.style.overflow = 'hidden';
 
-                function matchHeights() {
-                    var targetHeight = debugBarBody.offsetHeight - 28;
-                    reportViewElement.style.height = targetHeight + 'px';
-                    propertiesView.style.height = (targetHeight - 3) + 'px';
-
-                    var chartHeight = chartContainer.offsetHeight;
-
-                    reportTable.style.height = (targetHeight - chartHeight - 4) + 'px';
-                }
-
-                debugBarPanel.style.overflow = 'hidden';
-
-                function addMetric(name, display) {
-                    var metricContainer = $(`<div class="antlers-trace-metric">
+                    function addMetric(name, display) {
+                        var metricContainer = $(`<div class="antlers-trace-metric">
     <span class="antlers-trace-metric-name">${name}:</span>
     <span class="antlers-trace-metric-display">${display}</span>
 </div`);
 
-                    $metricsContainer.append(metricContainer);
-                }
+                        $metricsContainer.append(metricContainer);
+                    }
 
-                $sourceGraph.empty();
+                    $sourceGraph.empty();
 
-                data.source_samples.forEach((item) => {
-                    var backgroundColor = 'transparent',
-                        color = 'black',
-                        title = '',
-                        cursorStyle = '';
+                    data.source_samples.forEach((item) => {
+                        var backgroundColor = 'transparent',
+                            color = 'black',
+                            title = '',
+                            cursorStyle = '';
 
-                    if (item.isNodeObject && item.totalElapsedTime != null && item.totalElapsedTime >= 0) {
-                        backgroundColor = categoryColorMapping[item.executionTimeCategory];
+                        if (item.isNodeObject && item.totalElapsedTime != null && item.totalElapsedTime >= 0) {
+                            backgroundColor = categoryColorMapping[item.executionTimeCategory];
 
-                        title = `title = "${item.clientTotalTimeDisplay}`;
+                            title = `title = "${item.clientTotalTimeDisplay}`;
 
-                        if (item.escapedNodeContent.trim().length > 0) {
-                            title += `: ${item.escapedNodeContent}`;
+                            if (item.escapedNodeContent.trim().length > 0) {
+                                title += `: ${item.escapedNodeContent}`;
+                            }
+
+                            title += '"';
+                            cursorStyle = 'cursor:pointer;';
                         }
 
-                        title += '"';
-                        cursorStyle = 'cursor:pointer;';
-                    }
+                        if (item.isCloseOutput) {
+                            color = 'gray';
+                        }
 
-                    if (item.isCloseOutput) {
-                        color = 'gray';
-                    }
+                        var template = `<pre ${title} style="display:inline; line-height: 2; color: ${color}; background-color:${backgroundColor};${cursorStyle}">${item.escapedBufferOutput}</pre>`;
 
-                    var template = `<pre ${title} style="display:inline; line-height: 2; color: ${color}; background-color:${backgroundColor};${cursorStyle}">${item.escapedBufferOutput}</pre>`;
+                        if (!item.isNodeObject) {
+                            $sourceGraph.append(template);
+                        } else {
+                            $nodeEl = $(template)[0];
+                            $nodeEl.addEventListener('click', function () {
+                                openPropertiesWindow(item);
+                            });
 
-                    if (!item.isNodeObject) {
-                        $sourceGraph.append(template);
-                    } else {
-                        $nodeEl = $(template)[0];
-                        $nodeEl.addEventListener('click', function () {
-                            openPropertiesWindow(item);
-                        });
+                            $sourceGraph.append($nodeEl);
+                        }
+                    });
 
-                        $sourceGraph.append($nodeEl);
-                    }
-                });
-
-                var chartContainer = document.getElementById('antlers-trace-chart'),
-                    chartData = {
-                        labels: data.system_samples.map(obj => obj.time),
-                        datasets: [
-                            {
-                                label: 'Memory Usage (MB)',
-                                data: data.system_samples.map(obj => ({ x: obj.time, y: obj.memory / (1024 * 1024) })),
-                                fill: {
-                                    target: 'origin',
-                                    above: 'rgb(94 190 255)',
-                                    below: '#3498db'
-                                }
-                            }
-                        ],
-                    };
-
-                new Chart(chartContainer, {
-                    type: 'line',
-                    height: 100,
-                    data: chartData,
-                    options: {
-                        maintainAspectRatio: false,
-                        scales: {
-                            x: {
-                                ticks: {
-                                    callback: function (value, index, values) {
-                                        return getSampleTime(data.system_samples[index].time);
+                    var chartContainer = document.getElementById('antlers-trace-chart'),
+                        chartData = {
+                            labels: data.system_samples.map((obj) => obj.time),
+                            datasets: [
+                                {
+                                    label: 'Memory Usage (MB)',
+                                    data: data.system_samples.map((obj) => ({
+                                        x: obj.time,
+                                        y: obj.memory / (1024 * 1024),
+                                    })),
+                                    fill: {
+                                        target: 'origin',
+                                        above: 'rgb(94 190 255)',
+                                        below: '#3498db',
                                     },
                                 },
-                            },
-                            y: {
-                                beginAtZero: true,
+                            ],
+                        };
+
+                    new Chart(chartContainer, {
+                        type: 'line',
+                        height: 100,
+                        data: chartData,
+                        options: {
+                            maintainAspectRatio: false,
+                            scales: {
+                                x: {
+                                    ticks: {
+                                        callback: function (value, index, values) {
+                                            return getSampleTime(data.system_samples[index].time);
+                                        },
+                                    },
+                                },
+                                y: {
+                                    beginAtZero: true,
+                                },
                             },
                         },
-                    },
-                });
+                    });
 
-                var columnConfig = {
-                    expander: {
-                        title: '',
-                    },
-                    sequence: {
-                        title: 'Time',
-                        field: 'sampleTime',
-                        formatter: function (cell) {
-                            var data = cell.getData();
-
-                            return getSampleTime(data.sampleTime);
-                        }
-                    },
-                    type: {
-                        title: 'Type',
-                        field: 'type',
-                        formatter: function (cell) {
-                            var data = cell.getData(),
-                                contents = '',
-                                icon = '';
-
-                            if (!data.isNodeObject) {
-                                contents = "View";
-                                icon = svgs.codeBrackets;
-                            } else if (data.isTag) {
-                                contents = "Tag"
-                                icon = svgs.tag;
-                            } else {
-                                contents = "Variable";
-                                icon = svgs.variable;
-                            }
-
-                            return `<span class="antlers-trace-type-tooltip">${icon}${contents}</span>`;
-                        }
-                    },
-                    item: {
-                        title: 'Item',
-                        maxInitialWidth: 640,
-                        field: 'clientDisplay',
-                        formatter: function (cell) {
-                            var data = cell.getData();
-                            var contents = !data.isNodeObject ? data.path : data.escapedNodeContent;
-
-                            contents = truncateString(contents, 100);
-
-                            return `<span class="antlers-trace-item-tooltip">${contents}</span>`;
-                        }
-                    },
-                    path: {
-                        title: 'View Path',
-                        field: 'path',
-                        visible: false,
-                        formatter: function (cell) {
-                            var data = cell.getData(),
-                                output = data.path;
-
-                            if (data.editorLink.trim().length > 0) {
-                                output += makeEditorLink(data);
-                            }
-
-                            return output;
-                        }
-                    },
-                    lineNumber: {
-                        title: 'Line',
-                        headerHozAlign: 'right',
-                        formatter: (cell) => cell.getValue(),
-                        field: 'line',
-                        hozAlign: 'right',
-                        formatter: function (cell) {
-                            var data = cell.getData(),
-                                output = data.line;
-
-                            if (data.editorLink.trim().length > 0) {
-                                output += makeEditorLink(data);
-                            }
-
-                            if (output === 0) {
-                                return "&mdash;";
-                            }
-
-                            return output;
-                        }
-                    },
-                    cumulativeMemoryUsage: {
-                        title: 'Memory Usage',
-                        formatter: function (cell) {
-                            var data = cell.getData();
-
-                            if (!data.isNodeObject) {
-                                return '';
-                            }
-
-                            return formatBytes(data.cumulativeMemorySamples);
+                    var columnConfig = {
+                        expander: {
+                            title: '',
                         },
-                        field: 'cumulativeMemorySamples',
-                        hozAlign: 'right',
-                    },
-                    executionCount: {
-                        title: 'Execution',
-                        field: 'executionCount',
-                        hozAlign: 'right',
-                        formatter: function (cell) {
-                            var data = cell.getData(),
-                                display = '';
+                        sequence: {
+                            title: 'Time',
+                            field: 'sampleTime',
+                            formatter: function (cell) {
+                                var data = cell.getData();
 
-                            if (!data.isNodeObject) {
-                                return '';
-                            }
+                                return getSampleTime(data.sampleTime);
+                            },
+                        },
+                        type: {
+                            title: 'Type',
+                            field: 'type',
+                            formatter: function (cell) {
+                                var data = cell.getData(),
+                                    contents = '',
+                                    icon = '';
+
+                                if (!data.isNodeObject) {
+                                    contents = 'View';
+                                    icon = svgs.codeBrackets;
+                                } else if (data.isTag) {
+                                    contents = 'Tag';
+                                    icon = svgs.tag;
+                                } else {
+                                    contents = 'Variable';
+                                    icon = svgs.variable;
+                                }
+
+                                return `<span class="antlers-trace-type-tooltip">${icon}${contents}</span>`;
+                            },
+                        },
+                        item: {
+                            title: 'Item',
+                            maxInitialWidth: 640,
+                            field: 'clientDisplay',
+                            formatter: function (cell) {
+                                var data = cell.getData();
+                                var contents = !data.isNodeObject ? data.path : data.escapedNodeContent;
+
+                                contents = truncateString(contents, 100);
+
+                                return `<span class="antlers-trace-item-tooltip">${contents}</span>`;
+                            },
+                        },
+                        path: {
+                            title: 'View Path',
+                            field: 'path',
+                            visible: false,
+                            formatter: function (cell) {
+                                var data = cell.getData(),
+                                    output = data.path;
+
+                                if (data.editorLink.trim().length > 0) {
+                                    output += makeEditorLink(data);
+                                }
+
+                                return output;
+                            },
+                        },
+                        lineNumber: {
+                            title: 'Line',
+                            headerHozAlign: 'right',
+                            formatter: (cell) => cell.getValue(),
+                            field: 'line',
+                            hozAlign: 'right',
+                            formatter: function (cell) {
+                                var data = cell.getData(),
+                                    output = data.line;
+
+                                if (data.editorLink.trim().length > 0) {
+                                    output += makeEditorLink(data);
+                                }
+
+                                if (output === 0) {
+                                    return '&mdash;';
+                                }
+
+                                return output;
+                            },
+                        },
+                        cumulativeMemoryUsage: {
+                            title: 'Memory Usage',
+                            formatter: function (cell) {
+                                var data = cell.getData();
+
+                                if (!data.isNodeObject) {
+                                    return '';
+                                }
+
+                                return formatBytes(data.cumulativeMemorySamples);
+                            },
+                            field: 'cumulativeMemorySamples',
+                            hozAlign: 'right',
+                        },
+                        executionCount: {
+                            title: 'Execution',
+                            field: 'executionCount',
+                            hozAlign: 'right',
+                            formatter: function (cell) {
+                                var data = cell.getData(),
+                                    display = '';
+
+                                if (!data.isNodeObject) {
+                                    return '';
+                                }
+
+                                if (data.isHot) {
+                                    display += `<span title="This code, or code it contains, is executed a large number of times.">${svgs.hotCode}</span>`;
+                                }
+
+                                display += data.executionCount;
+
+                                return display;
+                            },
+                        },
+                        totalExecutionTime: {
+                            title: 'Total Time',
+                            field: 'clientTotalTime',
+                            formatter: function (cell) {
+                                var data = cell.getData();
+
+                                if (!data.isNodeObject) {
+                                    return '';
+                                }
+
+                                return data.clientTotalTimeDisplay;
+                            },
+                            hozAlign: 'right',
+                        },
+                        selfExecutionTime: {
+                            title: 'Tag Time',
+                            headerHozAlign: 'right',
+                            field: 'clientSelfTime',
+                            formatter: function (cell) {
+                                var data = cell.getData();
+
+                                if (!data.isNodeObject) {
+                                    return '';
+                                }
+
+                                return data.clientSelfTimeDisplay;
+                            },
+                            hozAlign: 'right',
+                        },
+                        percentOfExecutionTime: {
+                            title: '%',
+                            field: 'percentOfExecutionTime',
+                            hozAlign: 'right',
+                            headerHozAlign: 'right',
+                            formatter: function (cell) {
+                                var data = cell.getData(),
+                                    contents = '';
+
+                                if (!data.isNodeObject) {
+                                    return contents;
+                                } else {
+                                    if (data.percentOfExecutionTime > 40) {
+                                        contents += `<span title="This block takes up a disproportionate amount of total execution time.">${svgs.warning}</span>`;
+                                    }
+                                }
+
+                                contents += data.percentOfExecutionTime;
+
+                                return contents;
+                            },
+                        },
+                    };
+
+                    var tableOptions = {
+                        dataTree: true,
+                        dataTreeStartExpanded: true,
+                        dataTreeChildField: 'children',
+                        responsiveLayout: true,
+                        tooltips: true,
+                        rowFormatter: function (row) {
+                            var data = row.getData(),
+                                rowEl = row.getElement(); // Get the row element
 
                             if (data.isHot) {
-                                display += `<span title="This code, or code it contains, is executed a large number of times.">${svgs.hotCode}</span>`;
+                                rowEl.style.backgroundColor = colors.hotCode;
                             }
 
-                            display += data.executionCount;
-
-                            return display;
+                            // If we replace the "hot" background color, that is fine.
+                            // The execution time visibility is more important. The
+                            // > 70 limit here is just to reduce the visual noise.
+                            if (data.isNodeObject && data.totalElapsedTime != null && data.totalElapsedTime > 70) {
+                                rowEl.style.backgroundColor = categoryColorMapping[data.executionTimeCategory];
+                            }
                         },
-                    },
-                    totalExecutionTime: {
-                        title: 'Total Time',
-                        field: 'clientTotalTime',
-                        formatter: function (cell) {
-                            var data = cell.getData();
+                    };
 
-                            if (!data.isNodeObject) {
-                                return '';
-                            }
+                    var callTable = new Tabulator('#antlers-trace-call-table', {
+                        ...tableOptions,
+                        columns: [
+                            columnConfig.expander,
+                            columnConfig.sequence,
+                            columnConfig.type,
+                            columnConfig.item,
+                            columnConfig.path,
+                            columnConfig.lineNumber,
+                            columnConfig.cumulativeMemoryUsage,
+                            columnConfig.executionCount,
+                            columnConfig.selfExecutionTime,
+                            columnConfig.totalExecutionTime,
+                            columnConfig.percentOfExecutionTime,
+                        ],
+                        data: data.data,
+                    });
 
-                            return data.clientTotalTimeDisplay;
-                        },
-                        hozAlign: 'right'
-                    },
-                    selfExecutionTime: {
-                        title: 'Tag Time',
-                        headerHozAlign: 'right',
-                        field: 'clientSelfTime',
-                        formatter: function (cell) {
-                            var data = cell.getData();
+                    callTable.on('rowClick', function (e, row) {
+                        openPropertiesWindow(row.getData());
+                    });
 
-                            if (!data.isNodeObject) {
-                                return '';
-                            }
+                    btnCallGraph.addEventListener('click', function () {
+                        tabCallGraph.style.display = 'block';
+                        tabSourceGraph.style.display = 'none';
 
-                            return data.clientSelfTimeDisplay;
-                        },
-                        hozAlign: 'right'
-                    },
-                    percentOfExecutionTime: {
-                        title: '%',
-                        field: 'percentOfExecutionTime',
-                        hozAlign: 'right',
-                        headerHozAlign: 'right',
-                        formatter: function (cell) {
-                            var data = cell.getData(),
-                                contents = '';
+                        btnCallGraph.classList.add('antlers-trace-button-active');
+                        btnNodeGraph.classList.remove('antlers-trace-button-active');
+                        btnSourceGraph.classList.remove('antlers-trace-button-active');
 
-                            if (!data.isNodeObject) {
-                                return contents;
-                            } else {
-                                if (data.percentOfExecutionTime > 40) {
-                                    contents += `<span title="This block takes up a disproportionate amount of total execution time.">${svgs.warning}</span>`;
-                                }
-                            }
+                        callTable.replaceData(data.data);
+                        callTable.hideColumn('path');
+                    });
 
-                            contents += data.percentOfExecutionTime
+                    btnNodeGraph.addEventListener('click', function () {
+                        tabCallGraph.style.display = 'block';
+                        tabSourceGraph.style.display = 'none';
 
-                            return contents;
-                        }
-                    }
-                };
+                        btnCallGraph.classList.remove('antlers-trace-button-active');
+                        btnNodeGraph.classList.add('antlers-trace-button-active');
+                        btnSourceGraph.classList.remove('antlers-trace-button-active');
 
-                var tableOptions = {
-                    dataTree: true,
-                    dataTreeStartExpanded: true,
-                    dataTreeChildField: 'children',
-                    responsiveLayout: true,
-                    tooltips: true,
-                    rowFormatter: function (row) {
-                        var data = row.getData(),
-                            rowEl = row.getElement(); // Get the row element
+                        callTable.replaceData(data.performance_items);
+                        callTable.showColumn('path');
+                    });
 
-                        if (data.isHot) {
-                            rowEl.style.backgroundColor = colors.hotCode;
-                        }
+                    btnSourceGraph.addEventListener('click', function () {
+                        tabCallGraph.style.display = 'none';
+                        tabSourceGraph.style.display = 'block';
 
-                        // If we replace the "hot" background color, that is fine.
-                        // The execution time visibility is more important. The
-                        // > 70 limit here is just to reduce the visual noise.
-                        if (data.isNodeObject && data.totalElapsedTime != null && data.totalElapsedTime > 70) {
-                            rowEl.style.backgroundColor = categoryColorMapping[data.executionTimeCategory];
-                        }
-                    }
-                };
+                        btnCallGraph.classList.remove('antlers-trace-button-active');
+                        btnNodeGraph.classList.remove('antlers-trace-button-active');
+                        btnSourceGraph.classList.add('antlers-trace-button-active');
+                    });
 
-                var callTable = new Tabulator('#antlers-trace-call-table', {
-                    ...tableOptions,
-                    columns: [
-                        columnConfig.expander,
-                        columnConfig.sequence,
-                        columnConfig.type,
-                        columnConfig.item,
-                        columnConfig.path,
-                        columnConfig.lineNumber,
-                        columnConfig.cumulativeMemoryUsage,
-                        columnConfig.executionCount,
-                        columnConfig.selfExecutionTime,
-                        columnConfig.totalExecutionTime,
-                        columnConfig.percentOfExecutionTime,
-                    ],
-                    data: data.data
-                });
+                    var observer = new MutationObserver(() => {
+                        matchHeights();
+                    });
 
-                callTable.on('rowClick', function (e, row) {
-                    openPropertiesWindow(row.getData());
-                });
-
-                btnCallGraph.addEventListener('click', function () {
-                    tabCallGraph.style.display = 'block';
-                    tabSourceGraph.style.display = 'none';
-
-                    btnCallGraph.classList.add('antlers-trace-button-active');
-                    btnNodeGraph.classList.remove('antlers-trace-button-active');
-                    btnSourceGraph.classList.remove('antlers-trace-button-active');
-
-                    callTable.replaceData(data.data);
-                    callTable.hideColumn('path');
-                });
-
-                btnNodeGraph.addEventListener('click', function () {
-                    tabCallGraph.style.display = 'block';
-                    tabSourceGraph.style.display = 'none';
-
-                    btnCallGraph.classList.remove('antlers-trace-button-active');
-                    btnNodeGraph.classList.add('antlers-trace-button-active');
-                    btnSourceGraph.classList.remove('antlers-trace-button-active');
-
-                    callTable.replaceData(data.performance_items);
-                    callTable.showColumn('path');
-                });
-
-                btnSourceGraph.addEventListener('click', function () {
-                    tabCallGraph.style.display = 'none';
-                    tabSourceGraph.style.display = 'block';
-
-                    btnCallGraph.classList.remove('antlers-trace-button-active');
-                    btnNodeGraph.classList.remove('antlers-trace-button-active');
-                    btnSourceGraph.classList.add('antlers-trace-button-active');
-                });
-
-
-                var observer = new MutationObserver(() => {
                     matchHeights();
-                });
 
-                matchHeights();
+                    var observerConfig = { attributes: true, attributeFilter: ['style'] };
+                    observer.observe(debugBarBody, observerConfig);
 
-                var observerConfig = { attributes: true, attributeFilter: ['style'] };
-                observer.observe(debugBarBody, observerConfig);
-
-                addMetric('Expressions Processed', data.total_antlers_nodes.toLocaleString());
-            }.bind(this));
+                    addMetric('Expressions Processed', data.total_antlers_nodes.toLocaleString());
+                }.bind(this),
+            );
         },
-
-    });
+    }));
 })(PhpDebugBar.$);

@@ -64,6 +64,7 @@ abstract class Filter extends Scope implements Arrayable
             'fields' => $this->fields()->toPublishArray(),
             'meta' => $this->fields()->meta(),
             'values' => $this->fields()->all()->map->defaultValue(),
+            'is_fields' => $this instanceof Filters\Fields,
         ];
     }
 

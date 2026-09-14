@@ -21,15 +21,9 @@ class StringUtilities
         }
     }
 
-    protected static $methodCache = [];
-
     protected static function getMethod($text)
     {
-        if (! array_key_exists($text, self::$methodCache)) {
-            self::$methodCache[$text] = mb_strlen($text, 'utf-8') < strlen($text);
-        }
-
-        return self::$methodCache[$text];
+        return mb_strlen($text, 'utf-8') < strlen($text);
     }
 
     public static function substr($string, $start = null, $length = null)
@@ -79,15 +73,10 @@ class StringUtilities
      */
     public static function sanitizePhp($text)
     {
-        $text = str_replace('<?php', '&lt;?php', $text);
-
-        // Also replace short tags if they're enabled.
-        if (ini_get('short_open_tag')) {
-            $xmlPlaceholder = '__XML_PLACEHOLDER'.Str::uuid();
-            $text = str_replace('<?xml', $xmlPlaceholder, $text);
-            $text = str_replace('<?', '&lt;?', $text);
-            $text = str_replace($xmlPlaceholder, '<?xml', $text);
-        }
+        $xmlPlaceholder = '__XML_PLACEHOLDER'.Str::uuid();
+        $text = str_replace('<?xml', $xmlPlaceholder, $text);
+        $text = str_replace('<?', '&lt;?', $text);
+        $text = str_replace($xmlPlaceholder, '<?xml', $text);
 
         return $text;
     }

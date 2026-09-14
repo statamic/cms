@@ -13,7 +13,7 @@ class GlobalSetPolicy
     {
         $user = User::fromUser($user);
 
-        if ($user->hasPermission('configure globals')) {
+        if ($user->isSuper() || $user->hasPermission('configure globals')) {
             return true;
         }
     }
@@ -38,7 +38,7 @@ class GlobalSetPolicy
 
     public function store($user)
     {
-        // handled by before()
+        return $this->create($user);
     }
 
     public function view($user, $set)
@@ -55,6 +55,11 @@ class GlobalSetPolicy
     public function edit($user, $set)
     {
         // handled by before()
+    }
+
+    public function update($user, $set)
+    {
+        return $this->edit($user, $set);
     }
 
     public function configure($user, $set)
