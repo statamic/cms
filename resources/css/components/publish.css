@@ -3,9 +3,14 @@
 .publish-fields,
 .field-grid {
     display: grid;
-    --grid-columns: 12;
+    --grid-columns: 1;
+    --col-span: initial;
     grid-template-columns: repeat(var(--grid-columns), 1fr);
     @apply gap-x-3 gap-6 @lg/panel:gap-8;
+
+    @variant @lg/panel {
+        --grid-columns: 12;
+    }
 
     aside & {
         @apply gap-x-2 gap-y-6;

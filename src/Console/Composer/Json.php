@@ -2,7 +2,6 @@
 
 namespace Statamic\Console\Composer;
 
-use Illuminate\Support\Env;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\Support\Arr;
@@ -11,7 +10,12 @@ class Json
 {
     public static function filename(): string
     {
-        return trim((string) Env::get('COMPOSER')) ?: 'composer.json';
+        // Read the env var using vanilla PHP so that this can be run in a Composer hook, where
+        // Composer registers the class autoloader but never runs the `autoload.files` entries.
+        // That means Laravel's helper functions don't exist, and `Env::get()` relies on `value()`.
+        $filename = $_ENV['COMPOSER'] ?? $_SERVER['COMPOSER'] ?? getenv('COMPOSER');
+
+        return trim((string) $filename) ?: 'composer.json';
     }
 
     public static function path(): string
