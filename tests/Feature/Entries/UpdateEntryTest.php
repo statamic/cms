@@ -586,6 +586,31 @@ class UpdateEntryTest extends TestCase
     }
 
     #[Test]
+    public function non_revisable_fields_are_not_removed_from_an_entry_without_an_origin()
+    {
+        [$user, $collection] = $this->seedUserAndCollection(true);
+
+        $this->seedBlueprintFields($collection, [
+            'foo' => ['type' => 'text', 'revisable' => false],
+        ]);
+
+        $entry = EntryFactory::id('1')
+            ->slug('test')
+            ->collection('test')
+            ->published(true)
+            ->data(['title' => 'Test', 'foo' => 'bar'])
+            ->create();
+
+        // A single site install doesn't send _localized at all.
+        $this
+            ->actingAs($user)
+            ->update($entry, ['foo' => 'bar'])
+            ->assertOk();
+
+        $this->assertEquals('bar', $entry->fresh()->get('foo'));
+    }
+
+    #[Test]
     public function published_entry_without_non_revisable_fields_is_not_saved()
     {
         [$user, $collection] = $this->seedUserAndCollection(true);
@@ -613,7 +638,7 @@ class UpdateEntryTest extends TestCase
     }
 
     #[Test]
-    public function synced_non_revisable_fields_are_not_saved_to_the_localization()
+    public function non_revisable_fields_are_only_saved_to_the_localization_while_localized()
     {
         $this->setSites([
             'en' => ['locale' => 'en', 'url' => '/'],
@@ -664,7 +689,28 @@ class UpdateEntryTest extends TestCase
         $localization = $localization->fresh();
         $this->assertEquals('le bar', $localization->get('foo'));
         $this->assertEquals('bar', $origin->fresh()->get('foo'));
+
+        $this
+            ->actingAs($user)
+            ->update($localization, [
+                'foo' => 'bar',
+                '_localized' => [],
+            ])
+            ->assertOk();
+
+        $localization = $localization->fresh();
+        $this->assertFalse($localization->has('foo'));
+        $this->assertEquals('bar', $localization->foo);
+
+        // Publishing merges non-revisable fields back from the live entry, which no
+        // longer has the handle, so the field stays synced with the origin.
+        $localization->publishWorkingCopy(['user' => $user]);
+
+        $localization = $localization->fresh();
+        $this->assertFalse($localization->has('foo'));
+        $this->assertEquals('bar', $localization->foo);
     }
+
 
     #[Test]
     public function it_can_validate_against_published_value()
