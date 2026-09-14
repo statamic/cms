@@ -177,7 +177,18 @@ class Glide extends Tags
                 : $this->getGenerator()->generateByPath($item, $params);
         }
 
-        return $this->getGenerator()->generateByAsset(Asset::find($item), $params);
+        $asset = Asset::find($item);
+
+        if (! $asset) {
+            // Thrown (rather than logged here directly) so the calling closure's
+            // existing catch (\Exception $e) { Log::error($e->getMessage()); }
+            // in generate() logs it with the identifying $item, instead of the
+            // flat, context-free message generateByAsset()'s own null-asset
+            // guard would otherwise produce.
+            throw new \Exception('Cannot generate an image for a missing asset: '.(is_string($item) ? $item : json_encode($item)));
+        }
+
+        return $this->getGenerator()->generateByAsset($asset, $params);
     }
 
     /**

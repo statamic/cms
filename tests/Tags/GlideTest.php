@@ -3,6 +3,7 @@
 namespace Tests\Tags;
 
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Log;
 use Orchestra\Testbench\Attributes\DefineEnvironment;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\File;
@@ -11,6 +12,25 @@ use Tests\TestCase;
 
 class GlideTest extends TestCase
 {
+    #[Test]
+    /**
+     * https://github.com/statamic/cms/pull/15447
+     */
+    public function it_logs_the_item_when_the_asset_cannot_be_resolved()
+    {
+        Log::shouldReceive('error')
+            ->once()
+            ->with(\Mockery::pattern('/Cannot generate an image for a missing asset.*nonexistent\.jpg/'));
+
+        $result = (string) Parse::template(
+            '{{ glide:foo width="100" }}',
+            ['foo' => 'nonexistent.jpg'],
+            trusted: true
+        );
+
+        $this->assertSame('', $result);
+    }
+
     #[Test]
     #[DefineEnvironment('relativeRouteUrl')]
     public function it_outputs_a_relative_url_by_default_when_the_glide_route_is_relative()
