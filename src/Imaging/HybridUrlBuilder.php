@@ -9,14 +9,8 @@ use Statamic\Facades\URL;
 
 class HybridUrlBuilder extends ImageUrlBuilder
 {
-    protected GlideCachePathResolver $resolver;
-
-    protected array $options;
-
-    public function __construct(GlideCachePathResolver $resolver, array $options = [])
+    public function __construct(private GlideCachePathResolver $resolver, private array $options = [])
     {
-        $this->resolver = $resolver;
-        $this->options = $options;
     }
 
     /**
