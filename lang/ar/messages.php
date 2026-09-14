@@ -187,6 +187,7 @@ return [
     'publish_actions_publish' => 'سيتم تطبيق التغييرات على النسخة الحالية وسيتم نشرها على الفور.',
     'publish_actions_schedule' => 'سيتم تطبيق التغييرات على النسخة الحالية وسيتم نشرها في التاريخ المحدد.',
     'publish_actions_unpublish' => 'ستتم إزالة النشر عن المراجعة الحالية.',
+    'relationship_item_unavailable' => 'هذا العنصر غير متاح. ربما تم حذفه، أو قد لا تملك صلاحية عرضه.',
     'reset_password_notification_body' => 'تتلقى هذا البريد الإلكتروني لأننا تلقينا طلبًا لإعادة تعيين كلمة المرور لحسابك.',
     'reset_password_notification_no_action' => 'إذا لم تطلب إعادة تعيين كلمة المرور، فلا يلزم اتخاذ أي إجراء آخر.',
     'reset_password_notification_subject' => 'إشعار إعادة تعيين كلمة المرور',

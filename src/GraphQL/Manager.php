@@ -23,12 +23,12 @@ class Manager
 
     public function addType($type)
     {
-        return GraphQL::addType($type);
+        GraphQL::addType($type);
     }
 
     public function addTypes($type)
     {
-        return GraphQL::addTypes($type);
+        GraphQL::addTypes($type);
     }
 
     public function type($type)

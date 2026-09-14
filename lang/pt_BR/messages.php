@@ -187,6 +187,7 @@ return [
     'publish_actions_publish' => 'As alterações à cópia de trabalho serão aplicadas à entrada e serão publicadas imediatamente.',
     'publish_actions_schedule' => 'As alterações à cópia de trabalho serão aplicadas à entrada e aparecerá publicada na data selecionada.',
     'publish_actions_unpublish' => 'A revisão atual será despublicada.',
+    'relationship_item_unavailable' => 'Este item não está disponível. Ele pode ter sido excluído ou você pode não ter permissão para visualizá-lo.',
     'reset_password_notification_body' => 'Você está recebendo este e-mail porque recebemos uma solicitação de redefinição de senha para sua conta.',
     'reset_password_notification_no_action' => 'Se você não solicitou uma redefinição de senha, nenhuma ação adicional será necessária.',
     'reset_password_notification_subject' => 'Notificação de Redefinição de Senha',

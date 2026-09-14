@@ -187,6 +187,7 @@ return [
     'publish_actions_publish' => 'Töökoopia muudatused rakendatakse kirjele ja see avaldatakse kohe.',
     'publish_actions_schedule' => 'Töökoopia muudatused rakendatakse kirjele ja see avaldatakse valitud kuupäeval.',
     'publish_actions_unpublish' => 'Praegune redaktsioon muudetakse mustandiks.',
+    'relationship_item_unavailable' => 'See üksus pole saadaval. Võimalik, et see on kustutatud või sul pole õigust seda vaadata.',
     'reset_password_notification_body' => 'Saite selle e-kirja, kuna saime sinu konto parooli lähtestamise taotluse.',
     'reset_password_notification_no_action' => 'Kui sa parooli lähtestamist ei taotlenud, pole edasisi toiminguid vaja.',
     'reset_password_notification_subject' => 'Parooli lähtestamise teavitus',

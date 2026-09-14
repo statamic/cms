@@ -76,7 +76,7 @@ class Dictionary extends Fieldtype
     public function preload(): array
     {
         return [
-            'url' => cp_route('dictionary-fieldtype', $this->dictionary()->handle()),
+            'url' => route('statamic.dictionary-fieldtype', $this->dictionary()->handle()),
             'selectedOptions' => $this->getItemData($this->field->value()),
         ];
     }
@@ -86,11 +86,12 @@ class Dictionary extends Fieldtype
         return collect($values)->map(function ($key) {
             $item = $this->dictionary()->get($key);
 
-            return [
+            return array_filter([
                 'value' => $item?->value() ?? $key,
                 'label' => $item?->label() ?? $key,
+                'icon' => $item?->icon(),
                 'invalid' => ! $item,
-            ];
+            ], fn ($v, $k) => $k !== 'icon' || $v !== null, ARRAY_FILTER_USE_BOTH);
         })->values()->all();
     }
 

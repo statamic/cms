@@ -8,9 +8,11 @@ use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Foundation\Http\Middleware\TrimStrings;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
+use Statamic\Console\Processes\Ffmpeg;
 use Statamic\CP\CarbonAsVueComponent;
 use Statamic\Facades;
 use Statamic\Facades\Addon;
@@ -20,7 +22,9 @@ use Statamic\Facades\Stache;
 use Statamic\Facades\Token;
 use Statamic\Facades\User;
 use Statamic\Fields\FieldsetRecursionStack;
+use Statamic\Http\Middleware\PingOutpost;
 use Statamic\Jobs\HandleEntrySchedule;
+use Statamic\Licensing\Radio;
 use Statamic\Notifications\ElevatedSessionVerificationCode;
 use Statamic\Sites\Sites;
 use Statamic\Stache\Query\RevisionQueryBuilder;
@@ -47,11 +51,19 @@ class AppServiceProvider extends ServiceProvider
             $this->loadRoutesFrom("{$this->root}/routes/routes.php");
         });
 
+        if (class_exists(\Laravel\Octane\Events\RequestReceived::class)) {
+            Event::listen(\Laravel\Octane\Events\RequestReceived::class, fn () => Ffmpeg::clearBinaryCache());
+        }
+
         $this->app[\Illuminate\Contracts\Http\Kernel::class]
             ->pushMiddleware(\Statamic\Http\Middleware\PoweredByHeader::class)
             ->pushMiddleware(\Statamic\Http\Middleware\CheckComposerJsonScripts::class)
             ->pushMiddleware(\Statamic\Http\Middleware\CheckMultisite::class)
-            ->pushMiddleware(\Statamic\Http\Middleware\StopImpersonating::class);
+            ->pushMiddleware(\Statamic\Http\Middleware\StopImpersonating::class)
+            ->pushMiddleware(PingOutpost::class)
+            // Prepended so the snapshot runs before any middleware that could
+            // throw and render a page (which would register json variables).
+            ->prependMiddleware(\Statamic\Http\Middleware\SnapshotJsonVariables::class);
 
         $this->loadViewsFrom("{$this->root}/resources/views", 'statamic');
 
@@ -97,6 +109,7 @@ class AppServiceProvider extends ServiceProvider
         ], 'statamic-scaffolding');
 
         $this->app['redirect']->macro('cpRoute', function ($route, $parameters = []) {
+            /** @var \Illuminate\Routing\Redirector $this */
             return $this->to(cp_route($route, $parameters));
         });
 
@@ -136,7 +149,15 @@ class AppServiceProvider extends ServiceProvider
 
         $this->registerElevatedSessionMacros();
 
-        $this->app->make(Schedule::class)->job(HandleEntrySchedule::class)->everyMinute();
+        if (config('statamic.system.handle_scheduled_entries')) {
+            $this->app->make(Schedule::class)->job(HandleEntrySchedule::class)->everyMinute();
+        }
+
+        $this->app->make(Schedule::class)
+            ->call(fn () => app(Radio::class)->ping())
+            ->hourly()
+            ->name('statamic-outpost')
+            ->withoutOverlapping();
     }
 
     public function register()
@@ -178,6 +199,7 @@ class AppServiceProvider extends ServiceProvider
                 ->setRepository('collection', \Statamic\Contracts\Entries\CollectionRepository::class)
                 ->setRepository('taxonomy', \Statamic\Contracts\Taxonomies\TaxonomyRepository::class)
                 ->setRepository('global', \Statamic\Contracts\Globals\GlobalRepository::class)
+                ->setRepository('globals', \Statamic\Contracts\Globals\GlobalVariablesRepository::class)
                 ->setRepository('asset', \Statamic\Contracts\Assets\AssetRepository::class)
                 ->setRepository('user', \Statamic\Contracts\Auth\UserRepository::class);
         });
@@ -357,7 +379,7 @@ class AppServiceProvider extends ServiceProvider
             }
 
             return Carbon::createFromTimestamp($lastElevated)
-                ->addMinutes(config('statamic.users.elevated_session_duration', 15))
+                ->addMinutes((float) config('statamic.users.elevated_session_duration', 15))
                 ->timestamp;
         });
 
@@ -366,6 +388,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Session::macro('elevate', function () {
+            /** @var \Illuminate\Session\Store $this */
             $this->put('statamic_elevated_session', now()->timestamp);
             $this->forget('statamic_elevated_session_verification_code');
         });

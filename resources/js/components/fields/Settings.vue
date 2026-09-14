@@ -43,6 +43,7 @@
                                 :suggestable-fields="suggestableConditionFields"
                                 @updated="updateFieldConditions"
                                 @updated-always-save="updateAlwaysSave"
+                                @updated-reserve-space-when-hidden="updateReserveSpaceWhenHidden"
                             />
                         </CardPanel>
                     </TabContent>
@@ -153,12 +154,6 @@ export default {
             return blueprint;
         },
 
-        selectedWidth: function () {
-            var width = this.config.width || 100;
-            var found = this.widths.find((w) => w.value === width);
-            return found.text;
-        },
-
         fieldtypeConfig() {
             return this.fieldtype.config;
         },
@@ -261,6 +256,12 @@ export default {
             this.values.always_save = alwaysSave;
 
             this.markFieldEdited('always_save');
+        },
+
+        updateReserveSpaceWhenHidden(reserveSpaceWhenHidden) {
+            this.values.reserve_space_when_hidden = reserveSpaceWhenHidden;
+
+            this.markFieldEdited('reserve_space_when_hidden');
         },
 
         markFieldEdited(handle) {

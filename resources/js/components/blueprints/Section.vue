@@ -54,7 +54,18 @@
                             class="font-mono text-sm"
                             v-model="editingSection.handle"
                             @input="handleSyncedWithDisplay = false"
-                        />
+                        >
+                            <template #append>
+                                <ui-button
+                                    icon="sync"
+                                    size="sm"
+                                    variant="ghost"
+                                    :aria-label="__('Regenerate from: :field', { field: __('Display') })"
+                                    @click="regenerateHandle"
+                                    v-tooltip="__('Regenerate from: :field', { field: __('Display') })"
+                                />
+                            </template>
+                        </ui-input>
                     </ui-field>
                     <ui-field :label="__('Instructions')">
                         <ui-input type="text" v-model="editingSection.instructions" />
@@ -219,15 +230,15 @@ export default {
         },
     },
 
-    created() {
-        // This logic isn't ideal, but it was better than passing along a 'isNew' boolean and having
-        // to deal with stripping it out and making it not new, etc. Good enough for a quick win.
-        if (!this.section.handle || this.section.handle == 'new_section' || this.section.handle == 'new_set') {
-            this.handleSyncedWithDisplay = true;
-        }
-    },
-
     methods: {
+        regenerateHandle() {
+            if (!this.editingSection) {
+                return;
+            }
+
+            this.editingSection.handle = snake_case(this.editingSection.display);
+        },
+
         fieldLinked(field) {
             this.section.fields.push(field);
             this.$toast.success(__('Field added'));
@@ -250,6 +261,7 @@ export default {
         },
 
         edit() {
+            this.handleSyncedWithDisplay = !this.section.handle || ['new_section', 'new_set'].includes(this.section.handle);
             this.editingSection = {
                 display: this.section.display,
                 handle: this.section.handle,

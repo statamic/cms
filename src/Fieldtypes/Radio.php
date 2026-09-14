@@ -3,12 +3,14 @@
 namespace Statamic\Fieldtypes;
 
 use Statamic\Fields\Fieldtype;
+use Statamic\Fieldtypes\Concerns\MigratesLegacyInlineConfig;
 
 use function Statamic\trans as __;
 
 class Radio extends Fieldtype
 {
     use HasSelectOptions;
+    use MigratesLegacyInlineConfig;
 
     protected $categories = ['controls'];
     protected $selectableInForms = true;
@@ -34,10 +36,12 @@ class Radio extends Fieldtype
             [
                 'display' => __('Appearance'),
                 'fields' => [
-                    'inline' => [
-                        'display' => __('Inline'),
-                        'instructions' => __('statamic::fieldtypes.radio.config.inline'),
-                        'type' => 'toggle',
+                    'appearance' => [
+                        'display' => __('Appearance'),
+                        'instructions' => __('statamic::fieldtypes.radio.config.appearance'),
+                        'type' => 'control_appearance',
+                        'default' => 'default',
+                        'control' => 'radio',
                     ],
                 ],
             ],

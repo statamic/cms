@@ -4,6 +4,7 @@ namespace Statamic\Git;
 
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Statamic\Console\Processes\Git as GitProcess;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Facades\Antlers;
@@ -92,6 +93,10 @@ class Git
             $delayInMinutes = now()->addMinutes((int) $delay);
             $message = null;
         }
+
+        $saves = Cache::get('statamic-git-pending-saves', []);
+        $saves[] = ['name' => $this->gitUserName(), 'email' => $this->gitUserEmail()];
+        Cache::put('statamic-git-pending-saves', $saves);
 
         CommitJob::dispatch($message, $this->authenticatedUser())
             ->onConnection(config('statamic.git.queue_connection'))
@@ -283,8 +288,11 @@ class Git
     {
         $string = str_replace('"', '', $string);
         $string = str_replace("'", '', $string);
+        $string = str_replace('\\', '\\\\', $string);
+        $string = str_replace('$', '\\$', $string);
+        $string = str_replace('`', '\\`', $string);
 
-        return escapeshellcmd($string);
+        return $string;
     }
 
     /**

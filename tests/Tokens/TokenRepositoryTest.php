@@ -5,6 +5,7 @@ namespace Tests\Tokens;
 use Facades\Statamic\Tokens\Generator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Tokens\Token;
 use Statamic\Facades\File;
@@ -127,6 +128,37 @@ YAML;
     public function attempting_to_find_a_non_existent_token_returns_null()
     {
         $this->assertNull($this->tokens->find('missing-token'));
+    }
+
+    #[Test]
+    public function it_prevents_path_traversal_in_find()
+    {
+        File::put(storage_path('statamic/evil.yaml'), "handler: 'Handler'\nexpires_at: 9999999999\ndata: []");
+
+        $this->assertNull($this->tokens->find('../evil'));
+    }
+
+    #[Test]
+    #[DataProvider('invalidTokenNameProvider')]
+    public function it_throws_when_making_a_token_with_an_invalid_name($token)
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        $this->tokens->make($token, 'Handler');
+    }
+
+    public static function invalidTokenNameProvider()
+    {
+        return [
+            'parent traversal' => ['../evil'],
+            'backslash traversal' => ['..\\evil'],
+            'nested traversal' => ['foo/../../evil'],
+            'forward slash' => ['foo/evil'],
+            'dots only' => ['..'],
+            'absolute path' => ['/etc/passwd'],
+            'windows drive' => ['C:\\evil'],
+            'trailing newline' => ["evil\n"],
+        ];
     }
 
     #[Test]

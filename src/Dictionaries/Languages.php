@@ -109,4 +109,9 @@ class Languages extends BasicDictionary
             ['code' => 'gl', 'name' => __('statamic::dictionary-languages.gl')],
         ];
     }
+
+    public function allowsPublicAccess(): bool
+    {
+        return true;
+    }
 }

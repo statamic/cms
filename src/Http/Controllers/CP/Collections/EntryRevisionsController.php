@@ -83,7 +83,7 @@ class EntryRevisionsController extends CpController
             'readOnly' => true,
             'published' => $entry->published(),
             'locale' => $entry->locale(),
-            'localizations' => $entry->collection()->sites()->map(function ($handle) use ($entry) {
+            'localizations' => $this->getAuthorizedSitesForCollection($entry->collection())->map(function ($handle) use ($entry) {
                 $localized = $entry->in($handle);
                 $exists = $localized !== null;
 
@@ -119,5 +119,12 @@ class EntryRevisionsController extends CpController
             'title' => $collection->title(),
             'url' => cp_route('collections.show', $collection->handle()),
         ];
+    }
+
+    private function getAuthorizedSitesForCollection($collection)
+    {
+        return $collection
+            ->sites()
+            ->filter(fn ($handle) => User::current()->can('view', Site::get($handle)));
     }
 }

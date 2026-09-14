@@ -22,7 +22,7 @@ class FormSubmissionsStore extends ChildStore
 
     public function getItemKey($item)
     {
-        return $item->id();
+        return $item->form()->handle().'::'.$item->id();
     }
 
     public function getItemFilter(SplFileInfo $file)

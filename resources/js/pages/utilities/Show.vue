@@ -6,7 +6,7 @@ defineProps(['title', 'html']);
 </script>
 
 <template>
-    <Head :title="[title, __('Utilities')]" />
+    <Head :title="[__(title), __('Utilities')]" />
 
     <DynamicHtmlRenderer :html="html" />
 </template>

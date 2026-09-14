@@ -737,6 +737,26 @@ class FrontendTest extends TestCase
     }
 
     #[Test]
+    public function outputting_a_date_does_not_localize_it_for_the_rest_of_the_template()
+    {
+        config([
+            'statamic.system.date_format' => 'H:i',
+            'statamic.system.display_timezone' => 'Europe/Zurich', // +1 hour
+            'statamic.system.localize_dates_in_modifiers' => false,
+        ]);
+
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+        $this->viewShouldReturnRaw('some_template', '<p>{{ date }}</p><p>{{ date format="H:i" }}</p>');
+
+        tap($this->makeCollection()->dated(true))->save();
+        tap($this->makePage('about', ['with' => ['template' => 'some_template']])->date(Carbon::parse('2025-01-01 18:25')))->save();
+
+        $this->get('/about')
+            ->assertSee('<p>19:25</p>', false)
+            ->assertSee('<p>18:25</p>', false);
+    }
+
+    #[Test]
     public function it_sets_the_locale()
     {
         // You can only set the locale to one that is actually installed on the server.

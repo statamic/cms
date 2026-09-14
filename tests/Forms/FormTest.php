@@ -11,6 +11,7 @@ use Statamic\Events\FormDeleted;
 use Statamic\Events\FormDeleting;
 use Statamic\Events\FormSaved;
 use Statamic\Events\FormSaving;
+use Statamic\Facades\File;
 use Statamic\Facades\Form;
 use Statamic\Fields\Blueprint;
 use Tests\TestCase;
@@ -22,6 +23,28 @@ class FormTest extends TestCase
         parent::setUp();
 
         Form::all()->each->delete();
+    }
+
+    #[Test]
+    public function it_falls_back_to_the_handle_for_the_title()
+    {
+        $form = Form::make('contact_us');
+
+        $this->assertEquals('Contact_us', $form->title());
+
+        $form->title('Contact Us');
+
+        $this->assertEquals('Contact Us', $form->title());
+    }
+
+    #[Test]
+    public function it_doesnt_save_the_fallback_title()
+    {
+        $form = Form::make('contact_us');
+
+        $form->save();
+
+        $this->assertStringNotContainsString('title', File::get($form->path()));
     }
 
     #[Test]

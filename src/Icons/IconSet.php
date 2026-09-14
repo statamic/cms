@@ -38,9 +38,13 @@ class IconSet
         return $this->files()->map->getContents()->all();
     }
 
-    public function get(string $name): string
+    public function get(string $name): ?string
     {
-        return $this->filesystem->get($this->directory.'/'.$name.'.svg');
+        $path = $this->directory.'/'.$name.'.svg';
+
+        return $this->filesystem->exists($path)
+            ? $this->filesystem->get($path)
+            : null;
     }
 
     private function files(): Collection

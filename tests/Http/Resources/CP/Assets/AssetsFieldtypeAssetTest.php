@@ -39,6 +39,7 @@ class AssetsFieldtypeAssetTest extends TestCase
 
         $this->assertEquals('test::img/photo.jpg', $resource['id']);
         $this->assertEquals('photo.jpg', $resource['basename']);
+        $this->assertEquals('asset::test::img/photo.jpg', $resource['reference']);
         $this->assertEquals('jpg', $resource['extension']);
         $this->assertEquals('/assets/img/photo.jpg', $resource['url']);
         $this->assertArrayHasKey('downloadUrl', $resource);

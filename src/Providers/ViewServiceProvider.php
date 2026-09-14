@@ -10,6 +10,8 @@ use Illuminate\View\View;
 use Statamic\Contracts\View\Antlers\Parser as ParserContract;
 use Statamic\Facades\Site;
 use Statamic\Statamic;
+use Statamic\StaticCaching\NoCache\Region;
+use Statamic\Tags\IncludeTag;
 use Statamic\View\Antlers\Engine;
 use Statamic\View\Antlers\Language\Analyzers\NodeTypeAnalyzer;
 use Statamic\View\Antlers\Language\Runtime\Debugging\GlobalDebugManager;
@@ -26,7 +28,6 @@ use Statamic\View\Cascade;
 use Statamic\View\Debugbar\AntlersProfiler\PerformanceCollector;
 use Statamic\View\Debugbar\AntlersProfiler\PerformanceTracer;
 use Statamic\View\Interop\Stacks;
-use Statamic\View\Store;
 
 class ViewServiceProvider extends ServiceProvider
 {
@@ -37,8 +38,6 @@ class ViewServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton(Store::class);
-
         $this->app->singleton(Cascade::class, function ($app) {
             return new Cascade($app['request'], Site::current());
         });
@@ -428,6 +427,8 @@ PHP;
     {
         ViewFactory::addNamespace('compiled__views', storage_path('framework/views'));
 
+        Region::preserveContextKeys(IncludeTag::VIEW_DATA_KEYS);
+
         $this->registerBladeDirectives();
 
         Blade::precompiler(function ($content) {
@@ -439,8 +440,8 @@ PHP;
         });
 
         View::macro('withoutExtractions', function () {
-            if ($this->engine instanceof Engine) {
-                $this->engine->withoutExtractions();
+            if ($this->getEngine() instanceof Engine) {
+                $this->getEngine()->withoutExtractions();
             }
 
             return $this;

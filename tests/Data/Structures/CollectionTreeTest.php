@@ -2,6 +2,7 @@
 
 namespace Tests\Data\Structures;
 
+use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Facades\Event;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\CollectionTreeEntriesMovedOrRemoved;
@@ -9,6 +10,7 @@ use Statamic\Events\CollectionTreeSaving;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
+use Statamic\Facades\Stache;
 use Statamic\Structures\CollectionTree;
 use Statamic\Structures\CollectionTreeDiff;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -125,6 +127,22 @@ class CollectionTreeTest extends TestCase
         $tree->save();
 
         Event::assertDispatched(CollectionTreeSaving::class);
+
+        $this->assertFileExists($tree->path());
+    }
+
+    #[Test]
+    public function it_does_not_fire_a_saving_event_when_saving_quietly()
+    {
+        Event::fake();
+
+        $collection = Collection::make('test')->structureContents(['root' => true]);
+        Collection::shouldReceive('findByHandle')->with('test')->andReturn($collection);
+
+        $tree = $collection->structure()->makeTree('en');
+        $tree->saveQuietly();
+
+        Event::assertNotDispatched(CollectionTreeSaving::class);
 
         $this->assertFileExists($tree->path());
     }
@@ -251,5 +269,59 @@ class CollectionTreeTest extends TestCase
         $tree->save();
 
         Event::assertNotDispatched(CollectionTreeEntriesMovedOrRemoved::class);
+    }
+
+    #[Test]
+    public function reordering_a_parent_keeps_the_order_index_of_its_descendants_in_sync()
+    {
+        $collection = tap(Collection::make('pages')->routes('{slug}')->structureContents(['root' => false]))->save();
+
+        foreach (['alfa', 'a1', 'a2', 'a3', 'bravo', 'charlie'] as $id) {
+            EntryFactory::collection('pages')->id($id)->slug($id)->data(['title' => $id])->create();
+        }
+
+        $collection->structure()->in('en')->tree([
+            ['entry' => 'alfa', 'children' => [
+                ['entry' => 'a1'],
+                ['entry' => 'a2'],
+                ['entry' => 'a3'],
+            ]],
+            ['entry' => 'bravo'],
+            ['entry' => 'charlie'],
+        ])->save();
+
+        $this->assertEquals([
+            'alfa' => 1,
+            'a1' => 2,
+            'a2' => 3,
+            'a3' => 4,
+            'bravo' => 5,
+            'charlie' => 6,
+        ], $this->cachedOrderIndex('pages'));
+
+        // Move "alfa" (and its three children) to the bottom.
+        $collection->structure()->in('en')->tree([
+            ['entry' => 'bravo'],
+            ['entry' => 'charlie'],
+            ['entry' => 'alfa', 'children' => [
+                ['entry' => 'a1'],
+                ['entry' => 'a2'],
+                ['entry' => 'a3'],
+            ]],
+        ])->save();
+
+        $this->assertEquals([
+            'alfa' => 3,
+            'a1' => 4,
+            'a2' => 5,
+            'a3' => 6,
+            'bravo' => 1,
+            'charlie' => 2,
+        ], $this->cachedOrderIndex('pages'));
+    }
+
+    private function cachedOrderIndex(string $collection): array
+    {
+        return Stache::store('entries')->store($collection)->index('order')->items()->all();
     }
 }

@@ -209,6 +209,9 @@ class InstallEloquentDriver extends Command
 
             case 'tokens':
                 return config('statamic.eloquent-driver.tokens.driver') === 'eloquent';
+
+            default:
+                throw new \LogicException("Unknown repository: {$repository}");
         }
     }
 

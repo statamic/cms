@@ -187,6 +187,7 @@ return [
     'publish_actions_publish' => 'Ändringar av arbetsexemplaret kommer att tillämpas på inlägget och det kommer att publiceras omedelbart.',
     'publish_actions_schedule' => 'Ändringar av arbetskopian kommer att tillämpas på posten och den kommer att visas publicerad på det valda datumet.',
     'publish_actions_unpublish' => 'Den aktuella versionen kommer att avpubliceras.',
+    'relationship_item_unavailable' => 'Det här objektet är inte tillgängligt. Det kan ha tagits bort, eller så har du inte behörighet att visa det.',
     'reset_password_notification_body' => 'Du får det här e-postmeddelandet eftersom vi har fått en begäran om lösenordsåterställning för ditt konto.',
     'reset_password_notification_no_action' => 'Om du inte begärde en lösenordsåterställning krävs ingen ytterligare åtgärd.',
     'reset_password_notification_subject' => 'Återställ lösenordsmeddelande',

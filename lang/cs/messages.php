@@ -187,6 +187,7 @@ return [
     'publish_actions_publish' => 'Publikovat',
     'publish_actions_schedule' => 'Naplánovat',
     'publish_actions_unpublish' => 'Zrušit publikaci',
+    'relationship_item_unavailable' => 'Tato položka není dostupná. Mohla být smazána nebo nemáte oprávnění ji zobrazit.',
     'reset_password_notification_body' => 'Vaše heslo bylo změněno. Pokud jste nezměnili heslo, prosím kontaktujte správce webu.',
     'reset_password_notification_no_action' => 'Toto je automatická zpráva. Prosím neodpovídejte na ni.',
     'reset_password_notification_subject' => 'Změna hesla',

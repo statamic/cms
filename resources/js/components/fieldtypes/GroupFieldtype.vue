@@ -10,7 +10,7 @@
                 >
                 </publish-field-fullscreen-header>
                 <section :class="{ 'mt-14 p-4': fullScreenMode }">
-                    <div :class="{
+                    <div class="@container/panel" :class="{
                         'bg-white dark:bg-gray-800 dark:border-gray-900 rounded-lg border': config.border,
                         'hidden' : isCollapsed && !fullScreenMode
                     }">
@@ -21,7 +21,7 @@
                             :field-path-prefix="fieldPathPrefix ? `${fieldPathPrefix}.${handle}` : handle"
                             :meta-path-prefix="metaPathPrefix ? `${metaPathPrefix}.${handle}` : handle"
                         >
-                            <Fields class="pt-4" :class="{ 'px-4 py-4': config.border }"/>
+                            <Fields :class="{ 'px-4 py-4': config.border, 'pt-4': !config.border && !config.hide_display }"/>
                         </FieldsProvider>
                     </div>
                 </section>

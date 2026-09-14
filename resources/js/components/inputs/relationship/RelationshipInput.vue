@@ -300,6 +300,16 @@ export default {
             this.$emit('item-data-updated', data);
         },
 
+        value(value) {
+            if (this.initializing || this.loading) return;
+
+            // A value set from outside (e.g. a save response normalizing a typed term) may
+            // reference an id we have no data for yet, which would render as a raw id.
+            if (value?.some((selection) => !this.data?.find((item) => item.id == selection))) {
+                this.getDataForSelections(value);
+            }
+        },
+
         items(items, oldItems) {
             if (items.length > 0 && oldItems.length === 0) {
                 if (this.canReorder) {

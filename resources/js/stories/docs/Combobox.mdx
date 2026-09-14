@@ -42,6 +42,10 @@ By default, the combobox is searchable. You may disable search by setting the `s
 When `ignoreFilter` is `true`, the combobox won't filter options locally. Use this with the `search` event to implement server-side searching.
 <Canvas of={ComboboxStories._IgnoreFilter} sourceState={'shown'} />
 
+## Search by Multiple Keys
+By default, search only matches against the `optionLabel` key. Use the `searchKeys` prop to also match against other keys on the option object — useful when an option has a value that isn't displayed but should still be searchable, such as an email address.
+<Canvas of={ComboboxStories._SearchKeys} sourceState={'shown'} />
+
 ## Customize Options
 You may customize how options are rendered using the `selected-option` and `option` slots.
 

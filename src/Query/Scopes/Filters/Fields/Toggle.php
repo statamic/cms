@@ -2,7 +2,7 @@
 
 namespace Statamic\Query\Scopes\Filters\Fields;
 
-use Illuminate\Support\Arr;
+use Statamic\Support\Arr;
 
 use function Statamic\trans as __;
 
@@ -40,7 +40,7 @@ class Toggle extends FieldtypeFilter
 
     public function isComplete($values): bool
     {
-        $values = array_filter($values);
+        $values = Arr::removeNullValues($values);
 
         return Arr::has($values, 'value');
     }

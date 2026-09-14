@@ -15,7 +15,7 @@ use Statamic\Facades\User;
 use Symfony\Component\Uid\Uuid;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
-use Webauthn\PublicKeyCredentialSource;
+use Webauthn\CredentialRecord;
 use Webauthn\TrustPath\EmptyTrustPath;
 
 class ResetPasswordTest extends TestCase
@@ -68,7 +68,7 @@ class ResetPasswordTest extends TestCase
 
     private function addPasskey($user)
     {
-        $credential = PublicKeyCredentialSource::create(
+        $credential = CredentialRecord::create(
             publicKeyCredentialId: 'test-credential-id',
             type: 'public-key',
             transports: ['usb'],
@@ -163,5 +163,84 @@ class ResetPasswordTest extends TestCase
 
         $this->assertGuest();
         $this->assertTrue(Hash::check('newpassword', $user->fresh()->password()));
+    }
+
+    #[Test]
+    #[DataProvider('resetPasswordProvider')]
+    public function it_prefills_email_on_the_reset_form_from_the_token($type)
+    {
+        $user = $this->createUser();
+        $token = $this->createToken($user, $type);
+
+        $url = match ($type) {
+            'cp' => cp_route('password.reset', $token),
+            'web' => route('statamic.password.reset', $token),
+        };
+
+        $this
+            ->get($url)
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->component('auth/passwords/Reset')
+                ->where('email', 'san@holo.com')
+                ->where('emailReadonly', true)
+            );
+    }
+
+    #[Test]
+    #[DataProvider('resetPasswordProvider')]
+    public function it_allows_email_to_be_provided_in_the_query_string($type)
+    {
+        $user = $this->createUser();
+        $token = $this->createToken($user, $type);
+
+        $url = match ($type) {
+            'cp' => cp_route('password.reset', $token),
+            'web' => route('statamic.password.reset', $token),
+        };
+
+        $this
+            ->get($url.'?email=other@example.com')
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->component('auth/passwords/Reset')
+                ->where('email', 'other@example.com')
+                ->where('emailReadonly', false)
+            );
+    }
+
+    #[Test]
+    public function it_prefills_email_on_the_account_activation_form_from_the_token()
+    {
+        $user = tap(User::make()->email('san@holo.com'))->save();
+        $token = $user->generateActivateAccountToken();
+
+        $this
+            ->get(route('statamic.account.activate', $token))
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->component('auth/passwords/Reset')
+                ->where('email', 'san@holo.com')
+                ->where('emailReadonly', true)
+            );
+    }
+
+    #[Test]
+    #[DataProvider('resetPasswordProvider')]
+    public function it_throttles_requests_to_the_reset_form($type)
+    {
+        $user = $this->createUser();
+        $token = $this->createToken($user, $type);
+
+        $url = match ($type) {
+            'cp' => cp_route('password.reset', $token),
+            'web' => route('statamic.password.reset', $token),
+        };
+
+        foreach (range(1, 15) as $i) {
+            $this->get($url)->assertOk();
+        }
+
+        $this->get($url)->assertStatus(429);
     }
 }

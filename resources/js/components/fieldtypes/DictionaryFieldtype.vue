@@ -36,6 +36,7 @@
                         class="sortable-item cursor-grab active:cursor-grabbing"
                     >
                         <Badge size="lg" color="white">
+                            <Icon v-if="option.icon" :name="option.icon" />
                             <div v-if="labelHtml" v-html="getOptionLabel(option)"></div>
                             <div v-else>{{ __(getOptionLabel(option)) }}</div>
 
@@ -65,7 +66,7 @@ import Fieldtype from './Fieldtype.vue';
 import HasInputOptions from './HasInputOptions.js';
 import { SortableList } from '../sortable/Sortable';
 import debounce from '@/util/debounce.js';
-import { Badge, Combobox } from '@/components/ui';
+import { Badge, Combobox, Icon } from '@/components/ui';
 
 export default {
     mixins: [Fieldtype, HasInputOptions],
@@ -73,6 +74,7 @@ export default {
     components: {
         Badge,
         Combobox,
+        Icon,
         SortableList,
     },
 
@@ -89,7 +91,17 @@ export default {
         },
 
         normalizedOptions() {
-            return this.normalizeInputOptions(this.options);
+            const options = this.normalizeInputOptions(this.options);
+
+            // Multi-select renders its selections from the slot below, so the options can be left alone.
+            if (this.multiple) return options;
+
+            // In single mode the Combobox resolves the selected label from these options, and the fetched
+            // options may not include the stored value (API-backed dictionaries only return a page of
+            // results), so merge the selected options in or it would display the raw value instead.
+            const values = new Set(options.map((option) => option.value));
+
+            return [...options, ...this.selectedOptions.filter((option) => !values.has(option.value))];
         },
 
         selectedOptions() {
@@ -109,6 +121,7 @@ export default {
                     label: DOMPurify.sanitize(option.label, {
                         USE_PROFILES: { html: true, svg: true },
                     }),
+                    ...(option.icon ? { icon: option.icon } : {}),
                     invalid: option.invalid
                 };
             });

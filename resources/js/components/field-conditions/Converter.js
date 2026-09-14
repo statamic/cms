@@ -2,17 +2,30 @@ import { OPERATORS, ALIASES } from './Constants.js';
 
 export default class {
     fromBlueprint(conditions, prefix = null) {
-        return Object.entries(conditions).map(([field, condition]) => this.splitRhs(field, condition, prefix));
+        return Object.entries(conditions).flatMap(([field, condition]) =>
+            this.wrap(condition).map((condition) => this.splitRhs(field, condition, prefix)),
+        );
     }
 
     toBlueprint(conditions) {
         let converted = {};
 
         conditions.forEach((condition) => {
-            converted[condition.field] = this.combineRhs(condition);
+            const field = condition.field;
+            const value = this.combineRhs(condition);
+
+            if (field in converted) {
+                converted[field] = this.wrap(converted[field]).concat(value);
+            } else {
+                converted[field] = value;
+            }
         });
 
         return converted;
+    }
+
+    wrap(value) {
+        return Array.isArray(value) ? value : [value];
     }
 
     splitRhs(field, condition, prefix = null) {

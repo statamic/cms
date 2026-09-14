@@ -24,6 +24,7 @@ class Asset extends JsonResource
             'permalink' => $this->absoluteUrl(),
             'extension' => $this->extension(),
             'downloadUrl' => $this->cpDownloadUrl(),
+            'cropUrl' => cp_route('assets.crop', ['encoded_asset' => base64_encode($this->id())]),
             'size' => Str::fileSizeForHumans($this->size()),
             'lastModified' => $this->lastModified()->toIso8601String(),
             'lastModifiedRelative' => $this->lastModified()->diffForHumans(),

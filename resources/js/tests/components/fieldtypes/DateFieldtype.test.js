@@ -123,6 +123,33 @@ test('range dates use configured timezone', () => {
     expect(value.end.toString()).toBe('2025-12-26T02:23:00+00:00[Europe/London]');
 });
 
+test('range dates with time are saved in the configured timezone', async () => {
+    process.env.TZ = 'America/New_York';
+
+    const { CalendarDateTime } = await import('@internationalized/date');
+
+    const dateField = makeDateField({
+        meta: { timezone: 'America/New_York' },
+        config: {
+            mode: 'range',
+            time_enabled: true,
+            earliest_date: { date: null, time: null },
+            latest_date: { date: null, time: null },
+        },
+    });
+
+    dateField.vm.datePickerUpdated({
+        start: new CalendarDateTime(2012, 8, 29, 5, 0, 0),
+        end: new CalendarDateTime(2013, 9, 27, 23, 59, 0),
+    });
+
+    // 05:00 in New York (EDT, -04:00) is 09:00 UTC; 23:59 becomes 03:59 the next day.
+    expect(dateField.emitted('update:value')[0][0]).toEqual({
+        start: '2012-08-29T09:00:00.000Z',
+        end: '2013-09-28T03:59:00.000Z',
+    });
+});
+
 test.each([
     ['UTC'],
     ['America/New_York'],

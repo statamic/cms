@@ -71,6 +71,12 @@ window.addEventListener('popstate', (event) => {
     if (! dirty.value.length) return;
     if (! isWarningEnabled()) return;
 
+    // Hash-only navigation (e.g. tab switching) stays on the same page.
+    if (dirtyUrl) {
+        const origin = new URL(dirtyUrl);
+        if (window.location.pathname === origin.pathname && window.location.search === origin.search) return;
+    }
+
     // Block Inertia's listener so it doesn't `setQuietly(..., { preserveState: false })`
     // and wipe the in-memory form data before we've confirmed.
     event.stopImmediatePropagation();

@@ -21,7 +21,7 @@ provide('isFormSubmission', true);
 
 <template>
     <div class="max-w-5xl 3xl:max-w-6xl mx-auto" data-max-width-wrapper>
-        <Head :title="[title, formTitle, __('Forms')]" />
+        <Head :title="[title, __(formTitle), __('Forms')]" />
 
         <PublishForm
             icon="forms"

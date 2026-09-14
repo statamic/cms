@@ -2,9 +2,11 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Fields\Values;
 use Statamic\Modifiers\Modifier;
+use Statamic\Modifiers\ModifierException;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
@@ -36,6 +38,51 @@ class FluentModifyTest extends TestCase
         $result = Modify::value($values)->fetch();
 
         $this->assertSame($values, $result);
+    }
+
+    #[Test]
+    #[DataProvider('scalarValues')]
+    public function it_casts_scalar_and_null_values_to_string($value, $expected)
+    {
+        $this->assertSame($expected, (string) Modify::value($value));
+    }
+
+    public static function scalarValues()
+    {
+        return [
+            'integer zero' => [0, '0'],
+            'positive integer' => [42, '42'],
+            'negative integer' => [-7, '-7'],
+            'float' => [1.5, '1.5'],
+            'true' => [true, '1'],
+            'false' => [false, ''],
+            'null' => [null, ''],
+            'string' => ['hello', 'hello'],
+        ];
+    }
+
+    #[Test]
+    public function it_casts_a_modified_integer_chain_result_to_string()
+    {
+        $this->assertSame('5', (string) Modify::value(0)->add(5));
+    }
+
+    #[Test]
+    public function it_throws_when_casting_an_array_to_string()
+    {
+        $this->expectException(ModifierException::class);
+        $this->expectExceptionMessage('Attempted to access modified value as a string, but encountered [array]');
+
+        (string) Modify::value(['foo' => 'bar']);
+    }
+
+    #[Test]
+    public function it_throws_modifier_exception_when_iterating_over_a_scalar()
+    {
+        $this->expectException(ModifierException::class);
+        $this->expectExceptionMessage('Attempted to access modified value as an array, but encountered [int]');
+
+        iterator_to_array(Modify::value(42));
     }
 
     #[Test]

@@ -2,6 +2,7 @@
 
 namespace Statamic\Auth;
 
+use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 use function Statamic\trans as __;
@@ -19,6 +20,7 @@ class Permission
     protected $label;
     protected $description;
     protected $group;
+    protected $hiddenBy;
 
     /**
      * @return ($value is null ? string|string[] : static)
@@ -100,10 +102,12 @@ class Permission
             $replaced = (new self)
                 ->value($this->value)
                 ->label($this->label)
+                ->description($this->description())
                 ->placeholder($this->placeholder)
                 ->placeholderLabel($replacement['label'])
                 ->placeholderValue($replacement['value'])
-                ->group($this->group());
+                ->group($this->group())
+                ->hiddenBy($this->hiddenBy());
 
             if ($this->children()) {
                 $replaced->children($this->children()->all());
@@ -187,10 +191,12 @@ class Permission
                     $replaced = (new self)
                         ->value($child->originalValue())
                         ->label($child->originalLabel())
+                        ->description($child->description())
                         ->placeholder($permission->placeholder())
                         ->placeholderLabel($permission->placeholderLabel())
                         ->placeholderValue($permission->placeholderValue())
-                        ->group($permission->group());
+                        ->group($permission->group())
+                        ->hiddenBy($child->hiddenBy());
 
                     if ($children = $child->children()) {
                         $replaced->children($children->all());
@@ -205,6 +211,7 @@ class Permission
                 'label' => $permission->label(),
                 'description' => $permission->description(),
                 'group' => $permission->group(),
+                'hidden_by' => $permission->hiddenBy(),
                 'children' => $children->flatMap->toTree()->all(),
             ];
         })->all();
@@ -218,5 +225,14 @@ class Permission
     public function description()
     {
         return $this->fluentlyGetOrSet('description')->args(func_get_args());
+    }
+
+    public function hiddenBy(string|array|null $permissions = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('hiddenBy')
+            ->getter(fn ($permissions) => $permissions ?? [])
+            ->setter(fn ($permissions) => Arr::wrap($permissions))
+            ->args(func_get_args());
     }
 }

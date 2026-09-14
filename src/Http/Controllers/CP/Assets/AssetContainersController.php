@@ -188,6 +188,7 @@ class AssetContainersController extends CpController
                         'type' => 'taggable',
                         'display' => __('Validation Rules'),
                         'instructions' => __('statamic::messages.asset_container_validation_rules_instructions'),
+                        'paste_delimiter' => '|',
                     ],
                 ],
             ],

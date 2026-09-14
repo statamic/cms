@@ -7,7 +7,7 @@ import Month from './Month.vue';
 import Week from './Week.vue';
 import { Listing, StatusIndicator } from '@/components/ui';
 import DateFormatter from '@/components/DateFormatter.js';
-import { getWeekDates, getCurrentDateRange } from './calendar.js';
+import { getWeekDates, getCurrentDateRange, getEntryDate } from './calendar.js';
 import { Link } from '@inertiajs/vue3';
 import { ToggleGroup, ToggleItem, Button, Popover, Label, Select, Heading } from '@ui';
 import { preferences } from '@api';
@@ -122,8 +122,7 @@ const selectedDateEntries = computed(() => {
     const dateStr = selectedDate.value.toString();
 
     return entries.value.filter(entry => {
-        const entryDate = new Date(entry.date?.date || entry.date);
-        return entryDate.toISOString().split('T')[0] === dateStr;
+        return getEntryDate(entry).toString().split('T')[0] === dateStr;
     });
 });
 

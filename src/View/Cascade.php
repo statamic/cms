@@ -317,6 +317,7 @@ class Cascade
             'statamic.search.defaults',
             'statamic.search.queue',
             'statamic.search.queue_connection',
+            'statamic.search.queue_timeout',
             'statamic.search.chunk_size',
             'statamic.stache.watcher',
             'statamic.stache.cache_store',

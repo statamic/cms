@@ -16,6 +16,12 @@ class ColorTest extends TestCase
         File::delete(resource_path('preferences.yaml'));
     }
 
+    public function tearDown(): void
+    {
+        File::delete(resource_path('preferences.yaml'));
+        parent::tearDown();
+    }
+
     #[Test]
     public function theme_has_defaults()
     {

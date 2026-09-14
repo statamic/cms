@@ -15,25 +15,24 @@ class Attributes
     public function from(FilesystemAdapter $source, string $path)
     {
         if ($source->getAdapter() instanceof LocalFilesystemAdapter) {
-            $this->cacheDisk = $source;
+            $fullPath = $source->path($path);
         } else {
+            $temporaryPath = Str::random(32).'.'.pathinfo($path, PATHINFO_EXTENSION);
+
             $manager = $this->mountManager($source->getDriver(), $this->cacheDisk()->getDriver());
+            $manager->copy("source://{$path}", "cache://{$temporaryPath}", ['visibility' => 'private']);
 
-            if ($manager->has($destination = "cache://{$path}")) {
-                $manager->delete($destination);
-            }
-
-            $manager->copy("source://{$path}", $destination, ['visibility' => 'private']);
+            $fullPath = $this->cacheDisk()->path($temporaryPath);
         }
 
         $svg = Str::endsWith($path, '.svg');
 
         try {
-            $attributes = $svg ? $this->svgAttributes($path) : $this->imageAttributes($path);
+            $attributes = $svg ? $this->svgAttributes($fullPath) : $this->imageAttributes($fullPath);
         } catch (\Exception $e) {
             $attributes = $svg ? $this->defaultSvgAttributes() : [];
         } finally {
-            isset($manager) && $manager->delete($destination);
+            isset($temporaryPath) && $this->cacheDisk()->delete($temporaryPath);
         }
 
         return $attributes;
@@ -41,13 +40,11 @@ class Attributes
 
     private function imageAttributes(string $path)
     {
-        $fullPath = $this->prefixPath($path);
-
-        if (! file_exists($fullPath)) {
+        if (! file_exists($path)) {
             return ['width' => 0, 'height' => 0];
         }
 
-        $size = @getimagesize($fullPath);
+        $size = @getimagesize($path);
 
         if ($size === false) {
             return ['width' => 0, 'height' => 0];
@@ -55,12 +52,21 @@ class Attributes
 
         [$width, $height] = $size;
 
+        if (function_exists('exif_read_data')) {
+            $exif = @exif_read_data($path);
+            $orientation = $exif['Orientation'] ?? 1;
+
+            if (in_array($orientation, [5, 6, 7, 8])) {
+                [$width, $height] = [$height, $width];
+            }
+        }
+
         return compact('width', 'height');
     }
 
     private function svgAttributes(string $path)
     {
-        $svg = simplexml_load_file($this->prefixPath($path));
+        $svg = simplexml_load_file($path);
 
         if ($svg['width'] && $svg['height']
             && is_numeric((string) $svg['width'])
@@ -90,14 +96,9 @@ class Attributes
 
     private function cacheDisk()
     {
-        return $this->cacheDisk ?: $this->cacheDisk = Storage::build([
+        return $this->cacheDisk ??= Storage::build([
             'driver' => 'local',
             'root' => storage_path('statamic/attributes-cache'),
         ]);
-    }
-
-    private function prefixPath($path)
-    {
-        return $this->cacheDisk()->path($path);
     }
 }

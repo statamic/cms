@@ -2,12 +2,10 @@
 import {
     Label,
     Combobox,
-    Badge,
     Card,
     Panel,
-    Icon,
 } from '@ui';
-import { computed } from 'vue';
+import { computed, useId } from 'vue';
 import Localization from './Localization.vue';
 
 const props = defineProps({
@@ -19,9 +17,17 @@ const props = defineProps({
         type: [Boolean, String],
         default: false,
     },
+    heading: {
+        type: String,
+        default: null,
+    },
 });
 
 defineEmits(['selected']);
+
+const comboboxId = useId();
+
+const panelHeading = computed(() => props.heading || __('Working In'));
 
 const activeLocalization = computed(() => {
     return props.localizations.find((localization) => localization.active);
@@ -29,12 +35,17 @@ const activeLocalization = computed(() => {
 </script>
 
 <template>
-    <Panel v-if="localizations.length > 1" :heading="__('Sites')">
+    <Panel v-if="localizations.length > 1" :heading="panelHeading" icon="globe-arrow">
         <Card class="p-3! space-y-1">
             <template v-if="localizations.length > 5">
-                <Label :text="__('Current Localization')" />
+                <Label
+                    :for="comboboxId"
+                    :text="panelHeading"
+                    class="sr-only"
+                />
 
                 <Combobox
+                    :id="comboboxId"
                     class="flex-1"
                     :options="localizations"
                     option-value="handle"
@@ -48,16 +59,22 @@ const activeLocalization = computed(() => {
                 </Combobox>
             </template>
 
-            <button
+            <div
                 v-else
-                v-for="option in localizations"
-                :key="option.handle"
-                class="w-full cursor-pointer px-4 py-2 text-sm rounded-lg"
-                :class="option.active ? 'dark:bg-gray-700 bg-blue-100' : 'dark:hover:bg-gray-800 hover:bg-gray-100'"
-                @click="$emit('selected', option)"
+                role="group"
+                :aria-label="panelHeading"
+                class="space-y-1"
             >
-                <Localization :localization="option" :localizing />
-            </button>
+                <button
+                    v-for="option in localizations"
+                    :key="option.handle"
+                    class="w-full cursor-pointer px-4 py-2 text-sm rounded-lg"
+                    :class="option.active ? 'dark:bg-gray-700 bg-blue-100' : 'dark:hover:bg-gray-800 hover:bg-gray-100'"
+                    @click="$emit('selected', option)"
+                >
+                    <Localization :localization="option" :localizing />
+                </button>
+            </div>
         </Card>
     </Panel>
 </template>

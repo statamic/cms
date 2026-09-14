@@ -345,11 +345,17 @@ class Assets extends Fieldtype
 
     public function getItemData($items)
     {
-        return collect($items)->map(function ($url) {
-            return ($asset = Asset::find($url))
-                ? (new AssetResource($asset))->resolve()['data']
-                : null;
-        })->filter()->values();
+        $user = User::current();
+
+        return collect($items)->map(function ($url) use ($user) {
+            $asset = Asset::find($url);
+
+            if (! $asset || ! $user->can('view', $asset)) {
+                return ['id' => $url, 'url' => $url, 'invalid' => true];
+            }
+
+            return (new AssetResource($asset))->resolve()['data'];
+        })->values();
     }
 
     public function augment($values)
@@ -462,6 +468,7 @@ class Assets extends Fieldtype
         $assets = $this->getItemsForPreProcessIndex($data)->map(function ($asset) {
             $arr = [
                 'id' => $asset->id(),
+                'basename' => $asset->basename(),
                 'is_image' => $isImage = $asset->isImage(),
                 'is_svg' => $asset->isSvg(),
                 'extension' => $asset->extension(),

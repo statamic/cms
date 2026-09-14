@@ -152,7 +152,7 @@ reveal.use(rootEl, () => emit('expanded'));
                     class="size-4 cursor-grab text-gray-400"
                     v-if="!readOnly"
                 />
-                <button type="button" class="show-focus-within_target flex flex-1 items-center gap-4 p-2 py-1.75 min-w-0 focus:outline-none cursor-pointer" @click="toggleCollapsedState">
+                <button type="button" class="show-focus-within_target flex flex-1 min-w-0 cursor-pointer items-center gap-4 overflow-x-auto p-2 py-1.75 pe-4 focus:outline-none st-mask-horizontal-overflow" @click="toggleCollapsedState">
                     <Badge size="lg" pill color="white" class="px-3">
                         <span v-if="isSetGroupVisible" class="flex items-center gap-2">
                             {{ __(setGroup.display) }}

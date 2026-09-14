@@ -20,6 +20,9 @@ use Statamic\Support\Svg;
 use Statamic\Support\TextDirection;
 use Statamic\Tags\FluentTag;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class Statamic
 {
     const CORE_SLUG = 'statamic';
@@ -35,6 +38,7 @@ class Statamic
     protected static $webRoutes = [];
     protected static $actionRoutes = [];
     protected static $jsonVariables = [];
+    protected static $jsonVariablesSnapshot = null;
     protected static $bootedCallbacks = [];
     protected static $afterInstalledCallbacks = [];
     public static bool $isRenderingCpException = false;
@@ -241,6 +245,21 @@ class Statamic
         static::$jsonVariables = array_merge(static::$jsonVariables, $variables);
 
         return new static;
+    }
+
+    public static function snapshotJsonVariables()
+    {
+        // Once per process: the first request's starting state is the boot-time
+        // state, and keeping it pristine means a request that fails mid-cycle
+        // can never bake its own variables into the baseline.
+        static::$jsonVariablesSnapshot ??= static::$jsonVariables;
+    }
+
+    public static function restoreJsonVariablesSnapshot()
+    {
+        if (static::$jsonVariablesSnapshot !== null) {
+            static::$jsonVariables = static::$jsonVariablesSnapshot;
+        }
     }
 
     public static function svg($name, $attrs = null, $fallback = null)

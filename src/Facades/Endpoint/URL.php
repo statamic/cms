@@ -174,6 +174,9 @@ class URL
      */
     public function makeRelative(?string $url): string
     {
+        // Normalize duplicate leading slashes before parsing to avoid protocol-relative URL interpretation.
+        $url = preg_replace('#^/+#', '/', (string) $url);
+
         $parsed = parse_url($url);
 
         $url = $parsed['path'] ?? '/';
@@ -203,10 +206,21 @@ class URL
             return self::tidy($url);
         }
 
+        // Protocol-relative URLs and other schemes (mailto:, tel:, etc) already
+        // point somewhere else, so prepending the site URL would mangle them.
+        if (Str::startsWith($url, '//') || self::hasScheme($url)) {
+            return $url;
+        }
+
         $url = Str::ensureLeft($url, '/');
         $url = Str::ensureLeft($url, self::getRequestRootUrl());
 
         return self::tidy($url);
+    }
+
+    private function hasScheme(?string $url): bool
+    {
+        return (bool) preg_match('/^[a-z][a-z0-9+.\-]*:/i', (string) $url);
     }
 
     /**
@@ -259,15 +273,21 @@ class URL
             return false;
         }
 
-        $url = Str::ensureRight($url, '/');
+        $cacheKey = $url;
+
+        if (Str::startsWith($url, '//')) {
+            return self::$externalSiteUrlsCache[$cacheKey] = true;
+        }
 
         if (Str::startsWith($url, ['/', '?', '#'])) {
-            return self::$externalSiteUrlsCache[$url] = false;
+            return self::$externalSiteUrlsCache[$cacheKey] = false;
         }
+
+        $url = Str::ensureRight(Str::before(Str::before($url, '#'), '?'), '/');
 
         $isExternal = ! Str::startsWith($url, Str::ensureRight(Site::current()->absoluteUrl(), '/'));
 
-        return self::$externalSiteUrlsCache[$url] = $isExternal;
+        return self::$externalSiteUrlsCache[$cacheKey] = $isExternal;
     }
 
     /**
@@ -418,11 +438,11 @@ class URL
         $sites = Site::all();
 
         self::$hasRelativeSiteCache = $sites->contains(
-            fn ($site) => Str::startsWith((string) ($site->rawConfig()['url'] ?? ''), '/')
+            fn ($site) => Str::startsWith((string) $site->url(), '/')
         );
 
         self::$absoluteSiteUrlsCache = $sites
-            ->map(fn ($site) => $site->rawConfig()['url'] ?? null)
+            ->map(fn ($site) => $site->url())
             ->filter(fn ($siteUrl) => self::isAbsolute($siteUrl))
             ->map(fn ($siteUrl) => self::getDomainFromAbsolute($siteUrl));
 

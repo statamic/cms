@@ -104,7 +104,7 @@
                             </div>
 
                             <!-- Video -->
-                            <video :src="asset.url" class="max-w-full max-h-full object-contain" controls v-else-if="asset.isVideo" />
+                            <video :src="asset.url" :width="asset.width" :height="asset.height" class="max-w-full max-h-full object-contain" controls v-else-if="asset.isVideo" />
 
                             <!-- Other thumbnail -->
                             <img v-else-if="asset.preview" :src="asset.preview" class="asset-thumb shadow-ui-xl max-w-full max-h-full object-contain" />
@@ -157,8 +157,8 @@
                         </ui-badge>
                     </div>
                     <div class="flex items-center space-x-3 rtl:space-x-reverse">
-                        <ui-button icon="chevron-left" @click="navigateToPreviousAsset" v-tooltip="__('Previous Asset')" />
-                        <ui-button icon="chevron-right" @click="navigateToNextAsset" v-tooltip="__('Next Asset')" />
+                        <ui-button v-if="showNavigation" icon="chevron-left" @click="navigateToPreviousAsset" v-tooltip="__('Previous Asset')" />
+                        <ui-button v-if="showNavigation" icon="chevron-right" @click="navigateToNextAsset" v-tooltip="__('Next Asset')" />
                         <ui-button variant="primary" icon="save" @click="saveAndClose" v-if="!readOnly" :text="__('Save')" />
                     </div>
                 </div>
@@ -214,7 +214,7 @@ import ItemActions from '@/components/actions/ItemActions.vue';
 import useCheckerboard from '@/composables/checkerboard.js';
 
 export default {
-    emits: ['previous', 'next', 'saved', 'closed', 'action-started', 'action-completed'],
+    emits: ['previous', 'next', 'saved', 'closed', 'created', 'action-started', 'action-completed'],
 
     components: {
         Button,
@@ -239,11 +239,19 @@ export default {
             type: Boolean,
             default: true,
         },
+        showNavigation: {
+            type: Boolean,
+            default: true,
+        },
         allowDeleting: {
             type: Boolean,
             default() {
                 return true;
             },
+        },
+        redirectAfterCrop: {
+            type: Boolean,
+            default: true,
         },
     },
 
@@ -377,13 +385,25 @@ export default {
         },
 
         keydown(event) {
-            if ((event.metaKey || event.ctrlKey) && event.key === 'ArrowLeft') {
+            if (!event.metaKey && !event.ctrlKey) return;
+
+            if (this.isEditingText(event.target)) return;
+
+            if (event.key === 'ArrowLeft') {
                 this.navigateToPreviousAsset();
             }
 
-            if ((event.metaKey || event.ctrlKey) && event.key === 'ArrowRight') {
+            if (event.key === 'ArrowRight') {
                 this.navigateToNextAsset();
             }
+        },
+
+        isEditingText(element) {
+            if (!element) return false;
+
+            const tag = element.tagName;
+
+            return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || element.isContentEditable;
         },
 
         navigateToPreviousAsset() {
@@ -432,6 +452,11 @@ export default {
         },
 
         handleCropCreated(newAssetId) {
+            if (!this.redirectAfterCrop) {
+                this.$emit('created', newAssetId);
+                return;
+            }
+
             const [containerHandle, assetPath] = newAssetId.split('::');
             const editUrl = cp_url(`assets/browse/${containerHandle}/${assetPath}/edit`);
             router.get(editUrl);

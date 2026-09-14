@@ -117,6 +117,8 @@ const isInvalid = computed(() => {
     return props.modelValue === null && props.required;
 });
 
+const hasTime = computed(() => props.granularity != null && props.granularity !== 'day');
+
 const getInputLabel = (part) => {
     switch (part) {
         case 'day':
@@ -161,7 +163,7 @@ const getInputLabel = (part) => {
                         :class="[
                             'flex w-full items-center overflow-x-auto overflow-y-hidden bg-white uppercase dark:bg-gray-900',
                             'border border-gray-300 dark:border-gray-700',
-                            'text-gray-600 dark:text-gray-300',
+                            'leading-[1.375rem] text-gray-600 dark:text-gray-300',
                             'shadow-ui-sm not-prose h-10 rounded-lg px-2 disabled:shadow-none',
                             'data-invalid:border-red-500',
                             'disabled:shadow-none disabled:opacity-50',
@@ -178,12 +180,13 @@ const getInputLabel = (part) => {
                         >
                             <Icon name="calendar" class="size-4" />
                         </DatePickerTrigger>
-                        <div class="flex items-center flex-1">
+                        <div class="flex flex-1 items-center" :class="{ '@max-xs:text-xs': hasTime }">
                             <template v-for="item in segments" :key="item.part">
                                 <div v-if="item.part === 'literal'">
                                     <DatePickerInput
                                         :part="item.part"
-                                        :class="{ 'text-sm text-gray-600 dark:text-gray-400 antialiased': !item.contenteditable }"
+                                        class="whitespace-pre"
+                                        :class="{ 'text-gray-600 dark:text-gray-400': !item.contenteditable }"
                                         v-on="inputEvents"
                                     >
                                         {{ item.value }}
@@ -192,9 +195,9 @@ const getInputLabel = (part) => {
                                 <div v-else>
                                     <DatePickerInput
                                         :part="item.part"
-                                        class="rounded-sm px-0.25 py-0.5 focus:bg-blue-100 focus:outline-hidden data-placeholder:text-gray-600 dark:focus:bg-blue-900 dark:data-placeholder:text-gray-400"
+                                        class="rounded-sm py-0.5 focus:bg-blue-100 focus:outline-hidden data-placeholder:text-gray-600 dark:focus:bg-blue-900 dark:data-placeholder:text-gray-400"
                                         :class="{
-                                            'px-0.5!': item.part === 'month' || item.part === 'year' || item.part === 'day',
+                                            'px-0.25!': item.part === 'month' || item.part === 'year' || item.part === 'day',
                                         }"
                                         :aria-label="getInputLabel(item.part)"
                                         v-on="inputEvents"
@@ -210,7 +213,7 @@ const getInputLabel = (part) => {
                             :additional-timezones="additionalTimezones"
                             side="top"
                         >
-                            <Text class="text-gray-600! dark:text-gray-400! ms-2.5 me-1" size="xs" :text="timeZoneLabel" />
+                            <Text class="text-gray-600! dark:text-gray-400! ms-2" size="xs" :text="timeZoneLabel" />
                         </TimezoneHoverCard>
                         <Button
                             v-if="clearable && !readOnly"

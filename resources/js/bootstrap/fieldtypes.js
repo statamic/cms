@@ -13,6 +13,7 @@ import BardButtonsSettingFieldtype from '../components/fieldtypes/bard/BardButto
 import BlueprintsFieldtype from '../components/fieldtypes/BlueprintsFieldtype.vue';
 import ButtonGroupFieldtype from '../components/fieldtypes/ButtonGroupFieldtype.vue';
 import CheckboxesFieldtype from '../components/fieldtypes/CheckboxesFieldtype.vue';
+import ControlAppearanceFieldtype from '../components/fieldtypes/control-appearance/ControlAppearanceFieldtype.vue';
 import Routes from '../components/collections/Routes.vue';
 import TitleFormats from '../components/collections/TitleFormats.vue';
 import ColorFieldtype from '../components/fieldtypes/ColorFieldtype.vue';
@@ -33,6 +34,7 @@ import GroupFieldtype from '../components/fieldtypes/GroupFieldtype.vue';
 import HiddenFieldtype from '../components/fieldtypes/HiddenFieldtype.vue';
 import HtmlFieldtype from '../components/fieldtypes/HtmlFieldtype.vue';
 import IconFieldtype from '../components/fieldtypes/IconFieldtype.vue';
+import InfoFieldtype from '../components/fieldtypes/InfoFieldtype.vue';
 import IntegerFieldtype from '../components/fieldtypes/IntegerFieldtype.vue';
 import LinkFieldtype from '../components/fieldtypes/LinkFieldtype.vue';
 import LinkIndexFieldtype from '../components/fieldtypes/LinkIndexFieldtype.vue';
@@ -82,6 +84,7 @@ export default function registerFieldtypes(app) {
     app.component('button_group-fieldtype', ButtonGroupFieldtype);
     app.component('blueprints-fieldtype', BlueprintsFieldtype);
     app.component('checkboxes-fieldtype', CheckboxesFieldtype);
+    app.component('control_appearance-fieldtype', ControlAppearanceFieldtype);
     app.component(
         'code-fieldtype',
         defineAsyncComponent(() => import('../components/fieldtypes/CodeFieldtype.vue')),
@@ -106,6 +109,7 @@ export default function registerFieldtypes(app) {
     app.component('hidden-fieldtype', HiddenFieldtype);
     app.component('html-fieldtype', HtmlFieldtype);
     app.component('icon-fieldtype', IconFieldtype);
+    app.component('info-fieldtype', InfoFieldtype);
     app.component('integer-fieldtype', IntegerFieldtype);
     app.component('link-fieldtype', LinkFieldtype);
     app.component('link-fieldtype-index', LinkIndexFieldtype);

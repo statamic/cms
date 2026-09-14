@@ -2,8 +2,8 @@
 =================================================== */
 .nav-main {
     @apply flex flex-col gap-6 py-6 px-2 sm:px-3 text-sm antialiased select-none;
-    /* Same as the main element, accounting for the header with a class of h-14, which is the same as 3.5rem */
-    @apply h-[calc(100vh-3.5rem)];
+    /* Similar to the main element, accounting for the header with a class of h-14, which is the same as 3.5rem */
+    @apply h-[calc(100dvh-3.5rem)];
     @apply overflow-y-auto fixed top-14 start-0 w-48;
     @apply [&_svg]:text-gray-500 dark:[&_svg]:text-gray-500/85;
     /* Wait for the full page to load before allowing this transition otherwise you see the Sidebar animate in/out on load in Firefox (and sometimes Safari) */
@@ -28,11 +28,11 @@
     }
 
     ul li ul {
-        @apply ml-3.5 pl-3.5 translate-x-px my-1.5 text-[0.8125rem] min-w-0 flex-col gap-1.5 border-s border-gray-300 dark:border-gray-700;
+        @apply ml-3.5 translate-x-px my-1.5 text-[0.8125rem] min-w-0 flex-col gap-1.5 border-s border-gray-300 dark:border-gray-700;
     }
 
     ul li ul li a {
-        @apply py-0 hover:bg-transparent;
+        @apply py-0 ps-5 hover:bg-transparent;
     }
 
     ul li ul li a.active {
@@ -79,12 +79,11 @@
             &::before {
                 content: '';
                 position: absolute;
-                width: anchor-size(height);
                 height: calc(anchor-size(height) + 0.5px);
                 @apply border-s border-s-black;
                 translate: -100% 0;
                 position-anchor: --active;
-                left: calc(anchor(left) + 0.25rem - 0.5px);
+                left: anchor(left);
                 top: anchor(top);
                 transition-property: top, left;
                 transition-duration: 0.2s;
@@ -115,8 +114,9 @@
 /* Mobile nav behavior */
 @media (width < theme(--breakpoint-lg)) {
     .nav-main {
-        /* Always visible but off-screen by default */
+        /* Always visible but off-screen until opened (do not rely on JS adding .nav-closed before first paint). */
         @apply flex;
+        @apply -start-50;
         @apply bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700;
     }
 

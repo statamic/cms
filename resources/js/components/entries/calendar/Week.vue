@@ -6,9 +6,9 @@ import { Button } from '@ui';
 import {
     isToday,
     getCreateUrlDateParam,
+    getEntryDate,
 } from './calendar.js';
 import DateFormatter from '@/components/DateFormatter.js';
-import { parseAbsoluteToLocal } from '@internationalized/date';
 
 const props = defineProps({
     weekDates: { type: Array, required: true },
@@ -27,12 +27,11 @@ const visibleHours = Array.from({ length: 24 }, (_, i) => i);
 function getEntriesForHour(date, hour) {
     const dateStr = date.toString();
     return props.entries.filter(entry => {
-        const entryDate = parseAbsoluteToLocal(entry.date?.date || entry.date);
+        const entryDate = getEntryDate(entry);
         const entryDateStr = entryDate.toString().split('T')[0];
         if (entryDateStr !== dateStr) return false;
 
-        const entryHour = entryDate.hour;
-        return entryHour === hour;
+        return (entryDate.hour ?? 0) === hour;
     });
 }
 

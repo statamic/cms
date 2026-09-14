@@ -3,6 +3,7 @@
 namespace Statamic\Fieldtypes;
 
 use Statamic\Facades\AssetContainer;
+use Statamic\Facades\User;
 use Statamic\Support\Str;
 
 use function Statamic\trans as __;
@@ -59,6 +60,18 @@ class AssetFolder extends Relationship
         ];
     }
 
+    protected function authorizeItemData($id): bool
+    {
+        // No static container configured (dynamic/sibling-container mode); the by-id value
+        // only echoes the submitted folder path back, so there is nothing to authorize.
+        // Folder enumeration is gated separately, on the runtime container, in getIndexItems().
+        if (! $container = $this->config('container')) {
+            return true;
+        }
+
+        return $this->authorizeViewable(AssetContainer::find($container));
+    }
+
     protected function toItemArray($id, $site = null)
     {
         return ['title' => $id, 'id' => $id];
@@ -66,7 +79,14 @@ class AssetFolder extends Relationship
 
     public function getIndexItems($request)
     {
-        return AssetContainer::find($request->container)
+        $container = AssetContainer::find($request->container);
+
+        // No/unviewable container: return an empty folder list rather than throwing.
+        if (! $container || ! User::current()->can('view', $container)) {
+            return collect();
+        }
+
+        return $container
             ->folders()
             ->map(function ($folder) {
                 return ['id' => $folder, 'title' => $folder];

@@ -3,13 +3,13 @@
         <section class="flex gap-3 items-center">
             <ui-select
                 v-model="linkType"
-                :options="visibleLinkTypes"
+                :options="linkTypes"
                 option-label="title"
                 option-value="type"
                 class="w-1/4 min-w-24"
             />
 
-            <div class="flex-1 min-w-0">
+            <div class="flex-1 min-w-0 link-fieldtype">
                 <!-- URL input -->
                 <ui-input
                     v-if="linkType === 'url'"
@@ -40,40 +40,17 @@
                     @keydown.enter.prevent="commit"
                 />
 
-                <!-- Data input -->
-                <div
-                    v-else
-                    :class="[
-                                'flex overflow-hidden cursor-pointer items-center justify-between',
-                                'w-full block bg-white dark:bg-gray-900 min-w-0',
-                                'border border-gray-300 with-contrast:border-gray-500 dark:border-gray-700 dark:with-contrast:border-gray-500 dark:inset-shadow-2xs dark:inset-shadow-black',
-                                'text-gray-925 dark:text-gray-300 placeholder:text-gray-500 dark:placeholder:text-gray-400/85',
-                                'appearance-none antialiased shadow-ui-sm disabled:shadow-none disabled:opacity-50 not-prose',
-                                'text-sm rounded-lg px-2.5 py-1.5 h-10 leading-[1.125rem]'
-                            ]"
-                    @click="openSelector"
-                >
-                    <Icon v-if="isLoading" name="loading" />
-
-                    <div v-else class="flex flex-1 items-center me-2 overflow-hidden min-w-0">
-                        <img
-                            v-if="linkType === 'asset' && itemData.asset && itemData.asset.isImage"
-                            :src="itemData.asset.thumbnail || itemData.asset.url"
-                            class="asset-thumbnail lazyloaded size-6 max-h-full max-w-full rounded-sm object-cover me-2 flex-shrink-0"
-                        />
-                        <div class="truncate min-w-0 flex-1">{{ displayValue || __('Choose item...') }}</div>
-                    </div>
-
-                    <button
-                        class="flex items-center cursor-pointer"
-                        v-tooltip="`${__('Browse')}...`"
-                        :aria-label="`${__('Browse')}...`"
-                        @click="openSelector"
-                    >
-                        <Icon v-show="linkType === 'asset'" name="folder-photos" class="size-4" />
-                        <Icon v-show="linkType !== 'asset'" name="folder" class="size-4" />
-                    </button>
-                </div>
+                <!-- Registered link type picker (entry, asset, or any custom type) -->
+                <component
+                    v-else-if="registeredLinkType"
+                    :is="registeredLinkTypeComponent"
+                    ref="typeField"
+                    :config="registeredLinkType.config"
+                    :meta="typeMeta"
+                    :value="selectedTypeValue"
+                    @update:value="typeSelected"
+                    @update:meta="typeMetaUpdated"
+                />
             </div>
         </section>
 
@@ -115,35 +92,6 @@
             </div>
         </section>
 
-        <relationship-input
-            class="hidden"
-            ref="relationshipInput"
-            name="link"
-            :value="[]"
-            :config="relationshipConfig"
-            :item-data-url="itemDataUrl"
-            :selections-url="selectionsUrl"
-            :filters-url="filtersUrl"
-            :columns="[{ label: __('Title'), field: 'title' }]"
-            :max-items="1"
-            :site="bard.site"
-            :search="true"
-            @loading="isLoading = $event"
-            @item-data-updated="entrySelected"
-        />
-
-        <Stack v-model:open="showAssetSelector" inset :show-close-button="false">
-            <asset-selector
-                :container="{id: config.container}"
-                :folder="config.folder || '/'"
-                :restrict-folder-navigation="config.restrict_assets"
-                :selected="[]"
-                :max-files="1"
-                :columns="bard.meta.assets.columns"
-                @selected="assetSelected"
-                @closed="showAssetSelector = false"
-            />
-        </Stack>
     </StackContent>
 
 
@@ -171,19 +119,19 @@
 </template>
 
 <script>
-import qs from 'qs';
-import AssetSelector from '../../assets/Selector.vue';
-import { Icon, Stack, StackContent, StackFooter } from '@/components/ui';
+import { Icon, StackContent, StackFooter } from '@/components/ui';
 
 export default {
     emits: ['updated', 'canceled', 'deselected'],
 
     components: {
-        AssetSelector,
         Icon,
-	    Stack,
         StackContent,
         StackFooter,
+    },
+
+    provide: {
+        isInLinkField: true,
     },
 
     props: {
@@ -195,13 +143,6 @@ export default {
     data() {
         return {
             linkType: 'url',
-            linkTypes: [
-                { type: 'url', title: __('URL') },
-                { type: 'entry', title: __('Entry') },
-                { type: 'asset', title: __('Asset') },
-                { type: 'mailto', title: __('Email') },
-                { type: 'tel', title: __('Phone') },
-            ],
             url: {},
             urlData: {},
             itemData: {},
@@ -209,34 +150,39 @@ export default {
             title: null,
             rel: null,
             targetBlank: false,
-            showAssetSelector: false,
-            isLoading: false,
+            typeMetaOverrides: {},
         };
     },
 
     computed: {
-        visibleLinkTypes() {
-            return this.linkTypes.filter((type) => {
-                if (type.type === 'asset' && !this.config.container) {
-                    return false;
-                }
-                return true;
-            });
+        linkTypes() {
+            return [
+                { type: 'url', title: __('URL') },
+                ...Object.entries(this.bard.meta.linkTypes ?? {}).map(([handle, type]) => ({
+                    type: handle,
+                    title: type.title,
+                })),
+                { type: 'mailto', title: __('Email') },
+                { type: 'tel', title: __('Phone') },
+            ];
         },
 
-        displayValue() {
-            switch (this.linkType) {
-                case 'url':
-                    return this.url.url;
-                case 'entry':
-                    return this.itemData.entry ? this.itemData.entry.title : null;
-                case 'asset':
-                    return this.itemData.asset ? this.itemData.asset.basename : null;
-                case 'mailto':
-                    return this.urlData.mailto ? this.urlData.mailto : null;
-                case 'tel':
-                    return this.urlData.tel ? this.urlData.tel : null;
+        registeredLinkType() {
+            return this.bard.meta.linkTypes?.[this.linkType] ?? null;
+        },
+
+        registeredLinkTypeComponent() {
+            return `${this.registeredLinkType.component}-fieldtype`;
+        },
+
+        typeMeta() {
+            if (this.typeMetaOverrides[this.linkType]) {
+                return this.typeMetaOverrides[this.linkType];
             }
+
+            const meta = this.registeredLinkType?.meta ?? {};
+
+            return this.selectedTypeData.length ? { ...meta, data: this.selectedTypeData } : meta;
         },
 
         canCommit() {
@@ -261,57 +207,18 @@ export default {
             return rel.length ? rel.join(' ') : null;
         },
 
-        relationshipConfig() {
-            return {
-                type: 'entries',
-                collections: this.collections,
-                max_items: 1,
-                select_across_sites: this.config.select_across_sites,
-            };
+        selectedTypeValue() {
+            const { type, id } = this.parseDataUrl(this.url[this.linkType]);
+
+            return type === this.linkType && id ? [id] : [];
         },
 
-        itemDataUrl() {
-            return (
-                cp_url('fieldtypes/relationship/data') +
-                '?' +
-                qs.stringify({
-                    config: this.configParameter,
-                })
-            );
-        },
-
-        selectionsUrl() {
-            return (
-                cp_url('fieldtypes/relationship') +
-                '?' +
-                qs.stringify({
-                    config: this.configParameter,
-                    collections: this.collections,
-                })
-            );
-        },
-
-        filtersUrl() {
-            return (
-                cp_url('fieldtypes/relationship/filters') +
-                '?' +
-                qs.stringify({
-                    config: this.configParameter,
-                    collections: this.collections,
-                })
-            );
-        },
-
-        configParameter() {
-            return utf8btoa(JSON.stringify(this.relationshipConfig));
-        },
-
-        collections() {
-            return this.bard.meta.linkCollections;
+        selectedTypeData() {
+            return this.itemData[this.linkType] ? [this.itemData[this.linkType]] : [];
         },
 
         canHaveTarget() {
-            return ['url', 'entry', 'asset'].includes(this.linkType);
+            return !['mailto', 'tel'].includes(this.linkType);
         },
 
         selectedTextIsEmail() {
@@ -330,6 +237,10 @@ export default {
             }
 
             this.autofocus();
+
+            if (this.registeredLinkType && !this.selectedTypeValue.length) {
+                this.$nextTick(() => this.openSelector());
+            }
         },
 
         urlData: {
@@ -430,51 +341,29 @@ export default {
         },
 
         openSelector() {
-            if (this.linkType === 'entry') {
-                this.openEntrySelector();
-            } else if (this.linkType === 'asset') {
-                this.openAssetSelector();
+            const field = this.$refs.typeField;
+
+            if (!field) return;
+
+            if (typeof field.linkExistingItem === 'function') field.linkExistingItem();
+            else if (typeof field.openSelector === 'function') field.openSelector();
+        },
+
+        typeSelected(selected) {
+            const id = selected[0] ?? null;
+
+            this.setUrl(this.linkType, id ? `statamic://${this.linkType}::${id}` : null);
+        },
+
+        typeMetaUpdated(meta) {
+            this.typeMetaOverrides = { ...this.typeMetaOverrides, [this.linkType]: meta };
+
+            const item = meta.data?.[0];
+
+            if (item) {
+                this.setItemData(this.linkType, item);
+                this.putItemDataIntoMeta(`${this.linkType}::${item.id}`, item);
             }
-        },
-
-        openEntrySelector() {
-            this.$refs.relationshipInput.openSelector();
-        },
-
-        openAssetSelector() {
-            this.showAssetSelector = true;
-        },
-
-        assetSelected(data) {
-            if (data.length) {
-                this.loadAssetData(data[0]);
-            }
-        },
-
-        loadAssetData(url) {
-            this.$axios
-                .post(cp_url('assets-fieldtype'), {
-                    assets: [url],
-                })
-                .then((response) => {
-                    this.selectItem('asset', response.data[0]);
-                    this.isLoading = false;
-                });
-        },
-
-        entrySelected(data) {
-            if (data.length) {
-                this.selectItem('entry', data[0]);
-            }
-        },
-
-        selectItem(type, item) {
-            const ref = `${type}::${item.id}`;
-
-            this.setItemData(type, item);
-            this.setUrl(type, `statamic://${ref}`);
-
-            this.putItemDataIntoMeta(ref, item);
         },
 
         putItemDataIntoMeta(ref, item) {

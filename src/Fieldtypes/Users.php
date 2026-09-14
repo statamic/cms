@@ -102,9 +102,14 @@ class Users extends Relationship
         return parent::preProcess($data);
     }
 
+    protected function authorizeItemData($id): bool
+    {
+        return $this->authorizeViewable($this->findUser($id));
+    }
+
     protected function toItemArray($id, $site = null)
     {
-        if ($user = User::find($id)) {
+        if ($user = $this->findUser($id)) {
             $canViewUsers = $this->canViewUser($user);
 
             return [
@@ -118,8 +123,19 @@ class Users extends Relationship
         return $this->invalidItemArray($id);
     }
 
+    protected function findUser($id)
+    {
+        return $this->itemCache[$id] ??= User::find($id);
+    }
+
     public function getIndexItems($request)
     {
+        // Don't reveal existence to a user who can't view the listing; return an empty
+        // result set instead of throwing, matching the picker's filter-to-viewable behavior.
+        if (! User::current()->can('index', UserContract::class)) {
+            return collect();
+        }
+
         $query = User::query();
 
         if ($search = $request->search) {
@@ -243,7 +259,11 @@ class Users extends Relationship
     {
         $single = $this->config('max_items') === 1;
 
-        $ids = Arr::wrap($values);
+        $ids = collect(Arr::wrap($values))
+            ->map(fn ($id) => $id === 'current' ? User::current()?->id() : $id)
+            ->filter()
+            ->values()
+            ->all();
 
         $query = (new OrderedQueryBuilder(User::query(), $ids))->whereIn('id', $ids);
 

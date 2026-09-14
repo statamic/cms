@@ -7,6 +7,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Statamic\CP\Column;
 use Statamic\Facades\Scope;
+use Statamic\Facades\User;
 use Statamic\Fields\Fieldtype;
 use Statamic\Query\OrderBy;
 
@@ -30,6 +31,14 @@ abstract class Relationship extends Fieldtype
         '_' => '_', // forces an object in js
     ];
     protected $formStackSize;
+    protected array $itemCache = [];
+
+    public function __clone()
+    {
+        // The fieldtype repository hands out clones of a single instance per handle,
+        // so without this the cache would be inherited by unrelated fields.
+        $this->itemCache = [];
+    }
 
     protected function configFieldItems(): array
     {
@@ -242,8 +251,22 @@ abstract class Relationship extends Fieldtype
     public function getItemData($values)
     {
         return collect($values)->map(function ($id) {
-            return $this->toItemArray($id);
+            return $this->authorizeItemData($id)
+                ? $this->toItemArray($id)
+                : $this->invalidItemArray($id);
         })->values();
+    }
+
+    protected function authorizeItemData($id): bool
+    {
+        // Fail-open so that we don't introduce a breaking change.
+        // Will change in an upcoming release.
+        return true;
+    }
+
+    protected function authorizeViewable($item): bool
+    {
+        return $item && User::current()->can('view', $item);
     }
 
     public function getItemHint($item): ?string
@@ -351,7 +374,12 @@ abstract class Relationship extends Fieldtype
 
     protected function applyIndexQueryScopes($query, $params)
     {
-        collect(Arr::wrap($this->config('query_scopes')))
+        $handles = Arr::wrap($this->config('query_scopes'));
+
+        // Pass the active handles along so an aliased scope knows which is in effect.
+        $params = array_merge($params, ['queryScopes' => $handles]);
+
+        collect($handles)
             ->map(fn ($handle) => Scope::find($handle))
             ->filter()
             ->each(fn ($scope) => $scope->apply($query, $params));
