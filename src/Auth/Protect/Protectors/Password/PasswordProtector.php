@@ -20,7 +20,7 @@ class PasswordProtector extends Protector
             throw new ForbiddenHttpException();
         }
 
-        if (request()->isLivePreview()) {
+        if (request()->isLivePreviewOf($this->data)) {
             return;
         }
 

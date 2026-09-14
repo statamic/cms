@@ -10,6 +10,7 @@ use Statamic\Extend\RegistersItself;
 use Statamic\Facades\Antlers;
 use Statamic\Support\Arr;
 use Statamic\Support\Traits\Hookable;
+use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
 
 abstract class Tags
 {
@@ -17,24 +18,28 @@ abstract class Tags
 
     protected static $binding = 'tags';
 
+    public static $isolated = false;
+
     /**
      * The content written between the tags (when a tag pair).
      *
-     * @public string
+     * @var string
      */
     public $content;
+
+    public $isolatedContext;
 
     /**
      * The variable context around which this tag is positioned.
      *
-     * @public array
+     * @var Context
      */
     public $context;
 
     /**
      * The parameters used on this tag.
      *
-     * @public array
+     * @var Parameters
      */
     public $params;
 
@@ -68,7 +73,7 @@ abstract class Tags
     /**
      * The parser instance that executed this tag.
      *
-     * @var \Statamic\View\Antlers\Parser
+     * @var \Statamic\Contracts\View\Antlers\Parser
      */
     public $parser;
 
@@ -123,6 +128,14 @@ abstract class Tags
     public function setContext($context)
     {
         $this->context = new Context($context);
+
+        return $this;
+    }
+
+    public function setIsolatedContext($context)
+    {
+        $this->isolatedContext = new Context($context);
+        $this->context = new Context();
 
         return $this;
     }
@@ -207,8 +220,10 @@ abstract class Tags
         }
 
         return Antlers::usingParser($this->parser, function ($antlers) use ($data) {
+            $trusted = ! GlobalRuntimeState::$isEvaluatingUserData;
+
             return $antlers
-                ->parse($this->content, array_merge($this->context->all(), $data))
+                ->parse($this->content, array_merge($this->context->all(), $data), $trusted)
                 ->withoutExtractions();
         });
     }
@@ -244,8 +259,10 @@ abstract class Tags
         }
 
         return Antlers::usingParser($this->parser, function ($antlers) use ($data, $supplement) {
+            $trusted = ! GlobalRuntimeState::$isEvaluatingUserData;
+
             return $antlers
-                ->parseLoop($this->content, $data, $supplement, $this->context->all())
+                ->parseLoop($this->content, $data, $supplement, $this->context->all(), $trusted)
                 ->withoutExtractions();
         });
     }

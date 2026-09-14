@@ -9,9 +9,11 @@ class IpAddress extends Protector
 {
     public function protect()
     {
-        $ips = Arr::get($this->config, 'allowed', []);
+        $allowed = Arr::get($this->config, 'allowed', []);
 
-        if (! in_array(request()->ip(), $ips)) {
+        $requestIps = request()->ips();
+
+        if (empty(array_intersect($requestIps, $allowed))) {
             throw new ForbiddenHttpException();
         }
     }

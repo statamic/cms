@@ -1,0 +1,25 @@
+<script setup>
+import { computed } from 'vue';
+import { Link } from '@inertiajs/vue3';
+
+const props = defineProps({
+    entry: { type: Object, required: true }
+});
+
+const entryClasses = computed(() => ({
+    'border-green-500 bg-green-50 dark:bg-green-900/20': props.entry.status === 'published',
+    'border-gray-300 bg-gray-50 dark:bg-gray-800': props.entry.status === 'draft',
+    'border-purple-500 bg-purple-50 dark:bg-purple-900/20': props.entry.status === 'scheduled'
+}));
+</script>
+
+<template>
+    <Link
+        :href="entry.edit_url"
+        :key="entry.id"
+        class="block text-xs p-1 rounded-r border-l-2 mb-1 cursor-pointer hover:shadow-sm"
+        :class="entryClasses"
+    >
+        <div class="font-medium line-clamp-2" v-text="entry.title" />
+    </Link>
+</template>

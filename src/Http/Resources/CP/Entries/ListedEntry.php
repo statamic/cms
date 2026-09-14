@@ -3,7 +3,6 @@
 namespace Statamic\Http\Resources\CP\Entries;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use Statamic\Facades\Action;
 use Statamic\Facades\User;
 
 class ListedEntry extends JsonResource
@@ -46,7 +45,6 @@ class ListedEntry extends JsonResource
             'collection' => array_merge($entry->collection()->toArray(), ['dated' => $entry->collection()->dated()]),
             'viewable' => User::current()->can('view', $entry),
             'editable' => User::current()->can('edit', $entry),
-            'actions' => Action::for($entry, ['collection' => $collection->handle()]),
         ];
     }
 
@@ -56,7 +54,9 @@ class ListedEntry extends JsonResource
             $key = $column->field;
             $field = $this->blueprint->field($key);
 
-            if ($key === 'site') {
+            if ($key === 'type') {
+                return [$key => $this->resource->collection()->title()];
+            } elseif ($key === 'site') {
                 $value = $this->resource->locale();
             } else {
                 $value = $extra[$key] ?? $this->resource->value($key) ?? $field?->defaultValue();

@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Facade;
 use Statamic\Auth\Permissions;
 
 /**
- * @method static void boot()
+ * @method static \Statamic\Auth\Permissions boot()
  * @method static void extend(\Closure $callback)
  * @method static \Statamic\Auth\Permission make(string $value)
  * @method static \Statamic\Auth\Permission register(string $permission, \Closure $callback = null)

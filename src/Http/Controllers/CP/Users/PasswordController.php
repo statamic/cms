@@ -19,6 +19,10 @@ class PasswordController extends CpController
 
         $updatingOwnPassword = $user->id() == User::fromUser($request->user())->id();
 
+        if (! $updatingOwnPassword) {
+            $this->requireElevatedSession();
+        }
+
         $this->authorize('editPassword', $user);
 
         $rules = [

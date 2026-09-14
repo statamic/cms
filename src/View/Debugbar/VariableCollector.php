@@ -6,7 +6,7 @@ use DebugBar\DataCollector\ConfigCollector;
 
 class VariableCollector extends ConfigCollector
 {
-    public function getWidgets()
+    public function getWidgets(): array
     {
         $widgets = parent::getWidgets();
 
@@ -21,6 +21,10 @@ class VariableCollector extends ConfigCollector
             $value = false;
         }
 
-        return parent::useHtmlVarDumper($value);
+        if (method_exists(parent::class, 'useHtmlVarDumper')) {
+            return parent::useHtmlVarDumper($value);
+        }
+
+        return $this;
     }
 }

@@ -1,0 +1,27 @@
+import { Canvas, Meta, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as EditableStories from '../Editable.stories';
+
+<Meta of={EditableStories} />
+
+# Editable
+An inline editable text component that allows users to click to edit text in place. Perfect for titles, labels, and other short text fields that need quick editing.
+<Canvas of={EditableStories._DocsIntro} sourceState={'shown'} />
+
+## Start With Edit Mode
+Set `start-with-edit-mode` to `true` to automatically focus the input when the component mounts.
+<Canvas of={EditableStories._StartWithEditMode} sourceState={'shown'} />
+
+## Submit Modes
+Control when edits are saved using the `submit-mode` prop. Choose from `blur` (save when clicking away), `enter` (save when pressing Enter), or `both`.
+<Canvas of={EditableStories._SubmitModes} sourceState={'shown'} />
+
+## Events
+Listen to `@submit`, `@cancel`, and `@edit` events to respond to user interactions.
+<Canvas of={EditableStories._Events} sourceState={'shown'} />
+
+## Custom Placeholder
+Provide helpful context with a custom placeholder that appears when the value is empty.
+<Canvas of={EditableStories._CustomPlaceholder} sourceState={'shown'} />
+
+## Arguments
+<ArgTypes of={EditableStories} />

@@ -16,6 +16,7 @@ use Statamic\StaticCaching\StaticCacheManager;
  * @method static ApplicationCacher createApplicationDriver(array $config)
  * @method static \Illuminate\Cache\Repository cacheStore()
  * @method static void flush()
+ * @method static void csrfTokenJs(string $js)
  * @method static void nocacheJs(string $js)
  * @method static void nocachePlaceholder(string $placeholder)
  * @method static void includeJs()

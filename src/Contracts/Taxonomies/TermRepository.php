@@ -2,6 +2,8 @@
 
 namespace Statamic\Contracts\Taxonomies;
 
+use Closure;
+
 interface TermRepository
 {
     public function all();
@@ -15,6 +17,10 @@ interface TermRepository
     public function findByUri(string $uri);
 
     public function findOrFail($id);
+
+    public function findOrMake($id);
+
+    public function findOr($id, Closure $callback);
 
     public function make(?string $slug = null);
 

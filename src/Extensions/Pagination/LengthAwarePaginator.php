@@ -4,6 +4,7 @@ namespace Statamic\Extensions\Pagination;
 
 use Illuminate\Http\Resources\Json\PaginatedResourceResponse;
 use Illuminate\Pagination\LengthAwarePaginator as BasePaginator;
+use Statamic\Facades\StaticCache;
 
 class LengthAwarePaginator extends BasePaginator
 {
@@ -64,7 +65,9 @@ class LengthAwarePaginator extends BasePaginator
 
     public function withQueryString()
     {
-        $this->appends(request()->query());
+        parent::withQueryString();
+
+        unset($this->query[StaticCache::recacheTokenParameter()]);
 
         return $this;
     }

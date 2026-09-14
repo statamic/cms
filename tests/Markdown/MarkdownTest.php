@@ -249,11 +249,12 @@ EOT;
 <h2>Charlie Delta</h2>
 EOT, $markdown);
 
+        // Make assertion without the tabindex attribute because it's only added in commonmark 2.9.2 and later.
         $this->assertEquals(<<<'EOT'
 <h2><a id="content-alfa-bravo" href="#content-alfa-bravo" class="heading-permalink" aria-hidden="true" title="Permalink">¶</a>Alfa Bravo</h2>
 <h2><a id="content-charlie-delta" href="#content-charlie-delta" class="heading-permalink" aria-hidden="true" title="Permalink">¶</a>Charlie Delta</h2>
 EOT,
-            rtrim(Markdown::withHeadingPermalinks()->parse($markdown))
+            str_replace(' tabindex="-1"', '', rtrim(Markdown::withHeadingPermalinks()->parse($markdown)))
         );
     }
 
@@ -289,10 +290,11 @@ EOT, $markdown);
 <p>Baz qux.</p>
 EOT;
 
-        // Make assertion without newlines because they differ between versions of commonmark.
+        // Make assertion without newlines because they differ between versions of commonmark,
+        // and without the tabindex attribute because it's only added in 2.9.2 and later.
         $this->assertEquals(
             str($expected)->replace("\n", ''),
-            str(Markdown::withTableOfContents()->parse($markdown))->trim()->replace("\n", '')
+            str(Markdown::withTableOfContents()->parse($markdown))->trim()->replace("\n", '')->replace(' tabindex="-1"', '')
         );
     }
 }

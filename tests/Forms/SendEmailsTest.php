@@ -3,6 +3,7 @@
 namespace Tests\Forms;
 
 use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Forms\SubmissionRepository;
@@ -137,6 +138,34 @@ class SendEmailsTest extends TestCase
         $submissions = app(SubmissionRepository::class)->all();
 
         $this->assertEmpty($submissions);
+    }
+
+    #[Test]
+    public function delete_attachments_job_deletes_files_from_the_configured_disk_and_path()
+    {
+        config([
+            'statamic.system.file_uploads_disk' => 'uploads',
+            'statamic.system.file_uploads_path' => 'temp-uploads',
+        ]);
+
+        $localDisk = Storage::fake('local');
+        $uploadsDisk = Storage::fake('uploads');
+        $uploadsDisk->put('temp-uploads/1234567/file.txt', 'contents');
+        $localDisk->put('statamic/file-uploads/1234567/file.txt', 'contents');
+
+        $form = tap(FacadesForm::make('attachments_test')->email([
+            'from' => 'first@sender.com',
+            'to' => 'first@recipient.com',
+        ]))->save();
+
+        $form->blueprint()->ensureField('attachments', ['type' => 'files'])->save();
+
+        $submission = $form->makeSubmission()->data(['attachments' => ['1234567/file.txt']]);
+
+        (new DeleteTemporaryAttachments($submission))->handle();
+
+        $uploadsDisk->assertMissing('temp-uploads/1234567/file.txt');
+        $localDisk->assertExists('statamic/file-uploads/1234567/file.txt');
     }
 
     #[Test]

@@ -34,11 +34,36 @@ class SiteTest extends TestCase
     }
 
     #[Test]
+    public function name_falls_back_to_handle()
+    {
+        $site = new Site('en', []);
+
+        $this->assertEquals('en', $site->name());
+    }
+
+    #[Test]
     public function gets_locale()
     {
         $site = new Site('en', ['locale' => 'en_US']);
 
         $this->assertEquals('en_US', $site->locale());
+    }
+
+    #[Test]
+    public function resolves_antlers_syntax_in_config_values()
+    {
+        $site = new Site('en', ['locale' => '{{ config:app.locale }}']);
+
+        $this->assertNotEmpty($site->locale());
+        $this->assertStringNotContainsString('{{', $site->locale());
+    }
+
+    #[Test]
+    public function sanitizes_php_tags_in_config_values()
+    {
+        $site = new Site('en', ['name' => '<?php echo "hacked"; ?>']);
+
+        $this->assertEquals('&lt;?php echo "hacked"; ?>', $site->name());
     }
 
     #[Test]
@@ -293,7 +318,7 @@ class SiteTest extends TestCase
         $site = new Site('test', []);
 
         $this->assertSame('test', (string) $site);
-        $this->assertEquals('test', Antlers::parse('{{ site }}', ['site' => $site]));
+        $this->assertEquals('test', Antlers::parse('{{ site }}', ['site' => $site], true));
     }
 
     #[Test]

@@ -85,6 +85,13 @@ class RuntimeConfiguration
     public $guardedContentTagPatterns = [];
 
     /**
+     * A list of all allowed content tag patterns.
+     *
+     * @var string[]
+     */
+    public $allowedContentTagPatterns = [];
+
+    /**
      * A list of all invalid modifier patterns.
      *
      * @var string[]
@@ -99,6 +106,13 @@ class RuntimeConfiguration
     public $guardedContentModifiers = [];
 
     /**
+     * A list of all allowed content modifier patterns.
+     *
+     * @var string[]
+     */
+    public $allowedContentModifiers = [];
+
+    /**
      * Indicates if PHP Code should be evaluated in user content.
      *
      * When disabled, *antlers.php templates will be allowed,
@@ -108,6 +122,16 @@ class RuntimeConfiguration
      * @var bool
      */
     public $allowPhpInUserContent = false;
+
+    /**
+     * Indicates if method invocations should be evaluated in user content.
+     *
+     * When disabled, method calls like object:method() within
+     * fields with antlers:true will be blocked.
+     *
+     * @var bool
+     */
+    public $allowMethodsInUserContent = false;
 
     /**
      * Registers a new Antlers preparser callback.

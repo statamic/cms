@@ -118,6 +118,107 @@ class FieldsetTest extends TestCase
     }
 
     #[Test]
+    public function it_gets_fields_from_sections()
+    {
+        $fieldset = new Fieldset;
+
+        $fieldset->setContents([
+            'sections' => [
+                [
+                    'display' => 'First section',
+                    'fields' => [
+                        [
+                            'handle' => 'one',
+                            'field' => ['type' => 'text'],
+                        ],
+                    ],
+                ],
+                [
+                    'display' => 'Second section',
+                    'fields' => [
+                        [
+                            'handle' => 'two',
+                            'field' => ['type' => 'textarea'],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $fields = $fieldset->fields();
+
+        $this->assertTrue($fieldset->hasSections());
+        $this->assertCount(2, $fieldset->sections());
+        $this->assertInstanceOf(Fields::class, $fields);
+        $this->assertEveryItemIsInstanceOf(Field::class, $fields = $fields->all());
+        $this->assertEquals(['one', 'two'], $fields->map->handle()->values()->all());
+        $this->assertEquals(['text', 'textarea'], $fields->map->type()->values()->all());
+    }
+
+    #[Test]
+    public function it_drops_empty_sections_when_storing_flat_fields()
+    {
+        $fieldset = new Fieldset;
+
+        $fieldset->setContents([
+            'title' => 'Test',
+            'sections' => [],
+            'fields' => [
+                ['handle' => 'one', 'field' => ['type' => 'text']],
+            ],
+        ]);
+
+        $this->assertArrayNotHasKey('sections', $fieldset->contents());
+        $this->assertEquals('one', $fieldset->fields()->all()->first()->handle());
+    }
+
+    #[Test]
+    public function it_drops_top_level_fields_when_storing_sections()
+    {
+        $fieldset = new Fieldset;
+
+        $fieldset->setContents([
+            'sections' => [
+                [
+                    'display' => 'A',
+                    'fields' => [
+                        ['handle' => 'one', 'field' => ['type' => 'text']],
+                    ],
+                ],
+            ],
+            'fields' => [
+                ['handle' => 'stale', 'field' => ['type' => 'text']],
+            ],
+        ]);
+
+        $this->assertArrayNotHasKey('fields', $fieldset->contents());
+        $this->assertEquals(['one'], $fieldset->fields()->all()->keys()->all());
+    }
+
+    #[Test]
+    public function it_normalizes_legacy_section_fields_syntax()
+    {
+        $fieldset = new Fieldset;
+
+        $fieldset->setContents([
+            'sections' => [
+                [
+                    'display' => 'First section',
+                    'fields' => [
+                        'one' => ['type' => 'text'],
+                        'two' => ['type' => 'textarea'],
+                    ],
+                ],
+            ],
+        ]);
+
+        $fields = $fieldset->fields()->all();
+
+        $this->assertEquals(['one', 'two'], $fields->map->handle()->values()->all());
+        $this->assertEquals(['text', 'textarea'], $fields->map->type()->values()->all());
+    }
+
+    #[Test]
     public function it_gets_fields_using_legacy_syntax()
     {
         $fieldset = new Fieldset;
@@ -435,6 +536,32 @@ class FieldsetTest extends TestCase
             ->setContents([
                 'fields' => [
                     ['handle' => 'meta_title', 'field' => 'seo.meta_title'],
+                ],
+            ])
+            ->save();
+
+        $importedBy = $fieldset->importedBy();
+
+        $this->assertCount(1, $importedBy['fieldsets']);
+        $this->assertEquals($fieldsetA->handle(), $importedBy['fieldsets']->first()->handle());
+    }
+
+    #[Test]
+    public function gets_fieldsets_importing_fieldset_inside_sections()
+    {
+        $fieldset = Fieldset::make('seo')->setContents(['fields' => [
+            ['handle' => 'meta_title', 'field' => ['type' => 'text']],
+        ]])->save();
+
+        $fieldsetA = Fieldset::make('one')
+            ->setContents([
+                'sections' => [
+                    [
+                        'display' => 'SEO',
+                        'fields' => [
+                            ['import' => 'seo'],
+                        ],
+                    ],
                 ],
             ])
             ->save();

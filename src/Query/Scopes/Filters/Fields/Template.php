@@ -4,6 +4,8 @@ namespace Statamic\Query\Scopes\Filters\Fields;
 
 use Statamic\Support\Arr;
 
+use function Statamic\trans as __;
+
 class Template extends FieldtypeFilter
 {
     public function fieldItems()

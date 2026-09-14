@@ -7,8 +7,13 @@ use Statamic\Contracts\Assets\Asset;
 use Statamic\Exceptions\FileExtensionMismatch;
 use Statamic\Exceptions\ValidationException;
 
+use function Statamic\trans;
+use function Statamic\trans as __;
+
 class ReuploadAsset extends Action
 {
+    protected $icon = 'upload-cloud';
+
     public static function title()
     {
         return __('Reupload');
@@ -51,7 +56,8 @@ class ReuploadAsset extends Action
     {
         $asset = $assets->first();
 
-        $file = new ReplacementFile('statamic/file-uploads/'.$values['file']);
+        $basePath = config('statamic.system.file_uploads_path', 'statamic/file-uploads');
+        $file = new ReplacementFile($basePath.'/'.$values['file']);
 
         try {
             $asset->reupload($file);

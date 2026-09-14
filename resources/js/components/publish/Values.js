@@ -1,17 +1,17 @@
-import { clone } from  '../../bootstrap/globals.js'
-import { data_get } from  '../../bootstrap/globals.js'
-import { data_set } from  '../../bootstrap/globals.js'
-import isObject from 'underscore/modules/isObject.js'
+import { clone } from '../../bootstrap/globals.js';
+import { data_get } from '../../bootstrap/globals.js';
+import { data_set } from '../../bootstrap/globals.js';
 
 function data_delete(obj, path) {
     var parts = path.split('.');
     while (parts.length - 1) {
         var key = parts.shift();
+        if (obj === null || typeof obj !== 'object') return;
         var shouldBeArray = parts.length ? new RegExp('^[0-9]+$').test(parts[0]) : false;
-        if (! (key in obj)) obj[key] = shouldBeArray ? [] : {};
+        if (!(key in obj)) obj[key] = shouldBeArray ? [] : {};
         obj = obj[key];
     }
-    delete obj[parts[0]];
+    if (obj !== null && typeof obj === 'object') delete obj[parts[0]];
 }
 
 export default class Values {
@@ -24,28 +24,22 @@ export default class Values {
     }
 
     get(dottedKey) {
-        let decodedValues = new this.constructor(clone(this.values), this.jsonFields)
-            .jsonDecode()
-            .values;
+        let decodedValues = new this.constructor(clone(this.values), this.jsonFields).jsonDecode().values;
 
         return data_get(decodedValues, dottedKey);
     }
 
-    set(dottedKey, value)  {
-        this.jsonDecode()
-            .setValue(dottedKey, value)
-            .jsonEncode();
+    set(dottedKey, value) {
+        this.jsonDecode().setValue(dottedKey, value).jsonEncode();
 
         return this;
     }
 
-    mergeDottedKeys(dottedKeys, values)  {
-        let decodedValues = new this.constructor(clone(values.values), values.jsonFields)
-            .jsonDecode()
-            .values;
+    mergeDottedKeys(dottedKeys, values) {
+        let decodedValues = new this.constructor(clone(values.values), values.jsonFields).jsonDecode().values;
 
         this.jsonDecode();
-        dottedKeys.forEach(dottedKey => {
+        dottedKeys.forEach((dottedKey) => {
             data_set(this.values, dottedKey, data_get(decodedValues, dottedKey));
         });
         this.jsonEncode();
@@ -54,10 +48,7 @@ export default class Values {
     }
 
     except(dottedKeys) {
-        return this.jsonDecode()
-            .rejectValuesByKey(dottedKeys)
-            .jsonEncode()
-            .all();
+        return this.jsonDecode().rejectValuesByKey(dottedKeys).jsonEncode().all();
     }
 
     all() {
@@ -65,7 +56,7 @@ export default class Values {
     }
 
     jsonDecode() {
-        this.jsonFields.forEach(dottedKey => {
+        this.jsonFields.forEach((dottedKey) => {
             this.jsonDecodeValue(dottedKey);
         });
 
@@ -73,23 +64,27 @@ export default class Values {
     }
 
     jsonEncode() {
-        clone(this.jsonFields).reverse().forEach(dottedKey => {
-            this.jsonEncodeValue(dottedKey);
-        });
+        clone(this.jsonFields)
+            .reverse()
+            .forEach((dottedKey) => {
+                this.jsonEncodeValue(dottedKey);
+            });
 
         return this;
     }
 
     dottedKeyToJsPath(dottedKey) {
-        return dottedKey.split('.')
-            .map(key => new RegExp(/^\d+.*/).test(key) ? '["' + key + '"]' : key)
+        return dottedKey
+            .split('.')
+            .map((key) => (new RegExp(/^\d+.*/).test(key) ? '["' + key + '"]' : key))
             .join('.')
             .replace(/\.\[/g, '[');
     }
 
     missingValue(dottedKey) {
         var properties = Array.isArray(dottedKey) ? dottedKey : dottedKey.split('.');
-        var value = properties.reduce((prev, curr) => prev && prev[curr], clone(this.values));
+        // Read-only walk — no need to clone. The constructor already made this.values private.
+        var value = properties.reduce((prev, curr) => (prev == null ? undefined : prev[curr]), this.values);
 
         return value === undefined;
     }
@@ -97,25 +92,15 @@ export default class Values {
     jsonDecodeValue(dottedKey) {
         if (this.missingValue(dottedKey)) return;
 
-        let values = clone(this.values);
-        let fieldValue = data_get(values, dottedKey);
-        let decodedFieldValue = JSON.parse(fieldValue);
-
-        data_set(values, dottedKey, decodedFieldValue);
-
-        this.values = values;
+        let fieldValue = data_get(this.values, dottedKey);
+        data_set(this.values, dottedKey, JSON.parse(fieldValue));
     }
 
     jsonEncodeValue(dottedKey) {
         if (this.missingValue(dottedKey)) return;
 
-        let values = clone(this.values);
-        let fieldValue = data_get(values, dottedKey);
-        let encodedFieldValue = JSON.stringify(fieldValue);
-
-        data_set(values, dottedKey, encodedFieldValue);
-
-        this.values = values;
+        let fieldValue = data_get(this.values, dottedKey);
+        data_set(this.values, dottedKey, JSON.stringify(fieldValue));
     }
 
     setValue(dottedKey, value) {
@@ -125,7 +110,7 @@ export default class Values {
     }
 
     rejectValuesByKey(dottedKeys) {
-        dottedKeys.forEach(dottedKey => {
+        dottedKeys.forEach((dottedKey) => {
             this.forgetValue(dottedKey);
         });
 
@@ -135,10 +120,6 @@ export default class Values {
     forgetValue(dottedKey) {
         if (this.missingValue(dottedKey)) return;
 
-        let values = clone(this.values);
-
-        data_delete(values, dottedKey);
-
-        this.values = values;
+        data_delete(this.values, dottedKey);
     }
 }

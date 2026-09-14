@@ -15,7 +15,13 @@ class DefaultCacher extends AbstractCacher
      */
     public function get(Request $request)
     {
-        return Cache::get($this->getCacheKey($request));
+        $cached = Cache::get($this->getCacheKey($request));
+
+        if (! is_array($cached)) {
+            return null;
+        }
+
+        return new JsonResponse($cached['content'], $cached['status'], $cached['headers'], json: true);
     }
 
     /**
@@ -25,7 +31,11 @@ class DefaultCacher extends AbstractCacher
     {
         $key = $this->trackEndpoint($request);
 
-        Cache::put($key, $response, $this->cacheExpiry());
+        Cache::put($key, [
+            'content' => $response->getContent(),
+            'status' => $response->getStatusCode(),
+            'headers' => $response->headers->all(),
+        ], $this->cacheExpiry());
     }
 
     /**

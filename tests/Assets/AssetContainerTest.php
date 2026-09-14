@@ -9,7 +9,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\Storage;
 use League\Flysystem\DirectoryAttributes;
 use League\Flysystem\DirectoryListing;
@@ -33,7 +33,6 @@ use Statamic\Facades\File;
 use Statamic\Fields\Blueprint;
 use Statamic\Filesystem\Filesystem;
 use Statamic\Filesystem\FlysystemAdapter;
-use Tests\Fakes\FakeArtisanRequest;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -173,66 +172,6 @@ class AssetContainerTest extends TestCase
 
         $container = (new AssetContainer)->handle('main');
         $this->assertEquals($blueprint, $container->blueprint());
-    }
-
-    #[Test]
-    public function it_gets_and_sets_whether_uploads_are_allowed()
-    {
-        $container = new AssetContainer;
-        $this->assertTrue($container->allowUploads());
-
-        $return = $container->allowUploads(false);
-
-        $this->assertEquals($container, $return);
-        $this->assertFalse($container->allowUploads());
-    }
-
-    #[Test]
-    public function it_gets_and_sets_whether_folders_can_be_created()
-    {
-        $container = new AssetContainer;
-        $this->assertTrue($container->createFolders());
-
-        $return = $container->createFolders(false);
-
-        $this->assertEquals($container, $return);
-        $this->assertFalse($container->createFolders());
-    }
-
-    #[Test]
-    public function it_gets_and_sets_whether_renaming_is_allowed()
-    {
-        $container = new AssetContainer;
-        $this->assertTrue($container->allowRenaming());
-
-        $return = $container->allowRenaming(false);
-
-        $this->assertEquals($container, $return);
-        $this->assertFalse($container->allowRenaming());
-    }
-
-    #[Test]
-    public function it_gets_and_sets_whether_moving_is_allowed()
-    {
-        $container = new AssetContainer;
-        $this->assertTrue($container->allowMoving());
-
-        $return = $container->allowMoving(false);
-
-        $this->assertEquals($container, $return);
-        $this->assertFalse($container->allowMoving());
-    }
-
-    #[Test]
-    public function it_gets_and_sets_whether_downloading_is_allowed()
-    {
-        $container = new AssetContainer;
-        $this->assertTrue($container->allowDownloading());
-
-        $return = $container->allowDownloading(false);
-
-        $this->assertEquals($container, $return);
-        $this->assertFalse($container->allowDownloading());
     }
 
     #[Test]
@@ -641,7 +580,7 @@ class AssetContainerTest extends TestCase
     }
 
     #[Test]
-    public function it_gets_the_files_from_the_cache_every_time_if_running_in_a_queue_worker()
+    public function it_still_only_gets_the_files_from_the_cache_once_per_job_if_running_in_a_queue_worker()
     {
         $cacheKey = 'asset-list-contents-test';
 
@@ -662,11 +601,17 @@ class AssetContainerTest extends TestCase
 
         $container = (new AssetContainer)->handle('test')->disk('test');
 
-        Request::swap(new FakeArtisanRequest('queue:listen'));
-
         $expected = ['one.jpg', 'two.jpg'];
         $this->assertEquals($expected, $container->files()->all());
         $this->assertEquals(1, $cacheHits);
+        $this->assertEquals($expected, $container->files()->all());
+        $this->assertEquals(1, $cacheHits);
+
+        // Laravel's real queue worker daemon loop clears resolved facade instances
+        // before every job it processes, which resets the Blink-backed
+        // AssetContainerContents instance behind the `contents()` call.
+        Facade::clearResolvedInstances();
+
         $this->assertEquals($expected, $container->files()->all());
         $this->assertEquals(2, $cacheHits);
     }
@@ -769,7 +714,7 @@ class AssetContainerTest extends TestCase
     }
 
     #[Test]
-    public function it_gets_the_folders_from_the_cache_and_blink_every_time_if_running_in_a_queue_worker()
+    public function it_still_only_gets_the_folders_from_the_cache_and_blink_once_per_job_if_running_in_a_queue_worker()
     {
         $cacheKey = 'asset-list-contents-test';
 
@@ -789,17 +734,65 @@ class AssetContainerTest extends TestCase
 
         $container = (new AssetContainer)->handle('test')->disk('test');
 
-        Request::swap(new FakeArtisanRequest('queue:listen'));
-
         $expected = ['one', 'two'];
         $this->assertEquals($expected, $container->folders()->all());
         $this->assertEquals(1, $cacheHits);
         $this->assertEquals($expected, $container->folders()->all());
-        $this->assertEquals(2, $cacheHits);
+        $this->assertEquals(1, $cacheHits);
 
+        // Still within the same job (resolved facade instances haven't been cleared),
+        // a freshly newed up container reuses the same Blink-cached contents.
         $anotherInstanceOfTheContainer = (new AssetContainer)->handle('test')->disk('test');
         $this->assertEquals($expected, $anotherInstanceOfTheContainer->folders()->all());
-        $this->assertEquals(3, $cacheHits);
+        $this->assertEquals(1, $cacheHits);
+
+        // Laravel's real queue worker daemon loop clears resolved facade instances
+        // before every job it processes, which resets the Blink-backed contents cache.
+        Facade::clearResolvedInstances();
+
+        $this->assertEquals($expected, $container->folders()->all());
+        $this->assertEquals(2, $cacheHits);
+    }
+
+    #[Test]
+    public function it_does_not_leak_stale_contents_state_across_calls_when_running_in_a_queue_worker()
+    {
+        $cacheKey = 'asset-list-contents-test';
+
+        Cache::put($cacheKey, collect([
+            'a.txt' => ['type' => 'file', 'path' => 'a.txt', 'dirname' => ''],
+            '.meta/a.txt.yaml' => ['type' => 'file', 'path' => '.meta/a.txt.yaml', 'dirname' => '.meta'],
+        ]));
+
+        $container = (new AssetContainer)->handle('test')->disk('test');
+
+        // First job populates the instance's $metaFiles cache. metaFilesIn() has no
+        // memoization guard of its own, so if contents() reused the same instance
+        // across jobs the filtered result would stick around and bleed into the
+        // next job. In real usage, Laravel's queue worker daemon loop clears
+        // resolved facade instances before every job it processes, which resets
+        // the Blink-backed instance behind `contents()` at each job boundary.
+        $this->assertEquals(
+            ['.meta/a.txt.yaml'],
+            $container->contents()->metaFilesIn('/', true)->keys()->all()
+        );
+
+        // Simulate the next job seeing a different state on disk.
+        Cache::put($cacheKey, collect([
+            'a.txt' => ['type' => 'file', 'path' => 'a.txt', 'dirname' => ''],
+            '.meta/a.txt.yaml' => ['type' => 'file', 'path' => '.meta/a.txt.yaml', 'dirname' => '.meta'],
+            'b.txt' => ['type' => 'file', 'path' => 'b.txt', 'dirname' => ''],
+            '.meta/b.txt.yaml' => ['type' => 'file', 'path' => '.meta/b.txt.yaml', 'dirname' => '.meta'],
+        ]));
+
+        // Simulate the job boundary: Laravel clears resolved facade instances
+        // before every job.
+        Facade::clearResolvedInstances();
+
+        $this->assertEquals(
+            ['.meta/a.txt.yaml', '.meta/b.txt.yaml'],
+            $container->contents()->metaFilesIn('/', true)->keys()->sort()->values()->all()
+        );
     }
 
     #[Test]

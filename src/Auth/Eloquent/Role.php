@@ -4,6 +4,9 @@ namespace Statamic\Auth\Eloquent;
 
 use Statamic\Auth\File\Role as FileRole;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class Role extends FileRole
 {
     protected $model;

@@ -2,6 +2,7 @@
 
 namespace Statamic\Http\Controllers\CP\Fields;
 
+use Facades\Statamic\Fields\FieldRepository;
 use Facades\Statamic\Fields\FieldtypeRepository;
 use Illuminate\Http\Request;
 use Statamic\Facades\Blueprint;
@@ -9,6 +10,7 @@ use Statamic\Facades\Fieldset;
 use Statamic\Fields\Field;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Middleware\CP\CanManageBlueprints;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 use function Statamic\trans as __;
@@ -36,16 +38,30 @@ class FieldsController extends CpController
 
         $blueprint = $this->blueprint($fieldtype->configBlueprint());
 
+        $values = $fieldtype->migrateConfig($request->values);
+
         $fields = $blueprint
             ->fields()
-            ->addValues($request->values)
+            ->addValues($values)
             ->preProcess();
+
+        if ($request->reference) {
+            $originFields = $blueprint
+                ->fields()
+                ->addValues($fieldtype->migrateConfig(FieldRepository::find($request->reference)->config()))
+                ->preProcess();
+
+            $originValues = Arr::except($originFields->values()->all(), 'handle');
+            $originMeta = $originFields->meta()->all();
+        }
 
         return [
             'fieldtype' => $fieldtype->toArray(),
             'blueprint' => $blueprint->toPublishArray(),
-            'values' => array_merge($request->values, $fields->values()->all()),
+            'values' => array_merge($values, $fields->values()->all()),
             'meta' => $fields->meta(),
+            'originValues' => $originValues ?? null,
+            'originMeta' => $originMeta ?? null,
         ];
     }
 
@@ -74,7 +90,11 @@ class FieldsController extends CpController
                         ->when($request->has('id'), fn ($collection) => $collection->reject(fn ($field) => $field['_id'] === $request->id))
                         ->flatMap(function (array $field) {
                             if ($field['type'] === 'import') {
-                                return Fieldset::find($field['fieldset'])->fields()->all()->map->handle()->toArray();
+                                return Fieldset::find($field['fieldset'])
+                                    ->fields()->all()
+                                    ->map(fn ($importedField) => ($field['prefix'] ?? '').$importedField->handle())
+                                    ->values()
+                                    ->toArray();
                             }
 
                             return [$field['handle']];
@@ -111,6 +131,8 @@ class FieldsController extends CpController
         $fields->validate($extraRules, $customMessages);
 
         $values = array_merge($request->values, $fields->process()->values()->all());
+
+        $values = $fieldtype->migrateConfig($values);
 
         return $values;
     }

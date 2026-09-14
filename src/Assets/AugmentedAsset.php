@@ -31,6 +31,7 @@ class AugmentedAsset extends AbstractAugmented
                 'is_image',
                 'is_svg',
                 'is_video',
+                'is_pdf',
                 'blueprint',
                 'edit_url',
                 'container',

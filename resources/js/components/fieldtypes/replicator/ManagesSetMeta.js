@@ -1,7 +1,6 @@
 import ManagesRowMeta from '../grid/ManagesRowMeta';
 
 export default {
-
     mixins: [ManagesRowMeta],
 
     methods: {
@@ -12,6 +11,5 @@ export default {
         removeSetMeta(set) {
             this.removeRowMeta(set);
         },
-    }
-
-}
+    },
+};

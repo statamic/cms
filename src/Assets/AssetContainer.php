@@ -7,6 +7,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
+use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Events\AssetContainerBlueprintFound;
@@ -27,9 +28,12 @@ use Statamic\Facades\Search;
 use Statamic\Facades\Stache;
 use Statamic\Facades\URL;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, Augmentable
+use function Statamic\trans as __;
+
+class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, Augmentable, ContainsQueryableValues
 {
     use ExistsAsFile, FluentlyGetsAndSets, HasAugmentedInstance;
 
@@ -37,11 +41,6 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
     protected $handle;
     protected $disk;
     protected $private;
-    protected $allowUploads;
-    protected $allowDownloading;
-    protected $allowMoving;
-    protected $allowRenaming;
-    protected $createFolders;
     protected $sourcePreset;
     protected $warmPresets;
     protected $searchIndex;
@@ -138,9 +137,7 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
             return null;
         }
 
-        $url = rtrim($this->disk()->url('/'), '/');
-
-        return ($url === '') ? '/' : $url;
+        return URL::tidy($this->disk()->url('/'), external: true);
     }
 
     /**
@@ -181,6 +178,11 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
     public function showUrl()
     {
         return cp_route('assets.browse.show', $this->handle());
+    }
+
+    public function editBlueprintUrl()
+    {
+        return cp_route('blueprints.asset-containers.edit', $this->handle());
     }
 
     public function apiUrl()
@@ -226,6 +228,14 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
         });
     }
 
+    public function blueprintCommandPaletteLink()
+    {
+        return $this->blueprint()?->commandPaletteLink(
+            type: 'Asset Containers',
+            url: $this->editBlueprintUrl(),
+        );
+    }
+
     public function afterSave($callback)
     {
         $this->afterSaveCallbacks[] = $callback;
@@ -243,7 +253,7 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
     /**
      * Save the container.
      *
-     * @return void
+     * @return $this|false
      */
     public function save()
     {
@@ -292,7 +302,7 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
     /**
      * Delete the container.
      *
-     * @return void
+     * @return bool
      */
     public function delete()
     {
@@ -503,96 +513,6 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
     }
 
     /**
-     * Enable the quick download button when editing files in this container.
-     *
-     * @param  bool|null  $allowDownloading
-     * @return bool|$this
-     *
-     * @deprecated
-     */
-    public function allowDownloading($allowDownloading = null)
-    {
-        return $this
-            ->fluentlyGetOrSet('allowDownloading')
-            ->getter(function ($allowDownloading) {
-                return (bool) ($allowDownloading ?? true);
-            })
-            ->args(func_get_args());
-    }
-
-    /**
-     * The ability to move files around within this container.
-     *
-     * @param  bool|null  $allowMoving
-     * @return bool|$this
-     *
-     * @deprecated
-     */
-    public function allowMoving($allowMoving = null)
-    {
-        return $this
-            ->fluentlyGetOrSet('allowMoving')
-            ->getter(function ($allowMoving) {
-                return (bool) ($allowMoving ?? true);
-            })
-            ->args(func_get_args());
-    }
-
-    /**
-     * The ability to rename files in this container.
-     *
-     * @param  bool|null  $allowRenaming
-     * @return bool|$this
-     *
-     * @deprecated
-     */
-    public function allowRenaming($allowRenaming = null)
-    {
-        return $this
-            ->fluentlyGetOrSet('allowRenaming')
-            ->getter(function ($allowRenaming) {
-                return (bool) ($allowRenaming ?? true);
-            })
-            ->args(func_get_args());
-    }
-
-    /**
-     * The ability to upload into this container.
-     *
-     * @param  bool|null  $allowUploads
-     * @return bool|$this
-     *
-     * @deprecated
-     */
-    public function allowUploads($allowUploads = null)
-    {
-        return $this
-            ->fluentlyGetOrSet('allowUploads')
-            ->getter(function ($allowUploads) {
-                return (bool) ($allowUploads ?? true);
-            })
-            ->args(func_get_args());
-    }
-
-    /**
-     * The ability to create folders within this container.
-     *
-     * @param  bool|null  $createFolders
-     * @return bool|$this
-     *
-     * @deprecated
-     */
-    public function createFolders($createFolders = null)
-    {
-        return $this
-            ->fluentlyGetOrSet('createFolders')
-            ->getter(function ($createFolders) {
-                return (bool) ($createFolders ?? true);
-            })
-            ->args(func_get_args());
-    }
-
-    /**
      * The glide source preset to be permanently applied to source image on upload.
      *
      * @param  string|null  $preset
@@ -608,7 +528,7 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
     /**
      * The specific glide presets to be used when warming glide image cache on upload.
      *
-     * @param  array|null  $presets
+     * @param  array|null  $preset
      * @return array|null|$this
      */
     public function warmPresets($preset = null)
@@ -650,11 +570,6 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
             'title' => $this->title,
             'disk' => $this->disk,
             'search_index' => $this->searchIndex,
-            'allow_uploads' => $this->allowUploads,
-            'allow_downloading' => $this->allowDownloading,
-            'allow_renaming' => $this->allowRenaming,
-            'allow_moving' => $this->allowMoving,
-            'create_folders' => $this->createFolders,
             'source_preset' => $this->sourcePreset,
             'warm_presets' => $this->warmPresets,
             'validate' => $this->validation,
@@ -691,6 +606,24 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
     public static function __callStatic($method, $parameters)
     {
         return Facades\AssetContainer::{$method}(...$parameters);
+    }
+
+    public function getQueryableValue(string $field)
+    {
+        if (in_array($method = Str::camel($field), $this->queryableMethods())) {
+            return $this->{$method}();
+        }
+
+        return null;
+    }
+
+    private function queryableMethods(): array
+    {
+        return [
+            'absoluteUrl', 'accessible', 'allowDownloading', 'allowMoving', 'allowRenaming', 'allowUploads',
+            'blueprint', 'createFolders', 'diskHandle', 'diskPath', 'editUrl', 'handle', 'hasSearchIndex',
+            'id', 'path', 'private', 'searchIndex', 'showUrl', 'sortDirection', 'sortField', 'title', 'url',
+        ];
     }
 
     public function __toString()

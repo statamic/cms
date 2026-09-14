@@ -11,6 +11,8 @@ use Statamic\Facades\Glide;
 use Statamic\Imaging\GlideImageManipulator;
 use Statamic\Imaging\GlideUrlBuilder;
 use Statamic\Imaging\ImageGenerator;
+use Statamic\Imaging\ImageValidator;
+use Statamic\Imaging\Intervention;
 use Statamic\Imaging\PresetGenerator;
 use Statamic\Imaging\StaticUrlBuilder;
 
@@ -38,6 +40,10 @@ class GlideServiceProvider extends ServiceProvider
             return new PresetGenerator(
                 $app->make(ImageGenerator::class)
             );
+        });
+
+        $this->app->bind(ImageValidator::class, function () {
+            return new ImageValidator(Intervention::driver());
         });
     }
 

@@ -29,6 +29,9 @@ class EventServiceProvider extends ServiceProvider
         \Illuminate\Foundation\Http\Events\RequestHandled::class => [
             \Statamic\Listeners\ClearState::class,
         ],
+        \Illuminate\Console\Events\CommandFinished::class => [
+            \Statamic\Listeners\PingOutpostOnCommandFinished::class,
+        ],
     ];
 
     protected $subscribe = [
@@ -37,6 +40,7 @@ class EventServiceProvider extends ServiceProvider
         \Statamic\Listeners\GeneratePresetImageManipulations::class,
         \Statamic\Listeners\UpdateAssetReferences::class,
         \Statamic\Listeners\UpdateTermReferences::class,
+        \Statamic\Listeners\InvalidateNavCache::class,
     ];
 
     public function register()

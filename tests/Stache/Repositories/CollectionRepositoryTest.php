@@ -41,12 +41,12 @@ class CollectionRepositoryTest extends TestCase
         $collections = $this->repo->all();
 
         $this->assertInstanceOf(IlluminateCollection::class, $collections);
-        $this->assertCount(4, $collections);
+        $this->assertCount(5, $collections);
         $this->assertEveryItemIsInstanceOf(Collection::class, $collections);
 
         $ordered = $collections->sortBy->handle()->values();
-        $this->assertEquals(['alphabetical', 'blog', 'numeric', 'pages'], $ordered->map->handle()->all());
-        $this->assertEquals(['Alphabetical', 'Blog', 'Numeric', 'Pages'], $ordered->map->title()->all());
+        $this->assertEquals(['alphabetical', 'blog', 'custom_class', 'numeric', 'pages'], $ordered->map->handle()->all());
+        $this->assertEquals(['Alphabetical', 'Blog', 'Custom Class', 'Numeric', 'Pages'], $ordered->map->title()->all());
     }
 
     #[Test]

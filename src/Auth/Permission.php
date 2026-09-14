@@ -2,6 +2,7 @@
 
 namespace Statamic\Auth;
 
+use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 use function Statamic\trans as __;
@@ -19,7 +20,11 @@ class Permission
     protected $label;
     protected $description;
     protected $group;
+    protected $hiddenBy;
 
+    /**
+     * @return ($value is null ? string|string[] : static)
+     */
     public function value(?string $value = null)
     {
         if (func_num_args() > 0) {
@@ -41,6 +46,9 @@ class Permission
         return $this->label;
     }
 
+    /**
+     * @return ($label is null ? string|null : static)
+     */
     public function label(?string $label = null)
     {
         if (func_num_args() > 0) {
@@ -51,7 +59,9 @@ class Permission
 
         $label = $this->label ?? str_replace('{'.$this->placeholder.'}', ':'.$this->placeholder, $this->value);
 
-        return __($label, [$this->placeholder => $this->placeholderLabel]);
+        return $this->placeholder
+            ? __($label, [$this->placeholder => $this->placeholderLabel])
+            : __($label);
     }
 
     public function placeholder(?string $placeholder = null)
@@ -92,16 +102,62 @@ class Permission
             $replaced = (new self)
                 ->value($this->value)
                 ->label($this->label)
+                ->description($this->description())
                 ->placeholder($this->placeholder)
                 ->placeholderLabel($replacement['label'])
                 ->placeholderValue($replacement['value'])
-                ->group($this->group());
+                ->group($this->group())
+                ->hiddenBy($this->hiddenBy());
 
             if ($this->children()) {
                 $replaced->children($this->children()->all());
             }
 
             return $replaced;
+        })->values();
+    }
+
+    public function flattened()
+    {
+        if (! $this->callback) {
+            return [
+                $this,
+                ...$this->children()->map(function ($child) {
+                    return (new self)
+                        ->value($child->value())
+                        ->label($child->label())
+                        ->placeholder($this->placeholder)
+                        ->placeholderLabel($this->placeholderLabel)
+                        ->placeholderValue($this->placeholderValue)
+                        ->children($child->children()->all())
+                        ->group($this->group());
+                })->flatMap->flattened()->all(),
+            ];
+        }
+
+        $items = call_user_func($this->callback);
+
+        return collect($items)->flatMap(function ($replacement) {
+            $replaced = (new self)
+                ->value($this->value)
+                ->label($this->label)
+                ->placeholder($this->placeholder)
+                ->placeholderLabel($replacement['label'])
+                ->placeholderValue($replacement['value'])
+                ->group($this->group());
+
+            $children = $this->children()->map(function ($child) use ($replacement) {
+                return (new self)
+                    ->value($child->originalValue())
+                    ->label($child->originalLabel())
+                    ->placeholder($this->placeholder)
+                    ->placeholderLabel($replacement['label'])
+                    ->placeholderValue($replacement['value'])
+                    ->children($child->children()->all())
+                    ->group($this->group());
+            });
+
+            return [$replaced, ...$children->flatMap->flattened()->all()];
         })->values();
     }
 
@@ -135,10 +191,12 @@ class Permission
                     $replaced = (new self)
                         ->value($child->originalValue())
                         ->label($child->originalLabel())
+                        ->description($child->description())
                         ->placeholder($permission->placeholder())
                         ->placeholderLabel($permission->placeholderLabel())
                         ->placeholderValue($permission->placeholderValue())
-                        ->group($permission->group());
+                        ->group($permission->group())
+                        ->hiddenBy($child->hiddenBy());
 
                     if ($children = $child->children()) {
                         $replaced->children($children->all());
@@ -153,6 +211,7 @@ class Permission
                 'label' => $permission->label(),
                 'description' => $permission->description(),
                 'group' => $permission->group(),
+                'hidden_by' => $permission->hiddenBy(),
                 'children' => $children->flatMap->toTree()->all(),
             ];
         })->all();
@@ -166,5 +225,14 @@ class Permission
     public function description()
     {
         return $this->fluentlyGetOrSet('description')->args(func_get_args());
+    }
+
+    public function hiddenBy(string|array|null $permissions = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('hiddenBy')
+            ->getter(fn ($permissions) => $permissions ?? [])
+            ->setter(fn ($permissions) => Arr::wrap($permissions))
+            ->args(func_get_args());
     }
 }

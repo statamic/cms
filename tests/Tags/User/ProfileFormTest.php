@@ -16,7 +16,7 @@ class ProfileFormTest extends TestCase
 
     private function tag($tag)
     {
-        return Parse::template($tag, []);
+        return Parse::template($tag, trusted: true);
     }
 
     #[Test]
@@ -74,8 +74,8 @@ EOT
         preg_match_all($this->regex(), $output, $actual);
 
         $expected = [
-            '<label>Name</label><input id="userprofile-form-name-field" type="text" name="name" value="Test User">',
-            '<label>Email Address</label><input id="userprofile-form-email-field" type="email" name="email" value="test@example.com">',
+            '<label>Name</label><input id="userprofile-form-name-field" type="text" name="name" value="Test User" autocomplete="name">',
+            '<label>Email Address</label><input id="userprofile-form-email-field" type="email" name="email" value="test@example.com" autocomplete="email">',
         ];
 
         $this->assertEquals($expected, $actual[0]);
@@ -112,7 +112,7 @@ EOT
             '<h2 class="tab">Main</h2>',
             '<h3 class="section">Account</h3>',
             '<label>Full Name</label><input id="userprofile-form-name-field" type="text" name="name" value="Test User">',
-            '<label>Email Address</label><input id="userprofile-form-email-field" type="email" name="email" value="test@example.com">',
+            '<label>Email Address</label><input id="userprofile-form-email-field" type="email" name="email" value="test@example.com" autocomplete="email">',
             '<h3 class="section">About you</h3>',
             '<label>Phone Number</label><input id="userprofile-form-phone-field" type="text" name="phone" value="12345">',
             '<label>Over 18 years of age?</label><input id="userprofile-form-age-field" type="text" name="age" value="" required>',
@@ -150,7 +150,7 @@ EOT
         $expected = [
             '<h3 class="section">Account</h3>',
             '<label>Full Name</label><input id="userprofile-form-name-field" type="text" name="name" value="Test User">',
-            '<label>Email Address</label><input id="userprofile-form-email-field" type="email" name="email" value="test@example.com">',
+            '<label>Email Address</label><input id="userprofile-form-email-field" type="email" name="email" value="test@example.com" autocomplete="email">',
             '<h3 class="section">About you</h3>',
             '<label>Phone Number</label><input id="userprofile-form-phone-field" type="text" name="phone" value="12345">',
             '<label>Over 18 years of age?</label><input id="userprofile-form-age-field" type="text" name="age" value="" required>',
@@ -183,7 +183,7 @@ EOT
 
         $expected = [
             '<label>Full Name</label><input id="userprofile-form-name-field" type="text" name="name" value="Test User">',
-            '<label>Email Address</label><input id="userprofile-form-email-field" type="email" name="email" value="test@example.com">',
+            '<label>Email Address</label><input id="userprofile-form-email-field" type="email" name="email" value="test@example.com" autocomplete="email">',
             '<label>Phone Number</label><input id="userprofile-form-phone-field" type="text" name="phone" value="12345">',
             '<label>Over 18 years of age?</label><input id="userprofile-form-age-field" type="text" name="age" value="" required>',
             '<label>Newsletter</label><label><input type="hidden" name="newsletter" value="0"><input id="userprofile-form-newsletter-field" type="checkbox" name="newsletter" value="1" checked></label>',
@@ -237,10 +237,12 @@ EOT
         $this->actingAs(User::make()->save());
 
         $this
+            ->from('/profile-form')
             ->post('/!/auth/profile', [
                 'email' => 'san@holo.com',
             ])
-            ->assertSessionHasNoErrors();
+            ->assertSessionHasNoErrors()
+            ->assertLocation('/profile-form');
 
         $output = $this->tag(<<<'EOT'
 {{ user:profile_form }}
@@ -328,6 +330,19 @@ EOT
         $this->assertEmpty($success[1]);
         $this->assertEquals($expected, $errors[1]);
         $this->assertEquals($expected, $inlineErrors[1]);
+    }
+
+    #[Test]
+    public function it_wont_follow_redirect_to_external_url()
+    {
+        $this->actingAs(User::make()->id('1')->email('san@holo.com')->save());
+
+        $this
+            ->post('/!/auth/profile', [
+                'email' => 'san@holo.com',
+                '_redirect' => 'https://evil.com',
+            ])
+            ->assertLocation('/');
     }
 
     #[Test]

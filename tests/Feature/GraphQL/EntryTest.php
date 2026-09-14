@@ -796,4 +796,41 @@ GQL;
                 'title' => 'That was so rad!',
             ]]]);
     }
+
+    #[Test]
+    public function it_does_not_show_unpublished_entries_with_token_for_different_entry()
+    {
+        FilterAuthorizer::shouldReceive('allowedForSubResources')
+            ->andReturn(['published', 'status']);
+
+        EntryFactory::collection('blog')
+            ->id('6')
+            ->slug('that-was-so-rad')
+            ->data(['title' => 'That was so rad!'])
+            ->published(false)
+            ->create();
+
+        $other = EntryFactory::collection('blog')
+            ->id('7')
+            ->slug('other')
+            ->data(['title' => 'Other'])
+            ->create();
+
+        LivePreview::tokenize('test-token', $other);
+
+        $query = <<<'GQL'
+{
+    entry(id: "6") {
+        id
+        title
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql?token=test-token', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => ['entry' => null]]);
+    }
 }

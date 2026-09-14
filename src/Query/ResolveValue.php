@@ -5,6 +5,7 @@ namespace Statamic\Query;
 use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Contracts\Query\QueryableValue;
 use Statamic\Support\Arr;
+use Statamic\Support\MethodDenylist;
 use Statamic\Support\Str;
 
 class ResolveValue
@@ -52,7 +53,7 @@ class ResolveValue
             return $item->getQueryableValue($name);
         }
 
-        if (method_exists($item, $method = Str::camel($name))) {
+        if (method_exists($item, $method = Str::camel($name)) && ! MethodDenylist::blocks($method)) {
             return $item->{$method}();
         }
 

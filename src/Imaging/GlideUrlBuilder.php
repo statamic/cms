@@ -25,7 +25,6 @@ class GlideUrlBuilder extends ImageUrlBuilder
      *
      * @param  \Statamic\Contracts\Assets\Asset|string  $item
      * @param  array  $params
-     * @param  string|null  $filename
      * @return string
      *
      * @throws \Exception
@@ -64,6 +63,8 @@ class GlideUrlBuilder extends ImageUrlBuilder
             $params['mark'] = 'asset::'.Str::toBase64Url($asset->containerId().'/'.$asset->path());
         }
 
-        return URL::prependSiteRoot($builder->getUrl($path, $params));
+        return URL::makeRelative(
+            URL::prependSiteUrl($builder->getUrl($path, $params))
+        );
     }
 }

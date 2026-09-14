@@ -1,18 +1,19 @@
 <script>
-export default {
+import { h } from 'vue';
+import striptags from 'striptags';
 
+export default {
     props: {
-        value: { required: true }
+        value: { required: true },
     },
 
     data() {
         return {
-            truncateAt: 50
-        }
+            truncateAt: 50,
+        };
     },
 
     computed: {
-
         text() {
             let value = this.value;
 
@@ -22,21 +23,18 @@ export default {
 
             if (typeof value !== 'string') return JSON.stringify(value);
 
-            // Basic html stripping. https://stackoverflow.com/a/5002161
-            value = value.replace(/<\/?[^>]+(>|$)/g, '');
+            value = striptags(value);
 
             if (value.length > this.truncateAt) {
-                value = value.substring(0, this.truncateAt) + '&hellip;';
+                value = value.substring(0, this.truncateAt) + '\u2026';
             }
 
             return value;
-        }
-
+        },
     },
 
-    render(h) {
-        return h('div', { domProps: { innerHTML: this.text }});
-    }
-
-}
+    render() {
+        return h('div', { textContent: this.text });
+    },
+};
 </script>

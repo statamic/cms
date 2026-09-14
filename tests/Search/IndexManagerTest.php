@@ -36,7 +36,7 @@ class IndexManagerTest extends TestCase
 
         $manager = new IndexManager($this->app);
 
-        $this->assertEquals(['foo', 'bar_en', 'bar_fr', 'baz_en', 'baz_fr', 'baz_de'], $manager->all()->map->name()->values()->all());
+        $this->assertEquals(['foo', 'bar_en', 'bar_fr', 'baz_en', 'baz_fr', 'baz_de', 'cp'], $manager->all()->map->name()->values()->all());
 
         $this->assertInstanceOf(NullIndex::class, $foo = $manager->index('foo'));
         $this->assertEquals('foo', $foo->name());
@@ -74,5 +74,56 @@ class IndexManagerTest extends TestCase
         } catch (\InvalidArgumentException $e) {
             $this->assertEquals('Search index [bar] has not been configured for the [de] site.', $e->getMessage());
         }
+    }
+
+    #[Test]
+    public function it_builds_the_cp_index_if_it_doesnt_exist_in_the_config()
+    {
+        config(['statamic.search.indexes' => [
+            'default' => [
+                'driver' => 'local',
+                'searchables' => 'content',
+                'fields' => ['title'],
+            ],
+        ]]);
+
+        $manager = new IndexManager($this->app);
+
+        $this->assertEquals(['default', 'cp'], $manager->all()->map->name()->values()->all());
+
+        $this->assertEquals([
+            'fields' => ['title'],
+            'path' => storage_path('statamic/search'),
+            'driver' => 'local',
+            'searchables' => ['content', 'users', 'addons'],
+        ], $manager->index('cp')->config());
+    }
+
+    #[Test]
+    public function it_uses_the_cp_index_from_the_config_if_it_exists()
+    {
+        config(['statamic.search.indexes' => [
+            'default' => [
+                'driver' => 'local',
+                'searchables' => 'content',
+                'fields' => ['title'],
+            ],
+            'cp' => [
+                'driver' => 'local',
+                'searchables' => ['collections:pages', 'collections:blog'],
+                'fields' => ['title', 'excerpt'],
+            ],
+        ]]);
+
+        $manager = new IndexManager($this->app);
+
+        $this->assertEquals(['default', 'cp'], $manager->all()->map->name()->values()->all());
+
+        $this->assertEquals([
+            'fields' => ['title', 'excerpt'],
+            'path' => storage_path('statamic/search'),
+            'driver' => 'local',
+            'searchables' => ['collections:pages', 'collections:blog'],
+        ], $manager->index('cp')->config());
     }
 }

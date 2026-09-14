@@ -7,6 +7,8 @@ use Statamic\Facades\CP\Nav;
 use Statamic\Facades\Preference;
 use Statamic\Http\Controllers\Controller;
 
+use function Statamic\trans as __;
+
 class DefaultNavController extends Controller
 {
     use Concerns\HasNavBuilder;
@@ -20,9 +22,10 @@ class DefaultNavController extends Controller
     {
         $preferences = Preference::default()->get('nav');
 
-        $nav = $preferences
-            ? Nav::build($preferences, true)
-            : Nav::buildWithoutPreferences(true);
+        $nav = Nav::build(
+            preferences: $preferences ?: false,
+            editing: true,
+        );
 
         return $this->navBuilder($nav, [
             'title' => __('Default'),

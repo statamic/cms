@@ -84,6 +84,10 @@ abstract class BasicStore extends Store
             return $item;
         }
 
+        if (! File::exists($path)) {
+            return null;
+        }
+
         $item = $this->makeItemFromFile($path, File::get($path));
 
         $this->cacheItem($item);

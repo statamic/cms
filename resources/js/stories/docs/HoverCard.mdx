@@ -1,0 +1,26 @@
+import { Canvas, Meta, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as HoverCardStories from '../HoverCard.stories';
+
+<Meta of={HoverCardStories} />
+
+# Hover Card
+Displays rich content in a floating card when hovering over a trigger element. Hover Cards are perfect for showing additional context or user information without cluttering the interface.
+
+## Overview
+The hover card component has a `<template #trigger>` slot to contain the element that will trigger the card on hover.
+<Canvas of={HoverCardStories._DocsIntro} sourceState={'shown'} />
+
+## Direction
+Control which side of the trigger the card appears on.
+<Canvas of={HoverCardStories._Direction} sourceState={'shown'} />
+
+## No Arrow
+Remove the arrow pointer by setting `arrow` to `false`.
+<Canvas of={HoverCardStories._NoArrow} sourceState={'shown'} />
+
+## Custom Delay
+Adjust the delay before the card appears using the `delay` prop.
+<Canvas of={HoverCardStories._CustomDelay} sourceState={'shown'} />
+
+## Arguments
+<ArgTypes of={HoverCardStories} />

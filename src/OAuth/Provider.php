@@ -7,6 +7,7 @@ use Illuminate\Support\Arr;
 use Laravel\Socialite\Contracts\User as SocialiteUser;
 use Laravel\Socialite\Facades\Socialite;
 use Statamic\Contracts\Auth\User as StatamicUser;
+use Statamic\Exceptions\OAuthEmailExistsException;
 use Statamic\Facades\File;
 use Statamic\Facades\User;
 use Statamic\Support\Str;
@@ -26,7 +27,7 @@ class Provider
     {
         $driver = Socialite::driver($this->name);
 
-        if (Arr::get($this->config, 'stateless', false)) {
+        if ($this->isStateless()) {
             $driver->stateless();
         }
 
@@ -44,6 +45,9 @@ class Provider
         return array_flip($this->getIds())[$id] ?? null;
     }
 
+    /**
+     * @deprecated Use findUser() and createUser() directly.
+     */
     public function findOrCreateUser($socialite): StatamicUser
     {
         if ($user = $this->findUser($socialite)) {
@@ -62,14 +66,7 @@ class Provider
      */
     public function findUser($socialite): ?StatamicUser
     {
-        if (
-            ($user = User::findByOAuthId($this, $socialite->getId())) ||
-            ($user = User::findByEmail($socialite->getEmail()))
-        ) {
-            return $user;
-        }
-
-        return null;
+        return User::findByOAuthId($this, $socialite->getId());
     }
 
     /**
@@ -80,6 +77,10 @@ class Provider
     public function createUser($socialite): StatamicUser
     {
         $user = $this->makeUser($socialite);
+
+        if (User::findByEmail($user->email())) {
+            throw new OAuthEmailExistsException;
+        }
 
         $user->save();
 
@@ -104,8 +105,6 @@ class Provider
         collect($this->userData($socialite, $user))->each(fn ($value, $key) => $user->set($key, $value));
 
         $user->save();
-
-        $this->setUserProviderId($user, $socialite->getId());
 
         return $user;
     }
@@ -143,6 +142,11 @@ class Provider
         return $this->config['label'] ?? Str::title($this->name);
     }
 
+    public function name()
+    {
+        return $this->name;
+    }
+
     public function config()
     {
         return $this->config;
@@ -162,15 +166,41 @@ class Provider
         $contents = '<?php return '.var_export($ids, true).';';
 
         File::put($this->storagePath(), $contents);
+
+        // Bust the opcache immediately, otherwise it may take a few moments
+        // for PHP to pick up the changes to the file. Connecting a provider
+        // will show disconnected momentarily and vice versa.
+        if (function_exists('opcache_invalidate')) {
+            opcache_invalidate($this->storagePath(), true);
+        }
     }
 
-    protected function setUserProviderId($user, $id)
+    public function setUserProviderId($user, $id)
     {
         $ids = $this->getIds();
 
         $ids[$user->id()] = $id;
 
         $this->setIds($ids);
+    }
+
+    public function forgetUser($user)
+    {
+        $ids = $this->getIds();
+
+        unset($ids[$user->id()]);
+
+        $this->setIds($ids);
+    }
+
+    public function isConnectedTo($user): bool
+    {
+        return array_key_exists($user->id(), $this->getIds());
+    }
+
+    public function isStateless(): bool
+    {
+        return (bool) Arr::get($this->config, 'stateless', false);
     }
 
     protected function storagePath()

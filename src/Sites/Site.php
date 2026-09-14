@@ -4,10 +4,15 @@ namespace Statamic\Sites;
 
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Data\HasAugmentedData;
+use Statamic\Facades\Parse;
+use Statamic\Facades\URL;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\TextDirection;
+use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
 use Statamic\View\Antlers\Language\Runtime\RuntimeParser;
+use Statamic\View\Antlers\Language\Utilities\StringUtilities;
+use Statamic\View\Cascade;
 
 class Site implements Augmentable
 {
@@ -33,7 +38,7 @@ class Site implements Augmentable
 
     public function name()
     {
-        return $this->config['name'];
+        return $this->config['name'] ?? $this->handle();
     }
 
     public function locale()
@@ -53,13 +58,7 @@ class Site implements Augmentable
 
     public function url()
     {
-        $url = $this->config['url'];
-
-        if ($url === '/') {
-            return '/';
-        }
-
-        return Str::removeRight($url, '/');
+        return URL::tidy($this->config['url'], true);
     }
 
     public function direction()
@@ -79,22 +78,14 @@ class Site implements Augmentable
 
     public function absoluteUrl()
     {
-        if (Str::startsWith($url = $this->url(), '/')) {
-            $url = Str::ensureLeft($url, request()->getSchemeAndHttpHost());
-        }
-
-        return Str::removeRight($url, '/');
+        return URL::makeAbsolute($this->url());
     }
 
     public function relativePath($url)
     {
-        $url = Str::ensureRight($url, '/');
+        $absoluteUrl = Str::removeRight($this->absoluteUrl(), '/');
 
-        $path = Str::removeLeft($url, $this->absoluteUrl());
-
-        $path = Str::removeRight(Str::ensureLeft($path, '/'), '/');
-
-        return $path === '' ? '/' : $path;
+        return URL::makeRelative(Str::removeLeft($url, $absoluteUrl));
     }
 
     public function isDefault()
@@ -129,7 +120,20 @@ class Site implements Augmentable
                 ->all();
         }
 
-        return (string) app(RuntimeParser::class)->parse($value, ['config' => config()->all()]);
+        if (! is_string($value) || ! Str::contains($value, ['{', '@'])) {
+            return is_string($value) ? StringUtilities::sanitizePhp($value) : $value;
+        }
+
+        $value = Parse::config($value);
+
+        $isEvaluatingUserData = GlobalRuntimeState::$isEvaluatingUserData;
+        GlobalRuntimeState::$isEvaluatingUserData = true;
+
+        try {
+            return (string) app(RuntimeParser::class)->parse($value, ['config' => Cascade::config()]);
+        } finally {
+            GlobalRuntimeState::$isEvaluatingUserData = $isEvaluatingUserData;
+        }
     }
 
     private function removePath($url)

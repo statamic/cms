@@ -2,11 +2,15 @@
 
 namespace Statamic\Imaging;
 
-use Statamic\Support\Str;
+use Intervention\Image\Interfaces\DriverInterface;
 use Symfony\Component\Mime\MimeTypes;
 
 class ImageValidator
 {
+    public function __construct(private DriverInterface $driver)
+    {
+    }
+
     /**
      * Check if image has valid extension and mimetype.
      *
@@ -39,22 +43,11 @@ class ImageValidator
      */
     public function isValidExtension($extension)
     {
-        $driver = config('statamic.assets.image_manipulation.driver');
-
-        if ($driver == 'gd') {
-            $allowed = ['jpeg', 'jpg', 'png', 'gif', 'webp'];
-        } elseif ($driver == 'imagick') {
-            $allowed = ['jpeg', 'jpg', 'png', 'gif', 'tif', 'bmp', 'psd', 'webp'];
-        } else {
-            throw new \Exception("Unsupported image manipulation driver [$driver]");
+        if (! $extension) {
+            return false;
         }
 
-        $additional = config('statamic.assets.image_manipulation.additional_extensions', []);
-
-        return collect($allowed)
-            ->merge($additional)
-            ->map(fn ($extension) => Str::lower($extension))
-            ->contains(Str::lower($extension));
+        return $this->driver->supports($extension);
     }
 
     /**

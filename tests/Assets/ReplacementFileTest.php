@@ -30,4 +30,19 @@ class ReplacementFileTest extends TestCase
 
         $targetDisk->assertExists('the/new/path.jpg');
     }
+
+    #[Test]
+    public function it_reads_from_configured_disk()
+    {
+        config(['statamic.system.file_uploads_disk' => 'uploads']);
+
+        $originDisk = Storage::fake('uploads');
+        $targetDisk = Storage::fake('target');
+        $originDisk->write('foo/bar/baz.jpg', 'contents');
+
+        (new ReplacementFile('foo/bar/baz.jpg'))->writeTo($targetDisk, 'the/new/path.jpg');
+
+        $targetDisk->assertExists('the/new/path.jpg');
+        $this->assertEquals('contents', $targetDisk->get('the/new/path.jpg'));
+    }
 }

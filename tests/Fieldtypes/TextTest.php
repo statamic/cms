@@ -33,4 +33,29 @@ class TextTest extends TestCase
             'number' => ['number', [0, 3, 3, 3.14, null]],
         ];
     }
+
+    #[Test]
+    #[DataProvider('preProcessIndexProvider')]
+    public function it_pre_processes_index_values($config, $value, $expected)
+    {
+        $field = (new Text)->setField(new Field('test', array_merge([
+            'type' => 'text',
+        ], $config)));
+
+        $this->assertSame($expected, $field->preProcessIndex($value));
+    }
+
+    public static function preProcessIndexProvider()
+    {
+        return [
+            'string value' => [[], 'hello', 'hello'],
+            'null value' => [[], null, null],
+            'zero integer' => [[], 0, '0'],
+            'zero string' => [[], '0', '0'],
+            'zero with prepend' => [['prepend' => '$'], 0, '$0'],
+            'zero with append' => [['append' => '%'], 0, '0%'],
+            'zero with prepend and append' => [['prepend' => '$', 'append' => '%'], 0, '$0%'],
+            'string with prepend' => [['prepend' => '$'], 'hello', '$hello'],
+        ];
+    }
 }

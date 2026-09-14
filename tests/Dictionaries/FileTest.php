@@ -2,6 +2,7 @@
 
 namespace Tests\Dictionaries;
 
+use League\Flysystem\PathTraversalDetected;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Dictionaries\File;
@@ -179,5 +180,16 @@ class FileTest extends TestCase
             'value' => 'banana',
             'emoji' => '🍌',
         ], $item->data());
+    }
+
+    #[Test]
+    public function path_traversal_not_allowed()
+    {
+        $this->expectException(PathTraversalDetected::class);
+        $this->expectExceptionMessage('Path traversal detected: ../secret.json');
+
+        (new File)
+            ->setConfig(['filename' => '../secret.json'])
+            ->options();
     }
 }

@@ -4,6 +4,8 @@ namespace Statamic\Fieldtypes;
 
 use Statamic\Fields\Fieldtype;
 
+use function Statamic\trans as __;
+
 class Revealer extends Fieldtype
 {
     protected $categories = ['controls', 'special'];
@@ -26,12 +28,14 @@ class Revealer extends Fieldtype
                             'toggle' => __('Toggle'),
                         ],
                         'default' => 'button',
+                        'width' => 50,
                     ],
                     'input_label' => [
                         'display' => __('Input Label'),
                         'instructions' => __('statamic::fieldtypes.revealer.config.input_label'),
                         'type' => 'text',
                         'default' => '',
+                        'width' => 50,
                     ],
                 ],
             ],
