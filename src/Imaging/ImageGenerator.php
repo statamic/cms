@@ -373,6 +373,10 @@ class ImageGenerator
 
     private function parseUrl($url)
     {
-        return app(RemoteUrlValidator::class)->parse($url);
+        $validator = app(RemoteUrlValidator::class);
+
+        $validator->validate($url);
+
+        return $validator->parse($url);
     }
 }
