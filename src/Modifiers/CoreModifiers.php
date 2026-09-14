@@ -28,6 +28,7 @@ use Statamic\Fields\Values;
 use Statamic\Fieldtypes\Bard;
 use Statamic\Fieldtypes\Bard\Augmentor;
 use Statamic\Fieldtypes\Link\ArrayableLink;
+use Statamic\Fieldtypes\Video\Embed;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Dumper;
@@ -3199,60 +3200,11 @@ class CoreModifiers extends Modifier
      */
     public function embedUrl($url)
     {
-        if (Str::contains($url, 'vimeo')) {
-            $url = str_replace('/vimeo.com', '/player.vimeo.com/video', $url);
-
-            [$url, $hash] = $this->handleUnlistedVimeoUrls($url);
-
-            $paramsToAdd = '?dnt=1';
-            if ($hash) {
-                $paramsToAdd .= '&h='.$hash;
-            }
-
-            if (Str::contains($url, '?')) {
-                $url = str_replace('?', $paramsToAdd.'&', $url);
-            } else {
-                $url .= $paramsToAdd;
-            }
-
-            return $url;
+        if ($url instanceof Embed) {
+            return $url->embedUrl;
         }
 
-        if (Str::contains($url, 'youtu.be')) {
-            $url = str_replace('youtu.be', 'www.youtube.com/embed', $url);
-
-            // Check for start at point and replace it with correct parameter.
-            if (Str::contains($url, '?t=')) {
-                $url = str_replace('?t=', '?start=', $url);
-            }
-        }
-
-        if (Str::contains($url, 'youtube.com/watch?v=')) {
-            $url = str_replace('watch?v=', 'embed/', $url);
-
-            if (Str::contains($url, '&t=')) {
-                $url = str_replace('&t=', '?start=', $url);
-            }
-        }
-
-        if (Str::contains($url, 'youtube.com/shorts/')) {
-            $url = str_replace('shorts/', 'embed/', $url);
-        }
-
-        if (Str::contains($url, 'youtube.com')) {
-            $url = str_replace('youtube.com', 'youtube-nocookie.com', $url);
-        }
-
-        // This avoids SSL issues when using the non-www version
-        if (Str::contains($url, '//youtube-nocookie.com')) {
-            $url = str_replace('//youtube-nocookie.com', '//www.youtube-nocookie.com', $url);
-        }
-
-        if (Str::contains($url, '&') && ! Str::contains($url, '?')) {
-            $url = Str::replaceFirst('&', '?', $url);
-        }
-
-        return $url;
+        return Embed::embedUrl($url);
     }
 
     /**
@@ -3264,6 +3216,10 @@ class CoreModifiers extends Modifier
      */
     public function trackableEmbedUrl($url)
     {
+        if ($url instanceof Embed) {
+            return $url->embedUrl;
+        }
+
         if (Str::contains($url, 'vimeo')) {
             return str_replace('/vimeo.com', '/player.vimeo.com/video', $url);
         }
@@ -3296,7 +3252,11 @@ class CoreModifiers extends Modifier
      */
     public function isEmbeddable($url)
     {
-        return Str::contains($url, ['youtu.be', 'youtube', 'vimeo']);
+        if ($url instanceof Embed) {
+            return $url->isSupported();
+        }
+
+        return Embed::isEmbeddable($url);
     }
 
     /**
@@ -3379,24 +3339,6 @@ class CoreModifiers extends Modifier
         return $this->usingRuntimeMethodSyntax($context) ?
                 $params[$key] :
                 Arr::get($context, $params[$key], $params[$key]);
-    }
-
-    // unlisted vimeo urls are in the form vimeo.com/id/hash, but embeds pass the hash as a get param
-    private function handleUnlistedVimeoUrls($url)
-    {
-        $hash = '';
-
-        if (! Str::contains($url, 'progressive_redirect') && Str::substrCount($url, '/') > 4) {
-            $hash = Str::afterLast($url, '/');
-            $url = Str::beforeLast($url, '/');
-
-            if (Str::contains($hash, '?')) {
-                $url .= '?'.Str::after($hash, '?');
-                $hash = Str::before($hash, '?');
-            }
-        }
-
-        return [$url, $hash];
     }
 
     private function dumpingAllowed(array $params): bool
