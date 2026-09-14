@@ -8,12 +8,8 @@ use Statamic\Http\Controllers\CP\CpController;
 
 class VideoFieldtypeController extends CpController
 {
-    public function details(Request $request): Video
+    public function details(Request $request): array
     {
-        if (is_null($url = $request->query('url'))) {
-            return Video::notSupported();
-        }
-
-        return Video::fromUrl($url);
+        return Video::fromValue($request->query('value'))->toArray();
     }
 }

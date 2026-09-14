@@ -2,6 +2,7 @@
 
 namespace Tests\Fieldtypes\Video;
 
+use Illuminate\Support\Facades\Http;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Fieldtypes\Video\Video;
@@ -11,31 +12,111 @@ class VideoTest extends TestCase
 {
     #[Test]
     #[DataProvider('valuesProvider')]
-    public function it_creates_video($provider, $id, $url)
+    public function it_creates_a_video($value, $provider, $id, $embedUrl)
     {
-        $video = Video::fromUrl($url);
+        $video = Video::fromValue($value);
 
         $this->assertSame($provider, $video->provider);
         $this->assertSame($id, $video->id);
+        $this->assertSame($embedUrl, $video->embedUrl);
     }
 
     public static function valuesProvider()
     {
         return [
-            ['Youtube', null, 'https://www.youtube.com/watch?v=FK3dav4bA4s'],
-            ['Cloudflare', '1234', 'cloudflare:1234'],
+            'youtube' => ['https://www.youtube.com/watch?v=FK3dav4bA4s', 'Youtube', null, 'https://www.youtube.com/embed/FK3dav4bA4s?feature=oembed'],
+            'youtube shorts' => ['https://www.youtube.com/shorts/FK3dav4bA4s', 'Youtube', null, 'https://www.youtube.com/embed/FK3dav4bA4s?feature=oembed'],
+            'vimeo' => ['https://vimeo.com/22439234', 'Vimeo', null, 'https://player.vimeo.com/video/22439234'],
+            'cloudflare' => ['cloudflare:1234', 'cloudflare', '1234', 'https://iframe.cloudflarestream.com/1234'],
+            'cloudflare without an id' => ['cloudflare:', 'unsupported', null, null],
+            'mp4 file' => ['https://example.com/clip.mp4', 'file', null, 'https://example.com/clip.mp4'],
+            'uppercase file extension' => ['https://example.com/clip.MOV', 'file', null, 'https://example.com/clip.MOV'],
+            'file with a query string' => ['https://example.com/clip.webm?t=1', 'file', null, 'https://example.com/clip.webm?t=1'],
+            'unsupported' => ['https://example.com/nope', 'unsupported', null, null],
+            'empty' => ['', 'unsupported', null, null],
+            'null' => [null, 'unsupported', null, null],
         ];
     }
 
     #[Test]
-    public function it_escapes_the_cloudflare_id_in_the_embed()
+    public function it_does_not_make_http_requests_for_offline_providers()
     {
-        $video = Video::fromUrl('cloudflare:1234"></iframe><script>alert(1)</script>');
+        Http::preventStrayRequests();
 
-        $this->assertStringNotContainsString('<script>', $video->embed);
-        $this->assertStringContainsString(
-            'src="https://iframe.cloudflarestream.com/1234&quot;&gt;&lt;/iframe&gt;&lt;script&gt;alert(1)&lt;/script&gt;"',
-            $video->embed
+        $this->assertSame('Youtube', Video::fromValue('https://www.youtube.com/watch?v=FK3dav4bA4s')->provider);
+        $this->assertSame('Vimeo', Video::fromValue('https://vimeo.com/22439234')->provider);
+    }
+
+    #[Test]
+    public function it_returns_an_embed_url_rather_than_provider_supplied_markup()
+    {
+        Http::fake(['*' => Http::response([
+            'html' => '<img src=x onerror="alert(1)"><iframe src="https://fast.wistia.net/embed/iframe/abc"></iframe>',
+        ])]);
+
+        $video = Video::fromValue('https://wistia.com/medias/abc');
+
+        $this->assertSame('https://fast.wistia.net/embed/iframe/abc', $video->embedUrl);
+        $this->assertStringNotContainsString('onerror', $video->embedUrl);
+    }
+
+    #[Test]
+    public function it_rejects_an_embed_that_is_not_a_valid_url()
+    {
+        Http::fake(['*' => Http::response(['html' => '<iframe src="javascript:alert(1)"></iframe>'])]);
+
+        $this->assertFalse(Video::fromValue('https://wistia.com/medias/abc')->isSupported());
+    }
+
+    #[Test]
+    public function it_upgrades_an_insecure_embed_url_to_https()
+    {
+        Http::fake(['*' => Http::response(['html' => '<iframe src="http://fast.wistia.net/embed/iframe/abc"></iframe>'])]);
+
+        $this->assertSame(
+            'https://fast.wistia.net/embed/iframe/abc',
+            Video::fromValue('https://wistia.com/medias/abc')->embedUrl,
         );
+    }
+
+    #[Test]
+    public function it_is_not_supported_when_the_lookup_fails()
+    {
+        Http::fake(['*' => Http::response(status: 500)]);
+
+        $this->assertFalse(Video::fromValue('https://wistia.com/medias/abc')->isSupported());
+    }
+
+    #[Test]
+    public function it_caches_lookups_that_require_a_request()
+    {
+        Http::fake(['*' => Http::response(['html' => '<iframe src="https://fast.wistia.net/embed/iframe/abc"></iframe>'])]);
+
+        Video::fromValue('https://wistia.com/medias/abc');
+        Video::fromValue('https://wistia.com/medias/abc');
+
+        Http::assertSentCount(1);
+    }
+
+    #[Test]
+    public function it_casts_to_the_original_value()
+    {
+        $this->assertSame('https://vimeo.com/22439234', (string) Video::fromValue('https://vimeo.com/22439234'));
+        $this->assertSame('', (string) Video::fromValue(null));
+    }
+
+    #[Test]
+    public function it_is_arrayable_and_accessible_as_an_array()
+    {
+        $video = Video::fromValue('cloudflare:1234');
+
+        $this->assertSame([
+            'embed_url' => 'https://iframe.cloudflarestream.com/1234',
+            'id' => '1234',
+            'provider' => 'cloudflare',
+            'url' => 'cloudflare:1234',
+        ], $video->toArray());
+
+        $this->assertSame('https://iframe.cloudflarestream.com/1234', $video['embed_url']);
     }
 }
