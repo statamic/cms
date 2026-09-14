@@ -4,9 +4,7 @@ namespace Statamic\Imaging;
 
 use League\Glide\Server;
 use Statamic\Contracts\Assets\Asset;
-use Statamic\Facades\Asset as Assets;
 use Statamic\Facades\URL;
-use Statamic\Support\Str;
 
 class GlideCachePathResolver
 {
@@ -53,14 +51,6 @@ class GlideCachePathResolver
     {
         if ($item instanceof Asset) {
             return $this->resolveForAsset($item, $params);
-        }
-
-        if (is_string($item) && Str::contains($item, '::')) {
-            $asset = Assets::find($item);
-
-            if ($asset) {
-                return $this->resolveForAsset($asset, $params);
-            }
         }
 
         if (is_string($item) && URL::isAbsolute($item)) {
