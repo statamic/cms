@@ -438,11 +438,11 @@ class URL
         $sites = Site::all();
 
         self::$hasRelativeSiteCache = $sites->contains(
-            fn ($site) => Str::startsWith((string) ($site->rawConfig()['url'] ?? ''), '/')
+            fn ($site) => Str::startsWith((string) $site->url(), '/')
         );
 
         self::$absoluteSiteUrlsCache = $sites
-            ->map(fn ($site) => $site->rawConfig()['url'] ?? null)
+            ->map(fn ($site) => $site->url())
             ->filter(fn ($siteUrl) => self::isAbsolute($siteUrl))
             ->map(fn ($siteUrl) => self::getDomainFromAbsolute($siteUrl));
 

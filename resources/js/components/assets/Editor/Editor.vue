@@ -214,7 +214,7 @@ import ItemActions from '@/components/actions/ItemActions.vue';
 import useCheckerboard from '@/composables/checkerboard.js';
 
 export default {
-    emits: ['previous', 'next', 'saved', 'closed', 'action-started', 'action-completed'],
+    emits: ['previous', 'next', 'saved', 'closed', 'created', 'action-started', 'action-completed'],
 
     components: {
         Button,
@@ -248,6 +248,10 @@ export default {
             default() {
                 return true;
             },
+        },
+        redirectAfterCrop: {
+            type: Boolean,
+            default: true,
         },
     },
 
@@ -448,6 +452,11 @@ export default {
         },
 
         handleCropCreated(newAssetId) {
+            if (!this.redirectAfterCrop) {
+                this.$emit('created', newAssetId);
+                return;
+            }
+
             const [containerHandle, assetPath] = newAssetId.split('::');
             const editUrl = cp_url(`assets/browse/${containerHandle}/${assetPath}/edit`);
             router.get(editUrl);

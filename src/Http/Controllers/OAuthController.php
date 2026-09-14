@@ -149,7 +149,7 @@ class OAuthController
 
         $existingUserId = $oauth->getUserId($providerUser->getId());
 
-        if ($existingUserId === (string) $user->id()) {
+        if ($existingUserId === (string) $user->getAuthIdentifier()) {
             return redirect()
                 ->to($this->successRedirectUrl())
                 ->with('success', __('statamic::messages.oauth_already_connected', ['provider' => $oauth->label()]));

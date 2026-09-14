@@ -120,9 +120,12 @@ YAML;
         File::ensureDirectoryExists($this->globalsPath.'/de');
 
         File::put($this->globalsPath.'/test.yaml', Yaml::dump(['title' => 'Test']));
-        File::put($this->globalsPath.'/en/test.yaml', Yaml::dump(['foo' => 'Bar', 'baz' => 'Qux']));
-        File::put($this->globalsPath.'/fr/test.yaml', Yaml::dump(['origin' => 'en', 'foo' => 'Bar']));
+
+        // Written out of order on purpose. The Stache indexes variables by modification
+        // time, but the sites array should follow the order of the sites config.
         File::put($this->globalsPath.'/de/test.yaml', Yaml::dump(['origin' => 'fr']));
+        File::put($this->globalsPath.'/fr/test.yaml', Yaml::dump(['origin' => 'en', 'foo' => 'Bar']));
+        File::put($this->globalsPath.'/en/test.yaml', Yaml::dump(['foo' => 'Bar', 'baz' => 'Qux']));
 
         $this->runUpdateScript(UpdateGlobalVariables::class);
 
@@ -130,9 +133,9 @@ YAML;
         $expected = <<<'YAML'
 title: Test
 sites:
-  de: fr
   en: null
   fr: en
+  de: fr
 
 YAML;
 

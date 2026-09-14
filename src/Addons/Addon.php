@@ -350,18 +350,21 @@ final class Addon
 
     public function hasSettingsBlueprint(): bool
     {
-        return $this->settingsBlueprint() !== null;
+        return app()->bound($this->settingsBlueprintBinding());
     }
 
     public function settingsBlueprint()
     {
-        $binding = "statamic.addons.{$this->slug()}.settings_blueprint";
-
-        if (! app()->bound($binding)) {
+        if (! $this->hasSettingsBlueprint()) {
             return null;
         }
 
-        return Blueprint::make("addons.{$this->slug()}")->setContents(app($binding));
+        return Blueprint::make("addons.{$this->slug()}")->setContents(app($this->settingsBlueprintBinding()));
+    }
+
+    private function settingsBlueprintBinding(): string
+    {
+        return "statamic.addons.{$this->slug()}.settings_blueprint";
     }
 
     public function setting($key, $default = null): mixed

@@ -1,6 +1,6 @@
 <script setup>
 import { CheckboxIndicator, CheckboxRoot } from 'reka-ui';
-import { computed, useAttrs, useId } from 'vue';
+import { computed, useAttrs, useId, useSlots } from 'vue';
 import { cva } from 'cva';
 import { twMerge } from 'tailwind-merge';
 import { injectCheckboxContext } from './Group.vue';
@@ -8,6 +8,7 @@ import { injectCheckboxContext } from './Group.vue';
 defineOptions({ inheritAttrs: false });
 
 const attrs = useAttrs();
+const slots = useSlots();
 
 const props = defineProps({
     /** Optional ID for the checkbox input */
@@ -100,7 +101,8 @@ const conditionalProps = computed(() => {
         props_obj['aria-describedby'] = `${props.id}-description`;
     }
 
-    if (props.solo && (props.label || props.value)) {
+    // Providing the name ourselves stops Reka from deriving it from the label's innerText, which forces a layout.
+    if ((props.solo || !slots.default) && (props.label || props.value)) {
         props_obj['aria-label'] = props.label || props.value;
     }
 

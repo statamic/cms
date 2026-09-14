@@ -376,6 +376,24 @@ class EntriesTest extends TestCase
         $this->assertEquals(['one', 'two', 'three', 'four'], $augmented->get()->map->slug()->all());
     }
 
+    #[Test]
+    public function it_doesnt_inherit_the_item_cache_from_another_fieldtype_instance()
+    {
+        $this->actingAs(Facades\User::make()->makeSuper());
+
+        $field = new Field('test', ['type' => 'entries', 'collections' => ['blog']]);
+
+        // The fieldtype repository hands out clones of a single instance per handle,
+        // so one field's lookups must not leak into another's.
+        $first = $field->fieldtype();
+        $this->assertFalse($first->getItemData(['123'])->first()['invalid'] ?? false);
+
+        Facades\Entry::find('123')->delete();
+
+        $second = $field->fieldtype();
+        $this->assertTrue($second->getItemData(['123'])->first()['invalid']);
+    }
+
     public function fieldtype($config = [], $parent = null)
     {
         $field = new Field('test', array_merge([

@@ -1,5 +1,6 @@
 import { expect, test, vi } from 'vitest';
 import Editor from '@/components/assets/Editor/Editor.vue';
+import Asset from '@/components/fieldtypes/assets/Asset';
 
 function keydown(key, target, modifier) {
     const component = {
@@ -46,3 +47,15 @@ test.each([['ctrlKey'], ['metaKey']])(
         expect(keydown('ArrowRight', target, modifier).navigateToNextAsset).not.toHaveBeenCalled();
     },
 );
+
+test('keeps crop copies in the asset field', () => {
+    const editor = { redirectAfterCrop: false, $emit: vi.fn() };
+    const asset = { editingId: 'assets::source.png', $emit: vi.fn(), closeEditor: vi.fn() };
+
+    Editor.methods.handleCropCreated.call(editor, 'assets::crop.png');
+    Asset.methods.assetCreated.call(asset, 'assets::crop.png');
+
+    expect(editor.$emit).toHaveBeenCalledWith('created', 'assets::crop.png');
+    expect(asset.$emit).toHaveBeenCalledWith('id-changed', 'assets::source.png', 'assets::crop.png');
+    expect(asset.closeEditor).toHaveBeenCalled();
+});

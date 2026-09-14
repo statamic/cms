@@ -5,9 +5,14 @@ import { data_get } from '../../util/data_get.js';
 import { isObject, intersection } from 'lodash-es';
 
 const NUMBER_SPECIFIC_COMPARISONS = ['>', '>=', '<', '<='];
+const CUSTOM_PREFIX_RE = /^custom /;
+const ROOT_PREFIX_RE = /^\$?root\./;
 
 const isEmpty = (value) => {
     if (value === null || value === undefined) return true;
+
+    // Object.keys() would consider numbers empty.
+    if (typeof value === 'number') return false;
 
     return Array.isArray(value) ? value.length === 0 : Object.keys(value).length === 0;
 };
@@ -25,6 +30,7 @@ export default class {
         this.passOnAny = false;
         this.showOnPass = true;
         this.converter = new Converter();
+        this._conditionsResolved = false;
     }
 
     usingRootValues() {
@@ -56,6 +62,21 @@ export default class {
     }
 
     getConditions() {
+        // Memoized per instance. It's not a pure getter — it also sets passOnAny and
+        // showOnPass — so a cached call has to replay them. Like the uncached path, the
+        // replay only ever sets the flags; it never puts them back to their defaults.
+        if (this._conditionsResolved) {
+            if (this._setPassOnAny) this.passOnAny = true;
+            if (this._setShowOffPass) this.showOnPass = false;
+
+            return this._conditions;
+        }
+
+        this._conditionsResolved = true;
+        this._setPassOnAny = false;
+        this._setShowOffPass = false;
+        this._conditions = undefined;
+
         let key = KEYS.filter((key) => this.field[key])[0];
 
         if (!key) {
@@ -63,18 +84,21 @@ export default class {
         }
 
         if (key.includes('any')) {
-            this.passOnAny = true;
+            this.passOnAny = this._setPassOnAny = true;
         }
 
         if (key.includes('unless') || key.includes('hide_when')) {
             this.showOnPass = false;
+            this._setShowOffPass = true;
         }
 
         let conditions = this.field[key];
 
-        return this.isCustomConditionWithoutTarget(conditions)
+        this._conditions = this.isCustomConditionWithoutTarget(conditions)
             ? conditions
             : this.converter.fromBlueprint(conditions, this.field.prefix);
+
+        return this._conditions;
     }
 
     isCustomConditionWithoutTarget(conditions) {
@@ -189,7 +213,7 @@ export default class {
     }
 
     prepareFunctionName(condition) {
-        return condition.replace(new RegExp('^custom '), '').split(':')[0];
+        return condition.replace(CUSTOM_PREFIX_RE, '').split(':')[0];
     }
 
     prepareParams(condition) {
@@ -204,7 +228,7 @@ export default class {
         }
 
         if (field.startsWith('$root.') || field.startsWith('root.')) {
-            return data_get(this.rootValues, field.replace(new RegExp('^\\$?root\\.'), ''));
+            return data_get(this.rootValues, field.replace(ROOT_PREFIX_RE, ''));
         }
 
         return data_get(this.values, field);
@@ -293,7 +317,7 @@ export default class {
         }
 
         if (lhs.startsWith('$root.') || lhs.startsWith('root.')) {
-            return lhs.replace(new RegExp('^\\$?root\\.'), '');
+            return lhs.replace(ROOT_PREFIX_RE, '');
         }
 
         return dottedPrefix ? dottedPrefix + '.' + lhs : lhs;

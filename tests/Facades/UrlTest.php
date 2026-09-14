@@ -315,6 +315,41 @@ class UrlTest extends TestCase
     }
 
     #[Test]
+    public function it_determines_external_url_to_application_when_site_urls_are_configured_with_antlers()
+    {
+        config(['app.frontend_url' => 'http://frontend-site.com']);
+
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => '{{ config:app:frontend_url }}'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => '{{ config:app:frontend_url }}/fr'],
+        ]);
+
+        $this->assertFalse(URL::isExternalToApplication('http://frontend-site.com/'));
+        $this->assertFalse(URL::isExternalToApplication('http://frontend-site.com/fr/'));
+        $this->assertTrue(URL::isExternalToApplication('http://external-site.com/'));
+    }
+
+    #[Test]
+    public function it_tidies_urls_on_site_hosts_configured_with_antlers()
+    {
+        config(['app.frontend_url' => 'http://frontend-site.com']);
+
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => '{{ config:app:frontend_url }}'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => '{{ config:app:frontend_url }}/fr'],
+        ]);
+
+        $this->assertSame('http://frontend-site.com', URL::tidy('http://frontend-site.com/'));
+        $this->assertSame('http://frontend-site.com/fr', URL::tidy('http://frontend-site.com/fr/'));
+        $this->assertSame('http://external-site.com/page/', URL::tidy('http://external-site.com/page/'));
+
+        URL::enforceTrailingSlashes();
+
+        $this->assertSame('http://frontend-site.com/fr/', URL::tidy('http://frontend-site.com/fr'));
+        $this->assertSame('http://external-site.com/page', URL::tidy('http://external-site.com/page'));
+    }
+
+    #[Test]
     #[DataProvider('assembleProvider')]
     public function it_can_assemble_urls($segments, $assembled)
     {

@@ -117,6 +117,10 @@ export default {
 
             return;
         },
+
+        newPageDepth() {
+            return this.targetParent ? this.targetParent.level + 1 : 1;
+        },
     },
 
     watch: {
@@ -186,7 +190,7 @@ export default {
         },
 
         editPage(page) {
-            this.editingPage = { page };
+            this.editingPage = { page, depth: this.$refs.tree.depthOf(page) };
         },
 
         updatePage(values) {
@@ -550,6 +554,7 @@ export default {
             :site="site"
             :id="editingPage.page.id"
             :entry="editingPage.page.entry"
+            :depth="editingPage.depth"
             :editEntryUrl="editingPage.page.entry ? editingPage.page.edit_url : null"
             :publish-info="publishInfo[editingPage.page.id]"
             :blueprint="blueprint"
@@ -565,6 +570,7 @@ export default {
             v-if="creatingPage"
             creating
             :site="site"
+            :depth="newPageDepth"
             :blueprint="blueprint"
             :handle="handle"
             :read-only="!canEdit"
