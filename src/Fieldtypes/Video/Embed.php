@@ -9,6 +9,8 @@ use JsonSerializable;
 use Statamic\Contracts\Support\Boolable;
 use Statamic\Support\FileTypes;
 
+use function Statamic\trans as __;
+
 class Embed implements Arrayable, ArrayAccess, Boolable, JsonSerializable
 {
     const CLOUDFLARE = 'cloudflare';
@@ -17,6 +19,7 @@ class Embed implements Arrayable, ArrayAccess, Boolable, JsonSerializable
     const CLOUDFLARE_PREFIX = 'cloudflare:';
     const FILE = 'file';
     const UNSUPPORTED = 'unsupported';
+    const URL = 'url';
     const VIMEO = 'vimeo';
     const YOUTUBE = 'youtube';
 
@@ -43,6 +46,14 @@ class Embed implements Arrayable, ArrayAccess, Boolable, JsonSerializable
         }
 
         return static::unsupported($value);
+    }
+
+    public static function options(): array
+    {
+        return [
+            ['value' => self::URL, 'label' => __('URL')],
+            ['value' => self::CLOUDFLARE, 'label' => __('Cloudflare Stream')],
+        ];
     }
 
     public static function unsupported(?string $value = null): self

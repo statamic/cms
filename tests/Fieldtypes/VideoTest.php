@@ -48,8 +48,31 @@ class VideoTest extends TestCase
         );
     }
 
-    private function fieldtype()
+    #[Test]
+    public function it_preloads_the_providers_and_the_current_video()
     {
-        return (new Video)->setField(new Field('test', ['type' => 'video']));
+        $meta = $this->fieldtype('cloudflare:1234')->preload();
+
+        $this->assertSame([
+            ['value' => 'url', 'label' => 'URL'],
+            ['value' => 'cloudflare', 'label' => 'Cloudflare Stream'],
+        ], $meta['providers']);
+
+        $this->assertSame('cloudflare', $meta['video']['provider']);
+        $this->assertSame('https://iframe.cloudflarestream.com/1234', $meta['video']['embed_url']);
+    }
+
+    #[Test]
+    public function it_preloads_an_empty_field()
+    {
+        $this->assertSame('unsupported', $this->fieldtype()->preload()['video']['provider']);
+    }
+
+    private function fieldtype($value = null)
+    {
+        return tap(new Video, fn (Video $fieldtype) => $fieldtype
+            ->setField(new Field('test', ['type' => 'video']))
+            ->field()->setValue($value)
+        );
     }
 }
