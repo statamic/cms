@@ -14,8 +14,14 @@
             />
         </ui-input-group>
         <ui-description v-if="isInvalid" class="text-red-600">{{ __('statamic::validation.url') }}</ui-description>
+        <video
+            v-if="shouldShowPreview && isVideo"
+            :src="isVisible ? embedUrl : null"
+            controls
+            class="aspect-video rounded-lg w-full"
+        ></video>
         <iframe
-            v-if="shouldShowPreview"
+            v-else-if="shouldShowPreview"
             ref="iframe"
             :src="isVisible ? embedUrl : null"
             frameborder="0"

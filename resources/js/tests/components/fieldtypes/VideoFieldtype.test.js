@@ -5,10 +5,15 @@ import { publishContextKey } from '@/components/ui';
 
 window.__ = (key) => key;
 
+let intersect;
+
 beforeEach(() => {
     vi.useFakeTimers();
 
     window.IntersectionObserver = class {
+        constructor(callback) {
+            intersect = () => callback([{ isIntersecting: true, intersectionRatio: 1 }]);
+        }
         observe() {}
         disconnect() {}
     };
@@ -59,4 +64,29 @@ test('it debounces updates while typing', async () => {
 
     expect(wrapper.emitted('update:value')).toHaveLength(1);
     expect(wrapper.emitted('update:value')[0]).toEqual(['https://www.youtube.com/watch?v=123']);
+});
+
+test('it renders a direct video file in a video element', async () => {
+    const wrapper = mountVideoField({ value: 'https://example.com/clip.mp4' });
+    intersect();
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.find('video').attributes('src')).toBe('https://example.com/clip.mp4');
+    expect(wrapper.find('video').attributes('controls')).toBeDefined();
+    expect(wrapper.find('iframe').exists()).toBe(false);
+});
+
+test('it renders an embeddable url in an iframe', async () => {
+    const wrapper = mountVideoField({ value: 'https://www.youtube.com/watch?v=1234' });
+    intersect();
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.find('iframe').exists()).toBe(true);
+    expect(wrapper.find('video').exists()).toBe(false);
+});
+
+test('it does not load the preview until the field is visible', () => {
+    const wrapper = mountVideoField({ value: 'https://example.com/clip.mp4' });
+
+    expect(wrapper.find('video').attributes('src')).toBeUndefined();
 });
