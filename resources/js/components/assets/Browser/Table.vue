@@ -99,6 +99,7 @@
                 >
                     <asset-thumbnail
                         :asset="asset"
+                        alt=""
                         :square="true"
                         class="size-8 cursor-pointer"
                         @click.native.stop="$emit('edit-asset', asset)"

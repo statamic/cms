@@ -4,6 +4,7 @@ namespace Statamic\Console\Processes;
 
 use Illuminate\Support\Facades\Cache;
 use Statamic\Console\Composer\Lock;
+use Statamic\Facades\Path;
 use Statamic\Jobs\RunComposer;
 use Statamic\Support\Str;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
@@ -48,7 +49,7 @@ class Composer extends Process
      */
     public function isInstalled(string $package)
     {
-        $lock = Lock::file($this->basePath.'composer.lock');
+        $lock = $this->lock();
 
         return $lock->exists() && $lock->isPackageInstalled($package);
     }
@@ -60,7 +61,7 @@ class Composer extends Process
      */
     public function installed()
     {
-        $lock = Lock::file($this->basePath.'composer.lock');
+        $lock = $this->lock();
 
         if (! $lock->exists()) {
             return collect();
@@ -83,7 +84,7 @@ class Composer extends Process
      */
     public function installedVersion(string $package)
     {
-        $lock = Lock::file($this->basePath.'composer.lock');
+        $lock = $this->lock();
 
         if (! $lock->exists()) {
             return null;
@@ -92,6 +93,13 @@ class Composer extends Process
         $version = $lock->getInstalledVersion($package);
 
         return $this->normalizeVersion($version);
+    }
+
+    private function lock(): Lock
+    {
+        $filename = Lock::filename();
+
+        return Lock::file(Path::isAbsolute($filename) ? $filename : $this->basePath.$filename);
     }
 
     /**

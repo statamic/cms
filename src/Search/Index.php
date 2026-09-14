@@ -12,6 +12,8 @@ abstract class Index
     protected $handle;
     protected $locale;
     protected $config;
+    protected ?string $queue = null;
+    protected ?string $queueConnection = null;
     protected static ?Closure $nameCallback = null;
 
     abstract public function search($query);
@@ -98,11 +100,37 @@ abstract class Index
     {
         $documents
             ->chunk(config('statamic.search.chunk_size'))
-            ->each(fn ($documents) => InsertMultipleJob::dispatch(
-                name: $this->handle,
-                locale: $this->locale,
-                documents: $documents
-            ));
+            ->each(function ($documents) {
+                $job = new InsertMultipleJob(
+                    name: $this->handle,
+                    locale: $this->locale,
+                    documents: $documents
+                );
+
+                if ($this->queueConnection) {
+                    $job->onConnection($this->queueConnection);
+                }
+
+                if ($this->queue) {
+                    $job->onQueue($this->queue);
+                }
+
+                dispatch($job);
+            });
+
+        return $this;
+    }
+
+    public function onConnection(string $connection)
+    {
+        $this->queueConnection = $connection;
+
+        return $this;
+    }
+
+    public function onQueue(string $queue)
+    {
+        $this->queue = $queue;
 
         return $this;
     }
