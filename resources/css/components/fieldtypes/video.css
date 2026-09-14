@@ -1,13 +1,14 @@
-.embera-embed-responsive {
+.video-fieldtype-embed {
     position: relative;
     display: block;
     width: 100%;
     padding: 0;
+    padding-bottom: 56.25%;
     overflow: hidden;
-    padding-bottom: 50%;
+    border-radius: var(--radius-md);
 }
 
-.embera-embed-responsive-item {
+.video-fieldtype-embed iframe {
     position: absolute;
     top: 0;
     bottom: 0;
