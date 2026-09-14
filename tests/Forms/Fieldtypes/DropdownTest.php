@@ -3,6 +3,7 @@
 namespace Tests\Forms\Fieldtypes;
 
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Forms\Charts\HorizontalBar;
 use Statamic\Forms\Fields\FormField;
 use Statamic\Forms\Fieldtypes\Dropdown;
 use Tests\TestCase;
@@ -87,5 +88,25 @@ class DropdownTest extends TestCase
             'max_items' => null,
             'default' => 'red',
         ], $fieldtype->toFieldArray());
+    }
+
+    #[Test]
+    public function it_defaults_to_a_bar_chart()
+    {
+        $this->assertEquals(HorizontalBar::class, (new Dropdown)->defaultChart());
+    }
+
+    #[Test]
+    public function it_returns_its_options_as_chart_options()
+    {
+        $fieldtype = (new Dropdown)->setField(new FormField('seen', [
+            'type' => 'dropdown',
+            'options' => ['yep' => 'Yep', 'nope' => 'Nope'],
+        ]));
+
+        $options = $fieldtype->chartOptions(collect());
+
+        $this->assertEquals(['yep', 'nope'], $options->map->key->all());
+        $this->assertEquals(['Yep', 'Nope'], $options->map->label->all());
     }
 }

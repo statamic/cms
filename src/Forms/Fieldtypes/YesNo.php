@@ -2,6 +2,9 @@
 
 namespace Statamic\Forms\Fieldtypes;
 
+use Illuminate\Support\Collection;
+use Statamic\Forms\Charts\ChartOption;
+use Statamic\Forms\Charts\HorizontalBar;
 use Statamic\Forms\Fields\FormFieldtype;
 use Statamic\Support\Arr;
 
@@ -32,6 +35,19 @@ class YesNo extends FormFieldtype
             ],
             ...Arr::except($this->config(), ['type', 'options']),
         ];
+    }
+
+    public function defaultChart(): ?string
+    {
+        return HorizontalBar::class;
+    }
+
+    public function chartOptions(Collection $values): ?Collection
+    {
+        return collect([
+            new ChartOption('yes', __('Yes'), icon: 'checkmark-circle-filled'),
+            new ChartOption('no', __('No'), icon: 'delete-circle-filled'),
+        ]);
     }
 
     public function example(): ?array

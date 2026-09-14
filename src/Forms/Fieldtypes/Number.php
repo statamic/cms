@@ -2,7 +2,10 @@
 
 namespace Statamic\Forms\Fieldtypes;
 
+use Statamic\Forms\Charts\VerticalBar;
 use Statamic\Forms\Fields\FormFieldtype;
+use Statamic\Forms\Insights\Average;
+use Statamic\Forms\Insights\MinMax;
 use Statamic\Support\Arr;
 
 use function Statamic\trans as __;
@@ -42,6 +45,16 @@ class Number extends FormFieldtype
             'max' => $this->config('max'),
             ...Arr::except($this->config(), ['type', 'min', 'max']),
         ];
+    }
+
+    public function defaultChart(): ?string
+    {
+        return VerticalBar::class;
+    }
+
+    public function insights(): array
+    {
+        return [new MinMax, new Average];
     }
 
     public function example(): ?array

@@ -6,7 +6,7 @@ import {
     PanelHeader,
     Card,
     Heading,
-	Stack,
+    Stack,
 } from '@ui';
 import { injectListingContext } from '../Listing/Listing.vue';
 import { dateFormatter } from '@/api';
