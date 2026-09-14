@@ -8,6 +8,7 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\FormSubmitted;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
+use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Forms\SendEmails;
 use Tests\FakesRoles;
@@ -71,6 +72,26 @@ class GenerateFakeSubmissionTest extends TestCase
             ->assertSessionHas('error');
 
         $this->assertEquals(0, $form->querySubmissions()->count());
+    }
+
+    #[Test]
+    public function it_assigns_the_selected_site_to_the_fake_submission()
+    {
+        $this->setSites([
+            'en' => ['url' => 'http://localhost/', 'locale' => 'en'],
+            'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
+        ]);
+        Site::setSelected('fr');
+
+        $form = $this->makeForm('contact');
+        $user = $this->userWithConfigureFormsPermission();
+
+        $this
+            ->actingAs($user)
+            ->post(cp_route('forms.submissions.generate-fake', $form->handle()), ['mode' => 'cp_only'])
+            ->assertOk();
+
+        $this->assertEquals('fr', $form->querySubmissions()->first()->site()->handle());
     }
 
     #[Test]

@@ -29,7 +29,7 @@ class GenerateFakeSubmissionController extends CpController
 
         $values = $generator->generate($form);
         $fields = $form->blueprint()->fields()->addValues($values);
-        $submission = $form->makeSubmission();
+        $submission = $form->makeSubmission()->site(Site::selected());
         $submission->data(
             $fields->process()->values()->merge([
                 '_fake' => true,
@@ -47,7 +47,7 @@ class GenerateFakeSubmissionController extends CpController
         $submission->save();
 
         if ($validated['mode'] === 'full_pipeline') {
-            SendEmails::dispatch($submission, Site::default());
+            SendEmails::dispatch($submission, $submission->site());
         }
 
         return response([
