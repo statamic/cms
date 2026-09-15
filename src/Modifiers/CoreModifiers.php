@@ -36,6 +36,7 @@ use Statamic\Support\Html;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\ChecksDumpability;
 use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
+use Stringable;
 use Stringy\StaticStringy as Stringy;
 
 use function Statamic\trans;
@@ -1561,7 +1562,9 @@ class CoreModifiers extends Modifier
             return $value->count();
         }
 
-        if ($value instanceof Arrayable) {
+        // Value objects like ArrayableString are both Arrayable and Stringable.
+        // They stand in for a string, so measure the string, not the array.
+        if ($value instanceof Arrayable && ! $value instanceof Stringable) {
             $value = $value->toArray();
         }
 
