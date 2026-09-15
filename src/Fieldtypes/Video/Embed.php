@@ -34,12 +34,12 @@ class Embed implements Arrayable, ArrayAccess, Boolable, JsonSerializable
                 : static::unsupported($value);
         }
 
-        if (static::isVideoFile($value)) {
-            return new self(self::FILE, $value, $value);
-        }
-
         if ($provider = static::oembedProvider($value)) {
             return new self($provider, $value, static::embedUrl($value));
+        }
+
+        if (static::isVideoFile($value)) {
+            return new self(self::FILE, $value, $value);
         }
 
         return static::unsupported($value);
