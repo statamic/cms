@@ -29,7 +29,7 @@
                 <div
                     v-if="!isReadOnly && showPicker"
                     data-asset-picker
-                    class="not-[.link-fieldtype_&]:p-2 not-[.link-fieldtype_&]:border border-gray-300 dark:border-gray-700 dark:bg-gray-850 rounded-xl flex items-center gap-3"
+                    class="not-[.link-fieldtype_&]:p-2 not-[.link-fieldtype_&]:border border-gray-300 dark:border-gray-700 dark:bg-gray-850 rounded-xl flex flex-wrap items-center gap-y-1 gap-x-3"
                     :class="{
                         'rounded-b-none': expanded,
                         'bard-drag-handle': isInBardField,
@@ -56,7 +56,7 @@
                         @keyup.space.enter="openSelector"
                     />
 
-                    <div class="min-w-0 flex-1 hidden not-[.link-fieldtype_&]:flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400" v-if="canUpload">
+                    <div class="min-w-0 grow basis-[min-content] hidden not-[.link-fieldtype_&]:flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400" v-if="canUpload">
                         <ui-icon name="upload-cloud" class="size-5 shrink-0 text-gray-500 hidden @sm:block" />
                         <div class="min-w-0">
                             <span class="hidden @sm:inline">{{ __('Drag & drop here or') }}&nbsp;</span>

@@ -19,6 +19,7 @@ class Cascade
     protected $content;
     protected $sections;
     protected $hydratedCallbacks = [];
+    protected $hydratedOnceCallbacks = [];
 
     public function __construct(Request $request, Site $site, array $data = [])
     {
@@ -86,6 +87,13 @@ class Cascade
         return $this;
     }
 
+    public function hydratedOnce($callback)
+    {
+        $this->hydratedOnceCallbacks[] = $callback;
+
+        return $this;
+    }
+
     public function hydrate()
     {
         $this->data([]);
@@ -103,6 +111,13 @@ class Cascade
     private function runHydratedCallbacks()
     {
         foreach ($this->hydratedCallbacks as $callback) {
+            $callback($this);
+        }
+
+        $callbacks = $this->hydratedOnceCallbacks;
+        $this->hydratedOnceCallbacks = [];
+
+        foreach ($callbacks as $callback) {
             $callback($this);
         }
 
