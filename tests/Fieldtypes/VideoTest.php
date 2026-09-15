@@ -32,7 +32,7 @@ class VideoTest extends TestCase
     public static function augmentProvider()
     {
         return [
-            'url' => ['https://vimeo.com/22439234', 'Vimeo', null, 'https://player.vimeo.com/video/22439234'],
+            'url' => ['https://vimeo.com/22439234', 'Vimeo', null, 'https://player.vimeo.com/video/22439234?dnt=1'],
             'cloudflare' => ['cloudflare:1234', 'cloudflare', '1234', 'https://iframe.cloudflarestream.com/1234'],
             'file' => ['https://example.com/clip.mp4', 'file', null, 'https://example.com/clip.mp4'],
             'unsupported' => ['https://example.com/nope', 'unsupported', null, null],

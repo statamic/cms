@@ -25,8 +25,8 @@ class Embed implements Arrayable, ArrayAccess, Boolable, JsonSerializable
     const FILE = 'file';
     const UNSUPPORTED = 'unsupported';
     const URL = 'url';
-    const VIMEO = 'vimeo';
-    const YOUTUBE = 'youtube';
+    const VIMEO = 'Vimeo';
+    const YOUTUBE = 'Youtube';
 
     public static function fromValue(?string $value): self
     {
@@ -40,6 +40,10 @@ class Embed implements Arrayable, ArrayAccess, Boolable, JsonSerializable
             return preg_match(self::CLOUDFLARE_ID_PATTERN, $id)
                 ? new self(self::CLOUDFLARE, $value, self::CLOUDFLARE_EMBED_URL.$id, $id)
                 : static::unsupported($value);
+        }
+
+        if ($provider = static::knownProvider($value)) {
+            return new self($provider, $value, static::embedUrl($value));
         }
 
         if ($video = static::fromOembed($value)) {
@@ -144,7 +148,7 @@ class Embed implements Arrayable, ArrayAccess, Boolable, JsonSerializable
             return $url;
         }
 
-        if (Str::contains($url, self::VIMEO)) {
+        if (Str::contains($url, 'vimeo')) {
             return static::vimeoEmbedUrl($url);
         }
 
@@ -187,7 +191,7 @@ class Embed implements Arrayable, ArrayAccess, Boolable, JsonSerializable
 
     public static function isEmbeddableUrl(?string $url): bool
     {
-        return filled($url) && Str::contains($url, ['youtu.be', 'youtube', self::VIMEO]);
+        return filled($url) && Str::contains($url, ['youtu.be', 'youtube', 'vimeo']);
     }
 
     protected static function isVideoFile(string $url): bool
@@ -197,6 +201,19 @@ class Embed implements Arrayable, ArrayAccess, Boolable, JsonSerializable
         }
 
         return in_array(strtolower(pathinfo($path, PATHINFO_EXTENSION)), FileTypes::video());
+    }
+
+    protected static function knownProvider(string $url): ?string
+    {
+        if (Str::contains($url, 'vimeo')) {
+            return self::VIMEO;
+        }
+
+        if (Str::contains($url, ['youtu.be', 'youtube'])) {
+            return self::YOUTUBE;
+        }
+
+        return null;
     }
 
     protected static function fromOembed(string $url): ?self

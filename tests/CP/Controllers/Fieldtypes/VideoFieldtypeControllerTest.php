@@ -30,7 +30,7 @@ class VideoFieldtypeControllerTest extends TestCase
         return [
             'no value' => [[], ['embed_url' => null, 'id' => null, 'provider' => 'unsupported', 'url' => null]],
             'youtube' => [['value' => 'https://www.youtube.com/watch?v=FK3dav4bA4s'], [
-                'embed_url' => 'https://www.youtube.com/embed/FK3dav4bA4s?feature=oembed',
+                'embed_url' => 'https://www.youtube-nocookie.com/embed/FK3dav4bA4s',
                 'id' => null,
                 'provider' => 'Youtube',
                 'url' => 'https://www.youtube.com/watch?v=FK3dav4bA4s',

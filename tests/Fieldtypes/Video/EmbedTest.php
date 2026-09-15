@@ -24,10 +24,10 @@ class EmbedTest extends TestCase
     public static function valuesProvider()
     {
         return [
-            'youtube' => ['https://www.youtube.com/watch?v=FK3dav4bA4s', 'Youtube', null, 'https://www.youtube.com/embed/FK3dav4bA4s?feature=oembed'],
-            'youtube shorts' => ['https://www.youtube.com/shorts/FK3dav4bA4s', 'Youtube', null, 'https://www.youtube.com/embed/FK3dav4bA4s?feature=oembed'],
-            'youtu.be' => ['https://youtu.be/FK3dav4bA4s', 'Youtube', null, 'https://www.youtube.com/embed/FK3dav4bA4s?feature=oembed'],
-            'vimeo' => ['https://vimeo.com/22439234', 'Vimeo', null, 'https://player.vimeo.com/video/22439234'],
+            'youtube' => ['https://www.youtube.com/watch?v=FK3dav4bA4s', 'Youtube', null, 'https://www.youtube-nocookie.com/embed/FK3dav4bA4s'],
+            'youtube shorts' => ['https://www.youtube.com/shorts/FK3dav4bA4s', 'Youtube', null, 'https://www.youtube-nocookie.com/embed/FK3dav4bA4s'],
+            'youtu.be' => ['https://youtu.be/FK3dav4bA4s', 'Youtube', null, 'https://www.youtube-nocookie.com/embed/FK3dav4bA4s'],
+            'vimeo' => ['https://vimeo.com/22439234', 'Vimeo', null, 'https://player.vimeo.com/video/22439234?dnt=1'],
             'cloudflare' => ['cloudflare:1234', 'cloudflare', '1234', 'https://iframe.cloudflarestream.com/1234'],
             'cloudflare without an id' => ['cloudflare:', 'unsupported', null, null],
             'cloudflare with a malformed id' => ['cloudflare:1234"></iframe><script>alert(1)</script>', 'unsupported', null, null],
