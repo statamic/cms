@@ -630,7 +630,13 @@ class Terms extends Relationship
         $query->whereIn('taxonomy', $taxonomies);
 
         if ($search = $request->search) {
-            $query->where('title', 'like', '%'.$search.'%');
+            $descendants = $this->descendantIdsOfTitleMatches($search, $taxonomies, $request->site);
+
+            $descendants
+                ? $query->where(fn ($query) => $query
+                    ->where('title', 'like', '%'.$search.'%')
+                    ->orWhereIn('id', $descendants))
+                : $query->where('title', 'like', '%'.$search.'%');
         }
 
         if ($site = $request->site) {
@@ -644,6 +650,50 @@ class Terms extends Relationship
         $this->applyIndexQueryScopes($query, $request->all());
 
         return $query;
+    }
+
+    /**
+     * The ids of every term sitting beneath one whose title matches the search, so that
+     * searching a parent surfaces its descendants — the same thing the breadcrumb in
+     * `search_titles` does for the whole-list modes, but decided on the server, where
+     * a typeahead's filtering actually happens.
+     *
+     * The tree only stores slugs, so the matching titles have to be resolved first.
+     * Exclusions aren't applied: a parent that's already been selected is no longer
+     * an option, but typing it should still find what's underneath it.
+     */
+    private function descendantIdsOfTitleMatches(string $search, array $taxonomies, $site): array
+    {
+        $hierarchical = $this->hierarchicalTaxonomies()
+            ->keyBy->handle()
+            ->only($taxonomies);
+
+        if ($hierarchical->isEmpty()) {
+            return [];
+        }
+
+        $query = Term::query()
+            ->whereIn('taxonomy', $hierarchical->keys()->all())
+            ->where('title', 'like', '%'.$search.'%');
+
+        if ($site) {
+            $query->where('site', $site);
+        }
+
+        return $query->get()
+            ->flatMap(function ($term) use ($hierarchical) {
+                $taxonomy = $hierarchical->get($term->taxonomyHandle());
+
+                // The tree is keyed by the default locale's slugs, the way `depth()` and the
+                // tree ordering read it. The matched term leads the list and is skipped —
+                // the title match above already covers it.
+                return collect($taxonomy->termWithDescendants($term->inDefaultLocale()->slug()))
+                    ->skip(1)
+                    ->map(fn ($slug) => $taxonomy->handle().'::'.$slug);
+            })
+            ->unique()
+            ->values()
+            ->all();
     }
 
     public function taxonomies()
