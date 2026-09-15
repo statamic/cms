@@ -58,6 +58,11 @@ class Embed implements Arrayable, ArrayAccess, Boolable, JsonSerializable
     ) {
     }
 
+    public function isEmbeddable(): bool
+    {
+        return ! in_array($this->provider, [self::FILE, self::UNSUPPORTED]);
+    }
+
     public function isSupported(): bool
     {
         return $this->provider !== self::UNSUPPORTED;
@@ -161,7 +166,7 @@ class Embed implements Arrayable, ArrayAccess, Boolable, JsonSerializable
         return $url;
     }
 
-    public static function isEmbeddable(?string $url): bool
+    public static function isEmbeddableUrl(?string $url): bool
     {
         return filled($url) && Str::contains($url, ['youtu.be', 'youtube', self::VIMEO]);
     }

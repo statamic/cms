@@ -3257,10 +3257,10 @@ class CoreModifiers extends Modifier
     public function isEmbeddable($url)
     {
         if ($url instanceof Embed) {
-            return $url->isSupported();
+            return $url->isEmbeddable();
         }
 
-        return Embed::isEmbeddable($url);
+        return Embed::isEmbeddableUrl($url);
     }
 
     /**
