@@ -189,6 +189,21 @@ class EntryQueryBuilderTest extends TestCase
     }
 
     #[Test]
+    public function entries_are_found_using_where_date_when_the_app_timezone_is_not_utc()
+    {
+        config()->set('app.timezone', 'Europe/Zurich');
+
+        $this->createWhereDateTestEntries();
+
+        // The entries are indexed in UTC, so Post 3 (2021-11-15 00:00 in Zurich) is stored
+        // as 2021-11-14 23:00. It should still be found when querying for the 15th.
+        $entries = Entry::query()->whereDate('test_date', Carbon::parse('2021-11-15', 'Europe/Zurich'))->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['Post 1', 'Post 3'], $entries->map->title->all());
+    }
+
+    #[Test]
     public function entries_are_found_using_where_month()
     {
         $this->createWhereDateTestEntries();
@@ -276,6 +291,21 @@ class EntryQueryBuilderTest extends TestCase
         $value = Carbon::create(2021, 11, 13, 12, 0, 0, 'Europe/Moscow');
 
         $entries = Entry::query()->whereTime('test_date', $value)->get();
+
+        $this->assertCount(1, $entries);
+        $this->assertEquals(['Post 2'], $entries->map->title->all());
+    }
+
+    #[Test]
+    public function entries_are_found_using_where_time_when_the_app_timezone_is_not_utc()
+    {
+        config()->set('app.timezone', 'Europe/Zurich');
+
+        $this->createWhereDateTestEntries();
+
+        // Post 2's 09:00 in Zurich (+01:00) is indexed as 08:00 in UTC, so it should
+        // still be found when querying for 09:00.
+        $entries = Entry::query()->whereTime('test_date', Carbon::parse('2021-11-13 09:00', 'Europe/Zurich'))->get();
 
         $this->assertCount(1, $entries);
         $this->assertEquals(['Post 2'], $entries->map->title->all());
@@ -1204,6 +1234,18 @@ class EntryQueryBuilderTest extends TestCase
         $this->assertSame(['post-3', 'post-2', 'post-1'], Entry::query()->orderBy('title', 'desc')->get()->map->slug()->all());
 
         $this->assertSame(['post-1', 'post-2', 'post-3'], Entry::query()->orderBy('title', 'desc')->reorder()->orderBy('asc', 'desc')->get()->map->slug()->all());
+    }
+
+    #[Test]
+    public function entries_are_sorted_naturally()
+    {
+        Collection::make('headings')->save();
+        EntryFactory::id('a')->slug('heading-10')->collection('headings')->data(['title' => 'Heading 10'])->create();
+        EntryFactory::id('b')->slug('heading-2')->collection('headings')->data(['title' => 'Heading 2'])->create();
+        EntryFactory::id('c')->slug('heading-1')->collection('headings')->data(['title' => 'Heading 1'])->create();
+
+        $this->assertSame(['heading-1', 'heading-2', 'heading-10'], Entry::query()->where('collection', 'headings')->orderBy('title')->get()->map->slug()->all());
+        $this->assertSame(['heading-10', 'heading-2', 'heading-1'], Entry::query()->where('collection', 'headings')->orderBy('title', 'desc')->get()->map->slug()->all());
     }
 
     #[Test]

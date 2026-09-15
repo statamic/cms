@@ -43,10 +43,13 @@ class ComposerTest extends TestCase
             return;
         }
 
+        unset($_ENV['COMPOSER']);
+
         $this->files->deleteDirectory($this->basePath('tmp'));
         $this->files->deleteDirectory($this->basePath('vendor'));
         $this->files->delete($this->basePath('composer.json'));
         $this->files->delete($this->basePath('composer.lock'));
+        $this->files->delete($this->basePath('composer.testing.lock'));
         $this->files->move($this->basePath('composer.lock.bak'), $this->basePath('composer.lock'));
         $this->files->move($this->basePath('composer.json.bak'), $this->basePath('composer.json'));
 
@@ -74,6 +77,19 @@ class ComposerTest extends TestCase
     #[Test]
     public function it_can_get_installed_version_of_a_package_directly_from_composer_lock()
     {
+        $this->assertEquals('1.2.3', Composer::installedVersion('statamic/composer-test-example-dependency'));
+    }
+
+    #[Group('integration')]
+    #[Test]
+    public function it_gets_installed_version_from_the_lock_file_named_by_the_composer_env_var()
+    {
+        $_ENV['COMPOSER'] = 'composer.testing.json';
+
+        $this->assertNull(Composer::installedVersion('statamic/composer-test-example-dependency'));
+
+        $this->files->move($this->basePath('composer.lock'), $this->basePath('composer.testing.lock'));
+
         $this->assertEquals('1.2.3', Composer::installedVersion('statamic/composer-test-example-dependency'));
     }
 

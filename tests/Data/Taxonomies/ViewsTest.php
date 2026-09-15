@@ -200,6 +200,18 @@ class ViewsTest extends TestCase
     }
 
     #[Test]
+    public function it_loads_the_collection_specific_term_url_using_a_custom_term_template()
+    {
+        $this->mountBlogPageToBlogCollection();
+
+        $this->tagsTaxonomy->termTemplate('taxonomy.term')->save();
+
+        $this->viewShouldReturnRaw('taxonomy.term', 'custom {{ title }}');
+
+        $this->get('/the-blog/tags/test')->assertOk()->assertSee('custom Test');
+    }
+
+    #[Test]
     public function it_loads_the_localized_collection_specific_taxonomy_url_if_the_view_exists()
     {
         $this->mountBlogPageToBlogCollection();
