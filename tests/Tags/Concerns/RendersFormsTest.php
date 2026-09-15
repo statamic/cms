@@ -5,7 +5,7 @@ namespace Tests\Tags\Concerns;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Antlers;
-use Statamic\Fields\Field;
+use Statamic\Forms\Fields\FormField;
 use Statamic\Forms\RenderableField;
 use Statamic\Support\Arr;
 use Statamic\Tags\Concerns;
@@ -98,17 +98,39 @@ class RendersFormsTest extends TestCase
 HTML;
 
         $this->withFakeViews();
-        $this->viewShouldReturnRaw('statamic::forms.fields.text', $html);
+        $this->viewShouldReturnRaw('statamic::forms.fields.short_answer', $html);
 
         $expected = '<select><option>One</option><option>Two</option></select><label><input type="checkbox">Option <a href="/link">with link</a> text or <span class="tailwind">style</span> class</label><label><input type="radio">Intentionally<a href="/link">tight</a>link or<span class="tailwind">style</span>class</label><textarea>Some <a href="/link">link</a> or <span class="tailwind">styled text</textarea><textarea><a href="/link">Start with</a> and end with a <a href="/link">link</a></textarea>';
 
-        $field = $this->createField('text')['field'];
+        $field = $this->createFormField('short_answer')['field'];
 
         $this->assertInstanceOf(RenderableField::class, $field);
         $this->assertEquals($expected, (string) $field);
     }
 
-    private function createField($type, $value = null, $default = null, $old = null, $config = [])
+    #[Test]
+    public function renderable_fields_receive_common_field_option_defaults()
+    {
+        $rendered = $this->createFormField('short_answer', old: self::MISSING);
+
+        $this->assertSame('above', $rendered['instructions_position']);
+        $this->assertSame('visible', $rendered['visibility']);
+        $this->assertSame(100, $rendered['width']);
+    }
+
+    #[Test]
+    public function common_field_option_defaults_can_be_overridden_by_the_field_config()
+    {
+        $rendered = $this->createFormField('short_answer', old: self::MISSING, config: [
+            'instructions_position' => 'below',
+            'width' => 50,
+        ]);
+
+        $this->assertSame('below', $rendered['instructions_position']);
+        $this->assertSame(50, $rendered['width']);
+    }
+
+    private function createFormField($type, $value = null, $default = null, $old = null, $config = [])
     {
         $config = array_merge($config, ['type' => $type]);
 
@@ -116,7 +138,10 @@ HTML;
             $config['default'] = $default;
         }
 
-        $field = new Field('test', $config);
+        $formField = new FormField('test', $config);
+        $field = $formField->toField();
+        $field->setHandle('test');
+        $field->setFormField($formField);
         $field->setValue($value);
 
         if ($old !== self::MISSING) {
@@ -131,12 +156,12 @@ HTML;
     #[DataProvider('renderTextProvider')]
     public function renders_text_fields($value, $default, $old, $expected)
     {
-        $this->textFieldtypeTest('text', $value, $default, $old, $expected);
+        $this->shortAnswerFieldtypeTest('short_answer', $value, $default, $old, $expected);
     }
 
-    private function textFieldtypeTest($fieldtype, $value, $default, $old, $expected)
+    private function shortAnswerFieldtypeTest($fieldtype, $value, $default, $old, $expected)
     {
-        $rendered = $this->createField($fieldtype, $value, $default, $old);
+        $rendered = $this->createFormField($fieldtype, $value, $default, $old);
 
         $this->assertSame($expected, $rendered['value']);
         $this->assertStringContainsString('value="'.$rendered['value'].'"', $rendered['field']);
@@ -151,14 +176,14 @@ HTML;
             protected static $handle = 'testing';
         })::register();
 
-        $this->textFieldtypeTest('testing', $value, $default, $old, $expected);
+        $this->shortAnswerFieldtypeTest('testing', $value, $default, $old, $expected);
     }
 
     #[Test]
     #[DataProvider('renderTextProvider')]
     public function renders_textarea_fields($value, $default, $old, $expected)
     {
-        $rendered = $this->createField('textarea', $value, $default, $old);
+        $rendered = $this->createFormField('long_answer', $value, $default, $old);
 
         $this->assertSame($expected, $rendered['value']);
         $this->assertStringContainsString('>'.$rendered['value'].'</textarea', $rendered['field']);
@@ -189,7 +214,7 @@ HTML;
     #[DataProvider('renderToggleProvider')]
     public function renders_toggles($value, $default, $old, $expected)
     {
-        $rendered = $this->createField('toggle', $value, $default, $old);
+        $rendered = $this->createFormField('toggle', $value, $default, $old);
 
         $this->assertSame($expected, (bool) $rendered['value']);
         $this->assertStringContainsString('<input type="hidden" name="test" value="0">', $rendered['field']);
@@ -242,7 +267,7 @@ HTML;
     #[DataProvider('renderSingleSelectProvider')]
     public function renders_single_select_fields($value, $default, $old, $expected)
     {
-        $rendered = $this->createField('select', $value, $default, $old, [
+        $rendered = $this->createFormField('dropdown', $value, $default, $old, [
             'options' => $options = [
                 'alfa' => 'Alfa',
                 'bravo' => 'Bravo',
@@ -268,7 +293,7 @@ HTML;
     #[DataProvider('renderSingleSelectProvider')]
     public function renders_radio_fields($value, $default, $old, $expected)
     {
-        $rendered = $this->createField('radio', $value, $default, $old, [
+        $rendered = $this->createFormField('multi_choice', $value, $default, $old, [
             'options' => $options = [
                 'alfa' => 'Alfa',
                 'bravo' => 'Bravo',
@@ -279,12 +304,12 @@ HTML;
         if ($expected) {
             $unexpected = array_keys(Arr::except($options, $expected));
             $this->assertTrue(
-                (bool) preg_match('/value="'.$expected.'"\s+checked/', $rendered['field']),
+                (bool) preg_match('/value="'.$expected.'"[^>]*checked/s', $rendered['field']),
                 'The "'.$expected.'" radio button was not checked within '.$rendered['field'],
             );
             foreach ($unexpected as $e) {
                 $this->assertFalse(
-                    (bool) preg_match('/value="'.$e.'"\s+checked/', $rendered['field']),
+                    (bool) preg_match('/value="'.$e.'"[^>]*checked/s', $rendered['field']),
                     'The "'.$expected.'" radio button was checked within '.$rendered['field'],
                 );
             }
@@ -314,7 +339,7 @@ HTML;
     #[DataProvider('renderMultipleSelectProvider')]
     public function renders_multiple_select_fields($value, $default, $old, $expected)
     {
-        $rendered = $this->createField('select', $value, $default, $old, [
+        $rendered = $this->createFormField('dropdown', $value, $default, $old, [
             'multiple' => true,
             'options' => $options = [
                 'alfa' => 'Alfa',
@@ -344,7 +369,7 @@ HTML;
     #[DataProvider('renderMultipleSelectProvider')]
     public function renders_checkboxes_fields($value, $default, $old, $expected)
     {
-        $rendered = $this->createField('checkboxes', $value, $default, $old, [
+        $rendered = $this->createFormField('checkboxes', $value, $default, $old, [
             'options' => $options = [
                 'alfa' => 'Alfa',
                 'bravo' => 'Bravo',

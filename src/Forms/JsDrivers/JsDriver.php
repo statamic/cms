@@ -10,6 +10,8 @@ interface JsDriver
 
     public function addToRenderableFieldData($field, $data);
 
+    // public function addToRenderablePageData($page, array $data): array;
+
     public function addToRenderableFieldAttributes($field);
 
     public function render($html);

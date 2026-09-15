@@ -76,9 +76,94 @@
     }
 }
 
+/*
+    Break out of .content-card horizontal padding and [data-max-width-wrapper] max-w-page
+    so content can span the card while staying aligned with padded siblings on scroll.
+
+    HTML Example:
+    <div class="content-card">
+        (direct descendants only)
+        <div class="st-full-bleed-content">
+            <div>…wide / scrollable content…</div>
+        </div>
+    </div>
+*/
+@utility st-full-bleed-content {
+    @apply -mx-2 sm:-mx-6 md:-mx-12 min-w-0;
+
+    & > * {
+        @apply min-w-0 pb-6;
+    }
+}
+
+/*
+    When a page renders full-height, full-bleed content (e.g. the forms logic
+    tree), build a definite-height flex chain from the scroll container down so
+    the region fills the viewport exactly and only its inner panels scroll,
+    rather than the page itself.
+*/
+#content-card:has(.st-full-bleed-content) {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+.content-card:has(.st-full-bleed-content) {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    min-width: 0;
+    overflow-x: clip;
+    padding-bottom: 0;
+}
+[data-max-width-wrapper]:has(.st-full-bleed-content) {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    margin-bottom: 0;
+    max-width: none !important;
+}
+
+/*
+    Show a block-start border once the page or an inner panel has scrolled.
+
+    - On the element: tracks the nearest ancestor scroll container (e.g. #main-content).
+    - On descendant .overflow-y-auto panels: tracks their own scroll (e.g. logic tree splitters).
+*/
+@utility st-separator-on-scroll {
+    &, & :where(.overflow-y-auto) {
+        border-block-start: 1px solid transparent;
+        animation: separator-on-scroll linear both;
+        animation-range: 0.5rem 100%;
+    }
+
+    animation-timeline: scroll(nearest block);
+
+    & :where(.overflow-y-auto) {
+        animation-timeline: scroll(self block);
+    }
+}
+
+@keyframes separator-on-scroll {
+    0% {
+        border-block-start-color: transparent;
+    }
+
+    0.01%,
+    100% {
+        border-block-start-color: var(--color-content-border);
+    }
+}
+
 /* UTILITIES / TEXT
 =================================================== */
-/* Avoid prefixing things with `st-text-` (st for Statamic) because `text-` is a Tailwind prefix */
+/* Prefix things with `st-text-` (st for Statamic) because `text-` is a Tailwind prefix */
+@utility st-text-trim-cap {
+    /* =Jay. This is the banger you probably want */
+    text-box: cap alphabetic;
+}
+
 @utility st-text-trim-start {
     text-box: trim-start;
     /* =Jay. When we have an SVG we probably don't want to text trim, for example in a Markdown field with button controls like Bold, Italic, etc. */
@@ -92,11 +177,9 @@
         text-box: unset;
     }
 }
-@utility st-text-trim-cap {
-    /* =Jay. Sometimes this is handy e.g. the text inside the command palette searchbox */
-    text-box: cap alphabetic;
-}
+
 @utility st-text-trim-ex-alphabetic {
+    /* =Jay. More useful for all lowercase text */
     text-box: ex alphabetic;
 }
 
@@ -284,6 +367,7 @@
 */
 @utility bg-architectural-lines {
     &:not(:has(.page-tree-branch)) {
+        position: relative;
         &::before {
             content: '';
             pointer-events: none;
@@ -350,6 +434,59 @@
                 }
             }
         }
+    }
+}
+
+/* UTILITIES / DECORATION / GRAPH PAPER
+=================================================== */
+/* Notes...
+
+    URL example
+    -----------
+    /cp/forms/ > editing experience
+
+    What does it do?
+    ----------------
+    - Add a background image of graph paper to the element.
+
+*/
+/* HTML Example...
+
+    <div class="content-card bg-graph-paper"> <-- background graph paper added to this element
+    </div>
+
+*/
+@utility bg-graph-paper {
+    position: relative;
+
+    &::before {
+        border-radius: inherit;
+        content: '';
+        position: absolute;
+        top: var(--graph-paper-y-offset);
+        z-index: var(--z-index-below);
+        opacity: 0.7;
+        /* Effectively remove the right border */
+        width: calc(100% - 6px);
+        height: calc(100% - var(--graph-paper-y-offset));
+
+        /* https://css-pattern.com/graph-paper/ */
+        /* control the size */
+        --s: 120px;
+        --c1: var(--color-gray-200);
+        --c2: transparent;
+        --_g: #0000 90deg,var(--c1) 0;
+        background:
+          conic-gradient(from 90deg at 1px 1px,var(--_g)),
+          conic-gradient(from 90deg at 1px 1px,var(--_g)),
+          var(--c2);
+        background-size: var(--s) var(--s), calc(var(--s)/5) calc(var(--s)/5);
+        /* Effectively remove the left border */
+        background-position: -1px;
+    }
+    .dark &::before {
+        --c1: var(--color-gray-800);
+        opacity: 0.35;
     }
 }
 

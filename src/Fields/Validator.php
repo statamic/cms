@@ -77,7 +77,7 @@ class Validator
         }
 
         return $this->preProcessedFields()->all()->reduce(function ($carry, $field) {
-            if (request()->isPrecognitive() && $field->type() == 'assets') {
+            if (request()->isPrecognitive() && in_array($field->type(), ['assets', 'files', 'form_upload'], true)) {
                 return $carry;
             }
 

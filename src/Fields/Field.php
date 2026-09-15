@@ -10,6 +10,7 @@ use Rebing\GraphQL\Support\Field as GqlField;
 use Statamic\Contracts\Forms\Form;
 use Statamic\Facades\Field as FieldFacade;
 use Statamic\Facades\GraphQL;
+use Statamic\Forms\Fields\FormField;
 use Statamic\Rules\Handle;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -30,6 +31,7 @@ class Field implements Arrayable
     protected $parentIndex;
     protected $validationContext;
     protected ?Form $form = null;
+    protected ?FormField $formField = null;
 
     public function __construct($handle, array $config)
     {
@@ -485,7 +487,7 @@ class Field implements Arrayable
         return $this->fieldtype()->isRelationship();
     }
 
-    public function setForm(Form $form)
+    public function setForm(Form $form): self
     {
         $this->form = $form;
 
@@ -497,21 +499,21 @@ class Field implements Arrayable
         return $this->form;
     }
 
+    public function setFormField(FormField $formField): self
+    {
+        $this->formField = $formField;
+
+        return $this;
+    }
+
+    public function formField(): ?FormField
+    {
+        return $this->formField;
+    }
+
     public static function commonFieldOptions(): Fields
     {
-        $reserved = [
-            'content_type',
-            'elseif',
-            'endif',
-            'endunless',
-            'if',
-            'length',
-            'reference',
-            'resource',
-            'status',
-            'unless',
-            'views',
-        ];
+        $reserved = static::reservedHandles();
 
         $fields = collect([
             'display' => [
@@ -626,5 +628,22 @@ class Field implements Arrayable
         ])->map(fn ($field, $handle) => compact('handle', 'field'))->values()->all();
 
         return new ConfigFields($fields);
+    }
+
+    public static function reservedHandles(): array
+    {
+        return [
+            'content_type',
+            'elseif',
+            'endif',
+            'endunless',
+            'if',
+            'length',
+            'reference',
+            'resource',
+            'status',
+            'unless',
+            'views',
+        ];
     }
 }
