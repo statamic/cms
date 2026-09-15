@@ -409,6 +409,43 @@ class UpdateTermReferencesTest extends TestCase
     }
 
     #[Test]
+    public function it_nullifies_references_when_deleting_a_term_cached_without_its_original_state()
+    {
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'favourites',
+                    'field' => [
+                        'type' => 'terms',
+                        'taxonomies' => ['topics'],
+                        'mode' => 'select',
+                    ],
+                ],
+            ],
+        ]);
+
+        $entry = tap(Facades\Entry::make()->collection($collection)->data([
+            'favourites' => ['hoff', 'norris'],
+        ]))->save();
+
+        // Mimic an item cached by a version that didn't sync the original state.
+        $store = Facades\Stache::store('terms')->store('topics');
+        $item = Facades\Term::find('topics::hoff');
+        (function () {
+            $this->original = [];
+        })->call($item->term());
+        (function () use ($item) {
+            $this->cacheItem($item);
+        })->call($store);
+
+        Facades\Term::find('topics::hoff')->delete();
+
+        $this->assertEquals(['norris'], $entry->fresh()->get('favourites'));
+    }
+
+    #[Test]
     public function it_keeps_a_term_retrieved_from_the_stache_dirty_until_it_has_been_saved()
     {
         $dirty = null;
