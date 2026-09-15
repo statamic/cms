@@ -91,22 +91,23 @@ class TreeBuilder
             $page = $item['page'];
             $collection = $page->mountedCollection();
             $referenceExists = $page->referenceExists();
+            $entry = $referenceExists ? $page->entry() : null;
 
             return [
                 'id' => $page->id(),
                 'entry' => $page->reference(),
                 'title' => $page->hasCustomTitle() ? $page->title() : null,
-                'entry_title' => $referenceExists ? $page->entry()->value('title') : null,
-                'entry_blueprint' => $referenceExists ? [
-                    'handle' => $page->entry()->blueprint()->handle(),
-                    'title' => $page->entry()->blueprint()->title(),
+                'entry_title' => $entry ? $entry->value('title') : null,
+                'entry_blueprint' => $entry ? [
+                    'handle' => $entry->blueprint()->handle(),
+                    'title' => $entry->blueprint()->title(),
                 ] : null,
                 'url' => $page->url(),
                 'edit_url' => $page->editUrl(),
-                'can_delete' => $referenceExists ? User::current()->can('delete', $page->entry()) : true,
+                'can_delete' => $entry ? User::current()->can('delete', $entry) : true,
                 'slug' => $page->slug(),
                 'status' => $referenceExists ? $page->status() : null,
-                'redirect' => $referenceExists ? $page->entry()->get('redirect') : null,
+                'redirect' => $entry ? $entry->get('redirect') : null,
                 'collection' => ! $collection ? null : [
                     'handle' => $collection->handle(),
                     'title' => $collection->title(),
