@@ -91,7 +91,7 @@ class Embed implements Arrayable, ArrayAccess, Boolable, JsonSerializable
     #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
-        return $this->toArray();
+        return (string) $this;
     }
 
     #[\ReturnTypeWillChange]
