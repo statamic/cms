@@ -25,7 +25,7 @@
             <button
                 v-if="showFilename"
                 @click="editOrOpen"
-                class="min-w-0 flex-1 truncate text-start text-sm leading-5"
+                class="flex min-w-0 flex-col w-full flex-1 justify-center gap-1 truncate text-sm leading-5 text-gray-600 dark:text-gray-400 text-start"
                 :class="{
                     'text-gray-600 dark:text-gray-300': !asset.invalid,
                     'text-gray-500 dark:text-gray-400': asset.invalid
@@ -33,7 +33,10 @@
                 :title="asset.invalid ? invalidLabel : __('Edit')"
                 :aria-label="__('Edit Asset')"
             >
-                {{ label }}
+                <div>{{ label }}</div>
+                <template v-if="errors.length">
+                    <small class="text-xs text-red-500" v-for="(error, i) in errors" :key="i" v-text="error" />
+                </template>
             </button>
             <div v-if="readOnly" v-text="asset.size" class="asset-filesize hidden shrink-0 px-2 text-sm leading-5 text-gray-600 dark:text-gray-400 @xs:block" />
         </td>
