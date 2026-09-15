@@ -60,6 +60,8 @@ class TaxonomyTermsStore extends ChildStore
 
         $term->dataForLocale($term->defaultLocale(), $data);
 
+        $term->syncOriginal();
+
         return $term;
     }
 
@@ -73,23 +75,22 @@ class TaxonomyTermsStore extends ChildStore
         $this->handleFileChanges();
 
         if ($item = $this->getCachedItem($key)) {
-            $item->term()->syncOriginal();
-
             return $item;
         }
 
         [$site, $slug] = explode('::', $key);
 
         if ($path = $this->getPath($key)) {
-            $item = $this->makeItemFromFile($path, File::get($path))->in($site);
+            $term = $this->makeItemFromFile($path, File::get($path));
         } else {
-            $item = Term::make($slug)
+            $term = Term::make($slug)
                 ->taxonomy($this->childKey())
-                ->set('title', $this->index('title')->get($key))
-                ->in($site);
+                ->set('title', $this->index('title')->get($key));
         }
 
-        $item->term()->syncOriginal();
+        $term->syncOriginal();
+
+        $item = $term->in($site);
 
         $this->cacheItem($item);
 

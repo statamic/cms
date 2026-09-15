@@ -2,8 +2,10 @@
 
 namespace Tests\Listeners;
 
+use Illuminate\Support\Facades\Event;
 use Orchestra\Testbench\Attributes\DefineEnvironment;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Events\TermSaving;
 use Statamic\Facades;
 use Statamic\Support\Arr;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -374,6 +376,52 @@ class UpdateTermReferencesTest extends TestCase
 
         $this->assertEquals(['hoff'], $entry->fresh()->get('topics'));
         $this->assertNull(Facades\Term::find('topics::ghost'));
+    }
+
+    #[Test]
+    public function it_updates_references_when_renaming_a_term_retrieved_from_the_stache()
+    {
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'favourite',
+                    'field' => [
+                        'type' => 'terms',
+                        'taxonomies' => ['topics'],
+                        'max_items' => 1,
+                        'mode' => 'select',
+                    ],
+                ],
+            ],
+        ]);
+
+        $entry = tap(Facades\Entry::make()->collection($collection)->data([
+            'favourite' => 'hoff',
+        ]))->save();
+
+        $term = Facades\Term::find('topics::hoff');
+        $term->slug('hoff-new');
+        $term->save();
+
+        $this->assertEquals('hoff-new', $entry->fresh()->get('favourite'));
+    }
+
+    #[Test]
+    public function it_keeps_a_term_retrieved_from_the_stache_dirty_until_it_has_been_saved()
+    {
+        $dirty = null;
+
+        Event::listen(TermSaving::class, function ($event) use (&$dirty) {
+            $dirty = $event->term->isDirty('title');
+        });
+
+        $term = Facades\Term::find('topics::hoff');
+        $term->set('title', 'The Hoff');
+        $term->save();
+
+        $this->assertTrue($dirty);
     }
 
     #[Test]
