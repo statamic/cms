@@ -74,9 +74,26 @@ final class InstallableModule extends Module
     {
         $this->installableFiles()->each(function ($toPath, $fromPath) {
             $this->installFile($fromPath, $toPath, $this->installer->console());
+            $this->loadInstalledConfig($toPath);
         });
 
         return $this;
+    }
+
+    /**
+     * Load installed config file into the running app, so later install steps see it.
+     */
+    private function loadInstalledConfig(string $path): void
+    {
+        $configPath = Path::tidy(config_path()).'/';
+
+        if (! Str::startsWith($path, $configPath) || ! Str::endsWith($path, '.php')) {
+            return;
+        }
+
+        $key = Str::of($path)->after($configPath)->beforeLast('.php')->replace('/', '.')->toString();
+
+        config()->set($key, array_merge(config($key, []), require $path));
     }
 
     /**

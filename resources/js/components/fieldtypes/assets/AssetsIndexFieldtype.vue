@@ -1,7 +1,7 @@
 <template>
     <div class="flex text-2xs gap-2">
         <a v-for="asset in value.assets.slice(0, value.total > 6 ? 5 : 6)" :key="asset.id" :href="asset.url" target="_blank">
-            <asset-thumbnail :asset="asset" class="-my-1 h-8 max-w-3xs" />
+            <asset-thumbnail :asset="asset" :alt="asset.basename" class="-my-1 h-8 max-w-3xs" />
         </a>
         <span
             v-if="value.total > 6"
