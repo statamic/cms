@@ -114,8 +114,12 @@ class Embed implements Arrayable, ArrayAccess, Boolable, JsonSerializable
     /**
      * Turn a link that's direct to a video's page into its embeddable equivalent.
      */
-    public static function embedUrl(string $url): string
+    public static function embedUrl(?string $url): ?string
     {
+        if (blank($url)) {
+            return $url;
+        }
+
         if (Str::contains($url, self::VIMEO)) {
             return static::vimeoEmbedUrl($url);
         }
@@ -157,9 +161,9 @@ class Embed implements Arrayable, ArrayAccess, Boolable, JsonSerializable
         return $url;
     }
 
-    public static function isEmbeddable(string $url): bool
+    public static function isEmbeddable(?string $url): bool
     {
-        return Str::contains($url, ['youtu.be', 'youtube', self::VIMEO]);
+        return filled($url) && Str::contains($url, ['youtu.be', 'youtube', self::VIMEO]);
     }
 
     protected static function isVideoFile(string $url): bool
