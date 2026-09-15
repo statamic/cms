@@ -140,6 +140,8 @@
                     :url="entriesActionUrl"
                     :context="{ view: 'tree' }"
                     :item="branch.entry"
+                    @started="treeActionStarted"
+                    @completed="treeActionCompleted"
                     v-slot="{ actions, loadActions, shouldShowSkeleton }"
                 >
                     <Dropdown
@@ -172,7 +174,12 @@
                                 @click="deleteTreeBranch(branch, removeBranch)"
                             />
 
-                            <DropdownSeparator v-if="shouldShowSkeleton || branchTreeActions(actions).length" />
+                            <DropdownSeparator
+                                v-if="
+                                    (depth < structureMaxDepth || branch.can_delete) &&
+                                    (shouldShowSkeleton || branchTreeActions(actions).length)
+                                "
+                            />
 
                             <template v-if="shouldShowSkeleton">
                                 <div v-for="index in 3" :key="index" class="contents">
@@ -467,7 +474,29 @@ export default {
         },
 
         branchTreeActions(actions) {
-            return (actions || []).filter((action) => action.handle !== 'delete');
+            // Destructive actions (e.g. Delete, DeleteMultisiteEntry) are excluded, since
+            // deleting from the tree is handled by the tree-aware "Delete" item instead.
+            return (actions || []).filter((action) => !action.dangerous);
+        },
+
+        treeActionStarted() {
+            Statamic.$progress.loading('action', true);
+        },
+
+        treeActionCompleted(successful = null, response = {}) {
+            Statamic.$progress.loading('action', false);
+
+            if (!successful) {
+                Statamic.$toast.error(response.message || __('Action failed'));
+                return;
+            }
+
+            if (response.message !== false) {
+                Statamic.$toast.success(response.message || __('Action completed'));
+            }
+
+            // Reloading the tree would discard any unsaved structure changes.
+            if (!this.treeIsDirty) this.$refs.tree?.refresh();
         },
 
         createEntry(blueprint, parent) {

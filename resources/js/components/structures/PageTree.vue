@@ -218,6 +218,12 @@ export default {
             });
         },
 
+        refresh() {
+            return this.getPages().then(() => {
+                this.initialPages = clone(this.pages);
+            });
+        },
+
         treeUpdated() {
             this.pages = this.$refs.tree.getData();
             this.$emit('changed', this.pages);
