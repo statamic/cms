@@ -39,7 +39,7 @@ class ListedTerm extends JsonResource
             ])),
 
             'parent_path' => $term->taxonomy()->hierarchical()
-                ? ($term->ancestors()->map->title()->implode(' » ') ?: null)
+                ? ($term->ancestors()->map->title()->implode(' › ') ?: null)
                 : null,
 
             'permalink' => $term->absoluteUrl(),
