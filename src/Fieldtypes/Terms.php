@@ -568,8 +568,9 @@ class Terms extends Relationship
     protected function pathDelimiter(): ?string
     {
         // Typing a path creates the terms it names, so the field needs to know how to split
-        // what was typed into the same segments the save will.
-        return $this->hasHierarchicalTaxonomy() ? EnsuresTermPaths::DELIMITER : null;
+        // what was typed into the same segments the save will. Only a single configured
+        // taxonomy ever creates anything, so anywhere else a path would just be a string.
+        return $this->hierarchicalTaxonomy() ? EnsuresTermPaths::DELIMITER : null;
     }
 
     /**

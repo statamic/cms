@@ -90,6 +90,20 @@ class TermsHierarchyTest extends TestCase
     }
 
     #[Test]
+    public function preload_has_no_path_delimiter_when_more_than_one_taxonomy_is_configured()
+    {
+        tap(Facades\Taxonomy::make('tags'))->save();
+
+        $this->assertNull($this->fieldtype(['taxonomies' => ['categories', 'tags']])->preload()['pathDelimiter']);
+    }
+
+    #[Test]
+    public function preload_has_no_path_delimiter_when_no_taxonomies_are_configured()
+    {
+        $this->assertNull($this->fieldtype([])->preload()['pathDelimiter']);
+    }
+
+    #[Test]
     public function the_item_hint_is_only_the_taxonomy_when_more_than_one_is_configured()
     {
         tap(Facades\Taxonomy::make('tags'))->save();
