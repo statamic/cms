@@ -19,6 +19,9 @@ import {
     PanelFooter,
 } from '@ui';
 
+/**
+ * @import import { Listing } from '@statamic/cms/ui';
+ */
 const meta = {
     title: 'Layout/Listing',
     component: Listing,

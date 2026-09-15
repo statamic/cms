@@ -10,6 +10,9 @@ import {
     ContextSeparator
 } from '@ui';
 
+/**
+ * @import import { Context } from '@statamic/cms/ui';
+ */
 const meta = {
     title: 'Overlays/Context',
     component: Context,

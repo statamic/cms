@@ -1,6 +1,9 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
 import {Button, Heading, Popover, Textarea} from '@ui';
 
+/**
+ * @import import { Popover } from '@statamic/cms/ui';
+ */
 const meta = {
     title: 'Overlays/Popover',
     component: Popover,

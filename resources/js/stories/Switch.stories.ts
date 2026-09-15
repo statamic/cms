@@ -2,6 +2,9 @@ import type {Meta, StoryObj} from '@storybook/vue3';
 import {Switch} from '@ui';
 import {ref} from 'vue';
 
+/**
+ * @import import { Switch } from '@statamic/cms/ui';
+ */
 const meta = {
     title: 'Forms/Switch',
     component: Switch,

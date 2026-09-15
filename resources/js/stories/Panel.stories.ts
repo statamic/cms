@@ -1,6 +1,9 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
 import {Button, Card, Description, Heading, Panel, PanelFooter, PanelHeader} from '@ui';
 
+/**
+ * @import import { Panel } from '@statamic/cms/ui';
+ */
 const meta = {
     title: 'Layout/Panel',
     component: Panel,

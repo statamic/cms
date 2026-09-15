@@ -1,6 +1,9 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
 import {Radio, RadioGroup} from '@ui';
 
+/**
+ * @import import { Radio } from '@statamic/cms/ui';
+ */
 const meta = {
     title: 'Forms/Radio',
     component: Radio,

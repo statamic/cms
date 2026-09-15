@@ -11,6 +11,9 @@ import {
     TabProvider,
 } from '@ui';
 
+/**
+ * @import import { PublishContainer } from '@statamic/cms/ui';
+ */
 const meta = {
     title: 'Components/PublishContainer',
     component: PublishContainer,

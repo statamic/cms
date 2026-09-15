@@ -3,6 +3,9 @@ import {Badge} from '@ui';
 import {computed} from 'vue';
 import {icons} from "@/stories/icons";
 
+/**
+ * @import import { Badge } from '@statamic/cms/ui';
+ */
 const meta = {
     title: 'Components/Badge',
     component: Badge,

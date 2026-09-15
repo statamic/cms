@@ -2,6 +2,9 @@ import type {Meta, StoryObj} from '@storybook/vue3';
 import {Badge, Button, Header} from '@ui';
 import {icons} from "@/stories/icons";
 
+/**
+ * @import import { Header } from '@statamic/cms/ui';
+ */
 const meta = {
     title: 'Layout/Header',
     component: Header,

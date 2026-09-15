@@ -1,6 +1,9 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
 import {Button, Dropdown, DropdownFooter, DropdownHeader, DropdownItem, DropdownMenu, DropdownSeparator} from '@ui';
 
+/**
+ * @import import { Dropdown } from '@statamic/cms/ui';
+ */
 const meta = {
     title: 'Overlays/Dropdown',
     component: Dropdown,
