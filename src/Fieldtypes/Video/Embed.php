@@ -75,7 +75,7 @@ class Embed implements Arrayable, ArrayAccess, Boolable, JsonSerializable
 
     public function toBool(): bool
     {
-        return $this->isSupported();
+        return (bool) $this->url;
     }
 
     public function __toString(): string
