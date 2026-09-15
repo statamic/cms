@@ -2,23 +2,36 @@
 
 namespace Tests\Imaging;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\Psr7\Response;
 use Illuminate\Cache\FileStore;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use InvalidArgumentException;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use League\Glide\Server;
+use Orchestra\Testbench\Attributes\DefineEnvironment;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Imaging\UrlBuilder;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
+use Statamic\Facades\Config;
 use Statamic\Facades\File;
 use Statamic\Facades\Glide;
 use Statamic\Facades\Path;
+use Statamic\Imaging\GlideCachePathResolver;
 use Statamic\Imaging\GlideUrlBuilder;
+use Statamic\Imaging\HybridUrlBuilder;
 use Statamic\Imaging\ImageGenerator;
+use Statamic\Imaging\RemoteUrlValidator;
 use Statamic\Imaging\StaticUrlBuilder;
+use Statamic\Providers\GlideServiceProvider;
 use Statamic\Support\Str;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -30,6 +43,10 @@ class GlideTest extends TestCase
     public function tearDown(): void
     {
         $this->clearGlideCache();
+
+        if (file_exists($path = public_path('img'))) {
+            File::delete($path);
+        }
 
         parent::tearDown();
     }
@@ -68,6 +85,349 @@ class GlideTest extends TestCase
         $this->assertEquals(public_path('imgcache').DIRECTORY_SEPARATOR, $this->getRootFromLocalAdapter($adapter));
         $this->assertInstanceOf(StaticUrlBuilder::class, $this->app[UrlBuilder::class]);
         $this->assertEquals('/imgs', Glide::url());
+    }
+
+    #[Test]
+    public function hybrid_caching_will_make_a_filesystem_using_the_cache_path_location()
+    {
+        config([
+            'statamic.assets.image_manipulation.route' => 'imgs',
+            'statamic.assets.image_manipulation.cache' => 'hybrid',
+            'statamic.assets.image_manipulation.cache_path' => public_path('imgcache'),
+        ]);
+
+        $cache = Glide::server()->getCache();
+
+        $this->assertLocalAdapter($adapter = $this->getAdapterFromFilesystem($cache));
+        $this->assertEquals('public', $this->defaultFolderVisibility($cache));
+        $this->assertEquals(public_path('imgcache').DIRECTORY_SEPARATOR, $this->getRootFromLocalAdapter($adapter));
+        $this->assertInstanceOf(HybridUrlBuilder::class, $this->app[UrlBuilder::class]);
+        $this->assertEquals('/imgs', Glide::url());
+    }
+
+    #[Test]
+    public function hybrid_caching_without_cache_path_will_throw_exception()
+    {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Image manipulation cache path is not defined.');
+
+        config([
+            'statamic.assets.image_manipulation.route' => 'imgs',
+            'statamic.assets.image_manipulation.cache' => 'hybrid',
+            'statamic.assets.image_manipulation.cache_path' => null,
+        ]);
+
+        Glide::server()->getCache();
+    }
+
+    #[Test]
+    public function hybrid_caching_is_detected_as_half_measure()
+    {
+        config(['statamic.assets.image_manipulation.cache' => 'hybrid']);
+
+        $this->assertTrue(Glide::isUsingHybridCaching());
+        $this->assertFalse(Glide::shouldServeDirectly());
+        $this->assertFalse(Glide::shouldServeByHttp());
+    }
+
+    #[Test]
+    #[DataProvider('cachePathServedByRouteProvider')]
+    public function hybrid_caching_knows_when_the_cache_path_is_served_by_the_route($route, $cachePath, $expected)
+    {
+        config([
+            'statamic.assets.image_manipulation.cache' => 'hybrid',
+            'statamic.assets.image_manipulation.route' => $route,
+            'statamic.assets.image_manipulation.cache_path' => $cachePath(),
+        ]);
+
+        $this->assertSame($expected, Glide::cachePathIsServedByRoute());
+    }
+
+    public static function cachePathServedByRouteProvider()
+    {
+        return [
+            'matching' => ['img', fn () => public_path('img'), true],
+            'matching with slashes' => ['/img/', fn () => public_path('img/'), true],
+            'matching absolute route' => ['http://localhost/img', fn () => public_path('img'), true],
+            'matching nested' => ['assets/img', fn () => public_path('assets/img'), true],
+            'different directory' => ['img', fn () => public_path('imgcache'), false],
+            'outside public' => ['img', fn () => storage_path('img'), false],
+        ];
+    }
+
+    #[Test]
+    public function hybrid_caching_warns_when_the_cache_path_is_not_served_by_the_route()
+    {
+        config([
+            'statamic.assets.image_manipulation.cache' => 'hybrid',
+            'statamic.assets.image_manipulation.route' => 'img',
+            'statamic.assets.image_manipulation.cache_path' => public_path('imgcache'),
+        ]);
+
+        Log::shouldReceive('warning')->once()->withArgs(fn ($message) => str_contains($message, 'hybrid'));
+
+        (new GlideServiceProvider($this->app))->boot();
+    }
+
+    #[Test]
+    public function hybrid_caching_does_not_warn_when_the_cache_path_is_served_by_the_route()
+    {
+        config([
+            'statamic.assets.image_manipulation.cache' => 'hybrid',
+            'statamic.assets.image_manipulation.route' => 'img',
+            'statamic.assets.image_manipulation.cache_path' => public_path('img'),
+        ]);
+
+        Log::shouldReceive('warning')->never();
+
+        (new GlideServiceProvider($this->app))->boot();
+    }
+
+    #[Test]
+    public function hybrid_caching_predicted_path_matches_generated_path()
+    {
+        config([
+            'statamic.assets.image_manipulation.cache' => false,
+            'statamic.assets.auto_crop' => true,
+        ]);
+
+        $asset = $this->createAsset();
+
+        $server = $this->app->make(Server::class);
+        $resolver = new GlideCachePathResolver($server);
+
+        $params = ['w' => 100, 'h' => 50];
+
+        $predictedPath = $resolver->resolveForAsset($asset, $params);
+
+        $generator = new ImageGenerator($server);
+        $generatedPath = $generator->generateByAsset($asset, $params);
+
+        $this->assertEquals($generatedPath, $predictedPath);
+    }
+
+    #[Test]
+    #[DataProvider('remoteUrlProvider')]
+    public function hybrid_caching_predicted_path_matches_generated_path_for_a_url($url)
+    {
+        config(['statamic.assets.image_manipulation.cache' => false]);
+
+        $this->bindRemoteImage();
+
+        $server = $this->app->make(Server::class);
+        $resolver = new GlideCachePathResolver($server);
+
+        $params = ['w' => 100, 'h' => 50];
+
+        $predictedPath = $resolver->resolveForUrl($url, $params);
+
+        $generator = new ImageGenerator($server);
+        $generatedPath = $generator->generateByUrl($url, $params);
+
+        $this->assertEquals($generatedPath, $predictedPath);
+    }
+
+    public static function remoteUrlProvider()
+    {
+        return [
+            'plain' => ['https://example.com/foo/hoff.jpg'],
+            'with query string' => ['https://example.com/foo/hoff.jpg?query=david'],
+        ];
+    }
+
+    #[Test]
+    #[DefineEnvironment('hybridCaching')]
+    public function hybrid_caching_generates_image_on_first_request()
+    {
+        $asset = $this->createAsset();
+        $url = $this->app->make(UrlBuilder::class)->build($asset, ['w' => 100]);
+
+        $resolver = new GlideCachePathResolver($this->app->make(Server::class));
+        $expectedPath = $resolver->resolveForAsset($asset, ['w' => 100]);
+
+        $this->assertFalse(Glide::cacheDisk()->exists($expectedPath));
+
+        $response = $this->get($url);
+
+        $response->assertOk();
+        $response->assertHeader('content-type', 'image/jpeg');
+        $this->assertTrue(Glide::cacheDisk()->exists($expectedPath));
+    }
+
+    #[Test]
+    #[DefineEnvironment('hybridCaching')]
+    public function hybrid_caching_generates_watermarked_image_at_the_predicted_path()
+    {
+        $asset = $this->createAsset('foo/hoff.jpg');
+        $watermark = $this->createAsset('foo/mark.png');
+
+        $url = $this->app->make(UrlBuilder::class)->build($asset, ['w' => 100, 'mark' => $watermark]);
+        $expectedPath = Str::after($url, '/img/');
+
+        $this->assertFalse(Glide::cacheDisk()->exists($expectedPath));
+
+        $response = $this->get($url);
+
+        $response->assertOk();
+        $response->streamedContent();
+        $this->assertTrue(Glide::cacheDisk()->exists($expectedPath));
+    }
+
+    #[Test]
+    #[DefineEnvironment('hybridCaching')]
+    public function hybrid_caching_serves_existing_cached_file()
+    {
+        $fakePath = 'containers/test/fake-hash/image.jpg';
+        $image = UploadedFile::fake()->image('image.jpg', 10, 10);
+        Glide::cacheDisk()->put($fakePath, file_get_contents($image->getPathname()));
+
+        $response = $this->get('/img/'.$fakePath);
+
+        $response->assertOk();
+    }
+
+    #[Test]
+    #[DefineEnvironment('hybridCaching')]
+    public function hybrid_caching_returns_404_when_no_mapping_exists()
+    {
+        $response = $this->get('/img/containers/nonexistent/hash/image.jpg');
+
+        $response->assertNotFound();
+    }
+
+    #[Test]
+    #[DefineEnvironment('hybridCaching')]
+    public function hybrid_caching_returns_404_when_path_traverses_outside_the_cache()
+    {
+        $response = $this->get('/img/../../.env');
+
+        $response->assertNotFound();
+    }
+
+    #[Test]
+    #[DefineEnvironment('hybridCaching')]
+    public function hybrid_caching_regenerates_when_file_deleted_but_mapping_exists()
+    {
+        $asset = $this->createAsset();
+        $url = $this->app->make(UrlBuilder::class)->build($asset, ['w' => 100]);
+
+        $resolver = new GlideCachePathResolver($this->app->make(Server::class));
+        $expectedPath = $resolver->resolveForAsset($asset, ['w' => 100]);
+
+        // Generate the image
+        $response = $this->get($url);
+        $response->assertOk();
+        $response->streamedContent(); // Ensure the file handle is closed (Windows compat)
+        $this->assertTrue(Glide::cacheDisk()->exists($expectedPath));
+
+        // Delete the file but leave the mapping
+        Glide::cacheDisk()->delete($expectedPath);
+        $this->assertFalse(Glide::cacheDisk()->exists($expectedPath));
+
+        // Request again — should regenerate via the mapping
+        $response = $this->get($url);
+        $response->assertOk();
+        $this->assertTrue(Glide::cacheDisk()->exists($expectedPath));
+    }
+
+    #[Test]
+    #[DefineEnvironment('hybridCaching')]
+    public function hybrid_caching_url_has_no_query_params()
+    {
+        $asset = $this->createAsset();
+        $url = $this->app->make(UrlBuilder::class)->build($asset, ['w' => 100]);
+
+        $this->assertStringNotContainsString('?', $url);
+        $this->assertStringStartsWith('/img/', $url);
+    }
+
+    #[Test]
+    #[DefineEnvironment('hybridCaching')]
+    public function hybrid_caching_generates_image_on_first_request_by_asset_id_string()
+    {
+        $asset = $this->createAsset();
+
+        $url = $this->app->make(UrlBuilder::class)->build('test_container::foo/hoff.jpg', ['w' => 100]);
+
+        $resolver = new GlideCachePathResolver($this->app->make(Server::class));
+        $expectedPath = $resolver->resolveForAsset($asset, ['w' => 100]);
+
+        $this->assertFalse(Glide::cacheDisk()->exists($expectedPath));
+
+        $response = $this->get($url);
+
+        $response->assertOk();
+        $response->assertHeader('content-type', 'image/jpeg');
+        $this->assertTrue(Glide::cacheDisk()->exists($expectedPath));
+    }
+
+    #[Test]
+    #[DefineEnvironment('hybridCaching')]
+    public function hybrid_caching_generates_image_on_first_request_by_url()
+    {
+        $this->app->bind(RemoteUrlValidator::class, fn () => new RemoteUrlValidator(function () {
+            throw new \Exception('The host should not be resolved when building a URL.');
+        }));
+
+        $url = $this->app->make(UrlBuilder::class)->build('https://example.com/foo/hoff.jpg', ['w' => 100]);
+        $expectedPath = Str::after($url, '/img/');
+
+        $this->assertStringStartsWith('/img/http/foo/hoff.jpg/', $url);
+        $this->assertSame([
+            'type' => 'url',
+            'url' => 'https://example.com/foo/hoff.jpg',
+            'params' => ['w' => 100],
+        ], Glide::cacheStore()->get('hybrid::'.$expectedPath));
+        $this->assertFalse(Glide::cacheDisk()->exists($expectedPath));
+
+        $this->bindRemoteImage();
+
+        $response = $this->get($url);
+
+        $response->assertOk();
+        $response->assertHeader('content-type', 'image/jpeg');
+        $this->assertTrue(Glide::cacheDisk()->exists($expectedPath));
+    }
+
+    #[Test]
+    #[DefineEnvironment('hybridCaching')]
+    public function hybrid_caching_generates_image_on_first_request_by_path()
+    {
+        $fakeImage = UploadedFile::fake()->image('test-path.jpg', 30, 60);
+        $imagePath = 'test-path.jpg';
+
+        file_put_contents(public_path($imagePath), file_get_contents($fakeImage->getPathname()));
+
+        $url = $this->app->make(UrlBuilder::class)->build($imagePath, ['w' => 100]);
+
+        $resolver = new GlideCachePathResolver($this->app->make(Server::class));
+        $expectedPath = $resolver->resolveForPath($imagePath, ['w' => 100]);
+
+        $this->assertFalse(Glide::cacheDisk()->exists($expectedPath));
+
+        $response = $this->get($url);
+
+        $response->assertOk();
+        $this->assertTrue(Glide::cacheDisk()->exists($expectedPath));
+
+        @unlink(public_path($imagePath));
+    }
+
+    #[Test]
+    #[DefineEnvironment('hybridCaching')]
+    public function hybrid_caching_only_registers_the_cache_path_route()
+    {
+        $asset = $this->createAsset();
+
+        $uris = collect(Route::getRoutes()->getRoutes())->map->uri();
+
+        $this->assertContains('img/{path}', $uris->all());
+        $this->assertNotContains('img/asset/{container}/{path?}', $uris->all());
+        $this->assertNotContains('img/http/{url}/{filename?}', $uris->all());
+
+        $signedUrl = (new GlideUrlBuilder(['key' => Config::getAppKey(), 'route' => '/img']))->build($asset, ['w' => 100]);
+
+        $this->get($signedUrl)->assertNotFound();
     }
 
     #[Test]
@@ -244,5 +604,37 @@ class GlideTest extends TestCase
         }
 
         return collect(array_merge([$manifestCacheKey], $manifest));
+    }
+
+    private function createAsset(string $path = 'foo/hoff.jpg'): AssetContract
+    {
+        if (! $container = AssetContainer::find('test_container')) {
+            Storage::fake('test');
+            $container = tap(AssetContainer::make('test_container')->disk('test'))->save();
+        }
+
+        $file = UploadedFile::fake()->image(basename($path), 30, 60);
+        Storage::disk('test')->putFileAs(dirname($path), $file, basename($path));
+
+        return tap($container->makeAsset($path))->save();
+    }
+
+    private function bindRemoteImage()
+    {
+        $this->app->bind(RemoteUrlValidator::class, fn () => new RemoteUrlValidator(fn () => [['ip' => '93.184.216.34']]));
+
+        $this->app->bind('statamic.imaging.guzzle', function () {
+            $file = UploadedFile::fake()->image('', 30, 60);
+            $response = new Response(200, [], file_get_contents($file->getPathname()));
+
+            return new Client(['handler' => new MockHandler([$response, $response, $response])]);
+        });
+    }
+
+    protected function hybridCaching($app)
+    {
+        $app['config']->set('statamic.assets.image_manipulation.cache', 'hybrid');
+        $app['config']->set('statamic.assets.image_manipulation.cache_path', public_path('img'));
+        $app['config']->set('statamic.assets.image_manipulation.route', 'img');
     }
 }

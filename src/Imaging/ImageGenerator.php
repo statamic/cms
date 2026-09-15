@@ -83,7 +83,7 @@ class ImageGenerator
     public function generateByPath($path, array $params)
     {
         return Glide::cacheStore()->rememberForever(
-            'path::'.$path.'::'.md5(json_encode($params)),
+            static::manipulationCacheKey('path', $path, $params),
             fn () => $this->doGenerateByPath($path, $params)
         );
     }
@@ -109,7 +109,7 @@ class ImageGenerator
     public function generateByUrl($url, array $params)
     {
         return Glide::cacheStore()->rememberForever(
-            'url::'.$url.'::'.md5(json_encode($params)),
+            static::manipulationCacheKey('url', $url, $params),
             fn () => $this->doGenerateByUrl($url, $params)
         );
     }
@@ -163,7 +163,7 @@ class ImageGenerator
             return '';
         }
 
-        $manipulationCacheKey = 'asset::'.$asset->id().'::'.md5(json_encode($params));
+        $manipulationCacheKey = static::manipulationCacheKey('asset', $asset, $params);
         $manifestCacheKey = static::assetCacheManifestKey($asset);
 
         // Store the cache key for this manipulation in a manifest so that we can easily remove when deleting an asset.
@@ -194,6 +194,17 @@ class ImageGenerator
         return $this->generate($this->asset->basename());
     }
 
+    public static function manipulationCacheKey(string $type, $item, array $params): string
+    {
+        $id = $item;
+
+        if ($type === 'asset') {
+            $id = $item->id();
+        }
+
+        return "{$type}::{$id}::".md5(json_encode($params));
+    }
+
     public static function assetCacheManifestKey($asset)
     {
         return 'asset::'.$asset->id();
@@ -216,32 +227,54 @@ class ImageGenerator
 
     private function setUpWatermark($watermark): string
     {
-        [$filesystem, $param] = $this->getWatermarkFilesystemAndParam($watermark);
+        $watermark = static::decodeWatermark($watermark);
 
-        $this->updateWatermarkFilesystem($filesystem);
+        $this->updateWatermarkFilesystem($this->watermarkFilesystem($watermark));
 
-        return $param;
+        return static::watermarkParam($watermark);
     }
 
-    private function getWatermarkFilesystemAndParam($item)
+    /**
+     * The `mark` param as Glide will see it, which is what the cache path is hashed from.
+     */
+    public static function watermarkParam($watermark): string
     {
-        if (is_string($item) && Str::startsWith($item, 'asset::')) {
-            $decoded = Str::fromBase64Url(Str::after($item, 'asset::'));
-            [$container, $path] = explode('/', $decoded, 2);
-            $item = Assets::find($container.'::'.$path);
+        $watermark = static::decodeWatermark($watermark);
+
+        if ($watermark instanceof Asset) {
+            return $watermark->path();
         }
 
-        if ($item instanceof Asset) {
-            return [$item->disk()->filesystem()->getDriver(), $item->path()];
+        if (URL::isAbsolute($watermark)) {
+            return app(RemoteUrlValidator::class)->parse($watermark)['path'];
         }
 
-        if (URL::isAbsolute($item)) {
-            $parsed = $this->parseUrl($item);
+        return $watermark;
+    }
 
-            return [$this->guzzleSourceFilesystem($parsed['base']), $parsed['path']];
+    private static function decodeWatermark($watermark)
+    {
+        if (! is_string($watermark) || ! Str::startsWith($watermark, 'asset::')) {
+            return $watermark;
         }
 
-        return [$this->pathSourceFilesystem(), $item];
+        $decoded = Str::fromBase64Url(Str::after($watermark, 'asset::'));
+        [$container, $path] = explode('/', $decoded, 2);
+
+        return Assets::find($container.'::'.$path);
+    }
+
+    private function watermarkFilesystem($watermark)
+    {
+        if ($watermark instanceof Asset) {
+            return $watermark->disk()->filesystem()->getDriver();
+        }
+
+        if (URL::isAbsolute($watermark)) {
+            return $this->guzzleSourceFilesystem($this->parseUrl($watermark)['base']);
+        }
+
+        return $this->pathSourceFilesystem();
     }
 
     private function updateWatermarkFilesystem($filesystem)
@@ -294,22 +327,29 @@ class ImageGenerator
     }
 
     /**
+     * Get the default Glide manipulation parameters for an asset.
+     */
+    public static function getDefaultManipulations(?Asset $asset = null): array
+    {
+        $defaults = Glide::normalizeParameters(
+            Config::get('statamic.assets.image_manipulation.defaults') ?: []
+        );
+
+        if (Config::get('statamic.assets.auto_crop') && $asset) {
+            $defaults['fit'] = 'crop-'.$asset->get('focus', '50-50');
+        }
+
+        return $defaults;
+    }
+
+    /**
      * Apply default Glide manipulations on the image.
      *
      * @return void
      */
     private function applyDefaultManipulations()
     {
-        $defaults = Glide::normalizeParameters(
-            Config::get('statamic.assets.image_manipulation.defaults') ?: []
-        );
-
-        // Enable automatic cropping
-        if (Config::get('statamic.assets.auto_crop') && $this->asset) {
-            $defaults['fit'] = 'crop-'.$this->asset->get('focus', '50-50');
-        }
-
-        $this->server->setDefaults($defaults);
+        $this->server->setDefaults(static::getDefaultManipulations($this->asset));
     }
 
     /**
@@ -355,6 +395,10 @@ class ImageGenerator
 
     private function parseUrl($url)
     {
-        return app(RemoteUrlValidator::class)->parse($url);
+        $validator = app(RemoteUrlValidator::class);
+
+        $validator->validate($url);
+
+        return $validator->parse($url);
     }
 }
