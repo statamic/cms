@@ -3217,7 +3217,11 @@ class CoreModifiers extends Modifier
     public function trackableEmbedUrl($url)
     {
         if ($url instanceof Embed) {
-            return $url->embedUrl;
+            $url = $url->url;
+        }
+
+        if (blank($url)) {
+            return $url;
         }
 
         if (Str::contains($url, 'vimeo')) {
