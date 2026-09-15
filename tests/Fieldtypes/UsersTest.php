@@ -173,6 +173,14 @@ class UsersTest extends TestCase
         $this->assertEquals('email', $columns[1]->field);
     }
 
+    #[Test]
+    public function preload_asks_for_emails_to_be_searchable()
+    {
+        $this->actingAs($this->cpUserWithPermissions(['access cp', 'view users']));
+
+        $this->assertEquals(['title', 'email'], $this->fieldtype()->preload()['searchKeys']);
+    }
+
     public function fieldtype($config = [])
     {
         $field = new Field('test', array_merge([

@@ -52,6 +52,8 @@ trait ListensForContentEvents
         \Statamic\Events\SubmissionSaved::class,
         \Statamic\Events\TaxonomyDeleted::class,
         \Statamic\Events\TaxonomySaved::class,
+        \Statamic\Events\TaxonomyTreeSaved::class,
+        \Statamic\Events\TaxonomyTreeDeleted::class,
         \Statamic\Events\TermDeleted::class,
         \Statamic\Events\TermSaved::class,
         \Statamic\Events\TermReferencesUpdated::class,

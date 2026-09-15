@@ -43,6 +43,18 @@ class TermInterface extends InterfaceType
             'taxonomy' => [
                 'type' => GraphQL::nonNull(GraphQL::type(TaxonomyType::NAME)),
             ],
+            'parent' => [
+                'type' => GraphQL::type(TermInterface::NAME),
+            ],
+            'children' => [
+                'type' => GraphQL::listOf(GraphQL::type(TermInterface::NAME)),
+            ],
+            'ancestors' => [
+                'type' => GraphQL::listOf(GraphQL::type(TermInterface::NAME)),
+            ],
+            'depth' => [
+                'type' => GraphQL::int(),
+            ],
         ];
 
         foreach (GraphQL::getExtraTypeFields(static::NAME) as $field => $closure) {

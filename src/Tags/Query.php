@@ -28,10 +28,26 @@ class Query extends Tags
 
     protected function evaluate($query)
     {
+        $this->queryTaxonomyDescendants($query);
         $this->queryConditions($query);
         $this->queryScopes($query);
         $this->queryOrderBys($query);
 
         return $this->output($this->results($query));
+    }
+
+    /**
+     * Hierarchical taxonomy filters include descendant terms unless
+     * `with_descendants="false"` is passed.
+     */
+    private function queryTaxonomyDescendants($query)
+    {
+        if ($this->params->has('with_descendants') && ! $this->params->bool('with_descendants')) {
+            try {
+                $query->withTaxonomyDescendants(false);
+            } catch (\BadMethodCallException $e) {
+                // The builder doesn't query taxonomized entries. The param is a no-op.
+            }
+        }
     }
 }

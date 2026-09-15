@@ -155,7 +155,19 @@ abstract class Relationship extends Fieldtype
             'taggable' => $this->getTaggable(),
             'initialSortColumn' => $this->initialSortColumn(),
             'initialSortDirection' => $this->initialSortDirection(),
+            'searchKeys' => $this->searchKeys(),
+            'pathDelimiter' => $this->pathDelimiter(),
         ];
+    }
+
+    protected function searchKeys(): ?array
+    {
+        return null;
+    }
+
+    protected function pathDelimiter(): ?string
+    {
+        return null;
     }
 
     protected function canCreate()
@@ -270,6 +282,11 @@ abstract class Relationship extends Fieldtype
     }
 
     public function getItemHint($item): ?string
+    {
+        return null;
+    }
+
+    public function getItemPath($item): ?array
     {
         return null;
     }

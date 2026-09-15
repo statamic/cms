@@ -520,4 +520,80 @@ class TermTest extends TestCase
         $this->assertEquals('A', $term->getSupplement('bar'));
         $this->assertEquals('B', $clone->getSupplement('bar'));
     }
+
+    #[Test]
+    public function it_gets_the_default_route()
+    {
+        $taxonomy = tap(Taxonomy::make('tags'))->save();
+        $term = (new Term)->taxonomy('tags')->slug('foo')->inDefaultLocale();
+
+        $this->assertEquals('/tags/{slug}', $term->route());
+        $this->assertEquals('/tags/foo', $term->uri());
+    }
+
+    #[Test]
+    public function it_gets_a_custom_route()
+    {
+        $this->setSites([
+            'en' => ['url' => 'http://domain.com/'],
+            'fr' => ['url' => 'http://domain.com/fr/'],
+        ]);
+
+        tap(Taxonomy::make('tags')->sites(['en', 'fr'])->routes([
+            'en' => '/topics/{slug}',
+            'fr' => '/sujets/{slug}',
+        ]))->save();
+
+        $term = (new Term)->taxonomy('tags');
+        $term->in('en')->slug('foo');
+        $term->in('fr')->slug('le-foo');
+
+        $this->assertEquals('/topics/{slug}', $term->in('en')->route());
+        $this->assertEquals('/topics/foo', $term->in('en')->uri());
+        $this->assertEquals('/sujets/{slug}', $term->in('fr')->route());
+        $this->assertEquals('/sujets/le-foo', $term->in('fr')->uri());
+    }
+
+    #[Test]
+    public function it_has_no_route_when_term_routes_are_disabled()
+    {
+        tap(Taxonomy::make('tags')->routes(false))->save();
+        $term = (new Term)->taxonomy('tags')->slug('foo')->inDefaultLocale();
+
+        $this->assertNull($term->route());
+        $this->assertNull($term->uri());
+        $this->assertNull($term->url());
+        $this->assertNull($term->absoluteUrl());
+    }
+
+    #[Test]
+    public function hierarchical_terms_use_parent_uri_in_the_default_route()
+    {
+        $taxonomy = tap(Taxonomy::make('categories')->structureContents([]))->save();
+        tap((new Term)->taxonomy('categories')->slug('animals')->data(['title' => 'Animals']))->save();
+        tap((new Term)->taxonomy('categories')->slug('cat')->data(['title' => 'Cat']))->save();
+
+        $taxonomy->structure()->tree()->tree([
+            ['term' => 'animals', 'children' => [
+                ['term' => 'cat'],
+            ]],
+        ])->save();
+
+        $cat = Facades\Term::find('categories::cat');
+
+        $this->assertEquals('/categories/{parent_uri}/{slug}', $cat->route());
+        $this->assertEquals('/categories/animals/cat', $cat->uri());
+
+        $taxonomy->routes('/topics/{parent_uri}/{slug}')->save();
+        $cat = Facades\Term::find('categories::cat');
+
+        $this->assertEquals('/topics/{parent_uri}/{slug}', $cat->route());
+        $this->assertEquals('/topics/animals/cat', $cat->uri());
+
+        $taxonomy->routes('/topics/{slug}')->save();
+        $cat = Facades\Term::find('categories::cat');
+
+        $this->assertEquals('/topics/{slug}', $cat->route());
+        $this->assertEquals('/topics/cat', $cat->uri());
+    }
 }
