@@ -5,12 +5,12 @@
         <ui-icon name="handles" class="item-move sortable-handle size-4 shrink-0 cursor-grab text-gray-300 dark:text-gray-700" v-if="sortable" />
         <ui-status-indicator v-if="item.status" :status="item.status" class="shrink-0" />
 
-        <div class="flex min-w-0 flex-1 flex-wrap items-center gap-x-1 gap-y-0.5 text-sm text-gray-600 dark:text-gray-300">
+        <div class="flex min-w-0 flex-1 items-center gap-x-1 text-sm text-gray-600 dark:text-gray-300">
             <div
                 v-if="item.invalid"
                 v-tooltip.top="__('messages.relationship_item_unavailable')"
                 v-text="__(item.title)"
-                class="text-sm text-gray-500 dark:text-gray-400"
+                class="truncate text-sm text-gray-500 dark:text-gray-400"
             />
 
             <template v-else>
@@ -20,12 +20,12 @@
                     v-if="editable"
                     @click.prevent="edit"
                     v-text="__(item.title)"
-                    class="text-xs text-gray-600 dark:text-gray-300"
+                    class="truncate text-sm text-gray-600 dark:text-gray-300"
                     v-tooltip="item.title"
                     :href="item.edit_url"
                 />
 
-                <div v-else v-text="__(item.title)" />
+                <div v-else v-text="__(item.title)" class="truncate" />
             </template>
 
             <inline-edit-form

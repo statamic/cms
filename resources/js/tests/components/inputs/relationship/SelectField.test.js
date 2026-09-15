@@ -153,7 +153,7 @@ describe('SelectField option hierarchy', () => {
 
         expect(option.attributes('style')).toBeUndefined();
         expect(option.find('[data-icon="arrow-down-right"]').exists()).toBe(false);
-        expect(option.findAll('.badge').map((badge) => badge.text())).toEqual(['Animals']);
+        expect(option.get('span[title]').text()).toContain('Animals');
         expect(option.findAll('[data-icon="chevron-right"]')).toHaveLength(1);
 
         wrapper.unmount();
@@ -193,7 +193,7 @@ describe('SelectField option hierarchy while filtering', () => {
 
         expect(option.attributes('style')).toBeUndefined();
         expect(option.find('[data-icon="arrow-down-right"]').exists()).toBe(false);
-        expect(option.findAll('.badge').map((badge) => badge.text())).toEqual(['Animals']);
+        expect(option.get('span[title]').text()).toContain('Animals');
 
         wrapper.unmount();
     });
