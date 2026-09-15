@@ -87,7 +87,7 @@ class ExportSubmissionsTest extends TestCase
     {
         return collect(explode("\n", trim($csv)))
             ->slice(1)
-            ->map(fn ($line) => str_getcsv($line)[0])
+            ->map(fn ($line) => str_getcsv($line, escape: '')[0])
             ->values()
             ->all();
     }
