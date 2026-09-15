@@ -559,9 +559,9 @@ class Terms extends Relationship
 
     protected function searchKeys(): ?array
     {
-        // Terms in a hierarchical taxonomy are also matched on their breadcrumb, so searching a
-        // parent surfaces its descendants. Titles rather than slugs, so what's typed can match
-        // what's on screen.
+        // These are the keys the combobox fuzzysorts when it filters the list itself. Including
+        // the breadcrumb means searching a parent surfaces its descendants. Titles rather than
+        // slugs, so what's typed can match what's on screen.
         return ['title', 'search_titles'];
     }
 
