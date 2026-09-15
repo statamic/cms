@@ -3201,7 +3201,7 @@ class CoreModifiers extends Modifier
     public function embedUrl($url)
     {
         if ($url instanceof Embed) {
-            return $url->embedUrl;
+            return $url->embedUrl ?? $url->url;
         }
 
         return Embed::embedUrl($url);
