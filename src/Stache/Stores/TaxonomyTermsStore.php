@@ -73,6 +73,8 @@ class TaxonomyTermsStore extends ChildStore
         $this->handleFileChanges();
 
         if ($item = $this->getCachedItem($key)) {
+            $item->term()->syncOriginal();
+
             return $item;
         }
 
@@ -86,6 +88,8 @@ class TaxonomyTermsStore extends ChildStore
                 ->set('title', $this->index('title')->get($key))
                 ->in($site);
         }
+
+        $item->term()->syncOriginal();
 
         $this->cacheItem($item);
 

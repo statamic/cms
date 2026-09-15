@@ -315,6 +315,68 @@ class UpdateTermReferencesTest extends TestCase
     }
 
     #[Test]
+    public function it_nullifies_references_when_deleting_a_term_loaded_from_its_file()
+    {
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'favourites',
+                    'field' => [
+                        'type' => 'terms',
+                        'taxonomies' => ['topics'],
+                        'mode' => 'select',
+                    ],
+                ],
+            ],
+        ]);
+
+        $entry = tap(Facades\Entry::make()->collection($collection)->data([
+            'favourites' => ['hoff', 'norris'],
+        ]))->save();
+
+        $this->assertEquals(['hoff', 'norris'], $entry->get('favourites'));
+
+        Facades\Stache::store('terms')->store('topics')->forgetItem('en::hoff');
+
+        Facades\Term::find('topics::hoff')->delete();
+
+        $this->assertEquals(['norris'], $entry->fresh()->get('favourites'));
+    }
+
+    /** @see https://github.com/statamic/cms/issues/11264 */
+    #[Test]
+    public function it_nullifies_references_when_deleting_a_term_that_only_exists_in_entry_data()
+    {
+        $collection = tap(Facades\Collection::make('articles')->taxonomies(['topics']))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'topics',
+                    'field' => [
+                        'type' => 'terms',
+                        'taxonomies' => ['topics'],
+                        'mode' => 'select',
+                    ],
+                ],
+            ],
+        ]);
+
+        $entry = tap(Facades\Entry::make()->collection($collection)->data([
+            'topics' => ['hoff', 'ghost'],
+        ]))->save();
+
+        $this->assertEquals(['hoff', 'ghost'], $entry->get('topics'));
+
+        Facades\Term::find('topics::ghost')->delete();
+
+        $this->assertEquals(['hoff'], $entry->fresh()->get('topics'));
+        $this->assertNull(Facades\Term::find('topics::ghost'));
+    }
+
+    #[Test]
     public function it_nullifies_references_when_deleting_a_scoped_term()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
