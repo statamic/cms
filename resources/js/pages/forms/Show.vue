@@ -23,8 +23,7 @@ const listingParameters = ref({});
 
 const hasFilteredScope = computed(() => {
     const params = listingParameters.value;
-    const hasSortOverride = (params.sort && params.sort !== 'datestamp') || (params.order && params.order !== 'desc');
-    return !!(params.search || params.filters || hasSortOverride);
+    return !!(params.search || params.filters);
 });
 
 function openExportModal() {
@@ -40,17 +39,18 @@ function exportSubmissions() {
 
     let url = exporter.downloadUrl;
 
-    if (exportScope.value === 'filtered') {
-        const params = listingParameters.value;
-        const query = new URLSearchParams();
-        if (params.search) query.set('search', params.search);
-        if (params.sort) query.set('sort', params.sort);
-        if (params.order) query.set('order', params.order);
-        if (params.filters) query.set('filters', params.filters);
+    const params = listingParameters.value;
+    const query = new URLSearchParams();
+    if (params.sort) query.set('sort', params.sort);
+    if (params.order) query.set('order', params.order);
 
-        const separator = url.includes('?') ? '&' : '?';
-        url += separator + query.toString();
+    if (exportScope.value === 'filtered') {
+        if (params.search) query.set('search', params.search);
+        if (params.filters) query.set('filters', params.filters);
     }
+
+    const separator = url.includes('?') ? '&' : '?';
+    url += separator + query.toString();
 
     window.open(url, '_blank');
     exportModalOpen.value = false;
