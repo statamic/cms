@@ -49,10 +49,25 @@ class EmbedTest extends TestCase
     }
 
     #[Test]
-    public function it_is_falsey_when_unsupported()
+    public function it_is_truthy_whenever_it_holds_a_value()
     {
         $this->assertTrue(Embed::fromValue('https://vimeo.com/22439234')->toBool());
-        $this->assertFalse(Embed::fromValue('https://example.com/nope')->toBool());
+        $this->assertTrue(Embed::fromValue('https://example.com/nope')->toBool());
+        $this->assertFalse(Embed::fromValue('')->toBool());
+    }
+
+    #[Test]
+    public function it_knows_whether_it_is_supported_and_embeddable()
+    {
+        $this->assertTrue(Embed::fromValue('https://vimeo.com/22439234')->isEmbeddable());
+        $this->assertTrue(Embed::fromValue('https://vimeo.com/22439234')->isSupported());
+
+        // A file is something we can play, but not something we can put in an iframe.
+        $this->assertFalse(Embed::fromValue('https://example.com/clip.mp4')->isEmbeddable());
+        $this->assertTrue(Embed::fromValue('https://example.com/clip.mp4')->isSupported());
+
+        $this->assertFalse(Embed::fromValue('https://example.com/nope')->isEmbeddable());
+        $this->assertFalse(Embed::fromValue('https://example.com/nope')->isSupported());
     }
 
     #[Test]
@@ -73,11 +88,9 @@ class EmbedTest extends TestCase
     }
 
     #[Test]
-    public function it_serializes_to_json_as_its_array()
+    public function it_serializes_to_json_as_the_original_value()
     {
-        $this->assertSame(
-            json_encode(Embed::fromValue('cloudflare:1234')->toArray()),
-            json_encode(Embed::fromValue('cloudflare:1234')),
-        );
+        $this->assertSame('"cloudflare:1234"', json_encode(Embed::fromValue('cloudflare:1234')));
+        $this->assertSame('"https:\\/\\/vimeo.com\\/1"', json_encode(Embed::fromValue('https://vimeo.com/1')));
     }
 }
