@@ -698,6 +698,74 @@ class QueryBuilderTest extends TestCase
     }
 
     #[Test]
+    public function results_are_limited()
+    {
+        $items = collect([
+            ['reference' => 'a'],
+            ['reference' => 'b'],
+            ['reference' => 'c'],
+            ['reference' => 'd'],
+            ['reference' => 'e'],
+        ]);
+
+        $results = (new FakeQueryBuilder($items))->withoutData()->limit(3)->get();
+
+        $this->assertCount(3, $results);
+        $this->assertEquals(['a', 'b', 'c'], $results->map->reference->all());
+    }
+
+    #[Test]
+    public function results_are_limited_with_offset()
+    {
+        $items = collect([
+            ['reference' => 'a'],
+            ['reference' => 'b'],
+            ['reference' => 'c'],
+            ['reference' => 'd'],
+            ['reference' => 'e'],
+        ]);
+
+        $results = (new FakeQueryBuilder($items))->withoutData()->offset(2)->limit(2)->get();
+
+        $this->assertCount(2, $results);
+        $this->assertEquals(['c', 'd'], $results->map->reference->all());
+    }
+
+    #[Test]
+    public function results_are_limited_with_wheres()
+    {
+        $items = collect([
+            ['reference' => 'a', 'status' => 'published'],
+            ['reference' => 'b', 'status' => 'draft'],
+            ['reference' => 'c', 'status' => 'published'],
+            ['reference' => 'd', 'status' => 'draft'],
+            ['reference' => 'e', 'status' => 'published'],
+            ['reference' => 'f', 'status' => 'published'],
+        ]);
+
+        $results = (new FakeQueryBuilder($items))->withoutData()
+            ->where('status', 'published')
+            ->limit(2)
+            ->get();
+
+        $this->assertCount(2, $results);
+        $this->assertEquals(['a', 'c'], $results->map->reference->all());
+    }
+
+    #[Test]
+    public function limit_handles_fewer_results_than_requested()
+    {
+        $items = collect([
+            ['reference' => 'a'],
+            ['reference' => 'b'],
+        ]);
+
+        $results = (new FakeQueryBuilder($items))->withoutData()->limit(10)->get();
+
+        $this->assertCount(2, $results);
+    }
+
+    #[Test]
     public function results_are_found_using_where_status()
     {
         $items = collect([
@@ -732,5 +800,14 @@ class FakeQueryBuilder extends QueryBuilder
     public function getSearchResults($query)
     {
         return $this->results;
+    }
+
+    protected function getBaseItemsLazy(): \Generator
+    {
+        foreach ($this->results as $i => $result) {
+            $plainResult = new \Statamic\Search\PlainResult($result);
+            $plainResult->setScore($result['search_score'] ?? null);
+            yield $plainResult;
+        }
     }
 }
