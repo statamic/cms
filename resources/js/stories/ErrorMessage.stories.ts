@@ -13,38 +13,24 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const defaultCode = `
-<ErrorMessage text="This field is required." />
-`;
-
 export const _DocsIntro: Story = {
     tags: ['!dev'],
-    parameters: {
-        docs: {
-            source: { code: defaultCode }
-        }
-    },
     render: () => ({
         components: { ErrorMessage },
-        template: defaultCode,
+        template: `
+            <ErrorMessage text="This field is required." />
+        `,
     }),
 };
 
-const withSlotCode = `
-<ErrorMessage>
-    The file size exceeds the maximum allowed. <a href="#">Learn more</a>
-</ErrorMessage>
-`;
-
 export const _WithSlot: Story = {
     tags: ['!dev'],
-    parameters: {
-        docs: {
-            source: { code: withSlotCode }
-        }
-    },
     render: () => ({
         components: { ErrorMessage },
-        template: withSlotCode,
+        template: `
+            <ErrorMessage>
+                The file size exceeds the maximum allowed. <a href="#">Learn more</a>
+            </ErrorMessage>
+        `,
     }),
 };

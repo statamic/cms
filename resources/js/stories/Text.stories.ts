@@ -1,6 +1,5 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
 import {Text} from '@ui';
-import {computed} from 'vue';
 
 /**
  * @import import { Text } from '@statamic/cms/ui';
@@ -33,25 +32,18 @@ export const Default: Story = {
     },
 };
 
-const introCode = `
-<div class="flex flex-wrap gap-3 items-center">
-    <Text text="Default" />
-    <Text variant="strong" text="Strong" />
-    <Text variant="subtle" text="Subtle" />
-    <Text variant="code" text="code_example" />
-</div>
-`;
-
 export const _DocsIntro: Story = {
     tags: ['!dev'],
-    parameters: {
-        docs: {
-            source: { code: introCode },
-        },
-    },
     render: () => ({
         components: { Text },
-        template: introCode,
+        template: `
+            <div class="flex flex-wrap gap-3 items-center">
+                <Text text="Default" />
+                <Text variant="strong" text="Strong" />
+                <Text variant="subtle" text="Subtle" />
+                <Text variant="code" text="code_example" />
+            </div>
+        `,
     }),
 };
 
@@ -78,21 +70,17 @@ export const Variants: Story = {
     render: (args) => ({
         components: { Text },
         setup() {
-            const sharedProps = computed(() => {
-                const { variant, text, ...rest } = args;
-                return rest;
-            });
-            return { sharedProps };
+            return { args };
         },
         template: `
             <div class="flex flex-wrap gap-3 items-center">
-                <Text variant="default" text="Default" v-bind="sharedProps" />
-                <Text variant="strong" text="Strong" v-bind="sharedProps" />
-                <Text variant="subtle" text="Subtle" v-bind="sharedProps" />
-                <Text variant="code" text="code_example" v-bind="sharedProps" />
-                <Text variant="danger" text="Danger" v-bind="sharedProps" />
-                <Text variant="success" text="Success" v-bind="sharedProps" />
-                <Text variant="warning" text="Warning" v-bind="sharedProps" />
+                <Text v-bind="args" variant="default" text="Default" />
+                <Text v-bind="args" variant="strong" text="Strong" />
+                <Text v-bind="args" variant="subtle" text="Subtle" />
+                <Text v-bind="args" variant="code" text="code_example" />
+                <Text v-bind="args" variant="danger" text="Danger" />
+                <Text v-bind="args" variant="success" text="Success" />
+                <Text v-bind="args" variant="warning" text="Warning" />
             </div>
         `,
     }),
@@ -117,55 +105,37 @@ export const Sizes: Story = {
     render: (args) => ({
         components: { Text },
         setup() {
-            const sharedProps = computed(() => {
-                const { size, text, ...rest } = args;
-                return rest;
-            });
-            return { sharedProps };
+            return { args };
         },
         template: `
             <div class="flex flex-wrap gap-3 items-center">
-                <Text size="lg" text="Large" v-bind="sharedProps" />
-                <Text size="base" text="Base" v-bind="sharedProps" />
-                <Text size="sm" text="Small" v-bind="sharedProps" />
+                <Text v-bind="args" size="lg" text="Large" />
+                <Text v-bind="args" size="base" text="Base" />
+                <Text v-bind="args" size="sm" text="Small" />
             </div>
         `,
     }),
 };
 
-const inlineCode = `
-<Text>Default with <Text variant="strong">strong</Text> and <Text variant="subtle">subtle</Text> inline</Text>
-`;
-
 export const _InlineDocs: Story = {
     tags: ['!dev'],
-    parameters: {
-        docs: {
-            source: { code: inlineCode },
-        },
-    },
     render: () => ({
         components: { Text },
-        template: inlineCode,
+        template: `
+            <Text>Default with <Text variant="strong">strong</Text> and <Text variant="subtle">subtle</Text> inline</Text>
+        `,
     }),
 };
 
-const paragraphCode = `
-<div class="space-y-2">
-    <Text as="p">This is a paragraph of default text that could appear inside a widget or table description.</Text>
-    <Text as="p" variant="subtle">This is a subtle paragraph, useful for secondary information or metadata.</Text>
-</div>
-`;
-
 export const _AsParagraph: Story = {
     tags: ['!dev'],
-    parameters: {
-        docs: {
-            source: { code: paragraphCode },
-        },
-    },
     render: () => ({
         components: { Text },
-        template: paragraphCode,
+        template: `
+            <div class="space-y-2">
+                <Text as="p">This is a paragraph of default text that could appear inside a widget or table description.</Text>
+                <Text as="p" variant="subtle">This is a subtle paragraph, useful for secondary information or metadata.</Text>
+            </div>
+        `,
     }),
 };

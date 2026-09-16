@@ -13,36 +13,22 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const defaultCode = `
-<DocsCallout topic="Blueprints" url="content-modeling/blueprints" />
-`;
-
 export const _DocsIntro: Story = {
     tags: ['!dev'],
-    parameters: {
-        docs: {
-            source: { code: defaultCode }
-        }
-    },
     render: () => ({
         components: { DocsCallout },
-        template: defaultCode,
+        template: `
+            <DocsCallout topic="Blueprints" url="content-modeling/blueprints" />
+        `,
     }),
 };
 
-const thirdPartyCode = `
-<DocsCallout topic="SEO Pro" url="https://github.com/statamic/seo-pro" />
-`;
-
 export const _ThirdParty: Story = {
     tags: ['!dev'],
-    parameters: {
-        docs: {
-            source: { code: thirdPartyCode }
-        }
-    },
     render: () => ({
         components: { DocsCallout },
-        template: thirdPartyCode,
+        template: `
+            <DocsCallout topic="SEO Pro" url="https://github.com/statamic/seo-pro" />
+        `,
     }),
 };

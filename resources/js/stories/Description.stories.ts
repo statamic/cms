@@ -13,38 +13,24 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const defaultCode = `
-<Description text="Enter your full name as it appears on your ID." />
-`;
-
 export const _DocsIntro: Story = {
     tags: ['!dev'],
-    parameters: {
-        docs: {
-            source: { code: defaultCode }
-        }
-    },
     render: () => ({
         components: { Description },
-        template: defaultCode,
+        template: `
+            <Description text="Enter your full name as it appears on your ID." />
+        `,
     }),
 };
 
-const withSlotCode = `
-<Description>
-    This will be visible to all users. <a href="#">Learn more about privacy</a>
-</Description>
-`;
-
 export const _WithSlot: Story = {
     tags: ['!dev'],
-    parameters: {
-        docs: {
-            source: { code: withSlotCode }
-        }
-    },
     render: () => ({
         components: { Description },
-        template: withSlotCode,
+        template: `
+            <Description>
+                This will be visible to all users. <a href="#">Learn more about privacy</a>
+            </Description>
+        `,
     }),
 };

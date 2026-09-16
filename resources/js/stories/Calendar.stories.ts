@@ -32,7 +32,7 @@ export const _DocsIntro: Story = {
     },
     render: () => ({
         components: { Calendar, Card },
-        template: `<Card>${defaultCode}</Card>`,
+        template: `<Card><Calendar /></Card>`,
     }),
 };
 
@@ -47,7 +47,7 @@ export const _MultipleMonths: Story = {
     },
     render: () => ({
         components: { Calendar, Card },
-        template: `<Card>${multipleMonthsCode}</Card>`,
+        template: `<Card><Calendar :number-of-months="2" /></Card>`,
     }),
 };
 
@@ -62,6 +62,6 @@ export const _WeekStartsOn: Story = {
     },
     render: () => ({
         components: { Calendar, Card },
-        template: `<Card>${weekStartsOnCode}</Card>`,
+        template: `<Card><Calendar week-starts-on="1" /></Card>`,
     }),
 };

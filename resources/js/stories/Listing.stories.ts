@@ -106,158 +106,96 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const defaultCode = `
-<Listing 
-    :items="[
-        { id: 1, name: 'Jack McDade', location: 'USA 🇺🇸', role: 'Founder' },
-        { id: 2, name: 'Jason Varga', location: 'USA 🇺🇸', role: 'Lead Developer' },
-        { id: 3, name: 'Joshua Blum', location: 'Germany 🇩🇪', role: 'Support' },
-        { id: 4, name: 'Duncan McClean', location: 'Scotland 🏴󠁧󠁢󠁳󠁣󠁴󠁿', role: 'Developer' },
-        { id: 5, name: 'Jay George', location: 'England 🏴󠁧󠁢󠁥󠁮󠁧󠁿️', role: 'Developer' },
-        { id: 6, name: 'David Hasselhoff', location: 'USA 🇺🇸', role: 'The Hoff' },
-    ]"
-    :columns="[
-        { field: 'name', label: 'Name', sortable: true },
-        { field: 'location', label: 'Location', sortable: true },
-        { field: 'role', label: 'Role', sortable: true },
-    ]"
-/>
-`;
-
 // passing dropdown actions
 // using a json url
 
 export const _DocsIntro: Story = {
     tags: ['!dev'],
-    parameters: {
-        docs: {
-            source: { code: defaultCode }
-        }
-    },
     render: () => ({
         components: { Listing },
-        template: defaultCode,
+        template: `
+            <Listing 
+                :items="[
+                    { id: 1, name: 'Jack McDade', location: 'USA 🇺🇸', role: 'Founder' },
+                    { id: 2, name: 'Jason Varga', location: 'USA 🇺🇸', role: 'Lead Developer' },
+                    { id: 3, name: 'Joshua Blum', location: 'Germany 🇩🇪', role: 'Support' },
+                    { id: 4, name: 'Duncan McClean', location: 'Scotland 🏴󠁧󠁢󠁳󠁣󠁴󠁿', role: 'Developer' },
+                    { id: 5, name: 'Jay George', location: 'England 🏴󠁧󠁢󠁥󠁮󠁧󠁿️', role: 'Developer' },
+                    { id: 6, name: 'David Hasselhoff', location: 'USA 🇺🇸', role: 'The Hoff' },
+                ]"
+                :columns="[
+                    { field: 'name', label: 'Name', sortable: true },
+                    { field: 'location', label: 'Location', sortable: true },
+                    { field: 'role', label: 'Role', sortable: true },
+                ]"
+            />
+        `,
     }),
 };
-
-const customCellsCode = `
-<Listing 
-    :items="[
-        { id: 1, name: 'Jack McDade', location: 'USA 🇺🇸', role: 'Founder' },
-        { id: 2, name: 'Jason Varga', location: 'USA 🇺🇸', role: 'Lead Developer' },
-        { id: 3, name: 'Joshua Blum', location: 'Germany 🇩🇪', role: 'Support' },
-        { id: 4, name: 'Duncan McClean', location: 'Scotland 🏴󠁧󠁢󠁳󠁣󠁴󠁿', role: 'Developer' },
-        { id: 5, name: 'Jay George', location: 'England 🏴󠁧󠁢󠁥󠁮󠁧󠁿️', role: 'Developer' },
-        { id: 6, name: 'David Hasselhoff', location: 'USA 🇺🇸', role: 'The Hoff' },
-    ]"
-    :columns="[
-        { field: 'name', label: 'Name', sortable: true },
-        { field: 'location', label: 'Location', sortable: true },
-        { field: 'role', label: 'Role', sortable: true },
-    ]"
->
-    <template #cell-name="{ row, value }">
-        <a class="title-index-field" href="#" v-html="value" />
-    </template>
-
-    <template #cell-role="{ row, value }">
-        <Badge :text="value" pill />
-    </template>
-</Listing>
-`;
 
 export const _CustomCells: Story = {
     tags: ['!dev'],
-    parameters: {
-        docs: {
-            source: { code: customCellsCode }
-        }
-    },
     render: () => ({
         components: { Listing, Badge },
-        template: customCellsCode,
+        template: `
+            <Listing 
+                :items="[
+                    { id: 1, name: 'Jack McDade', location: 'USA 🇺🇸', role: 'Founder' },
+                    { id: 2, name: 'Jason Varga', location: 'USA 🇺🇸', role: 'Lead Developer' },
+                    { id: 3, name: 'Joshua Blum', location: 'Germany 🇩🇪', role: 'Support' },
+                    { id: 4, name: 'Duncan McClean', location: 'Scotland 🏴󠁧󠁢󠁳󠁣󠁴󠁿', role: 'Developer' },
+                    { id: 5, name: 'Jay George', location: 'England 🏴󠁧󠁢󠁥󠁮󠁧󠁿️', role: 'Developer' },
+                    { id: 6, name: 'David Hasselhoff', location: 'USA 🇺🇸', role: 'The Hoff' },
+                ]"
+                :columns="[
+                    { field: 'name', label: 'Name', sortable: true },
+                    { field: 'location', label: 'Location', sortable: true },
+                    { field: 'role', label: 'Role', sortable: true },
+                ]"
+            >
+                <template #cell-name="{ row, value }">
+                    <a class="title-index-field" href="#" v-html="value" />
+                </template>
+
+                <template #cell-role="{ row, value }">
+                    <Badge :text="value" pill />
+                </template>
+            </Listing>
+        `,
     }),
 };
-
-const actionsCode = `
-<Listing 
-    :items="[
-        { id: 1, name: 'Jack McDade', location: 'USA 🇺🇸', role: 'Founder' },
-        { id: 2, name: 'Jason Varga', location: 'USA 🇺🇸', role: 'Lead Developer' },
-        { id: 3, name: 'Joshua Blum', location: 'Germany 🇩🇪', role: 'Support' },
-        { id: 4, name: 'Duncan McClean', location: 'Scotland 🏴󠁧󠁢󠁳󠁣󠁴󠁿', role: 'Developer' },
-        { id: 5, name: 'Jay George', location: 'England 🏴󠁧󠁢󠁥󠁮󠁧󠁿️', role: 'Developer' },
-        { id: 6, name: 'David Hasselhoff', location: 'USA 🇺🇸', role: 'The Hoff' },
-    ]"
-    :columns="[
-        { field: 'name', label: 'Name', sortable: true },
-        { field: 'location', label: 'Location', sortable: true },
-        { field: 'role', label: 'Role', sortable: true },
-    ]"
->
-    <template #prepended-row-actions="{ row: entry }">
-        <DropdownItem text="Visit Profile" href="#" icon="eye" target="_blank" />
-        <DropdownItem text="Edit" href="#" icon="edit" />
-    </template>
-</Listing>
-`;
 
 export const _WithActions: Story = {
     tags: ['!dev'],
-    parameters: {
-        docs: {
-            source: { code: actionsCode }
-        }
-    },
     render: () => ({
         components: { Listing, Badge, DropdownItem },
-        template: actionsCode,
+        template: `
+            <Listing 
+                :items="[
+                    { id: 1, name: 'Jack McDade', location: 'USA 🇺🇸', role: 'Founder' },
+                    { id: 2, name: 'Jason Varga', location: 'USA 🇺🇸', role: 'Lead Developer' },
+                    { id: 3, name: 'Joshua Blum', location: 'Germany 🇩🇪', role: 'Support' },
+                    { id: 4, name: 'Duncan McClean', location: 'Scotland 🏴󠁧󠁢󠁳󠁣󠁴󠁿', role: 'Developer' },
+                    { id: 5, name: 'Jay George', location: 'England 🏴󠁧󠁢󠁥󠁮󠁧󠁿️', role: 'Developer' },
+                    { id: 6, name: 'David Hasselhoff', location: 'USA 🇺🇸', role: 'The Hoff' },
+                ]"
+                :columns="[
+                    { field: 'name', label: 'Name', sortable: true },
+                    { field: 'location', label: 'Location', sortable: true },
+                    { field: 'role', label: 'Role', sortable: true },
+                ]"
+            >
+                <template #prepended-row-actions="{ row: entry }">
+                    <DropdownItem text="Visit Profile" href="#" icon="eye" target="_blank" />
+                    <DropdownItem text="Edit" href="#" icon="edit" />
+                </template>
+            </Listing>
+        `,
     }),
 };
 
-const customLayoutCode = `
-<Listing 
-    :items="[
-        { id: 1, name: 'Jack McDade', location: 'USA 🇺🇸', role: 'Founder' },
-        { id: 2, name: 'Jason Varga', location: 'USA 🇺🇸', role: 'Lead Developer' },
-        { id: 3, name: 'Joshua Blum', location: 'Germany 🇩🇪', role: 'Support' },
-        { id: 4, name: 'Duncan McClean', location: 'Scotland 🏴󠁧󠁢󠁳󠁣󠁴󠁿', role: 'Developer' },
-        { id: 5, name: 'Jay George', location: 'England 🏴󠁧󠁢󠁥󠁮󠁧󠁿️', role: 'Developer' },
-        { id: 6, name: 'David Hasselhoff', location: 'USA 🇺🇸', role: 'The Hoff' },
-    ]"
-    :columns="[
-        { field: 'name', label: 'Name', sortable: true },
-        { field: 'location', label: 'Location', sortable: true },
-        { field: 'role', label: 'Role', sortable: true },
-    ]"
-    v-slot="{ items, isColumnVisible, loading }"
->
-    <div class="relative flex flex-1 items-center gap-3">
-        <ListingSearch />
-        <ListingFilters />
-        <ListingCustomizeColumns />
-    </div>
-
-    <span v-if="!items.length" v-text="__('No results')" />
-
-    <Panel v-else>
-        <ListingTable>
-            <template #prepended-row-actions="{ row: entry }">
-                <DropdownItem text="Visit Profile" href="#" icon="eye" target="_blank" />
-                <DropdownItem text="Edit" href="#" icon="edit" />
-            </template>
-        </ListingTable>
-    </Panel>
-</Listing>
-`;
-
 export const _CustomLayout: Story = {
     tags: ['!dev'],
-    parameters: {
-        docs: {
-            source: { code: customLayoutCode }
-        }
-    },
     render: () => ({
         components: {
             Listing,
@@ -272,6 +210,40 @@ export const _CustomLayout: Story = {
             Badge,
             DropdownItem,
         },
-        template: customLayoutCode,
+        template: `
+            <Listing 
+                :items="[
+                    { id: 1, name: 'Jack McDade', location: 'USA 🇺🇸', role: 'Founder' },
+                    { id: 2, name: 'Jason Varga', location: 'USA 🇺🇸', role: 'Lead Developer' },
+                    { id: 3, name: 'Joshua Blum', location: 'Germany 🇩🇪', role: 'Support' },
+                    { id: 4, name: 'Duncan McClean', location: 'Scotland 🏴󠁧󠁢󠁳󠁣󠁴󠁿', role: 'Developer' },
+                    { id: 5, name: 'Jay George', location: 'England 🏴󠁧󠁢󠁥󠁮󠁧󠁿️', role: 'Developer' },
+                    { id: 6, name: 'David Hasselhoff', location: 'USA 🇺🇸', role: 'The Hoff' },
+                ]"
+                :columns="[
+                    { field: 'name', label: 'Name', sortable: true },
+                    { field: 'location', label: 'Location', sortable: true },
+                    { field: 'role', label: 'Role', sortable: true },
+                ]"
+                v-slot="{ items, isColumnVisible, loading }"
+            >
+                <div class="relative flex flex-1 items-center gap-3">
+                    <ListingSearch />
+                    <ListingFilters />
+                    <ListingCustomizeColumns />
+                </div>
+
+                <span v-if="!items.length" v-text="__('No results')" />
+
+                <Panel v-else>
+                    <ListingTable>
+                        <template #prepended-row-actions="{ row: entry }">
+                            <DropdownItem text="Visit Profile" href="#" icon="eye" target="_blank" />
+                            <DropdownItem text="Edit" href="#" icon="edit" />
+                        </template>
+                    </ListingTable>
+                </Panel>
+            </Listing>
+        `,
     }),
 };

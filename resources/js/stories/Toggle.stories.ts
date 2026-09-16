@@ -33,53 +33,39 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const introCode = `
-<ToggleGroup v-model="selected">
-    <ToggleItem value="grid" icon="view-grid" label="Grid" />
-    <ToggleItem value="list" icon="view-list" label="List" />
-    <ToggleItem value="table" icon="view-table" label="Table" />
-</ToggleGroup>
-`;
-
 export const _DocsIntro: Story = {
     tags: ['!dev'],
-    parameters: {
-        docs: {
-            source: { code: introCode },
-        },
-    },
     render: () => ({
         components: { ToggleGroup, ToggleItem },
         setup() {
             const selected = ref('list');
             return { selected };
         },
-        template: introCode,
+        template: `
+            <ToggleGroup v-model="selected">
+                <ToggleItem value="grid" icon="view-grid" label="Grid" />
+                <ToggleItem value="list" icon="view-list" label="List" />
+                <ToggleItem value="table" icon="view-table" label="Table" />
+            </ToggleGroup>
+        `,
     }),
 };
 
-const defaultCode = `
-<ToggleGroup v-model="selected">
-    <ToggleItem value="option1" label="Option 1" />
-    <ToggleItem value="option2" label="Option 2" />
-    <ToggleItem value="option3" label="Option 3" />
-</ToggleGroup>
-`;
-
 export const Default: Story = {
     tags: ['!dev'],
-    parameters: {
-        docs: {
-            source: { code: defaultCode },
-        },
-    },
     render: () => ({
         components: { ToggleGroup, ToggleItem },
         setup() {
             const selected = ref('option1');
             return { selected };
         },
-        template: defaultCode,
+        template: `
+            <ToggleGroup v-model="selected">
+                <ToggleItem value="option1" label="Option 1" />
+                <ToggleItem value="option2" label="Option 2" />
+                <ToggleItem value="option3" label="Option 3" />
+            </ToggleGroup>
+        `,
     }),
 };
 
@@ -214,53 +200,39 @@ export const Sizes: Story = {
     }),
 };
 
-const withIconsCode = `
-<ToggleGroup v-model="selected">
-    <ToggleItem value="tree" icon="navigation" label="Tree" />
-    <ToggleItem value="list" icon="layout-list" label="List" />
-    <ToggleItem value="calendar" icon="calendar" label="Calendar" />
-</ToggleGroup>
-`;
-
 export const WithIcons: Story = {
     tags: ['!dev'],
-    parameters: {
-        docs: {
-            source: { code: withIconsCode },
-        },
-    },
     render: () => ({
         components: { ToggleGroup, ToggleItem },
         setup() {
             const selected = ref('tree');
             return { selected };
         },
-        template: withIconsCode,
+        template: `
+            <ToggleGroup v-model="selected">
+                <ToggleItem value="tree" icon="navigation" label="Tree" />
+                <ToggleItem value="list" icon="layout-list" label="List" />
+                <ToggleItem value="calendar" icon="calendar" label="Calendar" />
+            </ToggleGroup>
+        `,
     }),
 };
 
-const iconOnlyCode = `
-<ToggleGroup v-model="selected">
-    <ToggleItem value="bold" icon="text-bold" />
-    <ToggleItem value="italic" icon="text-italic" />
-    <ToggleItem value="underline" icon="text-underline" />
-</ToggleGroup>
-`;
-
 export const IconOnly: Story = {
     tags: ['!dev'],
-    parameters: {
-        docs: {
-            source: { code: iconOnlyCode },
-        },
-    },
     render: () => ({
         components: { ToggleGroup, ToggleItem },
         setup() {
             const selected = ref('bold');
             return { selected };
         },
-        template: iconOnlyCode,
+        template: `
+            <ToggleGroup v-model="selected">
+                <ToggleItem value="bold" icon="text-bold" />
+                <ToggleItem value="italic" icon="text-italic" />
+                <ToggleItem value="underline" icon="text-underline" />
+            </ToggleGroup>
+        `,
     }),
 };
 
@@ -290,34 +262,31 @@ export const Multiple: Story = {
         },
         template: `
             <div class="space-y-4">
-                ${multipleCode}
+                <ToggleGroup v-model="selected" multiple>
+                    <ToggleItem value="bold" icon="text-bold" label="Bold" />
+                    <ToggleItem value="italic" icon="text-italic" label="Italic" />
+                    <ToggleItem value="underline" icon="text-underline" label="Underline" />
+                </ToggleGroup>
                 <div class="text-sm text-gray-600">Selected: {{ selected.join(', ') || 'none' }}</div>
             </div>
         `,
     }),
 };
 
-const disabledCode = `
-<ToggleGroup v-model="selected">
-    <ToggleItem value="option1" label="Option 1" />
-    <ToggleItem value="option2" label="Option 2" disabled />
-    <ToggleItem value="option3" label="Option 3" />
-</ToggleGroup>
-`;
-
 export const Disabled: Story = {
     tags: ['!dev'],
-    parameters: {
-        docs: {
-            source: { code: disabledCode },
-        },
-    },
     render: () => ({
         components: { ToggleGroup, ToggleItem },
         setup() {
             const selected = ref('option1');
             return { selected };
         },
-        template: disabledCode,
+        template: `
+            <ToggleGroup v-model="selected">
+                <ToggleItem value="option1" label="Option 1" />
+                <ToggleItem value="option2" label="Option 2" disabled />
+                <ToggleItem value="option3" label="Option 3" />
+            </ToggleGroup>
+        `,
     }),
 };

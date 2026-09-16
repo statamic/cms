@@ -1,5 +1,6 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
 import { Button, Badge, ConfirmationModal, Icon } from '@ui';
+import { ref } from 'vue';
 
 /**
  * @import import { ConfirmationModal } from '@statamic/cms/ui';
@@ -29,10 +30,11 @@ export const _DocsIntro: Story = {
     },
     render: () => ({
         components: { ConfirmationModal, Button, Badge },
-        data: () => ({
-            isConfirming: false,
-            hasConfirmed: false,
-        }),
+        setup() {
+            const isConfirming = ref(false);
+            const hasConfirmed = ref(false);
+            return { isConfirming, hasConfirmed };
+        },
         template: `
             <div class="flex items-center gap-2">
                 <Button text="Confirm" @click="isConfirming = true" />
@@ -50,11 +52,12 @@ export const _DocsIntro: Story = {
 
 export const ViaProp: Story = {
     render: () => ({
-        components: { ConfirmationModal, Button, Icon },
-        data: () => ({
-            isOpen: false,
-            isConfirmed: false,
-        }),
+        components: { ConfirmationModal, Button },
+        setup() {
+            const isOpen = ref(false);
+            const isConfirmed = ref(false);
+            return { isOpen, isConfirmed };
+        },
         template: `
             <div class="flex items-center gap-2">
                 <Button

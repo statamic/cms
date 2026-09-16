@@ -2,7 +2,6 @@ import type {Meta, StoryObj} from '@storybook/vue3';
 import {Timezones, TimezoneHoverCard} from '@ui';
 
 const exampleDate = '2026-05-05T12:00:00.000Z';
-const exampleRange = { start: '2026-05-05T12:00:00.000Z', end: '2026-05-08T17:30:00.000Z' };
 
 /**
  * @import import { Timezones } from '@statamic/cms/ui';
@@ -20,10 +19,6 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const defaultCode = `
-<Timezones :date="date" />
-`;
-
 export const _DocsIntro: Story = {
     tags: ['!dev'],
     args: {
@@ -37,9 +32,12 @@ export const _DocsIntro: Story = {
     render: (args) => ({
         components: { Timezones },
         setup() {
-            return { date: args.date };
+            const date = args.date;
+            return { date };
         },
-        template: defaultCode,
+        template: `
+            <Timezones :date="date" />
+        `,
     }),
 };
 
@@ -62,11 +60,14 @@ export const _HoverCard: Story = {
     render: (args) => ({
         components: { TimezoneHoverCard },
         setup() {
-            return { date: args.date };
+            const date = args.date;
+            return { date };
         },
         template: `
             <div class="flex justify-center p-12">
-                ${hoverCardCode}
+                <TimezoneHoverCard :date="date">
+                    <span class="underline decoration-dotted">Hover the underlined text</span>
+                </TimezoneHoverCard>
             </div>
         `,
     }),
@@ -86,7 +87,8 @@ export const _Range: Story = {
     render: () => ({
         components: { Timezones },
         setup() {
-            return { range: exampleRange };
+            const range = { start: '2026-05-05T12:00:00.000Z', end: '2026-05-08T17:30:00.000Z' };
+            return { range };
         },
         template: `<Timezones :date="range" />`,
     }),
@@ -104,7 +106,8 @@ export const _Invalid: Story = {
     render: (args) => ({
         components: { Timezones },
         setup() {
-            return { date: args.date };
+            const date = args.date;
+            return { date };
         },
         template: `
             <div>
@@ -125,14 +128,14 @@ export const _CustomDate: Story = {
     render: () => ({
         components: { Timezones },
         setup() {
-            return {
-                isoString: exampleDate,
-                dateObject: new Date(exampleDate),
-            };
+            const isoString = '2026-05-05T12:00:00.000Z';
+            const dateObject = new Date(isoString);
+            return { isoString, dateObject };
         },
         template: `
             <div class="space-y-4">
-                ${customDateCode}
+                <Timezones :date="isoString" />
+                <Timezones :date="dateObject" />
             </div>
         `,
     }),
