@@ -772,6 +772,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
     {
         $filename = Uploader::getSafeFilename($filename ?: $this->filename());
         $oldPath = $this->path();
+        $oldMetaCacheKey = $this->metaCacheKey();
         $oldMetaPath = $this->metaPath();
         $newPath = Str::removeLeft(Path::tidy($folder.'/'.$filename.'.'.pathinfo($oldPath, PATHINFO_EXTENSION)), '/');
 
@@ -781,6 +782,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
 
         $this->hydrate();
         $this->disk()->rename($oldPath, $newPath);
+        $this->cacheStore()->forget($oldMetaCacheKey);
         $this->path($newPath);
         $this->save();
 

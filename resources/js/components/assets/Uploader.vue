@@ -174,7 +174,7 @@ export default {
             return readEntries();
         },
 
-        addFile(file, data = {}) {
+        addFile(file, data = {}, meta = {}) {
             if (!this.enabled) return;
 
             const id = uniqid();
@@ -187,8 +187,11 @@ export default {
                 percent: 0,
                 errorMessage: null,
                 errorStatus: null,
+                conflict: meta.conflict ?? null,
+                resolution: meta.resolution ?? null,
                 instance: upload,
-                retry: (opts) => this.retry(id, opts),
+                retry: (opts, retryMeta = {}) => this.retry(id, opts, retryMeta),
+                skip: () => this.skip(id),
             });
         },
 
@@ -272,7 +275,8 @@ export default {
         },
 
         handleUploadSuccess(id, response) {
-            this.$emit('upload-complete', response.data, this.uploads);
+            const upload = this.findUpload(id);
+            this.$emit('upload-complete', response.data, this.uploads, upload);
             this.uploads.splice(this.findUploadIndex(id), 1);
 
             this.handleToasts(response._toasts ?? []);
@@ -297,6 +301,7 @@ export default {
 
             upload.errorMessage = msg;
             upload.errorStatus = status;
+            upload.conflict = response?.conflict ?? null;
             this.$emit('error', upload, this.uploads);
             this.processUploadQueue();
         },
@@ -305,10 +310,21 @@ export default {
             toasts.forEach((toast) => Statamic.$toast[toast.type](toast.message, { duration: toast.duration }));
         },
 
-        retry(id, args) {
-            let file = this.findUpload(id).instance.form.get('file');
-            this.addFile(file, args);
+        retry(id, args = {}, meta = {}) {
+            const currentUpload = this.findUpload(id);
+            let file = currentUpload.instance.form.get('file');
+
+            this.addFile(file, args, {
+                conflict: meta.conflict ?? currentUpload.conflict ?? null,
+                resolution: meta.resolution ?? currentUpload.resolution ?? null,
+            });
+
             this.uploads.splice(this.findUploadIndex(id), 1);
+        },
+
+        skip(id) {
+            this.uploads.splice(this.findUploadIndex(id), 1);
+            this.processUploadQueue();
         },
     },
 };

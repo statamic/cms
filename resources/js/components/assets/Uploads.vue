@@ -7,10 +7,8 @@
         :percent="upload.percent"
         :error="upload.errorMessage"
         :error-status="upload.errorStatus"
-        :allow-selecting-existing="allowSelectingExisting"
         @clear="clearUpload(i)"
         @retry="retry(i, $event)"
-        @existing-selected="existingSelected(i)"
     />
 </template>
 
@@ -20,7 +18,6 @@ import Upload from './Upload.vue';
 export default {
     props: {
         uploads: Array,
-        allowSelectingExisting: Boolean,
     },
 
     components: {
@@ -34,11 +31,6 @@ export default {
 
         retry(i, args) {
             this.uploads[i].retry(args);
-        },
-
-        existingSelected(i) {
-            this.$emit('existing-selected', this.uploads[i]);
-            this.clearUpload(i);
         },
     },
 };

@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Assets;
 
 use Facades\Statamic\Fields\Validator as FieldValidator;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Validator;
@@ -124,7 +125,20 @@ class AssetsController extends CpController
             try {
                 $validator->validate();
             } catch (ValidationException $e) {
-                throw $e->status(409);
+                $existingAsset = $container->asset($path);
+
+                throw new HttpResponseException(response()->json([
+                    'message' => $e->getMessage(),
+                    'errors' => $e->errors(),
+                    'conflict' => [
+                        'type' => 'asset_upload',
+                        'filename' => $basename,
+                        'existing' => [
+                            'preview' => $existingAsset ? ($existingAsset->container()->accessible() ? $existingAsset->url() : $existingAsset->thumbnailUrl()) : null,
+                            'thumbnail' => $existingAsset?->thumbnailUrl('small'),
+                        ],
+                    ],
+                ], 409));
             }
         }
 

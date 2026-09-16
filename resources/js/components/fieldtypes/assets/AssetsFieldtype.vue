@@ -101,11 +101,7 @@
                 </div>
 
                 <div v-if="uploads.length" class="divide-y">
-                    <uploads
-                        :uploads="uploads"
-                        allow-selecting-existing
-                        @existing-selected="uploadSelected"
-                    />
+                    <uploads :uploads="uploads" />
                 </div>
 
                 <div v-if="isReadOnly && !expanded" class="border border-gray-300 dark:border-gray-700 border-dashed rounded-lg p-3 text-center">
@@ -192,6 +188,12 @@
             </div>
         </uploader>
 
+        <UploadConflictModal
+            :uploads="uploads"
+            allow-selecting-existing
+            @existing-selected="uploadSelected"
+        />
+
         <Stack v-model:open="showSelector" inset :show-close-button="false">
             <Selector
                 :container="container"
@@ -215,6 +217,7 @@ import AssetTile from './AssetTile.vue';
 import Selector from '../../assets/Selector.vue';
 import Uploader from '../../assets/Uploader.vue';
 import Uploads from '../../assets/Uploads.vue';
+import UploadConflictModal from '../../assets/UploadConflictModal.vue';
 import { SortableList } from '../../sortable/Sortable';
 import { isEqual } from 'lodash-es';
 import { Button, Dropdown, DropdownMenu, DropdownItem, Stack } from '@/components/ui';
@@ -230,6 +233,7 @@ export default {
         Selector,
         Uploader,
         Uploads,
+        UploadConflictModal,
         SortableList,
         Dropdown,
         DropdownMenu,
@@ -589,7 +593,10 @@ export default {
          */
         uploadError(upload, uploads) {
             this.uploads = uploads;
-            this.$toast.error(upload.errorMessage);
+
+            if (upload.errorStatus !== 409) {
+                this.$toast.error(upload.errorMessage);
+            }
         },
 
         /**
@@ -650,8 +657,6 @@ export default {
         uploadSelected(upload) {
             const path = `${this.folder}/${upload.basename}`.replace(/^\/+/, '');
             const id = `${this.container.id}::${path}`;
-
-            this.uploads.splice(this.uploads.indexOf(upload), 1);
 
             if (this.value.includes(id)) return;
 

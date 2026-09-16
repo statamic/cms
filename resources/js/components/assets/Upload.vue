@@ -14,44 +14,21 @@
             <div class="flex-1" v-else />
 
             <div class="flex items-center gap-2" v-if="status === 'error'">
-                <Dropdown v-if="errorStatus === 409">
-                    <template #trigger>
-                        <Button size="xs" :text="`${__('Fix')}...`" />
-                    </template>
-                    <DropdownMenu>
-                        <DropdownItem @click="retryAndOverwrite" :text="__('messages.uploader_overwrite_existing')" />
-                        <DropdownItem @click="openNewFilenameModal" :text="`${__('messages.uploader_choose_new_filename')}...`" />
-                        <DropdownItem @click="retryWithTimestamp" :text="__('messages.uploader_append_timestamp')" />
-                        <DropdownItem @click="selectExisting" v-if="allowSelectingExisting" :text="__('messages.uploader_discard_use_existing')" />
-                    </DropdownMenu>
-                </Dropdown>
+                <span v-if="errorStatus === 409" class="text-xs text-gray-500 dark:text-gray-300">
+                    {{ __('messages.asset_conflict_pending') }}
+                </span>
                 <Button size="xs" @click="clear" :text="__('Discard')" />
             </div>
         </div>
-
-
-
-        <confirmation-modal
-            :open="showNewFilenameModal"
-            :title="__('New Filename')"
-            @cancel="showNewFilenameModal = false"
-            @confirm="confirmNewFilename"
-        >
-            <Input autoselect v-model="newFilename" @keydown.enter="confirmNewFilename" />
-        </confirmation-modal>
     </div>
 </template>
 
 <script>
-import { Button, Dropdown, DropdownMenu, DropdownItem, Input, Icon } from '@/components/ui';
+import { Button, Icon } from '@/components/ui';
 
 export default {
     components: {
         Button,
-        Dropdown,
-        DropdownMenu,
-        DropdownItem,
-        Input,
         Icon,
     },
 
@@ -61,14 +38,10 @@ export default {
         percent: Number,
         error: String,
         errorStatus: Number,
-        allowSelectingExisting: Boolean,
     },
 
     data() {
-        return {
-            showNewFilenameModal: false,
-            newFilename: '',
-        };
+        return {};
     },
 
     computed: {
@@ -86,32 +59,6 @@ export default {
     methods: {
         clear() {
             this.$emit('clear');
-        },
-
-        retryAndOverwrite() {
-            this.$emit('retry', { option: 'overwrite' });
-        },
-
-        retryWithTimestamp() {
-            this.$emit('retry', { option: 'timestamp' });
-        },
-
-        openNewFilenameModal() {
-            this.showNewFilenameModal = true;
-            this.newFilename = this.basename.substring(0, this.basename.lastIndexOf('.'));
-        },
-
-        confirmNewFilename() {
-            this.showNewFilenameModal = false;
-            this.retryWithNewFilename();
-        },
-
-        retryWithNewFilename() {
-            this.$emit('retry', { option: 'rename', filename: this.newFilename });
-        },
-
-        selectExisting() {
-            this.$emit('existing-selected');
         },
     },
 };

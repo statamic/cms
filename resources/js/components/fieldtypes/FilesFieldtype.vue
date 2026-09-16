@@ -70,6 +70,8 @@
                 </div>
             </div>
         </uploader>
+
+        <UploadConflictModal :uploads="uploads" />
     </div>
 </template>
 
@@ -77,6 +79,7 @@
 import Fieldtype from './Fieldtype.vue';
 import Uploader from '../assets/Uploader.vue';
 import Uploads from '../assets/Uploads.vue';
+import UploadConflictModal from '../assets/UploadConflictModal.vue';
 import { Button } from '@/components/ui';
 
 export default {
@@ -86,6 +89,7 @@ export default {
         Button,
         Uploader,
         Uploads,
+        UploadConflictModal,
     },
 
     data() {
@@ -120,7 +124,10 @@ export default {
          */
         uploadError(upload, uploads) {
             this.uploads = uploads;
-            this.$toast.error(upload.errorMessage);
+
+            if (upload.errorStatus !== 409) {
+                this.$toast.error(upload.errorMessage);
+            }
         },
 
         /**

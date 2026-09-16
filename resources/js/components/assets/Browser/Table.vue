@@ -162,7 +162,7 @@ export default {
         loading: Boolean,
         columns: Array,
         visibleColumns: Array,
-        isSearching: Boolean
+        isSearching: Boolean,
     },
 
     watch: {

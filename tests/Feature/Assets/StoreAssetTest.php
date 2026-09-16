@@ -123,6 +123,28 @@ class StoreAssetTest extends TestCase
     }
 
     #[Test]
+    public function it_returns_conflict_payload_when_file_exists()
+    {
+        Storage::disk('test')->put('path/to/test.jpg', 'contents');
+        $existing = tap($this->container->makeAsset('path/to/test.jpg'))->save();
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->submit()
+            ->assertStatus(409)
+            ->assertJson([
+                'conflict' => [
+                    'type' => 'asset_upload',
+                    'filename' => 'test.jpg',
+                    'existing' => [
+                        'preview' => $existing->container()->accessible() ? $existing->url() : $existing->thumbnailUrl(),
+                        'thumbnail' => $existing->thumbnailUrl('small'),
+                    ],
+                ],
+            ]);
+    }
+
+    #[Test]
     public function it_doesnt_upload_when_file_exists_with_different_casing()
     {
         Storage::disk('test')->put('path/to/test.jpg', 'contents');

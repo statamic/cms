@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers\CP;
 
 use Exception;
 use Illuminate\Http\Request;
+use Statamic\Exceptions\AssetConflictException;
 use Statamic\Facades\Action;
 use Statamic\Facades\User;
 use Statamic\Support\Arr;
@@ -47,7 +48,13 @@ abstract class ActionController extends CpController
         try {
             $response = $action->run($items, $values);
         } catch (Exception $e) {
-            $response = empty($msg = $e->getMessage()) ? __('Action failed') : $msg;
+            if ($e instanceof AssetConflictException) {
+                $response = array_merge([
+                    'message' => $e->getMessage(),
+                ], $e->context());
+            } else {
+                $response = empty($msg = $e->getMessage()) ? __('Action failed') : $msg;
+            }
             $successful = false;
         }
 

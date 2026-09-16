@@ -130,9 +130,7 @@
                             <Uploads
                                 v-if="uploads.length"
                                 :uploads="uploads"
-                                :allow-selecting-existing="allowSelectingExistingUpload"
                                 class="mb-3 rounded-lg"
-                                @existing-selected="existingUploadSelected"
                             />
 
                             <Table
@@ -143,6 +141,7 @@
                                 :columns="columns"
                                 :visible-columns="visibleColumns"
                                 :is-searching="isSearching"
+                                :selected-assets="selectedAssets"
                                 v-bind="sharedAssetProps"
                                 v-on="sharedAssetEvents"
                             />
@@ -181,6 +180,38 @@
             @action-started="actionStarted"
             @action-completed="actionCompleted"
         />
+
+        <Modal
+            :open="showMoveConflictModal"
+            :title="__('messages.asset_conflict_title')"
+            @update:open="onMoveConflictModalOpenUpdated"
+        >
+            <p>{{ moveConflictMessage }}</p>
+
+            <template #footer>
+                <div class="flex items-center justify-between gap-2 ps-2 pt-3 pb-1">
+                    <div>
+                        <Checkbox
+                            v-if="showMoveConflictApplyToAll"
+                            :model-value="moveConflictApplyToAll"
+                            :label="__('messages.asset_conflict_apply_to_all')"
+                            @update:model-value="moveConflictApplyToAll = $event"
+                        />
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <Button variant="ghost" :text="__('messages.asset_conflict_cancel')" @click="resolveMoveConflict('cancel')" />
+                        <Button variant="default" :text="__('messages.asset_conflict_keep_both')" @click="resolveMoveConflict('timestamp')" />
+                        <Button variant="danger" :text="__('messages.asset_conflict_overwrite')" @click="resolveMoveConflict('overwrite')" />
+                    </div>
+                </div>
+            </template>
+        </Modal>
+
+        <UploadConflictModal
+            :uploads="uploads"
+            :allow-selecting-existing="allowSelectingExistingUpload"
+            @existing-selected="existingUploadSelected"
+        />
     </div>
 </template>
 
@@ -192,6 +223,7 @@ import Table from './Table.vue';
 import HasPreferences from '../../data-list/HasPreferences';
 import Uploader from '../Uploader.vue';
 import Uploads from '../Uploads.vue';
+import UploadConflictModal from '../UploadConflictModal.vue';
 import { debounce, sortBy } from 'lodash-es';
 import {
     Header,
@@ -214,6 +246,8 @@ import {
     Icon,
     ToggleGroup,
     ToggleItem,
+    Modal,
+    Checkbox,
 } from '@ui';
 import Breadcrumbs from './Breadcrumbs.vue';
 import useCheckerboard from '@/composables/checkerboard.js';
@@ -233,6 +267,7 @@ export default {
         AssetEditor,
         Uploader,
         Uploads,
+        UploadConflictModal,
         Grid,
         Table,
         Header,
@@ -249,6 +284,8 @@ export default {
         Icon,
         ToggleGroup,
         ToggleItem,
+        Modal,
+        Checkbox,
     },
 
     props: {
@@ -305,6 +342,11 @@ export default {
             creatingFolder: false,
             creatingFolderError: false,
             uploads: [],
+            moveConflictContext: null,
+            moveConflictMessage: '',
+            showMoveConflictModal: false,
+            moveConflictApplyToAll: false,
+            moveConflictPolicy: null,
             page: 1,
             preferencesPrefix: `assets.${this.container.id}`,
             meta: {},
@@ -440,9 +482,14 @@ export default {
                     this.creatingFolder = false;
                     this.creatingFolderError = false;
                 },
+                'asset-move-conflict': this.openMoveConflictModal,
                 'prevent-dragging': (preventDragging) => (this.preventDragging = preventDragging),
                 'update:creatingFolderError': (value) => (this.creatingFolderError = value),
             };
+        },
+
+        showMoveConflictApplyToAll() {
+            return (this.moveConflictContext?.pendingSelections?.length || 0) > 1;
         },
     },
 
@@ -513,6 +560,19 @@ export default {
     },
 
     methods: {
+        onMoveConflictModalOpenUpdated(open) {
+            if (open) {
+                this.showMoveConflictModal = true;
+                return;
+            }
+
+            if (!this.showMoveConflictModal) {
+                return;
+            }
+
+            this.resolveMoveConflict('cancel');
+        },
+
         filtersUpdated(filters) {
             this.activeFilters = filters;
         },
@@ -548,7 +608,13 @@ export default {
             this.loading = true;
         },
 
-        actionCompleted() {
+        actionCompleted(successful = null, response = {}) {
+            if (successful === true && response.message !== false) {
+                this.$toast.success(response.message || __('Action completed'));
+            } else if (successful === false) {
+                this.$toast.error(response.message || __('Action failed'));
+            }
+
             // Intentionally not completing the loading state here since
             // the listing will refresh and immediately restart it.
             // this.loading = false;
@@ -730,7 +796,15 @@ export default {
             this.lastItemClicked = index;
         },
 
-        uploadCompleted(asset) {
+        uploadCompleted(asset, uploads, upload) {
+            if (['overwrite', 'timestamp'].includes(upload?.resolution)) {
+                const urls = this.getUploadConflictCacheBustUrls(upload);
+
+                if (urls.length) {
+                    Statamic.$callbacks.call('bustAndReloadImageCaches', urls);
+                }
+            }
+
             if (this.autoselectUploads) {
                 this.sortColumn = 'last_modified';
                 this.sortDirection = 'desc';
@@ -749,11 +823,245 @@ export default {
 
         uploadError(upload, uploads) {
             this.uploads = uploads;
-            this.$toast.error(upload.errorMessage);
+
+            if (upload.errorStatus !== 409) {
+                this.$toast.error(upload.errorMessage);
+            }
         },
 
         uploadsUpdated(uploads) {
             this.uploads = uploads;
+        },
+
+        getUploadConflictCacheBustUrls(upload) {
+            if (upload?.conflict?.existing) {
+                return [upload.conflict.existing.preview, upload.conflict.existing.thumbnail].filter(Boolean);
+            }
+
+            const folderPath = (this.folder?.path || '').replace(/^\/+|\/+$/g, '');
+            const basename = upload?.basename || '';
+            const fullPath = [folderPath, basename].filter(Boolean).join('/');
+            const existingAsset = this.assets.find((asset) => {
+                if (asset.path === fullPath) {
+                    return true;
+                }
+
+                return folderPath === '' && asset.basename === basename;
+            });
+
+            if (!existingAsset) {
+                return [];
+            }
+
+            return [existingAsset.preview, existingAsset.thumbnail].filter(Boolean);
+        },
+
+        openMoveConflictModal({ action, asset, destinationFolder, selections, message, conflict, completedMoves }) {
+            const initialRemap =
+                completedMoves && typeof completedMoves === 'object' && !Array.isArray(completedMoves) ? completedMoves : {};
+            const completedSelectionIds = new Set(Object.keys(initialRemap).map((id) => String(id)));
+            const pendingSelections = Array.from(new Set((selections || [asset?.id]).filter(Boolean))).filter(
+                (id) => !completedSelectionIds.has(String(id)),
+            );
+
+            this.moveConflictContext = {
+                action,
+                asset,
+                destinationFolder,
+                pendingSelections,
+                conflict,
+                idRemap: { ...initialRemap },
+            };
+            this.moveConflictMessage = message;
+            this.showMoveConflictModal = true;
+        },
+
+        remapMoveConflictAssetId(id, idRemap = {}) {
+            let current = id;
+            const seen = new Set();
+
+            while (current && idRemap[current] && !seen.has(current)) {
+                seen.add(current);
+                current = idRemap[current];
+            }
+
+            return current;
+        },
+
+        async resolveMoveConflict(strategy) {
+            const conflictContext = this.moveConflictContext;
+            this.showMoveConflictModal = false;
+            this.moveConflictContext = null;
+
+            if (!conflictContext) {
+                return;
+            }
+
+            if (this.moveConflictApplyToAll) {
+                this.moveConflictPolicy = strategy;
+            }
+
+            this.moveConflictApplyToAll = false;
+            this.actionStarted();
+            await this.continueMoveConflictResolution(conflictContext, strategy);
+        },
+
+        async continueMoveConflictResolution(context, strategy = null) {
+            let nextStrategy = strategy;
+
+            while (true) {
+                const conflictAssetId = context.conflict?.asset?.id;
+                const resolution = this.moveConflictPolicy;
+
+                if (conflictAssetId) {
+                    const idRemap = context.idRemap || {};
+
+                    context.pendingSelections = context.pendingSelections.filter(
+                        (id) => this.remapMoveConflictAssetId(id, idRemap) !== conflictAssetId,
+                    );
+                }
+
+                if (nextStrategy && nextStrategy !== 'cancel' && conflictAssetId) {
+                    const resolutionResult = await this.runMoveConflictAction(
+                        context,
+                        [this.remapMoveConflictAssetId(conflictAssetId, context.idRemap || {})],
+                        nextStrategy,
+                    );
+
+                    if (resolutionResult.success === false) {
+                        this.moveConflictPolicy = null;
+                        this.actionCompleted(false, resolutionResult);
+                        return;
+                    }
+
+                    if (nextStrategy === 'overwrite') {
+                        const urls = [
+                            context.conflict?.existing?.preview,
+                            context.conflict?.existing?.thumbnail,
+                        ].filter(Boolean);
+
+                        if (urls.length) {
+                            Statamic.$callbacks.call('bustAndReloadImageCaches', urls);
+                        }
+                    }
+                }
+
+                if (context.pendingSelections.length === 0) {
+                    this.moveConflictPolicy = null;
+                    this.actionCompleted(true, {
+                        message: false,
+                    });
+                    return;
+                }
+
+                const response = await this.runMoveConflictAction(context, context.pendingSelections, null);
+
+                if (response.success !== false) {
+                    this.moveConflictPolicy = null;
+                    this.actionCompleted(true, response);
+                    return;
+                }
+
+                if (response.conflict?.type !== 'asset_move') {
+                    this.moveConflictPolicy = null;
+                    this.actionCompleted(false, response);
+                    return;
+                }
+
+                if (
+                    response.completed_moves &&
+                    typeof response.completed_moves === 'object' &&
+                    !Array.isArray(response.completed_moves) &&
+                    Object.keys(response.completed_moves).length
+                ) {
+                    context.idRemap = { ...context.idRemap, ...response.completed_moves };
+                }
+
+                context.conflict = response.conflict;
+                this.moveConflictMessage = response.message;
+
+                const currentConflictAssetId = response.conflict?.asset?.id;
+
+                if (!currentConflictAssetId) {
+                    this.moveConflictPolicy = null;
+                    this.actionCompleted(false, response);
+                    return;
+                }
+
+                if (resolution) {
+                    nextStrategy = resolution;
+                    continue;
+                }
+
+                this.moveConflictContext = context;
+                this.showMoveConflictModal = true;
+                return;
+            }
+        },
+
+        invokeActionCallback(data) {
+            if (!data) {
+                return;
+            }
+
+            if (Array.isArray(data.callback) && data.callback.length) {
+                Statamic.$callbacks.call(data.callback[0], ...data.callback.slice(1));
+                return;
+            }
+
+            if (
+                data.completed_moves &&
+                typeof data.completed_moves === 'object' &&
+                !Array.isArray(data.completed_moves) &&
+                Object.keys(data.completed_moves).length
+            ) {
+                Statamic.$callbacks.call('replaceInSelections', data.completed_moves);
+            }
+        },
+
+        async runMoveConflictAction(context, selections, strategy = null) {
+            const idRemap = context.idRemap || {};
+            const selectedAssetIds = Array.from(
+                new Set(
+                    (selections || [])
+                        .filter(Boolean)
+                        .map((id) => this.remapMoveConflictAssetId(id, idRemap)),
+                ),
+            );
+
+            if (selectedAssetIds.length === 0) {
+                return {
+                    success: true,
+                    message: false,
+                };
+            }
+
+            const payload = {
+                action: context.action.handle,
+                context: {
+                    ...context.action.context,
+                    ...(strategy ? { conflict: strategy } : {}),
+                },
+                selections: selectedAssetIds,
+                values: {
+                    folder: context.destinationFolder.path,
+                },
+            };
+
+            try {
+                const { data } = await this.$axios.post(this.actionUrl, payload);
+                this.invokeActionCallback(data);
+
+                return data || {};
+            } catch ({ response }) {
+                const data = response?.data || {
+                    success: false,
+                    message: __('Action failed'),
+                };
+                this.invokeActionCallback(data);
+
+                return data;
+            }
         },
 
         addToCommandPalette() {

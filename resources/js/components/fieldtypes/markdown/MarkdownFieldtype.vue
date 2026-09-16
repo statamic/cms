@@ -21,6 +21,7 @@
                     :path="folder"
                     @updated="uploadsUpdated"
                     @upload-complete="uploadComplete"
+                    @error="uploadError"
                     v-slot="{ dragging }"
                 >
                     <div>
@@ -153,6 +154,8 @@
                 </Stack>
             </div>
         </div>
+
+        <UploadConflictModal :uploads="uploads" />
     </portal>
 </template>
 
@@ -184,6 +187,7 @@ import { availableButtons } from './buttons';
 import AssetSelector from '../../assets/Selector.vue';
 import Uploader from '../../assets/Uploader.vue';
 import Uploads from '../../assets/Uploads.vue';
+import UploadConflictModal from '../../assets/UploadConflictModal.vue';
 import MarkdownToolbar from './MarkdownToolbar.vue';
 import { useContentDirection } from '@/composables/content-direction';
 import { dedupeInFlight } from '@/util/dedupeInFlight.js';
@@ -239,6 +243,7 @@ export default {
         AssetSelector,
         Uploader,
         Uploads,
+        UploadConflictModal,
         MarkdownToolbar,
 	    Stack,
     },
@@ -613,6 +618,14 @@ export default {
 
         uploadsUpdated(uploads) {
             this.uploads = uploads;
+        },
+
+        uploadError(upload, uploads) {
+            this.uploads = uploads;
+
+            if (upload.errorStatus !== 409) {
+                this.$toast.error(upload.errorMessage);
+            }
         },
 
         uploadComplete(upload, uploads) {
