@@ -212,12 +212,23 @@ class GlideTest extends TestCase
 
                 return [$test->createAsset(), ['w' => 100, 'h' => 50]];
             }],
+            'asset with reserved characters in its filename' => [fn ($test) => [$test->createAsset('foo/photo #1.jpg'), ['w' => 100]]],
             'asset id' => [fn ($test) => [$test->createAsset()->id(), ['w' => 100]]],
             'path' => [fn ($test) => [$test->createPublicImage('test-path.jpg'), ['w' => 100]]],
             'remote url' => [function ($test) {
                 $test->bindRemoteImage();
 
                 return ['https://example.com/foo/hoff.jpg', ['w' => 100]];
+            }],
+            'remote url with a query string' => [function ($test) {
+                $test->bindRemoteImage();
+
+                return ['https://example.com/foo/hoff.jpg?query=david', ['w' => 100]];
+            }],
+            'remote url with an encoded character' => [function ($test) {
+                $test->bindRemoteImage();
+
+                return ['https://example.com/foo/photo%23one.jpg', ['w' => 100]];
             }],
             'asset watermark' => [fn ($test) => [$test->createAsset(), ['w' => 100, 'mark' => $test->createAsset('foo/mark.png')]]],
             'path watermark' => [fn ($test) => [$test->createAsset(), ['w' => 100, 'mark' => $test->createPublicImage('mark.png')]]],

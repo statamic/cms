@@ -34,7 +34,9 @@ class HybridUrlBuilder extends ImageUrlBuilder
 
         $this->cacheSource($cachePath, $this->withEncodedWatermark($params));
 
-        $urlPath = URL::tidy($this->options['route'].'/'.$cachePath, withTrailingSlash: false);
+        $encodedCachePath = collect(explode('/', $cachePath))->map(rawurlencode(...))->implode('/');
+
+        $urlPath = URL::tidy($this->options['route'].'/'.$encodedCachePath, withTrailingSlash: false);
 
         return URL::makeRelative(URL::prependSiteUrl($urlPath));
     }
