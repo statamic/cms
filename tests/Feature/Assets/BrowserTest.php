@@ -367,6 +367,26 @@ class BrowserTest extends TestCase
     }
 
     #[Test]
+    public function it_only_allows_editing_the_blueprint_with_permission()
+    {
+        AssetContainer::make('test')->disk('test')->save();
+
+        $this->setTestRoles(['test' => ['access cp', 'view test assets', 'configure fields']]);
+
+        $this
+            ->actingAs(User::make()->assignRole('test')->save())
+            ->get(cp_route('assets.browse.show', 'test'))
+            ->assertSuccessful()
+            ->assertInertia(fn ($page) => $page->where('container.can_edit_blueprint', true));
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->get(cp_route('assets.browse.show', 'test'))
+            ->assertSuccessful()
+            ->assertInertia(fn ($page) => $page->where('container.can_edit_blueprint', false));
+    }
+
+    #[Test]
     public function it_includes_container_actions_in_the_browse_data()
     {
         TestContainerAction::register();

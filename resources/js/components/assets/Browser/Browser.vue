@@ -45,7 +45,7 @@
                                     @completed="containerActionCompleted"
                                     v-slot="{ actions }"
                                 >
-                                    <Dropdown v-if="container.can_edit || container.can_delete || container.can_create || actions.length">
+                                    <Dropdown v-if="container.can_edit || container.can_delete || container.can_edit_blueprint || actions.length">
                                         <DropdownMenu>
                                             <DropdownItem
                                                 icon="container-add"
@@ -61,6 +61,7 @@
                                             />
                                             <DropdownItem
                                                 icon="blueprint-edit"
+                                                v-if="container.can_edit_blueprint"
                                                 :text="__('Edit Blueprint')"
                                                 :href="container.blueprint_url"
                                             />
@@ -842,6 +843,7 @@ export default {
             });
 
             Statamic.$commandPalette.add({
+                when: () => this.container.can_edit_blueprint,
                 category: Statamic.$commandPalette.category.Actions,
                 text: __('Edit Blueprint'),
                 icon: 'blueprint-edit',
