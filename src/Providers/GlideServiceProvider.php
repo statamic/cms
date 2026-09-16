@@ -52,7 +52,11 @@ class GlideServiceProvider extends ServiceProvider
 
     public function boot()
     {
-        if (Glide::isUsingHybridCaching() && ! Glide::cachePathIsServedByRoute()) {
+        if (! Glide::isUsingHybridCaching() || Glide::cachePathIsServedByRoute()) {
+            return;
+        }
+
+        if (Glide::cacheStore()->add('hybrid-cache-path-warning', true)) {
             Log::warning('Glide hybrid caching: the image_manipulation.cache_path must live at the image_manipulation.route inside the public directory, otherwise cached images are never served directly by the web server.');
         }
     }

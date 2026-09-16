@@ -158,7 +158,7 @@ class GlideTest extends TestCase
     }
 
     #[Test]
-    public function hybrid_caching_warns_when_the_cache_path_is_not_served_by_the_route()
+    public function hybrid_caching_warns_once_when_the_cache_path_is_not_served_by_the_route()
     {
         config([
             'statamic.assets.image_manipulation.cache' => 'hybrid',
@@ -168,6 +168,7 @@ class GlideTest extends TestCase
 
         Log::shouldReceive('warning')->once()->withArgs(fn ($message) => str_contains($message, 'hybrid'));
 
+        (new GlideServiceProvider($this->app))->boot();
         (new GlideServiceProvider($this->app))->boot();
     }
 
