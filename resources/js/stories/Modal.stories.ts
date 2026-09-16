@@ -1,6 +1,5 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
 import {Button, Field, Input, Modal, ModalClose, ModalTitle} from '@ui';
-import PortalTargets from "@/components/portals/PortalTargets.vue";
 
 /**
  * @import import { Modal } from '@statamic/cms/ui';
@@ -56,11 +55,11 @@ export const _DocsIntro: Story = {
         }
     },
     render: () => ({
-        components: { Modal, Button, PortalTargets },
+        components: { Modal, Button },
         data: () => {
             return { isOpen: false };
         },
-        template: `<div>${defaultCode}</div><PortalTargets />`,
+        template: `<div>${defaultCode}</div>`,
     }),
 };
 
