@@ -37,35 +37,53 @@
                     <template #default="{ items }">
                         <slot name="header" v-bind="{ canUpload, openFileBrowser, canCreateFolders, startCreatingFolder, mode, modeChanged }">
                             <Header :title="__(container.title)" icon="assets">
-                                <Dropdown v-if="container.can_edit || container.can_delete || container.can_create">
-                                    <DropdownMenu>
-                                        <DropdownItem
-                                            icon="container-add"
-                                            v-if="canCreateContainers"
-                                            :text="__('Create Container')"
-                                            :href="createContainerUrl"
-                                        />
-                                        <DropdownItem
-                                            icon="cog"
-                                            v-if="container.can_edit"
-                                            :text="__('Configure Container')"
-                                            :href="container.edit_url"
-                                        />
-                                        <DropdownItem
-                                            icon="blueprint-edit"
-                                            :text="__('Edit Blueprint')"
-                                            :href="container.blueprint_url"
-                                        />
-                                        <DropdownSeparator v-if="container.can_delete" />
-                                        <DropdownItem
-                                            icon="trash"
-                                            variant="destructive"
-                                            v-if="container.can_delete"
-                                            :text="__('Delete Container')"
-                                            @click="$event.preventDefault(); $refs.deleter.confirm()"
-                                        />
-                                    </DropdownMenu>
-                                </Dropdown>
+                                <ItemActions
+                                    ref="containerActions"
+                                    :url="container.actions_url"
+                                    :actions="container.actions"
+                                    :item="container.id"
+                                    @completed="containerActionCompleted"
+                                    v-slot="{ actions }"
+                                >
+                                    <Dropdown v-if="container.can_edit || container.can_delete || container.can_create || actions.length">
+                                        <DropdownMenu>
+                                            <DropdownItem
+                                                icon="container-add"
+                                                v-if="canCreateContainers"
+                                                :text="__('Create Container')"
+                                                :href="createContainerUrl"
+                                            />
+                                            <DropdownItem
+                                                icon="cog"
+                                                v-if="container.can_edit"
+                                                :text="__('Configure Container')"
+                                                :href="container.edit_url"
+                                            />
+                                            <DropdownItem
+                                                icon="blueprint-edit"
+                                                :text="__('Edit Blueprint')"
+                                                :href="container.blueprint_url"
+                                            />
+                                            <DropdownSeparator v-if="actions.length" />
+                                            <DropdownItem
+                                                v-for="action in actions"
+                                                :key="action.handle"
+                                                :text="__(action.title)"
+                                                :icon="action.icon"
+                                                :variant="action.dangerous ? 'destructive' : 'default'"
+                                                @click="action.run"
+                                            />
+                                            <DropdownSeparator v-if="container.can_delete" />
+                                            <DropdownItem
+                                                icon="trash"
+                                                variant="destructive"
+                                                v-if="container.can_delete"
+                                                :text="__('Delete Container')"
+                                                @click="$event.preventDefault(); $refs.deleter.confirm()"
+                                            />
+                                        </DropdownMenu>
+                                    </Dropdown>
+                                </ItemActions>
 
                                 <resource-deleter
                                     ref="deleter"
@@ -192,6 +210,7 @@ import Table from './Table.vue';
 import HasPreferences from '../../data-list/HasPreferences';
 import Uploader from '../Uploader.vue';
 import Uploads from '../Uploads.vue';
+import ItemActions from '@/components/actions/ItemActions.vue';
 import { debounce, sortBy } from 'lodash-es';
 import {
     Header,
@@ -231,6 +250,7 @@ export default {
         DropdownSeparator,
         AssetThumbnail,
         AssetEditor,
+        ItemActions,
         Uploader,
         Uploads,
         Grid,
@@ -556,6 +576,19 @@ export default {
             this.$refs.listing.refresh();
         },
 
+        containerActionCompleted(successful, response = {}) {
+            if (!successful) {
+                Statamic.$toast.error(response.message || __('Action failed'));
+                return;
+            }
+
+            if (response.message !== false) {
+                Statamic.$toast.success(response.message || __('Action completed'));
+            }
+
+            if (!response.redirect) this.$refs.listing.refresh();
+        },
+
         assetSaved() {
             this.loadAssets();
         },
@@ -822,6 +855,16 @@ export default {
                 icon: 'trash',
                 action: () => this.$refs.deleter.confirm(),
             });
+
+            this.container.actions?.forEach(action => Statamic.$commandPalette.add({
+                when: () => Boolean(this.$refs.containerActions),
+                category: Statamic.$commandPalette.category.Actions,
+                text: [__('Container'), action.title],
+                icon: action.icon,
+                action: () => this.$refs.containerActions.preparedActions
+                    .find(prepared => prepared.handle === action.handle)
+                    ?.run(),
+            }));
         }
     },
 };
