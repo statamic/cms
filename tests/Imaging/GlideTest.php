@@ -17,6 +17,7 @@ use League\Glide\Server;
 use Orchestra\Testbench\Attributes\DefineEnvironment;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Console\Processes\Ffmpeg;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Imaging\UrlBuilder;
 use Statamic\Facades\Asset;
@@ -224,6 +225,11 @@ class GlideTest extends TestCase
                 Site::setCurrent('french');
 
                 return [$test->createAsset(), ['w' => 100]];
+            }],
+            'video asset' => [function ($test) {
+                $test->fakeFfmpeg();
+
+                return [$test->createAsset('foo/clip.mp4'), ['w' => 100]];
             }],
             'path' => [fn ($test) => [$test->createPublicImage('test-path.jpg'), ['w' => 100]]],
             'remote url' => [function ($test) {
@@ -571,6 +577,18 @@ class GlideTest extends TestCase
             $response = new Response(200, [], file_get_contents($file->getPathname()));
 
             return new Client(['handler' => new MockHandler([$response, $response, $response])]);
+        });
+    }
+
+    private function fakeFfmpeg()
+    {
+        $this->mock(Ffmpeg::class, function ($mock) {
+            $mock->shouldReceive('available')->andReturnTrue();
+            $mock->shouldReceive('extractThumbnail')->andReturnUsing(function ($input, $output) {
+                $thumbnail = UploadedFile::fake()->image('thumbnail.jpg', 30, 60);
+
+                return tap($output, fn () => file_put_contents($output, file_get_contents($thumbnail->getPathname())));
+            });
         });
     }
 

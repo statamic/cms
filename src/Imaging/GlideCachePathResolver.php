@@ -14,6 +14,10 @@ class GlideCachePathResolver
 
     public function resolveForAsset(Asset $asset, array $params): string
     {
+        if ($asset->isVideo()) {
+            return $this->resolveForPath(ThumbnailExtractor::getFileName($asset), $params);
+        }
+
         return $this->resolve(
             $asset->basename(),
             $params,
