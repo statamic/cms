@@ -49,19 +49,16 @@ class DuplicateForm extends Action
     public function run($items, $values)
     {
         $items->each(function (Form $original) use ($values) {
-            $originalBlueprintContents = $original->blueprint()->contents();
-
             $form = Forms::make()
                 ->handle($values['handle'])
                 ->title($values['title'])
                 ->honeypot($original->honeypot())
                 ->store($original->store())
                 ->email($original->email())
+                ->formFields($original->formFields()->contents())
                 ->data($original->data());
 
             $form->save();
-
-            $form->blueprint()->setContents($originalBlueprintContents)->save();
         });
     }
 

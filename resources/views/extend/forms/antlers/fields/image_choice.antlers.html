@@ -1,0 +1,25 @@
+{{ options }}
+    <label>
+        <input
+            id="{{ id }}-{{ key | slugify }}-option"
+            type="{{ multiple ? 'checkbox' : 'radio' }}"
+            name="{{ multiple ? '{name}[]' : name }}"
+            value="{{ key }}"
+            {{ if js_driver }}{{ js_attributes }}{{ /if }}
+            {{ if multiple }}
+                {{ if value|in_array:key }}checked{{ /if }}
+            {{ else }}
+                {{ if value == key }}checked{{ /if }}
+            {{ /if }}
+            {{ if validate|contains:required }}required{{ /if }}
+            {{ if error }}
+                aria-invalid="true" aria-describedby="{{ id }}-error"
+            {{ elseif instructions }}
+                aria-describedby="{{ id }}-instructions"
+            {{ /if }}
+        >
+        <img src="{{ image }}" alt="{{ label ?? key }}" style="max-width: 200px; display: block;">
+        {{ label ?? key }}
+    </label>
+    <br>
+{{ /options }}

@@ -16,8 +16,7 @@ class FieldtypesController extends CpController
             });
 
         if ($request->selectable) {
-            $selectableMethod = $request->forms ? 'selectableInForms' : 'selectable';
-            $fieldtypes = $fieldtypes->filter->$selectableMethod();
+            $fieldtypes = $fieldtypes->filter->selectable();
         }
 
         return $fieldtypes->sortBy->handle()->values();
