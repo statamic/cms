@@ -25,6 +25,7 @@ use Statamic\Facades\Config;
 use Statamic\Facades\File;
 use Statamic\Facades\Glide;
 use Statamic\Facades\Path;
+use Statamic\Facades\Site;
 use Statamic\Imaging\GlideCachePathResolver;
 use Statamic\Imaging\GlideUrlBuilder;
 use Statamic\Imaging\HybridUrlBuilder;
@@ -214,6 +215,16 @@ class GlideTest extends TestCase
             }],
             'asset with reserved characters in its filename' => [fn ($test) => [$test->createAsset('foo/photo #1.jpg'), ['w' => 100]]],
             'asset id' => [fn ($test) => [$test->createAsset()->id(), ['w' => 100]]],
+            'asset on a subdirectory site' => [function ($test) {
+                $test->setSites([
+                    'english' => ['url' => '/', 'locale' => 'en_US'],
+                    'french' => ['url' => '/fr/', 'locale' => 'fr_FR'],
+                ]);
+
+                Site::setCurrent('french');
+
+                return [$test->createAsset(), ['w' => 100]];
+            }],
             'path' => [fn ($test) => [$test->createPublicImage('test-path.jpg'), ['w' => 100]]],
             'remote url' => [function ($test) {
                 $test->bindRemoteImage();
