@@ -36,9 +36,7 @@ class HybridUrlBuilder extends ImageUrlBuilder
 
         $encodedCachePath = collect(explode('/', $cachePath))->map(rawurlencode(...))->implode('/');
 
-        $urlPath = URL::tidy($this->options['route'].'/'.$encodedCachePath, withTrailingSlash: false);
-
-        return URL::makeRelative($urlPath);
+        return URL::makeRelative($this->options['route'].'/'.$encodedCachePath);
     }
 
     private function findAsset(string $id): Asset
