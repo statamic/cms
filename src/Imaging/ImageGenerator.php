@@ -225,7 +225,7 @@ class ImageGenerator
         @set_time_limit(config('statamic.system.php_max_execution_time'));
     }
 
-    private function setUpWatermark($watermark): string
+    private function setUpWatermark($watermark): ?string
     {
         $watermark = static::decodeWatermark($watermark);
 
@@ -237,7 +237,7 @@ class ImageGenerator
     /**
      * The `mark` param as Glide will see it, which is what the cache path is hashed from.
      */
-    public static function watermarkParam($watermark): string
+    public static function watermarkParam($watermark): ?string
     {
         $watermark = static::decodeWatermark($watermark);
 
