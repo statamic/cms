@@ -1,10 +1,7 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
-import {Badge} from '@ui';
+import {Badge} from '@statamic/cms/ui';
 import {icons} from "@/stories/icons";
 
-/**
- * @import import { Badge } from '@statamic/cms/ui';
- */
 const meta = {
     title: 'Components/Badge',
     component: Badge,

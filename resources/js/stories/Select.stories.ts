@@ -1,11 +1,8 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
-import {Select} from '@ui';
+import {Select} from '@statamic/cms/ui';
 import {icons} from "@/stories/icons";
 import {ref} from "vue";
 
-/**
- * @import import { Select } from '@statamic/cms/ui';
- */
 const meta = {
     title: 'Forms/Select',
     component: Select,

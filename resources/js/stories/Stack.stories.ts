@@ -1,10 +1,7 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
-import {Button, Stack, StackClose, StackHeader, StackContent, StackFooter, Modal, ModalClose} from '@ui';
+import {Button, Stack, StackClose, StackHeader, StackContent, StackFooter, Modal, ModalClose} from '@statamic/cms/ui';
 import {ref} from 'vue';
 
-/**
- * @import import { Stack } from '@statamic/cms/ui';
- */
 const meta = {
     title: 'Overlays/Stack',
     component: Stack,

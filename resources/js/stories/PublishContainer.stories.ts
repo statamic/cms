@@ -9,11 +9,8 @@ import {
     PublishSections,
     PublishTabs,
     TabProvider,
-} from '@ui';
+} from '@statamic/cms/ui';
 
-/**
- * @import import { PublishContainer } from '@statamic/cms/ui';
- */
 const meta = {
     title: 'Components/PublishContainer',
     component: PublishContainer,

@@ -1,9 +1,6 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
-import {SplitterGroup, SplitterPanel, SplitterResizeHandle} from '@ui';
+import {SplitterGroup, SplitterPanel, SplitterResizeHandle} from '@statamic/cms/ui';
 
-/**
- * @import import { SplitterGroup } from '@statamic/cms/ui';
- */
 const meta = {
     title: 'Layout/Splitter',
     component: SplitterGroup,

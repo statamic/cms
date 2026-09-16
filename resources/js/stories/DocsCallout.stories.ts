@@ -1,9 +1,6 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
-import {DocsCallout} from '@ui';
+import {DocsCallout} from '@statamic/cms/ui';
 
-/**
- * @import import { DocsCallout } from '@statamic/cms/ui';
- */
 const meta = {
     title: 'Components/DocsCallout',
     component: DocsCallout,

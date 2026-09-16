@@ -1,10 +1,7 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
 import {ref} from 'vue';
-import {Button, Field, Input, Switch, Textarea} from '@ui';
+import {Button, Field, Input, Switch, Textarea} from '@statamic/cms/ui';
 
-/**
- * @import import { Field } from '@statamic/cms/ui';
- */
 const meta = {
     title: 'Forms/Field',
     component: Field,

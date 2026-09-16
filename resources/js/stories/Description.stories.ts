@@ -1,9 +1,6 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
-import {Description} from '@ui';
+import {Description} from '@statamic/cms/ui';
 
-/**
- * @import import { Description } from '@statamic/cms/ui';
- */
 const meta = {
     title: 'Forms/Description',
     component: Description,

@@ -1,10 +1,7 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
-import {Button, ButtonGroup} from '@ui';
+import {Button, ButtonGroup} from '@statamic/cms/ui';
 import {icons} from './icons';
 
-/**
- * @import import { Button } from '@statamic/cms/ui';
- */
 const meta = {
     title: 'Forms/Button',
     component: Button,

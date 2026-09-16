@@ -1,10 +1,7 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
-import {Pagination} from '@ui';
+import {Pagination} from '@statamic/cms/ui';
 import {ref} from 'vue';
 
-/**
- * @import import { Pagination } from '@statamic/cms/ui';
- */
 const meta = {
     title: 'Layout/Pagination',
     component: Pagination,

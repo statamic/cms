@@ -17,11 +17,8 @@ import {
     ListingToggleAll,
     Panel,
     PanelFooter,
-} from '@ui';
+} from '@statamic/cms/ui';
 
-/**
- * @import import { Listing } from '@statamic/cms/ui';
- */
 const meta = {
     title: 'Layout/Listing',
     component: Listing,

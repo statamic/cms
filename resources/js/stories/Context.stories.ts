@@ -8,11 +8,8 @@ import {
     ContextLabel,
     ContextMenu,
     ContextSeparator
-} from '@ui';
+} from '@statamic/cms/ui';
 
-/**
- * @import import { Context } from '@statamic/cms/ui';
- */
 const meta = {
     title: 'Overlays/Context',
     component: Context,

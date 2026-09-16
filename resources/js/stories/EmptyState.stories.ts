@@ -1,9 +1,6 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
-import {EmptyStateItem, EmptyStateMenu} from '@ui';
+import {EmptyStateItem, EmptyStateMenu} from '@statamic/cms/ui';
 
-/**
- * @import import { EmptyStateMenu } from '@statamic/cms/ui';
- */
 const meta = {
     title: 'Layout/EmptyState',
     component: EmptyStateMenu,

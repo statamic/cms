@@ -1,12 +1,9 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
 import {expect, fn, userEvent, waitFor, within} from 'storybook/test';
-import {Combobox} from '@ui';
+import {Combobox} from '@statamic/cms/ui';
 import {ref} from 'vue';
 import {icons} from "@/stories/icons";
 
-/**
- * @import import { Combobox } from '@statamic/cms/ui';
- */
 const meta = {
     title: 'Forms/Combobox',
     component: Combobox,

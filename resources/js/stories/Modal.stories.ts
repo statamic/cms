@@ -1,10 +1,7 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
-import {Button, Field, Input, Modal, ModalClose, ModalTitle} from '@ui';
+import {Button, Field, Input, Modal, ModalClose, ModalTitle} from '@statamic/cms/ui';
 import {ref} from 'vue';
 
-/**
- * @import import { Modal } from '@statamic/cms/ui';
- */
 const meta = {
     title: 'Overlays/Modal',
     component: Modal,

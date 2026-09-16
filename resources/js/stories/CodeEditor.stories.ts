@@ -1,10 +1,7 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
-import {CodeEditor} from '@ui';
+import {CodeEditor} from '@statamic/cms/ui';
 import {ref} from 'vue';
 
-/**
- * @import import { CodeEditor } from '@statamic/cms/ui';
- */
 const meta = {
     title: 'Components/CodeEditor',
     component: CodeEditor,

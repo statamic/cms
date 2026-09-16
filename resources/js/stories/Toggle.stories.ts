@@ -1,10 +1,7 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
-import {ToggleGroup, ToggleItem} from '@ui';
+import {ToggleGroup, ToggleItem} from '@statamic/cms/ui';
 import {ref} from 'vue';
 
-/**
- * @import import { ToggleGroup } from '@statamic/cms/ui';
- */
 const meta = {
     title: 'Forms/Toggle',
     component: ToggleGroup,

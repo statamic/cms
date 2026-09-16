@@ -1,9 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3';
-import { DragHandle } from '@ui';
+import { DragHandle } from '@statamic/cms/ui';
 
-/**
- * @import import { DragHandle } from '@statamic/cms/ui';
- */
 const meta = {
     title: 'Components/DragHandle',
     component: DragHandle,

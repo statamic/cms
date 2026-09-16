@@ -1,11 +1,8 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
-import {Timezones, TimezoneHoverCard} from '@ui';
+import {Timezones, TimezoneHoverCard} from '@statamic/cms/ui';
 
 const exampleDate = '2026-05-05T12:00:00.000Z';
 
-/**
- * @import import { Timezones } from '@statamic/cms/ui';
- */
 const meta = {
     title: 'Overlays/Timezones',
     component: Timezones,

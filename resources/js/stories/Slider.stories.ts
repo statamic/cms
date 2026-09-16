@@ -1,10 +1,7 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
 import {ref} from 'vue';
-import {Field, Slider} from '@ui';
+import {Field, Slider} from '@statamic/cms/ui';
 
-/**
- * @import import { Slider } from '@statamic/cms/ui';
- */
 const meta = {
     title: 'Forms/Slider',
     component: Slider,

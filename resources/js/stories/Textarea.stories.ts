@@ -1,9 +1,6 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
-import {Textarea} from '@ui';
+import {Textarea} from '@statamic/cms/ui';
 
-/**
- * @import import { Textarea } from '@statamic/cms/ui';
- */
 const meta = {
     title: 'Forms/Textarea',
     component: Textarea,

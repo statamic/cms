@@ -1,10 +1,7 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
-import {CharacterCounter, Input} from '@ui';
+import {CharacterCounter, Input} from '@statamic/cms/ui';
 import {ref} from 'vue';
 
-/**
- * @import import { CharacterCounter } from '@statamic/cms/ui';
- */
 const meta = {
     title: 'Forms/CharacterCounter',
     component: CharacterCounter,

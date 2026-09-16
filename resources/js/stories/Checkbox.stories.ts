@@ -1,10 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3';
-import { Checkbox, CheckboxGroup } from '@ui';
+import { Checkbox, CheckboxGroup } from '@statamic/cms/ui';
 import { ref } from 'vue';
 
-/**
- * @import import { Checkbox } from '@statamic/cms/ui';
- */
 const meta = {
     title: 'Forms/Checkbox',
     component: Checkbox,

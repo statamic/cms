@@ -1,9 +1,6 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
-import {Card, Skeleton} from '@ui';
+import {Card, Skeleton} from '@statamic/cms/ui';
 
-/**
- * @import import { Skeleton } from '@statamic/cms/ui';
- */
 const meta = {
     title: 'Components/Skeleton',
     component: Skeleton,

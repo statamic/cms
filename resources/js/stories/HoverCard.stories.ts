@@ -1,9 +1,6 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
-import {Button, Description, Heading, HoverCard} from '@ui';
+import {Button, Description, Heading, HoverCard} from '@statamic/cms/ui';
 
-/**
- * @import import { HoverCard } from '@statamic/cms/ui';
- */
 const meta = {
     title: 'Overlays/HoverCard',
     component: HoverCard,

@@ -1,9 +1,6 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
-import {StatusIndicator} from '@ui';
+import {StatusIndicator} from '@statamic/cms/ui';
 
-/**
- * @import import { StatusIndicator } from '@statamic/cms/ui';
- */
 const meta = {
     title: 'Components/StatusIndicator',
     component: StatusIndicator,

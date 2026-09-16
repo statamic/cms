@@ -1,9 +1,6 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
-import {Field, Input, Label} from '@ui';
+import {Field, Input, Label} from '@statamic/cms/ui';
 
-/**
- * @import import { Label } from '@statamic/cms/ui';
- */
 const meta = {
     title: 'Forms/Label',
     component: Label,

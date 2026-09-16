@@ -1,10 +1,7 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
-import {TabContent, TabList, Tabs, TabTrigger} from '@ui';
+import {TabContent, TabList, Tabs, TabTrigger} from '@statamic/cms/ui';
 import {ref} from 'vue';
 
-/**
- * @import import { Tabs } from '@statamic/cms/ui';
- */
 const meta = {
     title: 'Layout/Tabs',
     component: Tabs,

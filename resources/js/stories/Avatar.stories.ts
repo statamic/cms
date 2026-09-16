@@ -1,9 +1,6 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
-import {Avatar} from '@ui';
+import {Avatar} from '@statamic/cms/ui';
 
-/**
- * @import import { Avatar } from '@statamic/cms/ui';
- */
 const meta = {
     title: 'Components/Avatar',
     component: Avatar,

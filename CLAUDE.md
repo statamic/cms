@@ -98,7 +98,7 @@ The project uses Vite for asset compilation with separate configs:
   - After changing components or stories, run the story tests through the MCP server or with `npx vitest run --project storybook`.
 - Storybook generates component manifests for AI agents from stories, MDX docs and component source. Inspect them at `http://localhost:6006/manifests/components.html`.
   - Document props with JSDoc comments. They end up in the manifest.
-  - Every story file's `meta` needs a JSDoc `@import` tag with the public import path, e.g. `@import import { Button } from '@statamic/cms/ui';`. Otherwise snippets use the internal `@ui` alias.
+  - Stories import components from `@statamic/cms/ui`, not `@ui`. Snippets copy the story's imports, and `@ui` doesn't exist for addons. `tsconfig.json` maps `@statamic/cms/ui` to `resources/js/components/ui` so this resolves in Storybook.
   - Snippets are extracted statically from each story's `render`. Write `template` as a literal without `${}` interpolation, use `setup()` instead of `data`/`methods`, keep everything `setup` references inside it (or imported), and read args as `args.foo` or `v-bind="args"`. A story that breaks these rules has no snippet in the manifest. Only add `parameters.docs.source.code` when the docs should show something different from the template.
 
 ## For PR Reviews
