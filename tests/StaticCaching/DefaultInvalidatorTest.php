@@ -369,6 +369,7 @@ class DefaultInvalidatorTest extends TestCase
             $m->shouldReceive('site')->andReturn(Site::default());
             $m->shouldReceive('parent')->andReturnNull();
             $m->shouldReceive('getOriginal')->andReturnNull();
+            $m->shouldReceive('route')->andReturnNull();
             $m->shouldReceive('toAugmentedCollection')
                 ->andReturnSelf()
                 ->shouldReceive('merge')
@@ -424,6 +425,7 @@ class DefaultInvalidatorTest extends TestCase
             $m->shouldReceive('site')->andReturn(Site::get('fr'));
             $m->shouldReceive('parent')->andReturnNull();
             $m->shouldReceive('getOriginal')->andReturnNull();
+            $m->shouldReceive('route')->andReturnNull();
             $m->shouldReceive('toAugmentedCollection')
                 ->andReturnSelf()
                 ->shouldReceive('merge')
@@ -474,6 +476,7 @@ class DefaultInvalidatorTest extends TestCase
             $m->shouldReceive('site')->andReturn(Site::default());
             $m->shouldReceive('parent')->andReturnNull();
             $m->shouldReceive('getOriginal')->andReturnNull();
+            $m->shouldReceive('route')->andReturnNull();
             $m->shouldReceive('toAugmentedCollection')
                 ->andReturnSelf()
                 ->shouldReceive('merge')
@@ -514,6 +517,7 @@ class DefaultInvalidatorTest extends TestCase
             $m->shouldReceive('descendants')->andReturn(collect());
             $m->shouldReceive('parent')->andReturnNull();
             $m->shouldReceive('getOriginal')->andReturnNull();
+            $m->shouldReceive('route')->andReturnNull();
             $m->shouldReceive('site')->andReturn(Site::default());
             $m->shouldReceive('toAugmentedCollection')
                 ->andReturnSelf()
@@ -559,6 +563,7 @@ class DefaultInvalidatorTest extends TestCase
             $m->shouldReceive('slug')->andReturn('new-slug');
             $m->shouldReceive('route')->andReturn('/blog/{slug}');
             $m->shouldReceive('routeData')->andReturn(['slug' => 'new-slug']);
+            $m->shouldReceive('isDirty')->with('slug')->andReturn(true);
             $m->shouldReceive('toAugmentedCollection')
                 ->andReturnSelf()
                 ->shouldReceive('merge')
@@ -588,6 +593,44 @@ class DefaultInvalidatorTest extends TestCase
             $m->shouldReceive('parent')->andReturnNull();
             $m->shouldReceive('getOriginal')->with('slug')->andReturn('my-slug');
             $m->shouldReceive('slug')->andReturn('my-slug');
+            $m->shouldReceive('route')->andReturn('/blog/{slug}');
+            $m->shouldReceive('isDirty')->with('slug')->andReturn(false);
+            $m->shouldReceive('toAugmentedCollection')
+                ->andReturnSelf()
+                ->shouldReceive('merge')
+                ->andReturn(collect(['parent_uri' => null]));
+        });
+
+        $invalidator = new Invalidator($cacher, []);
+
+        $this->assertNull($invalidator->invalidate($entry));
+    }
+
+    #[Test]
+    public function old_entry_url_is_invalidated_when_a_non_slug_route_field_changes()
+    {
+        $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
+            $cacher->shouldReceive('invalidateUrls')->with([
+                'http://localhost/2025/my-post',
+                'http://localhost/2024/my-post',
+                'http://localhost/2024/my-post/*',
+            ])->once();
+        });
+
+        $entry = tap(Mockery::mock(Entry::class), function ($m) {
+            $m->shouldReceive('isRedirect')->andReturn(false);
+            $m->shouldReceive('absoluteUrl')->andReturn('http://localhost/2025/my-post');
+            $m->shouldReceive('collectionHandle')->andReturn('blog');
+            $m->shouldReceive('descendants')->andReturn(collect());
+            $m->shouldReceive('site')->andReturn(Site::default());
+            $m->shouldReceive('parent')->andReturnNull();
+            $m->shouldReceive('getOriginal')->with('slug')->andReturn('my-post');
+            $m->shouldReceive('getOriginal')->with('date')->andReturn('2024-01-15-1200');
+            $m->shouldReceive('slug')->andReturn('my-post');
+            $m->shouldReceive('route')->andReturn('/{year}/{slug}');
+            $m->shouldReceive('routeData')->andReturn(['slug' => 'my-post', 'year' => '2025']);
+            $m->shouldReceive('isDirty')->with('slug')->andReturn(false);
+            $m->shouldReceive('isDirty')->with('date')->andReturn(true);
             $m->shouldReceive('toAugmentedCollection')
                 ->andReturnSelf()
                 ->shouldReceive('merge')
@@ -1082,6 +1125,7 @@ class DefaultInvalidatorTest extends TestCase
             $m->shouldReceive('site')->andReturn(Site::default());
             $m->shouldReceive('parent')->andReturnNull();
             $m->shouldReceive('getOriginal')->andReturnNull();
+            $m->shouldReceive('route')->andReturnNull();
             $m->shouldReceive('toAugmentedCollection')
                 ->andReturnSelf()
                 ->shouldReceive('merge')
@@ -1123,6 +1167,7 @@ class DefaultInvalidatorTest extends TestCase
             $m->shouldReceive('site')->andReturn(Site::default());
             $m->shouldReceive('parent')->andReturnNull();
             $m->shouldReceive('getOriginal')->andReturnNull();
+            $m->shouldReceive('route')->andReturnNull();
             $m->shouldReceive('toAugmentedCollection')
                 ->andReturnSelf()
                 ->shouldReceive('merge')
@@ -1169,6 +1214,7 @@ class DefaultInvalidatorTest extends TestCase
             $m->shouldReceive('slug')->andReturn('new-slug');
             $m->shouldReceive('route')->andReturn('/blog/{slug}');
             $m->shouldReceive('routeData')->andReturn(['slug' => 'new-slug']);
+            $m->shouldReceive('isDirty')->with('slug')->andReturn(true);
             $m->shouldReceive('toAugmentedCollection')
                 ->andReturnSelf()
                 ->shouldReceive('merge')
