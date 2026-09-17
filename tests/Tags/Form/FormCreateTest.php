@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Fieldset as FieldsetRepository;
@@ -704,6 +705,44 @@ EOT
                 'display' => 'Cat Selfies',
             ],
         ]);
+    }
+
+    #[Test]
+    #[DataProvider('templateLanguageProvider')]
+    public function it_dynamically_renders_banner_field($language)
+    {
+        config(['statamic.templates.language' => $language]);
+
+        $this->assertFieldRendersHtml([
+            '<div><p>Before continuing:</p><ul><li>Read the terms</li><li>Grab a coffee</li></ul></div>',
+        ], [
+            'handle' => 'notice',
+            'field' => [
+                'type' => 'banner',
+                'display' => 'Notice',
+                'content' => "Before continuing:\n\n- Read the terms\n- Grab a coffee",
+            ],
+        ]);
+
+        $this->assertFieldRendersHtml([
+            '<div><svg',
+        ], [
+            'handle' => 'notice',
+            'field' => [
+                'type' => 'banner',
+                'display' => 'Notice',
+                'content' => 'Please read this before continuing.',
+                'icon' => 'lightbulb-idea',
+            ],
+        ]);
+    }
+
+    public static function templateLanguageProvider()
+    {
+        return [
+            'antlers' => ['antlers'],
+            'blade' => ['blade'],
+        ];
     }
 
     #[Test]
