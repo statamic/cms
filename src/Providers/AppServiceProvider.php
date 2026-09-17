@@ -23,6 +23,7 @@ use Statamic\Facades\Token;
 use Statamic\Facades\User;
 use Statamic\Fields\FieldsetRecursionStack;
 use Statamic\Http\Middleware\PingOutpost;
+use Statamic\Icons\IconManager;
 use Statamic\Jobs\HandleEntrySchedule;
 use Statamic\Licensing\Radio;
 use Statamic\Notifications\ElevatedSessionVerificationCode;
@@ -167,6 +168,8 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton(Sites::class);
+
+        $this->app->singleton(IconManager::class);
 
         collect([
             \Statamic\Contracts\Entries\EntryRepository::class => \Statamic\Stache\Repositories\EntryRepository::class,
