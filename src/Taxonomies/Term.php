@@ -236,6 +236,7 @@ class Term implements ContainsQueryableValues, TermContract
             // The term only gets appended to the tree when it's read, so anything that
             // read it before now would have cached a version without this term in it.
             $taxonomy->structure()->flushCache();
+            $taxonomy->updateTermOrder([$this->id()]);
         }
 
         foreach ($afterSaveCallbacks as $callback) {

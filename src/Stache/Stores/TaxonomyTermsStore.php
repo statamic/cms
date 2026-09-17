@@ -238,6 +238,24 @@ class TaxonomyTermsStore extends ChildStore
         }
     }
 
+    public function updateOrders($ids = null)
+    {
+        $this->updateTermsWithinIndex($this->index('order'), $ids);
+    }
+
+    private function updateTermsWithinIndex($index, $ids)
+    {
+        if (collect($ids)->isEmpty()) {
+            return $index->update();
+        }
+
+        collect($ids)
+            ->map(fn ($id) => Term::find($id))
+            ->filter()
+            ->flatMap(fn ($term) => $term->term()->localizations()->values())
+            ->each(fn ($term) => $index->updateItem($term));
+    }
+
     private function forgetItemsForSlug(string $slug): void
     {
         $this->paths()->keys()

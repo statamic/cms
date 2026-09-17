@@ -316,6 +316,13 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, ContainsQ
         return $this;
     }
 
+    public function updateTermOrder($ids = null)
+    {
+        Facades\Term::updateOrders($this, $ids);
+
+        return $this;
+    }
+
     public function queryTerms()
     {
         $query = Facades\Term::query()->where('taxonomy', $this->handle());

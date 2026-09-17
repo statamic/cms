@@ -3,6 +3,7 @@
 namespace Tests\Feature\Taxonomies;
 
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\Stache;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
 use Statamic\Facades\User;
@@ -264,6 +265,106 @@ class ReorderTermsTest extends TestCase
             ->assertSessionHasErrors('perPage');
 
         $this->assertEquals($tree, $this->structure->tree()->tree());
+    }
+
+    #[Test]
+    public function creating_a_term_gives_it_the_correct_order_when_the_tree_has_already_been_read()
+    {
+        tap(Term::make('one')->taxonomy('test')->data(['title' => 'One']))->save();
+        tap(Term::make('two')->taxonomy('test')->data(['title' => 'Two']))->save();
+        tap(Term::make('three')->taxonomy('test')->data(['title' => 'Three']))->save();
+
+        $this->structure->tree()->tree([
+            ['term' => 'one'],
+            ['term' => 'two'],
+            ['term' => 'three'],
+        ])->save();
+
+        // Read the tree before the term is created, so it gets cached without it.
+        $this->structure->tree()->tree();
+
+        tap(Term::make('four')->taxonomy('test')->data(['title' => 'Four']))->save();
+
+        $this->assertEquals([
+            ['term' => 'one'],
+            ['term' => 'two'],
+            ['term' => 'three'],
+            ['term' => 'four'],
+        ], $this->structure->tree()->tree());
+
+        $this->assertEquals(4, Term::find('test::four')->order());
+    }
+
+    #[Test]
+    public function creating_a_term_gives_it_the_correct_order_in_the_index()
+    {
+        tap(Term::make('one')->taxonomy('test')->data(['title' => 'One']))->save();
+        tap(Term::make('two')->taxonomy('test')->data(['title' => 'Two']))->save();
+        tap(Term::make('three')->taxonomy('test')->data(['title' => 'Three']))->save();
+
+        $this->structure->tree()->tree([
+            ['term' => 'one'],
+            ['term' => 'two'],
+            ['term' => 'three'],
+        ])->save();
+
+        tap(Term::make('four')->taxonomy('test')->data(['title' => 'Four']))->save();
+
+        $this->assertEquals(
+            ['en::one' => 1, 'en::two' => 2, 'en::three' => 3, 'en::four' => 4],
+            Stache::store('terms::test')->index('order')->items()->all()
+        );
+    }
+
+    #[Test]
+    public function it_reorders_terms_created_through_the_cp_in_a_descending_taxonomy()
+    {
+        $this->taxonomy->setSortDirection('desc')->save();
+
+        foreach (['one', 'two', 'three'] as $slug) {
+            tap(Term::make($slug)->taxonomy('test')->data(['title' => ucfirst($slug)]))->save();
+        }
+
+        $this->structure->tree()->tree([
+            ['term' => 'one'],
+            ['term' => 'two'],
+            ['term' => 'three'],
+        ])->save();
+
+        $user = tap(User::make()->makeSuper())->save();
+
+        foreach (['zebra', 'apple', 'mango'] as $slug) {
+            $this
+                ->actingAs($user)
+                ->post(cp_route('taxonomies.terms.store', ['test', 'en']), [
+                    'title' => ucfirst($slug),
+                    'slug' => $slug,
+                    '_blueprint' => 'test',
+                    'published' => true,
+                ])
+                ->assertOk();
+        }
+
+        // The listing shows mango, apple, zebra, three, two, one. The first page contains mango and apple.
+        $ids = $this
+            ->actingAs($user)
+            ->getJson(cp_route('taxonomies.terms.index', 'test').'?perPage=2&page=1')
+            ->assertOk()
+            ->json('data.*.id');
+
+        $this
+            ->actingAs($user)
+            ->reorder(['page' => 1, 'perPage' => 2, 'ids' => array_reverse($ids)])
+            ->assertOk();
+
+        $this->assertEquals([
+            ['term' => 'one'],
+            ['term' => 'two'],
+            ['term' => 'three'],
+            ['term' => 'zebra'],
+            ['term' => 'mango'],
+            ['term' => 'apple'],
+        ], $this->structure->tree()->tree());
     }
 
     private function seedFourTerms()

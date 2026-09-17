@@ -261,6 +261,11 @@ class TermRepository implements RepositoryContract
         return new TermQueryBuilder($this->store);
     }
 
+    public function updateOrders($taxonomy, $ids = null)
+    {
+        $this->store->store($taxonomy->handle())->updateOrders($ids);
+    }
+
     public function make(?string $slug = null): Term
     {
         return app(Term::class)->slug($slug);

@@ -37,7 +37,7 @@ class TaxonomyTree extends Tree implements TreeContract
             })->values();
         };
 
-        return $flatten($this->tree);
+        return $flatten($this->tree());
     }
 
     public function append($entry)
