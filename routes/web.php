@@ -40,7 +40,7 @@ Route::name('statamic.')->group(function () {
         Route::post('forms/{form}', [FormController::class, 'submit'])->middleware([HandlePrecognitiveRequests::class, 'throttle:statamic.forms'])->name('forms.submit');
 
         Route::get('protect/password', [PasswordProtectController::class, 'show'])->name('protect.password.show')->middleware([HandleInertiaRequests::class]);
-        Route::post('protect/password', [PasswordProtectController::class, 'store'])->name('protect.password.store');
+        Route::post('protect/password', [PasswordProtectController::class, 'store'])->middleware('throttle:statamic.protect.password')->name('protect.password.store');
 
         Route::get('fieldtypes/dictionaries/{dictionary}', DictionaryFieldtypeController::class)->middleware([CPAuthGuard::class, 'throttle:statamic.dictionaries'])->name('dictionary-fieldtype');
 
