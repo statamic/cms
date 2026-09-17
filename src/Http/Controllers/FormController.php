@@ -67,6 +67,10 @@ class FormController extends Controller
         } catch (SilentFormFailureException $e) {
             $result = new SubmissionResult(submission: $action->submission());
 
+            if ($result->submission->isSpam()) {
+                $this->forgetPartialSubmission($form);
+            }
+
             return $this->formSuccess($params, $result, silentFailure: true);
         } catch (ValidationException $e) {
             return $this->formFailure($params, $e->errors(), $form->handle());
