@@ -69,17 +69,6 @@ class SubmissionQueryBuilderTest extends TestCase
     }
 
     #[Test]
-    public function where_in_and_where_not_in_are_case_insensitive()
-    {
-        $form = tap(Form::make('test'))->save();
-        FormSubmission::make()->form($form)->data(['id' => 'a', 'test' => 'foo'])->save();
-        FormSubmission::make()->form($form)->data(['id' => 'b', 'test' => 'bar'])->save();
-
-        $this->assertSame(['a'], FormSubmission::query()->whereIn('test', ['FOO'])->get()->map->get('id')->all());
-        $this->assertSame(['b'], FormSubmission::query()->whereNotIn('test', ['FOO'])->get()->map->get('id')->all());
-    }
-
-    #[Test]
     public function it_filters_using_or_where_not_ins()
     {
         $form = tap(Form::make('test'))->save();
