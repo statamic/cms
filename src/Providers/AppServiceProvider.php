@@ -119,7 +119,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Request::macro('statamicToken', function () {
-            if ($token = $this->token ?? $this->header('X-Statamic-Token')) {
+            if (($token = $this->token ?? $this->header('X-Statamic-Token')) && is_string($token)) {
                 return Token::find($token);
             }
         });
