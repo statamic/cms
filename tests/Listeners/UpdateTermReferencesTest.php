@@ -1372,6 +1372,90 @@ class UpdateTermReferencesTest extends TestCase
     }
 
     #[Test]
+    public function it_doesnt_update_same_slug_terms_from_another_taxonomy_on_multi_taxonomy_fields()
+    {
+        $tags = tap(Facades\Taxonomy::make('tags'))->save();
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'favourite',
+                    'field' => [
+                        'type' => 'terms',
+                        'taxonomies' => ['topics', 'tags'],
+                        'max_items' => 1,
+                    ],
+                ],
+                [
+                    'handle' => 'other_favourite',
+                    'field' => [
+                        'type' => 'terms',
+                        'taxonomies' => ['topics', 'tags'],
+                        'max_items' => 1,
+                    ],
+                ],
+                [
+                    'handle' => 'favourites',
+                    'field' => [
+                        'type' => 'terms',
+                        'taxonomies' => ['topics', 'tags'],
+                    ],
+                ],
+            ],
+        ]);
+
+        $entry = tap(Facades\Entry::make()->collection($collection)->data([
+            'favourite' => 'topics::hoff',
+            'other_favourite' => 'tags::hoff',
+            'favourites' => ['topics::hoff', 'tags::hoff', 'topics::norris'],
+        ]))->save();
+
+        $this->termHoff->slug('hoff-new')->save();
+
+        $this->assertEquals('topics::hoff-new', $entry->fresh()->get('favourite'));
+        $this->assertEquals('tags::hoff', $entry->fresh()->get('other_favourite'));
+        $this->assertEquals(['topics::hoff-new', 'tags::hoff', 'topics::norris'], $entry->fresh()->get('favourites'));
+    }
+
+    #[Test]
+    public function it_doesnt_nullify_same_slug_terms_from_another_taxonomy_on_multi_taxonomy_fields()
+    {
+        $tags = tap(Facades\Taxonomy::make('tags'))->save();
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'favourite',
+                    'field' => [
+                        'type' => 'terms',
+                        'taxonomies' => ['topics', 'tags'],
+                        'max_items' => 1,
+                    ],
+                ],
+                [
+                    'handle' => 'favourites',
+                    'field' => [
+                        'type' => 'terms',
+                        'taxonomies' => ['topics', 'tags'],
+                    ],
+                ],
+            ],
+        ]);
+
+        $entry = tap(Facades\Entry::make()->collection($collection)->data([
+            'favourite' => 'tags::hoff',
+            'favourites' => ['topics::hoff', 'tags::hoff'],
+        ]))->save();
+
+        $this->termHoff->delete();
+
+        $this->assertEquals('tags::hoff', $entry->fresh()->get('favourite'));
+        $this->assertEquals(['tags::hoff'], $entry->fresh()->get('favourites'));
+    }
+
+    #[Test]
     public function it_updates_entries()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();

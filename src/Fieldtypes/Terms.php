@@ -857,21 +857,21 @@ class Terms extends Relationship
             }
 
             return is_string($data)
-                ? $this->replaceValue($data, $newValue, $oldValue)
-                : $this->replaceValuesInArray($data, $newValue, $oldValue);
+                ? $this->replaceValue($data, $newValue, $oldValue, $taxonomy)
+                : $this->replaceValuesInArray($data, $newValue, $oldValue, $taxonomy);
         }
 
         $scopedOldValue = "{$taxonomy}::{$oldValue}";
         $scopedNewValue = $newValue !== null ? "{$taxonomy}::{$newValue}" : null;
 
         return is_string($data)
-            ? $this->replaceValue($data, $scopedNewValue, $scopedOldValue)
-            : $this->replaceValuesInArray($data, $scopedNewValue, $scopedOldValue);
+            ? $this->replaceValue($data, $scopedNewValue, $scopedOldValue, $taxonomy)
+            : $this->replaceValuesInArray($data, $scopedNewValue, $scopedOldValue, $taxonomy);
     }
 
-    protected function replaceValue($data, $newValue, $oldValue)
+    protected function replaceValue($data, $newValue, $oldValue, ?string $taxonomy = null)
     {
-        if (! $this->valueRefersToTerm($data, $oldValue)) {
+        if (! $this->valueRefersToTerm($data, $oldValue, $taxonomy)) {
             return $data;
         }
 
@@ -882,14 +882,14 @@ class Terms extends Relationship
         return $this->rewriteTermValue($data, $oldValue, $newValue);
     }
 
-    protected function replaceValuesInArray($data, $newValue, $oldValue)
+    protected function replaceValuesInArray($data, $newValue, $oldValue, ?string $taxonomy = null)
     {
         if (! is_array($data) || ! $data) {
             return $data;
         }
 
         $result = collect(Arr::dot($data))
-            ->map(fn ($value) => $this->valueRefersToTerm($value, $oldValue)
+            ->map(fn ($value) => $this->valueRefersToTerm($value, $oldValue, $taxonomy)
                 ? ($newValue === null ? null : $this->rewriteTermValue($value, $oldValue, $newValue))
                 : $value)
             ->filter()
@@ -898,7 +898,7 @@ class Terms extends Relationship
         return $result->isEmpty() ? null : $result->all();
     }
 
-    private function valueRefersToTerm($value, $oldValue): bool
+    private function valueRefersToTerm($value, $oldValue, ?string $taxonomy = null): bool
     {
         if ($value === $oldValue) {
             return true;
@@ -908,10 +908,16 @@ class Terms extends Relationship
             return false;
         }
 
-        [$path, $taxonomy] = $this->termPathAndTaxonomy($value);
+        [$path, $valueTaxonomy] = $this->termPathAndTaxonomy($value);
         [$oldSlug, $oldTaxonomy] = $this->termPathAndTaxonomy($oldValue);
 
-        if ($oldTaxonomy && $taxonomy !== $oldTaxonomy) {
+        if ($oldTaxonomy && $valueTaxonomy !== $oldTaxonomy) {
+            return false;
+        }
+
+        // When the field is configured with multiple taxonomies, the old value is an
+        // unprefixed slug, so a prefixed value would otherwise match on slug alone.
+        if ($taxonomy && $valueTaxonomy && $valueTaxonomy !== $taxonomy) {
             return false;
         }
 
