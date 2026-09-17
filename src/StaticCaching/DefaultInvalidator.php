@@ -2,12 +2,14 @@
 
 namespace Statamic\StaticCaching;
 
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection as IlluminateCollection;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Forms\Form;
 use Statamic\Contracts\Globals\Variables;
+use Statamic\Contracts\Routing\UrlBuilder;
 use Statamic\Contracts\Structures\Nav;
 use Statamic\Contracts\Structures\NavTree;
 use Statamic\Contracts\Structures\TaxonomyTree;
@@ -15,6 +17,7 @@ use Statamic\Facades;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
+use Statamic\Statamic;
 use Statamic\Structures\CollectionTree;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -34,6 +37,11 @@ class DefaultInvalidator implements Invalidator
 
     public function invalidate($item)
     {
+        // Old URLs no longer resolve so they cannot be recached, only invalidated.
+        if ($this->refreshing && ($oldUrls = $this->getItemOldUrls($item))) {
+            $this->cacher->invalidateUrls($oldUrls);
+        }
+
         if ($this->rules === 'all') {
             $this->refreshing
                 ? $this->cacher->refreshUrls($this->cacher->getUrls()->all())
@@ -46,7 +54,7 @@ class DefaultInvalidator implements Invalidator
 
         $this->refreshing
             ? $this->cacher->refreshUrls($urls)
-            : $this->cacher->invalidateUrls($urls);
+            : $this->cacher->invalidateUrls([...$urls, ...$this->getItemOldUrls($item)]);
     }
 
     public function refresh($item)
@@ -94,6 +102,68 @@ class DefaultInvalidator implements Invalidator
         }
 
         return $urls;
+    }
+
+    protected function getItemOldUrls($item)
+    {
+        return $item instanceof Entry ? $this->getOldEntryUrls($item) : [];
+    }
+
+    protected function getOldEntryUrls($entry)
+    {
+        if (! ($route = $entry->route())) {
+            return [];
+        }
+
+        // The route can reference any field, e.g. {year}/{month}/{day}/{slug}.
+        $original = collect(Antlers::identifiers($this->convertToAntlers($route)))
+            ->filter(fn ($identifier) => $this->routeIdentifierIsDirty($entry, $identifier))
+            ->mapWithKeys(fn ($identifier) => [$identifier => $this->originalRouteValue($entry, $identifier)])
+            ->filter(fn ($value) => ! is_null($value));
+
+        if ($original->isEmpty()) {
+            return [];
+        }
+
+        $uri = app(UrlBuilder::class)->content($entry)->merge([
+            'parent_uri' => $entry->parent()?->uri(),
+            ...$original->all(),
+        ])->build($route);
+
+        $oldUrl = URL::tidy($entry->site()->absoluteUrl().'/'.$uri);
+
+        if ($oldUrl === $entry->absoluteUrl()) {
+            return [];
+        }
+
+        // Anything cached under the old URL (descendants, mounted collections) is stale too.
+        return [$oldUrl, Str::finish($oldUrl, '/').'*'];
+    }
+
+    private function routeIdentifierIsDirty($entry, $identifier)
+    {
+        return $entry->isDirty(in_array($identifier, ['year', 'month', 'day']) ? 'date' : $identifier);
+    }
+
+    private function originalRouteValue($entry, $identifier)
+    {
+        if (! in_array($identifier, ['year', 'month', 'day', 'date'])) {
+            return $entry->getOriginal($identifier);
+        }
+
+        if (is_null($original = $entry->getOriginal('date'))) {
+            return null;
+        }
+
+        $date = Carbon::createFromFormat('Y-m-d-Hi', $original, $entry->date()?->timezone)
+            ->setTimezone(Statamic::displayTimezone());
+
+        return match ($identifier) {
+            'year' => $date->format('Y'),
+            'month' => $date->format('m'),
+            'day' => $date->format('d'),
+            'date' => $date,
+        };
     }
 
     protected function getFormUrls($form)

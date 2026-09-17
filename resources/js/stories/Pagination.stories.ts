@@ -1,5 +1,5 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
-import {Pagination} from '@ui';
+import {Pagination} from '@statamic/cms/ui';
 import {ref} from 'vue';
 
 const meta = {
@@ -26,19 +26,19 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const createResourceMeta = (currentPage: number, total: number, perPage: number) => ({
-    current_page: currentPage,
-    from: (currentPage - 1) * perPage + 1,
-    to: Math.min(currentPage * perPage, total),
-    total,
-    last_page: Math.ceil(total / perPage),
-});
-
 export const _DocsIntro: Story = {
     tags: ['!dev'],
     render: () => ({
         components: { Pagination },
         setup() {
+            const createResourceMeta = (currentPage: number, total: number, perPage: number) => ({
+                current_page: currentPage,
+                from: (currentPage - 1) * perPage + 1,
+                to: Math.min(currentPage * perPage, total),
+                total,
+                last_page: Math.ceil(total / perPage),
+            });
+
             const currentPage = ref(1);
             const perPage = ref(25);
             const resourceMeta = ref(createResourceMeta(currentPage.value, 100, perPage.value));
@@ -72,6 +72,14 @@ export const Default: Story = {
     render: () => ({
         components: { Pagination },
         setup() {
+            const createResourceMeta = (currentPage: number, total: number, perPage: number) => ({
+                current_page: currentPage,
+                from: (currentPage - 1) * perPage + 1,
+                to: Math.min(currentPage * perPage, total),
+                total,
+                last_page: Math.ceil(total / perPage),
+            });
+
             const currentPage = ref(1);
             const perPage = ref(25);
             const resourceMeta = ref(createResourceMeta(currentPage.value, 100, perPage.value));
@@ -105,6 +113,14 @@ export const ManyPages: Story = {
     render: () => ({
         components: { Pagination },
         setup() {
+            const createResourceMeta = (currentPage: number, total: number, perPage: number) => ({
+                current_page: currentPage,
+                from: (currentPage - 1) * perPage + 1,
+                to: Math.min(currentPage * perPage, total),
+                total,
+                last_page: Math.ceil(total / perPage),
+            });
+
             const currentPage = ref(5);
             const perPage = ref(25);
             const resourceMeta = ref(createResourceMeta(currentPage.value, 500, perPage.value));
@@ -153,6 +169,14 @@ export const WithoutPageLinks: Story = {
     render: () => ({
         components: { Pagination },
         setup() {
+            const createResourceMeta = (currentPage: number, total: number, perPage: number) => ({
+                current_page: currentPage,
+                from: (currentPage - 1) * perPage + 1,
+                to: Math.min(currentPage * perPage, total),
+                total,
+                last_page: Math.ceil(total / perPage),
+            });
+
             const currentPage = ref(1);
             const perPage = ref(25);
             const resourceMeta = ref(createResourceMeta(currentPage.value, 100, perPage.value));
@@ -200,6 +224,14 @@ export const WithoutPerPageSelector: Story = {
     render: () => ({
         components: { Pagination },
         setup() {
+            const createResourceMeta = (currentPage: number, total: number, perPage: number) => ({
+                current_page: currentPage,
+                from: (currentPage - 1) * perPage + 1,
+                to: Math.min(currentPage * perPage, total),
+                total,
+                last_page: Math.ceil(total / perPage),
+            });
+
             const currentPage = ref(1);
             const resourceMeta = ref(createResourceMeta(currentPage.value, 100, 25));
 

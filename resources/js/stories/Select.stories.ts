@@ -1,5 +1,5 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
-import {Select} from '@ui';
+import {Select} from '@statamic/cms/ui';
 import {icons} from "@/stories/icons";
 import {ref} from "vue";
 
@@ -32,14 +32,6 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const defaultOptions = [
-    { label: 'The Midnight', value: 'the_midnight' },
-    { label: 'The 1975', value: 'the_1975' },
-    { label: 'Sunglasses Kid', value: 'sunglasses_kid' },
-    { label: 'FM-84', value: 'fm_84' },
-    { label: 'Timecop1983', value: 'timecop1983' },
-];
-
 const defaultCode = `
 <Select
     placeholder="Select a band..."
@@ -64,7 +56,13 @@ export const _DocsIntro: Story = {
         components: { Select },
         setup() {
             const value = ref(null);
-            const options = defaultOptions;
+            const options = [
+                { label: 'The Midnight', value: 'the_midnight' },
+                { label: 'The 1975', value: 'the_1975' },
+                { label: 'Sunglasses Kid', value: 'sunglasses_kid' },
+                { label: 'FM-84', value: 'fm_84' },
+                { label: 'Timecop1983', value: 'timecop1983' },
+            ];
             return { value, options };
         },
         template: `
@@ -95,10 +93,24 @@ export const _Sizes: Story = {
     render: () => ({
         components: { Select },
         setup() {
-            const options = defaultOptions;
+            const options = [
+                { label: 'The Midnight', value: 'the_midnight' },
+                { label: 'The 1975', value: 'the_1975' },
+                { label: 'Sunglasses Kid', value: 'sunglasses_kid' },
+                { label: 'FM-84', value: 'fm_84' },
+                { label: 'Timecop1983', value: 'timecop1983' },
+            ];
             return { options };
         },
-        template: `<div class="flex flex-col gap-4">${sizesCode}</div>`,
+        template: `
+            <div class="flex flex-col gap-4">
+                <Select size="xs" placeholder="Extra Small" :options="options" />
+                <Select size="sm" placeholder="Small" :options="options" />
+                <Select size="base" placeholder="Base" :options="options" />
+                <Select size="lg" placeholder="Large" :options="options" />
+                <Select size="xl" placeholder="Extra Large" :options="options" />
+            </div>
+        `,
     }),
 };
 
@@ -119,15 +131,28 @@ export const _Variants: Story = {
     render: () => ({
         components: { Select },
         setup() {
-            const options = defaultOptions;
+            const options = [
+                { label: 'The Midnight', value: 'the_midnight' },
+                { label: 'The 1975', value: 'the_1975' },
+                { label: 'Sunglasses Kid', value: 'sunglasses_kid' },
+                { label: 'FM-84', value: 'fm_84' },
+                { label: 'Timecop1983', value: 'timecop1983' },
+            ];
             return { options };
         },
-        template: `<div class="flex flex-col gap-4">${variantsCode}</div>`,
+        template: `
+            <div class="flex flex-col gap-4">
+                <Select variant="default" placeholder="Default" :options="options" />
+                <Select variant="filled" placeholder="Filled" :options="options" />
+                <Select variant="ghost" placeholder="Ghost" :options="options" />
+                <Select variant="subtle" placeholder="Subtle" :options="options" />
+            </div>
+        `,
     }),
 };
 
 const clearableCode = `
-<Combobox clearable placeholder="Select a band..." :options="options" />
+<Select clearable placeholder="Select a band..." :options="options" />
 `;
 
 export const _Clearable: Story = {
@@ -141,7 +166,13 @@ export const _Clearable: Story = {
         components: { Select },
         setup() {
             const value = ref('the_midnight');
-            const options = defaultOptions;
+            const options = [
+                { label: 'The Midnight', value: 'the_midnight' },
+                { label: 'The 1975', value: 'the_1975' },
+                { label: 'Sunglasses Kid', value: 'sunglasses_kid' },
+                { label: 'FM-84', value: 'fm_84' },
+                { label: 'Timecop1983', value: 'timecop1983' },
+            ];
             return { value, options };
         },
         template: `
