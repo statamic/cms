@@ -4,6 +4,7 @@ namespace Statamic\Fieldtypes\Assets;
 
 use Illuminate\Support\Collection;
 use Statamic\Actions\RenameAssetFolder;
+use Statamic\Assets\ChunkUploads;
 use Statamic\Assets\OrderedQueryBuilder;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\CP\Column;
@@ -217,6 +218,10 @@ class Assets extends Fieldtype
                 'can_create_folders' => User::current()->can('create', [\Statamic\Contracts\Assets\AssetFolder::class, $container]),
                 'sort_field' => $container->sortField(),
                 'sort_direction' => $container->sortDirection(),
+                'chunked_uploads' => ChunkUploads::enabledForContainer($container),
+                'chunk_size' => ChunkUploads::chunkSize(),
+                'chunk_upload_url' => cp_route('assets.chunks.store'),
+                'max_filesize' => ChunkUploads::maxFilesizeBytes($container->validationRules()),
             ],
             'dynamicFolder' => $dynamicFolder = $this->dynamicFolder(),
             'rename_folder' => $this->renameFolderAction($dynamicFolder),

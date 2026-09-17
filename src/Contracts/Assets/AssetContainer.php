@@ -109,4 +109,6 @@ interface AssetContainer
      * @return array
      */
     public function validationRules($rules = null);
+
+    public function chunkedUploads($enabled = null);
 }
