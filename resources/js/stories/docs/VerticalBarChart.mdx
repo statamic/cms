@@ -1,0 +1,24 @@
+import { Canvas, Meta, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as VerticalBarChartStories from '../VerticalBarChart.stories';
+
+<Meta of={VerticalBarChartStories} />
+
+# VerticalBarChart
+A vertical distribution chart. Bar heights scale against the largest item's percentage unless `maxValue` is provided.
+<Canvas of={VerticalBarChartStories._DocsIntro} sourceState={'shown'} />
+
+Use vertical bars for ordered scales where the labels are short, such as ratings or scores. Each item supports `label`, `percent`, and `count`.
+
+## Response counts
+<Canvas of={VerticalBarChartStories._Counts} sourceState={'shown'} />
+
+## Fixed scale
+By default, the largest item fills the available height. Set `maxValue` when multiple charts need a shared scale or when the scale has a known ceiling.
+<Canvas of={VerticalBarChartStories._FixedScale} sourceState={'shown'} />
+
+## Summary
+Use the `summary` slot for an average, range, or other aggregate. Include that information in `accessibleLabel` too.
+<Canvas of={VerticalBarChartStories._WithSummary} sourceState={'shown'} />
+
+## Arguments
+<ArgTypes of={VerticalBarChartStories} />
