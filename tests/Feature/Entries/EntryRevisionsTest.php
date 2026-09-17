@@ -535,6 +535,124 @@ class EntryRevisionsTest extends TestCase
         $this->assertCount(1, $entry->revisions());
     }
 
+    #[Test]
+    public function localized_entry_with_inherited_localizable_date_keeps_following_its_origin_when_reconstructed_from_revision()
+    {
+        $this->setSites([
+            'en' => ['url' => 'http://localhost/', 'locale' => 'en'],
+            'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
+        ]);
+
+        $this->setTestBlueprint('test', [
+            'foo' => ['type' => 'text'],
+            'date' => ['type' => 'date', 'localizable' => true],
+        ]);
+        $this->setTestRoles(['test' => ['access cp', 'publish blog entries']]);
+        $user = User::make()->id('user-1')->assignRole('test')->save();
+
+        $this->collection->sites(['en', 'fr'])->save();
+
+        $origin = EntryFactory::id('1')
+            ->slug('test')
+            ->collection('blog')
+            ->locale('en')
+            ->published(true)
+            ->date('2010-12-25')
+            ->data([
+                'blueprint' => 'test',
+                'title' => 'Title',
+                'foo' => 'bar',
+            ])->create();
+
+        $localized = EntryFactory::id('2')
+            ->slug('test')
+            ->collection('blog')
+            ->locale('fr')
+            ->origin($origin)
+            ->published(true)
+            ->data(['blueprint' => 'test'])
+            ->create();
+
+        $this->assertFalse($localized->hasExplicitDate());
+
+        tap($localized->makeWorkingCopy(), function ($copy) {
+            $attrs = $copy->attributes();
+            $attrs['data']['foo'] = 'foo modified in localized working copy';
+            $copy->attributes($attrs);
+        })->save();
+
+        $this->assertNull($localized->workingCopy()->attributes()['date']);
+
+        tap($origin->makeWorkingCopy(), function ($copy) {
+            $attrs = $copy->attributes();
+            $attrs['date'] = Carbon::parse('2020-06-15')->timestamp;
+            $copy->attributes($attrs);
+        })->save();
+
+        $this
+            ->actingAs($user)
+            ->publish($origin, ['message' => 'Publish origin with new date'])
+            ->assertOk();
+
+        $localized = Entry::find('2');
+        $this->assertFalse($localized->fromWorkingCopy()->hasExplicitDate());
+        $this->assertEquals('2020-06-15', $localized->fromWorkingCopy()->date()->format('Y-m-d'));
+
+        $this
+            ->actingAs($user)
+            ->publish($localized, ['message' => 'Publish localization'])
+            ->assertOk();
+
+        $localized = Entry::find('2');
+        $this->assertFalse($localized->hasExplicitDate());
+        $this->assertEquals('2020-06-15', $localized->date()->format('Y-m-d'));
+    }
+
+    #[Test]
+    public function localized_entry_reconstructed_from_a_revision_without_a_date_drops_its_own_date()
+    {
+        $this->setSites([
+            'en' => ['url' => 'http://localhost/', 'locale' => 'en'],
+            'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
+        ]);
+
+        $this->setTestBlueprint('test', [
+            'foo' => ['type' => 'text'],
+            'date' => ['type' => 'date', 'localizable' => true],
+        ]);
+
+        $this->collection->sites(['en', 'fr'])->save();
+
+        $origin = EntryFactory::id('1')
+            ->slug('test')
+            ->collection('blog')
+            ->locale('en')
+            ->published(true)
+            ->date('2010-12-25')
+            ->data(['blueprint' => 'test', 'title' => 'Title', 'foo' => 'bar'])
+            ->create();
+
+        $localized = EntryFactory::id('2')
+            ->slug('test')
+            ->collection('blog')
+            ->locale('fr')
+            ->origin($origin)
+            ->published(true)
+            ->date('2015-03-10')
+            ->data(['blueprint' => 'test'])
+            ->create();
+
+        tap($localized->makeWorkingCopy(), function ($copy) {
+            $attrs = $copy->attributes();
+            $attrs['date'] = null;
+            $copy->attributes($attrs);
+        })->save();
+
+        $this->assertTrue($localized->hasExplicitDate());
+        $this->assertFalse($localized->fromWorkingCopy()->hasExplicitDate());
+        $this->assertEquals('2010-12-25', $localized->fromWorkingCopy()->date()->format('Y-m-d'));
+    }
+
     private function publish($entry, $payload)
     {
         return $this->post($entry->publishUrl(), $payload);
