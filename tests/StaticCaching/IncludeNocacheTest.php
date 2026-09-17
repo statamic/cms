@@ -45,7 +45,7 @@ class IncludeNocacheTest extends TestCase
             $this->viewShouldReturnRaw($name, $contents, 'blade.php');
         }
 
-        view()->addNamespace('compiled__views', storage_path('statamic/tmp/nocache'));
+        view()->addNamespace('nocache__views', storage_path('statamic/tmp/nocache'));
     }
 
     private function renderTwice(string $layout, array $views): array

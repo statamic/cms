@@ -30,7 +30,7 @@ class AntlersBladePrecompiler
 
             File::put(storage_path('statamic/tmp/nocache/'.$fileName.'.antlers.html'), $innerContent);
 
-            $content = str_replace($original, '@include(\'compiled__views::'.$fileName.'\')', $content);
+            $content = str_replace($original, '@include(\'nocache__views::'.$fileName.'\')', $content);
         }
 
         return $content;

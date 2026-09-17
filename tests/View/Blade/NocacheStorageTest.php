@@ -15,7 +15,7 @@ class NocacheStorageTest extends TestCase
         $compiled = (new StatamicTagCompiler())->compile('<s:nocache>Hello</s:nocache>');
         $viewName = '_nocache'.sha1('Hello');
 
-        $this->assertSame("@nocache('compiled__views::{$viewName}')", $compiled);
+        $this->assertSame("@nocache('nocache__views::{$viewName}')", $compiled);
         $this->assertSame('Hello', file_get_contents(storage_path("statamic/tmp/nocache/{$viewName}.blade.php")));
     }
 
@@ -27,7 +27,7 @@ class NocacheStorageTest extends TestCase
 
         $compiled = AntlersBladePrecompiler::compile("@antlers{$antlers}@endantlers");
 
-        $this->assertSame("@include('compiled__views::{$viewName}')", $compiled);
+        $this->assertSame("@include('nocache__views::{$viewName}')", $compiled);
         $this->assertSame($antlers, file_get_contents(storage_path("statamic/tmp/nocache/{$viewName}.antlers.html")));
     }
 }

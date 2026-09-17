@@ -15,6 +15,6 @@ trait CompilesNocache
         $path = storage_path('statamic/tmp/nocache/'.$viewName.'.blade.php');
         File::put($path, $compiled);
 
-        return '@nocache(\'compiled__views::'.$viewName.'\')';
+        return '@nocache(\'nocache__views::'.$viewName.'\')';
     }
 }
