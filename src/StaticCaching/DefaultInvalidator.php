@@ -127,7 +127,7 @@ class DefaultInvalidator implements Invalidator
             ...$original->all(),
         ])->build($route);
 
-        $oldUrl = URL::tidy($entry->site()->url().'/'.$uri);
+        $oldUrl = URL::tidy($entry->site()->absoluteUrl().'/'.$uri);
 
         if ($oldUrl === $entry->absoluteUrl()) {
             return [];
@@ -144,20 +144,22 @@ class DefaultInvalidator implements Invalidator
 
     private function originalRouteValue($entry, $identifier)
     {
-        if (! in_array($identifier, ['year', 'month', 'day'])) {
+        if (! in_array($identifier, ['year', 'month', 'day', 'date'])) {
             return $entry->getOriginal($identifier);
         }
 
-        if (is_null($date = $entry->getOriginal('date'))) {
+        if (is_null($original = $entry->getOriginal('date'))) {
             return null;
         }
 
-        $date = Carbon::createFromFormat('Y-m-d-Hi', $date)->setTimezone(Statamic::displayTimezone());
+        $date = Carbon::createFromFormat('Y-m-d-Hi', $original, $entry->date()?->timezone)
+            ->setTimezone(Statamic::displayTimezone());
 
         return match ($identifier) {
             'year' => $date->format('Y'),
             'month' => $date->format('m'),
             'day' => $date->format('d'),
+            'date' => $date,
         };
     }
 
