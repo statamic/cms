@@ -23,7 +23,7 @@ class HandleAuthenticatedInertiaRequestsTest extends TestCase
         Statamic::pushCpRoutes(function () {
             Route::get('json-response-test', fn () => ['foo' => 'bar']);
 
-            Route::get('blade-page-test', fn () => view('statamic::layout'));
+            Route::get('non-inertia-page-data-test', fn () => Statamic::nonInertiaPageData());
         });
     }
 
@@ -37,7 +37,7 @@ class HandleAuthenticatedInertiaRequestsTest extends TestCase
         });
 
         $this
-            ->actingAs(User::make()->makeSuper())
+            ->actingAs(User::make()->makeSuper()->save())
             ->get('/cp/json-response-test')
             ->assertOk();
 
@@ -62,17 +62,14 @@ class HandleAuthenticatedInertiaRequestsTest extends TestCase
     }
 
     #[Test]
-    public function it_builds_the_nav_for_blade_based_pages()
+    public function it_resolves_the_nav_for_pages_rendered_outside_of_inertia()
     {
-        $response = $this
+        $data = $this
             ->actingAs(User::make()->makeSuper()->save())
-            ->get('/cp/blade-page-test')
-            ->assertOk();
+            ->get('/cp/non-inertia-page-data-test')
+            ->assertOk()
+            ->json();
 
-        preg_match('/data-page="([^"]*)"/', $response->getContent(), $matches);
-
-        $page = json_decode(htmlspecialchars_decode($matches[1], ENT_QUOTES), true);
-
-        $this->assertNotEmpty($page['props']['_statamic']['nav']);
+        $this->assertNotEmpty($data['props']['_statamic']['nav']);
     }
 }
