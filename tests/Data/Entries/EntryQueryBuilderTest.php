@@ -78,6 +78,16 @@ class EntryQueryBuilderTest extends TestCase
     }
 
     #[Test]
+    public function where_in_and_where_not_in_are_case_insensitive()
+    {
+        EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post One'])->create();
+        EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post Two'])->create();
+
+        $this->assertSame(['Post One'], Entry::query()->whereIn('title', ['POST ONE'])->get()->map->title->all());
+        $this->assertSame(['Post Two'], Entry::query()->whereNotIn('title', ['POST ONE'])->get()->map->title->all());
+    }
+
+    #[Test]
     public function entries_are_found_using_or_where_not_in()
     {
         EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1'])->create();
