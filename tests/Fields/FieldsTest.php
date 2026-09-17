@@ -491,6 +491,7 @@ class FieldsTest extends TestCase
                 'sortable' => true,
                 'replicator_preview' => true,
                 'duplicate' => true,
+                'revisable' => true,
                 'actions' => true,
             ],
             [
@@ -515,6 +516,7 @@ class FieldsTest extends TestCase
                 'sortable' => true,
                 'replicator_preview' => true,
                 'duplicate' => true,
+                'revisable' => true,
                 'actions' => true,
                 'rows' => null,
             ],
@@ -583,6 +585,7 @@ class FieldsTest extends TestCase
                 'sortable' => true,
                 'replicator_preview' => true,
                 'duplicate' => true,
+                'revisable' => true,
                 'actions' => true,
             ],
             [
@@ -611,6 +614,7 @@ class FieldsTest extends TestCase
                 'sortable' => true,
                 'replicator_preview' => true,
                 'duplicate' => true,
+                'revisable' => true,
                 'actions' => true,
             ],
         ], $fields->toPublishArray());
