@@ -75,6 +75,12 @@ class TaxonomyTermsStore extends ChildStore
         $this->handleFileChanges();
 
         if ($item = $this->getCachedItem($key)) {
+            // Only sync the original state when it's missing, since re-syncing would
+            // discard changes made to a term being saved.
+            if (empty($item->term()->getOriginal())) {
+                $item->term()->syncOriginal();
+            }
+
             return $item;
         }
 

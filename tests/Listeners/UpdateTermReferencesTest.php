@@ -2,8 +2,10 @@
 
 namespace Tests\Listeners;
 
+use Illuminate\Support\Facades\Event;
 use Orchestra\Testbench\Attributes\DefineEnvironment;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Events\TermSaving;
 use Statamic\Facades;
 use Statamic\Support\Arr;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -490,6 +492,149 @@ class UpdateTermReferencesTest extends TestCase
 
         $this->assertEquals(['topics::hoff-new'], $entry->fresh()->get('favourite'));
         $this->assertEquals('topics::norris', $entry->fresh()->get('non_favourites'));
+    }
+
+    #[Test]
+    public function it_nullifies_references_when_deleting_a_term_loaded_from_its_file()
+    {
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'favourites',
+                    'field' => [
+                        'type' => 'terms',
+                        'taxonomies' => ['topics'],
+                        'mode' => 'select',
+                    ],
+                ],
+            ],
+        ]);
+
+        $entry = tap(Facades\Entry::make()->collection($collection)->data([
+            'favourites' => ['hoff', 'norris'],
+        ]))->save();
+
+        $this->assertEquals(['hoff', 'norris'], $entry->get('favourites'));
+
+        Facades\Stache::store('terms')->store('topics')->forgetItem('en::hoff');
+
+        Facades\Term::find('topics::hoff')->delete();
+
+        $this->assertEquals(['norris'], $entry->fresh()->get('favourites'));
+    }
+
+    /** @see https://github.com/statamic/cms/issues/11264 */
+    #[Test]
+    public function it_nullifies_references_when_deleting_a_term_that_only_exists_in_entry_data()
+    {
+        $collection = tap(Facades\Collection::make('articles')->taxonomies(['topics']))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'topics',
+                    'field' => [
+                        'type' => 'terms',
+                        'taxonomies' => ['topics'],
+                        'mode' => 'select',
+                    ],
+                ],
+            ],
+        ]);
+
+        $entry = tap(Facades\Entry::make()->collection($collection)->data([
+            'topics' => ['hoff', 'ghost'],
+        ]))->save();
+
+        $this->assertEquals(['hoff', 'ghost'], $entry->get('topics'));
+
+        Facades\Term::find('topics::ghost')->delete();
+
+        $this->assertEquals(['hoff'], $entry->fresh()->get('topics'));
+        $this->assertNull(Facades\Term::find('topics::ghost'));
+    }
+
+    #[Test]
+    public function it_updates_references_when_renaming_a_term_retrieved_from_the_stache()
+    {
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'favourite',
+                    'field' => [
+                        'type' => 'terms',
+                        'taxonomies' => ['topics'],
+                        'max_items' => 1,
+                        'mode' => 'select',
+                    ],
+                ],
+            ],
+        ]);
+
+        $entry = tap(Facades\Entry::make()->collection($collection)->data([
+            'favourite' => 'hoff',
+        ]))->save();
+
+        $term = Facades\Term::find('topics::hoff');
+        $term->slug('hoff-new');
+        $term->save();
+
+        $this->assertEquals('hoff-new', $entry->fresh()->get('favourite'));
+    }
+
+    #[Test]
+    public function it_nullifies_references_when_deleting_a_term_cached_by_a_cold_read()
+    {
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'favourites',
+                    'field' => [
+                        'type' => 'terms',
+                        'taxonomies' => ['topics'],
+                        'mode' => 'select',
+                    ],
+                ],
+            ],
+        ]);
+
+        $entry = tap(Facades\Entry::make()->collection($collection)->data([
+            'favourites' => ['hoff', 'norris'],
+        ]))->save();
+
+        $this->assertEquals(['hoff', 'norris'], $entry->get('favourites'));
+
+        // On a cold read, paths() caches every localization without syncing their original state.
+        $store = Facades\Stache::store('terms')->store('topics');
+        $store->forgetItem('en::hoff');
+        $store->clearCachedPaths();
+        $store->paths();
+
+        Facades\Term::find('topics::hoff')->delete();
+
+        $this->assertEquals(['norris'], $entry->fresh()->get('favourites'));
+    }
+
+    #[Test]
+    public function it_keeps_a_term_retrieved_from_the_stache_dirty_until_it_has_been_saved()
+    {
+        $dirty = null;
+
+        Event::listen(TermSaving::class, function ($event) use (&$dirty) {
+            $dirty = $event->term->isDirty('title');
+        });
+
+        $term = Facades\Term::find('topics::hoff');
+        $term->set('title', 'The Hoff');
+        $term->save();
+
+        $this->assertTrue($dirty);
     }
 
     #[Test]

@@ -11,9 +11,7 @@ class IpAddress extends Protector
     {
         $allowed = Arr::get($this->config, 'allowed', []);
 
-        $requestIps = request()->ips();
-
-        if (empty(array_intersect($requestIps, $allowed))) {
+        if (! in_array(request()->ip(), $allowed, strict: true)) {
             throw new ForbiddenHttpException();
         }
     }
