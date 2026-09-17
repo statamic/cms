@@ -1,5 +1,5 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
-import {CodeEditor} from '@ui';
+import {CodeEditor} from '@statamic/cms/ui';
 import {ref} from 'vue';
 
 const meta = {
@@ -59,7 +59,7 @@ export const _DocsIntro: Story = {
             const code = ref('function hello() {\n    console.log("Hello, world!");\n}');
             return { code };
         },
-        template: `<CodeEditor mode="javascript" v-model="code" /><PortalTargets />`,
+        template: `<CodeEditor mode="javascript" v-model="code" />`,
     }),
 };
 
@@ -92,7 +92,6 @@ export const _Modes: Story = {
                 <CodeEditor mode="php" v-model="phpCode" />
                 <CodeEditor mode="yaml" v-model="yamlCode" />
             </div>
-            <PortalTargets />
         `,
     }),
 };
@@ -120,7 +119,7 @@ export const _ModeSelection: Story = {
             const mode = ref('javascript');
             return { code, mode };
         },
-        template: `<CodeEditor v-model="code" :mode="mode" :allow-mode-selection="false" @update:mode="mode = $event" /><PortalTargets />`,
+        template: `<CodeEditor v-model="code" :mode="mode" :allow-mode-selection="false" @update:mode="mode = $event" />`,
     }),
 };
 
@@ -145,6 +144,6 @@ export const _NoLineNumbers: Story = {
             const markdown = ref('# Hello\n\nThis is a markdown editor without line numbers.');
             return { markdown };
         },
-        template: `<CodeEditor mode="markdown" v-model="markdown" :line-numbers="false" /><PortalTargets />`,
+        template: `<CodeEditor mode="markdown" v-model="markdown" :line-numbers="false" />`,
     }),
 };
