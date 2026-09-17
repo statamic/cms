@@ -200,7 +200,7 @@ return [
     'session_expiry_logged_out_for_inactivity' => 'しばらく操作がなかったため、ログアウトされました。',
     'session_expiry_logging_out_in_seconds' => 'しばらく非アクティブであったため、 :seconds秒後にログアウトされます。クリックしてセッションを延長します。',
     'session_expiry_new_window' => '新しいウィンドウで開きます。ログインしたら戻ってきてください。',
-    'show_slugs_instructions' => 'ツリービューにナメクジを表示するかどうか。',
+    'show_slugs_instructions' => 'ツリービューにスラッグを表示するかどうか。',
     'site_configure_attributes_instructions' => 'テンプレートでアクセスできる任意の属性をサイトの設定に追加します。[詳細](https://statamic.dev/multi-site#additional-attributes)。',
     'site_configure_handle_instructions' => 'このサイトへの一意の参照。後で変更するのは簡単ではありません。',
     'site_configure_lang_instructions' => '[言語](https://statamic.dev/multi-site#language)について学びます。',
@@ -250,5 +250,5 @@ return [
     'user_wizard_roles_groups_intro' => 'ユーザーは、コントロール パネル全体で権限、アクセス、機能をカスタマイズする役割に割り当てることができます。',
     'user_wizard_super_admin_instructions' => 'スーパー管理者は、コントロール パネル内のすべてを完全に制御し、アクセスできます。この役割を賢明に与えてください。',
     'view_more_count' => '表示:count',
-    'width_x_height' => ':width x :height',
+    'width_x_height' => ':width × :height',
 ];
