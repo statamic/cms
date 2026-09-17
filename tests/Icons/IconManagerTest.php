@@ -5,6 +5,7 @@ namespace Tests\Icons;
 use Illuminate\Support\Facades\Facade;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Icon;
+use Statamic\Icons\IconSet;
 use Tests\TestCase;
 
 class IconManagerTest extends TestCase
@@ -17,5 +18,6 @@ class IconManagerTest extends TestCase
         Facade::clearResolvedInstances();
 
         $this->assertTrue(Icon::sets()->has('test'));
+        $this->assertInstanceOf(IconSet::class, Icon::get('test'));
     }
 }
