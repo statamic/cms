@@ -445,6 +445,35 @@ class HierarchicalTaxonomyTest extends TestCase
     }
 
     #[Test]
+    public function creating_a_term_adds_it_to_a_tree_thats_already_been_read()
+    {
+        $taxonomy = $this->makeHierarchicalTaxonomy();
+
+        // Read the tree before the term is created, so it gets cached without it.
+        $taxonomy->structure()->tree()->tree();
+
+        tap(Term::make('dog')->taxonomy('categories')->data(['title' => 'Dog']))->save();
+
+        $this->assertContains('dog', collect($taxonomy->structure()->tree()->tree())->pluck('term')->all());
+        $this->assertNotNull(Term::find('categories::dog')->page());
+    }
+
+    #[Test]
+    public function deleting_a_term_thats_not_in_the_tree_removes_it_from_a_tree_thats_already_been_read()
+    {
+        $taxonomy = $this->makeHierarchicalTaxonomy();
+
+        tap(Term::make('dog')->taxonomy('categories')->data(['title' => 'Dog']))->save();
+
+        // Reading the tree appends 'dog' without persisting it, and caches the term slugs.
+        $this->assertContains('dog', collect($taxonomy->structure()->tree()->tree())->pluck('term')->all());
+
+        Term::find('categories::dog')->delete();
+
+        $this->assertNotContains('dog', collect($taxonomy->structure()->tree()->tree())->pluck('term')->all());
+    }
+
+    #[Test]
     public function renaming_a_term_slug_updates_the_tree()
     {
         $taxonomy = $this->makeHierarchicalTaxonomy();

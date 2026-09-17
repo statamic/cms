@@ -366,6 +366,7 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, ContainsQ
         Blink::forget("taxonomy-{$this->id()}-structure");
         Blink::forget("taxonomy-structure-taxonomy-{$this->handle()}");
         Blink::forget("taxonomy-structure-tree-{$this->handle()}");
+        Blink::forget("taxonomy-structure-term-slugs-{$this->handle()}");
 
         if ($withEvents) {
             if ($isNew) {
@@ -401,6 +402,11 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, ContainsQ
         $this->queryTerms()->get()->each->delete();
 
         Facades\Taxonomy::delete($this);
+
+        Blink::forget("taxonomy-{$this->id()}-structure");
+        Blink::forget("taxonomy-structure-taxonomy-{$this->handle()}");
+        Blink::forget("taxonomy-structure-tree-{$this->handle()}");
+        Blink::forget("taxonomy-structure-term-slugs-{$this->handle()}");
 
         if ($withEvents) {
             TaxonomyDeleted::dispatch($this);

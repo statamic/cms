@@ -371,6 +371,20 @@ class TaxonomyStructure extends Structure
         return $branches;
     }
 
+    /**
+     * The blinks are forgotten after the parent, since it reads the tree back
+     * through in(), which would otherwise blink it again.
+     */
+    public function flushCache($site = null)
+    {
+        $structure = parent::flushCache($site);
+
+        Blink::forget("taxonomy-structure-tree-{$this->handle()}");
+        Blink::forget('taxonomy-structure-term-slugs-'.$this->handle());
+
+        return $structure;
+    }
+
     public function save()
     {
         $this->taxonomy()->structure($this)->save();
