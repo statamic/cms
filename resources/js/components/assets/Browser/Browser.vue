@@ -237,6 +237,7 @@ import {
 } from '@ui';
 import Breadcrumbs from './Breadcrumbs.vue';
 import useCheckerboard from '@/composables/checkerboard.js';
+import { router } from '@inertiajs/vue3';
 
 export default {
     mixins: [HasPreferences],
@@ -587,7 +588,7 @@ export default {
                 Statamic.$toast.success(response.message || __('Action completed'));
             }
 
-            if (!response.redirect) this.$refs.listing.refresh();
+            if (!response.redirect) router.reload();
         },
 
         assetSaved() {
