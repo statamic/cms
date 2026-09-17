@@ -512,13 +512,22 @@ class Statamic
 
     public static function nonInertiaPageData()
     {
-        $props = Inertia::getShared();
-
         return [
             'url' => '/'.request()->path(),
             'component' => 'NonInertiaPage',
             'version' => inertia()->getVersion(),
-            'props' => $props,
+            'props' => static::resolveProps(Inertia::getShared()),
         ];
+    }
+
+    private static function resolveProps(array $props)
+    {
+        return collect($props)->map(function ($value) {
+            if ($value instanceof Closure) {
+                $value = $value();
+            }
+
+            return is_array($value) ? static::resolveProps($value) : $value;
+        })->all();
     }
 }
