@@ -14,9 +14,13 @@ class RemoteUrlValidator
         $this->resolver = $resolver ?? fn ($host) => dns_get_record($host, DNS_A + DNS_AAAA) ?: [];
     }
 
+    /**
+     * Parse the URL without resolving its host. Safe to call while rendering
+     * templates, but call validate() or resolve() before fetching anything.
+     */
     public function parse($url)
     {
-        $components = $this->validatedComponents($url);
+        $components = $this->components($url);
 
         return [
             'path' => Str::after($components['path'], '/'),
@@ -27,7 +31,7 @@ class RemoteUrlValidator
 
     public function validate($url)
     {
-        $this->parse($url);
+        $this->resolve($url);
     }
 
     /**
@@ -38,16 +42,16 @@ class RemoteUrlValidator
      */
     public function resolve($url)
     {
-        $components = $this->validatedComponents($url);
+        $components = $this->components($url);
 
         return [
             'host' => $components['host'],
             'port' => $components['port'],
-            'ips' => $components['ips'],
+            'ips' => $this->ensureHostResolvesToPublicIps($components['host']),
         ];
     }
 
-    protected function validatedComponents($url)
+    protected function components($url)
     {
         $parsed = parse_url($url);
 
@@ -81,8 +85,6 @@ class RemoteUrlValidator
             throw new InvalidRemoteUrlException('Invalid URL host.');
         }
 
-        $ips = $this->ensureHostResolvesToPublicIps($host);
-
         return [
             'scheme' => $scheme,
             'host' => $host,
@@ -90,7 +92,6 @@ class RemoteUrlValidator
             'port_suffix' => isset($parsed['port']) ? ':'.$parsed['port'] : '',
             'path' => $parsed['path'] ?? '/',
             'query' => $parsed['query'] ?? null,
-            'ips' => $ips,
         ];
     }
 
