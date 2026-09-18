@@ -6,6 +6,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Mockery;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Query\Builder;
+use Statamic\Fields\ArrayableString;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
@@ -47,10 +48,24 @@ class LengthTest extends TestCase
     #[Test]
     public function it_returns_the_number_of_items_in_an_arrayable()
     {
-        $arrayable = Mockery::mock(Arrayable::class)->shouldReceive('toArray')->andReturn(['one', 'two'])->getMock();
+        $arrayable = new class implements Arrayable
+        {
+            public function toArray()
+            {
+                return ['one', 'two'];
+            }
+        };
 
         $modified = $this->modify($arrayable);
         $this->assertSame(2, $modified);
+    }
+
+    #[Test]
+    public function it_returns_the_number_of_chars_in_a_stringable_arrayable()
+    {
+        // Value objects like ArrayableString stand in for a string, so the
+        // string is what should get measured, not their array form.
+        $this->assertSame(19, $this->modify(new ArrayableString('https://vimeo.com/1')));
     }
 
     #[Test]
