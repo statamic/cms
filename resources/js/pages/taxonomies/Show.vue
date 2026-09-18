@@ -147,7 +147,11 @@ export default {
 
         cancelTreeProgress() {
             this.$refs.tree.cancel();
+        },
+
+        treeDiscarded() {
             this.deletedTerms = [];
+            this.markTreeClean();
         },
 
         saveTree() {
@@ -406,6 +410,7 @@ export default {
             @edit-page="editTerm"
             @changed="markTreeDirty"
             @saved="markTreeClean"
+            @canceled="treeDiscarded"
         >
             <template #branch-options="{ branch, removeBranch, depth }">
                 <template v-if="canCreate && depth < maxDepth">
