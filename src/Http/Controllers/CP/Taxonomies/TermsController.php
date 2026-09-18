@@ -237,7 +237,7 @@ class TermsController extends CpController
             'children' => [],
         ];
 
-        if ($taxonomy->hierarchical() && $request->parent) {
+        if ($taxonomy->nestable() && $request->parent) {
             $parentTerm = Term::find($taxonomy->handle().'::'.$this->termSlugFromParentValue($taxonomy, $request->parent))?->in($site->handle());
             $extraValues['depth'] = ($parentTerm?->depth() ?? 0) + 1;
         }
@@ -298,7 +298,7 @@ class TermsController extends CpController
 
         $values = $fields->process()->values()->except(['slug', 'blueprint']);
 
-        $parent = $taxonomy->hierarchical()
+        $parent = $taxonomy->nestable()
             ? $this->termSlugFromParentValue($taxonomy, $request->_parent)
             : null;
 
@@ -333,7 +333,7 @@ class TermsController extends CpController
 
         $saved = $term->updateLastModified(User::current())->save();
 
-        if ($saved && $taxonomy->hierarchical()) {
+        if ($saved && $taxonomy->nestable()) {
             $this->addTermToTree($taxonomy, $term, $parent);
         }
 

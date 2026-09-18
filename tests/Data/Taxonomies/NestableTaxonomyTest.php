@@ -14,11 +14,11 @@ use Statamic\Taxonomies\EnsuresTermPaths;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-class HierarchicalTaxonomyTest extends TestCase
+class NestableTaxonomyTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    private function makeHierarchicalTaxonomy()
+    private function makeNestableTaxonomy()
     {
         $taxonomy = tap(Taxonomy::make('categories')->title('Categories')->structureContents([]))->save();
 
@@ -39,23 +39,23 @@ class HierarchicalTaxonomyTest extends TestCase
     }
 
     #[Test]
-    public function a_taxonomy_without_structure_is_not_hierarchical()
+    public function a_taxonomy_without_structure_is_not_nestable()
     {
         $taxonomy = tap(Taxonomy::make('tags'))->save();
 
         $this->assertFalse($taxonomy->hasStructure());
-        $this->assertFalse($taxonomy->hierarchical());
+        $this->assertFalse($taxonomy->nestable());
         $this->assertFalse($taxonomy->orderable());
         $this->assertNull($taxonomy->structure());
     }
 
     #[Test]
-    public function a_taxonomy_with_structure_is_hierarchical()
+    public function a_taxonomy_with_structure_is_nestable()
     {
         $taxonomy = tap(Taxonomy::make('categories')->structureContents(['max_depth' => 3]))->save();
 
         $this->assertTrue($taxonomy->hasStructure());
-        $this->assertTrue($taxonomy->hierarchical());
+        $this->assertTrue($taxonomy->nestable());
         $this->assertFalse($taxonomy->orderable());
         $this->assertInstanceOf(TaxonomyStructure::class, $structure = $taxonomy->structure());
         $this->assertEquals(3, $structure->maxDepth());
@@ -87,19 +87,19 @@ class HierarchicalTaxonomyTest extends TestCase
     }
 
     #[Test]
-    public function a_taxonomy_with_max_depth_of_one_is_orderable_but_not_hierarchical()
+    public function a_taxonomy_with_max_depth_of_one_is_orderable_but_not_nestable()
     {
         $taxonomy = tap(Taxonomy::make('categories')->structureContents(['max_depth' => 1]))->save();
 
         $this->assertTrue($taxonomy->hasStructure());
-        $this->assertFalse($taxonomy->hierarchical());
+        $this->assertFalse($taxonomy->nestable());
         $this->assertTrue($taxonomy->orderable());
     }
 
     #[Test]
-    public function it_gets_hierarchy_from_the_tree()
+    public function it_gets_nesting_from_the_tree()
     {
-        $this->makeHierarchicalTaxonomy();
+        $this->makeNestableTaxonomy();
 
         $calico = Term::find('categories::calico');
         $animals = Term::find('categories::animals');
@@ -114,9 +114,9 @@ class HierarchicalTaxonomyTest extends TestCase
     }
 
     #[Test]
-    public function hierarchical_terms_get_nested_uris()
+    public function nested_terms_get_nested_uris()
     {
-        $this->makeHierarchicalTaxonomy();
+        $this->makeNestableTaxonomy();
 
         $this->assertEquals('/categories/animals', Term::find('categories::animals')->uri());
         $this->assertEquals('/categories/animals/cat', Term::find('categories::cat')->uri());
@@ -125,9 +125,9 @@ class HierarchicalTaxonomyTest extends TestCase
     }
 
     #[Test]
-    public function it_finds_hierarchical_terms_by_nested_uri()
+    public function it_finds_nested_terms_by_nested_uri()
     {
-        $this->makeHierarchicalTaxonomy();
+        $this->makeNestableTaxonomy();
 
         $term = Term::findByUri('/categories/animals/cat/calico');
 
@@ -136,9 +136,9 @@ class HierarchicalTaxonomyTest extends TestCase
     }
 
     #[Test]
-    public function it_finds_hierarchical_terms_by_flat_uri_for_redirecting()
+    public function it_finds_nested_terms_by_flat_uri_for_redirecting()
     {
-        $this->makeHierarchicalTaxonomy();
+        $this->makeNestableTaxonomy();
 
         $term = Term::findByUri('/categories/calico');
 
@@ -159,7 +159,7 @@ class HierarchicalTaxonomyTest extends TestCase
     #[Test]
     public function validating_a_tree_appends_missing_terms()
     {
-        $taxonomy = $this->makeHierarchicalTaxonomy();
+        $taxonomy = $this->makeNestableTaxonomy();
 
         tap(Term::make('dog')->taxonomy('categories')->data(['title' => 'Dog']))->save();
 
@@ -177,7 +177,7 @@ class HierarchicalTaxonomyTest extends TestCase
     #[Test]
     public function validating_a_tree_removes_non_existent_terms()
     {
-        $taxonomy = $this->makeHierarchicalTaxonomy();
+        $taxonomy = $this->makeNestableTaxonomy();
 
         $tree = $taxonomy->structure()->validateTree([
             ['term' => 'animals'],
@@ -193,7 +193,7 @@ class HierarchicalTaxonomyTest extends TestCase
     #[Test]
     public function validating_a_tree_promotes_the_children_of_a_non_existent_term()
     {
-        $taxonomy = $this->makeHierarchicalTaxonomy();
+        $taxonomy = $this->makeNestableTaxonomy();
 
         $tree = $taxonomy->structure()->validateTree([
             ['term' => 'ghost', 'children' => [
@@ -217,7 +217,7 @@ class HierarchicalTaxonomyTest extends TestCase
     #[Test]
     public function validating_a_tree_promotes_the_children_of_a_nested_non_existent_term()
     {
-        $taxonomy = $this->makeHierarchicalTaxonomy();
+        $taxonomy = $this->makeNestableTaxonomy();
 
         $tree = $taxonomy->structure()->validateTree([
             ['term' => 'animals', 'children' => [
@@ -243,7 +243,7 @@ class HierarchicalTaxonomyTest extends TestCase
     #[Test]
     public function a_non_existent_term_in_the_persisted_tree_does_not_swallow_its_children()
     {
-        $taxonomy = $this->makeHierarchicalTaxonomy();
+        $taxonomy = $this->makeNestableTaxonomy();
 
         $taxonomy->structure()->tree()->tree([
             ['term' => 'ghost', 'children' => [
@@ -267,7 +267,7 @@ class HierarchicalTaxonomyTest extends TestCase
     #[Test]
     public function the_depth_of_a_term_ignores_non_existent_ancestors()
     {
-        $taxonomy = $this->makeHierarchicalTaxonomy();
+        $taxonomy = $this->makeNestableTaxonomy();
 
         $taxonomy->structure()->tree()->tree([
             ['term' => 'ghost', 'children' => [
@@ -350,7 +350,7 @@ class HierarchicalTaxonomyTest extends TestCase
     #[Test]
     public function validating_a_tree_drops_duplicate_terms_keeping_the_first()
     {
-        $taxonomy = $this->makeHierarchicalTaxonomy();
+        $taxonomy = $this->makeNestableTaxonomy();
 
         $tree = $taxonomy->structure()->validateTree([
             ['term' => 'animals', 'children' => [
@@ -373,7 +373,7 @@ class HierarchicalTaxonomyTest extends TestCase
     #[Test]
     public function validating_a_tree_normalizes_entry_keys_and_full_term_ids()
     {
-        $taxonomy = $this->makeHierarchicalTaxonomy();
+        $taxonomy = $this->makeNestableTaxonomy();
 
         $tree = $taxonomy->structure()->validateTree([
             ['entry' => 'categories::animals', 'children' => [
@@ -400,7 +400,7 @@ class HierarchicalTaxonomyTest extends TestCase
     #[Test]
     public function appending_a_term_stores_the_slug_under_the_term_key()
     {
-        $taxonomy = $this->makeHierarchicalTaxonomy();
+        $taxonomy = $this->makeNestableTaxonomy();
         $term = Term::find('categories::furniture');
 
         $tree = $taxonomy->structure()->tree();
@@ -418,7 +418,7 @@ class HierarchicalTaxonomyTest extends TestCase
     #[Test]
     public function it_gets_the_term_parent_uri()
     {
-        $taxonomy = $this->makeHierarchicalTaxonomy();
+        $taxonomy = $this->makeNestableTaxonomy();
 
         $structure = $taxonomy->structure();
 
@@ -430,7 +430,7 @@ class HierarchicalTaxonomyTest extends TestCase
     #[Test]
     public function deleting_a_term_removes_its_branch_and_promotes_children()
     {
-        $taxonomy = $this->makeHierarchicalTaxonomy();
+        $taxonomy = $this->makeNestableTaxonomy();
 
         Term::find('categories::cat')->delete();
 
@@ -447,7 +447,7 @@ class HierarchicalTaxonomyTest extends TestCase
     #[Test]
     public function creating_a_term_adds_it_to_a_tree_thats_already_been_read()
     {
-        $taxonomy = $this->makeHierarchicalTaxonomy();
+        $taxonomy = $this->makeNestableTaxonomy();
 
         // Read the tree before the term is created, so it gets cached without it.
         $taxonomy->structure()->tree()->tree();
@@ -461,7 +461,7 @@ class HierarchicalTaxonomyTest extends TestCase
     #[Test]
     public function deleting_a_term_thats_not_in_the_tree_removes_it_from_a_tree_thats_already_been_read()
     {
-        $taxonomy = $this->makeHierarchicalTaxonomy();
+        $taxonomy = $this->makeNestableTaxonomy();
 
         tap(Term::make('dog')->taxonomy('categories')->data(['title' => 'Dog']))->save();
 
@@ -476,7 +476,7 @@ class HierarchicalTaxonomyTest extends TestCase
     #[Test]
     public function renaming_a_term_slug_updates_the_tree()
     {
-        $taxonomy = $this->makeHierarchicalTaxonomy();
+        $taxonomy = $this->makeNestableTaxonomy();
 
         $term = Term::find('categories::cat');
         $term->slug('feline');
@@ -497,7 +497,7 @@ class HierarchicalTaxonomyTest extends TestCase
     #[Test]
     public function deleting_a_taxonomy_deletes_its_tree()
     {
-        $taxonomy = $this->makeHierarchicalTaxonomy();
+        $taxonomy = $this->makeNestableTaxonomy();
 
         $tree = $taxonomy->structure()->tree();
 
@@ -507,9 +507,9 @@ class HierarchicalTaxonomyTest extends TestCase
     }
 
     #[Test]
-    public function augmented_term_includes_hierarchy_keys()
+    public function augmented_term_includes_nesting_keys()
     {
-        $this->makeHierarchicalTaxonomy();
+        $this->makeNestableTaxonomy();
 
         $augmented = Term::find('categories::calico')->in('en')->toAugmentedArray(['parent', 'ancestors', 'children', 'depth']);
 
@@ -522,7 +522,7 @@ class HierarchicalTaxonomyTest extends TestCase
     #[Test]
     public function structured_taxonomies_sort_terms_by_tree_order()
     {
-        $taxonomy = $this->makeHierarchicalTaxonomy();
+        $taxonomy = $this->makeNestableTaxonomy();
 
         $this->assertEquals('order', $taxonomy->sortField());
         $this->assertEquals(1, Term::find('categories::animals')->order());
@@ -559,7 +559,7 @@ class HierarchicalTaxonomyTest extends TestCase
     #[Test]
     public function lowering_max_depth_below_the_existing_tree_does_not_break_reading_it()
     {
-        $taxonomy = $this->makeHierarchicalTaxonomy();
+        $taxonomy = $this->makeNestableTaxonomy();
 
         tap($taxonomy->structureContents(['max_depth' => 2]))->save();
 

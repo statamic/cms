@@ -82,7 +82,7 @@ class AugmentedTermTest extends AugmentedTestCase
     }
 
     #[Test]
-    public function flat_taxonomy_blueprint_fields_with_reserved_hierarchy_handles_are_not_shadowed()
+    public function flat_taxonomy_blueprint_fields_with_reserved_nesting_handles_are_not_shadowed()
     {
         $blueprint = Blueprint::makeFromFields([
             'parent' => ['type' => 'text'],
@@ -115,7 +115,7 @@ class AugmentedTermTest extends AugmentedTestCase
     }
 
     #[Test]
-    public function flat_taxonomy_blueprint_fields_with_reserved_hierarchy_handles_keep_their_fieldtypes()
+    public function flat_taxonomy_blueprint_fields_with_reserved_nesting_handles_keep_their_fieldtypes()
     {
         $blueprint = Blueprint::makeFromFields([
             'parent' => ['type' => 'terms', 'taxonomies' => ['test'], 'max_items' => 1],
@@ -150,7 +150,7 @@ class AugmentedTermTest extends AugmentedTestCase
     }
 
     #[Test]
-    public function flat_taxonomy_blueprint_fields_with_reserved_hierarchy_handles_are_augmented_by_their_fieldtypes()
+    public function flat_taxonomy_blueprint_fields_with_reserved_nesting_handles_are_augmented_by_their_fieldtypes()
     {
         $blueprint = Blueprint::makeFromFields([
             'parent' => ['type' => 'terms', 'taxonomies' => ['test'], 'max_items' => 1],
@@ -176,7 +176,7 @@ class AugmentedTermTest extends AugmentedTestCase
         $augmented = new AugmentedTerm($term->in('en'));
 
         // The control field proves what an untouched terms field of the same shape does on
-        // this object, so the hierarchy handles can be compared against it rather than
+        // this object, so the nesting handles can be compared against it rather than
         // against an assumption about how the terms fieldtype augments.
         $this->assertEquals(
             ['Alfa', 'Bravo'],
@@ -193,7 +193,7 @@ class AugmentedTermTest extends AugmentedTestCase
     }
 
     #[Test]
-    public function hierarchical_taxonomy_returns_structural_values_even_when_blueprint_defines_those_fields()
+    public function nestable_taxonomy_returns_structural_values_even_when_blueprint_defines_those_fields()
     {
         $blueprint = Blueprint::makeFromFields([
             'parent' => ['type' => 'text'],

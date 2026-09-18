@@ -28,7 +28,7 @@ class TaxonomizeNestedTermsTest extends TestCase
 
     #[Test]
     #[DataProvider('taxonomyProvider')]
-    public function a_stored_value_never_creates_a_hierarchy_from_the_delimiter($handle, $expectedTree)
+    public function a_stored_value_never_creates_nesting_from_the_delimiter($handle, $expectedTree)
     {
         tap(Taxonomy::make('tags'))->save();
         Collection::findByHandle('blog')->taxonomies(['categories', 'tags'])->save();
@@ -53,7 +53,7 @@ class TaxonomizeNestedTermsTest extends TestCase
     {
         return [
             // The stub gets absorbed into the tree as a single flat branch, not as "events" > "concerts".
-            'hierarchical' => ['categories', [['term' => 'events-concerts']]],
+            'nestable' => ['categories', [['term' => 'events-concerts']]],
             'flat' => ['tags', []],
         ];
     }

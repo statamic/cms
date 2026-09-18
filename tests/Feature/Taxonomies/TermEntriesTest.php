@@ -251,7 +251,7 @@ class TermEntriesTest extends TestCase
     #[Test]
     public function it_counts_entries_tagged_with_descendant_terms()
     {
-        $this->createHierarchicalCategories();
+        $this->createNestableCategories();
 
         Collection::make('products')->taxonomies(['categories'])->save();
         EntryFactory::collection('products')->slug('coat')->data(['categories' => ['clothing']])->create();
@@ -304,7 +304,7 @@ class TermEntriesTest extends TestCase
     #[Test]
     public function it_counts_an_entry_tagged_with_both_a_term_and_its_descendant_once()
     {
-        $this->createHierarchicalCategories();
+        $this->createNestableCategories();
 
         Collection::make('products')->taxonomies(['categories'])->save();
         EntryFactory::collection('products')->slug('tee')->data(['categories' => ['clothing', 't-shirts']])->create();
@@ -316,7 +316,7 @@ class TermEntriesTest extends TestCase
     #[Test]
     public function it_counts_descendant_entries_within_a_single_collection()
     {
-        $this->createHierarchicalCategories();
+        $this->createNestableCategories();
 
         $products = tap(Collection::make('products')->taxonomies(['categories']))->save();
         $articles = tap(Collection::make('articles')->taxonomies(['categories']))->save();
@@ -332,7 +332,7 @@ class TermEntriesTest extends TestCase
     #[Test]
     public function the_augmented_count_only_includes_published_descendant_entries()
     {
-        $this->createHierarchicalCategories();
+        $this->createNestableCategories();
 
         Collection::make('products')->taxonomies(['categories'])->save();
         EntryFactory::collection('products')->slug('tee')->data(['categories' => ['t-shirts']])->create();
@@ -342,7 +342,7 @@ class TermEntriesTest extends TestCase
         $this->assertEquals(1, Term::find('categories::clothing')->toAugmentedArray()['entries_count']->value());
     }
 
-    private function createHierarchicalCategories()
+    private function createNestableCategories()
     {
         tap(Taxonomy::make('categories')->structureContents([]))->save();
 

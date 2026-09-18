@@ -47,7 +47,7 @@ EXPECTED;
     }
 
     #[Test]
-    public function it_scaffolds_a_hierarchical_taxonomy_index()
+    public function it_scaffolds_a_nestable_taxonomy_index()
     {
         $taxonomy = tap(Taxonomy::make('categories')->title('Categories')->structureContents([]))->save();
 
@@ -66,7 +66,7 @@ EXPECTED;
     }
 
     #[Test]
-    public function it_scaffolds_a_hierarchical_taxonomy_show_template()
+    public function it_scaffolds_a_nestable_taxonomy_show_template()
     {
         $taxonomy = tap(Taxonomy::make('categories')->title('Categories')->structureContents([]))->save();
 

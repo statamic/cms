@@ -23,7 +23,7 @@ class TaxonomyTreeTest extends TestCase
         Facades\Config::set('statamic.api.resources.taxonomies', true);
     }
 
-    private function makeHierarchicalTaxonomy($sites = ['en'])
+    private function makeNestableTaxonomy($sites = ['en'])
     {
         tap(Taxonomy::make('categories')->sites($sites)->structureContents([]))->save();
 
@@ -42,7 +42,7 @@ class TaxonomyTreeTest extends TestCase
     #[Test]
     public function it_gets_the_taxonomy_tree()
     {
-        $this->makeHierarchicalTaxonomy();
+        $this->makeNestableTaxonomy();
 
         $response = $this->get('/api/taxonomies/categories/tree')->assertSuccessful();
 
@@ -59,7 +59,7 @@ class TaxonomyTreeTest extends TestCase
     #[Test]
     public function it_limits_the_tree_by_max_depth()
     {
-        $this->makeHierarchicalTaxonomy();
+        $this->makeNestableTaxonomy();
 
         $tree = $this->get('/api/taxonomies/categories/tree?max_depth=1')->assertSuccessful()->json('data');
 
@@ -78,7 +78,7 @@ class TaxonomyTreeTest extends TestCase
     #[Test]
     public function it_404s_when_the_requested_site_doesnt_exist()
     {
-        $this->makeHierarchicalTaxonomy();
+        $this->makeNestableTaxonomy();
 
         $this->get('/api/taxonomies/categories/tree?site=en')->assertSuccessful();
 
@@ -93,7 +93,7 @@ class TaxonomyTreeTest extends TestCase
             'de' => ['name' => 'German', 'url' => 'http://localhost/de/', 'locale' => 'de_DE'],
         ]);
 
-        $this->makeHierarchicalTaxonomy(['en']);
+        $this->makeNestableTaxonomy(['en']);
 
         $this->get('/api/taxonomies/categories/tree?site=en')->assertSuccessful();
 
@@ -103,7 +103,7 @@ class TaxonomyTreeTest extends TestCase
     #[Test]
     public function terms_include_parent_and_depth_when_requested()
     {
-        $this->makeHierarchicalTaxonomy();
+        $this->makeNestableTaxonomy();
 
         $url = '/api/taxonomies/categories/terms/%s?fields=depth,parent';
 
@@ -119,9 +119,9 @@ class TaxonomyTreeTest extends TestCase
     }
 
     #[Test]
-    public function tree_terms_dont_repeat_the_hierarchy_the_tree_already_describes()
+    public function tree_terms_dont_repeat_the_nesting_the_tree_already_describes()
     {
-        $this->makeHierarchicalTaxonomy();
+        $this->makeNestableTaxonomy();
 
         $tree = $this->get('/api/taxonomies/categories/tree')->assertSuccessful()->json('data');
 
@@ -134,7 +134,7 @@ class TaxonomyTreeTest extends TestCase
     #[Test]
     public function it_selects_fields_on_tree_terms()
     {
-        $this->makeHierarchicalTaxonomy();
+        $this->makeNestableTaxonomy();
 
         $tree = $this->get('/api/taxonomies/categories/tree?fields=title')->assertSuccessful()->json('data');
 
@@ -144,7 +144,7 @@ class TaxonomyTreeTest extends TestCase
     }
 
     #[Test]
-    public function flat_taxonomy_exposes_user_defined_fields_with_reserved_hierarchy_handles()
+    public function flat_taxonomy_exposes_user_defined_fields_with_reserved_nesting_handles()
     {
         $blueprint = Blueprint::makeFromFields([
             'parent' => ['type' => 'text'],

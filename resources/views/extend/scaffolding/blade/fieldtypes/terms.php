@@ -5,8 +5,8 @@
 use Statamic\Facades\Taxonomy;
 use Statamic\Support\Arr;
 
-$hierarchical = collect(Arr::wrap($context->field->get('taxonomies')))
-    ->contains(fn ($handle) => Taxonomy::findByHandle($handle)?->hierarchical());
+$nestable = collect(Arr::wrap($context->field->get('taxonomies')))
+    ->contains(fn ($handle) => Taxonomy::findByHandle($handle)?->nestable());
 
 $varName = $context
     ->emit
@@ -15,10 +15,10 @@ $varName = $context
 echo $context->emit->forEach(
     $context->handle,
     $varName,
-    content: function ($emit) use ($hierarchical) {
+    content: function ($emit) use ($nestable) {
         $content = $emit->variables('url', 'title');
 
-        if ($hierarchical) {
+        if ($nestable) {
             $content .= "\n".$emit->forEach(
                 'ancestors',
                 $emit->makeLoopVariableName('ancestors'),

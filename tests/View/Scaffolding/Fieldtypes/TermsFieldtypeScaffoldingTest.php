@@ -89,7 +89,7 @@ EXPECTED;
     }
 
     #[Test]
-    public function it_scaffolds_hierarchical_terms_fieldtype_antlers()
+    public function it_scaffolds_nestable_terms_fieldtype_antlers()
     {
         Taxonomy::make('categories')->structureContents([])->save();
 
@@ -117,7 +117,7 @@ EXPECTED;
     }
 
     #[Test]
-    public function it_scaffolds_hierarchical_terms_fieldtype_blade()
+    public function it_scaffolds_nestable_terms_fieldtype_blade()
     {
         Taxonomy::make('categories')->structureContents([])->save();
 

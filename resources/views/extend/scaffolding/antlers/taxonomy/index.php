@@ -4,7 +4,7 @@
 /** @var \Statamic\Taxonomies\Taxonomy $taxonomy */
 $handle = $taxonomy->handle();
 
-if ($taxonomy->hierarchical()) {
+if ($taxonomy->nestable()) {
     $content = (string) $emit->tag(
         'structure:taxonomy:'.$handle,
         fn () => '<li><a href="{{ url /}}">{{ title /}}</a></li>',

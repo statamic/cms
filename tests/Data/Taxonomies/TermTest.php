@@ -567,7 +567,7 @@ class TermTest extends TestCase
     }
 
     #[Test]
-    public function hierarchical_terms_use_parent_uri_in_the_default_route()
+    public function nested_terms_use_parent_uri_in_the_default_route()
     {
         $taxonomy = tap(Taxonomy::make('categories')->structureContents([]))->save();
         tap((new Term)->taxonomy('categories')->slug('animals')->data(['title' => 'Animals']))->save();

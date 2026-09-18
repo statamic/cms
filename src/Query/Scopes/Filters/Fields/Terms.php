@@ -83,7 +83,7 @@ class Terms extends FieldtypeFilter
 
         $fallback = array_values(array_filter([$prefix.$slug]));
 
-        if (! $handle || ! ($taxonomy = Facades\Taxonomy::findByHandle($handle)) || ! $taxonomy->hierarchical()) {
+        if (! $handle || ! ($taxonomy = Facades\Taxonomy::findByHandle($handle)) || ! $taxonomy->nestable()) {
             return $fallback;
         }
 

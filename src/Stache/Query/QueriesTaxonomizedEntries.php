@@ -43,7 +43,7 @@ trait QueriesTaxonomizedEntries
 
     /**
      * Terms in taxonomy wheres will also match entries tagged with any of
-     * their descendant terms (on hierarchical taxonomies).
+     * their descendant terms (on nestable taxonomies).
      */
     public function withTaxonomyDescendants($expand = true)
     {

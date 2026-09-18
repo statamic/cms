@@ -9,7 +9,7 @@ use Tests\FakesViews;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-class HierarchicalViewsTest extends TestCase
+class NestableViewsTest extends TestCase
 {
     use FakesViews;
     use PreventSavingStacheItemsToDisk;
@@ -36,7 +36,7 @@ class HierarchicalViewsTest extends TestCase
     }
 
     #[Test]
-    public function it_loads_hierarchical_terms_at_their_nested_urls()
+    public function it_loads_nested_terms_at_their_nested_urls()
     {
         $this->viewShouldReturnRaw('categories.show', 'showing {{ title }}');
 

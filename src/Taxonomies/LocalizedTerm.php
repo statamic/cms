@@ -318,7 +318,7 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, BulkAugmenta
             'slug' => $this->slug(),
         ]);
 
-        if ($this->taxonomy()->hierarchical()) {
+        if ($this->taxonomy()->nestable()) {
             $data->put('parent_uri', $this->taxonomy()->structure()->termParentUri($this) ?? '');
         }
 
@@ -414,13 +414,13 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, BulkAugmenta
     }
 
     /**
-     * Hierarchical terms are resolvable by their slug at any path within the taxonomy
+     * Nested terms are resolvable by their slug at any path within the taxonomy
      * (e.g. their old flat URL), but should permanently redirect to the canonical
      * nested URL to avoid serving duplicate content.
      */
     private function canonicalUriRedirect($request)
     {
-        if (! $this->taxonomy()->hierarchical()) {
+        if (! $this->taxonomy()->nestable()) {
             return null;
         }
 

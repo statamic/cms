@@ -139,7 +139,7 @@ class RoutingTest extends TestCase
     }
 
     #[Test]
-    public function hierarchical_custom_routes_use_parent_uri_and_redirect_from_flat_urls()
+    public function nestable_custom_routes_use_parent_uri_and_redirect_from_flat_urls()
     {
         tap(Taxonomy::make('categories')->title('Categories')->structureContents([])->routes('/topics/{parent_uri}/{slug}'))->save();
 

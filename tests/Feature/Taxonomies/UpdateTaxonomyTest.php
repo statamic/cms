@@ -69,7 +69,7 @@ class UpdateTaxonomyTest extends TestCase
 
         $this->assertTrue($taxonomy->hasStructure());
         $this->assertNull($taxonomy->structure()->maxDepth());
-        $this->assertTrue($taxonomy->hierarchical());
+        $this->assertTrue($taxonomy->nestable());
         $this->assertStringContainsString('structure:', $taxonomy->fileContents());
     }
 

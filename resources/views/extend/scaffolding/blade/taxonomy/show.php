@@ -3,14 +3,14 @@
 /** @var \Statamic\View\Scaffolding\Emitters\BladeSourceEmitter $emit */
 /** @var \Statamic\View\Scaffolding\TemplateGenerator $generator */
 /** @var \Statamic\Taxonomies\Taxonomy $taxonomy */
-if ($taxonomy->hierarchical()) {
+if ($taxonomy->nestable()) {
     echo $emit->forEach('ancestors', 'ancestor', content: fn ($emit) => $emit->variables('url', 'title'));
     echo "\n";
     echo $emit->forEach('children', 'child', content: fn ($emit) => $emit->variables('url', 'title'));
     echo "\n";
 }
 
-$entryParams = $taxonomy->hierarchical() ? ['with_descendants' => 'true'] : [];
+$entryParams = $taxonomy->nestable() ? ['with_descendants' => 'true'] : [];
 
 echo $emit->component(
     'entries',

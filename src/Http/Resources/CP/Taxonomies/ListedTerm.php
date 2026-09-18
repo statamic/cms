@@ -38,7 +38,7 @@ class ListedTerm extends JsonResource
                 'slug' => $term->slug(),
             ])),
 
-            'parent_path' => $term->taxonomy()->hierarchical()
+            'parent_path' => $term->taxonomy()->nestable()
                 ? ($term->ancestors()->map->title()->implode(' › ') ?: null)
                 : null,
 

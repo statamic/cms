@@ -160,7 +160,7 @@ GQL;
     }
 
     #[Test]
-    public function it_queries_hierarchy_fields_on_terms()
+    public function it_queries_nesting_fields_on_terms()
     {
         $query = <<<'GQL'
 {

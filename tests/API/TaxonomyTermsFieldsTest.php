@@ -15,7 +15,7 @@ class TaxonomyTermsFieldsTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    private $hierarchyFields = ['parent', 'children', 'ancestors', 'depth'];
+    private $nestingFields = ['parent', 'children', 'ancestors', 'depth'];
 
     public function setUp(): void
     {
@@ -25,7 +25,7 @@ class TaxonomyTermsFieldsTest extends TestCase
         Facades\Config::set('statamic.api.resources.taxonomies', true);
     }
 
-    private function makeHierarchicalTaxonomy()
+    private function makeNestableTaxonomy()
     {
         tap(Taxonomy::make('categories')->structureContents([]))->save();
 
@@ -62,8 +62,8 @@ class TaxonomyTermsFieldsTest extends TestCase
     {
         // https://github.com/statamic/cms/pull/15192 - requesting only excluded fields
         // used to leave an empty selection, which fell back to the full key set and
-        // recursed through the term hierarchy until the stack was exhausted.
-        $this->makeHierarchicalTaxonomy();
+        // recursed through the nested terms until the stack was exhausted.
+        $this->makeNestableTaxonomy();
 
         $this->get('/api/taxonomies/categories/terms?fields=entries')->assertSuccessful();
         $this->get('/api/taxonomies/categories/terms?fields=collection')->assertSuccessful();
@@ -71,14 +71,14 @@ class TaxonomyTermsFieldsTest extends TestCase
     }
 
     #[Test]
-    public function hierarchy_fields_are_not_in_the_default_output()
+    public function nesting_fields_are_not_in_the_default_output()
     {
-        $this->makeHierarchicalTaxonomy();
+        $this->makeNestableTaxonomy();
 
         $terms = $this->get('/api/taxonomies/categories/terms')->assertSuccessful()->json('data');
         $term = $this->get('/api/taxonomies/categories/terms/cat')->assertSuccessful()->json('data');
 
-        foreach ($this->hierarchyFields as $field) {
+        foreach ($this->nestingFields as $field) {
             $this->assertArrayNotHasKey($field, $terms[0]);
             $this->assertArrayNotHasKey($field, $term);
         }
@@ -87,13 +87,13 @@ class TaxonomyTermsFieldsTest extends TestCase
     }
 
     #[Test]
-    public function hierarchy_fields_are_not_in_the_default_output_of_an_orderable_taxonomy()
+    public function nesting_fields_are_not_in_the_default_output_of_an_orderable_taxonomy()
     {
         $this->makeOrderableTaxonomy();
 
         $term = $this->get('/api/taxonomies/ordered/terms/one')->assertSuccessful()->json('data');
 
-        foreach ($this->hierarchyFields as $field) {
+        foreach ($this->nestingFields as $field) {
             $this->assertArrayNotHasKey($field, $term);
         }
     }
@@ -101,7 +101,7 @@ class TaxonomyTermsFieldsTest extends TestCase
     #[Test]
     public function it_only_returns_the_requested_fields()
     {
-        $this->makeHierarchicalTaxonomy();
+        $this->makeNestableTaxonomy();
 
         $terms = $this->get('/api/taxonomies/categories/terms?fields=id')->assertSuccessful()->json('data');
 
@@ -111,7 +111,7 @@ class TaxonomyTermsFieldsTest extends TestCase
     #[Test]
     public function it_only_returns_the_requested_fields_for_a_single_term()
     {
-        $this->makeHierarchicalTaxonomy();
+        $this->makeNestableTaxonomy();
 
         $term = $this->get('/api/taxonomies/categories/terms/cat?fields=title')->assertSuccessful()->json('data');
 
@@ -121,7 +121,7 @@ class TaxonomyTermsFieldsTest extends TestCase
     #[Test]
     public function it_returns_a_shallow_parent_when_requested()
     {
-        $this->makeHierarchicalTaxonomy();
+        $this->makeNestableTaxonomy();
 
         $terms = $this->get('/api/taxonomies/categories/terms?fields=title,parent')->assertSuccessful()->json('data');
 
@@ -143,7 +143,7 @@ class TaxonomyTermsFieldsTest extends TestCase
     {
         // Resolving a parent looks the term up, which resets the columns selected by
         // the original query. The requested fields need to survive that.
-        $this->makeHierarchicalTaxonomy();
+        $this->makeNestableTaxonomy();
 
         $terms = $this->get('/api/taxonomies/categories/terms?fields=title,parent')->assertSuccessful()->json('data');
 
@@ -157,7 +157,7 @@ class TaxonomyTermsFieldsTest extends TestCase
     {
         // Matching entries, where a flat listing stays flat. The tree endpoint is
         // where a structure gets traversed.
-        $this->makeHierarchicalTaxonomy();
+        $this->makeNestableTaxonomy();
 
         $terms = $this->get('/api/taxonomies/categories/terms?fields=title,children,ancestors')
             ->assertSuccessful()->json('data');
@@ -169,7 +169,7 @@ class TaxonomyTermsFieldsTest extends TestCase
     #[Test]
     public function it_returns_the_depth_when_requested()
     {
-        $this->makeHierarchicalTaxonomy();
+        $this->makeNestableTaxonomy();
 
         $term = $this->get('/api/taxonomies/categories/terms/calico?fields=depth')
             ->assertSuccessful()->json('data');
@@ -178,7 +178,7 @@ class TaxonomyTermsFieldsTest extends TestCase
     }
 
     #[Test]
-    public function a_flat_taxonomy_returns_user_defined_fields_with_reserved_hierarchy_handles()
+    public function a_flat_taxonomy_returns_user_defined_fields_with_reserved_nesting_handles()
     {
         $blueprint = Blueprint::makeFromFields([
             'parent' => ['type' => 'text'],

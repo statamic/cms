@@ -37,7 +37,7 @@ class Query extends Tags
     }
 
     /**
-     * Hierarchical taxonomy filters include descendant terms unless
+     * Nestable taxonomy filters include descendant terms unless
      * `with_descendants="false"` is passed.
      */
     private function queryTaxonomyDescendants($query)

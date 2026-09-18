@@ -3,14 +3,14 @@
 /** @var \Statamic\View\Scaffolding\Emitters\AntlersSourceEmitter $emit */
 /** @var \Statamic\View\Scaffolding\TemplateGenerator $generator */
 /** @var \Statamic\Taxonomies\Taxonomy $taxonomy */
-if ($taxonomy->hierarchical()) {
+if ($taxonomy->nestable()) {
     echo $emit->pair('ancestors', fn ($emit) => $emit->isolate(fn () => $emit->variables('url', 'title')));
     echo "\n";
     echo $emit->pair('children', fn ($emit) => $emit->isolate(fn () => $emit->variables('url', 'title')));
     echo "\n";
 }
 
-$entryParams = $taxonomy->hierarchical() ? ['with_descendants' => 'true'] : [];
+$entryParams = $taxonomy->nestable() ? ['with_descendants' => 'true'] : [];
 
 echo $emit->tag(
     'entries',

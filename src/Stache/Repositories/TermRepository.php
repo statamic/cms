@@ -171,7 +171,7 @@ class TermRepository implements RepositoryContract
             return null;
         }
 
-        if ($term->uri() !== $uri && ! $taxonomy->hierarchical()) {
+        if ($term->uri() !== $uri && ! $taxonomy->nestable()) {
             return null;
         }
 

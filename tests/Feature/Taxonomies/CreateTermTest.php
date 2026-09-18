@@ -13,7 +13,7 @@ class CreateTermTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    private function makeHierarchicalTaxonomy()
+    private function makeNestableTaxonomy()
     {
         $taxonomy = tap(Taxonomy::make('categories')->title('Categories')->structureContents([]))->save();
 
@@ -33,7 +33,7 @@ class CreateTermTest extends TestCase
     #[Test]
     public function creating_a_child_term_passes_the_parent_through()
     {
-        $this->makeHierarchicalTaxonomy();
+        $this->makeNestableTaxonomy();
 
         $this
             ->actingAs(tap(User::make()->makeSuper())->save())
@@ -48,7 +48,7 @@ class CreateTermTest extends TestCase
     #[Test]
     public function creating_a_root_term_has_no_parent()
     {
-        $this->makeHierarchicalTaxonomy();
+        $this->makeNestableTaxonomy();
 
         $this
             ->actingAs(tap(User::make()->makeSuper())->save())
@@ -63,7 +63,7 @@ class CreateTermTest extends TestCase
     #[Test]
     public function creating_a_term_with_a_parent_grafts_it_into_the_tree()
     {
-        $this->makeHierarchicalTaxonomy();
+        $this->makeNestableTaxonomy();
 
         $this
             ->actingAs(tap(User::make()->makeSuper())->save())
@@ -91,7 +91,7 @@ class CreateTermTest extends TestCase
     #[Test]
     public function creating_a_term_without_a_parent_appends_it_to_the_root_of_the_tree()
     {
-        $this->makeHierarchicalTaxonomy();
+        $this->makeNestableTaxonomy();
 
         $this
             ->actingAs(tap(User::make()->makeSuper())->save())
@@ -118,7 +118,7 @@ class CreateTermTest extends TestCase
     #[Test]
     public function creating_a_term_with_a_parent_that_is_not_in_the_tree_appends_it_to_the_root()
     {
-        $this->makeHierarchicalTaxonomy();
+        $this->makeNestableTaxonomy();
 
         $this
             ->actingAs(tap(User::make()->makeSuper())->save())

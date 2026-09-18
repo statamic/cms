@@ -126,7 +126,7 @@ GQL;
     }
 
     #[Test]
-    public function it_queries_the_hierarchy_of_a_term()
+    public function it_queries_the_nesting_of_a_term()
     {
         // The REST API keeps its term output flat, but that's done by checking for an
         // API route, so GraphQL should still be able to traverse a structure.

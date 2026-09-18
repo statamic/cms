@@ -14,7 +14,7 @@ use Statamic\Tags\Taxonomy\Terms;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-class TaxonomyHierarchyTest extends TestCase
+class TaxonomyNestingTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
@@ -163,7 +163,7 @@ class TaxonomyHierarchyTest extends TestCase
     }
 
     #[Test]
-    public function hierarchy_fields_are_available_in_a_taxonomy_loop()
+    public function nesting_fields_are_available_in_a_taxonomy_loop()
     {
         // The REST API keeps its term output flat, but that's done by checking for an
         // API route, so templates should still be able to traverse a structure.

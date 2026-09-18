@@ -88,7 +88,7 @@ class TermsDescendantSearchTest extends TestCase
     }
 
     #[Test]
-    public function a_flat_taxonomy_alongside_a_hierarchical_one_only_expands_the_hierarchical_side()
+    public function a_flat_taxonomy_alongside_a_nestable_one_only_expands_the_nestable_side()
     {
         $this->assertEqualsCanonicalizing(
             ['categories::animals', 'categories::cat', 'categories::calico', 'tags::animals-tag'],

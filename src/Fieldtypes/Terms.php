@@ -179,9 +179,9 @@ class Terms extends Relationship
     }
 
     /**
-     * The single configured taxonomy, if it's hierarchical.
+     * The single configured taxonomy, if it can nest terms.
      */
-    public function hierarchicalTaxonomy()
+    public function nestableTaxonomy()
     {
         if (! $this->usingSingleTaxonomy()) {
             return null;
@@ -189,13 +189,13 @@ class Terms extends Relationship
 
         $taxonomy = Taxonomy::findByHandle($this->taxonomies()[0]);
 
-        return $taxonomy && $taxonomy->hierarchical() ? $taxonomy : null;
+        return $taxonomy && $taxonomy->nestable() ? $taxonomy : null;
     }
 
     /**
-     * Hierarchical taxonomies available to this field, including when several are configured.
+     * Nestable taxonomies available to this field, including when several are configured.
      */
-    public function hierarchicalTaxonomies(): Collection
+    public function nestableTaxonomies(): Collection
     {
         $handles = ! empty($this->taxonomies())
             ? $this->taxonomies()
@@ -204,13 +204,13 @@ class Terms extends Relationship
         return collect($handles)
             ->map(fn ($handle) => Taxonomy::findByHandle($handle))
             ->filter()
-            ->filter->hierarchical()
+            ->filter->nestable()
             ->values();
     }
 
-    public function hasHierarchicalTaxonomy(): bool
+    public function hasNestableTaxonomy(): bool
     {
-        return $this->hierarchicalTaxonomies()->isNotEmpty();
+        return $this->nestableTaxonomies()->isNotEmpty();
     }
 
     public function augment($values)
@@ -365,8 +365,8 @@ class Terms extends Relationship
 
         $query = $this->getIndexQuery($request);
 
-        if ($this->shouldOrderByHierarchy($request)) {
-            return $this->orderItemsByHierarchy($query->get());
+        if ($this->shouldOrderByNesting($request)) {
+            return $this->orderItemsByNesting($query->get());
         }
 
         if ($sort = $this->getSortColumn($request)) {
@@ -377,22 +377,22 @@ class Terms extends Relationship
     }
 
     /**
-     * Select/typeahead dropdowns for a hierarchical taxonomy should list options
+     * Select/typeahead dropdowns for a nestable taxonomy should list options
      * in tree order (so they can be indented), unless the user is searching
      * or explicitly sorting. Paginated (stack selector) requests keep
      * regular ordering since tree order is meaningless across pages.
      */
-    private function shouldOrderByHierarchy($request): bool
+    private function shouldOrderByNesting($request): bool
     {
         return ! $request->sort
             && ! $request->search
             && ! $request->boolean('paginate', true)
-            && $this->hasHierarchicalTaxonomy();
+            && $this->hasNestableTaxonomy();
     }
 
-    private function orderItemsByHierarchy(Collection $items): Collection
+    private function orderItemsByNesting(Collection $items): Collection
     {
-        $orders = $this->hierarchicalTaxonomies()->mapWithKeys(function ($taxonomy) {
+        $orders = $this->nestableTaxonomies()->mapWithKeys(function ($taxonomy) {
             return [$taxonomy->handle() => $taxonomy->structure()->tree()->flattenedPages()->map->id()->flip()];
         });
 
@@ -553,7 +553,7 @@ class Terms extends Relationship
             'edit_url' => $term->editUrl(),
             'editable' => User::current()->can('edit', $term),
             'hint' => $this->getItemHint($term),
-            ...$this->itemHierarchyMeta($term),
+            ...$this->itemNestingMeta($term),
         ];
     }
 
@@ -570,7 +570,7 @@ class Terms extends Relationship
         // Typing a path creates the terms it names, so the field needs to know how to split
         // what was typed into the same segments the save will. Only a single configured
         // taxonomy ever creates anything, so anywhere else a path would just be a string.
-        return $this->hierarchicalTaxonomy() ? EnsuresTermPaths::DELIMITER : null;
+        return $this->nestableTaxonomy() ? EnsuresTermPaths::DELIMITER : null;
     }
 
     /**
@@ -578,9 +578,9 @@ class Terms extends Relationship
      * indent by — but only for a list in tree order, since an indent means nothing without
      * the ancestors it steps in from listed above it.
      */
-    public function itemHierarchyMeta($term, $request = null): array
+    public function itemNestingMeta($term, $request = null): array
     {
-        if (! $term->taxonomy()?->hierarchical()) {
+        if (! $term->taxonomy()?->nestable()) {
             return [];
         }
 
@@ -589,7 +589,7 @@ class Terms extends Relationship
         return [
             'path' => $path,
             'search_titles' => collect($path)->push($term->title())->implode(' '.EnsuresTermPaths::DELIMITER.' '),
-            ...($request && $this->shouldOrderByHierarchy($request) ? ['depth' => $term->depth() ?? 1] : []),
+            ...($request && $this->shouldOrderByNesting($request) ? ['depth' => $term->depth() ?? 1] : []),
         ];
     }
 
@@ -665,16 +665,16 @@ class Terms extends Relationship
      */
     private function descendantIdsOfTitleMatches(string $search, array $taxonomies, $site): array
     {
-        $hierarchical = $this->hierarchicalTaxonomies()
+        $nestableTaxonomies = $this->nestableTaxonomies()
             ->keyBy->handle()
             ->only($taxonomies);
 
-        if ($hierarchical->isEmpty()) {
+        if ($nestableTaxonomies->isEmpty()) {
             return [];
         }
 
         $query = Term::query()
-            ->whereIn('taxonomy', $hierarchical->keys()->all())
+            ->whereIn('taxonomy', $nestableTaxonomies->keys()->all())
             ->where('title', 'like', '%'.$search.'%');
 
         if ($site) {
@@ -682,8 +682,8 @@ class Terms extends Relationship
         }
 
         return $query->get()
-            ->flatMap(function ($term) use ($hierarchical) {
-                $taxonomy = $hierarchical->get($term->taxonomyHandle());
+            ->flatMap(function ($term) use ($nestableTaxonomies) {
+                $taxonomy = $nestableTaxonomies->get($term->taxonomyHandle());
 
                 // The tree is keyed by the default locale's slugs, the way `depth()` and the
                 // tree ordering read it. The matched term leads the list and is skipped —
@@ -733,9 +733,9 @@ class Terms extends Relationship
         }
 
         if (Str::contains($string, EnsuresTermPaths::DELIMITER)
-            && ($hierarchical = Facades\Taxonomy::findByHandle($taxonomy))
-            && $hierarchical->hierarchical()) {
-            return $this->createTermsFromPath($string, $hierarchical);
+            && ($nestableTaxonomy = Facades\Taxonomy::findByHandle($taxonomy))
+            && $nestableTaxonomy->nestable()) {
+            return $this->createTermsFromPath($string, $nestableTaxonomy);
         }
 
         $taxonomy = Facades\Taxonomy::findByHandle($taxonomy);
@@ -755,7 +755,7 @@ class Terms extends Relationship
     }
 
     /**
-     * A typed value like "animals > cat > calico" on a hierarchical taxonomy creates
+     * A typed value like "animals > cat > calico" on a nestable taxonomy creates
      * each missing segment as a term chained under the previous one, and returns
      * the leaf's id. Existing segments are reused in place — the fieldtype
      * never re-parents a term that's already somewhere in the tree.
@@ -842,7 +842,7 @@ class Terms extends Relationship
 
     public function getItemPath($item): ?array
     {
-        return $item->taxonomy()?->hierarchical()
+        return $item->taxonomy()?->nestable()
             ? $item->ancestors()->map->title()->values()->all()
             : null;
     }

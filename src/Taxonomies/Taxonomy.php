@@ -260,7 +260,7 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, ContainsQ
         return optional($this->structure())->maxDepth() === 1;
     }
 
-    public function hierarchical()
+    public function nestable()
     {
         return $this->hasStructure() && $this->structure()->maxDepth() !== 1;
     }
@@ -272,7 +272,7 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, ContainsQ
      */
     public function termWithDescendants(string $slug): array
     {
-        if (! $this->hierarchical() || ! ($page = $this->structure()->tree()->find($slug))) {
+        if (! $this->nestable() || ! ($page = $this->structure()->tree()->find($slug))) {
             return [$slug];
         }
 
@@ -568,7 +568,7 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, ContainsQ
     {
         $base = $this->normalizeRoute(str_replace('_', '-', $this->handle));
 
-        return $this->hierarchical()
+        return $this->nestable()
             ? $base.'/{parent_uri}/{slug}'
             : $base.'/{slug}';
     }
@@ -591,7 +591,7 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, ContainsQ
         $pattern = $this->normalizeRoute($pattern);
 
         if (! Str::contains($pattern, '{slug}')) {
-            $pattern .= $this->hierarchical()
+            $pattern .= $this->nestable()
                 ? '/{parent_uri}/{slug}'
                 : '/{slug}';
         }

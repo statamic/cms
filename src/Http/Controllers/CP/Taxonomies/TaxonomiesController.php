@@ -365,8 +365,8 @@ class TaxonomiesController extends CpController
         }
 
         $fields = array_merge($fields, [
-            'hierarchy' => [
-                'display' => __('Ordering & Hierarchy'),
+            'nesting' => [
+                'display' => __('Ordering & Nesting'),
                 'fields' => [
                     'structured' => [
                         'display' => __('Orderable'),

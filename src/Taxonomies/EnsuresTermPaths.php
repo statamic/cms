@@ -48,7 +48,7 @@ class EnsuresTermPaths
      */
     public function ensure(Taxonomy $taxonomy, string $value, ?string $language = null, ?Closure $canCreate = null, string $errorKey = 'path'): ?string
     {
-        if (! $taxonomy->hierarchical() || ! str_contains($value, self::DELIMITER)) {
+        if (! $taxonomy->nestable() || ! str_contains($value, self::DELIMITER)) {
             return $this->slugFromValue($value, $language);
         }
 

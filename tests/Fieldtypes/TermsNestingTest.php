@@ -13,7 +13,7 @@ use Statamic\Fields\Field;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-class TermsHierarchyTest extends TestCase
+class TermsNestingTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
@@ -40,15 +40,15 @@ class TermsHierarchyTest extends TestCase
     }
 
     #[Test]
-    public function it_identifies_the_hierarchical_taxonomy()
+    public function it_identifies_the_nestable_taxonomy()
     {
-        $this->assertNotNull($this->fieldtype(['taxonomies' => ['categories']])->hierarchicalTaxonomy());
-        $this->assertNull($this->fieldtype(['taxonomies' => ['categories', 'other']])->hierarchicalTaxonomy());
-        $this->assertTrue($this->fieldtype(['taxonomies' => ['categories', 'other']])->hasHierarchicalTaxonomy());
+        $this->assertNotNull($this->fieldtype(['taxonomies' => ['categories']])->nestableTaxonomy());
+        $this->assertNull($this->fieldtype(['taxonomies' => ['categories', 'other']])->nestableTaxonomy());
+        $this->assertTrue($this->fieldtype(['taxonomies' => ['categories', 'other']])->hasNestableTaxonomy());
     }
 
     #[Test]
-    public function preload_includes_tree_meta_for_a_hierarchical_taxonomy()
+    public function preload_includes_tree_meta_for_a_nestable_taxonomy()
     {
         $preload = $this->fieldtype(['taxonomies' => ['categories']])->preload();
 
@@ -76,7 +76,7 @@ class TermsHierarchyTest extends TestCase
     }
 
     #[Test]
-    public function preload_ships_the_path_delimiter_for_a_hierarchical_taxonomy()
+    public function preload_ships_the_path_delimiter_for_a_nestable_taxonomy()
     {
         $this->assertEquals('>', $this->fieldtype(['taxonomies' => ['categories']])->preload()['pathDelimiter']);
     }
@@ -135,7 +135,7 @@ class TermsHierarchyTest extends TestCase
     }
 
     #[Test]
-    public function item_data_includes_search_titles_and_path_for_hierarchical_terms()
+    public function item_data_includes_search_titles_and_path_for_nested_terms()
     {
         $item = $this->fieldtype(['taxonomies' => ['categories']])->getItemData(['cat'])->first();
 

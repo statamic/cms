@@ -249,7 +249,7 @@ class UpdateTermReferencesTest extends TestCase
     }
 
     #[Test]
-    public function a_hierarchical_taxonomy_does_not_treat_the_delimiter_as_path_segments()
+    public function a_nestable_taxonomy_does_not_treat_the_delimiter_as_path_segments()
     {
         $this->topics->structureContents([])->save();
 

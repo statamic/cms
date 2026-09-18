@@ -39,7 +39,7 @@ class TermResource extends JsonResource
             return $requested->all();
         }
 
-        // Hierarchy fields are opt-in, the same way an entry's parent is. On a flat
+        // Nesting fields are opt-in, the same way an entry's parent is. On a flat
         // taxonomy they may be user-defined blueprint fields, so leave them alone.
         if ($this->resource->taxonomy()->hasStructure()) {
             $excluded = [...$excluded, 'parent', 'children', 'ancestors', 'depth'];

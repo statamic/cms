@@ -67,7 +67,7 @@ class Terms
         }
 
         $this->querySite($query);
-        $this->queryHierarchy($query);
+        $this->queryNesting($query);
         $this->queryConditions($query);
         $this->queryScopes($query);
         $this->queryOrderBys($query);
@@ -77,11 +77,11 @@ class Terms
     }
 
     /**
-     * On hierarchical taxonomies, `parent="slug"` limits results to children of
+     * On nestable taxonomies, `parent="slug"` limits results to children of
      * that term, and `depth` limits how many levels deep to include. With a
      * parent and no depth, only direct children are returned.
      */
-    protected function queryHierarchy($query)
+    protected function queryNesting($query)
     {
         $parent = $this->params->get('parent');
         $depth = $this->params->int('depth');
@@ -92,7 +92,7 @@ class Terms
 
         $taxonomy = $this->taxonomies->count() === 1 ? $this->taxonomies->first() : null;
 
-        if (! $taxonomy || ! $taxonomy->hierarchical()) {
+        if (! $taxonomy || ! $taxonomy->nestable()) {
             return;
         }
 
