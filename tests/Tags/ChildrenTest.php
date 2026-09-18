@@ -107,6 +107,12 @@ class ChildrenTest extends TestCase
     }
 
     #[Test]
+    public function it_returns_nothing_when_theres_no_collection_in_context()
+    {
+        $this->assertEquals('', $this->tag('{{ children }}{{ title }}{{ /children }}'));
+    }
+
+    #[Test]
     public function it_doesnt_affect_children_in_nav()
     {
         $this->setUpEntries();

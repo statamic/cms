@@ -1,0 +1,224 @@
+<?php
+
+namespace Tests\Feature\GraphQL;
+
+use Facades\Statamic\API\ResourceAuthorizer;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\Taxonomy;
+use Statamic\Facades\Term;
+use Tests\PreventSavingStacheItemsToDisk;
+use Tests\TestCase;
+
+#[Group('graphql')]
+class TaxonomyStructureTest extends TestCase
+{
+    use EnablesQueries;
+    use PreventSavingStacheItemsToDisk;
+
+    protected $enabledQueries = ['taxonomies', 'terms'];
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        tap(Taxonomy::make('categories')->title('Categories')->structureContents(['max_depth' => 3]))->save();
+
+        foreach (['animals', 'cat', 'furniture'] as $slug) {
+            tap(Term::make($slug)->taxonomy('categories')->data(['title' => ucfirst($slug)]))->save();
+        }
+
+        Taxonomy::findByHandle('categories')->structure()->tree()->tree([
+            ['term' => 'animals', 'children' => [
+                ['term' => 'cat'],
+            ]],
+            ['term' => 'furniture'],
+        ])->save();
+
+        ResourceAuthorizer::shouldReceive('isAllowed')->andReturnTrue();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->andReturn(['categories', 'tags']);
+        ResourceAuthorizer::makePartial();
+    }
+
+    #[Test]
+    public function it_queries_the_taxonomy_structure_tree()
+    {
+        $query = <<<'GQL'
+{
+    taxonomy(handle: "categories") {
+        structure {
+            handle
+            max_depth
+            expects_root
+            tree {
+                depth
+                term {
+                    id
+                }
+                children {
+                    depth
+                    term {
+                        id
+                    }
+                }
+            }
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => [
+                'taxonomy' => [
+                    'structure' => [
+                        'handle' => 'categories',
+                        'max_depth' => 3,
+                        'expects_root' => false,
+                        'tree' => [
+                            [
+                                'depth' => 1,
+                                'term' => ['id' => 'categories::animals'],
+                                'children' => [
+                                    [
+                                        'depth' => 2,
+                                        'term' => ['id' => 'categories::cat'],
+                                    ],
+                                ],
+                            ],
+                            [
+                                'depth' => 1,
+                                'term' => ['id' => 'categories::furniture'],
+                                'children' => [],
+                            ],
+                        ],
+                    ],
+                ],
+            ]]);
+    }
+
+    #[Test]
+    public function it_localizes_the_tree_terms_using_the_site_argument()
+    {
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://test.com/fr/'],
+        ]);
+
+        Taxonomy::findByHandle('categories')->sites(['en', 'fr'])->save();
+
+        Term::find('categories::animals')->in('fr')->data(['title' => 'Animaux'])->save();
+
+        $query = <<<'GQL'
+{
+    taxonomy(handle: "categories") {
+        structure {
+            tree(site: "fr") {
+                term {
+                    title
+                }
+            }
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertJsonPath('data.taxonomy.structure.tree.0.term.title', 'Animaux');
+    }
+
+    #[Test]
+    public function structure_is_null_on_flat_taxonomies()
+    {
+        tap(Taxonomy::make('tags')->title('Tags'))->save();
+
+        // Flat taxonomies don't error; the structure field is nullable.
+        $flatQuery = <<<'GQL'
+{
+    taxonomy(handle: "tags") {
+        structure {
+            handle
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $flatQuery])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => [
+                'taxonomy' => [
+                    'structure' => null,
+                ],
+            ]]);
+    }
+
+    #[Test]
+    public function it_queries_nesting_fields_on_terms()
+    {
+        $query = <<<'GQL'
+{
+    term(id: "categories::cat") {
+        id
+        ... on Term_Categories_Category {
+            depth
+            parent {
+                id
+            }
+            ancestors {
+                id
+            }
+            children {
+                id
+            }
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => [
+                'term' => [
+                    'id' => 'categories::cat',
+                    'depth' => 2,
+                    'parent' => ['id' => 'categories::animals'],
+                    'ancestors' => [['id' => 'categories::animals']],
+                    'children' => [],
+                ],
+            ]]);
+    }
+
+    #[Test]
+    public function nesting_fields_are_not_added_to_orderable_taxonomies()
+    {
+        tap(Taxonomy::make('tags')->title('Tags')->structureContents(['max_depth' => 1]))->save();
+        tap(Term::make('alpha')->taxonomy('tags')->data(['title' => 'Alpha']))->save();
+
+        $query = <<<'GQL'
+{
+    term(id: "tags::alpha") {
+        id
+        ... on Term_Tags_Tag {
+            depth
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertJson(['errors' => [[
+                'message' => 'Cannot query field "depth" on type "Term_Tags_Tag".',
+            ]]]);
+    }
+}

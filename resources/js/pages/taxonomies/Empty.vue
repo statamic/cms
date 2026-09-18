@@ -13,6 +13,7 @@ defineProps([
     'canCreate',
     'canEdit',
     'canConfigureFields',
+    'scaffoldUrl',
 ]);
 </script>
 
@@ -47,6 +48,13 @@ defineProps([
             icon="blueprints"
             :heading="__('Configure Blueprints')"
             :description="__('statamic::messages.taxonomy_next_steps_blueprints_description')"
+        />
+        <EmptyStateItem
+            v-if="canEdit"
+            :href="scaffoldUrl"
+            icon="scaffold"
+            :heading="__('Scaffold Views')"
+            :description="__('statamic::messages.taxonomy_next_steps_scaffold_description')"
         />
     </EmptyStateMenu>
 

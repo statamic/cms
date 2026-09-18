@@ -3,6 +3,7 @@ import { expect, test } from 'vitest';
 import { Combobox } from '@/components/ui';
 
 window.__ = (key) => key;
+window.CSS = { escape: (value) => value };
 
 const options = [{ label: 'Alfa', value: 'alfa' }];
 
@@ -22,4 +23,20 @@ test('trigger gives up its role and tab stop when the search input is shown', ()
     expect(trigger.attributes('aria-label')).toBeUndefined();
     expect(trigger.attributes('aria-haspopup')).toBeUndefined();
     expect(trigger.attributes('tabindex')).toBe('-1');
+});
+
+test('single select taggable shows the selected label', () => {
+    const wrapper = mount(Combobox, {
+        props: { options, modelValue: 'alfa', taggable: true, placeholder: 'Search or create...' },
+    });
+
+    expect(wrapper.get('input').attributes('placeholder')).toBe('Alfa');
+});
+
+test('multiple select taggable keeps the placeholder when items are selected', () => {
+    const wrapper = mount(Combobox, {
+        props: { options, modelValue: ['alfa'], taggable: true, multiple: true, placeholder: 'Search or create...' },
+    });
+
+    expect(wrapper.get('input').attributes('placeholder')).toBe('Search or create...');
 });

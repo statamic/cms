@@ -51,6 +51,9 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, ContainsQ
     protected $template;
     protected $termTemplate;
     protected $layout;
+    protected $structure;
+    protected $structureContents;
+    protected $routes;
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
 
@@ -180,9 +183,118 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, ContainsQ
         return $this->termBlueprints()->reject->hidden()->isNotEmpty();
     }
 
+    public function structure($structure = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('structure')
+            ->getter(function ($structure) {
+                return Blink::once("taxonomy-{$this->id()}-structure", function () use ($structure) {
+                    if (! $structure && $this->structureContents !== null) {
+                        $structure = $this->structure = $this->makeStructureFromContents();
+                    }
+
+                    return $structure;
+                });
+            })
+            ->setter(function ($structure) {
+                if ($structure) {
+                    $structure->handle($this->handle());
+                }
+
+                $this->structureContents = null;
+                Blink::forget("taxonomy-{$this->id()}-structure");
+
+                return $structure;
+            })
+            ->args(func_get_args());
+    }
+
+    public function structureContents(?array $contents = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('structureContents')
+            ->setter(function ($contents) {
+                Blink::forget("taxonomy-{$this->id()}-structure");
+                $this->structure = null;
+
+                return $contents;
+            })
+            ->getter(function ($contents) {
+                if (! $structure = $this->structure()) {
+                    return null;
+                }
+
+                // Empty arrays are stripped by ExistsAsFile::fileContents(), so
+                // keep a placeholder when there's no max depth. Collections get
+                // the same protection from their always-present `root` key.
+                return Arr::removeNullValues([
+                    'max_depth' => $structure->maxDepth(),
+                ]) ?: ['max_depth' => null];
+            })
+            ->args(func_get_args());
+    }
+
+    protected function makeStructureFromContents()
+    {
+        return (new \Statamic\Structures\TaxonomyStructure)
+            ->handle($this->handle())
+            ->maxDepth($this->structureContents['max_depth'] ?? null);
+    }
+
+    public function structureHandle()
+    {
+        if (! $this->hasStructure()) {
+            return null;
+        }
+
+        return $this->structure()->handle();
+    }
+
+    public function hasStructure()
+    {
+        return $this->structure !== null || $this->structureContents !== null;
+    }
+
+    public function orderable()
+    {
+        return optional($this->structure())->maxDepth() === 1;
+    }
+
+    public function nestable()
+    {
+        return $this->hasStructure() && $this->structure()->maxDepth() !== 1;
+    }
+
+    /**
+     * A term's slug, followed by the slugs of every term beneath it in the
+     * tree. On a flat taxonomy, or for a term that isn't in the tree, it's
+     * just the slug on its own.
+     */
+    public function termWithDescendants(string $slug): array
+    {
+        if (! $this->nestable() || ! ($page = $this->structure()->tree()->find($slug))) {
+            return [$slug];
+        }
+
+        return $page->flattenedPages()
+            ->map->id()
+            ->prepend($slug)
+            ->unique()
+            ->values()
+            ->all();
+    }
+
     public function sortField()
     {
-        return $this->sortField ?? 'title';
+        if ($this->sortField) {
+            return $this->sortField;
+        }
+
+        if ($this->orderable() || $this->hasStructure()) {
+            return 'order';
+        }
+
+        return 'title';
     }
 
     public function setSortField($field)
@@ -200,6 +312,13 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, ContainsQ
     public function setSortDirection($dir)
     {
         $this->sortDirection = $dir;
+
+        return $this;
+    }
+
+    public function updateTermOrder($ids = null)
+    {
+        Facades\Term::updateOrders($this, $ids);
 
         return $this;
     }
@@ -251,6 +370,11 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, ContainsQ
 
         Facades\Taxonomy::save($this);
 
+        Blink::forget("taxonomy-{$this->id()}-structure");
+        Blink::forget("taxonomy-structure-taxonomy-{$this->handle()}");
+        Blink::forget("taxonomy-structure-tree-{$this->handle()}");
+        Blink::forget("taxonomy-structure-term-slugs-{$this->handle()}");
+
         if ($withEvents) {
             if ($isNew) {
                 TaxonomyCreated::dispatch($this);
@@ -278,9 +402,18 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, ContainsQ
             return false;
         }
 
+        if ($this->hasStructure()) {
+            $this->structure()->trees()->each->delete();
+        }
+
         $this->queryTerms()->get()->each->delete();
 
         Facades\Taxonomy::delete($this);
+
+        Blink::forget("taxonomy-{$this->id()}-structure");
+        Blink::forget("taxonomy-structure-taxonomy-{$this->handle()}");
+        Blink::forget("taxonomy-structure-tree-{$this->handle()}");
+        Blink::forget("taxonomy-structure-term-slugs-{$this->handle()}");
 
         if ($withEvents) {
             TaxonomyDeleted::dispatch($this);
@@ -305,12 +438,17 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, ContainsQ
             'template' => $this->template,
             'term_template' => $this->termTemplate,
             'layout' => $this->layout,
+            'routes' => $this->routesForFile(),
         ];
 
         $data = Arr::removeNullValues(array_merge($data, [
             'sort_by' => $this->sortField,
             'sort_dir' => $this->sortDirection,
         ]));
+
+        if ($this->hasStructure()) {
+            $data['structure'] = $this->structureContents();
+        }
 
         if (Site::multiEnabled()) {
             $data['sites'] = $this->sites;
@@ -348,7 +486,11 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, ContainsQ
 
     public function url()
     {
-        return URL::makeRelative($this->absoluteUrl());
+        if (! $url = $this->absoluteUrl()) {
+            return null;
+        }
+
+        return URL::makeRelative($url);
     }
 
     public function urlWithoutRedirect()
@@ -358,6 +500,10 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, ContainsQ
 
     public function absoluteUrl()
     {
+        if (! $this->uri()) {
+            return null;
+        }
+
         return URL::tidy(Site::current()->absoluteUrl().$this->uri());
     }
 
@@ -365,9 +511,128 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, ContainsQ
     {
         $site = Site::current();
 
+        if (! $route = $this->taxonomyRoute($site->handle())) {
+            return null;
+        }
+
+        if ($this->hasCustomRoutes($site->handle())) {
+            return $route;
+        }
+
         $prefix = $this->collection() ? $this->collection()->uri($site->handle()) : '/';
 
-        return URL::tidy($prefix.str_replace('_', '-', '/'.$this->handle));
+        return URL::tidy($prefix.$route);
+    }
+
+    public function routes($routes = null)
+    {
+        return $this->fluentlyGetOrSet('routes')->args(func_get_args());
+    }
+
+    public function routesEnabled(): bool
+    {
+        return $this->routes !== false;
+    }
+
+    public function hasCustomRoutes(?string $site = null): bool
+    {
+        if ($this->routes === null || $this->routes === false || $this->routes === []) {
+            return false;
+        }
+
+        if ($site === null) {
+            return true;
+        }
+
+        $resolved = $this->routeForSite($this->routes, $site);
+
+        return is_string($resolved) && $resolved !== '';
+    }
+
+    public function taxonomyRoute(?string $site = null): ?string
+    {
+        if (! $termRoute = $this->termRoute($site)) {
+            return null;
+        }
+
+        return $this->indexRouteFromPattern($termRoute);
+    }
+
+    public function termRoute(?string $site = null): ?string
+    {
+        if ($this->routes === false) {
+            return null;
+        }
+
+        $site = $site ?? Site::current()->handle();
+        $resolved = $this->routeForSite($this->routes, $site);
+
+        if (is_string($resolved) && $resolved !== '') {
+            return $this->normalizeCustomTermRoute($resolved);
+        }
+
+        return $this->defaultTermRoute();
+    }
+
+    public function defaultTermRoute(): string
+    {
+        $base = $this->normalizeRoute(str_replace('_', '-', $this->handle));
+
+        return $this->nestable()
+            ? $base.'/{parent_uri}/{slug}'
+            : $base.'/{slug}';
+    }
+
+    private function routeForSite($configured, string $site)
+    {
+        if (is_string($configured)) {
+            return $configured;
+        }
+
+        if (is_array($configured) && array_key_exists($site, $configured)) {
+            return $configured[$site] === '' ? null : $configured[$site];
+        }
+
+        return null;
+    }
+
+    private function normalizeCustomTermRoute(string $pattern): string
+    {
+        $pattern = $this->normalizeRoute($pattern);
+
+        if (! Str::contains($pattern, '{slug}')) {
+            $pattern .= $this->nestable()
+                ? '/{parent_uri}/{slug}'
+                : '/{slug}';
+        }
+
+        return $this->normalizeRoute($pattern);
+    }
+
+    private function indexRouteFromPattern(string $pattern): string
+    {
+        $index = preg_replace('/\{\s*parent_uri\s*\}|\{\s*slug\s*\}/', '', $pattern);
+        $index = preg_replace('#/+#', '/', $index);
+
+        return $this->normalizeRoute($index === '' ? '/' : $index);
+    }
+
+    private function normalizeRoute(string $route): string
+    {
+        return URL::tidy($route);
+    }
+
+    private function routesForFile()
+    {
+        if ($this->routes === false) {
+            return false;
+        }
+
+        if (! $this->routes) {
+            return null;
+        }
+
+        return $this->routes;
     }
 
     public function collection($collection = null)
@@ -387,7 +652,7 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, ContainsQ
 
     public function toResponse($request)
     {
-        if (! view()->exists($this->template())) {
+        if (! $this->uri() || ! view()->exists($this->template())) {
             throw new NotFoundHttpException;
         }
 
@@ -614,8 +879,9 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, ContainsQ
     {
         return [
             'absoluteUrl', 'collection', 'collections', 'defaultPublishState', 'editUrl', 'handle',
-            'hasSearchIndex', 'id', 'layout', 'path', 'revisionsEnabled', 'searchIndex', 'sites',
-            'sortDirection', 'sortField', 'template', 'termTemplate', 'title', 'uri', 'url',
+            'hasSearchIndex', 'hasStructure', 'id', 'layout', 'orderable', 'path', 'revisionsEnabled',
+            'searchIndex', 'sites', 'sortDirection', 'sortField', 'structureHandle', 'template',
+            'termTemplate', 'title', 'uri', 'url',
         ];
     }
 }

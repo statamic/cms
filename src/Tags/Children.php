@@ -17,12 +17,16 @@ class Children extends Structure
      */
     public function index()
     {
+        $collection = $this->params->get('collection', $this->context->value('collection')?->handle());
+
+        if (! $collection) {
+            return [];
+        }
+
         $url = $this->params->get('of', URL::getCurrent());
 
         $this->params->put('from', Str::start(Str::after(URL::makeAbsolute($url), Site::current()->absoluteUrl()), '/'));
         $this->params->put('max_depth', 1);
-
-        $collection = $this->params->get('collection', $this->context->value('collection')?->handle());
 
         return $this->structure("collection::{$collection}");
     }

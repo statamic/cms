@@ -1,0 +1,609 @@
+<?php
+
+namespace Tests\Data\Taxonomies;
+
+use PHPUnit\Framework\Attributes\Test;
+use Statamic\Contracts\Structures\TaxonomyTreeRepository;
+use Statamic\Facades\Blink;
+use Statamic\Facades\Site;
+use Statamic\Facades\Taxonomy;
+use Statamic\Facades\Term;
+use Statamic\Structures\TaxonomyStructure;
+use Statamic\Structures\TaxonomyTree;
+use Statamic\Taxonomies\EnsuresTermPaths;
+use Tests\PreventSavingStacheItemsToDisk;
+use Tests\TestCase;
+
+class NestableTaxonomyTest extends TestCase
+{
+    use PreventSavingStacheItemsToDisk;
+
+    private function makeNestableTaxonomy()
+    {
+        $taxonomy = tap(Taxonomy::make('categories')->title('Categories')->structureContents([]))->save();
+
+        foreach (['animals', 'cat', 'calico', 'furniture'] as $slug) {
+            tap(Term::make($slug)->taxonomy('categories')->data(['title' => ucfirst($slug)]))->save();
+        }
+
+        $taxonomy->structure()->tree()->tree([
+            ['term' => 'animals', 'children' => [
+                ['term' => 'cat', 'children' => [
+                    ['term' => 'calico'],
+                ]],
+            ]],
+            ['term' => 'furniture'],
+        ])->save();
+
+        return $taxonomy;
+    }
+
+    #[Test]
+    public function a_taxonomy_without_structure_is_not_nestable()
+    {
+        $taxonomy = tap(Taxonomy::make('tags'))->save();
+
+        $this->assertFalse($taxonomy->hasStructure());
+        $this->assertFalse($taxonomy->nestable());
+        $this->assertFalse($taxonomy->orderable());
+        $this->assertNull($taxonomy->structure());
+    }
+
+    #[Test]
+    public function a_taxonomy_with_structure_is_nestable()
+    {
+        $taxonomy = tap(Taxonomy::make('categories')->structureContents(['max_depth' => 3]))->save();
+
+        $this->assertTrue($taxonomy->hasStructure());
+        $this->assertTrue($taxonomy->nestable());
+        $this->assertFalse($taxonomy->orderable());
+        $this->assertInstanceOf(TaxonomyStructure::class, $structure = $taxonomy->structure());
+        $this->assertEquals(3, $structure->maxDepth());
+        $this->assertFalse($structure->expectsRoot());
+        $this->assertInstanceOf(TaxonomyTree::class, $structure->tree());
+    }
+
+    #[Test]
+    public function an_unsaved_tree_uses_the_default_site_key_even_when_the_taxonomy_omits_it()
+    {
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => '/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => '/fr/'],
+        ]);
+
+        $taxonomy = tap(Taxonomy::make('topics')->sites(['fr'])->structureContents([]))->save();
+        tap(Term::make('foo')->taxonomy('topics')->data(['title' => 'Foo']))->save();
+
+        $tree = $taxonomy->structure()->tree();
+        $tree->tree([['term' => 'foo']]);
+
+        $this->assertEquals(Site::default()->handle(), $tree->locale());
+        $this->assertSame($tree, $taxonomy->structure()->tree());
+
+        $tree->save();
+
+        $this->assertNotNull(app(TaxonomyTreeRepository::class)->find('topics'));
+        $this->assertEquals([['term' => 'foo']], $taxonomy->structure()->tree()->tree());
+    }
+
+    #[Test]
+    public function a_taxonomy_with_max_depth_of_one_is_orderable_but_not_nestable()
+    {
+        $taxonomy = tap(Taxonomy::make('categories')->structureContents(['max_depth' => 1]))->save();
+
+        $this->assertTrue($taxonomy->hasStructure());
+        $this->assertFalse($taxonomy->nestable());
+        $this->assertTrue($taxonomy->orderable());
+    }
+
+    #[Test]
+    public function it_gets_nesting_from_the_tree()
+    {
+        $this->makeNestableTaxonomy();
+
+        $calico = Term::find('categories::calico');
+        $animals = Term::find('categories::animals');
+
+        $this->assertEquals(3, $calico->depth());
+        $this->assertEquals('categories::cat', $calico->parent()->id());
+        $this->assertEquals(['animals', 'cat'], $calico->ancestors()->map->slug()->all());
+        $this->assertEquals(['cat'], $animals->in('en')->children()->map->slug()->all());
+
+        $this->assertEquals(1, $animals->depth());
+        $this->assertNull($animals->in('en')->parent());
+    }
+
+    #[Test]
+    public function nested_terms_get_nested_uris()
+    {
+        $this->makeNestableTaxonomy();
+
+        $this->assertEquals('/categories/animals', Term::find('categories::animals')->uri());
+        $this->assertEquals('/categories/animals/cat', Term::find('categories::cat')->uri());
+        $this->assertEquals('/categories/animals/cat/calico', Term::find('categories::calico')->uri());
+        $this->assertEquals('/categories/furniture', Term::find('categories::furniture')->uri());
+    }
+
+    #[Test]
+    public function it_finds_nested_terms_by_nested_uri()
+    {
+        $this->makeNestableTaxonomy();
+
+        $term = Term::findByUri('/categories/animals/cat/calico');
+
+        $this->assertNotNull($term);
+        $this->assertEquals('categories::calico', $term->id());
+    }
+
+    #[Test]
+    public function it_finds_nested_terms_by_flat_uri_for_redirecting()
+    {
+        $this->makeNestableTaxonomy();
+
+        $term = Term::findByUri('/categories/calico');
+
+        $this->assertNotNull($term);
+        $this->assertEquals('categories::calico', $term->id());
+    }
+
+    #[Test]
+    public function it_doesnt_find_terms_by_nested_uri_on_flat_taxonomies()
+    {
+        tap(Taxonomy::make('tags'))->save();
+        tap(Term::make('foo')->taxonomy('tags')->data([]))->save();
+
+        $this->assertNotNull(Term::findByUri('/tags/foo'));
+        $this->assertNull(Term::findByUri('/tags/nested/foo'));
+    }
+
+    #[Test]
+    public function validating_a_tree_appends_missing_terms()
+    {
+        $taxonomy = $this->makeNestableTaxonomy();
+
+        tap(Term::make('dog')->taxonomy('categories')->data(['title' => 'Dog']))->save();
+
+        $tree = $taxonomy->structure()->validateTree([
+            ['term' => 'animals'],
+        ], 'en');
+
+        $slugs = collect($tree)->pluck('term')->all();
+
+        $this->assertContains('animals', $slugs);
+        $this->assertContains('dog', $slugs);
+        $this->assertContains('furniture', $slugs);
+    }
+
+    #[Test]
+    public function validating_a_tree_removes_non_existent_terms()
+    {
+        $taxonomy = $this->makeNestableTaxonomy();
+
+        $tree = $taxonomy->structure()->validateTree([
+            ['term' => 'animals'],
+            ['term' => 'nonexistent'],
+            ['term' => 'cat'],
+            ['term' => 'calico'],
+            ['term' => 'furniture'],
+        ], 'en');
+
+        $this->assertNotContains('nonexistent', collect($tree)->pluck('term')->all());
+    }
+
+    #[Test]
+    public function validating_a_tree_promotes_the_children_of_a_non_existent_term()
+    {
+        $taxonomy = $this->makeNestableTaxonomy();
+
+        $tree = $taxonomy->structure()->validateTree([
+            ['term' => 'ghost', 'children' => [
+                ['term' => 'cat'],
+            ]],
+            ['term' => 'animals'],
+            ['term' => 'calico'],
+            ['term' => 'furniture'],
+        ], 'en');
+
+        // 'cat' sits where 'ghost' was, ahead of 'animals'. If it had been dropped and
+        // re-appended as a missing term it would be last, and nowhere near this index.
+        $this->assertEquals([
+            ['term' => 'cat'],
+            ['term' => 'animals'],
+            ['term' => 'calico'],
+            ['term' => 'furniture'],
+        ], $tree);
+    }
+
+    #[Test]
+    public function validating_a_tree_promotes_the_children_of_a_nested_non_existent_term()
+    {
+        $taxonomy = $this->makeNestableTaxonomy();
+
+        $tree = $taxonomy->structure()->validateTree([
+            ['term' => 'animals', 'children' => [
+                ['term' => 'ghost', 'children' => [
+                    ['term' => 'cat'],
+                ]],
+                ['term' => 'calico'],
+            ]],
+            ['term' => 'furniture'],
+        ], 'en');
+
+        // 'cat' stays nested under 'animals', in 'ghost's position. The missing term
+        // re-append only ever adds branches at the root, so it cannot produce this.
+        $this->assertEquals([
+            ['term' => 'animals', 'children' => [
+                ['term' => 'cat'],
+                ['term' => 'calico'],
+            ]],
+            ['term' => 'furniture'],
+        ], $tree);
+    }
+
+    #[Test]
+    public function a_non_existent_term_in_the_persisted_tree_does_not_swallow_its_children()
+    {
+        $taxonomy = $this->makeNestableTaxonomy();
+
+        $taxonomy->structure()->tree()->tree([
+            ['term' => 'ghost', 'children' => [
+                ['term' => 'cat', 'children' => [
+                    ['term' => 'calico'],
+                ]],
+            ]],
+            ['term' => 'animals'],
+            ['term' => 'furniture'],
+        ])->save();
+
+        $this->assertEquals([
+            ['term' => 'cat', 'children' => [
+                ['term' => 'calico'],
+            ]],
+            ['term' => 'animals'],
+            ['term' => 'furniture'],
+        ], $taxonomy->structure()->tree()->tree());
+    }
+
+    #[Test]
+    public function the_depth_of_a_term_ignores_non_existent_ancestors()
+    {
+        $taxonomy = $this->makeNestableTaxonomy();
+
+        $taxonomy->structure()->tree()->tree([
+            ['term' => 'ghost', 'children' => [
+                ['term' => 'cat'],
+            ]],
+            ['term' => 'animals'],
+            ['term' => 'calico'],
+            ['term' => 'furniture'],
+        ])->save();
+
+        $structure = $taxonomy->structure();
+
+        // 'cat' is at the root of the rendered tree, so the max depth rules
+        // need to see it at depth 1 rather than counting the ghost branch.
+        $this->assertEquals([
+            ['term' => 'cat'],
+            ['term' => 'animals'],
+            ['term' => 'calico'],
+            ['term' => 'furniture'],
+        ], $structure->tree()->tree());
+
+        $this->assertEquals(1, $structure->depthOfTerm('cat'));
+    }
+
+    #[Test]
+    public function grafting_under_a_term_whose_ancestor_is_missing_is_not_rejected_as_too_deep()
+    {
+        $taxonomy = tap(Taxonomy::make('categories')->structureContents(['max_depth' => 2]))->save();
+
+        foreach (['cat', 'kitten'] as $slug) {
+            tap(Term::make($slug)->taxonomy('categories')->data(['title' => ucfirst($slug)]))->save();
+        }
+
+        $taxonomy->structure()->tree()->tree([
+            ['term' => 'ghost', 'children' => [
+                ['term' => 'cat'],
+            ]],
+        ])->save();
+
+        $structure = $taxonomy->structure();
+
+        // The tree shows 'cat' at the root, so nesting under it stays within max_depth 2.
+        // ('kitten' isn't in the tree yet, so it gets appended at the root for now.)
+        $this->assertEquals([['term' => 'cat'], ['term' => 'kitten']], $structure->tree()->tree());
+
+        $structure->graftTerm('kitten', 'cat');
+
+        $this->assertEquals([
+            ['term' => 'cat', 'children' => [
+                ['term' => 'kitten'],
+            ]],
+        ], $taxonomy->structure()->tree()->tree());
+
+        $this->assertEquals(2, $structure->depthOfTerm('kitten'));
+    }
+
+    #[Test]
+    public function a_term_path_is_not_rejected_because_of_a_non_existent_ancestor()
+    {
+        $taxonomy = tap(Taxonomy::make('categories')->structureContents(['max_depth' => 2]))->save();
+
+        tap(Term::make('cat')->taxonomy('categories')->data(['title' => 'Cat']))->save();
+
+        $taxonomy->structure()->tree()->tree([
+            ['term' => 'ghost', 'children' => [
+                ['term' => 'cat'],
+            ]],
+        ])->save();
+
+        $slug = (new EnsuresTermPaths)->ensure($taxonomy, 'Cat > Kitten');
+
+        $this->assertEquals('kitten', $slug);
+        $this->assertEquals([
+            ['term' => 'cat', 'children' => [
+                ['term' => 'kitten'],
+            ]],
+        ], Taxonomy::findByHandle('categories')->structure()->tree()->tree());
+    }
+
+    #[Test]
+    public function validating_a_tree_drops_duplicate_terms_keeping_the_first()
+    {
+        $taxonomy = $this->makeNestableTaxonomy();
+
+        $tree = $taxonomy->structure()->validateTree([
+            ['term' => 'animals', 'children' => [
+                ['term' => 'cat'],
+            ]],
+            ['term' => 'animals'],
+            ['term' => 'furniture'],
+            ['term' => 'calico'],
+        ], 'en');
+
+        $this->assertEquals([
+            ['term' => 'animals', 'children' => [
+                ['term' => 'cat'],
+            ]],
+            ['term' => 'furniture'],
+            ['term' => 'calico'],
+        ], $tree);
+    }
+
+    #[Test]
+    public function validating_a_tree_normalizes_entry_keys_and_full_term_ids()
+    {
+        $taxonomy = $this->makeNestableTaxonomy();
+
+        $tree = $taxonomy->structure()->validateTree([
+            ['entry' => 'categories::animals', 'children' => [
+                ['entry' => 'categories::cat', 'children' => [
+                    ['term' => 'categories::calico'],
+                ]],
+            ]],
+            ['term' => 'furniture'],
+            ['term' => 'animals'],
+            ['term' => 'cat'],
+            ['term' => 'calico'],
+        ], 'en');
+
+        $this->assertEquals([
+            ['term' => 'animals', 'children' => [
+                ['term' => 'cat', 'children' => [
+                    ['term' => 'calico'],
+                ]],
+            ]],
+            ['term' => 'furniture'],
+        ], $tree);
+    }
+
+    #[Test]
+    public function appending_a_term_stores_the_slug_under_the_term_key()
+    {
+        $taxonomy = $this->makeNestableTaxonomy();
+        $term = Term::find('categories::furniture');
+
+        $tree = $taxonomy->structure()->tree();
+        $tree->tree([
+            ['term' => 'animals'],
+        ]);
+        $tree->append($term);
+
+        $this->assertEquals([
+            ['term' => 'animals'],
+            ['term' => 'furniture'],
+        ], $tree->fileData()['tree']);
+    }
+
+    #[Test]
+    public function it_gets_the_term_parent_uri()
+    {
+        $taxonomy = $this->makeNestableTaxonomy();
+
+        $structure = $taxonomy->structure();
+
+        $this->assertEquals('', $structure->termParentUri(Term::find('categories::animals')->in('en')));
+        $this->assertEquals('animals', $structure->termParentUri(Term::find('categories::cat')->in('en')));
+        $this->assertEquals('animals/cat', $structure->termParentUri(Term::find('categories::calico')->in('en')));
+    }
+
+    #[Test]
+    public function deleting_a_term_removes_its_branch_and_promotes_children()
+    {
+        $taxonomy = $this->makeNestableTaxonomy();
+
+        Term::find('categories::cat')->delete();
+
+        $tree = $taxonomy->structure()->tree()->tree();
+
+        $this->assertEquals([
+            ['term' => 'animals', 'children' => [
+                ['term' => 'calico'],
+            ]],
+            ['term' => 'furniture'],
+        ], $tree);
+    }
+
+    #[Test]
+    public function creating_a_term_adds_it_to_a_tree_thats_already_been_read()
+    {
+        $taxonomy = $this->makeNestableTaxonomy();
+
+        // Read the tree before the term is created, so it gets cached without it.
+        $taxonomy->structure()->tree()->tree();
+
+        tap(Term::make('dog')->taxonomy('categories')->data(['title' => 'Dog']))->save();
+
+        $this->assertContains('dog', collect($taxonomy->structure()->tree()->tree())->pluck('term')->all());
+        $this->assertNotNull(Term::find('categories::dog')->page());
+    }
+
+    #[Test]
+    public function deleting_a_term_thats_not_in_the_tree_removes_it_from_a_tree_thats_already_been_read()
+    {
+        $taxonomy = $this->makeNestableTaxonomy();
+
+        tap(Term::make('dog')->taxonomy('categories')->data(['title' => 'Dog']))->save();
+
+        // Reading the tree appends 'dog' without persisting it, and caches the term slugs.
+        $this->assertContains('dog', collect($taxonomy->structure()->tree()->tree())->pluck('term')->all());
+
+        Term::find('categories::dog')->delete();
+
+        $this->assertNotContains('dog', collect($taxonomy->structure()->tree()->tree())->pluck('term')->all());
+    }
+
+    #[Test]
+    public function renaming_a_term_slug_updates_the_tree()
+    {
+        $taxonomy = $this->makeNestableTaxonomy();
+
+        $term = Term::find('categories::cat');
+        $term->slug('feline');
+        $term->save();
+
+        $tree = $taxonomy->structure()->tree()->tree();
+
+        $this->assertEquals([
+            ['term' => 'animals', 'children' => [
+                ['term' => 'feline', 'children' => [
+                    ['term' => 'calico'],
+                ]],
+            ]],
+            ['term' => 'furniture'],
+        ], $tree);
+    }
+
+    #[Test]
+    public function deleting_a_taxonomy_deletes_its_tree()
+    {
+        $taxonomy = $this->makeNestableTaxonomy();
+
+        $tree = $taxonomy->structure()->tree();
+
+        $taxonomy->delete();
+
+        $this->assertNull(\Statamic\Facades\Blink::store()->get('taxonomy-structure-tree-categories'));
+    }
+
+    #[Test]
+    public function augmented_term_includes_nesting_keys()
+    {
+        $this->makeNestableTaxonomy();
+
+        $augmented = Term::find('categories::calico')->in('en')->toAugmentedArray(['parent', 'ancestors', 'children', 'depth']);
+
+        $this->assertEquals('categories::cat', $augmented['parent']->value()->id());
+        $this->assertEquals(3, $augmented['depth']->value());
+        $this->assertCount(2, $augmented['ancestors']->value());
+        $this->assertCount(0, $augmented['children']->value());
+    }
+
+    #[Test]
+    public function structured_taxonomies_sort_terms_by_tree_order()
+    {
+        $taxonomy = $this->makeNestableTaxonomy();
+
+        $this->assertEquals('order', $taxonomy->sortField());
+        $this->assertEquals(1, Term::find('categories::animals')->order());
+        $this->assertEquals(2, Term::find('categories::cat')->order());
+        $this->assertEquals(3, Term::find('categories::calico')->order());
+        $this->assertEquals(4, Term::find('categories::furniture')->order());
+
+        $this->assertEquals(
+            ['animals', 'cat', 'calico', 'furniture'],
+            $taxonomy->queryTerms()->orderBy('order')->get()->map->slug()->all()
+        );
+    }
+
+    #[Test]
+    public function asserting_max_depth_rejects_branches_deeper_than_max_depth()
+    {
+        $taxonomy = tap(Taxonomy::make('categories')->structureContents(['max_depth' => 2]))->save();
+
+        foreach (['animals', 'cat', 'calico'] as $slug) {
+            tap(Term::make($slug)->taxonomy('categories')->data(['title' => ucfirst($slug)]))->save();
+        }
+
+        $this->expectException(\Illuminate\Validation\ValidationException::class);
+
+        $taxonomy->structure()->assertDoesNotExceedMaxDepth([
+            ['term' => 'animals', 'children' => [
+                ['term' => 'cat', 'children' => [
+                    ['term' => 'calico'],
+                ]],
+            ]],
+        ]);
+    }
+
+    #[Test]
+    public function lowering_max_depth_below_the_existing_tree_does_not_break_reading_it()
+    {
+        $taxonomy = $this->makeNestableTaxonomy();
+
+        tap($taxonomy->structureContents(['max_depth' => 2]))->save();
+
+        Blink::flush();
+
+        $this->assertEquals([
+            ['term' => 'animals', 'children' => [
+                ['term' => 'cat', 'children' => [
+                    ['term' => 'calico'],
+                ]],
+            ]],
+            ['term' => 'furniture'],
+        ], Taxonomy::findByHandle('categories')->structure()->tree()->tree());
+    }
+
+    #[Test]
+    public function grafting_a_term_rejects_a_parent_at_max_depth()
+    {
+        $taxonomy = tap(Taxonomy::make('categories')->structureContents(['max_depth' => 2]))->save();
+
+        foreach (['animals', 'cat', 'dog'] as $slug) {
+            tap(Term::make($slug)->taxonomy('categories')->data(['title' => ucfirst($slug)]))->save();
+        }
+
+        $taxonomy->structure()->tree()->tree([
+            ['term' => 'animals', 'children' => [
+                ['term' => 'cat'],
+            ]],
+        ])->save();
+
+        $this->expectException(\Illuminate\Validation\ValidationException::class);
+
+        $taxonomy->structure()->graftTerm('dog', 'cat');
+    }
+
+    #[Test]
+    public function grafting_a_term_under_itself_does_nothing()
+    {
+        $taxonomy = tap(Taxonomy::make('categories')->structureContents([]))->save();
+
+        tap(Term::make('cat')->taxonomy('categories')->data(['title' => 'Cat']))->save();
+
+        $taxonomy->structure()->graftTerm('cat', 'cat');
+
+        $this->assertEquals([], $taxonomy->structure()->tree()->fileData()['tree'] ?? []);
+    }
+}

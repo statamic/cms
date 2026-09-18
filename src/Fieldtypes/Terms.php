@@ -28,6 +28,7 @@ use Statamic\Query\Scopes\Filters\Fields\Terms as TermsFilter;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
+use Statamic\Taxonomies\EnsuresTermPaths;
 
 use function Statamic\trans as __;
 
@@ -144,6 +145,72 @@ class Terms extends Relationship
     public function filter()
     {
         return new TermsFilter($this);
+    }
+
+    public function preload()
+    {
+        $taxonomy = $this->usingSingleTaxonomy()
+            ? Taxonomy::findByHandle($this->taxonomies()[0])
+            : null;
+
+        $preload = parent::preload();
+
+        if (! $taxonomy || ! $taxonomy->hasStructure()) {
+            return $preload;
+        }
+
+        $blueprints = $taxonomy
+            ->termBlueprints()
+            ->reject->hidden()
+            ->map(function ($blueprint) {
+                return [
+                    'handle' => $blueprint->handle(),
+                    'title' => $blueprint->title(),
+                ];
+            })->values();
+
+        return array_merge($preload, ['tree' => [
+            'title' => $taxonomy->title(),
+            'url' => cp_route('taxonomies.tree.index', $taxonomy->handle()),
+            'showSlugs' => false,
+            'expectsRoot' => false,
+            'blueprints' => $blueprints,
+        ]]);
+    }
+
+    /**
+     * The single configured taxonomy, if it can nest terms.
+     */
+    public function nestableTaxonomy()
+    {
+        if (! $this->usingSingleTaxonomy()) {
+            return null;
+        }
+
+        $taxonomy = Taxonomy::findByHandle($this->taxonomies()[0]);
+
+        return $taxonomy && $taxonomy->nestable() ? $taxonomy : null;
+    }
+
+    /**
+     * Nestable taxonomies available to this field, including when several are configured.
+     */
+    public function nestableTaxonomies(): Collection
+    {
+        $handles = ! empty($this->taxonomies())
+            ? $this->taxonomies()
+            : $this->getConfiguredTaxonomies();
+
+        return collect($handles)
+            ->map(fn ($handle) => Taxonomy::findByHandle($handle))
+            ->filter()
+            ->filter->nestable()
+            ->values();
+    }
+
+    public function hasNestableTaxonomy(): bool
+    {
+        return $this->nestableTaxonomies()->isNotEmpty();
     }
 
     public function augment($values)
@@ -298,11 +365,49 @@ class Terms extends Relationship
 
         $query = $this->getIndexQuery($request);
 
+        if ($this->shouldOrderByNesting($request)) {
+            return $this->orderItemsByNesting($query->get());
+        }
+
         if ($sort = $this->getSortColumn($request)) {
             $query->orderBy($sort, $this->getSortDirection($request));
         }
 
         return $request->boolean('paginate', true) ? $query->paginate($request->filled('perPage') ? Statamic::cpPerPage($request->integer('perPage')) : 15) : $query->get();
+    }
+
+    /**
+     * Select/typeahead dropdowns for a nestable taxonomy should list options
+     * in tree order (so they can be indented), unless the user is searching
+     * or explicitly sorting. Paginated (stack selector) requests keep
+     * regular ordering since tree order is meaningless across pages.
+     */
+    private function shouldOrderByNesting($request): bool
+    {
+        return ! $request->sort
+            && ! $request->search
+            && ! $request->boolean('paginate', true)
+            && $this->hasNestableTaxonomy();
+    }
+
+    private function orderItemsByNesting(Collection $items): Collection
+    {
+        $orders = $this->nestableTaxonomies()->mapWithKeys(function ($taxonomy) {
+            return [$taxonomy->handle() => $taxonomy->structure()->tree()->flattenedPages()->map->id()->flip()];
+        });
+
+        return $items
+            ->sortBy(function ($term) use ($orders) {
+                $handle = $term->taxonomyHandle();
+                $order = $orders->get($handle);
+
+                if (! $order) {
+                    return [$handle, PHP_INT_MAX, $term->slug()];
+                }
+
+                return [$handle, $order->get($term->inDefaultLocale()->slug(), PHP_INT_MAX)];
+            })
+            ->values();
     }
 
     private function getViewableTaxonomies(array $taxonomies): Collection
@@ -448,6 +553,43 @@ class Terms extends Relationship
             'edit_url' => $term->editUrl(),
             'editable' => User::current()->can('edit', $term),
             'hint' => $this->getItemHint($term),
+            ...$this->itemNestingMeta($term),
+        ];
+    }
+
+    protected function searchKeys(): ?array
+    {
+        // These are the keys the combobox fuzzysorts when it filters the list itself. Including
+        // the breadcrumb means searching a parent surfaces its descendants. Titles rather than
+        // slugs, so what's typed can match what's on screen.
+        return ['title', 'search_titles'];
+    }
+
+    protected function pathDelimiter(): ?string
+    {
+        // Typing a path creates the terms it names, so the field needs to know how to split
+        // what was typed into the same segments the save will. Only a single configured
+        // taxonomy ever creates anything, so anywhere else a path would just be a string.
+        return $this->nestableTaxonomy() ? EnsuresTermPaths::DELIMITER : null;
+    }
+
+    /**
+     * The ancestor path and searchable ancestry for the relationship UI, plus the depth to
+     * indent by — but only for a list in tree order, since an indent means nothing without
+     * the ancestors it steps in from listed above it.
+     */
+    public function itemNestingMeta($term, $request = null): array
+    {
+        if (! $term->taxonomy()?->nestable()) {
+            return [];
+        }
+
+        $path = $this->getItemPath($term);
+
+        return [
+            'path' => $path,
+            'search_titles' => collect($path)->push($term->title())->implode(' '.EnsuresTermPaths::DELIMITER.' '),
+            ...($request && $this->shouldOrderByNesting($request) ? ['depth' => $term->depth() ?? 1] : []),
         ];
     }
 
@@ -489,7 +631,13 @@ class Terms extends Relationship
         $query->whereIn('taxonomy', $taxonomies);
 
         if ($search = $request->search) {
-            $query->where('title', 'like', '%'.$search.'%');
+            $descendants = $this->descendantIdsOfTitleMatches($search, $taxonomies, $request->site);
+
+            $descendants
+                ? $query->where(fn ($query) => $query
+                    ->where('title', 'like', '%'.$search.'%')
+                    ->orWhereIn('id', $descendants))
+                : $query->where('title', 'like', '%'.$search.'%');
         }
 
         if ($site = $request->site) {
@@ -503,6 +651,50 @@ class Terms extends Relationship
         $this->applyIndexQueryScopes($query, $request->all());
 
         return $query;
+    }
+
+    /**
+     * The ids of every term sitting beneath one whose title matches the search, so that
+     * searching a parent surfaces its descendants — the same thing the breadcrumb in
+     * `search_titles` does for the whole-list modes, but decided on the server, where
+     * a typeahead's filtering actually happens.
+     *
+     * The tree only stores slugs, so the matching titles have to be resolved first.
+     * Exclusions aren't applied: a parent that's already been selected is no longer
+     * an option, but typing it should still find what's underneath it.
+     */
+    private function descendantIdsOfTitleMatches(string $search, array $taxonomies, $site): array
+    {
+        $nestableTaxonomies = $this->nestableTaxonomies()
+            ->keyBy->handle()
+            ->only($taxonomies);
+
+        if ($nestableTaxonomies->isEmpty()) {
+            return [];
+        }
+
+        $query = Term::query()
+            ->whereIn('taxonomy', $nestableTaxonomies->keys()->all())
+            ->where('title', 'like', '%'.$search.'%');
+
+        if ($site) {
+            $query->where('site', $site);
+        }
+
+        return $query->get()
+            ->flatMap(function ($term) use ($nestableTaxonomies) {
+                $taxonomy = $nestableTaxonomies->get($term->taxonomyHandle());
+
+                // The tree is keyed by the default locale's slugs, the way `depth()` and the
+                // tree ordering read it. The matched term leads the list and is skipped —
+                // the title match above already covers it.
+                return collect($taxonomy->termWithDescendants($term->inDefaultLocale()->slug()))
+                    ->skip(1)
+                    ->map(fn ($slug) => $taxonomy->handle().'::'.$slug);
+            })
+            ->unique()
+            ->values()
+            ->all();
     }
 
     public function taxonomies()
@@ -528,32 +720,75 @@ class Terms extends Relationship
 
     protected function createTermFromString($string, $taxonomy)
     {
+        $slug = Str::slug($string, '-', $this->termLang());
+
+        // An existing term matching the full string wins over path parsing. This lets a term
+        // whose title contains the delimiter (e.g. "Ages > 21", created through the CP term
+        // form) be matched by typing it, instead of always being split into a path. The
+        // trade-off is that typing a path like "animals > cat" could match an unrelated
+        // existing term (e.g. "animalscat") instead of creating the nested path — accepted
+        // as low-probability.
+        if ($term = Facades\Term::find("{$taxonomy}::{$slug}")) {
+            return $term->id();
+        }
+
+        if (Str::contains($string, EnsuresTermPaths::DELIMITER)
+            && ($nestableTaxonomy = Facades\Taxonomy::findByHandle($taxonomy))
+            && $nestableTaxonomy->nestable()) {
+            return $this->createTermsFromPath($string, $nestableTaxonomy);
+        }
+
+        $taxonomy = Facades\Taxonomy::findByHandle($taxonomy);
+
+        if (User::current()->cant('create', [TermContract::class, $taxonomy])) {
+            return null;
+        }
+
+        $term = Facades\Term::make()
+            ->slug($slug)
+            ->taxonomy($taxonomy)
+            ->set('title', $string);
+
+        $term->save();
+
+        return $term->id();
+    }
+
+    /**
+     * A typed value like "animals > cat > calico" on a nestable taxonomy creates
+     * each missing segment as a term chained under the previous one, and returns
+     * the leaf's id. Existing segments are reused in place — the fieldtype
+     * never re-parents a term that's already somewhere in the tree.
+     */
+    private function createTermsFromPath(string $path, $taxonomy)
+    {
+        $paths = new EnsuresTermPaths;
+
+        if ($paths->segments($path)->isEmpty()) {
+            return null;
+        }
+
+        // The error goes under the field handle so the publish form can attach it to the field.
+        $slug = $paths->ensure(
+            $taxonomy,
+            $path,
+            $this->termLang(),
+            fn () => User::current()->can('create', [TermContract::class, $taxonomy]),
+            $this->field->handle()
+        );
+
+        return $slug ? $taxonomy->handle().'::'.$slug : null;
+    }
+
+    private function termLang()
+    {
         // The parent is the item this terms fieldtype exists on. Most commonly an
         // entry, but could also be something else, like another taxonomy term.
         $parent = $this->field->parent();
 
-        $lang = $parent instanceof Localization
+        return $parent instanceof Localization
             ? Site::get($parent->locale())->lang()
             : Site::default()->lang();
-
-        $slug = Str::slug($string, '-', $lang);
-
-        if (! $term = Facades\Term::find("{$taxonomy}::{$slug}")) {
-            $taxonomy = Facades\Taxonomy::findByHandle($taxonomy);
-
-            if (User::current()->cant('create', [TermContract::class, $taxonomy])) {
-                return null;
-            }
-
-            $term = Facades\Term::make()
-                ->slug($slug)
-                ->taxonomy($taxonomy)
-                ->set('title', $string);
-
-            $term->save();
-        }
-
-        return $term->id();
     }
 
     protected function getConfiguredTaxonomies()
@@ -605,6 +840,13 @@ class Terms extends Relationship
         ])->filter()->implode(' • ');
     }
 
+    public function getItemPath($item): ?array
+    {
+        return $item->taxonomy()?->nestable()
+            ? $item->ancestors()->map->title()->values()->all()
+            : null;
+    }
+
     public function replaceTermReferences($data, ?string $newValue, string $oldValue, string $taxonomy)
     {
         $configuredTaxonomies = Arr::wrap($this->config('taxonomies'));
@@ -615,15 +857,93 @@ class Terms extends Relationship
             }
 
             return is_string($data)
-                ? $this->replaceValue($data, $newValue, $oldValue)
-                : $this->replaceValuesInArray($data, $newValue, $oldValue);
+                ? $this->replaceValue($data, $newValue, $oldValue, $taxonomy)
+                : $this->replaceValuesInArray($data, $newValue, $oldValue, $taxonomy);
         }
 
         $scopedOldValue = "{$taxonomy}::{$oldValue}";
         $scopedNewValue = $newValue !== null ? "{$taxonomy}::{$newValue}" : null;
 
         return is_string($data)
-            ? $this->replaceValue($data, $scopedNewValue, $scopedOldValue)
-            : $this->replaceValuesInArray($data, $scopedNewValue, $scopedOldValue);
+            ? $this->replaceValue($data, $scopedNewValue, $scopedOldValue, $taxonomy)
+            : $this->replaceValuesInArray($data, $scopedNewValue, $scopedOldValue, $taxonomy);
+    }
+
+    protected function replaceValue($data, $newValue, $oldValue, ?string $taxonomy = null)
+    {
+        if (! $this->valueRefersToTerm($data, $oldValue, $taxonomy)) {
+            return $data;
+        }
+
+        if ($newValue === null) {
+            return null;
+        }
+
+        return $this->rewriteTermValue($data, $oldValue, $newValue);
+    }
+
+    protected function replaceValuesInArray($data, $newValue, $oldValue, ?string $taxonomy = null)
+    {
+        if (! is_array($data) || ! $data) {
+            return $data;
+        }
+
+        $result = collect(Arr::dot($data))
+            ->map(fn ($value) => $this->valueRefersToTerm($value, $oldValue, $taxonomy)
+                ? ($newValue === null ? null : $this->rewriteTermValue($value, $oldValue, $newValue))
+                : $value)
+            ->filter()
+            ->values();
+
+        return $result->isEmpty() ? null : $result->all();
+    }
+
+    private function valueRefersToTerm($value, $oldValue, ?string $taxonomy = null): bool
+    {
+        if ($value === $oldValue) {
+            return true;
+        }
+
+        if (! is_string($value) || ! is_string($oldValue)) {
+            return false;
+        }
+
+        [$path, $valueTaxonomy] = $this->termPathAndTaxonomy($value);
+        [$oldSlug, $oldTaxonomy] = $this->termPathAndTaxonomy($oldValue);
+
+        if ($oldTaxonomy && $valueTaxonomy !== $oldTaxonomy) {
+            return false;
+        }
+
+        // When the field is configured with multiple taxonomies, the old value is an
+        // unprefixed slug, so a prefixed value would otherwise match on slug alone.
+        if ($taxonomy && $valueTaxonomy && $valueTaxonomy !== $taxonomy) {
+            return false;
+        }
+
+        return (new EnsuresTermPaths)->slugFromValue($path, $this->termLang()) === $oldSlug;
+    }
+
+    private function rewriteTermValue(string $value, string $oldValue, string $newValue): string
+    {
+        if ($value === $oldValue) {
+            return $newValue;
+        }
+
+        [, $taxonomy] = $this->termPathAndTaxonomy($value);
+        [$newSlug, $newTaxonomy] = $this->termPathAndTaxonomy($newValue);
+
+        $prefix = $taxonomy ?? $newTaxonomy;
+
+        return $prefix ? $prefix.'::'.$newSlug : $newValue;
+    }
+
+    private function termPathAndTaxonomy(string $value): array
+    {
+        if (str_contains($value, '::')) {
+            return [Str::after($value, '::'), Str::before($value, '::')];
+        }
+
+        return [$value, null];
     }
 }

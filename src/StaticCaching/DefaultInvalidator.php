@@ -12,6 +12,7 @@ use Statamic\Contracts\Globals\Variables;
 use Statamic\Contracts\Routing\UrlBuilder;
 use Statamic\Contracts\Structures\Nav;
 use Statamic\Contracts\Structures\NavTree;
+use Statamic\Contracts\Structures\TaxonomyTree;
 use Statamic\Facades;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Site;
@@ -90,6 +91,8 @@ class DefaultInvalidator implements Invalidator
             $urls = $this->getCollectionUrls($item);
         } elseif ($item instanceof CollectionTree) {
             $urls = $this->getCollectionTreeUrls($item);
+        } elseif ($item instanceof TaxonomyTree) {
+            $urls = $this->getTaxonomyTreeUrls($item);
         } elseif ($item instanceof Asset) {
             $urls = $this->getAssetUrls($item);
         } elseif ($item instanceof Form) {
@@ -367,6 +370,50 @@ class DefaultInvalidator implements Invalidator
             ->filter()
             ->values()
             ->all();
+    }
+
+    protected function getTaxonomyTreeUrls($tree)
+    {
+        $taxonomy = $tree->taxonomy();
+
+        $rules = $this->parseInvalidationRules(Arr::get($this->rules, "taxonomies.{$taxonomy->handle()}.urls", []));
+
+        // Reordering or moving branches can change any term's URI, so invalidate
+        // everything under the taxonomy's URL (and its collection-scoped variants).
+        $urls = $taxonomy->sites()->flatMap(function ($site) use ($taxonomy) {
+            $route = $taxonomy->taxonomyRoute($site);
+
+            if (! $route) {
+                return [];
+            }
+
+            $siteUrl = Site::get($site)->absoluteUrl();
+
+            $prefixes = collect(['']);
+
+            if (! $taxonomy->hasCustomRoutes($site)) {
+                $prefixes = $prefixes->merge(
+                    $taxonomy->collections()->map(fn ($collection) => $collection->uri($site) ?? '/'.$collection->handle())
+                );
+            }
+
+            return $prefixes
+                ->map(fn ($prefix) => URL::tidy($siteUrl.$prefix.$route))
+                ->flatMap(fn ($url) => [$url, $url.'/*']);
+        })->all();
+
+        $absoluteUrls = $rules->filter(fn (string $rule) => URL::isAbsolute($rule))->all();
+
+        $prefixedRelativeUrls = $rules
+            ->reject(fn (string $rule) => URL::isAbsolute($rule))
+            ->map(fn (string $rule) => URL::tidy($tree->site()->url().'/'.$rule))
+            ->all();
+
+        return [
+            ...$urls,
+            ...$absoluteUrls,
+            ...$prefixedRelativeUrls,
+        ];
     }
 
     private function parseInvalidationRules(array $rules, array $context = []): IlluminateCollection

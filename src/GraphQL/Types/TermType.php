@@ -36,6 +36,7 @@ class TermType extends \Rebing\GraphQL\Support\Type
     {
         return $this->blueprint->fields()->toGql()
             ->merge((new TermInterface)->fields())
+            ->merge($this->nestingFields())
             ->merge(collect(GraphQL::getExtraTypeFields($this->name))->map(function ($closure) {
                 return $closure();
             }))
@@ -45,6 +46,31 @@ class TermType extends \Rebing\GraphQL\Support\Type
                 return $arr;
             })
             ->all();
+    }
+
+    private function nestingFields(): array
+    {
+        // Only nestable taxonomies get these. On a flat or orderable taxonomy the handles
+        // are free for the blueprint to use, so declaring them here would overwrite the
+        // user's own fields with the wrong types.
+        if (! $this->taxonomy->nestable()) {
+            return [];
+        }
+
+        return [
+            'parent' => [
+                'type' => GraphQL::type(TermInterface::NAME),
+            ],
+            'children' => [
+                'type' => GraphQL::listOf(GraphQL::type(TermInterface::NAME)),
+            ],
+            'ancestors' => [
+                'type' => GraphQL::listOf(GraphQL::type(TermInterface::NAME)),
+            ],
+            'depth' => [
+                'type' => GraphQL::int(),
+            ],
+        ];
     }
 
     private function resolver()
