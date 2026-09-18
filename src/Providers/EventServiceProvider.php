@@ -41,6 +41,7 @@ class EventServiceProvider extends ServiceProvider
         \Statamic\Listeners\UpdateAssetReferences::class,
         \Statamic\Listeners\UpdateTermReferences::class,
         \Statamic\Listeners\InvalidateNavCache::class,
+        \Statamic\Listeners\CleanupSiteContent::class,
     ];
 
     public function register()
