@@ -226,9 +226,9 @@ const triggerAttrs = computed(() => shouldShowInput.value
     : { role: 'combobox', tabindex: props.disabled || props.readOnly ? -1 : 0 });
 
 const placeholder = computed(() => {
-    // Taggable inputs keep the search/create prompt even when items are
-    // selected — those selections are listed separately, not in the field.
-    if (props.taggable) {
+    // Multi-select taggable inputs keep the search/create prompt even when items
+    // are selected — those selections are listed separately, not in the field.
+    if (props.taggable && props.multiple) {
         return props.placeholder;
     }
 
