@@ -166,15 +166,17 @@ GQL;
 {
     term(id: "categories::cat") {
         id
-        depth
-        parent {
-            id
-        }
-        ancestors {
-            id
-        }
-        children {
-            id
+        ... on Term_Categories_Category {
+            depth
+            parent {
+                id
+            }
+            ancestors {
+                id
+            }
+            children {
+                id
+            }
         }
     }
 }
@@ -193,5 +195,30 @@ GQL;
                     'children' => [],
                 ],
             ]]);
+    }
+
+    #[Test]
+    public function nesting_fields_are_not_added_to_orderable_taxonomies()
+    {
+        tap(Taxonomy::make('tags')->title('Tags')->structureContents(['max_depth' => 1]))->save();
+        tap(Term::make('alpha')->taxonomy('tags')->data(['title' => 'Alpha']))->save();
+
+        $query = <<<'GQL'
+{
+    term(id: "tags::alpha") {
+        id
+        ... on Term_Tags_Tag {
+            depth
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertJson(['errors' => [[
+                'message' => 'Cannot query field "depth" on type "Term_Tags_Tag".',
+            ]]]);
     }
 }

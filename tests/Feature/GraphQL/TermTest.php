@@ -150,10 +150,12 @@ GQL;
 {
     term(id: "categories::cat") {
         title
-        depth
-        parent { title }
-        children { title }
-        ancestors { title }
+        ... on Term_Categories_Category {
+            depth
+            parent { title }
+            children { title }
+            ancestors { title }
+        }
     }
 }
 GQL;
@@ -175,6 +177,86 @@ GQL;
                     'ancestors' => [['title' => 'Animals']],
                 ],
             ]]);
+    }
+
+    #[Test]
+    public function a_flat_taxonomy_keeps_its_own_nesting_named_blueprint_fields()
+    {
+        $this->createFlatTaxonomyWithNestingNamedFields();
+
+        $query = <<<'GQL'
+{
+    term(id: "tags::alpha") {
+        id
+        ... on Term_Tags_Tag {
+            parent
+            children
+            ancestors
+            depth
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => [
+                'term' => [
+                    'id' => 'tags::alpha',
+                    'parent' => 'the parent',
+                    'children' => 'the children',
+                    'ancestors' => 'the ancestors',
+                    'depth' => 'the depth',
+                ],
+            ]]);
+    }
+
+    #[Test]
+    public function a_flat_taxonomys_nesting_named_blueprint_fields_keep_their_own_types()
+    {
+        $this->createFlatTaxonomyWithNestingNamedFields();
+
+        $query = <<<'GQL'
+{
+    term(id: "tags::alpha") {
+        ... on Term_Tags_Tag {
+            parent { title }
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertJson(['errors' => [[
+                'message' => 'Field "parent" of type "String" must not have a sub selection.',
+            ]]]);
+    }
+
+    private function createFlatTaxonomyWithNestingNamedFields()
+    {
+        BlueprintRepository::partialMock();
+
+        $blueprint = Blueprint::makeFromFields([
+            'parent' => ['type' => 'text'],
+            'children' => ['type' => 'text'],
+            'ancestors' => ['type' => 'text'],
+            'depth' => ['type' => 'text'],
+        ])->setHandle('tag');
+        BlueprintRepository::shouldReceive('in')->with('taxonomies/tags')->andReturn(collect(['tag' => $blueprint]));
+
+        Taxonomy::make('tags')->save();
+
+        Term::make()->taxonomy('tags')->inDefaultLocale()->slug('alpha')->data([
+            'title' => 'Alpha',
+            'parent' => 'the parent',
+            'children' => 'the children',
+            'ancestors' => 'the ancestors',
+            'depth' => 'the depth',
+        ])->save();
     }
 
     #[Test]
