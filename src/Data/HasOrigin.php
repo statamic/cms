@@ -113,12 +113,28 @@ trait HasOrigin
 
     public function root()
     {
-        $entry = $this;
+        $chain = $this->originChain();
 
-        while ($entry->hasOrigin()) {
-            $entry = $entry->origin();
+        return empty($chain) ? $this : end($chain);
+    }
+
+    protected function originChain()
+    {
+        $chain = [];
+        $seen = [$this->originChainKey($this)];
+        $item = $this->origin();
+
+        while ($item && ! in_array($key = $this->originChainKey($item), $seen, true)) {
+            $chain[] = $item;
+            $seen[] = $key;
+            $item = $item->origin();
         }
 
-        return $entry;
+        return $chain;
+    }
+
+    private function originChainKey($item)
+    {
+        return method_exists($item, 'id') && ($id = $item->id()) ? $id : spl_object_id($item);
     }
 }
