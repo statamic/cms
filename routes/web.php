@@ -34,6 +34,7 @@ use Statamic\Statamic;
 use Statamic\StaticCaching\NoCache\CsrfTokenController;
 use Statamic\StaticCaching\NoCache\NoCacheController;
 use Statamic\StaticCaching\NoCache\NoCacheLocalize;
+use Statamic\StaticCaching\NoCache\ScriptController;
 
 Route::name('statamic.')->group(function () {
     Route::group(['prefix' => config('statamic.routes.action')], function () {
@@ -108,6 +109,11 @@ Route::name('statamic.')->group(function () {
 
         Route::post('csrf', CsrfTokenController::class)
             ->withoutMiddleware(['App\Http\Middleware\VerifyCsrfToken', 'Illuminate\Foundation\Http\Middleware\VerifyCsrfToken', 'Illuminate\Foundation\Http\Middleware\PreventRequestForgery']);
+
+        if (config('statamic.static_caching.script_delivery') === 'external') {
+            Route::get('nocache.js', [ScriptController::class, 'nocache'])->name('nocache.js');
+            Route::get('csrf.js', [ScriptController::class, 'csrf'])->name('csrf.js');
+        }
 
         Statamic::additionalActionRoutes();
     });
