@@ -4,7 +4,6 @@ namespace Statamic\StaticCaching\Replacers;
 
 use Illuminate\Http\Response;
 use Statamic\Facades\StaticCache;
-use Statamic\Facades\URL;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\Cachers\FileCacher;
 use Statamic\StaticCaching\Replacer;
@@ -82,19 +81,8 @@ class CsrfTokenReplacer implements Replacer
             Str::position($contents, '</head>'),
         ])->filter()->min();
 
-        $contents = Str::substrReplace($contents, $this->scriptTag($cacher), $insertBefore, 0);
+        $contents = Str::substrReplace($contents, $cacher->getCsrfScript(), $insertBefore, 0);
 
         $response->setContent($contents);
-    }
-
-    private function scriptTag(FileCacher $cacher): string
-    {
-        $external = config('statamic.static_caching.script_delivery') === 'external';
-
-        return trim(view('statamic::static-caching.script', [
-            'inline' => ! $external,
-            'src' => $external ? URL::makeRelative(route('statamic.csrf.js')) : null,
-            'contents' => $external ? null : $cacher->getCsrfTokenJs(),
-        ])->render());
     }
 }
