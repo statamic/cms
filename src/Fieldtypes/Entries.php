@@ -17,6 +17,8 @@ use Statamic\Facades\Scope;
 use Statamic\Facades\Search;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
+use Statamic\GraphQL\Types\DynamicEntryUnionType;
+use Statamic\GraphQL\Types\EntryInterface;
 use Statamic\Http\Resources\CP\Entries\EntriesFieldtypeEntries;
 use Statamic\Http\Resources\CP\Entries\EntriesFieldtypeEntry as EntryResource;
 use Statamic\Query\OrderBy;
@@ -480,10 +482,32 @@ class Entries extends Relationship
 
     public function toGqlType()
     {
-        $type = GraphQL::type('EntryInterface');
+        // Fallback to old behaviour if improved types are disabled.
+        if (! config('statamic.graphql.improved_types.enabled', false)) {
+            $type = GraphQL::type('EntryInterface');
+
+            if ($this->config('max_items') !== 1) {
+                $type = GraphQL::listOf($type);
+            }
+
+            return $type;
+        }
+
+        // If the fieldtype isn't constrained to specific collections, return the generic EntryInterface.
+        if (empty($this->config('collections'))) {
+            $type = GraphQL::type(EntryInterface::NAME);
+
+            if ($this->config('max_items') !== 1) {
+                $type = GraphQL::listOf(GraphQL::nonNull($type));
+            }
+
+            return $type;
+        }
+
+        $type = DynamicEntryUnionType::createTypeFor($this->getConfiguredCollections());
 
         if ($this->config('max_items') !== 1) {
-            $type = GraphQL::listOf($type);
+            $type = GraphQL::listOf(GraphQL::nonNull($type));
         }
 
         return $type;
