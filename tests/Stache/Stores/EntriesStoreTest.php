@@ -357,6 +357,45 @@ class EntriesStoreTest extends TestCase
     }
 
     #[Test]
+    public function it_updates_an_item_from_path()
+    {
+        $store = $this->parent->store('blog');
+        $path = Path::tidy($this->directory).'/blog/2018-07-04.fourth-of-july.md';
+        $original = file_get_contents($path);
+
+        $store->paths();
+
+        $this->assertEquals('Fourth of July', $store->getItem('blog-fourth-of-july')->get('title'));
+
+        try {
+            file_put_contents($path, "id: blog-fourth-of-july\ntitle: Independence Day\n");
+
+            $store->updateItemFromPath($path);
+
+            $this->assertEquals('Independence Day', $store->getItem('blog-fourth-of-july')->get('title'));
+        } finally {
+            file_put_contents($path, $original);
+        }
+    }
+
+    #[Test]
+    public function it_forgets_an_item_by_path()
+    {
+        $store = $this->parent->store('blog');
+        $path = Path::tidy($this->directory).'/blog/2018-07-04.fourth-of-july.md';
+
+        $store->paths();
+
+        $this->assertNotNull($store->getItem('blog-fourth-of-july'));
+
+        $store->forgetItemByPath($this->directory.'/blog//2018-07-04.fourth-of-july.md');
+
+        $this->assertNull($store->getItem('blog-fourth-of-july'));
+        $this->assertNull($store->paths()->get('blog-fourth-of-july'));
+        $this->assertFileExists($path);
+    }
+
+    #[Test]
     public function it_ignores_entries_in_a_site_subdirectory_where_the_collection_doesnt_have_that_site_enabled()
     {
         $this->markTestIncomplete();
