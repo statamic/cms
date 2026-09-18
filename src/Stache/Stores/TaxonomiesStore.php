@@ -48,11 +48,8 @@ class TaxonomiesStore extends BasicStore
             ->termTemplate(Arr::get($data, 'term_template', null))
             ->template(Arr::get($data, 'template', null))
             ->layout(Arr::get($data, 'layout', null))
-            ->routes(Arr::has($data, 'routes') ? Arr::get($data, 'routes') : null);
-
-        if (($structure = Arr::get($data, 'structure')) !== null) {
-            $taxonomy->structureContents($structure ?: []);
-        }
+            ->routes(Arr::has($data, 'routes') ? Arr::get($data, 'routes') : null)
+            ->structureContents(is_array($structure = Arr::get($data, 'structure')) ? $structure : null);
 
         return $taxonomy;
     }
