@@ -2,7 +2,9 @@
 
 namespace Tests\Http\Middleware;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\CP\Nav;
 use Statamic\Facades\User;
@@ -71,5 +73,31 @@ class HandleAuthenticatedInertiaRequestsTest extends TestCase
             ->json();
 
         $this->assertNotEmpty($data['props']['_statamic']['nav']);
+    }
+
+    #[Test]
+    public function it_resolves_shared_callables_the_same_way_inertia_does()
+    {
+        Inertia::share([
+            'closure_with_dependency' => fn (Request $request) => $request->path(),
+            'invokable' => new SharedInvokable,
+        ]);
+
+        $data = $this
+            ->actingAs(User::make()->makeSuper()->save())
+            ->get('/cp/non-inertia-page-data-test')
+            ->assertOk()
+            ->json();
+
+        $this->assertEquals('cp/non-inertia-page-data-test', $data['props']['closure_with_dependency']);
+        $this->assertEquals('invoked', $data['props']['invokable']);
+    }
+}
+
+class SharedInvokable
+{
+    public function __invoke()
+    {
+        return 'invoked';
     }
 }

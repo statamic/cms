@@ -523,8 +523,8 @@ class Statamic
     private static function resolveProps(array $props)
     {
         return collect($props)->map(function ($value) {
-            if ($value instanceof Closure) {
-                $value = $value();
+            if (is_object($value) && is_callable($value)) {
+                $value = App::call($value);
             }
 
             return is_array($value) ? static::resolveProps($value) : $value;
