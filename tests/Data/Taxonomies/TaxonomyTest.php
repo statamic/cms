@@ -264,6 +264,33 @@ class TaxonomyTest extends TestCase
     }
 
     #[Test]
+    public function sites_missing_from_a_routes_array_do_not_have_custom_routes()
+    {
+        $this->setSites([
+            'en' => ['url' => 'http://domain.com/'],
+            'fr' => ['url' => 'http://domain.com/fr/'],
+        ]);
+
+        $taxonomy = (new Taxonomy)->handle('tags')->sites(['en', 'fr'])->routes(['en' => '/topics/{slug}']);
+
+        $this->assertTrue($taxonomy->hasCustomRoutes());
+        $this->assertTrue($taxonomy->hasCustomRoutes('en'));
+        $this->assertFalse($taxonomy->hasCustomRoutes('fr'));
+        $this->assertEquals('/topics/{slug}', $taxonomy->termRoute('en'));
+        $this->assertEquals('/tags/{slug}', $taxonomy->termRoute('fr'));
+
+        $taxonomy->routes(['en' => '/topics/{slug}', 'fr' => '']);
+
+        $this->assertFalse($taxonomy->hasCustomRoutes('fr'));
+        $this->assertEquals('/tags/{slug}', $taxonomy->termRoute('fr'));
+
+        $taxonomy->routes(['en' => '/topics/{slug}', 'fr' => null]);
+
+        $this->assertFalse($taxonomy->hasCustomRoutes('fr'));
+        $this->assertEquals('/tags/{slug}', $taxonomy->termRoute('fr'));
+    }
+
+    #[Test]
     public function it_gets_sort_field_and_direction()
     {
         $taxonomy = new Taxonomy;

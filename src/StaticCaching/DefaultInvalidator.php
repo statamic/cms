@@ -391,7 +391,7 @@ class DefaultInvalidator implements Invalidator
 
             $prefixes = collect(['']);
 
-            if (! $taxonomy->hasCustomRoutes()) {
+            if (! $taxonomy->hasCustomRoutes($site)) {
                 $prefixes = $prefixes->merge(
                     $taxonomy->collections()->map(fn ($collection) => $collection->uri($site) ?? '/'.$collection->handle())
                 );

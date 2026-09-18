@@ -139,6 +139,62 @@ class RoutingTest extends TestCase
     }
 
     #[Test]
+    public function sites_missing_from_a_routes_array_get_automagic_and_collection_scoped_urls()
+    {
+        tap(Taxonomy::make('tags')->title('Tags')->sites(['en', 'fr'])->routes(['en' => '/topics/{slug}']))->save();
+
+        tap(Term::make('test')->taxonomy('tags'), function ($term) {
+            $term->in('en')->slug('test')->set('title', 'Test');
+            $term->in('fr')->slug('le-test')->set('title', 'Le Test');
+        })->save();
+
+        Collection::make('pages')->sites(['en', 'fr'])->routes('{slug}')->save();
+        EntryFactory::collection('pages')->id('blog-page')->slug('the-blog')->locale('en')->create();
+        EntryFactory::collection('pages')->id('blog-page-fr')->slug('le-blog')->locale('fr')->origin('blog-page')->create();
+        tap(Collection::make('blog')->sites(['en', 'fr'])->taxonomies(['tags'])->mount('blog-page'))->save();
+
+        $this->viewShouldReturnRaw('tags.index', '{{ title }} index');
+        $this->viewShouldReturnRaw('tags.show', 'showing {{ title }}');
+        $this->viewShouldReturnRaw('blog.tags.index', '{{ title }} blog index');
+        $this->viewShouldReturnRaw('blog.tags.show', 'blog showing {{ title }}');
+
+        // The en site opted into a custom route, so it doesn't get collection scoped urls.
+        $this->get('/topics')->assertOk()->assertSee('Tags index');
+        $this->get('/topics/test')->assertOk()->assertSee('showing Test');
+        $this->get('/the-blog/topics/test')->assertNotFound();
+        $this->get('/the-blog/tags/test')->assertNotFound();
+
+        // The fr site didn't, so it behaves exactly like an automagic route.
+        $this->get('/fr/tags')->assertOk()->assertSee('Tags index');
+        $this->get('/fr/tags/le-test')->assertOk()->assertSee('showing Le Test');
+        $this->get('/fr/le-blog/tags')->assertOk()->assertSee('Tags blog index');
+        $this->get('/fr/le-blog/tags/le-test')->assertOk()->assertSee('blog showing Le Test');
+        $this->get('/fr/topics/le-test')->assertNotFound();
+    }
+
+    #[Test]
+    public function sites_missing_from_a_routes_array_are_found_by_their_collection_scoped_uri()
+    {
+        tap(Taxonomy::make('tags')->title('Tags')->sites(['en', 'fr'])->routes(['en' => '/topics/{slug}']))->save();
+
+        tap(Term::make('test')->taxonomy('tags'), function ($term) {
+            $term->in('en')->slug('test')->set('title', 'Test');
+            $term->in('fr')->slug('le-test')->set('title', 'Le Test');
+        })->save();
+
+        Collection::make('pages')->sites(['en', 'fr'])->routes('{slug}')->save();
+        EntryFactory::collection('pages')->id('blog-page')->slug('the-blog')->locale('en')->create();
+        EntryFactory::collection('pages')->id('blog-page-fr')->slug('le-blog')->locale('fr')->origin('blog-page')->create();
+        tap(Collection::make('blog')->sites(['en', 'fr'])->taxonomies(['tags'])->mount('blog-page'))->save();
+
+        $this->assertNull(Taxonomy::findByUri('/the-blog/topics', 'en'));
+        $this->assertNull(Term::findByUri('/the-blog/topics/test', 'en'));
+
+        $this->assertEquals('tags', Taxonomy::findByUri('/le-blog/tags', 'fr')->handle());
+        $this->assertEquals('le-test', Term::findByUri('/le-blog/tags/le-test', 'fr')->slug());
+    }
+
+    #[Test]
     public function nestable_custom_routes_use_parent_uri_and_redirect_from_flat_urls()
     {
         tap(Taxonomy::make('categories')->title('Categories')->structureContents([])->routes('/topics/{parent_uri}/{slug}'))->save();

@@ -303,7 +303,7 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, BulkAugmenta
             return null;
         }
 
-        if ($this->collection() && ! $this->taxonomy()->hasCustomRoutes()) {
+        if ($this->collection() && ! $this->taxonomy()->hasCustomRoutes($this->locale())) {
             $collectionUrl = $this->collection()->uri($this->locale()) ?? $this->collection()->handle();
             $route = $collectionUrl.$route;
         }

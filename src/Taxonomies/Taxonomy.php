@@ -515,7 +515,7 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, ContainsQ
             return null;
         }
 
-        if ($this->hasCustomRoutes()) {
+        if ($this->hasCustomRoutes($site->handle())) {
             return $route;
         }
 
@@ -534,9 +534,19 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, ContainsQ
         return $this->routes !== false;
     }
 
-    public function hasCustomRoutes(): bool
+    public function hasCustomRoutes(?string $site = null): bool
     {
-        return $this->routes !== null && $this->routes !== false && $this->routes !== [];
+        if ($this->routes === null || $this->routes === false || $this->routes === []) {
+            return false;
+        }
+
+        if ($site === null) {
+            return true;
+        }
+
+        $resolved = $this->routeForSite($this->routes, $site);
+
+        return is_string($resolved) && $resolved !== '';
     }
 
     public function taxonomyRoute(?string $site = null): ?string

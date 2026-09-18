@@ -105,7 +105,7 @@ class TermRepository implements RepositoryContract
     private function findTermMatchingUri(string $uri, string $site, bool $automagicOnly = false): ?Term
     {
         foreach (Taxonomy::all()->sortByDesc(fn ($taxonomy) => strlen((string) $taxonomy->termRoute($site))) as $taxonomy) {
-            if ($automagicOnly && $taxonomy->hasCustomRoutes()) {
+            if ($automagicOnly && $taxonomy->hasCustomRoutes($site)) {
                 continue;
             }
 

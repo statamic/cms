@@ -94,7 +94,7 @@ class TaxonomyRepository implements RepositoryContract
     private function findByRoute(string $uri, string $site, bool $automagicOnly = false): ?Taxonomy
     {
         return $this->all()->first(function ($taxonomy) use ($uri, $site, $automagicOnly) {
-            if ($automagicOnly && $taxonomy->hasCustomRoutes()) {
+            if ($automagicOnly && $taxonomy->hasCustomRoutes($site)) {
                 return false;
             }
 
