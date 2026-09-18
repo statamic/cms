@@ -88,12 +88,11 @@ const containerClasses = computed(() => {
 const conditionalProps = computed(() => {
     const props_obj = {};
 
-    if (props.modelValue !== null) {
-        props_obj.modelValue = props.modelValue;
-    }
-
+    // Reka CheckboxRoot uses modelValue === 'indeterminate' (no separate indeterminate prop).
     if (props.indeterminate) {
-        props_obj.indeterminate = true;
+        props_obj.modelValue = 'indeterminate';
+    } else if (props.modelValue !== null) {
+        props_obj.modelValue = props.modelValue;
     }
 
     // Only add aria-describedby if description exists AND it's not a solo checkbox

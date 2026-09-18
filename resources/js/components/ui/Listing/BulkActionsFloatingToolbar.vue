@@ -5,6 +5,7 @@
  * Renders the floating toolbar when items are selected in a listing, with keyboard shortcuts
  * for each action. Shortcuts are derived from the localized action title (first unused letter).
  * Delete uses the backspace icon and is triggered by Delete/Backspace only.
+ * Select-all-matching uses A (always reserved so actions skip it).
  */
 import { Motion } from 'motion-v';
 import { computed, onMounted, onUnmounted } from 'vue';
@@ -14,18 +15,29 @@ import { Button, ButtonGroup, Icon } from '@ui';
 const DESELECT_SHORTCUT_KEY = 'Escape';
 const DESELECT_SHORTCUT_LABEL = 'Esc';
 const DELETE_SHORTCUT_KEY = 'Delete';
+const SELECT_ALL_MATCHING_SHORTCUT_KEY = 'a';
+const SELECT_ALL_MATCHING_SHORTCUT_LABEL = 'A';
 
 const shortcutKeyClasses =
     'ms-1.5 inline-flex h-4 min-w-4 items-center justify-center rounded bg-gray-200/75 px-1 font-semibold uppercase text-[0.625rem] text-gray-600 dark:bg-gray-800 dark:text-gray-400';
+
+const selectAllMatchingShortcutKeyClasses =
+    'ms-1.5 inline-flex h-4 min-w-4 items-center justify-center rounded border border-blue-300/80 px-1 font-semibold uppercase text-[0.625rem] text-blue-600 bg-blue-100/80 dark:border-blue-700 dark:text-blue-400 dark:bg-blue-950';
 
 const props = defineProps({
     actions: { type: Array, default: () => [] },
     visible: { type: Boolean, default: false },
     selections: { type: Array, default: () => [] },
     clearSelections: { type: Function, default: null },
+    canSelectAllMatching: { type: Boolean, default: false },
+    selectAllMatching: { type: Function, default: null },
+    selectingAllMatching: { type: Boolean, default: false },
+    matchingTotal: { type: Number, default: 0 },
 });
 
 const hasSelections = computed(() => (props.selections?.length ?? 0) > 0);
+const showSelectAllMatching = computed(() => !!props.canSelectAllMatching);
+const isSelectingAllMatching = computed(() => !!props.selectingAllMatching);
 
 /** True if this action is the built-in delete (by handle or trash icon). */
 function isDeleteAction(action) {
@@ -47,6 +59,9 @@ function findShortcutKey(action, used) {
 
 const actionsWithShortcuts = computed(() => {
     const used = new Set();
+    // Always reserve A so action shortcuts stay stable whether the select-all row is visible.
+    used.add(SELECT_ALL_MATCHING_SHORTCUT_KEY);
+
     return (props.actions || []).map((action) => {
         // Delete always shows the backspace icon and is triggered by Delete/Backspace only; no letter.
         if (isDeleteAction(action)) {
@@ -95,6 +110,17 @@ function onKeydown(event) {
     if (event.metaKey || event.ctrlKey || event.altKey) return;
     const key = event.key?.length === 1 ? event.key.toLowerCase() : null;
     if (!key) return;
+
+    if (
+        key === SELECT_ALL_MATCHING_SHORTCUT_KEY &&
+        showSelectAllMatching.value &&
+        !isSelectingAllMatching.value
+    ) {
+        props.selectAllMatching?.();
+        event.preventDefault();
+        return;
+    }
+
     const action = actionsWithShortcuts.value.find((a) => a.shortcutKey === key);
     if (action?.run) {
         action.run();
@@ -110,20 +136,40 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown, true));
 <template>
     <Motion
         v-if="visible"
-        layout
         data-floating-toolbar
         class="pointer-events-none sticky inset-x-0 bottom-1 sm:bottom-6 z-(--z-index-above) flex w-full max-w-[95vw] mx-auto justify-center"
         :initial="{ y: 100, opacity: 0 }"
         :animate="{ y: 0, opacity: 1 }"
         :transition="{ duration: 0.2, ease: 'easeInOut' }"
     >
-        <div class="pointer-events-auto space-y-3 rounded-xl border border-gray-300/60 dark:border-gray-700 p-1 bg-gray-200/55 shadow-[0_1px_16px_-2px_rgba(63,63,71,0.2)] dark:bg-gray-800 dark:shadow-[0_10px_15px_rgba(0,0,0,.5)] dark:inset-shadow-2xs dark:inset-shadow-white/10">
+        <div
+            class="pointer-events-auto space-y-1 rounded-xl border border-gray-300/60 dark:border-gray-700 p-1 shadow-[0_1px_16px_-2px_rgba(63,63,71,0.2)] dark:bg-gray-800 dark:shadow-[0_10px_15px_rgba(0,0,0,.5)] dark:inset-shadow-2xs dark:inset-shadow-white/10"
+            :class="showSelectAllMatching ? 'bg-white dark:bg-gray-900' : 'bg-gray-200/55'"
+        >
+            <div
+                v-if="showSelectAllMatching"
+                class="flex justify-center px-2"
+            >
+                <Button
+                    class="text-blue-600 dark:text-blue-500 tracking-tight"
+                    variant="ghost"
+                    size="sm"
+                    :loading="isSelectingAllMatching"
+                    :disabled="isSelectingAllMatching"
+                    @click="selectAllMatching?.()"
+                >
+                    {{ __('messages.selections_select_all_matching', { total: matchingTotal }) }}
+                    <span :class="selectAllMatchingShortcutKeyClasses">
+                        {{ SELECT_ALL_MATCHING_SHORTCUT_LABEL }}
+                    </span>
+                </Button>
+            </div>
             <ButtonGroup overflow="gap" justify="center">
                 <Button
-                    class="text-blue-500!"
+                    class="text-blue-600! dark:text-blue-500!"
                     @click="clearSelections?.()"
                 >
-                    {{ __n(`Deselect :count item|Deselect all :count items`, selections.length) }}
+                    {{ __n(`Deselect :count item|Deselect :count items`, selections.length) }}
                     <span :class="[shortcutKeyClasses, 'text-blue-600! bg-blue-100/80! dark:text-blue-400! dark:bg-blue-950!']">
                         {{ DESELECT_SHORTCUT_LABEL }}
                     </span>
@@ -135,7 +181,7 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown, true));
                     @click="action.run"
                 >
                     {{ __(action.title) }}
-                    <!-- Delete always shows backspace icon; other actions show their shortcut letter. -->
+                    <!-- Delete always shows the backspace icon; other actions show their shortcut letter. -->
                     <span
                         :class="[
                             shortcutKeyClasses,
