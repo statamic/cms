@@ -302,6 +302,14 @@ class TermsNestingTest extends TestCase
     }
 
     #[Test]
+    public function processing_a_path_that_repeats_a_term_fails_validation()
+    {
+        $this->expectException(ValidationException::class);
+
+        $this->fieldtype(['taxonomies' => ['categories']])->process(['dog > dog']);
+    }
+
+    #[Test]
     public function processing_a_plain_value_still_creates_a_root_term()
     {
         $processed = $this->fieldtype(['taxonomies' => ['categories']])->process(['Plants']);

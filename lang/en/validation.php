@@ -207,6 +207,7 @@ return [
     'reserved_field_handle' => 'Field with a handle of :handle is a reserved word.',
     'taxonomy_route_requires_slug' => 'The route must include {slug}.',
     'term_path_exceeds_max_depth' => 'The path :path exceeds the maximum depth of :max.',
+    'term_path_repeats_a_term' => 'The path :path cannot use the same term more than once.',
     'unique_entry_value' => 'This value has already been taken.',
     'unique_form_handle' => 'This value has already been taken.',
     'unique_term_value' => 'This value has already been taken.',

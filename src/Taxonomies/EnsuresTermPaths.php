@@ -63,7 +63,10 @@ class EnsuresTermPaths
             'slug' => Str::slug($segment, '-', $language ?? 'en'),
         ]);
 
-        $this->assertPathFitsWithinMaxDepth($taxonomy, $resolved->pluck('slug')->all(), $value, $errorKey);
+        $slugs = $resolved->pluck('slug')->all();
+
+        $this->assertPathHasNoRepeatedTerms($slugs, $value, $errorKey);
+        $this->assertPathFitsWithinMaxDepth($taxonomy, $slugs, $value, $errorKey);
 
         $missing = $resolved->filter(
             fn ($segment) => ! Term::find($taxonomy->handle().'::'.$segment['slug'])
@@ -101,6 +104,24 @@ class EnsuresTermPaths
         }
 
         return $slug;
+    }
+
+    /**
+     * Reject a path that uses the same term more than once. A term can only live in
+     * one place in the tree, so "dog > dog" asks for it to be nested under itself
+     * and "cat > dog > cat" asks for a cycle. Neither is expressible.
+     */
+    private function assertPathHasNoRepeatedTerms(array $slugs, string $path, string $errorKey): void
+    {
+        if (collect($slugs)->duplicates()->isEmpty()) {
+            return;
+        }
+
+        throw ValidationException::withMessages([
+            $errorKey => __('statamic::validation.term_path_repeats_a_term', [
+                'path' => $path,
+            ]),
+        ]);
     }
 
     /**

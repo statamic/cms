@@ -247,12 +247,17 @@ class TaxonomyStructure extends Structure
 
     /**
      * Nest $slug under $parentSlug in the persisted tree. No-op if $slug is
-     * already somewhere in the tree. If the parent isn't in the persisted
-     * tree yet (e.g. it was just created as part of the same path), it's
-     * appended at the root so the child can actually nest under it.
+     * already somewhere in the tree, or if it would be its own parent. If the
+     * parent isn't in the persisted tree yet (e.g. it was just created as part
+     * of the same path), it's appended at the root so the child can actually
+     * nest under it.
      */
     public function graftTerm(string $slug, string $parentSlug, bool $save = true): void
     {
+        if ($slug === $parentSlug) {
+            return;
+        }
+
         $tree = $this->tree();
         $raw = $this->repairTree($tree->fileData()['tree'] ?? []);
 

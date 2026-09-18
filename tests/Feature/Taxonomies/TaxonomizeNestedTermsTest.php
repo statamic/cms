@@ -186,6 +186,59 @@ class TaxonomizeNestedTermsTest extends TestCase
     }
 
     #[Test]
+    public function a_path_repeating_a_term_that_is_not_in_the_tree_is_rejected()
+    {
+        // Without the check this appends a "dog" branch to hold the parent, then nests
+        // "dog" inside it, leaving the term nested under itself in the saved tree.
+        try {
+            (new EnsuresTermPaths)->ensure(Taxonomy::findByHandle('categories'), 'Dog > Dog');
+            $this->fail('Expected a validation exception.');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('path', $e->errors());
+        }
+
+        $this->assertNull(Term::find('categories::dog'));
+        $this->assertEquals([], Taxonomy::findByHandle('categories')->structure()->tree()->fileData()['tree'] ?? []);
+    }
+
+    #[Test]
+    public function a_path_repeating_a_term_that_is_already_in_the_tree_is_rejected()
+    {
+        tap(Term::make('dog')->taxonomy('categories')->data(['title' => 'Dog']))->save();
+
+        Taxonomy::findByHandle('categories')->structure()->tree()->tree([
+            ['term' => 'dog'],
+        ])->save();
+
+        // Previously the graft was a no-op and the leaf slug came back as though the path was fine.
+        try {
+            (new EnsuresTermPaths)->ensure(Taxonomy::findByHandle('categories'), 'Dog > Dog');
+            $this->fail('Expected a validation exception.');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('path', $e->errors());
+        }
+
+        $this->assertEquals([
+            ['term' => 'dog'],
+        ], Taxonomy::findByHandle('categories')->structure()->tree()->fileData()['tree']);
+    }
+
+    #[Test]
+    public function a_path_that_returns_to_an_earlier_term_is_rejected()
+    {
+        try {
+            (new EnsuresTermPaths)->ensure(Taxonomy::findByHandle('categories'), 'Animals > Cat > Animals');
+            $this->fail('Expected a validation exception.');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('path', $e->errors());
+        }
+
+        $this->assertNull(Term::find('categories::animals'));
+        $this->assertNull(Term::find('categories::cat'));
+        $this->assertEquals([], Taxonomy::findByHandle('categories')->structure()->tree()->fileData()['tree'] ?? []);
+    }
+
+    #[Test]
     public function it_splits_a_typed_path_into_segments()
     {
         $this->assertEquals(

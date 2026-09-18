@@ -594,4 +594,16 @@ class NestableTaxonomyTest extends TestCase
 
         $taxonomy->structure()->graftTerm('dog', 'cat');
     }
+
+    #[Test]
+    public function grafting_a_term_under_itself_does_nothing()
+    {
+        $taxonomy = tap(Taxonomy::make('categories')->structureContents([]))->save();
+
+        tap(Term::make('cat')->taxonomy('categories')->data(['title' => 'Cat']))->save();
+
+        $taxonomy->structure()->graftTerm('cat', 'cat');
+
+        $this->assertEquals([], $taxonomy->structure()->tree()->fileData()['tree'] ?? []);
+    }
 }
