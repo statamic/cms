@@ -80,4 +80,51 @@ class FormRepositoryTest extends TestCase
             ],
         ], $this->repo->extraConfigFor('another_form'));
     }
+
+    #[Test]
+    public function it_registers_config_with_before_position()
+    {
+        $this->repo->appendConfigFields('*', 'Fields', [
+            'recaptcha' => ['type' => 'toggle'],
+        ], before: 'honeypot');
+
+        $this->assertEquals([
+            'fields' => [
+                'display' => 'Fields',
+                'fields' => [
+                    'recaptcha' => ['type' => 'toggle'],
+                ],
+                'before' => 'honeypot',
+            ],
+        ], $this->repo->extraConfigFor('test_form'));
+    }
+
+    #[Test]
+    public function it_registers_config_with_after_position()
+    {
+        $this->repo->appendConfigFields('*', 'Fields', [
+            'recaptcha' => ['type' => 'toggle'],
+        ], after: 'honeypot');
+
+        $this->assertEquals([
+            'fields' => [
+                'display' => 'Fields',
+                'fields' => [
+                    'recaptcha' => ['type' => 'toggle'],
+                ],
+                'after' => 'honeypot',
+            ],
+        ], $this->repo->extraConfigFor('test_form'));
+    }
+
+    #[Test]
+    public function it_throws_when_both_before_and_after_are_provided()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Pass only before or after, not both.');
+
+        $this->repo->appendConfigFields('*', 'Fields', [
+            'recaptcha' => ['type' => 'toggle'],
+        ], before: 'honeypot', after: 'title');
+    }
 }
