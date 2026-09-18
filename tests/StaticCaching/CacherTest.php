@@ -4,8 +4,10 @@ namespace Tests\StaticCaching;
 
 use Illuminate\Cache\Repository;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Event;
 use Mockery;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Events\UrlInvalidated;
 use Statamic\StaticCaching\Cachers\AbstractCacher;
 use Tests\TestCase;
 
@@ -238,6 +240,8 @@ class CacherTest extends TestCase
     #[Test]
     public function it_invalidates_urls()
     {
+        Event::fake();
+
         $cache = app(Repository::class);
 
         $this->setSites([
@@ -259,13 +263,6 @@ class CacherTest extends TestCase
 
         $cacher = $this->cacher();
 
-        $cacher->shouldReceive('invalidateUrl')->once()->with('/', 'http://example.com');
-        $cacher->shouldReceive('invalidateUrl')->twice()->with('/one', 'http://example.com');
-        $cacher->shouldReceive('invalidateUrl')->once()->with('/two', 'http://example.com');
-        $cacher->shouldReceive('invalidateUrl')->once()->with('/three', 'http://example.co.uk');
-        $cacher->shouldReceive('invalidateUrl')->times(3)->with('/blog/post', 'http://example.com');
-        $cacher->shouldReceive('invalidateUrl')->once()->with('/blog/post', 'http://example.co.uk');
-
         $cacher->invalidateUrls([
             '/',
             '/one',
@@ -277,6 +274,22 @@ class CacherTest extends TestCase
             'http://example.com/blog/*',
             'http://example.co.uk/blog/*',
         ]);
+
+        // Matching entries are removed from each domain's urls map.
+        $this->assertEquals(['blog' => '/blog', 'contact' => '/contact'], $cacher->getUrls('http://example.com')->all());
+        $this->assertEquals(['blog' => '/blog', 'contact' => '/contact'], $cacher->getUrls('http://example.co.uk')->all());
+
+        // An event fires for every requested path on its resolved domain, with
+        // wildcards expanding to the map entries they matched: '/' (1),
+        // '/one' and 'one' (2), '/two' (1), '/three' (1), and '/blog/post'
+        // once per wildcard on its domain (3 + 1).
+        Event::assertDispatchedTimes(UrlInvalidated::class, 9);
+        Event::assertDispatched(UrlInvalidated::class, fn ($event) => $event->url === 'http://example.com/');
+        Event::assertDispatched(UrlInvalidated::class, fn ($event) => $event->url === 'http://example.com/one');
+        Event::assertDispatched(UrlInvalidated::class, fn ($event) => $event->url === 'http://example.com/two');
+        Event::assertDispatched(UrlInvalidated::class, fn ($event) => $event->url === 'http://example.co.uk/three');
+        Event::assertDispatched(UrlInvalidated::class, fn ($event) => $event->url === 'http://example.com/blog/post');
+        Event::assertDispatched(UrlInvalidated::class, fn ($event) => $event->url === 'http://example.co.uk/blog/post');
     }
 
     private function cacher($config = [])
