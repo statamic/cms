@@ -92,6 +92,7 @@ Most of the folder structure will feel familiar to Laravel developers. However, 
 - You should use Statamic's UI Components where possible. It includes components for buttons, cards, inputs, etc.
     - UI Components can be imported from `@statamic/cms/ui`.
     - For more information on Statamic's UI Components, please visit our Storybook docs: https://ui.statamic.dev
+    - A machine-readable manifest of the UI Components (props, slots, events, and usage snippets) is available at https://ui.statamic.dev/manifests/components.json. Its entries link to per-component details via relative `$ref` URLs.
 
 ### Additional Context
 - Statamic Documentation: https://statamic.dev/llms.txt
