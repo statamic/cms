@@ -34,7 +34,7 @@
                 input-class="border-s-0"
             />
         </ui-input-group>
-        <ui-description v-if="isInvalid" class="text-red-600">{{ __('statamic::validation.url') }}</ui-description>
+        <ui-description v-if="isInvalid" class="text-red-600">{{ invalidMessage }}</ui-description>
         <iframe
             v-if="shouldShowPreview"
             ref="iframe"
@@ -102,6 +102,12 @@ export default {
             }
 
             return embed_url;
+        },
+
+        invalidMessage() {
+            return this.isCloudflare
+                ? __('statamic::validation.video_fieldtype_cloudflare_id')
+                : __('statamic::validation.url');
         },
 
         isCloudflare() {
