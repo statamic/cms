@@ -5,6 +5,7 @@
             :options="meta.providers"
             option-label="label"
             option-value="value"
+            :read-only="isReadOnly"
             :aria-label="__('Video Provider')"
             @update:model-value="changeMode"
         />
