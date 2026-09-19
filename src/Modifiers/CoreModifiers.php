@@ -1564,7 +1564,7 @@ class CoreModifiers extends Modifier
 
         // Value objects like ArrayableString are both Arrayable and Stringable.
         // They stand in for a string, so measure the string, not the array.
-        if ($value instanceof Arrayable && ! $value instanceof Stringable) {
+        if ($value instanceof Arrayable && ! $value instanceof ArrayableString && ! $value instanceof Embed) {
             $value = $value->toArray();
         }
 
