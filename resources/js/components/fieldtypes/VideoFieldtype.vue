@@ -1,7 +1,7 @@
 <template>
     <div class="flex flex-col space-y-3 p-1.5 bg-gray-100 border border-gray-300 dark:bg-gray-900 dark:border-gray-700 rounded-xl">
         <ui-combobox
-            :model-value="mode"
+            :model-value="isCloudflare ? 'cloudflare' : 'url'"
             :options="meta.providers"
             option-label="label"
             option-value="value"
