@@ -2,6 +2,7 @@
 
 namespace Statamic\StaticCaching\Cachers;
 
+use Closure;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -344,6 +345,23 @@ EOT;
 EOT;
 
         return $this->nocacheJs ?? $default;
+    }
+
+    public function getCsrfScript(): string
+    {
+        return $this->script('statamic.csrf.js', fn () => $this->getCsrfTokenJs());
+    }
+
+    public function getNocacheScript(): string
+    {
+        return $this->script('statamic.nocache.js', fn () => $this->getNocacheJs());
+    }
+
+    private function script(string $route, Closure $js): string
+    {
+        return config('statamic.static_caching.script_delivery') === 'external'
+            ? '<script src="'.URL::makeRelative(route($route)).'"></script>'
+            : '<script>'.$js().'</script>';
     }
 
     public function shouldOutputJs(): bool

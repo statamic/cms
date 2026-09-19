@@ -12,6 +12,7 @@ use Statamic\Http\Controllers\CP\Assets\AssetContainerBlueprintController;
 use Statamic\Http\Controllers\CP\Assets\AssetContainersController;
 use Statamic\Http\Controllers\CP\Assets\AssetsController;
 use Statamic\Http\Controllers\CP\Assets\BrowserController;
+use Statamic\Http\Controllers\CP\Assets\ContainerActionController;
 use Statamic\Http\Controllers\CP\Assets\FieldtypeController;
 use Statamic\Http\Controllers\CP\Assets\FolderActionController;
 use Statamic\Http\Controllers\CP\Assets\FoldersController;
@@ -251,6 +252,8 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::patch('globals/{global_set}/variables', [GlobalVariablesController::class, 'update'])->name('globals.variables.update');
 
     Route::resource('asset-containers', AssetContainersController::class)->except('index');
+    Route::post('asset-containers/actions', [ContainerActionController::class, 'run'])->name('asset-containers.actions.run');
+    Route::post('asset-containers/actions/list', [ContainerActionController::class, 'bulkActions'])->name('asset-containers.actions.bulk');
     Route::post('asset-containers/{asset_container}/folders', [FoldersController::class, 'store']);
     Route::post('assets/actions', [AssetActionController::class, 'run'])->name('assets.actions.run');
     Route::post('assets/actions/list', [AssetActionController::class, 'bulkActions'])->name('assets.actions.bulk');
