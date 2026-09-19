@@ -142,6 +142,7 @@ export default {
         changeMode(mode) {
             if (mode === this.mode) return;
 
+            this.updateDebounced.cancel();
             this.mode = mode;
 
             if (this.value) this.update(null);
