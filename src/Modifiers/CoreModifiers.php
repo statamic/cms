@@ -23,6 +23,7 @@ use Statamic\Facades\Path;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Facades\YAML;
+use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Value;
 use Statamic\Fields\Values;
 use Statamic\Fieldtypes\Bard;
@@ -36,7 +37,6 @@ use Statamic\Support\Html;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\ChecksDumpability;
 use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
-use Stringable;
 use Stringy\StaticStringy as Stringy;
 
 use function Statamic\trans;
