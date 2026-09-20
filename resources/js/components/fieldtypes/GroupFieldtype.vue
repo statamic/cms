@@ -39,11 +39,6 @@ import { reveal } from '@api';
 export default {
     mixins: [Fieldtype, ManagesPreviewText],
     components: { Fields, FieldsProvider },
-    mounted() {
-        reveal.mount(this.$refs.fieldsContainer, () => {
-            this.isCollapsed = false;
-        });
-    },
     data() {
         return {
             containerWidth: null,
@@ -54,6 +49,11 @@ export default {
                 group: this.makeGroupProvide(),
             },
         };
+    },
+    mounted() {
+        reveal.mount(this.$refs.fieldsContainer, () => {
+            this.isCollapsed = false;
+        });
     },
     computed: {
         values() {

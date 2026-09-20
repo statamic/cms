@@ -44,20 +44,25 @@ const props = defineProps({
 
 const emit = defineEmits(['opened', 'closed']);
 
+const editableSelector = 'input:not([type="hidden"]):not([disabled]), textarea:not([disabled]), [contenteditable="true"]';
+const focusableSelector = 'button:not([disabled]), [tabindex="0"]';
+
 const { name, blueprint, values } = injectContainerContext();
 const portalEnabled = ref(false);
 const panesVisible = ref(false);
 const headerVisible = ref(false);
 const widthLocalStorageKey = 'statamic.live-preview.editor-width';
-const editorWidth = ref(localStorage.getItem(widthLocalStorageKey) || 400);
+const defaultEditorWidth = 400;
+const storedEditorWidth = () => localStorage.getItem(widthLocalStorageKey) || defaultEditorWidth;
+const editorWidth = ref(storedEditorWidth());
 const editorResizing = ref(false);
 const editorCollapsed = ref(false);
 const channel = ref(null);
 const channelName = `livepreview-${nanoid()}`;
-let popoutTimer;
 const poppedOut = ref(false);
 const popoutWindow = ref(null);
 const popoutResponded = ref(false);
+let popoutTimer;
 const loading = ref(true);
 const extras = ref({});
 const token = ref(null);
@@ -65,25 +70,34 @@ const target = ref(0);
 const iframeContentContainer = useTemplateRef('contents');
 const editorFields = useTemplateRef('editorFields');
 const selectingFields = ref(false);
+let selectFieldsBinding = null;
 let source;
 
-const { updateIframeContents, selectFields, highlightField, dispose: disposeIframe } = useIframeManager(iframeContentContainer, selectField);
+const { updateIframeContents, selectFields, highlightField, dispose: disposeIframe } = useIframeManager(
+    iframeContentContainer,
+    selectField,
+    () => (selectingFields.value = false),
+);
+
+function focusField(element) {
+    const input = element.querySelector(editableSelector) ?? element.querySelector(focusableSelector);
+
+    input?.focus({ preventScroll: true });
+}
 
 function selectField(field) {
     if (!props.enabled || !Array.isArray(field?.path)) return;
 
-    if (editorCollapsed.value) setEditorWidth(localStorage.getItem(widthLocalStorageKey) || 400);
+    selectingFields.value = false;
+
+    if (editorCollapsed.value) setEditorWidth(storedEditorWidth());
 
     const element = findPublishField(editorFields.value, field.path);
     if (!element) return;
 
     reveal.element(element);
 
-    nextTick(() => {
-        const input = element.querySelector('input:not([type="hidden"]):not([disabled]), textarea:not([disabled]), [contenteditable="true"]')
-            ?? element.querySelector('button:not([disabled]), [tabindex="0"]');
-        input?.focus({ preventScroll: true });
-    });
+    nextTick(() => focusField(element));
 }
 
 function highlightEditorField(event) {
@@ -100,6 +114,15 @@ function highlightEditorField(event) {
 watch(selectingFields, enabled => {
     selectFields(enabled);
     channel.value?.postMessage({ event: 'field.selecting', enabled });
+
+    if (enabled) {
+        selectFieldsBinding = Statamic.$keys.bindGlobal('esc', () => (selectingFields.value = false));
+
+        return;
+    }
+
+    selectFieldsBinding?.destroy();
+    selectFieldsBinding = null;
 });
 
 const livePreviewFieldsPortal = computed(() => {
@@ -221,7 +244,7 @@ watch(
     (enabled, wasEnabled) => {
         if (wasEnabled && !enabled) {
             teardownPayloadWatch();
-            disposeIframe?.();
+            disposeIframe();
             selectingFields.value = false;
             nextTick(() => (portalEnabled.value = false));
         } else {
@@ -249,6 +272,9 @@ function popout() {
         switch (e.data.event) {
             case 'field.selected':
                 selectField(e.data.field);
+                break;
+            case 'field.selecting':
+                selectingFields.value = e.data.enabled;
                 break;
             case 'popout.opened':
                 listenForPopoutClose();
@@ -381,7 +407,8 @@ Statamic.$events.$on(refreshEvent, refreshHandler);
 
 onUnmounted(() => {
     teardownPayloadWatch();
-    disposeIframe?.();
+    disposeIframe();
+    selectFieldsBinding?.destroy();
     clearTimeout(popoutTimer);
     channel.value?.close();
     keybinding.value.destroy();

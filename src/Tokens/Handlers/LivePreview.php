@@ -24,22 +24,11 @@ class LivePreview
 
         $item->repository()->substitute($item);
 
-        $manager = app(InstrumentationManager::class);
         $tracer = new FieldDomTracer;
-        $markers = FieldMarkers::make()->using($tracer);
 
-        $manager->register($markers);
+        $response = $this->traceFields($tracer, fn () => $next($request));
 
-        try {
-            $response = $tracer->capture(fn () => $next($request));
-        } finally {
-            $manager->forget($markers);
-        }
-
-        if ($response->isSuccessful()
-            && ! $request->isMethod('HEAD')
-            && str_contains($response->headers->get('Content-Type', ''), 'text/html')
-            && is_string($response->getContent())) {
+        if ($this->shouldAddFieldManifest($request, $response)) {
             $this->addFieldManifest($response, $item, $tracer);
         }
 
@@ -59,28 +48,54 @@ class LivePreview
         return $response;
     }
 
+    private function traceFields(FieldDomTracer $tracer, Closure $callback)
+    {
+        $manager = app(InstrumentationManager::class);
+        $markers = FieldMarkers::make()->using($tracer);
+
+        $manager->register($markers);
+
+        try {
+            return $tracer->capture($callback);
+        } finally {
+            $manager->forget($markers);
+        }
+    }
+
+    private function shouldAddFieldManifest($request, $response): bool
+    {
+        return $response->isSuccessful()
+            && ! $request->isMethod('HEAD')
+            && str_contains($response->headers->get('Content-Type', ''), 'text/html')
+            && is_string($response->getContent());
+    }
+
     private function addFieldManifest($response, $item, FieldDomTracer $tracer): void
     {
-        $manifest = json_encode([
+        $script = '<script type="application/json" id="statamic-preview-fields">'.$this->fieldManifest($item, $tracer).'</script>';
+
+        $response->setContent($this->injectBeforeBodyClose($response->getContent(), $script));
+        $response->headers->remove('Content-Length');
+        $response->headers->remove('ETag');
+    }
+
+    private function fieldManifest($item, FieldDomTracer $tracer): string
+    {
+        return json_encode([
             'version' => 1,
             'owner' => ['reference' => $item->reference(), 'locale' => $item->locale()],
             'fields' => $tracer->fields(),
             'markers' => $tracer->markers(),
         ], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_INVALID_UTF8_SUBSTITUTE);
+    }
 
-        $html = $response->getContent();
-        $data = '<script type="application/json" id="statamic-preview-fields">'.$manifest.'</script>';
+    private function injectBeforeBodyClose(string $html, string $script): string
+    {
         $position = strripos($html, '</body>');
 
-        if ($position === false) {
-            $html .= $data;
-        } else {
-            $html = substr_replace($html, $data, $position, 0);
-        }
-
-        $response->setContent($html);
-        $response->headers->remove('Content-Length');
-        $response->headers->remove('ETag');
+        return $position === false
+            ? $html.$script
+            : substr_replace($html, $script, $position, 0);
     }
 
     private function getSchemeAndHost(Site $site): string

@@ -1,115 +1,120 @@
+import { createHighlightOverlay } from './FieldHighlights.js';
+
 export const fieldHighlightDuration = 2000;
 
-export function createFieldSync(doc, onSelect) {
+export const fieldManifestId = 'statamic-preview-fields';
+const fieldAttribute = 'data-statamic-field';
+const markerComment = /^(\/?)statamic:field:(\d+)$/;
+
+function emptyIndex() {
+    return { byElement: new WeakMap(), byPath: new Map() };
+}
+
+function getRects(entry) {
+    return entry.range ? Array.from(entry.range.getClientRects()) : [entry.element.getBoundingClientRect()];
+}
+
+function addEntry(index, manifest, marker, { element, range = null, depth = 0 }) {
+    const fields = (manifest.markers[marker] ?? [])
+        .map(id => manifest.fields[id])
+        .filter(field => {
+            return field
+                && Array.isArray(field.path)
+                && field.reference === manifest.owner.reference
+                && field.locale === manifest.owner.locale;
+        });
+
+    if (!fields.length || !element) return;
+
+    const entry = { fields, element, range, depth };
+
+    if (!index.byElement.has(element)) index.byElement.set(element, []);
+    index.byElement.get(element).push(entry);
+
+    for (const field of fields) {
+        const path = field.path.join('.');
+        if (!index.byPath.has(path)) index.byPath.set(path, []);
+        index.byPath.get(path).push(entry);
+    }
+}
+
+export function createFieldSync(doc, onSelect, onCancel = () => {}) {
     const win = doc.defaultView;
-    let entriesByElement = new WeakMap();
-    let entriesByPath = new Map();
+    const highlights = createHighlightOverlay(doc);
+
+    let index = emptyIndex();
     let selectedPath = null;
     let selecting = false;
     let hoveredEntry = null;
+    let fading = false;
     let frame = null;
     let disposed = false;
     let hideTimer;
     let clearTimer;
-    let fading = false;
-
-    const fadeDuration = win.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 180;
-    const canvas = doc.createElement('canvas');
-    canvas.width = 1;
-    canvas.height = 1;
-    const colors = canvas.getContext('2d', { willReadFrequently: true });
-
-    const overlay = doc.createElement('div');
-    overlay.setAttribute('aria-hidden', 'true');
-    overlay.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:2147483647;';
-    overlay.style.transition = `opacity ${fadeDuration}ms ease-out`;
-    doc.documentElement.append(overlay);
-
-    function indexFields() {
-        entriesByElement = new WeakMap();
-        entriesByPath = new Map();
-        hoveredEntry = null;
-
-        const manifest = readManifest();
-        if (!doc.body || !manifest?.owner || !manifest.fields || !manifest.markers) {
-            drawHighlights();
-            return;
-        }
-
-        const walker = doc.createTreeWalker(doc.body, win.NodeFilter.SHOW_ELEMENT | win.NodeFilter.SHOW_COMMENT);
-        const starts = new Map();
-        let depth = 0;
-
-        while (walker.nextNode()) {
-            const node = walker.currentNode;
-            if (node.nodeType === win.Node.ELEMENT_NODE) {
-                if (node.hasAttribute('data-statamic-field')) {
-                    addEntry(manifest, node.getAttribute('data-statamic-field'), node);
-                }
-                continue;
-            }
-
-            const match = node.data.match(/^(\/?)statamic:field:(\d+)$/);
-            if (!match) continue;
-
-            if (!match[1]) {
-                depth++;
-                starts.set(match[2], { node, depth });
-            } else {
-                const start = starts.get(match[2]);
-                starts.delete(match[2]);
-                depth = Math.max(0, depth - 1);
-
-                // Browser repair or application morphing can invalidate a boundary pair.
-                if (!start || start.node.parentNode !== node.parentNode) continue;
-
-                const range = doc.createRange();
-                range.setStartAfter(start.node);
-                range.setEndBefore(node);
-                addEntry(manifest, match[2], node.parentElement, range, start.depth);
-            }
-        }
-
-        drawHighlights();
-    }
 
     function readManifest() {
         try {
-            return JSON.parse(doc.getElementById('statamic-preview-fields')?.textContent ?? 'null');
+            return JSON.parse(doc.getElementById(fieldManifestId)?.textContent ?? 'null');
         } catch {
             return null;
         }
     }
 
-    function addEntry(manifest, marker, element, range = null, depth = 0) {
-        const fields = (manifest.markers[marker] ?? [])
-            .map(id => manifest.fields[id])
-            .filter(field => {
-                return field
-                    && Array.isArray(field.path)
-                    && field.reference === manifest.owner.reference
-                    && field.locale === manifest.owner.locale;
-            });
+    function buildIndex() {
+        const index = emptyIndex();
+        const manifest = readManifest();
 
-        if (!fields.length || !element) return;
+        if (!doc.body || !manifest?.owner || !manifest.fields || !manifest.markers) return index;
 
-        const entry = { fields, element, range, depth };
-        if (!entriesByElement.has(element)) entriesByElement.set(element, []);
-        entriesByElement.get(element).push(entry);
+        const walker = doc.createTreeWalker(doc.body, win.NodeFilter.SHOW_ELEMENT | win.NodeFilter.SHOW_COMMENT);
+        const openMarkers = new Map();
+        let depth = 0;
 
-        for (const field of fields) {
-            const path = field.path.join('.');
-            if (!entriesByPath.has(path)) entriesByPath.set(path, []);
-            entriesByPath.get(path).push(entry);
+        while (walker.nextNode()) {
+            const node = walker.currentNode;
+
+            if (node.nodeType === win.Node.ELEMENT_NODE) {
+                if (node.hasAttribute(fieldAttribute)) {
+                    addEntry(index, manifest, node.getAttribute(fieldAttribute), { element: node });
+                }
+                continue;
+            }
+
+            const match = node.data.match(markerComment);
+            if (!match) continue;
+
+            const [, isClosing, marker] = match;
+
+            if (!isClosing) {
+                depth++;
+                openMarkers.set(marker, { node, depth });
+                continue;
+            }
+
+            const start = openMarkers.get(marker);
+            openMarkers.delete(marker);
+            depth = Math.max(0, depth - 1);
+
+            // Browser repair or application morphing can invalidate a boundary pair.
+            if (!start || start.node.parentNode !== node.parentNode) continue;
+
+            const range = doc.createRange();
+            range.setStartAfter(start.node);
+            range.setEndBefore(node);
+            addEntry(index, manifest, marker, { element: node.parentElement, range, depth: start.depth });
         }
+
+        return index;
     }
 
-    function getRects(entry) {
-        if (entry.range) {
-            return Array.from(entry.range.getClientRects());
-        }
+    function reindex() {
+        index = buildIndex();
+        hoveredEntry = null;
+        draw();
+    }
 
-        return [entry.element.getBoundingClientRect()];
+    function entriesFor(path) {
+        return index.byPath.get(path) ?? [];
     }
 
     function getScrollContainers(entry) {
@@ -137,7 +142,7 @@ export function createFieldSync(doc, onSelect) {
     }
 
     function scrollToField(path) {
-        const matches = (entriesByPath.get(path) ?? []).flatMap(entry => {
+        const matches = entriesFor(path).flatMap(entry => {
             return getRects(entry)
                 .filter(rect => rect.width && rect.height)
                 .map(rect => ({ entry, rect }));
@@ -148,6 +153,7 @@ export function createFieldSync(doc, onSelect) {
 
         const distanceFromCenter = match => Math.abs(match.rect.top - win.innerHeight / 2);
         const nearest = matches.sort((a, b) => distanceFromCenter(a) - distanceFromCenter(b))[0];
+
         scrollEntryIntoView(nearest.entry);
     }
 
@@ -174,7 +180,7 @@ export function createFieldSync(doc, onSelect) {
         const candidates = [];
 
         for (let el = event.target; el; el = el.parentElement) {
-            for (const entry of entriesByElement.get(el) ?? []) {
+            for (const entry of index.byElement.get(el) ?? []) {
                 if (entry.fields.length !== 1) continue;
 
                 const containsPointer = getRects(entry).some(rect => {
@@ -182,10 +188,9 @@ export function createFieldSync(doc, onSelect) {
                         && event.clientY >= rect.top && event.clientY <= rect.bottom;
                 });
 
-                if (containsPointer) {
-                    candidates.push(entry);
-                }
+                if (containsPointer) candidates.push(entry);
             }
+
             if (candidates.length) break;
         }
 
@@ -193,23 +198,19 @@ export function createFieldSync(doc, onSelect) {
         return candidates.sort((a, b) => b.depth - a.depth)[0] ?? null;
     }
 
-    function highlightColor(element) {
-        const ancestors = [];
-        for (let current = element; current; current = current.parentElement) {
-            ancestors.unshift(current);
-        }
+    function draw() {
+        if (disposed) return;
 
-        colors.fillStyle = win.getComputedStyle(doc.documentElement).colorScheme === 'dark' ? '#121212' : '#ffffff';
-        colors.fillRect(0, 0, 1, 1);
-        for (const ancestor of ancestors) {
-            colors.fillStyle = win.getComputedStyle(ancestor).backgroundColor;
-            colors.fillRect(0, 0, 1, 1);
-        }
+        highlights.draw(hoveredEntry ? [hoveredEntry] : entriesFor(selectedPath), { faded: fading && !hoveredEntry });
+    }
 
-        const [red, green, blue] = colors.getImageData(0, 0, 1, 1).data;
-        const brightness = (red * 299 + green * 587 + blue * 114) / 1000;
+    function scheduleDraw() {
+        if (frame !== null) return;
 
-        return brightness < 128 ? '147 197 253' : '59 130 246';
+        frame = win.requestAnimationFrame(() => {
+            frame = null;
+            draw();
+        });
     }
 
     function showHighlight(path, duration = fieldHighlightDuration) {
@@ -218,65 +219,18 @@ export function createFieldSync(doc, onSelect) {
         selectedPath = path;
         hoveredEntry = null;
         fading = false;
-        drawHighlights();
+        draw();
 
         hideTimer = win.setTimeout(() => {
             fading = true;
-            drawHighlights();
+            draw();
+
             clearTimer = win.setTimeout(() => {
                 selectedPath = null;
                 fading = false;
-                drawHighlights();
-            }, fadeDuration);
+                draw();
+            }, highlights.fadeDuration);
         }, duration);
-    }
-
-    function drawHighlights() {
-        if (disposed) return;
-
-        overlay.replaceChildren();
-        overlay.style.opacity = fading && !hoveredEntry ? '0' : '1';
-        let entries;
-        if (hoveredEntry) {
-            entries = [hoveredEntry];
-        } else {
-            entries = entriesByPath.get(selectedPath) ?? [];
-        }
-        const boxes = new Set();
-
-        for (const entry of entries) {
-            const rect = entry.range?.getBoundingClientRect() ?? entry.element.getBoundingClientRect();
-
-            if (!rect.width || !rect.height || rect.bottom < 0 || rect.top > win.innerHeight) continue;
-            const key = [rect.left, rect.top, rect.width, rect.height].join(',');
-            if (boxes.has(key)) continue;
-            boxes.add(key);
-
-            const color = highlightColor(entry.element);
-            const box = doc.createElement('div');
-            Object.assign(box.style, {
-                position: 'absolute',
-                left: `${rect.left - 3}px`,
-                top: `${rect.top - 3}px`,
-                width: `${rect.width + 6}px`,
-                height: `${rect.height + 6}px`,
-                border: `1px solid rgb(${color} / 85%)`,
-                background: `rgb(${color} / 5%)`,
-                boxShadow: `0 0 0 2px rgb(${color} / 10%)`,
-                borderRadius: '5px',
-                boxSizing: 'border-box',
-            });
-            overlay.append(box);
-        }
-    }
-
-    function scheduleDraw() {
-        if (frame !== null) return;
-
-        frame = win.requestAnimationFrame(() => {
-            frame = null;
-            drawHighlights();
-        });
     }
 
     function handlePointerMove(event) {
@@ -303,29 +257,44 @@ export function createFieldSync(doc, onSelect) {
         onSelect(entry.fields[0]);
     }
 
+    function handleKeydown(event) {
+        if (!selecting || event.key !== 'Escape') return;
+
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        selecting = false;
+        hoveredEntry = null;
+        draw();
+        onCancel();
+    }
+
     const observer = new win.MutationObserver(mutations => {
         // Ignore our own drawing when watching for body replacements.
-        if (mutations.some(mutation => !overlay.contains(mutation.target))) indexFields();
+        if (mutations.some(mutation => !highlights.contains(mutation.target))) reindex();
     });
+
     observer.observe(doc.documentElement, {
         subtree: true,
         childList: true,
         characterData: true,
         attributes: true,
-        attributeFilter: ['data-statamic-field'],
+        attributeFilter: [fieldAttribute],
     });
+
     doc.addEventListener('pointermove', handlePointerMove);
     doc.addEventListener('pointerleave', handlePointerLeave);
     doc.addEventListener('click', handleClick, true);
+    doc.addEventListener('keydown', handleKeydown, true);
     win.addEventListener('scroll', scheduleDraw, true);
     win.addEventListener('resize', scheduleDraw);
-    indexFields();
+
+    reindex();
 
     return {
         select(enabled) {
             selecting = enabled;
             hoveredEntry = null;
-            drawHighlights();
+            draw();
         },
         highlight(path, duration = fieldHighlightDuration) {
             scrollToField(path);
@@ -340,9 +309,10 @@ export function createFieldSync(doc, onSelect) {
             doc.removeEventListener('pointermove', handlePointerMove);
             doc.removeEventListener('pointerleave', handlePointerLeave);
             doc.removeEventListener('click', handleClick, true);
+            doc.removeEventListener('keydown', handleKeydown, true);
             win.removeEventListener('scroll', scheduleDraw, true);
             win.removeEventListener('resize', scheduleDraw);
-            overlay.remove();
+            highlights.dispose();
         },
     };
 }
@@ -356,4 +326,6 @@ export function findPublishField(container, path) {
         if (field) return field;
         parts.pop();
     }
+
+    return null;
 }

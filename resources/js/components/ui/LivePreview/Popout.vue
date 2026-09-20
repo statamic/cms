@@ -5,18 +5,31 @@ import { onMounted, onUnmounted, ref, useTemplateRef } from 'vue';
 const channel = ref(null);
 const iframeContentContainer = useTemplateRef('contents');
 
-const { updateIframeContents, selectFields, highlightField, dispose } = useIframeManager(
+const { updateIframeContents, selectFields, highlightField, isSelectingFields, dispose } = useIframeManager(
     iframeContentContainer,
     field => channel.value?.postMessage({ event: 'field.selected', field }),
+    cancelSelecting,
 );
 
 function setIframeAttributes(iframe) {
     iframe.setAttribute('class', 'min-h-screen');
 }
 
+function cancelSelecting() {
+    selectFields(false);
+    channel.value?.postMessage({ event: 'field.selecting', enabled: false });
+}
+
+function handleKeydown(event) {
+    if (event.key !== 'Escape' || !isSelectingFields()) return;
+
+    cancelSelecting();
+}
+
 onMounted(() => {
-    const session = new URL(window.location.href).searchParams.get('preview-session') || 'livepreview';
-    channel.value = new BroadcastChannel(session);
+    const channelName = new URL(window.location.href).searchParams.get('preview-session') || 'livepreview';
+
+    channel.value = new BroadcastChannel(channelName);
 
     channel.value.onmessage = (e) => {
         switch (e.data.event) {
@@ -39,9 +52,12 @@ onMounted(() => {
     };
 
     channel.value.postMessage({ event: 'popout.opened' });
+
+    window.addEventListener('keydown', handleKeydown);
 });
 
 onUnmounted(() => {
+    window.removeEventListener('keydown', handleKeydown);
     dispose();
     channel.value?.close();
 });
