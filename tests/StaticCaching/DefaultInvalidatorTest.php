@@ -966,6 +966,68 @@ class DefaultInvalidatorTest extends TestCase
     }
 
     #[Test]
+    public function navigation_urls_are_made_absolute_in_a_multisite_with_relative_site_urls()
+    {
+        $this->setSites([
+            'de' => ['url' => '/de/', 'locale' => 'de_DE'],
+            'fr' => ['url' => '/fr/', 'locale' => 'fr_FR'],
+        ]);
+
+        $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
+            $cacher->shouldReceive('invalidateUrls')->with([
+                'http://localhost/de/*',
+                'http://localhost/fr/*',
+            ])->once();
+        });
+
+        $nav = tap(Mockery::mock(Nav::class), function ($m) {
+            $m->shouldReceive('handle')->andReturn('links');
+            $m->shouldReceive('sites')->andReturn(collect(['de', 'fr']));
+            $m->shouldReceive('toAugmentedCollection')->andReturn(collect());
+        });
+
+        $invalidator = new Invalidator($cacher, [
+            'navigation' => [
+                'links' => [
+                    'urls' => ['/*'],
+                ],
+            ],
+        ]);
+
+        $this->assertNull($invalidator->invalidate($nav));
+    }
+
+    #[Test]
+    public function absolute_navigation_urls_are_tidied()
+    {
+        $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
+            $cacher->shouldReceive('invalidateUrls')->with([
+                'http://localhost/de/*',
+                'http://localhost/fr',
+            ])->once();
+        });
+
+        $nav = tap(Mockery::mock(Nav::class), function ($m) {
+            $m->shouldReceive('handle')->andReturn('links');
+            $m->shouldReceive('sites')->andReturn(collect(['en']));
+            $m->shouldReceive('toAugmentedCollection')->andReturn(collect());
+        });
+
+        $invalidator = new Invalidator($cacher, [
+            'navigation' => [
+                'links' => [
+                    'urls' => [
+                        'http://localhost//de/*',
+                        'http://localhost//fr/',
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertNull($invalidator->invalidate($nav));
+    }
+
+    #[Test]
     public function navigation_urls_can_be_invalidated_by_a_tree()
     {
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
