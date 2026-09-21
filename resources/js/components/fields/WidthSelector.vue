@@ -33,10 +33,11 @@ const selected = computed(() => {
 const selectedSpan = computed(() => widthToColumnSpan(selected.value))
 
 const wrapperClasses = cva({
-    base: 'relative text-gray-600 dark:text-gray-400 font-mono antialiased bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 with-contrast:border-gray-500 overflow-hidden flex cursor-pointer',
+    base: 'relative text-gray-600 dark:text-gray-400 font-mono antialiased bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 with-contrast:border-gray-500 overflow-hidden flex cursor-pointer shadow-ui-sm',
     variants: {
         size: {
             base: 'h-6 w-14 text-xs rounded-md',
+            md: 'h-8 w-16 text-xs rounded-lg',
             lg: 'h-10 w-24 text-sm rounded-lg',
         },
     },
