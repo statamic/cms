@@ -2,9 +2,15 @@
 
 namespace Tests\StaticCaching;
 
+use Illuminate\Contracts\Cache\Repository;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Events\ResponsePrepared;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Queue;
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Console\Commands\StaticWarmJob;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Assets\AssetContainer;
 use Statamic\Contracts\Entries\Collection;
@@ -20,6 +26,7 @@ use Statamic\Facades\URL;
 use Statamic\Globals\Variables;
 use Statamic\Sites\Site as SiteModel;
 use Statamic\StaticCaching\Cacher;
+use Statamic\StaticCaching\Cachers\ApplicationCacher;
 use Statamic\StaticCaching\DefaultInvalidator as Invalidator;
 use Statamic\Structures\CollectionTree;
 use Statamic\Structures\CollectionTreeDiff;
@@ -963,6 +970,124 @@ class DefaultInvalidatorTest extends TestCase
         ]);
 
         $this->assertNull($invalidator->invalidate($nav));
+    }
+
+    #[Test]
+    public function navigation_urls_are_made_absolute_in_a_multisite_with_relative_site_urls()
+    {
+        $this->setSites([
+            'de' => ['url' => '/de/', 'locale' => 'de_DE'],
+            'fr' => ['url' => '/fr/', 'locale' => 'fr_FR'],
+        ]);
+
+        $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
+            $cacher->shouldReceive('invalidateUrls')->with([
+                'http://localhost/de/*',
+                'http://localhost/fr/*',
+            ])->once();
+        });
+
+        $nav = tap(Mockery::mock(Nav::class), function ($m) {
+            $m->shouldReceive('handle')->andReturn('links');
+            $m->shouldReceive('sites')->andReturn(collect(['de', 'fr']));
+            $m->shouldReceive('toAugmentedCollection')->andReturn(collect());
+        });
+
+        $invalidator = new Invalidator($cacher, [
+            'navigation' => [
+                'links' => [
+                    'urls' => ['/*'],
+                ],
+            ],
+        ]);
+
+        $this->assertNull($invalidator->invalidate($nav));
+    }
+
+    #[Test]
+    public function absolute_navigation_urls_are_tidied()
+    {
+        $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
+            $cacher->shouldReceive('invalidateUrls')->with([
+                'http://localhost/de/*',
+                'http://localhost/fr',
+            ])->once();
+        });
+
+        $nav = tap(Mockery::mock(Nav::class), function ($m) {
+            $m->shouldReceive('handle')->andReturn('links');
+            $m->shouldReceive('sites')->andReturn(collect(['en']));
+            $m->shouldReceive('toAugmentedCollection')->andReturn(collect());
+        });
+
+        $invalidator = new Invalidator($cacher, [
+            'navigation' => [
+                'links' => [
+                    'urls' => [
+                        'http://localhost//de/*',
+                        'http://localhost//fr/',
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertNull($invalidator->invalidate($nav));
+    }
+
+    #[Test]
+    #[DataProvider('wildcardRulesWithTrailingSlashes')]
+    public function wildcard_rules_work_with_trailing_slash_enforcement($rule, $path, $method)
+    {
+        URL::enforceTrailingSlashes();
+        config(['statamic.static_caching.background_recache' => true]);
+        Queue::fake();
+
+        $cacher = new ApplicationCacher(app(Repository::class), []);
+        $request = Request::create('http://localhost'.$path);
+        $unrelatedRequest = Request::create('http://localhost/other/');
+
+        foreach ([$request, $unrelatedRequest] as $cachedRequest) {
+            $response = response('cached content');
+            $cacher->cachePage($cachedRequest, $response);
+            event(new ResponsePrepared($cachedRequest, $response));
+            $this->assertTrue($cacher->hasCachedPage($cachedRequest));
+        }
+
+        $nav = tap(Mockery::mock(Nav::class), function ($m) {
+            $m->shouldReceive('handle')->andReturn('links');
+            $m->shouldReceive('sites')->andReturn(collect(['en']));
+            $m->shouldReceive('toAugmentedCollection')->andReturn(collect());
+        });
+
+        $invalidator = new Invalidator($cacher, [
+            'navigation' => ['links' => ['urls' => [$rule]]],
+        ]);
+
+        $invalidator->{$method}($nav);
+
+        if ($method === 'refresh') {
+            Queue::assertPushed(StaticWarmJob::class, 1);
+            Queue::assertPushed(StaticWarmJob::class, fn ($job) => $job->request->getUri()->getPath() === $path);
+        } else {
+            $this->assertFalse($cacher->hasCachedPage($request));
+            Queue::assertNothingPushed();
+        }
+
+        $this->assertTrue($cacher->hasCachedPage($unrelatedRequest));
+    }
+
+    public static function wildcardRulesWithTrailingSlashes()
+    {
+        foreach ([
+            'absolute subtree' => ['http://localhost//blog/*', '/blog/one/'],
+            'relative subtree' => ['/blog/*', '/blog/one/'],
+            'absolute prefix' => ['http://localhost/blog*', '/blogroll/'],
+            'relative prefix' => ['/blog*', '/blogroll/'],
+        ] as $name => [$rule, $path]) {
+            foreach (['invalidate', 'refresh'] as $method) {
+                yield "$name $method" => [$rule, $path, $method];
+            }
+        }
     }
 
     #[Test]
