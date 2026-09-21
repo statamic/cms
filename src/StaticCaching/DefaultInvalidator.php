@@ -285,21 +285,20 @@ class DefaultInvalidator implements Invalidator
 
     private function resolveRuleUrls(IlluminateCollection $rules, iterable $sites): array
     {
-        $absoluteUrls = $rules
-            ->filter(fn (string $rule) => URL::isAbsolute($rule))
-            ->map(fn (string $rule) => URL::tidy($rule));
+        $absoluteUrls = $rules->filter(fn (string $rule) => URL::isAbsolute($rule));
 
         // Prefix with the absolute site URL so the cacher can resolve the domain. A relative
         // site URL (e.g. "/de") would otherwise fall back to the cacher's base URL, which
         // includes the current site's path and never matches the host-only cached domains.
         $prefixedRelativeUrls = collect($sites)->flatMap(fn ($site) => $rules
             ->reject(fn (string $rule) => URL::isAbsolute($rule))
-            ->map(fn (string $rule) => URL::tidy($site->absoluteUrl().'/'.$rule)));
+            ->map(fn (string $rule) => $site->absoluteUrl().'/'.$rule));
 
-        return [
-            ...$absoluteUrls->values()->all(),
-            ...$prefixedRelativeUrls->values()->all(),
-        ];
+        // The cacher removes the final character of wildcard rules, so keep the asterisk last.
+        return $absoluteUrls->concat($prefixedRelativeUrls)
+            ->map(fn (string $url) => URL::tidy($url, withTrailingSlash: Str::endsWith($url, '*') ? false : null))
+            ->values()
+            ->all();
     }
 
     private function parseInvalidationRules(array $rules, array $context = []): IlluminateCollection
