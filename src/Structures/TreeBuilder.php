@@ -5,6 +5,7 @@ namespace Statamic\Structures;
 use Statamic\Contracts\Structures\Nav;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Structure;
+use Statamic\Facades\Term;
 use Statamic\Facades\User;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -32,14 +33,23 @@ class TreeBuilder
         $tree->withEntries();
 
         $entry = null;
+        $fromPage = null;
 
         if ($from && $from !== '/') {
-            if (! $entry = Entry::findByUri(Str::start($from, '/'), $params['site'])) {
+            if ($structure instanceof TaxonomyStructure) {
+                $fromPage = $this->findTaxonomyPage($tree, $from, $params['site']);
+
+                if (! $fromPage) {
+                    return [];
+                }
+            } elseif (! $entry = Entry::findByUri(Str::start($from, '/'), $params['site'])) {
                 return [];
             }
         }
 
-        if ($entry) {
+        if ($fromPage) {
+            $pages = $fromPage->pages()->all();
+        } elseif ($entry) {
             $page = $tree->find($entry->id());
             $pages = $page->pages()->all();
         } else {
@@ -70,12 +80,61 @@ class TreeBuilder
                 return null;
             }
 
-            return [
+            $isTaxonomy = $page->structure() instanceof TaxonomyStructure;
+
+            $term = $isTaxonomy ? $this->hydrateTaxonomyPage($page, $params['site']) : null;
+
+            $branch = [
                 'page' => $page->selectedQueryColumns($fields),
                 'depth' => $depth,
                 'children' => $this->toTree($page->pages()->all(), $params, $depth + 1),
             ];
+
+            if ($isTaxonomy) {
+                $branch['term'] = $term;
+            }
+
+            return $branch;
         })->filter()->values()->all();
+    }
+
+    private function findTaxonomyPage($tree, string $from, string $site): ?Page
+    {
+        if ($term = Term::findByUri(Str::start($from, '/'), $site)) {
+            return $tree->find($term->inDefaultLocale()->slug());
+        }
+
+        $slug = Str::afterLast(trim($from, '/'), '/');
+
+        if ($page = $tree->find($slug)) {
+            return $page;
+        }
+
+        $taxonomy = $tree->structure()->taxonomy();
+
+        foreach ($tree->flattenedPages() as $page) {
+            $term = Term::find($taxonomy->handle().'::'.$page->id());
+
+            if ($term && $term->in($site)->slug() === $slug) {
+                return $page;
+            }
+        }
+
+        return null;
+    }
+
+    private function hydrateTaxonomyPage(Page $page, string $site)
+    {
+        $term = Term::find($page->structure()->handle().'::'.$page->id())?->in($site);
+
+        if (! $term) {
+            return null;
+        }
+
+        $page->setTitle($term->title());
+        $page->setUrl($term->url());
+
+        return $term;
     }
 
     public function buildForController($params)

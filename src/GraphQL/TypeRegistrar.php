@@ -26,6 +26,8 @@ use Statamic\GraphQL\Types\RoleType;
 use Statamic\GraphQL\Types\SectionType;
 use Statamic\GraphQL\Types\SiteType;
 use Statamic\GraphQL\Types\TableRowType;
+use Statamic\GraphQL\Types\TaxonomyStructureType;
+use Statamic\GraphQL\Types\TaxonomyTreeBranchType;
 use Statamic\GraphQL\Types\TaxonomyType;
 use Statamic\GraphQL\Types\TermInterface;
 use Statamic\GraphQL\Types\UserGroupType;
@@ -50,6 +52,8 @@ class TypeRegistrar
         GraphQL::addType(CollectionType::class);
         GraphQL::addType(CollectionStructureType::class);
         GraphQL::addType(TaxonomyType::class);
+        GraphQL::addType(TaxonomyStructureType::class);
+        GraphQL::addType(TaxonomyTreeBranchType::class);
         GraphQL::addType(AssetContainerType::class);
         GraphQL::addType(NavType::class);
         GraphQL::addType(CollectionTreeBranchType::class);

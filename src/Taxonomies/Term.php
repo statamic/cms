@@ -232,6 +232,13 @@ class Term implements ContainsQueryableValues, TermContract
 
         Facades\Term::save($this);
 
+        if ($isNew && ($taxonomy = $this->taxonomy())->hasStructure()) {
+            // The term only gets appended to the tree when it's read, so anything that
+            // read it before now would have cached a version without this term in it.
+            $taxonomy->structure()->flushCache();
+            $taxonomy->updateTermOrder([$this->id()]);
+        }
+
         foreach ($afterSaveCallbacks as $callback) {
             $callback($this);
         }
@@ -266,6 +273,12 @@ class Term implements ContainsQueryableValues, TermContract
         }
 
         Facades\Term::delete($this);
+
+        if (($taxonomy = $this->taxonomy())->hasStructure()) {
+            // Anything that read the tree before now would have cached a version
+            // that still has this term in it.
+            $taxonomy->structure()->flushCache();
+        }
 
         if ($withEvents) {
             TermDeleted::dispatch($this);
@@ -315,7 +328,7 @@ class Term implements ContainsQueryableValues, TermContract
     private function queryableMethods(): array
     {
         return [
-            'blueprint', 'collection', 'entriesCount', 'id', 'path', 'reference',
+            'blueprint', 'collection', 'entriesCount', 'id', 'order', 'path', 'reference',
             'slug', 'taxonomy', 'taxonomyHandle', 'title',
         ];
     }

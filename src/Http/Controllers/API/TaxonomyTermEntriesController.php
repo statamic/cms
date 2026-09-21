@@ -39,6 +39,10 @@ class TaxonomyTermEntriesController extends ApiController
 
         $query = $term->queryEntries();
 
+        if (request()->has('with_descendants') && ! request()->boolean('with_descendants')) {
+            $query->withTaxonomyDescendants(false);
+        }
+
         $this->allowedCollections = $this->allowedCollections();
 
         foreach ($this->allowedCollections as $collection) {

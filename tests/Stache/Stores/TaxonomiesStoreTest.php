@@ -104,6 +104,54 @@ YAML;
     }
 
     #[Test]
+    public function it_does_not_hydrate_a_structure_when_the_key_is_absent()
+    {
+        $item = $this->store->makeItemFromFile($this->tempDir.'/example.yaml', 'title: Example');
+
+        $this->assertFalse($item->hasStructure());
+    }
+
+    #[Test]
+    public function it_does_not_hydrate_a_structure_when_the_value_is_false()
+    {
+        $item = $this->store->makeItemFromFile($this->tempDir.'/example.yaml', "title: Example\nstructure: false");
+
+        $this->assertFalse($item->hasStructure());
+    }
+
+    #[Test]
+    public function it_does_not_hydrate_a_structure_when_the_value_is_true()
+    {
+        $item = $this->store->makeItemFromFile($this->tempDir.'/example.yaml', "title: Example\nstructure: true");
+
+        $this->assertFalse($item->hasStructure());
+    }
+
+    #[Test]
+    public function it_hydrates_an_unbounded_structure_when_the_value_is_an_empty_array()
+    {
+        $item = $this->store->makeItemFromFile($this->tempDir.'/example.yaml', "title: Example\nstructure: {}");
+
+        $this->assertTrue($item->hasStructure());
+        $this->assertNull($item->structure()->maxDepth());
+    }
+
+    #[Test]
+    public function it_hydrates_a_structure_with_a_max_depth()
+    {
+        $contents = <<<'YAML'
+title: Example
+structure:
+  max_depth: 3
+YAML;
+
+        $item = $this->store->makeItemFromFile($this->tempDir.'/example.yaml', $contents);
+
+        $this->assertTrue($item->hasStructure());
+        $this->assertEquals(3, $item->structure()->maxDepth());
+    }
+
+    #[Test]
     public function it_uses_the_filename_as_the_item_key()
     {
         $this->assertEquals(

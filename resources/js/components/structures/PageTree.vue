@@ -111,6 +111,7 @@ export default {
         submitParameters: { type: Object, default: () => ({}) },
         createUrl: { type: String },
         site: { type: String, required: true },
+        submitSite: { type: Boolean, default: true },
         localizations: { type: Array },
         maxDepth: { type: Number, default: Infinity },
         expectsRoot: { type: Boolean, required: true },
@@ -248,7 +249,7 @@ export default {
 
             const payload = {
                 pages: this.cleanPagesForSubmission(this.pages),
-                site: this.site,
+                ...(this.submitSite ? { site: this.site } : {}),
                 expectsRoot: this.expectsRoot,
                 ...this.submitParameters,
             };

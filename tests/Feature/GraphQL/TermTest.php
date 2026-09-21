@@ -126,6 +126,140 @@ GQL;
     }
 
     #[Test]
+    public function it_queries_the_nesting_of_a_term()
+    {
+        // The REST API keeps its term output flat, but that's done by checking for an
+        // API route, so GraphQL should still be able to traverse a structure.
+        config(['statamic.api.enabled' => true]);
+
+        tap(Taxonomy::make('categories')->structureContents([]))->save();
+
+        foreach (['animals', 'cat', 'calico'] as $slug) {
+            tap(Term::make($slug)->taxonomy('categories')->data(['title' => ucfirst($slug)]))->save();
+        }
+
+        Taxonomy::findByHandle('categories')->structure()->tree()->tree([
+            ['term' => 'animals', 'children' => [
+                ['term' => 'cat', 'children' => [
+                    ['term' => 'calico'],
+                ]],
+            ]],
+        ])->save();
+
+        $query = <<<'GQL'
+{
+    term(id: "categories::cat") {
+        title
+        ... on Term_Categories_Category {
+            depth
+            parent { title }
+            children { title }
+            ancestors { title }
+        }
+    }
+}
+GQL;
+
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'taxonomies')->andReturnTrue()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'taxonomies')->andReturn(Taxonomy::all()->map->handle()->all())->once();
+        ResourceAuthorizer::makePartial();
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => [
+                'term' => [
+                    'title' => 'Cat',
+                    'depth' => 2,
+                    'parent' => ['title' => 'Animals'],
+                    'children' => [['title' => 'Calico']],
+                    'ancestors' => [['title' => 'Animals']],
+                ],
+            ]]);
+    }
+
+    #[Test]
+    public function a_flat_taxonomy_keeps_its_own_nesting_named_blueprint_fields()
+    {
+        $this->createFlatTaxonomyWithNestingNamedFields();
+
+        $query = <<<'GQL'
+{
+    term(id: "tags::alpha") {
+        id
+        ... on Term_Tags_Tag {
+            parent
+            children
+            ancestors
+            depth
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => [
+                'term' => [
+                    'id' => 'tags::alpha',
+                    'parent' => 'the parent',
+                    'children' => 'the children',
+                    'ancestors' => 'the ancestors',
+                    'depth' => 'the depth',
+                ],
+            ]]);
+    }
+
+    #[Test]
+    public function a_flat_taxonomys_nesting_named_blueprint_fields_keep_their_own_types()
+    {
+        $this->createFlatTaxonomyWithNestingNamedFields();
+
+        $query = <<<'GQL'
+{
+    term(id: "tags::alpha") {
+        ... on Term_Tags_Tag {
+            parent { title }
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertJson(['errors' => [[
+                'message' => 'Field "parent" of type "String" must not have a sub selection.',
+            ]]]);
+    }
+
+    private function createFlatTaxonomyWithNestingNamedFields()
+    {
+        BlueprintRepository::partialMock();
+
+        $blueprint = Blueprint::makeFromFields([
+            'parent' => ['type' => 'text'],
+            'children' => ['type' => 'text'],
+            'ancestors' => ['type' => 'text'],
+            'depth' => ['type' => 'text'],
+        ])->setHandle('tag');
+        BlueprintRepository::shouldReceive('in')->with('taxonomies/tags')->andReturn(collect(['tag' => $blueprint]));
+
+        Taxonomy::make('tags')->save();
+
+        Term::make()->taxonomy('tags')->inDefaultLocale()->slug('alpha')->data([
+            'title' => 'Alpha',
+            'parent' => 'the parent',
+            'children' => 'the children',
+            'ancestors' => 'the ancestors',
+            'depth' => 'the depth',
+        ])->save();
+    }
+
+    #[Test]
     public function it_can_add_custom_fields_to_interface()
     {
         GraphQL::addField('TermInterface', 'one', function () {

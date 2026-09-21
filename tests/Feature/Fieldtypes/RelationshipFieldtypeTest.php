@@ -673,6 +673,84 @@ class RelationshipFieldtypeTest extends TestCase
     }
 
     #[Test]
+    public function it_scopes_structure_listing_to_viewable_taxonomies()
+    {
+        tap(Taxonomy::make('topics')->title('Topics')->structureContents([]))->save();
+        tap(Taxonomy::make('secret')->title('Secret')->structureContents([]))->save();
+        Taxonomy::make('flat')->title('Flat')->save();
+
+        $this->setTestRoles(['test' => ['access cp', 'view topics terms', 'view flat terms']]);
+        $user = User::make()->assignRole('test')->save();
+
+        $config = base64_encode(json_encode(['type' => 'structures']));
+
+        $response = $this
+            ->actingAs($user)
+            ->getJson("/cp/fieldtypes/relationship?config={$config}")
+            ->assertOk();
+
+        $ids = collect($response->json('data'))->pluck('id')->all();
+
+        $this->assertContains('taxonomy::topics', $ids);
+        $this->assertNotContains('taxonomy::secret', $ids);
+        $this->assertNotContains('taxonomy::flat', $ids);
+    }
+
+    #[Test]
+    public function it_resolves_a_taxonomy_structure_by_id()
+    {
+        tap(Taxonomy::make('topics')->title('Topics')->structureContents([]))->save();
+
+        $this->setTestRoles(['test' => ['access cp', 'view topics terms']]);
+        $user = User::make()->assignRole('test')->save();
+
+        $response = $this
+            ->actingAs($user)
+            ->postJson('/cp/fieldtypes/relationship/data', [
+                'config' => base64_encode(json_encode(['type' => 'structures'])),
+                'selections' => ['taxonomy::topics'],
+            ])
+            ->assertOk();
+
+        $this->assertEquals(
+            ['id' => 'taxonomy::topics', 'title' => 'Topics'],
+            $response->json('data.0')
+        );
+    }
+
+    #[Test]
+    public function a_taxonomy_structure_does_not_collide_with_a_nav_of_the_same_handle()
+    {
+        Nav::make('topics')->title('Topics Nav')->save();
+        tap(Taxonomy::make('topics')->title('Topics Taxonomy')->structureContents([]))->save();
+
+        $config = base64_encode(json_encode(['type' => 'structures']));
+        $user = User::make()->makeSuper()->save();
+
+        $listing = $this
+            ->actingAs($user)
+            ->getJson("/cp/fieldtypes/relationship?config={$config}")
+            ->assertOk();
+
+        $this->assertEquals([
+            ['id' => 'topics', 'title' => 'Topics Nav'],
+            ['id' => 'taxonomy::topics', 'title' => 'Topics Taxonomy'],
+        ], $listing->json('data'));
+
+        $byId = $this
+            ->actingAs($user)
+            ->postJson('/cp/fieldtypes/relationship/data', [
+                'config' => $config,
+                'selections' => ['topics', 'taxonomy::topics'],
+            ])
+            ->assertOk();
+
+        $data = collect($byId->json('data'))->keyBy('id');
+        $this->assertEquals('Topics Nav', $data['topics']['title']);
+        $this->assertEquals('Topics Taxonomy', $data['taxonomy::topics']['title']);
+    }
+
+    #[Test]
     public function it_scopes_form_listing_to_viewable_forms()
     {
         Form::make('contact')->title('Contact')->save();

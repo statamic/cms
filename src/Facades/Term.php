@@ -24,6 +24,7 @@ use Statamic\Taxonomies\TermCollection;
  * @method static int entriesCount(Term $term)
  * @method static void substitute($item)
  * @method static \Illuminate\Support\Collection applySubstitutions($items)
+ * @method static void updateOrders(\Statamic\Taxonomies\Taxonomy $taxonomy, $ids = null)
  *
  * @see \Statamic\Contracts\Taxonomies\TermRepository
  * @link \Statamic\Taxonomies\Term

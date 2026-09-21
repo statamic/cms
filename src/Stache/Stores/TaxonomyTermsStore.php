@@ -13,6 +13,7 @@ use Statamic\Stache\Indexes;
 use Statamic\Stache\Indexes\Terms\Value;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
+use Statamic\Taxonomies\EnsuresTermPaths;
 use Symfony\Component\Finder\SplFileInfo;
 
 class TaxonomyTermsStore extends ChildStore
@@ -21,6 +22,7 @@ class TaxonomyTermsStore extends ChildStore
     protected $storeIndexes = [
         'slug',
         'taxonomy',
+        'order',
         'associations' => Indexes\Terms\Associations::class,
         'site' => Indexes\Terms\Site::class,
     ];
@@ -84,7 +86,11 @@ class TaxonomyTermsStore extends ChildStore
 
         [$site, $slug] = explode('::', $key);
 
-        if ($path = $this->getPath($key)) {
+        // Association indexes create extra `{site}::{slug}` keys for every site an
+        // entry uses the term. If the taxonomy isn't enabled in that site, there's
+        // no path for the key — fall back to the term's file so we don't return a
+        // title-from-slug stub that shadows the real term on save/reload.
+        if ($path = $this->getPath($key) ?? $this->pathForSlug($slug)) {
             $term = $this->makeItemFromFile($path, File::get($path));
         } else {
             $term = Term::make($slug)
@@ -101,12 +107,27 @@ class TaxonomyTermsStore extends ChildStore
         return $item;
     }
 
+    private function pathForSlug(string $slug): ?string
+    {
+        return $this->paths()->first(
+            fn ($path, $key) => Str::after((string) $key, '::') === $slug
+        );
+    }
+
     public function sync($entry, $terms)
     {
         $taxonomy = $this->childKey();
+        $paths = new EnsuresTermPaths;
+        $lang = $entry->site()->lang();
 
-        $terms = collect(Arr::wrap($terms))->mapWithKeys(function ($value) {
-            return [Str::slug($value) => $value];
+        $terms = collect(Arr::wrap($terms))->mapWithKeys(function ($value) use ($paths, $lang) {
+            if ($value === null || $value === '') {
+                return [];
+            }
+
+            $slug = $paths->slugFromValue($value, $lang);
+
+            return $slug ? [$slug => $value] : [];
         });
 
         $indexes = $this->resolveIndexes()->except('associations');
@@ -204,10 +225,10 @@ class TaxonomyTermsStore extends ChildStore
 
         $this->writeItemToDisk($term);
 
+        $this->forgetItemsForSlug($term->inDefaultLocale()->slug());
+
         foreach ($term->localizations() as $item) {
             $key = $this->getItemKey($item);
-
-            $this->forgetItem($key);
 
             $this->setPath($key, $item->path());
 
@@ -215,6 +236,33 @@ class TaxonomyTermsStore extends ChildStore
 
             $this->cacheItem($item);
         }
+    }
+
+    public function updateOrders($ids = null)
+    {
+        $this->updateTermsWithinIndex($this->index('order'), $ids);
+    }
+
+    private function updateTermsWithinIndex($index, $ids)
+    {
+        if (collect($ids)->isEmpty()) {
+            return $index->update();
+        }
+
+        collect($ids)
+            ->map(fn ($id) => Term::find($id))
+            ->filter()
+            ->flatMap(fn ($term) => $term->term()->localizations()->values())
+            ->each(fn ($term) => $index->updateItem($term));
+    }
+
+    private function forgetItemsForSlug(string $slug): void
+    {
+        $this->paths()->keys()
+            ->merge($this->index('title')->keys())
+            ->filter(fn ($key) => Str::after((string) $key, '::') === $slug)
+            ->unique()
+            ->each(fn ($key) => $this->forgetItem($key));
     }
 
     public function delete($term)

@@ -27,6 +27,7 @@ class UpdateTermReferencesTest extends TestCase
         $this->setSites([
             'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
             'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+            'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://de.test.com/'],
         ]);
 
         $this->topics = tap(Facades\Taxonomy::make('topics'))->save();
@@ -197,7 +198,7 @@ class UpdateTermReferencesTest extends TestCase
         $this->assertEquals('norris', $entry->get('non_favourite'));
         $this->assertEquals(['hoff', 'norris'], $entry->get('favourites'));
 
-        $this->termHoff->delete();
+        Facades\Term::find('topics::hoff')->delete();
 
         $this->assertFalse($entry->fresh()->has('favourite'));
         $this->assertEquals('norris', $entry->fresh()->get('non_favourite'));
@@ -207,6 +208,183 @@ class UpdateTermReferencesTest extends TestCase
 
         $this->assertFalse($entry->fresh()->has('non_favourite'));
         $this->assertFalse($entry->fresh()->has('favourites'));
+    }
+
+    #[Test]
+    public function a_flat_taxonomy_does_not_treat_slashes_as_path_segments()
+    {
+        $acdc = tap(Facades\Term::make()->taxonomy('topics')->slug('acdc')->data(['title' => 'AC/DC']))->save();
+        $dc = tap(Facades\Term::make()->taxonomy('topics')->slug('dc')->data(['title' => 'DC']))->save();
+
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'favourites',
+                    'field' => [
+                        'type' => 'terms',
+                        'taxonomies' => ['topics'],
+                        'mode' => 'select',
+                    ],
+                ],
+            ],
+        ]);
+
+        $entry = tap(Facades\Entry::make()->collection($collection)->data([
+            'favourites' => ['AC/DC', 'hoff'],
+        ]))->save();
+
+        $dc->slug('dc-comics')->save();
+
+        $this->assertEquals(['AC/DC', 'hoff'], $entry->fresh()->get('favourites'));
+
+        $dc->delete();
+
+        $this->assertEquals(['AC/DC', 'hoff'], $entry->fresh()->get('favourites'));
+
+        $acdc->slug('ac-dc')->save();
+
+        $this->assertEquals(['ac-dc', 'hoff'], $entry->fresh()->get('favourites'));
+    }
+
+    #[Test]
+    public function a_nestable_taxonomy_does_not_treat_the_delimiter_as_path_segments()
+    {
+        $this->topics->structureContents([])->save();
+
+        tap(Facades\Term::make()->taxonomy('topics')->slug('events')->data(['title' => 'Events']))->save();
+        $concerts = tap(Facades\Term::make()->taxonomy('topics')->slug('concerts')->data(['title' => 'Concerts']))->save();
+        $eventsConcerts = tap(Facades\Term::make()->taxonomy('topics')->slug('events-concerts')->data(['title' => 'Events > Concerts']))->save();
+
+        $this->topics->structure()->tree()->tree([
+            ['term' => 'events', 'children' => [
+                ['term' => 'concerts'],
+            ]],
+            ['term' => 'events-concerts'],
+        ])->save();
+
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'favourites',
+                    'field' => [
+                        'type' => 'terms',
+                        'taxonomies' => ['topics'],
+                        'mode' => 'select',
+                    ],
+                ],
+            ],
+        ]);
+
+        $entry = tap(Facades\Entry::make()->collection($collection)->data([
+            'favourites' => ['events > concerts', 'hoff'],
+        ]))->save();
+
+        // The delimiter is a CP input convention, not a storage format. A stored value naming
+        // one segment isn't a reference to that segment's term, so renaming it changes nothing.
+        $concerts->slug('gigs')->save();
+
+        $this->assertEquals(['events > concerts', 'hoff'], $entry->fresh()->get('favourites'));
+
+        // The whole value slugs to "events-concerts", so that's the term it actually refers to.
+        $eventsConcerts->slug('shows')->save();
+
+        $this->assertEquals(['shows', 'hoff'], $entry->fresh()->get('favourites'));
+    }
+
+    #[Test]
+    public function it_slugs_stored_values_using_the_items_language()
+    {
+        $buecher = tap(Facades\Term::make()->taxonomy('topics')->slug('buecher')->data(['title' => 'Bücher']))->save();
+
+        $collection = tap(Facades\Collection::make('articles')->sites(['en', 'de']))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'favourites',
+                    'field' => [
+                        'type' => 'terms',
+                        'taxonomies' => ['topics'],
+                        'mode' => 'select',
+                    ],
+                ],
+            ],
+        ]);
+
+        $german = tap(Facades\Entry::make()->collection($collection)->locale('de')->data([
+            'favourites' => ['Bücher', 'hoff'],
+        ]))->save();
+
+        $english = tap(Facades\Entry::make()->collection($collection)->locale('en')->data([
+            'favourites' => ['Bücher', 'hoff'],
+        ]))->save();
+
+        $buecher->slug('literatur')->save();
+
+        // German transliterates "ü" to "ue", so the value slugs to "buecher" and refers to the term.
+        $this->assertEquals(['literatur', 'hoff'], $german->fresh()->get('favourites'));
+
+        // English transliterates it to "u", so the value slugs to "bucher" and refers to nothing.
+        $this->assertEquals(['Bücher', 'hoff'], $english->fresh()->get('favourites'));
+    }
+
+    #[Test]
+    public function it_slugs_nested_stored_values_using_the_items_language()
+    {
+        $buecher = tap(Facades\Term::make()->taxonomy('topics')->slug('buecher')->data(['title' => 'Bücher']))->save();
+
+        $collection = tap(Facades\Collection::make('articles')->sites(['en', 'de']))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'reppy',
+                    'field' => [
+                        'type' => 'replicator',
+                        'sets' => [
+                            'set_one' => [
+                                'fields' => [
+                                    [
+                                        'handle' => 'favourites',
+                                        'field' => [
+                                            'type' => 'terms',
+                                            'taxonomies' => ['topics'],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $german = tap(Facades\Entry::make()->collection($collection)->locale('de')->data([
+            'reppy' => [
+                [
+                    'type' => 'set_one',
+                    'favourites' => ['Bücher', 'hoff'],
+                ],
+            ],
+        ]))->save();
+
+        $english = tap(Facades\Entry::make()->collection($collection)->locale('en')->data([
+            'reppy' => [
+                [
+                    'type' => 'set_one',
+                    'favourites' => ['Bücher', 'hoff'],
+                ],
+            ],
+        ]))->save();
+
+        $buecher->slug('literatur')->save();
+
+        $this->assertEquals(['literatur', 'hoff'], Arr::get($german->fresh()->data(), 'reppy.0.favourites'));
+        $this->assertEquals(['Bücher', 'hoff'], Arr::get($english->fresh()->data(), 'reppy.0.favourites'));
     }
 
     #[Test]
@@ -1191,6 +1369,90 @@ class UpdateTermReferencesTest extends TestCase
         $this->assertEquals(['hoff', 'norris'], $entry->fresh()->get('wrong_favourites'));
         $this->assertEquals(['topics::hoff-new', 'wrong_topics::hoff'], $entry->fresh()->get('mixed_terms'));
         $this->assertEquals(['topics::hoff', 'wrong_topics::hoff'], $entry->fresh()->get('wrong_mixed_terms'));
+    }
+
+    #[Test]
+    public function it_doesnt_update_same_slug_terms_from_another_taxonomy_on_multi_taxonomy_fields()
+    {
+        $tags = tap(Facades\Taxonomy::make('tags'))->save();
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'favourite',
+                    'field' => [
+                        'type' => 'terms',
+                        'taxonomies' => ['topics', 'tags'],
+                        'max_items' => 1,
+                    ],
+                ],
+                [
+                    'handle' => 'other_favourite',
+                    'field' => [
+                        'type' => 'terms',
+                        'taxonomies' => ['topics', 'tags'],
+                        'max_items' => 1,
+                    ],
+                ],
+                [
+                    'handle' => 'favourites',
+                    'field' => [
+                        'type' => 'terms',
+                        'taxonomies' => ['topics', 'tags'],
+                    ],
+                ],
+            ],
+        ]);
+
+        $entry = tap(Facades\Entry::make()->collection($collection)->data([
+            'favourite' => 'topics::hoff',
+            'other_favourite' => 'tags::hoff',
+            'favourites' => ['topics::hoff', 'tags::hoff', 'topics::norris'],
+        ]))->save();
+
+        $this->termHoff->slug('hoff-new')->save();
+
+        $this->assertEquals('topics::hoff-new', $entry->fresh()->get('favourite'));
+        $this->assertEquals('tags::hoff', $entry->fresh()->get('other_favourite'));
+        $this->assertEquals(['topics::hoff-new', 'tags::hoff', 'topics::norris'], $entry->fresh()->get('favourites'));
+    }
+
+    #[Test]
+    public function it_doesnt_nullify_same_slug_terms_from_another_taxonomy_on_multi_taxonomy_fields()
+    {
+        $tags = tap(Facades\Taxonomy::make('tags'))->save();
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'favourite',
+                    'field' => [
+                        'type' => 'terms',
+                        'taxonomies' => ['topics', 'tags'],
+                        'max_items' => 1,
+                    ],
+                ],
+                [
+                    'handle' => 'favourites',
+                    'field' => [
+                        'type' => 'terms',
+                        'taxonomies' => ['topics', 'tags'],
+                    ],
+                ],
+            ],
+        ]);
+
+        $entry = tap(Facades\Entry::make()->collection($collection)->data([
+            'favourite' => 'tags::hoff',
+            'favourites' => ['topics::hoff', 'tags::hoff'],
+        ]))->save();
+
+        $this->termHoff->delete();
+
+        $this->assertEquals('tags::hoff', $entry->fresh()->get('favourite'));
+        $this->assertEquals(['tags::hoff'], $entry->fresh()->get('favourites'));
     }
 
     #[Test]

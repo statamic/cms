@@ -18,6 +18,8 @@ use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 use Statamic\Rules\Slug;
 use Statamic\Rules\UniqueTermValue;
 use Statamic\Statamic;
+use Statamic\Support\Arr;
+use Statamic\Support\Str;
 
 use function Statamic\trans as __;
 
@@ -92,7 +94,7 @@ class TermsController extends CpController
 
         $blueprint = $term->blueprint();
 
-        [$values, $meta] = $this->extractFromFields($term, $blueprint);
+        [$values, $meta, $extraValues] = $this->extractFromFields($term, $blueprint);
 
         if ($hasOrigin = $term->hasOrigin()) {
             [$originValues, $originMeta] = $this->extractFromFields($term->origin(), $blueprint);
@@ -109,6 +111,7 @@ class TermsController extends CpController
                 'editBlueprint' => cp_route('blueprints.taxonomies.edit', [$taxonomy, $blueprint]),
             ],
             'values' => array_merge($values, ['id' => $term->id()]),
+            'extraValues' => $extraValues,
             'meta' => $meta,
             'taxonomy' => $taxonomy->handle(),
             'blueprint' => $blueprint->toPublishArray(),
@@ -196,7 +199,7 @@ class TermsController extends CpController
 
         $saved = $term->updateLastModified(User::current())->save();
 
-        [$values, $meta] = $this->extractFromFields($term, $term->blueprint());
+        [$values, $meta, $extraValues] = $this->extractFromFields($term, $term->blueprint());
 
         return (new TermResource($term))
             ->additional([
@@ -204,6 +207,7 @@ class TermsController extends CpController
                 'data' => [
                     'values' => $values,
                     'meta' => $meta,
+                    'extraValues' => $extraValues,
                 ],
             ]);
     }
@@ -228,6 +232,16 @@ class TermsController extends CpController
             'published' => $taxonomy->defaultPublishState(),
         ]);
 
+        $extraValues = [
+            'depth' => 1,
+            'children' => [],
+        ];
+
+        if ($taxonomy->nestable() && $request->parent) {
+            $parentTerm = Term::find($taxonomy->handle().'::'.$this->termSlugFromParentValue($taxonomy, $request->parent))?->in($site->handle());
+            $extraValues['depth'] = ($parentTerm?->depth() ?? 0) + 1;
+        }
+
         $viewData = [
             'title' => $taxonomy->createLabel(),
             'actions' => [
@@ -235,20 +249,22 @@ class TermsController extends CpController
                 'editBlueprint' => cp_route('blueprints.taxonomies.edit', [$taxonomy, $blueprint]),
             ],
             'values' => $values,
+            'extraValues' => $extraValues,
             'meta' => $fields->meta(),
             'taxonomy' => $taxonomy->handle(),
             'taxonomyCreateLabel' => $taxonomy->createLabel(),
+            'parent' => $taxonomy->hasStructure() ? $request->parent : null,
             'blueprint' => $blueprint->toPublishArray(),
             'published' => $taxonomy->defaultPublishState(),
             'locale' => $site->handle(),
-            'localizations' => $this->getAuthorizedSitesForTaxonomy($taxonomy)->map(function ($handle) use ($taxonomy, $site) {
+            'localizations' => $this->getAuthorizedSitesForTaxonomy($taxonomy)->map(function ($handle) use ($taxonomy, $site, $request) {
                 return [
                     'handle' => $handle,
                     'name' => Site::get($handle)->name(),
                     'active' => $handle === $site->handle(),
                     'exists' => false,
                     'published' => false,
-                    'url' => cp_route('taxonomies.terms.create', [$taxonomy->handle(), $handle]),
+                    'url' => cp_route('taxonomies.terms.create', [$taxonomy->handle(), $handle, 'blueprint' => $request->blueprint, 'parent' => $request->parent]),
                     'livePreviewUrl' => cp_route('taxonomies.terms.preview.create', [$taxonomy->handle(), $handle]),
                 ];
             })->values()->all(),
@@ -262,7 +278,7 @@ class TermsController extends CpController
         return Inertia::render('terms/Create', [
             ...$viewData,
             'canEditBlueprint' => User::current()->can('configure fields'),
-            'createAnotherUrl' => cp_route('taxonomies.terms.create', [$taxonomy->handle(), $site->handle()]),
+            'createAnotherUrl' => cp_route('taxonomies.terms.create', [$taxonomy->handle(), $site->handle(), 'blueprint' => $request->blueprint, 'parent' => $request->parent]),
             'listingUrl' => cp_route('taxonomies.show', $taxonomy->handle()),
         ]);
     }
@@ -281,6 +297,10 @@ class TermsController extends CpController
         ]);
 
         $values = $fields->process()->values()->except(['slug', 'blueprint']);
+
+        $parent = $taxonomy->nestable()
+            ? $this->termSlugFromParentValue($taxonomy, $request->_parent)
+            : null;
 
         $term = Term::make()
             ->taxonomy($taxonomy)
@@ -306,10 +326,47 @@ class TermsController extends CpController
             ->data($values)
             ->slug($slug);
 
+        // The tree would reject the graft too, but only once the term has been saved.
+        if ($parent) {
+            $taxonomy->structure()->assertCanNest($parent);
+        }
+
         $saved = $term->updateLastModified(User::current())->save();
+
+        if ($saved && $taxonomy->nestable()) {
+            $this->addTermToTree($taxonomy, $term, $parent);
+        }
 
         return (new TermResource($term))
             ->additional(['saved' => $saved]);
+    }
+
+    private function addTermToTree($taxonomy, $term, ?string $parent)
+    {
+        $structure = $taxonomy->structure();
+        $tree = $structure->tree();
+        $slug = $term->inDefaultLocale()->slug();
+
+        // Grafting has to happen first. Appending at the root would put the slug
+        // in the tree, and the graft would then see it and bail.
+        if ($parent && $tree->find($parent)) {
+            $structure->graftTerm($slug, $parent);
+
+            return;
+        }
+
+        $tree->appendTo(null, $slug)->save();
+    }
+
+    private function termSlugFromParentValue($taxonomy, $value): ?string
+    {
+        $value = is_array($value) ? Arr::first($value) : $value;
+
+        if (! $value) {
+            return null;
+        }
+
+        return Str::after($value, $taxonomy->handle().'::');
     }
 
     protected function getAuthorizedSitesForTaxonomy($taxonomy)

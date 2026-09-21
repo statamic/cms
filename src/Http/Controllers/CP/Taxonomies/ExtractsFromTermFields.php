@@ -17,6 +17,7 @@ trait ExtractsFromTermFields
         }
 
         $fields = $blueprint
+            ->setParent($term)
             ->fields()
             ->addValues($values->all())
             ->preProcess();
@@ -26,6 +27,11 @@ trait ExtractsFromTermFields
             'slug' => $term->slug(),
         ]);
 
-        return [$values->all(), $fields->meta()];
+        $extraValues = [
+            'depth' => $term->page()?->depth(),
+            'children' => $term->page()?->flattenedPages()->pluck('id')->all(),
+        ];
+
+        return [$values->all(), $fields->meta(), $extraValues];
     }
 }
