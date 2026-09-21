@@ -115,7 +115,7 @@ return [
     'prohibits' => ':attribute alanı ile :other alanını birlikte gönderemezsiniz.',
     'regex' => ':attribute biçimi geçersiz.',
     'required' => ':attribute alanı gereklidir.',
-    'required_array_keys' => ':attribute alanı, :değerler için girişler içermelidir.',
+    'required_array_keys' => ':attribute alanı :values için girdi içermelidir.',
     'required_if' => ':attribute alanı, :other :value değerine sahip olduğunda zorunludur.',
     'required_if_accepted' => ':other kabul edildiğinde bu alan gereklidir.',
     'required_if_declined' => ':other reddedildiğinde bu alan zorunludur.',
