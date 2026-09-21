@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3';
-import { Checkbox, CheckboxGroup } from '@ui';
+import { Checkbox, CheckboxGroup } from '@statamic/cms/ui';
 import { ref } from 'vue';
 
 const meta = {

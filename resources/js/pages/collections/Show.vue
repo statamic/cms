@@ -7,6 +7,7 @@
                 :url="actionUrl"
                 :actions="actions"
                 :item="handle"
+                @completed="actionCompleted"
                 v-slot="{ actions }"
             >
                 <Dropdown v-if="canEdit || canEditBlueprints || actions.length" placement="left-start">
@@ -510,7 +511,16 @@ export default {
             $event.metaKey ? window.open(url) : router.get(url);
         },
 
-        afterActionSuccessfullyCompleted(response) {
+        actionCompleted(successful, response = {}) {
+            if (!successful) {
+                Statamic.$toast.error(response.message || __('Action failed'));
+                return;
+            }
+
+            if (response.message !== false) {
+                Statamic.$toast.success(response.message || __('Action completed'));
+            }
+
             if (!response.redirect) router.reload();
         },
 
