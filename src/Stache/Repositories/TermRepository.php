@@ -65,20 +65,22 @@ class TermRepository implements RepositoryContract
 
     public function find($id): ?Term
     {
-        $query = $this->query()->where('id', $id);
-
-        // Association indexes add keys for every site an entry uses the term.
-        // Prefer the taxonomy's own default site so we load the term file
-        // instead of a stub from another site's association.
+        // Association indexes add keys for every site an entry uses the term. Prefer
+        // the taxonomy's own default site so we load the term file instead of a stub
+        // from another site's association. A term with no file only exists under the
+        // locales of the entries referencing it, though, so fall back to any site.
+        // The preference can then only ever disambiguate, never eliminate a match.
         if (is_string($id) && str_contains($id, '::')) {
             $taxonomy = Taxonomy::findByHandle(Str::before($id, '::'));
 
             if ($taxonomy && $site = $taxonomy->sites()->first()) {
-                $query->where('site', $site);
+                if ($term = $this->query()->where('id', $id)->where('site', $site)->first()) {
+                    return $term;
+                }
             }
         }
 
-        return $query->first();
+        return $this->query()->where('id', $id)->first();
     }
 
     public function findByUri(string $uri, ?string $site = null): ?Term

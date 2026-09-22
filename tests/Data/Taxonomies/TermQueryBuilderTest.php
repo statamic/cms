@@ -6,6 +6,7 @@ use Facades\Tests\Factories\EntryFactory;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
+use Statamic\Facades\Stache;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
 use Statamic\Query\Scopes\Scope;
@@ -885,6 +886,68 @@ class TermQueryBuilderTest extends TestCase
         Term::query()->orderBy('delete', 'asc')->get();
 
         $this->assertCount($count, Term::all());
+    }
+
+    #[Test]
+    public function it_finds_a_term_that_only_exists_through_an_association_in_another_site()
+    {
+        $this->setSites([
+            'en' => ['url' => '/', 'locale' => 'en'],
+            'fr' => ['url' => '/fr/', 'locale' => 'fr'],
+        ]);
+
+        Taxonomy::make('tags')->sites(['en', 'fr'])->save();
+        Collection::make('blog')->sites(['en', 'fr'])->taxonomies(['tags'])->save();
+
+        EntryFactory::collection('blog')->locale('fr')->slug('un')->data(['tags' => ['alfa']])->create();
+
+        $this->warmTermIndexes('tags');
+
+        // The term has no file, so its only key comes from the association, which uses
+        // the entry's locale. Preferring the taxonomy's first site mustn't lose it.
+        $this->assertEquals('fr', Term::query()->where('id', 'tags::alfa')->first()->locale());
+
+        $term = Term::find('tags::alfa');
+
+        $this->assertNotNull($term);
+        $this->assertEquals('tags::alfa', $term->id());
+        $this->assertEquals('fr', $term->locale());
+
+        $this->assertNull(Term::find('tags::bravo'));
+    }
+
+    #[Test]
+    public function it_finds_a_term_in_the_taxonomys_first_site_when_it_is_also_associated_in_another()
+    {
+        $this->setSites([
+            'en' => ['url' => '/', 'locale' => 'en'],
+            'fr' => ['url' => '/fr/', 'locale' => 'fr'],
+        ]);
+
+        Taxonomy::make('tags')->sites(['en'])->save();
+        Collection::make('blog')->sites(['en', 'fr'])->taxonomies(['tags'])->save();
+
+        Term::make('alfa')->taxonomy('tags')->data(['title' => 'Alfa'])->save();
+
+        EntryFactory::collection('blog')->locale('fr')->slug('un')->data(['tags' => ['alfa']])->create();
+
+        $this->warmTermIndexes('tags');
+
+        $term = Term::find('tags::alfa');
+
+        $this->assertEquals('en', $term->locale());
+        $this->assertEquals('Alfa', $term->title());
+    }
+
+    // Rebuild the indexes from scratch, so the keys match what a site would have
+    // after a deploy or a stache:clear rather than what the save left behind.
+    private function warmTermIndexes($taxonomy)
+    {
+        $store = Stache::store('terms')->store($taxonomy);
+
+        foreach (['associations', 'title', 'id', 'site', 'slug', 'taxonomy'] as $index) {
+            $store->index($index)->update();
+        }
     }
 }
 
