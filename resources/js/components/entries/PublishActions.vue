@@ -10,10 +10,11 @@
                     <Select class="w-full" :options v-model="action" />
 
                     <template v-if="action">
-<!--                        <DatePicker-->
-<!--                            v-if="action == 'schedule'"-->
-<!--                            v-model="publishTime"-->
-<!--                        />-->
+                        <DatePicker
+                            v-if="action == 'publishLater'"
+                            granularity="minute"
+                            v-model="publishRevisionAt"
+                        />
 
                         <Textarea
                             class="text-sm"
@@ -23,7 +24,7 @@
                             :focus="true"
                         />
 
-                        <Button variant="primary" :text="submitButtonText" @click="submit" />
+                        <Button variant="primary" :text="submitButtonText" :disabled="!canSubmit" @click="submit" />
 
                         <div class="flex">
                             <Icon name="info" class="size-4 shrink-0 me-2" />
@@ -61,6 +62,7 @@ export default {
     data() {
         return {
             action: this.canManagePublishState ? 'publish' : 'revision',
+            publishRevisionAt: null,
             revisionMessage: null,
             saving: false,
         };
@@ -72,6 +74,7 @@ export default {
 
             if (this.canManagePublishState) {
                 options.push({ value: 'publish', label: __('Publish Now') });
+                options.push({ value: 'publishLater', label: __('Publish Later') });
 
                 if (this.published) {
                     options.push({ value: 'unpublish', label: __('Unpublish') });
@@ -95,11 +98,17 @@ export default {
                     return __('messages.publish_actions_unpublish');
                 case 'revision':
                     return __('messages.publish_actions_create_revision');
+                case 'publishLater':
+                    return __('messages.publish_actions_schedule_revision');
             }
         },
 
         submitButtonText() {
             return this.options.find((o) => o.value === this.action).label;
+        },
+
+        canSubmit() {
+            return this.action !== 'publishLater' || !!this.publishRevisionAt;
         },
     },
 
@@ -188,8 +197,16 @@ export default {
                 .catch((e) => this.handleAxiosError(e));
         },
 
-        submitRevision() {
+        submitPublishLater() {
+            this.submitRevision(this.publishRevisionAt);
+        },
+
+        submitRevision(publishRevisionAt) {
             const payload = { message: this.revisionMessage };
+
+            if (publishRevisionAt) {
+                payload.publish_at = publishRevisionAt.toAbsoluteString();
+            }
 
             this.$axios
                 .post(this.actions.createRevision, payload)
