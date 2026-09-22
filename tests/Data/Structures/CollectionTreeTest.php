@@ -12,7 +12,7 @@ use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Stache;
 use Statamic\Structures\CollectionTree;
-use Statamic\Structures\CollectionTreeDiff;
+use Statamic\Structures\TreeDiff;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 use Tests\UnlinksPaths;
@@ -108,7 +108,7 @@ class CollectionTreeTest extends TestCase
         ]);
 
         $diff = $tree->diff();
-        $this->assertInstanceOf(CollectionTreeDiff::class, $diff);
+        $this->assertInstanceOf(TreeDiff::class, $diff);
         $this->assertEquals(['1.4', '3.0'], $diff->added());
         $this->assertEquals(['1.3'], $diff->removed());
         $this->assertEquals(['1.1', '2.2', '2.3'], $diff->moved());

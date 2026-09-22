@@ -178,6 +178,20 @@ abstract class Tree implements ContainsQueryableValues, Contract, Localization
         return ($this->cachedFlattenedPageOrder ??= $this->flattenedPages()->map->reference()->flip())->get($reference);
     }
 
+    public function diff()
+    {
+        return app(TreeDiff::class)->setIdKey($this->idKey())->analyze(
+            $this->diffableTree($this->original['tree'] ?? []),
+            $this->diffableTree($this->tree),
+            $this->structure()->expectsRoot()
+        );
+    }
+
+    protected function diffableTree($tree)
+    {
+        return $tree;
+    }
+
     public function flushCache()
     {
         $this->cachedFlattenedPages = null;
@@ -199,7 +213,7 @@ abstract class Tree implements ContainsQueryableValues, Contract, Localization
 
         $this->flushCache();
 
-        Blink::forget('collection-structure-tree*');
+        $this->forgetStructureBlinks();
 
         $this->repository()->save($this);
 
@@ -224,7 +238,7 @@ abstract class Tree implements ContainsQueryableValues, Contract, Localization
         $withEvents = $this->withEvents;
         $this->withEvents = true;
 
-        Blink::forget('collection-structure-tree*');
+        $this->forgetStructureBlinks();
 
         $this->repository()->delete($this);
 
@@ -243,6 +257,11 @@ abstract class Tree implements ContainsQueryableValues, Contract, Localization
     }
 
     abstract protected function repository();
+
+    protected function forgetStructureBlinks()
+    {
+        //
+    }
 
     protected function dispatchSavedEvent()
     {

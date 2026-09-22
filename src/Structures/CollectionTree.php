@@ -2,7 +2,6 @@
 
 namespace Statamic\Structures;
 
-use Facades\Statamic\Structures\CollectionTreeDiff;
 use Statamic\Contracts\Structures\CollectionTree as TreeContract;
 use Statamic\Contracts\Structures\CollectionTreeRepository;
 use Statamic\Events\CollectionTreeDeleted;
@@ -72,13 +71,9 @@ class CollectionTree extends Tree implements TreeContract
         return $this->structure()->collection();
     }
 
-    public function diff()
+    protected function forgetStructureBlinks()
     {
-        return CollectionTreeDiff::analyze(
-            $this->original['tree'],
-            $this->tree,
-            $this->structure()->expectsRoot()
-        );
+        Blink::forget('collection-structure-tree*');
     }
 
     protected function repository()

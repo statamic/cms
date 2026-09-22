@@ -107,21 +107,23 @@ class TaxonomyTree extends Tree implements TreeContract
         TaxonomyTreeDeleted::dispatch($this);
     }
 
+    /**
+     * Branches may still be keyed by `entry`, or hold full term IDs, so they need
+     * normalizing before either side of the diff can be keyed on the slug.
+     */
+    protected function diffableTree($tree)
+    {
+        return $this->structure()->repairTree($tree ?? []);
+    }
+
+    protected function forgetStructureBlinks()
+    {
+        Blink::forget("taxonomy-structure-tree-{$this->handle()}");
+        Blink::forget('taxonomy-structure-term-slugs-'.$this->handle());
+    }
+
     protected function repository()
     {
         return app(TaxonomyTreeRepository::class);
-    }
-
-    public function save()
-    {
-        $saved = parent::save();
-
-        if ($saved) {
-            Stache::store('terms')->store($this->handle())->index('order')->update();
-            Blink::forget("taxonomy-structure-tree-{$this->handle()}");
-            Blink::forget('taxonomy-structure-term-slugs-'.$this->handle());
-        }
-
-        return $saved;
     }
 }

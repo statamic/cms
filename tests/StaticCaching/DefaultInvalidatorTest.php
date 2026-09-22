@@ -23,9 +23,9 @@ use Statamic\Sites\Site as SiteModel;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\DefaultInvalidator as Invalidator;
 use Statamic\Structures\CollectionTree;
-use Statamic\Structures\CollectionTreeDiff;
 use Statamic\Structures\NavTree;
 use Statamic\Structures\Structure;
+use Statamic\Structures\TreeDiff;
 use Statamic\Taxonomies\LocalizedTerm;
 use Tests\TestCase;
 
@@ -229,7 +229,7 @@ class DefaultInvalidatorTest extends TestCase
             $m->shouldReceive('structure')->andReturn($structure);
             $m->shouldReceive('collection')->andReturn($collection);
             $m->shouldReceive('site')->andReturn(Site::default());
-            $m->shouldReceive('diff')->andReturn(new CollectionTreeDiff);
+            $m->shouldReceive('diff')->andReturn(new TreeDiff);
         });
 
         $invalidator = new Invalidator($cacher, [
@@ -279,7 +279,7 @@ class DefaultInvalidatorTest extends TestCase
             $m->shouldReceive('structure')->andReturn($structure);
             $m->shouldReceive('collection')->andReturn($collection);
             $m->shouldReceive('site')->andReturn(Site::get('fr'));
-            $m->shouldReceive('diff')->andReturn(new CollectionTreeDiff);
+            $m->shouldReceive('diff')->andReturn(new TreeDiff);
         });
 
         $invalidator = new Invalidator($cacher, [
@@ -323,7 +323,7 @@ class DefaultInvalidatorTest extends TestCase
         EntryFacade::shouldReceive('find')->with('redirect')->andReturn($redirectEntry);
         EntryFacade::shouldReceive('find')->with('missing')->andReturnNull();
 
-        $diff = tap(Mockery::mock(CollectionTreeDiff::class), function ($m) {
+        $diff = tap(Mockery::mock(TreeDiff::class), function ($m) {
             $m->shouldReceive('ancestryChanged')->andReturn(['child', 'redirect', 'missing']);
         });
 

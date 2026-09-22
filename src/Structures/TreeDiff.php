@@ -2,14 +2,22 @@
 
 namespace Statamic\Structures;
 
-class CollectionTreeDiff
+class TreeDiff
 {
     protected $added = [];
     protected $removed = [];
     protected $moved = [];
     protected $ancestryChanged = [];
     protected $expectsRoot = false;
+    protected $idKey;
     private $positions;
+
+    public function setIdKey($idKey)
+    {
+        $this->idKey = $idKey;
+
+        return $this;
+    }
 
     public function analyze($old, $new, $expectsRoot = false)
     {
@@ -37,7 +45,7 @@ class CollectionTreeDiff
     private function flatten($arr)
     {
         return collect($arr)->mapWithKeys(function ($item, $i) {
-            $results = [$item['entry'] => [
+            $results = [$item[$this->idKey] => [
                 'path' => $item['path'],
                 'index' => $i,
             ]];
@@ -60,7 +68,7 @@ class CollectionTreeDiff
             }
 
             if (isset($item['children'])) {
-                $item['children'] = $this->addPaths($item['children'], $path.'.'.$item['entry']);
+                $item['children'] = $this->addPaths($item['children'], $path.'.'.$item[$this->idKey]);
             }
 
             return $item;
