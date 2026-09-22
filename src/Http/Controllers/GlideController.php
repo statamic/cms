@@ -95,7 +95,7 @@ class GlideController extends Controller
     private function generateOnDemand(string $path)
     {
         if ($this->existsInCache($path)) {
-            Log::debug('Glide hybrid cache loaded ['.$path.'] If you are seeing this, your server rewrite rules have not been set up correctly.');
+            $this->warnAboutServingThroughPhp($path);
 
             return $this->createResponse($path);
         }
@@ -123,6 +123,20 @@ class GlideController extends Controller
         } catch (PathTraversalDetected $e) {
             throw new NotFoundHttpException;
         }
+    }
+
+    /**
+     * The image already exists, so the web server should have served it without
+     * involving PHP. Warn once, since otherwise this fires on every request
+     * for every image, which is the situation we're complaining about.
+     */
+    private function warnAboutServingThroughPhp(string $path): void
+    {
+        if (! Glide::cacheStore()->add('hybrid-served-through-php-warning', true)) {
+            return;
+        }
+
+        Log::warning('Glide hybrid caching: ['.$path.'] already exists but was still served by PHP. Check that the image_manipulation.cache_path is inside your public directory and reachable at the image_manipulation.route.');
     }
 
     /**

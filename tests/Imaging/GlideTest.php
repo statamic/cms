@@ -273,6 +273,32 @@ class GlideTest extends TestCase
 
     #[Test]
     #[DefineEnvironment('hybridCaching')]
+    public function hybrid_caching_warns_once_when_an_existing_image_is_served_through_php()
+    {
+        $fakePath = 'containers/test/fake-hash/image.jpg';
+        $image = UploadedFile::fake()->image('image.jpg', 10, 10);
+        Glide::cacheDisk()->put($fakePath, file_get_contents($image->getPathname()));
+
+        Log::shouldReceive('warning')->once()->withArgs(fn ($message) => str_contains($message, 'served by PHP'));
+
+        $this->get('/img/'.$fakePath)->assertOk();
+        $this->get('/img/'.$fakePath)->assertOk();
+    }
+
+    #[Test]
+    #[DefineEnvironment('hybridCaching')]
+    public function hybrid_caching_does_not_warn_when_the_image_is_generated_on_demand()
+    {
+        $asset = $this->createAsset();
+        $url = $this->app->make(UrlBuilder::class)->build($asset, ['w' => 100]);
+
+        Log::shouldReceive('warning')->never();
+
+        $this->get($url)->assertOk()->streamedContent();
+    }
+
+    #[Test]
+    #[DefineEnvironment('hybridCaching')]
     public function hybrid_caching_returns_404_when_no_mapping_exists()
     {
         $response = $this->get('/img/containers/nonexistent/hash/image.jpg');
