@@ -48,3 +48,15 @@ test('typing an hour keeps the day period of the zoned dates', async () => {
     expect(emitted.start.toString()).toBe(start.toString());
     expect(emitted.end.toString()).toBe(end.set({ hour: 17 }).toString());
 });
+
+test('day period reflects the zoned date rather than the browser timezone when only the end is set', () => {
+    process.env.TZ = 'America/New_York';
+
+    const dateRangePicker = makeDateRangePicker({
+        start: undefined,
+        end: toZoned(new CalendarDateTime(2024, 1, 21, 16, 30), 'Europe/London'),
+    });
+
+    expect(dateRangePicker.get(segment('end', 'hour')).text()).toBe('4');
+    expect(dateRangePicker.get(segment('end', 'dayPeriod')).text()).toBe('PM');
+});
