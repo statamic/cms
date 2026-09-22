@@ -133,7 +133,7 @@ const hoverCardDate = computed(() => {
             v-bind="$attrs"
             prevent-deselect
             hide-time-zone
-            :default-placeholder="defaultPlaceholder"
+            :default-placeholder="modelValue?.start ? undefined : defaultPlaceholder"
             close-on-select
         >
             <DateRangePickerField v-slot="{ segments }" class="w-full">
