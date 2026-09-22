@@ -58,6 +58,12 @@ class RevisionRepository implements Contract
     public function delete(RevisionContract $revision)
     {
         $this->store->delete($revision);
+
+        $directory = $this->directory().'/'.$revision->key();
+
+        if (File::exists($directory) && File::isEmpty($directory)) {
+            File::delete($directory);
+        }
     }
 
     public function query()

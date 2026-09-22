@@ -5,10 +5,16 @@ namespace Tests\Feature\Entries;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Event;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Events\EntryDeleted;
+use Statamic\Events\EntryDeleting;
+use Statamic\Events\RevisionDeleted;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Folder;
+use Statamic\Facades\Revision as Revisions;
+use Statamic\Facades\Stache;
 use Statamic\Facades\User;
 use Statamic\Fields\Blueprint;
 use Statamic\Revisions\Revision;
@@ -866,6 +872,137 @@ class EntryRevisionsTest extends TestCase
         // User should only see en and fr sites, not de
         $this->assertCount(2, $localizations);
         $this->assertEquals(['en', 'fr'], array_column($localizations, 'handle'));
+    }
+
+    #[Test]
+    public function it_deletes_revisions_and_the_working_copy_when_the_entry_is_deleted()
+    {
+        Event::fake([RevisionDeleted::class]);
+
+        [$entry, $revisions, $workingCopy] = $this->entryWithRevisions('1');
+
+        $this->assertRevisionFilesExist($entry, $revisions, $workingCopy);
+
+        $entry->delete();
+
+        $this->assertRevisionFilesAreGone($entry, $revisions, $workingCopy);
+        $this->assertCount(0, $entry->revisions());
+        $this->assertNull($entry->workingCopy());
+        Event::assertDispatchedTimes(RevisionDeleted::class, 3);
+    }
+
+    #[Test]
+    public function it_leaves_revisions_belonging_to_other_entries()
+    {
+        [$entry, $revisions, $workingCopy] = $this->entryWithRevisions('1');
+        [$other, $otherRevisions, $otherWorkingCopy] = $this->entryWithRevisions('2');
+
+        $entry->delete();
+
+        $this->assertRevisionFilesAreGone($entry, $revisions, $workingCopy);
+        $this->assertRevisionFilesExist($other, $otherRevisions, $otherWorkingCopy);
+        $this->assertCount(2, $other->revisions());
+        $this->assertNotNull($other->workingCopy());
+    }
+
+    #[Test]
+    public function it_keeps_revisions_when_entry_deletion_is_cancelled()
+    {
+        Event::fake([RevisionDeleted::class]);
+
+        Event::listen(EntryDeleting::class, function () {
+            return false;
+        });
+
+        [$entry, $revisions, $workingCopy] = $this->entryWithRevisions('1');
+
+        $this->assertFalse($entry->delete());
+
+        $this->assertRevisionFilesExist($entry, $revisions, $workingCopy);
+        $this->assertCount(2, $entry->revisions());
+        $this->assertNotNull($entry->workingCopy());
+        Event::assertNotDispatched(RevisionDeleted::class);
+    }
+
+    #[Test]
+    public function it_deletes_revisions_when_the_entry_is_deleted_quietly()
+    {
+        Event::fake([EntryDeleted::class, RevisionDeleted::class]);
+
+        [$entry, $revisions, $workingCopy] = $this->entryWithRevisions('1');
+
+        $entry->deleteQuietly();
+
+        $this->assertRevisionFilesAreGone($entry, $revisions, $workingCopy);
+        Event::assertNotDispatched(EntryDeleted::class);
+        Event::assertDispatchedTimes(RevisionDeleted::class, 3);
+    }
+
+    #[Test]
+    public function it_deletes_revisions_from_a_custom_revisions_path()
+    {
+        $custom = $this->dir.'/revisions';
+
+        config(['statamic.revisions.path' => $custom]);
+
+        Stache::store('revisions')->directory(config('statamic.revisions.path'));
+
+        [$entry, $revisions, $workingCopy] = $this->entryWithRevisions('1');
+
+        $this->assertStringStartsWith($custom, $revisions[0]->path());
+        $this->assertRevisionFilesExist($entry, $revisions, $workingCopy);
+
+        $entry->delete();
+
+        $this->assertRevisionFilesAreGone($entry, $revisions, $workingCopy);
+        $this->assertFileDoesNotExist($this->fakeStacheDirectory.'/revisions/collections/blog/en/1');
+    }
+
+    private function entryWithRevisions(string $id): array
+    {
+        $entry = EntryFactory::id($id)
+            ->slug('entry-'.$id)
+            ->collection('blog')
+            ->date('2010-12-25')
+            ->data(['title' => 'Title '.$id])
+            ->create();
+
+        $revisions = collect([
+            $entry->makeRevision()->message('Revision one')->date(Carbon::parse('2017-02-01')),
+            $entry->makeRevision()->message('Revision two')->date(Carbon::parse('2017-02-03')),
+        ]);
+
+        $revisions->each->save();
+
+        $workingCopy = $entry->makeWorkingCopy();
+        $workingCopy->save();
+
+        return [$entry, $revisions->all(), $workingCopy];
+    }
+
+    private function assertRevisionFilesExist($entry, array $revisions, Revision $workingCopy): void
+    {
+        foreach ($revisions as $revision) {
+            $this->assertFileExists($revision->path());
+        }
+
+        $this->assertFileExists($workingCopy->path());
+        $this->assertDirectoryExists($this->revisionDirectory($entry));
+    }
+
+    private function assertRevisionFilesAreGone($entry, array $revisions, Revision $workingCopy): void
+    {
+        foreach ($revisions as $revision) {
+            $this->assertFileDoesNotExist($revision->path());
+        }
+
+        $this->assertFileDoesNotExist($workingCopy->path());
+        $this->assertDirectoryDoesNotExist($this->revisionDirectory($entry));
+    }
+
+    private function revisionDirectory($entry): string
+    {
+        return Revisions::directory().'/collections/blog/en/'.$entry->id();
     }
 
     private function setTestBlueprint($handle, $fields)

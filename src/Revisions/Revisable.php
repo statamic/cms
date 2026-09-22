@@ -81,6 +81,13 @@ trait Revisable
         return optional($this->workingCopy())->delete();
     }
 
+    public function deleteRevisions()
+    {
+        $this->revisions()->each->delete();
+
+        $this->deleteWorkingCopy();
+    }
+
     public function publishWorkingCopy($options = [])
     {
         $item = $this->fromWorkingCopy();
