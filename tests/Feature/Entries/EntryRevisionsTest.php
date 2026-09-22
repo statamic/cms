@@ -13,6 +13,7 @@ use Statamic\Events\RevisionDeleted;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Folder;
+use Statamic\Facades\Path;
 use Statamic\Facades\Revision as Revisions;
 use Statamic\Facades\Stache;
 use Statamic\Facades\User;
@@ -941,7 +942,7 @@ class EntryRevisionsTest extends TestCase
     #[Test]
     public function it_deletes_revisions_from_a_custom_revisions_path()
     {
-        $custom = $this->dir.'/revisions';
+        $custom = Path::tidy($this->dir.'/revisions');
 
         config(['statamic.revisions.path' => $custom]);
 
