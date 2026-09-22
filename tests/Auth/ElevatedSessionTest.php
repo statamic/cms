@@ -248,6 +248,17 @@ class ElevatedSessionTest extends TestCase
     }
 
     #[Test]
+    public function it_redirects_the_confirm_password_form_to_two_factor_setup_when_setup_is_incomplete()
+    {
+        config(['statamic.users.two_factor_enforced_roles' => ['*']]);
+
+        $this
+            ->actingAs($this->user)
+            ->get(cp_route('confirm-password'))
+            ->assertRedirect(cp_route('two-factor-setup'));
+    }
+
+    #[Test]
     public function it_cannot_start_elevated_session_with_incorrect_password()
     {
         $this
