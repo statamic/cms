@@ -2,6 +2,7 @@
 
 namespace Tests\Data\Taxonomies;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Structures\TaxonomyTreeRepository;
 use Statamic\Facades\Blink;
@@ -534,6 +535,41 @@ class NestableTaxonomyTest extends TestCase
             ['animals', 'cat', 'calico', 'furniture'],
             $taxonomy->queryTerms()->orderBy('order')->get()->map->slug()->all()
         );
+    }
+
+    #[Test]
+    #[DataProvider('multisiteMaxDepthProvider')]
+    public function terms_missing_from_a_multisite_tree_are_appended_once($maxDepth)
+    {
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => '/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => '/fr/'],
+        ]);
+
+        $taxonomy = tap(Taxonomy::make('categories')->sites(['en', 'fr'])->structureContents(['max_depth' => $maxDepth]))->save();
+
+        foreach (['animals', 'dog', 'zebra'] as $slug) {
+            tap(Term::make($slug)->taxonomy('categories')->data(['title' => ucfirst($slug)]))->save();
+        }
+
+        $taxonomy->structure()->tree()->tree([['term' => 'animals']])->save();
+
+        $this->assertEquals(
+            [['term' => 'animals'], ['term' => 'dog'], ['term' => 'zebra']],
+            $taxonomy->structure()->tree()->tree()
+        );
+
+        $this->assertEquals(1, Term::find('categories::animals')->order());
+        $this->assertEquals(2, Term::find('categories::dog')->order());
+        $this->assertEquals(3, Term::find('categories::zebra')->order());
+    }
+
+    public static function multisiteMaxDepthProvider()
+    {
+        return [
+            'nestable' => [null],
+            'orderable' => [1],
+        ];
     }
 
     #[Test]

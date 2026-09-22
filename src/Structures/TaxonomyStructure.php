@@ -134,7 +134,9 @@ class TaxonomyStructure extends Structure
             return Term::query()
                 ->where('taxonomy', $this->handle())
                 ->get()
-                ->map(fn ($term) => $term->inDefaultLocale()->slug());
+                ->map(fn ($term) => $term->inDefaultLocale()->slug())
+                ->unique()
+                ->values();
         });
     }
 
