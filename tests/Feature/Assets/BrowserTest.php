@@ -4,6 +4,8 @@ namespace Tests\Feature\Assets;
 
 use Illuminate\Http\UploadedFile;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Actions\Action;
+use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\User;
 use Tests\FakesRoles;
@@ -364,6 +366,92 @@ class BrowserTest extends TestCase
             ->assertForbidden();
     }
 
+    #[Test]
+    public function it_only_allows_editing_the_blueprint_with_permission()
+    {
+        AssetContainer::make('test')->disk('test')->save();
+
+        $this->setTestRoles(['test' => ['access cp', 'view test assets', 'configure fields']]);
+
+        $this
+            ->actingAs(User::make()->assignRole('test')->save())
+            ->get(cp_route('assets.browse.show', 'test'))
+            ->assertSuccessful()
+            ->assertInertia(fn ($page) => $page->where('container.can_edit_blueprint', true));
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->get(cp_route('assets.browse.show', 'test'))
+            ->assertSuccessful()
+            ->assertInertia(fn ($page) => $page->where('container.can_edit_blueprint', false));
+    }
+
+    #[Test]
+    public function it_includes_container_actions_in_the_browse_data()
+    {
+        TestContainerAction::register();
+
+        AssetContainer::make('test')->disk('test')->save();
+
+        $this
+            ->actingAs($this->userWithContainerActionPermission())
+            ->get(cp_route('assets.browse.show', 'test'))
+            ->assertSuccessful()
+            ->assertInertia(fn ($page) => $page
+                ->component('assets/Browse')
+                ->where('container.actions_url', 'http://localhost/cp/asset-containers/actions')
+                ->where('container.actions.0.handle', 'test-container-action'));
+    }
+
+    #[Test]
+    public function it_runs_a_container_action()
+    {
+        TestContainerAction::register();
+        TestContainerAction::$ran = [];
+
+        $container = AssetContainer::make('test')->disk('test')->save();
+
+        $this
+            ->actingAs($this->userWithContainerActionPermission())
+            ->post(cp_route('asset-containers.actions.run'), [
+                'action' => 'test-container-action',
+                'selections' => ['test'],
+                'values' => [],
+            ])
+            ->assertSuccessful();
+
+        $this->assertCount(1, TestContainerAction::$ran);
+        $this->assertInstanceOf(AssetContainerContract::class, TestContainerAction::$ran[0]);
+        $this->assertEquals($container->handle(), TestContainerAction::$ran[0]->handle());
+    }
+
+    #[Test]
+    public function it_doesnt_run_a_container_action_without_permission()
+    {
+        TestContainerAction::register();
+        TestContainerAction::$ran = [];
+
+        AssetContainer::make('test')->disk('test')->save();
+
+        $this
+            ->actingAs($this->userWithoutPermission())
+            ->post(cp_route('asset-containers.actions.run'), [
+                'action' => 'test-container-action',
+                'selections' => ['test'],
+                'values' => [],
+            ])
+            ->assertForbidden();
+
+        $this->assertCount(0, TestContainerAction::$ran);
+    }
+
+    private function userWithContainerActionPermission()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'view test assets', 'configure asset containers']]);
+
+        return User::make()->assignRole('test')->save();
+    }
+
     private function userWithPermission()
     {
         $this->setTestRoles(['test' => ['access cp', 'view test assets', 'view one assets', 'view two assets']]);
@@ -392,5 +480,30 @@ class BrowserTest extends TestCase
                 ],
             ],
         ];
+    }
+}
+
+class TestContainerAction extends Action
+{
+    public static $ran = [];
+
+    public static function handle()
+    {
+        return 'test-container-action';
+    }
+
+    public function visibleTo($item)
+    {
+        return $item instanceof AssetContainerContract;
+    }
+
+    public function authorize($user, $item)
+    {
+        return $user->can('configure asset containers');
+    }
+
+    public function run($items, $values)
+    {
+        static::$ran = $items->all();
     }
 }

@@ -1,5 +1,40 @@
 # Release Notes
 
+## 6.33.0 (2026-09-16)
+
+### What's new
+- Add Info fieldtype [#15368](https://github.com/statamic/cms/issues/15368) by @joshuablum
+- Add `--connection` and `--queue` options to `search:update` [#15357](https://github.com/statamic/cms/issues/15357) by @edalzell
+
+### What's fixed
+- Give reference updater fields the item being updated as their parent [#15443](https://github.com/statamic/cms/issues/15443) by @jasonvarga
+- Allow fieldtypes to have an "icon" config field [#15444](https://github.com/statamic/cms/issues/15444) by @jasonvarga
+- Relax group/grid fieldtype check in `ReplicatorController` [#14068](https://github.com/statamic/cms/issues/14068) by @duncanmcclean
+- Fix default values and fieldtype meta after saving entries and terms [#15427](https://github.com/statamic/cms/issues/15427) by @duncanmcclean
+- Use the nav item's current tree depth in the page editor [#15425](https://github.com/statamic/cms/issues/15425) by @duncanmcclean
+- Add autocomplete defaults to the user blueprint's name and email fields [#15423](https://github.com/statamic/cms/issues/15423) by @duncanmcclean
+- Don't reset revisions when saving a collection with the field hidden [#15431](https://github.com/statamic/cms/issues/15431) by @lazerg
+- Invalidate moved entries' new URLs when a collection tree is saved [#15361](https://github.com/statamic/cms/issues/15361) by @duncanmcclean
+- Fix listing search label and empty table header cells [#15406](https://github.com/statamic/cms/issues/15406) by @bpmore
+- Fix Bard sets showing the wrong values after saving [#15445](https://github.com/statamic/cms/issues/15445) by @duncanmcclean
+- Fix Comb returning 500 when matched search token is longer than the configured `snippet_length` [#15358](https://github.com/statamic/cms/issues/15358) by @ryanmitchell
+- Reset remaining CP statics between requests in long-lived processes [#15441](https://github.com/statamic/cms/issues/15441) by @petemolinero
+- Fix Glide tag erroring when an asset cannot be resolved [#15360](https://github.com/statamic/cms/issues/15360) by @lazerg
+- Load installed starter kit config files into the running app [#15353](https://github.com/statamic/cms/issues/15353) by @duncanmcclean
+- Fix OAuth connections for Eloquent users [#15266](https://github.com/statamic/cms/issues/15266) by @FlxRobole
+- Cache image extension support lookups [#15449](https://github.com/statamic/cms/issues/15449) by @daun
+- Fix nocache region key collisions between pages [#15451](https://github.com/statamic/cms/issues/15451) by @duncanmcclean
+- Fix error response codes sticking to later pages in long-lived processes [#15454](https://github.com/statamic/cms/issues/15454) by @petemolinero
+- Fix stale static cache status on responses in long-lived processes [#15455](https://github.com/statamic/cms/issues/15455) by @petemolinero
+- Keep augmentable tag results as objects inside Antlers interpolations [#15424](https://github.com/statamic/cms/issues/15424) by @duncanmcclean
+- Show and keep a localized date in the control panel [#15453](https://github.com/statamic/cms/issues/15453) by @SUXUMI
+- Debounce video fieldtype updates [#15456](https://github.com/statamic/cms/issues/15456) by @edalzell
+- Respect the listing sort order when exporting form submissions [#15105](https://github.com/statamic/cms/issues/15105) by @aerni
+- Use the resolved client IP in the `ip_address` protector [#15462](https://github.com/statamic/cms/issues/15462) by @jasonvarga
+- Bump svgo from 3.3.4 to 3.3.5 [#15438](https://github.com/statamic/cms/issues/15438) by @dependabot
+
+
+
 ## 6.32.0 (2026-09-09)
 
 ### What's new

@@ -61,4 +61,15 @@ class NocacheRouteTest extends TestCase
             ->postJson('/!/nocache')
             ->assertJsonValidationErrorFor('url');
     }
+
+    #[Test]
+    public function the_script_routes_are_not_registered_unless_script_delivery_is_external()
+    {
+        // Defaults to "inline", so the routes shouldn't exist.
+        $this->assertFalse(\Illuminate\Support\Facades\Route::has('statamic.nocache.js'));
+        $this->assertFalse(\Illuminate\Support\Facades\Route::has('statamic.csrf.js'));
+
+        $this->get('/!/nocache.js')->assertNotFound();
+        $this->get('/!/csrf.js')->assertNotFound();
+    }
 }
