@@ -598,7 +598,7 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, ContainsQ
 
     private function normalizeCustomTermRoute(string $pattern): string
     {
-        $pattern = $this->normalizeRoute($pattern);
+        $pattern = TermRoute::canonicalize($this->normalizeRoute($pattern));
 
         if (! Str::contains($pattern, '{slug}')) {
             $pattern .= $this->nestable()

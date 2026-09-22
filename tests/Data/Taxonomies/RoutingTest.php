@@ -3,6 +3,7 @@
 namespace Tests\Data\Taxonomies;
 
 use Facades\Tests\Factories\EntryFactory;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Taxonomy;
@@ -214,9 +215,53 @@ class RoutingTest extends TestCase
         $this->viewShouldReturnRaw('categories.show', 'showing {{ title }}');
 
         $this->get('/topics/animals/cat/calico')->assertOk()->assertSeeText('showing Calico');
+        $this->get('/topics/animals')->assertOk()->assertSeeText('showing Animals');
         $this->get('/topics/calico')
             ->assertStatus(301)
             ->assertRedirect('/topics/animals/cat/calico');
         $this->get('/categories/animals/cat/calico')->assertNotFound();
+    }
+
+    #[Test]
+    public function whitespace_around_a_route_placeholder_is_ignored()
+    {
+        tap(Taxonomy::make('tags')->title('Tags')->routes('/topics/{ slug }'))->save();
+        tap(Term::make('test')->taxonomy('tags')->data(['title' => 'Test']))->save();
+
+        $this->viewShouldReturnRaw('tags.show', 'showing {{ title }}');
+
+        $this->assertEquals('/topics/test', Term::find('tags::test')->uri());
+        $this->get('/topics/test')->assertOk()->assertSee('showing Test');
+    }
+
+    #[Test]
+    #[DataProvider('unmatchableRouteProvider')]
+    public function an_unmatchable_route_404s_without_breaking_the_rest_of_the_site($route)
+    {
+        tap(Taxonomy::make('tags')->title('Tags')->routes($route))->save();
+        tap(Term::make('test')->taxonomy('tags')->data(['title' => 'Test']))->save();
+
+        Collection::make('pages')->routes('{slug}')->save();
+        EntryFactory::collection('pages')->slug('about')->data(['title' => 'About'])->create();
+
+        $this->viewShouldReturnRaw('tags.show', 'showing {{ title }}');
+        $this->viewShouldReturnRaw('default', 'entry {{ title }}');
+
+        $this->get('/topics/test')->assertNotFound();
+
+        // Every non-entry url is matched against every taxonomy's route, so a
+        // route that can't be compiled must not take the whole site down.
+        $this->get('/about')->assertOk()->assertSee('entry About');
+        $this->get('/not-a-real-url')->assertNotFound();
+    }
+
+    public static function unmatchableRouteProvider()
+    {
+        return [
+            'antlers' => ['/topics/{{ slug }}'],
+            'antlers conditional' => ['/topics/{{ if depth > 1 }}{{ parent_uri }}/{{ slug }}{{ else }}{{ slug }}{{ /if }}'],
+            'duplicate placeholder' => ['/topics/{slug}/{slug}'],
+            'placeholder starting with a digit' => ['/topics/{1x}/{slug}'],
+        ];
     }
 }

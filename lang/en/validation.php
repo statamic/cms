@@ -205,6 +205,8 @@ return [
     'parent_exceeds_max_depth' => 'This would exceed the maximum depth.',
     'reserved' => 'This is a reserved word.',
     'reserved_field_handle' => 'Field with a handle of :handle is a reserved word.',
+    'taxonomy_route_invalid' => 'The route is not a valid URL pattern. :reason',
+    'taxonomy_route_no_antlers' => 'The route may not contain Antlers. Use {slug} instead of {{ slug }}.',
     'taxonomy_route_requires_slug' => 'The route must include {slug}.',
     'term_path_exceeds_max_depth' => 'The path :path exceeds the maximum depth of :max.',
     'term_path_repeats_a_term' => 'The path :path cannot use the same term more than once.',

@@ -3,10 +3,12 @@
 namespace Statamic\Stache\Repositories;
 
 use Closure;
+use Illuminate\Support\Facades\Log;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Contracts\Taxonomies\TermRepository as RepositoryContract;
 use Statamic\Exceptions\TaxonomyNotFoundException;
 use Statamic\Exceptions\TermNotFoundException;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Taxonomy;
@@ -17,6 +19,7 @@ use Statamic\Stache\Stache;
 use Statamic\Support\Str;
 use Statamic\Taxonomies\LocalizedTerm;
 use Statamic\Taxonomies\TermCollection;
+use Statamic\Taxonomies\TermRoute;
 
 class TermRepository implements RepositoryContract
 {
@@ -147,7 +150,7 @@ class TermRepository implements RepositoryContract
         }
 
         $pattern = URL::tidy($pattern);
-        $captures = $this->matchRoutePattern($uri, $pattern);
+        $captures = $this->matchRoutePattern($uri, $pattern, $taxonomy->nestable());
 
         if ($captures === null) {
             return null;
@@ -181,42 +184,42 @@ class TermRepository implements RepositoryContract
     /**
      * Match a URI against a route pattern like `/topics/{parent_uri}/{slug}`.
      *
-     * `{parent_uri}` may span multiple segments and is optional (root terms
-     * tidy away the empty segment). Other placeholders match a single segment.
+     * `{parent_uri}` may span multiple segments and is optional, so nestable
+     * taxonomies get a second pattern for terms at the root of the tree.
      */
-    private function matchRoutePattern(string $uri, string $pattern): ?array
+    private function matchRoutePattern(string $uri, string $pattern, bool $nestable): ?array
     {
-        $pattern = str_replace(['{{ ', ' }}', '{{', '}}'], ['{', '}', '{', '}'], $pattern);
-
-        $tokens = [];
-        $i = 0;
-
-        $tokenized = preg_replace_callback('/\{([a-zA-Z0-9_]+)\}/', function ($match) use (&$tokens, &$i) {
-            $key = '___T'.$i.'___';
-            $tokens[$key] = $match[1];
-            $i++;
-
-            return $key;
-        }, $pattern);
-
-        $regex = preg_quote($tokenized, '#');
-
-        foreach ($tokens as $token => $name) {
-            $quoted = preg_quote($token, '#');
-
-            if ($name === 'parent_uri') {
-                $regex = str_replace($quoted.'/', '(?:(?P<parent_uri>.+)/)?', $regex);
-                $regex = str_replace($quoted, '(?P<parent_uri>.*)', $regex);
-            } else {
-                $regex = str_replace($quoted, '(?P<'.$name.'>[^/]+)', $regex);
+        foreach ($this->routePatternRegexes($pattern, $nestable) as $regex) {
+            if (preg_match($regex, $uri, $matches)) {
+                return array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY);
             }
         }
 
-        if (! preg_match('#^'.$regex.'$#', $uri, $matches)) {
-            return null;
-        }
+        return null;
+    }
 
-        return array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY);
+    private function routePatternRegexes(string $pattern, bool $nestable): array
+    {
+        return Blink::store('term-route-regexes')->once($pattern.'@'.(int) $nestable, function () use ($pattern, $nestable) {
+            $patterns = [$pattern];
+
+            if ($nestable && Str::contains($pattern, '{parent_uri}')) {
+                $patterns[] = TermRoute::withoutParentUri($pattern);
+            }
+
+            return collect($patterns)
+                ->map(function ($pattern) {
+                    try {
+                        return TermRoute::toRegex($pattern);
+                    } catch (\DomainException|\LogicException $e) {
+                        Log::warning("Taxonomy route [{$pattern}] could not be compiled: {$e->getMessage()}");
+
+                        return null;
+                    }
+                })
+                ->filter()
+                ->all();
+        });
     }
 
     public function findOrFail($id): Term

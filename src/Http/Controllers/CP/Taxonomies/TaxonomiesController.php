@@ -23,6 +23,7 @@ use Statamic\Stache\Repositories\TermRepository as StacheTermRepository;
 use Statamic\Structures\TaxonomyStructure;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
+use Statamic\Taxonomies\TermRoute;
 
 use function Statamic\trans as __;
 
@@ -210,7 +211,7 @@ class TaxonomiesController extends CpController
 
         $values = $fields->process()->values()->all();
 
-        $this->assertCustomRouteContainsSlug($values['route_mode'] ?? 'automagic', $values['route'] ?? null);
+        $this->validateCustomRoutes($values['route_mode'] ?? 'automagic', $values['route'] ?? null);
 
         $taxonomy
             ->title($values['title'])
@@ -552,7 +553,7 @@ class TaxonomiesController extends CpController
         return $value;
     }
 
-    private function assertCustomRouteContainsSlug(string $mode, $route): void
+    private function validateCustomRoutes(string $mode, $route): void
     {
         if ($mode !== 'custom') {
             return;
@@ -561,12 +562,38 @@ class TaxonomiesController extends CpController
         $routes = is_array($route) ? $route : [$route];
 
         foreach ($routes as $pattern) {
-            if ($pattern && ! Str::contains((string) $pattern, '{slug}')) {
-                throw \Illuminate\Validation\ValidationException::withMessages([
-                    'route' => __('statamic::validation.taxonomy_route_requires_slug'),
-                ]);
+            if ($pattern) {
+                $this->validateCustomRoute((string) $pattern);
             }
         }
+    }
+
+    private function validateCustomRoute(string $pattern): void
+    {
+        if (TermRoute::containsAntlers($pattern)) {
+            $this->throwRouteValidationException('statamic::validation.taxonomy_route_no_antlers');
+        }
+
+        $pattern = TermRoute::canonicalize($pattern);
+
+        if (! Str::contains($pattern, '{slug}')) {
+            $this->throwRouteValidationException('statamic::validation.taxonomy_route_requires_slug');
+        }
+
+        try {
+            TermRoute::toRegex($pattern);
+        } catch (\DomainException|\LogicException $e) {
+            $this->throwRouteValidationException('statamic::validation.taxonomy_route_invalid', [
+                'reason' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    private function throwRouteValidationException(string $key, array $replacements = []): void
+    {
+        throw \Illuminate\Validation\ValidationException::withMessages([
+            'route' => __($key, $replacements),
+        ]);
     }
 
     protected function getAuthorizedSitesForTaxonomy($taxonomy)

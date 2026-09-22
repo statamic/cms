@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Taxonomies;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Taxonomy;
@@ -192,6 +193,50 @@ class UpdateTaxonomyTest extends TestCase
                 'route' => '/topics',
             ])
             ->assertSessionHasErrors('route');
+    }
+
+    #[Test]
+    public function it_canonicalizes_whitespace_in_a_custom_route()
+    {
+        $taxonomy = tap(Taxonomy::make('test')->title('Test'))->save();
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->update($taxonomy, [
+                'route_mode' => 'custom',
+                'route' => '/topics/{ slug }',
+            ])
+            ->assertOk();
+
+        $this->assertEquals('/topics/{slug}', Taxonomy::findByHandle('test')->termRoute());
+    }
+
+    #[Test]
+    #[DataProvider('invalidCustomRouteProvider')]
+    public function it_rejects_a_custom_route_that_cannot_be_matched($route)
+    {
+        $taxonomy = tap(Taxonomy::make('test')->title('Test'))->save();
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->update($taxonomy, [
+                'route_mode' => 'custom',
+                'route' => $route,
+            ])
+            ->assertSessionHasErrors('route');
+
+        $this->assertArrayNotHasKey('routes', Taxonomy::findByHandle('test')->fileData());
+    }
+
+    public static function invalidCustomRouteProvider()
+    {
+        return [
+            'antlers' => ['/topics/{{ slug }}'],
+            'antlers without spaces' => ['/topics/{{slug}}'],
+            'antlers conditional' => ['/topics/{{ if depth > 1 }}{{ parent_uri }}/{{ slug }}{{ else }}{{ slug }}{{ /if }}'],
+            'duplicate placeholder' => ['/topics/{slug}/{slug}'],
+            'placeholder starting with a digit' => ['/topics/{1x}/{slug}'],
+        ];
     }
 
     #[Test]
