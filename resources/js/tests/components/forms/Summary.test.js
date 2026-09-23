@@ -119,3 +119,48 @@ test('picking another chart after a failed preview fetches it', async () => {
     expect(axios.get.mock.calls[2][1].params.charts).toEqual([{ field: 'color', chart: 'lollipop' }]);
     expect(wrapper.vm.summary.fields[0].chart.handle).toBe('lollipop');
 });
+
+function pendingUntilAborted(signals) {
+    return (url, { signal }) => {
+        signals.push(signal);
+
+        return new Promise((resolve, reject) => {
+            signal.addEventListener('abort', () => reject({ name: 'CanceledError' }));
+        });
+    };
+}
+
+test('refetching the summary aborts in-flight previews', async () => {
+    const wrapper = await mountEditing();
+    const signals = [];
+
+    axios.get.mockImplementationOnce(pendingUntilAborted(signals));
+    wrapper.vm.setChart(0, 'pie');
+    await flushPromises();
+
+    axios.get.mockResolvedValue({ data: summary([field('color', 'pie')]) });
+    wrapper.vm.refresh();
+    await settle();
+
+    expect(signals[0].aborted).toBe(true);
+    expect(toast.error).not.toHaveBeenCalled();
+    expect(wrapper.vm.summary.fields[0].chart.handle).toBe('pie');
+});
+
+test('cancelling editing aborts in-flight previews', async () => {
+    const wrapper = await mountEditing();
+    const signals = [];
+
+    axios.get.mockImplementationOnce(pendingUntilAborted(signals));
+    wrapper.vm.setChart(0, 'pie');
+    await flushPromises();
+
+    axios.get.mockResolvedValue({ data: summary([field('color', 'horizontal_bar')]) });
+    wrapper.vm.cancelEditing();
+    await settle();
+
+    expect(signals[0].aborted).toBe(true);
+    expect(toast.error).not.toHaveBeenCalled();
+    expect(axios.get).toHaveBeenCalledTimes(3);
+    expect(wrapper.vm.summary.fields[0].chart.handle).toBe('horizontal_bar');
+});

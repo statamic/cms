@@ -33,6 +33,7 @@ const props = withDefaults(
 );
 
 let abortController: AbortController | null = null;
+const previewControllers = new Set<AbortController>();
 let saveBinding: { destroy: () => void } | null = null;
 
 const { showFieldNumbers } = useFieldNumberingPreference();
@@ -123,7 +124,13 @@ function parameters(): object {
     return params;
 }
 
+function abortPreviews() {
+    previewControllers.forEach((controller) => controller.abort());
+    previewControllers.clear();
+}
+
 async function fetchSummary() {
+    abortPreviews();
     abortController?.abort();
     abortController = new AbortController();
 
@@ -142,23 +149,33 @@ async function fetchSummary() {
 
 async function fetchPreviews(charts: ChartConfig[]) {
     const handles = charts.map((item) => item.field);
+    const controller = new AbortController();
 
+    previewControllers.add(controller);
     loadingPreviews.value.push(...handles);
 
     try {
-        const response = await axios.get(props.summaryUrl, { params: { ...parameters(), charts } });
+        const response = await axios.get(props.summaryUrl, {
+            params: { ...parameters(), charts },
+            signal: controller.signal,
+        });
         const previews: SummaryField[] = response.data.fields;
 
-        summary.value!.fields = [
-            ...summary.value!.fields.filter((field) => !previews.some((preview) => preview.handle === field.handle)),
+        if (!summary.value) return;
+
+        summary.value.fields = [
+            ...summary.value.fields.filter((field) => !previews.some((preview) => preview.handle === field.handle)),
             ...previews,
         ];
 
         failedPreviews.value.push(...charts.filter((item) => !isSummarized(item)).map(previewKey));
     } catch (error) {
+        if (axios.isCancel(error)) return;
+
         failedPreviews.value.push(...charts.map(previewKey));
         Statamic.$toast.error(error?.response?.data?.message ?? __('Something went wrong'));
     } finally {
+        previewControllers.delete(controller);
         loadingPreviews.value = loadingPreviews.value.filter((handle) => !handles.includes(handle));
     }
 }
