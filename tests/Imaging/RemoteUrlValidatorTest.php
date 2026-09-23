@@ -127,6 +127,38 @@ class RemoteUrlValidatorTest extends TestCase
     }
 
     #[Test]
+    public function it_parses_without_resolving_the_host()
+    {
+        $parsed = $this->validator(function () {
+            throw new \Exception('The resolver should not be called when parsing.');
+        })->parse('https://unknown.test/foo.jpg?w=100');
+
+        $this->assertSame([
+            'path' => 'foo.jpg',
+            'base' => 'https://unknown.test',
+            'query' => 'w=100',
+        ], $parsed);
+    }
+
+    #[Test]
+    public function it_still_rejects_malformed_urls_when_parsing()
+    {
+        $this->expectException(InvalidRemoteUrlException::class);
+        $this->expectExceptionMessage('URLs with credentials are not allowed.');
+
+        $this->validator()->parse('https://user:pass@example.com/foo.jpg');
+    }
+
+    #[Test]
+    public function it_resolves_the_host_when_validating()
+    {
+        $this->expectException(InvalidRemoteUrlException::class);
+        $this->expectExceptionMessage('Unable to resolve URL host.');
+
+        $this->validator()->validate('https://unknown.test/foo.jpg');
+    }
+
+    #[Test]
     public function it_includes_an_explicit_port_in_the_parsed_base()
     {
         $this->assertSame('http://example.com:8080', $this->validator()->parse('http://example.com:8080/foo.jpg')['base']);

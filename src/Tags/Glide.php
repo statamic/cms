@@ -15,6 +15,7 @@ use Statamic\Facades\Glide as GlideManager;
 use Statamic\Facades\Image;
 use Statamic\Facades\Path;
 use Statamic\Facades\URL;
+use Statamic\Imaging\AssetNotFoundException;
 use Statamic\Imaging\ImageGenerator;
 use Statamic\Support\Str;
 
@@ -177,15 +178,12 @@ class Glide extends Tags
                 : $this->getGenerator()->generateByPath($item, $params);
         }
 
-        $asset = Asset::find($item);
+        $asset = $item instanceof AssetContract ? $item : Asset::find($item);
 
         if (! $asset) {
-            // Thrown (rather than logged here directly) so the calling closure's
-            // existing catch (\Exception $e) { Log::error($e->getMessage()); }
-            // in generate() logs it with the identifying $item, instead of the
-            // flat, context-free message generateByAsset()'s own null-asset
-            // guard would otherwise produce.
-            throw new \Exception('Cannot generate an image for a missing asset: '.(is_string($item) ? $item : json_encode($item)));
+            throw new AssetNotFoundException(
+                sprintf('Could not generate a manipulated image from asset [%s]', $item)
+            );
         }
 
         return $this->getGenerator()->generateByAsset($asset, $params);
@@ -301,7 +299,7 @@ class Glide extends Tags
 
         // Double colons indicate an asset ID.
         if (Str::contains($item, '::')) {
-            return Asset::find($item);
+            return Asset::find($item) ?? $item;
         }
 
         // In a subfolder installation, the subfolder will likely be passed in

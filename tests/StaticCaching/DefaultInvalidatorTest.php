@@ -2,8 +2,15 @@
 
 namespace Tests\StaticCaching;
 
+use Illuminate\Contracts\Cache\Repository;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Events\ResponsePrepared;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Queue;
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Console\Commands\StaticWarmJob;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Assets\AssetContainer;
 use Statamic\Contracts\Entries\Collection;
@@ -13,12 +20,16 @@ use Statamic\Contracts\Globals\GlobalSet;
 use Statamic\Contracts\Structures\Nav;
 use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Facades\Entry as EntryFacade;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Globals\Variables;
+use Statamic\Sites\Site as SiteModel;
 use Statamic\StaticCaching\Cacher;
+use Statamic\StaticCaching\Cachers\ApplicationCacher;
 use Statamic\StaticCaching\DefaultInvalidator as Invalidator;
 use Statamic\Structures\CollectionTree;
+use Statamic\Structures\CollectionTreeDiff;
 use Statamic\Structures\NavTree;
 use Statamic\Structures\Structure;
 use Statamic\Taxonomies\LocalizedTerm;
@@ -224,6 +235,7 @@ class DefaultInvalidatorTest extends TestCase
             $m->shouldReceive('structure')->andReturn($structure);
             $m->shouldReceive('collection')->andReturn($collection);
             $m->shouldReceive('site')->andReturn(Site::default());
+            $m->shouldReceive('diff')->andReturn(new CollectionTreeDiff);
         });
 
         $invalidator = new Invalidator($cacher, [
@@ -273,6 +285,7 @@ class DefaultInvalidatorTest extends TestCase
             $m->shouldReceive('structure')->andReturn($structure);
             $m->shouldReceive('collection')->andReturn($collection);
             $m->shouldReceive('site')->andReturn(Site::get('fr'));
+            $m->shouldReceive('diff')->andReturn(new CollectionTreeDiff);
         });
 
         $invalidator = new Invalidator($cacher, [
@@ -285,6 +298,56 @@ class DefaultInvalidatorTest extends TestCase
                         '/test/{test}',
                         '{{ if favourite_color == "purple" }}/purple{{ /if }}',
                         '{{ if favourite_color == "red" }}/red{{ /if }}',
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertNull($invalidator->invalidate($tree));
+    }
+
+    #[Test]
+    public function moved_entry_urls_can_be_invalidated_by_a_tree()
+    {
+        $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
+            $cacher->shouldReceive('invalidateUrls')->with([
+                'http://localhost/parent/child',
+                'http://localhost/blog/one',
+            ])->once();
+        });
+
+        $movedEntry = tap(Mockery::mock(Entry::class), function ($m) {
+            $m->shouldReceive('isRedirect')->andReturn(false);
+            $m->shouldReceive('absoluteUrl')->andReturn('http://localhost/parent/child');
+        });
+
+        $redirectEntry = tap(Mockery::mock(Entry::class), function ($m) {
+            $m->shouldReceive('isRedirect')->andReturn(true);
+        });
+
+        EntryFacade::shouldReceive('find')->with('child')->andReturn($movedEntry);
+        EntryFacade::shouldReceive('find')->with('redirect')->andReturn($redirectEntry);
+        EntryFacade::shouldReceive('find')->with('missing')->andReturnNull();
+
+        $diff = tap(Mockery::mock(CollectionTreeDiff::class), function ($m) {
+            $m->shouldReceive('ancestryChanged')->andReturn(['child', 'redirect', 'missing']);
+        });
+
+        $collection = tap(Mockery::mock(Collection::class), function ($m) {
+            $m->shouldReceive('handle')->andReturn('blog');
+        });
+
+        $tree = tap(Mockery::mock(CollectionTree::class), function ($m) use ($collection, $diff) {
+            $m->shouldReceive('collection')->andReturn($collection);
+            $m->shouldReceive('site')->andReturn(Site::default());
+            $m->shouldReceive('diff')->andReturn($diff);
+        });
+
+        $invalidator = new Invalidator($cacher, [
+            'collections' => [
+                'blog' => [
+                    'urls' => [
+                        '/blog/one',
                     ],
                 ],
             ],
@@ -314,6 +377,8 @@ class DefaultInvalidatorTest extends TestCase
             $m->shouldReceive('descendants')->andReturn(collect());
             $m->shouldReceive('site')->andReturn(Site::default());
             $m->shouldReceive('parent')->andReturnNull();
+            $m->shouldReceive('getOriginal')->andReturnNull();
+            $m->shouldReceive('route')->andReturnNull();
             $m->shouldReceive('toAugmentedCollection')
                 ->andReturnSelf()
                 ->shouldReceive('merge')
@@ -368,6 +433,8 @@ class DefaultInvalidatorTest extends TestCase
             $m->shouldReceive('descendants')->andReturn(collect());
             $m->shouldReceive('site')->andReturn(Site::get('fr'));
             $m->shouldReceive('parent')->andReturnNull();
+            $m->shouldReceive('getOriginal')->andReturnNull();
+            $m->shouldReceive('route')->andReturnNull();
             $m->shouldReceive('toAugmentedCollection')
                 ->andReturnSelf()
                 ->shouldReceive('merge')
@@ -417,6 +484,8 @@ class DefaultInvalidatorTest extends TestCase
             $m->shouldReceive('descendants')->andReturn(collect());
             $m->shouldReceive('site')->andReturn(Site::default());
             $m->shouldReceive('parent')->andReturnNull();
+            $m->shouldReceive('getOriginal')->andReturnNull();
+            $m->shouldReceive('route')->andReturnNull();
             $m->shouldReceive('toAugmentedCollection')
                 ->andReturnSelf()
                 ->shouldReceive('merge')
@@ -456,6 +525,8 @@ class DefaultInvalidatorTest extends TestCase
             $m->shouldReceive('collectionHandle')->andReturn('blog');
             $m->shouldReceive('descendants')->andReturn(collect());
             $m->shouldReceive('parent')->andReturnNull();
+            $m->shouldReceive('getOriginal')->andReturnNull();
+            $m->shouldReceive('route')->andReturnNull();
             $m->shouldReceive('site')->andReturn(Site::default());
             $m->shouldReceive('toAugmentedCollection')
                 ->andReturnSelf()
@@ -475,6 +546,221 @@ class DefaultInvalidatorTest extends TestCase
                 ],
             ],
         ]);
+
+        $this->assertNull($invalidator->invalidate($entry));
+    }
+
+    #[Test]
+    public function old_entry_url_is_invalidated_when_the_slug_changes()
+    {
+        $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
+            $cacher->shouldReceive('invalidateUrls')->with([
+                'http://localhost/blog/new-slug',
+                'http://localhost/blog/old-slug',
+                'http://localhost/blog/old-slug/*',
+            ])->once();
+        });
+
+        $entry = tap(Mockery::mock(Entry::class), function ($m) {
+            $m->shouldReceive('isRedirect')->andReturn(false);
+            $m->shouldReceive('absoluteUrl')->andReturn('http://localhost/blog/new-slug');
+            $m->shouldReceive('collectionHandle')->andReturn('blog');
+            $m->shouldReceive('descendants')->andReturn(collect());
+            $m->shouldReceive('site')->andReturn(Site::default());
+            $m->shouldReceive('parent')->andReturnNull();
+            $m->shouldReceive('getOriginal')->with('slug')->andReturn('old-slug');
+            $m->shouldReceive('slug')->andReturn('new-slug');
+            $m->shouldReceive('route')->andReturn('/blog/{slug}');
+            $m->shouldReceive('routeData')->andReturn(['slug' => 'new-slug']);
+            $m->shouldReceive('isDirty')->with('slug')->andReturn(true);
+            $m->shouldReceive('toAugmentedCollection')
+                ->andReturnSelf()
+                ->shouldReceive('merge')
+                ->andReturn(collect(['parent_uri' => null]));
+        });
+
+        $invalidator = new Invalidator($cacher, []);
+
+        $this->assertNull($invalidator->invalidate($entry));
+    }
+
+    #[Test]
+    public function old_entry_url_is_not_invalidated_when_the_slug_is_unchanged()
+    {
+        $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
+            $cacher->shouldReceive('invalidateUrls')->with([
+                'http://localhost/blog/my-slug',
+            ])->once();
+        });
+
+        $entry = tap(Mockery::mock(Entry::class), function ($m) {
+            $m->shouldReceive('isRedirect')->andReturn(false);
+            $m->shouldReceive('absoluteUrl')->andReturn('http://localhost/blog/my-slug');
+            $m->shouldReceive('collectionHandle')->andReturn('blog');
+            $m->shouldReceive('descendants')->andReturn(collect());
+            $m->shouldReceive('site')->andReturn(Site::default());
+            $m->shouldReceive('parent')->andReturnNull();
+            $m->shouldReceive('getOriginal')->with('slug')->andReturn('my-slug');
+            $m->shouldReceive('slug')->andReturn('my-slug');
+            $m->shouldReceive('route')->andReturn('/blog/{slug}');
+            $m->shouldReceive('isDirty')->with('slug')->andReturn(false);
+            $m->shouldReceive('toAugmentedCollection')
+                ->andReturnSelf()
+                ->shouldReceive('merge')
+                ->andReturn(collect(['parent_uri' => null]));
+        });
+
+        $invalidator = new Invalidator($cacher, []);
+
+        $this->assertNull($invalidator->invalidate($entry));
+    }
+
+    #[Test]
+    public function old_entry_url_is_invalidated_when_a_non_slug_route_field_changes()
+    {
+        $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
+            $cacher->shouldReceive('invalidateUrls')->with([
+                'http://localhost/2025/my-post',
+                'http://localhost/2024/my-post',
+                'http://localhost/2024/my-post/*',
+            ])->once();
+        });
+
+        $entry = tap(Mockery::mock(Entry::class), function ($m) {
+            $m->shouldReceive('isRedirect')->andReturn(false);
+            $m->shouldReceive('absoluteUrl')->andReturn('http://localhost/2025/my-post');
+            $m->shouldReceive('collectionHandle')->andReturn('blog');
+            $m->shouldReceive('descendants')->andReturn(collect());
+            $m->shouldReceive('site')->andReturn(Site::default());
+            $m->shouldReceive('parent')->andReturnNull();
+            $m->shouldReceive('getOriginal')->with('slug')->andReturn('my-post');
+            $m->shouldReceive('getOriginal')->with('date')->andReturn('2024-01-15-1200');
+            $m->shouldReceive('slug')->andReturn('my-post');
+            $m->shouldReceive('date')->andReturn(Carbon::parse('2025-06-01', 'UTC'));
+            $m->shouldReceive('route')->andReturn('/{year}/{slug}');
+            $m->shouldReceive('routeData')->andReturn(['slug' => 'my-post', 'year' => '2025']);
+            $m->shouldReceive('isDirty')->with('slug')->andReturn(false);
+            $m->shouldReceive('isDirty')->with('date')->andReturn(true);
+            $m->shouldReceive('toAugmentedCollection')
+                ->andReturnSelf()
+                ->shouldReceive('merge')
+                ->andReturn(collect(['parent_uri' => null]));
+        });
+
+        $invalidator = new Invalidator($cacher, []);
+
+        $this->assertNull($invalidator->invalidate($entry));
+    }
+
+    #[Test]
+    public function old_entry_url_is_built_from_the_sites_absolute_url_not_its_configured_url()
+    {
+        $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
+            $cacher->shouldReceive('invalidateUrls')->with([
+                'http://example.test/blog/new-slug',
+                'http://example.test/blog/old-slug',
+                'http://example.test/blog/old-slug/*',
+            ])->once();
+        });
+
+        $site = tap(Mockery::mock(SiteModel::class), function ($m) {
+            // Configured url() is relative, as it is on a default install.
+            // absoluteUrl() must be used to build a comparable/cacheable URL.
+            $m->shouldReceive('url')->andReturn('/');
+            $m->shouldReceive('absoluteUrl')->andReturn('http://example.test');
+        });
+
+        $entry = tap(Mockery::mock(Entry::class), function ($m) use ($site) {
+            $m->shouldReceive('isRedirect')->andReturn(false);
+            $m->shouldReceive('absoluteUrl')->andReturn('http://example.test/blog/new-slug');
+            $m->shouldReceive('collectionHandle')->andReturn('blog');
+            $m->shouldReceive('descendants')->andReturn(collect());
+            $m->shouldReceive('site')->andReturn($site);
+            $m->shouldReceive('parent')->andReturnNull();
+            $m->shouldReceive('getOriginal')->with('slug')->andReturn('old-slug');
+            $m->shouldReceive('slug')->andReturn('new-slug');
+            $m->shouldReceive('route')->andReturn('/blog/{slug}');
+            $m->shouldReceive('routeData')->andReturn(['slug' => 'new-slug']);
+            $m->shouldReceive('isDirty')->with('slug')->andReturn(true);
+            $m->shouldReceive('toAugmentedCollection')
+                ->andReturnSelf()
+                ->shouldReceive('merge')
+                ->andReturn(collect(['parent_uri' => null]));
+        });
+
+        $invalidator = new Invalidator($cacher, []);
+
+        $this->assertNull($invalidator->invalidate($entry));
+    }
+
+    #[Test]
+    public function old_entry_url_is_not_invalidated_when_a_dirty_route_field_reconstructs_to_the_same_url()
+    {
+        $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
+            $cacher->shouldReceive('invalidateUrls')->with([
+                'http://localhost/2025/my-post',
+            ])->once();
+        });
+
+        $entry = tap(Mockery::mock(Entry::class), function ($m) {
+            $m->shouldReceive('isRedirect')->andReturn(false);
+            $m->shouldReceive('absoluteUrl')->andReturn('http://localhost/2025/my-post');
+            $m->shouldReceive('collectionHandle')->andReturn('blog');
+            $m->shouldReceive('descendants')->andReturn(collect());
+            $m->shouldReceive('site')->andReturn(Site::default());
+            $m->shouldReceive('parent')->andReturnNull();
+            $m->shouldReceive('getOriginal')->with('slug')->andReturn('my-post');
+            $m->shouldReceive('getOriginal')->with('date')->andReturn('2025-01-05-1200');
+            $m->shouldReceive('slug')->andReturn('my-post');
+            $m->shouldReceive('date')->andReturn(Carbon::parse('2025-02-20', 'UTC'));
+            $m->shouldReceive('route')->andReturn('/{year}/{slug}');
+            $m->shouldReceive('routeData')->andReturn(['slug' => 'my-post', 'year' => '2025']);
+            $m->shouldReceive('isDirty')->with('slug')->andReturn(false);
+            $m->shouldReceive('isDirty')->with('date')->andReturn(true);
+            $m->shouldReceive('toAugmentedCollection')
+                ->andReturnSelf()
+                ->shouldReceive('merge')
+                ->andReturn(collect(['parent_uri' => null]));
+        });
+
+        $invalidator = new Invalidator($cacher, []);
+
+        $this->assertNull($invalidator->invalidate($entry));
+    }
+
+    #[Test]
+    public function old_entry_url_is_rebuilt_from_originals_of_all_dirty_route_fields()
+    {
+        $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
+            $cacher->shouldReceive('invalidateUrls')->with([
+                'http://localhost/2025/new-post',
+                'http://localhost/2024/old-post',
+                'http://localhost/2024/old-post/*',
+            ])->once();
+        });
+
+        $entry = tap(Mockery::mock(Entry::class), function ($m) {
+            $m->shouldReceive('isRedirect')->andReturn(false);
+            $m->shouldReceive('absoluteUrl')->andReturn('http://localhost/2025/new-post');
+            $m->shouldReceive('collectionHandle')->andReturn('blog');
+            $m->shouldReceive('descendants')->andReturn(collect());
+            $m->shouldReceive('site')->andReturn(Site::default());
+            $m->shouldReceive('parent')->andReturnNull();
+            $m->shouldReceive('getOriginal')->with('slug')->andReturn('old-post');
+            $m->shouldReceive('getOriginal')->with('date')->andReturn('2024-03-10-0900');
+            $m->shouldReceive('slug')->andReturn('new-post');
+            $m->shouldReceive('date')->andReturn(Carbon::parse('2025-01-01', 'UTC'));
+            $m->shouldReceive('route')->andReturn('/{year}/{slug}');
+            $m->shouldReceive('routeData')->andReturn(['slug' => 'new-post', 'year' => '2025']);
+            $m->shouldReceive('isDirty')->with('slug')->andReturn(true);
+            $m->shouldReceive('isDirty')->with('date')->andReturn(true);
+            $m->shouldReceive('toAugmentedCollection')
+                ->andReturnSelf()
+                ->shouldReceive('merge')
+                ->andReturn(collect(['parent_uri' => null]));
+        });
+
+        $invalidator = new Invalidator($cacher, []);
 
         $this->assertNull($invalidator->invalidate($entry));
     }
@@ -684,6 +970,124 @@ class DefaultInvalidatorTest extends TestCase
         ]);
 
         $this->assertNull($invalidator->invalidate($nav));
+    }
+
+    #[Test]
+    public function navigation_urls_are_made_absolute_in_a_multisite_with_relative_site_urls()
+    {
+        $this->setSites([
+            'de' => ['url' => '/de/', 'locale' => 'de_DE'],
+            'fr' => ['url' => '/fr/', 'locale' => 'fr_FR'],
+        ]);
+
+        $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
+            $cacher->shouldReceive('invalidateUrls')->with([
+                'http://localhost/de/*',
+                'http://localhost/fr/*',
+            ])->once();
+        });
+
+        $nav = tap(Mockery::mock(Nav::class), function ($m) {
+            $m->shouldReceive('handle')->andReturn('links');
+            $m->shouldReceive('sites')->andReturn(collect(['de', 'fr']));
+            $m->shouldReceive('toAugmentedCollection')->andReturn(collect());
+        });
+
+        $invalidator = new Invalidator($cacher, [
+            'navigation' => [
+                'links' => [
+                    'urls' => ['/*'],
+                ],
+            ],
+        ]);
+
+        $this->assertNull($invalidator->invalidate($nav));
+    }
+
+    #[Test]
+    public function absolute_navigation_urls_are_tidied()
+    {
+        $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
+            $cacher->shouldReceive('invalidateUrls')->with([
+                'http://localhost/de/*',
+                'http://localhost/fr',
+            ])->once();
+        });
+
+        $nav = tap(Mockery::mock(Nav::class), function ($m) {
+            $m->shouldReceive('handle')->andReturn('links');
+            $m->shouldReceive('sites')->andReturn(collect(['en']));
+            $m->shouldReceive('toAugmentedCollection')->andReturn(collect());
+        });
+
+        $invalidator = new Invalidator($cacher, [
+            'navigation' => [
+                'links' => [
+                    'urls' => [
+                        'http://localhost//de/*',
+                        'http://localhost//fr/',
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertNull($invalidator->invalidate($nav));
+    }
+
+    #[Test]
+    #[DataProvider('wildcardRulesWithTrailingSlashes')]
+    public function wildcard_rules_work_with_trailing_slash_enforcement($rule, $path, $method)
+    {
+        URL::enforceTrailingSlashes();
+        config(['statamic.static_caching.background_recache' => true]);
+        Queue::fake();
+
+        $cacher = new ApplicationCacher(app(Repository::class), []);
+        $request = Request::create('http://localhost'.$path);
+        $unrelatedRequest = Request::create('http://localhost/other/');
+
+        foreach ([$request, $unrelatedRequest] as $cachedRequest) {
+            $response = response('cached content');
+            $cacher->cachePage($cachedRequest, $response);
+            event(new ResponsePrepared($cachedRequest, $response));
+            $this->assertTrue($cacher->hasCachedPage($cachedRequest));
+        }
+
+        $nav = tap(Mockery::mock(Nav::class), function ($m) {
+            $m->shouldReceive('handle')->andReturn('links');
+            $m->shouldReceive('sites')->andReturn(collect(['en']));
+            $m->shouldReceive('toAugmentedCollection')->andReturn(collect());
+        });
+
+        $invalidator = new Invalidator($cacher, [
+            'navigation' => ['links' => ['urls' => [$rule]]],
+        ]);
+
+        $invalidator->{$method}($nav);
+
+        if ($method === 'refresh') {
+            Queue::assertPushed(StaticWarmJob::class, 1);
+            Queue::assertPushed(StaticWarmJob::class, fn ($job) => $job->request->getUri()->getPath() === $path);
+        } else {
+            $this->assertFalse($cacher->hasCachedPage($request));
+            Queue::assertNothingPushed();
+        }
+
+        $this->assertTrue($cacher->hasCachedPage($unrelatedRequest));
+    }
+
+    public static function wildcardRulesWithTrailingSlashes()
+    {
+        foreach ([
+            'absolute subtree' => ['http://localhost//blog/*', '/blog/one/'],
+            'relative subtree' => ['/blog/*', '/blog/one/'],
+            'absolute prefix' => ['http://localhost/blog*', '/blogroll/'],
+            'relative prefix' => ['/blog*', '/blogroll/'],
+        ] as $name => [$rule, $path]) {
+            foreach (['invalidate', 'refresh'] as $method) {
+                yield "$name $method" => [$rule, $path, $method];
+            }
+        }
     }
 
     #[Test]
@@ -961,6 +1365,8 @@ class DefaultInvalidatorTest extends TestCase
             $m->shouldReceive('descendants')->andReturn(collect());
             $m->shouldReceive('site')->andReturn(Site::default());
             $m->shouldReceive('parent')->andReturnNull();
+            $m->shouldReceive('getOriginal')->andReturnNull();
+            $m->shouldReceive('route')->andReturnNull();
             $m->shouldReceive('toAugmentedCollection')
                 ->andReturnSelf()
                 ->shouldReceive('merge')
@@ -1001,6 +1407,8 @@ class DefaultInvalidatorTest extends TestCase
             $m->shouldReceive('descendants')->andReturn(collect());
             $m->shouldReceive('site')->andReturn(Site::default());
             $m->shouldReceive('parent')->andReturnNull();
+            $m->shouldReceive('getOriginal')->andReturnNull();
+            $m->shouldReceive('route')->andReturnNull();
             $m->shouldReceive('toAugmentedCollection')
                 ->andReturnSelf()
                 ->shouldReceive('merge')
@@ -1017,6 +1425,44 @@ class DefaultInvalidatorTest extends TestCase
                 ],
             ],
         ]);
+
+        $this->assertNull($invalidator->refresh($entry));
+    }
+
+    #[Test]
+    public function old_entry_url_is_invalidated_rather_than_recached_when_background_recache_is_enabled()
+    {
+        config()->set('statamic.static_caching.background_recache', true);
+
+        $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
+            $cacher->shouldReceive('invalidateUrls')->once()->with([
+                'http://localhost/blog/old-slug',
+                'http://localhost/blog/old-slug/*',
+            ]);
+            $cacher->shouldReceive('refreshUrls')->once()->with([
+                'http://localhost/blog/new-slug',
+            ]);
+        });
+
+        $entry = tap(Mockery::mock(Entry::class), function ($m) {
+            $m->shouldReceive('isRedirect')->andReturn(false);
+            $m->shouldReceive('absoluteUrl')->andReturn('http://localhost/blog/new-slug');
+            $m->shouldReceive('collectionHandle')->andReturn('blog');
+            $m->shouldReceive('descendants')->andReturn(collect());
+            $m->shouldReceive('site')->andReturn(Site::default());
+            $m->shouldReceive('parent')->andReturnNull();
+            $m->shouldReceive('getOriginal')->with('slug')->andReturn('old-slug');
+            $m->shouldReceive('slug')->andReturn('new-slug');
+            $m->shouldReceive('route')->andReturn('/blog/{slug}');
+            $m->shouldReceive('routeData')->andReturn(['slug' => 'new-slug']);
+            $m->shouldReceive('isDirty')->with('slug')->andReturn(true);
+            $m->shouldReceive('toAugmentedCollection')
+                ->andReturnSelf()
+                ->shouldReceive('merge')
+                ->andReturn(collect(['parent_uri' => null]));
+        });
+
+        $invalidator = new Invalidator($cacher, []);
 
         $this->assertNull($invalidator->refresh($entry));
     }

@@ -2,6 +2,7 @@
 
 namespace Statamic\Data;
 
+use ReflectionMethod;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Fields\Value;
 use Statamic\Statamic;
@@ -97,9 +98,23 @@ abstract class AbstractAugmented implements Augmented
 
     private function methodExistsOnData(string $handle, string $method): bool
     {
-        return method_exists($this->data, $method)
+        // Non-public methods route through __call(), which re-augments the same handle forever
+        return $this->publicMethodExistsOnData($method)
             && collect($this->keys())->contains(Str::snake($handle))
             && ! in_array($handle, ['hook', 'value', 'entry']);
+    }
+
+    private function publicMethodExistsOnData(string $method): bool
+    {
+        static $cache = [];
+
+        if (! method_exists($this->data, $method)) {
+            return false;
+        }
+
+        $key = get_class($this->data).'::'.$method;
+
+        return $cache[$key] ??= (new ReflectionMethod($this->data, $method))->isPublic();
     }
 
     protected function getFromData($handle)
