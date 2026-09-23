@@ -4,11 +4,11 @@ namespace Statamic\Providers;
 
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Facades\Blade;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\View as ViewFactory;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\View;
 use Statamic\Contracts\View\Antlers\Parser as ParserContract;
+use Statamic\Facades\File;
 use Statamic\Facades\Site;
 use Statamic\Statamic;
 use Statamic\StaticCaching\NoCache\Region;
@@ -426,7 +426,7 @@ PHP;
 
     public function boot()
     {
-        File::ensureDirectoryExists($nocacheViews = storage_path('statamic/tmp/nocache'));
+        File::makeDirectory($nocacheViews = storage_path('statamic/tmp/nocache'));
 
         ViewFactory::addNamespace('nocache__views', $nocacheViews);
 
