@@ -26,6 +26,12 @@ class FormSummaryController extends CpController
 
         $this->authorize('viewSubmissions', $form);
 
+        $request->validate([
+            'charts' => 'nullable|array',
+            'charts.*.field' => 'required|string|distinct',
+            'charts.*.chart' => 'required|string',
+        ]);
+
         $numbers = $this->fieldNumbers($form);
         $charts = $this->resolveCharts($request, $form);
 

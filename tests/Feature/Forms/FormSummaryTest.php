@@ -3,6 +3,7 @@
 namespace Tests\Feature\Forms;
 
 use Facades\Statamic\Console\Processes\Composer;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Form;
 use Statamic\Facades\FormSubmission;
@@ -205,6 +206,31 @@ class FormSummaryTest extends TestCase
             ->assertJsonPath('fields.0.chart.props.items.0.count', 1);
 
         $this->assertEquals([['field' => 'rating', 'chart' => 'horizontal_bar']], Form::find('survey')->charts());
+    }
+
+    #[Test]
+    #[DataProvider('invalidChartLayoutProvider')]
+    public function it_validates_a_previewed_chart_layout($charts, $error)
+    {
+        $form = $this->makeForm();
+
+        $this
+            ->actingAs($this->superUser())
+            ->getJson(cp_route('forms.submissions.summary', $form->handle()).'?'.http_build_query(['charts' => $charts]))
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors($error);
+    }
+
+    public static function invalidChartLayoutProvider()
+    {
+        return [
+            'not an array' => ['pie', 'charts'],
+            'array field' => [[['field' => ['color'], 'chart' => 'pie']], 'charts.0.field'],
+            'array chart' => [[['field' => 'color', 'chart' => ['pie']]], 'charts.0.chart'],
+            'missing field' => [[['chart' => 'pie']], 'charts.0.field'],
+            'missing chart' => [[['field' => 'color']], 'charts.0.chart'],
+            'duplicate field' => [[['field' => 'color', 'chart' => 'pie'], ['field' => 'color', 'chart' => 'pie']], 'charts.0.field'],
+        ];
     }
 
     #[Test]
