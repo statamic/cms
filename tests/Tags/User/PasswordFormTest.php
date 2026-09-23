@@ -351,4 +351,12 @@ EOT
 
         $this->assertFalse(Password::tokenExists($user, $token));
     }
+
+    #[Test]
+    public function it_returns_404_when_frontend_authentication_is_disabled(): void
+    {
+        config(['statamic.users.frontend_auth_enabled' => false]);
+
+        $this->post('/!/auth/password')->assertNotFound();
+    }
 }

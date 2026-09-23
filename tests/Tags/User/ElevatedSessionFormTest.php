@@ -252,4 +252,15 @@ class ElevatedSessionFormTest extends TestCase
             ])
             ->assertRedirect('/intended-destination');
     }
+
+    #[Test]
+    public function it_returns_404_when_frontend_authentication_is_disabled(): void
+    {
+        config(['statamic.users.frontend_auth_enabled' => false]);
+
+        $this->get('/!/auth/confirm-password')->assertNotFound();
+        $this->post('/!/auth/elevated-session')->assertNotFound();
+        $this->get('/!/auth/elevated-session/passkey-options')->assertNotFound();
+        $this->get('/!/auth/elevated-session/resend-code')->assertNotFound();
+    }
 }
