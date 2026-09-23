@@ -79,4 +79,13 @@ class TwoFactorRecoveryCodesTagTest extends TestCase
 
         return $user;
     }
+
+    #[Test]
+    public function it_returns_404_when_frontend_authentication_is_disabled(): void
+    {
+        config(['statamic.users.frontend_auth_enabled' => false]);
+
+        $this->get('/!/auth/two-factor/recovery-codes')->assertNotFound();
+        $this->get('/!/auth/two-factor/recovery-codes/download')->assertNotFound();
+    }
 }

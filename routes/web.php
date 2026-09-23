@@ -28,6 +28,7 @@ use Statamic\Http\Controllers\User\TwoFactorRecoveryCodesController;
 use Statamic\Http\Middleware\AuthGuard;
 use Statamic\Http\Middleware\CP\AuthGuard as CPAuthGuard;
 use Statamic\Http\Middleware\CP\HandleInertiaRequests;
+use Statamic\Http\Middleware\EnsureFrontendAuthEnabled;
 use Statamic\Http\Middleware\HandleFormPrecognitiveRequests;
 use Statamic\Http\Middleware\RedirectIfTwoFactorSetupIncomplete;
 use Statamic\Http\Middleware\RequireElevatedSession;
@@ -45,7 +46,7 @@ Route::name('statamic.')->group(function () {
 
         Route::get('fieldtypes/dictionaries/{dictionary}', DictionaryFieldtypeController::class)->middleware([CPAuthGuard::class, 'throttle:statamic.dictionaries'])->name('dictionary-fieldtype');
 
-        Route::group(['prefix' => 'auth', 'middleware' => [AuthGuard::class]], function () {
+        Route::group(['prefix' => 'auth', 'middleware' => [EnsureFrontendAuthEnabled::class, AuthGuard::class]], function () {
             Route::get('logout', [LoginController::class, 'logout'])->name('logout');
 
             Route::group(['middleware' => [HandlePrecognitiveRequests::class, 'throttle:statamic.auth']], function () {
