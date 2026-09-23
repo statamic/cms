@@ -44,6 +44,7 @@ const draftLayout = ref<ChartConfig[]>([]);
 const savedLayout = ref<ChartConfig[]>([]);
 const saving = ref<boolean>(false);
 const loadingPreviews = ref<string[]>([]);
+const failedPreviews = ref<string[]>([]);
 const isDragging = ref<boolean>(false);
 const metric = ref<ChartMetric>(preferences.get(`${preferencesPrefix.value}.summary.chart_metric`, ChartMetric.Percent));
 
@@ -88,8 +89,17 @@ const widgets = computed<SummaryWidget[]>(() => {
 const isDirty = computed<boolean>(() => editing.value && JSON.stringify(draftLayout.value) !== JSON.stringify(savedLayout.value));
 
 const missingPreviews = computed<ChartConfig[]>(() =>
-    draftLayout.value.filter((item) => !isSummarized(item) && !loadingPreviews.value.includes(item.field)),
+    draftLayout.value.filter(
+        (item) =>
+            !isSummarized(item) &&
+            !loadingPreviews.value.includes(item.field) &&
+            !failedPreviews.value.includes(previewKey(item)),
+    ),
 );
+
+function previewKey(config: ChartConfig): string {
+    return `${config.field}:${config.chart}`;
+}
 
 function chartableField(handle: string): MetaField | undefined {
     return chartableFields.value.find((field) => field.handle === handle);
@@ -143,7 +153,10 @@ async function fetchPreviews(charts: ChartConfig[]) {
             ...summary.value!.fields.filter((field) => !previews.some((preview) => preview.handle === field.handle)),
             ...previews,
         ];
+
+        failedPreviews.value.push(...charts.filter((item) => !isSummarized(item)).map(previewKey));
     } catch (error) {
+        failedPreviews.value.push(...charts.map(previewKey));
         Statamic.$toast.error(error?.response?.data?.message ?? __('Something went wrong'));
     } finally {
         loadingPreviews.value = loadingPreviews.value.filter((handle) => !handles.includes(handle));
@@ -157,6 +170,7 @@ function startEditing() {
     }));
 
     draftLayout.value = clone(savedLayout.value);
+    failedPreviews.value = [];
     editing.value = true;
 }
 
