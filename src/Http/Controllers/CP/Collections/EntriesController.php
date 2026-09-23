@@ -142,7 +142,9 @@ class EntriesController extends CpController
             'blueprint' => $blueprint->toPublishArray(),
             'readOnly' => User::current()->cant('edit', $entry),
             'locale' => $entry->locale(),
-            'localizedFields' => $entry->data()->keys()->all(),
+            'localizedFields' => $entry->data()->keys()
+                ->when($hasOrigin && $entry->hasExplicitDate() && $blueprint->field('date')->isLocalizable(), fn ($fields) => $fields->push('date'))
+                ->all(),
             'originBehavior' => $collection->originBehavior(),
             'hasOrigin' => $hasOrigin,
             'originValues' => $originValues ?? null,
