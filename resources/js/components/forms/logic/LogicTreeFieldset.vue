@@ -30,7 +30,7 @@ const rows = computed(() => Object.entries(props.field.previews ?? {}).map(([han
         <Icon :name="row.icon" class="size-4 shrink-0 text-gray-600 dark:text-gray-400" aria-hidden="true" />
         <span class="linked-list__field-name min-w-0 flex-1">
             <FieldNumber :field-key="`${field._id}:${row.handle}`" />
-            {{ row.display }}
+            {{ __(row.display) }}
         </span>
         <span
             v-tooltip="fieldsetTitle ? __('Linked Fieldset: :title', { title: __(fieldsetTitle) }) : __('Linked Fieldset')"

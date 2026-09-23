@@ -25,6 +25,7 @@ class HeadingTest extends TestCase
             'hide_display' => true,
             'listable' => false,
             'instructions' => null,
+            'handle' => null,
         ], $fieldtype->toFieldArray());
     }
 
@@ -46,6 +47,7 @@ class HeadingTest extends TestCase
             'hide_display' => true,
             'listable' => false,
             'instructions' => null,
+            'handle' => null,
             'width' => 50,
             'if' => ['subscribe' => 'is true'],
         ], $fieldtype->toFieldArray());

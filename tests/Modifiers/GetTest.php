@@ -22,7 +22,7 @@ class GetTest extends TestCase
     }
 
     #[Test]
-    public function it_returns_falsy_field_values_instead_of_falling_through_to_a_method()
+    public function it_returns_falsy_field_values_instead_of_the_original_value()
     {
         $item = new GetTestItem;
 
@@ -32,45 +32,20 @@ class GetTest extends TestCase
     }
 
     #[Test]
-    public function it_dispatches_to_a_non_destructive_accessor_method()
+    public function it_does_not_dispatch_to_methods()
     {
         $item = new GetTestItem;
 
-        $this->assertEquals('https://example.com', $this->modify($item, 'url'));
-    }
-
-    #[Test]
-    public function it_does_not_dispatch_to_destructive_methods()
-    {
-        $item = new GetTestItem;
-
-        $result = $this->modify($item, 'delete');
+        $this->assertSame($item, $this->modify($item, 'url'));
+        $this->assertSame($item, $this->modify($item, 'delete'));
 
         $this->assertFalse($item->deleted);
-        $this->assertSame($item, $result);
-    }
-
-    #[Test]
-    public function it_does_not_dispatch_to_destructive_methods_case_insensitively()
-    {
-        // Str::slug() lowercases the parameter (e.g. "deleteQuietly" => "deletequietly"),
-        // but method_exists() is case-insensitive, so the denylist must match regardless of case.
-        $item = new GetTestItem;
-
-        $this->modify($item, 'deletequietly');
-        $this->assertFalse($item->deletedQuietly);
-
-        $this->modify($item, 'savequietly');
-        $this->assertFalse($item->savedQuietly);
     }
 }
 
 class GetTestItem
 {
     public $deleted = false;
-    public $deletedQuietly = false;
-    public $saved = false;
-    public $savedQuietly = false;
 
     public function toArray()
     {
@@ -90,20 +65,5 @@ class GetTestItem
     public function delete()
     {
         $this->deleted = true;
-    }
-
-    public function deleteQuietly()
-    {
-        $this->deletedQuietly = true;
-    }
-
-    public function save()
-    {
-        $this->saved = true;
-    }
-
-    public function saveQuietly()
-    {
-        $this->savedQuietly = true;
     }
 }

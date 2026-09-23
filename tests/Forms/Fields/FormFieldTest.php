@@ -49,7 +49,7 @@ class FormFieldTest extends TestCase
         {
             public function toFieldArray(): array
             {
-                // TODO: Implement toFieldArray() method.
+                return [];
             }
         };
 

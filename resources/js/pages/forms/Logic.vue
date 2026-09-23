@@ -8,6 +8,7 @@ import FieldNumberingToggle from '@/components/forms/FieldNumberingToggle.vue';
 import LogicList from '@/components/forms/logic/LogicList.vue';
 import LogicTree, { TreeDensity, SelectionType, type Selection } from '@/components/forms/logic/LogicTree.vue';
 import { provideBuilderContext } from '@/pages/forms/Builder.vue';
+import { collectsValue } from '@/components/forms/builder/categories';
 import Head from '@/pages/layout/Head.vue';
 import { useFieldNumberingPreference } from '@/composables/forms/field-numbering';
 import { computed, nextTick, onMounted, onUnmounted, provide, ref, watch } from 'vue';
@@ -84,7 +85,7 @@ const fieldNumbers = computed(() => {
 provide('fieldNumbers', fieldNumbers);
 
 const suggestableFields = computed(() => flattenedFields.value
-    .filter(({ field }) => !['information', 'structure'].includes(fieldCategory(field)))
+    .filter(({ field }) => collectsValue(fieldCategory(field)))
     .map(({ field, pageIndex }) => ({
         handle: field.handle,
         icon: field.icon,

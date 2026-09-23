@@ -110,6 +110,14 @@ class CollectionStructure extends Structure
             ->all();
     }
 
+    public function flushCache($site = null)
+    {
+        Blink::forget('collection-structure-tree-'.$this->handle().'-'.($site ?? '*'));
+        Blink::forget('collection-structure-tree-entries::'.$this->handle().'::'.($site ?? '*'));
+
+        return parent::flushCache($site);
+    }
+
     public function save()
     {
         $this->collection()->structure($this)->save();

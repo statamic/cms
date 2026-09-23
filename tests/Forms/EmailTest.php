@@ -352,6 +352,24 @@ class EmailTest extends TestCase
     }
 
     #[Test]
+    public function it_skips_attachments_whose_temporary_files_no_longer_exist()
+    {
+        Storage::fake('local');
+
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'document', 'field' => ['type' => 'files', 'max_files' => 1]],
+            ],
+        ]))->save();
+
+        $submission = $form->makeSubmission()->data(['document' => now()->timestamp.'/resume.pdf']);
+
+        $email = tap(new Email($submission, ['to' => 'test@test.com', 'attachments' => true], Site::default()))->build();
+
+        $this->assertEmpty($email->attachments);
+    }
+
+    #[Test]
     public function it_attaches_files_from_files_field_on_the_configured_disk_and_path()
     {
         config([

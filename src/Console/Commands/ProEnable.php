@@ -8,6 +8,8 @@ use Statamic\Console\EnhancesCommands;
 use Statamic\Console\RunsInPlease;
 use Statamic\Support\Str;
 
+use function Laravel\Prompts\text;
+
 class ProEnable extends Command
 {
     use ConfirmableTrait, EnhancesCommands, RunsInPlease;
@@ -39,20 +41,20 @@ class ProEnable extends Command
             return;
         }
 
-        $this->checkInfo('Statamic Pro successfully enabled in .env file!');
+        $this->components->info('Statamic Pro successfully enabled in .env file!');
         $this->promptToSetLicenseKey();
 
         if ($this->option('update-config') && $this->updateConfig()) {
-            $this->checkInfo('Statamic editions config successfully updated to reference .env var!');
+            $this->components->info('Statamic editions config successfully updated to reference .env var!');
         }
 
         if ($this->option('update-config') && ! $this->isConfigReferencingEnv()) {
-            $this->crossLine('Could not reliably update editions config to reference .env var!');
-            $this->comment(PHP_EOL.'For this setting to take effect, please modify your [config/statamic/editions.php] as follows:');
+            $this->components->error('Could not reliably update editions config to reference .env var!');
+            $this->line('For this setting to take effect, please modify your [config/statamic/editions.php] as follows:');
             $this->line("'pro' => env('STATAMIC_PRO_ENABLED', false)");
         } elseif (! $this->isConfigReferencingEnv()) {
-            $this->crossLine('Statamic editions config not currently referencing .env var!');
-            $this->comment('Please re-run this command with the `--update-config` option.');
+            $this->components->error('Statamic editions config not currently referencing .env var!');
+            $this->line('Please re-run this command with the `--update-config` option.');
         } else {
             config()->set('statamic.editions.pro', true);
         }
@@ -127,10 +129,13 @@ class ProEnable extends Command
             return;
         }
 
-        $licenseKey = trim((string) $this->ask('If you have a Statamic license key, paste it now (leave blank to add later)'));
+        $licenseKey = trim(text(
+            label: 'If you have a Statamic license key, paste it now',
+            hint: 'Leave blank to add later.',
+        ));
 
         if ($licenseKey === '') {
-            $this->comment('Add `STATAMIC_LICENSE_KEY=...` to your `.env` before or when your site goes live.');
+            $this->components->warn('Add `STATAMIC_LICENSE_KEY=...` to your `.env` before or when your site goes live.');
 
             return;
         }
@@ -141,7 +146,7 @@ class ProEnable extends Command
             $this->appendLicenseKeyToEnv($licenseKey);
         }
 
-        $this->checkInfo('Statamic license key saved in .env file.');
+        $this->components->info('Statamic license key saved in .env file.');
     }
 
     /**

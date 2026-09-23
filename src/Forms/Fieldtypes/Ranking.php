@@ -53,12 +53,12 @@ class Ranking extends FormFieldtype
     {
         return [
             'config' => [
-                'display' => __('Rank your favorite seasons'),
+                'display' => 'Rank your favorite seasons',
                 'options' => [
-                    'spring' => __('Spring'),
-                    'summer' => __('Summer'),
-                    'autumn' => __('Autumn'),
-                    'winter' => __('Winter'),
+                    'spring' => 'Spring',
+                    'summer' => 'Summer',
+                    'autumn' => 'Autumn',
+                    'winter' => 'Winter',
                 ],
             ],
             'value' => ['summer', 'spring', 'autumn', 'winter'],

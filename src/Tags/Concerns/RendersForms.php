@@ -140,7 +140,8 @@ trait RendersForms
         $default = $field->value() ?? $field->defaultValue();
         $value = $old === $missing ? $default : $old;
 
-        $configDefaults = FormField::commonFieldOptions()->all()
+        $configDefaults = Field::commonFieldOptions()->all()
+            ->merge(FormField::commonFieldOptions()->all())
             ->merge($field->fieldtype()->configFields()->all())
             ->map->get('default')
             ->filter()->all();

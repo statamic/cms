@@ -8,6 +8,10 @@ class Ffmpeg extends Process
 {
     protected string $startTimestamp = '00:00:00';
 
+    private static bool $binaryResolved = false;
+
+    private static ?string $resolvedBinary = null;
+
     public function startTimestamp(string $startTimestamp): self
     {
         $this->startTimestamp = $startTimestamp;
@@ -49,10 +53,30 @@ class Ffmpeg extends Process
         ])->join(' ');
     }
 
+    public function available(): bool
+    {
+        return filled($this->ffmpegBinary());
+    }
+
     public function ffmpegBinary(): ?string
     {
+        if (static::$binaryResolved) {
+            return static::$resolvedBinary;
+        }
+
+        static::$binaryResolved = true;
+
+        return static::$resolvedBinary = $this->resolveFfmpegBinary();
+    }
+
+    private function resolveFfmpegBinary(): ?string
+    {
+        if (! $this->procOpenAvailable()) {
+            return null;
+        }
+
         if ($binary = config('statamic.assets.ffmpeg.binary')) {
-            return $binary;
+            return is_executable($binary) ? $binary : null;
         }
 
         $output = $this->run($this->isWindows() ? 'where ffmpeg' : 'which ffmpeg');
@@ -66,8 +90,25 @@ class Ffmpeg extends Process
             return null;
         }
 
-        return str(StringUtilities::normalizeLineEndings(trim($output)))
+        $resolved = str(StringUtilities::normalizeLineEndings(trim($output)))
             ->explode("\n")
             ->first();
+
+        if (! filled($resolved) || ! is_executable($resolved)) {
+            return null;
+        }
+
+        return $resolved;
+    }
+
+    protected function procOpenAvailable(): bool
+    {
+        return function_exists('proc_open');
+    }
+
+    public static function clearBinaryCache(): void
+    {
+        static::$binaryResolved = false;
+        static::$resolvedBinary = null;
     }
 }

@@ -8,6 +8,8 @@ const props = defineProps({
     heading: { type: String, default: null },
     /** Subheading text below the heading */
     subheading: { type: String, default: null },
+    /** Icon name shown next to the heading. [Browse available icons](/?path=/story/components-icon--all-icons) */
+    icon: { type: String, default: null },
 });
 </script>
 
@@ -21,7 +23,9 @@ const props = defineProps({
     >
         <PanelHeader v-if="heading" class="flex items-center justify-between">
 	        <div>
-		        <Heading v-html="heading" />
+		        <Heading :icon="icon">
+                    <span v-html="heading" />
+                </Heading>
 		        <Subheading v-if="subheading" v-html="subheading" />
 	        </div>
 	        <div v-if="$slots['header-actions']" class="flex flex-wrap items-center gap-2 sm:gap-3">

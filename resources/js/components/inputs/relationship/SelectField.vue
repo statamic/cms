@@ -12,6 +12,7 @@
             :read-only="readOnly"
             :taggable="isTaggable"
             :close-on-select="isTaggable"
+            :search-keys="searchKeys"
             option-label="title"
             option-value="id"
             @update:modelValue="itemsSelected"
@@ -89,6 +90,12 @@ export default {
                 paginate: false,
                 columns: 'title,id',
             };
+        },
+
+        // The `users` fieldtype falls back to displaying a user's email as their title when
+        // they have no name, but doesn't show it otherwise, so it needs to be searchable too.
+        searchKeys() {
+            return this.config.type === 'users' ? ['title', 'email'] : null;
         },
 
 	    cacheKey() {

@@ -766,9 +766,45 @@ EOT
         ));
 
         // button_label should default to "Next", then "Submit" on the last page.
-        // The back button is only output when a previous_page_label is set.
+        // The back button is output when a previous_page_label is set or show_previous_button is true.
         $this->assertStringContainsString('<div class="page">page_one - Page One (Page One Instructions) - button:Next - [Section A:name,]</div>', $output);
         $this->assertStringContainsString('<div class="page">page_two - Page Two - back:Back - button:Submit - [Section B:email,]</div>', $output);
+    }
+
+    #[Test]
+    public function it_outputs_previous_page_label_when_show_previous_button_is_enabled()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        $this->createForm([
+            'pages' => [
+                [
+                    'id' => 'page_one',
+                    'sections' => [
+                        ['display' => 'Section A', 'fields' => [['handle' => 'name', 'field' => ['type' => 'text']]]],
+                    ],
+                ],
+                [
+                    'id' => 'page_two',
+                    'show_previous_button' => true,
+                    'sections' => [
+                        ['display' => 'Section B', 'fields' => [['handle' => 'email', 'field' => ['type' => 'text']]]],
+                    ],
+                ],
+            ],
+        ], 'survey');
+
+        $output = $this->normalizeHtml($this->tag(<<<'EOT'
+{{ form:survey }}
+    {{ pages }}
+        <div class="page">{{ id }}{{ if previous_page_label }} - back:{{ previous_page_label }}{{ /if }} - button:{{ button_label }}</div>
+    {{ /pages }}
+{{ /form:survey }}
+EOT
+        ));
+
+        $this->assertStringContainsString('<div class="page">page_one - button:Next</div>', $output);
+        $this->assertStringContainsString('<div class="page">page_two - back:Previous Page - button:Submit</div>', $output);
     }
 
     #[Test]

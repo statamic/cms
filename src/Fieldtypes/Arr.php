@@ -42,6 +42,11 @@ class Arr extends Fieldtype
                         'display' => __('Expanded format'),
                         'instructions' => __('statamic::fieldtypes.array.config.expand'),
                     ],
+                    'compact' => [
+                        'type' => 'toggle',
+                        'display' => __('Compact'),
+                        'instructions' => __('statamic::fieldtypes.array.config.compact'),
+                    ],
                 ],
             ],
             [

@@ -45,14 +45,14 @@ class User extends BaseUser
     {
         if (func_num_args() === 0) {
             $data = array_merge($this->model()->attributesToArray(), [
-                'roles' => $this->roles()->map->handle()->values()->all(),
+                'roles' => $this->explicitRoles()->map->handle()->values()->all(),
                 'groups' => $this->groups()->map->handle()->values()->all(),
             ]);
 
             return collect(Arr::except($data, ['id', 'email']));
         }
 
-        foreach ($data as $key => $value) {
+        foreach (Arr::except($data, ['roles', 'groups']) as $key => $value) {
             $this->set($key, $value);
         }
 
@@ -112,7 +112,7 @@ class User extends BaseUser
 
     protected function saveRoles()
     {
-        $roles = $this->roles()->map->id();
+        $roles = $this->explicitRoles()->map->id();
 
         (new Roles($this))->sync($roles);
     }
@@ -295,7 +295,15 @@ class User extends BaseUser
         }
 
         if ($value === null) {
-            unset($this->model()->$key);
+            // Only keep a null when the key is a real database column (i.e. it
+            // was loaded from the database). This lets an existing value be
+            // cleared out, while preventing non-column fields from being added
+            // as attributes, which would error when the model is saved.
+            if ($this->model()->exists && array_key_exists($key, $this->model()->getRawOriginal())) {
+                $this->model()->$key = null;
+            } else {
+                unset($this->model()->$key);
+            }
 
             return $this;
         }
@@ -316,7 +324,7 @@ class User extends BaseUser
     {
         $merged = $this->data()
             ->except(['roles', 'groups'])
-            ->merge(collect($data)->filter(fn ($v) => $v !== null)->all());
+            ->merge($data);
 
         $this->data($merged->all());
 

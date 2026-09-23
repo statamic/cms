@@ -1,7 +1,7 @@
 <template>
     <!-- Safari doesn't support `position: relative` on `<tr>` elements, but these two properties can be used as an alternative. Source: https://mtsknn.fi/blog/relative-tr-in-safari/ transform: translate(0); clip-path: inset(0); -->
     <tr class="group relative bg-white hover:bg-gray-50 dark:bg-gray-900 dark:hover:bg-gray-900 border-b dark:border-gray-600 last:border-b-0" :class="{ 'cursor-grab': !readOnly }" style="transform: translate(0); clip-path: inset(0);">
-        <td class="flex h-full min-w-0 items-center gap-2 p-3 sm:gap-3">
+        <td class="flex h-full min-w-0 items-center gap-2 p-3 sm:gap-3 [.link-fieldtype_&]:py-1.5">
             <div
                 v-if="canShowSvg"
                 class="img svg-img flex size-7 items-center justify-center bg-cover bg-center bg-no-repeat text-center"
@@ -18,6 +18,7 @@
                     :src="thumbnail"
                     :alt="asset.basename"
                     v-if="thumbnail"
+                    @error="asset.thumbnail = null"
                 />
                 <file-icon :extension="asset.extension ?? 'generic'" v-else class="size-7" />
             </button>
@@ -36,7 +37,7 @@
             </button>
             <div v-if="readOnly" v-text="asset.size" class="asset-filesize hidden shrink-0 px-2 text-sm leading-5 text-gray-600 dark:text-gray-400 @xs:block" />
         </td>
-        <td v-if="!readOnly" class="absolute top-0 right-0 flex items-center bg-linear-to-r to-20% from-transparent to-white p-3 ps-8 align-middle text-end group-hover:to-gray-50 dark:to-gray-900 dark:group-hover:to-gray-900">
+        <td v-if="!readOnly" class="absolute top-0 right-0 flex items-center bg-linear-to-r to-20% from-transparent to-white p-3 ps-8 align-middle text-end group-hover:to-gray-50 dark:to-gray-900 dark:group-hover:to-gray-900 [.link-fieldtype_&]:py-1.5">
             <ui-badge
                 v-if="showSetAlt && needsAlt"
                 as="button"
@@ -61,10 +62,12 @@
                     :id="editingId"
                     :allow-deleting="false"
                     :show-navigation="siblings.length > 1"
+                    :redirect-after-crop="false"
                     @previous="navigateToPrevious"
                     @next="navigateToNext"
                     @closed="closeEditor"
                     @saved="assetSaved"
+                    @created="assetCreated"
                     @action-completed="actionCompleted"
                 >
                 </asset-editor>

@@ -139,7 +139,7 @@ const hasErrors = computed(() => {
         <Field
             v-else
             :class="{ 'opacity-60': field.config.hidden }"
-            :label="field.config.display"
+            :label="__(field.config.display)"
             :instructions="field.config.instructions"
             :error="hasErrors ? __('This field has errors. Please fix them before saving.') : null"
         >

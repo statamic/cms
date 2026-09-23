@@ -25,7 +25,7 @@ const rules = computed(() => {
                 rules.push({
                     ...rule,
                     _pageId: page._id,
-                    _pageDisplay: page.display || __('Page :number', { number: pageIndex + 1 }),
+                    _pageDisplay: __(page.display) || __('Page :number', { number: pageIndex + 1 }),
                 });
             });
         }
@@ -57,7 +57,7 @@ const getPageDestinationOptions = (pageId) => {
     return props.pages
         .slice(pageIndex + 1)
         .map((page, index) => ({
-            label: page.display || __('Page :number', { number: pageIndex + index + 2 }),
+            label: __(page.display) || __('Page :number', { number: pageIndex + index + 2 }),
             value: page._id,
             icon: 'page',
         }));
@@ -66,7 +66,7 @@ const getPageDestinationOptions = (pageId) => {
 const availablePages = computed(() => {
     return props.pages.slice(0, -1).map((page, index) => ({
         handle: page._id,
-        display: page.display || __('Page :number', { number: index + 1 }),
+        display: __(page.display) || __('Page :number', { number: index + 1 }),
         icon: 'page',
     }));
 });

@@ -220,7 +220,7 @@ class Arr
     /**
      * Get rid of null values. (Empty arrays, literal null values, and empty strings).
      *
-     * @param  array  $array
+     * @param  array  $data
      * @return array
      */
     public static function removeNullValues($data)

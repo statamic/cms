@@ -40,6 +40,7 @@ use Statamic\Http\Controllers\CP\Collections\EntriesController;
 use Statamic\Http\Controllers\CP\Collections\EntryActionController;
 use Statamic\Http\Controllers\CP\Collections\EntryPreviewController;
 use Statamic\Http\Controllers\CP\Collections\EntryRevisionsController;
+use Statamic\Http\Controllers\CP\Collections\EntryTitleFormatController;
 use Statamic\Http\Controllers\CP\Collections\LocalizeEntryController;
 use Statamic\Http\Controllers\CP\Collections\PublishedEntriesController;
 use Statamic\Http\Controllers\CP\Collections\ReorderCollectionBlueprintsController;
@@ -72,6 +73,7 @@ use Statamic\Http\Controllers\CP\Forms\FormFieldsetPreviewsController;
 use Statamic\Http\Controllers\CP\Forms\FormLogicController;
 use Statamic\Http\Controllers\CP\Forms\FormsController;
 use Statamic\Http\Controllers\CP\Forms\FormSubmissionsController;
+use Statamic\Http\Controllers\CP\Forms\GenerateFakeSubmissionController;
 use Statamic\Http\Controllers\CP\Forms\SubmissionActionController;
 use Statamic\Http\Controllers\CP\Globals\GlobalsBlueprintController;
 use Statamic\Http\Controllers\CP\Globals\GlobalsController;
@@ -193,6 +195,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::post('actions/list', [EntryActionController::class, 'bulkActions'])->name('collections.entries.actions.bulk');
         Route::get('create/{site}', [EntriesController::class, 'create'])->name('collections.entries.create');
         Route::post('create/{site}/preview', [EntryPreviewController::class, 'create'])->name('collections.entries.preview.create');
+        Route::post('create/{site}/title-format', [EntryTitleFormatController::class, 'create'])->name('collections.entries.title-format.create');
         Route::post('reorder', ReorderEntriesController::class)->name('collections.entries.reorder');
         Route::post('{site}', [EntriesController::class, 'store'])->name('collections.entries.store');
 
@@ -214,6 +217,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
             Route::post('restore-revision', RestoreEntryRevisionController::class)->name('collections.entries.restore-revision');
             Route::post('preview', [EntryPreviewController::class, 'edit'])->name('collections.entries.preview.edit');
             Route::get('preview', [EntryPreviewController::class, 'show'])->name('collections.entries.preview.popout');
+            Route::post('title-format', [EntryTitleFormatController::class, 'edit'])->name('collections.entries.title-format.edit');
             Route::patch('/', [EntriesController::class, 'update'])->name('collections.entries.update');
             Route::get('{slug}', fn ($collection, $entry, $slug) => redirect($entry->editUrl()));
         });
@@ -347,7 +351,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::post('forms/actions/list', [FormActionController::class, 'bulkActions'])->name('forms.actions.bulk');
     Route::post('forms/{form}/submissions/actions', [SubmissionActionController::class, 'run'])->name('forms.submissions.actions.run');
     Route::post('forms/{form}/submissions/actions/list', [SubmissionActionController::class, 'bulkActions'])->name('forms.submissions.actions.bulk');
-    Route::post('forms/{form}/submissions/generate-fake', [FormSubmissionsController::class, 'generateFake'])->name('forms.submissions.generate-fake');
+    Route::post('forms/{form}/submissions/generate-fake', GenerateFakeSubmissionController::class)->name('forms.submissions.generate-fake');
     Route::resource('forms', FormsController::class);
     Route::get('forms/{form}/submissions', [FormSubmissionsController::class, 'index'])->name('forms.submissions.index');
     Route::get('forms/{form}/submissions/{submission}', [FormSubmissionsController::class, 'show'])->name('forms.submissions.show');

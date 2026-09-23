@@ -3,6 +3,7 @@ import { Button, Input } from '@ui';
 import { computed, ref } from 'vue';
 import { mapValues } from 'lodash-es';
 import fuzzysort from 'fuzzysort';
+import { usePage } from '@inertiajs/vue3';
 import { FieldView, injectBuilderContext, InspectorType } from '@/pages/forms/Builder.vue';
 import { categories, categoryColorClasses } from './categories';
 import { __ } from '@/bootstrap/globals';
@@ -11,6 +12,8 @@ const { fieldtypes, fieldView, formsProInstalled, inspect } = injectBuilderConte
 
 const search = ref('');
 const isSearching = computed(() => search.value.length > 0);
+
+const hasFieldsets = Object.keys(usePage().props.fieldsets ?? {}).length > 0;
 
 const allFieldtypes = computed(() => {
     let options = [...fieldtypes];
@@ -39,15 +42,17 @@ const allFieldtypes = computed(() => {
         });
     }
 
-    options.push({
-        handle: 'fieldset',
-        title: __('Link Existing'),
-        description: __('Link one or more existing fields from a fieldset.'),
-        categories: ['fieldsets'],
-        keywords: [],
-        icon: 'link',
-        config: [],
-    });
+    if (hasFieldsets) {
+        options.push({
+            handle: 'fieldset',
+            title: __('Link Existing'),
+            description: __('Link one or more existing fields from a fieldset.'),
+            categories: ['fieldsets'],
+            keywords: [],
+            icon: 'link',
+            config: [],
+        });
+    }
 
     return options;
 });

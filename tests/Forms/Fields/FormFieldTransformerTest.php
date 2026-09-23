@@ -120,6 +120,23 @@ class FormFieldTransformerTest extends TestCase
     }
 
     #[Test]
+    public function it_removes_is_new_from_inline_field_config()
+    {
+        $field = FormFieldTransformer::fromVue([
+            'handle' => 'my_field',
+            'type' => 'inline',
+            'fieldtype' => 'short_answer',
+            'config' => [
+                'type' => 'short_answer',
+                'display' => 'My Field',
+                'isNew' => true,
+            ],
+        ]);
+
+        $this->assertArrayNotHasKey('isNew', $field['field']);
+    }
+
+    #[Test]
     public function it_removes_full_width_from_field_config()
     {
         $fromVue = FormFieldTransformer::fromVue([
@@ -172,7 +189,7 @@ class FormFieldTransformerTest extends TestCase
     }
 
     #[Test]
-    public function it_removes_icon_from_field_config()
+    public function it_preserves_icon_from_field_config()
     {
         $fromVue = FormFieldTransformer::fromVue([
             'fieldtype' => 'short_answer',
@@ -183,7 +200,43 @@ class FormFieldTransformerTest extends TestCase
 
         $this->assertEquals('test', $fromVue['handle']);
         $this->assertEquals('Test', $fromVue['field']['display']);
-        $this->assertArrayNotHasKey('icon', $fromVue['field']);
+        $this->assertEquals('text', $fromVue['field']['icon']);
+    }
+
+    #[Test]
+    public function a_form_fieldtype_can_have_an_icon_config_field()
+    {
+        $formFieldtype = new class extends FormFieldtype
+        {
+            public static $handle = 'test_form_field';
+
+            protected $icon = 'fieldtype-icon';
+
+            public function configFieldItems(): array
+            {
+                return [
+                    'icon' => ['type' => 'text', 'default' => 'default-icon'],
+                ];
+            }
+
+            public function toFieldArray(): array
+            {
+                return ['type' => 'text'];
+            }
+        };
+
+        $formFieldtype::register();
+
+        $field = [
+            'handle' => 'test',
+            'field' => ['type' => 'test_form_field', 'icon' => 'chosen-icon', 'foo' => 'bar'],
+        ];
+
+        $vue = FormFieldTransformer::toVue($field);
+
+        $this->assertEquals('fieldtype-icon', $vue['icon']);
+        $this->assertEquals('chosen-icon', $vue['config']['icon']);
+        $this->assertEquals($field, FormFieldTransformer::fromVue($vue));
     }
 
     #[Test]

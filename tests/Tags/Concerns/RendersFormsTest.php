@@ -108,6 +108,28 @@ HTML;
         $this->assertEquals($expected, (string) $field);
     }
 
+    #[Test]
+    public function renderable_fields_receive_common_field_option_defaults()
+    {
+        $rendered = $this->createFormField('short_answer', old: self::MISSING);
+
+        $this->assertSame('above', $rendered['instructions_position']);
+        $this->assertSame('visible', $rendered['visibility']);
+        $this->assertSame(100, $rendered['width']);
+    }
+
+    #[Test]
+    public function common_field_option_defaults_can_be_overridden_by_the_field_config()
+    {
+        $rendered = $this->createFormField('short_answer', old: self::MISSING, config: [
+            'instructions_position' => 'below',
+            'width' => 50,
+        ]);
+
+        $this->assertSame('below', $rendered['instructions_position']);
+        $this->assertSame(50, $rendered['width']);
+    }
+
     private function createFormField($type, $value = null, $default = null, $old = null, $config = [])
     {
         $config = array_merge($config, ['type' => $type]);

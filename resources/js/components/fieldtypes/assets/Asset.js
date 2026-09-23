@@ -112,6 +112,11 @@ export default {
             this.closeEditor();
         },
 
+        assetCreated(assetId) {
+            this.$emit('id-changed', this.editingId, assetId);
+            this.closeEditor();
+        },
+
         actionCompleted(successful, response) {
             if (successful === false) return;
             const id = response.ids[0] || null;

@@ -30,7 +30,7 @@ defineExpose({ ...expose, focus });
             v-for="(option, index) in options"
             :disabled="config.disabled"
             :key="index"
-            :label="option.label || option.value"
+            :label="__(option.label) || option.value"
             :read-only="isReadOnly"
             :value="option.value"
             item-class="relative top-0.5"

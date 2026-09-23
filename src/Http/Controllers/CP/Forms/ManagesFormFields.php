@@ -83,6 +83,7 @@ trait ManagesFormFields
             'display' => $page['display'] ?? null,
             'instructions' => $page['instructions'] ?? null,
             'button_label' => $page['button_label'] ?? null,
+            'show_previous_button' => $page['show_previous_button'] ?? filled($page['previous_page_label'] ?? null),
             'previous_page_label' => $page['previous_page_label'] ?? null,
             'rules' => collect($page['rules'] ?? [])->map(function (array $rule): array {
                 return [
@@ -118,6 +119,7 @@ trait ManagesFormFields
                 'display' => $page['display'] ?? null,
                 'instructions' => $page['instructions'] ?? null,
                 'button_label' => $page['button_label'] ?? null,
+                'show_previous_button' => $page['show_previous_button'] ?? false,
                 'previous_page_label' => $page['previous_page_label'] ?? null,
                 'rules' => collect($page['rules'] ?? [])
                     ->map(fn (array $rule) => Arr::only($rule, ['conditions', 'destination']))

@@ -48,7 +48,7 @@ const operatorLabels = {
 const getOperatorLabel = (operator) => operatorLabels[operator] || operator || __('equals');
 
 const getFieldConfig = (handle) => props.suggestableFields.find(field => field.handle === handle);
-const getFieldDisplay = (handle) => getFieldConfig(handle)?.config?.display || handle;
+const getFieldDisplay = (handle) => __(getFieldConfig(handle)?.config?.display) || handle;
 
 const getIconClass = (category) => {
     const color = categories[category]?.color || 'gray';
@@ -61,7 +61,7 @@ const firstFieldConfig = computed(() => {
     const field = getFieldConfig(firstCondition.field);
     return {
         handle: firstCondition.field,
-        display: field?.config?.display || firstCondition.field,
+        display: __(field?.config?.display) || firstCondition.field,
         icon: field?.icon || 'generic-field',
         iconClass: getIconClass(field?.category),
     };

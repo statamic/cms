@@ -372,6 +372,63 @@ class FieldsTest extends TestCase
     }
 
     #[Test]
+    public function it_carries_items_over_to_a_new_instance_without_resolving_them_again()
+    {
+        $items = [
+            ['handle' => 'one', 'field' => ['display' => 'First']],
+            ['handle' => 'two', 'field' => ['display' => 'Second']],
+        ];
+
+        $fields = new Fields($items);
+        $instance = $fields->newInstance();
+
+        $this->assertNotSame($fields, $instance);
+        $this->assertEquals($items, $instance->items()->all());
+
+        // The already resolved fields get carried over as-is, rather than being
+        // resolved a second time only for setFields() to throw them away.
+        $this->assertSame($fields->get('one'), $instance->get('one'));
+        $this->assertSame($fields->get('two'), $instance->get('two'));
+    }
+
+    #[Test]
+    public function replacing_the_items_on_a_new_instance_doesnt_affect_the_original()
+    {
+        $fields = new Fields([
+            ['handle' => 'one', 'field' => ['display' => 'First']],
+        ]);
+
+        $instance = $fields->newInstance();
+
+        $instance->setItems([
+            ['handle' => 'two', 'field' => ['display' => 'Second']],
+        ]);
+
+        $this->assertEquals(['one'], $fields->items()->pluck('handle')->all());
+        $this->assertEquals(['two'], $instance->items()->pluck('handle')->all());
+        $this->assertTrue($fields->has('one'));
+        $this->assertFalse($fields->has('two'));
+    }
+
+    #[Test]
+    public function mutating_the_items_on_a_new_instance_doesnt_affect_the_original()
+    {
+        $fields = new Fields([
+            ['handle' => 'one', 'field' => ['display' => 'First']],
+        ]);
+
+        $instance = $fields->newInstance();
+
+        $this->assertNotSame($fields->items(), $instance->items());
+
+        $instance->items()->push(['handle' => 'two', 'field' => ['display' => 'Second']]);
+        $instance->items()->put(0, ['handle' => 'clobbered', 'field' => ['display' => 'Clobbered']]);
+
+        $this->assertEquals(['one'], $fields->items()->pluck('handle')->all());
+        $this->assertEquals(['clobbered', 'two'], $instance->items()->pluck('handle')->all());
+    }
+
+    #[Test]
     public function converts_to_array_suitable_for_rendering_fields_in_publish_component()
     {
         FieldRepository::shouldReceive('find')
@@ -426,6 +483,7 @@ class FieldsTest extends TestCase
                 'visibility' => 'visible',
                 'read_only' => false, // deprecated
                 'always_save' => false,
+                'reserve_space_when_hidden' => false,
                 'autocomplete' => null,
                 'hide_display' => false,
                 'instructions_position' => 'above',
@@ -450,6 +508,7 @@ class FieldsTest extends TestCase
                 'visibility' => 'visible',
                 'read_only' => false, // deprecated
                 'always_save' => false,
+                'reserve_space_when_hidden' => false,
                 'hide_display' => false,
                 'instructions_position' => 'above',
                 'listable' => 'hidden',
@@ -457,6 +516,7 @@ class FieldsTest extends TestCase
                 'replicator_preview' => true,
                 'duplicate' => true,
                 'actions' => true,
+                'rows' => null,
             ],
         ], $fields->toPublishArray());
     }
@@ -515,6 +575,7 @@ class FieldsTest extends TestCase
                 'visibility' => 'visible',
                 'read_only' => false, // deprecated
                 'always_save' => false,
+                'reserve_space_when_hidden' => false,
                 'autocomplete' => null,
                 'hide_display' => false,
                 'instructions_position' => 'above',
@@ -542,6 +603,7 @@ class FieldsTest extends TestCase
                 'visibility' => 'visible',
                 'read_only' => false, // deprecated
                 'always_save' => false,
+                'reserve_space_when_hidden' => false,
                 'autocomplete' => null,
                 'hide_display' => false,
                 'instructions_position' => 'above',

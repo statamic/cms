@@ -20,7 +20,7 @@ class StarRating extends FormFieldtype
         return [
             'max_stars' => [
                 'display' => __('Max Stars'),
-                'instructions' => __('The maximum number of selectable stars.'),
+                'instructions' => __('statamic::form-fieldtypes.star_rating.config.max_stars.instructions'),
                 'type' => 'integer',
                 'default' => 5,
                 'min' => 1,
@@ -30,7 +30,7 @@ class StarRating extends FormFieldtype
             ],
             'allow_half_stars' => [
                 'display' => __('Allow Half Stars'),
-                'instructions' => __('Allow ratings like 4.5.'),
+                'instructions' => __('statamic::form-fieldtypes.star_rating.config.allow_half_stars.instructions'),
                 'type' => 'toggle',
                 'default' => false,
                 'width' => 50,
@@ -57,7 +57,7 @@ class StarRating extends FormFieldtype
     {
         return [
             'config' => [
-                'display' => __('How would you rate your experience?'),
+                'display' => 'How would you rate your experience?',
                 'max_stars' => 5,
                 'allow_half_stars' => true,
             ],

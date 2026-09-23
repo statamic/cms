@@ -88,6 +88,7 @@ it('exports inertia', async () => {
         'toggleArchitecturalBackground',
         'useArchitecturalBackground',
         'useForm',
+        'usePage',
         'usePoll',
     ];
 
@@ -135,6 +136,7 @@ it('exports ui', async () => {
         'CharacterCounter',
         'Checkbox',
         'CheckboxGroup',
+        'ChoiceGrid',
         'CodeEditor',
         'Combobox',
         'ConfirmationModal',
@@ -184,6 +186,7 @@ it('exports ui', async () => {
         'Popover',
         'Radio',
         'RadioGroup',
+        'RankList',
         'Select',
         'Separator',
         'Skeleton',
@@ -191,6 +194,7 @@ it('exports ui', async () => {
         'SplitterGroup',
         'SplitterPanel',
         'SplitterResizeHandle',
+        'StarRating',
         'Subheading',
         'Switch',
         'TabContent',

@@ -15,7 +15,7 @@ const props = defineProps<{
     canDeleteSection: boolean,
 }>();
 
-const { clearInspector, dirty, fieldtypes, fieldView, inspect, inspecting, inspectorType, pages } = injectBuilderContext();
+const { clearInspector, dirty, ensureUniqueDisplay, fieldtypes, fieldView, inspect, inspecting, inspectorType, pages } = injectBuilderContext();
 
 const isOnlySection = computed(() => pages.value.flatMap((page) => page.sections).length === 1);
 
@@ -54,7 +54,7 @@ const containerMeta = computed(() => {
     const meta = {};
 
     props.section.fields.forEach((field) => {
-        if (field.preview?.meta) meta[field.handle] = field.preview.meta;
+        if (field.preview?.meta) meta[field.preview.config.handle] = field.preview.meta;
     });
 
     return meta;
@@ -64,7 +64,7 @@ const containerValues = computed(() => {
     const values = {};
 
     props.section.fields.forEach((field) => {
-        if (field.preview?.value) values[field.handle] = field.preview.value;
+        if (field.preview?.value) values[field.preview.config.handle] = field.preview.value;
     });
 
     return values;
@@ -83,15 +83,16 @@ const updateFieldWidth = (field, width) => {
 const duplicateField = (field) => {
     const { section } = props;
     const index = section.fields.indexOf(field);
-    const handle = uniqid({ withoutHyphens: true });
+    const _id = uniqid();
 
     const newField = {
         ...field,
-        _id: `${section._id}-${section.fields.length}`,
-        handle,
-        config: { ...field.config, display: `${field.config.display} (${__('Duplicate')})` },
+        _id,
+        handle: null,
+        isNew: true,
+        config: { ...field.config, display: ensureUniqueDisplay(`${field.config.display} (${__('Duplicate')})`) },
         preview: {
-            config: { ...field.preview.config, handle },
+            config: { ...field.preview.config, handle: _id },
             value: field.preview.value,
             meta: field.preview.meta,
         },
@@ -171,6 +172,7 @@ const isFieldInLastRow = (index): boolean => index >= rowBoundaries.value.lastRo
                     icon="pencil-line"
                     size="sm"
                     variant="ghost"
+                    :aria-label="__('Edit section')"
                     @click.stop="editSection"
                 />
                 <Button
@@ -179,6 +181,7 @@ const isFieldInLastRow = (index): boolean => index >= rowBoundaries.value.lastRo
                     icon="trash"
                     size="sm"
                     variant="ghost"
+                    :aria-label="__('Delete section')"
                     @click.stop="confirmDelete"
                 />
                 <Button

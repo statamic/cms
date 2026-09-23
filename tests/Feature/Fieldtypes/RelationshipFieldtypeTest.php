@@ -97,6 +97,47 @@ class RelationshipFieldtypeTest extends TestCase
     }
 
     #[Test]
+    public function it_gets_selection_filters_for_multiple_collections()
+    {
+        Collection::make('pages')->save();
+
+        $this->setTestRoles(['test' => ['access cp', 'view test entries', 'view pages entries']]);
+        $user = User::make()->assignRole('test')->save();
+
+        $config = base64_encode(json_encode([
+            'type' => 'entries',
+            'collections' => ['test', 'pages'],
+        ]));
+
+        $handles = collect($this
+            ->actingAs($user)
+            ->getJson("/cp/fieldtypes/relationship/filters?config={$config}")
+            ->assertOk()
+            ->json())
+            ->pluck('handle');
+
+        $this->assertTrue($handles->contains('collection'));
+    }
+
+    #[Test]
+    public function it_gets_selection_filters_when_collections_config_is_a_string()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'view test entries']]);
+        $user = User::make()->assignRole('test')->save();
+
+        // Single collection configs are often stored as a plain string in YAML.
+        $config = base64_encode(json_encode([
+            'type' => 'entries',
+            'collections' => 'test',
+        ]));
+
+        $this
+            ->actingAs($user)
+            ->getJson("/cp/fieldtypes/relationship/filters?config={$config}")
+            ->assertOk();
+    }
+
+    #[Test]
     public function it_limits_access_to_entries_from_collections_the_user_can_view()
     {
         Collection::make('pages')->save();

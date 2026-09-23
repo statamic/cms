@@ -1,7 +1,6 @@
 <div>
-    @if($icon)
+    @if (isset($icon))
         <s:svg :src="$icon" style="width: 30px; height: 30px" />
     @endif
-    <h2>{{ $heading }}</h2>
-    <p>{{ $text }}</p>
+    {!! Statamic::modify($content ?? '')->markdown() !!}
 </div>

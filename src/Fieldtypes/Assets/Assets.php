@@ -468,6 +468,7 @@ class Assets extends Fieldtype
         $assets = $this->getItemsForPreProcessIndex($data)->map(function ($asset) {
             $arr = [
                 'id' => $asset->id(),
+                'basename' => $asset->basename(),
                 'is_image' => $isImage = $asset->isImage(),
                 'is_svg' => $asset->isSvg(),
                 'extension' => $asset->extension(),

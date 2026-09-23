@@ -17,15 +17,16 @@ export default {
                     let valueKey = 'value';
                     let labelKey = 'label';
 
-                    // Support both {key: '', value: ''} and {value: '', label: ''} formats.
+                    // Support {key: '', value: ''}, {key: '', label: ''}, and {value: '', label: ''} formats.
                     if (option.hasOwnProperty('key')) {
                         valueKey = 'key';
-                        labelKey = 'value';
+                        labelKey = option.hasOwnProperty('value') ? 'value' : 'label';
                     }
 
                     return {
                         value: option[valueKey],
                         label: `${__(option[labelKey]) || option[valueKey]}`,
+                        ...(option.icon ? { icon: option.icon } : {}),
                     };
                 }
 

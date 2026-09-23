@@ -80,7 +80,12 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
      */
     public function title($title = null)
     {
-        return $this->fluentlyGetOrSet('title')->args(func_get_args());
+        return $this
+            ->fluentlyGetOrSet('title')
+            ->getter(function ($title) {
+                return $title ?? ucfirst($this->handle);
+            })
+            ->args(func_get_args());
     }
 
     public function formFields($fields = null)
@@ -241,7 +246,7 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
             return Blink::get($blink);
         }
 
-        $blueprint = $this->formFields()->toBlueprint();
+        $blueprint = $this->formFields()->toBlueprint()->setHandle($this->handle());
 
         Blink::put($blink, $blueprint);
 

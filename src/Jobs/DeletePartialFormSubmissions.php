@@ -6,9 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
-use Statamic\Contracts\Forms\Submission;
 use Statamic\Facades\FormSubmission;
-use Statamic\Forms\DeleteTemporaryFiles;
 
 class DeletePartialFormSubmissions implements ShouldQueue
 {
@@ -26,10 +24,6 @@ class DeletePartialFormSubmissions implements ShouldQueue
             ->where('partial', true)
             ->where('date', '<', $threshold)
             ->get()
-            ->each(function (Submission $submission): void {
-                DeleteTemporaryFiles::dispatchSync($submission);
-
-                $submission->delete();
-            });
+            ->each->delete();
     }
 }

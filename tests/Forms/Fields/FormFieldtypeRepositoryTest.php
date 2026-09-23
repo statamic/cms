@@ -101,7 +101,7 @@ class FooFormFieldtype extends FormFieldtype
 
     public function toFieldArray(): array
     {
-        // TODO: Implement toFieldArray() method.
+        return [];
     }
 }
 
@@ -111,6 +111,6 @@ class BarFormFieldtype extends FormFieldtype
 
     public function toFieldArray(): array
     {
-        // TODO: Implement toFieldArray() method.
+        return [];
     }
 }

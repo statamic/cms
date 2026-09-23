@@ -7,7 +7,6 @@ const emit = defineEmits(['update:condition']);
 
 const props = defineProps({
     condition: Object,
-    conditions: Array,
     suggestableFields: Array,
     excludeHandle: String,
     excludeOperators: { type: Array, default: () => [] },
@@ -31,16 +30,8 @@ const operatorOptions = computed(() => [
 const selectedField = computed(() => props.suggestableFields.find((field) => field.handle === props.condition.field));
 
 const fieldOptions = computed(() => {
-    const conditionFields = props.conditions.map((condition) => condition.field);
-
     return props.suggestableFields
-        .filter((field) => {
-            return !(
-                field.handle === props.excludeHandle ||
-                props.condition.field === field.handle ||
-                conditionFields.includes(field.handle)
-            );
-        })
+        .filter((field) => field.handle !== props.excludeHandle && field.handle !== props.condition.field)
         .map((field) => {
             let display = field.config.display;
 
@@ -54,11 +45,11 @@ const fieldOptions = computed(() => {
         });
 });
 
-const isToggleField = computed(() => selectedField.value && ['toggle', 'revealer', 'yes_no'].includes(selectedField.value.config.type));
-const showValueToggle = computed(() => isToggleField.value && ['equals', 'not', '===', '!=='].includes(props.condition.operator));
+const isToggleField = (field) => ['toggle', 'revealer', 'yes_no'].includes(field?.config?.type);
+const showValueToggle = computed(() => isToggleField(selectedField.value) && ['equals', 'not', '===', '!=='].includes(props.condition.operator));
 
 const showValueDropdown = computed(() => {
-    const optionTypes = ['button_group', 'checkboxes', 'radio', 'select', 'dropdown', 'multi_choice', 'ranking'];
+    const optionTypes = ['button_group', 'checkboxes', 'radio', 'select', 'dropdown', 'multi_choice', 'ranking', 'image_choice'];
     return optionTypes.includes(selectedField.value?.config?.type) && ['equals', 'not', '===', '!=='].includes(props.condition.operator);
 });
 
@@ -76,7 +67,21 @@ const onFieldBlur = (search) => search ? update('field', search) : null;
 const onValueBlur = (value) => value ? update('value', value) : null;
 const onValueToggle = (checked) => update('value', checked.toString());
 
-const update = (key, value) => emit('update:condition', { ...props.condition, [key]: value });
+const update = (key, value) => {
+    const condition = { ...props.condition, [key]: value };
+
+    // When switching to a Toggle field, ensure the value is set to
+    // "false" to ensure it doesn't get filtered out for being empty.
+    if (
+        key === 'field'
+        && isToggleField(props.suggestableFields.find((field) => field.handle === value))
+        && !condition.value
+    ) {
+        condition.value = 'false';
+    }
+
+    emit('update:condition', condition);
+};
 </script>
 
 <template>
