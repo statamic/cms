@@ -4,6 +4,7 @@ namespace Statamic\Providers;
 
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\View as ViewFactory;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\View;
@@ -425,7 +426,9 @@ PHP;
 
     public function boot()
     {
-        ViewFactory::addNamespace('nocache__views', storage_path('statamic/tmp/nocache'));
+        File::ensureDirectoryExists($nocacheViews = storage_path('statamic/tmp/nocache'));
+
+        ViewFactory::addNamespace('nocache__views', $nocacheViews);
 
         Region::preserveContextKeys(IncludeTag::VIEW_DATA_KEYS);
 
