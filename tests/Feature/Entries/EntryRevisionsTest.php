@@ -936,7 +936,7 @@ class EntryRevisionsTest extends TestCase
 
         $this->assertRevisionFilesAreGone($entry, $revisions, $workingCopy);
         Event::assertNotDispatched(EntryDeleted::class);
-        Event::assertDispatchedTimes(RevisionDeleted::class, 3);
+        Event::assertNotDispatched(RevisionDeleted::class);
     }
 
     #[Test]
