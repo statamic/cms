@@ -4,7 +4,9 @@ namespace Tests\Fieldtypes;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\Antlers;
 use Statamic\Fields\Field;
+use Statamic\Fields\Value;
 use Statamic\Fieldtypes\Video;
 use Statamic\Fieldtypes\Video\Embed;
 use Tests\TestCase;
@@ -48,8 +50,39 @@ class VideoTest extends TestCase
         );
     }
 
+    #[Test]
+    #[DataProvider('emptyFallbackProvider')]
+    public function an_empty_video_falls_back_in_antlers($template)
+    {
+        $this->assertSame('fb', $this->render($template, ''));
+    }
+
+    public static function emptyFallbackProvider()
+    {
+        return [
+            'null coalescence' => ['{{ video ?? "fb" }}'],
+            'ternary' => ['{{ video ?: "fb" }}'],
+            'or' => ['{{ video or "fb" }}'],
+            'equals null' => ['{{ if video == null }}fb{{ /if }}'],
+        ];
+    }
+
+    #[Test]
+    public function a_video_renders_in_antlers()
+    {
+        $this->assertSame(
+            'https://vimeo.com/22439234 vimeo',
+            $this->render('{{ video ?? "fb" }} {{ video:provider }}', 'https://vimeo.com/22439234'),
+        );
+    }
+
     private function fieldtype()
     {
         return (new Video)->setField(new Field('test', ['type' => 'video']));
+    }
+
+    private function render(string $template, ?string $value): string
+    {
+        return (string) Antlers::parse($template, ['video' => new Value($value, 'video', $this->fieldtype())]);
     }
 }

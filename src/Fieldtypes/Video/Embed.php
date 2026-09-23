@@ -2,14 +2,11 @@
 
 namespace Statamic\Fieldtypes\Video;
 
-use ArrayAccess;
-use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Str;
-use JsonSerializable;
-use Statamic\Contracts\Support\Boolable;
+use Statamic\Fields\ArrayableString;
 use Statamic\Support\FileTypes;
 
-class Embed implements Arrayable, ArrayAccess, Boolable, JsonSerializable
+class Embed extends ArrayableString
 {
     const CLOUDFLARE = 'cloudflare';
     const CLOUDFLARE_EMBED_URL = 'https://iframe.cloudflarestream.com/';
@@ -56,6 +53,7 @@ class Embed implements Arrayable, ArrayAccess, Boolable, JsonSerializable
         public readonly ?string $embedUrl = null,
         public readonly ?string $id = null,
     ) {
+        parent::__construct($url);
     }
 
     public function isEmbeddable(): bool
@@ -76,11 +74,6 @@ class Embed implements Arrayable, ArrayAccess, Boolable, JsonSerializable
             'provider' => $this->provider,
             'url' => $this->url,
         ];
-    }
-
-    public function toBool(): bool
-    {
-        return (bool) $this->url;
     }
 
     public function __toString(): string
@@ -104,16 +97,6 @@ class Embed implements Arrayable, ArrayAccess, Boolable, JsonSerializable
     public function offsetGet(mixed $offset)
     {
         return $this->toArray()[$offset] ?? null;
-    }
-
-    #[\ReturnTypeWillChange]
-    public function offsetSet(mixed $offset, mixed $value)
-    {
-    }
-
-    #[\ReturnTypeWillChange]
-    public function offsetUnset(mixed $offset)
-    {
     }
 
     /**
