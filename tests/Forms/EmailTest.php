@@ -169,6 +169,30 @@ class EmailTest extends TestCase
     }
 
     #[Test]
+    public function it_augments_appended_config_fields()
+    {
+        $formBlueprint = Blueprint::makeFromFields(['foo' => ['type' => 'text']]);
+        BlueprintRepository::shouldReceive('find')->with('forms.test')->andReturn($formBlueprint);
+        BlueprintRepository::shouldReceive('makeFromTabs')->passthru();
+        BlueprintRepository::shouldReceive('make')->passthru();
+
+        Form::appendConfigFields('*', 'Fields', [
+            'test_config' => ['type' => 'bard', 'display' => 'A Bard field'],
+        ]);
+
+        $form = tap(Form::make('test')->data([
+            'test_config' => [['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => 'Shut up, Malacoustix!']]]],
+        ]))->save();
+
+        $email = $this->makeEmailWithSubmission($form->makeSubmission()->data(['foo' => 'bar']));
+
+        $this->assertStringContainsString(
+            '<p>Shut up, Malacoustix!</p>',
+            (string) $email->viewData['form_config']['test_config']
+        );
+    }
+
+    #[Test]
     public function it_escapes_submitted_values_in_the_automagic_email()
     {
         $formBlueprint = Blueprint::makeFromFields([
