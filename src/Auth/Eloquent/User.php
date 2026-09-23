@@ -295,7 +295,15 @@ class User extends BaseUser
         }
 
         if ($value === null) {
-            unset($this->model()->$key);
+            // Only keep a null when the key is a real database column (i.e. it
+            // was loaded from the database). This lets an existing value be
+            // cleared out, while preventing non-column fields from being added
+            // as attributes, which would error when the model is saved.
+            if ($this->model()->exists && array_key_exists($key, $this->model()->getRawOriginal())) {
+                $this->model()->$key = null;
+            } else {
+                unset($this->model()->$key);
+            }
 
             return $this;
         }
@@ -316,7 +324,7 @@ class User extends BaseUser
     {
         $merged = $this->data()
             ->except(['roles', 'groups'])
-            ->merge(collect($data)->filter(fn ($v) => $v !== null)->all());
+            ->merge($data);
 
         $this->data($merged->all());
 

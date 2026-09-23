@@ -355,6 +355,32 @@ class EloquentUserTest extends TestCase
     }
 
     #[Test]
+    public function it_clears_an_existing_database_column_when_set_to_null()
+    {
+        $user = $this->makeUser();
+        $user->set('avatar', 'hendrix.jpg')->save();
+
+        $this->assertSame('hendrix.jpg', Facades\User::find($user->id())->get('avatar'));
+
+        $user->set('avatar', null)->save();
+
+        $this->assertNull(Facades\User::find($user->id())->get('avatar'));
+    }
+
+    #[Test]
+    public function it_clears_an_existing_database_column_when_merged_with_null()
+    {
+        $user = $this->makeUser();
+        $user->set('avatar', 'hendrix.jpg')->save();
+
+        $this->assertSame('hendrix.jpg', Facades\User::find($user->id())->get('avatar'));
+
+        $user->merge(['avatar' => null])->save();
+
+        $this->assertNull(Facades\User::find($user->id())->get('avatar'));
+    }
+
+    #[Test]
     public function merge_does_not_set_roles_and_groups_as_model_attributes()
     {
         $user = $this->user();

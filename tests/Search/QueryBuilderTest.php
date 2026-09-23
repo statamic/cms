@@ -137,6 +137,25 @@ class QueryBuilderTest extends TestCase
     }
 
     #[Test]
+    public function results_are_found_using_where_date_when_the_app_timezone_is_not_utc()
+    {
+        config()->set('app.timezone', 'Europe/Zurich');
+
+        // The indexed values are in UTC, so 'b' (2021-11-15 00:00 in Zurich) is stored
+        // as 2021-11-14 23:00. It should still be found when querying for the 15th.
+        $items = collect([
+            ['reference' => 'a', 'test_date' => Carbon::parse('2021-11-15 20:31:04', 'Europe/Zurich')->utc()],
+            ['reference' => 'b', 'test_date' => Carbon::parse('2021-11-15 00:00:00', 'Europe/Zurich')->utc()],
+            ['reference' => 'c', 'test_date' => Carbon::parse('2021-11-14 09:00:00', 'Europe/Zurich')->utc()],
+        ]);
+
+        $results = (new FakeQueryBuilder($items))->withoutData()->whereDate('test_date', Carbon::parse('2021-11-15', 'Europe/Zurich'))->get();
+
+        $this->assertCount(2, $results);
+        $this->assertEquals(['a', 'b'], $results->map->reference->all());
+    }
+
+    #[Test]
     public function results_are_found_using_where_month()
     {
         $items = $this->createWhereDateTestItems();
@@ -198,6 +217,24 @@ class QueryBuilderTest extends TestCase
 
         $this->assertCount(2, $results);
         $this->assertEquals(['a', 'd'], $results->map->reference->all());
+    }
+
+    #[Test]
+    public function results_are_found_using_where_time_when_the_app_timezone_is_not_utc()
+    {
+        config()->set('app.timezone', 'Europe/Zurich');
+
+        // 'a' is at 09:00 in Zurich (+01:00), so it is indexed as 08:00 in UTC.
+        // It should still be found when querying for 09:00.
+        $items = collect([
+            ['reference' => 'a', 'test_date' => Carbon::parse('2021-11-14 09:00:00', 'Europe/Zurich')->utc()],
+            ['reference' => 'b', 'test_date' => Carbon::parse('2021-11-15 20:31:04', 'Europe/Zurich')->utc()],
+        ]);
+
+        $results = (new FakeQueryBuilder($items))->withoutData()->whereTime('test_date', Carbon::parse('2021-11-14 09:00', 'Europe/Zurich'))->get();
+
+        $this->assertCount(1, $results);
+        $this->assertEquals(['a'], $results->map->reference->all());
     }
 
     private function createWhereDateTestItems()

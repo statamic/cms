@@ -40,7 +40,7 @@ const blueprint = computed(() => {
             sections: (tab.sections || []).map((section) => ({
                 ...section,
                 fields: (section.fields || []).map((field) => {
-                    if (['form_heading', 'form_paragraph', 'form_banner'].includes(field.type)) return field;
+                    if (['form_heading', 'form_paragraph', 'info'].includes(field.type)) return field;
 
                     return {
                         ...field,
