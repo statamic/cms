@@ -1,6 +1,27 @@
 <template>
     <div class="flex flex-col space-y-3 p-1.5 bg-gray-100 border border-gray-300 dark:bg-gray-900 dark:border-gray-700 rounded-xl">
-        <ui-input-group>
+        <ui-combobox
+            :model-value="isCloudflare ? 'cloudflare' : 'url'"
+            :options="meta.providers"
+            option-label="label"
+            option-value="value"
+            :read-only="isReadOnly"
+            :aria-label="__('Video Provider')"
+            @update:model-value="changeMode"
+        />
+        <ui-input-group v-if="isCloudflare">
+            <ui-input-group-prepend :text="__('ID')" />
+            <ui-input
+                :model-value="videoId"
+                :isReadOnly="isReadOnly"
+                :aria-label="__('Video ID')"
+                @update:model-value="updateCloudflareId"
+                @focus="$emit('focus')"
+                @blur="$emit('blur')"
+                input-class="border-s-0"
+            />
+        </ui-input-group>
+        <ui-input-group v-else>
             <ui-input-group-prepend :text="__('URL')" />
             <ui-input
                 :model-value="value"
@@ -13,7 +34,7 @@
                 input-class="border-s-0"
             />
         </ui-input-group>
-        <ui-description v-if="isInvalid" class="text-red-600">{{ __('statamic::validation.url') }}</ui-description>
+        <ui-description v-if="isInvalid" class="text-red-600">{{ invalidMessage }}</ui-description>
         <iframe
             v-if="shouldShowPreview"
             ref="iframe"
@@ -29,6 +50,10 @@
 <script>
 import Fieldtype from './Fieldtype.vue';
 
+const CLOUDFLARE = 'cloudflare';
+const CLOUDFLARE_PREFIX = 'cloudflare:';
+const URL_MODE = 'url';
+
 export default {
     mixins: [Fieldtype],
 
@@ -36,15 +61,21 @@ export default {
         return {
             isVisible: false,
             observer: null,
+            // Only consulted when there's no value; otherwise the value itself says which input to show.
+            mode: this.meta.video?.provider === CLOUDFLARE ? CLOUDFLARE : URL_MODE,
         };
     },
 
     computed: {
         shouldShowPreview() {
-            return !this.isInvalid && (this.isEmbeddable || this.isVideo);
+            return !this.isInvalid && (this.isCloudflare ? !!this.videoId : this.isEmbeddable || this.isVideo);
         },
 
         embedUrl() {
+            if (this.isCloudflare) {
+                return this.videoId ? `https://iframe.cloudflarestream.com/${this.videoId}` : null;
+            }
+
             let embed_url = this.value || '';
 
             if (embed_url.includes('youtube')) {
@@ -73,6 +104,16 @@ export default {
             return embed_url;
         },
 
+        invalidMessage() {
+            return this.isCloudflare
+                ? __('statamic::validation.video_fieldtype_cloudflare_id')
+                : __('statamic::validation.url');
+        },
+
+        isCloudflare() {
+            return this.value?.startsWith(CLOUDFLARE_PREFIX) || (!this.value && this.mode === CLOUDFLARE);
+        },
+
         isEmbeddable() {
             const url = this.value || '';
             const isYoutube = url.includes('youtube') || url.includes('youtu.be');
@@ -81,6 +122,8 @@ export default {
         },
 
         isInvalid() {
+            if (this.isCloudflare) return !!this.videoId && !/^[a-zA-Z0-9]+$/.test(this.videoId);
+
             let htmlRegex = new RegExp(/<([A-Z][A-Z0-9]*)\b[^>]*>.*?<\/\1>|<([A-Z][A-Z0-9]*)\b[^\/]*\/>/i);
             return htmlRegex.test(this.value || '');
         },
@@ -94,6 +137,25 @@ export default {
             const url = this.value || '';
             const isVideo = url.includes('.mp4') || url.includes('.ogv') || url.includes('.mov') || url.includes('.webm');
             return !this.isEmbeddable && isVideo;
+        },
+
+        videoId() {
+            return this.value?.startsWith(CLOUDFLARE_PREFIX) ? this.value.slice(CLOUDFLARE_PREFIX.length) : null;
+        },
+    },
+
+    methods: {
+        changeMode(mode) {
+            if (mode === this.mode) return;
+
+            this.updateDebounced.cancel();
+            this.mode = mode;
+
+            if (this.value) this.update(null);
+        },
+
+        updateCloudflareId(id) {
+            this.update(id ? `${CLOUDFLARE_PREFIX}${id}` : null);
         },
     },
 
