@@ -2173,6 +2173,7 @@ class EntryTest extends TestCase
         $blueprint = tap(Blueprint::make('standard_article')->setNamespace('collections.articles'))->save();
 
         $articleEntry = Entry::make('test')->collection($articles)->blueprint($blueprint->handle());
+        tap(Blueprint::make('standard_article')->setNamespace('collections.pages'))->save();
         $pageEntry = Entry::make('test')->collection($pages)->blueprint($blueprint->handle());
 
         // mapped collection uses the mapped prefix instead of the collection handle
