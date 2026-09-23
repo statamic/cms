@@ -7,6 +7,8 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Actions\Action;
 use Statamic\Dictionaries\Dictionary;
 use Statamic\Fields\Fieldtype;
+use Statamic\Forms\Charts\Chart;
+use Statamic\Forms\Insights\Insight;
 use Statamic\Query\Scopes\Scope;
 use Statamic\Tags\Tags;
 use Statamic\Widgets\Widget;
@@ -43,6 +45,8 @@ class ExtensionServiceProviderTest extends TestCase
             'actions' => [Action::class],
             'dictionaries' => [Dictionary::class],
             'fieldtypes' => [Fieldtype::class],
+            'form charts' => [Chart::class],
+            'form insights' => [Insight::class],
             'scopes' => [Scope::class],
             'tags' => [Tags::class],
             'widgets' => [Widget::class],

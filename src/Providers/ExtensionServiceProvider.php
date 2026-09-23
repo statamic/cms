@@ -173,18 +173,18 @@ class ExtensionServiceProvider extends ServiceProvider
     ];
 
     protected $formCharts = [
-        Forms\Charts\HorizontalBar::class,
-        Forms\Charts\Lollipop::class,
-        Forms\Charts\Pie::class,
-        Forms\Charts\RankedOptions::class,
-        Forms\Charts\VerticalBar::class,
+        'horizontal_bar' => Forms\Charts\HorizontalBar::class,
+        'lollipop' => Forms\Charts\Lollipop::class,
+        'pie' => Forms\Charts\Pie::class,
+        'ranked_options' => Forms\Charts\RankedOptions::class,
+        'vertical_bar' => Forms\Charts\VerticalBar::class,
     ];
 
     protected $formInsights = [
-        Forms\Insights\Average::class,
-        Forms\Insights\Checked::class,
-        Forms\Insights\MinMax::class,
-        Forms\Insights\StarRating::class,
+        'average' => Forms\Insights\Average::class,
+        'checked' => Forms\Insights\Checked::class,
+        'min_max' => Forms\Insights\MinMax::class,
+        'star_rating' => Forms\Insights\StarRating::class,
     ];
 
     protected $modifierAliases = [
