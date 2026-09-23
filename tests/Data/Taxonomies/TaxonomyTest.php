@@ -692,4 +692,16 @@ class TaxonomyTest extends TestCase
 
         $this->assertTrue($return);
     }
+
+    #[Test]
+    public function it_updates_term_parents_through_the_term_repository()
+    {
+        $taxonomy = (new Taxonomy)->handle('test');
+
+        Facades\Term::shouldReceive('updateParents')->with($taxonomy, null)->once()->ordered();
+        Facades\Term::shouldReceive('updateParents')->with($taxonomy, ['test::one', 'test::two'])->once()->ordered();
+
+        $taxonomy->updateTermParent();
+        $taxonomy->updateTermParent(['test::one', 'test::two']);
+    }
 }

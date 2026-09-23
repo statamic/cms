@@ -5,7 +5,7 @@ namespace Statamic\Taxonomies;
 use Statamic\Events\TaxonomyTreeSaved;
 use Statamic\Structures\TaxonomyTree;
 
-class UpdateStructuredTermOrder
+class UpdateStructuredTermOrderAndParent
 {
     public function handle(TaxonomyTreeSaved $event)
     {
@@ -20,11 +20,13 @@ class UpdateStructuredTermOrder
             return;
         }
 
-        $taxonomy->updateTermOrder(
-            collect($this->slugsWithDescendants($tree, $moved, $slugs))
-                ->map(fn ($slug) => $taxonomy->handle().'::'.$slug)
-                ->all()
-        );
+        $taxonomy->updateTermParent($this->ids($taxonomy, $slugs));
+        $taxonomy->updateTermOrder($this->ids($taxonomy, $this->slugsWithDescendants($tree, $moved, $slugs)));
+    }
+
+    private function ids(Taxonomy $taxonomy, array $slugs): array
+    {
+        return collect($slugs)->map(fn ($slug) => $taxonomy->handle().'::'.$slug)->all();
     }
 
     private function slugsWithDescendants(TaxonomyTree $tree, array $moved, array $slugs): array

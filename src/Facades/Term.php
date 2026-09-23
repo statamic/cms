@@ -25,6 +25,7 @@ use Statamic\Taxonomies\TermCollection;
  * @method static void substitute($item)
  * @method static \Illuminate\Support\Collection applySubstitutions($items)
  * @method static void updateOrders(\Statamic\Taxonomies\Taxonomy $taxonomy, $ids = null)
+ * @method static void updateParents(\Statamic\Taxonomies\Taxonomy $taxonomy, $ids = null)
  *
  * @see \Statamic\Contracts\Taxonomies\TermRepository
  * @link \Statamic\Taxonomies\Term

@@ -21,7 +21,7 @@ class EventServiceProvider extends ServiceProvider
             \Statamic\Entries\UpdateStructuredEntryOrderAndParent::class,
         ],
         \Statamic\Events\TaxonomyTreeSaved::class => [
-            \Statamic\Taxonomies\UpdateStructuredTermOrder::class,
+            \Statamic\Taxonomies\UpdateStructuredTermOrderAndParent::class,
         ],
         \Statamic\Events\EntryBlueprintFound::class => [
             \Statamic\Entries\AddSiteColumnToBlueprint::class,

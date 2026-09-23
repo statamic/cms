@@ -19,13 +19,27 @@ use Symfony\Component\Finder\SplFileInfo;
 class TaxonomyTermsStore extends ChildStore
 {
     protected $valueIndex = Value::class;
-    protected $storeIndexes = [
-        'slug',
-        'taxonomy',
-        'order',
-        'associations' => Indexes\Terms\Associations::class,
-        'site' => Indexes\Terms\Site::class,
-    ];
+
+    protected function storeIndexes()
+    {
+        $indexes = [
+            'slug',
+            'taxonomy',
+            'order',
+            'associations' => Indexes\Terms\Associations::class,
+            'site' => Indexes\Terms\Site::class,
+        ];
+
+        if (! $taxonomy = Taxonomy::findByHandle($this->childKey())) {
+            return $indexes;
+        }
+
+        if ($taxonomy->hasStructure()) {
+            $indexes['parent'] = Indexes\Terms\Parents::class;
+        }
+
+        return $indexes;
+    }
 
     public function getItemFilter(SplFileInfo $file)
     {
@@ -241,6 +255,11 @@ class TaxonomyTermsStore extends ChildStore
     public function updateOrders($ids = null)
     {
         $this->updateTermsWithinIndex($this->index('order'), $ids);
+    }
+
+    public function updateParents($ids = null)
+    {
+        $this->updateTermsWithinIndex($this->index('parent'), $ids);
     }
 
     private function updateTermsWithinIndex($index, $ids)
