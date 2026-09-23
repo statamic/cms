@@ -93,7 +93,6 @@ class ExtensionServiceProvider extends ServiceProvider
         'global_set_sites' => Fieldtypes\GlobalSetSites::class,
         'grid' => Fieldtypes\Grid::class,
         'group' => Fieldtypes\Group::class,
-        'form_banner' => Fieldtypes\FormBanner::class,
         'form_heading' => Fieldtypes\FormHeading::class,
         'form_paragraph' => Fieldtypes\FormParagraph::class,
         'form_upload' => Fieldtypes\FormUpload::class,
