@@ -59,7 +59,7 @@ class FormField
 
     public static function commonFieldOptions(): ConfigFields
     {
-        $reserved = [...Field::reservedHandles(), 'date', 'message', 'messages'];
+        $reserved = [...Field::reservedHandles(), 'date', 'entry', 'message', 'messages'];
 
         $fields = collect([
             'display' => [

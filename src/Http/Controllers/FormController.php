@@ -31,6 +31,10 @@ class FormController extends Controller
 
         $action->form($form);
 
+        if (is_string($entry = $request->input('_entry'))) {
+            $action->entry($entry);
+        }
+
         if ($form->hasMultiplePages()) {
             $action->page($form->formFields()->pages()->first()['id']);
 

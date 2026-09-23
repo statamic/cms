@@ -13,13 +13,13 @@ class Submissions extends ResourceCollection
     use HasRequestedColumns;
 
     public $collects = ListedSubmission::class;
-    protected $blueprint;
+    protected $form;
     protected $columnPreferenceKey;
     protected $columns;
 
-    public function blueprint($blueprint)
+    public function form($form)
     {
-        $this->blueprint = $blueprint;
+        $this->form = $form;
 
         return $this;
     }
@@ -33,8 +33,12 @@ class Submissions extends ResourceCollection
 
     private function setColumns()
     {
-        $columns = $this->blueprint
+        $columns = $this->form
+            ->blueprint()
             ->columns()
+            ->when($this->form->hasUniqueInstances(), fn ($columns) => $columns->ensurePrepended(
+                Column::make('entry')->label(__('Entry'))->fieldtype('relationship')->sortable(false)
+            ))
             ->ensurePrepended(Column::make('datestamp')->label(__('Date')));
 
         $status = Column::make('status')
@@ -60,7 +64,7 @@ class Submissions extends ResourceCollection
 
         return $this->collection->each(function ($collection) {
             $collection
-                ->blueprint($this->blueprint)
+                ->blueprint($this->form->blueprint())
                 ->columns($this->requestedColumns());
         });
     }
