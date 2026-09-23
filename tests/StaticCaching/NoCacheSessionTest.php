@@ -93,6 +93,26 @@ class NoCacheSessionTest extends TestCase
         ], $region->fragmentData());
     }
 
+    /**
+     * @see https://github.com/statamic/cms/issues/15450
+     **/
+    #[Test]
+    public function it_generates_unique_region_ids_across_urls()
+    {
+        $home = new Session('https://example.test/');
+        $error = new Session('https://example.test/1');
+
+        for ($i = 0; $i < 14; $i++) {
+            $home->getRegionId();
+        }
+
+        for ($i = 0; $i < 4; $i++) {
+            $error->getRegionId();
+        }
+
+        $this->assertNotEquals($home->getRegionId(), $error->getRegionId());
+    }
+
     #[Test]
     public function it_writes()
     {

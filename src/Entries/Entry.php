@@ -761,7 +761,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             'id' => $this->id(),
             'slug' => $this->slug(),
             'published' => $this->published(),
-            'date' => $this->collection()->dated() ? $this->date()->timestamp : null,
+            'date' => $this->collection()->dated() && (! $this->hasOrigin() || $this->hasExplicitDate()) ? $this->date()->timestamp : null,
             'data' => $this->data()->except(['updated_by', 'updated_at'])->all(),
         ];
     }
@@ -781,9 +781,13 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             ->data($attrs['data'])
             ->slug($attrs['slug']);
 
-        if ($this->collection()->dated() && ($date = Arr::get($attrs, 'date'))) {
-            if ($this->isRoot() || $this->blueprint()->field('date')->isLocalizable()) {
+        if ($this->collection()->dated()) {
+            $date = Arr::get($attrs, 'date');
+
+            if ($date !== null && ($this->isRoot() || $this->blueprint()->field('date')->isLocalizable())) {
                 $entry->date(Carbon::createFromTimestamp($date, config('app.timezone')));
+            } elseif ($date === null && $this->hasOrigin()) {
+                $entry->date(null);
             }
         }
 
