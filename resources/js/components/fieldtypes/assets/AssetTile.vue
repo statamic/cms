@@ -29,6 +29,15 @@
             canBeTransparent && checkerboardMode === 'transparent' ? `bg-checkerboard before:opacity-0 hover:before:opacity-100 rounded-lg` : '',
         ]">
             <div class="pb-1 @min-[300px]:p-1 flex flex-col items-center justify-center h-full">
+                <template v-if="errors.length">
+                    <div class="absolute z-10 inset-0 bg-white/75 dark:bg-dark-800/90 flex flex-col gap-2 items-center justify-center px-1 py-2">
+                        <small
+                            class="text-xs text-red-500 text-center"
+                            v-text="errors[0]"
+                        />
+                    </div>
+                </template>
+
                 <!-- Solo Bard -->
                 <template v-if="isImage && isInBardField && !isInAssetBrowser">
                     <img :src="asset.url" />
@@ -45,7 +54,7 @@
                 </template>
 
             </div>
-            <div class="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 duration-100">
+            <div class="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 duration-100 z-10">
                 <div class="flex items-center justify-center gap-2">
                     <template v-if="!readOnly">
                         <ui-button size="sm" @click="editOrOpen" :icon="asset.isEditable ? 'pencil' : 'eye'" aria-label="__('Edit')" v-if="asset.isViewable" />
