@@ -3,11 +3,16 @@
 namespace Tests\Forms\Charts;
 
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Forms\Charts\ChartOption;
 use Statamic\Forms\Charts\HorizontalBar;
+use Statamic\Forms\Charts\Lollipop;
+use Statamic\Forms\Charts\Pie;
+use Statamic\Forms\Charts\RankedOptions;
 use Statamic\Forms\Charts\VerticalBar;
 use Statamic\Forms\Fields\FormField;
+use Statamic\Forms\Fields\FormValueType;
 use Statamic\Forms\Summary\FieldResponses;
 use Tests\TestCase;
 
@@ -195,6 +200,49 @@ class ChartTest extends TestCase
 
         $this->assertCount(11, $props['items']);
         $this->assertEquals('0', $props['items'][0]['key']);
+    }
+
+    #[Test]
+    #[DataProvider('supportedValueTypesProvider')]
+    public function it_declares_the_value_types_it_supports(string $chart, array $supports)
+    {
+        $this->assertEquals($supports, (new $chart)->supports());
+    }
+
+    public static function supportedValueTypesProvider()
+    {
+        $any = [FormValueType::Number, FormValueType::Boolean, FormValueType::Choice, FormValueType::Choices];
+
+        return [
+            'horizontal bar' => [HorizontalBar::class, $any],
+            'vertical bar' => [VerticalBar::class, $any],
+            'lollipop' => [Lollipop::class, $any],
+            'pie' => [Pie::class, [FormValueType::Number, FormValueType::Boolean, FormValueType::Choice]],
+            'ranked options' => [RankedOptions::class, [FormValueType::Ranking]],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('appliesToProvider')]
+    public function it_applies_to_fields_whose_value_type_it_supports(string $chart, array $config, bool $applies)
+    {
+        $this->assertSame($applies, (new $chart)->appliesTo(new FormField('field', $config)));
+    }
+
+    public static function appliesToProvider()
+    {
+        return [
+            'bar on checkboxes' => [HorizontalBar::class, ['type' => 'checkboxes'], true],
+            'bar on ranking' => [HorizontalBar::class, ['type' => 'ranking'], false],
+            'bar on short answer' => [HorizontalBar::class, ['type' => 'short_answer'], false],
+            'pie on multi choice' => [Pie::class, ['type' => 'multi_choice'], true],
+            'pie on toggle' => [Pie::class, ['type' => 'toggle'], true],
+            'pie on checkboxes' => [Pie::class, ['type' => 'checkboxes'], false],
+            'pie on single dropdown' => [Pie::class, ['type' => 'dropdown'], true],
+            'pie on multiple dropdown' => [Pie::class, ['type' => 'dropdown', 'multiple' => true], false],
+            'ranked options on ranking' => [RankedOptions::class, ['type' => 'ranking'], true],
+            'ranked options on multi choice' => [RankedOptions::class, ['type' => 'multi_choice'], false],
+        ];
     }
 
     private function weightedValues(array $keys): FieldResponses

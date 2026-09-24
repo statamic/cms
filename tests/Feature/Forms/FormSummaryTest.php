@@ -164,6 +164,21 @@ class FormSummaryTest extends TestCase
     }
 
     #[Test]
+    public function it_falls_back_to_the_default_chart_when_the_saved_chart_doesnt_apply()
+    {
+        $form = $this->makeForm();
+        $form->charts([['field' => 'color', 'chart' => 'ranked_options']])->save();
+
+        $this
+            ->actingAs($this->superUser())
+            ->getJson(cp_route('forms.submissions.summary', $form->handle()))
+            ->assertOk()
+            ->assertJsonCount(1, 'fields')
+            ->assertJsonPath('fields.0.handle', 'color')
+            ->assertJsonPath('fields.0.chart.handle', 'pie');
+    }
+
+    #[Test]
     public function it_excludes_hidden_fields()
     {
         $form = tap(Form::make('survey')->formFields([
@@ -264,7 +279,9 @@ class FormSummaryTest extends TestCase
             ->assertJsonCount(2, 'meta.fields')
             ->assertJsonPath('meta.fields.0.handle', 'color')
             ->assertJsonPath('meta.fields.0.default_chart', 'pie')
-            ->assertJsonPath('meta.fields.1.handle', 'rating');
+            ->assertJsonPath('meta.fields.0.charts', ['horizontal_bar', 'lollipop', 'pie', 'vertical_bar'])
+            ->assertJsonPath('meta.fields.1.handle', 'rating')
+            ->assertJsonPath('meta.fields.1.charts', ['horizontal_bar', 'lollipop', 'pie', 'vertical_bar']);
 
         $this->setTestRoles(['test' => ['access cp', 'view form submissions']]);
         $user = tap(User::make()->assignRole('test'))->save();

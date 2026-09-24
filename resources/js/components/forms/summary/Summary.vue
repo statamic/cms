@@ -106,6 +106,12 @@ function chartableField(handle: string): MetaField | undefined {
     return chartableFields.value.find((field) => field.handle === handle);
 }
 
+function chartsFor(handle: string): MetaChart[] {
+    const handles = chartableField(handle)?.charts ?? [];
+
+    return availableCharts.value.filter((chart) => handles.includes(chart.handle));
+}
+
 function summarizedField(handle: string): SummaryField | undefined {
     return summary.value?.fields.find((field) => field.handle === handle);
 }
@@ -323,7 +329,7 @@ defineExpose({ refresh: fetchSummary });
                         <template v-if="editing" #chrome>
                             <EditChrome
                                 :config="widget.config"
-                                :charts="availableCharts"
+                                :charts="chartsFor(widget.config.field)"
                                 :loading="loadingPreviews.includes(widget.config.field)"
                                 @update:chart="setChart(index, $event)"
                                 @remove="removeChart(index)"
@@ -342,7 +348,7 @@ defineExpose({ refresh: fetchSummary });
                         <template v-if="editing" #actions>
                             <EditChrome
                                 :config="widget.config"
-                                :charts="availableCharts"
+                                :charts="chartsFor(widget.config.field)"
                                 :loading="loadingPreviews.includes(widget.config.field)"
                                 @update:chart="setChart(index, $event)"
                                 @remove="removeChart(index)"

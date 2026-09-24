@@ -56,5 +56,11 @@ class UpdateFormChartsController extends CpController
                 'charts' => __('statamic::validation.form_chart_unknown_chart', ['chart' => $config['chart']]),
             ]);
         }
+
+        if (! app(app('statamic.form-charts')->get($config['chart']))->appliesTo($field)) {
+            throw ValidationException::withMessages([
+                'charts' => __('statamic::validation.form_chart_not_applicable', ['chart' => $config['chart'], 'field' => $config['field']]),
+            ]);
+        }
     }
 }

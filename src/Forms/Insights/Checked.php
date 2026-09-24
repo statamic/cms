@@ -2,10 +2,16 @@
 
 namespace Statamic\Forms\Insights;
 
+use Statamic\Forms\Fields\FormValueType;
 use Statamic\Forms\Summary\FieldResponses;
 
 class Checked extends Insight
 {
+    public function supports(): array
+    {
+        return [FormValueType::Boolean];
+    }
+
     public function props(FieldResponses $responses): array
     {
         $total = $responses->total();

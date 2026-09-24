@@ -198,6 +198,7 @@ return [
     'email_available' => 'A user with this email already exists.',
     'fieldset_imported_recursively' => 'Fieldset :handle is being imported recursively.',
     'form_chart_hidden_field' => 'Field :field is hidden and cannot be charted.',
+    'form_chart_not_applicable' => 'Chart :chart cannot be used for field :field.',
     'form_chart_unknown_chart' => 'Chart :chart does not exist.',
     'form_chart_unknown_field' => 'Field :field does not exist on this form.',
     'one_site_without_origin' => 'At least one site must not have an origin.',

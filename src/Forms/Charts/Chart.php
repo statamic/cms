@@ -6,6 +6,8 @@ use Illuminate\Support\Collection;
 use Statamic\Extend\HasHandle;
 use Statamic\Extend\HasTitle;
 use Statamic\Extend\RegistersItself;
+use Statamic\Forms\Fields\FormField;
+use Statamic\Forms\Fields\FormValueType;
 use Statamic\Forms\Summary\FieldResponses;
 
 use function Statamic\trans as __;
@@ -26,6 +28,14 @@ abstract class Chart
     public function icon(): ?string
     {
         return $this->icon;
+    }
+
+    /** @return list<FormValueType> */
+    abstract public function supports(): array;
+
+    public function appliesTo(FormField $field): bool
+    {
+        return in_array($field->fieldtype()->valueType(), $this->supports(), true);
     }
 
     public function props(FieldResponses $responses, ?Collection $options = null): array

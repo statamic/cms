@@ -3,6 +3,7 @@
 namespace Statamic\Forms\Charts;
 
 use Illuminate\Support\Collection;
+use Statamic\Forms\Fields\FormValueType;
 use Statamic\Forms\Summary\FieldResponses;
 
 class RankedOptions extends Chart
@@ -11,6 +12,11 @@ class RankedOptions extends Chart
 
     protected ?string $component = 'ui-horizontal-lollipop-chart';
     protected ?string $icon = 'rank';
+
+    public function supports(): array
+    {
+        return [FormValueType::Ranking];
+    }
 
     public function props(FieldResponses $responses, ?Collection $options = null): array
     {

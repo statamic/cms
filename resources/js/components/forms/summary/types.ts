@@ -62,6 +62,7 @@ export interface MetaField {
     display: string;
     icon: string;
     default_chart: string;
+    charts: string[];
 }
 
 export interface Summary {

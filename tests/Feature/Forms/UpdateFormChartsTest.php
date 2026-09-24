@@ -149,7 +149,22 @@ class UpdateFormChartsTest extends TestCase
     }
 
     #[Test]
-    public function it_allows_any_registered_chart_for_any_field()
+    public function it_allows_a_non_default_chart_that_applies_to_the_field()
+    {
+        $form = $this->makeForm();
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->patchJson(cp_route('forms.submissions.charts.update', $form->handle()), [
+                'charts' => [['field' => 'rating', 'chart' => 'pie']],
+            ])
+            ->assertNoContent();
+
+        $this->assertEquals([['field' => 'rating', 'chart' => 'pie']], Form::find('survey')->charts());
+    }
+
+    #[Test]
+    public function it_rejects_charts_that_dont_apply_to_the_field()
     {
         $form = $this->makeForm();
 
@@ -158,9 +173,10 @@ class UpdateFormChartsTest extends TestCase
             ->patchJson(cp_route('forms.submissions.charts.update', $form->handle()), [
                 'charts' => [['field' => 'color', 'chart' => 'ranked_options']],
             ])
-            ->assertNoContent();
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['charts' => 'Chart ranked_options cannot be used for field color.']);
 
-        $this->assertEquals([['field' => 'color', 'chart' => 'ranked_options']], Form::find('survey')->charts());
+        $this->assertNull(Form::find('survey')->charts());
     }
 
     #[Test]

@@ -5,7 +5,6 @@ namespace Statamic\Http\Controllers\CP\Forms;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Forms\SubmissionQueryBuilder;
 use Statamic\Facades\User;
-use Statamic\Forms\Charts\Chart;
 use Statamic\Forms\Charts\SummaryChart;
 use Statamic\Forms\Fields\FormField;
 use Statamic\Forms\Insights\Insight;
@@ -60,7 +59,8 @@ class FormSummaryController extends CpController
         if (is_null($layout)) {
             return $fields
                 ->filter(fn (FormField $field): bool => $field->fieldtype()->defaultChart() !== null)
-                ->map(fn (FormField $field): SummaryChart => new SummaryChart($field, app($field->fieldtype()->defaultChart())))
+                ->map(fn (FormField $field): ?SummaryChart => SummaryChart::fromLayout($field))
+                ->filter()
                 ->values();
         }
 
@@ -70,11 +70,7 @@ class FormSummaryController extends CpController
                     return null;
                 }
 
-                if (! $chart = $this->resolveChart($field, Arr::get($config, 'chart'))) {
-                    return null;
-                }
-
-                return new SummaryChart($field, $chart);
+                return SummaryChart::fromLayout($field, $config);
             })
             ->filter()
             ->values();
@@ -84,13 +80,6 @@ class FormSummaryController extends CpController
     {
         return $form->formFields()->fields()
             ->reject(fn (FormField $field): bool => $field->config()['hidden'] ?? false);
-    }
-
-    private function resolveChart(FormField $field, ?string $handle): ?Chart
-    {
-        $class = app('statamic.form-charts')->get($handle) ?? $field->fieldtype()->defaultChart();
-
-        return $class ? app($class) : null;
     }
 
     private function fieldNumbers($form): Collection
@@ -148,8 +137,7 @@ class FormSummaryController extends CpController
                 'component' => $chart->component(),
                 'props' => $chart->props($responses, $fieldtype->chartOptions($responses)),
             ],
-            'insights' => collect($fieldtype->defaultInsights())
-                ->map(fn (string $class): Insight => app($class)->setConfig($fieldtype->insightConfig()))
+            'insights' => $summary->insights()
                 ->map(fn (Insight $insight): array => [
                     'handle' => $insight::handle(),
                     'component' => $insight->component(),
@@ -185,6 +173,10 @@ class FormSummaryController extends CpController
                     'display' => $field->display(),
                     'icon' => $field->fieldtype()->icon(),
                     'default_chart' => $field->fieldtype()->defaultChart()::handle(),
+                    'charts' => app('statamic.form-charts')
+                        ->filter(fn (string $class): bool => app($class)->appliesTo($field))
+                        ->keys()
+                        ->values(),
                 ])
                 ->values(),
         ];

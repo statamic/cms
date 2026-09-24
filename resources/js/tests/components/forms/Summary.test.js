@@ -59,7 +59,15 @@ function summary(fields) {
         fields,
         meta: {
             charts: [],
-            fields: [{ handle: 'color', display: 'Color', icon: 'fieldtype-radio', default_chart: 'horizontal_bar' }],
+            fields: [
+                {
+                    handle: 'color',
+                    display: 'Color',
+                    icon: 'fieldtype-radio',
+                    default_chart: 'horizontal_bar',
+                    charts: ['horizontal_bar', 'pie'],
+                },
+            ],
         },
     };
 }
@@ -82,6 +90,20 @@ async function mountEditing() {
 async function settle() {
     for (let i = 0; i < 10; i++) await flushPromises();
 }
+
+test('the chart dropdown only offers charts that apply to the field', async () => {
+    const wrapper = await mountEditing();
+
+    wrapper.vm.summary.meta.charts = ['horizontal_bar', 'pie', 'ranked_options'].map((handle) => ({
+        handle,
+        title: handle,
+        icon: null,
+        component: `ui-${handle}-chart`,
+    }));
+
+    expect(wrapper.vm.chartsFor('color').map((chart) => chart.handle)).toEqual(['horizontal_bar', 'pie']);
+    expect(wrapper.vm.chartsFor('missing')).toEqual([]);
+});
 
 test('a failed preview is not retried in a loop', async () => {
     const wrapper = await mountEditing();

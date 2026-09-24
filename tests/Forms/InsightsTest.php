@@ -2,8 +2,10 @@
 
 namespace Tests\Forms;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Forms\Fields\FormField;
+use Statamic\Forms\Fields\FormValueType;
 use Statamic\Forms\Insights\Average;
 use Statamic\Forms\Insights\Checked;
 use Statamic\Forms\Insights\MinMax;
@@ -103,6 +105,45 @@ class InsightsTest extends TestCase
             ['average' => 2.3, 'total' => 0],
             (new StarRating)->props($this->responses([1, 2, 4]))
         );
+    }
+
+    #[Test]
+    #[DataProvider('supportedValueTypesProvider')]
+    public function it_declares_the_value_types_it_supports(string $insight, array $supports)
+    {
+        $this->assertEquals($supports, (new $insight)->supports());
+    }
+
+    public static function supportedValueTypesProvider()
+    {
+        return [
+            'average' => [Average::class, [FormValueType::Number]],
+            'min max' => [MinMax::class, [FormValueType::Number]],
+            'star rating' => [StarRating::class, [FormValueType::Number]],
+            'checked' => [Checked::class, [FormValueType::Boolean]],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('appliesToProvider')]
+    public function it_applies_to_fields_whose_value_type_it_supports(string $insight, array $config, bool $applies)
+    {
+        $this->assertSame($applies, (new $insight)->appliesTo(new FormField('field', $config)));
+    }
+
+    public static function appliesToProvider()
+    {
+        return [
+            'average on number' => [Average::class, ['type' => 'number'], true],
+            'average on opinion scale' => [Average::class, ['type' => 'opinion_scale'], true],
+            'average on toggle' => [Average::class, ['type' => 'toggle'], false],
+            'min max on currency' => [MinMax::class, ['type' => 'currency', 'currency' => 'GBP'], true],
+            'min max on multi choice' => [MinMax::class, ['type' => 'multi_choice'], false],
+            'checked on toggle' => [Checked::class, ['type' => 'toggle'], true],
+            'checked on yes no' => [Checked::class, ['type' => 'yes_no'], false],
+            'star rating on star rating' => [StarRating::class, ['type' => 'star_rating'], true],
+            'star rating on number' => [StarRating::class, ['type' => 'number'], false],
+        ];
     }
 
     private function responses(iterable $values): FieldResponses
