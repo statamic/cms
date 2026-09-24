@@ -39,32 +39,6 @@ export const _FixedScale: Story = {
     parameters: {docs: {source: {code: `<VerticalBarChart :items="items" :max-value="100" accessible-label="Rating distribution" />`}}},
 };
 
-const summaryCode = `
-<VerticalBarChart :items="items" accessible-label="Rating distribution. Average 3.2 out of 5.">
-    <template #summary>
-        <div class="inline-flex rounded-md border px-2 py-1">3.2 Average</div>
-    </template>
-</VerticalBarChart>
-`;
-
-export const _WithSummary: Story = {
-    tags: ['!dev'],
-    parameters: {docs: {source: {code: summaryCode}}},
-    render: (args) => ({
-        components: {VerticalBarChart},
-        setup: () => ({args}),
-        template: `
-            <VerticalBarChart v-bind="args">
-                <template #summary>
-                    <div class="inline-flex rounded-md border border-gray-200 px-2 py-1 text-sm dark:border-gray-700">
-                        <strong class="me-2">3.2</strong> Average
-                    </div>
-                </template>
-            </VerticalBarChart>
-        `,
-    }),
-};
-
 export const TestRendersAccessibleChartAndScalesBars: Story = {
     tags: ['!dev', 'test'],
     play: async ({canvasElement}) => {
