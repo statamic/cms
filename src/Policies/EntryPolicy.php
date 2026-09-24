@@ -30,6 +30,10 @@ class EntryPolicy
             return false;
         }
 
+        if ($this->hasAnotherAuthor($user, $entry)) {
+            return $user->hasPermission("view other authors {$entry->collectionHandle()} entries");
+        }
+
         return $this->edit($user, $entry)
             || $user->hasPermission("view {$entry->collectionHandle()} entries");
     }
@@ -47,6 +51,11 @@ class EntryPolicy
         }
 
         return $user->hasPermission("edit {$entry->collectionHandle()} entries");
+    }
+
+    public function viewOtherAuthorsEntries($user, $collection)
+    {
+        return $user->hasPermission("view other authors {$collection->handle()} entries");
     }
 
     public function editOtherAuthorsEntries($user, $collection, $blueprint = null)

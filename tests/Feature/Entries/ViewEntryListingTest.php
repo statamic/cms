@@ -5,7 +5,9 @@ namespace Tests\Feature\Entries;
 use Facades\Tests\Factories\EntryFactory;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Entries\Collection;
+use Statamic\Facades\Search;
 use Statamic\Facades\User;
+use Statamic\Fields\Blueprint;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -14,6 +16,17 @@ class ViewEntryListingTest extends TestCase
 {
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
+
+    private $searchPath;
+
+    public function tearDown(): void
+    {
+        if ($this->searchPath) {
+            app('files')->deleteDirectory($this->searchPath);
+        }
+
+        parent::tearDown();
+    }
 
     #[Test]
     public function it_shows_entries_index()
@@ -89,5 +102,150 @@ class ViewEntryListingTest extends TestCase
         ];
 
         $this->assertEquals($expected, $entries->pluck('slug')->all());
+    }
+
+    #[Test]
+    public function it_shows_only_entries_in_index_the_user_can_access()
+    {
+        $this->setTestRole('view-own-entries', [
+            'access cp',
+            'view test entries',
+        ]);
+
+        $this->setTestRole('view-other-authors-entries', [
+            'access cp',
+            'view test entries',
+            'view other authors test entries',
+        ]);
+
+        $userOne = tap(User::make()->assignRole('view-own-entries'))->save();
+        $userTwo = tap(User::make()->assignRole('view-other-authors-entries'))->save();
+
+        Blueprint::make('with-author')
+            ->setNamespace('collections/test')
+            ->ensureField('author', ['type' => 'users'])
+            ->save();
+
+        Blueprint::make('without-author')
+            ->setNamespace('collections/test')
+            ->save();
+
+        $collection = tap(Collection::make('test'))->save();
+
+        EntryFactory::collection($collection)
+            ->slug('entry-user-one')
+            ->data(['blueprint' => 'with-author', 'author' => $userOne->id()])
+            ->create();
+
+        EntryFactory::collection($collection)
+            ->slug('entry-user-two')
+            ->data(['blueprint' => 'with-author', 'author' => $userTwo->id()])
+            ->create();
+
+        EntryFactory::collection($collection)
+            ->slug('entry-with-multiple-authors')
+            ->data(['blueprint' => 'with-author', 'author' => [$userOne->id(), $userTwo->id()]])
+            ->create();
+
+        EntryFactory::collection($collection)
+            ->slug('entry-without-author')
+            ->data(['blueprint' => 'without-author'])
+            ->create();
+
+        $responseUserOne = $this
+            ->actingAs($userOne)
+            ->get(cp_route('collections.entries.index', ['collection' => 'test']))
+            ->assertOk();
+
+        $entries = collect($responseUserOne->getData()->data);
+
+        $expected = [
+            'entry-user-one',
+            'entry-with-multiple-authors',
+            'entry-without-author',
+        ];
+
+        $this->assertEquals($expected, $entries->pluck('slug')->all());
+
+        $responseUserTwo = $this
+            ->actingAs($userTwo)
+            ->get(cp_route('collections.entries.index', ['collection' => 'test']))
+            ->assertOk();
+
+        $entries = collect($responseUserTwo->getData()->data);
+
+        $expected = [
+            'entry-user-one',
+            'entry-user-two',
+            'entry-with-multiple-authors',
+            'entry-without-author',
+        ];
+
+        $this->assertEquals($expected, $entries->pluck('slug')->all());
+    }
+
+    #[Test]
+    public function it_shows_only_entries_in_index_the_user_can_access_when_searching()
+    {
+        $collectionHandle = 'view-other-authors-search';
+        $this->searchPath = storage_path('statamic/search/view-other-authors-search');
+
+        config([
+            'statamic.search.indexes.default.driver' => 'local',
+            'statamic.search.drivers.local.path' => $this->searchPath,
+        ]);
+
+        $this->setTestRole('view-own-entries', [
+            'access cp',
+            "view {$collectionHandle} entries",
+        ]);
+
+        $user = tap(User::make()->assignRole('view-own-entries'))->save();
+        $otherUser = tap(User::make())->save();
+
+        Blueprint::make('with-author')
+            ->setNamespace("collections/{$collectionHandle}")
+            ->ensureField('author', ['type' => 'users'])
+            ->save();
+
+        $collection = tap(Collection::make($collectionHandle)->searchIndex('default'))->save();
+
+        EntryFactory::collection($collection)
+            ->slug('entry-user-one')
+            ->data([
+                'blueprint' => 'with-author',
+                'author' => $user->id(),
+                'title' => 'Searchable entry',
+            ])
+            ->create();
+
+        EntryFactory::collection($collection)
+            ->slug('entry-user-two')
+            ->data([
+                'blueprint' => 'with-author',
+                'author' => $otherUser->id(),
+                'title' => 'Searchable entry',
+            ])
+            ->create();
+
+        EntryFactory::collection($collection)
+            ->slug('entry-with-multiple-authors')
+            ->data([
+                'blueprint' => 'with-author',
+                'author' => [$user->id(), $otherUser->id()],
+                'title' => 'Searchable entry',
+            ])
+            ->create();
+
+        Search::index('default')->update();
+
+        $response = $this
+            ->actingAs($user)
+            ->get(cp_route('collections.entries.index', ['collection' => $collectionHandle, 'search' => 'searchable']))
+            ->assertOk();
+
+        $entries = collect($response->getData()->data);
+
+        $this->assertEquals(['entry-user-one', 'entry-with-multiple-authors'], $entries->pluck('slug')->all());
     }
 }

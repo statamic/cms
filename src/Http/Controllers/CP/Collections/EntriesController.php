@@ -31,6 +31,7 @@ class EntriesController extends CpController
 {
     use ExtractsFromEntryFields,
         Hookable,
+        QueriesAuthorEntries,
         QueriesFilters;
 
     public function index(FilteredRequest $request, $collection)
@@ -75,19 +76,23 @@ class EntriesController extends CpController
         $query = $collection->queryEntries();
 
         if ($search = request('search')) {
-            if ($collection->hasSearchIndex()) {
-                return $collection
-                    ->searchIndex()
-                    ->ensureExists()
-                    ->search($search)
-                    ->where('collection', $collection->handle());
-            }
-
             $query->where('title', 'like', '%'.$search.'%');
+        }
+
+        if ($search && $collection->hasSearchIndex()) {
+            $query = $collection
+                ->searchIndex()
+                ->ensureExists()
+                ->search($search)
+                ->where('collection', $collection->handle());
         }
 
         if (Site::multiEnabled()) {
             $query->whereIn('site', Site::authorized()->map->handle()->all());
+        }
+
+        if (User::current()->cant('view-other-authors-entries', [EntryContract::class, $collection])) {
+            $this->queryAuthorEntries($query, $collection);
         }
 
         return $query;
@@ -107,10 +112,6 @@ class EntriesController extends CpController
         }
 
         $blueprint->setParent($entry);
-
-        if (User::current()->cant('edit-other-authors-entries', [EntryContract::class, $collection, $blueprint])) {
-            $blueprint->ensureFieldHasConfig('author', ['visibility' => 'read_only']);
-        }
 
         [$values, $meta, $extraValues] = $this->extractFromFields($entry, $blueprint);
 

@@ -8,6 +8,7 @@ use Statamic\Auth\User;
 use Statamic\Entries\Collection;
 use Statamic\Facades;
 use Statamic\Facades\Scope;
+use Statamic\Fields\Blueprint;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -156,6 +157,76 @@ class ViewCollectionListingTest extends TestCase
                 ->component('collections/Index')
                 ->has('collections', 1)
                 ->where('collections.0.id', 'bar'));
+    }
+
+    #[Test]
+    public function it_only_counts_entries_the_user_can_access()
+    {
+        $this->setTestRole('view-own-entries', [
+            'access cp',
+            'view test entries',
+        ]);
+
+        $this->setTestRole('view-other-authors-entries', [
+            'access cp',
+            'view test entries',
+            'view other authors test entries',
+        ]);
+
+        $user = tap(Facades\User::make()->assignRole('view-own-entries'))->save();
+        $otherUser = tap(Facades\User::make())->save();
+
+        Blueprint::make('with-author')
+            ->setNamespace('collections/test')
+            ->ensureField('author', ['type' => 'users'])
+            ->save();
+
+        $collection = tap(Collection::make('test')
+            ->dated(true)
+            ->futureDateBehavior('private')
+            ->pastDateBehavior('public')
+        )->save();
+
+        EntryFactory::collection($collection)
+            ->data(['blueprint' => 'with-author', 'author' => $user->id()])
+            ->create();
+
+        EntryFactory::collection($collection)
+            ->data(['blueprint' => 'with-author', 'author' => $user->id()])
+            ->published(false)
+            ->create();
+
+        EntryFactory::collection($collection)
+            ->data(['blueprint' => 'with-author', 'author' => $user->id()])
+            ->published(true)
+            ->date(now()->addDay())
+            ->create();
+
+        EntryFactory::collection($collection)
+            ->data(['blueprint' => 'with-author', 'author' => $otherUser->id()])
+            ->create();
+
+        EntryFactory::collection($collection)
+            ->data(['blueprint' => 'with-author', 'author' => $otherUser->id()])
+            ->published(false)
+            ->create();
+
+        EntryFactory::collection($collection)
+            ->data(['blueprint' => 'with-author', 'author' => $otherUser->id()])
+            ->published(true)
+            ->date(now()->addDay())
+            ->create();
+
+        $this
+            ->actingAs($user)
+            ->get(cp_route('collections.index'))
+            ->assertInertia(fn ($page) => $page
+                ->component('collections/Index')
+                ->where('collections.0.id', 'test')
+                ->where('collections.0.entries_count', 3)
+                ->where('collections.0.published_entries_count', 1)
+                ->where('collections.0.draft_entries_count', 1)
+                ->where('collections.0.scheduled_entries_count', 1));
     }
 
     #[Test]
