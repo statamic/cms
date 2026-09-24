@@ -39,10 +39,12 @@ final readonly class SummaryChart
 
     private static function resolveInsights(FormField $field, Collection $classes): Collection
     {
-        $config = $field->fieldtype()->insightConfig();
-
         return $classes
-            ->map(fn (string $class): Insight => app($class)->setConfig($config))
+            ->map(function (string $class) use ($field): Insight {
+                $insight = app($class);
+
+                return $insight->setConfig($field->fieldtype()->insightConfig($insight));
+            })
             ->filter(fn (Insight $insight): bool => $insight->appliesTo($field))
             ->values();
     }

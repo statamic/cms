@@ -129,8 +129,10 @@ class StarRatingTest extends TestCase
         ]));
 
         $this->assertSame([StarRatingInsight::class], $fieldtype->defaultInsights());
-        $this->assertSame(['total' => 3], $fieldtype->insightConfig());
-        $this->assertEquals(['average' => 2.0, 'total' => 3], (new StarRatingInsight)->setConfig($fieldtype->insightConfig())->props($this->responses([1, 3])));
+        $insight = new StarRatingInsight;
+
+        $this->assertSame(['total' => 3], $fieldtype->insightConfig($insight));
+        $this->assertEquals(['average' => 2.0, 'total' => 3], $insight->setConfig($fieldtype->insightConfig($insight))->props($this->responses([1, 3])));
     }
 
     private function responses(iterable $values): FieldResponses

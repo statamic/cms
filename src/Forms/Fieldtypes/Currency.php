@@ -7,6 +7,7 @@ use Statamic\Forms\Charts\VerticalBar;
 use Statamic\Forms\Fields\FormFieldtype;
 use Statamic\Forms\Fields\FormValueType;
 use Statamic\Forms\Insights\Average;
+use Statamic\Forms\Insights\Insight;
 use Statamic\Forms\Insights\MinMax;
 use Statamic\Support\Arr;
 
@@ -61,13 +62,13 @@ class Currency extends FormFieldtype
         return [MinMax::class, Average::class];
     }
 
-    public function insightConfig(): array
+    public function insightConfig(Insight $insight): array
     {
         $extra = Dictionary::find('currencies')?->get($this->config('currency'))?->extra() ?? [];
 
         return [
             'prefix' => Arr::get($extra, 'symbol'),
-            'decimals' => Arr::get($extra, 'decimals', 2),
+            'precision' => Arr::get($extra, 'decimals', 2),
         ];
     }
 

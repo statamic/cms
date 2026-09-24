@@ -8,6 +8,10 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Form;
 use Statamic\Facades\FormSubmission;
 use Statamic\Facades\User;
+use Statamic\Forms\Fieldtypes\Number;
+use Statamic\Forms\Insights\Average;
+use Statamic\Forms\Insights\Insight;
+use Statamic\Forms\Insights\MinMax;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -200,6 +204,57 @@ class FormSummaryTest extends TestCase
                 'chart' => 'vertical_bar',
                 'insights' => [['type' => 'average'], ['type' => 'min_max']],
             ]);
+    }
+
+    #[Test]
+    #[DataProvider('precisionProvider')]
+    public function the_fields_precision_decides_the_decimals_of_each_insight(array $field, array $minMax, array $average)
+    {
+        TemperatureFormFieldtype::register();
+
+        $form = $this->makeNumberForm($field);
+
+        $this->submit($form, ['price' => 18]);
+        $this->submit($form, ['price' => 24]);
+        $this->submit($form, ['price' => 22]);
+
+        $response = $this
+            ->actingAs($this->superUser())
+            ->getJson(cp_route('forms.submissions.summary', $form->handle()))
+            ->assertOk()
+            ->assertJsonPath('fields.0.insights.0.handle', 'min_max')
+            ->assertJsonPath('fields.0.insights.1.handle', 'average');
+
+        $this->assertEquals($minMax, $response->json('fields.0.insights.0.props'));
+        $this->assertEquals($average, $response->json('fields.0.insights.1.props'));
+    }
+
+    public static function precisionProvider()
+    {
+        return [
+            'number' => [['type' => 'number'], ['min' => '18', 'max' => '24'], ['average' => '21.3']],
+            'currency' => [['type' => 'currency', 'currency' => 'GBP'], ['min' => '18.00', 'max' => '24.00', 'prefix' => '£'], ['average' => '21.33', 'prefix' => '£']],
+            'one decimal' => [['type' => 'temperature'], ['min' => '18.0', 'max' => '24.0'], ['average' => '21.3']],
+        ];
+    }
+
+    #[Test]
+    public function each_insight_gets_the_fields_facts_for_that_insight()
+    {
+        PerInsightFormFieldtype::register();
+
+        $form = $this->makeNumberForm(['type' => 'per_insight']);
+
+        $this->submit($form, ['price' => 5]);
+        $this->submit($form, ['price' => 10]);
+
+        $response = $this
+            ->actingAs($this->superUser())
+            ->getJson(cp_route('forms.submissions.summary', $form->handle()))
+            ->assertOk();
+
+        $this->assertEquals(['min' => '5', 'max' => '10', 'suffix' => ' (min/max)'], $response->json('fields.0.insights.0.props'));
+        $this->assertEquals(['average' => '7.5', 'suffix' => ' (average)'], $response->json('fields.0.insights.1.props'));
     }
 
     #[Test]
@@ -470,13 +525,13 @@ class FormSummaryTest extends TestCase
         ]))->save();
     }
 
-    private function makeNumberForm()
+    private function makeNumberForm(array $field = ['type' => 'number'])
     {
         return tap(Form::make('survey')->formFields([
             'sections' => [
                 [
                     'fields' => [
-                        ['handle' => 'price', 'field' => ['type' => 'number']],
+                        ['handle' => 'price', 'field' => $field],
                     ],
                 ],
             ],
@@ -496,5 +551,29 @@ class FormSummaryTest extends TestCase
     private function superUser()
     {
         return tap(User::make()->makeSuper())->save();
+    }
+}
+
+class TemperatureFormFieldtype extends Number
+{
+    public static $handle = 'temperature';
+
+    public function insightConfig(Insight $insight): array
+    {
+        return ['precision' => 1];
+    }
+}
+
+class PerInsightFormFieldtype extends Number
+{
+    public static $handle = 'per_insight';
+
+    public function insightConfig(Insight $insight): array
+    {
+        return match ($insight::class) {
+            MinMax::class => ['suffix' => ' (min/max)'],
+            Average::class => ['suffix' => ' (average)'],
+            default => [],
+        };
     }
 }

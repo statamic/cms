@@ -7,7 +7,7 @@ use Statamic\Forms\Summary\FieldResponses;
 
 class Average extends Insight
 {
-    protected array $defaults = ['decimals' => 1];
+    protected array $defaults = ['precision' => 0];
 
     public function supports(): array
     {
@@ -17,7 +17,7 @@ class Average extends Insight
     public function props(FieldResponses $responses): array
     {
         return array_filter([
-            'average' => number_format($responses->numeric()?->average() ?? 0, (int) $this->config('decimals')),
+            'average' => number_format($responses->numeric()?->average() ?? 0, max((int) $this->config('precision'), 1)),
             'prefix' => $this->config('prefix'),
             'suffix' => $this->config('suffix'),
         ], fn ($value) => $value !== null);

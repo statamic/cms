@@ -74,7 +74,7 @@ class NumberTest extends TestCase
         $fieldtype = (new Number)->setField(new FormField('age', ['type' => 'number']));
 
         $this->assertSame([MinMax::class, Average::class], $fieldtype->defaultInsights());
-        $this->assertSame([], $fieldtype->insightConfig());
+        $this->assertSame([], $fieldtype->insightConfig(new Average));
     }
 
     private function responses(iterable $values): FieldResponses

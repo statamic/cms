@@ -16,7 +16,7 @@ class StarRating extends Insight
     public function appliesTo(FormField $field): bool
     {
         return parent::appliesTo($field)
-            && filled($field->fieldtype()->insightConfig()['total'] ?? null);
+            && filled($field->fieldtype()->insightConfig($this)['total'] ?? null);
     }
 
     public function props(FieldResponses $responses): array

@@ -32,7 +32,8 @@ class SummaryDefaultsTest extends TestCase
 
         foreach ($fieldtype->defaultInsights() as $insight) {
             $this->assertSame($insight, app('statamic.form-insights')->get($insight::handle()));
-            $this->assertTrue(app($insight)->setConfig($fieldtype->insightConfig())->appliesTo($field), "{$insight} does not apply");
+            $instance = app($insight);
+            $this->assertTrue($instance->setConfig($fieldtype->insightConfig($instance))->appliesTo($field), "{$insight} does not apply");
         }
     }
 

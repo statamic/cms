@@ -6,6 +6,9 @@ use Facades\Statamic\Console\Processes\Composer;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Form;
 use Statamic\Facades\User;
+use Statamic\Forms\Fieldtypes\Number;
+use Statamic\Forms\Insights\Insight;
+use Statamic\Forms\Insights\StarRating;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -356,6 +359,25 @@ class UpdateFormChartsTest extends TestCase
     }
 
     #[Test]
+    public function it_checks_whether_an_insight_applies_using_the_facts_for_that_insight()
+    {
+        StarsOnlyFormFieldtype::register();
+
+        $form = tap(Form::make('survey')->formFields([
+            'sections' => [['fields' => [['handle' => 'score', 'field' => ['type' => 'stars_only']]]]],
+        ]))->save();
+
+        $charts = [['field' => 'score', 'chart' => 'vertical_bar', 'insights' => [['type' => 'star_rating']]]];
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->patchJson(cp_route('forms.submissions.charts.update', $form->handle()), ['charts' => $charts])
+            ->assertNoContent();
+
+        $this->assertSame($charts, Form::find('survey')->charts());
+    }
+
+    #[Test]
     public function it_validates_the_shape_of_insights()
     {
         $form = $this->makeForm();
@@ -390,5 +412,15 @@ class UpdateFormChartsTest extends TestCase
         $this->setTestRoles(['test' => ['access cp', 'edit forms']]);
 
         return tap(User::make()->assignRole('test'))->save();
+    }
+}
+
+class StarsOnlyFormFieldtype extends Number
+{
+    public static $handle = 'stars_only';
+
+    public function insightConfig(Insight $insight): array
+    {
+        return $insight instanceof StarRating ? ['total' => 5] : [];
     }
 }

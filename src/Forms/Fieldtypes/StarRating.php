@@ -7,6 +7,7 @@ use Statamic\Forms\Charts\ChartOption;
 use Statamic\Forms\Charts\HorizontalBar;
 use Statamic\Forms\Fields\FormFieldtype;
 use Statamic\Forms\Fields\FormValueType;
+use Statamic\Forms\Insights\Insight;
 use Statamic\Forms\Insights\StarRating as StarRatingInsight;
 use Statamic\Forms\Summary\FieldResponses;
 use Statamic\Support\Arr;
@@ -96,7 +97,7 @@ class StarRating extends FormFieldtype
         return [StarRatingInsight::class];
     }
 
-    public function insightConfig(): array
+    public function insightConfig(Insight $insight): array
     {
         return ['total' => $this->maxStars()];
     }

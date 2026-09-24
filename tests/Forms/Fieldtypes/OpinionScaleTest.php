@@ -106,7 +106,7 @@ class OpinionScaleTest extends TestCase
         $fieldtype = (new OpinionScale)->setField(new FormField('satisfaction', ['type' => 'opinion_scale']));
 
         $this->assertSame([Average::class], $fieldtype->defaultInsights());
-        $this->assertSame([], $fieldtype->insightConfig());
+        $this->assertSame([], $fieldtype->insightConfig(new Average));
     }
 
     private function responses(iterable $values): FieldResponses

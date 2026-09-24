@@ -72,11 +72,12 @@ class CurrencyTest extends TestCase
             'currency' => 'GBP',
         ]));
 
-        $config = $fieldtype->insightConfig();
+        $minMax = new MinMax;
+        $average = new Average;
 
-        $this->assertSame(['prefix' => '£', 'decimals' => 2], $config);
-        $this->assertEquals(['min' => '5.00', 'max' => '15.00', 'prefix' => '£'], (new MinMax)->setConfig($config)->props($this->responses([5, 15])));
-        $this->assertEquals(['average' => '10.00', 'prefix' => '£'], (new Average)->setConfig($config)->props($this->responses([5, 15])));
+        $this->assertSame(['prefix' => '£', 'precision' => 2], $fieldtype->insightConfig($minMax));
+        $this->assertEquals(['min' => '5.00', 'max' => '15.00', 'prefix' => '£'], $minMax->setConfig($fieldtype->insightConfig($minMax))->props($this->responses([5, 15])));
+        $this->assertEquals(['average' => '10.00', 'prefix' => '£'], $average->setConfig($fieldtype->insightConfig($average))->props($this->responses([5, 15])));
     }
 
     #[Test]
@@ -87,7 +88,7 @@ class CurrencyTest extends TestCase
             'currency' => 'NOPE',
         ]));
 
-        $this->assertSame(['prefix' => null, 'decimals' => 2], $fieldtype->insightConfig());
+        $this->assertSame(['prefix' => null, 'precision' => 2], $fieldtype->insightConfig(new MinMax));
     }
 
     private function responses(iterable $values): FieldResponses

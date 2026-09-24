@@ -29,7 +29,7 @@ class InsightsTest extends TestCase
     {
         $this->assertEquals(
             ['average' => '2.33', 'prefix' => '£'],
-            (new Average)->setConfig(['prefix' => '£', 'decimals' => 2])->props($this->responses([1, 2, 4]))
+            (new Average)->setConfig(['prefix' => '£', 'precision' => 2])->props($this->responses([1, 2, 4]))
         );
     }
 
@@ -43,8 +43,27 @@ class InsightsTest extends TestCase
 
         $this->assertEquals(
             ['min' => '5.00', 'max' => '50.00', 'prefix' => '£'],
-            (new MinMax)->setConfig(['prefix' => '£', 'decimals' => 2])->props($this->responses([5, 50, 30]))
+            (new MinMax)->setConfig(['prefix' => '£', 'precision' => 2])->props($this->responses([5, 50, 30]))
         );
+    }
+
+    #[Test]
+    #[DataProvider('precisionProvider')]
+    public function precision_decides_how_many_decimals_each_insight_shows(array $config, array $minMax, array $average)
+    {
+        $responses = $this->responses([18, 24, 22]);
+
+        $this->assertEquals($minMax, (new MinMax)->setConfig($config)->props($responses));
+        $this->assertEquals($average, (new Average)->setConfig($config)->props($responses));
+    }
+
+    public static function precisionProvider()
+    {
+        return [
+            'whole numbers' => [['precision' => 0], ['min' => '18', 'max' => '24'], ['average' => '21.3']],
+            'one decimal' => [['precision' => 1], ['min' => '18.0', 'max' => '24.0'], ['average' => '21.3']],
+            'currency' => [['precision' => 2], ['min' => '18.00', 'max' => '24.00'], ['average' => '21.33']],
+        ];
     }
 
     #[Test]
@@ -77,28 +96,28 @@ class InsightsTest extends TestCase
     #[Test]
     public function config_merges_defaults_with_the_given_config()
     {
-        $this->assertSame(['decimals' => 1], (new Average)->config());
-        $this->assertSame(1, (new Average)->config('decimals'));
+        $this->assertSame(['precision' => 0], (new Average)->config());
+        $this->assertSame(0, (new Average)->config('precision'));
         $this->assertNull((new Average)->config('prefix'));
         $this->assertSame('fallback', (new Average)->config('prefix', 'fallback'));
 
-        $average = (new Average)->setConfig(['decimals' => 3, 'suffix' => '%']);
+        $average = (new Average)->setConfig(['precision' => 3, 'suffix' => '%']);
 
-        $this->assertSame(['decimals' => 3, 'suffix' => '%'], $average->config());
-        $this->assertSame(3, $average->config('decimals'));
+        $this->assertSame(['precision' => 3, 'suffix' => '%'], $average->config());
+        $this->assertSame(3, $average->config('precision'));
     }
 
     #[Test]
     public function config_values_are_cast_defensively()
     {
         $this->assertEquals(
-            ['average' => '2', 'suffix' => '%'],
-            (new Average)->setConfig(['decimals' => 'nonsense', 'suffix' => '%'])->props($this->responses([1, 2, 4]))
+            ['average' => '2.3', 'suffix' => '%'],
+            (new Average)->setConfig(['precision' => 'nonsense', 'suffix' => '%'])->props($this->responses([1, 2, 4]))
         );
 
         $this->assertEquals(
             ['min' => '1.0', 'max' => '4.0'],
-            (new MinMax)->setConfig(['decimals' => '1'])->props($this->responses([1, 2, 4]))
+            (new MinMax)->setConfig(['precision' => '1'])->props($this->responses([1, 2, 4]))
         );
 
         $this->assertEquals(

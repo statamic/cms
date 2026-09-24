@@ -231,10 +231,10 @@ abstract class FormFieldtype implements Arrayable
     }
 
     /**
-     * Facts about the field's values, passed to every insight as config.
-     * Core insights read `prefix`, `suffix`, `decimals` and `total`.
+     * Facts about the field's values, passed to the given insight as config.
+     * Core insights read `prefix`, `suffix`, `precision` (decimals in the values themselves) and `total`.
      */
-    public function insightConfig(): array
+    public function insightConfig(Insight $insight): array
     {
         return [];
     }

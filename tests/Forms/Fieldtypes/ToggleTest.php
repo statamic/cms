@@ -71,7 +71,7 @@ class ToggleTest extends TestCase
         $fieldtype = (new Toggle)->setField(new FormField('agree', ['type' => 'toggle']));
 
         $this->assertSame([Checked::class], $fieldtype->defaultInsights());
-        $this->assertSame([], $fieldtype->insightConfig());
+        $this->assertSame([], $fieldtype->insightConfig(new Checked));
     }
 
     private function responses(iterable $values): FieldResponses

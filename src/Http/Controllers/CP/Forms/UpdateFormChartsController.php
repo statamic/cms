@@ -103,7 +103,9 @@ class UpdateFormChartsController extends CpController
 
             $seen[] = $type;
 
-            if (! app($class)->setConfig($field->fieldtype()->insightConfig())->appliesTo($field)) {
+            $insight = app($class);
+
+            if (! $insight->setConfig($field->fieldtype()->insightConfig($insight))->appliesTo($field)) {
                 throw ValidationException::withMessages([
                     'charts' => __('statamic::validation.form_insight_not_applicable', ['insight' => $type, 'field' => $config['field']]),
                 ]);
