@@ -3,6 +3,9 @@
 namespace Statamic\Data;
 
 use Statamic\Facades\Blink;
+use Statamic\Fields\Blueprint;
+use Statamic\Fields\Fields;
+use Statamic\Fields\Fieldset;
 use Statamic\Fieldtypes\UpdatesReferences;
 use Statamic\Git\Subscriber as GitSubscriber;
 use Statamic\Support\Arr;
@@ -69,13 +72,57 @@ abstract class DataReferenceUpdater
         $this->originalValue = $originalValue;
         $this->newValue = $newValue;
 
-        $this->recursivelyUpdateFields($this->getTopLevelFields());
+        if ($this->item instanceof Blueprint || $this->item instanceof Fieldset) {
+            $this->updateBlueprintFields();
+        } else {
+            $this->recursivelyUpdateFields($this->getTopLevelFields());
+        }
 
         if ($this->updated) {
             $this->saveItem();
         }
 
         return (bool) $this->updated;
+    }
+
+    /**
+     * Update fields in blueprints and fieldsets.
+     *
+     * @return void
+     */
+    abstract protected function updateBlueprintFields();
+
+    /**
+     * Finds fields of a given type in the contents of a blueprint.
+     * Returns dot-notation paths to the fields.
+     *
+     * Note: This uses a simple heuristic that matches any nested array with
+     * a 'type' key whose value is in the given fieldtypes list. While this
+     * could theoretically match non-field structures, in practice blueprint
+     * contents don't contain these strings in other contexts (like validation
+     * rules), and downstream code guards against false matches by checking
+     * for the presence of required keys like 'sets'.
+     *
+     * @param  array  $array
+     * @param  array  $fieldtypes
+     * @param  string|null  $dottedPrefix
+     * @param  array  $fieldPaths
+     * @return array
+     */
+    protected function findFieldsInBlueprintContents($array, $fieldtypes, $dottedPrefix = '', &$fieldPaths = [])
+    {
+        foreach ($array as $key => $value) {
+            if (is_array($value)) {
+                $fieldPath = $dottedPrefix ? "$dottedPrefix.$key" : $key;
+                $this->findFieldsInBlueprintContents($value, $fieldtypes, $fieldPath, $fieldPaths);
+            }
+
+            if (is_string($value) && $key === 'type' && in_array($value, $fieldtypes)) {
+                $fieldPaths[] = $dottedPrefix;
+            }
+        }
+
+        return $fieldPaths;
     }
 
     /**

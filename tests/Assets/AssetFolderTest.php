@@ -1174,6 +1174,7 @@ class AssetFolderTest extends TestCase
         Storage::fake('local');
 
         $container = Facades\AssetContainer::make('test')->disk('local');
+        Facades\AssetContainer::shouldReceive('find')->with('assets')->andReturn(null);
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
         Facades\AssetContainer::shouldReceive('save')->with($container);
 
