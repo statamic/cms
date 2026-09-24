@@ -69,8 +69,7 @@ const chartTone = (index: number): number => Math.min(colorIndex(index) + 1, 5);
 
 <template>
     <figure class="grid p-6" role="img" :aria-label="accessibleLabel" data-ui-horizontal-bar-chart>
-        <slot name="summary" />
-        <ol :style="{ gridTemplateColumns: columns }" class="grid items-center list-none m-0 gap-x-2.25 [&:not(:has(>_:nth-child(5)))]:pt-4 gap-y-2.5 p-0" aria-hidden="true">
+        <ol :style="{ gridTemplateColumns: columns }" class="grid items-center list-none m-0 gap-x-2.25 gap-y-2.5 p-0" aria-hidden="true">
             <li v-for="(item, index) in items" :key="item.key ?? item.label" class="contents">
                 <component
                     :is="item.clickable ? 'button' : 'span'"

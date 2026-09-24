@@ -16,6 +16,7 @@ defineProps<{
             :key="star"
             :name="star <= Math.round(average) ? 'star-filled' : 'star'"
             class="size-3.5 shrink-0 text-gray-950 dark:text-gray-300"
+            aria-hidden="true"
         />
         <span class="text-[0.75rem] text-gray-500 dark:text-gray-300">
             {{ __(':average/:total Average', { average, total }) }}

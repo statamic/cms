@@ -1,7 +1,8 @@
 import { mount } from '@vue/test-utils';
 import { beforeEach, expect, test, vi } from 'vitest';
 import ChartWidget from '@/components/forms/summary/ChartWidget.vue';
-import { HorizontalBarChart, Pagination, PieChart } from '@ui';
+import { HorizontalBarChart, HorizontalLollipopChart, Pagination, PieChart, VerticalBarChart } from '@ui';
+import AverageInsight from '@/components/forms/summary/insights/AverageInsight.vue';
 
 beforeEach(() => {
     vi.stubGlobal('__', (key, replacements = {}) => {
@@ -67,7 +68,15 @@ const barField = {
 function mountCard(props = {}) {
     return mount(ChartWidget, {
         props: { field, ...props },
-        global: { components: { 'ui-pie-chart': PieChart, 'ui-horizontal-bar-chart': HorizontalBarChart } },
+        global: {
+            components: {
+                'ui-pie-chart': PieChart,
+                'ui-horizontal-bar-chart': HorizontalBarChart,
+                'ui-vertical-bar-chart': VerticalBarChart,
+                'ui-horizontal-lollipop-chart': HorizontalLollipopChart,
+                'form-summary-average-insight': AverageInsight,
+            },
+        },
     });
 }
 
@@ -138,6 +147,45 @@ test('it prefixes the field number when enabled', () => {
     const wrapper = mountCard({ showNumber: true });
 
     expect(wrapper.text()).toContain('3. Wake me up');
+});
+
+test.each([
+    'ui-horizontal-bar-chart',
+    'ui-vertical-bar-chart',
+    'ui-pie-chart',
+    'ui-horizontal-lollipop-chart',
+])('it renders insights alongside the %s component', (component) => {
+    const wrapper = mountCard({
+        field: {
+            ...field,
+            chart: { ...field.chart, component },
+            insights: [{ handle: 'average', component: 'form-summary-average-insight', props: { average: 3.2 } }],
+        },
+    });
+
+    expect(wrapper.findComponent(AverageInsight).exists()).toBe(true);
+    expect(wrapper.text()).toContain('3.2');
+    expect(wrapper.text()).toContain('Average');
+});
+
+test('insights stay visible on the other breakdown', async () => {
+    const wrapper = mountCard({
+        field: {
+            ...field,
+            insights: [{ handle: 'average', component: 'form-summary-average-insight', props: { average: 3.2 } }],
+        },
+    });
+
+    await paginationButtons(wrapper).next.trigger('click');
+
+    expect(wrapper.text()).toContain('Bohemian Rhapsody');
+    expect(wrapper.findComponent(AverageInsight).exists()).toBe(true);
+});
+
+test('it renders no insights row without insights', () => {
+    const wrapper = mountCard();
+
+    expect(wrapper.find('[data-chart-insights]').exists()).toBe(false);
 });
 
 test('the submission summary components compile', async () => {

@@ -84,21 +84,20 @@ watch([chart, () => props.editing], () => (page.value = 1));
                 @page-selected="page = $event"
             />
         </template>
-        <div class="relative flex-1 overflow-hidden rounded-b-xl">
+        <div class="relative flex flex-1 flex-col overflow-hidden rounded-b-xl">
             <p v-if="hasDrilldown" class="sr-only" aria-live="polite">{{ showingDrilldown ? accessibleLabel : '' }}</p>
-            <component :is="chart.component" v-bind="chartProps" @select="page = 2">
-                <template v-if="field.insights.length" #summary>
-                    <div class="flex flex-wrap gap-2.5 pb-5 -ms-1">
-                        <component
-                            v-for="insight in field.insights"
-                            :key="insight.handle"
-                            :is="insight.component"
-                            v-bind="insight.props"
-                            :metric
-                        />
-                    </div>
-                </template>
-            </component>
+            <div v-if="field.insights.length" class="flex flex-wrap gap-2.5 ps-5 pe-6 pt-6 -mb-1" data-chart-insights>
+                <component
+                    v-for="insight in field.insights"
+                    :key="insight.handle"
+                    :is="insight.component"
+                    v-bind="insight.props"
+                    :metric
+                />
+            </div>
+            <div class="min-h-0 flex-1">
+                <component :is="chart.component" v-bind="chartProps" @select="page = 2" />
+            </div>
         </div>
     </Widget>
 </template>

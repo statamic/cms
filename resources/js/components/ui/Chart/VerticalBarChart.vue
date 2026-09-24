@@ -37,9 +37,6 @@ const maximum = computed<number>(() => props.maxValue ?? Math.max(...props.items
 
 <template>
     <figure class="vertical-bar-chart-figure" role="img" :aria-label="accessibleLabel" data-ui-vertical-bar-chart>
-        <div v-if="$slots.summary" aria-hidden="true">
-            <slot name="summary" />
-        </div>
         <ol class="vertical-bar-chart" aria-hidden="true">
             <li v-for="item in items" :key="item.key ?? item.label" class="vertical-bar-chart__bar">
                 <div class="vertical-bar-chart__plot">
