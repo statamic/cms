@@ -221,7 +221,7 @@ class GlideController extends Controller
         $url = $this->request->url();
         $siteUrl = Site::current()->absoluteUrl();
 
-        $path = Str::startsWith($url, $siteUrl)
+        $path = Str::startsWith(Str::ensureRight($url, '/'), Str::ensureRight($siteUrl, '/'))
             ? Str::after($url, $siteUrl)
             : $this->request->getPathInfo();
 

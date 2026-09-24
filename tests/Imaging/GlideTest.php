@@ -415,6 +415,7 @@ class GlideTest extends TestCase
         return [
             'same domain' => ['http://localhost/'],
             'different domain' => ['https://www.example.com/'],
+            'domain starting with the app domain' => ['http://local/'],
         ];
     }
 
