@@ -5,6 +5,7 @@ namespace Tests\Forms\Fieldtypes;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Forms\Charts\HorizontalBar;
 use Statamic\Forms\Fields\FormField;
+use Statamic\Forms\Fields\FormValueType;
 use Statamic\Forms\Fieldtypes\Toggle;
 use Statamic\Forms\Insights\Checked;
 use Tests\TestCase;
@@ -45,6 +46,12 @@ class ToggleTest extends TestCase
     public function it_defaults_to_a_bar_chart()
     {
         $this->assertEquals(HorizontalBar::class, (new Toggle)->defaultChart());
+    }
+
+    #[Test]
+    public function it_stores_boolean_values()
+    {
+        $this->assertSame(FormValueType::Boolean, (new Toggle)->valueType());
     }
 
     #[Test]

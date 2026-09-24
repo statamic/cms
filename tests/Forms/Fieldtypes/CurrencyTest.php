@@ -5,6 +5,7 @@ namespace Tests\Forms\Fieldtypes;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Forms\Charts\VerticalBar;
 use Statamic\Forms\Fields\FormField;
+use Statamic\Forms\Fields\FormValueType;
 use Statamic\Forms\Fieldtypes\Currency;
 use Statamic\Forms\Insights\Average;
 use Statamic\Forms\Insights\MinMax;
@@ -48,6 +49,12 @@ class CurrencyTest extends TestCase
     public function it_defaults_to_a_column_chart()
     {
         $this->assertEquals(VerticalBar::class, (new Currency)->defaultChart());
+    }
+
+    #[Test]
+    public function it_stores_number_values()
+    {
+        $this->assertSame(FormValueType::Number, (new Currency)->valueType());
     }
 
     #[Test]

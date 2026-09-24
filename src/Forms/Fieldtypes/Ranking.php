@@ -6,6 +6,7 @@ use Illuminate\Support\Collection;
 use Statamic\Forms\Charts\ChartOption;
 use Statamic\Forms\Charts\RankedOptions;
 use Statamic\Forms\Fields\FormFieldtype;
+use Statamic\Forms\Fields\FormValueType;
 use Statamic\Support\Arr;
 
 use function Statamic\trans as __;
@@ -50,6 +51,11 @@ class Ranking extends FormFieldtype
                 is_array($option) ? $option['key'] : $key => is_array($option) ? $option['value'] : $option,
             ])
             ->all();
+    }
+
+    public function valueType(): ?FormValueType
+    {
+        return FormValueType::Ranking;
     }
 
     public function defaultChart(): ?string

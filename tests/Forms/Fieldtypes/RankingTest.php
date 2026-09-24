@@ -5,6 +5,7 @@ namespace Tests\Forms\Fieldtypes;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Forms\Charts\RankedOptions;
 use Statamic\Forms\Fields\FormField;
+use Statamic\Forms\Fields\FormValueType;
 use Statamic\Forms\Fieldtypes\Ranking;
 use Tests\TestCase;
 
@@ -36,6 +37,12 @@ class RankingTest extends TestCase
     public function it_defaults_to_a_ranking_chart()
     {
         $this->assertEquals(RankedOptions::class, (new Ranking)->defaultChart());
+    }
+
+    #[Test]
+    public function it_stores_ranking_values()
+    {
+        $this->assertSame(FormValueType::Ranking, (new Ranking)->valueType());
     }
 
     #[Test]

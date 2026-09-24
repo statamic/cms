@@ -5,6 +5,7 @@ namespace Tests\Forms\Fieldtypes;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Forms\Charts\HorizontalBar;
 use Statamic\Forms\Fields\FormField;
+use Statamic\Forms\Fields\FormValueType;
 use Statamic\Forms\Fieldtypes\Checkboxes;
 use Tests\TestCase;
 
@@ -58,6 +59,12 @@ class CheckboxesTest extends TestCase
     public function it_defaults_to_a_bar_chart()
     {
         $this->assertEquals(HorizontalBar::class, (new Checkboxes)->defaultChart());
+    }
+
+    #[Test]
+    public function it_stores_multiple_choice_values()
+    {
+        $this->assertSame(FormValueType::Choices, (new Checkboxes)->valueType());
     }
 
     #[Test]

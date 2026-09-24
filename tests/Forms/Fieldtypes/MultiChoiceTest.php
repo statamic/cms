@@ -5,6 +5,7 @@ namespace Tests\Forms\Fieldtypes;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Forms\Charts\Pie;
 use Statamic\Forms\Fields\FormField;
+use Statamic\Forms\Fields\FormValueType;
 use Statamic\Forms\Fieldtypes\MultiChoice;
 use Tests\TestCase;
 
@@ -58,6 +59,12 @@ class MultiChoiceTest extends TestCase
     public function it_defaults_to_a_pie_chart()
     {
         $this->assertEquals(Pie::class, (new MultiChoice)->defaultChart());
+    }
+
+    #[Test]
+    public function it_stores_single_choice_values()
+    {
+        $this->assertSame(FormValueType::Choice, (new MultiChoice)->valueType());
     }
 
     #[Test]

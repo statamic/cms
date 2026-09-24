@@ -6,6 +6,7 @@ use Illuminate\Support\Collection;
 use Statamic\Forms\Charts\ChartOption;
 use Statamic\Forms\Charts\VerticalBar;
 use Statamic\Forms\Fields\FormFieldtype;
+use Statamic\Forms\Fields\FormValueType;
 use Statamic\Forms\Insights\Average;
 use Statamic\Support\Arr;
 
@@ -69,6 +70,11 @@ class OpinionScale extends FormFieldtype
             'high_label' => $this->config('high_label'),
             ...Arr::except($this->config(), ['type', 'min', 'max', 'low_label', 'middle_label', 'high_label']),
         ];
+    }
+
+    public function valueType(): ?FormValueType
+    {
+        return FormValueType::Number;
     }
 
     public function defaultChart(): ?string

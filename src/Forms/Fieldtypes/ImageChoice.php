@@ -6,6 +6,7 @@ use Illuminate\Support\Collection;
 use Statamic\Forms\Charts\ChartOption;
 use Statamic\Forms\Charts\HorizontalBar;
 use Statamic\Forms\Fields\FormFieldtype;
+use Statamic\Forms\Fields\FormValueType;
 use Statamic\Support\Arr;
 
 use function Statamic\trans as __;
@@ -103,6 +104,11 @@ class ImageChoice extends FormFieldtype
             'gap' => $this->normalizedGap(),
             ...Arr::except($this->config(), ['type', 'multiple', 'columns', 'aspect_ratio', 'gap']),
         ];
+    }
+
+    public function valueType(): ?FormValueType
+    {
+        return $this->config('multiple') ? FormValueType::Choices : FormValueType::Choice;
     }
 
     public function defaultChart(): ?string

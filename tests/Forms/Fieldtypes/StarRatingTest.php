@@ -5,6 +5,7 @@ namespace Tests\Forms\Fieldtypes;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Forms\Charts\HorizontalBar;
 use Statamic\Forms\Fields\FormField;
+use Statamic\Forms\Fields\FormValueType;
 use Statamic\Forms\Fieldtypes\StarRating;
 use Statamic\Forms\Insights\StarRating as StarRatingInsight;
 use Tests\TestCase;
@@ -84,6 +85,12 @@ class StarRatingTest extends TestCase
     public function it_defaults_to_a_bar_chart()
     {
         $this->assertEquals(HorizontalBar::class, (new StarRating)->defaultChart());
+    }
+
+    #[Test]
+    public function it_stores_number_values()
+    {
+        $this->assertSame(FormValueType::Number, (new StarRating)->valueType());
     }
 
     #[Test]

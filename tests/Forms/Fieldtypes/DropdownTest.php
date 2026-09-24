@@ -5,6 +5,7 @@ namespace Tests\Forms\Fieldtypes;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Forms\Charts\HorizontalBar;
 use Statamic\Forms\Fields\FormField;
+use Statamic\Forms\Fields\FormValueType;
 use Statamic\Forms\Fieldtypes\Dropdown;
 use Tests\TestCase;
 
@@ -94,6 +95,22 @@ class DropdownTest extends TestCase
     public function it_defaults_to_a_bar_chart()
     {
         $this->assertEquals(HorizontalBar::class, (new Dropdown)->defaultChart());
+    }
+
+    #[Test]
+    public function it_stores_a_single_choice_when_not_multiple()
+    {
+        $fieldtype = (new Dropdown)->setField(new FormField('field', ['type' => 'dropdown', 'multiple' => false]));
+
+        $this->assertSame(FormValueType::Choice, $fieldtype->valueType());
+    }
+
+    #[Test]
+    public function it_stores_multiple_choices_when_multiple()
+    {
+        $fieldtype = (new Dropdown)->setField(new FormField('field', ['type' => 'dropdown', 'multiple' => true]));
+
+        $this->assertSame(FormValueType::Choices, $fieldtype->valueType());
     }
 
     #[Test]

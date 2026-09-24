@@ -7,6 +7,7 @@ use Statamic\Fields\Field;
 use Statamic\Fieldtypes\ImageChoice as ImageChoiceFieldtype;
 use Statamic\Forms\Charts\HorizontalBar;
 use Statamic\Forms\Fields\FormField;
+use Statamic\Forms\Fields\FormValueType;
 use Statamic\Forms\Fieldtypes\ImageChoice as ImageChoiceFormFieldtype;
 use Tests\TestCase;
 
@@ -122,6 +123,22 @@ class ImageChoiceTest extends TestCase
     public function it_defaults_to_a_bar_chart()
     {
         $this->assertEquals(HorizontalBar::class, (new ImageChoiceFormFieldtype)->defaultChart());
+    }
+
+    #[Test]
+    public function it_stores_a_single_choice_when_not_multiple()
+    {
+        $fieldtype = (new ImageChoiceFormFieldtype)->setField(new FormField('field', ['type' => 'image_choice', 'multiple' => false]));
+
+        $this->assertSame(FormValueType::Choice, $fieldtype->valueType());
+    }
+
+    #[Test]
+    public function it_stores_multiple_choices_when_multiple()
+    {
+        $fieldtype = (new ImageChoiceFormFieldtype)->setField(new FormField('field', ['type' => 'image_choice', 'multiple' => true]));
+
+        $this->assertSame(FormValueType::Choices, $fieldtype->valueType());
     }
 
     #[Test]

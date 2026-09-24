@@ -6,6 +6,7 @@ use Illuminate\Support\Collection;
 use Statamic\Forms\Charts\ChartOption;
 use Statamic\Forms\Charts\HorizontalBar;
 use Statamic\Forms\Fields\FormFieldtype;
+use Statamic\Forms\Fields\FormValueType;
 use Statamic\Support\Arr;
 
 use function Statamic\trans as __;
@@ -35,6 +36,11 @@ class YesNo extends FormFieldtype
             ],
             ...Arr::except($this->config(), ['type', 'options']),
         ];
+    }
+
+    public function valueType(): ?FormValueType
+    {
+        return FormValueType::Choice;
     }
 
     public function defaultChart(): ?string

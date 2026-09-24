@@ -6,6 +6,7 @@ use Illuminate\Support\Collection;
 use Statamic\Forms\Charts\ChartOption;
 use Statamic\Forms\Charts\Pie;
 use Statamic\Forms\Fields\FormFieldtype;
+use Statamic\Forms\Fields\FormValueType;
 use Statamic\Support\Arr;
 
 use function Statamic\trans as __;
@@ -52,6 +53,11 @@ class MultiChoice extends FormFieldtype
                 is_array($option) ? $option['key'] : $key => is_array($option) ? $option['value'] : $option,
             ])
             ->all();
+    }
+
+    public function valueType(): ?FormValueType
+    {
+        return FormValueType::Choice;
     }
 
     public function defaultChart(): ?string

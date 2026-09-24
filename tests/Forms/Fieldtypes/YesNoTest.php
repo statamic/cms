@@ -5,6 +5,7 @@ namespace Tests\Forms\Fieldtypes;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Forms\Charts\HorizontalBar;
 use Statamic\Forms\Fields\FormField;
+use Statamic\Forms\Fields\FormValueType;
 use Statamic\Forms\Fieldtypes\YesNo;
 use Tests\TestCase;
 
@@ -50,6 +51,12 @@ class YesNoTest extends TestCase
     public function it_defaults_to_a_bar_chart()
     {
         $this->assertEquals(HorizontalBar::class, (new YesNo)->defaultChart());
+    }
+
+    #[Test]
+    public function it_stores_single_choice_values()
+    {
+        $this->assertSame(FormValueType::Choice, (new YesNo)->valueType());
     }
 
     #[Test]

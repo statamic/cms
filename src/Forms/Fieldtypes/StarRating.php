@@ -6,6 +6,7 @@ use Illuminate\Support\Collection;
 use Statamic\Forms\Charts\ChartOption;
 use Statamic\Forms\Charts\HorizontalBar;
 use Statamic\Forms\Fields\FormFieldtype;
+use Statamic\Forms\Fields\FormValueType;
 use Statamic\Forms\Insights\StarRating as StarRatingInsight;
 use Statamic\Support\Arr;
 
@@ -55,6 +56,11 @@ class StarRating extends FormFieldtype
             'step' => $allowHalfStars ? 0.5 : 1,
             ...Arr::except($this->config(), ['type', 'max_stars', 'allow_half_stars']),
         ];
+    }
+
+    public function valueType(): ?FormValueType
+    {
+        return FormValueType::Number;
     }
 
     public function defaultChart(): ?string

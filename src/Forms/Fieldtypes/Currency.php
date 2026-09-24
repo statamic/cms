@@ -5,6 +5,7 @@ namespace Statamic\Forms\Fieldtypes;
 use Statamic\Facades\Dictionary;
 use Statamic\Forms\Charts\VerticalBar;
 use Statamic\Forms\Fields\FormFieldtype;
+use Statamic\Forms\Fields\FormValueType;
 use Statamic\Forms\Insights\Average;
 use Statamic\Forms\Insights\MinMax;
 use Statamic\Support\Arr;
@@ -43,6 +44,11 @@ class Currency extends FormFieldtype
             'currency_symbol' => $symbol,
             ...Arr::except($this->config(), ['type', 'currency']),
         ];
+    }
+
+    public function valueType(): ?FormValueType
+    {
+        return FormValueType::Number;
     }
 
     public function defaultChart(): ?string

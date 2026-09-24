@@ -207,6 +207,11 @@ abstract class FormFieldtype implements Arrayable
         return null;
     }
 
+    public function valueType(): ?FormValueType
+    {
+        return null;
+    }
+
     public function defaultChart(): ?string
     {
         return null;

@@ -6,6 +6,7 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Dictionary as Dictionaries;
 use Statamic\Forms\Charts\Lollipop;
 use Statamic\Forms\Fields\FormField;
+use Statamic\Forms\Fields\FormValueType;
 use Statamic\Forms\Fieldtypes\Dictionary;
 use Tests\TestCase;
 
@@ -53,6 +54,38 @@ class DictionaryTest extends TestCase
     public function it_defaults_to_a_lollipop_chart()
     {
         $this->assertEquals(Lollipop::class, (new Dictionary)->defaultChart());
+    }
+
+    #[Test]
+    public function it_stores_a_single_choice_when_limited_to_one_item()
+    {
+        $fieldtype = (new Dictionary)->setField(new FormField('field', ['type' => 'dictionary', 'max_items' => 1]));
+
+        $this->assertSame(FormValueType::Choice, $fieldtype->valueType());
+    }
+
+    #[Test]
+    public function it_stores_a_single_choice_when_limited_to_one_item_as_a_string()
+    {
+        $fieldtype = (new Dictionary)->setField(new FormField('field', ['type' => 'dictionary', 'max_items' => '1']));
+
+        $this->assertSame(FormValueType::Choice, $fieldtype->valueType());
+    }
+
+    #[Test]
+    public function it_stores_multiple_choices_when_allowing_more_than_one_item()
+    {
+        $fieldtype = (new Dictionary)->setField(new FormField('field', ['type' => 'dictionary', 'max_items' => 3]));
+
+        $this->assertSame(FormValueType::Choices, $fieldtype->valueType());
+    }
+
+    #[Test]
+    public function it_stores_multiple_choices_when_unlimited()
+    {
+        $fieldtype = (new Dictionary)->setField(new FormField('field', ['type' => 'dictionary', 'max_items' => null]));
+
+        $this->assertSame(FormValueType::Choices, $fieldtype->valueType());
     }
 
     #[Test]

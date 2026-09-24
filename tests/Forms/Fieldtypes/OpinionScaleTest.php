@@ -5,6 +5,7 @@ namespace Tests\Forms\Fieldtypes;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Forms\Charts\VerticalBar;
 use Statamic\Forms\Fields\FormField;
+use Statamic\Forms\Fields\FormValueType;
 use Statamic\Forms\Fieldtypes\OpinionScale;
 use Statamic\Forms\Insights\Average;
 use Tests\TestCase;
@@ -78,6 +79,12 @@ class OpinionScaleTest extends TestCase
     public function it_defaults_to_a_column_chart()
     {
         $this->assertEquals(VerticalBar::class, (new OpinionScale)->defaultChart());
+    }
+
+    #[Test]
+    public function it_stores_number_values()
+    {
+        $this->assertSame(FormValueType::Number, (new OpinionScale)->valueType());
     }
 
     #[Test]

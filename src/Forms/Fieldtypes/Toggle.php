@@ -6,6 +6,7 @@ use Illuminate\Support\Collection;
 use Statamic\Forms\Charts\ChartOption;
 use Statamic\Forms\Charts\HorizontalBar;
 use Statamic\Forms\Fields\FormFieldtype;
+use Statamic\Forms\Fields\FormValueType;
 use Statamic\Forms\Insights\Checked;
 use Statamic\Support\Arr;
 
@@ -38,6 +39,11 @@ class Toggle extends FormFieldtype
             'inline_label' => $this->config('inline_label'),
             ...Arr::except($this->config(), ['type', 'inline_label']),
         ];
+    }
+
+    public function valueType(): ?FormValueType
+    {
+        return FormValueType::Boolean;
     }
 
     public function defaultChart(): ?string
