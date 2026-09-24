@@ -5,11 +5,11 @@ namespace Tests;
 use Facades\Statamic\CP\LivePreview;
 use Facades\Statamic\Routing\ResolveRedirect;
 use Facades\Tests\Factories\EntryFactory;
+use Illuminate\Contracts\Http\Kernel as HttpKernel;
 use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Route;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\Protect\ProtectorManager;
@@ -22,6 +22,7 @@ use Statamic\Facades\GlobalSet;
 use Statamic\Facades\User;
 use Statamic\Tags\Tags;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException as SymfonyNotFoundHttpException;
 
 class FrontendTest extends TestCase
@@ -719,13 +720,9 @@ class FrontendTest extends TestCase
     }
 
     #[Test]
-    public function it_hydrates_the_cascade_for_a_404_thrown_outside_of_statamics_own_exception_stack()
+    public function it_hydrates_the_cascade_for_an_error_thrown_outside_of_statamics_own_exception_stack()
     {
-        // Simulates something like Livewire's default 404 handling, which throws Symfony's
-        // stock NotFoundHttpException rather than Statamic's own subclass. See GH-14167.
-        Route::get('/non-statamic-404', function () {
-            throw new SymfonyNotFoundHttpException;
-        });
+        $this->throwFromGlobalMiddleware(new SymfonyNotFoundHttpException);
 
         $global = GlobalSet::make('site_settings')->save();
         $global->in('en')->data(['site_name' => 'Test Site'])->save();
@@ -734,9 +731,30 @@ class FrontendTest extends TestCase
         $this->viewShouldReturnRaw('layout', '{{ template_content }}');
         $this->viewShouldReturnRaw('errors.404', 'Not found: {{ site_settings:site_name }}');
 
-        $this->get('/non-statamic-404')
+        $this->get('/anything')
             ->assertNotFound()
             ->assertSee('Not found: Test Site');
+    }
+
+    // Mirrors the reported case: Livewire's RequireLivewireHeaders aborts from middleware,
+    // so Symfony's stock exception reaches the handler without passing through Statamic's
+    // own exception classes. Throwing from a route wouldn't reproduce it — Statamic's
+    // frontend catch-all matches every path, so its own NotFoundHttpException wins. See #14167.
+    private function throwFromGlobalMiddleware(HttpExceptionInterface $exception)
+    {
+        $this->app->instance('test-throwing-middleware', new class($exception)
+        {
+            public function __construct(private HttpExceptionInterface $exception)
+            {
+            }
+
+            public function handle($request, $next)
+            {
+                throw $this->exception;
+            }
+        });
+
+        $this->app[HttpKernel::class]->pushMiddleware('test-throwing-middleware');
     }
 
     #[Test]
