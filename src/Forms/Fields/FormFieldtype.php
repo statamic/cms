@@ -13,6 +13,7 @@ use Statamic\Fields\Blueprint;
 use Statamic\Fields\ConfigFields;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
+use Statamic\Forms\Insights\Insight;
 use Statamic\Forms\Summary\FieldResponses;
 use Statamic\Support\Str;
 
@@ -223,7 +224,17 @@ abstract class FormFieldtype implements Arrayable
         return null;
     }
 
-    public function insights(): array
+    /** @return list<class-string<Insight>> */
+    public function defaultInsights(): array
+    {
+        return [];
+    }
+
+    /**
+     * Facts about the field's values, passed to every insight as config.
+     * Core insights read `prefix`, `suffix`, `decimals` and `total`.
+     */
+    public function insightConfig(): array
     {
         return [];
     }

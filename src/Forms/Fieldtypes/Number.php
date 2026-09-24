@@ -58,9 +58,9 @@ class Number extends FormFieldtype
         return VerticalBar::class;
     }
 
-    public function insights(): array
+    public function defaultInsights(): array
     {
-        return [new MinMax, new Average];
+        return [MinMax::class, Average::class];
     }
 
     public function example(): ?array

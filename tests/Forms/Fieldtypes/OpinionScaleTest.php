@@ -101,12 +101,12 @@ class OpinionScaleTest extends TestCase
     }
 
     #[Test]
-    public function it_returns_an_average_insight()
+    public function it_defaults_to_an_average_insight()
     {
-        $insights = (new OpinionScale)->setField(new FormField('satisfaction', ['type' => 'opinion_scale']))->insights();
+        $fieldtype = (new OpinionScale)->setField(new FormField('satisfaction', ['type' => 'opinion_scale']));
 
-        $this->assertCount(1, $insights);
-        $this->assertInstanceOf(Average::class, $insights[0]);
+        $this->assertSame([Average::class], $fieldtype->defaultInsights());
+        $this->assertSame([], $fieldtype->insightConfig());
     }
 
     private function responses(iterable $values): FieldResponses

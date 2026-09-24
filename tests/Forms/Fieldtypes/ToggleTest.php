@@ -66,12 +66,12 @@ class ToggleTest extends TestCase
     }
 
     #[Test]
-    public function it_returns_a_checked_insight()
+    public function it_defaults_to_a_checked_insight()
     {
-        $insights = (new Toggle)->setField(new FormField('agree', ['type' => 'toggle']))->insights();
+        $fieldtype = (new Toggle)->setField(new FormField('agree', ['type' => 'toggle']));
 
-        $this->assertCount(1, $insights);
-        $this->assertInstanceOf(Checked::class, $insights[0]);
+        $this->assertSame([Checked::class], $fieldtype->defaultInsights());
+        $this->assertSame([], $fieldtype->insightConfig());
     }
 
     private function responses(iterable $values): FieldResponses

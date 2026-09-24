@@ -12,6 +12,27 @@ abstract class Insight
     use HasHandle, HasTitle, RegistersItself;
 
     protected ?string $component = null;
+    protected array $defaults = [];
+    private array $config = [];
+
+    protected function defaults(): array
+    {
+        return $this->defaults;
+    }
+
+    public function setConfig(array $config): static
+    {
+        $this->config = $config;
+
+        return $this;
+    }
+
+    public function config(?string $key = null, mixed $default = null): mixed
+    {
+        $config = [...$this->defaults(), ...$this->config];
+
+        return $key === null ? $config : ($config[$key] ?? $default);
+    }
 
     public function component(): string
     {

@@ -91,9 +91,14 @@ class StarRating extends FormFieldtype
         return max(1, min(10, (int) $this->config('max_stars', 5)));
     }
 
-    public function insights(): array
+    public function defaultInsights(): array
     {
-        return [new StarRatingInsight(total: $this->maxStars())];
+        return [StarRatingInsight::class];
+    }
+
+    public function insightConfig(): array
+    {
+        return ['total' => $this->maxStars()];
     }
 
     public function example(): ?array

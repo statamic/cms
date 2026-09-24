@@ -56,15 +56,18 @@ class Currency extends FormFieldtype
         return VerticalBar::class;
     }
 
-    public function insights(): array
+    public function defaultInsights(): array
     {
-        $extra = Dictionary::find('currencies')->get($this->config('currency'))->extra();
-        $symbol = Arr::get($extra, 'symbol');
-        $decimals = Arr::get($extra, 'decimals', 2);
+        return [MinMax::class, Average::class];
+    }
+
+    public function insightConfig(): array
+    {
+        $extra = Dictionary::find('currencies')?->get($this->config('currency'))?->extra() ?? [];
 
         return [
-            new MinMax(prefix: $symbol, decimals: $decimals),
-            new Average(prefix: $symbol, decimals: $decimals),
+            'prefix' => Arr::get($extra, 'symbol'),
+            'decimals' => Arr::get($extra, 'decimals', 2),
         ];
     }
 

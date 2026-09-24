@@ -69,13 +69,12 @@ class NumberTest extends TestCase
     }
 
     #[Test]
-    public function it_returns_min_max_and_average_insights()
+    public function it_defaults_to_min_max_and_average_insights()
     {
-        $insights = (new Number)->setField(new FormField('age', ['type' => 'number']))->insights();
+        $fieldtype = (new Number)->setField(new FormField('age', ['type' => 'number']));
 
-        $this->assertCount(2, $insights);
-        $this->assertInstanceOf(MinMax::class, $insights[0]);
-        $this->assertInstanceOf(Average::class, $insights[1]);
+        $this->assertSame([MinMax::class, Average::class], $fieldtype->defaultInsights());
+        $this->assertSame([], $fieldtype->insightConfig());
     }
 
     private function responses(iterable $values): FieldResponses

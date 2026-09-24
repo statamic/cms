@@ -121,18 +121,16 @@ class StarRatingTest extends TestCase
     }
 
     #[Test]
-    public function it_returns_a_star_rating_insight()
+    public function it_defaults_to_a_star_rating_insight()
     {
         $fieldtype = (new StarRating)->setField(new FormField('rating', [
             'type' => 'star_rating',
             'max_stars' => 3,
         ]));
 
-        $insights = $fieldtype->insights();
-
-        $this->assertCount(1, $insights);
-        $this->assertInstanceOf(StarRatingInsight::class, $insights[0]);
-        $this->assertEquals(['average' => 2.0, 'total' => 3], $insights[0]->props($this->responses([1, 3])));
+        $this->assertSame([StarRatingInsight::class], $fieldtype->defaultInsights());
+        $this->assertSame(['total' => 3], $fieldtype->insightConfig());
+        $this->assertEquals(['average' => 2.0, 'total' => 3], (new StarRatingInsight)->setConfig($fieldtype->insightConfig())->props($this->responses([1, 3])));
     }
 
     private function responses(iterable $values): FieldResponses

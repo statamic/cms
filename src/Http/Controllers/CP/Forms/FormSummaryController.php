@@ -148,7 +148,8 @@ class FormSummaryController extends CpController
                 'component' => $chart->component(),
                 'props' => $chart->props($responses, $fieldtype->chartOptions($responses)),
             ],
-            'insights' => collect($fieldtype->insights())
+            'insights' => collect($fieldtype->defaultInsights())
+                ->map(fn (string $class): Insight => app($class)->setConfig($fieldtype->insightConfig()))
                 ->map(fn (Insight $insight): array => [
                     'handle' => $insight::handle(),
                     'component' => $insight->component(),

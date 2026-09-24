@@ -60,9 +60,9 @@ class Toggle extends FormFieldtype
         ]);
     }
 
-    public function insights(): array
+    public function defaultInsights(): array
     {
-        return [new Checked];
+        return [Checked::class];
     }
 
     public function example(): ?array

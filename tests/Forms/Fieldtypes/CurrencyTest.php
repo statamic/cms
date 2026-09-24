@@ -59,20 +59,35 @@ class CurrencyTest extends TestCase
     }
 
     #[Test]
-    public function it_returns_insights_formatted_for_the_currency()
+    public function it_defaults_to_min_max_and_average_insights()
+    {
+        $this->assertSame([MinMax::class, Average::class], (new Currency)->defaultInsights());
+    }
+
+    #[Test]
+    public function it_formats_insights_for_the_currency()
     {
         $fieldtype = (new Currency)->setField(new FormField('price', [
             'type' => 'currency',
             'currency' => 'GBP',
         ]));
 
-        $insights = $fieldtype->insights();
+        $config = $fieldtype->insightConfig();
 
-        $this->assertCount(2, $insights);
-        $this->assertInstanceOf(MinMax::class, $insights[0]);
-        $this->assertInstanceOf(Average::class, $insights[1]);
-        $this->assertEquals(['min' => '5.00', 'max' => '15.00', 'prefix' => '£'], $insights[0]->props($this->responses([5, 15])));
-        $this->assertEquals(['average' => '10.00', 'prefix' => '£'], $insights[1]->props($this->responses([5, 15])));
+        $this->assertSame(['prefix' => '£', 'decimals' => 2], $config);
+        $this->assertEquals(['min' => '5.00', 'max' => '15.00', 'prefix' => '£'], (new MinMax)->setConfig($config)->props($this->responses([5, 15])));
+        $this->assertEquals(['average' => '10.00', 'prefix' => '£'], (new Average)->setConfig($config)->props($this->responses([5, 15])));
+    }
+
+    #[Test]
+    public function it_has_no_currency_insight_config_for_an_unknown_currency()
+    {
+        $fieldtype = (new Currency)->setField(new FormField('price', [
+            'type' => 'currency',
+            'currency' => 'NOPE',
+        ]));
+
+        $this->assertSame(['prefix' => null, 'decimals' => 2], $fieldtype->insightConfig());
     }
 
     private function responses(iterable $values): FieldResponses

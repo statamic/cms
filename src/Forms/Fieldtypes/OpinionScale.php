@@ -91,9 +91,9 @@ class OpinionScale extends FormFieldtype
             ->map(fn ($value) => new ChartOption((string) $value));
     }
 
-    public function insights(): array
+    public function defaultInsights(): array
     {
-        return [new Average];
+        return [Average::class];
     }
 
     public function example(): ?array
