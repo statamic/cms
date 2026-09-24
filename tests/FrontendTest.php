@@ -24,6 +24,7 @@ use Statamic\Tags\Tags;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException as SymfonyNotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException as SymfonyUnauthorizedHttpException;
 
 class FrontendTest extends TestCase
 {
@@ -734,6 +735,21 @@ class FrontendTest extends TestCase
         $this->get('/anything')
             ->assertNotFound()
             ->assertSee('Not found: Test Site');
+    }
+
+    #[Test]
+    public function it_keeps_the_exception_headers_when_rendering_an_error_view()
+    {
+        $this->throwFromGlobalMiddleware(new SymfonyUnauthorizedHttpException('Basic realm="Restricted"'));
+
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+        $this->viewShouldReturnRaw('errors.401', 'Unauthorized');
+
+        $this->get('/anything')
+            ->assertUnauthorized()
+            ->assertSee('Unauthorized')
+            ->assertHeader('WWW-Authenticate', 'Basic realm="Restricted"');
     }
 
     // Mirrors the reported case: Livewire's RequireLivewireHeaders aborts from middleware,

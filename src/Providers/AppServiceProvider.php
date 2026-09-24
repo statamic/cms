@@ -404,7 +404,8 @@ class AppServiceProvider extends ServiceProvider
 
                 return response(
                     $this->app->make(\Statamic\View\View::class)->template('errors.'.$status)->layout($layout)->render(),
-                    $status
+                    $status,
+                    $e->getHeaders()
                 );
             }
         );
