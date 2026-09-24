@@ -28,7 +28,11 @@ class RankedOptions extends Chart
             ->map(function (ChartOption $option) use ($responses, $optionCount): array {
                 $byPosition = $responses->positions()->get($option->key, []);
                 $appearances = array_sum($byPosition);
-                $positionSum = collect($byPosition)->sum(fn ($count, $position) => $count * $position);
+                $positionSum = 0;
+
+                foreach ($byPosition as $position => $count) {
+                    $positionSum += $count * $position;
+                }
 
                 return [
                     'key' => $option->key,
