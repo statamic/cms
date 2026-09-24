@@ -43,11 +43,17 @@ export interface SummaryField {
     responses: number;
     chart: ChartPayload;
     insights: InsightPayload[];
+    layout: ChartConfig;
+}
+
+export interface InsightConfig {
+    type: string;
 }
 
 export interface ChartConfig {
     field: string;
     chart: string;
+    insights?: InsightConfig[];
 }
 
 export interface MetaChart {

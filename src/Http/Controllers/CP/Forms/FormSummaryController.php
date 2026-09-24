@@ -31,6 +31,9 @@ class FormSummaryController extends CpController
             'charts' => 'nullable|array',
             'charts.*.field' => 'required|string|distinct',
             'charts.*.chart' => 'required|string',
+            'charts.*.insights' => 'nullable|array',
+            'charts.*.insights.*' => 'array',
+            'charts.*.insights.*.type' => 'required|string',
         ]);
 
         $numbers = $this->fieldNumbers($form);
@@ -144,6 +147,7 @@ class FormSummaryController extends CpController
                     'props' => $insight->props($responses),
                 ])
                 ->values(),
+            'layout' => $summary->layout(),
         ];
     }
 

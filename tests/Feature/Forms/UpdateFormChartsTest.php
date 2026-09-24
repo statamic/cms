@@ -195,6 +195,154 @@ class UpdateFormChartsTest extends TestCase
         $this->assertNull(Form::find('survey')->charts());
     }
 
+    #[Test]
+    public function it_saves_insights()
+    {
+        $form = $this->makeForm();
+
+        $charts = [
+            ['field' => 'rating', 'chart' => 'horizontal_bar', 'insights' => [['type' => 'star_rating']]],
+            ['field' => 'color', 'chart' => 'pie', 'insights' => []],
+        ];
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->patchJson(cp_route('forms.submissions.charts.update', $form->handle()), ['charts' => $charts])
+            ->assertNoContent();
+
+        $this->assertSame($charts, Form::find('survey')->charts());
+    }
+
+    #[Test]
+    public function it_drops_extra_keys_on_insights()
+    {
+        $form = $this->makeForm();
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->patchJson(cp_route('forms.submissions.charts.update', $form->handle()), [
+                'charts' => [['field' => 'rating', 'chart' => 'horizontal_bar', 'insights' => [['type' => 'star_rating', 'extra' => 'value']]]],
+            ])
+            ->assertNoContent();
+
+        $this->assertSame(
+            [['field' => 'rating', 'chart' => 'horizontal_bar', 'insights' => [['type' => 'star_rating']]]],
+            Form::find('survey')->charts()
+        );
+    }
+
+    #[Test]
+    public function it_doesnt_store_insights_when_none_are_given()
+    {
+        $form = $this->makeForm();
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->patchJson(cp_route('forms.submissions.charts.update', $form->handle()), [
+                'charts' => [
+                    ['field' => 'rating', 'chart' => 'horizontal_bar'],
+                    ['field' => 'color', 'chart' => 'pie', 'insights' => null],
+                ],
+            ])
+            ->assertNoContent();
+
+        $this->assertSame(
+            [['field' => 'rating', 'chart' => 'horizontal_bar'], ['field' => 'color', 'chart' => 'pie']],
+            Form::find('survey')->charts()
+        );
+    }
+
+    #[Test]
+    public function it_rejects_unknown_insights()
+    {
+        $form = $this->makeForm();
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->patchJson(cp_route('forms.submissions.charts.update', $form->handle()), [
+                'charts' => [['field' => 'rating', 'chart' => 'horizontal_bar', 'insights' => [['type' => 'missing']]]],
+            ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['charts' => 'Insight missing does not exist.']);
+
+        $this->assertNull(Form::find('survey')->charts());
+    }
+
+    #[Test]
+    public function it_rejects_duplicate_insights()
+    {
+        $form = $this->makeForm();
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->patchJson(cp_route('forms.submissions.charts.update', $form->handle()), [
+                'charts' => [['field' => 'rating', 'chart' => 'horizontal_bar', 'insights' => [['type' => 'star_rating'], ['type' => 'star_rating']]]],
+            ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['charts' => 'Insight star_rating is used more than once for field rating.']);
+
+        $this->assertNull(Form::find('survey')->charts());
+    }
+
+    #[Test]
+    public function it_allows_the_same_insight_on_different_charts()
+    {
+        $form = tap(Form::make('survey')->formFields([
+            'sections' => [
+                [
+                    'fields' => [
+                        ['handle' => 'price', 'field' => ['type' => 'number']],
+                        ['handle' => 'age', 'field' => ['type' => 'number']],
+                    ],
+                ],
+            ],
+        ]))->save();
+
+        $charts = [
+            ['field' => 'price', 'chart' => 'vertical_bar', 'insights' => [['type' => 'average']]],
+            ['field' => 'age', 'chart' => 'vertical_bar', 'insights' => [['type' => 'average']]],
+        ];
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->patchJson(cp_route('forms.submissions.charts.update', $form->handle()), ['charts' => $charts])
+            ->assertNoContent();
+
+        $this->assertSame($charts, Form::find('survey')->charts());
+    }
+
+    #[Test]
+    public function it_rejects_insights_that_dont_apply_to_the_field()
+    {
+        $form = $this->makeForm();
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->patchJson(cp_route('forms.submissions.charts.update', $form->handle()), [
+                'charts' => [['field' => 'rating', 'chart' => 'horizontal_bar', 'insights' => [['type' => 'checked']]]],
+            ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['charts' => 'Insight checked cannot be used for field rating.']);
+
+        $this->assertNull(Form::find('survey')->charts());
+    }
+
+    #[Test]
+    public function it_validates_the_shape_of_insights()
+    {
+        $form = $this->makeForm();
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->patchJson(cp_route('forms.submissions.charts.update', $form->handle()), [
+                'charts' => [['field' => 'rating', 'chart' => 'horizontal_bar', 'insights' => ['star_rating', ['name' => 'star_rating']]]],
+            ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['charts.0.insights.0', 'charts.0.insights.1.type']);
+
+        $this->assertNull(Form::find('survey')->charts());
+    }
+
     private function makeForm()
     {
         return tap(Form::make('survey')->formFields([

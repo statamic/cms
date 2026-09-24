@@ -179,6 +179,115 @@ class FormSummaryTest extends TestCase
     }
 
     #[Test]
+    public function it_shows_the_saved_insights_in_order()
+    {
+        $form = $this->makeNumberForm();
+        $form->charts([['field' => 'price', 'chart' => 'vertical_bar', 'insights' => [['type' => 'average'], ['type' => 'min_max']]]])->save();
+
+        $this->submit($form, ['price' => 5]);
+        $this->submit($form, ['price' => 10]);
+
+        $this
+            ->actingAs($this->superUser())
+            ->getJson(cp_route('forms.submissions.summary', $form->handle()))
+            ->assertOk()
+            ->assertJsonCount(2, 'fields.0.insights')
+            ->assertJsonPath('fields.0.insights.0.handle', 'average')
+            ->assertJsonPath('fields.0.insights.0.props.average', '7.5')
+            ->assertJsonPath('fields.0.insights.1.handle', 'min_max')
+            ->assertJsonPath('fields.0.layout', [
+                'field' => 'price',
+                'chart' => 'vertical_bar',
+                'insights' => [['type' => 'average'], ['type' => 'min_max']],
+            ]);
+    }
+
+    #[Test]
+    public function it_uses_the_default_insights_when_the_layout_has_no_insights()
+    {
+        $form = $this->makeNumberForm();
+        $form->charts([['field' => 'price', 'chart' => 'horizontal_bar']])->save();
+
+        $response = $this
+            ->actingAs($this->superUser())
+            ->getJson(cp_route('forms.submissions.summary', $form->handle()))
+            ->assertOk()
+            ->assertJsonCount(2, 'fields.0.insights')
+            ->assertJsonPath('fields.0.insights.0.handle', 'min_max')
+            ->assertJsonPath('fields.0.insights.1.handle', 'average')
+            ->assertJsonPath('fields.0.layout', ['field' => 'price', 'chart' => 'horizontal_bar']);
+
+        $this->assertArrayNotHasKey('insights', $response->json('fields.0.layout'));
+    }
+
+    #[Test]
+    public function it_echoes_the_resolved_chart_in_the_layout()
+    {
+        $form = $this->makeForm();
+        $form->charts([['field' => 'color', 'chart' => 'ranked_options']])->save();
+
+        $this
+            ->actingAs($this->superUser())
+            ->getJson(cp_route('forms.submissions.summary', $form->handle()))
+            ->assertOk()
+            ->assertJsonPath('fields.0.layout', ['field' => 'color', 'chart' => 'pie']);
+    }
+
+    #[Test]
+    public function it_shows_no_insights_when_the_layout_has_an_empty_list()
+    {
+        $form = $this->makeNumberForm();
+        $form->charts([['field' => 'price', 'chart' => 'vertical_bar', 'insights' => []]])->save();
+
+        $this
+            ->actingAs($this->superUser())
+            ->getJson(cp_route('forms.submissions.summary', $form->handle()))
+            ->assertOk()
+            ->assertJsonCount(0, 'fields.0.insights')
+            ->assertJsonPath('fields.0.layout', ['field' => 'price', 'chart' => 'vertical_bar', 'insights' => []]);
+    }
+
+    #[Test]
+    public function it_skips_unknown_inapplicable_and_duplicate_insights()
+    {
+        $form = $this->makeNumberForm();
+        $form->charts([['field' => 'price', 'chart' => 'vertical_bar', 'insights' => [
+            ['type' => 'missing'],
+            ['type' => 'star_rating'],
+            ['type' => 'checked'],
+            'average',
+            ['type' => 'average'],
+            ['type' => 'average'],
+        ]]])->save();
+
+        $this
+            ->actingAs($this->superUser())
+            ->getJson(cp_route('forms.submissions.summary', $form->handle()))
+            ->assertOk()
+            ->assertJsonCount(1, 'fields.0.insights')
+            ->assertJsonPath('fields.0.insights.0.handle', 'average')
+            ->assertJsonPath('fields.0.layout.insights', [['type' => 'average']]);
+    }
+
+    #[Test]
+    public function it_previews_insights_in_an_unsaved_chart_layout()
+    {
+        $form = $this->makeNumberForm();
+
+        $this->submit($form, ['price' => 5]);
+
+        $this
+            ->actingAs($this->superUser())
+            ->getJson(cp_route('forms.submissions.summary', $form->handle()).'?'.http_build_query([
+                'charts' => [['field' => 'price', 'chart' => 'vertical_bar', 'insights' => [['type' => 'average']]]],
+            ]))
+            ->assertOk()
+            ->assertJsonCount(1, 'fields.0.insights')
+            ->assertJsonPath('fields.0.insights.0.handle', 'average')
+            ->assertJsonPath('fields.0.layout.insights', [['type' => 'average']]);
+    }
+
+    #[Test]
     public function it_excludes_hidden_fields()
     {
         $form = tap(Form::make('survey')->formFields([
@@ -245,6 +354,10 @@ class FormSummaryTest extends TestCase
             'missing field' => [[['chart' => 'pie']], 'charts.0.field'],
             'missing chart' => [[['field' => 'color']], 'charts.0.chart'],
             'duplicate field' => [[['field' => 'color', 'chart' => 'pie'], ['field' => 'color', 'chart' => 'pie']], 'charts.0.field'],
+            'insights not an array' => [[['field' => 'color', 'chart' => 'pie', 'insights' => 'average']], 'charts.0.insights'],
+            'insight not an array' => [[['field' => 'color', 'chart' => 'pie', 'insights' => ['average']]], 'charts.0.insights.0'],
+            'insight missing type' => [[['field' => 'color', 'chart' => 'pie', 'insights' => [['name' => 'average']]]], 'charts.0.insights.0.type'],
+            'array insight type' => [[['field' => 'color', 'chart' => 'pie', 'insights' => [['type' => ['average']]]]], 'charts.0.insights.0.type'],
         ];
     }
 
@@ -301,6 +414,19 @@ class FormSummaryTest extends TestCase
                         ['handle' => 'name', 'field' => ['type' => 'short_answer']],
                         ['handle' => 'color', 'field' => ['type' => 'multi_choice', 'options' => ['red' => 'Red', 'blue' => 'Blue']]],
                         ['handle' => 'rating', 'field' => ['type' => 'star_rating']],
+                    ],
+                ],
+            ],
+        ]))->save();
+    }
+
+    private function makeNumberForm()
+    {
+        return tap(Form::make('survey')->formFields([
+            'sections' => [
+                [
+                    'fields' => [
+                        ['handle' => 'price', 'field' => ['type' => 'number']],
                     ],
                 ],
             ],

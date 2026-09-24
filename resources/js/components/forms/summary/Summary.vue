@@ -187,10 +187,7 @@ async function fetchPreviews(charts: ChartConfig[]) {
 }
 
 function startEditing() {
-    savedLayout.value = (summary.value?.fields ?? []).map((field) => ({
-        field: field.handle,
-        chart: field.chart.handle,
-    }));
+    savedLayout.value = (summary.value?.fields ?? []).map((field) => clone(field.layout));
 
     draftLayout.value = clone(savedLayout.value);
     failedPreviews.value = [];

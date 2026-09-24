@@ -40,7 +40,7 @@ beforeEach(() => {
     vi.stubGlobal('Statamic', { $toast: toast });
 });
 
-function field(handle, chart) {
+function field(handle, chart, layout = { field: handle, chart }) {
     return {
         handle,
         display: handle,
@@ -50,6 +50,7 @@ function field(handle, chart) {
         responses: 1,
         chart: { handle: chart, component: `ui-${chart}-chart`, props: { items: [] } },
         insights: [],
+        layout,
     };
 }
 
@@ -72,8 +73,8 @@ function summary(fields) {
     };
 }
 
-async function mountEditing() {
-    axios.get.mockResolvedValueOnce({ data: summary([field('color', 'horizontal_bar')]) });
+async function mountEditing(fields = [field('color', 'horizontal_bar')]) {
+    axios.get.mockResolvedValueOnce({ data: summary(fields) });
 
     const wrapper = shallowMount(Summary, {
         props: { form: 'survey', summaryUrl: '/summary', chartsUpdateUrl: '/charts' },
@@ -103,6 +104,37 @@ test('the chart dropdown only offers charts that apply to the field', async () =
 
     expect(wrapper.vm.chartsFor('color').map((chart) => chart.handle)).toEqual(['horizontal_bar', 'pie']);
     expect(wrapper.vm.chartsFor('missing')).toEqual([]);
+});
+
+test('saving sends back the stored insights untouched', async () => {
+    const insights = [{ type: 'checked' }, { type: 'average' }];
+    const wrapper = await mountEditing([
+        field('color', 'horizontal_bar', { field: 'color', chart: 'horizontal_bar', insights }),
+    ]);
+
+    axios.patch.mockResolvedValue({});
+    axios.get.mockResolvedValue({ data: summary([field('color', 'horizontal_bar')]) });
+    await wrapper.vm.save();
+
+    expect(axios.patch.mock.calls[0][1].charts).toEqual([{ field: 'color', chart: 'horizontal_bar', insights }]);
+});
+
+test('saving after a chart change keeps the stored insights', async () => {
+    const insights = [{ type: 'checked' }];
+    const wrapper = await mountEditing([
+        field('color', 'horizontal_bar', { field: 'color', chart: 'horizontal_bar', insights }),
+    ]);
+
+    axios.get.mockResolvedValue({ data: summary([field('color', 'pie', { field: 'color', chart: 'pie', insights })]) });
+    wrapper.vm.setChart(0, 'pie');
+    await settle();
+
+    expect(axios.get.mock.calls[1][1].params.charts).toEqual([{ field: 'color', chart: 'pie', insights }]);
+
+    axios.patch.mockResolvedValue({});
+    await wrapper.vm.save();
+
+    expect(axios.patch.mock.calls[0][1].charts).toEqual([{ field: 'color', chart: 'pie', insights }]);
 });
 
 test('a failed preview is not retried in a loop', async () => {

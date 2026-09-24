@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers\CP\Forms;
 
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Statamic\Forms\Fields\FormField;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Statamic;
 
@@ -21,18 +22,35 @@ class UpdateFormChartsController extends CpController
             'charts' => 'present|array',
             'charts.*.field' => 'required|string|distinct',
             'charts.*.chart' => 'required|string',
+            'charts.*.insights' => 'nullable|array',
+            'charts.*.insights.*' => 'array',
+            'charts.*.insights.*.type' => 'required|string',
         ]);
 
         $charts = collect($request->input('charts'))
-            ->map(fn (array $config): array => [
-                'field' => $config['field'],
-                'chart' => $config['chart'],
-            ])
+            ->map(fn (array $config): array => $this->chartConfig($config))
             ->each(fn ($config) => $this->validateChart($form, $config));
 
         $form->charts($charts->values()->all())->save();
 
         return response()->noContent();
+    }
+
+    private function chartConfig(array $config): array
+    {
+        $chart = [
+            'field' => $config['field'],
+            'chart' => $config['chart'],
+        ];
+
+        if (isset($config['insights'])) {
+            $chart['insights'] = collect($config['insights'])
+                ->map(fn (array $insight): array => ['type' => $insight['type']])
+                ->values()
+                ->all();
+        }
+
+        return $chart;
     }
 
     private function validateChart($form, array $config): void
@@ -61,6 +79,35 @@ class UpdateFormChartsController extends CpController
             throw ValidationException::withMessages([
                 'charts' => __('statamic::validation.form_chart_not_applicable', ['chart' => $config['chart'], 'field' => $config['field']]),
             ]);
+        }
+
+        $this->validateInsights($field, $config);
+    }
+
+    private function validateInsights(FormField $field, array $config): void
+    {
+        $seen = [];
+
+        foreach ($config['insights'] ?? [] as ['type' => $type]) {
+            if (! $class = app('statamic.form-insights')->get($type)) {
+                throw ValidationException::withMessages([
+                    'charts' => __('statamic::validation.form_insight_unknown', ['insight' => $type]),
+                ]);
+            }
+
+            if (in_array($type, $seen, true)) {
+                throw ValidationException::withMessages([
+                    'charts' => __('statamic::validation.form_insight_duplicate', ['insight' => $type, 'field' => $config['field']]),
+                ]);
+            }
+
+            $seen[] = $type;
+
+            if (! app($class)->setConfig($field->fieldtype()->insightConfig())->appliesTo($field)) {
+                throw ValidationException::withMessages([
+                    'charts' => __('statamic::validation.form_insight_not_applicable', ['insight' => $type, 'field' => $config['field']]),
+                ]);
+            }
         }
     }
 }

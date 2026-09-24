@@ -13,6 +13,7 @@ final readonly class SummaryChart
         private FormField $field,
         private Chart $chart,
         private Collection $insights,
+        private bool $usesDefaultInsights,
     ) {
     }
 
@@ -22,14 +23,16 @@ final readonly class SummaryChart
             return null;
         }
 
+        $usesDefaultInsights = ! is_array($layout['insights'] ?? null);
+
         $fieldtype = $field->fieldtype();
 
-        $insights = collect($fieldtype->defaultInsights())
+        $insights = ($usesDefaultInsights ? collect($fieldtype->defaultInsights()) : self::insightClasses($layout['insights']))
             ->map(fn (string $class): Insight => app($class)->setConfig($fieldtype->insightConfig()))
             ->filter(fn (Insight $insight): bool => $insight->appliesTo($field))
             ->values();
 
-        return new self($field, $chart, $insights);
+        return new self($field, $chart, $insights, $usesDefaultInsights);
     }
 
     private static function resolveChart(FormField $field, mixed $handle): ?Chart
@@ -47,6 +50,17 @@ final readonly class SummaryChart
         return $class ? app($class) : null;
     }
 
+    private static function insightClasses(array $items): Collection
+    {
+        return collect($items)
+            ->map(fn ($item) => is_array($item) && is_string($type = $item['type'] ?? null)
+                ? app('statamic.form-insights')->get($type)
+                : null)
+            ->filter()
+            ->unique()
+            ->values();
+    }
+
     public function field(): FormField
     {
         return $this->field;
@@ -60,5 +74,22 @@ final readonly class SummaryChart
     public function insights(): Collection
     {
         return $this->insights;
+    }
+
+    public function layout(): array
+    {
+        $layout = [
+            'field' => $this->field->handle(),
+            'chart' => $this->chart::handle(),
+        ];
+
+        if (! $this->usesDefaultInsights) {
+            $layout['insights'] = $this->insights
+                ->map(fn (Insight $insight): array => ['type' => $insight::handle()])
+                ->values()
+                ->all();
+        }
+
+        return $layout;
     }
 }
