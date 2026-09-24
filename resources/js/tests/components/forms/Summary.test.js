@@ -17,7 +17,7 @@ vi.mock('@ui', () => ({ Button: {}, Skeleton: {}, ToggleGroup: {}, ToggleItem: {
 vi.mock('@/components/sortable/Sortable.js', () => ({ SortableList: {} }));
 vi.mock('@/bootstrap/globals.js', () => ({
     clone: (value) => JSON.parse(JSON.stringify(value)),
-    utf8btoa: (value) => value,
+    utf8btoa: (value) => btoa(value),
 }));
 
 vi.mock('@/components/ui/Listing/Listing.vue', async () => {
@@ -88,6 +88,10 @@ async function mountEditing(fields = [field('color', 'horizontal_bar')]) {
     return wrapper;
 }
 
+function sentCharts(call) {
+    return JSON.parse(atob(call[1].params.charts));
+}
+
 async function settle() {
     for (let i = 0; i < 10; i++) await flushPromises();
 }
@@ -129,12 +133,42 @@ test('saving after a chart change keeps the stored insights', async () => {
     wrapper.vm.setChart(0, 'pie');
     await settle();
 
-    expect(axios.get.mock.calls[1][1].params.charts).toEqual([{ field: 'color', chart: 'pie', insights }]);
+    expect(sentCharts(axios.get.mock.calls[1])).toEqual([{ field: 'color', chart: 'pie', insights }]);
 
     axios.patch.mockResolvedValue({});
     await wrapper.vm.save();
 
     expect(axios.patch.mock.calls[0][1].charts).toEqual([{ field: 'color', chart: 'pie', insights }]);
+});
+
+test('previewing and saving keep an intentionally empty insight list', async () => {
+    const wrapper = await mountEditing([
+        field('color', 'horizontal_bar', { field: 'color', chart: 'horizontal_bar', insights: [] }),
+    ]);
+
+    axios.get.mockResolvedValue({ data: summary([field('color', 'pie', { field: 'color', chart: 'pie', insights: [] })]) });
+    wrapper.vm.setChart(0, 'pie');
+    await settle();
+
+    expect(axios.get.mock.calls[1][1].params.charts).toBe(btoa(JSON.stringify([{ field: 'color', chart: 'pie', insights: [] }])));
+
+    axios.patch.mockResolvedValue({});
+    await wrapper.vm.save();
+
+    expect(axios.patch.mock.calls[0][1].charts).toEqual([{ field: 'color', chart: 'pie', insights: [] }]);
+});
+
+test('refetching the summary while editing sends the encoded layout', async () => {
+    const wrapper = await mountEditing([
+        field('color', 'horizontal_bar', { field: 'color', chart: 'horizontal_bar', insights: [] }),
+    ]);
+
+    axios.get.mockResolvedValue({ data: summary([field('color', 'horizontal_bar')]) });
+    await wrapper.vm.fetchSummary();
+
+    expect(axios.get.mock.calls[1][1].params.charts).toBe(
+        btoa(JSON.stringify([{ field: 'color', chart: 'horizontal_bar', insights: [] }])),
+    );
 });
 
 test('a failed preview is not retried in a loop', async () => {
@@ -170,7 +204,7 @@ test('picking another chart after a failed preview fetches it', async () => {
     await settle();
 
     expect(axios.get).toHaveBeenCalledTimes(3);
-    expect(axios.get.mock.calls[2][1].params.charts).toEqual([{ field: 'color', chart: 'lollipop' }]);
+    expect(sentCharts(axios.get.mock.calls[2])).toEqual([{ field: 'color', chart: 'lollipop' }]);
     expect(wrapper.vm.summary.fields[0].chart.handle).toBe('lollipop');
 });
 

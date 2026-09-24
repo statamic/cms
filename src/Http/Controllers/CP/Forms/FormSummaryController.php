@@ -27,6 +27,8 @@ class FormSummaryController extends CpController
 
         $this->authorize('viewSubmissions', $form);
 
+        $this->decodeCharts($request);
+
         $request->validate([
             'charts' => 'nullable|array',
             'charts.*.field' => 'required|string|distinct',
@@ -52,6 +54,14 @@ class FormSummaryController extends CpController
                 ->values(),
             'meta' => $this->meta($form),
         ];
+    }
+
+    // The layout is sent encoded because a query string can't represent an empty insights list.
+    private function decodeCharts(FilteredRequest $request): void
+    {
+        if (is_string($charts = $request->input('charts'))) {
+            $request->merge(['charts' => json_decode(base64_decode($charts), true) ?? $charts]);
+        }
     }
 
     private function resolveCharts(FilteredRequest $request, $form): Collection

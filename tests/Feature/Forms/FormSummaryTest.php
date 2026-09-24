@@ -248,6 +248,23 @@ class FormSummaryTest extends TestCase
     }
 
     #[Test]
+    public function it_uses_the_default_insights_when_none_of_the_stored_insights_resolve()
+    {
+        $form = $this->makeNumberForm();
+        $form->charts([['field' => 'price', 'chart' => 'horizontal_bar', 'insights' => [['type' => 'missing'], ['type' => 'checked']]]])->save();
+
+        $response = $this
+            ->actingAs($this->superUser())
+            ->getJson(cp_route('forms.submissions.summary', $form->handle()))
+            ->assertOk()
+            ->assertJsonCount(2, 'fields.0.insights')
+            ->assertJsonPath('fields.0.insights.0.handle', 'min_max')
+            ->assertJsonPath('fields.0.insights.1.handle', 'average');
+
+        $this->assertArrayNotHasKey('insights', $response->json('fields.0.layout'));
+    }
+
+    #[Test]
     public function it_skips_unknown_inapplicable_and_duplicate_insights()
     {
         $form = $this->makeNumberForm();
@@ -278,13 +295,24 @@ class FormSummaryTest extends TestCase
 
         $this
             ->actingAs($this->superUser())
-            ->getJson(cp_route('forms.submissions.summary', $form->handle()).'?'.http_build_query([
-                'charts' => [['field' => 'price', 'chart' => 'vertical_bar', 'insights' => [['type' => 'average']]]],
-            ]))
+            ->getJson($this->previewUrl($form, [['field' => 'price', 'chart' => 'vertical_bar', 'insights' => [['type' => 'average']]]]))
             ->assertOk()
             ->assertJsonCount(1, 'fields.0.insights')
             ->assertJsonPath('fields.0.insights.0.handle', 'average')
             ->assertJsonPath('fields.0.layout.insights', [['type' => 'average']]);
+    }
+
+    #[Test]
+    public function it_previews_an_intentionally_empty_insight_list()
+    {
+        $form = $this->makeNumberForm();
+
+        $this
+            ->actingAs($this->superUser())
+            ->getJson($this->previewUrl($form, [['field' => 'price', 'chart' => 'vertical_bar', 'insights' => []]]))
+            ->assertOk()
+            ->assertJsonCount(0, 'fields.0.insights')
+            ->assertJsonPath('fields.0.layout', ['field' => 'price', 'chart' => 'vertical_bar', 'insights' => []]);
     }
 
     #[Test]
@@ -320,9 +348,7 @@ class FormSummaryTest extends TestCase
 
         $this
             ->actingAs($this->superUser())
-            ->getJson(cp_route('forms.submissions.summary', $form->handle()).'?'.http_build_query([
-                'charts' => [['field' => 'color', 'chart' => 'horizontal_bar']],
-            ]))
+            ->getJson($this->previewUrl($form, [['field' => 'color', 'chart' => 'horizontal_bar']]))
             ->assertOk()
             ->assertJsonCount(1, 'fields')
             ->assertJsonPath('fields.0.handle', 'color')
@@ -340,9 +366,21 @@ class FormSummaryTest extends TestCase
 
         $this
             ->actingAs($this->superUser())
-            ->getJson(cp_route('forms.submissions.summary', $form->handle()).'?'.http_build_query(['charts' => $charts]))
+            ->getJson($this->previewUrl($form, $charts))
             ->assertUnprocessable()
             ->assertJsonValidationErrors($error);
+    }
+
+    #[Test]
+    public function it_rejects_a_previewed_chart_layout_that_isnt_encoded()
+    {
+        $form = $this->makeForm();
+
+        $this
+            ->actingAs($this->superUser())
+            ->getJson(cp_route('forms.submissions.summary', $form->handle()).'?charts=not-encoded')
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('charts');
     }
 
     public static function invalidChartLayoutProvider()
@@ -431,6 +469,11 @@ class FormSummaryTest extends TestCase
                 ],
             ],
         ]))->save();
+    }
+
+    private function previewUrl($form, $charts)
+    {
+        return cp_route('forms.submissions.summary', $form->handle()).'?'.http_build_query(['charts' => base64_encode(json_encode($charts))]);
     }
 
     private function submit($form, array $data)

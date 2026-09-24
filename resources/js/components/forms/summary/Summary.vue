@@ -125,9 +125,14 @@ function parameters(): object {
 
     if (searchQuery.value) params.search = searchQuery.value;
     if (Object.keys(activeFilters.value).length) params.filters = utf8btoa(JSON.stringify(activeFilters.value));
-    if (editing.value) params.charts = draftLayout.value;
+    if (editing.value) params.charts = encodeCharts(draftLayout.value);
 
     return params;
+}
+
+// Encoded so an empty insights list survives the query string.
+function encodeCharts(charts: ChartConfig[]): string {
+    return utf8btoa(JSON.stringify(charts));
 }
 
 function abortPreviews() {
@@ -162,7 +167,7 @@ async function fetchPreviews(charts: ChartConfig[]) {
 
     try {
         const response = await axios.get(props.summaryUrl, {
-            params: { ...parameters(), charts },
+            params: { ...parameters(), charts: encodeCharts(charts) },
             signal: controller.signal,
         });
         const previews: SummaryField[] = response.data.fields;

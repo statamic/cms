@@ -23,16 +23,28 @@ final readonly class SummaryChart
             return null;
         }
 
-        $usesDefaultInsights = ! is_array($layout['insights'] ?? null);
+        $stored = $layout['insights'] ?? null;
 
-        $fieldtype = $field->fieldtype();
+        $insights = is_array($stored) ? self::resolveInsights($field, self::insightClasses($stored)) : collect();
 
-        $insights = ($usesDefaultInsights ? collect($fieldtype->defaultInsights()) : self::insightClasses($layout['insights']))
-            ->map(fn (string $class): Insight => app($class)->setConfig($fieldtype->insightConfig()))
-            ->filter(fn (Insight $insight): bool => $insight->appliesTo($field))
-            ->values();
+        // A list where nothing resolves (e.g. an uninstalled addon's insight) isn't a choice of no insights.
+        $usesDefaultInsights = ! is_array($stored) || ($stored !== [] && $insights->isEmpty());
+
+        if ($usesDefaultInsights) {
+            $insights = self::resolveInsights($field, collect($field->fieldtype()->defaultInsights()));
+        }
 
         return new self($field, $chart, $insights, $usesDefaultInsights);
+    }
+
+    private static function resolveInsights(FormField $field, Collection $classes): Collection
+    {
+        $config = $field->fieldtype()->insightConfig();
+
+        return $classes
+            ->map(fn (string $class): Insight => app($class)->setConfig($config))
+            ->filter(fn (Insight $insight): bool => $insight->appliesTo($field))
+            ->values();
     }
 
     private static function resolveChart(FormField $field, mixed $handle): ?Chart

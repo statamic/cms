@@ -253,6 +253,34 @@ class UpdateFormChartsTest extends TestCase
     }
 
     #[Test]
+    public function it_round_trips_the_summary_layout_without_turning_unresolved_insights_into_none()
+    {
+        $form = $this->makeForm();
+        $form->charts([
+            ['field' => 'color', 'chart' => 'pie', 'insights' => [['type' => 'missing']]],
+            ['field' => 'rating', 'chart' => 'horizontal_bar', 'insights' => []],
+        ])->save();
+
+        $user = tap(User::make()->makeSuper())->save();
+
+        $layout = $this
+            ->actingAs($user)
+            ->getJson(cp_route('forms.submissions.summary', $form->handle()))
+            ->assertOk()
+            ->json('fields.*.layout');
+
+        $this
+            ->actingAs($user)
+            ->patchJson(cp_route('forms.submissions.charts.update', $form->handle()), ['charts' => $layout])
+            ->assertNoContent();
+
+        $this->assertSame([
+            ['field' => 'color', 'chart' => 'pie'],
+            ['field' => 'rating', 'chart' => 'horizontal_bar', 'insights' => []],
+        ], Form::find('survey')->charts());
+    }
+
+    #[Test]
     public function it_rejects_unknown_insights()
     {
         $form = $this->makeForm();
