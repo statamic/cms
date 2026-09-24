@@ -9,6 +9,7 @@ use Statamic\Forms\Fields\FormValueType;
 use Statamic\Forms\Fieldtypes\Currency;
 use Statamic\Forms\Insights\Average;
 use Statamic\Forms\Insights\MinMax;
+use Statamic\Forms\Summary\FieldResponses;
 use Tests\TestCase;
 
 class CurrencyTest extends TestCase
@@ -70,7 +71,12 @@ class CurrencyTest extends TestCase
         $this->assertCount(2, $insights);
         $this->assertInstanceOf(MinMax::class, $insights[0]);
         $this->assertInstanceOf(Average::class, $insights[1]);
-        $this->assertEquals(['min' => '5.00', 'max' => '15.00', 'prefix' => '£'], $insights[0]->props(collect([5, 15])));
-        $this->assertEquals(['average' => '10.00', 'prefix' => '£'], $insights[1]->props(collect([5, 15])));
+        $this->assertEquals(['min' => '5.00', 'max' => '15.00', 'prefix' => '£'], $insights[0]->props($this->responses([5, 15])));
+        $this->assertEquals(['average' => '10.00', 'prefix' => '£'], $insights[1]->props($this->responses([5, 15])));
+    }
+
+    private function responses(iterable $values): FieldResponses
+    {
+        return FieldResponses::fromValues(new FormField('field', ['type' => 'currency']), $values);
     }
 }

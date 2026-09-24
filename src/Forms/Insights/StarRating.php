@@ -2,7 +2,7 @@
 
 namespace Statamic\Forms\Insights;
 
-use Illuminate\Support\Collection;
+use Statamic\Forms\Summary\FieldResponses;
 
 class StarRating extends Insight
 {
@@ -10,12 +10,10 @@ class StarRating extends Insight
     {
     }
 
-    public function props(Collection $values): array
+    public function props(FieldResponses $responses): array
     {
-        $values = $values->filter(fn ($value) => is_numeric($value));
-
         return [
-            'average' => round($values->avg() ?? 0, 1),
+            'average' => round($responses->numeric()?->average() ?? 0, 1),
             'total' => $this->total,
         ];
     }

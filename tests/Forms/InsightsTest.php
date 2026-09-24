@@ -3,10 +3,12 @@
 namespace Tests\Forms;
 
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Forms\Fields\FormField;
 use Statamic\Forms\Insights\Average;
 use Statamic\Forms\Insights\Checked;
 use Statamic\Forms\Insights\MinMax;
 use Statamic\Forms\Insights\StarRating;
+use Statamic\Forms\Summary\FieldResponses;
 use Tests\TestCase;
 
 class InsightsTest extends TestCase
@@ -16,7 +18,7 @@ class InsightsTest extends TestCase
     {
         $this->assertEquals(
             ['average' => '2.3'],
-            (new Average)->props(collect([1, 2, 4, 'nonsense']))
+            (new Average)->props($this->responses([1, 2, 4, 'nonsense']))
         );
     }
 
@@ -25,7 +27,7 @@ class InsightsTest extends TestCase
     {
         $this->assertEquals(
             ['average' => '2.33', 'prefix' => '£'],
-            (new Average(prefix: '£', decimals: 2))->props(collect([1, 2, 4]))
+            (new Average(prefix: '£', decimals: 2))->props($this->responses([1, 2, 4]))
         );
     }
 
@@ -34,12 +36,12 @@ class InsightsTest extends TestCase
     {
         $this->assertEquals(
             ['min' => '4', 'max' => '44'],
-            (new MinMax)->props(collect([26, 4, 44, 'nonsense']))
+            (new MinMax)->props($this->responses([26, 4, 44, 'nonsense']))
         );
 
         $this->assertEquals(
             ['min' => '5.00', 'max' => '50.00', 'prefix' => '£'],
-            (new MinMax(prefix: '£', decimals: 2))->props(collect([5, 50, 30]))
+            (new MinMax(prefix: '£', decimals: 2))->props($this->responses([5, 50, 30]))
         );
     }
 
@@ -48,7 +50,7 @@ class InsightsTest extends TestCase
     {
         $this->assertEquals(
             ['count' => 2, 'percent' => 40],
-            (new Checked)->props(collect([true, true, false, false, false]))
+            (new Checked)->props($this->responses([true, true, false, false, false]))
         );
     }
 
@@ -57,16 +59,21 @@ class InsightsTest extends TestCase
     {
         $this->assertEquals(
             ['average' => 4.3, 'total' => 5],
-            (new StarRating(total: 5))->props(collect([4, 4.5, 4.5]))
+            (new StarRating(total: 5))->props($this->responses([4, 4.5, 4.5]))
         );
     }
 
     #[Test]
     public function insights_handle_having_no_responses()
     {
-        $this->assertEquals(['average' => '0.0'], (new Average)->props(collect()));
-        $this->assertEquals(['min' => '0', 'max' => '0'], (new MinMax)->props(collect()));
-        $this->assertEquals(['count' => 0, 'percent' => 0], (new Checked)->props(collect()));
-        $this->assertEquals(['average' => 0.0, 'total' => 5], (new StarRating(total: 5))->props(collect()));
+        $this->assertEquals(['average' => '0.0'], (new Average)->props($this->responses([])));
+        $this->assertEquals(['min' => '0', 'max' => '0'], (new MinMax)->props($this->responses([])));
+        $this->assertEquals(['count' => 0, 'percent' => 0], (new Checked)->props($this->responses([])));
+        $this->assertEquals(['average' => 0.0, 'total' => 5], (new StarRating(total: 5))->props($this->responses([])));
+    }
+
+    private function responses(iterable $values): FieldResponses
+    {
+        return FieldResponses::fromValues(new FormField('field', ['type' => 'number']), $values);
     }
 }

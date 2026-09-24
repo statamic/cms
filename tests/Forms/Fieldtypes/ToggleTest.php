@@ -8,6 +8,7 @@ use Statamic\Forms\Fields\FormField;
 use Statamic\Forms\Fields\FormValueType;
 use Statamic\Forms\Fieldtypes\Toggle;
 use Statamic\Forms\Insights\Checked;
+use Statamic\Forms\Summary\FieldResponses;
 use Tests\TestCase;
 
 class ToggleTest extends TestCase
@@ -57,7 +58,7 @@ class ToggleTest extends TestCase
     #[Test]
     public function it_returns_boolean_chart_options()
     {
-        $options = (new Toggle)->setField(new FormField('agree', ['type' => 'toggle']))->chartOptions(collect());
+        $options = (new Toggle)->setField(new FormField('agree', ['type' => 'toggle']))->chartOptions($this->responses([]));
 
         $this->assertEquals(['true', 'false'], $options->map->key->all());
         $this->assertEquals(['Yes', 'No'], $options->map->label->all());
@@ -71,5 +72,10 @@ class ToggleTest extends TestCase
 
         $this->assertCount(1, $insights);
         $this->assertInstanceOf(Checked::class, $insights[0]);
+    }
+
+    private function responses(iterable $values): FieldResponses
+    {
+        return FieldResponses::fromValues(new FormField('field', ['type' => 'toggle']), $values);
     }
 }

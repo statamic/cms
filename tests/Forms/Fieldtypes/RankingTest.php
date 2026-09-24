@@ -7,6 +7,7 @@ use Statamic\Forms\Charts\RankedOptions;
 use Statamic\Forms\Fields\FormField;
 use Statamic\Forms\Fields\FormValueType;
 use Statamic\Forms\Fieldtypes\Ranking;
+use Statamic\Forms\Summary\FieldResponses;
 use Tests\TestCase;
 
 class RankingTest extends TestCase
@@ -53,9 +54,14 @@ class RankingTest extends TestCase
             'options' => ['spring' => 'Spring', 'summer' => 'Summer'],
         ]));
 
-        $options = $fieldtype->chartOptions(collect());
+        $options = $fieldtype->chartOptions($this->responses([]));
 
         $this->assertEquals(['spring', 'summer'], $options->map->key->all());
         $this->assertEquals(['Spring', 'Summer'], $options->map->label->all());
+    }
+
+    private function responses(iterable $values): FieldResponses
+    {
+        return FieldResponses::fromValues(new FormField('field', ['type' => 'ranking']), $values);
     }
 }

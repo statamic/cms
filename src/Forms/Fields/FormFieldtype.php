@@ -13,6 +13,7 @@ use Statamic\Fields\Blueprint;
 use Statamic\Fields\ConfigFields;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
+use Statamic\Forms\Summary\FieldResponses;
 use Statamic\Support\Str;
 
 use function Statamic\trans as __;
@@ -217,7 +218,7 @@ abstract class FormFieldtype implements Arrayable
         return null;
     }
 
-    public function chartOptions(Collection $values): ?Collection
+    public function chartOptions(FieldResponses $responses): ?Collection
     {
         return null;
     }

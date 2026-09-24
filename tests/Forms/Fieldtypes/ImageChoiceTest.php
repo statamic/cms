@@ -9,6 +9,7 @@ use Statamic\Forms\Charts\HorizontalBar;
 use Statamic\Forms\Fields\FormField;
 use Statamic\Forms\Fields\FormValueType;
 use Statamic\Forms\Fieldtypes\ImageChoice as ImageChoiceFormFieldtype;
+use Statamic\Forms\Summary\FieldResponses;
 use Tests\TestCase;
 
 class ImageChoiceTest extends TestCase
@@ -152,11 +153,16 @@ class ImageChoiceTest extends TestCase
             ],
         ]));
 
-        $options = $fieldtype->chartOptions(collect());
+        $options = $fieldtype->chartOptions($this->responses([]));
 
         $this->assertEquals(['cat', 'dog'], $options->map->key->all());
         $this->assertEquals(['Cat', 'Dog'], $options->map->label->all());
         $this->assertEquals(['https://example.com/cat.jpg', 'https://example.com/dog.jpg'], $options->map->image->all());
         $this->assertEquals(['A', 'B'], $options->map->badge->all());
+    }
+
+    private function responses(iterable $values): FieldResponses
+    {
+        return FieldResponses::fromValues(new FormField('field', ['type' => 'image_choice']), $values);
     }
 }

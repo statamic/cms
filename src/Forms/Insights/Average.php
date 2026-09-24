@@ -2,7 +2,7 @@
 
 namespace Statamic\Forms\Insights;
 
-use Illuminate\Support\Collection;
+use Statamic\Forms\Summary\FieldResponses;
 
 class Average extends Insight
 {
@@ -10,12 +10,10 @@ class Average extends Insight
     {
     }
 
-    public function props(Collection $values): array
+    public function props(FieldResponses $responses): array
     {
-        $values = $values->filter(fn ($value) => is_numeric($value));
-
         return array_filter([
-            'average' => number_format($values->avg() ?? 0, $this->decimals),
+            'average' => number_format($responses->numeric()?->average() ?? 0, $this->decimals),
             'prefix' => $this->prefix,
             'suffix' => $this->suffix,
         ], fn ($value) => $value !== null);

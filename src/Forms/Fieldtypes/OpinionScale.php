@@ -8,6 +8,7 @@ use Statamic\Forms\Charts\VerticalBar;
 use Statamic\Forms\Fields\FormFieldtype;
 use Statamic\Forms\Fields\FormValueType;
 use Statamic\Forms\Insights\Average;
+use Statamic\Forms\Summary\FieldResponses;
 use Statamic\Support\Arr;
 
 use function Statamic\trans as __;
@@ -82,7 +83,7 @@ class OpinionScale extends FormFieldtype
         return VerticalBar::class;
     }
 
-    public function chartOptions(Collection $values): ?Collection
+    public function chartOptions(FieldResponses $responses): ?Collection
     {
         [$min, $max] = $this->normalizedRange();
 

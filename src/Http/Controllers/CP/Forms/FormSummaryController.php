@@ -9,6 +9,8 @@ use Statamic\Forms\Charts\Chart;
 use Statamic\Forms\Charts\SummaryChart;
 use Statamic\Forms\Fields\FormField;
 use Statamic\Forms\Insights\Insight;
+use Statamic\Forms\Summary\FieldResponseCounter;
+use Statamic\Forms\Summary\FieldResponses;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Controllers\CP\Forms\Concerns\QueriesFormSubmissionSearch;
 use Statamic\Http\Requests\FilteredRequest;
@@ -35,14 +37,14 @@ class FormSummaryController extends CpController
         $numbers = $this->fieldNumbers($form);
         $charts = $this->resolveCharts($request, $form);
 
-        [$total, $values] = $this->collectValues($this->query($request, $form), $charts);
+        [$total, $responses] = $this->countResponses($this->query($request, $form), $charts);
 
         return [
             'total' => $total,
             'fields' => $charts
                 ->map(fn (SummaryChart $summary): array => $this->summarizeField(
                     $summary,
-                    $values[$summary->field()->handle()],
+                    $responses[$summary->field()->handle()],
                     $numbers->get($summary->field()->handle())
                 ))
                 ->values(),
@@ -110,25 +112,25 @@ class FormSummaryController extends CpController
         return $query;
     }
 
-    private function collectValues(SubmissionQueryBuilder $query, Collection $charts): array
+    private function countResponses(SubmissionQueryBuilder $query, Collection $charts): array
     {
         $total = 0;
-        $values = $charts->mapWithKeys(fn (SummaryChart $summary) => [$summary->field()->handle() => collect()]);
+        $counters = $charts
+            ->mapWithKeys(fn (SummaryChart $summary) => [$summary->field()->handle() => new FieldResponseCounter($summary->field())])
+            ->all();
 
         foreach ($query->lazy(500) as $submission) {
             $total++;
 
-            $values->each(function (Collection $collected, string $handle) use ($submission) {
-                if (filled($value = $submission->get($handle))) {
-                    $collected->put($submission->id(), $value);
-                }
-            });
+            foreach ($counters as $handle => $counter) {
+                $counter->add($submission->get($handle));
+            }
         }
 
-        return [$total, $values];
+        return [$total, array_map(fn (FieldResponseCounter $counter) => $counter->responses(), $counters)];
     }
 
-    private function summarizeField(SummaryChart $summary, Collection $values, ?int $number): array
+    private function summarizeField(SummaryChart $summary, FieldResponses $responses, ?int $number): array
     {
         $field = $summary->field();
         $fieldtype = $field->fieldtype();
@@ -140,17 +142,17 @@ class FormSummaryController extends CpController
             'icon' => $fieldtype->icon(),
             'fieldtype' => $fieldtype->handle(),
             'number' => $number,
-            'responses' => $values->count(),
+            'responses' => $responses->total(),
             'chart' => [
                 'handle' => $chart::handle(),
                 'component' => $chart->component(),
-                'props' => $summary->props($values),
+                'props' => $chart->props($responses, $fieldtype->chartOptions($responses)),
             ],
             'insights' => collect($fieldtype->insights())
                 ->map(fn (Insight $insight): array => [
                     'handle' => $insight::handle(),
                     'component' => $insight->component(),
-                    'props' => $insight->props($values),
+                    'props' => $insight->props($responses),
                 ])
                 ->values(),
         ];

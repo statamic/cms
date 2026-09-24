@@ -7,6 +7,8 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Forms\Charts\ChartOption;
 use Statamic\Forms\Charts\HorizontalBar;
 use Statamic\Forms\Charts\VerticalBar;
+use Statamic\Forms\Fields\FormField;
+use Statamic\Forms\Summary\FieldResponses;
 use Tests\TestCase;
 
 class ChartTest extends TestCase
@@ -15,7 +17,7 @@ class ChartTest extends TestCase
     public function it_counts_values_per_option()
     {
         $props = (new HorizontalBar)->props(
-            collect(['red', 'red', 'green']),
+            $this->responses(['red', 'red', 'green']),
             $this->chartOptions(['red' => 'Red', 'green' => 'Green', 'blue' => 'Blue'])
         );
 
@@ -30,7 +32,7 @@ class ChartTest extends TestCase
     public function it_flattens_multi_value_fields_and_counts_each_selection()
     {
         $props = (new HorizontalBar)->props(
-            collect([['tea', 'coffee'], ['tea'], ['coffee']]),
+            $this->responses([['tea', 'coffee'], ['tea'], ['coffee']]),
             $this->chartOptions(['tea' => 'Tea', 'coffee' => 'Coffee', 'water' => 'Water'])
         );
 
@@ -45,7 +47,7 @@ class ChartTest extends TestCase
     public function it_normalizes_boolean_values()
     {
         $props = (new HorizontalBar)->props(
-            collect([true, true, false]),
+            $this->responses([true, true, false]),
             $this->chartOptions(['true' => 'Yes', 'false' => 'No'])
         );
 
@@ -58,7 +60,7 @@ class ChartTest extends TestCase
     #[Test]
     public function it_passes_option_extras_through_to_items()
     {
-        $props = (new HorizontalBar)->props(collect(['cat']), collect([
+        $props = (new HorizontalBar)->props($this->responses(['cat']), collect([
             new ChartOption('cat', 'Cat', icon: 'star-filled', image: '/cat.jpg', badge: 'A'),
         ]));
 
@@ -87,7 +89,7 @@ class ChartTest extends TestCase
     public function it_doesnt_drill_down_when_everything_fits()
     {
         $props = (new HorizontalBar)->props(
-            collect(['red', 'red', 'green']),
+            $this->responses(['red', 'red', 'green']),
             $this->chartOptions(['red' => 'Red', 'green' => 'Green'])
         );
 
@@ -147,7 +149,7 @@ class ChartTest extends TestCase
     #[Test]
     public function it_counts_unique_values_when_there_are_no_options()
     {
-        $props = (new HorizontalBar)->props(collect(['Alice', 'Alice', 'Bob']));
+        $props = (new HorizontalBar)->props($this->responses(['Alice', 'Alice', 'Bob']));
 
         $this->assertEquals([
             ['key' => 'Alice', 'label' => 'Alice', 'count' => 2, 'percent' => 67],
@@ -158,7 +160,7 @@ class ChartTest extends TestCase
     #[Test]
     public function it_sorts_unique_numeric_values_ascending()
     {
-        $props = (new VerticalBar)->props(collect([3, 1, 3, 10]));
+        $props = (new VerticalBar)->props($this->responses([3, 1, 3, 10]));
 
         $this->assertEquals([
             ['key' => '1', 'label' => '1', 'count' => 1, 'percent' => 25],
@@ -170,7 +172,7 @@ class ChartTest extends TestCase
     #[Test]
     public function it_bins_numeric_values_when_there_are_many_unique_ones()
     {
-        $props = (new VerticalBar)->props(collect(range(1, 20)));
+        $props = (new VerticalBar)->props($this->responses(range(1, 20)));
 
         $this->assertEquals([
             ['key' => '1-3', 'label' => '1–3', 'count' => 3, 'percent' => 15],
@@ -187,7 +189,7 @@ class ChartTest extends TestCase
     public function it_doesnt_bin_numeric_values_when_the_field_has_options()
     {
         $props = (new VerticalBar)->props(
-            collect(range(0, 10)),
+            $this->responses(range(0, 10)),
             $this->chartOptions(collect(range(0, 10))->mapWithKeys(fn ($value) => [$value => (string) $value])->all())
         );
 
@@ -195,13 +197,18 @@ class ChartTest extends TestCase
         $this->assertEquals('0', $props['items'][0]['key']);
     }
 
-    private function weightedValues(array $keys): Collection
+    private function weightedValues(array $keys): FieldResponses
     {
-        return collect($keys)->flatMap(fn ($key, $index) => array_fill(0, count($keys) + 2 - $index, $key));
+        return $this->responses(collect($keys)->flatMap(fn ($key, $index) => array_fill(0, count($keys) + 2 - $index, $key)));
     }
 
     private function chartOptions(array $options): Collection
     {
         return collect($options)->map(fn ($label, $key) => new ChartOption((string) $key, $label))->values();
+    }
+
+    private function responses(iterable $values): FieldResponses
+    {
+        return FieldResponses::fromValues(new FormField('field', ['type' => 'checkboxes']), $values);
     }
 }

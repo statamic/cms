@@ -7,6 +7,7 @@ use Statamic\Forms\Charts\ChartOption;
 use Statamic\Forms\Charts\Lollipop;
 use Statamic\Forms\Fields\FormFieldtype;
 use Statamic\Forms\Fields\FormValueType;
+use Statamic\Forms\Summary\FieldResponses;
 use Statamic\Support\Arr;
 
 use function Statamic\trans as __;
@@ -59,12 +60,11 @@ class Dictionary extends FormFieldtype
         return Lollipop::class;
     }
 
-    public function chartOptions(Collection $values): ?Collection
+    public function chartOptions(FieldResponses $responses): ?Collection
     {
         $dictionary = $this->toField()->fieldtype()->dictionary();
 
-        return $values->flatten()
-            ->countBy(fn ($value) => (string) $value)
+        return $responses->counts()
             ->sortDesc()
             ->keys()
             ->map(fn ($value) => new ChartOption((string) $value, $dictionary->get((string) $value)?->label()));

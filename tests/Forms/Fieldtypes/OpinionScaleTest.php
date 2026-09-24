@@ -8,6 +8,7 @@ use Statamic\Forms\Fields\FormField;
 use Statamic\Forms\Fields\FormValueType;
 use Statamic\Forms\Fieldtypes\OpinionScale;
 use Statamic\Forms\Insights\Average;
+use Statamic\Forms\Summary\FieldResponses;
 use Tests\TestCase;
 
 class OpinionScaleTest extends TestCase
@@ -96,7 +97,7 @@ class OpinionScaleTest extends TestCase
             'max' => 5,
         ]));
 
-        $this->assertEquals(['1', '2', '3', '4', '5'], $fieldtype->chartOptions(collect())->map->key->all());
+        $this->assertEquals(['1', '2', '3', '4', '5'], $fieldtype->chartOptions($this->responses([]))->map->key->all());
     }
 
     #[Test]
@@ -106,5 +107,10 @@ class OpinionScaleTest extends TestCase
 
         $this->assertCount(1, $insights);
         $this->assertInstanceOf(Average::class, $insights[0]);
+    }
+
+    private function responses(iterable $values): FieldResponses
+    {
+        return FieldResponses::fromValues(new FormField('field', ['type' => 'opinion_scale']), $values);
     }
 }

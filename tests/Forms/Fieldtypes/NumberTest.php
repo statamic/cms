@@ -9,6 +9,7 @@ use Statamic\Forms\Fields\FormValueType;
 use Statamic\Forms\Fieldtypes\Number;
 use Statamic\Forms\Insights\Average;
 use Statamic\Forms\Insights\MinMax;
+use Statamic\Forms\Summary\FieldResponses;
 use Tests\TestCase;
 
 class NumberTest extends TestCase
@@ -64,7 +65,7 @@ class NumberTest extends TestCase
     {
         $fieldtype = (new Number)->setField(new FormField('age', ['type' => 'number']));
 
-        $this->assertNull($fieldtype->chartOptions(collect([1, 2])));
+        $this->assertNull($fieldtype->chartOptions($this->responses([1, 2])));
     }
 
     #[Test]
@@ -75,5 +76,10 @@ class NumberTest extends TestCase
         $this->assertCount(2, $insights);
         $this->assertInstanceOf(MinMax::class, $insights[0]);
         $this->assertInstanceOf(Average::class, $insights[1]);
+    }
+
+    private function responses(iterable $values): FieldResponses
+    {
+        return FieldResponses::fromValues(new FormField('field', ['type' => 'number']), $values);
     }
 }

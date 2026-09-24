@@ -3,6 +3,7 @@
 namespace Statamic\Forms\Charts;
 
 use Illuminate\Support\Collection;
+use Statamic\Forms\Summary\FieldResponses;
 
 class RankedOptions extends Chart
 {
@@ -11,30 +12,24 @@ class RankedOptions extends Chart
     protected ?string $component = 'ui-horizontal-lollipop-chart';
     protected ?string $icon = 'rank';
 
-    public function props(Collection $values, ?Collection $options = null): array
+    public function props(FieldResponses $responses, ?Collection $options = null): array
     {
         $options ??= collect();
-
-        $rankings = $values
-            ->filter(fn ($value): bool => is_array($value))
-            ->map(fn (array $value): array => array_map('strval', array_values($value)))
-            ->values();
-
-        $maxPoints = $rankings->count() * $options->count();
+        $optionCount = $options->count();
+        $maxPoints = $responses->total() * $optionCount;
 
         $items = $options
-            ->map(function (ChartOption $option) use ($rankings, $options): array {
-                $positions = $rankings
-                    ->map(fn ($ranking) => array_search($option->key, $ranking, true))
-                    ->filter(fn ($position): bool => $position !== false)
-                    ->map(fn ($position): int => $position + 1);
+            ->map(function (ChartOption $option) use ($responses, $optionCount): array {
+                $byPosition = $responses->positions()->get($option->key, []);
+                $appearances = array_sum($byPosition);
+                $positionSum = collect($byPosition)->sum(fn ($count, $position) => $count * $position);
 
                 return [
                     'key' => $option->key,
                     'label' => $option->label,
-                    'count' => $positions->filter(fn ($position) => $position === 1)->count(),
-                    'points' => $positions->map(fn ($position) => $options->count() - $position + 1)->sum(),
-                    'average' => $positions->avg(),
+                    'count' => $byPosition[1] ?? 0,
+                    'points' => $appearances * ($optionCount + 1) - $positionSum,
+                    'average' => $appearances ? $positionSum / $appearances : null,
                 ];
             })
             ->sortBy(fn ($item): float => $item['average'] ?? PHP_FLOAT_MAX)

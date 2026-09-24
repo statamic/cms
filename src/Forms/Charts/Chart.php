@@ -6,6 +6,7 @@ use Illuminate\Support\Collection;
 use Statamic\Extend\HasHandle;
 use Statamic\Extend\HasTitle;
 use Statamic\Extend\RegistersItself;
+use Statamic\Forms\Summary\FieldResponses;
 
 use function Statamic\trans as __;
 
@@ -27,9 +28,9 @@ abstract class Chart
         return $this->icon;
     }
 
-    public function props(Collection $values, ?Collection $options = null): array
+    public function props(FieldResponses $responses, ?Collection $options = null): array
     {
-        [$items, $other] = $this->truncatedItems($values, $options);
+        [$items, $other] = $this->truncatedItems($responses, $options);
 
         $props = ['items' => $items->all()];
 
@@ -37,15 +38,15 @@ abstract class Chart
             return $props;
         }
 
-        $props['drilldown'] = $this->drilldown($items, $other, $values->count());
+        $props['drilldown'] = $this->drilldown($items, $other, $responses->total());
 
         return $props;
     }
 
-    protected function truncatedItems(Collection $values, ?Collection $options): array
+    protected function truncatedItems(FieldResponses $responses, ?Collection $options): array
     {
-        $total = $values->count();
-        $items = $this->items($values, $options, $total);
+        $total = $responses->total();
+        $items = $this->items($responses->counts(), $options, $total);
 
         if (! $this->limit || $items->count() <= $this->limit) {
             return [$items->values(), collect()];
@@ -69,10 +70,8 @@ abstract class Chart
         return [$items->values(), $other->values()];
     }
 
-    private function items(Collection $values, ?Collection $options, int $total): Collection
+    private function items(Collection $counts, ?Collection $options, int $total): Collection
     {
-        $counts = $values->flatten()->countBy(fn ($value) => $this->key($value));
-
         if ($options === null && $this->shouldBin($counts)) {
             return $this->binnedItems($counts, $total);
         }
@@ -126,15 +125,6 @@ abstract class Chart
             : $keys->sortByDesc(fn ($key) => $counts->get($key));
 
         return $keys->map(fn ($value) => new ChartOption((string) $value));
-    }
-
-    private function key($value): string
-    {
-        if (is_bool($value)) {
-            return $value ? 'true' : 'false';
-        }
-
-        return (string) $value;
     }
 
     protected function drilldown(Collection $items, Collection $other, int $total): array

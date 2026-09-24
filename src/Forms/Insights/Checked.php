@@ -2,14 +2,16 @@
 
 namespace Statamic\Forms\Insights;
 
-use Illuminate\Support\Collection;
+use Statamic\Forms\Summary\FieldResponses;
 
 class Checked extends Insight
 {
-    public function props(Collection $values): array
+    public function props(FieldResponses $responses): array
     {
-        $total = $values->count();
-        $checked = $values->filter(fn ($value) => filter_var($value, FILTER_VALIDATE_BOOLEAN))->count();
+        $total = $responses->total();
+        $checked = $responses->counts()
+            ->filter(fn ($count, $key) => filter_var($key, FILTER_VALIDATE_BOOLEAN))
+            ->sum();
 
         return [
             'count' => $checked,

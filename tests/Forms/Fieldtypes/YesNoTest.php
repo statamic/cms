@@ -7,6 +7,7 @@ use Statamic\Forms\Charts\HorizontalBar;
 use Statamic\Forms\Fields\FormField;
 use Statamic\Forms\Fields\FormValueType;
 use Statamic\Forms\Fieldtypes\YesNo;
+use Statamic\Forms\Summary\FieldResponses;
 use Tests\TestCase;
 
 class YesNoTest extends TestCase
@@ -62,10 +63,15 @@ class YesNoTest extends TestCase
     #[Test]
     public function it_returns_yes_and_no_chart_options()
     {
-        $options = (new YesNo)->setField(new FormField('pint', ['type' => 'yes_no']))->chartOptions(collect());
+        $options = (new YesNo)->setField(new FormField('pint', ['type' => 'yes_no']))->chartOptions($this->responses([]));
 
         $this->assertEquals(['yes', 'no'], $options->map->key->all());
         $this->assertEquals(['Yes', 'No'], $options->map->label->all());
         $this->assertEquals(['checkmark-circle-filled', 'delete-circle-filled'], $options->map->icon->all());
+    }
+
+    private function responses(iterable $values): FieldResponses
+    {
+        return FieldResponses::fromValues(new FormField('field', ['type' => 'yes_no']), $values);
     }
 }

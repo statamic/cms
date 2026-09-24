@@ -8,6 +8,7 @@ use Statamic\Forms\Charts\HorizontalBar;
 use Statamic\Forms\Fields\FormFieldtype;
 use Statamic\Forms\Fields\FormValueType;
 use Statamic\Forms\Insights\StarRating as StarRatingInsight;
+use Statamic\Forms\Summary\FieldResponses;
 use Statamic\Support\Arr;
 
 use function Statamic\trans as __;
@@ -68,7 +69,7 @@ class StarRating extends FormFieldtype
         return HorizontalBar::class;
     }
 
-    public function chartOptions(Collection $values): ?Collection
+    public function chartOptions(FieldResponses $responses): ?Collection
     {
         $options = collect();
         $step = $this->config('allow_half_stars') ? 0.5 : 1;

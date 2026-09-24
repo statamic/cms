@@ -7,6 +7,7 @@ use Statamic\Forms\Charts\Pie;
 use Statamic\Forms\Fields\FormField;
 use Statamic\Forms\Fields\FormValueType;
 use Statamic\Forms\Fieldtypes\MultiChoice;
+use Statamic\Forms\Summary\FieldResponses;
 use Tests\TestCase;
 
 class MultiChoiceTest extends TestCase
@@ -75,7 +76,7 @@ class MultiChoiceTest extends TestCase
             'options' => ['red' => 'Red', 'blue' => 'Blue'],
         ]));
 
-        $options = $fieldtype->chartOptions(collect());
+        $options = $fieldtype->chartOptions($this->responses([]));
 
         $this->assertEquals(['red', 'blue'], $options->map->key->all());
         $this->assertEquals(['Red', 'Blue'], $options->map->label->all());
@@ -92,6 +93,11 @@ class MultiChoiceTest extends TestCase
             ],
         ]));
 
-        $this->assertEquals(['red'], $fieldtype->chartOptions(collect())->map->key->all());
+        $this->assertEquals(['red'], $fieldtype->chartOptions($this->responses([]))->map->key->all());
+    }
+
+    private function responses(iterable $values): FieldResponses
+    {
+        return FieldResponses::fromValues(new FormField('field', ['type' => 'multi_choice']), $values);
     }
 }

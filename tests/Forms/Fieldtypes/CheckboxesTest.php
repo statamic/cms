@@ -7,6 +7,7 @@ use Statamic\Forms\Charts\HorizontalBar;
 use Statamic\Forms\Fields\FormField;
 use Statamic\Forms\Fields\FormValueType;
 use Statamic\Forms\Fieldtypes\Checkboxes;
+use Statamic\Forms\Summary\FieldResponses;
 use Tests\TestCase;
 
 class CheckboxesTest extends TestCase
@@ -75,10 +76,15 @@ class CheckboxesTest extends TestCase
             'options' => ['music' => 'Music', 'sports' => 'Sports'],
         ]));
 
-        $options = $fieldtype->chartOptions(collect());
+        $options = $fieldtype->chartOptions($this->responses([]));
 
         $this->assertEquals(['music', 'sports'], $options->map->key->all());
         $this->assertEquals(['Music', 'Sports'], $options->map->label->all());
         $this->assertEquals(['checkbox-filled', 'checkbox-filled'], $options->map->icon->all());
+    }
+
+    private function responses(iterable $values): FieldResponses
+    {
+        return FieldResponses::fromValues(new FormField('field', ['type' => 'checkboxes']), $values);
     }
 }

@@ -8,6 +8,7 @@ use Statamic\Forms\Fields\FormField;
 use Statamic\Forms\Fields\FormValueType;
 use Statamic\Forms\Fieldtypes\StarRating;
 use Statamic\Forms\Insights\StarRating as StarRatingInsight;
+use Statamic\Forms\Summary\FieldResponses;
 use Tests\TestCase;
 
 class StarRatingTest extends TestCase
@@ -101,7 +102,7 @@ class StarRatingTest extends TestCase
             'max_stars' => 3,
         ]));
 
-        $options = $fieldtype->chartOptions(collect());
+        $options = $fieldtype->chartOptions($this->responses([]));
 
         $this->assertEquals(['3', '2', '1'], $options->map->key->all());
         $this->assertEquals(['star-filled', 'star-filled', 'star-filled'], $options->map->icon->all());
@@ -116,7 +117,7 @@ class StarRatingTest extends TestCase
             'allow_half_stars' => true,
         ]));
 
-        $this->assertEquals(['3', '2.5', '2', '1.5', '1', '0.5'], $fieldtype->chartOptions(collect())->map->key->all());
+        $this->assertEquals(['3', '2.5', '2', '1.5', '1', '0.5'], $fieldtype->chartOptions($this->responses([]))->map->key->all());
     }
 
     #[Test]
@@ -131,6 +132,11 @@ class StarRatingTest extends TestCase
 
         $this->assertCount(1, $insights);
         $this->assertInstanceOf(StarRatingInsight::class, $insights[0]);
-        $this->assertEquals(['average' => 2.0, 'total' => 3], $insights[0]->props(collect([1, 3])));
+        $this->assertEquals(['average' => 2.0, 'total' => 3], $insights[0]->props($this->responses([1, 3])));
+    }
+
+    private function responses(iterable $values): FieldResponses
+    {
+        return FieldResponses::fromValues(new FormField('field', ['type' => 'star_rating']), $values);
     }
 }

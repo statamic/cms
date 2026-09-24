@@ -7,6 +7,7 @@ use Statamic\Forms\Charts\ChartOption;
 use Statamic\Forms\Charts\Pie;
 use Statamic\Forms\Fields\FormFieldtype;
 use Statamic\Forms\Fields\FormValueType;
+use Statamic\Forms\Summary\FieldResponses;
 use Statamic\Support\Arr;
 
 use function Statamic\trans as __;
@@ -65,7 +66,7 @@ class MultiChoice extends FormFieldtype
         return Pie::class;
     }
 
-    public function chartOptions(Collection $values): ?Collection
+    public function chartOptions(FieldResponses $responses): ?Collection
     {
         return collect($this->enabledOptions())
             ->map(fn ($label, $key) => new ChartOption($key, $label))

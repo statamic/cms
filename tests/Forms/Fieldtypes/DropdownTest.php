@@ -7,6 +7,7 @@ use Statamic\Forms\Charts\HorizontalBar;
 use Statamic\Forms\Fields\FormField;
 use Statamic\Forms\Fields\FormValueType;
 use Statamic\Forms\Fieldtypes\Dropdown;
+use Statamic\Forms\Summary\FieldResponses;
 use Tests\TestCase;
 
 class DropdownTest extends TestCase
@@ -121,9 +122,14 @@ class DropdownTest extends TestCase
             'options' => ['yep' => 'Yep', 'nope' => 'Nope'],
         ]));
 
-        $options = $fieldtype->chartOptions(collect());
+        $options = $fieldtype->chartOptions($this->responses([]));
 
         $this->assertEquals(['yep', 'nope'], $options->map->key->all());
         $this->assertEquals(['Yep', 'Nope'], $options->map->label->all());
+    }
+
+    private function responses(iterable $values): FieldResponses
+    {
+        return FieldResponses::fromValues(new FormField('field', ['type' => 'dropdown']), $values);
     }
 }

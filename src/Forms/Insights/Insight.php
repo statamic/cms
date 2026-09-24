@@ -2,10 +2,10 @@
 
 namespace Statamic\Forms\Insights;
 
-use Illuminate\Support\Collection;
 use Statamic\Extend\HasHandle;
 use Statamic\Extend\HasTitle;
 use Statamic\Extend\RegistersItself;
+use Statamic\Forms\Summary\FieldResponses;
 
 abstract class Insight
 {
@@ -18,5 +18,5 @@ abstract class Insight
         return $this->component ?? str_replace('_', '-', static::handle()).'-insight';
     }
 
-    abstract public function props(Collection $values): array;
+    abstract public function props(FieldResponses $responses): array;
 }

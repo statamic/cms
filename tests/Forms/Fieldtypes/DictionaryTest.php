@@ -8,6 +8,7 @@ use Statamic\Forms\Charts\Lollipop;
 use Statamic\Forms\Fields\FormField;
 use Statamic\Forms\Fields\FormValueType;
 use Statamic\Forms\Fieldtypes\Dictionary;
+use Statamic\Forms\Summary\FieldResponses;
 use Tests\TestCase;
 
 class DictionaryTest extends TestCase
@@ -96,12 +97,17 @@ class DictionaryTest extends TestCase
             'dictionary' => 'countries',
         ]));
 
-        $options = $fieldtype->chartOptions(collect(['USA', 'GBR', 'GBR']));
+        $options = $fieldtype->chartOptions($this->responses(['USA', 'GBR', 'GBR']));
 
         $this->assertEquals(['GBR', 'USA'], $options->map->key->all());
         $this->assertEquals([
             Dictionaries::find('countries')->get('GBR')->label(),
             Dictionaries::find('countries')->get('USA')->label(),
         ], $options->map->label->all());
+    }
+
+    private function responses(iterable $values): FieldResponses
+    {
+        return FieldResponses::fromValues(new FormField('field', ['type' => 'dictionary']), $values);
     }
 }

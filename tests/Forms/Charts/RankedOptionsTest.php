@@ -6,6 +6,8 @@ use Illuminate\Support\Collection;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Forms\Charts\ChartOption;
 use Statamic\Forms\Charts\RankedOptions;
+use Statamic\Forms\Fields\FormField;
+use Statamic\Forms\Summary\FieldResponses;
 use Tests\TestCase;
 
 class RankedOptionsTest extends TestCase
@@ -14,7 +16,7 @@ class RankedOptionsTest extends TestCase
     public function it_ranks_options_by_average_position()
     {
         $props = (new RankedOptions)->props(
-            collect([
+            $this->responses([
                 ['summer', 'spring', 'winter'],
                 ['summer', 'winter', 'spring'],
                 ['spring', 'summer', 'winter'],
@@ -32,5 +34,10 @@ class RankedOptionsTest extends TestCase
     private function chartOptions(array $options): Collection
     {
         return collect($options)->map(fn ($label, $key) => new ChartOption((string) $key, $label))->values();
+    }
+
+    private function responses(iterable $values): FieldResponses
+    {
+        return FieldResponses::fromValues(new FormField('field', ['type' => 'ranking']), $values);
     }
 }

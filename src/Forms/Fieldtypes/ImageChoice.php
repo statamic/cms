@@ -7,6 +7,7 @@ use Statamic\Forms\Charts\ChartOption;
 use Statamic\Forms\Charts\HorizontalBar;
 use Statamic\Forms\Fields\FormFieldtype;
 use Statamic\Forms\Fields\FormValueType;
+use Statamic\Forms\Summary\FieldResponses;
 use Statamic\Support\Arr;
 
 use function Statamic\trans as __;
@@ -116,7 +117,7 @@ class ImageChoice extends FormFieldtype
         return HorizontalBar::class;
     }
 
-    public function chartOptions(Collection $values): ?Collection
+    public function chartOptions(FieldResponses $responses): ?Collection
     {
         return collect($this->toField()->fieldtype()->preload()['options'])
             ->map(fn ($option) => new ChartOption($option['key'], $option['label'], image: $option['image'], badge: $option['letter']));

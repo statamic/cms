@@ -8,6 +8,7 @@ use Statamic\Forms\Charts\HorizontalBar;
 use Statamic\Forms\Fields\FormFieldtype;
 use Statamic\Forms\Fields\FormValueType;
 use Statamic\Forms\Insights\Checked;
+use Statamic\Forms\Summary\FieldResponses;
 use Statamic\Support\Arr;
 
 use function Statamic\trans as __;
@@ -51,7 +52,7 @@ class Toggle extends FormFieldtype
         return HorizontalBar::class;
     }
 
-    public function chartOptions(Collection $values): ?Collection
+    public function chartOptions(FieldResponses $responses): ?Collection
     {
         return collect([
             new ChartOption('true', __('Yes'), icon: 'checkmark-circle-filled'),
