@@ -4,6 +4,7 @@ namespace Statamic\StaticCaching;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Statamic\Events\AssetDeleted;
+use Statamic\Events\AssetReuploaded;
 use Statamic\Events\AssetSaved;
 use Statamic\Events\BlueprintDeleted;
 use Statamic\Events\BlueprintSaved;
@@ -33,6 +34,7 @@ class Invalidate implements ShouldQueue
     protected $events = [
         AssetSaved::class => 'refreshAsset',
         AssetDeleted::class => 'invalidateAsset',
+        AssetReuploaded::class => 'refreshAsset',
         EntrySaved::class => 'refreshEntry',
         EntryDeleting::class => 'invalidateEntry',
         EntryScheduleReached::class => 'invalidateEntry',
