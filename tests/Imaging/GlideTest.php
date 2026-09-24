@@ -398,6 +398,39 @@ class GlideTest extends TestCase
     }
 
     #[Test]
+    #[DataProvider('signedUrlSiteProvider')]
+    public function it_validates_the_signature_against_the_site_url($siteUrl)
+    {
+        $this->setSites([
+            'en' => ['url' => $siteUrl, 'locale' => 'en_US'],
+        ]);
+
+        $url = $this->app->make(UrlBuilder::class)->build($this->createAsset(), ['w' => 100]);
+
+        $this->get($url)->assertOk()->streamedContent();
+    }
+
+    public static function signedUrlSiteProvider()
+    {
+        return [
+            'same domain' => ['http://localhost/'],
+            'different domain' => ['https://www.example.com/'],
+        ];
+    }
+
+    #[Test]
+    public function it_rejects_an_invalid_signature_when_the_site_url_is_on_a_different_domain()
+    {
+        $this->setSites([
+            'en' => ['url' => 'https://www.example.com/', 'locale' => 'en_US'],
+        ]);
+
+        $url = $this->app->make(UrlBuilder::class)->build($this->createAsset(), ['w' => 100]);
+
+        $this->get(str_replace('w=100', 'w=200', $url))->assertStatus(400);
+    }
+
+    #[Test]
     public function cache_true_without_cache_path_will_throw_exception()
     {
         $this->expectException(\Exception::class);
