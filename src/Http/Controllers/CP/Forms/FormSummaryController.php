@@ -59,9 +59,10 @@ class FormSummaryController extends CpController
     // The layout is sent encoded because a query string can't represent an empty insights list.
     private function decodeCharts(FilteredRequest $request): void
     {
-        if (is_string($charts = $request->input('charts'))) {
-            $request->merge(['charts' => json_decode(base64_decode($charts), true) ?? $charts]);
-        }
+        $charts = $request->input('charts');
+
+        // Like filters, anything that isn't an encoded layout is ignored.
+        $request->merge(['charts' => is_string($charts) ? json_decode(base64_decode($charts), true) : null]);
     }
 
     private function resolveCharts(FilteredRequest $request, $form): Collection

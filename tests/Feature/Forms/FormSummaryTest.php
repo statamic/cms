@@ -372,15 +372,27 @@ class FormSummaryTest extends TestCase
     }
 
     #[Test]
-    public function it_rejects_a_previewed_chart_layout_that_isnt_encoded()
+    #[DataProvider('unencodedChartLayoutProvider')]
+    public function it_ignores_a_previewed_chart_layout_that_isnt_encoded($query)
     {
         $form = $this->makeForm();
+        $form->charts([['field' => 'rating', 'chart' => 'horizontal_bar']])->save();
 
         $this
             ->actingAs($this->superUser())
-            ->getJson(cp_route('forms.submissions.summary', $form->handle()).'?charts=not-encoded')
-            ->assertUnprocessable()
-            ->assertJsonValidationErrors('charts');
+            ->getJson(cp_route('forms.submissions.summary', $form->handle()).'?'.$query)
+            ->assertOk()
+            ->assertJsonCount(1, 'fields')
+            ->assertJsonPath('fields.0.handle', 'rating')
+            ->assertJsonPath('fields.0.chart.handle', 'horizontal_bar');
+    }
+
+    public static function unencodedChartLayoutProvider()
+    {
+        return [
+            'plain array' => [http_build_query(['charts' => [['field' => 'color', 'chart' => 'pie']]])],
+            'not encoded' => ['charts=not-encoded'],
+        ];
     }
 
     public static function invalidChartLayoutProvider()
