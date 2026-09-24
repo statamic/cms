@@ -3,7 +3,6 @@
 namespace Statamic\Addons;
 
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Str;
 use Statamic\Addons\SettingsRepository as AbstractSettingsRepository;
 use Statamic\Contracts\Addons\Settings as AddonSettingsContract;
 use Statamic\Facades;
@@ -13,15 +12,17 @@ class FileSettingsRepository extends AbstractSettingsRepository
 {
     public function find(string $addon): ?AddonSettingsContract
     {
-        $slug = Str::after($addon, '/');
+        if (! $addon = Facades\Addon::get($addon)) {
+            return null;
+        }
 
-        $path = resource_path("addons/{$slug}.yaml");
+        $path = resource_path("addons/{$addon->slug()}.yaml");
 
         if (! File::exists($path)) {
             return null;
         }
 
-        return $this->makeFromPath($path);
+        return $this->make($addon, YAML::file($path)->parse());
     }
 
     public function save(AddonSettingsContract $settings): bool
@@ -38,15 +39,6 @@ class FileSettingsRepository extends AbstractSettingsRepository
         File::delete($settings->path());
 
         return true;
-    }
-
-    private function makeFromPath(string $path): AddonSettingsContract
-    {
-        $yaml = YAML::file($path)->parse();
-
-        $addon = Facades\Addon::all()->first(fn ($addon) => $addon->slug() === basename($path, '.yaml'));
-
-        return $this->make($addon, $yaml);
     }
 
     public static function bindings(): array

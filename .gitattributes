@@ -21,4 +21,5 @@ phpstan.dist.neon export-ignore
 phpunit.bat export-ignore
 phpunit.dist.xml export-ignore
 SECURITY.md export-ignore
+testbench.yaml export-ignore
 translator export-ignore

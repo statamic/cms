@@ -1,6 +1,6 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
 import {expect, fn, userEvent, waitFor, within} from 'storybook/test';
-import {Combobox} from '@ui';
+import {Combobox} from '@statamic/cms/ui';
 import {ref} from 'vue';
 import {icons} from "@/stories/icons";
 
@@ -114,7 +114,13 @@ export const _DocsIntro: Story = {
         components: { Combobox },
         setup() {
             const value = ref(null);
-            const options = defaultOptions;
+            const options = [
+                { label: 'The Midnight', value: 'the_midnight' },
+                { label: 'The 1975', value: 'the_1975' },
+                { label: 'Sunglasses Kid', value: 'sunglasses_kid' },
+                { label: 'FM-84', value: 'fm_84' },
+                { label: 'Timecop1983', value: 'timecop1983' },
+            ];
             return { value, options };
         },
         template: `
@@ -145,10 +151,24 @@ export const _Sizes: Story = {
     render: () => ({
         components: { Combobox },
         setup() {
-            const options = defaultOptions;
+            const options = [
+                { label: 'The Midnight', value: 'the_midnight' },
+                { label: 'The 1975', value: 'the_1975' },
+                { label: 'Sunglasses Kid', value: 'sunglasses_kid' },
+                { label: 'FM-84', value: 'fm_84' },
+                { label: 'Timecop1983', value: 'timecop1983' },
+            ];
             return { options };
         },
-        template: `<div class="flex flex-col gap-4">${sizesCode}</div>`,
+        template: `
+            <div class="flex flex-col gap-4">
+                <Combobox size="xs" placeholder="Extra Small" :options="options" />
+                <Combobox size="sm" placeholder="Small" :options="options" />
+                <Combobox size="base" placeholder="Base" :options="options" />
+                <Combobox size="lg" placeholder="Large" :options="options" />
+                <Combobox size="xl" placeholder="Extra Large" :options="options" />
+            </div>
+        `,
     }),
 };
 
@@ -169,10 +189,23 @@ export const _Variants: Story = {
     render: () => ({
         components: { Combobox },
         setup() {
-            const options = defaultOptions;
+            const options = [
+                { label: 'The Midnight', value: 'the_midnight' },
+                { label: 'The 1975', value: 'the_1975' },
+                { label: 'Sunglasses Kid', value: 'sunglasses_kid' },
+                { label: 'FM-84', value: 'fm_84' },
+                { label: 'Timecop1983', value: 'timecop1983' },
+            ];
             return { options };
         },
-        template: `<div class="flex flex-col gap-4">${variantsCode}</div>`,
+        template: `
+            <div class="flex flex-col gap-4">
+                <Combobox variant="default" placeholder="Default" :options="options" />
+                <Combobox variant="filled" placeholder="Filled" :options="options" />
+                <Combobox variant="ghost" placeholder="Ghost" :options="options" />
+                <Combobox variant="subtle" placeholder="Subtle" :options="options" />
+            </div>
+        `,
     }),
 };
 
@@ -191,7 +224,13 @@ export const _Clearable: Story = {
         components: { Combobox },
         setup() {
             const value = ref('the_midnight');
-            const options = defaultOptions;
+            const options = [
+                { label: 'The Midnight', value: 'the_midnight' },
+                { label: 'The 1975', value: 'the_1975' },
+                { label: 'Sunglasses Kid', value: 'sunglasses_kid' },
+                { label: 'FM-84', value: 'fm_84' },
+                { label: 'Timecop1983', value: 'timecop1983' },
+            ];
             return { value, options };
         },
         template: `
@@ -220,7 +259,13 @@ export const _Multiple: Story = {
         components: { Combobox },
         setup() {
             const value = ref(['the_midnight', 'fm_84']);
-            const options = defaultOptions;
+            const options = [
+                { label: 'The Midnight', value: 'the_midnight' },
+                { label: 'The 1975', value: 'the_1975' },
+                { label: 'Sunglasses Kid', value: 'sunglasses_kid' },
+                { label: 'FM-84', value: 'fm_84' },
+                { label: 'Timecop1983', value: 'timecop1983' },
+            ];
             return { value, options };
         },
         template: `
@@ -254,7 +299,13 @@ export const _MaxSelections: Story = {
         components: { Combobox },
         setup() {
             const value = ref(['the_midnight', 'fm_84']);
-            const options = defaultOptions;
+            const options = [
+                { label: 'The Midnight', value: 'the_midnight' },
+                { label: 'The 1975', value: 'the_1975' },
+                { label: 'Sunglasses Kid', value: 'sunglasses_kid' },
+                { label: 'FM-84', value: 'fm_84' },
+                { label: 'Timecop1983', value: 'timecop1983' },
+            ];
             return { value, options };
         },
         template: `
@@ -289,7 +340,13 @@ export const _Taggable: Story = {
         components: { Combobox },
         setup() {
             const value = ref(['the_midnight']);
-            const options = defaultOptions;
+            const options = [
+                { label: 'The Midnight', value: 'the_midnight' },
+                { label: 'The 1975', value: 'the_1975' },
+                { label: 'Sunglasses Kid', value: 'sunglasses_kid' },
+                { label: 'FM-84', value: 'fm_84' },
+                { label: 'Timecop1983', value: 'timecop1983' },
+            ];
             return { value, options };
         },
         template: `
@@ -319,7 +376,13 @@ export const _SearchDisabled: Story = {
         components: { Combobox },
         setup() {
             const value = ref(null);
-            const options = defaultOptions;
+            const options = [
+                { label: 'The Midnight', value: 'the_midnight' },
+                { label: 'The 1975', value: 'the_1975' },
+                { label: 'Sunglasses Kid', value: 'sunglasses_kid' },
+                { label: 'FM-84', value: 'fm_84' },
+                { label: 'Timecop1983', value: 'timecop1983' },
+            ];
             return { value, options };
         },
         template: `
@@ -356,14 +419,16 @@ export const _IgnoreFilter: Story = {
         components: { Combobox },
         setup() {
             const value = ref(null);
-            const allOptions = defaultOptions;
+            const allOptions = [
+                { label: 'The Midnight', value: 'the_midnight' },
+                { label: 'The 1975', value: 'the_1975' },
+                { label: 'Sunglasses Kid', value: 'sunglasses_kid' },
+                { label: 'FM-84', value: 'fm_84' },
+                { label: 'Timecop1983', value: 'timecop1983' },
+            ];
             const filteredOptions = ref([...allOptions]);
 
             const onSearch = (query: string) => {
-                if (!query) {
-                    filteredOptions.value = [...allOptions];
-                    return;
-                }
                 filteredOptions.value = allOptions.filter((opt) =>
                     opt.label.toLowerCase().includes(query.toLowerCase())
                 );
@@ -378,6 +443,50 @@ export const _IgnoreFilter: Story = {
                 placeholder="Server-side filtering..."
                 :options="filteredOptions"
                 @search="onSearch"
+            />
+        `,
+    }),
+};
+
+const searchKeysCode = `
+<Combobox
+    placeholder="Select author..."
+    :search-keys="['label', 'email']"
+    :options="[
+        { label: 'Tyler Lyle', email: 'workhorse92@example.com', value: 'tyler' },
+        { label: 'Tim McEwan', email: 'nightowl47@example.com', value: 'tim' },
+        { label: 'Nikki Flores', email: 'skyline08@example.com', value: 'nikki' },
+    ]"
+/>
+`;
+
+export const _SearchKeys: Story = {
+    tags: ['!dev'],
+    parameters: {
+        docs: {
+            source: { code: searchKeysCode },
+            description: {
+                story: 'By default, search only matches against `optionLabel`. Use `searchKeys` to also match against other keys on the option object — useful when an option has a value that isn\'t displayed but should still be searchable, such as an email address. Try searching "nightowl" below — it only appears in Tim McEwan\'s email, not his label.',
+            },
+        },
+    },
+    render: () => ({
+        components: { Combobox },
+        setup() {
+            const value = ref(null);
+            const options = [
+                { label: 'Tyler Lyle', email: 'workhorse92@example.com', value: 'tyler' },
+                { label: 'Tim McEwan', email: 'nightowl47@example.com', value: 'tim' },
+                { label: 'Nikki Flores', email: 'skyline08@example.com', value: 'nikki' },
+            ];
+            return { value, options };
+        },
+        template: `
+            <Combobox
+                v-model="value"
+                placeholder="Select author..."
+                :search-keys="['label', 'email']"
+                :options="options"
             />
         `,
     }),
@@ -727,6 +836,40 @@ export const TestCanSearchOptions: Story = {
     },
 };
 
+export const TestSearchKeysMatchesAdditionalFields: Story = {
+    tags: ['!dev', 'test'],
+    render: () => ({
+        components: { Combobox },
+        setup() {
+            const value = ref(null);
+            const options = [
+                { label: 'Tyler Lyle', email: 'workhorse92@example.com', value: 'tyler' },
+                { label: 'Tim McEwan', email: 'nightowl47@example.com', value: 'tim' },
+                { label: 'Nikki Flores', email: 'skyline08@example.com', value: 'nikki' },
+            ];
+            return { value, options };
+        },
+        template: `<Combobox v-model="value" :options="options" :search-keys="['label', 'email']" placeholder="Select..." />`,
+    }),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const trigger = canvas.getByRole('combobox');
+
+        await userEvent.click(trigger);
+
+        const input = document.querySelector('input[type="search"]') as HTMLInputElement;
+
+        // "nightowl" only appears in Tim McEwan's email, not in any label.
+        await userEvent.type(input, 'nightowl');
+
+        await new Promise((r) => setTimeout(r, 100));
+
+        const options = document.querySelectorAll('[data-ui-combobox-item]');
+        expect(options.length).toBe(1);
+        expect(options[0].getAttribute('data-ui-combobox-item')).toBe('tim');
+    },
+};
+
 export const TestSearchDisabledWhenNotSearchable: Story = {
     tags: ['!dev', 'test'],
     render: () => ({
@@ -796,6 +939,205 @@ export const TestTaggableCanAddOptions: Story = {
 
         await expect(args['onUpdate:modelValue']).toHaveBeenCalled();
         expect(args.onAdded).toHaveBeenCalledWith('new-tag');
+    },
+};
+
+export const TestTaggableCommitsOnBlur: Story = {
+    tags: ['!dev', 'test'],
+    args: {
+        'onUpdate:modelValue': fn(),
+    },
+    render: (args) => ({
+        components: { Combobox },
+        setup() {
+            const value = ref<string[]>([]);
+            return { value, options: defaultOptions, onUpdate: args['onUpdate:modelValue'] };
+        },
+        template: `<Combobox v-model="value" :options="options" multiple taggable placeholder="Add tags..." @update:modelValue="onUpdate" />`,
+    }),
+    play: async ({ canvasElement, args }) => {
+        const canvas = within(canvasElement);
+        const trigger = canvas.getByRole('combobox');
+
+        await userEvent.click(trigger);
+
+        const input = document.querySelector('input[type="search"]') as HTMLInputElement;
+        await userEvent.click(input);
+        await userEvent.type(input, 'new-tag');
+        input.blur();
+
+        await waitFor(() => expect(args['onUpdate:modelValue']).toHaveBeenCalledWith(['new-tag']));
+    },
+};
+
+export const TestTaggablePasteSplitsIntoTags: Story = {
+    tags: ['!dev', 'test'],
+    args: {
+        'onUpdate:modelValue': fn(),
+    },
+    render: (args) => ({
+        components: { Combobox },
+        setup() {
+            const value = ref<string[]>([]);
+            return { value, options: defaultOptions, onUpdate: args['onUpdate:modelValue'] };
+        },
+        template: `<Combobox v-model="value" :options="options" multiple taggable placeholder="Add tags..." @update:modelValue="onUpdate" />`,
+    }),
+    play: async ({ canvasElement, args }) => {
+        const canvas = within(canvasElement);
+        const trigger = canvas.getByRole('combobox');
+
+        await userEvent.click(trigger);
+
+        const input = document.querySelector('input[type="search"]') as HTMLInputElement;
+        await userEvent.click(input);
+        await userEvent.paste('one, two');
+
+        await waitFor(() => expect(args['onUpdate:modelValue']).toHaveBeenCalledWith(['one', 'two']));
+    },
+};
+
+export const TestTaggableSingleCanAddOption: Story = {
+    tags: ['!dev', 'test'],
+    args: {
+        'onUpdate:modelValue': fn(),
+        onAdded: fn(),
+    },
+    render: (args) => ({
+        components: { Combobox },
+        setup() {
+            const value = ref<string | null>(null);
+            return { value, options: defaultOptions, onUpdate: args['onUpdate:modelValue'], onAdded: args.onAdded };
+        },
+        template: `<Combobox v-model="value" :options="options" taggable placeholder="Add a tag..." @update:modelValue="onUpdate" @added="onAdded" />`,
+    }),
+    play: async ({ canvasElement, args }) => {
+        const canvas = within(canvasElement);
+        const trigger = canvas.getByRole('combobox');
+
+        await userEvent.click(trigger);
+
+        const input = document.querySelector('input[type="search"]') as HTMLInputElement;
+        await userEvent.click(input);
+        await userEvent.type(input, 'new-tag');
+        await userEvent.keyboard('{Enter}');
+
+        await expect(args['onUpdate:modelValue']).toHaveBeenCalledWith('new-tag');
+        expect(args.onAdded).toHaveBeenCalledWith('new-tag');
+
+        await waitFor(() => expect(document.querySelector('[data-ui-combobox-content]')).toBeFalsy());
+    },
+};
+
+export const TestTaggableSingleCommitsOnBlur: Story = {
+    tags: ['!dev', 'test'],
+    args: {
+        'onUpdate:modelValue': fn(),
+    },
+    render: (args) => ({
+        components: { Combobox },
+        setup() {
+            const value = ref<string | null>(null);
+            return { value, options: defaultOptions, onUpdate: args['onUpdate:modelValue'] };
+        },
+        template: `<Combobox v-model="value" :options="options" taggable placeholder="Add a tag..." @update:modelValue="onUpdate" />`,
+    }),
+    play: async ({ canvasElement, args }) => {
+        const canvas = within(canvasElement);
+        const trigger = canvas.getByRole('combobox');
+
+        await userEvent.click(trigger);
+
+        const input = document.querySelector('input[type="search"]') as HTMLInputElement;
+        await userEvent.click(input);
+        await userEvent.type(input, 'new-tag');
+        input.blur();
+
+        await waitFor(() => expect(args['onUpdate:modelValue']).toHaveBeenCalledWith('new-tag'));
+    },
+};
+
+export const TestTaggableSingleIgnoresDuplicateValue: Story = {
+    tags: ['!dev', 'test'],
+    args: {
+        onAdded: fn(),
+    },
+    render: (args) => ({
+        components: { Combobox },
+        setup() {
+            const value = ref('existing-tag');
+            return { value, options: defaultOptions, onAdded: args.onAdded };
+        },
+        template: `<Combobox v-model="value" :options="options" taggable placeholder="Add a tag..." @added="onAdded" />`,
+    }),
+    play: async ({ canvasElement, args }) => {
+        const canvas = within(canvasElement);
+        const trigger = canvas.getByRole('combobox');
+
+        await userEvent.click(trigger);
+
+        const input = document.querySelector('input[type="search"]') as HTMLInputElement;
+        await userEvent.click(input);
+        await userEvent.type(input, 'existing-tag');
+        await userEvent.keyboard('{Enter}');
+
+        expect(args.onAdded).not.toHaveBeenCalled();
+        await waitFor(() => expect(input.value).toBe(''));
+    },
+};
+
+export const TestTaggableSingleAllowsValueContainedInCurrentValue: Story = {
+    tags: ['!dev', 'test'],
+    args: {
+        'onUpdate:modelValue': fn(),
+    },
+    render: (args) => ({
+        components: { Combobox },
+        setup() {
+            const value = ref('abc');
+            return { value, options: defaultOptions, onUpdate: args['onUpdate:modelValue'] };
+        },
+        template: `<Combobox v-model="value" :options="options" taggable placeholder="Add a tag..." @update:modelValue="onUpdate" />`,
+    }),
+    play: async ({ canvasElement, args }) => {
+        const canvas = within(canvasElement);
+        const trigger = canvas.getByRole('combobox');
+
+        await userEvent.click(trigger);
+
+        const input = document.querySelector('input[type="search"]') as HTMLInputElement;
+        await userEvent.click(input);
+        await userEvent.type(input, 'b');
+        await userEvent.keyboard('{Enter}');
+
+        await expect(args['onUpdate:modelValue']).toHaveBeenCalledWith('b');
+    },
+};
+
+export const TestTaggableSinglePasteDoesNotCommitTags: Story = {
+    tags: ['!dev', 'test'],
+    args: {
+        'onUpdate:modelValue': fn(),
+    },
+    render: (args) => ({
+        components: { Combobox },
+        setup() {
+            const value = ref<string | null>(null);
+            return { value, options: defaultOptions, onUpdate: args['onUpdate:modelValue'] };
+        },
+        template: `<Combobox v-model="value" :options="options" taggable placeholder="Add a tag..." @update:modelValue="onUpdate" />`,
+    }),
+    play: async ({ canvasElement, args }) => {
+        const canvas = within(canvasElement);
+        const trigger = canvas.getByRole('combobox');
+
+        await userEvent.click(trigger);
+
+        const input = document.querySelector('input[type="search"]') as HTMLInputElement;
+        await userEvent.click(input);
+        await userEvent.paste('one, two');
+
+        expect(args['onUpdate:modelValue']).not.toHaveBeenCalled();
     },
 };
 
@@ -1008,5 +1350,42 @@ export const TestShouldOpenDropdownDoesNotBlockClose: Story = {
         await new Promise((r) => setTimeout(r, 100));
 
         await expect(document.querySelector('[data-ui-combobox-content]')).toBeFalsy();
+    },
+};
+
+const falsyValueOptions = [
+    { label: 'Day(s)', value: 3 },
+    { label: 'Week(s)', value: 2 },
+    { label: 'Month(s)', value: 1 },
+    { label: 'Year(s)', value: 0 },
+];
+
+export const TestFalsyModelValue: Story = {
+    tags: ['!dev', 'test'],
+    render: () => ({
+        components: { Combobox },
+        setup() {
+            const value = ref(0);
+            return { value, options: falsyValueOptions };
+        },
+        template: `<Combobox v-model="value" :options="options" clearable placeholder="Select..." />`,
+    }),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+
+        // A falsy modelValue (0) should still show its label, not the placeholder
+        const selectedOption = canvasElement.querySelector('[data-ui-combobox-selected-option]');
+        await expect(selectedOption).toBeTruthy();
+        expect(selectedOption?.textContent).toBe('Year(s)');
+
+        // The clear button should be visible for a falsy but non-null selection
+        const clearButton = canvas.getByRole('button', { name: /clear/i });
+        await expect(clearButton).toBeTruthy();
+
+        // Clearing should reset to the placeholder
+        await userEvent.click(clearButton);
+        await waitFor(() => {
+            expect(canvas.getByPlaceholderText('Select...')).toBeTruthy();
+        });
     },
 };

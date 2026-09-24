@@ -1,0 +1,44 @@
+# Everything the test suite is known to write into the testbench skeleton
+# (vendor/orchestra/testbench-core/laravel). Tests/TestCase clears these once per
+# process before snapshotting the skeleton, so a suite run never inherits leftovers
+# from a previous one. It's also what `vendor/bin/testbench package:purge-skeleton`
+# removes.
+purge:
+    directories:
+        - addons
+        - app/Actions
+        - app/Dictionaries
+        - app/Fieldtypes
+        - app/Modifiers
+        - app/Scopes
+        - app/Tags
+        - app/Widgets
+        - config/statamic
+        - public/diskimgroot
+        - public/glide
+        - public/imgcache
+        - public/static
+        - public/testimages
+        - public/vendor
+        - resources/addons
+        - resources/blueprints
+        - resources/content
+        - resources/css
+        - resources/dictionaries
+        - resources/fieldsets
+        - resources/forms
+        - resources/js
+        - resources/users
+        - storage/framework/testing/disks
+        - storage/statamic
+    files:
+        - app/Providers/AppServiceProvider.php
+        - composer.json.bak
+        - composer.lock
+        - package.json
+        - public/*.jpg
+        - resources/*.svg
+        - resources/preferences.yaml
+        - resources/sites.yaml
+        - storage/logs/*.log
+        - vite-cp.config.js

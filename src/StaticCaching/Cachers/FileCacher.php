@@ -2,6 +2,7 @@
 
 namespace Statamic\StaticCaching\Cachers;
 
+use Closure;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -279,7 +280,12 @@ class FileCacher extends AbstractCacher
             window.livewireScriptConfig.csrf = data.csrf;
         } else {
             // Delays replacing the token until Livewire is initialized. Usually on slow networks.
-            document.addEventListener('livewire:init', () => window.livewireScriptConfig.csrf = data.csrf);
+            // Only applies when Livewire is bundled manually, as livewireScriptConfig doesn't exist otherwise.
+            document.addEventListener('livewire:init', () => {
+                if (window.livewireScriptConfig) {
+                    window.livewireScriptConfig.csrf = data.csrf;
+                }
+            });
         }
 
         document.dispatchEvent(new CustomEvent('statamic:csrf.replaced', { detail: data }));
@@ -344,6 +350,23 @@ EOT;
 EOT;
 
         return $this->nocacheJs ?? $default;
+    }
+
+    public function getCsrfScript(): string
+    {
+        return $this->script('statamic.csrf.js', fn () => $this->getCsrfTokenJs());
+    }
+
+    public function getNocacheScript(): string
+    {
+        return $this->script('statamic.nocache.js', fn () => $this->getNocacheJs());
+    }
+
+    private function script(string $route, Closure $js): string
+    {
+        return config('statamic.static_caching.script_delivery') === 'external'
+            ? '<script src="'.URL::makeRelative(route($route)).'"></script>'
+            : '<script>'.$js().'</script>';
     }
 
     public function shouldOutputJs(): bool

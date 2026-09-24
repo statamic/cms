@@ -12,6 +12,7 @@ use Statamic\Http\Controllers\CP\Assets\AssetContainerBlueprintController;
 use Statamic\Http\Controllers\CP\Assets\AssetContainersController;
 use Statamic\Http\Controllers\CP\Assets\AssetsController;
 use Statamic\Http\Controllers\CP\Assets\BrowserController;
+use Statamic\Http\Controllers\CP\Assets\ContainerActionController;
 use Statamic\Http\Controllers\CP\Assets\FieldtypeController;
 use Statamic\Http\Controllers\CP\Assets\FolderActionController;
 use Statamic\Http\Controllers\CP\Assets\FoldersController;
@@ -40,6 +41,7 @@ use Statamic\Http\Controllers\CP\Collections\EntriesController;
 use Statamic\Http\Controllers\CP\Collections\EntryActionController;
 use Statamic\Http\Controllers\CP\Collections\EntryPreviewController;
 use Statamic\Http\Controllers\CP\Collections\EntryRevisionsController;
+use Statamic\Http\Controllers\CP\Collections\EntryTitleFormatController;
 use Statamic\Http\Controllers\CP\Collections\LocalizeEntryController;
 use Statamic\Http\Controllers\CP\Collections\PublishedEntriesController;
 use Statamic\Http\Controllers\CP\Collections\ReorderCollectionBlueprintsController;
@@ -188,6 +190,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::post('actions/list', [EntryActionController::class, 'bulkActions'])->name('collections.entries.actions.bulk');
         Route::get('create/{site}', [EntriesController::class, 'create'])->name('collections.entries.create');
         Route::post('create/{site}/preview', [EntryPreviewController::class, 'create'])->name('collections.entries.preview.create');
+        Route::post('create/{site}/title-format', [EntryTitleFormatController::class, 'create'])->name('collections.entries.title-format.create');
         Route::post('reorder', ReorderEntriesController::class)->name('collections.entries.reorder');
         Route::post('{site}', [EntriesController::class, 'store'])->name('collections.entries.store');
 
@@ -209,6 +212,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
             Route::post('restore-revision', RestoreEntryRevisionController::class)->name('collections.entries.restore-revision');
             Route::post('preview', [EntryPreviewController::class, 'edit'])->name('collections.entries.preview.edit');
             Route::get('preview', [EntryPreviewController::class, 'show'])->name('collections.entries.preview.popout');
+            Route::post('title-format', [EntryTitleFormatController::class, 'edit'])->name('collections.entries.title-format.edit');
             Route::patch('/', [EntriesController::class, 'update'])->name('collections.entries.update');
             Route::get('{slug}', fn ($collection, $entry, $slug) => redirect($entry->editUrl()));
         });
@@ -247,6 +251,8 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::patch('globals/{global_set}/variables', [GlobalVariablesController::class, 'update'])->name('globals.variables.update');
 
     Route::resource('asset-containers', AssetContainersController::class)->except('index');
+    Route::post('asset-containers/actions', [ContainerActionController::class, 'run'])->name('asset-containers.actions.run');
+    Route::post('asset-containers/actions/list', [ContainerActionController::class, 'bulkActions'])->name('asset-containers.actions.bulk');
     Route::post('asset-containers/{asset_container}/folders', [FoldersController::class, 'store']);
     Route::post('assets/actions', [AssetActionController::class, 'run'])->name('assets.actions.run');
     Route::post('assets/actions/list', [AssetActionController::class, 'bulkActions'])->name('assets.actions.bulk');
@@ -452,10 +458,13 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
 
     if (config('statamic.users.elevated_sessions_enabled')) {
         Route::get('auth/confirm-password', [ElevatedSessionController::class, 'showForm'])->name('confirm-password');
-        Route::get('elevated-session', [ElevatedSessionController::class, 'status'])->name('elevated-session.status');
-        Route::get('elevated-session/passkey-options', [ElevatedSessionController::class, 'options'])->name('elevated-session.passkey-options')->middleware('throttle:statamic.cp.passkeys');
-        Route::post('elevated-session', [ElevatedSessionController::class, 'confirm'])->name('elevated-session.confirm')->middleware('throttle:statamic.cp.auth');
-        Route::get('elevated-session/resend-code', [ElevatedSessionController::class, 'resendCode'])->name('elevated-session.resend-code')->middleware('throttle:send-elevated-session-code');
+
+        Route::withoutMiddleware(RedirectIfTwoFactorSetupIncomplete::class)->group(function () {
+            Route::get('elevated-session', [ElevatedSessionController::class, 'status'])->name('elevated-session.status');
+            Route::get('elevated-session/passkey-options', [ElevatedSessionController::class, 'options'])->name('elevated-session.passkey-options')->middleware('throttle:statamic.cp.passkeys');
+            Route::post('elevated-session', [ElevatedSessionController::class, 'confirm'])->name('elevated-session.confirm')->middleware('throttle:statamic.cp.auth');
+            Route::get('elevated-session/resend-code', [ElevatedSessionController::class, 'resendCode'])->name('elevated-session.resend-code')->middleware('throttle:send-elevated-session-code');
+        });
     }
 
     Route::get('playground', PlaygroundController::class)->name('playground');

@@ -3,6 +3,8 @@
 namespace Statamic\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use League\Flysystem\PathTraversalDetected;
 use League\Flysystem\UnableToReadFile;
 use League\Glide\Server;
 use League\Glide\Signatures\SignatureException;
@@ -12,6 +14,7 @@ use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Config;
+use Statamic\Facades\Glide;
 use Statamic\Facades\Site;
 use Statamic\Imaging\ImageGenerator;
 use Statamic\Support\Str;
@@ -51,6 +54,10 @@ class GlideController extends Controller
      */
     public function generateByPath($path)
     {
+        if (Glide::isUsingHybridCaching()) {
+            return $this->generateOnDemand($path);
+        }
+
         $this->validateSignature();
 
         // If the auto crop setting is enabled, we will attempt to resolve an asset from the
@@ -80,9 +87,76 @@ class GlideController extends Controller
     }
 
     /**
+     * Generate an on-demand image for the hybrid caching strategy.
+     *
+     * The URL path is the predicted cache path. A mapping stored in the
+     * Glide cache store links it back to the source and manipulation params.
+     */
+    private function generateOnDemand(string $path)
+    {
+        if ($this->existsInCache($path)) {
+            $this->warnAboutServingThroughPhp($path);
+
+            return $this->createResponse($path);
+        }
+
+        $mapping = Glide::cacheStore()->get('hybrid::'.$path);
+
+        throw_unless($mapping, new NotFoundHttpException);
+
+        $type = $mapping['type'];
+        $params = $mapping['params'];
+
+        $item = match ($type) {
+            'asset' => Asset::find($mapping['id']) ?? throw new NotFoundHttpException,
+            'url' => $mapping['url'],
+            'path' => $mapping['path'],
+        };
+
+        return $this->createResponse($this->ensureGenerated($type, $item, $params));
+    }
+
+    private function existsInCache(string $path): bool
+    {
+        try {
+            return Glide::cacheDisk()->exists($path);
+        } catch (PathTraversalDetected $e) {
+            throw new NotFoundHttpException;
+        }
+    }
+
+    /**
+     * The image already exists, so the web server should have served it without
+     * involving PHP. Warn once, since otherwise this fires on every request
+     * for every image, which is the situation we're complaining about.
+     */
+    private function warnAboutServingThroughPhp(string $path): void
+    {
+        if (! Glide::cacheStore()->add('hybrid-served-through-php-warning', true)) {
+            return;
+        }
+
+        Log::warning('Glide hybrid caching: ['.$path.'] already exists but was still served by PHP. Check that the image_manipulation.cache_path is inside your public directory and reachable at the image_manipulation.route.');
+    }
+
+    /**
+     * Forget any stale cache store entry, then generate the image.
+     *
+     * In hybrid mode, the file on disk is the source of truth.
+     * If we're here, the file doesn't exist, so the cache store
+     * entry (if any) is stale and should be cleared first.
+     */
+    private function ensureGenerated(string $type, $item, array $params)
+    {
+        Glide::cacheStore()->forget(ImageGenerator::manipulationCacheKey($type, $item, $params));
+
+        return $this->generateBy($type, $item, $params);
+    }
+
+    /**
      * Generate a manipulated image by an asset reference.
      *
-     * @param  string  $ref
+     * @param  string  $encoded
      * @return mixed
      *
      * @throws \Exception
@@ -108,12 +182,12 @@ class GlideController extends Controller
      *
      * @return mixed
      */
-    private function generateBy($type, $item)
+    private function generateBy($type, $item, ?array $params = null)
     {
         $method = 'generateBy'.ucfirst($type);
 
         try {
-            return $this->generator->$method($item, $this->request->all());
+            return $this->generator->$method($item, $params ?? $this->request->all());
         } catch (InvalidRemoteUrlException $e) {
             abort(400, $e->getMessage());
         } catch (UnableToReadFile $e) {

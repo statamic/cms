@@ -37,20 +37,16 @@ class StacheDoctor extends Command
         });
 
         if ($missing->isEmpty()) {
-            $this->checkLine('No unconfigured indexes.');
+            $this->components->info('No unconfigured indexes.');
             $this->output->text('Indexes are created on demand through regular site usage.');
             $this->output->text('You could consider trying again after browsing your site.');
 
             return;
         }
 
-        if (! $this->hasDuplicateIds) {
-            $this->output->newLine();
-        }
-
         $missing->each(function ($item, $key) {
-            $this->line("<fg=red>[✗]</> Unconfigured indexes in <comment>{$key}</comment>");
-            $this->output->listing($item->all());
+            $this->components->warn("Unconfigured indexes in [{$key}]:");
+            $this->components->bulletList($item->all());
         });
     }
 
@@ -73,7 +69,7 @@ class StacheDoctor extends Command
         $this->hasDuplicateIds = $duplicates->isNotEmpty();
 
         if (! $this->hasDuplicateIds) {
-            $this->checkLine('No duplicate IDs detected.');
+            $this->components->success('No duplicate IDs detected.');
 
             return;
         }
@@ -81,7 +77,7 @@ class StacheDoctor extends Command
         $duplicates->flatMap(function ($duplicates) {
             return $duplicates;
         })->each(function ($paths, $id) {
-            $this->line("<fg=red>[✗]</> Duplicate ID <comment>$id</comment>");
+            $this->components->error("Duplicate ID [{$id}]:");
 
             $this->output->listing(collect($paths)->map(function ($path) {
                 return Str::after($path, base_path().'/');

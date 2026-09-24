@@ -18,7 +18,7 @@ const problemBadgeColor = computed(() => {
 <template>
     <Badge v-if="licensing.valid" :text="__('Pro')" size="sm" class="bg-white/15!" />
 
-    <Badge v-else :color="problemBadgeColor" class="max-[500px]:hidden" foo="bar" v-tooltip="licensing.requestFailureMessage">
+    <Badge v-else :color="problemBadgeColor" class="max-[500px]:hidden" v-tooltip="licensing.requestFailureMessage">
         {{ __('Pro') }} – {{ licensing.isOnPublicDomain ? __('statamic::messages.licensing_error_unlicensed') : __('Trial Mode') }}
     </Badge>
 </template>

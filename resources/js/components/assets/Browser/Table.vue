@@ -27,7 +27,7 @@
                             <a class="group flex cursor-pointer items-center" @click="selectFolder(folder.path)">
                                 <file-icon
                                     extension="folder"
-                                    class="me-2 inline-block size-8 text-blue-400/90 group-hover:text-blue-400"
+                                    class="me-2 inline-block size-8 shrink-0 text-blue-400/90 group-hover:text-blue-400"
                                 />
                                 {{ folder.basename }}
                             </a>
@@ -63,14 +63,14 @@
                         <a class="group flex cursor-pointer items-center">
                             <file-icon
                                 extension="folder"
-                                class="me-2 inline-block size-8 text-blue-400/90 group-hover:text-blue-400
+                                class="me-2 inline-block size-8 shrink-0 text-blue-400/90 group-hover:text-blue-400
                                 dark:text-blue-400/90 dark:group-hover:text-blue-400"
                             />
                             <Editable
                                 ref="newFolderInput"
                                 v-model:modelValue="newFolderName"
                                 :start-with-edit-mode="true"
-                                submit-mode="enter"
+                                submit-mode="both"
                                 :placeholder="__('Name')"
                                 :class="[
                                     'placeholder:lowercase',
@@ -99,6 +99,7 @@
                 >
                     <asset-thumbnail
                         :asset="asset"
+                        alt=""
                         :square="true"
                         class="size-8 cursor-pointer"
                         @click.native.stop="$emit('edit-asset', asset)"

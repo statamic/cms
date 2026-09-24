@@ -36,6 +36,7 @@
                         class="sortable-item cursor-grab active:cursor-grabbing"
                     >
                         <Badge size="lg" color="white">
+                            <Icon v-if="option.icon" :name="option.icon" />
                             <div v-if="labelHtml" v-html="getOptionLabel(option)"></div>
                             <div v-else>{{ __(getOptionLabel(option)) }}</div>
 
@@ -65,7 +66,7 @@ import Fieldtype from './Fieldtype.vue';
 import HasInputOptions from './HasInputOptions.js';
 import { SortableList } from '../sortable/Sortable';
 import debounce from '@/util/debounce.js';
-import { Badge, Combobox } from '@/components/ui';
+import { Badge, Combobox, Icon } from '@/components/ui';
 
 export default {
     mixins: [Fieldtype, HasInputOptions],
@@ -73,6 +74,7 @@ export default {
     components: {
         Badge,
         Combobox,
+        Icon,
         SortableList,
     },
 
@@ -119,6 +121,7 @@ export default {
                     label: DOMPurify.sanitize(option.label, {
                         USE_PROFILES: { html: true, svg: true },
                     }),
+                    ...(option.icon ? { icon: option.icon } : {}),
                     invalid: option.invalid
                 };
             });

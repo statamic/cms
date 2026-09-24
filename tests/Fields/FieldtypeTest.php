@@ -313,6 +313,229 @@ class FieldtypeTest extends TestCase
     }
 
     #[Test]
+    public function it_appends_config_sections_to_linear_fieldtypes()
+    {
+        $fieldtype = new class extends Fieldtype
+        {
+            protected $configFields = [
+                'foo' => ['type' => 'textarea'],
+                'max_items' => ['type' => 'integer'],
+            ];
+        };
+
+        $fieldtype::appendConfigFields([
+            [
+                'display' => 'Extra section',
+                'fields' => [
+                    'more_options' => ['type' => 'array'],
+                    'extra_html_class' => ['type' => 'textarea'],
+                ],
+            ],
+        ]);
+
+        $this->assertEquals([
+            [
+                'fields' => [
+                    ['handle' => 'foo', 'field' => ['type' => 'textarea']],
+                    ['handle' => 'max_items', 'field' => ['type' => 'integer']],
+                ],
+            ],
+            [
+                'display' => 'Extra section',
+                'fields' => [
+                    ['handle' => 'more_options', 'field' => ['type' => 'array']],
+                    ['handle' => 'extra_html_class', 'field' => ['type' => 'textarea']],
+                ],
+            ],
+        ], $fieldtype->configBlueprint()->contents()['tabs']['main']['sections']);
+
+        $this->assertEquals([
+            'foo' => 'textarea',
+            'max_items' => 'integer',
+            'more_options' => 'array',
+            'extra_html_class' => 'textarea',
+        ], $fieldtype->configFields()->all()->map(fn ($field) => $field->type())->all());
+    }
+
+    #[Test]
+    public function it_appends_multiple_config_sections()
+    {
+        $fieldtype = new class extends Fieldtype
+        {
+            protected $configFields = [
+                'foo' => ['type' => 'textarea'],
+                'max_items' => ['type' => 'integer'],
+            ];
+        };
+
+        $fieldtype::appendConfigFields([
+            [
+                'display' => 'Extra section',
+                'fields' => [
+                    'more_options' => ['type' => 'array'],
+                ],
+            ],
+            [
+                'display' => 'New extra section',
+                'fields' => [
+                    'extra_html_class' => ['type' => 'textarea'],
+                ],
+            ],
+        ]);
+
+        $this->assertEquals([
+            [
+                'fields' => [
+                    ['handle' => 'foo', 'field' => ['type' => 'textarea']],
+                    ['handle' => 'max_items', 'field' => ['type' => 'integer']],
+                ],
+            ],
+            [
+                'display' => 'Extra section',
+                'fields' => [
+                    ['handle' => 'more_options', 'field' => ['type' => 'array']],
+                ],
+            ],
+            [
+                'display' => 'New extra section',
+                'fields' => [
+                    ['handle' => 'extra_html_class', 'field' => ['type' => 'textarea']],
+                ],
+            ],
+        ], $fieldtype->configBlueprint()->contents()['tabs']['main']['sections']);
+
+        $this->assertEquals([
+            'foo' => 'textarea',
+            'max_items' => 'integer',
+            'more_options' => 'array',
+            'extra_html_class' => 'textarea',
+        ], $fieldtype->configFields()->all()->map(fn ($field) => $field->type())->all());
+    }
+
+    #[Test]
+    public function it_appends_config_sections_to_sectioned_fieldtypes()
+    {
+        $fieldtype = new class extends Fieldtype
+        {
+            protected $configFields = [
+                [
+                    'display' => 'Main',
+                    'fields' => [
+                        'foo' => ['type' => 'textarea'],
+                    ],
+                ],
+                [
+                    'display' => 'More',
+                    'fields' => [
+                        'max_items' => ['type' => 'integer'],
+                    ],
+                ],
+            ];
+        };
+
+        $fieldtype::appendConfigFields([
+            [
+                'display' => 'Extra section',
+                'fields' => [
+                    'more_options' => ['type' => 'array'],
+                ],
+            ],
+        ]);
+
+        $this->assertEquals([
+            [
+                'display' => 'Main',
+                'fields' => [
+                    ['handle' => 'foo', 'field' => ['type' => 'textarea']],
+                ],
+            ],
+            [
+                'display' => 'More',
+                'fields' => [
+                    ['handle' => 'max_items', 'field' => ['type' => 'integer']],
+                ],
+            ],
+            [
+                'display' => 'Extra section',
+                'fields' => [
+                    ['handle' => 'more_options', 'field' => ['type' => 'array']],
+                ],
+            ],
+        ], $fieldtype->configBlueprint()->contents()['tabs']['main']['sections']);
+    }
+
+    #[Test]
+    public function it_appends_fields_and_sections_together()
+    {
+        $fieldtype = new class extends Fieldtype
+        {
+            protected $configFields = [
+                'foo' => ['type' => 'textarea'],
+            ];
+        };
+
+        $fieldtype::appendConfigFields([
+            'group' => ['type' => 'text'],
+            [
+                'display' => 'Extra section',
+                'fields' => [
+                    'more_options' => ['type' => 'array'],
+                ],
+            ],
+        ]);
+
+        $this->assertEquals([
+            [
+                'fields' => [
+                    ['handle' => 'foo', 'field' => ['type' => 'textarea']],
+                    ['handle' => 'group', 'field' => ['type' => 'text']],
+                ],
+            ],
+            [
+                'display' => 'Extra section',
+                'fields' => [
+                    ['handle' => 'more_options', 'field' => ['type' => 'array']],
+                ],
+            ],
+        ], $fieldtype->configBlueprint()->contents()['tabs']['main']['sections']);
+    }
+
+    #[Test]
+    public function appending_a_grid_config_field_is_not_treated_as_a_section()
+    {
+        $grid = [
+            'type' => 'grid',
+            'display' => 'Columns',
+            'fields' => [
+                ['handle' => 'label', 'field' => ['type' => 'text']],
+            ],
+        ];
+
+        $fieldtype = new class extends Fieldtype
+        {
+            protected $configFields = [
+                'foo' => ['type' => 'textarea'],
+            ];
+        };
+
+        $fieldtype::appendConfigFields([
+            'columns' => $grid,
+        ]);
+
+        $this->assertEquals([
+            [
+                'fields' => [
+                    ['handle' => 'foo', 'field' => ['type' => 'textarea']],
+                    ['handle' => 'columns', 'field' => $grid],
+                ],
+            ],
+        ], $fieldtype->configBlueprint()->contents()['tabs']['main']['sections']);
+
+        $this->assertEquals('grid', $fieldtype->configFields()->get('columns')->type());
+        $this->assertNull($fieldtype->configFields()->get('label'));
+    }
+
+    #[Test]
     public function it_wont_override_previously_appended_config_fields()
     {
         TestAppendConfigFields::appendConfigFields([

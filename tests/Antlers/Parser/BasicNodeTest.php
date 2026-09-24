@@ -12,6 +12,7 @@ use Statamic\View\Antlers\Language\Nodes\Operators\LogicalOrOperator;
 use Statamic\View\Antlers\Language\Nodes\Paths\PathNode;
 use Statamic\View\Antlers\Language\Nodes\Paths\VariableReference;
 use Statamic\View\Antlers\Language\Nodes\Structures\LogicGroup;
+use Statamic\View\Antlers\Language\Nodes\Structures\PhpExecutionNode;
 use Statamic\View\Antlers\Language\Nodes\Structures\SemanticGroup;
 use Statamic\View\Antlers\Language\Nodes\VariableNode;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
@@ -29,6 +30,69 @@ class BasicNodeTest extends ParserTestCase
         $this->assertInstanceOf(LiteralNode::class, $nodes[1]);
         $this->assertInstanceOf(AntlersNode::class, $nodes[2]);
         $this->assertInstanceOf(LiteralNode::class, $nodes[3]);
+    }
+
+    public function test_interpolations_after_a_directive_skip_the_directive_node()
+    {
+        $nodes = $this->parseNodes("@props(['a' => 1])\n{{ tag x=\"{{ y }}\" }}");
+
+        $regions = array_values($nodes[2]->processedInterpolationRegions);
+        $this->assertCount(1, $regions[0]);
+        $first = $regions[0][0];
+        $this->assertInstanceOf(AntlersNode::class, $first);
+        $this->assertSame('int_c', $first->content);
+        $this->assertSame(27, $first->startPosition->offset);
+        $this->assertSame(2, $first->startPosition->line);
+        $this->assertSame(9, $first->startPosition->char);
+
+        $inner = array_values($first->processedInterpolationRegions)[0][0];
+        $this->assertSame(' y ', $inner->content);
+        $this->assertSame(27, $inner->startPosition->offset);
+    }
+
+    public function test_php_nodes_inside_interpolations_are_kept()
+    {
+        $nodes = $this->parseNodes('<div>{{ tag value="{{$ \'hi\' $}}" }}</div>');
+
+        $outer = array_values($nodes[1]->processedInterpolationRegions)[0][0];
+        $php = array_values($outer->processedInterpolationRegions)[0][0];
+
+        $this->assertInstanceOf(PhpExecutionNode::class, $php);
+        $this->assertSame(" 'hi' ", $php->content);
+        $this->assertTrue($php->isEchoNode);
+    }
+
+    public function test_multibyte_literals_keep_character_based_region_boundaries_and_lines()
+    {
+        $nodes = $this->parseNodes("caf\u{00E9}\n\u{65E5}\u{672C} {{ first }}\n\u{1F389} {{ second }} tail");
+
+        $this->assertSame("caf\u{00E9}\n\u{65E5}\u{672C} ", $nodes[0]->content);
+        $this->assertSame(' first ', $nodes[1]->content);
+        $this->assertSame("\n\u{1F389} ", $nodes[2]->content);
+        $this->assertSame(' second ', $nodes[3]->content);
+        $this->assertSame(' tail', $nodes[4]->content);
+
+        $this->assertSame(8, $nodes[1]->startPosition->offset);
+        $this->assertSame(2, $nodes[1]->startPosition->line);
+        $this->assertSame(4, $nodes[1]->startPosition->char);
+        $this->assertSame(22, $nodes[3]->startPosition->offset);
+        $this->assertSame(3, $nodes[3]->startPosition->line);
+        $this->assertSame(3, $nodes[3]->startPosition->char);
+    }
+
+    public function test_columns_are_correct_after_a_document_initial_newline()
+    {
+        foreach (["\n", "\r", "\r\n"] as $newline) {
+            $nodes = $this->parseNodes($newline."\u{65E5}\u{672C}{{ first }}".$newline.'ab{{ second }}');
+
+            $this->assertSame(3, $nodes[1]->startPosition->offset);
+            $this->assertSame(2, $nodes[1]->startPosition->line);
+            $this->assertSame(3, $nodes[1]->startPosition->char);
+
+            $this->assertSame(17, $nodes[3]->startPosition->offset);
+            $this->assertSame(3, $nodes[3]->startPosition->line);
+            $this->assertSame(3, $nodes[3]->startPosition->char);
+        }
     }
 
     public function test_it_doesnt_trim_off_content_start()

@@ -8,16 +8,30 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Site;
 use Statamic\Http\Middleware\AddViewPaths;
 use Statamic\Support\Arr;
-use Statamic\Support\Str;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Symfony\Component\HttpFoundation\Response;
 use Tests\TestCase;
 
 class AddViewPathsTest extends TestCase
 {
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        mkdir(__DIR__.'/tmp/views/french', 0755, true);
+        mkdir(__DIR__.'/tmp/other/views/english', 0755, true);
+    }
+
+    public function tearDown(): void
+    {
+        app('files')->deleteDirectory(__DIR__.'/tmp');
+
+        parent::tearDown();
+    }
+
     #[Test]
     #[DataProvider('viewPathProvider')]
-    public function adds_view_paths($isAmpEnabled, $requestUrl, $expectedPaths)
+    public function adds_view_paths($requestUrl, $expectedPaths)
     {
         $this->setSites([
             'english' => ['url' => 'http://localhost/', 'locale' => 'en'],
@@ -25,11 +39,9 @@ class AddViewPathsTest extends TestCase
         ]);
 
         view()->getFinder()->setPaths($originalPaths = [
-            '/path/to/views',
-            '/path/to/other/views',
+            __DIR__.'/tmp/views',
+            __DIR__.'/tmp/other/views',
         ]);
-
-        config(['statamic.amp.enabled' => $isAmpEnabled]);
 
         $this->setCurrentSiteBasedOnUrl($requestUrl);
 
@@ -57,8 +69,8 @@ class AddViewPathsTest extends TestCase
         ]);
 
         view()->getFinder()->replaceNamespace('foo', [
-            '/path/to/views',
-            '/path/to/other',
+            __DIR__.'/tmp/views',
+            __DIR__.'/tmp/other/views',
         ]);
         $originalHints = view()->getFinder()->getHints()['foo'];
 
@@ -78,10 +90,58 @@ class AddViewPathsTest extends TestCase
         $this->assertEquals($originalHints, Arr::get(view()->getFinder()->getHints(), 'foo'));
     }
 
+    #[Test]
+    public function adds_no_view_paths_on_single_site_when_site_directory_does_not_exist()
+    {
+        $this->setSites([
+            'english' => ['url' => 'http://localhost/', 'locale' => 'en'],
+        ]);
+
+        view()->getFinder()->setPaths($originalPaths = [__DIR__.'/tmp/views']);
+        view()->getFinder()->replaceNamespace('foo', $originalHints = [__DIR__.'/tmp/views']);
+
+        $request = $this->createRequest('/test');
+        $handled = false;
+
+        (new AddViewPaths())->handle($request, function () use ($originalPaths, $originalHints, &$handled) {
+            $this->assertEquals($originalPaths, view()->getFinder()->getPaths());
+            $this->assertEquals($originalHints, Arr::get(view()->getFinder()->getHints(), 'foo'));
+            $handled = true;
+
+            return new Response;
+        });
+
+        $this->assertTrue($handled);
+    }
+
+    #[Test]
+    public function adds_view_paths_on_single_site_when_site_directory_exists()
+    {
+        $this->setSites([
+            'english' => ['url' => 'http://localhost/', 'locale' => 'en'],
+        ]);
+
+        view()->getFinder()->setPaths([__DIR__.'/tmp/other/views']);
+
+        $request = $this->createRequest('/test');
+        $handled = false;
+
+        (new AddViewPaths())->handle($request, function () use (&$handled) {
+            $this->assertEquals([
+                __DIR__.'/tmp/other/views/english',
+                __DIR__.'/tmp/other/views',
+            ], view()->getFinder()->getPaths());
+            $handled = true;
+
+            return new Response;
+        });
+
+        $this->assertTrue($handled);
+    }
+
     private function setCurrentSiteBasedOnUrl($requestUrl)
     {
-        $url = 'http://localhost'.Str::removeLeft($requestUrl, '/amp');
-        $site = Site::findByUrl($url);
+        $site = Site::findByUrl('http://localhost'.$requestUrl);
         Site::setCurrent($site->handle());
     }
 
@@ -95,29 +155,15 @@ class AddViewPathsTest extends TestCase
     public static function viewPathProvider()
     {
         return [
-            'amp enabled, amp request' => [true, '/amp/fr/test', [
-                '/path/to/views/french',
-                '/path/to/views',
-                '/path/to/other/views/french',
-                '/path/to/other/views',
+            'site directory exists in first path' => ['/fr/test', [
+                __DIR__.'/tmp/views/french',
+                __DIR__.'/tmp/views',
+                __DIR__.'/tmp/other/views',
             ]],
-            'amp enabled, non-amp request' => [true, '/fr/test', [
-                '/path/to/views/french',
-                '/path/to/views',
-                '/path/to/other/views/french',
-                '/path/to/other/views',
-            ]],
-            'amp disabled, default site' => [false, '/test', [
-                '/path/to/views/english',
-                '/path/to/views',
-                '/path/to/other/views/english',
-                '/path/to/other/views',
-            ]],
-            'amp disabled, second site' => [false, '/fr/test', [
-                '/path/to/views/french',
-                '/path/to/views',
-                '/path/to/other/views/french',
-                '/path/to/other/views',
+            'site directory exists in second path' => ['/test', [
+                __DIR__.'/tmp/views',
+                __DIR__.'/tmp/other/views/english',
+                __DIR__.'/tmp/other/views',
             ]],
         ];
     }
@@ -125,22 +171,20 @@ class AddViewPathsTest extends TestCase
     public static function namespacedViewPathProvider()
     {
         return [
-            'default site' => [
-                '/test',
-                [
-                    '/path/to/views/english',
-                    '/path/to/views',
-                    '/path/to/other/english',
-                    '/path/to/other',
-                ],
-            ],
-            'second site' => [
+            'site directory exists in first path' => [
                 '/fr/test',
                 [
-                    '/path/to/views/french',
-                    '/path/to/views',
-                    '/path/to/other/french',
-                    '/path/to/other',
+                    __DIR__.'/tmp/views/french',
+                    __DIR__.'/tmp/views',
+                    __DIR__.'/tmp/other/views',
+                ],
+            ],
+            'site directory exists in second path' => [
+                '/test',
+                [
+                    __DIR__.'/tmp/views',
+                    __DIR__.'/tmp/other/views/english',
+                    __DIR__.'/tmp/other/views',
                 ],
             ],
         ];

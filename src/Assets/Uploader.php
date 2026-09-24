@@ -4,7 +4,6 @@ namespace Statamic\Assets;
 
 use Facades\Statamic\Imaging\ImageValidator;
 use Statamic\Facades\Glide;
-use Statamic\Support\Str;
 use Statamic\Support\Svg;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -58,7 +57,7 @@ abstract class Uploader
     {
         $stream = fopen($sourcePath, 'r');
 
-        if (config('statamic.assets.svg_sanitization_on_upload', true) && Str::endsWith($destinationPath, '.svg')) {
+        if (config('statamic.assets.svg_sanitization_on_upload', true) && trim(strtolower(pathinfo($destinationPath, PATHINFO_EXTENSION))) === 'svg') {
             $stream = Svg::sanitize(stream_get_contents($stream));
         }
 

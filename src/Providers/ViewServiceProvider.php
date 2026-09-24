@@ -8,8 +8,11 @@ use Illuminate\Support\Facades\View as ViewFactory;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\View;
 use Statamic\Contracts\View\Antlers\Parser as ParserContract;
+use Statamic\Facades\File;
 use Statamic\Facades\Site;
 use Statamic\Statamic;
+use Statamic\StaticCaching\NoCache\Region;
+use Statamic\Tags\IncludeTag;
 use Statamic\View\Antlers\Engine;
 use Statamic\View\Antlers\Language\Analyzers\NodeTypeAnalyzer;
 use Statamic\View\Antlers\Language\Runtime\Debugging\GlobalDebugManager;
@@ -423,7 +426,11 @@ PHP;
 
     public function boot()
     {
-        ViewFactory::addNamespace('compiled__views', storage_path('framework/views'));
+        File::makeDirectory($nocacheViews = storage_path('statamic/tmp/nocache'));
+
+        ViewFactory::addNamespace('nocache__views', $nocacheViews);
+
+        Region::preserveContextKeys(IncludeTag::VIEW_DATA_KEYS);
 
         $this->registerBladeDirectives();
 

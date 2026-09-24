@@ -161,7 +161,6 @@ class Process
     /**
      * Run callback without logging errors.
      *
-     * @param  Closure  $callable
      * @return mixed
      */
     public function withoutLoggingErrors(Closure $callback)

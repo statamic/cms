@@ -11,6 +11,7 @@ use Statamic\Facades;
 use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\Link;
+use Statamic\Fieldtypes\Link\EntryLinkType;
 use Statamic\Fieldtypes\Link\LinkType;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -101,6 +102,20 @@ class LinkTest extends TestCase
         $this->assertInstanceOf(ArrayableString::class, $augmented);
         $this->assertNull($augmented->value());
         $this->assertEquals(['url' => null], $augmented->toArray());
+    }
+
+    #[Test]
+    public function it_wraps_a_string_collections_config_into_an_array_for_the_entry_link_type()
+    {
+        // A hand-authored blueprint may set `collections: pages` (a string) rather than
+        // `collections: [pages]`. Building the nested entries fieldtype config used to
+        // return that string as-is, which broke the `array` return type on collections()
+        // and crashed as soon as the link field's "entry" type was rendered (e.g. opening
+        // "Link to Entry" in a nav item).
+        $field = new Field('test', ['type' => 'link', 'collections' => 'pages']);
+        $config = (new EntryLinkType)->fieldtype($field);
+
+        $this->assertEquals(['pages'], $config['collections']);
     }
 
     #[Test]
@@ -392,6 +407,71 @@ class LinkTest extends TestCase
         $fieldtype = (new Link)->setField(new Field('test', ['type' => 'link']));
 
         $this->assertArrayNotHasKey('link-extend-test-no-picker', $fieldtype->preload()['types']);
+    }
+
+    #[Test]
+    public function it_only_preloads_meta_for_the_initial_option()
+    {
+        $this->setUpRoutableCollection();
+
+        Facades\AssetContainer::make('assets')->disk('local')->save();
+
+        $field = new Field('test', ['type' => 'link', 'container' => 'assets']);
+        $field->setValue('entry::123');
+
+        $types = (new Link)->setField($field)->preload()['types'];
+
+        $this->assertNotNull($types['entry']['meta']);
+        $this->assertTrue($types['entry']['metaLoaded']);
+        $this->assertNull($types['asset']['meta']);
+        $this->assertFalse($types['asset']['metaLoaded']);
+    }
+
+    #[Test]
+    public function it_preloads_meta_for_the_default_option_when_there_is_no_value()
+    {
+        $this->setUpRoutableCollection();
+
+        Facades\AssetContainer::make('assets')->disk('local')->save();
+
+        $field = new Field('test', ['type' => 'link', 'container' => 'assets', 'default_option' => 'asset']);
+
+        $types = (new Link)->setField($field)->preload()['types'];
+
+        $this->assertNull($types['entry']['meta']);
+        $this->assertFalse($types['entry']['metaLoaded']);
+        $this->assertNotNull($types['asset']['meta']);
+        $this->assertTrue($types['asset']['metaLoaded']);
+    }
+
+    #[Test]
+    public function it_preloads_no_type_meta_when_there_is_no_initial_option()
+    {
+        $this->setUpRoutableCollection();
+
+        Facades\AssetContainer::make('assets')->disk('local')->save();
+
+        $field = new Field('test', ['type' => 'link', 'container' => 'assets']);
+
+        $types = (new Link)->setField($field)->preload()['types'];
+
+        $this->assertNull($types['entry']['meta']);
+        $this->assertFalse($types['entry']['metaLoaded']);
+        $this->assertNull($types['asset']['meta']);
+        $this->assertFalse($types['asset']['metaLoaded']);
+    }
+
+    #[Test]
+    public function it_marks_meta_as_loaded_for_a_type_whose_fieldtype_preloads_nothing()
+    {
+        Link::extend('link-extend-test-basic-preload', TestBasicLinkType::class);
+
+        $field = new Field('test', ['type' => 'link', 'default_option' => 'link-extend-test-basic-preload']);
+
+        $types = (new Link)->setField($field)->preload()['types'];
+
+        $this->assertNull($types['link-extend-test-basic-preload']['meta']);
+        $this->assertTrue($types['link-extend-test-basic-preload']['metaLoaded']);
     }
 
     #[Test]

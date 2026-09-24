@@ -56,6 +56,49 @@ class GlideTest extends TestCase
     }
 
     #[Test]
+    public function it_doesnt_error_when_a_url_cannot_be_resolved_to_an_asset()
+    {
+        $tag = '{{ glide src="http://external.com/bar (1).jpg" width="100" }}{{ url }}{{ /glide }}';
+
+        $this->assertSame('', (string) Parse::template($tag, trusted: true));
+    }
+
+    #[Test]
+    public function it_doesnt_error_when_an_asset_id_cannot_be_resolved()
+    {
+        $tag = '{{ glide src="test::bar.jpg" width="100" fit="crop_focal" }}{{ url }}{{ /glide }}';
+
+        $this->assertSame('', (string) Parse::template($tag, trusted: true));
+    }
+
+    #[Test]
+    #[DefineEnvironment('relativeRouteUrl')]
+    public function it_doesnt_error_when_an_asset_id_cannot_be_resolved_and_images_are_served_directly()
+    {
+        $tag = '{{ glide src="test::bar.jpg" width="100" }}{{ url }}{{ /glide }}';
+
+        $this->assertSame('', (string) Parse::template($tag, trusted: true));
+    }
+
+    #[Test]
+    #[DefineEnvironment('hybridCaching')]
+    public function it_doesnt_error_when_a_url_cannot_be_resolved_to_an_asset_and_hybrid_caching_is_enabled()
+    {
+        $tag = '{{ glide src="http://external.com/bar (1).jpg" width="100" }}{{ url }}{{ /glide }}';
+
+        $this->assertSame('', (string) Parse::template($tag, trusted: true));
+    }
+
+    #[Test]
+    #[DefineEnvironment('hybridCaching')]
+    public function it_doesnt_error_when_an_asset_id_cannot_be_resolved_and_hybrid_caching_is_enabled()
+    {
+        $tag = '{{ glide src="test::bar.jpg" width="100" fit="crop_focal" }}{{ url }}{{ /glide }}';
+
+        $this->assertSame('', (string) Parse::template($tag, trusted: true));
+    }
+
+    #[Test]
     public function it_outputs_a_data_url()
     {
         $this->createImageInPublicDirectory();
@@ -99,6 +142,12 @@ EOT;
     public function absoluteHttpsRouteUrl($app)
     {
         $this->configureGlideCacheDiskWithUrl($app, 'https://localhost/glide');
+    }
+
+    public function hybridCaching($app)
+    {
+        $app['config']->set('statamic.assets.image_manipulation.cache', 'hybrid');
+        $app['config']->set('statamic.assets.image_manipulation.cache_path', public_path('img'));
     }
 
     private function configureGlideCacheDiskWithUrl($app, $url, $cache = 'glide')

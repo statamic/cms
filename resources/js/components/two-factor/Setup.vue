@@ -25,12 +25,20 @@ onMounted(() => getSetupCode());
 function getSetupCode() {
     loading.value = true;
 
-    axios.post(props.enableUrl).then((response) => {
-        qrCode.value = response.data.qr;
-        secretKey.value = response.data.secret_key;
-        confirmUrl.value = response.data.confirm_url;
-        loading.value = false;
-    });
+    axios
+        .post(props.enableUrl)
+        .then((response) => {
+            qrCode.value = response.data.qr;
+            secretKey.value = response.data.secret_key;
+            confirmUrl.value = response.data.confirm_url;
+        })
+        .catch((error) => {
+            setupModalOpen.value = false;
+            Statamic.$toast.error(error.response?.data?.message ?? error.message);
+        })
+        .finally(() => {
+            loading.value = false;
+        });
 }
 
 function confirm() {
