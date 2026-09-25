@@ -70,7 +70,7 @@ class CoreNav
         Nav::content('Collections')
             ->route('collections.index')
             ->icon('collections')
-            ->can('index', Collection::class)
+            ->can('index', [Collection::class, Site::selected()])
             ->extra([
                 'breadcrumbs' => [
                     'create_label' => 'Create Collection',
@@ -103,7 +103,7 @@ class CoreNav
         Nav::content('Navigation')
             ->route('navigation.index')
             ->icon('navigation')
-            ->can('index', NavContract::class)
+            ->can('index', [NavContract::class, Site::selected()])
             ->extra([
                 'breadcrumbs' => [
                     'create_label' => 'Create Navigation',
@@ -181,7 +181,7 @@ class CoreNav
         Nav::content('Globals')
             ->route('globals.index')
             ->icon('globals')
-            ->can('index', GlobalSet::class)
+            ->can('index', [GlobalSet::class, Site::selected()])
             ->extra([
                 'breadcrumbs' => [
                     'create_label' => 'Create Global Set',
