@@ -27,7 +27,6 @@ class RequestCacheTest extends TestCase
 
         GraphQL::addQuery(QueryOne::class);
         GraphQL::addQuery(QueryTwo::class);
-        GraphQL::addMiddleware(TrackRequests::class);
     }
 
     #[Test]
@@ -254,6 +253,11 @@ class QueryOne extends PingQuery
 
     public function resolve()
     {
+        app('request-tracking')[] = [
+            'query' => request()->input('query'),
+            'variables' => request()->input('variables'),
+        ];
+
         return 'one';
     }
 }
@@ -265,19 +269,6 @@ class QueryTwo extends PingQuery
     public function resolve()
     {
         return 'two';
-    }
-}
-
-class TrackRequests
-{
-    public function handle($request, $next)
-    {
-        app('request-tracking')[] = [
-            'query' => $request->input('query'),
-            'variables' => $request->input('variables'),
-        ];
-
-        return $next($request);
     }
 }
 
