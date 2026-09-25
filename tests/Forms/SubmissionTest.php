@@ -452,8 +452,7 @@ class SubmissionTest extends TestCase
 
         $form->makeSubmission()->asPartial()->finalize();
 
-        Queue::assertPushed(CreateAssetsFromFileUploads::class);
-        Queue::assertCount(1);
+        Queue::assertNothingPushed();
     }
 
     #[Test]
