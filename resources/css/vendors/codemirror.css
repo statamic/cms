@@ -106,8 +106,9 @@
     }
 
     &.CodeMirror pre.CodeMirror-placeholder {
-        @apply text-gray-500 dark:text-gray-400/85;
+        @apply text-gray-500;
     }
+
     .CodeMirror-gutters {
         @apply border-r-gray-300;
     }
@@ -513,6 +514,10 @@ span.CodeMirror-selectedtext {
         background: #263238;
         @apply dark:bg-gray-900;
         color: #eeffff;
+    }
+
+    &.CodeMirror pre.CodeMirror-placeholder {
+        @apply text-gray-400/85;
     }
 
     .CodeMirror-gutters {
