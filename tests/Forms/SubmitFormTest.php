@@ -262,6 +262,85 @@ class SubmitFormTest extends TestCase
     }
 
     #[Test]
+    public function it_saves_the_submission_as_spam_when_the_honeypot_is_filled_and_configured_to_do_so()
+    {
+        Bus::fake();
+        Event::fake([FormSubmitted::class, SubmissionFinalized::class]);
+
+        $this->form->data(['honeypot_behavior' => 'mark_as_spam'])->save();
+
+        try {
+            $this->action()->submit(['email' => 'test@example.com', 'winnie' => 'the pooh']);
+
+            $this->fail('Expected SilentFormFailureException was not thrown');
+        } catch (SilentFormFailureException $e) {
+            // Expected
+        }
+
+        $submission = $this->form->submissions()->first();
+
+        $this->assertNotNull($submission);
+        $this->assertTrue($submission->isSpam());
+        $this->assertEquals('spam', $submission->status());
+
+        // The raw partial key sticks around so finalizing can pick up where it
+        // left off when the submission is marked as not spam, but the
+        // submission no longer reports itself as partial.
+        $this->assertTrue($submission->get('partial'));
+        $this->assertFalse($submission->isPartial());
+
+        Event::assertNotDispatched(FormSubmitted::class);
+        Event::assertNotDispatched(SubmissionFinalized::class);
+        Bus::assertNotDispatched(SendEmails::class);
+    }
+
+    #[Test]
+    public function it_ignores_the_honeypot_spam_setting_when_the_form_does_not_store_submissions()
+    {
+        $this->form->store(false)->data(['honeypot_behavior' => 'mark_as_spam'])->save();
+
+        try {
+            $this->action()->submit(['email' => 'test@example.com', 'winnie' => 'the pooh']);
+
+            $this->fail('Expected SilentFormFailureException was not thrown');
+        } catch (SilentFormFailureException $e) {
+            // Expected
+        }
+
+        $this->assertCount(0, $this->form->submissions());
+    }
+
+    #[Test]
+    public function it_keeps_uploaded_files_when_a_spam_submission_is_stored()
+    {
+        Bus::fake(); // Otherwise the temp file is deleted by DeleteTemporaryFiles right after submission.
+
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $form = $this->uploadForm(honeypot: true);
+        $form->data(['honeypot_behavior' => 'mark_as_spam'])->save();
+
+        $action = app(SubmitForm::class)->form($form)->page('main');
+
+        try {
+            $action->submit(
+                data: ['email' => 'test@example.com', 'winnie' => 'the pooh'],
+                files: ['avatar' => [UploadedFile::fake()->image('avatar.jpg')]],
+            );
+        } catch (SilentFormFailureException $e) {
+            // Expected
+        }
+
+        // The file stays as a temporary upload until the submission is
+        // marked as not spam, at which point finalizing moves it into
+        // the asset container.
+        Storage::disk('local')->assertExists('statamic/form-uploads/'.$action->submission()->get('avatar')[0]);
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
     public function it_throws_silent_failure_exception_when_event_listener_returns_false()
     {
         Event::listen(FormSubmitted::class, fn () => false);
