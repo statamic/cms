@@ -215,3 +215,47 @@ test.each([
 
     expect(wrapper.find('[responses]').exists()).toBe(false);
 });
+
+test('it passes a custom chart its own props, with the widget values winning', async () => {
+    const CustomChart = {
+        props: ['items', 'metric', 'responses', 'accessibleLabel', 'centerLabel', 'drilldown'],
+        emits: ['select'],
+        template: '<div>{{ items.map((item) => item.label).join(", ") }}</div>',
+    };
+
+    const wrapper = mount(ChartWidget, {
+        props: {
+            metric: 'count',
+            field: {
+                ...field,
+                chart: {
+                    handle: 'custom',
+                    component: 'custom-chart',
+                    props: {
+                        ...field.chart.props,
+                        centerLabel: 'Songs',
+                        metric: 'percent',
+                        responses: 1,
+                        accessibleLabel: 'Overridden',
+                    },
+                },
+            },
+        },
+        global: { components: { 'custom-chart': CustomChart } },
+    });
+
+    const chart = wrapper.findComponent(CustomChart);
+
+    expect(chart.props('centerLabel')).toBe('Songs');
+    expect(chart.props('drilldown')).toBeUndefined();
+    expect(chart.props('metric')).toBe('count');
+    expect(chart.props('responses')).toBe(248);
+    expect(chart.props('accessibleLabel')).toContain('Wake me up: Before you Go Go 112');
+    expect(chart.props('items').find((item) => item.other).clickable).toBe(true);
+
+    await paginationButtons(wrapper).next.trigger('click');
+
+    expect(chart.props('items').map((item) => item.key)).toEqual(['bohemian', 'wonderwall']);
+    expect(chart.props('centerLabel')).toBeUndefined();
+    expect(chart.vm.$attrs.focusedIndex).toBe(3);
+});

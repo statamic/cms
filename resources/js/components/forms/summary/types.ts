@@ -25,6 +25,7 @@ export interface ChartPayload {
             items: ChartItem[];
             [prop: string]: unknown;
         };
+        [prop: string]: unknown;
     };
 }
 

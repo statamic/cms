@@ -53,13 +53,17 @@ const accessibleLabel = computed(() => {
         : `${__(props.field.display)}: ${values}`;
 });
 
-const chartProps = computed(() => ({
-    ...(showingDrilldown.value ? drilldown.value : {}),
-    items: items.value,
-    metric: props.metric,
-    responses: props.field.responses,
-    accessibleLabel: accessibleLabel.value,
-}));
+const chartProps = computed(() => {
+    const { drilldown: _, ...mainProps } = chart.value.props;
+
+    return {
+        ...(showingDrilldown.value ? drilldown.value : mainProps),
+        items: items.value,
+        metric: props.metric,
+        responses: props.field.responses,
+        accessibleLabel: accessibleLabel.value,
+    };
+});
 
 watch([chart, () => props.editing], () => (page.value = 1));
 </script>
