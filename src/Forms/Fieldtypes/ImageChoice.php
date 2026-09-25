@@ -2,7 +2,12 @@
 
 namespace Statamic\Forms\Fieldtypes;
 
+use Illuminate\Support\Collection;
+use Statamic\Forms\Charts\ChartOption;
+use Statamic\Forms\Charts\HorizontalBar;
 use Statamic\Forms\Fields\FormFieldtype;
+use Statamic\Forms\Fields\FormValueType;
+use Statamic\Forms\Summary\FieldResponses;
 use Statamic\Support\Arr;
 
 use function Statamic\trans as __;
@@ -100,6 +105,22 @@ class ImageChoice extends FormFieldtype
             'gap' => $this->normalizedGap(),
             ...Arr::except($this->config(), ['type', 'multiple', 'columns', 'aspect_ratio', 'gap']),
         ];
+    }
+
+    public function valueType(): ?FormValueType
+    {
+        return $this->config('multiple') ? FormValueType::Choices : FormValueType::Choice;
+    }
+
+    public function defaultChart(): ?string
+    {
+        return HorizontalBar::class;
+    }
+
+    public function chartOptions(FieldResponses $responses): ?Collection
+    {
+        return collect($this->toField()->fieldtype()->preload()['options'])
+            ->map(fn ($option) => new ChartOption($option['key'], $option['label'], image: $option['image'], badge: $option['letter']));
     }
 
     public function example(): ?array

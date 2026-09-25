@@ -46,6 +46,7 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
     protected $honeypot;
     protected $store;
     protected $connections;
+    protected $charts;
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
 
@@ -349,6 +350,17 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
     }
 
     /**
+     * Get or set the submission summary charts.
+     *
+     * @param  mixed  $charts
+     * @return mixed
+     */
+    public function charts($charts = null)
+    {
+        return $this->fluentlyGetOrSet('charts')->args(func_get_args());
+    }
+
+    /**
      * Get the form fields off the blueprint.
      *
      * @return \Illuminate\Support\Collection
@@ -408,12 +420,17 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
         $data = $this->data->merge(collect([
             'title' => $this->title,
             'fields' => $this->formFields()->contents(),
+            'charts' => $this->charts,
             'honeypot' => $this->honeypot,
             'connections' => $this->connectionsFileData(),
         ]))->filter()->all();
 
         if ($this->store === false) {
             $data['store'] = false;
+        }
+
+        if ($this->charts === []) {
+            $data['charts'] = [];
         }
 
         if ($this->get('generate_fake_submissions') === false) {
@@ -495,6 +512,7 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
 
         $methods = [
             'title',
+            'charts',
             'honeypot',
             'store',
             'connections',
