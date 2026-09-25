@@ -255,8 +255,56 @@ class ChartTest extends TestCase
     {
         $props = (new VerticalBar)->props($this->responses([1.5, 10.25, 20, 30.75, 40, 50.5, 60, 70.25, 80, 90.5, 100]));
 
-        $this->assertEquals(['1–13', '14–26', '27–39', '40–52', '53–65', '66–78', '79–91', '92–100'], array_column($props['items'], 'label'));
+        $this->assertEquals(['1–14', '14–27', '27–40', '40–53', '53–66', '66–79', '79–92', '92–100'], array_column($props['items'], 'label'));
         $this->assertEquals([2, 1, 1, 2, 1, 1, 2, 1], array_column($props['items'], 'count'));
+    }
+
+    #[Test]
+    public function it_labels_capped_decimal_ranges_with_the_boundaries_they_count()
+    {
+        $props = (new VerticalBar)->props($this->responses([0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.9]));
+
+        $this->assertEquals([
+            ['key' => '0.1-0.3', 'label' => '0.1–0.3', 'count' => 4, 'percent' => 36],
+            ['key' => '0.3-0.5', 'label' => '0.3–0.5', 'count' => 4, 'percent' => 36],
+            ['key' => '0.5-0.7', 'label' => '0.5–0.7', 'count' => 2, 'percent' => 18],
+            ['key' => '0.7-0.9', 'label' => '0.7–0.9', 'count' => 0, 'percent' => 0],
+            ['key' => '0.9-0.9', 'label' => '0.9', 'count' => 1, 'percent' => 9],
+        ], $props['items']);
+    }
+
+    #[Test]
+    public function it_labels_capped_decimal_ranges_that_dont_start_on_a_boundary()
+    {
+        $props = (new VerticalBar)->props($this->responses(range(4.25, 9, 0.25)));
+
+        $this->assertEquals(['4.2–4.9', '4.9–5.6', '5.6–6.3', '6.3–7.0', '7.0–7.7', '7.7–8.4', '8.4–9.0'], array_column($props['items'], 'label'));
+        $this->assertEquals([3, 3, 3, 2, 3, 3, 3], array_column($props['items'], 'count'));
+    }
+
+    #[Test]
+    public function it_labels_decimal_values_capped_to_whole_number_ranges()
+    {
+        $props = (new VerticalBar)->props($this->responses([1, 2, 2.5, 3, 4, 5, 6, 7, 8, 9, 10]));
+
+        $this->assertEquals(['1–3', '3–5', '5–7', '7–9', '9–10'], array_column($props['items'], 'label'));
+        $this->assertEquals([3, 2, 2, 2, 2], array_column($props['items'], 'count'));
+    }
+
+    #[Test]
+    public function it_bins_values_with_more_than_ten_decimal_places()
+    {
+        $props = (new VerticalBar)->props($this->responses(array_map(fn ($i) => $i * 1e-11, range(1, 11))));
+
+        $this->assertEquals([
+            '0.00000000001–0.00000000002',
+            '0.00000000003–0.00000000004',
+            '0.00000000005–0.00000000006',
+            '0.00000000007–0.00000000008',
+            '0.00000000009–0.00000000010',
+            '0.00000000011',
+        ], array_column($props['items'], 'label'));
+        $this->assertEquals([2, 2, 2, 2, 2, 1], array_column($props['items'], 'count'));
     }
 
     #[Test]

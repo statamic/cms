@@ -9,7 +9,6 @@ use Statamic\Extend\RegistersItself;
 use Statamic\Forms\Fields\FormField;
 use Statamic\Forms\Fields\FormValueType;
 use Statamic\Forms\Summary\FieldResponses;
-use Statamic\Support\Str;
 
 use function Statamic\trans as __;
 
@@ -107,8 +106,7 @@ abstract class Chart
 
     private function binnedItems(Collection $counts, int $total): Collection
     {
-        $keys = $counts->keys()->map(fn ($key) => (float) $key);
-        $decimals = $this->binDecimals($keys);
+        $decimals = $this->binDecimals($counts->keys());
         $scale = 10 ** $decimals;
         $scaled = $counts->keys()->mapWithKeys(fn ($key) => [$key => round((float) $key * $scale, 6)]);
         $min = (int) floor($scaled->min());
@@ -116,8 +114,12 @@ abstract class Chart
         $step = max(1, (int) ceil(($max - $min + 1) / 8));
         $format = fn (int $value) => number_format($value / $scale, $decimals, '.', '');
 
-        return collect(range($min, $max, $step))->map(function ($start) use ($counts, $total, $step, $max, $scaled, $format) {
-            $end = min($start + $step - 1, $max);
+        // When the decimals were capped, values can fall between the inclusive ends of
+        // neighbouring ranges, so each range ends where the next one starts instead.
+        $continuous = $scaled->contains(fn ($value) => $value != floor($value));
+
+        return collect(range($min, (int) floor($scaled->max()), $step))->map(function ($start) use ($counts, $total, $step, $max, $scaled, $format, $continuous) {
+            $end = min($continuous ? $start + $step : $start + $step - 1, $max);
             $count = $counts
                 ->filter(fn ($count, $key) => $scaled[$key] >= $start && $scaled[$key] < $start + $step)
                 ->sum();
@@ -131,18 +133,22 @@ abstract class Chart
         })->values();
     }
 
-    private function binDecimals(Collection $values): int
+    private function binDecimals(Collection $keys): int
     {
-        $decimals = $values->map(function (float $value) {
-            $fraction = rtrim(Str::after(number_format($value, 10, '.', ''), '.'), '0');
-
-            return strlen($fraction);
-        })->max();
+        $decimals = $keys->map(fn ($key) => $this->decimalPlaces((string) $key))->max();
+        $values = $keys->map(fn ($key) => (float) $key);
 
         // No more decimals than it takes to split the range into about 8 ranges.
         $needed = max(0, (int) ceil(-log10(($values->max() - $values->min()) / 8)));
 
         return min($decimals, $needed);
+    }
+
+    private function decimalPlaces(string $value): int
+    {
+        preg_match('/(?:\.(\d*))?(?:e([+-]?\d+))?\s*$/i', $value, $matches);
+
+        return max(0, strlen(rtrim($matches[1] ?? '', '0')) - (int) ($matches[2] ?? 0));
     }
 
     private function optionsFromValues(Collection $counts): Collection
