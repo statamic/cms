@@ -65,7 +65,7 @@ abstract class Chart
 
         $keep = $items->sortByDesc('count')->take($this->limit - 1)->pluck('key');
 
-        [$items, $other] = $items->partition(fn ($item): bool => $keep->contains($item['key']));
+        [$items, $other] = $items->partition(fn ($item): bool => $keep->containsStrict($item['key']));
 
         $icons = $other->pluck('icon')->filter()->unique();
 

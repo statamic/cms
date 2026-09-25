@@ -91,6 +91,17 @@ class ChartTest extends TestCase
     }
 
     #[Test]
+    public function it_keeps_option_keys_that_are_loosely_equal_apart_when_truncating()
+    {
+        $props = (new Pie)->props($this->weightedValues(['0', 'a', 'b', '00', 'c']), $this->chartOptions(
+            ['0' => 'Zero', 'a' => 'A', 'b' => 'B', '00' => 'Double Zero', 'c' => 'C']
+        ));
+
+        $this->assertEquals(['0', 'a', 'b', 'other'], array_column($props['items'], 'key'));
+        $this->assertEquals(['00', 'c'], array_column($props['drilldown']['items'], 'key'));
+    }
+
+    #[Test]
     public function it_doesnt_drill_down_when_everything_fits()
     {
         $props = (new HorizontalBar)->props(
