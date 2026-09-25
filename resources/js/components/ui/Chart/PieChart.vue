@@ -24,6 +24,8 @@ const props = withDefaults(
         items?: Item[];
         /** Whether values are displayed as percentages or response counts. */
         metric?: 'percent' | 'count';
+        /** Number of respondents for the field. Use it for totals instead of summing `items`, which counts choices rather than people for multi-select fields and only holds the "Other" breakdown on the drilldown page. */
+        responses?: number | null;
         /** Optional segment data when the legend describes a focused segment. */
         segments?: Item[] | null;
     }>(),
@@ -31,6 +33,7 @@ const props = withDefaults(
         focusedIndex: null,
         items: () => [],
         metric: 'percent',
+        responses: null,
         segments: null,
     },
 );

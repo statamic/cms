@@ -26,6 +26,8 @@ const props = withDefaults(
         metricPosition?: 'start' | 'end';
         /** Places the marker before or after the label. */
         markerPosition?: 'before-label' | 'after-label';
+        /** Number of respondents for the field. Use it for totals instead of summing `items`, which counts choices rather than people for multi-select fields and only holds the "Other" breakdown on the drilldown page. */
+        responses?: number | null;
         /** Whether to show item labels. */
         showLabel?: boolean;
         /** Whether to show a marker before each label. */
@@ -37,6 +39,7 @@ const props = withDefaults(
         metric: 'percent',
         metricPosition: 'start',
         markerPosition: 'before-label',
+        responses: null,
         showLabel: true,
         showMarker: true,
     },

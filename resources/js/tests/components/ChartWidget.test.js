@@ -193,3 +193,25 @@ test('the submission summary components compile', async () => {
 
     expect(summary.default).toBeTruthy();
 });
+
+test('it passes the field response count to the chart on both pages', async () => {
+    const wrapper = mountCard();
+
+    expect(wrapper.findComponent(PieChart).props('responses')).toBe(248);
+
+    await paginationButtons(wrapper).next.trigger('click');
+
+    expect(wrapper.text()).toContain('Bohemian Rhapsody');
+    expect(wrapper.findComponent(PieChart).props('responses')).toBe(248);
+});
+
+test.each([
+    'ui-horizontal-bar-chart',
+    'ui-vertical-bar-chart',
+    'ui-pie-chart',
+    'ui-horizontal-lollipop-chart',
+])('the %s component does not render the response count as an attribute', (component) => {
+    const wrapper = mountCard({ field: { ...field, chart: { ...field.chart, component } } });
+
+    expect(wrapper.find('[responses]').exists()).toBe(false);
+});

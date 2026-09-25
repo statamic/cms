@@ -21,12 +21,15 @@ const props = withDefaults(
         maxValue?: number | null;
         /** Whether values are displayed as percentages or response counts. */
         metric?: 'percent' | 'count';
+        /** Number of respondents for the field. Use it for totals instead of summing `items`, which counts choices rather than people for multi-select fields and only holds the "Other" breakdown on the drilldown page. */
+        responses?: number | null;
     }>(),
     {
         focusedIndex: null,
         items: () => [],
         maxValue: null,
         metric: 'percent',
+        responses: null,
     },
 );
 

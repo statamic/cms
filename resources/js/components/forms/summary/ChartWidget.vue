@@ -57,6 +57,7 @@ const chartProps = computed(() => ({
     ...(showingDrilldown.value ? drilldown.value : {}),
     items: items.value,
     metric: props.metric,
+    responses: props.field.responses,
     accessibleLabel: accessibleLabel.value,
 }));
 
