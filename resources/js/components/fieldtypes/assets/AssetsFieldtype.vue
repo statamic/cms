@@ -671,7 +671,9 @@ export default {
 
                 // The components deal with passing around asset objects, however
                 // our fieldtype is only concerned with their respective IDs.
-                this.update(this.assetIds);
+                if (!isEqual(this.value, this.assetIds)) {
+                    this.update(this.assetIds);
+                }
 
                 this.updateMeta({
                     ...this.meta,
