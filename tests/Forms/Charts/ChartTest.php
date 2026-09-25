@@ -191,6 +191,64 @@ class ChartTest extends TestCase
     }
 
     #[Test]
+    public function it_bins_whole_numbers_across_a_wide_range_into_whole_number_ranges()
+    {
+        $props = (new VerticalBar)->props($this->responses([20, 35, 60, 90, 120, 150, 200, 250, 300, 400, 470]));
+
+        $this->assertEquals([
+            ['key' => '20-76', 'label' => '20–76', 'count' => 3, 'percent' => 27],
+            ['key' => '77-133', 'label' => '77–133', 'count' => 2, 'percent' => 18],
+            ['key' => '134-190', 'label' => '134–190', 'count' => 1, 'percent' => 9],
+            ['key' => '191-247', 'label' => '191–247', 'count' => 1, 'percent' => 9],
+            ['key' => '248-304', 'label' => '248–304', 'count' => 2, 'percent' => 18],
+            ['key' => '305-361', 'label' => '305–361', 'count' => 0, 'percent' => 0],
+            ['key' => '362-418', 'label' => '362–418', 'count' => 1, 'percent' => 9],
+            ['key' => '419-470', 'label' => '419–470', 'count' => 1, 'percent' => 9],
+        ], $props['items']);
+    }
+
+    #[Test]
+    public function it_bins_decimal_values_into_decimal_ranges()
+    {
+        $props = (new VerticalBar)->props($this->responses([0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55]));
+
+        $this->assertEquals([
+            ['key' => '0.05-0.11', 'label' => '0.05–0.11', 'count' => 2, 'percent' => 18],
+            ['key' => '0.12-0.18', 'label' => '0.12–0.18', 'count' => 1, 'percent' => 9],
+            ['key' => '0.19-0.25', 'label' => '0.19–0.25', 'count' => 2, 'percent' => 18],
+            ['key' => '0.26-0.32', 'label' => '0.26–0.32', 'count' => 1, 'percent' => 9],
+            ['key' => '0.33-0.39', 'label' => '0.33–0.39', 'count' => 1, 'percent' => 9],
+            ['key' => '0.40-0.46', 'label' => '0.40–0.46', 'count' => 2, 'percent' => 18],
+            ['key' => '0.47-0.53', 'label' => '0.47–0.53', 'count' => 1, 'percent' => 9],
+            ['key' => '0.54-0.55', 'label' => '0.54–0.55', 'count' => 1, 'percent' => 9],
+        ], $props['items']);
+    }
+
+    #[Test]
+    public function it_bins_decimal_values_either_side_of_zero()
+    {
+        $props = (new VerticalBar)->props($this->responses([-0.5, -0.4, -0.3, -0.2, -0.1, 0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6]));
+
+        $this->assertEquals([
+            ['key' => '-0.5--0.4', 'label' => '-0.5–-0.4', 'count' => 2, 'percent' => 17],
+            ['key' => '-0.3--0.2', 'label' => '-0.3–-0.2', 'count' => 2, 'percent' => 17],
+            ['key' => '-0.1-0.0', 'label' => '-0.1–0.0', 'count' => 2, 'percent' => 17],
+            ['key' => '0.1-0.2', 'label' => '0.1–0.2', 'count' => 2, 'percent' => 17],
+            ['key' => '0.3-0.4', 'label' => '0.3–0.4', 'count' => 2, 'percent' => 17],
+            ['key' => '0.5-0.6', 'label' => '0.5–0.6', 'count' => 2, 'percent' => 17],
+        ], $props['items']);
+    }
+
+    #[Test]
+    public function it_bins_decimal_values_across_a_wide_range_into_whole_number_ranges()
+    {
+        $props = (new VerticalBar)->props($this->responses([1.5, 10.25, 20, 30.75, 40, 50.5, 60, 70.25, 80, 90.5, 100]));
+
+        $this->assertEquals(['1–13', '14–26', '27–39', '40–52', '53–65', '66–78', '79–91', '92–100'], array_column($props['items'], 'label'));
+        $this->assertEquals([2, 1, 1, 2, 1, 1, 2, 1], array_column($props['items'], 'count'));
+    }
+
+    #[Test]
     public function it_doesnt_bin_numeric_values_when_the_field_has_options()
     {
         $props = (new VerticalBar)->props(

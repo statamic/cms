@@ -9,6 +9,7 @@ use Statamic\Extend\RegistersItself;
 use Statamic\Forms\Fields\FormField;
 use Statamic\Forms\Fields\FormValueType;
 use Statamic\Forms\Summary\FieldResponses;
+use Statamic\Support\Str;
 
 use function Statamic\trans as __;
 
@@ -107,23 +108,41 @@ abstract class Chart
     private function binnedItems(Collection $counts, int $total): Collection
     {
         $keys = $counts->keys()->map(fn ($key) => (float) $key);
-        $min = (int) floor($keys->min());
-        $max = (int) ceil($keys->max());
+        $decimals = $this->binDecimals($keys);
+        $scale = 10 ** $decimals;
+        $scaled = $counts->keys()->mapWithKeys(fn ($key) => [$key => round((float) $key * $scale, 6)]);
+        $min = (int) floor($scaled->min());
+        $max = (int) ceil($scaled->max());
         $step = max(1, (int) ceil(($max - $min + 1) / 8));
+        $format = fn (int $value) => number_format($value / $scale, $decimals, '.', '');
 
-        return collect(range($min, $max, $step))->map(function ($start) use ($counts, $total, $step, $max) {
+        return collect(range($min, $max, $step))->map(function ($start) use ($counts, $total, $step, $max, $scaled, $format) {
             $end = min($start + $step - 1, $max);
             $count = $counts
-                ->filter(fn ($count, $key) => (float) $key >= $start && (float) $key < $start + $step)
+                ->filter(fn ($count, $key) => $scaled[$key] >= $start && $scaled[$key] < $start + $step)
                 ->sum();
 
             return [
-                'key' => "{$start}-{$end}",
-                'label' => $start === $end ? (string) $start : "{$start}–{$end}",
+                'key' => "{$format($start)}-{$format($end)}",
+                'label' => $start === $end ? $format($start) : "{$format($start)}–{$format($end)}",
                 'count' => $count,
                 'percent' => $this->percent($count, $total),
             ];
         })->values();
+    }
+
+    private function binDecimals(Collection $values): int
+    {
+        $decimals = $values->map(function (float $value) {
+            $fraction = rtrim(Str::after(number_format($value, 10, '.', ''), '.'), '0');
+
+            return strlen($fraction);
+        })->max();
+
+        // No more decimals than it takes to split the range into about 8 ranges.
+        $needed = max(0, (int) ceil(-log10(($values->max() - $values->min()) / 8)));
+
+        return min($decimals, $needed);
     }
 
     private function optionsFromValues(Collection $counts): Collection
