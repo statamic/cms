@@ -377,4 +377,36 @@ class FormTest extends TestCase
         $this->assertEquals('email', $formFields->field('email')->handle());
         $this->assertEquals('name', $formFields->field('name')->handle());
     }
+
+    #[Test]
+    public function it_saves_charts_to_yaml_and_hydrates_them_back()
+    {
+        $charts = [
+            ['field' => 'color', 'chart' => 'pie'],
+            ['field' => 'rating', 'chart' => 'horizontal_bar'],
+        ];
+
+        $form = tap(Form::make('contact_us')->charts($charts))->save();
+
+        $this->assertEquals($charts, YAML::parse(File::get($form->path()))['charts']);
+        $this->assertEquals($charts, Form::find('contact_us')->charts());
+    }
+
+    #[Test]
+    public function it_saves_an_explicitly_emptied_charts_list()
+    {
+        $form = tap(Form::make('contact_us')->charts([]))->save();
+
+        $this->assertEquals([], YAML::parse(File::get($form->path()))['charts']);
+        $this->assertEquals([], Form::find('contact_us')->charts());
+    }
+
+    #[Test]
+    public function it_doesnt_save_charts_when_never_configured()
+    {
+        $form = tap(Form::make('contact_us'))->save();
+
+        $this->assertArrayNotHasKey('charts', YAML::parse(File::get($form->path())));
+        $this->assertNull(Form::find('contact_us')->charts());
+    }
 }

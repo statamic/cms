@@ -1,0 +1,579 @@
+<?php
+
+namespace Tests\Feature\Forms;
+
+use Facades\Statamic\Console\Processes\Composer;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\Form;
+use Statamic\Facades\FormSubmission;
+use Statamic\Facades\User;
+use Statamic\Forms\Fieldtypes\Number;
+use Statamic\Forms\Insights\Average;
+use Statamic\Forms\Insights\Insight;
+use Statamic\Forms\Insights\MinMax;
+use Tests\FakesRoles;
+use Tests\PreventSavingStacheItemsToDisk;
+use Tests\TestCase;
+
+class FormSummaryTest extends TestCase
+{
+    use FakesRoles;
+    use PreventSavingStacheItemsToDisk;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturnTrue()->byDefault();
+    }
+
+    protected function resolveApplicationConfiguration($app)
+    {
+        parent::resolveApplicationConfiguration($app);
+
+        $app['config']['statamic.forms.forms'] = $this->fakeStacheDirectory.'/forms';
+    }
+
+    #[Test]
+    public function it_requires_forms_pro()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturnFalse();
+
+        $form = $this->makeForm();
+
+        $this
+            ->actingAs($this->superUser())
+            ->getJson(cp_route('forms.submissions.summary', $form->handle()))
+            ->assertNotFound();
+    }
+
+    #[Test]
+    public function it_shows_the_summary_with_the_view_form_submissions_permission()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'view form submissions']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+        $form = $this->makeForm();
+
+        $this
+            ->actingAs($user)
+            ->getJson(cp_route('forms.submissions.summary', $form->handle()))
+            ->assertOk();
+    }
+
+    #[Test]
+    public function it_denies_access_without_permission()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'edit forms']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+        $form = $this->makeForm();
+
+        $this
+            ->from('/original')
+            ->actingAs($user)
+            ->get(cp_route('forms.submissions.summary', $form->handle()))
+            ->assertRedirect('/original')
+            ->assertSessionHas('error');
+    }
+
+    #[Test]
+    public function it_summarizes_fields_with_a_default_chart_in_blueprint_order()
+    {
+        $form = $this->makeForm();
+
+        $this->submit($form, ['name' => 'Alice', 'color' => 'red', 'rating' => 5]);
+        $this->submit($form, ['name' => 'Bob', 'color' => 'red', 'rating' => 4]);
+        $this->submit($form, ['name' => 'Carol', 'color' => 'blue']);
+
+        $response = $this
+            ->actingAs($this->superUser())
+            ->getJson(cp_route('forms.submissions.summary', $form->handle()))
+            ->assertOk()
+            ->assertJsonPath('total', 3)
+            ->assertJsonCount(2, 'fields')
+            ->assertJsonPath('fields.0.handle', 'color')
+            ->assertJsonPath('fields.0.fieldtype', 'multi_choice')
+            ->assertJsonPath('fields.0.responses', 3)
+            ->assertJsonPath('fields.0.chart.handle', 'pie')
+            ->assertJsonPath('fields.0.chart.component', 'ui-pie-chart')
+            ->assertJsonPath('fields.1.handle', 'rating')
+            ->assertJsonPath('fields.1.responses', 2)
+            ->assertJsonPath('fields.1.insights.0.handle', 'star_rating')
+            ->assertJsonPath('fields.1.insights.0.component', 'star-rating-insight')
+            ->assertJsonPath('fields.1.insights.0.props.average', 4.5)
+            ->assertJsonPath('fields.1.insights.0.props.total', 5);
+
+        $this->assertEquals([
+            ['key' => 'red', 'label' => 'Red', 'count' => 2, 'percent' => 67],
+            ['key' => 'blue', 'label' => 'Blue', 'count' => 1, 'percent' => 33],
+        ], $response->json('fields.0.chart.props.items'));
+    }
+
+    #[Test]
+    public function it_ignores_fields_that_cant_be_charted()
+    {
+        $form = tap(Form::make('survey')->formFields([
+            'sections' => [
+                [
+                    'fields' => [
+                        ['handle' => 'intro', 'field' => ['type' => 'heading', 'display' => 'Tell us about yourself']],
+                        ['handle' => 'joined', 'field' => ['type' => 'date_picker', 'display' => 'When did you join?']],
+                        ['handle' => 'color', 'field' => ['type' => 'multi_choice', 'options' => ['red' => 'Red']]],
+                    ],
+                ],
+            ],
+        ]))->save();
+
+        $this
+            ->actingAs($this->superUser())
+            ->getJson(cp_route('forms.submissions.summary', $form->handle()))
+            ->assertOk()
+            ->assertJsonCount(1, 'fields')
+            ->assertJsonPath('fields.0.handle', 'color')
+            ->assertJsonCount(1, 'meta.fields')
+            ->assertJsonPath('meta.fields.0.handle', 'color');
+    }
+
+    #[Test]
+    public function it_uses_the_saved_chart_layout()
+    {
+        $form = $this->makeForm();
+        $form->charts([['field' => 'rating', 'chart' => 'horizontal_bar']])->save();
+
+        $this
+            ->actingAs($this->superUser())
+            ->getJson(cp_route('forms.submissions.summary', $form->handle()))
+            ->assertOk()
+            ->assertJsonCount(1, 'fields')
+            ->assertJsonPath('fields.0.handle', 'rating')
+            ->assertJsonPath('fields.0.chart.handle', 'horizontal_bar');
+    }
+
+    #[Test]
+    public function it_skips_unknown_fields_and_falls_back_on_unknown_charts()
+    {
+        $form = $this->makeForm();
+        $form->charts([
+            ['field' => 'missing', 'chart' => 'pie'],
+            ['field' => 'color', 'chart' => 'line'],
+        ])->save();
+
+        $this
+            ->actingAs($this->superUser())
+            ->getJson(cp_route('forms.submissions.summary', $form->handle()))
+            ->assertOk()
+            ->assertJsonCount(1, 'fields')
+            ->assertJsonPath('fields.0.handle', 'color')
+            ->assertJsonPath('fields.0.chart.handle', 'pie');
+    }
+
+    #[Test]
+    public function it_falls_back_to_the_default_chart_when_the_saved_chart_doesnt_apply()
+    {
+        $form = $this->makeForm();
+        $form->charts([['field' => 'color', 'chart' => 'ranked_options']])->save();
+
+        $this
+            ->actingAs($this->superUser())
+            ->getJson(cp_route('forms.submissions.summary', $form->handle()))
+            ->assertOk()
+            ->assertJsonCount(1, 'fields')
+            ->assertJsonPath('fields.0.handle', 'color')
+            ->assertJsonPath('fields.0.chart.handle', 'pie');
+    }
+
+    #[Test]
+    public function it_shows_the_saved_insights_in_order()
+    {
+        $form = $this->makeNumberForm();
+        $form->charts([['field' => 'price', 'chart' => 'vertical_bar', 'insights' => [['type' => 'average'], ['type' => 'min_max']]]])->save();
+
+        $this->submit($form, ['price' => 5]);
+        $this->submit($form, ['price' => 10]);
+
+        $this
+            ->actingAs($this->superUser())
+            ->getJson(cp_route('forms.submissions.summary', $form->handle()))
+            ->assertOk()
+            ->assertJsonCount(2, 'fields.0.insights')
+            ->assertJsonPath('fields.0.insights.0.handle', 'average')
+            ->assertJsonPath('fields.0.insights.0.props.average', '7.5')
+            ->assertJsonPath('fields.0.insights.1.handle', 'min_max')
+            ->assertJsonPath('fields.0.layout', [
+                'field' => 'price',
+                'chart' => 'vertical_bar',
+                'insights' => [['type' => 'average'], ['type' => 'min_max']],
+            ]);
+    }
+
+    #[Test]
+    #[DataProvider('precisionProvider')]
+    public function the_fields_precision_decides_the_decimals_of_each_insight(array $field, array $minMax, array $average)
+    {
+        TemperatureFormFieldtype::register();
+
+        $form = $this->makeNumberForm($field);
+
+        $this->submit($form, ['price' => 18]);
+        $this->submit($form, ['price' => 24]);
+        $this->submit($form, ['price' => 22]);
+
+        $response = $this
+            ->actingAs($this->superUser())
+            ->getJson(cp_route('forms.submissions.summary', $form->handle()))
+            ->assertOk()
+            ->assertJsonPath('fields.0.insights.0.handle', 'min_max')
+            ->assertJsonPath('fields.0.insights.1.handle', 'average');
+
+        $this->assertEquals($minMax, $response->json('fields.0.insights.0.props'));
+        $this->assertEquals($average, $response->json('fields.0.insights.1.props'));
+    }
+
+    public static function precisionProvider()
+    {
+        return [
+            'number' => [['type' => 'number'], ['min' => '18', 'max' => '24'], ['average' => '21.3']],
+            'currency' => [['type' => 'currency', 'currency' => 'GBP'], ['min' => '18.00', 'max' => '24.00', 'prefix' => '£'], ['average' => '21.33', 'prefix' => '£']],
+            'one decimal' => [['type' => 'temperature'], ['min' => '18.0', 'max' => '24.0'], ['average' => '21.3']],
+        ];
+    }
+
+    #[Test]
+    public function each_insight_gets_the_fields_facts_for_that_insight()
+    {
+        PerInsightFormFieldtype::register();
+
+        $form = $this->makeNumberForm(['type' => 'per_insight']);
+
+        $this->submit($form, ['price' => 5]);
+        $this->submit($form, ['price' => 10]);
+
+        $response = $this
+            ->actingAs($this->superUser())
+            ->getJson(cp_route('forms.submissions.summary', $form->handle()))
+            ->assertOk();
+
+        $this->assertEquals(['min' => '5', 'max' => '10', 'suffix' => ' (min/max)'], $response->json('fields.0.insights.0.props'));
+        $this->assertEquals(['average' => '7.5', 'suffix' => ' (average)'], $response->json('fields.0.insights.1.props'));
+    }
+
+    #[Test]
+    public function it_uses_the_default_insights_when_the_layout_has_no_insights()
+    {
+        $form = $this->makeNumberForm();
+        $form->charts([['field' => 'price', 'chart' => 'horizontal_bar']])->save();
+
+        $response = $this
+            ->actingAs($this->superUser())
+            ->getJson(cp_route('forms.submissions.summary', $form->handle()))
+            ->assertOk()
+            ->assertJsonCount(2, 'fields.0.insights')
+            ->assertJsonPath('fields.0.insights.0.handle', 'min_max')
+            ->assertJsonPath('fields.0.insights.1.handle', 'average')
+            ->assertJsonPath('fields.0.layout', ['field' => 'price', 'chart' => 'horizontal_bar']);
+
+        $this->assertArrayNotHasKey('insights', $response->json('fields.0.layout'));
+    }
+
+    #[Test]
+    public function it_echoes_the_resolved_chart_in_the_layout()
+    {
+        $form = $this->makeForm();
+        $form->charts([['field' => 'color', 'chart' => 'ranked_options']])->save();
+
+        $this
+            ->actingAs($this->superUser())
+            ->getJson(cp_route('forms.submissions.summary', $form->handle()))
+            ->assertOk()
+            ->assertJsonPath('fields.0.layout', ['field' => 'color', 'chart' => 'pie']);
+    }
+
+    #[Test]
+    public function it_shows_no_insights_when_the_layout_has_an_empty_list()
+    {
+        $form = $this->makeNumberForm();
+        $form->charts([['field' => 'price', 'chart' => 'vertical_bar', 'insights' => []]])->save();
+
+        $this
+            ->actingAs($this->superUser())
+            ->getJson(cp_route('forms.submissions.summary', $form->handle()))
+            ->assertOk()
+            ->assertJsonCount(0, 'fields.0.insights')
+            ->assertJsonPath('fields.0.layout', ['field' => 'price', 'chart' => 'vertical_bar', 'insights' => []]);
+    }
+
+    #[Test]
+    public function it_uses_the_default_insights_when_none_of_the_stored_insights_resolve()
+    {
+        $form = $this->makeNumberForm();
+        $form->charts([['field' => 'price', 'chart' => 'horizontal_bar', 'insights' => [['type' => 'missing'], ['type' => 'checked']]]])->save();
+
+        $response = $this
+            ->actingAs($this->superUser())
+            ->getJson(cp_route('forms.submissions.summary', $form->handle()))
+            ->assertOk()
+            ->assertJsonCount(2, 'fields.0.insights')
+            ->assertJsonPath('fields.0.insights.0.handle', 'min_max')
+            ->assertJsonPath('fields.0.insights.1.handle', 'average');
+
+        $this->assertArrayNotHasKey('insights', $response->json('fields.0.layout'));
+    }
+
+    #[Test]
+    public function it_skips_unknown_inapplicable_and_duplicate_insights()
+    {
+        $form = $this->makeNumberForm();
+        $form->charts([['field' => 'price', 'chart' => 'vertical_bar', 'insights' => [
+            ['type' => 'missing'],
+            ['type' => 'star_rating'],
+            ['type' => 'checked'],
+            'average',
+            ['type' => 'average'],
+            ['type' => 'average'],
+        ]]])->save();
+
+        $this
+            ->actingAs($this->superUser())
+            ->getJson(cp_route('forms.submissions.summary', $form->handle()))
+            ->assertOk()
+            ->assertJsonCount(1, 'fields.0.insights')
+            ->assertJsonPath('fields.0.insights.0.handle', 'average')
+            ->assertJsonPath('fields.0.layout.insights', [['type' => 'average']]);
+    }
+
+    #[Test]
+    public function it_previews_insights_in_an_unsaved_chart_layout()
+    {
+        $form = $this->makeNumberForm();
+
+        $this->submit($form, ['price' => 5]);
+
+        $this
+            ->actingAs($this->superUser())
+            ->getJson($this->previewUrl($form, [['field' => 'price', 'chart' => 'vertical_bar', 'insights' => [['type' => 'average']]]]))
+            ->assertOk()
+            ->assertJsonCount(1, 'fields.0.insights')
+            ->assertJsonPath('fields.0.insights.0.handle', 'average')
+            ->assertJsonPath('fields.0.layout.insights', [['type' => 'average']]);
+    }
+
+    #[Test]
+    public function it_previews_an_intentionally_empty_insight_list()
+    {
+        $form = $this->makeNumberForm();
+
+        $this
+            ->actingAs($this->superUser())
+            ->getJson($this->previewUrl($form, [['field' => 'price', 'chart' => 'vertical_bar', 'insights' => []]]))
+            ->assertOk()
+            ->assertJsonCount(0, 'fields.0.insights')
+            ->assertJsonPath('fields.0.layout', ['field' => 'price', 'chart' => 'vertical_bar', 'insights' => []]);
+    }
+
+    #[Test]
+    public function it_excludes_hidden_fields()
+    {
+        $form = tap(Form::make('survey')->formFields([
+            'sections' => [
+                [
+                    'fields' => [
+                        ['handle' => 'color', 'field' => ['type' => 'multi_choice', 'options' => ['red' => 'Red'], 'hidden' => true]],
+                        ['handle' => 'rating', 'field' => ['type' => 'star_rating']],
+                    ],
+                ],
+            ],
+        ]))->save();
+
+        $this
+            ->actingAs($this->superUser())
+            ->getJson(cp_route('forms.submissions.summary', $form->handle()))
+            ->assertOk()
+            ->assertJsonCount(1, 'fields')
+            ->assertJsonPath('fields.0.handle', 'rating')
+            ->assertJsonCount(1, 'meta.fields');
+    }
+
+    #[Test]
+    public function it_previews_an_unsaved_chart_layout()
+    {
+        $form = $this->makeForm();
+        $form->charts([['field' => 'rating', 'chart' => 'horizontal_bar']])->save();
+
+        $this->submit($form, ['color' => 'red']);
+
+        $this
+            ->actingAs($this->superUser())
+            ->getJson($this->previewUrl($form, [['field' => 'color', 'chart' => 'horizontal_bar']]))
+            ->assertOk()
+            ->assertJsonCount(1, 'fields')
+            ->assertJsonPath('fields.0.handle', 'color')
+            ->assertJsonPath('fields.0.chart.handle', 'horizontal_bar')
+            ->assertJsonPath('fields.0.chart.props.items.0.count', 1);
+
+        $this->assertEquals([['field' => 'rating', 'chart' => 'horizontal_bar']], Form::find('survey')->charts());
+    }
+
+    #[Test]
+    #[DataProvider('invalidChartLayoutProvider')]
+    public function it_validates_a_previewed_chart_layout($charts, $error)
+    {
+        $form = $this->makeForm();
+
+        $this
+            ->actingAs($this->superUser())
+            ->getJson($this->previewUrl($form, $charts))
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors($error);
+    }
+
+    #[Test]
+    #[DataProvider('unencodedChartLayoutProvider')]
+    public function it_ignores_a_previewed_chart_layout_that_isnt_encoded($query)
+    {
+        $form = $this->makeForm();
+        $form->charts([['field' => 'rating', 'chart' => 'horizontal_bar']])->save();
+
+        $this
+            ->actingAs($this->superUser())
+            ->getJson(cp_route('forms.submissions.summary', $form->handle()).'?'.$query)
+            ->assertOk()
+            ->assertJsonCount(1, 'fields')
+            ->assertJsonPath('fields.0.handle', 'rating')
+            ->assertJsonPath('fields.0.chart.handle', 'horizontal_bar');
+    }
+
+    public static function unencodedChartLayoutProvider()
+    {
+        return [
+            'plain array' => [http_build_query(['charts' => [['field' => 'color', 'chart' => 'pie']]])],
+            'not encoded' => ['charts=not-encoded'],
+        ];
+    }
+
+    public static function invalidChartLayoutProvider()
+    {
+        return [
+            'not an array' => ['pie', 'charts'],
+            'array field' => [[['field' => ['color'], 'chart' => 'pie']], 'charts.0.field'],
+            'array chart' => [[['field' => 'color', 'chart' => ['pie']]], 'charts.0.chart'],
+            'missing field' => [[['chart' => 'pie']], 'charts.0.field'],
+            'missing chart' => [[['field' => 'color']], 'charts.0.chart'],
+            'duplicate field' => [[['field' => 'color', 'chart' => 'pie'], ['field' => 'color', 'chart' => 'pie']], 'charts.0.field'],
+            'insights not an array' => [[['field' => 'color', 'chart' => 'pie', 'insights' => 'average']], 'charts.0.insights'],
+            'insight not an array' => [[['field' => 'color', 'chart' => 'pie', 'insights' => ['average']]], 'charts.0.insights.0'],
+            'insight missing type' => [[['field' => 'color', 'chart' => 'pie', 'insights' => [['name' => 'average']]]], 'charts.0.insights.0.type'],
+            'array insight type' => [[['field' => 'color', 'chart' => 'pie', 'insights' => [['type' => ['average']]]]], 'charts.0.insights.0.type'],
+        ];
+    }
+
+    #[Test]
+    public function it_scopes_counts_to_the_search_query()
+    {
+        $form = $this->makeForm();
+
+        $this->submit($form, ['name' => 'Alice', 'color' => 'red']);
+        $this->submit($form, ['name' => 'Bob', 'color' => 'blue']);
+
+        $this
+            ->actingAs($this->superUser())
+            ->getJson(cp_route('forms.submissions.summary', $form->handle()).'?search=alice')
+            ->assertOk()
+            ->assertJsonPath('total', 1)
+            ->assertJsonPath('fields.0.chart.props.items.0.count', 1)
+            ->assertJsonPath('fields.0.chart.props.items.1.count', 0);
+    }
+
+    #[Test]
+    public function it_only_includes_meta_for_users_who_can_edit_the_form()
+    {
+        $form = $this->makeForm();
+
+        $this
+            ->actingAs($this->superUser())
+            ->getJson(cp_route('forms.submissions.summary', $form->handle()))
+            ->assertJsonCount(5, 'meta.charts')
+            ->assertJsonPath('meta.charts.0.handle', 'horizontal_bar')
+            ->assertJsonPath('meta.charts.0.component', 'ui-horizontal-bar-chart')
+            ->assertJsonCount(2, 'meta.fields')
+            ->assertJsonPath('meta.fields.0.handle', 'color')
+            ->assertJsonPath('meta.fields.0.default_chart', 'pie')
+            ->assertJsonPath('meta.fields.0.charts', ['horizontal_bar', 'lollipop', 'pie', 'vertical_bar'])
+            ->assertJsonPath('meta.fields.1.handle', 'rating')
+            ->assertJsonPath('meta.fields.1.charts', ['horizontal_bar', 'lollipop', 'pie', 'vertical_bar']);
+
+        $this->setTestRoles(['test' => ['access cp', 'view form submissions']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+
+        $this
+            ->actingAs($user)
+            ->getJson(cp_route('forms.submissions.summary', $form->handle()))
+            ->assertJsonPath('meta', []);
+    }
+
+    private function makeForm()
+    {
+        return tap(Form::make('survey')->formFields([
+            'sections' => [
+                [
+                    'fields' => [
+                        ['handle' => 'name', 'field' => ['type' => 'short_answer']],
+                        ['handle' => 'color', 'field' => ['type' => 'multi_choice', 'options' => ['red' => 'Red', 'blue' => 'Blue']]],
+                        ['handle' => 'rating', 'field' => ['type' => 'star_rating']],
+                    ],
+                ],
+            ],
+        ]))->save();
+    }
+
+    private function makeNumberForm(array $field = ['type' => 'number'])
+    {
+        return tap(Form::make('survey')->formFields([
+            'sections' => [
+                [
+                    'fields' => [
+                        ['handle' => 'price', 'field' => $field],
+                    ],
+                ],
+            ],
+        ]))->save();
+    }
+
+    private function previewUrl($form, $charts)
+    {
+        return cp_route('forms.submissions.summary', $form->handle()).'?'.http_build_query(['charts' => base64_encode(json_encode($charts))]);
+    }
+
+    private function submit($form, array $data)
+    {
+        FormSubmission::make()->form($form)->data($data)->save();
+    }
+
+    private function superUser()
+    {
+        return tap(User::make()->makeSuper())->save();
+    }
+}
+
+class TemperatureFormFieldtype extends Number
+{
+    public static $handle = 'temperature';
+
+    public function insightConfig(Insight $insight): array
+    {
+        return ['precision' => 1];
+    }
+}
+
+class PerInsightFormFieldtype extends Number
+{
+    public static $handle = 'per_insight';
+
+    public function insightConfig(Insight $insight): array
+    {
+        return match ($insight::class) {
+            MinMax::class => ['suffix' => ' (min/max)'],
+            Average::class => ['suffix' => ' (average)'],
+            default => [],
+        };
+    }
+}

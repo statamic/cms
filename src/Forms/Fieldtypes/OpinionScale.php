@@ -2,7 +2,13 @@
 
 namespace Statamic\Forms\Fieldtypes;
 
+use Illuminate\Support\Collection;
+use Statamic\Forms\Charts\ChartOption;
+use Statamic\Forms\Charts\VerticalBar;
 use Statamic\Forms\Fields\FormFieldtype;
+use Statamic\Forms\Fields\FormValueType;
+use Statamic\Forms\Insights\Average;
+use Statamic\Forms\Summary\FieldResponses;
 use Statamic\Support\Arr;
 
 use function Statamic\trans as __;
@@ -65,6 +71,29 @@ class OpinionScale extends FormFieldtype
             'high_label' => $this->config('high_label'),
             ...Arr::except($this->config(), ['type', 'min', 'max', 'low_label', 'middle_label', 'high_label']),
         ];
+    }
+
+    public function valueType(): ?FormValueType
+    {
+        return FormValueType::Number;
+    }
+
+    public function defaultChart(): ?string
+    {
+        return VerticalBar::class;
+    }
+
+    public function chartOptions(FieldResponses $responses): ?Collection
+    {
+        [$min, $max] = $this->normalizedRange();
+
+        return collect(range($min, $max))
+            ->map(fn ($value) => new ChartOption((string) $value));
+    }
+
+    public function defaultInsights(): array
+    {
+        return [Average::class];
     }
 
     public function example(): ?array

@@ -3,8 +3,12 @@
 namespace Tests\Forms\Fieldtypes;
 
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Forms\Charts\VerticalBar;
 use Statamic\Forms\Fields\FormField;
+use Statamic\Forms\Fields\FormValueType;
 use Statamic\Forms\Fieldtypes\OpinionScale;
+use Statamic\Forms\Insights\Average;
+use Statamic\Forms\Summary\FieldResponses;
 use Tests\TestCase;
 
 class OpinionScaleTest extends TestCase
@@ -70,5 +74,43 @@ class OpinionScaleTest extends TestCase
 
         $this->assertEquals(5, $fieldtype->toFieldArray()['min']);
         $this->assertEquals(10, $fieldtype->toFieldArray()['max']);
+    }
+
+    #[Test]
+    public function it_defaults_to_a_column_chart()
+    {
+        $this->assertEquals(VerticalBar::class, (new OpinionScale)->defaultChart());
+    }
+
+    #[Test]
+    public function it_stores_number_values()
+    {
+        $this->assertSame(FormValueType::Number, (new OpinionScale)->valueType());
+    }
+
+    #[Test]
+    public function it_returns_its_range_as_chart_options()
+    {
+        $fieldtype = (new OpinionScale)->setField(new FormField('satisfaction', [
+            'type' => 'opinion_scale',
+            'min' => 1,
+            'max' => 5,
+        ]));
+
+        $this->assertEquals(['1', '2', '3', '4', '5'], $fieldtype->chartOptions($this->responses([]))->map->key->all());
+    }
+
+    #[Test]
+    public function it_defaults_to_an_average_insight()
+    {
+        $fieldtype = (new OpinionScale)->setField(new FormField('satisfaction', ['type' => 'opinion_scale']));
+
+        $this->assertSame([Average::class], $fieldtype->defaultInsights());
+        $this->assertSame([], $fieldtype->insightConfig(new Average));
+    }
+
+    private function responses(iterable $values): FieldResponses
+    {
+        return FieldResponses::fromValues(new FormField('field', ['type' => 'opinion_scale']), $values);
     }
 }

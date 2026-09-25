@@ -3,8 +3,12 @@
 namespace Tests\Forms\Fieldtypes;
 
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Forms\Charts\HorizontalBar;
 use Statamic\Forms\Fields\FormField;
+use Statamic\Forms\Fields\FormValueType;
 use Statamic\Forms\Fieldtypes\Toggle;
+use Statamic\Forms\Insights\Checked;
+use Statamic\Forms\Summary\FieldResponses;
 use Tests\TestCase;
 
 class ToggleTest extends TestCase
@@ -37,5 +41,41 @@ class ToggleTest extends TestCase
             'inline_label' => 'I agree to the terms',
             'default' => true,
         ], $fieldtype->toFieldArray());
+    }
+
+    #[Test]
+    public function it_defaults_to_a_bar_chart()
+    {
+        $this->assertEquals(HorizontalBar::class, (new Toggle)->defaultChart());
+    }
+
+    #[Test]
+    public function it_stores_boolean_values()
+    {
+        $this->assertSame(FormValueType::Boolean, (new Toggle)->valueType());
+    }
+
+    #[Test]
+    public function it_returns_boolean_chart_options()
+    {
+        $options = (new Toggle)->setField(new FormField('agree', ['type' => 'toggle']))->chartOptions($this->responses([]));
+
+        $this->assertEquals(['true', 'false'], $options->map->key->all());
+        $this->assertEquals(['Yes', 'No'], $options->map->label->all());
+        $this->assertEquals(['checkmark-circle-filled', 'delete-circle-filled'], $options->map->icon->all());
+    }
+
+    #[Test]
+    public function it_defaults_to_a_checked_insight()
+    {
+        $fieldtype = (new Toggle)->setField(new FormField('agree', ['type' => 'toggle']));
+
+        $this->assertSame([Checked::class], $fieldtype->defaultInsights());
+        $this->assertSame([], $fieldtype->insightConfig(new Checked));
+    }
+
+    private function responses(iterable $values): FieldResponses
+    {
+        return FieldResponses::fromValues(new FormField('field', ['type' => 'toggle']), $values);
     }
 }

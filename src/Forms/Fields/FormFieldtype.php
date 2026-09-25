@@ -5,6 +5,7 @@ namespace Statamic\Forms\Fields;
 use Facades\Statamic\Fields\FieldtypeRepository;
 use Facades\Statamic\Forms\Fields\FormFieldtypeRepository;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Collection;
 use Statamic\Extend\HasHandle;
 use Statamic\Extend\RegistersItself;
 use Statamic\Facades\Blink;
@@ -12,6 +13,8 @@ use Statamic\Fields\Blueprint;
 use Statamic\Fields\ConfigFields;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
+use Statamic\Forms\Insights\Insight;
+use Statamic\Forms\Summary\FieldResponses;
 use Statamic\Support\Str;
 
 use function Statamic\trans as __;
@@ -204,6 +207,36 @@ abstract class FormFieldtype implements Arrayable
     public function example(): ?array
     {
         return null;
+    }
+
+    public function valueType(): ?FormValueType
+    {
+        return null;
+    }
+
+    public function defaultChart(): ?string
+    {
+        return null;
+    }
+
+    public function chartOptions(FieldResponses $responses): ?Collection
+    {
+        return null;
+    }
+
+    /** @return list<class-string<Insight>> */
+    public function defaultInsights(): array
+    {
+        return [];
+    }
+
+    /**
+     * Facts about the field's values, passed to the given insight as config.
+     * Core insights read `prefix`, `suffix`, `precision` (decimals in the values themselves) and `total`.
+     */
+    public function insightConfig(Insight $insight): array
+    {
+        return [];
     }
 
     public function view(): string
