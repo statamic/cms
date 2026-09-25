@@ -14,6 +14,7 @@
         :show-mode-label="config.show_mode_label"
         :mode="mode"
         :model-value="value.code"
+        :placeholder="config.placeholder"
         :title="config.display"
         :field-actions="fieldActions"
         @update:mode="modeUpdated"
