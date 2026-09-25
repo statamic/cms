@@ -81,6 +81,16 @@ const reloadPage = () => router.reload();
                         pill
                     />
                 </template>
+                <template #cell-connections="{ row: form, value: connections }">
+                    <Badge
+                        v-if="form.can_edit"
+                        :href="form.connect_url"
+                        :append="String(connections)"
+                        :text="__('Connections')"
+                        color="white"
+                        pill
+                    />
+                </template>
                 <template #prepended-row-actions="{ row: form }">
                     <DropdownItem v-if="form.can_edit" :text="__('Configure')" :href="form.edit_url" icon="cog" />
                 </template>

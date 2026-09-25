@@ -12,6 +12,7 @@ import {
 import PageRule from '@/components/forms/builder/pages/PageRule.vue';
 import FieldNumber from '@/components/forms/FieldNumber.vue';
 import { categories, categoryColorClasses } from '@/components/forms/builder/categories';
+import { operatorLabel } from './operatorLabels';
 
 const emit = defineEmits(['collapsed', 'expanded', 'removed', 'update:rule']);
 
@@ -25,27 +26,6 @@ const props = defineProps({
     pageDestinationOptions: { type: Array, default: () => [] },
     fieldtypes: Array,
 });
-
-const operatorLabels = {
-    '': __('equals'),
-    'equals': __('equals'),
-    'not': __('not'),
-    'not_equals': __('does not equal'),
-    'contains': __('contains'),
-    'not_contains': __('does not contain'),
-    'is_empty': __('is empty'),
-    'not_empty': __('is not empty'),
-    'starts_with': __('starts with'),
-    'ends_with': __('ends with'),
-    '==': __('equals'),
-    '!=': __('does not equal'),
-    '>': __('is greater than'),
-    '<': __('is less than'),
-    '>=': __('is at least'),
-    '<=': __('is at most'),
-};
-
-const getOperatorLabel = (operator) => operatorLabels[operator] || operator || __('equals');
 
 const getFieldConfig = (handle) => props.suggestableFields.find(field => field.handle === handle);
 const getFieldDisplay = (handle) => __(getFieldConfig(handle)?.config?.display) || handle;
@@ -76,7 +56,7 @@ const previewParts = computed(() => {
         if (!condition.field) return;
 
         if (index === 0) {
-            parts.push({ type: 'operator', text: getOperatorLabel(condition.operator) });
+            parts.push({ type: 'operator', text: operatorLabel(condition.operator) });
 
             if (condition.value !== null && condition.value !== undefined && condition.value !== '') {
                 const displayValue = Array.isArray(condition.value)
@@ -87,7 +67,7 @@ const previewParts = computed(() => {
         } else {
             parts.push({ type: 'join', text: condition.join === 'or' ? __('or') : __('and') });
             parts.push({ type: 'field-plain', text: getFieldDisplay(condition.field) });
-            parts.push({ type: 'operator', text: getOperatorLabel(condition.operator) });
+            parts.push({ type: 'operator', text: operatorLabel(condition.operator) });
 
             if (condition.value !== null && condition.value !== undefined && condition.value !== '') {
                 const displayValue = Array.isArray(condition.value)
