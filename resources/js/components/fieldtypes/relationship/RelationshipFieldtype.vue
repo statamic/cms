@@ -54,7 +54,7 @@ export default {
             }
 
             if (this.publishContainer?.asConfig && this.handle === 'default') {
-                return this.publishContainer.values?.max_items || Infinity;
+                return Number(this.publishContainer.values?.max_items) || Infinity;
             }
 
             return Infinity;
