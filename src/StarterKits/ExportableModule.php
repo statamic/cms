@@ -4,6 +4,7 @@ namespace Statamic\StarterKits;
 
 use Exception;
 use Illuminate\Support\Collection;
+use Statamic\Console\Composer\Json as ComposerJson;
 use Statamic\StarterKits\Exceptions\StarterKitException;
 use Statamic\Support\Str;
 
@@ -78,7 +79,7 @@ class ExportableModule extends Module
      */
     protected function exportDependenciesFromComposerRequire(string $requireKey, Collection $exportableDependencies): mixed
     {
-        $composerJson = json_decode($this->files->get(base_path('composer.json')), true);
+        $composerJson = json_decode($this->files->get(ComposerJson::path()), true);
 
         $dependencies = collect($composerJson[$requireKey] ?? [])
             ->filter(function ($version, $dependency) use ($exportableDependencies) {
@@ -134,7 +135,7 @@ class ExportableModule extends Module
      */
     protected function ensureExportableDependenciesExist(): self
     {
-        $installedDependencies = collect(json_decode($this->files->get(base_path('composer.json')), true))
+        $installedDependencies = collect(json_decode($this->files->get(ComposerJson::path()), true))
             ->only(['require', 'require-dev'])
             ->map(fn ($dependencies) => array_keys($dependencies))
             ->flatten();

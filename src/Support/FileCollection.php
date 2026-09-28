@@ -10,6 +10,9 @@ use Statamic\Facades\URL;
 use Symfony\Component\Finder\Comparator\DateComparator;
 use Symfony\Component\Finder\Comparator\NumberComparator;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class FileCollection extends Collection
 {
     /**

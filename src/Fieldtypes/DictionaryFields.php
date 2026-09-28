@@ -7,6 +7,8 @@ use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
 use Statamic\Support\Arr;
 
+use function Statamic\trans as __;
+
 class DictionaryFields extends Fieldtype
 {
     protected $selectable = false;

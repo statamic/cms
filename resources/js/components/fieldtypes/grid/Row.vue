@@ -5,6 +5,7 @@
         <FieldsProvider
             :fields="fields"
             :as-config="false"
+            :read-only
             :field-path-prefix="`${fieldPathPrefix}.${index}`"
             :meta-path-prefix="`${metaPathPrefix}.existing.${values._id}`"
         >
@@ -74,6 +75,9 @@ export default {
             type: Boolean,
             default: false,
         },
+        readOnly: {
+            type: Boolean,
+        },
     },
 
     inject: ['grid', 'sortableItemClass', 'sortableHandleClass'],
@@ -94,15 +98,11 @@ export default {
 
     methods: {
         updated(handle, value) {
-            let row = JSON.parse(JSON.stringify(this.values));
-            row[handle] = value;
-            this.$emit('updated', this.index, row);
+            this.$emit('updated', this.index, { ...this.values, [handle]: value });
         },
 
         metaUpdated(handle, value) {
-            let meta = clone(this.meta);
-            meta[handle] = value;
-            this.$emit('meta-updated', meta);
+            this.$emit('meta-updated', { ...this.meta, [handle]: value });
         },
 
         fieldPath(handle) {

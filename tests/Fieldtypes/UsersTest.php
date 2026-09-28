@@ -61,6 +61,36 @@ class UsersTest extends TestCase
     }
 
     #[Test]
+    public function it_augments_the_current_user_when_value_is_the_current_string()
+    {
+        $this->actingAs(Facades\User::find('123'));
+
+        $augmented = $this->fieldtype(['max_items' => 1])->augment('current');
+
+        $this->assertInstanceOf(User::class, $augmented);
+        $this->assertEquals('123', $augmented->id());
+    }
+
+    #[Test]
+    public function it_augments_the_current_user_to_a_query_builder_when_value_is_the_current_string()
+    {
+        $this->actingAs(Facades\User::find('123'));
+
+        $augmented = $this->fieldtype()->augment('current');
+
+        $this->assertInstanceOf(Builder::class, $augmented);
+        $this->assertEquals(['123'], $augmented->get()->map->id()->all());
+    }
+
+    #[Test]
+    public function it_augments_to_null_when_value_is_the_current_string_and_no_user_is_authenticated()
+    {
+        $augmented = $this->fieldtype(['max_items' => 1])->augment('current');
+
+        $this->assertNull($augmented);
+    }
+
+    #[Test]
     public function it_shallow_augments_to_a_collection_of_users()
     {
         $augmented = $this->fieldtype()->shallowAugment(['123', 456]);
@@ -99,15 +129,13 @@ class UsersTest extends TestCase
     }
 
     #[Test]
-    public function it_hides_email_from_index_items_without_view_users_permission()
+    public function it_returns_empty_index_items_without_view_users_permission()
     {
         $this->actingAs($this->cpUserWithPermissions(['access cp']));
 
         $items = $this->fieldtype()->getIndexItems(new Request(['paginate' => false]));
-        $namelessUser = $items->firstWhere('id', '789');
 
-        $this->assertArrayNotHasKey('email', $namelessUser);
-        $this->assertEquals('789', $namelessUser['title']);
+        $this->assertTrue($items->isEmpty());
     }
 
     #[Test]
@@ -164,7 +192,6 @@ class UsersTest extends TestCase
     private function getColumns(Users $fieldtype): array
     {
         $method = new \ReflectionMethod($fieldtype, 'getColumns');
-        $method->setAccessible(true);
 
         return $method->invoke($fieldtype);
     }

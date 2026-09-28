@@ -10,4 +10,9 @@ class RedirectIfTwoFactorSetupIncomplete extends Middleware
     {
         return 'statamic.cp.two-factor-setup';
     }
+
+    protected function redirectUrl(): string
+    {
+        return route($this->redirectRoute());
+    }
 }

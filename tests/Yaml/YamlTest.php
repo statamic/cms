@@ -68,11 +68,11 @@ EOT;
     {
         $expected = <<<'EOT'
 foo: bar
-content: {  }
+content: {}
 
 EOT;
 
-        $this->assertEquals($expected, YAML::dump(['foo' => 'bar'], []));
+        $this->assertEquals($expected, $this->normalizeYaml(YAML::dump(['foo' => 'bar'], [])));
     }
 
     #[Test]
@@ -134,12 +134,12 @@ EOT;
         $expected = <<<'EOT'
 ---
 foo: bar
-content: {  }
+content: {}
 ---
 
 EOT;
 
-        $this->assertStringEqualsStringIgnoringLineEndings($expected, YAML::dumpFrontMatter(['foo' => 'bar'], []));
+        $this->assertStringEqualsStringIgnoringLineEndings($expected, $this->normalizeYaml(YAML::dumpFrontMatter(['foo' => 'bar'], [])));
     }
 
     #[Test]

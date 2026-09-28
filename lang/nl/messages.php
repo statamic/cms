@@ -208,6 +208,7 @@ return [
     'publish_actions_publish' => 'Aanpassingen aan de werkkopie worden toegepast op de entry en onmiddelijk gepubliceerd.',
     'publish_actions_schedule' => 'Aanpassingen aan de werkkopie worden toegepast op de entry en gepubliceerd op de publicatiedatum.',
     'publish_actions_unpublish' => 'De huidige revisie wordt gedepubliceerd.',
+    'relationship_item_unavailable' => 'Dit item is niet beschikbaar. Het is mogelijk verwijderd, of je hebt geen toestemming om het te bekijken.',
     'reset_password_notification_body' => 'Je ontvangt deze e-mail, omdat we een verzoek hebben gekregen om je wachtwoord te resetten.',
     'reset_password_notification_no_action' => 'Als je geen verzoek hebt gedaan om je wachtwoord te resetten dan hoef je verder niets te doen.',
     'reset_password_notification_subject' => 'Wachtwoordresetnotificatie',

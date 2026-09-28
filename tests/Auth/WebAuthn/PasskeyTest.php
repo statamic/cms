@@ -11,6 +11,7 @@ use Statamic\Facades\User;
 use Symfony\Component\Uid\Uuid;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
+use Webauthn\CredentialRecord;
 use Webauthn\PublicKeyCredentialSource;
 use Webauthn\TrustPath\EmptyTrustPath;
 
@@ -19,9 +20,9 @@ class PasskeyTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    private function createTestCredential(): PublicKeyCredentialSource
+    private function createTestCredential(): CredentialRecord
     {
-        return PublicKeyCredentialSource::create(
+        return CredentialRecord::create(
             publicKeyCredentialId: 'test-credential-id-123',
             type: 'public-key',
             transports: ['usb', 'nfc'],
@@ -32,6 +33,42 @@ class PasskeyTest extends TestCase
             userHandle: 'test-user-id',
             counter: 0
         );
+    }
+
+    #[Test]
+    public function it_reads_a_credential_stored_by_an_older_webauthn_lib_version()
+    {
+        // A credential in the exact JSON shape stored by web-auth/webauthn-lib 5.2 (where it was a
+        // PublicKeyCredentialSource). The 5.3 CredentialRecord format is field-identical, so passkeys
+        // saved before the upgrade must still deserialize.
+        $stored = [
+            'publicKeyCredentialId' => 'dGVzdC1jcmVkZW50aWFsLWlkLTEyMw',
+            'type' => 'public-key',
+            'transports' => ['usb', 'nfc'],
+            'attestationType' => 'none',
+            'trustPath' => [],
+            'aaguid' => '00000000-0000-0000-0000-000000000000',
+            'credentialPublicKey' => 'dGVzdC1wdWJsaWMta2V5LWRhdGE',
+            'userHandle' => 'dGVzdC11c2VyLWlk',
+            'counter' => 0,
+        ];
+
+        $user = User::make()->id('test-user')->email('test@example.com');
+
+        $passkey = (new Passkey)
+            ->setName('My Passkey')
+            ->setUser($user)
+            ->setCredential($stored);
+
+        $credential = $passkey->credential();
+
+        $this->assertInstanceOf(PublicKeyCredentialSource::class, $credential);
+        $this->assertEquals('test-credential-id-123', $credential->publicKeyCredentialId);
+        $this->assertEquals('public-key', $credential->type);
+        $this->assertEquals(['usb', 'nfc'], $credential->transports);
+        $this->assertEquals('test-public-key-data', $credential->credentialPublicKey);
+        $this->assertEquals('test-user-id', $credential->userHandle);
+        $this->assertEquals(Base64UrlSafe::encodeUnpadded('test-credential-id-123'), $passkey->id());
     }
 
     #[Test]

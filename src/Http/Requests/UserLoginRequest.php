@@ -10,6 +10,8 @@ use Illuminate\Validation\ValidationException;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 
+use function Statamic\trans as __;
+
 class UserLoginRequest extends FormRequest
 {
     use Localizable;
@@ -30,7 +32,7 @@ class UserLoginRequest extends FormRequest
     protected function failedValidation(Validator $validator)
     {
         if ($this->isPrecognitive() || $this->wantsJson()) {
-            return parent::failedValidation($validator);
+            parent::failedValidation($validator);
         }
 
         if ($this->ajax()) {
@@ -56,6 +58,6 @@ class UserLoginRequest extends FormRequest
     {
         $site = Site::findByUrl(LaravelURL::previous()) ?? Site::default();
 
-        return $this->withLocale($site->lang(), fn () => parent::validateResolved());
+        $this->withLocale($site->lang(), fn () => parent::validateResolved());
     }
 }

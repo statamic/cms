@@ -198,9 +198,11 @@ export default {
         const bladeContent = el?.innerHTML || '';
         const _this = this;
 
+        const corePages = import.meta.glob('../pages/**/*.vue');
+
         await createInertiaApp({
             id: 'statamic',
-            resolve: name => {
+            resolve: async name => {
                 if (name === 'NonInertiaPage') {
                     return {
                         default: {
@@ -211,8 +213,8 @@ export default {
                 }
 
                 // Resolve core pages
-                const pages = import.meta.glob('../pages/**/*.vue', { eager: true });
-                let page = pages[`../pages/${name}.vue`];
+                const pageImport = corePages[`../pages/${name}.vue`];
+                let page = pageImport ? await pageImport() : null;
 
                 // Resolve addon pages
                 if (!page) {

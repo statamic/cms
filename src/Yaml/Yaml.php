@@ -136,7 +136,6 @@ class Yaml
             'args' => $args,
         ]);
         $traceProperty = new ReflectionProperty('Exception', 'trace');
-        $traceProperty->setAccessible(true);
         $traceProperty->setValue($exception, $trace);
 
         return $exception;

@@ -1,9 +1,5 @@
 # Statamic CMS - Claude AI Context
 
-## ⚠️ Always Check Before Making Changes
-
-- Are all user-facing strings localized?
-
 ## Project Overview
 
 This is the **Statamic CMS Core Package** - a Laravel-powered, flat-file (by default) CMS designed for building modern, easy-to-manage websites. This repository contains the core Composer package that gets installed into Laravel applications.
@@ -92,6 +88,31 @@ The project uses Vite for asset compilation with separate configs:
 - Our Vite bundle assembles everything the node module needs in `resouces/js/bootstrap/cms` and makes it available in the `window.__STATAMIC__` object.
 - The node module is defined in `packages/cms` and resolves everything through the `window` object.
 - Code needs to be in the `window` object to prevent addon bundles from re-including our code, and from needing to recompile our source files.
+
+## UI Components & Storybook
+
+- UI components live in `resources/js/components/ui/` and are available to addons via `@statamic/cms/ui`. They are documented with Storybook at [ui.statamic.dev](https://ui.statamic.dev).
+- Stories live in `resources/js/stories/*.stories.ts`, their docs pages in `resources/js/stories/docs/*.mdx`.
+- `npm run storybook` starts Storybook along with its MCP server at `http://localhost:6006/mcp` (configured in `.mcp.json`).
+  - Use its documentation tools to look up a component's props, stories and usage before using or changing a UI component.
+  - After changing components or stories, run the story tests through the MCP server or with `npx vitest run --project storybook`.
+- Storybook generates component manifests for AI agents from stories, MDX docs and component source. Inspect them at `http://localhost:6006/manifests/components.html`.
+  - Document props with JSDoc comments. They end up in the manifest.
+  - Stories import components from `@statamic/cms/ui`, not `@ui`. Snippets copy the story's imports, and `@ui` doesn't exist for addons. `tsconfig.json` maps `@statamic/cms/ui` to `resources/js/components/ui` so this resolves in Storybook.
+  - Snippets are extracted statically from each story's `render`. Write `template` as a literal without `${}` interpolation, use `setup()` instead of `data`/`methods`, keep everything `setup` references inside it (or imported), and read args as `args.foo` or `v-bind="args"`. A story that breaks these rules has no snippet in the manifest. Only add `parameters.docs.source.code` when the docs should show something different from the template.
+
+## For PR Reviews
+
+- All user-facing strings should be localized.
+  - Short strings (like "Submit" or "Click here") can use the translation strings as keys. 
+  - Longer phrases or sentences should use keys and have their translations stored in an appropriate translation file.
+  - When adding to a translation file, only English strings need to be added. Other languages will be provided by contributors.
+  - Exception messages can stay untranslated in English
+
+## Misc
+
+- Commit messages within a PR do *not* need the PR number prefix. Those are just for the PR merge commit itself.
+
 
 ## Links
 

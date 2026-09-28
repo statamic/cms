@@ -7,6 +7,8 @@ use Statamic\Contracts\Auth\UserGroupRepository as RepositoryContract;
 use Statamic\Events\UserGroupBlueprintFound;
 use Statamic\Facades\Blueprint;
 
+use function Statamic\trans as __;
+
 abstract class UserGroupRepository implements RepositoryContract
 {
     public function find($id): ?UserGroupContract

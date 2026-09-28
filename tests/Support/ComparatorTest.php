@@ -39,6 +39,15 @@ class ComparatorTest extends TestCase
     }
 
     #[Test]
+    public function it_compares_strings_naturally()
+    {
+        $this->assertSecond(Compare::strings('Heading 2', 'Heading 10'));
+        $this->assertFirst(Compare::strings('Heading 10', 'Heading 2'));
+        $this->assertSecond(Compare::strings('Heading 9', 'Heading 10'));
+        $this->assertEqual(Compare::strings('Heading 10', 'heading 10'));
+    }
+
+    #[Test]
     public function it_compares_numbers()
     {
         $this->assertSecond(Compare::numbers(1, 2));

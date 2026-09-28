@@ -9,6 +9,9 @@ use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class AssetUploader extends Uploader
 {
     private $asset;
@@ -80,7 +83,7 @@ class AssetUploader extends Uploader
 
     public static function getSafeFilename($string)
     {
-        $replacements = [
+        $replacements = array_merge(config('statamic.assets.additional_filename_replacements', []), [
             ' ' => '-',
             '#' => '-',
             ':' => '-',
@@ -95,7 +98,7 @@ class AssetUploader extends Uploader
             '%' => '-',
             "'" => '-',
             '--' => '-',
-        ];
+        ]);
 
         return (string) Str::of(urldecode($string))
             ->replace(array_keys($replacements), array_values($replacements))

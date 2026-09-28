@@ -43,7 +43,7 @@
                                     :sortable-handle-class="sortableHandleClass"
                                     :collapsed="collapsed.includes(set._id)"
                                     :enabled="set.enabled"
-                                    :read-only
+                                    :read-only="isReadOnly"
                                     :can-add-set="canAddSet"
                                     :has-error="setHasError(set._id)"
                                     :show-field-previews="config.previews"
@@ -293,13 +293,9 @@ export default {
             if (!this.canAddSet) return;
 
             const index = this.value.findIndex((v) => v._id === old_id);
-            const old = this.value[index];
-            const set = {
-                ...JSON.parse(JSON.stringify(old)),
-                _id: uniqid(),
-            };
+            const { values: set, meta } = this.duplicateValues(this.value[index], this.meta.existing[old_id]);
 
-            this.updateSetMeta(set._id, this.meta.existing[old_id]);
+            this.updateSetMeta(set._id, meta);
 
             this.update([...this.value.slice(0, index + 1), set, ...this.value.slice(index + 1)]);
 

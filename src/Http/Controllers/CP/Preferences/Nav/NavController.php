@@ -9,6 +9,8 @@ use Statamic\Facades\User;
 use Statamic\Http\Controllers\Controller;
 use Statamic\Statamic;
 
+use function Statamic\trans as __;
+
 class NavController extends Controller
 {
     public function index()

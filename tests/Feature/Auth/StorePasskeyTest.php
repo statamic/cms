@@ -39,6 +39,9 @@ class StorePasskeyTest extends TestCase
         $this->assertArrayHasKey('challenge', $data);
         $this->assertArrayHasKey('user', $data);
         $this->assertArrayHasKey('rp', $data);
+        $this->assertEquals('required', $data['authenticatorSelection']['residentKey']);
+        $this->assertTrue($data['authenticatorSelection']['requireResidentKey']);
+        $this->assertEquals('required', $data['authenticatorSelection']['userVerification']);
         $this->assertNotNull(session('webauthn.challenge'));
     }
 
@@ -69,7 +72,7 @@ class StorePasskeyTest extends TestCase
         $responseChallenge = $response->json('challenge');
 
         $this->assertNotNull(session('webauthn.challenge'));
-        $this->assertEquals(16, strlen(session('webauthn.challenge')));
+        $this->assertEquals(16, strlen(base64_decode(session('webauthn.challenge'))));
         $this->assertIsString($responseChallenge);
     }
 

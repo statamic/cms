@@ -78,7 +78,7 @@ class ForgotPasswordFormTest extends TestCase
     }
 
     #[Test]
-    public function it_wont_send_reset_link_for_non_existent_user_and_renders_errors()
+    public function it_returns_generic_success_for_non_existent_user_to_prevent_enumeration()
     {
         $this
             ->post('/!/auth/password/email', [
@@ -101,9 +101,53 @@ EOT
         preg_match_all('/<p class="success">(.+)<\/p>/U', $output, $success);
         preg_match_all('/<p class="email_sent">(.+)<\/p>/U', $output, $emailSent);
 
-        $this->assertEquals([__(Password::INVALID_USER)], $errors[1]);
-        $this->assertEmpty($success[1]);
-        $this->assertEmpty($emailSent[1]);
+        $this->assertEmpty($errors[1]);
+        $this->assertEquals([__(Password::RESET_LINK_SENT)], $success[1]);
+        $this->assertEquals([__(Password::RESET_LINK_SENT)], $emailSent[1]);
+    }
+
+    #[Test]
+    public function it_returns_generic_success_for_throttled_user_to_prevent_enumeration()
+    {
+        $throttled = new class
+        {
+            public function sendResetLink()
+            {
+                return Password::RESET_THROTTLED;
+            }
+        };
+
+        Password::shouldReceive('broker')->andReturn($throttled);
+
+        User::make()
+            ->email('san@holo.com')
+            ->password('chewy')
+            ->save();
+
+        $this
+            ->post('/!/auth/password/email', [
+                'email' => 'san@holo.com',
+            ])
+            ->assertLocation('/');
+
+        $output = $this->tag(<<<'EOT'
+{{ user:forgot_password_form }}
+    {{ errors }}
+        <p class="error">{{ value }}</p>
+    {{ /errors }}
+    <p class="success">{{ success }}</p>
+    <p class="email_sent">{{ email_sent }}</p>
+{{ /user:forgot_password_form }}
+EOT
+        );
+
+        preg_match_all('/<p class="error">(.+)<\/p>/U', $output, $errors);
+        preg_match_all('/<p class="success">(.+)<\/p>/U', $output, $success);
+        preg_match_all('/<p class="email_sent">(.+)<\/p>/U', $output, $emailSent);
+
+        $this->assertEmpty($errors[1]);
+        $this->assertEquals([__(Password::RESET_LINK_SENT)], $success[1]);
+        $this->assertEquals([__(Password::RESET_LINK_SENT)], $emailSent[1]);
     }
 
     #[Test]
@@ -211,36 +255,6 @@ EOT
     }
 
     #[Test]
-    public function it_wont_log_user_in_and_follow_custom_error_redirect_with_errors()
-    {
-        $this
-            ->post('/!/auth/password/email', [
-                'email' => 'san@holo.com',
-                '_error_redirect' => '/password-reset-error',
-            ])
-            ->assertLocation('/password-reset-error');
-
-        $output = $this->tag(<<<'EOT'
-{{ user:forgot_password_form }}
-    {{ errors }}
-        <p class="error">{{ value }}</p>
-    {{ /errors }}
-    <p class="success">{{ success }}</p>
-    <p class="email_sent">{{ email_sent }}</p>
-{{ /user:forgot_password_form }}
-EOT
-        );
-
-        preg_match_all('/<p class="error">(.+)<\/p>/U', $output, $errors);
-        preg_match_all('/<p class="success">(.+)<\/p>/U', $output, $success);
-        preg_match_all('/<p class="email_sent">(.+)<\/p>/U', $output, $emailSent);
-
-        $this->assertEquals([__(Password::INVALID_USER)], $errors[1]);
-        $this->assertEmpty($success[1]);
-        $this->assertEmpty($emailSent[1]);
-    }
-
-    #[Test]
     public function it_wont_follow_redirect_to_external_url()
     {
         $this->simulateSuccessfulPasswordResetEmail();
@@ -255,18 +269,6 @@ EOT
             ->post('/!/auth/password/email', [
                 'email' => 'san@holo.com',
                 '_redirect' => 'https://external-site.com/phishing',
-            ])
-            ->assertLocation('/forgot-password');
-    }
-
-    #[Test]
-    public function it_wont_follow_redirect_to_external_url_on_error()
-    {
-        $this
-            ->from('/forgot-password')
-            ->post('/!/auth/password/email', [
-                'email' => 'nonexistent@test.com',
-                '_error_redirect' => 'https://external-site.com/phishing',
             ])
             ->assertLocation('/forgot-password');
     }

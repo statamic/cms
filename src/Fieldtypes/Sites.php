@@ -3,10 +3,16 @@
 namespace Statamic\Fieldtypes;
 
 use Statamic\Facades\Site;
+use Statamic\Facades\User;
 
 class Sites extends Relationship
 {
     protected $indexComponent = 'text';
+
+    protected function authorizeItemData($id): bool
+    {
+        return $this->authorizeViewable(Site::get($id));
+    }
 
     public function toItemArray($id)
     {
@@ -22,12 +28,15 @@ class Sites extends Relationship
 
     public function getIndexItems($request)
     {
-        return Site::all()->sortBy('name')->map(function ($site) {
-            return [
-                'id' => $site->handle(),
-                'title' => $site->name(),
-            ];
-        })->values();
+        return Site::all()
+            ->filter(fn ($site) => User::current()->can('view', $site))
+            ->sortBy('name')
+            ->map(function ($site) {
+                return [
+                    'id' => $site->handle(),
+                    'title' => $site->name(),
+                ];
+            })->values();
     }
 
     public function augmentValue($value)

@@ -38,6 +38,17 @@ class NavTreePolicyTest extends PolicyTestCase
     }
 
     #[Test]
+    public function trees_are_viewable_and_editable_with_configure_permission()
+    {
+        $user = $this->userWithPermissions(['configure navs']);
+
+        $nav = Nav::make('test');
+
+        $this->assertTrue($user->can('view', $nav->makeTree('en')));
+        $this->assertTrue($user->can('edit', $nav->makeTree('en')));
+    }
+
+    #[Test]
     public function navs_are_editable_with_edit_permissions()
     {
         $user = $this->userWithPermissions(['edit alfa nav']);

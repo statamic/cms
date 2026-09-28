@@ -5,6 +5,8 @@ namespace Statamic\Notifications;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
+use function Statamic\trans as __;
+
 class ElevatedSessionVerificationCode extends Notification
 {
     public function __construct(public string $verificationCode)

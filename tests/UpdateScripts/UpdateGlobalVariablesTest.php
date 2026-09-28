@@ -4,6 +4,7 @@ namespace Tests\UpdateScripts;
 
 use Illuminate\Support\Facades\File;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\GlobalSet;
 use Statamic\Facades\YAML;
 use Statamic\UpdateScripts\UpdateGlobalVariables;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -80,6 +81,32 @@ YAML;
     }
 
     #[Test]
+    public function migrated_variables_survive_being_saved_later_in_the_same_process()
+    {
+        File::put($this->globalsPath.'/test.yaml', Yaml::dump([
+            'title' => 'Test',
+            'data' => [
+                'foo' => 'Bar',
+            ],
+        ]));
+
+        $this->runUpdateScript(UpdateGlobalVariables::class);
+
+        // Simulates an addon update script saving variables after the migration
+        $variables = GlobalSet::findByHandle('test')->inDefaultSite();
+        $variables->set('baz', 'Qux');
+        $variables->save();
+
+        $this->assertEquals(
+            ['foo' => 'Bar', 'baz' => 'Qux'],
+            YAML::parse(File::get($this->globalsPath.'/en/test.yaml'))
+        );
+
+        unlink($this->globalsPath.'/test.yaml');
+        unlink($this->globalsPath.'/en/test.yaml');
+    }
+
+    #[Test]
     public function it_builds_the_sites_array_in_a_multi_site_install()
     {
         $this->setSites([
@@ -93,9 +120,12 @@ YAML;
         File::ensureDirectoryExists($this->globalsPath.'/de');
 
         File::put($this->globalsPath.'/test.yaml', Yaml::dump(['title' => 'Test']));
-        File::put($this->globalsPath.'/en/test.yaml', Yaml::dump(['foo' => 'Bar', 'baz' => 'Qux']));
-        File::put($this->globalsPath.'/fr/test.yaml', Yaml::dump(['origin' => 'en', 'foo' => 'Bar']));
+
+        // Written out of order on purpose. The Stache indexes variables by modification
+        // time, but the sites array should follow the order of the sites config.
         File::put($this->globalsPath.'/de/test.yaml', Yaml::dump(['origin' => 'fr']));
+        File::put($this->globalsPath.'/fr/test.yaml', Yaml::dump(['origin' => 'en', 'foo' => 'Bar']));
+        File::put($this->globalsPath.'/en/test.yaml', Yaml::dump(['foo' => 'Bar', 'baz' => 'Qux']));
 
         $this->runUpdateScript(UpdateGlobalVariables::class);
 
@@ -103,9 +133,9 @@ YAML;
         $expected = <<<'YAML'
 title: Test
 sites:
-  de: fr
   en: null
   fr: en
+  de: fr
 
 YAML;
 

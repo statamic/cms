@@ -33,7 +33,7 @@
     }
 
     &.status-scheduled {
-        @apply bg-amber-200 text-amber-900 dark:bg-amber-300 dark:text-amber-950;
+        @apply bg-amber-200 text-amber-900 dark:bg-amber-300/6 dark:text-amber-300;
     }
 }
 

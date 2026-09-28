@@ -11,6 +11,8 @@ use Statamic\Facades\User;
 use Statamic\Http\Resources\CP\Nav\Nav as NavResource;
 use Statamic\Statamic;
 
+use function Statamic\trans as __;
+
 trait HasNavBuilder
 {
     protected function navBuilder($nav = null, $props = [])

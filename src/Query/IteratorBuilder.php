@@ -115,20 +115,29 @@ abstract class IteratorBuilder extends Builder
 
     protected function filterWhereIn($entries, $where)
     {
-        return $entries->filter(function ($entry) use ($where) {
+        $values = array_map($this->normalizeWhereInValue(...), $where['values']);
+
+        return $entries->filter(function ($entry) use ($where, $values) {
             $value = $this->getFilterItemValue($entry, $where['column']);
 
-            return in_array($value, $where['values']);
+            return in_array($this->normalizeWhereInValue($value), $values);
         });
     }
 
     protected function filterWhereNotIn($entries, $where)
     {
-        return $entries->filter(function ($entry) use ($where) {
+        $values = array_map($this->normalizeWhereInValue(...), $where['values']);
+
+        return $entries->filter(function ($entry) use ($where, $values) {
             $value = $this->getFilterItemValue($entry, $where['column']);
 
-            return ! in_array($value, $where['values']);
+            return ! in_array($this->normalizeWhereInValue($value), $values);
         });
+    }
+
+    private function normalizeWhereInValue($value)
+    {
+        return is_string($value) ? strtolower($value) : $value;
     }
 
     protected function filterWhereBasic($entries, $where)
@@ -259,7 +268,9 @@ abstract class IteratorBuilder extends Builder
                 return false;
             }
 
-            return $value->copy()->startOfDay()->$method($where['value']);
+            $value = $value->copy()->setTimezone(config('app.timezone'));
+
+            return $value->startOfDay()->$method($where['value']);
         });
     }
 
@@ -318,6 +329,8 @@ abstract class IteratorBuilder extends Builder
             if (is_null($value)) {
                 return false;
             }
+
+            $value = $value->copy()->setTimezone(config('app.timezone'));
 
             $compareValue = $value->copy()->setTimeFromTimeString($where['value']);
 

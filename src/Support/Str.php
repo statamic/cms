@@ -8,6 +8,8 @@ use Statamic\Facades\Compare;
 use Stringy\StaticStringy;
 use voku\helper\ASCII;
 
+use function Statamic\trans;
+
 /** @mixin \Illuminate\Support\Str */
 class Str
 {
@@ -151,6 +153,7 @@ class Str
 
     public static function durationForHumans($s)
     {
+        $s = (int) round($s);
         $hours = floor($s / 3600);
         $mins = floor(($s % 3600) / 60);
         $secs = $s % 60;

@@ -61,7 +61,7 @@ The `Listing` component can pull data from a JSON endpoint.
     {
         $query = TeamMember::query();
 
-        if ($search $request->input('search')) {
+        if ($search = $request->input('search')) {
             $query->where('name', 'like', "%{$search}%");
         }
 
@@ -116,8 +116,8 @@ class TeamMemberActionController extends Controller
 Next, add two routes pointing to the controller:
 
 ```php
-Route::get('team-members/actions', [TeamMemberActionController::class, 'run']);
-Route::get('team-members/actions/list', [TeamMemberActionController::class, 'bulkActions']);
+Route::post('team-members/actions', [TeamMemberActionController::class, 'run']);
+Route::post('team-members/actions/list', [TeamMemberActionController::class, 'bulkActions']);
 ```
 
 Finally, pass the URL for the first route to the `actionUrl` prop:

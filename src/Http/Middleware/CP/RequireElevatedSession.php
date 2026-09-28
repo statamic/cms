@@ -2,17 +2,9 @@
 
 namespace Statamic\Http\Middleware\CP;
 
-use Closure;
-use Statamic\Exceptions\ElevatedSessionAuthorizationException;
+use Statamic\Http\Middleware\RequireElevatedSession as Middleware;
 
-class RequireElevatedSession
+class RequireElevatedSession extends Middleware
 {
-    public function handle($request, Closure $next)
-    {
-        if (! $request->hasElevatedSession()) {
-            throw new ElevatedSessionAuthorizationException;
-        }
-
-        return $next($request);
-    }
+    //
 }

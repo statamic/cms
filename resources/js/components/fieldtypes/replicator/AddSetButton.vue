@@ -58,7 +58,7 @@ const props = defineProps({
     loadingSet: { type: String, default: null },
 });
 
-const label = computed(() => props.label ? __(props.label) : __('Add Block'));
+const label = computed(() => props.label ? __(props.label) : __('Add Set'));
 
 function addSet(handle) {
     emit('added', handle, props.index);

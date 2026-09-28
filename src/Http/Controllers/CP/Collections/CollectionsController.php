@@ -94,7 +94,6 @@ class CollectionsController extends CpController
                 'editable' => User::current()->can('edit', $collection),
                 'blueprint_editable' => User::current()->can('configure fields'),
                 'available_in_selected_site' => $collection->sites()->contains(Site::selected()->handle()),
-                'actions' => Action::for($collection),
                 'actions_url' => cp_route('collections.actions.run'),
                 'icon' => $collection->icon(),
                 'create_label' => $collection->createLabel(),
@@ -333,7 +332,6 @@ class CollectionsController extends CpController
             ->defaultPublishState($values['default_publish_state'])
             ->sortDirection($values['sort_direction'])
             ->mount($values['mount'] ?? null)
-            ->revisionsEnabled($values['revisions'] ?? false)
             ->taxonomies($values['taxonomies'] ?? [])
             ->futureDateBehavior(Arr::get($values, 'future_date_behavior'))
             ->pastDateBehavior(Arr::get($values, 'past_date_behavior'))
@@ -342,6 +340,10 @@ class CollectionsController extends CpController
             ->titleFormats($values['title_formats'])
             ->requiresSlugs($values['require_slugs'])
             ->previewTargets($values['preview_targets']);
+
+        if (array_key_exists('revisions', $values)) {
+            $collection->revisionsEnabled($values['revisions']);
+        }
 
         if ($sites = Arr::get($values, 'sites')) {
             $collection

@@ -1,0 +1,21 @@
+import { Canvas, Meta, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as TimezonesStories from '../Timezones.stories';
+
+<Meta of={TimezonesStories} />
+
+# Timezones
+Displays a given instant rendered across the user's local timezone, the configured app timezone, and UTC.
+
+## Overview
+<Canvas of={TimezonesStories._DocsIntro} sourceState={'shown'} />
+
+## Range
+Pass a `{ start, end }` object to render a date range. The value column uses locale-aware formatting that collapses repeated parts (e.g. shared month or year).
+<Canvas of={TimezonesStories._Range} sourceState={'shown'} />
+
+## Hover Card
+This is a convenience wrapper component that displays the timezones in a hover card. You can provide any of [HoverCard](?path=/docs/overlays-hovercard--docs)'s props.
+<Canvas of={TimezonesStories._HoverCard} sourceState={'shown'} />
+
+## Arguments
+<ArgTypes of={TimezonesStories} />

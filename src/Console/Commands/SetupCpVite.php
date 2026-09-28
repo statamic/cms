@@ -53,11 +53,11 @@ class SetupCpVite extends Command
 
                 $installedDependencies = collect($contents['dependencies'] ?? [])->merge($contents['devDependencies'] ?? []);
 
-                if (! $installedDependencies->contains('vite')) {
-                    $contents['devDependencies']['vite'] = '^7.0.4';
+                if (! $installedDependencies->has('vite')) {
+                    $contents['devDependencies']['vite'] = '^8.0.0';
                 }
 
-                if (! $installedDependencies->contains('@statamic/cms')) {
+                if (! $installedDependencies->has('@statamic/cms')) {
                     $contents['dependencies']['@statamic/cms'] = 'file:./vendor/statamic/cms/resources/dist-package';
                 }
 

@@ -19,8 +19,7 @@ abstract class Settings implements Contract
     public function __construct(Addon $addon, array $settings = [])
     {
         $this->addon = $addon;
-        $this->settings = $this->resolveAntlers($settings);
-        $this->rawSettings = $settings;
+        $this->setValues($settings);
     }
 
     public function addon(): Addon
@@ -59,7 +58,7 @@ abstract class Settings implements Contract
     private function setValues(array $values): self
     {
         $this->rawSettings = $values;
-        $this->settings = $this->resolveAntlers($values);
+        $this->settings = $this->resolveAntlers($this->applyBlueprintDefaults($values));
 
         return $this;
     }
@@ -80,6 +79,20 @@ abstract class Settings implements Contract
     public function delete(): bool
     {
         return app(SettingsRepository::class)->delete($this);
+    }
+
+    private function applyBlueprintDefaults(array $settings): array
+    {
+        if (! $blueprint = $this->addon->settingsBlueprint()) {
+            return $settings;
+        }
+
+        $defaults = $blueprint->fields()->all()
+            ->mapWithKeys(fn ($field) => [$field->handle() => $field->defaultValue()])
+            ->whereNotNull()
+            ->all();
+
+        return array_merge($defaults, $settings);
     }
 
     public function resolveAntlers($config)

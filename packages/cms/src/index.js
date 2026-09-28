@@ -19,6 +19,7 @@ export const {
     requireElevatedSession,
     requireElevatedSessionIf,
     clone,
+    debounce,
     deepClone,
     resetValuesFromResponse,
 } = __STATAMIC__.core;

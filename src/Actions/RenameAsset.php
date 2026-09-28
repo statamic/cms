@@ -5,6 +5,8 @@ namespace Statamic\Actions;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Rules\AvailableAssetFilename;
 
+use function Statamic\trans as __;
+
 class RenameAsset extends Action
 {
     protected $icon = 'rename';
@@ -43,16 +45,23 @@ class RenameAsset extends Action
 
     public function run($assets, $values)
     {
-        $ids = $assets->each->rename($values['filename'], true)->map->id()->all();
+        $oldIds = $assets->map->id()->all();
+
+        $newIds = $assets->each->rename($values['filename'], true)->map->id()->all();
 
         return [
-            'ids' => $ids,
+            'ids' => $newIds,
+            'callback' => ['replaceInSelections', array_combine($oldIds, $newIds)],
         ];
     }
 
     protected function fieldItems()
     {
         $asset = $this->items->first();
+
+        // The selected asset may no longer exist (e.g. it was renamed by a
+        // previous request), in which case there's nothing left to rename.
+        abort_unless($asset, 404);
 
         return [
             'filename' => [

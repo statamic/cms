@@ -78,6 +78,7 @@ return [
     'assign_user_groups' => 'Gruppen zuweisen',
     'assign_roles' => 'Rollen zuweisen',
     'impersonate_users' => 'Als andere Benutzer:in anmelden (Impersonate)',
+    'impersonate_users_desc' => 'Erlaubt das Einloggen als beliebige Benutzer:in – einschließlich Super-Admins. Vergib diese Berechtigung nur mit großer Vorsicht.',
     'group_updates' => 'Updates',
     'view_updates' => 'Updates anzeigen',
     'group_addons' => 'Add-ons',

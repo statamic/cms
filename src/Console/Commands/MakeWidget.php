@@ -71,8 +71,6 @@ class MakeWidget extends GeneratorCommand
 
     /**
      * Generate the widget view file.
-     *
-     * @param  string  $addon
      */
     protected function generateWidgetView()
     {

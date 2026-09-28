@@ -13,6 +13,8 @@ use Statamic\Facades\URL;
 use Statamic\Facades\User;
 use Statamic\Rules\UniqueUserValue;
 
+use function Statamic\trans as __;
+
 class UserRegisterRequest extends FormRequest
 {
     use Localizable;
@@ -28,7 +30,7 @@ class UserRegisterRequest extends FormRequest
     protected function failedValidation(Validator $validator)
     {
         if ($this->isPrecognitive() || $this->wantsJson()) {
-            return parent::failedValidation($validator);
+            parent::failedValidation($validator);
         }
 
         if ($this->ajax()) {
@@ -80,7 +82,7 @@ class UserRegisterRequest extends FormRequest
     {
         $site = Site::findByUrl(LaravelURL::previous()) ?? Site::default();
 
-        return $this->withLocale($site->lang(), fn () => parent::validateResolved());
+        $this->withLocale($site->lang(), fn () => parent::validateResolved());
     }
 
     private function valuesWithoutAssetFields($fields)

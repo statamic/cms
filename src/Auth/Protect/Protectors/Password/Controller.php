@@ -9,6 +9,8 @@ use Statamic\Facades\Site;
 use Statamic\Http\Controllers\Controller as BaseController;
 use Statamic\View\View;
 
+use function Statamic\trans as __;
+
 class Controller extends BaseController
 {
     protected $tokenData;
@@ -17,7 +19,7 @@ class Controller extends BaseController
     public function show()
     {
         if ($this->tokenData = session('statamic:protect:password.tokens.'.request('token'))) {
-            $site = Site::findByUrl($this->getUrl());
+            $site = Site::findByUrl($this->getUrl()) ?? Site::default();
             $data = Data::find($this->tokenData['reference']);
 
             app()->setLocale($site->lang());
