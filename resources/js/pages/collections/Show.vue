@@ -165,19 +165,9 @@
                                 />
                             </template>
 
-                            <DropdownSeparator v-if="depth < structureMaxDepth && branch.can_delete" />
-
-                            <DropdownItem
-                                v-if="branch.can_delete"
-                                :text="__('Delete')"
-                                icon="trash"
-                                variant="destructive"
-                                @click="deleteTreeBranch(branch, removeBranch)"
-                            />
-
                             <DropdownSeparator
                                 v-if="
-                                    (depth < structureMaxDepth || branch.can_delete) &&
+                                    depth < structureMaxDepth &&
                                     (shouldShowSkeleton || branchTreeActions(actions).length)
                                 "
                             />
@@ -201,6 +191,23 @@
                                     @click="action.run"
                                 />
                             </template>
+
+                            <DropdownSeparator
+                                v-if="
+                                    branch.can_delete &&
+                                    (depth < structureMaxDepth ||
+                                        shouldShowSkeleton ||
+                                        branchTreeActions(actions).length)
+                                "
+                            />
+
+                            <DropdownItem
+                                v-if="branch.can_delete"
+                                :text="__('Delete')"
+                                icon="trash"
+                                variant="destructive"
+                                @click="deleteTreeBranch(branch, removeBranch)"
+                            />
                         </DropdownMenu>
                     </Dropdown>
                 </ItemActions>
