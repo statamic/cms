@@ -1,9 +1,12 @@
 import { flushPromises, mount } from '@vue/test-utils';
-import { expect, test, vi } from 'vitest';
+import { afterEach, expect, test, vi } from 'vitest';
 import { defineComponent, h } from 'vue';
 import axios from 'axios';
 import * as Globals from '@/bootstrap/globals';
 import Listing, { injectListingContext } from '@/components/ui/Listing/Listing.vue';
+import ToggleAll from '@/components/ui/Listing/ToggleAll.vue';
+import Checkbox from '@/components/ui/Checkbox/Item.vue';
+import { setTranslations } from '@/translations/translator';
 
 vi.mock('axios', () => ({
     default: {
@@ -27,6 +30,12 @@ window.Statamic = {
     $events: { $on: () => {}, $off: () => {}, $emit: () => {} },
     $toast: { error: vi.fn(), success: vi.fn() },
 };
+
+const defaultConfigGet = window.Statamic.$config.get;
+
+afterEach(() => {
+    window.Statamic.$config.get = defaultConfigGet;
+});
 
 const Probe = defineComponent({
     setup() {
@@ -118,10 +127,9 @@ test('canSelectAllMatching can be disabled via allowSelectAllMatching', async ()
 });
 
 test('canSelectAllMatching is hidden when total exceeds selectAllLimit', async () => {
-    const previousGet = window.Statamic.$config.get;
     window.Statamic.$config.get = (key, fallback) => {
         if (key === 'selectAllLimit') return 3;
-        return previousGet(key, fallback);
+        return defaultConfigGet(key, fallback);
     };
 
     axios.get.mockResolvedValue({
@@ -147,8 +155,6 @@ test('canSelectAllMatching is hidden when total exceeds selectAllLimit', async (
     listing.selections.value = ['1', '2'];
 
     expect(listing.canSelectAllMatching.value).toBe(false);
-
-    window.Statamic.$config.get = previousGet;
 });
 
 test('selectAllMatching pages through listing results past the perPage ceiling', async () => {
@@ -235,6 +241,26 @@ test('selectAllMatching stays selected when fetched ids are fewer than meta.tota
     expect(listing.selectedAllMatching.value).toBe(true);
     expect(listing.allMatchingSelected.value).toBe(true);
     expect(listing.canSelectAllMatching.value).toBe(false);
+});
+
+test('toggle all describes the selected count rather than meta.total after select-all', async () => {
+    setTranslations({ '*.messages.selections_click_to_deselect_all': 'All :total items selected.' });
+
+    const wrapper = mount(Listing, {
+        props: { items: [{ id: '1' }, { id: '2' }] },
+        slots: { default: () => [h(Probe), h(ToggleAll)] },
+    });
+    const { listing } = wrapper.findComponent(Probe).vm;
+
+    listing.meta.value = { total: 5 };
+    listing.selectedAllMatchingCount.value = 4;
+    listing.selections.value = ['1', '2', '3', '4'];
+    listing.selectedAllMatching.value = true;
+    await flushPromises();
+
+    expect(wrapper.findComponent(Checkbox).props('description')).toBe('All 4 items selected.');
+
+    setTranslations({});
 });
 
 test('selectedAllMatching clears when a selection is removed after select-all', async () => {
