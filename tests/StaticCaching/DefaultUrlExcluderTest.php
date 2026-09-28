@@ -4,8 +4,9 @@ namespace Tests\StaticCaching;
 
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\StaticCaching\DefaultUrlExcluder;
+use Tests\TestCase;
 
-class DefaultUrlExcluderTest extends \PHPUnit\Framework\TestCase
+class DefaultUrlExcluderTest extends TestCase
 {
     private function excluder(array $urls, string $baseUrl = 'http://localhost')
     {

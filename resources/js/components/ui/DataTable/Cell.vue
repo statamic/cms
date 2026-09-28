@@ -1,0 +1,56 @@
+<script setup>
+import { inject } from 'vue';
+import { cva } from 'cva';
+
+const variant = inject('dataTableVariant', 'normal');
+
+const props = defineProps({
+    /** Text alignment. <br><br> Options: `left`, `center`, `right` */
+    align: { type: String, default: 'left' },
+    /** Function to calculate position for left side rounding */
+    position: { type: Function, required: true },
+    /** Function to calculate position for right side rounding */
+    rightPosition: { type: Function, required: true },
+    /** Cell index */
+    index: { type: Number, required: true },
+});
+
+const bodyCellClasses = cva({
+    base: '',
+    variants: {
+        variant: {
+            normal: 'px-4 py-3',
+            compact: 'px-2 py-1.5',
+        },
+    },
+})({ variant });
+
+const tableCellVariants = cva({
+    base: 'border-t border-gray-200 dark:border-white/10',
+    variants: {
+        position: {
+            first: 'border-l rounded-tl-xl',
+            firstRight: 'border-r rounded-tr-xl',
+            last: 'border-l rounded-bl-xl',
+            lastRight: 'border-r rounded-br-xl',
+            left: 'border-l',
+            right: 'border-r',
+            middle: '',
+        },
+    },
+});
+</script>
+
+<template>
+    <td
+        :class="[
+            bodyCellClasses,
+            `text-${align}`,
+            tableCellVariants({
+                position: position(index),
+            }),
+        ]"
+    >
+        <slot />
+    </td>
+</template>

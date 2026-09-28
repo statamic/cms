@@ -2,6 +2,7 @@
 
 namespace Statamic\Stache\Repositories;
 
+use Closure;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Contracts\Taxonomies\TermRepository as RepositoryContract;
 use Statamic\Exceptions\TaxonomyNotFoundException;
@@ -9,6 +10,7 @@ use Statamic\Exceptions\TermNotFoundException;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Taxonomy;
+use Statamic\Facades\URL;
 use Statamic\Query\Scopes\AllowsScopes;
 use Statamic\Stache\Query\TermQueryBuilder;
 use Statamic\Stache\Stache;
@@ -124,6 +126,16 @@ class TermRepository implements RepositoryContract
         return $term;
     }
 
+    public function findOrMake($id)
+    {
+        return $this->find($id) ?? $this->make();
+    }
+
+    public function findOr($id, Closure $callback)
+    {
+        return $this->find($id) ?? $callback();
+    }
+
     public function save($term)
     {
         $this->store
@@ -192,7 +204,7 @@ class TermRepository implements RepositoryContract
 
     private function findTaxonomyHandleByUri($uri)
     {
-        return $this->stache->store('taxonomies')->index('uri')->items()->flip()->get(Str::ensureLeft($uri, '/'));
+        return $this->stache->store('taxonomies')->index('uri')->items()->flip()->get(URL::tidy($uri));
     }
 
     public function substitute($item)

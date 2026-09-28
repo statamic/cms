@@ -10,12 +10,17 @@ class FieldsetPolicy
     {
         $user = User::fromUser($user);
 
-        if ($user->hasPermission('configure fields')) {
+        if ($user->isSuper() || $user->hasPermission('configure fields')) {
             return true;
         }
     }
 
     public function edit($user, $fieldset)
+    {
+        // handled by before()
+    }
+
+    public function delete($user, $fieldset)
     {
         // handled by before()
     }

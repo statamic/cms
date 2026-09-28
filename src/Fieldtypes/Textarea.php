@@ -5,6 +5,8 @@ namespace Statamic\Fieldtypes;
 use Statamic\Fields\Fieldtype;
 use Statamic\Query\Scopes\Filters\Fields\Textarea as TextareaFilter;
 
+use function Statamic\trans as __;
+
 class Textarea extends Fieldtype
 {
     protected $categories = ['text'];
@@ -14,35 +16,47 @@ class Textarea extends Fieldtype
     {
         return [
             [
-                'display' => __('Appearance & Behavior'),
+                'display' => __('Appearance'),
                 'fields' => [
                     'placeholder' => [
                         'display' => __('Placeholder'),
                         'instructions' => __('statamic::fieldtypes.text.config.placeholder'),
                         'type' => 'text',
+                        'width' => 50,
                     ],
                     'character_limit' => [
                         'display' => __('Character Limit'),
                         'instructions' => __('statamic::fieldtypes.text.config.character_limit'),
                         'type' => 'integer',
+                        'width' => 50,
                     ],
+                    'rows' => [
+                        'display' => __('Rows'),
+                        'instructions' => __('statamic::fieldtypes.text.config.rows'),
+                        'type' => 'integer',
+                        'width' => 50,
+                        'default' => null,
+                    ],
+                ],
+            ],
+            [
+                'display' => __('Data & Format'),
+                'fields' => [
                     'default' => [
                         'display' => __('Default Value'),
                         'instructions' => __('statamic::messages.fields_default_instructions'),
                         'type' => 'textarea',
                     ],
-
                 ],
             ],
             [
-                'display' => __('Antlers'),
+                'display' => __('Advanced'),
                 'fields' => [
                     'antlers' => [
                         'display' => __('Allow Antlers'),
                         'instructions' => __('statamic::fieldtypes.any.config.antlers'),
                         'type' => 'toggle',
                     ],
-
                 ],
             ],
         ];

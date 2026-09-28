@@ -1,9 +1,13 @@
-<template>
-    <div v-html="config.html" />
-</template>
+<script setup>
+import Fieldtype from '@/components/fieldtypes/fieldtype';
+import { computed } from 'vue';
+import DOMPurify from 'dompurify';
 
-<script>
-export default {
-    mixins: [Fieldtype]
-};
+const props = defineProps(Fieldtype.props);
+
+const html = computed(() => props.config.sanitize ? DOMPurify.sanitize(props.config.html) : props.config.html);
 </script>
+
+<template>
+    <div v-html="html" />
+</template>

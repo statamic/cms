@@ -20,11 +20,13 @@ class Site extends Filter
 
     public function fieldItems()
     {
+        $options = $this->options()->all();
+
         return [
             'site' => [
                 'display' => __('Site'),
-                'type' => 'radio',
-                'options' => $this->options()->all(),
+                'type' => count($options) > 5 ? 'select' : 'radio',
+                'options' => $options,
             ],
         ];
     }

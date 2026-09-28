@@ -82,7 +82,7 @@ class PerformanceCollector extends DataCollector implements AssetProvider, Rende
         return str_replace(config('debugbar.remote_sites_path'), config('debugbar.local_sites_path'), $filePath);
     }
 
-    public function getWidgets()
+    public function getWidgets(): array
     {
         return [
             'custom_widget' => [
@@ -133,7 +133,7 @@ class PerformanceCollector extends DataCollector implements AssetProvider, Rende
         return array_values($newItems);
     }
 
-    public function collect()
+    public function collect(): array
     {
         /** @var PerformanceTracer $tracer */
         $tracer = app(PerformanceTracer::class);
@@ -180,12 +180,12 @@ class PerformanceCollector extends DataCollector implements AssetProvider, Rende
         return $this->filterSamples($result);
     }
 
-    public function getName()
+    public function getName(): string
     {
         return 'antlers';
     }
 
-    public function getAssets()
+    public function getAssets(): array
     {
         return [
             'js' => [

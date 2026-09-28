@@ -1,0 +1,14 @@
+import { Canvas, Meta, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as AvatarStories from '../Avatar.stories';
+
+<Meta of={AvatarStories} />
+
+# Avatar
+Avatars display user profile images or generated initials with beautiful mesh gradient backgrounds.
+
+<Canvas of={AvatarStories._DocsIntro} sourceState={'shown'} />
+
+The `Avatar` component will use whatever information you pass via the `user` prop to display the user's avatar.
+
+## Arguments
+<ArgTypes of={AvatarStories} />

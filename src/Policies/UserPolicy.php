@@ -6,6 +6,13 @@ use Statamic\Facades\User;
 
 class UserPolicy
 {
+    public function before($user)
+    {
+        if (User::fromUser($user)->isSuper()) {
+            return true;
+        }
+    }
+
     public function index($authed)
     {
         $authed = User::fromUser($authed);
@@ -59,5 +66,12 @@ class UserPolicy
     public function sendPasswordReset($authed, $user)
     {
         return $this->edit($authed, $user);
+    }
+
+    public function impersonate($authed, $user)
+    {
+        $authed = User::fromUser($authed);
+
+        return $authed->hasPermission('impersonate users');
     }
 }

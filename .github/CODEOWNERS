@@ -1,0 +1,8 @@
+/composer.json @statamic/security
+/src/helpers.php @statamic/security
+/src/namespaced_helpers.php @statamic/security
+/src/View/Blade/helpers.php @statamic/security
+
+/.github/CODEOWNERS @statamic/security
+/.github/workflows/tripwire.yml @statamic/security
+/scripts/check-autoload-files.sh @statamic/security

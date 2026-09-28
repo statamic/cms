@@ -2,127 +2,105 @@
 
 namespace Statamic\Fieldtypes;
 
-use Illuminate\Filesystem\Filesystem;
-use Statamic\Facades\File;
-use Statamic\Facades\Folder;
-use Statamic\Facades\Path;
+use Statamic\Facades\Icon as Icons;
 use Statamic\Fields\Fieldtype;
+use Statamic\Icons\IconSet;
 use Statamic\Support\Str;
+
+use function Statamic\trans as __;
 
 class Icon extends Fieldtype
 {
-    public const DEFAULT_FOLDER = 'regular';
-
     protected $categories = ['media'];
-    protected $icon = 'icon_picker';
-
-    protected static $customSvgIcons = [];
+    protected $icon = 'fieldtype-icon_picker';
 
     public function preload(): array
     {
-        [$path, $directory, $folder, $hasConfiguredDirectory] = $this->resolveParts();
-
         return [
             'url' => cp_route('icon-fieldtype'),
-            'native' => ! $hasConfiguredDirectory,
-            'directory' => $directory,
-            'set' => $folder,
         ];
     }
 
     public function icons()
     {
-        [$path, $directory, $folder, $hasConfiguredDirectory] = $this->resolveParts();
+        $set = $this->iconSet();
 
-        return collect(Folder::getFilesByType($path, 'svg'))->mapWithKeys(fn ($path) => [
-            pathinfo($path)['filename'] => $hasConfiguredDirectory ? File::get($path) : null,
-        ])->all();
+        return $set->name() === 'default'
+            ? $set->names()->mapWithKeys(fn ($name) => [$name => null])->all()
+            : $set->contents();
     }
 
     protected function configFieldItems(): array
     {
-        return [
-            [
+        $sections = [];
+
+        if (Icons::sets()->isNotEmpty()) {
+            $sections[] = [
                 'display' => __('Selection'),
                 'fields' => [
-                    'directory' => [
-                        'display' => __('Directory'),
-                        'instructions' => __('statamic::fieldtypes.icon.config.directory'),
-                        'type' => 'text',
-                        'placeholder' => 'vendor/statamic/cms/resources/svg/icons',
+                    'set' => [
+                        'display' => __('Icon Set'),
+                        'instructions' => __('statamic::fieldtypes.icon.config.set'),
+                        'type' => 'select',
+                        'default' => 'default',
+                        'options' => $this->iconSetOptions(),
+                        'width' => 50,
                     ],
-                    'folder' => [
-                        'display' => __('Folder'),
-                        'instructions' => __('statamic::fieldtypes.icon.config.folder'),
-                        'type' => 'text',
-                        'placeholder' => static::DEFAULT_FOLDER,
+                ],
+            ];
+        }
+
+        $sections[] = [
+            'display' => __('Appearance'),
+            'fields' => [
+                'mode' => [
+                    'display' => __('UI Mode'),
+                    'instructions' => __('statamic::fieldtypes.icon.config.mode'),
+                    'type' => 'button_group',
+                    'default' => 'default',
+                    'options' => [
+                        'default' => __('Default'),
+                        'compact' => __('Compact'),
                     ],
-                    'default' => [
-                        'display' => __('Default Value'),
-                        'instructions' => __('statamic::messages.fields_default_instructions'),
-                        'type' => 'text',
-                    ],
+                    'width' => 50,
                 ],
             ],
         ];
+
+        $sections[] = [
+            'display' => __('Data & Format'),
+            'fields' => [
+                'default' => [
+                    'display' => __('Default Icon'),
+                    'instructions' => __('statamic::messages.fields_default_instructions'),
+                    'type' => 'text',
+                    'width' => 50,
+                ],
+            ],
+        ];
+
+        return $sections;
     }
 
     public function augment($value)
     {
-        [$path] = $this->resolveParts();
-
-        return File::get($path.'/'.$value.'.svg');
-    }
-
-    private function resolveParts()
-    {
-        $hasConfiguredDirectory = true;
-
-        if (! $directory = $this->config('directory')) {
-            $hasConfiguredDirectory = false;
-            $directory = statamic_path('resources/svg/icons');
+        if (! $value) {
+            return null;
         }
 
-        $folder = $this->config(
-            'folder',
-            $hasConfiguredDirectory ? null : self::DEFAULT_FOLDER // Only apply a default folder if using Statamic icons.
-        );
-
-        $path = Path::tidy($directory.'/'.$folder);
-
-        return [
-            $path,
-            $directory,
-            $folder,
-            $hasConfiguredDirectory,
-        ];
+        return $this->iconSet()->get($value);
     }
 
-    /**
-     * Provide custom SVG icons to script.
-     *
-     * @param  string  $directory
-     * @param  string|null  $folder
-     */
-    public static function provideCustomSvgIconsToScript($directory, $folder = null)
+    private function iconSet(): IconSet
     {
-        $path = Str::removeRight(Path::tidy($directory.'/'.$folder), '/');
+        return Icons::get($this->config('set', 'default'));
+    }
 
-        static::$customSvgIcons[$path] = collect(app(Filesystem::class)->files($path))
-            ->filter(fn ($file) => strtolower($file->getExtension()) === 'svg')
-            ->keyBy(fn ($file) => pathinfo($file->getBasename(), PATHINFO_FILENAME))
-            ->map
-            ->getContents()
+    private function iconSetOptions(): array
+    {
+        return Icons::sets()
+            ->mapWithKeys(fn (IconSet $set) => [$set->name() => Str::headline($set->name())])
+            ->prepend(__('Default'), 'default')
             ->all();
-    }
-
-    /**
-     * Get custom SVG icons for script.
-     *
-     * @return array
-     */
-    public static function getCustomSvgIcons()
-    {
-        return static::$customSvgIcons;
     }
 }

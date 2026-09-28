@@ -17,7 +17,6 @@ use Statamic\Events\ResponseCreated;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Cascade;
 use Statamic\Facades\Collection;
-use Statamic\Facades\Entry;
 use Statamic\Facades\User;
 use Statamic\Tags\Tags;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
@@ -38,8 +37,7 @@ class FrontendTest extends TestCase
 
     private function withStandardBlueprints()
     {
-        $this->addToAssertionCount(-1);
-        Blueprint::shouldReceive('in')->withAnyArgs()->zeroOrMoreTimes()->andReturn(collect([new \Statamic\Fields\Blueprint]));
+        Blueprint::shouldReceive('in')->withAnyArgs()->andReturn(collect([new \Statamic\Fields\Blueprint]));
     }
 
     #[Test]
@@ -255,6 +253,21 @@ class FrontendTest extends TestCase
     }
 
     #[Test]
+    public function drafts_are_not_visible_if_using_live_preview_token_for_different_entry()
+    {
+        $this->withStandardFakeErrorViews();
+
+        $page = tap($this->createPage('about')->published(false)->set('content', 'Testing 123'))->save();
+        $other = $this->createPage('other');
+
+        LivePreview::tokenize('test-token', $other);
+
+        $this
+            ->get('/about?token=test-token')
+            ->assertStatus(404);
+    }
+
+    #[Test]
     public function drafts_dont_get_statically_cached()
     {
         $this->markTestIncomplete();
@@ -369,7 +382,7 @@ class FrontendTest extends TestCase
         $page->set('protect', 'logged_in')->save();
 
         $this
-            ->actingAs(User::make())
+            ->actingAs(tap(User::make())->save())
             ->get('/about')
             ->assertOk()
             ->assertHeader('X-Statamic-Protected', true);
@@ -408,7 +421,7 @@ class FrontendTest extends TestCase
         $page->set('protect', 'test')->save();
 
         $this
-            ->actingAs(User::make())
+            ->actingAs(User::make()->save())
             ->get('/about')
             ->assertOk()
             ->assertHeaderMissing('X-Statamic-Protected');
@@ -464,8 +477,8 @@ class FrontendTest extends TestCase
     {
         $this->createPage('about', ['with' => ['content_type' => 'xml']]);
 
-        // Laravel adds utf-8 if the content-type starts with text/
-        $this->get('about')->assertHeader('Content-Type', 'text/xml; charset=UTF-8');
+        // Symfony adds utf-8 if the content-type starts with text/
+        $this->get('about')->assertContentType('text/xml; charset=utf-8');
     }
 
     #[Test]
@@ -473,8 +486,8 @@ class FrontendTest extends TestCase
     {
         $this->createPage('about', ['with' => ['content_type' => 'atom']]);
 
-        // Laravel adds utf-8 if the content-type starts with text/
-        $this->get('about')->assertHeader('Content-Type', 'application/atom+xml; charset=UTF-8');
+        // Symfony adds utf-8 if the content-type starts with text/
+        $this->get('about')->assertContentType('application/atom+xml; charset=utf-8');
     }
 
     #[Test]
@@ -482,7 +495,7 @@ class FrontendTest extends TestCase
     {
         $this->createPage('about', ['with' => ['content_type' => 'json']]);
 
-        $this->get('about')->assertHeader('Content-Type', 'application/json');
+        $this->get('about')->assertContentType('application/json');
     }
 
     #[Test]
@@ -490,8 +503,8 @@ class FrontendTest extends TestCase
     {
         $this->createPage('about', ['with' => ['content_type' => 'text']]);
 
-        // Laravel adds utf-8 if the content-type starts with text/
-        $this->get('about')->assertHeader('Content-Type', 'text/plain; charset=UTF-8');
+        // Symfony adds utf-8 if the content-type starts with text/
+        $this->get('about')->assertContentType('text/plain; charset=utf-8');
     }
 
     #[Test]
@@ -504,7 +517,7 @@ class FrontendTest extends TestCase
 
         $response = $this
             ->get('about')
-            ->assertHeader('Content-Type', 'text/xml; charset=UTF-8');
+            ->assertContentType('text/xml; charset=utf-8');
 
         $this->assertEquals('<?xml ?><foo></foo>', $response->getContent());
     }
@@ -519,7 +532,7 @@ class FrontendTest extends TestCase
 
         $response = $this
             ->get('about')
-            ->assertHeader('Content-Type', 'text/xml; charset=UTF-8');
+            ->assertContentType('text/xml; charset=utf-8');
 
         $this->assertEquals('<foo></foo>', $response->getContent());
     }
@@ -534,7 +547,7 @@ class FrontendTest extends TestCase
 
         $response = $this
             ->get('about')
-            ->assertHeader('Content-Type', 'text/xml; charset=UTF-8');
+            ->assertContentType('text/xml; charset=utf-8');
 
         $this->assertEquals('<?xml ?><foo></foo>', $response->getContent());
     }
@@ -551,7 +564,7 @@ class FrontendTest extends TestCase
 
         $response = $this
             ->get('about')
-            ->assertHeader('Content-Type', 'text/html; charset=UTF-8');
+            ->assertContentType('text/html; charset=utf-8');
 
         $this->assertEquals('<foo></foo>', $response->getContent());
     }
@@ -566,7 +579,7 @@ class FrontendTest extends TestCase
 
         $this
             ->get('about')
-            ->assertHeader('Content-Type', 'application/json');
+            ->assertContentType('application/json');
     }
 
     #[Test]
@@ -585,23 +598,6 @@ class FrontendTest extends TestCase
         $this->createPage('about');
 
         $this->get('about')->assertHeaderMissing('X-Powered-By', 'Statamic');
-    }
-
-    #[Test]
-    public function disables_floc_through_header_by_default()
-    {
-        $this->createPage('about');
-
-        $this->get('about')->assertHeader('Permissions-Policy', 'interest-cohort=()');
-    }
-
-    #[Test]
-    public function doesnt_disable_floc_through_header_if_disabled()
-    {
-        config(['statamic.system.disable_floc' => false]);
-        $this->createPage('about');
-
-        $this->get('about')->assertHeaderMissing('Permissions-Policy', 'interest-cohort=()');
     }
 
     #[Test]
@@ -703,6 +699,23 @@ class FrontendTest extends TestCase
     }
 
     #[Test]
+    public function a_404_does_not_leak_its_response_code_into_later_requests()
+    {
+        // In a long-lived process the Cascade is reused between requests. A 404 render
+        // must not poison the response_code seen by subsequent successful requests.
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+        $this->viewShouldReturnRaw('some_template', 'Page {{ response_code }}');
+        $this->viewShouldReturnRaw('errors.404', 'Not found {{ response_code }}');
+
+        $this->createPage('about', ['with' => ['template' => 'some_template']]);
+
+        $this->get('unknown')->assertNotFound()->assertSee('Not found 404');
+
+        $this->get('/about')->assertOk()->assertSee('Page 200');
+    }
+
+    #[Test]
     public function it_sets_the_translation_locale_based_on_site()
     {
         app('translator')->addNamespace('test', __DIR__.'/__fixtures__/lang');
@@ -738,6 +751,26 @@ class FrontendTest extends TestCase
         $this->get('/about')->assertSee('21/10/2022');
 
         $this->assertDefaultCarbonFormat();
+    }
+
+    #[Test]
+    public function outputting_a_date_does_not_localize_it_for_the_rest_of_the_template()
+    {
+        config([
+            'statamic.system.date_format' => 'H:i',
+            'statamic.system.display_timezone' => 'Europe/Zurich', // +1 hour
+            'statamic.system.localize_dates_in_modifiers' => false,
+        ]);
+
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+        $this->viewShouldReturnRaw('some_template', '<p>{{ date }}</p><p>{{ date format="H:i" }}</p>');
+
+        tap($this->makeCollection()->dated(true))->save();
+        tap($this->makePage('about', ['with' => ['template' => 'some_template']])->date(Carbon::parse('2025-01-01 18:25')))->save();
+
+        $this->get('/about')
+            ->assertSee('<p>19:25</p>', false)
+            ->assertSee('<p>18:25</p>', false);
     }
 
     #[Test]
@@ -1060,36 +1093,8 @@ class FrontendTest extends TestCase
         $this->get('/does-not-exist')->assertRedirect('/login?redirect=http://localhost/does-not-exist');
 
         $this
-            ->actingAs(User::make())
+            ->actingAs(tap(User::make())->save())
             ->get('/does-not-exist')
             ->assertStatus(404);
-    }
-
-    #[Test]
-    public function it_sets_etag_header_and_returns_304_when_content_matches()
-    {
-        $this->withStandardBlueprints();
-        $this->withFakeViews();
-        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
-        $this->viewShouldReturnRaw('default', '<h1>Test Page</h1>');
-
-        $this->createPage('about');
-
-        $response = $this->get('/about');
-        $response->assertStatus(200);
-
-        $content = trim($response->content());
-        $this->assertEquals('<h1>Test Page</h1>', $content);
-
-        $etag = $response->headers->get('ETag');
-        $this->assertEquals('"'.md5($content).'"', $etag); // Per spec, the quotes need to be in the string.
-
-        $response = $this->get('/about', ['If-None-Match' => $etag]);
-        $response->assertStatus(304);
-        $this->assertEmpty($response->content());
-
-        $response = $this->get('/about', ['If-None-Match' => '"wrong-etag"']);
-        $response->assertStatus(200);
-        $this->assertEquals('<h1>Test Page</h1>', trim($response->content()));
     }
 }

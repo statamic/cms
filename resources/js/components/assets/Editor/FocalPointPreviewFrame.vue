@@ -1,42 +1,39 @@
 <template>
-    <div class="frame-image" ref="frame" :style="{ backgroundImage: `url('${encodeURI(imageUrl)}')`, backgroundPosition: backgroundPosition, transform: `scale(${z})`, transformOrigin: transformOrigin }"
+    <div
+        class="frame-image"
+        ref="frame"
+        :style="{
+            backgroundImage: `url('${encodeURI(imageUrl)}')`,
+            backgroundPosition: backgroundPosition,
+            transform: `scale(${z})`,
+            transformOrigin: transformOrigin,
+        }"
     />
 </template>
 
 <script>
 export default {
-
-    props: [
-        'x',
-        'y',
-        'z',
-        'imageUrl',
-        'imageDimensions'
-    ],
-
+    props: ['x', 'y', 'z', 'imageUrl', 'imageDimensions'],
 
     data() {
         return {
             frameDimensions: {
                 w: 100,
-                h: 100
-            }
+                h: 100,
+            },
         };
     },
-
 
     mounted() {
         const frame = this.$refs['frame'];
         // this is not responsive, but w/e
         this.frameDimensions = {
             w: frame.clientWidth,
-            h: frame.clientHeight
+            h: frame.clientHeight,
         };
     },
 
-
     computed: {
-
         // the dimensions of the image when used as a background of the frame so that it's shorter dimensions matches the frame dimension along that axis
         bgImageDimensions() {
             const ratio = ({ w, h }) => w / h;
@@ -46,18 +43,14 @@ export default {
                     // background image will be the same height as the frame
                     h: this.frameDimensions.h,
                     // width of the background image is proportional to the scaling of the heights
-                    w:
-                        (this.frameDimensions.h / this.imageDimensions.h) *
-                        this.imageDimensions.w,
+                    w: (this.frameDimensions.h / this.imageDimensions.h) * this.imageDimensions.w,
                 };
             } else {
                 return {
                     // background image will be the same width as the frame
                     w: this.frameDimensions.w,
                     // height of the background image is proportional to the scaling of the widths
-                    h:
-                        (this.frameDimensions.w / this.imageDimensions.w) *
-                        this.imageDimensions.h,
+                    h: (this.frameDimensions.w / this.imageDimensions.w) * this.imageDimensions.h,
                 };
             }
         },
@@ -107,17 +100,11 @@ export default {
         // this has to be calculated because the focal point is not the center of the frame.
         transformOrigin() {
             const origin = {
-                x:
-                    ((this.x - this.relOffsetLeft) / this.frameWidthPercent) *
-                    100,
-                y:
-                    ((this.y - this.relOffsetTop) / this.frameHeightPercent) *
-                    100,
+                x: ((this.x - this.relOffsetLeft) / this.frameWidthPercent) * 100,
+                y: ((this.y - this.relOffsetTop) / this.frameHeightPercent) * 100,
             };
             return `${origin.x}% ${origin.y}%`;
-        }
-
-    }
-
+        },
+    },
 };
 </script>

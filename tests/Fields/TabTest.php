@@ -4,8 +4,10 @@ namespace Tests\Fields;
 
 use Facades\Statamic\Fields\FieldRepository;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\Fieldset as FieldsetRepository;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
+use Statamic\Fields\Fieldset;
 use Statamic\Fields\Tab;
 use Tests\TestCase;
 
@@ -146,25 +148,26 @@ class TabTest extends TestCase
                             'instructions' => 'One instructions',
                             'instructions_position' => 'above',
                             'listable' => 'hidden',
-                            'sortable' => true,
                             'visibility' => 'visible',
+                            'sortable' => true,
                             'replicator_preview' => true,
                             'duplicate' => true,
+                            'actions' => true,
                             'type' => 'text',
-                            'validate' => 'required|min:2',
                             'input_type' => 'text',
-                            'placeholder' => null,
-                            'default' => null,
-                            'character_limit' => 0,
+                            'character_limit' => null,
                             'autocomplete' => null,
+                            'placeholder' => null,
                             'prepend' => null,
                             'append' => null,
+                            'default' => null,
                             'antlers' => false,
                             'component' => 'text',
                             'prefix' => null,
                             'required' => true,
                             'read_only' => false, // deprecated
                             'always_save' => false,
+                            'reserve_space_when_hidden' => false,
                         ],
                         [
                             'display' => 'Two',
@@ -173,14 +176,15 @@ class TabTest extends TestCase
                             'instructions' => 'Two instructions',
                             'instructions_position' => 'above',
                             'listable' => 'hidden',
-                            'sortable' => true,
                             'visibility' => 'visible',
+                            'sortable' => true,
                             'replicator_preview' => true,
                             'duplicate' => true,
+                            'actions' => true,
                             'type' => 'textarea',
-                            'validate' => 'min:2',
                             'placeholder' => null,
-                            'character_limit' => 0,
+                            'character_limit' => null,
+                            'rows' => null,
                             'default' => null,
                             'antlers' => false,
                             'component' => 'textarea',
@@ -188,10 +192,172 @@ class TabTest extends TestCase
                             'required' => false,
                             'read_only' => false, // deprecated
                             'always_save' => false,
+                            'reserve_space_when_hidden' => false,
                         ],
                     ],
                 ],
             ],
         ], $tab->toPublishArray());
+    }
+
+    #[Test]
+    public function it_expands_sectioned_fieldset_imports_into_publish_sections()
+    {
+        FieldsetRepository::shouldReceive('find')
+            ->with('seo')
+            ->andReturn((new Fieldset)->setHandle('seo')->setContents([
+                'sections' => [
+                    [
+                        'display' => 'SEO',
+                        'fields' => [
+                            ['handle' => 'meta_title', 'field' => ['type' => 'text']],
+                        ],
+                    ],
+                    [
+                        'display' => 'Social',
+                        'fields' => [
+                            ['handle' => 'og_title', 'field' => ['type' => 'text']],
+                        ],
+                    ],
+                ],
+            ]));
+
+        $tab = (new Tab('main'))->setContents([
+            'sections' => [
+                [
+                    'display' => 'Main',
+                    'fields' => [
+                        ['handle' => 'title', 'field' => ['type' => 'text']],
+                        ['import' => 'seo'],
+                        ['handle' => 'summary', 'field' => ['type' => 'textarea']],
+                    ],
+                ],
+            ],
+        ]);
+
+        $publish = $tab->toPublishArray();
+
+        $this->assertCount(4, $publish['sections']);
+        $this->assertEquals('Main', $publish['sections'][0]['display']);
+        $this->assertEquals(['title'], collect($publish['sections'][0]['fields'])->pluck('handle')->all());
+        $this->assertEquals('SEO', $publish['sections'][1]['display']);
+        $this->assertEquals(['meta_title'], collect($publish['sections'][1]['fields'])->pluck('handle')->all());
+        $this->assertEquals('Social', $publish['sections'][2]['display']);
+        $this->assertEquals(['og_title'], collect($publish['sections'][2]['fields'])->pluck('handle')->all());
+        $this->assertEquals('Main', $publish['sections'][3]['display']);
+        $this->assertEquals(['summary'], collect($publish['sections'][3]['fields'])->pluck('handle')->all());
+    }
+
+    #[Test]
+    public function it_applies_prefixes_to_fields_inside_imported_fieldset_sections()
+    {
+        FieldsetRepository::shouldReceive('find')
+            ->with('seo')
+            ->andReturn((new Fieldset)->setHandle('seo')->setContents([
+                'sections' => [
+                    [
+                        'display' => 'SEO',
+                        'fields' => [
+                            ['handle' => 'meta_title', 'field' => ['type' => 'text']],
+                        ],
+                    ],
+                ],
+            ]));
+
+        $tab = (new Tab('main'))->setContents([
+            'sections' => [
+                [
+                    'fields' => [
+                        ['import' => 'seo', 'prefix' => 'seo_'],
+                    ],
+                ],
+            ],
+        ]);
+
+        $publish = $tab->toPublishArray();
+        $field = $publish['sections'][0]['fields'][0];
+
+        $this->assertEquals('seo_meta_title', $field['handle']);
+        $this->assertEquals('seo_', $field['prefix']);
+    }
+
+    #[Test]
+    public function it_can_flatten_imported_fieldset_sections_in_place()
+    {
+        FieldsetRepository::shouldReceive('find')
+            ->with('seo')
+            ->andReturn((new Fieldset)->setHandle('seo')->setContents([
+                'sections' => [
+                    [
+                        'display' => 'SEO',
+                        'fields' => [
+                            ['handle' => 'meta_title', 'field' => ['type' => 'text']],
+                        ],
+                    ],
+                ],
+            ]));
+
+        $tab = (new Tab('main'))->setContents([
+            'sections' => [
+                [
+                    'display' => 'Main',
+                    'fields' => [
+                        ['handle' => 'title', 'field' => ['type' => 'text']],
+                        ['import' => 'seo', 'section_behavior' => 'flatten'],
+                        ['handle' => 'summary', 'field' => ['type' => 'textarea']],
+                    ],
+                ],
+            ],
+        ]);
+
+        $publish = $tab->toPublishArray();
+
+        $this->assertCount(1, $publish['sections']);
+        $this->assertEquals('Main', $publish['sections'][0]['display']);
+        $this->assertEquals(['title', 'meta_title', 'summary'], collect($publish['sections'][0]['fields'])->pluck('handle')->all());
+    }
+
+    #[Test]
+    public function it_applies_config_overrides_to_fields_inside_imported_fieldset_sections()
+    {
+        FieldsetRepository::shouldReceive('find')
+            ->with('seo')
+            ->andReturn((new Fieldset)->setHandle('seo')->setContents([
+                'sections' => [
+                    [
+                        'display' => 'SEO',
+                        'fields' => [
+                            ['handle' => 'meta_title', 'field' => ['type' => 'text', 'display' => 'Meta Title']],
+                            ['handle' => 'meta_description', 'field' => ['type' => 'textarea', 'display' => 'Meta Description']],
+                        ],
+                    ],
+                ],
+            ]));
+
+        $tab = (new Tab('main'))->setContents([
+            'sections' => [
+                [
+                    'fields' => [
+                        [
+                            'import' => 'seo',
+                            'config' => [
+                                'meta_title' => ['instructions' => 'Keep it under 60 characters.'],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $publish = $tab->toPublishArray();
+        $fields = collect($publish['sections'][0]['fields']);
+
+        $metaTitle = $fields->firstWhere('handle', 'meta_title');
+        $this->assertEquals('Keep it under 60 characters.', $metaTitle['instructions']);
+        $this->assertEquals('Meta Title', $metaTitle['display']);
+
+        $metaDescription = $fields->firstWhere('handle', 'meta_description');
+        $this->assertNull($metaDescription['instructions']);
+        $this->assertEquals('Meta Description', $metaDescription['display']);
     }
 }

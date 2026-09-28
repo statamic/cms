@@ -1,6 +1,8 @@
-import { FloatingMenuPlugin } from './FloatingMenuPlugin'
+import { FloatingMenuPlugin } from './FloatingMenuPlugin';
 
 export const FloatingMenu = {
+    emits: ['shown', 'hidden'],
+
     name: 'FloatingMenu',
 
     props: {
@@ -14,15 +16,15 @@ export const FloatingMenu = {
         },
         isShowing: {
             type: Boolean,
-        }
+        },
     },
 
     data() {
         return {
             show: false,
             x: 0,
-            y: 0
-        }
+            y: 0,
+        };
     },
 
     watch: {
@@ -32,14 +34,16 @@ export const FloatingMenu = {
                 if (!editor) return;
 
                 this.$nextTick(() => {
-                    editor.registerPlugin(FloatingMenuPlugin({
-                        pluginKey: 'floatingMenu',
-                        editor,
-                        vm: this,
-                        element: this.$el,
-                        shouldShow: this.shouldShow,
-                    }))
-                })
+                    editor.registerPlugin(
+                        FloatingMenuPlugin({
+                            pluginKey: 'floatingMenu',
+                            editor,
+                            vm: this,
+                            element: this.$el,
+                            shouldShow: this.shouldShow,
+                        }),
+                    );
+                });
             },
         },
 
@@ -55,17 +59,17 @@ export const FloatingMenu = {
             } else {
                 this.$emit('hidden');
             }
-        }
+        },
     },
 
     render() {
-        return this.$scopedSlots.default({
+        return this.$slots.default({
             x: this.x,
             y: this.y,
         });
     },
 
-    beforeDestroy() {
-        this.editor.unregisterPlugin('floatingMenu')
+    beforeUnmount() {
+        this.editor.unregisterPlugin('floatingMenu');
     },
-}
+};

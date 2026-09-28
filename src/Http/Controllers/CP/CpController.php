@@ -4,9 +4,13 @@ namespace Statamic\Http\Controllers\CP;
 
 use Illuminate\Auth\Access\AuthorizationException as LaravelAuthException;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Statamic\Exceptions\AuthorizationException;
+use Statamic\Exceptions\ElevatedSessionAuthorizationException;
 use Statamic\Http\Controllers\Controller;
 use Statamic\Statamic;
+
+use function Statamic\trans as __;
 
 /**
  * The base control panel controller.
@@ -31,7 +35,9 @@ class CpController extends Controller
      */
     public function pageNotFound()
     {
-        return response()->view('statamic::errors.404', [], 404);
+        return Inertia::render('errors/404')
+            ->toResponse(request())
+            ->setStatusCode(404);
     }
 
     public function authorize($ability, $args = [], $message = null)
@@ -63,6 +69,13 @@ class CpController extends Controller
     {
         if ($condition) {
             return $this->authorizePro();
+        }
+    }
+
+    public function requireElevatedSession(): void
+    {
+        if (config('statamic.users.elevated_sessions_enabled') && ! request()->hasElevatedSession()) {
+            throw new ElevatedSessionAuthorizationException;
         }
     }
 }

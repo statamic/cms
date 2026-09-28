@@ -16,7 +16,7 @@ class PasswordFormTest extends TestCase
 
     private function tag($tag)
     {
-        return Parse::template($tag, []);
+        return Parse::template($tag, trusted: true);
     }
 
     #[Test]
@@ -74,9 +74,9 @@ EOT
         preg_match_all('/<label>.+<\/label><input.+>/U', $output, $actual);
 
         $expected = [
-            '<label>Current Password</label><input id="userpassword-form-current_password-field" type="password" name="current_password" value="">',
+            '<label>Current Password</label><input id="userpassword-form-current-password-field" type="password" name="current_password" value="">',
             '<label>Password</label><input id="userpassword-form-password-field" type="password" name="password" value="">',
-            '<label>Password Confirmation</label><input id="userpassword-form-password_confirmation-field" type="password" name="password_confirmation" value="">',
+            '<label>Password Confirmation</label><input id="userpassword-form-password-confirmation-field" type="password" name="password_confirmation" value="">',
         ];
 
         $this->assertEquals($expected, $actual[0]);
@@ -174,12 +174,14 @@ EOT
         $this->actingAs(User::make()->password('mypassword')->save());
 
         $this
+            ->from('/password-form')
             ->post('/!/auth/password', [
                 'current_password' => 'mypassword',
                 'password' => 'newpassword',
                 'password_confirmation' => 'newpassword',
             ])
-            ->assertSessionHasNoErrors();
+            ->assertSessionHasNoErrors()
+            ->assertLocation('/password-form');
 
         $output = $this->tag(<<<'EOT'
 {{ user:password_form }}
@@ -273,6 +275,21 @@ EOT
         $this->assertEmpty($success[1]);
         $this->assertContains($errors[1], $expected);
         $this->assertContains($inlineErrors[1], $expected);
+    }
+
+    #[Test]
+    public function it_wont_follow_redirect_to_external_url()
+    {
+        $this->actingAs(User::make()->password('mypassword')->save());
+
+        $this
+            ->post('/!/auth/password', [
+                'current_password' => 'mypassword',
+                'password' => 'newpassword',
+                'password_confirmation' => 'newpassword',
+                '_redirect' => 'https://evil.com',
+            ])
+            ->assertLocation('/');
     }
 
     #[Test]

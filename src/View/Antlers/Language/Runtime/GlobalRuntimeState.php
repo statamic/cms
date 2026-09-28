@@ -77,7 +77,7 @@ class GlobalRuntimeState
      *
      * @var bool
      */
-    public static $isEvaluatingUserData = false;
+    public static $isEvaluatingUserData = true;
 
     public static $isEvaluatingData = false;
 
@@ -164,6 +164,13 @@ class GlobalRuntimeState
     public static $bannedContentTagPaths = [];
 
     /**
+     * A list of all allowed content tag paths.
+     *
+     * @var string[]
+     */
+    public static $allowedContentTagPaths = [];
+
+    /**
      * A list of all invalid modifier paths.
      *
      * @var string[]
@@ -178,11 +185,25 @@ class GlobalRuntimeState
     public static $bannedContentModifierPaths = [];
 
     /**
+     * A list of all allowed content modifier paths.
+     *
+     * @var string[]
+     */
+    public static $allowedContentModifierPaths = [];
+
+    /**
      * Controls if PHP is evaluated in user content.
      *
      * @var bool
      */
     public static $allowPhpInContent = false;
+
+    /**
+     * Controls if method invocations are evaluated in user content.
+     *
+     * @var bool
+     */
+    public static $allowMethodsInContent = false;
 
     /**
      * Maintains a list of all field prefixes that have been encountered.
@@ -198,9 +219,16 @@ class GlobalRuntimeState
 
     public static $requiresRuntimeIsolation = false;
 
+    // Scopes the parseView() data restore to renders that request it (the include tag).
+    // Views leaving data behind on the processor is arguably the real bug, but other
+    // renders keep that behavior for BC. Remove once that is fixed for everyone.
+    public static $isolateViewData = false;
+
     public static $evaulatingTagContents = false;
 
     public static $userContentEvalState = null;
+
+    public static $isCascadeEnabled = true;
 
     /**
      * A list of callbacks that will be invoked when ___internal_debug:peek is called.
@@ -214,8 +242,47 @@ class GlobalRuntimeState
 
     public static $isCacheEnabled = false;
 
+    public static function isolate(): void
+    {
+        self::$traceTagAssignments = false;
+        self::$tracedRuntimeAssignments = [];
+        self::$requiresRuntimeIsolation = true;
+        self::$isCascadeEnabled = false;
+    }
+
+    public static function captureRuntimeState(): array
+    {
+        return [
+            self::$requiresRuntimeIsolation,
+            self::$traceTagAssignments,
+            self::$tracedRuntimeAssignments,
+            self::$isCascadeEnabled,
+        ];
+    }
+
+    public static function captureAndIsolate(): array
+    {
+        $captured = self::captureRuntimeState();
+
+        self::isolate();
+
+        return $captured;
+    }
+
+    public static function restoreState(array $capturedState): void
+    {
+        self::$requiresRuntimeIsolation = $capturedState[0];
+        self::$traceTagAssignments = $capturedState[1];
+        self::$tracedRuntimeAssignments = $capturedState[2];
+        // Forcing true when absent is technically incorrect: the caller may itself be
+        // isolated, and this re-enables its cascade access mid-render. Preserved
+        // for backwards compatibility and not causing too much chaos and pain
+        self::$isCascadeEnabled = $capturedState[3] ?? true;
+    }
+
     public static function resetGlobalState()
     {
+        self::$isCascadeEnabled = true;
         self::$templateFileStack = [];
         self::$shareVariablesTemplateTrigger = '';
         self::$layoutVariables = [];
@@ -226,6 +293,9 @@ class GlobalRuntimeState
         self::$yieldCount = 0;
         self::$yieldStacks = [];
         self::$abandonedNodes = [];
+        self::$isEvaluatingUserData = true;
+        self::$isEvaluatingData = false;
+        self::$userContentEvalState = null;
 
         StackReplacementManager::clearStackState();
         LiteralReplacementManager::resetLiteralState();

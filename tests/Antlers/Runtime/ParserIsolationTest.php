@@ -3,6 +3,7 @@
 namespace Tests\Antlers\Runtime;
 
 use Facades\Tests\Factories\EntryFactory;
+use Illuminate\Support\Str;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Nav;
 use Statamic\Facades\Taxonomy;
@@ -273,5 +274,48 @@ EXPECTED;
 
         $this->assertSame($expectedOne, $contentOne);
         $this->assertSame($expectedTwo, $contentTwo);
+    }
+
+    public function test_php_nodes_dont_overwrite_parent_scope_needlessly()
+    {
+        $this->createBlueprintsAndData();
+        $this->withFakeViews();
+
+        $layout = <<<'EOT'
+{{ template_content }}
+Layout: {{ title }}
+EOT;
+
+        $template = <<<'EOT'
+{{?
+    $loop_data = [
+        [
+            'title' => 'A different title',
+        ],
+    ];
+?}}
+
+Before: {{ title }}
+{{ collection:news }}
+    {{ collection:news }}
+        {{ loop_data }}
+            {{? /* */ ?}}
+        {{ /loop_data }}
+    {{ /collection:news }}
+{{ /collection:news }}
+After: {{ title }}
+EOT;
+
+        $this->viewShouldReturnRaw('layout', $layout);
+        $this->viewShouldReturnRaw('default', $template);
+
+        $result = $this->get('bravo/news-2')
+            ->assertOk()
+            ->content();
+
+        $this->assertSame(
+            'Before: News 2 After: News 2 Layout: News 2',
+            Str::squish($result)
+        );
     }
 }

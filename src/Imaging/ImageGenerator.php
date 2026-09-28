@@ -15,6 +15,7 @@ use Statamic\Facades\Asset as Assets;
 use Statamic\Facades\Config;
 use Statamic\Facades\File;
 use Statamic\Facades\Glide;
+use Statamic\Facades\URL;
 use Statamic\Support\Str;
 
 class ImageGenerator
@@ -82,17 +83,17 @@ class ImageGenerator
     public function generateByPath($path, array $params)
     {
         return Glide::cacheStore()->rememberForever(
-            'path::'.$path.'::'.md5(json_encode($params)),
+            static::manipulationCacheKey('path', $path, $params),
             fn () => $this->doGenerateByPath($path, $params)
         );
     }
 
-    private function doGenerateByPath($path, array $params)
+    private function doGenerateByPath($path, array $params, $sourceFilesystemRoot = null)
     {
         $this->path = $path;
         $this->setParams($params);
 
-        $this->server->setSource($this->pathSourceFilesystem());
+        $this->server->setSource($this->pathSourceFilesystem($sourceFilesystemRoot));
         $this->server->setSourcePathPrefix('/');
         $this->server->setCachePathPrefix('paths');
 
@@ -108,7 +109,7 @@ class ImageGenerator
     public function generateByUrl($url, array $params)
     {
         return Glide::cacheStore()->rememberForever(
-            'url::'.$url.'::'.md5(json_encode($params)),
+            static::manipulationCacheKey('url', $url, $params),
             fn () => $this->doGenerateByUrl($url, $params)
         );
     }
@@ -129,6 +130,24 @@ class ImageGenerator
     }
 
     /**
+     * @param  \Statamic\Contracts\Assets\Asset  $asset
+     */
+    public function generateVideoThumbnail($asset, array $params)
+    {
+        if ($path = app(ThumbnailExtractor::class)->generateThumbnail($asset)) {
+            $this->skip_validation = true;
+
+            return $this->doGenerateByPath(
+                basename($path),
+                $params,
+                config('statamic.assets.ffmpeg.cache_path'),
+            );
+        }
+
+        return '';
+    }
+
+    /**
      * Generate a manipulated image by an asset.
      *
      * @param  \Statamic\Contracts\Assets\Asset  $asset
@@ -136,7 +155,15 @@ class ImageGenerator
      */
     public function generateByAsset($asset, array $params)
     {
-        $manipulationCacheKey = 'asset::'.$asset->id().'::'.md5(json_encode($params));
+        if ($asset->isVideo() && ThumbnailExtractor::available()) {
+            return $this->generateVideoThumbnail($asset, $params);
+        }
+
+        if ($asset->isVideo()) {
+            return '';
+        }
+
+        $manipulationCacheKey = static::manipulationCacheKey('asset', $asset, $params);
         $manifestCacheKey = static::assetCacheManifestKey($asset);
 
         // Store the cache key for this manipulation in a manifest so that we can easily remove when deleting an asset.
@@ -167,6 +194,17 @@ class ImageGenerator
         return $this->generate($this->asset->basename());
     }
 
+    public static function manipulationCacheKey(string $type, $item, array $params): string
+    {
+        $id = $item;
+
+        if ($type === 'asset') {
+            $id = $item->id();
+        }
+
+        return "{$type}::{$id}::".md5(json_encode($params));
+    }
+
     public static function assetCacheManifestKey($asset)
     {
         return 'asset::'.$asset->id();
@@ -187,34 +225,56 @@ class ImageGenerator
         @set_time_limit(config('statamic.system.php_max_execution_time'));
     }
 
-    private function setUpWatermark($watermark): string
+    private function setUpWatermark($watermark): ?string
     {
-        [$filesystem, $param] = $this->getWatermarkFilesystemAndParam($watermark);
+        $watermark = static::decodeWatermark($watermark);
 
-        $this->updateWatermarkFilesystem($filesystem);
+        $this->updateWatermarkFilesystem($this->watermarkFilesystem($watermark));
 
-        return $param;
+        return static::watermarkParam($watermark);
     }
 
-    private function getWatermarkFilesystemAndParam($item)
+    /**
+     * The `mark` param as Glide will see it, which is what the cache path is hashed from.
+     */
+    public static function watermarkParam($watermark): ?string
     {
-        if (is_string($item) && Str::startsWith($item, 'asset::')) {
-            $decoded = Str::fromBase64Url(Str::after($item, 'asset::'));
-            [$container, $path] = explode('/', $decoded, 2);
-            $item = Assets::find($container.'::'.$path);
+        $watermark = static::decodeWatermark($watermark);
+
+        if ($watermark instanceof Asset) {
+            return $watermark->path();
         }
 
-        if ($item instanceof Asset) {
-            return [$item->disk()->filesystem()->getDriver(), $item->path()];
+        if (URL::isAbsolute($watermark)) {
+            return app(RemoteUrlValidator::class)->parse($watermark)['path'];
         }
 
-        if (Str::startsWith($item, ['http://', 'https://'])) {
-            $parsed = $this->parseUrl($item);
+        return $watermark;
+    }
 
-            return [$this->guzzleSourceFilesystem($parsed['base']), $parsed['path']];
+    private static function decodeWatermark($watermark)
+    {
+        if (! is_string($watermark) || ! Str::startsWith($watermark, 'asset::')) {
+            return $watermark;
         }
 
-        return [$this->pathSourceFilesystem(), $item];
+        $decoded = Str::fromBase64Url(Str::after($watermark, 'asset::'));
+        [$container, $path] = explode('/', $decoded, 2);
+
+        return Assets::find($container.'::'.$path);
+    }
+
+    private function watermarkFilesystem($watermark)
+    {
+        if ($watermark instanceof Asset) {
+            return $watermark->disk()->filesystem()->getDriver();
+        }
+
+        if (URL::isAbsolute($watermark)) {
+            return $this->guzzleSourceFilesystem($this->parseUrl($watermark)['base']);
+        }
+
+        return $this->pathSourceFilesystem();
     }
 
     private function updateWatermarkFilesystem($filesystem)
@@ -267,22 +327,29 @@ class ImageGenerator
     }
 
     /**
+     * Get the default Glide manipulation parameters for an asset.
+     */
+    public static function getDefaultManipulations(?Asset $asset = null): array
+    {
+        $defaults = Glide::normalizeParameters(
+            Config::get('statamic.assets.image_manipulation.defaults') ?: []
+        );
+
+        if (Config::get('statamic.assets.auto_crop') && $asset) {
+            $defaults['fit'] = 'crop-'.$asset->get('focus', '50-50');
+        }
+
+        return $defaults;
+    }
+
+    /**
      * Apply default Glide manipulations on the image.
      *
      * @return void
      */
     private function applyDefaultManipulations()
     {
-        $defaults = Glide::normalizeParameters(
-            Config::get('statamic.assets.image_manipulation.defaults') ?: []
-        );
-
-        // Enable automatic cropping
-        if (Config::get('statamic.assets.auto_crop') && $this->asset) {
-            $defaults['fit'] = 'crop-'.$this->asset->get('focus', '50-50');
-        }
-
-        $this->server->setDefaults($defaults);
+        $this->server->setDefaults(static::getDefaultManipulations($this->asset));
     }
 
     /**
@@ -306,13 +373,15 @@ class ImageGenerator
         }
 
         if (! ImageValidator::isValidImage($extension, $mime)) {
-            throw new \Exception("Image [{$path}] does not actually appear to be a valid image.");
+            throw UnableToReadFile::fromLocation($path, "Image [{$path}] does not actually appear to be a valid image.");
         }
     }
 
-    private function pathSourceFilesystem()
+    private function pathSourceFilesystem($root = null)
     {
-        return Storage::build(['driver' => 'local', 'root' => public_path()])->getDriver();
+        $root ??= public_path();
+
+        return Storage::build(['driver' => 'local', 'root' => $root])->getDriver();
     }
 
     private function guzzleSourceFilesystem($base)
@@ -326,12 +395,10 @@ class ImageGenerator
 
     private function parseUrl($url)
     {
-        $parsed = parse_url($url);
+        $validator = app(RemoteUrlValidator::class);
 
-        return [
-            'path' => Str::after($parsed['path'], '/'),
-            'base' => $parsed['scheme'].'://'.$parsed['host'],
-            'query' => $parsed['query'] ?? null,
-        ];
+        $validator->validate($url);
+
+        return $validator->parse($url);
     }
 }

@@ -1,7 +1,7 @@
+import { test, expect } from 'vitest';
 import Converter from '../components/field-conditions/Converter.js';
-global._ = require('underscore');
 
-const FieldConditionsConverter = new Converter;
+const FieldConditionsConverter = new Converter();
 
 test('it converts from blueprint format', () => {
     let converted = FieldConditionsConverter.fromBlueprint({
@@ -11,67 +11,94 @@ test('it converts from blueprint format', () => {
     });
 
     let expected = [
-        {field: 'name', operator: 'not', value: 'joe'},
-        {field: 'age', operator: 'equals', value: '13'},
-        {field: 'email', operator: 'equals', value: 'san@holo.com'}
+        { field: 'name', operator: 'not', value: 'joe' },
+        { field: 'age', operator: 'equals', value: '13' },
+        { field: 'email', operator: 'equals', value: 'san@holo.com' },
     ];
 
     expect(converted).toEqual(expected);
 });
 
 test('it converts from blueprint format and applies prefixes', () => {
-    let converted = FieldConditionsConverter.fromBlueprint({
-        name: 'isnt joe',
-        age: 13,
-        email: 'equals san@holo.com',
-    }, 'nested_');
+    let converted = FieldConditionsConverter.fromBlueprint(
+        {
+            name: 'isnt joe',
+            age: 13,
+            email: 'equals san@holo.com',
+        },
+        'nested_',
+    );
 
     let expected = [
-        {field: 'nested_name', operator: 'not', value: 'joe'},
-        {field: 'nested_age', operator: 'equals', value: '13'},
-        {field: 'nested_email', operator: 'equals', value: 'san@holo.com'}
+        { field: 'nested_name', operator: 'not', value: 'joe' },
+        { field: 'nested_age', operator: 'equals', value: '13' },
+        { field: 'nested_email', operator: 'equals', value: 'san@holo.com' },
+    ];
+
+    expect(converted).toEqual(expected);
+});
+
+test('it converts from blueprint format when a field has multiple conditions', () => {
+    let converted = FieldConditionsConverter.fromBlueprint({
+        status: ['published', 'archived'],
+        audience: 'members',
+    });
+
+    let expected = [
+        { field: 'status', operator: 'equals', value: 'published' },
+        { field: 'status', operator: 'equals', value: 'archived' },
+        { field: 'audience', operator: 'equals', value: 'members' },
     ];
 
     expect(converted).toEqual(expected);
 });
 
 test('it converts from blueprint format and does not apply prefix to field conditions with root syntax', () => {
-    let converted = FieldConditionsConverter.fromBlueprint({
-        'name': 'isnt joe',
-        '$root.title': 'not empty',
-    }, 'nested_');
+    let converted = FieldConditionsConverter.fromBlueprint(
+        {
+            name: 'isnt joe',
+            '$root.title': 'not empty',
+        },
+        'nested_',
+    );
 
     let expected = [
-        {field: 'nested_name', operator: 'not', value: 'joe'},
-        {field: '$root.title', operator: 'not', value: 'empty'}
+        { field: 'nested_name', operator: 'not', value: 'joe' },
+        { field: '$root.title', operator: 'not', value: 'empty' },
     ];
 
     expect(converted).toEqual(expected);
 });
 
 test('it converts from blueprint format and does not apply prefix to field conditions with legacy root syntax for backwards compatibility', () => {
-    let converted = FieldConditionsConverter.fromBlueprint({
-        'name': 'isnt joe',
-        'root.title': 'not empty',
-    }, 'nested_');
+    let converted = FieldConditionsConverter.fromBlueprint(
+        {
+            name: 'isnt joe',
+            'root.title': 'not empty',
+        },
+        'nested_',
+    );
 
     let expected = [
-        {field: 'nested_name', operator: 'not', value: 'joe'},
-        {field: 'root.title', operator: 'not', value: 'empty'}
+        { field: 'nested_name', operator: 'not', value: 'joe' },
+        { field: 'root.title', operator: 'not', value: 'empty' },
     ];
 
     expect(converted).toEqual(expected);
 });
 
 test('it converts from blueprint format and does not apply prefix to field conditions with parent syntax', () => {
-    let converted = FieldConditionsConverter.fromBlueprint({
-        'name': 'isnt joe',
-        '$parent.title': 'not empty',
-    }, 'nested_');
+    let converted = FieldConditionsConverter.fromBlueprint(
+        {
+            name: 'isnt joe',
+            '$parent.title': 'not empty',
+        },
+        'nested_',
+    );
 
     let expected = [
-        {field: 'nested_name', operator: 'not', value: 'joe'},
-        {field: '$parent.title', operator: 'not', value: 'empty'}
+        { field: 'nested_name', operator: 'not', value: 'joe' },
+        { field: '$parent.title', operator: 'not', value: 'empty' },
     ];
 
     expect(converted).toEqual(expected);
@@ -79,13 +106,28 @@ test('it converts from blueprint format and does not apply prefix to field condi
 
 test('it converts to blueprint format', () => {
     let converted = FieldConditionsConverter.toBlueprint([
-        {field: 'name', operator: 'isnt', value: 'joe'},
-        {field: 'age', operator: '==', value: '13'}
+        { field: 'name', operator: 'isnt', value: 'joe' },
+        { field: 'age', operator: '==', value: '13' },
     ]);
 
     let expected = {
         name: 'isnt joe',
-        age: '== 13'
+        age: '== 13',
+    };
+
+    expect(converted).toEqual(expected);
+});
+
+test('it converts to blueprint format when a field has multiple conditions', () => {
+    let converted = FieldConditionsConverter.toBlueprint([
+        { field: 'status', operator: 'is', value: 'published' },
+        { field: 'status', operator: 'is', value: 'archived' },
+        { field: 'audience', operator: 'is', value: 'members' },
+    ]);
+
+    let expected = {
+        status: ['is published', 'is archived'],
+        audience: 'is members',
     };
 
     expect(converted).toEqual(expected);
@@ -93,13 +135,13 @@ test('it converts to blueprint format', () => {
 
 test('it converts and trims properly with empty operators', () => {
     let converted = FieldConditionsConverter.toBlueprint([
-        {field: 'name', operator: '', value: 'joe'},
-        {field: 'age', operator: null, value: '13'}
+        { field: 'name', operator: '', value: 'joe' },
+        { field: 'age', operator: null, value: '13' },
     ]);
 
     let expected = {
         name: 'joe',
-        age: '13'
+        age: '13',
     };
 
     expect(converted).toEqual(expected);

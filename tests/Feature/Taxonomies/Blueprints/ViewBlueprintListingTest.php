@@ -32,31 +32,31 @@ class ViewBlueprintListingTest extends TestCase
 
         $response = $this
             ->actingAs($user)
-            ->get(cp_route('taxonomies.blueprints.index', 'test'))
+            ->get(cp_route('blueprints.taxonomies.index', 'test'))
             ->assertSuccessful()
-            ->assertViewHas('blueprints', collect([
-                [
+            ->assertInertia(fn ($page) => $page
+                ->has('blueprints', 2)
+                ->where('blueprints.0', [
                     'id' => 'foo',
                     'handle' => 'foo',
                     'title' => 'Foo',
                     'tabs' => 2,
                     'fields' => 2,
                     'hidden' => false,
-                    'edit_url' => 'http://localhost/cp/taxonomies/test/blueprints/foo/edit',
-                    'delete_url' => 'http://localhost/cp/taxonomies/test/blueprints/foo',
-                ],
-                [
+                    'edit_url' => 'http://localhost/cp/fields/blueprints/taxonomies/test/foo/edit',
+                    'delete_url' => 'http://localhost/cp/fields/blueprints/taxonomies/test/foo',
+                ])
+                ->where('blueprints.1', [
                     'id' => 'bar',
                     'handle' => 'bar',
                     'title' => 'Bar',
                     'tabs' => 2,
                     'fields' => 2,
                     'hidden' => false,
-                    'edit_url' => 'http://localhost/cp/taxonomies/test/blueprints/bar/edit',
-                    'delete_url' => 'http://localhost/cp/taxonomies/test/blueprints/bar',
-                ],
-            ]))
-            ->assertDontSee('no-results');
+                    'edit_url' => 'http://localhost/cp/fields/blueprints/taxonomies/test/bar/edit',
+                    'delete_url' => 'http://localhost/cp/fields/blueprints/taxonomies/test/bar',
+                ])
+            );
     }
 
     #[Test]
@@ -69,7 +69,7 @@ class ViewBlueprintListingTest extends TestCase
         $response = $this
             ->from('/cp/original')
             ->actingAs($user)
-            ->get(cp_route('taxonomies.blueprints.index', 'test'))
+            ->get(cp_route('blueprints.taxonomies.index', 'test'))
             ->assertRedirect('/cp/original');
     }
 

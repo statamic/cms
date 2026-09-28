@@ -4,10 +4,12 @@ namespace Statamic\StaticCaching;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Statamic\Events\AssetDeleted;
+use Statamic\Events\AssetReuploaded;
 use Statamic\Events\AssetSaved;
 use Statamic\Events\BlueprintDeleted;
 use Statamic\Events\BlueprintSaved;
 use Statamic\Events\CollectionTreeDeleted;
+use Statamic\Events\CollectionTreeEntriesMovedOrRemoved;
 use Statamic\Events\CollectionTreeSaved;
 use Statamic\Events\EntryDeleting;
 use Statamic\Events\EntrySaved;
@@ -27,32 +29,36 @@ use Statamic\Facades\Form;
 class Invalidate implements ShouldQueue
 {
     protected $invalidator;
+    protected $cacher;
 
     protected $events = [
-        AssetSaved::class => 'invalidateAsset',
+        AssetSaved::class => 'refreshAsset',
         AssetDeleted::class => 'invalidateAsset',
-        EntrySaved::class => 'invalidateEntry',
+        AssetReuploaded::class => 'refreshAsset',
+        EntrySaved::class => 'refreshEntry',
         EntryDeleting::class => 'invalidateEntry',
         EntryScheduleReached::class => 'invalidateEntry',
         LocalizedTermSaved::class => 'invalidateTerm',
         LocalizedTermDeleted::class => 'invalidateTerm',
-        GlobalVariablesSaved::class => 'invalidateGlobalSet',
-        GlobalVariablesDeleted::class => 'invalidateGlobalSet',
-        NavSaved::class => 'invalidateNav',
+        GlobalVariablesSaved::class => 'refreshGlobalVariables',
+        GlobalVariablesDeleted::class => 'invalidateGlobalVariables',
+        NavSaved::class => 'refreshNav',
         NavDeleted::class => 'invalidateNav',
-        FormSaved::class => 'invalidateForm',
+        FormSaved::class => 'refreshForm',
         FormDeleted::class => 'invalidateForm',
+        CollectionTreeEntriesMovedOrRemoved::class => 'invalidateMovedOrRemovedEntries',
         CollectionTreeSaved::class => 'invalidateCollectionByTree',
         CollectionTreeDeleted::class => 'invalidateCollectionByTree',
-        NavTreeSaved::class => 'invalidateNavByTree',
+        NavTreeSaved::class => 'refreshNavByTree',
         NavTreeDeleted::class => 'invalidateNavByTree',
-        BlueprintSaved::class => 'invalidateByBlueprint',
+        BlueprintSaved::class => 'refreshByBlueprint',
         BlueprintDeleted::class => 'invalidateByBlueprint',
     ];
 
-    public function __construct(Invalidator $invalidator)
+    public function __construct(Invalidator $invalidator, Cacher $cacher)
     {
         $this->invalidator = $invalidator;
+        $this->cacher = $cacher;
     }
 
     public function subscribe($dispatcher)
@@ -67,9 +73,19 @@ class Invalidate implements ShouldQueue
         $this->invalidator->invalidate($event->asset);
     }
 
+    public function refreshAsset($event)
+    {
+        $this->invalidator->refresh($event->asset);
+    }
+
     public function invalidateEntry($event)
     {
         $this->invalidator->invalidate($event->entry);
+    }
+
+    public function refreshEntry($event)
+    {
+        $this->invalidator->refresh($event->entry);
     }
 
     public function invalidateTerm($event)
@@ -77,9 +93,19 @@ class Invalidate implements ShouldQueue
         $this->invalidator->invalidate($event->term);
     }
 
-    public function invalidateGlobalSet($event)
+    public function refreshTerm($event)
+    {
+        $this->invalidator->refresh($event->term);
+    }
+
+    public function invalidateGlobalVariables($event)
     {
         $this->invalidator->invalidate($event->variables);
+    }
+
+    public function refreshGlobalVariables($event)
+    {
+        $this->invalidator->refresh($event->variables);
     }
 
     public function invalidateNav($event)
@@ -87,9 +113,26 @@ class Invalidate implements ShouldQueue
         $this->invalidator->invalidate($event->nav);
     }
 
+    public function refreshNav($event)
+    {
+        $this->invalidator->refresh($event->nav);
+    }
+
     public function invalidateForm($event)
     {
         $this->invalidator->invalidate($event->form);
+    }
+
+    public function refreshForm($event)
+    {
+        $this->invalidator->refresh($event->form);
+    }
+
+    public function invalidateMovedOrRemovedEntries($event)
+    {
+        if ($urls = array_merge($event->removedUrls, $event->movedUrls)) {
+            $this->cacher->invalidateUrls($urls);
+        }
     }
 
     public function invalidateCollectionByTree($event)
@@ -97,9 +140,19 @@ class Invalidate implements ShouldQueue
         $this->invalidator->invalidate($event->tree);
     }
 
+    public function refreshCollectionByTree($event)
+    {
+        $this->invalidator->refresh($event->tree->collection());
+    }
+
     public function invalidateNavByTree($event)
     {
         $this->invalidator->invalidate($event->tree);
+    }
+
+    public function refreshNavByTree($event)
+    {
+        $this->invalidator->refresh($event->tree->structure());
     }
 
     public function invalidateByBlueprint($event)
@@ -107,6 +160,15 @@ class Invalidate implements ShouldQueue
         if ($event->blueprint->namespace() === 'forms') {
             if ($form = Form::find($event->blueprint->handle())) {
                 $this->invalidator->invalidate($form);
+            }
+        }
+    }
+
+    public function refreshByBlueprint($event)
+    {
+        if ($event->blueprint->namespace() === 'forms') {
+            if ($form = Form::find($event->blueprint->handle())) {
+                $this->invalidator->refresh($form);
             }
         }
     }

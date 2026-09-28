@@ -1,18 +1,18 @@
-/* Inter var v3.19 (https://rsms.me/inter/)
-   ========================================================================== */
-
+/* Inter var 4.1 (https://rsms.me/inter/)
+========================================================================== */
 @font-face {
-    font-family: 'Inter var';
+    font-family: "inter";
+    src: url("../../fonts/inter/intervariable.woff2?v=4.1") format("woff2");
     font-weight: 100 900;
-    font-display: swap;
     font-style: normal;
-    src: url("../../fonts/Inter/Inter-roman.var.woff2?v=3.19") format("woff2");
-}
-
-@font-face {
-    font-family: 'Inter var';
-    font-weight: 100 900;
+    /* https://developer.chrome.com/docs/lighthouse/performance/font-display/#how-to-avoid-showing-invisible-text */
     font-display: swap;
+}
+@font-face {
+    font-family: "inter";
+    src: url("../../fonts/inter/intervariable-italic.woff2?v=4.1") format("woff2");
+    font-weight: 100 900;
     font-style: italic;
-    src: url("../../fonts/Inter/Inter-italic.var.woff2?v=3.19") format("woff2");
+    /* https://developer.chrome.com/docs/lighthouse/performance/font-display/#how-to-avoid-showing-invisible-text */
+    font-display: swap;
 }

@@ -84,11 +84,58 @@ class CascadeTest extends TestCase
             $this->assertEquals('<?xml version="1.0" encoding="utf-8" ?>', $cascade['xml_header']);
             $this->assertEquals(csrf_token(), $cascade['csrf_token']);
             $this->assertEquals(csrf_field(), $cascade['csrf_field']);
-            $this->assertEquals(config()->all(), $cascade['config']);
+            $this->assertEquals(Cascade::config(), $cascade['config']);
 
             // Response code is constant. It gets manually overridden on errors.
             $this->assertEquals(200, $cascade['response_code']);
         });
+    }
+
+    #[Test]
+    public function it_only_hydrates_allowlisted_config_values()
+    {
+        config([
+            'app.foo' => 'bar',
+            'statamic.system.view_config_allowlist' => ['app.name'],
+        ]);
+
+        tap($this->cascade()->hydrate()->toArray(), function ($cascade) {
+            $this->assertTrue(Arr::has($cascade['config'], 'app.name'));
+            $this->assertFalse(Arr::has($cascade['config'], 'app.foo'));
+        });
+    }
+
+    #[Test]
+    public function overriding_the_allowlist_changes_the_config_subset()
+    {
+        config(['statamic.system.view_config_allowlist' => ['app.name']]);
+
+        $nameOnly = Cascade::config();
+
+        config(['statamic.system.view_config_allowlist' => ['app.env']]);
+
+        $envOnly = Cascade::config();
+
+        $this->assertTrue(Arr::has($nameOnly, 'app.name'));
+        $this->assertFalse(Arr::has($nameOnly, 'app.env'));
+        $this->assertTrue(Arr::has($envOnly, 'app.env'));
+        $this->assertFalse(Arr::has($envOnly, 'app.name'));
+    }
+
+    #[Test]
+    public function default_allowlist_can_be_extended_with_default_spread_syntax()
+    {
+        config([
+            'app.foo' => 'bar',
+            'statamic.system.license_key' => 'test-license-key',
+            'statamic.system.view_config_allowlist' => ['@default', 'app.foo'],
+        ]);
+
+        $config = Cascade::config();
+
+        $this->assertTrue(Arr::has($config, 'app.name'));
+        $this->assertTrue(Arr::has($config, 'app.foo'));
+        $this->assertFalse(Arr::has($config, 'statamic.system.license_key'));
     }
 
     #[Test]
@@ -411,6 +458,32 @@ class CascadeTest extends TestCase
     }
 
     #[Test]
+    public function it_hydrates_page_data_by_closure()
+    {
+        $vars = ['foo' => 'bar', 'baz' => 'qux'];
+        $page = EntryFactory::id('test')
+            ->collection('example')
+            ->data($vars)
+            ->make();
+        $cascade = $this->cascade()->withContent(fn () => $page);
+
+        $this->assertEquals($page, call_user_func($cascade->content()));
+
+        tap($cascade->hydrate()->toArray(), function ($cascade) use ($page) {
+            $this->assertArrayHasKey('page', $cascade);
+            $this->assertEquals($page, $cascade['page']);
+
+            // The 'page' values should also be at the top level.
+            // They'll be Value classes so Antlers can lazily augment them.
+            // Blade can prefer {{ $globalhandle->field }} over just {{ $field }}
+            $this->assertEquals('bar', $cascade['foo']);
+            $this->assertEquals('qux', $cascade['baz']);
+            $this->assertInstanceOf(Value::class, $cascade['foo']);
+            $this->assertInstanceOf(Value::class, $cascade['baz']);
+        });
+    }
+
+    #[Test]
     public function it_hydrates_globals()
     {
         $globals = $this->createGlobal('global', ['foo' => 'bar', 'hello' => 'world']);
@@ -449,6 +522,60 @@ class CascadeTest extends TestCase
             // a var that would normally be there to show the callbacks are run at the end
             $this->assertEquals('not the xml header', $cascade['xml_header']);
         });
+    }
+
+    #[Test]
+    public function a_hydrated_once_callback_only_runs_on_the_next_hydration()
+    {
+        $cascade = $this->cascade();
+
+        $cascade->hydratedOnce(function ($cascade) {
+            $cascade->set('response_code', 404);
+        });
+
+        // The callback runs during this hydration...
+        $this->assertEquals(404, $cascade->hydrate()->toArray()['response_code']);
+
+        // ...but not on subsequent ones, so the value falls back to its default.
+        $this->assertEquals(200, $cascade->hydrate()->toArray()['response_code']);
+    }
+
+    #[Test]
+    public function hydrated_once_callbacks_do_not_accumulate_across_hydrations()
+    {
+        $cascade = $this->cascade();
+
+        $runs = 0;
+        $register = function () use ($cascade, &$runs) {
+            $cascade->hydratedOnce(function () use (&$runs) {
+                $runs++;
+            });
+        };
+
+        // Simulate two error renders on the same long-lived process.
+        $register();
+        $cascade->hydrate();
+        $register();
+        $cascade->hydrate();
+
+        // Two registrations, two runs — not three (which is what accumulation would cause).
+        $this->assertEquals(2, $runs);
+    }
+
+    #[Test]
+    public function persistent_hydrated_callbacks_still_run_every_hydration()
+    {
+        $cascade = $this->cascade();
+
+        $runs = 0;
+        $cascade->hydrated(function () use (&$runs) {
+            $runs++;
+        });
+
+        $cascade->hydrate();
+        $cascade->hydrate();
+
+        $this->assertEquals(2, $runs);
     }
 
     #[Test]
@@ -504,11 +631,8 @@ class CascadeTest extends TestCase
 
     private function createGlobal($handle, $data)
     {
-        $global = GlobalSet::make()->handle($handle);
-        $global->addLocalization(
-            $global->makeLocalization('en')->data($data)
-        );
-        $global->save();
+        $global = GlobalSet::make()->handle($handle)->save();
+        $global->in('en')->data($data)->save();
 
         return $global->in('en');
     }

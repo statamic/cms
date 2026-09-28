@@ -1,14 +1,7 @@
 <template>
-
     <div>
-
-        <div
-            ref="sections"
-            class="blueprint-sections flex flex-wrap -mx-2 outline-none"
-            :data-tab="tabId"
-        >
-
-            <blueprint-section
+        <div ref="sections" class="blueprint-sections flex flex-wrap outline-hidden" :data-tab="tabId" tabindex="-1">
+            <BlueprintSection
                 ref="section"
                 v-for="(section, i) in sections"
                 :key="section._id"
@@ -16,43 +9,37 @@
                 :can-define-localizable="canDefineLocalizable"
                 :tab-id="tabId"
                 :show-handle-field="showSectionHandleField"
+                :show-collapsible-field="showSectionCollapsibleField"
                 :show-hide-field="showSectionHideField"
+                :exclude-fieldset="excludeFieldset"
+                :with-command-palette="withCommandPalette"
                 :edit-text="editSectionText"
                 @updated="updateSection(i, $event)"
                 @deleted="deleteSection(i)"
             />
 
             <div class="blueprint-add-section-container w-full">
-                <button class="blueprint-add-section-button outline-none" @click="addAndEditSection">
-                    <div class="text-center flex items-center leading-none">
-                        <svg-icon name="micro/plus" class="h-3 w-3 rtl:ml-2 ltr:mr-2" />
+                <button class="blueprint-add-section-button" @click="addAndEditSection">
+                    <div class="flex items-center gap-2">
+                        <ui-icon name="plus" class="size-4" />
                         <div v-text="addSectionText" />
                     </div>
-
-                    <div
-                        class="blueprint-section-draggable-zone outline-none"
-                        :data-tab="tabId"
-                    />
                 </button>
             </div>
-
         </div>
-
     </div>
-
 </template>
 
 <script>
-import uniqid from 'uniqid';
+import { nanoid as uniqid } from 'nanoid';
 import BlueprintSection from './Section.vue';
 import CanDefineLocalizable from '../fields/CanDefineLocalizable';
 
 export default {
-
     mixins: [CanDefineLocalizable],
 
     components: {
-        BlueprintSection
+        BlueprintSection,
     },
 
     props: {
@@ -61,63 +48,74 @@ export default {
         },
         initialSections: {
             type: Array,
-            required: true
+            required: true,
         },
         addSectionText: {
             type: String,
-            default: () => __('Add Section')
+            default: () => __('Add Section'),
         },
         editSectionText: {
             type: String,
-            default: () => __('Edit Section')
+            default: () => __('Edit Section'),
         },
         newSectionText: {
             type: String,
-            default: () => __('New Section')
+            default: () => __('New Section'),
         },
         singleSection: {
             type: Boolean,
-            default: false
+            default: false,
         },
         requireSection: {
             type: Boolean,
-            default: true
+            default: true,
         },
         showSectionHandleField: {
             type: Boolean,
-            default: false
+            default: false,
         },
+	    showSectionCollapsibleField: {
+			type: Boolean,
+		    default: false,
+	    },
         showSectionHideField: {
             type: Boolean,
-            default: false
-        }
+            default: false,
+        },
+        excludeFieldset: {
+            type: String,
+            default: null,
+        },
+        withCommandPalette: {
+            type: Boolean,
+            default: false,
+        },
     },
 
     data() {
         return {
-            sections: this.initialSections
-        }
+            sections: this.initialSections,
+        };
     },
 
     watch: {
-
         sections(sections) {
             this.$emit('updated', sections);
-        }
-
+        },
     },
 
     methods: {
-
         addSection() {
             const section = {
                 _id: uniqid(),
                 display: this.newSectionText,
                 instructions: null,
+                collapsible: false,
+                collapsed: false,
                 icon: null,
                 hide: null,
                 handle: snake_case(this.newSectionText),
-                fields: []
+                fields: [],
             };
 
             this.sections.push(section);
@@ -129,7 +127,7 @@ export default {
             const section = this.addSection();
 
             this.$nextTick(() => {
-                this.$refs.section.find(vm => vm.section._id === section._id).edit();
+                this.$refs.section.find((vm) => vm.section._id === section._id).edit();
             });
         },
 
@@ -147,9 +145,7 @@ export default {
             if (this.requireSection && this.sections.length === 0) {
                 this.addSection();
             }
-        }
-
-    }
-
-}
+        },
+    },
+};
 </script>

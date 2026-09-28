@@ -12,6 +12,8 @@ use Statamic\OAuth\Provider;
 use Statamic\Query\Scopes\AllowsScopes;
 use Statamic\Statamic;
 
+use function Statamic\trans as __;
+
 abstract class UserRepository implements RepositoryContract
 {
     use AllowsScopes, StoresComputedFieldCallbacks;
@@ -64,11 +66,11 @@ abstract class UserRepository implements RepositoryContract
         }
 
         $blueprint = Blueprint::find('user') ?? Blueprint::makeFromFields([
-            'name' => ['type' => 'text', 'display' => __('Name'), 'listable' => true],
-            'email' => ['type' => 'text', 'input_type' => 'email', 'display' => __('Email Address'), 'listable' => true],
+            'name' => ['type' => 'text', 'autocomplete' => 'name', 'display' => __('Name'), 'listable' => true],
+            'email' => ['type' => 'text', 'input_type' => 'email', 'autocomplete' => 'email', 'display' => __('Email Address'), 'listable' => true],
         ])->setHandle('user');
 
-        $blueprint->ensureField('email', ['type' => 'text', 'input_type' => 'email', 'display' => __('Email Address'), 'listable' => true]);
+        $blueprint->ensureField('email', ['type' => 'text', 'input_type' => 'email', 'autocomplete' => 'email', 'display' => __('Email Address'), 'listable' => true]);
 
         if (Statamic::pro()) {
             $blueprint->ensureField('roles', ['type' => 'user_roles', 'mode' => 'select', 'width' => 50, 'listable' => true, 'filterable' => false]);
@@ -83,6 +85,14 @@ abstract class UserRepository implements RepositoryContract
         UserBlueprintFound::dispatch($blueprint);
 
         return $blueprint;
+    }
+
+    public function blueprintCommandPaletteLink()
+    {
+        return $this->blueprint()?->commandPaletteLink(
+            type: 'Users',
+            url: cp_route('blueprints.users.edit'),
+        );
     }
 
     public function findByOAuthId(Provider $provider, string $id): ?User

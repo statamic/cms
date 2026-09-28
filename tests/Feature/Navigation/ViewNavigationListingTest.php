@@ -26,10 +26,11 @@ class ViewNavigationListingTest extends TestCase
             ->actingAs($user)
             ->visitIndex()
             ->assertSuccessful()
-            ->assertViewHas('navs', function ($navs) {
-                return $navs->map->id->all() === ['foo', 'bar'];
-            })
-            ->assertDontSee('no-results');
+            ->assertInertia(fn ($page) => $page->component('navigation/Index')
+                ->has('navs', 2)
+                ->where('navs.0.id', 'foo')
+                ->where('navs.1.id', 'bar')
+            );
     }
 
     #[Test]
@@ -41,8 +42,7 @@ class ViewNavigationListingTest extends TestCase
             ->actingAs($user)
             ->visitIndex()
             ->assertSuccessful()
-            ->assertViewHas('navs', collect([]))
-            ->assertSee('no-results');
+            ->assertInertia(fn ($page) => $page->component('navigation/Index')->has('navs', 0));
     }
 
     #[Test]
@@ -59,10 +59,10 @@ class ViewNavigationListingTest extends TestCase
             ->actingAs($user)
             ->visitIndex()
             ->assertSuccessful()
-            ->assertViewHas('navs', function ($navs) {
-                return $navs->map->id->all() === ['bar'];
-            })
-            ->assertDontSee('no-results');
+            ->assertInertia(fn ($page) => $page->component('navigation/Index')
+                ->has('navs', 1)
+                ->where('navs.0.id', 'bar')
+            );
     }
 
     #[Test]
@@ -79,10 +79,11 @@ class ViewNavigationListingTest extends TestCase
             ->actingAs($user)
             ->visitIndex()
             ->assertSuccessful()
-            ->assertViewHas('navs', function ($navs) {
-                return $navs->map->id->all() === ['foo', 'bar'];
-            })
-            ->assertDontSee('no-results');
+            ->assertInertia(fn ($page) => $page->component('navigation/Index')
+                ->has('navs', 2)
+                ->where('navs.0.id', 'foo')
+                ->where('navs.1.id', 'bar')
+            );
     }
 
     #[Test]
@@ -101,18 +102,6 @@ class ViewNavigationListingTest extends TestCase
             ->actingAs($user)
             ->visitIndex()
             ->assertRedirect('/cp/original');
-    }
-
-    #[Test]
-    public function create_structure_button_is_visible_with_permission_to_configure()
-    {
-        $this->setTestRoles(['test' => ['access cp', 'configure navs']]);
-        $user = Facades\User::make()->assignRole('test')->save();
-
-        $response = $this
-            ->actingAs($user)
-            ->visitIndex()
-            ->assertSee('Create Navigation');
     }
 
     #[Test]

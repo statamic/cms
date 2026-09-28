@@ -3,10 +3,10 @@
 namespace Tests\GraphQL;
 
 use Facades\Statamic\Fields\BlueprintRepository;
-use Facades\Tests\Factories\GlobalFactory;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Rebing\GraphQL\Support\Facades\GraphQL;
+use Statamic\Facades\GlobalSet;
 use Statamic\Fields\Blueprint;
 use Statamic\GraphQL\Types\GlobalSetInterface;
 use Statamic\GraphQL\Types\GlobalSetType;
@@ -23,9 +23,9 @@ class GlobalSetInterfaceTest extends TestCase
     {
         GraphQL::spy();
 
-        GlobalFactory::handle('social_media')->create();
-        GlobalFactory::handle('company_details')->create();
-        GlobalFactory::handle('without_blueprint')->create();
+        GlobalSet::make('social_media')->save();
+        GlobalSet::make('company_details')->save();
+        GlobalSet::make('without_blueprint')->save();
         $social = tap($this->partialMock(Blueprint::class), function ($m) {
             $m->shouldReceive('handle')->andReturn('article');
             $m->shouldReceive('addGqlTypes')->once();

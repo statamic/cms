@@ -8,18 +8,21 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Vite;
+use Inertia\Inertia;
 use Laravel\Nova\Nova;
 use Statamic\Facades\File;
-use Statamic\Facades\Preference;
 use Statamic\Facades\URL;
 use Statamic\Modifiers\Modify;
 use Statamic\Support\Arr;
 use Statamic\Support\DateFormat;
 use Statamic\Support\Str;
+use Statamic\Support\Svg;
 use Statamic\Support\TextDirection;
 use Statamic\Tags\FluentTag;
-use Stringy\StaticStringy;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class Statamic
 {
     const CORE_SLUG = 'statamic';
@@ -35,8 +38,10 @@ class Statamic
     protected static $webRoutes = [];
     protected static $actionRoutes = [];
     protected static $jsonVariables = [];
+    protected static $jsonVariablesSnapshot = null;
     protected static $bootedCallbacks = [];
     protected static $afterInstalledCallbacks = [];
+    public static bool $isRenderingCpException = false;
 
     public static function version()
     {
@@ -242,20 +247,36 @@ class Statamic
         return new static;
     }
 
+    public static function snapshotJsonVariables()
+    {
+        // Once per process: the first request's starting state is the boot-time
+        // state, and keeping it pristine means a request that fails mid-cycle
+        // can never bake its own variables into the baseline.
+        static::$jsonVariablesSnapshot ??= static::$jsonVariables;
+    }
+
+    public static function restoreJsonVariablesSnapshot()
+    {
+        if (static::$jsonVariablesSnapshot !== null) {
+            static::$jsonVariables = static::$jsonVariablesSnapshot;
+        }
+    }
+
     public static function svg($name, $attrs = null, $fallback = null)
     {
-        if ($attrs) {
-            $attrs = " class=\"{$attrs}\"";
-        }
+        $dir = statamic_path('resources/svg');
 
-        $path = statamic_path("resources/svg/{$name}.svg");
+        $path = "{$dir}/{$name}.svg";
+
         if ($fallback && ! File::exists($path)) {
-            $path = statamic_path("resources/svg/{$fallback}.svg");
+            $path = "{$dir}/{$fallback}.svg";
         }
 
-        $svg = StaticStringy::collapseWhitespace(File::get($path));
+        if (File::exists($path) && $attrs) {
+            return Svg::withClasses(File::get($path), $attrs);
+        }
 
-        return str_replace('<svg', sprintf('<svg%s', $attrs), $svg);
+        return File::get($path) ?? '';
     }
 
     public static function vendorAssetUrl($url = '/')
@@ -286,8 +307,8 @@ class Statamic
     public static function cpViteScripts()
     {
         return static::cpVite()->withEntryPoints([
-            'resources/js/app.js',
-            'resources/css/tailwind.css',
+            'resources/js/index.js',
+            'resources/css/app.css',
         ]);
     }
 
@@ -295,19 +316,11 @@ class Statamic
     {
         return Vite::getFacadeRoot()
             ->useHotFile('vendor/statamic/cp/hot')
-            ->useBuildDirectory('vendor/statamic/cp/build');
-    }
-
-    public static function cpDateFormat()
-    {
-        return Preference::get('date_format', config('statamic.cp.date_format'));
-    }
-
-    public static function cpDateTimeFormat()
-    {
-        $format = self::cpDateFormat();
-
-        return DateFormat::containsTime($format) ? $format : $format.' H:i';
+            ->useBuildDirectory(
+                config('app.debug') && is_dir(public_path('vendor/statamic/cp-dev'))
+                    ? 'vendor/statamic/cp-dev/build'
+                    : 'vendor/statamic/cp/build'
+            );
     }
 
     public static function dateFormat()
@@ -320,6 +333,11 @@ class Statamic
         $format = self::dateFormat();
 
         return DateFormat::containsTime($format) ? $format : $format.' H:i';
+    }
+
+    public static function displayTimezone(): string
+    {
+        return config('statamic.system.display_timezone') ?? config('app.timezone');
     }
 
     public static function flash()
@@ -425,6 +443,15 @@ class Statamic
         return $line;
     }
 
+    public static function transChoice($key, $number, $replace = [], $locale = null)
+    {
+        if (is_array(\__($key, $replace, $locale))) {
+            return $key;
+        }
+
+        return \trans_choice($key, $number, $replace, $locale);
+    }
+
     public static function isWorker()
     {
         if (! App::runningInConsole()) {
@@ -467,5 +494,31 @@ class Statamic
     public static function cpDirection()
     {
         return TextDirection::of(static::cpLocale());
+    }
+
+    public static function cpPerPage($perPage)
+    {
+        if ($perPage === null || $perPage === '') {
+            return null;
+        }
+
+        $perPage = (int) $perPage;
+
+        $options = config('statamic.cp.pagination_size_options') ?: [config('statamic.cp.pagination_size')];
+        $ceiling = max($options);
+
+        return max(1, min($perPage, $ceiling));
+    }
+
+    public static function nonInertiaPageData()
+    {
+        $props = Inertia::getShared();
+
+        return [
+            'url' => '/'.request()->path(),
+            'component' => 'NonInertiaPage',
+            'version' => inertia()->getVersion(),
+            'props' => $props,
+        ];
     }
 }

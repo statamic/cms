@@ -5,6 +5,7 @@ namespace Statamic\View\Antlers;
 use Closure;
 use Statamic\Contracts\View\Antlers\Parser;
 use Statamic\View\Antlers\Language\Parser\IdentifierFinder;
+use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
 
 class Antlers
 {
@@ -26,9 +27,17 @@ class Antlers
         return $contents;
     }
 
-    public function parse($str, $variables = [])
+    public function parse($str, $variables = [], $trusted = false)
     {
-        return $this->parser()->parse($str, $variables);
+        $parser = $this->parser();
+        $previousState = GlobalRuntimeState::$isEvaluatingUserData;
+        GlobalRuntimeState::$isEvaluatingUserData = ! $trusted;
+
+        try {
+            return $parser->parse($str, $variables);
+        } finally {
+            GlobalRuntimeState::$isEvaluatingUserData = $previousState;
+        }
     }
 
     /**
@@ -38,11 +47,12 @@ class Antlers
      * @param  array  $data
      * @param  bool  $supplement
      * @param  array  $context
+     * @param  bool  $trusted
      * @return string
      */
-    public function parseLoop($content, $data, $supplement = true, $context = [])
+    public function parseLoop($content, $data, $supplement = true, $context = [], $trusted = false)
     {
-        return new AntlersLoop($this->parser(), $content, $data, $supplement, $context);
+        return new AntlersLoop($this->parser(), $content, $data, $supplement, $context, $trusted);
     }
 
     public function identifiers(string $content): array

@@ -7,9 +7,12 @@ use Statamic\Facades\Entry;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Term;
 use Statamic\Facades\User;
+use Statamic\Support\Traits\Hookable;
 
 trait GetsItemsContainingData
 {
+    use Hookable;
+
     /**
      * Get items containing data.
      *
@@ -29,6 +32,9 @@ trait GetsItemsContainingData
             }),
             LazyCollection::make(function () {
                 yield from User::query()->lazy();
+            }),
+            LazyCollection::make(function () {
+                yield from ($this->runHooks('additional') ?? LazyCollection::make());
             }),
         ];
 

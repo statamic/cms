@@ -1,19 +1,20 @@
 <template>
-    <div>
-        <div class="flex items-center mb-6">
-            <h1 class="flex-1">
-                <span v-text="name" />
-                <span v-if="currentVersion" class="font-normal text-gray-700 rtl:mr-2 ltr:ml-2">{{ currentVersion }}</span>
-            </h1>
-            <button v-if="!onLatestVersion" class="btn-primary rtl:mr-4 ltr:ml-4" @click="modalOpen = true">{{ __('Update') }}</button>
-            <div v-if="onLatestVersion" v-text="__('Up to date')" />
-        </div>
+    <div class="max-w-page mx-auto">
+        <ui-header :title="name" icon="updates">
+            <template v-if="!gettingChangelog" #actions>
+                {{ currentVersion }}
+                <ui-badge v-if="onLatestVersion" :text="__('Up to date')" color="green" size="lg" icon="checkmark" />
+                <ui-badge v-else-if="securityUpdateAvailable" :text="__('Security update available')" color="red" size="lg" icon="alert-warning-exclamation-mark" />
+                <ui-badge v-else :text="__('Update available')" color="amber" size="lg" icon="alert-warning-exclamation-mark" />
+            </template>
+        </ui-header>
 
-        <div v-if="gettingChangelog" class="card p-6 text-center">
-            <loading-graphic  />
-        </div>
+        <ui-card v-if="gettingChangelog" class="text-center starting-style-transition" v-cloak>
+            <Icon name="loading" />
+        </ui-card>
 
-        <div class="bg-yellow border-yellow-dark border-dashed p-4 text-xs border mb-6 rounded cursor-pointer flex items-center justify-between"
+        <div
+            class="mb-6 flex cursor-pointer items-center justify-between rounded-sm border border-dashed border-yellow-dark bg-yellow p-4 text-xs"
             v-if="!showingUnlicensedReleases && hasUnlicensedReleases"
             @click="showingUnlicensedReleases = true"
         >
@@ -21,7 +22,7 @@
                 <h4 v-text="__('messages.addon_has_more_releases_beyond_license_heading')" />
                 <p v-text="__('messages.addon_has_more_releases_beyond_license_body')" />
             </div>
-            <button class="btn btn-xs" v-text="__('View additional releases')" />
+            <ui-button size="sm" v-text="__('View additional releases')" />
         </div>
 
         <template v-if="showingUnlicensedReleases">
@@ -44,96 +45,109 @@
             :show-actions="showActions"
         />
 
-        <confirmation-modal
-            v-if="modalOpen"
-            :cancellable="false"
-            :button-text="__('OK')"
-            @confirm="modalOpen = false"
-        >
-            <div class="prose">
-                <p v-text="`${__('messages.updater_update_to_latest_command')}:`" />
-                <code-block copyable :text="`composer update ${package}`" />
-                <p v-html="link"></p>
-            </div>
-        </confirmation-modal>
+        <Pagination
+            v-if="meta.last_page > 1"
+            class="mt-6"
+            :resource-meta="meta"
+            :per-page="perPage"
+            @page-selected="setPage"
+            @per-page-changed="setPerPage"
+        />
     </div>
 </template>
 
 <script>
-    import Release from './Release.vue';
+import Release from './Release.vue';
+import { Icon, Pagination } from '@/components/ui';
 
-    export default {
+export default {
+    components: {
+        Release,
+        Icon,
+        Pagination,
+    },
 
-        components: {
-            Release
+    props: ['slug', 'package', 'name'],
+
+    data() {
+        return {
+            gettingChangelog: true,
+            changelog: [],
+            currentVersion: null,
+            onLatestVersion: false,
+            securityUpdateAvailable: false,
+            showingUnlicensedReleases: false,
+            page: 1,
+            perPage: 10,
+            meta: {},
+        };
+    },
+
+    computed: {
+        toEleven() {
+            return { timeout: Statamic.$config.get('ajaxTimeout') };
         },
 
-        props: [
-            'slug',
-            'package',
-            'name',
-        ],
-
-        data() {
-            return {
-                gettingChangelog: true,
-                changelog: [],
-                currentVersion: null,
-                modalOpen: false,
-                latestRelease: null,
-                showingUnlicensedReleases: false,
-            };
+        showActions() {
+            return !this.gettingChangelog;
         },
 
-        computed: {
-            toEleven() {
-                return {timeout: Statamic.$config.get('ajaxTimeout')};
-            },
-
-            showActions() {
-                return ! this.gettingChangelog;
-            },
-
-            onLatestVersion() {
-                return this.currentVersion && this.currentVersion == this.latestVersion;
-            },
-
-            licensedReleases() {
-                return this.changelog.filter(release => release.licensed);
-            },
-
-            unlicensedReleases() {
-                return this.changelog.filter(release => !release.licensed);
-            },
-
-            hasUnlicensedReleases() {
-                return this.unlicensedReleases.length > 0;
-            },
-
-            latestVersion() {
-                return this.latestRelease && this.latestRelease.version;
-            },
-
-            link() {
-                return __('Learn more about :link', { link: `<a href="https://statamic.dev/updating" target="_blank">${__('Updates')}</a>`}) + '.';
-            },
+        licensedReleases() {
+            return this.changelog.filter((release) => release.licensed);
         },
 
-        created() {
-            this.getChangelog();
+        unlicensedReleases() {
+            return this.changelog.filter((release) => !release.licensed);
         },
 
-        methods: {
-            getChangelog() {
-                this.gettingChangelog = true;
+        hasUnlicensedReleases() {
+            return this.unlicensedReleases.length > 0;
+        },
 
-                this.$axios.get(cp_url(`/updater/${this.slug}/changelog`)).then(response => {
+        link() {
+            return (
+                __('Learn more about :link', {
+                    link: `<a href="https://statamic.dev/updating" target="_blank">${__('Updates')}</a>`,
+                }) + '.'
+            );
+        },
+    },
+
+    created() {
+        this.getChangelog();
+    },
+
+    methods: {
+        getChangelog() {
+            this.gettingChangelog = true;
+
+            this.$axios
+                .get(cp_url(`/updater/${this.slug}/changelog`), {
+                    params: {
+                        page: this.page,
+                        perPage: this.perPage,
+                    },
+                })
+                .then((response) => {
                     this.gettingChangelog = false;
                     this.changelog = response.data.changelog;
                     this.currentVersion = response.data.currentVersion;
-                    this.latestRelease = response.data.changelog[0];
+                    this.onLatestVersion = response.data.onLatestVersion;
+                    this.securityUpdateAvailable = response.data.securityUpdateAvailable;
+                    this.meta = response.data.meta;
                 });
-            },
-        }
-    }
+        },
+
+        setPage(page) {
+            this.page = page;
+            this.getChangelog();
+        },
+
+        setPerPage(perPage) {
+            this.perPage = perPage;
+            this.page = 1;
+            this.getChangelog();
+        },
+    },
+};
 </script>

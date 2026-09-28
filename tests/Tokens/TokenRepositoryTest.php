@@ -5,6 +5,7 @@ namespace Tests\Tokens;
 use Facades\Statamic\Tokens\Generator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Tokens\Token;
 use Statamic\Facades\File;
@@ -87,6 +88,8 @@ YAML;
     #[Test]
     public function it_finds_a_token()
     {
+        Carbon::setTestNow(Carbon::create(2020, 1, 1, 0, 0, 0));
+
         $contents = <<<YAML
 handler: 'The\Test\Class'
 expires_at: 1577849700
@@ -110,9 +113,52 @@ YAML;
     }
 
     #[Test]
+    public function it_returns_null_and_deletes_expired_token_on_find()
+    {
+        Carbon::setTestNow(Carbon::create(2020, 1, 1, 3, 0, 0));
+
+        $this->tokens->make('expired-token', 'test')->expireAt(Carbon::now()->subMinute())->save();
+
+        $this->assertFileExists(storage_path('statamic/tokens/expired-token.yaml'));
+        $this->assertNull($this->tokens->find('expired-token'));
+        $this->assertFileDoesNotExist(storage_path('statamic/tokens/expired-token.yaml'));
+    }
+
+    #[Test]
     public function attempting_to_find_a_non_existent_token_returns_null()
     {
         $this->assertNull($this->tokens->find('missing-token'));
+    }
+
+    #[Test]
+    public function it_prevents_path_traversal_in_find()
+    {
+        File::put(storage_path('statamic/evil.yaml'), "handler: 'Handler'\nexpires_at: 9999999999\ndata: []");
+
+        $this->assertNull($this->tokens->find('../evil'));
+    }
+
+    #[Test]
+    #[DataProvider('invalidTokenNameProvider')]
+    public function it_throws_when_making_a_token_with_an_invalid_name($token)
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        $this->tokens->make($token, 'Handler');
+    }
+
+    public static function invalidTokenNameProvider()
+    {
+        return [
+            'parent traversal' => ['../evil'],
+            'backslash traversal' => ['..\\evil'],
+            'nested traversal' => ['foo/../../evil'],
+            'forward slash' => ['foo/evil'],
+            'dots only' => ['..'],
+            'absolute path' => ['/etc/passwd'],
+            'windows drive' => ['C:\\evil'],
+            'trailing newline' => ["evil\n"],
+        ];
     }
 
     #[Test]
@@ -125,16 +171,16 @@ YAML;
         $this->tokens->make('c', 'test')->expireAt(Carbon::now()->subHour())->save();
         $this->tokens->make('d', 'test')->expireAt(Carbon::now()->addMinute())->save();
 
-        $this->assertNotNull($this->tokens->find('a'));
-        $this->assertNotNull($this->tokens->find('b'));
-        $this->assertNotNull($this->tokens->find('c'));
-        $this->assertNotNull($this->tokens->find('d'));
+        $this->assertFileExists(storage_path('statamic/tokens/a.yaml'));
+        $this->assertFileExists(storage_path('statamic/tokens/b.yaml'));
+        $this->assertFileExists(storage_path('statamic/tokens/c.yaml'));
+        $this->assertFileExists(storage_path('statamic/tokens/d.yaml'));
 
         $this->tokens->collectGarbage();
 
-        $this->assertNotNull($this->tokens->find('a'));
-        $this->assertNull($this->tokens->find('b'));
-        $this->assertNull($this->tokens->find('c'));
-        $this->assertNotNull($this->tokens->find('d'));
+        $this->assertFileExists(storage_path('statamic/tokens/a.yaml'));
+        $this->assertFileDoesNotExist(storage_path('statamic/tokens/b.yaml'));
+        $this->assertFileDoesNotExist(storage_path('statamic/tokens/c.yaml'));
+        $this->assertFileExists(storage_path('statamic/tokens/d.yaml'));
     }
 }

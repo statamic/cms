@@ -4,7 +4,6 @@ namespace Tests\Feature\GraphQL;
 
 use Facades\Statamic\API\ResourceAuthorizer;
 use Facades\Statamic\Fields\BlueprintRepository;
-use Facades\Tests\Factories\GlobalFactory;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blueprint;
@@ -43,8 +42,10 @@ class GlobalTest extends TestCase
     #[Test]
     public function it_queries_a_global_set_by_handle()
     {
-        GlobalFactory::handle('social')->data(['twitter' => '@statamic'])->create();
-        GlobalFactory::handle('company')->data(['company_name' => 'Statamic'])->create();
+        $social = tap(GlobalSet::make('social'))->save();
+        $social->inDefaultSite()->data(['twitter' => '@statamic'])->save();
+        $company = tap(GlobalSet::make('company'))->save();
+        $company->inDefaultSite()->data(['company_name' => 'Statamic'])->save();
         $social = Blueprint::makeFromFields(['twitter' => ['type' => 'text']])->setHandle('social')->setNamespace('globals');
         $company = Blueprint::makeFromFields(['company_name' => ['type' => 'text']])->setHandle('company')->setNamespace('globals');
         BlueprintRepository::shouldReceive('find')->with('globals.social')->andReturn($social);
@@ -120,9 +121,9 @@ GQL;
             'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
         ]);
 
-        $set = GlobalFactory::handle('social')->data(['twitter' => '@statamic'])->create();
-        $variables = $set->makeLocalization('fr')->data(['twitter' => '@statamic_fr']);
-        $set->addLocalization($variables);
+        $set = tap(GlobalSet::make('social')->sites(['en', 'fr']))->save();
+        $set->in('en')->data(['twitter' => '@statamic'])->save();
+        $set->in('fr')->data(['twitter' => '@statamic_fr'])->save();
         $social = Blueprint::makeFromFields(['twitter' => ['type' => 'text']])->setHandle('social')->setNamespace('globals');
         BlueprintRepository::shouldReceive('find')->with('globals.social')->andReturn($social);
 
@@ -176,7 +177,8 @@ GQL;
             ];
         });
 
-        GlobalFactory::handle('social')->data(['twitter' => '@statamic'])->create();
+        $set = tap(GlobalSet::make('social'))->save();
+        $set->inDefaultSite()->data(['twitter' => '@statamic']);
         $social = Blueprint::makeFromFields(['twitter' => ['type' => 'text']])->setHandle('social')->setNamespace('globals');
         BlueprintRepository::shouldReceive('find')->with('globals.social')->andReturn($social);
 
@@ -215,7 +217,7 @@ GQL;
             ];
         });
 
-        GlobalFactory::handle('social')->data(['twitter' => '@statamic'])->create();
+        GlobalSet::make('social')->save();
         $social = Blueprint::makeFromFields(['twitter' => ['type' => 'text']])->setHandle('social')->setNamespace('globals');
         BlueprintRepository::shouldReceive('find')->with('globals.social')->andReturn($social);
 

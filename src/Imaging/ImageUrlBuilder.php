@@ -4,6 +4,7 @@ namespace Statamic\Imaging;
 
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Imaging\UrlBuilder;
+use Statamic\Facades\URL;
 use Statamic\Support\Str;
 
 abstract class ImageUrlBuilder implements UrlBuilder
@@ -22,12 +23,22 @@ abstract class ImageUrlBuilder implements UrlBuilder
     {
         if ($this->item instanceof Asset) {
             return 'asset';
-        } elseif (Str::startsWith($this->item, ['http://', 'https://'])) {
+        } elseif (URL::isAbsolute($this->item)) {
             return 'url';
         } elseif (Str::contains($this->item, '::')) {
             return 'id';
         }
 
         return 'path';
+    }
+
+    protected function withEncodedWatermark(array $params): array
+    {
+        if (isset($params['mark']) && $params['mark'] instanceof Asset) {
+            $asset = $params['mark'];
+            $params['mark'] = 'asset::'.Str::toBase64Url($asset->containerId().'/'.$asset->path());
+        }
+
+        return $params;
     }
 }

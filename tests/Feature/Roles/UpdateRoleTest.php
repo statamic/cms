@@ -2,12 +2,14 @@
 
 namespace Tests\Feature\Roles;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Role;
 use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
+#[Group('elevated-session')]
 class UpdateRoleTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
@@ -25,7 +27,7 @@ class UpdateRoleTest extends TestCase
             $data,
         );
 
-        return $this->patch(cp_route('roles.update', $role->handle()), $data);
+        return $this->patchJson(cp_route('roles.update', $role->handle()), $data);
     }
 
     private function actingAsUserWithPermissions($permissions)
@@ -40,6 +42,11 @@ class UpdateRoleTest extends TestCase
         return tap(User::make()->assignRole('user'))->save();
     }
 
+    private function withActiveElevatedSession()
+    {
+        return $this->session(['statamic_elevated_session' => now()->timestamp]);
+    }
+
     #[Test]
     public function it_denies_access_without_permission_to_edit_roles()
     {
@@ -47,9 +54,22 @@ class UpdateRoleTest extends TestCase
 
         $this
             ->actingAsUserWithPermissions([])
+            ->withActiveElevatedSession()
             ->from('/original')
             ->update($role)
-            ->assertRedirect('/original');
+            ->assertForbidden();
+    }
+
+    #[Test]
+    public function it_denies_access_without_active_elevated_session()
+    {
+        $role = tap(Role::make('test'))->save();
+
+        $this
+            ->actingAsUserWithPermissions([])
+            ->from('/original')
+            ->update($role)
+            ->assertForbidden();
     }
 
     #[Test]
@@ -58,15 +78,16 @@ class UpdateRoleTest extends TestCase
         $role = tap(
             Role::make('test')
                 ->title('Test')
-                ->permissions(['one', 'two'])
+                ->permissions(['configure fields', 'manage preferences'])
         )->save();
 
         $this
             ->actingAsUserWithPermissions(['edit roles'])
+            ->withActiveElevatedSession()
             ->update($role, [
                 'title' => 'Updated',
                 'handle' => 'changed',
-                'permissions' => ['one', 'three'],
+                'permissions' => ['configure fields', 'resolve duplicate ids'],
             ])
             ->assertOk()
             ->assertJson(['redirect' => cp_route('roles.index')]);
@@ -74,7 +95,53 @@ class UpdateRoleTest extends TestCase
         $this->assertNull(Role::find('test'));
         $role = Role::find('changed');
         $this->assertEquals('Updated', $role->title());
-        $this->assertEquals(['one', 'three'], $role->permissions()->all());
+        $this->assertEquals(['configure fields', 'resolve duplicate ids'], $role->permissions()->all());
+        $this->assertFalse($role->isSuper());
+    }
+
+    #[Test]
+    public function it_preserves_permissions_that_are_no_longer_registered()
+    {
+        // A permission that used to be registered, but no longer is. For example, one
+        // belonging to an addon that's been disabled, or a deprecated core permission.
+        $role = tap(
+            Role::make('test')
+                ->title('Test')
+                ->permissions(['configure fields', 'manage preferences', 'do addon things'])
+        )->save();
+
+        $this
+            ->actingAsUserWithPermissions(['edit roles'])
+            ->withActiveElevatedSession()
+            ->update($role, [
+                'permissions' => ['configure fields'],
+            ])
+            ->assertOk();
+
+        $role = Role::find('test');
+        $this->assertEquals(['configure fields', 'do addon things'], $role->permissions()->all());
+    }
+
+    #[Test]
+    public function demoting_a_super_role_does_not_resurrect_the_super_permission()
+    {
+        $role = tap(
+            Role::make('test')
+                ->title('Test')
+                ->permissions(['super'])
+        )->save();
+
+        $this
+            ->actingAs(tap(User::make()->makeSuper())->save())
+            ->withActiveElevatedSession()
+            ->update($role, [
+                'super' => false,
+                'permissions' => [],
+            ])
+            ->assertOk();
+
+        $role = Role::find('test');
+        $this->assertEquals([], $role->permissions()->all());
         $this->assertFalse($role->isSuper());
     }
 
@@ -89,6 +156,7 @@ class UpdateRoleTest extends TestCase
 
         $this
             ->actingAs(tap(User::make()->makeSuper())->save())
+            ->withActiveElevatedSession()
             ->update($role, [
                 'super' => true,
             ])
@@ -111,6 +179,7 @@ class UpdateRoleTest extends TestCase
 
         $this
             ->actingAsUserWithPermissions(['edit roles'])
+            ->withActiveElevatedSession()
             ->update($role, [
                 'super' => true,
             ])
@@ -133,6 +202,7 @@ class UpdateRoleTest extends TestCase
 
         $this
             ->actingAsUserWithPermissions(['edit roles'])
+            ->withActiveElevatedSession()
             ->update($role, [
                 'super' => false,
                 'permissions' => ['super'],

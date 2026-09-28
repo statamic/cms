@@ -177,13 +177,13 @@ EOT;
         $md = $this->fieldtype(['smartypants' => true, 'antlers' => true]);
 
         $value = <<<'EOT'
-{{ "this is a string" | replace(" is ", " isnt ") | reverse }}
+{{ "this is a string" | replace(" is ", " isnt ") | upper }}
 EOT;
 
         $value = new Value($value, 'markdown', $md);
 
         $expected = <<<'EOT'
-<p>gnirts a tnsi siht</p>
+<p>THIS ISNT A STRING</p>
 EOT;
 
         $this->assertEqualsTrimmed($expected, $value->antlersValue(app(\Statamic\Contracts\View\Antlers\Parser::class), []));

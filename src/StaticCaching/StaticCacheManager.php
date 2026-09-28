@@ -2,7 +2,6 @@
 
 namespace Statamic\StaticCaching;
 
-use Illuminate\Cache\Repository;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Events\StaticCacheCleared;
 use Statamic\Facades\Site;
@@ -37,7 +36,7 @@ class StaticCacheManager extends Manager
 
     public function createApplicationDriver(array $config)
     {
-        return new ApplicationCacher($this->app[Repository::class], $config);
+        return new ApplicationCacher($this->cacheStore(), $config);
     }
 
     public function cacheStore()
@@ -101,6 +100,11 @@ class StaticCacheManager extends Manager
         $this->cacheStore()->forget('nocache::urls');
     }
 
+    public function csrfTokenJs(string $js)
+    {
+        $this->fileDriver()->setCsrfTokenJs($js);
+    }
+
     public function nocacheJs(string $js)
     {
         $this->fileDriver()->setNocacheJs($js);
@@ -119,5 +123,21 @@ class StaticCacheManager extends Manager
     private function fileDriver()
     {
         return ($driver = $this->driver()) instanceof FileCacher ? $driver : optional();
+    }
+
+    public function recacheTokenParameter()
+    {
+        return config('statamic.static_caching.recache_token_parameter', '__recache');
+    }
+
+    public function recacheToken()
+    {
+        return config('statamic.static_caching.recache_token')
+            ?? hash_hmac('sha256', 'recache', config('app.key'));
+    }
+
+    public function checkRecacheToken(string $token): bool
+    {
+        return hash_equals($this->recacheToken(), $token);
     }
 }

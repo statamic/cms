@@ -1,97 +1,99 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>GraphiQL ‹ Statamic</title>
-    <style>
-      body {
-        margin: 0;
-        overflow: hidden; /* in Firefox */
-      }
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>GraphiQL ‹ Statamic</title>
+        <style>
+            body {
+                margin: 0;
+            }
 
-      #graphiql {
-        height: 100dvh;
-      }
+            #graphiql {
+                height: 100dvh;
+            }
 
-      .loading {
-        height: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 4rem;
-      }
-    </style>
-    <link
-      rel="stylesheet"
-      href="https://esm.sh/graphiql@4.0.0/dist/style.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://esm.sh/@graphiql/plugin-explorer@4.0.0/dist/style.css"
-    />
-    <!-- Note: the ?standalone flag bundles the module along with all of its `dependencies`, excluding `peerDependencies`, into a single JavaScript file. -->
-    <script type="importmap">
-      {
-        "imports": {
-          "react": "https://esm.sh/react@19.1.0",
-          "react/jsx-runtime": "https://esm.sh/react@19.1.0/jsx-runtime",
+            .loading {
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 4rem;
+            }
+        </style>
+        <link
+            rel="stylesheet"
+            href="https://esm.sh/graphiql@5.2.2/dist/style.css"
+        >
+        <link
+            rel="stylesheet"
+            href="https://esm.sh/@graphiql/plugin-explorer@5.1.1/dist/style.css"
+        >
 
-          "react-dom": "https://esm.sh/react-dom@19.1.0",
-          "react-dom/client": "https://esm.sh/react-dom@19.1.0/client",
+        @if (!$introspection)
+        <style>
+            button[aria-label*="Re-fetch GraphQL schema"] { visibility: hidden; }
+        </style>
+        @endif
 
-          "graphiql": "https://esm.sh/graphiql@4.0.0?standalone&external=react,react/jsx-runtime,react-dom,@graphiql/react",
-          "@graphiql/plugin-explorer": "https://esm.sh/@graphiql/plugin-explorer@4.0.0?standalone&external=react,react/jsx-runtime,react-dom,@graphiql/react,graphql",
-          "@graphiql/react": "https://esm.sh/@graphiql/react@0.30.0?standalone&external=react,react/jsx-runtime,react-dom,graphql,@graphiql/toolkit",
+        <script type="importmap">
+            {
+              "imports": {
+                "react": "https://esm.sh/react@19.2.5",
+                "react/": "https://esm.sh/react@19.2.5/",
 
-          "@graphiql/toolkit": "https://esm.sh/@graphiql/toolkit@0.11.2?standalone&external=graphql",
-          "graphql": "https://esm.sh/graphql@16.11.0"
-        }
-      }
-    </script>
-    <script type="module">
-      // Import React and ReactDOM
-      import React from 'react';
-      import ReactDOM from 'react-dom/client';
-      // Import GraphiQL and the Explorer plugin
-      import { GraphiQL } from 'graphiql';
-      import { createGraphiQLFetcher } from '@graphiql/toolkit';
-      import { explorerPlugin } from '@graphiql/plugin-explorer';
+                "react-dom": "https://esm.sh/react-dom@19.2.5",
+                "react-dom/": "https://esm.sh/react-dom@19.2.5/",
 
-      var xcsrfToken = null;
+                "graphiql": "https://esm.sh/graphiql@5.2.2?standalone&external=react,react-dom,@graphiql/react,graphql",
+                "graphiql/": "https://esm.sh/graphiql@5.2.2/",
+                "@graphiql/plugin-explorer": "https://esm.sh/@graphiql/plugin-explorer@5.1.1?standalone&external=react,@graphiql/react,graphql",
+                "@graphiql/react": "https://esm.sh/@graphiql/react@0.37.3?standalone&external=react,react-dom,graphql,@graphiql/toolkit,@emotion/is-prop-valid",
 
-      const fetcher = createGraphiQLFetcher({
-        url: '{{ $url }}',
-        headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-            'x-csrf-token': xcsrfToken || '{{ csrf_token() }}',
-        },
-        fetch: async (fetchURL, fetchOptions) => {
-            return await fetch(fetchURL, fetchOptions).then((response) => {
-                xcsrfToken = response.headers.get('x-csrf-token');
-                return response;
+                "@graphiql/toolkit": "https://esm.sh/@graphiql/toolkit@0.11.3?standalone&external=graphql",
+                "graphql": "https://esm.sh/graphql@16.13.2",
+                "@emotion/is-prop-valid": "data:text/javascript,"
+              }
+            }
+        </script>
+        <script type="module">
+            import React from 'react';
+            import ReactDOM from 'react-dom/client';
+            import { GraphiQL, HISTORY_PLUGIN } from 'graphiql';
+            import { createGraphiQLFetcher } from '@graphiql/toolkit';
+            import { explorerPlugin } from '@graphiql/plugin-explorer';
+            import 'graphiql/setup-workers/esm.sh';
+
+            const introspectionEnabled = {{ \Statamic\Support\Str::bool($introspection) }};
+
+            const authToken = {{ Js::from($authToken) }};
+
+            const fetcher = createGraphiQLFetcher({
+                url: '{{ $url }}',
+                ...(authToken ? { headers: { 'Authorization': `Bearer ${authToken}` } } : {}),
             });
-        },
-      });
-      
-      const explorer = explorerPlugin();
 
-      function App() {
-        return React.createElement(GraphiQL, {
-          fetcher,
-          plugins: [explorer],
-        });
-      }
+            let plugins = [HISTORY_PLUGIN];
+            if (introspectionEnabled) plugins.push(explorerPlugin());
 
-      const container = document.getElementById('graphiql');
-      const root = ReactDOM.createRoot(container);
-      root.render(React.createElement(App));
-    </script>
-  </head>
-  <body>
-    <div id="graphiql">
-      <div class="loading">Loading…</div>
-    </div>
-  </body>
+            function App() {
+                return React.createElement(GraphiQL, {
+                    fetcher,
+                    plugins,
+                    defaultEditorToolsVisibility: true,
+                    referencePlugin: introspectionEnabled ? undefined : null,
+                    schema: introspectionEnabled ? undefined : null,
+                });
+            }
+
+            const container = document.getElementById('graphiql');
+            const root = ReactDOM.createRoot(container);
+            root.render(React.createElement(App));
+        </script>
+    </head>
+    <body>
+        <div id="graphiql">
+            <div class="loading">Loading…</div>
+        </div>
+    </body>
 </html>

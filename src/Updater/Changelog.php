@@ -28,18 +28,49 @@ abstract class Changelog
      */
     public function get()
     {
+        return $this->transformReleases(
+            Marketplace::releases($this->item())['data']
+        );
+    }
+
+    /**
+     * Get paginated changelog.
+     *
+     * @return array
+     */
+    public function paginate($page = 1, $perPage = 10)
+    {
+        $response = Marketplace::releases($this->item(), [
+            'page' => $page,
+            'perPage' => $perPage,
+        ]);
+
+        return [
+            'data' => $this->transformReleases($response['data'], $page),
+            'meta' => $response['meta'],
+        ];
+    }
+
+    /**
+     * Transform releases into changelog format.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    protected function transformReleases($releases, $page = 1)
+    {
         $type = null;
 
-        return Marketplace::releases($this->item())->map(function ($release, $index) use (&$type) {
+        return $releases->map(function ($release, $index) use (&$type, $page) {
             $type = $type === 'downgrade' ? $type : $this->parseReleaseType($release['version'], $index);
 
             return (object) [
                 'version' => $release['version'],
                 'type' => $type,
-                'latest' => $index === 0,
+                'latest' => $page === 1 && $index === 0,
                 'licensed' => $this->isLicensed($release['version']),
-                'date' => Carbon::parse($release['date'])->format(config('statamic.cp.date_format')),
+                'date' => Carbon::parse($release['date'])->toIso8601String(),
                 'body' => $release['changelog'],
+                'security' => $release['security'] ?? false,
             ];
         });
     }
@@ -54,6 +85,18 @@ abstract class Changelog
         return $this->get()->filter(function ($release) {
             return $release->type === 'upgrade';
         })->count();
+    }
+
+    /**
+     * Check if any available upgrade is marked as a security update.
+     *
+     * @return bool
+     */
+    public function hasSecurityUpdate()
+    {
+        return $this->get()->contains(function ($release) {
+            return $release->type === 'upgrade' && $release->security;
+        });
     }
 
     /**

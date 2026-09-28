@@ -13,6 +13,7 @@ use Statamic\GraphQL\Middleware\ResolvePage;
 use Statamic\GraphQL\Queries\Concerns\FiltersQuery;
 use Statamic\GraphQL\Types\AssetInterface;
 use Statamic\GraphQL\Types\JsonArgument;
+use Statamic\Query\OrderBy;
 use Statamic\Support\Str;
 
 class AssetsQuery extends Query
@@ -69,7 +70,9 @@ class AssetsQuery extends Query
                 [$sort, $order] = explode(' ', $sort);
             }
 
-            $query->orderBy($sort, $order);
+            if ($sort = OrderBy::column($sort)) {
+                $query->orderBy($sort, $order);
+            }
         }
     }
 

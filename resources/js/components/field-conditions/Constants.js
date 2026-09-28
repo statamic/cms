@@ -6,7 +6,7 @@ export const KEYS = [
     'unless',
     'unless_any',
     'hide_when',
-    'hide_when_any'
+    'hide_when_any',
 ];
 
 export const OPERATORS = [
@@ -25,9 +25,9 @@ export const OPERATORS = [
 ];
 
 export const ALIASES = {
-    'is': 'equals',
+    is: 'equals',
     '==': 'equals',
-    'isnt': 'not',
+    isnt: 'not',
     '!=': 'not',
-    'includes': 'contains',
+    includes: 'contains',
 };

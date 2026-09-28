@@ -9,6 +9,7 @@ use Statamic\View\Antlers\Language\Nodes\AbstractNode;
 use Statamic\View\Antlers\Language\Nodes\AntlersNode;
 use Statamic\View\Antlers\Language\Nodes\Conditions\ConditionNode;
 use Statamic\View\Antlers\Language\Nodes\Conditions\ExecutionBranch;
+use Statamic\View\Antlers\Language\Nodes\DirectiveNode;
 use Statamic\View\Antlers\Language\Nodes\EscapedContentNode;
 use Statamic\View\Antlers\Language\Nodes\RecursiveNode;
 use Statamic\View\Antlers\Language\Nodes\TagIdentifier;
@@ -106,7 +107,7 @@ class TagPairAnalyzer
 
                 foreach ($nodes as $node) {
                     if ($node instanceof AntlersNode) {
-                        if ($node instanceof RecursiveNode) {
+                        if ($node instanceof RecursiveNode || $node instanceof DirectiveNode) {
                             continue;
                         }
                         if ($node->isComment) {
@@ -156,7 +157,7 @@ class TagPairAnalyzer
 
     private function canPossiblyClose($node)
     {
-        if ($node instanceof RecursiveNode) {
+        if ($node instanceof RecursiveNode || $node instanceof DirectiveNode) {
             return false;
         }
 
@@ -368,6 +369,7 @@ class TagPairAnalyzer
 
                 if ($node instanceof AntlersNode &&
                     $node->isComment == false &&
+                    $node instanceof DirectiveNode == false &&
                     $node->name->name == 'noparse' &&
                     ($node instanceof EscapedContentNode) == false &&
                     $node->isClosingTag == false) {
@@ -465,6 +467,7 @@ class TagPairAnalyzer
             $node = $nodes[$i];
 
             if ($node instanceof AntlersNode && $node->isComment == false &&
+                $node instanceof DirectiveNode == false &&
                 $node->name->compound == 'if' && $node->isClosingTag == false &&
                 $node->isClosedBy != null) {
                 $conditionNode = new ConditionNode();

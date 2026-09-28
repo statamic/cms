@@ -15,12 +15,12 @@ class SvgTagTest extends TestCase
     {
         parent::setUp();
 
-        File::copy(__DIR__.'/../../resources/svg/icons/light/users.svg', resource_path('users.svg'));
+        File::copy(statamic_path('resources/svg/icons/users.svg'), resource_path('users.svg'));
     }
 
     private function tag($tag, $variables = [])
     {
-        return Parse::template($tag, $variables);
+        return Parse::template($tag, $variables, trusted: true);
     }
 
     #[Test]
@@ -33,7 +33,7 @@ class SvgTagTest extends TestCase
     #[Test]
     public function it_renders_svg_with_additional_params()
     {
-        $this->assertStringStartsWith('<svg class="mb-2" xmlns="', $this->tag('{{ svg src="users" sanitize="false" class="mb-2" }}'));
+        $this->assertStringStartsWith('<svg class="mb-2" viewBox="', $this->tag('{{ svg src="users" sanitize="false" class="mb-2" }}'));
     }
 
     #[Test]
@@ -112,6 +112,19 @@ SVG);
         Svg::enableSanitization();
 
         $this->assertEquals('<svg><path/></svg>', $this->tag('{{ svg src="xss" }}'));
+    }
+
+    #[Test]
+    public function it_sanitizes_css_in_style_tags()
+    {
+        File::put(resource_path('css-inject.svg'), '<svg xmlns="http://www.w3.org/2000/svg"><style>@import url("https://evil.com/track.css"); .cls-1 { fill: #333; }</style><rect class="cls-1"/></svg>');
+
+        $result = $this->tag('{{ svg src="css-inject" }}');
+
+        $this->assertStringNotContainsString('@import', $result);
+        $this->assertStringNotContainsString('evil.com', $result);
+        $this->assertStringContainsString('.cls-1', $result);
+        $this->assertStringContainsString('fill:', $result);
     }
 
     #[Test]

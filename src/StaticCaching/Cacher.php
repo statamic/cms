@@ -52,6 +52,22 @@ interface Cacher
     public function invalidateUrls($urls);
 
     /**
+     * Refresh a URL.
+     *
+     * @param  string  $url
+     * @return void
+     */
+    public function refreshUrl($url);
+
+    /**
+     * Refresh multiple URLs.
+     *
+     * @param  array  $urls
+     * @return void
+     */
+    public function refreshUrls($urls);
+
+    /**
      * Get all the URLs that have been cached.
      *
      * @param  string|null  $domain

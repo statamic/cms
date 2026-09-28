@@ -10,6 +10,9 @@ use Statamic\Facades\URL;
 use Symfony\Component\Finder\Comparator\DateComparator;
 use Symfony\Component\Finder\Comparator\NumberComparator;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class FileCollection extends Collection
 {
     /**
@@ -198,7 +201,7 @@ class FileCollection extends Collection
             $gb = number_format($size / 1073741824, 2);
 
             $data[] = [
-                'file' => URL::format($path), // Todo: This will only work when using the local file adapter
+                'file' => URL::tidy($path), // Todo: This will only work when using the local file adapter
                 'filename' => $pathinfo['filename'],
                 'extension' => Arr::get($pathinfo, 'extension'),
                 'basename' => Arr::get($pathinfo, 'basename'),

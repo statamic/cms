@@ -123,13 +123,12 @@ YAML;
 
         $expected = <<<'EOT'
 tree:
-  -
-    title: Test
+  - title: Test
     url: /test
 
 EOT;
 
-        $this->assertStringEqualsFile($this->tempDir.'/links.yaml', $expected);
+        $this->assertEquals($expected, $this->normalizeYaml(file_get_contents($this->tempDir.'/links.yaml')));
     }
 
     private function assertTree($array, $item)
@@ -140,7 +139,6 @@ EOT;
         // the structure. That'll happen later within the repository.
         $reflect = new \ReflectionObject($item);
         $property = $reflect->getProperty('tree');
-        $property->setAccessible(true);
         $this->assertEquals($array, $property->getValue($item));
     }
 }

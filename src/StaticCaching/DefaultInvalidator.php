@@ -2,14 +2,21 @@
 
 namespace Statamic\StaticCaching;
 
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection as IlluminateCollection;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Forms\Form;
 use Statamic\Contracts\Globals\Variables;
+use Statamic\Contracts\Routing\UrlBuilder;
 use Statamic\Contracts\Structures\Nav;
 use Statamic\Contracts\Structures\NavTree;
+use Statamic\Facades;
+use Statamic\Facades\Antlers;
 use Statamic\Facades\Site;
+use Statamic\Facades\URL;
+use Statamic\Statamic;
 use Statamic\Structures\CollectionTree;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -19,6 +26,7 @@ class DefaultInvalidator implements Invalidator
 {
     protected $cacher;
     protected $rules;
+    protected $refreshing = false;
 
     public function __construct(Cacher $cacher, $rules = [])
     {
@@ -28,72 +36,153 @@ class DefaultInvalidator implements Invalidator
 
     public function invalidate($item)
     {
+        // Old URLs no longer resolve so they cannot be recached, only invalidated.
+        if ($this->refreshing && ($oldUrls = $this->getItemOldUrls($item))) {
+            $this->cacher->invalidateUrls($oldUrls);
+        }
+
         if ($this->rules === 'all') {
-            $this->cacher->flush();
+            $this->refreshing
+                ? $this->cacher->refreshUrls($this->cacher->getUrls()->all())
+                : $this->cacher->flush();
 
             return;
         }
 
-        if ($item instanceof Entry) {
-            $this->invalidateEntryUrls($item);
-        } elseif ($item instanceof LocalizedTerm) {
-            $this->invalidateTermUrls($item);
-        } elseif ($item instanceof Nav) {
-            $this->invalidateNavUrls($item);
-        } elseif ($item instanceof NavTree) {
-            $this->invalidateNavTreeUrls($item);
-        } elseif ($item instanceof Variables) {
-            $this->invalidateGlobalUrls($item);
-        } elseif ($item instanceof Collection) {
-            $this->invalidateCollectionUrls($item);
-        } elseif ($item instanceof CollectionTree) {
-            $this->invalidateCollectionTreeUrls($item);
-        } elseif ($item instanceof Asset) {
-            $this->invalidateAssetUrls($item);
-        } elseif ($item instanceof Form) {
-            $this->invalidateFormUrls($item);
+        $urls = $this->getItemUrls($item);
+
+        $this->refreshing
+            ? $this->cacher->refreshUrls($urls)
+            : $this->cacher->invalidateUrls([...$urls, ...$this->getItemOldUrls($item)]);
+    }
+
+    public function refresh($item)
+    {
+        if (! config('statamic.static_caching.background_recache', false)) {
+            $this->invalidate($item);
+
+            return;
+        }
+
+        $previous = $this->refreshing;
+        $this->refreshing = true;
+
+        try {
+            $this->invalidate($item);
+        } finally {
+            $this->refreshing = $previous;
         }
     }
 
-    protected function invalidateFormUrls($form)
+    protected function getItemUrls($item)
+    {
+        if ($item instanceof Entry) {
+            $urls = $this->getEntryUrls($item);
+        } elseif ($item instanceof LocalizedTerm) {
+            $urls = $this->getTermUrls($item);
+        } elseif ($item instanceof Nav) {
+            $urls = $this->getNavUrls($item);
+        } elseif ($item instanceof NavTree) {
+            $urls = $this->getNavTreeUrls($item);
+        } elseif ($item instanceof Variables) {
+            $urls = $this->getGlobalUrls($item);
+        } elseif ($item instanceof Collection) {
+            $urls = $this->getCollectionUrls($item);
+        } elseif ($item instanceof CollectionTree) {
+            $urls = $this->getCollectionTreeUrls($item);
+        } elseif ($item instanceof Asset) {
+            $urls = $this->getAssetUrls($item);
+        } elseif ($item instanceof Form) {
+            $urls = $this->getFormUrls($item);
+        } else {
+            $urls = [];
+        }
+
+        return $urls;
+    }
+
+    protected function getItemOldUrls($item)
+    {
+        return $item instanceof Entry ? $this->getOldEntryUrls($item) : [];
+    }
+
+    protected function getOldEntryUrls($entry)
+    {
+        if (! ($route = $entry->route())) {
+            return [];
+        }
+
+        // The route can reference any field, e.g. {year}/{month}/{day}/{slug}.
+        $original = collect(Antlers::identifiers($this->convertToAntlers($route)))
+            ->filter(fn ($identifier) => $this->routeIdentifierIsDirty($entry, $identifier))
+            ->mapWithKeys(fn ($identifier) => [$identifier => $this->originalRouteValue($entry, $identifier)])
+            ->filter(fn ($value) => ! is_null($value));
+
+        if ($original->isEmpty()) {
+            return [];
+        }
+
+        $uri = app(UrlBuilder::class)->content($entry)->merge([
+            'parent_uri' => $entry->parent()?->uri(),
+            ...$original->all(),
+        ])->build($route);
+
+        $oldUrl = URL::tidy($entry->site()->absoluteUrl().'/'.$uri);
+
+        if ($oldUrl === $entry->absoluteUrl()) {
+            return [];
+        }
+
+        // Anything cached under the old URL (descendants, mounted collections) is stale too.
+        return [$oldUrl, Str::finish($oldUrl, '/').'*'];
+    }
+
+    private function routeIdentifierIsDirty($entry, $identifier)
+    {
+        return $entry->isDirty(in_array($identifier, ['year', 'month', 'day']) ? 'date' : $identifier);
+    }
+
+    private function originalRouteValue($entry, $identifier)
+    {
+        if (! in_array($identifier, ['year', 'month', 'day', 'date'])) {
+            return $entry->getOriginal($identifier);
+        }
+
+        if (is_null($original = $entry->getOriginal('date'))) {
+            return null;
+        }
+
+        $date = Carbon::createFromFormat('Y-m-d-Hi', $original, $entry->date()?->timezone)
+            ->setTimezone(Statamic::displayTimezone());
+
+        return match ($identifier) {
+            'year' => $date->format('Y'),
+            'month' => $date->format('m'),
+            'day' => $date->format('d'),
+            'date' => $date,
+        };
+    }
+
+    protected function getFormUrls($form)
     {
         $rules = collect(Arr::get($this->rules, "forms.{$form->handle()}.urls"));
 
-        $absoluteUrls = $rules->filter(fn (string $rule) => $this->isAbsoluteUrl($rule))->all();
-
-        $prefixedRelativeUrls = Site::all()->map(function ($site) use ($rules) {
-            return $rules
-                ->reject(fn (string $rule) => $this->isAbsoluteUrl($rule))
-                ->map(fn (string $rule) => Str::removeRight($site->url(), '/').Str::ensureLeft($rule, '/'));
-        })->flatten()->all();
-
-        $this->cacher->invalidateUrls([
-            ...$absoluteUrls,
-            ...$prefixedRelativeUrls,
-        ]);
+        return $this->resolveRuleUrls($rules, Site::all());
     }
 
-    protected function invalidateAssetUrls($asset)
+    protected function getAssetUrls($asset)
     {
-        $rules = collect(Arr::get($this->rules, "assets.{$asset->container()->handle()}.urls"));
+        $rules = collect(Arr::get($this->rules, "assets.{$asset->container()->handle()}.urls", []));
 
-        $absoluteUrls = $rules->filter(fn (string $rule) => $this->isAbsoluteUrl($rule))->all();
-
-        $prefixedRelativeUrls = Site::all()->map(function ($site) use ($rules) {
-            return $rules
-                ->reject(fn (string $rule) => $this->isAbsoluteUrl($rule))
-                ->map(fn (string $rule) => Str::removeRight($site->url(), '/').Str::ensureLeft($rule, '/'));
-        })->flatten()->all();
-
-        $this->cacher->invalidateUrls([
-            ...$absoluteUrls,
-            ...$prefixedRelativeUrls,
-        ]);
+        return $this->resolveRuleUrls($rules, Site::all());
     }
 
-    protected function invalidateEntryUrls($entry)
+    protected function getEntryUrls($entry)
     {
-        $rules = collect(Arr::get($this->rules, "collections.{$entry->collectionHandle()}.urls"));
+        $rules = $this->parseInvalidationRules(
+            Arr::get($this->rules, "collections.{$entry->collectionHandle()}.urls", []),
+            $entry->toAugmentedCollection()->merge(['parent_uri' => $entry->parent()?->uri()])->all()
+        );
 
         $urls = $entry->descendants()
             ->merge([$entry])
@@ -101,23 +190,18 @@ class DefaultInvalidator implements Invalidator
             ->map->absoluteUrl()
             ->all();
 
-        $absoluteUrls = $rules->filter(fn (string $rule) => $this->isAbsoluteUrl($rule))->all();
-
-        $prefixedRelativeUrls = $rules
-            ->reject(fn (string $rule) => $this->isAbsoluteUrl($rule))
-            ->map(fn (string $rule) => Str::removeRight($entry->site()->url(), '/').Str::ensureLeft($rule, '/'))
-            ->all();
-
-        $this->cacher->invalidateUrls([
+        return [
             ...$urls,
-            ...$absoluteUrls,
-            ...$prefixedRelativeUrls,
-        ]);
+            ...$this->resolveRuleUrls($rules, [$entry->site()]),
+        ];
     }
 
-    protected function invalidateTermUrls($term)
+    protected function getTermUrls($term)
     {
-        $rules = collect(Arr::get($this->rules, "taxonomies.{$term->taxonomyHandle()}.urls"));
+        $rules = $this->parseInvalidationRules(
+            Arr::get($this->rules, "taxonomies.{$term->taxonomyHandle()}.urls", []),
+            $term->toAugmentedCollection()->all()
+        );
 
         if ($url = $term->absoluteUrl()) {
             $urls = $term->taxonomy()->collections()
@@ -127,112 +211,123 @@ class DefaultInvalidator implements Invalidator
                 ->all();
         }
 
-        $absoluteUrls = $rules->filter(fn (string $rule) => $this->isAbsoluteUrl($rule))->all();
-
-        $prefixedRelativeUrls = $rules
-            ->reject(fn (string $rule) => $this->isAbsoluteUrl($rule))
-            ->map(fn (string $rule) => Str::removeRight($term->site()->url(), '/').Str::ensureLeft($rule, '/'))
-            ->all();
-
-        $this->cacher->invalidateUrls([
+        return [
             ...$urls ?? [],
-            ...$absoluteUrls,
-            ...$prefixedRelativeUrls,
-        ]);
+            ...$this->resolveRuleUrls($rules, [$term->site()]),
+        ];
     }
 
-    protected function invalidateNavUrls($nav)
+    protected function getNavUrls($nav)
     {
-        $rules = collect(Arr::get($this->rules, "navigation.{$nav->handle()}.urls"));
+        $rules = $this->parseInvalidationRules(
+            Arr::get($this->rules, "navigation.{$nav->handle()}.urls", []),
+            $nav->toAugmentedCollection()->all()
+        );
 
-        $absoluteUrls = $rules->filter(fn (string $rule) => $this->isAbsoluteUrl($rule))->all();
-
-        $prefixedRelativeUrls = $nav->sites()->map(function ($site) use ($rules) {
-            return $rules
-                ->reject(fn (string $rule) => $this->isAbsoluteUrl($rule))
-                ->map(fn (string $rule) => Str::removeRight(Site::get($site)->url(), '/').Str::ensureLeft($rule, '/'));
-        })->flatten()->all();
-
-        $this->cacher->invalidateUrls([
-            ...$absoluteUrls,
-            ...$prefixedRelativeUrls,
-        ]);
+        return $this->resolveRuleUrls($rules, $nav->sites()->map(fn ($site) => Site::get($site)));
     }
 
-    protected function invalidateNavTreeUrls($tree)
+    protected function getNavTreeUrls($tree)
     {
-        $rules = collect(Arr::get($this->rules, "navigation.{$tree->structure()->handle()}.urls"));
+        $rules = $this->parseInvalidationRules(
+            Arr::get($this->rules, "navigation.{$tree->structure()->handle()}.urls", []),
+            $tree->structure()->toAugmentedCollection()->all()
+        );
 
-        $absoluteUrls = $rules->filter(fn (string $rule) => $this->isAbsoluteUrl($rule))->all();
-
-        $prefixedRelativeUrls = $rules
-            ->reject(fn (string $rule) => $this->isAbsoluteUrl($rule))
-            ->map(fn (string $rule) => Str::removeRight($tree->site()->url(), '/').Str::ensureLeft($rule, '/'))
-            ->all();
-
-        $this->cacher->invalidateUrls([
-            ...$absoluteUrls,
-            ...$prefixedRelativeUrls,
-        ]);
+        return $this->resolveRuleUrls($rules, [$tree->site()]);
     }
 
-    protected function invalidateGlobalUrls($variables)
+    protected function getGlobalUrls($variables)
     {
-        $rules = collect(Arr::get($this->rules, "globals.{$variables->globalSet()->handle()}.urls"));
+        $rules = $this->parseInvalidationRules(
+            Arr::get($this->rules, "globals.{$variables->globalSet()->handle()}.urls", []),
+            $variables->toAugmentedCollection()->all()
+        );
 
-        $absoluteUrls = $rules->filter(fn (string $rule) => $this->isAbsoluteUrl($rule))->all();
-
-        $prefixedRelativeUrls = $rules
-            ->reject(fn (string $rule) => $this->isAbsoluteUrl($rule))
-            ->map(fn (string $rule) => Str::removeRight($variables->site()->url(), '/').Str::ensureLeft($rule, '/'))
-            ->all();
-
-        $this->cacher->invalidateUrls([
-            ...$absoluteUrls,
-            ...$prefixedRelativeUrls,
-        ]);
+        return $this->resolveRuleUrls($rules, [$variables->site()]);
     }
 
-    protected function invalidateCollectionUrls($collection)
+    protected function getCollectionUrls($collection)
     {
-        $rules = collect(Arr::get($this->rules, "collections.{$collection->handle()}.urls"));
+        $rules = $this->parseInvalidationRules(Arr::get($this->rules, "collections.{$collection->handle()}.urls", []));
 
         $urls = $collection->sites()->map(fn ($site) => $collection->absoluteUrl($site))->filter()->all();
 
-        $absoluteUrls = $rules->filter(fn (string $rule) => $this->isAbsoluteUrl($rule))->all();
-
-        $prefixedRelativeUrls = $collection->sites()->map(function ($site) use ($rules) {
-            return $rules
-                ->reject(fn (string $rule) => $this->isAbsoluteUrl($rule))
-                ->map(fn (string $rule) => Str::removeRight(Site::get($site)->url(), '/').Str::ensureLeft($rule, '/'));
-        })->flatten()->all();
-
-        $this->cacher->invalidateUrls([
+        return [
             ...$urls,
-            ...$absoluteUrls,
-            ...$prefixedRelativeUrls,
-        ]);
+            ...$this->resolveRuleUrls($rules, $collection->sites()->map(fn ($site) => Site::get($site))),
+        ];
     }
 
-    protected function invalidateCollectionTreeUrls($tree)
+    protected function getCollectionTreeUrls($tree)
     {
-        $rules = collect(Arr::get($this->rules, "collections.{$tree->collection()->handle()}.urls"));
+        $rules = $this->parseInvalidationRules(Arr::get($this->rules, "collections.{$tree->collection()->handle()}.urls", []));
 
-        $absoluteUrls = $rules->filter(fn (string $rule) => $this->isAbsoluteUrl($rule))->all();
+        $urls = $this->getMovedEntryUrls($tree);
 
-        $prefixedRelativeUrls = $rules
-            ->reject(fn (string $rule) => $this->isAbsoluteUrl($rule))
-            ->map(fn (string $rule) => Str::removeRight($tree->site()->url(), '/').Str::ensureLeft($rule, '/'))
+        return [
+            ...$urls,
+            ...$this->resolveRuleUrls($rules, [$tree->site()]),
+        ];
+    }
+
+    private function getMovedEntryUrls($tree)
+    {
+        return collect($tree->diff()->ancestryChanged())
+            ->map(fn ($id) => Facades\Entry::find($id))
+            ->filter()
+            ->reject(fn ($entry) => $entry->isRedirect())
+            ->map->absoluteUrl()
+            ->filter()
+            ->values()
             ->all();
-
-        $this->cacher->invalidateUrls([
-            ...$absoluteUrls,
-            ...$prefixedRelativeUrls,
-        ]);
     }
 
-    private function isAbsoluteUrl(string $url)
+    private function resolveRuleUrls(IlluminateCollection $rules, iterable $sites): array
     {
-        return isset(parse_url($url)['scheme']);
+        $absoluteUrls = $rules->filter(fn (string $rule) => URL::isAbsolute($rule));
+
+        // Prefix with the absolute site URL so the cacher can resolve the domain. A relative
+        // site URL (e.g. "/de") would otherwise fall back to the cacher's base URL, which
+        // includes the current site's path and never matches the host-only cached domains.
+        $prefixedRelativeUrls = collect($sites)->flatMap(fn ($site) => $rules
+            ->reject(fn (string $rule) => URL::isAbsolute($rule))
+            ->map(fn (string $rule) => $site->absoluteUrl().'/'.$rule));
+
+        // The cacher removes the final character of wildcard rules, so keep the asterisk last.
+        return $absoluteUrls->concat($prefixedRelativeUrls)
+            ->map(fn (string $url) => URL::tidy($url, withTrailingSlash: Str::endsWith($url, '*') ? false : null))
+            ->values()
+            ->all();
+    }
+
+    private function parseInvalidationRules(array $rules, array $context = []): IlluminateCollection
+    {
+        return collect($rules)
+            ->map(fn (string $rule): string => $this->convertToAntlers($rule))
+            ->filter(function (string $rule) use ($context): bool {
+                // We only want to parse the Antlers string if we have enough data to fulfill it.
+                // We want to avoid returning half-built URLs (eg. "/test/{test}" becoming "/test").
+                if (Str::contains($rule, '{{')) {
+                    $identifiers = Antlers::identifiers($rule);
+
+                    return collect($context)->keys()->intersect($identifiers)->isNotEmpty();
+                }
+
+                return true;
+            })
+            ->map(fn (string $rule) => (string) Antlers::parse($rule, $context))
+            ->filter();
+    }
+
+    private function convertToAntlers(string $route): string
+    {
+        if (Str::contains($route, '{{')) {
+            return $route;
+        }
+
+        return preg_replace_callback('/{\s*([a-zA-Z0-9_\-]+)\s*}/', function ($match) {
+            return "{{ {$match[1]} }}";
+        }, $route);
     }
 }

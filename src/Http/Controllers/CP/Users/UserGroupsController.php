@@ -3,12 +3,15 @@
 namespace Statamic\Http\Controllers\CP\Users;
 
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Statamic\Facades\Scope;
 use Statamic\Facades\User;
 use Statamic\Facades\UserGroup;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Middleware\RequireStatamicPro;
 use Statamic\Support\Str;
+
+use function Statamic\trans as __;
 
 class UserGroupsController extends CpController
 {
@@ -38,8 +41,12 @@ class UserGroupsController extends CpController
             return $groups;
         }
 
-        return view('statamic::usergroups.index', [
+        return Inertia::render('user-groups/Index', [
             'groups' => $groups,
+            'createUrl' => cp_route('user-groups.create'),
+            'editBlueprintUrl' => cp_route('blueprints.user-groups.edit'),
+            'canCreate' => User::current()->can('edit user groups'),
+            'canConfigureFields' => User::current()->can('configure fields'),
         ]);
     }
 
@@ -51,11 +58,25 @@ class UserGroupsController extends CpController
             return $this->pageNotFound();
         }
 
-        return view('statamic::usergroups.show', [
-            'group' => $group,
+        return Inertia::render('user-groups/Show', [
+            'group' => [
+                'id' => $group->handle(),
+                'title' => $group->title(),
+                'handle' => $group->handle(),
+                'editUrl' => $group->editUrl(),
+                'deleteUrl' => $group->deleteUrl(),
+                'canEdit' => User::current()->can('edit', $group),
+                'canDelete' => User::current()->can('delete', $group),
+            ],
             'filters' => Scope::filters('usergroup-users', [
                 'blueprints' => ['user'],
             ]),
+            'listingConfig' => [
+                'listingKey' => 'usergroup-users',
+                'groupId' => $group->id(),
+                'actionUrl' => cp_route('users.actions.run'),
+                'allowFilterPresets' => false,
+            ],
         ]);
     }
 
@@ -90,7 +111,7 @@ class UserGroupsController extends CpController
             'reference' => $group->handle(),
             'actions' => [
                 'save' => $group->updateUrl(),
-                'editBlueprint' => cp_route('user-groups.blueprint.edit'),
+                'editBlueprint' => cp_route('blueprints.user-groups.edit'),
             ],
         ];
 
@@ -98,7 +119,9 @@ class UserGroupsController extends CpController
             return $viewData;
         }
 
-        return view('statamic::usergroups.edit', $viewData);
+        return Inertia::render('user-groups/Edit', array_merge($viewData, [
+            'canEditBlueprint' => User::current()->can('configure fields'),
+        ]));
     }
 
     public function update(Request $request, $group)
@@ -134,7 +157,7 @@ class UserGroupsController extends CpController
         return ['title' => $group->title()];
     }
 
-    public function create()
+    public function create(Request $request)
     {
         $this->authorize('edit user groups');
 
@@ -155,9 +178,17 @@ class UserGroupsController extends CpController
             'actions' => [
                 'save' => cp_route('user-groups.store'),
             ],
+            'canEditBlueprint' => User::current()->can('configure fields'),
+            'isCreating' => true,
         ];
 
-        return view('statamic::usergroups.create', $viewData);
+        if ($request->wantsJson()) {
+            return $viewData;
+        }
+
+        return Inertia::render('user-groups/Create', array_merge($viewData, [
+            'title' => __('Create User Group'),
+        ]));
     }
 
     public function store(Request $request)

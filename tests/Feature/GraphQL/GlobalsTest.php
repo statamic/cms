@@ -4,7 +4,6 @@ namespace Tests\Feature\GraphQL;
 
 use Facades\Statamic\API\ResourceAuthorizer;
 use Facades\Statamic\Fields\BlueprintRepository;
-use Facades\Tests\Factories\GlobalFactory;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blueprint;
@@ -42,8 +41,10 @@ class GlobalsTest extends TestCase
     #[Test]
     public function it_queries_global_sets()
     {
-        GlobalFactory::handle('social')->data(['twitter' => '@statamic'])->create();
-        GlobalFactory::handle('company')->data(['company_name' => 'Statamic'])->create();
+        $social = tap(GlobalSet::make('social'))->save();
+        $social->inDefaultSite()->data(['twitter' => '@statamic'])->save();
+        $company = tap(GlobalSet::make('company'))->save();
+        $company->inDefaultSite()->data(['company_name' => 'Statamic'])->save();
         $social = Blueprint::makeFromFields(['twitter' => ['type' => 'text']])->setHandle('social')->setNamespace('globals');
         $company = Blueprint::makeFromFields(['company_name' => ['type' => 'text']])->setHandle('company')->setNamespace('globals');
         BlueprintRepository::shouldReceive('find')->with('globals.social')->andReturn($social);
@@ -80,8 +81,10 @@ GQL;
     #[Test]
     public function it_cannot_query_against_non_allowed_sub_resource()
     {
-        GlobalFactory::handle('social')->data(['twitter' => '@statamic'])->create();
-        GlobalFactory::handle('company')->data(['company_name' => 'Statamic'])->create();
+        $social = tap(GlobalSet::make('social'))->save();
+        $social->inDefaultSite()->data(['twitter' => '@statamic'])->save();
+        $company = tap(GlobalSet::make('company'))->save();
+        $company->inDefaultSite()->data(['company_name' => 'Statamic'])->save();
         $social = Blueprint::makeFromFields(['twitter' => ['type' => 'text']])->setHandle('social')->setNamespace('globals');
         $company = Blueprint::makeFromFields(['company_name' => ['type' => 'text']])->setHandle('company')->setNamespace('globals');
         BlueprintRepository::shouldReceive('find')->with('globals.social')->andReturn($social);

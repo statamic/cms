@@ -205,7 +205,6 @@ class Exporter
 
         $normalizedModuleKeyOrder = [
             'export_paths',
-            'export_as',
             'dependencies',
             'dependencies_dev',
             'modules',

@@ -246,6 +246,28 @@ class PrecedenceTest extends TestCase
     }
 
     #[Test]
+    public function it_replaces_list_preferences_instead_of_merging_them()
+    {
+        $this->actingAs(User::make()->preferences([
+            'collections' => [
+                'orders' => [
+                    'columns' => ['date', 'title', 'customer'],
+                ],
+            ],
+        ]));
+
+        Preference::default()->set([
+            'collections' => [
+                'orders' => [
+                    'columns' => ['date', 'title', 'customer', 'grand_total', 'order_status'],
+                ],
+            ],
+        ])->save();
+
+        $this->assertEquals(['date', 'title', 'customer'], Preference::get('collections.orders.columns'));
+    }
+
+    #[Test]
     public function it_merges_preferences_at_every_level_unless_otherwise_configured()
     {
         $this->actingAs(User::make()->assignRole('rabbit')->assignRole('bear')->preferences([
@@ -257,6 +279,7 @@ class PrecedenceTest extends TestCase
                     'user' => true,
                 ],
             ],
+            'theme' => null,
         ]));
 
         $this->setTestRoles([
@@ -270,6 +293,7 @@ class PrecedenceTest extends TestCase
                         'role' => true,
                     ],
                 ],
+                'theme' => ['id' => 2],
             ]),
         ]);
 
@@ -284,10 +308,12 @@ class PrecedenceTest extends TestCase
                     'default' => true,
                 ],
             ],
+            'theme' => ['id' => 1],
         ])->save();
 
         Preference::preventMergingChildren('actions');
         Preference::preventMergingChildren('deeply.nested');
+        Preference::preventMergingChildren('theme');
 
         $this->assertEquals('english', Preference::get('site'));
         $this->assertFalse(Preference::get('actions.hibernates'));
@@ -297,6 +323,7 @@ class PrecedenceTest extends TestCase
         $this->assertTrue(Preference::get('deeply.nested.user'));
         $this->assertNull(Preference::get('deeply.nested.role'));
         $this->assertNull(Preference::get('deeply.nested.default'));
+        $this->assertNull(Preference::get('theme'));
     }
 
     #[Test]

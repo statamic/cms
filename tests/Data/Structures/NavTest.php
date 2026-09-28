@@ -89,6 +89,21 @@ class NavTest extends StructureTestCase
     }
 
     #[Test]
+    public function exists_in_is_bounded_to_currently_registered_sites()
+    {
+        $this->setSites([
+            'en' => ['url' => '/', 'locale' => 'en'],
+        ]);
+
+        $structure = $this->structure('test');
+
+        // Simulates an orphaned tree file left behind for a site that's since been removed.
+        NavTreeRepository::shouldReceive('find')->with('test', 'de')->andReturn($structure->makeTree('de'));
+
+        $this->assertFalse($structure->existsIn('de'));
+    }
+
+    #[Test]
     public function it_gets_and_sets_the_title()
     {
         $structure = $this->structure('test');
@@ -217,6 +232,29 @@ class NavTest extends StructureTestCase
     }
 
     #[Test]
+    public function collections_query_scopes_can_be_get_and_set()
+    {
+        $nav = $this->structure();
+
+        $this->assertEquals([], $nav->collectionsQueryScopes());
+
+        $return = $nav->collectionsQueryScopes(['scope_one', 'scope_two']);
+
+        $this->assertSame($nav, $return);
+        $this->assertEquals(['scope_one', 'scope_two'], $nav->collectionsQueryScopes());
+    }
+
+    #[Test]
+    public function collections_query_scopes_are_normalized()
+    {
+        $nav = $this->structure();
+
+        $nav->collectionsQueryScopes(['ScopeOne', 'scope_two', '', null, 'ScopeOne']);
+
+        $this->assertEquals(['scope_one', 'scope_two'], $nav->collectionsQueryScopes());
+    }
+
+    #[Test]
     public function it_has_cp_urls()
     {
         $nav = $this->structure('test');
@@ -224,7 +262,6 @@ class NavTest extends StructureTestCase
         $this->assertEquals('http://localhost/cp/navigation/test', $nav->showUrl());
         $this->assertEquals('http://localhost/cp/navigation/test?foo=bar', $nav->showUrl(['foo' => 'bar']));
         $this->assertEquals('http://localhost/cp/navigation/test/edit', $nav->editUrl());
-        $this->assertEquals('http://localhost/cp/navigation/test', $nav->deleteUrl());
     }
 
     #[Test]

@@ -2,6 +2,7 @@
 
 namespace Statamic\Search\Searchables;
 
+use Statamic\Facades\Scope;
 use Statamic\Facades\Search;
 use Statamic\Search\Index;
 use Statamic\Search\ProvidesSearchables;
@@ -55,6 +56,15 @@ abstract class Provider implements ProvidesSearchables
         return in_array('*', $this->keys);
     }
 
+    protected function applyQueryScope($query)
+    {
+        if (! $scope = $this->index->config()['query_scope'] ?? null) {
+            return;
+        }
+
+        Scope::find($scope)->apply($query, []);
+    }
+
     protected function filter()
     {
         $filter = $this->index->config()['filter'] ?? null;
@@ -68,6 +78,6 @@ abstract class Provider implements ProvidesSearchables
 
     protected function defaultFilter()
     {
-        return fn () => true;
+        return null;
     }
 }

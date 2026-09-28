@@ -1,13 +1,9 @@
-import Document from '@tiptap/extension-document'
+import Document from '@tiptap/extension-document';
 
 export const DocumentBlock = Document.extend({
-
-    content: '(block | root)+'
-
-})
+    content: '(block | root)+',
+});
 
 export const DocumentInline = Document.extend({
-
     content: 'paragraph',
-
 });

@@ -22,7 +22,9 @@ class ArrayableLink extends ArrayableString
     #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
-        return $this->url(); // Use a string for backwards compatibility in the REST API, etc.
+        return is_object($this->value)
+            ? $this->value->toShallowAugmentedArray()
+            : ['url' => $this->url()];
     }
 
     public function url()

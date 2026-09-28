@@ -1,0 +1,35 @@
+import { Canvas, Meta, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as ToggleStories from '../Toggle.stories';
+
+<Meta of={ToggleStories} />
+
+# Toggle
+A group of buttons that allow users to select one or multiple options. Similar to segmented controls or button-styled radio groups.
+<Canvas of={ToggleStories._DocsIntro} sourceState={'shown'} />
+
+## Variants
+Use the `variant` prop to change the appearance of the toggle group.
+<Canvas of={ToggleStories.Variants} sourceState={'shown'} />
+
+## Sizes
+Use the `size` prop to change the size of the toggle items.
+<Canvas of={ToggleStories.Sizes} sourceState={'shown'} />
+
+## With Icons
+Add icons to toggle items for better visual recognition.
+<Canvas of={ToggleStories.WithIcons} sourceState={'shown'} />
+
+## Icon Only
+Use icons without labels for a more compact layout.
+<Canvas of={ToggleStories.IconOnly} sourceState={'shown'} />
+
+## Multiple Selection
+Set the `multiple` prop to allow selecting multiple items at once.
+<Canvas of={ToggleStories.Multiple} sourceState={'shown'} />
+
+## Disabled Items
+Individual toggle items can be disabled.
+<Canvas of={ToggleStories.Disabled} sourceState={'shown'} />
+
+## Arguments
+<ArgTypes of={ToggleStories} />

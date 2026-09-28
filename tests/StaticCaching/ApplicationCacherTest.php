@@ -4,9 +4,12 @@ namespace Tests\StaticCaching;
 
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Events\ResponsePrepared;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Queue;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Console\Commands\StaticWarmJob;
 use Statamic\Events\UrlInvalidated;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\Cachers\ApplicationCacher;
@@ -68,6 +71,82 @@ class ApplicationCacherTest extends TestCase
     }
 
     #[Test]
+    #[DataProvider('cachedResponseProvider')]
+    public function caching_a_page_tracks_the_url($status, $content)
+    {
+        $cache = app(Repository::class);
+        $cacher = new ApplicationCacher($cache, ['base_url' => 'http://example.com']);
+        $request = Request::create('http://example.com/about', 'GET');
+        $response = response($content, $status);
+
+        $cacher->cachePage($request, $response);
+        event(new ResponsePrepared($request, $response));
+
+        $this->assertEquals(['/about'], $cacher->getUrls()->values()->all());
+        $this->assertTrue($cacher->hasCachedPage($request));
+        $this->assertEquals($content, $cacher->getCachedPage($request)->content);
+    }
+
+    public static function cachedResponseProvider()
+    {
+        return [
+            'successful response' => [200, 'about page'],
+            'error response' => [404, 'not found'],
+        ];
+    }
+
+    #[Test]
+    public function refreshing_a_wildcard_warms_successful_urls_and_invalidates_error_urls()
+    {
+        Queue::fake();
+
+        $cache = app(Repository::class);
+        $cacher = new ApplicationCacher($cache, ['base_url' => 'http://example.com']);
+
+        $goodRequest = Request::create('http://example.com/rail/one', 'GET');
+        $cacher->cachePage($goodRequest, response('one', 200));
+        event(new ResponsePrepared($goodRequest, response('one', 200)));
+
+        $junkRequest = Request::create('http://example.com/rail/scanner-junk', 'GET');
+        $cacher->cachePage($junkRequest, response('not found', 404));
+        event(new ResponsePrepared($junkRequest, response('not found', 404)));
+
+        $cacher->refreshUrls(['/rail/*']);
+
+        Queue::assertPushed(StaticWarmJob::class, function ($job) {
+            return str_contains((string) $job->request->getUri(), '/rail/one');
+        });
+        Queue::assertNotPushed(StaticWarmJob::class, function ($job) {
+            return str_contains((string) $job->request->getUri(), 'scanner-junk');
+        });
+
+        // The error response is invalidated rather than warmed, so the
+        // tracked set converges to real pages.
+        $this->assertEquals(['/rail/one'], $cacher->getUrls()->values()->all());
+        $this->assertFalse($cacher->hasCachedPage($junkRequest));
+    }
+
+    #[Test]
+    public function refreshing_an_error_url_invalidates_it_instead_of_warming_it()
+    {
+        Queue::fake();
+
+        $cache = app(Repository::class);
+        $cacher = new ApplicationCacher($cache, ['base_url' => 'http://example.com']);
+        $request = Request::create('http://example.com/foo', 'GET');
+        $response = response('not found', 404);
+
+        $cacher->cachePage($request, $response);
+        event(new ResponsePrepared($request, $response));
+
+        $cacher->refreshUrls(['/foo']);
+
+        Queue::assertNothingPushed();
+        $this->assertEquals([], $cacher->getUrls()->all());
+        $this->assertFalse($cacher->hasCachedPage($request));
+    }
+
+    #[Test]
     public function invalidating_a_url_removes_the_html_and_the_url()
     {
         $cache = app(Repository::class);
@@ -90,6 +169,23 @@ class ApplicationCacherTest extends TestCase
         $this->assertNull($cache->get('static-cache:responses:one'));
         $this->assertNotNull($cache->get('static-cache:responses:onemore'));
         $this->assertNotNull($cache->get('static-cache:responses:two'));
+    }
+
+    #[Test]
+    public function invalidating_a_url_removes_a_cached_error_response()
+    {
+        $cache = app(Repository::class);
+        $cacher = new ApplicationCacher($cache, ['base_url' => 'http://example.com']);
+        $request = Request::create('http://example.com/foo', 'GET');
+        $response = response('not found', 404);
+
+        $cacher->cachePage($request, $response);
+        event(new ResponsePrepared($request, $response));
+
+        $cacher->invalidateUrl('/foo');
+
+        $this->assertEquals([], $cacher->getUrls()->all());
+        $this->assertFalse($cacher->hasCachedPage($request));
     }
 
     #[Test]
@@ -117,6 +213,60 @@ class ApplicationCacherTest extends TestCase
         $this->assertNull($cache->get('static-cache:responses:one'));
         $this->assertNull($cache->get('static-cache:responses:oneqs'));
         $this->assertNotNull($cache->get('static-cache:responses:onemore'));
+        $this->assertNotNull($cache->get('static-cache:responses:two'));
+    }
+
+    #[Test]
+    public function invalidating_a_url_with_explicit_domain_updates_correct_url_index()
+    {
+        $cache = app(Repository::class);
+        $cacher = new ApplicationCacher($cache, ['base_url' => 'http://example.com']);
+
+        // Different domain than base_url
+        $domainHash = md5('http://differentexample.com');
+        $cache->forever("static-cache:{$domainHash}.urls", [
+            'one' => '/one',
+            'two' => '/two',
+        ]);
+        $cache->forever('static-cache:responses:one', 'html content');
+        $cache->forever('static-cache:responses:two', 'two html content');
+
+        // Invalidate explicit domain
+        $cacher->invalidateUrl('/one', 'http://differentexample.com');
+
+        // URL index under http://differentexample.com should be updated and not http://example.com
+        $this->assertEquals(
+            ['two' => '/two'],
+            $cacher->getUrls('http://differentexample.com')->all()
+        );
+        $this->assertNull($cache->get('static-cache:responses:one'));
+        $this->assertNotNull($cache->get('static-cache:responses:two'));
+    }
+
+    #[Test]
+    public function invalidating_a_full_url_without_domain_extracts_domain_correctly()
+    {
+        $cache = app(Repository::class);
+        $cacher = new ApplicationCacher($cache, ['base_url' => 'http://example.com']);
+
+        // Different domain than base_url
+        $domainHash = md5('http://differentexample.com');
+        $cache->forever("static-cache:{$domainHash}.urls", [
+            'one' => '/one',
+            'two' => '/two',
+        ]);
+        $cache->forever('static-cache:responses:one', 'html content');
+        $cache->forever('static-cache:responses:two', 'two html content');
+
+        // Invalidate full URL with no explicit domain to simulate CLI
+        $cacher->invalidateUrl('http://differentexample.com/one');
+
+        // Should extract domain from URL and update correct URL index
+        $this->assertEquals(
+            ['two' => '/two'],
+            $cacher->getUrls('http://differentexample.com')->all()
+        );
+        $this->assertNull($cache->get('static-cache:responses:one'));
         $this->assertNotNull($cache->get('static-cache:responses:two'));
     }
 
@@ -176,6 +326,23 @@ class ApplicationCacherTest extends TestCase
         $this->assertNull($cache->get('static-cache:responses:four'));
         $this->assertEquals([], $cacher->getUrls('http://example.com')->all());
         $this->assertEquals([], $cacher->getUrls('http://another.com')->all());
+    }
+
+    #[Test]
+    public function flushing_removes_cached_error_responses()
+    {
+        $cache = app(Repository::class);
+        $cacher = new ApplicationCacher($cache, ['base_url' => 'http://example.com']);
+        $request = Request::create('http://example.com/foo', 'GET');
+        $response = response('not found', 404);
+
+        $cacher->cachePage($request, $response);
+        event(new ResponsePrepared($request, $response));
+
+        $cacher->flush();
+
+        $this->assertEquals([], $cacher->getUrls()->all());
+        $this->assertFalse($cacher->hasCachedPage($request));
     }
 
     #[Test]

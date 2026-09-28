@@ -4,6 +4,7 @@ namespace Statamic\Routing;
 
 use Statamic\Contracts\Routing\UrlBuilder as UrlBuilderContract;
 use Statamic\Facades\Antlers;
+use Statamic\Facades\Parse;
 use Statamic\Facades\URL;
 use Statamic\Support\Str;
 
@@ -49,6 +50,8 @@ class UrlBuilder implements UrlBuilderContract
 
         $route = $this->convertToAntlers($route);
 
+        $route = Parse::config($route);
+
         $url = Antlers::parse($route, $this->routeData());
 
         // Slugify it because we're dealing with URLs after all.
@@ -57,11 +60,7 @@ class UrlBuilder implements UrlBuilderContract
         // If provided variables had no matching value, we would end up with
         // blank spaces in the URL, possibly resulting in double slashes.
         // Tidying up the URL will de-duplicate those extra slashes.
-        $url = URL::tidy($url);
-
-        $url = rtrim($url, '/');
-
-        return Str::ensureLeft($url, '/');
+        return URL::tidy($url, withTrailingSlash: false);
     }
 
     private function convertToAntlers($route)

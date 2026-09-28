@@ -2,15 +2,20 @@
 
 namespace Statamic\Providers;
 
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
 use League\Glide\Server;
 use Statamic\Contracts\Imaging\ImageManipulator;
 use Statamic\Contracts\Imaging\UrlBuilder;
 use Statamic\Facades\Config;
 use Statamic\Facades\Glide;
+use Statamic\Imaging\GlideCachePathResolver;
 use Statamic\Imaging\GlideImageManipulator;
 use Statamic\Imaging\GlideUrlBuilder;
+use Statamic\Imaging\HybridUrlBuilder;
 use Statamic\Imaging\ImageGenerator;
+use Statamic\Imaging\ImageValidator;
+use Statamic\Imaging\Intervention;
 use Statamic\Imaging\PresetGenerator;
 use Statamic\Imaging\StaticUrlBuilder;
 
@@ -39,10 +44,32 @@ class GlideServiceProvider extends ServiceProvider
                 $app->make(ImageGenerator::class)
             );
         });
+
+        $this->app->bind(ImageValidator::class, function () {
+            return new ImageValidator(Intervention::driver());
+        });
+    }
+
+    public function boot()
+    {
+        if (! Glide::isUsingHybridCaching() || Glide::cachePathIsServedByRoute()) {
+            return;
+        }
+
+        if (Glide::cacheStore()->add('hybrid-cache-path-warning', true)) {
+            Log::warning('Glide hybrid caching: the image_manipulation.cache_path must live at the image_manipulation.route inside the public directory, otherwise cached images are never served directly by the web server.');
+        }
     }
 
     private function getBuilder()
     {
+        if (Glide::isUsingHybridCaching()) {
+            return new HybridUrlBuilder(
+                $this->app->make(GlideCachePathResolver::class),
+                ['route' => Glide::url()]
+            );
+        }
+
         if (Glide::shouldServeDirectly()) {
             return new StaticUrlBuilder($this->app->make(ImageGenerator::class), [
                 'route' => Glide::url(),

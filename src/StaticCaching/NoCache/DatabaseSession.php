@@ -11,7 +11,7 @@ class DatabaseSession extends Session
 
     public function restore()
     {
-        $regions = DatabaseRegion::where('url', $this->url)->get(['key']);
+        $regions = DatabaseRegion::where('url', md5($this->url))->get(['key']);
 
         $this->regions = $regions->map->key;
 
@@ -30,7 +30,17 @@ class DatabaseSession extends Session
             throw new RegionNotFound($key);
         }
 
-        return unserialize($region->region);
+        // Fall back to treating the value as a raw serialized string for rows
+        // written before base64 encoding was introduced. Strict base64_decode
+        // reliably detects legacy rows because any serialized PHP value always
+        // contains ":" or ";", neither of which are in the base64 alphabet.
+        $decoded = base64_decode($region->region, true);
+
+        if ($decoded === false) {
+            $decoded = $region->region;
+        }
+
+        return unserialize($decoded, ['allowed_classes' => true]);
     }
 
     protected function cacheRegion(Region $region)
@@ -38,8 +48,8 @@ class DatabaseSession extends Session
         DatabaseRegion::updateOrCreate([
             'key' => $region->key(),
         ], [
-            'url' => $this->url,
-            'region' => serialize($region),
+            'url' => md5($this->url),
+            'region' => base64_encode(serialize($region)),
         ]);
     }
 }

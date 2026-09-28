@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers\CP;
 
 use Facades\Statamic\CP\LivePreview;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Statamic\Facades\URL;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -12,12 +13,12 @@ class PreviewController extends CpController
 {
     public function show()
     {
-        return view('statamic::entries.preview');
+        return Inertia::render('entries/Preview');
     }
 
     public function edit(Request $request, $_, $data)
     {
-        $this->authorize('view', $data);
+        $this->authorize('update', $data);
 
         $fields = $data->blueprint()
             ->fields()

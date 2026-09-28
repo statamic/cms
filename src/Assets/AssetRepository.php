@@ -59,7 +59,7 @@ class AssetRepository implements Contract
             $url = $siteUrl.$url;
         }
 
-        $path = Str::after($url, $containerUrl);
+        $path = rawurldecode(Str::after($url, $containerUrl));
 
         return $container->asset($path);
     }
@@ -93,6 +93,7 @@ class AssetRepository implements Contract
     public function findById(string $id)
     {
         [$container_id, $path] = explode('::', $id);
+        $path = str_replace('\\', '/', $path);
 
         // If a container can't be found, we'll assume there's no asset.
         if (! $container = AssetContainer::find($container_id)) {
