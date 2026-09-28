@@ -2,12 +2,15 @@
 
 namespace Statamic\Stache;
 
+use Illuminate\Queue\Events\JobProcessing;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
 use Statamic\Assets\QueryBuilder as AssetQueryBuilder;
 use Statamic\Facades\File;
 use Statamic\Facades\Site;
 use Statamic\Stache\Query\EntryQueryBuilder;
 use Statamic\Stache\Query\SubmissionQueryBuilder;
+use Statamic\Statamic;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\Store\FlockStore;
 
@@ -45,6 +48,8 @@ class ServiceProvider extends LaravelServiceProvider
         $stache->sites(Site::all()->keys()->all());
 
         $this->registerStores($stache);
+
+        $this->resetMemoizedStateBetweenJobs($stache);
     }
 
     private function registerStores($stache)
@@ -68,6 +73,19 @@ class ServiceProvider extends LaravelServiceProvider
         });
 
         $stache->registerStores($stores->all());
+    }
+
+    private function resetMemoizedStateBetweenJobs($stache)
+    {
+        Event::listen(JobProcessing::class, function () use ($stache) {
+            if (! Statamic::isWorker()) {
+                return;
+            }
+
+            $stache->stores()->each->resetMemoizedState();
+
+            $this->app->make('stache.indexes')->each->resetMemoizedState();
+        });
     }
 
     private function locks()

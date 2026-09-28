@@ -130,15 +130,12 @@ export default {
         },
 
         fieldOptions() {
-            const conditions = this.conditions.map((condition) => condition.field);
-
             return this.suggestableFields
                 .filter((field) => {
                     return !(
                         field.handle === this.config.handle || // Exclude the field you're adding a condition to.
-                        this.condition.field === field.handle || // Exclude the field being used in the current condition.
-                        conditions.includes(field.handle)
-                    ); // Exclude fields already used in other conditions.
+                        this.condition.field === field.handle // Exclude the field being used in the current condition.
+                    );
                 })
                 .map((field) => {
                     let display = field.config.display;
@@ -159,6 +156,7 @@ export default {
                 not: __('Not'),
                 contains: __('Contains'),
                 contains_any: __('Contains Any'),
+                includes_any: __('Includes Any'),
                 '===': '===',
                 '!==': '!==',
                 '>': '>',

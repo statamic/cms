@@ -48,16 +48,3 @@ parameters:
       identifier: staticMethod.notFound
       message: '#^Call to an undefined static method Statamic\\Providers\\AppServiceProvider::this\(\)\.$#'
       path: src/Providers/AppServiceProvider.php
-
-    # keyByWithKey() is a public Collection macro kept for third-party/addon backward
-    # compatibility even though Statamic's own code no longer calls it, so its use of
-    # Collection's protected valueRetriever()/$items internals is left as-is rather than
-    # rewritten to public equivalents.
-    -
-      identifier: method.protected
-      message: '#^Call to protected method valueRetriever\(\) of class Illuminate\\Support\\Collection(<.*>)?\.$#'
-      path: src/Providers/CollectionsServiceProvider.php
-    -
-      identifier: property.protected
-      message: '#^Access to protected property Illuminate\\Support\\Collection::\$items\.$#'
-      path: src/Providers/CollectionsServiceProvider.php

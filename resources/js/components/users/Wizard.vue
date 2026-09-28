@@ -28,6 +28,11 @@
                     :blueprint="blueprint"
                     v-model="values"
                     :meta="meta"
+                    :extra-values="{
+                        roles: user.roles,
+                        groups: user.groups,
+                        super: user.super,
+                    }"
                     :track-dirty-state="false"
                     :errors="errors"
                 >

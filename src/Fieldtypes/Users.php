@@ -117,7 +117,7 @@ class Users extends Relationship
             return true;
         }
 
-        return $this->authorizeViewable(User::find($id));
+        return $this->authorizeViewable($this->findUser($id));
     }
 
     protected function toItemArray($id, $site = null)
@@ -126,7 +126,7 @@ class Users extends Relationship
             return $this->currentUserOption();
         }
 
-        if ($user = User::find($id)) {
+        if ($user = $this->findUser($id)) {
             $canViewUsers = $this->canViewUser($user);
 
             return [
@@ -138,6 +138,11 @@ class Users extends Relationship
         }
 
         return $this->invalidItemArray($id);
+    }
+
+    protected function findUser($id)
+    {
+        return $this->itemCache[$id] ??= User::find($id);
     }
 
     public function getIndexItems($request)

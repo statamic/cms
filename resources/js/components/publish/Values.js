@@ -83,7 +83,8 @@ export default class Values {
 
     missingValue(dottedKey) {
         var properties = Array.isArray(dottedKey) ? dottedKey : dottedKey.split('.');
-        var value = properties.reduce((prev, curr) => (prev == null ? undefined : prev[curr]), clone(this.values));
+        // Read-only walk — no need to clone. The constructor already made this.values private.
+        var value = properties.reduce((prev, curr) => (prev == null ? undefined : prev[curr]), this.values);
 
         return value === undefined;
     }
@@ -91,25 +92,15 @@ export default class Values {
     jsonDecodeValue(dottedKey) {
         if (this.missingValue(dottedKey)) return;
 
-        let values = clone(this.values);
-        let fieldValue = data_get(values, dottedKey);
-        let decodedFieldValue = JSON.parse(fieldValue);
-
-        data_set(values, dottedKey, decodedFieldValue);
-
-        this.values = values;
+        let fieldValue = data_get(this.values, dottedKey);
+        data_set(this.values, dottedKey, JSON.parse(fieldValue));
     }
 
     jsonEncodeValue(dottedKey) {
         if (this.missingValue(dottedKey)) return;
 
-        let values = clone(this.values);
-        let fieldValue = data_get(values, dottedKey);
-        let encodedFieldValue = JSON.stringify(fieldValue);
-
-        data_set(values, dottedKey, encodedFieldValue);
-
-        this.values = values;
+        let fieldValue = data_get(this.values, dottedKey);
+        data_set(this.values, dottedKey, JSON.stringify(fieldValue));
     }
 
     setValue(dottedKey, value) {
@@ -129,10 +120,6 @@ export default class Values {
     forgetValue(dottedKey) {
         if (this.missingValue(dottedKey)) return;
 
-        let values = clone(this.values);
-
-        data_delete(values, dottedKey);
-
-        this.values = values;
+        data_delete(this.values, dottedKey);
     }
 }

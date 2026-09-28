@@ -92,6 +92,25 @@ class OutpostTest extends TestCase
     }
 
     #[Test]
+    public function the_cached_response_is_used_when_only_the_environment_has_changed()
+    {
+        $outpost = $this->outpostWithJsonResponse(['newer' => 'response']);
+
+        $payload = $outpost->payload();
+        $payload['host'] = 'some-other-host.com';
+        $payload['ip'] = '9.9.9.9';
+        $payload['port'] = null;
+        $payload['php_version'] = '1.2.3';
+
+        $this->setCachedResponse($testCachedResponse = [
+            'cached' => 'response',
+            'payload' => $payload,
+        ]);
+
+        $this->assertEquals($testCachedResponse, $outpost->response());
+    }
+
+    #[Test]
     public function license_key_file_is_used_when_it_exists()
     {
         config(['statamic.system.license_key' => 'testsitekey12345']);
@@ -244,6 +263,24 @@ class OutpostTest extends TestCase
 
         $this->assertEquals($expectedResponse, $outpost->response());
         Carbon::setTestNow(now()->addSeconds($retryAfter - 1));
+        $this->assertCachedResponseEquals($expectedResponse);
+        Carbon::setTestNow(now()->addSeconds(1));
+        $this->assertResponseNotCached();
+    }
+
+    #[Test]
+    public function it_caches_a_429_too_many_requests_error_for_five_minutes_when_theres_no_retry_after_header()
+    {
+        $outpost = $this->outpostWithErrorResponse(429);
+
+        $expectedResponse = [
+            'error' => 429,
+            'expiry' => now()->addMinutes(5)->timestamp,
+            'payload' => $outpost->payload(),
+        ];
+
+        $this->assertEquals($expectedResponse, $outpost->response());
+        Carbon::setTestNow(now()->addMinutes(5)->subSecond());
         $this->assertCachedResponseEquals($expectedResponse);
         Carbon::setTestNow(now()->addSeconds(1));
         $this->assertResponseNotCached();

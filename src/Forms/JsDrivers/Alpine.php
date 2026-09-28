@@ -64,7 +64,7 @@ class Alpine extends AbstractJsDriver
         $attributes = [];
 
         if ($field->fieldtype()->hasJsDriverDataBinding()) {
-            $attributes['x-model'] = $this->getAlpineXDataKey($field->handle(), $this->scope);
+            $attributes['x-model.fill'] = $this->getAlpineXDataKey($field->handle(), $this->scope);
         }
 
         return $attributes;

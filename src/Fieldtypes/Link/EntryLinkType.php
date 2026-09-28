@@ -7,6 +7,7 @@ use Statamic\Facades;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Site;
 use Statamic\Fields\Field;
+use Statamic\Support\Arr;
 
 use function Statamic\trans as __;
 
@@ -80,6 +81,6 @@ class EntryLinkType extends LinkType
             });
         }
 
-        return $collections;
+        return Arr::wrap($collections);
     }
 }
