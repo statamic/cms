@@ -14,7 +14,8 @@
             >
                 <template #no-options><div class="hidden" /></template>
                 <template #option="option">
-                    <div class="flex items-center">
+                    <span v-if="option.create" class="truncate">{{ __('Add ":value"', { value: option.value }) }}</span>
+                    <div v-else class="flex items-center">
                         <span class="flex-shrink-0 truncate" v-text="option.label" />
                         <span
                             v-text="option.value"

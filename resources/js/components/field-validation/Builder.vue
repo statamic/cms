@@ -41,7 +41,10 @@
                 @added="ifSearchNotFoundAddCustom"
             >
                 <template #option="option">
-                    {{ __(option.display) }} <code class="px-1 rounded-sm text-[0.8rem]">{{ valueWithoutTrailingColon(option.value) }}</code>
+                    <template v-if="option.create">{{ __('Add ":value"', { value: option.value }) }}</template>
+                    <template v-else>
+                        {{ __(option.display) }} <code class="px-1 rounded-sm text-[0.8rem]">{{ valueWithoutTrailingColon(option.value) }}</code>
+                    </template>
                 </template>
 
                 <template #selected-options>
