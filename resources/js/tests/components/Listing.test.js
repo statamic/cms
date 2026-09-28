@@ -1,4 +1,4 @@
-import { flushPromises, mount } from '@vue/test-utils';
+import { enableAutoUnmount, flushPromises, mount } from '@vue/test-utils';
 import { afterEach, expect, test, vi } from 'vitest';
 import { defineComponent, h } from 'vue';
 import axios from 'axios';
@@ -36,6 +36,8 @@ const defaultConfigGet = window.Statamic.$config.get;
 afterEach(() => {
     window.Statamic.$config.get = defaultConfigGet;
 });
+
+enableAutoUnmount(afterEach);
 
 const Probe = defineComponent({
     setup() {
