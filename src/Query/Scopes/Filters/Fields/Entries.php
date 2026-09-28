@@ -4,7 +4,6 @@ namespace Statamic\Query\Scopes\Filters\Fields;
 
 use Statamic\Facades;
 use Statamic\Support\Arr;
-use Statamic\Support\Str;
 
 use function Statamic\trans as __;
 
@@ -13,30 +12,28 @@ class Entries extends FieldtypeFilter
     public function fieldItems()
     {
         return [
-            'field' => [
-                'type' => 'select',
-                'options' => [
-                    'id' => __('ID'),
-                    'title' => __('Title'),
-                ],
-                'default' => 'title',
-            ],
             'operator' => [
                 'type' => 'select',
                 'options' => [
-                    'like' => __('Contains'),
                     '=' => __('Is'),
                     '!=' => __('Isn\'t'),
                     'null' => __('Empty'),
                     'not-null' => __('Not empty'),
                 ],
-                'default' => 'like',
+                'default' => '=',
             ],
             'value' => [
-                'type' => 'text',
-                'placeholder' => __('Value'),
-                'if' => [
-                    'operator' => 'contains_any like, =, !=',
+                'type' => 'entries',
+                'max_items' => 1,
+                'mode' => 'typeahead',
+                'create' => false,
+                'collections' => $this->fieldtype->config('collections'),
+                'search_index' => $this->fieldtype->config('search_index'),
+                'select_across_sites' => $this->fieldtype->config('select_across_sites'),
+                'blueprints' => $this->fieldtype->config('blueprints'),
+                'query_scopes' => $this->fieldtype->config('query_scopes'),
+                'unless' => [
+                    'operator' => 'contains_any null, not-null',
                 ],
                 'required' => false,
             ],
@@ -45,10 +42,7 @@ class Entries extends FieldtypeFilter
 
     public function apply($query, $handle, $values)
     {
-        $config = $this->fieldtype->field()->config();
-        $maxItems = $config['max_items'] ?? 0;
         $operator = $values['operator'];
-        $value = $values['value'];
 
         if (in_array($operator, ['null', 'not-null'])) {
             match ($operator) {
@@ -59,56 +53,41 @@ class Entries extends FieldtypeFilter
             return;
         }
 
-        if ($operator === 'like') {
-            $value = Str::ensureLeft($value, '%');
-            $value = Str::ensureRight($value, '%');
+        if (! $id = $values['value']) {
+            return;
         }
 
-        if ($values['field'] == 'id') {
-            $maxItems === 1
-                ? $query->where($handle, $operator, $value)
-                : $query->whereJsonContains($handle, $value);
+        $single = $this->fieldtype->config('max_items') === 1;
+
+        if ($operator === '=') {
+            $single
+                ? $query->where($handle, $id)
+                : $query->whereJsonContains($handle, [$id]);
 
             return;
         }
 
-        $ids = Facades\Entry::query()
-            ->when($config['collections'] ?? null, fn ($query) => $query->whereIn('collection', $config['collections']))
-            ->where($values['field'], $operator, $value)
-            ->get(['id'])
-            ->map(fn ($entry) => $entry->id())
-            ->all();
-
-        if (empty($ids)) {
-            $maxItems === 1
-                ? $query->where($handle, -1)
-                : $query->whereJsonContains($handle, [-1]);
-
-            return;
-        }
-
-        if ($maxItems === 1) {
-            $query->whereIn($handle, $ids);
-
-            return;
-        }
-
-        $query->where(function ($subquery) use ($handle, $ids) {
-            foreach ($ids as $count => $id) {
-                $subquery->{$count == 0 ? 'whereJsonContains' : 'orWhereJsonContains'}($handle, [$id]);
-            }
-        });
+        $single
+            ? $query->where($handle, '!=', $id)
+            : $query->whereJsonDoesntContain($handle, [$id]);
     }
 
     public function badge($values)
     {
         $field = $this->fieldtype->field()->display();
-        $selectedField = $values['field'];
         $operator = $values['operator'];
-        $translatedField = Arr::get($this->fieldItems(), "field.options.{$selectedField}");
         $translatedOperator = Arr::get($this->fieldItems(), "operator.options.{$operator}");
-        $value = $values['value'];
 
-        return $field.' '.$translatedField.' '.strtolower($translatedOperator).' '.$value;
+        if (in_array($operator, ['null', 'not-null'])) {
+            return $field.' '.strtolower($translatedOperator);
+        }
+
+        if (! $id = $values['value']) {
+            return null;
+        }
+
+        $title = Facades\Entry::find($id)?->value('title') ?? $id;
+
+        return $field.' '.strtolower($translatedOperator).' '.$title;
     }
 }

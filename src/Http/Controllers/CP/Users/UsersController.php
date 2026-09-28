@@ -9,6 +9,7 @@ use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Action;
 use Statamic\Facades\CP\Toast;
+use Statamic\Facades\OAuth;
 use Statamic\Facades\Scope;
 use Statamic\Facades\Search;
 use Statamic\Facades\TwoFactor;
@@ -159,7 +160,7 @@ class UsersController extends CpController
             ->keys();
 
         $viewData = [
-            'values' => (object) $fields->values()->only($additional)->all(),
+            'initialValues' => (object) $fields->values()->only($additional)->all(),
             'meta' => (object) $fields->meta()->all(),
             'fields' => collect($blueprint->fields()->toPublishArray())->filter(fn ($field) => $additional->contains($field['handle']))->values()->all(),
             'blueprint' => $blueprint->toPublishArray(),
@@ -279,6 +280,7 @@ class UsersController extends CpController
                 'editBlueprint' => cp_route('blueprints.users.edit'),
             ],
             'canEditBlueprint' => User::current()->can('configure fields'),
+            'oauthEnabled' => OAuth::enabled(),
             'canEditPassword' => User::fromUser($request->user())->can('editPassword', $user),
             'requiresCurrentPassword' => $isCurrentUser = $request->user()->id === $user->id(),
             'itemActions' => Action::for($user, ['view' => 'form']),

@@ -2,6 +2,9 @@
 
 namespace Statamic\Events;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class SubmissionCreating extends Event
 {
     public function __construct(public $submission)

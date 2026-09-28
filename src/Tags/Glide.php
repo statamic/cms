@@ -4,6 +4,7 @@ namespace Statamic\Tags;
 
 use Facades\Statamic\Imaging\Attributes;
 use Facades\Statamic\Imaging\ImageValidator;
+use Illuminate\Support\Facades\Log;
 use League\Glide\Server;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Data\Augmentable;
@@ -14,6 +15,7 @@ use Statamic\Facades\Glide as GlideManager;
 use Statamic\Facades\Image;
 use Statamic\Facades\Path;
 use Statamic\Facades\URL;
+use Statamic\Imaging\AssetNotFoundException;
 use Statamic\Imaging\ImageGenerator;
 use Statamic\Support\Str;
 
@@ -25,7 +27,6 @@ class Glide extends Tags
      * Where `field` is the variable containing the image ID
      *
      * @param  string  $method
-     * @param  array  $args
      * @return string
      */
     public function wildcard($method)
@@ -147,7 +148,7 @@ class Glide extends Tags
 
                 return $data;
             } catch (\Exception $e) {
-                \Log::error($e->getMessage());
+                Log::error($e->getMessage());
             }
         })->filter()->all();
 
@@ -177,7 +178,15 @@ class Glide extends Tags
                 : $this->getGenerator()->generateByPath($item, $params);
         }
 
-        return $this->getGenerator()->generateByAsset(Asset::find($item), $params);
+        $asset = $item instanceof AssetContract ? $item : Asset::find($item);
+
+        if (! $asset) {
+            throw new AssetNotFoundException(
+                sprintf('Could not generate a manipulated image from asset [%s]', $item)
+            );
+        }
+
+        return $this->getGenerator()->generateByAsset($asset, $params);
     }
 
     /**
@@ -206,7 +215,7 @@ class Glide extends Tags
         try {
             $url = $this->isValidExtension($item) ? $this->getManipulator($item)->build() : $this->normalizeItem($item);
         } catch (\Exception $e) {
-            \Log::error($e->getMessage());
+            Log::error($e->getMessage());
 
             return;
         }
@@ -231,7 +240,7 @@ class Glide extends Tags
             $source = $cache->read($path);
             $url = 'data:'.$cache->mimeType($path).';base64,'.base64_encode($source);
         } catch (\Exception $e) {
-            \Log::error($e->getMessage());
+            Log::error($e->getMessage());
 
             return;
         }
@@ -290,7 +299,7 @@ class Glide extends Tags
 
         // Double colons indicate an asset ID.
         if (Str::contains($item, '::')) {
-            return Asset::find($item);
+            return Asset::find($item) ?? $item;
         }
 
         // In a subfolder installation, the subfolder will likely be passed in

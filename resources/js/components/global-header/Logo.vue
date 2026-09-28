@@ -28,6 +28,7 @@ function toggleNav() {
                 class="flex items-center group rounded-xs cursor-pointer"
                 data-cp-global-nav-toggle
                 :aria-label="__('Toggle Nav')"
+                v-tooltip="__('Toggle Nav')"
                 style="--focus-outline-offset: 0.2rem;"
                 @click.stop="toggleNav"
             >
@@ -36,7 +37,7 @@ function toggleNav() {
                 </div>
             </button>
             <Link :href="cp_url('/')" v-tooltip="version" style="--focus-outline-offset: var(--outline-offset-button);">
-                <img v-if="customLogoImage" :src="customLogoImage" :alt="cmsName" class="w-full max-w-[260px] max-h-7" v-tooltip="version">
+                <img v-if="customLogoImage" :src="customLogoImage" :alt="cmsName" class="w-full max-w-[260px] max-h-7">
                 <span v-if="customLogoText && !customLogoImage" class="font-medium text-white whitespace-nowrap">{{ customLogoText }}</span>
             </Link>
         </div>
@@ -48,6 +49,7 @@ function toggleNav() {
                 class="flex items-center group rounded-xs cursor-pointer"
                 data-cp-global-nav-toggle
                 :aria-label="__('Toggle Nav')"
+                v-tooltip="__('Toggle Nav')"
                 style="--focus-outline-offset: 0.2rem;"
                 @click.stop="toggleNav"
             >

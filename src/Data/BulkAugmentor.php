@@ -5,6 +5,9 @@ namespace Statamic\Data;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\BulkAugmentable;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class BulkAugmentor
 {
     private $isTree = false;

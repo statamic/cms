@@ -5,12 +5,12 @@ namespace Tests\Feature\Assets;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
-use Intervention\Image\ImageManager;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Assets\AssetContainer;
 use Statamic\CP\Assets\CropProcessor;
 use Statamic\Events\AssetUploaded;
 use Statamic\Facades;
+use Statamic\Imaging\Intervention;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -308,17 +308,23 @@ class CropAssetTest extends TestCase
 
     private function makeImage($width, $height)
     {
-        return (string) ImageManager::gd()->create($width, $height)->fill('ff0000')->encodeByExtension('jpg');
+        $image = Intervention::create(Intervention::manager('gd'), $width, $height)->fill('ff0000');
+
+        return (string) Intervention::encodeByExtension($image, 'jpg');
     }
 
     private function makeTransparentImage($width, $height)
     {
-        return (string) ImageManager::gd()->create($width, $height)->encodeByExtension('png');
+        $image = Intervention::create(Intervention::manager('gd'), $width, $height);
+
+        return (string) Intervention::encodeByExtension($image, 'png');
     }
 
     private function redChannel($path)
     {
-        $hex = ImageManager::gd()->read(Storage::disk('test')->get($path))->pickColor(5, 5)->toHex();
+        $image = Intervention::decode(Intervention::manager('gd'), Storage::disk('test')->get($path));
+
+        $hex = Intervention::colorAt($image, 5, 5)->toHex();
 
         return hexdec(substr($hex, 0, 2));
     }

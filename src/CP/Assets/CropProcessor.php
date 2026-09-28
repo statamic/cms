@@ -2,7 +2,7 @@
 
 namespace Statamic\CP\Assets;
 
-use Intervention\Image\ImageManager;
+use Statamic\Imaging\Intervention;
 
 /**
  * @internal
@@ -13,7 +13,7 @@ class CropProcessor
     {
         // Bake in EXIF orientation so the crop coordinates, which come from the
         // auto-oriented image the user saw in the browser, line up with the source.
-        $image = $this->manager()->read($contents)->orient();
+        $image = Intervention::decode(Intervention::manager(), $contents)->orient();
 
         $x = max(0, min($x, $image->width() - 1));
         $y = max(0, min($y, $image->height() - 1));
@@ -25,10 +25,10 @@ class CropProcessor
         // JPEG has no alpha channel, so flatten any transparency onto a
         // background colour rather than letting it default to black.
         if (in_array(strtolower($extension), ['jpg', 'jpeg'])) {
-            $image->blendTransparency($background ?? 'ffffff');
+            Intervention::fillTransparentAreas($image, $background ?? 'ffffff');
         }
 
-        return (string) $image->encodeByExtension($extension, quality: $quality ?? self::defaultQuality());
+        return (string) Intervention::encodeByExtension($image, $extension, $quality ?? self::defaultQuality());
     }
 
     public static function defaultQuality(): int
@@ -36,16 +36,5 @@ class CropProcessor
         return config('statamic.assets.image_manipulation.crop_quality')
             ?? config('statamic.assets.image_manipulation.defaults.quality')
             ?? 90;
-    }
-
-    protected function manager(): ImageManager
-    {
-        $driver = config('statamic.assets.image_manipulation.driver', 'gd');
-
-        return match ($driver) {
-            'gd' => ImageManager::gd(),
-            'imagick' => ImageManager::imagick(),
-            default => ImageManager::withDriver($driver),
-        };
     }
 }
