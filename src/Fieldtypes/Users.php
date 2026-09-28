@@ -212,6 +212,7 @@ class Users extends Relationship
 
         $users = $query->get()->map($userFields);
 
+        // The "Current User" option is only offered to the select and typeahead modes, which don't paginate.
         return $this->prependCurrentUserOption($users, $request);
     }
 
@@ -237,6 +238,7 @@ class Users extends Relationship
         return [
             'id' => 'current',
             'title' => __('Current User'),
+            'editable' => false,
         ];
     }
 

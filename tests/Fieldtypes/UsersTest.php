@@ -118,7 +118,7 @@ class UsersTest extends TestCase
 
         $items = $this->fieldtype(['allow_current' => true])->getIndexItems(new Request(['paginate' => false]));
 
-        $this->assertEquals(['id' => 'current', 'title' => 'Current User'], $items->first());
+        $this->assertEquals(['id' => 'current', 'title' => 'Current User', 'editable' => false], $items->first());
     }
 
     #[Test]
@@ -154,7 +154,7 @@ class UsersTest extends TestCase
     {
         $data = $this->fieldtype(['allow_current' => true])->getItemData(['current']);
 
-        $this->assertEquals([['id' => 'current', 'title' => 'Current User']], $data->all());
+        $this->assertEquals([['id' => 'current', 'title' => 'Current User', 'editable' => false]], $data->all());
     }
 
     #[Test]
