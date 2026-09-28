@@ -32,6 +32,43 @@ class ToJsonTest extends TestCase
         $this->assertEquals(json_encode(json_decode($expected, true), JSON_PRETTY_PRINT), $modified);
     }
 
+    #[Test]
+    public function it_hex_encodes_html_sensitive_characters_when_safe(): void
+    {
+        $value = '</script><script>alert(1)</script>';
+        $modified = $this->modify($value, ['safe']);
+
+        $this->assertSame(
+            json_encode($value, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT),
+            $modified,
+        );
+        $this->assertStringNotContainsString('</script>', $modified);
+        $this->assertSame($value, json_decode($modified));
+    }
+
+    #[Test]
+    #[DataProvider('safeParamOrderProvider')]
+    public function it_can_combine_pretty_and_safe(array $params): void
+    {
+        $value = ['html' => '</script>'];
+        $modified = $this->modify($value, $params);
+
+        $this->assertSame(
+            json_encode($value, JSON_PRETTY_PRINT | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT),
+            $modified,
+        );
+        $this->assertStringNotContainsString('</script>', $modified);
+        $this->assertSame($value, json_decode($modified, true));
+    }
+
+    public static function safeParamOrderProvider(): array
+    {
+        return [
+            'pretty then safe' => [['pretty', 'safe']],
+            'safe then pretty' => [['safe', 'pretty']],
+        ];
+    }
+
     private function modify($value, $options = [])
     {
         return Modify::value($value)->toJson($options)->fetch();

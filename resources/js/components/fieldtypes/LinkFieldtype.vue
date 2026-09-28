@@ -5,11 +5,11 @@
             <Select :options v-model="option" :adaptive-width="true" />
         </div>
 
-        <div class="flex-1 flex">
+        <div class="flex min-w-0 flex-1">
             <Input v-if="option === 'url'" :read-only="isReadOnly" v-model="urlValue" />
 
             <component
-                v-else-if="matchedType"
+                v-else-if="matchedType && matchedType.metaLoaded"
                 :is="matchedTypeComponent"
                 ref="typeField"
                 :config="matchedType.config"
@@ -17,21 +17,23 @@
                 :value="selectedByType[option]"
                 :handle="option"
                 @update:value="typeSelected"
-                @update:meta="updateTypeMeta"
+                @update:meta="updateTypeMeta(option, $event)"
             />
+
+            <Icon v-else-if="matchedType" name="loading" class="size-4 self-center" />
         </div>
     </div>
 </template>
 
 <script>
 import Fieldtype from './Fieldtype.vue';
-import { Input, Select } from '@/components/ui';
+import { Icon, Input, Select } from '@/components/ui';
 import debounce from '@/util/debounce.js';
 import { markRaw } from 'vue';
 import { UPDATE_DEBOUNCE_MS } from './constants';
 
 export default {
-    components: { Input, Select },
+    components: { Icon, Input, Select },
     mixins: [Fieldtype],
 
     provide: {
@@ -53,6 +55,8 @@ export default {
             this.update(url);
             this.updateMeta({ ...this.meta, initialUrl: url });
         }, UPDATE_DEBOUNCE_MS));
+
+        if (this.matchedType) this.loadTypeMeta(this.option);
     },
 
     computed: {
@@ -96,9 +100,13 @@ export default {
             } else if (option === 'first-child') {
                 this.update('@child');
             } else if (this.matchedType) {
-                this.typeValue
-                    ? this.update(this.typeValue)
-                    : this.$nextTick(() => this.openTypeSelector());
+                this.loadTypeMeta(option).then(() => {
+                    if (this.option !== option) return;
+
+                    this.typeValue
+                        ? this.update(this.typeValue)
+                        : this.$nextTick(() => this.openTypeSelector());
+                });
             }
 
             this.updateMeta({ ...this.meta, initialOption: option });
@@ -140,6 +148,22 @@ export default {
             );
         },
 
+        loadTypeMeta(handle) {
+            const type = this.meta.types[handle];
+
+            if (!type || type.metaLoaded) return Promise.resolve();
+
+            const params = {
+                config: utf8btoa(JSON.stringify({ ...type.config, handle })),
+                value: this.selectedByType[handle]?.[0] ?? null,
+            };
+
+            return this.$axios
+                .post(cp_url('fields/field-meta'), params)
+                .then((response) => this.updateTypeMeta(handle, response.data.meta))
+                .catch((e) => this.$toast.error(e.response?.data?.message || __('Something went wrong')));
+        },
+
         openTypeSelector() {
             const field = this.$refs.typeField;
 
@@ -161,12 +185,12 @@ export default {
             });
         },
 
-        updateTypeMeta(typeMeta) {
+        updateTypeMeta(handle, typeMeta) {
             this.updateMeta({
                 ...this.meta,
                 types: {
                     ...this.meta.types,
-                    [this.option]: { ...this.meta.types[this.option], meta: typeMeta },
+                    [handle]: { ...this.meta.types[handle], meta: typeMeta, metaLoaded: true },
                 },
             });
         },

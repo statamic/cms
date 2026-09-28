@@ -3,6 +3,7 @@
         <Radio
             v-for="(option, index) in options"
             :disabled="config.disabled"
+            :id="`${id}_${index}`"
             :key="index"
             :label="option.label || option.value"
             :read-only="isReadOnly"

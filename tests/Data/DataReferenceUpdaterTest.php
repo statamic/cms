@@ -4,11 +4,27 @@ namespace Tests\Data;
 
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Assets\AssetReferenceUpdater;
-use Statamic\Facades\Blueprint;
+use Statamic\Facades;
+use Statamic\Fields\Fieldtype;
+use Statamic\Fieldtypes\UpdatesReferences;
+use Statamic\Taxonomies\TermReferenceUpdater;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class DataReferenceUpdaterTest extends TestCase
 {
+    use PreventSavingStacheItemsToDisk;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        ParentRecorderFieldtype::register();
+        ParentRecorderFieldtype::$parents = [];
+
+        tap(Facades\Collection::make('articles'))->save();
+    }
+
     private function makeItem(array $data)
     {
         return new class($data)
@@ -29,7 +45,7 @@ class DataReferenceUpdaterTest extends TestCase
             {
                 $this->blueprintResolved = true;
 
-                return Blueprint::makeFromFields([]);
+                return Facades\Blueprint::makeFromFields([]);
             }
 
             public function save()
@@ -130,5 +146,152 @@ class DataReferenceUpdaterTest extends TestCase
             ->updateReferences('img/hoff.jpg', 'img/new-hoff.jpg');
 
         $this->assertTrue($item->blueprintResolved);
+    }
+
+    #[Test]
+    public function it_traverses_blueprint_when_original_value_cannot_be_json_encoded()
+    {
+        $item = $this->makeItem(['hero' => 'unrelated.jpg']);
+
+        AssetReferenceUpdater::item($item)
+            ->filterByContainer('assets')
+            ->updateReferences("img/\xB1\x31.jpg", 'img/new.jpg');
+
+        $this->assertTrue($item->blueprintResolved);
+    }
+
+    #[Test]
+    public function it_traverses_blueprint_when_original_value_is_nested_within_replicator_and_grid_data()
+    {
+        $item = $this->makeItem([
+            'sets' => [
+                ['type' => 'image', 'grid' => [['hero' => 'img/hoff.jpg']]],
+            ],
+        ]);
+
+        AssetReferenceUpdater::item($item)
+            ->filterByContainer('assets')
+            ->updateReferences('img/hoff.jpg', 'img/new-hoff.jpg');
+
+        $this->assertTrue($item->blueprintResolved);
+    }
+
+    #[Test]
+    public function it_skips_blueprint_traversal_for_terms_when_data_cannot_contain_the_original_value()
+    {
+        $item = $this->makeItem(['tags' => ['other']]);
+
+        $updated = TermReferenceUpdater::item($item)
+            ->filterByTaxonomy('tags')
+            ->updateReferences('rad', 'radical');
+
+        $this->assertFalse($updated);
+        $this->assertFalse($item->blueprintResolved);
+    }
+
+    #[Test]
+    public function it_traverses_blueprint_for_terms_when_data_contains_the_original_value()
+    {
+        $item = $this->makeItem(['tags' => ['rad']]);
+
+        TermReferenceUpdater::item($item)
+            ->filterByTaxonomy('tags')
+            ->updateReferences('rad', 'radical');
+
+        $this->assertTrue($item->blueprintResolved);
+    }
+
+    #[Test]
+    public function it_gives_top_level_fields_the_item_being_updated_as_their_parent()
+    {
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                ['handle' => 'hero', 'field' => ['type' => 'parent_recorder']],
+            ],
+        ]);
+
+        $one = tap(Facades\Entry::make()->collection('articles')->slug('one')->data(['hero' => 'hoff.jpg']))->save();
+        $two = tap(Facades\Entry::make()->collection('articles')->slug('two')->data(['hero' => 'hoff.jpg']))->save();
+
+        $this->updateReferences($one);
+        $this->updateReferences($two);
+
+        $this->assertCount(2, ParentRecorderFieldtype::$parents);
+        $this->assertSame($one, ParentRecorderFieldtype::$parents[0]);
+        $this->assertSame($two, ParentRecorderFieldtype::$parents[1]);
+    }
+
+    #[Test]
+    public function it_gives_nested_fields_the_item_being_updated_as_their_parent()
+    {
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'grid',
+                    'field' => [
+                        'type' => 'grid',
+                        'fields' => [
+                            ['handle' => 'hero', 'field' => ['type' => 'parent_recorder']],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $entry = tap(Facades\Entry::make()->collection('articles')->slug('one')->data([
+            'grid' => [['hero' => 'hoff.jpg']],
+        ]))->save();
+
+        $this->updateReferences($entry);
+
+        $this->assertCount(1, ParentRecorderFieldtype::$parents);
+        $this->assertSame($entry, ParentRecorderFieldtype::$parents[0]);
+    }
+
+    #[Test]
+    public function it_doesnt_leave_the_item_on_the_blueprints_shared_fields()
+    {
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                ['handle' => 'hero', 'field' => ['type' => 'parent_recorder']],
+            ],
+        ]);
+
+        $entry = tap(Facades\Entry::make()->collection('articles')->slug('one')->data(['hero' => 'hoff.jpg']))->save();
+
+        $blueprint = Facades\Collection::find('articles')->entryBlueprint();
+        $blueprint->setParent(null);
+
+        $this->updateReferences($entry);
+
+        $this->assertNull($blueprint->fields()->get('hero')->parent());
+    }
+
+    private function setInBlueprints($namespace, $blueprintContents)
+    {
+        $blueprint = tap(Facades\Blueprint::make('set-in-blueprints')->setContents($blueprintContents))->save();
+
+        Facades\Blueprint::shouldReceive('in')->with($namespace)->andReturn(collect([$blueprint]));
+    }
+
+    private function updateReferences($item)
+    {
+        AssetReferenceUpdater::item($item)
+            ->filterByContainer('test_container')
+            ->updateReferences('hoff.jpg', 'norris.jpg');
+    }
+}
+
+class ParentRecorderFieldtype extends Fieldtype
+{
+    use UpdatesReferences;
+
+    public static $parents = [];
+
+    public function replaceAssetReferences($data, ?string $newValue, string $oldValue, string $container)
+    {
+        static::$parents[] = $this->field->parent();
+
+        return $data;
     }
 }

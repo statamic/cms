@@ -1,7 +1,6 @@
 ---
 name: changelog
 description: Generate a changelog for a release
-disable-model-invocation: true
 ---
 
 Generate a changelog entry for the CHANGELOG.md file by following these steps:
