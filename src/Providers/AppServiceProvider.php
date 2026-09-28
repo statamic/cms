@@ -23,6 +23,7 @@ use Statamic\Facades\Token;
 use Statamic\Facades\User;
 use Statamic\Fields\FieldsetRecursionStack;
 use Statamic\Http\Middleware\PingOutpost;
+use Statamic\Icons\IconManager;
 use Statamic\Jobs\HandleEntrySchedule;
 use Statamic\Licensing\Radio;
 use Statamic\Notifications\ElevatedSessionVerificationCode;
@@ -60,7 +61,10 @@ class AppServiceProvider extends ServiceProvider
             ->pushMiddleware(\Statamic\Http\Middleware\CheckComposerJsonScripts::class)
             ->pushMiddleware(\Statamic\Http\Middleware\CheckMultisite::class)
             ->pushMiddleware(\Statamic\Http\Middleware\StopImpersonating::class)
-            ->pushMiddleware(PingOutpost::class);
+            ->pushMiddleware(PingOutpost::class)
+            // Prepended so the snapshot runs before any middleware that could
+            // throw and render a page (which would register json variables).
+            ->prependMiddleware(\Statamic\Http\Middleware\SnapshotJsonVariables::class);
 
         $this->loadViewsFrom("{$this->root}/resources/views", 'statamic');
 
@@ -115,7 +119,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Request::macro('statamicToken', function () {
-            if ($token = $this->token ?? $this->header('X-Statamic-Token')) {
+            if (($token = $this->token ?? $this->header('X-Statamic-Token')) && is_string($token)) {
                 return Token::find($token);
             }
         });
@@ -164,6 +168,8 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton(Sites::class);
+
+        $this->app->singleton(IconManager::class);
 
         collect([
             \Statamic\Contracts\Entries\EntryRepository::class => \Statamic\Stache\Repositories\EntryRepository::class,
