@@ -187,13 +187,15 @@ test('it can use includes_any or contains_any operators in conditions', () => {
     });
 
     expect(showFieldIf({ cancellation_reasons: 'includes_any sick, other' })).toBe(true);
-    expect(showFieldIf({ cancellation_reasons: 'contains_any sick, other' })).toBe(true);
     expect(showFieldIf({ cancellation_reasons: 'includes_any sick, found another' })).toBe(false);
-    expect(showFieldIf({ cancellation_reasons: 'contains_any sick, found another' })).toBe(false);
+    expect(showFieldIf({ cancellation_reasons: 'contains_any sick, other' })).toBe(true);
+    expect(showFieldIf({ cancellation_reasons: 'contains_any sick, expensive' })).toBe(false);
 
-    expect(showFieldIf({ example_string: 'includes_any parrot, lazy dog' })).toBe(true);
-    expect(showFieldIf({ example_string: 'contains_any parrot, lazy dog' })).toBe(true);
+    expect(
+        showFieldIf({ example_string: 'includes_any parrot, The quick brown fox jumps over the lazy dog' }),
+    ).toBe(true);
     expect(showFieldIf({ example_string: 'includes_any parrot, hops' })).toBe(false);
+    expect(showFieldIf({ example_string: 'contains_any parrot, lazy dog' })).toBe(true);
     expect(showFieldIf({ example_string: 'contains_any parrot, hops' })).toBe(false);
 
     expect(showFieldIf({ age: 'includes_any fox, 13' })).toBe(true);
@@ -266,6 +268,21 @@ test('it only shows when multiple conditions are met', () => {
 
     expect(showFieldIf({ first_name: 'is San', last_name: 'is Holo', age: '!= 20' })).toBe(true);
     expect(showFieldIf({ first_name: 'is San', last_name: 'is Holo', age: '> 40' })).toBe(false);
+});
+
+test('it supports multiple conditions targeting the same field', () => {
+    setValues({
+        status: 'published',
+        audience: 'members',
+        age: 22,
+    });
+
+    expect(Fields.showField({ if_any: { status: ['is archived', 'is published'], audience: 'is guests' } })).toBe(true);
+    expect(Fields.showField({ if_any: { status: ['is archived', 'is draft'], audience: 'is guests' } })).toBe(false);
+    expect(Fields.showField({ if: { age: ['> 18', '< 65'], audience: 'is members' } })).toBe(true);
+    expect(Fields.showField({ if: { age: ['> 18', '< 21'], audience: 'is members' } })).toBe(false);
+    expect(Fields.showField({ unless_any: { status: ['is archived', 'is draft'], audience: 'is guests' } })).toBe(true);
+    expect(Fields.showField({ hide_when_any: { status: ['is archived', 'is published'], audience: 'is guests' } })).toBe(false);
 });
 
 test('it shows or hides with parent key variants', () => {

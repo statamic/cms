@@ -611,7 +611,7 @@ class AssetTest extends TestCase
     #[Test]
     public function it_checks_if_its_a_video_file()
     {
-        $extensions = ['h264', 'mp4', 'm4v', 'ogv', 'webm'];
+        $extensions = ['h264', 'mp4', 'm4v', 'ogv', 'webm', 'mov', 'mpeg', 'mpg', 'mkv'];
 
         foreach ($extensions as $ext) {
             $this->assertTrue((new Asset)->path("path/to/asset.$ext")->isVideo());

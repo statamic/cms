@@ -140,7 +140,9 @@ class StaticWarm extends Command
             'fulfilled' => function (Response $response, $index) use ($urls) {
                 $this->components->twoColumnDetail($this->getRelativeUri($urls->get($index)), '<info>✓ Cached</info>');
             },
-            'rejected' => [$this, 'outputFailureLine'],
+            'rejected' => function ($exception, $index) use ($urls) {
+                $this->outputFailureLineFor($urls->get($index), $exception);
+            },
         ]);
 
         $promise = $pool->promise();
@@ -183,7 +185,12 @@ class StaticWarm extends Command
 
     public function outputFailureLine($exception, $index): void
     {
-        $uri = $this->getRelativeUri($this->uris()->get($index));
+        $this->outputFailureLineFor($this->uris()->get($index), $exception);
+    }
+
+    private function outputFailureLineFor(string $url, $exception): void
+    {
+        $uri = $this->getRelativeUri($url);
 
         if ($exception instanceof RequestException && $exception->hasResponse()) {
             $response = $exception->getResponse();

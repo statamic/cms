@@ -8,9 +8,11 @@ use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Foundation\Http\Middleware\TrimStrings;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
+use Statamic\Console\Processes\Ffmpeg;
 use Statamic\CP\CarbonAsVueComponent;
 use Statamic\Facades;
 use Statamic\Facades\Addon;
@@ -21,6 +23,7 @@ use Statamic\Facades\Token;
 use Statamic\Facades\User;
 use Statamic\Fields\FieldsetRecursionStack;
 use Statamic\Http\Middleware\PingOutpost;
+use Statamic\Icons\IconManager;
 use Statamic\Jobs\HandleEntrySchedule;
 use Statamic\Licensing\Radio;
 use Statamic\Notifications\ElevatedSessionVerificationCode;
@@ -49,12 +52,19 @@ class AppServiceProvider extends ServiceProvider
             $this->loadRoutesFrom("{$this->root}/routes/routes.php");
         });
 
+        if (class_exists(\Laravel\Octane\Events\RequestReceived::class)) {
+            Event::listen(\Laravel\Octane\Events\RequestReceived::class, fn () => Ffmpeg::clearBinaryCache());
+        }
+
         $this->app[\Illuminate\Contracts\Http\Kernel::class]
             ->pushMiddleware(\Statamic\Http\Middleware\PoweredByHeader::class)
             ->pushMiddleware(\Statamic\Http\Middleware\CheckComposerJsonScripts::class)
             ->pushMiddleware(\Statamic\Http\Middleware\CheckMultisite::class)
             ->pushMiddleware(\Statamic\Http\Middleware\StopImpersonating::class)
-            ->pushMiddleware(PingOutpost::class);
+            ->pushMiddleware(PingOutpost::class)
+            // Prepended so the snapshot runs before any middleware that could
+            // throw and render a page (which would register json variables).
+            ->prependMiddleware(\Statamic\Http\Middleware\SnapshotJsonVariables::class);
 
         $this->loadViewsFrom("{$this->root}/resources/views", 'statamic');
 
@@ -109,7 +119,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Request::macro('statamicToken', function () {
-            if ($token = $this->token ?? $this->header('X-Statamic-Token')) {
+            if (($token = $this->token ?? $this->header('X-Statamic-Token')) && is_string($token)) {
                 return Token::find($token);
             }
         });
@@ -158,6 +168,8 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton(Sites::class);
+
+        $this->app->singleton(IconManager::class);
 
         collect([
             \Statamic\Contracts\Entries\EntryRepository::class => \Statamic\Stache\Repositories\EntryRepository::class,
