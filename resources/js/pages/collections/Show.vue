@@ -150,7 +150,6 @@
                         @focus="loadActions"
                         @click="loadActions"
                         placement="left-start"
-                        :modal="false"
                         :class="{ invisible: isRoot }"
                     >
                         <DropdownMenu>
@@ -212,7 +211,7 @@
                     </Dropdown>
                 </ItemActions>
 
-                <Dropdown v-else placement="left-start" :modal="false" :class="{ invisible: isRoot }">
+                <Dropdown v-else placement="left-start" :class="{ invisible: isRoot }">
                     <DropdownMenu>
                         <template v-if="depth < structureMaxDepth">
                             <DropdownLabel :text="__('Create Child Entry')" v-if="blueprints.length > 1" />

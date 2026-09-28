@@ -11,8 +11,6 @@ defineOptions({
 const attrs = useAttrs();
 
 const props = defineProps({
-    /** Whether the dropdown should behave as a modal and hide outside content from assistive tech. */
-    modal: { type: Boolean, default: true },
     /** The preferred alignment against the trigger. May change when collisions occur. <br><br> Options: `start`, `center`, `end` */
     align: { type: String, default: 'start' },
     /** The distance in pixels from the trigger */
@@ -31,7 +29,7 @@ const dropdownContentClasses = cva({
 </script>
 
 <template>
-    <DropdownMenuRoot :modal="modal">
+    <DropdownMenuRoot>
         <DropdownMenuTrigger as-child data-ui-dropdown-trigger>
             <slot name="trigger">
                 <Button icon="dots" variant="ghost" size="sm" v-bind="attrs" :aria-label="__('Open dropdown menu')" />
