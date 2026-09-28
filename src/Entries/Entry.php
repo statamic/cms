@@ -285,6 +285,8 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             EntryDeleted::dispatch($this);
         }
 
+        $withEvents ? $this->deleteRevisions() : $this->deleteRevisionsQuietly();
+
         return true;
     }
 
