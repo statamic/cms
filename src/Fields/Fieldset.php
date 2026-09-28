@@ -101,19 +101,8 @@ class Fieldset implements ContainsQueryableValues
     {
         $contents = $this->contents;
 
-        $contents['fields'] = $contents['fields'] ?? [];
-
-        if ($this->ensuredFields) {
-            $contents = $this->addEnsuredFieldsToContents($contents, $this->ensuredFields);
-        }
-
-        return array_filter($contents);
-    }
-
-    private function addEnsuredFieldsToContents($contents, $ensuredFields)
-    {
-        foreach ($ensuredFields as $field) {
-            $contents = $this->addEnsuredFieldToContents($contents, $field);
+        foreach ($this->ensuredFields as $ensured) {
+            $contents = $this->addEnsuredFieldToContents($contents, $ensured);
         }
 
         return $contents;
@@ -121,72 +110,76 @@ class Fieldset implements ContainsQueryableValues
 
     private function addEnsuredFieldToContents($contents, $ensured)
     {
-        $imported = false;
         $handle = $ensured['handle'];
         $config = $ensured['config'];
-        $prepend = $ensured['prepend'];
+        $usesSections = ! empty($contents['sections']);
 
-        $fields = collect($contents['fields'] ?? [])->keyBy(function ($field) {
-            return (isset($field['import'])) ? 'import:'.($field['prefix'] ?? null).$field['import'] : $field['handle'];
-        });
+        $sections = collect($usesSections ? $contents['sections'] : [['fields' => $contents['fields'] ?? []]])
+            ->map(function ($section) {
+                $section['fields'] = collect($section['fields'] ?? [])->keyBy(function ($field) {
+                    return isset($field['import']) ? 'import:'.($field['prefix'] ?? null).$field['import'] : $field['handle'];
+                });
 
-        $importedFields = $fields->filter(function ($field, $key) {
-            return Str::startsWith($key, 'import:');
-        })->keyBy(function ($field) {
-            return ($field['prefix'] ?? null).$field['import'];
-        })->mapWithKeys(function ($field, $partial) {
-            return (new Fields([$field]))->all()->map(function ($field) use ($partial) {
-                return compact('partial', 'field');
+                return $section;
             });
-        });
 
-        // If a field with that handle is in the contents, its either an inline field or a referenced field...
-        $existingField = $fields->get($handle);
+        $existingSection = $sections->search(fn ($section) => $section['fields']->has($handle));
 
-        if ($exists = $existingField !== null) {
+        if ($existingSection !== false) {
+            $fields = $sections[$existingSection]['fields'];
+            $existingField = $fields->get($handle);
+
             if (is_string($existingField['field'])) {
                 // If it's a string, then it's a reference field. We should merge any ensured config into the 'config'
-                // override array, but only keys that don't already exist in the actual partial field's config.
-                $referencedField = FieldRepository::find($existingField['field']);
-                $referencedFieldConfig = $referencedField->config();
-                $config = array_merge($config, $referencedFieldConfig);
-                $config = Arr::except($config, array_keys($referencedFieldConfig));
-                $field = ['handle' => $handle, 'field' => $existingField['field'], 'config' => $config];
+                // override array, but only keys that don't already exist in the referenced field's config or overrides.
+                $referencedFieldConfig = FieldRepository::find($existingField['field'])->config();
+                $config = array_merge(Arr::except($config, array_keys($referencedFieldConfig)), $existingField['config'] ?? []);
+                $fields->put($handle, ['handle' => $handle, 'field' => $existingField['field'], 'config' => $config]);
             } else {
                 // If it's not a string, then it's an inline field. We'll just merge the
                 // config right into the field key, with the user defined config winning.
-                $config = array_merge($config, $existingField['field']);
-                $field = ['handle' => $handle, 'field' => $config];
+                $fields->put($handle, ['handle' => $handle, 'field' => array_merge($config, $existingField['field'])]);
             }
+        } elseif ($imported = $this->findImportedField($sections, $handle)) {
+            [$sectionIndex, $importKey, $importedField] = $imported;
+            $fields = $sections[$sectionIndex]['fields'];
+            $import = $fields->get($importKey);
+            $config = Arr::except($config, array_keys($importedField->config()));
+            $import['config'][$handle] = array_merge($config, $import['config'][$handle] ?? []);
+            $fields->put($importKey, $import);
         } else {
-            if ($importedField = $importedFields->get($handle)) {
-                $importKey = 'import:'.$importedField['partial'];
-                $field = $fields->get($importKey);
-                $importedConfig = $importedField['field']->config();
-                $config = array_merge($config, $importedConfig);
-                $config = Arr::except($config, array_keys($importedConfig));
-                $field['config'][$handle] = $config;
-                $fields->put($importKey, $field);
-                $imported = true;
-            } else {
-                $field = ['handle' => $handle, 'field' => $config];
-            }
+            $field = ['handle' => $handle, 'field' => $config];
+            $ensured['prepend'] ? $sections[0]['fields']->prepend($field) : $sections[0]['fields']->push($field);
         }
 
-        // Set the field config in it's proper place.
-        if (! $imported) {
-            if ($exists) {
-                $fields->put($handle, $field);
-            } elseif (! $exists && $prepend) {
-                $fields->prepend($field);
-            } else {
-                $fields->push($field);
-            }
-        }
+        $sections = $sections->map(function ($section) {
+            $section['fields'] = $section['fields']->values()->all();
 
-        $contents['fields'] = $fields->values()->all();
+            return $section;
+        })->all();
+
+        if ($usesSections) {
+            $contents['sections'] = $sections;
+        } else {
+            $contents['fields'] = $sections[0]['fields'];
+        }
 
         return $contents;
+    }
+
+    private function findImportedField($sections, $handle)
+    {
+        foreach ($sections as $sectionIndex => $section) {
+            foreach ($section['fields'] as $key => $field) {
+                if (! Str::startsWith($key, 'import:')) {
+                    continue;
+                }
+
+                if ($importedField = (new Fields([$field]))->all()->get($handle)) {
+                    return [$sectionIndex, $key, $importedField];
+                }
+            }
+        }
     }
 
     public function title()
@@ -213,7 +206,7 @@ class Fieldset implements ContainsQueryableValues
 
     public function sections(): IlluminateCollection
     {
-        return collect(Arr::get($this->contents, 'sections', []));
+        return collect(Arr::get($this->contents(), 'sections', []));
     }
 
     public function hasSections(): bool

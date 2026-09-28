@@ -932,4 +932,95 @@ class FieldsetTest extends TestCase
             $this->assertEquals(['textarea', 'text', 'text'], $items->map->type()->values()->all());
         });
     }
+
+    #[Test]
+    public function it_preserves_existing_config_overrides_when_ensuring_a_field_that_already_exists_as_a_reference()
+    {
+        FieldsetRepository::shouldReceive('find')->with('the_partial')->andReturn(
+            (new Fieldset)->setContents(['fields' => [
+                ['handle' => 'the_field', 'field' => ['type' => 'text', 'display' => 'Original']],
+            ]])
+        );
+
+        $fieldset = (new Fieldset)->setContents(['fields' => [
+            ['handle' => 'from_partial', 'field' => 'the_partial.the_field', 'config' => ['display' => 'Overridden', 'foo' => 'existing']],
+        ]]);
+
+        $fieldset->ensureField('from_partial', ['display' => 'Ensured', 'foo' => 'bar', 'baz' => 'qux']);
+
+        $this->assertEquals(['fields' => [
+            ['handle' => 'from_partial', 'field' => 'the_partial.the_field', 'config' => ['display' => 'Overridden', 'foo' => 'existing', 'baz' => 'qux']],
+        ]], $fieldset->contents());
+
+        $this->assertEquals('Overridden', $fieldset->field('from_partial')->display());
+    }
+
+    #[Test]
+    public function it_preserves_existing_config_overrides_when_ensuring_a_field_that_already_exists_inside_an_imported_fieldset()
+    {
+        FieldsetRepository::shouldReceive('find')->with('the_partial')->andReturn(
+            (new Fieldset)->setContents(['fields' => [
+                ['handle' => 'one', 'field' => ['type' => 'text', 'display' => 'Original']],
+            ]])
+        );
+
+        $fieldset = (new Fieldset)->setContents(['fields' => [
+            ['import' => 'the_partial', 'config' => ['one' => ['display' => 'Overridden', 'foo' => 'existing']]],
+        ]]);
+
+        $fieldset->ensureField('one', ['display' => 'Ensured', 'foo' => 'bar', 'baz' => 'qux']);
+
+        $this->assertEquals(['fields' => [
+            ['import' => 'the_partial', 'config' => ['one' => ['display' => 'Overridden', 'foo' => 'existing', 'baz' => 'qux']]],
+        ]], $fieldset->contents());
+
+        $this->assertEquals('Overridden', $fieldset->field('one')->display());
+    }
+
+    #[Test]
+    public function it_ensures_a_field_exists_in_the_first_section()
+    {
+        $fieldset = (new Fieldset)->setContents(['sections' => [
+            ['display' => 'One', 'fields' => [['handle' => 'one', 'field' => ['type' => 'text']]]],
+            ['display' => 'Two', 'fields' => [['handle' => 'two', 'field' => ['type' => 'text']]]],
+        ]]);
+
+        $fieldset->ensureField('appended', ['type' => 'textarea']);
+        $fieldset->ensureFieldPrepended('prepended', ['type' => 'textarea']);
+
+        $this->assertEquals(['sections' => [
+            ['display' => 'One', 'fields' => [
+                ['handle' => 'prepended', 'field' => ['type' => 'textarea']],
+                ['handle' => 'one', 'field' => ['type' => 'text']],
+                ['handle' => 'appended', 'field' => ['type' => 'textarea']],
+            ]],
+            ['display' => 'Two', 'fields' => [['handle' => 'two', 'field' => ['type' => 'text']]]],
+        ]], $fieldset->contents());
+
+        $this->assertEquals(['prepended', 'one', 'appended', 'two'], $fieldset->fields()->all()->keys()->all());
+    }
+
+    #[Test]
+    public function it_ensures_config_on_a_field_in_a_later_section_without_moving_it()
+    {
+        $fieldset = (new Fieldset)->setContents(['sections' => [
+            ['display' => 'One', 'fields' => [['handle' => 'one', 'field' => ['type' => 'text']]]],
+            ['display' => 'Two', 'fields' => [['handle' => 'two', 'field' => ['type' => 'text']]]],
+        ]]);
+
+        $fieldset->ensureFieldHasConfig('two', ['type' => 'textarea', 'foo' => 'bar']);
+
+        $this->assertEquals(['sections' => [
+            ['display' => 'One', 'fields' => [['handle' => 'one', 'field' => ['type' => 'text']]]],
+            ['display' => 'Two', 'fields' => [['handle' => 'two', 'field' => ['type' => 'text', 'foo' => 'bar']]]],
+        ]], $fieldset->contents());
+    }
+
+    #[Test]
+    public function it_does_not_modify_contents_when_no_fields_are_ensured()
+    {
+        $fieldset = (new Fieldset)->setContents(['title' => 'Test']);
+
+        $this->assertEquals(['title' => 'Test', 'fields' => []], $fieldset->contents());
+    }
 }
