@@ -281,11 +281,11 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
         Facades\Entry::delete($this);
 
-        $withEvents ? $this->deleteRevisions() : $this->deleteRevisionsQuietly();
-
         if ($withEvents) {
             EntryDeleted::dispatch($this);
         }
+
+        $withEvents ? $this->deleteRevisions() : $this->deleteRevisionsQuietly();
 
         return true;
     }

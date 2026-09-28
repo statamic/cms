@@ -6,6 +6,7 @@ use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Queue;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\EntryDeleted;
 use Statamic\Events\EntryDeleting;
@@ -18,6 +19,7 @@ use Statamic\Facades\Revision as Revisions;
 use Statamic\Facades\Stache;
 use Statamic\Facades\User;
 use Statamic\Fields\Blueprint;
+use Statamic\Git\CommitJob;
 use Statamic\Revisions\Revision;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -937,6 +939,20 @@ class EntryRevisionsTest extends TestCase
         $this->assertRevisionFilesAreGone($entry, $revisions, $workingCopy);
         Event::assertNotDispatched(EntryDeleted::class);
         Event::assertNotDispatched(RevisionDeleted::class);
+    }
+
+    #[Test]
+    public function it_commits_the_entry_deletion_rather_than_its_revisions()
+    {
+        [$entry] = $this->entryWithRevisions('1');
+
+        config(['statamic.git.enabled' => true, 'statamic.git.automatic' => true]);
+        Queue::fake();
+
+        $entry->delete();
+
+        Queue::assertPushed(CommitJob::class, 1);
+        Queue::assertPushed(CommitJob::class, fn ($job) => $job->message === 'Entry deleted');
     }
 
     #[Test]
