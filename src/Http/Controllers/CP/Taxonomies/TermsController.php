@@ -196,13 +196,14 @@ class TermsController extends CpController
 
         $saved = $term->updateLastModified(User::current())->save();
 
-        [$values] = $this->extractFromFields($term, $term->blueprint());
+        [$values, $meta] = $this->extractFromFields($term, $term->blueprint());
 
         return (new TermResource($term))
             ->additional([
                 'saved' => $saved,
                 'data' => [
                     'values' => $values,
+                    'meta' => $meta,
                 ],
             ]);
     }

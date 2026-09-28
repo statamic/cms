@@ -27,9 +27,6 @@ class NavTest extends TestCase
 
         Route::any('wordpress-importer', ['as' => 'statamic.cp.wordpress-importer.index']);
         Route::any('security-droids', ['as' => 'statamic.cp.security-droids.index']);
-
-        // TODO: Other tests are leaving behind forms without titles that are causing failures here?
-        Facades\Form::shouldReceive('all')->andReturn(collect());
     }
 
     #[Test]

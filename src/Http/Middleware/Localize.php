@@ -40,7 +40,7 @@ class Localize
                 return $date->forHumans();
             }
 
-            return $date->setTimezone(Statamic::displayTimezone())->format(Statamic::dateFormat());
+            return $date->copy()->setTimezone(Statamic::displayTimezone())->format(Statamic::dateFormat());
         });
 
         $response = $next($request);

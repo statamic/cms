@@ -42,4 +42,27 @@ class GlideRoutePrefixTest extends TestCase
             'Glide route prefix should not contain a double slash.'
         );
     }
+
+    #[Test]
+    public function it_registers_the_hybrid_caching_route_once_without_a_site_prefix()
+    {
+        config([
+            'statamic.assets.image_manipulation.cache' => 'hybrid',
+            'statamic.assets.image_manipulation.route' => 'hybrid-img',
+        ]);
+
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => '/en/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => '/fr/'],
+        ]);
+
+        require __DIR__.'/../../routes/glide.php';
+
+        $uris = collect(Route::getRoutes()->getRoutes())
+            ->map->uri()
+            ->filter(fn ($uri) => str_contains($uri, 'hybrid-img'))
+            ->values();
+
+        $this->assertSame(['hybrid-img/{path}'], $uris->all());
+    }
 }

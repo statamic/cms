@@ -17,6 +17,7 @@ class RedirectIfTwoFactorSetupIncomplete
             && ($user = User::fromUser($request->user()))
             && $user->isTwoFactorAuthenticationRequired()
             && ! $user->hasEnabledTwoFactorAuthentication()
+            && ! session()->has('statamic_impersonated_by')
             && ! $this->isSetupUrl($request)
         ) {
             if (empty($user->two_factor_secret)) {

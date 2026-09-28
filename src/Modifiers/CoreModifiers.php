@@ -32,7 +32,6 @@ use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Dumper;
 use Statamic\Support\Html;
-use Statamic\Support\MethodDenylist;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\ChecksDumpability;
 use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
@@ -902,12 +901,6 @@ class CoreModifiers extends Modifier
 
         if (Arr::has($array, $var)) {
             return Arr::get($array, $var);
-        }
-
-        // Finally, try to call a method on the object
-        $method = Str::slug($var);
-        if (method_exists($item, $method) && ! MethodDenylist::blocks($method)) {
-            return $item->$method();
         }
 
         // If after all is said and done, there's still nothing, just show the original value.
@@ -2809,7 +2802,15 @@ class CoreModifiers extends Modifier
      */
     public function toJson($value, $params)
     {
-        $options = Arr::get($params, 0) === 'pretty' ? JSON_PRETTY_PRINT : 0;
+        $options = 0;
+
+        if (in_array('pretty', $params)) {
+            $options |= JSON_PRETTY_PRINT;
+        }
+
+        if (in_array('safe', $params)) {
+            $options |= JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT;
+        }
 
         if (Compare::isQueryBuilder($value)) {
             $value = $value->get();
@@ -3359,7 +3360,7 @@ class CoreModifiers extends Modifier
         }
 
         if (config('statamic.system.localize_dates_in_modifiers')) {
-            $value->setTimezone(Statamic::displayTimezone());
+            $value = $value->copy()->setTimezone(Statamic::displayTimezone());
         }
 
         return $value;

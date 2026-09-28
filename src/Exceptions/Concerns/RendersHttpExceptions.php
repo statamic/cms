@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Inertia\Inertia;
 use Statamic\Exceptions\AuthenticationException;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Cascade;
 use Statamic\Facades\User;
 use Statamic\Http\Middleware\CP\HandleInertiaRequests;
@@ -51,7 +52,7 @@ trait RendersHttpExceptions
 
     protected function contents()
     {
-        Cascade::hydrated(function ($cascade) {
+        Cascade::hydratedOnce(function ($cascade) {
             $cascade->set('response_code', $this->getStatusCode());
         });
 
@@ -96,9 +97,15 @@ trait RendersHttpExceptions
 
         $request = Request::createFrom(request())->fakeStaticCacheStatus($status);
 
-        return $cacher->hasCachedPage($request)
-            ? $cacher->getCachedPage($request)->toResponse($request)
-            : null;
+        if (! $cacher->hasCachedPage($request)) {
+            return null;
+        }
+
+        // The cached error still contains its replacer placeholders. Let the static
+        // caching middleware know it needs to expand them before this is sent out.
+        Blink::put('static-cache.shared-error', true);
+
+        return $cacher->getCachedPage($request)->toResponse($request);
     }
 
     public static function renderUsing(Closure $callback): void
