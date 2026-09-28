@@ -56,12 +56,15 @@ class RelationshipFieldtypeController extends CpController
 
         // The json may include unicode characters, so we'll try to convert it to UTF-8.
         // See https://github.com/statamic/cms/issues/566
-        $utf8 = mb_convert_encoding($json, 'UTF-8', mb_list_encodings());
+        // Fast path: skip encoding detection when already valid UTF-8.
+        if (! mb_check_encoding($json, 'UTF-8')) {
+            $utf8 = mb_convert_encoding($json, 'UTF-8', mb_list_encodings());
 
-        // In PHP 8.1 there's a bug where encoding will return null. It's fixed in 8.1.2.
-        // In this case, we'll fall back to the original JSON, but without the encoding.
-        // Issue #566 may still occur, but it's better than failing completely.
-        $json = empty($utf8) ? $json : $utf8;
+            // In PHP 8.1 there's a bug where encoding will return null. It's fixed in 8.1.2.
+            // In this case, we'll fall back to the original JSON, but without the encoding.
+            // Issue #566 may still occur, but it's better than failing completely.
+            $json = empty($utf8) ? $json : $utf8;
+        }
 
         return json_decode($json, true);
     }

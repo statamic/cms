@@ -30,3 +30,21 @@ test('aria-describedby and the description element share the custom id', () => {
     expect(wrapper.find('[role="checkbox"]').attributes('aria-describedby')).toBe('custom-checkbox-id-description');
     expect(wrapper.find('p').attributes('id')).toBe('custom-checkbox-id-description');
 });
+
+test('the label prop is rendered as the aria-label', () => {
+    const wrapper = mount(Checkbox, {
+        props: { label: 'Subscribe' },
+    });
+
+    expect(wrapper.find('[role="checkbox"]').attributes('aria-label')).toBe('Subscribe');
+});
+
+test('no aria-label is rendered when the label comes from the slot', () => {
+    const wrapper = mount(Checkbox, {
+        props: { value: 'subscribe' },
+        slots: { default: () => 'Subscribe' },
+    });
+
+    expect(wrapper.find('[role="checkbox"]').attributes('aria-label')).toBeUndefined();
+});
+

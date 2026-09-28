@@ -240,6 +240,8 @@ function syncField(path) {
 }
 
 function desyncField(path) {
+    if (!trackingDirtyState.value) return;
+
     addLocalizedField(path);
     dirty();
 }
@@ -370,6 +372,7 @@ onUnmounted(() => {
 defineExpose({
     name: props.name,
     values,
+    meta,
     saving,
     saved,
     revealerFields,

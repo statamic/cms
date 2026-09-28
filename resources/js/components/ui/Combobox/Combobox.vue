@@ -183,7 +183,7 @@ const selectedOptions = computed(() => {
 });
 
 const selectedOption = computed(() => {
-    if (props.multiple || !props.modelValue || selectedOptions.value.length !== 1) {
+    if (props.multiple || props.modelValue === null || selectedOptions.value.length !== 1) {
         return null;
     }
 
@@ -212,7 +212,7 @@ const limitIndicatorColor = computed(() => {
     return 'text-gray';
 });
 
-const canClearSelection = computed(() => props.clearable && props.modelValue);
+const canClearSelection = computed(() => props.clearable && props.modelValue !== null);
 const shouldCloseOnSelect = computed(() => props.closeOnSelect ?? !props.multiple);
 const shouldShowOptionsChevron = computed(() => props.options.length > 0 || props.ignoreFilter);
 const shouldShowLimitIndicator = computed(() => props.multiple && props.maxSelections && props.maxSelections !== Infinity);
@@ -221,8 +221,14 @@ const shouldShowInput = computed(() => {
     if (!props.searchable) return false;
     if (props.taggable) return true;
 
-    return dropdownOpen.value || !props.modelValue || (props.multiple && props.placeholder);
+    return dropdownOpen.value || props.modelValue === null || (props.multiple && props.placeholder);
 });
+
+// The search input is the combobox whenever it's rendered, so the trigger wrapping it has to give up
+// the role, the tab stop and the popup attributes that reka-ui puts on every trigger.
+const triggerAttrs = computed(() => shouldShowInput.value
+    ? { 'aria-label': undefined, 'aria-haspopup': undefined, 'aria-expanded': undefined }
+    : { role: 'combobox', tabindex: props.disabled || props.readOnly ? -1 : 0 });
 
 const placeholder = computed(() => {
     if (props.multiple && selectedOptions.value.length > 0) {
@@ -289,7 +295,7 @@ function deselect(option) {
 }
 
 function updateModelValue(value) {
-    let originalValue = props.modelValue || [];
+    let originalValue = props.modelValue === null ? [] : props.modelValue;
 
     searchQuery.value = '';
     emit('update:modelValue', value);
@@ -385,7 +391,7 @@ function pushTaggableOption(e) {
 }
 
 function scrollToSelectedOption() {
-    if (props.multiple || !props.modelValue) return;
+    if (props.multiple || props.modelValue === null) return;
 
     rootRef.value?.highlightSelected?.();
 }
@@ -431,7 +437,7 @@ defineExpose({
                     <ComboboxTrigger
                         as="div"
                         ref="trigger"
-                        :tabindex="disabled || readOnly || shouldShowInput ? -1 : 0"
+                        v-bind="triggerAttrs"
                         :class="triggerClasses"
                         data-ui-combobox-trigger
                         @keydown.enter="openDropdown"
@@ -462,8 +468,8 @@ defineExpose({
                                 data-ui-combobox-selected-option
                             >
                                 <slot v-if="selectedOption" name="selected-option" v-bind="{ option: selectedOption }">
-                                    <div v-if="icon" class="size-4">
-                                        <Icon :name="icon" class="text-gray-900 dark:text-white dark:opacity-50" />
+                                    <div v-if="selectedOption.icon || icon" class="size-4">
+                                        <Icon :name="selectedOption.icon ?? icon" class="text-gray-900 dark:text-white dark:opacity-50" />
                                     </div>
                                     <span v-if="labelHtml" v-html="getOptionLabel(selectedOption)" class="block truncate" />
                                     <span v-else v-text="getOptionLabel(selectedOption)" class="block truncate" />
@@ -555,6 +561,7 @@ defineExpose({
                                                 <span v-if="option.create" class="truncate">{{ __('Add ":value"', { value: getOptionLabel(option) }) }}</span>
                                                 <template v-else>
                                                     <img v-if="option.image" :src="option.image" class="size-5 rounded-full" :alt="getOptionLabel(option)">
+                                                    <Icon v-else-if="option.icon" :name="option.icon" />
                                                     <span v-if="labelHtml" class="truncate" v-html="getOptionLabel(option)" />
                                                     <span class="truncate" v-else>{{ __(getOptionLabel(option)) }}</span>
                                                 </template>
@@ -599,6 +606,7 @@ defineExpose({
                         class="sortable-item mt-2 cursor-grab active:cursor-grabbing"
                     >
                         <Badge pill size="lg" class="[&>*]:st-text-trim-ex-alphabetic">
+                            <Icon v-if="option.icon" :name="option.icon" />
                             <div v-if="labelHtml" v-html="getOptionLabel(option)"></div>
                             <div v-else>{{ __(getOptionLabel(option)) }}</div>
 

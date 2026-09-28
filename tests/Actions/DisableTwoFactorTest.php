@@ -51,6 +51,14 @@ class DisableTwoFactorTest extends TestCase
     }
 
     #[Test]
+    public function its_visible_for_users_with_incomplete_two_factor_setup()
+    {
+        $userWithIncompleteSetup = User::make()->set('two_factor_secret', 'secret');
+
+        $this->assertTrue((new Action)->visibleTo($userWithIncompleteSetup));
+    }
+
+    #[Test]
     public function it_does_not_disable_two_factor_if_current_user_doesnt_have_permission()
     {
         $this->setTestRoles([

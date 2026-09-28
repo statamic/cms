@@ -17,6 +17,7 @@
             @paste.stop
             @cut.stop
             @dragstart="preventNodeSelectionDrag"
+            @mousedown="preventFormControlNodeSelection"
         >
             <div ref="content" hidden />
             <header
@@ -351,6 +352,12 @@ export default {
         disableDragging() {
             this.$el.setAttribute('draggable', false);
             this._draggableObserver?.observe(this.$el, { attributes: true, attributeFilter: ['draggable'] });
+        },
+
+        preventFormControlNodeSelection(event) {
+            const target = event.target instanceof Element ? event.target : event.target.parentElement;
+
+            if (target?.closest('[data-ui-combobox], [data-ui-input], [data-interactive]')) event.stopPropagation();
         },
 
         preventNodeSelectionDrag(event) {

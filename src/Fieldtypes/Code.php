@@ -149,6 +149,12 @@ class Code extends Fieldtype
                         'add_button' => __('Add Ruler'),
                         'width' => '50',
                     ],
+                    'placeholder' => [
+                        'display' => __('Placeholder'),
+                        'instructions' => __('statamic::fieldtypes.text.config.placeholder'),
+                        'type' => 'textarea',
+                        'width' => '100',
+                    ],
                 ],
             ],
         ];

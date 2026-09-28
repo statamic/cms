@@ -106,8 +106,13 @@ class AugmentedEntry extends AbstractAugmented
 
     public function date()
     {
-        return $this->data->collection()->dated()
-            ? $this->data->date()
-            : $this->wrapValue($this->getFromData('date'), 'date');
+        if (! $this->data->collection()->dated()) {
+            return $this->wrapValue($this->getFromData('date'), 'date');
+        }
+
+        // Return a copy, not the entry's live `date` instance. Carbon is mutable, and this
+        // value gets augmented (and potentially mutated by modifiers, e.g. via `title_format`)
+        // before the entry is saved, which would otherwise corrupt the entry's actual date.
+        return optional($this->data->date())->copy();
     }
 }

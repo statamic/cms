@@ -252,9 +252,7 @@ export default {
                 return this.selectMeta(selection);
             }
 
-            const field = this.createField(selection.value);
-
-            this.$emit('selected', field);
+            this.$emit('selected', this.createField(selection.value));
             this.close();
         },
 
@@ -265,19 +263,21 @@ export default {
                 fieldtype = 'text';
             }
 
-            let field = this.createField(fieldtype);
+            const { config, icon } = this.createField(fieldtype);
 
-            field = Object.assign(
-                {
-                    display: __(`cp.${selection.value}`),
-                    handle: selection.value,
-                    type: fieldtype,
-                    isMeta: true,
-                },
-                field,
-            );
+            this.$emit('selected', {
+                icon,
+                config: Object.assign(
+                    {
+                        display: __(`cp.${selection.value}`),
+                        handle: selection.value,
+                        type: fieldtype,
+                        isMeta: true,
+                    },
+                    config,
+                ),
+            });
 
-            this.$emit('selected', field);
             this.close();
         },
 
@@ -291,7 +291,6 @@ export default {
                 type: fieldtype.handle,
                 display: __(':title Field', { title: fieldtype.title }),
                 handle: null, // The handle will be generated from the display by the "slug" fieldtype.
-                icon: fieldtype.icon,
                 instructions: null,
                 localizable: false,
                 width: 100,
@@ -307,8 +306,15 @@ export default {
                 defaults[configField.handle] = configField.default || null;
             });
 
-            // Smoosh the field together with the defaults.
-            return Object.assign(defaults, field);
+            // The icon is kept alongside the config rather than inside it. It belongs to the
+            // fieldtype, not the field, and would otherwise clobber the default value of a
+            // config field that happens to be handled "icon".
+            return {
+                icon: fieldtype.icon,
+
+                // Smoosh the field together with the defaults.
+                config: Object.assign(defaults, field),
+            };
         },
 
         close() {

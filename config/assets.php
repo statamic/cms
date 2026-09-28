@@ -46,9 +46,16 @@ return [
         | Save Cached Images
         |--------------------------------------------------------------------------
         |
-        | Enabling this will make Glide save publicly accessible images. It will
-        | increase performance at the cost of the dynamic nature of HTTP based
-        | image manipulation. You will need to invalidate images manually.
+        | This controls how manipulated images are cached and served.
+        |
+        | false  - Images are generated on each HTTP request via Glide routes.
+        | true   - Images are eagerly generated during template rendering and
+        |          saved to a publicly accessible location.
+        | 'hybrid' - Images are generated on-demand on the first HTTP request,
+        |          then saved to a publicly accessible location so the web
+        |          server can serve them directly on subsequent requests.
+        |
+        | When using true or 'hybrid', you should configure the cache_path below.
         |
         */
 
@@ -148,8 +155,9 @@ return [
     | Control Panel Video Thumbnails
     |--------------------------------------------------------------------------
     |
-    | When enabled, Statamic will generate thumbnails for videos.
-    | Generated thumbnails are displayed in the Control Panel.
+    | When enabled, Statamic will generate thumbnails for videos when FFmpeg
+    | is available. Generated thumbnails are displayed in the Control Panel.
+    | Without FFmpeg, videos fall back to a filetype icon.
     |
     */
 
@@ -272,6 +280,7 @@ return [
     |
     | Statamic uses FFmpeg to extract thumbnails from videos to be shown in the
     | Control Panel. You may adjust the binary location and cache path here.
+    | The configured binary must exist and be executable.
     |
     */
 
