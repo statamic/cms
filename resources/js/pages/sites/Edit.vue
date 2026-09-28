@@ -67,7 +67,7 @@ onUnmounted(() => saveKeyBinding.destroy());
 <template>
     <Head :title="__('Configure Sites')" />
 
-    <div class="max-w-5xl mx-auto">
+    <div class="max-w-page mx-auto">
         <Header :title="pageTitle" icon="site">
             <CommandPaletteItem
                 :category="$commandPalette.category.Actions"

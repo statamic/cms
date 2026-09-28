@@ -85,8 +85,8 @@ return [
     | Date Format
     |--------------------------------------------------------------------------
     |
-    | Whenever a Carbon date is cast to a string on front-end routes, it will
-    | use this format. On CP routes, the format defined in cp.php is used.
+    | This format will be used whenever a Carbon date is cast to a string on
+    | front-end routes. It doesn't affect how dates are formatted in the CP.
     | You can customize this format using PHP's date string constants.
     | Setting this value to null will use Carbon's default format.
     |
@@ -149,6 +149,19 @@ return [
     */
 
     'track_last_update' => true,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Handle Scheduled Entries
+    |--------------------------------------------------------------------------
+    |
+    | Process entries that have reached their scheduled publish date.
+    | Disabling this may cause the static cache and search indexes to fall
+    | out of sync.
+    |
+    */
+
+    'handle_scheduled_entries' => env('STATAMIC_HANDLE_SCHEDULED_ENTRIES', true),
 
     /*
     |--------------------------------------------------------------------------
@@ -268,5 +281,49 @@ return [
     */
 
     'layout' => env('STATAMIC_LAYOUT', 'layout'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Blueprint Templates
+    |--------------------------------------------------------------------------
+    |
+    | When an entry's template is set to `@blueprint`, Statamic will look for
+    | a view named `{collection}.{blueprint}`. You may override this logic
+    | on a per-collection basis here.
+    |
+    | https://statamic.dev/content-modeling/collections#templates
+    |
+    */
+
+    'blueprint_templates' => [
+        //
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | File Uploads Disk
+    |--------------------------------------------------------------------------
+    |
+    | Temporary file uploads are stored here before being moved to their
+    | final destination. You may configure this to use a shared filesystem
+    | in multiserver environments. This disk may be shared by other kinds
+    | of temporary file uploads (e.g. forms) that use their own path below.
+    |
+    */
+
+    'file_uploads_disk' => env('STATAMIC_FILE_UPLOADS_DISK', 'local'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | File Uploads Path
+    |--------------------------------------------------------------------------
+    |
+    | The path (on the file uploads disk above) where temporary file uploads
+    | from the Files fieldtype are stored before being moved to their final
+    | destination. These files are automatically cleaned up over time.
+    |
+    */
+
+    'file_uploads_path' => env('STATAMIC_FILE_UPLOADS_PATH', 'statamic/file-uploads'),
 
 ];

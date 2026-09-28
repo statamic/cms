@@ -15,6 +15,7 @@ class UpdatesOverview
 
     protected $count;
     protected $statamic;
+    protected $security;
     protected $addons;
 
     /**
@@ -45,6 +46,29 @@ class UpdatesOverview
     public function updatableAddons()
     {
         return $this->getCached('updates-overview.addons');
+    }
+
+    /**
+     * Check if a security update is available (Statamic or any addon).
+     *
+     * @return bool
+     */
+    public function hasSecurityUpdate()
+    {
+        return $this->getCached('updates-overview.security');
+    }
+
+    /**
+     * Get badge data (count and whether there is a security update).
+     *
+     * @return array{count: int, security: bool}
+     */
+    public function badge()
+    {
+        return [
+            'count' => $this->count(),
+            'security' => $this->hasSecurityUpdate(),
+        ];
     }
 
     /**
@@ -83,6 +107,7 @@ class UpdatesOverview
     {
         $this->count = 0;
         $this->statamic = false;
+        $this->security = false;
         $this->addons = [];
 
         return $this;
@@ -106,6 +131,10 @@ class UpdatesOverview
             $this->count++;
         }
 
+        if ($this->statamic && Marketplace::statamic()->changelog()->hasSecurityUpdate()) {
+            $this->security = true;
+        }
+
         return $this;
     }
 
@@ -116,11 +145,17 @@ class UpdatesOverview
      */
     protected function checkForAddonUpdates()
     {
-        $this->addons = Addon::all()
-            ->reject->isLatestVersion()
-            ->map->id()
-            ->values()
-            ->all();
+        $updatableAddons = Addon::all()->reject->isLatestVersion();
+
+        foreach ($updatableAddons as $addon) {
+            if ($addon->changelog()->hasSecurityUpdate()) {
+                $this->security = true;
+                break;
+            }
+        }
+
+        $this->addons = $updatableAddons->map->id()->values()->all();
+        $this->count += count($this->addons);
 
         return $this;
     }
@@ -136,6 +171,7 @@ class UpdatesOverview
 
         Cache::put('updates-overview.count', $this->count, $expiry);
         Cache::put('updates-overview.statamic', $this->statamic, $expiry);
+        Cache::put('updates-overview.security', $this->security, $expiry);
         Cache::put('updates-overview.addons', $this->addons, $expiry);
 
         return $this;

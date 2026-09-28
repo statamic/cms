@@ -19,6 +19,7 @@
                     <DropdownMenu>
                         <DropdownItem :text="__('Edit Blueprint')" icon="blueprint-edit" v-if="canEditBlueprint" :href="actions.editBlueprint" />
                         <DropdownItem :text="__('Passkeys')" icon="key" :href="cp_url('passkeys')" />
+                        <DropdownItem v-if="oauthEnabled" :text="__('Sign-in Providers')" icon="sign-in" :href="cp_url('oauth')" />
                         <DropdownSeparator v-if="canEditBlueprint && itemActions.length" />
                         <DropdownItem
                             v-for="action in itemActions"
@@ -120,6 +121,7 @@ export default {
         method: String,
         canEditPassword: Boolean,
         canEditBlueprint: Boolean,
+        oauthEnabled: Boolean,
         requiresCurrentPassword: Boolean,
         twoFactor: Object,
     },
@@ -185,6 +187,12 @@ export default {
                     this.title = response.data.title;
 
                     this.$nextTick(() => this.$emit('saved', response));
+                })
+                .catch((e) => {
+                    if (!(e instanceof PipelineStopped)) {
+                        this.$toast.error(__('Something went wrong'));
+                        console.error(e);
+                    }
                 });
         },
 

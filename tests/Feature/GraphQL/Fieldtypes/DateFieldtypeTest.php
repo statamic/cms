@@ -19,7 +19,6 @@ class DateFieldtypeTest extends FieldtypeTestCase
             $reflection = new ReflectionClass(self::this());
 
             $factory = $reflection->getMethod('getFactory');
-            $factory->setAccessible(true);
 
             return Arr::get($factory->invoke(self::this())->getSettings(), 'toStringFormat');
         });

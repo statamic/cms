@@ -32,7 +32,7 @@
 </template>
 
 <script>
-import uniqid from 'uniqid';
+import { nanoid as uniqid } from 'nanoid';
 import { PublishContainer, PublishFieldsProvider as FieldsProvider, PublishFields } from '@/components/ui';
 
 export default {

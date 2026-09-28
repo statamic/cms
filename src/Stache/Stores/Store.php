@@ -9,7 +9,6 @@ use Statamic\Facades\Stache;
 use Statamic\Stache\Exceptions\DuplicateKeyException;
 use Statamic\Stache\Indexes;
 use Statamic\Stache\Indexes\Index;
-use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
@@ -28,6 +27,15 @@ abstract class Store
     protected $modified;
     protected $keys;
 
+    /**
+     * @return string
+     */
+    abstract public function key();
+
+    /**
+     * @param  string|null  $directory
+     * @return ($directory is null ? string : static)
+     */
     public function directory($directory = null)
     {
         if (func_num_args() === 0) {
@@ -290,7 +298,7 @@ abstract class Store
     {
         $this->handleFileChanges();
 
-        if ($this->paths && ! Statamic::isWorker()) {
+        if ($this->paths) {
             return $this->paths;
         }
 
@@ -318,6 +326,8 @@ abstract class Store
 
             return $isDuplicate ?? false;
         });
+
+        $items->each(fn ($item) => $this->cacheItem($item['item']));
 
         $paths = $items->pluck('path', 'key');
 
@@ -365,6 +375,11 @@ abstract class Store
     {
         $this->paths = null;
         Stache::cacheStore()->forget($this->pathsCacheKey());
+    }
+
+    public function resetMemoizedState()
+    {
+        $this->paths = null;
     }
 
     protected function pathsCacheKey()

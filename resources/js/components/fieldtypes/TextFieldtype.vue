@@ -14,7 +14,7 @@
         :placeholder="__(config.placeholder)"
         :name="name"
         :id="id"
-        :direction="config.direction"
+        :input-attrs="{ dir: contentDirection }"
         @update:model-value="inputUpdated"
         @focus="$emit('focus')"
         @blur="$emit('blur')"
@@ -25,6 +25,7 @@
 import Fieldtype from '@/components/fieldtypes/fieldtype.js';
 import { Input } from '@/components/ui';
 import { computed } from 'vue';
+import { useContentDirection } from '@/composables/content-direction';
 
 const emit = defineEmits(Fieldtype.emits);
 const props = defineProps(Fieldtype.props);
@@ -36,12 +37,17 @@ const {
     expose
 } = Fieldtype.use(emit, props);
 
-const shouldFocus = computed(() => {
-    if (props.config.focus === false) {
-        return false;
-    }
+const { direction: contentDirection } = useContentDirection();
 
-    return props.config.focus || name.value === 'title' || name.value === 'alt';
+const shouldFocus = computed(() => {
+    if (props.config.focus === false || props.config.focus === true) {
+        return props.config.focus;
+    }
+    
+    const isRootField = !props.fieldPathPrefix;
+    const isImplicitAutofocusField = name.value === 'title' || name.value === 'alt';
+
+    return isRootField && isImplicitAutofocusField;
 });
 
 function inputUpdated(value) {

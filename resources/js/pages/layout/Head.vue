@@ -10,11 +10,11 @@ const props = defineProps<{
 const { cmsName } = useStatamicPageProps();
 
 const title = computed(() => {
-    let title = props.title;
-    if (typeof title === 'string') title = [title];
-    title.push(cmsName);
+    let parts = props.title;
+    if (typeof parts === 'string') parts = [parts];
+    parts = [...parts, cmsName];
     const divider = Statamic.$config.get('direction') === 'ltr' ? '‹' : '›';
-    return title.join(` ${divider} `);
+    return parts.join(` ${divider} `);
 });
 </script>
 

@@ -8,12 +8,14 @@ use Statamic\Fields\Fieldtype;
 use Statamic\Query\Scopes\Filters\Fields\Markdown as MarkdownFilter;
 use Statamic\Support\Html;
 
+use function Statamic\trans as __;
+
 class Markdown extends Fieldtype
 {
+    use Concerns\ResolvesStatamicUrls, UpdatesReferences;
+
     protected $categories = ['text'];
     protected $keywords = ['md', 'content', 'html'];
-
-    use Concerns\ResolvesStatamicUrls;
 
     protected function configFieldItems(): array
     {
@@ -116,6 +118,13 @@ class Markdown extends Fieldtype
                         'instructions' => __('statamic::fieldtypes.markdown.config.table_of_contents'),
                         'type' => 'toggle',
                         'default' => false,
+                        'width' => 50,
+                    ],
+                    'fullscreen' => [
+                        'display' => __('Allow Fullscreen Mode'),
+                        'instructions' => __('statamic::fieldtypes.grid.config.fullscreen'),
+                        'type' => 'toggle',
+                        'default' => true,
                         'width' => 50,
                     ],
                     'default' => [
@@ -243,5 +252,18 @@ class Markdown extends Fieldtype
     public function shouldParseAntlersFromRawString(): bool
     {
         return $this->config('smartypants', false);
+    }
+
+    public function replaceAssetReferences($data, ?string $newValue, string $oldValue, string $container)
+    {
+        if ($this->config('container') !== $container) {
+            return $data;
+        }
+
+        if (! is_string($data) || ! $data) {
+            return $data;
+        }
+
+        return $this->replaceStatamicUrls($data, $newValue, $oldValue);
     }
 }

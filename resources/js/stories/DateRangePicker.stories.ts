@@ -1,6 +1,6 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
 import {ref} from 'vue';
-import {DateRangePicker} from '@ui';
+import {DateRangePicker} from '@statamic/cms/ui';
 import {parseDate} from '@internationalized/date';
 
 const meta = {
@@ -12,10 +12,10 @@ const meta = {
             options: ['day', 'hour', 'minute', 'second'],
         },
         'update:modelValue': {
-            description: 'Event handler called when the date range value changes. <br><br> Returns an object with `start` and `end` properties, each as an ISO 8601 date and time string.',
+            description: 'Event handler called when the date range value changes. <br><br> Returns a [`DateRange` object](https://reka-ui.com/docs/guides/dates).',
             table: {
                 category: 'events',
-                type: { summary: '(value: { start: string, end: string }) => void' }
+                type: { summary: '(value: DateRange) => void' }
             }
         }
     },
@@ -24,38 +24,22 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const defaultCode = `
-<DateRangePicker v-model="dateRange" />
-`;
-
 export const _DocsIntro: Story = {
     tags: ['!dev'],
-    parameters: {
-        docs: {
-            source: { code: defaultCode }
-        }
-    },
     render: () => ({
         components: { DateRangePicker },
         setup() {
             const dateRange = ref(null);
             return { dateRange };
         },
-        template: defaultCode,
+        template: `
+            <DateRangePicker v-model="dateRange" />
+        `,
     }),
 };
 
-const minMaxCode = `
-<DateRangePicker v-model="vacation" :min="minDate" :max="maxDate" />
-`;
-
 export const _MinMax: Story = {
     tags: ['!dev'],
-    parameters: {
-        docs: {
-            source: { code: minMaxCode }
-        }
-    },
     render: () => ({
         components: { DateRangePicker },
         setup() {
@@ -67,27 +51,22 @@ export const _MinMax: Story = {
             const maxDate = parseDate(futureDate.toISOString().split('T')[0]);
             return { vacation, minDate, maxDate };
         },
-        template: minMaxCode,
+        template: `
+            <DateRangePicker v-model="vacation" :min="minDate" :max="maxDate" />
+        `,
     }),
 };
 
-const inlineCode = `
-<DateRangePicker v-model="range" inline />
-`;
-
 export const _Inline: Story = {
     tags: ['!dev'],
-    parameters: {
-        docs: {
-            source: { code: inlineCode }
-        }
-    },
     render: () => ({
         components: { DateRangePicker },
         setup() {
             const range = ref(null);
             return { range };
         },
-        template: inlineCode,
+        template: `
+            <DateRangePicker v-model="range" inline />
+        `,
     }),
 };

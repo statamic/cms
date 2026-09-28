@@ -28,10 +28,10 @@ function handleDelete() {
 </script>
 
 <template>
-    <div>
-        <Head :title="group.title" />
+    <div class="max-w-5xl 3xl:max-w-6xl mx-auto" data-max-width-wrapper>
+        <Head :title="__(group.title)" />
 
-        <Header :title="group.title" icon="groups">
+        <Header :title="__(group.title)" icon="groups">
             <template #actions>
                 <Dropdown v-if="group.canEdit || group.canDelete">
                     <template #trigger>
@@ -75,7 +75,7 @@ function handleDelete() {
             ref="deleter"
             :resource-title="group.title"
             :route="group.deleteUrl"
-            redirect="/cp/user-groups"
+            :redirect="cp_url('user-groups')"
         />
     </div>
 </template>

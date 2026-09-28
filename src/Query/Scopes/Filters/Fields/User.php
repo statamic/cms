@@ -5,6 +5,8 @@ namespace Statamic\Query\Scopes\Filters\Fields;
 use Statamic\Facades\User as Users;
 use Statamic\Support\Arr;
 
+use function Statamic\trans as __;
+
 class User extends FieldtypeFilter
 {
     public function fieldItems()
@@ -68,7 +70,8 @@ class User extends FieldtypeFilter
             return null;
         }
 
-        $user = Users::find($user)->name();
+        $user = Users::find($user);
+        $user = $user->name() ?? $user->email();
 
         return $field.' '.strtolower($translatedOperator).' '.$user;
     }

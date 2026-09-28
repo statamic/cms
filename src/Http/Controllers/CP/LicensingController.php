@@ -5,6 +5,8 @@ namespace Statamic\Http\Controllers\CP;
 use Inertia\Inertia;
 use Statamic\Licensing\LicenseManager as Licenses;
 
+use function Statamic\trans as __;
+
 class LicensingController extends CpController
 {
     public function show(Licenses $licenses)

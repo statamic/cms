@@ -38,20 +38,24 @@ class UpdateGlobalVariables extends UpdateScript
      */
     private function buildSitesArray(): void
     {
-        GlobalSet::all()->each(function ($globalSet) {
+        $siteOrder = Site::all()->keys()->flip();
+
+        GlobalSet::all()->each(function ($globalSet) use ($siteOrder) {
             $variables = GlobalVariables::whereSet($globalSet->handle());
 
-            $sites = $variables->mapWithKeys(function ($variable) {
-                $contents = YAML::file($variable->path())->parse();
-                $origin = Arr::get($contents, 'origin');
+            $sites = $variables
+                ->sortBy(fn ($variable) => $siteOrder->get($variable->locale(), $siteOrder->count()))
+                ->mapWithKeys(function ($variable) {
+                    $contents = YAML::file($variable->path())->parse();
+                    $origin = Arr::get($contents, 'origin');
 
-                return [$variable->locale() => $origin];
-            });
+                    return [$variable->locale() => $origin];
+                });
 
             $globalSet->sites($sites)->save();
 
             $variables->each(function ($variable) {
-                $data = YAML::file($variable->path())->parse();
+                $data = YAML::file($variable->path())->parse() ?? [];
 
                 File::put($variable->path(), YAML::dump(Arr::except($data, 'origin')));
             });
@@ -72,11 +76,11 @@ class UpdateGlobalVariables extends UpdateScript
             }
 
             $contents = YAML::file($globalSet->path())->parse();
-            $data = Arr::get($contents, 'data', []);
+            $data = Arr::get($contents, 'data') ?? [];
 
             $globalSet->save();
 
-            File::put($variablesPath, YAML::dump($data));
+            $globalSet->inDefaultSite()->data($data)->saveQuietly();
         });
     }
 }

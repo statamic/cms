@@ -18,6 +18,11 @@ class CsrfTokenReplacer implements Replacer
         $this->replaceInResponse($response);
 
         $this->modifyFullMeasureResponse($response);
+
+        if (app(Cacher::class) instanceof FileCacher) {
+            $this->replaceInResponse($initial);
+            $this->modifyFullMeasureResponse($initial);
+        }
     }
 
     public function replaceInCachedResponse(Response $response)
@@ -76,9 +81,7 @@ class CsrfTokenReplacer implements Replacer
             Str::position($contents, '</head>'),
         ])->filter()->min();
 
-        $js = "<script>{$cacher->getCsrfTokenJs()}</script>";
-
-        $contents = Str::substrReplace($contents, $js, $insertBefore, 0);
+        $contents = Str::substrReplace($contents, $cacher->getCsrfScript(), $insertBefore, 0);
 
         $response->setContent($contents);
     }

@@ -129,6 +129,8 @@ class RouteBindingTest extends TestCase
     ) {
         $this->setupContent();
 
+        $this->actingAs(tap(Facades\User::make()->makeSuper())->save());
+
         $response = $this->get($uri);
 
         if ($expectationCallback) {
@@ -147,6 +149,8 @@ class RouteBindingTest extends TestCase
         $expectationCallback = null
     ) {
         $this->setupContent();
+
+        $this->actingAs(tap(Facades\User::make()->makeSuper())->save());
 
         $response = $this->get($uri);
 
@@ -207,9 +211,7 @@ class RouteBindingTest extends TestCase
         Facades\Revision::shouldReceive('whereKey')->with('collections/blog/en/123')->andReturn(collect(['timestamp1' => $entryRevision]));
 
         Facades\Taxonomy::make('tags')->title('Product Tags')->save();
-        $term = tap(Facades\Term::make()->taxonomy('tags')->inDefaultLocale()->slug('bravo')->data([]))->save();
-        $termRevision = \Mockery::mock(Revision::class)->shouldReceive('id')->andReturn('2')->getMock();
-        Facades\Revision::shouldReceive('whereKey')->with('taxonomies/tags/en/bravo')->andReturn(collect(['timestamp2' => $termRevision]));
+        Facades\Term::make()->taxonomy('tags')->inDefaultLocale()->slug('bravo')->data([])->save();
 
         Facades\AssetContainer::make('files')->disk('files')->title('The Files')->save();
         Storage::fake('files');
@@ -454,17 +456,6 @@ class RouteBindingTest extends TestCase
 
             'cp entry missing revision' => [
                 'cp/custom/entries/blog/123/revisions/invalid',
-            ],
-
-            'cp term revision' => [
-                'cp/custom/terms/tags/bravo/revisions/timestamp2',
-                function (Taxonomy $taxonomy, Term $term, Revision $revision) {
-                    return $taxonomy->handle() === 'tags' && $term->id() === 'tags::bravo' && $revision->id() === '2';
-                },
-            ],
-
-            'cp term missing revision' => [
-                'cp/custom/terms/tags/bravo/revisions/invalid',
             ],
 
             'cp invalid content revision' => [
@@ -848,24 +839,6 @@ class RouteBindingTest extends TestCase
                 null,
                 function (string $collection, string $entry, string $revision) {
                     return $collection === 'blog' && $entry === '123' && $revision === 'invalid';
-                },
-            ],
-
-            'term revision' => [
-                'custom/terms/tags/bravo/revisions/timestamp2',
-                function (Taxonomy $taxonomy, Term $term, Revision $revision) {
-                    return $taxonomy->handle() === 'tags' && $term->id() === 'tags::bravo' && $revision->id() === '2';
-                },
-                function (string $taxonomy, string $term, string $revision) {
-                    return $taxonomy === 'tags' && $term === 'bravo' && $revision === 'timestamp2';
-                },
-            ],
-
-            'term missing revision' => [
-                'custom/terms/tags/bravo/revisions/invalid',
-                null,
-                function (string $taxonomy, string $term, string $revision) {
-                    return $taxonomy === 'tags' && $term === 'bravo' && $revision === 'invalid';
                 },
             ],
 

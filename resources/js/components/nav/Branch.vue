@@ -7,8 +7,7 @@
         <div class="flex flex-1 items-center p-1.5 text-xs leading-normal">
             <div class="flex gap-2 sm:gap-3 grow items-center" :class="{ 'opacity-50': isHidden || isInHiddenSection }">
                 <template v-if="!isSection && !isChild">
-                    <i v-if="isAlreadySvg" class="size-4" v-html="icon"></i>
-                    <Icon v-else class="size-4" :name="icon" />
+                    <Icon class="size-4" :name="icon" />
                 </template>
 
                 <a

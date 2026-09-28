@@ -7,6 +7,8 @@ use Statamic\Contracts\Addons\SettingsRepository;
 use Statamic\Events\AddonSettingsSaved;
 use Statamic\Events\AddonSettingsSaving;
 use Statamic\Facades\Antlers;
+use Statamic\Support\Arr;
+use Statamic\View\Cascade;
 
 abstract class Settings implements Contract
 {
@@ -17,8 +19,7 @@ abstract class Settings implements Contract
     public function __construct(Addon $addon, array $settings = [])
     {
         $this->addon = $addon;
-        $this->settings = $this->resolveAntlers($settings);
-        $this->rawSettings = $settings;
+        $this->setValues($settings);
     }
 
     public function addon(): Addon
@@ -38,7 +39,7 @@ abstract class Settings implements Contract
 
     public function get(string $key, $default = null)
     {
-        return $this->settings[$key] ?? $default;
+        return Arr::get($this->settings, $key, $default);
     }
 
     public function set(string|array $key, mixed $value = null): self
@@ -48,8 +49,8 @@ abstract class Settings implements Contract
 
     private function setValue(string $key, mixed $value): self
     {
-        $this->rawSettings[$key] = $value;
-        $this->settings[$key] = $this->resolveAntlersValue($value);
+        Arr::set($this->rawSettings, $key, $value);
+        Arr::set($this->settings, $key, $this->resolveAntlersValue($value));
 
         return $this;
     }
@@ -57,7 +58,7 @@ abstract class Settings implements Contract
     private function setValues(array $values): self
     {
         $this->rawSettings = $values;
-        $this->settings = $this->resolveAntlers($values);
+        $this->settings = $this->resolveAntlers($this->applyBlueprintDefaults($values));
 
         return $this;
     }
@@ -80,6 +81,20 @@ abstract class Settings implements Contract
         return app(SettingsRepository::class)->delete($this);
     }
 
+    private function applyBlueprintDefaults(array $settings): array
+    {
+        if (! $blueprint = $this->addon->settingsBlueprint()) {
+            return $settings;
+        }
+
+        $defaults = $blueprint->fields()->all()
+            ->mapWithKeys(fn ($field) => [$field->handle() => $field->defaultValue()])
+            ->whereNotNull()
+            ->all();
+
+        return array_merge($defaults, $settings);
+    }
+
     public function resolveAntlers($config)
     {
         return collect($config)
@@ -95,6 +110,6 @@ abstract class Settings implements Contract
                 ->all();
         }
 
-        return (string) Antlers::parse($value, ['config' => config()->all()]);
+        return (string) Antlers::parse($value, ['config' => Cascade::config()]);
     }
 }

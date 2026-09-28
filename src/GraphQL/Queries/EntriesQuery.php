@@ -16,6 +16,7 @@ use Statamic\GraphQL\Queries\Concerns\FiltersQuery;
 use Statamic\GraphQL\Queries\Concerns\ScopesQuery;
 use Statamic\GraphQL\Types\EntryInterface;
 use Statamic\GraphQL\Types\JsonArgument;
+use Statamic\Query\OrderBy;
 use Statamic\Support\Str;
 
 class EntriesQuery extends Query
@@ -96,7 +97,9 @@ class EntriesQuery extends Query
                 [$sort, $order] = explode(' ', $sort);
             }
 
-            $query->orderBy($sort, $order);
+            if ($sort = OrderBy::column($sort)) {
+                $query->orderBy($sort, $order);
+            }
         }
     }
 

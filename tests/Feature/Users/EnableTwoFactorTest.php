@@ -51,7 +51,7 @@ class EnableTwoFactorTest extends TestCase
         $this
             ->actingAs($user)
             ->withActiveElevatedSession()
-            ->get($url())
+            ->postJson($url())
             ->assertOk()
             ->assertJsonStructure(['qr', 'secret_key', 'confirm_url']);
 
@@ -75,7 +75,7 @@ class EnableTwoFactorTest extends TestCase
 
         $this
             ->actingAs($user)
-            ->get(cp_route('users.two-factor.enable'))
+            ->post(cp_route('users.two-factor.enable'))
             ->assertRedirect('/cp/auth/confirm-password');
 
         $this->assertNull($user->two_factor_secret);
@@ -95,7 +95,7 @@ class EnableTwoFactorTest extends TestCase
         $this
             ->actingAs($user)
             ->withActiveElevatedSession()
-            ->get($url())
+            ->postJson($url())
             ->assertForbidden();
 
         Event::assertNotDispatched(TwoFactorAuthenticationEnabled::class, fn ($event) => $event->user->id === $user->id);
@@ -103,7 +103,7 @@ class EnableTwoFactorTest extends TestCase
 
     #[Test]
     #[DataProvider('enableProvider')]
-    public function it_doesnt_regenerate_secret_when_validation_error_is_present($url)
+    public function it_is_idempotent_when_secret_already_exists($url)
     {
         Event::fake();
 
@@ -112,19 +112,15 @@ class EnableTwoFactorTest extends TestCase
         $user->set('two_factor_recovery_codes', $originalRecoveryCodes = encrypt(['abc', 'def', 'ghi', 'jkl', 'mno', 'pqr', 'stu', 'vwx']));
         $user->save();
 
-        $errors = new \Illuminate\Support\ViewErrorBag;
-        $errors->put('default', new \Illuminate\Support\MessageBag(['code' => 'The provided two factor authentication code was invalid.']));
-
         $this
             ->actingAs($user)
             ->withActiveElevatedSession()
-            ->withSession(['errors' => $errors])
-            ->get($url())
+            ->postJson($url())
             ->assertOk()
             ->assertJsonStructure(['qr', 'secret_key', 'confirm_url']);
 
-        $this->assertEquals($originalSecret, $user->two_factor_secret);
-        $this->assertEquals($originalRecoveryCodes, $user->two_factor_recovery_codes);
+        $this->assertEquals($originalSecret, $user->fresh()->two_factor_secret);
+        $this->assertEquals($originalRecoveryCodes, $user->fresh()->two_factor_recovery_codes);
 
         Event::assertNotDispatched(TwoFactorAuthenticationEnabled::class, fn ($event) => $event->user->id === $user->id);
     }
@@ -143,7 +139,7 @@ class EnableTwoFactorTest extends TestCase
         $this
             ->actingAs($user)
             ->withActiveElevatedSession()
-            ->post($url(), [
+            ->postJson($url(), [
                 'code' => $this->getOneTimeCode($user),
             ])
             ->assertOk();
@@ -168,7 +164,7 @@ class EnableTwoFactorTest extends TestCase
             ->post($url(), [
                 'code' => '123456',
             ])
-            ->assertSessionHasErrors('code');
+            ->assertSessionHasErrors('code', null, 'user.two_factor_setup');
 
         $this->assertNull($user->two_factor_confirmed_at);
     }

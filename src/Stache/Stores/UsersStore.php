@@ -59,7 +59,6 @@ class UsersStore extends BasicStore
                 return app(Passkey::class)
                     ->setUser($user)
                     ->setName($keydata['name'])
-                    ->setLastLogin($keydata['last_login'])
                     ->setCredential($keydata['credential']);
             }));
 

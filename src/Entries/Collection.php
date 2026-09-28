@@ -7,6 +7,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use InvalidArgumentException;
 use Statamic\Contracts\Data\Augmentable as AugmentableContract;
 use Statamic\Contracts\Entries\Collection as Contract;
+use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Data\ContainsCascadingData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedData;
@@ -35,7 +36,7 @@ use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 use function Statamic\trans as __;
 
-class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contract
+class Collection implements Arrayable, ArrayAccess, AugmentableContract, ContainsQueryableValues, Contract
 {
     use ContainsCascadingData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedData, HasDirtyState;
 
@@ -465,7 +466,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
 
     public function createLabel()
     {
-        $key = "statamic::messages.{$this->handle()}_collection_create_entry";
+        $key = "messages.{$this->handle()}_collection_create_entry";
 
         $translation = __($key);
 
@@ -964,6 +965,24 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
         return [
             'title' => $this->title(),
             'handle' => $this->handle(),
+        ];
+    }
+
+    public function getQueryableValue(string $field)
+    {
+        if (in_array($method = Str::camel($field), $this->queryableMethods())) {
+            return $this->{$method}();
+        }
+
+        return null;
+    }
+
+    private function queryableMethods(): array
+    {
+        return [
+            'dated', 'defaultPublishState', 'editUrl', 'handle', 'hasStructure', 'id', 'layout', 'mount',
+            'orderable', 'path', 'requiresSlugs', 'revisionsEnabled', 'sites', 'sortDirection', 'sortField',
+            'structureHandle', 'taxonomies', 'template', 'title', 'url', 'uri',
         ];
     }
 

@@ -2,12 +2,14 @@
 
 namespace Statamic\Http\Requests;
 
+use Facades\Statamic\Fields\Validator as FieldValidator;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Traits\Localizable;
 use Illuminate\Validation\ValidationException;
+use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Site;
+use Statamic\Facades\URL;
 use Statamic\Rules\AllowedFile;
 use Statamic\Support\Arr;
 
@@ -42,7 +44,7 @@ class FrontendFormRequest extends FormRequest
         $url = $this->redirector->getUrlGenerator();
 
         if ($redirect = $this->input('_error_redirect')) {
-            return $url->to($redirect);
+            return URL::isExternalToApplication($redirect) ? $url->previous() : $url->to($redirect);
         }
 
         return $url->previous();
@@ -74,16 +76,33 @@ class FrontendFormRequest extends FormRequest
             throw (new ValidationException($validator, $response));
         }
 
-        return parent::failedValidation($validator);
+        parent::failedValidation($validator);
     }
 
     private function extraRules($fields)
     {
         return $fields->all()
-            ->filter(fn ($field) => $field->fieldtype()->handle() === 'assets')
+            ->filter(fn ($field) => in_array($field->fieldtype()->handle(), ['assets', 'files']))
             ->mapWithKeys(function ($field) {
-                return [$field->handle().'.*' => ['file', new AllowedFile]];
+                $rules = $field->fieldtype()->handle() === 'assets'
+                    ? array_merge(['file', new AllowedFile], $this->assetContainerRules($field))
+                    : ['file', new AllowedFile($field->fieldtype()->config('allowed_extensions'))];
+
+                return [$field->handle().'.*' => $rules];
             })
+            ->all();
+    }
+
+    private function assetContainerRules($field)
+    {
+        $configured = $field->fieldtype()->config('container');
+
+        $container = $configured
+            ? AssetContainer::find($configured)
+            : (($containers = AssetContainer::all())->count() === 1 ? $containers->first() : null);
+
+        return collect($container?->validationRules())
+            ->map(fn ($rule) => FieldValidator::parse($rule))
             ->all();
     }
 
@@ -122,7 +141,7 @@ class FrontendFormRequest extends FormRequest
         // directly in a headless format. In that case, we'll just use the default lang.
         $site = ($previousUrl = $this->previousUrl()) ? Site::findByUrl($previousUrl) : null;
 
-        return $this->withLocale($site?->lang(), fn () => parent::validateResolved());
+        $this->withLocale($site?->lang(), fn () => parent::validateResolved());
     }
 
     private function previousUrl()

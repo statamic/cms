@@ -15,9 +15,11 @@ class PdfController extends Controller
      */
     public function show($encodedAssetId)
     {
-        if (! $contents = $this->asset($encodedAssetId)->contents()) {
-            abort(500);
-        }
+        $asset = $this->asset($encodedAssetId);
+
+        abort_if(! $contents = $asset->contents(), 500);
+
+        $this->authorize('view', $asset);
 
         return response($contents)->header('Content-Type', 'application/pdf');
     }

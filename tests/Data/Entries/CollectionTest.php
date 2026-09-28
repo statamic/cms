@@ -20,7 +20,6 @@ use Statamic\Events\EntryBlueprintFound;
 use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Facades;
 use Statamic\Facades\Antlers;
-use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Fields\Blueprint;
 use Statamic\Structures\CollectionStructure;
@@ -813,12 +812,12 @@ class CollectionTest extends TestCase
 
         $this->assertEquals('test', Antlers::parse('{{ collection }}', ['collection' => $collection]));
 
-        $this->assertEquals('test Test', Antlers::parse('{{ collection }}{{ handle }} {{ title }}{{ /collection }}', ['collection' => $collection]));
+        $this->assertEquals('test Test', Antlers::parse('{{ collection }}{{ handle }} {{ title }}{{ /collection }}', ['collection' => $collection], true));
 
         $this->assertEquals('test', Antlers::parse('{{ collection:handle }}', ['collection' => $collection]));
 
         try {
-            Antlers::parse('{{ collection from="somewhere" }}{{ title }}{{ /collection }}', ['collection' => $collection]);
+            Antlers::parse('{{ collection from="somewhere" }}{{ title }}{{ /collection }}', ['collection' => $collection], true);
             $this->fail('Exception not thrown');
         } catch (CollectionNotFoundException $e) {
             $this->assertEquals('Collection [somewhere] not found', $e->getMessage());

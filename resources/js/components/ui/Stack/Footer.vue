@@ -9,7 +9,7 @@ const slots = useSlots();
 <template>
     <div
         data-ui-stack-footer
-        class="bg-gray-50 p-4 border-t border-gray-200"
+        class="bg-gray-50 p-4 border-t border-gray-200 dark:bg-gray-800 dark:border-gray-700"
     >
         <template v-if="slots['start'] || slots['end']">
             <div class="flex justify-between items-center">

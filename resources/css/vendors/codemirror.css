@@ -3,6 +3,7 @@
 .CodeMirror {
     /* Set height, width, borders, and global font properties here */
     @apply text-gray-900 dark:text-gray-300 leading-normal min-h-20;
+    direction: ltr;
 }
 
 /* CODEMIRROR / PADDING
@@ -102,6 +103,10 @@
     &.CodeMirror pre.CodeMirror-line,
     &.CodeMirror pre.CodeMirror-line-like {
         @apply text-gray-900 dark:text-gray-300;
+    }
+
+    &.CodeMirror pre.CodeMirror-placeholder {
+        @apply text-gray-500;
     }
 
     .CodeMirror-gutters {
@@ -318,7 +323,6 @@ div.CodeMirror span {
     left: 0;
     top: 0;
     min-height: 100%;
-    z-index: 3;
 }
 
 .CodeMirror-gutter {
@@ -331,7 +335,7 @@ div.CodeMirror span {
 
 .CodeMirror-gutter-wrapper {
     position: absolute;
-    z-index: 4;
+    z-index: var(--z-index-above);
     background: none !important;
     border: none !important;
 }
@@ -346,7 +350,6 @@ div.CodeMirror span {
 .CodeMirror-gutter-elt {
     position: absolute;
     cursor: default;
-    z-index: 4;
 }
 
 .CodeMirror-gutter-wrapper ::selection {
@@ -377,7 +380,6 @@ div.CodeMirror span {
     word-wrap: normal;
     line-height: inherit;
     color: inherit;
-    z-index: 2;
     position: relative;
     overflow: visible;
     -webkit-tap-highlight-color: transparent;
@@ -512,6 +514,10 @@ span.CodeMirror-selectedtext {
         background: #263238;
         @apply dark:bg-gray-900;
         color: #eeffff;
+    }
+
+    &.CodeMirror pre.CodeMirror-placeholder {
+        @apply text-gray-400/85;
     }
 
     .CodeMirror-gutters {

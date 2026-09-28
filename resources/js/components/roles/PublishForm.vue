@@ -1,5 +1,5 @@
 <template>
-    <div class="max-w-5xl mx-auto">
+    <div class="max-w-page mx-auto">
         <Header :title="__(initialTitle) || __('Create Role')" icon="permissions">
             <CommandPaletteItem
                 :category="$commandPalette.category.Actions"
@@ -9,6 +9,12 @@
                 prioritize
                 v-slot="{ text, action }"
             >
+                <Button
+                    v-if="!isSuper"
+                    :icon="areAllCheckedInAllGroups() ? 'checkbox-uncheck' : 'checkbox'"
+                    @click="toggleAllInAllGroups()"
+                    :text="areAllCheckedInAllGroups() ? __('Uncheck All') : __('Check All')"
+                />
                 <Button type="submit" variant="primary" @click="action" :text="text" />
             </CommandPaletteItem>
         </Header>
@@ -49,17 +55,34 @@
         </Panel>
 
         <div v-if="!isSuper" class="space-y-6 mt-6">
-            <CardPanel v-for="group in permissions" :key="group.handle" :heading="group.label">
-                <PermissionTree :depth="1" :initial-permissions="group.permissions" />
-            </CardPanel>
+            <Panel :heading="group.label" v-for="group in permissions" :key="group.handle">
+                <template #header-actions>
+                    <Button
+                        size="sm"
+                        variant="subtle"
+                        :icon="areAllChecked(group) ? 'checkbox-uncheck' : 'checkbox'"
+                        @click="toggleAllInGroup(group)"
+                    >
+                        {{ areAllChecked(group) ? __('Uncheck All') : __('Check All') }}
+                    </Button>
+                </template>
+                <Card>
+                    <PermissionTree
+                        :depth="1"
+                        :initial-permissions="group.permissions"
+                        :checked-permissions="checkedPermissions"
+                    />
+                </Card>
+            </Panel>
         </div>
     </div>
 </template>
 
 <script>
-import { Header, Button, CardPanel, Panel, PanelHeader, Heading, Card, Switch, Field, Input, CommandPaletteItem } from '@/components/ui';
+import { Header, Button, Panel, PanelHeader, Heading, Card, Switch, Field, Input, CommandPaletteItem } from '@/components/ui';
 import { requireElevatedSession } from '@/components/elevated-sessions';
 import PermissionTree from '@/components/roles/PermissionTree.vue';
+import { allVisibleChecked, checkVisible, uncheckAll, visible } from '@/components/roles/permissions.js';
 import { router } from '@inertiajs/vue3';
 
 const checked = function (permissions) {
@@ -74,7 +97,6 @@ export default {
         PermissionTree,
         Header,
         Button,
-        CardPanel,
         Panel,
         PanelHeader,
         Heading,
@@ -141,6 +163,43 @@ export default {
     },
 
     methods: {
+        areAllChecked(group) {
+            const checkedPermissions = this.checkedPermissions;
+            const shown = visible(group.permissions, checkedPermissions);
+
+            return shown.length > 0 && allVisibleChecked(shown, checkedPermissions);
+        },
+
+        areAllCheckedInAllGroups() {
+            return this.permissions.every(group => this.areAllChecked(group));
+        },
+
+        // Checking only affects what the user can see, but unchecking clears the group
+        // outright. Unchecking a broader permission reveals the ones it was hiding, so
+        // leaving those checked would need a second click to empty the group.
+        toggleAllInGroup(group) {
+            const checkedPermissions = this.checkedPermissions;
+
+            if (this.areAllChecked(group)) {
+                uncheckAll(group.permissions);
+            } else {
+                checkVisible(group.permissions, checkedPermissions);
+            }
+        },
+
+        toggleAllInAllGroups() {
+            const checkedPermissions = this.checkedPermissions;
+            const allChecked = this.areAllCheckedInAllGroups();
+
+            this.permissions.forEach((group) => {
+                if (allChecked) {
+                    uncheckAll(group.permissions);
+                } else {
+                    checkVisible(group.permissions, checkedPermissions);
+                }
+            });
+        },
+
         clearErrors() {
             this.error = null;
             this.errors = {};

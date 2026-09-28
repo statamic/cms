@@ -2,9 +2,12 @@
 
 namespace Statamic\Forms\Exporters;
 
+use League\Csv\EscapeFormula;
 use League\Csv\Writer;
 use SplTempFileObject;
 use Statamic\Support\Arr;
+
+use function Statamic\trans as __;
 
 class CsvExporter extends Exporter
 {
@@ -15,6 +18,7 @@ class CsvExporter extends Exporter
     {
         $this->writer = Writer::createFromFileObject(new SplTempFileObject);
         $this->writer->setDelimiter(Arr::get($this->config, 'delimiter', config('statamic.forms.csv_delimiter', ',')));
+        $this->writer->addFormatter(new EscapeFormula("'"));
 
         $this->insertHeaders();
 
@@ -27,29 +31,39 @@ class CsvExporter extends Exporter
     {
         $key = Arr::get($this->config, 'headers', config('statamic.forms.csv_headers', 'handle'));
 
-        $headers = $this->form->fields()
-            ->map(fn ($field) => $key === 'display' ? $field->display() : $field->handle())
-            ->push($key === 'display' ? __('Date') : 'date')
-            ->values()->all();
+        $headers = $this->columns()->map(function ($handle) use ($key) {
+            if ($key !== 'display') {
+                return $handle;
+            }
+
+            return $handle === 'date' ? __('Date') : $this->form->fields()->get($handle)->display();
+        })->all();
 
         $this->writer->insertOne($headers);
     }
 
     private function insertData()
     {
-        $data = $this->form->submissions()->map(function ($submission) {
-            $submission = $submission->toArray();
+        $columns = $this->columns();
 
-            $submission['date'] = (string) $submission['date'];
+        $data = $this->submissions()->map(function ($submission) use ($columns) {
+            $values = $submission->toArray();
 
-            unset($submission['id']);
+            $values['date'] = (string) $values['date'];
 
-            return collect($submission)->map(function ($value) {
-                return (is_array($value)) ? implode(', ', $value) : $value;
+            return $columns->map(function ($column) use ($values) {
+                $value = $values[$column] ?? null;
+
+                return is_array($value) ? implode(', ', $value) : $value;
             })->all();
         })->all();
 
         $this->writer->insertAll($data);
+    }
+
+    public function supportsColumnSelection(): bool
+    {
+        return true;
     }
 
     public function extension(): string

@@ -2,15 +2,22 @@
 import { Link } from '@inertiajs/vue3';
 import Head from '@/pages/layout/Head.vue';
 import { Header, Card, Panel, Table, TableRow, TableCell, Badge, Heading, Button, DocsCallout, CommandPaletteItem } from '@ui';
+import { computed } from 'vue';
 
-defineProps(['requestError', 'statamic', 'addons']);
+const props = defineProps(['requestError', 'statamic', 'addons']);
+
+const securityUpdateAvailable = computed(() => props.statamic.security || props.addons.some(addon => addon.security));
 </script>
 
 <template>
     <Head :title="__('Updates')" />
 
-    <div class="max-w-5xl mx-auto">
-        <Header :title="__('Updates')" icon="updates" />
+    <div class="max-w-page mx-auto">
+        <Header :title="__('Updates')" icon="updates">
+            <template #actions>
+                <Badge v-if="securityUpdateAvailable" :text="__('Security update available')" color="red" size="lg" icon="alert-warning-exclamation-mark" />
+            </template>
+        </Header>
 
         <Card v-if="requestError" class="w-full space-y-4 flex items-center justify-between">
             <Heading size="lg" class="mb-0!" :text="__('statamic::messages.outpost_issue_try_later')" icon="warning-diamond" />
@@ -38,7 +45,11 @@ defineProps(['requestError', 'statamic', 'addons']);
                             </TableCell>
                             <TableCell>{{ statamic.currentVersion }}</TableCell>
                             <TableCell v-if="statamic.availableUpdatesCount" class="text-right">
-                                <Badge size="sm" color="green">{{ __n('1 update|:count updates', statamic.availableUpdatesCount) }}</Badge>
+                                <Badge
+                                    size="sm"
+                                    :text="__n('1 update|:count updates', statamic.availableUpdatesCount)"
+                                    :color="statamic.security ? 'red' : 'amber'"
+                                />
                             </TableCell>
                             <TableCell v-else class="text-right">{{ __('Up to date') }}</TableCell>
                         </TableRow>
@@ -63,7 +74,11 @@ defineProps(['requestError', 'statamic', 'addons']);
                             </TableCell>
                             <TableCell>{{ addon.version }}</TableCell>
                             <TableCell v-if="addon.availableUpdatesCount" class="text-right">
-                                <Badge size="sm" color="green">{{ __n('1 update|:count updates', addon.availableUpdatesCount) }}</Badge>
+                                <Badge
+                                    size="sm"
+                                    :text="__n('1 update|:count updates', addon.availableUpdatesCount)"
+                                    :color="addon.security ? 'red' : 'amber'"
+                                />
                             </TableCell>
                             <TableCell v-else class="text-right">{{ __('Up to date') }}</TableCell>
                         </TableRow>

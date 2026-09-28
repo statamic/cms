@@ -54,7 +54,7 @@ async function createPasskey() {
 
     let startRegistrationResponse;
     try {
-        startRegistrationResponse = await startRegistration(await authOptionsResponse.json());
+        startRegistrationResponse = await startRegistration({ optionsJSON: await authOptionsResponse.json() });
     } catch (e) {
         console.error(e);
         passkeyWaiting.value = false;
@@ -136,12 +136,14 @@ function handleAxiosError(e) {
         :body-text="error"
         :cancellable="false"
         :button-text="__('OK')"
+        blur
         @update:open="error = null"
     />
 
     <Modal
         :title="__('Create a Passkey')"
         v-model:open="showCreateModal"
+        blur
     >
         <Field :label="__('Name')">
             <Input

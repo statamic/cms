@@ -22,28 +22,30 @@
                     </div>
                 </div>
                 <div class="mb-4 flex items-center justify-center text-sm">
-                    <div class="mx-4 flex items-center">
-                        <div class="ltr:mr-1 rtl:ml-1">X</div>
-                        <div class="value">{{ x }}%</div>
+                    <div class="mx-2 flex items-center gap-1">
+                        <label class="me-1" for="focal-point-x">X</label>
+                        <ui-input id="focal-point-x" v-model.number="x" type="number" min="0" max="100" step="1" size="sm" @change="clampPercent('x')" />
+                        <span>%</span>
                     </div>
-                    <div class="mx-4 flex items-center">
-                        <div class="ltr:mr-1 rtl:ml-1">Y</div>
-                        <div class="value">{{ y }}%</div>
+                    <div class="mx-2 flex items-center gap-1">
+                        <label class="me-1" for="focal-point-y">Y</label>
+                        <ui-input id="focal-point-y" v-model.number="y" type="number" min="0" max="100" step="1" size="sm" @change="clampPercent('y')" />
+                        <span>%</span>
                     </div>
-                    <div class="mx-4 flex items-center">
-                        <div class="ltr:mr-1 rtl:ml-1">Z</div>
-                        <div class="value">{{ z }}</div>
+                    <div class="mx-2 flex items-center gap-1">
+                        <label class="me-1" for="focal-point-z">Z</label>
+                        <ui-input id="focal-point-z" v-model.number="z" type="number" min="1" max="10" step="0.1" size="sm" @change="clampZoom" />
                     </div>
                 </div>
                 <div class="px-4">
-                    <input type="range" v-model="z" min="1" max="10" step="0.1" class="mb-4 w-full" />
+                    <input type="range" v-model.number="z" min="1" max="10" step="0.1" class="mb-4 w-full" />
                     <div class="mb-4 flex flex-wrap items-center justify-center gap-2">
                         <Button :text="__('Cancel')" @click="close" />
                         <Button :text="__('Reset')" @click="reset" />
                         <Button variant="primary" :text="__('Finish')" @click="select" />
                     </div>
                 </div>
-                <h6 class="rounded-b bg-gray-100  p-4 text-center  dark:bg-dark-800">
+                <h6 class="rounded-b bg-gray-100  p-4 text-center  dark:bg-gray-850">
                     {{ __('messages.focal_point_previews_are_examples') }}
                 </h6>
             </Card>
@@ -96,9 +98,12 @@ export default {
     mounted() {
         const initial = this.data || '50-50-1';
         const coords = initial.split('-');
-        this.x = coords[0];
-        this.y = coords[1];
-        this.z = coords[2] || 1;
+        this.x = Number(coords[0] ?? 50);
+        this.y = Number(coords[1] ?? 50);
+        this.z = Number(coords[2] ?? 1);
+        this.clampPercent('x');
+        this.clampPercent('y');
+        this.clampZoom();
     },
 
     computed: {
@@ -124,11 +129,29 @@ export default {
             var offsetX = e.clientX - rect.left;
             var offsetY = e.clientY - rect.top;
 
-            this.x = ((offsetX / imageW) * 100).toFixed();
-            this.y = ((offsetY / imageH) * 100).toFixed();
+            this.x = Math.round((offsetX / imageW) * 100);
+            this.y = Math.round((offsetY / imageH) * 100);
+            this.clampPercent('x');
+            this.clampPercent('y');
+        },
+
+        clampPercent(axis) {
+            const value = Number(this[axis]);
+            const safeValue = Number.isFinite(value) ? value : 50;
+            this[axis] = Math.min(100, Math.max(0, Math.round(safeValue)));
+        },
+
+        clampZoom() {
+            const value = Number(this.z);
+            const safeValue = Number.isFinite(value) ? value : 1;
+            const clamped = Math.min(10, Math.max(1, safeValue));
+            this.z = Math.round(clamped * 10) / 10;
         },
 
         select() {
+            this.clampPercent('x');
+            this.clampPercent('y');
+            this.clampZoom();
             this.$emit('selected', this.x + '-' + this.y + '-' + this.z);
             this.close();
         },

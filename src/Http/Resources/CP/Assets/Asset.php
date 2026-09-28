@@ -3,6 +3,7 @@
 namespace Statamic\Http\Resources\CP\Assets;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Facades\Action;
 use Statamic\Facades\User;
 use Statamic\Support\Str;
@@ -23,6 +24,7 @@ class Asset extends JsonResource
             'permalink' => $this->absoluteUrl(),
             'extension' => $this->extension(),
             'downloadUrl' => $this->cpDownloadUrl(),
+            'cropUrl' => cp_route('assets.crop', ['encoded_asset' => base64_encode($this->id())]),
             'size' => Str::fileSizeForHumans($this->size()),
             'lastModified' => $this->lastModified()->toIso8601String(),
             'lastModifiedRelative' => $this->lastModified()->diffForHumans(),
@@ -36,6 +38,8 @@ class Asset extends JsonResource
             'isPreviewable' => $this->isPreviewable(),
             'isEditable' => User::current()->can('edit', $this->resource),
             'isViewable' => User::current()->can('view', $this->resource),
+            'canCrop' => User::current()->can('store', [AssetContract::class, $this->resource->container()]),
+            'canReuploadCrop' => User::current()->can('reupload', $this->resource),
 
             $this->mergeWhen($this->hasDimensions(), function () {
                 return [

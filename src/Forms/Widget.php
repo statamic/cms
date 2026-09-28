@@ -29,6 +29,7 @@ class Widget extends BaseWidget
             'form' => $form->handle(),
             'fields' => $this->config('fields', []),
             'title' => $this->config('title', $form->title()),
+            'showTableHeader' => $this->config('show_table_header', false),
             'submissionsUrl' => cp_route('forms.show', $form->handle()),
             'initialPerPage' => $this->config('limit', 5),
         ]);

@@ -11,7 +11,7 @@ const props = defineProps({
     target: { type: String, default: null },
     /** Icon name. [Browse available icons](/?path=/story/components-icon--all-icons) */
     icon: { type: [String, null], default: null },
-    /** Controls the heading level, `h1`, `h2`, etc */
+    /** Controls the heading level */
     level: { type: [Number, null], default: null },
     /** Controls the size of the heading. Options: `base`, `lg`, `xl`, `2xl` */
     size: { type: String, default: 'base' },

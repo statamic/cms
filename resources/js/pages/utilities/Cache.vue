@@ -74,7 +74,7 @@ function invalidateStaticUrls() {
 <template>
     <Head :title="[__('Cache Manager'), __('Utilities')]" />
 
-    <div class="max-w-5xl mx-auto">
+    <div class="max-w-page mx-auto">
         <Header :title="__('Cache Manager')" icon="cache">
             <CommandPaletteItem
                 category="Actions"

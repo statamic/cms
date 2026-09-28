@@ -21,7 +21,7 @@ class ThemeTagsTest extends TestCase
 
     private function tag($tag): string
     {
-        return Parse::template($tag, []);
+        return Parse::template($tag, trusted: true);
     }
 
     public function testOutputsThemedJs()

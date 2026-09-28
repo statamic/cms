@@ -120,6 +120,7 @@ function disable() {
         v-model:open="disableModalOpen"
         :title="__('Are you sure?')"
         :danger="true"
+        blur
         @confirm="disable"
     >
         <p class="mb-2" v-html="__('statamic::messages.disable_two_factor_authentication')"></p>

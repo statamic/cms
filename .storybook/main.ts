@@ -8,9 +8,15 @@ const config: StorybookConfig = {
     ],
     addons: [
         '@storybook/addon-docs',
-        '@storybook/addon-a11y'
+        '@storybook/addon-a11y',
+        '@storybook/addon-vitest',
+        '@storybook/addon-mcp'
     ],
     staticDirs: ['./public'],
+    features: {
+        componentsManifest: true,
+        experimentalDocgenServer: true,
+    },
     framework: {
         name: '@storybook/vue3-vite',
         options: {
@@ -24,6 +30,10 @@ const config: StorybookConfig = {
                 '@api': resolve(process.cwd(), 'resources/js/api.js'),
             };
         }
+        config.build = {
+            ...config.build,
+            reportCompressedSize: false,
+        };
         return config;
     },
 };

@@ -6,7 +6,6 @@ use Facades\Tests\Factories\EntryFactory;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
-use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
 use Statamic\Query\Scopes\Scope;
@@ -292,6 +291,31 @@ class TermQueryBuilderTest extends TestCase
                 ->whereIn('collection', ['blog', 'news'])
                 ->where('taxonomy', 'tags')
                 ->get()->map->id()->sort()->values()->all()
+        );
+    }
+
+    #[Test]
+    public function it_filters_by_entries_count_using_only_published_entries()
+    {
+        Taxonomy::make('tags')->save();
+        Collection::make('blog')->taxonomies(['tags'])->save();
+
+        EntryFactory::collection('blog')->data(['tags' => ['a']])->published(true)->create();
+        EntryFactory::collection('blog')->data(['tags' => ['a']])->published(true)->create();
+        EntryFactory::collection('blog')->data(['tags' => ['b']])->published(true)->create();
+        EntryFactory::collection('blog')->data(['tags' => ['c']])->published(false)->create();
+
+        Term::make('a')->taxonomy('tags')->data([])->save();
+        Term::make('b')->taxonomy('tags')->data([])->save();
+        Term::make('c')->taxonomy('tags')->data([])->save();
+        Term::make('d')->taxonomy('tags')->data([])->save();
+
+        $this->assertEquals(['a', 'b'],
+            Term::query()->where('entries_count', '>=', 1)->get()->map->slug()->sort()->values()->all()
+        );
+
+        $this->assertEquals(['a'],
+            Term::query()->where('entries_count', '>=', 2)->get()->map->slug()->sort()->values()->all()
         );
     }
 
@@ -774,6 +798,93 @@ class TermQueryBuilderTest extends TestCase
 
         $this->assertCount(1, $terms);
         $this->assertEquals(['c'], $terms->map->slug->all());
+    }
+
+    #[Test]
+    public function can_get_min_value()
+    {
+        Taxonomy::make('tags')->save();
+        Term::make('a')->taxonomy('tags')->data(['type' => 'b', 'quantity' => 1])->save();
+        Term::make('b')->taxonomy('tags')->data(['type' => 'b', 'quantity' => 2])->save();
+        Term::make('c')->taxonomy('tags')->data(['type' => 'a', 'quantity' => 3])->save();
+        Term::make('d')->taxonomy('tags')->data(['type' => 'b', 'quantity' => 4])->save();
+
+        $this->assertEquals(1, Term::query()->min('quantity'));
+
+        // Assert only queried values are plucked.
+        $this->assertEquals(3, Term::query()->where('type', 'a')->min('quantity'));
+
+        // Assert returns null when there's no results.
+        $this->assertNull(Term::query()->where('type', 'c')->min('quantity'));
+    }
+
+    #[Test]
+    public function can_get_max_value()
+    {
+        Taxonomy::make('tags')->save();
+        Term::make('a')->taxonomy('tags')->data(['type' => 'b', 'quantity' => 1])->save();
+        Term::make('b')->taxonomy('tags')->data(['type' => 'b', 'quantity' => 2])->save();
+        Term::make('c')->taxonomy('tags')->data(['type' => 'a', 'quantity' => 3])->save();
+        Term::make('d')->taxonomy('tags')->data(['type' => 'b', 'quantity' => 4])->save();
+
+        $this->assertEquals(4, Term::query()->max('quantity'));
+
+        // Assert only queried values are plucked.
+        $this->assertEquals(3, Term::query()->where('type', 'a')->max('quantity'));
+
+        // Assert returns null when there's no results.
+        $this->assertNull(Term::query()->where('type', 'c')->max('quantity'));
+    }
+
+    #[Test]
+    public function can_sum_values()
+    {
+        Taxonomy::make('tags')->save();
+        Term::make('a')->taxonomy('tags')->data(['type' => 'b', 'quantity' => 1])->save();
+        Term::make('b')->taxonomy('tags')->data(['type' => 'b', 'quantity' => 2])->save();
+        Term::make('c')->taxonomy('tags')->data(['type' => 'a', 'quantity' => 3])->save();
+        Term::make('d')->taxonomy('tags')->data(['type' => 'b', 'quantity' => 4])->save();
+
+        $this->assertEquals(10, Term::query()->sum('quantity'));
+
+        // Assert only queried values are plucked.
+        $this->assertEquals(3, Term::query()->where('type', 'a')->sum('quantity'));
+
+        // Assert falls back to 0 when there's no results.
+        $this->assertEquals(0, Term::query()->where('type', 'c')->sum('quantity'));
+    }
+
+    #[Test]
+    public function can_get_average_value()
+    {
+        Taxonomy::make('tags')->save();
+        Term::make('a')->taxonomy('tags')->data(['type' => 'b', 'quantity' => 1])->save();
+        Term::make('b')->taxonomy('tags')->data(['type' => 'b', 'quantity' => 2])->save();
+        Term::make('c')->taxonomy('tags')->data(['type' => 'a', 'quantity' => 3])->save();
+        Term::make('d')->taxonomy('tags')->data(['type' => 'b', 'quantity' => 4])->save();
+
+        $this->assertEquals(2.5, Term::query()->average('quantity'));
+
+        // Assert only queried values are plucked.
+        $this->assertEquals(3, Term::query()->where('type', 'a')->average('quantity'));
+
+        // Assert returns null when there's no results.
+        $this->assertNull(Term::query()->where('type', 'c')->average('quantity'));
+    }
+
+    #[Test]
+    public function sorting_by_unsafe_method_does_not_invoke_it()
+    {
+        Taxonomy::make('tags')->save();
+        Term::make('a')->taxonomy('tags')->data(['title' => 'Alpha'])->save();
+        Term::make('b')->taxonomy('tags')->data(['title' => 'Bravo'])->save();
+
+        $count = Term::all()->count();
+        $this->assertGreaterThan(0, $count);
+
+        Term::query()->orderBy('delete', 'asc')->get();
+
+        $this->assertCount($count, Term::all());
     }
 }
 

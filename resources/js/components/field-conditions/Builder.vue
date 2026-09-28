@@ -25,22 +25,33 @@
                 @removed="remove(index)"
             />
 
-            <div class="border-t pt-6 dark:border-dark-900" v-if="hasConditions && isStandard">
+            <div class="border-t pt-6 dark:border-gray-900" v-if="hasConditions && isStandard">
                 <Button :text="__('Add Condition')" @click="add" />
             </div>
         </div>
 
-        <Field
-            :label="__('Always Save')"
-            :instructions="__('messages.field_conditions_always_save_instructions')"
-        >
-            <Switch v-model="alwaysSave" />
-        </Field>
+        <div class="w-full publish-fields">
+            <Field
+                class="form-group field-w-33"
+                :label="__('Always Save')"
+                :instructions="__('messages.field_conditions_always_save_instructions')"
+            >
+                <Switch v-model="alwaysSave" />
+            </Field>
+
+            <Field
+                class="form-group field-w-33"
+                :label="__('Reserve Space When Hidden')"
+                :instructions="__('messages.field_conditions_reserve_space_when_hidden_instructions')"
+            >
+                <Switch v-model="reserveSpaceWhenHidden" />
+            </Field>
+        </div>
     </div>
 </template>
 
 <script>
-import uniqid from 'uniqid';
+import { nanoid as uniqid } from 'nanoid';
 import HasInputOptions from '../fieldtypes/HasInputOptions.js';
 import Converter from '../field-conditions/Converter.js';
 import { KEYS, OPERATORS } from '../field-conditions/Constants.js';
@@ -77,6 +88,7 @@ export default {
             customMethod: null,
             conditions: [],
             alwaysSave: false,
+            reserveSpaceWhenHidden: false,
         };
     },
 
@@ -135,12 +147,17 @@ export default {
         alwaysSave(alwaysSave) {
             this.$emit('updated-always-save', alwaysSave);
         },
+
+        reserveSpaceWhenHidden(reserveSpaceWhenHidden) {
+            this.$emit('updated-reserve-space-when-hidden', reserveSpaceWhenHidden);
+        },
     },
 
     created() {
         this.add();
         this.getInitialConditions();
         this.getInitialAlwaysSaveState();
+        this.getInitialReserveSpaceWhenHiddenState();
     },
 
     methods: {
@@ -185,6 +202,10 @@ export default {
 
         getInitialAlwaysSaveState() {
             this.alwaysSave = data_get(this.config, 'always_save', false);
+        },
+
+        getInitialReserveSpaceWhenHiddenState() {
+            this.reserveSpaceWhenHidden = data_get(this.config, 'reserve_space_when_hidden', false);
         },
 
         prepareEditableConditions(conditions) {

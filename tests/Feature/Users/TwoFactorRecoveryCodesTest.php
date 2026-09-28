@@ -76,7 +76,7 @@ class TwoFactorRecoveryCodesTest extends TestCase
         $this
             ->actingAs($user)
             ->withActiveElevatedSession()
-            ->post($url())
+            ->postJson($url())
             ->assertOk()
             ->assertJsonStructure(['recovery_codes']);
     }

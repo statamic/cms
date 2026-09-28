@@ -67,7 +67,7 @@ trait UserContractTests
         $this->assertEquals('John Smith', $this->makeUser()->set('name', 'John Smith')->name());
         $this->assertEquals('John', $this->makeUser()->data(['name' => null, 'first_name' => 'John'])->name());
         $this->assertEquals('John Smith', $this->makeUser()->data(['name' => null, 'first_name' => 'John', 'last_name' => 'Smith'])->name());
-        $this->assertEquals('john@example.com', $this->makeUser()->remove('name')->email('john@example.com')->name());
+        $this->assertNull($this->makeUser()->remove('name')->email('john@example.com')->name());
     }
 
     #[Test]
@@ -325,11 +325,11 @@ trait UserContractTests
     }
 
     #[Test]
-    public function it_gets_initials_from_email_if_name_doesnt_exist()
+    public function it_gets_question_mark_initials_if_name_doesnt_exist()
     {
         $user = $this->user()->remove('name');
 
-        $this->assertEquals('J', $user->initials());
+        $this->assertEquals('?', $user->initials());
     }
 
     #[Test]
@@ -355,6 +355,27 @@ trait UserContractTests
     public function it_gets_preferred_locale()
     {
         $this->assertEquals('en', $this->user()->preferredLocale());
+    }
+
+    #[Test]
+    #[DataProvider('preferredColorModeProvider')]
+    public function it_gets_preferred_color_mode($stored, $expected)
+    {
+        $user = $this->makeUser();
+        $user->setPreference('color_mode', $stored);
+
+        $this->assertEquals($expected, $user->preferredColorMode());
+    }
+
+    public static function preferredColorModeProvider(): array
+    {
+        return [
+            'null' => [null, 'auto'],
+            'light' => ['light', 'light'],
+            'dark' => ['dark', 'dark'],
+            'auto' => ['auto', 'auto'],
+            'invalid' => ['invalid', 'auto'],
+        ];
     }
 
     #[Test]
@@ -398,17 +419,31 @@ trait UserContractTests
         $this->assertTrue($this->user()->blueprint()->hasField('email'));
         $this->assertEquals('Email Address', $this->user()->blueprint()->fields()->get('email')->display());
         $this->assertEquals('email', $this->user()->blueprint()->fields()->get('email')->get('input_type'));
+        $this->assertEquals('email', $this->user()->blueprint()->fields()->get('email')->get('autocomplete'));
     }
 
     #[Test]
     public function it_allows_email_field_customizations_in_blueprint()
     {
-        $blueprint = Blueprint::makeFromFields(['email' => ['display' => 'Custom Email Display']]);
+        $blueprint = Blueprint::makeFromFields(['email' => ['display' => 'Custom Email Display', 'autocomplete' => 'off']]);
         Blueprint::shouldReceive('find')->with('user')->andReturn($blueprint);
 
         $this->assertTrue($this->user()->blueprint()->hasField('email'));
         $this->assertEquals('Custom Email Display', $this->user()->blueprint()->fields()->get('email')->display());
         $this->assertEquals('email', $this->user()->blueprint()->fields()->get('email')->get('input_type'));
+        $this->assertEquals('off', $this->user()->blueprint()->fields()->get('email')->get('autocomplete'));
+    }
+
+    #[Test]
+    public function it_provides_name_and_email_fields_when_no_blueprint_is_defined()
+    {
+        Blueprint::partialMock()->shouldReceive('find')->with('user')->andReturnNull();
+
+        $fields = $this->user()->blueprint()->fields();
+
+        $this->assertEquals('name', $fields->get('name')->get('autocomplete'));
+        $this->assertEquals('email', $fields->get('email')->get('autocomplete'));
+        $this->assertEquals('email', $fields->get('email')->get('input_type'));
     }
 
     #[Test]
@@ -646,6 +681,23 @@ trait UserContractTests
             ->save();
 
         $this->assertTrue($user->hasEnabledTwoFactorAuthentication());
+    }
+
+    #[Test]
+    public function it_does_not_require_two_factor_when_globally_disabled_even_if_user_has_setup()
+    {
+        config()->set('statamic.users.two_factor_enabled', false);
+        config()->set('statamic.users.two_factor_enforced_roles', ['*']);
+
+        $user = $this->makeUser()
+            ->makeSuper()
+            ->set('two_factor_secret', 'secret')
+            ->set('two_factor_confirmed_at', now()->timestamp);
+
+        $user->save();
+
+        $this->assertTrue($user->hasEnabledTwoFactorAuthentication());
+        $this->assertFalse($user->isTwoFactorAuthenticationRequired());
     }
 
     #[Test]

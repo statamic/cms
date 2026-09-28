@@ -26,7 +26,7 @@
                             <button
                                 v-for="swatch in config.swatches"
                                 type="button"
-                                class="flex size-9 rounded-full cursor-pointer"
+                                class="flex size-9 rounded-full cursor-pointer border border-gray-900/15 dark:border-gray-100/20"
                                 :style="{ 'background-color': swatch }"
                                 @click="update(swatch)"
                             >
@@ -102,7 +102,7 @@ export default {
             if (!this.showFieldPreviews) return;
 
             return this.value
-                ? replicatorPreviewHtml(`<span class="little-dot" style="background-color:${this.value}"></span>`)
+                ? replicatorPreviewHtml(`<span class="little-dot" style="background-color:${escapeHtml(this.value)}"></span>`)
                 : null;
         },
     },

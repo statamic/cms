@@ -1,5 +1,5 @@
 <template>
-    <div class="max-w-5xl mx-auto">
+    <div class="max-w-5xl 3xl:max-w-6xl mx-auto" data-max-width-wrapper>
         <Head :title="__('Edit Fieldset')" />
 
         <Header :title="__('Edit Fieldset')" icon="fieldsets">
@@ -23,26 +23,20 @@
             </ui-card>
         </ui-panel>
 
-        <ui-panel :heading="__('Fields')">
-            <fields
-                :fields="fields"
-                :editing-field="editingField"
-                :exclude-fieldset="fieldset.handle"
-                :suggestable-condition-fields="suggestableConditionFields(this)"
-                with-command-palette
-                @field-created="fieldCreated"
-                @field-updated="fieldUpdated"
-                @field-linked="fieldLinked"
-                @field-deleted="deleteField"
-                @field-editing="editingField = $event"
-                @editor-closed="editingField = null"
-            />
-        </ui-panel>
+        <sections
+            class="mt-8"
+            tab-id="fieldset"
+            :initial-sections="sections"
+            :show-section-collapsible-field="true"
+            :exclude-fieldset="fieldset.handle"
+            with-command-palette
+            @updated="sections = $event"
+        />
     </div>
 </template>
 
 <script>
-import Fields from '@/components/blueprints/Fields.vue';
+import Sections from '@/components/blueprints/Sections.vue';
 import { Sortable, Plugins } from '@shopify/draggable';
 import SuggestsConditionalFields from '@/components/blueprints/SuggestsConditionalFields';
 import { Header, Button } from '@/components/ui';
@@ -53,7 +47,7 @@ export default {
 
     components: {
         Head,
-        Fields,
+        Sections,
         Header,
         Button,
     },
@@ -71,17 +65,17 @@ export default {
     },
 
     computed: {
-        fields: {
+        sections: {
             get() {
-                return this.fieldset.fields;
+                return this.fieldset.sections;
             },
-            set(fields) {
-                this.fieldset.fields = fields;
+            set(sections) {
+                this.fieldset.sections = sections;
             },
         },
 
         fieldsForConditionSuggestions() {
-            return this.fields;
+            return this.sections.reduce((fields, section) => fields.concat(section.fields || []), []);
         },
     },
 
@@ -94,6 +88,12 @@ export default {
             deep: true,
             handler() {
                 this.$dirty.add('fieldsets');
+            },
+        },
+        sections: {
+            deep: true,
+            handler() {
+                this.$nextTick(() => this.makeSortable());
             },
         },
     },
@@ -112,35 +112,39 @@ export default {
                 });
         },
 
-        fieldCreated(field) {
-            this.fields.push(field);
-        },
-
-        fieldUpdated(i, field) {
-            this.fields.splice(i, 1, field);
-        },
-
-        deleteField(i) {
-            this.fields.splice(i, 1);
-        },
-
-        fieldLinked(field) {
-            this.fields.push(field);
-            this.$toast.success(__('Field added'));
-
-            if (field.type === 'reference') {
-                this.$nextTick(() => (this.editingField = field._id));
-            }
-        },
-
         makeSortable() {
-            new Sortable(this.$el.querySelector('.blueprint-section-draggable-zone'), {
+            if (this.sortableSections) {
+                this.sortableSections.destroy();
+            }
+
+            if (this.sortableFields) {
+                this.sortableFields.destroy();
+            }
+
+            this.sortableSections = new Sortable(this.$el.querySelector('.blueprint-sections'), {
+                draggable: '.blueprint-section',
+                handle: '.blueprint-section-drag-handle',
+                mirror: { constrainDimensions: true, appendTo: 'body' },
+                plugins: [Plugins.SwapAnimation],
+            }).on('sortable:stop', (e) => {
+                this.fieldset.sections.splice(e.newIndex, 0, this.fieldset.sections.splice(e.oldIndex, 1)[0]);
+            });
+
+            this.sortableFields = new Sortable(this.$el.querySelectorAll('.blueprint-section-draggable-zone'), {
                 draggable: '.blueprint-section-field',
                 handle: '.blueprint-drag-handle',
                 mirror: { constrainDimensions: true, appendTo: 'body' },
                 plugins: [Plugins.SwapAnimation],
             }).on('sortable:stop', (e) => {
-                this.fieldset.fields.splice(e.newIndex, 0, this.fieldset.fields.splice(e.oldIndex, 1)[0]);
+                const oldSection = this.fieldset.sections.find((section) => section._id === e.oldContainer.dataset.section);
+                const newSection = this.fieldset.sections.find((section) => section._id === e.newContainer.dataset.section);
+
+                if (!oldSection || !newSection) {
+                    return;
+                }
+
+                const field = oldSection.fields.splice(e.oldIndex, 1)[0];
+                newSection.fields.splice(e.newIndex, 0, field);
             });
         },
     },
@@ -160,6 +164,14 @@ export default {
 
     beforeUnmount() {
         this.$events.$off('root-form-save');
+
+        if (this.sortableSections) {
+            this.sortableSections.destroy();
+        }
+
+        if (this.sortableFields) {
+            this.sortableFields.destroy();
+        }
     },
 };
 </script>

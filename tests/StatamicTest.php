@@ -100,6 +100,40 @@ class StatamicTest extends TestCase
     }
 
     #[Test]
+    public function it_translates_a_string()
+    {
+        app('translator')->addNamespace('package', __DIR__.'/__fixtures__/lang');
+
+        $this->assertEquals('Hello', Statamic::trans('package::messages.hello'));
+        $this->assertEquals('Hello, Bob', Statamic::trans('package::messages.hello_name', ['name' => 'Bob']));
+    }
+
+    #[Test]
+    public function trans_returns_the_key_when_the_value_is_an_array()
+    {
+        app('translator')->addNamespace('package', __DIR__.'/__fixtures__/lang');
+
+        $this->assertEquals('package::messages', Statamic::trans('package::messages'));
+    }
+
+    #[Test]
+    public function it_pluralizes_with_trans_choice()
+    {
+        app('translator')->addNamespace('package', __DIR__.'/__fixtures__/lang');
+
+        $this->assertEquals('There is one apple', Statamic::transChoice('package::messages.apples', 1));
+        $this->assertEquals('There are 5 apples', Statamic::transChoice('package::messages.apples', 5));
+    }
+
+    #[Test]
+    public function trans_choice_returns_the_key_when_the_value_is_an_array()
+    {
+        app('translator')->addNamespace('package', __DIR__.'/__fixtures__/lang');
+
+        $this->assertEquals('package::messages', Statamic::transChoice('package::messages', 1));
+    }
+
+    #[Test]
     public function it_aliases_query_builders()
     {
         app()->bind('statamic.queries.test', function () {
@@ -295,5 +329,40 @@ class StatamicTest extends TestCase
     public function customAssetUrl($app)
     {
         $app['config']->set('app.asset_url', 'http://test-asset-url.com');
+    }
+
+    #[Test]
+    #[DataProvider('cpPerPageProvider')]
+    public function it_resolves_cp_per_page($input, $expected)
+    {
+        config(['statamic.cp.pagination_size_options' => [10, 25, 50, 100, 500]]);
+
+        $this->assertSame($expected, Statamic::cpPerPage($input));
+    }
+
+    public static function cpPerPageProvider()
+    {
+        return [
+            'in range' => [10, 10],
+            'at ceiling' => [500, 500],
+            'above ceiling' => [99999, 500],
+            'numeric string above ceiling' => ['99999', 500],
+            'null' => [null, null],
+            'empty string' => ['', null],
+            'zero' => [0, 1],
+            'negative' => [-5, 1],
+        ];
+    }
+
+    #[Test]
+    public function cp_per_page_falls_back_to_pagination_size_when_options_empty()
+    {
+        config([
+            'statamic.cp.pagination_size_options' => [],
+            'statamic.cp.pagination_size' => 50,
+        ]);
+
+        $this->assertSame(50, Statamic::cpPerPage(1000));
+        $this->assertSame(25, Statamic::cpPerPage(25));
     }
 }

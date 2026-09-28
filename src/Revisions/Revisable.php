@@ -64,9 +64,35 @@ trait Revisable
         return $revision->toWorkingCopy();
     }
 
+    public function saveToWorkingCopy()
+    {
+        if (! $this->revisionsEnabled() || ! $this->hasWorkingCopy()) {
+            return false;
+        }
+
+        $workingCopy = $this->workingCopy();
+        $workingCopy->attributes($this->revisionAttributes());
+
+        return $workingCopy->save();
+    }
+
     public function deleteWorkingCopy()
     {
         return optional($this->workingCopy())->delete();
+    }
+
+    public function deleteRevisions()
+    {
+        $this->revisions()->each->delete();
+
+        $this->deleteWorkingCopy();
+    }
+
+    public function deleteRevisionsQuietly()
+    {
+        $this->revisions()->each->deleteQuietly();
+
+        optional($this->workingCopy())->deleteQuietly();
     }
 
     public function publishWorkingCopy($options = [])

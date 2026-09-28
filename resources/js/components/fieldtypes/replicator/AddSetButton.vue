@@ -4,7 +4,7 @@
             <template #trigger>
                 <div class="inline-flex relative pt-2" :class="{ 'pt-6': showConnector }">
                     <div v-if="showConnector" class="absolute group-hover:opacity-0 transition-opacity delay-25 duration-125 inset-y-0 h-full left-3.5 border-l-1 border-gray-400 dark:border-gray-600 border-dashed z-0 dark:bg-gray-850" />
-                    <Button v-if="enabled" size="sm" :text="label" icon="plus" class="relative z-2" />
+                    <Button v-if="enabled" size="sm" :text="label" icon="plus" class="relative" />
                 </div>
             </template>
         </set-picker>
@@ -58,7 +58,7 @@ const props = defineProps({
     loadingSet: { type: String, default: null },
 });
 
-const label = computed(() => props.label ? __(props.label) : __('Add Block'));
+const label = computed(() => props.label ? __(props.label) : __('Add Set'));
 
 function addSet(handle) {
     emit('added', handle, props.index);

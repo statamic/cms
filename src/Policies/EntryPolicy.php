@@ -98,6 +98,10 @@ class EntryPolicy
     {
         $user = User::fromUser($user);
 
+        if ($entry instanceof \Statamic\Contracts\Entries\Collection) {
+            return $user->hasPermission("publish {$entry->handle()} entries");
+        }
+
         if ($this->hasAnotherAuthor($user, $entry)) {
             return $user->hasPermission("publish other authors {$entry->collectionHandle()} entries");
         }

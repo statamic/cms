@@ -22,11 +22,14 @@ class DeleteTemporaryAttachments implements ShouldQueue
 
     public function handle()
     {
+        $disk = Storage::disk(config('statamic.system.file_uploads_disk', 'local'));
+        $basePath = config('statamic.system.file_uploads_path', 'statamic/file-uploads');
+
         $this->submission->form()->blueprint()->fields()->all()
             ->filter(fn (Field $field) => $field->type() === 'files')
-            ->each(function (Field $field) {
+            ->each(function (Field $field) use ($disk, $basePath) {
                 Collection::wrap($this->submission->get($field->handle(), []))
-                    ->each(fn ($path) => Storage::disk('local')->delete('statamic/file-uploads/'.$path));
+                    ->each(fn ($path) => $disk->delete($basePath.'/'.$path));
 
                 $this->submission->remove($field->handle());
             });

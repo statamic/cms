@@ -148,6 +148,24 @@ class StrTest extends TestCase
     }
 
     #[Test]
+    public function it_gets_duration_for_humans()
+    {
+        $this->assertEquals('0:00', Str::durationForHumans(0));
+        $this->assertEquals('0:01', Str::durationForHumans(1));
+        $this->assertEquals('0:12', Str::durationForHumans(12));
+        $this->assertEquals('0:59', Str::durationForHumans(59));
+        $this->assertEquals('1:00', Str::durationForHumans(60));
+        $this->assertEquals('2:01', Str::durationForHumans(121));
+        $this->assertEquals('16:40', Str::durationForHumans(1000));
+        $this->assertEquals('59:59', Str::durationForHumans(3599));
+        $this->assertEquals('1:00:00', Str::durationForHumans(3600));
+        $this->assertEquals('1:01:01', Str::durationForHumans(3661));
+        $this->assertEquals('2:10:00', Str::durationForHumans(7800));
+        $this->assertEquals('10:05:30', Str::durationForHumans(36330));
+        $this->assertEquals('0:37', Str::durationForHumans(36.92));
+    }
+
+    #[Test]
     public function it_widonts()
     {
         $this->assertEquals('one two&nbsp;three', Str::widont('one two three'));
@@ -173,13 +191,13 @@ class StrTest extends TestCase
     #[Test]
     public function it_makes_tailwind_width_classes()
     {
-        $this->assertEquals('w-full @lg:w-1/2 @4xl:w-1/3 @8xl:w-1/4', Str::tailwindWidthClass(25));
-        $this->assertEquals('w-full @lg:w-1/2 @4xl:w-1/3 @8xl:w-1/4', Str::tailwindWidthClass(33));
-        $this->assertEquals('w-full @lg:w-1/2 @4xl:w-1/2 @8xl:w-1/3', Str::tailwindWidthClass(50));
-        $this->assertEquals('w-full @lg:w-1/2 @4xl:w-1/2 @8xl:w-1/3', Str::tailwindWidthClass(66));
-        $this->assertEquals('w-full @lg:w-full @4xl:w-2/3 @8xl:w-3/4', Str::tailwindWidthClass(75));
+        $this->assertEquals('w-full @lg:w-1/2 @4xl:w-1/3 @7xl:w-1/4', Str::tailwindWidthClass(25));
+        $this->assertEquals('w-full @lg:w-1/2 @4xl:w-1/3 @7xl:w-1/4', Str::tailwindWidthClass(33));
+        $this->assertEquals('w-full @lg:w-1/2 @4xl:w-1/2 @7xl:w-1/3', Str::tailwindWidthClass(50));
+        $this->assertEquals('w-full @lg:w-1/2 @4xl:w-1/2 @7xl:w-1/3', Str::tailwindWidthClass(66));
+        $this->assertEquals('w-full @lg:w-full @4xl:w-2/3 @7xl:w-3/4', Str::tailwindWidthClass(75));
         $this->assertEquals('w-full', Str::tailwindWidthClass(100));
-        $this->assertEquals('w-full @lg:w-1/2 @4xl:w-1/2 @8xl:w-1/3', Str::tailwindWidthClass('foo'));
+        $this->assertEquals('w-full @lg:w-1/2 @4xl:w-1/2 @7xl:w-1/3', Str::tailwindWidthClass('foo'));
     }
 
     #[Test]

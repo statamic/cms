@@ -12,6 +12,7 @@ import { motion } from 'motion-v';
 import { cva } from 'cva';
 import { Icon, Subheading } from '@/components/ui';
 import { router } from '@inertiajs/vue3';
+import { escapeHtml } from '@/bootstrap/globals.js';
 
 let metaPressed = ref(false);
 let open = ref(false);
@@ -26,6 +27,7 @@ let recentItems = ref(getRecentItems());
 let keyboardBindings = ref([]);
 
 Statamic.$keys.bindGlobal(['mod+k'], (e) => {
+    if (Statamic.$commandPalette.shouldPreventOpening()) return;
     e.preventDefault();
     open.value = true;
 });
@@ -74,22 +76,37 @@ const aggregatedItems = computed(() => [
     ...(searchResults.value || []),
 ]);
 
+function highlightResult(text) {
+    const classes = 'text-blue-600 dark:text-blue-400 underline underline-offset-4 decoration-blue-200 dark:decoration-blue-600/45';
+    const safeText = escapeHtml(text);
+    const result = fuzzysort.single(query.value, safeText);
+    return result?.highlight(`<span class="${classes}">`, '</span>') || safeText;
+}
+
 const results = computed(() => {
     let items = aggregatedItems.value.map(item => normalizeItem(item));
+    let filterableItems = items.filter(item => item.text && item.category !== 'Content Search');
 
     let filtered = fuzzysort
-        .go(query.value, items, {
+        .go(query.value, filterableItems, {
             all: true,
             keys: ['text'],
             scoreFn: fuzzysortScoringAlgorithm,
         })
-        .map(result => {
-            return {
-                score: result._score,
-                html: result[0].highlight('<span class="text-blue-600 dark:text-blue-400 underline underline-offset-4 decoration-blue-200 dark:decoration-blue-600/45">', '</span>'),
-                ...result.obj,
-            };
-        });
+        .map(result => ({
+            score: result._score,
+            html: highlightResult(result.obj.text),
+            ...result.obj,
+        }));
+
+	let contentSearchResults = items
+		.filter(item => item.category === 'Content Search')
+		.map(item => ({
+			...item,
+			html: highlightResult(item.text),
+		}));
+
+    filtered = [...contentSearchResults, ...filtered];
 
     let categoryOrder = query.value
         ? uniq(filtered.map(item => item.category))
@@ -195,6 +212,7 @@ function searchContent() {
 
 function select(selected) {
     let item = findSelectedItem(selected);
+	if (!item) return;
 
     if (item.trackRecent) {
         addToRecentItems(item);
@@ -271,10 +289,7 @@ const modalClasses = cva({
     ],
 })({});
 
-router.on('start', () => {
-    Statamic.$commandPalette.clear();
-    open.value = false;
-});
+router.on('start', () => Statamic.$commandPalette.clear());
 </script>
 
 <template>

@@ -4,6 +4,7 @@ namespace Statamic\Rules;
 
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Support\Facades\Lang;
 use Statamic\Facades\Entry;
 
 class UniqueEntryValue implements ValidationRule
@@ -44,6 +45,10 @@ class UniqueEntryValue implements ValidationRule
             return;
         }
 
-        $fail('statamic::validation.unique_entry_value')->translate();
+        $key = Lang::has('validation.unique_entry_value')
+            ? 'validation.unique_entry_value'
+            : 'statamic::validation.unique_entry_value';
+
+        $fail($key)->translate();
     }
 }

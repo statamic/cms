@@ -65,9 +65,10 @@ class PasskeyLoginTest extends TestCase
         // Verify the session has been populated
         $this->assertNotNull(session('webauthn.challenge'));
 
-        // The session challenge is the binary form (32 bytes)
+        // The session challenge is base64 encoded (32 bytes -> 44 chars)
         // The response challenge is the base64url encoded form
-        $this->assertEquals(32, strlen(session('webauthn.challenge')));
+        $this->assertEquals(44, strlen(session('webauthn.challenge')));
+        $this->assertEquals(32, strlen(base64_decode(session('webauthn.challenge'))));
         $this->assertIsString($responseChallenge);
     }
 
@@ -92,32 +93,17 @@ class PasskeyLoginTest extends TestCase
     }
 
     #[Test]
-    public function it_redirects_to_referer_after_successful_login()
-    {
-        $user = $this->createUser();
-        $refererUrl = 'http://localhost/cp/collections';
-        WebAuthn::shouldReceive('getUserFromCredentials')->once()->andReturn($user);
-        WebAuthn::shouldReceive('validateAssertion')->once()->andReturnTrue();
-
-        $this
-            ->loginRequest(['referer' => $refererUrl])
-            ->assertOk()
-            ->assertJson(['redirect' => $refererUrl]);
-
-        $this->assertAuthenticatedAs($user);
-    }
-
-    #[Test]
-    public function it_does_not_redirect_to_non_cp_referer()
+    public function it_redirects_to_intended_url_after_successful_login()
     {
         $user = $this->createUser();
         WebAuthn::shouldReceive('getUserFromCredentials')->once()->andReturn($user);
         WebAuthn::shouldReceive('validateAssertion')->once()->andReturnTrue();
 
         $this
-            ->loginRequest(['referer' => 'http://localhost/some-other-page'])
+            ->withSession(['url.intended' => 'http://localhost/cp/collections'])
+            ->loginRequest()
             ->assertOk()
-            ->assertJson(['redirect' => cp_route('index')]);
+            ->assertJson(['redirect' => 'http://localhost/cp/collections']);
 
         $this->assertAuthenticatedAs($user);
     }

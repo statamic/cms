@@ -1,5 +1,5 @@
 import { Node } from '@tiptap/core';
-import { Plugin, PluginKey } from '@tiptap/pm/state';
+import { Plugin, PluginKey, NodeSelection } from '@tiptap/pm/state';
 import { Slice, Fragment } from '@tiptap/pm/model';
 import { Decoration, DecorationSet } from '@tiptap/pm/view';
 import { VueNodeViewRenderer } from '@tiptap/vue-3';
@@ -78,7 +78,29 @@ export const Set = Node.create({
     addProseMirrorPlugins() {
         const bard = this.options.bard;
         const type = this.type;
+        const sliceHasSetNodes = (slice) => {
+            let found = false;
+            slice.content.forEach((node) => {
+                if (node.type === type) found = true;
+            });
+            return found;
+        };
         return [
+            new Plugin({
+                key: new PluginKey('setBlockCharacterInput'),
+                props: {
+                    handleKeyDown(view, event) {
+                        const { selection } = view.state;
+                        if (!(selection instanceof NodeSelection) || selection.node.type !== type) return false;
+
+                        const key = event.key;
+                        if (['Backspace', 'Delete', 'Enter', 'Escape', 'Tab'].includes(key)) return false;
+                        if (key.length === 1) return true;
+
+                        return false;
+                    },
+                },
+            }),
             new Plugin({
                 key: new PluginKey('setSelectionDecorator'),
                 props: {
@@ -106,13 +128,13 @@ export const Set = Node.create({
             new Plugin({
                 key: new PluginKey('setPastedTransformer'),
                 props: {
-                    handlePaste: (view, event, slice) => {
-                        let hasSetNodes = false;
-                        slice.content.forEach((node) => {
-                            if (node.type === type) hasSetNodes = true;
-                        });
+                    handleDrop: (view, event, slice, moved) => {
+                        if (moved || !slice) return false;
 
-                        if (!hasSetNodes) return false;
+                        return sliceHasSetNodes(slice);
+                    },
+                    handlePaste: (view, event, slice) => {
+                        if (!sliceHasSetNodes(slice)) return false;
 
                         (async () => {
                             const content = [];

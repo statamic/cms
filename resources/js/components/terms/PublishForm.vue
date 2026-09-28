@@ -56,7 +56,7 @@
             v-if="fieldset"
             ref="container"
             :name="publishContainer"
-            :reference="initialReference"
+            :reference="reference"
             :blueprint="fieldset"
             v-model="values"
             :meta="meta"
@@ -64,6 +64,7 @@
             :origin-meta="originMeta"
             :errors="errors"
             :site="site"
+            :read-only="readOnly"
             v-model:modified-fields="localizedFields"
             :sync-field-confirmation-text="syncFieldConfirmationText"
             :remember-tab="!isInline"
@@ -215,6 +216,7 @@ export default {
             originValues: this.initialOriginValues || {},
             originMeta: this.initialOriginMeta || {},
             site: this.initialSite,
+            reference: this.initialReference,
             isPreviewing: false,
             state: 'new',
             published: this.initialPublished,
@@ -269,7 +271,7 @@ export default {
         },
 
         showLivePreviewButton() {
-            return !this.isCreating && this.isBase && this.livePreviewUrl && this.showVisitUrlButton;
+            return !this.isPreviewing && !this.readOnly && !this.isCreating && this.isBase && this.livePreviewUrl && this.showVisitUrlButton;
         },
 
         showVisitUrlButton() {
@@ -301,7 +303,7 @@ export default {
         },
 
         afterSaveOption() {
-            return this.getPreference('after_save');
+            return this.getPreference('after_save') ?? 'listing';
         },
 
         direction() {
@@ -368,8 +370,8 @@ export default {
                         this.redirectTo(this.createAnotherUrl);
                     }
 
-                    // If the user has opted to go to listing (default/null option), redirect them there.
-                    else if (!this.isInline && nextAction === null) {
+                    // If the user has opted to go to listing, redirect them there.
+                    else if (!this.isInline && nextAction === 'listing') {
                         this.redirectTo(this.listingUrl);
                     }
 
@@ -419,10 +421,6 @@ export default {
             } else {
                 this.createLocalization(localization);
             }
-
-            if (this.publishContainer === 'base') {
-                window.history.replaceState({}, '', localization.url);
-            }
         },
 
         editLocalization(localization) {
@@ -440,8 +438,13 @@ export default {
                 this.actions = data.actions;
                 this.fieldset = data.blueprint;
                 this.site = localization.handle;
+                this.reference = data.reference;
                 this.localizing = false;
                 this.$nextTick(() => this.$refs.container.clearDirtyState());
+
+                if (this.publishContainer === 'base' && localization.url) {
+                    window.history.replaceState({}, '', localization.url + window.location.hash);
+                }
             });
         },
 

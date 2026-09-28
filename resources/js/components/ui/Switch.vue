@@ -11,6 +11,8 @@ const props = defineProps({
     modelValue: { type: Boolean, default: false },
     /** Controls the size of the switch. <br><br> Options: `xs`, `sm`, `base`, `lg` */
     size: { type: String, default: 'base' },
+    /** Whether the switch is disabled */
+    disabled: { type: Boolean, default: false },
 });
 
 defineEmits(['update:modelValue']);
@@ -18,10 +20,11 @@ defineEmits(['update:modelValue']);
 const switchRootClasses = cva({
     base: [
         'relative flex rounded-full shrink-0 border-2 with-contrast:border-1 with-contrast:border-gray-500!',
-        'transition-colors cursor-pointer',
+        'transition-colors',
         'data-[state=checked]:shadow-inner data-[state=checked]:border-switch-bg data-[state=checked]:bg-switch-bg',
         'data-[state=unchecked]:border-transparent',
-        'data-[state=unchecked]:bg-gray-200 dark:data-[state=unchecked]:bg-gray-700'
+        'data-[state=unchecked]:bg-gray-200 dark:data-[state=unchecked]:bg-gray-700',
+        'data-[disabled]:opacity-50 [&:not([data-disabled])]:cursor-pointer data-[disabled]:cursor-not-allowed',
     ],
     variants: {
         size: {
@@ -56,6 +59,7 @@ const switchThumbClasses = cva({
         :id="id"
         :model-value="modelValue"
         :class="switchRootClasses"
+        :disabled="disabled"
         @update:model-value="$emit('update:modelValue', $event)"
         data-ui-switch
     >

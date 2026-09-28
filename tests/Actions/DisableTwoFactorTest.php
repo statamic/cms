@@ -3,6 +3,7 @@
 namespace Tests\Actions;
 
 use Mockery;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Actions\DisableTwoFactorAuthentication as Action;
 use Statamic\Auth\TwoFactor\DisableTwoFactorAuthentication;
@@ -11,6 +12,7 @@ use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
+#[Group('2fa')]
 class DisableTwoFactorTest extends TestCase
 {
     use FakesRoles;
@@ -46,6 +48,14 @@ class DisableTwoFactorTest extends TestCase
 
         $this->assertFalse((new Action)->visibleTo($userWithout2fa));
         $this->assertTrue((new Action)->visibleTo($userWith2fa));
+    }
+
+    #[Test]
+    public function its_visible_for_users_with_incomplete_two_factor_setup()
+    {
+        $userWithIncompleteSetup = User::make()->set('two_factor_secret', 'secret');
+
+        $this->assertTrue((new Action)->visibleTo($userWithIncompleteSetup));
     }
 
     #[Test]

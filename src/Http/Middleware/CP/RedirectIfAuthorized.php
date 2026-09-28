@@ -6,6 +6,8 @@ use Closure;
 use Illuminate\Support\Facades\Auth;
 use Statamic\Facades\User;
 
+use function Statamic\trans as __;
+
 class RedirectIfAuthorized
 {
     /**

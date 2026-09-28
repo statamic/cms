@@ -32,6 +32,7 @@
                     :meta-path-prefix="metaPathPrefix"
                     :can-delete="canDeleteRows"
                     :can-add-rows="canAddRows"
+                    :read-only
                     @updated="(row, value) => $emit('updated', row, value)"
                     @duplicate="(row) => $emit('duplicate', row)"
                     @meta-updated="$emit('meta-updated', row._id, $event)"

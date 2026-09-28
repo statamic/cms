@@ -6,17 +6,25 @@ use Locale;
 use Statamic\Facades\Preference;
 use Statamic\Statamic;
 
+use function Statamic\trans as __;
+
 class CorePreferences
 {
     public function boot()
     {
         Preference::register('locale', [
             'type' => 'select',
-            'display' => __('Locale'),
+            'display' => __('Language'),
             'instructions' => __('statamic::messages.preference_locale_instructions'),
             'clearable' => true,
             'label_html' => true,
             'options' => $this->localeOptions(),
+        ]);
+
+        Preference::register('formatting_locale', [
+            'type' => 'formatting_locales',
+            'display' => __('Formatting Locale'),
+            'instructions' => __('statamic::messages.preference_formatting_locale_instructions'),
         ]);
 
         Preference::register('start_page', [

@@ -16,6 +16,9 @@ use Statamic\Facades;
 use Statamic\Facades\Revision as Revisions;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class Revision implements Arrayable, ContainsQueryableValues, Contract
 {
     use ExistsAsFile, FluentlyGetsAndSets, TracksQueriedColumns, TracksQueriedRelations;
@@ -27,6 +30,7 @@ class Revision implements Arrayable, ContainsQueryableValues, Contract
     protected $message;
     protected $action = 'revision';
     protected $attributes = [];
+    protected $withEvents = true;
 
     public function id()
     {
@@ -115,7 +119,7 @@ class Revision implements Arrayable, ContainsQueryableValues, Contract
             $user = [
                 'id' => $user->id(),
                 'email' => $user->email(),
-                'name' => $user->name(),
+                'name' => $user->name() ?? $user->email(),
                 'avatar' => $user->avatar(),
                 'initials' => $user->initials(),
             ];
@@ -144,11 +148,23 @@ class Revision implements Arrayable, ContainsQueryableValues, Contract
         return true;
     }
 
+    public function deleteQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->delete();
+    }
+
     public function delete()
     {
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
         Revisions::delete($this);
 
-        RevisionDeleted::dispatch($this);
+        if ($withEvents) {
+            RevisionDeleted::dispatch($this);
+        }
     }
 
     public function isWorkingCopy(): bool

@@ -17,9 +17,11 @@ class NavBuilder
 
     protected $items = [];
     protected $pendingItems = [];
+    protected $itemsKeyedById = null;
     protected $withHidden = false;
     protected $itemsWithChildrenClosures = [];
     protected $sections = [];
+    protected $sectionsEmptiedByAuthorization = [];
     protected $sectionsOriginalItemIds = [];
     protected $sectionsManipulations = [];
     protected $sectionsOrder = [];
@@ -32,7 +34,6 @@ class NavBuilder
      * Instantiate nav builder.
      *
      * @param  array  $items
-     * @param  bool  $withHidden
      */
     public function __construct($items)
     {
@@ -153,9 +154,33 @@ class NavBuilder
      */
     protected function authorizeItems()
     {
+        $sectionsBefore = $this->sectionsWithItems($this->items);
+
         $this->items = $this->filterAuthorizedNavItems($this->items);
+        $this->itemsKeyedById = null;
+
+        $this->sectionsEmptiedByAuthorization = $sectionsBefore
+            ->diff($this->sectionsWithItems($this->items))
+            ->values()
+            ->all();
 
         return $this;
+    }
+
+    /**
+     * Get the sections that currently contain at least one top-level item.
+     *
+     * @param  mixed  $items
+     * @return \Illuminate\Support\Collection
+     */
+    protected function sectionsWithItems($items)
+    {
+        return collect($items)
+            ->reject(fn ($item) => $item->isChild())
+            ->map(fn ($item) => $item->section())
+            ->filter()
+            ->unique()
+            ->values();
     }
 
     /**
@@ -352,6 +377,7 @@ class NavBuilder
 
         if (! in_array($item->manipulations()['action'], ['@modify', '@hide'])) {
             $this->items[] = $item;
+            $this->itemsKeyedById = null;
         }
 
         return $item;
@@ -518,6 +544,16 @@ class NavBuilder
     }
 
     /**
+     * Get items keyed by ID
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    protected function getItemsKeyedById()
+    {
+        return $this->itemsKeyedById ??= collect($this->items)->keyBy->id();
+    }
+
+    /**
      * Find existing nav item by ID.
      *
      * @param  string  $id
@@ -534,7 +570,7 @@ class NavBuilder
             return $item;
         }
 
-        $items = collect($this->items)->keyBy->id();
+        $items = $this->getItemsKeyedById();
 
         if ($item = $items->get($id)) {
             return $item;
@@ -562,7 +598,7 @@ class NavBuilder
             $id = NavTransformer::removeUniqueIdHash($id);
         }
 
-        $items = collect($this->items)->keyBy->id();
+        $items = $this->getItemsKeyedById();
 
         $idParts = collect(explode('::', $id));
 
@@ -832,6 +868,7 @@ class NavBuilder
         $this->items = collect($this->items)
             ->reject(fn ($registeredItem) => $registeredItem->id() === $item->id())
             ->all();
+        $this->itemsKeyedById = null;
     }
 
     /**
@@ -892,7 +929,7 @@ class NavBuilder
         // Collect and order each section's items...
         $built = collect($sections)
             ->reject(fn ($items, $section) => $this->withHidden ? false : Arr::get($manipulations, "{$section}.action") === '@hide')
-            ->filter(fn ($items) => $items || $this->withHidden)
+            ->filter(fn ($items, $section) => $items || ($this->withHidden && ! in_array($section, $this->sectionsEmptiedByAuthorization)))
             ->map(function ($items, $section) {
                 return collect($this->sectionsWithReorderedItems)->contains($section)
                     ? collect($items)->sortBy(fn ($item) => $item->order())->values()
@@ -984,7 +1021,7 @@ class NavBuilder
         $updated = collect($this->items)
             ->filter(fn ($item) => collect($this->itemsWithChildrenClosures)->contains($item->id()))
             ->filter(fn ($item) => $item->isActive() || $this->withHidden)
-            ->mapWithKeys(fn ($item) => [$item->id() => $item->children()?->map->url()->all() ?? []])
+            ->mapWithKeys(fn ($item) => [$item->id() => $item->resolveChildren()->children()?->map->url()->all() ?? []])
             ->filter(fn ($urls, $id) => $this->urlsUnresolvedChildren->get($id) != $urls)
             ->each(fn ($urls, $id) => $this->trackChangedChildren($id, $urls))
             ->isNotEmpty();
@@ -1038,8 +1075,17 @@ class NavBuilder
      */
     public static function getUnresolvedChildrenUrlsForItem($item)
     {
-        return Blink::get(static::UNRESOLVED_CHILDREN_URLS_CACHE_KEY)?->get($item->id())
-            ?? Cache::get(static::UNRESOLVED_CHILDREN_URLS_CACHE_KEY)?->get($item->id());
+        if ($urls = Blink::get(static::UNRESOLVED_CHILDREN_URLS_CACHE_KEY)) {
+            return $urls->get($item->id());
+        }
+
+        if ($urls = Cache::get(static::UNRESOLVED_CHILDREN_URLS_CACHE_KEY)) {
+            Blink::put(static::UNRESOLVED_CHILDREN_URLS_CACHE_KEY, $urls);
+
+            return $urls->get($item->id());
+        }
+
+        return null;
     }
 
     /**
@@ -1049,9 +1095,15 @@ class NavBuilder
      */
     public static function getAllUrls()
     {
-        return Blink::get(static::ALL_URLS_CACHE_KEY)
-            ?? Cache::get(static::ALL_URLS_CACHE_KEY)
-            ?? collect();
+        if ($urls = Blink::get(static::ALL_URLS_CACHE_KEY)) {
+            return $urls;
+        }
+
+        $urls = Cache::get(static::ALL_URLS_CACHE_KEY) ?? collect();
+
+        Blink::put(static::ALL_URLS_CACHE_KEY, $urls);
+
+        return $urls;
     }
 
     /**

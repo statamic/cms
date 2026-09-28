@@ -1,7 +1,7 @@
 <script>
 import { defineAsyncComponent } from 'vue';
 import { mapValues, pick } from 'lodash-es';
-import uniqid from 'uniqid';
+import { nanoid as uniqid } from 'nanoid';
 import Head from '@/pages/layout/Head.vue';
 import PageEditor from '@/components/structures/PageEditor.vue';
 import PageSelector from '@/components/structures/PageSelector.vue';
@@ -51,6 +51,7 @@ export default {
         canSelectAcrossSites: { type: Boolean, required: true },
         canEditBlueprint: { type: Boolean, required: true },
         entryQueryScopes: { type: Array, default: () => [] },
+	    collectionTree: { type: Object, required: false },
     },
 
     data() {
@@ -115,6 +116,10 @@ export default {
             }
 
             return;
+        },
+
+        newPageDepth() {
+            return this.targetParent ? this.targetParent.level + 1 : 1;
         },
     },
 
@@ -185,7 +190,7 @@ export default {
         },
 
         editPage(page) {
-            this.editingPage = { page };
+            this.editingPage = { page, depth: this.$refs.tree.depthOf(page) };
         },
 
         updatePage(values) {
@@ -357,10 +362,10 @@ export default {
 </script>
 
 <template>
-    <div>
-        <Head :title="title" />
+    <div class="max-w-5xl 3xl:max-w-6xl mx-auto" data-max-width-wrapper>
+        <Head :title="[__(title), __('Navigation')]" />
 
-        <Header v-if="mounted" :title="title" icon="navigation">
+        <Header v-if="mounted" :title="__(title)" icon="navigation">
             <ItemActions
                 v-if="hasItemActions"
                 :url="itemActionUrl"
@@ -540,6 +545,7 @@ export default {
             :query-scopes="entryQueryScopes"
             :max-items="maxPagesSelection"
             :can-select-across-sites="canSelectAcrossSites"
+            :tree="collectionTree"
             @selected="entriesSelected"
         />
 
@@ -548,6 +554,7 @@ export default {
             :site="site"
             :id="editingPage.page.id"
             :entry="editingPage.page.entry"
+            :depth="editingPage.depth"
             :editEntryUrl="editingPage.page.entry ? editingPage.page.edit_url : null"
             :publish-info="publishInfo[editingPage.page.id]"
             :blueprint="blueprint"
@@ -563,6 +570,7 @@ export default {
             v-if="creatingPage"
             creating
             :site="site"
+            :depth="newPageDepth"
             :blueprint="blueprint"
             :handle="handle"
             :read-only="!canEdit"

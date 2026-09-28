@@ -15,7 +15,7 @@ const reloadPage = () => router.reload();
 <template>
     <Head :title="__('Roles & Permissions')" />
 
-    <div class="max-w-5xl mx-auto">
+    <div class="max-w-page mx-auto">
         <Header :title="__('Roles & Permissions')" icon="permissions">
             <CommandPaletteItem
                 category="Actions"
@@ -64,6 +64,6 @@ const reloadPage = () => router.reload();
             </template>
         </Listing>
 
-        <DocsCallout :topic="__('Roles & Permissions')" url="users#permissions" />
+        <DocsCallout :topic="__('Roles & Permissions')" url="permissions" />
     </div>
 </template>

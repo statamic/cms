@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import { Modal, Button, Icon } from '@/components/ui';
+import useCopy from '@/composables/copy';
 
 const emit = defineEmits(['cancel', 'close']);
 
@@ -14,7 +15,7 @@ const props = defineProps({
 const loading = ref(true);
 const confirming = ref(false);
 const recoveryCodes = ref(null);
-const canCopy = !!navigator.clipboard;
+const { copySupported, copy } = useCopy();
 
 onMounted(() => getRecoveryCodes());
 
@@ -34,19 +35,10 @@ function regenerate() {
         Statamic.$toast.success(__('Refreshed recovery codes'));
     });
 }
-
-function copyToClipboard() {
-    if (!canCopy) return Statamic.$toast.error(__('Unable to copy to clipboard'));
-
-    navigator.clipboard
-        .writeText(recoveryCodes.value.join('\n'))
-        .then(() => Statamic.$toast.success(__('Copied to clipboard')))
-        .catch((error) => Statamic.$toast.error(__('Unable to copy to clipboard')));
-}
 </script>
 
 <template>
-    <Modal :title="__('Recovery Codes')" open @update:open="$emit('cancel')">
+    <Modal :title="__('Recovery Codes')" blur open @update:open="$emit('cancel')">
         <div>
             <div v-if="loading" class="flex items-center justify-center text-center">
                 <Icon name="loading" />
@@ -67,7 +59,7 @@ function copyToClipboard() {
                     </div>
 
                     <div class="flex items-center space-x-4">
-                        <Button v-if="canCopy" @click="copyToClipboard">{{ __('Copy') }}</Button>
+                        <Button v-if="copySupported" @click="copy(recoveryCodes.join('\n'))">{{ __('Copy') }}</Button>
 
                         <Button :href="downloadUrl" download>{{ __('Download') }}</Button>
 
@@ -90,6 +82,7 @@ function copyToClipboard() {
         :open="confirming"
         :danger="true"
         :title="__('Are you sure?')"
+        blur
         @cancel="confirming = false"
         @confirm="regenerate"
     >

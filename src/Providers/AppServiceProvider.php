@@ -8,20 +8,32 @@ use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Foundation\Http\Middleware\TrimStrings;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Str;
+use Statamic\Console\Processes\Ffmpeg;
 use Statamic\CP\CarbonAsVueComponent;
 use Statamic\Facades;
 use Statamic\Facades\Addon;
+use Statamic\Facades\Config;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\Token;
+use Statamic\Facades\User;
 use Statamic\Fields\FieldsetRecursionStack;
+use Statamic\Http\Middleware\PingOutpost;
+use Statamic\Icons\IconManager;
 use Statamic\Jobs\HandleEntrySchedule;
+use Statamic\Licensing\Radio;
+use Statamic\Notifications\ElevatedSessionVerificationCode;
 use Statamic\Sites\Sites;
 use Statamic\Stache\Query\RevisionQueryBuilder;
 use Statamic\Statamic;
 use Statamic\Tokens\Handlers\LivePreview;
 use Statamic\View\Scaffolding\TemplateGenerator;
+
+use function Statamic\trans as __;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -40,11 +52,19 @@ class AppServiceProvider extends ServiceProvider
             $this->loadRoutesFrom("{$this->root}/routes/routes.php");
         });
 
+        if (class_exists(\Laravel\Octane\Events\RequestReceived::class)) {
+            Event::listen(\Laravel\Octane\Events\RequestReceived::class, fn () => Ffmpeg::clearBinaryCache());
+        }
+
         $this->app[\Illuminate\Contracts\Http\Kernel::class]
             ->pushMiddleware(\Statamic\Http\Middleware\PoweredByHeader::class)
             ->pushMiddleware(\Statamic\Http\Middleware\CheckComposerJsonScripts::class)
             ->pushMiddleware(\Statamic\Http\Middleware\CheckMultisite::class)
-            ->pushMiddleware(\Statamic\Http\Middleware\StopImpersonating::class);
+            ->pushMiddleware(\Statamic\Http\Middleware\StopImpersonating::class)
+            ->pushMiddleware(PingOutpost::class)
+            // Prepended so the snapshot runs before any middleware that could
+            // throw and render a page (which would register json variables).
+            ->prependMiddleware(\Statamic\Http\Middleware\SnapshotJsonVariables::class);
 
         $this->loadViewsFrom("{$this->root}/resources/views", 'statamic');
 
@@ -77,8 +97,12 @@ class AppServiceProvider extends ServiceProvider
 
         $this->loadViewsFrom("{$this->root}/resources/views/extend", 'statamic');
 
+        $formsSource = config('statamic.templates.language', 'antlers') === 'blade'
+            ? "{$this->root}/resources/views/extend/forms/blade"
+            : "{$this->root}/resources/views/extend/forms/antlers";
+
         $this->publishes([
-            "{$this->root}/resources/views/extend/forms" => resource_path('views/vendor/statamic/forms'),
+            $formsSource => resource_path('views/vendor/statamic/forms'),
         ], 'statamic-forms');
 
         $this->publishes([
@@ -86,6 +110,7 @@ class AppServiceProvider extends ServiceProvider
         ], 'statamic-scaffolding');
 
         $this->app['redirect']->macro('cpRoute', function ($route, $parameters = []) {
+            /** @var \Illuminate\Routing\Redirector $this */
             return $this->to(cp_route($route, $parameters));
         });
 
@@ -94,13 +119,25 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Request::macro('statamicToken', function () {
-            if ($token = $this->token ?? $this->header('X-Statamic-Token')) {
+            if (($token = $this->token ?? $this->header('X-Statamic-Token')) && is_string($token)) {
                 return Token::find($token);
             }
         });
 
         Request::macro('isLivePreview', function () {
             return optional($this->statamicToken())->handler() === LivePreview::class;
+        });
+
+        Request::macro('isLivePreviewOf', function ($item) {
+            $token = $this->statamicToken();
+
+            if (! $token || $token->handler() !== LivePreview::class) {
+                return false;
+            }
+
+            $previewItem = \Facades\Statamic\CP\LivePreview::item($token);
+
+            return $item && $previewItem && method_exists($item, 'reference') && $previewItem->reference() === $item->reference();
         });
 
         TrimStrings::skipWhen(function (Request $request) {
@@ -111,7 +148,17 @@ class AppServiceProvider extends ServiceProvider
 
         $this->addAboutCommandInfo();
 
-        $this->app->make(Schedule::class)->job(HandleEntrySchedule::class)->everyMinute();
+        $this->registerElevatedSessionMacros();
+
+        if (config('statamic.system.handle_scheduled_entries')) {
+            $this->app->make(Schedule::class)->job(HandleEntrySchedule::class)->everyMinute();
+        }
+
+        $this->app->make(Schedule::class)
+            ->call(fn () => app(Radio::class)->ping())
+            ->hourly()
+            ->name('statamic-outpost')
+            ->withoutOverlapping();
     }
 
     public function register()
@@ -121,6 +168,8 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton(Sites::class);
+
+        $this->app->singleton(IconManager::class);
 
         collect([
             \Statamic\Contracts\Entries\EntryRepository::class => \Statamic\Stache\Repositories\EntryRepository::class,
@@ -153,6 +202,7 @@ class AppServiceProvider extends ServiceProvider
                 ->setRepository('collection', \Statamic\Contracts\Entries\CollectionRepository::class)
                 ->setRepository('taxonomy', \Statamic\Contracts\Taxonomies\TaxonomyRepository::class)
                 ->setRepository('global', \Statamic\Contracts\Globals\GlobalRepository::class)
+                ->setRepository('globals', \Statamic\Contracts\Globals\GlobalVariablesRepository::class)
                 ->setRepository('asset', \Statamic\Contracts\Assets\AssetRepository::class)
                 ->setRepository('user', \Statamic\Contracts\Auth\UserRepository::class);
         });
@@ -180,6 +230,8 @@ class AppServiceProvider extends ServiceProvider
                     ]);
                 });
         });
+
+        $this->app->singleton(\Statamic\Fields\FieldRepository::class);
 
         $this->app->singleton(\Statamic\Fields\FieldsetRepository::class, function () {
             return (new \Statamic\Fields\FieldsetRepository)
@@ -217,6 +269,42 @@ class AppServiceProvider extends ServiceProvider
                 ->finalNewline(config('statamic.templates.style.final_newline', false))
                 ->preferComponentSyntax(config('statamic.templates.antlers.use_components', false));
         });
+
+        $this->registerSerializableClasses();
+    }
+
+    private function registerSerializableClasses()
+    {
+        $existing = $this->app['config']->get('cache.serializable_classes');
+
+        if ($existing === null || $existing === true) {
+            return;
+        }
+
+        $this->app['config']->set('cache.serializable_classes', array_merge(is_array($existing) ? $existing : [], [
+            \Statamic\Auth\File\User::class,
+            \Statamic\Auth\File\Passkey::class,
+            \Statamic\Auth\Eloquent\Passkey::class,
+            \Statamic\Assets\Asset::class,
+            \Statamic\Assets\AssetContainer::class,
+            \Statamic\Entries\Collection::class,
+            \Statamic\Entries\Entry::class,
+            \Statamic\Forms\Form::class,
+            \Statamic\Forms\Submission::class,
+            \Statamic\Globals\GlobalSet::class,
+            \Statamic\Globals\Variables::class,
+            \Statamic\Revisions\Revision::class,
+            \Statamic\Structures\Nav::class,
+            \Statamic\Structures\NavTree::class,
+            \Statamic\Structures\CollectionTree::class,
+            \Statamic\Structures\CollectionStructure::class,
+            \Statamic\Taxonomies\Taxonomy::class,
+            \Statamic\Taxonomies\LocalizedTerm::class,
+            \Statamic\Taxonomies\Term::class,
+            \Carbon\Carbon::class,
+            \Illuminate\Support\Carbon::class,
+            \Illuminate\Support\Collection::class,
+        ]));
     }
 
     protected function registerMiddlewareGroup()
@@ -245,6 +333,7 @@ class AppServiceProvider extends ServiceProvider
         AboutCommand::add('Statamic', [
             'Version' => fn () => Statamic::version().' '.(Statamic::pro() ? '<fg=yellow;options=bold>PRO</>' : 'Solo'),
             'Addons' => $addons->count(),
+            'License Key' => fn () => Config::getLicenseKey() ? 'Set' : 'Not set',
             'Stache Watcher' => fn () => $this->stacheWatcher(),
             'Static Caching' => config('statamic.static_caching.strategy') ?: 'Disabled',
             'Sites' => fn () => $this->sitesAboutCommandInfo(),
@@ -279,5 +368,51 @@ class AppServiceProvider extends ServiceProvider
             : $sites->take(3)->map->name()->join(', ').', and '.($sites->count() - 3).' more';
 
         return $sites->count().' ('.$summary.')';
+    }
+
+    private function registerElevatedSessionMacros()
+    {
+        Request::macro('hasElevatedSession', function () {
+            return $this->getElevatedSessionExpiry() > now()->timestamp;
+        });
+
+        Request::macro('getElevatedSessionExpiry', function () {
+            if (! $lastElevated = session()->get('statamic_elevated_session')) {
+                return null;
+            }
+
+            return Carbon::createFromTimestamp($lastElevated)
+                ->addMinutes((float) config('statamic.users.elevated_session_duration', 15))
+                ->timestamp;
+        });
+
+        Request::macro('getElevatedSessionVerificationCode', function () {
+            return session()->get('statamic_elevated_session_verification_code')['code'] ?? null;
+        });
+
+        Session::macro('elevate', function () {
+            /** @var \Illuminate\Session\Store $this */
+            $this->put('statamic_elevated_session', now()->timestamp);
+            $this->forget('statamic_elevated_session_verification_code');
+        });
+
+        Session::macro('sendElevatedSessionVerificationCodeIfRequired', function () {
+            if ($timestamp = session()->get('statamic_elevated_session_verification_code')['generated_at'] ?? null) {
+                if ($timestamp > now()->subMinutes(5)->timestamp) {
+                    return;
+                }
+            }
+
+            $this->sendElevatedSessionVerificationCode();
+        });
+
+        Session::macro('sendElevatedSessionVerificationCode', function () {
+            session()->put(
+                key: 'statamic_elevated_session_verification_code',
+                value: ['code' => $verificationCode = Str::random(20), 'generated_at' => now()->timestamp],
+            );
+
+            User::current()->notify(new ElevatedSessionVerificationCode($verificationCode));
+        });
     }
 }

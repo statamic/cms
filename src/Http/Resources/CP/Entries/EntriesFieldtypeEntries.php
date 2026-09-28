@@ -6,6 +6,8 @@ use Illuminate\Pagination\AbstractPaginator;
 use Statamic\CP\Column;
 use Statamic\Fieldtypes\Entries as EntriesFieldtype;
 
+use function Statamic\trans as __;
+
 class EntriesFieldtypeEntries extends Entries
 {
     private EntriesFieldtype $fieldtype;

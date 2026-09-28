@@ -143,7 +143,7 @@ abstract class Builder extends BaseBuilder
 
     protected function getItems($keys)
     {
-        return $this->store->getItems($keys);
+        return $this->store->getItems($keys)->filter()->values();
     }
 
     protected function filterWhereBasic($values, $where)
@@ -157,20 +157,31 @@ abstract class Builder extends BaseBuilder
 
     protected function filterWhereIn($values, $where)
     {
-        $lookup = array_flip(array_map(fn ($v) => $v ?? '__NULL__', $where['values']));
+        $lookup = array_flip(array_map($this->normalizeLookupValue(...), $where['values']));
 
         return $values->filter(
-            fn ($value) => ! is_array($value) && isset($lookup[$value ?? '__NULL__'])
+            fn ($value) => ! is_array($value) && isset($lookup[$this->normalizeLookupValue($value)])
         );
     }
 
     protected function filterWhereNotIn($values, $where)
     {
-        $lookup = array_flip(array_map(fn ($v) => $v ?? '__NULL__', $where['values']));
+        $lookup = array_flip(array_map($this->normalizeLookupValue(...), $where['values']));
 
         return $values->filter(
-            fn ($value) => is_array($value) || ! isset($lookup[$value ?? '__NULL__'])
+            fn ($value) => is_array($value) || ! isset($lookup[$this->normalizeLookupValue($value)])
         );
+    }
+
+    private function normalizeLookupValue($value): string|int
+    {
+        return match (true) {
+            is_string($value) => strtolower($value),
+            $value === null => '__NULL__',
+            $value === true => '__TRUE__',
+            $value === false => '__FALSE__',
+            default => $value,
+        };
     }
 
     protected function filterWhereNull($values, $where)
@@ -196,7 +207,9 @@ abstract class Builder extends BaseBuilder
                 return false;
             }
 
-            return $value->copy()->startOfDay()->$method($where['value']);
+            $value = $value->copy()->setTimezone(config('app.timezone'));
+
+            return $value->startOfDay()->$method($where['value']);
         });
     }
 
@@ -247,6 +260,8 @@ abstract class Builder extends BaseBuilder
             if (is_null($value)) {
                 return false;
             }
+
+            $value = $value->copy()->setTimezone(config('app.timezone'));
 
             $compareValue = $value->copy()->setTimeFromTimeString($where['value']);
 

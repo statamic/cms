@@ -1,5 +1,5 @@
 import { ref } from 'vue';
-import { startAuthentication, browserSupportsWebAuthn } from '@simplewebauthn/browser';
+import { startAuthentication, browserSupportsWebAuthn, WebAuthnAbortService } from '@simplewebauthn/browser';
 import axios from 'axios';
 
 export function usePasskey() {
@@ -19,6 +19,7 @@ export function usePasskey() {
             try {
                 startAuthResponse = await startAuthentication({ optionsJSON, useBrowserAutofill });
             } catch (e) {
+                if (e.name === 'AbortError' || e.name === 'NotAllowedError') return;
                 console.error(e);
                 error.value = __('Authentication failed.');
                 if (!useBrowserAutofill) waiting.value = false;
@@ -37,6 +38,10 @@ export function usePasskey() {
         }
     }
 
+    function cancel() {
+        WebAuthnAbortService.cancelCeremony();
+    }
+
     function handleError(e) {
         if (e.response) {
             const { message } = e.response.data;
@@ -52,5 +57,6 @@ export function usePasskey() {
         waiting,
         supported,
         authenticate,
+        cancel,
     };
 }

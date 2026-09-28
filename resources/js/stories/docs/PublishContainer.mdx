@@ -4,10 +4,128 @@ import * as PublishContainerStories from '../PublishContainer.stories';
 <Meta of={PublishContainerStories} />
 
 # PublishContainer
-The `PublishContainer` component is used to create Publish Forms in the Control Panel. It handles field rendering, validation, localization and state management.
+The `PublishContainer` component powers Publish Forms across the Control Panel. It handles field rendering, validation, localization and state management.
 
-## Learn more
-To learn more about the `PublishContainer` component (and publish forms in general), please visit the ["Publish Forms"](https://statamic.dev/control-panel/publish-forms) page on our main documentation site.
+> If you're looking to create a publish form, check out the [Publish Forms guide](https://statamic.dev/control-panel/publish-forms). This page covers the JavaScript internals of the `PublishContainer` component.
+
+## Context
+The `PublishContainer` exposes state and methods via Vue's provide/inject mechanism. You can inject these into any component nested inside the container.
+
+> Note: Components _outside_ the container cannot inject this context.
+
+**Composition API:**
+```js
+import { injectPublishContext } from '@statamic/cms/ui';
+const { values, setFieldValue, etc } = injectPublishContext();
+
+// Refs are provided, so you need to call `.value` to unwrap it.
+const somethingFieldValue = values.value.something;
+```
+
+**Options API**
+```js
+import { publishContextKey } from '@statamic/cms/ui';
+
+export default {
+  inject: {
+    publishContext: { from: publishContextKey }
+  },
+  methods: {
+    getSomething() {
+      return this.publishContext.values.something;
+    }
+  }
+}
+```
+
+### Available keys
+`injectPublishContext()` exposes the following:
+
+- `asConfig` — Returns `true` when it's a config publish form, which renders slightly differently.
+- `blueprint` — The blueprint's publish array.
+- `components` — Components pushed by addons (eg. the Collaboration addon displays a list of collaborators).
+- `desyncField(path)` — Desync a field from its origin value.
+- `direction` — Text direction (`ltr` or `rtl`).
+- `errors` — Validation errors.
+- `extraValues` — Extra values made available to field conditions.
+- `hiddenFields` — Array of hidden field handles.
+- `isDirty()` - Returns `true` when the publish container's values are dirty
+- `isTrackingOriginValues` — Returns `true` when editing a localization.
+- `localizedFields` — Array of localized field handles.
+- `meta` — Fieldtype meta.
+- `name`
+- `originValues` — Values from the origin localization.
+- `parentContainer` — The parent component, if nested.
+- `previews` — Bard/Replicator set previews.
+- `readOnly`
+- `reference` — The reference of the item being edited (eg. `entry::the-entry-id`)
+- `rememberTab` — Returns `true` when the active tab should be remembered in the URL hash.
+- `revealerFields` — Array of revealer field handles.
+- `revealerValues` — Values of revealer fields.
+- `setFieldMeta(path, value)` — Update a field's metadata.
+- `setFieldPreviewValue(path, value)` — Update a field's Bard/Replicator preview.
+- `setFieldValue(path, value)` — Update a field's value.
+- `setHiddenField(field)` — Mark field as hidden.
+- `setRevealerField(path)` — Mark field as a revealer.
+- `setValues(newValues)` — Replace all values.
+- `site` — The site handle of the active localization.
+- `syncField(path)` — Sync a field with its origin value.
+- `unsetRevealerField(path)` — Unmark a field as a revealer.
+- `values` — The current form values.
+- `visibleValues` — Values for currently visible fields.
+- `withoutDirtying()` — Run a callback without marking the form as dirty.
+- Any other keys provided by the publish form (eg. entry publish form provides `isWorkingCopy` and `revisionsEnabled`)
+
+## Customizing the layout
+By default, the `PublishContainer` component renders a standard publish form with tabs and sections. If you need a custom layout - for example: to add extra actions, or avoid rendering sections, you may provide your markup in the default slot.
+
+Inside the slot, use the `Publish` sub-components, which automatically connect to the parent `PublishContainer` via the shared context.
+
+```js
+<script setup>
+import { ref } from 'vue';
+import { PublishContainer, PublishComponents, PublishTabs, Button } from '@statamic/cms/ui';
+
+const props = defineProps({
+    permalink: String,
+    blueprint: Object,
+    initialMeta: Object,
+    initialValues: Object,
+});
+
+const meta = ref(props.initialMeta);
+const values = ref(props.initialValues);
+</script>
+```
+```html
+<template>
+    <PublishContainer :meta :blueprint v-model="values">
+        <PublishComponents />
+
+        <PublishTabs>
+            <template #actions>
+                <Button
+                    :href="permalink"
+                    :text="__('Visit URL')"
+                    icon="external-link"
+                    target="_blank"
+                />
+            </template>
+        </PublishTabs>
+    </PublishContainer>
+</template>
+```
+
+### Available components
+
+You can use the following components to build your own layout:
+
+- `PublishComponents` — Renders components pushed by addons (eg. the Collaboration addon displays a list of collaborators).
+- `PublishField` — Renders an individual field.
+- `PublishFields` — Renders fields in a section. Must be wrapped by `PublishFieldsProvider`.
+- `PublishLocalizations` — Renders the localization switcher.
+- `PublishSections` — Renders sections in a tab.
+- `PublishTabs` — Renders tabs. Must be wrapped by `TabsProvider`.
 
 ## Arguments
 <ArgTypes of={PublishContainerStories} />

@@ -1,7 +1,9 @@
 import { translate, translateChoice } from '../translations/translator';
-import uid from 'uniqid';
+import { nanoid as uid } from 'nanoid';
 import PreviewHtml from '../components/fieldtypes/replicator/PreviewHtml';
 import renderMarkdown from '@/util/markdown.js';
+
+export { data_get } from '@/util/data_get.js';
 
 export function cp_url(url) {
     url = Statamic.$config.get('cpUrl') + '/' + url;
@@ -27,13 +29,6 @@ export function relative_url(url) {
 
 export function dd(args) {
     console.log(args);
-}
-
-export function data_get(obj, path, fallback = null) {
-    // Source: https://stackoverflow.com/a/22129960
-    var properties = Array.isArray(path) ? path : path.split('.');
-    var value = properties.reduce((prev, curr) => prev && prev[curr], obj);
-    return value !== undefined ? value : fallback;
 }
 
 export function data_set(obj, path, value) {

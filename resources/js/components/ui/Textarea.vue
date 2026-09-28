@@ -1,14 +1,18 @@
 <script setup>
 import { cva } from 'cva';
 import CharacterCounter from './CharacterCounter.vue';
+import Button from './Button/Button.vue';
 import autosize from 'autosize/dist/autosize.js';
-import { nextTick, onBeforeUnmount, onMounted, useTemplateRef } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, useTemplateRef } from 'vue';
+import useCopy from '@/composables/copy';
 
 defineEmits(['update:modelValue']);
 
 const props = defineProps({
     /** When `true`, the textarea will automatically grow/shrink to fit content */
     elastic: { type: Boolean, default: false },
+    /** When `true`, shows a copy button to copy the value to clipboard */
+    copyable: { type: Boolean, default: false },
     disabled: { type: Boolean, default: false },
     /** ID attribute for the textarea element */
     id: { type: String, default: null },
@@ -23,6 +27,9 @@ const props = defineProps({
     /** Specify a character limit */
     limit: { type: Number, default: null },
 });
+
+const { copySupported, copied, copy } = useCopy();
+const canCopy = computed(() => props.copyable && copySupported.value);
 
 const classes = cva({
     base: [
@@ -47,11 +54,17 @@ const classes = cva({
 const textarea = useTemplateRef('textarea');
 
 onMounted(() => {
-    autosize(textarea.value);
-    setTimeout(() => nextTick(() => autosize.update(textarea.value)), 1);
+    if (props.elastic) {
+        autosize(textarea.value);
+        setTimeout(() => nextTick(() => autosize.update(textarea.value)), 1);
+    }
 });
 
-onBeforeUnmount(() => autosize.destroy(textarea.value));
+onBeforeUnmount(() => {
+    if (props.elastic) {
+        autosize.destroy(textarea.value);
+    }
+});
 </script>
 
 <template>
@@ -68,6 +81,16 @@ onBeforeUnmount(() => autosize.destroy(textarea.value));
             data-ui-control
             @input="$emit('update:modelValue', $event.target.value)"
         />
+        <div class="absolute right-2 top-2" v-if="canCopy">
+            <Button
+                size="sm"
+                :icon="copied ? 'clipboard-check' : 'clipboard'"
+                variant="subtle"
+                @click="copy(modelValue)"
+                class="animate"
+                :class="copied ? 'animate-wiggle' : ''"
+            />
+        </div>
         <div class="absolute right-2 bottom-2" v-if="limit">
             <CharacterCounter :text="modelValue" :limit />
         </div>

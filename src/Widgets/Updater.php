@@ -18,19 +18,22 @@ class Updater extends Widget
         $items = collect(UpdatesOverview::updatableAddons())->map(function ($id) {
             $addon = Addon::get($id);
 
+            $changelog = $addon->changelog();
+
             return [
                 'name' => $addon->name(),
-                'count' => $addon->changelog()->availableUpdatesCount(),
-                'critical' => false,
+                'count' => $changelog->availableUpdatesCount(),
+                'security' => $changelog->hasSecurityUpdate(),
                 'url' => cp_route('updater.product', $addon->slug()),
             ];
         });
 
         if (UpdatesOverview::hasStatamicUpdate()) {
+            $changelog = Marketplace::statamic()->changelog();
             $items->push([
                 'name' => 'Statamic Core',
-                'count' => Marketplace::statamic()->changelog()->availableUpdatesCount(),
-                'critical' => false,
+                'count' => $changelog->availableUpdatesCount(),
+                'security' => $changelog->hasSecurityUpdate(),
                 'url' => cp_route('updater.product', 'statamic'),
             ]);
         }

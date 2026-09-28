@@ -29,7 +29,7 @@ class DisableTwoFactorTest extends TestCase
         $this
             ->actingAs($user)
             ->withActiveElevatedSession()
-            ->delete(cp_route('users.two-factor.disable'))
+            ->deleteJson(cp_route('users.two-factor.disable'))
             ->assertOk()
             ->assertJson(['redirect' => null]);
 
@@ -55,7 +55,7 @@ class DisableTwoFactorTest extends TestCase
         $this
             ->actingAs($user)
             ->withActiveElevatedSession()
-            ->delete(cp_route('users.two-factor.disable'))
+            ->deleteJson(cp_route('users.two-factor.disable'))
             ->assertOk()
             ->assertJson(['redirect' => cp_route('two-factor-setup')]);
 

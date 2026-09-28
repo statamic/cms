@@ -1,16 +1,16 @@
 <template>
     <div ref="browser" class="h-full" @keydown.shift="shiftDown" @keyup="clearShift">
         <Uploader
-            ref="uploader"
+            ref="internalUploader"
             :container="container.id"
             :path="path"
-            :enabled="!preventDragging && canUpload"
+            :enabled="!uploader && !preventDragging && canUpload"
             @updated="uploadsUpdated"
             @upload-complete="uploadCompleted"
             @error="uploadError"
             v-slot="{ dragging }"
         >
-            <div>
+            <div class="pb-1">
                 <div class="drag-notification" v-show="dragging">
                     <Icon name="upload-cloud-large" class="m-4 size-13" />
                     <span>{{ __('Drop File to Upload') }}</span>
@@ -20,12 +20,16 @@
                     ref="listing"
                     :url="requestUrl"
                     :columns="columns"
+                    :sort-column="sortColumn"
+                    :sort-direction="sortDirection"
+                    :filters="filters"
                     :action-url="actionUrl"
                     :action-context="actionContext"
                     :allow-bulk-actions="allowBulkActions"
                     :selections="selectedAssets"
                     :max-selections="maxFiles"
                     :preferences-prefix="preferencesPrefix"
+                    :additional-parameters="additionalParameters"
                     v-model:search-query="searchQuery"
                     @request-completed="listingRequestCompleted"
                     @update:selections="$emit('selections-updated', $event)"
@@ -33,35 +37,54 @@
                     <template #default="{ items }">
                         <slot name="header" v-bind="{ canUpload, openFileBrowser, canCreateFolders, startCreatingFolder, mode, modeChanged }">
                             <Header :title="__(container.title)" icon="assets">
-                                <Dropdown v-if="container.can_edit || container.can_delete || container.can_create">
-                                    <DropdownMenu>
-                                        <DropdownItem
-                                            icon="container-add"
-                                            v-if="canCreateContainers"
-                                            :text="__('Create Container')"
-                                            :href="createContainerUrl"
-                                        />
-                                        <DropdownItem
-                                            icon="cog"
-                                            v-if="container.can_edit"
-                                            :text="__('Configure Container')"
-                                            :href="container.edit_url"
-                                        />
-                                        <DropdownItem
-                                            icon="blueprint-edit"
-                                            :text="__('Edit Blueprint')"
-                                            :href="container.blueprint_url"
-                                        />
-                                        <DropdownSeparator v-if="container.can_delete" />
-                                        <DropdownItem
-                                            icon="trash"
-                                            variant="destructive"
-                                            v-if="container.can_delete"
-                                            :text="__('Delete Container')"
-                                            @click="$event.preventDefault(); $refs.deleter.confirm()"
-                                        />
-                                    </DropdownMenu>
-                                </Dropdown>
+                                <ItemActions
+                                    ref="containerActions"
+                                    :url="container.actions_url"
+                                    :actions="container.actions"
+                                    :item="container.id"
+                                    @completed="containerActionCompleted"
+                                    v-slot="{ actions }"
+                                >
+                                    <Dropdown v-if="container.can_edit || container.can_delete || container.can_edit_blueprint || actions.length">
+                                        <DropdownMenu>
+                                            <DropdownItem
+                                                icon="container-add"
+                                                v-if="canCreateContainers"
+                                                :text="__('Create Container')"
+                                                :href="createContainerUrl"
+                                            />
+                                            <DropdownItem
+                                                icon="cog"
+                                                v-if="container.can_edit"
+                                                :text="__('Configure Container')"
+                                                :href="container.edit_url"
+                                            />
+                                            <DropdownItem
+                                                icon="blueprint-edit"
+                                                v-if="container.can_edit_blueprint"
+                                                :text="__('Edit Blueprint')"
+                                                :href="container.blueprint_url"
+                                            />
+                                            <DropdownSeparator v-if="actions.length" />
+                                            <DropdownItem
+                                                v-for="action in actions"
+                                                :key="action.handle"
+                                                :text="__(action.title)"
+                                                :icon="action.icon"
+                                                :variant="action.dangerous ? 'destructive' : 'default'"
+                                                @click="action.run"
+                                            />
+                                            <DropdownSeparator v-if="container.can_delete" />
+                                            <DropdownItem
+                                                icon="trash"
+                                                variant="destructive"
+                                                v-if="container.can_delete"
+                                                :text="__('Delete Container')"
+                                                @click="$event.preventDefault(); $refs.deleter.confirm()"
+                                            />
+                                        </DropdownMenu>
+                                    </Dropdown>
+                                </ItemActions>
 
                                 <resource-deleter
                                     ref="deleter"
@@ -80,7 +103,8 @@
 
                             <div class="flex items-center gap-2 sm:gap-3 py-3 relative overflow-clip st-overflow-clip-margin">
                                 <div class="flex flex-1 items-center gap-2 sm:gap-3">
-                                    <ListingSearch />
+                                    <ListingSearch :label="__('Search assets')" />
+                                    <ListingFilters @filters-updated="filtersUpdated" />
                                 </div>
                                 <ListingCustomizeColumns v-if="mode === 'table'" />
                             </div>
@@ -93,23 +117,33 @@
                         />
 
                         <Panel v-else :class="{ 'relative overflow-x-auto overscroll-x-contain': mode === 'table' }">
-                            <PanelHeader class="flex items-center justify-between px-1!">
+                            <PanelHeader class="flex items-center justify-between gap-2 px-1!">
                                 <Breadcrumbs
                                     v-if="!restrictFolderNavigation"
                                     :path="path"
                                     @navigated="selectFolder"
                                 />
-
-                                <Slider
-                                    v-if="mode === 'grid'"
-                                    size="sm"
-                                    class="me-2 w-24!"
-                                    variant="subtle"
-                                    v-model="gridThumbnailSize"
-                                    :min="60"
-                                    :max="300"
-                                    :step="25"
-                                />
+                                <div v-if="mode === 'grid'" class="flex items-center gap-2 mr-2">
+                                    <ui-button
+                                        inset
+                                        size="sm"
+                                        variant="ghost"
+                                        icon-only
+                                        :icon="checkerboardIcon"
+                                        v-tooltip="__('Transparency')"
+                                        :aria-label="__('Transparency')"
+                                        @click="cycleCheckerboard"
+                                    />
+                                    <Slider
+                                        size="sm"
+                                        class="w-24!"
+                                        variant="subtle"
+                                        v-model="gridThumbnailSize"
+                                        :min="60"
+                                        :max="300"
+                                        :step="25"
+                                    />
+                                </div>
                             </PanelHeader>
 
                             <Uploads
@@ -121,22 +155,26 @@
                             />
 
                             <Table
+                                ref="table"
                                 v-if="mode === 'table'"
                                 :assets="items"
                                 :folders="folders"
                                 :columns="columns"
                                 :visible-columns="visibleColumns"
-                                :is-searching="!!searchQuery"
+                                :is-searching="isSearching"
                                 v-bind="sharedAssetProps"
                                 v-on="sharedAssetEvents"
                             />
 
                             <Grid
+                                ref="grid"
                                 v-if="mode === 'grid'"
                                 :assets="items"
                                 :action-url="actionUrl"
                                 :thumbnail-size="gridThumbnailSize"
                                 :selected-assets="selectedAssets"
+                                :show-checkerboard="showCheckerboard"
+                                :checkerboard-mode="checkerboardMode"
                                 v-bind="sharedAssetProps"
                                 v-on="sharedAssetEvents"
                             />
@@ -173,6 +211,7 @@ import Table from './Table.vue';
 import HasPreferences from '../../data-list/HasPreferences';
 import Uploader from '../Uploader.vue';
 import Uploads from '../Uploads.vue';
+import ItemActions from '@/components/actions/ItemActions.vue';
 import { debounce, sortBy } from 'lodash-es';
 import {
     Header,
@@ -188,6 +227,7 @@ import {
     Listing,
     ListingTable,
     ListingPagination,
+    ListingFilters,
     ListingSearch,
     ListingCustomizeColumns,
     Slider,
@@ -196,6 +236,8 @@ import {
     ToggleItem,
 } from '@ui';
 import Breadcrumbs from './Breadcrumbs.vue';
+import useCheckerboard from '@/composables/checkerboard.js';
+import { router } from '@inertiajs/vue3';
 
 export default {
     mixins: [HasPreferences],
@@ -210,6 +252,7 @@ export default {
         DropdownSeparator,
         AssetThumbnail,
         AssetEditor,
+        ItemActions,
         Uploader,
         Uploads,
         Grid,
@@ -221,6 +264,7 @@ export default {
         ListingTable,
         ListingPagination,
         ListingSearch,
+        ListingFilters,
         ListingCustomizeColumns,
         Breadcrumbs,
         Slider,
@@ -245,10 +289,25 @@ export default {
         restrictFolderNavigation: Boolean, // Whether to restrict to a single folder and prevent navigation.
         selectedAssets: Array,
         selectedPath: String, // The path to display, determined by a parent component.
+        filters: Array,
         initialColumns: {
             type: Array,
             default: () => [],
         },
+        uploader: {
+            type: Object,
+            default: null,
+        },
+    },
+
+    setup() {
+        const checkerboard = useCheckerboard();
+        return {
+            showCheckerboard: checkerboard.enabled,
+            checkerboardIcon: checkerboard.icon,
+            checkerboardMode: checkerboard.mode,
+            cycleCheckerboard: checkerboard.cycle,
+        };
     },
 
     data() {
@@ -263,6 +322,7 @@ export default {
             folders: [],
             folder: {},
             searchQuery: '',
+            activeFilters: {},
             editedAssetId: this.initialEditingAssetId,
             creatingFolder: false,
             creatingFolderError: false,
@@ -284,7 +344,7 @@ export default {
 
     computed: {
         requestUrl() {
-            return this.searchQuery
+            return this.isSearching
                 ? cp_url(
                       `assets/browse/search/${this.container.id}/${this.restrictFolderNavigation ? this.path : ''}`,
                   ).replace(/\/$/, '')
@@ -293,6 +353,12 @@ export default {
 
         actionContext() {
             return { container: this.container.id };
+        },
+
+        additionalParameters() {
+            return {
+                queryScopes: this.queryScopes,
+            };
         },
 
         canCreateFolders() {
@@ -319,6 +385,21 @@ export default {
 
         hasSelections() {
             return this.selectedAssets.length > 0;
+        },
+
+        hasActiveFilters() {
+            return Object.entries(this.activeFilters).some(([key, value]) => {
+                if (Array.isArray(value)) {
+                    return value.length > 0;
+                } else if (typeof value === 'object' && value !== null) {
+                    return Object.keys(value).length > 0;
+                }
+                return Boolean(value);
+            });
+        },
+
+        isSearching() {
+            return this.searchQuery || this.hasActiveFilters;
         },
 
         parameters() {
@@ -361,6 +442,7 @@ export default {
                 folder: this.folder,
                 folderActionUrl: this.folderActionUrl,
                 folders: this.folders,
+                maxFiles: this.maxFiles,
                 restrictFolderNavigation: this.restrictFolderNavigation,
                 path: this.path,
                 creatingFolder: this.creatingFolder,
@@ -420,12 +502,20 @@ export default {
             this.loadAssets();
         },
 
-        path() {
+        path(path) {
             this.loadAssets();
+            this.$emit('path-changed', path);
         },
 
         searchQuery() {
             this.page = 1;
+        },
+
+        activeFilters: {
+            deep: true,
+            handler() {
+                this.page = 1;
+            },
         },
 
         selectedPath: {
@@ -445,6 +535,10 @@ export default {
     },
 
     methods: {
+        filtersUpdated(filters) {
+            this.activeFilters = filters;
+        },
+
         modeChanged(mode) {
             this.mode = mode;
         },
@@ -457,7 +551,7 @@ export default {
         listingRequestCompleted({ response }) {
             this.assets = response.data.data;
 
-            if (this.searchQuery) {
+            if (this.isSearching) {
                 this.folder = null;
                 this.folders = [];
             } else {
@@ -482,6 +576,19 @@ export default {
             // this.loading = false;
 
             this.$refs.listing.refresh();
+        },
+
+        containerActionCompleted(successful, response = {}) {
+            if (!successful) {
+                Statamic.$toast.error(response.message || __('Action failed'));
+                return;
+            }
+
+            if (response.message !== false) {
+                Statamic.$toast.success(response.message || __('Action completed'));
+            }
+
+            if (!response.redirect) router.reload();
         },
 
         assetSaved() {
@@ -609,7 +716,7 @@ export default {
         },
 
         openFileBrowser() {
-            this.$refs.uploader.browse();
+            (this.uploader || this.$refs.internalUploader).browse();
         },
 
         selectFolder(path) {
@@ -663,7 +770,11 @@ export default {
                 this.sortColumn = 'last_modified';
                 this.sortDirection = 'desc';
 
-                this.selectedAssets.push(asset.id);
+                if (this.maxFiles === 1) {
+                    this.selectedAssets.splice(0, this.selectedAssets.length, asset.id);
+                } else if (!this.reachedSelectionLimit) {
+                    this.selectedAssets.push(asset.id);
+                }
                 this.$emit('selections-updated', this.selectedAssets);
             }
 
@@ -733,6 +844,7 @@ export default {
             });
 
             Statamic.$commandPalette.add({
+                when: () => this.container.can_edit_blueprint,
                 category: Statamic.$commandPalette.category.Actions,
                 text: __('Edit Blueprint'),
                 icon: 'blueprint-edit',
@@ -746,6 +858,16 @@ export default {
                 icon: 'trash',
                 action: () => this.$refs.deleter.confirm(),
             });
+
+            this.container.actions?.forEach(action => Statamic.$commandPalette.add({
+                when: () => Boolean(this.$refs.containerActions),
+                category: Statamic.$commandPalette.category.Actions,
+                text: [__('Container'), action.title],
+                icon: action.icon,
+                action: () => this.$refs.containerActions.preparedActions
+                    .find(prepared => prepared.handle === action.handle)
+                    ?.run(),
+            }));
         }
     },
 };

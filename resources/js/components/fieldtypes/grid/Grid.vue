@@ -25,6 +25,7 @@
                         :can-add-rows="canAddRows"
                         :allow-fullscreen="config.fullscreen"
                         :hide-display="config.hide_display"
+                        :read-only="isReadOnly"
                         :errors="publishContainer.errors"
                         @updated="updated"
                         @meta-updated="updateRowMeta"
@@ -54,7 +55,7 @@
 
 <script>
 import Fieldtype from '../Fieldtype.vue';
-import uniqid from 'uniqid';
+import { nanoid as uniqid } from 'nanoid';
 import GridTable from './Table.vue';
 import GridStacked from './Stacked.vue';
 import ManagesRowMeta from './ManagesRowMeta';
@@ -85,7 +86,8 @@ export default {
 
     computed: {
         component() {
-            const isNarrow = this.fields.length > 1 && this.containerWidth < 600;
+            const stackAt = this.config.stack_at ?? 550;
+            const isNarrow = this.fields.length > 1 && this.containerWidth < stackAt;
 
             return this.config.mode === 'stacked' || isNarrow ? 'GridStacked' : 'GridTable';
         },
@@ -142,6 +144,7 @@ export default {
                     title: __('Toggle Fullscreen Mode'),
                     icon: ({ vm }) => (vm.fullScreenMode ? 'fullscreen-close' : 'fullscreen-open'),
                     quick: true,
+                    visible: this.config.fullscreen,
                     visibleWhenReadOnly: true,
                     run: this.toggleFullScreen,
                 },
@@ -173,9 +176,10 @@ export default {
     methods: {
         addRow() {
             const id = uniqid();
+            const defaults = JSON.parse(JSON.stringify(this.meta.defaults));
 
             const row = Object.fromEntries(
-                this.fields.map((field) => [field.handle, this.meta.defaults[field.handle]]),
+                this.fields.map((field) => [field.handle, defaults[field.handle]]),
             );
 
             row._id = id;
@@ -191,8 +195,9 @@ export default {
         removed(index) {
             // if the row is empty, don't show the confirmation. this.value[index] is an object with the row data
             const row = this.value[index];
+            const defaults = JSON.parse(JSON.stringify(this.meta.defaults));
             const emptyRow = Object.fromEntries(
-                this.fields.map((field) => [field.handle, this.meta.defaults[field.handle]]),
+                this.fields.map((field) => [field.handle, defaults[field.handle]]),
             );
 
             // Check if the row has been modified from its default state
@@ -212,11 +217,10 @@ export default {
         },
 
         duplicate(index) {
-            const row = clone(this.value[index]);
-            const old_id = row._id;
-            row._id = uniqid();
+            const original = this.value[index];
+            const { values: row, meta } = this.duplicateValues(original, this.meta.existing[original._id]);
 
-            this.updateRowMeta(row._id, this.meta.existing[old_id]);
+            this.updateRowMeta(row._id, meta);
 
             this.update([...this.value, row]);
         },
