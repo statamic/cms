@@ -69,6 +69,11 @@
     tbody {
         @apply text-sm shadow-sm-b rounded-xl outline-none;
 
+        > tr {
+            /* Localize row updates; layout-only so cell focus rings / shadows aren't clipped. */
+            contain: layout;
+        }
+
         tr {
             &:last-child {
                 @apply border-none;

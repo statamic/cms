@@ -12,7 +12,7 @@ const isImpersonating = computed((() => user.is_impersonating));
 <template>
     <Dropdown align="end" v-cloak>
         <template #trigger>
-            <Button :icon-only="true" variant="ghost">
+            <Button :icon-only="true" variant="ghost" :aria-label="__('User Menu')">
                 <Avatar :user="user" />
             </Button>
         </template>

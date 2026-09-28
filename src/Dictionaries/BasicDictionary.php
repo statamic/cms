@@ -62,6 +62,10 @@ abstract class BasicDictionary extends Dictionary
         $searchableLookup = empty($this->searchable) ? null : array_flip($this->searchable);
 
         foreach ($item->extra() as $key => $value) {
+            if ($key === 'icon') {
+                continue;
+            }
+
             if ($searchableLookup !== null && ! isset($searchableLookup[$key])) {
                 continue;
             }

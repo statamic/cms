@@ -49,7 +49,7 @@ class InstallSsg extends Command
             'Installing the statamic/ssg package...'
         );
 
-        $this->checkLine('Installed statamic/ssg package');
+        $this->components->info('Installed statamic/ssg package');
 
         if (confirm('Would you like to publish the config file?')) {
             spin(
@@ -65,7 +65,7 @@ class InstallSsg extends Command
                 message: 'Publishing the config file...'
             );
 
-            $this->checkLine('Config file published. You can find it at config/statamic/ssg.php');
+            $this->components->info('Config file published. You can find it at config/statamic/ssg.php');
         }
 
         if (
@@ -78,7 +78,7 @@ class InstallSsg extends Command
                 'Installing the spatie/fork package...'
             );
 
-            $this->checkLine('Installed spatie/fork package');
+            $this->components->info('Installed spatie/fork package');
         }
     }
 }

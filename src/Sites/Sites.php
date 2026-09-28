@@ -39,6 +39,10 @@ class Sites
 
     public function authorized()
     {
+        if (User::current()->isSuper()) {
+            return $this->sites;
+        }
+
         return $this->sites->filter(fn ($site) => User::current()->can('view', $site));
     }
 
@@ -130,9 +134,11 @@ class Sites
 
     protected function getSavedSites()
     {
-        return File::exists($sitesPath = $this->path())
+        $sites = File::exists($sitesPath = $this->path())
             ? YAML::file($sitesPath)->parse()
-            : $this->getFallbackConfig();
+            : [];
+
+        return $sites ?: $this->getFallbackConfig();
     }
 
     protected function getFallbackConfig()
@@ -242,12 +248,17 @@ class Sites
                     'instructions' => __('statamic::messages.site_configure_attributes_instructions'),
                     'type' => 'array',
                     'add_button' => __('Add Attribute'),
+                    'compact' => true,
                 ],
             ],
         ];
 
         // If multisite, nest fields in a grid
         if ($this->multiEnabled()) {
+            $tableWidths = [
+                'attributes' => 30,
+            ];
+
             $siteFields = [
                 [
                     'handle' => 'sites',
@@ -256,9 +267,15 @@ class Sites
                         'hide_display' => true,
                         'actions' => false,
                         'fullscreen' => false,
-                        'mode' => 'stacked',
+                        'mode' => 'table',
+                        'stack_at' => 925,
                         'add_row' => __('Add Site'),
-                        'fields' => $siteFields,
+                        'fields' => collect($siteFields)->map(function ($field) use ($tableWidths) {
+                            $field['field']['width'] = $tableWidths[$field['handle']] ?? 14;
+                            $field['field']['classes'] = 'max-w-48 min-w-0 overflow-hidden';
+
+                            return $field;
+                        })->all(),
                         'required' => true,
                     ],
                 ],

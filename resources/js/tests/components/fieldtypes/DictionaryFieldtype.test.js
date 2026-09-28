@@ -14,7 +14,7 @@ function mountFieldtype({ value, maxItems, selectedOptions, fetchedOptions, shal
             handle: 'country',
             value,
             config: { max_items: maxItems },
-            meta: { url: '/cp/fieldtypes/dictionaries/partial_countries', selectedOptions },
+            meta: { url: '/!/fieldtypes/dictionaries/partial_countries', selectedOptions },
         },
         global: {
             mocks: {
@@ -67,5 +67,24 @@ describe('DictionaryFieldtype options', () => {
         await flushPromises();
 
         expect(fieldtype.vm.normalizedOptions).toEqual([{ value: 'ca', label: 'Canada' }]);
+    });
+
+    test('selected options carry their icon when present', async () => {
+        const fieldtype = mountFieldtype({
+            value: ['de', 'fr'],
+            maxItems: null,
+            selectedOptions: [
+                { value: 'de', label: 'Germany', icon: 'globe', invalid: false },
+                { value: 'fr', label: 'France', invalid: false },
+            ],
+            fetchedOptions: [],
+            shallow: true,
+        });
+        await flushPromises();
+
+        expect(fieldtype.vm.selectedOptions).toEqual([
+            { value: 'de', label: 'Germany', icon: 'globe', invalid: false },
+            { value: 'fr', label: 'France', invalid: false },
+        ]);
     });
 });

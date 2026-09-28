@@ -19,7 +19,7 @@ class Controller extends BaseController
     public function show()
     {
         if ($this->tokenData = session('statamic:protect:password.tokens.'.request('token'))) {
-            $site = Site::findByUrl($this->getUrl());
+            $site = Site::findByUrl($this->getUrl()) ?? Site::default();
             $data = Data::find($this->tokenData['reference']);
 
             app()->setLocale($site->lang());

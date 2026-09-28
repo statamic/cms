@@ -241,6 +241,24 @@ class EloquentUserTest extends TestCase
         $this->assertSame([$user->email(), $userTwo->email(), $userThree->email(), $userFour->email()], Facades\User::query()->whereGroupIn(['a', 'b'])->orWhereGroupIn(['c'])->get()->map->email()->all());
     }
 
+    #[Test]
+    public function it_doesnt_save_roles_inherited_from_groups_to_the_role_user_table()
+    {
+        $directRole = Facades\Role::make('direct');
+        $groupRole = Facades\Role::make('grouped');
+        $group = (new UserGroup)->handle('usergroup')->assignRole($groupRole);
+
+        Facades\Role::shouldReceive('find')->with('direct')->andReturn($directRole);
+        Facades\Role::shouldReceive('find')->with('grouped')->andReturn($groupRole);
+        Facades\UserGroup::shouldReceive('find')->with('usergroup')->andReturn($group);
+
+        $user = $this->createPermissible()->assignRole($directRole)->addToGroup($group);
+        $user->save();
+
+        $this->assertSame(['direct'], \DB::table(config('statamic.users.tables.role_user', 'role_user'))->where('user_id', $user->id())->pluck('role_id')->all());
+        $this->assertSame(['usergroup'], \DB::table(config('statamic.users.tables.group_user', 'group_user'))->where('user_id', $user->id())->pluck('group_id')->all());
+    }
+
     public function makeUser()
     {
         return (new EloquentUser)
@@ -337,11 +355,51 @@ class EloquentUserTest extends TestCase
     }
 
     #[Test]
+    public function it_clears_an_existing_database_column_when_set_to_null()
+    {
+        $user = $this->makeUser();
+        $user->set('avatar', 'hendrix.jpg')->save();
+
+        $this->assertSame('hendrix.jpg', Facades\User::find($user->id())->get('avatar'));
+
+        $user->set('avatar', null)->save();
+
+        $this->assertNull(Facades\User::find($user->id())->get('avatar'));
+    }
+
+    #[Test]
+    public function it_clears_an_existing_database_column_when_merged_with_null()
+    {
+        $user = $this->makeUser();
+        $user->set('avatar', 'hendrix.jpg')->save();
+
+        $this->assertSame('hendrix.jpg', Facades\User::find($user->id())->get('avatar'));
+
+        $user->merge(['avatar' => null])->save();
+
+        $this->assertNull(Facades\User::find($user->id())->get('avatar'));
+    }
+
+    #[Test]
     public function merge_does_not_set_roles_and_groups_as_model_attributes()
     {
         $user = $this->user();
 
         $user->merge(['name' => 'Updated Name']);
+
+        $attributes = $user->model()->getAttributes();
+
+        $this->assertArrayNotHasKey('roles', $attributes);
+        $this->assertArrayNotHasKey('groups', $attributes);
+        $this->assertEquals('Updated Name', $attributes['name']);
+    }
+
+    #[Test]
+    public function data_does_not_set_roles_and_groups_as_model_attributes()
+    {
+        $user = $this->user();
+
+        $user->data($user->data()->merge(['name' => 'Updated Name'])->all());
 
         $attributes = $user->model()->getAttributes();
 

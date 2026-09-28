@@ -26,8 +26,14 @@ class Index extends BaseIndex
 
     protected function client(): SearchClient
     {
-        if (! $this->settingsInitialized && isset($this->config['settings']) && ! $this->exists()) {
-            $this->client->setSettings($this->name, $this->config['settings']);
+        if (! $this->settingsInitialized && isset($this->config['settings'])) {
+            if (! $this->exists()) {
+                $this->client->setSettings($this->name, $this->config['settings']);
+            }
+
+            // Mark as initialized either way. Otherwise, when the index already
+            // exists, we'd never stop checking and every write would spend an
+            // extra API call on listIndices().
             $this->settingsInitialized = true;
         }
 

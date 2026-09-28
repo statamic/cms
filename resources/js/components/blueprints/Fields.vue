@@ -128,16 +128,16 @@ export default {
             return field.type === 'import' ? 'ImportField' : 'RegularField';
         },
 
-        fieldtypeSelected(field) {
+        fieldtypeSelected({ config, icon }) {
             this.isSelectingNewFieldtype = false;
 
             const pending = {
                 _id: uniqid(),
                 type: 'inline',
-                fieldtype: field.type,
-                icon: field.icon,
+                fieldtype: config.type,
+                icon,
                 config: {
-                    ...field,
+                    ...config,
                     isNew: true,
                 },
             };
