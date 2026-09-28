@@ -62,13 +62,13 @@ export function canSelectAllMatching({
 }
 
 /**
- * Resolve the CP select-all ceiling. `null` / falsy config means no limit.
+ * Resolve the CP select-all ceiling. `null` means no limit; invalid values use the fallback.
  */
 export function resolveSelectAllLimit(value, fallback = 1000) {
     if (value === null) return Infinity;
     if (value === undefined) return fallback;
     const limit = Number(value);
-    if (!Number.isFinite(limit) || limit <= 0) return Infinity;
+    if (!Number.isFinite(limit) || limit <= 0) return fallback;
 
     return limit;
 }

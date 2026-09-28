@@ -138,6 +138,13 @@ test('resolveSelectAllLimit coerces positive numbers', () => {
     expect(resolveSelectAllLimit('100')).toBe(100);
 });
 
+test('resolveSelectAllLimit uses fallback for zero, negative, or invalid values', () => {
+    expect(resolveSelectAllLimit(0)).toBe(1000);
+    expect(resolveSelectAllLimit(-5)).toBe(1000);
+    expect(resolveSelectAllLimit('abc')).toBe(1000);
+    expect(resolveSelectAllLimit(0, 500)).toBe(500);
+});
+
 test('canSelectAllMatching is false for client-side listings without a url', () => {
     expect(
         canSelectAllMatching({
