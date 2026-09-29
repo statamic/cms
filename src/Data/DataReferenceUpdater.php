@@ -82,7 +82,7 @@ abstract class DataReferenceUpdater
         return (bool) $this->updated;
     }
 
-    protected function itemMayContainReferences()
+    private function itemMayContainReferences(): bool
     {
         if (! is_string($this->originalValue) || $this->originalValue === '') {
             return true;
