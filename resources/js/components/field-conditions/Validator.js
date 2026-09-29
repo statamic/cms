@@ -268,6 +268,11 @@ export default class {
     }
 
     passesIncludesCondition(condition) {
+        // Arrays and strings can be searched. Other objects, like a date range, can't.
+        if (typeof condition.lhs?.includes !== 'function') {
+            return false;
+        }
+
         return condition.lhs.includes(condition.rhs);
     }
 
