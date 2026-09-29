@@ -5,6 +5,7 @@ import Head from '@/pages/layout/Head.vue';
 defineProps([
     'actions',
     'titleFormat',
+    'slugFormat',
     'collection',
     'title',
     'reference',
@@ -41,6 +42,7 @@ defineProps([
         publish-container="base"
         :initial-actions="actions"
         :initial-title-format="titleFormat"
+        :initial-slug-format="slugFormat"
         method="patch"
         :collection-handle="collection"
         :initial-title="title"

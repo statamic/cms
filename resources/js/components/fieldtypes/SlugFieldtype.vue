@@ -46,6 +46,10 @@ import { useContentDirection } from '@/composables/content-direction';
 export default {
     mixins: [Fieldtype],
 
+    inject: {
+        entrySlugSource: { default: () => () => null },
+    },
+
     components: {
         Input,
         Button,
@@ -74,6 +78,8 @@ export default {
         source() {
             if (!this.generate) return;
 
+            if (this.usesEntrySlugSource) return this.entrySlugSource();
+
             const field = this.config.from || 'title';
             let key = field;
 
@@ -83,6 +89,10 @@ export default {
             }
 
             return data_get(this.publishContainer?.values, key);
+        },
+
+        usesEntrySlugSource() {
+            return this.handle === 'slug' && !this.fieldPathPrefix && this.entrySlugSource() !== null;
         },
 
         language() {

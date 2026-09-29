@@ -6,6 +6,7 @@ import Head from '@/pages/layout/Head.vue';
 defineProps([
     'actions',
     'titleFormat',
+    'slugFormat',
     'collection',
     'collectionCreateLabel',
     'blueprint',
@@ -36,6 +37,7 @@ function saved(response) {
         publish-container="base"
         :initial-actions="actions"
         :initial-title-format="titleFormat"
+        :initial-slug-format="slugFormat"
         method="post"
         :initial-title="collectionCreateLabel"
         :collection-handle="collection"

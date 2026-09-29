@@ -354,12 +354,19 @@ export default {
         autosaveInterval: Number,
         parent: String,
         initialTitleFormat: Object,
+        initialSlugFormat: Object,
+    },
+
+    provide() {
+        return { entrySlugSource: () => this.slugSource };
     },
 
     data() {
         return {
             actions: this.initialActions,
             titleFormat: this.initialTitleFormat,
+            slugFormat: this.initialSlugFormat,
+            slugSource: this.initialSlugFormat ? '' : null,
             localizing: false,
             trackDirtyState: true,
             fieldset: this.initialFieldset,
@@ -664,6 +671,36 @@ export default {
                 });
         },
 
+        generateSlugSource() {
+            if (!this.slugFormat || this.meta.slug?.auto === false) return;
+
+            const values = this.slugFormatValues();
+            const serialized = JSON.stringify(values);
+
+            if (serialized === this.lastSlugFormatValues) return;
+            this.lastSlugFormatValues = serialized;
+
+            this.slugRequest?.abort();
+            this.slugRequest = new AbortController();
+
+            this.$axios
+                .post(
+                    this.slugFormat.url,
+                    { blueprint: this.fieldset.handle, values },
+                    { signal: this.slugRequest.signal },
+                )
+                .then(({ data }) => (this.slugSource = data.slug))
+                .catch((e) => {
+                    if (e.code !== 'ERR_CANCELED') throw e;
+                });
+        },
+
+        slugFormatValues() {
+            const fields = this.slugFormat.fields.filter((field) => field in this.values && field !== 'slug');
+
+            return Object.fromEntries(fields.map((field) => [field, this.values[field]]));
+        },
+
         titleFormatValues() {
             // The server discards these, so sending them would only mean pointless
             // requests whenever the slug gets regenerated from the title.
@@ -727,6 +764,7 @@ export default {
                 this.title = data.editing ? data.values.title : this.title;
                 this.actions = data.actions;
                 this.titleFormat = data.titleFormat;
+                this.slugFormat = data.slugFormat;
 				this.itemActions = data.itemActions;
                 this.fieldset = data.blueprint;
                 this.permalink = data.permalink;
@@ -926,6 +964,11 @@ export default {
         if (this.titleFormat) {
             this.lastTitleFormatValues = JSON.stringify(this.titleFormatValues());
             this.$watch('values', debounce(() => this.generateTitle(), 300), { deep: true });
+        }
+
+        if (this.slugFormat) {
+            this.lastSlugFormatValues = JSON.stringify(this.slugFormatValues());
+            this.$watch('values', debounce(() => this.generateSlugSource(), 300), { deep: true });
         }
 
         this.selectedOrigin =
