@@ -40,6 +40,7 @@ return [
     'collection_configure_origin_behavior_option_select' => 'Let the user select the origin',
     'collection_configure_propagate_instructions' => 'Automatically propagate new entries to all configured sites.',
     'collection_configure_require_slugs_instructions' => 'Make slugs required or optional.',
+    'collection_configure_slug_format_instructions' => 'Automatically generate slugs for entries in this collection, e.g. `{issue}-{title}`.',
     'collection_configure_template_instructions' => 'Set this collection\'s default template. Entries can override this setting with a `template` field.',
     'collection_configure_title_format_instructions' => 'Automatically generate titles for entries in this collection. [Read more](https://statamic.dev/collections#titles).',
     'collection_configure_title_instructions' => 'Use a plural noun, such as \'Articles\' or \'Products\'',

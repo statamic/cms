@@ -267,6 +267,9 @@ class CollectionsController extends CpController
             'title_formats' => $collection->titleFormats()->unique()->count() === 1
                 ? $collection->titleFormats()->first()
                 : $collection->titleFormats()->all(),
+            'slug_formats' => $collection->slugFormats()->unique()->count() === 1
+                ? $collection->slugFormats()->first()
+                : $collection->slugFormats()->all(),
             'preview_targets' => $collection->basePreviewTargets(),
             'origin_behavior' => $collection->originBehavior(),
         ];
@@ -339,6 +342,7 @@ class CollectionsController extends CpController
             ->propagate(Arr::get($values, 'propagate'))
             ->titleFormats($values['title_formats'])
             ->requiresSlugs($values['require_slugs'])
+            ->slugFormats($values['slug_formats'])
             ->previewTargets($values['preview_targets']);
 
         if (array_key_exists('revisions', $values)) {
@@ -638,6 +642,12 @@ class CollectionsController extends CpController
                         'display' => __('Require Slugs'),
                         'instructions' => __('statamic::messages.collection_configure_require_slugs_instructions'),
                         'type' => 'toggle',
+                        'width' => '50',
+                    ],
+                    'slug_formats' => [
+                        'display' => __('Automatic Slug Format'),
+                        'instructions' => __('statamic::messages.collection_configure_slug_format_instructions'),
+                        'type' => 'collection_title_formats',
                         'width' => '50',
                     ],
                     'mount' => [

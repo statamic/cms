@@ -83,6 +83,19 @@ class UpdateCollectionTest extends TestCase
     }
 
     #[Test]
+    public function it_updates_the_slug_format()
+    {
+        $collection = tap(Collection::make('test'))->save();
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->update($collection, ['slug_formats' => '{issue}-{title}'])
+            ->assertOk();
+
+        $this->assertEquals('{issue}-{title}', Collection::find('test')->slugFormat('en'));
+    }
+
+    #[Test]
     public function setting_links_to_true_will_create_a_blueprint_if_it_doesnt_already_exist()
     {
         BlueprintRepository::swap(new FakeBlueprintRepository(BlueprintRepository::getFacadeRoot()));
