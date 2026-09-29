@@ -177,6 +177,18 @@ test('it can use includes or contains operators in conditions', () => {
     expect(showFieldIf({ null_value: 'contains fox' })).toBe(false);
 });
 
+test('it fails includes or contains conditions against an object instead of throwing', () => {
+    setValues({
+        stay_dates: { start: '2026-01-01', end: '2026-01-05' },
+        address: { city: 'Little Rock' },
+    });
+
+    expect(showFieldIf({ stay_dates: 'contains 2026' })).toBe(false);
+    expect(showFieldIf({ stay_dates: 'includes 2026-01-01' })).toBe(false);
+    expect(showFieldIf({ address: 'contains Little Rock' })).toBe(false);
+    expect(Fields.showField({ unless: { address: 'contains Little Rock' } })).toBe(true);
+});
+
 test('it can use includes_any or contains_any operators in conditions', () => {
     setValues({
         cancellation_reasons: ['found another service', 'other'],
