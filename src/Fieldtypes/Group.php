@@ -15,6 +15,7 @@ use function Statamic\trans as __;
 
 class Group extends Fieldtype
 {
+    use AddsEntryValidationReplacements;
     use UpdatesReferences;
 
     protected $categories = ['structured'];
@@ -110,7 +111,10 @@ class Group extends Fieldtype
             ->validator()
             ->withContext([
                 'prefix' => $this->field->validationContext('prefix'),
-            ])
+            ]);
+
+        $rules = $this
+            ->addEntryValidationReplacements($this->field, $rules)
             ->rules();
 
         return collect($rules)->mapWithKeys(function ($rules, $handle) {
