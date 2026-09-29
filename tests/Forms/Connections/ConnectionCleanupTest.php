@@ -185,12 +185,12 @@ class ConnectionCleanupTest extends TestCase
     }
 
     #[Test]
-    public function a_job_without_the_queueable_trait_throws()
+    public function a_job_without_a_public_middleware_property_throws()
     {
-        [$submission] = $this->submissionWithUpload([['id' => 'a', 'job' => 'without-queueable']]);
+        [$submission] = $this->submissionWithUpload([['id' => 'a', 'job' => 'without-middleware']]);
 
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Form connection job ['.JobWithoutQueueableTrait::class.'] must implement '.ShouldQueue::class.' and use the '.Queueable::class.' trait.');
+        $this->expectExceptionMessage('Form connection job ['.JobWithoutMiddlewareProperty::class.'] must implement '.ShouldQueue::class.' and have a public $middleware property, e.g. by using the '.Queueable::class.' trait.');
 
         $submission->finalize();
     }
@@ -201,9 +201,19 @@ class ConnectionCleanupTest extends TestCase
         [$submission] = $this->submissionWithUpload([['id' => 'a', 'job' => 'without-should-queue']]);
 
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Form connection job ['.JobWithoutShouldQueue::class.'] must implement '.ShouldQueue::class.' and use the '.Queueable::class.' trait.');
+        $this->expectExceptionMessage('Form connection job ['.JobWithoutShouldQueue::class.'] must implement '.ShouldQueue::class.' and have a public $middleware property, e.g. by using the '.Queueable::class.' trait.');
 
         $submission->finalize();
+    }
+
+    #[Test]
+    public function a_job_with_its_own_middleware_property_counts_down_without_the_queueable_trait()
+    {
+        [$submission, $path] = $this->submissionWithUpload([['id' => 'a', 'job' => 'own-middleware']]);
+
+        $submission->finalize();
+
+        Storage::disk('local')->assertMissing('statamic/form-uploads/'.$path);
     }
 
     #[Test]
@@ -287,7 +297,8 @@ class CountdownConnection extends Connection
     {
         return collect($this->config())
             ->mapWithKeys(fn ($config) => [$config['id'] => match ($config['job'] ?? null) {
-                'without-queueable' => new JobWithoutQueueableTrait,
+                'without-middleware' => new JobWithoutMiddlewareProperty,
+                'own-middleware' => new JobWithOwnMiddlewareProperty,
                 'without-should-queue' => new JobWithoutShouldQueue,
                 default => new CountdownJob($config['id']),
             }])
@@ -326,8 +337,17 @@ class CountdownJob implements ShouldQueue
     }
 }
 
-class JobWithoutQueueableTrait implements ShouldQueue
+class JobWithoutMiddlewareProperty implements ShouldQueue
 {
+    public function handle(): void
+    {
+    }
+}
+
+class JobWithOwnMiddlewareProperty implements ShouldQueue
+{
+    public $middleware = [];
+
     public function handle(): void
     {
     }

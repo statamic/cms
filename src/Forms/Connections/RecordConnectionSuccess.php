@@ -22,8 +22,9 @@ class RecordConnectionSuccess
 
     public static function ensureAttachable(object $job): void
     {
-        if (! $job instanceof ShouldQueue || ! isset(class_uses_recursive($job)[Queueable::class])) {
-            throw new LogicException('Form connection job ['.get_class($job).'] must implement '.ShouldQueue::class.' and use the '.Queueable::class.' trait.');
+        // Queued jobs run through the middleware in their public $middleware property, which is where the countdown hooks in.
+        if (! $job instanceof ShouldQueue || ! array_key_exists('middleware', get_object_vars($job))) {
+            throw new LogicException('Form connection job ['.get_class($job).'] must implement '.ShouldQueue::class.' and have a public $middleware property, e.g. by using the '.Queueable::class.' trait.');
         }
     }
 
