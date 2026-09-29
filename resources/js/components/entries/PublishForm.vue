@@ -648,48 +648,32 @@ export default {
         generateTitle() {
             if (!this.titleFormat) return;
 
-            const values = this.titleFormatValues();
-            const serialized = JSON.stringify(values);
-
-            if (serialized === this.lastTitleFormatValues) return;
-            this.lastTitleFormatValues = serialized;
-
-            this.titleRequest?.abort();
-            this.titleRequest = new AbortController();
-
-            this.$axios
-                .post(
-                    this.titleFormat.url,
-                    { blueprint: this.fieldset.handle, values },
-                    { signal: this.titleRequest.signal },
-                )
-                .then(({ data }) => {
-                    if (data.title !== this.values.title) this.$refs.container.setFieldValue('title', data.title);
-                })
-                .catch((e) => {
-                    if (e.code !== 'ERR_CANCELED') throw e;
-                });
+            this.generateFromFormat('title', this.titleFormat, this.titleFormatValues(), (data) => {
+                if (data.title !== this.values.title) this.$refs.container.setFieldValue('title', data.title);
+            });
         },
 
         generateSlugSource() {
             if (!this.slugFormat || this.meta.slug?.auto === false) return;
 
-            const values = this.slugFormatValues();
+            this.generateFromFormat('slug', this.slugFormat, this.slugFormatValues(), (data) => {
+                this.slugSource = data.slug;
+            });
+        },
+
+        generateFromFormat(key, format, values, callback) {
+            const request = (this.formatRequests[key] ??= {});
             const serialized = JSON.stringify(values);
 
-            if (serialized === this.lastSlugFormatValues) return;
-            this.lastSlugFormatValues = serialized;
+            if (serialized === request.values) return;
+            request.values = serialized;
 
-            this.slugRequest?.abort();
-            this.slugRequest = new AbortController();
+            request.controller?.abort();
+            request.controller = new AbortController();
 
             this.$axios
-                .post(
-                    this.slugFormat.url,
-                    { blueprint: this.fieldset.handle, values },
-                    { signal: this.slugRequest.signal },
-                )
-                .then(({ data }) => (this.slugSource = data.slug))
+                .post(format.url, { blueprint: this.fieldset.handle, values }, { signal: request.controller.signal })
+                .then(({ data }) => callback(data))
                 .catch((e) => {
                     if (e.code !== 'ERR_CANCELED') throw e;
                 });
@@ -961,13 +945,15 @@ export default {
     created() {
         window.history.replaceState({}, document.title, document.location.href.replace('created=true', ''));
 
+        this.formatRequests = {};
+
         if (this.titleFormat) {
-            this.lastTitleFormatValues = JSON.stringify(this.titleFormatValues());
+            this.formatRequests.title = { values: JSON.stringify(this.titleFormatValues()) };
             this.$watch('values', debounce(() => this.generateTitle(), 300), { deep: true });
         }
 
         if (this.slugFormat) {
-            this.lastSlugFormatValues = JSON.stringify(this.slugFormatValues());
+            this.formatRequests.slug = { values: JSON.stringify(this.slugFormatValues()) };
             this.$watch('values', debounce(() => this.generateSlugSource(), 300), { deep: true });
         }
 
