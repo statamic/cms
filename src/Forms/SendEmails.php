@@ -10,6 +10,9 @@ use Statamic\Contracts\Forms\Submission;
 use Statamic\Forms\Connections\ConnectionLogic;
 use Statamic\Sites\Site;
 
+/**
+ * @deprecated Use the jobs returned by Statamic\Forms\Connections\Email::finalized() instead, one per email.
+ */
 class SendEmails implements ShouldQueue
 {
     use Dispatchable, Queueable, SerializesModels;

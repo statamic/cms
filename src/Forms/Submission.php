@@ -24,6 +24,7 @@ use Statamic\Facades\FormSubmission;
 use Statamic\Facades\Site as Sites;
 use Statamic\Facades\Stache;
 use Statamic\Fields\Field;
+use Statamic\Forms\Connections\RecordConnectionSuccess;
 use Statamic\Forms\Uploaders\AssetsUploader;
 use Statamic\Forms\Uploaders\FilesUploader;
 use Statamic\Forms\Uploaders\FormFileUpload;
@@ -274,21 +275,28 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
 
         SubmissionFinalized::dispatch($this);
 
-        // Assets need to exist before anything reads the submission, so this stays
-        // synchronous. The connection jobs are chained behind each other instead.
+        // Assets need to exist before anything reads the submission, so this stays synchronous.
         CreateAssetsFromFileUploads::dispatchSync($this);
 
-        $jobsFromConnections = $this->form()->connections()
+        $jobs = $this->form()->connections()
             ->map(fn ($config, $connection) => FormConnection::find($connection)?->setConfig($config)->finalized($this))
-            ->flatten();
+            ->flatten()
+            ->filter()
+            ->each(fn ($job) => RecordConnectionSuccess::ensureAttachable($job))
+            ->values()
+            ->all();
 
-        $jobs = array_filter([
-            ...$jobsFromConnections,
-            $this->shouldDeleteTemporaryFiles() ? new DeleteTemporaryFiles($this) : null,
-        ]);
+        if ($this->shouldDeleteTemporaryFiles()) {
+            if ($jobs) {
+                RecordConnectionSuccess::countDown($this, $jobs);
+            } else {
+                rescue(fn () => Bus::dispatch(new DeleteTemporaryFiles($this)));
+            }
+        }
 
-        if ($jobs) {
-            Bus::chain($jobs)->dispatch();
+        // Dispatched independently so one failing connection (e.g. on the sync queue) doesn't stop the others.
+        foreach ($jobs as $job) {
+            rescue(fn () => Bus::dispatch($job));
         }
 
         return $this;

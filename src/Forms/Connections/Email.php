@@ -7,7 +7,6 @@ use Statamic\Contracts\Forms\Form;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Facades\Blueprint;
 use Statamic\Forms\Connections\Rules\EmailConnectionAddress;
-use Statamic\Forms\SendEmails;
 use Statamic\Http\Controllers\CP\Forms\EmailConnectionPreviewController;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
@@ -42,7 +41,13 @@ class Email extends Connection
 
     public function finalized(Submission $submission): object|array
     {
-        return new SendEmails($submission, $submission->site(), $this->config());
+        $class = config('statamic.forms.send_email_job');
+
+        return collect($this->config())
+            ->filter(fn (array $config) => ConnectionLogic::passes($config, $submission))
+            ->map(fn (array $config) => new $class($submission, $submission->site(), $config))
+            ->values()
+            ->all();
     }
 
     public function render(Form $form): VueComponent

@@ -22,7 +22,7 @@ use Statamic\Facades\Fieldset;
 use Statamic\Facades\Form;
 use Statamic\Forms\CreateAssetsFromFileUploads;
 use Statamic\Forms\Email;
-use Statamic\Forms\SendEmails;
+use Statamic\Forms\SendEmail;
 use Statamic\Forms\SubmissionResult;
 use Statamic\Forms\SubmitForm;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -370,7 +370,7 @@ class SubmitFormTest extends TestCase
     public function it_persists_the_real_asset_path_after_finalizing_a_store_true_upload()
     {
         // Deliberately no Bus::fake() here: the bug only reproduces when the real
-        // CreateAssetsFromFileUploads, SendEmails and DeleteTemporaryFiles jobs run.
+        // CreateAssetsFromFileUploads and DeleteTemporaryFiles jobs run.
         Storage::fake('local');
         Storage::fake('avatars');
         AssetContainer::make('avatars')->disk('avatars')->save();
@@ -903,7 +903,7 @@ class SubmitFormTest extends TestCase
         Event::assertNotDispatched(FormSubmitted::class);
         Event::assertNotDispatched(SubmissionFinalized::class);
         Bus::assertNotDispatched(CreateAssetsFromFileUploads::class);
-        Bus::assertNotDispatched(SendEmails::class);
+        Bus::assertNotDispatched(SendEmail::class);
 
         $form->submissions()->each->delete();
     }
@@ -1116,7 +1116,7 @@ class SubmitFormTest extends TestCase
         Event::assertNotDispatched(FormSubmitted::class);
         Event::assertNotDispatched(SubmissionFinalized::class);
         Bus::assertNotDispatched(CreateAssetsFromFileUploads::class);
-        Bus::assertNotDispatched(SendEmails::class);
+        Bus::assertNotDispatched(SendEmail::class);
 
         // Earlier-page values are preserved while the new page's values are merged in.
         $stored = $form->submission($result->submission->id());
@@ -1189,7 +1189,7 @@ class SubmitFormTest extends TestCase
         Event::assertNotDispatched(FormSubmitted::class);
         Event::assertNotDispatched(SubmissionFinalized::class);
         Bus::assertNotDispatched(CreateAssetsFromFileUploads::class);
-        Bus::assertNotDispatched(SendEmails::class);
+        Bus::assertNotDispatched(SendEmail::class);
 
         $form->submissions()->each->delete();
     }

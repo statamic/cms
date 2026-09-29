@@ -49,6 +49,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Connections Cache Store
+    |--------------------------------------------------------------------------
+    |
+    | The cache store used to track when a submission's connections have all
+    | finished, so its temporary files can be deleted. A persistent store
+    | such as "database" or "redis" is recommended. Null uses the default.
+    |
+    */
+
+    'connections_cache_store' => null,
+
+    /*
+    |--------------------------------------------------------------------------
     | Partial Submissions
     |--------------------------------------------------------------------------
     |

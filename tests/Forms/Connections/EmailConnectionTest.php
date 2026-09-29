@@ -11,7 +11,7 @@ use Statamic\Facades\Form;
 use Statamic\Facades\FormConnection;
 use Statamic\Facades\User;
 use Statamic\Forms\Connections\Email;
-use Statamic\Forms\SendEmails;
+use Statamic\Forms\SendEmail;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -30,17 +30,52 @@ class EmailConnectionTest extends TestCase
     }
 
     #[Test]
-    public function it_returns_a_job_that_sends_the_emails()
+    public function it_returns_a_job_per_email()
     {
         $form = tap(Form::make('test')->connections(['email' => [
             ['id' => 'one', 'to' => ['first@example.com']],
             ['id' => 'two', 'to' => ['second@example.com']],
         ]]))->save();
 
-        $this->assertInstanceOf(
-            SendEmails::class,
-            (new Email)->setConfig($form->connections()->get('email'))->finalized($form->makeSubmission())
-        );
+        $jobs = (new Email)->setConfig($form->connections()->get('email'))->finalized($form->makeSubmission());
+
+        $this->assertCount(2, $jobs);
+        $this->assertContainsOnlyInstancesOf(SendEmail::class, $jobs);
+        $this->assertEquals('one', $jobs[0]->config['id']);
+        $this->assertEquals('two', $jobs[1]->config['id']);
+    }
+
+    #[Test]
+    public function it_uses_the_configured_send_email_job()
+    {
+        config(['statamic.forms.send_email_job' => CustomSendEmail::class]);
+
+        $form = tap(Form::make('test')->connections(['email' => [
+            ['id' => 'one', 'to' => ['first@example.com']],
+        ]]))->save();
+
+        $jobs = (new Email)->setConfig($form->connections()->get('email'))->finalized($form->makeSubmission());
+
+        $this->assertContainsOnlyInstancesOf(CustomSendEmail::class, $jobs);
+    }
+
+    #[Test]
+    public function it_filters_emails_using_conditions_when_finalized()
+    {
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'department', 'field' => ['type' => 'text']],
+            ],
+        ])->connections(['email' => [
+            ['id' => 'sales', 'to' => ['sales@example.com'], 'conditions' => [['field' => 'department', 'operator' => 'equals', 'value' => 'sales', 'join' => 'and']]],
+            ['id' => 'support', 'to' => ['support@example.com'], 'conditions' => [['field' => 'department', 'operator' => 'equals', 'value' => 'support', 'join' => 'and']]],
+            ['id' => 'disabled', 'to' => ['disabled@example.com'], 'enabled' => false],
+        ]]))->save();
+
+        $jobs = (new Email)->setConfig($form->connections()->get('email'))->finalized($form->makeSubmission()->data(['department' => 'support']));
+
+        $this->assertCount(1, $jobs);
+        $this->assertEquals('support', $jobs[0]->config['id']);
     }
 
     #[Test]
@@ -521,4 +556,8 @@ class EmailConnectionTest extends TestCase
 
         return tap(User::make()->assignRole('test'))->save();
     }
+}
+
+class CustomSendEmail extends SendEmail
+{
 }
