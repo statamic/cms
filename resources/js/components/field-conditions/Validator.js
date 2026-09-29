@@ -11,8 +11,8 @@ const ROOT_PREFIX_RE = /^\$?root\./;
 const isEmpty = (value) => {
     if (value === null || value === undefined) return true;
 
-    // Object.keys() would consider numbers empty.
-    if (typeof value === 'number') return false;
+    // Object.keys() would consider numbers and booleans empty.
+    if (typeof value === 'number' || typeof value === 'boolean') return false;
 
     return Array.isArray(value) ? value.length === 0 : Object.keys(value).length === 0;
 };

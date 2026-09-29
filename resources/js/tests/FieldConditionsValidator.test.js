@@ -231,6 +231,8 @@ test('it can check if value is empty', () => {
         favorite_foods: ['lasagna'],
         age: 43,
         zero: 0,
+        toggled_on: true,
+        toggled_off: false,
         empty_string: '',
         empty_array: [],
         empty_object: {},
@@ -245,6 +247,9 @@ test('it can check if value is empty', () => {
     expect(showFieldIf({ age: 'empty' })).toBe(false);
     expect(showFieldIf({ age: 'not empty' })).toBe(true);
     expect(showFieldIf({ zero: 'empty' })).toBe(false);
+    expect(showFieldIf({ toggled_on: 'empty' })).toBe(false);
+    expect(showFieldIf({ toggled_on: 'not empty' })).toBe(true);
+    expect(showFieldIf({ toggled_off: 'empty' })).toBe(false);
     expect(showFieldIf({ empty_string: 'empty' })).toBe(true);
     expect(showFieldIf({ empty_array: 'empty' })).toBe(true);
     expect(showFieldIf({ empty_object: 'empty' })).toBe(true);
