@@ -48,13 +48,14 @@ afterEach(() => {
 
 test('the slug source is generated from the fields the format references', async () => {
     const wrapper = mountForm(
-        { title: 'Summer 2026', slug: null, issue: null, body: 'Lorem ipsum' },
+        { title: null, slug: null, issue: null, body: 'Lorem ipsum' },
         { url: '/slug-format', fields: ['issue', 'title'] },
     );
 
     expect(wrapper.vm.slugSource).toBe('');
+    expect(post).not.toHaveBeenCalled();
 
-    await wrapper.setData({ values: { issue: 56 } });
+    await wrapper.setData({ values: { issue: 56, title: 'Summer 2026' } });
 
     await vi.advanceTimersByTimeAsync(299);
     expect(post).not.toHaveBeenCalled();
@@ -70,9 +71,32 @@ test('the slug source is generated from the fields the format references', async
     expect(wrapper.vm.slugSource).toBe('56-summer-2026');
 });
 
+test('the slug source is generated straight away when the format fields are prefilled', async () => {
+    const wrapper = mountForm(
+        { title: 'Summer 2026', slug: null, issue: 56 },
+        { url: '/slug-format', fields: ['issue', 'title'] },
+    );
+
+    expect(post).toHaveBeenCalledOnce();
+    expect(post.mock.calls[0][1].values).toEqual({ issue: 56, title: 'Summer 2026' });
+
+    await vi.advanceTimersByTimeAsync(0);
+
+    expect(wrapper.vm.slugSource).toBe('56-summer-2026');
+});
+
+test('the slug source is not generated straight away when the entry already has a slug', async () => {
+    mountForm(
+        { title: 'Summer 2026', slug: '56-summer-2026', issue: 56 },
+        { url: '/slug-format', fields: ['issue', 'title'] },
+    );
+
+    expect(post).not.toHaveBeenCalled();
+});
+
 test('the slug source is not generated when a field the format ignores changes', async () => {
     const wrapper = mountForm(
-        { title: 'Summer 2026', slug: null, issue: 56, body: 'Lorem ipsum' },
+        { title: 'Summer 2026', slug: '56-summer-2026', issue: 56, body: 'Lorem ipsum' },
         { url: '/slug-format', fields: ['issue', 'title'] },
     );
 
@@ -87,6 +111,8 @@ test('the slug is never submitted, even when the format references it', async ()
         { title: 'Summer 2026', slug: null, issue: 56 },
         { url: '/slug-format', fields: ['slug', 'issue'] },
     );
+
+    post.mockClear();
 
     await wrapper.setData({ values: { issue: 57 } });
     await vi.advanceTimersByTimeAsync(300);

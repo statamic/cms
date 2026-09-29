@@ -953,7 +953,13 @@ export default {
         }
 
         if (this.slugFormat) {
-            this.formatRequests.slug = { values: JSON.stringify(this.slugFormatValues()) };
+            const values = Object.values(this.slugFormatValues());
+            const prefilled = !this.values.slug && values.some((value) => ![null, undefined, ''].includes(value));
+
+            // Prefilled values never change, so nothing else would generate a slug from them.
+            if (prefilled) this.generateSlugSource();
+
+            this.formatRequests.slug ??= { values: JSON.stringify(this.slugFormatValues()) };
             this.$watch('values', debounce(() => this.generateSlugSource(), 300), { deep: true });
         }
 
