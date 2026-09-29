@@ -144,8 +144,10 @@ class Fieldset implements ContainsQueryableValues
             [$sectionIndex, $importKey, $importedField] = $imported;
             $fields = $sections[$sectionIndex]['fields'];
             $import = $fields->get($importKey);
+            // Import overrides are keyed by the handles within the fieldset, before any prefix is applied.
+            $importedHandle = Str::after($handle, $import['prefix'] ?? '');
             $config = Arr::except($config, array_keys($importedField->config()));
-            $import['config'][$handle] = array_merge($config, $import['config'][$handle] ?? []);
+            $import['config'][$importedHandle] = array_merge($config, $import['config'][$importedHandle] ?? []);
             $fields->put($importKey, $import);
         } else {
             $field = ['handle' => $handle, 'field' => $config];
@@ -432,7 +434,47 @@ class Fieldset implements ContainsQueryableValues
             return $this;
         }
 
-        return $this->ensureField($handle, $config);
+        // If the field only exists as a deferred ensured field, we'll need to update it instead.
+        if (! $path = $this->findFieldPath($handle)) {
+            $this->ensuredFields[$handle]['config'] = array_merge($this->ensuredFields[$handle]['config'], $config);
+
+            return $this;
+        }
+
+        $field = Arr::get($this->contents, $path);
+
+        if (isset($field['import'])) {
+            $key = 'config.'.Str::after($handle, $field['prefix'] ?? '');
+        } elseif (is_string($field['field'])) {
+            $key = 'config';
+        } else {
+            $key = 'field';
+        }
+
+        Arr::set($this->contents, "{$path}.{$key}", array_merge(Arr::get($field, $key, []), $config));
+
+        return $this;
+    }
+
+    private function findFieldPath($handle): ?string
+    {
+        $groups = empty($this->contents['sections'])
+            ? ['fields' => $this->contents['fields'] ?? []]
+            : collect($this->contents['sections'])->mapWithKeys(fn ($section, $index) => ["sections.{$index}.fields" => $section['fields'] ?? []])->all();
+
+        foreach ($groups as $path => $fields) {
+            foreach ($fields as $index => $field) {
+                $handles = isset($field['import'])
+                    ? (new Fields([$field]))->all()->keys()->all()
+                    : [$field['handle']];
+
+                if (in_array($handle, $handles)) {
+                    return "{$path}.{$index}";
+                }
+            }
+        }
+
+        return null;
     }
 
     public function commandPaletteLink(): Link

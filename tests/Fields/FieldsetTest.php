@@ -1008,11 +1008,109 @@ class FieldsetTest extends TestCase
             ['display' => 'Two', 'fields' => [['handle' => 'two', 'field' => ['type' => 'text']]]],
         ]]);
 
-        $fieldset->ensureFieldHasConfig('two', ['type' => 'textarea', 'foo' => 'bar']);
+        $fieldset->ensureFieldHasConfig('two', ['foo' => 'bar']);
 
         $this->assertEquals(['sections' => [
             ['display' => 'One', 'fields' => [['handle' => 'one', 'field' => ['type' => 'text']]]],
             ['display' => 'Two', 'fields' => [['handle' => 'two', 'field' => ['type' => 'text', 'foo' => 'bar']]]],
+        ]], $fieldset->contents());
+    }
+
+    #[Test]
+    public function it_ensures_a_field_exists_in_a_prefixed_imported_fieldset()
+    {
+        FieldsetRepository::shouldReceive('find')->with('the_partial')->andReturn(
+            (new Fieldset)->setContents(['fields' => [
+                ['handle' => 'author', 'field' => ['type' => 'text']],
+            ]])
+        );
+
+        $fieldset = (new Fieldset)->setContents(['fields' => [
+            ['import' => 'the_partial', 'prefix' => 'prefixed_'],
+        ]]);
+
+        $fieldset->ensureField('prefixed_author', ['type' => 'textarea', 'foo' => 'bar']);
+
+        $this->assertEquals(['fields' => [
+            ['import' => 'the_partial', 'prefix' => 'prefixed_', 'config' => ['author' => ['foo' => 'bar']]],
+        ]], $fieldset->contents());
+
+        $this->assertEquals(['type' => 'text', 'foo' => 'bar'], $fieldset->field('prefixed_author')->config());
+    }
+
+    #[Test]
+    public function ensuring_a_field_has_config_overwrites_existing_config()
+    {
+        FieldsetRepository::shouldReceive('find')->with('the_partial')->andReturn(
+            (new Fieldset)->setContents(['fields' => [
+                ['handle' => 'referenced', 'field' => ['type' => 'text', 'visibility' => 'hidden']],
+                ['handle' => 'imported', 'field' => ['type' => 'text', 'visibility' => 'hidden']],
+            ]])
+        );
+
+        $fieldset = (new Fieldset)->setContents(['fields' => [
+            ['handle' => 'inline', 'field' => ['type' => 'text', 'visibility' => 'hidden']],
+            ['handle' => 'reference', 'field' => 'the_partial.referenced', 'config' => ['visibility' => 'hidden']],
+            ['import' => 'the_partial', 'prefix' => 'prefixed_', 'config' => ['imported' => ['visibility' => 'hidden', 'foo' => 'bar']]],
+        ]]);
+
+        $fieldset
+            ->ensureFieldHasConfig('inline', ['visibility' => 'read_only'])
+            ->ensureFieldHasConfig('reference', ['visibility' => 'read_only'])
+            ->ensureFieldHasConfig('prefixed_imported', ['visibility' => 'read_only']);
+
+        $this->assertEquals(['fields' => [
+            ['handle' => 'inline', 'field' => ['type' => 'text', 'visibility' => 'read_only']],
+            ['handle' => 'reference', 'field' => 'the_partial.referenced', 'config' => ['visibility' => 'read_only']],
+            ['import' => 'the_partial', 'prefix' => 'prefixed_', 'config' => ['imported' => ['visibility' => 'read_only', 'foo' => 'bar']]],
+        ]], $fieldset->contents());
+
+        $this->assertEquals('read_only', $fieldset->field('inline')->config()['visibility']);
+        $this->assertEquals('read_only', $fieldset->field('reference')->config()['visibility']);
+        $this->assertEquals('read_only', $fieldset->field('prefixed_imported')->config()['visibility']);
+    }
+
+    #[Test]
+    public function ensuring_a_field_has_config_overwrites_config_in_a_later_section()
+    {
+        $fieldset = (new Fieldset)->setContents(['sections' => [
+            ['fields' => [['handle' => 'one', 'field' => ['type' => 'text']]]],
+            ['fields' => [['handle' => 'two', 'field' => ['type' => 'text']]]],
+        ]]);
+
+        $fieldset->ensureFieldHasConfig('two', ['type' => 'textarea']);
+
+        $this->assertEquals(['sections' => [
+            ['fields' => [['handle' => 'one', 'field' => ['type' => 'text']]]],
+            ['fields' => [['handle' => 'two', 'field' => ['type' => 'textarea']]]],
+        ]], $fieldset->contents());
+    }
+
+    #[Test]
+    public function ensuring_a_field_has_config_updates_a_deferred_ensured_field()
+    {
+        $fieldset = (new Fieldset)->setContents(['fields' => []]);
+
+        $fieldset
+            ->ensureField('new', ['type' => 'text', 'visibility' => 'hidden'])
+            ->ensureFieldHasConfig('new', ['visibility' => 'read_only']);
+
+        $this->assertEquals(['fields' => [
+            ['handle' => 'new', 'field' => ['type' => 'text', 'visibility' => 'read_only']],
+        ]], $fieldset->contents());
+    }
+
+    #[Test]
+    public function ensuring_a_field_has_config_does_nothing_if_the_field_doesnt_exist()
+    {
+        $fieldset = (new Fieldset)->setContents(['fields' => [
+            ['handle' => 'one', 'field' => ['type' => 'text']],
+        ]]);
+
+        $fieldset->ensureFieldHasConfig('missing', ['type' => 'textarea']);
+
+        $this->assertEquals(['fields' => [
+            ['handle' => 'one', 'field' => ['type' => 'text']],
         ]], $fieldset->contents());
     }
 
