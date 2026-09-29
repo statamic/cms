@@ -563,6 +563,33 @@ test('it can call a custom function on a specific field', () => {
     expect(showFieldIf({ favorite_animals: 'custom lovesAnimals' })).toBe(true);
 });
 
+test('it inverts a custom function on a specific field only once', () => {
+    setValues({
+        first_name: 'San',
+        favorite_animals: ['cats', 'dogs', 'rats', 'bats'],
+    });
+
+    Statamic.$conditions.add('lovesAnimals', function ({ target }) {
+        return target.length > 3;
+    });
+
+    Statamic.$conditions.add('hatesAnimals', function ({ target }) {
+        return target.length === 0;
+    });
+
+    expect(Fields.showField({ unless: { favorite_animals: 'custom lovesAnimals' } })).toBe(false);
+    expect(Fields.showField({ unless: { favorite_animals: 'custom hatesAnimals' } })).toBe(true);
+    expect(Fields.showField({ hide_when: { favorite_animals: 'custom lovesAnimals' } })).toBe(false);
+    expect(Fields.showField({ unless_any: { favorite_animals: 'custom lovesAnimals' } })).toBe(false);
+    expect(Fields.showField({ hide_when_any: { favorite_animals: 'custom hatesAnimals', first_name: 'is San' } })).toBe(
+        false,
+    );
+    expect(Fields.showField({ unless: { favorite_animals: 'custom lovesAnimals', first_name: 'is San' } })).toBe(false);
+    expect(Fields.showField({ unless: { favorite_animals: 'custom lovesAnimals', first_name: 'is Rincess' } })).toBe(
+        true,
+    );
+});
+
 test('it can call a custom function on a specific field using params against a root value', () => {
     setStoreValues({
         favorite_animals: ['cats', 'dogs', 'rats', 'bats'],

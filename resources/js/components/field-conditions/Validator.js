@@ -53,7 +53,9 @@ export default class {
         if (conditions === undefined) {
             return true;
         } else if (this.isCustomConditionWithoutTarget(conditions)) {
-            return this.passesCustomCondition(this.prepareCondition(conditions));
+            let passes = this.passesCustomCondition(this.prepareCondition(conditions));
+
+            return this.showOnPass ? passes : !passes;
         }
 
         let passes = this.passOnAny ? this.passesAnyConditions(conditions) : this.passesAllConditions(conditions);
@@ -306,7 +308,9 @@ export default class {
             ...this.extraPayload,
         });
 
-        return this.showOnPass ? passes : !passes;
+        // Inverting for `unless` and `hide_when` is left to passesConditions(), so a custom
+        // condition nested in a field's conditions isn't inverted twice.
+        return passes;
     }
 
     passesNonRevealerConditions(dottedPrefix) {
