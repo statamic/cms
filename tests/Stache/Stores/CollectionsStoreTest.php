@@ -70,6 +70,14 @@ class CollectionsStoreTest extends TestCase
     }
 
     #[Test]
+    public function it_sets_the_slug_format_from_the_file()
+    {
+        $item = $this->store->makeItemFromFile($this->tempDir.'/example.yaml', "slug_format: '{issue}-{title}'");
+
+        $this->assertEquals('{issue}-{title}', $item->slugFormat('en'));
+    }
+
+    #[Test]
     public function it_normalizes_preview_target_url_into_format()
     {
         // it's just nicer to write "url" into yaml than "format".

@@ -44,6 +44,7 @@ class CollectionsStore extends BasicStore
             ->routes(Arr::get($data, 'route'))
             ->requiresSlugs(Arr::get($data, 'slugs', true))
             ->titleFormats(Arr::get($data, 'title_format'))
+            ->slugFormats(Arr::get($data, 'slug_format'))
             ->mount(Arr::get($data, 'mount'))
             ->dated(Arr::get($data, 'date', false))
             ->sites($sites)

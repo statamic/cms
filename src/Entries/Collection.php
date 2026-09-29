@@ -65,6 +65,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contain
     protected $structureContents;
     protected $taxonomies = [];
     protected $requiresSlugs = true;
+    protected $slugFormats = [];
     protected $titleFormats = [];
     protected $previewTargets = [];
     protected $autosave;
@@ -156,6 +157,37 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contain
     public function autoGeneratesTitles()
     {
         return $this->titleFormats !== [];
+    }
+
+    public function slugFormats($formats = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('slugFormats')
+            ->setter(function ($format) {
+                if (! $format) {
+                    $format = [];
+                }
+
+                return $format;
+            })
+            ->getter(function ($formats) {
+                return $this->sites()->mapWithKeys(function ($site) use ($formats) {
+                    $siteFormat = is_string($formats) ? $formats : ($formats[$site] ?? null);
+
+                    return [$site => $siteFormat];
+                });
+            })
+            ->args(func_get_args());
+    }
+
+    public function slugFormat($site)
+    {
+        return $this->slugFormats()->get($site);
+    }
+
+    public function autoGeneratesSlugs()
+    {
+        return $this->slugFormats !== [];
     }
 
     public function dated($dated = null)
@@ -594,6 +626,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contain
             'taxonomies' => $this->taxonomies,
             'revisions' => $this->revisions,
             'title_format' => $this->titleFormats,
+            'slug_format' => $this->slugFormats,
             'autosave' => $this->autosave,
             'entry_class' => $this->entryClass,
         ];

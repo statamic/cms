@@ -182,6 +182,82 @@ class CollectionTest extends TestCase
     }
 
     #[Test]
+    public function it_gets_and_sets_the_slug_formats()
+    {
+        $this->setSites([
+            'en' => ['url' => 'http://domain.com/'],
+            'fr' => ['url' => 'http://domain.com/fr/'],
+            'de' => ['url' => 'http://domain.com/de/'],
+        ]);
+
+        // A collection with no sites uses the default site.
+        $collection = new Collection;
+        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $collection->slugFormats());
+        $this->assertEquals(['en' => null], $collection->slugFormats()->all());
+        $this->assertFalse($collection->autoGeneratesSlugs());
+
+        $collection->slugFormats(null);
+        $this->assertFalse($collection->autoGeneratesSlugs());
+
+        $return = $collection->slugFormats([
+            'en' => '{issue}-{title}',
+            'fr' => '{issue}-fr-{title}',
+            'de' => '{issue}-de-{title}',
+        ]);
+
+        $this->assertEquals($collection, $return);
+        $this->assertTrue($collection->autoGeneratesSlugs());
+
+        // Only slugFormats corresponding to the collection's sites will be returned.
+        $this->assertEquals(['en' => '{issue}-{title}'], $collection->slugFormats()->all());
+        $this->assertEquals('{issue}-{title}', $collection->slugFormat('en'));
+        $this->assertNull($collection->slugFormat('fr'));
+        $this->assertNull($collection->slugFormat('unknown'));
+
+        $collection->sites(['en', 'fr']);
+
+        $this->assertEquals([
+            'en' => '{issue}-{title}',
+            'fr' => '{issue}-fr-{title}',
+        ], $collection->slugFormats()->all());
+        $this->assertEquals('{issue}-fr-{title}', $collection->slugFormat('fr'));
+        $this->assertNull($collection->slugFormat('de'));
+    }
+
+    #[Test]
+    public function it_sets_all_the_slug_formats_identically()
+    {
+        $this->setSites([
+            'en' => ['url' => 'http://domain.com/'],
+            'fr' => ['url' => 'http://domain.com/fr/'],
+            'de' => ['url' => 'http://domain.com/de/'],
+        ]);
+
+        $collection = (new Collection)->sites(['en', 'fr']);
+
+        $return = $collection->slugFormats('{issue}-{title}');
+
+        $this->assertEquals($collection, $return);
+        $this->assertEquals([
+            'en' => '{issue}-{title}',
+            'fr' => '{issue}-{title}',
+        ], $collection->slugFormats()->all());
+        $this->assertNull($collection->slugFormat('de'));
+    }
+
+    #[Test]
+    public function it_includes_the_slug_format_in_the_file_data()
+    {
+        $collection = (new Collection)->handle('test');
+
+        $this->assertArrayNotHasKey('slug_format', $collection->fileData());
+
+        $collection->slugFormats('{issue}-{title}');
+
+        $this->assertEquals('{issue}-{title}', $collection->fileData()['slug_format']);
+    }
+
+    #[Test]
     public function it_gets_and_sets_the_template()
     {
         $collection = new Collection;
