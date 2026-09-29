@@ -331,6 +331,46 @@ class UpdateEntryTest extends TestCase
     }
 
     #[Test]
+    public function existing_slug_is_kept_when_using_a_slug_format()
+    {
+        [$user, $collection] = $this->seedUserAndCollection();
+        $collection->slugFormats('{issue}-{title}')->save();
+        $this->seedBlueprintFields($collection, ['issue' => ['type' => 'integer']]);
+
+        $entry = EntryFactory::collection($collection)
+            ->slug('56-summer-2026')
+            ->data(['title' => 'Summer 2026', 'issue' => 56])
+            ->create();
+
+        $this
+            ->actingAs($user)
+            ->update($entry, ['title' => 'Winter 2026', 'slug' => '56-summer-2026', 'issue' => 57])
+            ->assertOk();
+
+        $this->assertEquals('56-summer-2026', $entry->fresh()->slug());
+    }
+
+    #[Test]
+    public function slug_gets_regenerated_from_the_slug_format_when_it_is_still_being_auto_generated()
+    {
+        [$user, $collection] = $this->seedUserAndCollection();
+        $collection->slugFormats('{issue}-{title}')->save();
+        $this->seedBlueprintFields($collection, ['issue' => ['type' => 'integer']]);
+
+        $entry = EntryFactory::collection($collection)
+            ->slug('56-summer-2026')
+            ->data(['title' => 'Summer 2026', 'issue' => 56])
+            ->create();
+
+        $this
+            ->actingAs($user)
+            ->update($entry, ['title' => 'Winter 2026', 'slug' => '56-summer-2026', 'issue' => 57, '_auto_slug' => true])
+            ->assertOk();
+
+        $this->assertEquals('57-winter-2026', $entry->fresh()->slug());
+    }
+
+    #[Test]
     public function submitted_slug_is_ignored_when_it_is_still_being_auto_generated()
     {
         // The browser generates the slug asynchronously, so what it submits can lag

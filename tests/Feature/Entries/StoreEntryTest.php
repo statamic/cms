@@ -198,6 +198,70 @@ class StoreEntryTest extends TestCase
     }
 
     #[Test]
+    public function slug_gets_created_from_the_slug_format()
+    {
+        [$user, $collection] = $this->seedUserAndCollection();
+        $collection->slugFormats('{issue}-{title}')->save();
+        $this->seedBlueprintFields($collection, ['issue' => ['type' => 'integer']]);
+
+        $this
+            ->actingAs($user)
+            ->submit($collection, ['title' => 'Summer 2026', 'slug' => '', 'issue' => 56])
+            ->assertOk();
+
+        $entry = Entry::all()->first();
+        $this->assertEquals('56-summer-2026', $entry->slug());
+        $this->assertEquals('56-summer-2026.md', pathinfo($entry->path(), PATHINFO_BASENAME));
+    }
+
+    #[Test]
+    public function slug_gets_created_from_the_slug_format_and_title_format()
+    {
+        [$user, $collection] = $this->seedUserAndCollection();
+        $collection->titleFormats('Auto {foo}')->slugFormats('{issue}-{title}')->save();
+        $this->seedBlueprintFields($collection, ['foo' => ['type' => 'text'], 'issue' => ['type' => 'integer']]);
+
+        $this
+            ->actingAs($user)
+            ->submit($collection, ['title' => 'Auto stale', 'slug' => '', 'foo' => 'bar', 'issue' => 56])
+            ->assertOk();
+
+        $entry = Entry::all()->first();
+        $this->assertEquals('Auto bar', $entry->value('title'));
+        $this->assertEquals('56-auto-bar', $entry->slug());
+    }
+
+    #[Test]
+    public function submitted_slug_is_favored_over_the_slug_format()
+    {
+        [$user, $collection] = $this->seedUserAndCollection();
+        $collection->slugFormats('{issue}-{title}')->save();
+        $this->seedBlueprintFields($collection, ['issue' => ['type' => 'integer']]);
+
+        $this
+            ->actingAs($user)
+            ->submit($collection, ['title' => 'Summer 2026', 'slug' => 'manually-entered-slug', 'issue' => 56])
+            ->assertOk();
+
+        $this->assertEquals('manually-entered-slug', Entry::all()->first()->slug());
+    }
+
+    #[Test]
+    public function submitted_slug_is_ignored_in_favor_of_the_slug_format_when_it_is_still_being_auto_generated()
+    {
+        [$user, $collection] = $this->seedUserAndCollection();
+        $collection->slugFormats('{issue}-{title}')->save();
+        $this->seedBlueprintFields($collection, ['issue' => ['type' => 'integer']]);
+
+        $this
+            ->actingAs($user)
+            ->submit($collection, ['title' => 'Summer 2026', 'slug' => '5-summer', 'issue' => 56, '_auto_slug' => true])
+            ->assertOk();
+
+        $this->assertEquals('56-summer-2026', Entry::all()->first()->slug());
+    }
+
+    #[Test]
     public function submitted_slug_is_ignored_when_it_is_still_being_auto_generated()
     {
         // The browser generates the slug asynchronously, so what it submits can lag
