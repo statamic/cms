@@ -284,7 +284,10 @@ export default class {
             return intersection(condition.lhs, condition.rhs).length;
         }
 
-        return new RegExp(condition.rhs.join('|')).test(condition.lhs);
+        // Match each value literally, so characters like `.`, `(` or `+` aren't read as a pattern.
+        const lhs = condition.lhs === null || condition.lhs === undefined ? '' : String(condition.lhs);
+
+        return condition.rhs.some((value) => lhs.includes(value));
     }
 
     passesCustomCondition(condition) {

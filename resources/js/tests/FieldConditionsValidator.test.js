@@ -207,6 +207,22 @@ test('it can use includes_any or contains_any operators in conditions', () => {
     expect(showFieldIf({ null_value: 'contains_any fox, 13' })).toBe(false);
 });
 
+test('it matches contains_any values literally rather than as patterns', () => {
+    setValues({
+        version: 'a.b',
+        other_version: 'axb',
+        phone: 'Call 555-0100',
+        language: 'C++',
+        price: 'From $100',
+    });
+
+    expect(showFieldIf({ version: 'contains_any a.b' })).toBe(true);
+    expect(showFieldIf({ other_version: 'contains_any a.b' })).toBe(false);
+    expect(showFieldIf({ phone: 'contains_any (555)' })).toBe(false);
+    expect(showFieldIf({ language: 'contains_any C++' })).toBe(true);
+    expect(showFieldIf({ price: 'contains_any 50%, $100' })).toBe(true);
+});
+
 test('it handles null, true, and false in condition as literal', () => {
     setValues({
         last_name: 'HasselHoff',
