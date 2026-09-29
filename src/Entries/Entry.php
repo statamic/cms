@@ -185,7 +185,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
     public function blueprint($blueprint = null)
     {
-        $key = "entry-{$this->id()}-blueprint";
+        $key = 'entry-'.($this->id() ?? 'obj-'.spl_object_id($this)).'-blueprint';
 
         return $this
             ->fluentlyGetOrSet('blueprint')
