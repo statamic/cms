@@ -18,11 +18,11 @@ export default {
 
     methods: {
         actionStarted() {
-            if (this.savingRef) this.savingRef.value = true;
+            this.saving = true;
         },
 
         actionCompleted(successful = null, response) {
-            if (this.savingRef) this.savingRef.value = false;
+            this.saving = false;
 
             if (successful === false) return;
 

@@ -794,7 +794,7 @@ export default {
         },
 
         publishActionCompleted({ published, isWorkingCopy, response }) {
-            this.savingRef.value = false;
+            this.saving = false;
             if (published !== undefined) {
                 this.$refs.container.setFieldValue('published', published);
                 this.initialPublished = published;
@@ -834,7 +834,7 @@ export default {
 
         publishActionFailed() {
             this.confirmPublish = false;
-            this.savingRef.value = false;
+            this.saving = false;
         },
 
         setFieldValue(handle, value) {
