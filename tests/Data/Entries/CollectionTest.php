@@ -111,7 +111,8 @@ class CollectionTest extends TestCase
     }
 
     #[Test]
-    public function it_gets_and_sets_the_title_formats()
+    #[DataProvider('formatsProvider')]
+    public function it_gets_and_sets_the_formats($formats, $format, $autoGenerates)
     {
         $this->setSites([
             'en' => ['url' => 'http://domain.com/'],
@@ -121,44 +122,45 @@ class CollectionTest extends TestCase
 
         // A collection with no sites uses the default site.
         $collection = new Collection;
-        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $collection->titleFormats());
-        $this->assertEquals(['en' => null], $collection->titleFormats()->all());
-        $this->assertFalse($collection->autoGeneratesTitles());
+        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $collection->$formats());
+        $this->assertEquals(['en' => null], $collection->$formats()->all());
+        $this->assertFalse($collection->$autoGenerates());
 
-        $collection->titleFormats(null);
-        $this->assertFalse($collection->autoGeneratesTitles());
+        $collection->$formats(null);
+        $this->assertFalse($collection->$autoGenerates());
 
-        $return = $collection->titleFormats([
+        $return = $collection->$formats([
             'en' => 'Quote by {author}',
             'fr' => 'Citation de {author}',
             'de' => 'Zitat vom {author}',
         ]);
 
         $this->assertEquals($collection, $return);
-        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $collection->titleFormats());
-        $this->assertTrue($collection->autoGeneratesTitles());
+        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $collection->$formats());
+        $this->assertTrue($collection->$autoGenerates());
 
-        // Only titleFormats corresponding to the collection's sites will be returned.
-        $this->assertEquals(['en' => 'Quote by {author}'], $collection->titleFormats()->all());
-        $this->assertEquals('Quote by {author}', $collection->titleFormat('en'));
-        $this->assertNull($collection->titleFormat('fr'));
-        $this->assertNull($collection->titleFormat('de'));
-        $this->assertNull($collection->titleFormat('unknown'));
+        // Only formats corresponding to the collection's sites will be returned.
+        $this->assertEquals(['en' => 'Quote by {author}'], $collection->$formats()->all());
+        $this->assertEquals('Quote by {author}', $collection->$format('en'));
+        $this->assertNull($collection->$format('fr'));
+        $this->assertNull($collection->$format('de'));
+        $this->assertNull($collection->$format('unknown'));
 
         $collection->sites(['en', 'fr']);
 
         $this->assertEquals([
             'en' => 'Quote by {author}',
             'fr' => 'Citation de {author}',
-        ], $collection->titleFormats()->all());
-        $this->assertEquals('Quote by {author}', $collection->titleFormat('en'));
-        $this->assertEquals('Citation de {author}', $collection->titleFormat('fr'));
-        $this->assertNull($collection->titleFormat('de'));
-        $this->assertNull($collection->titleFormat('unknown'));
+        ], $collection->$formats()->all());
+        $this->assertEquals('Quote by {author}', $collection->$format('en'));
+        $this->assertEquals('Citation de {author}', $collection->$format('fr'));
+        $this->assertNull($collection->$format('de'));
+        $this->assertNull($collection->$format('unknown'));
     }
 
     #[Test]
-    public function it_sets_all_the_title_formats_identically()
+    #[DataProvider('formatsProvider')]
+    public function it_sets_all_the_formats_identically($formats, $format)
     {
         $this->setSites([
             'en' => ['url' => 'http://domain.com/'],
@@ -168,81 +170,25 @@ class CollectionTest extends TestCase
 
         $collection = (new Collection)->sites(['en', 'fr']);
 
-        $return = $collection->titleFormats('Quote by {author}');
+        $return = $collection->$formats('Quote by {author}');
 
         $this->assertEquals($collection, $return);
         $this->assertEquals([
             'en' => 'Quote by {author}',
             'fr' => 'Quote by {author}',
-        ], $collection->titleFormats()->all());
-        $this->assertEquals('Quote by {author}', $collection->titleFormat('en'));
-        $this->assertEquals('Quote by {author}', $collection->titleFormat('fr'));
-        $this->assertNull($collection->titleFormat('de'));
-        $this->assertNull($collection->titleFormat('unknown'));
+        ], $collection->$formats()->all());
+        $this->assertEquals('Quote by {author}', $collection->$format('en'));
+        $this->assertEquals('Quote by {author}', $collection->$format('fr'));
+        $this->assertNull($collection->$format('de'));
+        $this->assertNull($collection->$format('unknown'));
     }
 
-    #[Test]
-    public function it_gets_and_sets_the_slug_formats()
+    public static function formatsProvider()
     {
-        $this->setSites([
-            'en' => ['url' => 'http://domain.com/'],
-            'fr' => ['url' => 'http://domain.com/fr/'],
-            'de' => ['url' => 'http://domain.com/de/'],
-        ]);
-
-        // A collection with no sites uses the default site.
-        $collection = new Collection;
-        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $collection->slugFormats());
-        $this->assertEquals(['en' => null], $collection->slugFormats()->all());
-        $this->assertFalse($collection->autoGeneratesSlugs());
-
-        $collection->slugFormats(null);
-        $this->assertFalse($collection->autoGeneratesSlugs());
-
-        $return = $collection->slugFormats([
-            'en' => '{issue}-{title}',
-            'fr' => '{issue}-fr-{title}',
-            'de' => '{issue}-de-{title}',
-        ]);
-
-        $this->assertEquals($collection, $return);
-        $this->assertTrue($collection->autoGeneratesSlugs());
-
-        // Only slugFormats corresponding to the collection's sites will be returned.
-        $this->assertEquals(['en' => '{issue}-{title}'], $collection->slugFormats()->all());
-        $this->assertEquals('{issue}-{title}', $collection->slugFormat('en'));
-        $this->assertNull($collection->slugFormat('fr'));
-        $this->assertNull($collection->slugFormat('unknown'));
-
-        $collection->sites(['en', 'fr']);
-
-        $this->assertEquals([
-            'en' => '{issue}-{title}',
-            'fr' => '{issue}-fr-{title}',
-        ], $collection->slugFormats()->all());
-        $this->assertEquals('{issue}-fr-{title}', $collection->slugFormat('fr'));
-        $this->assertNull($collection->slugFormat('de'));
-    }
-
-    #[Test]
-    public function it_sets_all_the_slug_formats_identically()
-    {
-        $this->setSites([
-            'en' => ['url' => 'http://domain.com/'],
-            'fr' => ['url' => 'http://domain.com/fr/'],
-            'de' => ['url' => 'http://domain.com/de/'],
-        ]);
-
-        $collection = (new Collection)->sites(['en', 'fr']);
-
-        $return = $collection->slugFormats('{issue}-{title}');
-
-        $this->assertEquals($collection, $return);
-        $this->assertEquals([
-            'en' => '{issue}-{title}',
-            'fr' => '{issue}-{title}',
-        ], $collection->slugFormats()->all());
-        $this->assertNull($collection->slugFormat('de'));
+        return [
+            'title' => ['titleFormats', 'titleFormat', 'autoGeneratesTitles'],
+            'slug' => ['slugFormats', 'slugFormat', 'autoGeneratesSlugs'],
+        ];
     }
 
     #[Test]
