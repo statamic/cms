@@ -95,9 +95,11 @@ abstract class DataReferenceUpdater
                 return true;
             }
 
-            $needle = substr(json_encode($this->originalValue, $flags), 1, -1);
+            if (! is_string($needle = json_encode($this->originalValue, $flags))) {
+                return true;
+            }
 
-            return str_contains($data, $needle);
+            return str_contains($data, substr($needle, 1, -1));
         } catch (\Throwable $e) {
             return true;
         }
