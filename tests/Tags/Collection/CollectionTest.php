@@ -437,6 +437,34 @@ class CollectionTest extends TestCase
         $this->assertEquals(['Danish'], $this->runTagAndGetTitles('newer')); // Alias of next when date:asc
     }
 
+    /**
+     * https://github.com/statamic/cms/issues/11263
+     */
+    #[Test]
+    public function it_can_get_previous_and_next_entries_in_a_dated_asc_collection_when_date_and_time_enabled()
+    {
+        $this->foods->dated(true)->save();
+        $blueprint = Blueprint::makeFromFields(['date' => ['type' => 'date', 'time_enabled' => true, 'time_seconds_enabled' => true]])->setHandle('test');
+        Blueprint::shouldReceive('in')->with('collections/foods')->once()->andReturn(collect([$blueprint]));
+
+        $this->makeEntry($this->foods, 'a')->date('2019-03-10-1250')->set('title', 'Apple')->save();
+        $this->makeEntry($this->foods, 'b')->date('2019-03-10-1251')->set('title', 'Banana')->save();
+        $this->makeEntry($this->foods, 'c')->date('2019-03-10-1252')->set('title', 'Carrot')->save();
+        $this->makeEntry($this->foods, 'd')->date('2019-03-10-1253')->set('title', 'Danish')->save();
+        $this->makeEntry($this->foods, 'e')->date('2019-03-10-1254')->set('title', 'Egg')->save();
+        $this->makeEntry($this->foods, 'f')->date('2019-03-10-1255')->set('title', 'Fig')->save();
+        $this->setTagParameters([
+            'in' => 'foods',
+            'current' => $this->findEntryByTitle('Carrot')->id(),
+            'order_by' => 'date:asc|title:asc',
+            'limit' => 1,
+        ]);
+        $this->assertEquals(['Banana'], $this->runTagAndGetTitles('previous'));
+        $this->assertEquals(['Banana'], $this->runTagAndGetTitles('older')); // Alias of previous when date:desc
+        $this->assertEquals(['Danish'], $this->runTagAndGetTitles('next'));
+        $this->assertEquals(['Danish'], $this->runTagAndGetTitles('newer')); // Alias of next when date:asc
+    }
+
     #[Test]
     public function it_can_get_previous_and_next_entries_in_an_orderable_asc_collection()
     {
