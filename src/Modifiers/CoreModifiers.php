@@ -23,6 +23,7 @@ use Statamic\Facades\Path;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Facades\YAML;
+use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Value;
 use Statamic\Fields\Values;
 use Statamic\Fieldtypes\Bard;
@@ -1560,7 +1561,7 @@ class CoreModifiers extends Modifier
             return $value->count();
         }
 
-        if ($value instanceof Arrayable) {
+        if ($value instanceof Arrayable && ! $value instanceof ArrayableString) {
             $value = $value->toArray();
         }
 
