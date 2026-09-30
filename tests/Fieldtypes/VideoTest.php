@@ -69,8 +69,8 @@ class VideoTest extends TestCase
     public function a_video_renders_in_antlers()
     {
         $this->assertSame(
-            'https://vimeo.com/22439234 vimeo',
-            $this->render('{{ video ?? "fb" }} {{ video:provider }}', 'https://vimeo.com/22439234'),
+            'https://vimeo.com/22439234 vimeo 22439234',
+            $this->render('{{ video ?? "fb" }} {{ video:provider }} {{ video:id }}', 'https://vimeo.com/22439234'),
         );
     }
 

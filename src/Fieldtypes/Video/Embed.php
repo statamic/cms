@@ -11,7 +11,9 @@ class Embed extends ArrayableString
     const FILE = 'file';
     const UNSUPPORTED = 'unsupported';
     const VIMEO = 'vimeo';
+    const VIMEO_PRIVACY_HASH_PATTERN = '/^[a-zA-Z0-9]+$/';
     const YOUTUBE = 'youtube';
+    const YOUTUBE_ID_PATTERN = '/^[a-zA-Z0-9_-]+$/';
 
     public static function fromValue(?string $value): self
     {
@@ -20,7 +22,12 @@ class Embed extends ArrayableString
         }
 
         if ($provider = static::oembedProvider($value)) {
-            return new self($provider, $value, static::embedUrl($value));
+            [$id, $privacyHash] = match ($provider) {
+                self::VIMEO => static::vimeoIdAndPrivacyHash($value),
+                self::YOUTUBE => [static::youtubeId($value), null],
+            };
+
+            return new self($provider, $value, static::embedUrl($value), $id, $privacyHash);
         }
 
         if (static::isVideoFile($value)) {
@@ -39,6 +46,8 @@ class Embed extends ArrayableString
         public readonly string $provider,
         public readonly ?string $url = null,
         public readonly ?string $embedUrl = null,
+        public readonly ?string $id = null,
+        public readonly ?string $privacyHash = null,
     ) {
         parent::__construct($url);
     }
@@ -57,6 +66,8 @@ class Embed extends ArrayableString
     {
         return [
             'embed_url' => $this->embedUrl,
+            'id' => $this->id,
+            'privacy_hash' => $this->privacyHash,
             'provider' => $this->provider,
             'url' => $this->url,
         ];
@@ -160,6 +171,52 @@ class Embed extends ArrayableString
         }
 
         return null;
+    }
+
+    protected static function youtubeId(string $url): ?string
+    {
+        $url = static::withScheme($url);
+        $path = parse_url($url, PHP_URL_PATH) ?? '';
+
+        if (parse_url($url, PHP_URL_HOST) === 'youtu.be') {
+            $id = Str::before(ltrim($path, '/'), '/');
+        } elseif (preg_match('#^/(?:embed|shorts)/([^/]+)#', $path, $matches)) {
+            $id = $matches[1];
+        } else {
+            parse_str(parse_url($url, PHP_URL_QUERY) ?? '', $query);
+            $id = $query['v'] ?? null;
+        }
+
+        return is_string($id) && preg_match(self::YOUTUBE_ID_PATTERN, $id) ? $id : null;
+    }
+
+    protected static function vimeoIdAndPrivacyHash(string $url): array
+    {
+        $url = static::withScheme($url);
+        $path = parse_url($url, PHP_URL_PATH) ?? '';
+
+        $patterns = [
+            '#^/(\d+)(?:/([a-zA-Z0-9]+))?/?$#',
+            '#^/video/(\d+)/?$#',
+            '#^/progressive_redirect/playback/(\d+)/#',
+        ];
+
+        foreach ($patterns as $pattern) {
+            if (preg_match($pattern, $path, $matches)) {
+                parse_str(parse_url($url, PHP_URL_QUERY) ?? '', $query);
+                $privacyHash = $matches[2] ?? $query['h'] ?? null;
+
+                return [$matches[1], is_string($privacyHash) && preg_match(self::VIMEO_PRIVACY_HASH_PATTERN, $privacyHash) ? $privacyHash : null];
+            }
+        }
+
+        return [null, null];
+    }
+
+    // Without a scheme, parse_url treats the host as part of the path.
+    protected static function withScheme(string $url): string
+    {
+        return preg_match('#^([a-z][a-z0-9+.-]*:)?//#i', $url) ? $url : 'https://'.$url;
     }
 
     // Unlisted vimeo urls are in the form vimeo.com/id/hash, but embeds pass the hash as a get param.
