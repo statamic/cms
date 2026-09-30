@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, onUnmounted, ref, watch } from 'vue';
+import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import axios from 'axios';
 import { keys } from '@api';
 import Layout from '@/pages/layout/Layout.vue';
@@ -34,8 +34,9 @@ const save = () => {
     saving.value = true;
 
     axios.patch(props.action, value.value)
-        .then(() => {
-            Statamic.$dirty.remove('connection');
+        .then((response) => {
+            value.value = response.data;
+            nextTick(() => Statamic.$dirty.remove('connection'));
             Statamic.$toast.success(__('Saved'));
         })
         .catch((e) => {

@@ -71,6 +71,8 @@ class FormConnectController extends CpController
 
         if ($request->boolean('_save', true)) {
             $form->connections($form->connections()->put($connection->handle(), $config))->save();
+
+            return $connection->preProcess($config, $form);
         }
 
         return $config;

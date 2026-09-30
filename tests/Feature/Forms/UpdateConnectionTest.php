@@ -38,10 +38,10 @@ class UpdateConnectionTest extends TestCase
                 ['id' => 'ghi', 'to' => ['another@example.com']],
             ])
             ->assertOk()
-            ->assertExactJson([
-                ['id' => 'abc', 'to' => ['new@example.com'], 'subject' => 'Updated'],
-                ['id' => 'ghi', 'to' => ['another@example.com']],
-            ]);
+            ->assertJsonCount(2)
+            ->assertJsonPath('0.id', 'abc')
+            ->assertJsonPath('0.subject', 'Updated')
+            ->assertJsonPath('1.id', 'ghi');
 
         $updated = Form::find('test');
         $this->assertEquals([
@@ -49,6 +49,35 @@ class UpdateConnectionTest extends TestCase
             ['id' => 'ghi', 'to' => ['another@example.com']],
         ], $updated->connections()->get('email'));
         $this->assertEquals([['id' => 'def', 'url' => 'https://example.com/hook']], $updated->connections()->get('webhook'));
+    }
+
+    #[Test]
+    public function it_returns_the_pre_processed_values_after_saving()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'edit forms']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+        $form = tap(Form::make('test'))->save();
+
+        $response = $this
+            ->actingAs($user)
+            ->patchJson(cp_route('forms.connect.update', [$form->handle(), 'email']), [
+                [
+                    'id' => 'abc',
+                    'to' => ['new@example.com'],
+                    'conditions' => [
+                        ['_id' => 'client', 'field' => 'name', 'operator' => 'equals', 'value' => 'Foo'],
+                        ['_id' => 'incomplete', 'field' => '', 'operator' => 'equals', 'value' => 'Foo'],
+                    ],
+                ],
+            ])
+            ->assertOk();
+
+        $conditions = $response->json('0.conditions');
+        $this->assertCount(1, $conditions);
+        $this->assertNotEmpty($conditions[0]['_id']);
+        $this->assertNotEquals('client', $conditions[0]['_id']);
+        $this->assertTrue($response->json('0.enabled'));
+        $this->assertArrayNotHasKey('_id', Form::find('test')->connections()->get('email')[0]['conditions'][0]);
     }
 
     #[Test]
