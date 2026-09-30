@@ -33,7 +33,7 @@ class RecordConnectionSuccess
         rescue(fn () => static::cache()->put(static::key($submission), count($jobs), static::TTL));
 
         foreach ($jobs as $job) {
-            $job->middleware[] = new static($submission, (string) Str::uuid());
+            $job->middleware[] = new self($submission, (string) Str::uuid());
         }
     }
 
