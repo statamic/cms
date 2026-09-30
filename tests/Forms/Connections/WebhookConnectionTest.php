@@ -9,17 +9,35 @@ use Illuminate\Support\Facades\Validator;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use RuntimeException;
+use Statamic\Exceptions\InvalidRemoteUrlException;
 use Statamic\Facades\Form;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Forms\Connections\Webhook;
 use Statamic\Forms\Connections\Webhooks\SendWebhook;
+use Statamic\Imaging\RemoteUrlValidator;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class WebhookConnectionTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->app->bind(RemoteUrlValidator::class, function () {
+            return new RemoteUrlValidator(function ($host) {
+                return match ($host) {
+                    'example.com' => [['ip' => '93.184.216.34']],
+                    'internal.test' => [['ip' => '10.0.0.5']],
+                    default => [],
+                };
+            });
+        });
+    }
 
     #[Test]
     public function it_returns_a_job_per_webhook()
@@ -124,6 +142,148 @@ class WebhookConnectionTest extends TestCase
         ]))->handle();
 
         Http::assertSentCount(1);
+    }
+
+    #[Test]
+    public function it_does_not_follow_redirects()
+    {
+        Http::fake([
+            'example.com/*' => Http::response(null, 302, ['Location' => 'http://169.254.169.254/latest/meta-data']),
+            '169.254.169.254/*' => Http::response('secret'),
+        ]);
+
+        $form = tap(Form::make('test'))->save();
+
+        try {
+            (new SendWebhook($form->makeSubmission(), Site::default(), ['url' => 'https://example.com/hook']))->handle();
+        } catch (RequestException) {
+        }
+
+        Http::assertSentCount(1);
+        Http::assertNotSent(fn (Request $request) => str_contains($request->url(), '169.254.169.254'));
+    }
+
+    #[Test]
+    #[DataProvider('internalUrlProvider')]
+    public function it_does_not_send_to_internal_addresses(string $url)
+    {
+        Http::fake();
+
+        $form = tap(Form::make('test'))->save();
+
+        try {
+            (new SendWebhook($form->makeSubmission(), Site::default(), ['url' => $url]))->handle();
+            $this->fail('An InvalidRemoteUrlException should have been thrown.');
+        } catch (InvalidRemoteUrlException) {
+        }
+
+        Http::assertNothingSent();
+    }
+
+    public static function internalUrlProvider(): array
+    {
+        return [
+            'metadata ip' => ['http://169.254.169.254/latest/meta-data'],
+            'loopback ip' => ['http://127.0.0.1:8080/hook'],
+            'localhost' => ['http://localhost:8080/hook'],
+            'hostname resolving to a private ip' => ['https://internal.test/hook'],
+            'credentials with an internal host' => ['https://user:pass@internal.test/hook'],
+        ];
+    }
+
+    #[Test]
+    public function it_sends_to_urls_with_credentials()
+    {
+        $options = null;
+
+        Http::fake(function ($request, $requestOptions) use (&$options) {
+            $options = $requestOptions;
+
+            return Http::response();
+        });
+
+        $form = tap(Form::make('test'))->save();
+
+        (new SendWebhook($form->makeSubmission(), Site::default(), ['url' => 'https://user:pass@example.com/hook']))->handle();
+
+        Http::assertSentCount(1);
+        $this->assertSame(['example.com:443:93.184.216.34'], $options['curl'][CURLOPT_RESOLVE]);
+    }
+
+    #[Test]
+    public function it_refuses_to_send_when_the_connection_cant_be_pinned()
+    {
+        Http::fake();
+
+        $form = tap(Form::make('test'))->save();
+
+        $job = new class($form->makeSubmission(), Site::default(), ['url' => 'https://example.com/hook']) extends SendWebhook
+        {
+            protected function supportsConnectionPinning(): bool
+            {
+                return false;
+            }
+        };
+
+        try {
+            $job->handle();
+            $this->fail('A RuntimeException should have been thrown.');
+        } catch (RuntimeException $e) {
+            $this->assertEquals('The curl PHP extension is required to send webhooks.', $e->getMessage());
+        }
+
+        Http::assertNothingSent();
+    }
+
+    #[Test]
+    public function it_pins_the_request_to_the_validated_ips()
+    {
+        $options = null;
+
+        Http::fake(function ($request, $requestOptions) use (&$options) {
+            $options = $requestOptions;
+
+            return Http::response();
+        });
+
+        $form = tap(Form::make('test'))->save();
+
+        (new SendWebhook($form->makeSubmission(), Site::default(), ['url' => 'https://example.com:8443/hook']))->handle();
+
+        $this->assertSame(['example.com:8443:93.184.216.34'], $options['curl'][CURLOPT_RESOLVE]);
+    }
+
+    #[Test]
+    public function it_skips_validation_and_pinning_on_local()
+    {
+        $this->app['env'] = 'local';
+
+        $options = null;
+
+        Http::fake(function ($request, $requestOptions) use (&$options) {
+            $options = $requestOptions;
+
+            return Http::response();
+        });
+
+        $form = tap(Form::make('test'))->save();
+
+        (new SendWebhook($form->makeSubmission(), Site::default(), ['url' => 'http://localhost:8080/hook']))->handle();
+
+        Http::assertSentCount(1);
+        $this->assertArrayNotHasKey(CURLOPT_RESOLVE, $options['curl'] ?? []);
+    }
+
+    #[Test]
+    public function it_throws_when_the_response_is_a_redirect()
+    {
+        Http::fake(['*' => Http::response(null, 302, ['Location' => 'https://example.com/elsewhere'])]);
+
+        $form = tap(Form::make('test'))->save();
+
+        $this->expectException(RequestException::class);
+
+        (new SendWebhook($form->makeSubmission(), Site::default(), ['url' => 'https://example.com/hook']))->handle();
     }
 
     #[Test]
