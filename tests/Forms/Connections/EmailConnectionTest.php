@@ -321,6 +321,78 @@ class EmailConnectionTest extends TestCase
     }
 
     #[Test]
+    public function it_validates_the_config_before_previewing()
+    {
+        $form = $this->makeForm();
+
+        $this
+            ->actingAs($this->userWithEditPermission())
+            ->postJson(cp_route('forms.connect.email.preview', $form->handle()), [
+                'id' => 'abc',
+                'subject' => 'Hello',
+            ])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['0.to']);
+
+        $this
+            ->actingAs($this->userWithEditPermission())
+            ->postJson(cp_route('forms.connect.email.preview', $form->handle()), [
+                'id' => 'abc',
+                'to' => ['not-an-email'],
+            ])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['0.to']);
+    }
+
+    #[Test]
+    #[DataProvider('invalidViewProvider')]
+    public function it_only_allows_views_the_template_field_offers(?string $folder, string $view)
+    {
+        config(['statamic.forms.email_view_folder' => $folder]);
+
+        $form = $this->makeForm();
+
+        foreach (['html', 'text'] as $key) {
+            $this
+                ->actingAs($this->userWithEditPermission())
+                ->postJson(cp_route('forms.connect.email.preview', $form->handle()), [
+                    'id' => 'abc',
+                    'to' => ['recipient@example.com'],
+                    $key => $view,
+                ])
+                ->assertStatus(422)
+                ->assertJsonValidationErrors(["0.{$key}"]);
+        }
+    }
+
+    public static function invalidViewProvider(): array
+    {
+        return [
+            'namespaced view' => [null, 'statamic::forms.fields'],
+            'view outside the folder' => ['emails', 'other.preview'],
+            'view outside the folder using slashes' => ['emails', 'other/preview'],
+            'folder name as a prefix of another folder' => ['emails', 'emails-old.preview'],
+        ];
+    }
+
+    #[Test]
+    public function it_allows_views_inside_the_configured_folder()
+    {
+        config(['statamic.forms.email_view_folder' => 'emails']);
+
+        $form = $this->makeForm();
+
+        $this
+            ->actingAs($this->userWithEditPermission())
+            ->postJson(cp_route('forms.connect.email.preview', $form->handle()), [
+                'id' => 'abc',
+                'to' => ['recipient@example.com'],
+                'html' => 'emails/preview',
+            ])
+            ->assertOk();
+    }
+
+    #[Test]
     public function it_denies_the_preview_if_you_dont_have_permission()
     {
         $form = $this->makeForm();

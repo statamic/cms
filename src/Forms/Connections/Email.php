@@ -7,6 +7,7 @@ use Statamic\Contracts\Forms\Form;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Facades\Blueprint;
 use Statamic\Forms\Connections\Rules\EmailConnectionAddress;
+use Statamic\Forms\Connections\Rules\EmailConnectionView;
 use Statamic\Http\Controllers\CP\Forms\EmailConnectionPreviewController;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
@@ -104,6 +105,8 @@ class Email extends Connection
             '*.bcc' => [new EmailConnectionAddress($form)],
             '*.from' => [new EmailConnectionAddress($form)],
             '*.reply_to' => [new EmailConnectionAddress($form)],
+            '*.html' => [new EmailConnectionView],
+            '*.text' => [new EmailConnectionView],
             '*.enabled' => ['nullable', 'boolean'],
             '*.conditions' => ['nullable', 'array'],
             '*.conditions.*' => ['array'],
