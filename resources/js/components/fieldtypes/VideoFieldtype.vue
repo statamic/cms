@@ -1,7 +1,7 @@
 <template>
     <div class="flex flex-col space-y-3 p-1.5 bg-gray-100 border border-gray-300 dark:bg-gray-900 dark:border-gray-700 rounded-xl">
         <ui-combobox
-            :model-value="isCloudflare ? 'cloudflare' : 'url'"
+            :model-value="provider"
             :options="meta.providers"
             option-label="label"
             option-value="value"
@@ -139,6 +139,10 @@ export default {
             return !this.isEmbeddable && isVideo;
         },
 
+        provider() {
+            return this.isCloudflare ? CLOUDFLARE : URL_MODE;
+        },
+
         videoId() {
             return this.value?.startsWith(CLOUDFLARE_PREFIX) ? this.value.slice(CLOUDFLARE_PREFIX.length) : null;
         },
@@ -146,7 +150,7 @@ export default {
 
     methods: {
         changeMode(mode) {
-            if (mode === this.mode) return;
+            if (mode === this.provider) return;
 
             this.updateDebounced.cancel();
             this.mode = mode;

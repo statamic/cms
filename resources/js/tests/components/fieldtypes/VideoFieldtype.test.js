@@ -41,7 +41,11 @@ const mountVideoField = (value = null, video = null) => {
         global: {
             provide: { [publishContextKey]: {} },
             stubs: {
-                'ui-combobox': stub('select'),
+                'ui-combobox': {
+                    props: ['modelValue', 'options'],
+                    emits: ['update:modelValue'],
+                    template: `<select :value="modelValue" @change="$emit('update:modelValue', $event.target.value)"><option v-for="option in options" :value="option.value">{{ option.label }}</option></select>`,
+                },
                 'ui-input': stub('input'),
                 'ui-input-group': { template: '<div><slot /></div>' },
                 'ui-input-group-prepend': { template: '<span />' },
@@ -94,6 +98,23 @@ test('it does not emit when switching to the provider already in use', async () 
     await wrapper.find('select').setValue('url');
 
     expect(wrapper.emitted('update:value')).toBeUndefined();
+});
+
+test('it switches provider when a malformed cloudflare id was preloaded as unsupported', async () => {
+    const wrapper = mountVideoField('cloudflare:ABC-123', { provider: 'unsupported', url: 'cloudflare:ABC-123' });
+
+    await wrapper.find('select').setValue('url');
+
+    expect(wrapper.emitted('update:value')).toEqual([[null]]);
+});
+
+test('it switches provider after the value changes from outside', async () => {
+    const wrapper = mountVideoField('cloudflare:abc123', { provider: 'cloudflare', url: 'cloudflare:abc123' });
+
+    await wrapper.setProps({ value: 'https://vimeo.com/1' });
+    await wrapper.find('select').setValue('cloudflare');
+
+    expect(wrapper.emitted('update:value')).toEqual([[null]]);
 });
 
 test('it rejects a malformed cloudflare id', async () => {
