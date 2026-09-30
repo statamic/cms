@@ -20,7 +20,7 @@ class ConnectionLogic
     {
         $conditions = collect($conditions)
             ->map(fn ($condition) => Arr::only($condition, ['field', 'operator', 'value', 'join']))
-            ->filter(fn ($condition) => Arr::get($condition, 'field') && filled(Arr::get($condition, 'value')))
+            ->filter(fn ($condition) => filled(Arr::get($condition, 'field')))
             ->values();
 
         return $conditions->isNotEmpty() ? $conditions->all() : null;

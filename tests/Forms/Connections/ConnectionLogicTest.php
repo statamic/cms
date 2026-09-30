@@ -36,7 +36,20 @@ class ConnectionLogicTest extends TestCase
         ], ConnectionLogic::process([
             ['_id' => 'vue-row', 'field' => 'name', 'operator' => 'equals', 'value' => 'Bob', 'join' => 'and'],
             ['field' => null, 'operator' => 'equals', 'value' => 'incomplete', 'join' => 'and'],
+            ['field' => '', 'operator' => 'equals', 'value' => '', 'join' => 'and'],
+            ['operator' => 'equals', 'value' => '', 'join' => 'and'],
+        ]));
+    }
+
+    #[Test]
+    public function it_keeps_conditions_with_a_field_but_a_blank_value()
+    {
+        $this->assertEquals([
             ['field' => 'name', 'operator' => 'equals', 'value' => '', 'join' => 'and'],
+            ['field' => 'name', 'operator' => 'equals', 'value' => null, 'join' => 'or'],
+        ], ConnectionLogic::process([
+            ['_id' => 'a', 'field' => 'name', 'operator' => 'equals', 'value' => '', 'join' => 'and'],
+            ['_id' => 'b', 'field' => 'name', 'operator' => 'equals', 'value' => null, 'join' => 'or'],
         ]));
     }
 
@@ -47,6 +60,20 @@ class ConnectionLogicTest extends TestCase
         $this->assertNull(ConnectionLogic::process([
             ['field' => null, 'operator' => 'equals', 'value' => 'incomplete', 'join' => 'and'],
         ]));
+    }
+
+    #[Test]
+    public function a_blank_value_condition_survives_a_round_trip()
+    {
+        $processed = ConnectionLogic::process([
+            ['_id' => 'a', 'field' => 'name', 'operator' => 'equals', 'value' => '', 'join' => 'and'],
+        ]);
+
+        $preProcessed = ConnectionLogic::preProcess($processed);
+
+        $this->assertCount(1, $preProcessed);
+        $this->assertEquals('name', $preProcessed[0]['field']);
+        $this->assertEquals($processed, ConnectionLogic::process($preProcessed));
     }
 
     #[Test]
@@ -67,6 +94,7 @@ class ConnectionLogicTest extends TestCase
     public static function passesProvider(): array
     {
         $matching = [['field' => 'how_did_you_hear', 'operator' => 'equals', 'value' => 'friend', 'join' => 'and']];
+        $blank = [['field' => 'how_did_you_hear', 'operator' => 'equals', 'value' => '', 'join' => 'and']];
         $nonMatching = [['field' => 'how_did_you_hear', 'operator' => 'equals', 'value' => 'google', 'join' => 'and']];
 
         return [
@@ -74,6 +102,7 @@ class ConnectionLogicTest extends TestCase
             'explicitly enabled' => [['enabled' => true], true],
             'matching conditions' => [['conditions' => $matching], true],
             'non-matching conditions' => [['conditions' => $nonMatching], false],
+            'blank value against a filled field' => [['conditions' => $blank], false],
             'disabled' => [['enabled' => false], false],
             'disabled with matching conditions' => [['enabled' => false, 'conditions' => $matching], false],
         ];
