@@ -150,7 +150,7 @@
                         @mouseover="loadActions"
                         @focus="loadActions"
                         @click="loadActions"
-                        align="end"
+                        placement="left-start"
                         :class="{ invisible: isRoot && branch.actions && !branchTreeActions(actions).length }"
                     >
                         <DropdownMenu>
@@ -212,7 +212,7 @@
                     </Dropdown>
                 </ItemActions>
 
-                <Dropdown v-else align="end" :class="{ invisible: isRoot }">
+                <Dropdown v-else placement="left-start" :class="{ invisible: isRoot }">
                     <DropdownMenu>
                         <template v-if="depth < structureMaxDepth">
                             <DropdownLabel :text="__('Create Child Entry')" v-if="blueprints.length > 1" />
