@@ -143,17 +143,16 @@
                     :item="branch.entry"
                     @started="treeActionStarted"
                     @completed="treeActionCompleted"
-                    v-slot="{ actions, loadActions, shouldShowSkeleton }"
+                    v-slot="{ actions, loadActions, loading, shouldShowSkeleton }"
                 >
                     <Dropdown
                         @mouseover="loadActions"
                         @focus="loadActions"
                         @click="loadActions"
                         placement="left-start"
-                        :class="{ invisible: isRoot }"
                     >
                         <DropdownMenu>
-                            <template v-if="depth < structureMaxDepth">
+                            <template v-if="canCreateChildEntry(depth, isRoot)">
                                 <DropdownLabel :text="__('Create Child Entry')" v-if="blueprints.length > 1" />
                                 <DropdownItem
                                     v-for="blueprint in blueprints"
@@ -166,7 +165,7 @@
 
                             <DropdownSeparator
                                 v-if="
-                                    depth < structureMaxDepth &&
+                                    canCreateChildEntry(depth, isRoot) &&
                                     (shouldShowSkeleton || branchTreeActions(actions).length)
                                 "
                             />
@@ -189,19 +188,24 @@
                                     :variant="action.dangerous ? 'destructive' : 'default'"
                                     @click="action.run"
                                 />
+                                <DropdownItem
+                                    v-if="isRoot && !loading && !branchTreeActions(actions).length"
+                                    :text="__('No actions available')"
+                                    disabled
+                                />
                             </template>
 
                             <DropdownSeparator
                                 v-if="
-                                    branch.can_delete &&
-                                    (depth < structureMaxDepth ||
+                                    canDeleteTreeBranch(branch, isRoot) &&
+                                    (canCreateChildEntry(depth, isRoot) ||
                                         shouldShowSkeleton ||
                                         branchTreeActions(actions).length)
                                 "
                             />
 
                             <DropdownItem
-                                v-if="branch.can_delete"
+                                v-if="canDeleteTreeBranch(branch, isRoot)"
                                 :text="__('Delete')"
                                 icon="trash"
                                 variant="destructive"
@@ -451,6 +455,14 @@ export default {
             }
 
             return this.canUseStructureTree ? 'tree' : 'list';
+        },
+
+        canCreateChildEntry(depth, isRoot) {
+            return !isRoot && depth < this.structureMaxDepth;
+        },
+
+        canDeleteTreeBranch(branch, isRoot) {
+            return !isRoot && branch.can_delete;
         },
 
         deleteTreeBranch(branch, removeFromUi) {
