@@ -150,11 +150,29 @@ class ConnectionTest extends TestCase
     }
 
     #[Test]
-    public function it_pre_processes_the_config_unchanged_by_default()
+    public function it_pre_processes_the_config_by_default()
     {
         $config = [['id' => 'abc', 'foo' => 'bar']];
 
-        $this->assertEquals($config, (new TestMultiWordConnection)->preProcess($config, Form::make('contact')));
+        $this->assertEquals([
+            ['id' => 'abc', 'enabled' => true, 'conditions' => [], 'foo' => 'bar'],
+        ], (new TestMultiWordConnection)->preProcess($config, Form::make('contact')));
+    }
+
+    #[Test]
+    public function it_adds_enabled_and_conditions_when_pre_processing_by_default()
+    {
+        $rows = (new TestMultiWordConnection)->preProcess([
+            ['id' => 'one', 'foo' => 'bar', 'enabled' => false, 'conditions' => [['field' => 'a', 'operator' => 'equals', 'value' => 'b', 'join' => 'and']]],
+            ['id' => 'two', 'foo' => 'baz'],
+        ], Form::make('contact'));
+
+        $this->assertFalse($rows[0]['enabled']);
+        $this->assertTrue($rows[1]['enabled']);
+        $this->assertCount(1, $rows[0]['conditions']);
+        $this->assertNotEmpty($rows[0]['conditions'][0]['_id']);
+        $this->assertSame([], $rows[1]['conditions']);
+        $this->assertEquals('baz', $rows[1]['foo']);
     }
 
     #[Test]

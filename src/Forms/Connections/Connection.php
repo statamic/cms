@@ -9,6 +9,7 @@ use Statamic\Extend\HasHandle;
 use Statamic\Extend\HasTitle;
 use Statamic\Extend\RegistersItself;
 use Statamic\Statamic;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\VueComponent;
 
@@ -88,7 +89,19 @@ abstract class Connection
 
     public function preProcess(array $config, Form $form): array
     {
-        return $config;
+        return collect($config)
+            ->map(fn (array $row): array => [...$row, ...$this->preProcessRow($row)])
+            ->values()
+            ->all();
+    }
+
+    protected function preProcessRow(array $config): array
+    {
+        return [
+            'id' => $config['id'],
+            'enabled' => Arr::get($config, 'enabled') !== false,
+            'conditions' => ConnectionLogic::preProcess(Arr::get($config, 'conditions') ?? []),
+        ];
     }
 
     public function rules(Form $form): array

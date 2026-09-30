@@ -74,9 +74,7 @@ class Webhook extends Connection
 
         return collect($config)
             ->map(fn (array $config): array => [
-                'id' => $config['id'],
-                'enabled' => Arr::get($config, 'enabled') !== false,
-                'conditions' => ConnectionLogic::preProcess(Arr::get($config, 'conditions') ?? []),
+                ...$this->preProcessRow($config),
                 ...$fields->addValues($config)->preProcess()->values()->all(),
             ])
             ->values()
