@@ -6,7 +6,13 @@ use Illuminate\Contracts\Support\Arrayable;
 use Mockery;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Query\Builder;
+use Statamic\Facades\Antlers;
 use Statamic\Fields\ArrayableString;
+use Statamic\Fields\Field;
+use Statamic\Fields\LabeledValue;
+use Statamic\Fields\Value;
+use Statamic\Fieldtypes\Link\ArrayableLink;
+use Statamic\Fieldtypes\Select;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
@@ -48,24 +54,49 @@ class LengthTest extends TestCase
     #[Test]
     public function it_returns_the_number_of_items_in_an_arrayable()
     {
-        $arrayable = new class implements Arrayable
-        {
-            public function toArray()
-            {
-                return ['one', 'two'];
-            }
-        };
+        $arrayable = Mockery::mock(Arrayable::class)->shouldReceive('toArray')->andReturn(['one', 'two'])->getMock();
 
         $modified = $this->modify($arrayable);
         $this->assertSame(2, $modified);
     }
 
     #[Test]
-    public function it_returns_the_number_of_chars_in_a_stringable_arrayable()
+    public function it_returns_the_number_of_chars_in_an_arrayable_string()
     {
-        // Value objects like ArrayableString stand in for a string, so the
-        // string is what should get measured, not their array form.
-        $this->assertSame(19, $this->modify(new ArrayableString('https://vimeo.com/1')));
+        $this->assertSame(5, $this->modify(new ArrayableString('hello')));
+        $this->assertSame(5, $this->modify(new ArrayableString('hello', ['code' => 'hello', 'mode' => 'php'])));
+        $this->assertSame(4, $this->modify(new ArrayableString('héļö')));
+    }
+
+    #[Test]
+    public function it_returns_the_number_of_chars_in_a_labeled_value()
+    {
+        $this->assertSame(6, $this->modify(new LabeledValue('orange', 'Orange Juice')));
+    }
+
+    #[Test]
+    public function it_returns_the_number_of_chars_in_an_arrayable_link_url()
+    {
+        $this->assertSame(19, $this->modify(new ArrayableLink('https://example.com')));
+    }
+
+    #[Test]
+    public function it_returns_the_number_of_chars_in_an_entry_backed_arrayable_link_url()
+    {
+        $entry = Mockery::mock();
+        $entry->shouldReceive('url')->andReturn('/blog/hello');
+        $entry->shouldReceive('toAugmentedArray')->andReturn(['id' => 'a', 'title' => 'Hello', 'url' => '/blog/hello']);
+
+        $this->assertSame(11, $this->modify(new ArrayableLink($entry)));
+    }
+
+    #[Test]
+    public function it_returns_the_number_of_chars_in_a_select_value_in_antlers()
+    {
+        $fieldtype = (new Select)->setField(new Field('fruit', ['type' => 'select', 'options' => ['orange' => 'Orange Juice']]));
+        $value = new Value('orange', 'fruit', $fieldtype);
+
+        $this->assertSame('6', (string) Antlers::parse('{{ fruit | length }}', ['fruit' => $value]));
     }
 
     #[Test]

@@ -1562,8 +1562,6 @@ class CoreModifiers extends Modifier
             return $value->count();
         }
 
-        // Value objects like ArrayableString are both Arrayable and Stringable.
-        // They stand in for a string, so measure the string, not the array.
         if ($value instanceof Arrayable && ! $value instanceof ArrayableString) {
             $value = $value->toArray();
         }

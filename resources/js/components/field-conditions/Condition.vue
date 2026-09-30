@@ -156,6 +156,7 @@ export default {
                 not: __('Not'),
                 contains: __('Contains'),
                 contains_any: __('Contains Any'),
+                includes_any: __('Includes Any'),
                 '===': '===',
                 '!==': '!==',
                 '>': '>',
