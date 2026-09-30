@@ -329,7 +329,9 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
     public function email($emails = null)
     {
         if (func_num_args() === 0) {
-            return $this->connections()->get('email');
+            $emails = $this->connections()->get('email');
+
+            return is_null($emails) ? null : array_map(fn ($email) => Arr::except($email, 'id'), $emails);
         }
 
         $connections = $this->connections();

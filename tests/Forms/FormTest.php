@@ -480,7 +480,7 @@ class FormTest extends TestCase
 
         $form->connections(['email' => [['to' => 'foo@bar.com']]]);
 
-        $this->assertEquals([['to' => 'foo@bar.com']], collect($form->email())->map(fn ($config) => Arr::except($config, 'id'))->all());
+        $this->assertEquals([['to' => 'foo@bar.com']], $form->email());
     }
 
     #[Test]
@@ -492,7 +492,7 @@ class FormTest extends TestCase
 
         $this->assertEquals(['webhook', 'email'], $form->connections()->keys()->all());
         $this->assertEquals([['url' => 'https://example.com/hook']], array_map(fn ($config) => Arr::except($config, 'id'), $form->connections()->get('webhook')));
-        $this->assertEquals([['to' => 'foo@bar.com']], collect($form->email())->map(fn ($config) => Arr::except($config, 'id'))->all());
+        $this->assertEquals([['to' => 'foo@bar.com']], $form->email());
     }
 
     #[Test]
@@ -500,7 +500,7 @@ class FormTest extends TestCase
     {
         $form = Form::make('contact_us')->email([['to' => 'foo@bar.com'], ['to' => 'baz@qux.com']]);
 
-        $ids = collect($form->email())->pluck('id');
+        $ids = collect($form->connections()->get('email'))->pluck('id');
 
         $this->assertCount(2, $ids->filter()->unique());
     }
@@ -510,7 +510,7 @@ class FormTest extends TestCase
     {
         $form = Form::make('contact_us')->email([['id' => 'abc', 'to' => 'foo@bar.com']]);
 
-        $this->assertEquals('abc', $form->email()[0]['id']);
+        $this->assertEquals('abc', $form->connections()->get('email')[0]['id']);
     }
 
     #[Test]
@@ -518,7 +518,7 @@ class FormTest extends TestCase
     {
         $form = Form::make('contact_us')->email(['to' => 'foo@bar.com']);
 
-        $this->assertEquals([['to' => 'foo@bar.com']], collect($form->email())->map(fn ($config) => Arr::except($config, 'id'))->all());
+        $this->assertEquals([['to' => 'foo@bar.com']], $form->email());
     }
 
     #[Test]
