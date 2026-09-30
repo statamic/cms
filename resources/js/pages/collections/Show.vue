@@ -141,15 +141,17 @@
                     :url="entriesActionUrl"
                     :context="{ view: 'tree' }"
                     :item="branch.entry"
+                    :preload="isRoot"
                     @started="treeActionStarted"
                     @completed="treeActionCompleted"
-                    v-slot="{ actions, loadActions, loading, shouldShowSkeleton }"
+                    v-slot="{ actions, loadActions, shouldShowSkeleton }"
                 >
                     <Dropdown
                         @mouseover="loadActions"
                         @focus="loadActions"
                         @click="loadActions"
                         placement="left-start"
+                        :class="{ invisible: isRoot && !branchTreeActions(actions).length }"
                     >
                         <DropdownMenu>
                             <template v-if="canCreateChildEntry(depth, isRoot)">
@@ -187,11 +189,6 @@
                                     :icon="action.icon"
                                     :variant="action.dangerous ? 'destructive' : 'default'"
                                     @click="action.run"
-                                />
-                                <DropdownItem
-                                    v-if="isRoot && !loading && !branchTreeActions(actions).length"
-                                    :text="__('No actions available')"
-                                    disabled
                                 />
                             </template>
 
