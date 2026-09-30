@@ -31,6 +31,7 @@ class EmbedTest extends TestCase
             'cloudflare with a malformed id' => ['cloudflare:1234"></iframe><script>alert(1)</script>', 'unsupported', null],
             'cloudflare with a path traversal id' => ['cloudflare:../../evil', 'unsupported', null],
             'cloudflare with an id containing another provider' => ['cloudflare:vimeo1234', 'cloudflare', 'https://iframe.cloudflarestream.com/vimeo1234'],
+            'cloudflare with a trailing newline' => ["cloudflare:1234\n", 'unsupported', null],
             'mp4 file' => ['https://example.com/clip.mp4', 'file', 'https://example.com/clip.mp4'],
             'uppercase file extension' => ['https://example.com/clip.MOV', 'file', 'https://example.com/clip.MOV'],
             'file with a query string' => ['https://example.com/clip.webm?t=1', 'file', 'https://example.com/clip.webm?t=1'],

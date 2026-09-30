@@ -18,7 +18,7 @@ class Embed extends ArrayableString
     const YOUTUBE = 'youtube';
 
     private const CLOUDFLARE_EMBED_URL = 'https://iframe.cloudflarestream.com/';
-    private const CLOUDFLARE_ID_PATTERN = '/^[a-zA-Z0-9]+$/';
+    private const CLOUDFLARE_ID_PATTERN = '/^[a-zA-Z0-9]+\z/';
     private const CLOUDFLARE_PREFIX = 'cloudflare:';
     private const VIMEO_PRIVACY_HASH_PATTERN = '/^[a-zA-Z0-9]+$/';
     private const YOUTUBE_ID_PATTERN = '/^[a-zA-Z0-9_-]+$/';
