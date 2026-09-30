@@ -10,7 +10,7 @@ use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
-use Statamic\Forms\SendEmails;
+use Statamic\Forms\SendEmail;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -109,7 +109,7 @@ class GenerateFakeSubmissionTest extends TestCase
             ->assertOk();
 
         Event::assertNotDispatched(FormSubmitted::class);
-        Bus::assertNotDispatched(SendEmails::class);
+        Bus::assertNotDispatched(SendEmail::class);
         $this->assertEquals(1, $form->querySubmissions()->count());
     }
 
@@ -120,6 +120,7 @@ class GenerateFakeSubmissionTest extends TestCase
         Bus::fake();
 
         $form = $this->makeForm('contact');
+        $form->connections(['email' => [['to' => 'first@example.com'], ['to' => 'second@example.com']]])->save();
         $user = $this->userWithConfigureFormsPermission();
 
         $this
@@ -128,7 +129,7 @@ class GenerateFakeSubmissionTest extends TestCase
             ->assertOk();
 
         Event::assertDispatched(FormSubmitted::class);
-        Bus::assertDispatched(SendEmails::class);
+        Bus::assertDispatchedTimes(SendEmail::class, 2);
         $this->assertEquals(1, $form->querySubmissions()->count());
     }
 

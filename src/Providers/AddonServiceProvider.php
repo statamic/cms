@@ -22,6 +22,7 @@ use Statamic\Facades\Path;
 use Statamic\Facades\YAML;
 use Statamic\Fields\Fieldtype;
 use Statamic\Forms\Charts\Chart;
+use Statamic\Forms\Connections\Connection as FormConnection;
 use Statamic\Forms\Fields\FormFieldtype;
 use Statamic\Forms\Insights\Insight;
 use Statamic\Forms\JsDrivers\JsDriver;
@@ -72,6 +73,11 @@ abstract class AddonServiceProvider extends ServiceProvider
      * @var list<class-string<Fieldtype>>
      */
     protected $fieldtypes = [];
+
+    /**
+     * @var list<class-string<FormConnection>>
+     */
+    protected $formConnections = [];
 
     /**
      * @var list<class-string<FormFieldtype>>
@@ -221,6 +227,7 @@ abstract class AddonServiceProvider extends ServiceProvider
                 ->bootActions()
                 ->bootDictionaries()
                 ->bootFieldtypes()
+                ->bootFormConnections()
                 ->bootFormFieldtypes()
                 ->bootFormCharts()
                 ->bootFormInsights()
@@ -376,6 +383,19 @@ abstract class AddonServiceProvider extends ServiceProvider
             ->unique();
 
         foreach ($fieldtypes as $class) {
+            $class::register();
+        }
+
+        return $this;
+    }
+
+    protected function bootFormConnections()
+    {
+        $formConnections = collect($this->formConnections)
+            ->merge($this->autoloadFilesFromFolder('FormConnections', FormConnection::class))
+            ->unique();
+
+        foreach ($formConnections as $class) {
             $class::register();
         }
 
