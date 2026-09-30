@@ -14,9 +14,6 @@ use Tests\TestCase;
  * An augmented video field has to behave like the string it was before it was
  * augmented. Everything here would pass against a raw string, so each case
  * asserts the augmented value agrees with it.
- *
- * Cloudflare values are deliberately absent: `cloudflare:<id>` is a new format
- * with no prior behaviour to preserve. VideoTest covers it instead.
  */
 class ParityTest extends TestCase
 {

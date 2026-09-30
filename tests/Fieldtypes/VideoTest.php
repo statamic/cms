@@ -21,23 +21,21 @@ class VideoTest extends TestCase
 
     #[Test]
     #[DataProvider('augmentProvider')]
-    public function it_augments_to_a_video($value, $provider, $id, $embedUrl)
+    public function it_augments_to_a_video($value, $provider, $embedUrl)
     {
         $video = $this->fieldtype()->augment($value);
 
         $this->assertInstanceOf(Embed::class, $video);
         $this->assertSame($provider, $video->provider);
-        $this->assertSame($id, $video->id);
         $this->assertSame($embedUrl, $video->embedUrl);
     }
 
     public static function augmentProvider()
     {
         return [
-            'url' => ['https://vimeo.com/22439234', 'vimeo', null, 'https://player.vimeo.com/video/22439234?dnt=1'],
-            'cloudflare' => ['cloudflare:1234', 'cloudflare', '1234', 'https://iframe.cloudflarestream.com/1234'],
-            'file' => ['https://example.com/clip.mp4', 'file', null, 'https://example.com/clip.mp4'],
-            'unsupported' => ['https://example.com/nope', 'unsupported', null, null],
+            'url' => ['https://vimeo.com/22439234', 'vimeo', 'https://player.vimeo.com/video/22439234?dnt=1'],
+            'file' => ['https://example.com/clip.mp4', 'file', 'https://example.com/clip.mp4'],
+            'unsupported' => ['https://example.com/nope', 'unsupported', null],
         ];
     }
 

@@ -8,10 +8,6 @@ use Statamic\Support\FileTypes;
 
 class Embed extends ArrayableString
 {
-    const CLOUDFLARE = 'cloudflare';
-    const CLOUDFLARE_EMBED_URL = 'https://iframe.cloudflarestream.com/';
-    const CLOUDFLARE_ID_PATTERN = '/^[a-zA-Z0-9]+$/';
-    const CLOUDFLARE_PREFIX = 'cloudflare:';
     const FILE = 'file';
     const UNSUPPORTED = 'unsupported';
     const VIMEO = 'vimeo';
@@ -21,14 +17,6 @@ class Embed extends ArrayableString
     {
         if (blank($value)) {
             return static::unsupported($value);
-        }
-
-        if (Str::startsWith($value, self::CLOUDFLARE_PREFIX)) {
-            $id = Str::after($value, self::CLOUDFLARE_PREFIX);
-
-            return preg_match(self::CLOUDFLARE_ID_PATTERN, $id)
-                ? new self(self::CLOUDFLARE, $value, self::CLOUDFLARE_EMBED_URL.$id, $id)
-                : static::unsupported($value);
         }
 
         if ($provider = static::oembedProvider($value)) {
@@ -51,7 +39,6 @@ class Embed extends ArrayableString
         public readonly string $provider,
         public readonly ?string $url = null,
         public readonly ?string $embedUrl = null,
-        public readonly ?string $id = null,
     ) {
         parent::__construct($url);
     }
@@ -70,7 +57,6 @@ class Embed extends ArrayableString
     {
         return [
             'embed_url' => $this->embedUrl,
-            'id' => $this->id,
             'provider' => $this->provider,
             'url' => $this->url,
         ];
