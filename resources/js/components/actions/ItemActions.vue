@@ -11,7 +11,6 @@ const props = defineProps({
     context: { type: Object, default: () => ({}) },
     item: { required: true },
     isDirty: { type: Boolean, default: false },
-    preload: { type: Boolean, default: false },
 });
 
 const emit = defineEmits(['started', 'completed']);
@@ -92,14 +91,6 @@ function loadActions() {
 
     return loadActionsRequest;
 }
-
-watch(
-    () => props.preload,
-    (preload) => {
-        if (preload) loadActions();
-    },
-    { immediate: true }
-);
 
 defineExpose({
     preparedActions,
