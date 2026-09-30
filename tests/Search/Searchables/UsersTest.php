@@ -142,6 +142,31 @@ class UsersTest extends TestCase
         $this->assertTrue($provider->contains($d));
     }
 
+    /**
+     * @see https://github.com/statamic/cms/issues/15542
+     */
+    #[Test]
+    public function it_can_use_a_query_scope_and_a_custom_filter()
+    {
+        CustomUsersScope::register();
+
+        $a = tap(User::make()->id('a')->email('a@test.com'))->save();
+        $b = tap(User::make()->id('b')->email('b@test.com'))->save();
+        $c = tap(User::make()->id('c')->email('c@test.com')->set('is_searchable', false))->save();
+
+        $provider = $this->makeProvider(null, [
+            'searchables' => 'all',
+            'query_scope' => 'custom_users_scope',
+            'filter' => fn ($user) => $user->email() !== 'b@test.com',
+        ]);
+
+        $this->assertEquals(['user::a'], $provider->provide()->all());
+
+        $this->assertTrue($provider->contains($a));
+        $this->assertFalse($provider->contains($b));
+        $this->assertFalse($provider->contains($c));
+    }
+
     private function makeProvider($locale, $config)
     {
         $index = $this->makeIndex($locale, $config);
