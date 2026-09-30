@@ -141,7 +141,7 @@
                     :url="entriesActionUrl"
                     :context="{ view: 'tree' }"
                     :item="branch.entry"
-                    :preload="isRoot"
+                    :actions="branch.actions"
                     @started="treeActionStarted"
                     @completed="treeActionCompleted"
                     v-slot="{ actions, loadActions, shouldShowSkeleton }"
@@ -150,8 +150,8 @@
                         @mouseover="loadActions"
                         @focus="loadActions"
                         @click="loadActions"
-                        placement="left-start"
-                        :class="{ invisible: isRoot && !branchTreeActions(actions).length }"
+                        align="end"
+                        :class="{ invisible: isRoot && branch.actions && !branchTreeActions(actions).length }"
                     >
                         <DropdownMenu>
                             <template v-if="canCreateChildEntry(depth, isRoot)">
@@ -212,7 +212,7 @@
                     </Dropdown>
                 </ItemActions>
 
-                <Dropdown v-else placement="left-start" :class="{ invisible: isRoot }">
+                <Dropdown v-else align="end" :class="{ invisible: isRoot }">
                     <DropdownMenu>
                         <template v-if="depth < structureMaxDepth">
                             <DropdownLabel :text="__('Create Child Entry')" v-if="blueprints.length > 1" />
