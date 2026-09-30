@@ -36,6 +36,55 @@ class EmbedTest extends TestCase
     }
 
     #[Test]
+    #[DataProvider('idsProvider')]
+    public function it_extracts_the_id_and_privacy_hash($value, $id, $privacyHash)
+    {
+        $video = Embed::fromValue($value);
+
+        $this->assertSame($id, $video->id);
+        $this->assertSame($privacyHash, $video->privacyHash);
+    }
+
+    public static function idsProvider()
+    {
+        return [
+            'youtube' => ['https://www.youtube.com/watch?v=FK3dav4bA4s', 'FK3dav4bA4s', null],
+            'youtube without www' => ['https://youtube.com/watch?v=FK3dav4bA4s', 'FK3dav4bA4s', null],
+            'mobile youtube' => ['https://m.youtube.com/watch?v=FK3dav4bA4s', 'FK3dav4bA4s', null],
+            'youtube with a start time' => ['https://www.youtube.com/watch?v=hyJ7CBs_2RQ&t=2', 'hyJ7CBs_2RQ', null],
+            'youtube with v after other params' => ['https://www.youtube.com/watch?feature=share&v=FK3dav4bA4s', 'FK3dav4bA4s', null],
+            'youtube shorts' => ['https://www.youtube.com/shorts/FK3dav4bA4s', 'FK3dav4bA4s', null],
+            'youtube embed' => ['https://www.youtube.com/embed/FK3dav4bA4s?start=2', 'FK3dav4bA4s', null],
+            'youtube nocookie embed' => ['https://www.youtube-nocookie.com/embed/FK3dav4bA4s', 'FK3dav4bA4s', null],
+            'youtu.be' => ['https://youtu.be/FK3dav4bA4s', 'FK3dav4bA4s', null],
+            'youtu.be with a start time' => ['https://youtu.be/s72r_wu_NVY?t=559', 's72r_wu_NVY', null],
+            'youtube without a scheme' => ['www.youtube.com/watch?v=FK3dav4bA4s', 'FK3dav4bA4s', null],
+            'youtube shorts without a scheme' => ['youtube.com/shorts/FK3dav4bA4s', 'FK3dav4bA4s', null],
+            'youtu.be without a scheme' => ['youtu.be/FK3dav4bA4s', 'FK3dav4bA4s', null],
+            'protocol-relative youtu.be' => ['//youtu.be/FK3dav4bA4s', 'FK3dav4bA4s', null],
+            'youtube without an id' => ['https://www.youtube.com/@statamic', null, null],
+            'youtube with a malformed id' => ['https://www.youtube.com/watch?v=x"><script>alert(1)</script>', null, null],
+            'youtube with an array id' => ['https://www.youtube.com/watch?v[]=FK3dav4bA4s', null, null],
+            'vimeo' => ['https://vimeo.com/22439234', '22439234', null],
+            'vimeo with a query string' => ['https://vimeo.com/22439234?foo=bar', '22439234', null],
+            'unlisted vimeo' => ['https://vimeo.com/735352648/fa55a4d0fc', '735352648', 'fa55a4d0fc'],
+            'unlisted vimeo with a query string' => ['https://vimeo.com/735352648/fa55a4d0fc?foo=bar', '735352648', 'fa55a4d0fc'],
+            'vimeo player' => ['https://player.vimeo.com/video/22439234', '22439234', null],
+            'unlisted vimeo player' => ['https://player.vimeo.com/video/735352648?h=fa55a4d0fc', '735352648', 'fa55a4d0fc'],
+            'vimeo progressive file' => ['https://player.vimeo.com/progressive_redirect/playback/990169258/rendition/1080p/file.mp4?loc=external', '990169258', null],
+            'vimeo without a scheme' => ['vimeo.com/22439234', '22439234', null],
+            'unlisted vimeo without a scheme' => ['vimeo.com/735352648/fa55a4d0fc', '735352648', 'fa55a4d0fc'],
+            'vimeo player without a scheme' => ['player.vimeo.com/video/735352648?h=fa55a4d0fc', '735352648', 'fa55a4d0fc'],
+            'vimeo progressive file with the api format' => ['https://player.vimeo.com/progressive_redirect/playback/286898202/container/d8f1d190-1e26-407e-90a4-45991fe334f0/7bfe0e56?expires=1686246201', '286898202', null],
+            'vimeo without an id' => ['https://vimeo.com/statamic', null, null],
+            'vimeo with a malformed hash' => ['https://player.vimeo.com/video/735352648?h=x"><script>', '735352648', null],
+            'file' => ['https://example.com/clip.mp4', null, null],
+            'unsupported' => ['https://example.com/nope', null, null],
+            'null' => [null, null, null],
+        ];
+    }
+
+    #[Test]
     public function it_casts_to_the_original_value()
     {
         $this->assertSame('https://vimeo.com/22439234', (string) Embed::fromValue('https://vimeo.com/22439234'));
@@ -72,6 +121,8 @@ class EmbedTest extends TestCase
 
         $this->assertSame([
             'embed_url' => 'https://player.vimeo.com/video/22439234?dnt=1',
+            'id' => '22439234',
+            'privacy_hash' => null,
             'provider' => 'vimeo',
             'url' => 'https://vimeo.com/22439234',
         ], $video->toArray());
