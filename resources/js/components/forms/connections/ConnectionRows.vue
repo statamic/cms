@@ -34,9 +34,9 @@ const props = withDefaults(defineProps<{
     modelValue: () => [],
     errors: () => ({}),
     defaults: () => ({}),
-    addLabel: __('Add Row'),
-    deleteHeading: __('Delete Row'),
-    deleteDescription: __('Are you sure you want to delete this row?'),
+    addLabel: () => __('Add Row'),
+    deleteHeading: () => __('Delete Row'),
+    deleteDescription: () => __('Are you sure you want to delete this row?'),
 });
 
 const sortableItemClass = 'connection-row';
