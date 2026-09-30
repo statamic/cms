@@ -41,7 +41,7 @@ const props = withDefaults(defineProps<{
     fallback: null,
 });
 
-const suggestableFields = usePage().props.suggestableFields as SuggestableField[];
+const suggestableFields = (usePage().props.suggestableFields ?? []) as SuggestableField[];
 
 const findField = (handle: string): SuggestableField | undefined => suggestableFields.find((field) => field.handle === handle);
 const fieldDisplay = (handle: string): string => __(findField(handle)?.config?.display) || handle;

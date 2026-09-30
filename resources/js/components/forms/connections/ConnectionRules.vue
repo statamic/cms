@@ -14,7 +14,7 @@ const props = defineProps({
     ifLabel: { type: String, default: () => __('Run if...') },
 });
 
-const suggestableFields = usePage().props.suggestableFields;
+const suggestableFields = usePage().props.suggestableFields ?? [];
 
 const when = ref(props.conditions.length ? 'if' : 'always');
 

@@ -19,7 +19,7 @@ defineProps({
     previewUrl: String,
 });
 
-const suggestableFields = usePage().props.suggestableFields;
+const suggestableFields = usePage().props.suggestableFields ?? [];
 
 const previewing = ref<Record<string, unknown> | null>(null);
 
