@@ -6,6 +6,7 @@ use Statamic\Contracts\Forms\Form;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\User;
+use Statamic\Forms\Connections\Rules\WebhookConnectionUrl;
 use Statamic\Forms\Connections\Webhooks\SendWebhook;
 use Statamic\Forms\Fields\FormField;
 use Statamic\Statamic;
@@ -85,7 +86,7 @@ class Webhook extends Connection
     {
         return [
             '*' => ['array'],
-            '*.url' => ['required', 'url:http,https'],
+            '*.url' => ['required', 'url:http,https', new WebhookConnectionUrl],
             '*.verify_ssl' => ['nullable', 'boolean'],
             '*.enabled' => ['nullable', 'boolean'],
             '*.conditions' => ['nullable', 'array'],

@@ -450,6 +450,42 @@ class WebhookConnectionTest extends TestCase
     }
 
     #[Test]
+    public function it_rejects_internal_urls_when_validating()
+    {
+        $form = tap(Form::make('test'))->save();
+
+        foreach (['http://169.254.169.254/', 'http://localhost:8080/hook', 'https://internal.test/hook', 'https://unresolvable.test/hook'] as $url) {
+            $validator = Validator::make([['url' => $url]], (new Webhook)->rules($form));
+
+            $this->assertTrue($validator->fails(), $url);
+            $this->assertTrue($validator->errors()->has('0.url'), $url);
+            $this->assertEquals('Webhooks must use a public address.', $validator->errors()->first('0.url'), $url);
+        }
+    }
+
+    #[Test]
+    public function it_allows_urls_with_credentials_when_validating()
+    {
+        $form = tap(Form::make('test'))->save();
+
+        $validator = Validator::make([['url' => 'https://user:pass@example.com/hook']], (new Webhook)->rules($form));
+
+        $this->assertTrue($validator->passes());
+    }
+
+    #[Test]
+    public function it_allows_internal_urls_when_validating_on_local()
+    {
+        $this->app['env'] = 'local';
+
+        $form = tap(Form::make('test'))->save();
+
+        $validator = Validator::make([['url' => 'http://localhost:8080/hook']], (new Webhook)->rules($form));
+
+        $this->assertTrue($validator->passes());
+    }
+
+    #[Test]
     #[DataProvider('invalidConfigs')]
     public function it_rejects_invalid_configs($configs, $errors)
     {

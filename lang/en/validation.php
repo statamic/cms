@@ -219,6 +219,7 @@ return [
     'unique_user_value' => 'This value has already been taken.',
     'unique_uri' => 'This URI has already been taken.',
     'time' => 'Not a valid time.',
+    'webhook_url_not_public' => 'Webhooks must use a public address.',
     'asset_current_filename' => 'This is the current filename.',
     'asset_file_exists' => 'A file already exists with this name.',
     'asset_file_exists_same_content' => 'A file already exists with this name and has the same content. You may want to delete this rather than rename it.',
