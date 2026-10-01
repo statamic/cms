@@ -17,7 +17,7 @@ class Video extends Fieldtype
             return null;
         }
 
-        return Embed::fromValue($value);
+        return new Embed($value);
     }
 
     protected function configFieldItems(): array

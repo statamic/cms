@@ -11,45 +11,61 @@ class Embed extends ArrayableString
     const FILE = 'file';
     const UNSUPPORTED = 'unsupported';
     const VIMEO = 'vimeo';
-    const VIMEO_PRIVACY_HASH_PATTERN = '/^[a-zA-Z0-9]+$/';
     const YOUTUBE = 'youtube';
-    const YOUTUBE_ID_PATTERN = '/^[a-zA-Z0-9_-]+$/';
 
-    public static function fromValue(?string $value): self
+    private const VIMEO_PRIVACY_HASH_PATTERN = '/^[a-zA-Z0-9]+$/';
+    private const YOUTUBE_ID_PATTERN = '/^[a-zA-Z0-9_-]+$/';
+
+    private string $provider;
+
+    public function __construct(?string $value)
     {
-        if (blank($value)) {
-            return static::unsupported($value);
-        }
+        parent::__construct($value);
 
-        if ($provider = static::oembedProvider($value)) {
-            [$id, $privacyHash] = match ($provider) {
-                self::VIMEO => static::vimeoIdAndPrivacyHash($value),
-                self::YOUTUBE => [static::youtubeId($value), null],
-            };
-
-            return new self($provider, $value, static::embedUrl($value), $id, $privacyHash);
-        }
-
-        if (static::isVideoFile($value)) {
-            return new self(self::FILE, $value, $value);
-        }
-
-        return static::unsupported($value);
+        $this->provider = self::providerFor($value);
     }
 
-    public static function unsupported(?string $value = null): self
+    public function url(): ?string
     {
-        return new self(self::UNSUPPORTED, $value);
+        return $this->value;
     }
 
-    public function __construct(
-        public readonly string $provider,
-        public readonly ?string $url = null,
-        public readonly ?string $embedUrl = null,
-        public readonly ?string $id = null,
-        public readonly ?string $privacyHash = null,
-    ) {
-        parent::__construct($url);
+    public function provider(): string
+    {
+        return $this->provider;
+    }
+
+    public function embedUrl(): ?string
+    {
+        return match ($this->provider) {
+            self::VIMEO, self::YOUTUBE => self::embedUrlFor($this->value),
+            self::FILE => $this->value,
+            default => null,
+        };
+    }
+
+    public function trackableEmbedUrl(): ?string
+    {
+        return match ($this->provider) {
+            self::VIMEO, self::YOUTUBE => self::trackableEmbedUrlFor($this->value),
+            default => $this->embedUrl() ?? $this->value,
+        };
+    }
+
+    public function id(): ?string
+    {
+        return match ($this->provider) {
+            self::VIMEO => self::vimeoIdAndPrivacyHash($this->value)[0],
+            self::YOUTUBE => self::youtubeId($this->value),
+            default => null,
+        };
+    }
+
+    public function privacyHash(): ?string
+    {
+        return $this->provider === self::VIMEO
+            ? self::vimeoIdAndPrivacyHash($this->value)[1]
+            : null;
     }
 
     public function isEmbeddable(): bool
@@ -65,17 +81,17 @@ class Embed extends ArrayableString
     public function toArray(): array
     {
         return [
-            'embed_url' => $this->embedUrl,
-            'id' => $this->id,
-            'privacy_hash' => $this->privacyHash,
+            'embed_url' => $this->embedUrl(),
+            'id' => $this->id(),
+            'privacy_hash' => $this->privacyHash(),
             'provider' => $this->provider,
-            'url' => $this->url,
+            'url' => $this->value,
         ];
     }
 
     public function __toString(): string
     {
-        return (string) $this->url;
+        return (string) $this->value;
     }
 
     #[\ReturnTypeWillChange]
@@ -99,14 +115,14 @@ class Embed extends ArrayableString
     /**
      * Turn a link that's direct to a video's page into its embeddable equivalent.
      */
-    public static function embedUrl(?string $url): ?string
+    public static function embedUrlFor(?string $url): ?string
     {
         if (blank($url)) {
             return $url;
         }
 
         if (Str::contains($url, self::VIMEO)) {
-            return static::vimeoEmbedUrl($url);
+            return self::vimeoEmbedUrl($url);
         }
 
         if (Str::contains($url, 'youtu.be')) {
@@ -146,12 +162,45 @@ class Embed extends ArrayableString
         return $url;
     }
 
+    /**
+     * Turn a link that's direct to a video's page into its embeddable equivalent, without privacy enhancements.
+     */
+    public static function trackableEmbedUrlFor(?string $url): ?string
+    {
+        if (blank($url)) {
+            return $url;
+        }
+
+        if (Str::contains($url, self::VIMEO)) {
+            return str_replace('/vimeo.com', '/player.vimeo.com/video', $url);
+        }
+
+        if (Str::contains($url, 'youtu.be')) {
+            $url = str_replace('youtu.be', 'www.youtube.com/embed', $url);
+
+            // Check for start at point and replace it with correct parameter.
+            if (Str::contains($url, '?t=')) {
+                $url = str_replace('?t=', '?start=', $url);
+            }
+        }
+
+        if (Str::contains($url, 'youtube.com/watch?v=')) {
+            $url = str_replace('watch?v=', 'embed/', $url);
+        }
+
+        if (Str::contains($url, '&') && ! Str::contains($url, '?')) {
+            $url = Str::replaceFirst('&', '?', $url);
+        }
+
+        return $url;
+    }
+
     public static function isEmbeddableUrl(?string $url): bool
     {
         return filled($url) && Str::contains($url, ['youtu.be', 'youtube', self::VIMEO]);
     }
 
-    protected static function isVideoFile(string $url): bool
+    private static function isVideoFile(string $url): bool
     {
         if (blank($path = parse_url($url, PHP_URL_PATH))) {
             return false;
@@ -160,22 +209,20 @@ class Embed extends ArrayableString
         return in_array(strtolower(pathinfo($path, PATHINFO_EXTENSION)), FileTypes::video());
     }
 
-    protected static function oembedProvider(string $url): ?string
+    private static function providerFor(?string $url): string
     {
-        if (Str::contains($url, self::VIMEO)) {
-            return self::VIMEO;
-        }
-
-        if (Str::contains($url, ['youtu.be', 'youtube'])) {
-            return self::YOUTUBE;
-        }
-
-        return null;
+        return match (true) {
+            blank($url) => self::UNSUPPORTED,
+            Str::contains($url, self::VIMEO) => self::VIMEO,
+            Str::contains($url, ['youtu.be', 'youtube']) => self::YOUTUBE,
+            self::isVideoFile($url) => self::FILE,
+            default => self::UNSUPPORTED,
+        };
     }
 
-    protected static function youtubeId(string $url): ?string
+    private static function youtubeId(string $url): ?string
     {
-        $url = static::withScheme($url);
+        $url = self::withScheme($url);
         $path = parse_url($url, PHP_URL_PATH) ?? '';
 
         if (parse_url($url, PHP_URL_HOST) === 'youtu.be') {
@@ -190,9 +237,9 @@ class Embed extends ArrayableString
         return is_string($id) && preg_match(self::YOUTUBE_ID_PATTERN, $id) ? $id : null;
     }
 
-    protected static function vimeoIdAndPrivacyHash(string $url): array
+    private static function vimeoIdAndPrivacyHash(string $url): array
     {
-        $url = static::withScheme($url);
+        $url = self::withScheme($url);
         $path = parse_url($url, PHP_URL_PATH) ?? '';
 
         $patterns = [
@@ -214,13 +261,13 @@ class Embed extends ArrayableString
     }
 
     // Without a scheme, parse_url treats the host as part of the path.
-    protected static function withScheme(string $url): string
+    private static function withScheme(string $url): string
     {
         return preg_match('#^([a-z][a-z0-9+.-]*:)?//#i', $url) ? $url : 'https://'.$url;
     }
 
     // Unlisted vimeo urls are in the form vimeo.com/id/hash, but embeds pass the hash as a get param.
-    protected static function vimeoEmbedUrl(string $url): string
+    private static function vimeoEmbedUrl(string $url): string
     {
         $url = str_replace('/vimeo.com', '/player.vimeo.com/video', $url);
         $hash = '';

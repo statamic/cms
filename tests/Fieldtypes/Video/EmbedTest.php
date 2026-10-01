@@ -13,10 +13,10 @@ class EmbedTest extends TestCase
     #[DataProvider('valuesProvider')]
     public function it_creates_a_video($value, $provider, $embedUrl)
     {
-        $video = Embed::fromValue($value);
+        $video = new Embed($value);
 
-        $this->assertSame($provider, $video->provider);
-        $this->assertSame($embedUrl, $video->embedUrl);
+        $this->assertSame($provider, $video->provider());
+        $this->assertSame($embedUrl, $video->embedUrl());
     }
 
     public static function valuesProvider()
@@ -39,10 +39,10 @@ class EmbedTest extends TestCase
     #[DataProvider('idsProvider')]
     public function it_extracts_the_id_and_privacy_hash($value, $id, $privacyHash)
     {
-        $video = Embed::fromValue($value);
+        $video = new Embed($value);
 
-        $this->assertSame($id, $video->id);
-        $this->assertSame($privacyHash, $video->privacyHash);
+        $this->assertSame($id, $video->id());
+        $this->assertSame($privacyHash, $video->privacyHash());
     }
 
     public static function idsProvider()
@@ -85,39 +85,61 @@ class EmbedTest extends TestCase
     }
 
     #[Test]
+    #[DataProvider('trackableEmbedUrlsProvider')]
+    public function it_gets_the_trackable_embed_url($value, $expected)
+    {
+        $this->assertSame($expected, (new Embed($value))->trackableEmbedUrl());
+    }
+
+    public static function trackableEmbedUrlsProvider()
+    {
+        return [
+            'youtube' => ['https://www.youtube.com/watch?v=FK3dav4bA4s', 'https://www.youtube.com/embed/FK3dav4bA4s'],
+            'youtube with a start time' => ['https://www.youtube.com/watch?v=hyJ7CBs_2RQ&t=2', 'https://www.youtube.com/embed/hyJ7CBs_2RQ?t=2'],
+            'youtu.be' => ['https://youtu.be/FK3dav4bA4s', 'https://www.youtube.com/embed/FK3dav4bA4s'],
+            'youtu.be with a start time' => ['https://youtu.be/s72r_wu_NVY?t=559', 'https://www.youtube.com/embed/s72r_wu_NVY?start=559'],
+            'vimeo' => ['https://vimeo.com/22439234', 'https://player.vimeo.com/video/22439234'],
+            'file' => ['https://example.com/clip.mp4', 'https://example.com/clip.mp4'],
+            'unsupported' => ['https://example.com/nope', 'https://example.com/nope'],
+            'empty' => ['', ''],
+            'null' => [null, null],
+        ];
+    }
+
+    #[Test]
     public function it_casts_to_the_original_value()
     {
-        $this->assertSame('https://vimeo.com/22439234', (string) Embed::fromValue('https://vimeo.com/22439234'));
-        $this->assertSame('https://example.com/nope', (string) Embed::fromValue('https://example.com/nope'));
-        $this->assertSame('', (string) Embed::fromValue(null));
+        $this->assertSame('https://vimeo.com/22439234', (string) new Embed('https://vimeo.com/22439234'));
+        $this->assertSame('https://example.com/nope', (string) new Embed('https://example.com/nope'));
+        $this->assertSame('', (string) new Embed(null));
     }
 
     #[Test]
     public function it_is_truthy_whenever_it_holds_a_value()
     {
-        $this->assertTrue(Embed::fromValue('https://vimeo.com/22439234')->toBool());
-        $this->assertTrue(Embed::fromValue('https://example.com/nope')->toBool());
-        $this->assertFalse(Embed::fromValue('')->toBool());
+        $this->assertTrue((new Embed('https://vimeo.com/22439234'))->toBool());
+        $this->assertTrue((new Embed('https://example.com/nope'))->toBool());
+        $this->assertFalse((new Embed(''))->toBool());
     }
 
     #[Test]
     public function it_knows_whether_it_is_supported_and_embeddable()
     {
-        $this->assertTrue(Embed::fromValue('https://vimeo.com/22439234')->isEmbeddable());
-        $this->assertTrue(Embed::fromValue('https://vimeo.com/22439234')->isSupported());
+        $this->assertTrue((new Embed('https://vimeo.com/22439234'))->isEmbeddable());
+        $this->assertTrue((new Embed('https://vimeo.com/22439234'))->isSupported());
 
         // A file is something we can play, but not something we can put in an iframe.
-        $this->assertFalse(Embed::fromValue('https://example.com/clip.mp4')->isEmbeddable());
-        $this->assertTrue(Embed::fromValue('https://example.com/clip.mp4')->isSupported());
+        $this->assertFalse((new Embed('https://example.com/clip.mp4'))->isEmbeddable());
+        $this->assertTrue((new Embed('https://example.com/clip.mp4'))->isSupported());
 
-        $this->assertFalse(Embed::fromValue('https://example.com/nope')->isEmbeddable());
-        $this->assertFalse(Embed::fromValue('https://example.com/nope')->isSupported());
+        $this->assertFalse((new Embed('https://example.com/nope'))->isEmbeddable());
+        $this->assertFalse((new Embed('https://example.com/nope'))->isSupported());
     }
 
     #[Test]
     public function it_is_arrayable_and_accessible_as_an_array()
     {
-        $video = Embed::fromValue('https://vimeo.com/22439234');
+        $video = new Embed('https://vimeo.com/22439234');
 
         $this->assertSame([
             'embed_url' => 'https://player.vimeo.com/video/22439234?dnt=1',
@@ -135,6 +157,6 @@ class EmbedTest extends TestCase
     #[Test]
     public function it_serializes_to_json_as_the_original_value()
     {
-        $this->assertSame('"https:\\/\\/vimeo.com\\/1"', json_encode(Embed::fromValue('https://vimeo.com/1')));
+        $this->assertSame('"https:\\/\\/vimeo.com\\/1"', json_encode(new Embed('https://vimeo.com/1')));
     }
 }

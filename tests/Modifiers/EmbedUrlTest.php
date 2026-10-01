@@ -119,7 +119,7 @@ class EmbedUrlTest extends TestCase
     {
         $this->assertEquals(
             'https://player.vimeo.com/video/22439234?dnt=1',
-            $this->embed(Embed::fromValue('https://vimeo.com/22439234')),
+            $this->embed(new Embed('https://vimeo.com/22439234')),
         );
     }
 

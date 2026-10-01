@@ -3202,10 +3202,10 @@ class CoreModifiers extends Modifier
     public function embedUrl($url)
     {
         if ($url instanceof Embed) {
-            return $url->embedUrl ?? $url->url;
+            return $url->embedUrl() ?? $url->url();
         }
 
-        return Embed::embedUrl($url);
+        return Embed::embedUrlFor($url);
     }
 
     /**
@@ -3218,35 +3218,10 @@ class CoreModifiers extends Modifier
     public function trackableEmbedUrl($url)
     {
         if ($url instanceof Embed) {
-            $url = $url->url;
+            return $url->trackableEmbedUrl();
         }
 
-        if (blank($url)) {
-            return $url;
-        }
-
-        if (Str::contains($url, 'vimeo')) {
-            return str_replace('/vimeo.com', '/player.vimeo.com/video', $url);
-        }
-
-        if (Str::contains($url, 'youtu.be')) {
-            $url = str_replace('youtu.be', 'www.youtube.com/embed', $url);
-
-            // Check for start at point and replace it with correct parameter.
-            if (Str::contains($url, '?t=')) {
-                $url = str_replace('?t=', '?start=', $url);
-            }
-        }
-
-        if (Str::contains($url, 'youtube.com/watch?v=')) {
-            $url = str_replace('watch?v=', 'embed/', $url);
-        }
-
-        if (Str::contains($url, '&') && ! Str::contains($url, '?')) {
-            $url = Str::replaceFirst('&', '?', $url);
-        }
-
-        return $url;
+        return Embed::trackableEmbedUrlFor($url);
     }
 
     /**
