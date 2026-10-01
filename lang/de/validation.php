@@ -104,7 +104,7 @@ return [
     'password.uncompromised' => 'Dieser Wert ist in einem Datenleck aufgetreten. Bitte einen anderen wählen.',
     'present' => 'Muss vorhanden sein.',
     'present_if' => 'Muss vorhanden sein, wenn :other den Wert :value hat.',
-    'present_unless' => 'Muss vorhanden sein, ausser wenn :other den Wert :value hat.',
+    'present_unless' => 'Muss vorhanden sein, außer wenn :other den Wert :value hat.',
     'present_with' => 'Muss vorhanden sein, wenn :values vorhanden ist.',
     'present_with_all' => 'Muss vorhanden sein, wenn :values vorhanden sind.',
     'prohibited' => 'Nicht erlaubt.',
