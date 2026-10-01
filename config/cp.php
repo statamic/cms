@@ -72,6 +72,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Select All Limit
+    |--------------------------------------------------------------------------
+    |
+    | The maximum number of matching results that can be selected across pages
+    | via "Select all". Raise this if your server can handle larger bulk
+    | actions, or set it to null for no limit.
+    |
+    */
+
+    'select_all_limit' => 1000,
+
+    /*
+    |--------------------------------------------------------------------------
     | Links to Documentation
     |--------------------------------------------------------------------------
     |

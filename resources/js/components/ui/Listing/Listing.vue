@@ -23,6 +23,7 @@ import Table from './Table.vue';
 import Pagination from './Pagination.vue';
 import { sortBy } from 'lodash-es';
 import fuzzysort from 'fuzzysort';
+import { canSelectAllMatching as canSelectAllMatchingHelper, fetchAllMatchingIds, isPageFullySelected, isRequestCanceled, resolveSelectAllLimit } from '@/util/listing-selections.js';
 
 const emit = defineEmits([
     'update:columns',
@@ -51,6 +52,11 @@ const props = defineProps({
     },
     /** When `true`, bulk actions are available when items are selected. */
     allowBulkActions: {
+        type: Boolean,
+        default: true,
+    },
+    /** When `true`, offers selecting all matching results across pages after the current page is selected. */
+    allowSelectAllMatching: {
         type: Boolean,
         default: true,
     },
@@ -173,8 +179,13 @@ const currentPage = ref(1);
 const perPage = ref(initializePerPage());
 const initializing = ref(true);
 const loading = ref(true);
+const selectingAllMatching = ref(false);
+const selectedAllMatching = ref(false);
+const selectedAllMatchingCount = ref(0);
+const selectAllLimit = computed(() => resolveSelectAllLimit(Statamic.$config.get('selectAllLimit')));
 let popping = false;
 let source = null;
+let selectAllMatchingSource = null;
 const searchQuery = ref(null);
 const columns = ref(initializeColumns());
 const sortColumn = ref(props.sortColumn || (columns.value.length ? columns.value[0].field : null));
@@ -322,9 +333,68 @@ const shouldRequestFirstPage = computed(() => {
     return false;
 });
 
+function abortSelectAllMatching() {
+    if (selectAllMatchingSource) {
+        selectAllMatchingSource.abort();
+        selectAllMatchingSource = null;
+    }
+    selectingAllMatching.value = false;
+}
+
+async function selectAllMatching() {
+    if (!props.url || !meta.value?.total) return;
+    if (meta.value.total > selectAllLimit.value) return;
+
+    abortSelectAllMatching();
+    selectingAllMatching.value = true;
+    const controller = new AbortController();
+    selectAllMatchingSource = controller;
+
+    try {
+        const ids = await fetchAllMatchingIds({
+            get: axios.get.bind(axios),
+            url: props.url,
+            parameters: {
+                ...parameters.value,
+                columns: 'id',
+            },
+            total: meta.value.total,
+            pageSize: selectAllMatchingPageSize(),
+            signal: controller.signal,
+            maxSelections: props.maxSelections,
+        });
+
+        if (selectAllMatchingSource !== controller) return;
+
+        selectedAllMatchingCount.value = ids.length;
+        selections.value.splice(0, selections.value.length, ...ids);
+        selectedAllMatching.value = true;
+    } catch (e) {
+        if (isRequestCanceled(e) || selectAllMatchingSource !== controller) return;
+        Statamic.$toast.error(e.response ? e.response.data.message : __('Something went wrong'), {
+            duration: null,
+        });
+    } finally {
+        if (selectAllMatchingSource !== controller) return;
+        selectingAllMatching.value = false;
+        selectAllMatchingSource = null;
+    }
+}
+
+function selectAllMatchingPageSize() {
+    const options = Statamic.$config.get('paginationSizeOptions');
+
+    if (Array.isArray(options) && options.length > 0) {
+        return Math.max(...options.map(Number));
+    }
+
+    return perPage.value || meta.value?.per_page || 100;
+}
+
 function request() {
     if (props.items) return;
 
+    abortSelectAllMatching();
     loading.value = true;
 
     if (source) source.abort();
@@ -351,7 +421,7 @@ function request() {
             });
         })
         .catch((e) => {
-            if (axios.isCancel(e)) return;
+            if (isRequestCanceled(e) || axios.isCancel(e)) return;
             initializing.value = false;
             loading.value = false;
             if (e.request && !e.response) return;
@@ -557,8 +627,57 @@ function selectRange(from, to) {
 }
 
 function clearSelections() {
+    abortSelectAllMatching();
+    selectedAllMatching.value = false;
+    selectedAllMatchingCount.value = 0;
     selections.value.splice(0, selections.value.length);
 }
+
+const pageFullySelected = computed(() => isPageFullySelected(items.value, selections.value));
+
+const allMatchingSelected = computed(() => selectedAllMatching.value);
+
+const canSelectAllMatching = computed(() =>
+    props.allowSelectAllMatching &&
+    canSelectAllMatchingHelper({
+        hasUrl: !!props.url && !props.items,
+        total: meta.value?.total ?? 0,
+        pageSize: items.value?.length ?? 0,
+        pageFullySelected: pageFullySelected.value,
+        allMatchingSelected: allMatchingSelected.value,
+        selectedCount: selections.value.length,
+        maxSelections: props.maxSelections,
+        selectAllLimit: selectAllLimit.value,
+    }),
+);
+
+// Only invalidate all-matching mode when the result set itself changes.
+const matchingQueryKey = computed(() =>
+    JSON.stringify({
+        url: props.url ?? null,
+        additionalParameters: props.additionalParameters ?? {},
+        search: parameters.value.search ?? null,
+        filters: parameters.value.filters ?? null,
+        sort: parameters.value.sort ?? null,
+        order: parameters.value.order ?? null,
+    }),
+);
+
+watch(matchingQueryKey, () => {
+    selectedAllMatching.value = false;
+    selectedAllMatchingCount.value = 0;
+});
+
+watch(
+    selections,
+    (next) => {
+        if (selectedAllMatching.value && next.length < selectedAllMatchingCount.value) {
+            selectedAllMatching.value = false;
+            selectedAllMatchingCount.value = 0;
+        }
+    },
+    { deep: true },
+);
 
 function setFilters(filters) {
     activeFilters.value = filters || {};
@@ -651,6 +770,12 @@ provideListingContext({
     selectRange,
     toggleSelection,
     clearSelections,
+    selectAllMatching,
+    selectingAllMatching,
+    canSelectAllMatching,
+    allMatchingSelected,
+    selectedAllMatching,
+    selectedAllMatchingCount,
     actionUrl: toRef(() => props.actionUrl),
     actionContext: toRef(() => props.actionContext),
     showBulkActions,
@@ -702,6 +827,8 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
     Statamic.$progress.complete(id);
+    abortSelectAllMatching();
+    if (source) source.abort();
     if (props.pushQuery) window.removeEventListener('popstate', popState);
 });
 
