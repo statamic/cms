@@ -11,7 +11,7 @@ class Query extends QueryBuilder
     {
         $results = Blink::once(
             "search-algolia-{$this->index->name()}-".md5($query),
-            fn () => $this->index->searchUsingApi($query)
+            fn () => $this->index->searchUsingApi($query, arguments: $this->arguments())
         );
 
         return $results->map(function ($result, $i) use ($results) {
