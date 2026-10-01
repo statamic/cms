@@ -18,10 +18,11 @@
             @update:modelValue="itemsSelected"
             @search="search"
         >
-            <template #option="{ title, hint, status }">
+            <template #option="{ title, hint, status, create }">
                 <div class="flex w-full text-left items-center gap-2">
                     <StatusIndicator v-if="status" :status="status" />
-                    <div v-text="title" class="truncate grow" />
+                    <div v-if="create" class="truncate grow">{{ __('Add ":value"', { value: title }) }}</div>
+                    <div v-else v-text="title" class="truncate grow" />
                     <ui-badge v-if="hint" size="sm" v-text="hint" />
                 </div>
             </template>
@@ -190,11 +191,6 @@ export default {
             });
 
             this.$emit('input', items);
-        },
-
-        createOption(value) {
-            const existing = this.options.find((option) => option.title === value);
-            return existing || { id: value, title: value };
         },
     },
 };

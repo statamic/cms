@@ -18,8 +18,9 @@
                 <span class="text-gray-500 dark:text-gray-400" v-text="getSample(value)" />
             </div>
         </template>
-        <template #option="{ value, label, sample }">
-            <template v-if="value === 'language'">{{ label }}</template>
+        <template #option="{ value, label, sample, create }">
+            <template v-if="create">{{ __('Add ":value"', { value }) }}</template>
+            <template v-else-if="value === 'language'">{{ label }}</template>
             <div v-else class="w-full flex justify-between">
                 <div class="text-start flex-1">
                     {{ label }}
