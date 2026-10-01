@@ -1,6 +1,7 @@
-const outlineOnDark = '147 197 253';
-const outlineOnLight = '59 130 246';
-const outlinePadding = 3;
+// Match CP --focus-outline-color fallback (--color-blue-400).
+const outlineOnDark = '96 165 250';
+const outlineOnLight = '96 165 250';
+const outlinePadding = 8;
 const fadeDuration = 180;
 
 export function createHighlightOverlay(doc) {
@@ -47,9 +48,9 @@ export function createHighlightOverlay(doc) {
             top: `${rect.top - outlinePadding}px`,
             width: `${rect.width + outlinePadding * 2}px`,
             height: `${rect.height + outlinePadding * 2}px`,
-            border: `1px solid rgb(${color} / 85%)`,
+            // Mirror CP `.focus-outline`: 2px solid focus color, light fill.
+            border: `2px solid rgb(${color})`,
             background: `rgb(${color} / 5%)`,
-            boxShadow: `0 0 0 2px rgb(${color} / 10%)`,
             borderRadius: '5px',
             boxSizing: 'border-box',
         });
