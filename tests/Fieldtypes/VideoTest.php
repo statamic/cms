@@ -26,8 +26,8 @@ class VideoTest extends TestCase
         $video = $this->fieldtype()->augment($value);
 
         $this->assertInstanceOf(Embed::class, $video);
-        $this->assertSame($provider, $video->provider);
-        $this->assertSame($embedUrl, $video->embedUrl);
+        $this->assertSame($provider, $video->provider());
+        $this->assertSame($embedUrl, $video->embedUrl());
     }
 
     public static function augmentProvider()
