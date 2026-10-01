@@ -88,7 +88,7 @@ class EmbedTest extends TestCase
     #[DataProvider('trackableEmbedUrlsProvider')]
     public function it_gets_the_trackable_embed_url($value, $expected)
     {
-        $this->assertSame($expected, new Embed($value)->trackableEmbedUrl());
+        $this->assertSame($expected, (new Embed($value))->trackableEmbedUrl());
     }
 
     public static function trackableEmbedUrlsProvider()
@@ -117,23 +117,23 @@ class EmbedTest extends TestCase
     #[Test]
     public function it_is_truthy_whenever_it_holds_a_value()
     {
-        $this->assertTrue(new Embed('https://vimeo.com/22439234')->toBool());
-        $this->assertTrue(new Embed('https://example.com/nope')->toBool());
-        $this->assertFalse(new Embed('')->toBool());
+        $this->assertTrue((new Embed('https://vimeo.com/22439234'))->toBool());
+        $this->assertTrue((new Embed('https://example.com/nope'))->toBool());
+        $this->assertFalse((new Embed(''))->toBool());
     }
 
     #[Test]
     public function it_knows_whether_it_is_supported_and_embeddable()
     {
-        $this->assertTrue(new Embed('https://vimeo.com/22439234')->isEmbeddable());
-        $this->assertTrue(new Embed('https://vimeo.com/22439234')->isSupported());
+        $this->assertTrue((new Embed('https://vimeo.com/22439234'))->isEmbeddable());
+        $this->assertTrue((new Embed('https://vimeo.com/22439234'))->isSupported());
 
         // A file is something we can play, but not something we can put in an iframe.
-        $this->assertFalse(new Embed('https://example.com/clip.mp4')->isEmbeddable());
-        $this->assertTrue(new Embed('https://example.com/clip.mp4')->isSupported());
+        $this->assertFalse((new Embed('https://example.com/clip.mp4'))->isEmbeddable());
+        $this->assertTrue((new Embed('https://example.com/clip.mp4'))->isSupported());
 
-        $this->assertFalse(new Embed('https://example.com/nope')->isEmbeddable());
-        $this->assertFalse(new Embed('https://example.com/nope')->isSupported());
+        $this->assertFalse((new Embed('https://example.com/nope'))->isEmbeddable());
+        $this->assertFalse((new Embed('https://example.com/nope'))->isSupported());
     }
 
     #[Test]
