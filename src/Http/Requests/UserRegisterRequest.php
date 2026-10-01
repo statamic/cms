@@ -11,6 +11,7 @@ use Illuminate\Validation\ValidationException;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Facades\User;
+use Statamic\Rules\EmailWithoutPathCharacters;
 use Statamic\Rules\UniqueUserValue;
 
 class UserRegisterRequest extends FormRequest
@@ -70,7 +71,7 @@ class UserRegisterRequest extends FormRequest
         return $this->blueprintFields
             ->validator()
             ->withRules([
-                'email' => ['required', 'email', new UniqueUserValue],
+                'email' => ['required', 'email', new EmailWithoutPathCharacters, new UniqueUserValue],
                 'password' => ['required', 'confirmed', Password::default()],
             ])
             ->validator();
