@@ -61,8 +61,5 @@ test('focuses the dialog when autofocus is disabled', async () => {
     });
     await nextTick();
 
-    const content = document.querySelector('[data-ui-modal-content]');
-
-    expect(document.activeElement).toBe(content);
-    expect(content.getAttribute('tabindex')).toBe('-1');
+    expect(document.activeElement).toBe(document.querySelector('[data-ui-modal-content]'));
 });

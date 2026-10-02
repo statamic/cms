@@ -111,10 +111,9 @@ function focusOnOpen() {
     }
 }
 
+// Modal owns initial focus; prevent FocusScope from focusing the first tabbable first.
 function onMountAutoFocus(event) {
-    if (!props.autofocus) {
-        event.preventDefault();
-    }
+    event.preventDefault();
 }
 
 function close() {
