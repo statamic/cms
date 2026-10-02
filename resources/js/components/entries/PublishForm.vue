@@ -124,6 +124,7 @@
                             <Panel class="flex justify-between px-5! py-3! dark:bg-gray-800!" v-if="!revisionsEnabled">
                                 <Heading :text="__('Published')" />
                                 <Switch
+                                    :label="__('Published')"
                                     :model-value="published"
                                     :disabled="!canManagePublishState"
                                     @update:model-value="setFieldValue('published', $event)"
