@@ -34,6 +34,7 @@ class VideoTest extends TestCase
     {
         return [
             'url' => ['https://vimeo.com/22439234', 'vimeo', 'https://player.vimeo.com/video/22439234?dnt=1'],
+            'cloudflare' => ['cloudflare:1234', 'cloudflare', 'https://iframe.cloudflarestream.com/1234'],
             'file' => ['https://example.com/clip.mp4', 'file', 'https://example.com/clip.mp4'],
             'unsupported' => ['https://example.com/nope', 'unsupported', null],
         ];
@@ -74,9 +75,32 @@ class VideoTest extends TestCase
         );
     }
 
-    private function fieldtype()
+    #[Test]
+    public function it_preloads_the_providers_and_the_current_video()
     {
-        return (new Video)->setField(new Field('test', ['type' => 'video']));
+        $meta = $this->fieldtype('cloudflare:1234')->preload();
+
+        $this->assertSame([
+            ['value' => 'url', 'label' => 'URL'],
+            ['value' => 'cloudflare', 'label' => 'Cloudflare Stream'],
+        ], $meta['providers']);
+
+        $this->assertSame('cloudflare', $meta['video']['provider']);
+        $this->assertSame('https://iframe.cloudflarestream.com/1234', $meta['video']['embed_url']);
+    }
+
+    #[Test]
+    public function it_preloads_an_empty_field()
+    {
+        $this->assertSame('unsupported', $this->fieldtype()->preload()['video']['provider']);
+    }
+
+    private function fieldtype($value = null)
+    {
+        return tap(new Video, fn (Video $fieldtype) => $fieldtype
+            ->setField(new Field('test', ['type' => 'video']))
+            ->field()->setValue($value)
+        );
     }
 
     private function render(string $template, ?string $value): string

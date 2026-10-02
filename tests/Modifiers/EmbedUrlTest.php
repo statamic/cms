@@ -118,6 +118,11 @@ class EmbedUrlTest extends TestCase
     public function it_gets_the_embed_url_from_an_augmented_video_value()
     {
         $this->assertEquals(
+            'https://iframe.cloudflarestream.com/1234',
+            $this->embed(new Embed('cloudflare:1234')),
+        );
+
+        $this->assertEquals(
             'https://player.vimeo.com/video/22439234?dnt=1',
             $this->embed(new Embed('https://vimeo.com/22439234')),
         );

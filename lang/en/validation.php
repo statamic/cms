@@ -218,6 +218,7 @@ return [
     'invalid_two_factor_code' => 'The provided two factor authentication code was invalid.',
     'invalid_two_factor_recovery_code' => 'The provided two factor recovery code was invalid.',
     'bard_container_required_by_button' => 'This field is required by a toolbar button.',
+    'video_fieldtype_cloudflare_id' => 'Must contain only letters and numbers.',
 
     /*
     |--------------------------------------------------------------------------

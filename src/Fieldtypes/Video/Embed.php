@@ -6,13 +6,20 @@ use Illuminate\Support\Str;
 use Statamic\Fields\ArrayableString;
 use Statamic\Support\FileTypes;
 
+use function Statamic\trans as __;
+
 class Embed extends ArrayableString
 {
+    const CLOUDFLARE = 'cloudflare';
     const FILE = 'file';
     const UNSUPPORTED = 'unsupported';
+    const URL = 'url';
     const VIMEO = 'vimeo';
     const YOUTUBE = 'youtube';
 
+    private const CLOUDFLARE_EMBED_URL = 'https://iframe.cloudflarestream.com/';
+    private const CLOUDFLARE_ID_PATTERN = '/^[a-zA-Z0-9]+\z/';
+    private const CLOUDFLARE_PREFIX = 'cloudflare:';
     private const VIMEO_PRIVACY_HASH_PATTERN = '/^[a-zA-Z0-9]+$/';
     private const YOUTUBE_ID_PATTERN = '/^[a-zA-Z0-9_-]+$/';
 
@@ -23,6 +30,14 @@ class Embed extends ArrayableString
         parent::__construct($value);
 
         $this->provider = self::providerFor($value);
+    }
+
+    public static function options(): array
+    {
+        return [
+            ['value' => self::URL, 'label' => __('URL')],
+            ['value' => self::CLOUDFLARE, 'label' => __('Cloudflare Stream')],
+        ];
     }
 
     public function url(): ?string
@@ -38,6 +53,7 @@ class Embed extends ArrayableString
     public function embedUrl(): ?string
     {
         return match ($this->provider) {
+            self::CLOUDFLARE => self::CLOUDFLARE_EMBED_URL.$this->id(),
             self::VIMEO, self::YOUTUBE => self::embedUrlFor($this->value),
             self::FILE => $this->value,
             default => null,
@@ -55,6 +71,7 @@ class Embed extends ArrayableString
     public function id(): ?string
     {
         return match ($this->provider) {
+            self::CLOUDFLARE => Str::after($this->value, self::CLOUDFLARE_PREFIX),
             self::VIMEO => self::vimeoIdAndPrivacyHash($this->value)[0],
             self::YOUTUBE => self::youtubeId($this->value),
             default => null,
@@ -213,11 +230,17 @@ class Embed extends ArrayableString
     {
         return match (true) {
             blank($url) => self::UNSUPPORTED,
+            Str::startsWith($url, self::CLOUDFLARE_PREFIX) => self::isCloudflareId(Str::after($url, self::CLOUDFLARE_PREFIX)) ? self::CLOUDFLARE : self::UNSUPPORTED,
             Str::contains($url, self::VIMEO) => self::VIMEO,
             Str::contains($url, ['youtu.be', 'youtube']) => self::YOUTUBE,
             self::isVideoFile($url) => self::FILE,
             default => self::UNSUPPORTED,
         };
+    }
+
+    private static function isCloudflareId(string $id): bool
+    {
+        return preg_match(self::CLOUDFLARE_ID_PATTERN, $id) === 1;
     }
 
     private static function youtubeId(string $url): ?string

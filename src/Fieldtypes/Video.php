@@ -20,6 +20,14 @@ class Video extends Fieldtype
         return new Embed($value);
     }
 
+    public function preload()
+    {
+        return [
+            'providers' => Embed::options(),
+            'video' => (new Embed($this->field()->value()))->toArray(),
+        ];
+    }
+
     protected function configFieldItems(): array
     {
         return [
