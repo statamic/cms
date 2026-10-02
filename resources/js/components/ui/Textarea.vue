@@ -3,11 +3,13 @@ import { cva } from 'cva';
 import CharacterCounter from './CharacterCounter.vue';
 import Button from './Button/Button.vue';
 import autosize from 'autosize/dist/autosize.js';
-import { computed, nextTick, onBeforeUnmount, onMounted, toRef, useTemplateRef } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, toRef, useAttrs, useTemplateRef } from 'vue';
 import useCopy from '@/composables/copy';
-import { useUiFieldId } from '@/composables/ui-field-id.js';
+import { mergeAriaDescribedBy, useUiFieldId } from '@/composables/ui-field-id.js';
 
 defineEmits(['update:modelValue']);
+
+defineOptions({ inheritAttrs: false });
 
 const props = defineProps({
     /** When `true`, the textarea will automatically grow/shrink to fit content */
@@ -29,7 +31,17 @@ const props = defineProps({
     limit: { type: Number, default: null },
 });
 
-const { id } = useUiFieldId(toRef(props, 'id'));
+const attrs = useAttrs();
+const { id, describedBy, invalid } = useUiFieldId(toRef(props, 'id'));
+
+const resolvedDescribedBy = computed(() =>
+    mergeAriaDescribedBy(describedBy.value, attrs['aria-describedby']),
+);
+
+const textareaAttrs = computed(() => {
+    const { 'aria-describedby': _describedBy, 'aria-invalid': _invalid, ...rest } = attrs;
+    return rest;
+});
 
 const { copySupported, copied, copy } = useCopy();
 const canCopy = computed(() => props.copyable && copySupported.value);
@@ -77,10 +89,12 @@ onBeforeUnmount(() => {
             :class="classes"
             :rows="rows"
             :id="id"
-            v-bind="$attrs"
+            v-bind="textareaAttrs"
             :value="modelValue"
             :disabled="disabled"
             :readonly="readOnly"
+            :aria-describedby="resolvedDescribedBy"
+            :aria-invalid="invalid ? 'true' : undefined"
             data-ui-control
             @input="$emit('update:modelValue', $event.target.value)"
         />

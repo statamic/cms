@@ -3,13 +3,31 @@ import { computed, inject, unref, useId } from 'vue';
 export const UI_FIELD_ID_KEY = 'uiFieldId';
 
 /**
- * Resolve a control's id: explicit prop, then a claimed parent ui/Field id, then a generated id.
+ * Merge aria-describedby id lists, dropping empties and duplicates.
+ */
+export function mergeAriaDescribedBy(...parts) {
+    const ids = parts
+        .flatMap((part) => {
+            const value = unref(part);
+            if (value == null || value === '') return [];
+            return String(value).split(/\s+/);
+        })
+        .filter(Boolean);
+
+    return ids.length ? [...new Set(ids)].join(' ') : undefined;
+}
+
+/**
+ * Resolve a control's id and field a11y attrs from a parent ui/Field.
  *
- * Field only exposes an id for injection when it auto-generated one (no explicit `id` prop).
- * The first control to call this claims that id so sibling controls don't share it.
+ * Id resolution: explicit prop, then a claimed parent Field id (when claimable),
+ * then a generated id. Only the first control claims an auto-generated Field id.
  *
- * Returns `{ id, labelId }`. `labelId` is set when this control claimed the Field association
- * (for non-labelable controls that need `aria-labelledby`).
+ * `describedBy` and `invalid` are only applied when this control's resolved id
+ * matches the Field's id — so composite fieldtypes (Table, List, etc.) don't
+ * mark every nested control invalid.
+ *
+ * Returns `{ id, labelId, describedBy, invalid }`.
  */
 export function useUiFieldId(id) {
     const context = inject(UI_FIELD_ID_KEY, null);
@@ -21,7 +39,9 @@ export function useUiFieldId(id) {
     let claimedId = null;
     let claimedLabelId = null;
 
-    if (!hasExplicit && context?.id != null && !context.claimed) {
+    const canClaim = context?.claimable !== false;
+
+    if (!hasExplicit && canClaim && context?.id != null && !context.claimed) {
         context.claimed = true;
         claimedId = context.id;
         claimedLabelId = context.labelId ?? null;
@@ -45,5 +65,21 @@ export function useUiFieldId(id) {
         return value != null && value !== '' ? value : null;
     });
 
-    return { id: resolvedId, labelId };
+    const isFieldControl = computed(() => {
+        const fieldId = unref(context?.id);
+        if (fieldId == null || fieldId === '') return false;
+        return resolvedId.value === fieldId;
+    });
+
+    const describedBy = computed(() => {
+        if (!isFieldControl.value) return undefined;
+        return mergeAriaDescribedBy(context?.describedBy);
+    });
+
+    const invalid = computed(() => {
+        if (!isFieldControl.value) return false;
+        return !!unref(context?.invalid);
+    });
+
+    return { id: resolvedId, labelId, describedBy, invalid };
 }

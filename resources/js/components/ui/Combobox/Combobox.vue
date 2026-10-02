@@ -80,7 +80,7 @@ defineOptions({
     inheritAttrs: false,
 });
 
-const { id, labelId } = useUiFieldId(toRef(props, 'id'));
+const { id, labelId, describedBy, invalid } = useUiFieldId(toRef(props, 'id'));
 
 const attrs = useAttrs();
 
@@ -402,6 +402,8 @@ defineExpose({
                         v-bind="triggerAttrs"
                         :id="shouldShowInput ? undefined : id"
                         :aria-labelledby="shouldShowInput ? undefined : labelId"
+                        :aria-describedby="shouldShowInput ? undefined : describedBy"
+                        :aria-invalid="!shouldShowInput && invalid ? 'true' : undefined"
                         :class="triggerClasses"
                         data-ui-combobox-trigger
                         @keydown.enter="openDropdown"
@@ -412,6 +414,8 @@ defineExpose({
                                 v-if="shouldShowInput"
                                 :id
                                 :placeholder
+                                :aria-describedby="describedBy"
+                                :aria-invalid="invalid ? 'true' : undefined"
                                 ref="search"
                                 class="w-full bg-transparent text-gray-900 dark:text-gray-300 opacity-100 focus:outline-none placeholder-gray-500 dark:placeholder-gray-400 [&::-webkit-search-cancel-button]:hidden cursor-pointer"
                                 :class="{

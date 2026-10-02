@@ -172,3 +172,137 @@ test('it associates the label with a nested combobox trigger via aria-labelledby
 
     wrapper.unmount();
 });
+
+test('it associates errors and instructions with the nested input', () => {
+    const wrapper = mount(Field, {
+        props: {
+            label: 'Email',
+            instructions: 'Your work email',
+            error: 'This field is required.',
+        },
+        slots: {
+            default: () => h(Input, { name: 'email' }),
+        },
+        attachTo: document.body,
+    });
+
+    const input = wrapper.find('[data-ui-control]');
+    const description = wrapper.find('[data-ui-description]');
+    const error = wrapper.find('[data-ui-error-message]');
+
+    expect(description.attributes('id')).toBeTruthy();
+    expect(error.attributes('id')).toBe(`${input.attributes('id')}-error`);
+    expect(input.attributes('aria-invalid')).toBe('true');
+    expect(input.attributes('aria-describedby')).toContain(description.attributes('id'));
+    expect(input.attributes('aria-describedby')).toContain(error.attributes('id'));
+
+    wrapper.unmount();
+});
+
+test('an explicit field id still wires describedby and invalid onto nested inputs', () => {
+    const wrapper = mount(Field, {
+        props: {
+            label: 'Title',
+            id: 'field_title',
+            error: 'This field is required.',
+        },
+        slots: {
+            default: () => h(Input, { name: 'title', id: 'field_title' }),
+        },
+        attachTo: document.body,
+    });
+
+    const input = wrapper.find('[data-ui-control]');
+    const error = wrapper.find('[data-ui-error-message]');
+
+    expect(input.attributes('id')).toBe('field_title');
+    expect(error.attributes('id')).toBe('field_title-error');
+    expect(input.attributes('aria-invalid')).toBe('true');
+    expect(input.attributes('aria-describedby')).toBe('field_title-error');
+
+    wrapper.unmount();
+});
+
+test('descendant controls that do not share the field id are not marked invalid', () => {
+    const wrapper = mount(Field, {
+        props: {
+            label: 'Table',
+            id: 'field_table',
+            error: 'This field is required.',
+        },
+        slots: {
+            default: () => [h(Input, { name: 'a' }), h(Input, { name: 'b' })],
+        },
+        attachTo: document.body,
+    });
+
+    const inputs = wrapper.findAll('[data-ui-control]');
+
+    expect(inputs[0].attributes('aria-invalid')).toBeUndefined();
+    expect(inputs[1].attributes('aria-invalid')).toBeUndefined();
+    expect(inputs[0].attributes('aria-describedby')).toBeUndefined();
+    expect(inputs[1].attributes('aria-describedby')).toBeUndefined();
+
+    wrapper.unmount();
+});
+
+test('it assigns stable ids across multiple errors', () => {
+    const wrapper = mount(Field, {
+        props: {
+            label: 'Email',
+            id: 'field_email',
+            errors: ['Required.', 'Must be valid.'],
+        },
+        slots: {
+            default: () => h(Input, { name: 'email', id: 'field_email' }),
+        },
+        attachTo: document.body,
+    });
+
+    const errors = wrapper.findAll('[data-ui-error-message]');
+    const input = wrapper.find('[data-ui-control]');
+
+    expect(errors[0].attributes('id')).toBe('field_email-error');
+    expect(errors[1].attributes('id')).toBe('field_email-error-1');
+    expect(input.attributes('aria-describedby')).toBe('field_email-error field_email-error-1');
+
+    wrapper.unmount();
+});
+
+test('it does not set aria-describedby when the field has no instructions or errors', () => {
+    const wrapper = mount(Field, {
+        props: { label: 'Email' },
+        slots: {
+            default: () => h(Input, { name: 'email' }),
+        },
+        attachTo: document.body,
+    });
+
+    expect(wrapper.find('[data-ui-control]').attributes('aria-describedby')).toBeUndefined();
+
+    wrapper.unmount();
+});
+
+test('it merges consumer aria-describedby with the field description', () => {
+    const wrapper = mount(Field, {
+        props: {
+            label: 'Email',
+            id: 'field_email',
+            error: 'Required.',
+        },
+        slots: {
+            default: () => h(Input, {
+                name: 'email',
+                id: 'field_email',
+                inputAttrs: { 'aria-describedby': 'extra-help' },
+            }),
+        },
+        attachTo: document.body,
+    });
+
+    expect(wrapper.find('[data-ui-control]').attributes('aria-describedby')).toBe(
+        'field_email-error extra-help',
+    );
+
+    wrapper.unmount();
+});

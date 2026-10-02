@@ -18,7 +18,7 @@ const props = defineProps({
 
 defineEmits(['update:modelValue']);
 
-const { id } = useUiFieldId(toRef(props, 'id'));
+const { id, describedBy, invalid } = useUiFieldId(toRef(props, 'id'));
 
 const switchRootClasses = cva({
     base: [
@@ -60,6 +60,8 @@ const switchThumbClasses = cva({
         data-ui-control
         dir="ltr"
         :id="id"
+        :aria-describedby="describedBy"
+        :aria-invalid="invalid ? 'true' : undefined"
         :model-value="modelValue"
         :class="switchRootClasses"
         :disabled="disabled"
