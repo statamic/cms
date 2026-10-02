@@ -1,5 +1,5 @@
 import { flushPromises, mount } from '@vue/test-utils';
-import { afterEach, expect, test } from 'vitest';
+import { afterEach, expect, test, vi } from 'vitest';
 import { h } from 'vue';
 import { portals } from '@api';
 import { Modal, ModalTitle } from '@/components/ui';
@@ -47,6 +47,8 @@ test('content has no accessible name when there is no title', async () => {
 });
 
 test('hides the page behind from the accessibility tree', async () => {
+    vi.useFakeTimers();
+
     const page = document.createElement('main');
     page.textContent = 'Behind the modal';
     document.body.appendChild(page);
@@ -56,7 +58,10 @@ test('hides the page behind from the accessibility tree', async () => {
     expect(page.getAttribute('aria-hidden')).toBe('true');
 
     await wrapper.setProps({ open: false });
+    await vi.advanceTimersByTimeAsync(300);
     await flushPromises();
 
     expect(page.hasAttribute('aria-hidden')).toBe(false);
+
+    vi.useRealTimers();
 });

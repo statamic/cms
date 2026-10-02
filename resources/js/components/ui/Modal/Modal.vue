@@ -127,7 +127,6 @@ function revealPageBehind() {
 
 function close() {
     visible.value = false;
-    revealPageBehind();
 
     wait(300).then(() => {
         mounted.value = false;
