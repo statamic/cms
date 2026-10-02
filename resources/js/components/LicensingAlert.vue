@@ -31,6 +31,7 @@ function manageLicenses() {
         :title="__('Licensing Alert')"
         :open="open"
         blur
+        :autofocus="false"
         @update:open="snooze"
         icon="alert-alarm-bell"
         class="[&_[data-ui-heading]]:text-red-600! [&_svg]:text-red-600 dark:[&_[data-ui-heading]]:text-red-400! dark:[&_svg]:text-red-400!"
@@ -41,7 +42,7 @@ function manageLicenses() {
         </div>
         <template #footer>
             <div class="flex items-center justify-end space-x-3 pt-3 pb-1">
-                <Button @click="snooze" :text="__('Snooze')" variant="ghost" tabindex="-1" />
+                <Button @click="snooze" :text="__('Snooze')" variant="ghost" />
                 <Button v-if="manageUrl" @click="manageLicenses" :text="__('Manage Licenses')" />
             </div>
         </template>
