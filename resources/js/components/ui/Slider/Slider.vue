@@ -1,13 +1,14 @@
 <script setup>
-import { useId } from 'vue';
+import { toRef } from 'vue';
 import { cva } from 'cva';
 import { SliderRange, SliderRoot, SliderThumb, SliderTrack } from 'reka-ui';
+import { useUiFieldId } from '@/composables/ui-field-id.js';
 
 const props = defineProps({
     /** Description text for the slider. */
     description: { type: String, default: null },
-    /** ID attribute for the slider. */
-    id: { type: String, default: () => useId() },
+    /** ID attribute for the slider. Inherits from parent `Field` when omitted. */
+    id: { type: String, default: null },
     /** Label text for the slider. */
     label: { type: String, default: null },
     /** The controlled value of the slider. */
@@ -25,6 +26,8 @@ const props = defineProps({
 });
 
 defineEmits(['update:modelValue']);
+
+const { id } = useUiFieldId(toRef(props, 'id'));
 
 const rootClasses = cva({
     base: 'relative flex w-full touch-none items-center select-none',
@@ -73,7 +76,6 @@ const thumbClasses = cva({
     <SliderRoot
         data-ui-control
         :class="rootClasses"
-        :id
         :max="max"
         :min="min"
         :step="step"
@@ -84,6 +86,7 @@ const thumbClasses = cva({
             <SliderRange :class="rangeClasses" />
         </SliderTrack>
         <SliderThumb
+            :id
             :class="thumbClasses"
             :aria-label="label"
         />
