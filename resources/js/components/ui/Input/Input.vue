@@ -1,11 +1,12 @@
 <script setup>
-import { computed, useSlots, useAttrs, ref, useId, useTemplateRef, onMounted, nextTick } from 'vue';
+import { computed, useSlots, useAttrs, ref, toRef, useTemplateRef, onMounted, nextTick } from 'vue';
 import { cva } from 'cva';
 import { twMerge } from 'tailwind-merge';
 import Icon from '../Icon/Icon.vue';
 import Button from '../Button/Button.vue';
 import CharacterCounter from '../CharacterCounter.vue';
 import useCopy from '@/composables/copy';
+import { mergeAriaDescribedBy, useUiFieldId } from '@/composables/ui-field-id.js';
 
 defineOptions({ inheritAttrs: false });
 
@@ -29,8 +30,8 @@ const props = defineProps({
     iconAppend: { type: String, default: null },
     /** Icon name. Will display before the text. [Browse available icons](/?path=/story/components-icon--all-icons) */
     iconPrepend: { type: String, default: null },
-    /** ID attribute for the input element */
-    id: { type: String, default: () => useId() },
+    /** ID attribute for the input element. Inherits from parent `Field` when omitted. */
+    id: { type: String, default: null },
     /** Specify a character limit */
     limit: { type: Number, default: null },
     /** When `true`, an animated loading indicator will show next to the input */
@@ -57,6 +58,8 @@ const props = defineProps({
     inputClass: { type: String, default: '' },
 });
 
+const { id, describedBy, invalid } = useUiFieldId(toRef(props, 'id'));
+
 const inputAttributeKeys = [
     'accept', 'autocomplete', 'autofocus', 'capture', 'checked', 'dirname', 'form',
     'formaction', 'formenctype', 'formmethod', 'formnovalidate', 'formtarget',
@@ -67,7 +70,9 @@ const inputAttributeKeys = [
 const outerAttrs = computed(() => {
     const result = {};
     for (const key in attrs) {
-        if (!inputAttributeKeys.includes(key.toLowerCase())) result[key] = attrs[key];
+        if (!inputAttributeKeys.includes(key.toLowerCase()) && key !== 'aria-describedby' && key !== 'aria-invalid') {
+            result[key] = attrs[key];
+        }
     }
     return result;
 });
@@ -89,6 +94,15 @@ const inputAttrs = computed(() => {
     }
     return { ...result, ...normalizedInputAttrs.value };
 });
+
+const controlAttrs = computed(() => {
+    const { 'aria-describedby': _describedBy, 'aria-invalid': _invalid, ...rest } = inputAttrs.value;
+    return rest;
+});
+
+const resolvedDescribedBy = computed(() =>
+    mergeAriaDescribedBy(describedBy.value, inputAttrs.value['aria-describedby'], attrs['aria-describedby']),
+);
 
 const hasPrependedIcon = computed(() => !!props.iconPrepend || !!props.icon || !!slots.prepend);
 const hasAppendedIcon = computed(() => !!props.iconAppend || !!slots.append || clearable.value || props.viewable || canCopy.value || props.loading);
@@ -227,7 +241,9 @@ defineExpose({ focus, select });
                 :readonly="readOnly"
                 data-ui-control
                 data-ui-group-target
-                v-bind="inputAttrs"
+                v-bind="controlAttrs"
+                :aria-describedby="resolvedDescribedBy"
+                :aria-invalid="invalid ? 'true' : undefined"
                 @input="$emit('update:modelValue', $event.target.value)"
             />
             <div v-if="hasAppendedIcon" :class="appendedIconClasses">
