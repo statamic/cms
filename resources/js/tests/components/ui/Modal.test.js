@@ -45,3 +45,18 @@ test('content has no accessible name when there is no title', async () => {
 
     expect(content.hasAttribute('aria-labelledby')).toBe(false);
 });
+
+test('hides the page behind from the accessibility tree', async () => {
+    const page = document.createElement('main');
+    page.textContent = 'Behind the modal';
+    document.body.appendChild(page);
+
+    const wrapper = await openModal({ title: 'Delete Entry' });
+
+    expect(page.getAttribute('aria-hidden')).toBe('true');
+
+    await wrapper.setProps({ open: false });
+    await flushPromises();
+
+    expect(page.hasAttribute('aria-hidden')).toBe(false);
+});
