@@ -5,6 +5,9 @@ import {ref} from 'vue';
 const meta = {
     title: 'Forms/Switch',
     component: Switch,
+    args: {
+        label: 'Enabled',
+    },
     argTypes: {
         size: {
             control: 'select',
@@ -25,14 +28,14 @@ type Story = StoryObj<typeof meta>;
 
 export const _DocsIntro: Story = {
     tags: ['!dev'],
-    render: () => ({
+    render: (args) => ({
         components: { Switch },
         setup() {
             const enabled = ref(false);
-            return { enabled };
+            return { args, enabled };
         },
         template: `
-            <Switch v-model="enabled" />
+            <Switch v-model="enabled" :label="args.label" />
         `,
     }),
 };
@@ -50,10 +53,10 @@ export const _Sizes: Story = {
         },
         template: `
             <div class="flex items-center gap-2">
-                <Switch v-model="lg" size="lg" />
-                <Switch v-model="base" />
-                <Switch v-model="sm" size="sm" />
-                <Switch v-model="xs" size="xs" />
+                <Switch v-model="lg" size="lg" label="Large" />
+                <Switch v-model="base" label="Base" />
+                <Switch v-model="sm" size="sm" label="Small" />
+                <Switch v-model="xs" size="xs" label="Extra small" />
             </div>
         `,
     }),

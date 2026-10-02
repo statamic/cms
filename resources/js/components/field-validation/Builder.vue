@@ -5,7 +5,7 @@
             :label="__('Required')"
             :instructions="__('messages.field_validation_required_instructions')"
         >
-            <Switch v-model="isRequired" />
+            <Switch v-model="isRequired" :label="__('Required')" />
         </Field>
 
         <Field
@@ -13,7 +13,7 @@
             :label="__('Sometimes')"
             :instructions="__('messages.field_validation_sometimes_instructions')"
         >
-            <Switch v-model="sometimesValidate" />
+            <Switch v-model="sometimesValidate" :label="__('Sometimes')" />
         </Field>
 
         <Field class="form-group field-w-100" :label="__('Rules')">
