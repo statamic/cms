@@ -11,6 +11,7 @@ use Statamic\Facades\Antlers;
 use Statamic\Facades\Parse;
 use Statamic\Facades\Path;
 use Statamic\Facades\User;
+use Statamic\Stache\GitPathMapper;
 use Statamic\Support\Str;
 
 use function Statamic\trans as __;
@@ -20,29 +21,20 @@ class Git
     private ?UserContract $authenticatedUser;
 
     /**
-     * Instantiate git tracked content manager.
-     */
-    public function __construct()
-    {
-        if (! config('statamic.git.enabled')) {
-            throw new \Exception(__('statamic::messages.git_disabled'));
-        }
-    }
-
-    /**
      * Listen to custom addon event.
      *
      * @param  string  $event
      */
     public function listen($event)
     {
+        $this->ensureEnabled();
         \Illuminate\Support\Facades\Event::listen($event, Subscriber::class.'@commit');
     }
 
     /**
      * Get statuses of tracked content paths.
      *
-     * @return \Illuminate\Support\Collection|null
+     * @return Collection|null
      */
     public function statuses()
     {
@@ -79,6 +71,7 @@ class Git
      */
     public function commit($message = null)
     {
+        $this->ensureEnabled();
         $this->groupTrackedContentPathsByRepo()->each(function ($paths, $gitRoot) use ($message) {
             $this->runConfiguredCommands($gitRoot, $paths, $message ?? __('Content saved'));
         });
@@ -89,6 +82,7 @@ class Git
      */
     public function dispatchCommit($message = null)
     {
+        $this->ensureEnabled();
         if ($delay = config('statamic.git.dispatch_delay')) {
             $delayInMinutes = now()->addMinutes((int) $delay);
             $message = null;
@@ -143,7 +137,7 @@ class Git
     /**
      * Group tracked content paths by repo.
      *
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
     protected function groupTrackedContentPathsByRepo()
     {
@@ -303,5 +297,171 @@ class Git
         return collect($paths)
             ->map(fn ($path) => '"'.$path.'"')
             ->implode(' ');
+    }
+
+    /**
+     * Throw if the git integration is not enabled.
+     */
+    protected function ensureEnabled(): void
+    {
+        if (! config('statamic.git.enabled')) {
+            throw new \Exception(__('statamic::messages.git_disabled'));
+        }
+    }
+
+    /**
+     * Get the path to the stache git ref file.
+     */
+    public function stacheRefFilePath(): string
+    {
+        return storage_path('statamic/.stache-git-ref');
+    }
+
+    /**
+     * Read the stored stache git ref SHA, or null if none exists.
+     */
+    public function getStacheRef(): ?string
+    {
+        $path = $this->stacheRefFilePath();
+
+        if (! file_exists($path)) {
+            return null;
+        }
+
+        $sha = trim((string) file_get_contents($path));
+
+        return $sha === '' ? null : $sha;
+    }
+
+    /**
+     * Write a SHA to the stache git ref file.
+     */
+    public function setStacheRef(string $sha): void
+    {
+        $path = $this->stacheRefFilePath();
+        $dir = dirname($path);
+
+        if (! is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+
+        file_put_contents($path, $sha);
+    }
+
+    /**
+     * Get the current HEAD SHA.
+     */
+    public function currentSha(): string
+    {
+        return GitProcess::create(base_path())->currentSha();
+    }
+
+    /**
+     * Determine whether the current directory is a git repository.
+     */
+    public function isRepo(): bool
+    {
+        return GitProcess::create(base_path())->isRepo();
+    }
+
+    /**
+     * Parse a git diff --name-status output string into a collection of changes.
+     *
+     * Each item is an array with keys: 'status' (A|M|D) and 'path' (relative to git root).
+     * Rename lines (R100\told\tnew) are normalized into a delete + add pair.
+     * Copy lines (C100\told\tnew) are normalized into an add of the new path.
+     *
+     * @return Collection<array{status: string, path: string}>
+     */
+    public function parseDiffOutput(?string $output): Collection
+    {
+        return collect(explode("\n", trim((string) $output)))
+            ->filter()
+            ->map(function ($line) {
+                if (preg_match('/^R\d*\t(.+)\t(.+)$/', $line, $m)) {
+                    return [
+                        ['status' => 'D', 'path' => $m[1]],
+                        ['status' => 'A', 'path' => $m[2]],
+                    ];
+                }
+
+                if (preg_match('/^C\d*\t(.+)\t(.+)$/', $line, $m)) {
+                    return [
+                        ['status' => 'A', 'path' => $m[2]],
+                    ];
+                }
+
+                $parts = explode("\t", $line, 2);
+
+                if (count($parts) < 2) {
+                    return null;
+                }
+
+                return [['status' => $parts[0], 'path' => $parts[1]]];
+            })
+            ->filter()
+            ->flatten(1)
+            ->values();
+    }
+
+    /**
+     * Get all git changes since the stored stache ref as a collection of stache actions.
+     *
+     * Pass $includeDirty = true to also include staged and unstaged working-tree changes.
+     *
+     * Returns null when there is no stored ref (first run), indicating a full refresh is needed.
+     *
+     * Each action is an array with keys: type, storeKey, absolutePath, displayPath.
+     *
+     * @return Collection<array{type: string, storeKey: string|null, absolutePath: string|null, displayPath: string}>|null
+     */
+    public function stacheDiff(bool $includeDirty = false): ?Collection
+    {
+        $fromSha = $this->getStacheRef();
+
+        if ($fromSha === null) {
+            return null;
+        }
+
+        $process = $this->stacheGitProcess();
+
+        $changes = $this->parseDiffOutput($process->diff($fromSha, 'HEAD'));
+
+        if ($includeDirty) {
+            $changes = $changes
+                ->merge($this->parseDiffOutput($process->diffDirty()))
+                ->merge($this->parseDiffOutput($process->diffStaged()))
+                ->merge($this->parseUntrackedOutput($process->untrackedFiles()))
+                ->unique(fn ($c) => $c['status'].':'.$c['path']);
+        }
+
+        if ($changes->isEmpty()) {
+            return collect();
+        }
+
+        $storeDirectories = collect(config('statamic.stache.stores', []))
+            ->filter(fn ($config) => isset($config['directory']))
+            ->map(fn ($config) => rtrim($config['directory'], '/'))
+            ->all();
+
+        return (new GitPathMapper)->map($changes, base_path(), $storeDirectories);
+    }
+
+    /**
+     * Parse git ls-files --others output into added changes.
+     *
+     * @return Collection<array{status: string, path: string}>
+     */
+    public function parseUntrackedOutput(?string $output): Collection
+    {
+        return collect(explode("\n", trim((string) $output)))
+            ->filter()
+            ->map(fn ($path) => ['status' => 'A', 'path' => $path])
+            ->values();
+    }
+
+    protected function stacheGitProcess(): GitProcess
+    {
+        return GitProcess::create(base_path());
     }
 }

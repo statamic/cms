@@ -2,6 +2,7 @@
 
 namespace Statamic\Console\Processes;
 
+use Statamic\Console\Processes\Exceptions\ProcessException;
 use Statamic\Support\Str;
 
 class Git extends Process
@@ -50,6 +51,58 @@ class Git extends Process
     }
 
     /**
+     * Get git diff --name-status between two refs.
+     *
+     * @param  string  $from  Base commit SHA or ref
+     * @param  string  $to  Target commit SHA or ref (e.g. 'HEAD')
+     * @return string
+     */
+    public function diff(string $from, string $to = 'HEAD')
+    {
+        return $this->runRequiredGitCommand('diff', '--name-status', $from, $to);
+    }
+
+    /**
+     * Get git diff --name-status for dirty (unstaged) files.
+     *
+     * @return string
+     */
+    public function diffDirty()
+    {
+        return $this->runRequiredGitCommand('diff', '--name-status', 'HEAD');
+    }
+
+    /**
+     * Get git diff --name-status for staged (cached) files.
+     *
+     * @return string
+     */
+    public function diffStaged()
+    {
+        return $this->runRequiredGitCommand('diff', '--name-status', '--cached', 'HEAD');
+    }
+
+    /**
+     * List untracked files, excluding ignored paths.
+     *
+     * @return string
+     */
+    public function untrackedFiles()
+    {
+        return $this->runRequiredGitCommand('ls-files', '--others', '--exclude-standard');
+    }
+
+    /**
+     * Get the current HEAD commit SHA.
+     *
+     * @return string
+     */
+    public function currentSha()
+    {
+        return $this->runGitCommand('rev-parse', 'HEAD');
+    }
+
+    /**
      * Run git command.
      *
      * @param  mixed  $parts
@@ -58,6 +111,42 @@ class Git extends Process
     private function runGitCommand(...$parts)
     {
         return $this->run($this->prepareProcessArguments($parts));
+    }
+
+    /**
+     * Run a git command that must succeed. Throw when git writes to stderr or exits non-zero.
+     *
+     * @param  mixed  $parts
+     * @return mixed
+     *
+     * @throws ProcessException
+     */
+    private function runRequiredGitCommand(...$parts)
+    {
+        $this->throwOnFailure = true;
+
+        try {
+            $output = $this->runGitCommand(...$parts);
+        } catch (ProcessException $e) {
+            throw new ProcessException($this->failedGitCommandMessage($e), 0, $e);
+        } finally {
+            $this->throwOnFailure = false;
+        }
+
+        if ($this->hasErrorOutput()) {
+            throw new ProcessException($this->failedGitCommandMessage());
+        }
+
+        return $output;
+    }
+
+    private function failedGitCommandMessage(?ProcessException $e = null): string
+    {
+        $detail = $this->hasErrorOutput()
+            ? collect($this->errorOutput)->implode("\n")
+            : ($e?->getMessage() ?: 'unknown error');
+
+        return 'Git command failed: '.$detail;
     }
 
     /**
