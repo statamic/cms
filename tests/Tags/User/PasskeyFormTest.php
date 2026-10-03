@@ -152,4 +152,13 @@ class PasskeyFormTest extends TestCase
             ])
             ->assertStatus(500);
     }
+
+    #[Test]
+    public function it_returns_404_when_frontend_authentication_is_disabled(): void
+    {
+        config(['statamic.users.frontend_auth_enabled' => false]);
+
+        $this->get('/!/auth/passkeys/create')->assertNotFound();
+        $this->post('/!/auth/passkeys')->assertNotFound();
+    }
 }
