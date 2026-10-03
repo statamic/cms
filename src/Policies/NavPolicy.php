@@ -4,6 +4,7 @@ namespace Statamic\Policies;
 
 use Statamic\Facades\Nav;
 use Statamic\Facades\User;
+use Statamic\Sites\Site;
 
 class NavPolicy
 {
@@ -18,7 +19,7 @@ class NavPolicy
         }
     }
 
-    public function index($user)
+    public function index($user, ?Site $site = null)
     {
         $user = User::fromUser($user);
 
@@ -26,9 +27,10 @@ class NavPolicy
             return true;
         }
 
-        return ! Nav::all()->filter(function ($nav) use ($user) {
-            return $this->view($user, $nav);
-        })->isEmpty();
+        return Nav::all()
+            ->filter(fn ($nav) => $this->view($user, $nav))
+            ->filter(fn ($nav) => ! $site || $nav->existsIn($site->handle()))
+            ->isNotEmpty();
     }
 
     public function create($user)

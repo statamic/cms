@@ -5,6 +5,7 @@ namespace Tests\Policies;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Structures\Nav as NavContract;
 use Statamic\Facades\Nav;
+use Statamic\Facades\Site;
 
 class NavPolicyTest extends PolicyTestCase
 {
@@ -45,6 +46,24 @@ class NavPolicyTest extends PolicyTestCase
 
         $this->assertTrue($userWithEnPermission->can('index', NavContract::class));
         $this->assertFalse($userWithDePermission->can('index', NavContract::class));
+    }
+
+    #[Test]
+    public function index_is_allowed_for_a_site_if_any_nav_is_viewable_in_that_site()
+    {
+        $this->withSites(['en', 'fr']);
+
+        $user = $this->userWithPermissions([
+            'view test nav',
+            'access en site',
+            'access fr site',
+        ]);
+
+        $nav = tap(Nav::make('test'))->save();
+        $nav->makeTree('en')->save();
+
+        $this->assertTrue($user->can('index', [NavContract::class, Site::get('en')]));
+        $this->assertFalse($user->can('index', [NavContract::class, Site::get('fr')]));
     }
 
     #[Test]
