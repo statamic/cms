@@ -118,13 +118,15 @@ export default {
     created() {
         if (!this.typeahead) this.request();
 
-		watch(
-			() => loaders.value[this.cacheKey],
-			(loading) => {
-				this.options = optionsCache[this.cacheKey];
-				this.requested = true;
-			}
-		);
+        watch(
+            () => loaders.value[this.cacheKey],
+            (loading) => {
+                if (loading || !optionsCache[this.cacheKey]) return;
+
+                this.options = optionsCache[this.cacheKey];
+                this.requested = true;
+            },
+        );
 
         this.removeNavigationListener = router.on('before', () => {
             if (this.abortController) this.abortController.abort();
