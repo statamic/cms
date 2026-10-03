@@ -128,7 +128,7 @@ export default {
         },
 
         widthClass() {
-            return `${field_width_class(this.width)}`;
+            return `field-w-${this.width}`;
         },
 
         localizable: {

@@ -15,30 +15,7 @@ const props = defineProps({
 if (props.widgets.length === 0) useArchitecturalBackground();
 
 function classes(widget) {
-    return `${widget.classes} ${tailwindWidthClass(widget.width)}`;
-}
-
-function tailwindWidthClass(width) {
-    const sizes = {
-        sm: 'w-full @2xl:w-1/2 @4xl:w-1/3 @7xl:w-1/4',
-        md: 'w-full @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3',
-        lg: 'w-full @2xl:w-full @4xl:w-2/3 @7xl:w-3/4',
-        full: 'w-full',
-    };
-
-    // For backward compatibility, map old numeric widths to new sizes
-    const legacyMap = {
-        25: 'sm',
-        33: 'sm',
-        50: 'md',
-        66: 'md',
-        75: 'lg',
-        100: 'full'
-    };
-
-    const size = typeof width === 'number' ? (legacyMap[width] ?? 'full') : width;
-
-    return sizes[size] ?? sizes.md;
+    return `${widget.classes} widget-w-${widget.width}`;
 }
 </script>
 
@@ -48,10 +25,10 @@ function tailwindWidthClass(width) {
     <template v-if="widgets.length">
         <ui-header :title="__('Dashboard')" icon="dashboard" />
 
-        <div class="widgets @container/widgets flex flex-wrap gap-y-6 -mx-2 sm:-mx-3">
+        <div class="widgets @container/widgets">
             <div
                 v-for="widget in widgets"
-                class="px-3 starting-style-transition"
+                class="starting-style-transition"
                 :class="classes(widget)"
             >
                 <component v-if="widget.component" :is="widget.component.name" v-bind="widget.component.props" />
