@@ -41,7 +41,7 @@ class CustomMiddlewareTest extends TestCase
     }
 
     #[Test]
-    #[DefineEnvironment('addCustomMiddlewareWithMethod')]
+    #[DefineEnvironment('addCustomMiddlewareThroughConfig')]
     public function a_custom_middleware_can_be_added_to_the_default_schema_through_config()
     {
         $this->post('/graphql', ['query' => '{ping}']);
@@ -52,6 +52,16 @@ class CustomMiddlewareTest extends TestCase
     protected function addCustomMiddlewareThroughConfig($app)
     {
         $app['config']->set('statamic.graphql.middleware', [CountRequests::class]);
+    }
+
+    #[Test]
+    #[DefineEnvironment('addCustomMiddlewareThroughConfig')]
+    public function custom_middleware_runs_before_the_cached_response_is_returned()
+    {
+        $this->post('/graphql', ['query' => '{ping}']);
+        $this->post('/graphql', ['query' => '{ping}']);
+
+        $this->assertEquals(2, app('request-count'));
     }
 }
 
