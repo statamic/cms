@@ -93,6 +93,7 @@ return [
 
         'assets' => [
             'class' => Stores\AssetsStore::class,
+            'directory' => base_path('content/assets'),
         ],
 
         'users' => [
