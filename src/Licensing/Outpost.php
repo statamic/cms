@@ -171,6 +171,8 @@ class Outpost
 
     public function clearCachedResponse()
     {
+        $this->response = null;
+
         return $this->cache()->forget(self::CACHE_KEY);
     }
 
