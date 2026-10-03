@@ -258,6 +258,11 @@ class EntriesController extends CpController
                 ->user(User::current())
                 ->save();
 
+            // have to save in case there are non-revisable fields
+            if ($saved) {
+                $this->saveNonRevisableFields($entry, $request->input('_localized'));
+            }
+
             // catch any changes through RevisionSaving event
             $entry = $entry->fromWorkingCopy();
         } else {
@@ -530,5 +535,29 @@ class EntriesController extends CpController
         if (Site::multiEnabled() && ! $collection->sites()->contains($site->handle())) {
             return redirect()->back()->with('error', __('Collection is not available on site ":handle".', ['handle' => $site->handle]));
         }
+    }
+
+    private function saveNonRevisableFields(EntryContract $entry, ?array $localized = null): void
+    {
+        $handles = collect($entry->nonRevisableFields());
+
+        $values = $entry->data()->only($handles->all());
+
+        // On a localization, a non-revisable field that's no longer localized has been
+        // dropped from the data entirely, so remove it from the saved localization.
+        // Otherwise the stale value would keep shadowing the origin.
+        $removed = $entry->hasOrigin()
+            ? $handles->diff($localized ?? [])->filter(fn ($handle) => $entry->fresh()->has($handle))
+            : collect();
+
+        if ($values->isEmpty() && $removed->isEmpty()) {
+            return;
+        }
+
+        $fresh = $entry->fresh()->merge($values);
+
+        $removed->each(fn ($handle) => $fresh->remove($handle));
+
+        $fresh->updateLastModified(User::current())->save();
     }
 }
