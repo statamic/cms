@@ -137,7 +137,7 @@ class Stache
         if ($this->shouldUseParallelWarming($stores)) {
             $this->warmInParallel($stores);
         } else {
-            $stores->each->warm();
+            $this->warmSequentially($stores);
         }
 
         $this->stopTimer();
@@ -280,6 +280,25 @@ class Stache
         return true;
     }
 
+    /**
+     * Two-pass warm: Pass 1 caches all per-item value indexes (including entries'
+     * taxonomy indexes) across every store before Pass 2 runs. This lets
+     * Terms\Associations read from the cache in Pass 2 instead of loading all
+     * Entry objects from disk, which was the main source of slow warm times.
+     *
+     * Stores that define their own warm() are warmed through it instead, so
+     * third-party overrides aren't silently bypassed.
+     */
+    protected function warmSequentially($stores)
+    {
+        [$overriding, $twoPass] = $stores->partition->overridesWarm();
+
+        $overriding->each->warm();
+
+        $twoPass->each->warmValueIndexes();
+        $twoPass->each->warmOtherIndexes();
+    }
+
     protected function warmInParallel($stores)
     {
         try {
@@ -297,7 +316,9 @@ class Stache
 
             $closures = $chunks->map(function ($chunk) {
                 return function () use ($chunk) {
-                    return $chunk->each->warm()->keys()->all();
+                    $this->warmSequentially($chunk);
+
+                    return $chunk->keys()->all();
                 };
             })->all();
 
@@ -310,7 +331,7 @@ class Stache
             Concurrency::driver($driver)->run($closures);
         } catch (\Exception $e) {
             Log::warning('Parallel warming failed, falling back to sequential: '.$e->getMessage());
-            $stores->each->warm();
+            $this->warmSequentially($stores);
         }
     }
 
