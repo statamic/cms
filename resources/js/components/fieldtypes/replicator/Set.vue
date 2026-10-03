@@ -25,6 +25,7 @@ const replicatorSets = inject('replicatorSets');
 
 const props = defineProps({
     config: Object,
+    configHash: String,
     id: String,
     fieldPath: String,
     metaPath: String,
@@ -125,7 +126,7 @@ reveal.use(rootEl, () => emit('expanded'));
 </script>
 
 <template>
-    <div ref="rootEl" :class="sortableItemClass">
+    <div ref="rootEl" :class="sortableItemClass" :data-config-hash="configHash">
         <slot name="picker" />
         <div
             layout
