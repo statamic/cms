@@ -23,7 +23,7 @@
             <grid-cell v-for="(field, i) in fields" :key="field.handle" :field="field" />
         </FieldsProvider>
 
-        <td class="grid-row-controls row-controls" v-if="showRowControls">
+        <td class="grid-row-controls row-controls relative" v-if="showRowControls">
             <button
                 ref="rootEl"
                 type="button"
@@ -31,12 +31,24 @@
                 :tabindex="moving ? 0 : -1"
                 :aria-label="__('Use up and down arrows to reorder. Press Enter or Escape when finished.')"
             />
+            <Badge
+                v-if="moving"
+                size="sm"
+                color="blue"
+                pill
+                class="pointer-events-none absolute start-full top-1/2 ms-2 -translate-y-1/2 gap-0! px-1! py-0.5! [&_svg]:size-2! [&_svg]:opacity-100!"
+                aria-hidden="true"
+            >
+                <span class="flex flex-col items-center -space-y-px">
+                    <Icon name="chevron-up" />
+                    <Icon name="chevron-down" />
+                </span>
+            </Badge>
             <Dropdown placement="left-start">
                 <DropdownMenu>
                     <DropdownItem
                         v-if="grid.isReorderable"
                         :text="__('Move')"
-                        icon="handles"
                         @click="startMoving"
                     />
                     <DropdownItem v-if="canAddRows" :text="__('Duplicate Row')" icon="duplicate" @click="$emit('duplicate', index)" />
@@ -56,11 +68,11 @@
 
 <script>
 import GridCell from './Cell.vue';
-import { Dropdown, DropdownMenu, DropdownItem, PublishFieldsProvider as FieldsProvider } from '@ui';
+import { Badge, Dropdown, DropdownMenu, DropdownItem, Icon, PublishFieldsProvider as FieldsProvider } from '@ui';
 import { useKeyboardItemReorder } from '@/composables/keyboard-item-reorder.js';
 
 export default {
-    components: { Dropdown, DropdownMenu, DropdownItem, FieldsProvider, GridCell },
+    components: { Badge, Dropdown, DropdownMenu, DropdownItem, Icon, FieldsProvider, GridCell },
 
     props: {
         index: {
