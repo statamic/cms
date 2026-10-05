@@ -20,7 +20,7 @@ export default {
 
     computed: {
         keyClasses() {
-            return 'inline-flex h-4 min-w-4 items-center justify-center rounded border border-blue-200 bg-blue-50 px-1 text-[0.625rem] font-semibold text-blue-600 shadow-sm dark:border-blue-700 dark:bg-gray-800 dark:text-blue-300';
+            return 'inline-flex h-4 min-w-4 items-center justify-center rounded border border-blue-200 bg-blue-50 px-1 text-[0.625rem] font-semibold text-blue-600 dark:border-blue-700 dark:bg-gray-800 dark:text-blue-300';
         },
     },
 };
