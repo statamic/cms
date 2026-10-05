@@ -464,6 +464,35 @@ class EntryQueryBuilderTest extends TestCase
     }
 
     #[Test]
+    public function entries_are_found_using_nested_where_on_collection()
+    {
+        EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1'])->create();
+        EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2'])->create();
+        EntryFactory::id('3')->slug('page-1')->collection('pages')->data(['title' => 'Page 1'])->create();
+        EntryFactory::id('4')->slug('page-2')->collection('pages')->data(['title' => 'Page 2'])->create();
+        EntryFactory::id('5')->slug('event-1')->collection('events')->data(['title' => 'Event 1'])->create();
+
+        $entries = Entry::query()
+            ->where(function ($query) {
+                $query->where('collection', 'posts');
+            })
+            ->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['1', '2'], $entries->map->id()->all());
+
+        $entries = Entry::query()
+            ->where(function ($query) {
+                $query->where('collection', 'posts')->orWhereIn('collection', ['events']);
+            })
+            ->orWhere('title', 'Page 2')
+            ->get();
+
+        $this->assertCount(4, $entries);
+        $this->assertEquals(['1', '2', '5', '4'], $entries->map->id()->all());
+    }
+
+    #[Test]
     public function entries_are_found_using_where_between()
     {
         EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1', 'number_field' => 8])->create();
