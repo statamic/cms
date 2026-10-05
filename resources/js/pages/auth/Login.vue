@@ -100,24 +100,20 @@ onUnmounted(() => passkey.cancel());
                     <Input v-model="email" name="email" autofocus :autocomplete="emailAutocomplete" />
                 </Field>
 
-                <div class="relative flex flex-col gap-6">
-                    <Field :label="__('Password')" :error="errors?.password">
-                        <template #actions>
-                            <span class="invisible mb-1.5 text-sm" aria-hidden="true">{{ __('Forgot password?') }}</span>
-                        </template>
-                        <Input v-model="password" name="password" type="password" :autocomplete="passwordAutocomplete" />
-                    </Field>
+                <Field :label="__('Password')" :error="errors?.password">
+                    <template #actions>
+                        <span
+                            class="mb-1.5 text-sm text-transparent select-none pointer-events-none"
+                            style="anchor-name: --login-forgot-password"
+                            aria-hidden="true"
+                        >{{ __('Forgot password?') }}</span>
+                    </template>
+                    <Input v-model="password" name="password" type="password" :autocomplete="passwordAutocomplete" />
+                </Field>
 
-                    <Checkbox v-model="remember" name="remember" :label="__('Remember me')" />
+                <Checkbox v-model="remember" name="remember" :label="__('Remember me')" />
 
-                    <Button type="submit" variant="primary" :disabled="processing" :text="__('Continue')" />
-
-                    <Link
-                        :href="forgotPasswordUrl"
-                        class="absolute top-0 end-0 z-(--z-index-above) text-ui-accent-text text-sm hover:text-ui-accent-text/80"
-                        v-text="__('Forgot password?')"
-                    />
-                </div>
+                <Button type="submit" variant="primary" :disabled="processing" :text="__('Continue')" />
             </form>
 
             <template v-if="showOAuth || showPasskeyLogin">
@@ -151,6 +147,14 @@ onUnmounted(() => passkey.cancel());
                     </div>
                 </div>
             </template>
+
+            <Link
+                v-if="emailLoginEnabled"
+                :href="forgotPasswordUrl"
+                class="absolute z-(--z-index-above) text-ui-accent-text mb-1.5 text-sm hover:text-ui-accent-text/80"
+                style="position-anchor: --login-forgot-password; top: anchor(top); left: anchor(left); position-visibility: always"
+                v-text="__('Forgot password?')"
+            />
         </div>
     </AuthCard>
 </template>
