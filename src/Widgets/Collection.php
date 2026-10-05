@@ -4,6 +4,7 @@ namespace Statamic\Widgets;
 
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\CP\Column;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection as CollectionAPI;
 use Statamic\Facades\Scope;
 use Statamic\Facades\Site;
@@ -13,6 +14,80 @@ use function Statamic\trans as __;
 
 class Collection extends Widget
 {
+    public static function icon(): string
+    {
+        return 'collections';
+    }
+
+    public function blueprint(): \Statamic\Fields\Blueprint
+    {
+        return Blueprint::make()->setContents([
+            'tabs' => [
+                'main' => [
+                    'sections' => [
+                        [
+                            'fields' => [
+                                [
+                                    'handle' => 'collection',
+                                    'field' => [
+                                        'type' => 'collections',
+                                        'display' => __('Collection'),
+                                        'max_items' => 1,
+                                        'mode' => 'select',
+                                        'validate' => 'required',
+                                    ],
+                                ],
+                                [
+                                    'handle' => 'title',
+                                    'field' => [
+                                        'type' => 'text',
+                                        'display' => __('Title'),
+                                        'instructions' => __('statamic::messages.widget_collection_title_instructions'),
+                                    ],
+                                ],
+                                [
+                                    'handle' => 'limit',
+                                    'field' => [
+                                        'type' => 'integer',
+                                        'display' => __('Limit'),
+                                        'default' => 5,
+                                    ],
+                                ],
+                                [
+                                    'handle' => 'order_by',
+                                    'field' => [
+                                        'type' => 'text',
+                                        'display' => __('Order By'),
+                                        'instructions' => __('statamic::messages.widget_collection_order_by_instructions'),
+                                        'default' => 'date:desc',
+                                    ],
+                                ],
+                                [
+                                    'handle' => 'show_table_header',
+                                    'field' => [
+                                        'type' => 'toggle',
+                                        'display' => __('Show Table Header'),
+                                        'default' => false,
+                                    ],
+                                ],
+                                [
+                                    'handle' => 'fields',
+                                    'field' => [
+                                        'type' => 'list',
+                                        'display' => __('Fields'),
+                                        'instructions' => __('statamic::messages.widget_collection_fields_instructions'),
+                                        'default' => ['title'],
+                                    ],
+                                ],
+                                ...$this->commonBlueprintFields(),
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
     public function component()
     {
         $collection = $this->config('collection');
