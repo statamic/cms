@@ -126,21 +126,33 @@ class RemoteUrlValidator
 
     protected function assertPublicIp($ip)
     {
-        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
-            $packed = inet_pton($ip);
-
-            if ($this->ipv6MatchesAnyPrefix($packed, $this->embeddedIpv4Prefixes())) {
-                $ip = inet_ntop(substr($packed, 12));
-            } elseif ($this->ipv6MatchesAnyPrefix($packed, $this->blockedIpv6Prefixes())) {
-                throw new InvalidRemoteUrlException('Destination IP is not publicly routable.');
-            }
-        }
-
-        $result = filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE);
-
-        if (! $result) {
+        if (! filter_var($ip, FILTER_VALIDATE_IP)) {
             throw new InvalidRemoteUrlException('Destination IP is not publicly routable.');
         }
+
+        $packed = inet_pton($ip);
+
+        if ($this->matchesAnyPrefix($packed, $this->embeddedIpv4Prefixes())) {
+            $packed = substr($packed, 12);
+            $ip = inet_ntop($packed);
+        }
+
+        $public = strlen($packed) === 4 ? $this->isPublicIpv4($packed) : $this->isPublicIpv6($packed);
+
+        if (! $public || ! filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+            throw new InvalidRemoteUrlException('Destination IP is not publicly routable.');
+        }
+    }
+
+    protected function isPublicIpv4($packed)
+    {
+        return ! $this->matchesAnyPrefix($packed, $this->blockedIpv4Prefixes());
+    }
+
+    protected function isPublicIpv6($packed)
+    {
+        return $this->matchesAnyPrefix($packed, $this->globalIpv6Prefixes())
+            && ! $this->matchesAnyPrefix($packed, $this->blockedIpv6Prefixes());
     }
 
     protected function embeddedIpv4Prefixes()
@@ -152,24 +164,63 @@ class RemoteUrlValidator
         ];
     }
 
-    protected function blockedIpv6Prefixes()
+    protected function blockedIpv4Prefixes()
     {
         return [
-            '::/96', // Deprecated IPv4-compatible, including :: and ::1
-            '64:ff9b:1::/48', // NAT64 local-use prefix
-            '100::/64', // Discard-only
-            '2001::/32', // Teredo
-            '2002::/16', // 6to4
+            '0.0.0.0/8', // "This network"
+            '10.0.0.0/8', // Private
+            '100.64.0.0/10', // Shared address space (CGNAT)
+            '127.0.0.0/8', // Loopback
+            '169.254.0.0/16', // Link-local
+            '172.16.0.0/12', // Private
+            '192.0.0.0/24', // IETF protocol assignments
+            '192.0.2.0/24', // TEST-NET-1
+            '192.88.99.0/24', // Deprecated 6to4 relay anycast
+            '192.168.0.0/16', // Private
+            '198.18.0.0/15', // Benchmarking
+            '198.51.100.0/24', // TEST-NET-2
+            '203.0.113.0/24', // TEST-NET-3
+            '224.0.0.0/4', // Multicast
+            '240.0.0.0/4', // Reserved, including broadcast
         ];
     }
 
-    protected function ipv6MatchesAnyPrefix($packed, array $prefixes)
+    protected function globalIpv6Prefixes()
+    {
+        return [
+            '2000::/3', // Global unicast
+        ];
+    }
+
+    protected function blockedIpv6Prefixes()
+    {
+        return [
+            '2001::/23', // IETF protocol assignments, including Teredo
+            '2001:db8::/32', // Documentation
+            '2002::/16', // 6to4
+            '3fff::/20', // Documentation
+        ];
+    }
+
+    protected function matchesAnyPrefix($packed, array $prefixes)
     {
         foreach ($prefixes as $prefix) {
             [$network, $bits] = explode('/', $prefix);
+            $network = inet_pton($network);
             $bytes = intdiv((int) $bits, 8);
+            $remainder = (int) $bits % 8;
 
-            if (substr($packed, 0, $bytes) === substr(inet_pton($network), 0, $bytes)) {
+            if (strlen($packed) !== strlen($network) || substr($packed, 0, $bytes) !== substr($network, 0, $bytes)) {
+                continue;
+            }
+
+            if ($remainder === 0) {
+                return true;
+            }
+
+            $mask = (0xFF << (8 - $remainder)) & 0xFF;
+
+            if ((ord($packed[$bytes]) & $mask) === (ord($network[$bytes]) & $mask)) {
                 return true;
             }
         }
