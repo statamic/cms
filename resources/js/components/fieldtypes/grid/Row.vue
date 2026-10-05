@@ -5,7 +5,7 @@
             {
                 'opacity-50': isExcessive,
                 'inset-ring-1 inset-ring-red': hasError,
-                'outline outline-2 outline-offset-[-2px] outline-blue-400': moving,
+                'focus-outline': moving,
             },
         ]"
         :data-moving="moving || undefined"

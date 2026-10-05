@@ -6,7 +6,7 @@
             {
                 'opacity-50': isExcessive,
                 'ring-red-500': hasError,
-                'ring-2 ring-blue-400': moving,
+                'focus-outline': moving,
             },
         ]"
         :data-error="hasError ?? undefined"
