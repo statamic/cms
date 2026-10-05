@@ -148,8 +148,8 @@ onUnmounted(() => {
         <div>
             <Tabs v-if="width" v-model:modelValue="activeTab">
                 <div v-if="hasMultipleVisibleMainTabs" class="flex items-center gap-x-2 -mt-2 mb-6">
-                    <TabList class="flex-1 min-w-0 overflow-x-clip overflow-y-visible pe-0.25">
-                        <div class="flex-1 flex items-center gap-x-2.5 min-w-0">
+                    <div class="flex-1 flex items-center gap-x-2.5 min-w-0">
+                        <TabList class="flex-1 min-w-0 overflow-x-clip overflow-y-visible pe-0.25">
                             <div ref="tabWrapper" class="min-w-0 flex-1 flex overflow-clip px-0.25">
                                 <div ref="tabInner" class="flex items-center gap-x-2.5 shrink-0">
                                     <TabTrigger
@@ -162,36 +162,36 @@ onUnmounted(() => {
                                     </TabTrigger>
                                 </div>
                             </div>
-                            <Dropdown
-                                v-if="overflowedTabs.length"
-                                align="end"
-                                side="bottom"
-                                class="shrink-0"
-                            >
-                                <template #trigger>
-                                    <Button
-                                        icon="dots"
-                                        variant="ghost"
-                                        size="sm"
-                                        :aria-label="__('Open dropdown menu')"
-                                    />
-                                </template>
-                                <DropdownMenu>
-                                    <DropdownItem
-                                        v-for="tab in overflowedTabs"
-                                        :key="tab.handle"
-                                        :icon="tab.icon"
-                                        :class="{ 'bg-gray-100 dark:bg-gray-800': activeTab === tab.handle }"
-                                        @click="setActive(tab.handle)"
-                                    >
-                                        <span class="block max-w-48 overflow-hidden text-ellipsis whitespace-nowrap">
-                                            {{ __(tab.display) }}
-                                        </span>
-                                    </DropdownItem>
-                                </DropdownMenu>
-                            </Dropdown>
-                        </div>
-                    </TabList>
+                        </TabList>
+                        <Dropdown
+                            v-if="overflowedTabs.length"
+                            align="end"
+                            side="bottom"
+                            class="shrink-0"
+                        >
+                            <template #trigger>
+                                <Button
+                                    icon="dots"
+                                    variant="ghost"
+                                    size="sm"
+                                    :aria-label="__('Open dropdown menu')"
+                                />
+                            </template>
+                            <DropdownMenu>
+                                <DropdownItem
+                                    v-for="tab in overflowedTabs"
+                                    :key="tab.handle"
+                                    :icon="tab.icon"
+                                    :class="{ 'bg-gray-100 dark:bg-gray-800': activeTab === tab.handle }"
+                                    @click="setActive(tab.handle)"
+                                >
+                                    <span class="block max-w-48 overflow-hidden text-ellipsis whitespace-nowrap">
+                                        {{ __(tab.display) }}
+                                    </span>
+                                </DropdownItem>
+                            </DropdownMenu>
+                        </Dropdown>
+                    </div>
                 </div>
 
                 <div :class="{ 'grid grid-cols-[1fr_320px] gap-8': shouldShowSidebar }">

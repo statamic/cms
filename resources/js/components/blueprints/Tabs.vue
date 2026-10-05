@@ -3,8 +3,8 @@
         <div>
             <Tabs v-model="currentTab" :unmount-on-hide="false">
                 <div v-if="!singleTab && tabs.length > 0" class="flex items-center justify-between gap-x-2 mb-6">
-                    <TabList class="flex-1 min-w-0 overflow-x-clip overflow-y-visible pe-0.25">
-                        <div ref="tabs" class="flex-1 flex items-center gap-x-2.5 min-w-0">
+                    <div ref="tabs" class="flex-1 flex items-center gap-x-2.5 min-w-0">
+                        <TabList class="flex-1 min-w-0 overflow-x-clip overflow-y-visible pe-0.25">
                             <div ref="tabWrapper" class="min-w-0 flex-1 flex overflow-clip px-0.25">
                                 <div ref="tabInner" class="flex items-center gap-x-2.5 shrink-0">
                                     <BlueprintTab
@@ -21,41 +21,41 @@
                                     />
                                 </div>
                             </div>
-                            <Dropdown
-                                v-if="overflowedTabs.length"
-                                align="end"
-                                side="bottom"
-                                class="shrink-0"
-                            >
-                                <template #trigger>
-                                    <Button
-                                        icon="dots"
-                                        variant="ghost"
-                                        size="sm"
-                                        :aria-label="__('Open dropdown menu')"
-                                    />
+                        </TabList>
+                        <Dropdown
+                            v-if="overflowedTabs.length"
+                            align="end"
+                            side="bottom"
+                            class="shrink-0"
+                        >
+                            <template #trigger>
+                                <Button
+                                    icon="dots"
+                                    variant="ghost"
+                                    size="sm"
+                                    :aria-label="__('Open dropdown menu')"
+                                />
+                            </template>
+                            <DropdownMenu>
+                                <DropdownItem
+                                    v-for="tab in overflowedTabs"
+                                    :key="tab._id"
+                                    :icon="tab.icon"
+                                    :class="{ 'bg-gray-100 dark:bg-gray-800': currentTab === tab._id }"
+                                    @click="selectTab(tab._id)"
+                                >
+                                    <span class="block max-w-48 overflow-hidden text-ellipsis whitespace-nowrap">
+                                        {{ __(tab.display) }}
+                                    </span>
+                                </DropdownItem>
+                                <template v-if="activeTabIsOverflowed">
+                                    <DropdownSeparator />
+                                    <DropdownItem :text="__('Edit')" icon="edit" @click="editActiveOverflowedTab" />
+                                    <DropdownItem :text="__('Delete')" icon="trash" variant="destructive" @click="removeActiveOverflowedTab" />
                                 </template>
-                                <DropdownMenu>
-                                    <DropdownItem
-                                        v-for="tab in overflowedTabs"
-                                        :key="tab._id"
-                                        :icon="tab.icon"
-                                        :class="{ 'bg-gray-100 dark:bg-gray-800': currentTab === tab._id }"
-                                        @click="selectTab(tab._id)"
-                                    >
-                                        <span class="block max-w-48 overflow-hidden text-ellipsis whitespace-nowrap">
-                                            {{ __(tab.display) }}
-                                        </span>
-                                    </DropdownItem>
-                                    <template v-if="activeTabIsOverflowed">
-                                        <DropdownSeparator />
-                                        <DropdownItem :text="__('Edit')" icon="edit" @click="editActiveOverflowedTab" />
-                                        <DropdownItem :text="__('Delete')" icon="trash" variant="destructive" @click="removeActiveOverflowedTab" />
-                                    </template>
-                                </DropdownMenu>
-                            </Dropdown>
-                        </div>
-                    </TabList>
+                            </DropdownMenu>
+                        </Dropdown>
+                    </div>
 
                     <Button icon="plus" size="sm" round v-tooltip="addTabText" @click="addAndEditTab" />
                 </div>
@@ -89,7 +89,7 @@
 </template>
 
 <script>
-import { Sortable, Plugins } from '@shopify/draggable';
+import { Sortable, Plugins, Draggable } from '@shopify/draggable';
 import { nanoid as uniqid } from 'nanoid';
 import { createTabsOverflowTracker } from '@/util/tabs-overflow.js';
 import BlueprintTab from './Tab.vue';
@@ -259,6 +259,11 @@ export default {
                 swapAnimation: { horizontal: true },
                 plugins: [Plugins.SwapAnimation],
                 distance: 10,
+                // Focusable adds tabindex to sortable wrappers, which puts non-tab
+                // focusables inside the tablist and fails aria-required-children.
+                exclude: {
+                    plugins: [Draggable.Plugins.Focusable],
+                },
             })
                 .on('sortable:stop', (e) => {
                     this.tabs.splice(e.newIndex, 0, this.tabs.splice(e.oldIndex, 1)[0]);

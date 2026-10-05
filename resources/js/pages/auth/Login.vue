@@ -97,24 +97,23 @@ onUnmounted(() => passkey.cancel());
                 class="flex flex-col gap-6"
             >
                 <Field :label="__('Email')" :error="errors?.email">
-                    <Input v-model="email" name="email" autofocus tabindex="1" :autocomplete="emailAutocomplete" />
+                    <Input v-model="email" name="email" autofocus :autocomplete="emailAutocomplete" />
                 </Field>
 
                 <Field :label="__('Password')" :error="errors?.password">
-                    <Input v-model="password" name="password" type="password" :autocomplete="passwordAutocomplete" tabindex="2" />
+                    <Input v-model="password" name="password" type="password" :autocomplete="passwordAutocomplete" />
                     <template #actions>
                         <Link
                             :href="forgotPasswordUrl"
                             class="text-ui-accent-text mb-1.5 text-sm hover:text-ui-accent-text/80"
-                            tabindex="6"
                             v-text="__('Forgot password?')"
                         />
                     </template>
                 </Field>
 
-                <Checkbox v-model="remember" name="remember" :label="__('Remember me')" tabindex="4" />
+                <Checkbox v-model="remember" name="remember" :label="__('Remember me')" />
 
-                <Button type="submit" variant="primary" :disabled="processing" :text="__('Continue')" tabindex="5" />
+                <Button type="submit" variant="primary" :disabled="processing" :text="__('Continue')" />
             </form>
 
             <template v-if="showOAuth || showPasskeyLogin">

@@ -1,13 +1,15 @@
 <template>
-    <TabTrigger :name="tab._id" class="blueprint-tab flex items-center">
-        <Icon
-            v-if="tab.icon"
-            :name="tab.icon"
-            :set="iconSet"
-            class="h-4 w-4 me-1"
-        />
+    <div class="blueprint-tab relative flex items-center">
+        <TabTrigger :name="tab._id" class="flex items-center">
+            <Icon
+                v-if="tab.icon"
+                :name="tab.icon"
+                :set="iconSet"
+                class="h-4 w-4 me-1"
+            />
 
-        <span class="block max-w-48 overflow-clip text-ellipsis whitespace-nowrap" v-tooltip="__(tab.display).length > 24 ? __(tab.display) : null">{{ __(tab.display) }}</span>
+            <span class="block max-w-48 overflow-clip text-ellipsis whitespace-nowrap" v-tooltip="__(tab.display).length > 24 ? __(tab.display) : null">{{ __(tab.display) }}</span>
+        </TabTrigger>
 
         <Dropdown v-if="isActive" placement="left-start" class="me-3">
             <template #trigger>
@@ -20,7 +22,7 @@
         </Dropdown>
 
         <Stack
-	        size="narrow"
+            size="narrow"
             :open="editing"
             @opened="() => $nextTick(() => $refs.title.select())"
             @update:open="editCancelled"
@@ -75,7 +77,7 @@
                 </div>
             </div>
         </Stack>
-    </TabTrigger>
+    </div>
 </template>
 
 <script>
