@@ -29,6 +29,14 @@ export function useKeyboardItemReorder({ index, total, onMove }) {
         });
     }
 
+    function scrollMovingItemIntoView() {
+        nextTick(() => {
+            const item = rootEl.value?.closest('[data-moving]');
+            item?.scrollIntoView({ block: 'center', inline: 'nearest' });
+            rootEl.value?.focus({ preventScroll: true });
+        });
+    }
+
     function onKeydown(event) {
         if (!moving.value) return;
 
@@ -108,7 +116,7 @@ export function useKeyboardItemReorder({ index, total, onMove }) {
         () => {
             if (!moving.value) return;
             announcePosition();
-            focusRoot();
+            scrollMovingItemIntoView();
         },
     );
 
