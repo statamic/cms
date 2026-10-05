@@ -2,6 +2,7 @@
 
 namespace Tests\Imaging;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Exceptions\InvalidRemoteUrlException;
 use Statamic\Imaging\RemoteUrlValidator;
@@ -87,6 +88,68 @@ class RemoteUrlValidatorTest extends TestCase
         $this->expectExceptionMessage('Destination IP is not publicly routable.');
 
         $this->validator()->resolve('http://169.254.169.254/latest/meta-data/');
+    }
+
+    #[Test]
+    #[DataProvider('nonPublicIpv6Provider')]
+    public function it_blocks_hosts_that_resolve_to_non_public_ipv6_addresses($ip)
+    {
+        $this->expectException(InvalidRemoteUrlException::class);
+        $this->expectExceptionMessage('Destination IP is not publicly routable.');
+
+        $this->validator(fn () => [['ipv6' => $ip]])->resolve('https://internal.test/foo.jpg');
+    }
+
+    public static function nonPublicIpv6Provider()
+    {
+        return [
+            'loopback' => ['::1'],
+            'unspecified' => ['::'],
+            'link-local' => ['fe80::1'],
+            'unique local' => ['fd00:ec2::254'],
+            'ipv4-mapped private' => ['::ffff:10.0.0.1'],
+            'ipv4-mapped loopback' => ['::ffff:127.0.0.1'],
+            'siit private' => ['::ffff:0:a00:1'],
+            'siit loopback' => ['::ffff:0:7f00:1'],
+            'nat64 10/8' => ['64:ff9b::a00:1'],
+            'nat64 172.16/12' => ['64:ff9b::ac10:1'],
+            'nat64 192.168/16' => ['64:ff9b::c0a8:1'],
+            'nat64 127/8' => ['64:ff9b::7f00:1'],
+            'nat64 169.254/16' => ['64:ff9b::a9fe:a9fe'],
+            'nat64 dotted private' => ['64:ff9b::10.0.0.1'],
+            'nat64 local-use' => ['64:ff9b:1::808:808'],
+            '6to4' => ['2002:808:808::1'],
+            'teredo' => ['2001:0:4136:e378:8000:63bf:3fff:fdd2'],
+            'ipv4-compatible private' => ['::a00:1'],
+            'ipv4-compatible public' => ['::808:808'],
+            'discard-only' => ['100::1'],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('publicIpv6Provider')]
+    public function it_allows_hosts_that_resolve_to_public_ipv6_addresses($ip)
+    {
+        $this->assertSame([$ip], $this->validator(fn () => [['ipv6' => $ip]])->resolve('https://example.com/foo.jpg')['ips']);
+    }
+
+    public static function publicIpv6Provider()
+    {
+        return [
+            'cloudflare' => ['2606:4700::1111'],
+            'google' => ['2001:4860:4860::8888'],
+            'ipv4-mapped public' => ['::ffff:8.8.8.8'],
+            'nat64 public' => ['64:ff9b::808:808'],
+        ];
+    }
+
+    #[Test]
+    public function it_blocks_ipv6_literal_hosts()
+    {
+        $this->expectException(InvalidRemoteUrlException::class);
+        $this->expectExceptionMessage('Invalid URL host.');
+
+        $this->validator()->resolve('http://[64:ff9b::a00:1]/foo.jpg');
     }
 
     #[Test]

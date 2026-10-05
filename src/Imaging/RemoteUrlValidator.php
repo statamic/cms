@@ -128,8 +128,11 @@ class RemoteUrlValidator
     {
         if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
             $packed = inet_pton($ip);
-            if ($packed !== false && substr($packed, 0, 12) === "\0\0\0\0\0\0\0\0\0\0\xff\xff") {
+
+            if ($this->ipv6MatchesAnyPrefix($packed, $this->embeddedIpv4Prefixes())) {
                 $ip = inet_ntop(substr($packed, 12));
+            } elseif ($this->ipv6MatchesAnyPrefix($packed, $this->blockedIpv6Prefixes())) {
+                throw new InvalidRemoteUrlException('Destination IP is not publicly routable.');
             }
         }
 
@@ -138,5 +141,39 @@ class RemoteUrlValidator
         if (! $result) {
             throw new InvalidRemoteUrlException('Destination IP is not publicly routable.');
         }
+    }
+
+    protected function embeddedIpv4Prefixes()
+    {
+        return [
+            '::ffff:0:0/96', // IPv4-mapped
+            '::ffff:0:0:0/96', // SIIT
+            '64:ff9b::/96', // NAT64 well-known prefix
+        ];
+    }
+
+    protected function blockedIpv6Prefixes()
+    {
+        return [
+            '::/96', // Deprecated IPv4-compatible, including :: and ::1
+            '64:ff9b:1::/48', // NAT64 local-use prefix
+            '100::/64', // Discard-only
+            '2001::/32', // Teredo
+            '2002::/16', // 6to4
+        ];
+    }
+
+    protected function ipv6MatchesAnyPrefix($packed, array $prefixes)
+    {
+        foreach ($prefixes as $prefix) {
+            [$network, $bits] = explode('/', $prefix);
+            $bytes = intdiv((int) $bits, 8);
+
+            if (substr($packed, 0, $bytes) === substr(inet_pton($network), 0, $bytes)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
