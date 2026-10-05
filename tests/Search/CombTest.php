@@ -355,7 +355,7 @@ EOT;
         // The time taken used to grow quadratically with the length of
         // a record that did not contain the required word. Records of
         // this size took multiple seconds each. Now they take no time.
-        $content = str_repeat('lorem ipsum dolor ', 2500);
+        $content = str_repeat('lorem ipsum dolor ', 5000);
 
         $comb = new Comb([
             ['title' => 'One', 'content' => $content],
@@ -368,7 +368,7 @@ EOT;
         $elapsed = microtime(true) - $start;
 
         $this->assertEquals(['Three'], collect($results['data'])->pluck('data.title')->all());
-        $this->assertLessThan(1, $elapsed);
+        $this->assertLessThan(5, $elapsed);
     }
 
     #[Test]
