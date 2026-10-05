@@ -106,7 +106,7 @@ class Svg extends Tags
         $this->setAllowedTags($sanitizer);
 
         return $sanitizer->sanitize($svg, [
-            'remove-xml-tags' => ! Str::startsWith($svg, '<?xml'),
+            'remove-xml-tags' => true,
         ]);
     }
 

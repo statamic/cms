@@ -2000,6 +2000,53 @@ class AssetTest extends TestCase
         ];
     }
 
+    #[Test]
+    #[DataProvider('xmlStylesheetSvgProvider')]
+    public function it_removes_xml_stylesheet_instructions_from_svgs_on_upload($svg)
+    {
+        Event::fake();
+
+        $asset = (new Asset)->container($this->container)->path('path/to/asset.svg')->syncOriginal();
+
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
+
+        $asset->upload(UploadedFile::fake()->createWithContent('asset.svg', $svg));
+
+        $this->assertStringNotContainsString('xml-stylesheet', $asset->contents());
+    }
+
+    #[Test]
+    #[DataProvider('xmlStylesheetSvgProvider')]
+    public function it_removes_xml_stylesheet_instructions_from_svgs_on_reupload($svg)
+    {
+        Event::fake();
+
+        $asset = (new Asset)->container($this->container)->path('path/to/asset.svg')->syncOriginal();
+
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
+
+        $asset->upload(UploadedFile::fake()->createWithContent('asset.svg', '<svg xmlns="http://www.w3.org/2000/svg"/>'));
+
+        Storage::fake('local')->put('path/to/replacement.svg', $svg);
+
+        $asset->reupload(new ReplacementFile('path/to/replacement.svg'));
+
+        $this->assertStringNotContainsString('xml-stylesheet', $asset->contents());
+    }
+
+    public static function xmlStylesheetSvgProvider()
+    {
+        // A processing instruction telling the browser to apply an inline xslt
+        // stylesheet, which would replace the image with arbitrary html.
+        $instruction = '<?xml-stylesheet type="text/xsl" href="data:text/xml;base64,PHhzbDpzdHlsZXNoZWV0Lz4="?>';
+
+        return [
+            'on its own' => [$instruction.'<svg xmlns="http://www.w3.org/2000/svg"/>'],
+            'after a declaration' => ['<?xml version="1.0"?>'.$instruction.'<svg xmlns="http://www.w3.org/2000/svg"/>'],
+            'on separate lines' => ['<?xml version="1.0"?>'."\n".$instruction."\n".'<svg xmlns="http://www.w3.org/2000/svg"/>'],
+        ];
+    }
+
     public static function nonGlideableFileExtensionsProvider()
     {
         return [
