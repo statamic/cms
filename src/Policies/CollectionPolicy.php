@@ -4,6 +4,7 @@ namespace Statamic\Policies;
 
 use Statamic\Facades\Collection;
 use Statamic\Facades\User;
+use Statamic\Sites\Site;
 
 class CollectionPolicy
 {
@@ -18,7 +19,7 @@ class CollectionPolicy
         }
     }
 
-    public function index($user)
+    public function index($user, ?Site $site = null)
     {
         $user = User::fromUser($user);
 
@@ -26,9 +27,10 @@ class CollectionPolicy
             return true;
         }
 
-        return ! Collection::all()->filter(function ($collection) use ($user) {
-            return $this->view($user, $collection);
-        })->isEmpty();
+        return Collection::all()
+            ->filter(fn ($collection) => $this->view($user, $collection))
+            ->filter(fn ($collection) => ! $site || $collection->sites()->contains($site->handle()))
+            ->isNotEmpty();
     }
 
     public function create($user)
