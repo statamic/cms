@@ -1328,6 +1328,12 @@ class EntryQueryBuilderTest extends TestCase
         EntryFactory::collection('alerts')->id('alerts-past')->published(true)->date(now()->subDay())->create();
         EntryFactory::collection('alerts')->id('alerts-past-draft')->published(false)->date(now()->subDay())->create();
 
+        Collection::make('promos')->dated(true)->futureDateBehavior('private')->pastDateBehavior('private')->save();
+        EntryFactory::collection('promos')->id('promo-future')->published(true)->date(now()->addDay())->create();
+        EntryFactory::collection('promos')->id('promo-future-draft')->published(false)->date(now()->addDay())->create();
+        EntryFactory::collection('promos')->id('promo-past')->published(true)->date(now()->subDay())->create();
+        EntryFactory::collection('promos')->id('promo-past-draft')->published(false)->date(now()->subDay())->create();
+
         // Undated, but with customized date behavior. Nonsensical situation, but it can happen.
         // See https://github.com/statamic/eloquent-driver/issues/288
         Collection::make('undated')->dated(false)->futureDateBehavior('private')->pastDateBehavior('private')->save();
@@ -1352,6 +1358,8 @@ class EntryQueryBuilderTest extends TestCase
                 'news-past-draft',
                 'alerts-future-draft',
                 'alerts-past-draft',
+                'promo-future-draft',
+                'promo-past-draft',
                 'undated-draft',
             ]],
             'published' => ['published', [
@@ -1368,9 +1376,11 @@ class EntryQueryBuilderTest extends TestCase
             ]],
             'scheduled' => ['scheduled', [
                 'blog-future',
+                'promo-future',
             ]],
             'expired' => ['expired', [
                 'event-past',
+                'promo-past',
             ]],
         ];
     }
