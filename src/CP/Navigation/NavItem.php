@@ -212,7 +212,7 @@ class NavItem
             $sanitizer = new DOMSanitizer(DOMSanitizer::SVG);
 
             return $sanitizer->sanitize($svg, [
-                'remove-xml-tags' => ! Str::startsWith($svg, '<?xml'),
+                'remove-xml-tags' => true,
             ]);
         } catch (\Throwable $e) {
             return '';

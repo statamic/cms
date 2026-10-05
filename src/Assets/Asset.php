@@ -952,7 +952,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
             $this->disk()->put(
                 $this->path(),
                 (new DOMSanitizer(DOMSanitizer::SVG))->sanitize($contents, [
-                    'remove-xml-tags' => ! Str::startsWith($contents, '<?xml'),
+                    'remove-xml-tags' => true,
                 ])
             );
         }

@@ -5,7 +5,6 @@ namespace Statamic\Assets;
 use Facades\Statamic\Imaging\ImageValidator;
 use Rhukster\DomSanitizer\DOMSanitizer;
 use Statamic\Facades\Glide;
-use Statamic\Support\Str;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 abstract class Uploader
@@ -60,8 +59,8 @@ abstract class Uploader
 
         if (config('statamic.assets.svg_sanitization_on_upload', true) && trim(strtolower(pathinfo($destinationPath, PATHINFO_EXTENSION))) === 'svg') {
             $sanitizer = new DOMSanitizer(DOMSanitizer::SVG);
-            $stream = $sanitizer->sanitize($svg = stream_get_contents($stream), [
-                'remove-xml-tags' => ! Str::startsWith($svg, '<?xml'),
+            $stream = $sanitizer->sanitize(stream_get_contents($stream), [
+                'remove-xml-tags' => true,
             ]);
         }
 
