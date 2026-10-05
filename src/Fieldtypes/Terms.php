@@ -19,6 +19,7 @@ use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
 use Statamic\Facades\User;
+use Statamic\GraphQL\Types\DynamicTermUnionType;
 use Statamic\GraphQL\Types\TermInterface;
 use Statamic\Http\Resources\CP\Taxonomies\TermsFieldtypeTerms as TermsResource;
 use Statamic\Query\OrderBy;
@@ -565,10 +566,31 @@ class Terms extends Relationship
 
     public function toGqlType()
     {
-        $type = GraphQL::type(TermInterface::NAME);
+        if (! config('statamic.graphql.improved_types.enabled', false)) {
+            $type = GraphQL::type(TermInterface::NAME);
+
+            if ($this->config('max_items') !== 1) {
+                $type = GraphQL::listOf($type);
+            }
+
+            return $type;
+        }
+
+        // If the fieldtype isn't constrained to specific taxonomies, return the generic TermInterface.
+        if (empty($this->field()->config()['taxonomies'])) {
+            $type = GraphQL::type(TermInterface::NAME);
+
+            if ($this->config('max_items') !== 1) {
+                $type = GraphQL::listOf(GraphQL::nonNull($type));
+            }
+
+            return $type;
+        }
+
+        $type = DynamicTermUnionType::createTypeFor($this->getConfiguredTaxonomies());
 
         if ($this->config('max_items') !== 1) {
-            $type = GraphQL::listOf($type);
+            $type = GraphQL::listOf(GraphQL::nonNull($type));
         }
 
         return $type;

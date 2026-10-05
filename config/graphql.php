@@ -29,6 +29,33 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Improved Types
+    |--------------------------------------------------------------------------
+    |
+    | When enabled, fields like entries and terms can return dynamically
+    | generated union types when multiple blueprints are possible. Also will
+    | use non-nullable types for entries and terms.
+    |
+    | You may also register per-collection and per-taxonomy queries that
+    | return typed results. List collection or taxonomy handles under
+    | "collections" and "terms", or use "*" to enable all.
+    |
+    */
+
+    'improved_types' => [
+        'enabled' => env('STATAMIC_GRAPHQL_IMPROVED_TYPES', true),
+        'collections' => [
+            // 'blog_posts',
+            // '*',
+        ],
+        'terms' => [
+            // 'tags',
+            // '*',
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Authentication
     |--------------------------------------------------------------------------
     |
