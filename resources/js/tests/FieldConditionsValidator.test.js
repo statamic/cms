@@ -179,7 +179,7 @@ test('it compares conditions without eval, so a content security policy can omit
     }
 });
 
-test('it compares a number value with a condition value as eval did', () => {
+test('it loosely compares a number value with a string condition value', () => {
     setValues({ age: 13 });
 
     // The condition value arrives as a string, and a loose comparison still matches the number.
@@ -201,7 +201,7 @@ test('it compares a field with no value as null', () => {
 
 test('it compares an undefined operand without throwing', () => {
     // String operands reach passesCondition() JSON-encoded, but an undefined lhs does not, and
-    // decoding it as JSON would throw where eval() returned a result.
+    // decoding it as JSON would throw.
     const validator = new Validator({}, {});
 
     expect(validator.passesCondition({ lhs: undefined, operator: '==', rhs: JSON.stringify('Jesse') })).toBe(false);

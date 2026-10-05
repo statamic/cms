@@ -19,7 +19,6 @@ const isEmpty = (value) => {
 
 const isString = (str) => str != null && typeof str.valueOf() === 'string';
 
-// The comparisons `passesCondition()` used to hand to `eval()`.
 const COMPARISONS = {
     '==': (lhs, rhs) => lhs == rhs,
     '!=': (lhs, rhs) => lhs != rhs,
@@ -31,9 +30,8 @@ const COMPARISONS = {
     '<=': (lhs, rhs) => lhs <= rhs,
 };
 
-// prepareLhs() and prepareRhs() JSON-encode string operands. Decode them back to the values
-// eval() would have read, and leave everything else as is: an undefined lhs, for one, is not
-// valid JSON, and eval() simply compared it.
+// prepareLhs() and prepareRhs() JSON-encode string operands, so decode them before comparing.
+// Non-string operands, like an undefined lhs, aren't valid JSON and are compared as is.
 const decodeOperand = (operand) => (isString(operand) ? JSON.parse(operand) : operand);
 
 export default class {
