@@ -2,8 +2,13 @@
 
 namespace Statamic\Fields;
 
+use Illuminate\Contracts\Validation\CompilableRules;
+use Illuminate\Contracts\Validation\InvokableRule;
+use Illuminate\Contracts\Validation\Rule;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Validator as LaravelValidator;
+use InvalidArgumentException;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
@@ -157,7 +162,39 @@ class Validator
 
         [$class, $arguments] = (new ClassRuleParser)->parse($rule);
 
+        $class = ltrim(trim($class), '\\');
+
+        if (! $this->isValidationRuleClass($class)) {
+            throw new InvalidArgumentException("[{$class}] is not a valid validation rule class.");
+        }
+
         return new $class(...$arguments);
+    }
+
+    private function isValidationRuleClass(string $class): bool
+    {
+        if (! preg_match('/^[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*(\\\\[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*)*$/', $class)) {
+            return false;
+        }
+
+        if (! class_exists($class)) {
+            return false;
+        }
+
+        $contracts = [
+            Rule::class,
+            ValidationRule::class,
+            InvokableRule::class,
+            CompilableRules::class,
+        ];
+
+        foreach ($contracts as $contract) {
+            if (is_subclass_of($class, $contract)) {
+                return true;
+            }
+        }
+
+        return Str::startsWith($class, 'Illuminate\\Validation\\Rules\\');
     }
 
     private function parseStringBasedRule($rule)
