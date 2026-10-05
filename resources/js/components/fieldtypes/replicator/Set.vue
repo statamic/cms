@@ -19,6 +19,7 @@ import FieldAction from '@/components/field-actions/FieldAction.js';
 import toFieldActions from '@/components/field-actions/toFieldActions.js';
 import { reveal } from '@api';
 import { useKeyboardItemReorder } from '@/composables/keyboard-item-reorder.js';
+import KeyboardReorderIndicator from '@/components/sortable/KeyboardReorderIndicator.vue';
 
 const emit = defineEmits(['collapsed', 'expanded', 'duplicated', 'removed', 'moved']);
 
@@ -160,19 +161,7 @@ reveal.use(rootEl, () => emit('expanded'));
             :data-readonly="readOnly ?? undefined"
             :data-type="config.handle"
         >
-            <Badge
-                v-if="moving"
-                size="sm"
-                color="blue"
-                pill
-                class="pointer-events-none absolute start-full top-1/2 ms-2 -translate-y-1/2 gap-0! px-1! py-0.5! [&_svg]:size-2! [&_svg]:opacity-100!"
-                aria-hidden="true"
-            >
-                <span class="flex flex-col items-center -space-y-px">
-                    <Icon name="chevron-up" />
-                    <Icon name="chevron-down" />
-                </span>
-            </Badge>
+            <KeyboardReorderIndicator :moving="moving" />
             <header
                 class="group/header animate-border-color flex items-center show-focus-within rounded-[calc(var(--radius-lg)-1px)] px-1.5 antialiased duration-200 bg-gray-100/50 dark:bg-gray-925 hover:bg-gray-100 dark:hover:bg-gray-950/45 border-gray-300 dark:shadow-md"
                 :class="{

@@ -31,19 +31,7 @@
                 :tabindex="moving ? 0 : -1"
                 :aria-label="__('Use up and down arrows to reorder. Press Enter or Escape when finished.')"
             />
-            <Badge
-                v-if="moving"
-                size="sm"
-                color="blue"
-                pill
-                class="pointer-events-none absolute start-full top-1/2 ms-2 -translate-y-1/2 gap-0! px-1! py-0.5! [&_svg]:size-2! [&_svg]:opacity-100!"
-                aria-hidden="true"
-            >
-                <span class="flex flex-col items-center -space-y-px">
-                    <Icon name="chevron-up" />
-                    <Icon name="chevron-down" />
-                </span>
-            </Badge>
+            <KeyboardReorderIndicator :moving="moving" />
             <Dropdown placement="left-start">
                 <DropdownMenu>
                     <DropdownItem
@@ -68,11 +56,12 @@
 
 <script>
 import GridCell from './Cell.vue';
-import { Badge, Dropdown, DropdownMenu, DropdownItem, Icon, PublishFieldsProvider as FieldsProvider } from '@ui';
+import { Dropdown, DropdownMenu, DropdownItem, PublishFieldsProvider as FieldsProvider } from '@ui';
 import { useKeyboardItemReorder } from '@/composables/keyboard-item-reorder.js';
+import KeyboardReorderIndicator from '@/components/sortable/KeyboardReorderIndicator.vue';
 
 export default {
-    components: { Badge, Dropdown, DropdownMenu, DropdownItem, Icon, FieldsProvider, GridCell },
+    components: { Dropdown, DropdownMenu, DropdownItem, FieldsProvider, GridCell, KeyboardReorderIndicator },
 
     props: {
         index: {
