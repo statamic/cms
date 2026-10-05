@@ -8,11 +8,13 @@ use Illuminate\Support\Facades\URL as LaravelURL;
 use Illuminate\Support\Traits\Localizable;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
+use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Facades\User;
 use Statamic\Rules\EmailWithoutPathCharacters;
 use Statamic\Rules\UniqueUserValue;
+use Statamic\Statamic;
 
 class UserRegisterRequest extends FormRequest
 {
@@ -23,6 +25,8 @@ class UserRegisterRequest extends FormRequest
 
     public function authorize(): bool
     {
+        throw_unless(Statamic::pro(), new NotFoundHttpException);
+
         return true;
     }
 

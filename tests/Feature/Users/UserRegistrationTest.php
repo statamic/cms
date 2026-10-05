@@ -71,4 +71,40 @@ class UserRegistrationTest extends TestCase
 
         $this->assertSame($contents, file_get_contents($victim->path()));
     }
+
+    #[Test]
+    public function it_returns_a_404_and_creates_no_user_when_pro_is_disabled()
+    {
+        config(['statamic.editions.pro' => false]);
+
+        $this
+            ->post(route('statamic.register'), ['email' => 'foo@bar.com', 'password' => 'password', 'password_confirmation' => 'password'])
+            ->assertNotFound();
+
+        $this->assertCount(0, User::all());
+        $this->assertGuest();
+    }
+
+    #[Test]
+    public function it_returns_a_404_rather_than_validation_errors_when_pro_is_disabled()
+    {
+        config(['statamic.editions.pro' => false]);
+
+        $this->post(route('statamic.register'), ['email' => 'not-an-email'])->assertNotFound();
+        $this->postJson(route('statamic.register'), [])->assertNotFound();
+
+        $this->assertCount(0, User::all());
+    }
+
+    #[Test]
+    public function it_registers_a_user_when_pro_is_enabled()
+    {
+        config(['statamic.editions.pro' => true]);
+
+        $this
+            ->post(route('statamic.register'), ['email' => 'foo@bar.com', 'password' => 'password', 'password_confirmation' => 'password'])
+            ->assertRedirect();
+
+        $this->assertCount(1, User::all());
+    }
 }

@@ -35,6 +35,8 @@ class OAuthCallbackTest extends TestCase
         $provider->shouldReceive('getSocialiteUser')->andReturn($socialiteUser);
 
         OAuth::partialMock()->shouldReceive('provider')->with($name)->andReturn($provider);
+
+        return $provider;
     }
 
     #[Test]
@@ -93,6 +95,51 @@ class OAuthCallbackTest extends TestCase
 
         $this->assertAuthenticatedAs($admin->fresh());
         $this->assertCount(1, UserFacade::all());
+    }
+
+    #[Test]
+    public function a_new_user_is_not_created_when_pro_is_disabled()
+    {
+        config(['statamic.editions.pro' => false]);
+        config(['statamic.oauth.create_user' => true]);
+
+        $provider = $this->fakeProvider('google');
+        $provider->shouldNotReceive('createUser');
+
+        $this->get('/oauth/google/callback')->assertRedirect('/');
+
+        $this->assertGuest();
+        $this->assertCount(0, UserFacade::all());
+    }
+
+    #[Test]
+    public function an_existing_user_can_still_log_in_when_pro_is_disabled()
+    {
+        config(['statamic.oauth.create_user' => true]);
+
+        $provider = $this->fakeProvider('evil');
+        $user = $provider->createUser(new FakeSocialiteUser);
+
+        config(['statamic.editions.pro' => false]);
+
+        $this->get('/oauth/evil/callback');
+
+        $this->assertAuthenticatedAs($user->fresh());
+        $this->assertCount(1, UserFacade::all());
+    }
+
+    #[Test]
+    public function a_new_user_is_created_when_pro_is_enabled()
+    {
+        config(['statamic.editions.pro' => true]);
+        config(['statamic.oauth.create_user' => true]);
+
+        $this->fakeProvider('google');
+
+        $this->get('/oauth/google/callback');
+
+        $this->assertCount(1, UserFacade::all());
+        $this->assertAuthenticatedAs(UserFacade::all()->first()->fresh());
     }
 }
 
