@@ -46,7 +46,7 @@
         "doctrine/dbal": "^3.6",
         "fakerphp/faker": "~1.10",
         "google/cloud-translate": "^1.6",
-        "larastan/larastan": "^3.10",
+        "larastan/larastan": "^3.12.3",
         "laravel/pao": "^1.1",
         "laravel/pint": "1.16.0",
         "laravel/socialite": "^5.28",
