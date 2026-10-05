@@ -18,8 +18,9 @@ import PreviewHtml from '@/components/fieldtypes/replicator/PreviewHtml.js';
 import FieldAction from '@/components/field-actions/FieldAction.js';
 import toFieldActions from '@/components/field-actions/toFieldActions.js';
 import { reveal } from '@api';
+import { useKeyboardItemReorder } from '@/composables/keyboard-item-reorder.js';
 
-const emit = defineEmits(['collapsed', 'expanded', 'duplicated', 'removed']);
+const emit = defineEmits(['collapsed', 'expanded', 'duplicated', 'removed', 'moved']);
 
 const replicatorSets = inject('replicatorSets');
 
@@ -37,6 +38,8 @@ const props = defineProps({
     enabled: Boolean,
     hasError: Boolean,
     canAddSet: Boolean,
+    canReorder: Boolean,
+    totalSets: Number,
     showFieldPreviews: Boolean,
 });
 
@@ -120,19 +123,36 @@ function destroy() {
     emit('removed');
 }
 
+const {
+    moving,
+    rootEl: reorderFocusEl,
+    status: reorderStatus,
+    startMoving,
+} = useKeyboardItemReorder({
+    index: () => props.index,
+    total: () => props.totalSets,
+    onMove: (from, to) => emit('moved', from, to),
+});
+
 const rootEl = ref();
 reveal.use(rootEl, () => emit('expanded'));
 </script>
 
 <template>
-    <div ref="rootEl" :class="sortableItemClass">
+    <div
+        :class="sortableItemClass"
+        :data-moving="moving || undefined"
+        :aria-grabbed="moving ? 'true' : undefined"
+    >
         <slot name="picker" />
         <div
+            ref="rootEl"
             layout
             data-replicator-set
             class="relative w-full rounded-lg border border-gray-300 text-base dark:border-white/10 bg-white dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black shadow-ui-sm dark:[&_[data-ui-switch]]:border-gray-600 dark:[&_[data-ui-switch]]:border-1"
             :class="{
-                'border-red-500': hasError
+                'border-red-500': hasError,
+                'outline outline-2 outline-offset-2 outline-blue-400': moving,
             }"
             :data-collapsed="collapsed ?? undefined"
             :data-error="hasError ?? undefined"
@@ -173,6 +193,13 @@ reveal.use(rootEl, () => emit('expanded'));
                     />
                 </button>
                 <div class="flex items-center gap-2" v-if="!readOnly">
+                    <button
+                        ref="reorderFocusEl"
+                        type="button"
+                        class="sr-only"
+                        :tabindex="moving ? 0 : -1"
+                        :aria-label="__('Use up and down arrows to reorder. Press Enter or Escape when finished.')"
+                    />
                     <Switch size="xs" :model-value="enabled" @update:model-value="toggleEnabledState" v-tooltip="enabled ? __('Included in output') : __('Hidden from output')" />
                     <Dropdown>
                         <template #trigger>
@@ -191,6 +218,12 @@ reveal.use(rootEl, () => emit('expanded'));
                                 :text="__(collapsed ? __('Expand Set') : __('Collapse Set'))"
                                 @click="toggleCollapsedState"
                             />
+                            <DropdownItem
+                                v-if="canReorder"
+                                :text="__('Move')"
+                                icon="handles"
+                                @click="startMoving"
+                            />
                             <DropdownItem v-if="canAddSet" :text="__('Duplicate Set')" @click="emit('duplicated')" />
                             <DropdownItem
                                 :text="__('Delete Set')"
@@ -199,6 +232,7 @@ reveal.use(rootEl, () => emit('expanded'));
                             />
                         </DropdownMenu>
                     </Dropdown>
+                    <div class="sr-only" aria-live="assertive">{{ reorderStatus }}</div>
                 </div>
             </header>
 

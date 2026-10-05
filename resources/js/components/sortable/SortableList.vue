@@ -1,15 +1,6 @@
 <script>
 import { Sortable, Plugins, Draggable } from '@shopify/draggable';
-
-function move(items, oldIndex, newIndex) {
-    const itemRemovedArray = [...items.slice(0, oldIndex), ...items.slice(oldIndex + 1, items.length)];
-
-    return [
-        ...itemRemovedArray.slice(0, newIndex),
-        items[oldIndex],
-        ...itemRemovedArray.slice(newIndex, itemRemovedArray.length),
-    ];
-}
+import arrayMove from './arrayMove.js';
 
 export default {
     emits: ['dragstart', 'dragend', 'update:model-value'],
@@ -133,7 +124,7 @@ export default {
             this.sortable.on('drag:stop', () => this.$emit('dragend'));
 
             this.sortable.on('sortable:stop', ({ oldIndex, newIndex }) => {
-                this.$emit('update:model-value', move(this.modelValue, oldIndex, newIndex));
+                this.$emit('update:model-value', arrayMove(this.modelValue, oldIndex, newIndex));
             });
 
             if (this.mirror === false) {

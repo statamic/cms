@@ -31,12 +31,14 @@
                     :meta-path-prefix="metaPathPrefix"
                     :can-delete="canDeleteRows"
                     :can-add-rows="canAddRows"
+                    :total-rows="rows.length"
                     :has-error="rowHasError(row._id)"
                     :read-only
                     @updated="(row, value) => $emit('updated', row, value)"
                     @meta-updated="$emit('meta-updated', row._id, $event)"
                     @duplicate="(row) => $emit('duplicate', row)"
                     @removed="(row) => $emit('removed', row)"
+                    @moved="(from, to) => $emit('moved', from, to)"
                     @focus="$emit('focus')"
                     @blur="$emit('blur')"
                 />

@@ -1,5 +1,16 @@
 <template>
-    <tr :class="[sortableItemClass, { 'opacity-50': isExcessive, 'inset-ring-1 inset-ring-red': hasError }]">
+    <tr
+        :class="[
+            sortableItemClass,
+            {
+                'opacity-50': isExcessive,
+                'inset-ring-1 inset-ring-red': hasError,
+                'outline outline-2 outline-offset-[-2px] outline-blue-400': moving,
+            },
+        ]"
+        :data-moving="moving || undefined"
+        :aria-grabbed="moving ? 'true' : undefined"
+    >
         <td v-if="grid.isReorderable" class="drag-handle" :class="sortableHandleClass"></td>
 
         <FieldsProvider
@@ -12,13 +23,27 @@
             <grid-cell v-for="(field, i) in fields" :key="field.handle" :field="field" />
         </FieldsProvider>
 
-        <td class="grid-row-controls row-controls" v-if="!grid.isReadOnly && (canAddRows || canDelete)">
-            <Dropdown v-if="canAddRows || canDelete" placement="left-start">
+        <td class="grid-row-controls row-controls" v-if="showRowControls">
+            <button
+                ref="rootEl"
+                type="button"
+                class="sr-only"
+                :tabindex="moving ? 0 : -1"
+                :aria-label="__('Use up and down arrows to reorder. Press Enter or Escape when finished.')"
+            />
+            <Dropdown placement="left-start">
                 <DropdownMenu>
+                    <DropdownItem
+                        v-if="grid.isReorderable"
+                        :text="__('Move')"
+                        icon="handles"
+                        @click="startMoving"
+                    />
                     <DropdownItem v-if="canAddRows" :text="__('Duplicate Row')" icon="duplicate" @click="$emit('duplicate', index)" />
                     <DropdownItem v-if="canDelete" :text="__('Delete Row')" icon="trash" variant="destructive" @click="$emit('removed', index, fields)" />
                 </DropdownMenu>
             </Dropdown>
+            <div class="sr-only" aria-live="assertive">{{ status }}</div>
         </td>
     </tr>
 </template>
@@ -32,6 +57,7 @@
 <script>
 import GridCell from './Cell.vue';
 import { Dropdown, DropdownMenu, DropdownItem, PublishFieldsProvider as FieldsProvider } from '@ui';
+import { useKeyboardItemReorder } from '@/composables/keyboard-item-reorder.js';
 
 export default {
     components: { Dropdown, DropdownMenu, DropdownItem, FieldsProvider, GridCell },
@@ -71,6 +97,10 @@ export default {
             type: Boolean,
             default: true,
         },
+        totalRows: {
+            type: Number,
+            required: true,
+        },
         hasError: {
             type: Boolean,
             default: false,
@@ -81,6 +111,14 @@ export default {
     },
 
     inject: ['grid', 'sortableItemClass', 'sortableHandleClass'],
+
+    setup(props, { emit }) {
+        return useKeyboardItemReorder({
+            index: () => props.index,
+            total: () => props.totalRows,
+            onMove: (from, to) => emit('moved', from, to),
+        });
+    },
 
     data() {
         return {
@@ -93,6 +131,10 @@ export default {
             const max = this.grid.config.max_rows;
             if (!max) return false;
             return this.index >= max;
+        },
+
+        showRowControls() {
+            return !this.grid.isReadOnly && (this.canAddRows || this.canDelete || this.grid.isReorderable);
         },
     },
 
