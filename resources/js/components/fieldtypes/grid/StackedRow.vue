@@ -15,7 +15,10 @@
     >
         <KeyboardReorderIndicator :moving="moving" />
         <header class="bg-gray-50 dark:bg-gray-900 rounded-t-xl border-b border-gray-300 dark:border-gray-700 ps-4 pe-2 py-1.5 flex items-center justify-between">
-            <ui-drag-handle :class="{ [sortableHandleClass]: grid.isReorderable }" />
+            <ui-drag-handle
+                :class="{ [sortableHandleClass]: grid.isReorderable }"
+                @keyboard-reorder="startMoving"
+            />
             <div v-if="showRowControls" class="flex flex-1 items-center justify-end">
                 <button
                     ref="rootEl"

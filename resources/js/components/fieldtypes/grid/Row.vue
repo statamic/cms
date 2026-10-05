@@ -11,7 +11,16 @@
         :data-moving="moving || undefined"
         :aria-grabbed="moving ? 'true' : undefined"
     >
-        <td v-if="grid.isReorderable" class="drag-handle" :class="sortableHandleClass"></td>
+        <td
+            v-if="grid.isReorderable"
+            class="drag-handle"
+            :class="sortableHandleClass"
+            tabindex="0"
+            role="button"
+            :aria-label="__('Drag to reorder, or press Space to move with arrow keys')"
+            @keydown.space.prevent="startMoving"
+            @keydown.enter.prevent="startMoving"
+        ></td>
 
         <FieldsProvider
             :fields="fields"

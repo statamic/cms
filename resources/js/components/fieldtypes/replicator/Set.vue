@@ -10,6 +10,7 @@ import {
     DropdownSeparator,
     Button,
     DropdownMenu,
+    DragHandle,
     PublishFields as Fields,
     PublishFieldsProvider as FieldsProvider,
     injectPublishContext as injectContainerContext,
@@ -168,11 +169,11 @@ reveal.use(rootEl, () => emit('expanded'));
                     'bg-gray-200/50 dark:bg-gray-950/35 rounded-b-none': !collapsed && hasFields
                 }"
             >
-                <Icon
-                    name="handles"
-                    :class="sortableHandleClass"
-                    class="size-4 cursor-grab text-gray-400"
+                <DragHandle
                     v-if="!readOnly"
+                    :class="sortableHandleClass"
+                    class="size-4 shrink-0"
+                    @keyboard-reorder="startMoving"
                 />
                 <button type="button" class="show-focus-within_target flex flex-1 min-w-0 cursor-pointer items-center gap-4 overflow-x-auto p-2 py-1.75 pe-4 focus:outline-none st-mask-horizontal-overflow" @click="toggleCollapsedState">
                     <Badge size="lg" pill color="white" class="px-3">
