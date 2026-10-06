@@ -1,14 +1,15 @@
 import { computed, nextTick, onBeforeUnmount, ref, toValue, watch } from 'vue';
 
 /**
- * Menu-initiated keyboard reordering: select "Move", then ArrowUp/ArrowDown to
- * reorder, Enter/Escape to finish.
+ * Keyboard reordering: activate from the drag handle or Move menu, then
+ * ArrowUp/ArrowDown to reorder, Enter/Escape to finish.
  *
  * Keys are handled on window (capture) so this still works if the dropdown steals
  * focus back to its trigger after closing.
  */
 export function useKeyboardItemReorder({ index, total, onMove }) {
     const moving = ref(false);
+    const moveOrigin = ref('end');
     const rootEl = ref(null);
     const status = ref('');
     let startTimer = null;
@@ -82,8 +83,10 @@ export function useKeyboardItemReorder({ index, total, onMove }) {
         window.removeEventListener('pointerdown', onPointerDown, true);
     }
 
-    function startMoving() {
+    function startMoving(origin = 'end') {
         clearTimeout(startTimer);
+        // Ignore non-string args (e.g. click/keyboard events bound directly).
+        moveOrigin.value = origin === 'start' ? 'start' : 'end';
 
         // Wait for the dropdown to finish closing / restoring focus, otherwise
         // our focus and the first keypress get eaten by the menu teardown.
@@ -101,13 +104,18 @@ export function useKeyboardItemReorder({ index, total, onMove }) {
 
         if (!moving.value) return;
 
-        const trigger = rootEl.value?.parentElement?.querySelector('[data-ui-dropdown-trigger]');
+        const item = rootEl.value?.closest('[data-moving]');
+        const focusTarget =
+            moveOrigin.value === 'start'
+                ? item?.querySelector('[data-drag-handle]')
+                : rootEl.value?.parentElement?.querySelector('[data-ui-dropdown-trigger]');
+
         moving.value = false;
         status.value = '';
         unbindListeners();
 
         if (restoreFocus) {
-            nextTick(() => trigger?.focus({ preventScroll: true }));
+            nextTick(() => focusTarget?.focus({ preventScroll: true }));
         }
     }
 
@@ -127,6 +135,7 @@ export function useKeyboardItemReorder({ index, total, onMove }) {
 
     return {
         moving,
+        moveOrigin,
         rootEl,
         status,
         canMoveUp,

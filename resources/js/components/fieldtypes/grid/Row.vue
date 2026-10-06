@@ -10,8 +10,9 @@
         :data-moving="moving || undefined"
         :aria-grabbed="moving ? 'true' : undefined"
     >
-        <td v-if="grid.isReorderable" class="drag-handle">
-            <DragHandle :class="sortableHandleClass" @keyboard-reorder="startMoving" />
+        <td v-if="grid.isReorderable" class="drag-handle relative">
+            <DragHandle :class="sortableHandleClass" @keyboard-reorder="startMovingFromHandle" />
+            <KeyboardReorderIndicator :moving="moving && moveOrigin === 'start'" side="start" />
         </td>
 
         <FieldsProvider
@@ -32,13 +33,13 @@
                 :tabindex="moving ? 0 : -1"
                 :aria-label="__('Use up and down arrows to reorder. Press Enter or Escape when finished.')"
             />
-            <KeyboardReorderIndicator :moving="moving" />
+            <KeyboardReorderIndicator :moving="moving && moveOrigin === 'end'" side="end" />
             <Dropdown placement="left-start">
                 <DropdownMenu>
                     <DropdownItem
                         v-if="grid.isReorderable"
                         :text="__('Move')"
-                        @click="startMoving"
+                        @click="startMovingFromMenu"
                     />
                     <DropdownItem v-if="canAddRows" :text="__('Duplicate Row')" icon="duplicate" @click="$emit('duplicate', index)" />
                     <DropdownItem v-if="canDelete" :text="__('Delete Row')" icon="trash" variant="destructive" @click="$emit('removed', index, fields)" />
@@ -141,6 +142,14 @@ export default {
     },
 
     methods: {
+        startMovingFromHandle() {
+            this.startMoving('start');
+        },
+
+        startMovingFromMenu() {
+            this.startMoving('end');
+        },
+
         updated(handle, value) {
             this.$emit('updated', this.index, { ...this.values, [handle]: value });
         },

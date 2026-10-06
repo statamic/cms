@@ -127,6 +127,7 @@ function destroy() {
 
 const {
     moving,
+    moveOrigin,
     rootEl: reorderFocusEl,
     status: reorderStatus,
     startMoving,
@@ -135,6 +136,14 @@ const {
     total: () => props.totalSets,
     onMove: (from, to) => emit('moved', from, to),
 });
+
+function startMovingFromHandle() {
+    startMoving('start');
+}
+
+function startMovingFromMenu() {
+    startMoving('end');
+}
 
 const rootEl = ref();
 reveal.use(rootEl, () => emit('expanded'));
@@ -162,7 +171,7 @@ reveal.use(rootEl, () => emit('expanded'));
             :data-readonly="readOnly ?? undefined"
             :data-type="config.handle"
         >
-            <KeyboardReorderIndicator :moving="moving" />
+            <KeyboardReorderIndicator :moving="moving" :side="moveOrigin" />
             <header
                 class="group/header animate-border-color flex items-center show-focus-within rounded-[calc(var(--radius-lg)-1px)] px-1.5 antialiased duration-200 bg-gray-100/50 dark:bg-gray-925 hover:bg-gray-100 dark:hover:bg-gray-950/45 border-gray-300 dark:shadow-md"
                 :class="{
@@ -173,7 +182,7 @@ reveal.use(rootEl, () => emit('expanded'));
                     v-if="!readOnly"
                     :class="sortableHandleClass"
                     class="shrink-0"
-                    @keyboard-reorder="startMoving"
+                    @keyboard-reorder="startMovingFromHandle"
                 />
                 <button type="button" class="show-focus-within_target flex flex-1 min-w-0 cursor-pointer items-center gap-4 overflow-x-auto p-2 py-1.75 pe-4 focus:outline-none st-mask-horizontal-overflow" @click="toggleCollapsedState">
                     <Badge size="lg" pill color="white" class="px-3">
@@ -224,7 +233,7 @@ reveal.use(rootEl, () => emit('expanded'));
                             <DropdownItem
                                 v-if="canReorder"
                                 :text="__('Move')"
-                                @click="startMoving"
+                                @click="startMovingFromMenu"
                             />
                             <DropdownItem v-if="canAddSet" :text="__('Duplicate Set')" @click="emit('duplicated')" />
                             <DropdownItem

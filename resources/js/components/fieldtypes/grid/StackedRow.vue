@@ -13,11 +13,11 @@
         :data-moving="moving || undefined"
         :aria-grabbed="moving ? 'true' : undefined"
     >
-        <KeyboardReorderIndicator :moving="moving" />
+        <KeyboardReorderIndicator :moving="moving" :side="moveOrigin" />
         <header class="bg-gray-50 dark:bg-gray-900 rounded-t-xl border-b border-gray-300 dark:border-gray-700 ps-4 pe-2 py-1.5 flex items-center justify-between">
             <ui-drag-handle
                 :class="{ [sortableHandleClass]: grid.isReorderable }"
-                @keyboard-reorder="startMoving"
+                @keyboard-reorder="startMovingFromHandle"
             />
             <div v-if="showRowControls" class="flex flex-1 items-center justify-end">
                 <button
@@ -32,7 +32,7 @@
                         <DropdownItem
                             v-if="grid.isReorderable"
                             :text="__('Move')"
-                            @click="startMoving"
+                            @click="startMovingFromMenu"
                         />
                         <DropdownItem v-if="canAddRows" :text="__('Duplicate Row')" icon="duplicate" @click="$emit('duplicate', index)" />
                         <DropdownItem v-if="canDelete" :text="__('Delete Row')" icon="trash" variant="destructive" @click="$emit('removed', index)" />

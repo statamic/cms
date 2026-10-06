@@ -1,7 +1,8 @@
 <template>
     <span
         v-if="moving"
-        class="pointer-events-none absolute start-full top-3 ms-2 flex items-center gap-0.5"
+        class="pointer-events-none absolute top-3 flex items-center gap-0.5"
+        :class="side === 'start' ? 'end-full me-2' : 'start-full ms-2'"
         aria-hidden="true"
     >
         <kbd :class="keyClasses">↑</kbd>
@@ -15,6 +16,12 @@ export default {
         moving: {
             type: Boolean,
             default: false,
+        },
+        /** `start` = outside the left (handle) side; `end` = outside the right (menu) side */
+        side: {
+            type: String,
+            default: 'end',
+            validator: (value) => ['start', 'end'].includes(value),
         },
     },
 
