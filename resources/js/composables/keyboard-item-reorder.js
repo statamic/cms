@@ -16,6 +16,8 @@ export function useKeyboardItemReorder({ index, total, onMove }) {
     const rootEl = ref(null);
     const status = ref('');
     let startTimer = null;
+    let ignoreOutsideTimer = null;
+    let ignoreOutside = false;
 
     const session = {
         stopMoving: () => stopMoving(),
@@ -110,6 +112,8 @@ export function useKeyboardItemReorder({ index, total, onMove }) {
 
     function onPointerDown(event) {
         if (!moving.value) return;
+        // Dropdown/menu teardown can pointerdown outside right as we start — ignore briefly.
+        if (ignoreOutside) return;
         // rootEl is only the focus sentinel — treat the whole moving item as inside.
         if (event.target.closest?.('[data-moving]')) return;
         stopMoving();
@@ -123,6 +127,10 @@ export function useKeyboardItemReorder({ index, total, onMove }) {
             focusRoot();
             return;
         }
+
+        // Menu close can bounce focus through <body> after Move is chosen; don't
+        // cancel the session we just started from that menu.
+        if (ignoreOutside) return;
 
         // Focus left the item (e.g. Shift+Tab into a field) — end move mode.
         if (!event.target?.closest?.('[data-moving]')) {
@@ -142,6 +150,16 @@ export function useKeyboardItemReorder({ index, total, onMove }) {
         window.removeEventListener('focusin', onFocusIn, true);
     }
 
+    function beginIgnoringOutside() {
+        ignoreOutside = true;
+        clearTimeout(ignoreOutsideTimer);
+        // Long enough for portaled dropdown focus/pointer teardown after "Move".
+        ignoreOutsideTimer = setTimeout(() => {
+            ignoreOutside = false;
+            ignoreOutsideTimer = null;
+        }, 200);
+    }
+
     function startMoving(origin = 'end') {
         clearTimeout(startTimer);
         // Ignore non-string args (e.g. click/keyboard events bound directly).
@@ -159,6 +177,7 @@ export function useKeyboardItemReorder({ index, total, onMove }) {
 
             moving.value = true;
             status.value = __('messages.keyboard_item_reorder_instructions');
+            beginIgnoringOutside();
             bindListeners();
             focusRoot();
             // Catch late focus restoration from the menu after our first focus attempt.
@@ -169,6 +188,13 @@ export function useKeyboardItemReorder({ index, total, onMove }) {
     function stopMoving({ restoreFocus = false } = {}) {
         clearTimeout(startTimer);
         startTimer = null;
+        clearTimeout(ignoreOutsideTimer);
+        ignoreOutsideTimer = null;
+        ignoreOutside = false;
+
+        if (activeSession === session) {
+            activeSession = null;
+        }
 
         if (!moving.value) return;
 
@@ -178,10 +204,6 @@ export function useKeyboardItemReorder({ index, total, onMove }) {
         moving.value = false;
         status.value = '';
         unbindListeners();
-
-        if (activeSession === session) {
-            activeSession = null;
-        }
 
         if (restoreFocus) {
             nextTick(() => {
@@ -201,6 +223,7 @@ export function useKeyboardItemReorder({ index, total, onMove }) {
 
     onBeforeUnmount(() => {
         clearTimeout(startTimer);
+        clearTimeout(ignoreOutsideTimer);
         if (activeSession === session) {
             activeSession = null;
         }

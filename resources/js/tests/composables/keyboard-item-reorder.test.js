@@ -127,7 +127,35 @@ test('tabbing away ends move mode without trapping keys', async () => {
     api.startMoving('start');
     vi.advanceTimersByTime(50);
     await nextTick();
+    // Past the post-start grace period that ignores outside focus/pointer.
+    vi.advanceTimersByTime(200);
 
     window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }));
     expect(api.moving.value).toBe(false);
+});
+
+test('menu teardown focusin does not cancel a session started after escape', async () => {
+    const { api, wrapper } = mountReorder();
+
+    api.startMoving('start');
+    vi.advanceTimersByTime(50);
+    await nextTick();
+
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    await nextTick();
+    expect(api.moving.value).toBe(false);
+
+    api.startMoving('end');
+    vi.advanceTimersByTime(50);
+    await nextTick();
+    expect(api.moving.value).toBe(true);
+
+    // Dropdown close can bounce focus through body after choosing Move.
+    document.body.tabIndex = -1;
+    document.body.focus();
+    window.dispatchEvent(new FocusEvent('focusin', { bubbles: true }));
+
+    expect(api.moving.value).toBe(true);
+
+    wrapper.unmount();
 });
