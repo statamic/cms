@@ -10,6 +10,7 @@ use Illuminate\View\View;
 use Statamic\Contracts\View\Antlers\Parser as ParserContract;
 use Statamic\Facades\File;
 use Statamic\Facades\Site;
+use Statamic\Fields\Value;
 use Statamic\Statamic;
 use Statamic\StaticCaching\NoCache\Region;
 use Statamic\Tags\IncludeTag;
@@ -25,6 +26,7 @@ use Statamic\View\Antlers\Language\Runtime\Tracing\TraceManager;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Statamic\View\Blade\AntlersBladePrecompiler;
 use Statamic\View\Blade\StatamicTagCompiler;
+use Statamic\View\Blade\ValueEchoHandler;
 use Statamic\View\Cascade;
 use Statamic\View\Debugbar\AntlersProfiler\PerformanceCollector;
 use Statamic\View\Debugbar\AntlersProfiler\PerformanceTracer;
@@ -441,6 +443,8 @@ PHP;
         Blade::precompiler(function ($content) {
             return AntlersBladePrecompiler::compile($content);
         });
+
+        Blade::stringable(Value::class, [ValueEchoHandler::class, 'handle']);
 
         View::macro('withoutExtractions', function () {
             if ($this->getEngine() instanceof Engine) {
