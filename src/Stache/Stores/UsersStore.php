@@ -9,6 +9,7 @@ use Statamic\Facades\YAML;
 use Statamic\Stache\Indexes\Users\Group;
 use Statamic\Stache\Indexes\Users\Role;
 use Statamic\Support\Arr;
+use Symfony\Component\Finder\SplFileInfo;
 
 class UsersStore extends BasicStore
 {
@@ -34,6 +35,11 @@ class UsersStore extends BasicStore
     public function key()
     {
         return 'users';
+    }
+
+    public function getItemFilter(SplFileInfo $file)
+    {
+        return parent::getItemFilter($file) && $file->getRelativePath() === '';
     }
 
     public function makeItemFromFile($path, $contents)

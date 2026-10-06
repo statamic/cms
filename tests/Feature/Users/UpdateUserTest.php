@@ -2,8 +2,10 @@
 
 namespace Tests\Feature\Users;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\User;
+use Tests\Auth\UnsafeEmailPayloads;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -12,6 +14,7 @@ class UpdateUserTest extends TestCase
 {
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
+    use UnsafeEmailPayloads;
 
     #[Test]
     public function it_saves_a_user()
@@ -30,6 +33,24 @@ class UpdateUserTest extends TestCase
 
         $this->assertEquals('updated@domain.com', User::find($user->id())->email());
         $this->assertEquals('Jonathan Smith', User::find($user->id())->name);
+    }
+
+    #[Test]
+    #[DataProvider('unsafeEmailProvider')]
+    public function it_rejects_emails_that_are_unsafe_as_file_paths($email)
+    {
+        $this->setTestRoles(['test' => ['access cp', 'edit users']]);
+        $user = tap(User::make()->email('test@domain.com'))->save();
+        $me = tap(User::make()->email('admin@domain.com')->assignRole('test'))->save();
+        $before = $this->filesystemSnapshot();
+
+        $this
+            ->actingAs($me)
+            ->patchJson($user->updateUrl(), ['email' => $email])
+            ->assertJsonValidationErrors('email');
+
+        $this->assertSame($before, $this->filesystemSnapshot());
+        $this->assertEquals('test@domain.com', User::find($user->id())->email());
     }
 
     #[Test]

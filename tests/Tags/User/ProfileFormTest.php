@@ -2,17 +2,19 @@
 
 namespace Tests\Tags\User;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Parse;
 use Statamic\Facades\User;
+use Tests\Auth\UnsafeEmailPayloads;
 use Tests\NormalizesHtml;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class ProfileFormTest extends TestCase
 {
-    use NormalizesHtml, PreventSavingStacheItemsToDisk;
+    use NormalizesHtml, PreventSavingStacheItemsToDisk, UnsafeEmailPayloads;
 
     private function tag($tag)
     {
@@ -190,6 +192,22 @@ EOT
         ];
 
         $this->assertEquals($expected, $actual[0]);
+    }
+
+    #[Test]
+    #[DataProvider('unsafeEmailProvider')]
+    public function it_wont_update_user_with_an_email_that_is_unsafe_as_a_file_path($email)
+    {
+        $user = tap(User::make()->email('john@x.com'))->save();
+        $this->actingAs($user);
+        $before = $this->filesystemSnapshot();
+
+        $this
+            ->post('/!/auth/profile', ['email' => $email])
+            ->assertSessionHasErrors('email', null, 'user.profile');
+
+        $this->assertSame($before, $this->filesystemSnapshot());
+        $this->assertEquals('john@x.com', User::find($user->id())->email());
     }
 
     #[Test]
