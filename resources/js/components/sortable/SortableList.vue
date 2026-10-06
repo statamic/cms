@@ -1,6 +1,7 @@
 <script>
 import { Sortable, Plugins, Draggable } from '@shopify/draggable';
 import arrayMove from './arrayMove.js';
+import { POINTER_DRAG_THRESHOLD } from './pointerDragThreshold.js';
 
 export default {
     emits: ['dragstart', 'dragend', 'update:model-value'],
@@ -37,7 +38,7 @@ export default {
         },
         distance: {
             type: Number,
-            default: 0,
+            default: POINTER_DRAG_THRESHOLD,
         },
         disabled: {
             type: Boolean,
@@ -120,7 +121,17 @@ export default {
         setupSortableList() {
             this.sortable = new Sortable(this.$el, this.computedOptions);
 
-            this.sortable.on('drag:start', () => this.$emit('dragstart'));
+            this.sortable.on('drag:start', (event) => {
+                // Tell DragHandle a real drag began so click-to-move won't also fire.
+                const source = event.originalSource;
+                source?.querySelectorAll?.('[data-drag-handle]').forEach((handle) => {
+                    handle.dispatchEvent(new CustomEvent('statamic-drag-start'));
+                });
+                if (source?.matches?.('[data-drag-handle]')) {
+                    source.dispatchEvent(new CustomEvent('statamic-drag-start'));
+                }
+                this.$emit('dragstart');
+            });
             this.sortable.on('drag:stop', () => this.$emit('dragend'));
 
             this.sortable.on('sortable:stop', ({ oldIndex, newIndex }) => {
