@@ -1,5 +1,26 @@
 # Release Notes
 
+## 6.35.1 (2026-10-06)
+
+### What's fixed
+- Harden asset authorization [#15196](https://github.com/statamic/cms/issues/15196) by @duncanmcclean
+- Fix Forgot Password balance [#15581](https://github.com/statamic/cms/issues/15581) by @jaygeorge
+- Tighten SVG sanitization [#15582](https://github.com/statamic/cms/issues/15582) by @jasonvarga
+- Harden remote URL validation [#15584](https://github.com/statamic/cms/issues/15584) by @jasonvarga
+- Fix theme resetting after leaving preferences page [#15579](https://github.com/statamic/cms/issues/15579) by @duncanmcclean
+- Fix fieldtypes extending Replicator when adding sets [#15574](https://github.com/statamic/cms/issues/15574) by @joshuablum
+- Tighten class based validation rules [#15585](https://github.com/statamic/cms/issues/15585) by @jasonvarga
+- Compare field conditions without eval() [#15564](https://github.com/statamic/cms/issues/15564) by @bpmore
+- Fix scheduled and expired status queries when both date behaviors are private [#15577](https://github.com/statamic/cms/issues/15577) by @wakqasahmed
+- Respect collection wheres inside nested where closures [#15563](https://github.com/statamic/cms/issues/15563) by @lazerg
+- Harden user file paths [#15593](https://github.com/statamic/cms/issues/15593) by @jasonvarga
+- French translations [#15565](https://github.com/statamic/cms/issues/15565) by @ebeauchamps
+- Danish translations [#15570](https://github.com/statamic/cms/issues/15570) by @FoksVHox
+- Bump the npm_and_yarn group across 1 directory with 3 updates [#15568](https://github.com/statamic/cms/issues/15568) by @dependabot
+- Bump the npm_and_yarn group across 1 directory with 3 updates [#15587](https://github.com/statamic/cms/issues/15587) by @dependabot
+
+
+
 ## 6.35.0 (2026-10-01)
 
 ### What's new
