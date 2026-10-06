@@ -471,4 +471,12 @@ EOT
     {
         return '/(?:<h[23].+>.+<\/h[23]>|<label>.+<\/label><input.+>|<label>.+<\/label><label><input.+><input.+><\/label>)+/U';
     }
+
+    #[Test]
+    public function it_returns_404_when_frontend_authentication_is_disabled(): void
+    {
+        config(['statamic.users.frontend_auth_enabled' => false]);
+
+        $this->post('/!/auth/profile')->assertNotFound();
+    }
 }
