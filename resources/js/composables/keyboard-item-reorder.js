@@ -124,15 +124,18 @@ export function useKeyboardItemReorder({ index, total, onMove }) {
 
         if (!moving.value) return;
 
-        // Prefer the drag handle over the ⋯ menu so focus doesn't land on the dots.
-        const focusTarget = movingItem()?.querySelector('[data-drag-handle]');
+        // Land on the whole row/set (not the grab handle or ⋯ menu).
+        const item = movingItem();
+        const focusTarget = item?.querySelector('[data-reorder-focus]') ?? item;
 
         moving.value = false;
         status.value = '';
         unbindListeners();
 
         if (restoreFocus) {
-            nextTick(() => focusTarget?.focus({ preventScroll: true }));
+            nextTick(() => {
+                focusTarget?.focus({ preventScroll: true, focusVisible: true });
+            });
         }
     }
 

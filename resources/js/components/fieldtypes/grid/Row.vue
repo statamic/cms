@@ -1,5 +1,7 @@
 <template>
     <tr
+        tabindex="-1"
+        data-reorder-focus
         :class="[
             sortableItemClass,
             {

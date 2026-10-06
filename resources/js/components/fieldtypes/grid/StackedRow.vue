@@ -1,5 +1,7 @@
 <template>
     <div
+        tabindex="-1"
+        data-reorder-focus
         class="relative @container/panel bg-white dark:bg-gray-850 rounded-xl ring ring-gray-300 dark:ring-x-0 dark:ring-b-0 dark:ring-gray-700 shadow-ui-md"
         :class="[
             sortableItemClass,
