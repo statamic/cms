@@ -10,6 +10,7 @@
             },
         ]"
         :data-moving="moving || undefined"
+        :data-move-origin="moving ? moveOrigin : undefined"
     >
         <td v-if="grid.isReorderable" class="drag-handle relative">
             <DragHandle

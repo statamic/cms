@@ -78,12 +78,21 @@
                     @apply bg-gray-100;
                 }
 
-                /* While moving: blue start edge. No ring after Enter/Escape. */
-                &[data-moving] > td:first-child {
+                /*
+                    While moving: blue edge on the side that activated move
+                    (handle = start, ⋯ menu = end). No ring after Enter/Escape.
+                */
+                &[data-moving][data-move-origin='start'] > td:first-child {
                     box-shadow: inset 3px 0 0 var(--focus-outline-color, var(--color-blue-400));
                 }
-                &:dir(rtl)[data-moving] > td:first-child {
+                &[data-moving][data-move-origin='end'] > td:last-child {
                     box-shadow: inset -3px 0 0 var(--focus-outline-color, var(--color-blue-400));
+                }
+                &:dir(rtl)[data-moving][data-move-origin='start'] > td:first-child {
+                    box-shadow: inset -3px 0 0 var(--focus-outline-color, var(--color-blue-400));
+                }
+                &:dir(rtl)[data-moving][data-move-origin='end'] > td:last-child {
+                    box-shadow: inset 3px 0 0 var(--focus-outline-color, var(--color-blue-400));
                 }
             }
 
