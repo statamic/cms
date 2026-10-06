@@ -77,6 +77,14 @@
                 &.draggable-source--is-dragging td {
                     @apply bg-gray-100;
                 }
+
+                /* Keyboard move mode — blue start edge instead of a full-row outline */
+                &[data-moving] > td:first-child {
+                    box-shadow: inset 3px 0 0 var(--focus-outline-color, var(--color-blue-400));
+                }
+                &:dir(rtl)[data-moving] > td:first-child {
+                    box-shadow: inset -3px 0 0 var(--focus-outline-color, var(--color-blue-400));
+                }
             }
 
             .grid-cell :is([data-ui-field-header], [data-ui-label], [data-ui-description]) {

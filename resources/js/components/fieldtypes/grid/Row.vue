@@ -7,7 +7,6 @@
             {
                 'opacity-50': isExcessive,
                 'inset-ring-1 inset-ring-red': hasError,
-                'focus-outline': moving,
             },
         ]"
         :data-moving="moving || undefined"
