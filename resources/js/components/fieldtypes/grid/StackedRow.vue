@@ -13,11 +13,11 @@
         ]"
         :data-error="hasError ?? undefined"
         :data-moving="moving || undefined"
-        :aria-grabbed="moving ? 'true' : undefined"
     >
         <KeyboardReorderIndicator :moving="moving" :side="moveOrigin" />
         <header class="bg-gray-50 dark:bg-gray-900 rounded-t-xl border-b border-gray-300 dark:border-gray-700 ps-4 pe-2 py-1.5 flex items-center justify-between">
             <ui-drag-handle
+                :keyboard-reorder="grid.isReorderable"
                 :class="{ [sortableHandleClass]: grid.isReorderable }"
                 @keyboard-reorder="startMovingFromHandle"
             />
@@ -27,7 +27,7 @@
                     type="button"
                     class="sr-only"
                     :tabindex="moving ? 0 : -1"
-                    :aria-label="__('Use up and down arrows to reorder. Press Enter or Escape when finished.')"
+                    :aria-label="__('messages.keyboard_item_reorder_instructions')"
                 />
                 <Dropdown placement="left-start">
                     <DropdownMenu>
@@ -40,7 +40,7 @@
                         <DropdownItem v-if="canDelete" :text="__('Delete Row')" icon="trash" variant="destructive" @click="$emit('removed', index)" />
                     </DropdownMenu>
                 </Dropdown>
-                <div class="sr-only" aria-live="assertive">{{ status }}</div>
+                <div class="sr-only" aria-live="polite">{{ status }}</div>
             </div>
         </header>
         <div class="px-4 py-3">
@@ -60,11 +60,21 @@
 <script>
 import Row from './Row.vue';
 import { Dropdown, DropdownMenu, DropdownItem, PublishFields, PublishFieldsProvider as FieldsProvider } from '@ui';
+import { useKeyboardItemReorder } from '@/composables/keyboard-item-reorder.js';
 import KeyboardReorderIndicator from '@/components/sortable/KeyboardReorderIndicator.vue';
 
 export default {
     mixins: [Row],
 
     components: { Dropdown, DropdownMenu, DropdownItem, PublishFields, FieldsProvider, KeyboardReorderIndicator },
+
+    // Vue does not run setup() from mixins — declare it here so stacked mode works.
+    setup(props, { emit }) {
+        return useKeyboardItemReorder({
+            index: () => props.index,
+            total: () => props.totalRows,
+            onMove: (from, to) => emit('moved', from, to),
+        });
+    },
 };
 </script>

@@ -5,8 +5,8 @@
         :class="side === 'start' ? 'end-full me-2' : 'start-full ms-2'"
         aria-hidden="true"
     >
-        <kbd :class="keyClasses">↑</kbd>
-        <kbd :class="keyClasses">↓</kbd>
+        <kbd class="inline-flex h-4 min-w-4 items-center justify-center rounded border border-blue-200 bg-blue-50 px-1 text-[0.625rem] font-semibold text-blue-600 dark:border-blue-700 dark:bg-gray-800 dark:text-blue-300">↑</kbd>
+        <kbd class="inline-flex h-4 min-w-4 items-center justify-center rounded border border-blue-200 bg-blue-50 px-1 text-[0.625rem] font-semibold text-blue-600 dark:border-blue-700 dark:bg-gray-800 dark:text-blue-300">↓</kbd>
     </span>
 </template>
 
@@ -22,12 +22,6 @@ export default {
             type: String,
             default: 'end',
             validator: (value) => ['start', 'end'].includes(value),
-        },
-    },
-
-    computed: {
-        keyClasses() {
-            return 'inline-flex h-4 min-w-4 items-center justify-center rounded border border-blue-200 bg-blue-50 px-1 text-[0.625rem] font-semibold text-blue-600 dark:border-blue-700 dark:bg-gray-800 dark:text-blue-300';
         },
     },
 };

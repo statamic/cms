@@ -22,6 +22,7 @@
                             :vertical="true"
                             :item-class="sortableItemClass"
                             :handle-class="sortableHandleClass"
+                            :distance="pointerDragThreshold"
                             append-to="body"
                             constrain-dimensions
                             @update:model-value="sorted($event)"
@@ -96,7 +97,7 @@ import { nanoid as uniqid } from 'nanoid';
 import ReplicatorSet from './Set.vue';
 import AddSetButton from './AddSetButton.vue';
 import ManagesSetMeta from './ManagesSetMeta';
-import { SortableList, arrayMove } from '../../sortable/Sortable';
+import { SortableList, arrayMove, POINTER_DRAG_THRESHOLD } from '../../sortable/Sortable';
 import { data_get } from "@/bootstrap/globals.js";
 
 export default {
@@ -106,6 +107,10 @@ export default {
         ReplicatorSet,
         SortableList,
         AddSetButton,
+    },
+
+    setup() {
+        return { pointerDragThreshold: POINTER_DRAG_THRESHOLD };
     },
 
     data() {

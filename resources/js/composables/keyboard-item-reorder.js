@@ -18,7 +18,7 @@ export function useKeyboardItemReorder({ index, total, onMove }) {
     const canMoveDown = computed(() => toValue(index) < toValue(total) - 1);
 
     function announcePosition() {
-        status.value = __('Item :current of :total', {
+        status.value = __('messages.keyboard_item_reorder_position', {
             current: toValue(index) + 1,
             total: toValue(total),
         });
@@ -56,6 +56,8 @@ export function useKeyboardItemReorder({ index, total, onMove }) {
             event.stopPropagation();
             if (canMoveUp.value) {
                 onMove(toValue(index), toValue(index) - 1);
+            } else {
+                announcePosition();
             }
             return;
         }
@@ -65,6 +67,8 @@ export function useKeyboardItemReorder({ index, total, onMove }) {
             event.stopPropagation();
             if (canMoveDown.value) {
                 onMove(toValue(index), toValue(index) + 1);
+            } else {
+                announcePosition();
             }
             return;
         }
@@ -73,6 +77,12 @@ export function useKeyboardItemReorder({ index, total, onMove }) {
             event.preventDefault();
             event.stopPropagation();
             stopMoving({ restoreFocus: true });
+            return;
+        }
+
+        // Leave move mode when tabbing away so we don't trap page-wide keys.
+        if (event.key === 'Tab') {
+            stopMoving();
         }
     }
 
@@ -85,8 +95,17 @@ export function useKeyboardItemReorder({ index, total, onMove }) {
 
     function onFocusIn(event) {
         if (!moving.value) return;
-        if (!event.target?.closest?.('[data-ui-dropdown-trigger]')) return;
-        focusRoot();
+
+        // Dropdown close restores focus to the ⋯ trigger — take it back.
+        if (event.target?.closest?.('[data-ui-dropdown-trigger]')) {
+            focusRoot();
+            return;
+        }
+
+        // Focus left the item (e.g. Shift+Tab into a field) — end move mode.
+        if (!event.target?.closest?.('[data-moving]')) {
+            stopMoving();
+        }
     }
 
     function bindListeners() {
@@ -106,11 +125,13 @@ export function useKeyboardItemReorder({ index, total, onMove }) {
         // Ignore non-string args (e.g. click/keyboard events bound directly).
         moveOrigin.value = origin === 'start' ? 'start' : 'end';
 
+        if (toValue(total) < 2) return;
+
         // Wait for the dropdown to finish closing / restoring focus, otherwise
         // our focus and the first keypress get eaten by the menu teardown.
         startTimer = setTimeout(() => {
             moving.value = true;
-            status.value = __('Use up and down arrows to reorder. Press Enter or Escape when finished.');
+            status.value = __('messages.keyboard_item_reorder_instructions');
             bindListeners();
             focusRoot();
             // Catch late focus restoration from the menu after our first focus attempt.

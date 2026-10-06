@@ -1,7 +1,6 @@
 <script>
 import { Sortable, Plugins, Draggable } from '@shopify/draggable';
 import arrayMove from './arrayMove.js';
-import { POINTER_DRAG_THRESHOLD } from './pointerDragThreshold.js';
 
 export default {
     emits: ['dragstart', 'dragend', 'update:model-value'],
@@ -38,7 +37,7 @@ export default {
         },
         distance: {
             type: Number,
-            default: POINTER_DRAG_THRESHOLD,
+            default: 0,
         },
         disabled: {
             type: Boolean,

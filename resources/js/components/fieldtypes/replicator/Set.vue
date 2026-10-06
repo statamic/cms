@@ -153,7 +153,6 @@ reveal.use(rootEl, () => emit('expanded'));
     <div
         :class="sortableItemClass"
         :data-moving="moving || undefined"
-        :aria-grabbed="moving ? 'true' : undefined"
     >
         <slot name="picker" />
         <div
@@ -182,6 +181,7 @@ reveal.use(rootEl, () => emit('expanded'));
             >
                 <DragHandle
                     v-if="!readOnly"
+                    :keyboard-reorder="canReorder"
                     :class="sortableHandleClass"
                     class="shrink-0"
                     @keyboard-reorder="startMovingFromHandle"
@@ -212,7 +212,7 @@ reveal.use(rootEl, () => emit('expanded'));
                         type="button"
                         class="sr-only"
                         :tabindex="moving ? 0 : -1"
-                        :aria-label="__('Use up and down arrows to reorder. Press Enter or Escape when finished.')"
+                        :aria-label="__('messages.keyboard_item_reorder_instructions')"
                     />
                     <Switch size="xs" :model-value="enabled" @update:model-value="toggleEnabledState" v-tooltip="enabled ? __('Included in output') : __('Hidden from output')" />
                     <Dropdown>
@@ -245,7 +245,7 @@ reveal.use(rootEl, () => emit('expanded'));
                             />
                         </DropdownMenu>
                     </Dropdown>
-                    <div class="sr-only" aria-live="assertive">{{ reorderStatus }}</div>
+                    <div class="sr-only" aria-live="polite">{{ reorderStatus }}</div>
                 </div>
             </header>
 

@@ -5,6 +5,7 @@
             :vertical="true"
             :item-class="sortableItemClass"
             :handle-class="sortableHandleClass"
+            :distance="pointerDragThreshold"
             append-to="body"
             constrain-dimensions
             @dragstart="$emit('focus')"
@@ -50,7 +51,7 @@
 <script>
 import View from './View.vue';
 import StackedRow from './StackedRow.vue';
-import { SortableList } from '../../sortable/Sortable';
+import { SortableList, POINTER_DRAG_THRESHOLD } from '../../sortable/Sortable';
 
 export default {
     mixins: [View],
@@ -58,6 +59,10 @@ export default {
     components: {
         StackedRow,
         SortableList,
+    },
+
+    setup() {
+        return { pointerDragThreshold: POINTER_DRAG_THRESHOLD };
     },
 };
 </script>

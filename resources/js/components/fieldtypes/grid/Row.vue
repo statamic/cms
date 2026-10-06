@@ -7,13 +7,17 @@
             {
                 'opacity-50': isExcessive,
                 'inset-ring-1 inset-ring-red': hasError,
+                'focus-outline': moving,
             },
         ]"
         :data-moving="moving || undefined"
-        :aria-grabbed="moving ? 'true' : undefined"
     >
         <td v-if="grid.isReorderable" class="drag-handle relative">
-            <DragHandle :class="sortableHandleClass" @keyboard-reorder="startMovingFromHandle" />
+            <DragHandle
+                keyboard-reorder
+                :class="sortableHandleClass"
+                @keyboard-reorder="startMovingFromHandle"
+            />
             <KeyboardReorderIndicator :moving="moving && moveOrigin === 'start'" side="start" />
         </td>
 
@@ -33,7 +37,7 @@
                 type="button"
                 class="sr-only"
                 :tabindex="moving ? 0 : -1"
-                :aria-label="__('Use up and down arrows to reorder. Press Enter or Escape when finished.')"
+                :aria-label="__('messages.keyboard_item_reorder_instructions')"
             />
             <KeyboardReorderIndicator :moving="moving && moveOrigin === 'end'" side="end" />
             <Dropdown placement="left-start">
@@ -47,7 +51,7 @@
                     <DropdownItem v-if="canDelete" :text="__('Delete Row')" icon="trash" variant="destructive" @click="$emit('removed', index, fields)" />
                 </DropdownMenu>
             </Dropdown>
-            <div class="sr-only" aria-live="assertive">{{ status }}</div>
+            <div class="sr-only" aria-live="polite">{{ status }}</div>
         </td>
     </tr>
 </template>
@@ -104,7 +108,7 @@ export default {
         },
         totalRows: {
             type: Number,
-            required: true,
+            default: 0,
         },
         hasError: {
             type: Boolean,

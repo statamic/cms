@@ -12,6 +12,7 @@
             :vertical="true"
             :item-class="sortableItemClass"
             :handle-class="sortableHandleClass"
+            :distance="pointerDragThreshold"
             append-to="body"
             @dragstart="$emit('focus')"
             @dragend="$emit('blur')"
@@ -51,7 +52,7 @@
 import View from './View.vue';
 import GridRow from './Row.vue';
 import GridHeaderCell from './HeaderCell.vue';
-import { SortableList } from '../../sortable/Sortable';
+import { SortableList, POINTER_DRAG_THRESHOLD } from '../../sortable/Sortable';
 
 export default {
     mixins: [View],
@@ -60,6 +61,10 @@ export default {
         GridRow,
         GridHeaderCell,
         SortableList,
+    },
+
+    setup() {
+        return { pointerDragThreshold: POINTER_DRAG_THRESHOLD };
     },
 };
 </script>
