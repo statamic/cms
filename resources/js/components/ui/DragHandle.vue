@@ -19,7 +19,7 @@ function onKeydown(event) {
         style="--focus-outline-offset: 2px"
         data-drag-handle
         :aria-label="__('Drag to reorder, or press Space to move with arrow keys')"
-        v-tooltip="__('Press Space, then ↑↓ to reorder')"
+        v-tooltip="{ content: __('Press Space, then ↑↓ to reorder'), focusOnly: true }"
         @keydown="onKeydown"
     >
         <DragDots class="w-[7px] h-[17px]" />
