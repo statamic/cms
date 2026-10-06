@@ -5,22 +5,14 @@
             {
                 'opacity-50': isExcessive,
                 'inset-ring-1 inset-ring-red': hasError,
-                'focus-outline': moving,
             },
         ]"
         :data-moving="moving || undefined"
         :aria-grabbed="moving ? 'true' : undefined"
     >
-        <td
-            v-if="grid.isReorderable"
-            class="drag-handle"
-            :class="sortableHandleClass"
-            tabindex="0"
-            role="button"
-            :aria-label="__('Drag to reorder, or press Space to move with arrow keys')"
-            @keydown.space.prevent="startMoving"
-            @keydown.enter.prevent="startMoving"
-        ></td>
+        <td v-if="grid.isReorderable" class="drag-handle">
+            <DragHandle :class="sortableHandleClass" @keyboard-reorder="startMoving" />
+        </td>
 
         <FieldsProvider
             :fields="fields"
@@ -65,12 +57,12 @@
 
 <script>
 import GridCell from './Cell.vue';
-import { Dropdown, DropdownMenu, DropdownItem, PublishFieldsProvider as FieldsProvider } from '@ui';
+import { DragHandle, Dropdown, DropdownMenu, DropdownItem, PublishFieldsProvider as FieldsProvider } from '@ui';
 import { useKeyboardItemReorder } from '@/composables/keyboard-item-reorder.js';
 import KeyboardReorderIndicator from '@/components/sortable/KeyboardReorderIndicator.vue';
 
 export default {
-    components: { Dropdown, DropdownMenu, DropdownItem, FieldsProvider, GridCell, KeyboardReorderIndicator },
+    components: { DragHandle, Dropdown, DropdownMenu, DropdownItem, FieldsProvider, GridCell, KeyboardReorderIndicator },
 
     props: {
         index: {

@@ -172,7 +172,7 @@ reveal.use(rootEl, () => emit('expanded'));
                 <DragHandle
                     v-if="!readOnly"
                     :class="sortableHandleClass"
-                    class="size-4 shrink-0"
+                    class="shrink-0"
                     @keyboard-reorder="startMoving"
                 />
                 <button type="button" class="show-focus-within_target flex flex-1 min-w-0 cursor-pointer items-center gap-4 overflow-x-auto p-2 py-1.75 pe-4 focus:outline-none st-mask-horizontal-overflow" @click="toggleCollapsedState">
