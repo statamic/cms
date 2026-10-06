@@ -2,12 +2,18 @@
 
 namespace Tests\Fields;
 
+use Closure;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Support\Collection;
+use Illuminate\Validation\Rules\In;
+use InvalidArgumentException;
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Validator;
+use Statamic\Rules\UniqueEntryValue;
 use Tests\TestCase;
 
 class ValidatorTest extends TestCase
@@ -210,6 +216,68 @@ class ValidatorTest extends TestCase
         $this->assertSame(true, $rule->true);
         $this->assertSame(false, $rule->false);
         $this->assertSame(null, $rule->null);
+    }
+
+    #[Test]
+    #[DataProvider('validClassBasedRuleProvider')]
+    public function it_instantiates_validation_rule_classes($rule, $expectedClass)
+    {
+        $rules = $this->rulesFor($rule);
+
+        $this->assertInstanceOf($expectedClass, $rules['one'][0]);
+    }
+
+    public static function validClassBasedRuleProvider()
+    {
+        return [
+            'validation rule' => ['new Tests\Fields\FakeRule(1, 2, 3, 4, 5, 6)', FakeRule::class],
+            'validation rule with leading slash' => ['new \Tests\Fields\FakeRule(1, 2, 3, 4, 5, 6)', FakeRule::class],
+            'statamic rule' => ['new \Statamic\Rules\UniqueEntryValue("blog")', UniqueEntryValue::class],
+            'laravel rule object' => ['new Illuminate\Validation\Rules\In("a", "b")', In::class],
+            'laravel rule object with leading slash' => ['new \Illuminate\Validation\Rules\In("a", "b")', In::class],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('invalidClassBasedRuleProvider')]
+    public function it_does_not_instantiate_classes_that_are_not_validation_rules($rule)
+    {
+        NotARule::$constructed = false;
+
+        try {
+            $this->rulesFor($rule);
+            $this->fail('Expected an InvalidArgumentException.');
+        } catch (InvalidArgumentException $e) {
+            //
+        }
+
+        $this->assertFalse(NotARule::$constructed);
+    }
+
+    public static function invalidClassBasedRuleProvider()
+    {
+        return [
+            'arbitrary class' => ['new Tests\Fields\NotARule'],
+            'arbitrary class with arguments' => ['new \Tests\Fields\NotARule("foo")'],
+            'stringable class' => ['new \Illuminate\Support\HtmlString("foo")'],
+            'native class' => ['new \SplFileObject("/tmp/foo", "r")'],
+            'non-existent class' => ['new \Tests\Fields\DoesNotExist'],
+            'non-existent class in laravel rules namespace' => ['new \Illuminate\Validation\Rules\DoesNotExist'],
+            'invalid class name' => ['new ../Tests/Fields/NotARule'],
+        ];
+    }
+
+    private function rulesFor($rule)
+    {
+        $field = Mockery::mock(Field::class);
+        $field->shouldReceive('setValidationContext')->with([])->andReturnSelf();
+        $field->shouldReceive('rules')->andReturn(['one' => [$rule]]);
+
+        $fields = Mockery::mock(Fields::class);
+        $fields->shouldReceive('all')->andReturn(collect([$field]));
+        $fields->shouldReceive('preProcessValidatables')->andReturnSelf();
+
+        return (new Validator)->fields($fields)->rules();
     }
 
     #[Test]
@@ -509,7 +577,7 @@ class ValidatorTest extends TestCase
     }
 }
 
-class FakeRule
+class FakeRule implements ValidationRule
 {
     public function __construct(
         public $string,
@@ -520,5 +588,20 @@ class FakeRule
         public $null
     ) {
         //
+    }
+
+    public function validate(string $attribute, mixed $value, Closure $fail): void
+    {
+        //
+    }
+}
+
+class NotARule
+{
+    public static $constructed = false;
+
+    public function __construct(...$args)
+    {
+        static::$constructed = true;
     }
 }
