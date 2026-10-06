@@ -1,5 +1,17 @@
 # Release Notes
 
+## 5.74.5 (2026-10-06)
+
+### What's fixed
+- Harden asset authorization [#15196](https://github.com/statamic/cms/issues/15196) by @duncanmcclean
+- Harden impersonation action [#15562](https://github.com/statamic/cms/issues/15562) by @jasonvarga
+- Tighten SVG sanitization [#15583](https://github.com/statamic/cms/issues/15583) by @jasonvarga
+- Harden remote URL validation [#15584](https://github.com/statamic/cms/issues/15584) by @jasonvarga
+- Tighten class based validation rules [#15585](https://github.com/statamic/cms/issues/15585) by @jasonvarga
+- Harden user file paths [#15593](https://github.com/statamic/cms/issues/15593) by @jasonvarga
+
+
+
 ## 5.74.4 (2026-08-12)
 
 ### What's fixed
