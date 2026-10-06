@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils';
-import { expect, test, vi } from 'vitest';
+import { expect, test } from 'vitest';
 import DragHandle from '@/components/ui/DragHandle.vue';
 
 test('default handle keeps the drag-to-reorder label and does not emit on space', async () => {
@@ -10,6 +10,14 @@ test('default handle keeps the drag-to-reorder label and does not emit on space'
 
     await button.trigger('keydown', { key: ' ' });
     expect(wrapper.emitted('keyboard-reorder')).toBeUndefined();
+});
+
+test('a consumer aria-label wins over the default label', () => {
+    const wrapper = mount(DragHandle, {
+        attrs: { 'aria-label': 'Move column' },
+    });
+
+    expect(wrapper.get('button').attributes('aria-label')).toBe('Move column');
 });
 
 test('keyboard-reorder opt-in emits on space and click-like pointerup', async () => {

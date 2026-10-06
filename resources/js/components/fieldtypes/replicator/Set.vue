@@ -41,7 +41,10 @@ const props = defineProps({
     hasError: Boolean,
     canAddSet: Boolean,
     canReorder: Boolean,
-    totalSets: Number,
+    totalSets: {
+        type: Number,
+        default: 0,
+    },
     showFieldPreviews: Boolean,
 });
 

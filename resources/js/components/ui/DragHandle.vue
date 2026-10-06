@@ -119,8 +119,8 @@ onBeforeUnmount(() => {
         :class="{ 'rounded-sm p-1': keyboardReorder }"
         style="--focus-outline-offset: 2px"
         data-drag-handle
-        v-bind="attrs"
         :aria-label="ariaLabel"
+        v-bind="attrs"
         v-tooltip="tooltip"
         @keydown="onKeydown"
         @pointerdown="onPointerDown"

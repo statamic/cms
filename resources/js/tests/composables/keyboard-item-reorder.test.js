@@ -3,7 +3,17 @@ import { defineComponent, nextTick, ref } from 'vue';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 import { useKeyboardItemReorder } from '@/composables/keyboard-item-reorder.js';
 
-function mountReorder({ index = 1, total = 3, onMove = vi.fn() } = {}) {
+function mountReorder({
+    index = 1,
+    total = 3,
+    onMove = vi.fn(),
+    template = `
+        <div data-moving="true" data-reorder-focus tabindex="-1">
+            <div data-reorder-focus tabindex="-1">nested</div>
+            <button ref="rootEl" type="button">sentinel</button>
+        </div>
+    `,
+} = {}) {
     const indexRef = ref(index);
     const totalRef = ref(total);
     let api;
@@ -18,12 +28,7 @@ function mountReorder({ index = 1, total = 3, onMove = vi.fn() } = {}) {
 
             return { ...api, indexRef };
         },
-        template: `
-            <div data-moving="true">
-                <div data-reorder-focus tabindex="-1">row</div>
-                <button ref="rootEl" type="button">sentinel</button>
-            </div>
-        `,
+        template,
     });
 
     const wrapper = mount(Comp);
@@ -70,28 +75,50 @@ test('arrow keys move and announce at edges', async () => {
 
     window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true }));
     expect(onMove).not.toHaveBeenCalled();
+    await nextTick();
     expect(api.status.value).toBe('messages.keyboard_item_reorder_position');
 
     window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
     expect(onMove).toHaveBeenCalledWith(0, 1);
 });
 
-test('escape stops moving and restores focus to the row', async () => {
+test('escape restores focus to the moving item when it is the reorder focus target', async () => {
     const { wrapper, api } = mountReorder();
-    const row = wrapper.find('[data-reorder-focus]').element;
-    const focusSpy = vi.spyOn(row, 'focus');
+    const row = wrapper.find('[data-moving]').element;
+    const nested = wrapper.find('[data-moving] [data-reorder-focus]').element;
+    const rowFocus = vi.spyOn(row, 'focus');
+    const nestedFocus = vi.spyOn(nested, 'focus');
 
     api.startMoving('start');
     vi.advanceTimersByTime(50);
     await nextTick();
 
-    expect(api.rootEl.value).toBeTruthy();
-
     window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
     await nextTick();
 
     expect(api.moving.value).toBe(false);
-    expect(focusSpy).toHaveBeenCalled();
+    expect(rowFocus).toHaveBeenCalled();
+    expect(nestedFocus).not.toHaveBeenCalled();
+});
+
+test('starting a second session stops the first', async () => {
+    const first = mountReorder();
+    const second = mountReorder();
+
+    first.api.startMoving('start');
+    vi.advanceTimersByTime(50);
+    await nextTick();
+    expect(first.api.moving.value).toBe(true);
+
+    second.api.startMoving('end');
+    vi.advanceTimersByTime(50);
+    await nextTick();
+
+    expect(first.api.moving.value).toBe(false);
+    expect(second.api.moving.value).toBe(true);
+
+    first.wrapper.unmount();
+    second.wrapper.unmount();
 });
 
 test('tabbing away ends move mode without trapping keys', async () => {

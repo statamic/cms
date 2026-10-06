@@ -17,7 +17,7 @@
         <KeyboardReorderIndicator :moving="moving" :side="moveOrigin" />
         <header class="bg-gray-50 dark:bg-gray-900 rounded-t-xl border-b border-gray-300 dark:border-gray-700 ps-4 pe-2 py-1.5 flex items-center justify-between">
             <ui-drag-handle
-                :keyboard-reorder="grid.isReorderable"
+                :keyboard-reorder="canReorder"
                 :class="{ [sortableHandleClass]: grid.isReorderable }"
                 @keyboard-reorder="startMovingFromHandle"
             />
@@ -32,7 +32,7 @@
                 <Dropdown placement="left-start">
                     <DropdownMenu>
                         <DropdownItem
-                            v-if="grid.isReorderable"
+                            v-if="canReorder"
                             :text="__('Move')"
                             @click="startMovingFromMenu"
                         />

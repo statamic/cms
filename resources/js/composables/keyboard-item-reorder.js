@@ -1,5 +1,8 @@
 import { computed, nextTick, onBeforeUnmount, ref, toValue, watch } from 'vue';
 
+/** Only one keyboard-reorder session may be active (avoids nested Grid/Replicator both moving). */
+let activeSession = null;
+
 /**
  * Keyboard reordering: activate from the drag handle or Move menu, then
  * ArrowUp/ArrowDown to reorder, Enter/Escape to finish.
@@ -14,13 +17,23 @@ export function useKeyboardItemReorder({ index, total, onMove }) {
     const status = ref('');
     let startTimer = null;
 
+    const session = {
+        stopMoving: () => stopMoving(),
+    };
+
     const canMoveUp = computed(() => toValue(index) > 0);
     const canMoveDown = computed(() => toValue(index) < toValue(total) - 1);
 
     function announcePosition() {
-        status.value = __('messages.keyboard_item_reorder_position', {
+        const message = __('messages.keyboard_item_reorder_position', {
             current: toValue(index) + 1,
             total: toValue(total),
+        });
+
+        // Clear first so aria-live re-announces when stuck at an edge.
+        status.value = '';
+        nextTick(() => {
+            status.value = message;
         });
     }
 
@@ -28,9 +41,18 @@ export function useKeyboardItemReorder({ index, total, onMove }) {
         return rootEl.value?.closest('[data-moving]');
     }
 
+    function reorderFocusTarget(item) {
+        if (!item) return null;
+        // Prefer the item itself (Grid row) over a nested [data-reorder-focus] (Replicator in a cell).
+        if (item.matches('[data-reorder-focus]')) return item;
+
+        return item.querySelector('[data-reorder-focus]') ?? item;
+    }
+
     function dropdownTrigger() {
-        return movingItem()?.querySelector('[data-ui-dropdown-trigger]')
-            ?? rootEl.value?.parentElement?.querySelector('[data-ui-dropdown-trigger]');
+        // Prefer the controls next to the sentinel — not a nested field's dropdown.
+        return rootEl.value?.parentElement?.querySelector('[data-ui-dropdown-trigger]')
+            ?? movingItem()?.querySelector('[data-ui-dropdown-trigger]');
     }
 
     function focusRoot() {
@@ -130,6 +152,11 @@ export function useKeyboardItemReorder({ index, total, onMove }) {
         // Wait for the dropdown to finish closing / restoring focus, otherwise
         // our focus and the first keypress get eaten by the menu teardown.
         startTimer = setTimeout(() => {
+            if (activeSession && activeSession !== session) {
+                activeSession.stopMoving();
+            }
+            activeSession = session;
+
             moving.value = true;
             status.value = __('messages.keyboard_item_reorder_instructions');
             bindListeners();
@@ -146,12 +173,15 @@ export function useKeyboardItemReorder({ index, total, onMove }) {
         if (!moving.value) return;
 
         // Land on the whole row/set (not the grab handle or ⋯ menu).
-        const item = movingItem();
-        const focusTarget = item?.querySelector('[data-reorder-focus]') ?? item;
+        const focusTarget = reorderFocusTarget(movingItem());
 
         moving.value = false;
         status.value = '';
         unbindListeners();
+
+        if (activeSession === session) {
+            activeSession = null;
+        }
 
         if (restoreFocus) {
             nextTick(() => {
@@ -171,6 +201,9 @@ export function useKeyboardItemReorder({ index, total, onMove }) {
 
     onBeforeUnmount(() => {
         clearTimeout(startTimer);
+        if (activeSession === session) {
+            activeSession = null;
+        }
         unbindListeners();
     });
 

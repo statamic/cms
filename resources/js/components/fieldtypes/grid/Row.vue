@@ -13,7 +13,7 @@
     >
         <td v-if="grid.isReorderable" class="drag-handle relative">
             <DragHandle
-                keyboard-reorder
+                :keyboard-reorder="canReorder"
                 :class="sortableHandleClass"
                 @keyboard-reorder="startMovingFromHandle"
             />
@@ -42,7 +42,7 @@
             <Dropdown placement="left-start">
                 <DropdownMenu>
                     <DropdownItem
-                        v-if="grid.isReorderable"
+                        v-if="canReorder"
                         :text="__('Move')"
                         @click="startMovingFromMenu"
                     />
@@ -139,6 +139,10 @@ export default {
             const max = this.grid.config.max_rows;
             if (!max) return false;
             return this.index >= max;
+        },
+
+        canReorder() {
+            return this.grid.isReorderable && this.totalRows > 1;
         },
 
         showRowControls() {
