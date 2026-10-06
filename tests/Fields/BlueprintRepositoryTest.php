@@ -3,6 +3,7 @@
 namespace Tests\Fields;
 
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Exceptions\BlueprintNotFoundException;
 use Statamic\Facades;
@@ -465,5 +466,23 @@ EOT;
 
         $repo->find('globals.test');
         $repo->find('forms.test');
+    }
+
+    #[Test]
+    #[DataProvider('namespaceAndHandleFromPathProvider')]
+    public function it_gets_namespace_and_handle_from_path($path, $namespace, $handle)
+    {
+        $this->assertSame([$namespace, $handle], $this->repo->getNamespaceAndHandleFromPath($path));
+    }
+
+    public static function namespaceAndHandleFromPathProvider()
+    {
+        return [
+            'root' => ['/path/to/resources/blueprints/test.yaml', null, 'test'],
+            'collection' => ['/path/to/resources/blueprints/collections/blog/post.yaml', 'collections.blog', 'post'],
+            'vendor override' => ['/path/to/resources/blueprints/vendor/runway/category.yaml', 'runway', 'category'],
+            'nested vendor override' => ['/path/to/resources/blueprints/vendor/statamic-rad-pack/runway/category.yaml', 'statamic-rad-pack.runway', 'category'],
+            'collection named vendor' => ['/path/to/resources/blueprints/collections/vendor/pages.yaml', 'collections.vendor', 'pages'],
+        ];
     }
 }
