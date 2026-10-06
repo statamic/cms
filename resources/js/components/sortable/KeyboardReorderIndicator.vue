@@ -1,7 +1,7 @@
 <template>
     <span
         v-if="moving"
-        class="pointer-events-none absolute start-full top-1/2 ms-2 flex -translate-y-1/2 items-center gap-0.5"
+        class="pointer-events-none absolute start-full top-3 ms-2 flex items-center gap-0.5"
         aria-hidden="true"
     >
         <kbd :class="keyClasses">↑</kbd>
