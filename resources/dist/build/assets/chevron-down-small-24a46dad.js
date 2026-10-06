@@ -1,0 +1,1 @@
+var t=function(){var e=this,r=e._self._c;return r("svg",{attrs:{fill:"currentColor",viewBox:"0 0 9.9 6.4"}},[r("path",{attrs:{d:"M9.9 1.4 5 6.4l-5-5L1.4 0 5 3.5 8.5 0l1.4 1.4z"}})])};const l={render:t};export{l as default};
