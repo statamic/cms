@@ -24,17 +24,27 @@ export function useKeyboardItemReorder({ index, total, onMove }) {
         });
     }
 
+    function movingItem() {
+        return rootEl.value?.closest('[data-moving]');
+    }
+
+    function dropdownTrigger() {
+        return movingItem()?.querySelector('[data-ui-dropdown-trigger]')
+            ?? rootEl.value?.parentElement?.querySelector('[data-ui-dropdown-trigger]');
+    }
+
     function focusRoot() {
         nextTick(() => {
+            // Dropdown close restores focus to the ⋯ trigger — take it back.
+            dropdownTrigger()?.blur();
             rootEl.value?.focus({ preventScroll: true });
         });
     }
 
     function scrollMovingItemIntoView() {
         nextTick(() => {
-            const item = rootEl.value?.closest('[data-moving]');
-            item?.scrollIntoView({ block: 'center', inline: 'nearest' });
-            rootEl.value?.focus({ preventScroll: true });
+            movingItem()?.scrollIntoView({ block: 'center', inline: 'nearest' });
+            focusRoot();
         });
     }
 
@@ -73,14 +83,22 @@ export function useKeyboardItemReorder({ index, total, onMove }) {
         stopMoving();
     }
 
+    function onFocusIn(event) {
+        if (!moving.value) return;
+        if (!event.target?.closest?.('[data-ui-dropdown-trigger]')) return;
+        focusRoot();
+    }
+
     function bindListeners() {
         window.addEventListener('keydown', onKeydown, true);
         window.addEventListener('pointerdown', onPointerDown, true);
+        window.addEventListener('focusin', onFocusIn, true);
     }
 
     function unbindListeners() {
         window.removeEventListener('keydown', onKeydown, true);
         window.removeEventListener('pointerdown', onPointerDown, true);
+        window.removeEventListener('focusin', onFocusIn, true);
     }
 
     function startMoving(origin = 'end') {
@@ -95,6 +113,8 @@ export function useKeyboardItemReorder({ index, total, onMove }) {
             status.value = __('Use up and down arrows to reorder. Press Enter or Escape when finished.');
             bindListeners();
             focusRoot();
+            // Catch late focus restoration from the menu after our first focus attempt.
+            requestAnimationFrame(() => focusRoot());
         }, 50);
     }
 
@@ -104,11 +124,8 @@ export function useKeyboardItemReorder({ index, total, onMove }) {
 
         if (!moving.value) return;
 
-        const item = rootEl.value?.closest('[data-moving]');
-        const focusTarget =
-            moveOrigin.value === 'start'
-                ? item?.querySelector('[data-drag-handle]')
-                : rootEl.value?.parentElement?.querySelector('[data-ui-dropdown-trigger]');
+        // Prefer the drag handle over the ⋯ menu so focus doesn't land on the dots.
+        const focusTarget = movingItem()?.querySelector('[data-drag-handle]');
 
         moving.value = false;
         status.value = '';
