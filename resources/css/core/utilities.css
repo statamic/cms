@@ -155,13 +155,9 @@
     outline-style: var(--focus-outline-style, solid);
 }
 
-/* Keyboard reorder: keep the whole set/panel outlined after Enter/Escape.
-   Table rows are excluded — <tr> outlines paint behind cells (see grid.css). */
-[data-reorder-focus]:focus:not(tr) {
-    outline-width: var(--focus-outline-width);
-    outline-offset: var(--focus-outline-offset);
-    outline-color: var(--focus-outline-color, currentColor);
-    outline-style: var(--focus-outline-style, solid);
+/* Keyboard reorder: no focus ring after Enter/Escape (moving uses focus-outline / table edge). */
+[data-reorder-focus]:focus {
+    outline: none;
 }
 
 @utility focus-none {
