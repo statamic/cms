@@ -227,22 +227,31 @@ reveal.use(rootEl, () => emit('expanded'));
                                 v-if="fieldActions.length"
                                 v-for="action in fieldActions"
                                 :text="action.title"
+                                :icon="action.icon"
                                 :variant="action.dangerous ? 'destructive' : 'default'"
                                 @click="action.run(action)"
                             />
                             <DropdownSeparator v-if="fieldActions.length" />
                             <DropdownItem
                                 :text="__(collapsed ? __('Expand Set') : __('Collapse Set'))"
+                                :icon="collapsed ? 'expand' : 'collapse'"
                                 @click="toggleCollapsedState"
                             />
                             <DropdownItem
                                 v-if="canReorder"
                                 :text="__('Move')"
+                                icon="move-vertical"
                                 @click="startMovingFromMenu"
                             />
-                            <DropdownItem v-if="canAddSet" :text="__('Duplicate Set')" @click="emit('duplicated')" />
+                            <DropdownItem
+                                v-if="canAddSet"
+                                :text="__('Duplicate Set')"
+                                icon="duplicate"
+                                @click="emit('duplicated')"
+                            />
                             <DropdownItem
                                 :text="__('Delete Set')"
+                                icon="trash"
                                 variant="destructive"
                                 @click="deletingSet = true"
                             />

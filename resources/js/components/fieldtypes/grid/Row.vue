@@ -44,6 +44,7 @@
                     <DropdownItem
                         v-if="canReorder"
                         :text="__('Move')"
+                        icon="move-vertical"
                         @click="startMovingFromMenu"
                     />
                     <DropdownItem v-if="canAddRows" :text="__('Duplicate Row')" icon="duplicate" @click="$emit('duplicate', index)" />
