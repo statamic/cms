@@ -410,7 +410,7 @@ class FormTest extends TestCase
     }
 
     #[Test]
-    public function it_assigns_ids_to_connection_rows_when_setting()
+    public function it_assigns_ids_to_connections_when_setting()
     {
         $form = Form::make('contact_us')->connections([
             'webhook' => [['url' => 'https://example.com/hook'], ['id' => 'abc', 'url' => 'https://example.com/other']],
@@ -423,7 +423,7 @@ class FormTest extends TestCase
     }
 
     #[Test]
-    public function it_normalizes_connection_configs_into_lists_of_rows_when_setting()
+    public function it_normalizes_connection_configs_into_lists_of_connections_when_setting()
     {
         $form = Form::make('contact_us')->connections([
             'acme' => ['token' => 'secret'],
@@ -431,7 +431,7 @@ class FormTest extends TestCase
             'other' => 'nope',
         ]);
 
-        $connections = $form->connections()->map(fn ($rows) => array_map(fn ($row) => Arr::except($row, 'id'), $rows))->all();
+        $connections = $form->connections()->map(fn ($list) => array_map(fn ($connection) => Arr::except($connection, 'id'), $list))->all();
 
         $this->assertSame([
             'acme' => [['token' => 'secret']],
@@ -441,7 +441,7 @@ class FormTest extends TestCase
     }
 
     #[Test]
-    public function it_assigns_ids_to_connection_rows_when_hydrating()
+    public function it_assigns_ids_to_connections_when_hydrating()
     {
         File::put(Form::make('contact_us')->path(), YAML::dump([
             'title' => 'Contact Us',

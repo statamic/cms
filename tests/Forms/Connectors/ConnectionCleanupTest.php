@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Forms\Connections;
+namespace Tests\Forms\Connectors;
 
 use Exception;
 use Illuminate\Bus\Queueable;
@@ -18,8 +18,8 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Facades\Form;
-use Statamic\Forms\Connections\Connection;
-use Statamic\Forms\Connections\Webhooks\SendWebhook;
+use Statamic\Forms\Connectors\Connector;
+use Statamic\Forms\Connectors\Webhooks\SendWebhook;
 use Statamic\Forms\SendEmail;
 use Statamic\Forms\Uploaders\FormFileUpload;
 use Statamic\Support\VueComponent;
@@ -35,8 +35,8 @@ class ConnectionCleanupTest extends TestCase
         parent::setUp();
 
         Storage::fake('local');
-        CountdownConnection::register();
-        CountdownConnection::$jobs = [];
+        CountdownConnector::register();
+        CountdownConnector::$jobs = [];
         CountdownJob::$outcomes = [];
         CountdownJob::$runs = [];
     }
@@ -280,7 +280,7 @@ class ConnectionCleanupTest extends TestCase
 
     private function retry(string $id): void
     {
-        Bus::dispatch(CountdownConnection::$jobs[$id]);
+        Bus::dispatch(CountdownConnector::$jobs[$id]);
     }
 
     private function counterKey(Submission $submission): string
@@ -289,7 +289,7 @@ class ConnectionCleanupTest extends TestCase
     }
 }
 
-class CountdownConnection extends Connection
+class CountdownConnector extends Connector
 {
     public static array $jobs = [];
 

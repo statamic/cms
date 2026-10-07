@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Forms\Connections\Webhooks;
+namespace Statamic\Forms\Connectors\Webhooks;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;

@@ -19,12 +19,12 @@ use Statamic\Events\SubmissionFinalized;
 use Statamic\Events\SubmissionSaved;
 use Statamic\Events\SubmissionSaving;
 use Statamic\Facades\File;
-use Statamic\Facades\FormConnection;
+use Statamic\Facades\FormConnector;
 use Statamic\Facades\FormSubmission;
 use Statamic\Facades\Site as Sites;
 use Statamic\Facades\Stache;
 use Statamic\Fields\Field;
-use Statamic\Forms\Connections\RecordConnectionSuccess;
+use Statamic\Forms\Connectors\RecordConnectionSuccess;
 use Statamic\Forms\Uploaders\AssetsUploader;
 use Statamic\Forms\Uploaders\FilesUploader;
 use Statamic\Forms\Uploaders\FormFileUpload;
@@ -279,7 +279,7 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
         CreateAssetsFromFileUploads::dispatchSync($this);
 
         $jobs = $this->form()->connections()
-            ->map(fn ($config, $connection) => FormConnection::find($connection)?->setConfig($config)->finalized($this))
+            ->map(fn ($config, $handle) => FormConnector::find($handle)?->setConfig($config)->finalized($this))
             ->flatten()
             ->filter()
             ->each(fn ($job) => RecordConnectionSuccess::ensureAttachable($job))

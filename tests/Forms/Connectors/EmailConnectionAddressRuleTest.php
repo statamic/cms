@@ -1,12 +1,12 @@
 <?php
 
-namespace Tests\Forms\Connections;
+namespace Tests\Forms\Connectors;
 
 use Illuminate\Support\Facades\Validator;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Form;
-use Statamic\Forms\Connections\Rules\EmailConnectionAddress;
+use Statamic\Forms\Connectors\Rules\EmailConnectionAddress;
 use Tests\TestCase;
 
 class EmailConnectionAddressRuleTest extends TestCase

@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Forms\Connections\Rules;
+namespace Statamic\Forms\Connectors\Rules;
 
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;

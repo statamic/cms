@@ -5,10 +5,10 @@ import { Button, ConfirmationModal, Description } from '@ui';
 import { SortableList } from '@/components/sortable/Sortable.js';
 import { deepClone } from '@/util/clone.js';
 import { preferences } from '@api';
-import ConnectionRow from './ConnectionRow.vue';
+import ConnectionItem from './ConnectionItem.vue';
 import { __ } from '@/bootstrap/globals';
 
-type Row = {
+type Connection = {
     id: string;
     enabled: boolean;
     conditions: {
@@ -23,7 +23,7 @@ type Row = {
 const emit = defineEmits(['update:modelValue']);
 
 const props = withDefaults(defineProps<{
-    modelValue: Row[];
+    modelValue: Connection[];
     errors: Record<string, string[]>;
     defaults: Record<string, unknown>;
     addLabel: string;
@@ -34,18 +34,18 @@ const props = withDefaults(defineProps<{
     modelValue: () => [],
     errors: () => ({}),
     defaults: () => ({}),
-    addLabel: () => __('Add Row'),
-    deleteHeading: () => __('Delete Row'),
-    deleteDescription: () => __('Are you sure you want to delete this row?'),
+    addLabel: () => __('Add Connection'),
+    deleteHeading: () => __('Delete Connection'),
+    deleteDescription: () => __('Are you sure you want to delete this connection?'),
 });
 
-const sortableItemClass = 'connection-row';
-const sortableHandleClass = 'connection-row-handle';
+const sortableItemClass = 'connection-item';
+const sortableHandleClass = 'connection-item-handle';
 
-const collapseByDefault = ref<boolean>(preferences.get('forms.connect.collapse_rows', true));
-const collapsed = ref<string[]>(collapseByDefault.value ? props.modelValue.map((row) => row.id) : []);
+const collapseByDefault = ref<boolean>(preferences.get('forms.connect.collapse_connections', true));
+const collapsed = ref<string[]>(collapseByDefault.value ? props.modelValue.map((connection) => connection.id) : []);
 const confirmingRemoval = ref<string | null>(null);
-const errorRowIds = ref<string[]>([]);
+const errorConnectionIds = ref<string[]>([]);
 
 const add = (): void => {
     emit('update:modelValue', [
@@ -59,36 +59,36 @@ const add = (): void => {
     ]);
 };
 
-const duplicate = (row: Row): void => {
+const duplicate = (connection: Connection): void => {
     const duplicated = [...props.modelValue];
 
-    duplicated.splice(props.modelValue.indexOf(row) + 1, 0, {
-        ...deepClone(row),
+    duplicated.splice(props.modelValue.indexOf(connection) + 1, 0, {
+        ...deepClone(connection),
         id: uniqid(),
-        conditions: row.conditions.map((condition) => ({ ...condition, _id: uniqid() })),
+        conditions: connection.conditions.map((condition) => ({ ...condition, _id: uniqid() })),
     });
 
     emit('update:modelValue', duplicated);
 };
 
-const updateEnabled = (row: Row, enabled: boolean): void => {
+const updateEnabled = (connection: Connection, enabled: boolean): void => {
     emit(
         'update:modelValue',
-        props.modelValue.map((existing) => (existing.id === row.id ? { ...existing, enabled } : existing))
+        props.modelValue.map((existing) => (existing.id === connection.id ? { ...existing, enabled } : existing))
     );
 };
 
 const remove = (): void => {
-    const row = props.modelValue.find((item) => item.id === confirmingRemoval.value);
+    const connection = props.modelValue.find((item) => item.id === confirmingRemoval.value);
 
     expand(confirmingRemoval.value);
     confirmingRemoval.value = null;
 
-    if (row) emit('update:modelValue', props.modelValue.filter((existing) => existing !== row));
+    if (connection) emit('update:modelValue', props.modelValue.filter((existing) => existing !== connection));
 };
 
-const isEnabled = (row: Row): boolean => row.enabled !== false;
-const isCollapsed = (row: Row): boolean => collapsed.value.includes(row.id);
+const isEnabled = (connection: Connection): boolean => connection.enabled !== false;
+const isCollapsed = (connection: Connection): boolean => collapsed.value.includes(connection.id);
 
 const collapse = (id: string): void => {
     if (!collapsed.value.includes(id)) {
@@ -96,7 +96,7 @@ const collapse = (id: string): void => {
     }
 };
 
-const expand = (id: string): void => (collapsed.value = collapsed.value.filter((rowId) => rowId !== id));
+const expand = (id: string): void => (collapsed.value = collapsed.value.filter((connectionId) => connectionId !== id));
 
 const expandAll = (): void => {
     collapsed.value = [];
@@ -104,22 +104,22 @@ const expandAll = (): void => {
 };
 
 const collapseAll = (): void => {
-    collapsed.value = props.modelValue.map((row) => row.id);
+    collapsed.value = props.modelValue.map((connection) => connection.id);
     collapseByDefault.value = true;
 };
 
 const allCollapsed = computed(() => collapsed.value.length === props.modelValue.length);
 
-const errorIndex = (row: Row): number => errorRowIds.value.indexOf(row.id);
+const errorIndex = (connection: Connection): number => errorConnectionIds.value.indexOf(connection.id);
 
-const hasError = (row: Row): boolean => {
-    const index = errorIndex(row);
+const hasError = (connection: Connection): boolean => {
+    const index = errorIndex(connection);
 
     return index !== -1 && Object.keys(props.errors).some((key) => key === `${index}` || key.startsWith(`${index}.`));
 };
 
-const rowErrors = (row: Row) => {
-    const index = errorIndex(row);
+const connectionErrors = (connection: Connection) => {
+    const index = errorIndex(connection);
 
     return Object.entries(props.errors)
         .filter(([key]) => key.startsWith(`${index}.`))
@@ -130,17 +130,17 @@ const rowErrors = (row: Row) => {
         }, {});
 };
 
-watch(collapseByDefault, (collapse: boolean) => preferences.set('forms.connect.collapse_rows', collapse));
+watch(collapseByDefault, (collapse: boolean) => preferences.set('forms.connect.collapse_connections', collapse));
 
 watch(
     () => props.errors,
-    () => (errorRowIds.value = props.modelValue.map((row) => row.id)),
+    () => (errorConnectionIds.value = props.modelValue.map((connection) => connection.id)),
     { immediate: true },
 );
 </script>
 
 <template>
-    <Teleport v-if="modelValue.length > 1" defer to="#connection-rows-actions">
+    <Teleport v-if="modelValue.length > 1" defer to="#connection-list-actions">
         <Button
             size="xs"
             variant="ghost"
@@ -163,25 +163,25 @@ watch(
             :handle-class="sortableHandleClass"
             @update:model-value="$emit('update:modelValue', $event)"
         >
-            <div class="relative space-y-6 mb-0" data-connection-rows>
-                <div v-for="(row, index) in modelValue" :key="row.id" :class="sortableItemClass">
-                    <ConnectionRow
-                        :enabled="isEnabled(row)"
-                        :collapsed="isCollapsed(row)"
-                        :has-error="hasError(row)"
+            <div class="relative space-y-6 mb-0" data-connection-list>
+                <div v-for="(connection, index) in modelValue" :key="connection.id" :class="sortableItemClass">
+                    <ConnectionItem
+                        :enabled="isEnabled(connection)"
+                        :collapsed="isCollapsed(connection)"
+                        :has-error="hasError(connection)"
                         :handle-class="sortableHandleClass"
-                        @collapsed="collapse(row.id)"
-                        @expanded="expand(row.id)"
-                        @duplicated="duplicate(row)"
-                        @removed="confirmingRemoval = row.id"
-                        @update:enabled="updateEnabled(row, $event)"
+                        @collapsed="collapse(connection.id)"
+                        @expanded="expand(connection.id)"
+                        @duplicated="duplicate(connection)"
+                        @removed="confirmingRemoval = connection.id"
+                        @update:enabled="updateEnabled(connection, $event)"
                     >
                         <template #header>
-                            <slot name="header" :item="row" :index="index" :collapsed="collapsed.includes(row.id)" />
+                            <slot name="header" :item="connection" :index="index" :collapsed="collapsed.includes(connection.id)" />
                         </template>
 
-                        <slot :item="row" :index="index" :errors="rowErrors(row)" />
-                    </ConnectionRow>
+                        <slot :item="connection" :index="index" :errors="connectionErrors(connection)" />
+                    </ConnectionItem>
                 </div>
             </div>
         </SortableList>
@@ -204,7 +204,7 @@ watch(
 </template>
 
 <style scoped>
-[data-connection-rows]::before {
+[data-connection-list]::before {
     content: '';
     position: absolute;
     top: 1.5rem;
@@ -213,7 +213,7 @@ watch(
     border-inline-start: 1px dashed var(--color-gray-400);
 }
 
-.dark [data-connection-rows]::before {
+.dark [data-connection-list]::before {
     border-inline-start-color: var(--color-gray-600);
 }
 </style>

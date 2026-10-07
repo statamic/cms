@@ -6,8 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 use Statamic\Exceptions\NotFoundHttpException;
-use Statamic\Facades\FormConnection;
-use Statamic\Forms\Connections\Connection;
+use Statamic\Facades\FormConnector;
+use Statamic\Forms\Connectors\Connector;
 use Statamic\Forms\Fields\FormField;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Controllers\CP\Forms\Concerns\ProvidesFormAbilities;
@@ -24,56 +24,56 @@ class FormConnectController extends CpController
         return Inertia::render('forms/connect/Index', [
             'form' => $form,
             'can' => $this->formAbilities($form),
-            'connections' => FormConnection::all()->map(fn (Connection $connection): array => [
-                'handle' => $connection->handle(),
-                'title' => $connection->title(),
-                'description' => $connection->description(),
-                'icon' => $connection->icon(),
-                'developer' => $connection->developer(),
-                'count' => $connection->count($form),
-                'url' => cp_route('forms.connect.edit', [$form->handle(), $connection->handle()]),
+            'connectors' => FormConnector::all()->map(fn (Connector $connector): array => [
+                'handle' => $connector->handle(),
+                'title' => $connector->title(),
+                'description' => $connector->description(),
+                'icon' => $connector->icon(),
+                'developer' => $connector->developer(),
+                'count' => $connector->count($form),
+                'url' => cp_route('forms.connect.edit', [$form->handle(), $connector->handle()]),
             ])->values(),
         ]);
     }
 
-    public function edit($form, string $connection)
+    public function edit($form, string $handle)
     {
         $this->authorize('edit', $form);
 
-        throw_unless($connection = FormConnection::find($connection), NotFoundHttpException::class);
+        throw_unless($connector = FormConnector::find($handle), NotFoundHttpException::class);
 
         return Inertia::render('forms/connect/Edit', [
             'form' => $form,
             'can' => $this->formAbilities($form),
-            'connection' => [
-                'handle' => $connection->handle(),
-                'title' => $connection->title(),
-                'description' => $connection->description(),
-                'icon' => $connection->smallIcon(),
+            'connector' => [
+                'handle' => $connector->handle(),
+                'title' => $connector->title(),
+                'description' => $connector->description(),
+                'icon' => $connector->smallIcon(),
             ],
-            'component' => $connection->render($form),
-            'value' => $connection->preProcess($form->connections()->get($connection->handle(), []), $form),
-            'action' => cp_route('forms.connect.update', [$form->handle(), $connection->handle()]),
-            'isConfigured' => $connection->isConfigured(),
+            'component' => $connector->render($form),
+            'value' => $connector->preProcess($form->connections()->get($connector->handle(), []), $form),
+            'action' => cp_route('forms.connect.update', [$form->handle(), $connector->handle()]),
+            'isConfigured' => $connector->isConfigured(),
             'suggestableFields' => $this->suggestableFields($form),
         ]);
     }
 
-    public function update(Request $request, $form, string $connection)
+    public function update(Request $request, $form, string $handle)
     {
         $this->authorize('edit', $form);
 
-        throw_unless($connection = FormConnection::find($connection), NotFoundHttpException::class);
+        throw_unless($connector = FormConnector::find($handle), NotFoundHttpException::class);
 
-        Validator::make($request->except('_save'), $connection->rules($form))->validate();
+        Validator::make($request->except('_save'), $connector->rules($form))->validate();
 
-        $config = $connection->process($request->except('_save'), $form);
+        $config = $connector->process($request->except('_save'), $form);
 
         if ($request->boolean('_save', true)) {
-            $form->connections($form->connections()->put($connection->handle(), $config))->save();
+            $form->connections($form->connections()->put($connector->handle(), $config))->save();
         }
 
-        return $connection->preProcess($config, $form);
+        return $connector->preProcess($config, $form);
     }
 
     private function suggestableFields($form): array

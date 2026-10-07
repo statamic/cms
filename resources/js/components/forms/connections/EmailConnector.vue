@@ -2,9 +2,9 @@
 import { ref } from 'vue';
 import { usePage } from '@inertiajs/vue3';
 import { Badge, Button, Icon, Label, PublishContainer, PublishFields, PublishFieldsProvider } from '@ui';
-import ConnectionRows from './ConnectionRows.vue';
+import ConnectionList from './ConnectionList.vue';
 import ConnectionRules from './ConnectionRules.vue';
-import ConnectionRowSummary from './ConnectionRowSummary.vue';
+import ConnectionSummary from './ConnectionSummary.vue';
 import EmailPreview from './EmailPreview.vue';
 
 defineEmits(['update:modelValue']);
@@ -37,7 +37,7 @@ const recipients = (to: string[] | string): string =>
 <template>
     <Label :text="__('Emails')" class="mb-2" />
 
-    <ConnectionRows
+    <ConnectionList
         :model-value="modelValue"
         :errors
         :defaults
@@ -54,7 +54,7 @@ const recipients = (to: string[] | string): string =>
                         <Icon name="mail-sign-at" class="size-3.5 me-1 opacity-100! text-blue-600 dark:text-blue-400" aria-hidden="true" />
                         {{ email.to?.length ? __('Message sent to :email', { email: recipients(email.to) }) : __('New Email') }}
                     </Badge>
-                    <ConnectionRowSummary
+                    <ConnectionSummary
                         v-show="collapsed"
                         :conditions="email.conditions"
                         :fallback="email.subject"
@@ -89,7 +89,7 @@ const recipients = (to: string[] | string): string =>
                 </template>
             </ConnectionRules>
         </template>
-    </ConnectionRows>
+    </ConnectionList>
 
     <EmailPreview v-model="previewing" :url="previewUrl" />
 </template>

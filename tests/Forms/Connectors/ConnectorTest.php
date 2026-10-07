@@ -1,27 +1,27 @@
 <?php
 
-namespace Tests\Forms\Connections;
+namespace Tests\Forms\Connectors;
 
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Facades\Form;
-use Statamic\Forms\Connections\Connection;
+use Statamic\Forms\Connectors\Connector;
 use Statamic\Statamic;
 use Statamic\Support\VueComponent;
 use Tests\TestCase;
 
-class ConnectionTest extends TestCase
+class ConnectorTest extends TestCase
 {
     #[Test]
     public function the_handle_is_snake_cased_from_the_class_by_default()
     {
-        $this->assertEquals('test_multi_word', (new TestMultiWordConnection)->handle());
+        $this->assertEquals('test_multi_word', (new TestMultiWordConnector)->handle());
     }
 
     #[Test]
     public function handle_can_be_defined_as_a_property()
     {
-        $connection = new class extends Connection
+        $connector = new class extends Connector
         {
             protected static $handle = 'example';
 
@@ -31,19 +31,19 @@ class ConnectionTest extends TestCase
             }
         };
 
-        $this->assertEquals('example', $connection->handle());
+        $this->assertEquals('example', $connector->handle());
     }
 
     #[Test]
     public function title_is_the_humanized_handle_by_default()
     {
-        $this->assertEquals('Test Multi Word', (new TestMultiWordConnection)->title());
+        $this->assertEquals('Test Multi Word', (new TestMultiWordConnector)->title());
     }
 
     #[Test]
     public function title_can_be_defined_as_a_property()
     {
-        $connection = new class extends Connection
+        $connector = new class extends Connector
         {
             protected static $title = 'Super Cool Example';
 
@@ -53,13 +53,13 @@ class ConnectionTest extends TestCase
             }
         };
 
-        $this->assertEquals('Super Cool Example', $connection->title());
+        $this->assertEquals('Super Cool Example', $connector->title());
     }
 
     #[Test]
     public function it_gets_the_description_and_developer()
     {
-        $connection = new class extends Connection
+        $connector = new class extends Connector
         {
             protected $description = 'Send submissions to Acme.';
             protected $developer = 'Acme Inc';
@@ -70,14 +70,14 @@ class ConnectionTest extends TestCase
             }
         };
 
-        $this->assertEquals('Send submissions to Acme.', $connection->description());
-        $this->assertEquals('Acme Inc', $connection->developer());
+        $this->assertEquals('Send submissions to Acme.', $connector->description());
+        $this->assertEquals('Acme Inc', $connector->developer());
     }
 
     #[Test]
     public function the_small_icon_falls_back_to_the_icon()
     {
-        $connection = new class extends Connection
+        $connector = new class extends Connector
         {
             protected $icon = 'globe-arrow';
 
@@ -87,14 +87,14 @@ class ConnectionTest extends TestCase
             }
         };
 
-        $this->assertEquals(Statamic::svg('icons/globe-arrow'), $connection->icon());
-        $this->assertEquals(Statamic::svg('icons/globe-arrow'), $connection->smallIcon());
+        $this->assertEquals(Statamic::svg('icons/globe-arrow'), $connector->icon());
+        $this->assertEquals(Statamic::svg('icons/globe-arrow'), $connector->smallIcon());
     }
 
     #[Test]
     public function small_icon_can_be_defined_as_a_property()
     {
-        $connection = new class extends Connection
+        $connector = new class extends Connector
         {
             protected $icon = 'globe-arrow';
             protected $smallIcon = '<svg><circle r="1" /></svg>';
@@ -105,8 +105,8 @@ class ConnectionTest extends TestCase
             }
         };
 
-        $this->assertEquals(Statamic::svg('icons/globe-arrow'), $connection->icon());
-        $this->assertEquals('<svg><circle r="1" /></svg>', $connection->smallIcon());
+        $this->assertEquals(Statamic::svg('icons/globe-arrow'), $connector->icon());
+        $this->assertEquals('<svg><circle r="1" /></svg>', $connector->smallIcon());
     }
 
     #[Test]
@@ -114,7 +114,7 @@ class ConnectionTest extends TestCase
     {
         $form = Form::make('contact');
 
-        $connection = new class extends Connection
+        $connector = new class extends Connector
         {
             public function render(\Statamic\Contracts\Forms\Form $form): VueComponent
             {
@@ -127,41 +127,41 @@ class ConnectionTest extends TestCase
             }
         };
 
-        $this->assertEquals(3, $connection->count($form));
+        $this->assertEquals(3, $connector->count($form));
     }
 
     #[Test]
-    public function it_counts_rows_by_default()
+    public function it_counts_connections_by_default()
     {
         $form = Form::make('contact')->connections([
             'test_multi_word' => [['foo' => 'bar'], ['foo' => 'baz']],
         ]);
 
-        $this->assertEquals(2, (new TestMultiWordConnection)->count($form));
-        $this->assertEquals(0, (new TestMultiWordConnection)->count(Form::make('other')));
+        $this->assertEquals(2, (new TestMultiWordConnector)->count($form));
+        $this->assertEquals(0, (new TestMultiWordConnector)->count(Form::make('other')));
     }
 
     #[Test]
     public function it_is_configured_by_default()
     {
-        $this->assertTrue((new TestMultiWordConnection)->isConfigured());
+        $this->assertTrue((new TestMultiWordConnector)->isConfigured());
     }
 
     #[Test]
-    public function it_has_row_validation_rules_by_default()
+    public function it_has_connection_validation_rules_by_default()
     {
         $this->assertEquals([
             '*' => ['array'],
             '*.enabled' => ['nullable', 'boolean'],
             '*.conditions' => ['nullable', 'array'],
             '*.conditions.*' => ['array'],
-        ], (new TestMultiWordConnection)->rules(Form::make('contact')));
+        ], (new TestMultiWordConnector)->rules(Form::make('contact')));
     }
 
     #[Test]
-    public function it_merges_row_rules_into_the_default_rules()
+    public function it_merges_connection_rules_into_the_default_rules()
     {
-        $rules = (new TestRowConnection)->rules(Form::make('contact'));
+        $rules = (new TestHookedConnector)->rules(Form::make('contact'));
 
         $this->assertEquals([
             '*' => ['array'],
@@ -173,9 +173,9 @@ class ConnectionTest extends TestCase
     }
 
     #[Test]
-    public function it_processes_rows_by_default()
+    public function it_processes_connections_by_default()
     {
-        $rows = (new TestMultiWordConnection)->process([
+        $connections = (new TestMultiWordConnector)->process([
             ['id' => 'abc', 'foo' => 'bar', 'empty' => null, 'enabled' => true, 'conditions' => []],
             ['foo' => 'baz', 'enabled' => false, 'conditions' => [
                 ['_id' => 'one', 'field' => 'name', 'operator' => 'equals', 'value' => 'Foo', 'join' => 'and'],
@@ -183,24 +183,24 @@ class ConnectionTest extends TestCase
             ]],
         ], Form::make('contact'));
 
-        $this->assertSame(['id' => 'abc', 'foo' => 'bar'], $rows[0]);
-        $this->assertNotEmpty($rows[1]['id']);
+        $this->assertSame(['id' => 'abc', 'foo' => 'bar'], $connections[0]);
+        $this->assertNotEmpty($connections[1]['id']);
         $this->assertSame([
-            'id' => $rows[1]['id'],
+            'id' => $connections[1]['id'],
             'foo' => 'baz',
             'enabled' => false,
             'conditions' => [['field' => 'name', 'operator' => 'equals', 'value' => 'Foo', 'join' => 'and']],
-        ], $rows[1]);
+        ], $connections[1]);
     }
 
     #[Test]
-    public function it_processes_rows_through_the_row_hook()
+    public function it_processes_connections_through_the_connection_hook()
     {
-        $rows = (new TestRowConnection)->process([
+        $connections = (new TestHookedConnector)->process([
             ['id' => 'abc', 'token' => ' secret ', 'extra' => 'dropped', 'enabled' => false],
         ], Form::make('contact'));
 
-        $this->assertSame([['id' => 'abc', 'token' => 'secret', 'enabled' => false]], $rows);
+        $this->assertSame([['id' => 'abc', 'token' => 'secret', 'enabled' => false]], $connections);
     }
 
     #[Test]
@@ -210,35 +210,35 @@ class ConnectionTest extends TestCase
 
         $this->assertEquals([
             ['id' => 'abc', 'enabled' => true, 'conditions' => [], 'foo' => 'bar'],
-        ], (new TestMultiWordConnection)->preProcess($config, Form::make('contact')));
+        ], (new TestMultiWordConnector)->preProcess($config, Form::make('contact')));
     }
 
     #[Test]
     public function it_mints_missing_ids_when_pre_processing()
     {
-        $rows = (new TestMultiWordConnection)->preProcess([['foo' => 'bar']], Form::make('contact'));
+        $connections = (new TestMultiWordConnector)->preProcess([['foo' => 'bar']], Form::make('contact'));
 
-        $this->assertNotEmpty($rows[0]['id']);
-        $this->assertEquals('bar', $rows[0]['foo']);
+        $this->assertNotEmpty($connections[0]['id']);
+        $this->assertEquals('bar', $connections[0]['foo']);
     }
 
     #[Test]
-    public function it_pre_processes_rows_through_the_row_hook()
+    public function it_pre_processes_connections_through_the_connection_hook()
     {
-        $rows = (new TestRowConnection)->preProcess([['id' => 'abc', 'token' => 'secret', 'extra' => 'dropped']], Form::make('contact'));
+        $connections = (new TestHookedConnector)->preProcess([['id' => 'abc', 'token' => 'secret', 'extra' => 'dropped']], Form::make('contact'));
 
-        $this->assertEquals([['id' => 'abc', 'token' => 'SECRET', 'enabled' => true, 'conditions' => []]], $rows);
+        $this->assertEquals([['id' => 'abc', 'token' => 'SECRET', 'enabled' => true, 'conditions' => []]], $connections);
     }
 
     #[Test]
-    public function it_normalizes_non_list_configs_into_rows()
+    public function it_normalizes_non_list_configs_into_connections()
     {
-        $connection = new TestMultiWordConnection;
+        $connector = new TestMultiWordConnector;
 
-        $this->assertEquals([['token' => 'secret']], $connection->setConfig(['token' => 'secret'])->config());
-        $this->assertEquals([['foo' => 'bar']], $connection->setConfig([['foo' => 'bar'], 'nope', null])->config());
-        $this->assertCount(1, $connection->preProcess(['token' => 'secret'], Form::make('contact')));
-        $this->assertCount(1, $connection->process(['token' => 'secret'], Form::make('contact')));
+        $this->assertEquals([['token' => 'secret']], $connector->setConfig(['token' => 'secret'])->config());
+        $this->assertEquals([['foo' => 'bar']], $connector->setConfig([['foo' => 'bar'], 'nope', null])->config());
+        $this->assertCount(1, $connector->preProcess(['token' => 'secret'], Form::make('contact')));
+        $this->assertCount(1, $connector->process(['token' => 'secret'], Form::make('contact')));
     }
 
     #[Test]
@@ -246,20 +246,20 @@ class ConnectionTest extends TestCase
     {
         $form = Form::make('contact');
 
-        $jobs = (new TestMultiWordConnection)->setConfig([['id' => 'abc']])->finalized($form->makeSubmission());
+        $jobs = (new TestMultiWordConnector)->setConfig([['id' => 'abc']])->finalized($form->makeSubmission());
 
         $this->assertSame([], $jobs);
     }
 
     #[Test]
-    public function it_only_makes_jobs_for_enabled_rows_whose_conditions_pass()
+    public function it_only_makes_jobs_for_enabled_connections_whose_conditions_pass()
     {
         $form = Form::make('contact')->formFields([
             'fields' => [['handle' => 'name', 'field' => ['type' => 'text']]],
         ]);
         $submission = $form->makeSubmission()->data(['name' => 'Foo']);
 
-        $jobs = (new TestRowConnection)->setConfig([
+        $jobs = (new TestHookedConnector)->setConfig([
             ['id' => 'one'],
             ['id' => 'two', 'enabled' => false],
             ['id' => 'three', 'conditions' => [['field' => 'name', 'operator' => 'equals', 'value' => 'Foo']]],
@@ -267,24 +267,24 @@ class ConnectionTest extends TestCase
             ['id' => 'skip'],
         ])->finalized($submission);
 
-        $this->assertEquals(['one', 'three'], array_map(fn ($job) => $job->row['id'], $jobs));
+        $this->assertEquals(['one', 'three'], array_map(fn ($job) => $job->connection['id'], $jobs));
         $this->assertSame($submission, $jobs[0]->submission);
     }
 
     #[Test]
     public function it_adds_enabled_and_conditions_when_pre_processing_by_default()
     {
-        $rows = (new TestMultiWordConnection)->preProcess([
+        $connections = (new TestMultiWordConnector)->preProcess([
             ['id' => 'one', 'foo' => 'bar', 'enabled' => false, 'conditions' => [['field' => 'a', 'operator' => 'equals', 'value' => 'b', 'join' => 'and']]],
             ['id' => 'two', 'foo' => 'baz'],
         ], Form::make('contact'));
 
-        $this->assertFalse($rows[0]['enabled']);
-        $this->assertTrue($rows[1]['enabled']);
-        $this->assertCount(1, $rows[0]['conditions']);
-        $this->assertNotEmpty($rows[0]['conditions'][0]['_id']);
-        $this->assertSame([], $rows[1]['conditions']);
-        $this->assertEquals('baz', $rows[1]['foo']);
+        $this->assertFalse($connections[0]['enabled']);
+        $this->assertTrue($connections[1]['enabled']);
+        $this->assertCount(1, $connections[0]['conditions']);
+        $this->assertNotEmpty($connections[0]['conditions'][0]['_id']);
+        $this->assertSame([], $connections[1]['conditions']);
+        $this->assertEquals('baz', $connections[1]['foo']);
     }
 
     #[Test]
@@ -292,27 +292,27 @@ class ConnectionTest extends TestCase
     {
         $form = Form::make('contact');
 
-        $connection = new class extends Connection
+        $connector = new class extends Connector
         {
             public function render(\Statamic\Contracts\Forms\Form $form): VueComponent
             {
-                return VueComponent::render('acme-connection', [
+                return VueComponent::render('acme-connector', [
                     'foo' => 'bar',
                 ]);
             }
         };
 
-        $component = $connection->render($form);
+        $component = $connector->render($form);
 
         $this->assertInstanceOf(VueComponent::class, $component);
         $this->assertEquals([
-            'name' => 'acme-connection',
+            'name' => 'acme-connector',
             'props' => ['foo' => 'bar'],
         ], $component->toArray());
     }
 }
 
-class TestMultiWordConnection extends Connection
+class TestMultiWordConnector extends Connector
 {
     public function render(\Statamic\Contracts\Forms\Form $form): VueComponent
     {
@@ -320,34 +320,34 @@ class TestMultiWordConnection extends Connection
     }
 }
 
-class TestRowConnection extends Connection
+class TestHookedConnector extends Connector
 {
     public function render(\Statamic\Contracts\Forms\Form $form): VueComponent
     {
         return VueComponent::render('nothing');
     }
 
-    protected function job(Submission $submission, array $row): ?object
+    protected function job(Submission $submission, array $connection): ?object
     {
-        if ($row['id'] === 'skip') {
+        if ($connection['id'] === 'skip') {
             return null;
         }
 
-        return (object) ['submission' => $submission, 'row' => $row];
+        return (object) ['submission' => $submission, 'connection' => $connection];
     }
 
-    protected function preProcessRow(array $row, \Statamic\Contracts\Forms\Form $form): array
+    protected function preProcessConnection(array $connection, \Statamic\Contracts\Forms\Form $form): array
     {
-        return ['token' => strtoupper($row['token'] ?? '')];
+        return ['token' => strtoupper($connection['token'] ?? '')];
     }
 
-    protected function rowRules(\Statamic\Contracts\Forms\Form $form): array
+    protected function connectionRules(\Statamic\Contracts\Forms\Form $form): array
     {
         return ['token' => ['required', 'string']];
     }
 
-    protected function processRow(array $row, \Statamic\Contracts\Forms\Form $form): array
+    protected function processConnection(array $connection, \Statamic\Contracts\Forms\Form $form): array
     {
-        return ['token' => trim($row['token'] ?? '')];
+        return ['token' => trim($connection['token'] ?? '')];
     }
 }

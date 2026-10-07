@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Forms\Connections;
+namespace Statamic\Forms\Connectors;
 
 use Closure;
 use Illuminate\Bus\Queueable;

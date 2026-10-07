@@ -40,7 +40,7 @@ function toggleCollapsedState() {
                 />
                 <Dropdown>
                     <template #trigger>
-                        <Button icon="dots" variant="ghost" size="xs" class="me-2" :aria-label="__('Open row actions')" />
+                        <Button icon="dots" variant="ghost" size="xs" class="me-2" :aria-label="__('Open connection actions')" />
                     </template>
                     <DropdownMenu>
                         <DropdownItem

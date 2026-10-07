@@ -9,7 +9,7 @@ use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-class EditConnectionTest extends TestCase
+class EditConnectorTest extends TestCase
 {
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
@@ -36,9 +36,9 @@ class EditConnectionTest extends TestCase
             ->assertSuccessful()
             ->assertInertia(fn ($page) => $page
                 ->component('forms/connect/Edit', false)
-                ->where('connection.handle', 'email')
-                ->where('connection.title', 'Email')
-                ->where('component.name', 'email-connection')
+                ->where('connector.handle', 'email')
+                ->where('connector.title', 'Email')
+                ->where('component.name', 'email-connector')
                 ->missing('component.props.action')
                 ->missing('config')
                 ->has('suggestableFields')
@@ -51,7 +51,7 @@ class EditConnectionTest extends TestCase
     }
 
     #[Test]
-    public function it_404s_if_the_connection_doesnt_exist()
+    public function it_404s_if_the_connector_doesnt_exist()
     {
         $this->setTestRoles(['test' => ['access cp', 'edit forms']]);
         $user = tap(User::make()->assignRole('test'))->save();

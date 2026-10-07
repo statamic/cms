@@ -14,7 +14,7 @@ defineOptions({ layout: [Layout, PanelLayout, FormsLayout] });
 
 const props = defineProps({
     form: Object,
-    connection: Object,
+    connector: Object,
     component: Object,
     value: Array,
     action: String,
@@ -36,7 +36,7 @@ const save = () => {
     axios.patch(props.action, value.value)
         .then((response) => {
             value.value = response.data;
-            nextTick(() => Statamic.$dirty.remove('connection'));
+            nextTick(() => Statamic.$dirty.remove('connections'));
             Statamic.$toast.success(__('Saved'));
         })
         .catch((e) => {
@@ -50,7 +50,7 @@ const save = () => {
         .finally(() => (saving.value = false));
 };
 
-watch(value, () => Statamic.$dirty.add('connection'), { deep: true });
+watch(value, () => Statamic.$dirty.add('connections'), { deep: true });
 
 onMounted(() => {
     if (!props.isConfigured) return;
@@ -63,12 +63,12 @@ onMounted(() => {
 
 onUnmounted(() => {
     saveBinding.value?.destroy();
-    Statamic.$dirty.remove('connection');
+    Statamic.$dirty.remove('connections');
 });
 </script>
 
 <template>
-    <Head :title="[__(connection.title), __('Connect'), __(form.title), __('Forms')]" />
+    <Head :title="[__(connector.title), __('Connect'), __(form.title), __('Forms')]" />
 
     <Teleport v-if="isConfigured" to="#form-layout-actions">
         <Button variant="primary" :aria-label="__('Save')" :disabled="saving" @click="save">
@@ -99,18 +99,18 @@ onUnmounted(() => {
                         <Icon name="chevron-right" class="size-3.5 text-gray-400 dark:text-gray-500" aria-hidden="true" />
                         <span class="relative inline-flex items-center gap-1.5">
                             <span
-                                v-if="connection.icon"
+                                v-if="connector.icon"
                                 class="size-4 text-gray-700 dark:text-gray-300 [&_svg]:size-4"
                                 aria-hidden="true"
-                                v-html="connection.icon"
+                                v-html="connector.icon"
                             />
-                            <span>{{ __(connection.title) }}</span>
+                            <span>{{ __(connector.title) }}</span>
                             <Badge pill class="absolute start-full top-1/2 ms-1.5 size-6 -translate-y-1/2">
                                 {{ value.length }}
                             </Badge>
                         </span>
                     </Heading>
-                    <div id="connection-rows-actions" />
+                    <div id="connection-list-actions" />
                 </div>
             </PanelHeader>
             <Card>

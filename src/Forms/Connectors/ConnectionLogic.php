@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Forms\Connections;
+namespace Statamic\Forms\Connectors;
 
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Forms\Logic\RuleEvaluator;

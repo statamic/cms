@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Forms\Connections;
+namespace Tests\Forms\Connectors;
 
 use Illuminate\Http\Client\Request;
 use Illuminate\Http\Client\RequestException;
@@ -14,13 +14,13 @@ use Statamic\Exceptions\InvalidRemoteUrlException;
 use Statamic\Facades\Form;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
-use Statamic\Forms\Connections\Webhook;
-use Statamic\Forms\Connections\Webhooks\SendWebhook;
+use Statamic\Forms\Connectors\Webhook;
+use Statamic\Forms\Connectors\Webhooks\SendWebhook;
 use Statamic\Imaging\RemoteUrlValidator;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-class WebhookConnectionTest extends TestCase
+class WebhookConnectorTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
@@ -359,7 +359,7 @@ class WebhookConnectionTest extends TestCase
 
         $component = (new Webhook)->render($form)->toArray();
 
-        $this->assertEquals('webhook-connection', $component['name']);
+        $this->assertEquals('webhook-connector', $component['name']);
         $this->assertEquals(['blueprint', 'meta', 'defaults', 'examplePayload'], array_keys($component['props']));
         $this->assertEquals(['one', 'two'], array_keys($component['props']['meta']));
         $this->assertNull($component['props']['defaults']['values']['url']);

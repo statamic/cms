@@ -5,13 +5,13 @@ namespace Tests\Feature\Forms;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Form;
 use Statamic\Facades\User;
-use Statamic\Forms\Connections\Connection;
+use Statamic\Forms\Connectors\Connector;
 use Statamic\Support\VueComponent;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-class ViewConnectionsTest extends TestCase
+class ViewConnectorsTest extends TestCase
 {
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
@@ -22,7 +22,7 @@ class ViewConnectionsTest extends TestCase
 
         $app['config']['statamic.forms.forms'] = $this->fakeStacheDirectory.'/forms';
 
-        $app->booting(fn () => AcmeConnection::register());
+        $app->booting(fn () => AcmeConnector::register());
     }
 
     #[Test]
@@ -68,7 +68,7 @@ class ViewConnectionsTest extends TestCase
     }
 
     #[Test]
-    public function it_lists_connections()
+    public function it_lists_connectors()
     {
         $this->setTestRoles(['test' => ['access cp', 'edit forms']]);
         $user = tap(User::make()->assignRole('test'))->save();
@@ -82,14 +82,14 @@ class ViewConnectionsTest extends TestCase
             ->assertSuccessful()
             ->assertInertia(fn ($page) => $page
                 ->component('forms/connect/Index')
-                ->has('connections', 3)
-                ->where('connections.0.handle', 'email')
-                ->where('connections.0.title', 'Email')
-                ->where('connections.0.count', 1)
-                ->where('connections.0.url', cp_route('forms.connect.edit', [$form->handle(), 'email']))
-                ->where('connections.1.handle', 'webhook')
-                ->where('connections.1.count', 0)
-                ->where('connections.2.handle', 'acme'));
+                ->has('connectors', 3)
+                ->where('connectors.0.handle', 'email')
+                ->where('connectors.0.title', 'Email')
+                ->where('connectors.0.count', 1)
+                ->where('connectors.0.url', cp_route('forms.connect.edit', [$form->handle(), 'email']))
+                ->where('connectors.1.handle', 'webhook')
+                ->where('connectors.1.count', 0)
+                ->where('connectors.2.handle', 'acme'));
     }
 
     #[Test]
@@ -138,10 +138,10 @@ class ViewConnectionsTest extends TestCase
     }
 }
 
-class AcmeConnection extends Connection
+class AcmeConnector extends Connector
 {
     public function render($form): VueComponent
     {
-        return VueComponent::render('acme-connection');
+        return VueComponent::render('acme-connector');
     }
 }

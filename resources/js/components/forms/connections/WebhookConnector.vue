@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { Badge, Button, Field, Icon, Label, PublishContainer, PublishFields, PublishFieldsProvider } from '@ui';
-import ConnectionRows from './ConnectionRows.vue';
+import ConnectionList from './ConnectionList.vue';
 import ConnectionRules from './ConnectionRules.vue';
-import ConnectionRowSummary from './ConnectionRowSummary.vue';
+import ConnectionSummary from './ConnectionSummary.vue';
 
 defineEmits(['update:modelValue']);
 
@@ -23,7 +23,7 @@ const showExamplePayload = ref<boolean>(props.modelValue.length === 0);
 <template>
     <Label :text="__('Webhooks')" class="mb-2" />
 
-    <ConnectionRows
+    <ConnectionList
         :model-value="modelValue"
         :errors
         :defaults
@@ -38,7 +38,7 @@ const showExamplePayload = ref<boolean>(props.modelValue.length === 0);
                 <Icon name="globe-setting" class="size-3.5 me-1 opacity-100! text-purple-600 dark:text-purple-400" aria-hidden="true" />
                 {{ webhook.url || __('New Webhook') }}
             </Badge>
-            <ConnectionRowSummary
+            <ConnectionSummary
                 v-show="collapsed"
                 :conditions="webhook.conditions"
             />
@@ -68,7 +68,7 @@ const showExamplePayload = ref<boolean>(props.modelValue.length === 0);
                 </template>
             </ConnectionRules>
         </template>
-    </ConnectionRows>
+    </ConnectionList>
 
     <Field
         class="mt-8"

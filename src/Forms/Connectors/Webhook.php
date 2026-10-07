@@ -1,13 +1,13 @@
 <?php
 
-namespace Statamic\Forms\Connections;
+namespace Statamic\Forms\Connectors;
 
 use Statamic\Contracts\Forms\Form;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\User;
-use Statamic\Forms\Connections\Rules\WebhookConnectionUrl;
-use Statamic\Forms\Connections\Webhooks\SendWebhook;
+use Statamic\Forms\Connectors\Rules\WebhookConnectionUrl;
+use Statamic\Forms\Connectors\Webhooks\SendWebhook;
 use Statamic\Forms\Fields\FormField;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
@@ -15,13 +15,13 @@ use Statamic\Support\VueComponent;
 
 use function Statamic\trans as __;
 
-class Webhook extends Connection
+class Webhook extends Connector
 {
     protected $developer = 'Statamic';
 
     public function description(): ?string
     {
-        return __('statamic::messages.webhook_connection_description');
+        return __('statamic::messages.webhook_connector_description');
     }
 
     public function icon(): ?string
@@ -34,9 +34,9 @@ class Webhook extends Connection
         return Statamic::svg('forms/connect/webhook-small');
     }
 
-    protected function job(Submission $submission, array $row): ?object
+    protected function job(Submission $submission, array $connection): ?object
     {
-        return new SendWebhook($submission, $submission->site(), $row);
+        return new SendWebhook($submission, $submission->site(), $connection);
     }
 
     public function render(Form $form): VueComponent
@@ -44,7 +44,7 @@ class Webhook extends Connection
         $blueprint = static::blueprint($form);
         $fields = $blueprint->fields()->preProcess();
 
-        return VueComponent::render('webhook-connection', [
+        return VueComponent::render('webhook-connector', [
             'blueprint' => $blueprint->toPublishArray(),
             'meta' => collect($form->connections()->get('webhook'))
                 ->mapWithKeys(fn (array $config): array => [
@@ -59,16 +59,16 @@ class Webhook extends Connection
         ]);
     }
 
-    protected function preProcessRow(array $row, Form $form): array
+    protected function preProcessConnection(array $connection, Form $form): array
     {
         return static::blueprint($form)->fields()
-            ->addValues($row)
+            ->addValues($connection)
             ->preProcess()
             ->values()
             ->all();
     }
 
-    protected function rowRules(Form $form): array
+    protected function connectionRules(Form $form): array
     {
         return [
             'url' => ['required', 'url:http,https', new WebhookConnectionUrl],
@@ -76,10 +76,10 @@ class Webhook extends Connection
         ];
     }
 
-    protected function processRow(array $row, Form $form): array
+    protected function processConnection(array $connection, Form $form): array
     {
         $values = static::blueprint($form)->fields()
-            ->addValues($row)
+            ->addValues($connection)
             ->process()
             ->values()
             ->all();

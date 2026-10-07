@@ -1,11 +1,11 @@
 <?php
 
-namespace Statamic\Forms\Connections\Rules;
+namespace Statamic\Forms\Connectors\Rules;
 
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Statamic\Exceptions\InvalidRemoteUrlException;
-use Statamic\Forms\Connections\Webhooks\SendWebhook;
+use Statamic\Forms\Connectors\Webhooks\SendWebhook;
 
 class WebhookConnectionUrl implements ValidationRule
 {

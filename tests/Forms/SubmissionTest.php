@@ -17,7 +17,7 @@ use Statamic\Events\SubmissionSaved;
 use Statamic\Events\SubmissionSaving;
 use Statamic\Facades\Form;
 use Statamic\Facades\Site;
-use Statamic\Forms\Connections\Webhooks\SendWebhook;
+use Statamic\Forms\Connectors\Webhooks\SendWebhook;
 use Statamic\Forms\CreateAssetsFromFileUploads;
 use Statamic\Forms\DeleteTemporaryFiles;
 use Statamic\Forms\SendEmail;

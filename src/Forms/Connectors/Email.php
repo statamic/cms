@@ -1,13 +1,13 @@
 <?php
 
-namespace Statamic\Forms\Connections;
+namespace Statamic\Forms\Connectors;
 
 use Illuminate\Routing\Router;
 use Statamic\Contracts\Forms\Form;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Facades\Blueprint;
-use Statamic\Forms\Connections\Rules\EmailConnectionAddress;
-use Statamic\Forms\Connections\Rules\EmailConnectionView;
+use Statamic\Forms\Connectors\Rules\EmailConnectionAddress;
+use Statamic\Forms\Connectors\Rules\EmailConnectionView;
 use Statamic\Http\Controllers\CP\Forms\EmailConnectionPreviewController;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
@@ -15,13 +15,13 @@ use Statamic\Support\VueComponent;
 
 use function Statamic\trans as __;
 
-class Email extends Connection
+class Email extends Connector
 {
     protected $developer = 'Statamic';
 
     public function description(): ?string
     {
-        return __('statamic::messages.email_connection_description');
+        return __('statamic::messages.email_connector_description');
     }
 
     public function icon(): ?string
@@ -34,11 +34,11 @@ class Email extends Connection
         return Statamic::svg('forms/connect/email-notifications-small');
     }
 
-    protected function job(Submission $submission, array $row): ?object
+    protected function job(Submission $submission, array $connection): ?object
     {
         $class = config('statamic.forms.send_email_job');
 
-        return new $class($submission, $submission->site(), $row);
+        return new $class($submission, $submission->site(), $connection);
     }
 
     public function render(Form $form): VueComponent
@@ -46,7 +46,7 @@ class Email extends Connection
         $blueprint = static::blueprint($form);
         $fields = $blueprint->fields()->preProcess();
 
-        return VueComponent::render('email-connection', [
+        return VueComponent::render('email-connector', [
             'blueprint' => $blueprint->toPublishArray(),
             'meta' => collect($form->connections()->get('email'))
                 ->mapWithKeys(fn (array $config): array => [
@@ -61,10 +61,10 @@ class Email extends Connection
         ]);
     }
 
-    protected function preProcessRow(array $row, Form $form): array
+    protected function preProcessConnection(array $connection, Form $form): array
     {
         return static::blueprint($form)->fields()
-            ->addValues($this->convertLegacyAddresses($row))
+            ->addValues($this->convertLegacyAddresses($connection))
             ->preProcess()
             ->values()
             ->all();
@@ -81,7 +81,7 @@ class Email extends Connection
         return $config;
     }
 
-    protected function rowRules(Form $form): array
+    protected function connectionRules(Form $form): array
     {
         return [
             'to' => ['required', new EmailConnectionAddress($form)],
@@ -94,10 +94,10 @@ class Email extends Connection
         ];
     }
 
-    protected function processRow(array $row, Form $form): array
+    protected function processConnection(array $connection, Form $form): array
     {
         $values = static::blueprint($form)->fields()
-            ->addValues($row)
+            ->addValues($connection)
             ->process()
             ->values()
             ->all();

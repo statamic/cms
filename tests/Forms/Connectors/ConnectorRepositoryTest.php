@@ -1,32 +1,32 @@
 <?php
 
-namespace Tests\Forms\Connections;
+namespace Tests\Forms\Connectors;
 
 use Illuminate\Support\Facades\Route;
 use PHPUnit\Framework\Attributes\Test;
-use Statamic\Facades\FormConnection;
-use Statamic\Forms\Connections\Connection;
+use Statamic\Facades\FormConnector;
+use Statamic\Forms\Connectors\Connector;
 use Statamic\Support\VueComponent;
 use Tests\TestCase;
 
-class ConnectionRepositoryTest extends TestCase
+class ConnectorRepositoryTest extends TestCase
 {
     #[Test]
-    public function it_gets_a_connection()
+    public function it_gets_a_connector()
     {
-        RoutedConnection::register();
+        RoutedConnector::register();
 
-        $this->assertInstanceOf(RoutedConnection::class, FormConnection::find('routed'));
-        $this->assertTrue(FormConnection::all()->contains(fn ($connection) => $connection instanceof RoutedConnection));
-        $this->assertNull(FormConnection::find('unknown'));
+        $this->assertInstanceOf(RoutedConnector::class, FormConnector::find('routed'));
+        $this->assertTrue(FormConnector::all()->contains(fn ($connector) => $connector instanceof RoutedConnector));
+        $this->assertNull(FormConnector::find('unknown'));
     }
 
     #[Test]
     public function it_registers_routes_with_authorization()
     {
-        RoutedConnection::register();
+        RoutedConnector::register();
 
-        FormConnection::routes();
+        FormConnector::routes();
 
         $route = collect(Route::getRoutes())->first(fn ($route) => $route->getName() === 'forms.connect.routed.process');
 
@@ -36,11 +36,11 @@ class ConnectionRepositoryTest extends TestCase
     }
 }
 
-class RoutedConnection extends Connection
+class RoutedConnector extends Connector
 {
     public function render($form): VueComponent
     {
-        return VueComponent::render('routed-connection');
+        return VueComponent::render('routed-connector');
     }
 
     public function routes($router): void

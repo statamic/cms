@@ -9,7 +9,7 @@ use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-class UpdateConnectionTest extends TestCase
+class UpdateConnectorTest extends TestCase
 {
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
@@ -22,7 +22,7 @@ class UpdateConnectionTest extends TestCase
     }
 
     #[Test]
-    public function it_updates_the_connection()
+    public function it_updates_the_connections()
     {
         $this->setTestRoles(['test' => ['access cp', 'edit forms']]);
         $user = tap(User::make()->assignRole('test'))->save();
@@ -150,7 +150,7 @@ class UpdateConnectionTest extends TestCase
     }
 
     #[Test]
-    public function it_404s_if_the_connection_doesnt_exist()
+    public function it_404s_if_the_connector_doesnt_exist()
     {
         $this->setTestRoles(['test' => ['access cp', 'edit forms']]);
         $user = tap(User::make()->assignRole('test'))->save();

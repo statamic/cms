@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Forms\Connections;
+namespace Tests\Forms\Connectors;
 
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Route;
@@ -8,15 +8,15 @@ use Illuminate\Support\Facades\Validator;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Form;
-use Statamic\Facades\FormConnection;
+use Statamic\Facades\FormConnector;
 use Statamic\Facades\User;
-use Statamic\Forms\Connections\Email;
+use Statamic\Forms\Connectors\Email;
 use Statamic\Forms\SendEmail;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-class EmailConnectionTest extends TestCase
+class EmailConnectorTest extends TestCase
 {
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
@@ -106,7 +106,7 @@ class EmailConnectionTest extends TestCase
 
         $component = (new Email)->render($form)->toArray();
 
-        $this->assertEquals('email-connection', $component['name']);
+        $this->assertEquals('email-connector', $component['name']);
         $this->assertEquals(['blueprint', 'meta', 'defaults', 'previewUrl'], array_keys($component['props']));
         $this->assertEquals(['one', 'two'], array_keys($component['props']['meta']));
         $this->assertEquals([], $component['props']['defaults']['values']['to']);
@@ -117,7 +117,7 @@ class EmailConnectionTest extends TestCase
     #[Test]
     public function it_registers_a_preview_route()
     {
-        FormConnection::routes();
+        FormConnector::routes();
 
         $route = collect(Route::getRoutes())->first(fn ($route) => $route->getName() === 'forms.connect.email.preview');
 

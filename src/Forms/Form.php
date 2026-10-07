@@ -27,7 +27,7 @@ use Statamic\Facades\FormSubmission;
 use Statamic\Facades\User;
 use Statamic\Facades\YAML;
 use Statamic\Fields\Blueprint;
-use Statamic\Forms\Connections\Connection;
+use Statamic\Forms\Connectors\Connector;
 use Statamic\Forms\Exporters\Exporter;
 use Statamic\Forms\Fields\FormFields;
 use Statamic\Statamic;
@@ -310,8 +310,8 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
     private function ensureConnectionIds($config): array
     {
         return array_map(
-            fn (array $row) => ['id' => Str::random(8), ...$row],
-            Connection::normalizeRows($config)
+            fn (array $connection) => ['id' => Str::random(8), ...$connection],
+            Connector::normalizeConnections($config)
         );
     }
 
@@ -450,7 +450,7 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
     private function connectionsFileData(): array
     {
         return $this->connections()
-            ->map(fn (array $rows) => array_map(fn (array $row) => Arr::removeNullValues($row), $rows))
+            ->map(fn (array $connections) => array_map(fn (array $connection) => Arr::removeNullValues($connection), $connections))
             ->all();
     }
 

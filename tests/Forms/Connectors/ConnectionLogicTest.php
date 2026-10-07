@@ -1,11 +1,11 @@
 <?php
 
-namespace Tests\Forms\Connections;
+namespace Tests\Forms\Connectors;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Form;
-use Statamic\Forms\Connections\ConnectionLogic;
+use Statamic\Forms\Connectors\ConnectionLogic;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 

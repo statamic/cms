@@ -144,9 +144,9 @@ class ExtensionServiceProvider extends ServiceProvider
         'form' => \Statamic\Forms\Fieldtype::class,
     ];
 
-    protected $formConnections = [
-        'email' => Forms\Connections\Email::class,
-        'webhook' => Forms\Connections\Webhook::class,
+    protected $formConnectors = [
+        'email' => Forms\Connectors\Email::class,
+        'webhook' => Forms\Connectors\Webhook::class,
     ];
 
     protected $formFieldtypes = [
@@ -384,10 +384,10 @@ class ExtensionServiceProvider extends ServiceProvider
                 'directory' => 'Fieldtypes',
                 'extensions' => $this->fieldtypes,
             ],
-            'form-connections' => [
-                'class' => Forms\Connections\Connection::class,
-                'directory' => 'FormConnections',
-                'extensions' => $this->formConnections,
+            'form-connectors' => [
+                'class' => Forms\Connectors\Connector::class,
+                'directory' => 'FormConnectors',
+                'extensions' => $this->formConnectors,
             ],
             'form-fieldtypes' => [
                 'class' => FormFieldtype::class,
