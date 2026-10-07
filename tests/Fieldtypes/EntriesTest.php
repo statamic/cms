@@ -75,6 +75,29 @@ class EntriesTest extends TestCase
         ];
     }
 
+    /**
+     * @see https://github.com/statamic/cms/issues/15536
+     */
+    #[Test]
+    public function it_only_counts_published_entries_in_the_augmented_query_builder()
+    {
+        $augmented = $this->fieldtype()->augment([456, '123', 'draft', 'scheduled', 'expired']);
+
+        $this->assertEquals(2, $augmented->count());
+        $this->assertEqualsCanonicalizing(['456', '123'], $augmented->pluck('id')->all());
+    }
+
+    /**
+     * @see https://github.com/statamic/cms/issues/15536
+     */
+    #[Test]
+    public function it_doesnt_consider_unpublished_entries_to_exist_in_the_augmented_query_builder()
+    {
+        $augmented = $this->fieldtype()->augment(['draft']);
+
+        $this->assertFalse($augmented->exists());
+    }
+
     #[Test]
     public function it_augments_to_a_query_builder_when_theres_no_value()
     {

@@ -22,15 +22,11 @@ class Impersonate extends Action
 
     public function visibleTo($item)
     {
-        if (! config('statamic.users.impersonate.enabled', true) || session()->get('statamic_impersonated_by')) {
-            return false;
-        }
-
         if (! ($item instanceof UserContract && $item->id() != User::current()->id())) {
             return false;
         }
 
-        return User::current()->can('impersonate', $item);
+        return $this->authorize(User::current(), $item);
     }
 
     public function visibleToBulk($items)
@@ -40,6 +36,10 @@ class Impersonate extends Action
 
     public function authorize($authed, $user)
     {
+        if (! config('statamic.users.impersonate.enabled', true) || session()->get('statamic_impersonated_by')) {
+            return false;
+        }
+
         return $authed->can('impersonate', $user);
     }
 

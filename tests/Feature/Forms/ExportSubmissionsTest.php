@@ -60,6 +60,25 @@ class ExportSubmissionsTest extends TestCase
         $this->assertEquals(['Bravo', 'Alice', 'Charlie'], $this->namesFromCsv($response->getContent()));
     }
 
+    #[Test]
+    public function it_exports_only_the_requested_columns()
+    {
+        $blueprint = Blueprint::makeFromFields([
+            'name' => ['type' => 'text'],
+            'email' => ['type' => 'text'],
+        ]);
+        Blueprint::partialMock()->shouldReceive('find')->with('forms.test')->andReturn($blueprint);
+
+        $form = tap(Form::make('test'))->save();
+
+        $this
+            ->actingAs(tap(User::make()->makeSuper())->save())
+            ->export($form, 'csv', ['columns' => 'name,date'])
+            ->assertOk()
+            ->assertSee("name,date\n", false)
+            ->assertDontSee('email');
+    }
+
     private function createFormWithSubmissions()
     {
         $blueprint = Blueprint::makeFromFields(['name' => ['type' => 'text']]);

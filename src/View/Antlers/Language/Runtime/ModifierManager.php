@@ -147,12 +147,12 @@ class ModifierManager
                 }
             }
 
-            if ($returnValue === null) {
-                break;
-            }
-
             if ($returnValue instanceof Value) {
                 $returnValue = $value->value();
+            }
+
+            if ($returnValue === null) {
+                break;
             }
 
             try {

@@ -46,6 +46,58 @@ class PasswordEntryTest extends PageProtectionTestCase
     }
 
     #[Test]
+    public function it_does_not_match_a_numerically_equivalent_password()
+    {
+        config(['statamic.protect.schemes.password-scheme' => [
+            'driver' => 'password',
+            'form_url' => '/password-entry',
+            'allowed' => ['1000'],
+        ]]);
+
+        session()->put('statamic:protect:password.tokens.test-token', [
+            'scheme' => 'password-scheme',
+            'url' => '/target-url',
+            'reference' => 'entry::test',
+        ]);
+
+        // A loose comparison would treat "1e3" as equal to "1000".
+        $this
+            ->from('/original')
+            ->post('/!/protect/password', [
+                'token' => 'test-token',
+                'password' => '1e3',
+            ])
+            ->assertRedirect('/original')
+            ->assertSessionHasErrors('password', null, 'passwordProtect');
+    }
+
+    #[Test]
+    public function it_matches_a_password_configured_as_an_integer()
+    {
+        $this->withoutExceptionHandling();
+
+        config(['statamic.protect.schemes.password-scheme' => [
+            'driver' => 'password',
+            'form_url' => '/password-entry',
+            'allowed' => [1000],
+        ]]);
+
+        session()->put('statamic:protect:password.tokens.test-token', [
+            'scheme' => 'password-scheme',
+            'url' => '/target-url',
+            'reference' => 'entry::test',
+        ]);
+
+        $this
+            ->post('/!/protect/password', [
+                'token' => 'test-token',
+                'password' => '1000',
+            ])
+            ->assertRedirect('http://localhost/target-url')
+            ->assertSessionHas('statamic:protect:password.passwords.scheme.password-scheme', '1000');
+    }
+
+    #[Test]
     public function it_allows_access_if_allowed_password_was_entered()
     {
         $this->withoutExceptionHandling();

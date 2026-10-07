@@ -312,6 +312,66 @@ EOT;
     }
 
     #[Test]
+    #[DataProvider('requiredWordsProvider')]
+    public function it_filters_out_results_without_required_words($term, $expected)
+    {
+        $comb = new Comb([
+            ['title' => 'Pizza', 'ingredients' => 'Tomato, Cheese, Bread'],
+            ['title' => 'Tomato Soup', 'ingredients' => 'Tomato, Water, Salt'],
+            ['title' => 'Chicken & Sweetcorn Soup', 'ingredients' => ['Chicken', 'Sweetcorn', 'Water']],
+            ['title' => 'Crème Brûlée', 'ingredients' => "Crème\nSugar\nEgg"],
+        ]);
+
+        try {
+            $results = $comb->lookUp($term);
+        } catch (NoResultsFound $e) {
+            $results = [];
+        }
+
+        $this->assertEquals($expected, collect($results['data'] ?? [])->pluck('data.title')->all());
+    }
+
+    public static function requiredWordsProvider()
+    {
+        return [
+            'required word present' => ['soup +tomato', ['Tomato Soup']],
+            'required word absent' => ['soup +bacon', []],
+            'only a required word' => ['+tomato', ['Tomato Soup', 'Pizza']],
+            'multiple required words' => ['+tomato +water', ['Tomato Soup']],
+            'multiple required words in reverse order' => ['+water +tomato', ['Tomato Soup']],
+            'multiple required words with one absent' => ['+tomato +bacon', []],
+            'required word in an array' => ['soup +sweetcorn', ['Chicken & Sweetcorn Soup']],
+            'case insensitive' => ['soup +TOMATO', ['Tomato Soup']],
+            'multibyte' => ['+brûlée', ['Crème Brûlée']],
+            'multibyte case insensitive' => ['+BRÛLÉE', ['Crème Brûlée']],
+            'multiple required words on different lines' => ['+sugar +egg', ['Crème Brûlée']],
+            'required and disallowed words' => ['+tomato -cheese', ['Tomato Soup']],
+        ];
+    }
+
+    #[Test]
+    public function it_checks_required_words_in_linear_time()
+    {
+        // The time taken used to grow quadratically with the length of
+        // a record that did not contain the required word. Records of
+        // this size took multiple seconds each. Now they take no time.
+        $content = str_repeat('lorem ipsum dolor ', 5000);
+
+        $comb = new Comb([
+            ['title' => 'One', 'content' => $content],
+            ['title' => 'Two', 'content' => $content],
+            ['title' => 'Three', 'content' => $content.'zakat'],
+        ]);
+
+        $start = microtime(true);
+        $results = $comb->lookUp('+zakat -ramadan');
+        $elapsed = microtime(true) - $start;
+
+        $this->assertEquals(['Three'], collect($results['data'])->pluck('data.title')->all());
+        $this->assertLessThan(5, $elapsed);
+    }
+
+    #[Test]
     public function it_handles_stop_words_case_insensitive()
     {
         $comb = new Comb([

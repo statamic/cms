@@ -189,7 +189,7 @@ class Email extends Mailable
         $sections = collect($pages)->flatMap->sections;
         $fields = $sections->flatMap->fields;
         $formConfig = ($configFields = Form::extraConfigFor($form->handle()))
-            ? Blueprint::makeFromTabs($configFields)->fields()->addValues($form->data()->all())->values()->all()
+            ? Blueprint::makeFromTabs($configFields)->fields()->addValues($form->data()->all())->augment()->values()->all()
             : [];
 
         $data = array_merge($augmented, $this->getGlobalsData(), [

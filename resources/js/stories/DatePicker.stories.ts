@@ -1,6 +1,6 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
 import {ref} from 'vue';
-import {DatePicker} from '@ui';
+import {DatePicker} from '@statamic/cms/ui';
 import {parseDate} from '@internationalized/date';
 
 const meta = {
@@ -24,59 +24,36 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const defaultCode = `
-<DatePicker v-model="date" />
-`;
-
 export const _DocsIntro: Story = {
     tags: ['!dev'],
-    parameters: {
-        docs: {
-            source: { code: defaultCode }
-        }
-    },
     render: () => ({
         components: { DatePicker },
         setup() {
             const date = ref(null);
             return { date };
         },
-        template: defaultCode,
+        template: `
+            <DatePicker v-model="date" />
+        `,
     }),
 };
 
-const withTimeCode = `
-<DatePicker v-model="appointment" granularity="minute" />
-`;
-
 export const _WithTime: Story = {
     tags: ['!dev'],
-    parameters: {
-        docs: {
-            source: { code: withTimeCode }
-        }
-    },
     render: () => ({
         components: { DatePicker },
         setup() {
             const appointment = ref(null);
             return { appointment };
         },
-        template: withTimeCode,
+        template: `
+            <DatePicker v-model="appointment" granularity="minute" />
+        `,
     }),
 };
 
-const minMaxCode = `
-<DatePicker v-model="deadline" :min="minDate" :max="maxDate" />
-`;
-
 export const _MinMax: Story = {
     tags: ['!dev'],
-    parameters: {
-        docs: {
-            source: { code: minMaxCode }
-        }
-    },
     render: () => ({
         components: { DatePicker },
         setup() {
@@ -88,48 +65,36 @@ export const _MinMax: Story = {
             const maxDate = parseDate(futureDate.toISOString().split('T')[0]);
             return { deadline, minDate, maxDate };
         },
-        template: minMaxCode,
+        template: `
+            <DatePicker v-model="deadline" :min="minDate" :max="maxDate" />
+        `,
     }),
 };
 
-const inlineCode = `
-<DatePicker v-model="selectedDate" inline />
-`;
-
 export const _Inline: Story = {
     tags: ['!dev'],
-    parameters: {
-        docs: {
-            source: { code: inlineCode }
-        }
-    },
     render: () => ({
         components: { DatePicker },
         setup() {
             const selectedDate = ref(null);
             return { selectedDate };
         },
-        template: inlineCode,
+        template: `
+            <DatePicker v-model="selectedDate" inline />
+        `,
     }),
 };
 
-const multipleMonthsCode = `
-<DatePicker v-model="date" :number-of-months="2" />
-`;
-
 export const _MultipleMonths: Story = {
     tags: ['!dev'],
-    parameters: {
-        docs: {
-            source: { code: multipleMonthsCode }
-        }
-    },
     render: () => ({
         components: { DatePicker },
         setup() {
             const date = ref(null);
             return { date };
         },
-        template: multipleMonthsCode,
+        template: `
+            <DatePicker v-model="date" :number-of-months="2" />
+        `,
     }),
 };

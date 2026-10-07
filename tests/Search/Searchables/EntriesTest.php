@@ -191,6 +191,32 @@ class EntriesTest extends TestCase
         $this->assertTrue($provider->contains($e));
     }
 
+    /**
+     * @see https://github.com/statamic/cms/issues/15542
+     */
+    #[Test]
+    public function it_can_use_a_query_scope_and_a_custom_filter()
+    {
+        CustomEntriesScope::register();
+
+        Collection::make('blog')->save();
+        $a = EntryFactory::collection('blog')->id('a')->create();
+        $b = EntryFactory::collection('blog')->id('b')->published(false)->create();
+        $c = EntryFactory::collection('blog')->id('c')->data(['is_searchable' => false])->create();
+
+        $provider = $this->makeProvider(null, [
+            'searchables' => 'content',
+            'query_scope' => 'custom_entries_scope',
+            'filter' => fn ($entry) => $entry->published(),
+        ]);
+
+        $this->assertEquals(['entry::a'], $provider->provide()->all());
+
+        $this->assertTrue($provider->contains($a));
+        $this->assertFalse($provider->contains($b));
+        $this->assertFalse($provider->contains($c));
+    }
+
     private function makeProvider($locale, $config)
     {
         $index = $this->makeIndex($locale, $config);
