@@ -167,6 +167,11 @@ class AssetContainerContents
         return $this->cacheStore()->get($this->key());
     }
 
+    public function isLoaded(): bool
+    {
+        return $this->files !== null;
+    }
+
     public function files()
     {
         return $this->all()->where('type', 'file');
