@@ -40,6 +40,7 @@ class ListedEntry extends JsonResource
 
             $this->merge($this->values(['slug' => $entry->slug()])),
 
+            'breadcrumb' => $entry->structureBreadcrumb(),
             'permalink' => $entry->absoluteUrl(),
             'edit_url' => $entry->editUrl(),
             'collection' => array_merge($entry->collection()->toArray(), ['dated' => $entry->collection()->dated()]),

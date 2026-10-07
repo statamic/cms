@@ -41,6 +41,7 @@
                                     <a class="title-index-field" :href="entry.edit_url" @click.prevent="toggleSelection(entry.id)">
                                         <StatusIndicator v-if="!isColumnVisible('status')" :status="entry.status" />
                                         <span v-text="entry.title" />
+                                        <Badge v-if="entry.breadcrumb" size="sm" icon="hierarchy" :text="entry.breadcrumb" />
                                     </a>
                                 </template>
                                 <template #cell-status="{ row: entry }">

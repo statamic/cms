@@ -564,6 +564,7 @@ class Entries extends Relationship
     public function getItemHint($item): ?string
     {
         return collect([
+            $item->structureBreadcrumb(),
             count($this->getConfiguredCollections()) > 1 ? __($item->collection()->title()) : null,
             $this->canSelectAcrossSites() && count($this->availableSites()) > 1 ? $item->site()->name() : null,
         ])->filter()->implode(' • ');

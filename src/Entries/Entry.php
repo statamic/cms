@@ -976,6 +976,27 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         return optional($this->page())->parent();
     }
 
+    public function structureBreadcrumb(): ?string
+    {
+        if (! $this->hasStructure()) {
+            return null;
+        }
+
+        $page = $this->parent();
+
+        if (! $page) {
+            return null;
+        }
+
+        // With a collection root, every page sits under it — omit it so
+        // the parent hint stays useful (e.g. "Fruit" instead of "Home").
+        if ($this->structure()->expectsRoot() && ! $page->parent()) {
+            return null;
+        }
+
+        return $page->title() ?: null;
+    }
+
     public function page()
     {
         if (! $this->hasStructure()) {

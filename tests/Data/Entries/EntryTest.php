@@ -1186,6 +1186,62 @@ class EntryTest extends TestCase
     }
 
     #[Test]
+    public function it_gets_a_structure_breadcrumb_from_ancestors()
+    {
+        $collection = tap(Collection::make('pages')->routes('{parent_uri}/{slug}'))->save();
+
+        $home = tap((new Entry)->locale('en')->id('home')->collection($collection)->slug('home')->data(['title' => 'Home']))->save();
+        $fruit = tap((new Entry)->locale('en')->id('fruit')->collection($collection)->slug('fruit')->data(['title' => 'Fruit']))->save();
+        $tomato = tap((new Entry)->locale('en')->id('tomato')->collection($collection)->slug('tomato')->data(['title' => 'Tomato']))->save();
+
+        $collection->structureContents([
+            'max_depth' => 3,
+        ])->save();
+        $collection->structure()->in('en')->tree([
+            [
+                'entry' => 'home',
+                'children' => [
+                    [
+                        'entry' => 'fruit',
+                        'children' => [
+                            ['entry' => 'tomato'],
+                        ],
+                    ],
+                ],
+            ],
+        ])->save();
+
+        $this->assertNull($home->structureBreadcrumb());
+        $this->assertEquals('Home', $fruit->structureBreadcrumb());
+        $this->assertEquals('Fruit', $tomato->structureBreadcrumb());
+
+        $collection->structureContents([
+            'max_depth' => 3,
+            'root' => true,
+        ])->save();
+        $collection->structure()->in('en')->tree([
+            [
+                'entry' => 'home',
+                'children' => [
+                    [
+                        'entry' => 'fruit',
+                        'children' => [
+                            ['entry' => 'tomato'],
+                        ],
+                    ],
+                ],
+            ],
+        ])->save();
+
+        $this->assertNull($home->fresh()->structureBreadcrumb());
+        $this->assertNull($fruit->fresh()->structureBreadcrumb());
+        $this->assertEquals('Fruit', $tomato->fresh()->structureBreadcrumb());
+
+        $flat = tap(Collection::make('flat'))->save();
+        $this->assertNull((new Entry)->collection($flat)->structureBreadcrumb());
+    }
+
+    #[Test]
     public function it_gets_the_order_from_the_collections_structure_when_the_tree_contains_a_null_item()
     {
         $collection = tap(Collection::make('ordered'))->save();
