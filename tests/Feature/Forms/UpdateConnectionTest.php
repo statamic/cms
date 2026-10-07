@@ -81,7 +81,7 @@ class UpdateConnectionTest extends TestCase
     }
 
     #[Test]
-    public function it_validates_and_processes_without_saving_when_save_is_false()
+    public function it_validates_and_returns_the_pre_processed_values_without_saving_when_save_is_false()
     {
         $this->setTestRoles(['test' => ['access cp', 'edit forms']]);
         $user = tap(User::make()->assignRole('test'))->save();
@@ -89,15 +89,24 @@ class UpdateConnectionTest extends TestCase
             'email' => [['id' => 'abc', 'to' => ['old@example.com']]],
         ]))->save();
 
-        $this
+        $response = $this
             ->actingAs($user)
             ->patchJson(cp_route('forms.connect.update', [$form->handle(), 'email']).'?_save=false', [
-                ['id' => 'abc', 'to' => ['new@example.com'], 'subject' => 'Updated'],
+                [
+                    'id' => 'abc',
+                    'to' => ['new@example.com'],
+                    'subject' => 'Updated',
+                    'conditions' => [['_id' => 'client', 'field' => 'name', 'operator' => 'equals', 'value' => 'Foo']],
+                ],
             ])
-            ->assertOk()
-            ->assertExactJson([
-                ['id' => 'abc', 'to' => ['new@example.com'], 'subject' => 'Updated'],
-            ]);
+            ->assertOk();
+
+        $this->assertEquals('abc', $response->json('0.id'));
+        $this->assertEquals(['new@example.com'], $response->json('0.to'));
+        $this->assertEquals('Updated', $response->json('0.subject'));
+        $this->assertTrue($response->json('0.enabled'));
+        $this->assertCount(1, $response->json('0.conditions'));
+        $this->assertNotEquals('client', $response->json('0.conditions.0._id'));
 
         $this->assertEquals(
             [['id' => 'abc', 'to' => ['old@example.com']]],
