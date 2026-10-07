@@ -49,6 +49,13 @@ class RateLimitingTest extends TestCase
     }
 
     #[Test]
+    public function password_protection_endpoint_is_rate_limited()
+    {
+        collect(range(1, 5))->each(fn () => $this->post('/!/protect/password')->assertNotRateLimited());
+        $this->post('/!/protect/password')->assertRateLimited();
+    }
+
+    #[Test]
     public function forms_endpoint_is_rate_limited()
     {
         collect(range(1, 10))->each(fn () => $this->post('/!/forms/contact')->assertNotRateLimited());

@@ -178,7 +178,7 @@ class Email extends Mailable
                 return $fields->reject(fn ($field) => in_array($field['fieldtype'], ['assets', 'files', 'form_upload']));
             });
         $formConfig = ($configFields = Form::extraConfigFor($form->handle()))
-            ? Blueprint::makeFromTabs($configFields)->fields()->addValues($form->data()->all())->values()->all()
+            ? Blueprint::makeFromTabs($configFields)->fields()->addValues($form->data()->all())->augment()->values()->all()
             : [];
 
         $data = array_merge($augmented, $this->getGlobalsData(), [

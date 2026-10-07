@@ -46,3 +46,16 @@ import { Card, Heading, Button } from '@statamic/cms/ui';
 Most of our components use [Reka](https://reka-ui.com/) under the hood, and are built with Vue.js's [composition API](https://vuejs.org/api/composition-api-setup).
 
 We utilize [Class Variariance Authority](https://cva.style/docs) to dynamically assemble our classes and styles based on variants and props.
+
+## Using AI Agents
+
+If you're building with an AI coding agent, point it at our component manifest instead of letting it guess. It's a machine-readable description of every component, including its props, slots, events, and usage snippets.
+
+- [`components.json`](https://ui.statamic.dev/manifests/components.json) is meant for agents. Its entries link to per-component details via relative `$ref` URLs.
+- [`components.html`](https://ui.statamic.dev/manifests/components.html) is a human-readable version of the same data.
+
+If you use [Laravel Boost](https://github.com/laravel/boost), Statamic's guidelines already tell your agent where to find the manifest.
+
+### Local MCP Server
+
+When contributing to Statamic itself (`statamic/cms`), running `npm run storybook` also starts a Storybook MCP server at `http://localhost:6006/mcp`. The repository's `.mcp.json` registers it automatically, so compatible agents can look up component documentation and run the story tests while they work.

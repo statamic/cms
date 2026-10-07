@@ -7,6 +7,7 @@ import { colorMode as colorModeApi } from '@api';
 // Addons
 import 'codemirror/addon/edit/matchbrackets';
 import 'codemirror/addon/display/fullscreen';
+import 'codemirror/addon/display/placeholder';
 import 'codemirror/addon/display/rulers';
 
 // Keymaps
@@ -64,6 +65,8 @@ const props = defineProps({
     tabSize: { type: Number, required: false },
     /** Theme of the code editor. Options: `system`, `light`, `dark` */
     colorMode: { type: String, default: 'system' },
+    /** Placeholder shown when the editor is empty */
+    placeholder: { type: String, default: '' },
     /** Title displayed in fullscreen mode */
     title: { type: String, default: () => __('Code Editor') },
 });
@@ -132,6 +135,7 @@ function initCodeMirror() {
     codemirror.value = markRaw(
         CodeMirror(codemirrorElement.value, {
             value: props.modelValue || '',
+            placeholder: props.placeholder,
             mode: props.mode,
             direction: document.querySelector('html').getAttribute('dir') ?? 'ltr',
             addModeClass: true,

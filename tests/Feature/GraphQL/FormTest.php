@@ -2,7 +2,10 @@
 
 namespace Tests\Feature\GraphQL;
 
+use Closure;
 use Facades\Statamic\API\ResourceAuthorizer;
+use Facades\Statamic\Fields\BlueprintRepository;
+use Illuminate\Contracts\Validation\ValidationRule;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\GraphQL\CastableToValidationString;
@@ -372,14 +375,23 @@ GQL;
     }
 }
 
-class TestValidationRuleWithToString implements CastableToValidationString
+class TestValidationRuleWithToString implements CastableToValidationString, ValidationRule
 {
     public function toGqlValidationString(): string
     {
         return 'thevalidationrule:foo,bar';
     }
+
+    public function validate(string $attribute, mixed $value, Closure $fail): void
+    {
+        //
+    }
 }
 
-class TestValidationRuleWithoutToString
+class TestValidationRuleWithoutToString implements ValidationRule
 {
+    public function validate(string $attribute, mixed $value, Closure $fail): void
+    {
+        //
+    }
 }
