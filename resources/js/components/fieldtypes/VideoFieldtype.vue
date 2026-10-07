@@ -1,27 +1,6 @@
 <template>
     <div class="flex flex-col space-y-3 p-1.5 bg-gray-100 border border-gray-300 dark:bg-gray-900 dark:border-gray-700 rounded-xl">
-        <ui-combobox
-            :model-value="provider"
-            :options="meta.providers"
-            option-label="label"
-            option-value="value"
-            :read-only="isReadOnly"
-            :aria-label="__('Video Provider')"
-            @update:model-value="changeMode"
-        />
-        <ui-input-group v-if="isCloudflare">
-            <ui-input-group-prepend :text="__('ID')" />
-            <ui-input
-                :model-value="videoId"
-                :isReadOnly="isReadOnly"
-                :aria-label="__('Video ID')"
-                @update:model-value="updateCloudflareId"
-                @focus="$emit('focus')"
-                @blur="$emit('blur')"
-                input-class="border-s-0"
-            />
-        </ui-input-group>
-        <ui-input-group v-else>
+        <ui-input-group>
             <ui-input-group-prepend :text="__('URL')" />
             <ui-input
                 :model-value="value"
@@ -34,7 +13,7 @@
                 input-class="border-s-0"
             />
         </ui-input-group>
-        <ui-description v-if="isInvalid" class="text-red-600">{{ invalidMessage }}</ui-description>
+        <ui-description v-if="isInvalid" class="text-red-600">{{ __('statamic::validation.url') }}</ui-description>
         <iframe
             v-if="shouldShowPreview"
             ref="iframe"
@@ -50,9 +29,7 @@
 <script>
 import Fieldtype from './Fieldtype.vue';
 
-const CLOUDFLARE = 'cloudflare';
-const CLOUDFLARE_PREFIX = 'cloudflare:';
-const URL_MODE = 'url';
+const CLOUDFLARE_URL_PATTERN = /^https?:\/\/(customer-[a-z0-9]+\.cloudflarestream\.com)\/([a-z0-9]+)(?:[/?#]|$)/i;
 
 export default {
     mixins: [Fieldtype],
@@ -61,20 +38,22 @@ export default {
         return {
             isVisible: false,
             observer: null,
-            // Only consulted when there's no value; otherwise the value itself says which input to show.
-            mode: this.meta.video?.provider === CLOUDFLARE ? CLOUDFLARE : URL_MODE,
         };
     },
 
     computed: {
         shouldShowPreview() {
-            return !this.isInvalid && (this.isCloudflare ? !!this.videoId : this.isEmbeddable || this.isVideo);
+            return !this.isInvalid && (this.isEmbeddable || this.isVideo);
+        },
+
+        cloudflare() {
+            const match = CLOUDFLARE_URL_PATTERN.exec(this.value || '');
+
+            return match ? { host: match[1], id: match[2] } : null;
         },
 
         embedUrl() {
-            if (this.isCloudflare) {
-                return this.videoId ? `https://iframe.cloudflarestream.com/${this.videoId}` : null;
-            }
+            if (this.cloudflare) return `https://${this.cloudflare.host}/${this.cloudflare.id}/iframe`;
 
             let embed_url = this.value || '';
 
@@ -104,26 +83,14 @@ export default {
             return embed_url;
         },
 
-        invalidMessage() {
-            return this.isCloudflare
-                ? __('statamic::validation.video_fieldtype_cloudflare_id')
-                : __('statamic::validation.url');
-        },
-
-        isCloudflare() {
-            return this.value?.startsWith(CLOUDFLARE_PREFIX) || (!this.value && this.mode === CLOUDFLARE);
-        },
-
         isEmbeddable() {
             const url = this.value || '';
             const isYoutube = url.includes('youtube') || url.includes('youtu.be');
             const isVimeo = url.includes('vimeo');
-            return isYoutube || isVimeo;
+            return isYoutube || isVimeo || !!this.cloudflare;
         },
 
         isInvalid() {
-            if (this.isCloudflare) return !!this.videoId && !/^[a-zA-Z0-9]+$/.test(this.videoId);
-
             let htmlRegex = new RegExp(/<([A-Z][A-Z0-9]*)\b[^>]*>.*?<\/\1>|<([A-Z][A-Z0-9]*)\b[^\/]*\/>/i);
             return htmlRegex.test(this.value || '');
         },
@@ -137,29 +104,6 @@ export default {
             const url = this.value || '';
             const isVideo = url.includes('.mp4') || url.includes('.ogv') || url.includes('.mov') || url.includes('.webm');
             return !this.isEmbeddable && isVideo;
-        },
-
-        provider() {
-            return this.isCloudflare ? CLOUDFLARE : URL_MODE;
-        },
-
-        videoId() {
-            return this.value?.startsWith(CLOUDFLARE_PREFIX) ? this.value.slice(CLOUDFLARE_PREFIX.length) : null;
-        },
-    },
-
-    methods: {
-        changeMode(mode) {
-            if (mode === this.provider) return;
-
-            this.updateDebounced.cancel();
-            this.mode = mode;
-
-            if (this.value) this.update(null);
-        },
-
-        updateCloudflareId(id) {
-            this.update(id ? `${CLOUDFLARE_PREFIX}${id}` : null);
         },
     },
 
