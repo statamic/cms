@@ -203,6 +203,36 @@ EOT;
     }
 
     #[Test]
+    public function it_extracts_snippets_when_the_term_is_longer_than_the_snippet_length()
+    {
+        // https://github.com/statamic/cms/issues/12951
+        $content = <<<'EOT'
+        We know, it was a long wait, but now we finally have it, support for OpenID
+        Connect front and back-channel logout. The backchannel_logout_session_required
+        flag can be set on a client. See backchannel_logout_uri too. The
+        frontchannel_logout_session_required flag is the front-channel equivalent, and
+        backchannel_logout_session_required appears once more right here.
+        EOT;
+
+        $comb = new Comb([
+            ['content' => $content],
+        ], ['snippet_length' => 30]);
+
+        try {
+            $results = $comb->lookUp('backchannel_logout_session_required');
+        } catch (NoResultsFound $e) {
+            $results = [];
+        }
+
+        $expected = [[
+            'backchannel_logout_session_required',
+            'backchannel_logout_session_required',
+        ]];
+
+        $this->assertEquals($expected, collect($results['data'] ?? [])->pluck('snippets.content')->all());
+    }
+
+    #[Test]
     public function it_can_search_for_plus_signs()
     {
         $comb = new Comb([
@@ -279,6 +309,66 @@ EOT;
         $results = $comb->lookUp('soup -tomato');
 
         $this->assertEquals(['Chicken & Sweetcorn Soup'], collect($results['data'] ?? [])->pluck('data.title')->all());
+    }
+
+    #[Test]
+    #[DataProvider('requiredWordsProvider')]
+    public function it_filters_out_results_without_required_words($term, $expected)
+    {
+        $comb = new Comb([
+            ['title' => 'Pizza', 'ingredients' => 'Tomato, Cheese, Bread'],
+            ['title' => 'Tomato Soup', 'ingredients' => 'Tomato, Water, Salt'],
+            ['title' => 'Chicken & Sweetcorn Soup', 'ingredients' => ['Chicken', 'Sweetcorn', 'Water']],
+            ['title' => 'Crème Brûlée', 'ingredients' => "Crème\nSugar\nEgg"],
+        ]);
+
+        try {
+            $results = $comb->lookUp($term);
+        } catch (NoResultsFound $e) {
+            $results = [];
+        }
+
+        $this->assertEquals($expected, collect($results['data'] ?? [])->pluck('data.title')->all());
+    }
+
+    public static function requiredWordsProvider()
+    {
+        return [
+            'required word present' => ['soup +tomato', ['Tomato Soup']],
+            'required word absent' => ['soup +bacon', []],
+            'only a required word' => ['+tomato', ['Tomato Soup', 'Pizza']],
+            'multiple required words' => ['+tomato +water', ['Tomato Soup']],
+            'multiple required words in reverse order' => ['+water +tomato', ['Tomato Soup']],
+            'multiple required words with one absent' => ['+tomato +bacon', []],
+            'required word in an array' => ['soup +sweetcorn', ['Chicken & Sweetcorn Soup']],
+            'case insensitive' => ['soup +TOMATO', ['Tomato Soup']],
+            'multibyte' => ['+brûlée', ['Crème Brûlée']],
+            'multibyte case insensitive' => ['+BRÛLÉE', ['Crème Brûlée']],
+            'multiple required words on different lines' => ['+sugar +egg', ['Crème Brûlée']],
+            'required and disallowed words' => ['+tomato -cheese', ['Tomato Soup']],
+        ];
+    }
+
+    #[Test]
+    public function it_checks_required_words_in_linear_time()
+    {
+        // The time taken used to grow quadratically with the length of
+        // a record that did not contain the required word. Records of
+        // this size took multiple seconds each. Now they take no time.
+        $content = str_repeat('lorem ipsum dolor ', 5000);
+
+        $comb = new Comb([
+            ['title' => 'One', 'content' => $content],
+            ['title' => 'Two', 'content' => $content],
+            ['title' => 'Three', 'content' => $content.'zakat'],
+        ]);
+
+        $start = microtime(true);
+        $results = $comb->lookUp('+zakat -ramadan');
+        $elapsed = microtime(true) - $start;
+
+        $this->assertEquals(['Three'], collect($results['data'])->pluck('data.title')->all());
+        $this->assertLessThan(5, $elapsed);
     }
 
     #[Test]

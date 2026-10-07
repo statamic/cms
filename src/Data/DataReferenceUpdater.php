@@ -69,6 +69,10 @@ abstract class DataReferenceUpdater
         $this->originalValue = $originalValue;
         $this->newValue = $newValue;
 
+        if (! $this->itemMayContainReferences()) {
+            return false;
+        }
+
         $this->recursivelyUpdateFields($this->getTopLevelFields());
 
         if ($this->updated) {
@@ -78,6 +82,29 @@ abstract class DataReferenceUpdater
         return (bool) $this->updated;
     }
 
+    private function itemMayContainReferences(): bool
+    {
+        if (! is_string($this->originalValue) || $this->originalValue === '') {
+            return true;
+        }
+
+        try {
+            $flags = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE;
+
+            if (! is_string($data = json_encode($this->item->data()->all(), $flags))) {
+                return true;
+            }
+
+            if (! is_string($needle = json_encode($this->originalValue, $flags))) {
+                return true;
+            }
+
+            return str_contains($data, substr($needle, 1, -1));
+        } catch (\Throwable $e) {
+            return true;
+        }
+    }
+
     /**
      * Get top level fields off item blueprint.
      *
@@ -85,7 +112,23 @@ abstract class DataReferenceUpdater
      */
     protected function getTopLevelFields()
     {
-        return $this->item->blueprint()->fields()->all();
+        return $this->fieldsWithItemAsParent($this->item->blueprint()->fields());
+    }
+
+    /**
+     * While updating references, the parent of every field is the item being updated.
+     *
+     * Blueprints hand back a Fields instance that's cached globally by handle, and nested fields
+     * are constructed without a parent at all, so neither can be relied upon to have the right
+     * one. The fields are cloned rather than mutated in place, otherwise the item would leak
+     * into every other consumer of that blueprint for the rest of the request.
+     *
+     * @param  \Statamic\Fields\Fields  $fields
+     * @return \Illuminate\Support\Collection
+     */
+    private function fieldsWithItemAsParent($fields)
+    {
+        return $fields->all()->map(fn ($field) => (clone $field)->setParent($this->item));
     }
 
     /**
@@ -120,7 +163,7 @@ abstract class DataReferenceUpdater
      */
     public function processNestedFields($fields, $dottedPrefix): void
     {
-        $this->recursivelyUpdateFields($fields->all(), $dottedPrefix);
+        $this->recursivelyUpdateFields($this->fieldsWithItemAsParent($fields), $dottedPrefix);
     }
 
     /**

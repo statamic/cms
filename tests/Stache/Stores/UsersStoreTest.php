@@ -49,12 +49,23 @@ class UsersStoreTest extends TestCase
         $this->assertEquals([
             $dir.'/one.yaml' => 1234567890,
             $dir.'/two.yaml' => 1234567890,
-            $dir.'/subdirectory/nested-one.yaml' => 1234567890,
-            $dir.'/subdirectory/nested-two.yaml' => 1234567890,
         ], $files->all());
 
         // Sanity check. Make sure the file is there but wasn't included.
         $this->assertTrue(file_exists($dir.'/three.txt'));
+    }
+
+    #[Test]
+    public function it_ignores_yaml_files_in_subdirectories()
+    {
+        touch($this->tempDir.'/one.yaml', 1234567890);
+        mkdir($this->tempDir.'/subdirectory');
+        touch($this->tempDir.'/subdirectory/one.yaml', 1234567890);
+
+        $files = Traverser::filter([$this->store, 'getItemFilter'])->traverse($this->store);
+
+        $this->assertEquals([Path::tidy($this->tempDir).'/one.yaml' => 1234567890], $files->all());
+        $this->assertTrue(file_exists($this->tempDir.'/subdirectory/one.yaml'));
     }
 
     #[Test]

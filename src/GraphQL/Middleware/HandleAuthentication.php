@@ -3,6 +3,7 @@
 namespace Statamic\GraphQL\Middleware;
 
 use Closure;
+use Statamic\Exceptions\ApiAuthenticationException;
 
 class HandleAuthentication
 {
@@ -18,7 +19,7 @@ class HandleAuthentication
             ($token = config('statamic.graphql.auth_token'))
             && ($request->bearerToken() !== $token)
         ) {
-            abort(401);
+            throw new ApiAuthenticationException;
         }
 
         return $next($request);

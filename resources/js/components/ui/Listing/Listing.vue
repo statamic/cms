@@ -274,9 +274,12 @@ const forwardedTableCellSlots = computed(() => {
 });
 
 const activeFilterBadgeCount = computed(() => {
-    let count = Object.keys(activeFilterBadges.value).length;
+    const filterHandles = props.filters.map((filter) => filter.handle);
+    const badgeHandles = Object.keys(activeFilterBadges.value).filter((handle) => filterHandles.includes(handle));
 
-    if (activeFilterBadges.value.hasOwnProperty('fields')) {
+    let count = badgeHandles.length;
+
+    if (badgeHandles.includes('fields')) {
         count = count + Object.keys(activeFilterBadges.value.fields).length - 1;
     }
 

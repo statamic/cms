@@ -31,6 +31,14 @@ abstract class Relationship extends Fieldtype
         '_' => '_', // forces an object in js
     ];
     protected $formStackSize;
+    protected array $itemCache = [];
+
+    public function __clone()
+    {
+        // The fieldtype repository hands out clones of a single instance per handle,
+        // so without this the cache would be inherited by unrelated fields.
+        $this->itemCache = [];
+    }
 
     protected function configFieldItems(): array
     {

@@ -176,6 +176,7 @@ abstract class Builder extends BaseBuilder
     private function normalizeLookupValue($value): string|int
     {
         return match (true) {
+            is_string($value) => strtolower($value),
             $value === null => '__NULL__',
             $value === true => '__TRUE__',
             $value === false => '__FALSE__',
@@ -206,7 +207,9 @@ abstract class Builder extends BaseBuilder
                 return false;
             }
 
-            return $value->copy()->startOfDay()->$method($where['value']);
+            $value = $value->copy()->setTimezone(config('app.timezone'));
+
+            return $value->startOfDay()->$method($where['value']);
         });
     }
 
@@ -257,6 +260,8 @@ abstract class Builder extends BaseBuilder
             if (is_null($value)) {
                 return false;
             }
+
+            $value = $value->copy()->setTimezone(config('app.timezone'));
 
             $compareValue = $value->copy()->setTimeFromTimeString($where['value']);
 
