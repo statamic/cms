@@ -7,7 +7,6 @@ use Mockery;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Events\AssetReuploaded;
-use Statamic\Events\BlueprintSaved;
 use Statamic\Events\CollectionTreeEntriesMovedOrRemoved;
 use Statamic\Facades\Entry as EntryFacade;
 use Statamic\StaticCaching\Cacher;

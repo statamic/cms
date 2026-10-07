@@ -4,7 +4,6 @@ namespace Tests\Feature\GraphQL;
 
 use Closure;
 use Facades\Statamic\API\ResourceAuthorizer;
-use Facades\Statamic\Fields\BlueprintRepository;
 use Illuminate\Contracts\Validation\ValidationRule;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
