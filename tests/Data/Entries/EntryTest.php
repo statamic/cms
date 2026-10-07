@@ -1191,7 +1191,7 @@ class EntryTest extends TestCase
         $collection = tap(Collection::make('pages')->routes('{parent_uri}/{slug}'))->save();
 
         $home = tap((new Entry)->locale('en')->id('home')->collection($collection)->slug('home')->data(['title' => 'Home']))->save();
-        $fruit = tap((new Entry)->locale('en')->id('fruit')->collection($collection)->slug('fruit')->data(['title' => 'Fruit']))->save();
+        $fruit = tap((new Entry)->locale('en')->id('fruit')->collection($collection)->slug('fruit')->data(['title' => 'Fruit › Bowl']))->save();
         $tomato = tap((new Entry)->locale('en')->id('tomato')->collection($collection)->slug('tomato')->data(['title' => 'Tomato']))->save();
         $seed = tap((new Entry)->locale('en')->id('seed')->collection($collection)->slug('seed')->data(['title' => 'Seed']))->save();
 
@@ -1217,40 +1217,46 @@ class EntryTest extends TestCase
             ],
         ])->save();
 
+        $this->assertSame([], $home->structureBreadcrumbs());
+        $this->assertSame(['Home'], $fruit->structureBreadcrumbs());
+        $this->assertSame(['Fruit › Bowl', 'Home'], $tomato->structureBreadcrumbs());
+        $this->assertSame(['Tomato', 'Fruit › Bowl', 'Home'], $seed->structureBreadcrumbs());
         $this->assertNull($home->structureBreadcrumb());
         $this->assertEquals('Home', $fruit->structureBreadcrumb());
-        $this->assertEquals('Fruit ‹ Home', $tomato->structureBreadcrumb());
-        $this->assertEquals('Tomato ‹ Fruit ‹ Home', $seed->structureBreadcrumb());
+        $this->assertEquals('Fruit › Bowl ‹ Home', $tomato->structureBreadcrumb());
+        $this->assertEquals('Tomato ‹ Fruit › Bowl ‹ Home', $seed->structureBreadcrumb());
 
+        // With a collection root, siblings of the root become its children.
         $collection->structureContents([
             'max_depth' => 4,
             'root' => true,
         ])->save();
         $collection->structure()->in('en')->tree([
+            ['entry' => 'home'],
             [
-                'entry' => 'home',
+                'entry' => 'fruit',
                 'children' => [
                     [
-                        'entry' => 'fruit',
+                        'entry' => 'tomato',
                         'children' => [
-                            [
-                                'entry' => 'tomato',
-                                'children' => [
-                                    ['entry' => 'seed'],
-                                ],
-                            ],
+                            ['entry' => 'seed'],
                         ],
                     ],
                 ],
             ],
         ])->save();
 
+        $this->assertSame([], $home->fresh()->structureBreadcrumbs());
+        $this->assertSame([], $fruit->fresh()->structureBreadcrumbs());
+        $this->assertSame(['Fruit › Bowl'], $tomato->fresh()->structureBreadcrumbs());
+        $this->assertSame(['Tomato', 'Fruit › Bowl'], $seed->fresh()->structureBreadcrumbs());
         $this->assertNull($home->fresh()->structureBreadcrumb());
         $this->assertNull($fruit->fresh()->structureBreadcrumb());
-        $this->assertEquals('Fruit', $tomato->fresh()->structureBreadcrumb());
-        $this->assertEquals('Tomato ‹ Fruit', $seed->fresh()->structureBreadcrumb());
+        $this->assertEquals('Fruit › Bowl', $tomato->fresh()->structureBreadcrumb());
+        $this->assertEquals('Tomato ‹ Fruit › Bowl', $seed->fresh()->structureBreadcrumb());
 
         $flat = tap(Collection::make('flat'))->save();
+        $this->assertSame([], (new Entry)->collection($flat)->structureBreadcrumbs());
         $this->assertNull((new Entry)->collection($flat)->structureBreadcrumb());
     }
 

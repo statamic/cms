@@ -19,10 +19,6 @@ class EntriesFieldtypeListedEntry extends ListedEntry
     {
         $arr = parent::toArray($request);
 
-        if ($breadcrumb = $this->resource->structureBreadcrumb()) {
-            $arr['breadcrumb'] = $breadcrumb;
-        }
-
         if (
             in_array($this->fieldtype->config('mode'), ['select', 'typeahead'])
             && ($hint = $this->fieldtype->getItemHint($this->resource))

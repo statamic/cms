@@ -976,32 +976,39 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         return optional($this->page())->parent();
     }
 
-    public function structureBreadcrumb(string $separator = ' ‹ '): ?string
+    public function structureBreadcrumbs(): array
     {
         if (! $this->hasStructure()) {
-            return null;
+            return [];
         }
 
-        $titles = collect();
+        $titles = [];
         $page = $this->parent();
         $skipRoot = $this->structure()->expectsRoot();
 
         while ($page) {
             // With a collection root, every page sits under it — omit it so
             // breadcrumbs stay useful (e.g. "Fruit" instead of "Home ‹ Fruit").
-            if ($skipRoot && ! $page->parent()) {
+            if ($skipRoot && $page->isRoot()) {
                 break;
             }
 
             if ($title = $page->title()) {
                 // Nearest parent first, matching CP document titles (Title ‹ Section).
-                $titles->push($title);
+                $titles[] = $title;
             }
 
             $page = $page->parent();
         }
 
-        return $titles->isEmpty() ? null : $titles->implode($separator);
+        return $titles;
+    }
+
+    public function structureBreadcrumb(string $separator = ' ‹ '): ?string
+    {
+        $titles = $this->structureBreadcrumbs();
+
+        return empty($titles) ? null : implode($separator, $titles);
     }
 
     public function page()

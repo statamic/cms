@@ -417,6 +417,36 @@ class EntriesTest extends TestCase
         $this->assertTrue($second->getItemData(['123'])->first()['invalid']);
     }
 
+    #[Test]
+    public function it_includes_structure_breadcrumb_before_collection_in_item_hints()
+    {
+        $pages = tap(Facades\Collection::make('pages')->routes('{parent_uri}/{slug}'))->save();
+        $home = EntryFactory::id('home')->collection($pages)->slug('home')->data(['title' => 'Home'])->create();
+        $fruit = EntryFactory::id('fruit')->collection($pages)->slug('fruit')->data(['title' => 'Fruit'])->create();
+        $tomato = EntryFactory::id('tomato')->collection($pages)->slug('tomato')->data(['title' => 'Tomato'])->create();
+
+        $pages->structureContents(['max_depth' => 3])->save();
+        $pages->structure()->in('en')->tree([
+            [
+                'entry' => 'home',
+                'children' => [
+                    [
+                        'entry' => 'fruit',
+                        'children' => [
+                            ['entry' => 'tomato'],
+                        ],
+                    ],
+                ],
+            ],
+        ])->save();
+
+        $fieldtype = $this->fieldtype(['collections' => ['pages', 'blog']]);
+
+        $this->assertEquals('Fruit ‹ Home • Pages', $fieldtype->getItemHint($tomato->fresh()));
+        $this->assertEquals('Pages', $fieldtype->getItemHint($home->fresh()));
+        $this->assertNull($this->fieldtype(['collections' => ['pages']])->getItemHint($home->fresh()));
+    }
+
     public function fieldtype($config = [], $parent = null)
     {
         $field = new Field('test', array_merge([
