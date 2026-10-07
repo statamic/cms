@@ -757,12 +757,8 @@ class AssetContainerTest extends TestCase
     #[Test]
     public function it_does_not_leak_stale_contents_state_across_calls_when_running_in_a_queue_worker()
     {
-        $cacheKey = 'asset-list-contents-test';
-
-        Cache::put($cacheKey, collect([
-            'a.txt' => ['type' => 'file', 'path' => 'a.txt', 'dirname' => ''],
-            '.meta/a.txt.yaml' => ['type' => 'file', 'path' => '.meta/a.txt.yaml', 'dirname' => '.meta'],
-        ]));
+        Storage::fake('test');
+        Storage::disk('test')->put('.meta/a.txt.yaml', '');
 
         $container = (new AssetContainer)->handle('test')->disk('test');
 
@@ -778,12 +774,7 @@ class AssetContainerTest extends TestCase
         );
 
         // Simulate the next job seeing a different state on disk.
-        Cache::put($cacheKey, collect([
-            'a.txt' => ['type' => 'file', 'path' => 'a.txt', 'dirname' => ''],
-            '.meta/a.txt.yaml' => ['type' => 'file', 'path' => '.meta/a.txt.yaml', 'dirname' => '.meta'],
-            'b.txt' => ['type' => 'file', 'path' => 'b.txt', 'dirname' => ''],
-            '.meta/b.txt.yaml' => ['type' => 'file', 'path' => '.meta/b.txt.yaml', 'dirname' => '.meta'],
-        ]));
+        Storage::disk('test')->put('.meta/b.txt.yaml', '');
 
         // Simulate the job boundary: Laravel clears resolved facade instances
         // before every job.
@@ -793,6 +784,50 @@ class AssetContainerTest extends TestCase
             ['.meta/a.txt.yaml', '.meta/b.txt.yaml'],
             $container->contents()->metaFilesIn('/', true)->keys()->sort()->values()->all()
         );
+    }
+
+    #[Test]
+    public function it_does_not_cache_meta_files_or_directories_in_the_listing()
+    {
+        $disk = $this->mock(Filesystem::class);
+        $disk->shouldReceive('filesystem->getDriver->listContents')
+            ->with('/', true)
+            ->once()
+            ->andReturn(new DirectoryListing([
+                new DirectoryAttributes('.meta'),
+                new FileAttributes('.meta/one.jpg.yaml'),
+                new FileAttributes('one.jpg'),
+                new DirectoryAttributes('one/.meta'),
+                new FileAttributes('one/.meta/two.jpg.yaml'),
+                new FileAttributes('one/two.jpg'),
+            ]));
+
+        File::shouldReceive('disk')->with('test')->andReturn($disk);
+
+        $container = (new AssetContainer)->handle('test')->disk('test');
+
+        $this->assertEquals(['one.jpg', 'one/two.jpg'], $container->files()->all());
+        $this->assertEquals(
+            ['one', 'one.jpg', 'one/two.jpg'],
+            Cache::get('asset-list-contents-test')->keys()->all()
+        );
+    }
+
+    #[Test]
+    public function it_gets_meta_files_from_the_filesystem_when_the_listing_is_cached_without_them()
+    {
+        Cache::put('asset-list-contents-test', collect([
+            'a.txt' => ['type' => 'file', 'path' => 'a.txt', 'dirname' => ''],
+        ]));
+
+        $this->assertEquals([
+            '.meta/a.txt.yaml',
+            '.meta/b.txt.yaml',
+            'nested/.meta/nested-a.txt.yaml',
+            'nested/.meta/nested-b.txt.yaml',
+            'nested/double-nested/.meta/double-nested-a.txt.yaml',
+            'nested/double-nested/.meta/double-nested-b.txt.yaml',
+        ], $this->containerWithDisk()->metaFiles()->all());
     }
 
     #[Test]
