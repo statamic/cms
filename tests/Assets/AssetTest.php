@@ -541,6 +541,38 @@ class AssetTest extends TestCase
     }
 
     #[Test]
+    public function exists_checks_the_disk_without_loading_the_container_listing()
+    {
+        Storage::disk('test')->put('yes.txt', '');
+        $asset = (new Asset)->container($this->container)->path('yes.txt');
+
+        $this->assertTrue($asset->exists());
+        $this->assertFalse(Cache::has('asset-list-contents-test_container'));
+    }
+
+    #[Test]
+    public function exists_uses_the_container_listing_when_it_is_already_loaded()
+    {
+        Storage::disk('test')->put('yes.txt', '');
+        $this->container->files();
+        Storage::disk('test')->put('later.txt', '');
+
+        $this->assertTrue((new Asset)->container($this->container)->path('yes.txt')->exists());
+        $this->assertFalse((new Asset)->container($this->container)->path('later.txt')->exists());
+    }
+
+    #[Test]
+    public function it_resolves_original_data_from_meta_without_loading_the_container_listing()
+    {
+        Storage::disk('test')->put('path/to/test.txt', '');
+        Storage::disk('test')->put('path/to/.meta/test.txt.yaml', "data:\n  foo: bar");
+        $asset = (new Asset)->container($this->container)->path('path/to/test.txt');
+
+        $this->assertEquals(['foo' => 'bar'], $asset->getOriginal()['data']);
+        $this->assertFalse(Cache::has('asset-list-contents-test_container'));
+    }
+
+    #[Test]
     public function it_gets_the_filename()
     {
         $this->assertEquals('asset', (new Asset)->path('path/to/asset.jpg')->filename());
