@@ -1193,9 +1193,10 @@ class EntryTest extends TestCase
         $home = tap((new Entry)->locale('en')->id('home')->collection($collection)->slug('home')->data(['title' => 'Home']))->save();
         $fruit = tap((new Entry)->locale('en')->id('fruit')->collection($collection)->slug('fruit')->data(['title' => 'Fruit']))->save();
         $tomato = tap((new Entry)->locale('en')->id('tomato')->collection($collection)->slug('tomato')->data(['title' => 'Tomato']))->save();
+        $seed = tap((new Entry)->locale('en')->id('seed')->collection($collection)->slug('seed')->data(['title' => 'Seed']))->save();
 
         $collection->structureContents([
-            'max_depth' => 3,
+            'max_depth' => 4,
         ])->save();
         $collection->structure()->in('en')->tree([
             [
@@ -1204,7 +1205,12 @@ class EntryTest extends TestCase
                     [
                         'entry' => 'fruit',
                         'children' => [
-                            ['entry' => 'tomato'],
+                            [
+                                'entry' => 'tomato',
+                                'children' => [
+                                    ['entry' => 'seed'],
+                                ],
+                            ],
                         ],
                     ],
                 ],
@@ -1213,10 +1219,11 @@ class EntryTest extends TestCase
 
         $this->assertNull($home->structureBreadcrumb());
         $this->assertEquals('Home', $fruit->structureBreadcrumb());
-        $this->assertEquals('Fruit', $tomato->structureBreadcrumb());
+        $this->assertEquals('Fruit ‹ Home', $tomato->structureBreadcrumb());
+        $this->assertEquals('Tomato ‹ Fruit ‹ Home', $seed->structureBreadcrumb());
 
         $collection->structureContents([
-            'max_depth' => 3,
+            'max_depth' => 4,
             'root' => true,
         ])->save();
         $collection->structure()->in('en')->tree([
@@ -1226,7 +1233,12 @@ class EntryTest extends TestCase
                     [
                         'entry' => 'fruit',
                         'children' => [
-                            ['entry' => 'tomato'],
+                            [
+                                'entry' => 'tomato',
+                                'children' => [
+                                    ['entry' => 'seed'],
+                                ],
+                            ],
                         ],
                     ],
                 ],
@@ -1236,6 +1248,7 @@ class EntryTest extends TestCase
         $this->assertNull($home->fresh()->structureBreadcrumb());
         $this->assertNull($fruit->fresh()->structureBreadcrumb());
         $this->assertEquals('Fruit', $tomato->fresh()->structureBreadcrumb());
+        $this->assertEquals('Tomato ‹ Fruit', $seed->fresh()->structureBreadcrumb());
 
         $flat = tap(Collection::make('flat'))->save();
         $this->assertNull((new Entry)->collection($flat)->structureBreadcrumb());
