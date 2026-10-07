@@ -165,26 +165,33 @@ test('collapsing and expanding preserves a narrow group layout', async () => {
 test('a collapsible group label toggles its content and preserves its field action', async () => {
     await render([group('options', [text('first')], { collapsible: true, collapsed: true, actions: true })], 1000);
 
-    const label = wrapper.find('button[aria-controls="field_options-content"]');
     const content = document.getElementById('field_options-content');
-    expect(label.attributes('type')).toBe('button');
-    expect(label.attributes('aria-expanded')).toBe('false');
-    expect(content.classList.contains('hidden')).toBe(true);
-    expect(wrapper.find('label button').exists()).toBe(false);
+    const expand = () => wrapper.find('button[aria-label="Expand"]');
+    const collapse = () => wrapper.find('button[aria-label="Collapse"]');
+    const name = wrapper.find('.group-fieldtype [data-ui-field-header] .cursor-pointer');
 
-    await label.trigger('click');
-    expect(label.attributes('aria-expanded')).toBe('true');
+    expect(expand().attributes('aria-controls')).toBe('field_options-content');
+    expect(expand().attributes('aria-expanded')).toBe('false');
+    expect(content.classList.contains('hidden')).toBe(true);
+    expect(wrapper.find('.group-fieldtype label[for="field_options"]').exists()).toBe(false);
+    expect(name.exists()).toBe(true);
+
+    await name.trigger('click');
+    expect(collapse().attributes('aria-expanded')).toBe('true');
     expect(content.classList.contains('hidden')).toBe(false);
 
-    await wrapper.find('button[aria-label="Collapse"]').trigger('click');
-    expect(label.attributes('aria-expanded')).toBe('false');
+    await collapse().trigger('click');
+    expect(expand().attributes('aria-expanded')).toBe('false');
     expect(content.classList.contains('hidden')).toBe(true);
 
-    label.element.focus();
+    expand().element.focus();
     await userEvent.keyboard('{Enter}');
-    expect(label.attributes('aria-expanded')).toBe('true');
+    expect(collapse().attributes('aria-expanded')).toBe('true');
+    expect(content.classList.contains('hidden')).toBe(false);
+    collapse().element.focus();
     await userEvent.keyboard(' ');
-    expect(label.attributes('aria-expanded')).toBe('false');
+    expect(expand().attributes('aria-expanded')).toBe('false');
+    expect(content.classList.contains('hidden')).toBe(true);
 });
 
 test('a non-collapsible group retains its label', async () => {
