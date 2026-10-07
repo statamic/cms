@@ -3,6 +3,7 @@
 namespace Tests\Forms\Connections;
 
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Contracts\Forms\Submission;
 use Statamic\Facades\Form;
 use Statamic\Forms\Connections\Connection;
 use Statamic\Statamic;
@@ -130,23 +131,76 @@ class ConnectionTest extends TestCase
     }
 
     #[Test]
+    public function it_counts_rows_by_default()
+    {
+        $form = Form::make('contact')->connections([
+            'test_multi_word' => [['foo' => 'bar'], ['foo' => 'baz']],
+        ]);
+
+        $this->assertEquals(2, (new TestMultiWordConnection)->count($form));
+        $this->assertEquals(0, (new TestMultiWordConnection)->count(Form::make('other')));
+    }
+
+    #[Test]
     public function it_is_configured_by_default()
     {
         $this->assertTrue((new TestMultiWordConnection)->isConfigured());
     }
 
     #[Test]
-    public function it_has_no_validation_rules_by_default()
+    public function it_has_row_validation_rules_by_default()
     {
-        $this->assertEquals([], (new TestMultiWordConnection)->rules(Form::make('contact')));
+        $this->assertEquals([
+            '*' => ['array'],
+            '*.enabled' => ['nullable', 'boolean'],
+            '*.conditions' => ['nullable', 'array'],
+            '*.conditions.*' => ['array'],
+        ], (new TestMultiWordConnection)->rules(Form::make('contact')));
     }
 
     #[Test]
-    public function it_processes_the_config_unchanged_by_default()
+    public function it_merges_row_rules_into_the_default_rules()
     {
-        $config = [['id' => 'abc', 'foo' => 'bar']];
+        $rules = (new TestRowConnection)->rules(Form::make('contact'));
 
-        $this->assertEquals($config, (new TestMultiWordConnection)->process($config, Form::make('contact')));
+        $this->assertEquals([
+            '*' => ['array'],
+            '*.token' => ['required', 'string'],
+            '*.enabled' => ['nullable', 'boolean'],
+            '*.conditions' => ['nullable', 'array'],
+            '*.conditions.*' => ['array'],
+        ], $rules);
+    }
+
+    #[Test]
+    public function it_processes_rows_by_default()
+    {
+        $rows = (new TestMultiWordConnection)->process([
+            ['id' => 'abc', 'foo' => 'bar', 'empty' => null, 'enabled' => true, 'conditions' => []],
+            ['foo' => 'baz', 'enabled' => false, 'conditions' => [
+                ['_id' => 'one', 'field' => 'name', 'operator' => 'equals', 'value' => 'Foo', 'join' => 'and'],
+                ['_id' => 'two', 'field' => null, 'operator' => 'equals', 'value' => 'Foo'],
+            ]],
+        ], Form::make('contact'));
+
+        $this->assertSame(['id' => 'abc', 'foo' => 'bar'], $rows[0]);
+        $this->assertNotEmpty($rows[1]['id']);
+        $this->assertSame([
+            'id' => $rows[1]['id'],
+            'foo' => 'baz',
+            'enabled' => false,
+            'conditions' => [['field' => 'name', 'operator' => 'equals', 'value' => 'Foo', 'join' => 'and']],
+        ], $rows[1]);
+    }
+
+    #[Test]
+    public function it_processes_rows_through_the_row_hook()
+    {
+        $rows = (new TestRowConnection)->process([
+            ['id' => 'abc', 'token' => ' secret ', 'extra' => 'dropped', 'enabled' => false],
+        ], Form::make('contact'));
+
+        $this->assertSame([['id' => 'abc', 'token' => 'secret', 'enabled' => false]], $rows);
     }
 
     #[Test]
@@ -157,6 +211,64 @@ class ConnectionTest extends TestCase
         $this->assertEquals([
             ['id' => 'abc', 'enabled' => true, 'conditions' => [], 'foo' => 'bar'],
         ], (new TestMultiWordConnection)->preProcess($config, Form::make('contact')));
+    }
+
+    #[Test]
+    public function it_mints_missing_ids_when_pre_processing()
+    {
+        $rows = (new TestMultiWordConnection)->preProcess([['foo' => 'bar']], Form::make('contact'));
+
+        $this->assertNotEmpty($rows[0]['id']);
+        $this->assertEquals('bar', $rows[0]['foo']);
+    }
+
+    #[Test]
+    public function it_pre_processes_rows_through_the_row_hook()
+    {
+        $rows = (new TestRowConnection)->preProcess([['id' => 'abc', 'token' => 'secret', 'extra' => 'dropped']], Form::make('contact'));
+
+        $this->assertEquals([['id' => 'abc', 'token' => 'SECRET', 'enabled' => true, 'conditions' => []]], $rows);
+    }
+
+    #[Test]
+    public function it_normalizes_non_list_configs_into_rows()
+    {
+        $connection = new TestMultiWordConnection;
+
+        $this->assertEquals([['token' => 'secret']], $connection->setConfig(['token' => 'secret'])->config());
+        $this->assertEquals([['foo' => 'bar']], $connection->setConfig([['foo' => 'bar'], 'nope', null])->config());
+        $this->assertCount(1, $connection->preProcess(['token' => 'secret'], Form::make('contact')));
+        $this->assertCount(1, $connection->process(['token' => 'secret'], Form::make('contact')));
+    }
+
+    #[Test]
+    public function it_returns_no_jobs_by_default()
+    {
+        $form = Form::make('contact');
+
+        $jobs = (new TestMultiWordConnection)->setConfig([['id' => 'abc']])->finalized($form->makeSubmission());
+
+        $this->assertSame([], $jobs);
+    }
+
+    #[Test]
+    public function it_only_makes_jobs_for_enabled_rows_whose_conditions_pass()
+    {
+        $form = Form::make('contact')->formFields([
+            'fields' => [['handle' => 'name', 'field' => ['type' => 'text']]],
+        ]);
+        $submission = $form->makeSubmission()->data(['name' => 'Foo']);
+
+        $jobs = (new TestRowConnection)->setConfig([
+            ['id' => 'one'],
+            ['id' => 'two', 'enabled' => false],
+            ['id' => 'three', 'conditions' => [['field' => 'name', 'operator' => 'equals', 'value' => 'Foo']]],
+            ['id' => 'four', 'conditions' => [['field' => 'name', 'operator' => 'equals', 'value' => 'Bar']]],
+            ['id' => 'skip'],
+        ])->finalized($submission);
+
+        $this->assertEquals(['one', 'three'], array_map(fn ($job) => $job->row['id'], $jobs));
+        $this->assertSame($submission, $jobs[0]->submission);
     }
 
     #[Test]
@@ -205,5 +317,37 @@ class TestMultiWordConnection extends Connection
     public function render(\Statamic\Contracts\Forms\Form $form): VueComponent
     {
         return VueComponent::render('nothing');
+    }
+}
+
+class TestRowConnection extends Connection
+{
+    public function render(\Statamic\Contracts\Forms\Form $form): VueComponent
+    {
+        return VueComponent::render('nothing');
+    }
+
+    protected function job(Submission $submission, array $row): ?object
+    {
+        if ($row['id'] === 'skip') {
+            return null;
+        }
+
+        return (object) ['submission' => $submission, 'row' => $row];
+    }
+
+    protected function preProcessRow(array $row, \Statamic\Contracts\Forms\Form $form): array
+    {
+        return ['token' => strtoupper($row['token'] ?? '')];
+    }
+
+    protected function rowRules(\Statamic\Contracts\Forms\Form $form): array
+    {
+        return ['token' => ['required', 'string']];
+    }
+
+    protected function processRow(array $row, \Statamic\Contracts\Forms\Form $form): array
+    {
+        return ['token' => trim($row['token'] ?? '')];
     }
 }

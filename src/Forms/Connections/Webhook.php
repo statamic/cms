@@ -11,7 +11,6 @@ use Statamic\Forms\Connections\Webhooks\SendWebhook;
 use Statamic\Forms\Fields\FormField;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
-use Statamic\Support\Str;
 use Statamic\Support\VueComponent;
 
 use function Statamic\trans as __;
@@ -35,18 +34,9 @@ class Webhook extends Connection
         return Statamic::svg('forms/connect/webhook-small');
     }
 
-    public function count(Form $form): ?int
+    protected function job(Submission $submission, array $row): ?object
     {
-        return count($form->connections()->get('webhook', []));
-    }
-
-    public function finalized(Submission $submission): object|array
-    {
-        return collect($this->config())
-            ->filter(fn (array $config) => ConnectionLogic::passes($config, $submission))
-            ->map(fn (array $config) => new SendWebhook($submission, $submission->site(), $config))
-            ->values()
-            ->all();
+        return new SendWebhook($submission, $submission->site(), $row);
     }
 
     public function render(Form $form): VueComponent
@@ -69,55 +59,35 @@ class Webhook extends Connection
         ]);
     }
 
-    public function preProcess(array $config, Form $form): array
+    protected function preProcessRow(array $row, Form $form): array
     {
-        $fields = static::blueprint($form)->fields();
-
-        return collect($config)
-            ->map(fn (array $config): array => [
-                ...$this->preProcessRow($config),
-                ...$fields->addValues($config)->preProcess()->values()->all(),
-            ])
+        return static::blueprint($form)->fields()
+            ->addValues($row)
+            ->preProcess()
             ->values()
             ->all();
     }
 
-    public function rules(Form $form): array
+    protected function rowRules(Form $form): array
     {
         return [
-            '*' => ['array'],
-            '*.url' => ['required', 'url:http,https', new WebhookConnectionUrl],
-            '*.verify_ssl' => ['nullable', 'boolean'],
-            '*.enabled' => ['nullable', 'boolean'],
-            '*.conditions' => ['nullable', 'array'],
-            '*.conditions.*' => ['array'],
+            'url' => ['required', 'url:http,https', new WebhookConnectionUrl],
+            'verify_ssl' => ['nullable', 'boolean'],
         ];
     }
 
-    public function process(array $data, Form $form): array
+    protected function processRow(array $row, Form $form): array
     {
-        $fields = static::blueprint($form)->fields();
-
-        return collect($data)
-            ->map(function (array $config) use ($fields): array {
-                $config = Arr::removeNullValues($config);
-
-                $values = $fields
-                    ->addValues($config)
-                    ->process()
-                    ->values()
-                    ->all();
-
-                return Arr::removeNullValues([
-                    'id' => Arr::get($config, 'id') ?? Str::random(8),
-                    ...$values,
-                    'enabled' => Arr::get($config, 'enabled') === false ? false : null,
-                    'verify_ssl' => Arr::get($values, 'verify_ssl') === false ? false : null,
-                    'conditions' => ConnectionLogic::process(Arr::get($config, 'conditions') ?? []),
-                ]);
-            })
+        $values = static::blueprint($form)->fields()
+            ->addValues($row)
+            ->process()
             ->values()
             ->all();
+
+        return [
+            ...$values,
+            'verify_ssl' => Arr::get($values, 'verify_ssl') === false ? false : null,
+        ];
     }
 
     public static function blueprint(Form $form): \Statamic\Fields\Blueprint

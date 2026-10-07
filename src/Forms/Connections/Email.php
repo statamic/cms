@@ -11,7 +11,6 @@ use Statamic\Forms\Connections\Rules\EmailConnectionView;
 use Statamic\Http\Controllers\CP\Forms\EmailConnectionPreviewController;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
-use Statamic\Support\Str;
 use Statamic\Support\VueComponent;
 
 use function Statamic\trans as __;
@@ -35,20 +34,11 @@ class Email extends Connection
         return Statamic::svg('forms/connect/email-notifications-small');
     }
 
-    public function count(Form $form): ?int
-    {
-        return count($form->connections()->get('email', []));
-    }
-
-    public function finalized(Submission $submission): object|array
+    protected function job(Submission $submission, array $row): ?object
     {
         $class = config('statamic.forms.send_email_job');
 
-        return collect($this->config())
-            ->filter(fn (array $config) => ConnectionLogic::passes($config, $submission))
-            ->map(fn (array $config) => new $class($submission, $submission->site(), $config))
-            ->values()
-            ->all();
+        return new $class($submission, $submission->site(), $row);
     }
 
     public function render(Form $form): VueComponent
@@ -71,16 +61,11 @@ class Email extends Connection
         ]);
     }
 
-    public function preProcess(array $config, Form $form): array
+    protected function preProcessRow(array $row, Form $form): array
     {
-        $fields = static::blueprint($form)->fields();
-
-        return collect($config)
-            ->map(fn (array $config): array => $this->convertLegacyAddresses($config))
-            ->map(fn (array $config): array => [
-                ...$this->preProcessRow($config),
-                ...$fields->addValues($config)->preProcess()->values()->all(),
-            ])
+        return static::blueprint($form)->fields()
+            ->addValues($this->convertLegacyAddresses($row))
+            ->preProcess()
             ->values()
             ->all();
     }
@@ -96,48 +81,32 @@ class Email extends Connection
         return $config;
     }
 
-    public function rules(Form $form): array
+    protected function rowRules(Form $form): array
     {
         return [
-            '*' => ['array'],
-            '*.to' => ['required', new EmailConnectionAddress($form)],
-            '*.cc' => [new EmailConnectionAddress($form)],
-            '*.bcc' => [new EmailConnectionAddress($form)],
-            '*.from' => [new EmailConnectionAddress($form)],
-            '*.reply_to' => [new EmailConnectionAddress($form)],
-            '*.html' => [new EmailConnectionView],
-            '*.text' => [new EmailConnectionView],
-            '*.enabled' => ['nullable', 'boolean'],
-            '*.conditions' => ['nullable', 'array'],
-            '*.conditions.*' => ['array'],
+            'to' => ['required', new EmailConnectionAddress($form)],
+            'cc' => [new EmailConnectionAddress($form)],
+            'bcc' => [new EmailConnectionAddress($form)],
+            'from' => [new EmailConnectionAddress($form)],
+            'reply_to' => [new EmailConnectionAddress($form)],
+            'html' => [new EmailConnectionView],
+            'text' => [new EmailConnectionView],
         ];
     }
 
-    public function process(array $data, Form $form): array
+    protected function processRow(array $row, Form $form): array
     {
-        $fields = static::blueprint($form)->fields();
-
-        return collect($data)
-            ->map(function (array $config) use ($fields): array {
-                $config = Arr::removeNullValues($config);
-
-                $values = $fields
-                    ->addValues($config)
-                    ->process()
-                    ->values()
-                    ->all();
-
-                return Arr::removeNullValues([
-                    'id' => Arr::get($config, 'id') ?? Str::random(8),
-                    ...$values,
-                    'enabled' => Arr::get($config, 'enabled') === false ? false : null,
-                    'markdown' => Arr::get($values, 'markdown') === true ? true : null,
-                    'attachments' => Arr::get($values, 'attachments') === true ? true : null,
-                    'conditions' => ConnectionLogic::process(Arr::get($config, 'conditions') ?? []),
-                ]);
-            })
+        $values = static::blueprint($form)->fields()
+            ->addValues($row)
+            ->process()
             ->values()
             ->all();
+
+        return [
+            ...$values,
+            'markdown' => Arr::get($values, 'markdown') === true ? true : null,
+            'attachments' => Arr::get($values, 'attachments') === true ? true : null,
+        ];
     }
 
     public function routes(Router $router): void

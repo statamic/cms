@@ -32,7 +32,7 @@ abstract class Connection
 
     public function setConfig(array $config): static
     {
-        $this->config = $config;
+        $this->config = static::normalizeRows($config);
 
         return $this;
     }
@@ -70,9 +70,17 @@ abstract class Connection
         return $this->developer;
     }
 
+    public static function normalizeRows(mixed $config): array
+    {
+        return collect(is_array($config) && array_is_list($config) ? $config : [$config])
+            ->filter(fn ($row) => is_array($row))
+            ->values()
+            ->all();
+    }
+
     public function count(Form $form): ?int
     {
-        return null;
+        return count($form->connections()->get(static::handle(), []));
     }
 
     public function isConfigured(): bool
@@ -82,36 +90,73 @@ abstract class Connection
 
     public function finalized(Submission $submission): object|array
     {
-        return [];
+        return collect($this->config())
+            ->filter(fn (array $row) => ConnectionLogic::passes($row, $submission))
+            ->map(fn (array $row) => $this->job($submission, $row))
+            ->filter()
+            ->values()
+            ->all();
+    }
+
+    protected function job(Submission $submission, array $row): ?object
+    {
+        return null;
     }
 
     abstract public function render(Form $form): VueComponent;
 
     public function preProcess(array $config, Form $form): array
     {
-        return collect($config)
-            ->map(fn (array $row): array => [...$row, ...$this->preProcessRow($row)])
-            ->values()
+        return collect(static::normalizeRows($config))
+            ->map(fn (array $row): array => [
+                ...$this->preProcessRow($row, $form),
+                'id' => Arr::get($row, 'id') ?? Str::random(8),
+                'enabled' => Arr::get($row, 'enabled') !== false,
+                'conditions' => ConnectionLogic::preProcess(Arr::get($row, 'conditions') ?? []),
+            ])
             ->all();
     }
 
-    protected function preProcessRow(array $config): array
+    protected function preProcessRow(array $row, Form $form): array
     {
-        return [
-            'id' => $config['id'],
-            'enabled' => Arr::get($config, 'enabled') !== false,
-            'conditions' => ConnectionLogic::preProcess(Arr::get($config, 'conditions') ?? []),
-        ];
+        return $row;
     }
 
     public function rules(Form $form): array
     {
+        return [
+            '*' => ['array'],
+            ...collect($this->rowRules($form))->mapWithKeys(fn ($rules, $key) => ['*.'.$key => $rules])->all(),
+            '*.enabled' => ['nullable', 'boolean'],
+            '*.conditions' => ['nullable', 'array'],
+            '*.conditions.*' => ['array'],
+        ];
+    }
+
+    protected function rowRules(Form $form): array
+    {
         return [];
     }
 
-    public function process(array $data, Form $form): array
+    public function process(array $config, Form $form): array
     {
-        return $data;
+        return collect(static::normalizeRows($config))
+            ->map(function (array $row) use ($form): array {
+                $row = Arr::removeNullValues($row);
+
+                return Arr::removeNullValues([
+                    'id' => Arr::get($row, 'id') ?? Str::random(8),
+                    ...$this->processRow(Arr::except($row, ['id', 'enabled', 'conditions']), $form),
+                    'enabled' => Arr::get($row, 'enabled') === false ? false : null,
+                    'conditions' => ConnectionLogic::process(Arr::get($row, 'conditions') ?? []),
+                ]);
+            })
+            ->all();
+    }
+
+    protected function processRow(array $row, Form $form): array
+    {
+        return $row;
     }
 
     public function routes(Router $router): void

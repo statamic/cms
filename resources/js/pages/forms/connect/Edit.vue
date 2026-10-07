@@ -16,7 +16,7 @@ const props = defineProps({
     form: Object,
     connection: Object,
     component: Object,
-    value: [Array, Object],
+    value: Array,
     action: String,
     isConfigured: Boolean,
     suggestableFields: Array,
@@ -105,7 +105,7 @@ onUnmounted(() => {
                                 v-html="connection.icon"
                             />
                             <span>{{ __(connection.title) }}</span>
-                            <Badge v-if="Array.isArray(value)" pill class="absolute start-full top-1/2 ms-1.5 size-6 -translate-y-1/2">
+                            <Badge pill class="absolute start-full top-1/2 ms-1.5 size-6 -translate-y-1/2">
                                 {{ value.length }}
                             </Badge>
                         </span>

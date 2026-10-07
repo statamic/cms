@@ -27,6 +27,7 @@ use Statamic\Facades\FormSubmission;
 use Statamic\Facades\User;
 use Statamic\Facades\YAML;
 use Statamic\Fields\Blueprint;
+use Statamic\Forms\Connections\Connection;
 use Statamic\Forms\Exporters\Exporter;
 use Statamic\Forms\Fields\FormFields;
 use Statamic\Statamic;
@@ -306,15 +307,11 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
             ->args(func_get_args());
     }
 
-    private function ensureConnectionIds($config)
+    private function ensureConnectionIds($config): array
     {
-        if (! is_array($config) || ! array_is_list($config)) {
-            return $config;
-        }
-
         return array_map(
-            fn ($row) => is_array($row) ? ['id' => Str::random(8), ...$row] : $row,
-            $config
+            fn (array $row) => ['id' => Str::random(8), ...$row],
+            Connection::normalizeRows($config)
         );
     }
 
@@ -338,17 +335,9 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
 
         is_null($emails)
             ? $connections->forget('email')
-            : $connections->put('email', $this->convertEmailToConnection($emails));
+            : $connections->put('email', $emails);
 
         return $this->connections($connections);
-    }
-
-    private function convertEmailToConnection(string|array $emails): array
-    {
-        return collect(is_array($emails) && array_is_list($emails) ? $emails : [$emails])
-            ->filter(fn ($config) => is_array($config))
-            ->values()
-            ->all();
     }
 
     /**
@@ -461,15 +450,7 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
     private function connectionsFileData(): array
     {
         return $this->connections()
-            ->map(function ($config) {
-                if (! is_array($config)) {
-                    return $config;
-                }
-
-                return array_is_list($config)
-                    ? array_map(fn ($item) => is_array($item) ? Arr::removeNullValues($item) : $item, $config)
-                    : Arr::removeNullValues($config);
-            })
+            ->map(fn (array $rows) => array_map(fn (array $row) => Arr::removeNullValues($row), $rows))
             ->all();
     }
 
@@ -531,7 +512,7 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
             });
 
         if (! is_null($emails = Arr::get($contents, 'connections.email', $contents['email'] ?? null))) {
-            $this->connections($this->connections()->put('email', $this->convertEmailToConnection($emails)));
+            $this->connections($this->connections()->put('email', $emails));
         }
 
         if (isset($contents['fields'])) {

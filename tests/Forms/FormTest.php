@@ -414,14 +414,30 @@ class FormTest extends TestCase
     {
         $form = Form::make('contact_us')->connections([
             'webhook' => [['url' => 'https://example.com/hook'], ['id' => 'abc', 'url' => 'https://example.com/other']],
-            'acme' => ['token' => 'secret'],
         ]);
 
         $webhooks = $form->connections()->get('webhook');
 
         $this->assertNotEmpty($webhooks[0]['id']);
         $this->assertEquals('abc', $webhooks[1]['id']);
-        $this->assertEquals(['token' => 'secret'], $form->connections()->get('acme'));
+    }
+
+    #[Test]
+    public function it_normalizes_connection_configs_into_lists_of_rows_when_setting()
+    {
+        $form = Form::make('contact_us')->connections([
+            'acme' => ['token' => 'secret'],
+            'webhook' => [['url' => 'https://example.com/hook'], 'nope', null],
+            'other' => 'nope',
+        ]);
+
+        $connections = $form->connections()->map(fn ($rows) => array_map(fn ($row) => Arr::except($row, 'id'), $rows))->all();
+
+        $this->assertSame([
+            'acme' => [['token' => 'secret']],
+            'webhook' => [['url' => 'https://example.com/hook']],
+            'other' => [],
+        ], $connections);
     }
 
     #[Test]
