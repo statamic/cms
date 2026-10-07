@@ -119,6 +119,7 @@ return [
     'info.config.content' => 'Les informations à afficher. Le format Markdown est pris en charge, y compris les liens et les listes.',
     'info.config.icon' => 'Choisissez une icône ou laissez le champ vide pour utiliser l’icône par défaut de l’état.',
     'info.config.state' => 'Choisissez l’importance visuelle de l’information.',
+    'info.title' => 'Info',
     'integer.config.max' => 'La valeur maximale autorisée.',
     'integer.config.min' => 'La valeur minimmale autorisée.',
     'integer.config.step' => 'L’intervalle entre les nombres valides.',
