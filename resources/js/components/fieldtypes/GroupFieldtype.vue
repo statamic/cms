@@ -76,6 +76,8 @@ export default {
                     run: this.toggleCollapsed,
                     visible: this.config.collapsible && this.isCollapsed && !this.fullScreenMode,
                     visibleWhenReadOnly: true,
+                    ariaExpanded: false,
+                    ariaControls: `${this.id}-content`,
                 },
                 {
                     title: __('Collapse'),
@@ -84,6 +86,8 @@ export default {
                     run: this.toggleCollapsed,
                     visible: this.config.collapsible && !this.isCollapsed && !this.fullScreenMode,
                     visibleWhenReadOnly: true,
+                    ariaExpanded: true,
+                    ariaControls: `${this.id}-content`,
                 },
                 {
                     title: __('Toggle Fullscreen Mode'),
