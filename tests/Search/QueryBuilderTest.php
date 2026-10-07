@@ -392,6 +392,21 @@ class QueryBuilderTest extends TestCase
     }
 
     #[Test]
+    public function results_are_found_using_where_in_and_where_not_in_case_insensitively()
+    {
+        $items = collect([
+            ['reference' => 'a', 'title' => 'Frodo'],
+            ['reference' => 'b', 'title' => 'Gandalf'],
+        ]);
+
+        $whereIn = (new FakeQueryBuilder($items))->withoutData()->whereIn('title', ['FRODO'])->get();
+        $whereNotIn = (new FakeQueryBuilder($items))->withoutData()->whereNotIn('title', ['FRODO'])->get();
+
+        $this->assertEquals(['a'], $whereIn->map->reference->all());
+        $this->assertEquals(['b'], $whereNotIn->map->reference->all());
+    }
+
+    #[Test]
     public function results_are_found_using_where_json_contains()
     {
         $items = collect([

@@ -175,7 +175,7 @@ parameters:
 			path: ../src/Providers/AppServiceProvider.php
 
 		-
-			message: '#^Access to an undefined property Statamic\\Providers\\EventServiceProvider\:\:\$listeners\.$#'
+			message: '#^Access to an undefined property Illuminate\\Contracts\\Events\\Dispatcher\:\:\$listeners\.$#'
 			identifier: property.notFound
 			count: 2
 			path: ../src/Providers/EventServiceProvider.php

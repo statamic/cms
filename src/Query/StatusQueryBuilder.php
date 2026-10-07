@@ -23,6 +23,24 @@ class StatusQueryBuilder implements Builder
         'orWhereNotNull',
     ];
 
+    const RESULT_METHODS = [
+        'count',
+        'exists',
+        'pluck',
+        'paginate',
+        'find',
+        'firstOrFail',
+        'firstOr',
+        'sole',
+        'min',
+        'max',
+        'sum',
+        'avg',
+        'average',
+        'chunk',
+        'lazy',
+    ];
+
     protected $builder;
     protected $queryFallbackStatus = true;
     protected $fallbackStatus;
@@ -35,11 +53,17 @@ class StatusQueryBuilder implements Builder
 
     public function get($columns = ['*'])
     {
-        if ($this->queryFallbackStatus) {
-            $this->builder->whereStatus($this->fallbackStatus);
-        }
+        $this->applyFallbackStatus();
 
         return $this->builder->get($columns);
+    }
+
+    private function applyFallbackStatus(): void
+    {
+        if ($this->queryFallbackStatus) {
+            $this->builder->whereStatus($this->fallbackStatus);
+            $this->queryFallbackStatus = false;
+        }
     }
 
     public function first()
@@ -51,6 +75,10 @@ class StatusQueryBuilder implements Builder
     {
         if ((in_array($method, self::METHODS) && in_array(Arr::first($parameters), ['status', 'published'])) || $method === 'whereStatus') {
             $this->queryFallbackStatus = false;
+        }
+
+        if (in_array($method, self::RESULT_METHODS)) {
+            $this->applyFallbackStatus();
         }
 
         $result = $this->forwardCallTo($this->builder, $method, $parameters);
