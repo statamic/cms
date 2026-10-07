@@ -115,13 +115,14 @@ class EmbedUrlTest extends TestCase
     }
 
     #[Test]
+    public function it_transforms_cloudflare_stream_urls()
+    {
+        $this->assertEquals('https://customer-wve7oze7jjxdb0j6.cloudflarestream.com/b209b1484821fff0ed2e5535fbb4ff7b/iframe', $this->embed('https://customer-wve7oze7jjxdb0j6.cloudflarestream.com/b209b1484821fff0ed2e5535fbb4ff7b/manifest/video.m3u8'));
+    }
+
+    #[Test]
     public function it_gets_the_embed_url_from_an_augmented_video_value()
     {
-        $this->assertEquals(
-            'https://iframe.cloudflarestream.com/1234',
-            $this->embed(new Embed('cloudflare:1234')),
-        );
-
         $this->assertEquals(
             'https://player.vimeo.com/video/22439234?dnt=1',
             $this->embed(new Embed('https://vimeo.com/22439234')),

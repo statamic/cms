@@ -34,7 +34,7 @@ class VideoTest extends TestCase
     {
         return [
             'url' => ['https://vimeo.com/22439234', 'vimeo', 'https://player.vimeo.com/video/22439234?dnt=1'],
-            'cloudflare' => ['cloudflare:1234', 'cloudflare', 'https://iframe.cloudflarestream.com/1234'],
+            'cloudflare' => ['https://customer-wve7oze7jjxdb0j6.cloudflarestream.com/b209b1484821fff0ed2e5535fbb4ff7b/manifest/video.m3u8', 'cloudflare', 'https://customer-wve7oze7jjxdb0j6.cloudflarestream.com/b209b1484821fff0ed2e5535fbb4ff7b/iframe'],
             'file' => ['https://example.com/clip.mp4', 'file', 'https://example.com/clip.mp4'],
             'unsupported' => ['https://example.com/nope', 'unsupported', null],
         ];
@@ -75,32 +75,9 @@ class VideoTest extends TestCase
         );
     }
 
-    #[Test]
-    public function it_preloads_the_providers_and_the_current_video()
+    private function fieldtype()
     {
-        $meta = $this->fieldtype('cloudflare:1234')->preload();
-
-        $this->assertSame([
-            ['value' => 'url', 'label' => 'URL'],
-            ['value' => 'cloudflare', 'label' => 'Cloudflare Stream'],
-        ], $meta['providers']);
-
-        $this->assertSame('cloudflare', $meta['video']['provider']);
-        $this->assertSame('https://iframe.cloudflarestream.com/1234', $meta['video']['embed_url']);
-    }
-
-    #[Test]
-    public function it_preloads_an_empty_field()
-    {
-        $this->assertSame('unsupported', $this->fieldtype()->preload()['video']['provider']);
-    }
-
-    private function fieldtype($value = null)
-    {
-        return tap(new Video, fn (Video $fieldtype) => $fieldtype
-            ->setField(new Field('test', ['type' => 'video']))
-            ->field()->setValue($value)
-        );
+        return (new Video)->setField(new Field('test', ['type' => 'video']));
     }
 
     private function render(string $template, ?string $value): string
