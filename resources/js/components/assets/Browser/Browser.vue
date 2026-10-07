@@ -588,7 +588,7 @@ export default {
                 Statamic.$toast.success(response.message || __('Action completed'));
             }
 
-            if (!response.redirect) router.reload();
+            if (!response.redirect) router.reload({ onSuccess: () => this.$refs.listing.refresh() });
         },
 
         assetSaved() {
