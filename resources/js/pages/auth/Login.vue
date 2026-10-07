@@ -15,7 +15,6 @@ const props = defineProps([
     'passkeyVerifyUrl',
     'oauthEnabled',
     'providers',
-    'referer',
     'submitUrl',
     'forgotPasswordUrl',
 ])
@@ -40,13 +39,6 @@ const submit = () => {
         onBefore: () => {
             processing.value = true;
             errors.value = {};
-        },
-        onSuccess: (page) => {
-			if (page.component === 'auth/two-factor/Challenge') {
-				return;
-			}
-
-	        window.location.href = props.referer;
         },
         onError: () => processing.value = false
     });

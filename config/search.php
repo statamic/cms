@@ -85,13 +85,15 @@ return [
     |--------------------------------------------------------------------------
     |
     | Here you may configure the queue name and connection used when indexing
-    | documents.
+    | documents, along with a timeout (in seconds) for each indexing job.
     |
     */
 
     'queue' => env('STATAMIC_SEARCH_QUEUE'),
 
     'queue_connection' => env('STATAMIC_SEARCH_QUEUE_CONNECTION'),
+
+    'queue_timeout' => env('STATAMIC_SEARCH_QUEUE_TIMEOUT'),
 
     /*
     |--------------------------------------------------------------------------

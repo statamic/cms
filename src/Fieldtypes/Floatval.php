@@ -6,6 +6,8 @@ use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
 use Statamic\Query\Scopes\Filters\Fields\Floatval as FloatFilter;
 
+use function Statamic\trans as __;
+
 class Floatval extends Fieldtype
 {
     protected $categories = ['number'];
@@ -88,11 +90,11 @@ class Floatval extends Fieldtype
     {
         $rules = ['numeric'];
 
-        if ($min = $this->config('min')) {
+        if (! is_null($min = $this->config('min'))) {
             $rules[] = 'min:'.$min;
         }
 
-        if ($max = $this->config('max')) {
+        if (! is_null($max = $this->config('max'))) {
             $rules[] = 'max:'.$max;
         }
 

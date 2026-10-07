@@ -5,6 +5,8 @@ namespace Statamic\Query\Scopes\Filters;
 use Statamic\Facades\Collection;
 use Statamic\Query\Scopes\Filter;
 
+use function Statamic\trans as __;
+
 class Status extends Filter
 {
     public $pinned = true;

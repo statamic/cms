@@ -26,5 +26,5 @@ useArchitecturalBackground();
         />
     </EmptyStateMenu>
 
-    <DocsCallout :topic="__('Roles & Permissions')" url="users#permissions" />
+    <DocsCallout :topic="__('Roles & Permissions')" url="permissions" />
 </template>

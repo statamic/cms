@@ -560,6 +560,20 @@ class UserQueryBuilderTest extends TestCase
         $this->assertCount(1, User::query()->customScope(['email' => 'gandalf@precious.com'])->get());
         $this->assertCount(1, User::query()->whereCustom(['email' => 'gandalf@precious.com'])->get());
     }
+
+    #[Test]
+    public function sorting_by_unsafe_method_does_not_invoke_it()
+    {
+        User::make()->email('a@example.com')->data(['name' => 'Alpha'])->save();
+        User::make()->email('b@example.com')->data(['name' => 'Bravo'])->save();
+
+        $count = User::all()->count();
+        $this->assertGreaterThan(0, $count);
+
+        User::query()->orderBy('delete', 'asc')->get();
+
+        $this->assertCount($count, User::all());
+    }
 }
 
 class CustomScope extends Scope

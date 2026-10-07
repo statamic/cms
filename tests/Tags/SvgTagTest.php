@@ -3,6 +3,7 @@
 namespace Tests\Tags;
 
 use Illuminate\Support\Facades\File;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Parse;
 use Statamic\Tags\Svg;
@@ -72,15 +73,34 @@ SVG);
     }
 
     #[Test]
-    public function sanitizing_doesnt_remove_an_xml_tag()
+    public function sanitizing_removes_an_xml_tag()
     {
-        // We want to make sure that we haven't configured it to remove it if we wanted it there to begin with.
+        // The declaration is meaningless once the svg is inlined into an html document,
+        // and keeping it meant trusting an attacker controlled "<?xml" prefix.
 
-        $svg = '<?xml version="1.0" encoding="UTF-8"?><svg><path/></svg>';
+        File::put(resource_path('xmltag.svg'), '<?xml version="1.0" encoding="UTF-8"?><svg><path/></svg>');
 
-        File::put(resource_path('xmltag.svg'), $svg);
+        $this->assertEquals('<svg><path/></svg>', $this->tag('{{ svg src="xmltag" }}'));
+    }
 
-        $this->assertEquals($svg, $this->tag('{{ svg src="xmltag" }}'));
+    #[Test]
+    #[DataProvider('xmlStylesheetProvider')]
+    public function sanitizing_removes_xml_stylesheet_processing_instructions($svg)
+    {
+        File::put(resource_path('stylesheet.svg'), $svg);
+
+        $this->assertStringNotContainsString('xml-stylesheet', $this->tag('{{ svg src="stylesheet" }}'));
+    }
+
+    public static function xmlStylesheetProvider()
+    {
+        $pi = '<?xml-stylesheet type="text/xsl" href="data:text/xml;base64,PHhzbDpzdHlsZXNoZWV0Lz4="?>';
+
+        return [
+            'on its own' => [$pi.'<svg><path/></svg>'],
+            'after a declaration' => ['<?xml version="1.0"?>'.$pi.'<svg><path/></svg>'],
+            'on separate lines' => ['<?xml version="1.0"?>'."\n".$pi."\n".'<svg><path/></svg>'],
+        ];
     }
 
     #[Test]
@@ -112,6 +132,19 @@ SVG);
         Svg::enableSanitization();
 
         $this->assertEquals('<svg><path/></svg>', $this->tag('{{ svg src="xss" }}'));
+    }
+
+    #[Test]
+    public function it_sanitizes_css_in_style_tags()
+    {
+        File::put(resource_path('css-inject.svg'), '<svg xmlns="http://www.w3.org/2000/svg"><style>@import url("https://evil.com/track.css"); .cls-1 { fill: #333; }</style><rect class="cls-1"/></svg>');
+
+        $result = $this->tag('{{ svg src="css-inject" }}');
+
+        $this->assertStringNotContainsString('@import', $result);
+        $this->assertStringNotContainsString('evil.com', $result);
+        $this->assertStringContainsString('.cls-1', $result);
+        $this->assertStringContainsString('fill:', $result);
     }
 
     #[Test]

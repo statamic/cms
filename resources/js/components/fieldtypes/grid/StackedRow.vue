@@ -31,6 +31,7 @@
             <FieldsProvider
                 :fields="fields"
                 :as-config="false"
+                :read-only
                 :field-path-prefix="`${fieldPathPrefix}.${index}`"
                 :meta-path-prefix="`${metaPathPrefix}.existing.${values._id}`"
             >

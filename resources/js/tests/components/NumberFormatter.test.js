@@ -203,6 +203,17 @@ describe('formatRange', () => {
     test('it normalizes string inputs', () => {
         expect(new NumberFormatter().formatRange('1000', '5000')).toBe('1,000–5,000');
     });
+
+    test('it formats a single number when the range endpoints are equal', () => {
+        expect(new NumberFormatter().formatRange(1, 1)).toBe('1');
+        expect(new NumberFormatter().formatRange('5', 5)).toBe('5');
+        expect(new NumberFormatter().formatRange(0.5, 0.5, 'percent')).toBe('50%');
+    });
+
+    test('it keeps the approximation when endpoints differ but format identically', () => {
+        expect(new NumberFormatter().formatRange(1, 1.3, { maximumFractionDigits: 0 })).toBe('~1');
+        expect(new NumberFormatter().formatRange(1.231, 1.234, { maximumFractionDigits: 2 })).toBe('~1.23');
+    });
 });
 
 describe('range via array syntax', () => {

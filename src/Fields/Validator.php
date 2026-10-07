@@ -2,14 +2,22 @@
 
 namespace Statamic\Fields;
 
-use Illuminate\Support\Collection;
+use Illuminate\Contracts\Validation\CompilableRules;
+use Illuminate\Contracts\Validation\InvokableRule;
+use Illuminate\Contracts\Validation\Rule;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Support\Facades\Validator as LaravelValidator;
+use InvalidArgumentException;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class Validator
 {
     protected $fields;
+    protected $preProcessedFields;
     protected $replacements = [];
     protected $extraRules = [];
     protected $customMessages = [];
@@ -23,8 +31,14 @@ class Validator
     public function fields($fields)
     {
         $this->fields = $fields;
+        $this->preProcessedFields = null;
 
         return $this;
+    }
+
+    protected function preProcessedFields()
+    {
+        return $this->preProcessedFields ??= $this->fields->preProcessValidatables();
     }
 
     public function withRules($rules)
@@ -67,7 +81,7 @@ class Validator
             return collect();
         }
 
-        return $this->fields->preProcessValidatables()->all()->reduce(function ($carry, $field) {
+        return $this->preProcessedFields()->all()->reduce(function ($carry, $field) {
             if (request()->isPrecognitive() && $field->type() == 'assets') {
                 return $carry;
             }
@@ -103,7 +117,7 @@ class Validator
     public function validator()
     {
         return LaravelValidator::make(
-            $this->fields->preProcessValidatables()->values()->all(),
+            $this->preProcessedFields()->values()->all(),
             $this->rules(),
             $this->customMessages,
             $this->attributes()
@@ -117,7 +131,7 @@ class Validator
 
     public function attributes()
     {
-        return $this->fields->preProcessValidatables()->all()->reduce(function ($carry, $field) {
+        return $this->preProcessedFields()->all()->reduce(function ($carry, $field) {
             return $carry->merge($field->validationAttributes());
         }, collect())->all();
     }
@@ -157,7 +171,39 @@ class Validator
 
         [$class, $arguments] = (new ClassRuleParser)->parse($rule);
 
+        $class = ltrim(trim($class), '\\');
+
+        if (! $this->isValidationRuleClass($class)) {
+            throw new InvalidArgumentException("[{$class}] is not a valid validation rule class.");
+        }
+
         return new $class(...$arguments);
+    }
+
+    private function isValidationRuleClass(string $class): bool
+    {
+        if (! preg_match('/^[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*(\\\\[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*)*$/', $class)) {
+            return false;
+        }
+
+        if (! class_exists($class)) {
+            return false;
+        }
+
+        $contracts = [
+            Rule::class,
+            ValidationRule::class,
+            InvokableRule::class,
+            CompilableRules::class,
+        ];
+
+        foreach ($contracts as $contract) {
+            if (is_subclass_of($class, $contract)) {
+                return true;
+            }
+        }
+
+        return Str::startsWith($class, 'Illuminate\\Validation\\Rules\\');
     }
 
     private function parseStringBasedRule($rule)
@@ -186,12 +232,10 @@ class Validator
     {
         $request = request();
 
-        if (! $request->headers->has('Precognition-Validate-Only')) {
+        if (! $request->isPrecognitive()) {
             return $rules;
         }
 
-        return Collection::make($rules)
-            ->only(explode(',', $request->header('Precognition-Validate-Only')))
-            ->all();
+        return $request->filterPrecognitiveRules($rules);
     }
 }

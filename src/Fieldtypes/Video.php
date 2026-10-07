@@ -3,10 +3,22 @@
 namespace Statamic\Fieldtypes;
 
 use Statamic\Fields\Fieldtype;
+use Statamic\Fieldtypes\Video\Embed;
+
+use function Statamic\trans as __;
 
 class Video extends Fieldtype
 {
     protected $categories = ['media'];
+
+    public function augment($value)
+    {
+        if (is_null($value)) {
+            return null;
+        }
+
+        return new Embed($value);
+    }
 
     protected function configFieldItems(): array
     {

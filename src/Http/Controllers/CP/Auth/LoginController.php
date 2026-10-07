@@ -15,8 +15,8 @@ use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Middleware\CP\RedirectIfAuthorized;
 use Statamic\OAuth\Provider;
 use Statamic\Statamic;
-use Statamic\Support\Str;
 
+use function Statamic\trans;
 use function Statamic\trans as __;
 
 class LoginController extends CpController
@@ -43,7 +43,6 @@ class LoginController extends CpController
             'oauthEnabled' => $oauthEnabled,
             'emailLoginEnabled' => $emailLoginEnabled,
             'providers' => $oauthEnabled ? $this->oauthProviders() : [],
-            'referer' => $this->getReferrer($request),
             'forgotPasswordUrl' => cp_route('password.request'),
             'submitUrl' => cp_route('login'),
             'passkeyOptionsUrl' => cp_route('passkeys.auth.options'),
@@ -53,7 +52,7 @@ class LoginController extends CpController
 
     private function oauthProviders()
     {
-        $redirect = parse_url(cp_route('index'))['path'];
+        $redirect = parse_url(cp_route('index'))['path'] ?? '/';
 
         return OAuth::providers()->map(fn (Provider $provider) => [
             'name' => $provider->name(),
@@ -70,11 +69,11 @@ class LoginController extends CpController
             'password' => 'required|string',
         ]);
 
-        $this->checkPasskeyEnforcement($request);
-
         $this->handleTooManyLoginAttempts($request);
 
         $user = User::fromUser($this->validateCredentials($request));
+
+        $this->checkPasskeyEnforcement($user);
 
         if (TwoFactor::enabled() && $user->hasEnabledTwoFactorAuthentication()) {
             return $this->twoFactorChallengeResponse($request, $user);
@@ -107,18 +106,18 @@ class LoginController extends CpController
 
     public function redirectPath()
     {
-        $cp = cp_route('index');
-        $referer = request('referer');
-        $referredFromCp = Str::startsWith($referer, $cp) && ! Str::startsWith($referer, $cp.'/auth/');
-
-        return $referredFromCp ? $referer : $cp;
+        return cp_route('index');
     }
 
     protected function authenticated(Request $request, $user)
     {
-        return $request->expectsJson()
-            ? response('Authenticated')
-            : redirect()->intended($this->redirectPath());
+        if ($request->expectsJson()) {
+            return response('Authenticated');
+        }
+
+        $url = redirect()->intended($this->redirectPath())->getTargetUrl();
+
+        return $request->inertia() ? Inertia::location($url) : redirect($url);
     }
 
     protected function credentials(Request $request)
@@ -144,28 +143,23 @@ class LoginController extends CpController
         return redirect(URL::isExternalToApplication($redirect) ? '/' : $redirect);
     }
 
-    protected function getReferrer()
-    {
-        $referrer = url()->previous();
-
-        return $referrer === cp_route('unauthorized') ? cp_route('index') : $referrer;
-    }
-
     public function username()
     {
         return 'email';
     }
 
-    private function checkPasskeyEnforcement(Request $request)
+    private function checkPasskeyEnforcement($user)
     {
-        if (! config('statamic.webauthn.allow_password_login_with_passkey', true)) {
-            if ($user = User::findByEmail($request->get($this->username()))) {
-                if ($user->passkeys()->isNotEmpty()) {
-                    throw ValidationException::withMessages([
-                        $this->username() => [trans('statamic::messages.password_passkeys_only')],
-                    ]);
-                }
-            }
+        if (config('statamic.webauthn.allow_password_login_with_passkey', true)) {
+            return;
         }
+
+        if ($user->passkeys()->isEmpty()) {
+            return;
+        }
+
+        throw ValidationException::withMessages([
+            $this->username() => [trans('statamic::messages.password_passkeys_only')],
+        ]);
     }
 }

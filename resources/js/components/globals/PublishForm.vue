@@ -59,7 +59,7 @@
                 @update:modelValue="localizationSelected"
             />
 
-            <div class="hidden items-center gap-2 sm:gap-3 md:flex">
+            <div class="items-center gap-2 sm:gap-3 md:flex">
                 <Button
                     v-if="canEdit"
                     variant="primary"
@@ -83,16 +83,20 @@
             v-if="fieldset && !fieldset.empty"
             ref="container"
             :name="publishContainer"
-            :reference="initialReference"
+            :reference="reference"
             :blueprint="fieldset"
+            :as-config="asConfig"
             v-model="values"
             :meta="meta"
             :origin-values="originValues"
             :origin-meta="originMeta"
             :errors="errors"
             :site="site"
+            :read-only="readOnly"
             v-model:modified-fields="localizedFields"
+            :track-dirty-state="trackDirtyState"
             :sync-field-confirmation-text="syncFieldConfirmationText"
+            remember-tab
         />
 
         <confirmation-modal
@@ -157,6 +161,7 @@ export default {
         canConfigure: Boolean,
         configureUrl: String,
         canEditBlueprint: Boolean,
+        asConfig: Boolean,
     },
 
     data() {
@@ -174,9 +179,12 @@ export default {
             originValues: this.initialOriginValues || {},
             originMeta: this.initialOriginMeta || {},
             site: this.initialSite,
+            reference: this.initialReference,
             readOnly: this.initialReadOnly,
             syncFieldConfirmationText: __('messages.sync_entry_field_confirmation_text'),
             pendingLocalization: null,
+            trackDirtyState: true,
+            trackDirtyStateTimeout: null,
         };
     },
 
@@ -195,8 +203,13 @@ export default {
             return computed(() => this.$refs.container);
         },
 
-        saving() {
-            return this.savingRef.value;
+        saving: {
+            get() {
+                return this.savingRef.value;
+            },
+            set(value) {
+                this.savingRef.value = value;
+            },
         },
 
         errors() {
@@ -296,14 +309,14 @@ export default {
         switchToLocalization(localization) {
             this.localizing = localization.handle;
 
-            if (this.publishContainer === 'base') {
-                window.history.replaceState({}, '', localization.url);
-            }
-
             this.$axios.get(localization.url).then((response) => {
+                clearTimeout(this.trackDirtyStateTimeout);
+                this.trackDirtyState = false;
+
                 const data = response.data;
                 this.values = data.values;
                 this.originValues = data.originValues;
+                this.originMeta = data.originMeta || {};
                 this.meta = data.meta;
                 this.localizations = data.localizations;
                 this.localizedFields = data.localizedFields;
@@ -311,9 +324,19 @@ export default {
                 this.actions = data.actions;
                 this.fieldset = data.blueprint;
                 this.site = localization.handle;
+                this.reference = data.reference;
                 this.localizing = false;
                 this.afterActionSuccessfullyCompleted(data);
-                this.$nextTick(() => this.$refs.container.clearDirtyState());
+
+                if (this.publishContainer === 'base' && localization.url) {
+                    window.history.replaceState({}, '', localization.url + window.location.hash);
+                }
+
+                // After any fieldtypes do a debounced update
+                this.trackDirtyStateTimeout = setTimeout(() => {
+                    this.trackDirtyState = true;
+                    this.$refs.container?.clearDirtyState();
+                }, 500);
             });
         },
 
@@ -367,6 +390,10 @@ export default {
 
     created() {
         window.history.replaceState({}, document.title, document.location.href.replace('created=true', ''));
+    },
+
+    beforeUnmount() {
+        clearTimeout(this.trackDirtyStateTimeout);
     },
 };
 </script>

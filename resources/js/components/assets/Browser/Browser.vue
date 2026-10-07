@@ -1,10 +1,10 @@
 <template>
     <div ref="browser" class="h-full" @keydown.shift="shiftDown" @keyup="clearShift">
         <Uploader
-            ref="uploader"
+            ref="internalUploader"
             :container="container.id"
             :path="path"
-            :enabled="!preventDragging && canUpload"
+            :enabled="!uploader && !preventDragging && canUpload"
             @updated="uploadsUpdated"
             @upload-complete="uploadCompleted"
             @error="uploadError"
@@ -37,35 +37,54 @@
                     <template #default="{ items }">
                         <slot name="header" v-bind="{ canUpload, openFileBrowser, canCreateFolders, startCreatingFolder, mode, modeChanged }">
                             <Header :title="__(container.title)" icon="assets">
-                                <Dropdown v-if="container.can_edit || container.can_delete || container.can_create">
-                                    <DropdownMenu>
-                                        <DropdownItem
-                                            icon="container-add"
-                                            v-if="canCreateContainers"
-                                            :text="__('Create Container')"
-                                            :href="createContainerUrl"
-                                        />
-                                        <DropdownItem
-                                            icon="cog"
-                                            v-if="container.can_edit"
-                                            :text="__('Configure Container')"
-                                            :href="container.edit_url"
-                                        />
-                                        <DropdownItem
-                                            icon="blueprint-edit"
-                                            :text="__('Edit Blueprint')"
-                                            :href="container.blueprint_url"
-                                        />
-                                        <DropdownSeparator v-if="container.can_delete" />
-                                        <DropdownItem
-                                            icon="trash"
-                                            variant="destructive"
-                                            v-if="container.can_delete"
-                                            :text="__('Delete Container')"
-                                            @click="$event.preventDefault(); $refs.deleter.confirm()"
-                                        />
-                                    </DropdownMenu>
-                                </Dropdown>
+                                <ItemActions
+                                    ref="containerActions"
+                                    :url="container.actions_url"
+                                    :actions="container.actions"
+                                    :item="container.id"
+                                    @completed="containerActionCompleted"
+                                    v-slot="{ actions }"
+                                >
+                                    <Dropdown v-if="container.can_edit || container.can_delete || container.can_edit_blueprint || actions.length">
+                                        <DropdownMenu>
+                                            <DropdownItem
+                                                icon="container-add"
+                                                v-if="canCreateContainers"
+                                                :text="__('Create Container')"
+                                                :href="createContainerUrl"
+                                            />
+                                            <DropdownItem
+                                                icon="cog"
+                                                v-if="container.can_edit"
+                                                :text="__('Configure Container')"
+                                                :href="container.edit_url"
+                                            />
+                                            <DropdownItem
+                                                icon="blueprint-edit"
+                                                v-if="container.can_edit_blueprint"
+                                                :text="__('Edit Blueprint')"
+                                                :href="container.blueprint_url"
+                                            />
+                                            <DropdownSeparator v-if="actions.length" />
+                                            <DropdownItem
+                                                v-for="action in actions"
+                                                :key="action.handle"
+                                                :text="__(action.title)"
+                                                :icon="action.icon"
+                                                :variant="action.dangerous ? 'destructive' : 'default'"
+                                                @click="action.run"
+                                            />
+                                            <DropdownSeparator v-if="container.can_delete" />
+                                            <DropdownItem
+                                                icon="trash"
+                                                variant="destructive"
+                                                v-if="container.can_delete"
+                                                :text="__('Delete Container')"
+                                                @click="$event.preventDefault(); $refs.deleter.confirm()"
+                                            />
+                                        </DropdownMenu>
+                                    </Dropdown>
+                                </ItemActions>
 
                                 <resource-deleter
                                     ref="deleter"
@@ -84,7 +103,7 @@
 
                             <div class="flex items-center gap-2 sm:gap-3 py-3 relative overflow-clip st-overflow-clip-margin">
                                 <div class="flex flex-1 items-center gap-2 sm:gap-3">
-                                    <ListingSearch />
+                                    <ListingSearch :label="__('Search assets')" />
                                     <ListingFilters @filters-updated="filtersUpdated" />
                                 </div>
                                 <ListingCustomizeColumns v-if="mode === 'table'" />
@@ -192,6 +211,7 @@ import Table from './Table.vue';
 import HasPreferences from '../../data-list/HasPreferences';
 import Uploader from '../Uploader.vue';
 import Uploads from '../Uploads.vue';
+import ItemActions from '@/components/actions/ItemActions.vue';
 import { debounce, sortBy } from 'lodash-es';
 import {
     Header,
@@ -217,6 +237,7 @@ import {
 } from '@ui';
 import Breadcrumbs from './Breadcrumbs.vue';
 import useCheckerboard from '@/composables/checkerboard.js';
+import { router } from '@inertiajs/vue3';
 
 export default {
     mixins: [HasPreferences],
@@ -231,6 +252,7 @@ export default {
         DropdownSeparator,
         AssetThumbnail,
         AssetEditor,
+        ItemActions,
         Uploader,
         Uploads,
         Grid,
@@ -271,6 +293,10 @@ export default {
         initialColumns: {
             type: Array,
             default: () => [],
+        },
+        uploader: {
+            type: Object,
+            default: null,
         },
     },
 
@@ -416,6 +442,7 @@ export default {
                 folder: this.folder,
                 folderActionUrl: this.folderActionUrl,
                 folders: this.folders,
+                maxFiles: this.maxFiles,
                 restrictFolderNavigation: this.restrictFolderNavigation,
                 path: this.path,
                 creatingFolder: this.creatingFolder,
@@ -475,8 +502,9 @@ export default {
             this.loadAssets();
         },
 
-        path() {
+        path(path) {
             this.loadAssets();
+            this.$emit('path-changed', path);
         },
 
         searchQuery() {
@@ -548,6 +576,19 @@ export default {
             // this.loading = false;
 
             this.$refs.listing.refresh();
+        },
+
+        containerActionCompleted(successful, response = {}) {
+            if (!successful) {
+                Statamic.$toast.error(response.message || __('Action failed'));
+                return;
+            }
+
+            if (response.message !== false) {
+                Statamic.$toast.success(response.message || __('Action completed'));
+            }
+
+            if (!response.redirect) router.reload({ onSuccess: () => this.$refs.listing.refresh() });
         },
 
         assetSaved() {
@@ -675,7 +716,7 @@ export default {
         },
 
         openFileBrowser() {
-            this.$refs.uploader.browse();
+            (this.uploader || this.$refs.internalUploader).browse();
         },
 
         selectFolder(path) {
@@ -803,6 +844,7 @@ export default {
             });
 
             Statamic.$commandPalette.add({
+                when: () => this.container.can_edit_blueprint,
                 category: Statamic.$commandPalette.category.Actions,
                 text: __('Edit Blueprint'),
                 icon: 'blueprint-edit',
@@ -816,6 +858,16 @@ export default {
                 icon: 'trash',
                 action: () => this.$refs.deleter.confirm(),
             });
+
+            this.container.actions?.forEach(action => Statamic.$commandPalette.add({
+                when: () => Boolean(this.$refs.containerActions),
+                category: Statamic.$commandPalette.category.Actions,
+                text: [__('Container'), action.title],
+                icon: action.icon,
+                action: () => this.$refs.containerActions.preparedActions
+                    .find(prepared => prepared.handle === action.handle)
+                    ?.run(),
+            }));
         }
     },
 };

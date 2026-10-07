@@ -72,7 +72,16 @@ abstract class Builder implements Contract
 
     public function offset($value)
     {
-        $this->offset = max(0, $value);
+        $value = max(0, $value);
+
+        // A large page number can overflow the offset arithmetic in forPage()/chunk() into a
+        // float, which array_slice() rejects. Clamp an out-of-range offset to PHP_INT_MAX so it
+        // yields an empty page instead of throwing.
+        if (is_float($value)) {
+            $value = $value >= PHP_INT_MAX ? PHP_INT_MAX : (int) $value;
+        }
+
+        $this->offset = $value;
 
         return $this;
     }
@@ -432,7 +441,7 @@ abstract class Builder implements Contract
             $value = Carbon::parse($value);
         }
 
-        $value = Carbon::parse($value->format('Y-m-d')); // we only care about the date part
+        $value = Carbon::instance($value)->setTimezone(config('app.timezone'))->startOfDay(); // we only care about the date part
 
         $this->wheres[] = [
             'type' => 'Date',
@@ -558,7 +567,7 @@ abstract class Builder implements Contract
             $value = Carbon::parse($value);
         }
 
-        $value = $value->format('H:i:s'); // we only care about the time part
+        $value = Carbon::instance($value)->setTimezone(config('app.timezone'))->format('H:i:s'); // we only care about the time part
 
         $this->wheres[] = [
             'type' => 'Time',
@@ -805,7 +814,7 @@ abstract class Builder implements Contract
 
         $pattern = Pattern::sqlLikeToRegex($like);
 
-        return preg_match('/'.$pattern.'/im', (string) $item);
+        return preg_match('/'.$pattern.'/imu', (string) $item);
     }
 
     protected function filterTestNotLike($item, $like)
@@ -815,7 +824,7 @@ abstract class Builder implements Contract
 
     protected function filterTestLikeRegex($item, $pattern)
     {
-        return preg_match("/{$pattern}/im", (string) $item);
+        return preg_match("/{$pattern}/imu", (string) $item);
     }
 
     protected function filterTestNotLikeRegex($item, $pattern)

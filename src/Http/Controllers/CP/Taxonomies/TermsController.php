@@ -13,9 +13,13 @@ use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Http\Resources\CP\Taxonomies\Term as TermResource;
 use Statamic\Http\Resources\CP\Taxonomies\Terms;
+use Statamic\Query\OrderBy;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 use Statamic\Rules\Slug;
 use Statamic\Rules\UniqueTermValue;
+use Statamic\Statamic;
+
+use function Statamic\trans as __;
 
 class TermsController extends CpController
 {
@@ -33,7 +37,7 @@ class TermsController extends CpController
             'blueprints' => $taxonomy->termBlueprints()->map->handle(),
         ]);
 
-        $sortField = request('sort');
+        $sortField = OrderBy::column(request('sort'));
         $sortDirection = request('order', 'asc');
 
         if (! $sortField && ! request('search')) {
@@ -45,7 +49,7 @@ class TermsController extends CpController
             $query->orderBy($sortField, $sortDirection);
         }
 
-        $paginator = $query->paginate(request('perPage'));
+        $paginator = $query->paginate(Statamic::cpPerPage(request('perPage')));
 
         $terms = $paginator->getCollection();
 
@@ -130,7 +134,7 @@ class TermsController extends CpController
                     'url' => $localized->editUrl(),
                     'livePreviewUrl' => $localized->livePreviewUrl(),
                 ];
-            })->all(),
+            })->values()->all(),
             'previewTargets' => $taxonomy->previewTargets()->all(),
             'itemActions' => Action::for($term, ['taxonomy' => $taxonomy->handle(), 'view' => 'form']),
             'hasTemplate' => view()->exists($term->template()),
@@ -163,14 +167,21 @@ class TermsController extends CpController
 
         $fields = $term->blueprint()->fields()->addValues($request->except('id'));
 
-        $fields->validate([
-            'title' => 'required',
-            'slug' => [
-                'required',
-                new Slug,
-                new UniqueTermValue(taxonomy: $taxonomy->handle(), except: $term->id(), site: $site->handle()),
-            ],
-        ]);
+        $fields
+            ->validator()
+            ->withRules([
+                'title' => 'required',
+                'slug' => [
+                    'required',
+                    new Slug,
+                    new UniqueTermValue(taxonomy: $taxonomy->handle(), except: $term->id(), site: $site->handle()),
+                ],
+            ])
+            ->withReplacements([
+                'id' => $term->id(),
+                'taxonomy' => $taxonomy->handle(),
+                'site' => $site->handle(),
+            ])->validate();
 
         $values = $fields->process()->values();
 
@@ -192,13 +203,14 @@ class TermsController extends CpController
 
         $saved = $term->updateLastModified(User::current())->save();
 
-        [$values] = $this->extractFromFields($term, $term->blueprint());
+        [$values, $meta] = $this->extractFromFields($term, $term->blueprint());
 
         return (new TermResource($term))
             ->additional([
                 'saved' => $saved,
                 'data' => [
                     'values' => $values,
+                    'meta' => $meta,
                 ],
             ]);
     }
@@ -270,10 +282,16 @@ class TermsController extends CpController
 
         $fields = $blueprint->fields()->addValues($request->all());
 
-        $fields->validate([
-            'title' => 'required',
-            'slug' => ['required', new UniqueTermValue(taxonomy: $taxonomy->handle(), site: $site->handle())],
-        ]);
+        $fields
+            ->validator()
+            ->withRules([
+                'title' => 'required',
+                'slug' => ['required', new UniqueTermValue(taxonomy: $taxonomy->handle(), site: $site->handle())],
+            ])
+            ->withReplacements([
+                'taxonomy' => $taxonomy->handle(),
+                'site' => $site->handle(),
+            ])->validate();
 
         $values = $fields->process()->values()->except(['slug', 'blueprint']);
 

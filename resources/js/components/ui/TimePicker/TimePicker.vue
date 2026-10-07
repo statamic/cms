@@ -14,6 +14,10 @@ const props = defineProps({
     granularity: { type: String, default: null },
     /** When `true`, clear and "set to now" buttons are displayed. */
     clearable: { type: Boolean, default: true },
+    /** When `true`, the time picker is disabled. */
+    disabled: { type: Boolean, default: false },
+    /** When `true`, the time picker is read-only. */
+    readOnly: { type: Boolean, default: false },
 });
 
 const setToNow = () => {
@@ -35,12 +39,15 @@ const setToNow = () => {
         v-slot="{ segments }"
         :locale="$date.locale"
         :granularity="granularity"
+        :disabled="disabled || readOnly"
         :class="[
             'flex items-center w-full bg-white dark:bg-gray-900',
             'border border-gray-300 dark:border-gray-700',
             'leading-5 text-gray-600 dark:text-gray-300',
             'shadow-ui-sm not-prose h-10 rounded-lg py-2 px-3 disabled:shadow-none',
             'data-invalid:border-red-500',
+            disabled ? 'disabled:shadow-none disabled:opacity-50' : '',
+            readOnly ? 'border-dashed' : '',
         ]"
     >
         <div class="flex-1 flex items-center">
@@ -56,8 +63,8 @@ const setToNow = () => {
             </template>
         </div>
         <div class="flex items-center gap-1">
-            <Button v-if="clearable" @click="setToNow" type="button" class="[&_svg]:opacity-80! dark:[&_svg]:opacity-70! hover:[&_svg]:opacity-100!" size="xs" v-tooltip="__('Set to now')" icon="time-now" />
-            <Button v-if="clearable" @click="emit('update:modelValue', null)" type="button" class="[&_svg]:opacity-80! dark:[&_svg]:opacity-70! hover:[&_svg]:opacity-100!" v-tooltip="__('Clear')" icon="x" size="xs" />
+            <Button v-if="clearable && !readOnly" @click="setToNow" type="button" class="[&_svg]:opacity-80! dark:[&_svg]:opacity-70! hover:[&_svg]:opacity-100!" size="xs" v-tooltip="__('Set to now')" icon="time-now" :disabled="disabled" />
+            <Button v-if="clearable && !readOnly" @click="emit('update:modelValue', null)" type="button" class="[&_svg]:opacity-80! dark:[&_svg]:opacity-70! hover:[&_svg]:opacity-100!" v-tooltip="__('Clear')" icon="x" size="xs" :disabled="disabled" />
         </div>
     </TimeFieldRoot>
 

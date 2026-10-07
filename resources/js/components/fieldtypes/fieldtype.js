@@ -2,6 +2,7 @@ import debounce from '@/util/debounce.js';
 import mixin from './Fieldtype.vue';
 import emits from './emits.js';
 import props from './props.js';
+import { UPDATE_DEBOUNCE_MS } from './constants';
 import { computed, ref, watch } from 'vue';
 import FieldAction from '@/components/field-actions/FieldAction.js';
 import toFieldActions from '@/components/field-actions/toFieldActions.js';
@@ -56,7 +57,7 @@ const use = function(emit, props) {
 
     const updateDebounced = debounce(function (value) {
         update(value);
-    }, 150);
+    }, UPDATE_DEBOUNCE_MS);
 
     const updateMeta = (value) => {
         emit('update:meta', value);

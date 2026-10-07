@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Storage;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Facades\Asset as Assets;
 
+use function Statamic\trans as __;
+
 class DuplicateAsset extends Action
 {
     protected $icon = 'duplicate';

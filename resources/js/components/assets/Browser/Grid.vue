@@ -64,7 +64,7 @@
                         ref="newFolderInput"
                         v-model:modelValue="newFolderName"
                         :start-with-edit-mode="true"
-                        submit-mode="enter"
+                        submit-mode="both"
                         :placeholder="__('Name')"
                         :class="[
                             'flex w-[80px] items-center placeholder:lowercase justify-center overflow-hidden mt-2 text-center text-xs text-ellipsis whitespace-nowrap placeholder:text-gray-400 dark:placeholder:text-gray-500 text-gray-500',
@@ -117,7 +117,7 @@
                                     @click.stop="selectionClicked(index, $event)"
                                     @dblclick.stop="$emit('edit-asset', asset)"
                                 >
-                                    <div class="relative flex aspect-square size-full items-center justify-center">
+                                    <div class="relative flex aspect-square size-full items-center justify-center" :class="{ 'cursor-pointer': maxFiles === 1 }">
                                         <div class="asset-thumb">
                                             <img
                                                 v-if="asset.thumbnail"
@@ -128,6 +128,7 @@
                                                     'w-full p-4': asset.extension === 'svg',
                                                     'rounded-lg p-1': asset.orientation === 'square',
                                                 }"
+                                                @error="asset.thumbnail = null"
                                             />
                                             <file-icon v-else :extension="asset.extension" class="size-1/2" />
                                         </div>
@@ -228,6 +229,7 @@ export default {
         assets: { type: Array },
         selectedAssets: { type: Array },
         thumbnailSize: { type: Number },
+        maxFiles: { type: Number },
         showCheckerboard: { type: Boolean, default: false },
         checkerboardMode: { type: String, default: 'transparent' },
     },

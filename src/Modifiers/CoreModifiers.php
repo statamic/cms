@@ -23,11 +23,13 @@ use Statamic\Facades\Path;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Facades\YAML;
+use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Value;
 use Statamic\Fields\Values;
 use Statamic\Fieldtypes\Bard;
 use Statamic\Fieldtypes\Bard\Augmentor;
 use Statamic\Fieldtypes\Link\ArrayableLink;
+use Statamic\Fieldtypes\Video\Embed;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Dumper;
@@ -36,6 +38,10 @@ use Statamic\Support\Str;
 use Statamic\Support\Traits\ChecksDumpability;
 use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
 use Stringy\StaticStringy as Stringy;
+
+use function Statamic\trans;
+use function Statamic\trans as __;
+use function Statamic\trans_choice;
 
 class CoreModifiers extends Modifier
 {
@@ -895,14 +901,8 @@ class CoreModifiers extends Modifier
         // available data. Then grab the requested variable from there.
         $array = $item instanceof Augmentable ? $item->toDeferredAugmentedArray() : $item->toArray();
 
-        if ($arrayValue = Arr::get($array, $var)) {
-            return $arrayValue;
-        }
-
-        // Finally, try to call a method on the object
-        $method = Str::slug($var);
-        if (method_exists($item, $method)) {
-            return $item->$method();
+        if (Arr::has($array, $var)) {
+            return Arr::get($array, $var);
         }
 
         // If after all is said and done, there's still nothing, just show the original value.
@@ -1191,7 +1191,9 @@ class CoreModifiers extends Modifier
     /**
      * Check if an item exists in an array using "dot" notation.
      *
-     * @param  $value
+     * @param  array  $haystack
+     * @param  array  $params
+     * @param  array  $context
      * @return bool
      */
     public function inArray($haystack, $params, $context)
@@ -1522,14 +1524,18 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Returns the last $params[0] characters of a string, or the last element of an array.
+     * Returns the last $params[0] characters of a string, or the last element of an array or Collection.
      *
-     * @return string
+     * @return mixed
      */
     public function last($value, $params)
     {
         if (is_array($value)) {
             return Arr::last($value);
+        }
+
+        if ($value instanceof Collection) {
+            return $value->last();
         }
 
         return Stringy::last($value, Arr::get($params, 0));
@@ -1556,7 +1562,7 @@ class CoreModifiers extends Modifier
             return $value->count();
         }
 
-        if ($value instanceof Arrayable) {
+        if ($value instanceof Arrayable && ! $value instanceof ArrayableString) {
             $value = $value->toArray();
         }
 
@@ -1701,7 +1707,6 @@ class CoreModifiers extends Modifier
     /**
      * Generate an md5 hash of a value.
      *
-     * @param  $params
      * @return string
      */
     public function md5($value)
@@ -2799,7 +2804,15 @@ class CoreModifiers extends Modifier
      */
     public function toJson($value, $params)
     {
-        $options = Arr::get($params, 0) === 'pretty' ? JSON_PRETTY_PRINT : 0;
+        $options = 0;
+
+        if (in_array('pretty', $params)) {
+            $options |= JSON_PRETTY_PRINT;
+        }
+
+        if (in_array('safe', $params)) {
+            $options |= JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT;
+        }
 
         if (Compare::isQueryBuilder($value)) {
             $value = $value->get();
@@ -2893,7 +2906,6 @@ class CoreModifiers extends Modifier
      * Converts a Carbon instance to a timestamp.
      *
      * @param  Carbon  $value
-     * @param  array  $params
      * @return int
      */
     public function timestamp($value)
@@ -3189,60 +3201,11 @@ class CoreModifiers extends Modifier
      */
     public function embedUrl($url)
     {
-        if (Str::contains($url, 'vimeo')) {
-            $url = str_replace('/vimeo.com', '/player.vimeo.com/video', $url);
-
-            [$url, $hash] = $this->handleUnlistedVimeoUrls($url);
-
-            $paramsToAdd = '?dnt=1';
-            if ($hash) {
-                $paramsToAdd .= '&h='.$hash;
-            }
-
-            if (Str::contains($url, '?')) {
-                $url = str_replace('?', $paramsToAdd.'&', $url);
-            } else {
-                $url .= $paramsToAdd;
-            }
-
-            return $url;
+        if ($url instanceof Embed) {
+            return $url->embedUrl() ?? $url->url();
         }
 
-        if (Str::contains($url, 'youtu.be')) {
-            $url = str_replace('youtu.be', 'www.youtube.com/embed', $url);
-
-            // Check for start at point and replace it with correct parameter.
-            if (Str::contains($url, '?t=')) {
-                $url = str_replace('?t=', '?start=', $url);
-            }
-        }
-
-        if (Str::contains($url, 'youtube.com/watch?v=')) {
-            $url = str_replace('watch?v=', 'embed/', $url);
-
-            if (Str::contains($url, '&t=')) {
-                $url = str_replace('&t=', '?start=', $url);
-            }
-        }
-
-        if (Str::contains($url, 'youtube.com/shorts/')) {
-            $url = str_replace('shorts/', 'embed/', $url);
-        }
-
-        if (Str::contains($url, 'youtube.com')) {
-            $url = str_replace('youtube.com', 'youtube-nocookie.com', $url);
-        }
-
-        // This avoids SSL issues when using the non-www version
-        if (Str::contains($url, '//youtube-nocookie.com')) {
-            $url = str_replace('//youtube-nocookie.com', '//www.youtube-nocookie.com', $url);
-        }
-
-        if (Str::contains($url, '&') && ! Str::contains($url, '?')) {
-            $url = Str::replaceFirst('&', '?', $url);
-        }
-
-        return $url;
+        return Embed::embedUrlFor($url);
     }
 
     /**
@@ -3254,28 +3217,11 @@ class CoreModifiers extends Modifier
      */
     public function trackableEmbedUrl($url)
     {
-        if (Str::contains($url, 'vimeo')) {
-            return str_replace('/vimeo.com', '/player.vimeo.com/video', $url);
+        if ($url instanceof Embed) {
+            return $url->trackableEmbedUrl();
         }
 
-        if (Str::contains($url, 'youtu.be')) {
-            $url = str_replace('youtu.be', 'www.youtube.com/embed', $url);
-
-            // Check for start at point and replace it with correct parameter.
-            if (Str::contains($url, '?t=')) {
-                $url = str_replace('?t=', '?start=', $url);
-            }
-        }
-
-        if (Str::contains($url, 'youtube.com/watch?v=')) {
-            $url = str_replace('watch?v=', 'embed/', $url);
-        }
-
-        if (Str::contains($url, '&') && ! Str::contains($url, '?')) {
-            $url = Str::replaceFirst('&', '?', $url);
-        }
-
-        return $url;
+        return Embed::trackableEmbedUrlFor($url);
     }
 
     /**
@@ -3286,7 +3232,11 @@ class CoreModifiers extends Modifier
      */
     public function isEmbeddable($url)
     {
-        return Str::contains($url, ['youtu.be', 'youtube', 'vimeo']);
+        if ($url instanceof Embed) {
+            return $url->isEmbeddable();
+        }
+
+        return Embed::isEmbeddableUrl($url);
     }
 
     /**
@@ -3350,7 +3300,7 @@ class CoreModifiers extends Modifier
         }
 
         if (config('statamic.system.localize_dates_in_modifiers')) {
-            $value->setTimezone(Statamic::displayTimezone());
+            $value = $value->copy()->setTimezone(Statamic::displayTimezone());
         }
 
         return $value;
@@ -3369,24 +3319,6 @@ class CoreModifiers extends Modifier
         return $this->usingRuntimeMethodSyntax($context) ?
                 $params[$key] :
                 Arr::get($context, $params[$key], $params[$key]);
-    }
-
-    // unlisted vimeo urls are in the form vimeo.com/id/hash, but embeds pass the hash as a get param
-    private function handleUnlistedVimeoUrls($url)
-    {
-        $hash = '';
-
-        if (! Str::contains($url, 'progressive_redirect') && Str::substrCount($url, '/') > 4) {
-            $hash = Str::afterLast($url, '/');
-            $url = Str::beforeLast($url, '/');
-
-            if (Str::contains($hash, '?')) {
-                $url .= '?'.Str::after($hash, '?');
-                $hash = Str::before($hash, '?');
-            }
-        }
-
-        return [$url, $hash];
     }
 
     private function dumpingAllowed(array $params): bool

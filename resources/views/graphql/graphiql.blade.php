@@ -23,11 +23,11 @@
         </style>
         <link
             rel="stylesheet"
-            href="https://esm.sh/graphiql/dist/style.css"
+            href="https://esm.sh/graphiql@5.2.2/dist/style.css"
         >
         <link
             rel="stylesheet"
-            href="https://esm.sh/@graphiql/plugin-explorer/dist/style.css"
+            href="https://esm.sh/@graphiql/plugin-explorer@5.1.1/dist/style.css"
         >
 
         @if (!$introspection)
@@ -39,19 +39,19 @@
         <script type="importmap">
             {
               "imports": {
-                "react": "https://esm.sh/react@19.1.0",
-                "react/": "https://esm.sh/react@19.1.0/",
+                "react": "https://esm.sh/react@19.2.5",
+                "react/": "https://esm.sh/react@19.2.5/",
 
-                "react-dom": "https://esm.sh/react-dom@19.1.0",
-                "react-dom/": "https://esm.sh/react-dom@19.1.0/",
+                "react-dom": "https://esm.sh/react-dom@19.2.5",
+                "react-dom/": "https://esm.sh/react-dom@19.2.5/",
 
-                "graphiql": "https://esm.sh/graphiql?standalone&external=react,react-dom,@graphiql/react,graphql",
-                "graphiql/": "https://esm.sh/graphiql/",
-                "@graphiql/plugin-explorer": "https://esm.sh/@graphiql/plugin-explorer?standalone&external=react,@graphiql/react,graphql",
-                "@graphiql/react": "https://esm.sh/@graphiql/react?standalone&external=react,react-dom,graphql,@graphiql/toolkit,@emotion/is-prop-valid",
+                "graphiql": "https://esm.sh/graphiql@5.2.2?standalone&external=react,react-dom,@graphiql/react,graphql",
+                "graphiql/": "https://esm.sh/graphiql@5.2.2/",
+                "@graphiql/plugin-explorer": "https://esm.sh/@graphiql/plugin-explorer@5.1.1?standalone&external=react,@graphiql/react,graphql",
+                "@graphiql/react": "https://esm.sh/@graphiql/react@0.37.3?standalone&external=react,react-dom,graphql,@graphiql/toolkit,@emotion/is-prop-valid",
 
-                "@graphiql/toolkit": "https://esm.sh/@graphiql/toolkit?standalone&external=graphql",
-                "graphql": "https://esm.sh/graphql@16.11.0",
+                "@graphiql/toolkit": "https://esm.sh/@graphiql/toolkit@0.11.3?standalone&external=graphql",
+                "graphql": "https://esm.sh/graphql@16.13.2",
                 "@emotion/is-prop-valid": "data:text/javascript,"
               }
             }

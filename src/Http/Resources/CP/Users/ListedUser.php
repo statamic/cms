@@ -5,6 +5,8 @@ namespace Statamic\Http\Resources\CP\Users;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Statamic\Facades\User;
 
+use function Statamic\trans as __;
+
 class ListedUser extends JsonResource
 {
     protected $blueprint;

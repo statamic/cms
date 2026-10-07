@@ -3,13 +3,21 @@
 namespace Statamic\Http\Middleware\CP;
 
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Inertia\Middleware;
 use Statamic\CP\Toasts\Manager;
 use Statamic\Statamic;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+
+use function Statamic\trans as __;
 
 class HandleInertiaRequests extends Middleware
 {
-    protected $rootView = 'statamic::layout';
+    public const ROOT_VIEW = 'statamic::layout';
+
+    protected $rootView = self::ROOT_VIEW;
 
     public function version(Request $request): ?string
     {
@@ -26,12 +34,21 @@ class HandleInertiaRequests extends Middleware
         return array_filter([
             ...parent::share($request),
             '_statamic' => [
-                'version' => Statamic::version(),
                 'cmsName' => __(Statamic::pro() ? config('statamic.cp.custom_cms_name', 'Statamic') : 'Statamic'),
                 'logos' => $this->logos(),
+                'isCpRoute' => Statamic::isCpRoute(),
             ],
             '_toasts' => $this->toasts($request),
         ]);
+    }
+
+    public function onEmptyResponse(Request $request, Response $response): Response
+    {
+        if ($response instanceof StreamedResponse || $response instanceof BinaryFileResponse) {
+            return Inertia::location($request->fullUrl());
+        }
+
+        return parent::onEmptyResponse($request, $response);
     }
 
     private function logos()
@@ -72,6 +89,11 @@ class HandleInertiaRequests extends Middleware
         $session = $request->session();
 
         if ($message = $session->get('success')) {
+            $this->toasts->success($message);
+        }
+
+        // Laravel's built-in auth flows (password reset, etc.) flash to 'status'.
+        if ($message = $session->get('status')) {
             $this->toasts->success($message);
         }
 

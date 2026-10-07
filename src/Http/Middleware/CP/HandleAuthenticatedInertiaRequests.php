@@ -15,6 +15,8 @@ use Statamic\Facades\User;
 use Statamic\Licensing\LicenseManager;
 use Statamic\Statamic;
 
+use function Statamic\trans as __;
+
 class HandleAuthenticatedInertiaRequests
 {
     public function handle(Request $request, Closure $next)
@@ -45,8 +47,9 @@ class HandleAuthenticatedInertiaRequests
     private function alwaysProps()
     {
         return [
+            'version' => Statamic::version(),
             'isPro' => Statamic::pro(),
-            'nav' => $this->nav(),
+            'nav' => fn () => $this->nav(),
             'cmsName' => __(Statamic::pro() ? config('statamic.cp.custom_cms_name', 'Statamic') : 'Statamic'),
         ];
     }
@@ -60,8 +63,8 @@ class HandleAuthenticatedInertiaRequests
         return [
             'supportUrl' => config('statamic.cp.support_url'),
             'selectedSiteUrl' => Site::selected()->url(),
-            'licensing' => $this->licensing(),
-            'sessionExpiry' => $this->sessionExpiry(),
+            'licensing' => fn () => $this->licensing(),
+            'sessionExpiry' => fn () => $this->sessionExpiry(),
         ];
     }
 

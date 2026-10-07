@@ -1,6 +1,6 @@
 <script>
 export default {
-    props: ['fields', 'rows', 'meta', 'name', 'canDeleteRows', 'canAddRows', 'allowFullscreen', 'hideDisplay', 'errors'],
+    props: ['fields', 'rows', 'meta', 'name', 'canDeleteRows', 'canAddRows', 'allowFullscreen', 'hideDisplay', 'errors', 'readOnly'],
 
     inject: ['grid'],
 

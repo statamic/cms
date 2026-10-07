@@ -54,7 +54,7 @@ function focusMain() {
 
                 // Otherwise, focus the content card
                 if (!autofocusInput) {
-                    document.querySelector('#content-card')?.focus();
+                    document.querySelector('#content-card')?.focus({ preventScroll: true });
                 }
             }, 100);
         });
@@ -82,10 +82,10 @@ onUnmounted(() => {
         <main id="main" class="flex bg-body-bg dark:border-t dark:border-body-border rounded-t-2xl fixed top-14 inset-x-0 bottom-0 min-h-[calc(100vh-3.5rem)]">
             <Nav />
             <!-- The data attribute allows CSS to target elements when max-width is disabled. -->
-            <div id="main-content" class="main-content sm:p-2 h-full flex-1 overflow-y-auto focus:outline-none rounded-t-2xl" :data-max-width-enabled="isMaxWidthEnabled">
+            <div id="main-content" scroll-region class="main-content sm:p-2 h-full flex-1 overflow-y-auto focus:outline-none rounded-t-2xl" :data-max-width-enabled="isMaxWidthEnabled">
                 <div id="content-card" tabindex="-1" class="focus:outline-none relative content-card grid min-h-full mx-auto">
                     <!-- Data attribute used by the CSS style tag below to override max-width when disabled.-->
-                    <div class="w-full min-w-0 mx-auto max-w-page" data-max-width-wrapper>
+                    <div class="w-full min-w-0 mx-auto max-w-page max-[1220px]:mb-18" data-max-width-wrapper>
                         <slot />
                     </div>
                 </div>

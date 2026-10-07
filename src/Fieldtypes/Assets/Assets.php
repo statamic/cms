@@ -23,6 +23,8 @@ use Statamic\Query\Scopes\Filter;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class Assets extends Fieldtype
 {
     use UpdatesReferences;
@@ -343,11 +345,17 @@ class Assets extends Fieldtype
 
     public function getItemData($items)
     {
-        return collect($items)->map(function ($url) {
-            return ($asset = Asset::find($url))
-                ? (new AssetResource($asset))->resolve()['data']
-                : null;
-        })->filter()->values();
+        $user = User::current();
+
+        return collect($items)->map(function ($url) use ($user) {
+            $asset = Asset::find($url);
+
+            if (! $asset || ! $user->can('view', $asset)) {
+                return ['id' => $url, 'url' => $url, 'invalid' => true];
+            }
+
+            return (new AssetResource($asset))->resolve()['data'];
+        })->values();
     }
 
     public function augment($values)
@@ -448,9 +456,8 @@ class Assets extends Fieldtype
 
     public function preProcessIndex($data)
     {
-        $total = $data === null
-            ? 0
-            : ($this->config('max_files') === 1 ? 1 : count($data));
+        $data = Arr::wrap($data);
+        $total = count($data);
 
         // Since we only want to display a handful of thumbnails, we'll slice it up here so we don't perform more
         // augmentation overhead than necessary. e.g. 5 thumbs then +remainder. If the remainder is 1, we may
@@ -460,6 +467,7 @@ class Assets extends Fieldtype
         $assets = $this->getItemsForPreProcessIndex($data)->map(function ($asset) {
             $arr = [
                 'id' => $asset->id(),
+                'basename' => $asset->basename(),
                 'is_image' => $isImage = $asset->isImage(),
                 'is_svg' => $asset->isSvg(),
                 'extension' => $asset->extension(),

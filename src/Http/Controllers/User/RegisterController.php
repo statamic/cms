@@ -13,6 +13,8 @@ use Statamic\Facades\User;
 use Statamic\Http\Requests\UserRegisterRequest;
 use Statamic\Support\Arr;
 
+use function Statamic\trans as __;
+
 class RegisterController
 {
     public function __invoke(UserRegisterRequest $request)

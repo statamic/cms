@@ -110,6 +110,23 @@ class ViewCollectionListingTest extends TestCase
     }
 
     #[Test]
+    public function it_does_not_eager_load_actions_in_listing()
+    {
+        $this->createCollection('bar');
+
+        $user = tap(User::make()->makeSuper())->save();
+
+        $this
+            ->actingAs($user)
+            ->get(cp_route('collections.index'))
+            ->assertSuccessful()
+            ->assertInertia(fn ($page) => $page
+                ->component('collections/Index')
+                ->has('collections', 1)
+                ->missing('collections.0.actions'));
+    }
+
+    #[Test]
     public function it_shows_no_results_when_there_are_no_collections()
     {
         $user = tap(User::make()->makeSuper())->save();

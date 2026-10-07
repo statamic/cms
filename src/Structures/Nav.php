@@ -2,6 +2,7 @@
 
 namespace Statamic\Structures;
 
+use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Contracts\Structures\Nav as Contract;
 use Statamic\Contracts\Structures\NavTree;
 use Statamic\Contracts\Structures\NavTreeRepository;
@@ -21,7 +22,7 @@ use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Support\Str;
 
-class Nav extends Structure implements Contract
+class Nav extends Structure implements ContainsQueryableValues, Contract
 {
     use ExistsAsFile;
 
@@ -144,7 +145,7 @@ class Nav extends Structure implements Contract
 
     public function existsIn($site)
     {
-        return $this->trees()->has($site);
+        return Site::all()->has($site) && $this->in($site) !== null;
     }
 
     public function blueprint()
@@ -199,5 +200,22 @@ class Nav extends Structure implements Contract
                     ->all();
             })
             ->args(func_get_args());
+    }
+
+    public function getQueryableValue(string $field)
+    {
+        if (in_array($method = Str::camel($field), $this->queryableMethods())) {
+            return $this->{$method}();
+        }
+
+        return null;
+    }
+
+    private function queryableMethods(): array
+    {
+        return [
+            'blueprint', 'collections', 'editUrl', 'expectsRoot', 'handle', 'id',
+            'maxDepth', 'path', 'showUrl', 'sites', 'title', 'trees',
+        ];
     }
 }

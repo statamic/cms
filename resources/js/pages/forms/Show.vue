@@ -4,6 +4,7 @@ import Head from '@/pages/layout/Head.vue';
 import { Header, Dropdown, DropdownMenu, DropdownItem, Button, CommandPaletteItem } from '@ui';
 import ResourceDeleter from '@/components/ResourceDeleter.vue';
 import FormSubmissionListing from '@/components/forms/SubmissionListing.vue';
+import ExportSubmissionsModal from '@/components/forms/ExportSubmissionsModal.vue';
 
 const props = defineProps([
     'form',
@@ -11,17 +12,26 @@ const props = defineProps([
     'filters',
     'actionUrl',
     'exporters',
+    'exportColumns',
     'redirectUrl',
 ]);
 
 const deleter = ref(null);
+const submissionListing = ref(null);
+const exportModalOpen = ref(false);
+const listingParameters = ref({});
+
+function openExportModal() {
+    listingParameters.value = submissionListing.value?.parameters ?? {};
+    exportModalOpen.value = true;
+}
 </script>
 
 <template>
     <div class="max-w-5xl 3xl:max-w-6xl mx-auto" data-max-width-wrapper>
-        <Head :title="[form.title, __('Forms')]" />
+        <Head :title="[__(form.title), __('Forms')]" />
 
-        <Header :title="form.title" icon="forms">
+        <Header :title="__(form.title)" icon="forms">
             <Dropdown v-if="form.canEdit || form.canDelete" placement="left-start" class="me-2">
                 <DropdownMenu>
                     <DropdownItem v-if="form.canEdit" :text="__('Configure Form')" icon="cog" :href="form.editUrl" />
@@ -70,39 +80,34 @@ const deleter = ref(null);
                 :redirect="redirectUrl"
             />
 
-            <Dropdown v-if="exporters.length">
-                <template #trigger>
-                    <Button :text="__('Export Submissions')" />
-                </template>
-                <DropdownMenu>
-                    <DropdownItem
-                        v-for="exporter in exporters"
-                        :key="exporter.downloadUrl"
-                        :text="exporter.title"
-                        :href="exporter.downloadUrl"
-                        target="_blank"
-                    />
-                </DropdownMenu>
-            </Dropdown>
+            <Button v-if="exporters.length" :text="__('Export Submissions')" @click="openExportModal" />
 
             <CommandPaletteItem
-                v-for="exporter in exporters"
-                :key="exporter.downloadUrl"
+                v-if="exporters.length"
                 category="Actions"
-                :text="[__('Export Submissions'), exporter.title]"
+                :text="__('Export Submissions')"
                 icon="save"
-                :url="exporter.downloadUrl"
+                :action="openExportModal"
                 prioritize
             />
         </Header>
 
         <FormSubmissionListing
+            ref="submissionListing"
             :form="form.handle"
             :action-url="actionUrl"
             sort-column="datestamp"
             sort-direction="desc"
             :columns="columns"
-                :filters="filters"
+            :filters="filters"
+        />
+
+        <ExportSubmissionsModal
+            v-if="exportModalOpen"
+            :exporters
+            :columns="exportColumns"
+            :listing-parameters
+            @close="exportModalOpen = false"
         />
     </div>
 </template>

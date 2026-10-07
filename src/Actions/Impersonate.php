@@ -9,6 +9,8 @@ use Statamic\Events\ImpersonationStarted;
 use Statamic\Facades\CP\Toast;
 use Statamic\Facades\User;
 
+use function Statamic\trans as __;
+
 class Impersonate extends Action
 {
     public $icon = 'mask';
@@ -20,11 +22,11 @@ class Impersonate extends Action
 
     public function visibleTo($item)
     {
-        if (! config('statamic.users.impersonate.enabled', true) || session()->get('statamic_impersonated_by')) {
+        if (! ($item instanceof UserContract && $item->id() != User::current()->id())) {
             return false;
         }
 
-        return $item instanceof UserContract && $item->id() != User::current()->id();
+        return $this->authorize(User::current(), $item);
     }
 
     public function visibleToBulk($items)
@@ -34,7 +36,11 @@ class Impersonate extends Action
 
     public function authorize($authed, $user)
     {
-        return $authed->can('impersonate users');
+        if (! config('statamic.users.impersonate.enabled', true) || session()->get('statamic_impersonated_by')) {
+            return false;
+        }
+
+        return $authed->can('impersonate', $user);
     }
 
     public function run($users, $values)

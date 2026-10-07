@@ -10,6 +10,9 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\Fieldset as FieldsetRepository;
 use Statamic\Support\Arr;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class Fields
 {
     protected $items;
@@ -115,10 +118,15 @@ class Fields
 
     public function newInstance()
     {
-        return (new static)
+        // Assign the items directly — setItems() would re-resolve every field, then
+        // setFields() would immediately discard that work. Clone so the two instances
+        // don't share one collection, which is what setItems() would have given us.
+        $instance = new static;
+        $instance->items = clone $this->items;
+
+        return $instance
             ->setParent($this->parent)
             ->setParentField($this->parentField, $this->parentIndex)
-            ->setItems($this->items)
             ->setFields($this->fields)
             ->setFilled($this->filled);
     }

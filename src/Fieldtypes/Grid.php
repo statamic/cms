@@ -13,6 +13,8 @@ use Statamic\Query\Scopes\Filters\Fields\Grid as GridFilter;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class Grid extends Fieldtype
 {
     use AddsEntryValidationReplacements;
@@ -53,6 +55,7 @@ class Grid extends Fieldtype
                         'display' => __('Add Row Label'),
                         'instructions' => __('statamic::fieldtypes.grid.config.add_row'),
                         'type' => 'text',
+                        'placeholder' => __('Add Row'),
                         'width' => 50,
                     ],
                     'reorderable' => [
@@ -204,9 +207,11 @@ class Grid extends Fieldtype
 
     public function preload()
     {
+        $defaults = $this->defaultRowData()->all();
+
         return [
-            'defaults' => $this->defaultRowData()->all(),
-            'new' => $this->fields()->meta()->all(),
+            'defaults' => $defaults,
+            'new' => $this->fields()->addValues($defaults)->meta()->all(),
             'existing' => collect($this->field->value())->mapWithKeys(function ($row, $index) {
                 return [$row['_id'] => $this->fields($index)->addValues($row)->meta()];
             })->toArray(),

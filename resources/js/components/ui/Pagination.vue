@@ -166,6 +166,7 @@ function getRange(start, end) {
             <Button
                 size="sm"
                 :variant="hasPrevious && !showPageLinks ? 'filled' : 'ghost'"
+                class="disabled:cursor-default"
                 round
                 icon="chevron-left"
                 :disabled="!hasPrevious"
@@ -177,6 +178,7 @@ function getRange(start, end) {
                 v-for="(page, i) in pages"
                 size="sm"
                 round
+                class="disabled:cursor-default"
                 :variant="page == currentPage ? 'filled' : 'ghost'"
                 :key="i"
                 @click="selectPage(page)"
@@ -187,6 +189,7 @@ function getRange(start, end) {
             <Button
                 size="sm"
                 :variant="hasNext && !showPageLinks ? 'filled' : 'ghost'"
+                class="disabled:cursor-default"
                 round
                 icon="chevron-right"
                 :disabled="!hasNext"

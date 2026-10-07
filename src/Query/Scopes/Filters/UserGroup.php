@@ -5,6 +5,8 @@ namespace Statamic\Query\Scopes\Filters;
 use Statamic\Facades;
 use Statamic\Query\Scopes\Filter;
 
+use function Statamic\trans as __;
+
 class UserGroup extends Filter
 {
     protected $pinned = true;

@@ -6,6 +6,8 @@ use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
 use Statamic\Query\Scopes\Filters\Fields\Integer as IntegerFilter;
 
+use function Statamic\trans as __;
+
 class Integer extends Fieldtype
 {
     protected $categories = ['number'];
@@ -92,11 +94,11 @@ class Integer extends Fieldtype
     {
         $rules = ['integer'];
 
-        if ($min = $this->config('min')) {
+        if (! is_null($min = $this->config('min'))) {
             $rules[] = 'min:'.$min;
         }
 
-        if ($max = $this->config('max')) {
+        if (! is_null($max = $this->config('max'))) {
             $rules[] = 'max:'.$max;
         }
 

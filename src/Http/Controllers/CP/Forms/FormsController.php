@@ -85,9 +85,15 @@ class FormsController extends CpController
             ]),
             'actionUrl' => cp_route('forms.submissions.actions.run', $form->handle()),
             'exporters' => $form->exporters()->map(fn ($exporter) => [
+                'handle' => $exporter->handle(),
                 'title' => $exporter->title(),
                 'downloadUrl' => $exporter->downloadUrl(),
+                'supportsColumnSelection' => $exporter->supportsColumnSelection(),
             ])->values(),
+            'exportColumns' => $form->fields()
+                ->map(fn ($field) => ['handle' => $field->handle(), 'title' => __($field->display())])
+                ->push(['handle' => 'date', 'title' => __('Date')])
+                ->values(),
             'redirectUrl' => cp_route('forms.index'),
         ]);
     }
@@ -319,6 +325,7 @@ class FormsController extends CpController
                                     'display' => __('HTML view'),
                                     'instructions' => __('statamic::messages.form_configure_email_html_instructions'),
                                     'folder' => config('statamic.forms.email_view_folder'),
+                                    'clearable' => true,
                                 ],
                             ],
                             [
@@ -328,6 +335,7 @@ class FormsController extends CpController
                                     'display' => __('Text view'),
                                     'instructions' => __('statamic::messages.form_configure_email_text_instructions'),
                                     'folder' => config('statamic.forms.email_view_folder'),
+                                    'clearable' => true,
                                 ],
                             ],
                             [

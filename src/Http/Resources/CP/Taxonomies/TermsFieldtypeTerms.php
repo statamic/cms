@@ -6,6 +6,8 @@ use Illuminate\Pagination\AbstractPaginator;
 use Statamic\CP\Column;
 use Statamic\Fieldtypes\Terms as TermsFieldtype;
 
+use function Statamic\trans as __;
+
 class TermsFieldtypeTerms extends Terms
 {
     private TermsFieldtype $fieldtype;

@@ -6,7 +6,9 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Mockery;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\StaticCache;
 use Statamic\StaticCaching\Cacher;
+use Statamic\StaticCaching\NoCache\RegionNotFound;
 use Statamic\StaticCaching\NoCache\Session;
 use Statamic\StaticCaching\NoCache\StringRegion;
 use Tests\FakesContent;
@@ -47,6 +49,22 @@ class NoCacheSessionTest extends TestCase
     }
 
     #[Test]
+    public function when_pushing_a_region_it_will_filter_out_private_variables()
+    {
+        $session = new Session('/');
+
+        $region = $session->pushRegion('', [
+            'foo' => 'bar',
+            '__env' => 'env value',
+            '__blaze' => fn () => 'a closure',
+        ], '');
+
+        $this->assertEquals([
+            'foo' => 'bar',
+        ], $region->context());
+    }
+
+    #[Test]
     public function it_gets_the_fragment_data()
     {
         // fragment data should be the context,
@@ -73,6 +91,26 @@ class NoCacheSessionTest extends TestCase
             'baz' => 'qux',
             'title' => 'local title',
         ], $region->fragmentData());
+    }
+
+    /**
+     * @see https://github.com/statamic/cms/issues/15450
+     **/
+    #[Test]
+    public function it_generates_unique_region_ids_across_urls()
+    {
+        $home = new Session('https://example.test/');
+        $error = new Session('https://example.test/1');
+
+        for ($i = 0; $i < 14; $i++) {
+            $home->getRegionId();
+        }
+
+        for ($i = 0; $i < 4; $i++) {
+            $error->getRegionId();
+        }
+
+        $this->assertNotEquals($home->getRegionId(), $error->getRegionId());
     }
 
     #[Test]
@@ -146,6 +184,39 @@ class NoCacheSessionTest extends TestCase
         $this->assertEquals('/test', $cascade['url']);
         $this->assertEquals('Test page', $cascade['title']);
         $this->assertEquals('http://localhost/cp', $cascade['cp_url']);
+    }
+
+    #[Test]
+    public function it_serializes_and_unserializes_regions_through_cache()
+    {
+        $session = new Session('http://localhost/test');
+
+        $region = $session->pushRegion('the contents', ['foo' => 'bar'], '.html');
+
+        $cached = StaticCache::cacheStore()->get('nocache::region.'.$region->key());
+        $this->assertIsString($cached, 'Region should be stored as a serialized string, not an object.');
+
+        $retrieved = $session->region($region->key());
+
+        $this->assertInstanceOf(StringRegion::class, $retrieved);
+        $this->assertEquals($region->key(), $retrieved->key());
+        $this->assertEquals(['foo' => 'bar'], $retrieved->context());
+    }
+
+    #[Test]
+    public function it_throws_region_not_found_when_cached_region_is_an_incomplete_class()
+    {
+        $session = new Session('http://localhost/test');
+
+        $region = $session->pushRegion('the contents', ['foo' => 'bar'], '.html');
+
+        // Simulate what happens when serializable_classes enforcement
+        // turns a cached Region object into __PHP_Incomplete_Class.
+        StaticCache::cacheStore()->forever('nocache::region.'.$region->key(), new \__PHP_Incomplete_Class);
+
+        $this->expectException(RegionNotFound::class);
+
+        $session->region($region->key());
     }
 
     #[Test]

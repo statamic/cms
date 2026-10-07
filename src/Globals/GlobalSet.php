@@ -4,6 +4,7 @@ namespace Statamic\Globals;
 
 use Statamic\Contracts\Globals\GlobalSet as Contract;
 use Statamic\Contracts\Globals\Variables;
+use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Events\GlobalSetCreated;
 use Statamic\Events\GlobalSetCreating;
@@ -18,14 +19,16 @@ use Statamic\Facades\GlobalVariables;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class GlobalSet implements Contract
+class GlobalSet implements ContainsQueryableValues, Contract
 {
     use ExistsAsFile, FluentlyGetsAndSets;
 
     protected $title;
     protected $handle;
+    protected $layoutMode;
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
     private $sites = [];
@@ -48,6 +51,11 @@ class GlobalSet implements Contract
                 return $title ?? ucfirst($this->handle);
             })
             ->args(func_get_args());
+    }
+
+    public function layoutMode($mode = null)
+    {
+        return $this->fluentlyGetOrSet('layoutMode')->args(func_get_args());
     }
 
     public function blueprint()
@@ -169,6 +177,7 @@ class GlobalSet implements Contract
     {
         return Arr::removeNullValues([
             'title' => $this->title(),
+            'layout_mode' => $this->layoutMode === 'multi_column' ? 'multi_column' : null,
             'sites' => Site::multiEnabled() ? $this->origins()->all() : null,
         ]);
     }
@@ -279,6 +288,22 @@ class GlobalSet implements Contract
     public function editBlueprintUrl()
     {
         return cp_route('blueprints.globals.edit', $this->handle());
+    }
+
+    public function getQueryableValue(string $field)
+    {
+        if (in_array($method = Str::camel($field), $this->queryableMethods())) {
+            return $this->{$method}();
+        }
+
+        return null;
+    }
+
+    private function queryableMethods(): array
+    {
+        return [
+            'blueprint', 'editUrl', 'handle', 'id', 'localizations', 'path', 'sites', 'title',
+        ];
     }
 
     public static function __callStatic($method, $parameters)

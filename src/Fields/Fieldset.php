@@ -2,8 +2,11 @@
 
 namespace Statamic\Fields;
 
+use Facades\Statamic\Fields\FieldRepository;
+use Illuminate\Support\Collection as IlluminateCollection;
 use Statamic\CommandPalette\Category;
 use Statamic\CommandPalette\Link;
+use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Events\FieldsetCreated;
 use Statamic\Events\FieldsetCreating;
 use Statamic\Events\FieldsetDeleted;
@@ -23,10 +26,13 @@ use Statamic\Facades\Taxonomy;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
-class Fieldset
+use function Statamic\trans as __;
+
+class Fieldset implements ContainsQueryableValues
 {
     protected $handle;
     protected $contents = [];
+    protected $ensuredFields = [];
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
     protected $initialPath;
@@ -62,18 +68,24 @@ class Fieldset
         return $this;
     }
 
+    /**
+     * Canonical storage: either top-level `fields` (flat) or non-empty `sections`, never both.
+     * Hand-edited YAML or mixed input is normalized on save.
+     */
     public function setContents(array $contents)
     {
-        $fields = Arr::get($contents, 'fields', []);
-
-        // Support legacy syntax
-        if (! empty($fields) && array_keys($fields)[0] !== 0) {
-            $fields = collect($fields)->map(function ($field, $handle) {
-                return compact('handle', 'field');
-            })->values()->all();
+        if (array_key_exists('sections', $contents)) {
+            $contents['sections'] = $this->normalizeSections(Arr::get($contents, 'sections', []));
         }
 
-        $contents['fields'] = $fields;
+        $usesSections = array_key_exists('sections', $contents) && ! empty($contents['sections']);
+
+        if ($usesSections) {
+            unset($contents['fields']);
+        } else {
+            unset($contents['sections']);
+            $contents['fields'] = $this->normalizeFields(Arr::get($contents, 'fields', []));
+        }
 
         $this->contents = $contents;
 
@@ -82,7 +94,94 @@ class Fieldset
 
     public function contents(): array
     {
-        return $this->contents;
+        return $this->getContents();
+    }
+
+    private function getContents()
+    {
+        $contents = $this->contents;
+
+        foreach ($this->ensuredFields as $ensured) {
+            $contents = $this->addEnsuredFieldToContents($contents, $ensured);
+        }
+
+        return $contents;
+    }
+
+    private function addEnsuredFieldToContents($contents, $ensured)
+    {
+        $handle = $ensured['handle'];
+        $config = $ensured['config'];
+        $usesSections = ! empty($contents['sections']);
+
+        $sections = collect($usesSections ? $contents['sections'] : [['fields' => $contents['fields'] ?? []]])
+            ->map(function ($section) {
+                $section['fields'] = collect($section['fields'] ?? [])->keyBy(function ($field) {
+                    return isset($field['import']) ? 'import:'.($field['prefix'] ?? null).$field['import'] : $field['handle'];
+                });
+
+                return $section;
+            });
+
+        $existingSection = $sections->search(fn ($section) => $section['fields']->has($handle));
+
+        if ($existingSection !== false) {
+            $fields = $sections[$existingSection]['fields'];
+            $existingField = $fields->get($handle);
+
+            if (is_string($existingField['field'])) {
+                // If it's a string, then it's a reference field. We should merge any ensured config into the 'config'
+                // override array, but only keys that don't already exist in the referenced field's config or overrides.
+                $referencedFieldConfig = FieldRepository::find($existingField['field'])->config();
+                $config = array_merge(Arr::except($config, array_keys($referencedFieldConfig)), $existingField['config'] ?? []);
+                $fields->put($handle, ['handle' => $handle, 'field' => $existingField['field'], 'config' => $config]);
+            } else {
+                // If it's not a string, then it's an inline field. We'll just merge the
+                // config right into the field key, with the user defined config winning.
+                $fields->put($handle, ['handle' => $handle, 'field' => array_merge($config, $existingField['field'])]);
+            }
+        } elseif ($imported = $this->findImportedField($sections, $handle)) {
+            [$sectionIndex, $importKey, $importedField] = $imported;
+            $fields = $sections[$sectionIndex]['fields'];
+            $import = $fields->get($importKey);
+            // Import overrides are keyed by the handles within the fieldset, before any prefix is applied.
+            $importedHandle = Str::after($handle, $import['prefix'] ?? '');
+            $config = Arr::except($config, array_keys($importedField->config()));
+            $import['config'][$importedHandle] = array_merge($config, $import['config'][$importedHandle] ?? []);
+            $fields->put($importKey, $import);
+        } else {
+            $field = ['handle' => $handle, 'field' => $config];
+            $ensured['prepend'] ? $sections[0]['fields']->prepend($field) : $sections[0]['fields']->push($field);
+        }
+
+        $sections = $sections->map(function ($section) {
+            $section['fields'] = $section['fields']->values()->all();
+
+            return $section;
+        })->all();
+
+        if ($usesSections) {
+            $contents['sections'] = $sections;
+        } else {
+            $contents['fields'] = $sections[0]['fields'];
+        }
+
+        return $contents;
+    }
+
+    private function findImportedField($sections, $handle)
+    {
+        foreach ($sections as $sectionIndex => $section) {
+            foreach ($section['fields'] as $key => $field) {
+                if (! Str::startsWith($key, 'import:')) {
+                    continue;
+                }
+
+                if ($importedField = (new Fields([$field]))->all()->get($handle)) {
+                    return [$sectionIndex, $key, $importedField];
+                }
+            }
+        }
     }
 
     public function title()
@@ -100,9 +199,21 @@ class Fieldset
 
     public function fields(): Fields
     {
-        $fields = Arr::get($this->contents, 'fields', []);
+        $fields = $this->hasSections()
+            ? $this->sections()->flatMap(fn ($section) => Arr::get($section, 'fields', []))->values()->all()
+            : Arr::get($this->contents(), 'fields', []);
 
         return new Fields($fields);
+    }
+
+    public function sections(): IlluminateCollection
+    {
+        return collect(Arr::get($this->contents(), 'sections', []));
+    }
+
+    public function hasSections(): bool
+    {
+        return $this->sections()->isNotEmpty();
     }
 
     public function field(string $handle): ?Field
@@ -159,9 +270,12 @@ class Fieldset
         })->values();
 
         $fieldsets = \Statamic\Facades\Fieldset::all()
-            ->filter(fn (Fieldset $fieldset) => isset($fieldset->contents()['fields']))
             ->filter(function (Fieldset $fieldset) {
-                return collect($fieldset->contents()['fields'])
+                $fields = $fieldset->hasSections()
+                    ? $fieldset->sections()->flatMap(fn ($section) => Arr::get($section, 'fields', []))->all()
+                    : Arr::get($fieldset->contents(), 'fields', []);
+
+                return collect($fields)
                     ->filter(fn ($field) => $this->fieldImportsFieldset($field))
                     ->isNotEmpty();
             })
@@ -298,6 +412,71 @@ class Fieldset
         return true;
     }
 
+    public function ensureField($handle, $config, $prepend = false)
+    {
+        if (isset($this->ensuredFields[$handle])) {
+            return $this;
+        }
+
+        $this->ensuredFields[$handle] = compact('handle', 'prepend', 'config');
+
+        return $this;
+    }
+
+    public function ensureFieldPrepended($handle, $field)
+    {
+        return $this->ensureField($handle, $field, true);
+    }
+
+    public function ensureFieldHasConfig($handle, $config)
+    {
+        if (! $this->hasField($handle)) {
+            return $this;
+        }
+
+        // If the field only exists as a deferred ensured field, we'll need to update it instead.
+        if (! $path = $this->findFieldPath($handle)) {
+            $this->ensuredFields[$handle]['config'] = array_merge($this->ensuredFields[$handle]['config'], $config);
+
+            return $this;
+        }
+
+        $field = Arr::get($this->contents, $path);
+
+        if (isset($field['import'])) {
+            $key = 'config.'.Str::after($handle, $field['prefix'] ?? '');
+        } elseif (is_string($field['field'])) {
+            $key = 'config';
+        } else {
+            $key = 'field';
+        }
+
+        Arr::set($this->contents, "{$path}.{$key}", array_merge(Arr::get($field, $key, []), $config));
+
+        return $this;
+    }
+
+    private function findFieldPath($handle): ?string
+    {
+        $groups = empty($this->contents['sections'])
+            ? ['fields' => $this->contents['fields'] ?? []]
+            : collect($this->contents['sections'])->mapWithKeys(fn ($section, $index) => ["sections.{$index}.fields" => $section['fields'] ?? []])->all();
+
+        foreach ($groups as $path => $fields) {
+            foreach ($fields as $index => $field) {
+                $handles = isset($field['import'])
+                    ? (new Fields([$field]))->all()->keys()->all()
+                    : [$field['handle']];
+
+                if (in_array($handle, $handles)) {
+                    return "{$path}.{$index}";
+                }
+            }
+        }
+
+        return null;
+    }
+
     public function commandPaletteLink(): Link
     {
         $text = [__('Fieldsets'), __($this->title())];
@@ -307,8 +486,46 @@ class Fieldset
             ->icon('fieldsets');
     }
 
+    public function getQueryableValue(string $field)
+    {
+        if (in_array($method = Str::camel($field), $this->queryableMethods())) {
+            return $this->{$method}();
+        }
+
+        return null;
+    }
+
+    private function queryableMethods(): array
+    {
+        return [
+            'editUrl', 'fields', 'handle', 'isDeletable', 'isResettable',
+            'namespace', 'path', 'title',
+        ];
+    }
+
     public static function __callStatic($method, $parameters)
     {
         return Facades\Fieldset::{$method}(...$parameters);
+    }
+
+    private function normalizeFields(array $fields): array
+    {
+        // Support legacy syntax where handles are array keys.
+        if (! empty($fields) && array_keys($fields)[0] !== 0) {
+            $fields = collect($fields)->map(function ($field, $handle) {
+                return compact('handle', 'field');
+            })->values()->all();
+        }
+
+        return $fields;
+    }
+
+    private function normalizeSections(array $sections): array
+    {
+        return collect($sections)->map(function ($section) {
+            $section['fields'] = $this->normalizeFields(Arr::get($section, 'fields', []));
+
+            return $section;
+        })->all();
     }
 }

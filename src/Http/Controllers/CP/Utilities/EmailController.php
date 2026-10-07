@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Statamic\Mail\Test;
 
+use function Statamic\trans as __;
+
 class EmailController
 {
     public function send(Request $request)

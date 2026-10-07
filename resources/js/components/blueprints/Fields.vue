@@ -60,6 +60,7 @@
                 :config="pendingCreatedField.config"
                 :suggestable-condition-fields="suggestableConditionFields"
                 :is-inside-set="isInsideSet"
+                :show-save-only-at-top-level="true"
                 @committed="fieldCreated"
                 @closed="close"
             />
@@ -127,16 +128,16 @@ export default {
             return field.type === 'import' ? 'ImportField' : 'RegularField';
         },
 
-        fieldtypeSelected(field) {
+        fieldtypeSelected({ config, icon }) {
             this.isSelectingNewFieldtype = false;
 
             const pending = {
                 _id: uniqid(),
                 type: 'inline',
-                fieldtype: field.type,
-                icon: field.icon,
+                fieldtype: config.type,
+                icon,
                 config: {
-                    ...field,
+                    ...config,
                     isNew: true,
                 },
             };

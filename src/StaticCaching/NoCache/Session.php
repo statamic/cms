@@ -51,7 +51,13 @@ class Session
     public function region(string $key): Region
     {
         if ($this->regions->contains($key) && ($region = StaticCache::cacheStore()->get('nocache::region.'.$key))) {
-            return $region;
+            if ($region instanceof Region) {
+                return $region;
+            }
+
+            if (is_string($region)) {
+                return unserialize($region, ['allowed_classes' => true]);
+            }
         }
 
         throw new RegionNotFound($key);
@@ -61,7 +67,7 @@ class Session
     {
         $this->regionCount += 1;
 
-        return md5($this->url.$this->regionCount);
+        return md5($this->url.'|'.$this->regionCount);
     }
 
     public function pushRegion($contents, $context, $extension): StringRegion
@@ -150,6 +156,6 @@ class Session
 
     protected function cacheRegion(Region $region)
     {
-        StaticCache::cacheStore()->forever('nocache::region.'.$region->key(), $region);
+        StaticCache::cacheStore()->forever('nocache::region.'.$region->key(), serialize($region));
     }
 }

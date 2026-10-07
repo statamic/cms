@@ -18,3 +18,4 @@ export { default as HasActionsMixin } from '../../components/publish/HasActions.
 export { default as resetValuesFromResponse } from '../../util/resetValuesFromResponse.js';
 export { requireElevatedSession, requireElevatedSessionIf } from '../../components/elevated-sessions';
 export { default as clone, deepClone } from '../../util/clone.js';
+export { default as debounce } from '../../util/debounce.js';
