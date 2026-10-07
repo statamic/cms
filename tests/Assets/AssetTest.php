@@ -61,12 +61,10 @@ class AssetTest extends TestCase
         config(['cache.default' => 'file']);
         Cache::clear();
 
-        config([
-            'filesystems.disks.test' => [
-                'driver' => 'local',
-                'root' => __DIR__.'/tmp',
-            ],
-        ]);
+        config(['filesystems.disks.test' => [
+            'driver' => 'local',
+            'root' => __DIR__.'/tmp',
+        ]]);
 
         $this->container = (new AssetContainer)
             ->handle('test_container')
@@ -356,13 +354,11 @@ class AssetTest extends TestCase
             'by calling set method' => [fn ($asset) => $asset->set('one', 'new-foo')],
             'by calling data method' => [fn ($asset) => $asset->data(['one' => 'new-foo', 'two' => 'bar', 'three' => 'qux'])],
             'by calling merge method' => [fn ($asset) => $asset->merge(['one' => 'new-foo', 'three' => 'qux'])],
-            'by calling __set() magically via property' => [
-                function ($asset) {
-                    $asset->one = 'new-foo';
+            'by calling __set() magically via property' => [function ($asset) {
+                $asset->one = 'new-foo';
 
-                    return $asset;
-                },
-            ],
+                return $asset;
+            }],
         ];
     }
 
@@ -641,33 +637,8 @@ class AssetTest extends TestCase
     public function it_checks_if_it_can_be_previewed_in_google_docs_previewer()
     {
         $extensions = [
-            'doc',
-            'docx',
-            'pages',
-            'txt',
-            'ai',
-            'psd',
-            'eps',
-            'ps',
-            'css',
-            'html',
-            'php',
-            'c',
-            'cpp',
-            'h',
-            'hpp',
-            'js',
-            'ppt',
-            'pptx',
-            'flv',
-            'tiff',
-            'ttf',
-            'dxf',
-            'xps',
-            'zip',
-            'rar',
-            'xls',
-            'xlsx',
+            'doc', 'docx', 'pages', 'txt', 'ai', 'psd', 'eps', 'ps', 'css', 'html', 'php', 'c', 'cpp', 'h', 'hpp', 'js',
+            'ppt', 'pptx', 'flv', 'tiff', 'ttf', 'dxf', 'xps', 'zip', 'rar', 'xls', 'xlsx',
         ];
 
         foreach ($extensions as $ext) {
@@ -2064,12 +2035,10 @@ class AssetTest extends TestCase
     {
         Event::fake();
 
-        config([
-            'statamic.assets.image_manipulation.presets.small' => [
-                'w' => '15',
-                'h' => '15',
-            ],
-        ]);
+        config(['statamic.assets.image_manipulation.presets.small' => [
+            'w' => '15',
+            'h' => '15',
+        ]]);
 
         $this->container->sourcePreset('small');
 
@@ -2112,11 +2081,9 @@ class AssetTest extends TestCase
     {
         Event::fake();
 
-        config([
-            'statamic.assets.image_manipulation.presets.enforce_png' => [
-                $formatParam => 'png',
-            ],
-        ]);
+        config(['statamic.assets.image_manipulation.presets.enforce_png' => [
+            $formatParam => 'png',
+        ]]);
 
         $this->container->sourcePreset('enforce_png');
 
@@ -2150,11 +2117,9 @@ class AssetTest extends TestCase
     {
         Event::fake();
 
-        config([
-            'statamic.assets.image_manipulation.presets.progressive' => [
-                'fm' => 'pjpg',
-            ],
-        ]);
+        config(['statamic.assets.image_manipulation.presets.progressive' => [
+            'fm' => 'pjpg',
+        ]]);
 
         $this->container->sourcePreset('progressive');
 
@@ -2281,12 +2246,10 @@ class AssetTest extends TestCase
     {
         Event::fake();
 
-        config([
-            'statamic.assets.image_manipulation.presets.small' => [
-                'w' => '15',
-                'h' => '15',
-            ],
-        ]);
+        config(['statamic.assets.image_manipulation.presets.small' => [
+            'w' => '15',
+            'h' => '15',
+        ]]);
 
         $this->container->sourcePreset('small');
 
@@ -2625,21 +2588,10 @@ class AssetTest extends TestCase
     private function toArrayKeysWhenFileExists()
     {
         return [
-            'size',
-            'size_bytes',
-            'size_kilobytes',
-            'size_megabytes',
-            'size_gigabytes',
-            'size_b',
-            'size_kb',
-            'size_mb',
-            'size_gb',
-            'last_modified',
-            'last_modified_timestamp',
-            'last_modified_instance',
-            'focus',
-            'focus_css',
-            'mime_type',
+            'size', 'size_bytes', 'size_kilobytes', 'size_megabytes', 'size_gigabytes',
+            'size_b', 'size_kb', 'size_mb', 'size_gb',
+            'last_modified', 'last_modified_timestamp', 'last_modified_instance',
+            'focus', 'focus_css', 'mime_type',
         ];
     }
 
