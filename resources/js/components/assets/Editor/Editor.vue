@@ -170,6 +170,7 @@
                 :image="asset.preview"
                 @selected="selectFocalPoint"
                 @closed="closeFocalPointEditor"
+                @save="saveFocalPoint"
             />
 
             <crop-editor
@@ -449,6 +450,10 @@ export default {
             point = point === '50-50-1' ? null : point;
             this.values['focus'] = point;
             this.$dirty.add(this.publishContainer);
+        },
+
+        saveFocalPoint() {
+            this.$nextTick(() => this.save().catch(() => {}));
         },
 
         openCropEditor() {
