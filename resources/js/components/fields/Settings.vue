@@ -194,7 +194,7 @@ export default {
         },
 
         saveAllShortcutLabel() {
-            return shortcutLabel('mod+shift+s');
+            return __('Save All (:shortcut)', { shortcut: shortcutLabel('mod+shift+s') });
         },
     },
 
