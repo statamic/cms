@@ -125,17 +125,11 @@ abstract class Connector
             ->all();
     }
 
-    protected function job(Submission $submission, array $connection): ?object
-    {
-        return null;
-    }
+    abstract protected function job(Submission $submission, array $connection): ?object;
 
     abstract public function render(): VueComponent;
 
-    public function blueprint(): ?Blueprint
-    {
-        return null;
-    }
+    abstract public function blueprint(): Blueprint;
 
     protected function connectionFields(array $connection): Fields
     {
@@ -181,10 +175,6 @@ abstract class Connector
 
     protected function preProcessConnection(array $connection): array
     {
-        if (! $this->blueprint()) {
-            return $connection;
-        }
-
         return $this->connectionFields($connection)->values()->all();
     }
 
@@ -216,11 +206,7 @@ abstract class Connector
     // Only top-level field rules can be derived without values. Grid sub-field rules belong in connectionRules().
     private function blueprintRules(): array
     {
-        if (! $blueprint = $this->blueprint()) {
-            return [];
-        }
-
-        $fields = $blueprint->fields();
+        $fields = $this->blueprint()->fields();
 
         return Arr::only($fields->validator()->rules(), $fields->all()->keys()->all());
     }
@@ -243,11 +229,7 @@ abstract class Connector
 
     protected function processConnection(array $connection): array
     {
-        if (! $blueprint = $this->blueprint()) {
-            return $connection;
-        }
-
-        return $blueprint->fields()->addValues($connection)->process()->values()->all();
+        return $this->blueprint()->fields()->addValues($connection)->process()->values()->all();
     }
 
     public function routes(Router $router): void

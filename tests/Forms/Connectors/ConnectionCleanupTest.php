@@ -16,7 +16,9 @@ use Illuminate\Support\Facades\Storage;
 use LogicException;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Forms\Submission;
+use Statamic\Facades\Blueprint as BlueprintFacade;
 use Statamic\Facades\Form;
+use Statamic\Fields\Blueprint;
 use Statamic\Forms\Connectors\Connector;
 use Statamic\Forms\Connectors\Webhooks\SendWebhook;
 use Statamic\Forms\SendEmail;
@@ -292,23 +294,24 @@ class CountdownConnector extends Connector
 {
     public static array $jobs = [];
 
-    public function finalized(Submission $submission): object|array
+    protected function job(Submission $submission, array $connection): ?object
     {
-        return collect($this->connections())
-            ->mapWithKeys(fn ($config) => [$config['id'] => match ($config['job'] ?? null) {
-                'without-middleware' => new JobWithoutMiddlewareProperty,
-                'own-middleware' => new JobWithOwnMiddlewareProperty,
-                'without-should-queue' => new JobWithoutShouldQueue,
-                default => new CountdownJob($config['id']),
-            }])
-            ->each(fn ($job, $id) => static::$jobs[$id] = $job)
-            ->values()
-            ->all();
+        return static::$jobs[$connection['id']] = match ($connection['job'] ?? null) {
+            'without-middleware' => new JobWithoutMiddlewareProperty,
+            'own-middleware' => new JobWithOwnMiddlewareProperty,
+            'without-should-queue' => new JobWithoutShouldQueue,
+            default => new CountdownJob($connection['id']),
+        };
     }
 
     public function render(): VueComponent
     {
         return VueComponent::render('countdown-connection');
+    }
+
+    public function blueprint(): Blueprint
+    {
+        return BlueprintFacade::make();
     }
 }
 

@@ -26,14 +26,9 @@ class ConnectorTest extends TestCase
     #[Test]
     public function handle_can_be_defined_as_a_property()
     {
-        $connector = new class extends Connector
+        $connector = new class extends TestConnector
         {
             protected static $handle = 'example';
-
-            public function render(): VueComponent
-            {
-                return VueComponent::render('nothing');
-            }
         };
 
         $this->assertEquals('example', $connector->handle());
@@ -48,14 +43,9 @@ class ConnectorTest extends TestCase
     #[Test]
     public function title_can_be_defined_as_a_property()
     {
-        $connector = new class extends Connector
+        $connector = new class extends TestConnector
         {
             protected static $title = 'Super Cool Example';
-
-            public function render(): VueComponent
-            {
-                return VueComponent::render('nothing');
-            }
         };
 
         $this->assertEquals('Super Cool Example', $connector->title());
@@ -64,15 +54,10 @@ class ConnectorTest extends TestCase
     #[Test]
     public function it_gets_the_description_and_developer()
     {
-        $connector = new class extends Connector
+        $connector = new class extends TestConnector
         {
             protected $description = 'Send submissions to Acme.';
             protected $developer = 'Acme Inc';
-
-            public function render(): VueComponent
-            {
-                return VueComponent::render('nothing');
-            }
         };
 
         $this->assertEquals('Send submissions to Acme.', $connector->description());
@@ -82,14 +67,9 @@ class ConnectorTest extends TestCase
     #[Test]
     public function the_small_icon_falls_back_to_the_icon()
     {
-        $connector = new class extends Connector
+        $connector = new class extends TestConnector
         {
             protected $icon = 'globe-arrow';
-
-            public function render(): VueComponent
-            {
-                return VueComponent::render('nothing');
-            }
         };
 
         $this->assertEquals(Statamic::svg('icons/globe-arrow'), $connector->icon());
@@ -99,15 +79,10 @@ class ConnectorTest extends TestCase
     #[Test]
     public function small_icon_can_be_defined_as_a_property()
     {
-        $connector = new class extends Connector
+        $connector = new class extends TestConnector
         {
             protected $icon = 'globe-arrow';
             protected $smallIcon = '<svg><circle r="1" /></svg>';
-
-            public function render(): VueComponent
-            {
-                return VueComponent::render('nothing');
-            }
         };
 
         $this->assertEquals(Statamic::svg('icons/globe-arrow'), $connector->icon());
@@ -157,13 +132,8 @@ class ConnectorTest extends TestCase
     #[Test]
     public function count_can_be_overridden()
     {
-        $connector = new class extends Connector
+        $connector = new class extends TestConnector
         {
-            public function render(): VueComponent
-            {
-                return VueComponent::render('nothing');
-            }
-
             public function count(): ?int
             {
                 return 3;
@@ -196,6 +166,7 @@ class ConnectorTest extends TestCase
     {
         $this->assertEquals([
             '*' => ['array'],
+            '*.foo' => ['nullable'],
             '*.enabled' => ['nullable', 'boolean'],
             '*.conditions' => ['nullable', 'array'],
             '*.conditions.*' => ['array'],
@@ -286,16 +257,6 @@ class ConnectorTest extends TestCase
     }
 
     #[Test]
-    public function it_returns_no_jobs_by_default()
-    {
-        $form = Form::make('contact');
-
-        $jobs = (new TestMultiWordConnector)->setConnections([['id' => 'abc']])->finalized($form->makeSubmission());
-
-        $this->assertSame([], $jobs);
-    }
-
-    #[Test]
     public function it_only_makes_jobs_for_enabled_connections_whose_conditions_pass()
     {
         $form = Form::make('contact')->formFields([
@@ -329,12 +290,6 @@ class ConnectorTest extends TestCase
         $this->assertNotEmpty($connections[0]['conditions'][0]['_id']);
         $this->assertSame([], $connections[1]['conditions']);
         $this->assertEquals('baz', $connections[1]['foo']);
-    }
-
-    #[Test]
-    public function it_has_no_blueprint_by_default()
-    {
-        $this->assertNull((new TestMultiWordConnector)->blueprint());
     }
 
     #[Test]
@@ -461,7 +416,7 @@ class ConnectorTest extends TestCase
     #[Test]
     public function it_renders_a_vue_component()
     {
-        $connector = new class extends Connector
+        $connector = new class extends TestConnector
         {
             public function render(): VueComponent
             {
@@ -481,21 +436,36 @@ class ConnectorTest extends TestCase
     }
 }
 
-class TestMultiWordConnector extends Connector
+abstract class TestConnector extends Connector
 {
     public function render(): VueComponent
     {
         return VueComponent::render('nothing');
+    }
+
+    public function blueprint(): \Statamic\Fields\Blueprint
+    {
+        return Blueprint::make();
+    }
+
+    protected function job(Submission $submission, array $connection): ?object
+    {
+        return null;
     }
 }
 
-class TestHookedConnector extends Connector
+class TestMultiWordConnector extends TestConnector
 {
-    public function render(): VueComponent
+    public function blueprint(): \Statamic\Fields\Blueprint
     {
-        return VueComponent::render('nothing');
+        return Blueprint::make()->setContents(['tabs' => ['main' => ['sections' => [['fields' => [
+            ['handle' => 'foo', 'field' => ['type' => 'text']],
+        ]]]]]]);
     }
+}
 
+class TestHookedConnector extends TestConnector
+{
     protected function job(Submission $submission, array $connection): ?object
     {
         if ($connection['id'] === 'skip') {
@@ -521,13 +491,8 @@ class TestHookedConnector extends Connector
     }
 }
 
-class TestBlueprintConnector extends Connector
+class TestBlueprintConnector extends TestConnector
 {
-    public function render(): VueComponent
-    {
-        return VueComponent::render('nothing');
-    }
-
     public function props(): array
     {
         return $this->blueprintProps();

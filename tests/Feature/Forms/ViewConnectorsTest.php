@@ -3,8 +3,11 @@
 namespace Tests\Feature\Forms;
 
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Contracts\Forms\Submission;
+use Statamic\Facades\Blueprint as BlueprintFacade;
 use Statamic\Facades\Form;
 use Statamic\Facades\User;
+use Statamic\Fields\Blueprint;
 use Statamic\Forms\Connectors\Connector;
 use Statamic\Support\VueComponent;
 use Tests\FakesRoles;
@@ -143,5 +146,15 @@ class AcmeConnector extends Connector
     public function render(): VueComponent
     {
         return VueComponent::render('acme-connector');
+    }
+
+    public function blueprint(): Blueprint
+    {
+        return BlueprintFacade::make();
+    }
+
+    protected function job(Submission $submission, array $connection): ?object
+    {
+        return null;
     }
 }
