@@ -1,5 +1,12 @@
 # Release Notes
 
+## 5.74.6 (2026-10-08)
+
+### What's fixed
+- Allow ueberdosis/tiptap-php ^2.1.2 [#15620](https://github.com/statamic/cms/issues/15620) by @jasonvarga
+
+
+
 ## 5.74.5 (2026-10-06)
 
 ### What's fixed
