@@ -15,7 +15,8 @@
             @paste.stop
             @cut.stop
             @dragstart="preventNodeSelectionDrag"
-            @mousedown="preventFormControlNodeSelection"
+            @mousedown="onMousedown"
+            @click="keepButtonGroupFocused"
         >
             <div ref="content" hidden />
             <header
@@ -365,6 +366,43 @@ export default {
                 this.dropdownJustClosed = false;
                 this._dropdownJustClosedTimeout = null;
             }, 150);
+        },
+
+        onMousedown(event) {
+            this.focusClickedButton(event);
+            this.preventFormControlNodeSelection(event);
+        },
+
+        clickedButton(event) {
+            const target = event.target instanceof Element ? event.target : event.target.parentElement;
+
+            return target?.closest('button:not(:disabled)');
+        },
+
+        focusClickedButton(event) {
+            // Safari doesn't focus buttons on click, which breaks the :focus-within rules for the selection outline.
+            // Buttons that keep focus elsewhere on purpose (e.g. with @mousedown.prevent) are left alone.
+            if (event.defaultPrevented) return;
+
+            this.clickedButton(event)?.focus({ preventScroll: true });
+        },
+
+        keepButtonGroupFocused(event) {
+            const button = this.clickedButton(event);
+            if (!button?.closest('[data-ui-button-group]')) return;
+
+            // Some components re-focus a wrapper after a click, so put focus back on the button.
+            // If the click moved focus somewhere else on purpose (e.g. into a modal), leave it there.
+            const refocus = () => {
+                const active = document.activeElement;
+                if (active === button) return;
+                if (active && active !== document.body && !active.contains(button)) return;
+
+                button.focus({ preventScroll: true });
+            };
+
+            requestAnimationFrame(refocus);
+            setTimeout(refocus, 0);
         },
 
         preventFormControlNodeSelection(event) {
