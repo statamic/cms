@@ -229,10 +229,20 @@ function select(selected) {
 }
 
 function openInNewTab(e) {
+    // Match Mousetrap's `mod`: Cmd on Mac, Ctrl elsewhere.
+    const isMac = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
+    if (!(isMac ? e.metaKey : e.ctrlKey)) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+
     let item = findSelectedItem(highlighted.value);
     if (!item) return;
 
-    if (!item.url) return select(highlighted.value);
+    if (!item.url) {
+        selected.value = highlighted.value;
+        return;
+    }
 
     // Simulate a modifier-click so the browser handles it like a real Cmd+click (background tab)
     // or Cmd+Shift+click (foreground tab).
@@ -332,8 +342,7 @@ router.on('start', () => Statamic.$commandPalette.clear());
                         :ignore-filter="true"
                         v-model="selected"
                         @keydown.tab.prevent.stop="keydownTab"
-                        @keydown.meta.enter.prevent.stop="openInNewTab"
-                        @keydown.ctrl.enter.prevent.stop="openInNewTab"
+                        @keydown.enter="openInNewTab"
                         @highlight="highlighted = $event?.value"
                     >
                         <header class="group/cmd-input flex h-14 items-center gap-2 border-b border-gray-200/80 px-5.5 dark:border-gray-950">
