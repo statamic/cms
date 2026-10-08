@@ -116,6 +116,7 @@ class JavascriptComposer
         }
 
         return $user->toAugmentedCollection()->merge([
+            'avatar' => $user->avatar(),
             'preferences' => Preference::all(),
             'permissions' => $user->permissions()->all(),
             'color_mode' => $user->preferredColorMode(),
