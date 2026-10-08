@@ -384,7 +384,14 @@ export default {
             // Buttons that keep focus elsewhere on purpose (e.g. with @mousedown.prevent) are left alone.
             if (event.defaultPrevented) return;
 
-            this.clickedButton(event)?.focus({ preventScroll: true });
+            const button = this.clickedButton(event);
+            if (!button) return;
+
+            button.focus({ preventScroll: true });
+
+            // Safari's default mousedown action then moves focus off the button again, which makes
+            // the outline flicker until it's re-focused. Preventing it keeps focus where we put it.
+            if (document.activeElement === button) event.preventDefault();
         },
 
         keepButtonGroupFocused(event) {
