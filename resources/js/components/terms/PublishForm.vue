@@ -225,7 +225,9 @@ export default {
             preferencesPrefix: `taxonomies.${this.taxonomyHandle}`,
             saveKeyBinding: null,
             quickSaveKeyBinding: null,
+            saveAndCloseKeyBinding: null,
             quickSave: false,
+            closeAfterSave: false,
             syncFieldConfirmationText: __('messages.sync_term_field_confirmation_text'),
             pendingLocalization: null,
         };
@@ -339,6 +341,7 @@ export default {
         save() {
             if (!this.canSave) {
                 this.quickSave = false;
+                this.closeAfterSave = false;
                 return;
             }
 
@@ -389,12 +392,18 @@ export default {
                     // the hooks are resolved because if this form is being shown in a stack, we only
                     // want to close it once everything's done.
                     else {
-                        this.$nextTick(() => this.$emit('saved', response));
+                        this.$nextTick(() => {
+                            this.$emit('saved', response);
+                            if (this.closeAfterSave) this.$emit('close');
+                            this.closeAfterSave = false;
+                        });
                     }
 
                     this.quickSave = false;
                 })
                 .catch((e) => {
+                    this.closeAfterSave = false;
+
                     if (!(e instanceof PipelineStopped)) {
                         this.$toast.error(__('Something went wrong'));
                         console.error(e);
@@ -518,6 +527,15 @@ export default {
             this.save();
         });
 
+        if (this.isInline) {
+            this.saveAndCloseKeyBinding = this.$keys.bindGlobal(['mod+shift+s'], (e) => {
+                e.preventDefault();
+                this.quickSave = true;
+                this.closeAfterSave = true;
+                this.save();
+            });
+        }
+
         this.addToCommandPalette();
     },
 
@@ -528,6 +546,7 @@ export default {
 	beforeUnmount() {
         this.saveKeyBinding.destroy();
         this.quickSaveKeyBinding.destroy();
+        this.saveAndCloseKeyBinding?.destroy();
     },
 };
 </script>
