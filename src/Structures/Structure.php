@@ -53,6 +53,19 @@ abstract class Structure implements Augmentable, StructureContract
         return $this->fluentlyGetOrSet('expectsRoot')->args(func_get_args());
     }
 
+    public function flushCache($site = null)
+    {
+        Facades\Blink::forget($site
+            ? 'structure-'.$this->handle().'-'.$site.'-*'
+            : 'structure-'.$this->handle().'-*');
+
+        $trees = $site ? collect([$this->in($site)]) : $this->trees();
+
+        $trees->filter()->each->flushCache();
+
+        return $this;
+    }
+
     public function trees()
     {
         return collect($this->trees);

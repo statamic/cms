@@ -116,7 +116,7 @@
                         </floating-menu>
 
                         <div class="bard-error" v-if="initError" v-text="initError"></div>
-                        <editor-content :editor="editor" :id="fieldId" />
+                        <editor-content :editor="editor" :id="fieldId" :dir="contentDirection" />
                     </div>
                     <div
                         class="bard-footer-toolbar"
@@ -178,6 +178,7 @@ import 'highlight.js/styles/github.css';
 import importTiptap from '@/util/tiptap.js';
 import { computed } from 'vue';
 import { data_get } from "@/bootstrap/globals.js";
+import { useContentDirection } from '@/composables/content-direction';
 
 const lowlight = createLowlight(common);
 let tiptap = null;
@@ -197,6 +198,12 @@ export default {
 
     provide: {
         isInBardField: true,
+    },
+
+    setup() {
+        const { direction: contentDirection } = useContentDirection();
+
+        return { contentDirection };
     },
 
     data() {
@@ -391,7 +398,10 @@ export default {
         this.initEditor();
 
         this.json = this.editor.getJSON().content;
-        this.html = this.editor.getHTML();
+
+        if (this.config.reading_time) {
+            this.html = this.editor.getHTML();
+        }
 
 		this.$nextTick(() => this.mounted = true);
 
@@ -440,18 +450,20 @@ export default {
             }
         },
 
-        value(value, oldValue) {
+        value(value) {
             if (!this.editor) return;
-
-            if (document.activeElement?.closest('.bard-content')) return;
 
             const oldContent = this.editor.getJSON();
             const content = this.valueToContent(value);
 
-            if (JSON.stringify(content) !== JSON.stringify(oldContent)) {
-                this.editor.commands.clearContent();
-                this.editor.commands.setContent(content, true);
-            }
+            if (JSON.stringify(content) === JSON.stringify(oldContent)) return;
+
+            // Sets sync their own values into the editor, so while it's focused those changes
+            // don't need a rebuild, which would destroy the field being typed in.
+            if (this.editorIsFocused() && this.onlySetValuesDiffer(value, oldContent.content ?? [])) return;
+
+            this.editor.commands.clearContent(false);
+            this.editor.commands.setContent(content, true);
         },
 
         readOnly(readOnly) {
@@ -595,10 +607,9 @@ export default {
         duplicateSet(old_id, attrs, getPos) {
             const id = uniqid();
             const enabled = attrs.enabled;
-            const deepCopy = JSON.parse(JSON.stringify(attrs.values));
-            const values = Object.assign({}, deepCopy);
+            const { values, meta } = this.duplicateValues(attrs.values, this.meta.existing[old_id]);
 
-            this.updateSetMeta(id, this.meta.existing[old_id]);
+            this.updateSetMeta(id, meta);
 
             this.debounceNextUpdate = false;
 
@@ -612,13 +623,12 @@ export default {
         },
 
         async pasteSet(attrs) {
-            const old_id = attrs.id;
             const id = uniqid();
             const enabled = attrs.enabled;
-            const values = Object.assign({}, attrs.values);
+            const { values, meta } = this.duplicateValues(attrs.values, this.meta.existing[attrs.id]);
 
-            if (this.meta.existing[old_id]) {
-                this.updateSetMeta(id, this.meta.existing[old_id]);
+            if (meta) {
+                this.updateSetMeta(id, meta);
             } else {
                 const data = await this.fetchSet(values.type);
                 this.updateSetMeta(id, data.new);
@@ -889,7 +899,10 @@ export default {
                     if (countNodes(oldJson) !== countNodes(newJson)) this.debounceNextUpdate = false;
 
                     this.json = newJson;
-                    this.html = this.editor.getHTML();
+
+                    if (this.config.reading_time) {
+                        this.html = this.editor.getHTML();
+                    }
                 },
                 onCreate: ({ editor }) => {
                     const state = editor.view.state;
@@ -940,6 +953,24 @@ export default {
 
         valueToContent(value) {
             return value.length ? { type: 'doc', content: value } : null;
+        },
+
+        editorIsFocused() {
+            return this.editor.view.dom.contains(document.activeElement);
+        },
+
+        onlySetValuesDiffer(nodes, oldNodes) {
+            return JSON.stringify(this.withoutSetValues(nodes)) === JSON.stringify(this.withoutSetValues(oldNodes));
+        },
+
+        withoutSetValues(nodes) {
+            return nodes.map((node) => {
+                if (node.type === 'set') return { ...node, attrs: { ...node.attrs, values: null } };
+
+                if (node.content) return { ...node, content: this.withoutSetValues(node.content) };
+
+                return node;
+            });
         },
 
         getExtensions() {
@@ -997,7 +1028,7 @@ export default {
             });
 
             let exts = [
-                CharacterCount.configure({ limit: this.config.character_limit }),
+                CharacterCount.configure(),
                 ...modeExts,
                 DisableCtrlEnter,
                 SlashSetPicker.configure({

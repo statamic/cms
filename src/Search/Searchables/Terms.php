@@ -59,8 +59,8 @@ class Terms extends Provider
             return false;
         }
 
-        if ($filter = $this->filter()) {
-            return $filter($searchable);
+        if (($filter = $this->filter()) && ! $filter($searchable)) {
+            return false;
         }
 
         $query = Term::query()->where('reference', $searchable->reference());

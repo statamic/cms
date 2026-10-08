@@ -42,7 +42,9 @@ class SiteClear extends Command
     public function handle()
     {
         if ($this->shouldAbort()) {
-            return $this->info('Aborted successfully.');
+            $this->info('Aborted successfully.');
+
+            return;
         }
 
         $this->files = app(Filesystem::class);

@@ -7,6 +7,7 @@ import { colorMode as colorModeApi } from '@api';
 // Addons
 import 'codemirror/addon/edit/matchbrackets';
 import 'codemirror/addon/display/fullscreen';
+import 'codemirror/addon/display/placeholder';
 import 'codemirror/addon/display/rulers';
 
 // Keymaps
@@ -51,7 +52,7 @@ const props = defineProps({
     lineNumbers: { type: Boolean, default: true },
     /** When `true`, long lines will wrap */
     lineWrapping: { type: Boolean, default: true },
-    /** The syntax highlighting mode. Options: `clike`, `css`, `diff`, `go`, `haml`, `handlebars`, `htmlmixed`, `less`, `markdown`, `gfm`, `nginx`, `text/x-java`, `javascript`, `jsx`, `text/x-objectivec`, `php`, `python`, `ruby`, `scss`, `shell`, `sql`, `twig`, `vue`, `xml`, `yaml-frontmatter` */
+    /** The syntax highlighting mode. Options: `clike`, `css`, `diff`, `go`, `haml`, `handlebars`, `htmlmixed`, `less`, `markdown`, `gfm`, `nginx`, `text/x-java`, `javascript`, `application/json`, `application/ld+json`, `jsx`, `text/x-objectivec`, `php`, `python`, `ruby`, `scss`, `shell`, `sql`, `twig`, `vue`, `xml`, `yaml-frontmatter` */
     mode: { type: String, default: 'javascript' },
     /** The controlled value of the code editor */
     modelValue: { type: String, default: '' },
@@ -64,6 +65,8 @@ const props = defineProps({
     tabSize: { type: Number, required: false },
     /** Theme of the code editor. Options: `system`, `light`, `dark` */
     colorMode: { type: String, default: 'system' },
+    /** Placeholder shown when the editor is empty */
+    placeholder: { type: String, default: '' },
     /** Title displayed in fullscreen mode */
     title: { type: String, default: () => __('Code Editor') },
 });
@@ -82,6 +85,8 @@ const modes = ref([
     { value: 'nginx', label: 'Nginx' },
     { value: 'text/x-java', label: 'Java' },
     { value: 'javascript', label: 'JavaScript' },
+    { value: 'application/json', label: 'JSON' },
+    { value: 'application/ld+json', label: 'JSON-LD' },
     { value: 'jsx', label: 'JSX' },
     { value: 'text/x-objectivec', label: 'Objective-C' },
     { value: 'php', label: 'PHP' },
@@ -130,6 +135,7 @@ function initCodeMirror() {
     codemirror.value = markRaw(
         CodeMirror(codemirrorElement.value, {
             value: props.modelValue || '',
+            placeholder: props.placeholder,
             mode: props.mode,
             direction: document.querySelector('html').getAttribute('dir') ?? 'ltr',
             addModeClass: true,

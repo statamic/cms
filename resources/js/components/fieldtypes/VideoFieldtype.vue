@@ -42,7 +42,7 @@ export default {
     methods: {
         onInputUpdate(value) {
             if (this.isReadOnly) return;
-            this.update(value);
+            this.updateDebounced(value);
         },
     },
 

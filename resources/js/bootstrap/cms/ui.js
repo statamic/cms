@@ -17,6 +17,7 @@ export {
     Combobox,
     CommandPaletteItem,
     ConfirmationModal,
+    ContentDirection,
     Context,
     ContextFooter,
     ContextHeader,
@@ -124,4 +125,6 @@ export {
     Widget,
     registerIconSet,
     registerIconSetFromStrings,
+    useContentDirection,
+    useUiDirection,
 } from '../../components/ui/index';

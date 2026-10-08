@@ -10,6 +10,7 @@ use Illuminate\Validation\ValidationException;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Facades\User;
+use Statamic\Rules\EmailWithoutPathCharacters;
 use Statamic\Rules\UniqueUserValue;
 
 class UserProfileRequest extends FormRequest
@@ -27,7 +28,7 @@ class UserProfileRequest extends FormRequest
     protected function failedValidation(Validator $validator)
     {
         if ($this->isPrecognitive() || $this->wantsJson()) {
-            return parent::failedValidation($validator);
+            parent::failedValidation($validator);
         }
 
         if ($this->ajax()) {
@@ -68,7 +69,7 @@ class UserProfileRequest extends FormRequest
 
         return $this->blueprintFields
             ->validator()
-            ->withRules(['email' => ['required', 'email', new UniqueUserValue(except: $userId)]])
+            ->withRules(['email' => ['required', 'email', new EmailWithoutPathCharacters, new UniqueUserValue(except: $userId)]])
             ->withReplacements(['id' => $userId])
             ->validator();
     }
@@ -77,7 +78,7 @@ class UserProfileRequest extends FormRequest
     {
         $site = Site::findByUrl(LaravelURL::previous()) ?? Site::default();
 
-        return $this->withLocale($site->lang(), fn () => parent::validateResolved());
+        $this->withLocale($site->lang(), fn () => parent::validateResolved());
     }
 
     private function valuesWithoutAssetFields($fields)

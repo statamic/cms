@@ -5,6 +5,7 @@ namespace Statamic\Http\Controllers\CP\Collections;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Statamic\Contracts\Entries\Collection;
+use Statamic\Facades\Action;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
@@ -25,6 +26,10 @@ class CollectionTreeController extends CpController
             'include_home' => true,
             'site' => $site,
         ]);
+
+        if ($collection->structure()->expectsRoot() && ! empty($pages)) {
+            $pages[0]['actions'] = Action::for(Entry::find($pages[0]['entry']), ['view' => 'tree']);
+        }
 
         return ['pages' => $pages];
     }
