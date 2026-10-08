@@ -6,6 +6,8 @@ import { SortableList } from '@/components/sortable/Sortable.js';
 import { deepClone } from '@/util/clone.js';
 import { preferences } from '@api';
 import ConnectionItem from './ConnectionItem.vue';
+import ConnectionRules from './ConnectionRules.vue';
+import ConnectionFields from './ConnectionFields.vue';
 import { __ } from '@/bootstrap/globals';
 
 type Connection = {
@@ -25,15 +27,30 @@ const emit = defineEmits(['update:modelValue']);
 const props = withDefaults(defineProps<{
     modelValue: Connection[];
     errors: Record<string, string[]>;
-    defaults: Record<string, unknown>;
+    defaults: { values?: Record<string, unknown>; meta?: Record<string, unknown> };
+    /** The blueprint's publish array, used by ConnectionFields. */
+    blueprint?: Record<string, unknown>;
+    /** Fieldtype meta for existing connections, keyed by connection id. */
+    meta?: Record<string, Record<string, unknown>>;
+    /** Prefix for each connection's publish container name. */
+    name?: string;
     addLabel: string;
     description?: string;
     deleteHeading: string;
     deleteDescription: string;
+    /** Label for the "always" option when no default slot is given. */
+    alwaysLabel?: string;
+    /** Label for the "if" option when no default slot is given. */
+    ifLabel?: string;
+    /** Whether to render ConnectionRules around the fields when no default slot is given. */
+    rules?: boolean;
 }>(), {
     modelValue: () => [],
     errors: () => ({}),
     defaults: () => ({}),
+    meta: () => ({}),
+    name: 'connection',
+    rules: true,
     addLabel: () => __('Add Connection'),
     deleteHeading: () => __('Delete Connection'),
     deleteDescription: () => __('Are you sure you want to delete this connection?'),
@@ -47,11 +64,25 @@ const collapsed = ref<string[]>(collapseByDefault.value ? props.modelValue.map((
 const confirmingRemoval = ref<string | null>(null);
 const errorConnectionIds = ref<string[]>([]);
 
+// Each connection gets its own meta object, since publish containers mutate it (e.g. grid row meta).
+const metaStore: Record<string, Record<string, unknown>> = {};
+
+const seedMeta = (meta: Record<string, Record<string, unknown>>): void => {
+    Object.entries(meta).forEach(([id, connectionMeta]) => (metaStore[id] = deepClone(connectionMeta)));
+};
+
+const metaFor = (connection: Connection): Record<string, unknown> =>
+    (metaStore[connection.id] ??= deepClone(props.defaults.meta ?? {}));
+
 const add = (): void => {
+    const id = uniqid();
+
+    metaStore[id] = deepClone(props.defaults.meta ?? {});
+
     emit('update:modelValue', [
         ...props.modelValue,
         {
-            id: uniqid(),
+            id,
             enabled: true,
             conditions: [],
             ...deepClone(props.defaults.values),
@@ -60,11 +91,14 @@ const add = (): void => {
 };
 
 const duplicate = (connection: Connection): void => {
+    const id = uniqid();
     const duplicated = [...props.modelValue];
+
+    metaStore[id] = deepClone(metaFor(connection));
 
     duplicated.splice(props.modelValue.indexOf(connection) + 1, 0, {
         ...deepClone(connection),
-        id: uniqid(),
+        id,
         conditions: connection.conditions.map((condition) => ({ ...condition, _id: uniqid() })),
     });
 
@@ -84,7 +118,10 @@ const remove = (): void => {
     expand(confirmingRemoval.value);
     confirmingRemoval.value = null;
 
-    if (connection) emit('update:modelValue', props.modelValue.filter((existing) => existing !== connection));
+    if (!connection) return;
+
+    delete metaStore[connection.id];
+    emit('update:modelValue', props.modelValue.filter((existing) => existing !== connection));
 };
 
 const isEnabled = (connection: Connection): boolean => connection.enabled !== false;
@@ -124,11 +161,22 @@ const connectionErrors = (connection: Connection) => {
     return Object.entries(props.errors)
         .filter(([key]) => key.startsWith(`${index}.`))
         .reduce((fields, [key, messages]) => {
-            const handle = key.replace(`${index}.`, '').split('.')[0];
-            fields[handle] = [...(fields[handle] ?? []), ...messages];
+            fields[key.slice(`${index}.`.length)] = messages;
             return fields;
         }, {});
 };
+
+const context = (connection: Connection) => ({
+    connection,
+    errors: connectionErrors(connection),
+    meta: metaFor(connection),
+    blueprint: props.blueprint,
+    name: props.name,
+});
+
+seedMeta(props.meta);
+
+watch(() => props.meta, seedMeta);
 
 watch(collapseByDefault, (collapse: boolean) => preferences.set('forms.connect.collapse_connections', collapse));
 
@@ -170,6 +218,7 @@ watch(
                         :collapsed="isCollapsed(connection)"
                         :has-error="hasError(connection)"
                         :handle-class="sortableHandleClass"
+                        :context="context(connection)"
                         @collapsed="collapse(connection.id)"
                         @expanded="expand(connection.id)"
                         @duplicated="duplicate(connection)"
@@ -180,7 +229,24 @@ watch(
                             <slot name="header" :item="connection" :index="index" :collapsed="collapsed.includes(connection.id)" />
                         </template>
 
-                        <slot :item="connection" :index="index" :errors="connectionErrors(connection)" />
+                        <slot
+                            v-if="$slots.default"
+                            :item="connection"
+                            :index="index"
+                            :errors="connectionErrors(connection)"
+                            :meta="metaFor(connection)"
+                        />
+                        <ConnectionRules
+                            v-else-if="rules"
+                            v-model:conditions="connection.conditions"
+                            :always-label="alwaysLabel"
+                            :if-label="ifLabel"
+                        >
+                            <template #then>
+                                <ConnectionFields />
+                            </template>
+                        </ConnectionRules>
+                        <ConnectionFields v-else />
                     </ConnectionItem>
                 </div>
             </div>

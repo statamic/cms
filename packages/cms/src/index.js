@@ -16,6 +16,7 @@ export const {
     RevisionPreview,
     SaveButtonOptions,
     SortableList,
+    ConnectionFields,
     ConnectionList,
     ConnectionRules,
     ConnectionSummary,

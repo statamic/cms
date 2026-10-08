@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { usePage } from '@inertiajs/vue3';
-import { Badge, Button, Icon, Label, PublishContainer, PublishFields, PublishFieldsProvider } from '@ui';
+import { Badge, Button, Icon, Label } from '@ui';
 import ConnectionList from './ConnectionList.vue';
-import ConnectionRules from './ConnectionRules.vue';
 import ConnectionSummary from './ConnectionSummary.vue';
 import EmailPreview from './EmailPreview.vue';
 
@@ -41,10 +40,15 @@ const recipients = (to: string[] | string): string =>
         :model-value="modelValue"
         :errors
         :defaults
+        :blueprint
+        :meta
+        name="email-connection"
         :add-label="__('Add Email')"
         :description="__('statamic::messages.email_connection_instructions')"
         :delete-heading="__('Delete Email')"
         :delete-description="__('statamic::messages.email_connection_delete_confirmation')"
+        :always-label="__('Always send')"
+        :if-label="__('Send if...')"
         @update:model-value="$emit('update:modelValue', $event)"
     >
         <template #header="{ item: email, collapsed }">
@@ -63,31 +67,6 @@ const recipients = (to: string[] | string): string =>
 
                 <Button icon="eye" size="xs" :text="__('Preview')" @click.stop="previewing = email" />
             </div>
-        </template>
-
-        <template #default="{ item: email, errors }">
-            <ConnectionRules
-                v-model:conditions="email.conditions"
-                :always-label="__('Always send')"
-                :if-label="__('Send if...')"
-            >
-                <template #then>
-                    <div class="rounded-lg border border-gray-300 bg-white p-4 dark:border-gray-700 dark:bg-gray-900">
-                        <PublishContainer
-                            :errors
-                            :blueprint
-                            :model-value="email"
-                            :meta="meta[email.id] ?? defaults.meta"
-                            :name="`email-connection-${email.id}`"
-                            :track-dirty-state="false"
-                        >
-                            <PublishFieldsProvider :fields="blueprint.tabs[0].sections[0].fields">
-                                <PublishFields />
-                            </PublishFieldsProvider>
-                        </PublishContainer>
-                    </div>
-                </template>
-            </ConnectionRules>
         </template>
     </ConnectionList>
 

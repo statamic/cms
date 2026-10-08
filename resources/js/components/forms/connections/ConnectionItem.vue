@@ -1,5 +1,7 @@
 <script setup>
+import { computed, provide } from 'vue';
 import { Button, DragHandle, Dropdown, DropdownItem, DropdownMenu, Switch } from '@ui';
+import { connectionContextKey } from './context';
 
 const emit = defineEmits(['collapsed', 'expanded', 'duplicated', 'removed', 'update:enabled']);
 
@@ -8,7 +10,10 @@ const props = defineProps({
     enabled: Boolean,
     hasError: Boolean,
     handleClass: String,
+    context: Object,
 });
+
+provide(connectionContextKey, computed(() => props.context));
 
 function toggleCollapsedState() {
     props.collapsed ? emit('expanded') : emit('collapsed');

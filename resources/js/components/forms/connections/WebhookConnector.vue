@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { Badge, Button, Field, Icon, Label, PublishContainer, PublishFields, PublishFieldsProvider } from '@ui';
+import { Badge, Button, Field, Icon, Label } from '@ui';
 import ConnectionList from './ConnectionList.vue';
-import ConnectionRules from './ConnectionRules.vue';
 import ConnectionSummary from './ConnectionSummary.vue';
 
 defineEmits(['update:modelValue']);
@@ -27,10 +26,15 @@ const showExamplePayload = ref<boolean>(props.modelValue.length === 0);
         :model-value="modelValue"
         :errors
         :defaults
+        :blueprint
+        :meta
+        name="webhook-connection"
         :add-label="__('Add Webhook')"
         :description="__('statamic::messages.webhook_connection_instructions')"
         :delete-heading="__('Delete Webhook')"
         :delete-description="__('statamic::messages.webhook_connection_delete_confirmation')"
+        :always-label="__('Always send')"
+        :if-label="__('Send if...')"
         @update:model-value="$emit('update:modelValue', $event)"
     >
         <template #header="{ item: webhook, collapsed }">
@@ -42,31 +46,6 @@ const showExamplePayload = ref<boolean>(props.modelValue.length === 0);
                 v-show="collapsed"
                 :conditions="webhook.conditions"
             />
-        </template>
-
-        <template #default="{ item: webhook, errors }">
-            <ConnectionRules
-                v-model:conditions="webhook.conditions"
-                :always-label="__('Always send')"
-                :if-label="__('Send if...')"
-            >
-                <template #then>
-                    <div class="rounded-lg border border-gray-300 bg-white p-4 dark:border-gray-700 dark:bg-gray-900">
-                        <PublishContainer
-                            :errors
-                            :blueprint
-                            :model-value="webhook"
-                            :meta="meta[webhook.id] ?? defaults.meta"
-                            :name="`webhook-connection-${webhook.id}`"
-                            :track-dirty-state="false"
-                        >
-                            <PublishFieldsProvider :fields="blueprint.tabs[0].sections[0].fields">
-                                <PublishFields />
-                            </PublishFieldsProvider>
-                        </PublishContainer>
-                    </div>
-                </template>
-            </ConnectionRules>
         </template>
     </ConnectionList>
 
