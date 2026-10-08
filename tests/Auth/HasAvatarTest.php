@@ -86,6 +86,17 @@ class HasAvatarTest extends TestCase
         $this->assertEquals('https://www.gravatar.com/avatar/d4c74594d841139328695756648b6bd6?s=128', $user->gravatarUrl(128));
     }
 
+    #[Test]
+    public function it_gets_the_avatar_if_the_field_augments_to_a_query()
+    {
+        config(['statamic.system.always_augment_to_query' => true]);
+
+        $user = $this->withAvatarField()->withGravatar()->userWithUploadedAvatar();
+
+        $this->assertEquals('/avatars/john.jpg', $user->avatarFieldUrl());
+        $this->assertEquals('http://localhost/cp/thumbnails/YXZhdGFyczo6am9obi5qcGc=/small/square', $user->avatar());
+    }
+
     /**
      * @see https://github.com/statamic/cms/issues/3207
      **/
