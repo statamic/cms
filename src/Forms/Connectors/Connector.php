@@ -2,6 +2,7 @@
 
 namespace Statamic\Forms\Connectors;
 
+use Illuminate\Contracts\Validation\CompilableRules;
 use Illuminate\Routing\Router;
 use Statamic\Contracts\Forms\Form;
 use Statamic\Contracts\Forms\Submission;
@@ -166,10 +167,16 @@ abstract class Connector
 
     public function rules(Form $form): array
     {
+        $connectionRules = collect($this->connectionRules($form));
+
+        // Laravel only compiles rules like Rule::forEach() when they're the key's entire value, so they can't be merged.
+        [$compilable, $connectionRules] = $connectionRules->partition(fn ($rules) => $rules instanceof CompilableRules);
+
         return [
             '*' => ['array'],
             ...collect($this->blueprintRules($form))
-                ->mergeRecursive(collect($this->connectionRules($form))->map(fn ($rules) => is_object($rules) ? [$rules] : Validator::explodeRules($rules)))
+                ->mergeRecursive($connectionRules->map(fn ($rules) => is_object($rules) ? [$rules] : Validator::explodeRules($rules)))
+                ->merge($compilable)
                 ->mapWithKeys(fn ($rules, $key) => ['*.'.$key => $rules])
                 ->all(),
             '*.enabled' => ['nullable', 'boolean'],

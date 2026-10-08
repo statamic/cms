@@ -3,6 +3,8 @@
 namespace Tests\Forms\Connectors;
 
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\NestedRules;
+use Illuminate\Validation\Rule;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Facades\Blueprint;
@@ -343,6 +345,27 @@ class ConnectorTest extends TestCase
         $this->assertEquals(['0.name'], Validator::make([['count' => 1]], $rules)->errors()->keys());
         $this->assertEquals(['0.name'], Validator::make([['name' => 'Far too long']], $rules)->errors()->keys());
         $this->assertEquals(['0.rows.0.label'], Validator::make([['name' => 'Foo', 'rows' => [['label' => null]]]], $rules)->errors()->keys());
+    }
+
+    #[Test]
+    public function it_compiles_for_each_connection_rules_against_each_item()
+    {
+        $connector = new class extends TestBlueprintConnector
+        {
+            protected function connectionRules(\Statamic\Contracts\Forms\Form $form): array
+            {
+                return [
+                    'rows.*.label' => Rule::forEach(fn ($value, $attribute, $data, $row) => ($row['strict'] ?? false) ? ['required'] : []),
+                ];
+            }
+        };
+
+        $rules = $connector->rules(Form::make('contact'));
+
+        $this->assertEquals(['0.rows.0.label'], Validator::make([
+            ['name' => 'Foo', 'rows' => [['strict' => true, 'label' => null], ['label' => null]]],
+        ], $rules)->errors()->keys());
+        $this->assertInstanceOf(NestedRules::class, $rules['*.rows.*.label']);
     }
 
     #[Test]
