@@ -21,7 +21,7 @@ class Lists extends Fieldtype
                 'type' => 'list',
             ],
             'add_row' => [
-                'display' => __('Add Row Label'),
+                'display' => __('Add Item Label'),
                 'instructions' => __('statamic::fieldtypes.list.config.add_row'),
                 'type' => 'text',
                 'placeholder' => __('Add Item'),

@@ -123,13 +123,12 @@ YAML;
 
         $expected = <<<'EOT'
 tree:
-  -
-    title: Test
+  - title: Test
     url: /test
 
 EOT;
 
-        $this->assertStringEqualsFile($this->tempDir.'/links.yaml', $expected);
+        $this->assertEquals($expected, $this->normalizeYaml(file_get_contents($this->tempDir.'/links.yaml')));
     }
 
     private function assertTree($array, $item)

@@ -246,8 +246,13 @@ export default {
             return computed(() => this.$refs.container);
         },
 
-        saving() {
-            return this.savingRef.value;
+        saving: {
+            get() {
+                return this.savingRef.value;
+            },
+            set(value) {
+                this.savingRef.value = value;
+            },
         },
 
         errors() {
@@ -271,7 +276,7 @@ export default {
         },
 
         showLivePreviewButton() {
-            return !this.isCreating && this.isBase && this.livePreviewUrl && this.showVisitUrlButton;
+            return !this.isPreviewing && !this.readOnly && !this.isCreating && this.isBase && this.livePreviewUrl && this.showVisitUrlButton;
         },
 
         showVisitUrlButton() {
@@ -421,10 +426,6 @@ export default {
             } else {
                 this.createLocalization(localization);
             }
-
-            if (this.publishContainer === 'base') {
-                window.history.replaceState({}, '', localization.url);
-            }
         },
 
         editLocalization(localization) {
@@ -445,6 +446,10 @@ export default {
                 this.reference = data.reference;
                 this.localizing = false;
                 this.$nextTick(() => this.$refs.container.clearDirtyState());
+
+                if (this.publishContainer === 'base' && localization.url) {
+                    window.history.replaceState({}, '', localization.url + window.location.hash);
+                }
             });
         },
 

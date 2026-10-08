@@ -86,7 +86,8 @@ export default {
 
     computed: {
         component() {
-            const isNarrow = this.fields.length > 1 && this.containerWidth < 600;
+            const stackAt = this.config.stack_at ?? 550;
+            const isNarrow = this.fields.length > 1 && this.containerWidth < stackAt;
 
             return this.config.mode === 'stacked' || isNarrow ? 'GridStacked' : 'GridTable';
         },
@@ -216,11 +217,10 @@ export default {
         },
 
         duplicate(index) {
-            const row = clone(this.value[index]);
-            const old_id = row._id;
-            row._id = uniqid();
+            const original = this.value[index];
+            const { values: row, meta } = this.duplicateValues(original, this.meta.existing[original._id]);
 
-            this.updateRowMeta(row._id, this.meta.existing[old_id]);
+            this.updateRowMeta(row._id, meta);
 
             this.update([...this.value, row]);
         },

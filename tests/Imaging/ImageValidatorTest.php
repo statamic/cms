@@ -8,6 +8,15 @@ use Tests\TestCase;
 
 class ImageValidatorTest extends TestCase
 {
+    public function tearDown(): void
+    {
+        (function () {
+            static::$extensionSupport = [];
+        })->call(new \Statamic\Imaging\ImageValidator(\Mockery::mock(\Intervention\Image\Interfaces\DriverInterface::class)));
+
+        parent::tearDown();
+    }
+
     #[Test]
     public function it_checks_if_image_has_valid_extension_and_mimetype()
     {
@@ -58,5 +67,19 @@ class ImageValidatorTest extends TestCase
 
         $this->assertTrue($imageValidator->isValidExtension('one'));
         $this->assertFalse($imageValidator->isValidExtension('two'));
+    }
+
+    #[Test]
+    public function it_only_asks_the_driver_about_an_extension_once()
+    {
+        $driver = \Mockery::mock(\Intervention\Image\Interfaces\DriverInterface::class);
+        $driver->shouldReceive('supports')->with('avif')->once()->andReturnTrue();
+
+        $validator = new \Statamic\Imaging\ImageValidator($driver);
+
+        $this->assertTrue($validator->isValidExtension('avif'));
+        $this->assertTrue($validator->isValidExtension('avif'));
+        $this->assertTrue($validator->isValidExtension('AVIF'));
+        $this->assertTrue((new \Statamic\Imaging\ImageValidator($driver))->isValidExtension('avif'));
     }
 }

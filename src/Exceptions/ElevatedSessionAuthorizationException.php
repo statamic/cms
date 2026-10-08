@@ -2,13 +2,14 @@
 
 namespace Statamic\Exceptions;
 
+use Illuminate\Contracts\Debug\ShouldntReport;
 use Illuminate\Http\Request;
 use Statamic\Facades\URL;
 use Statamic\Statamic;
 
 use function Statamic\trans as __;
 
-class ElevatedSessionAuthorizationException extends \Exception
+class ElevatedSessionAuthorizationException extends \Exception implements ShouldntReport
 {
     public function __construct()
     {

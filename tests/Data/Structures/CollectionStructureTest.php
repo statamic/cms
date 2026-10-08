@@ -174,14 +174,13 @@ class CollectionStructureTest extends StructureTestCase
         $this->collection->shouldReceive('route')->with('en')->once()->andReturn('{slug}');
 
         $page = $this->mock(Page::class);
-        $page->shouldReceive('reference')->andReturn('the-entry-id');
         $page->shouldReceive('setEntry')->once()->andReturnSelf();
         $page->shouldReceive('uri')->andReturn('/the-uri-from-the-page');
 
         $tree = $this->mock(Tree::class);
         $tree->shouldReceive('structure')->andReturn($structure);
         $tree->shouldReceive('locale')->andReturn('en');
-        $tree->shouldReceive('flattenedPages')->andReturn(collect([$page]));
+        $tree->shouldReceive('findByEntry')->with('the-entry-id')->andReturn($page);
 
         CollectionTreeRepository::shouldReceive('find')->with('test', 'en')->andReturn($tree);
 

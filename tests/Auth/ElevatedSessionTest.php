@@ -76,6 +76,26 @@ class ElevatedSessionTest extends TestCase
             ]);
     }
 
+    /**
+     * @see https://github.com/statamic/cms/pull/14771
+     **/
+    #[Test]
+    public function it_handles_string_config_value_for_elevated_session_duration()
+    {
+        config(['statamic.users.elevated_session_duration' => '15.5']);
+
+        $this
+            ->withElevatedSession(now()->subMinutes(5))
+            ->actingAs($this->user)
+            ->get('/cp/elevated-session')
+            ->assertOk()
+            ->assertJson([
+                'elevated' => true,
+                'expiry' => now()->addMinutes(10.5)->timestamp,
+                'method' => 'password_confirmation',
+            ]);
+    }
+
     #[Test]
     public function it_can_get_status_of_elevated_session_when_session_key_does_not_exist()
     {
@@ -198,6 +218,44 @@ class ElevatedSessionTest extends TestCase
             ->post('/cp/elevated-session', ['verification_code' => 'abc'])
             ->assertSessionHas('statamic_elevated_session', now()->timestamp)
             ->assertSessionMissing('statamic_elevated_session_verification_code');
+    }
+
+    #[Test]
+    public function it_can_get_elevated_session_status_when_two_factor_setup_is_incomplete()
+    {
+        config(['statamic.users.two_factor_enforced_roles' => ['*']]);
+
+        $this
+            ->actingAs($this->user)
+            ->getJson('/cp/elevated-session')
+            ->assertOk()
+            ->assertJson([
+                'elevated' => false,
+                'method' => 'password_confirmation',
+            ]);
+    }
+
+    #[Test]
+    public function it_can_start_an_elevated_session_when_two_factor_setup_is_incomplete()
+    {
+        config(['statamic.users.two_factor_enforced_roles' => ['*']]);
+
+        $this
+            ->actingAs($this->user)
+            ->postJson('/cp/elevated-session', ['password' => 'secret'])
+            ->assertOk()
+            ->assertSessionHas('statamic_elevated_session', now()->timestamp);
+    }
+
+    #[Test]
+    public function it_redirects_the_confirm_password_form_to_two_factor_setup_when_setup_is_incomplete()
+    {
+        config(['statamic.users.two_factor_enforced_roles' => ['*']]);
+
+        $this
+            ->actingAs($this->user)
+            ->get(cp_route('confirm-password'))
+            ->assertRedirect(cp_route('two-factor-setup'));
     }
 
     #[Test]

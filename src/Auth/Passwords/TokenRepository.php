@@ -71,6 +71,21 @@ class TokenRepository extends DatabaseTokenRepository
             && $this->hasher->check($token, $record['token']);
     }
 
+    public function findEmailByToken(#[\SensitiveParameter] string $token): ?string
+    {
+        foreach ($this->getResets() as $email => $record) {
+            if ($this->tokenExpired(Carbon::createFromTimestamp($record['created_at'], config('app.timezone')))) {
+                continue;
+            }
+
+            if ($this->hasher->check($token, $record['token'])) {
+                return $email;
+            }
+        }
+
+        return null;
+    }
+
     public function recentlyCreatedToken(CanResetPasswordContract $user)
     {
         $record = $this->getResets()->get($user->email());

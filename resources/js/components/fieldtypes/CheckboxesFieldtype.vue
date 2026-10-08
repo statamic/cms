@@ -1,9 +1,10 @@
 <template>
     <div>
-        <CheckboxGroup v-model="values" :inline="config.inline" ref="checkboxes">
+        <CheckboxGroup v-model="values" :appearance="appearance" ref="checkboxes">
             <Checkbox
                 v-for="(option, index) in options"
                 :disabled="config.disabled"
+                :id="`${id}_${index}`"
                 :key="index"
                 :label="option.label || option.value"
                 :read-only="isReadOnly"
@@ -33,6 +34,14 @@ export default {
     },
 
     computed: {
+        appearance() {
+            if (this.config.appearance !== 'default') {
+                return this.config.appearance;
+            }
+
+            return this.config.inline ? 'inline' : 'default';
+        },
+
         options() {
             return this.normalizeInputOptions(this.meta.options || this.config.options);
         },

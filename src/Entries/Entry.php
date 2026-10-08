@@ -185,7 +185,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
     public function blueprint($blueprint = null)
     {
-        $key = "entry-{$this->id()}-blueprint";
+        $key = 'entry-'.($this->id() ?? 'obj-'.spl_object_id($this)).'-blueprint';
 
         return $this
             ->fluentlyGetOrSet('blueprint')
@@ -284,6 +284,8 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         if ($withEvents) {
             EntryDeleted::dispatch($this);
         }
+
+        $withEvents ? $this->deleteRevisions() : $this->deleteRevisionsQuietly();
 
         return true;
     }
@@ -440,6 +442,13 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
         $this->ancestors()->each(fn ($entry) => Blink::forget('entry-descendants-'.$entry->id()));
 
+        if ($isNew && $this->collection()->orderable()) {
+            // The entry only gets appended to the tree when it's read, so anything that
+            // read it before now would have cached a version without this entry in it.
+            $this->collection()->structure()->flushCache($this->locale());
+            $this->collection()->updateEntryOrder([$this->id()]);
+        }
+
         $stack = InitiatorStack::entry($this)->push();
 
         $this->directDescendants()->each->{$withEvents ? 'save' : 'saveQuietly'}();
@@ -561,10 +570,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             return $this->value('order');
         }
 
-        return $this->structure()->in($this->locale())
-            ->flattenedPages()
-            ->map->reference()
-            ->flip()->get($this->id) + 1;
+        return $this->structure()->in($this->locale())->entryOrder($this->id) + 1;
     }
 
     public function template($template = null)
@@ -757,7 +763,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             'id' => $this->id(),
             'slug' => $this->slug(),
             'published' => $this->published(),
-            'date' => $this->collection()->dated() ? $this->date()->timestamp : null,
+            'date' => $this->collection()->dated() && (! $this->hasOrigin() || $this->hasExplicitDate()) ? $this->date()->timestamp : null,
             'data' => $this->data()->except(['updated_by', 'updated_at'])->all(),
         ];
     }
@@ -777,9 +783,13 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             ->data($attrs['data'])
             ->slug($attrs['slug']);
 
-        if ($this->collection()->dated() && ($date = Arr::get($attrs, 'date'))) {
-            if ($this->isRoot() || $this->blueprint()->field('date')->isLocalizable()) {
+        if ($this->collection()->dated()) {
+            $date = Arr::get($attrs, 'date');
+
+            if ($date !== null && ($this->isRoot() || $this->blueprint()->field('date')->isLocalizable())) {
                 $entry->date(Carbon::createFromTimestamp($date, config('app.timezone')));
+            } elseif ($date === null && $this->hasOrigin()) {
+                $entry->date(null);
             }
         }
 
@@ -869,8 +879,26 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
     {
         $localizations = $this->directDescendants();
 
-        foreach ($localizations as $loc) {
-            $localizations = $localizations->merge($loc->descendants());
+        // Breadth-first: fetch each level in one batched query instead of one query per node.
+        $origins = $localizations->map->id()->values()->all();
+        $seen = array_merge($origins, [$this->id()]);
+
+        while (! empty($origins)) {
+            $children = Facades\Entry::query()
+                ->where('collection', $this->collectionHandle())
+                ->whereIn('origin', $origins)
+                ->get()
+                // Guard against cyclic or duplicate origin data, which would
+                // otherwise loop forever as the same entries reappear.
+                ->reject(fn ($entry) => in_array($entry->id(), $seen, true));
+
+            if ($children->isEmpty()) {
+                break;
+            }
+
+            $localizations = $localizations->merge($children->keyBy->locale());
+            $origins = $children->map->id()->values()->all();
+            $seen = array_merge($seen, $origins);
         }
 
         return $localizations;
@@ -884,8 +912,8 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
     public function makeLocalization($site)
     {
         $localization = Facades\Entry::make()
-            ->collection($this->collection)
             ->origin($this)
+            ->collection($this->collection)
             ->locale($site)
             ->published($this->published)
             ->slug($this->slug());
@@ -968,7 +996,12 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
     public function routeData()
     {
-        $data = $this->values()->merge([
+        // This uses the `getValues(true)` method instead of values()
+        // This is so we can wrap computed fields in Value so we
+        // can delay their execution. If the computed value
+        // triggers the routeData() method, we will end
+        // up in an infinite loop that is not fun.
+        $data = $this->getValues(true)->merge([
             'id' => $this->id(),
             'slug' => $this->slug(),
             'published' => $this->published(),
@@ -1079,13 +1112,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
     public function autoGeneratedTitle()
     {
-        $format = $this->collection()->titleFormat($this->locale());
-
-        if (! Str::contains($format, '{{')) {
-            $format = preg_replace_callback('/{\s*([a-zA-Z0-9_\-\:\.]+)\s*}/', function ($match) {
-                return "{{ {$match[1]} }}";
-            }, $format);
-        }
+        $format = $this->antlersTitleFormat();
 
         // Since the slug is generated from the title, we'll avoid augmenting
         // the slug which could result in an infinite loop in some cases.
@@ -1096,6 +1123,24 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         });
 
         return trim($title);
+    }
+
+    public function autoGeneratedTitleFields()
+    {
+        return Antlers::identifiers($this->antlersTitleFormat());
+    }
+
+    private function antlersTitleFormat()
+    {
+        $format = $this->collection()->titleFormat($this->locale());
+
+        if (Str::contains($format, '{{')) {
+            return $format;
+        }
+
+        return preg_replace_callback('/{\s*([a-zA-Z0-9_\-\:\.]+)\s*}/', function ($match) {
+            return "{{ {$match[1]} }}";
+        }, $format);
     }
 
     public function previewTargets()

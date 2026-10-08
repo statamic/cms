@@ -9,8 +9,11 @@ use Statamic\Support\Str;
 abstract class Index
 {
     protected $name;
+    protected $handle;
     protected $locale;
     protected $config;
+    protected ?string $queue = null;
+    protected ?string $queueConnection = null;
     protected static ?Closure $nameCallback = null;
 
     abstract public function search($query);
@@ -25,6 +28,8 @@ abstract class Index
 
     public function __construct($name, array $config, ?string $locale = null)
     {
+        $this->handle = $name;
+
         $this->name = static::$nameCallback
             ? call_user_func(static::$nameCallback, $name, $locale)
             : ($locale ? $name.'_'.$locale : $name);
@@ -36,6 +41,11 @@ abstract class Index
     public function name()
     {
         return $this->name;
+    }
+
+    public function handle()
+    {
+        return $this->handle;
     }
 
     public static function resolveNameUsing(?Closure $callback)
@@ -90,11 +100,37 @@ abstract class Index
     {
         $documents
             ->chunk(config('statamic.search.chunk_size'))
-            ->each(fn ($documents) => InsertMultipleJob::dispatch(
-                name: $this->locale ? Str::before($this->name, "_{$this->locale}") : $this->name,
-                locale: $this->locale,
-                documents: $documents
-            ));
+            ->each(function ($documents) {
+                $job = new InsertMultipleJob(
+                    name: $this->handle,
+                    locale: $this->locale,
+                    documents: $documents
+                );
+
+                if ($this->queueConnection) {
+                    $job->onConnection($this->queueConnection);
+                }
+
+                if ($this->queue) {
+                    $job->onQueue($this->queue);
+                }
+
+                dispatch($job);
+            });
+
+        return $this;
+    }
+
+    public function onConnection(string $connection)
+    {
+        $this->queueConnection = $connection;
+
+        return $this;
+    }
+
+    public function onQueue(string $queue)
+    {
+        $this->queue = $queue;
 
         return $this;
     }

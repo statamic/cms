@@ -10,10 +10,11 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Psr\Http\Message\ResponseInterface;
+use Statamic\Console\Commands\Concerns\NormalizesPaginationHeader;
 
 class StaticWarmJob implements ShouldBeUnique, ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable;
+    use Dispatchable, InteractsWithQueue, NormalizesPaginationHeader, Queueable;
 
     public $uniqueId;
     public $tries = 1;
@@ -28,7 +29,7 @@ class StaticWarmJob implements ShouldBeUnique, ShouldQueue
         $response = (new Client($this->clientConfig))->send($this->request);
 
         if ($this->shouldWarmPaginatedPages($response)) {
-            [$currentPage, $totalPages, $pageName] = $response->getHeader('X-Statamic-Pagination');
+            [$currentPage, $totalPages, $pageName] = $this->paginationHeader($response);
 
             collect(range($currentPage, $totalPages))
                 ->map(function (int $page) use ($pageName): string {
@@ -53,7 +54,7 @@ class StaticWarmJob implements ShouldBeUnique, ShouldQueue
             return false;
         }
 
-        [$currentPage, $totalPages, $pageName] = $response->getHeader('X-Statamic-Pagination');
+        [$currentPage, $totalPages, $pageName] = $this->paginationHeader($response);
 
         return ! str_contains($this->request->getUri()->getQuery(), "{$pageName}=");
     }
