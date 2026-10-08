@@ -208,7 +208,7 @@ abstract class Connector
     {
         $fields = $this->blueprint()->fields();
 
-        return Arr::only($fields->validator()->rules(), $fields->all()->keys()->all());
+        return Arr::only($fields->validator()->withContext(['prefix' => '*.'])->rules(), $fields->all()->keys()->all());
     }
 
     public function process(array $connections): array

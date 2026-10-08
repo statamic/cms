@@ -341,6 +341,28 @@ class ConnectorTest extends TestCase
     }
 
     #[Test]
+    public function it_scopes_blueprint_rules_referencing_sibling_fields_to_each_connection()
+    {
+        $connector = new class extends TestConnector
+        {
+            public function blueprint(): \Statamic\Fields\Blueprint
+            {
+                return Blueprint::make()->setContents(['tabs' => ['main' => ['sections' => [['fields' => [
+                    ['handle' => 'mode', 'field' => ['type' => 'text']],
+                    ['handle' => 'token', 'field' => ['type' => 'text', 'validate' => ['required_if:{this}.mode,private']]],
+                ]]]]]]);
+            }
+        };
+
+        $rules = $connector->rules();
+
+        $this->assertEquals(['required_if:*.mode,private'], $rules['*.token']);
+        $this->assertEquals(['0.token'], Validator::make([['mode' => 'private']], $rules)->errors()->keys());
+        $this->assertTrue(Validator::make([['mode' => 'public'], ['mode' => 'private', 'token' => 'x']], $rules)->passes());
+        $this->assertEquals(['1.token'], Validator::make([['mode' => 'public', 'token' => 'x'], ['mode' => 'private']], $rules)->errors()->keys());
+    }
+
+    #[Test]
     public function it_compiles_for_each_connection_rules_against_each_item()
     {
         $connector = new class extends TestBlueprintConnector
