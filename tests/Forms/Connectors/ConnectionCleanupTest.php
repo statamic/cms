@@ -15,7 +15,6 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use LogicException;
 use PHPUnit\Framework\Attributes\Test;
-use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Facades\Form;
 use Statamic\Forms\Connectors\Connector;
@@ -295,7 +294,7 @@ class CountdownConnector extends Connector
 
     public function finalized(Submission $submission): object|array
     {
-        return collect($this->config())
+        return collect($this->connections())
             ->mapWithKeys(fn ($config) => [$config['id'] => match ($config['job'] ?? null) {
                 'without-middleware' => new JobWithoutMiddlewareProperty,
                 'own-middleware' => new JobWithOwnMiddlewareProperty,
@@ -307,7 +306,7 @@ class CountdownConnector extends Connector
             ->all();
     }
 
-    public function render(FormContract $form): VueComponent
+    public function render(): VueComponent
     {
         return VueComponent::render('countdown-connection');
     }

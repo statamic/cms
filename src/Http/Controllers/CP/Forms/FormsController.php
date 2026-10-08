@@ -51,7 +51,7 @@ class FormsController extends CpController
                     'title' => __($form->title()),
                     'status' => $form->status(),
                     'submissions' => $canViewSubmissions ? $form->querySubmissions()->where('site', Site::selected())->whereNull('partial')->count() : null,
-                    'connections' => $canEdit ? FormConnector::all()->sum(fn ($connector) => $connector->count($form) ?? 0) : null,
+                    'connections' => $canEdit ? FormConnector::all()->sum(fn ($connector) => $connector->forForm($form)->count() ?? 0) : null,
                     'show_url' => $form->showUrl(),
                     'submissions_url' => $form->submissionsUrl(),
                     'connect_url' => cp_route('forms.connect.index', $form->handle()),

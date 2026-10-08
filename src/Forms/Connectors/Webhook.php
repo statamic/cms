@@ -2,7 +2,6 @@
 
 namespace Statamic\Forms\Connectors;
 
-use Statamic\Contracts\Forms\Form;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\User;
@@ -39,15 +38,15 @@ class Webhook extends Connector
         return new SendWebhook($submission, $submission->site(), $connection);
     }
 
-    public function render(Form $form): VueComponent
+    public function render(): VueComponent
     {
         return VueComponent::render('webhook-connector', [
-            ...$this->blueprintProps($form, $form->connections()->get('webhook', [])),
-            'examplePayload' => $this->examplePayload($form),
+            ...$this->blueprintProps(),
+            'examplePayload' => $this->examplePayload(),
         ]);
     }
 
-    protected function connectionRules(Form $form): array
+    protected function connectionRules(): array
     {
         return [
             'url' => ['url:http,https', new WebhookConnectionUrl],
@@ -55,9 +54,9 @@ class Webhook extends Connector
         ];
     }
 
-    protected function processConnection(array $connection, Form $form): array
+    protected function processConnection(array $connection): array
     {
-        $values = parent::processConnection($connection, $form);
+        $values = parent::processConnection($connection);
 
         return [
             ...$values,
@@ -65,7 +64,7 @@ class Webhook extends Connector
         ];
     }
 
-    public function blueprint(Form $form): \Statamic\Fields\Blueprint
+    public function blueprint(): \Statamic\Fields\Blueprint
     {
         return Blueprint::make()->setContents([
             'tabs' => [
@@ -100,8 +99,9 @@ class Webhook extends Connector
         ]);
     }
 
-    private function examplePayload(Form $form): string
+    private function examplePayload(): string
     {
+        $form = $this->form();
         $latestSubmission = null;
 
         if (User::current()->can('viewSubmissions', $form)) {

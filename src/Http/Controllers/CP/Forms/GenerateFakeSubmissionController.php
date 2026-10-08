@@ -48,7 +48,7 @@ class GenerateFakeSubmissionController extends CpController
         $submission->save();
 
         if ($validated['mode'] === 'full_pipeline') {
-            $email = FormConnector::find('email')?->setConfig($form->connections()->get('email', []));
+            $email = FormConnector::find('email')?->forForm($form);
 
             foreach ($email?->finalized($submission) ?? [] as $job) {
                 Bus::dispatch($job);

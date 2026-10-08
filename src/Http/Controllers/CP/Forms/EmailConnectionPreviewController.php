@@ -19,9 +19,11 @@ class EmailConnectionPreviewController extends CpController
 {
     public function __invoke(Request $request, $form, EmailConnector $connector, FakeSubmissionGenerator $generator)
     {
-        Validator::make([$request->all()], $connector->rules($form))->validate();
+        $connector->setForm($form);
 
-        $config = $connector->process([$request->all()], $form)[0];
+        Validator::make([$request->all()], $connector->rules())->validate();
+
+        $config = $connector->process([$request->all()])[0];
         $latest = $this->latestSubmission($form);
         $submission = $latest ?? $this->sampleSubmission($form, $generator);
         $email = new Email($submission, $config, $submission->site());

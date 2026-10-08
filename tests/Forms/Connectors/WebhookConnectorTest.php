@@ -47,7 +47,7 @@ class WebhookConnectorTest extends TestCase
             ['url' => 'https://example.com/second'],
         ]]))->save();
 
-        $jobs = (new Webhook)->setConfig($form->connections()->get('webhook'))->finalized($form->makeSubmission());
+        $jobs = (new Webhook)->forForm($form)->finalized($form->makeSubmission());
 
         $this->assertCount(2, $jobs);
         $this->assertContainsOnlyInstancesOf(SendWebhook::class, $jobs);
@@ -63,7 +63,7 @@ class WebhookConnectorTest extends TestCase
             ['url' => 'https://example.com/enabled', 'enabled' => true],
         ]]))->save();
 
-        $jobs = array_values((new Webhook)->setConfig($form->connections()->get('webhook'))->finalized($form->makeSubmission()));
+        $jobs = array_values((new Webhook)->forForm($form)->finalized($form->makeSubmission()));
 
         $this->assertCount(1, $jobs);
         $this->assertEquals('https://example.com/enabled', $jobs[0]->config['url']);
@@ -83,7 +83,7 @@ class WebhookConnectorTest extends TestCase
 
         $submission = $form->makeSubmission()->data(['how_did_you_hear' => $value]);
 
-        $this->assertCount($shouldDispatch ? 1 : 0, (new Webhook)->setConfig($form->connections()->get('webhook'))->finalized($submission));
+        $this->assertCount($shouldDispatch ? 1 : 0, (new Webhook)->forForm($form)->finalized($submission));
     }
 
     public static function webhookConditionsProvider(): array
@@ -331,7 +331,7 @@ class WebhookConnectorTest extends TestCase
     {
         $form = tap(Form::make('test')->connections(['webhook' => $webhooks]))->save();
 
-        $this->assertEquals($count, (new Webhook)->count($form));
+        $this->assertEquals($count, (new Webhook)->forForm($form)->count());
     }
 
     public static function webhookCountProvider(): array
@@ -357,7 +357,7 @@ class WebhookConnectorTest extends TestCase
             ['id' => 'two', 'url' => 'https://example.com/second', 'verify_ssl' => false],
         ]]))->save();
 
-        $component = (new Webhook)->render($form)->toArray();
+        $component = (new Webhook)->forForm($form)->render()->toArray();
 
         $this->assertEquals('webhook-connector', $component['name']);
         $this->assertEquals(['blueprint', 'meta', 'defaults', 'examplePayload'], array_keys($component['props']));
@@ -396,7 +396,7 @@ class WebhookConnectorTest extends TestCase
 
     private function examplePayload($form): array
     {
-        $payload = (new Webhook)->render($form)->toArray()['props']['examplePayload'];
+        $payload = (new Webhook)->forForm($form)->render()->toArray()['props']['examplePayload'];
 
         $this->assertJson($payload);
 
@@ -415,7 +415,7 @@ class WebhookConnectorTest extends TestCase
             ['id' => 'two', 'url' => 'https://example.com/second', 'verify_ssl' => false, 'enabled' => false],
         ]]))->save();
 
-        $configs = (new Webhook)->preProcess($form->connections()->get('webhook'), $form);
+        $configs = (new Webhook)->setForm($form)->preProcess($form->connections()->get('webhook'));
 
         $this->assertEquals('one', $configs[0]['id']);
         $this->assertTrue($configs[0]['enabled']);
@@ -444,7 +444,7 @@ class WebhookConnectorTest extends TestCase
                 'enabled' => true,
                 'conditions' => [['field' => 'name', 'operator' => 'equals', 'value' => 'Bob', 'join' => 'and']],
             ],
-        ], (new Webhook)->rules($form));
+        ], (new Webhook)->setForm($form)->rules());
 
         $this->assertTrue($validator->passes());
     }
@@ -455,7 +455,7 @@ class WebhookConnectorTest extends TestCase
         $form = tap(Form::make('test'))->save();
 
         foreach (['http://169.254.169.254/', 'http://localhost:8080/hook', 'https://internal.test/hook', 'https://unresolvable.test/hook'] as $url) {
-            $validator = Validator::make([['url' => $url]], (new Webhook)->rules($form));
+            $validator = Validator::make([['url' => $url]], (new Webhook)->setForm($form)->rules());
 
             $this->assertTrue($validator->fails(), $url);
             $this->assertTrue($validator->errors()->has('0.url'), $url);
@@ -468,7 +468,7 @@ class WebhookConnectorTest extends TestCase
     {
         $form = tap(Form::make('test'))->save();
 
-        $validator = Validator::make([['url' => 'https://user:pass@example.com/hook']], (new Webhook)->rules($form));
+        $validator = Validator::make([['url' => 'https://user:pass@example.com/hook']], (new Webhook)->setForm($form)->rules());
 
         $this->assertTrue($validator->passes());
     }
@@ -480,7 +480,7 @@ class WebhookConnectorTest extends TestCase
 
         $form = tap(Form::make('test'))->save();
 
-        $validator = Validator::make([['url' => 'http://localhost:8080/hook']], (new Webhook)->rules($form));
+        $validator = Validator::make([['url' => 'http://localhost:8080/hook']], (new Webhook)->setForm($form)->rules());
 
         $this->assertTrue($validator->passes());
     }
@@ -491,7 +491,7 @@ class WebhookConnectorTest extends TestCase
     {
         $form = tap(Form::make('test'))->save();
 
-        $validator = Validator::make($configs, (new Webhook)->rules($form));
+        $validator = Validator::make($configs, (new Webhook)->setForm($form)->rules());
 
         $this->assertTrue($validator->fails());
 
@@ -525,13 +525,13 @@ class WebhookConnectorTest extends TestCase
             ]],
             ['id' => 'ghi', 'url' => 'http://localhost:5678/n8n', 'verify_ssl' => false],
             ['id' => 'jkl', 'url' => 'https://example.com/defaults'],
-        ], (new Webhook)->process([
+        ], (new Webhook)->setForm($form)->process([
             ['id' => 'def', 'url' => 'https://example.com/updated', 'enabled' => false, 'conditions' => [
                 ['_id' => 'vue-row', 'field' => 'name', 'operator' => 'equals', 'value' => 'Bob', 'join' => 'and'],
             ]],
             ['id' => 'ghi', 'url' => 'http://localhost:5678/n8n', 'verify_ssl' => false],
             ['id' => 'jkl', 'url' => 'https://example.com/defaults', 'enabled' => true, 'verify_ssl' => true],
-        ], $form));
+        ]));
     }
 
     #[Test]
@@ -541,9 +541,9 @@ class WebhookConnectorTest extends TestCase
 
         $this->assertEquals([
             ['id' => 'abc', 'url' => 'https://example.com/hook'],
-        ], (new Webhook)->process([
+        ], (new Webhook)->setForm($form)->process([
             ['_id' => 'vue-row', 'id' => 'abc', 'url' => 'https://example.com/hook'],
-        ], $form));
+        ]));
     }
 
     #[Test]
@@ -551,7 +551,7 @@ class WebhookConnectorTest extends TestCase
     {
         $form = tap(Form::make('test'))->save();
 
-        $config = (new Webhook)->process([['url' => 'https://example.com/hook']], $form)[0];
+        $config = (new Webhook)->setForm($form)->process([['url' => 'https://example.com/hook']])[0];
 
         $this->assertNotEmpty($config['id']);
         $this->assertEquals('https://example.com/hook', $config['url']);
@@ -565,10 +565,10 @@ class WebhookConnectorTest extends TestCase
         $this->assertEquals([[
             'id' => 'abc',
             'url' => 'https://example.com/hook',
-        ]], (new Webhook)->process([[
+        ]], (new Webhook)->setForm($form)->process([[
             'id' => 'abc',
             'url' => 'https://example.com/hook',
             'enabled' => null,
-        ]], $form));
+        ]]));
     }
 }

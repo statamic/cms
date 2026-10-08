@@ -3,7 +3,6 @@
 namespace Statamic\Forms\Connectors;
 
 use Illuminate\Routing\Router;
-use Statamic\Contracts\Forms\Form;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Facades\Blueprint;
 use Statamic\Fields\Fields;
@@ -42,17 +41,17 @@ class Email extends Connector
         return new $class($submission, $submission->site(), $connection);
     }
 
-    public function render(Form $form): VueComponent
+    public function render(): VueComponent
     {
         return VueComponent::render('email-connector', [
-            ...$this->blueprintProps($form, $form->connections()->get('email', [])),
-            'previewUrl' => cp_route('forms.connect.email.preview', $form->handle()),
+            ...$this->blueprintProps(),
+            'previewUrl' => cp_route('forms.connect.email.preview', $this->form()->handle()),
         ]);
     }
 
-    protected function connectionFields(array $connection, Form $form): Fields
+    protected function connectionFields(array $connection): Fields
     {
-        return parent::connectionFields($this->convertLegacyAddresses($connection), $form);
+        return parent::connectionFields($this->convertLegacyAddresses($connection));
     }
 
     private function convertLegacyAddresses(array $config): array
@@ -66,22 +65,22 @@ class Email extends Connector
         return $config;
     }
 
-    protected function connectionRules(Form $form): array
+    protected function connectionRules(): array
     {
         return [
-            'to' => [new EmailConnectionAddress($form)],
-            'cc' => [new EmailConnectionAddress($form)],
-            'bcc' => [new EmailConnectionAddress($form)],
-            'from' => [new EmailConnectionAddress($form)],
-            'reply_to' => [new EmailConnectionAddress($form)],
+            'to' => [new EmailConnectionAddress($this->form())],
+            'cc' => [new EmailConnectionAddress($this->form())],
+            'bcc' => [new EmailConnectionAddress($this->form())],
+            'from' => [new EmailConnectionAddress($this->form())],
+            'reply_to' => [new EmailConnectionAddress($this->form())],
             'html' => [new EmailConnectionView],
             'text' => [new EmailConnectionView],
         ];
     }
 
-    protected function processConnection(array $connection, Form $form): array
+    protected function processConnection(array $connection): array
     {
-        $values = parent::processConnection($connection, $form);
+        $values = parent::processConnection($connection);
 
         return [
             ...$values,
@@ -95,7 +94,7 @@ class Email extends Connector
         $router->post('preview', EmailConnectionPreviewController::class)->name('preview');
     }
 
-    public function blueprint(Form $form): \Statamic\Fields\Blueprint
+    public function blueprint(): \Statamic\Fields\Blueprint
     {
         return Blueprint::make()->setContents([
             'tabs' => [
@@ -110,7 +109,7 @@ class Email extends Connector
                                         'display' => __('Recipient(s)'),
                                         'validate' => ['required'],
                                         'instructions' => __('statamic::messages.form_configure_email_to_instructions'),
-                                        'form' => $form->handle(),
+                                        'form' => $this->form()->handle(),
                                         'prefix' => 'field:',
                                         'taggable' => true,
                                         'multiple' => true,
@@ -121,7 +120,7 @@ class Email extends Connector
                                     'field' => [
                                         'type' => 'form_fields',
                                         'display' => __('CC Recipient(s)'),
-                                        'form' => $form->handle(),
+                                        'form' => $this->form()->handle(),
                                         'prefix' => 'field:',
                                         'taggable' => true,
                                         'multiple' => true,
@@ -133,7 +132,7 @@ class Email extends Connector
                                     'field' => [
                                         'type' => 'form_fields',
                                         'display' => __('BCC Recipient(s)'),
-                                        'form' => $form->handle(),
+                                        'form' => $this->form()->handle(),
                                         'prefix' => 'field:',
                                         'taggable' => true,
                                         'multiple' => true,
@@ -147,7 +146,7 @@ class Email extends Connector
                                         'display' => __('Sender'),
                                         'instructions' => __('statamic::messages.form_configure_email_from_instructions'),
                                         'placeholder' => config('mail.from.address'),
-                                        'form' => $form->handle(),
+                                        'form' => $this->form()->handle(),
                                         'prefix' => 'field:',
                                         'taggable' => true,
                                         'clearable' => true,
@@ -160,7 +159,7 @@ class Email extends Connector
                                         'type' => 'form_fields',
                                         'display' => __('Reply To'),
                                         'instructions' => __('statamic::messages.form_configure_email_reply_to_instructions'),
-                                        'form' => $form->handle(),
+                                        'form' => $this->form()->handle(),
                                         'prefix' => 'field:',
                                         'taggable' => true,
                                         'multiple' => true,

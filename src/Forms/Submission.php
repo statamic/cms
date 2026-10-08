@@ -279,7 +279,7 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
         CreateAssetsFromFileUploads::dispatchSync($this);
 
         $jobs = $this->form()->connections()
-            ->map(fn ($config, $handle) => FormConnector::find($handle)?->setConfig($config)->finalized($this))
+            ->map(fn ($connections, $handle) => FormConnector::find($handle)?->setForm($this->form())->setConnections($connections)->finalized($this))
             ->flatten()
             ->filter()
             ->each(fn ($job) => RecordConnectionSuccess::ensureAttachable($job))

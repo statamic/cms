@@ -37,7 +37,7 @@ class EmailConnectorTest extends TestCase
             ['id' => 'two', 'to' => ['second@example.com']],
         ]]))->save();
 
-        $jobs = (new Email)->setConfig($form->connections()->get('email'))->finalized($form->makeSubmission());
+        $jobs = (new Email)->forForm($form)->finalized($form->makeSubmission());
 
         $this->assertCount(2, $jobs);
         $this->assertContainsOnlyInstancesOf(SendEmail::class, $jobs);
@@ -54,7 +54,7 @@ class EmailConnectorTest extends TestCase
             ['id' => 'one', 'to' => ['first@example.com']],
         ]]))->save();
 
-        $jobs = (new Email)->setConfig($form->connections()->get('email'))->finalized($form->makeSubmission());
+        $jobs = (new Email)->forForm($form)->finalized($form->makeSubmission());
 
         $this->assertContainsOnlyInstancesOf(CustomSendEmail::class, $jobs);
     }
@@ -72,7 +72,7 @@ class EmailConnectorTest extends TestCase
             ['id' => 'disabled', 'to' => ['disabled@example.com'], 'enabled' => false],
         ]]))->save();
 
-        $jobs = (new Email)->setConfig($form->connections()->get('email'))->finalized($form->makeSubmission()->data(['department' => 'support']));
+        $jobs = (new Email)->forForm($form)->finalized($form->makeSubmission()->data(['department' => 'support']));
 
         $this->assertCount(1, $jobs);
         $this->assertEquals('support', $jobs[0]->config['id']);
@@ -84,7 +84,7 @@ class EmailConnectorTest extends TestCase
     {
         $form = tap(Form::make('test')->connections(['email' => $emails]))->save();
 
-        $this->assertEquals($count, (new Email)->count($form));
+        $this->assertEquals($count, (new Email)->forForm($form)->count());
     }
 
     public static function emailCountProvider(): array
@@ -104,7 +104,7 @@ class EmailConnectorTest extends TestCase
             ['id' => 'two', 'to' => ['second@example.com'], 'subject' => 'Second'],
         ]]))->save();
 
-        $component = (new Email)->render($form)->toArray();
+        $component = (new Email)->forForm($form)->render()->toArray();
 
         $this->assertEquals('email-connector', $component['name']);
         $this->assertEquals(['blueprint', 'meta', 'defaults', 'previewUrl'], array_keys($component['props']));
@@ -409,6 +409,20 @@ class EmailConnectorTest extends TestCase
     }
 
     #[Test]
+    public function it_renders_the_bound_connections_rather_than_the_stored_ones()
+    {
+        $form = tap(Form::make('test')->connections(['email' => [
+            ['id' => 'stored', 'to' => ['stored@example.com']],
+        ]]))->save();
+
+        $component = (new Email)->setForm($form)->setConnections([
+            ['id' => 'override', 'to' => ['override@example.com']],
+        ])->render()->toArray();
+
+        $this->assertEquals(['override'], array_keys($component['props']['meta']));
+    }
+
+    #[Test]
     public function it_pre_processes_email_configs()
     {
         $form = tap(Form::make('test')->connections(['email' => [
@@ -421,7 +435,7 @@ class EmailConnectorTest extends TestCase
             ['id' => 'two', 'to' => ['second@example.com'], 'subject' => 'Second', 'enabled' => false],
         ]]))->save();
 
-        $configs = (new Email)->preProcess($form->connections()->get('email'), $form);
+        $configs = (new Email)->setForm($form)->preProcess($form->connections()->get('email'));
 
         $this->assertEquals('one', $configs[0]['id']);
         $this->assertTrue($configs[0]['enabled']);
@@ -445,7 +459,7 @@ class EmailConnectorTest extends TestCase
             ['id' => 'one', $handle => 'first@example.com, second@example.com'],
         ]]))->save();
 
-        $configs = (new Email)->preProcess($form->connections()->get('email'), $form);
+        $configs = (new Email)->setForm($form)->preProcess($form->connections()->get('email'));
 
         $this->assertEquals(['first@example.com', 'second@example.com'], $configs[0][$handle]);
     }
@@ -459,17 +473,17 @@ class EmailConnectorTest extends TestCase
         {
             public array $metaValues = [];
 
-            protected function connectionMeta(array $connection, \Statamic\Contracts\Forms\Form $form): array
+            protected function connectionMeta(array $connection): array
             {
-                $fields = $this->connectionFields($connection, $form);
+                $fields = $this->connectionFields($connection);
                 $this->metaValues[$connection['id']] = $fields->values()->only(['to', 'cc'])->all();
 
                 return $fields->meta()->all();
             }
         };
 
-        $form->connections(['email' => [['id' => 'one', 'to' => 'a@example.com, b@example.com', 'cc' => 'c@example.com']]]);
-        $props = $email->render($form)->toArray()['props'];
+        $email->setForm($form)->setConnections([['id' => 'one', 'to' => 'a@example.com, b@example.com', 'cc' => 'c@example.com']]);
+        $props = $email->render()->toArray()['props'];
 
         $this->assertEquals(['one'], array_keys($props['meta']));
         $this->assertEquals(['to' => ['a@example.com', 'b@example.com'], 'cc' => ['c@example.com']], $email->metaValues['one']);
@@ -502,7 +516,7 @@ class EmailConnectorTest extends TestCase
                 'enabled' => true,
                 'conditions' => [['field' => 'name', 'operator' => 'equals', 'value' => 'Bob', 'join' => 'and']],
             ],
-        ], (new Email)->rules($form));
+        ], (new Email)->setForm($form)->rules());
 
         $this->assertTrue($validator->passes());
     }
@@ -513,7 +527,7 @@ class EmailConnectorTest extends TestCase
     {
         $form = tap(Form::make('test'))->save();
 
-        $validator = Validator::make($configs, (new Email)->rules($form));
+        $validator = Validator::make($configs, (new Email)->setForm($form)->rules());
 
         $this->assertTrue($validator->fails());
 
@@ -554,13 +568,13 @@ class EmailConnectorTest extends TestCase
                 ['field' => 'name', 'operator' => 'equals', 'value' => 'Bob', 'join' => 'and'],
             ]],
             ['id' => 'ghi', 'to' => ['third@example.com'], 'markdown' => true, 'attachments' => true],
-        ], (new Email)->process([
+        ], (new Email)->setForm($form)->process([
             ['id' => 'abc', 'to' => ['new@example.com', 'field:email'], 'subject' => 'Updated', 'enabled' => true, 'markdown' => false, 'attachments' => false],
             ['id' => 'def', 'to' => ['another@example.com'], 'enabled' => false, 'conditions' => [
                 ['_id' => 'vue-row', 'field' => 'name', 'operator' => 'equals', 'value' => 'Bob', 'join' => 'and'],
             ]],
             ['id' => 'ghi', 'to' => ['third@example.com'], 'markdown' => true, 'attachments' => true],
-        ], $form));
+        ]));
     }
 
     #[Test]
@@ -570,9 +584,9 @@ class EmailConnectorTest extends TestCase
 
         $this->assertEquals([
             ['id' => 'abc', 'to' => ['foo@example.com']],
-        ], (new Email)->process([
+        ], (new Email)->setForm($form)->process([
             ['_id' => 'vue-row', 'id' => 'abc', 'to' => ['foo@example.com']],
-        ], $form));
+        ]));
     }
 
     #[Test]
@@ -580,7 +594,7 @@ class EmailConnectorTest extends TestCase
     {
         $form = tap(Form::make('test'))->save();
 
-        $config = (new Email)->process([['to' => ['foo@example.com']]], $form)[0];
+        $config = (new Email)->setForm($form)->process([['to' => ['foo@example.com']]])[0];
 
         $this->assertNotEmpty($config['id']);
         $this->assertEquals(['foo@example.com'], $config['to']);
@@ -594,13 +608,13 @@ class EmailConnectorTest extends TestCase
         $this->assertEquals([[
             'id' => 'abc',
             'to' => ['foo@example.com'],
-        ]], (new Email)->process([[
+        ]], (new Email)->setForm($form)->process([[
             'id' => 'abc',
             'to' => ['foo@example.com'],
             'cc' => [],
             'subject' => '',
             'reply_to' => null,
-        ]], $form));
+        ]]));
     }
 
     #[Test]
@@ -615,7 +629,7 @@ class EmailConnectorTest extends TestCase
             ],
         ]))->save();
 
-        $meta = (new Email)->blueprint($form)->fields()->meta();
+        $meta = (new Email)->setForm($form)->blueprint()->fields()->meta();
 
         foreach (['to', 'cc', 'bcc', 'from', 'reply_to'] as $handle) {
             $this->assertEquals([

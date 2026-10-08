@@ -4,6 +4,7 @@ namespace Statamic\Forms\Connectors;
 
 use Illuminate\Contracts\Validation\CompilableRules;
 use Illuminate\Routing\Router;
+use LogicException;
 use Statamic\Contracts\Forms\Form;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Extend\HasHandle;
@@ -27,23 +28,45 @@ abstract class Connector
     protected $icon;
     protected $smallIcon;
     protected $developer;
-    protected $config = [];
+    protected ?Form $form = null;
+    protected array $connections = [];
 
     public static function handle(): string
     {
         return Str::removeRight(static::traitHandle(), '_connector');
     }
 
-    public function setConfig(array $config): static
+    public function setForm(Form $form): static
     {
-        $this->config = static::normalizeConnections($config);
+        $this->form = $form;
 
         return $this;
     }
 
-    public function config(): array
+    public function form(): Form
     {
-        return $this->config;
+        if (! $this->form) {
+            throw new LogicException('No form has been set on the ['.static::handle().'] connector.');
+        }
+
+        return $this->form;
+    }
+
+    public function setConnections(array $connections): static
+    {
+        $this->connections = static::normalizeConnections($connections);
+
+        return $this;
+    }
+
+    public function connections(): array
+    {
+        return $this->connections;
+    }
+
+    public function forForm(Form $form): static
+    {
+        return $this->setForm($form)->setConnections($form->connections()->get(static::handle(), []));
     }
 
     public function description(): ?string
@@ -82,9 +105,9 @@ abstract class Connector
             ->all();
     }
 
-    public function count(Form $form): ?int
+    public function count(): ?int
     {
-        return count($form->connections()->get(static::handle(), []));
+        return count($this->connections());
     }
 
     public function isConfigured(): bool
@@ -94,7 +117,7 @@ abstract class Connector
 
     public function finalized(Submission $submission): object|array
     {
-        return collect($this->config())
+        return collect($this->connections())
             ->filter(fn (array $connection) => ConnectionLogic::passes($connection, $submission))
             ->map(fn (array $connection) => $this->job($submission, $connection))
             ->filter()
@@ -107,34 +130,34 @@ abstract class Connector
         return null;
     }
 
-    abstract public function render(Form $form): VueComponent;
+    abstract public function render(): VueComponent;
 
-    public function blueprint(Form $form): ?Blueprint
+    public function blueprint(): ?Blueprint
     {
         return null;
     }
 
-    protected function connectionFields(array $connection, Form $form): Fields
+    protected function connectionFields(array $connection): Fields
     {
-        return $this->blueprint($form)->fields()->addValues($connection)->preProcess();
+        return $this->blueprint()->fields()->addValues($connection)->preProcess();
     }
 
-    protected function connectionMeta(array $connection, Form $form): array
+    protected function connectionMeta(array $connection): array
     {
-        return $this->connectionFields($connection, $form)->meta()->all();
+        return $this->connectionFields($connection)->meta()->all();
     }
 
-    protected function blueprintProps(Form $form, array $connections): array
+    protected function blueprintProps(): array
     {
-        $blueprint = $this->blueprint($form);
+        $blueprint = $this->blueprint();
         $fields = $blueprint->fields()->preProcess();
 
         return [
             'blueprint' => $blueprint->toPublishArray(),
-            'meta' => collect(static::normalizeConnections($connections))
+            'meta' => collect($this->connections())
                 ->filter(fn (array $connection): bool => isset($connection['id']))
                 ->mapWithKeys(fn (array $connection): array => [
-                    $connection['id'] => $this->connectionMeta($connection, $form),
+                    $connection['id'] => $this->connectionMeta($connection),
                 ])
                 ->all(),
             'defaults' => [
@@ -144,11 +167,11 @@ abstract class Connector
         ];
     }
 
-    public function preProcess(array $config, Form $form): array
+    public function preProcess(array $connections): array
     {
-        return collect(static::normalizeConnections($config))
+        return collect(static::normalizeConnections($connections))
             ->map(fn (array $connection): array => [
-                ...$this->preProcessConnection($connection, $form),
+                ...$this->preProcessConnection($connection),
                 'id' => Arr::get($connection, 'id') ?? Str::random(8),
                 'enabled' => Arr::get($connection, 'enabled') !== false,
                 'conditions' => ConnectionLogic::preProcess(Arr::get($connection, 'conditions') ?? []),
@@ -156,25 +179,25 @@ abstract class Connector
             ->all();
     }
 
-    protected function preProcessConnection(array $connection, Form $form): array
+    protected function preProcessConnection(array $connection): array
     {
-        if (! $this->blueprint($form)) {
+        if (! $this->blueprint()) {
             return $connection;
         }
 
-        return $this->connectionFields($connection, $form)->values()->all();
+        return $this->connectionFields($connection)->values()->all();
     }
 
-    public function rules(Form $form): array
+    public function rules(): array
     {
-        $connectionRules = collect($this->connectionRules($form));
+        $connectionRules = collect($this->connectionRules());
 
         // Laravel only compiles rules like Rule::forEach() when they're the key's entire value, so they can't be merged.
         [$compilable, $connectionRules] = $connectionRules->partition(fn ($rules) => $rules instanceof CompilableRules);
 
         return [
             '*' => ['array'],
-            ...collect($this->blueprintRules($form))
+            ...collect($this->blueprintRules())
                 ->mergeRecursive($connectionRules->map(fn ($rules) => is_object($rules) ? [$rules] : Validator::explodeRules($rules)))
                 ->merge($compilable)
                 ->mapWithKeys(fn ($rules, $key) => ['*.'.$key => $rules])
@@ -185,15 +208,15 @@ abstract class Connector
         ];
     }
 
-    protected function connectionRules(Form $form): array
+    protected function connectionRules(): array
     {
         return [];
     }
 
     // Only top-level field rules can be derived without values. Grid sub-field rules belong in connectionRules().
-    private function blueprintRules(Form $form): array
+    private function blueprintRules(): array
     {
-        if (! $blueprint = $this->blueprint($form)) {
+        if (! $blueprint = $this->blueprint()) {
             return [];
         }
 
@@ -202,15 +225,15 @@ abstract class Connector
         return Arr::only($fields->validator()->rules(), $fields->all()->keys()->all());
     }
 
-    public function process(array $config, Form $form): array
+    public function process(array $connections): array
     {
-        return collect(static::normalizeConnections($config))
-            ->map(function (array $connection) use ($form): array {
+        return collect(static::normalizeConnections($connections))
+            ->map(function (array $connection): array {
                 $connection = Arr::removeNullValues($connection);
 
                 return Arr::removeNullValues([
                     'id' => Arr::get($connection, 'id') ?? Str::random(8),
-                    ...$this->processConnection(Arr::except($connection, ['id', 'enabled', 'conditions']), $form),
+                    ...$this->processConnection(Arr::except($connection, ['id', 'enabled', 'conditions'])),
                     'enabled' => Arr::get($connection, 'enabled') === false ? false : null,
                     'conditions' => ConnectionLogic::process(Arr::get($connection, 'conditions') ?? []),
                 ]);
@@ -218,9 +241,9 @@ abstract class Connector
             ->all();
     }
 
-    protected function processConnection(array $connection, Form $form): array
+    protected function processConnection(array $connection): array
     {
-        if (! $blueprint = $this->blueprint($form)) {
+        if (! $blueprint = $this->blueprint()) {
             return $connection;
         }
 

@@ -38,7 +38,7 @@ class ConnectorRepositoryTest extends TestCase
 
 class RoutedConnector extends Connector
 {
-    public function render($form): VueComponent
+    public function render(): VueComponent
     {
         return VueComponent::render('routed-connector');
     }
