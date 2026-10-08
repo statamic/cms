@@ -2,15 +2,21 @@
 
 namespace Tests\Feature\Forms;
 
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Contracts\Forms\Submission;
 use Statamic\Events\FormSubmitted;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
+use Statamic\Fields\Blueprint as FieldsBlueprint;
+use Statamic\Forms\Connectors\Connector;
 use Statamic\Forms\SendEmail;
+use Statamic\Support\VueComponent;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -131,6 +137,29 @@ class GenerateFakeSubmissionTest extends TestCase
         Event::assertDispatched(FormSubmitted::class);
         Bus::assertDispatchedTimes(SendEmail::class, 2);
         $this->assertEquals(1, $form->querySubmissions()->count());
+    }
+
+    #[Test]
+    public function full_pipeline_mode_dispatches_jobs_for_every_connector()
+    {
+        Bus::fake();
+        FakeSubmissionConnector::register();
+
+        $form = $this->makeForm('contact');
+        $form->connections([
+            'email' => [['to' => 'first@example.com']],
+            'fake_submission' => [['id' => 'one'], ['id' => 'two', 'enabled' => false]],
+        ])->save();
+        $user = $this->userWithConfigureFormsPermission();
+
+        $this
+            ->actingAs($user)
+            ->post(cp_route('forms.submissions.generate-fake', $form->handle()), ['mode' => 'full_pipeline'])
+            ->assertOk();
+
+        Bus::assertDispatchedTimes(SendEmail::class, 1);
+        Bus::assertDispatchedTimes(FakeSubmissionConnectorJob::class, 1);
+        Bus::assertDispatched(FakeSubmissionConnectorJob::class, fn ($job) => $job->id === 'one');
     }
 
     #[Test]
@@ -260,5 +289,37 @@ class GenerateFakeSubmissionTest extends TestCase
         $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
 
         return User::make()->assignRole('test')->save();
+    }
+}
+
+class FakeSubmissionConnector extends Connector
+{
+    public function render(): VueComponent
+    {
+        return VueComponent::render('fake-submission-connector');
+    }
+
+    public function blueprint(): FieldsBlueprint
+    {
+        return Blueprint::make();
+    }
+
+    protected function job(Submission $submission, array $connection): ?object
+    {
+        return new FakeSubmissionConnectorJob($connection['id']);
+    }
+}
+
+class FakeSubmissionConnectorJob implements ShouldQueue
+{
+    use Queueable;
+
+    public function __construct(public string $id)
+    {
+    }
+
+    public function handle(): void
+    {
+        //
     }
 }

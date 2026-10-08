@@ -5,7 +5,6 @@ namespace Statamic\Http\Controllers\CP\Forms;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Bus;
 use Statamic\Events\FormSubmitted;
-use Statamic\Facades\FormConnector;
 use Statamic\Facades\Site;
 use Statamic\Forms\FakeSubmissionGenerator;
 use Statamic\Http\Controllers\CP\CpController;
@@ -48,10 +47,8 @@ class GenerateFakeSubmissionController extends CpController
         $submission->save();
 
         if ($validated['mode'] === 'full_pipeline') {
-            $email = FormConnector::find('email')?->forForm($form);
-
-            foreach ($email?->finalized($submission) ?? [] as $job) {
-                Bus::dispatch($job);
+            foreach ($submission->connectionJobs() as $job) {
+                rescue(fn () => Bus::dispatch($job));
             }
         }
 

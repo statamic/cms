@@ -278,13 +278,7 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
         // Assets need to exist before anything reads the submission, so this stays synchronous.
         CreateAssetsFromFileUploads::dispatchSync($this);
 
-        $jobs = $this->form()->connections()
-            ->map(fn ($connections, $handle) => FormConnector::find($handle)?->setForm($this->form())->setConnections($connections)->finalized($this))
-            ->flatten()
-            ->filter()
-            ->each(fn ($job) => RecordConnectionSuccess::ensureAttachable($job))
-            ->values()
-            ->all();
+        $jobs = $this->connectionJobs();
 
         if ($this->shouldDeleteTemporaryFiles()) {
             if ($jobs) {
@@ -300,6 +294,17 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
         }
 
         return $this;
+    }
+
+    public function connectionJobs(): array
+    {
+        return $this->form()->connections()
+            ->map(fn ($connections, $handle) => FormConnector::find($handle)?->setForm($this->form())->setConnections($connections)->finalized($this))
+            ->flatten()
+            ->filter()
+            ->each(fn ($job) => RecordConnectionSuccess::ensureAttachable($job))
+            ->values()
+            ->all();
     }
 
     private function shouldDeleteTemporaryFiles(): bool
