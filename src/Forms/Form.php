@@ -450,6 +450,7 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
     private function connectionsFileData(): array
     {
         return $this->connections()
+            ->filter()
             ->map(fn (array $connections) => array_map(fn (array $connection) => Arr::removeNullValues($connection), $connections))
             ->all();
     }

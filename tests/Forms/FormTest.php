@@ -557,6 +557,43 @@ class FormTest extends TestCase
     }
 
     #[Test]
+    public function it_does_not_save_empty_connection_lists()
+    {
+        $form = Form::make('contact_us')->connections([
+            'email' => [],
+            'webhook' => [['url' => 'https://example.com/hook']],
+        ]);
+        $form->save();
+
+        $saved = YAML::parse(File::get($form->path()));
+
+        $this->assertEquals(['webhook'], array_keys($saved['connections']));
+
+        $form->connections(['email' => [], 'webhook' => []])->save();
+
+        $saved = YAML::parse(File::get($form->path()));
+
+        $this->assertArrayNotHasKey('connections', $saved);
+    }
+
+    #[Test]
+    public function saving_a_legacy_form_drops_empty_email_config()
+    {
+        File::put(Form::make('contact_us')->path(), YAML::dump([
+            'title' => 'Contact Us',
+            'email' => [],
+        ]));
+
+        $form = Form::find('contact_us');
+        $form->save();
+
+        $saved = YAML::parse(File::get($form->path()));
+
+        $this->assertArrayNotHasKey('connections', $saved);
+        $this->assertArrayNotHasKey('email', $saved);
+    }
+
+    #[Test]
     public function saving_a_legacy_form_migrates_email_config_without_a_to_key()
     {
         File::put(Form::make('contact_us')->path(), YAML::dump([
