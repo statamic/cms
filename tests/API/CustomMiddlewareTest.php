@@ -61,6 +61,23 @@ class CustomMiddlewareTest extends TestCase
             ->getJson('/api/collections/articles/entries')
             ->assertUnauthorized();
     }
+
+    #[Test]
+    public function route_bindings_are_not_resolved_when_the_cached_response_is_returned()
+    {
+        $this
+            ->getJson('/api/collections/articles/entries', ['X-Api-Key' => 'secret'])
+            ->assertOk();
+
+        Facades\Collection::spy();
+
+        $this
+            ->getJson('/api/collections/articles/entries', ['X-Api-Key' => 'secret'])
+            ->assertOk()
+            ->assertJsonPath('data.0.id', 'apple');
+
+        Facades\Collection::shouldNotHaveReceived('findByHandle');
+    }
 }
 
 class RequireApiKeyHeader

@@ -1,9 +1,11 @@
 <?php
 
+use Illuminate\Routing\Middleware\SubstituteBindings as LaravelSubstituteBindings;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Route;
 use Statamic\API\Middleware\Cache;
 use Statamic\API\Middleware\HandleAuthentication;
+use Statamic\API\Middleware\SubstituteBindings;
 use Statamic\Facades\Glide;
 use Statamic\Http\Middleware\CP\SwapExceptionHandler as SwapCpExceptionHandler;
 use Statamic\Http\Middleware\RequireStatamicPro;
@@ -14,7 +16,9 @@ if (config('statamic.api.enabled')) {
         HandleAuthentication::class,
         ...Arr::wrap(config('statamic.api.middleware')),
         Cache::class,
+        SubstituteBindings::class,
     ])
+        ->withoutMiddleware(LaravelSubstituteBindings::class)
         ->name('statamic.api.')
         ->prefix(config('statamic.api.route'))
         ->group(__DIR__.'/api.php');
