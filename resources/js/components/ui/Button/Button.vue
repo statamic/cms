@@ -51,7 +51,7 @@ const tag = computed(() => {
 const iconOnly = computed(() => (props.icon && !hasDefaultSlot && !props.text) || props.iconOnly);
 
 function focusButtonOnPointerDown(event) {
-    if (props.disabled || props.loading) return;
+    if (props.disabled || props.loading || props.readOnly) return;
 
     const target = event.currentTarget;
     if (!(target instanceof HTMLButtonElement)) return;
@@ -61,7 +61,7 @@ function focusButtonOnPointerDown(event) {
 }
 
 function keepGroupButtonFocused(event) {
-    if (props.disabled || props.loading) return;
+    if (props.disabled || props.loading || props.readOnly) return;
 
     const target = event.currentTarget;
     if (!(target instanceof HTMLButtonElement)) return;
