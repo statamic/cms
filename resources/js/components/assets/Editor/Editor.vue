@@ -414,6 +414,8 @@ export default {
         },
 
         navigateToPreviousAsset() {
+            if (this.saving) return;
+
             if (!this.$dirty.has(this.publishContainer)) {
                 return this.$emit('previous');
             }
@@ -424,6 +426,8 @@ export default {
         },
 
         navigateToNextAsset() {
+            if (this.saving) return;
+
             if (!this.$dirty.has(this.publishContainer)) {
                 return this.$emit('next');
             }
