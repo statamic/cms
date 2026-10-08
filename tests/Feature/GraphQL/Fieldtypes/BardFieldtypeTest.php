@@ -294,17 +294,17 @@ GQL;
         EntryFactory::collection('blog')->id('1')->data([
             'title' => 'Main Post',
             'things' => [
-                ['type' => 'text', 'text' => 'first text'],
-                ['type' => 'meal', 'food' => 'burger', 'drink' => 'coke', 'extras' => [
-                    ['type' => 'food', 'item' => 'fries'],
-                    ['type' => 'food', 'item' => 'ketchup'],
-                ]],
-                ['type' => 'text', 'text' => 'second text'],
-                ['type' => 'car', 'make' => 'toyota', 'model' => 'corolla'],
-                ['type' => 'meal', 'food' => 'salad', 'drink' => 'water', 'extras' => [
-                    ['type' => 'food', 'item' => 'dressing'],
-                ]],
-                ['type' => 'text', 'text' => 'last text'],
+                ['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => 'first text']]],
+                ['type' => 'set', 'attrs' => ['id' => '1', 'values' => ['type' => 'meal', 'food' => 'burger', 'drink' => 'coke', 'extras' => [
+                    ['type' => 'set', 'attrs' => ['id' => '1a', 'values' => ['type' => 'food', 'item' => 'fries']]],
+                    ['type' => 'set', 'attrs' => ['id' => '1b', 'values' => ['type' => 'food', 'item' => 'ketchup']]],
+                ]]]],
+                ['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => 'second text']]],
+                ['type' => 'set', 'attrs' => ['id' => '2', 'values' => ['type' => 'car', 'make' => 'toyota', 'model' => 'corolla']]],
+                ['type' => 'set', 'attrs' => ['id' => '3', 'values' => ['type' => 'meal', 'food' => 'salad', 'drink' => 'water', 'extras' => [
+                    ['type' => 'set', 'attrs' => ['id' => '3a', 'values' => ['type' => 'food', 'item' => 'dressing']]],
+                ]]]],
+                ['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => 'last text']]],
             ],
         ])->create();
 

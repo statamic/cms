@@ -37,7 +37,7 @@ class BardServiceProvider extends ServiceProvider
             'subscript' => new \Tiptap\Marks\Subscript(),
             'superscript' => new \Tiptap\Marks\Superscript(),
             'small' => new \Statamic\Fieldtypes\Bard\Marks\Small(),
-            'strike' => new \Tiptap\Marks\Strike(),
+            'strike' => new \Statamic\Fieldtypes\Bard\Marks\Strike(),
             'table' => new \Tiptap\Nodes\Table(),
             'tableCell' => new \Tiptap\Nodes\TableCell(),
             'tableHeader' => new \Tiptap\Nodes\TableHeader(),
