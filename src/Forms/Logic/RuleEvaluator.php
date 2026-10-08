@@ -125,7 +125,6 @@ class RuleEvaluator
         if ($rhs === 'empty') {
             $lhs = $this->isEmpty($lhs);
             $rhs = true;
-            $operator = '==';
         }
 
         if (is_array($lhs)) {
