@@ -49,6 +49,7 @@
                         :variant="!revisionsEnabled ? 'primary' : 'default'"
                         @click.prevent="save"
                         v-text="saveText"
+                        v-tooltip="saveAndCloseTooltip"
                     />
                 </save-button-options>
 
@@ -286,6 +287,7 @@ import {
 } from '@ui';
 import resetValuesFromResponse from '@/util/resetValuesFromResponse.js';
 import debounce from '@/util/debounce.js';
+import shortcutLabel from '@/util/shortcutLabel.js';
 import { computed, ref } from 'vue';
 import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } from '@ui/Publish/SavePipeline.js';
 import { router } from '@inertiajs/vue3';
@@ -444,6 +446,12 @@ export default {
 
         canSave() {
             return !this.readOnly && !this.somethingIsLoading;
+        },
+
+        saveAndCloseTooltip() {
+            if (!this.isInline) return null;
+
+            return __('Save & Close (:shortcut)', { shortcut: shortcutLabel('mod+shift+s') });
         },
 
         canPublish() {

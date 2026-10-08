@@ -45,7 +45,7 @@
 
             <div class="hidden items-center md:flex">
                 <save-button-options v-if="!readOnly" :show-options="!isInline" :preferences-prefix="preferencesPrefix">
-                    <Button :disabled="!canSave" variant="primary" @click.prevent="save" :text="saveText" />
+                    <Button :disabled="!canSave" variant="primary" @click.prevent="save" :text="saveText" v-tooltip="saveAndCloseTooltip" />
                 </save-button-options>
             </div>
 
@@ -150,6 +150,7 @@ import { ref, computed } from 'vue';
 import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } from '@ui/Publish/SavePipeline.js';
 import ItemActions from '@/components/actions/ItemActions.vue';
 import { router } from '@inertiajs/vue3';
+import shortcutLabel from '@/util/shortcutLabel.js';
 
 export default {
     mixins: [HasPreferences, HasActions],
@@ -271,6 +272,12 @@ export default {
 
         canSave() {
             return !this.readOnly && !this.somethingIsLoading;
+        },
+
+        saveAndCloseTooltip() {
+            if (!this.isInline) return null;
+
+            return __('Save & Close (:shortcut)', { shortcut: shortcutLabel('mod+shift+s') });
         },
 
         livePreviewUrl() {

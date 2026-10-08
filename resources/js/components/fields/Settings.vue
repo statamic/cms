@@ -63,6 +63,7 @@
 import { FieldConditionsBuilder, FIELD_CONDITIONS_KEYS } from '../field-conditions/FieldConditions.js';
 import FieldValidationBuilder from '../field-validation/Builder.vue';
 import { Heading, Button, Tabs, TabList, TabTrigger, TabContent, CardPanel, Icon, StackHeader, StackContent } from '@/components/ui';
+import shortcutLabel from '@/util/shortcutLabel.js';
 
 export default {
     emits: ['committed', 'closed'],
@@ -193,11 +194,7 @@ export default {
         },
 
         saveAllShortcutLabel() {
-            const platform = typeof navigator !== 'undefined'
-                ? (navigator.userAgentData?.platform || navigator.platform || '')
-                : '';
-            const isMac = /Mac|iPhone|iPad|iPod/i.test(platform);
-            return isMac ? 'Cmd+Shift+S' : 'Ctrl+Shift+S';
+            return shortcutLabel('mod+shift+s');
         },
     },
 
