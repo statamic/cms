@@ -70,6 +70,10 @@ export default function registerGlobalComponents(app) {
     app.component('min-max-insight', MinMaxInsight);
     app.component('star-rating-insight', StarRatingInsight);
 
+    // Form Connections
+    app.component('email-connector', defineAsyncComponent(() => import('../components/forms/connections/EmailConnector.vue')));
+    app.component('webhook-connector', defineAsyncComponent(() => import('../components/forms/connections/WebhookConnector.vue')));
+
     // Reusable
     app.component('file-icon', FileIcon);
 

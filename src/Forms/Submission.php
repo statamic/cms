@@ -3,6 +3,7 @@
 namespace Statamic\Forms;
 
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Bus;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Forms\Submission as SubmissionContract;
 use Statamic\Contracts\Query\ContainsQueryableValues;
@@ -18,9 +19,12 @@ use Statamic\Events\SubmissionFinalized;
 use Statamic\Events\SubmissionSaved;
 use Statamic\Events\SubmissionSaving;
 use Statamic\Facades\File;
+use Statamic\Facades\FormConnector;
 use Statamic\Facades\FormSubmission;
 use Statamic\Facades\Site as Sites;
 use Statamic\Facades\Stache;
+use Statamic\Fields\Field;
+use Statamic\Forms\Connectors\RecordConnectionSuccess;
 use Statamic\Forms\Uploaders\AssetsUploader;
 use Statamic\Forms\Uploaders\FilesUploader;
 use Statamic\Forms\Uploaders\FormFileUpload;
@@ -271,10 +275,42 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
 
         SubmissionFinalized::dispatch($this);
 
+        // Assets need to exist before anything reads the submission, so this stays synchronous.
         CreateAssetsFromFileUploads::dispatchSync($this);
-        SendEmails::dispatch($this, $this->site());
+
+        $jobs = $this->connectionJobs();
+
+        if ($this->shouldDeleteTemporaryFiles()) {
+            if ($jobs) {
+                RecordConnectionSuccess::countDown($this, $jobs);
+            } else {
+                rescue(fn () => Bus::dispatch(new DeleteTemporaryFiles($this)));
+            }
+        }
+
+        // Dispatched independently so one failing connection (e.g. on the sync queue) doesn't stop the others.
+        foreach ($jobs as $job) {
+            rescue(fn () => Bus::dispatch($job));
+        }
 
         return $this;
+    }
+
+    public function connectionJobs(): array
+    {
+        return $this->form()->connections()
+            ->map(fn ($connections, $handle) => FormConnector::find($handle)?->setForm($this->form())->setConnections($connections)->finalized($this))
+            ->flatten()
+            ->filter()
+            ->each(fn ($job) => RecordConnectionSuccess::ensureAttachable($job))
+            ->values()
+            ->all();
+    }
+
+    private function shouldDeleteTemporaryFiles(): bool
+    {
+        return $this->form()->blueprint()->fields()->all()
+            ->contains(fn (Field $field) => in_array($field->type(), ['files', 'form_upload']));
     }
 
     public function deleteQuietly()

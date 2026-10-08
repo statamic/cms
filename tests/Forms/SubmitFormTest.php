@@ -6,6 +6,8 @@ use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use PHPUnit\Framework\Attributes\Test;
@@ -19,7 +21,8 @@ use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Fieldset;
 use Statamic\Facades\Form;
 use Statamic\Forms\CreateAssetsFromFileUploads;
-use Statamic\Forms\SendEmails;
+use Statamic\Forms\Email;
+use Statamic\Forms\SendEmail;
 use Statamic\Forms\SubmissionResult;
 use Statamic\Forms\SubmitForm;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -168,7 +171,6 @@ class SubmitFormTest extends TestCase
         Event::assertDispatched(SubmissionCreated::class);
         Event::assertDispatched(SubmissionFinalized::class);
         Bus::assertDispatched(CreateAssetsFromFileUploads::class);
-        Bus::assertDispatched(SendEmails::class);
     }
 
     #[Test]
@@ -368,7 +370,7 @@ class SubmitFormTest extends TestCase
     public function it_persists_the_real_asset_path_after_finalizing_a_store_true_upload()
     {
         // Deliberately no Bus::fake() here: the bug only reproduces when the real
-        // CreateAssetsFromFileUploads + SendEmails + DeleteTemporaryFiles chain runs.
+        // CreateAssetsFromFileUploads and DeleteTemporaryFiles jobs run.
         Storage::fake('local');
         Storage::fake('avatars');
         AssetContainer::make('avatars')->disk('avatars')->save();
@@ -408,6 +410,56 @@ class SubmitFormTest extends TestCase
         $this->assertNotNull(Asset::find("avatars::{$storedValue}"));
 
         $form->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function connections_see_the_real_asset_path_for_a_store_true_upload_on_a_non_storing_form()
+    {
+        // Deliberately no Bus::fake(): the connection jobs need to run against whatever
+        // submission CreateAssetsFromFileUploads left behind.
+        Storage::fake('local');
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+        Http::fake();
+        Mail::fake();
+
+        $conditions = [['field' => 'photo', 'operator' => 'equals', 'value' => 'photo.jpg', 'join' => 'and']];
+
+        $form = tap(Form::make('uploads')->store(false)->connections([
+            'email' => [['to' => 'test@example.com', 'conditions' => $conditions]],
+            'webhook' => [['url' => 'https://example.com/hook', 'conditions' => $conditions]],
+        ])->formFields([
+            'pages' => [
+                [
+                    'id' => 'main',
+                    'sections' => [
+                        [
+                            'fields' => [
+                                ['handle' => 'email', 'field' => ['type' => 'email']],
+                                ['handle' => 'photo', 'field' => ['type' => 'upload', 'store' => true, 'container' => 'avatars', 'max_files' => 1]],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]))->save();
+
+        app(SubmitForm::class)
+            ->form($form)
+            ->page('main')
+            ->submit(
+                data: ['email' => 'test@example.com'],
+                files: ['photo' => [UploadedFile::fake()->image('photo.jpg')]],
+            );
+
+        Storage::disk('avatars')->assertExists('photo.jpg');
+
+        // Both connections evaluate their conditions against the converted asset path.
+        Http::assertSentCount(1);
+        Http::assertSent(fn ($request) => $request['submission']['photo'] === 'photo.jpg');
+
+        Mail::assertSent(Email::class, 1);
+        Mail::assertSent(Email::class, fn (Email $email) => $email->getSubmission()->get('photo') === 'photo.jpg');
     }
 
     #[Test]
@@ -851,7 +903,7 @@ class SubmitFormTest extends TestCase
         Event::assertNotDispatched(FormSubmitted::class);
         Event::assertNotDispatched(SubmissionFinalized::class);
         Bus::assertNotDispatched(CreateAssetsFromFileUploads::class);
-        Bus::assertNotDispatched(SendEmails::class);
+        Bus::assertNotDispatched(SendEmail::class);
 
         $form->submissions()->each->delete();
     }
@@ -1064,7 +1116,7 @@ class SubmitFormTest extends TestCase
         Event::assertNotDispatched(FormSubmitted::class);
         Event::assertNotDispatched(SubmissionFinalized::class);
         Bus::assertNotDispatched(CreateAssetsFromFileUploads::class);
-        Bus::assertNotDispatched(SendEmails::class);
+        Bus::assertNotDispatched(SendEmail::class);
 
         // Earlier-page values are preserved while the new page's values are merged in.
         $stored = $form->submission($result->submission->id());
@@ -1111,7 +1163,6 @@ class SubmitFormTest extends TestCase
         Event::assertNotDispatched(SubmissionCreated::class);
         Event::assertDispatched(SubmissionFinalized::class, 1);
         Bus::assertDispatched(CreateAssetsFromFileUploads::class, 1);
-        Bus::assertDispatched(SendEmails::class, 1);
 
         $form->submissions()->each->delete();
     }
@@ -1138,7 +1189,7 @@ class SubmitFormTest extends TestCase
         Event::assertNotDispatched(FormSubmitted::class);
         Event::assertNotDispatched(SubmissionFinalized::class);
         Bus::assertNotDispatched(CreateAssetsFromFileUploads::class);
-        Bus::assertNotDispatched(SendEmails::class);
+        Bus::assertNotDispatched(SendEmail::class);
 
         $form->submissions()->each->delete();
     }

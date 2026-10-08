@@ -93,6 +93,7 @@ class ExtensionServiceProvider extends ServiceProvider
         'global_set_sites' => Fieldtypes\GlobalSetSites::class,
         'grid' => Fieldtypes\Grid::class,
         'group' => Fieldtypes\Group::class,
+        'form_fields' => Fieldtypes\FormFields::class,
         'form_heading' => Fieldtypes\FormHeading::class,
         'form_paragraph' => Fieldtypes\FormParagraph::class,
         'form_upload' => Fieldtypes\FormUpload::class,
@@ -141,6 +142,11 @@ class ExtensionServiceProvider extends ServiceProvider
         'yaml' => Fieldtypes\Yaml::class,
         'yes_no' => Fieldtypes\YesNo::class,
         'form' => \Statamic\Forms\Fieldtype::class,
+    ];
+
+    protected $formConnectors = [
+        'email' => Forms\Connectors\Email::class,
+        'webhook' => Forms\Connectors\Webhook::class,
     ];
 
     protected $formFieldtypes = [
@@ -377,6 +383,11 @@ class ExtensionServiceProvider extends ServiceProvider
                 'class' => Fieldtype::class,
                 'directory' => 'Fieldtypes',
                 'extensions' => $this->fieldtypes,
+            ],
+            'form-connectors' => [
+                'class' => Forms\Connectors\Connector::class,
+                'directory' => 'FormConnectors',
+                'extensions' => $this->formConnectors,
             ],
             'form-fieldtypes' => [
                 'class' => FormFieldtype::class,

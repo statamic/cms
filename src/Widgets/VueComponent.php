@@ -5,6 +5,8 @@ namespace Statamic\Widgets;
 use Illuminate\Contracts\Support\Arrayable;
 
 /**
+ * @deprecated Use \Statamic\Support\VueComponent instead.
+ *
  * @phpstan-consistent-constructor
  */
 class VueComponent implements Arrayable
