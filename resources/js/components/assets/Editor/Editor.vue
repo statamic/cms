@@ -155,7 +155,7 @@
                     <div class="flex items-center space-x-3 rtl:space-x-reverse">
                         <ui-button v-if="showNavigation" icon="chevron-left" @click="navigateToPreviousAsset" v-tooltip="__('Previous Asset')" />
                         <ui-button v-if="showNavigation" icon="chevron-right" @click="navigateToNextAsset" v-tooltip="__('Next Asset')" />
-                        <ui-button variant="primary" icon="save" @click="saveAndClose" v-if="!readOnly" :loading="saving" :text="__('Save')" />
+                        <ui-button variant="primary" :icon="saving ? null : 'save'" @click="saveAndClose" v-if="!readOnly" :loading="saving" :text="__('Save')" />
                     </div>
                 </div>
             </template>
