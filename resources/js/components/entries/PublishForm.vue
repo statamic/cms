@@ -556,7 +556,6 @@ export default {
         save() {
             if (!this.canSave) {
                 this.quickSave = false;
-                this.closeAfterSave = false;
                 return;
             }
 
@@ -929,7 +928,7 @@ export default {
         if (this.isInline) {
             this.saveAndCloseKeyBinding = this.$keys.bindGlobal(['mod+shift+s'], (e) => {
                 e.preventDefault();
-                if (this.confirmingPublish) return;
+                if (this.confirmingPublish || !this.canSave) return;
                 this.quickSave = true;
                 this.closeAfterSave = true;
                 this.save();

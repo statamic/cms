@@ -341,7 +341,6 @@ export default {
         save() {
             if (!this.canSave) {
                 this.quickSave = false;
-                this.closeAfterSave = false;
                 return;
             }
 
@@ -392,11 +391,7 @@ export default {
                     // the hooks are resolved because if this form is being shown in a stack, we only
                     // want to close it once everything's done.
                     else {
-                        this.$nextTick(() => {
-                            this.$emit('saved', response);
-                            if (this.closeAfterSave) this.$emit('close');
-                            this.closeAfterSave = false;
-                        });
+                        this.emitSaved(response);
                     }
 
                     this.quickSave = false;
@@ -512,7 +507,15 @@ export default {
 
         redirectTo(location) {
             router.get(location);
-        }
+        },
+
+        emitSaved(response) {
+            this.$nextTick(() => {
+                this.$emit('saved', response);
+                if (this.closeAfterSave) this.$emit('close');
+                this.closeAfterSave = false;
+            });
+        },
     },
 
     mounted() {
@@ -530,6 +533,7 @@ export default {
         if (this.isInline) {
             this.saveAndCloseKeyBinding = this.$keys.bindGlobal(['mod+shift+s'], (e) => {
                 e.preventDefault();
+                if (!this.canSave) return;
                 this.quickSave = true;
                 this.closeAfterSave = true;
                 this.save();
