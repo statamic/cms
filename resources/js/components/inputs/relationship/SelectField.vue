@@ -30,8 +30,10 @@
         <template #selected-option>
             <span v-if="items.length === 1" v-text="items[0].title" class="truncate"></span>
         </template>
-        <!-- Override default selected-options (badges) so RelationshipInput lists rows below -->
-        <template #selected-options></template>
+        <template #selected-options>
+            <!-- We don't want to display the selected options here. The RelationshipInput component does that for us. -->
+            <div></div>
+        </template>
     </Combobox>
 </template>
 
