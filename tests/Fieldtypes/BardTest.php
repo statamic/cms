@@ -187,6 +187,21 @@ class BardTest extends TestCase
     }
 
     #[Test]
+    public function it_augments_strike_marks_to_strike_tags()
+    {
+        $data = [
+            [
+                'type' => 'paragraph',
+                'content' => [
+                    ['type' => 'text', 'marks' => [['type' => 'strike']], 'text' => 'struck'],
+                ],
+            ],
+        ];
+
+        $this->assertEquals('<p><strike>struck</strike></p>', $this->bard(['sets' => null])->augment($data));
+    }
+
+    #[Test]
     public function it_augments_tiptap_v1_snake_case_types_to_v2_camel_case_types()
     {
         Augmentor::addExtension('customNode', new class extends Node
