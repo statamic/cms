@@ -41,48 +41,23 @@ class Webhook extends Connector
 
     public function render(Form $form): VueComponent
     {
-        $blueprint = static::blueprint($form);
-        $fields = $blueprint->fields()->preProcess();
-
         return VueComponent::render('webhook-connector', [
-            'blueprint' => $blueprint->toPublishArray(),
-            'meta' => collect($form->connections()->get('webhook'))
-                ->mapWithKeys(fn (array $config): array => [
-                    $config['id'] => $fields->addValues($config)->preProcess()->meta()->all(),
-                ])
-                ->all(),
-            'defaults' => [
-                'values' => $fields->values()->all(),
-                'meta' => $fields->meta()->all(),
-            ],
+            ...$this->blueprintProps($form, $form->connections()->get('webhook', [])),
             'examplePayload' => $this->examplePayload($form),
         ]);
-    }
-
-    protected function preProcessConnection(array $connection, Form $form): array
-    {
-        return static::blueprint($form)->fields()
-            ->addValues($connection)
-            ->preProcess()
-            ->values()
-            ->all();
     }
 
     protected function connectionRules(Form $form): array
     {
         return [
-            'url' => ['required', 'url:http,https', new WebhookConnectionUrl],
+            'url' => ['url:http,https', new WebhookConnectionUrl],
             'verify_ssl' => ['nullable', 'boolean'],
         ];
     }
 
     protected function processConnection(array $connection, Form $form): array
     {
-        $values = static::blueprint($form)->fields()
-            ->addValues($connection)
-            ->process()
-            ->values()
-            ->all();
+        $values = parent::processConnection($connection, $form);
 
         return [
             ...$values,
@@ -90,7 +65,7 @@ class Webhook extends Connector
         ];
     }
 
-    public static function blueprint(Form $form): \Statamic\Fields\Blueprint
+    public function blueprint(Form $form): \Statamic\Fields\Blueprint
     {
         return Blueprint::make()->setContents([
             'tabs' => [

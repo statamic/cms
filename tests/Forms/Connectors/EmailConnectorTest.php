@@ -450,6 +450,31 @@ class EmailConnectorTest extends TestCase
         $this->assertEquals(['first@example.com', 'second@example.com'], $configs[0][$handle]);
     }
 
+    #[Test]
+    public function legacy_address_strings_are_converted_before_meta_is_built()
+    {
+        $form = tap(Form::make('test'))->save();
+
+        $email = new class extends Email
+        {
+            public array $metaValues = [];
+
+            protected function connectionMeta(array $connection, \Statamic\Contracts\Forms\Form $form): array
+            {
+                $fields = $this->connectionFields($connection, $form);
+                $this->metaValues[$connection['id']] = $fields->values()->only(['to', 'cc'])->all();
+
+                return $fields->meta()->all();
+            }
+        };
+
+        $form->connections(['email' => [['id' => 'one', 'to' => 'a@example.com, b@example.com', 'cc' => 'c@example.com']]]);
+        $props = $email->render($form)->toArray()['props'];
+
+        $this->assertEquals(['one'], array_keys($props['meta']));
+        $this->assertEquals(['to' => ['a@example.com', 'b@example.com'], 'cc' => ['c@example.com']], $email->metaValues['one']);
+    }
+
     public static function legacyAddressProvider(): array
     {
         return [
@@ -590,7 +615,7 @@ class EmailConnectorTest extends TestCase
             ],
         ]))->save();
 
-        $meta = Email::blueprint($form)->fields()->meta();
+        $meta = (new Email)->blueprint($form)->fields()->meta();
 
         foreach (['to', 'cc', 'bcc', 'from', 'reply_to'] as $handle) {
             $this->assertEquals([

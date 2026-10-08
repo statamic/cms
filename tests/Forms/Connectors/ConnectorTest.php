@@ -2,9 +2,12 @@
 
 namespace Tests\Forms\Connectors;
 
+use Illuminate\Support\Facades\Validator;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Forms\Submission;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
+use Statamic\Fields\Fields;
 use Statamic\Forms\Connectors\Connector;
 use Statamic\Statamic;
 use Statamic\Support\VueComponent;
@@ -288,6 +291,115 @@ class ConnectorTest extends TestCase
     }
 
     #[Test]
+    public function it_has_no_blueprint_by_default()
+    {
+        $this->assertNull((new TestMultiWordConnector)->blueprint(Form::make('contact')));
+    }
+
+    #[Test]
+    public function it_pre_processes_connections_through_the_blueprint()
+    {
+        $connections = (new TestBlueprintConnector)->preProcess([
+            ['id' => 'abc', 'name' => 'Foo', 'count' => '5', 'extra' => 'dropped'],
+        ], Form::make('contact'));
+
+        $this->assertEquals([
+            ['name' => 'Foo', 'active' => true, 'count' => '5', 'rows' => [], 'id' => 'abc', 'enabled' => true, 'conditions' => []],
+        ], $connections);
+    }
+
+    #[Test]
+    public function it_processes_connections_through_the_blueprint()
+    {
+        $connections = (new TestBlueprintConnector)->process([
+            ['id' => 'abc', 'name' => 'Foo', 'active' => false, 'count' => '5', 'extra' => 'dropped'],
+        ], Form::make('contact'));
+
+        $this->assertSame([['id' => 'abc', 'name' => 'Foo', 'active' => false, 'count' => 5]], $connections);
+    }
+
+    #[Test]
+    public function it_merges_top_level_blueprint_rules_with_connection_rules()
+    {
+        $rules = (new TestBlueprintConnector)->rules(Form::make('contact'));
+
+        $this->assertEquals(['required', 'string', 'max:10'], $rules['*.name']);
+        $this->assertEquals(['integer', 'nullable'], $rules['*.count']);
+        $this->assertEquals(['nullable'], $rules['*.active']);
+        $this->assertEquals(['required'], $rules['*.rows.*.label']);
+        $this->assertEquals(['nullable', 'boolean'], $rules['*.enabled']);
+        $this->assertEquals([
+            '*', '*.name', '*.active', '*.count', '*.rows', '*.rows.*.label', '*.enabled', '*.conditions', '*.conditions.*',
+        ], array_keys($rules));
+    }
+
+    #[Test]
+    public function it_validates_connections_with_blueprint_rules()
+    {
+        $form = Form::make('contact');
+        $rules = (new TestBlueprintConnector)->rules($form);
+
+        $this->assertTrue(Validator::make([['name' => 'Foo']], $rules)->passes());
+        $this->assertEquals(['0.name'], Validator::make([['count' => 1]], $rules)->errors()->keys());
+        $this->assertEquals(['0.name'], Validator::make([['name' => 'Far too long']], $rules)->errors()->keys());
+        $this->assertEquals(['0.rows.0.label'], Validator::make([['name' => 'Foo', 'rows' => [['label' => null]]]], $rules)->errors()->keys());
+    }
+
+    #[Test]
+    public function it_builds_publish_props_from_the_blueprint_and_given_connections()
+    {
+        $form = Form::make('contact')->connections(['test_blueprint' => [['id' => 'stored']]]);
+
+        $props = (new TestBlueprintConnector)->props($form, [
+            ['id' => 'one', 'name' => 'Foo', 'rows' => [['id' => 'row-1', 'label' => 'Bar']]],
+            ['id' => 'two'],
+            ['name' => 'No id'],
+        ]);
+
+        $this->assertEquals(['blueprint', 'meta', 'defaults'], array_keys($props));
+        $this->assertEquals(['name', 'active', 'count', 'rows'], collect($props['blueprint']['tabs'][0]['sections'][0]['fields'])->pluck('handle')->all());
+        $this->assertEquals(['one', 'two'], array_keys($props['meta']));
+        $this->assertEquals(['name', 'active', 'count', 'rows'], array_keys($props['meta']['one']));
+        $this->assertEquals(['row-1'], array_keys($props['meta']['one']['rows']['existing']));
+        $this->assertEquals([], $props['meta']['two']['rows']['existing']);
+        $this->assertEquals(['name' => null, 'active' => true, 'count' => null, 'rows' => []], $props['defaults']['values']);
+        $this->assertEquals(['name', 'active', 'count', 'rows'], array_keys($props['defaults']['meta']));
+    }
+
+    #[Test]
+    public function connection_meta_can_be_overridden()
+    {
+        $connector = new class extends TestBlueprintConnector
+        {
+            protected function connectionMeta(array $connection, \Statamic\Contracts\Forms\Form $form): array
+            {
+                return [...parent::connectionMeta($connection, $form), 'count' => ['options' => [$connection['id']]]];
+            }
+        };
+
+        $props = $connector->props(Form::make('contact'), [['id' => 'one']]);
+
+        $this->assertEquals(['options' => ['one']], $props['meta']['one']['count']);
+    }
+
+    #[Test]
+    public function connection_fields_can_be_overridden_for_values_and_meta()
+    {
+        $connector = new class extends TestBlueprintConnector
+        {
+            protected function connectionFields(array $connection, \Statamic\Contracts\Forms\Form $form): Fields
+            {
+                return parent::connectionFields([...$connection, 'rows' => [['id' => 'added', 'label' => 'Added']]], $form);
+            }
+        };
+
+        $form = Form::make('contact');
+
+        $this->assertEquals('added', $connector->preProcess([['id' => 'one']], $form)[0]['rows'][0]['_id']);
+        $this->assertEquals(['added'], array_keys($connector->props($form, [['id' => 'one']])['meta']['one']['rows']['existing']));
+    }
+
+    #[Test]
     public function it_renders_a_vue_component()
     {
         $form = Form::make('contact');
@@ -349,5 +461,38 @@ class TestHookedConnector extends Connector
     protected function processConnection(array $connection, \Statamic\Contracts\Forms\Form $form): array
     {
         return ['token' => trim($connection['token'] ?? '')];
+    }
+}
+
+class TestBlueprintConnector extends Connector
+{
+    public function render(\Statamic\Contracts\Forms\Form $form): VueComponent
+    {
+        return VueComponent::render('nothing');
+    }
+
+    public function props(\Statamic\Contracts\Forms\Form $form, array $connections): array
+    {
+        return $this->blueprintProps($form, $connections);
+    }
+
+    public function blueprint(\Statamic\Contracts\Forms\Form $form): \Statamic\Fields\Blueprint
+    {
+        return Blueprint::make()->setContents(['tabs' => ['main' => ['sections' => [['fields' => [
+            ['handle' => 'name', 'field' => ['type' => 'text', 'validate' => ['required']]],
+            ['handle' => 'active', 'field' => ['type' => 'toggle', 'default' => true]],
+            ['handle' => 'count', 'field' => ['type' => 'integer']],
+            ['handle' => 'rows', 'field' => ['type' => 'grid', 'fields' => [
+                ['handle' => 'label', 'field' => ['type' => 'text', 'validate' => ['required']]],
+            ]]],
+        ]]]]]]);
+    }
+
+    protected function connectionRules(\Statamic\Contracts\Forms\Form $form): array
+    {
+        return [
+            'name' => 'string|max:10',
+            'rows.*.label' => ['required'],
+        ];
     }
 }

@@ -8,6 +8,9 @@ use Statamic\Contracts\Forms\Submission;
 use Statamic\Extend\HasHandle;
 use Statamic\Extend\HasTitle;
 use Statamic\Extend\RegistersItself;
+use Statamic\Fields\Blueprint;
+use Statamic\Fields\Fields;
+use Statamic\Fields\Validator;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -105,6 +108,41 @@ abstract class Connector
 
     abstract public function render(Form $form): VueComponent;
 
+    public function blueprint(Form $form): ?Blueprint
+    {
+        return null;
+    }
+
+    protected function connectionFields(array $connection, Form $form): Fields
+    {
+        return $this->blueprint($form)->fields()->addValues($connection)->preProcess();
+    }
+
+    protected function connectionMeta(array $connection, Form $form): array
+    {
+        return $this->connectionFields($connection, $form)->meta()->all();
+    }
+
+    protected function blueprintProps(Form $form, array $connections): array
+    {
+        $blueprint = $this->blueprint($form);
+        $fields = $blueprint->fields()->preProcess();
+
+        return [
+            'blueprint' => $blueprint->toPublishArray(),
+            'meta' => collect(static::normalizeConnections($connections))
+                ->filter(fn (array $connection): bool => isset($connection['id']))
+                ->mapWithKeys(fn (array $connection): array => [
+                    $connection['id'] => $this->connectionMeta($connection, $form),
+                ])
+                ->all(),
+            'defaults' => [
+                'values' => $fields->values()->all(),
+                'meta' => $fields->meta()->all(),
+            ],
+        ];
+    }
+
     public function preProcess(array $config, Form $form): array
     {
         return collect(static::normalizeConnections($config))
@@ -119,14 +157,21 @@ abstract class Connector
 
     protected function preProcessConnection(array $connection, Form $form): array
     {
-        return $connection;
+        if (! $this->blueprint($form)) {
+            return $connection;
+        }
+
+        return $this->connectionFields($connection, $form)->values()->all();
     }
 
     public function rules(Form $form): array
     {
         return [
             '*' => ['array'],
-            ...collect($this->connectionRules($form))->mapWithKeys(fn ($rules, $key) => ['*.'.$key => $rules])->all(),
+            ...collect($this->blueprintRules($form))
+                ->mergeRecursive(collect($this->connectionRules($form))->map(fn ($rules) => is_object($rules) ? [$rules] : Validator::explodeRules($rules)))
+                ->mapWithKeys(fn ($rules, $key) => ['*.'.$key => $rules])
+                ->all(),
             '*.enabled' => ['nullable', 'boolean'],
             '*.conditions' => ['nullable', 'array'],
             '*.conditions.*' => ['array'],
@@ -136,6 +181,18 @@ abstract class Connector
     protected function connectionRules(Form $form): array
     {
         return [];
+    }
+
+    // Only top-level field rules can be derived without values. Grid sub-field rules belong in connectionRules().
+    private function blueprintRules(Form $form): array
+    {
+        if (! $blueprint = $this->blueprint($form)) {
+            return [];
+        }
+
+        $fields = $blueprint->fields();
+
+        return Arr::only($fields->validator()->rules(), $fields->all()->keys()->all());
     }
 
     public function process(array $config, Form $form): array
@@ -156,7 +213,11 @@ abstract class Connector
 
     protected function processConnection(array $connection, Form $form): array
     {
-        return $connection;
+        if (! $blueprint = $this->blueprint($form)) {
+            return $connection;
+        }
+
+        return $blueprint->fields()->addValues($connection)->process()->values()->all();
     }
 
     public function routes(Router $router): void

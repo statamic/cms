@@ -6,6 +6,7 @@ use Illuminate\Routing\Router;
 use Statamic\Contracts\Forms\Form;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Facades\Blueprint;
+use Statamic\Fields\Fields;
 use Statamic\Forms\Connectors\Rules\EmailConnectionAddress;
 use Statamic\Forms\Connectors\Rules\EmailConnectionView;
 use Statamic\Http\Controllers\CP\Forms\EmailConnectionPreviewController;
@@ -43,31 +44,15 @@ class Email extends Connector
 
     public function render(Form $form): VueComponent
     {
-        $blueprint = static::blueprint($form);
-        $fields = $blueprint->fields()->preProcess();
-
         return VueComponent::render('email-connector', [
-            'blueprint' => $blueprint->toPublishArray(),
-            'meta' => collect($form->connections()->get('email'))
-                ->mapWithKeys(fn (array $config): array => [
-                    $config['id'] => $fields->addValues($this->convertLegacyAddresses($config))->preProcess()->meta()->all(),
-                ])
-                ->all(),
-            'defaults' => [
-                'values' => $fields->values()->all(),
-                'meta' => $fields->meta()->all(),
-            ],
+            ...$this->blueprintProps($form, $form->connections()->get('email', [])),
             'previewUrl' => cp_route('forms.connect.email.preview', $form->handle()),
         ]);
     }
 
-    protected function preProcessConnection(array $connection, Form $form): array
+    protected function connectionFields(array $connection, Form $form): Fields
     {
-        return static::blueprint($form)->fields()
-            ->addValues($this->convertLegacyAddresses($connection))
-            ->preProcess()
-            ->values()
-            ->all();
+        return parent::connectionFields($this->convertLegacyAddresses($connection), $form);
     }
 
     private function convertLegacyAddresses(array $config): array
@@ -84,7 +69,7 @@ class Email extends Connector
     protected function connectionRules(Form $form): array
     {
         return [
-            'to' => ['required', new EmailConnectionAddress($form)],
+            'to' => [new EmailConnectionAddress($form)],
             'cc' => [new EmailConnectionAddress($form)],
             'bcc' => [new EmailConnectionAddress($form)],
             'from' => [new EmailConnectionAddress($form)],
@@ -96,11 +81,7 @@ class Email extends Connector
 
     protected function processConnection(array $connection, Form $form): array
     {
-        $values = static::blueprint($form)->fields()
-            ->addValues($connection)
-            ->process()
-            ->values()
-            ->all();
+        $values = parent::processConnection($connection, $form);
 
         return [
             ...$values,
@@ -114,7 +95,7 @@ class Email extends Connector
         $router->post('preview', EmailConnectionPreviewController::class)->name('preview');
     }
 
-    public static function blueprint(Form $form): \Statamic\Fields\Blueprint
+    public function blueprint(Form $form): \Statamic\Fields\Blueprint
     {
         return Blueprint::make()->setContents([
             'tabs' => [
