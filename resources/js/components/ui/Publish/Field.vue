@@ -5,6 +5,7 @@ import { injectFieldsContext } from './FieldsProvider.vue';
 import { useUiDirection } from '@/composables/ui-direction';
 import {
     Avatar,
+    Button,
     Field,
     Label,
 } from '@ui';
@@ -175,6 +176,11 @@ const shouldRenderField = computed(
 
 const shouldShowLabelText = computed(() => !props.config.hide_display);
 
+const isCollapsibleGroup = computed(() => props.config.type === 'group' && props.config.collapsible);
+const isGroupExpanded = computed(() => fieldtype.value
+    ? !fieldtype.value.isCollapsed || fieldtype.value.fullScreenMode
+    : !props.config.collapsed);
+
 // Whether the label renders anything visible. When it doesn't, we avoid rendering
 // the field header entirely (so it doesn't reserve space) and instead attach a
 // screen-reader-only label to the control below.
@@ -228,6 +234,10 @@ function desync() {
     desyncField(rootFieldPath.value);
 }
 
+function toggleGroupCollapsed() {
+    fieldtype.value?.toggleCollapsed();
+}
+
 const fieldtypeComponentProps = computed(() => ({
     id: fieldId.value,
     config: props.config,
@@ -273,27 +283,61 @@ const fieldtypeComponentEvents = computed(() => ({
             v-bind="$attrs"
         >
             <template #label v-if="shouldShowLabel">
-                <Label :for="fieldId" :required="isRequired" class="relative">
-                    <Transition name="lock-avatar-pop" mode="out-in">
-                        <Avatar
-                            v-if="isLocked"
-                            :key="`lock-avatar-${handle}-${lockedBy?.id}`"
-                            :user="lockedBy"
-                            class="inline-flex mx-1 -start-8 -top-0.5 absolute rounded-full size-6 text-3xs"
-                            v-tooltip="lockedBy.name"
+                <div class="flex flex-1 items-center justify-between gap-1.5">
+                    <div
+                        class="relative flex min-w-0 flex-1 items-center gap-1"
+                        :class="isCollapsibleGroup && 'group/group-label cursor-pointer'"
+                        @click="isCollapsibleGroup && toggleGroupCollapsed()"
+                    >
+                        <component
+                            :is="isCollapsibleGroup ? 'span' : Label"
+                            :for="isCollapsibleGroup ? undefined : fieldId"
+                            :required="isCollapsibleGroup ? undefined : isRequired"
+                            :class="[
+                                'relative min-w-0',
+                                isCollapsibleGroup && 'text-sm font-medium text-gray-925 select-none dark:text-gray-300'
+                            ]"
+                        >
+                            <Transition name="lock-avatar-pop" mode="out-in">
+                                <Avatar
+                                    v-if="isLocked"
+                                    :key="`lock-avatar-${handle}-${lockedBy?.id}`"
+                                    :user="lockedBy"
+                                    class="inline-flex mx-1 -start-8 -top-0.5 absolute rounded-full size-6 text-3xs"
+                                    v-tooltip="lockedBy.name"
+                                />
+                            </Transition>
+                            <template v-if="shouldShowLabelText">
+                                <span v-tooltip="{ content: config.handle, copyable: true }">
+                                    {{ __(config.display) }}
+                                </span>
+                            </template>
+                            <template v-else-if="config.hide_display">
+                                <span class="sr-only">{{ __(config.display) }}</span>
+                            </template>
+                            <span v-if="isCollapsibleGroup && isRequired" class="relative -top-px ms-0.5 text-red-600">*</span>
+                        </component>
+                        <Button
+                            v-if="isCollapsibleGroup"
+                            size="2xs"
+                            icon-only
+                            variant="ghost"
+                            inset
+                            tabindex="-1"
+                            aria-hidden="true"
+                            class="group-hover/group-label:bg-gray-400/10 group-hover/group-label:[&_svg]:opacity-70 dark:group-hover/group-label:bg-white/7 dark:group-hover/group-label:text-gray-200"
+                            v-tooltip="isGroupExpanded ? __('Collapse') : __('Expand')"
+                        >
+                            <ui-icon :name="isGroupExpanded ? 'collapse' : 'expand'" class="size-3.5" />
+                        </Button>
+                        <div
+                            v-if="isCollapsibleGroup"
+                            class="min-h-5 flex-1 self-stretch"
                         />
-                    </Transition>
-                    <template v-if="shouldShowLabelText">
-                        <span v-tooltip="{ content: config.handle, copyable: true }">
-                            {{ __(config.display) }}
-                        </span>
-                    </template>
-                    <template v-else-if="config.hide_display">
-                        <span class="sr-only">{{ __(config.display) }}</span>
-                    </template>
+                    </div>
                     <ui-button size="sm" class="[&_svg]:translate-y-0.5" inset icon="synced" variant="ghost" v-tooltip="__('messages.field_synced_with_origin')" v-if="!isReadOnly && isSyncable" v-show="isSynced" @click="desync" />
                     <ui-button size="sm" class="[&_svg]:translate-y-0.5" inset icon="unsynced" variant="ghost" v-tooltip="__('messages.field_desynced_from_origin')" v-if="!isReadOnly && isSyncable" v-show="!isSynced" @click="sync" />
-                </Label>
+                </div>
             </template>
             <template #actions v-if="shouldShowFieldActions">
                 <FieldActions :actions="fieldActions" />

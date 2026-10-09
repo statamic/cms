@@ -10,7 +10,7 @@
                 >
                 </publish-field-fullscreen-header>
                 <section :class="{ 'mt-14 p-4': fullScreenMode }">
-                    <div class="@container/panel" :class="{
+                    <div :id="`${id}-content`" class="@container/panel" :class="{
                         'bg-white dark:bg-gray-800 dark:border-gray-900 rounded-lg border': config.border,
                         'hidden' : isCollapsed && !fullScreenMode
                     }">
@@ -76,6 +76,8 @@ export default {
                     run: this.toggleCollapsed,
                     visible: this.config.collapsible && this.isCollapsed && !this.fullScreenMode,
                     visibleWhenReadOnly: true,
+                    ariaExpanded: false,
+                    ariaControls: `${this.id}-content`,
                 },
                 {
                     title: __('Collapse'),
@@ -84,6 +86,8 @@ export default {
                     run: this.toggleCollapsed,
                     visible: this.config.collapsible && !this.isCollapsed && !this.fullScreenMode,
                     visibleWhenReadOnly: true,
+                    ariaExpanded: true,
+                    ariaControls: `${this.id}-content`,
                 },
                 {
                     title: __('Toggle Fullscreen Mode'),
