@@ -29,6 +29,8 @@
 <script>
 import Fieldtype from './Fieldtype.vue';
 
+const CLOUDFLARE_URL_PATTERN = /^https?:\/\/(customer-[a-z0-9]+\.cloudflarestream\.com)\/([a-z0-9]+)(?:[/?#]|$)/i;
+
 export default {
     mixins: [Fieldtype],
 
@@ -44,7 +46,15 @@ export default {
             return !this.isInvalid && (this.isEmbeddable || this.isVideo);
         },
 
+        cloudflare() {
+            const match = CLOUDFLARE_URL_PATTERN.exec(this.value || '');
+
+            return match ? { host: match[1], id: match[2] } : null;
+        },
+
         embedUrl() {
+            if (this.cloudflare) return `https://${this.cloudflare.host}/${this.cloudflare.id}/iframe`;
+
             let embed_url = this.value || '';
 
             if (embed_url.includes('youtube')) {
@@ -77,7 +87,7 @@ export default {
             const url = this.value || '';
             const isYoutube = url.includes('youtube') || url.includes('youtu.be');
             const isVimeo = url.includes('vimeo');
-            return isYoutube || isVimeo;
+            return isYoutube || isVimeo || !!this.cloudflare;
         },
 
         isInvalid() {

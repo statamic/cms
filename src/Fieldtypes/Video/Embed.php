@@ -8,11 +8,13 @@ use Statamic\Support\FileTypes;
 
 class Embed extends ArrayableString
 {
+    const CLOUDFLARE = 'cloudflare';
     const FILE = 'file';
     const UNSUPPORTED = 'unsupported';
     const VIMEO = 'vimeo';
     const YOUTUBE = 'youtube';
 
+    private const CLOUDFLARE_URL_PATTERN = '#^https?://(customer-[a-z0-9]+\.cloudflarestream\.com)/([a-z0-9]+)(?:[/?\#]|\z)#i';
     private const VIMEO_PRIVACY_HASH_PATTERN = '/^[a-zA-Z0-9]+$/';
     private const YOUTUBE_ID_PATTERN = '/^[a-zA-Z0-9_-]+$/';
 
@@ -38,7 +40,7 @@ class Embed extends ArrayableString
     public function embedUrl(): ?string
     {
         return match ($this->provider) {
-            self::VIMEO, self::YOUTUBE => self::embedUrlFor($this->value),
+            self::CLOUDFLARE, self::VIMEO, self::YOUTUBE => self::embedUrlFor($this->value),
             self::FILE => $this->value,
             default => null,
         };
@@ -55,6 +57,7 @@ class Embed extends ArrayableString
     public function id(): ?string
     {
         return match ($this->provider) {
+            self::CLOUDFLARE => self::cloudflareParts($this->value)[1],
             self::VIMEO => self::vimeoIdAndPrivacyHash($this->value)[0],
             self::YOUTUBE => self::youtubeId($this->value),
             default => null,
@@ -121,6 +124,10 @@ class Embed extends ArrayableString
             return $url;
         }
 
+        if ($parts = self::cloudflareParts($url)) {
+            return self::cloudflareEmbedUrl(...$parts);
+        }
+
         if (Str::contains($url, self::VIMEO)) {
             return self::vimeoEmbedUrl($url);
         }
@@ -171,6 +178,10 @@ class Embed extends ArrayableString
             return $url;
         }
 
+        if ($parts = self::cloudflareParts($url)) {
+            return self::cloudflareEmbedUrl(...$parts);
+        }
+
         if (Str::contains($url, self::VIMEO)) {
             return str_replace('/vimeo.com', '/player.vimeo.com/video', $url);
         }
@@ -197,7 +208,17 @@ class Embed extends ArrayableString
 
     public static function isEmbeddableUrl(?string $url): bool
     {
-        return filled($url) && Str::contains($url, ['youtu.be', 'youtube', self::VIMEO]);
+        return filled($url) && (Str::contains($url, ['youtu.be', 'youtube', self::VIMEO]) || self::cloudflareParts($url) !== null);
+    }
+
+    private static function cloudflareEmbedUrl(string $host, string $id): string
+    {
+        return "https://{$host}/{$id}/iframe";
+    }
+
+    private static function cloudflareParts(?string $url): ?array
+    {
+        return preg_match(self::CLOUDFLARE_URL_PATTERN, $url ?? '', $matches) ? [$matches[1], $matches[2]] : null;
     }
 
     private static function isVideoFile(string $url): bool
@@ -213,6 +234,7 @@ class Embed extends ArrayableString
     {
         return match (true) {
             blank($url) => self::UNSUPPORTED,
+            self::cloudflareParts($url) !== null => self::CLOUDFLARE,
             Str::contains($url, self::VIMEO) => self::VIMEO,
             Str::contains($url, ['youtu.be', 'youtube']) => self::YOUTUBE,
             self::isVideoFile($url) => self::FILE,

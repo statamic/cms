@@ -34,6 +34,7 @@ class VideoTest extends TestCase
     {
         return [
             'url' => ['https://vimeo.com/22439234', 'vimeo', 'https://player.vimeo.com/video/22439234?dnt=1'],
+            'cloudflare' => ['https://customer-wve7oze7jjxdb0j6.cloudflarestream.com/b209b1484821fff0ed2e5535fbb4ff7b/manifest/video.m3u8', 'cloudflare', 'https://customer-wve7oze7jjxdb0j6.cloudflarestream.com/b209b1484821fff0ed2e5535fbb4ff7b/iframe'],
             'file' => ['https://example.com/clip.mp4', 'file', 'https://example.com/clip.mp4'],
             'unsupported' => ['https://example.com/nope', 'unsupported', null],
         ];
