@@ -64,6 +64,7 @@ export default {
                 this.readOnly ||
                 this.config.visibility === 'read_only' ||
                 this.config.visibility === 'computed' ||
+                this.config.read_only === true ||
                 false
             );
         },

@@ -1,17 +1,23 @@
 <template>
     <div>
         <div class="flex items-center gap-2" v-if="isToggleMode">
-            <Switch :model-value="isRevealed" @update:model-value="update" :read-only="isReadOnly" :id="id" />
+            <Switch
+                :model-value="isRevealed"
+                :disabled="config.disabled || isReadOnly"
+                :id="id"
+                @update:model-value="onToggleUpdate"
+            />
             <Heading v-if="config.input_label" v-html="$markdown(__(config.input_label), { openLinksInNewTabs: true })" />
         </div>
         <Button
             v-else
             icon="eye-closed"
-            @click="buttonReveal"
-            :read-only="isReadOnly"
-            :disabled="config.disabled"
+            :disabled="config.disabled || isReadOnly"
             :text="config.input_label || __('Show Fields')"
             :v-tooltip="__(config.instructions)"
+            :data-readonly="isReadOnly ? true : undefined"
+            :class="isReadOnly ? revealerReadOnlyButtonClass : undefined"
+            @click="buttonReveal"
         />
     </div>
 </template>
@@ -31,6 +37,10 @@ const isRevealed = computed(() => props.value);
 const isToggleMode = computed(() => data_get(props.config, 'mode') === 'toggle');
 const fieldPath = computed(() => props.fieldPathPrefix ? `${props.fieldPathPrefix}.${props.handle}` : props.handle);
 
+/** Dashed read-only aesthetic on the control (matches radio/checkbox field controls). */
+const revealerReadOnlyButtonClass =
+    'data-readonly:border-dashed! data-readonly:border-gray-300 data-readonly:with-contrast:border-gray-100 data-readonly:dark:border! data-readonly:dark:border-dashed! data-readonly:dark:border-gray-600!';
+
 onMounted(() => setRevealerField(fieldPath.value));
 onBeforeUnmount(() => unsetRevealerField(fieldPath.value));
 
@@ -38,6 +48,11 @@ watch(fieldPath, (fieldPath, oldFieldPath) => {
     unsetRevealerField(oldFieldPath);
     nextTick(() => setRevealerField(fieldPath));
 });
+
+function onToggleUpdate(value) {
+    if (isReadOnly.value) return;
+    update(value);
+}
 
 function buttonReveal() {
     if (isReadOnly.value) return;

@@ -59,6 +59,7 @@
                                             :sets="setConfigs"
                                             :index="index"
                                             :enabled="canAddSet"
+                                            :read-only="isReadOnly"
                                             :is-first="index === 0"
                                             :show-connector="!(index === 0 && config.hide_display)"
                                             :loading-set="loadingSet"
@@ -77,6 +78,7 @@
                             :index="value.length"
                             :label="config.button_label"
                             :is-first="value.length === 0"
+                            :read-only="isReadOnly"
                             :loading-set="loadingSet"
                             @added="addSet"
                         />
