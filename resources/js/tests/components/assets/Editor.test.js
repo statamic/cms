@@ -118,3 +118,30 @@ test.each([['navigateToPreviousAsset'], ['navigateToNextAsset']])(
         expect(component.$emit).not.toHaveBeenCalled();
     },
 );
+
+function saveFocalPoint(options) {
+    const component = {
+        $emit: vi.fn(),
+        $nextTick: (callback) => callback(),
+        save: vi.fn(() => Promise.resolve()),
+    };
+
+    Editor.methods.saveFocalPoint.call(component, options);
+
+    return component;
+}
+
+test('saving the focal point keeps the asset editor open', async () => {
+    const component = saveFocalPoint();
+
+    await vi.waitFor(() => expect(component.save).toHaveBeenCalled());
+    await new Promise((r) => setTimeout(r));
+
+    expect(component.$emit).not.toHaveBeenCalledWith('closed');
+});
+
+test('saving the focal point can close the asset editor', async () => {
+    const component = saveFocalPoint({ close: true });
+
+    await vi.waitFor(() => expect(component.$emit).toHaveBeenCalledWith('closed'));
+});

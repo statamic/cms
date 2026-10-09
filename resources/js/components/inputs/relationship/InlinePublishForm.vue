@@ -23,6 +23,7 @@
                     :is-inline="true"
                     :publish-container="publishContainer"
                     @saved="saved"
+                    @close="close"
                 >
                     <template #action-buttons-right>
                         <slot name="action-buttons-right" />

@@ -6,7 +6,7 @@
     <StackHeader v-if="!loading" :title="__(values.display) || __(config.display) || config.handle" :icon="fieldtype.icon">
         <template #actions>
             <Button v-if="!showSaveOnlyAtTopLevel" variant="default" @click.prevent="commit" :text="__('Apply')" />
-            <Button v-if="!(isNestedField)" variant="primary" @click.prevent="commitAndSave" icon="save" :text="showSaveOnlyAtTopLevel ? __('Save') : __('Apply & Save')" />
+            <Button v-if="!(isNestedField)" variant="primary" @click.prevent="commitAndSave" icon="save" :text="showSaveOnlyAtTopLevel ? __('Save') : __('Apply & Save')" v-tooltip="saveAndCloseShortcutLabel" />
             <Button v-if="isNestedField" variant="default" @click.prevent="commitAndSaveAll" :text="__('Save All')" v-tooltip="saveAllShortcutLabel" />
             <Button v-if="isNestedField" variant="primary" @click.prevent="commitAndSaveTopStack" icon="save" :text="__('Save')" />
         </template>
@@ -63,6 +63,7 @@
 import { FieldConditionsBuilder, FIELD_CONDITIONS_KEYS } from '../field-conditions/FieldConditions.js';
 import FieldValidationBuilder from '../field-validation/Builder.vue';
 import { Heading, Button, Tabs, TabList, TabTrigger, TabContent, CardPanel, Icon, StackHeader, StackContent } from '@/components/ui';
+import shortcutLabel from '@/util/shortcutLabel.js';
 
 export default {
     emits: ['committed', 'closed'],
@@ -192,12 +193,12 @@ export default {
             return this.isInsideSet || this.isInsideConfigFields;
         },
 
+        saveAndCloseShortcutLabel() {
+            return __('Save & Close (:shortcut)', { shortcut: shortcutLabel('mod+shift+s') });
+        },
+
         saveAllShortcutLabel() {
-            const platform = typeof navigator !== 'undefined'
-                ? (navigator.userAgentData?.platform || navigator.platform || '')
-                : '';
-            const isMac = /Mac|iPhone|iPad|iPod/i.test(platform);
-            return isMac ? 'Cmd+Shift+S' : 'Ctrl+Shift+S';
+            return __('Save All (:shortcut)', { shortcut: shortcutLabel('mod+shift+s') });
         },
     },
 
