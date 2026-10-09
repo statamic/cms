@@ -1,0 +1,2 @@
+@props(['title' => null])
+<div {{ $attributes }}>{!! $title !!}</div>
