@@ -422,7 +422,7 @@ class FormsController extends CpController
 
     protected function insertSection(array $sections, string $handle, array $section, ?string $before = null, ?string $after = null): array
     {
-        if (! $before && ! $after) {
+        if ((! $before && ! $after) || isset($sections[$handle])) {
             return $sections + [$handle => $section];
         }
 

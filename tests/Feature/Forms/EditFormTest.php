@@ -176,4 +176,23 @@ class EditFormTest extends TestCase
                 'Enable Automagic Form',
             ]);
     }
+
+    #[Test]
+    public function positioned_sections_do_not_replace_existing_sections_with_the_same_handle()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
+        $user = User::make()->assignRole('test')->save();
+        $form = tap(Form::make('test'))->save();
+
+        Form::appendConfigFields('*', 'fields', [
+            'injected' => ['type' => 'text', 'display' => 'Injected into duplicate section'],
+        ], afterSection: 'submissions');
+
+        $this
+            ->actingAs($user)
+            ->get(cp_route('forms.edit', $form->handle()))
+            ->assertSuccessful()
+            ->assertSee('Honeypot')
+            ->assertDontSee('Injected into duplicate section');
+    }
 }
