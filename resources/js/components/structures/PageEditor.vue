@@ -309,7 +309,7 @@ export default {
     },
 
     created() {
-        this.saveKeyBinding = this.$keys.bindGlobal(['mod+enter', 'mod+s'], (e) => {
+        this.saveKeyBinding = this.$keys.bindGlobal(['mod+enter', 'mod+s', 'mod+shift+s'], (e) => {
             e.preventDefault();
             this.submit();
         });

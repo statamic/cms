@@ -133,8 +133,8 @@ export default {
         editing: {
             handler(isEditing) {
                 if (isEditing) {
-                    // Bind Cmd+S to trigger save or confirm based on stack type
-                    this.saveKeyBinding = this.$keys.bindGlobal(['mod+s'], (e) => {
+                    // Bind Cmd+S and Cmd+Shift+S to trigger save or confirm based on stack type
+                    this.saveKeyBinding = this.$keys.bindGlobal(['mod+s', 'mod+shift+s'], (e) => {
                         e.preventDefault();
                         e.stopPropagation();
                         this.handleSaveOrConfirm();
