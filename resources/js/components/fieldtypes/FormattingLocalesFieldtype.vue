@@ -3,12 +3,13 @@
         clearable
         taggable
         :options="options"
+        :search-keys="['label', 'value']"
         :read-only="isReadOnly"
         :placeholder="null"
         :model-value="value"
         @update:modelValue="comboboxUpdated"
     >
-        <template #selected-option="{ option: { value, label, sample } }">
+        <template #selected-option="{ option: { value, label } }">
             <template v-if="value === 'language'">{{ label }}</template>
             <div v-else class="w-full flex justify-between">
                 <div class="text-start flex-1">
@@ -18,14 +19,14 @@
                 <span class="text-gray-500 dark:text-gray-400" v-text="getSample(value)" />
             </div>
         </template>
-        <template #option="{ value, label, sample }">
+        <template #option="{ value, label }">
             <template v-if="value === 'language'">{{ label }}</template>
             <div v-else class="w-full flex justify-between">
                 <div class="text-start flex-1">
                     {{ label }}
                     <span class="ms-4 text-gray-500 dark:text-gray-400" v-text="value" />
                 </div>
-                <span class="text-gray-500 dark:text-gray-400" v-text="sample" />
+                <span class="text-gray-500 dark:text-gray-400" v-text="getSample(value)" />
             </div>
         </template>
     </Combobox>
@@ -42,23 +43,25 @@ const props = defineProps(Fieldtype.props);
 const { isReadOnly, update } = Fieldtype.use(emit, props);
 
 const candidateLocales = [
-    'ar', 'az', 'cs', 'da', 'de', 'de-CH', 'en', 'es', 'et', 'fa', 'fr',
-    'hu', 'id', 'it', 'ja', 'ms', 'nb', 'nl', 'pl', 'pt', 'pt-BR', 'ru',
+    'ar', 'az', 'cs', 'da', 'de', 'de-AT', 'de-CH', 'en', 'en-GB', 'es', 'es-419', 'et', 'fa', 'fr',
+    'fr-CA', 'fr-CH', 'hu', 'id', 'it', 'it-CH', 'ja', 'ms', 'nb', 'nl', 'pl', 'pt', 'pt-BR', 'ru',
     'sl', 'sv', 'tr', 'uk', 'vi', 'zh-CN', 'zh-TW',
 ];
 
+const uiLocale = document.documentElement.lang || 'en';
+
 const displayNames = typeof Intl.DisplayNames !== 'undefined'
-    ? new Intl.DisplayNames([document.documentElement.lang || 'en'], { type: 'language' })
+    ? new Intl.DisplayNames([uiLocale], { type: 'language', languageDisplay: 'standard' })
     : null;
 
 const options = computed(() => {
-    const locales = Intl.DateTimeFormat.supportedLocalesOf(candidateLocales);
+    const locales = Intl.DateTimeFormat.supportedLocalesOf([...candidateLocales, ...browserLocales()]);
 
-    const formatted = locales.map((locale) => ({
-        value: locale,
-        label: getLabel(locale),
-        sample: getSample(locale),
-    }));
+    const collator = new Intl.Collator(uiLocale);
+
+    const formatted = locales
+        .map((locale) => ({ value: locale, label: getLabel(locale) }))
+        .sort((a, b) => collator.compare(a.label, b.label));
 
     return [
         { value: 'language', label: __('Same as language') },
@@ -66,8 +69,20 @@ const options = computed(() => {
     ];
 });
 
+function browserLocales() {
+    try {
+        return Intl.getCanonicalLocales(navigator.languages ?? []);
+    } catch {
+        return [];
+    }
+}
+
 function getLabel(locale) {
-    return displayNames?.of(locale.split('-')[0]);
+    try {
+        return displayNames?.of(locale) ?? locale;
+    } catch {
+        return locale;
+    }
 }
 
 function getSample(locale) {
