@@ -5,11 +5,9 @@
             class="shadow-ui-sm relative w-full rounded-lg border border-gray-300 bg-white text-base dark:border-white/10 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black"
             :dir="uiDirection"
             :class="{
-                // We’re styling a Set so that it shows a “selection outline” when selected with the mouse or keyboard.
-                // The extra `&:not(:has(:focus-within))` rule turns that outline off if any element inside the Set has focus (e.g. when editing inside a Bard field).
-                // This prevents the outer selection outline from showing while the user is actively working inside the Set.
-                'st-set-is-selected [&:not(:has(:focus-within))]:border-blue-400! [&:not(:has(:focus-within))]:dark:border-blue-400! [&:not(:has(:focus-within))]:before:content-[\'\'] [&:not(:has(:focus-within))]:before:absolute [&:not(:has(:focus-within))]:before:inset-[-1px] [&:not(:has(:focus-within))]:before:pointer-events-none [&:not(:has(:focus-within))]:before:border-2 [&:not(:has(:focus-within))]:before:border-blue-400 [&:not(:has(:focus-within))]:dark:before:border-blue-400 [&:not(:has(:focus-within))]:before:rounded-lg': showSelectionHighlight,
+                'st-set-is-selected': showSelectionHighlight,
                 'border-red-500': hasError,
+                'st-dropdown-just-closed': dropdownJustClosed,
             }"
             :data-type="config.handle"
             contenteditable="false"
@@ -17,7 +15,8 @@
             @paste.stop
             @cut.stop
             @dragstart="preventNodeSelectionDrag"
-            @mousedown="preventFormControlNodeSelection"
+            @mousedown="onMousedown"
+            @click="keepButtonGroupFocused"
         >
             <div ref="content" hidden />
             <header
@@ -52,7 +51,7 @@
                 <div class="flex items-center gap-2" v-if="!isReadOnly">
                     <Switch size="xs" v-model="enabled" v-tooltip="enabled ? __('Included in output') : __('Hidden from output')" />
 
-                    <Dropdown>
+                    <Dropdown @closed="onSetDropdownClosed">
                         <template #trigger>
                             <Button icon="dots" variant="ghost" size="xs" :aria-label="__('Open dropdown menu')" @mousedown.prevent />
                         </template>
@@ -128,6 +127,12 @@ export default {
     setup() {
         return {
             uiDirection: useUiDirection().direction,
+        };
+    },
+
+    data() {
+        return {
+            dropdownJustClosed: false,
         };
     },
 
@@ -354,6 +359,59 @@ export default {
             this._draggableObserver?.observe(this.$el, { attributes: true, attributeFilter: ['draggable'] });
         },
 
+        onSetDropdownClosed() {
+            this.dropdownJustClosed = true;
+            if (this._dropdownJustClosedTimeout) clearTimeout(this._dropdownJustClosedTimeout);
+            this._dropdownJustClosedTimeout = setTimeout(() => {
+                this.dropdownJustClosed = false;
+                this._dropdownJustClosedTimeout = null;
+            }, 150);
+        },
+
+        onMousedown(event) {
+            this.focusClickedButton(event);
+            this.preventFormControlNodeSelection(event);
+        },
+
+        clickedButton(event) {
+            const target = event.target instanceof Element ? event.target : event.target.parentElement;
+
+            return target?.closest('button:not(:disabled)');
+        },
+
+        focusClickedButton(event) {
+            // Safari doesn't focus buttons on click, which breaks the :focus-within rules for the selection outline.
+            // Buttons that keep focus elsewhere on purpose (e.g. with @mousedown.prevent) are left alone.
+            if (event.defaultPrevented) return;
+
+            const button = this.clickedButton(event);
+            if (!button) return;
+
+            button.focus({ preventScroll: true });
+
+            // Safari's default mousedown action then moves focus off the button again, which makes
+            // the outline flicker until it's re-focused. Preventing it keeps focus where we put it.
+            if (document.activeElement === button) event.preventDefault();
+        },
+
+        keepButtonGroupFocused(event) {
+            const button = this.clickedButton(event);
+            if (!button?.closest('[data-ui-button-group]')) return;
+
+            // Some components re-focus a wrapper after a click, so put focus back on the button.
+            // If the click moved focus somewhere else on purpose (e.g. into a modal), leave it there.
+            const refocus = () => {
+                const active = document.activeElement;
+                if (active === button) return;
+                if (active && active !== document.body && !active.contains(button)) return;
+
+                button.focus({ preventScroll: true });
+            };
+
+            requestAnimationFrame(refocus);
+            setTimeout(refocus, 0);
+        },
+
         preventFormControlNodeSelection(event) {
             const target = event.target instanceof Element ? event.target : event.target.parentElement;
 
@@ -405,6 +463,7 @@ export default {
     },
 
     beforeUnmount() {
+        if (this._dropdownJustClosedTimeout) clearTimeout(this._dropdownJustClosedTimeout);
         this._draggableObserver?.disconnect();
     },
 };
