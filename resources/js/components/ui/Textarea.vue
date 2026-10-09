@@ -3,10 +3,13 @@ import { cva } from 'cva';
 import CharacterCounter from './CharacterCounter.vue';
 import Button from './Button/Button.vue';
 import autosize from 'autosize/dist/autosize.js';
-import { computed, nextTick, onBeforeUnmount, onMounted, useTemplateRef } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, toRef, useAttrs, useTemplateRef } from 'vue';
 import useCopy from '@/composables/copy';
+import { mergeAriaDescribedBy, useUiFieldId } from '@/composables/ui-field-id.js';
 
 defineEmits(['update:modelValue']);
+
+defineOptions({ inheritAttrs: false });
 
 const props = defineProps({
     /** When `true`, the textarea will automatically grow/shrink to fit content */
@@ -14,7 +17,7 @@ const props = defineProps({
     /** When `true`, shows a copy button to copy the value to clipboard */
     copyable: { type: Boolean, default: false },
     disabled: { type: Boolean, default: false },
-    /** ID attribute for the textarea element */
+    /** ID attribute for the textarea element. Inherits from parent `Field` when omitted. */
     id: { type: String, default: null },
     readOnly: { type: Boolean, default: false },
     required: { type: Boolean, default: false },
@@ -26,6 +29,18 @@ const props = defineProps({
     modelValue: { type: String, default: null },
     /** Specify a character limit */
     limit: { type: Number, default: null },
+});
+
+const attrs = useAttrs();
+const { id, describedBy, invalid } = useUiFieldId(toRef(props, 'id'));
+
+const resolvedDescribedBy = computed(() =>
+    mergeAriaDescribedBy(describedBy.value, attrs['aria-describedby']),
+);
+
+const textareaAttrs = computed(() => {
+    const { 'aria-describedby': _describedBy, 'aria-invalid': _invalid, ...rest } = attrs;
+    return rest;
 });
 
 const { copySupported, copied, copy } = useCopy();
@@ -74,10 +89,12 @@ onBeforeUnmount(() => {
             :class="classes"
             :rows="rows"
             :id="id"
-            v-bind="$attrs"
+            v-bind="textareaAttrs"
             :value="modelValue"
             :disabled="disabled"
             :readonly="readOnly"
+            :aria-describedby="resolvedDescribedBy"
+            :aria-invalid="invalid ? 'true' : undefined"
             data-ui-control
             @input="$emit('update:modelValue', $event.target.value)"
         />

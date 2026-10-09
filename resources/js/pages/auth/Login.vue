@@ -3,8 +3,9 @@ import Head from '@/pages/layout/Head.vue';
 import Outside from '@/pages/layout/Outside.vue';
 import { AuthCard, Input, Field, Button, Separator, Checkbox, ErrorMessage } from '@ui';
 import { Link, router } from '@inertiajs/vue3';
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import { usePasskey } from '@/composables/passkey';
+import { reveal } from '@api';
 
 defineOptions({ layout: Outside });
 
@@ -40,7 +41,10 @@ const submit = () => {
             processing.value = true;
             errors.value = {};
         },
-        onError: () => processing.value = false
+        onError: () => {
+            processing.value = false;
+            nextTick(() => reveal.invalid());
+        },
     });
 }
 
