@@ -50,7 +50,12 @@
                     />
                 </button>
                 <div class="flex items-center gap-2" v-if="!isReadOnly">
-                    <Switch size="xs" v-model="enabled" v-tooltip="enabled ? __('Included in output') : __('Hidden from output')" />
+                    <Switch
+                        size="xs"
+                        v-model="enabled"
+                        :label="__('Included in output')"
+                        v-tooltip="enabled ? __('Included in output') : __('Hidden from output')"
+                    />
 
                     <Dropdown>
                         <template #trigger>

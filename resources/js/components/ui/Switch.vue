@@ -1,5 +1,5 @@
 <script setup>
-import { useId } from 'vue';
+import { onMounted, useAttrs, useId } from 'vue';
 import { SwitchRoot, SwitchThumb } from 'reka-ui';
 import { cva } from 'cva';
 
@@ -7,6 +7,12 @@ const props = defineProps({
     required: { type: Boolean, default: false },
     /** The id attribute for the toggle */
     id: { type: String, default: () => useId() },
+    /**
+     * Accessible name announced by assistive technology.
+     * Preferred over a fallthrough `aria-label`. Provide one of `label`,
+     * `aria-label`, or `aria-labelledby` — the switch has no visible text of its own.
+     */
+    label: { type: String, default: null },
     /** The controlled value of the switch */
     modelValue: { type: Boolean, default: false },
     /** Controls the size of the switch. <br><br> Options: `xs`, `sm`, `base`, `lg` */
@@ -16,6 +22,17 @@ const props = defineProps({
 });
 
 defineEmits(['update:modelValue']);
+
+const attrs = useAttrs();
+
+onMounted(() => {
+    if (!import.meta.env.DEV) return;
+    if (props.label || attrs['aria-label'] || attrs['aria-labelledby']) return;
+
+    console.warn(
+        '[ui/Switch] Provide a `label` prop (or `aria-label` / `aria-labelledby`) so the switch has an accessible name.',
+    );
+});
 
 const switchRootClasses = cva({
     base: [
@@ -57,6 +74,7 @@ const switchThumbClasses = cva({
         data-ui-control
         dir="ltr"
         :id="id"
+        v-bind="label ? { 'aria-label': label } : {}"
         :model-value="modelValue"
         :class="switchRootClasses"
         :disabled="disabled"

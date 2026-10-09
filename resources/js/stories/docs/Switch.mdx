@@ -7,6 +7,9 @@ import * as SwitchStories from '../Switch.stories';
 Toggle a setting on or off. Suitable for binary options like enabling or disabling features.
 <Canvas of={SwitchStories._DocsIntro} sourceState={'shown'} />
 
+## Accessibility
+The switch renders a `role="switch"` control with no visible text of its own. Pass a `label` prop so assistive technology can announce what it controls. You can also supply a fallthrough `aria-label` or `aria-labelledby` instead — useful when a visible label already exists in the DOM.
+
 ## Sizes
 Use the `size` prop to change the size of the switch.
 <Canvas of={SwitchStories._Sizes} sourceState={'shown'} />
