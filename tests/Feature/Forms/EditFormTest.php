@@ -84,48 +84,23 @@ class EditFormTest extends TestCase
     }
 
     #[Test]
-    public function fields_can_be_added_before_an_existing_field()
+    public function section_positions_cannot_be_used_when_adding_fields_to_an_existing_section()
     {
         $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
         $user = User::make()->assignRole('test')->save();
         $form = tap(Form::make('test'))->save();
 
         Form::appendConfigFields('*', 'Fields', [
-            'recaptcha' => ['type' => 'text', 'display' => 'Injected before honeypot'],
-        ], before: 'honeypot');
+            'recaptcha' => ['type' => 'text'],
+        ], afterSection: 'name');
+
+        $this->withoutExceptionHandling();
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage("The [Fields] section already exists, so beforeSection and afterSection can't be used.");
 
         $this
             ->actingAs($user)
-            ->get(cp_route('forms.edit', $form->handle()))
-            ->assertSuccessful()
-            ->assertSeeInOrder([
-                'Title',
-                'Injected before honeypot',
-                'Honeypot',
-                'Store Submissions',
-            ]);
-    }
-
-    #[Test]
-    public function fields_can_be_added_after_an_existing_field()
-    {
-        $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
-        $user = User::make()->assignRole('test')->save();
-        $form = tap(Form::make('test'))->save();
-
-        Form::appendConfigFields('*', 'Submissions', [
-            'webhook' => ['type' => 'text', 'display' => 'Injected after store'],
-        ], after: 'store');
-
-        $this
-            ->actingAs($user)
-            ->get(cp_route('forms.edit', $form->handle()))
-            ->assertSuccessful()
-            ->assertSeeInOrder([
-                'Store Submissions',
-                'Injected after store',
-                'Enable Fake Submission Generator',
-            ]);
+            ->get(cp_route('forms.edit', $form->handle()));
     }
 
     #[Test]
@@ -137,7 +112,7 @@ class EditFormTest extends TestCase
 
         Form::appendConfigFields('*', 'Automagic Forms', [
             'automagic_form' => ['type' => 'toggle', 'display' => 'Enable Automagic Form'],
-        ], before: 'submissions');
+        ], beforeSection: 'submissions');
 
         $this
             ->actingAs($user)
@@ -160,7 +135,7 @@ class EditFormTest extends TestCase
 
         Form::appendConfigFields('*', 'Automagic Forms', [
             'automagic_form' => ['type' => 'toggle', 'display' => 'Enable Automagic Form'],
-        ], after: 'fields');
+        ], afterSection: 'fields');
 
         $this
             ->actingAs($user)

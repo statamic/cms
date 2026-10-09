@@ -3,6 +3,7 @@
 namespace Statamic\Forms;
 
 use Closure;
+use InvalidArgumentException;
 use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\Contracts\Forms\FormRepository as Contract;
 use Statamic\Contracts\Forms\Submission as SubmissionContract;
@@ -85,18 +86,18 @@ class FormRepository implements Contract
         return $form;
     }
 
-    public function appendConfigFields($handles, string $display, array $fields, ?string $before = null, ?string $after = null)
+    public function appendConfigFields($handles, string $display, array $fields, ?string $beforeSection = null, ?string $afterSection = null)
     {
-        if ($before && $after) {
-            throw new \InvalidArgumentException('Pass only before or after, not both.');
+        if ($beforeSection && $afterSection) {
+            throw new InvalidArgumentException('Pass only beforeSection or afterSection, not both.');
         }
 
         $this->configs[] = [
             'display' => $display,
             'handles' => Arr::wrap($handles),
             'fields' => $fields,
-            'before' => $before,
-            'after' => $after,
+            'beforeSection' => $beforeSection,
+            'afterSection' => $afterSection,
         ];
     }
 
@@ -115,8 +116,8 @@ class FormRepository implements Contract
                         'fields' => collect($config['fields'])
                             ->filter(fn ($field, $index) => ! in_array($field['handle'] ?? $index, $reserved))
                             ->all(),
-                        'before' => $config['before'] ?? null,
-                        'after' => $config['after'] ?? null,
+                        'beforeSection' => $config['beforeSection'] ?? null,
+                        'afterSection' => $config['afterSection'] ?? null,
                     ], fn ($value) => ! is_null($value)),
                 ];
             })

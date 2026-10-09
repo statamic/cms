@@ -82,37 +82,37 @@ class FormRepositoryTest extends TestCase
     }
 
     #[Test]
-    public function it_registers_config_with_before_position()
+    public function it_registers_config_with_before_section_position()
     {
-        $this->repo->appendConfigFields('*', 'Fields', [
+        $this->repo->appendConfigFields('*', 'Spam', [
             'recaptcha' => ['type' => 'toggle'],
-        ], before: 'honeypot');
+        ], beforeSection: 'fields');
 
         $this->assertEquals([
-            'fields' => [
-                'display' => 'Fields',
+            'spam' => [
+                'display' => 'Spam',
                 'fields' => [
                     'recaptcha' => ['type' => 'toggle'],
                 ],
-                'before' => 'honeypot',
+                'beforeSection' => 'fields',
             ],
         ], $this->repo->extraConfigFor('test_form'));
     }
 
     #[Test]
-    public function it_registers_config_with_after_position()
+    public function it_registers_config_with_after_section_position()
     {
-        $this->repo->appendConfigFields('*', 'Fields', [
+        $this->repo->appendConfigFields('*', 'Spam', [
             'recaptcha' => ['type' => 'toggle'],
-        ], after: 'honeypot');
+        ], afterSection: 'fields');
 
         $this->assertEquals([
-            'fields' => [
-                'display' => 'Fields',
+            'spam' => [
+                'display' => 'Spam',
                 'fields' => [
                     'recaptcha' => ['type' => 'toggle'],
                 ],
-                'after' => 'honeypot',
+                'afterSection' => 'fields',
             ],
         ], $this->repo->extraConfigFor('test_form'));
     }
@@ -121,10 +121,10 @@ class FormRepositoryTest extends TestCase
     public function it_throws_when_both_before_and_after_are_provided()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Pass only before or after, not both.');
+        $this->expectExceptionMessage('Pass only beforeSection or afterSection, not both.');
 
-        $this->repo->appendConfigFields('*', 'Fields', [
+        $this->repo->appendConfigFields('*', 'Spam', [
             'recaptcha' => ['type' => 'toggle'],
-        ], before: 'honeypot', after: 'title');
+        ], beforeSection: 'fields', afterSection: 'name');
     }
 }

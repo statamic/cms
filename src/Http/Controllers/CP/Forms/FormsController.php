@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers\CP\Forms;
 
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use InvalidArgumentException;
 use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\CP\Column;
 use Statamic\CP\PublishForm;
@@ -378,22 +379,22 @@ class FormsController extends CpController
             $merged = false;
             foreach ($fields as $sectionHandle => $section) {
                 if ($section['display'] == __($config['display'])) {
-                    $fields[$sectionHandle]['fields'] = $this->insertRelative(
-                        $section['fields'],
-                        $config['fields'],
-                        $config['before'] ?? null,
-                        $config['after'] ?? null,
-                    );
+                    if (isset($config['beforeSection']) || isset($config['afterSection'])) {
+                        throw new InvalidArgumentException("The [{$config['display']}] section already exists, so beforeSection and afterSection can't be used.");
+                    }
+
+                    $fields[$sectionHandle]['fields'] += $config['fields'];
                     $merged = true;
                 }
             }
 
             if (! $merged) {
-                $fields = $this->insertRelative(
+                $fields = $this->insertSection(
                     $fields,
-                    [$handle => Arr::except($config, ['before', 'after'])],
-                    $config['before'] ?? null,
-                    $config['after'] ?? null,
+                    $handle,
+                    Arr::except($config, ['beforeSection', 'afterSection']),
+                    $config['beforeSection'] ?? null,
+                    $config['afterSection'] ?? null,
                 );
             }
         }
@@ -418,33 +419,29 @@ class FormsController extends CpController
 
     }
 
-    protected function insertRelative(array $existing, array $new, ?string $before = null, ?string $after = null): array
+    protected function insertSection(array $sections, string $handle, array $section, ?string $before = null, ?string $after = null): array
     {
         if (! $before && ! $after) {
-            return $existing + $new;
+            return $sections + [$handle => $section];
         }
 
         $result = [];
         $inserted = false;
 
-        foreach ($existing as $handle => $item) {
-            if ($before === $handle) {
-                foreach ($new as $newHandle => $newItem) {
-                    $result[$newHandle] = $newItem;
-                }
+        foreach ($sections as $existingHandle => $existing) {
+            if ($before === $existingHandle) {
+                $result[$handle] = $section;
                 $inserted = true;
             }
 
-            $result[$handle] = $item;
+            $result[$existingHandle] = $existing;
 
-            if ($after === $handle) {
-                foreach ($new as $newHandle => $newItem) {
-                    $result[$newHandle] = $newItem;
-                }
+            if ($after === $existingHandle) {
+                $result[$handle] = $section;
                 $inserted = true;
             }
         }
 
-        return $inserted ? $result : $existing + $new;
+        return $inserted ? $result : $sections + [$handle => $section];
     }
 }
