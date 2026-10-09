@@ -585,7 +585,7 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
 
     private function submissionCount(): int
     {
-        $query = $this->querySubmissions()->whereNull('partial');
+        $query = $this->querySubmissions()->whereStatus('finalized');
 
         if ($start = $this->submissionLimitPeriodStart()) {
             $query->where('date', '>=', $start);

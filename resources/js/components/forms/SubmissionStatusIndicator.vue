@@ -6,7 +6,7 @@ const props = defineProps({
         type: String,
         required: false,
         default: 'finalized',
-        validator: (value) => ['finalized', 'partial'].includes(value),
+        validator: (value) => ['finalized', 'partial', 'spam'].includes(value),
     },
     showDot: { type: Boolean, default: true },
     showLabel: { type: Boolean, default: false },
@@ -16,6 +16,7 @@ const statusClass = computed(() => {
     return {
         finalized: 'bg-green-400',
         partial: 'bg-gray-300 dark:bg-gray-200',
+        spam: 'bg-amber-400',
     }[props.status];
 });
 
@@ -23,6 +24,7 @@ const label = computed(() => {
     return {
         finalized: __('Finalized'),
         partial: __('Partial'),
+        spam: __('Spam'),
     }[props.status];
 });
 </script>

@@ -33,8 +33,9 @@ class SubmissionStatus extends Filter
     public function apply($query, $values)
     {
         match ($values['status']) {
-            'partial' => $query->where('partial', true),
-            default => $query->where('partial', '!=', true),
+            'partial' => $query->where('partial', true)->where('spam', '!=', true),
+            'spam' => $query->where('spam', true),
+            default => $query->where('partial', '!=', true)->where('spam', '!=', true),
         };
     }
 
@@ -53,6 +54,7 @@ class SubmissionStatus extends Filter
         return collect([
             'finalized' => __('Finalized'),
             'partial' => __('Partial'),
+            'spam' => __('Spam'),
         ]);
     }
 }
