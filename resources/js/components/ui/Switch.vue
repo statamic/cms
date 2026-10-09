@@ -1,12 +1,13 @@
 <script setup>
-import { useId } from 'vue';
+import { toRef } from 'vue';
 import { SwitchRoot, SwitchThumb } from 'reka-ui';
 import { cva } from 'cva';
+import { useUiFieldId } from '@/composables/ui-field-id.js';
 
 const props = defineProps({
     required: { type: Boolean, default: false },
-    /** The id attribute for the toggle */
-    id: { type: String, default: () => useId() },
+    /** The id attribute for the toggle. Inherits from parent `Field` when omitted. */
+    id: { type: String, default: null },
     /** The controlled value of the switch */
     modelValue: { type: Boolean, default: false },
     /** Controls the size of the switch. <br><br> Options: `xs`, `sm`, `base`, `lg` */
@@ -16,6 +17,8 @@ const props = defineProps({
 });
 
 defineEmits(['update:modelValue']);
+
+const { id } = useUiFieldId(toRef(props, 'id'));
 
 const switchRootClasses = cva({
     base: [
