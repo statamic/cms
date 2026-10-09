@@ -170,6 +170,7 @@
                 :image="asset.preview"
                 @selected="selectFocalPoint"
                 @closed="closeFocalPointEditor"
+                @save="saveFocalPoint"
             />
 
             <crop-editor
@@ -321,10 +322,17 @@ export default {
         this.load();
 
         window.addEventListener('keydown', this.keydown);
+
+        this.saveKeyBinding = this.$keys.bindGlobal(['mod+s'], (e) => {
+            e.preventDefault();
+            if (this.readOnly || this.loading || this.saving) return;
+            this.saveAndClose();
+        });
     },
 
     beforeUnmount() {
         window.removeEventListener('keydown', this.keydown);
+        this.saveKeyBinding.destroy();
     },
 
     events: {
@@ -407,19 +415,27 @@ export default {
         },
 
         navigateToPreviousAsset() {
-            if (this.$dirty.has(this.publishContainer)) {
-                this.save();
+            if (this.saving) return;
+
+            if (!this.$dirty.has(this.publishContainer)) {
+                return this.$emit('previous');
             }
 
-            this.$emit('previous');
+            this.save()
+                .then(() => this.$emit('previous'))
+                .catch(() => {});
         },
 
         navigateToNextAsset() {
-            if (this.$dirty.has(this.publishContainer)) {
-                this.save();
+            if (this.saving) return;
+
+            if (!this.$dirty.has(this.publishContainer)) {
+                return this.$emit('next');
             }
 
-            this.$emit('next');
+            this.save()
+                .then(() => this.$emit('next'))
+                .catch(() => {});
         },
 
         openFocalPointEditor() {
@@ -434,6 +450,10 @@ export default {
             point = point === '50-50-1' ? null : point;
             this.values['focus'] = point;
             this.$dirty.add(this.publishContainer);
+        },
+
+        saveFocalPoint() {
+            this.$nextTick(() => this.save().catch(() => {}));
         },
 
         openCropEditor() {
