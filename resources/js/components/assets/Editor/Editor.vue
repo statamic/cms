@@ -159,7 +159,7 @@
                     <div class="flex items-center space-x-3 rtl:space-x-reverse">
                         <ui-button v-if="showNavigation" icon="chevron-left" @click="navigateToPreviousAsset" v-tooltip="__('Previous Asset')" />
                         <ui-button v-if="showNavigation" icon="chevron-right" @click="navigateToNextAsset" v-tooltip="__('Next Asset')" />
-                        <ui-button variant="primary" icon="save" @click="saveAndClose" v-if="!readOnly" :text="__('Save')" />
+                        <ui-button variant="primary" icon="save" @click="saveAndClose" v-if="!readOnly" :text="__('Save')" v-tooltip="saveAndCloseTooltip" />
                     </div>
                 </div>
             </template>
@@ -212,6 +212,7 @@ import {
     Stack,
 } from '@ui';
 import ItemActions from '@/components/actions/ItemActions.vue';
+import shortcutLabel from '@/util/shortcutLabel.js';
 import useCheckerboard from '@/composables/checkerboard.js';
 
 export default {
@@ -281,6 +282,10 @@ export default {
             return !this.asset.isEditable;
         },
 
+        saveAndCloseTooltip() {
+            return __('Save & Close (:shortcut)', { shortcut: shortcutLabel('mod+shift+s') });
+        },
+
         isImage() {
             if (!this.asset) return false;
 
@@ -326,6 +331,12 @@ export default {
         this.saveKeyBinding = this.$keys.bindGlobal(['mod+s'], (e) => {
             e.preventDefault();
             if (this.readOnly || this.loading || this.saving) return;
+            this.save().catch(() => {});
+        });
+
+        this.saveAndCloseKeyBinding = this.$keys.bindGlobal(['mod+shift+s'], (e) => {
+            e.preventDefault();
+            if (this.readOnly || this.loading || this.saving) return;
             this.saveAndClose();
         });
     },
@@ -333,6 +344,7 @@ export default {
     beforeUnmount() {
         window.removeEventListener('keydown', this.keydown);
         this.saveKeyBinding.destroy();
+        this.saveAndCloseKeyBinding.destroy();
     },
 
     events: {
@@ -452,8 +464,12 @@ export default {
             this.$dirty.add(this.publishContainer);
         },
 
-        saveFocalPoint() {
-            this.$nextTick(() => this.save().catch(() => {}));
+        saveFocalPoint({ close = false } = {}) {
+            this.$nextTick(() => {
+                this.save()
+                    .then(() => close && this.$emit('closed'))
+                    .catch(() => {});
+            });
         },
 
         openCropEditor() {
@@ -525,7 +541,9 @@ export default {
         },
 
         saveAndClose() {
-            this.save().then(() => this.$emit('closed'));
+            this.save()
+                .then(() => this.$emit('closed'))
+                .catch(() => {});
         },
 
         clearErrors() {

@@ -376,8 +376,8 @@ function bindKeyboardShortcuts() {
         }
     });
 
-    // Cmd+S finishes the crop rather than saving and closing the asset editor underneath
-    saveBinding.value = keys.bindGlobal(['mod+s'], (e) => {
+    // Cmd+S and Cmd+Shift+S finish the crop rather than saving the asset editor underneath
+    saveBinding.value = keys.bindGlobal(['mod+s', 'mod+shift+s'], (e) => {
         e.preventDefault();
         if (cropper.value && !showConfirmation.value && !uploading.value) crop();
     });

@@ -6,7 +6,7 @@
     <StackHeader v-if="!loading" :title="__(values.display) || __(config.display) || config.handle" :icon="fieldtype.icon">
         <template #actions>
             <Button v-if="!showSaveOnlyAtTopLevel" variant="default" @click.prevent="commit" :text="__('Apply')" />
-            <Button v-if="!(isNestedField)" variant="primary" @click.prevent="commitAndSave" icon="save" :text="showSaveOnlyAtTopLevel ? __('Save') : __('Apply & Save')" />
+            <Button v-if="!(isNestedField)" variant="primary" @click.prevent="commitAndSave" icon="save" :text="showSaveOnlyAtTopLevel ? __('Save') : __('Apply & Save')" v-tooltip="saveAndCloseShortcutLabel" />
             <Button v-if="isNestedField" variant="default" @click.prevent="commitAndSaveAll" :text="__('Save All')" v-tooltip="saveAllShortcutLabel" />
             <Button v-if="isNestedField" variant="primary" @click.prevent="commitAndSaveTopStack" icon="save" :text="__('Save')" />
         </template>
@@ -191,6 +191,10 @@ export default {
 
         isNestedField() {
             return this.isInsideSet || this.isInsideConfigFields;
+        },
+
+        saveAndCloseShortcutLabel() {
+            return __('Save & Close (:shortcut)', { shortcut: shortcutLabel('mod+shift+s') });
         },
 
         saveAllShortcutLabel() {

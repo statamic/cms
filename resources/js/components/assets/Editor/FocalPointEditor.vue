@@ -105,16 +105,23 @@ export default {
         this.clampPercent('y');
         this.clampZoom();
 
-        // Cmd+S saves the focal point without closing the asset editor underneath
+        // Cmd+S saves the focal point and keeps the asset editor open, Cmd+Shift+S closes it too
         this.saveKeyBinding = this.$keys.bindGlobal(['mod+s'], (e) => {
             e.preventDefault();
             this.select();
             this.$emit('save');
         });
+
+        this.saveAndCloseKeyBinding = this.$keys.bindGlobal(['mod+shift+s'], (e) => {
+            e.preventDefault();
+            this.select();
+            this.$emit('save', { close: true });
+        });
     },
 
     beforeUnmount() {
         this.saveKeyBinding.destroy();
+        this.saveAndCloseKeyBinding.destroy();
     },
 
     computed: {
