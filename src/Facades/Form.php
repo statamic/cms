@@ -15,6 +15,7 @@ use Statamic\Forms\Exporters\ExporterRepository;
  * @method static \Statamic\Contracts\Forms\Form make(string $handle = null)
  * @method static void appendConfigFields(mixed $handles, string $display, array $fields, ?string $beforeSection = null, ?string $afterSection = null)
  * @method static array extraConfigFor(string $handle)
+ * @method static array extraConfigPositionsFor(string $handle)
  * @method static self redirect(string $form, \Closure $callback)
  * @method static \Closure getSubmissionRedirect(Submission $submission)
  * @method static ExporterRepository exporters()

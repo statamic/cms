@@ -15,7 +15,6 @@ use Statamic\Facades\Scope;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Rules\Handle;
-use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 use function Statamic\trans as __;
@@ -376,11 +375,15 @@ class FormsController extends CpController
 
         ];
 
+        $positions = Form::extraConfigPositionsFor($form->handle());
+
         foreach (Form::extraConfigFor($form->handle()) as $handle => $config) {
+            $before = $positions[$handle]['beforeSection'] ?? null;
+            $after = $positions[$handle]['afterSection'] ?? null;
             $merged = false;
             foreach ($fields as $sectionHandle => $section) {
                 if ($section['display'] == __($config['display'])) {
-                    if (isset($config['beforeSection']) || isset($config['afterSection'])) {
+                    if ($before || $after) {
                         throw new InvalidArgumentException("The [{$config['display']}] section already exists, so beforeSection and afterSection can't be used.");
                     }
 
@@ -390,13 +393,7 @@ class FormsController extends CpController
             }
 
             if (! $merged) {
-                $fields = $this->insertSection(
-                    $fields,
-                    $handle,
-                    Arr::except($config, ['beforeSection', 'afterSection']),
-                    $config['beforeSection'] ?? null,
-                    $config['afterSection'] ?? null,
-                );
+                $fields = $this->insertSection($fields, $handle, $config, $before, $after);
             }
         }
 

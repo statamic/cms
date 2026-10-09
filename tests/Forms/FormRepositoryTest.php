@@ -79,6 +79,8 @@ class FormRepositoryTest extends TestCase
                 ],
             ],
         ], $this->repo->extraConfigFor('another_form'));
+
+        $this->assertEquals([], $this->repo->extraConfigPositionsFor('test_form'));
     }
 
     #[Test]
@@ -94,9 +96,15 @@ class FormRepositoryTest extends TestCase
                 'fields' => [
                     'recaptcha' => ['type' => 'toggle'],
                 ],
-                'beforeSection' => 'fields',
             ],
         ], $this->repo->extraConfigFor('test_form'));
+
+        $this->assertEquals([
+            'spam' => [
+                'beforeSection' => 'fields',
+                'afterSection' => null,
+            ],
+        ], $this->repo->extraConfigPositionsFor('test_form'));
     }
 
     #[Test]
@@ -112,9 +120,15 @@ class FormRepositoryTest extends TestCase
                 'fields' => [
                     'recaptcha' => ['type' => 'toggle'],
                 ],
-                'afterSection' => 'fields',
             ],
         ], $this->repo->extraConfigFor('test_form'));
+
+        $this->assertEquals([
+            'spam' => [
+                'beforeSection' => null,
+                'afterSection' => 'fields',
+            ],
+        ], $this->repo->extraConfigPositionsFor('test_form'));
     }
 
     #[Test]

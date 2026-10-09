@@ -105,23 +105,35 @@ class FormRepository implements Contract
     {
         $reserved = ['title', 'honeypot', 'store', 'email'];
 
-        return collect($this->configs)
-            ->filter(function ($config) use ($handle) {
-                return in_array('*', $config['handles']) || in_array($handle, $config['handles']);
-            })
+        return $this->configsFor($handle)
             ->flatMap(function ($config) use ($reserved) {
                 return [
-                    Str::snake($config['display']) => array_filter([
+                    Str::snake($config['display']) => [
                         'display' => $config['display'],
                         'fields' => collect($config['fields'])
                             ->filter(fn ($field, $index) => ! in_array($field['handle'] ?? $index, $reserved))
                             ->all(),
-                        'beforeSection' => $config['beforeSection'] ?? null,
-                        'afterSection' => $config['afterSection'] ?? null,
-                    ], fn ($value) => ! is_null($value)),
+                    ],
                 ];
             })
             ->all();
+    }
+
+    public function extraConfigPositionsFor($handle)
+    {
+        return $this->configsFor($handle)
+            ->filter(fn ($config) => $config['beforeSection'] || $config['afterSection'])
+            ->flatMap(fn ($config) => [
+                Str::snake($config['display']) => Arr::only($config, ['beforeSection', 'afterSection']),
+            ])
+            ->all();
+    }
+
+    private function configsFor($handle)
+    {
+        return collect($this->configs)->filter(function ($config) use ($handle) {
+            return in_array('*', $config['handles']) || in_array($handle, $config['handles']);
+        });
     }
 
     public function redirect(string $form, Closure $callback)
