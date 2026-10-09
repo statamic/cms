@@ -2905,6 +2905,22 @@ YAML;
     }
 
     #[Test]
+    public function it_resolves_pending_original_meta_values_from_disk_when_the_listing_is_loaded()
+    {
+        Storage::disk('test')->put('path/to/test.txt', '');
+
+        // Warm the container listing before the meta file exists.
+        $this->container->files();
+
+        Storage::disk('test')->put('path/to/.meta/test.txt.yaml', "data:\n  alfa: bravo");
+
+        $asset = (new Asset)->container($this->container)->path('path/to/test.txt');
+        $asset->syncOriginal();
+
+        $this->assertEquals(['alfa' => 'bravo'], $asset->getOriginal('data'));
+    }
+
+    #[Test]
     #[DataProvider('warmPresetProvider')]
     public function it_gets_which_presets_to_warm($extension, $orientation, $cpEnabled, $expectedWarm)
     {
