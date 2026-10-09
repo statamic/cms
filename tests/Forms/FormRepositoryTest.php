@@ -132,6 +132,26 @@ class FormRepositoryTest extends TestCase
     }
 
     #[Test]
+    public function a_later_unpositioned_registration_clears_an_earlier_position()
+    {
+        $this->repo->appendConfigFields('*', 'Spam', [
+            'recaptcha' => ['type' => 'toggle'],
+        ], afterSection: 'name');
+
+        $this->repo->appendConfigFields('test_form', 'Spam', [
+            'turnstile' => ['type' => 'toggle'],
+        ]);
+
+        $this->assertEquals([], $this->repo->extraConfigPositionsFor('test_form'));
+        $this->assertEquals([
+            'spam' => [
+                'beforeSection' => null,
+                'afterSection' => 'name',
+            ],
+        ], $this->repo->extraConfigPositionsFor('another_form'));
+    }
+
+    #[Test]
     public function it_throws_when_both_before_and_after_are_provided()
     {
         $this->expectException(\InvalidArgumentException::class);

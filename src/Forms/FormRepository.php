@@ -122,10 +122,10 @@ class FormRepository implements Contract
     public function extraConfigPositionsFor($handle)
     {
         return $this->configsFor($handle)
-            ->filter(fn ($config) => $config['beforeSection'] || $config['afterSection'])
             ->flatMap(fn ($config) => [
                 Str::snake($config['display']) => Arr::only($config, ['beforeSection', 'afterSection']),
             ])
+            ->filter(fn ($position) => $position['beforeSection'] || $position['afterSection'])
             ->all();
     }
 
