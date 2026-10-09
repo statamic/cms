@@ -541,6 +541,38 @@ class AssetTest extends TestCase
     }
 
     #[Test]
+    public function exists_checks_the_disk_without_loading_the_container_listing()
+    {
+        Storage::disk('test')->put('yes.txt', '');
+        $asset = (new Asset)->container($this->container)->path('yes.txt');
+
+        $this->assertTrue($asset->exists());
+        $this->assertFalse(Cache::has('asset-list-contents-test_container'));
+    }
+
+    #[Test]
+    public function exists_uses_the_container_listing_when_it_is_already_loaded()
+    {
+        Storage::disk('test')->put('yes.txt', '');
+        $this->container->files();
+        Storage::disk('test')->put('later.txt', '');
+
+        $this->assertTrue((new Asset)->container($this->container)->path('yes.txt')->exists());
+        $this->assertFalse((new Asset)->container($this->container)->path('later.txt')->exists());
+    }
+
+    #[Test]
+    public function it_resolves_original_data_from_meta_without_loading_the_container_listing()
+    {
+        Storage::disk('test')->put('path/to/test.txt', '');
+        Storage::disk('test')->put('path/to/.meta/test.txt.yaml', "data:\n  foo: bar");
+        $asset = (new Asset)->container($this->container)->path('path/to/test.txt');
+
+        $this->assertEquals(['foo' => 'bar'], $asset->getOriginal()['data']);
+        $this->assertFalse(Cache::has('asset-list-contents-test_container'));
+    }
+
+    #[Test]
     public function it_gets_the_filename()
     {
         $this->assertEquals('asset', (new Asset)->path('path/to/asset.jpg')->filename());
@@ -1160,6 +1192,8 @@ class AssetTest extends TestCase
         })->all());
         $this->assertEquals([
             'old', // the empty directory doesnt actually get deleted
+            'old/.meta',
+            'old/.meta/asset.txt.yaml',
             'new',
             'new/asset.txt',
         ], $container->contents()->cached()->keys()->all());
@@ -1230,6 +1264,8 @@ class AssetTest extends TestCase
         })->all());
         $this->assertEquals([
             'old', // the empty directory doesnt actually get deleted
+            'old/.meta',
+            'old/.meta/asset.txt.yaml',
             'new',
             'new/asset.txt',
         ], $container->contents()->cached()->keys()->all());
@@ -1271,6 +1307,8 @@ class AssetTest extends TestCase
         })->all());
         $this->assertEquals([
             'old', // the empty directory doesnt actually get deleted
+            'old/.meta',
+            'old/.meta/asset.txt.yaml',
             'new',
             'new/newfilename.txt',
         ], $container->contents()->cached()->keys()->all());
@@ -1425,6 +1463,8 @@ class AssetTest extends TestCase
         })->all());
         $this->assertEquals([
             'old',
+            'old/.meta',
+            'old/.meta/asset.txt.yaml',
             'old/newfilename.txt',
         ], $container->contents()->cached()->keys()->all());
         Event::assertDispatched(AssetSaved::class);
@@ -1454,6 +1494,8 @@ class AssetTest extends TestCase
         ], $container->assets('/', true)->map->path()->all());
         $this->assertEquals([
             'old',
+            'old/.meta',
+            'old/.meta/asset.txt.yaml',
             'old/lowercase-this-file.txt',
         ], $container->contents()->cached()->keys()->all());
         Event::assertDispatched(AssetSaved::class);
@@ -1485,6 +1527,8 @@ class AssetTest extends TestCase
         ], $container->assets('/', true)->map->path()->all());
         $this->assertEquals([
             'old',
+            'old/.meta',
+            'old/.meta/asset.txt.yaml',
             'old/do-NOT-lowercase-THIS-file.txt',
         ], $container->contents()->cached()->keys()->all());
         Event::assertDispatched(AssetSaved::class);
@@ -1568,6 +1612,8 @@ class AssetTest extends TestCase
         })->all());
         $this->assertEquals([
             'old',
+            'old/.meta',
+            'old/.meta/foo.txt.yaml',
             'old/do-not-touch.txt',
             'old/tokyo.txt',
             'old/tokyo-1.txt',
@@ -1898,14 +1944,24 @@ class AssetTest extends TestCase
     #[Test]
     public function it_can_upload_a_file_without_an_existing_cache()
     {
-        $this->uploadFileTest();
+        $this->uploadFileTest([
+            'path',
+            'path/to',
+            'path/to/.meta',
+            'path/to/.meta/asset.jpg.yaml',
+            'path/to/asset.jpg',
+        ]);
     }
 
     #[Test]
     public function it_can_upload_a_file_with_an_existing_cache()
     {
         Cache::put('asset-list-contents-test_container', collect());
-        $this->uploadFileTest();
+        $this->uploadFileTest([
+            'path',
+            'path/to',
+            'path/to/asset.jpg',
+        ]);
     }
 
     #[Test]
@@ -1933,7 +1989,7 @@ class AssetTest extends TestCase
         Event::assertNotDispatched(AssetCreated::class);
     }
 
-    private function uploadFileTest()
+    private function uploadFileTest(array $expectedCachedListing)
     {
         Event::fake();
         $asset = (new Asset)->container($this->container)->path('path/to/asset.jpg')->syncOriginal();
@@ -1964,11 +2020,7 @@ class AssetTest extends TestCase
         ], $this->container->assets('/', true)->keyBy->path()->map(function ($item) {
             return $item->data()->all();
         })->all());
-        $this->assertEquals([
-            'path',
-            'path/to',
-            'path/to/asset.jpg',
-        ], Cache::get('asset-list-contents-test_container')->keys()->all());
+        $this->assertEquals($expectedCachedListing, Cache::get('asset-list-contents-test_container')->keys()->all());
 
         Event::assertDispatched(AssetCreating::class, fn ($event) => $event->asset === $asset);
         Event::assertDispatched(AssetSaved::class, fn ($event) => $event->asset === $asset);
