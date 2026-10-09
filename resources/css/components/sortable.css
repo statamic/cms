@@ -23,6 +23,11 @@ table .ui-sortable-helper {
     }
 }
 
+html.cursor-grabbing,
+html.cursor-grabbing * {
+    cursor: grabbing !important;
+}
+
 tbody.ui-sortable {
     > tr > .cell-counter > .move {
         @apply relative hidden text-sm text-gray-700;

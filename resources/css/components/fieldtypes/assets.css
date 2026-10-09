@@ -30,6 +30,21 @@
     }
 }
 
+/* Single asset picker (e.g. Image Choice option image)
+  ========================================================================== */
+
+/* Remove the double border effect */
+.single_asset-fieldtype .asset-tile {
+    outline: none;
+    img {
+        @apply rounded-[calc(var(--radius-sm)-1px)]!;
+    }
+    :has(> &) {
+        padding: 0;
+        padding-block-end: 3px;
+    }
+}
+
 /* In a Bard fieldtype
   ========================================================================== */
 

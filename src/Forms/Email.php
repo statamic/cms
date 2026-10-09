@@ -5,6 +5,8 @@ namespace Statamic\Forms;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Storage;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Blueprint;
@@ -12,6 +14,7 @@ use Statamic\Facades\Config;
 use Statamic\Facades\Form;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Parse;
+use Statamic\Forms\Fields\FormField;
 use Statamic\Sites\Site;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -50,6 +53,17 @@ class Email extends Mailable
     public function getConfig()
     {
         return $this->config;
+    }
+
+    public function hasRecipients(): bool
+    {
+        if (blank($to = Arr::get($this->config, 'to'))) {
+            return false;
+        }
+
+        $this->submissionData = $this->submission->toAugmentedArray();
+
+        return filled($this->addresses($this->parseConfig(['to' => $to])->get('to')));
     }
 
     public function build()
@@ -116,10 +130,14 @@ class Email extends Mailable
         }
 
         $this->getRenderableFieldData(Arr::except($this->submissionData, ['id', 'date', 'form']))
-            ->filter(fn ($field) => in_array($field['fieldtype'], ['assets', 'files']))
+            ->filter(fn ($field) => in_array($field['fieldtype'], ['assets', 'files', 'form_upload']))
             ->each(function ($field) {
                 $field['value'] = $field['value']->value();
-                $field['fieldtype'] === 'assets' ? $this->attachAssets($field) : $this->attachFiles($field);
+
+                $isStoredAsAsset = $field['fieldtype'] === 'assets'
+                    || ($field['fieldtype'] === 'form_upload' && Arr::get($field, 'config.store'));
+
+                $isStoredAsAsset ? $this->attachAssets($field) : $this->attachFiles($field);
             });
 
         return $this;
@@ -151,10 +169,15 @@ class Email extends Mailable
         }
 
         $disk = config('statamic.system.file_uploads_disk', 'local');
-        $basePath = config('statamic.system.file_uploads_path', 'statamic/file-uploads');
+
+        $basePath = $field['fieldtype'] === 'form_upload'
+            ? config('statamic.forms.file_uploads_path', 'statamic/form-uploads')
+            : config('statamic.system.file_uploads_path', 'statamic/file-uploads');
 
         foreach ($value as $file) {
-            $this->attachFromStorageDisk($disk, $basePath.'/'.$file);
+            if (Storage::disk($disk)->exists($path = "{$basePath}/{$file}")) {
+                $this->attachFromStorageDisk($disk, $path);
+            }
         }
     }
 
@@ -162,11 +185,9 @@ class Email extends Mailable
     {
         $augmented = $this->submission->toAugmentedArray();
         $form = $this->submission->form();
-        $fields = $this->getRenderableFieldData(Arr::except($augmented, ['id', 'date', 'form']))
-            ->reject(fn ($field) => $field['fieldtype'] === 'spacer')
-            ->when(Arr::has($this->config, 'attachments'), function ($fields) {
-                return $fields->reject(fn ($field) => in_array($field['fieldtype'], ['assets', 'files']));
-            });
+        $pages = $this->getRenderablePageData($form, $augmented);
+        $sections = collect($pages)->flatMap->sections;
+        $fields = $sections->flatMap->fields;
         $formConfig = ($configFields = Form::extraConfigFor($form->handle()))
             ? Blueprint::makeFromTabs($configFields)->fields()->addValues($form->data()->all())->augment()->values()->all()
             : [];
@@ -176,6 +197,8 @@ class Email extends Mailable
             'email_config' => $this->config,
             'config' => Cascade::config(),
             'fields' => $fields,
+            'sections' => $sections->all(),
+            'pages' => $pages,
             'site_url' => Config::getSiteUrl(),
             'date' => now(),
             'now' => now(),
@@ -185,6 +208,36 @@ class Email extends Mailable
         ]);
 
         return $this->with($data);
+    }
+
+    private function getRenderablePageData($form, array $augmented): array
+    {
+        $excludedFields = $form->formFields()->fields()
+            ->reject(fn (FormField $field) => $field->fieldtype()->collectsValue())
+            ->keys();
+
+        $fields = $this->getRenderableFieldData(Arr::except($augmented, ['id', 'date', 'form']))
+            ->reject(fn ($field) => $excludedFields->contains($field['handle']))
+            ->when(Arr::has($this->config, 'attachments'), function ($fields) {
+                return $fields->reject(fn ($field) => in_array($field['fieldtype'], ['assets', 'files', 'form_upload']));
+            });
+
+        return $form->blueprint()->tabs()
+            ->map(fn ($tab) => [
+                'display' => $tab->display(),
+                'instructions' => $tab->instructions(),
+                'sections' => $tab->sections()->map(fn ($section) => [
+                    'display' => $section->display(),
+                    'instructions' => $section->instructions(),
+                    'fields' => $section->fields()->all()->keys()
+                        ->map(fn ($handle) => $fields->firstWhere('handle', $handle))
+                        ->filter()
+                        ->values()
+                        ->all(),
+                ])->values()->all(),
+            ])
+            ->values()
+            ->all();
     }
 
     protected function getRenderableFieldData($values)
@@ -226,35 +279,55 @@ class Email extends Mailable
             return;
         }
 
-        return collect(explode(',', $addresses))->map(function ($address) {
-            $name = null;
-            $email = trim($address);
+        return collect(Arr::wrap($addresses))
+            ->flatMap(fn ($address) => Str::startsWith($address, 'field:')
+                ? Arr::wrap($this->submission->get(Str::after($address, 'field:')))
+                : [$address])
+            ->flatMap(fn ($address) => is_scalar($address) ? explode(',', (string) $address) : [])
+            ->map(fn ($address) => trim($this->sanitize((string) $address)))
+            ->filter()
+            ->map(function (string $email): array {
+                $name = null;
 
-            if (Str::contains($email, '<')) {
-                preg_match('/^(.*) \<(.*)\>$/', $email, $matches);
-                $name = $matches[1];
-                $email = $matches[2];
-            }
+                if (Str::contains($email, '<') && preg_match('/^(.*) \<(.*)\>$/', $email, $matches)) {
+                    $name = $matches[1];
+                    $email = $matches[2];
+                }
 
-            return [
-                'email' => $email,
-                'name' => $name,
-            ];
-        })->all();
+                return [
+                    'email' => $email,
+                    'name' => $name,
+                ];
+            })
+            ->filter(fn (array $address) => filter_var($address['email'], FILTER_VALIDATE_EMAIL))
+            ->values()
+            ->all();
     }
 
-    protected function parseConfig(array $config)
+    private function sanitize(string $value): string
     {
-        return collect($config)->map(function ($value) {
-            $value = Parse::env($value); // deprecated
+        return preg_replace('/[\x00-\x1F\x7F]/u', '', $value);
+    }
 
-            $value = Parse::config($value);
+    protected function parseConfig(array $config): Collection
+    {
+        return collect($config)
+            ->except('conditions')
+            ->map(fn ($value) => is_array($value)
+                ? array_map(fn ($item) => Str::startsWith($item, 'field:') ? $item : $this->parseConfigValue($item), $value)
+                : $this->parseConfigValue($value));
+    }
 
-            return (string) Antlers::parse($value, array_merge(
-                ['config' => Cascade::config()],
-                $this->getGlobalsData(),
-                $this->submissionData,
-            ));
-        });
+    private function parseConfigValue($value): string
+    {
+        $value = Parse::env($value); // deprecated
+
+        $value = Parse::config($value);
+
+        return (string) Antlers::parse($value, array_merge(
+            ['config' => Cascade::config()],
+            $this->getGlobalsData(),
+            $this->submissionData,
+        ));
     }
 }

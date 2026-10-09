@@ -12,6 +12,11 @@
         --grid-columns: 12;
     }
 
+    &[data-fields-collapsed="true"] {
+        /* Collapse the grid further on Forms > Someform > Edit, when we're in the collapsed view */
+        @apply gap-2;
+    }
+
     aside & {
         @apply gap-x-2 gap-y-6;
     }

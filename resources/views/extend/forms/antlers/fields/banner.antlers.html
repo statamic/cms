@@ -1,0 +1,6 @@
+<div>
+    {{ if icon }}
+        {{ svg :src="icon" style="width: 30px; height: 30px" }}
+    {{ /if }}
+    {{ content | markdown }}
+</div>

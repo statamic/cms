@@ -21,7 +21,7 @@ class CorePermissionsTest extends TestCase
             'globals' => ['edit {global} globals', 'configure globals'],
             'terms' => ['view {taxonomy} terms', 'configure taxonomies'],
             'assets' => ['view {container} assets', 'configure asset containers'],
-            'form submissions' => ['view {form} form submissions', 'configure forms'],
+            'form submissions' => ['view {form} form submissions', ['configure forms', 'view form submissions']],
         ];
     }
 
@@ -29,7 +29,7 @@ class CorePermissionsTest extends TestCase
     #[DataProvider('hiddenPermissionProvider')]
     public function configure_permissions_hide_their_per_item_permissions($permission, $hider)
     {
-        $this->assertEquals([$hider], Permission::boot()->get($permission)->hiddenBy());
+        $this->assertEquals((array) $hider, Permission::boot()->get($permission)->hiddenBy());
     }
 
     #[Test]
@@ -37,6 +37,15 @@ class CorePermissionsTest extends TestCase
     {
         $this->assertEquals([], Permission::boot()->get('edit {collection} entries')->hiddenBy());
         $this->assertEquals([], Permission::boot()->get('delete {container} assets')->hiddenBy());
+    }
+
+    #[Test]
+    public function configure_forms_hides_all_the_other_forms_permissions()
+    {
+        $this->assertEquals(['configure forms'], Permission::boot()->get('edit forms')->hiddenBy());
+        $this->assertEquals(['configure forms'], Permission::boot()->get('view form submissions')->hiddenBy());
+        $this->assertEquals(['configure forms', 'edit forms'], Permission::boot()->get('edit {form} form')->hiddenBy());
+        $this->assertEquals(['configure forms', 'view form submissions'], Permission::boot()->get('view {form} form submissions')->hiddenBy());
     }
 
     #[Test]

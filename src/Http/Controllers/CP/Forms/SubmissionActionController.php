@@ -12,6 +12,6 @@ class SubmissionActionController extends ActionController
 
         return $items->map(function ($item) use ($form) {
             return $form->submission($item);
-        });
+        })->filter();
     }
 }

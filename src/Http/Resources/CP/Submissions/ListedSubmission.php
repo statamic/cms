@@ -33,6 +33,7 @@ class ListedSubmission extends JsonResource
             $this->merge($this->values([
                 'datestamp' => $this->resource->date()->tz(config('app.timezone'))->toIso8601String(),
             ])),
+            'status' => $this->resource->status(),
             'url' => cp_route('forms.submissions.show', [$form->handle(), $this->resource->id()]),
             'deleteable' => User::current()->can('delete', $this->resource),
         ];
@@ -42,6 +43,11 @@ class ListedSubmission extends JsonResource
     {
         return $this->columns->mapWithKeys(function ($column) use ($extra) {
             $key = $column->field;
+
+            if ($key === 'status') {
+                return ['status' => $this->resource->status()];
+            }
+
             $value = $extra[$key] ?? $this->resource->get($key);
 
             if (! $field = $this->blueprint->field($key)) {

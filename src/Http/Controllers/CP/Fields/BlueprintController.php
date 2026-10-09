@@ -6,11 +6,9 @@ use Inertia\Inertia;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
-use Statamic\Facades\Form;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Nav;
 use Statamic\Facades\Taxonomy;
-use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 
 class BlueprintController extends CpController
@@ -32,7 +30,6 @@ class BlueprintController extends CpController
             'navs' => $this->navs(),
             'assetContainers' => $this->assets(),
             'globals' => $this->globals(),
-            'forms' => $this->forms(),
             'userBlueprint' => [
                 'edit_url' => cp_route('blueprints.users.edit'),
             ],
@@ -98,16 +95,5 @@ class BlueprintController extends CpController
             'handle' => $set->handle(),
             'edit_url' => cp_route('blueprints.globals.edit', $set->handle()),
         ])->values()->all();
-    }
-
-    public function forms(): array
-    {
-        return User::current()->can('configure form fields')
-            ? Form::all()->map(fn ($form) => [
-                'title' => $form->title(),
-                'handle' => $form->handle(),
-                'edit_url' => cp_route('blueprints.forms.edit', $form->handle()),
-            ])->values()->all()
-            : [];
     }
 }

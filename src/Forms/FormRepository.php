@@ -103,7 +103,7 @@ class FormRepository implements Contract
 
     public function extraConfigFor($handle)
     {
-        $reserved = ['title', 'honeypot', 'store', 'email'];
+        $reserved = ['title', 'honeypot', 'store', 'email', 'connections', 'fields'];
 
         return $this->configsFor($handle)
             ->flatMap(function ($config) use ($reserved) {

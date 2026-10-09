@@ -143,6 +143,18 @@ class ArrayTest extends TestCase
                     0 => 'none',
                 ],
             ],
+            'multidimensional array with hidden property' => [
+                [
+                    ['key' => 'food', 'value' => 'burger'],
+                    ['key' => 'drink', 'value' => 'coke', 'hidden' => true],
+                    ['key' => 'side', 'value' => 'fries'],
+                ],
+                [
+                    'food' => 'burger',
+                    'drink' => ['value' => 'coke', 'hidden' => true],
+                    'side' => 'fries',
+                ],
+            ],
         ];
     }
 
@@ -386,6 +398,32 @@ class ArrayTest extends TestCase
                     ['key' => 'one', 'value' => 'One'],
                     ['key' => 2, 'value' => 'Two'],
                     ['key' => 'three', 'value' => 'Three'],
+                ],
+            ],
+            'with hidden true is persisted' => [
+                true,
+                [
+                    'food' => 'burger',
+                    'drink' => ['value' => 'coke', 'hidden' => true],
+                    'side' => 'fries',
+                ],
+                [
+                    ['key' => 'food', 'value' => 'burger'],
+                    ['key' => 'drink', 'value' => 'coke', 'hidden' => true],
+                    ['key' => 'side', 'value' => 'fries'],
+                ],
+            ],
+            'with hidden false is not persisted' => [
+                true,
+                [
+                    'food' => 'burger',
+                    'drink' => ['value' => 'coke', 'hidden' => false],
+                    'side' => 'fries',
+                ],
+                [
+                    ['key' => 'food', 'value' => 'burger'],
+                    ['key' => 'drink', 'value' => 'coke'],
+                    ['key' => 'side', 'value' => 'fries'],
                 ],
             ],
         ];

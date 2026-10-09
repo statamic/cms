@@ -31,22 +31,59 @@ class FormPolicy
 
     public function create($user)
     {
-        // handled by before()
+        $user = User::fromUser($user);
+
+        return $user->hasPermission('create forms');
     }
 
     public function view($user, $form)
     {
         $user = User::fromUser($user);
 
-        return $user->hasPermission("view {$form->handle()} form submissions");
+        return $this->editFields($user, $form)
+            || $this->viewSubmissions($user, $form);
     }
 
     public function edit($user, $form)
     {
-        // handled by before()
+        $user = User::fromUser($user);
+
+        return $user->hasPermission('edit forms')
+            || $user->hasPermission("edit {$form->handle()} form");
     }
 
     public function delete($user, $form)
+    {
+        $user = User::fromUser($user);
+
+        return $user->hasPermission('delete forms');
+    }
+
+    public function editFields($user, $form)
+    {
+        $user = User::fromUser($user);
+
+        return $this->edit($user, $form)
+            || $user->hasPermission('configure form fields');
+    }
+
+    public function viewSubmissions($user, $form)
+    {
+        $user = User::fromUser($user);
+
+        return $user->hasPermission('view form submissions')
+            || $user->hasPermission("view {$form->handle()} form submissions");
+    }
+
+    public function deleteSubmissions($user, $form)
+    {
+        $user = User::fromUser($user);
+
+        return $user->hasPermission('delete form submissions')
+            || $user->hasPermission("delete {$form->handle()} form submissions");
+    }
+
+    public function generateFakeSubmissions($user, $form)
     {
         // handled by before()
     }

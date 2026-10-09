@@ -116,10 +116,6 @@ class Palette
             ->map(fn ($set) => $set->blueprintCommandPaletteLink())
             ->each(fn (Link $link) => $this->addCommand($link));
 
-        Facades\Form::all()
-            ->map(fn ($form) => $form->blueprintCommandPaletteLink())
-            ->each(fn (Link $link) => $this->addCommand($link));
-
         $this->addCommand(Facades\User::blueprintCommandPaletteLink());
         $this->addCommand(Facades\UserGroup::blueprintCommandPaletteLink());
 
