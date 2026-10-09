@@ -178,11 +178,33 @@ class EditFormTest extends TestCase
     }
 
     #[Test]
-    public function positioned_sections_do_not_replace_existing_sections_with_the_same_handle()
+    public function sections_replace_existing_sections_with_the_same_handle()
     {
         $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
         $user = User::make()->assignRole('test')->save();
         $form = tap(Form::make('test'))->save();
+
+        Form::appendConfigFields('*', 'fields', [
+            'injected' => ['type' => 'text', 'display' => 'Injected into duplicate section'],
+        ]);
+
+        $this
+            ->actingAs($user)
+            ->get(cp_route('forms.edit', $form->handle()))
+            ->assertSuccessful()
+            ->assertSeeInOrder(['Title', 'Injected into duplicate section', 'Store Submissions']);
+    }
+
+    #[Test]
+    public function positioned_sections_replace_existing_sections_with_the_same_handle_in_place_and_a_warning_is_logged()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
+        $user = User::make()->assignRole('test')->save();
+        $form = tap(Form::make('test'))->save();
+
+        Log::shouldReceive('warning')
+            ->once()
+            ->with('Form config section [fields] replaces an existing section, so its position was ignored.');
 
         Form::appendConfigFields('*', 'fields', [
             'injected' => ['type' => 'text', 'display' => 'Injected into duplicate section'],
@@ -192,7 +214,6 @@ class EditFormTest extends TestCase
             ->actingAs($user)
             ->get(cp_route('forms.edit', $form->handle()))
             ->assertSuccessful()
-            ->assertSee('Honeypot')
-            ->assertDontSee('Injected into duplicate section');
+            ->assertSeeInOrder(['Title', 'Injected into duplicate section', 'Store Submissions']);
     }
 }

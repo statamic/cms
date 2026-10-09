@@ -419,8 +419,14 @@ class FormsController extends CpController
 
     protected function insertSection(array $sections, string $handle, array $section, ?string $before = null, ?string $after = null): array
     {
-        if ((! $before && ! $after) || isset($sections[$handle])) {
-            return $sections + [$handle => $section];
+        if (isset($sections[$handle]) && ($before || $after)) {
+            Log::warning("Form config section [{$handle}] replaces an existing section, so its position was ignored.");
+        }
+
+        if (isset($sections[$handle]) || (! $before && ! $after)) {
+            $sections[$handle] = $section;
+
+            return $sections;
         }
 
         $result = [];
