@@ -416,6 +416,19 @@ class ImageGeneratorTest extends TestCase
     }
 
     #[Test]
+    public function the_watermark_is_dropped_when_an_asset_encoded_url_string_no_longer_resolves()
+    {
+        Storage::fake('test');
+        tap(AssetContainer::make('test_container')->disk('test'))->save();
+
+        $generator = $this->makeGenerator();
+
+        $generator->setParams(['mark' => 'asset::'.base64_encode('test_container/foo/deleted.jpg')]);
+
+        $this->assertEquals(['mark' => null], $generator->getParams());
+    }
+
+    #[Test]
     public function the_watermark_disk_is_a_local_adapter_when_a_path_is_provided()
     {
         $generator = $this->makeGenerator();

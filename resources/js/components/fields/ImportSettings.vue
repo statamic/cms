@@ -18,7 +18,7 @@
                 </Field>
 
                 <Field
-                    v-if="fieldsetHasSections"
+                    v-if="canChooseSectionBehavior"
                     :label="__('Section Behavior')"
                     :instructions="sectionBehaviorInstructions"
                     class="form-group field-w-100"
@@ -43,8 +43,11 @@
 
 <script>
 import { Button, Heading, CardPanel, Field, Input, StackHeader, StackContent, RadioGroup, Radio } from '@/components/ui';
+import PreservesImportedSections from '../blueprints/PreservesImportedSections.js';
 
 export default {
+    mixins: [PreservesImportedSections],
+
     components: { StackContent, StackHeader, Heading, Button, CardPanel, Field, Input, RadioGroup, Radio },
 
     props: ['config', 'isInsideSet'],
@@ -75,6 +78,10 @@ export default {
 
         fieldsetHasSections() {
             return this.fieldsetMeta?.has_sections === true;
+        },
+
+        canChooseSectionBehavior() {
+            return this.fieldsetHasSections && !this.isInsideSet && this.canPreserveImportedSections;
         },
 
         sectionBehavior() {

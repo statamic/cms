@@ -84,7 +84,7 @@
                     </Field>
 
                     <Field
-                        v-if="selectedFieldsetHasSections"
+                        v-if="canChooseSectionBehavior"
                         :label="__('Section Behavior')"
                         :instructions="__('messages.fieldset_import_section_behavior_instructions')"
                         class="mt-6"
@@ -112,8 +112,11 @@
 import { nanoid as uniqid } from 'nanoid';
 import { Combobox, Button, Input, Heading, Field, Stack, StackClose, RadioGroup, Radio } from '@/components/ui';
 import { usePage } from '@inertiajs/vue3';
+import PreservesImportedSections from './PreservesImportedSections.js';
 
 export default {
+    mixins: [PreservesImportedSections],
+
     components: { Heading, Combobox, Button, Input, Field, Stack, StackClose, RadioGroup, Radio },
 
     props: {
@@ -162,6 +165,10 @@ export default {
 
             return this.fieldsets.find((f) => f.handle === this.fieldset)?.has_sections === true;
         },
+
+        canChooseSectionBehavior() {
+            return this.selectedFieldsetHasSections && this.canPreserveImportedSections;
+        },
     },
 
     watch: {
@@ -207,7 +214,7 @@ export default {
                 prefix: this.importPrefix,
             };
 
-            if (this.selectedFieldsetHasSections) {
+            if (this.canChooseSectionBehavior) {
                 field.section_behavior = this.sectionBehavior;
             }
 

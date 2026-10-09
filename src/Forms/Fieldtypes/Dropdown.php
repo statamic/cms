@@ -2,7 +2,12 @@
 
 namespace Statamic\Forms\Fieldtypes;
 
+use Illuminate\Support\Collection;
+use Statamic\Forms\Charts\ChartOption;
+use Statamic\Forms\Charts\HorizontalBar;
 use Statamic\Forms\Fields\FormFieldtype;
+use Statamic\Forms\Fields\FormValueType;
+use Statamic\Forms\Summary\FieldResponses;
 use Statamic\Support\Arr;
 
 use function Statamic\trans as __;
@@ -75,6 +80,23 @@ class Dropdown extends FormFieldtype
                 is_array($option) ? $option['key'] : $key => is_array($option) ? $option['value'] : $option,
             ])
             ->all();
+    }
+
+    public function valueType(): ?FormValueType
+    {
+        return $this->config('multiple') ? FormValueType::Choices : FormValueType::Choice;
+    }
+
+    public function defaultChart(): ?string
+    {
+        return HorizontalBar::class;
+    }
+
+    public function chartOptions(FieldResponses $responses): ?Collection
+    {
+        return collect($this->enabledOptions())
+            ->map(fn ($label, $key) => new ChartOption($key, $label))
+            ->values();
     }
 
     public function example(): ?array

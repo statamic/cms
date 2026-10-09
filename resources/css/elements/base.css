@@ -1,6 +1,8 @@
 /* VARIABLES
 =================================================== */
 :root {
+    color-scheme: light;
+
     /* For animating height */
     interpolate-size: allow-keywords;
 

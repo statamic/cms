@@ -22,29 +22,31 @@ class DeleteTemporaryFiles implements ShouldQueue
 
     public function handle(): void
     {
-        $fields = $this->submission->form()->blueprint()->fields()->all();
+        $submission = $this->submission->form()->submission($this->submission->id()) ?? $this->submission;
+
+        $fields = $submission->form()->blueprint()->fields()->all();
         $disk = Storage::disk(config('statamic.system.file_uploads_disk', 'local'));
         $basePath = config('statamic.forms.file_uploads_path', 'statamic/form-uploads');
 
-        $fields->filter(fn (Field $field) => $field->type() === 'files')->each(function (Field $field) use ($disk): void {
+        $fields->filter(fn (Field $field) => $field->type() === 'files')->each(function (Field $field) use ($disk, $submission): void {
             $fileUploadsPath = config('statamic.system.file_uploads_path', 'statamic/file-uploads');
 
-            Collection::wrap($this->submission->get($field->handle(), []))
+            Collection::wrap($submission->get($field->handle(), []))
                 ->reject(fn ($path) => str_contains($path, '..'))
                 ->each(fn ($path) => $disk->delete("{$fileUploadsPath}/".$path));
         });
 
-        if ($disk->exists($uploadsPath = "{$basePath}/{$this->submission->id()}")) {
+        if ($disk->exists($uploadsPath = "{$basePath}/{$submission->id()}")) {
             $disk->deleteDirectory($uploadsPath);
         }
 
         $removed = $fields
             ->filter(fn (Field $field) => $field->type() === 'files' || ($field->type() === 'form_upload' && ! $field->fieldtype()->config('store')))
-            ->each(fn (Field $field) => $this->submission->remove($field->handle()))
+            ->each(fn (Field $field) => $submission->remove($field->handle()))
             ->isNotEmpty();
 
-        if ($removed && $this->submission->form()->store()) {
-            $this->submission->saveQuietly();
+        if ($removed && $submission->form()->store()) {
+            $submission->saveQuietly();
         }
     }
 }

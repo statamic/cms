@@ -10,7 +10,7 @@ use Statamic\Events\SubmissionFinalized;
 use Statamic\Facades\Form;
 use Statamic\Facades\User;
 use Statamic\Forms\CreateAssetsFromFileUploads;
-use Statamic\Forms\SendEmails;
+use Statamic\Forms\SendEmail;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -42,6 +42,8 @@ class MarkAsNotSpamTest extends TestCase
         Bus::fake();
         Event::fake([SubmissionFinalized::class]);
 
+        $this->form->connections(['email' => [['to' => 'test@example.com']]])->save();
+
         $submission = tap($this->form->makeSubmission()->asPartial()->markAsSpam()->data(['name' => 'Olaf']))->save();
 
         (new MarkAsNotSpam)->run(collect([$submission]), []);
@@ -54,7 +56,7 @@ class MarkAsNotSpamTest extends TestCase
 
         Event::assertDispatched(SubmissionFinalized::class);
         Bus::assertDispatched(CreateAssetsFromFileUploads::class);
-        Bus::assertDispatched(SendEmails::class);
+        Bus::assertDispatched(SendEmail::class);
     }
 
     #[Test]
@@ -62,6 +64,8 @@ class MarkAsNotSpamTest extends TestCase
     {
         Bus::fake();
         Event::fake([SubmissionFinalized::class]);
+
+        $this->form->connections(['email' => [['to' => 'test@example.com']]])->save();
 
         $submission = tap($this->form->makeSubmission()->markAsSpam()->data(['name' => 'Olaf']))->save();
 
@@ -73,7 +77,7 @@ class MarkAsNotSpamTest extends TestCase
         $this->assertEquals('finalized', $submission->status());
 
         Event::assertNotDispatched(SubmissionFinalized::class);
-        Bus::assertNotDispatched(SendEmails::class);
+        Bus::assertNotDispatched(SendEmail::class);
     }
 
     #[Test]

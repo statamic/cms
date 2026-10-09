@@ -3,10 +3,10 @@
 namespace Statamic\Http\Controllers\CP\Forms;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Bus;
 use Statamic\Events\FormSubmitted;
 use Statamic\Facades\Site;
 use Statamic\Forms\FakeSubmissionGenerator;
-use Statamic\Forms\SendEmails;
 use Statamic\Http\Controllers\CP\CpController;
 
 use function Statamic\trans as __;
@@ -47,7 +47,9 @@ class GenerateFakeSubmissionController extends CpController
         $submission->save();
 
         if ($validated['mode'] === 'full_pipeline') {
-            SendEmails::dispatch($submission, $submission->site());
+            foreach ($submission->connectionJobs() as $job) {
+                rescue(fn () => Bus::dispatch($job));
+            }
         }
 
         return response([

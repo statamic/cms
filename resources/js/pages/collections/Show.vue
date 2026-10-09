@@ -7,6 +7,7 @@
                 :url="actionUrl"
                 :actions="actions"
                 :item="handle"
+                @completed="actionCompleted"
                 v-slot="{ actions }"
             >
                 <Dropdown v-if="canEdit || canEditBlueprints || actions.length" placement="left-start">
@@ -134,25 +135,107 @@
                 />
             </template>
 
-            <template #branch-options="{ branch, removeBranch, depth }">
-                <template v-if="depth < structureMaxDepth">
-                    <DropdownLabel :text="__('Create Child Entry')" v-if="blueprints.length > 1" />
-                    <DropdownItem
-                        v-for="blueprint in blueprints"
-                        @click="createEntry(blueprint.handle, branch.id)"
-                        :icon="blueprint.icon || 'add-entry'"
-                        :key="blueprint.handle"
-                        :text="blueprints.length > 1 ? __(blueprint.title) : __('Create Child Entry')"
-                    />
-                </template>
-                <DropdownSeparator v-if="depth < structureMaxDepth && branch.can_delete" />
-                <DropdownItem
-                    v-if="branch.can_delete"
-                    :text="__('Delete')"
-                    icon="trash"
-                    variant="destructive"
-                    @click="deleteTreeBranch(branch, removeBranch)"
-                />
+            <template #branch-options-dropdown="{ branch, removeBranch, depth, isRoot }">
+                <ItemActions
+                    v-if="branch.entry"
+                    :url="entriesActionUrl"
+                    :context="{ view: 'tree' }"
+                    :item="branch.entry"
+                    :actions="branch.actions"
+                    @started="treeActionStarted"
+                    @completed="treeActionCompleted"
+                    v-slot="{ actions, loadActions, shouldShowSkeleton }"
+                >
+                    <Dropdown
+                        @mouseover="loadActions"
+                        @focus="loadActions"
+                        @click="loadActions"
+                        placement="left-start"
+                        :class="{ invisible: isRoot && branch.actions && !branchTreeActions(actions).length }"
+                    >
+                        <DropdownMenu>
+                            <template v-if="canCreateChildEntry(depth, isRoot)">
+                                <DropdownLabel :text="__('Create Child Entry')" v-if="blueprints.length > 1" />
+                                <DropdownItem
+                                    v-for="blueprint in blueprints"
+                                    @click="createEntry(blueprint.handle, branch.id)"
+                                    :icon="blueprint.icon || 'add-entry'"
+                                    :key="blueprint.handle"
+                                    :text="blueprints.length > 1 ? __(blueprint.title) : __('Create Child Entry')"
+                                />
+                            </template>
+
+                            <DropdownSeparator
+                                v-if="
+                                    canCreateChildEntry(depth, isRoot) &&
+                                    (shouldShowSkeleton || branchTreeActions(actions).length)
+                                "
+                            />
+
+                            <template v-if="shouldShowSkeleton">
+                                <div v-for="index in 3" :key="index" class="contents">
+                                    <Skeleton class="m-1 size-5" />
+                                    <Skeleton
+                                        class="mx-2 my-1.5 h-5"
+                                        :class="index === 1 ? 'w-28' : index === 2 ? 'w-36' : 'w-24'"
+                                    />
+                                </div>
+                            </template>
+                            <template v-else>
+                                <DropdownItem
+                                    v-for="action in branchTreeActions(actions)"
+                                    :key="action.handle"
+                                    :text="__(action.title)"
+                                    :icon="action.icon"
+                                    :variant="action.dangerous ? 'destructive' : 'default'"
+                                    @click="action.run"
+                                />
+                            </template>
+
+                            <DropdownSeparator
+                                v-if="
+                                    canDeleteTreeBranch(branch, isRoot) &&
+                                    (canCreateChildEntry(depth, isRoot) ||
+                                        shouldShowSkeleton ||
+                                        branchTreeActions(actions).length)
+                                "
+                            />
+
+                            <DropdownItem
+                                v-if="canDeleteTreeBranch(branch, isRoot)"
+                                :text="__('Delete')"
+                                icon="trash"
+                                variant="destructive"
+                                @click="deleteTreeBranch(branch, removeBranch)"
+                            />
+                        </DropdownMenu>
+                    </Dropdown>
+                </ItemActions>
+
+                <Dropdown v-else placement="left-start" :class="{ invisible: isRoot }">
+                    <DropdownMenu>
+                        <template v-if="depth < structureMaxDepth">
+                            <DropdownLabel :text="__('Create Child Entry')" v-if="blueprints.length > 1" />
+                            <DropdownItem
+                                v-for="blueprint in blueprints"
+                                @click="createEntry(blueprint.handle, branch.id)"
+                                :icon="blueprint.icon || 'add-entry'"
+                                :key="blueprint.handle"
+                                :text="blueprints.length > 1 ? __(blueprint.title) : __('Create Child Entry')"
+                            />
+                        </template>
+
+                        <DropdownSeparator v-if="depth < structureMaxDepth && branch.can_delete" />
+
+                        <DropdownItem
+                            v-if="branch.can_delete"
+                            :text="__('Delete')"
+                            icon="trash"
+                            variant="destructive"
+                            @click="deleteTreeBranch(branch, removeBranch)"
+                        />
+                    </DropdownMenu>
+                </Dropdown>
             </template>
         </page-tree>
 
@@ -190,7 +273,7 @@ import DeleteLocalizationConfirmation from '@/components/collections/DeleteLocal
 import CollectionCalendar from '@/components/entries/calendar/Calendar.vue';
 import SiteSelector from '@/components/SiteSelector.vue';
 import { defineAsyncComponent } from 'vue';
-import { Dropdown, DropdownItem, DropdownLabel, DropdownMenu, DropdownSeparator, Header, Button, ToggleGroup, ToggleItem } from '@/components/ui';
+import { Dropdown, DropdownItem, DropdownLabel, DropdownMenu, DropdownSeparator, Header, Button, Skeleton, ToggleGroup, ToggleItem } from '@/components/ui';
 import ItemActions from '@/components/actions/ItemActions.vue';
 import Head from '@/pages/layout/Head.vue';
 import { router } from '@inertiajs/vue3';
@@ -206,6 +289,7 @@ export default {
         Dropdown,
         Header,
         Button,
+        Skeleton,
         ToggleGroup,
         ToggleItem,
         PageTree: defineAsyncComponent(() => import('@/components/structures/PageTree.vue')),
@@ -370,6 +454,14 @@ export default {
             return this.canUseStructureTree ? 'tree' : 'list';
         },
 
+        canCreateChildEntry(depth, isRoot) {
+            return !isRoot && depth < this.structureMaxDepth;
+        },
+
+        canDeleteTreeBranch(branch, isRoot) {
+            return !isRoot && branch.can_delete;
+        },
+
         deleteTreeBranch(branch, removeFromUi) {
             this.showEntryDeletionConfirmation = true;
             this.entryBeingDeleted = branch;
@@ -397,6 +489,32 @@ export default {
             return branch.redirect != null;
         },
 
+        branchTreeActions(actions) {
+            // Destructive actions (e.g. Delete, DeleteMultisiteEntry) are excluded, since
+            // deleting from the tree is handled by the tree-aware "Delete" item instead.
+            return (actions || []).filter((action) => !action.dangerous);
+        },
+
+        treeActionStarted() {
+            Statamic.$progress.loading('action', true);
+        },
+
+        treeActionCompleted(successful = null, response = {}) {
+            Statamic.$progress.loading('action', false);
+
+            if (!successful) {
+                Statamic.$toast.error(response.message || __('Action failed'));
+                return;
+            }
+
+            if (response.message !== false) {
+                Statamic.$toast.success(response.message || __('Action completed'));
+            }
+
+            // Reloading the tree would discard any unsaved structure changes.
+            if (!this.treeIsDirty) this.$refs.tree?.refresh();
+        },
+
         createEntry(blueprint, parent) {
             let url = `${this.createUrl}?blueprint=${blueprint}`;
             if (parent) url += '&parent=' + parent;
@@ -408,7 +526,16 @@ export default {
             $event.metaKey ? window.open(url) : router.get(url);
         },
 
-        afterActionSuccessfullyCompleted(response) {
+        actionCompleted(successful, response = {}) {
+            if (!successful) {
+                Statamic.$toast.error(response.message || __('Action failed'));
+                return;
+            }
+
+            if (response.message !== false) {
+                Statamic.$toast.success(response.message || __('Action completed'));
+            }
+
             if (!response.redirect) router.reload();
         },
 

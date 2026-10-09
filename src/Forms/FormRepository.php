@@ -3,6 +3,7 @@
 namespace Statamic\Forms;
 
 use Closure;
+use InvalidArgumentException;
 use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\Contracts\Forms\FormRepository as Contract;
 use Statamic\Contracts\Forms\Submission as SubmissionContract;
@@ -85,25 +86,27 @@ class FormRepository implements Contract
         return $form;
     }
 
-    public function appendConfigFields($handles, string $display, array $fields)
+    public function appendConfigFields($handles, string $display, array $fields, ?string $beforeSection = null, ?string $afterSection = null)
     {
+        if ($beforeSection && $afterSection) {
+            throw new InvalidArgumentException('Pass only beforeSection or afterSection, not both.');
+        }
+
         $this->configs[] = [
             'display' => $display,
             'handles' => Arr::wrap($handles),
             'fields' => $fields,
+            'beforeSection' => $beforeSection,
+            'afterSection' => $afterSection,
         ];
     }
 
     public function extraConfigFor($handle)
     {
-        $reserved = ['title', 'honeypot', 'store', 'email'];
+        $reserved = ['title', 'honeypot', 'store', 'email', 'connections', 'fields'];
 
-        return collect($this->configs)
-            ->filter(function ($config) use ($handle) {
-                return in_array('*', $config['handles']) || in_array($handle, $config['handles']);
-            })
+        return $this->configsFor($handle)
             ->flatMap(function ($config) use ($reserved) {
-
                 return [
                     Str::snake($config['display']) => [
                         'display' => $config['display'],
@@ -114,6 +117,23 @@ class FormRepository implements Contract
                 ];
             })
             ->all();
+    }
+
+    public function extraConfigPositionsFor($handle)
+    {
+        return $this->configsFor($handle)
+            ->flatMap(fn ($config) => [
+                Str::snake($config['display']) => Arr::only($config, ['beforeSection', 'afterSection']),
+            ])
+            ->filter(fn ($position) => $position['beforeSection'] || $position['afterSection'])
+            ->all();
+    }
+
+    private function configsFor($handle)
+    {
+        return collect($this->configs)->filter(function ($config) use ($handle) {
+            return in_array('*', $config['handles']) || in_array($handle, $config['handles']);
+        });
     }
 
     public function redirect(string $form, Closure $callback)

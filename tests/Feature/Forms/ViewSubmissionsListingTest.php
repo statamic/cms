@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Forms;
 
+use Facades\Statamic\Console\Processes\Composer;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Form;
 use Statamic\Facades\FormSubmission;
@@ -14,6 +15,13 @@ class ViewSubmissionsListingTest extends TestCase
 {
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturnTrue()->byDefault();
+    }
 
     protected function resolveApplicationConfiguration($app)
     {

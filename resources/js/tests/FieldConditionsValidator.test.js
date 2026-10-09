@@ -149,6 +149,67 @@ test('it can use comparison operators in conditions', () => {
     expect(showFieldIf({ age: '¯\\_(ツ)_/¯ 13' })).toBe(false);
 });
 
+test('it compares conditions without eval, so a content security policy can omit unsafe-eval', () => {
+    setValues({
+        first_name: 'Jesse',
+        age: 13,
+        likes_food: true,
+        favorite_animal: null,
+    });
+
+    const originalEval = globalThis.eval;
+    globalThis.eval = () => {
+        throw new Error('eval() was called');
+    };
+
+    try {
+        expect(showFieldIf({ first_name: 'Jesse' })).toBe(true);
+        expect(showFieldIf({ first_name: 'not Jack' })).toBe(true);
+        expect(showFieldIf({ first_name: '=== Jesse' })).toBe(true);
+        expect(showFieldIf({ first_name: '!== Jesse' })).toBe(false);
+        expect(showFieldIf({ age: '> 5' })).toBe(true);
+        expect(showFieldIf({ age: '>= 14' })).toBe(false);
+        expect(showFieldIf({ age: '< 5' })).toBe(false);
+        expect(showFieldIf({ age: '<= 13' })).toBe(true);
+        expect(showFieldIf({ likes_food: '== true' })).toBe(true);
+        expect(showFieldIf({ favorite_animal: '=== null' })).toBe(true);
+        expect(showFieldIf({ first_name: 'not empty' })).toBe(true);
+    } finally {
+        globalThis.eval = originalEval;
+    }
+});
+
+test('it loosely compares a number value with a string condition value', () => {
+    setValues({ age: 13 });
+
+    // The condition value arrives as a string, and a loose comparison still matches the number.
+    expect(showFieldIf({ age: '13' })).toBe(true);
+    expect(showFieldIf({ age: 'not 13' })).toBe(false);
+    expect(showFieldIf({ age: '== 13' })).toBe(true);
+    expect(showFieldIf({ age: '!= 13' })).toBe(false);
+    expect(showFieldIf({ age: '=== 13' })).toBe(false);
+});
+
+test('it compares a field with no value as null', () => {
+    setValues({ first_name: 'Jesse' });
+
+    expect(showFieldIf({ middle_name: 'Jesse' })).toBe(false);
+    expect(showFieldIf({ middle_name: 'not Jesse' })).toBe(true);
+    expect(showFieldIf({ middle_name: '=== null' })).toBe(true);
+    expect(showFieldIf({ middle_name: '!== null' })).toBe(false);
+});
+
+test('it compares an undefined operand without throwing', () => {
+    // String operands reach passesCondition() JSON-encoded, but an undefined lhs does not, and
+    // decoding it as JSON would throw.
+    const validator = new Validator({}, {});
+
+    expect(validator.passesCondition({ lhs: undefined, operator: '==', rhs: JSON.stringify('Jesse') })).toBe(false);
+    expect(validator.passesCondition({ lhs: undefined, operator: '!=', rhs: JSON.stringify('Jesse') })).toBe(true);
+    expect(validator.passesCondition({ lhs: undefined, operator: '===', rhs: null })).toBe(false);
+    expect(validator.passesCondition({ lhs: undefined, operator: '==', rhs: null })).toBe(true);
+});
+
 test('it can use includes or contains operators in conditions', () => {
     setValues({
         cancellation_reasons: ['found another service', 'other'],
@@ -177,6 +238,18 @@ test('it can use includes or contains operators in conditions', () => {
     expect(showFieldIf({ null_value: 'contains fox' })).toBe(false);
 });
 
+test('it fails includes or contains conditions against an object instead of throwing', () => {
+    setValues({
+        stay_dates: { start: '2026-01-01', end: '2026-01-05' },
+        address: { city: 'Little Rock' },
+    });
+
+    expect(showFieldIf({ stay_dates: 'contains 2026' })).toBe(false);
+    expect(showFieldIf({ stay_dates: 'includes 2026-01-01' })).toBe(false);
+    expect(showFieldIf({ address: 'contains Little Rock' })).toBe(false);
+    expect(Fields.showField({ unless: { address: 'contains Little Rock' } })).toBe(true);
+});
+
 test('it can use includes_any or contains_any operators in conditions', () => {
     setValues({
         cancellation_reasons: ['found another service', 'other'],
@@ -187,13 +260,15 @@ test('it can use includes_any or contains_any operators in conditions', () => {
     });
 
     expect(showFieldIf({ cancellation_reasons: 'includes_any sick, other' })).toBe(true);
-    expect(showFieldIf({ cancellation_reasons: 'contains_any sick, other' })).toBe(true);
     expect(showFieldIf({ cancellation_reasons: 'includes_any sick, found another' })).toBe(false);
-    expect(showFieldIf({ cancellation_reasons: 'contains_any sick, found another' })).toBe(false);
+    expect(showFieldIf({ cancellation_reasons: 'contains_any sick, other' })).toBe(true);
+    expect(showFieldIf({ cancellation_reasons: 'contains_any sick, expensive' })).toBe(false);
 
-    expect(showFieldIf({ example_string: 'includes_any parrot, lazy dog' })).toBe(true);
-    expect(showFieldIf({ example_string: 'contains_any parrot, lazy dog' })).toBe(true);
+    expect(
+        showFieldIf({ example_string: 'includes_any parrot, The quick brown fox jumps over the lazy dog' }),
+    ).toBe(true);
     expect(showFieldIf({ example_string: 'includes_any parrot, hops' })).toBe(false);
+    expect(showFieldIf({ example_string: 'contains_any parrot, lazy dog' })).toBe(true);
     expect(showFieldIf({ example_string: 'contains_any parrot, hops' })).toBe(false);
 
     expect(showFieldIf({ age: 'includes_any fox, 13' })).toBe(true);
@@ -203,6 +278,22 @@ test('it can use includes_any or contains_any operators in conditions', () => {
 
     expect(showFieldIf({ empty_string: 'contains_any fox, 13' })).toBe(false);
     expect(showFieldIf({ null_value: 'contains_any fox, 13' })).toBe(false);
+});
+
+test('it matches contains_any values literally rather than as patterns', () => {
+    setValues({
+        version: 'a.b',
+        other_version: 'axb',
+        phone: 'Call 555-0100',
+        language: 'C++',
+        price: 'From $100',
+    });
+
+    expect(showFieldIf({ version: 'contains_any a.b' })).toBe(true);
+    expect(showFieldIf({ other_version: 'contains_any a.b' })).toBe(false);
+    expect(showFieldIf({ phone: 'contains_any (555)' })).toBe(false);
+    expect(showFieldIf({ language: 'contains_any C++' })).toBe(true);
+    expect(showFieldIf({ price: 'contains_any 50%, $100' })).toBe(true);
 });
 
 test('it handles null, true, and false in condition as literal', () => {
@@ -229,6 +320,8 @@ test('it can check if value is empty', () => {
         favorite_foods: ['lasagna'],
         age: 43,
         zero: 0,
+        toggled_on: true,
+        toggled_off: false,
         empty_string: '',
         empty_array: [],
         empty_object: {},
@@ -243,6 +336,9 @@ test('it can check if value is empty', () => {
     expect(showFieldIf({ age: 'empty' })).toBe(false);
     expect(showFieldIf({ age: 'not empty' })).toBe(true);
     expect(showFieldIf({ zero: 'empty' })).toBe(false);
+    expect(showFieldIf({ toggled_on: 'empty' })).toBe(false);
+    expect(showFieldIf({ toggled_on: 'not empty' })).toBe(true);
+    expect(showFieldIf({ toggled_off: 'empty' })).toBe(false);
     expect(showFieldIf({ empty_string: 'empty' })).toBe(true);
     expect(showFieldIf({ empty_array: 'empty' })).toBe(true);
     expect(showFieldIf({ empty_object: 'empty' })).toBe(true);
@@ -559,6 +655,33 @@ test('it can call a custom function on a specific field', () => {
     });
 
     expect(showFieldIf({ favorite_animals: 'custom lovesAnimals' })).toBe(true);
+});
+
+test('it inverts a custom function on a specific field only once', () => {
+    setValues({
+        first_name: 'San',
+        favorite_animals: ['cats', 'dogs', 'rats', 'bats'],
+    });
+
+    Statamic.$conditions.add('lovesAnimals', function ({ target }) {
+        return target.length > 3;
+    });
+
+    Statamic.$conditions.add('hatesAnimals', function ({ target }) {
+        return target.length === 0;
+    });
+
+    expect(Fields.showField({ unless: { favorite_animals: 'custom lovesAnimals' } })).toBe(false);
+    expect(Fields.showField({ unless: { favorite_animals: 'custom hatesAnimals' } })).toBe(true);
+    expect(Fields.showField({ hide_when: { favorite_animals: 'custom lovesAnimals' } })).toBe(false);
+    expect(Fields.showField({ unless_any: { favorite_animals: 'custom lovesAnimals' } })).toBe(false);
+    expect(Fields.showField({ hide_when_any: { favorite_animals: 'custom hatesAnimals', first_name: 'is San' } })).toBe(
+        false,
+    );
+    expect(Fields.showField({ unless: { favorite_animals: 'custom lovesAnimals', first_name: 'is San' } })).toBe(false);
+    expect(Fields.showField({ unless: { favorite_animals: 'custom lovesAnimals', first_name: 'is Rincess' } })).toBe(
+        true,
+    );
 });
 
 test('it can call a custom function on a specific field using params against a root value', () => {

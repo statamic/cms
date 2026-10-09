@@ -10,6 +10,7 @@ use Statamic\Facades\URL;
 use Statamic\Facades\User;
 use Statamic\Sites\Site;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 
 class Cascade
 {
@@ -229,7 +230,7 @@ class Cascade
             'site' => $this->site,
             'sites' => Facades\Site::all()->values(),
             'homepage' => $this->site->url(),
-            'is_homepage' => $this->site->absoluteUrl() == $this->request->url(),
+            'is_homepage' => Str::removeRight($this->site->absoluteUrl(), '/') == $this->request->url(),
             'cp_url' => cp_route('index'),
         ];
     }

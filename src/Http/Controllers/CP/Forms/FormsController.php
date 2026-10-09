@@ -3,11 +3,14 @@
 namespace Statamic\Http\Controllers\CP\Forms;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
+use InvalidArgumentException;
 use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\CP\Column;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
+use Statamic\Facades\FormConnector;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
@@ -36,19 +39,26 @@ class FormsController extends CpController
             $columns[] = Column::make('submissions')->label(__('Submissions'));
         }
 
+        if ($forms->contains(fn ($form) => $user->can('edit', $form))) {
+            $columns[] = Column::make('connections')->label(__('Connections'));
+        }
+
         $forms = $forms
             ->map(function ($form) use ($user) {
                 $canViewSubmissions = $user->can('viewSubmissions', $form);
+                $canEdit = $user->can('edit', $form);
 
                 return [
                     'id' => $form->handle(),
                     'title' => __($form->title()),
                     'status' => $form->status(),
                     'submissions' => $canViewSubmissions ? $form->querySubmissions()->where('site', Site::selected())->whereStatus('finalized')->count() : null,
+                    'connections' => $canEdit ? FormConnector::all()->sum(fn ($connector) => $connector->forForm($form)->count() ?? 0) : null,
                     'show_url' => $form->showUrl(),
                     'submissions_url' => $form->submissionsUrl(),
+                    'connect_url' => cp_route('forms.connect.index', $form->handle()),
                     'edit_url' => $form->editUrl(),
-                    'can_edit' => $user->can('edit', $form),
+                    'can_edit' => $canEdit,
                     'can_view_submissions' => $canViewSubmissions,
                 ];
             })
@@ -126,7 +136,6 @@ class FormsController extends CpController
             'title' => __($form->title()),
             'honeypot' => $form->honeypot(),
             'store' => $form->store(),
-            'email' => $form->email(),
             'generate_fake_submissions' => (bool) $form->get('generate_fake_submissions', true),
         ]);
 
@@ -155,13 +164,12 @@ class FormsController extends CpController
 
         $values = $fields->process()->values()->all();
 
-        $data = collect($values)->except(['title', 'honeypot', 'store', 'email']);
+        $data = collect($values)->except(['title', 'honeypot', 'store']);
 
         $form
             ->title($values['title'])
             ->honeypot($values['honeypot'])
             ->store($values['store'])
-            ->email($values['email'])
             ->merge($data);
 
         $form->save();
@@ -286,129 +294,27 @@ class FormsController extends CpController
                     ],
                 ],
             ],
-            'email' => [
-                'display' => __('Email'),
-                'fields' => [
-                    'email' => [
-                        'type' => 'grid',
-                        'mode' => 'stacked',
-                        'full_width_setting' => true,
-                        'add_row' => __('Add Email'),
-                        'instructions' => __('statamic::messages.form_configure_email_instructions'),
-                        'fields' => [
-                            [
-                                'handle' => 'to',
-                                'field' => [
-                                    'type' => 'text',
-                                    'display' => __('Recipient(s)'),
-                                    'validate' => [
-                                        'required',
-                                    ],
-                                    'instructions' => __('statamic::messages.form_configure_email_to_instructions'),
-                                ],
-                            ],
-                            [
-                                'handle' => 'cc',
-                                'field' => [
-                                    'type' => 'text',
-                                    'display' => __('CC Recipient(s)'),
-                                    'instructions' => __('statamic::messages.form_configure_email_cc_instructions'),
-                                ],
-                            ],
-                            [
-                                'handle' => 'bcc',
-                                'field' => [
-                                    'type' => 'text',
-                                    'display' => __('BCC Recipient(s)'),
-                                    'instructions' => __('statamic::messages.form_configure_email_bcc_instructions'),
-                                ],
-                            ],
-                            [
-                                'handle' => 'from',
-                                'field' => [
-                                    'type' => 'text',
-                                    'display' => __('Sender'),
-                                    'instructions' => __('statamic::messages.form_configure_email_from_instructions').' ('.config('mail.from.address').').',
-                                ],
-                            ],
-                            [
-                                'handle' => 'reply_to',
-                                'field' => [
-                                    'type' => 'text',
-                                    'display' => __('Reply To'),
-                                    'instructions' => __('statamic::messages.form_configure_email_reply_to_instructions'),
-                                ],
-                            ],
-                            [
-                                'handle' => 'subject',
-                                'field' => [
-                                    'type' => 'text',
-                                    'display' => __('Subject'),
-                                    'instructions' => __('statamic::messages.form_configure_email_subject_instructions'),
-                                ],
-                            ],
-                            [
-                                'handle' => 'html',
-                                'field' => [
-                                    'type' => 'template',
-                                    'display' => __('HTML view'),
-                                    'instructions' => __('statamic::messages.form_configure_email_html_instructions'),
-                                    'folder' => config('statamic.forms.email_view_folder'),
-                                    'clearable' => true,
-                                ],
-                            ],
-                            [
-                                'handle' => 'text',
-                                'field' => [
-                                    'type' => 'template',
-                                    'display' => __('Text view'),
-                                    'instructions' => __('statamic::messages.form_configure_email_text_instructions'),
-                                    'folder' => config('statamic.forms.email_view_folder'),
-                                    'clearable' => true,
-                                ],
-                            ],
-                            [
-                                'handle' => 'markdown',
-                                'field' => [
-                                    'type' => 'toggle',
-                                    'display' => __('Markdown'),
-                                    'instructions' => __('statamic::messages.form_configure_email_markdown_instructions'),
-                                ],
-                            ],
-                            [
-                                'handle' => 'attachments',
-                                'field' => [
-                                    'type' => 'toggle',
-                                    'display' => __('Attachments'),
-                                    'instructions' => __('statamic::messages.form_configure_email_attachments_instructions'),
-                                ],
-                            ],
-                            [
-                                'handle' => 'mailer',
-                                'field' => [
-                                    'type' => 'select',
-                                    'instructions' => __('statamic::messages.form_configure_mailer_instructions'),
-                                    'options' => array_keys(config('mail.mailers')),
-                                    'clearable' => true,
-                                ],
-                            ],
-                        ],
-                    ],
-                ],
-            ],
         ];
 
+        $positions = Form::extraConfigPositionsFor($form->handle());
+
         foreach (Form::extraConfigFor($form->handle()) as $handle => $config) {
+            $before = $positions[$handle]['beforeSection'] ?? null;
+            $after = $positions[$handle]['afterSection'] ?? null;
             $merged = false;
             foreach ($fields as $sectionHandle => $section) {
                 if ($section['display'] == __($config['display'])) {
+                    if ($before || $after) {
+                        throw new InvalidArgumentException("The [{$config['display']}] section already exists, so beforeSection and afterSection can't be used.");
+                    }
+
                     $fields[$sectionHandle]['fields'] += $config['fields'];
                     $merged = true;
                 }
             }
 
             if (! $merged) {
-                $fields[$handle] = $config;
+                $fields = $this->insertSection($fields, $handle, $config, $before, $after);
             }
         }
 
@@ -430,5 +336,43 @@ class FormsController extends CpController
             ],
         ])->all());
 
+    }
+
+    protected function insertSection(array $sections, string $handle, array $section, ?string $before = null, ?string $after = null): array
+    {
+        if (isset($sections[$handle]) && ($before || $after)) {
+            Log::warning("Form config section [{$handle}] replaces an existing section, so its position was ignored.");
+        }
+
+        if (isset($sections[$handle]) || (! $before && ! $after)) {
+            $sections[$handle] = $section;
+
+            return $sections;
+        }
+
+        $result = [];
+        $inserted = false;
+
+        foreach ($sections as $existingHandle => $existing) {
+            if ($before === $existingHandle) {
+                $result[$handle] = $section;
+                $inserted = true;
+            }
+
+            $result[$existingHandle] = $existing;
+
+            if ($after === $existingHandle) {
+                $result[$handle] = $section;
+                $inserted = true;
+            }
+        }
+
+        if (! $inserted) {
+            Log::warning("Form config section [{$handle}] could not be placed relative to [".($before ?? $after).'] because it does not exist. Appending it instead.');
+
+            return $sections + [$handle => $section];
+        }
+
+        return $result;
     }
 }

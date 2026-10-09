@@ -2,7 +2,12 @@
 
 namespace Statamic\Forms\Fieldtypes;
 
+use Illuminate\Support\Collection;
+use Statamic\Forms\Charts\ChartOption;
+use Statamic\Forms\Charts\Lollipop;
 use Statamic\Forms\Fields\FormFieldtype;
+use Statamic\Forms\Fields\FormValueType;
+use Statamic\Forms\Summary\FieldResponses;
 use Statamic\Support\Arr;
 
 use function Statamic\trans as __;
@@ -43,6 +48,26 @@ class Dictionary extends FormFieldtype
             'type' => 'dictionary',
             ...Arr::except($this->config(), ['type']),
         ];
+    }
+
+    public function valueType(): ?FormValueType
+    {
+        return (int) $this->config('max_items') === 1 ? FormValueType::Choice : FormValueType::Choices;
+    }
+
+    public function defaultChart(): ?string
+    {
+        return Lollipop::class;
+    }
+
+    public function chartOptions(FieldResponses $responses): ?Collection
+    {
+        $dictionary = $this->toField()->fieldtype()->dictionary();
+
+        return $responses->counts()
+            ->sortDesc()
+            ->keys()
+            ->map(fn ($value) => new ChartOption((string) $value, $dictionary->get((string) $value)?->label()));
     }
 
     public function example(): ?array

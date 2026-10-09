@@ -18,6 +18,7 @@ const operatorOptions = computed(() => [
     { label: __('Does not equal'), value: 'not' },
     { label: __('Contains'), value: 'contains' },
     { label: __('Contains Any'), value: 'contains_any' },
+    { label: __('Includes Any'), value: 'includes_any' },
     { label: '===', value: '===' },
     { label: '!==', value: '!==' },
     { label: '>', value: '>' },
