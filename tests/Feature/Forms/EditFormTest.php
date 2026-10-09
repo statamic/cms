@@ -171,7 +171,7 @@ class EditFormTest extends TestCase
             ->assertSuccessful()
             ->assertSeeInOrder([
                 'Store Submissions',
-                'Close Date',
+                'Add Email',
                 'Automagic Forms',
                 'Enable Automagic Form',
             ]);
