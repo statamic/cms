@@ -22,6 +22,7 @@
                             :vertical="true"
                             :item-class="sortableItemClass"
                             :handle-class="sortableHandleClass"
+                            :distance="pointerDragThreshold"
                             append-to="body"
                             constrain-dimensions
                             @update:model-value="sorted($event)"
@@ -45,12 +46,15 @@
                                     :enabled="set.enabled"
                                     :read-only="isReadOnly"
                                     :can-add-set="canAddSet"
+                                    :can-reorder="!isReadOnly && value.length > 1"
+                                    :total-sets="value.length"
                                     :has-error="setHasError(set._id)"
                                     :show-field-previews="config.previews"
                                     @collapsed="collapseSet(set._id)"
                                     @expanded="expandSet(set._id)"
                                     @duplicated="duplicateSet(set._id)"
                                     @removed="removed(set, index)"
+                                    @moved="moved"
                                 >
                                     <template v-slot:picker>
                                         <add-set-button
@@ -93,7 +97,7 @@ import { nanoid as uniqid } from 'nanoid';
 import ReplicatorSet from './Set.vue';
 import AddSetButton from './AddSetButton.vue';
 import ManagesSetMeta from './ManagesSetMeta';
-import { SortableList } from '../../sortable/Sortable';
+import { SortableList, arrayMove, POINTER_DRAG_THRESHOLD } from '../../sortable/Sortable';
 import { data_get } from "@/bootstrap/globals.js";
 
 export default {
@@ -103,6 +107,10 @@ export default {
         ReplicatorSet,
         SortableList,
         AddSetButton,
+    },
+
+    setup() {
+        return { pointerDragThreshold: POINTER_DRAG_THRESHOLD };
     },
 
     data() {
@@ -208,6 +216,12 @@ export default {
 
         sorted(value) {
             this.update(value);
+        },
+
+        moved(from, to) {
+            if (from === to || to < 0 || to >= this.value.length) return;
+
+            this.update(arrayMove(this.value, from, to));
         },
 
         addSet(handle, index) {

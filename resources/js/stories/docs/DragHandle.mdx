@@ -6,7 +6,14 @@ import * as DragHandleStories from '../DragHandle.stories';
 # DragHandle
 
 A button component that displays a drag handle icon for reorderable lists. Uses the `data-drag-handle` attribute for integration with drag-and-drop libraries.
+
+By default it only supports pointer drag. Pass `keyboard-reorder` to also emit `keyboard-reorder` on click / Space / Enter so parents can start arrow-key reordering.
+
 <Canvas of={DragHandleStories._DocsIntro} sourceState={'shown'} />
+
+## Keyboard reorder
+
+<Canvas of={DragHandleStories.KeyboardReorder} sourceState={'shown'} />
 
 ## Arguments
 <ArgTypes of={DragHandleStories} />

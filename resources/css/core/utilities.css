@@ -155,6 +155,13 @@
     outline-style: var(--focus-outline-style, solid);
 }
 
+@layer utilities {
+    /* Keyboard reorder: no focus ring after Enter/Escape (moving uses focus-outline / table edge). */
+    [data-reorder-focus]:focus {
+        outline: none;
+    }
+}
+
 @utility focus-none {
     outline: 0;
     box-shadow: none;
