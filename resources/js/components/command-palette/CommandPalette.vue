@@ -23,6 +23,7 @@ let serverItems = ref(setServerLoadingItems());
 let serverItemsLoaded = ref(false);
 let searchResults = ref([]);
 let selected = ref(null);
+let highlighted = ref(null);
 let recentItems = ref(getRecentItems());
 let keyboardBindings = ref([]);
 
@@ -227,6 +228,29 @@ function select(selected) {
     }
 }
 
+function openInNewTab(e) {
+    // Match Mousetrap's `mod`: Cmd on Mac, Ctrl elsewhere.
+    const isMac = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
+    if (!(isMac ? e.metaKey : e.ctrlKey)) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    let item = findSelectedItem(highlighted.value);
+    if (!item) return;
+
+    if (!item.url) {
+        selected.value = highlighted.value;
+        return;
+    }
+
+    // Simulate a modifier-click so the browser handles it like a real Cmd+click (background tab)
+    // or Cmd+Shift+click (foreground tab).
+    e.currentTarget.querySelector('[data-command-palette-item][data-highlighted]')?.dispatchEvent(
+        new MouseEvent('click', { bubbles: true, cancelable: true, metaKey: e.metaKey, ctrlKey: e.ctrlKey, shiftKey: e.shiftKey }),
+    );
+}
+
 function findSelectedItem(selected) {
     return find(aggregatedItems.value, (result) => result.text === selected);
 }
@@ -318,6 +342,8 @@ router.on('start', () => Statamic.$commandPalette.clear());
                         :ignore-filter="true"
                         v-model="selected"
                         @keydown.tab.prevent.stop="keydownTab"
+                        @keydown.enter="openInNewTab"
+                        @highlight="highlighted = $event?.value"
                     >
                         <header class="group/cmd-input flex h-14 items-center gap-2 border-b border-gray-200/80 px-5.5 dark:border-gray-950">
                             <Icon name="magnifying-glass" class="size-5 text-gray-400" />

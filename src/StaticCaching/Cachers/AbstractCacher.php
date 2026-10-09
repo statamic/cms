@@ -3,6 +3,8 @@
 namespace Statamic\StaticCaching\Cachers;
 
 use GuzzleHttp\Psr7\Request as GuzzleRequest;
+use Illuminate\Contracts\Cache\LockProvider;
+use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -172,15 +174,15 @@ abstract class AbstractCacher implements Cacher
     {
         $domain = $domain ?? $this->getBaseUrl();
 
-        $this->cacheDomain($domain);
-
-        $urls = $this->getUrls($domain);
-
         $url = Str::removeLeft($url, $domain);
 
-        $urls->put($key, $url);
+        $this->withUrlsLock(function () use ($key, $url, $domain) {
+            $this->cacheDomain($domain);
 
-        $this->cache->forever($this->getUrlsCacheKey($domain), $urls->all());
+            $urls = $this->getUrls($domain)->put($key, $url);
+
+            $this->cache->forever($this->getUrlsCacheKey($domain), $urls->all());
+        });
     }
 
     /**
@@ -191,11 +193,24 @@ abstract class AbstractCacher implements Cacher
      */
     public function forgetUrl($key, $domain = null)
     {
-        $urls = $this->getUrls($domain);
+        $this->withUrlsLock(function () use ($key, $domain) {
+            $urls = $this->getUrls($domain)->forget($key);
 
-        $urls->forget($key);
+            $this->cache->forever($this->getUrlsCacheKey($domain), $urls->all());
+        });
+    }
 
-        $this->cache->forever($this->getUrlsCacheKey($domain), $urls->all());
+    private function withUrlsLock(callable $callback)
+    {
+        if (! ($store = $this->cache->getStore()) instanceof LockProvider) {
+            return $callback();
+        }
+
+        try {
+            return $store->lock($this->normalizeKey('urls'), 10)->block(10, $callback);
+        } catch (LockTimeoutException $e) {
+            return $callback();
+        }
     }
 
     /**

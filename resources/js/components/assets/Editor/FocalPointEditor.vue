@@ -104,6 +104,17 @@ export default {
         this.clampPercent('x');
         this.clampPercent('y');
         this.clampZoom();
+
+        // Cmd+S saves the focal point without closing the asset editor underneath
+        this.saveKeyBinding = this.$keys.bindGlobal(['mod+s'], (e) => {
+            e.preventDefault();
+            this.select();
+            this.$emit('save');
+        });
+    },
+
+    beforeUnmount() {
+        this.saveKeyBinding.destroy();
     },
 
     computed: {
