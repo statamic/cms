@@ -14,6 +14,7 @@ class ComponentProxy extends Tags
 {
     public static $isolated = true;
     protected static $componentStack = [];
+    protected $rawParameters = [];
 
     private function makeComponentTagCompiler(): ComponentTagCompiler
     {
@@ -21,6 +22,13 @@ class ComponentProxy extends Tags
         $bladeCompiler = app(BladeCompiler::class);
 
         return new ComponentTagCompiler($bladeCompiler->getClassComponentAliases(), $bladeCompiler->getClassComponentNamespaces(), $bladeCompiler);
+    }
+
+    public function setParameters($parameters)
+    {
+        $this->rawParameters = $parameters;
+
+        return parent::setParameters($parameters);
     }
 
     public function index()
@@ -37,7 +45,7 @@ class ComponentProxy extends Tags
             $className = $tagCompiler->componentClass($componentName);
 
             $data = $this->params->except('component_name___')->all();
-            $attributes = new ComponentAttributeBag($data);
+            $attributes = new ComponentAttributeBag($this->withLiteralBooleanStrings($data));
             $constructorParameters = [];
 
             $scopeData = $this->context->all();
@@ -120,6 +128,15 @@ class ComponentProxy extends Tags
         } catch (Throwable $e) {
             $this->handleViewException($e, $___obLevel);
         }
+    }
+
+    protected function withLiteralBooleanStrings(array $data): array
+    {
+        return collect($data)
+            ->map(fn ($value, $key) => is_bool($value) && in_array($this->rawParameters[$key] ?? null, ['true', 'false'], true)
+                ? $this->rawParameters[$key]
+                : $value)
+            ->all();
     }
 
     protected function handleViewException(Throwable $e, $obLevel)
