@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Forms;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use InvalidArgumentException;
 use Statamic\Contracts\Forms\Form as FormContract;
@@ -442,6 +443,12 @@ class FormsController extends CpController
             }
         }
 
-        return $inserted ? $result : $sections + [$handle => $section];
+        if (! $inserted) {
+            Log::warning("Form config section [{$handle}] could not be placed relative to [".($before ?? $after).'] because it does not exist. Appending it instead.');
+
+            return $sections + [$handle => $section];
+        }
+
+        return $result;
     }
 }

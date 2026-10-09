@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Forms;
 
+use Illuminate\Support\Facades\Log;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Form;
 use Statamic\Facades\User;
@@ -146,6 +147,33 @@ class EditFormTest extends TestCase
                 'Automagic Forms',
                 'Enable Automagic Form',
                 'Store Submissions',
+            ]);
+    }
+
+    #[Test]
+    public function sections_are_appended_and_a_warning_is_logged_when_the_target_section_does_not_exist()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
+        $user = User::make()->assignRole('test')->save();
+        $form = tap(Form::make('test'))->save();
+
+        Log::shouldReceive('warning')
+            ->once()
+            ->with('Form config section [automagic_forms] could not be placed relative to [nope] because it does not exist. Appending it instead.');
+
+        Form::appendConfigFields('*', 'Automagic Forms', [
+            'automagic_form' => ['type' => 'toggle', 'display' => 'Enable Automagic Form'],
+        ], afterSection: 'nope');
+
+        $this
+            ->actingAs($user)
+            ->get(cp_route('forms.edit', $form->handle()))
+            ->assertSuccessful()
+            ->assertSeeInOrder([
+                'Store Submissions',
+                'Close Date',
+                'Automagic Forms',
+                'Enable Automagic Form',
             ]);
     }
 }
