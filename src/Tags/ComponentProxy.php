@@ -7,6 +7,7 @@ use Illuminate\View\AnonymousComponent;
 use Illuminate\View\Compilers\BladeCompiler;
 use Illuminate\View\Compilers\ComponentTagCompiler;
 use Illuminate\View\ComponentAttributeBag;
+use Illuminate\View\DynamicComponent;
 use ReflectionClass;
 use Throwable;
 
@@ -36,7 +37,7 @@ class ComponentProxy extends Tags
             $tagCompiler = $this->makeComponentTagCompiler();
             $className = $tagCompiler->componentClass($componentName);
 
-            $data = $this->params->except('component_name___')->all();
+            $data = $this->params->except(['component_name___', 'component_bound___'])->all();
             $attributes = new ComponentAttributeBag($data);
             $constructorParameters = [];
 
@@ -74,7 +75,9 @@ class ComponentProxy extends Tags
             $component = $className::resolve($constructorParameters + ((array) $attributes->getIterator()));
             $component->withName($componentName);
             $__env->startComponent($component->resolveView(), $component->data());
-            $component->withAttributes($attributes->getAttributes());
+            $component->withAttributes($className === DynamicComponent::class
+                ? $attributes->getAttributes()
+                : $this->escapeBoundAttributes($attributes->getAttributes()));
 
             if ($this->content) {
                 $contextData = array_merge($this->isolatedContext?->all() ?? [], [
@@ -110,9 +113,9 @@ class ComponentProxy extends Tags
             $contextData = self::$componentStack[array_key_last(self::$componentStack)][1];
 
             $slot = $this->params->get('component_slot___');
-            $context = $this->params->except('component_slot___')->all();
+            $context = $this->params->except(['component_slot___', 'component_bound___'])->all();
 
-            $__env->slot($slot, null, $context);
+            $__env->slot($slot, null, $this->escapeBoundAttributes($context));
 
             echo $this->parse($contextData);
 
@@ -120,6 +123,15 @@ class ComponentProxy extends Tags
         } catch (Throwable $e) {
             $this->handleViewException($e, $___obLevel);
         }
+    }
+
+    protected function escapeBoundAttributes(array $attributes): array
+    {
+        $bound = explode(',', $this->params->get('component_bound___', ''));
+
+        return collect($attributes)
+            ->map(fn ($value, $key) => in_array($key, $bound) ? BladeCompiler::sanitizeComponentAttribute($value) : $value)
+            ->all();
     }
 
     protected function handleViewException(Throwable $e, $obLevel)
