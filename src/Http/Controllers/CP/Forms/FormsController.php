@@ -204,8 +204,8 @@ class FormsController extends CpController
                     ],
                 ],
             ],
-            'honeypot' => [
-                'display' => __('Honeypot'),
+            'fields' => [
+                'display' => __('Fields'),
                 'fields' => [
                     'honeypot' => [
                         'type' => 'text',
