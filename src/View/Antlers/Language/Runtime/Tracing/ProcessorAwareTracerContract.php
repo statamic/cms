@@ -8,5 +8,5 @@ use Statamic\View\Antlers\Language\Runtime\NodeProcessor;
 interface ProcessorAwareTracerContract
 {
     /** @param  NodeProcessor  $processor  The processor evaluating the node. */
-    public function setNodeProcessor(NodeProcessor $processor);
+    public function setNodeProcessor(NodeProcessor $processor): void;
 }

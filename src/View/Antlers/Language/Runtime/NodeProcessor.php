@@ -14,6 +14,7 @@ use ParseError;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Contracts\View\Antlers\Parser;
+use Statamic\Contracts\View\Instrumentation\ComposesRenderedOutput;
 use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Value;
 use Statamic\Fields\Values;
@@ -29,6 +30,7 @@ use Statamic\View\Antlers\Language\Errors\AntlersErrorCodes;
 use Statamic\View\Antlers\Language\Errors\ErrorFactory;
 use Statamic\View\Antlers\Language\Exceptions\RuntimeException;
 use Statamic\View\Antlers\Language\Exceptions\SyntaxErrorException;
+use Statamic\View\Antlers\Language\Facades\Runtime;
 use Statamic\View\Antlers\Language\Nodes\AbstractNode;
 use Statamic\View\Antlers\Language\Nodes\AntlersNode;
 use Statamic\View\Antlers\Language\Nodes\Conditions\ConditionNode;
@@ -211,6 +213,9 @@ class NodeProcessor
 
     /** @var int */
     private $traceReduceDepth = 0;
+
+    /** @var bool */
+    private $htmlInstrumentationActive = false;
 
     /**
      * A list of all valid PHP opening tags.
@@ -415,6 +420,141 @@ class NodeProcessor
         $this->doStackIntercept = $doIntercept;
 
         return $this;
+    }
+
+    /** @return bool */
+    private function instrumenting()
+    {
+        return $this->htmlInstrumentationActive;
+    }
+
+    private function suppressesMarkersFor(AntlersNode $node)
+    {
+        if (! $this->htmlInstrumentationActive || InstrumentationState::suppressed()) {
+            return false;
+        }
+
+        $context = $node->htmlContext();
+
+        return $context !== null && ! $context->isSafeForHtmlComments();
+    }
+
+    private function inHtmlContext(AntlersNode $node, callable $callback)
+    {
+        if ($this->suppressesMarkersFor($node)) {
+            return InstrumentationState::withoutInstrumentation($callback);
+        }
+
+        return $callback();
+    }
+
+    /**
+     * @param  mixed  $value
+     * @return mixed
+     */
+    private function instrumentedOutput(AntlersNode $node, $value)
+    {
+        if (! $this->htmlInstrumentationActive) {
+            return $value;
+        }
+
+        if ($value instanceof AntlersString) {
+            return $this->tagBodyOutput($node, $value);
+        }
+
+        if (! is_string($value) || $value === '') {
+            return $value;
+        }
+
+        $outputs = $this->data[count($this->data) - 1][InstrumentationState::twinsKey()] ?? null;
+        $output = is_array($outputs) ? ($outputs[trim((string) $node->content)] ?? null) : null;
+
+        if (! is_array($output) || $output[0] !== $value || ! $this->canOutputMarkers($node)) {
+            return $value;
+        }
+
+        return $output[1];
+    }
+
+    /**
+     * @param  array  $data
+     * @param  string  $name
+     * @param  string  $output
+     * @return array
+     */
+    private function captureNamedSlot($data, $name, $output)
+    {
+        if (! $this->instrumenting()) {
+            $data[$name] = trim($output);
+
+            return $data;
+        }
+
+        $key = InstrumentationState::twinsKey();
+        [$data[$name], $instrumented] = Runtime::splitMarkers((string) $output);
+
+        unset($data[$key][$name]);
+
+        if ($instrumented !== null) {
+            $data[$key][$name] = [$data[$name], $instrumented];
+        }
+
+        return $data;
+    }
+
+    /** @return bool */
+    private function canOutputMarkers(AntlersNode $node)
+    {
+        if (InstrumentationState::suppressed()) {
+            return false;
+        }
+
+        return $node->htmlContext()?->isSafeForHtmlComments() !== false;
+    }
+
+    /**
+     * @param  string  $output
+     * @return string
+     */
+    private function slotOutput(AntlersNode $node, $output)
+    {
+        if (! $this->htmlInstrumentationActive || $this->canOutputMarkers($node)) {
+            return $output;
+        }
+
+        return Runtime::removeMarkers($output);
+    }
+
+    /**
+     * @return \Statamic\View\Instrumentation\TagBody|null
+     */
+    private function tagBodyFor(AntlersNode $node, $tagName)
+    {
+        if (! $this->htmlInstrumentationActive || $node->runtimeContent === '') {
+            return null;
+        }
+
+        $tags = app('statamic.tags');
+        $composesOutput = $tags->has($tagName) && is_a($tags->get($tagName), ComposesRenderedOutput::class, true);
+
+        return Runtime::tagBody($node, $composesOutput);
+    }
+
+    /**
+     * @param  mixed  $output
+     * @return mixed
+     */
+    private function tagBodyOutput(AntlersNode $node, $output)
+    {
+        if (! $this->htmlInstrumentationActive || ! $output instanceof AntlersString) {
+            return $output;
+        }
+
+        if (! $this->isInterpolationProcessor && $this->canOutputMarkers($node)) {
+            return $output->instrumented();
+        }
+
+        return (string) $output;
     }
 
     private function startMeasuringTag($tagName, AntlersNode $node)
@@ -672,6 +812,7 @@ class NodeProcessor
     public function setAntlersParserInstance(Parser $parser)
     {
         $this->antlersParser = $parser;
+        $this->htmlInstrumentationActive = $parser instanceof RuntimeParser && $parser->instrumenting();
 
         return $this;
     }
@@ -1004,9 +1145,12 @@ class NodeProcessor
         $parameters = [];
         $runtimeContent = '';
 
+        $tagBody = null;
+
         if ($node instanceof AntlersNode) {
             $parameters = $node->getParameterValues($this, $this->getActiveData());
-            $runtimeContent = $node->runtimeContent;
+            $tagBody = $this->tagBodyFor($node, $tagName);
+            $runtimeContent = $tagBody !== null && ! $tagBody->composesOutput ? $tagBody->clean : $node->runtimeContent;
         }
 
         $parameters = array_merge($parameters, $additionalData);
@@ -1021,7 +1165,7 @@ class NodeProcessor
             'tag_method' => $tagMethod,
         ]);
 
-        return call_user_func([$tag, $tagMethod]);
+        return InstrumentationState::withTagBody($tagBody, fn () => call_user_func([$tag, $tagMethod]));
     }
 
     /**
@@ -1198,31 +1342,50 @@ class NodeProcessor
         $renderFailure = null;
 
         try {
+            if ($this->isInterpolationProcessor && $this->htmlInstrumentationActive) {
+                return $this->reduceValue($processNodes);
+            }
+
             return $this->reduceNodes($processNodes);
         } catch (Throwable $throwable) {
             $renderFailure = $throwable;
 
             throw $throwable;
         } finally {
-            $cleanupFailure = null;
-
-            if ($this->runtimeConfiguration?->traceManager !== null) {
-                try {
-                    $this->runtimeConfiguration->traceManager
-                        ->traceProcessorScopeComplete($this, $processorDepth);
-                } catch (Throwable $throwable) {
-                    if ($renderFailure === null) {
-                        $cleanupFailure = $throwable;
-                    }
-                }
-            }
-
             $this->traceReduceDepth--;
 
-            if ($cleanupFailure !== null) {
-                throw $cleanupFailure;
+            if ($this->runtimeConfiguration?->traceManager !== null) {
+                $this->completeTraceScope($processorDepth, $renderFailure);
             }
         }
+    }
+
+    /**
+     * @param  int  $processorDepth
+     * @param  Throwable|null  $renderFailure
+     */
+    private function completeTraceScope($processorDepth, $renderFailure)
+    {
+        try {
+            $this->runtimeConfiguration->traceManager->traceProcessorScopeComplete($this, $processorDepth);
+        } catch (Throwable $throwable) {
+            if ($renderFailure === null) {
+                throw $throwable;
+            }
+        }
+    }
+
+    private function reduceValue($processNodes)
+    {
+        $value = InstrumentationState::withoutInstrumentation(
+            fn () => $this->reduceNodes($processNodes)
+        );
+
+        if (! is_string($value)) {
+            return $value;
+        }
+
+        return Runtime::removeMarkers($value);
     }
 
     protected function reduceNodes($processNodes)
@@ -1638,7 +1801,7 @@ class NodeProcessor
 
                                 /** @var AntlersNode $slot */
                                 foreach ($namedSlots as $slotName => $slot) {
-                                    $tagActiveData['slot:'.$slotName] = trim($slotProcessor->reduce($slot->children));
+                                    $tagActiveData = $this->captureNamedSlot($tagActiveData, 'slot:'.$slotName, $slotProcessor->reduce($slot->children));
                                 }
 
                                 $tagActiveData[GlobalRuntimeState::createIndicatorVariable(GlobalRuntimeState::INDICATOR_NAMED_SLOTS_AVAILABLE)] = true;
@@ -1680,11 +1843,13 @@ class NodeProcessor
                                 GlobalRuntimeState::$tracedRuntimeAssignments
                             );
                         }
+                        $tagBody = $this->tagBodyFor($node, $tagToLoad);
+
                         /** @var Tags $tag */
                         $tag = $this->loader->load($tagToLoad, [
                             'parser' => $this->antlersParser,
                             'params' => $tagParameters,
-                            'content' => $node->runtimeContent,
+                            'content' => $tagBody !== null && ! $tagBody->composesOutput ? $tagBody->clean : $node->runtimeContent,
                             'context' => $tagActiveData,
                             'tag' => $tagName,
                             'tag_method' => $tagMethod,
@@ -1723,14 +1888,9 @@ class NodeProcessor
                         }
 
                         try {
-                            if ($this->antlersParser instanceof RuntimeParser && $this->antlersParser->hasHtmlInstrumentation()) {
-                                $output = InstrumentationState::whileRenderingInContext(
-                                    $node->htmlContext(),
-                                    fn () => call_user_func([$tag, $methodToCall], ...$args)
-                                );
-                            } else {
-                                $output = call_user_func([$tag, $methodToCall], ...$args);
-                            }
+                            $output = InstrumentationState::withTagBody($tagBody, fn () => $this->suppressesMarkersFor($node)
+                                ? InstrumentationState::withoutInstrumentation(fn () => call_user_func([$tag, $methodToCall], ...$args))
+                                : call_user_func([$tag, $methodToCall], ...$args));
 
                             if ($isCacheTag) {
                                 GlobalRuntimeState::$isCacheEnabled = false;
@@ -1786,7 +1946,13 @@ class NodeProcessor
                             $this->resolvedBuilder = null;
                         }
 
-                        RuntimeParser::pushNodeCache($node->runtimeContent, $node->children);
+                        if (! $this->htmlInstrumentationActive || $node->htmlContext()?->isSafeForHtmlComments() !== false) {
+                            RuntimeParser::pushNodeCache(
+                                $node->runtimeContent,
+                                $node->children,
+                                $this->antlersParser instanceof RuntimeParser && $this->antlersParser->annotatesHtmlContext()
+                            );
+                        }
 
                         if ($node->name->name == 'yield') {
                             // If the current processor instance is a conditional processor, we
@@ -1800,7 +1966,7 @@ class NodeProcessor
                             GlobalRuntimeState::$yieldCount += 1;
                             // Wrap it in a partial thing.
                             $wrapName = 'section:'.$tagMethod.'__yield'.GlobalRuntimeState::$yieldCount;
-                            $bufferOverride = LiteralReplacementManager::registerRegion($wrapName, $tagMethod, $output);
+                            $bufferOverride = LiteralReplacementManager::registerRegion($wrapName, $tagMethod, $this->tagBodyOutput($node, $output));
 
                             if (! array_key_exists(GlobalRuntimeState::$environmentId, GlobalRuntimeState::$yieldStacks)) {
                                 GlobalRuntimeState::$yieldStacks[GlobalRuntimeState::$environmentId] = [];
@@ -1842,7 +2008,7 @@ class NodeProcessor
                             LiteralReplacementManager::registerRegionReplacement(
                                 $sectionName,
                                 $tagMethod,
-                                $this->cascade->sections()->get($tagMethod)
+                                $this->tagBodyOutput($node, $this->cascade->sections()->get($tagMethod))
                             );
 
                             if (GlobalRuntimeState::$isCacheEnabled) {
@@ -1869,6 +2035,8 @@ class NodeProcessor
                                 $output = RuntimeValues::resolveWithRuntimeIsolation($output);
                             }
 
+                            $output = $this->tagBodyOutput($node, $output);
+
                             $output = PathDataManager::reduceForAntlers($output, $this->antlersParser, $this->getActiveData(), $node->isClosedBy != null);
                         }
 
@@ -1888,7 +2056,10 @@ class NodeProcessor
                         // Allow tags to return an array. We'll parse it for them.
                         if (is_array($output)) {
                             if (empty($output)) {
-                                $output = $tag->parseNoResults();
+                                $output = $this->inHtmlContext($node, fn () => InstrumentationState::withTagBody(
+                                    $tagBody,
+                                    fn () => $this->tagBodyOutput($node, $tag->parseNoResults())
+                                ));
                                 $currentProcessorCanHandleTagValue = false;
                             } else {
                                 GlobalRuntimeState::$traceTagAssignments = true;
@@ -1900,7 +2071,12 @@ class NodeProcessor
                                 // the scope or overall output of the tag result
                                 if ($node->hasScopeAdjustingParameters) {
                                     $tagAssocOutput = $output;
-                                    $output = Arr::assoc($output) ? (string) $tag->parse($output) : (string) $tag->parseLoop($this->addLoopIterationVariables($output));
+                                    $output = $this->inHtmlContext($node, fn () => InstrumentationState::withTagBody(
+                                        $tagBody,
+                                        fn () => Arr::assoc($output)
+                                            ? (string) $this->tagBodyOutput($node, $tag->parse($output))
+                                            : (string) $this->tagBodyOutput($node, $tag->parseLoop($this->addLoopIterationVariables($output)))
+                                    ));
                                     $tagCallbackResult = null;
                                     $currentProcessorCanHandleTagValue = false;
 
@@ -2143,8 +2319,10 @@ class NodeProcessor
                                     if ($this->guardRuntime($node, $runtimeResult)) {
                                         if ($runtimeResult instanceof Slot) {
                                             $lockData = $this->data;
-                                            $runtimeResult = $runtimeResult->render();
+                                            $runtimeResult = $this->slotOutput($node, $runtimeResult->render());
                                             $this->data = $lockData;
+                                        } else {
+                                            $runtimeResult = $this->instrumentedOutput($node, $runtimeResult);
                                         }
 
                                         $buffer .= $this->measureBufferAppend($node, $this->modifyBufferAppend($runtimeResult));
@@ -2230,7 +2408,7 @@ class NodeProcessor
 
                     if ($val instanceof Slot) {
                         $lockData = $this->data;
-                        $val = $val->render($node->hasParameters ? $this->getSlotOutputProps($node) : []);
+                        $val = $this->slotOutput($node, $val->render($node->hasParameters ? $this->getSlotOutputProps($node) : []));
                         $this->data = $lockData;
 
                         $buffer .= $this->measureBufferAppend($node, $this->modifyBufferAppend($val));

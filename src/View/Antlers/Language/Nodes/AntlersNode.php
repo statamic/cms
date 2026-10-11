@@ -40,11 +40,32 @@ class AntlersNode extends AbstractNode
      */
     protected $parser = null;
 
+    /**
+     * @internal
+     *
+     * @var \Statamic\View\Instrumentation\HtmlContext|null
+     */
+    public $htmlContext = null;
+
+    /**
+     * @internal
+     *
+     * @var int|null
+     */
+    public $parserGeneration = null;
+
     /** @var HtmlAntlersNode|null */
     protected $htmlGraphNode = null;
 
     /** @var AntlersNode|null */
     protected $htmlContextOwner = null;
+
+    /**
+     * @internal
+     *
+     * @var array{0: string, 1: \Statamic\View\Instrumentation\TagBody}|null
+     */
+    public $tagBody = null;
 
     /**
      * The parsed runtime content.
@@ -115,14 +136,6 @@ class AntlersNode extends AbstractNode
                 }
             }
         }
-
-        return $this;
-    }
-
-    /** @internal */
-    public function withHtmlNode(HtmlAntlersNode $node)
-    {
-        $this->htmlGraphNode = $node;
 
         return $this;
     }
@@ -700,35 +713,6 @@ class AntlersNode extends AbstractNode
         }
 
         return true;
-    }
-
-    /** @return ParameterNode|null */
-    public function parameter($name)
-    {
-        foreach ($this->parameters as $parameter) {
-            if (strcasecmp($parameter->name, $name) === 0) {
-                return $parameter;
-            }
-        }
-
-        return null;
-    }
-
-    public function staticParameterValue($name, $default = null)
-    {
-        $parameter = $this->parameter($name);
-
-        if ($parameter === null) {
-            return $default;
-        }
-
-        if (! $parameter->isStatic()) {
-            throw new \InvalidArgumentException(
-                sprintf('The [%s] Antlers parameter must be static.', $name)
-            );
-        }
-
-        return $parameter->value;
     }
 
     public function getNodeDocumentText()

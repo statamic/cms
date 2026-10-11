@@ -160,6 +160,32 @@ class RuntimeConfiguration
     }
 
     /**
+     * @param  callable|null  $previous
+     * @param  callable|null  $replacement
+     * @return void
+     */
+    public function replacePreparser($previous, $replacement)
+    {
+        $index = $previous === null ? false : array_search($previous, $this->preparsers, true);
+
+        if ($index === false) {
+            if ($replacement !== null) {
+                $this->preparse($replacement);
+            }
+
+            return;
+        }
+
+        if ($replacement === null || in_array($replacement, $this->preparsers, true)) {
+            array_splice($this->preparsers, $index, 1);
+
+            return;
+        }
+
+        $this->preparsers[$index] = $replacement;
+    }
+
+    /**
      * Gets all registered Antlers preparsers.
      *
      * @return callable[]
@@ -207,6 +233,20 @@ class RuntimeConfiguration
         }
 
         $this->visitors[] = $visitor;
+        RuntimeParser::clearRenderNodeCache();
+    }
+
+    /** @return void */
+    public function removeVisitor(NodeVisitorContract $visitor)
+    {
+        if (! in_array($visitor, $this->visitors, true)) {
+            return;
+        }
+
+        $this->visitors = array_values(array_filter(
+            $this->visitors,
+            fn ($registered) => $registered !== $visitor
+        ));
         RuntimeParser::clearRenderNodeCache();
     }
 
