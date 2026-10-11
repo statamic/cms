@@ -25,7 +25,8 @@ final class Span
         public readonly ?string $view,
         public readonly ?int $line,
         private readonly mixed $raw,
-        private readonly array $meta = [],
+        private readonly ?NodeProcessor $processor = null,
+        private readonly int $processorDepth = 0,
     ) {
     }
 
@@ -36,18 +37,15 @@ final class Span
     ): self {
         $view = GlobalRuntimeState::$currentExecutionFile;
 
-        if (! is_string($view) || $view === '') {
-            $view = null;
-        }
-
         return new self(
             self::ENGINE_ANTLERS,
             self::KIND_NODE,
             trim((string) $node->content),
-            $view,
+            is_string($view) && $view !== '' ? $view : null,
             $node->startPosition->line ?? null,
             $node,
-            ['processor' => $processor, 'processor_depth' => $processorDepth],
+            $processor,
+            $processorDepth,
         );
     }
 
@@ -58,11 +56,13 @@ final class Span
 
     public function meta(?string $key = null): mixed
     {
+        $meta = ['processor' => $this->processor, 'processor_depth' => $this->processorDepth];
+
         if ($key === null) {
-            return $this->meta;
+            return $meta;
         }
 
-        return $this->meta[$key] ?? null;
+        return $meta[$key] ?? null;
     }
 
     public function scope(): ?array
@@ -73,10 +73,8 @@ final class Span
 
         $this->scopeCaptured = true;
 
-        $processor = $this->meta['processor'] ?? null;
-
-        if ($processor instanceof NodeProcessor) {
-            return $this->capturedScope = $processor->getActiveData();
+        if ($this->processor !== null) {
+            return $this->capturedScope = $this->processor->getActiveData();
         }
 
         return null;

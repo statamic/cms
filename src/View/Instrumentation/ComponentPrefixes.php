@@ -11,16 +11,10 @@ final class ComponentPrefixes
         'statamic-', 'statamic:',
     ];
 
-    const ALL = self::DEFAULTS;
-
-    /**
-     * @param  string  $name
-     * @param  string[]|null  $prefixes
-     * @return bool
-     */
-    public static function matches($name, ?array $prefixes = null)
+    /** @param  string[]|null  $prefixes */
+    public static function matches(string $name, ?array $prefixes = null): bool
     {
-        $name = strtolower((string) $name);
+        $name = strtolower($name);
 
         foreach ($prefixes ?? self::DEFAULTS as $prefix) {
             if ($prefix !== '' && str_starts_with($name, strtolower($prefix))) {
@@ -35,7 +29,7 @@ final class ComponentPrefixes
      * @param  string[]  $prefixes
      * @return string[]
      */
-    public static function merge(array $prefixes)
+    public static function merge(array $prefixes): array
     {
         $merged = self::DEFAULTS;
 

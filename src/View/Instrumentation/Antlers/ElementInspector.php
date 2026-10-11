@@ -2,22 +2,43 @@
 
 namespace Statamic\View\Instrumentation\Antlers;
 
+use Statamic\View\Instrumentation\HtmlContext;
 use Statamic\View\Instrumentation\HtmlSpec;
 
 /** @internal */
 class ElementInspector
 {
-    public function openingTagAt($template, $startOffset, $startByteOffset = null)
+    protected const STATE_TAG_NAME = 'tag-name';
+
+    protected const STATE_BEFORE_ATTRIBUTE = 'before-attribute';
+
+    protected const STATE_ATTRIBUTE_NAME = 'attribute-name';
+
+    protected const STATE_AFTER_ATTRIBUTE = 'after-attribute';
+
+    protected const STATE_BEFORE_VALUE = 'before-value';
+
+    protected const STATE_DOUBLE_QUOTED = 'double-quoted';
+
+    protected const STATE_SINGLE_QUOTED = 'single-quoted';
+
+    protected const STATE_UNQUOTED_VALUE = 'unquoted-value';
+
+    protected const STATE_SELF_CLOSING = 'self-closing';
+
+    protected const STATE_DONE = 'done';
+
+    public function openingTagAt(string $template, int $startOffset, ?int $startByteOffset = null): string
     {
         $offset = $startByteOffset ?? strlen(mb_substr($template, 0, $startOffset));
         $length = strlen($template);
-        $state = 'tag-name';
+        $state = self::STATE_TAG_NAME;
 
         for ($index = $offset + 1; $index < $length; $index++) {
             $char = $template[$index];
 
-            if ($char === '{' && substr($template, $index, 2) === '{{') {
-                $end = $this->antlersEndInBytes($template, $index, $length);
+            if ($this->startsEmbedded($template, $index)) {
+                $end = $this->embeddedEnd($template, $index, $length);
 
                 if ($end === false) {
                     return substr($template, $offset);
@@ -29,62 +50,62 @@ class ElementInspector
                 continue;
             }
 
-            if ($state === 'double-quoted' || $state === 'single-quoted') {
+            if ($state === self::STATE_DOUBLE_QUOTED || $state === self::STATE_SINGLE_QUOTED) {
                 if ($this->isClosingQuote($state, $char)) {
-                    $state = 'before-attribute';
+                    $state = self::STATE_BEFORE_ATTRIBUTE;
                 }
 
                 continue;
             }
 
-            if ($char === '>' && $state !== 'tag-name') {
+            if ($char === '>' && $state !== self::STATE_TAG_NAME) {
                 return substr($template, $offset, $index + 1 - $offset);
             }
 
-            if ($state === 'tag-name') {
+            if ($state === self::STATE_TAG_NAME) {
                 if ($this->isHtmlSpace($char)) {
-                    $state = 'before-attribute';
+                    $state = self::STATE_BEFORE_ATTRIBUTE;
                 } elseif ($char === '/') {
-                    $state = 'self-closing';
+                    $state = self::STATE_SELF_CLOSING;
                 } elseif ($char === '>') {
                     return substr($template, $offset, $index + 1 - $offset);
                 }
-            } elseif ($state === 'before-attribute') {
+            } elseif ($state === self::STATE_BEFORE_ATTRIBUTE) {
                 if ($char === '/') {
-                    $state = 'self-closing';
+                    $state = self::STATE_SELF_CLOSING;
                 } elseif (! $this->isHtmlSpace($char)) {
-                    $state = 'attribute-name';
+                    $state = self::STATE_ATTRIBUTE_NAME;
                 }
-            } elseif ($state === 'attribute-name') {
+            } elseif ($state === self::STATE_ATTRIBUTE_NAME) {
                 if ($this->isHtmlSpace($char)) {
-                    $state = 'after-attribute';
+                    $state = self::STATE_AFTER_ATTRIBUTE;
                 } elseif ($char === '/') {
-                    $state = 'self-closing';
+                    $state = self::STATE_SELF_CLOSING;
                 } elseif ($char === '=') {
-                    $state = 'before-value';
+                    $state = self::STATE_BEFORE_VALUE;
                 }
-            } elseif ($state === 'after-attribute') {
+            } elseif ($state === self::STATE_AFTER_ATTRIBUTE) {
                 if ($char === '/') {
-                    $state = 'self-closing';
+                    $state = self::STATE_SELF_CLOSING;
                 } elseif ($char === '=') {
-                    $state = 'before-value';
+                    $state = self::STATE_BEFORE_VALUE;
                 } elseif (! $this->isHtmlSpace($char)) {
-                    $state = 'attribute-name';
+                    $state = self::STATE_ATTRIBUTE_NAME;
                 }
-            } elseif ($state === 'before-value') {
+            } elseif ($state === self::STATE_BEFORE_VALUE) {
                 if ($char === '"') {
-                    $state = 'double-quoted';
+                    $state = self::STATE_DOUBLE_QUOTED;
                 } elseif ($char === "'") {
-                    $state = 'single-quoted';
+                    $state = self::STATE_SINGLE_QUOTED;
                 } elseif (! $this->isHtmlSpace($char)) {
-                    $state = 'unquoted-value';
+                    $state = self::STATE_UNQUOTED_VALUE;
                 }
-            } elseif ($state === 'unquoted-value') {
+            } elseif ($state === self::STATE_UNQUOTED_VALUE) {
                 if ($this->isHtmlSpace($char)) {
-                    $state = 'before-attribute';
+                    $state = self::STATE_BEFORE_ATTRIBUTE;
                 }
-            } elseif ($state === 'self-closing') {
-                $state = 'before-attribute';
+            } elseif ($state === self::STATE_SELF_CLOSING) {
+                $state = self::STATE_BEFORE_ATTRIBUTE;
                 $index--;
             }
         }
@@ -92,20 +113,15 @@ class ElementInspector
         return substr($template, $offset);
     }
 
-    /**
-     * @param  string  $template
-     * @param  int  $startByteOffset  Byte offset of the element's `<`.
-     * @return int
-     */
-    public function attributeInsertionOffset($template, $startByteOffset)
+    public function attributeInsertionOffset(string $template, int $startByteOffset): int
     {
         $length = strlen($template);
         $index = $startByteOffset + 1;
 
         while ($index < $length
             && ! HtmlSpec::isTagNameDelimiter($template[$index])) {
-            if (substr($template, $index, 2) === '{{') {
-                $end = $this->antlersEndInBytes($template, $index, $length);
+            if ($this->startsEmbedded($template, $index)) {
+                $end = $this->embeddedEnd($template, $index, $length);
 
                 if ($end === false) {
                     break;
@@ -121,16 +137,15 @@ class ElementInspector
     }
 
     /**
-     * @param  string  $markup  The tag markup, starting at its `<`.
-     * @param  int[]  $offsets  Byte offsets relative to the markup start.
+     * @param  int[]  $offsets
      * @return array<int, array{0: string, 1: string|null, 2: string}> offset => [kind, attribute name, partial run]
      */
-    public function classifyTagPositions($markup, array $offsets)
+    public function classifyTagPositions(string $markup, array $offsets): array
     {
         $length = strlen($markup);
         $needed = array_fill_keys($offsets, true);
         $classified = [];
-        $state = 'tag-name';
+        $state = self::STATE_TAG_NAME;
         $tagName = '';
         $attributeName = '';
         $pendingValueOwner = '';
@@ -145,14 +160,22 @@ class ElementInspector
                 $classified[$index] = $this->classifyTagState($markup, $index, $length, $state, $tagName, $attributeName, $pendingValueOwner);
             }
 
-            if (substr($markup, $index, 2) === '{{') {
-                $end = $this->antlersEndInBytes($markup, $index, $length);
+            if ($this->startsEmbedded($markup, $index)) {
+                $end = $this->embeddedEnd($markup, $index, $length);
 
                 if ($end === false) {
                     break;
                 }
 
-                if ($state === 'before-attribute' || $state === 'after-attribute') {
+                if ($markup[$index] === '<') {
+                    foreach ($needed as $offset => $unused) {
+                        if ($offset > $index && $offset < $end && ! isset($classified[$offset])) {
+                            $classified[$offset] = $this->classifyTagState($markup, $offset, $length, $state, $tagName, $attributeName, $pendingValueOwner);
+                        }
+                    }
+                }
+
+                if ($state === self::STATE_BEFORE_ATTRIBUTE || $state === self::STATE_AFTER_ATTRIBUTE) {
                     $attributeName = '';
                     $pendingValueOwner = '';
                 }
@@ -165,9 +188,9 @@ class ElementInspector
 
             $char = $markup[$index];
 
-            if ($state === 'double-quoted' || $state === 'single-quoted') {
+            if ($state === self::STATE_DOUBLE_QUOTED || $state === self::STATE_SINGLE_QUOTED) {
                 if ($this->isClosingQuote($state, $char)) {
-                    $state = 'before-attribute';
+                    $state = self::STATE_BEFORE_ATTRIBUTE;
                     $attributeName = '';
                 }
 
@@ -177,58 +200,58 @@ class ElementInspector
             }
 
             switch ($state) {
-                case 'tag-name':
+                case self::STATE_TAG_NAME:
                     if ($this->isHtmlSpace($char) || $char === '/') {
-                        $state = 'before-attribute';
+                        $state = self::STATE_BEFORE_ATTRIBUTE;
                     } elseif ($char === '>') {
-                        $state = 'done';
+                        $state = self::STATE_DONE;
                     } else {
                         $tagName .= $char;
                     }
                     break;
-                case 'before-attribute':
+                case self::STATE_BEFORE_ATTRIBUTE:
                     if (! $this->isHtmlSpace($char) && $char !== '/' && $char !== '>') {
-                        $state = 'attribute-name';
+                        $state = self::STATE_ATTRIBUTE_NAME;
                         $attributeName = $char;
                     }
                     break;
-                case 'attribute-name':
+                case self::STATE_ATTRIBUTE_NAME:
                     if ($char === '=') {
                         $pendingValueOwner = $attributeName;
-                        $state = 'before-value';
+                        $state = self::STATE_BEFORE_VALUE;
                     } elseif ($this->isHtmlSpace($char)) {
                         $pendingValueOwner = $attributeName;
-                        $state = 'after-attribute';
+                        $state = self::STATE_AFTER_ATTRIBUTE;
                     } elseif ($char === '/' || $char === '>') {
-                        $state = 'before-attribute';
+                        $state = self::STATE_BEFORE_ATTRIBUTE;
                         $attributeName = '';
                     } else {
                         $attributeName .= $char;
                     }
                     break;
-                case 'after-attribute':
+                case self::STATE_AFTER_ATTRIBUTE:
                     if ($char === '=') {
-                        $state = 'before-value';
+                        $state = self::STATE_BEFORE_VALUE;
                     } elseif ($char === '/') {
-                        $state = 'before-attribute';
+                        $state = self::STATE_BEFORE_ATTRIBUTE;
                         $attributeName = '';
                     } elseif (! $this->isHtmlSpace($char)) {
-                        $state = 'attribute-name';
+                        $state = self::STATE_ATTRIBUTE_NAME;
                         $attributeName = $char;
                     }
                     break;
-                case 'before-value':
+                case self::STATE_BEFORE_VALUE:
                     if ($char === '"') {
-                        $state = 'double-quoted';
+                        $state = self::STATE_DOUBLE_QUOTED;
                     } elseif ($char === "'") {
-                        $state = 'single-quoted';
+                        $state = self::STATE_SINGLE_QUOTED;
                     } elseif (! $this->isHtmlSpace($char)) {
-                        $state = 'unquoted-value';
+                        $state = self::STATE_UNQUOTED_VALUE;
                     }
                     break;
-                case 'unquoted-value':
+                case self::STATE_UNQUOTED_VALUE:
                     if ($this->isHtmlSpace($char)) {
-                        $state = 'before-attribute';
+                        $state = self::STATE_BEFORE_ATTRIBUTE;
                         $attributeName = '';
                     }
                     break;
@@ -239,7 +262,7 @@ class ElementInspector
 
         foreach ($needed as $offset => $unused) {
             if (! isset($classified[$offset])) {
-                $classified[$offset] = ['tag-open', null, ''];
+                $classified[$offset] = [HtmlContext::KIND_TAG_OPEN, null, ''];
             }
         }
 
@@ -247,26 +270,26 @@ class ElementInspector
     }
 
     /** @return array{0: string, 1: string|null, 2: string} */
-    protected function classifyTagState($markup, $index, $length, $state, $tagName, $attributeName, $pendingValueOwner)
+    protected function classifyTagState(string $markup, int $index, int $length, string $state, string $tagName, string $attributeName, string $pendingValueOwner): array
     {
         switch ($state) {
-            case 'tag-name':
-                return ['element-name', null, $tagName];
-            case 'attribute-name':
-                return ['attribute-name', $this->normalizedAttributeName($attributeName), $attributeName];
-            case 'double-quoted':
-            case 'single-quoted':
-            case 'unquoted-value':
-            case 'before-value':
+            case self::STATE_TAG_NAME:
+                return [HtmlContext::KIND_ELEMENT_NAME, null, $tagName];
+            case self::STATE_ATTRIBUTE_NAME:
+                return [HtmlContext::KIND_ATTRIBUTE_NAME, $this->normalizedAttributeName($attributeName), $attributeName];
+            case self::STATE_DOUBLE_QUOTED:
+            case self::STATE_SINGLE_QUOTED:
+            case self::STATE_UNQUOTED_VALUE:
+            case self::STATE_BEFORE_VALUE:
                 $owner = $this->attributeValueOwner($state, $attributeName, $pendingValueOwner);
 
-                return ['attribute-value', $this->normalizedAttributeName($owner), ''];
-            case 'before-attribute':
-            case 'after-attribute':
+                return [HtmlContext::KIND_ATTRIBUTE_VALUE, $this->normalizedAttributeName($owner), ''];
+            case self::STATE_BEFORE_ATTRIBUTE:
+            case self::STATE_AFTER_ATTRIBUTE:
                 $lookahead = $index;
 
-                if (substr($markup, $lookahead, 2) === '{{') {
-                    $end = $this->antlersEndInBytes($markup, $lookahead, $length);
+                if ($this->startsEmbedded($markup, $lookahead)) {
+                    $end = $this->embeddedEnd($markup, $lookahead, $length);
 
                     if ($end === false) {
                         $lookahead = $length;
@@ -279,26 +302,26 @@ class ElementInspector
                     $lookahead++;
                 }
 
-                if (($markup[$lookahead] ?? null) === '=' && $state === 'before-attribute') {
-                    return ['attribute-name', null, ''];
+                if (($markup[$lookahead] ?? null) === '=' && $state === self::STATE_BEFORE_ATTRIBUTE) {
+                    return [HtmlContext::KIND_ATTRIBUTE_NAME, null, ''];
                 }
 
-                return ['tag-open', null, ''];
+                return [HtmlContext::KIND_TAG_OPEN, null, ''];
             default:
-                return ['tag-open', null, ''];
+                return [HtmlContext::KIND_TAG_OPEN, null, ''];
         }
     }
 
-    protected function stateAfterAntlers($state)
+    protected function stateAfterAntlers(string $state): string
     {
         return match ($state) {
-            'before-value' => 'unquoted-value',
-            'before-attribute', 'after-attribute' => 'attribute-name',
+            self::STATE_BEFORE_VALUE => self::STATE_UNQUOTED_VALUE,
+            self::STATE_BEFORE_ATTRIBUTE, self::STATE_AFTER_ATTRIBUTE => self::STATE_ATTRIBUTE_NAME,
             default => $state,
         };
     }
 
-    protected function normalizedAttributeName($name)
+    protected function normalizedAttributeName(string $name): ?string
     {
         if ($name === '') {
             return null;
@@ -307,18 +330,18 @@ class ElementInspector
         return strtolower($name);
     }
 
-    protected function isClosingQuote($state, $char)
+    protected function isClosingQuote(string $state, string $char): bool
     {
-        if ($state === 'double-quoted') {
+        if ($state === self::STATE_DOUBLE_QUOTED) {
             return $char === '"';
         }
 
-        return $state === 'single-quoted' && $char === "'";
+        return $state === self::STATE_SINGLE_QUOTED && $char === "'";
     }
 
-    protected function attributeValueOwner($state, $attributeName, $pendingValueOwner)
+    protected function attributeValueOwner(string $state, string $attributeName, string $pendingValueOwner): string
     {
-        if ($state === 'before-value' && $pendingValueOwner) {
+        if ($state === self::STATE_BEFORE_VALUE && $pendingValueOwner) {
             return $pendingValueOwner;
         }
 
@@ -329,7 +352,7 @@ class ElementInspector
         return $pendingValueOwner;
     }
 
-    public function hasAttribute($openingTag, $attributeName)
+    public function hasAttribute(string $openingTag, string $attributeName): bool
     {
         if (stripos($openingTag, $attributeName) === false) {
             return false;
@@ -340,8 +363,8 @@ class ElementInspector
 
         while ($index < $length
             && ! HtmlSpec::isTagNameDelimiter($openingTag[$index])) {
-            if (substr($openingTag, $index, 2) === '{{') {
-                $end = $this->antlersEndInBytes($openingTag, $index, $length);
+            if ($this->startsEmbedded($openingTag, $index)) {
+                $end = $this->embeddedEnd($openingTag, $index, $length);
 
                 if ($end === false) {
                     return false;
@@ -368,8 +391,8 @@ class ElementInspector
                 continue;
             }
 
-            if (substr($openingTag, $index, 2) === '{{') {
-                $end = $this->antlersEndInBytes($openingTag, $index, $length);
+            if ($this->startsEmbedded($openingTag, $index)) {
+                $end = $this->embeddedEnd($openingTag, $index, $length);
 
                 if ($end === false) {
                     return false;
@@ -389,9 +412,9 @@ class ElementInspector
 
             while ($index < $length
                 && ! HtmlSpec::isAttributeNameDelimiter($openingTag[$index])) {
-                if (substr($openingTag, $index, 2) === '{{') {
+                if ($this->startsEmbedded($openingTag, $index)) {
                     $dynamicName = true;
-                    $end = $this->antlersEndInBytes($openingTag, $index, $length);
+                    $end = $this->embeddedEnd($openingTag, $index, $length);
 
                     if ($end === false) {
                         return false;
@@ -427,8 +450,8 @@ class ElementInspector
                 $quote = $openingTag[$index++];
 
                 while ($index < $length && $openingTag[$index] !== $quote) {
-                    if (substr($openingTag, $index, 2) === '{{') {
-                        $end = $this->antlersEndInBytes($openingTag, $index, $length);
+                    if ($this->startsEmbedded($openingTag, $index)) {
+                        $end = $this->embeddedEnd($openingTag, $index, $length);
 
                         if ($end === false) {
                             return false;
@@ -447,8 +470,8 @@ class ElementInspector
                 while ($index < $length
                     && ! $this->isHtmlSpace($openingTag[$index])
                     && $openingTag[$index] !== '>') {
-                    if (substr($openingTag, $index, 2) === '{{') {
-                        $end = $this->antlersEndInBytes($openingTag, $index, $length);
+                    if ($this->startsEmbedded($openingTag, $index)) {
+                        $end = $this->embeddedEnd($openingTag, $index, $length);
 
                         if ($end === false) {
                             return false;
@@ -465,14 +488,25 @@ class ElementInspector
         return false;
     }
 
-    protected function isHtmlSpace($char)
+    protected function isHtmlSpace(string $char): bool
     {
         return HtmlSpec::isHtmlSpace($char);
     }
 
-    /** @return int|false Offset immediately after the closing delimiter. */
-    protected function antlersEndInBytes($content, $start, $length)
+    protected function startsEmbedded(string $content, int $index): bool
     {
-        return RegionExtents::endInBytes($content, $start, $length);
+        $char = $content[$index] ?? '';
+
+        if ($char === '{') {
+            return ($content[$index + 1] ?? '') === '{';
+        }
+
+        return $char === '<' && RegionExtents::startsPhpBlock($content, $index);
+    }
+
+    /** @return int|false Offset immediately after the Antlers region or PHP block. */
+    protected function embeddedEnd(string $content, int $start, int $length): int|false
+    {
+        return RegionExtents::embeddedEndInBytes($content, $start, $length) ?? false;
     }
 }

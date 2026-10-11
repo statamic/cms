@@ -19,19 +19,14 @@ final class TemplateRegion
         public readonly int $byteStart,
         public readonly int $byteEnd,
         private readonly HtmlContext $context,
-        private readonly mixed $raw,
         public readonly bool $commentSafe = false,
+        public readonly bool $insideCharacterReference = false,
     ) {
     }
 
     public function context(): HtmlContext
     {
         return $this->context;
-    }
-
-    public function raw(): mixed
-    {
-        return $this->raw;
     }
 
     public function isPair(): bool

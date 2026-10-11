@@ -2,7 +2,10 @@
 
 namespace Statamic\View\Instrumentation;
 
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Config;
 use InvalidArgumentException;
+use Statamic\View\Antlers\Language\Nodes\AntlersNode;
 use Statamic\View\Antlers\Language\Runtime\RuntimeConfiguration;
 use Statamic\View\Antlers\Language\Runtime\Tracing\NodeVisitorContract;
 use Statamic\View\Antlers\Language\Runtime\Tracing\RuntimeTracerContract;
@@ -17,16 +20,33 @@ class InstrumentationManager
     protected WeakMap $runtimeConfigurations;
 
     /** @var array<string, object> */
-    protected $configured = [];
+    protected array $configured = [];
 
     /** @var array<int, HtmlInstrumentation|RuntimeTracerContract|TracerContract> */
-    protected $antlersPieces = [];
+    protected array $antlersPieces = [];
+
+    /** @var array{0: mixed, 1: HtmlInstrumentation|null}|null */
+    protected ?array $configuredState = null;
+
+    /** @var HtmlInstrumentation[]|null */
+    protected ?array $htmlInstrumenters = null;
+
+    /** @var string[] */
+    protected array $cleanedWith = [];
+
+    protected ?string $cleanedHash = null;
+
+    protected int $cleanedLength = -1;
+
+    protected int $misplacedMarkerRemovals = 0;
+
+    protected int $removedMisplacedMarkerBytes = 0;
 
     /** @var callable[] */
-    protected $runtimePreparsers = [];
+    protected array $runtimePreparsers = [];
 
     /** @var NodeVisitorContract[] */
-    protected $runtimeVisitors = [];
+    protected array $runtimeVisitors = [];
 
     public function __construct()
     {
@@ -42,6 +62,13 @@ class InstrumentationManager
         $this->applyToAntlers(fn (RuntimeConfiguration $config) => $config->preparse($preparser));
     }
 
+    public function removePreparser(callable $preparser): void
+    {
+        $this->runtimePreparsers = $this->without($this->runtimePreparsers, $preparser);
+
+        $this->applyToAntlers(fn (RuntimeConfiguration $config) => $config->removePreparser($preparser));
+    }
+
     public function addVisitor(NodeVisitorContract $visitor): void
     {
         if (! in_array($visitor, $this->runtimeVisitors, true)) {
@@ -51,12 +78,15 @@ class InstrumentationManager
         $this->applyToAntlers(fn (RuntimeConfiguration $config) => $config->addVisitor($visitor));
     }
 
-    /**
-     * @param  object|string  $piece
-     * @param  string[]|null  $engines
-     * @return $this
-     */
-    public function register($piece, ?array $engines = null)
+    public function removeVisitor(NodeVisitorContract $visitor): void
+    {
+        $this->runtimeVisitors = $this->without($this->runtimeVisitors, $visitor);
+
+        $this->applyToAntlers(fn (RuntimeConfiguration $config) => $config->removeVisitor($visitor));
+    }
+
+    /** @param  string[]|null  $engines */
+    public function register(object|string $piece, ?array $engines = null): static
     {
         $engines = $this->normalizeEngines($engines);
         $abstract = null;
@@ -84,10 +114,39 @@ class InstrumentationManager
     }
 
     /**
-     * @param  array<string, mixed>  $config
-     * @return HtmlInstrumentation
+     * @template TReturn
+     *
+     * @param  callable(): TReturn  $callback
+     * @param  string[]|null  $engines
+     * @return TReturn
      */
-    public function configuredHtmlInstrumentation(array $config)
+    public function using(object|string $piece, callable $callback, ?array $engines = null): mixed
+    {
+        if (is_string($piece)) {
+            $piece = $this->configured[$piece] ?? app($piece);
+        }
+
+        $registered = in_array($piece, $this->antlersPieces, true);
+
+        $this->register($piece, $engines);
+
+        try {
+            return $callback();
+        } finally {
+            if (! $registered) {
+                $this->forget($piece, $engines);
+            }
+        }
+    }
+
+    /** @return Collection<int, array<string, mixed>> */
+    public function regions(string $html): Collection
+    {
+        return HtmlInstrumentation::regionsIn($html, $this->htmlInstrumenters());
+    }
+
+    /** @param  array<string, mixed>  $config */
+    public function configuredHtmlInstrumentation(array $config): HtmlInstrumentation
     {
         $key = $this->configurationKey($config);
 
@@ -95,26 +154,29 @@ class InstrumentationManager
             return HtmlInstrumentation::fromConfig($config);
         }
 
-        return $this->configured[$key] ??= HtmlInstrumentation::fromConfig($config);
+        if (isset($this->configured[$key])) {
+            return $this->configured[$key];
+        }
+
+        foreach (array_keys($this->configured) as $configured) {
+            if (str_starts_with($configured, 'html:')) {
+                unset($this->configured[$configured]);
+            }
+        }
+
+        return $this->configured[$key] = HtmlInstrumentation::fromConfig($config);
     }
 
-    /**
-     * @param  array<string, mixed>  $config
-     * @return string|null
-     */
-    protected function configurationKey(array $config)
+    /** @param  array<string, mixed>  $config */
+    protected function configurationKey(array $config): ?string
     {
         $fingerprint = HtmlInstrumentation::configurationFingerprint($config);
 
         return $fingerprint === null ? null : 'html:'.$fingerprint;
     }
 
-    /**
-     * @param  object|string  $piece
-     * @param  string[]|null  $engines
-     * @return $this
-     */
-    public function forget($piece, ?array $engines = null)
+    /** @param  string[]|null  $engines */
+    public function forget(object|string $piece, ?array $engines = null): static
     {
         $engines = $this->normalizeEngines($engines);
 
@@ -134,8 +196,9 @@ class InstrumentationManager
 
         $wantsAntlers = $engines === null || in_array(static::ENGINE_ANTLERS, $engines, true);
 
-        if ($wantsAntlers) {
+        if ($wantsAntlers && in_array($piece, $this->antlersPieces, true)) {
             $this->antlersPieces = $this->without($this->antlersPieces, $piece);
+            $this->htmlInstrumenters = null;
 
             $this->removeFromAntlers($piece);
         }
@@ -143,22 +206,38 @@ class InstrumentationManager
         return $this;
     }
 
-    /** @return $this */
-    public function flush()
+    public function flush(): static
     {
         $antlers = $this->antlersPieces;
+        $preparsers = $this->runtimePreparsers;
+        $visitors = $this->runtimeVisitors;
 
         $this->configured = [];
         $this->antlersPieces = [];
+        $this->runtimePreparsers = [];
+        $this->runtimeVisitors = [];
+        $this->htmlInstrumenters = null;
+        $this->cleanedWith = [];
+        $this->cleanedHash = null;
 
         foreach ($antlers as $piece) {
             $this->removeFromAntlers($piece);
         }
 
+        $this->applyToAntlers(function (RuntimeConfiguration $config) use ($preparsers, $visitors) {
+            foreach ($preparsers as $preparser) {
+                $config->removePreparser($preparser);
+            }
+
+            foreach ($visitors as $visitor) {
+                $config->removeVisitor($visitor);
+            }
+        });
+
         return $this;
     }
 
-    protected function removeFromAntlers($piece): void
+    protected function removeFromAntlers(object $piece): void
     {
         $this->applyToAntlers(function (RuntimeConfiguration $config) use ($piece) {
             if ($piece instanceof HtmlInstrumentation) {
@@ -168,14 +247,14 @@ class InstrumentationManager
             }
 
             $config->traceManager?->removeTracer($piece);
-        });
+        }, ! $piece instanceof HtmlInstrumentation);
     }
 
-    /** @return void */
-    protected function rememberAntlersPiece($piece)
+    protected function rememberAntlersPiece(HtmlInstrumentation|RuntimeTracerContract|TracerContract $piece): void
     {
         if (! in_array($piece, $this->antlersPieces, true)) {
             $this->antlersPieces[] = $piece;
+            $this->htmlInstrumenters = null;
         }
     }
 
@@ -185,22 +264,17 @@ class InstrumentationManager
      * @param  T[]  $items
      * @return T[]
      */
-    protected function without(array $items, $needle)
+    protected function without(array $items, mixed $needle): array
     {
         return array_values(array_filter($items, fn ($item) => $item !== $needle));
     }
 
-    /** @return void */
-    public function applyTo(RuntimeConfiguration $runtimeConfiguration)
+    public function applyTo(RuntimeConfiguration $runtimeConfiguration): void
     {
-        // Removing our tracers must preserve tracing enabled by the parser itself.
         $this->runtimeConfigurations[$runtimeConfiguration] ??= $runtimeConfiguration->isTracingEnabled;
 
-        $config = config('statamic.antlers.instrumentation', []);
-
-        if (is_array($config) && ($config['enabled'] ?? false)) {
-            $markerConfig = array_intersect_key($config, array_flip(['comments', 'prefix', 'attributes']));
-            $runtimeConfiguration->preparse($this->configuredHtmlInstrumentation($markerConfig));
+        if (($configured = $this->configuredInstrumenter()) !== null) {
+            $runtimeConfiguration->preparse($configured);
         }
 
         foreach ($this->runtimePreparsers as $preparser) {
@@ -222,12 +296,190 @@ class InstrumentationManager
         }
     }
 
+    public function sync(): void
+    {
+        $this->configuredInstrumenter();
+    }
+
+    public function instrumenting(): bool
+    {
+        return $this->htmlInstrumenters() !== [];
+    }
+
+    public function removeMarkers(string $html): string
+    {
+        return HtmlInstrumentation::removeMarkers($html, $this->htmlInstrumenters());
+    }
+
+    public function containsMarkers(string $html): bool
+    {
+        return HtmlInstrumentation::containsMarkers($html, $this->htmlInstrumenters());
+    }
+
+    public function tagBody(AntlersNode $node, bool $composesOutput = false): TagBody
+    {
+        $instrumenters = $this->htmlInstrumenters();
+        $key = $this->tagBodyKey($instrumenters, $composesOutput);
+
+        if ($node->tagBody !== null && $node->tagBody[0] === $key) {
+            return $node->tagBody[1];
+        }
+
+        $body = TagBody::from((string) $node->runtimeContent, $instrumenters, $composesOutput);
+        $node->tagBody = [$key, $body];
+
+        return $body;
+    }
+
+    /** @param  HtmlInstrumentation[]  $instrumenters */
+    protected function tagBodyKey(array $instrumenters, bool $composesOutput): string
+    {
+        $mode = $composesOutput ? 'composes' : 'clean';
+
+        return $mode.':'.implode("\0", $this->fingerprints($instrumenters));
+    }
+
+    /** @param  HtmlInstrumentation[]|null  $instrumenters */
+    public function removeMisplacedMarkers(string $html, ?array $instrumenters = null): string
+    {
+        $instrumenters ??= $this->htmlInstrumenters();
+
+        if ($instrumenters === []) {
+            return $html;
+        }
+
+        if (strlen($html) === $this->cleanedLength
+            && $this->cleanedCovers($instrumenters)
+            && hash('xxh3', $html) === $this->cleanedHash) {
+            return $html;
+        }
+
+        $cleaned = $this->cleanMisplacedMarkers($html, $instrumenters);
+
+        if ($cleaned !== $html) {
+            $this->misplacedMarkerRemovals++;
+            $this->removedMisplacedMarkerBytes += strlen($html) - strlen($cleaned);
+        }
+
+        $this->cleanedWith = $this->fingerprints($instrumenters);
+        $this->cleanedLength = strlen($cleaned);
+        $this->cleanedHash = hash('xxh3', $cleaned);
+
+        return $cleaned;
+    }
+
+    public function misplacedMarkerRemovals(): int
+    {
+        return $this->misplacedMarkerRemovals;
+    }
+
+    public function removedMisplacedMarkerBytes(): int
+    {
+        return $this->removedMisplacedMarkerBytes;
+    }
+
+    /** @param  HtmlInstrumentation[]  $instrumenters */
+    protected function cleanedCovers(array $instrumenters): bool
+    {
+        return array_diff($this->fingerprints($instrumenters), $this->cleanedWith) === [];
+    }
+
     /**
-     * @param  RuntimeTracerContract|TracerContract  $tracer
-     * @param  string[]|null  $engines
-     * @return $this
+     * @param  HtmlInstrumentation[]  $instrumenters
+     * @return string[]
      */
-    protected function registerTracer($tracer, ?array $engines)
+    protected function fingerprints(array $instrumenters): array
+    {
+        return array_map(
+            fn (HtmlInstrumentation $instrumenter) => $instrumenter->cacheFingerprint(),
+            $instrumenters
+        );
+    }
+
+    /** @param  HtmlInstrumentation[]  $instrumenters */
+    protected function cleanMisplacedMarkers(string $html, array $instrumenters): string
+    {
+        return HtmlInstrumentation::removeMisplacedMarkers($html, $instrumenters);
+    }
+
+    public function trimAroundMarkers(string $html): string
+    {
+        return HtmlInstrumentation::trimAroundMarkers($html, $this->htmlInstrumenters());
+    }
+
+    /** @return array{0: string, 1: string|null} */
+    public function splitMarkers(string $output): array
+    {
+        $instrumenters = $this->htmlInstrumenters();
+
+        if ($instrumenters === [] || ! HtmlInstrumentation::containsMarkers($output, $instrumenters)) {
+            return [trim($output), null];
+        }
+
+        $instrumented = HtmlInstrumentation::trimAroundMarkers($output, $instrumenters);
+        $stripped = HtmlInstrumentation::removeMarkers($instrumented, $instrumenters);
+        $value = trim($stripped);
+
+        if ($instrumented === $value || $stripped !== $value) {
+            return [$value, null];
+        }
+
+        return [$value, $instrumented];
+    }
+
+    /** @return HtmlInstrumentation[] */
+    protected function htmlInstrumenters(): array
+    {
+        $configured = $this->configuredInstrumenter();
+
+        if ($this->htmlInstrumenters !== null) {
+            return $this->htmlInstrumenters;
+        }
+
+        $instrumenters = array_values(array_filter(
+            $this->antlersPieces,
+            fn ($piece) => $piece instanceof HtmlInstrumentation
+        ));
+
+        if ($configured !== null) {
+            $instrumenters[] = $configured;
+        }
+
+        return $this->htmlInstrumenters = $instrumenters;
+    }
+
+    protected function configuredInstrumenter(): ?HtmlInstrumentation
+    {
+        $config = Config::all()['statamic']['antlers']['instrumentation'] ?? [];
+
+        if ($this->configuredState !== null && $this->configuredState[0] === $config) {
+            return $this->configuredState[1];
+        }
+
+        $instrumenter = null;
+
+        if (is_array($config) && ($config['enabled'] ?? false)) {
+            $instrumenter = $this->configuredHtmlInstrumentation(
+                array_intersect_key($config, array_flip(['comments', 'prefix', 'attributes', 'metadata', 'componentPrefixes', 'cache']))
+            );
+        }
+
+        $previous = $this->configuredState[1] ?? null;
+        $this->configuredState = [$config, $instrumenter];
+
+        if ($previous !== $instrumenter) {
+            $this->htmlInstrumenters = null;
+
+            $this->applyToAntlers(
+                fn (RuntimeConfiguration $runtimeConfiguration) => $runtimeConfiguration->replacePreparser($previous, $instrumenter)
+            );
+        }
+
+        return $instrumenter;
+    }
+
+    /** @param  string[]|null  $engines */
+    protected function registerTracer(RuntimeTracerContract|TracerContract $tracer, ?array $engines): static
     {
         $engines ??= [static::ENGINE_ANTLERS];
 
@@ -236,17 +488,14 @@ class InstrumentationManager
 
             $this->applyToAntlers(function (RuntimeConfiguration $config) use ($tracer) {
                 $config->enableTracing()->registerTracer($tracer);
-            });
+            }, true);
         }
 
         return $this;
     }
 
-    /**
-     * @param  string[]|null  $engines
-     * @return $this
-     */
-    protected function registerHtmlInstrumentation(HtmlInstrumentation $instrumentation, ?array $engines)
+    /** @param  string[]|null  $engines */
+    protected function registerHtmlInstrumentation(HtmlInstrumentation $instrumentation, ?array $engines): static
     {
         $wantsAntlers = $engines === null || in_array(static::ENGINE_ANTLERS, $engines, true);
 
@@ -258,12 +507,14 @@ class InstrumentationManager
         return $this;
     }
 
-    /** @return void */
-    protected function applyToAntlers(callable $apply)
+    protected function applyToAntlers(callable $apply, bool $syncTracing = false): void
     {
         foreach ($this->runtimeConfigurations as $configuration => $tracingEnabled) {
             $apply($configuration);
-            $configuration->isTracingEnabled = $tracingEnabled || $configuration->hasRegisteredTracers();
+
+            if ($syncTracing) {
+                $configuration->isTracingEnabled = $tracingEnabled || $configuration->hasRegisteredTracers();
+            }
         }
     }
 
@@ -271,7 +522,7 @@ class InstrumentationManager
      * @param  string[]|null  $engines
      * @return string[]|null
      */
-    protected function normalizeEngines(?array $engines)
+    protected function normalizeEngines(?array $engines): ?array
     {
         if ($engines === null) {
             return null;
