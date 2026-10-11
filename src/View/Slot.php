@@ -8,8 +8,10 @@ use Illuminate\Support\Facades\Blade;
 use RuntimeException;
 use Statamic\Contracts\View\Antlers\Parser as ParserContract;
 use Statamic\StaticCaching\NoCache\Region;
+use Statamic\View\Antlers\Language\Facades\Runtime;
 use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
 use Statamic\View\Antlers\Language\Runtime\NodeProcessor;
+use Statamic\View\Antlers\Language\Runtime\RuntimeParser;
 use Throwable;
 
 class Slot implements Htmlable
@@ -88,7 +90,9 @@ class Slot implements Htmlable
             [GlobalRuntimeState::$isCascadeEnabled, GlobalRuntimeState::$prefixState] = $callerState;
 
             try {
-                return (string) app(ParserContract::class)->parse($source, $data);
+                $parser = app(ParserContract::class);
+
+                return (string) ($parser instanceof RuntimeParser ? $parser->parse($source, $data, false) : $parser->parse($source, $data));
             } finally {
                 [GlobalRuntimeState::$isCascadeEnabled, GlobalRuntimeState::$prefixState] = $tagState;
             }
@@ -103,7 +107,12 @@ class Slot implements Htmlable
 
         $data = array_merge($this->data, ['params' => $this->params], $props);
 
-        return trim((string) ($this->renderer)($data));
+        return Runtime::trimAroundMarkers((string) ($this->renderer)($data));
+    }
+
+    protected function value(): string
+    {
+        return Runtime::removeMarkers($this->render());
     }
 
     public function withParams(array $params): static
@@ -122,12 +131,12 @@ class Slot implements Htmlable
 
     public function toHtml(): string
     {
-        return $this->render();
+        return $this->value();
     }
 
     public function __toString(): string
     {
-        return $this->render();
+        return $this->value();
     }
 
     public static function output(mixed $slot, array $props = []): string
@@ -142,7 +151,7 @@ class Slot implements Htmlable
     public function __serialize(): array
     {
         if ($this->source === null && $this->template === null) {
-            return ['name' => $this->name, 'rendered' => $this->render()];
+            return ['name' => $this->name, 'rendered' => $this->value()];
         }
 
         try {

@@ -89,12 +89,12 @@ class ComponentProxy extends Tags
                 self::$componentStack[] = [$component, $contextData];
                 $componentStackPushed = true;
 
-                echo InstrumentationState::whileParsingComponentContent(
+                echo InstrumentationState::withoutInstrumentation(
                     fn () => $this->parse($contextData)
                 );
             }
 
-            $result = InstrumentationState::whileRenderingComponentView(
+            $result = InstrumentationState::withinComponentView(
                 fn () => $__env->renderComponent()
             );
 
@@ -135,7 +135,7 @@ class ComponentProxy extends Tags
 
             $__env->slot($slot, null, $context);
 
-            echo InstrumentationState::whileParsingComponentContent(
+            echo InstrumentationState::withoutInstrumentation(
                 fn () => $this->parse($contextData)
             );
 

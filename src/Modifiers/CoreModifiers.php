@@ -35,6 +35,7 @@ use Statamic\Support\Html;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\ChecksDumpability;
 use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
+use Statamic\View\Instrumentation\InstrumentationState;
 use Stringy\StaticStringy as Stringy;
 
 use function Statamic\trans;
@@ -133,7 +134,9 @@ class CoreModifiers extends Modifier
     {
         $trusted = Arr::get($params, 0) === 'trusted' && ! GlobalRuntimeState::$isEvaluatingUserData;
 
-        return (string) Antlers::parse($value, $context, $trusted);
+        return (string) InstrumentationState::withoutInstrumentation(
+            fn () => Antlers::parse($value, $context, $trusted)
+        );
     }
 
     /**
