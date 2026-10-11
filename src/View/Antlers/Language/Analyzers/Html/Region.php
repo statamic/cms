@@ -4,16 +4,13 @@ namespace Statamic\View\Antlers\Language\Analyzers\Html;
 
 use Illuminate\Support\LazyCollection;
 use Statamic\View\Antlers\Language\Nodes\AntlersNode as LanguageAntlersNode;
-use Statamic\View\Antlers\Language\Nodes\Parameters\ParameterNode;
 
 /** @internal */
 class Region
 {
-    /** @var AntlersNode */
-    protected $opening;
+    protected AntlersNode $opening;
 
-    /** @var AntlersNode */
-    protected $closing;
+    protected AntlersNode $closing;
 
     public function __construct(AntlersNode $opening, AntlersNode $closing)
     {
@@ -21,22 +18,22 @@ class Region
         $this->closing = $closing;
     }
 
-    public function opening()
+    public function opening(): AntlersNode
     {
         return $this->opening;
     }
 
-    public function closing()
+    public function closing(): AntlersNode
     {
         return $this->closing;
     }
 
-    public function document()
+    public function document(): Document
     {
         return $this->opening->document();
     }
 
-    public function name()
+    public function name(): ?string
     {
         $name = $this->opening->antlersNode()->name;
 
@@ -47,27 +44,7 @@ class Region
         return $name->compound;
     }
 
-    /** @return ParameterNode|null */
-    public function parameter($name)
-    {
-        return $this->opening->antlersNode()->parameter($name);
-    }
-
-    public function staticParameterValue($name, $default = null)
-    {
-        try {
-            return $this->opening->antlersNode()->staticParameterValue($name, $default);
-        } catch (\InvalidArgumentException $exception) {
-            throw new \InvalidArgumentException(sprintf(
-                'The [%s] parameter on the [%s] HTML region must be static.',
-                $name,
-                $this->name()
-            ), 0, $exception);
-        }
-    }
-
-    /** @return NodeSequence|$this */
-    public function content($content = null)
+    public function content(Node|string|null $content = null): NodeSequence|static
     {
         $this->assertOrderedSiblings();
 
@@ -80,7 +57,7 @@ class Region
                 ->nodes()
                 ->all();
 
-            $this->closing->before($content);
+            $this->closing->before($content ?? '');
 
             foreach ($existing as $node) {
                 if ($node !== $content) {
@@ -98,7 +75,7 @@ class Region
      * @param  callable(string, string, Text): (string|null)  $rewrite
      * @param  (callable(Element): bool)|null  $descend
      */
-    public function rewriteTextEdges(callable $rewrite, ?callable $descend = null)
+    public function rewriteTextEdges(callable $rewrite, ?callable $descend = null): static
     {
         $this->content()->rewriteTextEdges($rewrite, $descend);
 
@@ -106,12 +83,12 @@ class Region
     }
 
     /** @return LazyCollection<int, Element> */
-    public function ownedElements()
+    public function ownedElements(): LazyCollection
     {
         return LazyCollection::make(fn () => $this->ownedElementsWithin($this->content()))->values();
     }
 
-    public function unwrap()
+    public function unwrap(): static
     {
         $this->assertOrderedSiblings();
         $this->closing->remove();
@@ -120,8 +97,7 @@ class Region
         return $this;
     }
 
-    /** @return $this */
-    public function wrapWith(Element $element)
+    public function wrapWith(Element $element): static
     {
         if ($element->document() !== $this->document()) {
             throw new \InvalidArgumentException('HTML graph nodes cannot be moved between documents.');
@@ -148,7 +124,7 @@ class Region
         return $this;
     }
 
-    protected function ownedElementsWithin(NodeSequence $sequence)
+    protected function ownedElementsWithin(NodeSequence $sequence): \Generator
     {
         $nestedClosing = null;
 
@@ -185,12 +161,8 @@ class Region
         }
     }
 
-    protected function isNestedRegionOpening($node)
+    protected function isNestedRegionOpening(LanguageAntlersNode $node): bool
     {
-        if (! $node instanceof LanguageAntlersNode) {
-            return false;
-        }
-
         if ($node->isClosingTag) {
             return false;
         }
@@ -206,7 +178,7 @@ class Region
         return strcasecmp($node->name->compound, (string) $this->name()) === 0;
     }
 
-    protected function assertOrderedSiblings()
+    protected function assertOrderedSiblings(): void
     {
         $parent = $this->opening->parent();
 

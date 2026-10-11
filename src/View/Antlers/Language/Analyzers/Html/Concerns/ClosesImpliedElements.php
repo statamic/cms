@@ -2,12 +2,10 @@
 
 namespace Statamic\View\Antlers\Language\Analyzers\Html\Concerns;
 
-use Statamic\View\Antlers\Language\Analyzers\Html\Element;
-
 /** @internal */
 trait ClosesImpliedElements
 {
-    protected function isInHtmlSelectMode()
+    protected function isInHtmlSelectMode(): bool
     {
         if ($this->openSelect === null) {
             return false;
@@ -43,22 +41,17 @@ trait ClosesImpliedElements
         return false;
     }
 
-    protected function hasOpenHtmlTemplate()
+    protected function hasOpenHtmlTemplate(): bool
     {
-        for ($index = count($this->stack) - 1; $index >= 0; $index--) {
-            $element = $this->stack[$index];
-
-            if (! $this->isForeignElement($element)
-                && $this->arena->name[$element] === 'template') {
-                return true;
-            }
-        }
-
-        return false;
+        return $this->hasOpenElement('template');
     }
 
-    protected function closeOpenElement($name)
+    protected function closeOpenElement(string $name): void
     {
+        if (! $this->hasOpenElement($name)) {
+            return;
+        }
+
         for ($index = count($this->stack) - 1; $index >= 0; $index--) {
             $element = $this->stack[$index];
 
@@ -76,8 +69,12 @@ trait ClosesImpliedElements
         }
     }
 
-    protected function hasOpenElementInTableScope($name)
+    protected function hasOpenElementInTableScope(string $name): bool
     {
+        if (! $this->hasOpenElement($name)) {
+            return false;
+        }
+
         for ($index = count($this->stack) - 1; $index >= 0; $index--) {
             $element = $this->stack[$index];
 
@@ -91,7 +88,7 @@ trait ClosesImpliedElements
                 return true;
             }
 
-            if (isset(self::$tableScopeBoundaries[$stackName])) {
+            if (isset(self::$tableScopeBoundaries[$stackName ?? ''])) {
                 return false;
             }
         }
@@ -99,20 +96,13 @@ trait ClosesImpliedElements
         return false;
     }
 
-    protected function stackIndex($name)
-    {
-        for ($index = count($this->stack) - 1; $index >= 0; $index--) {
-            if (strcasecmp((string) $this->arena->name[$this->stack[$index]], $name) === 0) {
-                return $index;
-            }
-        }
-
-        return null;
-    }
-
-    protected function htmlEndTagMatchIndex($name)
+    protected function htmlEndTagMatchIndex(string $name): ?int
     {
         if ($name === 'template') {
+            if (! $this->hasOpenElement('template')) {
+                return null;
+            }
+
             for ($index = count($this->stack) - 1; $index >= 0; $index--) {
                 $element = $this->stack[$index];
 
@@ -151,6 +141,10 @@ trait ClosesImpliedElements
             return $this->htmlElementInScopeIndex([$name => true], self::$tableScopeBoundaries);
         }
 
+        if (! $this->hasOpenElement($name)) {
+            return null;
+        }
+
         for ($index = count($this->stack) - 1; $index >= 0; $index--) {
             $element = $this->stack[$index];
 
@@ -162,7 +156,7 @@ trait ClosesImpliedElements
                 continue;
             }
 
-            $stackName = strtolower((string) $this->arena->name[$element]);
+            $stackName = $this->arena->name[$element] ?? '';
 
             if ($stackName === $name) {
                 return $index;
@@ -176,8 +170,23 @@ trait ClosesImpliedElements
         return null;
     }
 
-    protected function htmlElementInScopeIndex(array $targets, array $boundaries)
+    protected function hasAnyOpenElement(array $targets): bool
     {
+        foreach ($targets as $name => $_) {
+            if (isset($this->openElementCounts[$name])) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    protected function htmlElementInScopeIndex(array $targets, array $boundaries): ?int
+    {
+        if (! $this->hasAnyOpenElement($targets)) {
+            return null;
+        }
+
         for ($index = count($this->stack) - 1; $index >= 0; $index--) {
             $element = $this->stack[$index];
 
@@ -189,7 +198,7 @@ trait ClosesImpliedElements
                 continue;
             }
 
-            $name = strtolower((string) $this->arena->name[$element]);
+            $name = $this->arena->name[$element] ?? '';
 
             if (isset($targets[$name])) {
                 return $index;
@@ -203,7 +212,7 @@ trait ClosesImpliedElements
         return null;
     }
 
-    protected function isSpecialElement($name)
+    protected function isSpecialElement(string $name): bool
     {
         if (isset(self::$formattingBreakStarts[$name])) {
             return true;
@@ -216,16 +225,18 @@ trait ClosesImpliedElements
         return in_array($name, ['body', 'frameset', 'head', 'html', 'summary'], true);
     }
 
-    protected function setElementClosingMarkup($element, $markup)
+    protected function setElementClosingMarkup(int $element, string $markup, ?int $start = null): void
     {
         $this->arena->closing[$element] = $markup;
 
-        if (isset($this->handles[$element]) && $this->handles[$element] instanceof Element) {
-            $this->handles[$element]->closingTag($markup);
+        if ($start === null) {
+            unset($this->arena->closingStart[$element]);
+        } else {
+            $this->arena->closingStart[$element] = $start;
         }
     }
 
-    protected function closeImpliedElements($name)
+    protected function closeImpliedElements(string $name): void
     {
         if (empty($this->stack)) {
             return;
@@ -279,7 +290,7 @@ trait ClosesImpliedElements
                 $current = $this->stack[$index];
 
                 if (! $this->isForeignElement($current)
-                    && isset(self::$headingElements[strtolower((string) $this->arena->name[$current])])) {
+                    && isset(self::$headingElements[$this->arena->name[$current] ?? ''])) {
                     $this->sliceOpenStack($index);
                 }
             }
@@ -314,7 +325,7 @@ trait ClosesImpliedElements
         }
     }
 
-    protected function generateImpliedEndTags($except = null)
+    protected function generateImpliedEndTags(?string $except = null): void
     {
         $implied = [
             'dd' => true, 'dt' => true, 'li' => true, 'optgroup' => true,
@@ -330,7 +341,7 @@ trait ClosesImpliedElements
                 return;
             }
 
-            $name = strtolower((string) $this->arena->name[$element]);
+            $name = $this->arena->name[$element] ?? '';
 
             if ($name === $except || ! isset($implied[$name])) {
                 return;
@@ -340,8 +351,12 @@ trait ClosesImpliedElements
         }
     }
 
-    protected function closeItemBeforeSpecialBoundary(array $targets)
+    protected function closeItemBeforeSpecialBoundary(array $targets): void
     {
+        if (! $this->hasAnyOpenElement($targets)) {
+            return;
+        }
+
         for ($index = count($this->stack) - 1; $index >= 0; $index--) {
             $element = $this->stack[$index];
 
@@ -349,7 +364,7 @@ trait ClosesImpliedElements
                 return;
             }
 
-            $name = strtolower((string) $this->arena->name[$element]);
+            $name = $this->arena->name[$element] ?? '';
 
             if (isset($targets[$name])) {
                 $this->sliceOpenStack($index);
@@ -364,19 +379,23 @@ trait ClosesImpliedElements
         }
     }
 
-    protected function closeElementInScope(array $targets, array $boundaries)
+    protected function closeElementInScope(array $targets, array $boundaries): void
     {
+        if (! $this->hasAnyOpenElement($targets)) {
+            return;
+        }
+
         for ($index = count($this->stack) - 1; $index >= 0; $index--) {
             $stackElement = $this->stack[$index];
             $stackName = $this->arena->name[$stackElement];
 
-            if (isset($targets[$stackName])) {
+            if (isset($targets[$stackName ?? ''])) {
                 $this->sliceOpenStack($index);
 
                 return;
             }
 
-            if (isset($boundaries[$stackName])) {
+            if (isset($boundaries[$stackName ?? ''])) {
                 return;
             }
 

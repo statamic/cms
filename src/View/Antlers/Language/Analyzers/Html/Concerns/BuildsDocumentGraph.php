@@ -2,14 +2,16 @@
 
 namespace Statamic\View\Antlers\Language\Analyzers\Html\Concerns;
 
+use Statamic\View\Antlers\Language\Analyzers\Html\Arena;
 use Statamic\View\Antlers\Language\Analyzers\Html\TableMode;
 use Statamic\View\Antlers\Language\Nodes\AntlersNode as LanguageAntlersNode;
+use Statamic\View\Instrumentation\ComponentPrefixes;
 use Statamic\View\Instrumentation\HtmlSpec;
 
 /** @internal */
 trait BuildsDocumentGraph
 {
-    protected function nextTextBoundary($position, $sourceLength)
+    protected function nextTextBoundary(int $position, int $sourceLength): int
     {
         $nextMarkup = strpos($this->source, '<', $position);
 
@@ -30,7 +32,7 @@ trait BuildsDocumentGraph
         return min($nextMarkup, $nextAntlers);
     }
 
-    protected function startsBogusClosingTag($start, $next)
+    protected function startsBogusClosingTag(int $start, ?string $next): bool
     {
         if ($next !== '/') {
             return false;
@@ -49,7 +51,7 @@ trait BuildsDocumentGraph
         return ! isset($this->regionEnds[$start + 2]);
     }
 
-    protected function startsLiteralLessThan($start, $next)
+    protected function startsLiteralLessThan(int $start, ?string $next): bool
     {
         if ($next === null || HtmlSpec::isAsciiAlpha($next)) {
             return false;
@@ -62,7 +64,7 @@ trait BuildsDocumentGraph
         return ! isset($this->regionEnds[$start + 1]);
     }
 
-    protected function endTagContext($name)
+    protected function endTagContext(string $name): array
     {
         $processAsHtml = ! $this->currentContainerIsForeign();
         $foreignMatch = null;
@@ -91,7 +93,7 @@ trait BuildsDocumentGraph
         return [false, null];
     }
 
-    protected function closesCurrentTextElement($name)
+    protected function closesCurrentTextElement(string $name): bool
     {
         if ($this->textElement === null) {
             return false;
@@ -100,7 +102,7 @@ trait BuildsDocumentGraph
         return strcasecmp((string) $this->arena->name[$this->textElement], $name) === 0;
     }
 
-    protected function shouldCloseSelectBeforeEndTag($name)
+    protected function shouldCloseSelectBeforeEndTag(string $name): bool
     {
         if ($this->openSelect === null || ! $this->selectInTable) {
             return false;
@@ -113,7 +115,7 @@ trait BuildsDocumentGraph
         return isset(self::$selectTableElements[$name]);
     }
 
-    protected function shouldIgnoreEndTagInSelect($name, $closesCurrentTextElement)
+    protected function shouldIgnoreEndTagInSelect(string $name, bool $closesCurrentTextElement): bool
     {
         if ($this->openSelect === null || ! $this->isInHtmlSelectMode()) {
             return false;
@@ -126,7 +128,7 @@ trait BuildsDocumentGraph
         return ! in_array($name, ['option', 'optgroup', 'select', 'template'], true);
     }
 
-    protected function shouldCloseColgroupBeforeEndTag($name, $processAsHtml)
+    protected function shouldCloseColgroupBeforeEndTag(string $name, bool $processAsHtml): bool
     {
         if (! $processAsHtml) {
             return false;
@@ -139,7 +141,7 @@ trait BuildsDocumentGraph
         return ! in_array($name, ['col', 'colgroup', 'template'], true);
     }
 
-    protected function isHtmlFormEndTag($name, $processAsHtml)
+    protected function isHtmlFormEndTag(string $name, bool $processAsHtml): bool
     {
         if (! $processAsHtml || $name !== 'form') {
             return false;
@@ -148,7 +150,7 @@ trait BuildsDocumentGraph
         return ! $this->hasOpenHtmlTemplate();
     }
 
-    protected function consumeFormEndTag($start, $end, $markup)
+    protected function consumeFormEndTag(int $start, int $end, string $markup): void
     {
         if ($this->formElement === null) {
             $this->appendOpaqueMarkup($start, $end, $markup);
@@ -174,7 +176,7 @@ trait BuildsDocumentGraph
             }
 
             if ($formIndex !== false) {
-                array_splice($this->stack, $formIndex, 1);
+                $this->removeOpenElementAt($formIndex);
             }
         }
 
@@ -182,7 +184,7 @@ trait BuildsDocumentGraph
         $this->appendOpaqueMarkup($start, $end, $markup);
     }
 
-    protected function closeMatchedElement($match, $name, $markup, $start, $end)
+    protected function closeMatchedElement(int $match, string $name, string $markup, int $start, int $end): void
     {
         $matchedElement = $this->stack[$match];
 
@@ -190,7 +192,7 @@ trait BuildsDocumentGraph
             $this->attachEmbeddedRegions($matchedElement, $start, $end, true);
         }
 
-        $this->setElementClosingMarkup($matchedElement, $markup);
+        $this->setElementClosingMarkup($matchedElement, $markup, $start);
 
         if ($matchedElement === $this->textElement) {
             $this->textElement = null;
@@ -214,7 +216,7 @@ trait BuildsDocumentGraph
         }
     }
 
-    protected function closeDynamicElement($start, $end, $markup)
+    protected function closeDynamicElement(int $start, int $end, string $markup): bool
     {
         for ($index = count($this->stack) - 1; $index >= 0; $index--) {
             $element = $this->stack[$index];
@@ -224,7 +226,7 @@ trait BuildsDocumentGraph
             }
 
             $this->attachEmbeddedRegions($element, $start, $end, true);
-            $this->setElementClosingMarkup($element, $markup);
+            $this->setElementClosingMarkup($element, $markup, $start);
             $this->sliceOpenStack($index);
 
             return true;
@@ -233,9 +235,9 @@ trait BuildsDocumentGraph
         return false;
     }
 
-    protected function consumeStartTagInSelectMode($name, $start, $end, $markup)
+    protected function consumeStartTagInSelectMode(?string $name, int $start, int $end, string $markup): bool
     {
-        if ($this->selectInTable && isset(self::$selectTableElements[$name])) {
+        if ($this->selectInTable && isset(self::$selectTableElements[$name ?? ''])) {
             $this->closeOpenElement('select');
 
             return false;
@@ -263,7 +265,7 @@ trait BuildsDocumentGraph
         return true;
     }
 
-    protected function shouldExitForeignContentBeforeStart($container, $name, $markup)
+    protected function shouldExitForeignContentBeforeStart(int $container, ?string $name, string $markup): bool
     {
         if ($container === 0 || ! $this->isForeignElement($container)) {
             return false;
@@ -272,7 +274,7 @@ trait BuildsDocumentGraph
         return $this->shouldExitForeignContent($name, $markup);
     }
 
-    protected function shouldIgnoreFrameStart($name, $isHtmlElement, $processStartAsHtml)
+    protected function shouldIgnoreFrameStart(?string $name, bool $isHtmlElement, bool $processStartAsHtml): bool
     {
         if (! $isHtmlElement || ! $processStartAsHtml) {
             return false;
@@ -281,7 +283,7 @@ trait BuildsDocumentGraph
         return in_array($name, ['frame', 'frameset'], true);
     }
 
-    protected function initialFosterState($name, $namespace, $sourceContainer, $processStartAsHtml)
+    protected function initialFosterState(?string $name, string $namespace, int $sourceContainer, bool $processStartAsHtml): bool
     {
         if ($processStartAsHtml && $name !== null) {
             return $this->prepareTableStart($name);
@@ -294,7 +296,7 @@ trait BuildsDocumentGraph
         return $namespace !== 'html' && $this->shouldFosterContent();
     }
 
-    protected function isFosteredHiddenInput($element, $name, $foster)
+    protected function isFosteredHiddenInput(int $element, ?string $name, bool $foster): bool
     {
         if (! $foster || $name !== 'input') {
             return false;
@@ -304,13 +306,13 @@ trait BuildsDocumentGraph
     }
 
     protected function insertStartElement(
-        $element,
-        $sourceContainer,
-        $sourcePositionAnchor,
-        $sourceTable,
-        $sourceTableTail,
-        $foster
-    ) {
+        int $element,
+        int $sourceContainer,
+        ?int $sourcePositionAnchor,
+        ?int $sourceTable,
+        ?int $sourceTableTail,
+        bool $foster
+    ): void {
         if ($foster) {
             $this->fosterNode($element, $sourceContainer);
 
@@ -331,18 +333,18 @@ trait BuildsDocumentGraph
     }
 
     protected function pushStartElement(
-        $element,
-        $name,
-        $namespace,
-        $selfClosing,
-        $selectInTable,
-        $tableForm
-    ) {
+        int $element,
+        ?string $name,
+        string $namespace,
+        bool $selfClosing,
+        bool $selectInTable,
+        bool $tableForm
+    ): void {
         if ($tableForm || ! $this->shouldPushElement($name, $namespace, $selfClosing)) {
             return;
         }
 
-        $this->stack[] = $element;
+        $this->pushOpenElement($element);
 
         if ($namespace !== 'html') {
             return;
@@ -350,10 +352,6 @@ trait BuildsDocumentGraph
 
         if ($name !== null && isset(self::$formattingElements[$name])) {
             $this->pushActiveFormattingElement($element);
-        }
-
-        if ($name === 'table') {
-            $this->hasSeenTable = true;
         }
 
         if ($name === 'template') {
@@ -365,8 +363,8 @@ trait BuildsDocumentGraph
             $this->selectInTable = $selectInTable;
         }
 
-        if (isset(self::$formattingMarkerElements[$name])) {
-            $this->activeFormatting[] = null;
+        if (isset(self::$formattingMarkerElements[$name ?? ''])) {
+            $this->pushActiveFormattingMarker();
         }
 
         if ($name === 'script') {
@@ -378,7 +376,7 @@ trait BuildsDocumentGraph
         }
     }
 
-    protected function build(?array $nodes)
+    protected function build(?array $nodes): void
     {
         if ($nodes !== null) {
             $this->indexAntlersByteRegions($nodes);
@@ -411,7 +409,7 @@ trait BuildsDocumentGraph
 
             if ($this->source[$position] !== '<') {
                 $next = $this->nextTextBoundary($position, $sourceLength);
-                $this->appendParsedText(substr($this->source, $position, $next - $position));
+                $this->appendParsedText(substr($this->source, $position, $next - $position), $position);
                 $position = $next;
 
                 continue;
@@ -421,13 +419,16 @@ trait BuildsDocumentGraph
         }
 
         $this->regionEnds = [];
-        $this->stack = [];
+        $this->resetOpenStack();
         $this->activeFormatting = [];
-        $this->fosterCharacterTails = [];
+        $this->activeSignatureCounts = [];
+        $this->activeSignatureCountStack = [];
+        $this->formattingSignatures = [];
         $this->templateInsertionModes = [];
+        $this->insertionChains = [];
     }
 
-    protected function consumeMarkup($start)
+    protected function consumeMarkup(int $start): int
     {
         $next = $this->source[$start + 1] ?? null;
 
@@ -444,7 +445,7 @@ trait BuildsDocumentGraph
         }
 
         if ($this->startsLiteralLessThan($start, $next)) {
-            $this->appendParsedText('<');
+            $this->appendParsedText('<', $start);
 
             return $start + 1;
         }
@@ -474,7 +475,7 @@ trait BuildsDocumentGraph
         return $this->consumeStartTag($start, $end, $markup, $name);
     }
 
-    protected function consumeStartTag($start, $end, $markup, $name)
+    protected function consumeStartTag(int $start, int $end, string $markup, ?string $name): int
     {
         $sourcePositionContainer = $this->currentContainer();
         $sourcePositionAnchor = $this->arena->sourceAnchor[$sourcePositionContainer] ?? null;
@@ -552,6 +553,7 @@ trait BuildsDocumentGraph
         $elementName = $this->elementNameForNamespace($name, $namespace);
         $element = $this->arena->element($elementName, $markup, $selfClosing, $namespace);
         $this->elementSourceStarts[$element] = $start;
+        $this->arena->sourceStart[$element] = $start;
         if ($isHtmlElement && $name === 'form' && ! $this->hasOpenHtmlTemplate()) {
             $this->formElement = $element;
         }
@@ -585,7 +587,7 @@ trait BuildsDocumentGraph
         return $end;
     }
 
-    protected function consumeEndTag($start, $end, $markup, $name)
+    protected function consumeEndTag(int $start, int $end, string $markup, string|false|null $name): int
     {
         if (! is_string($name)) {
             if ($name === null && $this->closeDynamicElement($start, $end, $markup)) {
@@ -617,7 +619,7 @@ trait BuildsDocumentGraph
         }
 
         if ($this->shouldCloseColgroupBeforeEndTag($name, $processAsHtml)) {
-            array_pop($this->stack);
+            $this->popOpenElement();
         }
 
         if ($processAsHtml) {
@@ -661,7 +663,7 @@ trait BuildsDocumentGraph
                     $this->arena->append($container, $paragraph);
                 }
 
-                $this->stack[] = $paragraph;
+                $this->pushOpenElement($paragraph);
                 $match = count($this->stack) - 1;
             }
         } elseif ($processAsHtml) {
@@ -679,7 +681,7 @@ trait BuildsDocumentGraph
         return $end;
     }
 
-    protected function appendRecoveredBreak($start, $end, $markup)
+    protected function appendRecoveredBreak(int $start, int $end, string $markup): void
     {
         $sourceContainer = $this->currentContainer();
         [$sourceTable, $sourceTableTail] = $this->sourceTablePosition();
@@ -688,10 +690,15 @@ trait BuildsDocumentGraph
         if ($this->activeFormatting
             && $this->characterTokenUsesHtmlRules($this->currentContainer())) {
             $this->reconstructActiveFormatting();
+
+            if ($foster && $this->tableMode() === TableMode::Normal) {
+                $foster = false;
+            }
         }
 
         $element = $this->arena->element('br', $markup, false, 'html');
         $this->elementSourceStarts[$element] = $start;
+        $this->arena->sourceStart[$element] = $start;
 
         $this->insertStartElement(
             $element,
@@ -703,11 +710,11 @@ trait BuildsDocumentGraph
         );
 
         if ($this->regionStarts) {
-            $this->attachEmbeddedRegions($element, $start, $end);
+            $this->attachEmbeddedRegions($element, $start, $end, true);
         }
     }
 
-    protected function appendOpaqueMarkup($start, $end, $markup, $forcedType = null)
+    protected function appendOpaqueMarkup(int $start, int $end, string $markup, ?string $forcedType = null): void
     {
         [$sourceTable, $sourceTableTail] = $this->sourceTablePosition();
         $type = $forcedType;
@@ -717,6 +724,7 @@ trait BuildsDocumentGraph
         }
 
         $opaque = $this->arena->opaque($markup, $type);
+        $this->arena->sourceStart[$opaque] = $start;
         $container = $this->currentContainer();
         $this->arena->append($container, $opaque);
         $this->anchorRecoveredSourceNode($opaque, $container, $sourceTable, $sourceTableTail);
@@ -740,7 +748,7 @@ trait BuildsDocumentGraph
         }
     }
 
-    protected function appendTextWithAntlers($start, $end, $container)
+    protected function appendTextWithAntlers(int $start, int $end, int $container): void
     {
         if ($this->shouldReconstructFormattingInPlaintext()) {
             $this->reconstructActiveFormatting();
@@ -762,12 +770,12 @@ trait BuildsDocumentGraph
                 $next = $end;
             }
 
-            $this->arena->append($container, $this->arena->text(substr($this->source, $position, $next - $position)));
+            $this->arena->append($container, $this->arena->text(substr($this->source, $position, $next - $position), $position));
             $position = $next;
         }
     }
 
-    protected function shouldCloseImpliedElementsBeforeStart($name, $tableForm, $startsInHtmlSelectMode)
+    protected function shouldCloseImpliedElementsBeforeStart(string $name, bool $tableForm, bool $startsInHtmlSelectMode): bool
     {
         if ($tableForm || empty($this->stack)) {
             return false;
@@ -792,7 +800,7 @@ trait BuildsDocumentGraph
         return $name === 'button';
     }
 
-    protected function shouldIgnoreFormStart($name, $isHtmlElement)
+    protected function shouldIgnoreFormStart(?string $name, bool $isHtmlElement): bool
     {
         if (! $isHtmlElement || $name !== 'form' || $this->formElement === null) {
             return false;
@@ -801,16 +809,16 @@ trait BuildsDocumentGraph
         return ! $this->hasOpenHtmlTemplate();
     }
 
-    protected function shouldIgnoreTableStructureStart($name, $isHtmlElement)
+    protected function shouldIgnoreTableStructureStart(?string $name, bool $isHtmlElement): bool
     {
-        if (! $isHtmlElement || ! isset(self::$tableStructureStarts[$name])) {
+        if (! $isHtmlElement || ! isset(self::$tableStructureStarts[$name ?? ''])) {
             return false;
         }
 
         return $this->tableStructureMode() === null && ! $this->hasOpenHtmlTemplate();
     }
 
-    protected function isTableSelectStart($name, $isHtmlElement)
+    protected function isTableSelectStart(?string $name, bool $isHtmlElement): bool
     {
         if (! $isHtmlElement || $name !== 'select') {
             return false;
@@ -830,7 +838,7 @@ trait BuildsDocumentGraph
         );
     }
 
-    protected function isTableFormStart($name, $isHtmlElement)
+    protected function isTableFormStart(?string $name, bool $isHtmlElement): bool
     {
         if (! $isHtmlElement || $name !== 'form') {
             return false;
@@ -839,7 +847,7 @@ trait BuildsDocumentGraph
         return in_array($this->tableStructureMode(), [TableMode::Table, TableMode::TableBody, TableMode::Row], true);
     }
 
-    protected function prepareFormattingForStart($name, $foster, $tableForm, $startsInHtmlSelectMode)
+    protected function prepareFormattingForStart(string $name, bool $foster, bool $tableForm, bool $startsInHtmlSelectMode): bool
     {
         if ($name === 'nobr' && ! empty($this->activeFormatting)) {
             $this->reconstructActiveFormatting();
@@ -863,16 +871,16 @@ trait BuildsDocumentGraph
             $formatting = $this->activeFormatting[$formattingIndex];
             $stackDepth = count($this->stack);
             $this->closeFormattingElement($name);
-            $activeIndex = array_search($formatting, $this->activeFormatting, true);
+            $activeIndex = $this->activeFormattingPosition($formatting);
 
             if ($activeIndex !== false) {
-                array_splice($this->activeFormatting, $activeIndex, 1);
+                $this->removeActiveFormattingAt($activeIndex);
             }
 
-            $stackIndex = array_search($formatting, $this->stack, true);
+            $stackIndex = $this->openStackIndex($formatting);
 
             if ($stackIndex !== false) {
-                array_splice($this->stack, $stackIndex, 1);
+                $this->removeOpenElementAt($stackIndex);
             }
 
             if ($this->shouldRefosterAfterStackChange($foster, $stackDepth)) {
@@ -893,7 +901,7 @@ trait BuildsDocumentGraph
         return $foster;
     }
 
-    protected function shouldRefosterAfterStackChange($foster, $previousStackDepth)
+    protected function shouldRefosterAfterStackChange(bool $foster, int $previousStackDepth): bool
     {
         if ($foster || count($this->stack) === $previousStackDepth) {
             return false;
@@ -902,7 +910,7 @@ trait BuildsDocumentGraph
         return $this->shouldFosterContent();
     }
 
-    protected function shouldReconstructFormattingBeforeStart($name, $processStartAsHtml)
+    protected function shouldReconstructFormattingBeforeStart(?string $name, bool $processStartAsHtml): bool
     {
         if ($name === null || ! $processStartAsHtml || empty($this->activeFormatting)) {
             return false;
@@ -919,26 +927,27 @@ trait BuildsDocumentGraph
         return ! in_array($name, ['rb', 'rp', 'rt', 'rtc'], true);
     }
 
-    protected function elementNameForNamespace($name, $namespace)
+    protected function elementNameForNamespace(?string $name, string $namespace): ?string
     {
-        if ($namespace !== 'svg' || ! isset(self::$svgTagNames[$name])) {
+        if ($namespace !== 'svg' || ! isset(self::$svgTagNames[$name ?? ''])) {
             return $name;
         }
 
         return self::$svgTagNames[$name];
     }
 
-    protected function shouldPushElement($name, $namespace, $selfClosing)
+    protected function shouldPushElement(?string $name, string $namespace, bool $selfClosing): bool
     {
         if ($namespace !== 'html'
-            || \Statamic\View\Instrumentation\ComponentPrefixes::matches($name, $this->componentPrefixes)) {
+            || $name === null
+            || ComponentPrefixes::matches($name, $this->componentPrefixes)) {
             return ! $selfClosing;
         }
 
-        return $name === null || ! isset(self::$voidElements[$name]);
+        return ! isset(self::$voidElements[$name]);
     }
 
-    protected function startsTextElement($name)
+    protected function startsTextElement(?string $name): bool
     {
         if ($name === null) {
             return false;
@@ -947,7 +956,7 @@ trait BuildsDocumentGraph
         return isset(self::$rawTextElements[$name]) || $name === 'plaintext';
     }
 
-    protected function opaqueMarkupType($markup)
+    protected function opaqueMarkupType(string $markup): string
     {
         if (strncmp($markup, '<!--', 4) === 0) {
             return 'comment';
@@ -961,6 +970,10 @@ trait BuildsDocumentGraph
             return 'declaration';
         }
 
+        if ($this->startsPhpBlock($markup, 0)) {
+            return 'php';
+        }
+
         if (strncmp($markup, '<?', 2) === 0) {
             return 'processing-instruction';
         }
@@ -968,7 +981,7 @@ trait BuildsDocumentGraph
         return 'markup';
     }
 
-    protected function antlersPlacementBucket()
+    protected function antlersPlacementBucket(): string
     {
         if ($this->textElement !== null) {
             return 'raw-text';
@@ -977,7 +990,7 @@ trait BuildsDocumentGraph
         return 'content';
     }
 
-    protected function shouldReconstructFormattingInPlaintext()
+    protected function shouldReconstructFormattingInPlaintext(): bool
     {
         if ($this->textElement === null || empty($this->activeFormatting)) {
             return false;
@@ -990,7 +1003,7 @@ trait BuildsDocumentGraph
         return $this->characterTokenUsesHtmlRules($this->currentContainer());
     }
 
-    protected function shouldReconstructFormattingAroundAntlers()
+    protected function shouldReconstructFormattingAroundAntlers(): bool
     {
         if (empty($this->activeFormatting)) {
             return false;
@@ -1003,7 +1016,7 @@ trait BuildsDocumentGraph
         return $this->characterTokenUsesHtmlRules($this->currentContainer());
     }
 
-    protected function shouldReconstructFormattingForText($foster)
+    protected function shouldReconstructFormattingForText(bool $foster): bool
     {
         if (empty($this->activeFormatting)
             || ! $this->characterTokenUsesHtmlRules($this->currentContainer())) {
@@ -1013,28 +1026,35 @@ trait BuildsDocumentGraph
         return $foster || ! $this->shouldFosterContent();
     }
 
-    protected function appendAntlers($start, $container)
+    protected function appendAntlers(int $start, int $container): int
     {
         $end = $this->regionEnds[$start];
+
+        if (! $this->regionNodes[$start] instanceof LanguageAntlersNode) {
+            return $this->appendPhpRegion($start, $end, $container);
+        }
+
         $node = $this->makeAntlers($this->regionNodes[$start], $start, $end);
         [$sourceTable, $sourceTableTail] = $this->sourceTablePosition();
 
         if ($this->tableMode() === TableMode::ColumnGroup
             && $this->arena->name[$this->currentContainer()] === 'colgroup') {
-            array_pop($this->stack);
+            $this->popOpenElement();
         }
 
         $containerBeforeReconstruction = $this->currentContainer();
+        $reconstructed = false;
 
         if ($this->shouldReconstructFormattingAroundAntlers()) {
             $this->reconstructActiveFormatting();
             $container = $this->currentContainer();
+            $reconstructed = $container !== $containerBeforeReconstruction;
         }
 
         $fostered = $this->shouldFosterContent();
 
         if ($fostered) {
-            $this->fosterNode($node, $container, true);
+            $this->fosterNode($node, $container);
         } else {
             $this->arena->append($container, $node);
             $this->anchorRecoveredSourceNode($node, $container, $sourceTable, $sourceTableTail);
@@ -1047,13 +1067,25 @@ trait BuildsDocumentGraph
             'chain' => $chain,
             'parentElement' => $parentElement,
             'fostered' => $fostered,
-            'reconstructed' => $container !== $containerBeforeReconstruction,
+            'reconstructed' => $reconstructed,
         ]);
 
         return $end;
     }
 
-    protected function makeAntlers(LanguageAntlersNode $node, $start, $end)
+    protected function appendPhpRegion(int $start, int $end, int $container): int
+    {
+        [$sourceTable, $sourceTableTail] = $this->sourceTablePosition();
+        $opaque = $this->arena->opaque(substr($this->source, $start, $end - $start), 'php');
+        $this->arena->sourceStart[$opaque] = $start;
+
+        $this->arena->append($container, $opaque);
+        $this->anchorRecoveredSourceNode($opaque, $container, $sourceTable, $sourceTableTail);
+
+        return $end;
+    }
+
+    protected function makeAntlers(LanguageAntlersNode $node, int $start, int $end): int
     {
         $identity = spl_object_id($node);
 
@@ -1062,12 +1094,13 @@ trait BuildsDocumentGraph
                 $node,
                 substr($this->source, $start, $end - $start)
             );
+            $this->arena->sourceStart[$this->antlersNodes[$identity]] = $start;
         }
 
         return $this->antlersNodes[$identity];
     }
 
-    protected function attachEmbeddedRegions($element, $start, $end, $closing = false)
+    protected function attachEmbeddedRegions(int $element, int $start, int $end, bool $closing = false): void
     {
         if (empty($this->regionStarts)) {
             return;
@@ -1094,21 +1127,29 @@ trait BuildsDocumentGraph
         }
     }
 
-    protected function regionsBetween($start, $end)
+    protected function regionsBetween(int $start, int $end): array
     {
         if (empty($this->regionStarts)) {
             return [];
         }
 
         $regions = [];
+        $index = $this->regionCursor;
 
-        $index = $this->regionIndexAtOrAfter($start);
+        if (($this->regionStarts[$index] ?? PHP_INT_MAX) < $start
+            || ($index > 0 && $this->regionStarts[$index - 1] >= $start)) {
+            $index = $this->regionIndexAtOrAfter($start);
+        }
 
         for ($count = count($this->regionStarts); $index < $count; $index++) {
             $regionStart = $this->regionStarts[$index];
 
             if ($regionStart >= $end) {
                 break;
+            }
+
+            if (! $this->regionNodes[$regionStart] instanceof LanguageAntlersNode) {
+                continue;
             }
 
             $regions[] = [
@@ -1121,7 +1162,7 @@ trait BuildsDocumentGraph
         return $regions;
     }
 
-    protected function appendParsedText($text)
+    protected function appendParsedText(string $text, int $offset): void
     {
         if ($text === '') {
             return;
@@ -1131,22 +1172,23 @@ trait BuildsDocumentGraph
         $container = $this->currentContainer();
 
         if ($this->tableMode() === TableMode::ColumnGroup
-            && $this->arena->name[$this->currentContainer()] === 'colgroup') {
-            preg_match('/\A([\x09\x0A\x0C\x0D\x20]*)(.*)\z/s', $text, $matches);
+            && $this->arena->name[$container] === 'colgroup') {
+            $leading = strspn($text, "\t\n\f\r ");
 
-            if ($matches[1] !== '') {
-                $this->arena->append($container, $this->arena->text($matches[1]));
+            if ($leading > 0) {
+                $this->arena->append($container, $this->arena->text(substr($text, 0, $leading), $offset));
             }
 
-            if ($matches[2] === '') {
+            if ($leading === strlen($text)) {
                 return;
             }
 
-            array_pop($this->stack);
-            $text = $matches[2];
+            $this->popOpenElement();
+            $text = substr($text, $leading);
+            $offset += $leading;
         }
 
-        $hasNonWhitespace = preg_match('/[^\x09\x0A\x0C\x0D\x20]/', $text);
+        $hasNonWhitespace = strspn($text, "\t\n\f\r ") !== strlen($text);
         $foster = $this->shouldFosterContent() && $hasNonWhitespace;
 
         if ($this->shouldReconstructFormattingForText($foster)) {
@@ -1154,22 +1196,140 @@ trait BuildsDocumentGraph
         }
 
         $container = $this->currentContainer();
-        $node = $this->arena->text($text);
+        $node = $this->arena->text($text, $offset);
 
         if ($foster) {
-            $this->fosterNode($node, $container, true);
+            $this->fosterNode($node, $container);
         } else {
             $this->arena->append($container, $node);
             $this->anchorRecoveredSourceNode($node, $container, $sourceTable, $sourceTableTail);
         }
     }
 
-    protected function currentContainer()
+    protected function currentContainer(): int
     {
         if (empty($this->stack)) {
             return 0;
         }
 
         return $this->stack[count($this->stack) - 1];
+    }
+
+    protected function pushOpenElement(int $element): void
+    {
+        $this->stack[] = $element;
+        $this->stackFacts = [];
+        $this->countOpenElement($element);
+    }
+
+    protected function openStackIndex(int $element): int|false
+    {
+        for ($index = count($this->stack) - 1; $index >= 0; $index--) {
+            if ($this->stack[$index] === $element) {
+                return $index;
+            }
+        }
+
+        return false;
+    }
+
+    protected function activeFormattingPosition(int $element): int|false
+    {
+        for ($index = count($this->activeFormatting) - 1; $index >= 0; $index--) {
+            if ($this->activeFormatting[$index] === $element) {
+                return $index;
+            }
+        }
+
+        return false;
+    }
+
+    protected function popOpenElement(): void
+    {
+        $element = array_pop($this->stack);
+        $this->stackFacts = [];
+
+        if ($element !== null) {
+            $this->releaseOpenElement($element);
+        }
+    }
+
+    protected function removeOpenElementAt(int $index): void
+    {
+        [$element] = array_splice($this->stack, $index, 1);
+        $this->stackFacts = [];
+        $this->releaseOpenElement($element);
+    }
+
+    protected function insertOpenElementAt(int $index, int $element): void
+    {
+        array_splice($this->stack, $index, 0, [$element]);
+        $this->stackFacts = [];
+        $this->countOpenElement($element);
+    }
+
+    protected function replaceOpenElementAt(int $index, int $element): void
+    {
+        $this->releaseOpenElement($this->stack[$index]);
+        $this->stack[$index] = $element;
+        $this->stackFacts = [];
+        $this->countOpenElement($element);
+    }
+
+    protected function sliceOpenStack(?int $length): void
+    {
+        if ($length === null) {
+            return;
+        }
+
+        for ($count = count($this->stack); $count > $length; $count--) {
+            $this->releaseOpenElement(array_pop($this->stack));
+        }
+
+        $this->stackFacts = [];
+    }
+
+    protected function resetOpenStack(): void
+    {
+        $this->stack = [];
+        $this->openElementCounts = [];
+        $this->stackFacts = [];
+    }
+
+    protected function hasOpenElement(string $name): bool
+    {
+        return isset($this->openElementCounts[$name]);
+    }
+
+    protected function countOpenElement(int $element): void
+    {
+        if ($this->arena->kinds[$element] & (Arena::SVG | Arena::MATHML)) {
+            return;
+        }
+
+        $name = $this->arena->name[$element];
+
+        if ($name !== null) {
+            $this->openElementCounts[$name] = ($this->openElementCounts[$name] ?? 0) + 1;
+        }
+    }
+
+    protected function releaseOpenElement(int $element): void
+    {
+        if ($this->arena->kinds[$element] & (Arena::SVG | Arena::MATHML)) {
+            return;
+        }
+
+        $name = $this->arena->name[$element];
+
+        if ($name === null) {
+            return;
+        }
+
+        if (($this->openElementCounts[$name] ?? 0) <= 1) {
+            unset($this->openElementCounts[$name]);
+        } else {
+            $this->openElementCounts[$name]--;
+        }
     }
 }

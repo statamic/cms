@@ -2,16 +2,15 @@
 
 namespace Statamic\View\Antlers\Language\Analyzers\Html;
 
-use Statamic\View\Html\ElementCollection;
+use Illuminate\Support\Collection;
 
 /** @internal */
 trait Container
 {
-    /** @return NodeSequence|$this */
-    public function content($content = null)
+    public function content(Node|string|null $content = null): NodeSequence|static
     {
         if (func_num_args() !== 0) {
-            $replacement = $this->normalizeArenaNode($content);
+            $replacement = $this->normalizeArenaNode($content ?? '');
             $this->assertArenaInsertable($replacement);
             $existing = $this->children();
 
@@ -29,37 +28,37 @@ trait Container
         return NodeSequence::childrenOf($this->document, $this->arenaContainerId());
     }
 
-    public function children()
+    public function children(): array
     {
         return array_map([$this->document, 'handle'], $this->document->arena()->children($this->arenaContainerId()));
     }
 
-    /** @return ElementCollection */
-    public function descendants($name = null)
+    /** @return Collection<int, Element> */
+    public function descendants(?string $name = null): Collection
     {
         return $this->arenaDescendants($this->descendantNameFilter($name));
     }
 
-    public function firstDescendant($name = null)
+    public function firstDescendant(?string $name = null): ?Element
     {
         return $this->arenaFirstDescendant($this->descendantNameFilter($name));
     }
 
-    public function firstChild()
+    public function firstChild(): ?Node
     {
         $child = $this->document->arena()->firstChild($this->arenaContainerId());
 
         return $this->containerChild($child);
     }
 
-    public function lastChild()
+    public function lastChild(): ?Node
     {
         $child = $this->document->arena()->lastChild($this->arenaContainerId());
 
         return $this->containerChild($child);
     }
 
-    public function append($content)
+    public function append(Node|string $content): static
     {
         $node = $this->normalizeArenaNode($content);
         $this->assertArenaInsertable($node);
@@ -70,7 +69,7 @@ trait Container
         return $this;
     }
 
-    public function prepend($content)
+    public function prepend(Node|string $content): static
     {
         $node = $this->normalizeArenaNode($content);
         $this->assertArenaInsertable($node);
@@ -89,7 +88,7 @@ trait Container
         return $this;
     }
 
-    public function hasChild(Node $node)
+    public function hasChild(Node $node): bool
     {
         if ($node->document() !== $this->document) {
             return false;
@@ -102,27 +101,22 @@ trait Container
         return $this->document->arena()->hasChild($this->arenaContainerId(), $node->arenaId());
     }
 
-    public function siblingsFor(Node $node)
-    {
-        return $this->children();
-    }
-
-    public function insertBefore(Node $reference, $content)
+    public function insertBefore(Node $reference, Node|string $content): void
     {
         $this->insertArenaRelative($reference, $content, false);
     }
 
-    public function insertAfter(Node $reference, $content)
+    public function insertAfter(Node $reference, Node|string $content): void
     {
         $this->insertArenaRelative($reference, $content, true);
     }
 
-    public function replaceChild(Node $reference, $content)
+    public function replaceChild(Node $reference, Node|string $content): void
     {
         $this->replaceArenaChild($reference, $content);
     }
 
-    public function removeChild(Node $node)
+    public function removeChild(Node $node): void
     {
         if (! $this->hasChild($node)) {
             return;
@@ -133,22 +127,17 @@ trait Container
         $this->markDirty();
     }
 
-    public function createElement($name)
+    public function createElement(string $name): Element
     {
         return $this->document->createArenaElement($name);
     }
 
-    protected function renderChildren()
+    protected function renderChildren(): string
     {
         return $this->document->renderArenaChildren($this->arenaContainerId());
     }
 
-    protected function sourceChildren()
-    {
-        return $this->children();
-    }
-
-    protected function normalizeArenaNode($content)
+    protected function normalizeArenaNode(Node|string $content): Node
     {
         if ($content instanceof Node) {
             if ($content->document() !== $this->document) {
@@ -167,7 +156,7 @@ trait Container
         return $this->document->handle($id);
     }
 
-    protected function assertArenaInsertable(Node $node)
+    protected function assertArenaInsertable(Node $node): void
     {
         $arena = $this->document->arena();
 
@@ -182,7 +171,7 @@ trait Container
         }
     }
 
-    protected function detachArenaNodeForInsert(Node $node)
+    protected function detachArenaNodeForInsert(Node $node): void
     {
         $id = $node->arenaId();
         $arena = $this->document->arena();
@@ -190,10 +179,11 @@ trait Container
         if ($arena->parent($id) !== null && ! isset($arena->embeddedOwner[$id])) {
             $this->releaseArenaSourceAnchors($id);
             $arena->detach($id);
+            $this->document->markDirty();
         }
     }
 
-    protected function insertArenaRelative(Node $reference, $content, $after)
+    protected function insertArenaRelative(Node $reference, Node|string $content, bool $after): void
     {
         if (! $this->hasChild($reference)) {
             return;
@@ -231,7 +221,7 @@ trait Container
         $this->markDirty();
     }
 
-    protected function replaceArenaChild(Node $reference, $content)
+    protected function replaceArenaChild(Node $reference, Node|string $content): void
     {
         if (! $this->hasChild($reference)) {
             return;
@@ -262,9 +252,21 @@ trait Container
         $this->markDirty();
     }
 
-    protected function releaseArenaSourceAnchors($id)
+    protected function releaseArenaSourceAnchors(int $id): void
     {
         $arena = $this->document->arena();
+
+        if (($arena->kind($id) & Arena::KIND_MASK) === Arena::SOURCE_ANCHOR) {
+            $target = $arena->anchorTarget[$id] ?? null;
+
+            if ($target !== null) {
+                unset($arena->sourceAnchor[$target]);
+                $arena->anchorTarget[$id] = null;
+            }
+
+            return;
+        }
+
         $anchor = $arena->sourceAnchor[$id] ?? null;
 
         if ($anchor !== null) {
@@ -273,20 +275,11 @@ trait Container
         }
 
         for ($child = $arena->firstChild($id); $child !== null; $child = $arena->next($child)) {
-            if (($arena->kind($child) & Arena::KIND_MASK) === Arena::SOURCE_ANCHOR) {
-                $target = $arena->anchorTarget[$child] ?? null;
-
-                if ($target !== null) {
-                    unset($arena->sourceAnchor[$target]);
-                    $arena->anchorTarget[$child] = null;
-                }
-            } else {
-                $this->releaseArenaSourceAnchors($child);
-            }
+            $this->releaseArenaSourceAnchors($child);
         }
     }
 
-    protected function arenaContainerId()
+    protected function arenaContainerId(): ?int
     {
         if ($this instanceof Document) {
             return 0;
@@ -295,7 +288,7 @@ trait Container
         return $this->arenaId;
     }
 
-    protected function descendantNameFilter($name)
+    protected function descendantNameFilter(?string $name): array
     {
         if ($name === null) {
             return [];
@@ -304,7 +297,7 @@ trait Container
         return [(string) $name];
     }
 
-    protected function containerChild($child)
+    protected function containerChild(?int $child): ?Node
     {
         if ($child === null) {
             return null;
@@ -313,7 +306,7 @@ trait Container
         return $this->document->handle($child);
     }
 
-    protected function arenaDescendants(array $names)
+    protected function arenaDescendants(array $names): Collection
     {
         $arena = $this->document->arena();
         $set = array_map('strtolower', $names);
@@ -337,10 +330,10 @@ trait Container
             }
         }
 
-        return new ElementCollection($elements);
+        return new Collection($elements);
     }
 
-    protected function arenaFirstDescendant(array $names)
+    protected function arenaFirstDescendant(array $names): ?Element
     {
         $arena = $this->document->arena();
         $set = array_map('strtolower', $names);
@@ -365,7 +358,7 @@ trait Container
         return null;
     }
 
-    protected function arenaNameMatches($name, array $set)
+    protected function arenaNameMatches(?string $name, array $set): bool
     {
         return $name !== null && in_array(strtolower((string) $name), $set, true);
     }

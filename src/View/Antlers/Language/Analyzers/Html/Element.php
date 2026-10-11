@@ -3,45 +3,47 @@
 namespace Statamic\View\Antlers\Language\Analyzers\Html;
 
 use Illuminate\Support\LazyCollection;
-use Statamic\View\Html\Concerns\QueriesElementBasics;
 use Statamic\View\Instrumentation\Antlers\RegionExtents;
 use Statamic\View\Instrumentation\HtmlSpec;
 
 /** @internal */
 class Element extends Node
 {
-    use Container, QueriesElementBasics;
+    use Container;
 
-    protected $name;
+    protected ?string $name;
 
-    protected $namespace;
+    protected string $namespace;
 
-    protected $openingTag;
+    protected string $openingTag;
 
-    protected $closingTag = '';
+    protected string $closingTag = '';
 
-    protected $selfClosing = false;
+    protected bool $selfClosing = false;
 
-    protected $synthetic = false;
-
-    /** @var array<string, mixed> */
-    protected $attributes = [];
-
-    /** @var array<string, array<int, array{start: int, length: int}>> */
-    protected $attributeSpans = [];
+    protected bool $synthetic = false;
 
     /** @var array<string, mixed> */
-    protected $changedAttributes = [];
+    protected array $attributes = [];
 
     /** @var array<string, string> */
-    protected $changedAttributeNames = [];
+    protected array $attributeNames = [];
+
+    /** @var array<string, array<int, array{start: int, length: int, whitespace: int, trailing: int}>> */
+    protected array $attributeSpans = [];
+
+    /** @var array<string, mixed> */
+    protected array $changedAttributes = [];
+
+    /** @var array<string, string> */
+    protected array $changedAttributeNames = [];
 
     /** @var array<string, bool> */
-    protected $removedAttributes = [];
+    protected array $removedAttributes = [];
 
-    protected $attributesParsed = false;
+    protected bool $attributesParsed = false;
 
-    public function __construct(Document $document, $name, $openingTag, $selfClosing = false, $namespace = 'html')
+    public function __construct(Document $document, ?string $name, string $openingTag, bool $selfClosing = false, string $namespace = 'html')
     {
         parent::__construct($document);
 
@@ -51,14 +53,14 @@ class Element extends Node
         $this->selfClosing = $selfClosing;
     }
 
-    public static function fromArena(Document $document, $id)
+    public static function fromArena(Document $document, int $id): self
     {
         $arena = $document->arena();
         $type = $arena->kind($id);
         $element = new self(
             $document,
             $arena->name[$id],
-            $arena->value[$id],
+            $document->valueMarkup($id),
             (bool) ($type & Arena::SELF_CLOSING),
             $arena->namespace($id)
         );
@@ -74,12 +76,12 @@ class Element extends Node
         return $this->name;
     }
 
-    public function namespace()
+    public function namespace(): string
     {
         return $this->namespace;
     }
 
-    public function isHtml()
+    public function isHtml(): bool
     {
         return $this->namespace === 'html';
     }
@@ -103,7 +105,7 @@ class Element extends Node
     }
 
     /** @return LazyCollection<int, Element> */
-    public function ancestors()
+    public function ancestors(): LazyCollection
     {
         return LazyCollection::make(function () {
             for ($element = $this->parentElement(); $element !== null; $element = $element->parentElement()) {
@@ -113,7 +115,7 @@ class Element extends Node
     }
 
     /** @return LazyCollection<int, Element> */
-    public function ancestorsAndSelf()
+    public function ancestorsAndSelf(): LazyCollection
     {
         return LazyCollection::make(function () {
             for ($element = $this; $element !== null; $element = $element->parentElement()) {
@@ -122,22 +124,55 @@ class Element extends Node
         });
     }
 
-    public function closingTag($tag = null)
+    public function closingTag(): string
     {
-        if (func_num_args() === 0) {
-            return $this->closingTag;
+        if ($this->arenaId !== null) {
+            return $this->document->closingMarkup($this->arenaId);
         }
 
-        $this->closingTag = (string) $tag;
+        return $this->closingTag;
+    }
+
+    public function setClosingTag(string $tag): static
+    {
+        if (! $this->acceptsClosingTag()) {
+            throw new \LogicException('Reconstructed, void and self-closing HTML elements cannot have a closing tag.');
+        }
+
+        $this->closingTag = $tag;
 
         if ($this->arenaId !== null) {
-            $this->document->arena()->closing[$this->arenaId] = $this->closingTag;
+            $this->document->arena()->closing[$this->arenaId] = $tag;
+            unset($this->document->arena()->closingStart[$this->arenaId]);
         }
+
+        $this->touchDocument();
 
         return $this;
     }
 
-    public function isSelfClosing()
+    protected function acceptsClosingTag(): bool
+    {
+        if ($this->synthetic) {
+            return false;
+        }
+
+        if (! $this->isHtml()) {
+            return ! $this->selfClosing;
+        }
+
+        if (Document::isVoidElement($this->name)) {
+            return false;
+        }
+
+        if (! $this->selfClosing) {
+            return true;
+        }
+
+        return $this->name !== null && ! $this->document->isComponentElementName($this->name);
+    }
+
+    public function isSelfClosing(): bool
     {
         return $this->selfClosing;
     }
@@ -147,13 +182,20 @@ class Element extends Node
         return $this->synthetic;
     }
 
-    public function releaseSourceAnchors()
+    public function is(string $name): bool
     {
-        parent::releaseSourceAnchors();
+        return $this->name !== null && strcasecmp($this->name, $name) === 0;
+    }
 
-        foreach ($this->sourceChildren() as $child) {
-            $child->releaseSourceAnchors();
-        }
+    /** @return string[] */
+    public function classes(): array
+    {
+        return HtmlSpec::classList((string) $this->attr('class'));
+    }
+
+    public function hasClass(string $class): bool
+    {
+        return in_array($class, $this->classes(), true);
     }
 
     public function attr(string $name): ?string
@@ -191,20 +233,24 @@ class Element extends Node
     public function attributes(): array
     {
         $this->ensureAttributesParsed();
-        $attributes = $this->attributes;
+        $attributes = [];
 
-        foreach ($this->removedAttributes as $name => $_) {
-            unset($attributes[$name]);
+        foreach ($this->attributes as $key => $value) {
+            if (isset($this->removedAttributes[$key]) || array_key_exists($key, $this->changedAttributes)) {
+                continue;
+            }
+
+            $attributes[$this->attributeNames[$key] ?? $key] = $value;
         }
 
-        foreach ($this->changedAttributes as $name => $value) {
-            $attributes[$name] = $value;
+        foreach ($this->changedAttributes as $key => $value) {
+            $attributes[$this->changedAttributeNames[$key] ?? $key] = $value;
         }
 
         return $attributes;
     }
 
-    public function setAttribute($name, $value = null)
+    public function setAttribute(string $name, ?string $value = null): static
     {
         if ($this->synthetic) {
             throw new \LogicException('Reconstructed HTML elements have no source opening tag to mutate.');
@@ -235,7 +281,7 @@ class Element extends Node
         return $this;
     }
 
-    public function removeAttribute($name)
+    public function removeAttribute(string $name): static
     {
         if ($this->synthetic) {
             throw new \LogicException('Reconstructed HTML elements have no source opening tag to mutate.');
@@ -251,12 +297,10 @@ class Element extends Node
         return $this;
     }
 
-    public function addClass($class)
+    public function addClass(string $class): static
     {
         $value = (string) $this->attr('class');
 
-        // Authored attributes contain HTML entities; setAttribute values are
-        // already decoded. Keep Antlers expressions untouched in either case.
         if (! array_key_exists('class', $this->changedAttributes)) {
             $value = $this->decodeAttributeValue($value);
         }
@@ -272,30 +316,16 @@ class Element extends Node
         return $this->setAttribute('class', implode(' ', $classes));
     }
 
-    public function embeddedNodes()
-    {
-        return array_map([$this->document, 'handle'], $this->document->arena()->embedded[$this->arenaId] ?? []);
-    }
-
-    public function siblingsFor(Node $node)
-    {
-        if (in_array($node->arenaId(), $this->document->arena()->embedded[$this->arenaId] ?? [], true)) {
-            return $this->embeddedNodes();
-        }
-
-        return $this->children();
-    }
-
-    protected function render()
+    protected function render(): string
     {
         if ($this->synthetic) {
-            return $this->renderChildren().$this->closingTag;
+            return $this->renderChildren().$this->closingTag();
         }
 
-        return $this->renderOpeningTag().$this->renderChildren().$this->closingTag;
+        return $this->renderOpeningTag().$this->renderChildren().$this->closingTag();
     }
 
-    protected function renderOpeningTag()
+    protected function renderOpeningTag(): string
     {
         if (empty($this->changedAttributes) && empty($this->removedAttributes)) {
             return $this->openingTag;
@@ -305,14 +335,14 @@ class Element extends Node
 
         foreach ($this->removedAttributes as $name => $_) {
             foreach ($this->attributeSpans[$name] ?? [] as $span) {
-                $edits[] = [$span['start'], $span['length'], ''];
+                $edits[] = [$span['start'], $span['length'] + $span['trailing'], ''];
             }
         }
 
         $new = '';
 
         foreach ($this->changedAttributes as $name => $value) {
-            $attribute = ' '.($this->changedAttributeNames[$name] ?? $name);
+            $attribute = $this->changedAttributeNames[$name] ?? $name;
 
             if ($value !== null) {
                 $attribute .= '="'.$this->escapeAttributeValue($value).'"';
@@ -321,13 +351,14 @@ class Element extends Node
             if (isset($this->attributeSpans[$name])) {
                 $spans = $this->attributeSpans[$name];
                 $span = array_shift($spans);
-                $edits[] = [$span['start'], $span['length'], $attribute];
+                $whitespace = substr($this->openingTag, $span['start'], $span['whitespace']);
+                $edits[] = [$span['start'], $span['length'], $whitespace.$attribute];
 
                 foreach ($spans as $duplicate) {
-                    $edits[] = [$duplicate['start'], $duplicate['length'], ''];
+                    $edits[] = [$duplicate['start'], $duplicate['length'] + $duplicate['trailing'], ''];
                 }
             } else {
-                $new .= $attribute;
+                $new .= ' '.$attribute;
             }
         }
 
@@ -346,10 +377,14 @@ class Element extends Node
             $opening = substr($opening, 0, $offset).$new.substr($opening, $offset);
         }
 
-        return $opening;
+        if (str_starts_with($opening, '</')) {
+            $opening = '<'.substr($opening, 2);
+        }
+
+        return $this->document->adoptLineEndings($opening);
     }
 
-    protected function parseAttributes()
+    protected function parseAttributes(): void
     {
         $length = strlen($this->openingTag);
         $index = $this->openingNameEnd();
@@ -369,8 +404,8 @@ class Element extends Node
                 continue;
             }
 
-            if (substr($this->openingTag, $index, 2) === '{{') {
-                $index = $this->antlersEnd($index);
+            if (($embeddedEnd = $this->embeddedEnd($index)) !== null) {
+                $index = $embeddedEnd;
 
                 continue;
             }
@@ -384,9 +419,9 @@ class Element extends Node
 
             while ($index < $length
                 && ! HtmlSpec::isAttributeNameDelimiter($this->openingTag[$index])) {
-                if (substr($this->openingTag, $index, 2) === '{{') {
+                if (($embeddedEnd = $this->embeddedEnd($index)) !== null) {
                     $dynamicName = true;
-                    $index = $this->antlersEnd($index);
+                    $index = $embeddedEnd;
 
                     continue;
                 }
@@ -394,17 +429,12 @@ class Element extends Node
                 $index++;
             }
 
-            $name = strtolower(str_replace(
+            $rawName = str_replace(
                 "\0",
                 "\xEF\xBF\xBD",
                 substr($this->openingTag, $attributeStart, $index - $attributeStart)
-            ));
-
-            if ($name === '') {
-                $index++;
-
-                continue;
-            }
+            );
+            $name = strtolower($rawName);
 
             $attributeEnd = $index;
 
@@ -426,8 +456,8 @@ class Element extends Node
                     $valueStart = $index;
 
                     while ($index < $length && $this->openingTag[$index] !== $quote) {
-                        if (substr($this->openingTag, $index, 2) === '{{') {
-                            $index = $this->antlersEnd($index);
+                        if (($embeddedEnd = $this->embeddedEnd($index)) !== null) {
+                            $index = $embeddedEnd;
 
                             continue;
                         }
@@ -436,8 +466,8 @@ class Element extends Node
                     }
 
                     $value = str_replace(
-                        "\0",
-                        "\xEF\xBF\xBD",
+                        ["\0", "\r\n", "\r"],
+                        ["\xEF\xBF\xBD", "\n", "\n"],
                         substr($this->openingTag, $valueStart, $index - $valueStart)
                     );
                     if ($index < $length) {
@@ -449,8 +479,8 @@ class Element extends Node
                     while ($index < $length
                         && ! $this->isHtmlSpace($this->openingTag[$index])
                         && $this->openingTag[$index] !== '>') {
-                        if (substr($this->openingTag, $index, 2) === '{{') {
-                            $index = $this->antlersEnd($index);
+                        if (($embeddedEnd = $this->embeddedEnd($index)) !== null) {
+                            $index = $embeddedEnd;
 
                             continue;
                         }
@@ -480,21 +510,34 @@ class Element extends Node
 
             if (! array_key_exists($name, $this->attributes)) {
                 $this->attributes[$name] = $value;
+                $this->attributeNames[$name] = $this->isHtml() ? $name : $rawName;
+            }
+
+            $trailingEnd = $attributeEnd;
+
+            while ($trailingEnd < $length && $this->isHtmlSpace($this->openingTag[$trailingEnd])) {
+                $trailingEnd++;
+            }
+
+            if ($trailingEnd < $length && $this->openingTag[$trailingEnd] !== '>') {
+                $trailingEnd = $attributeEnd;
             }
 
             $this->attributeSpans[$name][] = [
                 'start' => $spanStart,
                 'length' => $attributeEnd - $spanStart,
+                'whitespace' => $attributeStart - $spanStart,
+                'trailing' => $trailingEnd - $attributeEnd,
             ];
         }
     }
 
-    protected function isHtmlSpace($char)
+    protected function isHtmlSpace(string $char): bool
     {
         return HtmlSpec::isHtmlSpace($char);
     }
 
-    protected function ensureAttributesParsed()
+    protected function ensureAttributesParsed(): void
     {
         if (! $this->attributesParsed) {
             $this->attributesParsed = true;
@@ -502,13 +545,14 @@ class Element extends Node
         }
     }
 
-    protected function openingNameEnd()
+    protected function openingNameEnd(): int
     {
         $length = strlen($this->openingTag);
+        $index = str_starts_with($this->openingTag, '</') ? 2 : 1;
 
-        for ($index = 1; $index < $length; $index++) {
-            if (substr($this->openingTag, $index, 2) === '{{') {
-                $index = $this->antlersEnd($index) - 1;
+        for (; $index < $length; $index++) {
+            if (($embeddedEnd = $this->embeddedEnd($index)) !== null) {
+                $index = $embeddedEnd - 1;
 
                 continue;
             }
@@ -523,12 +567,19 @@ class Element extends Node
         return $length;
     }
 
-    protected function antlersEnd($start)
+    protected function embeddedEnd(int $start): ?int
     {
-        return $this->antlersEndIn($this->openingTag, $start);
+        $length = strlen($this->openingTag);
+        $end = RegionExtents::embeddedEndInBytes($this->openingTag, $start, $length);
+
+        if ($end === false) {
+            return $length;
+        }
+
+        return $end;
     }
 
-    protected function escapeAttributeValue($value)
+    protected function escapeAttributeValue(string $value): string
     {
         return $this->transformAttributeLiterals(
             (string) $value,
@@ -568,7 +619,7 @@ class Element extends Node
         return $result.$transform(substr($value, $offset));
     }
 
-    protected function antlersEndIn($source, $start)
+    protected function antlersEndIn(string $source, int $start): int
     {
         $length = strlen($source);
         $end = RegionExtents::endInBytes($source, $start, $length);
@@ -580,7 +631,7 @@ class Element extends Node
         return $end;
     }
 
-    protected function markDirty()
+    protected function markDirty(): void
     {
         $this->touchDocument();
     }

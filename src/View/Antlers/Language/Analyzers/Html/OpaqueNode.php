@@ -5,11 +5,11 @@ namespace Statamic\View\Antlers\Language\Analyzers\Html;
 /** @internal */
 class OpaqueNode extends Node
 {
-    protected $source;
+    protected string $source;
 
-    protected $type;
+    protected string $type;
 
-    public function __construct(Document $document, $source, $type = 'markup')
+    public function __construct(Document $document, string $source, string $type = 'markup')
     {
         parent::__construct($document);
 
@@ -17,7 +17,7 @@ class OpaqueNode extends Node
         $this->type = $type;
     }
 
-    public static function fromArena(Document $document, $id)
+    public static function fromArena(Document $document, int $id): self
     {
         $arena = $document->arena();
         $node = new self($document, $arena->value[$id], $arena->opaqueType[$id]);
@@ -26,12 +26,12 @@ class OpaqueNode extends Node
         return $node;
     }
 
-    public function type()
+    public function type(): string
     {
         return $this->type;
     }
 
-    public function source($source = null)
+    public function source(?string $source = null): string|static
     {
         if (func_num_args() === 0) {
             return $this->source;
@@ -41,29 +41,24 @@ class OpaqueNode extends Node
 
         if ($this->arenaId !== null) {
             $this->document->arena()->value[$this->arenaId] = $this->source;
+            unset($this->document->arena()->sourceStart[$this->arenaId]);
         }
         $this->touchDocument();
 
         return $this;
     }
 
-    public function embeddedNodes()
-    {
-        return array_map([$this->document, 'handle'], $this->document->arena()->embedded[$this->arenaId] ?? []);
-    }
-
-    public function siblingsFor(Node $node)
-    {
-        return $this->embeddedNodes();
-    }
-
-    public function hasChild(Node $node)
+    public function hasChild(Node $node): bool
     {
         return in_array($node->arenaId(), $this->document->arena()->embedded[$this->arenaId] ?? [], true);
     }
 
-    protected function render()
+    protected function render(): string
     {
-        return $this->source;
+        if ($this->arenaId === null) {
+            return $this->source;
+        }
+
+        return $this->document->valueMarkup($this->arenaId);
     }
 }

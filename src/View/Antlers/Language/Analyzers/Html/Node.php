@@ -10,29 +10,27 @@ abstract class Node
 {
     use Conditionable, Tappable;
 
-    /** @var Document */
-    protected $document;
+    protected Document $document;
 
-    /** @var int|null */
-    protected $arenaId;
+    protected ?int $arenaId = null;
 
-    public function __construct(Document $document, $arenaId = null)
+    public function __construct(Document $document, ?int $arenaId = null)
     {
         $this->document = $document;
         $this->arenaId = $arenaId;
     }
 
-    public function arenaId()
+    public function arenaId(): ?int
     {
         return $this->arenaId;
     }
 
-    public function document()
+    public function document(): Document
     {
         return $this->document;
     }
 
-    public function parent()
+    public function parent(): Node|Document|null
     {
         if ($this->arenaId === null) {
             return null;
@@ -58,100 +56,14 @@ abstract class Node
         return $parent;
     }
 
-    public function previousSibling()
+    public function previousSibling(): ?Node
     {
         return $this->siblingAt(-1);
     }
 
-    public function nextSibling()
+    public function nextSibling(): ?Node
     {
         return $this->siblingAt(1);
-    }
-
-    public function isSourceAnchored()
-    {
-        return $this->arenaId !== null
-            && isset($this->document->arena()->sourceAnchor[$this->arenaId]);
-    }
-
-    public function sourceAnchor()
-    {
-        if ($this->arenaId === null) {
-            return null;
-        }
-
-        $anchor = $this->document->arena()->sourceAnchor[$this->arenaId] ?? null;
-
-        if ($anchor === null) {
-            return null;
-        }
-
-        return $this->document->handle($anchor);
-    }
-
-    public function anchorSourceAt(SourceAnchor $anchor)
-    {
-        if ($this->arenaId === null || $anchor->arenaId() === null) {
-            throw new \LogicException('Source anchors must belong to an HTML arena.');
-        }
-
-        if ($anchor->document() !== $this->document) {
-            throw new \InvalidArgumentException('Source anchors and targets must belong to the same HTML document.');
-        }
-
-        $arena = $this->document->arena();
-        $anchorId = $anchor->arenaId();
-        $currentAnchor = $arena->sourceAnchor[$this->arenaId] ?? null;
-        $currentTarget = $arena->anchorTarget[$anchorId] ?? null;
-
-        if ($currentAnchor === $anchorId && $currentTarget === $this->arenaId) {
-            return $this;
-        }
-
-        if ($currentAnchor !== null
-            && ($arena->anchorTarget[$currentAnchor] ?? null) === $this->arenaId) {
-            $arena->anchorTarget[$currentAnchor] = null;
-        }
-
-        if ($currentTarget !== null
-            && ($arena->sourceAnchor[$currentTarget] ?? null) === $anchorId) {
-            unset($arena->sourceAnchor[$currentTarget]);
-        }
-
-        $arena->sourceAnchor[$this->arenaId] = $anchorId;
-        $arena->anchorTarget[$anchorId] = $this->arenaId;
-        $this->touchDocument();
-        $this->touchArenaNode($anchorId);
-
-        return $this;
-    }
-
-    public function releaseSourceAnchor()
-    {
-        if ($this->arenaId === null) {
-            return $this;
-        }
-
-        $arena = $this->document->arena();
-        $anchor = $arena->sourceAnchor[$this->arenaId] ?? null;
-        unset($arena->sourceAnchor[$this->arenaId]);
-
-        if ($anchor !== null) {
-            $arena->anchorTarget[$anchor] = null;
-            $this->touchDocument();
-            $this->touchArenaNode($anchor);
-        }
-
-        return $this;
-    }
-
-    public function releaseSourceAnchors()
-    {
-        $anchor = $this->sourceAnchor();
-
-        if ($anchor !== null) {
-            $this->releaseSourceAnchor();
-        }
     }
 
     public function closest(string $name): ?Element
@@ -173,7 +85,7 @@ abstract class Node
         return null;
     }
 
-    public function before($content)
+    public function before(Node|string $content): static
     {
         $this->assertMutableSibling();
         $this->parent()->insertBefore($this, $content);
@@ -181,7 +93,7 @@ abstract class Node
         return $this;
     }
 
-    public function after($content)
+    public function after(Node|string $content): static
     {
         $this->assertMutableSibling();
         $this->parent()->insertAfter($this, $content);
@@ -189,7 +101,7 @@ abstract class Node
         return $this;
     }
 
-    public function replaceWith($content)
+    public function replaceWith(Node|string $content): static
     {
         $this->assertMutableSibling();
         $this->parent()->replaceChild($this, $content);
@@ -197,8 +109,7 @@ abstract class Node
         return $this;
     }
 
-    /** @return $this */
-    public function wrapWith(Element $element)
+    public function wrapWith(Element $element): static
     {
         if ($element === $this) {
             throw new \LogicException('HTML graph nodes cannot wrap themselves.');
@@ -211,7 +122,7 @@ abstract class Node
         return $this;
     }
 
-    public function remove()
+    public function remove(): static
     {
         $this->assertMutableSibling();
         $this->parent()->removeChild($this);
@@ -224,14 +135,14 @@ abstract class Node
         return $this->render();
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return $this->toHtml();
     }
 
-    abstract protected function render();
+    abstract protected function render(): string;
 
-    protected function siblingAt($direction)
+    protected function siblingAt(int $direction): ?Node
     {
         if ($this->arenaId === null) {
             return null;
@@ -261,7 +172,7 @@ abstract class Node
         return $this->siblingHandle($arena->next($this->arenaId));
     }
 
-    protected function siblingHandle($sibling)
+    protected function siblingHandle(?int $sibling): ?Node
     {
         if ($sibling === null) {
             return null;
@@ -270,7 +181,7 @@ abstract class Node
         return $this->document->handle($sibling);
     }
 
-    protected function assertMutableSibling()
+    protected function assertMutableSibling(): void
     {
         if (isset($this->document->arena()->embeddedOwner[$this->arenaId])) {
             throw new \LogicException('Antlers regions embedded in HTML markup cannot be moved as DOM children. Mutate the owning node instead.');
@@ -287,12 +198,12 @@ abstract class Node
         }
     }
 
-    protected function touchDocument()
+    protected function touchDocument(): void
     {
         $this->touchArenaNode($this->arenaId);
     }
 
-    protected function touchArenaNode($arenaId)
+    protected function touchArenaNode(?int $arenaId): void
     {
         if ($arenaId !== null && $this->document->arena()->parent($arenaId) !== null) {
             $this->document->markDirty();

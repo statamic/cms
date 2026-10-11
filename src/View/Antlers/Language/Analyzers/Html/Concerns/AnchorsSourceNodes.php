@@ -4,21 +4,17 @@ namespace Statamic\View\Antlers\Language\Analyzers\Html\Concerns;
 
 use Statamic\View\Antlers\Language\Analyzers\Html\Arena;
 
-/**
- * @internal
- */
+/** @internal */
 trait AnchorsSourceNodes
 {
-    protected function arenaNodeIsDescendantOf($node, $ancestor)
+    protected function arenaNodeIsDescendantOf(int $node, int $ancestor): bool
     {
-        $seen = [];
+        $remaining = count($this->arena->kinds);
 
         for ($parent = $this->arena->parent($node); $parent !== null; $parent = $this->arena->parent($parent)) {
-            if (isset($seen[$parent])) {
+            if ($remaining-- < 0) {
                 throw new \LogicException('Cycle detected while resolving an HTML arena ancestor.');
             }
-
-            $seen[$parent] = true;
 
             if ($parent === $ancestor) {
                 return true;
@@ -28,12 +24,12 @@ trait AnchorsSourceNodes
         return false;
     }
 
-    protected function arenaNodeHasSourceAnchoredAncestor($node)
+    protected function arenaNodeHasSourceAnchoredAncestor(int $node): bool
     {
         return $this->arenaNodeAncestorSourceAnchor($node) !== null;
     }
 
-    protected function arenaNodeAncestorSourceAnchor($node)
+    protected function arenaNodeAncestorSourceAnchor(int $node): ?int
     {
         $seen = [];
 
@@ -53,13 +49,13 @@ trait AnchorsSourceNodes
     }
 
     protected function anchorRecoveredSourceNode(
-        $node,
-        $container,
-        $sourceTable,
-        $sourceTableTail,
-        $previous = null,
-        $sourcePositionAnchor = null
-    ) {
+        int $node,
+        int $container,
+        ?int $sourceTable,
+        ?int $sourceTableTail,
+        ?int $previous = null,
+        ?int $sourcePositionAnchor = null
+    ): void {
         $containerIsSynthetic = (bool) ($this->arena->kind($container) & Arena::SYNTHETIC);
         $sourcePositionAnchor = $sourcePositionAnchor
             ?? ($this->arena->sourceAnchor[$container] ?? null);
@@ -74,7 +70,6 @@ trait AnchorsSourceNodes
             $sourcePositionTarget = $this->arena->anchorTarget[$sourcePositionAnchor] ?? null;
         }
 
-        // Continue an existing source-position anchor without anchoring the same subtree twice.
         if ($sourcePositionTarget !== null) {
             $ancestorSourceAnchor = $this->arenaNodeAncestorSourceAnchor($node);
             $ancestorAlreadyInsideSourceTarget = $ancestorSourceAnchor !== null
@@ -96,7 +91,6 @@ trait AnchorsSourceNodes
             }
         }
 
-        // Content recovered outside a table still renders at its authored position inside it.
         if ($sourceTable !== null
             && ! $this->arenaNodeIsDescendantOf($node, $sourceTable)
             && ! $this->arenaNodeHasSourceAnchoredAncestor($node)) {
@@ -115,7 +109,6 @@ trait AnchorsSourceNodes
             $previous = $this->arena->previous($node);
         }
 
-        // A synthetic container has no authored opening tag; follow its previous child's anchor.
         if ($containerIsSynthetic
             && $previous !== null
             && isset($this->arena->sourceAnchor[$previous])) {
@@ -133,7 +126,7 @@ trait AnchorsSourceNodes
         }
     }
 
-    protected function anchorAfterSourcePositionTail($node, $sourceContainer)
+    protected function anchorAfterSourcePositionTail(int $node, int $sourceContainer): bool
     {
         $sourcePositionAnchor = $this->arena->sourceAnchor[$sourceContainer] ?? null;
 
@@ -147,11 +140,17 @@ trait AnchorsSourceNodes
             return false;
         }
 
-        $sourceTail = $this->arena->lastChild($anchorParent);
+        $sourceTail = $sourcePositionAnchor;
 
-        if ($sourceTail === null
-            || $sourceTail === $sourcePositionAnchor
-            || ($this->arena->kind($sourceTail) & Arena::KIND_MASK) !== Arena::SOURCE_ANCHOR) {
+        for ($next = $this->arena->next($sourceTail); $next !== null; $next = $this->arena->next($next)) {
+            if (($this->arena->kind($next) & Arena::KIND_MASK) !== Arena::SOURCE_ANCHOR) {
+                break;
+            }
+
+            $sourceTail = $next;
+        }
+
+        if ($sourceTail === $sourcePositionAnchor) {
             return false;
         }
 
@@ -160,7 +159,7 @@ trait AnchorsSourceNodes
         return true;
     }
 
-    protected function anchorArenaNodeForMove($node)
+    protected function anchorArenaNodeForMove(int $node): void
     {
         if ($this->arena->parent($node) === null) {
             return;
@@ -173,10 +172,5 @@ trait AnchorsSourceNodes
         }
 
         $this->arena->detach($node);
-    }
-
-    protected function markDirtyFromContainer()
-    {
-        $this->markDirty();
     }
 }

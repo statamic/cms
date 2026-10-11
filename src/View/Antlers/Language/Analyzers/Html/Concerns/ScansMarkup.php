@@ -3,7 +3,9 @@
 namespace Statamic\View\Antlers\Language\Analyzers\Html\Concerns;
 
 use Statamic\View\Antlers\Language\Nodes\AntlersNode as LanguageAntlersNode;
+use Statamic\View\Antlers\Language\Nodes\Structures\PhpExecutionNode;
 use Statamic\View\Antlers\Language\Utilities\CharacterOffsets;
+use Statamic\View\Instrumentation\Antlers\RegionExtents;
 use Statamic\View\Instrumentation\HtmlSpec;
 
 /** @internal */
@@ -15,7 +17,23 @@ trait ScansMarkup
 
     private const SCRIPT_DOUBLE_ESCAPED = 2;
 
-    protected function isCurrentRawTextClosingTag($position)
+    private const TAG_STATE_NAME = 'tag-name';
+
+    private const TAG_STATE_BEFORE_ATTRIBUTE = 'before-attribute';
+
+    private const TAG_STATE_ATTRIBUTE_NAME = 'attribute-name';
+
+    private const TAG_STATE_AFTER_ATTRIBUTE = 'after-attribute';
+
+    private const TAG_STATE_BEFORE_VALUE = 'before-value';
+
+    private const TAG_STATE_QUOTED_VALUE = 'quoted-value';
+
+    private const TAG_STATE_UNQUOTED_VALUE = 'unquoted-value';
+
+    private const TAG_STATE_SELF_CLOSING = 'self-closing';
+
+    protected function isCurrentRawTextClosingTag(int $position): bool
     {
         $container = $this->textElement;
 
@@ -32,7 +50,7 @@ trait ScansMarkup
         return (bool) preg_match('/^<\/'.$name.'(?=[\x00-\x20>\/])/i', substr($this->source, $position));
     }
 
-    protected function nextRawTextBoundary($position)
+    protected function nextRawTextBoundary(int $position): int
     {
         $sourceLength = strlen($this->source);
         $nextAntlers = $this->nextRegionStart($position);
@@ -43,22 +61,26 @@ trait ScansMarkup
             return $this->nextScriptBoundary($position, $antlersBoundary);
         }
 
-        $pattern = '/<\/'.preg_quote($this->arena->name[$container], '/').'(?=[\x00-\x20>\/])/i';
-        $closing = false;
-
-        // Only search the literal run we are about to consume. Searching the
-        // remaining document again after every Antlers region is quadratic.
-        if (preg_match($pattern, substr($this->source, $position, $antlersBoundary - $position), $matches, PREG_OFFSET_CAPTURE)) {
-            $closing = $position + $matches[0][1];
+        if ($this->rawTextClosingElement !== $container || $this->rawTextClosingOffset < $position) {
+            $this->rawTextClosingElement = $container;
+            $this->rawTextClosingOffset = $this->rawTextClosingTagOffset($container, $position, $sourceLength);
         }
 
-        return min(
-            $antlersBoundary,
-            $this->resolvedEndOffset($closing, $sourceLength)
-        );
+        return min($antlersBoundary, $this->rawTextClosingOffset);
     }
 
-    protected function nextScriptBoundary($position, $limit)
+    protected function rawTextClosingTagOffset(int $container, int $position, int $sourceLength): int
+    {
+        $pattern = '/<\/'.preg_quote($this->arena->name[$container], '/').'(?=[\x00-\x20>\/])/i';
+
+        if (preg_match($pattern, $this->source, $matches, PREG_OFFSET_CAPTURE, $position)) {
+            return $matches[0][1];
+        }
+
+        return $sourceLength;
+    }
+
+    protected function nextScriptBoundary(int $position, int $limit): int
     {
         for ($index = $position; $index < $limit; $index++) {
             $char = $this->source[$index];
@@ -67,7 +89,7 @@ trait ScansMarkup
                 $closing = strtolower(substr($this->source, $index + 2, 6));
                 $delimiter = $this->source[$index + 8] ?? null;
 
-                if ($closing === 'script' && HtmlSpec::isTagNameDelimiter($delimiter)) {
+                if ($closing === 'script' && $delimiter !== null && HtmlSpec::isTagNameDelimiter($delimiter)) {
                     if ($this->scriptEscape === self::SCRIPT_DOUBLE_ESCAPED) {
                         $this->scriptEscape = self::SCRIPT_ESCAPED;
                         $index += 7;
@@ -100,7 +122,7 @@ trait ScansMarkup
         return $limit;
     }
 
-    protected function endsEscapedScriptSequence($char, $index)
+    protected function endsEscapedScriptSequence(string $char, int $index): bool
     {
         if ($char !== '>' || $this->scriptEscape === self::SCRIPT_DATA || $index < 2) {
             return false;
@@ -109,7 +131,7 @@ trait ScansMarkup
         return $this->source[$index - 1] === '-' && $this->source[$index - 2] === '-';
     }
 
-    protected function markupEnd($start)
+    protected function markupEnd(int $start): int
     {
         $length = strlen($this->source);
         $declaration = ($this->source[$start + 1] ?? null) === '!';
@@ -122,6 +144,10 @@ trait ScansMarkup
 
         if (! $declaration && ! $processingInstruction) {
             return $this->tagMarkupEnd($start, $length);
+        }
+
+        if ($processingInstruction && $this->startsPhpBlock($this->source, $start)) {
+            return $this->phpBlockEnd($start, $length);
         }
 
         if (empty($this->regionStarts)) {
@@ -208,7 +234,29 @@ trait ScansMarkup
         return $length;
     }
 
-    protected function bogusCommentEnd($start)
+    protected function startsPhpBlock(string $source, int $start): bool
+    {
+        return RegionExtents::startsPhpBlock($source, $start);
+    }
+
+    protected function phpBlockEnd(int $start, int $length): int
+    {
+        for ($index = $start + 2; $index < $length; $index++) {
+            if (isset($this->regionEnds[$index])) {
+                $index = $this->regionEnds[$index] - 1;
+
+                continue;
+            }
+
+            if ($this->source[$index] === '?' && ($this->source[$index + 1] ?? null) === '>') {
+                return $index + 2;
+            }
+        }
+
+        return $length;
+    }
+
+    protected function bogusCommentEnd(int $start): int
     {
         $length = strlen($this->source);
 
@@ -227,9 +275,9 @@ trait ScansMarkup
         return $length;
     }
 
-    protected function tagMarkupEnd($start, $length)
+    protected function tagMarkupEnd(int $start, int $length): int
     {
-        $state = 'tag-name';
+        $state = self::TAG_STATE_NAME;
         $quote = null;
         $index = $start + 1;
 
@@ -237,128 +285,168 @@ trait ScansMarkup
             $index++;
         }
 
-        for (; $index < $length; $index++) {
-            if (isset($this->regionEnds[$index])) {
-                if ($state === 'before-value') {
-                    $state = 'unquoted-value';
-                } elseif ($state === 'before-attribute' || $state === 'after-attribute') {
-                    $state = 'attribute-name';
+        $regionIndex = $this->regionIndexAtOrAfter($index);
+        $nextRegion = $this->regionStarts[$regionIndex] ?? PHP_INT_MAX;
+
+        while ($index < $length) {
+            $limit = min($length, $nextRegion);
+
+            if ($index < $limit) {
+                switch ($state) {
+                    case self::TAG_STATE_QUOTED_VALUE:
+                        $index += strcspn($this->source, $quote.'<', $index, $limit - $index);
+                        break;
+                    case self::TAG_STATE_UNQUOTED_VALUE:
+                        $index += strcspn($this->source, "\t\n\f\r ><", $index, $limit - $index);
+                        break;
+                    case self::TAG_STATE_NAME:
+                        $index += strcspn($this->source, "\t\n\f\r >/<", $index, $limit - $index);
+                        break;
+                    case self::TAG_STATE_ATTRIBUTE_NAME:
+                        $index += strcspn($this->source, "\t\n\f\r =>/<", $index, $limit - $index);
+                        break;
+                    case self::TAG_STATE_BEFORE_VALUE:
+                    case self::TAG_STATE_AFTER_ATTRIBUTE:
+                        $index += strspn($this->source, "\t\n\f\r ", $index, $limit - $index);
+                        break;
+                    case self::TAG_STATE_BEFORE_ATTRIBUTE:
+                        $index += strspn($this->source, "\t\n\f\r /", $index, $limit - $index);
+                        break;
+                }
+            }
+
+            if ($index >= $length) {
+                break;
+            }
+
+            $embeddedEnd = null;
+
+            if ($index === $nextRegion) {
+                $embeddedEnd = $this->regionEnds[$nextRegion];
+                $regionIndex++;
+                $nextRegion = $this->regionStarts[$regionIndex] ?? PHP_INT_MAX;
+            } elseif ($this->source[$index] === '<' && $this->startsPhpBlock($this->source, $index)) {
+                $embeddedEnd = $this->phpBlockEnd($index, $length);
+                $regionIndex = $this->regionIndexAtOrAfter($embeddedEnd);
+                $nextRegion = $this->regionStarts[$regionIndex] ?? PHP_INT_MAX;
+            }
+
+            if ($embeddedEnd !== null) {
+                if ($state === self::TAG_STATE_BEFORE_VALUE) {
+                    $state = self::TAG_STATE_UNQUOTED_VALUE;
+                } elseif ($state === self::TAG_STATE_BEFORE_ATTRIBUTE || $state === self::TAG_STATE_AFTER_ATTRIBUTE) {
+                    $state = self::TAG_STATE_ATTRIBUTE_NAME;
                 }
 
-                $index = $this->regionEnds[$index] - 1;
+                $index = $embeddedEnd;
 
                 continue;
             }
 
             $char = $this->source[$index];
+            $index++;
 
-            if ($state === 'quoted-value') {
+            if ($state === self::TAG_STATE_QUOTED_VALUE) {
                 if ($char === $quote) {
-                    $state = 'before-attribute';
+                    $state = self::TAG_STATE_BEFORE_ATTRIBUTE;
                     $quote = null;
                 }
 
                 continue;
             }
 
-            if ($state === 'unquoted-value') {
+            if ($state === self::TAG_STATE_UNQUOTED_VALUE) {
                 if ($char === '>') {
-                    return $index + 1;
+                    return $index;
                 }
 
                 if ($this->isHtmlSpace($char)) {
-                    $state = 'before-attribute';
+                    $state = self::TAG_STATE_BEFORE_ATTRIBUTE;
                 }
 
                 continue;
             }
 
-            if ($state === 'before-value') {
-                if ($this->isHtmlSpace($char)) {
-                    continue;
-                }
-
+            if ($state === self::TAG_STATE_BEFORE_VALUE) {
                 if ($char === '"' || $char === "'") {
-                    $state = 'quoted-value';
+                    $state = self::TAG_STATE_QUOTED_VALUE;
                     $quote = $char;
                 } elseif ($char === '>') {
-                    return $index + 1;
+                    return $index;
                 } else {
-                    $state = 'unquoted-value';
+                    $state = self::TAG_STATE_UNQUOTED_VALUE;
                 }
 
                 continue;
             }
 
-            if ($state === 'tag-name') {
+            if ($state === self::TAG_STATE_NAME) {
                 if ($char === '>') {
-                    return $index + 1;
+                    return $index;
                 }
 
                 if ($this->isHtmlSpace($char)) {
-                    $state = 'before-attribute';
+                    $state = self::TAG_STATE_BEFORE_ATTRIBUTE;
                 } elseif ($char === '/') {
-                    $state = 'self-closing';
+                    $state = self::TAG_STATE_SELF_CLOSING;
                 }
 
                 continue;
             }
 
-            if ($state === 'attribute-name') {
+            if ($state === self::TAG_STATE_ATTRIBUTE_NAME) {
                 if ($char === '=') {
-                    $state = 'before-value';
+                    $state = self::TAG_STATE_BEFORE_VALUE;
                 } elseif ($char === '>') {
-                    return $index + 1;
+                    return $index;
                 } elseif ($char === '/') {
-                    $state = 'self-closing';
+                    $state = self::TAG_STATE_SELF_CLOSING;
                 } elseif ($this->isHtmlSpace($char)) {
-                    $state = 'after-attribute';
+                    $state = self::TAG_STATE_AFTER_ATTRIBUTE;
                 }
 
                 continue;
             }
 
-            if ($state === 'after-attribute') {
+            if ($state === self::TAG_STATE_AFTER_ATTRIBUTE) {
                 if ($char === '=') {
-                    $state = 'before-value';
+                    $state = self::TAG_STATE_BEFORE_VALUE;
                 } elseif ($char === '>') {
-                    return $index + 1;
+                    return $index;
                 } elseif ($char === '/') {
-                    $state = 'self-closing';
-                } elseif (! $this->isHtmlSpace($char)) {
-                    $state = 'attribute-name';
+                    $state = self::TAG_STATE_SELF_CLOSING;
+                } else {
+                    $state = self::TAG_STATE_ATTRIBUTE_NAME;
                 }
 
                 continue;
             }
 
-            if ($state === 'self-closing') {
+            if ($state === self::TAG_STATE_SELF_CLOSING) {
                 if ($char === '>') {
-                    return $index + 1;
+                    return $index;
                 }
 
                 if ($this->isHtmlSpace($char)) {
-                    $state = 'before-attribute';
+                    $state = self::TAG_STATE_BEFORE_ATTRIBUTE;
                 } else {
-                    $state = 'attribute-name';
+                    $state = self::TAG_STATE_ATTRIBUTE_NAME;
                 }
 
                 continue;
             }
 
             if ($char === '>') {
-                return $index + 1;
+                return $index;
             }
 
-            if (! $this->isHtmlSpace($char) && $char !== '/') {
-                $state = 'attribute-name';
-            }
+            $state = self::TAG_STATE_ATTRIBUTE_NAME;
         }
 
         return $length;
     }
 
-    protected function nextRegionStart($position)
+    protected function nextRegionStart(int $position): ?int
     {
         $count = count($this->regionStarts);
 
@@ -373,43 +461,37 @@ trait ScansMarkup
     /**
      * @return string|null|false Static name, null for a dynamic name, or false for a missing name.
      */
-    protected function tagName($start, $end, $closing)
+    protected function tagName(int $start, int $end, bool $closing): string|false|null
     {
         $index = $start + 1;
 
         if ($closing) {
             $index++;
-
-            while ($index < $end && $this->isHtmlSpace($this->source[$index])) {
-                $index++;
-            }
+            $index += strspn($this->source, "\t\n\f\r ", $index, max(0, $end - $index));
         }
 
         $name = '';
         $dynamic = false;
+        $regionIndex = $this->regionIndexAtOrAfter($index);
+        $nextRegion = $this->regionStarts[$regionIndex] ?? PHP_INT_MAX;
 
-        for (; $index < $end; $index++) {
-            if (isset($this->regionEnds[$index])) {
-                if (! ($this->regionNodes[$index]->isComment ?? false)) {
-                    $dynamic = true;
-                }
+        while ($index < $end) {
+            $limit = min($end, $nextRegion);
+            $stop = $index + strcspn($this->source, "\t\n\f\r >/", $index, $limit - $index);
+            $name .= substr($this->source, $index, $stop - $index);
+            $index = $stop;
 
-                $index = $this->regionEnds[$index] - 1;
-
-                continue;
-            }
-
-            $char = $this->source[$index];
-
-            if ($char === '>' || $char === '/' || $this->isHtmlSpace($char)) {
+            if ($stop < $limit || $stop !== $nextRegion) {
                 break;
             }
 
-            if ($char === "\0") {
-                $char = "\xEF\xBF\xBD";
+            if (! ($this->regionNodes[$nextRegion]->isComment ?? false)) {
+                $dynamic = true;
             }
 
-            $name .= $char;
+            $index = $this->regionEnds[$nextRegion];
+            $regionIndex++;
+            $nextRegion = $this->regionStarts[$regionIndex] ?? PHP_INT_MAX;
         }
 
         if ($name === '' && ! $dynamic) {
@@ -420,10 +502,10 @@ trait ScansMarkup
             return null;
         }
 
-        return strtolower($name);
+        return strtolower(str_replace("\0", "\xEF\xBF\xBD", $name));
     }
 
-    protected function isSelfClosingTag($start, $end)
+    protected function isSelfClosingTag(int $start, int $end): bool
     {
         $slash = $end - 2;
 
@@ -449,88 +531,93 @@ trait ScansMarkup
             $index++;
         }
 
-        $state = 'before-attribute';
+        $state = self::TAG_STATE_BEFORE_ATTRIBUTE;
         $quote = null;
 
         for (; $index < $slash; $index++) {
-            if (isset($this->regionEnds[$index])) {
-                if ($state === 'before-value') {
-                    $state = 'unquoted-value';
+            $embeddedEnd = $this->regionEnds[$index] ?? null;
+            $char = $this->source[$index];
+
+            if ($embeddedEnd === null && $char === '<' && $this->startsPhpBlock($this->source, $index)) {
+                $embeddedEnd = $this->phpBlockEnd($index, $end);
+            }
+
+            if ($embeddedEnd !== null) {
+                if ($state === self::TAG_STATE_BEFORE_VALUE) {
+                    $state = self::TAG_STATE_UNQUOTED_VALUE;
                 }
 
-                $index = $this->regionEnds[$index] - 1;
+                $index = $embeddedEnd - 1;
 
                 continue;
             }
 
-            $char = $this->source[$index];
-
-            if ($state === 'quoted-value') {
+            if ($state === self::TAG_STATE_QUOTED_VALUE) {
                 if ($char === $quote) {
-                    $state = 'before-attribute';
+                    $state = self::TAG_STATE_BEFORE_ATTRIBUTE;
                     $quote = null;
                 }
 
                 continue;
             }
 
-            if ($state === 'unquoted-value') {
+            if ($state === self::TAG_STATE_UNQUOTED_VALUE) {
                 if ($this->isHtmlSpace($char)) {
-                    $state = 'before-attribute';
+                    $state = self::TAG_STATE_BEFORE_ATTRIBUTE;
                 }
 
                 continue;
             }
 
-            if ($state === 'before-value') {
+            if ($state === self::TAG_STATE_BEFORE_VALUE) {
                 if ($this->isHtmlSpace($char)) {
                     continue;
                 }
 
                 if ($char === '"' || $char === "'") {
-                    $state = 'quoted-value';
+                    $state = self::TAG_STATE_QUOTED_VALUE;
                     $quote = $char;
                 } else {
-                    $state = 'unquoted-value';
+                    $state = self::TAG_STATE_UNQUOTED_VALUE;
                 }
 
                 continue;
             }
 
-            if ($state === 'attribute-name') {
+            if ($state === self::TAG_STATE_ATTRIBUTE_NAME) {
                 if ($char === '=') {
-                    $state = 'before-value';
+                    $state = self::TAG_STATE_BEFORE_VALUE;
                 } elseif ($this->isHtmlSpace($char)) {
-                    $state = 'after-attribute-name';
+                    $state = self::TAG_STATE_AFTER_ATTRIBUTE;
                 }
 
                 continue;
             }
 
-            if ($state === 'after-attribute-name') {
+            if ($state === self::TAG_STATE_AFTER_ATTRIBUTE) {
                 if ($char === '=') {
-                    $state = 'before-value';
+                    $state = self::TAG_STATE_BEFORE_VALUE;
                 } elseif (! $this->isHtmlSpace($char)) {
-                    $state = 'attribute-name';
+                    $state = self::TAG_STATE_ATTRIBUTE_NAME;
                 }
 
                 continue;
             }
 
             if (! $this->isHtmlSpace($char)) {
-                $state = 'attribute-name';
+                $state = self::TAG_STATE_ATTRIBUTE_NAME;
             }
         }
 
-        return ! in_array($state, ['before-value', 'quoted-value', 'unquoted-value'], true);
+        return ! in_array($state, [self::TAG_STATE_BEFORE_VALUE, self::TAG_STATE_QUOTED_VALUE, self::TAG_STATE_UNQUOTED_VALUE], true);
     }
 
-    protected function isHtmlSpace($char)
+    protected function isHtmlSpace(string $char): bool
     {
         return HtmlSpec::isHtmlSpace($char);
     }
 
-    protected function resolvedEndOffset($offset, $sourceLength, $terminatorLength = 0)
+    protected function resolvedEndOffset(int|false|null $offset, int $sourceLength, int $terminatorLength = 0): int
     {
         if ($offset === null || $offset === false) {
             return $sourceLength;
@@ -539,7 +626,7 @@ trait ScansMarkup
         return $offset + $terminatorLength;
     }
 
-    protected function regionIndexAtOrAfter($position)
+    protected function regionIndexAtOrAfter(int $position): int
     {
         $low = 0;
         $high = count($this->regionStarts);
@@ -557,18 +644,27 @@ trait ScansMarkup
         return $low;
     }
 
-    protected function indexAntlersByteRegions(array $nodes)
+    protected function indexAntlersByteRegions(array $nodes): void
     {
         $characterRegions = [];
         $needed = [0 => true];
 
         foreach ($nodes as $node) {
-            if (! $node instanceof LanguageAntlersNode || $node->startPosition === null || $node->endPosition === null) {
+            if (! $node instanceof LanguageAntlersNode && ! $node instanceof PhpExecutionNode) {
+                continue;
+            }
+
+            if ($node->startPosition === null || $node->endPosition === null) {
                 continue;
             }
 
             $start = $node->startPosition->offset;
             $end = $node->endPosition->offset + 1;
+
+            if ($node instanceof PhpExecutionNode) {
+                $end = $node->endPosition->offset + strlen($node->rawEnd);
+            }
+
             $characterRegions[] = [$start, $end, $node];
             $needed[$start] = true;
             $needed[$end] = true;
@@ -595,7 +691,7 @@ trait ScansMarkup
         $this->regionStarts = array_keys($this->regionEnds);
     }
 
-    protected function characterToByteOffsets(array $needed)
+    protected function characterToByteOffsets(array $needed): array
     {
         return CharacterOffsets::toBytes($this->source, array_keys($needed));
     }

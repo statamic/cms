@@ -7,12 +7,12 @@ use Statamic\View\Antlers\Language\Analyzers\Html\Arena;
 /** @internal */
 trait ParsesForeignContent
 {
-    protected function isForeignElement($element)
+    protected function isForeignElement(int $element): bool
     {
         return (bool) ($this->arena->kind($element) & (Arena::SVG | Arena::MATHML));
     }
 
-    protected function isForeignScopeBoundary($element)
+    protected function isForeignScopeBoundary(int $element): bool
     {
         $name = strtolower((string) $this->arena->name[$element]);
         $namespace = $this->arena->namespace($element);
@@ -32,20 +32,16 @@ trait ParsesForeignContent
         return isset(self::$mathMlTextIntegrationPoints[$name]);
     }
 
-    protected function foreignElementEndsScope($element, array $boundaries)
+    protected function foreignElementEndsScope(int $element, array $boundaries): bool
     {
-        $name = strtolower((string) $this->arena->name[$element]);
-
-        // These legacy names retain the caller's name-based scope boundary even
-        // in foreign content. Other foreign names use namespace-specific rules.
-        if (isset($boundaries[$name]) && in_array($name, ['applet', 'marquee', 'object'], true)) {
-            return true;
+        if ($boundaries === self::$tableScopeBoundaries) {
+            return false;
         }
 
         return $this->isForeignScopeBoundary($element);
     }
 
-    protected function namespaceForForeignChild($name, $container)
+    protected function namespaceForForeignChild(?string $name, int $container): string
     {
         $namespace = $this->arena->namespace($container);
 
@@ -86,7 +82,7 @@ trait ParsesForeignContent
         return $namespace;
     }
 
-    protected function namespaceForStartTag($name, $container)
+    protected function namespaceForStartTag(?string $name, int $container): string
     {
         if ($container !== 0 && $this->isForeignElement($container)) {
             return $this->namespaceForForeignChild($name, $container);
@@ -103,7 +99,7 @@ trait ParsesForeignContent
         return 'html';
     }
 
-    protected function startTagUsesHtmlRules($name, $container)
+    protected function startTagUsesHtmlRules(?string $name, int $container): bool
     {
         if ($container === 0 || ! $this->isForeignElement($container)) {
             return true;
@@ -131,7 +127,7 @@ trait ParsesForeignContent
         return $this->isForeignIntegrationPoint($container);
     }
 
-    protected function characterTokenUsesHtmlRules($container)
+    protected function characterTokenUsesHtmlRules(int $container): bool
     {
         if ($container === 0) {
             return true;
@@ -144,16 +140,16 @@ trait ParsesForeignContent
         return $this->isForeignIntegrationPoint($container);
     }
 
-    protected function currentContainerIsForeign()
+    protected function currentContainerIsForeign(): bool
     {
         $container = $this->currentContainer();
 
         return $container !== 0 && $this->isForeignElement($container);
     }
 
-    protected function shouldExitForeignContent($name, $markup)
+    protected function shouldExitForeignContent(?string $name, string $markup): bool
     {
-        if (isset(self::$foreignBreakoutElements[$name])) {
+        if (isset(self::$foreignBreakoutElements[$name ?? ''])) {
             return true;
         }
 
@@ -164,7 +160,7 @@ trait ParsesForeignContent
         return (bool) preg_match('/\s(?:color|face|size)(?=[\x00-\x20=\/>])/i', $markup);
     }
 
-    protected function exitForeignContent()
+    protected function exitForeignContent(): void
     {
         while ($this->stack) {
             $container = $this->currentContainer();
@@ -178,7 +174,7 @@ trait ParsesForeignContent
         }
     }
 
-    protected function isForeignIntegrationPoint($element)
+    protected function isForeignIntegrationPoint(int $element): bool
     {
         $name = strtolower((string) $this->arena->name[$element]);
         $namespace = $this->arena->namespace($element);

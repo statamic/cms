@@ -7,19 +7,18 @@ use Illuminate\Support\LazyCollection;
 /** @internal */
 class NodeSequence
 {
-    /** @var Document */
-    protected $document;
+    protected Document $document;
 
-    /** @var callable(bool): iterable<Node> */
-    protected $iterate;
+    /** @var \Closure(bool): iterable<Node> */
+    protected \Closure $iterate;
 
-    protected function __construct(Document $document, callable $iterate)
+    protected function __construct(Document $document, \Closure $iterate)
     {
         $this->document = $document;
         $this->iterate = $iterate;
     }
 
-    public static function childrenOf(Document $document, $parent)
+    public static function childrenOf(Document $document, int $parent): self
     {
         return new self($document, function ($reverse) use ($document, $parent) {
             $arena = $document->arena();
@@ -32,7 +31,7 @@ class NodeSequence
         });
     }
 
-    public static function between(AntlersNode $opening, AntlersNode $closing)
+    public static function between(AntlersNode $opening, AntlersNode $closing): self
     {
         if ($opening->document() !== $closing->document()) {
             throw new \InvalidArgumentException('HTML sequence boundaries must belong to the same document.');
@@ -54,7 +53,7 @@ class NodeSequence
         });
     }
 
-    protected static function firstChildForDirection($arena, $parent, $reverse)
+    protected static function firstChildForDirection(Arena $arena, int $parent, bool $reverse): ?int
     {
         if ($reverse) {
             return $arena->lastChild($parent);
@@ -63,7 +62,7 @@ class NodeSequence
         return $arena->firstChild($parent);
     }
 
-    protected static function nextArenaSibling($arena, $node, $reverse)
+    protected static function nextArenaSibling(Arena $arena, int $node, bool $reverse): ?int
     {
         if ($reverse) {
             return $arena->previous($node);
@@ -72,7 +71,7 @@ class NodeSequence
         return $arena->next($node);
     }
 
-    protected static function regionTraversalStart($opening, $closing, $reverse)
+    protected static function regionTraversalStart(AntlersNode $opening, AntlersNode $closing, bool $reverse): array
     {
         if ($reverse) {
             return [$opening, $closing->previousSibling()];
@@ -81,7 +80,7 @@ class NodeSequence
         return [$closing, $opening->nextSibling()];
     }
 
-    protected static function nextObjectSibling($node, $reverse)
+    protected static function nextObjectSibling(Node $node, bool $reverse): ?Node
     {
         if ($reverse) {
             return $node->previousSibling();
@@ -90,19 +89,19 @@ class NodeSequence
         return $node->nextSibling();
     }
 
-    public function document()
+    public function document(): Document
     {
         return $this->document;
     }
 
     /** @return LazyCollection<int, Node> */
-    public function nodes()
+    public function nodes(): LazyCollection
     {
         return LazyCollection::make(fn () => ($this->iterate)(false));
     }
 
     /** @return LazyCollection<int, Element> */
-    public function elements($deep = true)
+    public function elements(bool $deep = true): LazyCollection
     {
         return LazyCollection::make(function () use ($deep) {
             foreach ($this->nodes() as $node) {
@@ -123,7 +122,7 @@ class NodeSequence
      * @param  callable(string, string, Text): (string|null)  $rewrite
      * @param  (callable(Element): bool)|null  $descend
      */
-    public function rewriteTextEdges(callable $rewrite, ?callable $descend = null)
+    public function rewriteTextEdges(callable $rewrite, ?callable $descend = null): static
     {
         $this->rewriteEdge(TextEdge::LEADING, $rewrite, $descend);
         $this->rewriteEdge(TextEdge::TRAILING, $rewrite, $descend);
@@ -131,29 +130,7 @@ class NodeSequence
         return $this;
     }
 
-    /**
-     * @param  callable(string, string, Text): (string|null)  $rewrite
-     * @param  (callable(Element): bool)|null  $descend
-     */
-    public function rewriteLeadingTextEdge(callable $rewrite, ?callable $descend = null)
-    {
-        $this->rewriteEdge(TextEdge::LEADING, $rewrite, $descend);
-
-        return $this;
-    }
-
-    /**
-     * @param  callable(string, string, Text): (string|null)  $rewrite
-     * @param  (callable(Element): bool)|null  $descend
-     */
-    public function rewriteTrailingTextEdge(callable $rewrite, ?callable $descend = null)
-    {
-        $this->rewriteEdge(TextEdge::TRAILING, $rewrite, $descend);
-
-        return $this;
-    }
-
-    protected function rewriteEdge($edge, callable $rewrite, ?callable $descend = null)
+    protected function rewriteEdge(string $edge, callable $rewrite, ?callable $descend = null): bool
     {
         $reverse = $edge === TextEdge::TRAILING;
 
@@ -187,10 +164,9 @@ class NodeSequence
                 continue;
             }
 
-            if ($node instanceof AntlersNode) {
+            if ($node instanceof AntlersNode || $node instanceof SourceAnchor) {
                 return true;
             }
-
         }
 
         return false;

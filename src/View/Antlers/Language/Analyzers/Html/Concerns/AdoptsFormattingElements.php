@@ -2,6 +2,8 @@
 
 namespace Statamic\View\Antlers\Language\Analyzers\Html\Concerns;
 
+use Statamic\View\Antlers\Language\Analyzers\Html\Arena;
+
 /** @internal */
 trait AdoptsFormattingElements
 {
@@ -9,7 +11,7 @@ trait AdoptsFormattingElements
 
     private const MAX_FORMATTING_INNER_RECONSTRUCTIONS = 3;
 
-    protected function closeFormattingElement($name, $closingMarkup = null, $start = null, $end = null)
+    protected function closeFormattingElement(string $name, ?string $closingMarkup = null, ?int $start = null, ?int $end = null): bool
     {
         $activeIndex = $this->activeFormattingIndex($name);
 
@@ -18,10 +20,10 @@ trait AdoptsFormattingElements
         }
 
         $formatting = $this->activeFormatting[$activeIndex];
-        $match = array_search($formatting, $this->stack, true);
+        $match = $this->openStackIndex($formatting);
 
         if ($match === false) {
-            array_splice($this->activeFormatting, $activeIndex, 1);
+            $this->removeActiveFormattingAt($activeIndex);
 
             if ($closingMarkup !== null) {
                 $this->appendOpaqueMarkup($start, $end, $closingMarkup);
@@ -43,20 +45,17 @@ trait AdoptsFormattingElements
         }
 
         if ($closingMarkup !== null) {
-            $this->attachEmbeddedRegions($formatting, $start, $end);
-            $this->setElementClosingMarkup($formatting, $closingMarkup);
+            $this->attachEmbeddedRegions($formatting, $start, $end, true);
+            $this->setElementClosingMarkup($formatting, $closingMarkup, $start);
         }
 
         $this->sliceOpenStack($match);
-
-        if ($activeIndex !== null) {
-            array_splice($this->activeFormatting, $activeIndex, 1);
-        }
+        $this->removeActiveFormattingAt($activeIndex);
 
         return true;
     }
 
-    protected function adoptFormattingAroundBlocks($match, $formatting, $closingMarkup, $start, $end)
+    protected function adoptFormattingAroundBlocks(int $match, int $formatting, ?string $closingMarkup, ?int $start, ?int $end): bool
     {
         $transformed = false;
         $closingOwner = null;
@@ -69,10 +68,10 @@ trait AdoptsFormattingElements
             }
 
             $formatting = $this->activeFormatting[$activeIndex];
-            $match = array_search($formatting, $this->stack, true);
+            $match = $this->openStackIndex($formatting);
 
             if ($match === false) {
-                array_splice($this->activeFormatting, $activeIndex, 1);
+                $this->removeActiveFormattingAt($activeIndex);
                 break;
             }
 
@@ -85,7 +84,7 @@ trait AdoptsFormattingElements
 
                 $closingOwner = $formatting;
                 $this->sliceOpenStack($match);
-                array_splice($this->activeFormatting, $activeIndex, 1);
+                $this->removeActiveFormattingAt($activeIndex);
                 break;
             }
 
@@ -97,25 +96,22 @@ trait AdoptsFormattingElements
                 $commonAncestor = $this->stack[$match - 1];
             }
 
-            // The bookmark is the replacement's position in active formatting;
-            // it must follow removals and reconstructed ancestors below.
             $bookmark = $activeIndex;
             $lastNode = $furthest;
             $inner = 0;
 
-            // Rebuild the ancestors between the block and the formatting element.
             for ($index = $furthestIndex - 1; $index > $match; $index--) {
                 $inner++;
                 $node = $this->stack[$index];
-                $nodeActiveIndex = array_search($node, $this->activeFormatting, true);
+                $nodeActiveIndex = $this->activeFormattingPosition($node);
 
                 if ($inner > self::MAX_FORMATTING_INNER_RECONSTRUCTIONS && $nodeActiveIndex !== false) {
-                    array_splice($this->activeFormatting, $nodeActiveIndex, 1);
+                    $this->removeActiveFormattingAt($nodeActiveIndex);
                     $nodeActiveIndex = false;
                 }
 
                 if ($nodeActiveIndex === false) {
-                    array_splice($this->stack, $index, 1);
+                    $this->removeOpenElementAt($index);
                     $furthestIndex--;
 
                     continue;
@@ -123,7 +119,7 @@ trait AdoptsFormattingElements
 
                 $copy = $this->reconstructedCopy($node);
                 $this->activeFormatting[$nodeActiveIndex] = $copy;
-                $this->stack[$index] = $copy;
+                $this->replaceOpenElementAt($index, $copy);
 
                 if ($lastNode === $furthest) {
                     $bookmark = $nodeActiveIndex + 1;
@@ -134,7 +130,6 @@ trait AdoptsFormattingElements
                 $lastNode = $copy;
             }
 
-            // Move the rebuilt subtree, retaining its authored rendering position.
             $this->anchorArenaNodeForMove($lastNode);
 
             if ($this->arena->parent($formatting) === $commonAncestor) {
@@ -156,11 +151,17 @@ trait AdoptsFormattingElements
                 $this->arena->append($commonAncestor, $lastNode);
             }
 
-            // Wrap the block's children and replace the old formatting entry in
-            // both lists. Keep these mutations ordered as their indices change.
             $newFormatting = $this->reconstructedCopy($formatting);
 
-            foreach ($this->arena->children($furthest) as $child) {
+            $moving = [];
+
+            for ($child = $this->arena->firstChild($furthest); $child !== null; $child = $this->arena->next($child)) {
+                if (($this->arena->kinds[$child] & Arena::KIND_MASK) !== Arena::SOURCE_ANCHOR) {
+                    $moving[] = $child;
+                }
+            }
+
+            foreach ($moving as $child) {
                 $this->anchorArenaNodeForMove($child);
                 $this->arena->append($newFormatting, $child);
             }
@@ -168,30 +169,34 @@ trait AdoptsFormattingElements
             $this->arena->append($furthest, $newFormatting);
             $closingOwner = $newFormatting;
 
-            $formattingActiveIndex = array_search($formatting, $this->activeFormatting, true);
+            $formattingActiveIndex = $this->activeFormattingPosition($formatting);
 
             if ($formattingActiveIndex !== false) {
-                array_splice($this->activeFormatting, $formattingActiveIndex, 1);
+                $this->removeActiveFormattingAt($formattingActiveIndex);
 
                 if ($formattingActiveIndex < $bookmark) {
                     $bookmark--;
                 }
             }
 
-            array_splice($this->activeFormatting, $bookmark, 0, [$newFormatting]);
-            $formattingStackIndex = array_search($formatting, $this->stack, true);
+            $this->insertActiveFormattingAt($bookmark, $newFormatting);
+            $formattingStackIndex = $this->openStackIndex($formatting);
 
             if ($formattingStackIndex !== false) {
-                array_splice($this->stack, $formattingStackIndex, 1);
+                $this->removeOpenElementAt($formattingStackIndex);
             }
 
-            $furthestStackIndex = array_search($furthest, $this->stack, true);
+            $furthestStackIndex = $this->openStackIndex($furthest);
 
             if ($furthestStackIndex === false) {
-                $this->stack[] = $newFormatting;
+                $this->pushOpenElement($newFormatting);
             } else {
-                array_splice($this->stack, $furthestStackIndex + 1, 0, [$newFormatting]);
+                $this->insertOpenElementAt($furthestStackIndex + 1, $newFormatting);
             }
+        }
+
+        if ($transformed) {
+            $this->insertionChains = [];
         }
 
         if (! $transformed || $closingOwner === null) {
@@ -202,21 +207,21 @@ trait AdoptsFormattingElements
             if ($outer === self::MAX_FORMATTING_ADOPTION_PASSES) {
                 $this->appendOpaqueMarkup($start, $end, $closingMarkup);
             } else {
-                $this->setElementClosingMarkup($closingOwner, $closingMarkup);
-                $this->attachEmbeddedRegions($closingOwner, $start, $end);
+                $this->setElementClosingMarkup($closingOwner, $closingMarkup, $start);
+                $this->attachEmbeddedRegions($closingOwner, $start, $end, true);
             }
         }
 
         return true;
     }
 
-    protected function reconstructActiveFormatting()
+    protected function reconstructActiveFormatting(): void
     {
         $count = count($this->activeFormatting);
 
         if ($count === 0
             || $this->activeFormatting[$count - 1] === null
-            || in_array($this->activeFormatting[$count - 1], $this->stack, true)) {
+            || $this->openStackIndex($this->activeFormatting[$count - 1]) !== false) {
             return;
         }
 
@@ -224,7 +229,7 @@ trait AdoptsFormattingElements
 
         while ($index > 0
             && $this->activeFormatting[$index - 1] !== null
-            && ! in_array($this->activeFormatting[$index - 1], $this->stack, true)) {
+            && $this->openStackIndex($this->activeFormatting[$index - 1]) === false) {
             $index--;
         }
 
@@ -238,12 +243,12 @@ trait AdoptsFormattingElements
                 $this->arena->append($container, $copy);
             }
 
-            $this->stack[] = $copy;
+            $this->pushOpenElement($copy);
             $this->activeFormatting[$index] = $copy;
         }
     }
 
-    protected function activeFormattingIndex($name)
+    protected function activeFormattingIndex(string $name): ?int
     {
         for ($index = count($this->activeFormatting) - 1; $index >= 0; $index--) {
             if ($this->activeFormatting[$index] === null) {
@@ -258,7 +263,7 @@ trait AdoptsFormattingElements
         return null;
     }
 
-    protected function stackIndexIsInScope($targetIndex, array $boundaries)
+    protected function stackIndexIsInScope(int $targetIndex, array $boundaries): bool
     {
         for ($index = count($this->stack) - 1; $index >= 0; $index--) {
             if ($index === $targetIndex) {
@@ -275,7 +280,7 @@ trait AdoptsFormattingElements
                 continue;
             }
 
-            if (isset($boundaries[strtolower((string) $this->arena->name[$element])])) {
+            if (isset($boundaries[$this->arena->name[$element] ?? ''])) {
                 return false;
             }
         }
@@ -283,11 +288,11 @@ trait AdoptsFormattingElements
         return false;
     }
 
-    protected function furthestFormattingBoundaryIndex($formattingIndex)
+    protected function furthestFormattingBoundaryIndex(int $formattingIndex): ?int
     {
         for ($index = $formattingIndex + 1, $count = count($this->stack); $index < $count; $index++) {
             $candidate = $this->stack[$index];
-            $name = strtolower((string) $this->arena->name[$candidate]);
+            $name = $this->arena->name[$candidate] ?? '';
 
             if ($this->isFormattingBoundary($candidate, $name)) {
                 return $index;
@@ -297,7 +302,7 @@ trait AdoptsFormattingElements
         return null;
     }
 
-    protected function isFormattingBoundary($candidate, $name)
+    protected function isFormattingBoundary(int $candidate, string $name): bool
     {
         if ($this->isForeignElement($candidate)) {
             return $this->isForeignScopeBoundary($candidate);
@@ -306,75 +311,123 @@ trait AdoptsFormattingElements
         return isset(self::$formattingBreakStarts[$name]);
     }
 
-    protected function pushActiveFormattingElement($element)
+    protected function pushActiveFormattingElement(int $element): void
     {
-        $equivalent = [];
+        $signature = $this->formattingSignature($element);
 
-        for ($index = count($this->activeFormatting) - 1; $index >= 0; $index--) {
-            $candidate = $this->activeFormatting[$index];
+        if (($this->activeSignatureCounts[$signature] ?? 0) >= 3) {
+            $equivalent = [];
 
-            if ($candidate === null) {
-                break;
+            for ($index = count($this->activeFormatting) - 1; $index >= 0; $index--) {
+                $candidate = $this->activeFormatting[$index];
+
+                if ($candidate === null) {
+                    break;
+                }
+
+                if ($this->formattingSignature($candidate) === $signature) {
+                    $equivalent[] = $index;
+
+                    if (count($equivalent) === 3) {
+                        break;
+                    }
+                }
             }
 
-            if ($this->formattingElementsAreEquivalent($candidate, $element)) {
-                $equivalent[] = $index;
+            if (count($equivalent) >= 3) {
+                $this->removeActiveFormattingAt($equivalent[count($equivalent) - 1]);
             }
-        }
-
-        if (count($equivalent) >= 3) {
-            array_splice($this->activeFormatting, $equivalent[count($equivalent) - 1], 1);
         }
 
         $this->activeFormatting[] = $element;
+        $this->countActiveFormatting($element, 1);
     }
 
-    protected function formattingElementsAreEquivalent($left, $right)
+    protected function pushActiveFormattingMarker(): void
     {
-        if ($this->arena->name[$left] !== $this->arena->name[$right]
-            || $this->arena->namespace($left) !== $this->arena->namespace($right)) {
-            return false;
+        $this->activeFormatting[] = null;
+        $this->activeSignatureCountStack[] = $this->activeSignatureCounts;
+        $this->activeSignatureCounts = [];
+    }
+
+    protected function removeActiveFormattingAt(int $index): void
+    {
+        [$element] = array_splice($this->activeFormatting, $index, 1);
+
+        if ($element !== null) {
+            $this->countActiveFormatting($element, -1);
+        }
+    }
+
+    protected function insertActiveFormattingAt(int $index, int $element): void
+    {
+        array_splice($this->activeFormatting, $index, 0, [$element]);
+        $this->countActiveFormatting($element, 1);
+    }
+
+    protected function countActiveFormatting(int $element, int $delta): void
+    {
+        $signature = $this->formattingSignature($element);
+        $count = ($this->activeSignatureCounts[$signature] ?? 0) + $delta;
+
+        if ($count > 0) {
+            $this->activeSignatureCounts[$signature] = $count;
+        } else {
+            unset($this->activeSignatureCounts[$signature]);
+        }
+    }
+
+    protected function formattingSignature(int $element): string
+    {
+        if (isset($this->formattingSignatures[$element])) {
+            return $this->formattingSignatures[$element];
         }
 
-        $leftMarkup = $this->arena->value[$left];
-        $rightMarkup = $this->arena->value[$right];
+        $markup = $this->arena->value[$element];
 
-        if (strpos($leftMarkup, '{{') !== false || strpos($rightMarkup, '{{') !== false) {
-            return $leftMarkup === $rightMarkup;
+        if (strpos($markup, '{{') !== false) {
+            $attributes = $markup;
+        } else {
+            $attributes = $this->handle($element)->attributes();
+            ksort($attributes);
+            $attributes = serialize($attributes);
         }
 
-        $leftAttributes = $this->handle($left)->attributes();
-        $rightAttributes = $this->handle($right)->attributes();
-        ksort($leftAttributes);
-        ksort($rightAttributes);
-
-        return $leftAttributes === $rightAttributes;
+        return $this->formattingSignatures[$element] = $this->arena->namespace($element)
+            .'|'.$this->arena->name[$element]
+            .'|'.$attributes;
     }
 
-    protected function sliceOpenStack($length)
-    {
-        $this->stack = array_slice($this->stack, 0, $length);
-    }
-
-    protected function clearActiveFormattingToLastMarker()
+    protected function clearActiveFormattingToLastMarker(): void
     {
         for ($index = count($this->activeFormatting) - 1; $index >= 0; $index--) {
             if ($this->activeFormatting[$index] === null) {
                 $this->activeFormatting = array_slice($this->activeFormatting, 0, $index);
+                $this->activeSignatureCounts = array_pop($this->activeSignatureCountStack) ?? [];
 
                 return;
             }
         }
     }
 
-    protected function reconstructedCopy($element)
+    protected function reconstructedCopy(int $element): int
     {
-        return $this->arena->element(
+        $copy = $this->arena->element(
             $this->arena->name[$element],
             $this->arena->value[$element],
             false,
             $this->arena->namespace($element),
             true
         );
+
+        if (isset($this->arena->sourceStart[$element])) {
+            $this->arena->sourceStart[$copy] = $this->arena->sourceStart[$element];
+        }
+
+        if (isset($this->formattingSignatures[$element])) {
+            $this->formattingSignatures[$copy] = $this->formattingSignatures[$element];
+        }
+
+        return $copy;
     }
 }
