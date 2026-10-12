@@ -10,7 +10,7 @@ import fuzzysort from 'fuzzysort';
 import { each, groupBy, orderBy, find, uniq } from 'lodash-es';
 import { motion } from 'motion-v';
 import { cva } from 'cva';
-import { Icon, Subheading } from '@/components/ui';
+import { Button, Icon, Subheading } from '@/components/ui';
 import { router } from '@inertiajs/vue3';
 import { escapeHtml } from '@/bootstrap/globals.js';
 
@@ -83,6 +83,16 @@ function highlightResult(text) {
     const result = fuzzysort.single(query.value, safeText);
     return result?.highlight(`<span class="${classes}">`, '</span>') || safeText;
 }
+
+// Prototype: pretend the AI understood a "create ..." style request.
+const askMock = computed(() => /^(create|make|generate|write|add)\b/i.test(query.value.trim()) && query.value.trim().split(/\s+/).length > 2);
+const askMockImages = [
+    '/ai-mock/aj-robsin-buq1rzckyw4.jpg',
+    '/ai-mock/hu-chen-3yd8oxgolqm.jpg',
+    '/ai-mock/sergi-ferrete-yxwt-vj3sza.jpg',
+    '/ai-mock/wolfgang-hasselmann-ldav4eljbt0.jpg',
+];
+const askMockSelected = ref(0);
 
 const results = computed(() => {
     let items = aggregatedItems.value.map(item => normalizeItem(item));
@@ -346,7 +356,7 @@ router.on('start', () => Statamic.$commandPalette.clear());
                         @highlight="highlighted = $event?.value"
                     >
                         <header class="group/cmd-input flex h-14 items-center gap-2 border-b border-gray-200/80 px-5.5 dark:border-gray-950">
-                            <Icon name="magnifying-glass" class="size-5 text-gray-400" />
+                            <Icon :name="askMock ? 'ai-chat' : 'magnifying-glass'" class="size-5 translate-y-0.75 text-gray-400" />
                             <ComboboxInput
                                 :auto-focus="true"
                                 :placeholder="__('Ask, search, or jump to...')"
@@ -356,7 +366,27 @@ router.on('start', () => Statamic.$commandPalette.clear());
                         </header>
                         <ComboboxContent>
                             <ComboboxViewport class="max-h-[360px] min-h-[360px] divide-y divide-gray-200/80 overflow-y-auto dark:divide-gray-950">
-                                <ComboboxEmpty v-if="query && !results.length" class="px-3 py-2 opacity-50">
+                                <div v-if="askMock" class="space-y-3 px-5 py-4">
+                                    <p class="text-sm text-gray-700 dark:text-gray-300">
+                                        I found these images in your assets that could work as the <strong>Hero Image</strong> for your <strong>Home</strong> entry. Pick one and I'll add it.
+                                    </p>
+                                    <div class="grid grid-cols-4 gap-2">
+                                        <button
+                                            v-for="(src, i) in askMockImages"
+                                            :key="src"
+                                            type="button"
+                                            @click="askMockSelected = i"
+                                            :class="['aspect-video overflow-hidden rounded-lg outline', askMockSelected === i ? 'outline-3 outline-primary' : 'outline-gray-300 hover:outline-gray-400 dark:outline-gray-700']"
+                                        >
+                                            <img :src="src" class="size-full object-cover" alt="" />
+                                        </button>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <Button variant="primary" size="sm" :text="__('Use selected')" />
+                                        <Button icon="folder-open" size="sm" :text="__('Browse Assets')" />
+                                    </div>
+                                </div>
+                                <ComboboxEmpty v-if="query && !results.length && !askMock" class="px-3 py-2 opacity-50">
                                     <CommandPaletteItem :text="__('No results found!')" icon="entry" disabled />
                                 </ComboboxEmpty>
                                 <ComboboxGroup
