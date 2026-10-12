@@ -160,7 +160,7 @@ function createCropper(imageElement) {
         aspectRatio: NaN,
         viewMode: 1,
         dragMode: 'crop',
-        autoCropArea: 0.9,
+        autoCropArea: 1,
         restore: false,
         guides: true,
         center: true,
