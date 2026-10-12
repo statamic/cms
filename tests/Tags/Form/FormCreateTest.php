@@ -1825,6 +1825,32 @@ EOT
     }
 
     #[Test]
+    public function the_json_success_response_excludes_internal_submission_keys()
+    {
+        $this
+            ->withHeaders(['Referer' => url('/')])
+            ->postJson('/!/forms/contact', [
+                'name' => 'Name',
+                'email' => 'test@test.com',
+                'message' => 'This is a message',
+            ])
+            ->assertOk()
+            ->assertExactJson([
+                'success' => true,
+                'submission_created' => true,
+                'submission' => [
+                    'name' => 'Name',
+                    'email' => 'test@test.com',
+                    'message' => 'This is a message',
+                ],
+                'redirect' => null,
+                'next_page' => null,
+            ]);
+
+        $this->assertEquals('en', Form::find('contact')->submissions()->first()->get('_site'));
+    }
+
+    #[Test]
     public function a_precognitive_success_does_not_persist_a_submission()
     {
         Bus::fake();

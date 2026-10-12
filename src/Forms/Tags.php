@@ -282,7 +282,7 @@ class Tags extends BaseTags
 
     protected function queryStatus($query)
     {
-        if ($this->isQueryingCondition('status') || $this->isQueryingCondition('partial') || $this->isQueryingCondition('spam')) {
+        if ($this->isQueryingCondition('status')) {
             return;
         }
 

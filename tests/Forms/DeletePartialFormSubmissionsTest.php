@@ -30,13 +30,13 @@ class DeletePartialFormSubmissionsTest extends TestCase
         $form = tap(Form::make('contact'))->save();
 
         Carbon::setTestNow('2025-06-01 12:00:00');
-        $oldPartial = tap($form->makeSubmission()->set('partial', true))->save();
+        $oldPartial = tap($form->makeSubmission()->asPartial())->save();
 
         Carbon::setTestNow('2025-06-02 12:00:00');
         $oldFinalized = tap($form->makeSubmission())->save();
 
         Carbon::setTestNow('2025-06-14 12:00:00');
-        $recentPartial = tap($form->makeSubmission()->set('partial', true))->save();
+        $recentPartial = tap($form->makeSubmission()->asPartial())->save();
 
         Carbon::setTestNow('2025-06-15 12:00:00');
 
@@ -55,7 +55,7 @@ class DeletePartialFormSubmissionsTest extends TestCase
         $form = tap(Form::make('contact'))->save();
 
         Carbon::setTestNow('2025-06-01 12:00:00');
-        $partial = tap($form->makeSubmission()->set('partial', true))->save();
+        $partial = tap($form->makeSubmission()->asPartial())->save();
 
         Carbon::setTestNow('2025-06-02 12:00:00');
         $finalized = tap($form->makeSubmission())->save();
@@ -76,10 +76,10 @@ class DeletePartialFormSubmissionsTest extends TestCase
         $form = tap(Form::make('contact'))->save();
 
         Carbon::setTestNow('2025-06-01 12:00:00');
-        $partial = tap($form->makeSubmission()->set('partial', true))->save();
+        $partial = tap($form->makeSubmission()->asPartial())->save();
 
         Carbon::setTestNow('2025-06-02 12:00:00');
-        $spam = tap($form->makeSubmission()->set('partial', true)->markAsSpam())->save();
+        $spam = tap($form->makeSubmission()->asPartial()->markAsSpam())->save();
 
         Carbon::setTestNow('2025-06-30 12:00:00');
 
@@ -97,7 +97,7 @@ class DeletePartialFormSubmissionsTest extends TestCase
         $form = tap(Form::make('contact'))->save();
 
         Carbon::setTestNow('2025-06-01 12:00:00');
-        $partial = tap($form->makeSubmission()->set('partial', true))->save();
+        $partial = tap($form->makeSubmission()->asPartial())->save();
 
         Carbon::setTestNow('2025-06-30 12:00:00');
 
@@ -116,7 +116,7 @@ class DeletePartialFormSubmissionsTest extends TestCase
         $form = tap(Form::make('contact'))->save();
 
         Carbon::setTestNow('2025-06-01 12:00:00');
-        tap($form->makeSubmission()->set('partial', true))->save();
+        tap($form->makeSubmission()->asPartial())->save();
 
         Carbon::setTestNow('2025-06-30 12:00:00');
 

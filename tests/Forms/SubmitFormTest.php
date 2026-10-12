@@ -288,7 +288,7 @@ class SubmitFormTest extends TestCase
         // The raw partial key sticks around so finalizing can pick up where it
         // left off when the submission is marked as not spam, but the
         // submission no longer reports itself as partial.
-        $this->assertTrue($submission->get('partial'));
+        $this->assertTrue($submission->get('_partial'));
         $this->assertFalse($submission->isPartial());
 
         Event::assertNotDispatched(FormSubmitted::class);
@@ -1161,6 +1161,7 @@ class SubmitFormTest extends TestCase
 
         $this->assertCount(1, $form->submissions());
         $this->assertTrue($result->submission->isPartial());
+        $this->assertTrue($result->submission->get('_partial'));
         $this->assertEquals('Olaf', $result->submission->get('name'));
 
         Event::assertDispatched(SubmissionCreated::class);
@@ -1417,6 +1418,7 @@ class SubmitFormTest extends TestCase
 
         $stored = $form->submission($result->submission->id());
         $this->assertFalse($stored->isPartial());
+        $this->assertFalse($stored->has('_partial'));
 
         // Earlier pages' values are preserved while the final page's values are merged in.
         $this->assertEquals('Olaf', $stored->get('name'));

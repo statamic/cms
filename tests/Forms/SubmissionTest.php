@@ -133,6 +133,39 @@ class SubmissionTest extends TestCase
     }
 
     #[Test]
+    public function it_gets_values_without_internal_keys()
+    {
+        $form = tap(Form::make('contact_us'))->save();
+
+        $submission = $form->makeSubmission()
+            ->data(['name' => 'Olaf', 'email' => 'olaf@example.com', '_fake' => true])
+            ->asPartial()
+            ->site('en');
+
+        $this->assertInstanceOf(Collection::class, $submission->values());
+        $this->assertEquals(['name' => 'Olaf', 'email' => 'olaf@example.com'], $submission->values()->all());
+        $this->assertEquals([
+            'name' => 'Olaf',
+            'email' => 'olaf@example.com',
+            '_fake' => true,
+            '_partial' => true,
+            '_site' => 'en',
+        ], $submission->data()->all());
+    }
+
+    #[Test]
+    public function data_remains_the_live_collection_including_internal_keys()
+    {
+        $form = tap(Form::make('contact_us'))->save();
+
+        $submission = $form->makeSubmission()->asPartial();
+        $submission->data()->put('name', 'Olaf');
+
+        $this->assertEquals(['name' => 'Olaf'], $submission->values()->all());
+        $this->assertEquals(['_partial' => true, 'name' => 'Olaf'], $submission->data()->all());
+    }
+
+    #[Test]
     public function setting_data_preserves_the_partial_spam_and_site_keys()
     {
         $form = tap(Form::make('contact_us'))->save();
@@ -142,9 +175,9 @@ class SubmissionTest extends TestCase
         $submission->data(['foo' => 'bar']);
 
         $this->assertEquals('bar', $submission->get('foo'));
-        $this->assertTrue($submission->get('partial'));
+        $this->assertTrue($submission->get('_partial'));
         $this->assertTrue($submission->isSpam());
-        $this->assertEquals('fr', $submission->get('site'));
+        $this->assertEquals('fr', $submission->get('_site'));
     }
 
     #[Test]
@@ -154,10 +187,10 @@ class SubmissionTest extends TestCase
 
         $submission = $form->makeSubmission()->asPartial()->site('fr');
 
-        $submission->data(['foo' => 'bar', 'partial' => false, 'site' => 'de']);
+        $submission->data(['foo' => 'bar', '_partial' => false, '_site' => 'de']);
 
         $this->assertFalse($submission->isPartial());
-        $this->assertEquals('de', $submission->get('site'));
+        $this->assertEquals('de', $submission->get('_site'));
     }
 
     #[Test]
@@ -365,16 +398,16 @@ class SubmissionTest extends TestCase
         // It can be set by handle, storing the handle in the data.
         $return = $submission->site('fr');
         $this->assertSame($submission, $return);
-        $this->assertEquals('fr', $submission->get('site'));
+        $this->assertEquals('fr', $submission->get('_site'));
         $this->assertEquals('fr', $submission->site()->handle());
 
         // It can be set with a Site instance, which also stores the handle.
         $submission->site(Site::get('en'));
-        $this->assertEquals('en', $submission->get('site'));
+        $this->assertEquals('en', $submission->get('_site'));
         $this->assertEquals('en', $submission->site()->handle());
 
         // An invalid handle falls back to the default.
-        $submission->set('site', 'nonexistent');
+        $submission->set('_site', 'nonexistent');
         $this->assertEquals('en', $submission->site()->handle());
     }
 
@@ -385,7 +418,7 @@ class SubmissionTest extends TestCase
 
         $form = tap(Form::make('contact_us'))->save();
 
-        $submission = $form->makeSubmission()->set('partial', true);
+        $submission = $form->makeSubmission()->asPartial();
         $submission->save();
 
         // A partial submission is still saved and created, so its events are never withheld.
@@ -400,14 +433,14 @@ class SubmissionTest extends TestCase
     {
         $form = tap(Form::make('contact_us'))->save();
 
-        $submission = $form->makeSubmission()->set('partial', true);
+        $submission = $form->makeSubmission()->asPartial();
         $submission->save();
 
         Event::fake();
 
         // The created event already fired when the partial was first saved. Removing the
         // partial key and saving again won't re-dispatch it, because the record exists.
-        $submission->remove('partial');
+        $submission->remove('_partial');
         $submission->save();
 
         Event::assertNotDispatched(SubmissionCreating::class);
@@ -495,7 +528,7 @@ class SubmissionTest extends TestCase
         Event::fake([SubmissionCreated::class, SubmissionFinalized::class]);
 
         $form = tap(Form::make('contact_us'))->save();
-        $submission = tap($form->makeSubmission()->set('partial', true))->save();
+        $submission = tap($form->makeSubmission()->asPartial())->save();
 
         $submission->finalize();
 
@@ -533,7 +566,7 @@ class SubmissionTest extends TestCase
 
         $form = tap(Form::make('contact_us')->store(false))->save();
 
-        $submission = tap($form->makeSubmission()->set('partial', true))->save();
+        $submission = tap($form->makeSubmission()->asPartial())->save();
         $this->assertNotNull($form->submission($submission->id()));
 
         $submission->finalize();
