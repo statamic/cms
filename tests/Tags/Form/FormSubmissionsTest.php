@@ -59,6 +59,14 @@ EOT
         $this->assertEquals('[finalized][partial]', trim($this->tag('{{ form:submissions in="contact" status:is="any" sort="message" }}[{{ message }}]{{ /form:submissions }}')));
     }
 
+    #[Test]
+    public function a_condition_on_a_field_named_partial_still_only_renders_finalized_submissions()
+    {
+        $this->createSubmissions();
+
+        $this->assertEquals('[finalized]', trim($this->tag('{{ form:submissions in="contact" partial:doesnt_exist="true" }}[{{ message }}]{{ /form:submissions }}')));
+    }
+
     private function createSubmissions()
     {
         $form = Form::find('contact');
