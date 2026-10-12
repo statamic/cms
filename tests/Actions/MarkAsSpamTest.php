@@ -90,18 +90,26 @@ class MarkAsSpamTest extends TestCase
     }
 
     #[Test]
-    public function it_requires_permission_to_view_submissions()
+    public function it_requires_permission_to_mark_submissions_as_spam()
     {
         $this->setTestRoles([
-            'access' => ['view form submissions'],
+            'global' => ['view form submissions', 'mark form submissions as spam'],
+            'form' => ['view contact form submissions', 'mark contact form submissions as spam'],
+            'other_form' => ['view contact form submissions', 'mark other form submissions as spam'],
+            'view_only' => ['view form submissions', 'view contact form submissions'],
             'noaccess' => [],
         ]);
 
-        $userWithPermission = tap(User::make()->assignRole('access'))->save();
-        $userWithoutPermission = tap(User::make()->assignRole('noaccess'))->save();
         $submission = tap($this->form->makeSubmission()->data(['name' => 'Olaf']))->save();
 
-        $this->assertTrue((new MarkAsSpam)->authorize($userWithPermission, $submission));
-        $this->assertFalse((new MarkAsSpam)->authorize($userWithoutPermission, $submission));
+        foreach (['global', 'form'] as $role) {
+            $user = tap(User::make()->assignRole($role))->save();
+            $this->assertTrue((new MarkAsSpam)->authorize($user, $submission), $role);
+        }
+
+        foreach (['other_form', 'view_only', 'noaccess'] as $role) {
+            $user = tap(User::make()->assignRole($role))->save();
+            $this->assertFalse((new MarkAsSpam)->authorize($user, $submission), $role);
+        }
     }
 }

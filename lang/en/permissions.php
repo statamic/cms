@@ -79,9 +79,11 @@ return [
     'view_form_submissions' => 'View submissions',
     'view_form_submissions_desc' => 'Grants access to submissions across all forms',
     'delete_form_submissions' => 'Delete submissions',
+    'mark_form_submissions_as_spam' => 'Mark submissions as spam',
     'edit_{form}_form' => 'Edit :form form',
     'view_{form}_form_submissions' => 'View :form submissions',
     'delete_{form}_form_submissions' => 'Delete :form submissions',
+    'mark_{form}_form_submissions_as_spam' => 'Mark :form submissions as spam',
 
     'group_users' => 'Users',
     'view_users' => 'View users',

@@ -18,11 +18,11 @@ class FormSubmissionPolicy
 
     public function markAsSpam($user, $submission)
     {
-        return User::fromUser($user)->can('viewSubmissions', $submission->form());
+        return User::fromUser($user)->can('markSubmissionsAsSpam', $submission->form());
     }
 
     public function markAsNotSpam($user, $submission)
     {
-        return User::fromUser($user)->can('viewSubmissions', $submission->form());
+        return User::fromUser($user)->can('markSubmissionsAsSpam', $submission->form());
     }
 }
