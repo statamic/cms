@@ -39,6 +39,7 @@ const showConfirmation = ref(false);
 const uploading = ref(false);
 const pendingCrop = ref(null);
 const cropDimensions = ref(null);
+const cropEdges = ref({});
 const defaultQuality = Statamic.$config.get('cropQuality') || 90;
 
 function normalizeFormat(format) {
@@ -123,6 +124,7 @@ function resetState() {
     uploading.value = false;
     pendingCrop.value = null;
     cropDimensions.value = null;
+    cropEdges.value = {};
     quality.value = initialQuality();
     format.value = sourceFormat.value;
     background.value = 'white';
@@ -177,6 +179,7 @@ function createCropper(imageElement) {
         cropstart: onCropStart,
         cropmove: onCropMove,
         cropend: onCropEnd,
+        ready: updateCropEdges,
         crop: onCrop,
     });
 }
@@ -185,6 +188,30 @@ function onCrop(event) {
     cropDimensions.value = {
         width: Math.round(event.detail.width),
         height: Math.round(event.detail.height),
+    };
+
+    updateCropEdges();
+}
+
+// Track which edges of the visible image the crop box touches, so the controls on those
+// edges can be drawn inside the crop box instead of being clipped.
+function updateCropEdges() {
+    if (!cropper.value) return;
+
+    const container = cropper.value.getContainerData();
+    const canvas = cropper.value.getCanvasData();
+    const box = cropper.value.getCropBoxData();
+
+    const top = Math.max(canvas.top, 0);
+    const left = Math.max(canvas.left, 0);
+    const right = Math.min(canvas.left + canvas.width, container.width);
+    const bottom = Math.min(canvas.top + canvas.height, container.height);
+
+    cropEdges.value = {
+        'at-top': box.top - top < 1,
+        'at-left': box.left - left < 1,
+        'at-right': right - (box.left + box.width) < 1,
+        'at-bottom': bottom - (box.top + box.height) < 1,
     };
 }
 
@@ -480,7 +507,7 @@ function close() {
 
             <!-- Content -->
             <div class="bg-gray-300 p-3 inset-shadow-xs dark:bg-gray-850 flex flex-1 flex-col overflow-auto relative min-h-0 w-full items-center justify-center" role="img" :aria-label="__('Image crop area')">
-                <div class="h-full w-full min-h-0 flex items-center justify-center overflow-hidden">
+                <div :class="cropEdges" class="crop-editor-canvas h-full w-full min-h-0 flex items-center justify-center overflow-hidden">
                     <img ref="image" :src="asset.preview" :crossorigin="crossOrigin" :alt="__('Image to crop')" class="max-w-full max-h-full" @error="onImageError" />
                 </div>
                 <div
@@ -612,3 +639,30 @@ function close() {
         </div>
     </Stack>
 </template>
+
+<style>
+/* Where the crop box touches the edge of the image, draw its border inside it so it isn't clipped, and make the handles more obvious. */
+.crop-editor-canvas .cropper-crop-box::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 0 solid #39f;
+    pointer-events: none;
+}
+
+.crop-editor-canvas.at-top .cropper-crop-box::before { border-top-width: 2px; }
+.crop-editor-canvas.at-right .cropper-crop-box::before { border-right-width: 2px; }
+.crop-editor-canvas.at-bottom .cropper-crop-box::before { border-bottom-width: 2px; }
+.crop-editor-canvas.at-left .cropper-crop-box::before { border-left-width: 2px; }
+
+.crop-editor-canvas.at-top :is(.point-n, .point-ne, .point-nw),
+.crop-editor-canvas.at-right :is(.point-e, .point-ne, .point-se),
+.crop-editor-canvas.at-bottom :is(.point-s, .point-se, .point-sw),
+.crop-editor-canvas.at-left :is(.point-w, .point-nw, .point-sw) {
+    width: 6px;
+    height: 6px;
+    background-color: #39f;
+    box-shadow: 0 0 0 1px #fff;
+    opacity: 1;
+}
+</style>
