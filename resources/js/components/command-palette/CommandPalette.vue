@@ -93,6 +93,19 @@ const askMockImages = [
     '/ai-mock/wolfgang-hasselmann-ldav4eljbt0.jpg',
 ];
 const askMockSelected = ref(0);
+const askSuggestionPhrases = [
+    'Create a new homepage image',
+    'Create a blog post about our latest product',
+    'Create a landing page for the summer sale',
+];
+const askSuggestions = computed(() => {
+    const typed = query.value.trim().toLowerCase();
+    if (!typed || askMock.value) return [];
+
+    return askSuggestionPhrases
+        .filter(phrase => phrase.toLowerCase().startsWith(typed) && phrase.toLowerCase() !== typed)
+        .map(phrase => ({ text: phrase, html: escapeHtml(phrase), icon: 'ai-chat', category: 'Ask' }));
+});
 
 const results = computed(() => {
     let items = aggregatedItems.value.map(item => normalizeItem(item));
@@ -133,7 +146,8 @@ const results = computed(() => {
                 items: grouped[category],
             };
         })
-        .filter(category => category.items);
+        .filter(category => category.items)
+        .concat(askSuggestions.value.length ? [{ text: __('Try asking'), items: askSuggestions.value }] : []);
 });
 
 function fuzzysortScoringAlgorithm(result) {
@@ -183,6 +197,13 @@ function renderKeys(keys) {
 
 watch(selected, (item) => {
     if (!item) return;
+
+    if (askSuggestions.value.some(suggestion => suggestion.text === item)) {
+        query.value = item;
+        selected.value = null;
+        return;
+    }
+
     select(item);
     reset();
 });
