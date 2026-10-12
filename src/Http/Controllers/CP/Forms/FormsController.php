@@ -52,7 +52,7 @@ class FormsController extends CpController
                     'id' => $form->handle(),
                     'title' => __($form->title()),
                     'status' => $form->status(),
-                    'submissions' => $canViewSubmissions ? $form->querySubmissions()->where('site', Site::selected())->whereNull('partial')->count() : null,
+                    'submissions' => $canViewSubmissions ? $form->querySubmissions()->where('site', Site::selected())->whereStatus('finalized')->count() : null,
                     'connections' => $canEdit ? FormConnector::all()->sum(fn ($connector) => $connector->forForm($form)->count() ?? 0) : null,
                     'show_url' => $form->showUrl(),
                     'submissions_url' => $form->submissionsUrl(),

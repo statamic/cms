@@ -461,4 +461,62 @@ class SubmissionQueryBuilderTest extends TestCase
         $submissions = FormSubmission::query()->offset(1)->get();
         $this->assertEquals(['b', 'c'], $submissions->map->get('id')->all());
     }
+
+    private function createSubmissionsWithStatuses()
+    {
+        $form = tap(Form::make('test'))->save();
+        FormSubmission::make()->form($form)->data(['ref' => 'a'])->save();
+        FormSubmission::make()->form($form)->data(['ref' => 'b', 'partial' => true])->save();
+        FormSubmission::make()->form($form)->data(['ref' => 'c'])->save();
+        FormSubmission::make()->form($form)->data(['ref' => 'd', 'partial' => true])->save();
+
+        return $form;
+    }
+
+    private function ids($submissions)
+    {
+        return $submissions->map->get('ref')->sort()->values()->all();
+    }
+
+    #[Test]
+    public function it_filters_by_status()
+    {
+        $this->createSubmissionsWithStatuses();
+
+        $this->assertEquals(['a', 'c'], $this->ids(FormSubmission::query()->whereStatus('finalized')->get()));
+        $this->assertEquals(['b', 'd'], $this->ids(FormSubmission::query()->whereStatus('partial')->get()));
+        $this->assertEquals(['a', 'b', 'c', 'd'], $this->ids(FormSubmission::query()->whereStatus('any')->get()));
+    }
+
+    #[Test]
+    public function it_throws_an_exception_for_an_invalid_status()
+    {
+        $this->expectExceptionMessage('Invalid status [foo]');
+
+        FormSubmission::query()->whereStatus('foo');
+    }
+
+    #[Test]
+    public function the_repository_query_does_not_filter_by_status_by_default()
+    {
+        $form = $this->createSubmissionsWithStatuses();
+
+        $this->assertEquals(['a', 'b', 'c', 'd'], $this->ids(FormSubmission::query()->get()));
+        $this->assertEquals(['a', 'b', 'c', 'd'], $this->ids(FormSubmission::all()));
+        $this->assertEquals(['a', 'b', 'c', 'd'], $this->ids(FormSubmission::whereForm('test')));
+
+        $partial = FormSubmission::query()->where('partial', true)->first();
+        $this->assertEquals($partial, FormSubmission::find($partial->id()));
+        $this->assertEquals($partial, $form->submission($partial->id()));
+    }
+
+    #[Test]
+    public function the_form_query_does_not_filter_by_status_by_default()
+    {
+        $form = $this->createSubmissionsWithStatuses();
+
+        $this->assertEquals(['a', 'b', 'c', 'd'], $this->ids($form->querySubmissions()->get()));
+        $this->assertEquals(['a', 'b', 'c', 'd'], $this->ids($form->submissions()));
+        $this->assertEquals(['b', 'd'], $this->ids($form->querySubmissions()->whereStatus('partial')->get()));
+    }
 }
