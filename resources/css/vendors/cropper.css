@@ -1,0 +1,28 @@
+/* CROPPER
+=================================================== */
+/* Where the crop box touches the edge of the image, draw its border inside it so it isn't clipped, and make the handles more obvious. */
+.crop-editor-canvas {
+    .cropper-crop-box::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border: 0 solid #39f;
+        pointer-events: none;
+    }
+
+    &.at-top .cropper-crop-box::before { border-top-width: 2px; }
+    &.at-right .cropper-crop-box::before { border-right-width: 2px; }
+    &.at-bottom .cropper-crop-box::before { border-bottom-width: 2px; }
+    &.at-left .cropper-crop-box::before { border-left-width: 2px; }
+
+    &.at-top :is(.point-n, .point-ne, .point-nw),
+    &.at-right :is(.point-e, .point-ne, .point-se),
+    &.at-bottom :is(.point-s, .point-se, .point-sw),
+    &.at-left :is(.point-w, .point-nw, .point-sw) {
+        width: 6px;
+        height: 6px;
+        background-color: #39f;
+        box-shadow: 0 0 0 1px #fff;
+        opacity: 1;
+    }
+}

@@ -639,30 +639,3 @@ function close() {
         </div>
     </Stack>
 </template>
-
-<style>
-/* Where the crop box touches the edge of the image, draw its border inside it so it isn't clipped, and make the handles more obvious. */
-.crop-editor-canvas .cropper-crop-box::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border: 0 solid #39f;
-    pointer-events: none;
-}
-
-.crop-editor-canvas.at-top .cropper-crop-box::before { border-top-width: 2px; }
-.crop-editor-canvas.at-right .cropper-crop-box::before { border-right-width: 2px; }
-.crop-editor-canvas.at-bottom .cropper-crop-box::before { border-bottom-width: 2px; }
-.crop-editor-canvas.at-left .cropper-crop-box::before { border-left-width: 2px; }
-
-.crop-editor-canvas.at-top :is(.point-n, .point-ne, .point-nw),
-.crop-editor-canvas.at-right :is(.point-e, .point-ne, .point-se),
-.crop-editor-canvas.at-bottom :is(.point-s, .point-se, .point-sw),
-.crop-editor-canvas.at-left :is(.point-w, .point-nw, .point-sw) {
-    width: 6px;
-    height: 6px;
-    background-color: #39f;
-    box-shadow: 0 0 0 1px #fff;
-    opacity: 1;
-}
-</style>
