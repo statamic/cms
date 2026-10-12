@@ -19,8 +19,8 @@
     &.at-right :is(.point-e, .point-ne, .point-se),
     &.at-bottom :is(.point-s, .point-se, .point-sw),
     &.at-left :is(.point-w, .point-nw, .point-sw) {
-        width: 6px;
-        height: 6px;
+        min-width: 6px;
+        min-height: 6px;
         background-color: #39f;
         box-shadow: 0 0 0 1px #fff;
         opacity: 1;
