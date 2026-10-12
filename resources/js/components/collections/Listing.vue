@@ -41,7 +41,7 @@
                                     <DropdownItem v-if="collection.editable" :text="__('Configure')" icon="cog" :href="collection.edit_url" />
                                     <DropdownItem v-if="collection.blueprint_editable" :text="__('Edit Blueprints')" icon="blueprint-edit" :href="collection.blueprints_url" />
                                     <DropdownItem v-if="collection.editable" :text="__('Scaffold Views')" icon="scaffold" :href="collection.scaffold_url" />
-                                    <DropdownSeparator v-if="shouldShowSkeleton || actions.length" />
+                                    <DropdownSeparator v-if="(collection.available_in_selected_site || collection.editable || collection.blueprint_editable) && (shouldShowSkeleton || actions.length)" />
                                     <template v-if="shouldShowSkeleton">
                                         <div v-for="index in 3" :key="index" class="contents">
                                             <ui-skeleton class="m-1 size-5" />
