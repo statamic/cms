@@ -105,6 +105,24 @@ class MarkAsNotSpamTest extends TestCase
     }
 
     #[Test]
+    public function it_only_authorizes_spam_submissions()
+    {
+        $this->setTestRoles(['global' => ['view form submissions', 'manage form spam']]);
+
+        $super = tap(User::make()->makeSuper())->save();
+        $user = tap(User::make()->assignRole('global'))->save();
+        $spam = $this->form->makeSubmission()->markAsSpam();
+        $submission = $this->form->makeSubmission();
+        $partial = $this->form->makeSubmission()->asPartial();
+
+        foreach ([$super, $user] as $u) {
+            $this->assertTrue((new MarkAsNotSpam)->authorize($u, $spam));
+            $this->assertFalse((new MarkAsNotSpam)->authorize($u, $submission));
+            $this->assertFalse((new MarkAsNotSpam)->authorize($u, $partial));
+        }
+    }
+
+    #[Test]
     public function it_is_only_visible_to_spam_submissions()
     {
         $submission = $this->form->makeSubmission();

@@ -23,7 +23,7 @@ class MarkAsNotSpam extends Action
 
     public function authorize($user, $item)
     {
-        return $user->can('markAsNotSpam', $item);
+        return $item->isSpam() && $user->can('markAsNotSpam', $item);
     }
 
     public function buttonText()
