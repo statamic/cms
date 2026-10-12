@@ -359,6 +359,191 @@ class SubmitFormTest extends TestCase
     }
 
     #[Test]
+    public function it_stores_a_submission_marked_as_spam_by_an_event_listener()
+    {
+        Bus::fake();
+        Event::fake([SubmissionFinalized::class]);
+
+        Event::listen(FormSubmitted::class, fn ($event) => $event->submission->markAsSpam());
+
+        $action = $this->action();
+
+        try {
+            $action->submit(['email' => 'test@example.com']);
+
+            $this->fail('Expected SilentFormFailureException was not thrown');
+        } catch (SilentFormFailureException $e) {
+            // Expected
+        }
+
+        $this->assertCount(1, $this->form->submissions());
+        $this->assertTrue($this->form->submissions()->first()->isSpam());
+        $this->assertTrue($action->submission()->isSpam());
+
+        Event::assertNotDispatched(SubmissionFinalized::class);
+        Bus::assertNotDispatched(SendEmails::class);
+    }
+
+    #[Test]
+    public function it_does_not_store_a_submission_marked_as_spam_by_an_event_listener_when_the_form_does_not_store_submissions()
+    {
+        $this->form->store(false)->save();
+
+        Event::listen(FormSubmitted::class, fn ($event) => $event->submission->markAsSpam());
+
+        try {
+            $this->action()->submit(['email' => 'test@example.com']);
+
+            $this->fail('Expected SilentFormFailureException was not thrown');
+        } catch (SilentFormFailureException $e) {
+            // Expected
+        }
+
+        $this->assertCount(0, $this->form->submissions());
+    }
+
+    #[Test]
+    public function it_keeps_uploaded_files_when_an_event_listener_marks_a_submission_as_spam()
+    {
+        Bus::fake();
+
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $form = $this->uploadForm();
+        $action = app(SubmitForm::class)->form($form)->page('main');
+
+        Event::listen(FormSubmitted::class, fn ($event) => $event->submission->markAsSpam());
+
+        try {
+            $action->submit(
+                data: ['email' => 'test@example.com'],
+                files: ['avatar' => [UploadedFile::fake()->image('avatar.jpg')]],
+            );
+        } catch (SilentFormFailureException $e) {
+            // Expected
+        }
+
+        Storage::disk('local')->assertExists('statamic/form-uploads/'.$action->submission()->get('avatar')[0]);
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function it_removes_uploaded_files_when_an_event_listener_marks_a_submission_as_spam_and_the_form_does_not_store_submissions()
+    {
+        Bus::fake();
+
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $form = $this->uploadForm();
+        $form->store(false)->save();
+        $action = app(SubmitForm::class)->form($form)->page('main');
+
+        Event::listen(FormSubmitted::class, fn ($event) => $event->submission->markAsSpam());
+
+        try {
+            $action->submit(
+                data: ['email' => 'test@example.com'],
+                files: ['avatar' => [UploadedFile::fake()->image('avatar.jpg')]],
+            );
+        } catch (SilentFormFailureException $e) {
+            // Expected
+        }
+
+        $this->assertCount(0, $form->submissions());
+        $this->assertNull(Asset::find('avatars::'.$action->submission()->get('avatar')[0]));
+    }
+
+    #[Test]
+    public function it_stores_one_spam_submission_when_an_event_listener_marks_it_as_spam_saves_and_returns_false()
+    {
+        Event::listen(FormSubmitted::class, function ($event) {
+            $event->submission->markAsSpam()->save();
+
+            return false;
+        });
+
+        try {
+            $this->action()->submit(['email' => 'test@example.com']);
+
+            $this->fail('Expected SilentFormFailureException was not thrown');
+        } catch (SilentFormFailureException $e) {
+            // Expected
+        }
+
+        $this->assertCount(1, $this->form->submissions());
+        $this->assertTrue($this->form->submissions()->first()->isSpam());
+    }
+
+    #[Test]
+    public function it_does_not_store_a_submission_when_an_event_listener_returns_false_without_marking_it_as_spam()
+    {
+        Event::listen(FormSubmitted::class, fn () => false);
+
+        try {
+            $this->action()->submit(['email' => 'test@example.com']);
+
+            $this->fail('Expected SilentFormFailureException was not thrown');
+        } catch (SilentFormFailureException $e) {
+            // Expected
+        }
+
+        $this->assertCount(0, $this->form->submissions());
+    }
+
+    #[Test]
+    public function it_stores_a_multi_page_submission_marked_as_spam_by_an_event_listener_on_the_final_page()
+    {
+        $form = $this->multiPageForm();
+
+        Event::listen(FormSubmitted::class, fn ($event) => $event->submission->markAsSpam());
+
+        $result = app(SubmitForm::class)->form($form)->page('one')->submit(['name' => 'Olaf']);
+        $result = app(SubmitForm::class)->form($form)->page('two')->resume($result->submission)->submit(['email' => 'olaf@example.com']);
+
+        $action = app(SubmitForm::class)->form($form)->page('three')->resume($result->submission);
+
+        try {
+            $action->submit(['message' => 'Hello']);
+
+            $this->fail('Expected SilentFormFailureException was not thrown');
+        } catch (SilentFormFailureException $e) {
+            // Expected
+        }
+
+        $this->assertCount(1, $form->submissions());
+        $this->assertTrue($form->submissions()->first()->isSpam());
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function it_deletes_the_persisted_partial_when_a_multi_page_submission_is_marked_as_spam_and_the_form_does_not_store_submissions()
+    {
+        $form = $this->multiPageForm();
+        $form->store(false)->save();
+
+        Event::listen(FormSubmitted::class, fn ($event) => $event->submission->markAsSpam());
+
+        $result = app(SubmitForm::class)->form($form)->page('one')->submit(['name' => 'Olaf']);
+        $result = app(SubmitForm::class)->form($form)->page('two')->resume($result->submission)->submit(['email' => 'olaf@example.com']);
+
+        $this->assertCount(1, $form->submissions());
+
+        try {
+            app(SubmitForm::class)->form($form)->page('three')->resume($result->submission)->submit(['message' => 'Hello']);
+
+            $this->fail('Expected SilentFormFailureException was not thrown');
+        } catch (SilentFormFailureException $e) {
+            // Expected
+        }
+
+        $this->assertCount(0, $form->submissions());
+    }
+
+    #[Test]
     public function it_throws_validation_exception_from_event_listener()
     {
         Event::listen(FormSubmitted::class, function () {

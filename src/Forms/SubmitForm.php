@@ -86,13 +86,19 @@ class SubmitForm
 
             if ($this->shouldFinalize($nextPage)) {
                 if (Arr::get($values, $this->form->honeypot())) {
+                    $this->rejectHoneypotSubmission();
+                }
+
+                $accepted = FormSubmitted::dispatch($this->submission) !== false;
+
+                if ($this->submission->isSpam()) {
                     $this->rejectSpamSubmission();
                 }
 
-                throw_if(FormSubmitted::dispatch($this->submission) === false, new SilentFormFailureException);
+                throw_unless($accepted, new SilentFormFailureException);
             }
         } catch (ValidationException|SilentFormFailureException $e) {
-            if (! $this->submission?->isSpam()) {
+            if (! ($this->submission?->isSpam() && $this->form->store())) {
                 $this->removeUploadedAssets($uploadedAssets);
             }
 
@@ -180,13 +186,23 @@ class SubmitForm
             ->all();
     }
 
+    private function rejectHoneypotSubmission(): void
+    {
+        if ($this->form->get('honeypot_behavior', 'ignore') === 'mark_as_spam') {
+            $this->submission->markAsSpam();
+        }
+
+        $this->rejectSpamSubmission();
+    }
+
     private function rejectSpamSubmission(): void
     {
-        if (
-            $this->form->get('honeypot_behavior', 'ignore') === 'mark_as_spam'
-            && $this->form->store()
-        ) {
-            $this->submission->markAsSpam()->save();
+        if ($this->form->store()) {
+            if ($this->submission->isSpam()) {
+                $this->submission->save();
+            }
+        } elseif ($this->form->submission($this->submission->id())) {
+            $this->submission->deleteQuietly();
         }
 
         throw new SilentFormFailureException;
