@@ -12,7 +12,7 @@ import { Icon } from '@ui';
             w-8 sm:w-auto sm:min-w-32 sm:px-2 md:py-[calc(5/16*1rem)]
             hover:bg-black/45 hover:text-white/70
         ">
-            <Icon name="search-ai" class="size-5 p-[3px] flex-none text-white/50 group-hover:text-white/70" />
+            <Icon name="search-ai" class="size-5 p-[2.5px] flex-none text-white/50 group-hover:text-white/70" />
             <span class="sr-only leading-none sm:not-sr-only st-text-trim-cap">{{ __('Search or Ask') }}</span>
             <kbd class="ml-auto md:ml-3 hidden self-center rounded-md bg-white/5 px-[0.3125rem] py-[0.0625rem] text-[0.625rem]/4 font-medium text-white/60 group-hover:text-white/70 ring-1 ring-white/7.5 [word-spacing:-0.15em] ring-inset md:block">
                 <kbd class="font-sans">⌘ </kbd><kbd class="font-sans">K</kbd>
