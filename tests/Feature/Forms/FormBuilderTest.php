@@ -488,12 +488,8 @@ class FormBuilderTest extends TestCase
             'starts with an underscore' => ['_partial'],
             'reserved word' => ['if'],
             'reserved forms word: date' => ['date'],
-            'reserved forms word: entry' => ['entry'],
             'reserved forms word: message' => ['message'],
             'reserved forms word: messages' => ['messages'],
-            'reserved forms word: partial' => ['partial'],
-            'reserved forms word: site' => ['site'],
-            'reserved forms word: spam' => ['spam'],
         ];
     }
 
@@ -541,6 +537,7 @@ class FormBuilderTest extends TestCase
         return [
             'partial' => ['partial'],
             'site' => ['site'],
+            'spam' => ['spam'],
         ];
     }
 
