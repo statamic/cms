@@ -20,12 +20,12 @@ class MarkAsSpam extends Action
 
     public function visibleTo($item)
     {
-        return $item instanceof Submission && ! $item->isSpam();
+        return $item instanceof Submission && ! $item->isSpam() && ! $item->isPartial();
     }
 
     public function authorize($user, $item)
     {
-        return $user->can('markAsSpam', $item);
+        return ! $item->isPartial() && $user->can('markAsSpam', $item);
     }
 
     public function buttonText()

@@ -56,6 +56,40 @@ class MarkAsSpamTest extends TestCase
     }
 
     #[Test]
+    public function it_is_not_visible_to_partial_submissions()
+    {
+        $partial = $this->form->makeSubmission()->asPartial();
+        $honeypot = $this->form->makeSubmission()->asPartial()->markAsSpam();
+
+        $this->assertFalse((new MarkAsSpam)->visibleTo($partial));
+        $this->assertFalse((new MarkAsSpam)->visibleTo($honeypot));
+    }
+
+    #[Test]
+    public function it_is_not_authorized_for_partial_submissions_even_for_super_users()
+    {
+        $user = tap(User::make()->makeSuper())->save();
+        $partial = tap($this->form->makeSubmission()->asPartial()->data(['name' => 'Olaf']))->save();
+        $finalized = tap($this->form->makeSubmission()->data(['name' => 'Olaf']))->save();
+
+        $this->assertFalse((new MarkAsSpam)->authorize($user, $partial));
+        $this->assertTrue((new MarkAsSpam)->authorize($user, $finalized));
+    }
+
+    #[Test]
+    public function it_is_not_available_in_bulk_when_the_selection_includes_a_partial_submission()
+    {
+        $user = tap(User::make()->makeSuper())->save();
+        $partial = tap($this->form->makeSubmission()->asPartial()->data(['name' => 'Olaf']))->save();
+        $finalized = tap($this->form->makeSubmission()->data(['name' => 'Anna']))->save();
+
+        $this->assertTrue((new MarkAsSpam)->visibleToBulk(collect([$finalized])));
+        $this->assertTrue((new MarkAsSpam)->authorizeBulk($user, collect([$finalized])));
+        $this->assertFalse((new MarkAsSpam)->visibleToBulk(collect([$finalized, $partial])));
+        $this->assertFalse((new MarkAsSpam)->authorizeBulk($user, collect([$finalized, $partial])));
+    }
+
+    #[Test]
     public function it_requires_permission_to_view_submissions()
     {
         $this->setTestRoles([
