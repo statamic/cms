@@ -349,7 +349,7 @@ router.on('start', () => Statamic.$commandPalette.clear());
                             <Icon name="magnifying-glass" class="size-5 text-gray-400" />
                             <ComboboxInput
                                 :auto-focus="true"
-                                :placeholder="__('Search or jump to...')"
+                                :placeholder="__('Ask, search, or jump to...')"
                                 v-model="query"
                                 class="flex w-full bg-transparent py-4 text-lg antialiased outline-none placeholder:text-gray-500!"
                             />
