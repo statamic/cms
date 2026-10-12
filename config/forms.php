@@ -78,9 +78,9 @@ return [
     |--------------------------------------------------------------------------
     |
     | Spam submissions are automatically deleted after a set number of days.
-    | Their file uploads are kept for the same period, so that submissions
-    | marked as not spam can still be finalized. Set this to null to
-    | prevent their automatic deletion.
+    | Files uploaded through form upload fields are kept for the same
+    | period, so that submissions marked as not spam can still be
+    | finalized. Set this to null to prevent their deletion.
     |
     */
 
