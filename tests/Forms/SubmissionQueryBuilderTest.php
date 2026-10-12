@@ -3,7 +3,6 @@
 namespace Tests\Forms;
 
 use Illuminate\Support\Collection;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Facades\Form;
@@ -463,36 +462,64 @@ class SubmissionQueryBuilderTest extends TestCase
         $this->assertEquals(['b', 'c'], $submissions->map->get('id')->all());
     }
 
-    #[Test]
-    #[DataProvider('filterByStatusProvider')]
-    public function it_filters_by_status(string $status, array $expected)
+    private function createSubmissionsWithStatuses()
     {
         $form = tap(Form::make('test'))->save();
-        FormSubmission::make()->form($form)->data(['id' => 'finalized'])->save();
-        FormSubmission::make()->form($form)->data(['id' => 'partial'])->asPartial()->save();
-        FormSubmission::make()->form($form)->data(['id' => 'spam'])->markAsSpam()->save();
-        FormSubmission::make()->form($form)->data(['id' => 'spam-partial'])->asPartial()->markAsSpam()->save();
+        FormSubmission::make()->form($form)->data(['ref' => 'a'])->save();
+        FormSubmission::make()->form($form)->data(['ref' => 'b', 'partial' => true])->save();
+        FormSubmission::make()->form($form)->data(['ref' => 'c'])->save();
+        FormSubmission::make()->form($form)->data(['ref' => 'd', 'partial' => true])->save();
+        FormSubmission::make()->form($form)->data(['ref' => 'e', 'spam' => true])->save();
+        FormSubmission::make()->form($form)->data(['ref' => 'f', 'partial' => true, 'spam' => true])->save();
 
-        $submissions = FormSubmission::query()->whereStatus($status)->get();
-
-        $this->assertEquals($expected, $submissions->map->get('id')->sort()->values()->all());
+        return $form;
     }
 
-    public static function filterByStatusProvider(): array
+    private function ids($submissions)
     {
-        return [
-            'any' => ['any', ['finalized', 'partial', 'spam', 'spam-partial']],
-            'finalized' => ['finalized', ['finalized']],
-            'partial' => ['partial', ['partial']],
-            'spam' => ['spam', ['spam', 'spam-partial']],
-        ];
+        return $submissions->map->get('ref')->sort()->values()->all();
     }
 
     #[Test]
-    public function filtering_by_unexpected_status_throws_exception()
+    public function it_filters_by_status()
+    {
+        $this->createSubmissionsWithStatuses();
+
+        $this->assertEquals(['a', 'c'], $this->ids(FormSubmission::query()->whereStatus('finalized')->get()));
+        $this->assertEquals(['b', 'd'], $this->ids(FormSubmission::query()->whereStatus('partial')->get()));
+        $this->assertEquals(['e', 'f'], $this->ids(FormSubmission::query()->whereStatus('spam')->get()));
+        $this->assertEquals(['a', 'b', 'c', 'd', 'e', 'f'], $this->ids(FormSubmission::query()->whereStatus('any')->get()));
+    }
+
+    #[Test]
+    public function it_throws_an_exception_for_an_invalid_status()
     {
         $this->expectExceptionMessage('Invalid status [foo]');
 
-        FormSubmission::query()->whereStatus('foo')->get();
+        FormSubmission::query()->whereStatus('foo');
+    }
+
+    #[Test]
+    public function the_repository_query_does_not_filter_by_status_by_default()
+    {
+        $form = $this->createSubmissionsWithStatuses();
+
+        $this->assertEquals(['a', 'b', 'c', 'd', 'e', 'f'], $this->ids(FormSubmission::query()->get()));
+        $this->assertEquals(['a', 'b', 'c', 'd', 'e', 'f'], $this->ids(FormSubmission::all()));
+        $this->assertEquals(['a', 'b', 'c', 'd', 'e', 'f'], $this->ids(FormSubmission::whereForm('test')));
+
+        $partial = FormSubmission::query()->where('partial', true)->first();
+        $this->assertEquals($partial, FormSubmission::find($partial->id()));
+        $this->assertEquals($partial, $form->submission($partial->id()));
+    }
+
+    #[Test]
+    public function the_form_query_does_not_filter_by_status_by_default()
+    {
+        $form = $this->createSubmissionsWithStatuses();
+
+        $this->assertEquals(['a', 'b', 'c', 'd', 'e', 'f'], $this->ids($form->querySubmissions()->get()));
+        $this->assertEquals(['a', 'b', 'c', 'd', 'e', 'f'], $this->ids($form->submissions()));
+        $this->assertEquals(['b', 'd'], $this->ids($form->querySubmissions()->whereStatus('partial')->get()));
     }
 }

@@ -32,11 +32,7 @@ class SubmissionStatus extends Filter
 
     public function apply($query, $values)
     {
-        match ($values['status']) {
-            'partial' => $query->where('partial', true)->where('spam', '!=', true),
-            'spam' => $query->where('spam', true),
-            default => $query->where('partial', '!=', true)->where('spam', '!=', true),
-        };
+        $query->whereStatus($values['status']);
     }
 
     public function badge($values)

@@ -16,6 +16,7 @@ use Statamic\Events\SubmissionFinalized;
 use Statamic\Events\SubmissionSaved;
 use Statamic\Events\SubmissionSaving;
 use Statamic\Facades\Form;
+use Statamic\Facades\FormSubmission;
 use Statamic\Facades\Site;
 use Statamic\Forms\Connectors\Webhooks\SendWebhook;
 use Statamic\Forms\CreateAssetsFromFileUploads;
@@ -580,5 +581,18 @@ class SubmissionTest extends TestCase
 
         $this->assertEquals('A', $submission->getSupplement('bar'));
         $this->assertEquals('B', $clone->getSupplement('bar'));
+    }
+
+    #[Test]
+    public function deleting_the_form_deletes_partial_submissions_too()
+    {
+        $form = tap(Form::make('contact_us'))->save();
+        $finalized = tap($form->makeSubmission())->save();
+        $partial = tap($form->makeSubmission()->asPartial())->save();
+
+        $form->delete();
+
+        $this->assertNull(FormSubmission::find($finalized->id()));
+        $this->assertNull(FormSubmission::find($partial->id()));
     }
 }

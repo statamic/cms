@@ -40,47 +40,31 @@ EOT
     }
 
     #[Test]
-    public function it_excludes_spam_and_partial_submissions_by_default()
+    public function it_only_renders_finalized_submissions_by_default()
     {
         $this->createSubmissions();
 
-        $output = $this->tag('{{ form:submissions in="contact" }}{{ message }},{{ /form:submissions }}');
+        $output = $this->tag('{{ form:submissions in="contact" }}[{{ message }}]{{ /form:submissions }}');
 
-        $this->assertStringContainsString('finalized,', $output);
-        $this->assertStringNotContainsString('partial,', $output);
-        $this->assertStringNotContainsString('spam,', $output);
+        $this->assertEquals('[finalized]', trim($output));
     }
 
     #[Test]
-    public function it_includes_spam_submissions_when_the_status_is_queried()
+    public function it_renders_submissions_filtered_by_status()
     {
         $this->createSubmissions();
 
-        $output = $this->tag('{{ form:submissions in="contact" status:is="spam" }}{{ message }},{{ /form:submissions }}');
-
-        $this->assertStringContainsString('spam,', $output);
-        $this->assertStringNotContainsString('finalized,', $output);
-        $this->assertStringNotContainsString('partial,', $output);
+        $this->assertEquals('[partial]', trim($this->tag('{{ form:submissions in="contact" status:is="partial" }}[{{ message }}]{{ /form:submissions }}')));
+        $this->assertEquals('[finalized]', trim($this->tag('{{ form:submissions in="contact" status:is="finalized" }}[{{ message }}]{{ /form:submissions }}')));
+        $this->assertEquals('[spam]', trim($this->tag('{{ form:submissions in="contact" status:is="spam" }}[{{ message }}]{{ /form:submissions }}')));
+        $this->assertEquals('[finalized][partial][spam]', trim($this->tag('{{ form:submissions in="contact" status:is="any" sort="message" }}[{{ message }}]{{ /form:submissions }}')));
     }
 
-    #[Test]
-    public function it_includes_all_submissions_when_any_status_is_queried()
-    {
-        $this->createSubmissions();
-
-        $output = $this->tag('{{ form:submissions in="contact" status:is="any" }}{{ message }},{{ /form:submissions }}');
-
-        $this->assertStringContainsString('finalized,', $output);
-        $this->assertStringContainsString('partial,', $output);
-        $this->assertStringContainsString('spam,', $output);
-    }
-
-    private function createSubmissions(): void
+    private function createSubmissions()
     {
         $form = Form::find('contact');
-
-        $form->makeSubmission()->data(['message' => 'finalized'])->save();
-        $form->makeSubmission()->data(['message' => 'partial'])->asPartial()->save();
-        $form->makeSubmission()->data(['message' => 'spam'])->markAsSpam()->save();
+        $form->makeSubmission()->data(['email' => 'san@holo.com', 'message' => 'finalized'])->save();
+        $form->makeSubmission()->data(['email' => 'foba@bett.com', 'message' => 'partial'])->asPartial()->save();
+        $form->makeSubmission()->data(['email' => 'spam@bot.com', 'message' => 'spam'])->markAsSpam()->save();
     }
 }

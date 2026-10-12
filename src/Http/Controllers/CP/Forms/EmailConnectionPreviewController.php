@@ -60,7 +60,7 @@ class EmailConnectionPreviewController extends CpController
             return null;
         }
 
-        return $form->querySubmissions()->whereNull('partial')->orderBy('date', 'desc')->first();
+        return $form->querySubmissions()->whereStatus('finalized')->orderBy('date', 'desc')->first();
     }
 
     private function sampleSubmission(Form $form, FakeSubmissionGenerator $generator): Submission

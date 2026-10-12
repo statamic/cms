@@ -282,4 +282,23 @@ class ViewFormListingTest extends TestCase
         $submission->data(['name' => 'John Doe']);
         $submission->save();
     }
+
+    #[Test]
+    public function it_excludes_partial_submissions_from_the_submission_count()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'view form submissions']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+        $form = tap(Form::make('test'))->save();
+        $this->makeSubmission($form);
+        $form->makeSubmission()->asPartial()->save();
+
+        $this
+            ->actingAs($user)
+            ->get(cp_route('forms.index'))
+            ->assertSuccessful()
+            ->assertInertia(fn ($page) => $page
+                ->component('forms/Index')
+                ->where('forms.0.submissions', 1)
+            );
+    }
 }
