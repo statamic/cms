@@ -466,9 +466,9 @@ class SubmissionQueryBuilderTest extends TestCase
     {
         $form = tap(Form::make('test'))->save();
         FormSubmission::make()->form($form)->data(['ref' => 'a'])->save();
-        FormSubmission::make()->form($form)->data(['ref' => 'b', 'partial' => true])->save();
+        FormSubmission::make()->form($form)->data(['ref' => 'b', '_partial' => true])->save();
         FormSubmission::make()->form($form)->data(['ref' => 'c'])->save();
-        FormSubmission::make()->form($form)->data(['ref' => 'd', 'partial' => true])->save();
+        FormSubmission::make()->form($form)->data(['ref' => 'd', '_partial' => true])->save();
 
         return $form;
     }
@@ -489,6 +489,23 @@ class SubmissionQueryBuilderTest extends TestCase
     }
 
     #[Test]
+    public function it_filters_by_site()
+    {
+        $this->setSites([
+            'en' => ['url' => '/'],
+            'fr' => ['url' => '/fr'],
+        ]);
+
+        $form = tap(Form::make('test'))->save();
+        FormSubmission::make()->form($form)->data(['ref' => 'a'])->site('en')->save();
+        FormSubmission::make()->form($form)->data(['ref' => 'b'])->site('fr')->save();
+        FormSubmission::make()->form($form)->data(['ref' => 'c'])->site('fr')->save();
+
+        $this->assertEquals(['b', 'c'], $this->ids(FormSubmission::query()->where('site', 'fr')->get()));
+        $this->assertEquals(['a'], $this->ids(FormSubmission::query()->where('site', 'en')->get()));
+    }
+
+    #[Test]
     public function it_throws_an_exception_for_an_invalid_status()
     {
         $this->expectExceptionMessage('Invalid status [foo]');
@@ -505,7 +522,7 @@ class SubmissionQueryBuilderTest extends TestCase
         $this->assertEquals(['a', 'b', 'c', 'd'], $this->ids(FormSubmission::all()));
         $this->assertEquals(['a', 'b', 'c', 'd'], $this->ids(FormSubmission::whereForm('test')));
 
-        $partial = FormSubmission::query()->where('partial', true)->first();
+        $partial = FormSubmission::query()->where('_partial', true)->first();
         $this->assertEquals($partial, FormSubmission::find($partial->id()));
         $this->assertEquals($partial, $form->submission($partial->id()));
     }

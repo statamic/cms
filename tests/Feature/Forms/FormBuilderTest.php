@@ -485,10 +485,58 @@ class FormBuilderTest extends TestCase
         return [
             'starts with a number' => ['1invalid'],
             'invalid characters' => ['not valid'],
+            'starts with an underscore' => ['_partial'],
             'reserved word' => ['if'],
             'reserved forms word: date' => ['date'],
             'reserved forms word: message' => ['message'],
             'reserved forms word: messages' => ['messages'],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('internalSubmissionKeyHandles')]
+    public function it_allows_handles_matching_internal_submission_keys_without_the_underscore($handle)
+    {
+        $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
+        $user = User::make()->assignRole('test')->save();
+        $form = tap(Form::make('test'))->save();
+
+        $payload = [
+            'pages' => [
+                [
+                    '_id' => 'page1',
+                    'sections' => [
+                        [
+                            '_id' => 'section1',
+                            'display' => 'Section',
+                            'fields' => [
+                                [
+                                    '_id' => 'field1',
+                                    'handle' => $handle,
+                                    'type' => 'inline',
+                                    'fieldtype' => 'short_answer',
+                                    'config' => ['type' => 'short_answer', 'display' => 'Name'],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this
+            ->actingAs($user)
+            ->patch(cp_route('forms.builder.update', $form->handle()), $payload)
+            ->assertSessionHasNoErrors();
+
+        $this->assertTrue(Form::find('test')->blueprint()->hasField($handle));
+    }
+
+    public static function internalSubmissionKeyHandles(): array
+    {
+        return [
+            'partial' => ['partial'],
+            'site' => ['site'],
         ];
     }
 

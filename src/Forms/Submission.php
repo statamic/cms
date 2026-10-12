@@ -74,9 +74,9 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
         $data = collect($data);
 
         // A full data replacement would otherwise drop the internal lifecycle
-        // keys, so carry over the existing partial and site values unless the
+        // keys, so carry over the existing _partial and _site values unless the
         // incoming payload provides its own.
-        foreach (['partial', 'site'] as $key) {
+        foreach (['_partial', '_site'] as $key) {
             if ($this->has($key) && ! $data->has($key)) {
                 $data[$key] = $this->get($key);
             }
@@ -121,10 +121,10 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
     public function site(Site|string|null $site = null): Site|static
     {
         if (func_num_args() === 0) {
-            return Sites::get($this->get('site')) ?? Sites::default();
+            return Sites::get($this->get('_site')) ?? Sites::default();
         }
 
-        $this->set('site', $site instanceof Site ? $site->handle() : $site);
+        $this->set('_site', $site instanceof Site ? $site->handle() : $site);
 
         return $this;
     }
@@ -161,14 +161,14 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
 
     public function asPartial(): self
     {
-        $this->set('partial', true);
+        $this->set('_partial', true);
 
         return $this;
     }
 
     public function isPartial(): bool
     {
-        return (bool) $this->get('partial');
+        return (bool) $this->get('_partial');
     }
 
     public function status(): string
@@ -258,7 +258,7 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
             return $this;
         }
 
-        $this->remove('partial');
+        $this->remove('_partial');
 
         if ($this->form()->store()) {
             $this->save();
