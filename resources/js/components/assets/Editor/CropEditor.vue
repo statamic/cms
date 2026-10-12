@@ -507,7 +507,7 @@ function close() {
 
             <!-- Content -->
             <div class="bg-gray-300 p-3 inset-shadow-xs dark:bg-gray-850 flex flex-1 flex-col overflow-auto relative min-h-0 w-full items-center justify-center" role="img" :aria-label="__('Image crop area')">
-                <div :class="cropEdges" class="crop-editor-canvas h-full w-full min-h-0 flex items-center justify-center overflow-hidden">
+                <div :class="cropEdges" class="crop-editor-canvas h-full w-full min-h-0 flex items-center justify-center">
                     <img ref="image" :src="asset.preview" :crossorigin="crossOrigin" :alt="__('Image to crop')" class="max-w-full max-h-full" @error="onImageError" />
                 </div>
                 <div
