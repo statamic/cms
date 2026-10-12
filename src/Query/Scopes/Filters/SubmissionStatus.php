@@ -32,10 +32,7 @@ class SubmissionStatus extends Filter
 
     public function apply($query, $values)
     {
-        match ($values['status']) {
-            'partial' => $query->where('partial', true),
-            default => $query->where('partial', '!=', true),
-        };
+        $query->whereStatus($values['status']);
     }
 
     public function badge($values)
