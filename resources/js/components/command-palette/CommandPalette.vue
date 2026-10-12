@@ -356,7 +356,7 @@ router.on('start', () => Statamic.$commandPalette.clear());
                         @highlight="highlighted = $event?.value"
                     >
                         <header class="group/cmd-input flex h-14 items-center gap-2 border-b border-gray-200/80 px-5.5 dark:border-gray-950">
-                            <Icon :name="askMock ? 'ai-chat' : 'magnifying-glass'" class="size-5 translate-y-0.75 text-gray-400" />
+                            <Icon :name="askMock ? 'ai-chat' : 'magnifying-glass'" :class="['size-5 text-gray-400', { 'translate-y-0.5': askMock }]" />
                             <ComboboxInput
                                 :auto-focus="true"
                                 :placeholder="__('Ask, search, or jump to...')"
@@ -376,7 +376,7 @@ router.on('start', () => Statamic.$commandPalette.clear());
                                             :key="src"
                                             type="button"
                                             @click="askMockSelected = i"
-                                            :class="['aspect-video overflow-hidden rounded-lg outline', askMockSelected === i ? 'outline-3 outline-primary' : 'outline-gray-300 hover:outline-gray-400 dark:outline-gray-700']"
+                                            :class="['aspect-video overflow-hidden rounded-lg outline', askMockSelected === i ? 'outline-3 outline-primary' : 'outline-transparent hover:outline-gray-300 dark:hover:outline-gray-600']"
                                         >
                                             <img :src="src" class="size-full object-cover" alt="" />
                                         </button>
