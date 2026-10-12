@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14" id="Search-Comment-History--Streamline-Flex">
+  <desc>
+    Search Comment History Streamline Icon: https://streamlinehq.com
+  </desc>
+  <g id="search-comment-history">
+    <path id="Union" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="M5.88383 0.76461C4.76608 0.793884 3.67132 0.866599 2.6122 0.977842c-0.8343 0.087628 -1.512 0.714328 -1.631892 1.544598C0.828721 3.57222 0.75 4.66871 0.75 5.78305c0 1.07632 0.078692 2.12195 0.220278 3.13902 0.123732 0.88882 0.874712 1.54243 1.768252 1.62553 0.07199 0.0067 0.14412 0.0135 0.2164 0.0202 0.2252 0.021 0.45179 0.0422 0.67969 0.0628V13.25c1.40557 -0.6313 2.20974 -1.2276 3.25862 -2.4341 0.03557 0.0001 0.07115 0.0002 0.10676 0.0002 1.48748 0 2.92775 -0.0899 4.3248 -0.2318 0.8647 -0.0879 1.5648 -0.7447 1.6863 -1.6053 0.0161 -0.11382 0.0315 -0.22802 0.0462 -0.34259" stroke-width="1"></path>
+    <path id="Vector" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="m13.5 6.49997 -1.187 -1.1871" stroke-width="1"></path>
+    <path id="Vector_2" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="M10.2505 6c1.76 0 2.75 -0.99 2.75 -2.75s-0.99 -2.75 -2.75 -2.75c-1.76001 0 -2.75001 0.99 -2.75001 2.75S8.49049 6 10.2505 6Z" stroke-width="1"></path>
+  </g>
+</svg>

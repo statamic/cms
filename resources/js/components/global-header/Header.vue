@@ -26,7 +26,7 @@ import UserDropdown from './UserDropdown.vue';
 
         <div class="dark flex-1 flex gap-1 md:gap-2 lg:gap-2 sm:gap-3 items-center justify-end shrink-0">
             <SiteSelector />
-            <div class="flex items-center">
+            <div class="flex shrink-0 items-center">
                 <Search />
             </div>
 	        <SupportButton />
