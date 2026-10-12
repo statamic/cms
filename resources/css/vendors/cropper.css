@@ -25,4 +25,15 @@
         box-shadow: 0 0 0 1px #fff;
         opacity: 1;
     }
+
+    /* Give the smaller handles _exactly_ the same drag area as the enlarged ones for consistent usability. */
+    .cropper-point::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 6px;
+        height: 6px;
+        translate: -50% -50%;
+    }
 }
