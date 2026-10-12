@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Actions\MarkAsNotSpam;
 use Statamic\Events\FormSubmitted;
 use Statamic\Events\SubmissionCreated;
 use Statamic\Events\SubmissionFinalized;
@@ -453,7 +454,7 @@ class SubmitFormTest extends TestCase
         }
 
         $this->assertCount(0, $form->submissions());
-        $this->assertNull(Asset::find('avatars::'.$action->submission()->get('avatar')[0]));
+        Storage::disk('local')->assertMissing('statamic/form-uploads/'.$action->submission()->get('avatar')[0]);
     }
 
     #[Test]
@@ -1068,6 +1069,276 @@ class SubmitFormTest extends TestCase
     }
 
     #[Test]
+    public function it_removes_assets_fieldtype_uploads_but_keeps_the_stored_spam_submission_from_a_honeypot()
+    {
+        Bus::fake();
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $form = $this->assetsForm(honeypot: true);
+        $form->data(['honeypot_behavior' => 'mark_as_spam'])->save();
+
+        $action = app(SubmitForm::class)->form($form)->page('main');
+
+        try {
+            $action->submit(
+                data: ['email' => 'test@example.com', 'winnie' => 'the pooh'],
+                files: ['photo' => [UploadedFile::fake()->image('photo.jpg')]],
+            );
+        } catch (SilentFormFailureException $e) {
+            // Expected
+        }
+
+        Storage::disk('avatars')->assertMissing('photo.jpg');
+        $this->assertCount(1, $form->submissions());
+        $this->assertTrue($form->submissions()->first()->isSpam());
+        $this->assertNull($form->submissions()->first()->get('photo'));
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function it_removes_assets_fieldtype_uploads_but_keeps_the_stored_spam_submission_from_a_listener()
+    {
+        Bus::fake();
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $form = $this->assetsForm();
+
+        Event::listen(FormSubmitted::class, fn ($event) => $event->submission->markAsSpam());
+
+        try {
+            app(SubmitForm::class)->form($form)->page('main')->submit(
+                data: ['email' => 'test@example.com'],
+                files: ['photo' => [UploadedFile::fake()->image('photo.jpg')]],
+            );
+        } catch (SilentFormFailureException $e) {
+            // Expected
+        }
+
+        Storage::disk('avatars')->assertMissing('photo.jpg');
+        $this->assertCount(1, $form->submissions());
+        $this->assertTrue($form->submissions()->first()->isSpam());
+        $this->assertNull($form->submissions()->first()->get('photo'));
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function it_can_mark_a_spam_submission_as_not_spam_after_its_assets_fieldtype_uploads_were_removed()
+    {
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $form = $this->assetsForm(withUpload: true);
+
+        Event::listen(FormSubmitted::class, fn ($event) => $event->submission->markAsSpam());
+
+        $action = app(SubmitForm::class)->form($form)->page('main');
+
+        try {
+            $action->submit(
+                data: ['email' => 'test@example.com'],
+                files: [
+                    'photo' => [UploadedFile::fake()->image('photo.jpg')],
+                    'avatar' => [UploadedFile::fake()->image('avatar.jpg')],
+                ],
+            );
+        } catch (SilentFormFailureException $e) {
+            // Expected
+        }
+
+        Storage::disk('avatars')->assertMissing('photo.jpg');
+        Storage::disk('local')->assertExists('statamic/form-uploads/'.$action->submission()->get('avatar')[0]);
+
+        $submission = $form->submissions()->first();
+        (new MarkAsNotSpam)->run(collect([$submission]), []);
+
+        $submission = $form->submission($submission->id());
+
+        $this->assertFalse($submission->isSpam());
+        $this->assertFalse($submission->isPartial());
+        $this->assertNull($submission->get('photo'));
+        Storage::disk('avatars')->assertExists('avatar.jpg');
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function it_removes_temporary_uploads_when_spam_is_discarded_by_a_listener_on_a_single_page_form()
+    {
+        Bus::fake();
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $form = $this->uploadForm();
+        $form->store(false)->save();
+
+        Event::listen(FormSubmitted::class, fn ($event) => $event->submission->markAsSpam());
+
+        $action = app(SubmitForm::class)->form($form)->page('main');
+
+        try {
+            $action->submit(
+                data: ['email' => 'test@example.com'],
+                files: ['avatar' => [UploadedFile::fake()->image('avatar.jpg')]],
+            );
+        } catch (SilentFormFailureException $e) {
+            // Expected
+        }
+
+        $id = $action->submission()->id();
+        Storage::disk('local')->assertMissing("statamic/form-uploads/{$id}/avatar/avatar.jpg");
+        $this->assertFalse(Storage::disk('local')->exists("statamic/form-uploads/{$id}"));
+    }
+
+    #[Test]
+    public function it_removes_earlier_pages_temporary_uploads_when_a_multi_page_submission_is_discarded_as_spam()
+    {
+        Bus::fake();
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $form = $this->multiPageUploadForm();
+        $form->store(false)->save();
+
+        Event::listen(FormSubmitted::class, fn ($event) => $event->submission->markAsSpam());
+
+        $result = app(SubmitForm::class)->form($form)->page('one')->submit(
+            data: [],
+            files: ['avatar' => [UploadedFile::fake()->image('avatar.jpg')]],
+        );
+
+        $id = $result->submission->id();
+        Storage::disk('local')->assertExists("statamic/form-uploads/{$id}/avatar/avatar.jpg");
+
+        try {
+            app(SubmitForm::class)->form($form)->page('two')->resume($result->submission)->submit(['email' => 'test@example.com']);
+        } catch (SilentFormFailureException $e) {
+            // Expected
+        }
+
+        $this->assertCount(0, $form->submissions());
+        Storage::disk('local')->assertMissing("statamic/form-uploads/{$id}/avatar/avatar.jpg");
+    }
+
+    #[Test]
+    public function it_removes_temporary_uploads_on_an_ignored_honeypot_when_the_form_does_not_store_submissions()
+    {
+        Bus::fake();
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $form = $this->uploadForm(honeypot: true);
+        $form->store(false)->save();
+
+        $action = app(SubmitForm::class)->form($form)->page('main');
+
+        try {
+            $action->submit(
+                data: ['email' => 'test@example.com', 'winnie' => 'the pooh'],
+                files: ['avatar' => [UploadedFile::fake()->image('avatar.jpg')]],
+            );
+        } catch (SilentFormFailureException $e) {
+            // Expected
+        }
+
+        $id = $action->submission()->id();
+        Storage::disk('local')->assertMissing("statamic/form-uploads/{$id}/avatar/avatar.jpg");
+        $this->assertCount(0, $form->submissions());
+    }
+
+    #[Test]
+    public function it_removes_temporary_uploads_when_a_listener_returns_false_without_marking_spam()
+    {
+        Bus::fake();
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $form = $this->uploadForm();
+
+        Event::listen(FormSubmitted::class, fn () => false);
+
+        $action = app(SubmitForm::class)->form($form)->page('main');
+
+        try {
+            $action->submit(
+                data: ['email' => 'test@example.com'],
+                files: ['avatar' => [UploadedFile::fake()->image('avatar.jpg')]],
+            );
+        } catch (SilentFormFailureException $e) {
+            // Expected
+        }
+
+        $id = $action->submission()->id();
+        Storage::disk('local')->assertMissing("statamic/form-uploads/{$id}/avatar/avatar.jpg");
+        $this->assertCount(0, $form->submissions());
+    }
+
+    #[Test]
+    public function it_keeps_earlier_pages_uploads_but_removes_the_rejected_pages_when_a_persisted_partial_survives()
+    {
+        Bus::fake();
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $form = $this->multiPageUploadForm();
+
+        Event::listen(FormSubmitted::class, fn () => false);
+
+        $result = app(SubmitForm::class)->form($form)->page('one')->submit(
+            data: [],
+            files: ['avatar' => [UploadedFile::fake()->image('avatar.jpg')]],
+        );
+
+        $id = $result->submission->id();
+
+        try {
+            app(SubmitForm::class)->form($form)->page('two')->resume($result->submission)->submit(
+                data: ['email' => 'test@example.com'],
+                files: ['resume' => [UploadedFile::fake()->image('resume.jpg')]],
+            );
+        } catch (SilentFormFailureException $e) {
+            // Expected
+        }
+
+        $this->assertCount(1, $form->submissions());
+        Storage::disk('local')->assertExists("statamic/form-uploads/{$id}/avatar/avatar.jpg");
+        Storage::disk('local')->assertMissing("statamic/form-uploads/{$id}/resume/resume.jpg");
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function it_keeps_temporary_uploads_for_a_stored_spam_submission_on_disk()
+    {
+        Bus::fake();
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $form = $this->uploadForm();
+
+        Event::listen(FormSubmitted::class, fn ($event) => $event->submission->markAsSpam());
+
+        $action = app(SubmitForm::class)->form($form)->page('main');
+
+        try {
+            $action->submit(
+                data: ['email' => 'test@example.com'],
+                files: ['avatar' => [UploadedFile::fake()->image('avatar.jpg')]],
+            );
+        } catch (SilentFormFailureException $e) {
+            // Expected
+        }
+
+        $id = $action->submission()->id();
+        Storage::disk('local')->assertExists("statamic/form-uploads/{$id}/avatar/avatar.jpg");
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
     public function it_removes_uploaded_assets_on_silent_failure()
     {
         Storage::fake('avatars');
@@ -1503,6 +1774,49 @@ class SubmitFormTest extends TestCase
                             ],
                         ],
                     ],
+                ],
+            ],
+        ]), fn ($f) => $f->save());
+    }
+
+    private function assetsForm(bool $honeypot = false, bool $withUpload = false)
+    {
+        $form = Form::make('assets_uploads');
+
+        if ($honeypot) {
+            $form->honeypot('winnie');
+        }
+
+        $fields = [
+            ['handle' => 'email', 'field' => ['type' => 'email']],
+            ['handle' => 'photo', 'field' => ['type' => 'assets', 'container' => 'avatars']],
+        ];
+
+        if ($withUpload) {
+            $fields[] = ['handle' => 'avatar', 'field' => ['type' => 'upload', 'store' => true, 'container' => 'avatars']];
+        }
+
+        return tap($form->formFields([
+            'pages' => [['id' => 'main', 'sections' => [['fields' => $fields]]]],
+        ]), fn ($f) => $f->save());
+    }
+
+    private function multiPageUploadForm()
+    {
+        return tap(Form::make('multi_uploads')->formFields([
+            'pages' => [
+                [
+                    'id' => 'one',
+                    'sections' => [['fields' => [
+                        ['handle' => 'avatar', 'field' => ['type' => 'upload', 'store' => true, 'container' => 'avatars']],
+                    ]]],
+                ],
+                [
+                    'id' => 'two',
+                    'sections' => [['fields' => [
+                        ['handle' => 'email', 'field' => ['type' => 'email']],
+                        ['handle' => 'resume', 'field' => ['type' => 'upload', 'store' => true, 'container' => 'avatars']],
+                    ]]],
                 ],
             ],
         ]), fn ($f) => $f->save());
