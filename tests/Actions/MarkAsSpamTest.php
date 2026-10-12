@@ -93,9 +93,9 @@ class MarkAsSpamTest extends TestCase
     public function it_requires_permission_to_mark_submissions_as_spam()
     {
         $this->setTestRoles([
-            'global' => ['view form submissions', 'mark form submissions as spam'],
-            'form' => ['view contact form submissions', 'mark contact form submissions as spam'],
-            'other_form' => ['view contact form submissions', 'mark other form submissions as spam'],
+            'global' => ['view form submissions', 'manage form spam'],
+            'form' => ['view contact form submissions', 'manage contact form spam'],
+            'other_form' => ['view contact form submissions', 'manage other form spam'],
             'view_only' => ['view form submissions', 'view contact form submissions'],
             'noaccess' => [],
         ]);

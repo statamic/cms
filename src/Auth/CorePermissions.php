@@ -218,7 +218,7 @@ class CorePermissions
         $this->register('view form submissions', function ($permission) {
             $this->permission($permission)->hiddenBy('configure forms')->children([
                 $this->permission('delete form submissions'),
-                $this->permission('mark form submissions as spam'),
+                $this->permission('manage form spam'),
             ]);
         });
 
@@ -233,7 +233,7 @@ class CorePermissions
         $this->register('view {form} form submissions', function ($permission) {
             $this->permission($permission)->hiddenBy(['configure forms', 'view form submissions'])->children([
                 $this->permission('delete {form} form submissions'),
-                $this->permission('mark {form} form submissions as spam'),
+                $this->permission('manage {form} form spam'),
             ])->replacements('form', function () {
                 return Form::all()->map(function ($form) {
                     return ['value' => $form->handle(), 'label' => __($form->title())];

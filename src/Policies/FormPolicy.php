@@ -83,12 +83,12 @@ class FormPolicy
             || $user->hasPermission("delete {$form->handle()} form submissions");
     }
 
-    public function markSubmissionsAsSpam($user, $form)
+    public function manageSpam($user, $form)
     {
         $user = User::fromUser($user);
 
-        return $user->hasPermission('mark form submissions as spam')
-            || $user->hasPermission("mark {$form->handle()} form submissions as spam");
+        return $user->hasPermission('manage form spam')
+            || $user->hasPermission("manage {$form->handle()} form spam");
     }
 
     public function generateFakeSubmissions($user, $form)
