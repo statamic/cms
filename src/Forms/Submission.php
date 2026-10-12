@@ -85,6 +85,11 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
         return $this->traitData($data);
     }
 
+    public function values()
+    {
+        return $this->data()->reject(fn ($value, $key) => Str::startsWith($key, '_'));
+    }
+
     /**
      * Get or set the ID.
      *

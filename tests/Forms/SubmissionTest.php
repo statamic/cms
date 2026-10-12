@@ -133,6 +133,39 @@ class SubmissionTest extends TestCase
     }
 
     #[Test]
+    public function it_gets_values_without_internal_keys()
+    {
+        $form = tap(Form::make('contact_us'))->save();
+
+        $submission = $form->makeSubmission()
+            ->data(['name' => 'Olaf', 'email' => 'olaf@example.com', '_fake' => true])
+            ->asPartial()
+            ->site('en');
+
+        $this->assertInstanceOf(Collection::class, $submission->values());
+        $this->assertEquals(['name' => 'Olaf', 'email' => 'olaf@example.com'], $submission->values()->all());
+        $this->assertEquals([
+            'name' => 'Olaf',
+            'email' => 'olaf@example.com',
+            '_fake' => true,
+            '_partial' => true,
+            '_site' => 'en',
+        ], $submission->data()->all());
+    }
+
+    #[Test]
+    public function data_remains_the_live_collection_including_internal_keys()
+    {
+        $form = tap(Form::make('contact_us'))->save();
+
+        $submission = $form->makeSubmission()->asPartial();
+        $submission->data()->put('name', 'Olaf');
+
+        $this->assertEquals(['name' => 'Olaf'], $submission->values()->all());
+        $this->assertEquals(['_partial' => true, 'name' => 'Olaf'], $submission->data()->all());
+    }
+
+    #[Test]
     public function setting_data_preserves_the_partial_and_site_keys()
     {
         $form = tap(Form::make('contact_us'))->save();
