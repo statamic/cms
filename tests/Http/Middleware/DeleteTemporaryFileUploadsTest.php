@@ -5,11 +5,22 @@ namespace Tests\Http\Middleware;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\Form;
 use Statamic\Http\Middleware\DeleteTemporaryFileUploads;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class DeleteTemporaryFileUploadsTest extends TestCase
 {
+    use PreventSavingStacheItemsToDisk;
+
+    protected function resolveApplicationConfiguration($app)
+    {
+        parent::resolveApplicationConfiguration($app);
+
+        $app['config']['statamic.forms.forms'] = $this->fakeStacheDirectory.'/forms';
+    }
+
     #[Test]
     public function it_deletes_file_uploads_over_an_hour_old_from_the_configured_disk_and_path()
     {
@@ -61,6 +72,36 @@ class DeleteTemporaryFileUploadsTest extends TestCase
         $uploadsDisk->assertMissing('temp-form-uploads/submission-one/document/old.txt');
         $uploadsDisk->assertExists('temp-form-uploads/submission-two/document/new.txt');
         $localDisk->assertExists('statamic/form-uploads/submission-one/document/old.txt');
+    }
+
+    #[Test]
+    public function it_keeps_form_uploads_over_a_week_old_for_spam_submissions_only()
+    {
+        $disk = Storage::fake('local');
+
+        $form = tap(Form::make('contact'))->save();
+        $spam = tap($form->makeSubmission()->markAsSpam())->save();
+
+        Date::setTestNow(now()->addSeconds(10));
+        $partial = tap($form->makeSubmission()->asPartial())->save();
+
+        Date::setTestNow(now()->addSeconds(10));
+        $finalized = tap($form->makeSubmission())->save();
+
+        $paths = collect([$spam->id(), $partial->id(), $finalized->id(), 'orphan'])
+            ->map(fn ($id) => "statamic/form-uploads/{$id}/document/file.txt");
+
+        $paths->each(function ($path) use ($disk) {
+            $disk->put($path, 'content');
+            touch($disk->path($path), now()->subWeeks(2)->timestamp);
+        });
+
+        $this->invoke('deleteFormUploadsOverAWeekOld');
+
+        $disk->assertExists($paths[0]);
+        $disk->assertMissing($paths[1]);
+        $disk->assertMissing($paths[2]);
+        $disk->assertMissing($paths[3]);
     }
 
     private function invoke(string $method): void

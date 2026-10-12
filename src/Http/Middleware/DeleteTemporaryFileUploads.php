@@ -4,6 +4,8 @@ namespace Statamic\Http\Middleware;
 
 use Closure;
 use Statamic\Facades\File;
+use Statamic\Facades\FormSubmission;
+use Statamic\Support\Str;
 
 class DeleteTemporaryFileUploads
 {
@@ -42,9 +44,21 @@ class DeleteTemporaryFileUploads
         $disk = File::disk(config('statamic.system.file_uploads_disk', 'local'));
         $directory = config('statamic.forms.file_uploads_path', 'statamic/form-uploads');
 
-        $disk
+        $submissionId = fn ($path) => explode('/', trim(Str::after($path, $directory), '/'))[0];
+
+        $files = $disk
             ->getFilesRecursively($directory)
-            ->filter(fn ($path) => $disk->lastModified($path) < now()->subWeek()->timestamp)
+            ->filter(fn ($path) => $disk->lastModified($path) < now()->subWeek()->timestamp);
+
+        $spamIds = $files->isEmpty() ? [] : FormSubmission::query()
+            ->whereIn('id', $files->map($submissionId)->unique()->values()->all())
+            ->whereStatus('spam')
+            ->get()
+            ->map->id()
+            ->all();
+
+        $files
+            ->reject(fn ($path) => in_array($submissionId($path), $spamIds))
             ->each(fn ($path) => $disk->delete($path));
 
         $disk->deleteEmptySubfolders($directory);
