@@ -37,8 +37,8 @@ class SubmissionQueryBuilder extends Builder implements QueryBuilderContract
     {
         return match ($status) {
             'any' => $this,
-            'finalized' => $this->where('partial', '!=', true),
-            'partial' => $this->where('partial', true),
+            'finalized' => $this->where('_partial', '!=', true),
+            'partial' => $this->where('_partial', true),
             default => throw new \Exception("Invalid status [$status]"),
         };
     }

@@ -148,7 +148,7 @@ class FormController extends Controller
             return response([
                 'success' => true,
                 'submission_created' => ! $silentFailure,
-                'submission' => $submission->data(),
+                'submission' => $submission->values(),
                 'redirect' => $redirect,
                 'next_page' => $result->nextPage,
             ]);
