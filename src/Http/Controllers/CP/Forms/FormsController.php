@@ -219,6 +219,9 @@ class FormsController extends CpController
                             'ignore' => __('Ignore'),
                             'mark_as_spam' => __('Save as Spam'),
                         ],
+                        'if' => [
+                            'store' => 'equals true',
+                        ],
                         'instructions' => __('statamic::messages.form_configure_honeypot_behavior_instructions'),
                     ],
                 ],
