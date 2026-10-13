@@ -19,6 +19,7 @@ use Statamic\Exceptions\FormRestrictedException;
 use Statamic\Exceptions\SilentFormFailureException;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Fieldset;
 use Statamic\Facades\File;
@@ -1896,6 +1897,7 @@ class SubmitFormTest extends TestCase
     public function it_ignores_unique_instances_when_forms_pro_is_not_installed()
     {
         Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturnFalse();
+        Blink::forget('forms-pro-installed');
 
         $this->form->set('unique_instances', true)->save();
 

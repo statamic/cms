@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Vite;
 use Inertia\Inertia;
 use Laravel\Nova\Nova;
+use Statamic\Facades\Blink;
 use Statamic\Facades\File;
 use Statamic\Facades\URL;
 use Statamic\Modifiers\Modify;
@@ -61,7 +62,7 @@ class Statamic
 
     public static function formsProInstalled(): bool
     {
-        return Composer::isInstalled('statamic/forms-pro');
+        return Blink::once('forms-pro-installed', fn () => Composer::isInstalled('statamic/forms-pro'));
     }
 
     public static function availableScripts(Request $request)
