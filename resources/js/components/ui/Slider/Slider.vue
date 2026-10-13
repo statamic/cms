@@ -27,7 +27,7 @@ const props = defineProps({
 
 defineEmits(['update:modelValue']);
 
-const { id, labelId } = useUiFieldId(toRef(props, 'id'));
+const { id, labelId, describedBy, invalid } = useUiFieldId(toRef(props, 'id'));
 
 const rootClasses = cva({
     base: 'relative flex w-full touch-none items-center select-none',
@@ -74,7 +74,6 @@ const thumbClasses = cva({
 
 <template>
     <SliderRoot
-        data-ui-control
         :class="rootClasses"
         :max="max"
         :min="min"
@@ -90,6 +89,9 @@ const thumbClasses = cva({
             :class="thumbClasses"
             :aria-label="label"
             :aria-labelledby="label ? undefined : labelId"
+            :aria-describedby="describedBy"
+            :aria-invalid="invalid ? 'true' : undefined"
+            data-ui-control
         />
     </SliderRoot>
 </template>

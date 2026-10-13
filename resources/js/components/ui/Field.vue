@@ -42,10 +42,51 @@ const generatedId = useId();
 const hasExplicitId = computed(() => props.id != null && props.id !== '');
 const fieldId = computed(() => (hasExplicitId.value ? props.id : generatedId));
 const labelId = computed(() => `${fieldId.value}-label`);
+const descriptionId = computed(() => `${fieldId.value}-description`);
 
-// Only auto-generated ids are injectable. Explicit ids (e.g. Publish/Field) stay on
-// the fieldtype via its own `id` prop so nested controls don't inherit them.
-provide(UI_FIELD_ID_KEY, hasExplicitId.value ? null : { id: fieldId, labelId, claimed: false });
+const instructions = computed(() => props.instructions ? markdown(__(props.instructions), { openLinksInNewTabs: true }) : null);
+
+const errorList = computed(() => {
+    if (props.error) {
+        return [props.error];
+    }
+
+    if (!props.errors) {
+        return [];
+    }
+
+    return Array.isArray(props.errors) ? props.errors : Object.values(props.errors);
+});
+
+const hasErrors = computed(() => errorList.value.length > 0);
+
+// Keep the first error id stable as `${fieldId}-error` for the common single-error case.
+const errorIds = computed(() =>
+    errorList.value.map((_, i) => (i === 0 ? `${fieldId.value}-error` : `${fieldId.value}-error-${i}`)),
+);
+
+const describedBy = computed(() => {
+    const ids = [];
+
+    if (instructions.value) {
+        ids.push(descriptionId.value);
+    }
+
+    ids.push(...errorIds.value);
+
+    return ids.length ? ids.join(' ') : null;
+});
+
+// Auto-generated ids may be claimed by the first nested control. Explicit ids (Publish)
+// stay on the fieldtype via its own `id` prop. describedBy/invalid are always available.
+provide(UI_FIELD_ID_KEY, {
+    id: fieldId,
+    labelId,
+    claimable: !hasExplicitId.value,
+    describedBy,
+    invalid: hasErrors,
+    claimed: false,
+});
 
 const labelProps = computed(() => ({
     badge: props.badge,
@@ -76,21 +117,6 @@ const rootClasses = computed(() =>
         ...props,
     })),
 );
-
-const instructions = computed(() => props.instructions ? markdown(__(props.instructions), { openLinksInNewTabs: true }) : null);
-
-const errors = computed(() => {
-    if (props.error) {
-        return [props.error];
-    }
-
-    return props.errors;
-});
-
-const hasErrors = computed(() => {
-    if (!errors.value) return false;
-    return Array.isArray(errors.value) ? errors.value.length > 0 : Object.keys(errors.value).length > 0;
-});
 </script>
 
 <template>
@@ -113,12 +139,25 @@ const hasErrors = computed(() => {
             <slot v-else name="label">
                 <Label v-if="label" v-bind="labelProps" />
             </slot>
-            <Description :text="instructions" v-if="instructions && !instructionsBelow" />
+            <Description
+                v-if="instructions && !instructionsBelow"
+                :id="descriptionId"
+                :text="instructions"
+            />
         </div>
         <slot :id="fieldId" />
         <div v-if="(instructions && instructionsBelow) || hasErrors" class="flex flex-col gap-2">
-            <Description :text="instructions" v-if="instructions && instructionsBelow" />
-            <ErrorMessage v-if="errors" v-for="(error, i) in errors" :key="i" :text="error" />
+            <Description
+                v-if="instructions && instructionsBelow"
+                :id="descriptionId"
+                :text="instructions"
+            />
+            <ErrorMessage
+                v-for="(error, i) in errorList"
+                :id="errorIds[i]"
+                :key="i"
+                :text="error"
+            />
         </div>
     </div>
 </template>
