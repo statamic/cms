@@ -3,8 +3,10 @@
 namespace Tests\Sites;
 
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Contracts\Query\QueryableValue;
 use Statamic\Data\AugmentedCollection;
 use Statamic\Facades\Antlers;
+use Statamic\Query\ResolveValue;
 use Statamic\Sites\Site;
 use Tests\TestCase;
 
@@ -365,5 +367,15 @@ class SiteTest extends TestCase
         $this->assertEquals('echo', $site->attribute('charlie.delta'));
         $this->assertNull($site->attribute('unknown'));
         $this->assertNull($site->attribute('charlie.unknown'));
+    }
+
+    #[Test]
+    public function it_resolves_to_its_handle_when_queried()
+    {
+        $site = new Site('en', []);
+
+        $this->assertInstanceOf(QueryableValue::class, $site);
+        $this->assertSame('en', $site->toQueryableValue());
+        $this->assertSame('en', (new ResolveValue)(['site' => $site], 'site'));
     }
 }

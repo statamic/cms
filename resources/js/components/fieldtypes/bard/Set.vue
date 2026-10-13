@@ -20,7 +20,8 @@
         >
             <div ref="content" hidden />
             <header
-                class="group/header animate-border-color show-focus-within flex items-center rounded-[calc(var(--radius-lg)-1px)] px-1.5 antialiased duration-200 bg-gray-100/50 dark:bg-gray-925 hover:bg-gray-100 dark:hover:bg-gray-950/45 border-gray-300 dark:shadow-md"
+                class="group/header animate-border-color show-focus-within flex items-center rounded-[calc(var(--radius-lg)-1px)] px-1.5 antialiased duration-200 bg-gray-100/50 dark:bg-gray-925 data-readonly:dark:!bg-transparent hover:bg-gray-100 dark:hover:bg-gray-950/45 border-gray-300 dark:shadow-md"
+                :data-readonly="isReadOnly ? true : undefined"
                 :class="{
                     'bg-gray-200/50 dark:bg-gray-950/35 rounded-b-none': !collapsed && hasFields
                 }"
@@ -49,7 +50,12 @@
                     />
                 </button>
                 <div class="flex items-center gap-2" v-if="!isReadOnly">
-                    <Switch size="xs" v-model="enabled" v-tooltip="enabled ? __('Included in output') : __('Hidden from output')" />
+                    <Switch
+                        size="xs"
+                        v-model="enabled"
+                        :label="__('Included in output')"
+                        v-tooltip="enabled ? __('Included in output') : __('Hidden from output')"
+                    />
 
                     <Dropdown @closed="onSetDropdownClosed">
                         <template #trigger>
