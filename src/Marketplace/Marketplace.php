@@ -3,7 +3,7 @@
 namespace Statamic\Marketplace;
 
 use Facades\Statamic\Marketplace\Client;
-use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\TransferException;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Facades\Addon;
 use Statamic\Marketplace\Addon as AddonProduct;
@@ -23,7 +23,7 @@ class Marketplace
                 $response = Client::post($uri, ['packages' => $packages]);
 
                 return [60 => collect($response['data'])];
-            } catch (RequestException $e) {
+            } catch (TransferException $e) {
                 return [5 => collect()];
             }
         });
@@ -46,7 +46,7 @@ class Marketplace
                     'data' => collect($response['data']),
                     'meta' => $response['meta'] ?? null,
                 ]];
-            } catch (RequestException $e) {
+            } catch (TransferException $e) {
                 return $fallback;
             }
         });
@@ -81,7 +81,7 @@ class Marketplace
                 $response = Client::get($uri);
 
                 return [60 => collect($response['data'])];
-            } catch (RequestException $e) {
+            } catch (TransferException $e) {
 
                 return [5 => collect()];
             }

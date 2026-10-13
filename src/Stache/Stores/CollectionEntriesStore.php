@@ -163,7 +163,7 @@ class CollectionEntriesStore extends ChildStore
             'collectionHandle',
             'published',
             'title',
-            'site' => Indexes\Site::class,
+            'site',
             'origin' => Indexes\Origin::class,
             'parent' => Indexes\Parents::class,
             'uri',

@@ -1027,7 +1027,7 @@ export default {
             });
 
             let exts = [
-                CharacterCount.configure({ limit: this.config.character_limit }),
+                CharacterCount.configure(),
                 ...modeExts,
                 DisableCtrlEnter,
                 SlashSetPicker.configure({
