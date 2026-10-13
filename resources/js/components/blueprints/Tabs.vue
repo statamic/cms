@@ -3,7 +3,7 @@
         <div>
             <Tabs v-model="currentTab" :unmount-on-hide="false">
                 <div v-if="!singleTab && tabs.length > 0" class="flex items-center justify-between gap-x-2 mb-6">
-                    <div ref="tabs" class="flex-1 flex items-center gap-x-2.5 min-w-0">
+                    <div ref="tabs" class="relative flex-1 flex items-center gap-x-2.5 min-w-0">
                         <TabList class="flex-1 min-w-0 overflow-x-clip overflow-y-visible pe-0.25">
                             <div ref="tabWrapper" class="min-w-0 flex-1 flex overflow-clip px-0.25">
                                 <div ref="tabInner" class="flex items-center gap-x-2.5 shrink-0">
@@ -22,6 +22,22 @@
                                 </div>
                             </div>
                         </TabList>
+                        <Dropdown v-if="activeTabMenuPosition && !activeTabIsOverflowed" align="end" side="bottom">
+                            <template #trigger>
+                                <Button
+                                    class="absolute!"
+                                    :style="activeTabMenuPosition"
+                                    icon="chevron-down"
+                                    variant="ghost"
+                                    size="xs"
+                                    :aria-label="__('Open Dropdown')"
+                                />
+                            </template>
+                            <DropdownMenu>
+                                <DropdownItem :text="__('Edit')" icon="edit" @click="editActiveTab" />
+                                <DropdownItem :text="__('Delete')" icon="trash" variant="destructive" @click="removeActiveTab" />
+                            </DropdownMenu>
+                        </Dropdown>
                         <Dropdown
                             v-if="overflowedTabs.length"
                             align="end"
@@ -50,8 +66,8 @@
                                 </DropdownItem>
                                 <template v-if="activeTabIsOverflowed">
                                     <DropdownSeparator />
-                                    <DropdownItem :text="__('Edit')" icon="edit" @click="editActiveOverflowedTab" />
-                                    <DropdownItem :text="__('Delete')" icon="trash" variant="destructive" @click="removeActiveOverflowedTab" />
+                                    <DropdownItem :text="__('Edit')" icon="edit" @click="editActiveTab" />
+                                    <DropdownItem :text="__('Delete')" icon="trash" variant="destructive" @click="removeActiveTab" />
                                 </template>
                             </DropdownMenu>
                         </Dropdown>
@@ -181,12 +197,13 @@ export default {
             sortableSections: null,
             sortableFields: null,
             overflowedTabs: [],
+            activeTabMenuPosition: null,
         };
     },
 
     computed: {
         activeTabIsOverflowed() {
-            return this.overflowedTabs.some((t) => t._id === this.currentTab);
+            return this.overflowedTabs.some((tab) => tab._id === this.currentTab);
         },
     },
 
@@ -213,6 +230,7 @@ export default {
             getItems: () => this.tabs,
             onUpdate: ({ overflowedItems }) => {
                 this.overflowedTabs = overflowedItems;
+                this.updateActiveTabMenuPosition();
             },
         });
         this.$nextTick(() => {
@@ -231,6 +249,24 @@ export default {
     methods: {
         checkOverflow() {
             this.overflowTracker?.checkOverflow();
+        },
+
+        updateActiveTabMenuPosition() {
+            const container = this.$refs.tabs;
+            const activeTab = this.$refs.tabInner?.querySelector('[role="tab"][data-state="active"]');
+
+            if (!container || !activeTab) {
+                this.activeTabMenuPosition = null;
+                return;
+            }
+
+            const containerRect = container.getBoundingClientRect();
+            const tabRect = activeTab.getBoundingClientRect();
+
+            this.activeTabMenuPosition = {
+                left: `${tabRect.right - containerRect.left - 10}px`,
+                top: `${tabRect.top - containerRect.top}px`,
+            };
         },
 
         ensureTab() {
@@ -372,19 +408,19 @@ export default {
             this.currentTab = tabId;
         },
 
-        editOverflowedTab(tab) {
+        editTab(tab) {
             if (!tab) return;
             const refs = this.$refs.tab;
             const tabRef = Array.isArray(refs) ? refs.find((c) => c.tab?._id === tab._id) : refs;
             tabRef?.edit();
         },
 
-        editActiveOverflowedTab() {
-            const tab = this.overflowedTabs.find((t) => t._id === this.currentTab);
-            if (tab) this.editOverflowedTab(tab);
+        editActiveTab() {
+            const tab = this.tabs.find((t) => t._id === this.currentTab);
+            if (tab) this.editTab(tab);
         },
 
-        removeActiveOverflowedTab() {
+        removeActiveTab() {
             this.removeTab(this.currentTab);
         },
 
