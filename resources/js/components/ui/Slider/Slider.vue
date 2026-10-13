@@ -27,7 +27,7 @@ const props = defineProps({
 
 defineEmits(['update:modelValue']);
 
-const { id, describedBy, invalid } = useUiFieldId(toRef(props, 'id'));
+const { id, labelId, describedBy, invalid } = useUiFieldId(toRef(props, 'id'));
 
 const rootClasses = cva({
     base: 'relative flex w-full touch-none items-center select-none',
@@ -88,6 +88,7 @@ const thumbClasses = cva({
             :id
             :class="thumbClasses"
             :aria-label="label"
+            :aria-labelledby="label ? undefined : labelId"
             :aria-describedby="describedBy"
             :aria-invalid="invalid ? 'true' : undefined"
             data-ui-control

@@ -24,12 +24,12 @@ const props = defineProps({
 
 defineEmits(['update:modelValue']);
 
-const { id, describedBy, invalid } = useUiFieldId(toRef(props, 'id'));
+const { id, labelId, describedBy, invalid } = useUiFieldId(toRef(props, 'id'));
 const attrs = useAttrs();
 
 onMounted(() => {
     if (!import.meta.env.DEV) return;
-    if (props.label || attrs['aria-label'] || attrs['aria-labelledby']) return;
+    if (props.label || labelId.value || attrs['aria-label'] || attrs['aria-labelledby']) return;
 
     console.warn(
         '[ui/Switch] Provide a `label` prop (or `aria-label` / `aria-labelledby`) so the switch has an accessible name.',
