@@ -2,6 +2,7 @@
 
 namespace Tests\Fieldtypes;
 
+use Illuminate\Support\HtmlString;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Antlers;
@@ -397,6 +398,89 @@ class AutocompleteEditorTest extends TestCase
 
         $this->assertNull($fieldtype->augment(null));
         $this->assertNull($fieldtype->augment(''));
+    }
+
+    #[Test]
+    public function render_html_escapes_values()
+    {
+        $html = AutocompleteEditor::renderHtml('Hi [[ name ]]', ['name' => '<b>Tom</b> & "Jerry" \'s'], inline: true);
+
+        $this->assertSame('Hi &lt;b&gt;Tom&lt;/b&gt; &amp; &quot;Jerry&quot; &#039;s', $html);
+    }
+
+    #[Test]
+    public function render_html_turns_newlines_in_values_into_line_breaks()
+    {
+        $html = AutocompleteEditor::renderHtml('Hi [[ name ]]', ['name' => "Tom\nJerry"], inline: true);
+
+        $this->assertSame("Hi Tom<br />\nJerry", $html);
+    }
+
+    #[Test]
+    public function render_html_inserts_htmlable_values_as_is()
+    {
+        $html = AutocompleteEditor::renderHtml('Hi [[ name ]]', ['name' => new HtmlString("<b>Tom</b>\nJerry")], inline: true);
+
+        $this->assertSame("Hi <b>Tom</b>\nJerry", $html);
+    }
+
+    #[Test]
+    public function render_html_unwraps_the_paragraph_only_when_inline()
+    {
+        $this->assertSame('Hi Tom', AutocompleteEditor::renderHtml('Hi [[ name ]]', ['name' => 'Tom'], inline: true));
+        $this->assertSame('<p>Hi Tom</p>', trim(AutocompleteEditor::renderHtml('Hi [[ name ]]', ['name' => 'Tom'])));
+    }
+
+    #[Test]
+    public function render_html_resolves_unknown_handles_to_an_empty_string()
+    {
+        $this->assertSame('Hi ', AutocompleteEditor::renderHtml('Hi [[ nope ]]', ['name' => 'Tom'], inline: true));
+    }
+
+    #[Test]
+    public function render_html_keeps_an_authors_escaped_literal()
+    {
+        $html = AutocompleteEditor::renderHtml('\\[\\[ x \\]\\] and [[ x ]]', ['x' => 'X'], inline: true);
+
+        $this->assertSame('&#91;&#91; x ]] and X', $html);
+    }
+
+    #[Test]
+    public function render_html_returns_an_empty_string_for_empty_markdown()
+    {
+        $this->assertSame('', AutocompleteEditor::renderHtml('', ['name' => 'Tom']));
+    }
+
+    #[Test]
+    public function render_html_passes_the_callback_through_without_exposing_values()
+    {
+        $data = ['name' => 'Tom', 'note' => 'a [[ secret ]] and {{ config:app.key }}'];
+
+        $html = AutocompleteEditor::renderHtml(
+            'Hi [[ name ]], {{ note }} / [[ note ]]',
+            ['name' => 'Tom', 'note' => $data['note'], 'secret' => 'S3CRET'],
+            inline: true,
+            using: fn ($template) => (string) Antlers::parse($template, $data)
+        );
+
+        $this->assertSame(
+            'Hi Tom, a [[ secret ]] and {{ config:app.key }} / a [[ secret ]] and {{ config:app.key }}',
+            $html
+        );
+    }
+
+    #[Test]
+    public function render_html_matches_doing_it_by_hand()
+    {
+        $markdown = "# Hi [[ name ]]\n\n**Bold** [[ note ]] \\[\\[ x \\]\\] [[ missing ]]";
+        $values = ['name' => 'Tom & Jerry', 'note' => "a\nb <i>"];
+
+        $expected = Mentions::replace(
+            AutocompleteEditor::parseMarkdown($markdown),
+            ['name' => 'Tom &amp; Jerry', 'note' => "a<br />\nb &lt;i&gt;"]
+        );
+
+        $this->assertSame($expected, AutocompleteEditor::renderHtml($markdown, $values));
     }
 
     private function fieldtype($config = [])

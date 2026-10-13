@@ -2,6 +2,7 @@
 
 namespace Statamic\Fieldtypes;
 
+use Illuminate\Contracts\Support\Htmlable;
 use Statamic\Facades\Markdown;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fieldtypes\AutocompleteEditor\Mentions;
@@ -134,13 +135,13 @@ class AutocompleteEditor extends Fieldtype
 
     // Static so a consumer holding a raw string, rather than a Value, can get the
     // same HTML without needing a field to read the config from.
-    public static function parseMarkdown($value, bool $inline = false): ?string
+    public static function parseMarkdown($markdown, bool $inline = false): ?string
     {
-        if ($value === null || $value === '') {
+        if ($markdown === null || $markdown === '') {
             return null;
         }
 
-        $value = (string) $value;
+        $markdown = (string) $markdown;
         $mentions = [];
 
         // An author's literal `\[\[ x \]\]` renders to `[[ x ]]`, which would be
@@ -151,16 +152,16 @@ class AutocompleteEditor extends Fieldtype
         // too, since replace() would otherwise read them as the plain text escape.
         do {
             $nonce = bin2hex(random_bytes(8));
-        } while (str_contains($value, $nonce));
+        } while (str_contains($markdown, $nonce));
 
-        $value = preg_replace_callback(Mentions::TOKEN, function ($matches) use (&$mentions, $nonce) {
+        $markdown = preg_replace_callback(Mentions::TOKEN, function ($matches) use (&$mentions, $nonce) {
             $sentinel = 'mention'.$nonce.'n'.count($mentions).'e';
             $mentions[$sentinel] = $matches[0];
 
             return $sentinel;
-        }, $value);
+        }, $markdown);
 
-        $html = Markdown::parser('default')->parse($value);
+        $html = Markdown::parser('default')->parse($markdown);
 
         $html = str_replace('[[', '&#91;&#91;', $html);
         $html = preg_replace_callback(
@@ -171,6 +172,23 @@ class AutocompleteEditor extends Fieldtype
         $html = strtr($html, $mentions);
 
         return $inline ? static::unwrapParagraph($html) : $html;
+    }
+
+    // The HTML-context convenience over Mentions::replace(), which stays raw and
+    // context-free. Values are escaped because markdown output is always HTML.
+    // Htmlable is the opt-out for values that are already HTML.
+    public static function renderHtml(string $markdown, array $values, bool $inline = false, ?callable $using = null): string
+    {
+        if (($html = static::parseMarkdown($markdown, $inline)) === null) {
+            return '';
+        }
+
+        $escaped = array_map(
+            fn ($value) => $value instanceof Htmlable ? $value->toHtml() : nl2br(e((string) $value)),
+            $values
+        );
+
+        return Mentions::replace($html, $escaped, $using);
     }
 
     private static function unwrapParagraph(string $html): string
