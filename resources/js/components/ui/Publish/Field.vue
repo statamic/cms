@@ -205,6 +205,7 @@ const isReadOnly = computed(() => {
     return (
         isLocked.value ||
         props.config.visibility === 'read_only' ||
+        props.config.visibility === 'computed' ||
         props.config.read_only === true ||
         false
     );
