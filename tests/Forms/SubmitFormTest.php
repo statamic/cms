@@ -20,7 +20,9 @@ use Statamic\Exceptions\SilentFormFailureException;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Fieldset;
+use Statamic\Facades\File;
 use Statamic\Facades\Form;
+use Statamic\Facades\YAML;
 use Statamic\Forms\CreateAssetsFromFileUploads;
 use Statamic\Forms\Email;
 use Statamic\Forms\SendEmail;
@@ -1311,6 +1313,52 @@ class SubmitFormTest extends TestCase
     }
 
     #[Test]
+    public function it_does_not_retain_a_resumed_partial_as_spam_when_a_listener_marks_it_and_then_throws_a_validation_exception()
+    {
+        Bus::fake();
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $form = $this->multiPageUploadForm(withAssets: true);
+
+        $result = app(SubmitForm::class)->form($form)->page('one')->submit(
+            data: [],
+            files: ['avatar' => [UploadedFile::fake()->image('avatar.jpg')]],
+        );
+
+        $id = $result->submission->id();
+
+        Event::listen(FormSubmitted::class, function ($event) {
+            $event->submission->markAsSpam();
+
+            throw ValidationException::withMessages(['email' => 'Nope']);
+        });
+
+        try {
+            app(SubmitForm::class)->form($form)->page('two')->resume($result->submission)->submit(
+                data: ['email' => 'test@example.com'],
+                files: [
+                    'resume' => [UploadedFile::fake()->image('resume.jpg')],
+                    'photo' => [UploadedFile::fake()->image('photo.jpg')],
+                ],
+            );
+        } catch (ValidationException $e) {
+            // Expected
+        }
+
+        $stored = YAML::parse(File::get($form->submission($id)->path()));
+
+        $this->assertArrayNotHasKey('_marked_spam_at', $stored);
+        $this->assertTrue($stored['_partial']);
+        $this->assertArrayNotHasKey('email', $stored);
+        Storage::disk('avatars')->assertMissing('photo.jpg');
+        Storage::disk('local')->assertExists("statamic/form-uploads/{$id}/avatar/avatar.jpg");
+        Storage::disk('local')->assertMissing("statamic/form-uploads/{$id}/resume/resume.jpg");
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
     public function it_keeps_temporary_uploads_for_a_stored_spam_submission_on_disk()
     {
         Bus::fake();
@@ -1801,8 +1849,17 @@ class SubmitFormTest extends TestCase
         ]), fn ($f) => $f->save());
     }
 
-    private function multiPageUploadForm()
+    private function multiPageUploadForm(bool $withAssets = false)
     {
+        $pageTwoFields = [
+            ['handle' => 'email', 'field' => ['type' => 'email']],
+            ['handle' => 'resume', 'field' => ['type' => 'upload', 'store' => true, 'container' => 'avatars']],
+        ];
+
+        if ($withAssets) {
+            $pageTwoFields[] = ['handle' => 'photo', 'field' => ['type' => 'assets', 'container' => 'avatars']];
+        }
+
         return tap(Form::make('multi_uploads')->formFields([
             'pages' => [
                 [
@@ -1813,10 +1870,7 @@ class SubmitFormTest extends TestCase
                 ],
                 [
                     'id' => 'two',
-                    'sections' => [['fields' => [
-                        ['handle' => 'email', 'field' => ['type' => 'email']],
-                        ['handle' => 'resume', 'field' => ['type' => 'upload', 'store' => true, 'container' => 'avatars']],
-                    ]]],
+                    'sections' => [['fields' => $pageTwoFields]],
                 ],
             ],
         ]), fn ($f) => $f->save());

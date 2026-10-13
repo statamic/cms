@@ -25,6 +25,7 @@ class SubmitForm
     protected Form $form;
     protected ?string $page = null;
     protected ?Submission $submission = null;
+    protected bool $retainedSpam = false;
 
     public function form(Form $form): static
     {
@@ -199,6 +200,7 @@ class SubmitForm
         if ($this->form->store()) {
             if ($this->submission->isSpam()) {
                 $this->submission->save();
+                $this->retainedSpam = true;
             }
         } elseif ($this->form->submission($this->submission->id())) {
             $this->submission->deleteQuietly();
@@ -213,20 +215,13 @@ class SubmitForm
 
         $this->removeUploadedAssets($assets);
 
-        if ($this->isRetainedSpam()) {
+        if ($this->retainedSpam) {
             $this->forgetRemovedAssets($assets);
 
             return;
         }
 
         $this->removeTemporaryUploads($uploads);
-    }
-
-    private function isRetainedSpam(): bool
-    {
-        return $this->form->store()
-            && $this->submission->isSpam()
-            && $this->form->submission($this->submission->id());
     }
 
     private function forgetRemovedAssets(array $assets): void
