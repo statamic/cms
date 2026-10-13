@@ -333,7 +333,7 @@ class EmailTest extends TestCase
             ],
         ]))->save();
 
-        $submission = $form->makeSubmission()->data(['name' => 'Foo Bar'])->set('entry', 'event-1');
+        $submission = $form->makeSubmission()->data(['name' => 'Foo Bar'])->set('_entry', 'event-1');
 
         $email = tap(new Email($submission, ['to' => 'test@test.com'], Site::default()))->build();
 

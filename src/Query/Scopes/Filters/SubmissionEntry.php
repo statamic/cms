@@ -37,7 +37,7 @@ class SubmissionEntry extends Filter
 
     public function apply($query, $values)
     {
-        $query->where('entry', $values['entry']);
+        $query->where('_entry', $values['entry']);
     }
 
     public function badge($values)
@@ -61,8 +61,8 @@ class SubmissionEntry extends Filter
     {
         $ids = $this->form()
             ->querySubmissions()
-            ->whereNotNull('entry')
-            ->pluck('entry')
+            ->whereNotNull('_entry')
+            ->pluck('_entry')
             ->unique()
             ->values();
 

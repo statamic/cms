@@ -98,7 +98,7 @@ class ViewSubmissionsListingTest extends TestCase
 
         $user = tap(User::make()->makeSuper())->save();
         $form = tap(Form::make('test')->set('unique_instances', true))->save();
-        FormSubmission::make()->form($form)->data(['entry' => 'event-1'])->save();
+        FormSubmission::make()->form($form)->data(['_entry' => 'event-1'])->save();
 
         $response = $this
             ->actingAs($user)
@@ -137,8 +137,8 @@ class ViewSubmissionsListingTest extends TestCase
 
         $user = tap(User::make()->makeSuper())->save();
         $form = tap(Form::make('test')->set('unique_instances', true))->save();
-        FormSubmission::make()->form($form)->data(['entry' => 'event-1'])->save();
-        FormSubmission::make()->form($form)->data(['entry' => 'event-2'])->save();
+        FormSubmission::make()->form($form)->data(['_entry' => 'event-1'])->save();
+        FormSubmission::make()->form($form)->data(['_entry' => 'event-2'])->save();
 
         $filters = base64_encode(json_encode(['submission_entry' => ['entry' => 'event-2']]));
 

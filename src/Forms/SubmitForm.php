@@ -84,7 +84,7 @@ class SubmitForm
         $this->submission = $this->submission ?? $this->form->makeSubmission()->asPartial()->site($this->site());
 
         if ($entry) {
-            $this->submission->set('entry', $entry->id());
+            $this->submission->set('_entry', $entry->id());
         }
 
         try {

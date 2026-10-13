@@ -145,7 +145,7 @@ class FormSubmissionsController extends CpController
             return $data;
         }
 
-        if ($form->hasUniqueInstances() && ($id = $submission->get('entry'))) {
+        if ($form->hasUniqueInstances() && ($id = $submission->get('_entry'))) {
             $entry = $submission->entry();
 
             $entryData = [

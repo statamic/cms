@@ -75,9 +75,9 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
         $data = collect($data);
 
         // A full data replacement would otherwise drop the internal lifecycle
-        // keys, so carry over the existing _partial, _marked_spam_at, _site and entry
+        // keys, so carry over the existing _partial, _marked_spam_at, _site and _entry
         // values unless the incoming payload provides its own.
-        foreach (['_partial', '_marked_spam_at', '_site', 'entry'] as $key) {
+        foreach (['_partial', '_marked_spam_at', '_site', '_entry'] as $key) {
             if ($this->has($key) && ! $data->has($key)) {
                 $data[$key] = $this->get($key);
             }
@@ -142,7 +142,7 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
      */
     public function entry()
     {
-        return Entry::find($this->get('entry'));
+        return Entry::find($this->get('_entry'));
     }
 
     /**
@@ -409,10 +409,11 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
     public function toArray()
     {
         $data = $this->data();
+        $fields = $this->form()->fields()->keys();
 
-        return $this->form()->fields()->keys()->flip()
+        return $fields->flip()
             ->reject(function ($field, $key) {
-                return in_array($key, ['id', 'date', 'form', 'entry']);
+                return in_array($key, ['id', 'date', 'form']);
             })
             ->map(function ($field, $key) use ($data) {
                 return $data[$key] ?? null;
@@ -421,8 +422,8 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
                 'id' => $this->id(),
                 'date' => $this->date(),
             ])
-            ->when($this->has('entry'), fn ($values) => $values->merge([
-                'entry' => $this->get('entry'),
+            ->when($this->has('_entry') && ! $fields->contains('entry'), fn ($values) => $values->merge([
+                'entry' => $this->get('_entry'),
             ]))
             ->all();
     }
@@ -433,7 +434,7 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
             'form' => $this->form,
         ]);
 
-        if ($this->has('entry')) {
+        if ($this->has('_entry') && ! $this->form()->fields()->has('entry')) {
             $data['entry'] = $this->entry();
         }
 

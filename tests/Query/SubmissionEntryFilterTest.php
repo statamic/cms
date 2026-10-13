@@ -63,9 +63,9 @@ class SubmissionEntryFilterTest extends TestCase
 
         $form = Form::find('test');
 
-        FormSubmission::make()->form($form)->id('1')->data(['entry' => 'event-1'])->save();
-        FormSubmission::make()->form($form)->id('2')->data(['entry' => 'event-1'])->save();
-        FormSubmission::make()->form($form)->id('3')->data(['entry' => 'event-2'])->save();
+        FormSubmission::make()->form($form)->id('1')->data(['_entry' => 'event-1'])->save();
+        FormSubmission::make()->form($form)->id('2')->data(['_entry' => 'event-1'])->save();
+        FormSubmission::make()->form($form)->id('3')->data(['_entry' => 'event-2'])->save();
         FormSubmission::make()->form($form)->id('4')->data([])->save();
 
         $this->assertEquals([

@@ -51,7 +51,7 @@ class ListedSubmission extends JsonResource
 
             if ($key === 'entry') {
                 $entry = (new Field('entry', ['type' => 'entries']))
-                    ->setValue($this->resource->get('entry'))
+                    ->setValue($this->resource->get('_entry'))
                     ->setParent($this->resource)
                     ->preProcessIndex()
                     ->value();

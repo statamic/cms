@@ -54,7 +54,7 @@ class ViewSubmissionTest extends TestCase
 
         $user = tap(User::make()->makeSuper())->save();
         $form = tap(Form::make('test')->set('unique_instances', true))->save();
-        $submission = tap(FormSubmission::make()->form($form)->data(['entry' => 'event-1']))->save();
+        $submission = tap(FormSubmission::make()->form($form)->data(['_entry' => 'event-1']))->save();
 
         $this
             ->actingAs($user)
@@ -75,7 +75,7 @@ class ViewSubmissionTest extends TestCase
 
         $user = tap(User::make()->makeSuper())->save();
         $form = tap(Form::make('test')->set('unique_instances', true))->save();
-        $submission = tap(FormSubmission::make()->form($form)->data(['entry' => 'event-1']))->save();
+        $submission = tap(FormSubmission::make()->form($form)->data(['_entry' => 'event-1']))->save();
 
         $this
             ->actingAs($user)

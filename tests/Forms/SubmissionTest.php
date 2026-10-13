@@ -241,12 +241,12 @@ class SubmissionTest extends TestCase
     {
         $form = tap(Form::make('contact_us'))->save();
 
-        $submission = $form->makeSubmission()->set('entry', 'event-1');
+        $submission = $form->makeSubmission()->set('_entry', 'event-1');
 
         $submission->data(['foo' => 'bar']);
 
         $this->assertEquals('bar', $submission->get('foo'));
-        $this->assertEquals('event-1', $submission->get('entry'));
+        $this->assertEquals('event-1', $submission->get('_entry'));
     }
 
     #[Test]
@@ -262,7 +262,7 @@ class SubmissionTest extends TestCase
 
         $this->assertArrayNotHasKey('entry', $submission->toArray());
 
-        $submission->set('entry', 'event-1');
+        $submission->set('_entry', 'event-1');
 
         $this->assertEquals('event-1', $submission->toArray()['entry']);
     }
@@ -278,10 +278,28 @@ class SubmissionTest extends TestCase
             ]]],
         ]))->save();
 
-        $submission = $form->makeSubmission()->data(['name' => 'San Holo'])->set('entry', 'event-1');
+        $submission = $form->makeSubmission()->data(['name' => 'San Holo'])->set('_entry', 'event-1');
 
         $this->assertEquals($entry->id(), $submission->entry()->id());
         $this->assertEquals($entry->id(), $submission->augmentedArrayData()['entry']->id());
+    }
+
+    #[Test]
+    public function a_form_field_named_entry_isnt_replaced_by_the_attached_entry()
+    {
+        (new EntryFactory)->collection('events')->id('event-1')->slug('event-one')->create();
+
+        $form = tap(Form::make('contact_us')->formFields([
+            'sections' => [['fields' => [
+                ['handle' => 'entry', 'field' => ['type' => 'text']],
+            ]]],
+        ]))->save();
+
+        $submission = $form->makeSubmission()->data(['entry' => 'Raffle ticket'])->set('_entry', 'event-1');
+
+        $this->assertEquals('event-1', $submission->entry()->id());
+        $this->assertEquals('Raffle ticket', $submission->toArray()['entry']);
+        $this->assertEquals('Raffle ticket', $submission->augmentedArrayData()['entry']);
     }
 
     #[Test]
@@ -603,7 +621,7 @@ class SubmissionTest extends TestCase
             'rsvp_form' => $rsvpFormValue,
         ])->create();
 
-        $form->makeSubmission()->set('entry', 'event-1')->asPartial()->finalize();
+        $form->makeSubmission()->set('_entry', 'event-1')->asPartial()->finalize();
 
         Bus::assertDispatchedTimes(SendWebhook::class, 1);
         Bus::assertDispatched(SendWebhook::class, fn (SendWebhook $job) => $job->config['url'] === $expectedUrl);

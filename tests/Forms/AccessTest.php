@@ -62,7 +62,7 @@ class AccessTest extends TestCase
             }
 
             if ($entry) {
-                $submission->set('entry', $entry);
+                $submission->set('_entry', $entry);
             }
 
             $submission->save();

@@ -1813,7 +1813,7 @@ class SubmitFormTest extends TestCase
 
         $result = $this->action()->entry('event-1')->submit(['email' => 'san@holo.com']);
 
-        $this->assertEquals('event-1', $result->submission->get('entry'));
+        $this->assertEquals('event-1', $result->submission->get('_entry'));
     }
 
     #[Test]
@@ -1867,7 +1867,7 @@ class SubmitFormTest extends TestCase
 
         $result = $this->action()->entry('event-1')->submit(['email' => 'san@holo.com']);
 
-        $this->assertEquals('event-1', $result->submission->get('entry'));
+        $this->assertEquals('event-1', $result->submission->get('_entry'));
     }
 
     #[Test]

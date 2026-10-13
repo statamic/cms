@@ -113,7 +113,7 @@ class Instance
         $query = $this->form->querySubmissions()->whereStatus('finalized');
 
         if ($this->entry) {
-            $query->where('entry', $this->entry);
+            $query->where('_entry', $this->entry);
         }
 
         if ($start = $this->submissionLimitPeriodStart()) {
