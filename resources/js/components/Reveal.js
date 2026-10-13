@@ -10,6 +10,7 @@ const FOCUSABLE_CONTROL_SELECTORS = [
     '[role="combobox"]:not([disabled]):not([aria-disabled="true"]):not([data-disabled])',
     '[role="slider"]:not([disabled]):not([aria-disabled="true"])',
     'button[data-ui-control]:not([disabled])',
+    'button:not([disabled]):not([aria-disabled="true"]):not([data-disabled])',
 ];
 
 class Reveal {
@@ -43,13 +44,30 @@ class Reveal {
         if (!root) return null;
 
         for (const selector of FOCUSABLE_CONTROL_SELECTORS) {
-            const control = root.querySelector(selector);
-            if (!control) continue;
-            if (control.tabIndex < 0 && control.getAttribute('role') === 'combobox') continue;
-            return control;
+            for (const control of root.querySelectorAll(selector)) {
+                if (control.closest('[data-ui-field-header]')) continue;
+                if (!this.isVisible(control)) continue;
+                if (control.tabIndex < 0 && control.getAttribute('role') === 'combobox') continue;
+                return control;
+            }
         }
 
         return null;
+    }
+
+    isVisible(control) {
+        if (control.closest('[hidden], [inert]')) return false;
+
+        const visibility = getComputedStyle(control).visibility;
+        if (visibility === 'hidden' || visibility === 'collapse') return false;
+
+        let element = control;
+        while (element) {
+            if (getComputedStyle(element).display === 'none') return false;
+            element = element.parentElement;
+        }
+
+        return true;
     }
 
     invalid() {
@@ -63,9 +81,10 @@ class Reveal {
             nextTick(() => {
                 const current =
                     document.querySelector('[data-ui-field-has-errors]:not(:has([data-ui-field-has-errors]))') || el;
+                const fallback = fieldId ? document.getElementById(fieldId) : null;
                 const control =
                     this.focusableControl(current) ||
-                    (fieldId ? document.getElementById(fieldId) : null);
+                    (fallback && this.isVisible(fallback) ? fallback : null);
 
                 control?.focus?.({ preventScroll: true });
             });
