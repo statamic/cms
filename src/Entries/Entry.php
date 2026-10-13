@@ -1186,6 +1186,11 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             return $this->value('authors');
         }
 
+        // Avoid resolving the Site object.
+        if ($field === 'site') {
+            return $this->locale();
+        }
+
         // Reset the cached uri so it gets recalculated.
         if ($field === 'uri') {
             Blink::store('entry-uris')->forget($this->id());
