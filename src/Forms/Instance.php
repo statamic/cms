@@ -8,7 +8,6 @@ use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Entry;
 use Statamic\Facades\User;
-use Statamic\Support\Arr;
 
 use function Statamic\trans as __;
 
@@ -84,11 +83,7 @@ class Instance
                 return [];
             }
 
-            $value = FormFieldValues::on($entry)
-                ->referencing($this->form->handle())
-                ->first(fn ($value) => is_array($value) && Arr::isAssoc($value));
-
-            return Arr::get($value, 'config', []);
+            return FormFieldValues::on($entry)->config($this->form->handle());
         });
     }
 

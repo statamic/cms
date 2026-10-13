@@ -98,6 +98,10 @@ class Fieldtype extends Relationship
             return ['form' => $handles, 'config' => []];
         }
 
+        if ($this->cannotConfigure($form)) {
+            return ['form' => $handles, 'config' => []];
+        }
+
         $config = Arr::get($data, 'config', []);
 
         return [
@@ -127,6 +131,12 @@ class Fieldtype extends Relationship
             return $handle;
         }
 
+        if ($this->cannotConfigure($form)) {
+            $config = ($entry = $this->parentEntry()) ? FormFieldValues::on($entry)->config($handle) : [];
+
+            return $config ? ['form' => $handle, 'config' => $config] : $handle;
+        }
+
         $config = Arr::get($data, 'config', []);
 
         // Only desynced fields are submitted, so a key's presence means it's an
@@ -145,6 +155,11 @@ class Fieldtype extends Relationship
     public function preProcessValidatable($value)
     {
         return $this->toFormHandles($value);
+    }
+
+    private function cannotConfigure(FormContract $form): bool
+    {
+        return ($user = User::current()) && ! $user->can('edit', $form);
     }
 
     private function configCanBeOverridden(): bool
@@ -314,6 +329,10 @@ class Fieldtype extends Relationship
         }
 
         if (! $form = $this->uniqueInstancesForm(Arr::first($this->toFormHandles($this->field->value())))) {
+            return null;
+        }
+
+        if ($this->cannotConfigure($form)) {
             return null;
         }
 

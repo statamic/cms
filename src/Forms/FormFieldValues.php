@@ -36,6 +36,13 @@ class FormFieldValues
         return $this->referencing($form)->isNotEmpty();
     }
 
+    public function config(string $form): array
+    {
+        $value = $this->referencing($form)->first(fn ($value) => is_array($value) && Arr::isAssoc($value));
+
+        return Arr::get($value, 'config', []);
+    }
+
     private function fromFields(Fields $fields, array $values): Collection
     {
         return $fields->all()->values()->flatMap(

@@ -9,11 +9,13 @@ use Statamic\Facades\Entry;
 use Statamic\Facades\Form;
 use Statamic\Facades\User;
 use Statamic\Fields\Field;
+use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class FormTest extends TestCase
 {
+    use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
     protected function resolveApplicationConfiguration($app)
@@ -207,6 +209,51 @@ class FormTest extends TestCase
         $originConnections = $preload['configureMeta']['originValues']['connections'];
 
         $this->assertEquals('https://example.com/webhook', $originConnections['webhook'][0]['url']);
+    }
+
+    #[Test]
+    public function it_only_preloads_configure_meta_for_users_who_can_edit_the_form()
+    {
+        Form::find('contact')->set('unique_instances', true)->save();
+
+        $preload = fn () => (new Field('rsvp_form', ['type' => 'form', 'max_items' => 1]))
+            ->setParent(Entry::make())
+            ->setValue(['form' => 'contact', 'config' => []])
+            ->fieldtype()
+            ->preload();
+
+        $this->actingAs(tap(User::make()->makeSuper())->save());
+        $this->assertArrayHasKey('configureMeta', $preload());
+
+        $this->setTestRoles(['editor' => ['access cp'], 'manager' => ['access cp', 'edit contact form']]);
+
+        $this->actingAs(tap(User::make()->assignRole('editor'))->save());
+        $this->assertArrayNotHasKey('configureMeta', $preload());
+
+        $this->actingAs(tap(User::make()->assignRole('manager'))->save());
+        $this->assertArrayHasKey('configureMeta', $preload());
+    }
+
+    #[Test]
+    public function it_doesnt_pre_process_the_stored_config_for_users_who_cant_edit_the_form()
+    {
+        $this->setTestRoles(['editor' => ['access cp']]);
+        $value = ['form' => 'contact', 'config' => ['submission_limit' => 5, 'connections' => ['webhook' => []]]];
+
+        $this->assertSame(5, $this->fieldtype()->preProcess($value)['config']['submission_limit']);
+
+        $this->actingAs(tap(User::make()->assignRole('editor'))->save());
+
+        $this->assertSame(['form' => ['contact'], 'config' => []], $this->fieldtype()->preProcess($value));
+    }
+
+    #[Test]
+    public function it_ignores_incoming_config_for_users_who_cant_edit_the_form_without_a_parent_entry()
+    {
+        $this->setTestRoles(['editor' => ['access cp']]);
+        $this->actingAs(tap(User::make()->assignRole('editor'))->save());
+
+        $this->assertSame('contact', $this->fieldtype()->process(['form' => ['contact'], 'config' => ['submission_limit' => 5]]));
     }
 
     #[Test]
