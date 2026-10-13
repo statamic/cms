@@ -60,6 +60,7 @@ use Statamic\View\Cascade;
 use Statamic\View\Instrumentation\InstrumentationState;
 use Statamic\View\Slot;
 use Statamic\View\State\CachesOutput;
+use Stringable;
 use Throwable;
 
 class NodeProcessor
@@ -112,6 +113,13 @@ class NodeProcessor
      * @var bool
      */
     protected $isInterpolationProcessor = false;
+
+    /**
+     * Indicates if the processor is reducing a value being assigned to a variable.
+     *
+     * @var bool
+     */
+    protected $isAssignmentProcessor = false;
 
     /**
      * Indicates if the processor is providing results for a parameter.
@@ -296,6 +304,19 @@ class NodeProcessor
     public function setIsInterpolationProcessor($isInterpolation)
     {
         $this->isInterpolationProcessor = $isInterpolation;
+
+        return $this;
+    }
+
+    /**
+     * Sets whether the NodeProcessor is reducing a value being assigned to a variable.
+     *
+     * @param  bool  $isAssignment  The value.
+     * @return $this
+     */
+    public function setIsAssignmentProcessor($isAssignment)
+    {
+        $this->isAssignmentProcessor = $isAssignment;
 
         return $this;
     }
@@ -1122,6 +1143,23 @@ class NodeProcessor
         }
 
         return $this->interpolationCache[$node->name];
+    }
+
+    /**
+     * Evaluates an interpolated variable being assigned to a variable, keeping tag objects intact.
+     *
+     * @param  VariableNode  $node  The interpolated variable.
+     * @return mixed
+     *
+     * @throws RuntimeException
+     * @throws SyntaxErrorException
+     */
+    public function reduceAssignedInterpolatedVariable(VariableNode $node)
+    {
+        return $this->cloneProcessor()
+            ->setIsInterpolationProcessor(true)
+            ->setIsAssignmentProcessor(true)
+            ->setData($this->getActiveData())->reduce($node->interpolationNodes);
     }
 
     /**
@@ -2037,7 +2075,9 @@ class NodeProcessor
 
                             $output = $this->tagBodyOutput($node, $output);
 
-                            $output = PathDataManager::reduceForAntlers($output, $this->antlersParser, $this->getActiveData(), $node->isClosedBy != null);
+                            if (! $this->assigningAugmentable($output)) {
+                                $output = PathDataManager::reduceForAntlers($output, $this->antlersParser, $this->getActiveData(), $node->isClosedBy != null);
+                            }
                         }
 
                         if ($this->isInterpolationProcessor) {
@@ -2744,6 +2784,13 @@ class NodeProcessor
         }
 
         return $buffer;
+    }
+
+    private function assigningAugmentable($output): bool
+    {
+        return $this->isAssignmentProcessor
+            && $output instanceof Augmentable
+            && $output instanceof Stringable;
     }
 
     /**

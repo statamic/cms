@@ -21,7 +21,7 @@ class StringFragment
         $this->contents = $contents;
         $this->extension = $extension;
         $this->data = $data;
-        $this->directory = config('view.compiled').'/nocache';
+        $this->directory = storage_path('statamic/tmp/nocache');
     }
 
     public function render(): string

@@ -124,6 +124,7 @@
                             <Panel class="flex justify-between px-5! py-3! dark:bg-gray-800!" v-if="!revisionsEnabled">
                                 <Heading :text="__('Published')" />
                                 <Switch
+                                    :label="__('Published')"
                                     :model-value="published"
                                     :disabled="!canManagePublishState"
                                     @update:model-value="setFieldValue('published', $event)"
@@ -419,8 +420,13 @@ export default {
             return computed(() => this.$refs.container);
         },
 
-        saving() {
-            return this.savingRef.value;
+        saving: {
+            get() {
+                return this.savingRef.value;
+            },
+            set(value) {
+                this.savingRef.value = value;
+            },
         },
 
         errors() {

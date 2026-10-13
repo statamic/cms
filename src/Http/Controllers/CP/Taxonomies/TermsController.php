@@ -167,14 +167,21 @@ class TermsController extends CpController
 
         $fields = $term->blueprint()->fields()->addValues($request->except('id'));
 
-        $fields->validate([
-            'title' => 'required',
-            'slug' => [
-                'required',
-                new Slug,
-                new UniqueTermValue(taxonomy: $taxonomy->handle(), except: $term->id(), site: $site->handle()),
-            ],
-        ]);
+        $fields
+            ->validator()
+            ->withRules([
+                'title' => 'required',
+                'slug' => [
+                    'required',
+                    new Slug,
+                    new UniqueTermValue(taxonomy: $taxonomy->handle(), except: $term->id(), site: $site->handle()),
+                ],
+            ])
+            ->withReplacements([
+                'id' => $term->id(),
+                'taxonomy' => $taxonomy->handle(),
+                'site' => $site->handle(),
+            ])->validate();
 
         $values = $fields->process()->values();
 
@@ -196,13 +203,14 @@ class TermsController extends CpController
 
         $saved = $term->updateLastModified(User::current())->save();
 
-        [$values] = $this->extractFromFields($term, $term->blueprint());
+        [$values, $meta] = $this->extractFromFields($term, $term->blueprint());
 
         return (new TermResource($term))
             ->additional([
                 'saved' => $saved,
                 'data' => [
                     'values' => $values,
+                    'meta' => $meta,
                 ],
             ]);
     }
@@ -274,10 +282,16 @@ class TermsController extends CpController
 
         $fields = $blueprint->fields()->addValues($request->all());
 
-        $fields->validate([
-            'title' => 'required',
-            'slug' => ['required', new UniqueTermValue(taxonomy: $taxonomy->handle(), site: $site->handle())],
-        ]);
+        $fields
+            ->validator()
+            ->withRules([
+                'title' => 'required',
+                'slug' => ['required', new UniqueTermValue(taxonomy: $taxonomy->handle(), site: $site->handle())],
+            ])
+            ->withReplacements([
+                'taxonomy' => $taxonomy->handle(),
+                'site' => $site->handle(),
+            ])->validate();
 
         $values = $fields->process()->values()->except(['slug', 'blueprint']);
 
