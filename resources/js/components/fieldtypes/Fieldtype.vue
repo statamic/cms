@@ -87,7 +87,6 @@ export default {
 
         fieldActionPayload() {
             return {
-                vm: this,
                 fieldPathPrefix: this.fieldPathPrefix,
                 handle: this.handle,
                 value: this.value,
@@ -96,6 +95,7 @@ export default {
                 update: this.update,
                 updateMeta: this.updateMeta,
                 isReadOnly: this.isReadOnly,
+                container: this.injectedPublishContainer,
             };
         },
     },

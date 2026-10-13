@@ -1,4 +1,5 @@
 import modal from './modal';
+import { progress } from '@/api';
 
 export default class FieldAction {
     #payload;
@@ -60,7 +61,6 @@ export default class FieldAction {
         const response = this.#run(payload);
 
         if (response instanceof Promise) {
-            const progress = this.#payload.vm.$progress;
             const name = this.#payload.fieldPathPrefix ?? this.#payload.handle;
             progress.loading(name, true);
             response.finally(() => progress.loading(name, false));
