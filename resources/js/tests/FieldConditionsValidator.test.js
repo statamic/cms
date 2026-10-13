@@ -149,6 +149,67 @@ test('it can use comparison operators in conditions', () => {
     expect(showFieldIf({ age: '¯\\_(ツ)_/¯ 13' })).toBe(false);
 });
 
+test('it compares conditions without eval, so a content security policy can omit unsafe-eval', () => {
+    setValues({
+        first_name: 'Jesse',
+        age: 13,
+        likes_food: true,
+        favorite_animal: null,
+    });
+
+    const originalEval = globalThis.eval;
+    globalThis.eval = () => {
+        throw new Error('eval() was called');
+    };
+
+    try {
+        expect(showFieldIf({ first_name: 'Jesse' })).toBe(true);
+        expect(showFieldIf({ first_name: 'not Jack' })).toBe(true);
+        expect(showFieldIf({ first_name: '=== Jesse' })).toBe(true);
+        expect(showFieldIf({ first_name: '!== Jesse' })).toBe(false);
+        expect(showFieldIf({ age: '> 5' })).toBe(true);
+        expect(showFieldIf({ age: '>= 14' })).toBe(false);
+        expect(showFieldIf({ age: '< 5' })).toBe(false);
+        expect(showFieldIf({ age: '<= 13' })).toBe(true);
+        expect(showFieldIf({ likes_food: '== true' })).toBe(true);
+        expect(showFieldIf({ favorite_animal: '=== null' })).toBe(true);
+        expect(showFieldIf({ first_name: 'not empty' })).toBe(true);
+    } finally {
+        globalThis.eval = originalEval;
+    }
+});
+
+test('it loosely compares a number value with a string condition value', () => {
+    setValues({ age: 13 });
+
+    // The condition value arrives as a string, and a loose comparison still matches the number.
+    expect(showFieldIf({ age: '13' })).toBe(true);
+    expect(showFieldIf({ age: 'not 13' })).toBe(false);
+    expect(showFieldIf({ age: '== 13' })).toBe(true);
+    expect(showFieldIf({ age: '!= 13' })).toBe(false);
+    expect(showFieldIf({ age: '=== 13' })).toBe(false);
+});
+
+test('it compares a field with no value as null', () => {
+    setValues({ first_name: 'Jesse' });
+
+    expect(showFieldIf({ middle_name: 'Jesse' })).toBe(false);
+    expect(showFieldIf({ middle_name: 'not Jesse' })).toBe(true);
+    expect(showFieldIf({ middle_name: '=== null' })).toBe(true);
+    expect(showFieldIf({ middle_name: '!== null' })).toBe(false);
+});
+
+test('it compares an undefined operand without throwing', () => {
+    // String operands reach passesCondition() JSON-encoded, but an undefined lhs does not, and
+    // decoding it as JSON would throw.
+    const validator = new Validator({}, {});
+
+    expect(validator.passesCondition({ lhs: undefined, operator: '==', rhs: JSON.stringify('Jesse') })).toBe(false);
+    expect(validator.passesCondition({ lhs: undefined, operator: '!=', rhs: JSON.stringify('Jesse') })).toBe(true);
+    expect(validator.passesCondition({ lhs: undefined, operator: '===', rhs: null })).toBe(false);
+    expect(validator.passesCondition({ lhs: undefined, operator: '==', rhs: null })).toBe(true);
+});
+
 test('it can use includes or contains operators in conditions', () => {
     setValues({
         cancellation_reasons: ['found another service', 'other'],

@@ -19,6 +19,21 @@ const isEmpty = (value) => {
 
 const isString = (str) => str != null && typeof str.valueOf() === 'string';
 
+const COMPARISONS = {
+    '==': (lhs, rhs) => lhs == rhs,
+    '!=': (lhs, rhs) => lhs != rhs,
+    '===': (lhs, rhs) => lhs === rhs,
+    '!==': (lhs, rhs) => lhs !== rhs,
+    '>': (lhs, rhs) => lhs > rhs,
+    '>=': (lhs, rhs) => lhs >= rhs,
+    '<': (lhs, rhs) => lhs < rhs,
+    '<=': (lhs, rhs) => lhs <= rhs,
+};
+
+// prepareLhs() and prepareRhs() JSON-encode string operands, so decode them before comparing.
+// Non-string operands, like an undefined lhs, aren't valid JSON and are compared as is.
+const decodeOperand = (operand) => (isString(operand) ? JSON.parse(operand) : operand);
+
 export default class {
     constructor(field, values, rootValues, currentFieldPath, revealerFields, extraPayload) {
         this.field = field;
@@ -174,7 +189,7 @@ export default class {
             lhs = null;
         }
 
-        // Prepare for eval() and return.
+        // JSON-encode strings, which passesCondition() decodes before comparing.
         return isString(lhs) ? JSON.stringify(lhs.trim()) : lhs;
     }
 
@@ -194,7 +209,7 @@ export default class {
             return Number(rhs);
         }
 
-        // When performing a comparison that cannot be eval()'d, return rhs as is.
+        // When performing a comparison that isn't a plain operator comparison, return rhs as is.
         if (rhs === 'empty' || operator === 'includes') {
             return rhs;
         }
@@ -204,7 +219,7 @@ export default class {
             return rhs.split(',').map((string) => string.trim());
         }
 
-        // Prepare for eval() and return.
+        // JSON-encode strings, which passesCondition() decodes before comparing.
         return isString(rhs) ? JSON.stringify(rhs.trim()) : rhs;
     }
 
@@ -266,7 +281,13 @@ export default class {
             return false;
         }
 
-        return eval(`${condition.lhs} ${condition.operator} ${condition.rhs}`);
+        const compare = COMPARISONS[condition.operator];
+
+        if (!compare) {
+            throw new Error(`Statamic field condition operator [${condition.operator}] is not supported.`);
+        }
+
+        return compare(decodeOperand(condition.lhs), decodeOperand(condition.rhs));
     }
 
     passesIncludesCondition(condition) {

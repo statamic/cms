@@ -15,6 +15,7 @@ import PortalVue from 'portal-vue';
 import autosize from 'autosize';
 import wait from '@/util/wait.js';
 import markdown from '@/util/markdown.js';
+import catchFirefoxHistoryLimitErrors from '@/util/firefox-history-limit-errors.js';
 import VueComponentDebug from 'vue-component-debug';
 import { registerIconSetFromStrings } from '@ui';
 import Layout from '@/pages/layout/Layout.vue';
@@ -199,6 +200,8 @@ export default {
         const _this = this;
 
         const corePages = import.meta.glob('../pages/**/*.vue');
+
+        catchFirefoxHistoryLimitErrors();
 
         await createInertiaApp({
             id: 'statamic',
