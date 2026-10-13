@@ -14,12 +14,7 @@ trait MemoizesResults
     protected function flushResultCache(): void
     {
         $this->configurationRevision++;
-        $this->resultCache = [];
-
-        if ($this->cacheScope !== null) {
-            unset(static::$sharedResultCache[$this->cacheScope]);
-            $this->cacheScope = null;
-        }
+        $this->cacheScope = null;
     }
 
     /** @return array<int, HtmlContext|null>|null */
@@ -49,7 +44,7 @@ trait MemoizesResults
 
     protected function cachedResult(string $key, bool $persistent = true): ?string
     {
-        $entry = $this->memoizedEntry($key);
+        $entry = static::$results[$this->memoKey($key)] ?? null;
 
         if ($entry === null && $persistent && ($entry = $this->storedEntry($key)) !== null) {
             $this->memoize($key, $entry);
@@ -80,54 +75,19 @@ trait MemoizesResults
         return $result;
     }
 
-    /** @return array{0: string, 1: array<int, HtmlContext|null>|null, 2: string}|null */
-    protected function memoizedEntry(string $key): ?array
+    protected function memoKey(string $key): string
     {
-        if ($this->cacheScope !== null) {
-            return static::$sharedResultCache[$this->cacheScope][$key] ?? null;
-        }
-
-        return $this->resultCache[$key] ?? null;
+        return $this->cacheFingerprint().':'.$key;
     }
 
     /** @param  array{0: string, 1: array<int, HtmlContext|null>|null, 2: string}  $entry */
     protected function memoize(string $key, array $entry): void
     {
-        if ($this->cacheScope !== null) {
-            if (! isset(static::$sharedResultCache[$this->cacheScope])
-                && count(static::$sharedResultCache) >= static::$sharedResultScopeLimit) {
-                static::$sharedResultCache = array_slice(
-                    static::$sharedResultCache,
-                    count(static::$sharedResultCache) - static::$sharedResultScopeLimit + 1,
-                    null,
-                    true
-                );
-            }
-
-            static::$sharedResultCache[$this->cacheScope] = $this->evict(
-                static::$sharedResultCache[$this->cacheScope] ?? []
-            );
-
-            static::$sharedResultCache[$this->cacheScope][$key] = $entry;
-
-            return;
+        if (count(static::$results) >= static::$resultLimit) {
+            static::$results = array_slice(static::$results, intdiv(static::$resultLimit, 2), null, true);
         }
 
-        $this->resultCache = $this->evict($this->resultCache);
-        $this->resultCache[$key] = $entry;
-    }
-
-    /**
-     * @param  array<string, array{0: string, 1: array<int, HtmlContext|null>|null, 2: string}>  $cache
-     * @return array<string, array{0: string, 1: array<int, HtmlContext|null>|null, 2: string}>
-     */
-    protected function evict(array $cache): array
-    {
-        if (count($cache) < $this->resultCacheLimit) {
-            return $cache;
-        }
-
-        return array_slice($cache, intdiv($this->resultCacheLimit, 2), null, true);
+        static::$results[$this->memoKey($key)] = $entry;
     }
 
     /** @param  array<int, HtmlContext|null>|null  $contexts */

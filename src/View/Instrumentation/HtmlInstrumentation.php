@@ -59,12 +59,9 @@ class HtmlInstrumentation
     protected array $componentPrefixes = ComponentPrefixes::DEFAULTS;
 
     /** @var array<string, array{0: string, 1: array<int, HtmlContext|null>|null, 2: string}> */
-    protected array $resultCache = [];
+    protected static array $results = [];
 
-    /** @var array<string, array<string, array{0: string, 1: array<int, HtmlContext|null>|null, 2: string}>> */
-    protected static array $sharedResultCache = [];
-
-    protected static int $sharedResultScopeLimit = 8;
+    protected static int $resultLimit = 256;
 
     /** @var array<string, array<int, HtmlContext|null>> */
     protected static array $annotations = [];
@@ -76,8 +73,6 @@ class HtmlInstrumentation
     protected static ?string $cacheStoreNamespace = null;
 
     protected ?string $cacheScope = null;
-
-    protected int $resultCacheLimit = 256;
 
     protected bool|string $cacheStore = false;
 
