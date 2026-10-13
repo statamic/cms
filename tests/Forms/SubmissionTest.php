@@ -181,6 +181,46 @@ class SubmissionTest extends TestCase
     }
 
     #[Test]
+    public function marking_as_spam_stores_a_timestamp_once()
+    {
+        $form = tap(Form::make('contact_us'))->save();
+        $submission = $form->makeSubmission();
+
+        Carbon::setTestNow('2025-05-01 12:00:00');
+        $submission->markAsSpam();
+        $timestamp = Carbon::now()->timestamp;
+
+        $this->assertSame($timestamp, $submission->get('_marked_spam_at'));
+        $this->assertTrue($submission->isSpam());
+
+        Carbon::setTestNow('2025-05-05 12:00:00');
+        $submission->markAsSpam();
+        $submission->data(['foo' => 'bar']);
+        $submission->save();
+
+        $this->assertSame($timestamp, $submission->get('_marked_spam_at'));
+    }
+
+    #[Test]
+    public function marking_as_not_spam_removes_the_timestamp_and_remarking_gets_a_new_one()
+    {
+        $form = tap(Form::make('contact_us'))->save();
+
+        Carbon::setTestNow('2025-05-01 12:00:00');
+        $submission = $form->makeSubmission()->markAsSpam();
+
+        $submission->markAsNotSpam();
+
+        $this->assertFalse($submission->has('_marked_spam_at'));
+        $this->assertFalse($submission->isSpam());
+
+        Carbon::setTestNow('2025-05-05 12:00:00');
+        $submission->markAsSpam();
+
+        $this->assertSame(Carbon::now()->timestamp, $submission->get('_marked_spam_at'));
+    }
+
+    #[Test]
     public function setting_data_with_partial_or_site_in_the_payload_overrides_them()
     {
         $form = tap(Form::make('contact_us'))->save();

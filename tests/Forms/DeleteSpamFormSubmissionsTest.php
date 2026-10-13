@@ -44,6 +44,33 @@ class DeleteSpamFormSubmissionsTest extends TestCase
     }
 
     #[Test]
+    public function it_counts_the_threshold_from_when_the_submission_was_marked_as_spam()
+    {
+        config(['statamic.forms.delete_spam_submissions_after' => 30]);
+
+        $form = tap(Form::make('contact'))->save();
+
+        Carbon::setTestNow('2025-03-01 12:00:00');
+        $recentlyMarked = tap($form->makeSubmission())->save();
+
+        Carbon::setTestNow('2025-03-01 12:00:10');
+        $longAgoMarked = tap($form->makeSubmission())->save();
+
+        Carbon::setTestNow('2025-04-01 12:00:00');
+        $longAgoMarked->markAsSpam()->save();
+
+        Carbon::setTestNow('2025-05-30 12:00:00');
+        $recentlyMarked->markAsSpam()->save();
+
+        Carbon::setTestNow('2025-05-31 12:00:00');
+
+        (new DeleteSpamFormSubmissions)->handle();
+
+        $this->assertNotNull($form->submission($recentlyMarked->id()));
+        $this->assertNull($form->submission($longAgoMarked->id()));
+    }
+
+    #[Test]
     public function it_only_deletes_spam_submissions()
     {
         config(['statamic.forms.delete_spam_submissions_after' => 30]);

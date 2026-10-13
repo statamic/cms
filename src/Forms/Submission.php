@@ -74,9 +74,9 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
         $data = collect($data);
 
         // A full data replacement would otherwise drop the internal lifecycle
-        // keys, so carry over the existing _partial, _spam and _site values
+        // keys, so carry over the existing _partial, _marked_spam_at and _site values
         // unless the incoming payload provides its own.
-        foreach (['_partial', '_spam', '_site'] as $key) {
+        foreach (['_partial', '_marked_spam_at', '_site'] as $key) {
             if ($this->has($key) && ! $data->has($key)) {
                 $data[$key] = $this->get($key);
             }
@@ -181,21 +181,23 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
 
     public function markAsSpam(): self
     {
-        $this->set('_spam', true);
+        if (! $this->isSpam()) {
+            $this->set('_marked_spam_at', now()->timestamp);
+        }
 
         return $this;
     }
 
     public function markAsNotSpam(): self
     {
-        $this->remove('_spam');
+        $this->remove('_marked_spam_at');
 
         return $this;
     }
 
     public function isSpam(): bool
     {
-        return (bool) $this->get('_spam');
+        return $this->get('_marked_spam_at') !== null;
     }
 
     public function status(): string

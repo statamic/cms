@@ -18,11 +18,11 @@ class DeleteSpamFormSubmissions implements ShouldQueue
             return;
         }
 
-        $threshold = now()->subDays($days);
+        $threshold = now()->subDays($days)->timestamp;
 
         FormSubmission::query()
             ->whereStatus('spam')
-            ->where('date', '<', $threshold)
+            ->where('_marked_spam_at', '<', $threshold)
             ->get()
             ->each->delete();
     }

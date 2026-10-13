@@ -37,9 +37,9 @@ class SubmissionQueryBuilder extends Builder implements QueryBuilderContract
     {
         return match ($status) {
             'any' => $this,
-            'finalized' => $this->where('_partial', '!=', true)->where('_spam', '!=', true),
-            'partial' => $this->where('_partial', true)->where('_spam', '!=', true),
-            'spam' => $this->where('_spam', true),
+            'finalized' => $this->where('_partial', '!=', true)->whereNull('_marked_spam_at'),
+            'partial' => $this->where('_partial', true)->whereNull('_marked_spam_at'),
+            'spam' => $this->whereNotNull('_marked_spam_at'),
             default => throw new \Exception("Invalid status [$status]"),
         };
     }

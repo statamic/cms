@@ -469,8 +469,8 @@ class SubmissionQueryBuilderTest extends TestCase
         FormSubmission::make()->form($form)->data(['ref' => 'b', '_partial' => true])->save();
         FormSubmission::make()->form($form)->data(['ref' => 'c'])->save();
         FormSubmission::make()->form($form)->data(['ref' => 'd', '_partial' => true])->save();
-        FormSubmission::make()->form($form)->data(['ref' => 'e', '_spam' => true])->save();
-        FormSubmission::make()->form($form)->data(['ref' => 'f', '_partial' => true, '_spam' => true])->save();
+        FormSubmission::make()->form($form)->data(['ref' => 'e', '_marked_spam_at' => 1700000000])->save();
+        FormSubmission::make()->form($form)->data(['ref' => 'f', '_partial' => true, '_marked_spam_at' => 1700000000])->save();
 
         return $form;
     }
