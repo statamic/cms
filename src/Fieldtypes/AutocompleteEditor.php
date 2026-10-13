@@ -81,12 +81,6 @@ class AutocompleteEditor extends Fieldtype
                 'width' => 50,
                 'if_any' => ['inline' => 'equals true', 'markdown' => 'equals false'],
             ],
-            'antlers' => [
-                'display' => __('Allow Antlers'),
-                'instructions' => __('statamic::fieldtypes.any.config.antlers'),
-                'type' => 'toggle',
-                'width' => 50,
-            ],
         ];
     }
 
