@@ -15,22 +15,16 @@ class FieldMarkers extends HtmlInstrumentation
         return $this;
     }
 
-    private function isOpaque($region)
+    private function isOpaque(TemplateRegion $region): bool
     {
-        if (
-            $region->isPair() &&
-            in_array(
-                $region->raw()->name?->name,
-                ['markdown', 'section', 'push', 'scope'], true
-            )
-        ) {
-            return true;
+        if (! $region->isPair() || ! preg_match('/^([A-Za-z_][\w-]*)/', $region->expression, $match)) {
+            return false;
         }
 
-        return false;
+        return in_array($match[1], ['markdown', 'section', 'push', 'scope'], true);
     }
 
-    protected function emitInstrumentation($template, array $analysis)
+    protected function emitInstrumentation(string $template, array $analysis): string
     {
         $edits = [];
         $elements = [];
@@ -107,7 +101,7 @@ class FieldMarkers extends HtmlInstrumentation
         return '{{ ___internal_field:'.$id.' }}';
     }
 
-    public function instrumentAntlers($template)
+    public function instrumentAntlers(string $template): string
     {
         if ($this->tracer->suppressesNestedMarkers()) {
             return $template;
