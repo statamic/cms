@@ -4,7 +4,6 @@ namespace Tests\Fieldtypes\AutocompleteEditor;
 
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Antlers;
-use Statamic\Fields\Field;
 use Statamic\Fieldtypes\AutocompleteEditor;
 use Statamic\Fieldtypes\AutocompleteEditor\Mentions;
 use Tests\TestCase;
@@ -347,10 +346,9 @@ class MentionsTest extends TestCase
     #[Test]
     public function submitted_text_survives_antlers_in_a_markdown_value()
     {
-        $field = (new AutocompleteEditor)->setField(new Field('body', ['type' => 'autocomplete_editor', 'inline' => true]));
         $data = ['name' => '[[ secret ]] {{ config:app.key }} \\[[ secret ]] \\\\ C:\\x'];
 
-        $html = $field->parseMarkdown('Hi {{ name }} from [[ who ]] and \\[\\[ who \\]\\]');
+        $html = AutocompleteEditor::parseMarkdown('Hi {{ name }} from [[ who ]] and \\[\\[ who \\]\\]', inline: true);
 
         $this->assertSame(
             'Hi '.$data['name'].' from Jane and &#91;&#91; who ]]',

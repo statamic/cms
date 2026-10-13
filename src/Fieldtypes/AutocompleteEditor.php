@@ -125,16 +125,16 @@ class AutocompleteEditor extends Fieldtype
 
     public function augment($value)
     {
-        if (! $this->config('markdown')) {
+        if (! $this->config('markdown', true)) {
             return $value === '' ? null : $value;
         }
 
-        return $this->parseMarkdown($value);
+        return static::parseMarkdown($value, (bool) $this->config('inline'));
     }
 
-    // Public so a consumer holding a raw config string, rather than a Value, can
-    // get the same HTML without going through augmentation.
-    public function parseMarkdown($value): ?string
+    // Static so a consumer holding a raw string, rather than a Value, can get the
+    // same HTML without needing a field to read the config from.
+    public static function parseMarkdown($value, bool $inline = false): ?string
     {
         if ($value === null || $value === '') {
             return null;
@@ -170,10 +170,10 @@ class AutocompleteEditor extends Fieldtype
         );
         $html = strtr($html, $mentions);
 
-        return $this->config('inline') ? $this->unwrapParagraph($html) : $html;
+        return $inline ? static::unwrapParagraph($html) : $html;
     }
 
-    private function unwrapParagraph(string $html): string
+    private static function unwrapParagraph(string $html): string
     {
         $html = trim($html);
 

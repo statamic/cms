@@ -212,9 +212,21 @@ class AutocompleteEditorTest extends TestCase
     #[Test]
     public function augment_delegates_to_the_parse_markdown_method()
     {
-        $fieldtype = $this->fieldtype();
+        $this->assertSame(AutocompleteEditor::parseMarkdown('Hi **John**'), $this->fieldtype()->augment('Hi **John**'));
+        $this->assertSame(AutocompleteEditor::parseMarkdown('Hi **John**', inline: true), $this->fieldtype(['inline' => true])->augment('Hi **John**'));
+    }
 
-        $this->assertSame($fieldtype->parseMarkdown('Hi **John**'), $fieldtype->augment('Hi **John**'));
+    #[Test]
+    public function parse_markdown_unwraps_the_paragraph_when_inline()
+    {
+        $this->assertSame('<p>Hi <strong>John</strong></p>', trim(AutocompleteEditor::parseMarkdown('Hi **John**')));
+        $this->assertSame('Hi <strong>John</strong>', AutocompleteEditor::parseMarkdown('Hi **John**', inline: true));
+    }
+
+    #[Test]
+    public function augment_parses_markdown_without_a_field()
+    {
+        $this->assertSame('<p>Hi <strong>John</strong></p>', trim((new AutocompleteEditor)->augment('Hi **John**')));
     }
 
     #[Test]
