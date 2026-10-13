@@ -7,6 +7,8 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Facades\Form;
 use Statamic\Facades\FormSubmission;
+use Statamic\Facades\Site;
+use Statamic\Facades\Stache;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -506,6 +508,25 @@ class SubmissionQueryBuilderTest extends TestCase
 
         $this->assertEquals(['b', 'c'], $this->ids(FormSubmission::query()->where('site', 'fr')->get()));
         $this->assertEquals(['a'], $this->ids(FormSubmission::query()->where('site', 'en')->get()));
+        $this->assertEquals(['b', 'c'], $this->ids(FormSubmission::query()->where('site', Site::get('fr'))->get()));
+    }
+
+    #[Test]
+    public function it_stores_site_handles_in_the_site_index()
+    {
+        $this->setSites([
+            'en' => ['url' => '/'],
+            'fr' => ['url' => '/fr'],
+        ]);
+
+        $form = tap(Form::make('test'))->save();
+        $en = tap(FormSubmission::make()->form($form)->site('en'))->save();
+        $fr = tap(FormSubmission::make()->form($form)->site('fr'))->save();
+
+        $this->assertSame([
+            "test::{$en->id()}" => 'en',
+            "test::{$fr->id()}" => 'fr',
+        ], Stache::store('form-submissions')->store('test')->index('site')->items()->all());
     }
 
     #[Test]

@@ -7,6 +7,7 @@ use Statamic\Facades\Form;
 use Statamic\Facades\FormSubmission;
 use Statamic\Facades\Path;
 use Statamic\Facades\YAML;
+use Statamic\Stache\Indexes;
 use Statamic\Stache\Indexes\Value;
 use Statamic\Support\Str;
 use Statamic\Yaml\ParseException;
@@ -18,6 +19,7 @@ class FormSubmissionsStore extends ChildStore
     protected $storeIndexes = [
         'form',
         'date',
+        'site' => Indexes\Submissions\Site::class,
     ];
 
     public function getItemKey($item)
