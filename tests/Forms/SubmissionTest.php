@@ -627,6 +627,29 @@ class SubmissionTest extends TestCase
         Bus::assertDispatched(SendWebhook::class, fn (SendWebhook $job) => $job->config['url'] === $expectedUrl);
     }
 
+    #[Test]
+    public function finalizing_dispatches_no_connections_when_the_entry_overrides_them_to_none()
+    {
+        Bus::fake();
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        $form = tap(Form::make('contact_us')->data(['unique_instances' => true])->connections([
+            'webhook' => [['url' => 'https://example.com/form-webhook']],
+        ]))->save();
+
+        Blueprint::make('event')->setNamespace('collections.events')->setContents(['fields' => [
+            ['handle' => 'rsvp_form', 'field' => ['type' => 'form', 'max_items' => 1]],
+        ]])->save();
+
+        (new EntryFactory)->collection('events')->id('event-1')->slug('event-1')->data([
+            'rsvp_form' => ['form' => 'contact_us', 'config' => ['connections' => []]],
+        ])->create();
+
+        $form->makeSubmission()->set('_entry', 'event-1')->asPartial()->finalize();
+
+        Bus::assertNotDispatched(SendWebhook::class);
+    }
+
     public static function connectionOverrideProvider(): array
     {
         return [

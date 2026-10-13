@@ -69,6 +69,22 @@ class FormTest extends TestCase
     }
 
     #[Test]
+    public function it_keeps_an_empty_connections_override()
+    {
+        $value = $this->fieldtype()->process(['form' => ['contact'], 'config' => ['connections' => []]]);
+
+        $this->assertSame(['form' => 'contact', 'config' => ['connections' => []]], $value);
+    }
+
+    #[Test]
+    public function it_pre_processes_an_empty_connections_override()
+    {
+        $value = $this->fieldtype()->preProcess(['form' => 'contact', 'config' => ['connections' => []]]);
+
+        $this->assertSame(['connections' => []], $value['config']);
+    }
+
+    #[Test]
     public function it_drops_blank_overrides()
     {
         $value = $this->fieldtype()->process(['form' => ['contact'], 'config' => [

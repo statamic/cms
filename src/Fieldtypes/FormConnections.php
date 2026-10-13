@@ -55,12 +55,10 @@ class FormConnections extends Fieldtype
             return null;
         }
 
-        $processed = collect($value)
+        return collect($value)
             ->map(fn ($config, $handle) => FormConnector::find($handle)?->setForm($form)->process(Connector::normalizeConnections($config)))
             ->filter()
             ->all();
-
-        return $processed ?: null;
     }
 
     private function form(): ?Form

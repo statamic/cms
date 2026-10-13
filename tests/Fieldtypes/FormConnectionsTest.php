@@ -67,13 +67,13 @@ class FormConnectionsTest extends TestCase
     #[Test]
     public function it_drops_unknown_connection_handles()
     {
-        $this->assertNull($this->fieldtype()->process(['unknown' => [['foo' => 'bar']]]));
+        $this->assertSame([], $this->fieldtype()->process(['unknown' => [['foo' => 'bar']]]));
     }
 
     #[Test]
-    public function it_processes_to_null_when_empty()
+    public function it_processes_to_an_empty_array_when_empty()
     {
-        $this->assertNull($this->fieldtype()->process([]));
+        $this->assertSame([], $this->fieldtype()->process([]));
     }
 
     #[Test]

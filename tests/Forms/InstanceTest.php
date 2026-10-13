@@ -193,6 +193,18 @@ class InstanceTest extends TestCase
     }
 
     #[Test]
+    public function an_entry_can_override_the_connections_to_none()
+    {
+        $form = tap($this->makeForm()->connections([
+            'webhook' => [['url' => 'https://example.com/form']],
+        ]))->save();
+
+        $this->makeEntry('event-1', ['form' => 'contact', 'config' => ['connections' => []]]);
+
+        $this->assertEquals([], $form->instance('event-1')->connections()->all());
+    }
+
+    #[Test]
     public function the_form_delegates_to_its_default_instance()
     {
         $form = $this->makeForm(['close_date' => '2020-01-01 09:00']);

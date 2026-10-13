@@ -64,8 +64,10 @@ class Instance
 
     public function connections(): Collection
     {
-        if ($overrides = $this->overrides()['connections'] ?? null) {
-            return collect($overrides);
+        $overrides = $this->overrides();
+
+        if (array_key_exists('connections', $overrides) && $overrides['connections'] !== null) {
+            return collect($overrides['connections']);
         }
 
         return $this->form->connections();
