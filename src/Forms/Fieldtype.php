@@ -288,6 +288,10 @@ class Fieldtype extends Relationship
 
     private function submissionsPreloadData(): ?array
     {
+        if ($this->config('max_items') !== 1) {
+            return null;
+        }
+
         if (! $form = $this->viewableUniqueInstancesForm(Arr::first($this->toFormHandles($this->field->value())))) {
             return null;
         }

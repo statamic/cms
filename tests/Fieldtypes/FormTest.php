@@ -4,6 +4,7 @@ namespace Tests\Fieldtypes;
 
 use Facades\Statamic\Console\Processes\Composer;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Form;
 use Statamic\Facades\User;
@@ -204,6 +205,23 @@ class FormTest extends TestCase
 
         $this->assertArrayNotHasKey('configureMeta', $field->fieldtype()->preload());
         $this->assertArrayHasKey('configureMeta', $field->setParent(Entry::make())->fieldtype()->preload());
+    }
+
+    #[Test]
+    public function it_only_preloads_submissions_when_a_single_form_is_allowed()
+    {
+        $this->actingAs(tap(User::make()->makeSuper())->save());
+
+        Form::find('contact')->set('unique_instances', true)->save();
+
+        $preload = fn (int $maxItems) => (new Field('rsvp_form', ['type' => 'form', 'max_items' => $maxItems]))
+            ->setParent(Entry::make()->id('entry-id')->collection(tap(Collection::make('pages'))->save()))
+            ->setValue(['contact'])
+            ->fieldtype()
+            ->preload();
+
+        $this->assertEquals('contact', $preload(1)['submissions']['form']);
+        $this->assertArrayNotHasKey('submissions', $preload(2));
     }
 
     #[Test]
