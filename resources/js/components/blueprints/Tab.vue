@@ -1,26 +1,24 @@
 <template>
-    <TabTrigger :name="tab._id" class="blueprint-tab flex items-center">
-        <Icon
-            v-if="tab.icon"
-            :name="tab.icon"
-            :set="iconSet"
-            class="h-4 w-4 me-1"
-        />
+    <div
+        class="blueprint-tab flex items-center"
+        :class="{ 'pe-4': currentTab === tab._id }"
+    >
+        <TabTrigger
+            :name="tab._id"
+            class="flex items-center [--focus-outline-offset:-3px] focus-visible:rounded-md! focus-visible:bg-gray-100 dark:focus-visible:bg-gray-800"
+        >
+            <Icon
+                v-if="tab.icon"
+                :name="tab.icon"
+                :set="iconSet"
+                class="h-4 w-4 me-1"
+            />
 
-        <span class="block max-w-48 overflow-clip text-ellipsis whitespace-nowrap" v-tooltip="__(tab.display).length > 24 ? __(tab.display) : null">{{ __(tab.display) }}</span>
-
-        <Dropdown v-if="isActive" placement="left-start" class="me-3">
-            <template #trigger>
-                <Button class="absolute! top-0.25 -right-4 starting-style-transition starting-style-transition--slow" variant="ghost" size="xs" icon="chevron-down" :aria-label="__('Open Dropdown')" />
-            </template>
-            <DropdownMenu>
-                <DropdownItem :text="__('Edit')" icon="edit" @click="edit" />
-                <DropdownItem :text="__('Delete')" icon="trash" variant="destructive" @click="remove" />
-            </DropdownMenu>
-        </Dropdown>
+            <span class="block max-w-48 overflow-clip text-ellipsis whitespace-nowrap" v-tooltip="__(tab.display).length > 24 ? __(tab.display) : null">{{ __(tab.display) }}</span>
+        </TabTrigger>
 
         <Stack
-	        size="narrow"
+            size="narrow"
             :open="editing"
             @opened="() => $nextTick(() => $refs.title.select())"
             @update:open="editCancelled"
@@ -75,14 +73,14 @@
                 </div>
             </div>
         </Stack>
-    </TabTrigger>
+    </div>
 </template>
 
 <script>
-import { TabTrigger, Dropdown, DropdownMenu, DropdownItem, Button, Icon, Field, Input, Stack, StackClose } from '@/components/ui';
+import { TabTrigger, Button, Icon, Field, Input, Stack, StackClose } from '@/components/ui';
 
 export default {
-    components: { TabTrigger, Dropdown, DropdownMenu, DropdownItem, Button, Icon, Field, Input, Stack, StackClose },
+    components: { TabTrigger, Button, Icon, Field, Input, Stack, StackClose },
 
     props: {
         tab: {
@@ -115,10 +113,6 @@ export default {
     },
 
     computed: {
-        isActive() {
-            return this.currentTab === this.tab._id;
-        },
-
         iconSet() {
             return this.$config.get('replicatorSetIcons') || undefined;
         },
