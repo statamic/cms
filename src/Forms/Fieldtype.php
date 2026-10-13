@@ -305,7 +305,7 @@ class Fieldtype extends Relationship
 
     private function configureMetaPreloadData(): ?array
     {
-        if (! $this->configCanBeOverridden()) {
+        if (! $this->configCanBeOverridden() || ! $this->parentEntry()) {
             return null;
         }
 

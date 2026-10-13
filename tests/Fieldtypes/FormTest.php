@@ -4,6 +4,7 @@ namespace Tests\Fieldtypes;
 
 use Facades\Statamic\Console\Processes\Composer;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\Entry;
 use Statamic\Facades\Form;
 use Statamic\Facades\User;
 use Statamic\Fields\Field;
@@ -154,6 +155,7 @@ class FormTest extends TestCase
         Form::find('contact')->set('unique_instances', true)->set('submission_limit', 100)->save();
 
         $preload = (new Field('rsvp_form', ['type' => 'form', 'max_items' => 1]))
+            ->setParent(Entry::make())
             ->setValue(['form' => 'contact', 'config' => ['submission_limit' => 25]])
             ->fieldtype()
             ->preload();
@@ -180,6 +182,7 @@ class FormTest extends TestCase
         ])->save();
 
         $preload = (new Field('rsvp_form', ['type' => 'form', 'max_items' => 1]))
+            ->setParent(Entry::make())
             ->setValue(['form' => 'contact', 'config' => []])
             ->fieldtype()
             ->preload();
@@ -187,6 +190,20 @@ class FormTest extends TestCase
         $originConnections = $preload['configureMeta']['originValues']['connections'];
 
         $this->assertEquals('https://example.com/webhook', $originConnections['webhook'][0]['url']);
+    }
+
+    #[Test]
+    public function it_doesnt_preload_configure_meta_when_the_parent_is_not_an_entry()
+    {
+        $this->actingAs(tap(User::make()->makeSuper())->save());
+
+        Form::find('contact')->set('unique_instances', true)->save();
+
+        $field = (new Field('rsvp_form', ['type' => 'form', 'max_items' => 1]))
+            ->setValue(['form' => 'contact', 'config' => []]);
+
+        $this->assertArrayNotHasKey('configureMeta', $field->fieldtype()->preload());
+        $this->assertArrayHasKey('configureMeta', $field->setParent(Entry::make())->fieldtype()->preload());
     }
 
     #[Test]
