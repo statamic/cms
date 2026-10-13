@@ -173,7 +173,13 @@ reveal.use(rootEl, () => emit('expanded'));
                     />
                 </button>
                 <div class="flex items-center gap-2" v-if="!readOnly">
-                    <Switch size="xs" :model-value="enabled" @update:model-value="toggleEnabledState" v-tooltip="enabled ? __('Included in output') : __('Hidden from output')" />
+                    <Switch
+                        size="xs"
+                        :model-value="enabled"
+                        :label="__('Included in output')"
+                        @update:model-value="toggleEnabledState"
+                        v-tooltip="enabled ? __('Included in output') : __('Hidden from output')"
+                    />
                     <Dropdown>
                         <template #trigger>
                             <Button icon="dots" variant="ghost" size="xs" :aria-label="__('Open dropdown menu')" />
