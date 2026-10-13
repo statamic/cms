@@ -75,8 +75,18 @@ function scrollToBottom() {
         </div>
 
         <form ref="form" class="relative p-2.5 ps-0.25" @submit.prevent="send()" @keydown.enter.exact.prevent="send()">
-            <Textarea v-model="prompt" :placeholder="__('Ask anything...')" rows="2" resize="none" elastic />
-            <Button type="submit" icon="arrow-up" variant="primary" size="xs" round class="absolute end-5 bottom-5" :aria-label="__('Send')" :disabled="!prompt.trim()" />
+            <Textarea v-model="prompt" :placeholder="__('Ask anything...')" rows="2" resize="none" elastic class="[&_textarea]:pe-10" />
+            <Button
+                type="submit"
+                icon="arrow-up"
+                variant="primary"
+                size="xs"
+                round
+                class="absolute end-5.25 bottom-5.25 bg-none! bg-primary! disabled:opacity-100! hover:bg-primary-hover! border-0 shadow-none! inset-shadow-none! [&_svg]:opacity-100! [&_g]:[stroke-width:1.5]"
+                :aria-label="__('Send')"
+                v-tooltip="__('Send')"
+                :disabled="!prompt.trim()"
+            />
         </form>
     </div>
 </template>
