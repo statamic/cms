@@ -96,8 +96,52 @@ class MentionsTest extends TestCase
     public function a_token_preceded_by_an_escaped_backslash_is_still_replaced()
     {
         $this->assertSame(
-            '\\\\John',
+            '\\John',
             Mentions::replace('\\\\[[ first_name ]]', ['first_name' => 'John'])
+        );
+    }
+
+    #[Test]
+    public function an_escaped_plain_text_literal_is_unescaped_and_left_unresolved()
+    {
+        $this->assertSame(
+            '[[ first_name ]] then John',
+            Mentions::replace('\\[[ first_name ]] then [[ first_name ]]', ['first_name' => 'John'])
+        );
+    }
+
+    #[Test]
+    public function the_parity_of_a_backslash_run_before_brackets_decides_whether_they_are_escaped()
+    {
+        $values = ['a' => 'John'];
+
+        $this->assertSame('\\[[ a ]]', Mentions::replace('\\\\\\[[ a ]]', $values));
+        $this->assertSame('\\\\John', Mentions::replace('\\\\\\\\[[ a ]]', $values));
+        $this->assertSame('\\\\[[ a ]]', Mentions::replace('\\\\\\\\\\[[ a ]]', $values));
+    }
+
+    #[Test]
+    public function a_bracket_directly_before_a_token_is_kept()
+    {
+        $values = ['a' => 'John'];
+
+        $this->assertSame('[John', Mentions::replace('[[[ a ]]', $values));
+        $this->assertSame('\\[John', Mentions::replace('\\\\[[[ a ]]', $values));
+        $this->assertSame('[[[John', Mentions::replace('\\[[[[[ a ]]', $values));
+    }
+
+    #[Test]
+    public function an_escaped_literal_directly_before_a_token_is_unescaped_while_the_token_resolves()
+    {
+        $this->assertSame('[[John', Mentions::replace('\\[[[[ a ]]', ['a' => 'John']));
+    }
+
+    #[Test]
+    public function backslashes_not_touching_brackets_are_left_alone()
+    {
+        $this->assertSame(
+            'C:\\path\\to \\[ x ] \\ John \\',
+            Mentions::replace('C:\\path\\to \\[ x ] \\ [[ a ]] \\', ['a' => 'John'])
         );
     }
 

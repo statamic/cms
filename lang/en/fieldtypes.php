@@ -27,6 +27,7 @@ return [
     'autocomplete_editor.config.buttons' => 'Choose which buttons to show in the toolbar.',
     'autocomplete_editor.config.enable_line_breaks' => 'Allows adding line breaks to the content.',
     'autocomplete_editor.config.inline' => 'Disable all block-level elements like headings and lists.',
+    'autocomplete_editor.config.markdown' => 'Allow formatting, stored as Markdown. When disabled, the content is plain text and mentions.',
     'autocomplete_editor.config.options' => 'Set the values and their optional labels available for autocompletion.',
     'autocomplete_editor.config.placeholder' => 'Text to display when the field is empty.',
     'autocomplete_editor.config.trigger' => 'The character that triggers the autocomplete suggestions.',

@@ -56,6 +56,14 @@ class AutocompleteEditor extends Fieldtype
                     'orderedlist' => __('Ordered List'),
                 ],
                 'default' => ['bold', 'italic', 'h2', 'h3', 'bulletlist', 'orderedlist'],
+                'if' => ['markdown' => 'equals true'],
+            ],
+            'markdown' => [
+                'display' => __('Markdown'),
+                'instructions' => __('statamic::fieldtypes.autocomplete_editor.config.markdown'),
+                'type' => 'toggle',
+                'default' => true,
+                'width' => 50,
             ],
             'inline' => [
                 'display' => __('Inline'),
@@ -63,6 +71,7 @@ class AutocompleteEditor extends Fieldtype
                 'type' => 'toggle',
                 'default' => false,
                 'width' => 50,
+                'if' => ['markdown' => 'equals true'],
             ],
             'enable_line_breaks' => [
                 'display' => __('Enable Line Breaks'),
@@ -70,7 +79,7 @@ class AutocompleteEditor extends Fieldtype
                 'type' => 'toggle',
                 'default' => false,
                 'width' => 50,
-                'if' => ['inline' => 'equals true'],
+                'if_any' => ['inline' => 'equals true', 'markdown' => 'equals false'],
             ],
             'antlers' => [
                 'display' => __('Allow Antlers'),
@@ -122,6 +131,10 @@ class AutocompleteEditor extends Fieldtype
 
     public function augment($value)
     {
+        if (! $this->config('markdown')) {
+            return $value === '' ? null : $value;
+        }
+
         return $this->parseMarkdown($value);
     }
 
@@ -140,6 +153,8 @@ class AutocompleteEditor extends Fieldtype
         // indistinguishable from a real mention in the HTML. Real tokens are swapped
         // for alphanumeric sentinels (inert to the markdown parser) and the literals
         // that remain get their brackets encoded so Mentions::replace() skips them.
+        // Backslashes before a real token (or a bracket touching one) are encoded
+        // too, since replace() would otherwise read them as the plain text escape.
         do {
             $nonce = bin2hex(random_bytes(8));
         } while (str_contains($value, $nonce));
@@ -154,6 +169,11 @@ class AutocompleteEditor extends Fieldtype
         $html = Markdown::parser('default')->parse($value);
 
         $html = str_replace('[[', '&#91;&#91;', $html);
+        $html = preg_replace_callback(
+            '/\\\\+(?=\[*mention'.$nonce.'n\d+e)/',
+            fn ($matches) => str_repeat('&#92;', strlen($matches[0])),
+            $html
+        );
         $html = strtr($html, $mentions);
 
         return $this->config('inline') ? $this->unwrapParagraph($html) : $html;

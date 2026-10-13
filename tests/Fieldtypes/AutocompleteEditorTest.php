@@ -28,6 +28,7 @@ class AutocompleteEditorTest extends TestCase
         $this->assertNull($fieldtype->config('placeholder'));
         $this->assertFalse($fieldtype->config('inline'));
         $this->assertFalse($fieldtype->config('enable_line_breaks'));
+        $this->assertTrue($fieldtype->config('markdown'));
         $this->assertSame(
             ['bold', 'italic', 'h2', 'h3', 'bulletlist', 'orderedlist'],
             $fieldtype->config('buttons')
@@ -304,7 +305,59 @@ class AutocompleteEditorTest extends TestCase
 
         $html = $fieldtype->augment('\\\\[[ a ]]');
 
-        $this->assertSame('\\1', Mentions::replace($html, ['a' => '1']));
+        $this->assertSame('&#92;[[ a ]]', $html);
+        $this->assertSame('&#92;1', Mentions::replace($html, ['a' => '1']));
+    }
+
+    #[Test]
+    public function augmented_markdown_resolves_the_same_as_before_plain_text_escapes_existed()
+    {
+        $fieldtype = $this->fieldtype(['inline' => true]);
+        $values = ['a' => '1'];
+
+        $cases = [
+            '[[ a ]]' => '1',
+            'x \\[\\[ a \\]\\] [[ a ]]' => 'x &#91;&#91; a ]] 1',
+            '\\\\[[ a ]]' => '&#92;1',
+            '\\\\\\\\[[ a ]]' => '&#92;&#92;1',
+            '\\[[[ a ]]' => '[1',
+            '\\\\\\[[[ a ]]' => '&#92;[1',
+            '`\\[[ a ]]`' => '<code>&#92;1</code>',
+        ];
+
+        foreach ($cases as $markdown => $expected) {
+            $this->assertSame($expected, Mentions::replace($fieldtype->augment($markdown), $values), $markdown);
+        }
+    }
+
+    #[Test]
+    public function augmented_markdown_never_leaves_a_backslash_or_bracket_where_replace_would_treat_it_as_an_escape()
+    {
+        $fieldtype = $this->fieldtype(['inline' => true]);
+        $values = ['a' => '1'];
+        $alphabet = ['\\', '[', ']', ' ', 'x', '`', '[[ a ]]', '\\[\\['];
+
+        $sequences = [''];
+
+        for ($length = 1; $length <= 4; $length++) {
+            $sequences = collect($sequences)->flatMap(fn ($sequence) => collect($alphabet)->map(fn ($item) => $sequence.$item))->all();
+
+            foreach ($sequences as $markdown) {
+                $html = (string) $fieldtype->augment($markdown);
+
+                $before = preg_replace_callback(
+                    Mentions::TOKEN,
+                    fn ($matches) => $values[$matches[1]] ?? '',
+                    str_replace('&#92;', '\\', $html)
+                );
+
+                $this->assertSame(
+                    html_entity_decode($before),
+                    html_entity_decode(Mentions::replace($html, $values)),
+                    $markdown
+                );
+            }
+        }
     }
 
     #[Test]
@@ -313,6 +366,25 @@ class AutocompleteEditorTest extends TestCase
         $fieldtype = $this->fieldtype(['inline' => true]);
 
         $this->assertSame('mentionabcn0e [[ a ]]', $fieldtype->augment('mentionabcn0e [[ a ]]'));
+    }
+
+    #[Test]
+    public function it_augments_plain_text_unchanged_when_markdown_is_disabled()
+    {
+        $fieldtype = $this->fieldtype(['markdown' => false]);
+
+        $value = "**Hi** _there_ # \\ `x` - 1. > Tom & Jerry <b> \\[[ literal ]] [[ first_name ]]\nline two";
+
+        $this->assertSame($value, $fieldtype->augment($value));
+    }
+
+    #[Test]
+    public function it_augments_null_and_empty_plain_text_to_null()
+    {
+        $fieldtype = $this->fieldtype(['markdown' => false]);
+
+        $this->assertNull($fieldtype->augment(null));
+        $this->assertNull($fieldtype->augment(''));
     }
 
     private function fieldtype($config = [])
