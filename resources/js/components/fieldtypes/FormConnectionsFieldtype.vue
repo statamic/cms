@@ -71,7 +71,7 @@ function applyConnector() {
     errors.value = {};
     saving.value = true;
 
-    axios.patch(`${connector.value.action}?_save=false`, draft.value)
+    axios.post(connector.value.action, draft.value)
         .then(({ data }) => {
             update({ ...(props.value ?? {}), [editingHandle.value]: data });
             closeEditor();

@@ -29,7 +29,7 @@ class FormConnections extends Fieldtype
                 'icon' => $connector->icon(),
                 'developer' => $connector->developer(),
                 'count' => $connector->forForm($form)->count(),
-                'action' => cp_route('forms.connect.update', [$form->handle(), $connector->handle()]),
+                'action' => cp_route('forms.connect.validate', [$form->handle(), $connector->handle()]),
             ])->values()->all(),
             'components' => FormConnector::all()->mapWithKeys(fn (Connector $connector): array => [
                 $connector->handle() => $connector->forForm($form)->render(),

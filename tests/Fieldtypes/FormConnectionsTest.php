@@ -37,7 +37,7 @@ class FormConnectionsTest extends TestCase
 
         $this->assertEquals(1, $types['email']['count']);
         $this->assertEquals(1, $types['webhook']['count']);
-        $this->assertEquals(cp_route('forms.connect.update', ['contact', 'webhook']), $types['webhook']['action']);
+        $this->assertEquals(cp_route('forms.connect.validate', ['contact', 'webhook']), $types['webhook']['action']);
 
         $this->assertEquals('email-connector', $preload['components']['email']->toArray()['name']);
         $this->assertEquals('webhook-connector', $preload['components']['webhook']->toArray()['name']);
