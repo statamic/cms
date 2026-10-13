@@ -156,11 +156,22 @@ const shouldShowField = computed(() => {
     ).showField(props.config, fullPath.value);
 });
 
+// Only applies when hidden by conditions; blueprint "hidden" visibility still removes the field from layout.
+const reserveSpaceWhenHiddenEnabled = computed(
+    () => props.config.reserve_space_when_hidden === true && props.config.visibility !== 'hidden',
+);
+
+const shouldHideFieldVisually = computed(
+    () => reserveSpaceWhenHiddenEnabled.value && !shouldShowField.value,
+);
+
 // Hidden fieldtypes are mounted like any other field so they take part in field
 // conditions, but they only become visible on a form submission.
 const isHiddenFieldtype = computed(() => props.config.type === 'hidden' && !isFormSubmission);
 
-const shouldRenderField = computed(() => shouldShowField.value && !isHiddenFieldtype.value);
+const shouldRenderField = computed(
+    () => !isHiddenFieldtype.value && (shouldShowField.value || reserveSpaceWhenHiddenEnabled.value),
+);
 
 const shouldShowLabelText = computed(() => !props.config.hide_display);
 
@@ -248,7 +259,8 @@ const fieldtypeComponentEvents = computed(() => ({
     >
         <Field
             v-show="shouldRenderField"
-            :class="`${config.type}-fieldtype`"
+            :class="[`${config.type}-fieldtype`, { 'opacity-0 pointer-events-none': shouldHideFieldVisually }]"
+            :inert="shouldHideFieldVisually"
             :id="fieldId"
             :dir="direction"
             :instructions="config.instructions"
@@ -272,15 +284,15 @@ const fieldtypeComponentEvents = computed(() => ({
                         />
                     </Transition>
                     <template v-if="shouldShowLabelText">
-                        <span v-tooltip="config.handle">
+                        <span v-tooltip="{ content: config.handle, copyable: true }">
                             {{ __(config.display) }}
                         </span>
                     </template>
                     <template v-else-if="config.hide_display">
                         <span class="sr-only">{{ __(config.display) }}</span>
                     </template>
-                    <ui-button size="xs" inset icon="synced" variant="ghost" v-tooltip="__('messages.field_synced_with_origin')" v-if="!isReadOnly && isSyncable" v-show="isSynced" @click="desync" />
-                    <ui-button size="xs" inset icon="unsynced" variant="ghost" v-tooltip="__('messages.field_desynced_from_origin')" v-if="!isReadOnly && isSyncable" v-show="!isSynced" @click="sync" />
+                    <ui-button size="sm" class="[&_svg]:translate-y-0.5" inset icon="synced" variant="ghost" v-tooltip="__('messages.field_synced_with_origin')" v-if="!isReadOnly && isSyncable" v-show="isSynced" @click="desync" />
+                    <ui-button size="sm" class="[&_svg]:translate-y-0.5" inset icon="unsynced" variant="ghost" v-tooltip="__('messages.field_desynced_from_origin')" v-if="!isReadOnly && isSyncable" v-show="!isSynced" @click="sync" />
                 </Label>
             </template>
             <template #actions v-if="shouldShowFieldActions">

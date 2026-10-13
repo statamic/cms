@@ -39,7 +39,7 @@
                     <div>
                         <Link :href="page.collection.create_url" v-text="__('Add')" class="hover:text-ui-accent-text" />
                         <span class="mx-1 text-gray-400 dark:text-gray-500">/</span>
-                        <Link :href="page.collection.edit_url" v-text="__('Edit')" class="hover:text-ui-accent-text" />
+                        <Link :href="page.collection.edit_url" v-text="__('List')" class="hover:text-ui-accent-text" />
                     </div>
                 </div>
             </div>
@@ -55,18 +55,26 @@
 
                 <slot name="branch-icon" :branch="page" />
 
-	            <template v-if="editable">
-	                <Dropdown placement="left-start" :class="{ invisible: isRoot }">
-	                    <DropdownMenu>
-	                        <slot
-	                            name="branch-options"
-	                            :branch="page"
-	                            :depth="depth"
-	                            :remove-branch="remove"
-	                        />
-	                    </DropdownMenu>
-	                </Dropdown>
-	            </template>
+                <template v-if="editable">
+                    <slot
+                        name="branch-options-dropdown"
+                        :branch="page"
+                        :depth="depth"
+                        :remove-branch="remove"
+                        :is-root="isRoot"
+                    >
+                        <Dropdown placement="left-start" :class="{ invisible: isRoot }">
+                            <DropdownMenu>
+                                <slot
+                                    name="branch-options"
+                                    :branch="page"
+                                    :depth="depth"
+                                    :remove-branch="remove"
+                                />
+                            </DropdownMenu>
+                        </Dropdown>
+                    </slot>
+                </template>
             </div>
         </div>
     </div>

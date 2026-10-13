@@ -1,5 +1,6 @@
 import { expect, test, vi } from 'vitest';
 import Editor from '@/components/assets/Editor/Editor.vue';
+import Asset from '@/components/fieldtypes/assets/Asset';
 
 function keydown(key, target, modifier) {
     const component = {
@@ -44,5 +45,76 @@ test.each([['ctrlKey'], ['metaKey']])(
 
         expect(keydown('ArrowLeft', target, modifier).navigateToPreviousAsset).not.toHaveBeenCalled();
         expect(keydown('ArrowRight', target, modifier).navigateToNextAsset).not.toHaveBeenCalled();
+    },
+);
+
+test('keeps crop copies in the asset field', () => {
+    const editor = { redirectAfterCrop: false, $emit: vi.fn() };
+    const asset = { editingId: 'assets::source.png', $emit: vi.fn(), closeEditor: vi.fn() };
+
+    Editor.methods.handleCropCreated.call(editor, 'assets::crop.png');
+    Asset.methods.assetCreated.call(asset, 'assets::crop.png');
+
+    expect(editor.$emit).toHaveBeenCalledWith('created', 'assets::crop.png');
+    expect(asset.$emit).toHaveBeenCalledWith('id-changed', 'assets::source.png', 'assets::crop.png');
+    expect(asset.closeEditor).toHaveBeenCalled();
+});
+
+function navigate(method, { dirty = true, saving = false, save = () => Promise.resolve() } = {}) {
+    const component = {
+        saving,
+        publishContainer: 'asset',
+        $dirty: { has: () => dirty },
+        $emit: vi.fn(),
+        save: vi.fn(save),
+    };
+
+    Editor.methods[method].call(component);
+
+    return component;
+}
+
+test.each([
+    ['navigateToPreviousAsset', 'previous'],
+    ['navigateToNextAsset', 'next'],
+])('%s navigates straight away when there are no changes', (method, event) => {
+    const component = navigate(method, { dirty: false });
+
+    expect(component.save).not.toHaveBeenCalled();
+    expect(component.$emit).toHaveBeenCalledWith(event);
+});
+
+test.each([
+    ['navigateToPreviousAsset', 'previous'],
+    ['navigateToNextAsset', 'next'],
+])('%s waits for the save before navigating', async (method, event) => {
+    let resolve;
+    const component = navigate(method, { save: () => new Promise((r) => (resolve = r)) });
+
+    expect(component.save).toHaveBeenCalled();
+    expect(component.$emit).not.toHaveBeenCalled();
+
+    resolve();
+    await vi.waitFor(() => expect(component.$emit).toHaveBeenCalledWith(event));
+});
+
+test.each([['navigateToPreviousAsset'], ['navigateToNextAsset']])(
+    '%s does not navigate when the save fails',
+    async (method) => {
+        const component = navigate(method, { save: () => Promise.reject(new Error()) });
+
+        await new Promise((r) => setTimeout(r));
+
+        expect(component.$emit).not.toHaveBeenCalled();
+    },
+);
+
+test.each([['navigateToPreviousAsset'], ['navigateToNextAsset']])(
+    '%s does nothing while a save is in progress',
+    (method) => {
+        const component = navigate(method, { saving: true });
+
+        expect(component.save).not.toHaveBeenCalled();
+        expect(component.$emit).not.toHaveBeenCalled();
     },
 );

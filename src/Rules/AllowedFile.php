@@ -10,6 +10,7 @@ class AllowedFile implements ValidationRule
 {
     private const EXTENSIONS = [
         '7z',
+        'aac',
         'aiff',
         'asc',
         'asf',
@@ -25,10 +26,12 @@ class AllowedFile implements ValidationRule
         'dotm',
         'dotx',
         'fla',
+        'flac',
         'flv',
         'gif',
         'gz',
         'gzip',
+        'h264',
         'heic',
         'heif',
         'hevc',
@@ -46,6 +49,7 @@ class AllowedFile implements ValidationRule
         'mcc',
         'md',
         'mid',
+        'mkv',
         'mov',
         'mp3',
         'mp4',

@@ -2,17 +2,19 @@
 
 namespace Tests\Tags\User;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Parse;
 use Statamic\Facades\User;
+use Tests\Auth\UnsafeEmailPayloads;
 use Tests\NormalizesHtml;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class ProfileFormTest extends TestCase
 {
-    use NormalizesHtml, PreventSavingStacheItemsToDisk;
+    use NormalizesHtml, PreventSavingStacheItemsToDisk, UnsafeEmailPayloads;
 
     private function tag($tag)
     {
@@ -74,8 +76,8 @@ EOT
         preg_match_all($this->regex(), $output, $actual);
 
         $expected = [
-            '<label>Name</label><input id="userprofile-form-name-field" type="text" name="name" value="Test User">',
-            '<label>Email Address</label><input id="userprofile-form-email-field" type="email" name="email" value="test@example.com">',
+            '<label>Name</label><input id="userprofile-form-name-field" type="text" name="name" value="Test User" autocomplete="name">',
+            '<label>Email Address</label><input id="userprofile-form-email-field" type="email" name="email" value="test@example.com" autocomplete="email">',
         ];
 
         $this->assertEquals($expected, $actual[0]);
@@ -112,7 +114,7 @@ EOT
             '<h2 class="tab">Main</h2>',
             '<h3 class="section">Account</h3>',
             '<label>Full Name</label><input id="userprofile-form-name-field" type="text" name="name" value="Test User">',
-            '<label>Email Address</label><input id="userprofile-form-email-field" type="email" name="email" value="test@example.com">',
+            '<label>Email Address</label><input id="userprofile-form-email-field" type="email" name="email" value="test@example.com" autocomplete="email">',
             '<h3 class="section">About you</h3>',
             '<label>Phone Number</label><input id="userprofile-form-phone-field" type="text" name="phone" value="12345">',
             '<label>Over 18 years of age?</label><input id="userprofile-form-age-field" type="text" name="age" value="" required>',
@@ -150,7 +152,7 @@ EOT
         $expected = [
             '<h3 class="section">Account</h3>',
             '<label>Full Name</label><input id="userprofile-form-name-field" type="text" name="name" value="Test User">',
-            '<label>Email Address</label><input id="userprofile-form-email-field" type="email" name="email" value="test@example.com">',
+            '<label>Email Address</label><input id="userprofile-form-email-field" type="email" name="email" value="test@example.com" autocomplete="email">',
             '<h3 class="section">About you</h3>',
             '<label>Phone Number</label><input id="userprofile-form-phone-field" type="text" name="phone" value="12345">',
             '<label>Over 18 years of age?</label><input id="userprofile-form-age-field" type="text" name="age" value="" required>',
@@ -183,13 +185,29 @@ EOT
 
         $expected = [
             '<label>Full Name</label><input id="userprofile-form-name-field" type="text" name="name" value="Test User">',
-            '<label>Email Address</label><input id="userprofile-form-email-field" type="email" name="email" value="test@example.com">',
+            '<label>Email Address</label><input id="userprofile-form-email-field" type="email" name="email" value="test@example.com" autocomplete="email">',
             '<label>Phone Number</label><input id="userprofile-form-phone-field" type="text" name="phone" value="12345">',
             '<label>Over 18 years of age?</label><input id="userprofile-form-age-field" type="text" name="age" value="" required>',
             '<label>Newsletter</label><label><input type="hidden" name="newsletter" value="0"><input id="userprofile-form-newsletter-field" type="checkbox" name="newsletter" value="1" checked></label>',
         ];
 
         $this->assertEquals($expected, $actual[0]);
+    }
+
+    #[Test]
+    #[DataProvider('unsafeEmailProvider')]
+    public function it_wont_update_user_with_an_email_that_is_unsafe_as_a_file_path($email)
+    {
+        $user = tap(User::make()->email('john@x.com'))->save();
+        $this->actingAs($user);
+        $before = $this->filesystemSnapshot();
+
+        $this
+            ->post('/!/auth/profile', ['email' => $email])
+            ->assertSessionHasErrors('email', null, 'user.profile');
+
+        $this->assertSame($before, $this->filesystemSnapshot());
+        $this->assertEquals('john@x.com', User::find($user->id())->email());
     }
 
     #[Test]

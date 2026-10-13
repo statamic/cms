@@ -12,14 +12,14 @@ import {
 import TabContent from './TabContent.vue';
 import { injectContainerContext } from './Container.vue';
 import Sections from './Sections.vue';
-import { ref, computed, useSlots, onMounted, onUnmounted, nextTick, watch } from 'vue';
+import { ref, computed, reactive, useSlots, onMounted, onUnmounted, nextTick, watch } from 'vue';
 import ElementContainer from '@/components/ElementContainer.vue';
 import ShowField from '@/components/field-conditions/ShowField.js';
 import { createTabsOverflowTracker } from '@/util/tabs-overflow.js';
 
 const slots = useSlots();
 const { blueprint, visibleValues, extraValues, revealerValues, errors, hiddenFields, setHiddenField, container, rememberTab } = injectContainerContext();
-const tabs = ref(blueprint.value.tabs);
+const tabs = computed(() => reactive(blueprint.value.tabs));
 const width = ref(null);
 const sidebarTab = computed(() => tabs.value.find((tab) => tab.handle === 'sidebar'));
 const mainTabs = computed(() =>

@@ -97,6 +97,32 @@ EOT;
     }
 
     #[Test]
+    public function it_saves_layout_mode_when_using_multi_column_layout()
+    {
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+            'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
+        ]);
+
+        $set = (new GlobalSet)->title('The title')->sites(['en' => null, 'fr' => 'en'])->layoutMode('multi_column');
+
+        $expected = <<<'EOT'
+title: 'The title'
+layout_mode: multi_column
+sites:
+  en: null
+  fr: en
+
+EOT;
+        $this->assertEquals($expected, $set->fileContents());
+
+        $set->layoutMode('default');
+
+        $this->assertStringNotContainsString('layout_mode', $set->fileContents());
+    }
+
+    #[Test]
     public function it_saves_through_the_api()
     {
         Event::fake();

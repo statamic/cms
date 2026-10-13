@@ -5,6 +5,7 @@ import { data_get } from '../bootstrap/globals';
 import FieldConditions from '@/components/FieldConditions';
 import PublishContainer from '@ui/Publish/Container.vue';
 import ShowField from '@/components/field-conditions/ShowField.js';
+import Validator from '@/components/field-conditions/Validator.js';
 
 // Even though there's no Store anymore, this variable is named Store so that all the
 // assertions don't need to be changed. This is now a reference to the PublishContainer component.
@@ -148,6 +149,67 @@ test('it can use comparison operators in conditions', () => {
     expect(showFieldIf({ age: '¯\\_(ツ)_/¯ 13' })).toBe(false);
 });
 
+test('it compares conditions without eval, so a content security policy can omit unsafe-eval', () => {
+    setValues({
+        first_name: 'Jesse',
+        age: 13,
+        likes_food: true,
+        favorite_animal: null,
+    });
+
+    const originalEval = globalThis.eval;
+    globalThis.eval = () => {
+        throw new Error('eval() was called');
+    };
+
+    try {
+        expect(showFieldIf({ first_name: 'Jesse' })).toBe(true);
+        expect(showFieldIf({ first_name: 'not Jack' })).toBe(true);
+        expect(showFieldIf({ first_name: '=== Jesse' })).toBe(true);
+        expect(showFieldIf({ first_name: '!== Jesse' })).toBe(false);
+        expect(showFieldIf({ age: '> 5' })).toBe(true);
+        expect(showFieldIf({ age: '>= 14' })).toBe(false);
+        expect(showFieldIf({ age: '< 5' })).toBe(false);
+        expect(showFieldIf({ age: '<= 13' })).toBe(true);
+        expect(showFieldIf({ likes_food: '== true' })).toBe(true);
+        expect(showFieldIf({ favorite_animal: '=== null' })).toBe(true);
+        expect(showFieldIf({ first_name: 'not empty' })).toBe(true);
+    } finally {
+        globalThis.eval = originalEval;
+    }
+});
+
+test('it loosely compares a number value with a string condition value', () => {
+    setValues({ age: 13 });
+
+    // The condition value arrives as a string, and a loose comparison still matches the number.
+    expect(showFieldIf({ age: '13' })).toBe(true);
+    expect(showFieldIf({ age: 'not 13' })).toBe(false);
+    expect(showFieldIf({ age: '== 13' })).toBe(true);
+    expect(showFieldIf({ age: '!= 13' })).toBe(false);
+    expect(showFieldIf({ age: '=== 13' })).toBe(false);
+});
+
+test('it compares a field with no value as null', () => {
+    setValues({ first_name: 'Jesse' });
+
+    expect(showFieldIf({ middle_name: 'Jesse' })).toBe(false);
+    expect(showFieldIf({ middle_name: 'not Jesse' })).toBe(true);
+    expect(showFieldIf({ middle_name: '=== null' })).toBe(true);
+    expect(showFieldIf({ middle_name: '!== null' })).toBe(false);
+});
+
+test('it compares an undefined operand without throwing', () => {
+    // String operands reach passesCondition() JSON-encoded, but an undefined lhs does not, and
+    // decoding it as JSON would throw.
+    const validator = new Validator({}, {});
+
+    expect(validator.passesCondition({ lhs: undefined, operator: '==', rhs: JSON.stringify('Jesse') })).toBe(false);
+    expect(validator.passesCondition({ lhs: undefined, operator: '!=', rhs: JSON.stringify('Jesse') })).toBe(true);
+    expect(validator.passesCondition({ lhs: undefined, operator: '===', rhs: null })).toBe(false);
+    expect(validator.passesCondition({ lhs: undefined, operator: '==', rhs: null })).toBe(true);
+});
+
 test('it can use includes or contains operators in conditions', () => {
     setValues({
         cancellation_reasons: ['found another service', 'other'],
@@ -176,6 +238,18 @@ test('it can use includes or contains operators in conditions', () => {
     expect(showFieldIf({ null_value: 'contains fox' })).toBe(false);
 });
 
+test('it fails includes or contains conditions against an object instead of throwing', () => {
+    setValues({
+        stay_dates: { start: '2026-01-01', end: '2026-01-05' },
+        address: { city: 'Little Rock' },
+    });
+
+    expect(showFieldIf({ stay_dates: 'contains 2026' })).toBe(false);
+    expect(showFieldIf({ stay_dates: 'includes 2026-01-01' })).toBe(false);
+    expect(showFieldIf({ address: 'contains Little Rock' })).toBe(false);
+    expect(Fields.showField({ unless: { address: 'contains Little Rock' } })).toBe(true);
+});
+
 test('it can use includes_any or contains_any operators in conditions', () => {
     setValues({
         cancellation_reasons: ['found another service', 'other'],
@@ -186,13 +260,15 @@ test('it can use includes_any or contains_any operators in conditions', () => {
     });
 
     expect(showFieldIf({ cancellation_reasons: 'includes_any sick, other' })).toBe(true);
-    expect(showFieldIf({ cancellation_reasons: 'contains_any sick, other' })).toBe(true);
     expect(showFieldIf({ cancellation_reasons: 'includes_any sick, found another' })).toBe(false);
-    expect(showFieldIf({ cancellation_reasons: 'contains_any sick, found another' })).toBe(false);
+    expect(showFieldIf({ cancellation_reasons: 'contains_any sick, other' })).toBe(true);
+    expect(showFieldIf({ cancellation_reasons: 'contains_any sick, expensive' })).toBe(false);
 
-    expect(showFieldIf({ example_string: 'includes_any parrot, lazy dog' })).toBe(true);
-    expect(showFieldIf({ example_string: 'contains_any parrot, lazy dog' })).toBe(true);
+    expect(
+        showFieldIf({ example_string: 'includes_any parrot, The quick brown fox jumps over the lazy dog' }),
+    ).toBe(true);
     expect(showFieldIf({ example_string: 'includes_any parrot, hops' })).toBe(false);
+    expect(showFieldIf({ example_string: 'contains_any parrot, lazy dog' })).toBe(true);
     expect(showFieldIf({ example_string: 'contains_any parrot, hops' })).toBe(false);
 
     expect(showFieldIf({ age: 'includes_any fox, 13' })).toBe(true);
@@ -202,6 +278,22 @@ test('it can use includes_any or contains_any operators in conditions', () => {
 
     expect(showFieldIf({ empty_string: 'contains_any fox, 13' })).toBe(false);
     expect(showFieldIf({ null_value: 'contains_any fox, 13' })).toBe(false);
+});
+
+test('it matches contains_any values literally rather than as patterns', () => {
+    setValues({
+        version: 'a.b',
+        other_version: 'axb',
+        phone: 'Call 555-0100',
+        language: 'C++',
+        price: 'From $100',
+    });
+
+    expect(showFieldIf({ version: 'contains_any a.b' })).toBe(true);
+    expect(showFieldIf({ other_version: 'contains_any a.b' })).toBe(false);
+    expect(showFieldIf({ phone: 'contains_any (555)' })).toBe(false);
+    expect(showFieldIf({ language: 'contains_any C++' })).toBe(true);
+    expect(showFieldIf({ price: 'contains_any 50%, $100' })).toBe(true);
 });
 
 test('it handles null, true, and false in condition as literal', () => {
@@ -226,6 +318,10 @@ test('it can check if value is empty', () => {
         last_name: 'HasselHoff',
         user: { email: 'david@hasselhoff.com' },
         favorite_foods: ['lasagna'],
+        age: 43,
+        zero: 0,
+        toggled_on: true,
+        toggled_off: false,
         empty_string: '',
         empty_array: [],
         empty_object: {},
@@ -237,6 +333,12 @@ test('it can check if value is empty', () => {
     expect(showFieldIf({ last_name: 'not empty' })).toBe(true);
     expect(showFieldIf({ user: 'empty' })).toBe(false);
     expect(showFieldIf({ favorite_foods: 'empty' })).toBe(false);
+    expect(showFieldIf({ age: 'empty' })).toBe(false);
+    expect(showFieldIf({ age: 'not empty' })).toBe(true);
+    expect(showFieldIf({ zero: 'empty' })).toBe(false);
+    expect(showFieldIf({ toggled_on: 'empty' })).toBe(false);
+    expect(showFieldIf({ toggled_on: 'not empty' })).toBe(true);
+    expect(showFieldIf({ toggled_off: 'empty' })).toBe(false);
     expect(showFieldIf({ empty_string: 'empty' })).toBe(true);
     expect(showFieldIf({ empty_array: 'empty' })).toBe(true);
     expect(showFieldIf({ empty_object: 'empty' })).toBe(true);
@@ -260,6 +362,21 @@ test('it only shows when multiple conditions are met', () => {
 
     expect(showFieldIf({ first_name: 'is San', last_name: 'is Holo', age: '!= 20' })).toBe(true);
     expect(showFieldIf({ first_name: 'is San', last_name: 'is Holo', age: '> 40' })).toBe(false);
+});
+
+test('it supports multiple conditions targeting the same field', () => {
+    setValues({
+        status: 'published',
+        audience: 'members',
+        age: 22,
+    });
+
+    expect(Fields.showField({ if_any: { status: ['is archived', 'is published'], audience: 'is guests' } })).toBe(true);
+    expect(Fields.showField({ if_any: { status: ['is archived', 'is draft'], audience: 'is guests' } })).toBe(false);
+    expect(Fields.showField({ if: { age: ['> 18', '< 65'], audience: 'is members' } })).toBe(true);
+    expect(Fields.showField({ if: { age: ['> 18', '< 21'], audience: 'is members' } })).toBe(false);
+    expect(Fields.showField({ unless_any: { status: ['is archived', 'is draft'], audience: 'is guests' } })).toBe(true);
+    expect(Fields.showField({ hide_when_any: { status: ['is archived', 'is published'], audience: 'is guests' } })).toBe(false);
 });
 
 test('it shows or hides with parent key variants', () => {
@@ -538,6 +655,33 @@ test('it can call a custom function on a specific field', () => {
     });
 
     expect(showFieldIf({ favorite_animals: 'custom lovesAnimals' })).toBe(true);
+});
+
+test('it inverts a custom function on a specific field only once', () => {
+    setValues({
+        first_name: 'San',
+        favorite_animals: ['cats', 'dogs', 'rats', 'bats'],
+    });
+
+    Statamic.$conditions.add('lovesAnimals', function ({ target }) {
+        return target.length > 3;
+    });
+
+    Statamic.$conditions.add('hatesAnimals', function ({ target }) {
+        return target.length === 0;
+    });
+
+    expect(Fields.showField({ unless: { favorite_animals: 'custom lovesAnimals' } })).toBe(false);
+    expect(Fields.showField({ unless: { favorite_animals: 'custom hatesAnimals' } })).toBe(true);
+    expect(Fields.showField({ hide_when: { favorite_animals: 'custom lovesAnimals' } })).toBe(false);
+    expect(Fields.showField({ unless_any: { favorite_animals: 'custom lovesAnimals' } })).toBe(false);
+    expect(Fields.showField({ hide_when_any: { favorite_animals: 'custom hatesAnimals', first_name: 'is San' } })).toBe(
+        false,
+    );
+    expect(Fields.showField({ unless: { favorite_animals: 'custom lovesAnimals', first_name: 'is San' } })).toBe(false);
+    expect(Fields.showField({ unless: { favorite_animals: 'custom lovesAnimals', first_name: 'is Rincess' } })).toBe(
+        true,
+    );
 });
 
 test('it can call a custom function on a specific field using params against a root value', () => {
@@ -1073,4 +1217,87 @@ test('it can use extra values in conditions', () => {
 
     expect(showFieldIf({ hello: 'world' })).toBe(true);
     expect(showFieldIf({ hello: 'there' })).toBe(false);
+});
+
+test('it memoizes conditions without losing the flags getConditions() sets', () => {
+    // getConditions() isn't a pure getter. It also sets passOnAny and showOnPass, and it
+    // gets called more than once per validator (passesNonRevealerConditions calls it twice).
+    // Repeat calls must leave the instance in the same state as the first one.
+    const cases = {
+        if: { passOnAny: false, showOnPass: true },
+        if_any: { passOnAny: true, showOnPass: true },
+        show_when: { passOnAny: false, showOnPass: true },
+        show_when_any: { passOnAny: true, showOnPass: true },
+        unless: { passOnAny: false, showOnPass: false },
+        unless_any: { passOnAny: true, showOnPass: false },
+        hide_when: { passOnAny: false, showOnPass: false },
+        hide_when_any: { passOnAny: true, showOnPass: false },
+    };
+
+    Object.entries(cases).forEach(([key, expected]) => {
+        const validator = new Validator({ handle: 'test', [key]: { first_name: 'is Rincess' } }, {}, {}, 'test', [], {});
+
+        const first = validator.getConditions();
+        expect({ passOnAny: validator.passOnAny, showOnPass: validator.showOnPass }).toEqual(expected);
+
+        const second = validator.getConditions();
+        expect({ passOnAny: validator.passOnAny, showOnPass: validator.showOnPass }).toEqual(expected);
+
+        const third = validator.getConditions();
+        expect({ passOnAny: validator.passOnAny, showOnPass: validator.showOnPass }).toEqual(expected);
+
+        expect(second).toEqual(first);
+        expect(third).toEqual(first);
+    });
+});
+
+test('it memoizes a field with no conditions without touching the flags', () => {
+    const validator = new Validator({ handle: 'test' }, {}, {}, 'test', [], {});
+
+    expect(validator.getConditions()).toBe(undefined);
+    expect(validator.getConditions()).toBe(undefined);
+    expect(validator.passOnAny).toBe(false);
+    expect(validator.showOnPass).toBe(true);
+});
+
+test('it gives the same answer whether conditions are evaluated once or twice', () => {
+    // passesConditions() reads passOnAny/showOnPass that getConditions() sets, so a
+    // validator that has already resolved its conditions must still evaluate the same.
+    setValues({ first_name: 'Rincess', last_name: 'Pleia' });
+
+    const configs = [
+        { unless: { first_name: 'is Rincess' } },
+        { if_any: { first_name: 'is Rincess', last_name: 'is Holo' } },
+        { unless_any: { first_name: 'is San', last_name: 'is Holo' } },
+        { hide_when: { first_name: 'is Rincess' } },
+    ];
+
+    configs.forEach((config) => {
+        const validator = new Validator({ handle: 'test', ...config }, Store.values, Store.values, 'test', [], {});
+
+        expect(validator.passesConditions()).toBe(validator.passesConditions());
+    });
+});
+
+test('it does not let evaluation mutate the memoized conditions', () => {
+    // The memoized array is now handed out to every caller, so nothing downstream is
+    // allowed to write to it. passesNonRevealerConditions() in particular filters it and
+    // re-evaluates, and 'empty' comparisons rewrite the condition they're given.
+    setValues({ first_name: 'Rincess', favorite_animals: [] });
+
+    const validator = new Validator(
+        { handle: 'test', if: { first_name: 'is Rincess', favorite_animals: 'is empty' } },
+        Store.values,
+        Store.values,
+        'test',
+        [],
+        {},
+    );
+
+    const before = JSON.parse(JSON.stringify(validator.getConditions()));
+
+    validator.passesConditions();
+    validator.passesNonRevealerConditions('');
+
+    expect(validator.getConditions()).toEqual(before);
 });

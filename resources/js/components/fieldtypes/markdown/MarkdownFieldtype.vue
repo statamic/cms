@@ -186,6 +186,7 @@ import Uploader from '../../assets/Uploader.vue';
 import Uploads from '../../assets/Uploads.vue';
 import MarkdownToolbar from './MarkdownToolbar.vue';
 import { useContentDirection } from '@/composables/content-direction';
+import { dedupeInFlight } from '@/util/dedupeInFlight.js';
 // Keymaps
 import 'codemirror/keymap/sublime';
 
@@ -587,8 +588,12 @@ export default {
             this.closeAssetSelector();
             this.selectedAssets = [];
 
-            this.$axios.post(cp_url('assets-fieldtype'), { assets }).then(({ data }) => {
-                data.forEach(asset => {
+            const cacheKey = JSON.stringify([...assets].slice().sort());
+
+            dedupeInFlight('assets-fieldtype', cacheKey, () =>
+                this.$axios.post(cp_url('assets-fieldtype'), { assets }),
+            ).then(({ data }) => {
+                data.forEach((asset) => {
                     const alt = asset.values.alt || '';
                     const url = encodeURI(`statamic://${asset.reference}`);
                     const method = assets.length === 1 ? 'insert' : 'append';

@@ -29,6 +29,9 @@ class EventServiceProvider extends ServiceProvider
         \Illuminate\Foundation\Http\Events\RequestHandled::class => [
             \Statamic\Listeners\ClearState::class,
         ],
+        \Illuminate\Console\Events\CommandFinished::class => [
+            \Statamic\Listeners\PingOutpostOnCommandFinished::class,
+        ],
     ];
 
     protected $subscribe = [

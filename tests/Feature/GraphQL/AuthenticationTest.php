@@ -30,14 +30,11 @@ class AuthenticationTest extends TestCase
         Config::set('statamic.graphql.auth_token', 'foobar');
 
         $this
-            ->withToken($token = 'invalid')
-            ->postJson($url = '/graphql', ['query' => '{ping}'])
-            ->assertUnauthorized();
-
-        $this
-            ->withToken($token)
-            ->post($url, ['query' => '{ping}'])
-            ->assertUnauthorized();
+            ->withToken('invalid')
+            ->postJson('/graphql', ['query' => '{ping}'])
+            ->assertUnauthorized()
+            ->assertHeader('WWW-Authenticate', 'Bearer')
+            ->assertExactJson(['message' => 'Unauthenticated.']);
     }
 
     #[Test]
@@ -46,12 +43,37 @@ class AuthenticationTest extends TestCase
         Config::set('statamic.graphql.auth_token', 'foobar');
 
         $this
-            ->postJson($url = '/graphql', ['query' => '{ping}'])
-            ->assertUnauthorized();
+            ->postJson('/graphql', ['query' => '{ping}'])
+            ->assertUnauthorized()
+            ->assertHeader('WWW-Authenticate', 'Bearer')
+            ->assertExactJson(['message' => 'Unauthenticated.']);
+    }
+
+    #[Test]
+    public function it_returns_the_same_json_response_when_debug_mode_is_enabled()
+    {
+        Config::set('app.debug', true);
+        Config::set('statamic.graphql.auth_token', 'foobar');
 
         $this
-            ->post($url, ['query' => '{ping}'])
-            ->assertUnauthorized();
+            ->postJson('/graphql', ['query' => '{ping}'])
+            ->assertUnauthorized()
+            ->assertHeader('WWW-Authenticate', 'Bearer')
+            ->assertExactJson(['message' => 'Unauthenticated.']);
+    }
+
+    #[Test]
+    public function it_returns_json_even_when_html_is_requested()
+    {
+        Config::set('statamic.graphql.auth_token', 'foobar');
+
+        $this
+            ->withHeader('Accept', 'text/html')
+            ->post('/graphql', ['query' => '{ping}'])
+            ->assertUnauthorized()
+            ->assertHeader('Content-Type', 'application/json')
+            ->assertHeader('WWW-Authenticate', 'Bearer')
+            ->assertExactJson(['message' => 'Unauthenticated.']);
     }
 
     #[Test]

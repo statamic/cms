@@ -86,7 +86,7 @@ class ServiceProvider extends LaravelServiceProvider
         // When the cascade gets hydrated, insert it into the
         // nocache session so it can filter out contextual data.
         Cascade::hydrated(function ($cascade) {
-            $this->app[Session::class]->setCascade($cascade->toArray());
+            app(Session::class)->setCascade($cascade->toArray());
         });
 
         Blade::directive('nocache', function ($exp) {

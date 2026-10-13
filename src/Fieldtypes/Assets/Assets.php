@@ -456,9 +456,8 @@ class Assets extends Fieldtype
 
     public function preProcessIndex($data)
     {
-        $total = $data === null
-            ? 0
-            : ($this->config('max_files') === 1 ? 1 : count($data));
+        $data = Arr::wrap($data);
+        $total = count($data);
 
         // Since we only want to display a handful of thumbnails, we'll slice it up here so we don't perform more
         // augmentation overhead than necessary. e.g. 5 thumbs then +remainder. If the remainder is 1, we may
@@ -468,6 +467,7 @@ class Assets extends Fieldtype
         $assets = $this->getItemsForPreProcessIndex($data)->map(function ($asset) {
             $arr = [
                 'id' => $asset->id(),
+                'basename' => $asset->basename(),
                 'is_image' => $isImage = $asset->isImage(),
                 'is_svg' => $asset->isSvg(),
                 'extension' => $asset->extension(),

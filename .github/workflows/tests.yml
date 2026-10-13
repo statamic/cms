@@ -74,15 +74,11 @@ jobs:
           echo "result=true" >> $GITHUB_OUTPUT
           echo "result=true" >> $env:GITHUB_OUTPUT
 
-      - name: Update apt sources
-        if: steps.should-run-tests.outputs.result == 'true' && matrix.os == 'ubuntu-latest'
-        run: |
-          sudo apt-get check || sudo apt --fix-broken install -y
-          sudo apt-get update
-
       - name: Install French Locale
         if: steps.should-run-tests.outputs.result == 'true' && matrix.os == 'ubuntu-latest'
-        run: sudo apt-get install language-pack-fr
+        run: |
+          sudo locale-gen fr_FR.UTF-8
+          locale -a | grep -q '^fr_FR\.utf8$'
 
       - name: Setup PHP
         uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2

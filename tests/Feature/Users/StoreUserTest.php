@@ -2,9 +2,11 @@
 
 namespace Tests\Feature\Users;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\User;
+use Tests\Auth\UnsafeEmailPayloads;
 use Tests\ElevatesSessions;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -16,6 +18,7 @@ class StoreUserTest extends TestCase
     use ElevatesSessions;
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
+    use UnsafeEmailPayloads;
 
     private function store($data = [])
     {
@@ -77,5 +80,21 @@ class StoreUserTest extends TestCase
             ->assertOk();
 
         $this->assertFalse(User::findByEmail('test@domain.com')->isSuper());
+    }
+
+    #[Test]
+    #[DataProvider('unsafeEmailProvider')]
+    public function it_rejects_emails_that_are_unsafe_as_file_paths($email)
+    {
+        $this->setTestRoles(['test' => ['access cp', 'create users']]);
+        $me = tap(User::make()->email('admin@domain.com')->assignRole('test'))->save();
+        $before = $this->filesystemSnapshot();
+
+        $this
+            ->actingAsWithElevatedSession($me)
+            ->postJson(cp_route('users.store'), ['email' => $email])
+            ->assertJsonValidationErrors('email');
+
+        $this->assertSame($before, $this->filesystemSnapshot());
     }
 }

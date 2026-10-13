@@ -9,7 +9,7 @@ Alerts are used to display important messages, notifications, and feedback to us
 <Canvas of={AlertStories._DocsIntro} sourceState={'shown'} />
 
 ## Variants
-Use the `variant` prop to change the appearance and semantic meaning of the alert. Available variants are `default`, `warning`, `error`, and `success`.
+Use the `variant` prop to change the appearance and semantic meaning of the alert. Available variants are `default`, `tip`, `warning`, `error`, and `success`.
 
 <Canvas of={AlertStories.Variants} sourceState={'shown'} />
 
@@ -34,6 +34,11 @@ Alerts support rich content including headings, paragraphs, and code snippets, m
 All heading levels (h1–h6) are styled identically, so choose the heading level that's semantically appropriate for your content. If you want to adjust the size of the headings, you can use the Heading component and specify a size (`base`, `lg`, `xl`, or `2xl`). The Alert component automatically adjusts spacing for larger headings.
 
 <Canvas of={AlertStories.RichContent} sourceState={'shown'} />
+
+## Live Regions
+By default, alerts are live regions so screen readers announce them when they appear. `warning` and `error` alerts are announced immediately, while other variants are announced politely.
+
+If the alert is static content that is present when the page loads, such as instructions in a form, set `:live="false"` so it isn't announced every time the page renders.
 
 ## Arguments
 <ArgTypes of={AlertStories} />

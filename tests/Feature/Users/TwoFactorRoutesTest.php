@@ -68,6 +68,24 @@ class TwoFactorRoutesTest extends TestCase
     }
 
     #[Test]
+    public function cp_two_factor_setup_middleware_does_not_redirect_when_impersonating()
+    {
+        config()->set('statamic.users.two_factor_enforced_roles', ['*']);
+
+        $impersonator = tap(User::make()->makeSuper()->email('impersonator@domain.com'))->save();
+        $user = tap(User::make()->makeSuper()->email('admin@domain.com'))->save();
+
+        $this
+            ->actingAs($user)
+            ->withSession(['statamic_impersonated_by' => $impersonator->id()])
+            ->get(cp_route('dashboard'))
+            ->assertOk();
+
+        $this->assertNull($user->fresh()->two_factor_secret);
+        $this->assertNull($user->fresh()->two_factor_recovery_codes);
+    }
+
+    #[Test]
     #[DefineEnvironment('disableTwoFactor')]
     public function cp_two_factor_setup_middleware_does_not_redirect_when_two_factor_is_disabled()
     {
@@ -146,6 +164,24 @@ class TwoFactorRoutesTest extends TestCase
             ->assertSessionHas('url.intended', url('/test-frontend-route'));
 
         $this->assertEquals($existing, $user->fresh()->two_factor_secret);
+    }
+
+    #[Test]
+    public function frontend_two_factor_setup_middleware_does_not_redirect_when_impersonating()
+    {
+        config()->set('statamic.users.two_factor_enforced_roles', ['*']);
+
+        $impersonator = tap(User::make()->makeSuper()->email('impersonator@domain.com'))->save();
+        $user = tap(User::make()->makeSuper()->email('admin@domain.com'))->save();
+
+        $this
+            ->actingAs($user)
+            ->withSession(['statamic_impersonated_by' => $impersonator->id()])
+            ->get('/test-frontend-route')
+            ->assertOk();
+
+        $this->assertNull($user->fresh()->two_factor_secret);
+        $this->assertNull($user->fresh()->two_factor_recovery_codes);
     }
 
     #[Test]

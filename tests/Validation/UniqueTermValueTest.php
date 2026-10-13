@@ -2,6 +2,7 @@
 
 namespace Tests\Validation;
 
+use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Validator;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Taxonomy;
@@ -95,5 +96,29 @@ class UniqueTermValueTest extends TestCase
             ['slug' => 'foo'],
             ['slug' => new UniqueTermValue(taxonomy: 'taxonomy-one', site: 'site-two')]
         )->passes());
+    }
+
+    #[Test]
+    public function it_uses_the_app_translation_when_one_exists()
+    {
+        Taxonomy::make('taxonomy-one')->save();
+
+        Term::make()->slug('foo')->taxonomy('taxonomy-one')->data(['Foo'])->save();
+
+        $validator = Validator::make(
+            ['slug' => 'foo'],
+            ['slug' => new UniqueTermValue]
+        );
+
+        $this->assertEquals('This value has already been taken.', $validator->errors()->first('slug'));
+
+        Lang::addLines(['validation.unique_term_value' => 'This slug has already been taken.'], 'en');
+
+        $validator = Validator::make(
+            ['slug' => 'foo'],
+            ['slug' => new UniqueTermValue]
+        );
+
+        $this->assertEquals('This slug has already been taken.', $validator->errors()->first('slug'));
     }
 }

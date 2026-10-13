@@ -5,7 +5,7 @@
             <Select :options v-model="option" :adaptive-width="true" />
         </div>
 
-        <div class="flex-1 flex">
+        <div class="flex min-w-0 flex-1">
             <Input v-if="option === 'url'" :read-only="isReadOnly" v-model="urlValue" />
 
             <component

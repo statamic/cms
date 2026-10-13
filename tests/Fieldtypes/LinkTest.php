@@ -11,6 +11,7 @@ use Statamic\Facades;
 use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\Link;
+use Statamic\Fieldtypes\Link\EntryLinkType;
 use Statamic\Fieldtypes\Link\LinkType;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -101,6 +102,20 @@ class LinkTest extends TestCase
         $this->assertInstanceOf(ArrayableString::class, $augmented);
         $this->assertNull($augmented->value());
         $this->assertEquals(['url' => null], $augmented->toArray());
+    }
+
+    #[Test]
+    public function it_wraps_a_string_collections_config_into_an_array_for_the_entry_link_type()
+    {
+        // A hand-authored blueprint may set `collections: pages` (a string) rather than
+        // `collections: [pages]`. Building the nested entries fieldtype config used to
+        // return that string as-is, which broke the `array` return type on collections()
+        // and crashed as soon as the link field's "entry" type was rendered (e.g. opening
+        // "Link to Entry" in a nav item).
+        $field = new Field('test', ['type' => 'link', 'collections' => 'pages']);
+        $config = (new EntryLinkType)->fieldtype($field);
+
+        $this->assertEquals(['pages'], $config['collections']);
     }
 
     #[Test]

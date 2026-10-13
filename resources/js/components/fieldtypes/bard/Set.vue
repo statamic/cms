@@ -17,6 +17,7 @@
             @paste.stop
             @cut.stop
             @dragstart="preventNodeSelectionDrag"
+            @mousedown="preventFormControlNodeSelection"
         >
             <div ref="content" hidden />
             <header
@@ -49,7 +50,12 @@
                     />
                 </button>
                 <div class="flex items-center gap-2" v-if="!isReadOnly">
-                    <Switch size="xs" v-model="enabled" v-tooltip="enabled ? __('Included in output') : __('Hidden from output')" />
+                    <Switch
+                        size="xs"
+                        v-model="enabled"
+                        :label="__('Included in output')"
+                        v-tooltip="enabled ? __('Included in output') : __('Hidden from output')"
+                    />
 
                     <Dropdown>
                         <template #trigger>
@@ -351,6 +357,12 @@ export default {
         disableDragging() {
             this.$el.setAttribute('draggable', false);
             this._draggableObserver?.observe(this.$el, { attributes: true, attributeFilter: ['draggable'] });
+        },
+
+        preventFormControlNodeSelection(event) {
+            const target = event.target instanceof Element ? event.target : event.target.parentElement;
+
+            if (target?.closest('[data-ui-combobox], [data-ui-input], [data-interactive]')) event.stopPropagation();
         },
 
         preventNodeSelectionDrag(event) {

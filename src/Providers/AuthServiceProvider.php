@@ -152,7 +152,9 @@ class AuthServiceProvider extends ServiceProvider
                 return null;
             }
 
-            $user = User::fromUser($user);
+            if (! $user = User::fromUser($user)) {
+                return null;
+            }
 
             if ($user->isSuper()) {
                 return true;
@@ -195,6 +197,10 @@ class AuthServiceProvider extends ServiceProvider
 
         RateLimiter::for('statamic.cp.passkeys', function (Request $request) {
             return RateLimiter::limiter('statamic.passkeys')($request);
+        });
+
+        RateLimiter::for('statamic.protect.password', function (Request $request) {
+            return Limit::perMinute(5)->by($request->ip());
         });
 
         RateLimiter::for('statamic.forms', function (Request $request) {
