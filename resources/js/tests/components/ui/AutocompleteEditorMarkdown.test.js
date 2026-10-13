@@ -218,3 +218,113 @@ test('hard breaks survive trailing whitespace stripping', () => {
     expect(markdown).toBe(stripped);
     expect(markdownToContent(stripped)).toEqual(content);
 });
+
+const textParagraph = (...lines) => ({
+    type: 'paragraph',
+    content: lines.flatMap((text, i) => [
+        ...(i > 0 ? [{ type: 'hardBreak' }] : []),
+        { type: 'text', text },
+    ]),
+});
+
+test.each([
+    ['- x'],
+    ['+ x'],
+    ['* x'],
+    ['1. x'],
+    ['1) x'],
+    ['12. x'],
+    ['# x'],
+    ['###### x'],
+    ['#'],
+    ['-'],
+    ['---'],
+    ['- - -'],
+    ['-- -'],
+    ['***'],
+    ['___'],
+    ['==='],
+    ['    x'],
+    ['  x'],
+    ['\tx'],
+    ['> x'],
+    ['```'],
+    ['~~~'],
+    ['1.5 apples'],
+    ['-5°C'],
+    ['+1 555'],
+    ['#hashtag'],
+    ['####### seven'],
+    ['2020. A year'],
+])('text starting with a block marker round trips: %j', (text) => {
+    const content = [textParagraph(text)];
+
+    expect(markdownToContent(contentToMarkdown(content))).toEqual(content);
+});
+
+test.each([
+    ['# x'],
+    ['- x'],
+    ['+ x'],
+    ['1. x'],
+    ['2. x'],
+    ['1) x'],
+    ['---'],
+    ['--'],
+    ['==='],
+    ['    x'],
+    ['  x'],
+    ['***'],
+    ['___'],
+    ['5°C'],
+    ['#hashtag'],
+    ['--|--'],
+    ['|-|-|'],
+    [':--|:-:'],
+    ['  - x'],
+])('text after a hard break starting with a block marker round trips: %j', (text) => {
+    const content = [textParagraph('Line one', text)];
+
+    expect(markdownToContent(contentToMarkdown(content))).toEqual(content);
+});
+
+test('every line after several hard breaks is escaped', () => {
+    const content = [textParagraph('# a', '- b', '1. c', '===', 'plain')];
+
+    expect(markdownToContent(contentToMarkdown(content))).toEqual(content);
+});
+
+test('block markers are only escaped when they would be parsed as one', () => {
+    expect(contentToMarkdown([textParagraph('1.5 apples')])).toBe('1.5 apples');
+    expect(contentToMarkdown([textParagraph('-5°C')])).toBe('-5°C');
+    expect(contentToMarkdown([textParagraph('#hashtag')])).toBe('#hashtag');
+    expect(contentToMarkdown([textParagraph('Line one', '2. x')])).toBe('Line one\\\n2. x');
+    expect(contentToMarkdown([textParagraph('# x')])).toBe('\\# x');
+});
+
+test('a mention at the start of a line is not escaped', () => {
+    const content = [
+        {
+            type: 'paragraph',
+            content: [
+                { type: 'mention', attrs: { value: 'first_name' } },
+                { type: 'hardBreak' },
+                { type: 'mention', attrs: { value: 'email' } },
+            ],
+        },
+    ];
+
+    expect(contentToMarkdown(content)).toBe('[[ first_name ]]\\\n[[ email ]]');
+    expect(markdownToContent(contentToMarkdown(content))).toEqual(content);
+});
+
+test('block markers are escaped inside list items', () => {
+    const content = [
+        {
+            type: 'bulletList',
+            content: [{ type: 'listItem', content: [textParagraph('# x', '- y')] }],
+        },
+    ];
+
+    expect(markdownToContent(contentToMarkdown(content))).toEqual(content);
+});

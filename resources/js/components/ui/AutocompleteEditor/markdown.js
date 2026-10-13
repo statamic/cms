@@ -11,6 +11,60 @@ import { Autocomplete } from './extensions/Autocomplete';
 
 const MENTION_TOKEN = /^\[\[\s*([\w.-]+)\s*\]\]/;
 
+// The serializer escapes inline syntax but not what only has meaning at the
+// start of a line, so plain text like "- x" or "# x" would reload as a list or
+// heading. `*` and `_` are already escaped by the serializer.
+function escapeBlockMarkers(line, isFirstLine) {
+    const indent = line.match(/^[ \t]*/)[0];
+
+    // Four columns of indentation is a code block, which the schema drops.
+    // Leading spaces are otherwise kept by the parser, so only this needs
+    // an entity, which paragraph parsing turns back into the whitespace.
+    if (indent.replace(/\t/g, '    ').length >= 4) {
+        return (indent[0] === '\t' ? '&#9;' : '&#32;') + line.slice(1);
+    }
+
+    const rest = line.slice(indent.length);
+    const orderedList = isFirstLine ? /^\d{1,9}[.)](?=[ \t]|$)/ : /^1[.)](?=[ \t]|$)/;
+
+    const needsEscape =
+        /^#{1,6}(?=[ \t]|$)/.test(rest) ||
+        /^[-+](?=[ \t]|$)/.test(rest) ||
+        /^-[-\t ]*$/.test(rest) ||
+        /^=+[ \t]*$/.test(rest) ||
+        /^(?=[-:| \t]*\|)[-:| \t]*-[-:| \t]*$/.test(rest) ||
+        orderedList.test(rest);
+
+    if (!needsEscape) return line;
+
+    // Escaping the first character of a numbered marker would leave the
+    // digits as plain text, so the delimiter is the part that gets escaped.
+    return indent + rest.replace(/^(\d{1,9})?(.)/, (_, digits = '', char) => `${digits}\\${char}`);
+}
+
+const BlockSafeParagraph = Paragraph.extend({
+    parseMarkdown(token, helpers) {
+        const tokens = (token.tokens || []).map((inline, i, all) => {
+            const startsLine = i === 0 || all[i - 1].type === 'br';
+
+            if (!startsLine || inline.type !== 'text') return inline;
+
+            return { ...inline, text: inline.text.replace(/^&#(32|9);/, (_, code) => (code === '9' ? '\t' : ' ')) };
+        });
+
+        return Paragraph.config.parseMarkdown({ ...token, tokens }, helpers);
+    },
+
+    renderMarkdown(node, helpers, context) {
+        const markdown = Paragraph.config.renderMarkdown(node, helpers, context);
+
+        return markdown
+            .split('\n')
+            .map((line, i) => escapeBlockMarkers(line, i === 0))
+            .join('\n');
+    },
+});
+
 // Markdown is how the fieldtype stores its value, not something the editor
 // itself does, so this is declared here rather than on the shared extension.
 const MarkdownAutocomplete = Autocomplete.extend({
@@ -48,7 +102,7 @@ const BackslashHardBreak = HardBreak.extend({
 const manager = new MarkdownManager({
     extensions: [
         Document,
-        Paragraph,
+        BlockSafeParagraph,
         Text,
         Bold,
         Italic,
