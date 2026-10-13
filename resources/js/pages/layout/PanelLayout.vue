@@ -24,7 +24,7 @@ const pagePanelLabel = ref(null);
 const { open: chatOpen } = useAiChat();
 const rightTab = ref('chat');
 const showRightTabs = computed(() => pagePanelActive.value && chatOpen.value);
-const showPagePanel = computed(() => !chatOpen.value || !pagePanelActive.value || rightTab.value === 'page');
+const showPagePanel = computed(() => pagePanelActive.value && (!chatOpen.value || rightTab.value === 'page'));
 const showChat = computed(() => chatOpen.value && (!pagePanelActive.value || rightTab.value === 'chat'));
 
 watch(chatOpen, (open) => (rightTab.value = open ? 'chat' : 'page'));
@@ -155,7 +155,7 @@ onUnmounted(() => {
                 </TabList>
             </Tabs>
             <div v-show="showPagePanel" id="right-panel-page" class="min-[1000px]:grid flex-1"></div>
-            <div v-show="showChat" class="layout-panel-content flex-1 min-h-0" :data-mobile-open="chatOpen">
+            <div v-show="showChat" class="layout-panel-content flex flex-1 flex-col min-h-0" :data-mobile-open="chatOpen">
                 <AiChat />
             </div>
         </div>

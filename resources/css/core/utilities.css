@@ -349,6 +349,35 @@
     }
 }
 
+/* UTILITIES / DECORATION / AI CHAT GLOW
+=================================================== */
+/* Notes...
+
+    What does it do?
+    ----------------
+    - Adds a soft, primary-tinted glow rising from the bottom of the element, e.g. from the ask box in the AI chat sidebar.
+    - Children that should sit above the glow need position: relative.
+    - Set --glow-bleed to stretch the glow into a parent's inline-start padding. Only the start side, since bleeding past the end would cause a horizontal scrollbar.
+
+*/
+.ai-chat-glow {
+    --glow-strength: 14%;
+    --glow-bleed: 0px;
+    position: relative;
+
+    &::before {
+        content: '';
+        pointer-events: none;
+        position: absolute;
+        inset: 0;
+        inset-inline-start: calc(var(--glow-bleed) * -1);
+        background: radial-gradient(ellipse 120% 55% at 50% 100%, color-mix(in oklab, var(--color-primary) var(--glow-strength), transparent), transparent 70%);
+    }
+    .dark & {
+        --glow-strength: 22%;
+    }
+}
+
 /* UTILITIES / DECORATION / CHECKERBOARD
 =================================================== */
 

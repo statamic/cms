@@ -1,9 +1,9 @@
 <script setup>
 import { nextTick, ref, useTemplateRef } from 'vue';
-import { Button, Heading, Textarea } from '@ui';
+import { Button, Textarea } from '@ui';
 import useAiChat from '@/composables/use-ai-chat.js';
 
-const { messages, close } = useAiChat();
+const { messages } = useAiChat();
 const prompt = ref('');
 const thread = useTemplateRef('thread');
 
@@ -35,38 +35,37 @@ function scrollToBottom() {
 </script>
 
 <template>
-    <div class="flex h-full flex-col">
-        <header class="flex items-center justify-between gap-2 px-3 py-2">
-            <Heading size="lg" :text="__('Ask')" />
-            <Button icon="x" variant="ghost" size="sm" :aria-label="__('Close')" @click="close" />
-        </header>
-
-        <div ref="thread" class="flex-1 space-y-3 overflow-y-auto ps-2 pe-3 py-2">
-            <div v-if="!messages.length" class="space-y-2">
-                <p class="text-sm text-gray-600 dark:text-gray-400">{{ __('Try asking') }}</p>
-                <button
-                    v-for="suggestion in suggestions"
-                    :key="suggestion"
-                    type="button"
-                    class="block w-full cursor-pointer rounded-lg border border-gray-200 px-3 py-2 text-start text-sm text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
-                    @click="send(suggestion)"
-                    v-text="suggestion"
+    <!-- Bleed the glow into the right panel's ps-2 padding -->
+    <div class="ai-chat-glow flex flex-1 flex-col" style="--glow-bleed: calc(var(--spacing) * 2)">
+        <div ref="thread" class="flex flex-1 flex-col overflow-y-auto ps-1.5 pe-3 py-2">
+            <!-- mt-auto keeps messages next to the input, while still scrolling once they overflow -->
+            <div class="relative mt-auto space-y-3">
+                <div v-if="!messages.length" class="space-y-2">
+                    <p class="text-sm text-gray-600 dark:text-gray-400">{{ __('Try asking') }}</p>
+                    <button
+                        v-for="suggestion in suggestions"
+                        :key="suggestion"
+                        type="button"
+                        class="block w-full cursor-pointer rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-start text-sm text-gray-700 hover:bg-white dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-900"
+                        @click="send(suggestion)"
+                        v-text="suggestion"
+                    />
+                </div>
+                <div
+                    v-for="(message, i) in messages"
+                    :key="i"
+                    :class="[
+                        'max-w-[85%] rounded-xl px-3 py-2 text-sm',
+                        message.role === 'user'
+                            ? 'ms-auto bg-gray-900 text-white dark:bg-gray-200 dark:text-gray-900'
+                            : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200',
+                    ]"
+                    v-text="message.text"
                 />
             </div>
-            <div
-                v-for="(message, i) in messages"
-                :key="i"
-                :class="[
-                    'max-w-[85%] rounded-xl px-3 py-2 text-sm',
-                    message.role === 'user'
-                        ? 'ms-auto bg-gray-900 text-white dark:bg-gray-200 dark:text-gray-900'
-                        : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200',
-                ]"
-                v-text="message.text"
-            />
         </div>
 
-        <form class="relative p-3" @submit.prevent="send()" @keydown.enter.exact.prevent="send()">
+        <form class="relative p-3 ps-1.5" @submit.prevent="send()" @keydown.enter.exact.prevent="send()">
             <Textarea v-model="prompt" :placeholder="__('Ask anything...')" rows="2" resize="none" elastic />
             <Button type="submit" icon="arrow-up" variant="primary" size="xs" round class="absolute end-5 bottom-5" :aria-label="__('Send')" :disabled="!prompt.trim()" />
         </form>
