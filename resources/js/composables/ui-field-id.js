@@ -1,4 +1,4 @@
-import { computed, inject, unref, useId } from 'vue';
+import { computed, inject, onBeforeUnmount, unref, useId } from 'vue';
 
 export const UI_FIELD_ID_KEY = 'uiFieldId';
 
@@ -25,6 +25,10 @@ export function useUiFieldId(id) {
         context.claimed = true;
         claimedId = context.id;
         claimedLabelId = context.labelId ?? null;
+
+        onBeforeUnmount(() => {
+            context.claimed = false;
+        });
     }
 
     const resolvedId = computed(() => {
