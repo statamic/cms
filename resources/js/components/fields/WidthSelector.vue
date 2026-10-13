@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { cva } from 'cva'
+import { GRID_COLUMNS, widthToColumnSpan, widthToPercentage } from '@/util/width.js'
 
 const props = defineProps({
     modelValue: Number,
@@ -13,7 +14,14 @@ const emit = defineEmits(['update:model-value'])
 
 const isHovering = ref(false)
 const hoveringOver = ref(null)
-const widths = ref(props.initialWidths ?? [25, 33, 50, 66, 75, 100])
+// Compared on resolved spans rather than raw values, so a width the stops don't
+// offer (a hand written span of 6, say) still fills the selector to the right place.
+const widths = computed(() =>
+    (props.initialWidths ?? [25, 33, 50, 66, 75, 100]).map((value) => ({
+        value,
+        span: widthToColumnSpan(value),
+    })),
+)
 
 const selected = computed(() => {
     if (isHovering.value) {
@@ -21,6 +29,8 @@ const selected = computed(() => {
     }
     return props.modelValue
 })
+
+const selectedSpan = computed(() => widthToColumnSpan(selected.value))
 
 const wrapperClasses = cva({
     base: 'relative text-gray-600 dark:text-gray-400 font-mono antialiased bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 with-contrast:border-gray-500 overflow-hidden flex cursor-pointer',
@@ -58,14 +68,14 @@ const sizerClasses = cva({
         <div class="flex w-full">
             <div
                 v-for="width in widths"
-                :key="width"
-                @mouseenter.stop="hoveringOver = width"
-                @click="$emit('update:model-value', width)"
+                :key="width.value"
+                @mouseenter.stop="hoveringOver = width.value"
+                @click="$emit('update:model-value', width.value)"
                 :class="sizerClasses"
-                :data-state="selected >= width ? 'selected' : 'unselected'"
-                :data-last="selected === width && width !== 100"
+                :data-state="selectedSpan >= width.span ? 'selected' : 'unselected'"
+                :data-last="selectedSpan === width.span && width.span !== GRID_COLUMNS"
             />
         </div>
-        <div class="pointer-events-none absolute inset-0 z-10 flex w-full items-center justify-center text-center font-medium text-gray-900 dark:text-gray-300">{{ selected }}%</div>
+        <div class="pointer-events-none absolute inset-0 z-10 flex w-full items-center justify-center text-center font-medium text-gray-900 dark:text-gray-300">{{ widthToPercentage(selected) }}%</div>
     </div>
 </template>

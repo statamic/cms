@@ -1,0 +1,50 @@
+/* GROUP WIDTHS
+=================================================== */
+
+/*
+ * A configured width resolves to a span of a twelve column grid.
+ *
+ * Consumed by the publish form grid (publish.css) and the dashboard widget grid
+ * (widgets.css). Each of those decides for itself at what container width it
+ * stops honouring the span and stacks everything instead, so these rules are
+ * unconditional.
+ *
+ * Spans and percentages are shared. The size keywords are widgets only, and are
+ * deliberately not given .field-w- equivalents.
+ *
+ * Spans are written as a fraction of --grid-columns rather than as plain numbers
+ * so that a grid redefining it continues to opt out of column spanning entirely.
+ * The asset editor does this by setting it to `none`.
+ */
+
+.field-w-1,    .widget-w-1    { --col-span: calc(var(--grid-columns) *  1 / 12); }
+.field-w-2,    .widget-w-2    { --col-span: calc(var(--grid-columns) *  2 / 12); }
+.field-w-3,    .widget-w-3    { --col-span: calc(var(--grid-columns) *  3 / 12); }
+.field-w-4,    .widget-w-4    { --col-span: calc(var(--grid-columns) *  4 / 12); }
+.field-w-5,    .widget-w-5    { --col-span: calc(var(--grid-columns) *  5 / 12); }
+.field-w-6,    .widget-w-6    { --col-span: calc(var(--grid-columns) *  6 / 12); }
+.field-w-7,    .widget-w-7    { --col-span: calc(var(--grid-columns) *  7 / 12); }
+.field-w-8,    .widget-w-8    { --col-span: calc(var(--grid-columns) *  8 / 12); }
+.field-w-9,    .widget-w-9    { --col-span: calc(var(--grid-columns) *  9 / 12); }
+.field-w-10,   .widget-w-10   { --col-span: calc(var(--grid-columns) * 10 / 12); }
+.field-w-11,   .widget-w-11   { --col-span: calc(var(--grid-columns) * 11 / 12); }
+.field-w-12,   .widget-w-12   { --col-span: calc(var(--grid-columns) * 12 / 12); }
+
+/* Percentages. The widths available before spans, and still what the width
+   selector writes. They were always exact twelfths. */
+.field-w-25,   .widget-w-25   { --col-span: calc(var(--grid-columns) *  3 / 12); }
+.field-w-33,   .widget-w-33   { --col-span: calc(var(--grid-columns) *  4 / 12); }
+.field-w-50,   .widget-w-50   { --col-span: calc(var(--grid-columns) *  6 / 12); }
+.field-w-66,   .widget-w-66   { --col-span: calc(var(--grid-columns) *  8 / 12); }
+.field-w-75,   .widget-w-75   { --col-span: calc(var(--grid-columns) *  9 / 12); }
+.field-w-100,  .widget-w-100  { --col-span: calc(var(--grid-columns) * 12 / 12); }
+
+/* Size keywords. Widgets only. Fields have never accepted these. */
+.widget-w-sm   { --col-span: calc(var(--grid-columns) *  4 / 12); }
+.widget-w-md   { --col-span: calc(var(--grid-columns) *  6 / 12); }
+.widget-w-lg   { --col-span: calc(var(--grid-columns) *  9 / 12); }
+.widget-w-full { --col-span: calc(var(--grid-columns) * 12 / 12); }
+
+/* No width configured. Needs a rule of its own rather than relying on the
+   var() fallback, because --col-span inherits. */
+.field-w-undefined, .widget-w-undefined { --col-span: calc(var(--grid-columns) * 12 / 12); }
