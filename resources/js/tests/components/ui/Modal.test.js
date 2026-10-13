@@ -1,5 +1,5 @@
 import { flushPromises, mount } from '@vue/test-utils';
-import { afterEach, expect, test } from 'vitest';
+import { afterEach, expect, test, vi } from 'vitest';
 import { h, nextTick } from 'vue';
 import { portals } from '@api';
 import { Modal, ModalTitle, Button } from '@/components/ui';
@@ -62,4 +62,24 @@ test('focuses the dialog when autofocus is disabled', async () => {
     await nextTick();
 
     expect(document.activeElement).toBe(document.querySelector('[data-ui-modal-content]'));
+});
+
+test('hides the page behind from the accessibility tree', async () => {
+    vi.useFakeTimers();
+
+    const page = document.createElement('main');
+    page.textContent = 'Behind the modal';
+    document.body.appendChild(page);
+
+    const wrapper = await openModal({ title: 'Delete Entry' });
+
+    expect(page.getAttribute('aria-hidden')).toBe('true');
+
+    await wrapper.setProps({ open: false });
+    await vi.advanceTimersByTimeAsync(300);
+    await flushPromises();
+
+    expect(page.hasAttribute('aria-hidden')).toBe(false);
+
+    vi.useRealTimers();
 });

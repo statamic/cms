@@ -2,6 +2,7 @@
 import { cva } from 'cva';
 import { hasComponent } from '@/composables/has-component.js';
 import { computed, getCurrentInstance, nextTick, onBeforeUnmount, onMounted, provide, ref, useAttrs, useId, useSlots, watch } from 'vue';
+import { hideOthers as ariaHideOthers } from 'aria-hidden';
 import Icon from '../Icon/Icon.vue';
 import Heading from '../Heading.vue';
 import { portals, keys } from '@api';
@@ -63,6 +64,7 @@ const modalContent = ref(null);
 const mounted = ref(false);
 const visible = ref(false);
 const escBinding = ref(null);
+let undoHideOthers = null;
 
 const instance = getCurrentInstance();
 const hasModalTitleComponent = hasComponent('ModalTitle');
@@ -84,7 +86,10 @@ function open() {
         nextTick(() => {
             visible.value = true;
             emit('opened');
-            nextTick(() => focusOnOpen());
+            nextTick(() => {
+                hidePageBehind();
+                focusOnOpen();
+            });
         });
     });
 }
@@ -114,6 +119,22 @@ function focusOnOpen() {
 // Modal owns initial focus; prevent FocusScope from focusing the first tabbable first.
 function onMountAutoFocus(event) {
     event.preventDefault();
+}
+
+function hidePageBehind() {
+    undoHideOthers?.();
+    undoHideOthers = null;
+
+    // Match Reka DialogContent: aria-hide everything except the dialog so the page
+    // behind leaves the accessibility tree. Overlay stays pointer-interactive.
+    if (modalContent.value) {
+        undoHideOthers = ariaHideOthers(modalContent.value);
+    }
+}
+
+function revealPageBehind() {
+    undoHideOthers?.();
+    undoHideOthers = null;
 }
 
 function close() {
@@ -154,6 +175,7 @@ function runCloseCallback() {
 }
 
 function cleanup() {
+    revealPageBehind();
     modal.value?.destroy();
     escBinding.value?.destroy();
 }

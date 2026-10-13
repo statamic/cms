@@ -1,8 +1,19 @@
 <template>
     <div>
         <div class="flex items-center gap-2" v-if="isToggleMode">
-            <Switch :model-value="isRevealed" @update:model-value="update" :read-only="isReadOnly" :id="id" />
-            <Heading v-if="config.input_label" v-html="$markdown(__(config.input_label), { openLinksInNewTabs: true })" />
+            <Switch
+                :model-value="isRevealed"
+                :label="config.input_label ? null : (__(config.display) || __('Show Fields'))"
+                :aria-labelledby="config.input_label ? inputLabelId : undefined"
+                @update:model-value="update"
+                :read-only="isReadOnly"
+                :id="id"
+            />
+            <Heading
+                v-if="config.input_label"
+                :id="inputLabelId"
+                v-html="$markdown(__(config.input_label), { openLinksInNewTabs: true })"
+            />
         </div>
         <Button
             v-else
@@ -19,7 +30,7 @@
 <script setup>
 import Fieldtype from '@/components/fieldtypes/fieldtype.js';
 import { Switch, Heading, Button, injectPublishContext as injectContainerContext } from '@ui';
-import { onMounted, onBeforeUnmount, watch, nextTick, computed } from 'vue';
+import { onMounted, onBeforeUnmount, watch, nextTick, computed, useId } from 'vue';
 
 const emit = defineEmits(Fieldtype.emits);
 const props = defineProps(Fieldtype.props);
@@ -30,6 +41,7 @@ const { setRevealerField, unsetRevealerField, setHiddenField } = injectContainer
 const isRevealed = computed(() => props.value);
 const isToggleMode = computed(() => data_get(props.config, 'mode') === 'toggle');
 const fieldPath = computed(() => props.fieldPathPrefix ? `${props.fieldPathPrefix}.${props.handle}` : props.handle);
+const inputLabelId = useId();
 
 onMounted(() => setRevealerField(fieldPath.value));
 onBeforeUnmount(() => unsetRevealerField(fieldPath.value));

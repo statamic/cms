@@ -711,7 +711,6 @@ class Comb
     private function removeDisallowedMatches($params)
     {
         $disallowed = '#'.implode('|', $params['disallowed']).'#iu';
-        $required = '#(?=.*'.implode(')(?=.*', $params['required']).')#iu';
         $new_data = [];
 
         // this only applies to boolean mode
@@ -739,10 +738,12 @@ class Comb
                     throw new CombException('');
                 }
 
-                // check for disallowed
-                if (count($params['required']) && ! preg_match($required, $record)) {
-                    // a disallowed was found, we don't want this
-                    throw new CombException('');
+                // check for required, one word at a time so each is a single linear scan
+                foreach ($params['required'] as $word) {
+                    if (! preg_match('#'.$word.'#iu', $record)) {
+                        // a required word is missing, we don't want this
+                        throw new CombException('');
+                    }
                 }
 
                 array_push($new_data, $item);
