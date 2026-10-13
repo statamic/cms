@@ -109,20 +109,39 @@ class FormCreateTest extends FormTestCase
     }
 
     #[Test]
-    public function it_uses_form_level_restrictions_when_the_entry_doesnt_use_the_form()
+    public function it_renders_the_closed_state_when_the_entry_doesnt_use_the_form()
     {
         Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
 
-        $form = Form::find('contact');
-        $form->set('unique_instances', true);
-        $form->set('submission_limit', 1);
-        $form->makeSubmission()->set('_entry', 'event-2')->save();
+        Form::find('contact')->set('unique_instances', true);
 
         $this->makeEntry('event-1', ['form' => 'another_form', 'config' => []]);
 
-        $output = $this->tag('{{ form:contact }}{{ status }}{{ /form:contact }}', ['id' => 'event-1']);
+        $output = $this->tag('{{ form:contact }}{{ restricted }}|{{ status }}|{{ restriction_message }}{{ /form:contact }}', ['id' => 'event-1']);
 
-        $this->assertStringContainsString('limit_reached', $output);
+        $this->assertStringContainsString('1|closed|'.__('statamic::validation.form_must_be_submitted_from_an_entry'), $output);
+        $this->assertStringNotContainsString('name="_entry"', $output);
+    }
+
+    #[Test]
+    public function it_renders_the_closed_state_outside_an_entry_context()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        Form::find('contact')->set('unique_instances', true);
+
+        $output = $this->tag('{{ form:contact }}{{ restricted }}|{{ status }}|{{ restriction_message }}{{ /form:contact }}');
+
+        $this->assertStringContainsString('1|closed|'.__('statamic::validation.form_must_be_submitted_from_an_entry'), $output);
+        $this->assertStringNotContainsString('name="_entry"', $output);
+    }
+
+    #[Test]
+    public function it_doesnt_render_the_closed_state_when_unique_instances_is_disabled()
+    {
+        $output = $this->tag('{{ form:contact }}{{ restricted }}|{{ status }}{{ /form:contact }}');
+
+        $this->assertStringNotContainsString('closed', $output);
     }
 
     #[Test]

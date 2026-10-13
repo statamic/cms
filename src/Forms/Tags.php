@@ -102,11 +102,17 @@ class Tags extends BaseTags
 
         $entry = $this->submittableEntry($form);
 
-        $instance = $form->instance($entry);
+        if ($form->hasUniqueInstances() && ! $entry) {
+            $data['restricted'] = true;
+            $data['restriction_message'] = __('statamic::validation.form_must_be_submitted_from_an_entry');
+            $data['status'] = 'closed';
+        } else {
+            $instance = $form->instance($entry);
 
-        $data['restricted'] = $instance->restricted();
-        $data['restriction_message'] = $instance->restrictionMessage();
-        $data['status'] = $instance->status();
+            $data['restricted'] = $instance->restricted();
+            $data['restriction_message'] = $instance->restrictionMessage();
+            $data['status'] = $instance->status();
+        }
 
         if ($jsDriver) {
             $data['js_driver'] = $jsDriver->handle();
