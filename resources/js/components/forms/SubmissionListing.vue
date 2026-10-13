@@ -69,7 +69,7 @@ defineExpose({ parameters, refresh });
         :sort-direction="sortDirection"
         :preferences-prefix="preferencesPrefix"
         :filters="filters"
-        :allow-presets="false"
+        :allow-presets="!viewInStack"
         :push-query="!viewInStack"
     >
         <template #default="{ items, showPresets, allowSearch, allowCustomizingColumns, hasFilters, meta }">
