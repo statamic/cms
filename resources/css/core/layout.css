@@ -146,6 +146,115 @@ main.nav-closed {
     @apply lg:ps-0;
 }
 
+/* GROUP THE MAIN NAV (LEFT SIDEBAR) / THREE PANEL STATES
+=================================================== */
+/* Three panels exist */
+[data-panels-showing] {
+    display: flex;
+
+    #content-card {
+        flex: 1;
+    }
+
+    @media (max-width: 1000px) {
+        [data-max-width-wrapper] {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+        }
+    }
+
+    &:has([data-fieldset-label]) [data-ui-panel] {
+        /* UI panels should be slightly narrower on mobile, less fieldset indicators will hang off the edge of the screen */
+        @apply max-sm:w-[96%];
+    }
+}
+
+[data-left-panel]:empty,
+[data-right-panel]:empty {
+    display: none;
+}
+
+[data-left-panel] {
+    [data-resize-handle] {
+        @apply dark:border-e dark:border-content-border;
+    }
+}
+[data-right-panel] {
+    @apply dark:border-s dark:border-content-border;
+}
+
+/* We need this CSS when transitioning the left panel to reveal the sidebar nav. Technically this border should only exist when we have three panels and the nav closes, but querying that is too slow and causes a 1px border layout shift - so instead we just always apply it and hope no one notices the 1px discrepancy when the nav is closed. */
+.main-content {
+    border-inline-start: 1px solid transparent;
+    transition:
+        /* Delay the shadow to so it doesn't flash in as we switch modes. This also improves performance. */
+        box-shadow 0s ease-out 0.3s,
+        border-inline-start 0s ease-out 0.3s
+    ;
+}
+
+/* If the left panel exists with content and the nav opens */
+#main.nav-open:has([data-left-panel]:not(:empty)) {
+    /* Add separation between the nav and the left panel, when the nav is open */
+    .main-content {
+        @apply border-s border-content-border;
+        /* If the left panel exists with content and the nav opens, delay the border a touch so it doesn't flash in as we switch modes. */
+        transition: border-inline-start 0s ease-out 0.1s;
+        @apply shadow-xl dark:rounded-none;
+    }
+}
+
+/* GROUP THREE PANEL STATES / SIDE PANELS
+=================================================== */
+@media (max-width: 999px) {
+    #left-panel,
+    #right-panel {
+        position: fixed;
+        top: 3.5rem;
+        bottom: 0;
+        z-index: var(--z-index-modal);
+        transition: transform 0.3s ease;
+        background: var(--theme-color-body-bg);
+        overflow-y: auto;
+        overscroll-behavior-y: contain;
+    }
+
+    #left-panel {
+        left: 0;
+        width: max(11rem, 33.33%);
+        transform: translateX(-100%);
+        @apply border-r border-gray-200 dark:border-gray-700;
+    }
+
+    #right-panel {
+        right: 0;
+        width: max(18rem, 33.33%);
+        transform: translateX(100%);
+        @apply border-l border-gray-200 dark:border-gray-700;
+    }
+
+    /* Slide in when open */
+    #left-panel:has([data-mobile-open="true"]),
+    #right-panel:has([data-mobile-open="true"]) {
+        transform: translateX(0);
+        @apply shadow-2xl;
+    }
+}
+
+/* Backdrop for mobile panel click-outside-to-close */
+.mobile-panel-backdrop {
+    @apply hidden;
+}
+
+@media (max-width: 999px) {
+    .mobile-panel-backdrop[data-visible="true"] {
+        @apply block fixed inset-0 cursor-pointer;
+        top: 3.5rem;
+        background: rgba(0, 0, 0, 0.3);
+        z-index: calc(var(--z-index-modal) - 1);
+    }
+}
+
 /* ==========================================================================
    DRAGGABLE MIRRORS
    ========================================================================== */

@@ -3,6 +3,7 @@ import Logo from './Logo.vue';
 import Breadcrumbs from './Breadcrumbs.vue';
 import SiteSelector from './SiteSelector.vue';
 import Search from './Search.vue';
+import AiChatButton from './AiChatButton.vue';
 import SupportButton from "@/components/global-header/SupportButton.vue";
 import MaxWidthButton from "@/components/global-header/MaxWidthButton.vue";
 import ViewSiteButton from './ViewSiteButton.vue';
@@ -29,6 +30,7 @@ import UserDropdown from './UserDropdown.vue';
             <div class="flex shrink-0 items-center">
                 <Search />
             </div>
+            <AiChatButton />
 	        <SupportButton />
 	        <MaxWidthButton />
             <ViewSiteButton />
