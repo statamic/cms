@@ -217,7 +217,13 @@ reveal.use(rootEl, () => emit('expanded'));
                         :tabindex="moving ? 0 : -1"
                         :aria-label="__('messages.keyboard_item_reorder_instructions')"
                     />
-                    <Switch size="xs" :model-value="enabled" @update:model-value="toggleEnabledState" v-tooltip="enabled ? __('Included in output') : __('Hidden from output')" />
+                    <Switch
+                        size="xs"
+                        :model-value="enabled"
+                        :label="__('Included in output')"
+                        @update:model-value="toggleEnabledState"
+                        v-tooltip="enabled ? __('Included in output') : __('Hidden from output')"
+                    />
                     <Dropdown>
                         <template #trigger>
                             <Button icon="dots" variant="ghost" size="xs" :aria-label="__('Open dropdown menu')" />

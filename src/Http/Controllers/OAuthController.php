@@ -14,6 +14,7 @@ use Statamic\Facades\OAuth;
 use Statamic\Facades\TwoFactor;
 use Statamic\Facades\URL;
 use Statamic\Facades\User;
+use Statamic\Statamic;
 use Statamic\Support\Str;
 
 use function Statamic\trans as __;
@@ -91,7 +92,7 @@ class OAuthController
             if (config('statamic.oauth.merge_user_data', true)) {
                 $user = $oauth->mergeUser($user, $providerUser);
             }
-        } elseif (config('statamic.oauth.create_user', true)) {
+        } elseif (Statamic::pro() && config('statamic.oauth.create_user', true)) {
             try {
                 $user = $oauth->createUser($providerUser);
             } catch (OAuthEmailExistsException $e) {

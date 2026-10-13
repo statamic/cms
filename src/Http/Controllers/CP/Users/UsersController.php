@@ -21,6 +21,7 @@ use Statamic\Http\Resources\CP\Users\Users;
 use Statamic\Notifications\ActivateAccount;
 use Statamic\Query\OrderBy;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
+use Statamic\Rules\EmailWithoutPathCharacters;
 use Statamic\Rules\UniqueUserValue;
 use Statamic\Search\Result;
 use Statamic\Statamic;
@@ -195,7 +196,7 @@ class UsersController extends CpController
 
         $fields = $blueprint->fields()->except(['roles', 'groups'])->addValues($request->all());
 
-        $fields->validate(['email' => ['required', 'email', new UniqueUserValue]]);
+        $fields->validate(['email' => ['required', 'email', new EmailWithoutPathCharacters, new UniqueUserValue]]);
 
         if ($request->input('_validate_only')) {
             return [];
@@ -320,7 +321,7 @@ class UsersController extends CpController
 
         $fields
             ->validator()
-            ->withRules(['email' => ['required', 'email', new UniqueUserValue(except: $user->id())]])
+            ->withRules(['email' => ['required', 'email', new EmailWithoutPathCharacters, new UniqueUserValue(except: $user->id())]])
             ->withReplacements(['id' => $user->id()])
             ->validate();
 
