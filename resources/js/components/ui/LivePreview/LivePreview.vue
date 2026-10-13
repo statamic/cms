@@ -433,7 +433,6 @@ onUnmounted(() => {
                         {{ __('Live Preview') }}
                     </div>
                     <div class="flex items-center gap-x-2">
-                        <!-- TODO: Need to remove/tweak this later. This is temporary UI to more easily test the reverse of Control Panel -> live preview field syncing. -->
                         <Button size="sm" icon="target-location" :variant="selectingFields ? 'pressed' : 'default'" :aria-pressed="selectingFields" @click="selectingFields = !selectingFields">
                             {{ __('Select field') }}
                         </Button>
