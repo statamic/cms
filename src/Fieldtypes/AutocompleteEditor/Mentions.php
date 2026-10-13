@@ -26,7 +26,35 @@ class Mentions
         return (bool) preg_match('/^'.self::VALUE.'$/D', $value);
     }
 
-    public static function replace(string $content, array $values): string
+    // Pass `$using` to run a template pass (e.g. Antlers) over the content. Neither
+    // order is safe without it: parsing first lets submitted values be read as
+    // mentions or have their backslashes eaten, and resolving first turns them
+    // into template source. So mentions become inert per-call placeholders, the
+    // callback gets the template, and the values go in afterwards. The callback
+    // never sees a value.
+    public static function replace(string $content, array $values, ?callable $using = null): string
+    {
+        if ($using === null) {
+            return self::resolve($content, $values);
+        }
+
+        do {
+            $nonce = bin2hex(random_bytes(8));
+        } while (str_contains($content, $nonce));
+
+        $placeholders = [];
+        $i = 0;
+
+        foreach ($values as $handle => $value) {
+            $placeholders['mention'.$nonce.'n'.$i++.'e'] = $value;
+        }
+
+        $template = self::resolve($content, array_combine(array_map('strval', array_keys($values)), array_keys($placeholders)));
+
+        return strtr((string) $using($template), $placeholders);
+    }
+
+    private static function resolve(string $content, array $values): string
     {
         return preg_replace_callback(self::RESOLVABLE, function ($matches) use ($values) {
             $backslashes = str_repeat('\\', strlen($matches[1]) / 2);
