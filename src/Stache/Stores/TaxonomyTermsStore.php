@@ -20,9 +20,8 @@ class TaxonomyTermsStore extends ChildStore
     protected $valueIndex = Value::class;
     protected $storeIndexes = [
         'slug',
-        'taxonomy',
         'associations' => Indexes\Terms\Associations::class,
-        'site' => Indexes\Terms\Site::class,
+        'site',
     ];
 
     public function getItemFilter(SplFileInfo $file)
