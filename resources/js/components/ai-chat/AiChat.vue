@@ -1,11 +1,18 @@
 <script setup>
-import { nextTick, ref, useTemplateRef } from 'vue';
+import { nextTick, ref, useTemplateRef, watch } from 'vue';
 import { Button, Icon, Textarea } from '@ui';
 import useAiChat from '@/composables/use-ai-chat.js';
 
-const { messages } = useAiChat();
+const { open, messages } = useAiChat();
 const prompt = ref('');
 const thread = useTemplateRef('thread');
+const form = useTemplateRef('form');
+
+// Move focus into the chat when it opens, so keyboard and screen reader users land on the input.
+// Closing is done with the same header button, which still has focus, so there's nothing to restore.
+watch(open, (isOpen) => {
+    if (isOpen) nextTick(() => form.value?.querySelector('textarea')?.focus());
+});
 
 // Prototype: same examples as the command palette.
 const suggestions = [
@@ -35,8 +42,7 @@ function scrollToBottom() {
 </script>
 
 <template>
-    <!-- Bleed the glow into the right panel's ps-2 padding -->
-    <div class="ai-chat-glow flex flex-1 flex-col" style="--glow-bleed: calc(var(--spacing) * 2)">
+    <div class="flex flex-1 flex-col">
         <div ref="thread" class="flex flex-1 flex-col overflow-y-auto ps-0.5 pe-2.5 py-2">
             <!-- mt-auto keeps messages next to the input, while still scrolling once they overflow -->
             <div class="relative mt-auto space-y-3">
@@ -49,9 +55,9 @@ function scrollToBottom() {
                         class="group flex w-full cursor-pointer items-start gap-2.5 rounded-xl border border-gray-200 bg-gray-50 p-3 text-start text-sm/5 text-gray-700 shadow-ui-sm transition-colors hover:border-gray-300 hover:bg-white focus-visible:focus-outline dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:border-gray-600 dark:hover:bg-gray-900"
                         @click="send(suggestion.text)"
                     >
-                        <Icon :name="suggestion.icon" class="mt-0.5 size-4 shrink-0 text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300" />
+                        <Icon :name="suggestion.icon" class="mt-0.5 size-4 shrink-0 text-gray-600 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-gray-200" />
                         <span class="flex-1">{{ suggestion.text }}</span>
-                        <Icon name="arrow-right" class="mt-0.5 size-3.5 shrink-0 text-gray-400 opacity-0 transition-opacity group-hover:opacity-100 rtl:rotate-180" />
+                        <Icon name="arrow-right" class="mt-0.5 size-3.5 shrink-0 text-gray-600 dark:text-gray-400 opacity-0 transition-opacity group-hover:opacity-100 rtl:rotate-180" />
                     </button>
                 </div>
                 <div
@@ -68,7 +74,7 @@ function scrollToBottom() {
             </div>
         </div>
 
-        <form class="relative p-2.5 ps-0.25" @submit.prevent="send()" @keydown.enter.exact.prevent="send()">
+        <form ref="form" class="relative p-2.5 ps-0.25" @submit.prevent="send()" @keydown.enter.exact.prevent="send()">
             <Textarea v-model="prompt" :placeholder="__('Ask anything...')" rows="2" resize="none" elastic />
             <Button type="submit" icon="arrow-up" variant="primary" size="xs" round class="absolute end-5 bottom-5" :aria-label="__('Send')" :disabled="!prompt.trim()" />
         </form>
