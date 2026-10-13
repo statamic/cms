@@ -12,7 +12,7 @@ import {
     ComboboxVirtualizer,
     FocusScope
 } from 'reka-ui';
-import { computed, nextTick, ref, useAttrs, useTemplateRef, watch } from 'vue';
+import { computed, nextTick, ref, toRef, useAttrs, useTemplateRef, watch } from 'vue';
 import { twMerge } from 'tailwind-merge';
 import Button from '../Button/Button.vue';
 import Icon from '../Icon/Icon.vue';
@@ -20,6 +20,7 @@ import Badge from '../Badge.vue';
 import fuzzysort from 'fuzzysort';
 import DOMPurify from 'dompurify';
 import { SortableList } from '@/components/sortable/Sortable.js';
+import { useUiFieldId } from '@/composables/ui-field-id.js';
 
 const emit = defineEmits(['update:modelValue', 'search', 'selected', 'added']);
 
@@ -37,8 +38,8 @@ const props = defineProps({
 	discreteFocusOutline: { type: Boolean, default: false },
 	/** Icon name. [Browse available icons](/?path=/story/components-icon--all-icons) */
 	icon: { type: String, default: null },
-	/** ID attribute for the input element */
-	id: { type: String },
+	/** ID attribute for the input element. Inherits from parent `Field` when omitted. */
+	id: { type: String, default: null },
 	/** When `true`, the Combobox will avoid filtering options, allowing you to handle filtering yourself by listening to the `search` event and updating the `options` prop. */
 	ignoreFilter: { type: Boolean, default: false },
 	/** When `true`, the option labels will be rendered with `v-html` instead of `v-text`. */
@@ -78,6 +79,8 @@ const props = defineProps({
 defineOptions({
     inheritAttrs: false,
 });
+
+const { id, labelId } = useUiFieldId(toRef(props, 'id'));
 
 const attrs = useAttrs();
 
@@ -397,6 +400,8 @@ defineExpose({
                         as="div"
                         ref="trigger"
                         v-bind="triggerAttrs"
+                        :id="shouldShowInput ? undefined : id"
+                        :aria-labelledby="shouldShowInput ? undefined : labelId"
                         :class="triggerClasses"
                         data-ui-combobox-trigger
                         @keydown.enter="openDropdown"

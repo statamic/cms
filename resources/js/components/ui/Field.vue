@@ -1,11 +1,12 @@
 <script setup>
 import { cva } from 'cva';
-import { computed } from 'vue';
+import { computed, provide, useId } from 'vue';
 import Description from './Description.vue';
 import Label from './Label.vue';
 import ErrorMessage from './ErrorMessage.vue';
 import markdown from '@/util/markdown.js';
 import { twMerge } from 'tailwind-merge';
+import { UI_FIELD_ID_KEY } from '@/composables/ui-field-id.js';
 
 defineOptions({
     inheritAttrs: false,
@@ -25,7 +26,8 @@ const props = defineProps({
     errors: { type: Object },
     /** When `true`, forces the field to use full width even when `asConfig` is enabled. */
     fullWidthSetting: { type: Boolean, default: false },
-    id: { type: String },
+    /** ID shared by the label and control. Defaults to a generated id. */
+    id: { type: String, default: null },
     /** Instructions text to display above or below the label. Supports Markdown. */
     instructions: { type: String, default: '' },
     /** When `true`, displays instructions below the control instead of below the label. */
@@ -36,9 +38,19 @@ const props = defineProps({
     required: { type: Boolean, default: false },
 });
 
+const generatedId = useId();
+const hasExplicitId = computed(() => props.id != null && props.id !== '');
+const fieldId = computed(() => (hasExplicitId.value ? props.id : generatedId));
+const labelId = computed(() => `${fieldId.value}-label`);
+
+// Only auto-generated ids are injectable. Explicit ids (e.g. Publish/Field) stay on
+// the fieldtype via its own `id` prop so nested controls don't inherit them.
+provide(UI_FIELD_ID_KEY, hasExplicitId.value ? null : { id: fieldId, labelId, claimed: false });
+
 const labelProps = computed(() => ({
     badge: props.badge,
-    for: props.id,
+    for: fieldId.value,
+    id: labelId.value,
     required: props.required,
     text: props.label,
 }));
@@ -103,7 +115,7 @@ const hasErrors = computed(() => {
             </slot>
             <Description :text="instructions" v-if="instructions && !instructionsBelow" />
         </div>
-        <slot />
+        <slot :id="fieldId" />
         <div v-if="(instructions && instructionsBelow) || hasErrors" class="flex flex-col gap-2">
             <Description :text="instructions" v-if="instructions && instructionsBelow" />
             <ErrorMessage v-if="errors" v-for="(error, i) in errors" :key="i" :text="error" />

@@ -3,8 +3,9 @@ import { cva } from 'cva';
 import CharacterCounter from './CharacterCounter.vue';
 import Button from './Button/Button.vue';
 import autosize from 'autosize/dist/autosize.js';
-import { computed, nextTick, onBeforeUnmount, onMounted, useTemplateRef } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, toRef, useTemplateRef } from 'vue';
 import useCopy from '@/composables/copy';
+import { useUiFieldId } from '@/composables/ui-field-id.js';
 
 defineEmits(['update:modelValue']);
 
@@ -14,7 +15,7 @@ const props = defineProps({
     /** When `true`, shows a copy button to copy the value to clipboard */
     copyable: { type: Boolean, default: false },
     disabled: { type: Boolean, default: false },
-    /** ID attribute for the textarea element */
+    /** ID attribute for the textarea element. Inherits from parent `Field` when omitted. */
     id: { type: String, default: null },
     readOnly: { type: Boolean, default: false },
     required: { type: Boolean, default: false },
@@ -27,6 +28,8 @@ const props = defineProps({
     /** Specify a character limit */
     limit: { type: Number, default: null },
 });
+
+const { id } = useUiFieldId(toRef(props, 'id'));
 
 const { copySupported, copied, copy } = useCopy();
 const canCopy = computed(() => props.copyable && copySupported.value);

@@ -1,11 +1,12 @@
 <script setup>
-import { computed, useSlots, useAttrs, ref, useId, useTemplateRef, onMounted, nextTick } from 'vue';
+import { computed, useSlots, useAttrs, ref, toRef, useTemplateRef, onMounted, nextTick } from 'vue';
 import { cva } from 'cva';
 import { twMerge } from 'tailwind-merge';
 import Icon from '../Icon/Icon.vue';
 import Button from '../Button/Button.vue';
 import CharacterCounter from '../CharacterCounter.vue';
 import useCopy from '@/composables/copy';
+import { useUiFieldId } from '@/composables/ui-field-id.js';
 
 defineOptions({ inheritAttrs: false });
 
@@ -29,8 +30,8 @@ const props = defineProps({
     iconAppend: { type: String, default: null },
     /** Icon name. Will display before the text. [Browse available icons](/?path=/story/components-icon--all-icons) */
     iconPrepend: { type: String, default: null },
-    /** ID attribute for the input element */
-    id: { type: String, default: () => useId() },
+    /** ID attribute for the input element. Inherits from parent `Field` when omitted. */
+    id: { type: String, default: null },
     /** Specify a character limit */
     limit: { type: Number, default: null },
     /** When `true`, an animated loading indicator will show next to the input */
@@ -56,6 +57,8 @@ const props = defineProps({
     /** Additional CSS classes for the input element */
     inputClass: { type: String, default: '' },
 });
+
+const { id } = useUiFieldId(toRef(props, 'id'));
 
 const inputAttributeKeys = [
     'accept', 'autocomplete', 'autofocus', 'capture', 'checked', 'dirname', 'form',

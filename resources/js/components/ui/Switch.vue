@@ -1,12 +1,13 @@
 <script setup>
-import { onMounted, useAttrs, useId } from 'vue';
+import { onMounted, toRef, useAttrs } from 'vue';
 import { SwitchRoot, SwitchThumb } from 'reka-ui';
 import { cva } from 'cva';
+import { useUiFieldId } from '@/composables/ui-field-id.js';
 
 const props = defineProps({
     required: { type: Boolean, default: false },
-    /** The id attribute for the toggle */
-    id: { type: String, default: () => useId() },
+    /** The id attribute for the toggle. Inherits from parent `Field` when omitted. */
+    id: { type: String, default: null },
     /**
      * Accessible name announced by assistive technology.
      * Preferred over a fallthrough `aria-label`. Provide one of `label`,
@@ -23,11 +24,12 @@ const props = defineProps({
 
 defineEmits(['update:modelValue']);
 
+const { id, labelId } = useUiFieldId(toRef(props, 'id'));
 const attrs = useAttrs();
 
 onMounted(() => {
     if (!import.meta.env.DEV) return;
-    if (props.label || attrs['aria-label'] || attrs['aria-labelledby']) return;
+    if (props.label || labelId.value || attrs['aria-label'] || attrs['aria-labelledby']) return;
 
     console.warn(
         '[ui/Switch] Provide a `label` prop (or `aria-label` / `aria-labelledby`) so the switch has an accessible name.',

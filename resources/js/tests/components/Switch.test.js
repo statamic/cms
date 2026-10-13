@@ -1,6 +1,8 @@
 import { mount } from '@vue/test-utils';
 import { expect, test, vi, afterEach } from 'vitest';
+import { h } from 'vue';
 import Switch from '@/components/ui/Switch.vue';
+import Field from '@/components/ui/Field.vue';
 
 afterEach(() => {
     vi.restoreAllMocks();
@@ -36,4 +38,17 @@ test('it warns in development when no accessible name is provided', () => {
     expect(warn).toHaveBeenCalledWith(
         expect.stringContaining('[ui/Switch] Provide a `label` prop'),
     );
+});
+
+test('it does not warn when labelled by a parent Field', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    mount(Field, {
+        props: { label: 'Publish' },
+        slots: {
+            default: () => h(Switch),
+        },
+    });
+
+    expect(warn).not.toHaveBeenCalled();
 });
