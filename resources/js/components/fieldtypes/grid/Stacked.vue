@@ -5,6 +5,7 @@
             :vertical="true"
             :item-class="sortableItemClass"
             :handle-class="sortableHandleClass"
+            :distance="pointerDragThreshold"
             append-to="body"
             constrain-dimensions
             @dragstart="$emit('focus')"
@@ -32,11 +33,13 @@
                     :meta-path-prefix="metaPathPrefix"
                     :can-delete="canDeleteRows"
                     :can-add-rows="canAddRows"
+                    :total-rows="rows.length"
                     :read-only
                     @updated="(row, value) => $emit('updated', row, value)"
                     @duplicate="(row) => $emit('duplicate', row)"
                     @meta-updated="$emit('meta-updated', row._id, $event)"
                     @removed="(row) => $emit('removed', row)"
+                    @moved="(from, to) => $emit('moved', from, to)"
                     @focus="$emit('focus')"
                     @blur="$emit('blur')"
                 />
@@ -48,7 +51,7 @@
 <script>
 import View from './View.vue';
 import StackedRow from './StackedRow.vue';
-import { SortableList } from '../../sortable/Sortable';
+import { SortableList, POINTER_DRAG_THRESHOLD } from '../../sortable/Sortable';
 
 export default {
     mixins: [View],
@@ -56,6 +59,10 @@ export default {
     components: {
         StackedRow,
         SortableList,
+    },
+
+    setup() {
+        return { pointerDragThreshold: POINTER_DRAG_THRESHOLD };
     },
 };
 </script>
