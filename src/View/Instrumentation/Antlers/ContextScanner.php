@@ -16,49 +16,41 @@ use Statamic\View\Instrumentation\HtmlSpec;
 /** @internal */
 class ContextScanner
 {
-    /** @var bool */
-    public static $enabled = false;
-
-    protected $treatComponentsAsDynamic = false;
+    protected bool $treatComponentsAsDynamic = false;
 
     /** @var string[] */
-    protected $componentPrefixes = ComponentPrefixes::DEFAULTS;
+    protected array $componentPrefixes = ComponentPrefixes::DEFAULTS;
 
-    /** @var ElementInspector */
-    protected $inspector;
+    protected ElementInspector $inspector;
 
     /** @var array<int, array<int, array{0: string, 1: string|null, 2: string}>> */
-    protected $embeddedPositions = [];
+    protected array $embeddedPositions = [];
+
+    /** @var array<string, string[]> */
+    protected array $reportableChains = [];
 
     public function __construct()
     {
         $this->inspector = new ElementInspector;
     }
 
-    public function treatComponentsAsDynamic($dynamic = true)
+    public function treatComponentsAsDynamic(bool $dynamic = true): static
     {
         $this->treatComponentsAsDynamic = $dynamic;
 
         return $this;
     }
 
-    /**
-     * @param  string[]  $prefixes
-     * @return $this
-     */
-    public function withComponentPrefixes(array $prefixes)
+    /** @param  string[]  $prefixes */
+    public function withComponentPrefixes(array $prefixes): static
     {
         $this->componentPrefixes = $prefixes;
 
         return $this;
     }
 
-    /**
-     * @param  AbstractNode[]  $nodes
-     * @param  DocumentParser|null  $parser
-     * @return void
-     */
-    public function annotate($nodes, $parser = null)
+    /** @param  AbstractNode[]  $nodes */
+    public function annotate(array $nodes, ?DocumentParser $parser = null, ?Document $document = null): void
     {
         $nodes = array_values($nodes);
 
@@ -90,13 +82,14 @@ class ContextScanner
             return;
         }
 
-        $document = $this->treatComponentsAsDynamic
+        $document ??= $this->treatComponentsAsDynamic
             ? Document::fromParser($parser, $this->componentPrefixes)
             : $parser->html();
         $placements = $document->regionPlacements();
         $source = (string) $parser->getParsedContent();
         $documentHasExplicitStructure = HtmlSpec::hasExplicitDocumentStructure($source);
         $this->classifyEmbeddedPlacements($placements, $source);
+        $this->reportableChains = [];
 
         $pending = [];
         $byteOffsets = [];
@@ -151,10 +144,9 @@ class ContextScanner
 
     /**
      * @param  array<string, mixed>|null  $placement
-     * @param  string  $source
      * @return array{0: HtmlContext, 1: int|null}
      */
-    protected function contextFromPlacement($placement, Document $document, $source)
+    protected function contextFromPlacement(?array $placement, Document $document, string $source): array
     {
         if ($placement === null) {
             return [new HtmlContext(HtmlContext::KIND_ELEMENT_CONTENT), null];
@@ -189,7 +181,7 @@ class ContextScanner
                 $elementName = $this->embeddedElementName($kind, $partial, $reportableOwner);
 
                 $context = new HtmlContext(
-                    $this->tagKind($kind),
+                    $kind,
                     $elementName,
                     $attribute,
                     $chain,
@@ -209,6 +201,12 @@ class ContextScanner
                     return [$context, null];
                 }
 
+                if ($type === 'php') {
+                    $context = new HtmlContext(HtmlContext::KIND_PHP, null, null, $chain);
+
+                    return [$context, null];
+                }
+
                 if ($type !== 'markup') {
                     $context = new HtmlContext(HtmlContext::KIND_DOCTYPE, null, null, $chain);
 
@@ -218,7 +216,7 @@ class ContextScanner
                 [$kind, $attribute, $partial] = $this->classifyEmbedded($placement, $source);
 
                 $context = new HtmlContext(
-                    $this->tagKind($kind),
+                    $kind,
                     $this->embeddedElementName($kind, $partial),
                     $attribute,
                     $chain,
@@ -232,10 +230,9 @@ class ContextScanner
 
     /**
      * @param  array<string, mixed>  $placement
-     * @param  string  $source
      * @return array{0: string, 1: string|null, 2: string}
      */
-    protected function classifyEmbedded(array $placement, $source)
+    protected function classifyEmbedded(array $placement, string $source): array
     {
         $relative = $placement['regionStart'] - $placement['markupStart'];
 
@@ -271,19 +268,28 @@ class ContextScanner
      * @param  array<int, string|null>  $chain
      * @return string[]
      */
-    protected function reportableChain(array $chain)
+    protected function reportableChain(array $chain): array
     {
+        if ($chain === []) {
+            return [];
+        }
+
+        $key = implode('/', $chain);
+
+        if (isset($this->reportableChains[$key])) {
+            return $this->reportableChains[$key];
+        }
+
         $reportable = [];
 
         foreach ($chain as $name) {
             $reportable[] = $this->reportableName($name) ?? HtmlContext::DYNAMIC_ELEMENT;
         }
 
-        return $reportable;
+        return $this->reportableChains[$key] = $reportable;
     }
 
-    /** @return string|null */
-    protected function reportableName($name)
+    protected function reportableName(?string $name): ?string
     {
         if ($name === null) {
             return null;
@@ -296,11 +302,8 @@ class ContextScanner
         return $name;
     }
 
-    /**
-     * @param  string[]  $chain
-     * @return string|null
-     */
-    protected function innermostStaticName(array $chain)
+    /** @param  string[]  $chain */
+    protected function innermostStaticName(array $chain): ?string
     {
         if ($chain === []) {
             return null;
@@ -315,7 +318,7 @@ class ContextScanner
         return $innermost;
     }
 
-    protected function contentKindForPlacement($bucket)
+    protected function contentKindForPlacement(string $bucket): string
     {
         if ($bucket === 'raw-text') {
             return HtmlContext::KIND_RAW_TEXT;
@@ -324,7 +327,7 @@ class ContextScanner
         return HtmlContext::KIND_ELEMENT_CONTENT;
     }
 
-    protected function shouldAppendDynamicOwner($ownerName, $reportableOwner, array $chain)
+    protected function shouldAppendDynamicOwner(?string $ownerName, ?string $reportableOwner, array $chain): bool
     {
         if ($ownerName === null || $reportableOwner !== null) {
             return false;
@@ -333,34 +336,16 @@ class ContextScanner
         return $chain === [] || $chain[count($chain) - 1] !== HtmlContext::DYNAMIC_ELEMENT;
     }
 
-    protected function embeddedElementName($kind, $partial, $fallback = null)
+    protected function embeddedElementName(string $kind, string $partial, ?string $fallback = null): ?string
     {
-        if ($kind === 'element-name' && $partial !== '') {
+        if ($kind === HtmlContext::KIND_ELEMENT_NAME && $partial !== '') {
             return $partial;
         }
 
         return $fallback;
     }
 
-    /**
-     * @param  string  $kind  A classifier kind from ElementInspector.
-     * @return string
-     */
-    protected function tagKind($kind)
-    {
-        switch ($kind) {
-            case 'element-name':
-                return HtmlContext::KIND_ELEMENT_NAME;
-            case 'attribute-name':
-                return HtmlContext::KIND_ATTRIBUTE_NAME;
-            case 'attribute-value':
-                return HtmlContext::KIND_ATTRIBUTE_VALUE;
-            default:
-                return HtmlContext::KIND_TAG_OPEN;
-        }
-    }
-
-    protected function dynamicComponentContext(HtmlContext $context)
+    protected function dynamicComponentContext(HtmlContext $context): HtmlContext
     {
         $stack = $context->elementStack;
 
@@ -376,18 +361,18 @@ class ContextScanner
         );
     }
 
-    protected function isComponentProxyNode(LanguageAntlersNode $node)
+    protected function isComponentProxyNode(LanguageAntlersNode $node): bool
     {
         return ComponentCompiler::isComponentProxyContent((string) $node->content);
     }
 
-    protected function applyContext(AbstractNode $node, HtmlContext $context)
+    protected function applyContext(AbstractNode $node, HtmlContext $context): void
     {
-        $node->htmlContext = $context;
-
         if (! $node instanceof LanguageAntlersNode) {
             return;
         }
+
+        $node->htmlContext = $context;
 
         foreach ($node->processedInterpolationRegions as $nodes) {
             foreach ($nodes as $interpolationNode) {

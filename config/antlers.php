@@ -15,15 +15,39 @@ return [
 
     'debugbar' => env('STATAMIC_ANTLERS_DEBUGBAR', true),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Tracing
+    |--------------------------------------------------------------------------
+    |
+    | When tracing is enabled, every tracer listed here is resolved from the
+    | container and notified as every Antlers node is entered and exited.
+    |
+    */
+
     'tracing' => env('STATAMIC_ANTLERS_TRACING', false),
 
     'tracers' => [],
 
+    /*
+    |--------------------------------------------------------------------------
+    | HTML Instrumentation
+    |--------------------------------------------------------------------------
+    |
+    | When enabled, rendered Antlers regions are wrapped in HTML comments and
+    | attributes that point back to the templates they came from. Analysis
+    | is cached by template content; set "cache" to false to skip that.
+    |
+    */
+
     'instrumentation' => [
         'enabled' => env('STATAMIC_ANTLERS_INSTRUMENTATION', false),
+        'cache' => env('STATAMIC_ANTLERS_INSTRUMENTATION_CACHE', true),
         'comments' => true,
         'prefix' => 'antlers',
         'attributes' => [],
+        'metadata' => [],
+        'componentPrefixes' => [],
     ],
 
     /*

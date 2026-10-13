@@ -2,6 +2,7 @@
 
 namespace Statamic\View\Instrumentation\Antlers;
 
+use Statamic\View\Antlers\Language\Nodes\AbstractNode;
 use Statamic\View\Antlers\Language\Nodes\AntlersNode;
 use Statamic\View\Antlers\Language\Nodes\EscapedContentNode;
 use Statamic\View\Antlers\Language\Parser\ComponentCompiler;
@@ -9,17 +10,17 @@ use Statamic\View\Antlers\Language\Parser\DocumentParser;
 use Statamic\View\Antlers\Language\Utilities\CharacterOffsets;
 use Statamic\View\Instrumentation\ComponentPrefixes;
 use Statamic\View\Instrumentation\HtmlContext;
+use Statamic\View\Instrumentation\InstrumentationState;
 use Statamic\View\Instrumentation\Span;
 use Statamic\View\Instrumentation\TemplateRegion;
 
 /** @internal */
 class TemplateAnalyzer
 {
-    /** @var ElementInspector */
-    protected $inspector;
+    protected ElementInspector $inspector;
 
     /** @var string[] */
-    protected $componentPrefixes;
+    protected array $componentPrefixes;
 
     /** @param  string[]|null  $componentPrefixes */
     public function __construct(?array $componentPrefixes = null)
@@ -29,16 +30,16 @@ class TemplateAnalyzer
     }
 
     /**
-     * @param  string  $template
-     * @param  bool  $collectElements  Whether attribute layers are configured.
-     * @return array{regions: TemplateRegion[], elements: array<int, array{insertAt: int, hasAttribute: callable}>}
+     * @return array{regions: TemplateRegion[], elements: array<int, array{insertAt: int, hasAttribute: callable}>, contexts: array<int, HtmlContext|null>}
      */
-    public function analyze($template, $collectElements = true, $commentsAtDocumentRoot = true, ?ComponentSourceMap $sourceMap = null)
+    public function analyze(string $template, bool $collectElements = true, bool $commentsAtDocumentRoot = true, ?ComponentSourceMap $sourceMap = null): array
     {
         $parser = new DocumentParser;
         $parser->inheritRuntimeLineSeed(false);
         $parser->parse($template);
         $nodes = $parser->getNodes();
+        $lineOffset = InstrumentationState::lineSeed() - 1;
+        $characterOffset = InstrumentationState::offsetSeed();
 
         (new ContextScanner)
             ->treatComponentsAsDynamic()
@@ -47,8 +48,13 @@ class TemplateAnalyzer
 
         $pending = [];
         $characterOffsets = [];
+        $contexts = [];
 
         foreach ($nodes as $node) {
+            if ($node instanceof AntlersNode) {
+                $contexts[] = $node->htmlContext;
+            }
+
             if ($this->shouldSkipNode($node)) {
                 continue;
             }
@@ -91,7 +97,7 @@ class TemplateAnalyzer
         }
 
         if ($pending === []) {
-            return ['regions' => [], 'elements' => []];
+            return ['regions' => [], 'elements' => [], 'contexts' => $contexts];
         }
 
         [$byteOffsets, $sourceCharacterOffsets] = CharacterOffsets::normalizedToBytesAndCharacters($template, $characterOffsets);
@@ -100,18 +106,21 @@ class TemplateAnalyzer
         [$mappedStarts, $mappedEnds] = $sourceMap?->positions(array_column($pending, 2), array_column($pending, 3)) ?? [[], []];
 
         foreach ($pending as [$node, $context, $start, $end, $commentSafe, $isPaired]) {
+            $insideCharacterReference = $context->isSafeForHtmlComments()
+                && $this->continuesCharacterReference($template, $byteOffsets[$start]);
+
             $regions[] = new TemplateRegion(
                 Span::ENGINE_ANTLERS,
                 $this->regionType($isPaired),
-                trim($node->content),
-                $mappedStarts[$start]['line'] ?? $node->startPosition->line,
-                $mappedStarts[$start]['offset'] ?? $sourceCharacterOffsets[$byteOffsets[$start]],
-                $mappedEnds[$end]['offset'] ?? $sourceCharacterOffsets[$byteOffsets[$end]],
+                $this->regionExpression($node),
+                ($mappedStarts[$start]['line'] ?? $node->startPosition->line) + $lineOffset,
+                ($mappedStarts[$start]['offset'] ?? $sourceCharacterOffsets[$byteOffsets[$start]]) + $characterOffset,
+                ($mappedEnds[$end]['offset'] ?? $sourceCharacterOffsets[$byteOffsets[$end]]) + $characterOffset,
                 $byteOffsets[$start],
                 $byteOffsets[$end],
                 $context,
-                $node,
-                $commentSafe
+                $commentSafe && ! $insideCharacterReference,
+                $insideCharacterReference
             );
 
             if ($this->canCollectElement($collectElements, $context)
@@ -124,10 +133,21 @@ class TemplateAnalyzer
             }
         }
 
-        return ['regions' => $regions, 'elements' => $elements];
+        return ['regions' => $regions, 'elements' => $elements, 'contexts' => $contexts];
     }
 
-    protected function shouldSkipNode($node)
+    protected function continuesCharacterReference(string $template, int $byteStart): bool
+    {
+        $length = min($byteStart, 34);
+
+        if ($length === 0) {
+            return false;
+        }
+
+        return preg_match('/&#?[A-Za-z0-9]*$/D', substr($template, $byteStart - $length, $length)) === 1;
+    }
+
+    protected function shouldSkipNode(AbstractNode $node): bool
     {
         if (! $node instanceof AntlersNode || $node instanceof EscapedContentNode) {
             return true;
@@ -140,7 +160,7 @@ class TemplateAnalyzer
         return ($node->name->name ?? null) === 'noparse';
     }
 
-    protected function canCollectElement($collectElements, HtmlContext $context)
+    protected function canCollectElement(bool $collectElements, HtmlContext $context): bool
     {
         if (! $collectElements) {
             return false;
@@ -153,7 +173,19 @@ class TemplateAnalyzer
         return $context->canInstrumentElement();
     }
 
-    protected function regionType($isPaired)
+    protected function regionExpression(AntlersNode $node): string
+    {
+        if ($node->interpolationRegions === []) {
+            return trim($node->content);
+        }
+
+        $raw = $node->getNodeDocumentText();
+        $inner = substr($raw, strlen($node->rawStart), strlen($raw) - strlen($node->rawStart) - strlen($node->rawEnd));
+
+        return trim($inner === '' ? $node->content : $inner);
+    }
+
+    protected function regionType(bool $isPaired): string
     {
         if ($isPaired) {
             return TemplateRegion::TYPE_PAIR;
@@ -162,17 +194,13 @@ class TemplateAnalyzer
         return TemplateRegion::TYPE_SINGLE;
     }
 
-    protected function isComponentProxyNode(AntlersNode $node)
+    protected function isComponentProxyNode(AntlersNode $node): bool
     {
         return ComponentCompiler::isComponentProxyContent((string) $node->content);
     }
 
-    /**
-     * @param  string  $template
-     * @param  int  $byteStart
-     * @return array{insertAt: int, hasAttribute: callable}
-     */
-    protected function elementFacts($template, HtmlContext $context, $byteStart)
+    /** @return array{insertAt: int, hasAttribute: callable} */
+    protected function elementFacts(string $template, HtmlContext $context, int $byteStart): array
     {
         $openingTag = $this->inspector->openingTagAt($template, $context->elementStartOffset, $byteStart);
         $inspector = $this->inspector;
@@ -183,8 +211,7 @@ class TemplateAnalyzer
         ];
     }
 
-    /** @return AntlersNode|null */
-    protected function closingBoundaryFor(AntlersNode $node)
+    protected function closingBoundaryFor(AntlersNode $node): ?AntlersNode
     {
         $closer = $node->isClosedBy;
         $visited = [];

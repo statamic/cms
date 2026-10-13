@@ -2,45 +2,30 @@
 
 namespace Statamic\View\Instrumentation\Concerns;
 
-use Statamic\Support\Str;
+use Closure;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Statamic\View\Instrumentation\ComponentPrefixes;
 use Statamic\View\Instrumentation\HtmlSpec;
 
 /** @internal */
 trait ConfiguresInstrumentation
 {
-    /**
-     * @param  string  $prefix
-     * @return $this
-     */
-    public function comments($prefix = 'antlers')
+    public function comments(string $prefix = 'antlers'): static
     {
-        $this->prefix($prefix);
-        $this->commentsEnabled = true;
-
-        return $this;
-    }
-
-    /**
-     * @param  string  $prefix
-     * @return $this
-     */
-    public function prefix($prefix)
-    {
-        if (! is_string($prefix)
-            || ! preg_match('/^[A-Za-z0-9_-]+$/D', $prefix)
+        if (! preg_match('/^[A-Za-z0-9_-]+$/D', $prefix)
             || str_contains($prefix, '--')) {
             throw new \InvalidArgumentException('HTML instrumentation comment prefixes may contain letters, numbers, underscores, and single hyphens.');
         }
 
         $this->commentPrefix = $prefix;
+        $this->commentsEnabled = true;
         $this->flushResultCache();
 
         return $this;
     }
 
-    /** @return $this */
-    public function withoutComments()
+    public function withoutComments(): static
     {
         $this->commentsEnabled = false;
         $this->flushResultCache();
@@ -48,64 +33,71 @@ trait ConfiguresInstrumentation
         return $this;
     }
 
-    /** @return $this */
-    public function markersUsing(callable $factory)
+    public function markersUsing(callable $factory): static
     {
-        $this->commentFactory = $factory;
+        $this->commentFactory = Closure::fromCallable($factory);
         $this->flushResultCache();
 
         return $this;
     }
 
-    /** @return $this */
-    public function filter(callable $filter)
+    public function filter(callable $filter): static
     {
-        $this->nodeFilter = $filter;
+        $filter = Closure::fromCallable($filter);
+        $previous = $this->nodeFilter;
+
+        $this->nodeFilter = $previous === null
+            ? $filter
+            : static fn ($metadata, $region) => $previous($metadata, $region) && $filter($metadata, $region);
+
         $this->flushResultCache();
 
         return $this;
     }
 
-    /** @return $this */
-    public function onSkip(callable $callback)
+    /** @param  string|array<string>  ...$patterns */
+    public function only(string|array ...$patterns): static
     {
-        $this->skipCallback = $callback;
+        $patterns = $this->expressionPatterns($patterns);
+
+        return $this->filter(static fn ($metadata) => Str::is($patterns, $metadata['expression']));
+    }
+
+    /** @param  string|array<string>  ...$patterns */
+    public function except(string|array ...$patterns): static
+    {
+        $patterns = $this->expressionPatterns($patterns);
+
+        return $this->filter(static fn ($metadata) => ! Str::is($patterns, $metadata['expression']));
+    }
+
+    /**
+     * @param  array<int, string|array<string>>  $patterns
+     * @return string[]
+     */
+    protected function expressionPatterns(array $patterns): array
+    {
+        return array_values(array_filter(Arr::flatten($patterns), 'is_string'));
+    }
+
+    public function onSkip(callable $callback): static
+    {
+        $this->skipCallback = Closure::fromCallable($callback);
         $this->flushResultCache();
 
         return $this;
     }
 
-    /**
-     * @param  array<string>  $patterns
-     * @return $this
-     */
-    public function matching(array $patterns)
+    public function attributes(string ...$attributeNames): static
     {
-        return $this->filter(static function ($metadata) use ($patterns) {
-            foreach ($patterns as $pattern) {
-                if (is_string($pattern) && Str::is($pattern, $metadata['expression'])) {
-                    return true;
-                }
-            }
+        foreach ($attributeNames ?: ['data-antlers'] as $attributeName) {
+            $this->attribute($attributeName);
+        }
 
-            return false;
-        });
+        return $this;
     }
 
-    /**
-     * @param  string  $attributeName
-     * @return $this
-     */
-    public function attributes($attributeName = 'data-antlers')
-    {
-        return $this->attribute($attributeName);
-    }
-
-    /**
-     * @param  string  $attributeName
-     * @return $this
-     */
-    public function attribute($attributeName, ?callable $valueFactory = null)
+    public function attribute(string $attributeName, ?callable $valueFactory = null): static
     {
         if ($this->invalidInstrumentationAttributeName($attributeName)) {
             throw new \InvalidArgumentException('Invalid HTML instrumentation attribute name.');
@@ -123,22 +115,18 @@ trait ConfiguresInstrumentation
             };
         }
 
-        $this->attributeLayers[$attributeName] = $valueFactory;
+        $this->attributeLayers[$attributeName] = Closure::fromCallable($valueFactory);
         $this->flushResultCache();
 
         return $this;
     }
 
-    protected function invalidInstrumentationAttributeName($attributeName)
+    protected function invalidInstrumentationAttributeName(string $attributeName): bool
     {
         return ! HtmlSpec::isValidName($attributeName);
     }
 
-    /**
-     * @param  string  $attributeName
-     * @return $this
-     */
-    public function jsonAttribute($attributeName = 'data-antlers')
+    public function jsonAttribute(string $attributeName = 'data-antlers'): static
     {
         return $this->attribute($attributeName, static function ($metadata) {
             $json = json_encode($metadata, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_INVALID_UTF8_SUBSTITUTE);
@@ -151,23 +139,17 @@ trait ConfiguresInstrumentation
         });
     }
 
-    /**
-     * @param  array<string>  $prefixes
-     * @return $this
-     */
-    public function componentPrefixes(array $prefixes)
+    /** @param  string|array<string>  ...$prefixes */
+    public function componentPrefixes(string|array ...$prefixes): static
     {
-        $this->componentPrefixes = ComponentPrefixes::merge($prefixes);
+        $this->componentPrefixes = ComponentPrefixes::merge(Arr::flatten($prefixes));
         $this->flushResultCache();
 
         return $this;
     }
 
-    /**
-     * @param  array<string, mixed>  $metadata
-     * @return $this
-     */
-    public function withMetadata(array $metadata)
+    /** @param  array<string, mixed>  $metadata */
+    public function withMetadata(array $metadata): static
     {
         $this->extraMetadata = array_merge($this->extraMetadata, $metadata);
         $this->flushResultCache();

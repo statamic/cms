@@ -65,7 +65,7 @@ class ComponentSourceMap
      * @param  int[]  $offsets
      * @param  array<int, array{compiledStart: int, compiledEnd: int, authoredStart: int, authoredEnd: int}>  $segments
      * @param  'authoredStart'|'authoredEnd'  $boundary
-     * @return array<int, int> Compiled character offset => authored normalized character offset.
+     * @return array<int, int>
      */
     private function mapEndpoints(array $offsets, array $segments, string $boundary): array
     {
@@ -82,8 +82,6 @@ class ComponentSourceMap
 
             $original = $offset - $delta;
 
-            // An endpoint inside generated markup belongs to the corresponding
-            // edge of the authored component tag, not to an interpolated offset.
             if (isset($segments[$index]) && $offset > $segments[$index]['compiledStart']) {
                 $original = $segments[$index][$boundary];
             }
@@ -94,7 +92,7 @@ class ComponentSourceMap
         return $mapped;
     }
 
-    /** @return array<int, array{offset: int, line: int}> Keyed by authored normalized character offset. */
+    /** @return array<int, array{offset: int, line: int}> */
     private function authoredPositions(array $offsets): array
     {
         [$bytes, $characters] = CharacterOffsets::normalizedToBytesAndCharacters($this->source, $offsets);

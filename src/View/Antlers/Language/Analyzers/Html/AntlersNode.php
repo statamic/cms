@@ -7,11 +7,11 @@ use Statamic\View\Antlers\Language\Nodes\AntlersNode as LanguageAntlersNode;
 /** @internal */
 class AntlersNode extends Node
 {
-    protected $node;
+    protected LanguageAntlersNode $node;
 
-    protected $source;
+    protected string $source;
 
-    public function __construct(Document $document, LanguageAntlersNode $node, $source)
+    public function __construct(Document $document, LanguageAntlersNode $node, string $source)
     {
         parent::__construct($document);
 
@@ -19,7 +19,7 @@ class AntlersNode extends Node
         $this->source = $source;
     }
 
-    public static function fromArena(Document $document, $id)
+    public static function fromArena(Document $document, int $id): self
     {
         $arena = $document->arena();
         $node = new self($document, $arena->antlersNode[$id], $arena->value[$id]);
@@ -28,12 +28,12 @@ class AntlersNode extends Node
         return $node;
     }
 
-    public function antlersNode()
+    public function antlersNode(): LanguageAntlersNode
     {
         return $this->node;
     }
 
-    public function source($source = null)
+    public function source(?string $source = null): string|static
     {
         if (func_num_args() === 0) {
             return $this->source;
@@ -53,14 +53,19 @@ class AntlersNode extends Node
 
         if ($this->arenaId !== null) {
             $this->document->arena()->value[$this->arenaId] = $this->source;
+            unset($this->document->arena()->sourceStart[$this->arenaId]);
         }
         $this->touchDocument();
 
         return $this;
     }
 
-    protected function render()
+    protected function render(): string
     {
-        return $this->source;
+        if ($this->arenaId === null) {
+            return $this->source;
+        }
+
+        return $this->document->valueMarkup($this->arenaId);
     }
 }

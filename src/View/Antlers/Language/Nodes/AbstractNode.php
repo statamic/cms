@@ -48,12 +48,6 @@ abstract class AbstractNode
      */
     public $originalAbstractNode = null;
 
-    /** @var \Statamic\View\Instrumentation\HtmlContext|null */
-    public $htmlContext = null;
-
-    /** @var int|null */
-    public $parserGeneration = null;
-
     public $isVirtual = false;
 
     public function __construct()

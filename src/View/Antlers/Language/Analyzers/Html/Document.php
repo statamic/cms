@@ -2,6 +2,7 @@
 
 namespace Statamic\View\Antlers\Language\Analyzers\Html;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Tappable;
@@ -10,7 +11,7 @@ use Statamic\View\Antlers\Language\Nodes\AntlersNode as LanguageAntlersNode;
 use Statamic\View\Antlers\Language\Parser\DocumentParser;
 use Statamic\View\Antlers\Language\Runtime\EnvironmentDetails;
 use Statamic\View\Antlers\Language\Utilities\CharacterOffsets;
-use Statamic\View\Html\ElementCollection;
+use Statamic\View\Instrumentation\ComponentPrefixes;
 use Statamic\View\Instrumentation\HtmlSpec;
 
 /** @internal */
@@ -27,124 +28,145 @@ class Document
         Container,
         Tappable;
 
-    protected static $voidElements = HtmlSpec::VOID_ELEMENTS;
+    private const MAX_CHAIN_DEPTH = 512;
 
-    protected static $rawTextElements = HtmlSpec::RAW_TEXT_ELEMENTS;
+    protected static array $voidElements = HtmlSpec::VOID_ELEMENTS;
 
-    protected static $pClosingElements = HtmlSpec::P_CLOSING_ELEMENTS;
+    protected static array $rawTextElements = HtmlSpec::RAW_TEXT_ELEMENTS;
 
-    protected static $impliedCloseTargets = HtmlSpec::IMPLIED_CLOSE_TARGETS;
+    protected static array $pClosingElements = HtmlSpec::P_CLOSING_ELEMENTS;
 
-    protected static $scopeBoundaries = HtmlSpec::SCOPE_BOUNDARIES;
+    protected static array $impliedCloseTargets = HtmlSpec::IMPLIED_CLOSE_TARGETS;
 
-    protected static $listItemScopeBoundaries = HtmlSpec::LIST_ITEM_SCOPE_BOUNDARIES;
+    protected static array $scopeBoundaries = HtmlSpec::SCOPE_BOUNDARIES;
 
-    protected static $buttonScopeBoundaries = HtmlSpec::BUTTON_SCOPE_BOUNDARIES;
+    protected static array $listItemScopeBoundaries = HtmlSpec::LIST_ITEM_SCOPE_BOUNDARIES;
 
-    protected static $tableScopeBoundaries = HtmlSpec::TABLE_SCOPE_BOUNDARIES;
+    protected static array $buttonScopeBoundaries = HtmlSpec::BUTTON_SCOPE_BOUNDARIES;
 
-    protected static $tableScopedStarts = HtmlSpec::TABLE_SCOPED_STARTS;
+    protected static array $tableScopeBoundaries = HtmlSpec::TABLE_SCOPE_BOUNDARIES;
 
-    protected static $tableStructureStarts = HtmlSpec::TABLE_STRUCTURE_STARTS;
+    protected static array $tableScopedStarts = HtmlSpec::TABLE_SCOPED_STARTS;
 
-    protected static $headingElements = HtmlSpec::HEADING_ELEMENTS;
+    protected static array $tableStructureStarts = HtmlSpec::TABLE_STRUCTURE_STARTS;
 
-    protected static $scopedEndTags = HtmlSpec::SCOPED_END_TAGS;
+    protected static array $headingElements = HtmlSpec::HEADING_ELEMENTS;
 
-    protected static $tableSections = HtmlSpec::TABLE_SECTIONS;
+    protected static array $scopedEndTags = HtmlSpec::SCOPED_END_TAGS;
 
-    protected static $tableStructuralElements = HtmlSpec::TABLE_STRUCTURAL_ELEMENTS;
+    protected static array $tableSections = HtmlSpec::TABLE_SECTIONS;
 
-    protected static $allowedInTable = HtmlSpec::ALLOWED_IN_TABLE;
+    protected static array $tableStructuralElements = HtmlSpec::TABLE_STRUCTURAL_ELEMENTS;
 
-    protected static $selectTableElements = HtmlSpec::SELECT_TABLE_ELEMENTS;
+    protected static array $allowedInTable = HtmlSpec::ALLOWED_IN_TABLE;
 
-    protected static $svgHtmlIntegrationPoints = HtmlSpec::SVG_HTML_INTEGRATION_POINTS;
+    protected static array $selectTableElements = HtmlSpec::SELECT_TABLE_ELEMENTS;
 
-    protected static $mathMlTextIntegrationPoints = HtmlSpec::MATHML_TEXT_INTEGRATION_POINTS;
+    protected static array $svgHtmlIntegrationPoints = HtmlSpec::SVG_HTML_INTEGRATION_POINTS;
 
-    protected static $foreignBreakoutElements = HtmlSpec::FOREIGN_BREAKOUT_ELEMENTS;
+    protected static array $mathMlTextIntegrationPoints = HtmlSpec::MATHML_TEXT_INTEGRATION_POINTS;
 
-    protected static $formattingElements = HtmlSpec::FORMATTING_ELEMENTS;
+    protected static array $foreignBreakoutElements = HtmlSpec::FOREIGN_BREAKOUT_ELEMENTS;
 
-    protected static $formattingMarkerElements = HtmlSpec::FORMATTING_MARKER_ELEMENTS;
+    protected static array $formattingElements = HtmlSpec::FORMATTING_ELEMENTS;
 
-    protected static $formattingBreakStarts = HtmlSpec::FORMATTING_BREAK_STARTS;
+    protected static array $formattingMarkerElements = HtmlSpec::FORMATTING_MARKER_ELEMENTS;
 
-    protected static $svgTagNames = HtmlSpec::SVG_TAG_NAMES;
+    protected static array $formattingBreakStarts = HtmlSpec::FORMATTING_BREAK_STARTS;
 
-    /** @var Document */
-    protected $document;
+    protected static array $svgTagNames = HtmlSpec::SVG_TAG_NAMES;
 
-    /** @var Arena */
-    protected $arena;
+    protected Document $document;
 
-    protected $source;
+    protected Arena $arena;
 
-    protected $dirty = false;
+    protected string $source;
+
+    protected bool $dirty = false;
 
     /** @var array<int, int> */
-    protected $antlersNodes = [];
+    protected array $antlersNodes = [];
 
     /** @var array<int, Node> */
-    protected $handles = [];
+    protected array $handles = [];
 
     /** @var array<int, int> */
-    protected $regionEnds = [];
+    protected array $regionEnds = [];
 
     /** @var array<int, LanguageAntlersNode> */
-    protected $regionNodes = [];
+    protected array $regionNodes = [];
 
     /** @var int[] */
-    protected $regionStarts = [];
+    protected array $regionStarts = [];
 
-    protected $regionCursor = 0;
+    protected int $regionCursor = 0;
 
     /** @var int[] */
-    protected $stack = [];
+    protected array $stack = [];
 
     /** @var array<int, int|null> */
-    protected $activeFormatting = [];
+    protected array $activeFormatting = [];
 
-    protected $scriptEscape = self::SCRIPT_DATA;
+    /** @var array<string, int> */
+    protected array $activeSignatureCounts = [];
 
-    /** @var int|null */
-    protected $openSelect;
+    /** @var array<int, array<string, int>> */
+    protected array $activeSignatureCountStack = [];
 
-    protected $selectInTable = false;
+    /** @var array<int, string> */
+    protected array $formattingSignatures = [];
 
-    /** @var int|null */
-    protected $formElement;
+    protected int $scriptEscape = self::SCRIPT_DATA;
 
-    /** @var int|null */
-    protected $textElement;
+    protected ?int $openSelect = null;
 
-    protected $hasSeenTable = false;
+    protected bool $selectInTable = false;
 
-    /** @var array<int, int> */
-    protected $fosterCharacterTails = [];
+    protected ?int $formElement = null;
 
-    /** @var int */
-    protected $tableStartDepth = 0;
+    protected ?int $textElement = null;
+
+    protected ?int $rawTextClosingElement = null;
+
+    protected int $rawTextClosingOffset = 0;
+
+    /** @var array<string, int> html element name => number of those elements on the open stack */
+    protected array $openElementCounts = [];
+
+    /** @var array<string, mixed> answers derived from the open stack, cleared whenever it changes */
+    protected array $stackFacts = [];
+
+    /** @var array<int, array{0: array<int, string|null>, 1: int|null}> container id => insertion chain */
+    protected array $insertionChains = [];
+
+    protected int $tableStartDepth = 0;
 
     /** @var array<int, TableMode> template element id => current template insertion mode */
-    protected $templateInsertionModes = [];
+    protected array $templateInsertionModes = [];
 
     /** @var array<int, array<string, mixed>> keyed by spl_object_id of the language node */
-    protected $regionPlacements = [];
+    protected array $regionPlacements = [];
 
     /** @var array<int, int> element id => byte offset of its opening `<` */
-    protected $elementSourceStarts = [];
+    protected array $elementSourceStarts = [];
 
-    /** @var string */
-    protected $authoredSource;
+    protected string $authoredSource;
 
     /** @var array<int, array{offset: int, line: int}>|null keyed by normalized byte offset */
-    protected $authoredPositions = null;
+    protected ?array $authoredPositions = null;
+
+    protected ?bool $mapsAuthoredSource = null;
+
+    /** @var int[] */
+    protected array $collapsedLineEndings = [];
+
+    protected int $collapsedCursor = 0;
+
+    protected ?string $insertedLineEnding = null;
 
     protected array $componentPrefixes = [];
 
-    private function __construct($source, $authoredSource = null)
+    private function __construct(string $source, ?string $authoredSource = null)
     {
         $this->document = $this;
         $this->arena = new Arena();
@@ -152,19 +174,18 @@ class Document
         $this->authoredSource = $authoredSource ?? $source;
     }
 
-    public function arena()
+    public function arena(): Arena
     {
         return $this->arena;
     }
 
     /** @return array<int, array<string, mixed>> */
-    public function regionPlacements()
+    public function regionPlacements(): array
     {
         return $this->regionPlacements;
     }
 
-    /** @return int|null */
-    public function elementSourceStart($id)
+    public function elementSourceStart(?int $id): ?int
     {
         if ($id === null) {
             return null;
@@ -173,20 +194,18 @@ class Document
         return $this->elementSourceStarts[$id] ?? null;
     }
 
-    /** @return int|null */
-    public function elementSourceCharacterOffset($id)
+    public function elementSourceCharacterOffset(?int $id): ?int
     {
         return $this->authoredElementPosition($id)['offset'] ?? null;
     }
 
-    /** @return int|null */
-    public function elementSourceLine($id)
+    public function elementSourceLine(?int $id): ?int
     {
         return $this->authoredElementPosition($id)['line'] ?? null;
     }
 
     /** @return array{offset: int, line: int}|null */
-    protected function authoredElementPosition($id)
+    protected function authoredElementPosition(?int $id): ?array
     {
         $byte = $this->elementSourceStart($id);
 
@@ -201,7 +220,7 @@ class Document
         return $this->authoredPositions[$byte] ?? null;
     }
 
-    protected function resolveAuthoredPositions()
+    protected function resolveAuthoredPositions(): void
     {
         $this->authoredPositions = [];
         $bytes = array_values(array_unique($this->elementSourceStarts));
@@ -241,7 +260,7 @@ class Document
         }
     }
 
-    protected function recordPlacement(LanguageAntlersNode $node, array $facts)
+    protected function recordPlacement(LanguageAntlersNode $node, array $facts): void
     {
         $identity = spl_object_id($node);
 
@@ -251,27 +270,44 @@ class Document
     }
 
     /** @return array{0: array<int, string|null>, 1: int|null} */
-    protected function insertionChain($id)
+    protected function insertionChain(?int $id): array
     {
-        $chain = [];
-        $innermost = null;
-
-        for (; $id !== null && $id !== 0; $id = $this->arena->parent($id)) {
-            if (($this->arena->kind($id) & Arena::KIND_MASK) !== Arena::ELEMENT) {
-                continue;
-            }
-
-            if ($innermost === null && isset($this->elementSourceStarts[$id])) {
-                $innermost = $id;
-            }
-
-            $chain[] = $this->arena->name[$id];
+        if ($id === null || $id === 0) {
+            return [[], null];
         }
 
-        return [array_reverse($chain), $innermost];
+        if (isset($this->insertionChains[$id])) {
+            return $this->insertionChains[$id];
+        }
+
+        $pending = [];
+
+        for ($ancestor = $id; $ancestor !== null && $ancestor !== 0 && ! isset($this->insertionChains[$ancestor]); $ancestor = $this->arena->parents[$ancestor]) {
+            $pending[] = $ancestor;
+        }
+
+        [$chain, $innermost] = $ancestor === null || $ancestor === 0 ? [[], null] : $this->insertionChains[$ancestor];
+
+        for ($index = count($pending) - 1; $index >= 0; $index--) {
+            $node = $pending[$index];
+
+            if (($this->arena->kinds[$node] & Arena::KIND_MASK) === Arena::ELEMENT) {
+                if (count($chain) >= self::MAX_CHAIN_DEPTH) {
+                    $chain = array_slice($chain, 0, self::MAX_CHAIN_DEPTH - 1);
+                }
+
+                $chain[] = $this->arena->name[$node];
+
+                if (isset($this->elementSourceStarts[$node])) {
+                    $innermost = $node;
+                }
+            }
+        }
+
+        return $this->insertionChains[$id] = [$chain, $innermost];
     }
 
-    public function handle($id)
+    public function handle(int $id): Node|static
     {
         if ($id === 0) {
             return $this;
@@ -304,7 +340,7 @@ class Document
         return $this->handles[$id] = $handle;
     }
 
-    public static function fromParser(DocumentParser $parser, array $componentPrefixes = [])
+    public static function fromParser(DocumentParser $parser, array $componentPrefixes = []): self
     {
         $document = new self($parser->getParsedContent(), $parser->getOriginalContent());
         $document->componentPrefixes = $componentPrefixes;
@@ -313,7 +349,7 @@ class Document
         return $document;
     }
 
-    public static function parse($template)
+    public static function parse(string $template): self
     {
         if (NodeTypeAnalyzer::$environmentDetails === null) {
             NodeTypeAnalyzer::$environmentDetails = app(EnvironmentDetails::class);
@@ -325,49 +361,17 @@ class Document
         return $parser->html();
     }
 
-    /**
-     * @internal
-     *
-     * @param  array<int, array{0: int, 1: int}>  $ranges  Non-overlapping byte ranges.
-     * @return array<int, bool> Whether a region is placed in reconstructed formatting.
-     */
-    public static function formattingRecoveryForRegions(string $source, array $ranges, array $componentPrefixes = []): array
-    {
-        $document = new self($source);
-        $document->componentPrefixes = $componentPrefixes;
-
-        foreach ($ranges as [$start, $end]) {
-            $document->regionEnds[$start] = $end;
-            $document->regionNodes[$start] = new LanguageAntlersNode;
-        }
-
-        ksort($document->regionEnds, SORT_NUMERIC);
-        $document->regionStarts = array_keys($document->regionEnds);
-        $document->build(null);
-        $recovery = [];
-
-        foreach ($document->regionNodes as $start => $node) {
-            $placement = $document->regionPlacements[spl_object_id($node)] ?? [];
-            $recovered = $placement['reconstructed'] ?? false;
-            $id = $document->antlersNodes[spl_object_id($node)] ?? null;
-
-            for ($parent = $id; $parent !== null; $parent = $document->arena->parent($parent)) {
-                $recovered = $recovered || ((bool) ($document->arena->kind($parent) & Arena::SYNTHETIC)
-                    && isset(HtmlSpec::FORMATTING_ELEMENTS[$document->arena->name[$parent] ?? '']));
-            }
-
-            $recovery[$start] = $recovered;
-        }
-
-        return $recovery;
-    }
-
-    public static function isVoidElement($name)
+    public static function isVoidElement(?string $name): bool
     {
         return is_string($name) && isset(self::$voidElements[strtolower($name)]);
     }
 
-    public function createArenaElement($name)
+    public function isComponentElementName(?string $name): bool
+    {
+        return $name !== null && ComponentPrefixes::matches($name, $this->componentPrefixes);
+    }
+
+    public function createArenaElement(string $name): Element
     {
         if (! HtmlSpec::isValidName($name)) {
             throw new \InvalidArgumentException('Invalid HTML element name.');
@@ -382,12 +386,12 @@ class Document
         return $this->handle($id);
     }
 
-    public function parent()
+    public function parent(): ?Node
     {
         return null;
     }
 
-    public function node(LanguageAntlersNode $node)
+    public function node(LanguageAntlersNode $node): ?AntlersNode
     {
         $id = $this->antlersNodes[spl_object_id($node)] ?? null;
 
@@ -398,20 +402,20 @@ class Document
         return $this->handle($id);
     }
 
-    /** @return ElementCollection<int, Element> */
-    public function elements(string ...$names): ElementCollection
+    /** @return Collection<int, Element> */
+    public function elements(string ...$names): Collection
     {
         return $this->arenaDescendants($names);
     }
 
     /** @return LazyCollection<int, Region> */
-    public function regions($name = null)
+    public function regions(?string $name = null): LazyCollection
     {
         return new LazyCollection(function () use ($name) {
             foreach ($this->regionStarts as $start) {
                 $node = $this->regionNodes[$start];
 
-                if (! $this->isRegionOpening($node, $name)) {
+                if (! $node instanceof LanguageAntlersNode || ! $this->isRegionOpening($node, $name)) {
                     continue;
                 }
 
@@ -425,9 +429,9 @@ class Document
         });
     }
 
-    protected function isRegionOpening($node, $name)
+    protected function isRegionOpening(LanguageAntlersNode $node, ?string $name): bool
     {
-        if (! $node instanceof LanguageAntlersNode || $node->isClosingTag) {
+        if ($node->isClosingTag) {
             return false;
         }
 
@@ -451,28 +455,152 @@ class Document
         return $this->arenaFirstDescendant([$name]);
     }
 
-    public function isDirty()
+    public function isDirty(): bool
     {
         return $this->dirty;
     }
 
-    public function markDirty()
+    public function markDirty(): static
     {
         $this->dirty = true;
 
         return $this;
     }
 
-    public function toHtml()
+    public function toHtml(): string
     {
-        if ($this->dirty) {
-            return $this->renderChildren();
+        if (! $this->dirty) {
+            return $this->authoredSource;
         }
 
-        return $this->source;
+        return $this->renderChildren();
     }
 
-    public function renderArenaChildren($parent)
+    protected function mapsAuthoredSource(): bool
+    {
+        if ($this->mapsAuthoredSource !== null) {
+            return $this->mapsAuthoredSource;
+        }
+
+        if ($this->authoredSource === $this->source) {
+            return $this->mapsAuthoredSource = false;
+        }
+
+        $collapsed = [];
+        $position = 0;
+
+        while (($position = strpos($this->authoredSource, "\r\n", $position)) !== false) {
+            $collapsed[] = $position - count($collapsed);
+            $position += 2;
+        }
+
+        if (strlen($this->authoredSource) - count($collapsed) !== strlen($this->source)) {
+            return $this->mapsAuthoredSource = false;
+        }
+
+        $this->collapsedLineEndings = $collapsed;
+        $lineFeeds = substr_count($this->authoredSource, "\n");
+        $carriageReturns = substr_count($this->authoredSource, "\r");
+
+        if ($collapsed !== [] && $lineFeeds === count($collapsed) && $carriageReturns === count($collapsed)) {
+            $this->insertedLineEnding = "\r\n";
+        } elseif ($lineFeeds === 0 && $carriageReturns > 0) {
+            $this->insertedLineEnding = "\r";
+        }
+
+        return $this->mapsAuthoredSource = true;
+    }
+
+    protected function authoredOffset(int $normalized): int
+    {
+        $count = count($this->collapsedLineEndings);
+        $cursor = $this->collapsedCursor;
+
+        if ($cursor > 0 && $this->collapsedLineEndings[$cursor - 1] >= $normalized) {
+            $high = $cursor;
+            $low = 0;
+        } elseif ($cursor === $count || $this->collapsedLineEndings[$cursor] >= $normalized) {
+            return $normalized + $cursor;
+        } elseif ($cursor + 1 === $count || $this->collapsedLineEndings[$cursor + 1] >= $normalized) {
+            $this->collapsedCursor = $cursor + 1;
+
+            return $normalized + $cursor + 1;
+        } else {
+            $low = $cursor + 1;
+            $high = $count;
+        }
+
+        while ($low < $high) {
+            $middle = ($low + $high) >> 1;
+
+            if ($this->collapsedLineEndings[$middle] < $normalized) {
+                $low = $middle + 1;
+            } else {
+                $high = $middle;
+            }
+        }
+
+        $this->collapsedCursor = $low;
+
+        return $normalized + $low;
+    }
+
+    protected function sourceSlice(int $start, int $length): string
+    {
+        $from = $this->authoredOffset($start);
+        $to = $this->authoredOffset($start + $length);
+
+        return substr($this->authoredSource, $from, $to - $from);
+    }
+
+    public function adoptLineEndings(string $markup): string
+    {
+        if (! $this->mapsAuthoredSource() || $this->insertedLineEnding === null || ! str_contains($markup, "\n")) {
+            return $markup;
+        }
+
+        if ($this->insertedLineEnding === "\r\n") {
+            return preg_replace('/(?<!\r)\n/', "\r\n", $markup) ?? $markup;
+        }
+
+        return str_replace(["\r\n", "\n"], "\r", $markup);
+    }
+
+    public function valueMarkup(int $id): string
+    {
+        $value = $this->arena->value[$id];
+
+        if (! str_contains($value, "\n") || ! $this->mapsAuthoredSource()) {
+            return $value;
+        }
+
+        $start = $this->arena->sourceStart[$id] ?? null;
+
+        if ($start === null) {
+            return $this->adoptLineEndings($value);
+        }
+
+        return $this->sourceSlice($start, strlen($value));
+    }
+
+    public function closingMarkup(int $id): string
+    {
+        $closing = $this->arena->closing[$id] ?? '';
+
+        if (! str_contains($closing, "\n") || ! $this->mapsAuthoredSource()) {
+            return $closing;
+        }
+
+        $start = $this->arena->closingStart[$id] ?? null;
+
+        if ($start === null) {
+            return $this->adoptLineEndings($closing);
+        }
+
+        return $this->sourceSlice($start, strlen($closing));
+    }
+
+    public function renderArenaChildren(int $parent): string
     {
         $html = '';
 
@@ -487,7 +615,7 @@ class Document
         return $html;
     }
 
-    public function renderArenaNode($id)
+    public function renderArenaNode(int $id): string
     {
         $kind = $this->arena->kind($id);
 
@@ -509,19 +637,15 @@ class Document
 
         if (($kind & Arena::KIND_MASK) === Arena::ELEMENT) {
             $children = $this->renderArenaChildren($id);
-            $opening = $this->arena->value[$id];
+            $opening = $kind & Arena::SYNTHETIC ? '' : $this->valueMarkup($id);
 
-            if ($kind & Arena::SYNTHETIC) {
-                $opening = '';
-            }
-
-            return $opening.$children.$this->arena->closing[$id];
+            return $opening.$children.$this->closingMarkup($id);
         }
 
-        return $this->arena->value[$id];
+        return $this->valueMarkup($id);
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return $this->toHtml();
     }

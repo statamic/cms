@@ -4,9 +4,11 @@ namespace Statamic\View\Antlers\Language\Runtime\Tracing;
 
 use Statamic\View\Antlers\Language\Nodes\AbstractNode;
 use Statamic\View\Antlers\Language\Runtime\NodeProcessor;
+use Statamic\View\Antlers\Language\Runtime\RuntimeParser;
 use Statamic\View\Instrumentation\Span;
 use Statamic\View\Instrumentation\TracerContract;
 use Throwable;
+use WeakMap;
 
 class TraceManager
 {
@@ -26,14 +28,23 @@ class TraceManager
     /** @var TracerContract[] */
     protected $spanTracers = [];
 
-    /** @var array<int, array{nodeId: int, span: Span, handles: array<int, array{0: TracerContract, 1: mixed}>, processorId: int|null, processorDepth: int}> */
+    /** @var array<int, array{0: int, 1: Span, 2: array<int, array{0: TracerContract, 1: mixed}>, 3: int|null, 4: int}> */
     protected $frames = [];
+
+    /** @var bool */
+    protected $hasUnrememberedSpanTracers = false;
 
     /** @var int[] */
     protected $renderBoundaries = [];
 
+    /** @var array{0: int, 1: int}|null */
+    protected $implicitRenderScope = null;
+
+    /** @var WeakMap<TraceManager, bool>|null */
+    protected static $openRenders = null;
+
     /** @var TracerContract[] */
-    protected $renderCompletionTracers = [];
+    protected static $renderCompletionTracers = [];
 
     /** @param  RuntimeTracerContract|TracerContract  $tracer */
     public function registerTracer($tracer)
@@ -62,6 +73,7 @@ class TraceManager
             }
 
             $this->spanTracers[] = $tracer;
+            $this->hasUnrememberedSpanTracers = true;
 
             return;
         }
@@ -114,11 +126,17 @@ class TraceManager
         ?NodeProcessor $processor = null,
         int $processorDepth = 0
     ) {
+        $processorId = $processor === null ? null : spl_object_id($processor);
+
         if ($this->renderBoundaries === []) {
             $this->traceRenderStart();
+
+            if ($processorId !== null && ! RuntimeParser::isRendering()) {
+                $this->implicitRenderScope = [$processorId, $processorDepth];
+            }
         }
 
-        if ($processor !== null && $processorDepth > 0) {
+        if ($processorId !== null && $processorDepth > 0 && $this->frames !== []) {
             $this->closeProcessorScopeFrames($processor, $processorDepth);
         }
 
@@ -134,44 +152,48 @@ class TraceManager
             $tracer->onEnter($node);
         }
 
-        if ($this->spanTracers !== []) {
-            $span = Span::antlersNode($node, $processor, $processorDepth);
-            $handles = [];
-
-            try {
-                foreach ($this->spanTracers as $tracer) {
-                    $handles[] = [$tracer, $tracer->onEnter($span)];
-                    $this->rememberRenderCompletionTracer($tracer);
-                }
-            } catch (Throwable $enterFailure) {
-                try {
-                    $this->closeHandles($span, $handles, null);
-                } catch (Throwable $cleanupFailure) {
-                    // Preserve the original onEnter failure after closing every acquired handle.
-                }
-
-                throw $enterFailure;
-            }
-
-            $processorId = null;
-
-            if ($processor !== null) {
-                $processorId = spl_object_id($processor);
-            }
-
-            $this->frames[] = [
-                'nodeId' => spl_object_id($node),
-                'span' => $span,
-                'handles' => $handles,
-                'processorId' => $processorId,
-                'processorDepth' => $processorDepth,
-            ];
+        if ($this->spanTracers === []) {
+            return;
         }
+
+        if ($this->hasUnrememberedSpanTracers) {
+            foreach ($this->spanTracers as $tracer) {
+                $this->rememberRenderCompletionTracer($tracer);
+            }
+
+            $this->hasUnrememberedSpanTracers = false;
+        }
+
+        $span = Span::antlersNode($node, $processor, $processorDepth);
+        $handles = [];
+
+        try {
+            foreach ($this->spanTracers as $tracer) {
+                $handles[] = [$tracer, $tracer->onEnter($span)];
+            }
+        } catch (Throwable $enterFailure) {
+            try {
+                $this->closeHandles($span, $handles, null);
+            } catch (Throwable) {
+            }
+
+            throw $enterFailure;
+        }
+
+        $this->frames[] = [spl_object_id($node), $span, $handles, $processorId, $processorDepth];
     }
 
-    public function traceProcessorScopeComplete(NodeProcessor $processor, int $processorDepth): void
+    public function traceProcessorScopeComplete(NodeProcessor $processor, int $processorDepth)
     {
-        $this->closeProcessorScopeFrames($processor, $processorDepth);
+        if ($this->frames !== []) {
+            $this->closeProcessorScopeFrames($processor, $processorDepth);
+        }
+
+        if ($this->implicitRenderScope !== null
+            && $this->implicitRenderScope[1] === $processorDepth
+            && $this->implicitRenderScope[0] === spl_object_id($processor)) {
+            $this->traceRenderComplete(false);
+        }
     }
 
     public function traceOnExit(AbstractNode $node, $runtimeContent)
@@ -200,7 +222,7 @@ class TraceManager
         $boundary = $this->currentRenderBoundary();
 
         for ($index = count($this->frames) - 1; $index >= $boundary; $index--) {
-            if ($this->frames[$index]['nodeId'] === $nodeId) {
+            if ($this->frames[$index][0] === $nodeId) {
                 $targetIndex = $index;
 
                 break;
@@ -236,22 +258,38 @@ class TraceManager
 
     public function traceRenderStart()
     {
-        if ($this->renderBoundaries === []) {
-            $this->renderCompletionTracers = $this->spanTracers;
+        self::$openRenders ??= new WeakMap;
+
+        if (count(self::$openRenders) === 0) {
+            self::$renderCompletionTracers = [];
         }
 
+        foreach ($this->spanTracers as $tracer) {
+            $this->rememberRenderCompletionTracer($tracer);
+        }
+
+        $this->hasUnrememberedSpanTracers = false;
         $this->renderBoundaries[] = count($this->frames);
+        self::$openRenders[$this] = true;
     }
 
-    public function renderDepth(): int
+    /** @return int */
+    public function renderDepth()
     {
         return count($this->renderBoundaries);
     }
 
-    public function traceRenderComplete()
+    /** @param  bool  $notifyTracers */
+    public function traceRenderComplete($notifyTracers = true)
     {
         $boundary = array_pop($this->renderBoundaries) ?? 0;
         $failure = null;
+        self::$openRenders ??= new WeakMap;
+
+        if ($this->renderBoundaries === []) {
+            $this->implicitRenderScope = null;
+            unset(self::$openRenders[$this]);
+        }
 
         while (count($this->frames) > $boundary) {
             try {
@@ -261,15 +299,21 @@ class TraceManager
             }
         }
 
-        foreach ($this->tracers as $tracer) {
-            try {
-                $tracer->onRenderComplete();
-            } catch (Throwable $throwable) {
-                $failure ??= $throwable;
+        if ($notifyTracers) {
+            foreach ($this->tracers as $tracer) {
+                try {
+                    $tracer->onRenderComplete();
+                } catch (Throwable $throwable) {
+                    $failure ??= $throwable;
+                }
             }
         }
 
-        if ($this->renderBoundaries !== []) {
+        if ($this->renderBoundaries === []) {
+            $this->lastProcessor = null;
+        }
+
+        if (count(self::$openRenders) > 0) {
             if ($failure !== null) {
                 throw $failure;
             }
@@ -277,9 +321,8 @@ class TraceManager
             return;
         }
 
-        $this->lastProcessor = null;
-        $completionTracers = $this->renderCompletionTracers;
-        $this->renderCompletionTracers = [];
+        $completionTracers = self::$renderCompletionTracers;
+        self::$renderCompletionTracers = [];
 
         foreach ($completionTracers as $tracer) {
             try {
@@ -296,15 +339,15 @@ class TraceManager
 
     protected function rememberRenderCompletionTracer(TracerContract $tracer)
     {
-        if (! in_array($tracer, $this->renderCompletionTracers, true)) {
-            $this->renderCompletionTracers[] = $tracer;
+        if (! in_array($tracer, self::$renderCompletionTracers, true)) {
+            self::$renderCompletionTracers[] = $tracer;
         }
     }
 
-    /** @param  array{nodeId: int, span: Span, handles: array<int, array{0: TracerContract, 1: mixed}>, processorId: int|null, processorDepth: int}  $frame */
+    /** @param  array{0: int, 1: Span, 2: array<int, array{0: TracerContract, 1: mixed}>, 3: int|null, 4: int}  $frame */
     protected function closeFrame(array $frame, $runtimeContent)
     {
-        $this->closeHandles($frame['span'], $frame['handles'], $runtimeContent);
+        $this->closeHandles($frame[1], $frame[2], $runtimeContent);
     }
 
     /** @param  array<int, array{0: TracerContract, 1: mixed}>  $handles */
@@ -327,7 +370,7 @@ class TraceManager
         }
     }
 
-    protected function closeProcessorScopeFrames(NodeProcessor $processor, int $processorDepth): void
+    protected function closeProcessorScopeFrames(NodeProcessor $processor, int $processorDepth)
     {
         if ($this->frames === []) {
             return;
@@ -341,8 +384,7 @@ class TraceManager
             $targetIndex = null;
 
             for ($index = count($this->frames) - 1; $index >= $boundary; $index--) {
-                if ($this->frames[$index]['processorId'] === $processorId
-                    && $this->frames[$index]['processorDepth'] === $processorDepth) {
+                if ($this->frames[$index][3] === $processorId && $this->frames[$index][4] === $processorDepth) {
                     $targetIndex = $index;
 
                     break;

@@ -23,32 +23,26 @@ class HtmlContext
 
     const KIND_DOCTYPE = 'doctype';
 
-    /** @var string */
-    public $kind;
+    const KIND_PHP = 'php';
 
-    /** @var string|null */
-    public $elementName;
+    public string $kind;
 
-    /** @var string|null */
-    public $attributeName;
+    public ?string $elementName;
+
+    public ?string $attributeName;
 
     /** @var string[] */
-    public $elementStack = [];
+    public array $elementStack = [];
 
-    /** @var int|null */
-    public $elementStartOffset;
+    public ?int $elementStartOffset;
 
-    /** @var bool */
-    public $isClosingTag;
+    public bool $isClosingTag;
 
-    /** @var bool */
-    public $requiresFormattingReconstruction;
+    public bool $requiresFormattingReconstruction;
 
-    /** @var bool */
-    public $documentHasExplicitStructure = false;
+    public bool $documentHasExplicitStructure = false;
 
-    /** @var bool */
-    public $fosterParented = false;
+    public bool $fosterParented = false;
 
     public function __construct(
         string $kind,
@@ -68,8 +62,41 @@ class HtmlContext
         $this->requiresFormattingReconstruction = $requiresFormattingReconstruction;
     }
 
-    /** @return bool */
-    public function isSafeForHtmlComments()
+    /** @return array{0: string, 1: string|null, 2: string|null, 3: string[], 4: int|null, 5: int} */
+    public function toArray(): array
+    {
+        return [
+            $this->kind,
+            $this->elementName,
+            $this->attributeName,
+            $this->elementStack,
+            $this->elementStartOffset,
+            ($this->isClosingTag ? 1 : 0)
+            | ($this->requiresFormattingReconstruction ? 2 : 0)
+            | ($this->documentHasExplicitStructure ? 4 : 0)
+            | ($this->fosterParented ? 8 : 0),
+        ];
+    }
+
+    /** @param  array{0: string, 1: string|null, 2: string|null, 3: string[], 4: int|null, 5: int}  $data */
+    public static function fromArray(array $data): static
+    {
+        $context = new static(
+            $data[0],
+            $data[1],
+            $data[2],
+            $data[3],
+            $data[4],
+            ($data[5] & 1) === 1,
+            ($data[5] & 2) === 2
+        );
+        $context->documentHasExplicitStructure = ($data[5] & 4) === 4;
+        $context->fosterParented = ($data[5] & 8) === 8;
+
+        return $context;
+    }
+
+    public function isSafeForHtmlComments(): bool
     {
         if ($this->kind !== self::KIND_ELEMENT_CONTENT) {
             return false;
@@ -101,7 +128,7 @@ class HtmlContext
         return true;
     }
 
-    public function isFosterParentingContext()
+    public function isFosterParentingContext(): bool
     {
         if ($this->fosterParented) {
             return true;
@@ -144,27 +171,7 @@ class HtmlContext
         return true;
     }
 
-    public function isAttributeContext()
-    {
-        return in_array($this->kind, [self::KIND_ATTRIBUTE_NAME, self::KIND_ATTRIBUTE_VALUE], true);
-    }
-
-    public function isTagContext()
-    {
-        return in_array($this->kind, [
-            self::KIND_TAG_OPEN,
-            self::KIND_ELEMENT_NAME,
-            self::KIND_ATTRIBUTE_NAME,
-            self::KIND_ATTRIBUTE_VALUE,
-        ], true);
-    }
-
-    public function isElementContent()
-    {
-        return $this->kind === self::KIND_ELEMENT_CONTENT;
-    }
-
-    public function canInstrumentOwningElement()
+    public function canInstrumentOwningElement(): bool
     {
         if (! $this->hasInstrumentableElement()) {
             return false;
@@ -177,7 +184,7 @@ class HtmlContext
         ], true);
     }
 
-    public function canInstrumentContainingElement()
+    public function canInstrumentContainingElement(): bool
     {
         if (! $this->hasInstrumentableElement()) {
             return false;
@@ -186,7 +193,7 @@ class HtmlContext
         return in_array($this->kind, [self::KIND_ELEMENT_CONTENT, self::KIND_RAW_TEXT], true);
     }
 
-    protected function hasInstrumentableElement()
+    protected function hasInstrumentableElement(): bool
     {
         if ($this->isClosingTag) {
             return false;
@@ -199,12 +206,12 @@ class HtmlContext
         return ! in_array(self::DYNAMIC_ELEMENT, $this->elementStack, true);
     }
 
-    public function canInstrumentElement()
+    public function canInstrumentElement(): bool
     {
         return $this->canInstrumentOwningElement() || $this->canInstrumentContainingElement();
     }
 
-    public function sharesElementContainerWith(HtmlContext $other)
+    public function sharesElementContainerWith(HtmlContext $other): bool
     {
         if ($this->elementStack !== $other->elementStack) {
             return false;

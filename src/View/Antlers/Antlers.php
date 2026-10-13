@@ -6,6 +6,7 @@ use Closure;
 use Statamic\Contracts\View\Antlers\Parser;
 use Statamic\View\Antlers\Language\Parser\IdentifierFinder;
 use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
+use Statamic\View\Antlers\Language\Runtime\RuntimeParser;
 
 class Antlers
 {
@@ -27,14 +28,16 @@ class Antlers
         return $contents;
     }
 
-    public function parse($str, $variables = [], $trusted = false)
+    public function parse($str, $variables = [], $trusted = false, $instrument = true)
     {
         $parser = $this->parser();
         $previousState = GlobalRuntimeState::$isEvaluatingUserData;
         GlobalRuntimeState::$isEvaluatingUserData = ! $trusted;
 
         try {
-            return $parser->parse($str, $variables);
+            return $instrument || ! $parser instanceof RuntimeParser
+                ? $parser->parse($str, $variables)
+                : $parser->parse($str, $variables, false);
         } finally {
             GlobalRuntimeState::$isEvaluatingUserData = $previousState;
         }

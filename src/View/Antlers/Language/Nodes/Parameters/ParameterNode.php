@@ -28,9 +28,4 @@ class ParameterNode extends AbstractNode
      * @var AntlersNode|null
      */
     public $parent = null;
-
-    public function isStatic()
-    {
-        return ! $this->isVariableReference && empty($this->interpolations);
-    }
 }

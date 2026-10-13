@@ -24,6 +24,7 @@ use Statamic\View\Antlers\Language\Runtime\Tracing\NodeVisitorContract;
 use Statamic\View\Antlers\Language\Utilities\CharacterOffsets;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Statamic\View\Instrumentation\Antlers\ContextScanner;
+use Statamic\View\Instrumentation\HtmlContext;
 
 class DocumentParser
 {
@@ -111,6 +112,9 @@ class DocumentParser
     /** @var bool */
     private $annotateHtmlContext = false;
 
+    /** @var string[]|null */
+    private $componentPrefixes = null;
+
     private $isInterpolatedParser = false;
 
     /** @var string */
@@ -119,7 +123,6 @@ class DocumentParser
     private $inheritRuntimeLineSeed = true;
 
     private $inputLen = 0;
-    private $documentOffsets = [];
     private $documentOffsetKeys = [];
     private $newlineCount = 0;
     private $isDoubleBrace = false;
@@ -216,10 +219,14 @@ class DocumentParser
         return $this;
     }
 
-    /** @internal */
-    public function annotatesHtmlContext(): bool
+    /**
+     * @internal
+     *
+     * @return bool
+     */
+    public function annotatesHtmlContext()
     {
-        return $this->annotateHtmlContext || ContextScanner::$enabled;
+        return $this->annotateHtmlContext;
     }
 
     /**
@@ -244,15 +251,66 @@ class DocumentParser
         }
 
         $this->htmlContextScanned = true;
+        $scanner = new ContextScanner;
 
-        (new ContextScanner)->annotate($this->nodes, $this);
+        if ($this->componentPrefixes !== null) {
+            $scanner->treatComponentsAsDynamic()->withComponentPrefixes($this->componentPrefixes);
+        }
+
+        $scanner->annotate($this->nodes, $this, $this->html());
+    }
+
+    /**
+     * @internal
+     *
+     * @param  string[]|null  $prefixes
+     * @return $this
+     */
+    public function withComponentPrefixes($prefixes)
+    {
+        $this->componentPrefixes = $prefixes;
+
+        return $this;
+    }
+
+    /**
+     * @internal
+     *
+     * @param  array<int, HtmlContext|null>  $contexts
+     * @return bool
+     */
+    public function adoptHtmlContexts($contexts)
+    {
+        if ($this->htmlContextScanned) {
+            return false;
+        }
+
+        $antlersNodes = [];
+
+        foreach ($this->nodes as $node) {
+            if ($node instanceof AntlersNode) {
+                $antlersNodes[] = $node;
+            }
+        }
+
+        if (count($antlersNodes) !== count($contexts)) {
+            return false;
+        }
+
+        foreach (array_values($contexts) as $index => $context) {
+            $antlersNodes[$index]->htmlContext = $context;
+        }
+
+        $this->htmlContextScanned = true;
+
+        return true;
     }
 
     /** @internal */
     public function html()
     {
         if ($this->htmlDocument === null) {
-            $this->htmlDocument = Document::fromParser($this);
+            $this->htmlDocument = Document::fromParser($this, $this->componentPrefixes ?? []);
         }
 
         return $this->htmlDocument;
@@ -266,6 +324,42 @@ class DocumentParser
     public function getOriginalContent()
     {
         return $this->originalContent;
+    }
+
+    /**
+     * @internal
+     *
+     * @return static
+     */
+    public function snapshot()
+    {
+        $snapshot = clone $this;
+
+        $snapshot->chars = [];
+        $snapshot->charLen = 0;
+        $snapshot->currentContent = [];
+        $snapshot->renderNodes = [];
+        $snapshot->lastAntlersNode = null;
+        $snapshot->antlersStartIndex = [];
+        $snapshot->antlersStartPositionIndex = [];
+        $snapshot->interpolationRegions = [];
+        $snapshot->prefixCharacterLengths = [];
+        $snapshot->neutralizedContent = null;
+        $snapshot->interpolatedCollisions = [];
+        $snapshot->interpolatedCollisionCount = [];
+        $snapshot->threeCharCollisions = [];
+        $snapshot->visitors = [];
+        $snapshot->runtimeVisitors = [];
+        $snapshot->sourceByteOffsets = [
+            0 => 0,
+            $this->inputLen => strlen($this->content),
+        ];
+
+        if ($snapshot->originalContent === $snapshot->content) {
+            $snapshot->originalContent = $snapshot->content;
+        }
+
+        return $snapshot;
     }
 
     /**
@@ -365,7 +459,7 @@ class DocumentParser
             $this->appendSourceChunk();
         }
 
-        return $this->chars[$count];
+        return $this->chars[$count] ?? null;
     }
 
     public function parseIntermediateText()
@@ -519,21 +613,16 @@ class DocumentParser
             $this->inputLen => strlen($this->content),
         ];
 
-        $currentLine = $this->seedStartLine;
         $newlineCount = 0;
-        $lastOffset = -1; // A virtual newline just before the document.
         $scanFromByte = 0;
         $scanFromCharacter = 0;
 
         if ($prefix !== null) {
             $this->sourceByteOffsets[$prefix['characters']] = $prefix['bytes'];
 
-            $this->documentOffsets = $prefix['newlineOffsets'];
             $this->documentOffsetKeys = $prefix['newlineKeys'];
             $newlineCount = $prefix['newlineCount'];
             $this->lineShift = $this->seedStartLine - $prefix['startLine'];
-            $currentLine = $prefix['startLine'] + $newlineCount;
-            $lastOffset = $newlineCount > 0 ? $this->documentOffsetKeys[$newlineCount - 1] : -1;
             $scanFromByte = $prefix['bytes'];
             $scanFromCharacter = $prefix['characters'];
         }
@@ -550,22 +639,13 @@ class DocumentParser
         );
 
         if ($prefix !== null && $newLineByteOffsets !== []) {
-            $this->documentOffsets = array_slice($this->documentOffsets, 0, $newlineCount, true);
             $this->documentOffsetKeys = array_slice($this->documentOffsetKeys, 0, $newlineCount);
         }
 
         foreach ($newLineByteOffsets as $newLineByteOffset) {
-            $thisIndex = $newLineCharacterOffsets[$newLineByteOffset];
-
-            $this->documentOffsets[$thisIndex] = [
-                self::K_CHAR => $thisIndex - $lastOffset,
-                self::K_LINE => $currentLine,
-            ];
-            $this->documentOffsetKeys[] = $thisIndex;
+            $this->documentOffsetKeys[] = $newLineCharacterOffsets[$newLineByteOffset];
 
             $newlineCount += 1;
-            $currentLine += 1;
-            $lastOffset = $thisIndex;
         }
 
         $this->newlineCount = $newlineCount;
@@ -693,7 +773,6 @@ class DocumentParser
             'startLine' => $this->seedStartLine - $this->lineShift,
             'newlineCount' => $this->newlineCountBefore($prefixCharacters),
             'newlineKeys' => $this->documentOffsetKeys,
-            'newlineOffsets' => $this->documentOffsets,
         ];
     }
 
@@ -1094,9 +1173,8 @@ class DocumentParser
         }
 
         foreach ($this->nodes as $node) {
-            $node->parserGeneration = $this->generation;
-
             if ($node instanceof AntlersNode) {
+                $node->parserGeneration = $this->generation;
                 $node->isInterpolationNode = $this->isInterpolatedParser;
             }
 
@@ -1163,7 +1241,7 @@ class DocumentParser
      *
      * @param  NodeVisitorContract[]  $visitors
      */
-    public function setRuntimeVisitors(array $visitors): void
+    public function setRuntimeVisitors(array $visitors)
     {
         $this->runtimeVisitors = $visitors;
     }
@@ -1812,22 +1890,18 @@ class DocumentParser
             $charToUse = $offset + 1;
         } else {
             $nearestIndex = $this->newlineCountBefore($offset);
+            $lineToUse = $this->seedStartLine + $nearestIndex;
 
             if ($nearestIndex === $this->newlineCount) {
-                $lastOffsetKey = $this->documentOffsetKeys[$nearestIndex - 1];
-                $lastOffset = $this->documentOffsets[$lastOffsetKey];
-                $lineToUse = $lastOffset[self::K_LINE] + 1 + $this->lineShift;
-                $charToUse = $offset - $lastOffsetKey;
+                $charToUse = $offset - $this->documentOffsetKeys[$nearestIndex - 1];
             } else {
                 $nearestOffsetIndex = $this->documentOffsetKeys[$nearestIndex];
-                $nearestOffset = $this->documentOffsets[$nearestOffsetIndex];
+                $previousOffsetIndex = $nearestIndex > 0 ? $this->documentOffsetKeys[$nearestIndex - 1] : -1;
 
                 if ($nearestOffsetIndex === $offset) {
-                    $lineToUse = $nearestOffset[self::K_LINE] + $this->lineShift;
-                    $charToUse = $nearestOffset[self::K_CHAR];
+                    $charToUse = $nearestOffsetIndex - $previousOffsetIndex;
                 } elseif ($isRelativeOffset) {
-                    $charToUse = $offset - $nearestOffset[self::K_CHAR];
-                    $lineToUse = $nearestOffset[self::K_LINE] + $this->lineShift;
+                    $charToUse = $offset - ($nearestOffsetIndex - $previousOffsetIndex);
 
                     if ($offset <= $nearestOffsetIndex) {
                         $charToUse = $offset + 1;
@@ -1835,8 +1909,7 @@ class DocumentParser
                         $lineToUse += 1;
                     }
                 } else {
-                    $charToUse = $nearestOffset[self::K_CHAR] - $nearestOffsetIndex + $offset;
-                    $lineToUse = $nearestOffset[self::K_LINE] + $this->lineShift;
+                    $charToUse = $offset - $previousOffsetIndex;
                 }
             }
         }
@@ -1931,7 +2004,6 @@ class DocumentParser
         $this->next = null;
         $this->prev = null;
         $this->inputLen = 0;
-        $this->documentOffsets = [];
         $this->documentOffsetKeys = [];
         $this->newlineCount = 0;
         $this->nodes = [];

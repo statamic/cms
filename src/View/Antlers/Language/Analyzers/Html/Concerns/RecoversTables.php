@@ -10,7 +10,7 @@ trait RecoversTables
 {
     private const MAX_TABLE_START_RECOVERY_DEPTH = 32;
 
-    protected function prepareTableEnd($name)
+    protected function prepareTableEnd(string $name): void
     {
         if ($name === 'table') {
             $tableIndex = $this->nearestTableIndex();
@@ -48,7 +48,7 @@ trait RecoversTables
         }
     }
 
-    protected function sourceTablePosition()
+    protected function sourceTablePosition(): array
     {
         $index = $this->nearestTableIndex();
 
@@ -61,15 +61,8 @@ trait RecoversTables
         return [$table, $this->arena->lastChild($table)];
     }
 
-    /**
-     * Close or synthesize table structure before inserting an opening tag.
-     *
-     * @return bool Whether the incoming element needs foster parenting.
-     */
-    protected function prepareTableStart($name)
+    protected function prepareTableStart(string $name): bool
     {
-        // Recovery reprocesses the same tag after changing the stack. Bound that
-        // recursion so malformed nesting cannot keep reprocessing indefinitely.
         if (++$this->tableStartDepth > self::MAX_TABLE_START_RECOVERY_DEPTH) {
             $this->tableStartDepth--;
 
@@ -123,8 +116,7 @@ trait RecoversTables
 
             if ($mode === TableMode::Table) {
                 if ($name === 'table') {
-                    $tableIndex = $this->nearestTableIndex();
-                    $this->sliceOpenStack($tableIndex);
+                    $this->sliceOpenStack($this->nearestTableIndex());
 
                     return false;
                 }
@@ -194,7 +186,7 @@ trait RecoversTables
                     return false;
                 }
 
-                array_pop($this->stack);
+                $this->popOpenElement();
 
                 return $this->prepareTableStart($name);
             }
@@ -205,7 +197,7 @@ trait RecoversTables
         }
     }
 
-    protected function shouldFosterContent()
+    protected function shouldFosterContent(): bool
     {
         $mode = $this->tableMode();
 
@@ -220,8 +212,16 @@ trait RecoversTables
         return $mode === TableMode::Row;
     }
 
-    /** The current insertion mode, including intervening ordinary or foreign content. */
     protected function tableMode(): ?TableMode
+    {
+        if (array_key_exists('tableMode', $this->stackFacts)) {
+            return $this->stackFacts['tableMode'];
+        }
+
+        return $this->stackFacts['tableMode'] = $this->resolveTableMode();
+    }
+
+    protected function resolveTableMode(): ?TableMode
     {
         $tableIndex = $this->nearestTableIndex();
         $templateIndex = $this->nearestTemplateIndex();
@@ -240,7 +240,7 @@ trait RecoversTables
         return $this->tableModeAbove($tableIndex, TableMode::Table);
     }
 
-    protected function tableModeAbove($contextIndex, TableMode $fallback): TableMode
+    protected function tableModeAbove(int $contextIndex, TableMode $fallback): TableMode
     {
         $context = $this->stack[$contextIndex];
 
@@ -251,7 +251,7 @@ trait RecoversTables
                 return TableMode::Normal;
             }
 
-            $name = strtolower((string) $this->arena->name[$element]);
+            $name = $this->arena->name[$element] ?? '';
 
             if ($name === 'td' || $name === 'th') {
                 return TableMode::Cell;
@@ -285,8 +285,16 @@ trait RecoversTables
         return $this->normalizeTableMode($fallback);
     }
 
-    /** The enclosing table structure, looking past intervening content for recovery. */
     protected function tableStructureMode(): ?TableMode
+    {
+        if (array_key_exists('tableStructureMode', $this->stackFacts)) {
+            return $this->stackFacts['tableStructureMode'];
+        }
+
+        return $this->stackFacts['tableStructureMode'] = $this->resolveTableStructureMode();
+    }
+
+    protected function resolveTableStructureMode(): ?TableMode
     {
         $tableIndex = $this->nearestTableIndex();
         $templateIndex = $this->nearestTemplateIndex();
@@ -305,14 +313,13 @@ trait RecoversTables
         return $this->tableStructureModeAbove($tableIndex, TableMode::Table);
     }
 
-    protected function templateIsNearerThanTable($templateIndex, $tableIndex)
+    protected function templateIsNearerThanTable(?int $templateIndex, ?int $tableIndex): bool
     {
         return $templateIndex !== null && ($tableIndex === null || $templateIndex > $tableIndex);
     }
 
-    protected function tableStructureModeAbove($contextIndex, TableMode $fallback): TableMode
+    protected function tableStructureModeAbove(int $contextIndex, TableMode $fallback): TableMode
     {
-
         for ($index = count($this->stack) - 1; $index > $contextIndex; $index--) {
             $element = $this->stack[$index];
 
@@ -320,7 +327,7 @@ trait RecoversTables
                 continue;
             }
 
-            $name = strtolower((string) $this->arena->name[$element]);
+            $name = $this->arena->name[$element] ?? '';
 
             if ($name === 'td' || $name === 'th') {
                 return TableMode::Cell;
@@ -355,7 +362,7 @@ trait RecoversTables
         return $mode;
     }
 
-    protected function prepareTemplateInsertionModeForStart($name)
+    protected function prepareTemplateInsertionModeForStart(string $name): void
     {
         if ($this->templateInsertionModes === []) {
             return;
@@ -391,12 +398,18 @@ trait RecoversTables
         } else {
             $this->templateInsertionModes[$template] = TableMode::Normal;
         }
+
+        $this->stackFacts = [];
     }
 
-    protected function nearestTableIndex()
+    protected function nearestTableIndex(): ?int
     {
-        if (! $this->hasSeenTable) {
+        if (! isset($this->openElementCounts['table'])) {
             return null;
+        }
+
+        if (array_key_exists('tableIndex', $this->stackFacts)) {
+            return $this->stackFacts['tableIndex'];
         }
 
         for ($index = count($this->stack) - 1; $index >= 0; $index--) {
@@ -404,19 +417,21 @@ trait RecoversTables
 
             if (! $this->isForeignElement($id)
                 && $this->arena->name[$id] === 'table') {
-                return $index;
+                return $this->stackFacts['tableIndex'] = $index;
             }
         }
 
-        $this->hasSeenTable = false;
-
-        return null;
+        return $this->stackFacts['tableIndex'] = null;
     }
 
-    protected function nearestTemplateIndex()
+    protected function nearestTemplateIndex(): ?int
     {
-        if ($this->templateInsertionModes === []) {
+        if ($this->templateInsertionModes === [] || ! isset($this->openElementCounts['template'])) {
             return null;
+        }
+
+        if (array_key_exists('templateIndex', $this->stackFacts)) {
+            return $this->stackFacts['templateIndex'];
         }
 
         for ($index = count($this->stack) - 1; $index >= 0; $index--) {
@@ -424,16 +439,14 @@ trait RecoversTables
 
             if (! $this->isForeignElement($id)
                 && $this->arena->name[$id] === 'template') {
-                return $index;
+                return $this->stackFacts['templateIndex'] = $index;
             }
         }
 
-        $this->templateInsertionModes = [];
-
-        return null;
+        return $this->stackFacts['templateIndex'] = null;
     }
 
-    protected function clearStackBackToTable()
+    protected function clearStackBackToTable(): void
     {
         $tableIndex = $this->nearestTableIndex();
 
@@ -442,13 +455,13 @@ trait RecoversTables
         }
     }
 
-    protected function clearStackBackToTableSection()
+    protected function clearStackBackToTableSection(): void
     {
         for ($index = count($this->stack) - 1; $index >= 0; $index--) {
             $id = $this->stack[$index];
 
             if (! $this->isForeignElement($id)
-                && isset(self::$tableSections[$this->arena->name[$id]])) {
+                && isset(self::$tableSections[$this->arena->name[$id] ?? ''])) {
                 $this->sliceOpenStack($index + 1);
 
                 return;
@@ -456,7 +469,7 @@ trait RecoversTables
         }
     }
 
-    protected function clearStackBackToTableRow()
+    protected function clearStackBackToTableRow(): void
     {
         for ($index = count($this->stack) - 1; $index >= 0; $index--) {
             $id = $this->stack[$index];
@@ -470,7 +483,7 @@ trait RecoversTables
         }
     }
 
-    protected function closeCurrentTableCell()
+    protected function closeCurrentTableCell(): void
     {
         for ($index = count($this->stack) - 1; $index >= 0; $index--) {
             $id = $this->stack[$index];
@@ -485,16 +498,16 @@ trait RecoversTables
         }
     }
 
-    protected function appendSyntheticElement($name)
+    protected function appendSyntheticElement(string $name): int
     {
         $element = $this->arena->element($name, '', false, 'html', true);
         $this->arena->append($this->currentContainer(), $element);
-        $this->stack[] = $element;
+        $this->pushOpenElement($element);
 
         return $element;
     }
 
-    protected function fosterNode($node, $sourceContainer, $character = false)
+    protected function fosterNode(int $node, int $sourceContainer): int
     {
         $tableIndex = $this->nearestTableIndex();
         $templateIndex = $this->nearestTemplateIndex();
@@ -526,32 +539,19 @@ trait RecoversTables
             return $node;
         }
 
-        if ($character) {
-            $tableId = $table;
-            $reference = $this->fosterCharacterTails[$tableId] ?? $table;
-
-            if ($this->arena->parent($reference) !== $parent) {
-                $reference = $table;
-            }
-
-            $this->arena->insertAfter($reference, $node);
-            $this->fosterCharacterTails[$tableId] = $node;
-        } else {
-            $this->arena->insertBefore($table, $node);
-        }
-
+        $this->arena->insertBefore($table, $node);
         $this->arena->append($sourceContainer, $this->arena->anchor($node));
 
         return $node;
     }
 
-    protected function isTableFosterParent($element)
+    protected function isTableFosterParent(int $element): bool
     {
         if ($this->isForeignElement($element)) {
             return false;
         }
 
-        return in_array(strtolower((string) $this->arena->name[$element]), [
+        return in_array($this->arena->name[$element], [
             'table', 'tbody', 'tfoot', 'thead', 'tr',
         ], true);
     }

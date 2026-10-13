@@ -30,51 +30,57 @@ class Arena
     const MATHML = 64;
 
     /** @var int[] */
-    public $kinds = [self::DOCUMENT];
+    public array $kinds = [self::DOCUMENT];
 
     /** @var array<int, int|null> */
-    public $parents = [null];
+    public array $parents = [null];
 
     /** @var array<int, int|null> */
-    public $firstChildren = [null];
+    public array $firstChildren = [null];
 
     /** @var array<int, int|null> */
-    public $lastChildren = [null];
+    public array $lastChildren = [null];
 
     /** @var array<int, int|null> */
-    public $previousSiblings = [null];
+    public array $previousSiblings = [null];
 
     /** @var array<int, int|null> */
-    public $nextSiblings = [null];
+    public array $nextSiblings = [null];
 
     /** @var array<int, string|null> */
-    public $name = [0 => null];
+    public array $name = [0 => null];
 
     /** @var string[] */
-    public $value = [''];
+    public array $value = [''];
 
     /** @var array<int, string> */
-    public $closing = [0 => ''];
+    public array $closing = [0 => ''];
 
     /** @var array<int, string> */
-    public $opaqueType = [];
+    public array $opaqueType = [];
 
     /** @var array<int, LanguageAntlersNode> */
-    public $antlersNode = [];
+    public array $antlersNode = [];
 
     /** @var array<int, int[]> */
-    public $embedded = [];
+    public array $embedded = [];
 
     /** @var array<int, int> */
-    public $embeddedOwner = [];
+    public array $embeddedOwner = [];
 
     /** @var array<int, int> target id => anchor id */
-    public $sourceAnchor = [];
+    public array $sourceAnchor = [];
 
     /** @var array<int, int|null> anchor id => target id */
-    public $anchorTarget = [];
+    public array $anchorTarget = [];
 
-    public function allocate($kind)
+    /** @var array<int, int> node id => normalized byte offset of its unedited value */
+    public array $sourceStart = [];
+
+    /** @var array<int, int> element id => normalized byte offset of its unedited closing markup */
+    public array $closingStart = [];
+
+    public function allocate(int $kind): int
     {
         $id = count($this->kinds);
         $this->kinds[] = $kind;
@@ -88,7 +94,7 @@ class Arena
         return $id;
     }
 
-    public function element($name, $opening, $selfClosing = false, $namespace = 'html', $synthetic = false)
+    public function element(?string $name, string $opening, bool $selfClosing = false, string $namespace = 'html', bool $synthetic = false): int
     {
         $flags = self::ELEMENT;
 
@@ -108,21 +114,15 @@ class Arena
             $flags |= self::MATHML;
         }
 
-        $id = count($this->kinds);
-        $this->kinds[] = $flags;
-        $this->parents[] = null;
-        $this->firstChildren[] = null;
-        $this->lastChildren[] = null;
-        $this->previousSiblings[] = null;
-        $this->nextSiblings[] = null;
+        $id = $this->allocate($flags);
         $this->name[$id] = $name;
-        $this->value[] = $opening;
+        $this->value[$id] = $opening;
         $this->closing[$id] = '';
 
         return $id;
     }
 
-    public function text($value)
+    public function text(string $value, ?int $sourceStart = null): int
     {
         $id = count($this->kinds);
         $this->kinds[] = self::TEXT;
@@ -133,10 +133,14 @@ class Arena
         $this->nextSiblings[] = null;
         $this->value[] = $value;
 
+        if ($sourceStart !== null) {
+            $this->sourceStart[$id] = $sourceStart;
+        }
+
         return $id;
     }
 
-    public function antlers(LanguageAntlersNode $node, $source)
+    public function antlers(LanguageAntlersNode $node, string $source): int
     {
         $id = $this->allocate(self::ANTLERS);
         $this->antlersNode[$id] = $node;
@@ -145,7 +149,7 @@ class Arena
         return $id;
     }
 
-    public function opaque($source, $type)
+    public function opaque(string $source, string $type): int
     {
         $id = $this->allocate(self::OPAQUE);
         $this->value[$id] = $source;
@@ -154,7 +158,7 @@ class Arena
         return $id;
     }
 
-    public function anchor($target)
+    public function anchor(int $target): int
     {
         $id = $this->allocate(self::SOURCE_ANCHOR);
         $this->anchorTarget[$id] = $target;
@@ -163,42 +167,42 @@ class Arena
         return $id;
     }
 
-    public function kind($id)
+    public function kind(int $id): int
     {
         return $this->kinds[$id];
     }
 
-    public function parent($id)
+    public function parent(int $id): ?int
     {
         return $this->parents[$id];
     }
 
-    public function setParent($id, $parent)
+    public function setParent(int $id, ?int $parent): void
     {
         $this->parents[$id] = $parent;
     }
 
-    public function firstChild($id)
+    public function firstChild(int $id): ?int
     {
         return $this->firstChildren[$id];
     }
 
-    public function lastChild($id)
+    public function lastChild(int $id): ?int
     {
         return $this->lastChildren[$id];
     }
 
-    public function previous($id)
+    public function previous(int $id): ?int
     {
         return $this->previousSiblings[$id];
     }
 
-    public function next($id)
+    public function next(int $id): ?int
     {
         return $this->nextSiblings[$id];
     }
 
-    public function anchorExisting($target)
+    public function anchorExisting(int $target): int
     {
         $parent = $this->parent($target);
 
@@ -232,7 +236,7 @@ class Arena
         return $anchor;
     }
 
-    public function append($parent, $node)
+    public function append(int $parent, int $node): int
     {
         $last = $this->lastChildren[$parent];
         $this->parents[$node] = $parent;
@@ -250,7 +254,7 @@ class Arena
         return $node;
     }
 
-    public function insertBefore($reference, $node)
+    public function insertBefore(int $reference, int $node): int
     {
         $parent = $this->parent($reference);
         $previous = $this->previous($reference);
@@ -268,7 +272,7 @@ class Arena
         return $node;
     }
 
-    public function insertAfter($reference, $node)
+    public function insertAfter(int $reference, int $node): int
     {
         $parent = $this->parent($reference);
         $next = $this->next($reference);
@@ -286,7 +290,7 @@ class Arena
         return $node;
     }
 
-    public function detach($node)
+    public function detach(int $node): int
     {
         $parent = $this->parent($node);
 
@@ -316,7 +320,7 @@ class Arena
         return $node;
     }
 
-    public function children($parent)
+    public function children(int $parent): array
     {
         $children = [];
         $seen = [];
@@ -333,12 +337,12 @@ class Arena
         return $children;
     }
 
-    public function hasChild($parent, $node)
+    public function hasChild(int $parent, int $node): bool
     {
         return $this->parent($node) === $parent && ! isset($this->embeddedOwner[$node]);
     }
 
-    public function namespace($id)
+    public function namespace(int $id): string
     {
         $type = $this->kind($id);
 
@@ -353,22 +357,22 @@ class Arena
         return 'html';
     }
 
-    protected function setFirstChild($id, $child)
+    protected function setFirstChild(int $id, ?int $child): void
     {
         $this->firstChildren[$id] = $child;
     }
 
-    protected function setLastChild($id, $child)
+    protected function setLastChild(int $id, ?int $child): void
     {
         $this->lastChildren[$id] = $child;
     }
 
-    protected function setPrevious($id, $previous)
+    protected function setPrevious(int $id, ?int $previous): void
     {
         $this->previousSiblings[$id] = $previous;
     }
 
-    protected function setNext($id, $next)
+    protected function setNext(int $id, ?int $next): void
     {
         $this->nextSiblings[$id] = $next;
     }

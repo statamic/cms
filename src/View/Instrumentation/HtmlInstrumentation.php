@@ -2,16 +2,20 @@
 
 namespace Statamic\View\Instrumentation;
 
+use Closure;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
 use Statamic\View\Instrumentation\Antlers\TemplateAnalyzer as AntlersTemplateAnalyzer;
+use Throwable;
 
 /** @internal */
 class HtmlInstrumentation
 {
     use Concerns\ConfiguresInstrumentation,
         Concerns\EmitsInstrumentation,
-        Concerns\MemoizesResults;
+        Concerns\MemoizesResults,
+        Concerns\RemovesMisplacedMarkers;
 
     const SKIP_FILTERED = 'filtered';
 
@@ -19,49 +23,67 @@ class HtmlInstrumentation
 
     const SKIP_INSIDE_DOCTYPE = 'inside-doctype';
 
+    const SKIP_INSIDE_PHP = 'inside-php';
+
     const SKIP_DYNAMIC_MARKUP = 'dynamic-markup';
 
     const SKIP_CLOSING_TAG_MARKUP = 'closing-tag-markup';
+
+    const SKIP_INSIDE_CHARACTER_REFERENCE = 'inside-character-reference';
 
     const SKIP_CROSS_CONTAINER_PAIR = 'cross-container-pair';
 
     const SKIP_NO_STRATEGY = 'no-available-strategy';
 
-    /** @var bool */
-    protected $commentsEnabled = true;
+    const CACHE_FORMAT = 1;
 
-    /** @var string */
-    protected $commentPrefix = 'antlers';
+    const CACHE_TTL = 2592000;
 
-    /** @var callable|null */
-    protected $commentFactory = null;
+    protected bool $commentsEnabled = true;
 
-    /** @var array<string, callable> */
-    protected $attributeLayers = [];
+    protected string $commentPrefix = 'antlers';
+
+    protected ?Closure $commentFactory = null;
+
+    /** @var array<string, Closure> */
+    protected array $attributeLayers = [];
 
     /** @var array<string, mixed> */
-    protected $extraMetadata = [];
+    protected array $extraMetadata = [];
 
-    /** @var callable|null */
-    protected $nodeFilter = null;
+    protected ?Closure $nodeFilter = null;
 
-    /** @var callable|null */
-    protected $skipCallback = null;
+    protected ?Closure $skipCallback = null;
 
     /** @var string[] */
-    protected $componentPrefixes = ComponentPrefixes::DEFAULTS;
+    protected array $componentPrefixes = ComponentPrefixes::DEFAULTS;
 
-    /** @var array<string, string> */
-    protected $resultCache = [];
+    /** @var array<string, array{0: string, 1: array<int, HtmlContext|null>|null, 2: string}> */
+    protected array $resultCache = [];
 
-    /** @var array<string, array<string, string>> */
-    protected static $sharedResultCache = [];
+    /** @var array<string, array<string, array{0: string, 1: array<int, HtmlContext|null>|null, 2: string}>> */
+    protected static array $sharedResultCache = [];
 
-    /** @var string|null */
-    protected $cacheScope = null;
+    protected static int $sharedResultScopeLimit = 8;
 
-    /** @var int */
-    protected $resultCacheLimit = 256;
+    /** @var array<string, array<int, HtmlContext|null>> */
+    protected static array $annotations = [];
+
+    protected static int $annotationLimit = 256;
+
+    protected static bool $transfersContexts = true;
+
+    protected static ?string $cacheStoreNamespace = null;
+
+    protected ?string $cacheScope = null;
+
+    protected int $resultCacheLimit = 256;
+
+    protected bool|string $cacheStore = false;
+
+    protected bool $cacheStoreFailed = false;
+
+    protected ?Throwable $lastCacheStoreException = null;
 
     protected ?string $instanceFingerprint = null;
 
@@ -69,13 +91,16 @@ class HtmlInstrumentation
 
     protected ?array $collectedEdits = null;
 
+    /** @var array<int, HtmlContext|null>|null */
+    protected ?array $lastContexts = null;
+
     public static function instrumentTogether(string $template, array $instrumenters): string
     {
         if ($instrumenters === []) {
             return $template;
         }
 
-        if (InstrumentationState::parsingComponentContent() || InstrumentationState::suppressesHtmlInstrumentation()) {
+        if (InstrumentationState::suppressed()) {
             return $template;
         }
 
@@ -92,7 +117,20 @@ class HtmlInstrumentation
                 false
             );
 
-        if (($cached = $instrumenters[0]->cachedResult($cacheKey)) !== null) {
+        $reportsSkips = false;
+        $persistent = GlobalRuntimeState::$currentExecutionFile !== null && InstrumentationState::attributesView();
+
+        foreach ($instrumenters as $instrumenter) {
+            if ($instrumenter->skipCallback !== null) {
+                $reportsSkips = true;
+            }
+
+            if ($instrumenter->cacheScope === null) {
+                $persistent = false;
+            }
+        }
+
+        if (! $reportsSkips && ($cached = $instrumenters[0]->cachedResult($cacheKey, $persistent)) !== null) {
             return $cached;
         }
 
@@ -102,6 +140,7 @@ class HtmlInstrumentation
         foreach ($instrumenters as $index => $instrumenter) {
             $previous = $instrumenter->collectedEdits;
             $instrumenter->collectedEdits = [];
+            $instrumenter->lastContexts = null;
 
             try {
                 $invoke($instrumenter);
@@ -125,7 +164,18 @@ class HtmlInstrumentation
             }
         }
 
-        return $instrumenters[0]->storeResult($cacheKey, $instrumenters[0]->spliceByteEdits($template, $edits));
+        return $instrumenters[0]->storeResult(
+            $cacheKey,
+            $instrumenters[0]->spliceByteEdits($template, $edits),
+            $instrumenters[0]->lastContexts,
+            $persistent && ! $reportsSkips
+        );
+    }
+
+    /** @return string[] */
+    public function getComponentPrefixes(): array
+    {
+        return $this->componentPrefixes;
     }
 
     public function cacheFingerprint(): string
@@ -143,17 +193,13 @@ class HtmlInstrumentation
     {
     }
 
-    /** @return static */
-    public static function make()
+    public static function make(): static
     {
         return new static;
     }
 
-    /**
-     * @param  array<string, mixed>  $config
-     * @return self
-     */
-    public static function fromConfig(array $config)
+    /** @param  array<string, mixed>  $config */
+    public static function fromConfig(array $config): static
     {
         $instrumentation = static::make();
 
@@ -177,16 +223,15 @@ class HtmlInstrumentation
             $instrumentation->componentPrefixes($config['componentPrefixes']);
         }
 
+        $cache = array_key_exists('cache', $config) ? $config['cache'] : true;
+        $instrumentation->cacheStore = is_string($cache) && $cache !== '' ? $cache : (bool) $cache;
         $instrumentation->cacheScope = static::configurationFingerprint($config);
 
         return $instrumentation;
     }
 
-    /**
-     * @param  array<string, mixed>  $config
-     * @return string|null
-     */
-    public static function configurationFingerprint(array $config)
+    /** @param  array<string, mixed>  $config */
+    public static function configurationFingerprint(array $config): ?string
     {
         $encoded = json_encode(
             $config,
@@ -200,22 +245,16 @@ class HtmlInstrumentation
         return md5($encoded);
     }
 
-    /**
-     * @param  string  $template
-     * @return string
-     */
-    public function instrument($template)
+    public function instrument(string $template): string
     {
         return $this->instrumentAntlers($template);
     }
 
-    /**
-     * @param  string  $template
-     * @return string
-     */
-    public function instrumentAntlers($template)
+    public function instrumentAntlers(string $template): string
     {
-        if (InstrumentationState::parsingComponentContent() || InstrumentationState::suppressesHtmlInstrumentation()) {
+        $this->lastContexts = null;
+
+        if (InstrumentationState::suppressed()) {
             return $template;
         }
 
@@ -224,23 +263,26 @@ class HtmlInstrumentation
             return $template;
         }
 
+        if ($this->commentsEnabled
+            && $this->commentFactory === null
+            && str_contains($template, '<!-- '.$this->commentPrefix.':start ')) {
+            return $template;
+        }
+
         $view = GlobalRuntimeState::$currentExecutionFile;
 
-        $commentsAtDocumentRoot = ! InstrumentationState::renderingComponentView()
-            && ! InstrumentationState::instrumentingView();
+        $commentsAtDocumentRoot = ! InstrumentationState::inComponentView()
+            && ! InstrumentationState::instrumenting();
 
         $cacheKey = $this->resultCacheKey(
             $template,
             $view,
             $commentsAtDocumentRoot
         );
-        $cached = null;
+        $memoizable = $this->collectedEdits === null && $this->skipCallback === null;
+        $persistent = $memoizable && $view !== null && InstrumentationState::attributesView();
 
-        if ($this->collectedEdits === null) {
-            $cached = $this->cachedResult($cacheKey);
-        }
-
-        if ($cached !== null) {
+        if ($memoizable && ($cached = $this->cachedResult($cacheKey, $persistent)) !== null) {
             return $cached;
         }
 
@@ -251,31 +293,53 @@ class HtmlInstrumentation
             InstrumentationState::sourceMap()
         );
 
+        $this->lastContexts = $analysis['contexts'];
         $instrumented = $this->emitInstrumentation($template, $analysis);
 
         if ($this->collectedEdits !== null) {
             return $instrumented;
         }
 
-        return $this->storeResult($cacheKey, $instrumented);
+        return $this->storeResult($cacheKey, $instrumented, $analysis['contexts'], $persistent);
     }
 
-    /**
-     * @param  string  $template
-     * @return string
-     */
-    public function __invoke($template)
+    public function __invoke(string $template): string
     {
-        return InstrumentationState::whileInstrumentingView(
+        return InstrumentationState::whileInstrumenting(
             fn () => $this->instrumentAntlers($template)
         );
     }
 
+    /** @return Collection<int, array<string, mixed>> */
+    public function regions(string $html): Collection
+    {
+        return static::regionsIn($html, [$this]);
+    }
+
     /**
-     * @param  string  $marker
-     * @return array<string, mixed>|null
+     * @param  HtmlInstrumentation[]  $instrumenters
+     * @return Collection<int, array<string, mixed>>
      */
-    public static function decode($marker)
+    public static function regionsIn(string $html, array $instrumenters): Collection
+    {
+        [, $markers] = static::extractMarkers($html, $instrumenters);
+
+        return collect($markers)->flatMap(function (array $marker) {
+            $text = $marker[1];
+
+            if (str_starts_with($text, '<!-- ')) {
+                return str_contains($text, ':start ') ? array_filter([static::decode($text)]) : [];
+            }
+
+            $value = htmlspecialchars_decode(substr($text, strpos($text, '="') + 2, -1), ENT_QUOTES);
+            $regions = static::decode($value) ?? json_decode($value, true);
+
+            return is_array($regions) && array_is_list($regions) ? array_filter($regions, 'is_array') : [];
+        })->values();
+    }
+
+    /** @return array<string, mixed>|null */
+    public static function decode(string $marker): ?array
     {
         if (str_contains($marker, '<!-- ')) {
             $marker = Str::betweenFirst($marker, ':start ', ' -->');
@@ -296,26 +360,14 @@ class HtmlInstrumentation
         return $metadata;
     }
 
-    protected function resultCacheKey($template, $view, $commentsAtDocumentRoot)
+    protected function resultCacheKey(string $template, ?string $view, bool $commentsAtDocumentRoot): string
     {
-        $parts = [InstrumentationState::sourceMap()?->fingerprint()];
-
-        $documentContext = 'nested';
-
-        if ($commentsAtDocumentRoot) {
-            $documentContext = 'root';
-        }
-
-        $viewPath = '';
-
-        if (is_string($view)) {
-            $viewPath = $view;
-        }
-
-        $parts[] = $documentContext;
-        $parts[] = $viewPath;
-        $parts[] = $template;
-
-        return hash('xxh128', serialize($parts));
+        return ($commentsAtDocumentRoot ? 'root:' : 'nested:')
+            .InstrumentationState::lineSeed()
+            .':'.InstrumentationState::offsetSeed()
+            .':'.(InstrumentationState::attributesView() ? '1' : '0')
+            .':'.(InstrumentationState::sourceMap()?->fingerprint() ?? '')
+            .':'.($view ?? '')
+            .':'.hash('xxh128', $template);
     }
 }

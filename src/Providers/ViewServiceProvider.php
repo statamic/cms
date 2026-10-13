@@ -154,7 +154,7 @@ class ViewServiceProvider extends ServiceProvider
             }
 
             if ($this->profilerEnabled()) {
-                if (! $isTracingOn) {
+                if ($runtimeConfig->traceManager === null) {
                     $runtimeConfig->traceManager = new TraceManager();
                     $runtimeConfig->isTracingEnabled = true;
                 }

@@ -4,17 +4,14 @@ namespace Statamic\View\Instrumentation\Concerns;
 
 use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
 use Statamic\View\Instrumentation\HtmlContext;
+use Statamic\View\Instrumentation\InstrumentationState;
 use Statamic\View\Instrumentation\TemplateRegion;
 
 /** @internal */
 trait EmitsInstrumentation
 {
-    /**
-     * @param  string  $template
-     * @param  array{regions: TemplateRegion[], elements: array<int, array{insertAt: int, hasAttribute: callable}>}  $analysis
-     * @return string
-     */
-    protected function emitInstrumentation($template, array $analysis)
+    /** @param  array{regions: TemplateRegion[], elements: array<int, array{insertAt: int, hasAttribute: callable}>}  $analysis */
+    protected function emitInstrumentation(string $template, array $analysis): string
     {
         $edits = [];
         $elementMetadata = [];
@@ -47,11 +44,11 @@ trait EmitsInstrumentation
                 [$start, $end] = $this->markersFor($metadata);
 
                 if ($start !== '') {
-                    $edits[] = ['start' => $region->byteStart, 'remove' => 0, 'content' => $start, 'type' => 'start', 'nodeStart' => $region->byteStart];
+                    $edits[] = ['start' => $region->byteStart, 'content' => $start, 'type' => 'start', 'nodeStart' => $region->byteStart];
                 }
 
                 if ($end !== '') {
-                    $edits[] = ['start' => $region->byteEnd, 'remove' => 0, 'content' => $end, 'type' => 'end', 'nodeStart' => $region->byteStart];
+                    $edits[] = ['start' => $region->byteEnd, 'content' => $end, 'type' => 'end', 'nodeStart' => $region->byteStart];
                 }
 
                 $contributed = $start !== '' || $end !== '';
@@ -91,7 +88,6 @@ trait EmitsInstrumentation
                     $attributes .= $attribute;
                     $edits[] = [
                         'start' => $element['insertAt'],
-                        'remove' => 0,
                         'content' => $attribute,
                         'type' => 'attribute',
                         'nodeStart' => $element['insertAt'],
@@ -114,11 +110,8 @@ trait EmitsInstrumentation
         return $this->spliceByteEdits($template, $edits);
     }
 
-    /**
-     * @param  array<int, array{0: array<string, mixed>, 1: TemplateRegion, 2: bool}>  $entries
-     * @return void
-     */
-    protected function reportDeferredSkips(array $entries)
+    /** @param  array<int, array{0: array<string, mixed>, 1: TemplateRegion, 2: bool}>  $entries */
+    protected function reportDeferredSkips(array $entries): void
     {
         foreach ($entries as [$metadata, $region, $alreadyContributed]) {
             if (! $alreadyContributed) {
@@ -128,7 +121,7 @@ trait EmitsInstrumentation
     }
 
     /** @return array<string, mixed> */
-    protected function regionMetadata(TemplateRegion $region)
+    protected function regionMetadata(TemplateRegion $region): array
     {
         $type = 'pair';
 
@@ -148,11 +141,8 @@ trait EmitsInstrumentation
         return $this->appendContextualMetadata($metadata, $region->context());
     }
 
-    /**
-     * @param  array<string, mixed>  $metadata
-     * @return void
-     */
-    protected function reportSkip(array $metadata, TemplateRegion $region, $reason)
+    /** @param  array<string, mixed>  $metadata */
+    protected function reportSkip(array $metadata, TemplateRegion $region, string $reason): void
     {
         if ($this->skipCallback !== null) {
             call_user_func($this->skipCallback, $metadata, $region, $reason);
@@ -160,7 +150,7 @@ trait EmitsInstrumentation
     }
 
     /** @return string One of the SKIP_* constants. */
-    protected function skipReasonFor(TemplateRegion $region)
+    protected function skipReasonFor(TemplateRegion $region): string
     {
         $context = $region->context();
 
@@ -172,6 +162,10 @@ trait EmitsInstrumentation
             return self::SKIP_INSIDE_DOCTYPE;
         }
 
+        if ($context->kind === HtmlContext::KIND_PHP) {
+            return self::SKIP_INSIDE_PHP;
+        }
+
         if ($context->kind === HtmlContext::KIND_ELEMENT_NAME
             || in_array(HtmlContext::DYNAMIC_ELEMENT, $context->elementStack, true)) {
             return self::SKIP_DYNAMIC_MARKUP;
@@ -179,6 +173,10 @@ trait EmitsInstrumentation
 
         if ($context->isClosingTag) {
             return self::SKIP_CLOSING_TAG_MARKUP;
+        }
+
+        if ($region->insideCharacterReference) {
+            return self::SKIP_INSIDE_CHARACTER_REFERENCE;
         }
 
         if ($this->commentsEnabled && $region->isPair() && $context->isSafeForHtmlComments()) {
@@ -192,7 +190,7 @@ trait EmitsInstrumentation
      * @param  array<string, mixed>  $metadata
      * @return array<string, mixed>
      */
-    protected function appendContextualMetadata(array $metadata, HtmlContext $context)
+    protected function appendContextualMetadata(array $metadata, HtmlContext $context): array
     {
         $metadata['context'] = $context->kind;
 
@@ -206,14 +204,14 @@ trait EmitsInstrumentation
 
         $view = GlobalRuntimeState::$currentExecutionFile;
 
-        if (is_string($view) && $view !== '') {
+        if (is_string($view) && $view !== '' && InstrumentationState::attributesView()) {
             $metadata['view'] = $this->publicViewIdentifier($view);
         }
 
         return array_merge($metadata, $this->extraMetadata);
     }
 
-    protected function publicViewIdentifier($view)
+    protected function publicViewIdentifier(string $view): string
     {
         $normalized = str_replace('\\', '/', $view);
 
@@ -241,7 +239,7 @@ trait EmitsInstrumentation
      * @param  array<string, mixed>  $metadata
      * @return array{0: string, 1: string}
      */
-    protected function markersFor(array $metadata)
+    protected function markersFor(array $metadata): array
     {
         if ($this->commentFactory !== null) {
             $markers = call_user_func($this->commentFactory, $metadata);
@@ -268,20 +266,14 @@ trait EmitsInstrumentation
         ];
     }
 
-    /**
-     * @param  string  $template
-     * @param  array<int, array{start: int, remove: int, content: string, type: string, nodeStart: int}>  $edits
-     * @return string
-     */
-    protected function spliceByteEdits($template, array $edits)
+    /** @param  array<int, array{start: int, content: string, type: string, nodeStart: int}>  $edits */
+    protected function spliceByteEdits(string $template, array $edits): string
     {
         if (empty($edits)) {
             return $template;
         }
 
-        // At a shared offset, close previous regions before opening new ones and
-        // emit insertions before replacements consume source bytes.
-        $order = ['end' => 0, 'attribute' => 1, 'start' => 2, 'replace' => 3];
+        $order = ['end' => 0, 'attribute' => 1, 'start' => 2];
 
         usort($edits, function ($left, $right) use ($order) {
             if ($left['start'] !== $right['start']) {
@@ -296,8 +288,6 @@ trait EmitsInstrumentation
             }
 
             if ($left['type'] === 'end') {
-                // Close inner regions first. Layers on the same region close in
-                // reverse instrumenter order so their markers remain nested.
                 return ($right['nodeStart'] <=> $left['nodeStart'])
                     ?: (($right['instrumenter'] ?? 0) <=> ($left['instrumenter'] ?? 0));
             }
@@ -311,7 +301,7 @@ trait EmitsInstrumentation
         foreach ($edits as $edit) {
             $result .= substr($template, $previous, max(0, $edit['start'] - $previous));
             $result .= $edit['content'];
-            $previous = max($previous, $edit['start'] + $edit['remove']);
+            $previous = max($previous, $edit['start']);
         }
 
         return $result.substr($template, $previous);

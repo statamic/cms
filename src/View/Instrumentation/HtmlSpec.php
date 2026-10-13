@@ -5,11 +5,7 @@ namespace Statamic\View\Instrumentation;
 /** @internal */
 class HtmlSpec
 {
-    /**
-     * @param  string  $source
-     * @return bool
-     */
-    public static function hasExplicitDocumentStructure($source)
+    public static function hasExplicitDocumentStructure(string $source): bool
     {
         return preg_match('/<(?:!doctype[\s>]|html[\s>\/]|head[\s>\/]|body[\s>\/])/i', $source) === 1;
     }
@@ -33,30 +29,22 @@ class HtmlSpec
         'pre' => true, 'listing' => true, 'plaintext' => true,
     ];
 
-    /**
-     * @param  string  $char
-     * @return bool
-     */
-    public static function isHtmlSpace($char)
+    public static function isHtmlSpace(string $char): bool
     {
         return $char === ' ' || $char === "\t" || $char === "\n" || $char === "\r" || $char === "\f";
     }
 
-    public static function isTagNameDelimiter($char)
+    public static function isTagNameDelimiter(?string $char): bool
     {
         return $char === null || self::isHtmlSpace($char) || $char === '>' || $char === '/';
     }
 
-    public static function isAttributeNameDelimiter($char)
+    public static function isAttributeNameDelimiter(?string $char): bool
     {
         return self::isTagNameDelimiter($char) || $char === '=';
     }
 
-    /**
-     * @param  mixed  $name
-     * @return bool
-     */
-    public static function isValidName($name)
+    public static function isValidName(mixed $name): bool
     {
         if (! is_string($name)) {
             return false;
@@ -73,11 +61,7 @@ class HtmlSpec
         return ! preg_match('/[\x00-\x20\x7F"\'<>\/=]/', $name);
     }
 
-    /**
-     * @param  string|null  $char
-     * @return bool
-     */
-    public static function isAsciiAlpha($char)
+    public static function isAsciiAlpha(?string $char): bool
     {
         if ($char === null) {
             return false;
@@ -91,11 +75,10 @@ class HtmlSpec
     }
 
     /**
-     * @param  mixed  $value
      * @param  array<int, array{0: string, 1: string}>  $dynamicDelimiters
      * @return string[]
      */
-    public static function classList($value, array $dynamicDelimiters = [['{{', '}}']])
+    public static function classList(mixed $value, array $dynamicDelimiters = [['{{', '}}']]): array
     {
         $value = (string) $value;
         $classes = [];
