@@ -4,6 +4,7 @@ namespace Tests\Data\Entries;
 
 use BadMethodCallException;
 use Facades\Statamic\Fields\BlueprintRepository;
+use Facades\Statamic\Fields\FieldRepository;
 use Facades\Statamic\Stache\Repositories\CollectionTreeRepository;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Contracts\Support\Arrayable;
@@ -32,6 +33,7 @@ use Statamic\Events\EntrySaving;
 use Statamic\Facades;
 use Statamic\Facades\Blink;
 use Statamic\Fields\Blueprint;
+use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Value;
 use Statamic\Sites\Site;
@@ -1271,6 +1273,38 @@ class EntryTest extends TestCase
 
         $this->assertEquals($entry, $return);
         $this->assertFalse($entry->published());
+    }
+
+    #[Test]
+    public function entries_with_the_same_blueprint_resolve_its_fields_once()
+    {
+        $finds = 0;
+        FieldRepository::shouldReceive('find')
+            ->with('fieldset_one.field_one')
+            ->andReturnUsing(function () use (&$finds) {
+                $finds++;
+
+                return new Field('field_one', ['type' => 'text']);
+            });
+
+        BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
+            'article' => (new Blueprint)->setHandle('article')->setContents([
+                'fields' => [['handle' => 'one', 'field' => 'fieldset_one.field_one']],
+            ]),
+        ]));
+        Collection::make('blog')->dated(true)->save();
+
+        // Setting the date reads the blueprint's date field, as it happens for every entry loaded from storage.
+        $makeEntry = fn ($i) => (new Entry)->id("entry-{$i}")->collection('blog')->blueprint('article')->date("2024-01-0{$i}");
+
+        $this->assertSame($entry = $makeEntry(1), $entry->blueprint()->field('one')->parent());
+        $findsForOneBuild = $finds;
+
+        foreach (range(2, 5) as $i) {
+            $this->assertSame($entry = $makeEntry($i), $entry->blueprint()->field('one')->parent());
+        }
+
+        $this->assertSame($findsForOneBuild, $finds);
     }
 
     #[Test]
