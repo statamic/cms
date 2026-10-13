@@ -76,6 +76,16 @@ class FormConnectionsTest extends TestCase
         $this->assertNull($this->fieldtype()->process([]));
     }
 
+    #[Test]
+    public function it_handles_a_form_that_does_not_exist()
+    {
+        $fieldtype = $this->fieldtype(['form' => 'missing']);
+
+        $this->assertEquals(['form' => null, 'types' => [], 'components' => []], $fieldtype->preload());
+        $this->assertEquals([], $fieldtype->preProcess(['webhook' => [['id' => 'def']]]));
+        $this->assertNull($fieldtype->process(['webhook' => [['url' => 'https://example.com/webhook']]]));
+    }
+
     private function fieldtype(array $config = []): FormConnections
     {
         return (new FormConnections)->setField(

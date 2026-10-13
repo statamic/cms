@@ -16,7 +16,9 @@ class FormConnections extends Fieldtype
 
     public function preload()
     {
-        $form = $this->form();
+        if (! $form = $this->form()) {
+            return ['form' => null, 'types' => [], 'components' => []];
+        }
 
         return [
             'form' => ['handle' => $form->handle(), 'title' => __($form->title())],
@@ -37,7 +39,9 @@ class FormConnections extends Fieldtype
 
     public function preProcess($value)
     {
-        $form = $this->form();
+        if (! $form = $this->form()) {
+            return [];
+        }
 
         return collect($value)
             ->map(fn ($config, $handle) => FormConnector::find($handle)?->setForm($form)->preProcess(Connector::normalizeConnections($config)))
@@ -47,7 +51,9 @@ class FormConnections extends Fieldtype
 
     public function process($value)
     {
-        $form = $this->form();
+        if (! $form = $this->form()) {
+            return null;
+        }
 
         $processed = collect($value)
             ->map(fn ($config, $handle) => FormConnector::find($handle)?->setForm($form)->process(Connector::normalizeConnections($config)))
