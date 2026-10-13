@@ -4,6 +4,7 @@ namespace Tests\Auth;
 
 use Illuminate\Support\Facades\Hash;
 use ParagonIE\ConstantTime\Base64UrlSafe;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\File\Passkey;
@@ -23,7 +24,7 @@ use Webauthn\PublicKeyCredentialSource;
 #[Group('2fa')]
 class FileUserTest extends TestCase
 {
-    use PermissibleContractTests, PreventSavingStacheItemsToDisk, UserContractTests;
+    use PermissibleContractTests, PreventSavingStacheItemsToDisk, UnsafeEmailPayloads, UserContractTests;
 
     public function makeUser()
     {
@@ -39,6 +40,32 @@ class FileUserTest extends TestCase
     public function it_gets_path()
     {
         $this->assertEquals($this->fakeStacheDirectory.'/users/john@example.com.yaml', $this->user()->path());
+    }
+
+    #[Test]
+    #[DataProvider('unsafeEmailProvider')]
+    public function it_cannot_get_a_path_for_an_unsafe_email($email)
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        $this->makeUser()->email($email)->path();
+    }
+
+    #[Test]
+    #[DataProvider('dotEmailProvider')]
+    public function it_cannot_get_a_path_for_a_dot_email($email)
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        $this->makeUser()->email($email)->path();
+    }
+
+    public static function dotEmailProvider(): array
+    {
+        return [
+            'dot' => ['.'],
+            'dot dot' => ['..'],
+        ];
     }
 
     #[Test]

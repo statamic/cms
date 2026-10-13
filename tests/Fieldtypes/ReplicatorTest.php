@@ -1330,6 +1330,154 @@ class ReplicatorTest extends TestCase
     }
 
     #[Test]
+    public function it_can_return_set_defaults_for_fieldtype_extending_replicator()
+    {
+        $this->partialMock(RowId::class, function (MockInterface $mock) {
+            $mock->shouldReceive('generate')->andReturn('random-string-1', 'random-string-2');
+        });
+
+        (new class extends Replicator
+        {
+            protected static $handle = 'custom_replicator';
+        })::register();
+
+        $blueprint = Facades\Blueprint::make()->setHandle('default')->setNamespace('collections.pages');
+        $blueprint->setContents([
+            'sections' => [
+                'main' => [
+                    'fields' => [
+                        [
+                            'handle' => 'content',
+                            'field' => [
+                                'type' => 'custom_replicator',
+                                'sets' => [
+                                    'main' => [
+                                        'sets' => [
+                                            'text' => [
+                                                'fields' => [
+                                                    ['handle' => 'body', 'field' => ['type' => 'textarea', 'default' => 'the default']],
+                                                ],
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        Facades\Blueprint::partialMock();
+        Facades\Blueprint::shouldReceive('find')->with('collections.pages.default')->andReturn($blueprint);
+
+        $user = tap(Facades\User::make()->makeSuper())->save();
+
+        $response = $this
+            ->actingAs($user)
+            ->postJson(cp_route('replicator-fieldtype.set'), [
+                'token' => encrypt([
+                    'fqh' => 'collections.pages.default',
+                    'user_id' => $user->id(),
+                ]),
+                'field' => 'content',
+                'set' => 'text',
+            ])
+            ->assertOk();
+
+        $this->assertEquals([
+            'body' => 'the default',
+        ], $response->json('defaults'));
+
+        $this->assertEquals([
+            '_' => '_',
+            'body' => null,
+        ], $response->json('new'));
+    }
+
+    #[Test]
+    public function it_can_return_set_defaults_for_replicator_nested_inside_fieldtype_extending_replicator()
+    {
+        $this->partialMock(RowId::class, function (MockInterface $mock) {
+            $mock->shouldReceive('generate')->andReturn('random-string-1', 'random-string-2');
+        });
+
+        (new class extends Replicator
+        {
+            protected static $handle = 'custom_replicator';
+        })::register();
+
+        $blueprint = Facades\Blueprint::make()->setHandle('default')->setNamespace('collections.pages');
+        $blueprint->setContents([
+            'sections' => [
+                'main' => [
+                    'fields' => [
+                        [
+                            'handle' => 'content',
+                            'field' => [
+                                'type' => 'custom_replicator',
+                                'sets' => [
+                                    'main' => [
+                                        'sets' => [
+                                            'wrapper' => [
+                                                'fields' => [
+                                                    [
+                                                        'handle' => 'blocks',
+                                                        'field' => [
+                                                            'type' => 'replicator',
+                                                            'sets' => [
+                                                                'main' => [
+                                                                    'sets' => [
+                                                                        'text' => [
+                                                                            'fields' => [
+                                                                                ['handle' => 'body', 'field' => ['type' => 'textarea', 'default' => 'the default']],
+                                                                            ],
+                                                                        ],
+                                                                    ],
+                                                                ],
+                                                            ],
+                                                        ],
+                                                    ],
+                                                ],
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        Facades\Blueprint::partialMock();
+        Facades\Blueprint::shouldReceive('find')->with('collections.pages.default')->andReturn($blueprint);
+
+        $user = tap(Facades\User::make()->makeSuper())->save();
+
+        $response = $this
+            ->actingAs($user)
+            ->postJson(cp_route('replicator-fieldtype.set'), [
+                'token' => encrypt([
+                    'fqh' => 'collections.pages.default',
+                    'user_id' => $user->id(),
+                ]),
+                'field' => 'content.wrapper.blocks',
+                'set' => 'text',
+            ])
+            ->assertOk();
+
+        $this->assertEquals([
+            'body' => 'the default',
+        ], $response->json('defaults'));
+
+        $this->assertEquals([
+            '_' => '_',
+            'body' => null,
+        ], $response->json('new'));
+    }
+
+    #[Test]
     public function fields_blink_cache_key_is_site_aware()
     {
         $this->setSites([

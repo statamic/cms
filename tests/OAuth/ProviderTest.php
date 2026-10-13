@@ -2,16 +2,18 @@
 
 namespace Tests\OAuth;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Exceptions\OAuthEmailExistsException;
 use Statamic\Facades\User as UserFacade;
 use Statamic\OAuth\Provider;
+use Tests\Auth\UnsafeEmailPayloads;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class ProviderTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk;
+    use PreventSavingStacheItemsToDisk, UnsafeEmailPayloads;
 
     private $tempDir;
 
@@ -138,6 +140,23 @@ class ProviderTest extends TestCase
             $this->assertCount(1, UserFacade::all());
             $this->assertNull($this->provider()->getUserId('foo-bar'));
         }
+    }
+
+    #[Test]
+    #[DataProvider('unsafeEmailProvider')]
+    public function it_cannot_create_a_user_with_an_email_that_is_unsafe_as_a_file_path($email)
+    {
+        $before = $this->filesystemSnapshot();
+
+        try {
+            $this->provider()->createUser($this->socialite($email));
+            $this->fail('Expected an exception.');
+        } catch (\InvalidArgumentException $e) {
+            //
+        }
+
+        $this->assertSame($before, $this->filesystemSnapshot());
+        $this->assertCount(0, UserFacade::all());
     }
 
     #[Test]
@@ -281,14 +300,18 @@ class ProviderTest extends TestCase
         return UserFacade::make()->id('foo')->email('foo@bar.com')->data(['name' => 'foo', 'extra' => 'bar']);
     }
 
-    private function socialite()
+    private function socialite($email = 'foo@bar.com')
     {
-        return new Socialite();
+        return new Socialite($email);
     }
 }
 
 class Socialite
 {
+    public function __construct(private $email = 'foo@bar.com')
+    {
+    }
+
     public function getId()
     {
         return 'foo-bar';
@@ -301,6 +324,6 @@ class Socialite
 
     public function getEmail()
     {
-        return 'foo@bar.com';
+        return $this->email;
     }
 }

@@ -9,6 +9,7 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Site;
+use Statamic\Facades\URL;
 use Statamic\Facades\User;
 use Statamic\Fields\Value;
 use Statamic\Sites\Site as SiteInstance;
@@ -28,6 +29,14 @@ class CascadeTest extends TestCase
     {
         parent::setUp();
         $this->fakeSiteConfig();
+    }
+
+    public function tearDown(): void
+    {
+        URL::enforceTrailingSlashes(false);
+        URL::clearUrlCache();
+
+        parent::tearDown();
     }
 
     private function cascade()
@@ -218,6 +227,30 @@ class CascadeTest extends TestCase
 
         tap($this->cascade()->hydrate()->toArray(), function ($cascade) {
             $this->assertTrue($cascade['is_homepage']);
+        });
+    }
+
+    #[Test]
+    public function it_hydrates_request_is_homepage_when_request_is_homepage_with_enforced_trailing_slashes()
+    {
+        URL::enforceTrailingSlashes();
+
+        $this->get('http://test.com/');
+
+        tap($this->cascade()->hydrate()->toArray(), function ($cascade) {
+            $this->assertTrue($cascade['is_homepage']);
+        });
+    }
+
+    #[Test]
+    public function it_hydrates_request_is_homepage_when_request_is_not_homepage_with_enforced_trailing_slashes()
+    {
+        URL::enforceTrailingSlashes();
+
+        $this->get('http://test.com/test/');
+
+        tap($this->cascade()->hydrate()->toArray(), function ($cascade) {
+            $this->assertFalse($cascade['is_homepage']);
         });
     }
 
