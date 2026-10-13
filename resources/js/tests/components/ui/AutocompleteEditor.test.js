@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils';
-import { expect, test } from 'vitest';
+import { expect, test, vi } from 'vitest';
 import AutocompleteEditor from '@/components/ui/AutocompleteEditor/AutocompleteEditor.vue';
 
 window.__ = (key) => key;
@@ -191,4 +191,38 @@ test('suggestion items are filtered by query against the option label', async ()
     ]);
     expect(mention.options.suggestion.items({ query: '' })).toEqual(sampleOptions);
     expect(mention.options.suggestion.items({ query: 'zzz' })).toEqual([]);
+});
+
+test('options with values outside the token grammar are dropped from loaded suggestions', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const loadOptions = async () => [
+        { value: 'ok', label: 'Ok' },
+        { value: 'a b', label: 'Space' },
+        { value: 'a]]b', label: 'Brackets' },
+    ];
+    const wrapper = await mountEditor({ options: [], loadOptions });
+    const items = wrapper.vm.editor.extensionManager.extensions
+        .find((extension) => extension.name === 'mention')
+        .options.suggestion.items;
+
+    expect(await items({ query: '' })).toEqual([{ value: 'ok', label: 'Ok' }]);
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('[a b]'));
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('[a]]b]'));
+
+    warn.mockRestore();
+});
+
+test('suggestion list never inserts a value outside the token grammar', async () => {
+    const SuggestionList = (await import('@/components/ui/AutocompleteEditor/SuggestionList.vue')).default;
+    const command = vi.fn();
+    const list = mount(SuggestionList, {
+        props: { command, items: [{ value: 'a b', label: 'Bad' }, { value: 'ok', label: 'Ok' }] },
+    });
+
+    const [bad, ok] = list.findAll('button');
+    await bad.trigger('click');
+    expect(command).not.toHaveBeenCalled();
+
+    await ok.trigger('click');
+    expect(command).toHaveBeenCalledWith({ value: 'ok', label: 'Ok' });
 });

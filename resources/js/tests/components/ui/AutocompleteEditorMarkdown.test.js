@@ -1,5 +1,6 @@
 import { expect, test } from 'vitest';
 import { contentToMarkdown, markdownToContent } from '@/components/ui/AutocompleteEditor/markdown';
+import { isValidMentionValue } from '@/components/ui/AutocompleteEditor/mentionToken';
 
 test('a value that is not a string is treated as empty', () => {
     const proseMirror = [{ type: 'paragraph', content: [{ type: 'text', text: 'legacy' }] }];
@@ -327,4 +328,15 @@ test('block markers are escaped inside list items', () => {
     ];
 
     expect(markdownToContent(contentToMarkdown(content))).toEqual(content);
+});
+
+test.each([
+    ['first_name', true],
+    ['user.last-name', true],
+    ['a b', false],
+    ['a]]b', false],
+    ['', false],
+    [null, false],
+])('mention value %j validity is %s', (value, valid) => {
+    expect(isValidMentionValue(value)).toBe(valid);
 });

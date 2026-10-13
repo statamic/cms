@@ -34,6 +34,7 @@ import History from '@tiptap/extension-history';
 import { Placeholder, Dropcursor, Gapcursor } from '@tiptap/extensions';
 import { __, clone } from '@/bootstrap/globals';
 import { Autocomplete } from './extensions/Autocomplete';
+import { isValidMentionValue } from './mentionToken';
 import { DocumentBlock, DocumentInline } from './extensions/Document';
 import AutocompleteEditorToolbar from './AutocompleteEditorToolbar.vue';
 
@@ -102,8 +103,20 @@ const resolvedButtons = computed(() => props.buttons.map((name) => buttonDefinit
 
 const showToolbar = computed(() => !props.inline && !props.readOnly && resolvedButtons.value.length > 0);
 
+function onlyValidOptions(options) {
+    return options.filter((option) => {
+        if (isValidMentionValue(option.value)) return true;
+
+        console.warn(`Ignoring autocomplete option with invalid value [${option.value}].`);
+
+        return false;
+    });
+}
+
 function resolveOptions({ query }) {
-    if (props.loadOptions) return props.loadOptions({ query });
+    if (props.loadOptions) {
+        return Promise.resolve(props.loadOptions({ query })).then(onlyValidOptions);
+    }
 
     const needle = (query ?? '').toLowerCase();
 

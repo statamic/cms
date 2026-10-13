@@ -2,6 +2,7 @@
 
 namespace Tests\Fieldtypes;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Antlers;
 use Statamic\Fields\Field;
@@ -115,6 +116,41 @@ class AutocompleteEditorTest extends TestCase
             ],
             $fieldtype->preload()['options']
         );
+    }
+
+    #[Test]
+    public function preload_accepts_values_matching_the_token_grammar()
+    {
+        $fieldtype = $this->fieldtype(['options' => ['first_name' => 'First', 'user.last-name' => 'Last']]);
+
+        $this->assertSame(['first_name', 'user.last-name'], collect($fieldtype->preload()['options'])->pluck('value')->all());
+    }
+
+    #[Test]
+    public function preload_casts_numeric_values_to_strings()
+    {
+        $fieldtype = $this->fieldtype(['options' => [1 => 'One', 2 => 'Two']]);
+
+        $this->assertSame(['1', '2'], collect($fieldtype->preload()['options'])->pluck('value')->all());
+    }
+
+    #[Test]
+    #[DataProvider('invalidOptionValues')]
+    public function preload_rejects_values_outside_the_token_grammar($value)
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('['.$value.']');
+
+        $this->fieldtype(['options' => [$value => 'Label']])->preload();
+    }
+
+    public static function invalidOptionValues()
+    {
+        return [
+            'space' => ['a b'],
+            'closing brackets' => ['a]]b'],
+            'empty' => [' '],
+        ];
     }
 
     #[Test]

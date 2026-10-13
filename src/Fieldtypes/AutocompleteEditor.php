@@ -101,7 +101,16 @@ class AutocompleteEditor extends Fieldtype
         }
 
         return collect($options)
-            ->map(fn ($item) => ['value' => $item['key'], 'label' => $item['value']])
+            ->map(function ($item) {
+                if (! Mentions::isValidValue($value = (string) $item['key'])) {
+                    throw new \InvalidArgumentException(sprintf(
+                        'Invalid autocomplete_editor option value [%s]. Values may only contain letters, numbers, underscores, hyphens and periods.',
+                        $value
+                    ));
+                }
+
+                return ['value' => $value, 'label' => $item['value']];
+            })
             ->values()
             ->all();
     }

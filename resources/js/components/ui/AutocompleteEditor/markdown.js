@@ -8,8 +8,7 @@ import Heading from '@tiptap/extension-heading';
 import HardBreak from '@tiptap/extension-hard-break';
 import { BulletList, OrderedList, ListItem } from '@tiptap/extension-list';
 import { Autocomplete } from './extensions/Autocomplete';
-
-const MENTION_TOKEN = /^\[\[\s*([\w.-]+)\s*\]\]/;
+import { MENTION_TOKEN } from './mentionToken';
 
 // The serializer escapes inline syntax but not what only has meaning at the
 // start of a line, so plain text like "- x" or "# x" would reload as a list or

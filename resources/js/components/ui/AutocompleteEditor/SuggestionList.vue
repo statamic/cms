@@ -25,6 +25,7 @@
 <script setup>
 import { ref, watch } from 'vue';
 import { __ } from '@/bootstrap/globals';
+import { isValidMentionValue } from './mentionToken';
 
 const props = defineProps({
     items: { type: Array, default: () => [] },
@@ -40,7 +41,7 @@ watch(
 
 function selectItem(index) {
     const item = props.items[index];
-    if (item) props.command(item);
+    if (item && isValidMentionValue(item.value)) props.command(item);
 }
 
 function onKeyDown({ event }) {
