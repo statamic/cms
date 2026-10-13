@@ -253,6 +253,7 @@ watch(
 
         if (!enabled) return;
 
+        selectingFields.value = true;
         startPayloadWatch();
         update();
         animateIn();
@@ -261,7 +262,10 @@ watch(
 
 // The watcher above only covers transitions, so a component mounted already enabled
 // needs the payload watch installed up front.
-if (props.enabled) startPayloadWatch();
+if (props.enabled) {
+    selectingFields.value = true;
+    startPayloadWatch();
+}
 
 const canPopOut = computed(() => typeof BroadcastChannel === 'function');
 
