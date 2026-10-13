@@ -19,15 +19,54 @@ class DashboardController extends CpController
      */
     public function index(Loader $loader)
     {
-        $widgets = $this->getDisplayableWidgets($loader);
+        $configs = $this->resolvedWidgetConfigs();
+        $widgets = $this->buildDisplayableWidgets($loader, $configs);
 
         return Inertia::render('Dashboard', [
             'widgets' => $widgets,
+            'widgetConfigs' => $this->preProcessedConfigs($configs),
+            'hasCustomWidgets' => Preference::get('dashboard.widgets') !== null,
+            'canEditWidgets' => User::current()->can('access cp'),
+            'widgetMetaUrl' => cp_route('dashboard.widgets.meta'),
+            'widgetUpdateUrl' => cp_route('dashboard.widgets.update'),
+            'widgetDestroyUrl' => cp_route('dashboard.widgets.destroy'),
             'pro' => Statamic::pro(),
             'blueprintsUrl' => cp_route('blueprints.index'),
             'collectionsCreateUrl' => cp_route('collections.create'),
             'navigationCreateUrl' => cp_route('navigation.create'),
         ]);
+    }
+
+    private function resolvedWidgetConfigs()
+    {
+        return Preference::get('dashboard.widgets') ?? config('statamic.cp.widgets') ?? [];
+    }
+
+    private function normalizedConfigs($widgets)
+    {
+        return collect($widgets)->map(function ($config) {
+            return is_string($config) ? ['type' => $config] : $config;
+        });
+    }
+
+    private function preProcessedConfigs($configs)
+    {
+        $availableWidgets = collect(app('statamic.widgets')->all());
+
+        return $this->normalizedConfigs($configs)->map(function ($config) use ($availableWidgets) {
+            $handle = $config['type'];
+            $widgetClass = $availableWidgets->get($handle);
+
+            if (! $widgetClass) {
+                return $config;
+            }
+
+            $widget = app($widgetClass);
+            $widget->setConfig($config);
+            $fields = $widget->blueprint()->fields()->addValues($config)->preProcess();
+
+            return array_merge(['type' => $handle], $fields->values()->all());
+        })->values()->all();
     }
 
     /**
@@ -36,14 +75,9 @@ class DashboardController extends CpController
      * @param  Loader  $loader
      * @return \Illuminate\Support\Collection
      */
-    private function getDisplayableWidgets($loader)
+    private function buildDisplayableWidgets($loader, $widgets)
     {
-        $widgets = Preference::get('widgets') ?? config('statamic.cp.widgets') ?? [];
-
-        return collect($widgets)
-            ->map(function ($config) {
-                return is_string($config) ? ['type' => $config] : $config;
-            })
+        return $this->normalizedConfigs($widgets)
             ->filter(function ($config) {
                 if ($config['type'] === 'getting_started') {
                     return false;
