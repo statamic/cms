@@ -71,6 +71,10 @@ class FormController extends Controller
         } catch (SilentFormFailureException $e) {
             $result = new SubmissionResult(submission: $action->submission());
 
+            if ($result->submission->isSpam()) {
+                $this->forgetPartialSubmission($form);
+            }
+
             return $this->formSuccess($params, $result, silentFailure: true);
         } catch (ValidationException $e) {
             return $this->formFailure($params, $e->errors(), $form->handle());
@@ -152,7 +156,7 @@ class FormController extends Controller
             return response([
                 'success' => true,
                 'submission_created' => ! $silentFailure,
-                'submission' => $submission->data(),
+                'submission' => $submission->values(),
                 'redirect' => $redirect,
                 'next_page' => $result->nextPage,
             ]);

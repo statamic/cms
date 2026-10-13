@@ -110,7 +110,7 @@ class Instance
 
     private function submissionCount(): int
     {
-        $query = $this->form->querySubmissions()->whereNull('partial');
+        $query = $this->form->querySubmissions()->whereStatus('finalized');
 
         if ($this->entry) {
             $query->where('entry', $this->entry);

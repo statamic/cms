@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Actions\MarkAsNotSpam;
 use Statamic\Events\FormSubmitted;
 use Statamic\Events\SubmissionCreated;
 use Statamic\Events\SubmissionFinalized;
@@ -20,7 +21,9 @@ use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Fieldset;
+use Statamic\Facades\File;
 use Statamic\Facades\Form;
+use Statamic\Facades\YAML;
 use Statamic\Forms\CreateAssetsFromFileUploads;
 use Statamic\Forms\Email;
 use Statamic\Forms\SendEmail;
@@ -266,6 +269,85 @@ class SubmitFormTest extends TestCase
     }
 
     #[Test]
+    public function it_saves_the_submission_as_spam_when_the_honeypot_is_filled_and_configured_to_do_so()
+    {
+        Bus::fake();
+        Event::fake([FormSubmitted::class, SubmissionFinalized::class]);
+
+        $this->form->data(['honeypot_behavior' => 'mark_as_spam'])->save();
+
+        try {
+            $this->action()->submit(['email' => 'test@example.com', 'winnie' => 'the pooh']);
+
+            $this->fail('Expected SilentFormFailureException was not thrown');
+        } catch (SilentFormFailureException $e) {
+            // Expected
+        }
+
+        $submission = $this->form->submissions()->first();
+
+        $this->assertNotNull($submission);
+        $this->assertTrue($submission->isSpam());
+        $this->assertEquals('spam', $submission->status());
+
+        // The raw partial key sticks around so finalizing can pick up where it
+        // left off when the submission is marked as not spam, but the
+        // submission no longer reports itself as partial.
+        $this->assertTrue($submission->get('_partial'));
+        $this->assertFalse($submission->isPartial());
+
+        Event::assertNotDispatched(FormSubmitted::class);
+        Event::assertNotDispatched(SubmissionFinalized::class);
+        Bus::assertNotDispatched(SendEmails::class);
+    }
+
+    #[Test]
+    public function it_ignores_the_honeypot_spam_setting_when_the_form_does_not_store_submissions()
+    {
+        $this->form->store(false)->data(['honeypot_behavior' => 'mark_as_spam'])->save();
+
+        try {
+            $this->action()->submit(['email' => 'test@example.com', 'winnie' => 'the pooh']);
+
+            $this->fail('Expected SilentFormFailureException was not thrown');
+        } catch (SilentFormFailureException $e) {
+            // Expected
+        }
+
+        $this->assertCount(0, $this->form->submissions());
+    }
+
+    #[Test]
+    public function it_keeps_uploaded_files_when_a_spam_submission_is_stored()
+    {
+        Bus::fake(); // Otherwise the temp file is deleted by DeleteTemporaryFiles right after submission.
+
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $form = $this->uploadForm(honeypot: true);
+        $form->data(['honeypot_behavior' => 'mark_as_spam'])->save();
+
+        $action = app(SubmitForm::class)->form($form)->page('main');
+
+        try {
+            $action->submit(
+                data: ['email' => 'test@example.com', 'winnie' => 'the pooh'],
+                files: ['avatar' => [UploadedFile::fake()->image('avatar.jpg')]],
+            );
+        } catch (SilentFormFailureException $e) {
+            // Expected
+        }
+
+        // The file stays as a temporary upload until the submission is
+        // marked as not spam, at which point finalizing moves it into
+        // the asset container.
+        Storage::disk('local')->assertExists('statamic/form-uploads/'.$action->submission()->get('avatar')[0]);
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
     public function it_throws_silent_failure_exception_when_event_listener_returns_false()
     {
         Event::listen(FormSubmitted::class, fn () => false);
@@ -279,6 +361,191 @@ class SubmitFormTest extends TestCase
         } catch (SilentFormFailureException $e) {
             $this->assertNotNull($action->submission());
         }
+    }
+
+    #[Test]
+    public function it_stores_a_submission_marked_as_spam_by_an_event_listener()
+    {
+        Bus::fake();
+        Event::fake([SubmissionFinalized::class]);
+
+        Event::listen(FormSubmitted::class, fn ($event) => $event->submission->markAsSpam());
+
+        $action = $this->action();
+
+        try {
+            $action->submit(['email' => 'test@example.com']);
+
+            $this->fail('Expected SilentFormFailureException was not thrown');
+        } catch (SilentFormFailureException $e) {
+            // Expected
+        }
+
+        $this->assertCount(1, $this->form->submissions());
+        $this->assertTrue($this->form->submissions()->first()->isSpam());
+        $this->assertTrue($action->submission()->isSpam());
+
+        Event::assertNotDispatched(SubmissionFinalized::class);
+        Bus::assertNotDispatched(SendEmails::class);
+    }
+
+    #[Test]
+    public function it_does_not_store_a_submission_marked_as_spam_by_an_event_listener_when_the_form_does_not_store_submissions()
+    {
+        $this->form->store(false)->save();
+
+        Event::listen(FormSubmitted::class, fn ($event) => $event->submission->markAsSpam());
+
+        try {
+            $this->action()->submit(['email' => 'test@example.com']);
+
+            $this->fail('Expected SilentFormFailureException was not thrown');
+        } catch (SilentFormFailureException $e) {
+            // Expected
+        }
+
+        $this->assertCount(0, $this->form->submissions());
+    }
+
+    #[Test]
+    public function it_keeps_uploaded_files_when_an_event_listener_marks_a_submission_as_spam()
+    {
+        Bus::fake();
+
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $form = $this->uploadForm();
+        $action = app(SubmitForm::class)->form($form)->page('main');
+
+        Event::listen(FormSubmitted::class, fn ($event) => $event->submission->markAsSpam());
+
+        try {
+            $action->submit(
+                data: ['email' => 'test@example.com'],
+                files: ['avatar' => [UploadedFile::fake()->image('avatar.jpg')]],
+            );
+        } catch (SilentFormFailureException $e) {
+            // Expected
+        }
+
+        Storage::disk('local')->assertExists('statamic/form-uploads/'.$action->submission()->get('avatar')[0]);
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function it_removes_uploaded_files_when_an_event_listener_marks_a_submission_as_spam_and_the_form_does_not_store_submissions()
+    {
+        Bus::fake();
+
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $form = $this->uploadForm();
+        $form->store(false)->save();
+        $action = app(SubmitForm::class)->form($form)->page('main');
+
+        Event::listen(FormSubmitted::class, fn ($event) => $event->submission->markAsSpam());
+
+        try {
+            $action->submit(
+                data: ['email' => 'test@example.com'],
+                files: ['avatar' => [UploadedFile::fake()->image('avatar.jpg')]],
+            );
+        } catch (SilentFormFailureException $e) {
+            // Expected
+        }
+
+        $this->assertCount(0, $form->submissions());
+        Storage::disk('local')->assertMissing('statamic/form-uploads/'.$action->submission()->get('avatar')[0]);
+    }
+
+    #[Test]
+    public function it_stores_one_spam_submission_when_an_event_listener_marks_it_as_spam_saves_and_returns_false()
+    {
+        Event::listen(FormSubmitted::class, function ($event) {
+            $event->submission->markAsSpam()->save();
+
+            return false;
+        });
+
+        try {
+            $this->action()->submit(['email' => 'test@example.com']);
+
+            $this->fail('Expected SilentFormFailureException was not thrown');
+        } catch (SilentFormFailureException $e) {
+            // Expected
+        }
+
+        $this->assertCount(1, $this->form->submissions());
+        $this->assertTrue($this->form->submissions()->first()->isSpam());
+    }
+
+    #[Test]
+    public function it_does_not_store_a_submission_when_an_event_listener_returns_false_without_marking_it_as_spam()
+    {
+        Event::listen(FormSubmitted::class, fn () => false);
+
+        try {
+            $this->action()->submit(['email' => 'test@example.com']);
+
+            $this->fail('Expected SilentFormFailureException was not thrown');
+        } catch (SilentFormFailureException $e) {
+            // Expected
+        }
+
+        $this->assertCount(0, $this->form->submissions());
+    }
+
+    #[Test]
+    public function it_stores_a_multi_page_submission_marked_as_spam_by_an_event_listener_on_the_final_page()
+    {
+        $form = $this->multiPageForm();
+
+        Event::listen(FormSubmitted::class, fn ($event) => $event->submission->markAsSpam());
+
+        $result = app(SubmitForm::class)->form($form)->page('one')->submit(['name' => 'Olaf']);
+        $result = app(SubmitForm::class)->form($form)->page('two')->resume($result->submission)->submit(['email' => 'olaf@example.com']);
+
+        $action = app(SubmitForm::class)->form($form)->page('three')->resume($result->submission);
+
+        try {
+            $action->submit(['message' => 'Hello']);
+
+            $this->fail('Expected SilentFormFailureException was not thrown');
+        } catch (SilentFormFailureException $e) {
+            // Expected
+        }
+
+        $this->assertCount(1, $form->submissions());
+        $this->assertTrue($form->submissions()->first()->isSpam());
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function it_deletes_the_persisted_partial_when_a_multi_page_submission_is_marked_as_spam_and_the_form_does_not_store_submissions()
+    {
+        $form = $this->multiPageForm();
+        $form->store(false)->save();
+
+        Event::listen(FormSubmitted::class, fn ($event) => $event->submission->markAsSpam());
+
+        $result = app(SubmitForm::class)->form($form)->page('one')->submit(['name' => 'Olaf']);
+        $result = app(SubmitForm::class)->form($form)->page('two')->resume($result->submission)->submit(['email' => 'olaf@example.com']);
+
+        $this->assertCount(1, $form->submissions());
+
+        try {
+            app(SubmitForm::class)->form($form)->page('three')->resume($result->submission)->submit(['message' => 'Hello']);
+
+            $this->fail('Expected SilentFormFailureException was not thrown');
+        } catch (SilentFormFailureException $e) {
+            // Expected
+        }
+
+        $this->assertCount(0, $form->submissions());
     }
 
     #[Test]
@@ -806,6 +1073,322 @@ class SubmitFormTest extends TestCase
     }
 
     #[Test]
+    public function it_removes_assets_fieldtype_uploads_but_keeps_the_stored_spam_submission_from_a_honeypot()
+    {
+        Bus::fake();
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $form = $this->assetsForm(honeypot: true);
+        $form->data(['honeypot_behavior' => 'mark_as_spam'])->save();
+
+        $action = app(SubmitForm::class)->form($form)->page('main');
+
+        try {
+            $action->submit(
+                data: ['email' => 'test@example.com', 'winnie' => 'the pooh'],
+                files: ['photo' => [UploadedFile::fake()->image('photo.jpg')]],
+            );
+        } catch (SilentFormFailureException $e) {
+            // Expected
+        }
+
+        Storage::disk('avatars')->assertMissing('photo.jpg');
+        $this->assertCount(1, $form->submissions());
+        $this->assertTrue($form->submissions()->first()->isSpam());
+        $this->assertNull($form->submissions()->first()->get('photo'));
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function it_removes_assets_fieldtype_uploads_but_keeps_the_stored_spam_submission_from_a_listener()
+    {
+        Bus::fake();
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $form = $this->assetsForm();
+
+        Event::listen(FormSubmitted::class, fn ($event) => $event->submission->markAsSpam());
+
+        try {
+            app(SubmitForm::class)->form($form)->page('main')->submit(
+                data: ['email' => 'test@example.com'],
+                files: ['photo' => [UploadedFile::fake()->image('photo.jpg')]],
+            );
+        } catch (SilentFormFailureException $e) {
+            // Expected
+        }
+
+        Storage::disk('avatars')->assertMissing('photo.jpg');
+        $this->assertCount(1, $form->submissions());
+        $this->assertTrue($form->submissions()->first()->isSpam());
+        $this->assertNull($form->submissions()->first()->get('photo'));
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function it_can_mark_a_spam_submission_as_not_spam_after_its_assets_fieldtype_uploads_were_removed()
+    {
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $form = $this->assetsForm(withUpload: true);
+
+        Event::listen(FormSubmitted::class, fn ($event) => $event->submission->markAsSpam());
+
+        $action = app(SubmitForm::class)->form($form)->page('main');
+
+        try {
+            $action->submit(
+                data: ['email' => 'test@example.com'],
+                files: [
+                    'photo' => [UploadedFile::fake()->image('photo.jpg')],
+                    'avatar' => [UploadedFile::fake()->image('avatar.jpg')],
+                ],
+            );
+        } catch (SilentFormFailureException $e) {
+            // Expected
+        }
+
+        Storage::disk('avatars')->assertMissing('photo.jpg');
+        Storage::disk('local')->assertExists('statamic/form-uploads/'.$action->submission()->get('avatar')[0]);
+
+        $submission = $form->submissions()->first();
+        (new MarkAsNotSpam)->run(collect([$submission]), []);
+
+        $submission = $form->submission($submission->id());
+
+        $this->assertFalse($submission->isSpam());
+        $this->assertFalse($submission->isPartial());
+        $this->assertNull($submission->get('photo'));
+        Storage::disk('avatars')->assertExists('avatar.jpg');
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function it_removes_temporary_uploads_when_spam_is_discarded_by_a_listener_on_a_single_page_form()
+    {
+        Bus::fake();
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $form = $this->uploadForm();
+        $form->store(false)->save();
+
+        Event::listen(FormSubmitted::class, fn ($event) => $event->submission->markAsSpam());
+
+        $action = app(SubmitForm::class)->form($form)->page('main');
+
+        try {
+            $action->submit(
+                data: ['email' => 'test@example.com'],
+                files: ['avatar' => [UploadedFile::fake()->image('avatar.jpg')]],
+            );
+        } catch (SilentFormFailureException $e) {
+            // Expected
+        }
+
+        $id = $action->submission()->id();
+        Storage::disk('local')->assertMissing("statamic/form-uploads/{$id}/avatar/avatar.jpg");
+        $this->assertFalse(Storage::disk('local')->exists("statamic/form-uploads/{$id}"));
+    }
+
+    #[Test]
+    public function it_removes_earlier_pages_temporary_uploads_when_a_multi_page_submission_is_discarded_as_spam()
+    {
+        Bus::fake();
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $form = $this->multiPageUploadForm();
+        $form->store(false)->save();
+
+        Event::listen(FormSubmitted::class, fn ($event) => $event->submission->markAsSpam());
+
+        $result = app(SubmitForm::class)->form($form)->page('one')->submit(
+            data: [],
+            files: ['avatar' => [UploadedFile::fake()->image('avatar.jpg')]],
+        );
+
+        $id = $result->submission->id();
+        Storage::disk('local')->assertExists("statamic/form-uploads/{$id}/avatar/avatar.jpg");
+
+        try {
+            app(SubmitForm::class)->form($form)->page('two')->resume($result->submission)->submit(['email' => 'test@example.com']);
+        } catch (SilentFormFailureException $e) {
+            // Expected
+        }
+
+        $this->assertCount(0, $form->submissions());
+        Storage::disk('local')->assertMissing("statamic/form-uploads/{$id}/avatar/avatar.jpg");
+    }
+
+    #[Test]
+    public function it_removes_temporary_uploads_on_an_ignored_honeypot_when_the_form_does_not_store_submissions()
+    {
+        Bus::fake();
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $form = $this->uploadForm(honeypot: true);
+        $form->store(false)->save();
+
+        $action = app(SubmitForm::class)->form($form)->page('main');
+
+        try {
+            $action->submit(
+                data: ['email' => 'test@example.com', 'winnie' => 'the pooh'],
+                files: ['avatar' => [UploadedFile::fake()->image('avatar.jpg')]],
+            );
+        } catch (SilentFormFailureException $e) {
+            // Expected
+        }
+
+        $id = $action->submission()->id();
+        Storage::disk('local')->assertMissing("statamic/form-uploads/{$id}/avatar/avatar.jpg");
+        $this->assertCount(0, $form->submissions());
+    }
+
+    #[Test]
+    public function it_removes_temporary_uploads_when_a_listener_returns_false_without_marking_spam()
+    {
+        Bus::fake();
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $form = $this->uploadForm();
+
+        Event::listen(FormSubmitted::class, fn () => false);
+
+        $action = app(SubmitForm::class)->form($form)->page('main');
+
+        try {
+            $action->submit(
+                data: ['email' => 'test@example.com'],
+                files: ['avatar' => [UploadedFile::fake()->image('avatar.jpg')]],
+            );
+        } catch (SilentFormFailureException $e) {
+            // Expected
+        }
+
+        $id = $action->submission()->id();
+        Storage::disk('local')->assertMissing("statamic/form-uploads/{$id}/avatar/avatar.jpg");
+        $this->assertCount(0, $form->submissions());
+    }
+
+    #[Test]
+    public function it_keeps_earlier_pages_uploads_but_removes_the_rejected_pages_when_a_persisted_partial_survives()
+    {
+        Bus::fake();
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $form = $this->multiPageUploadForm();
+
+        Event::listen(FormSubmitted::class, fn () => false);
+
+        $result = app(SubmitForm::class)->form($form)->page('one')->submit(
+            data: [],
+            files: ['avatar' => [UploadedFile::fake()->image('avatar.jpg')]],
+        );
+
+        $id = $result->submission->id();
+
+        try {
+            app(SubmitForm::class)->form($form)->page('two')->resume($result->submission)->submit(
+                data: ['email' => 'test@example.com'],
+                files: ['resume' => [UploadedFile::fake()->image('resume.jpg')]],
+            );
+        } catch (SilentFormFailureException $e) {
+            // Expected
+        }
+
+        $this->assertCount(1, $form->submissions());
+        Storage::disk('local')->assertExists("statamic/form-uploads/{$id}/avatar/avatar.jpg");
+        Storage::disk('local')->assertMissing("statamic/form-uploads/{$id}/resume/resume.jpg");
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function it_does_not_retain_a_resumed_partial_as_spam_when_a_listener_marks_it_and_then_throws_a_validation_exception()
+    {
+        Bus::fake();
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $form = $this->multiPageUploadForm(withAssets: true);
+
+        $result = app(SubmitForm::class)->form($form)->page('one')->submit(
+            data: [],
+            files: ['avatar' => [UploadedFile::fake()->image('avatar.jpg')]],
+        );
+
+        $id = $result->submission->id();
+
+        Event::listen(FormSubmitted::class, function ($event) {
+            $event->submission->markAsSpam();
+
+            throw ValidationException::withMessages(['email' => 'Nope']);
+        });
+
+        try {
+            app(SubmitForm::class)->form($form)->page('two')->resume($result->submission)->submit(
+                data: ['email' => 'test@example.com'],
+                files: [
+                    'resume' => [UploadedFile::fake()->image('resume.jpg')],
+                    'photo' => [UploadedFile::fake()->image('photo.jpg')],
+                ],
+            );
+        } catch (ValidationException $e) {
+            // Expected
+        }
+
+        $stored = YAML::parse(File::get($form->submission($id)->path()));
+
+        $this->assertArrayNotHasKey('_marked_spam_at', $stored);
+        $this->assertTrue($stored['_partial']);
+        $this->assertArrayNotHasKey('email', $stored);
+        Storage::disk('avatars')->assertMissing('photo.jpg');
+        Storage::disk('local')->assertExists("statamic/form-uploads/{$id}/avatar/avatar.jpg");
+        Storage::disk('local')->assertMissing("statamic/form-uploads/{$id}/resume/resume.jpg");
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function it_keeps_temporary_uploads_for_a_stored_spam_submission_on_disk()
+    {
+        Bus::fake();
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $form = $this->uploadForm();
+
+        Event::listen(FormSubmitted::class, fn ($event) => $event->submission->markAsSpam());
+
+        $action = app(SubmitForm::class)->form($form)->page('main');
+
+        try {
+            $action->submit(
+                data: ['email' => 'test@example.com'],
+                files: ['avatar' => [UploadedFile::fake()->image('avatar.jpg')]],
+            );
+        } catch (SilentFormFailureException $e) {
+            // Expected
+        }
+
+        $id = $action->submission()->id();
+        Storage::disk('local')->assertExists("statamic/form-uploads/{$id}/avatar/avatar.jpg");
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
     public function it_removes_uploaded_assets_on_silent_failure()
     {
         Storage::fake('avatars');
@@ -899,6 +1482,7 @@ class SubmitFormTest extends TestCase
 
         $this->assertCount(1, $form->submissions());
         $this->assertTrue($result->submission->isPartial());
+        $this->assertTrue($result->submission->get('_partial'));
         $this->assertEquals('Olaf', $result->submission->get('name'));
 
         Event::assertDispatched(SubmissionCreated::class);
@@ -1155,6 +1739,7 @@ class SubmitFormTest extends TestCase
 
         $stored = $form->submission($result->submission->id());
         $this->assertFalse($stored->isPartial());
+        $this->assertFalse($stored->has('_partial'));
 
         // Earlier pages' values are preserved while the final page's values are merged in.
         $this->assertEquals('Olaf', $stored->get('name'));
@@ -1348,6 +1933,55 @@ class SubmitFormTest extends TestCase
                             ],
                         ],
                     ],
+                ],
+            ],
+        ]), fn ($f) => $f->save());
+    }
+
+    private function assetsForm(bool $honeypot = false, bool $withUpload = false)
+    {
+        $form = Form::make('assets_uploads');
+
+        if ($honeypot) {
+            $form->honeypot('winnie');
+        }
+
+        $fields = [
+            ['handle' => 'email', 'field' => ['type' => 'email']],
+            ['handle' => 'photo', 'field' => ['type' => 'assets', 'container' => 'avatars']],
+        ];
+
+        if ($withUpload) {
+            $fields[] = ['handle' => 'avatar', 'field' => ['type' => 'upload', 'store' => true, 'container' => 'avatars']];
+        }
+
+        return tap($form->formFields([
+            'pages' => [['id' => 'main', 'sections' => [['fields' => $fields]]]],
+        ]), fn ($f) => $f->save());
+    }
+
+    private function multiPageUploadForm(bool $withAssets = false)
+    {
+        $pageTwoFields = [
+            ['handle' => 'email', 'field' => ['type' => 'email']],
+            ['handle' => 'resume', 'field' => ['type' => 'upload', 'store' => true, 'container' => 'avatars']],
+        ];
+
+        if ($withAssets) {
+            $pageTwoFields[] = ['handle' => 'photo', 'field' => ['type' => 'assets', 'container' => 'avatars']];
+        }
+
+        return tap(Form::make('multi_uploads')->formFields([
+            'pages' => [
+                [
+                    'id' => 'one',
+                    'sections' => [['fields' => [
+                        ['handle' => 'avatar', 'field' => ['type' => 'upload', 'store' => true, 'container' => 'avatars']],
+                    ]]],
+                ],
+                [
+                    'id' => 'two',
+                    'sections' => [['fields' => $pageTwoFields]],
                 ],
             ],
         ]), fn ($f) => $f->save());

@@ -25,6 +25,7 @@ use Statamic\Fields\FieldsetRecursionStack;
 use Statamic\Http\Middleware\PingOutpost;
 use Statamic\Icons\IconManager;
 use Statamic\Jobs\DeletePartialFormSubmissions;
+use Statamic\Jobs\DeleteSpamFormSubmissions;
 use Statamic\Jobs\HandleEntrySchedule;
 use Statamic\Licensing\Radio;
 use Statamic\Notifications\ElevatedSessionVerificationCode;
@@ -156,6 +157,7 @@ class AppServiceProvider extends ServiceProvider
         }
 
         $this->app->make(Schedule::class)->job(DeletePartialFormSubmissions::class)->daily();
+        $this->app->make(Schedule::class)->job(DeleteSpamFormSubmissions::class)->daily();
 
         $this->app->make(Schedule::class)
             ->call(fn () => app(Radio::class)->ping())

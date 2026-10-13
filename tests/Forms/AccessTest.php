@@ -58,7 +58,7 @@ class AccessTest extends TestCase
             $submission = $form->makeSubmission()->id(Carbon::now()->timestamp - $this->submissionId++);
 
             if ($partial) {
-                $submission->set('partial', true);
+                $submission->asPartial();
             }
 
             if ($entry) {

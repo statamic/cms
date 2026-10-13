@@ -2,6 +2,8 @@
 
 namespace Statamic\Forms;
 
+use Illuminate\Support\Facades\Log;
+use InvalidArgumentException;
 use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\Facades;
 use Statamic\Fields\Blueprint;
@@ -15,18 +17,26 @@ class ConfigFields
     {
         $fields = static::fields();
 
+        $positions = Facades\Form::extraConfigPositionsFor($form->handle());
+
         foreach (Facades\Form::extraConfigFor($form->handle()) as $handle => $config) {
+            $before = $positions[$handle]['beforeSection'] ?? null;
+            $after = $positions[$handle]['afterSection'] ?? null;
             $merged = false;
 
             foreach ($fields as $sectionHandle => $section) {
                 if ($section['display'] == __($config['display'])) {
+                    if ($before || $after) {
+                        throw new InvalidArgumentException("The [{$config['display']}] section already exists, so beforeSection and afterSection can't be used.");
+                    }
+
                     $fields[$sectionHandle]['fields'] += $config['fields'];
                     $merged = true;
                 }
             }
 
             if (! $merged) {
-                $fields[$handle] = $config;
+                $fields = static::insertSection($fields, $handle, $config, $before, $after);
             }
         }
 
@@ -68,6 +78,19 @@ class ConfigFields
                     'honeypot' => [
                         'type' => 'text',
                         'instructions' => __('statamic::messages.form_configure_honeypot_instructions'),
+                    ],
+                    'honeypot_behavior' => [
+                        'display' => __('Honeypot Behavior'),
+                        'type' => 'button_group',
+                        'default' => 'ignore',
+                        'options' => [
+                            'ignore' => __('Ignore'),
+                            'mark_as_spam' => __('Save as Spam'),
+                        ],
+                        'if' => [
+                            'store' => 'equals true',
+                        ],
+                        'instructions' => __('statamic::messages.form_configure_honeypot_behavior_instructions'),
                     ],
                 ],
             ],
@@ -150,5 +173,43 @@ class ConfigFields
                 ],
             ],
         ];
+    }
+
+    private static function insertSection(array $sections, string $handle, array $section, ?string $before = null, ?string $after = null): array
+    {
+        if (isset($sections[$handle]) && ($before || $after)) {
+            Log::warning("Form config section [{$handle}] replaces an existing section, so its position was ignored.");
+        }
+
+        if (isset($sections[$handle]) || (! $before && ! $after)) {
+            $sections[$handle] = $section;
+
+            return $sections;
+        }
+
+        $result = [];
+        $inserted = false;
+
+        foreach ($sections as $existingHandle => $existing) {
+            if ($before === $existingHandle) {
+                $result[$handle] = $section;
+                $inserted = true;
+            }
+
+            $result[$existingHandle] = $existing;
+
+            if ($after === $existingHandle) {
+                $result[$handle] = $section;
+                $inserted = true;
+            }
+        }
+
+        if (! $inserted) {
+            Log::warning("Form config section [{$handle}] could not be placed relative to [".($before ?? $after).'] because it does not exist. Appending it instead.');
+
+            return $sections + [$handle => $section];
+        }
+
+        return $result;
     }
 }

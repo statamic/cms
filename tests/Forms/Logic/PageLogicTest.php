@@ -98,6 +98,19 @@ class PageLogicTest extends TestCase
     }
 
     #[Test]
+    public function it_routes_on_a_not_empty_condition()
+    {
+        $form = $this->form([
+            $this->page('one', [$this->rule('three', [$this->condition('interests', 'not', 'empty')])]),
+            $this->page('two'),
+            $this->page('three'),
+        ]);
+
+        $this->assertEquals('three', (new PageLogic($form))->nextPage('one', ['interests' => ['music']]));
+        $this->assertEquals('two', (new PageLogic($form))->nextPage('one', ['interests' => []]));
+    }
+
+    #[Test]
     public function the_first_matching_rule_wins()
     {
         $form = $this->form([

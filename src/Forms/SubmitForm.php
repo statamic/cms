@@ -3,6 +3,7 @@
 namespace Statamic\Forms;
 
 use Facades\Statamic\Fields\Validator as FieldValidator;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Traits\Localizable;
 use Illuminate\Validation\ValidationException;
 use Statamic\Contracts\Entries\Entry as EntryContract;
@@ -29,6 +30,7 @@ class SubmitForm
     protected ?string $page = null;
     protected ?string $entry = null;
     protected ?Submission $submission = null;
+    protected bool $retainedSpam = false;
 
     public function form(Form $form): static
     {
@@ -106,11 +108,20 @@ class SubmitForm
             }
 
             if ($this->shouldFinalize($nextPage)) {
-                throw_if(Arr::get($values, $this->form->honeypot()), new SilentFormFailureException);
-                throw_if(FormSubmitted::dispatch($this->submission) === false, new SilentFormFailureException);
+                if (Arr::get($values, $this->form->honeypot())) {
+                    $this->rejectHoneypotSubmission();
+                }
+
+                $accepted = FormSubmitted::dispatch($this->submission) !== false;
+
+                if ($this->submission->isSpam()) {
+                    $this->rejectSpamSubmission();
+                }
+
+                throw_unless($accepted, new SilentFormFailureException);
             }
         } catch (ValidationException|SilentFormFailureException $e) {
-            $this->removeUploadedAssets($uploadedAssets);
+            $this->cleanUpUploads($uploadedAssets);
 
             throw $e;
         }
@@ -211,11 +222,66 @@ class SubmitForm
             ->all();
     }
 
-    /**
-     * Remove any uploaded assets.
-     *
-     * Triggered by a validation exception or silent failure.
-     */
+    private function rejectHoneypotSubmission(): void
+    {
+        if ($this->form->get('honeypot_behavior', 'ignore') === 'mark_as_spam') {
+            $this->submission->markAsSpam();
+        }
+
+        $this->rejectSpamSubmission();
+    }
+
+    private function rejectSpamSubmission(): void
+    {
+        if ($this->form->store()) {
+            if ($this->submission->isSpam()) {
+                $this->submission->save();
+                $this->retainedSpam = true;
+            }
+        } elseif ($this->form->submission($this->submission->id())) {
+            $this->submission->deleteQuietly();
+        }
+
+        throw new SilentFormFailureException;
+    }
+
+    private function cleanUpUploads(array $uploads): void
+    {
+        $assets = $this->uploadsOfType($uploads, ['assets']);
+
+        $this->removeUploadedAssets($assets);
+
+        if ($this->retainedSpam) {
+            $this->forgetRemovedAssets($assets);
+
+            return;
+        }
+
+        $this->removeTemporaryUploads($uploads);
+    }
+
+    private function forgetRemovedAssets(array $assets): void
+    {
+        if (! $assets) {
+            return;
+        }
+
+        foreach (array_keys($assets) as $handle) {
+            $this->submission->remove($handle);
+        }
+
+        $this->submission->saveQuietly();
+    }
+
+    private function uploadsOfType(array $uploads, array $types): array
+    {
+        $fields = $this->form->blueprint()->fields()->all();
+
+        return collect($uploads)
+            ->filter(fn ($value, $handle) => in_array($fields->get($handle)?->type(), $types))
+            ->all();
+    }
+
     private function removeUploadedAssets(array $assets): void
     {
         collect($assets)
@@ -225,6 +291,29 @@ class SubmitForm
                     $asset->delete();
                 }
             });
+    }
+
+    private function removeTemporaryUploads(array $uploads): void
+    {
+        $disk = Storage::disk(config('statamic.system.file_uploads_disk', 'local'));
+        $formUploadsPath = config('statamic.forms.file_uploads_path', 'statamic/form-uploads');
+        $filesPath = config('statamic.system.file_uploads_path', 'statamic/file-uploads');
+
+        // A persisted partial may be resumed, and its earlier pages' uploads belong to it.
+        if ($this->form->submission($this->submission->id())) {
+            $this->temporaryPaths($uploads, 'form_upload')->each(fn ($path) => $disk->delete("{$formUploadsPath}/{$path}"));
+        } else {
+            $disk->deleteDirectory("{$formUploadsPath}/{$this->submission->id()}");
+        }
+
+        $this->temporaryPaths($uploads, 'files')->each(fn ($path) => $disk->delete("{$filesPath}/{$path}"));
+    }
+
+    private function temporaryPaths(array $uploads, string $type)
+    {
+        return collect($this->uploadsOfType($uploads, [$type]))
+            ->flatten()
+            ->filter(fn ($path) => is_string($path) && $path !== '' && ! str_contains($path, '..'));
     }
 
     public function validate(array $data, array $files = [], ?array $only = null): void

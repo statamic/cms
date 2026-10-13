@@ -13,6 +13,7 @@ use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Form;
 use Statamic\Forms\CreateAssetsFromFileUploads;
 use Statamic\Forms\Uploaders\FormFileUpload;
+use Statamic\Http\Middleware\DeleteTemporaryFileUploads;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -50,6 +51,39 @@ class CreateAssetsFromFileUploadsTest extends TestCase
         $this->assertIsString($newValue);
         $this->assertNotEquals($path, $newValue);
         $this->assertNotNull(Asset::find("avatars::{$newValue}"));
+    }
+
+    #[Test]
+    public function it_finalizes_spam_with_uploads_older_than_a_week_when_marked_as_not_spam()
+    {
+        Storage::fake('local');
+        $this->fakeAvatarsContainer();
+
+        $form = tap(Form::make('contact')->formFields([
+            'sections' => [
+                ['fields' => [
+                    ['handle' => 'avatar', 'field' => ['type' => 'upload', 'store' => true, 'container' => 'avatars', 'max_files' => 1]],
+                ]],
+            ],
+        ]))->save();
+
+        $submission = tap($form->makeSubmission()->asPartial()->markAsSpam())->save();
+
+        $path = FormFileUpload::field(['handle' => 'avatar', 'max_files' => 1], $submission->id())
+            ->upload([UploadedFile::fake()->image('avatar.jpg')]);
+
+        $submission->set('avatar', $path)->save();
+
+        touch(Storage::disk('local')->path('statamic/form-uploads/'.$path), now()->subWeeks(2)->timestamp);
+
+        (new \ReflectionMethod(DeleteTemporaryFileUploads::class, 'deleteFormUploadsOverAWeekOld'))
+            ->invoke(new DeleteTemporaryFileUploads);
+
+        $submission = $form->submission($submission->id());
+        $submission->markAsNotSpam()->finalize();
+
+        Storage::disk('avatars')->assertExists('avatar.jpg');
+        $this->assertNotNull(Asset::find('avatars::'.$form->submission($submission->id())->get('avatar')));
     }
 
     #[Test]

@@ -29,6 +29,7 @@ const selectedRatio = ref(null);
 const baseRatio = ref(null);
 const isFlipped = ref(false);
 const enterBinding = ref(null);
+const saveBinding = ref(null);
 const isOptionKeyPressed = ref(false);
 const initialCropBoxCenter = ref(null);
 const isAdjustingCropBox = ref(false);
@@ -375,6 +376,12 @@ function bindKeyboardShortcuts() {
         }
     });
 
+    // Cmd+S finishes the crop rather than saving and closing the asset editor underneath
+    saveBinding.value = keys.bindGlobal(['mod+s'], (e) => {
+        e.preventDefault();
+        if (cropper.value && !showConfirmation.value && !uploading.value) crop();
+    });
+
     // Track Option/Alt key for center-based resizing
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
@@ -400,6 +407,10 @@ function unbindKeyboardShortcuts() {
     if (enterBinding.value) {
         enterBinding.value.destroy();
         enterBinding.value = null;
+    }
+    if (saveBinding.value) {
+        saveBinding.value.destroy();
+        saveBinding.value = null;
     }
     // Remove Option/Alt key listeners
     window.removeEventListener('keydown', handleKeyDown);
