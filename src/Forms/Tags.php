@@ -100,7 +100,9 @@ class Tags extends BaseTags
             $data['previous_page_url'] = $this->previousPageUrl();
         }
 
-        $instance = $form->instance($this->context->value('id'));
+        $entry = $this->submittableEntry($form);
+
+        $instance = $form->instance($entry);
 
         $data['restricted'] = $instance->restricted();
         $data['restriction_message'] = $instance->restrictionMessage();
@@ -147,7 +149,7 @@ class Tags extends BaseTags
             $params['page'] = Arr::get($this->currentPage(), 'id');
         }
 
-        if ($entry = $this->submittableEntry($instance)) {
+        if ($entry) {
             $params['entry'] = $entry;
         }
 
@@ -175,9 +177,9 @@ class Tags extends BaseTags
         return $html;
     }
 
-    private function submittableEntry(Instance $instance): ?string
+    private function submittableEntry(FormContract $form): ?string
     {
-        if (! $id = $instance->entry()) {
+        if (! $form->hasUniqueInstances() || ! $id = $this->context->value('id')) {
             return null;
         }
 
@@ -185,7 +187,7 @@ class Tags extends BaseTags
             return null;
         }
 
-        return FormFieldValues::on($entry)->references($instance->form()->handle()) ? $id : null;
+        return FormFieldValues::on($entry)->references($form->handle()) ? $id : null;
     }
 
     /**

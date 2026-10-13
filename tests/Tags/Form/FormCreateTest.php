@@ -108,6 +108,37 @@ class FormCreateTest extends FormTestCase
         $this->assertStringNotContainsString('name="_entry"', $output);
     }
 
+    #[Test]
+    public function it_uses_form_level_restrictions_when_the_entry_doesnt_use_the_form()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        $form = Form::find('contact');
+        $form->set('unique_instances', true);
+        $form->set('submission_limit', 1);
+        $form->makeSubmission()->set('_entry', 'event-2')->save();
+
+        $this->makeEntry('event-1', ['form' => 'another_form', 'config' => []]);
+
+        $output = $this->tag('{{ form:contact }}{{ status }}{{ /form:contact }}', ['id' => 'event-1']);
+
+        $this->assertStringContainsString('limit_reached', $output);
+    }
+
+    #[Test]
+    public function it_uses_entry_restrictions_when_the_entry_uses_the_form()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        Form::find('contact')->set('unique_instances', true);
+
+        $this->makeEntry('event-1', ['form' => 'contact', 'config' => ['close_date' => '2000-01-01']]);
+
+        $output = $this->tag('{{ form:contact }}{{ restricted }}|{{ status }}{{ /form:contact }}', ['id' => 'event-1']);
+
+        $this->assertStringContainsString('|closed', $output);
+    }
+
     private function makeEntry(string $id, array $formValue): void
     {
         Blueprint::make('event')->setNamespace('collections.events')->setContents(['fields' => [
