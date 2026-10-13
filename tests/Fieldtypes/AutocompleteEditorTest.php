@@ -7,6 +7,7 @@ use Statamic\Facades\Antlers;
 use Statamic\Fields\Field;
 use Statamic\Fields\Value;
 use Statamic\Fieldtypes\AutocompleteEditor;
+use Statamic\Fieldtypes\AutocompleteEditor\Mentions;
 use Tests\TestCase;
 
 class AutocompleteEditorTest extends TestCase
@@ -211,6 +212,71 @@ class AutocompleteEditorTest extends TestCase
             'Hi {{ first_name }}',
             (string) Antlers::parse('{{ test }}', ['test' => $value, 'first_name' => 'John'])
         );
+    }
+
+    #[Test]
+    public function an_escaped_literal_survives_augmenting_while_a_real_mention_resolves()
+    {
+        $fieldtype = $this->fieldtype();
+
+        $html = $fieldtype->augment('Hi [[ first_name ]], type \\[\\[ first_name \\]\\] literally');
+
+        $this->assertSame(
+            "<p>Hi John, type [[ first_name ]] literally</p>\n",
+            html_entity_decode(Mentions::replace($html, ['first_name' => 'John']))
+        );
+        $this->assertStringContainsString('type &#91;&#91; first_name ]] literally', $html);
+        $this->assertStringContainsString('Hi [[ first_name ]],', $html);
+    }
+
+    #[Test]
+    public function an_escaped_literal_survives_augmenting_when_inline()
+    {
+        $fieldtype = $this->fieldtype(['inline' => true]);
+
+        $html = $fieldtype->augment('[[ a ]] \\[\\[ a \\]\\] **[[ a ]]**');
+
+        $this->assertSame('1 &#91;&#91; a ]] <strong>1</strong>', Mentions::replace($html, ['a' => '1']));
+    }
+
+    #[Test]
+    public function an_escaped_literal_survives_antlers_and_mention_replacement()
+    {
+        $fieldtype = $this->fieldtype(['antlers' => true, 'inline' => true]);
+
+        $value = new Value('Hi [[ name ]] \\[\\[ name \\]\\] {{ other }}', 'test', $fieldtype);
+
+        $parsed = (string) Antlers::parse('{{ test }}', ['test' => $value, 'other' => 'X']);
+
+        $this->assertSame('Hi John &#91;&#91; name ]] X', Mentions::replace($parsed, ['name' => 'John']));
+    }
+
+    #[Test]
+    public function mention_tokens_keep_their_original_spacing_and_work_in_links_and_code()
+    {
+        $fieldtype = $this->fieldtype(['inline' => true]);
+
+        $html = $fieldtype->augment('[[a]] [[   b   ]] [x]([[ c ]]) `[[ d ]]`');
+
+        $this->assertSame('[[a]] [[   b   ]] <a href="[[ c ]]">x</a> <code>[[ d ]]</code>', $html);
+    }
+
+    #[Test]
+    public function an_escaped_backslash_before_a_real_token_still_resolves()
+    {
+        $fieldtype = $this->fieldtype(['inline' => true]);
+
+        $html = $fieldtype->augment('\\\\[[ a ]]');
+
+        $this->assertSame('\\1', Mentions::replace($html, ['a' => '1']));
+    }
+
+    #[Test]
+    public function text_resembling_the_sentinel_is_left_alone()
+    {
+        $fieldtype = $this->fieldtype(['inline' => true]);
+
+        $this->assertSame('mentionabcn0e [[ a ]]', $fieldtype->augment('mentionabcn0e [[ a ]]'));
     }
 
     private function fieldtype($config = [])

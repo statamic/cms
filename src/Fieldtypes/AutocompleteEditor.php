@@ -4,6 +4,7 @@ namespace Statamic\Fieldtypes;
 
 use Statamic\Facades\Markdown;
 use Statamic\Fields\Fieldtype;
+use Statamic\Fieldtypes\AutocompleteEditor\Mentions;
 use Statamic\Support\Arr;
 
 use function Statamic\trans as __;
@@ -123,7 +124,28 @@ class AutocompleteEditor extends Fieldtype
             return null;
         }
 
-        $html = Markdown::parser('default')->parse((string) $value);
+        $value = (string) $value;
+        $mentions = [];
+
+        // An author's literal `\[\[ x \]\]` renders to `[[ x ]]`, which would be
+        // indistinguishable from a real mention in the HTML. Real tokens are swapped
+        // for alphanumeric sentinels (inert to the markdown parser) and the literals
+        // that remain get their brackets encoded so Mentions::replace() skips them.
+        do {
+            $nonce = bin2hex(random_bytes(8));
+        } while (str_contains($value, $nonce));
+
+        $value = preg_replace_callback(Mentions::TOKEN, function ($matches) use (&$mentions, $nonce) {
+            $sentinel = 'mention'.$nonce.'n'.count($mentions).'e';
+            $mentions[$sentinel] = $matches[0];
+
+            return $sentinel;
+        }, $value);
+
+        $html = Markdown::parser('default')->parse($value);
+
+        $html = str_replace('[[', '&#91;&#91;', $html);
+        $html = strtr($html, $mentions);
 
         return $this->config('inline') ? $this->unwrapParagraph($html) : $html;
     }
