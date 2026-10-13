@@ -46,9 +46,16 @@ return [
         | Save Cached Images
         |--------------------------------------------------------------------------
         |
-        | Enabling this will make Glide save publicly accessible images. It will
-        | increase performance at the cost of the dynamic nature of HTTP based
-        | image manipulation. You will need to invalidate images manually.
+        | This controls how manipulated images are cached and served.
+        |
+        | false  - Images are generated on each HTTP request via Glide routes.
+        | true   - Images are eagerly generated during template rendering and
+        |          saved to a publicly accessible location.
+        | 'hybrid' - Images are generated on-demand on the first HTTP request,
+        |          then saved to a publicly accessible location so the web
+        |          server can serve them directly on subsequent requests.
+        |
+        | When using true or 'hybrid', you should configure the cache_path below.
         |
         */
 

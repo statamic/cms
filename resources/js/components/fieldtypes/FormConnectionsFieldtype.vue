@@ -3,12 +3,12 @@ import { computed, ref, watch } from 'vue';
 import axios from 'axios';
 import Fieldtype from '@/components/fieldtypes/fieldtype.js';
 import { Badge, Button, Card, Stack, ToggleGroup, ToggleItem } from '@/components/ui';
-import ConnectionsListing, { View } from '@/components/forms/connections/ConnectionsListing.vue';
+import ConnectorsListing, { View } from '@/components/forms/connections/ConnectorsListing.vue';
 import ConnectionEditor from '@/components/forms/connections/ConnectionEditor.vue';
 import clone from '@/util/clone.js';
 import { preferences } from '@api';
 
-type ConnectionType = {
+type ConnectorType = {
     handle: string;
     title: string;
     description: string;
@@ -18,7 +18,7 @@ type ConnectionType = {
     action: string;
 }
 
-type ConnectionComponent = {
+type ConnectorComponent = {
     name: string;
     props: Record<string, unknown>;
 }
@@ -38,22 +38,22 @@ const view = ref<View>(preferences.get('forms.connect.view', View.Grid));
 watch(view, (view: View) => preferences.set('forms.connect.view', view));
 
 const form = computed(() => props.meta.form ?? {});
-const types = computed<ConnectionType[]>(() => props.meta.types ?? []);
-const components = computed<Record<string, ConnectionComponent>>(() => props.meta.components ?? {});
+const types = computed<ConnectorType[]>(() => props.meta.types ?? []);
+const components = computed<Record<string, ConnectorComponent>>(() => props.meta.components ?? {});
 
-const connections = computed(() => {
+const connectors = computed(() => {
     return types.value.map((type) => ({
         ...type,
         count: (props.value?.[type.handle] ?? []).length,
     }));
 });
 
-const totalConfigured = computed(() => connections.value.reduce((total, c) => total + c.count, 0));
+const totalConfigured = computed(() => connectors.value.reduce((total, c) => total + c.count, 0));
 
-const connection = computed(() => types.value.find((type) => type.handle === editingHandle.value));
+const connector = computed(() => types.value.find((type) => type.handle === editingHandle.value));
 const component = computed(() => editingHandle.value ? components.value[editingHandle.value] : null);
 
-function selectConnection(handle: string) {
+function selectConnector(handle: string) {
     draft.value = clone(props.value?.[handle] ?? []);
     errors.value = {};
     editingHandle.value = handle;
@@ -65,13 +65,13 @@ function closeEditor() {
     errors.value = {};
 }
 
-function applyConnection() {
-    if (saving.value || !connection.value) return;
+function applyConnector() {
+    if (saving.value || !connector.value) return;
 
     errors.value = {};
     saving.value = true;
 
-    axios.patch(`${connection.value.action}?_save=false`, draft.value)
+    axios.patch(`${connector.value.action}?_save=false`, draft.value)
         .then(({ data }) => {
             update({ ...(props.value ?? {}), [editingHandle.value]: data });
             closeEditor();
@@ -104,7 +104,7 @@ defineExpose(expose);
         </template>
 
         <Card :class="{ 'p-0!': view === View.List }">
-            <ConnectionsListing :connections :linkable="false" :view @select="selectConnection" />
+            <ConnectorsListing :connectors :linkable="false" :view @select="selectConnector" />
         </Card>
 
         <template #footer-end>
@@ -112,12 +112,12 @@ defineExpose(expose);
         </template>
     </Stack>
 
-    <Stack :open="!!editingHandle" size="half" :title="connection ? __(connection.title) : ''" @update:open="closeEditor">
+    <Stack :open="!!editingHandle" size="half" :title="connector ? __(connector.title) : ''" @update:open="closeEditor">
         <ConnectionEditor v-if="component" :form :component :errors v-model="draft" />
 
         <template #footer-end>
             <Button variant="ghost" :text="__('Cancel')" :disabled="saving" @click="closeEditor" />
-            <Button variant="primary" :text="__('Apply')" :loading="saving" @click="applyConnection" />
+            <Button variant="primary" :text="__('Apply')" :loading="saving" @click="applyConnector" />
         </template>
     </Stack>
 </template>

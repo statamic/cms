@@ -7,9 +7,12 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Statamic\Contracts\Forms\Submission;
-use Statamic\Forms\Connections\ConnectionLogic;
+use Statamic\Forms\Connectors\ConnectionLogic;
 use Statamic\Sites\Site;
 
+/**
+ * @deprecated Use the jobs returned by Statamic\Forms\Connectors\Email::finalized() instead, one per email.
+ */
 class SendEmails implements ShouldQueue
 {
     use Dispatchable, Queueable, SerializesModels;

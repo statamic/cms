@@ -4,9 +4,9 @@ namespace Statamic\Fieldtypes;
 
 use Statamic\Contracts\Forms\Form;
 use Statamic\Facades\Form as Forms;
-use Statamic\Facades\FormConnection;
+use Statamic\Facades\FormConnector;
 use Statamic\Fields\Fieldtype;
-use Statamic\Forms\Connections\Connection;
+use Statamic\Forms\Connectors\Connector;
 
 use function Statamic\trans as __;
 
@@ -20,17 +20,17 @@ class FormConnections extends Fieldtype
 
         return [
             'form' => ['handle' => $form->handle(), 'title' => __($form->title())],
-            'types' => FormConnection::all()->map(fn (Connection $connection): array => [
-                'handle' => $connection->handle(),
-                'title' => $connection->title(),
-                'description' => $connection->description(),
-                'icon' => $connection->icon(),
-                'developer' => $connection->developer(),
-                'count' => $connection->count($form),
-                'action' => cp_route('forms.connect.update', [$form->handle(), $connection->handle()]),
+            'types' => FormConnector::all()->map(fn (Connector $connector): array => [
+                'handle' => $connector->handle(),
+                'title' => $connector->title(),
+                'description' => $connector->description(),
+                'icon' => $connector->icon(),
+                'developer' => $connector->developer(),
+                'count' => $connector->forForm($form)->count(),
+                'action' => cp_route('forms.connect.update', [$form->handle(), $connector->handle()]),
             ])->values()->all(),
-            'components' => FormConnection::all()->mapWithKeys(fn (Connection $connection): array => [
-                $connection->handle() => $connection->render($form),
+            'components' => FormConnector::all()->mapWithKeys(fn (Connector $connector): array => [
+                $connector->handle() => $connector->forForm($form)->render(),
             ])->all(),
         ];
     }
@@ -40,7 +40,7 @@ class FormConnections extends Fieldtype
         $form = $this->form();
 
         return collect($value)
-            ->map(fn ($config, $handle) => FormConnection::find($handle)?->preProcess($config, $form))
+            ->map(fn ($config, $handle) => FormConnector::find($handle)?->setForm($form)->preProcess(Connector::normalizeConnections($config)))
             ->filter()
             ->all();
     }
@@ -50,7 +50,7 @@ class FormConnections extends Fieldtype
         $form = $this->form();
 
         $processed = collect($value)
-            ->map(fn ($config, $handle) => FormConnection::find($handle)?->process($config, $form))
+            ->map(fn ($config, $handle) => FormConnector::find($handle)?->setForm($form)->process(Connector::normalizeConnections($config)))
             ->filter()
             ->all();
 

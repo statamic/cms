@@ -2,7 +2,29 @@
 
 namespace Statamic\Widgets;
 
-/** @deprecated Use \Statamic\Support\VueComponent instead. */
-class VueComponent extends \Statamic\Support\VueComponent
+use Illuminate\Contracts\Support\Arrayable;
+
+/**
+ * @deprecated Use \Statamic\Support\VueComponent instead.
+ *
+ * @phpstan-consistent-constructor
+ */
+class VueComponent implements Arrayable
 {
+    public function __construct(private string $name, private array $props = [])
+    {
+    }
+
+    public static function render($name, $props = [])
+    {
+        return new static($name, $props);
+    }
+
+    public function toArray()
+    {
+        return [
+            'name' => $this->name,
+            'props' => $this->props,
+        ];
+    }
 }

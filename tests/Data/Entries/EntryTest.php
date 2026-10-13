@@ -1359,6 +1359,25 @@ class EntryTest extends TestCase
     }
 
     #[Test]
+    public function unsaved_entries_in_different_collections_do_not_share_a_blueprint()
+    {
+        BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
+            'post' => $post = (new Blueprint)->setHandle('post'),
+        ]));
+        BlueprintRepository::shouldReceive('in')->with('collections/products')->andReturn(collect([
+            'product' => $product = (new Blueprint)->setHandle('product'),
+        ]));
+        $blog = tap(Collection::make('blog'))->save();
+        $products = tap(Collection::make('products'))->save();
+
+        $blogEntry = (new Entry)->collection($blog);
+        $productEntry = (new Entry)->collection($products);
+
+        $this->assertSame($post, $blogEntry->blueprint());
+        $this->assertSame($product, $productEntry->blueprint());
+    }
+
+    #[Test]
     public function the_blueprint_is_blinked_when_getting_and_flushed_when_setting()
     {
         $collection = Mockery::mock(Collection::make('blog'));
@@ -2154,6 +2173,7 @@ class EntryTest extends TestCase
         $blueprint = tap(Blueprint::make('standard_article')->setNamespace('collections.articles'))->save();
 
         $articleEntry = Entry::make('test')->collection($articles)->blueprint($blueprint->handle());
+        tap(Blueprint::make('standard_article')->setNamespace('collections.pages'))->save();
         $pageEntry = Entry::make('test')->collection($pages)->blueprint($blueprint->handle());
 
         // mapped collection uses the mapped prefix instead of the collection handle

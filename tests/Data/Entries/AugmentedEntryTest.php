@@ -251,4 +251,22 @@ class AugmentedEntryTest extends AugmentedTestCase
         $augmented->get('computed');
         $this->assertEquals(2, $computedCallbackCount);
     }
+
+    #[Test]
+    public function it_gets_a_field_whose_name_matches_a_non_public_method_on_the_entry()
+    {
+        $blueprint = Blueprint::makeFromFields([
+            'cp_url' => ['type' => 'text'],
+        ])->setHandle('test');
+        Blueprint::shouldReceive('in')->with('collections/test')->andReturn(collect(['test' => $blueprint]));
+
+        tap(Collection::make('test'))->save();
+
+        $entry = EntryFactory::collection('test')
+            ->slug('entry-slug')
+            ->data(['cp_url' => 'the stored value'])
+            ->create();
+
+        $this->assertEquals('the stored value', $entry->augmentedValue('cp_url')->value());
+    }
 }

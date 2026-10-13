@@ -7,7 +7,7 @@ use Inertia\Inertia;
 use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\CP\Column;
 use Statamic\Facades\Form;
-use Statamic\Facades\FormConnection;
+use Statamic\Facades\FormConnector;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Forms\ConfigFields;
@@ -51,7 +51,7 @@ class FormsController extends CpController
                     'title' => __($form->title()),
                     'status' => $form->status(),
                     'submissions' => $canViewSubmissions ? $form->querySubmissions()->where('site', Site::selected())->whereNull('partial')->count() : null,
-                    'connections' => $canEdit ? FormConnection::all()->sum(fn ($connection) => $connection->count($form) ?? 0) : null,
+                    'connections' => $canEdit ? FormConnector::all()->sum(fn ($connector) => $connector->forForm($form)->count() ?? 0) : null,
                     'show_url' => $form->showUrl(),
                     'submissions_url' => $form->submissionsUrl(),
                     'connect_url' => cp_route('forms.connect.index', $form->handle()),

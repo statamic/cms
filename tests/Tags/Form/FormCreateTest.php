@@ -14,7 +14,7 @@ use Statamic\Facades\Blueprint;
 use Statamic\Facades\Fieldset as FieldsetRepository;
 use Statamic\Facades\Form;
 use Statamic\Fields\Fieldset;
-use Statamic\Forms\SendEmails;
+use Statamic\Forms\SendEmail;
 use Statamic\Statamic;
 use Tests\Factories\EntryFactory;
 
@@ -1853,7 +1853,7 @@ EOT
             ->assertHeader('Precognition-Success', 'true');
 
         $this->assertEmpty(Form::find('contact')->submissions());
-        Bus::assertNotDispatched(SendEmails::class);
+        Bus::assertNotDispatched(SendEmail::class);
     }
 
     #[Test]

@@ -3,12 +3,13 @@
 namespace Statamic\Http\Controllers\CP\Forms;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Statamic\Contracts\Forms\Form;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Fields\Field;
-use Statamic\Forms\Connections\Email as EmailConnection;
+use Statamic\Forms\Connectors\Email as EmailConnector;
 use Statamic\Forms\Email;
 use Statamic\Forms\FakeSubmissionGenerator;
 use Statamic\Http\Controllers\CP\CpController;
@@ -16,9 +17,13 @@ use Statamic\Support\Arr;
 
 class EmailConnectionPreviewController extends CpController
 {
-    public function __invoke(Request $request, $form, EmailConnection $connection, FakeSubmissionGenerator $generator)
+    public function __invoke(Request $request, $form, EmailConnector $connector, FakeSubmissionGenerator $generator)
     {
-        $config = $connection->process([$request->all()], $form)[0];
+        $connector->setForm($form);
+
+        Validator::make([$request->all()], $connector->rules())->validate();
+
+        $config = $connector->process([$request->all()])[0];
         $latest = $this->latestSubmission($form);
         $submission = $latest ?? $this->sampleSubmission($form, $generator);
         $email = new Email($submission, $config, $submission->site());

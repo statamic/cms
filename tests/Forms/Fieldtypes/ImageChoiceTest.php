@@ -5,8 +5,11 @@ namespace Tests\Forms\Fieldtypes;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\ImageChoice as ImageChoiceFieldtype;
+use Statamic\Forms\Charts\HorizontalBar;
 use Statamic\Forms\Fields\FormField;
+use Statamic\Forms\Fields\FormValueType;
 use Statamic\Forms\Fieldtypes\ImageChoice as ImageChoiceFormFieldtype;
+use Statamic\Forms\Summary\FieldResponses;
 use Tests\TestCase;
 
 class ImageChoiceTest extends TestCase
@@ -115,5 +118,51 @@ class ImageChoiceTest extends TestCase
         ]));
 
         $this->assertSame('16/9', $invalid->toFieldArray()['aspect_ratio']);
+    }
+
+    #[Test]
+    public function it_defaults_to_a_bar_chart()
+    {
+        $this->assertEquals(HorizontalBar::class, (new ImageChoiceFormFieldtype)->defaultChart());
+    }
+
+    #[Test]
+    public function it_stores_a_single_choice_when_not_multiple()
+    {
+        $fieldtype = (new ImageChoiceFormFieldtype)->setField(new FormField('field', ['type' => 'image_choice', 'multiple' => false]));
+
+        $this->assertSame(FormValueType::Choice, $fieldtype->valueType());
+    }
+
+    #[Test]
+    public function it_stores_multiple_choices_when_multiple()
+    {
+        $fieldtype = (new ImageChoiceFormFieldtype)->setField(new FormField('field', ['type' => 'image_choice', 'multiple' => true]));
+
+        $this->assertSame(FormValueType::Choices, $fieldtype->valueType());
+    }
+
+    #[Test]
+    public function it_returns_its_options_as_chart_options_with_images_and_badges()
+    {
+        $fieldtype = (new ImageChoiceFormFieldtype)->setField(new FormField('animal', [
+            'type' => 'image_choice',
+            'options' => [
+                ['key' => 'cat', 'label' => 'Cat', 'image' => 'https://example.com/cat.jpg'],
+                ['key' => 'dog', 'label' => 'Dog', 'image' => 'https://example.com/dog.jpg'],
+            ],
+        ]));
+
+        $options = $fieldtype->chartOptions($this->responses([]));
+
+        $this->assertEquals(['cat', 'dog'], $options->map->key->all());
+        $this->assertEquals(['Cat', 'Dog'], $options->map->label->all());
+        $this->assertEquals(['https://example.com/cat.jpg', 'https://example.com/dog.jpg'], $options->map->image->all());
+        $this->assertEquals(['A', 'B'], $options->map->badge->all());
+    }
+
+    private function responses(iterable $values): FieldResponses
+    {
+        return FieldResponses::fromValues(new FormField('field', ['type' => 'image_choice']), $values);
     }
 }

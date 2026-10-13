@@ -19,9 +19,10 @@ use Statamic\Events\SubmissionSaving;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
 use Statamic\Facades\Site;
-use Statamic\Forms\Connections\Webhooks\SendWebhook;
+use Statamic\Forms\Connectors\Webhooks\SendWebhook;
 use Statamic\Forms\CreateAssetsFromFileUploads;
 use Statamic\Forms\DeleteTemporaryFiles;
+use Statamic\Forms\SendEmail;
 use Statamic\Forms\SendEmails;
 use Tests\Factories\EntryFactory;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -468,12 +469,12 @@ class SubmissionTest extends TestCase
     }
 
     #[Test]
-    public function finalizing_chains_various_jobs()
+    public function finalizing_dispatches_each_connection_job_independently()
     {
         Bus::fake();
 
         $form = tap(Form::make('contact_us')->connections([
-            'email' => [['to' => 'test@example.com']],
+            'email' => [['to' => 'test@example.com'], ['to' => 'test2@example.com']],
             'webhook' => [['url' => 'https://example.com/webhook'], ['url' => 'https://example.com/webhook2']],
         ])->formFields([
             'fields' => [
@@ -484,13 +485,14 @@ class SubmissionTest extends TestCase
         $form->makeSubmission()->asPartial()->finalize();
 
         Bus::assertDispatchedSync(CreateAssetsFromFileUploads::class);
+        Bus::assertDispatchedTimes(SendEmail::class, 2);
+        Bus::assertDispatchedTimes(SendWebhook::class, 2);
+        Bus::assertDispatchedWithoutChain(SendEmail::class);
+        Bus::assertDispatchedWithoutChain(SendWebhook::class);
+        Bus::assertNotDispatched(SendEmails::class);
 
-        Bus::assertChained([
-            SendEmails::class,
-            SendWebhook::class,
-            SendWebhook::class,
-            DeleteTemporaryFiles::class,
-        ]);
+        // Cleanup waits for the connection jobs to count down.
+        Bus::assertNotDispatched(DeleteTemporaryFiles::class);
     }
 
     #[Test]
@@ -514,9 +516,8 @@ class SubmissionTest extends TestCase
 
         $form->makeSubmission()->set('entry', 'event-1')->asPartial()->finalize();
 
-        Bus::assertChained([
-            fn (SendWebhook $job) => $job->config['url'] === $expectedUrl,
-        ]);
+        Bus::assertDispatchedTimes(SendWebhook::class, 1);
+        Bus::assertDispatched(SendWebhook::class, fn (SendWebhook $job) => $job->config['url'] === $expectedUrl);
     }
 
     public static function connectionOverrideProvider(): array
@@ -536,17 +537,31 @@ class SubmissionTest extends TestCase
     }
 
     #[Test]
-    public function finalizing_without_connections_or_uploads_doesnt_chain_anything()
+    public function finalizing_with_uploads_but_no_connection_jobs_dispatches_the_cleanup_immediately()
     {
-        // Not faking the bus, so an empty chain would blow up on a null first job.
+        Bus::fake();
+
+        $form = tap(Form::make('contact_us')->formFields([
+            'fields' => [
+                ['handle' => 'document', 'field' => ['type' => 'form_upload', 'store' => false]],
+            ],
+        ]))->save();
+
+        $form->makeSubmission()->asPartial()->finalize();
+
+        Bus::assertDispatched(DeleteTemporaryFiles::class);
+    }
+
+    #[Test]
+    public function finalizing_without_connections_or_uploads_doesnt_dispatch_anything()
+    {
         Queue::fake();
 
         $form = tap(Form::make('contact_us'))->save();
 
         $form->makeSubmission()->asPartial()->finalize();
 
-        Queue::assertPushed(CreateAssetsFromFileUploads::class);
-        Queue::assertCount(1);
+        Queue::assertNothingPushed();
     }
 
     #[Test]

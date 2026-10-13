@@ -410,22 +410,38 @@ class FormTest extends TestCase
     }
 
     #[Test]
-    public function it_assigns_ids_to_connection_rows_when_setting()
+    public function it_assigns_ids_to_connections_when_setting()
     {
         $form = Form::make('contact_us')->connections([
             'webhook' => [['url' => 'https://example.com/hook'], ['id' => 'abc', 'url' => 'https://example.com/other']],
-            'acme' => ['token' => 'secret'],
         ]);
 
         $webhooks = $form->connections()->get('webhook');
 
         $this->assertNotEmpty($webhooks[0]['id']);
         $this->assertEquals('abc', $webhooks[1]['id']);
-        $this->assertEquals(['token' => 'secret'], $form->connections()->get('acme'));
     }
 
     #[Test]
-    public function it_assigns_ids_to_connection_rows_when_hydrating()
+    public function it_normalizes_connection_configs_into_lists_of_connections_when_setting()
+    {
+        $form = Form::make('contact_us')->connections([
+            'acme' => ['token' => 'secret'],
+            'webhook' => [['url' => 'https://example.com/hook'], 'nope', null],
+            'other' => 'nope',
+        ]);
+
+        $connections = $form->connections()->map(fn ($list) => array_map(fn ($connection) => Arr::except($connection, 'id'), $list))->all();
+
+        $this->assertSame([
+            'acme' => [['token' => 'secret']],
+            'webhook' => [['url' => 'https://example.com/hook']],
+            'other' => [],
+        ], $connections);
+    }
+
+    #[Test]
+    public function it_assigns_ids_to_connections_when_hydrating()
     {
         File::put(Form::make('contact_us')->path(), YAML::dump([
             'title' => 'Contact Us',
@@ -480,7 +496,7 @@ class FormTest extends TestCase
 
         $form->connections(['email' => [['to' => 'foo@bar.com']]]);
 
-        $this->assertEquals([['to' => 'foo@bar.com']], collect($form->email())->map(fn ($config) => Arr::except($config, 'id'))->all());
+        $this->assertEquals([['to' => 'foo@bar.com']], $form->email());
     }
 
     #[Test]
@@ -492,7 +508,7 @@ class FormTest extends TestCase
 
         $this->assertEquals(['webhook', 'email'], $form->connections()->keys()->all());
         $this->assertEquals([['url' => 'https://example.com/hook']], array_map(fn ($config) => Arr::except($config, 'id'), $form->connections()->get('webhook')));
-        $this->assertEquals([['to' => 'foo@bar.com']], collect($form->email())->map(fn ($config) => Arr::except($config, 'id'))->all());
+        $this->assertEquals([['to' => 'foo@bar.com']], $form->email());
     }
 
     #[Test]
@@ -500,7 +516,7 @@ class FormTest extends TestCase
     {
         $form = Form::make('contact_us')->email([['to' => 'foo@bar.com'], ['to' => 'baz@qux.com']]);
 
-        $ids = collect($form->email())->pluck('id');
+        $ids = collect($form->connections()->get('email'))->pluck('id');
 
         $this->assertCount(2, $ids->filter()->unique());
     }
@@ -510,7 +526,7 @@ class FormTest extends TestCase
     {
         $form = Form::make('contact_us')->email([['id' => 'abc', 'to' => 'foo@bar.com']]);
 
-        $this->assertEquals('abc', $form->email()[0]['id']);
+        $this->assertEquals('abc', $form->connections()->get('email')[0]['id']);
     }
 
     #[Test]
@@ -518,7 +534,7 @@ class FormTest extends TestCase
     {
         $form = Form::make('contact_us')->email(['to' => 'foo@bar.com']);
 
-        $this->assertEquals([['to' => 'foo@bar.com']], collect($form->email())->map(fn ($config) => Arr::except($config, 'id'))->all());
+        $this->assertEquals([['to' => 'foo@bar.com']], $form->email());
     }
 
     #[Test]
@@ -537,6 +553,43 @@ class FormTest extends TestCase
         $this->assertCount(1, $saved['connections']['email']);
         $this->assertNotEmpty($saved['connections']['email'][0]['id']);
         $this->assertEquals('foo@bar.com', $saved['connections']['email'][0]['to']);
+        $this->assertArrayNotHasKey('email', $saved);
+    }
+
+    #[Test]
+    public function it_does_not_save_empty_connection_lists()
+    {
+        $form = Form::make('contact_us')->connections([
+            'email' => [],
+            'webhook' => [['url' => 'https://example.com/hook']],
+        ]);
+        $form->save();
+
+        $saved = YAML::parse(File::get($form->path()));
+
+        $this->assertEquals(['webhook'], array_keys($saved['connections']));
+
+        $form->connections(['email' => [], 'webhook' => []])->save();
+
+        $saved = YAML::parse(File::get($form->path()));
+
+        $this->assertArrayNotHasKey('connections', $saved);
+    }
+
+    #[Test]
+    public function saving_a_legacy_form_drops_empty_email_config()
+    {
+        File::put(Form::make('contact_us')->path(), YAML::dump([
+            'title' => 'Contact Us',
+            'email' => [],
+        ]));
+
+        $form = Form::find('contact_us');
+        $form->save();
+
+        $saved = YAML::parse(File::get($form->path()));
+
+        $this->assertArrayNotHasKey('connections', $saved);
         $this->assertArrayNotHasKey('email', $saved);
     }
 
@@ -581,5 +634,37 @@ class FormTest extends TestCase
         $saved = YAML::parse(File::get($form->path()));
 
         $this->assertArrayNotHasKey('connections', $saved);
+    }
+
+    #[Test]
+    public function it_saves_charts_to_yaml_and_hydrates_them_back()
+    {
+        $charts = [
+            ['field' => 'color', 'chart' => 'pie'],
+            ['field' => 'rating', 'chart' => 'horizontal_bar'],
+        ];
+
+        $form = tap(Form::make('contact_us')->charts($charts))->save();
+
+        $this->assertEquals($charts, YAML::parse(File::get($form->path()))['charts']);
+        $this->assertEquals($charts, Form::find('contact_us')->charts());
+    }
+
+    #[Test]
+    public function it_saves_an_explicitly_emptied_charts_list()
+    {
+        $form = tap(Form::make('contact_us')->charts([]))->save();
+
+        $this->assertEquals([], YAML::parse(File::get($form->path()))['charts']);
+        $this->assertEquals([], Form::find('contact_us')->charts());
+    }
+
+    #[Test]
+    public function it_doesnt_save_charts_when_never_configured()
+    {
+        $form = tap(Form::make('contact_us'))->save();
+
+        $this->assertArrayNotHasKey('charts', YAML::parse(File::get($form->path())));
+        $this->assertNull(Form::find('contact_us')->charts());
     }
 }

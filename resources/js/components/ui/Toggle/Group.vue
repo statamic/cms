@@ -18,6 +18,7 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue']);
 
 const toggleState = ref(props.modelValue ?? (props.multiple ? [] : null));
+const hasInteracted = ref(false);
 
 watch(
     () => props.modelValue,
@@ -58,6 +59,14 @@ function updateModelValue(value) {
         emit('update:modelValue', value);
     }
 }
+
+function markUserInteraction(event) {
+    if (event.type === 'keydown' && ! ['Enter', ' ', 'Spacebar'].includes(event.key)) {
+        return;
+    }
+
+    hasInteracted.value = true;
+}
 </script>
 
 <template>
@@ -65,7 +74,10 @@ function updateModelValue(value) {
         :type="multiple ? 'multiple' : 'single'"
         :class="groupClasses"
         data-ui-toggle-group
+        :data-ui-toggle-group-interacted="hasInteracted ? '' : null"
         :model-value="toggleState"
+        @pointerdown="markUserInteraction"
+        @keydown="markUserInteraction"
         @update:model-value="updateModelValue"
     >
         <slot />

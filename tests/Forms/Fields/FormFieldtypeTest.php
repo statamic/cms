@@ -261,4 +261,18 @@ class FormFieldtypeTest extends TestCase
 
         $this->assertEquals('textarea', $shortAnswer->configFields()->get('some_extra')->type());
     }
+
+    #[Test]
+    public function it_has_no_value_type_by_default()
+    {
+        $formFieldtype = new class extends FormFieldtype
+        {
+            public function toFieldArray(): array
+            {
+                return [];
+            }
+        };
+
+        $this->assertNull($formFieldtype->valueType());
+    }
 }

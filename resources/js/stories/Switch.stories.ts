@@ -1,5 +1,5 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
-import {Switch} from '@ui';
+import {Switch} from '@statamic/cms/ui';
 import {ref} from 'vue';
 
 const meta = {
@@ -23,43 +23,22 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const defaultCode = `
-<Switch v-model="enabled" />
-`;
-
 export const _DocsIntro: Story = {
     tags: ['!dev'],
-    parameters: {
-        docs: {
-            source: { code: defaultCode }
-        }
-    },
     render: () => ({
         components: { Switch },
         setup() {
             const enabled = ref(false);
             return { enabled };
         },
-        template: defaultCode,
+        template: `
+            <Switch v-model="enabled" />
+        `,
     }),
 };
 
-const sizesCode = `
-<div class="flex items-center gap-2">
-    <Switch v-model="lg" size="lg" />
-    <Switch v-model="base" />
-    <Switch v-model="sm" size="sm" />
-    <Switch v-model="xs" size="xs" />
-</div>
-`;
-
 export const _Sizes: Story = {
     tags: ['!dev'],
-    parameters: {
-        docs: {
-            source: { code: sizesCode }
-        }
-    },
     render: () => ({
         components: { Switch },
         setup() {
@@ -69,6 +48,13 @@ export const _Sizes: Story = {
             const xs = ref(false);
             return { lg, base, sm, xs };
         },
-        template: sizesCode,
+        template: `
+            <div class="flex items-center gap-2">
+                <Switch v-model="lg" size="lg" />
+                <Switch v-model="base" />
+                <Switch v-model="sm" size="sm" />
+                <Switch v-model="xs" size="xs" />
+            </div>
+        `,
     }),
 };

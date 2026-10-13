@@ -15,10 +15,15 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
     use QueriesEntryStatus, QueriesTaxonomizedEntries;
 
     protected $collections = [];
+    protected $nested = false;
 
     public function where($column, $operator = null, $value = null, $boolean = 'and')
     {
         if ($column === 'collection') {
+            if ($this->nested) {
+                return parent::where('collectionHandle', $operator, $value, $boolean);
+            }
+
             $this->verifyCollectionBeforeStatus();
 
             $this->collections[] = $operator;
@@ -36,6 +41,10 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
     public function whereIn($column, $values, $boolean = 'and')
     {
         if (in_array($column, ['collection', 'collections'])) {
+            if ($this->nested) {
+                return parent::whereIn('collectionHandle', $values, $boolean);
+            }
+
             $this->verifyCollectionBeforeStatus();
 
             $this->collections = array_merge($this->collections ?? [], $values);
@@ -48,6 +57,14 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
         }
 
         return parent::whereIn($column, $values, $boolean);
+    }
+
+    public function forNestedWhere()
+    {
+        $query = parent::forNestedWhere();
+        $query->nested = true;
+
+        return $query;
     }
 
     private function verifyCollectionBeforeStatus()

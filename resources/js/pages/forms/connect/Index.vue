@@ -5,13 +5,13 @@ import FormsLayout from '../Layout.vue';
 import Head from '@/pages/layout/Head.vue';
 import { Alert, Button, Card, DocsCallout, Header, Heading, Icon, Panel, PanelHeader, ToggleGroup, ToggleItem } from '@ui';
 import FormStatusIndicator from '@/components/forms/FormStatusIndicator.vue';
-import ConnectionsListing, { View } from '@/components/forms/connections/ConnectionsListing.vue';
+import ConnectorsListing, { View } from '@/components/forms/connections/ConnectorsListing.vue';
 import { ref, watch } from 'vue';
 import { preferences } from '@api';
 
 defineOptions({ layout: [Layout, PanelLayout, FormsLayout] });
 
-type Connection = {
+type Connector = {
     handle: string;
     title: string;
     description: string;
@@ -23,7 +23,7 @@ type Connection = {
 
 defineProps<{
     form: Object,
-    connections: Connection[],
+    connectors: Connector[],
     uniqueInstancesEnabled: boolean,
 }>();
 
@@ -71,7 +71,7 @@ watch(view, (view) => preferences.set('forms.connect.view', view));
                 </Heading>
             </PanelHeader>
             <Card :class="{ 'p-0!': view === View.List }">
-                <ConnectionsListing :connections :view />
+                <ConnectorsListing :connectors :view />
             </Card>
         </Panel>
 
