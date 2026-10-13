@@ -41,6 +41,7 @@
                         @removed="removed"
                         @duplicate="duplicate"
                         @sorted="sorted"
+                        @moved="moved"
                         @focus="focused = true"
                         @blur="blurred"
                     />
@@ -68,6 +69,7 @@ import { nanoid as uniqid } from 'nanoid';
 import GridTable from './Table.vue';
 import GridStacked from './Stacked.vue';
 import ManagesRowMeta from './ManagesRowMeta';
+import { arrayMove } from '../../sortable/Sortable';
 
 export default {
     mixins: [Fieldtype, ManagesRowMeta],
@@ -236,6 +238,12 @@ export default {
 
         sorted(rows) {
             this.update(rows);
+        },
+
+        moved(from, to) {
+            if (from === to || to < 0 || to >= this.value.length) return;
+
+            this.update(arrayMove(this.value, from, to));
         },
 
         focus() {
