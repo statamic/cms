@@ -166,17 +166,58 @@ class SubmissionTest extends TestCase
     }
 
     #[Test]
-    public function setting_data_preserves_the_partial_and_site_keys()
+    public function setting_data_preserves_the_partial_spam_and_site_keys()
     {
         $form = tap(Form::make('contact_us'))->save();
 
-        $submission = $form->makeSubmission()->asPartial()->site('fr');
+        $submission = $form->makeSubmission()->asPartial()->markAsSpam()->site('fr');
 
         $submission->data(['foo' => 'bar']);
 
         $this->assertEquals('bar', $submission->get('foo'));
-        $this->assertTrue($submission->isPartial());
+        $this->assertTrue($submission->get('_partial'));
+        $this->assertTrue($submission->isSpam());
         $this->assertEquals('fr', $submission->get('_site'));
+    }
+
+    #[Test]
+    public function marking_as_spam_stores_a_timestamp_once()
+    {
+        $form = tap(Form::make('contact_us'))->save();
+        $submission = $form->makeSubmission();
+
+        Carbon::setTestNow('2025-05-01 12:00:00');
+        $submission->markAsSpam();
+        $timestamp = Carbon::now()->timestamp;
+
+        $this->assertSame($timestamp, $submission->get('_marked_spam_at'));
+        $this->assertTrue($submission->isSpam());
+
+        Carbon::setTestNow('2025-05-05 12:00:00');
+        $submission->markAsSpam();
+        $submission->data(['foo' => 'bar']);
+        $submission->save();
+
+        $this->assertSame($timestamp, $submission->get('_marked_spam_at'));
+    }
+
+    #[Test]
+    public function marking_as_not_spam_removes_the_timestamp_and_remarking_gets_a_new_one()
+    {
+        $form = tap(Form::make('contact_us'))->save();
+
+        Carbon::setTestNow('2025-05-01 12:00:00');
+        $submission = $form->makeSubmission()->markAsSpam();
+
+        $submission->markAsNotSpam();
+
+        $this->assertFalse($submission->has('_marked_spam_at'));
+        $this->assertFalse($submission->isSpam());
+
+        Carbon::setTestNow('2025-05-05 12:00:00');
+        $submission->markAsSpam();
+
+        $this->assertSame(Carbon::now()->timestamp, $submission->get('_marked_spam_at'));
     }
 
     #[Test]
@@ -348,6 +389,20 @@ class SubmissionTest extends TestCase
         $partial = $form->makeSubmission()->asPartial();
         $this->assertTrue($partial->isPartial());
         $this->assertEquals('partial', $partial->status());
+
+        $spam = $form->makeSubmission()->markAsSpam();
+        $this->assertTrue($spam->isSpam());
+        $this->assertEquals('spam', $spam->status());
+
+        // Submissions caught by spam protection keep their raw partial
+        // key, but report as spam rather than partial.
+        $partialSpam = $form->makeSubmission()->asPartial()->markAsSpam();
+        $this->assertFalse($partialSpam->isPartial());
+        $this->assertEquals('spam', $partialSpam->status());
+
+        $notSpam = $spam->markAsNotSpam();
+        $this->assertFalse($notSpam->isSpam());
+        $this->assertEquals('finalized', $notSpam->status());
     }
 
     #[Test]

@@ -50,6 +50,7 @@ class SubmissionStatus extends Filter
         return collect([
             'finalized' => __('Finalized'),
             'partial' => __('Partial'),
+            'spam' => __('Spam'),
         ]);
     }
 }

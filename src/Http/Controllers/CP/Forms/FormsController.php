@@ -211,6 +211,19 @@ class FormsController extends CpController
                         'type' => 'text',
                         'instructions' => __('statamic::messages.form_configure_honeypot_instructions'),
                     ],
+                    'honeypot_behavior' => [
+                        'display' => __('Honeypot Behavior'),
+                        'type' => 'button_group',
+                        'default' => 'ignore',
+                        'options' => [
+                            'ignore' => __('Ignore'),
+                            'mark_as_spam' => __('Save as Spam'),
+                        ],
+                        'if' => [
+                            'store' => 'equals true',
+                        ],
+                        'instructions' => __('statamic::messages.form_configure_honeypot_behavior_instructions'),
+                    ],
                 ],
             ],
             'submissions' => [

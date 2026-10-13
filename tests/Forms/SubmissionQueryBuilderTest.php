@@ -469,6 +469,8 @@ class SubmissionQueryBuilderTest extends TestCase
         FormSubmission::make()->form($form)->data(['ref' => 'b', '_partial' => true])->save();
         FormSubmission::make()->form($form)->data(['ref' => 'c'])->save();
         FormSubmission::make()->form($form)->data(['ref' => 'd', '_partial' => true])->save();
+        FormSubmission::make()->form($form)->data(['ref' => 'e', '_marked_spam_at' => 1700000000])->save();
+        FormSubmission::make()->form($form)->data(['ref' => 'f', '_partial' => true, '_marked_spam_at' => 1700000000])->save();
 
         return $form;
     }
@@ -485,7 +487,8 @@ class SubmissionQueryBuilderTest extends TestCase
 
         $this->assertEquals(['a', 'c'], $this->ids(FormSubmission::query()->whereStatus('finalized')->get()));
         $this->assertEquals(['b', 'd'], $this->ids(FormSubmission::query()->whereStatus('partial')->get()));
-        $this->assertEquals(['a', 'b', 'c', 'd'], $this->ids(FormSubmission::query()->whereStatus('any')->get()));
+        $this->assertEquals(['e', 'f'], $this->ids(FormSubmission::query()->whereStatus('spam')->get()));
+        $this->assertEquals(['a', 'b', 'c', 'd', 'e', 'f'], $this->ids(FormSubmission::query()->whereStatus('any')->get()));
     }
 
     #[Test]
@@ -518,9 +521,9 @@ class SubmissionQueryBuilderTest extends TestCase
     {
         $form = $this->createSubmissionsWithStatuses();
 
-        $this->assertEquals(['a', 'b', 'c', 'd'], $this->ids(FormSubmission::query()->get()));
-        $this->assertEquals(['a', 'b', 'c', 'd'], $this->ids(FormSubmission::all()));
-        $this->assertEquals(['a', 'b', 'c', 'd'], $this->ids(FormSubmission::whereForm('test')));
+        $this->assertEquals(['a', 'b', 'c', 'd', 'e', 'f'], $this->ids(FormSubmission::query()->get()));
+        $this->assertEquals(['a', 'b', 'c', 'd', 'e', 'f'], $this->ids(FormSubmission::all()));
+        $this->assertEquals(['a', 'b', 'c', 'd', 'e', 'f'], $this->ids(FormSubmission::whereForm('test')));
 
         $partial = FormSubmission::query()->where('_partial', true)->first();
         $this->assertEquals($partial, FormSubmission::find($partial->id()));
@@ -532,8 +535,8 @@ class SubmissionQueryBuilderTest extends TestCase
     {
         $form = $this->createSubmissionsWithStatuses();
 
-        $this->assertEquals(['a', 'b', 'c', 'd'], $this->ids($form->querySubmissions()->get()));
-        $this->assertEquals(['a', 'b', 'c', 'd'], $this->ids($form->submissions()));
+        $this->assertEquals(['a', 'b', 'c', 'd', 'e', 'f'], $this->ids($form->querySubmissions()->get()));
+        $this->assertEquals(['a', 'b', 'c', 'd', 'e', 'f'], $this->ids($form->submissions()));
         $this->assertEquals(['b', 'd'], $this->ids($form->querySubmissions()->whereStatus('partial')->get()));
     }
 }

@@ -537,6 +537,7 @@ class FormBuilderTest extends TestCase
         return [
             'partial' => ['partial'],
             'site' => ['site'],
+            'spam' => ['spam'],
         ];
     }
 

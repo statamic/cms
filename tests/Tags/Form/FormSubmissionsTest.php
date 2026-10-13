@@ -56,7 +56,8 @@ EOT
 
         $this->assertEquals('[partial]', trim($this->tag('{{ form:submissions in="contact" status:is="partial" }}[{{ message }}]{{ /form:submissions }}')));
         $this->assertEquals('[finalized]', trim($this->tag('{{ form:submissions in="contact" status:is="finalized" }}[{{ message }}]{{ /form:submissions }}')));
-        $this->assertEquals('[finalized][partial]', trim($this->tag('{{ form:submissions in="contact" status:is="any" sort="message" }}[{{ message }}]{{ /form:submissions }}')));
+        $this->assertEquals('[spam]', trim($this->tag('{{ form:submissions in="contact" status:is="spam" }}[{{ message }}]{{ /form:submissions }}')));
+        $this->assertEquals('[finalized][partial][spam]', trim($this->tag('{{ form:submissions in="contact" status:is="any" sort="message" }}[{{ message }}]{{ /form:submissions }}')));
     }
 
     #[Test]
@@ -72,5 +73,6 @@ EOT
         $form = Form::find('contact');
         $form->makeSubmission()->data(['email' => 'san@holo.com', 'message' => 'finalized'])->save();
         $form->makeSubmission()->data(['email' => 'foba@bett.com', 'message' => 'partial'])->asPartial()->save();
+        $form->makeSubmission()->data(['email' => 'spam@bot.com', 'message' => 'spam'])->markAsSpam()->save();
     }
 }
