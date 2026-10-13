@@ -32,6 +32,7 @@ export default function useResizable() {
         { edge = 'right', minWidth = 200, maxWidth = 800, defaultWidth = null, storageKey = null } = {},
     ) {
         let cleanup = null;
+        const resolveStorageKey = () => (typeof storageKey === 'function' ? storageKey() : storageKey);
 
         watch(activeRef, (active) => {
             if (active) {
@@ -48,7 +49,7 @@ export default function useResizable() {
                         panel.style.width = typeof width === 'string' ? width : `${clampWidth(width)}px`;
                     };
 
-                    const storedWidth = getStoredWidth(storageKey);
+                    const storedWidth = getStoredWidth(resolveStorageKey());
                     const initialWidth = storedWidth ?? resolveDefaultWidth();
 
                     if (initialWidth !== null && initialWidth !== undefined) {
@@ -68,7 +69,7 @@ export default function useResizable() {
                     panel.appendChild(handle);
 
                     const resetToDefaultWidth = () => {
-                        clearStoredWidth(storageKey);
+                        clearStoredWidth(resolveStorageKey());
 
                         const currentDefaultWidth = resolveDefaultWidth();
                         if (currentDefaultWidth !== null && currentDefaultWidth !== undefined) {
@@ -102,7 +103,7 @@ export default function useResizable() {
                             document.body.style.userSelect = '';
                             document.removeEventListener('pointermove', onMove);
                             document.removeEventListener('pointerup', onUp);
-                            setStoredWidth(storageKey, panel.offsetWidth);
+                            setStoredWidth(resolveStorageKey(), panel.offsetWidth);
                         };
 
                         document.addEventListener('pointermove', onMove);

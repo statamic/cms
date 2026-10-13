@@ -29,12 +29,22 @@ const showChat = computed(() => chatOpen.value && (!pagePanelActive.value || rig
 
 watch(chatOpen, (open) => (rightTab.value = open ? 'chat' : 'page'));
 
+// The chat has its own default and remembered width, separate from page panels.
+const rightSizes = {
+    page: { defaults: [300, 290, 340], storageKey: 'statamic.panels.right-width' },
+    chat: { defaults: [230, 240, 260], storageKey: 'statamic.panels.ai-chat-width' },
+};
+
 const right = {
     ref: useTemplateRef('rightPanel'),
     active: computed(() => pagePanelActive.value || chatOpen.value),
     edge: 'left',
-    defaults: [300, 290, 340],
-    storageKey: 'statamic.panels.right-width',
+    get defaults() {
+        return rightSizes[showChat.value ? 'chat' : 'page'].defaults;
+    },
+    get storageKey() {
+        return rightSizes[showChat.value ? 'chat' : 'page'].storageKey;
+    },
 };
 
 provide('leftPanelActive', left.active);
@@ -60,11 +70,17 @@ const { makeResizable } = useResizable();
         minWidth,
         maxWidth,
         defaultWidth: () => getDefaultWidth(panel),
-        storageKey: panel.storageKey,
+        storageKey: () => panel.storageKey,
     });
+});
 
-    // Pre-compute the set of width strings we treat as "unmodified by the user"
-    panel.priorDefaults = new Set(panel.defaults.map((d) => formatWidth(panel, d)));
+// Switching between the chat and a page panel swaps to that one's width.
+watch(showChat, () => {
+    const el = right.ref.value;
+    if (!el || !right.active.value) return;
+
+    const stored = parseInt(localStorage.getItem(right.storageKey), 10);
+    el.style.width = Number.isFinite(stored) ? `${stored}px` : getDefaultWidth(right);
 });
 
 function applyBreakpointDefaults() {
@@ -75,8 +91,10 @@ function applyBreakpointDefaults() {
         const el = panel.ref.value;
         if (!el) return;
 
+        // Widths we treat as "unmodified by the user"
+        const priorDefaults = new Set(panel.defaults.map((d) => formatWidth(panel, d)));
         const current = el.style.width;
-        if (!current || panel.priorDefaults.has(current)) {
+        if (!current || priorDefaults.has(current)) {
             el.style.width = getDefaultWidth(panel);
         }
     });
