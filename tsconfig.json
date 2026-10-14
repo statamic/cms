@@ -14,6 +14,7 @@
             "@ui": ["resources/js/components/ui"],
             "@ui/*": ["resources/js/components/ui/*"],
             "@api": ["resources/js/api.js"],
+            "@statamic/cms/ui": ["resources/js/components/ui"],
             "@statamic/cms/*": ["packages/cms/src/*"]
         }
     },

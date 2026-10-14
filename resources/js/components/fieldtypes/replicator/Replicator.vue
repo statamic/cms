@@ -22,6 +22,7 @@
                             :vertical="true"
                             :item-class="sortableItemClass"
                             :handle-class="sortableRowHandleClass"
+                            :distance="pointerDragThreshold"
                             append-to="body"
                             constrain-dimensions
                             :animate="false"
@@ -64,12 +65,15 @@
                                         :enabled="set.enabled"
                                         :read-only="isReadOnly"
                                         :can-add-set="canAddSet"
+                                        :can-reorder="!isReadOnly && value.length > 1"
+                                        :total-sets="value.length"
                                         :has-error="setHasError(set._id)"
                                         :show-field-previews="config.previews"
                                         @collapsed="collapseSet(set._id)"
                                         @expanded="expandSet(set._id)"
                                         @duplicated="duplicateSet(set._id)"
                                         @removed="removed(set, index)"
+                                        @moved="moved"
                                     >
                                         <template v-slot:picker>
                                             <add-set-button
@@ -78,6 +82,7 @@
                                                 :sets="setConfigs"
                                                 :index="index"
                                                 :enabled="canAddSet"
+                                                :read-only="isReadOnly"
                                                 :is-first="index === 0"
                                                 :show-connector="showPickerConnector(index)"
                                                 :loading-set="loadingSet"
@@ -97,6 +102,7 @@
                             :index="value.length"
                             :label="config.button_label"
                             :is-first="value.length === 0"
+                            :read-only="isReadOnly"
                             :loading-set="loadingSet"
                             @added="addSet"
                         />
@@ -113,7 +119,7 @@ import { nanoid as uniqid } from 'nanoid';
 import ReplicatorSet from './Set.vue';
 import AddSetButton from './AddSetButton.vue';
 import ManagesSetMeta from './ManagesSetMeta';
-import { SortableList } from '../../sortable/Sortable';
+import { SortableList, arrayMove, POINTER_DRAG_THRESHOLD } from '../../sortable/Sortable';
 import { data_get } from "@/bootstrap/globals.js";
 import {
     buildCardLayouts,
@@ -130,6 +136,10 @@ export default {
         ReplicatorSet,
         SortableList,
         AddSetButton,
+    },
+
+    setup() {
+        return { pointerDragThreshold: POINTER_DRAG_THRESHOLD };
     },
 
     data() {
@@ -324,6 +334,12 @@ export default {
             if (fromDom) {
                 this.update(fromDom);
             }
+        },
+
+        moved(from, to) {
+            if (from === to || to < 0 || to >= this.value.length) return;
+
+            this.update(arrayMove(this.value, from, to));
         },
 
         addSet(handle, index) {
