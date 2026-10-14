@@ -100,9 +100,13 @@ class Outpost
             return ['error' => 500];
         }
 
-        return $response->put('packages', collect($response['packages'])->merge(
-            Addon::all()
-                ->reject(fn ($addon) => array_key_exists($addon->package(), $response['packages']))
+        $addons = Addon::all();
+
+        $packages = collect($response->get('packages', []))->only($addons->map->package()->all());
+
+        return $response->put('packages', $packages->merge(
+            $addons
+                ->reject(fn ($addon) => $packages->has($addon->package()))
                 ->mapWithKeys(fn ($addon) => [$addon->package() => [
                     'valid' => ! $addon->isCommercial() || $addon->edition() === 'free',
                     'exists' => $addon->existsOnMarketplace(),

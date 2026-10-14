@@ -179,6 +179,38 @@ class OutpostTest extends TestCase
     }
 
     #[Test]
+    public function license_key_file_response_excludes_packages_that_are_not_installed()
+    {
+        config(['statamic.system.license_key' => 'testsitekey12345']);
+
+        $encrypter = new Encrypter('testsitekey12345');
+        $encryptedKeyFile = $encrypter->encrypt(json_encode(['packages' => [
+            'foo/bar' => ['valid' => true, 'exists' => true, 'version_limit' => null],
+            'not/installed' => ['valid' => false, 'exists' => true, 'version_limit' => null],
+        ]]));
+
+        File::shouldReceive('exists')
+            ->with(storage_path('license.key'))
+            ->once()
+            ->andReturnTrue();
+
+        File::shouldReceive('get')
+            ->with(storage_path('license.key'))
+            ->once()
+            ->andReturn($encryptedKeyFile);
+
+        Addon::shouldReceive('all')->andReturn(collect([
+            (new FakeOutpostAddon('foo/bar', '1.2.3', null, true, true)),
+        ]));
+
+        $response = $this->outpost()->response();
+
+        $this->assertEquals([
+            'foo/bar' => ['valid' => true, 'exists' => true, 'version_limit' => null],
+        ], $response['packages']);
+    }
+
+    #[Test]
     public function the_cached_response_is_ignored_if_the_payload_is_different()
     {
         $this->setCachedResponse(['payload' => ['old' => 'stuff']]);
