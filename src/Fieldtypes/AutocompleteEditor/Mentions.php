@@ -19,7 +19,7 @@ class Mentions
     // Markdown values never reach this with a backslash touching `[[`. Augmenting
     // encodes literal brackets and any backslashes before a token as entities, so
     // only real tokens remain and they resolve exactly as before.
-    private const RESOLVABLE = '/(?<!\\\\)((?:\\\\\\\\)*)(?:\[\[\s*('.self::VALUE.')\s*\]\]|(\\\\)\[\[|\[(?=\[))/';
+    private const RESOLVABLE = '/(?<!\\\\)((?:\\\\\\\\)*+)(?:\[\[\s*('.self::VALUE.')\s*\]\]|(\\\\)\[\[|\[(?=\[))/';
 
     public static function isValidValue(string $value): bool
     {

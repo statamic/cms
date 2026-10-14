@@ -2,6 +2,7 @@
 
 namespace Tests\Fieldtypes;
 
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\HtmlString;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
@@ -342,6 +343,26 @@ class AutocompleteEditorTest extends TestCase
             '<a href="&#91;&#91; url ]]" title="&#91;&#91; title ]]">x</a> <img src="&#91;&#91; src ]]" alt="&#91;&#91; alt ]]" /> <a href="https://example.com/?id=&#91;&#91; id ]]">y</a>',
             $html
         );
+    }
+
+    #[Test]
+    public function values_are_limited_in_length()
+    {
+        $rules = (new Field('body', ['type' => 'autocomplete_editor']))->rules();
+
+        $this->assertTrue(Validator::make(['body' => str_repeat('a', 65535)], $rules)->passes());
+        $this->assertTrue(Validator::make(['body' => null], $rules)->passes());
+        $this->assertFalse(Validator::make(['body' => str_repeat('a', 65536)], $rules)->passes());
+    }
+
+    #[Test]
+    public function very_long_backslash_runs_render()
+    {
+        $run = str_repeat('\\', 200_000);
+
+        $html = AutocompleteEditor::renderHtml($run.' x '.$run.'[[ a ]]', ['a' => '1'], inline: true);
+
+        $this->assertSame(str_repeat('\\', 100_000).' x '.str_repeat('&#92;', 100_000).'1', $html);
     }
 
     #[Test]

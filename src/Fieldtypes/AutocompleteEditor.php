@@ -14,6 +14,8 @@ class AutocompleteEditor extends Fieldtype
 {
     protected $selectable = false;
 
+    protected $rules = ['string', 'max:65535'];
+
     protected function configFieldItems(): array
     {
         return [
@@ -167,7 +169,7 @@ class AutocompleteEditor extends Fieldtype
 
         $html = str_replace('[[', '&#91;&#91;', $html);
         $html = preg_replace_callback(
-            '/\\\\+(?=\[*mention'.$nonce.'n\d+e)/',
+            '/(?<!\\\\)\\\\++(?=\[*mention'.$nonce.'n\d+e)/',
             fn ($matches) => str_repeat('&#92;', strlen($matches[0])),
             $html
         );
