@@ -3071,6 +3071,13 @@ class EntryTest extends TestCase
 
         $this->assertSame('entry-slug', $unserialized->slug);
     }
+
+    #[Test]
+    public function it_gets_the_site_handle_as_the_queryable_site_value()
+    {
+        $this->assertSame('en', (new Entry)->locale('en')->getQueryableValue('site'));
+        $this->assertSame('removed', (new Entry)->locale('removed')->getQueryableValue('site'));
+    }
 }
 
 class CustomEntry extends Entry

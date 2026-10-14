@@ -18,7 +18,7 @@
             <tr v-for="site in sites" :key="site.handle">
                 <td class="grid-cell">
                     <div class="flex items-center gap-2">
-                        <Switch v-model="site.enabled" />
+                        <Switch v-model="site.enabled" :label="__(site.name)" />
                         <Heading :text="__(site.name)" />
                     </div>
                 </td>
