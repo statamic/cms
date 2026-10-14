@@ -1,0 +1,24 @@
+
+[data-logic-list][data-v-db6511e9]::before {
+    content: '';
+    position: absolute;
+    top: 1.5rem;
+    bottom: 0;
+    inset-inline-start: 0.875rem;
+    border-inline-start: 1px dashed var(--color-gray-400);
+}
+.dark [data-logic-list][data-v-db6511e9]::before {
+    border-inline-start-color: var(--color-gray-600);
+}
+
+[data-logic-list][data-v-a18f175c]::before {
+    content: '';
+    position: absolute;
+    top: 1.5rem;
+    bottom: 0;
+    inset-inline-start: 0.875rem;
+    border-inline-start: 1px dashed var(--color-gray-400);
+}
+.dark [data-logic-list][data-v-a18f175c]::before {
+    border-inline-start-color: var(--color-gray-600);
+}
