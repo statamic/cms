@@ -344,6 +344,46 @@ class SubmissionMentionsTest extends TestCase
         }));
     }
 
+    #[Test]
+    public function it_prints_only_filenames_for_non_stored_uploads()
+    {
+        $submission = $this->makeUploadSubmission(['type' => 'form_upload'], ['abc123/cv.pdf', 'abc123/photo.jpg']);
+
+        $this->assertSame(['upload' => 'cv.pdf, photo.jpg'], SubmissionMentions::values($submission, ['upload']));
+        $this->assertSame('cv.pdf, photo.jpg', SubmissionMentions::replace($submission, '[[upload]]'));
+    }
+
+    #[Test]
+    public function it_prints_the_filename_for_a_single_non_stored_upload()
+    {
+        $submission = $this->makeUploadSubmission(['type' => 'form_upload', 'max_files' => 1], 'abc123/cv.pdf');
+
+        $this->assertSame('cv.pdf', SubmissionMentions::replace($submission, '[[upload]]'));
+    }
+
+    #[Test]
+    public function it_prints_the_url_for_uploads_stored_as_assets()
+    {
+        $asset = Mockery::mock(AssetContract::class);
+        $asset->shouldReceive('absoluteUrl')->andReturn('http://localhost/assets/cv.pdf');
+
+        $submission = $this->makeUploadSubmission(['type' => 'form_upload', 'store' => true, 'container' => 'assets'], 'cv.pdf');
+
+        $this->assertSame(
+            'http://localhost/assets/cv.pdf',
+            SubmissionMentions::replace($submission, '[[upload]]', submissionData: ['upload' => new Value($asset)])
+        );
+    }
+
+    private function makeUploadSubmission(array $field, mixed $value)
+    {
+        $form = tap(Form::make('uploads')->formFields([
+            'fields' => [['handle' => 'upload', 'field' => $field + ['display' => 'Upload']]],
+        ]))->save();
+
+        return $form->makeSubmission()->data(['upload' => $value]);
+    }
+
     private function makeForm()
     {
         return tap(Form::make('test')->formFields([

@@ -11,8 +11,10 @@ use Statamic\Facades\GlobalSet;
 use Statamic\Fields\LabeledValue;
 use Statamic\Fields\Value;
 use Statamic\Fieldtypes\AutocompleteEditor\Mentions;
+use Statamic\Fieldtypes\FormUpload;
 use Statamic\Fieldtypes\Markdown;
 use Statamic\Fieldtypes\Relationship;
+use Statamic\Support\Arr;
 use Stringable;
 
 use function Statamic\trans as __;
@@ -87,7 +89,7 @@ class SubmissionMentions
                 continue;
             } else {
                 $submissionData ??= $submission->toAugmentedArray();
-                $value = $submissionData[$handle] ?? null;
+                $value = static::formFieldValue($submission, $handle, $submissionData[$handle] ?? null);
             }
 
             $values[$handle] = static::mentionValue($value);
@@ -137,6 +139,21 @@ class SubmissionMentions
         }
 
         return '';
+    }
+
+    private static function formFieldValue(Submission $submission, string $handle, mixed $value): mixed
+    {
+        $fieldtype = $submission->form()->fields()->get($handle)->fieldtype();
+
+        if (! $fieldtype instanceof FormUpload || $fieldtype->config('store')) {
+            return $value;
+        }
+
+        if ($value instanceof Value) {
+            $value = $value->value();
+        }
+
+        return collect(Arr::wrap($value))->map(fn ($path) => basename($path))->all();
     }
 
     private static function isGlobalFieldOffered($fieldtype, string $type): bool
