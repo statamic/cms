@@ -106,7 +106,7 @@
                         </td>
                         <td class="grid-cell">
                             <div class="flex pt-2 items-center gap-2">
-                                <Switch v-model="site.enabled" />
+                                <Switch v-model="site.enabled" :label="__(site.name)" />
                                 <Heading :text="__(site.name)" />
                             </div>
                         </td>

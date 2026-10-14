@@ -47,6 +47,7 @@ use Statamic\View\Antlers\Language\Nodes\Structures\StatementSeparatorNode;
 use Statamic\View\Antlers\Language\Nodes\Structures\SwitchGroup;
 use Statamic\View\Antlers\Language\Nodes\VariableNode;
 use Statamic\View\Antlers\Language\Parser\LanguageParser;
+use Statamic\View\Antlers\Language\Runtime\Concerns\ManagesIncludeSlots;
 use Statamic\View\Antlers\Language\Runtime\Debugging\GlobalDebugManager;
 use Statamic\View\Antlers\Language\Runtime\Sandbox\Environment;
 use Statamic\View\Antlers\Language\Runtime\Sandbox\RuntimeValues;
@@ -54,11 +55,15 @@ use Statamic\View\Antlers\Language\Runtime\Sandbox\TypeCoercion;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Statamic\View\Antlers\SyntaxError;
 use Statamic\View\Cascade;
+use Statamic\View\Slot;
 use Statamic\View\State\CachesOutput;
+use Stringable;
 use Throwable;
 
 class NodeProcessor
 {
+    use ManagesIncludeSlots;
+
     /**
      * @var Loader
      */
@@ -105,6 +110,13 @@ class NodeProcessor
      * @var bool
      */
     protected $isInterpolationProcessor = false;
+
+    /**
+     * Indicates if the processor is reducing a value being assigned to a variable.
+     *
+     * @var bool
+     */
+    protected $isAssignmentProcessor = false;
 
     /**
      * Indicates if the processor is providing results for a parameter.
@@ -283,6 +295,19 @@ class NodeProcessor
     public function setIsInterpolationProcessor($isInterpolation)
     {
         $this->isInterpolationProcessor = $isInterpolation;
+
+        return $this;
+    }
+
+    /**
+     * Sets whether the NodeProcessor is reducing a value being assigned to a variable.
+     *
+     * @param  bool  $isAssignment  The value.
+     * @return $this
+     */
+    public function setIsAssignmentProcessor($isAssignment)
+    {
+        $this->isAssignmentProcessor = $isAssignment;
 
         return $this;
     }
@@ -964,6 +989,23 @@ class NodeProcessor
     }
 
     /**
+     * Evaluates an interpolated variable being assigned to a variable, keeping tag objects intact.
+     *
+     * @param  VariableNode  $node  The interpolated variable.
+     * @return mixed
+     *
+     * @throws RuntimeException
+     * @throws SyntaxErrorException
+     */
+    public function reduceAssignedInterpolatedVariable(VariableNode $node)
+    {
+        return $this->cloneProcessor()
+            ->setIsInterpolationProcessor(true)
+            ->setIsAssignmentProcessor(true)
+            ->setData($this->getActiveData())->reduce($node->interpolationNodes);
+    }
+
+    /**
      * Executes the requested tag within the context of the current processor and provided node.
      *
      * @param  AntlersNode|ConditionNode  $node  The node.
@@ -1137,7 +1179,7 @@ class NodeProcessor
         $namedSlots = [];
 
         foreach ($node->children as $child) {
-            if ($child instanceof AntlersNode && ! $child->isComment && $child->name->name == 'slot') {
+            if ($child instanceof AntlersNode && ! $child->isComment && $child->isPaired() && $child->name->name == 'slot') {
                 $namedSlots[$child->name->methodPart] = $child;
             }
         }
@@ -1582,6 +1624,10 @@ class NodeProcessor
                             $this->data = $lockData;
                         }
 
+                        if ($node->name->name == 'include') {
+                            $tagParameters = $this->captureIncludeSlots($node, $tagActiveData, $tagParameters);
+                        }
+
                         if ($node->name->name == 'partial' || $node->name->name == 'scope') {
                             if (array_key_exists('handle_prefix', $tagParameters)) {
                                 $handlePrefixes = $tagParameters['handle_prefix'];
@@ -1667,7 +1713,7 @@ class NodeProcessor
                             GlobalRuntimeState::$evaulatingTagContents = false;
                             $this->stopMeasuringTag();
 
-                            if ($suspendedData != null) {
+                            if ($capturedRuntimeState !== null) {
                                 $this->data = $suspendedData;
 
                                 GlobalRuntimeState::restoreState($capturedRuntimeState);
@@ -1794,7 +1840,9 @@ class NodeProcessor
                                 $output = RuntimeValues::resolveWithRuntimeIsolation($output);
                             }
 
-                            $output = PathDataManager::reduceForAntlers($output, $this->antlersParser, $this->getActiveData(), $node->isClosedBy != null);
+                            if (! $this->assigningAugmentable($output)) {
+                                $output = PathDataManager::reduceForAntlers($output, $this->antlersParser, $this->getActiveData(), $node->isClosedBy != null);
+                            }
                         }
 
                         if ($this->isInterpolationProcessor) {
@@ -2070,6 +2118,12 @@ class NodeProcessor
                                     }
 
                                     if ($this->guardRuntime($node, $runtimeResult)) {
+                                        if ($runtimeResult instanceof Slot) {
+                                            $lockData = $this->data;
+                                            $runtimeResult = $runtimeResult->render();
+                                            $this->data = $lockData;
+                                        }
+
                                         $buffer .= $this->measureBufferAppend($node, $this->modifyBufferAppend($runtimeResult));
                                     }
 
@@ -2151,6 +2205,20 @@ class NodeProcessor
 
                     if ($val instanceof Builder) {
                         $val = $val->get()->all();
+                    }
+
+                    if ($val instanceof Slot) {
+                        $lockData = $this->data;
+                        $val = $val->render($node->hasParameters ? $this->getSlotOutputProps($node) : []);
+                        $this->data = $lockData;
+
+                        $buffer .= $this->measureBufferAppend($node, $this->modifyBufferAppend($val));
+
+                        if ($this->isTracingEnabled()) {
+                            $this->runtimeConfiguration->traceManager->traceOnExit($node, null);
+                        }
+
+                        continue;
                     }
 
                     $executedParamModifiers = false;
@@ -2482,6 +2550,13 @@ class NodeProcessor
         }
 
         return $buffer;
+    }
+
+    private function assigningAugmentable($output): bool
+    {
+        return $this->isAssignmentProcessor
+            && $output instanceof Augmentable
+            && $output instanceof Stringable;
     }
 
     /**

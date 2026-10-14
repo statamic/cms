@@ -213,6 +213,40 @@ class UpdateCollectionTest extends TestCase
         $this->assertEquals(['en', 'de'], Collection::findByHandle('test')->sites()->all());
     }
 
+    #[Test]
+    public function it_updates_revisions()
+    {
+        config(['statamic.revisions.enabled' => true]);
+
+        $collection = tap(Collection::make('test')->revisionsEnabled(false))->save();
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->update($collection, ['revisions' => true])
+            ->assertOk();
+
+        $this->assertTrue(Collection::findByHandle('test')->revisionsEnabled());
+    }
+
+    #[Test]
+    public function it_doesnt_update_revisions_when_the_field_is_hidden()
+    {
+        config(['statamic.revisions.enabled' => true]);
+
+        $collection = tap(Collection::make('test')->revisionsEnabled(true))->save();
+
+        config(['statamic.revisions.enabled' => false]);
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->update($collection)
+            ->assertOk();
+
+        config(['statamic.revisions.enabled' => true]);
+
+        $this->assertTrue(Collection::findByHandle('test')->revisionsEnabled());
+    }
+
     private function userWithoutPermission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
