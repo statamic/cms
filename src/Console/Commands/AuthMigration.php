@@ -49,6 +49,7 @@ class AuthMigration extends Command
         $this->createRolesTable();
 
         $this->createWebauthTable();
+        $this->createOAuthConnectionsTable();
 
         $this->composer->dumpAutoloads();
     }
@@ -102,6 +103,23 @@ class AuthMigration extends Command
         $contents = File::get($from);
 
         $contents = str_replace('WEBAUTHN_TABLE', config('statamic.users.tables.webauthn', 'webauthn'), $contents);
+
+        File::put($to, $contents);
+
+        $this->components->info("Migration [$file] created successfully.");
+    }
+
+    private function createOAuthConnectionsTable()
+    {
+        $from = __DIR__.'/stubs/auth/statamic_oauth_connections_table.php.stub';
+        $file = Carbon::now()->format('Y_m_d_His').'_statamic_oauth_connections_table';
+
+        $to = ($path = $this->option('path')) ? $path."/{$file}.php" : database_path("migrations/{$file}.php");
+
+        $contents = File::get($from);
+
+        $contents = str_replace('OAUTH_CONNECTIONS_TABLE', config('statamic.users.tables.oauth_connections', 'oauth_connections'), $contents);
+        $contents = str_replace('USERS_TABLE', config('statamic.users.tables.users', 'users'), $contents);
 
         File::put($to, $contents);
 

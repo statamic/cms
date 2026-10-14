@@ -135,6 +135,7 @@ return [
         'group_user' => 'group_user',
         'groups' => false,
         'webauthn' => 'webauthn',
+        'oauth_connections' => 'oauth_connections',
     ],
 
     /*
