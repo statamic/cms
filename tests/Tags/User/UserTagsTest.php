@@ -134,6 +134,30 @@ class UserTagsTest extends TestCase
     }
 
     #[Test]
+    #[DataProvider('guardProvider')]
+    public function it_renders_tag_content_for_a_specific_guard($tag, $expected)
+    {
+        config()->set('auth.guards.statamic', config('auth.guards.web'));
+        $this->setTestRoles(['admin' => ['configure collections']]);
+        $this->setTestUserGroups(['favourite' => ['admin']]);
+
+        auth('statamic')->login(User::make()->email('admin@example.com')->assignRole('admin')->addToGroup('favourite')->save());
+
+        $this->assertEquals('', $this->tag(sprintf($tag, '')));
+        $this->assertEquals($expected, $this->tag(sprintf($tag, ' guard="statamic"')));
+    }
+
+    public static function guardProvider()
+    {
+        return [
+            'user' => ['{{ user%s }}{{ email }}{{ /user }}', 'admin@example.com'],
+            'can' => ['{{ user:can%s do="configure collections" }}yes{{ /user:can }}', 'yes'],
+            'is' => ['{{ user:is%s role="admin" }}yes{{ /user:is }}', 'yes'],
+            'in' => ['{{ user:in%s group="favourite" }}yes{{ /user:in }}', 'yes'],
+        ];
+    }
+
+    #[Test]
     public function it_can_logout_user()
     {
         $this->actingAs(User::make()->save());
@@ -168,11 +192,31 @@ class UserTagsTest extends TestCase
     }
 
     #[Test]
+    public function it_can_logout_user_from_a_specific_guard()
+    {
+        config()->set('auth.guards.statamic', config('auth.guards.web'));
+
+        auth('statamic')->login(User::make()->save());
+        auth('web')->login(User::make()->save());
+
+        try {
+            $this->tag('{{ user:logout guard="statamic" }}');
+        } catch (HttpResponseException $exception) {
+            //
+        }
+
+        $this->assertFalse(auth('statamic')->check());
+        $this->assertTrue(auth('web')->check());
+    }
+
+    #[Test]
     public function it_can_render_logout_url()
     {
         $this->assertEquals(route('statamic.logout'), $this->tag('{{ user:logout_url }}'));
 
         $this->assertEquals(route('statamic.logout', ['redirect' => 'home']), $this->tag('{{ user:logout_url redirect="home" }}'));
+
+        $this->assertEquals(route('statamic.logout', ['guard' => 'statamic']), $this->tag('{{ user:logout_url guard="statamic" }}'));
     }
 
     #[Test]
