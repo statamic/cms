@@ -1882,6 +1882,38 @@ class SubmitFormTest extends TestCase
     }
 
     #[Test]
+    public function it_starts_a_fresh_submission_when_resuming_a_partial_from_another_entry()
+    {
+        $this->makeEntry('event-1', ['form' => 'contact', 'config' => []]);
+        $this->makeEntry('event-2', ['form' => 'contact', 'config' => []]);
+
+        $this->form->set('unique_instances', true)->save();
+
+        $partial = tap($this->form->makeSubmission()->data(['_entry' => 'event-1', 'email' => 'san@holo.com'])->asPartial())->save();
+
+        $result = $this->action()->entry('event-2')->resume($partial)->submit(['email' => 'foba@bett.com']);
+
+        $this->assertNotEquals($partial->id(), $result->submission->id());
+        $this->assertEquals('event-2', $result->submission->get('_entry'));
+        $this->assertEquals('event-1', $this->form->submission($partial->id())->get('_entry'));
+        $this->assertEquals('san@holo.com', $this->form->submission($partial->id())->get('email'));
+    }
+
+    #[Test]
+    public function it_resumes_a_partial_from_the_same_entry()
+    {
+        $this->makeEntry('event-1', ['form' => 'contact', 'config' => []]);
+
+        $this->form->set('unique_instances', true)->save();
+
+        $partial = tap($this->form->makeSubmission()->data(['_entry' => 'event-1'])->asPartial())->save();
+
+        $result = $this->action()->entry('event-1')->resume($partial)->submit(['email' => 'san@holo.com']);
+
+        $this->assertEquals($partial->id(), $result->submission->id());
+    }
+
+    #[Test]
     public function it_rejects_the_submission_when_an_entry_override_restricts_the_form()
     {
         $this->makeEntry('event-1', ['form' => 'contact', 'config' => ['close_date' => '2020-01-01 09:00']]);

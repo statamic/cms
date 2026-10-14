@@ -1869,6 +1869,62 @@ EOT
     }
 
     #[Test]
+    public function it_only_populates_fields_from_the_partial_submission_of_the_entry_being_rendered()
+    {
+        $this->createMultiPageForm();
+
+        $form = Form::find('survey');
+        $form->set('unique_instances', true)->save();
+        $this->makeEntry('event-a', ['form' => 'survey', 'config' => []]);
+        $this->makeEntry('event-b', ['form' => 'survey', 'config' => []]);
+
+        $this->post('/!/forms/survey', ['_page' => 'page_one', '_entry' => 'event-a', 'name' => 'Olaf']);
+
+        $template = '{{ form:survey }}{{ fields }}{{ handle }}={{ value }},{{ /fields }}{{ /form:survey }}';
+
+        $this->assertStringContainsString('name=Olaf,', $this->normalizeHtml($this->tag($template, ['id' => 'event-a'])));
+        $this->assertStringContainsString('name=,', $this->normalizeHtml($this->tag($template, ['id' => 'event-b'])));
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function it_keeps_a_separate_partial_submission_for_each_entry()
+    {
+        $this->createMultiPageForm();
+
+        $form = Form::find('survey');
+        $form->set('unique_instances', true)->save();
+        $this->makeEntry('event-a', ['form' => 'survey', 'config' => []]);
+        $this->makeEntry('event-b', ['form' => 'survey', 'config' => []]);
+
+        $this->post('/!/forms/survey', ['_page' => 'page_one', '_entry' => 'event-a', 'name' => 'Olaf']);
+        $this->post('/!/forms/survey', ['_page' => 'page_one', '_entry' => 'event-b', 'name' => 'Sven']);
+
+        $this->assertCount(2, $form->submissions());
+        $idA = session('form.survey.event-a.partial_submission');
+        $idB = session('form.survey.event-b.partial_submission');
+        $this->assertNotEquals($idA, $idB);
+        $this->assertEquals('Olaf', $form->submission($idA)->get('name'));
+        $this->assertEquals('event-a', $form->submission($idA)->get('_entry'));
+        $this->assertEquals('Sven', $form->submission($idB)->get('name'));
+
+        $this
+            ->post('/!/forms/survey', ['_page' => 'page_two', '_entry' => 'event-a', 'email' => 'olaf@example.com'])
+            ->assertSessionHasNoErrors()
+            ->assertSessionMissing('form.survey.event-a.partial_submission')
+            ->assertSessionHas('form.survey.event-b.partial_submission', $idB);
+
+        $finalized = $form->submission($idA);
+        $this->assertFalse($finalized->isPartial());
+        $this->assertEquals('event-a', $finalized->get('_entry'));
+        $this->assertEquals('Olaf', $finalized->get('name'));
+        $this->assertTrue($form->submission($idB)->isPartial());
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
     public function it_does_not_populate_fields_from_a_finalized_submission()
     {
         $this->createMultiPageForm();

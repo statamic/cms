@@ -619,7 +619,7 @@ class Tags extends BaseTags
 
     private function getPartialSubmission(): ?Submission
     {
-        $id = session()->get("form.{$this->form()->handle()}.partial_submission");
+        $id = session()->get(SubmitForm::partialSubmissionSessionKey($this->form(), $this->submittableEntry($this->form())));
         $submission = $this->form()->submission($id);
 
         if ($submission && ! $submission->isPartial()) {

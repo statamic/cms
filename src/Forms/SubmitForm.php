@@ -60,6 +60,13 @@ class SubmitForm
         return $this;
     }
 
+    public static function partialSubmissionSessionKey(Form $form, ?string $entry = null): string
+    {
+        return $entry && $form->hasUniqueInstances()
+            ? "form.{$form->handle()}.{$entry}.partial_submission"
+            : "form.{$form->handle()}.partial_submission";
+    }
+
     public function submission(): ?Submission
     {
         return $this->submission;
@@ -80,6 +87,10 @@ class SubmitForm
         $values = array_merge($data, $files);
 
         $this->validate($data, $files);
+
+        if ($entry && $this->submission && $this->submission->get('_entry') !== $entry->id()) {
+            $this->submission = null;
+        }
 
         $this->submission = $this->submission ?? $this->form->makeSubmission()->asPartial()->site($this->site());
 
