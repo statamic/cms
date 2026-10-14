@@ -129,6 +129,45 @@ class AssetsTest extends TestCase
     }
 
     #[Test]
+    public function it_pre_processes_for_index()
+    {
+        $preProcessed = $this->fieldtype()->preProcessIndex(['foo/one.txt', 'bar/two.txt']);
+
+        $this->assertEquals(2, $preProcessed['total']);
+        $this->assertEquals(['test::foo/one.txt', 'test::bar/two.txt'], $preProcessed['assets']->map(fn ($asset) => $asset['id'])->all());
+    }
+
+    #[Test]
+    public function it_pre_processes_for_index_when_max_files_is_one()
+    {
+        $preProcessed = $this->fieldtype(['max_files' => 1])->preProcessIndex('foo/one.txt');
+
+        $this->assertEquals(1, $preProcessed['total']);
+        $this->assertEquals(['test::foo/one.txt'], $preProcessed['assets']->map(fn ($asset) => $asset['id'])->all());
+    }
+
+    /**
+     * @see https://github.com/statamic/cms/issues/15469
+     */
+    #[Test]
+    public function it_pre_processes_a_single_value_for_index_when_max_files_is_no_longer_one()
+    {
+        $preProcessed = $this->fieldtype()->preProcessIndex('foo/one.txt');
+
+        $this->assertEquals(1, $preProcessed['total']);
+        $this->assertEquals(['test::foo/one.txt'], $preProcessed['assets']->map(fn ($asset) => $asset['id'])->all());
+    }
+
+    #[Test]
+    public function it_pre_processes_for_index_when_the_value_is_null()
+    {
+        $preProcessed = $this->fieldtype()->preProcessIndex(null);
+
+        $this->assertEquals(0, $preProcessed['total']);
+        $this->assertEquals([], $preProcessed['assets']->all());
+    }
+
+    #[Test]
     public function it_replaces_dimensions_rule()
     {
         config()->set('statamic.cp.route', '/');

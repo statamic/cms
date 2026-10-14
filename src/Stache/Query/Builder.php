@@ -176,6 +176,7 @@ abstract class Builder extends BaseBuilder
     private function normalizeLookupValue($value): string|int
     {
         return match (true) {
+            is_string($value) => strtolower($value),
             $value === null => '__NULL__',
             $value === true => '__TRUE__',
             $value === false => '__FALSE__',

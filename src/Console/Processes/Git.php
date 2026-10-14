@@ -180,6 +180,7 @@ class Git extends Process
             'remote: Processed',
             'Auto packing the repository',
             'remote: GitHub found',
+            'remote: Bypassed rule violations',
         ];
 
         if (Str::contains($buffer, $ignore)) {
