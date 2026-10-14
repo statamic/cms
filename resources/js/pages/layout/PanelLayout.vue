@@ -23,6 +23,9 @@ const left = {
 const pagePanelActive = ref(false);
 const pagePanelLabel = ref(null);
 const { open: chatOpen, floating: chatFloating } = useAiChat();
+
+// A white card with a purple-to-blue gradient edge and a faint matching glow.
+const chatCardClasses = 'rounded-2xl border border-transparent shadow-[0_10px_40px_-10px_color-mix(in_oklab,var(--color-primary)_45%,transparent)] [background:linear-gradient(white,white)_padding-box,linear-gradient(135deg,var(--color-primary),#60a5fa)_border-box] dark:[background:linear-gradient(var(--color-gray-900),var(--color-gray-900))_padding-box,linear-gradient(135deg,var(--color-primary),#60a5fa)_border-box]';
 // The chat only uses the right panel when it's docked there, rather than floating in the corner.
 const chatInPanel = computed(() => chatOpen.value && !chatFloating.value);
 const rightTab = ref('chat');
@@ -169,7 +172,8 @@ onUnmounted(() => {
 
     <div
         v-if="chatOpen && chatFloating"
-        class="fixed end-4 bottom-4 max-h-[calc(100dvh-11rem)] z-(--z-index-modal) group/chat flex w-95 max-w-[calc(100vw-2rem)] flex-col rounded-2xl border border-gray-200/80 bg-white/70 ps-2 shadow-2xl backdrop-blur-xl dark:border-gray-700/80 dark:bg-gray-900/70"
+        :class="chatCardClasses"
+        class="fixed end-4 bottom-4 max-h-[calc(100dvh-11rem)] z-(--z-index-modal) group/chat flex w-95 max-w-[calc(100vw-2rem)] flex-col ps-2"
     >
         <AiChat />
         <AiChatDockControl />
