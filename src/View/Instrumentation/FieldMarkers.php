@@ -2,6 +2,7 @@
 
 namespace Statamic\View\Instrumentation;
 
+/** @internal */
 class FieldMarkers extends HtmlInstrumentation
 {
     private FieldDomTracer $tracer;
@@ -101,9 +102,18 @@ class FieldMarkers extends HtmlInstrumentation
         return '{{ ___internal_field:'.$id.' }}';
     }
 
+    protected function markerPatterns(): array
+    {
+        return [
+            '{{ ___internal_field:' => '\{\{ ___internal_field:\d+ \}\}',
+            '<!--statamic:field:' => '<!--statamic:field:\d+-->',
+            '<!--/statamic:field:' => '<!--\/statamic:field:\d+-->',
+        ];
+    }
+
     public function instrumentAntlers(string $template): string
     {
-        if ($this->tracer->suppressesNestedMarkers()) {
+        if ($this->tracer->suppressesNestedMarkers() || str_contains($template, '{{ ___internal_field:')) {
             return $template;
         }
 

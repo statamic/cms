@@ -4,6 +4,7 @@ namespace Statamic\View\Instrumentation;
 
 use LogicException;
 
+/** @internal */
 class FieldDomTracer extends FieldTracer
 {
     private static ?self $active = null;
@@ -84,12 +85,18 @@ class FieldDomTracer extends FieldTracer
             return '';
         }
 
-        $frame = end($this->stack);
-        if (! $frame || $frame['instruction'] !== $target) {
+        for ($depth = count($this->stack) - 1; $depth >= 0; $depth--) {
+            if ($this->stack[$depth]['instruction'] === $target) {
+                break;
+            }
+        }
+
+        if ($depth < 0) {
             return '';
         }
 
-        array_pop($this->stack);
+        $frame = $this->stack[$depth];
+        array_splice($this->stack, $depth);
 
         if ($frame['comment']) {
             return '<!--/statamic:field:'.$frame['id'].'-->';
