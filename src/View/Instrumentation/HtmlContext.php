@@ -3,7 +3,7 @@
 namespace Statamic\View\Instrumentation;
 
 /** @internal */
-class HtmlContext
+final class HtmlContext
 {
     const DYNAMIC_ELEMENT = '*';
 
@@ -79,9 +79,9 @@ class HtmlContext
     }
 
     /** @param  array{0: string, 1: string|null, 2: string|null, 3: string[], 4: int|null, 5: int}  $data */
-    public static function fromArray(array $data): static
+    public static function fromArray(array $data): self
     {
-        $context = new static(
+        $context = new self(
             $data[0],
             $data[1],
             $data[2],

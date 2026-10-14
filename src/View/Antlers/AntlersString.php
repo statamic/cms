@@ -22,9 +22,9 @@ class AntlersString
     /**
      * @internal
      */
-    public static function withInstrumentation(string $rendered, Parser $parser, InstrumentationManager $instrumentation): static
+    public static function withInstrumentation(string $rendered, Parser $parser, InstrumentationManager $instrumentation): self
     {
-        $instance = new static('', $parser);
+        $instance = new self('', $parser);
         $instance->string = null;
         $instance->instrumentedString = $rendered;
         $instance->instrumentation = $instrumentation;
