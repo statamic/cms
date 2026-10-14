@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, useTemplateRef, watch } from 'vue';
+import { ref, computed, useTemplateRef, watch, useSlots } from 'vue';
 import useActions from './Actions.js';
 import ConfirmableAction from './ConfirmableAction.vue';
 import useSkeletonDelay from '@/composables/skeleton-delay.js';
@@ -35,6 +35,10 @@ watch(
 
 let preparedActions = computed(() => {
     return prepareActions(actions.value, confirmableActions.value);
+});
+
+let preparedQuickActions = computed(() => {
+    return prepareActions(actions.value?.filter((action) => action.quick), confirmableActions.value);
 });
 
 let errors = ref({});
@@ -92,6 +96,9 @@ function loadActions() {
     return loadActionsRequest;
 }
 
+const slots = useSlots();
+const showQuickActions = computed(() => preparedQuickActions.value && !!slots.quick);
+
 defineExpose({
     preparedActions,
 });
@@ -114,4 +121,5 @@ defineExpose({
         :loading="loading"
         :should-show-skeleton="shouldShowSkeleton"
     />
+    <slot v-if="showQuickActions" name="quick" :actions="preparedQuickActions" />
 </template>

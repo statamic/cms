@@ -8,26 +8,37 @@
                 :item="initialHandle"
                 @started="actionStarted"
                 @completed="actionCompleted"
-                v-slot="{ actions: preparedActions }"
             >
-                <Dropdown v-if="canConfigure || canEditBlueprint || hasItemActions">
-                    <template #trigger>
-                        <Button icon="dots" variant="ghost" :aria-label="__('Open dropdown menu')" />
-                    </template>
-                    <DropdownMenu>
-                        <DropdownItem :text="__('Configure')" icon="cog" v-if="canConfigure" :href="configureUrl" />
-                        <DropdownItem :text="__('Edit Blueprint')" icon="blueprint-edit" v-if="canEditBlueprint" :href="actions.editBlueprint" />
-                        <DropdownSeparator v-if="hasItemActions && (canConfigure || canEditBlueprint)" />
-                        <DropdownItem
-                            v-for="action in preparedActions"
-                            :key="action.handle"
-                            :text="__(action.title)"
-                            :icon="action.icon"
-                            :variant="action.dangerous ? 'destructive' : 'default'"
-                            @click="action.run"
-                        />
-                    </DropdownMenu>
-                </Dropdown>
+	            <template #default="{ actions: preparedActions }">
+	                <Dropdown v-if="canConfigure || canEditBlueprint || hasItemActions">
+	                    <template #trigger>
+	                        <Button icon="dots" variant="ghost" :aria-label="__('Open dropdown menu')" />
+	                    </template>
+	                    <DropdownMenu>
+	                        <DropdownItem :text="__('Configure')" icon="cog" v-if="canConfigure" :href="configureUrl" />
+	                        <DropdownItem :text="__('Edit Blueprint')" icon="blueprint-edit" v-if="canEditBlueprint" :href="actions.editBlueprint" />
+	                        <DropdownSeparator v-if="hasItemActions && (canConfigure || canEditBlueprint)" />
+	                        <DropdownItem
+	                            v-for="action in preparedActions"
+	                            :key="action.handle"
+	                            :text="__(action.title)"
+	                            :icon="action.icon"
+	                            :variant="action.dangerous ? 'destructive' : 'default'"
+	                            @click="action.run"
+	                        />
+	                    </DropdownMenu>
+	                </Dropdown>
+	            </template>
+	            <template #quick="{ actions }">
+		            <Button
+			            v-for="action in actions"
+			            :key="action.handle"
+			            :text="__(action.title)"
+			            :icon="action.icon"
+			            :variant="action.dangerous ? 'danger' : 'default'"
+			            @click="action.run"
+		            />
+	            </template>
             </ItemActions>
             <Dropdown v-else-if="canConfigure || canEditBlueprint">
                 <template #trigger>
