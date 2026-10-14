@@ -4,21 +4,18 @@ namespace Statamic\View\Instrumentation;
 
 use LogicException;
 use Statamic\Fields\Value;
-use Statamic\View\Antlers\Language\Nodes\AntlersNode;
 use WeakMap;
 
-class FieldTracer implements TracerContract
+/** @internal */
+abstract class FieldTracer
 {
     private bool $capturing = false;
     private bool $readingMetadata = false;
-    private array $frames = [];
     private array $fields = [];
-    private array $occurrences = [];
     private array $fieldIds = [];
     private WeakMap $values;
     private WeakMap $owners;
     private int $nextOwner = 0;
-    private int $nextOccurrence = 0;
 
     public function capture(callable $render): mixed
     {
@@ -26,22 +23,17 @@ class FieldTracer implements TracerContract
             throw new LogicException('A field trace capture is already active.');
         }
 
-        $this->frames = [];
         $this->fields = [];
-        $this->occurrences = [];
         $this->fieldIds = [];
         $this->values = new WeakMap;
         $this->owners = new WeakMap;
         $this->nextOwner = 0;
-        $this->nextOccurrence = 0;
         $this->capturing = true;
 
         try {
             return Value::withReadObserver($this->read(...), $render);
         } finally {
             $this->capturing = false;
-            $this->frames = [];
-
             $this->values = new WeakMap;
             $this->owners = new WeakMap;
             $this->fieldIds = [];
@@ -51,30 +43,6 @@ class FieldTracer implements TracerContract
     public function fields(): array
     {
         return $this->fields;
-    }
-
-    public function occurrences(): array
-    {
-        return $this->occurrences;
-    }
-
-    public function onEnter(Span $span): mixed
-    {
-        if (! $this->capturing || ! $span->raw() instanceof AntlersNode) {
-            return null;
-        }
-
-        $this->nextOccurrence++;
-        $id = $this->nextOccurrence;
-        $this->frames[$id] = [
-            'parent' => array_key_last($this->frames),
-            'expression' => $span->expression,
-            'view' => $span->view,
-            'line' => $span->line,
-            'fields' => [],
-        ];
-
-        return $id;
     }
 
     private function read(Value $value): void
@@ -100,15 +68,9 @@ class FieldTracer implements TracerContract
         }
     }
 
-    protected function isObservingReads(): bool
-    {
-        return $this->frames !== [];
-    }
+    abstract protected function isObservingReads(): bool;
 
-    protected function fieldRead(int $field): void
-    {
-        $this->frames[array_key_last($this->frames)]['fields'][$field] = $field;
-    }
+    abstract protected function fieldRead(int $field): void;
 
     private function fieldId(Value $value): ?int
     {
@@ -179,21 +141,5 @@ class FieldTracer implements TracerContract
         $this->fieldIds[$key] = $id;
 
         return $id;
-    }
-
-    public function onExit(Span $span, mixed $handle, mixed $output): void
-    {
-        if ($handle === null || ! isset($this->frames[$handle])) {
-            return;
-        }
-
-        $frame = $this->frames[$handle];
-        $frame['fields'] = array_values($frame['fields']);
-        $this->occurrences[$handle] = $frame;
-        unset($this->frames[$handle]);
-    }
-
-    public function onRenderComplete(): void
-    {
     }
 }
