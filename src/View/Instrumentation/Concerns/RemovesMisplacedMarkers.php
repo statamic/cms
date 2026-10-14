@@ -75,6 +75,12 @@ trait RemovesMisplacedMarkers
                     return true;
                 }
             }
+
+            foreach (array_keys($instrumenter->markerPatterns()) as $needle) {
+                if (str_contains($html, $needle)) {
+                    return true;
+                }
+            }
         }
 
         return false;
@@ -153,6 +159,11 @@ trait RemovesMisplacedMarkers
                 $patterns[] = MisplacedMarkerRemover::attributePattern($name);
                 $found = $found || str_contains($html, ' '.$name.'="');
             }
+
+            foreach ($instrumenter->markerPatterns() as $needle => $pattern) {
+                $patterns[] = $pattern;
+                $found = $found || str_contains($html, $needle);
+            }
         }
 
         if (! $found) {
@@ -165,5 +176,11 @@ trait RemovesMisplacedMarkers
     protected function strippableComments(): bool
     {
         return $this->commentsEnabled && $this->commentFactory === null;
+    }
+
+    /** @return array<string, string> */
+    protected function markerPatterns(): array
+    {
+        return [];
     }
 }
