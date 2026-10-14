@@ -551,13 +551,12 @@ export default {
                 return;
             }
 
-            const update = () => {
-                this.cardMultiColumnLayout = panel.clientWidth > CARD_MULTI_COLUMN_MIN_WIDTH;
-                this.cardMaxColumns = panel.clientWidth > CARD_THREE_COLUMN_MIN_WIDTH ? 3 : 2;
-            };
+            this.cardLayoutObserver = new ResizeObserver(([entry]) => {
+                const width = entry.contentRect.width;
 
-            update();
-            this.cardLayoutObserver = new ResizeObserver(update);
+                this.cardMultiColumnLayout = width > CARD_MULTI_COLUMN_MIN_WIDTH;
+                this.cardMaxColumns = width > CARD_THREE_COLUMN_MIN_WIDTH ? 3 : 2;
+            });
             this.cardLayoutObserver.observe(panel);
         },
     },
