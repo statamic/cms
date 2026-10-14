@@ -3,7 +3,7 @@ import { computed, provide, ref, watch, onMounted, onUnmounted, useTemplateRef }
 import useResizable from '@/composables/use-resizable.js';
 import useAiChat from '@/composables/use-ai-chat.js';
 import AiChat from '@/components/ai-chat/AiChat.vue';
-import AiChatDockStrip from '@/components/ai-chat/AiChatDockStrip.vue';
+import AiChatDockControl from '@/components/ai-chat/AiChatDockControl.vue';
 import { Tabs, TabList, TabTrigger } from '@ui';
 
 const minWidth = 175;
@@ -158,23 +158,21 @@ onUnmounted(() => {
                 </TabList>
             </Tabs>
             <div v-show="showPagePanel" id="right-panel-page" class="min-[1000px]:grid flex-1"></div>
-            <div v-show="showChat" class="layout-panel-content flex flex-1 min-h-0" :data-mobile-open="chatOpen">
-                <div class="flex min-w-0 flex-1 flex-col">
-                    <AiChat v-if="!chatFloating" />
-                </div>
-                <AiChatDockStrip v-if="!chatFloating" />
+            <div v-show="showChat" class="layout-panel-content group/chat relative flex flex-1 flex-col min-h-0" :data-mobile-open="chatOpen">
+                <template v-if="!chatFloating">
+                    <AiChat />
+                    <AiChatDockControl />
+                </template>
             </div>
         </div>
     </Teleport>
 
     <div
         v-if="chatOpen && chatFloating"
-        class="fixed end-4 bottom-4 max-h-[calc(100dvh-11rem)] z-(--z-index-modal) flex w-95 max-w-[calc(100vw-2rem)] rounded-2xl border border-gray-200/80 bg-white/70 ps-2 shadow-2xl backdrop-blur-xl dark:border-gray-700/80 dark:bg-gray-900/70"
+        class="fixed end-4 bottom-4 max-h-[calc(100dvh-11rem)] z-(--z-index-modal) group/chat flex w-95 max-w-[calc(100vw-2rem)] flex-col rounded-2xl border border-gray-200/80 bg-white/70 ps-2 shadow-2xl backdrop-blur-xl dark:border-gray-700/80 dark:bg-gray-900/70"
     >
-        <div class="flex min-w-0 flex-1 flex-col">
-            <AiChat />
-        </div>
-        <AiChatDockStrip />
+        <AiChat />
+        <AiChatDockControl />
     </div>
 
     <slot />
