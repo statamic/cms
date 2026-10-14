@@ -173,7 +173,7 @@ onUnmounted(() => {
     <div
         v-if="chatOpen && chatFloating"
         :class="chatCardClasses"
-        class="fixed end-4 bottom-4 max-h-[calc(100dvh-11rem)] z-(--z-index-modal) group/chat flex w-95 max-w-[calc(100vw-2rem)] flex-col ps-2"
+        class="fixed end-4 bottom-4 max-h-[calc(100dvh-11rem)] z-(--z-index-modal) group/chat flex w-84 max-w-[calc(100vw-2rem)] flex-col ps-2.25"
     >
         <AiChat />
         <AiChatDockControl />

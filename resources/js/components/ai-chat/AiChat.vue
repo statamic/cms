@@ -8,7 +8,8 @@ const { open, messages, floating } = useAiChat();
 // Floating, the input sits straight on the card with no box of its own. Docked, it keeps its usual white box.
 const inputClasses = computed(() =>
     floating.value
-        ? 'border-0! bg-transparent! py-2! shadow-none! outline-hidden! ps-1! pe-10! dark:bg-transparent!'
+        ? // The middle of the lowercase letters sits about 1.4px below the middle of the capitals, so even padding looks low unless we nudge it.
+        'border-0! bg-transparent! pt-[3.5px]! pb-[6px]! shadow-none! outline-hidden! ps-1! pe-10! dark:bg-transparent!'
         : 'pe-10',
 );
 const prompt = ref('');
@@ -112,7 +113,7 @@ function scrollToBottom() {
                 variant="primary"
                 size="xs"
                 round
-                :class="floating ? 'end-3.75 bottom-3.75' : 'end-5.25 bottom-5.25'"
+                :class="floating ? 'end-3.25 bottom-3.25' : 'end-5.25 bottom-5.25'"
                 class="absolute bg-none! bg-primary! disabled:opacity-100! hover:bg-primary-hover! border-0 shadow-none! inset-shadow-none! [&_svg]:opacity-100! [&_g]:[stroke-width:1.5]"
                 :aria-label="__('Send')"
                 v-tooltip="__('Send')"
