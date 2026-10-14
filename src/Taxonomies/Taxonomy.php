@@ -405,7 +405,7 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, ContainsQ
 
         return (new \Statamic\Http\Responses\DataResponse($this))
             ->with([
-                'terms' => $termQuery = $this->queryTerms()->where('site', $site),
+                'terms' => $termQuery = $this->queryTerms()->where('site', $site->handle()),
                 $this->handle() => $termQuery,
             ])
             ->toResponse($request);
