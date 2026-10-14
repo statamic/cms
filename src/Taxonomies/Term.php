@@ -67,7 +67,7 @@ class Term implements ContainsQueryableValues, TermContract
             })
             ->getter(function ($taxonomy) {
                 return $taxonomy ? Blink::once("taxonomy-{$taxonomy}", function () use ($taxonomy) {
-                    return Taxonomy::findByHandle($taxonomy);
+                    return Taxonomy::findByHandle($taxonomy)?->collection($this->collection());
                 }) : null;
             })
             ->args(func_get_args());
