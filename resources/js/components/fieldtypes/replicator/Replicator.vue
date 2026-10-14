@@ -19,7 +19,7 @@
                     <section :class="{ 'mt-12 p-4': fullScreenMode }">
                         <sortable-list
                             :model-value="value"
-                            :vertical="true"
+                            :vertical="!hasMultiColumnCards"
                             :item-class="sortableItemClass"
                             :handle-class="sortableRowHandleClass"
                             :distance="pointerDragThreshold"
@@ -27,11 +27,15 @@
                             constrain-dimensions
                             :animate="false"
                             @update:model-value="sorted"
-                            @dragstart="$emit('focus')"
-                            @dragend="$emit('blur')"
+                            @dragstart="startDragging"
+                            @dragend="stopDragging"
                             v-slot="{}"
                         >
-                            <div ref="setList" class="replicator-set-list relative">
+                            <div
+                                ref="setList"
+                                class="replicator-set-list relative"
+                                :data-replicator-dragging="dragging || undefined"
+                            >
                                 <div
                                     v-for="(set, index) in value"
                                     :key="set._id"
@@ -159,6 +163,7 @@ export default {
     data() {
         return {
             focused: false,
+            dragging: false,
             collapsed: clone(this.meta.collapsed),
             fullScreenMode: false,
             escBinding: null,
@@ -217,6 +222,10 @@ export default {
             );
         },
 
+        hasMultiColumnCards() {
+            return this.cardMultiColumnLayout && this.cardLayouts.some((layout) => layout.isCard && layout.columns > 1);
+        },
+
         replicatorPreview() {
             if (!this.showFieldPreviews) return;
 
@@ -255,6 +264,16 @@ export default {
     },
 
     methods: {
+        startDragging() {
+            this.dragging = true;
+            this.$emit('focus');
+        },
+
+        stopDragging() {
+            this.dragging = false;
+            this.$emit('blur');
+        },
+
         setConfig(handle) {
             return this.setConfigs.find((c) => c.handle === handle) || {};
         },

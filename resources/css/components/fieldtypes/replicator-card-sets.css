@@ -1,5 +1,12 @@
 /* GROUP REPLICATOR CARD SETS
 =================================================== */
+[data-replicator-dragging] [data-replicator-connector],
+[data-replicator-dragging] [data-replicator-set-picker],
+.draggable-mirror [data-replicator-connector],
+.draggable-mirror [data-replicator-set-picker] {
+    visibility: hidden;
+}
+
 @container panel (width > 635px) {
     .replicator-set-list {
         display: flex;

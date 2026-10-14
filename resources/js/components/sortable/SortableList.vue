@@ -148,6 +148,12 @@ export default {
     },
 
     watch: {
+        vertical() {
+            if (this.disabled) return;
+
+            this.destroySortableList();
+            this.setupSortableList();
+        },
         disabled(disabled) {
             disabled ? this.destroySortableList() : this.setupSortableList();
         },

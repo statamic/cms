@@ -5,6 +5,7 @@
                 <div class="inline-flex relative pt-2" :class="{ 'pt-6': showConnector }">
                     <div
                         v-if="showConnector"
+                        data-replicator-connector
                         class="absolute group-hover:opacity-0 transition-opacity delay-25 duration-125 inset-y-0 h-full left-3.5 border-l-1 border-dashed z-0 dark:bg-gray-850"
                         :class="readOnly ? 'border-gray-300 dark:border-gray-700/35' : 'border-gray-400 dark:border-gray-600'"
                     />
