@@ -57,6 +57,10 @@ class AppServiceProvider extends ServiceProvider
         }
 
         $this->app[\Illuminate\Contracts\Http\Kernel::class]
+            ->addToMiddlewarePriorityBefore(
+                \Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests::class,
+                \Statamic\Http\Middleware\EnsureFrontendAuthEnabled::class
+            )
             ->pushMiddleware(\Statamic\Http\Middleware\PoweredByHeader::class)
             ->pushMiddleware(\Statamic\Http\Middleware\CheckComposerJsonScripts::class)
             ->pushMiddleware(\Statamic\Http\Middleware\CheckMultisite::class)

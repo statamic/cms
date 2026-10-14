@@ -193,4 +193,39 @@ class UserTagsTest extends TestCase
 
         $this->assertEquals('foo@bar.com', $this->tag('{{ user field="field1" value="foobar" }}{{email}}{{ /user }}'));
     }
+
+    #[Test]
+    #[DataProvider('authTags')]
+    public function auth_tags_throw_when_frontend_authentication_is_disabled(string $tag): void
+    {
+        config(['statamic.users.frontend_auth_enabled' => false]);
+
+        $this->expectExceptionMessage('Front-end authentication is disabled. Enable it using the statamic.users.frontend_auth_enabled config option.');
+
+        $this->tag('{{ user:'.$tag.' }}{{ /user:'.$tag.' }}');
+    }
+
+    public static function authTags(): array
+    {
+        return [
+            ['login_form'],
+            ['register_form'],
+            ['registration_form'],
+            ['profile_form'],
+            ['password_form'],
+            ['passkey_form'],
+            ['delete_passkey_form'],
+            ['logout_url'],
+            ['logout'],
+            ['forgot_password_form'],
+            ['reset_password_form'],
+            ['elevated_session_form'],
+            ['two_factor_challenge_form'],
+            ['two_factor_enable_form'],
+            ['two_factor_setup_form'],
+            ['two_factor_recovery_codes_download_url'],
+            ['reset_two_factor_recovery_codes_form'],
+            ['disable_two_factor_form'],
+        ];
+    }
 }

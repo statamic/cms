@@ -720,4 +720,22 @@ EOT
 
         $this->assertGuest();
     }
+
+    #[Test]
+    public function it_returns_404_when_frontend_authentication_is_disabled(): void
+    {
+        User::make()->email('test@example.com')->password('secret')->save();
+
+        config(['statamic.users.frontend_auth_enabled' => false]);
+
+        $this->post('/!/auth/login', [
+            'email' => 'test@example.com',
+            'password' => 'secret',
+        ])->assertNotFound();
+
+        $this->get('/!/auth/passkeys/options')->assertNotFound();
+        $this->post('/!/auth/passkeys/auth')->assertNotFound();
+
+        $this->assertGuest();
+    }
 }

@@ -4,6 +4,7 @@ namespace Statamic\Auth;
 
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Auth\Role;
+use Statamic\Exceptions\FrontendAuthenticationDisabledException;
 use Statamic\Facades\TwoFactor;
 use Statamic\Facades\URL;
 use Statamic\Facades\User;
@@ -103,6 +104,8 @@ class UserTags extends Tags
      */
     public function loginForm()
     {
+        $this->ensureFrontendAuthEnabled();
+
         $data = array_merge($this->getFormSession(), [
             'passkey_options_url' => route('statamic.passkeys.options'),
             'passkey_verify_url' => route('statamic.passkeys.login'),
@@ -150,6 +153,8 @@ class UserTags extends Tags
      */
     public function registerForm()
     {
+        $this->ensureFrontendAuthEnabled();
+
         $data = $this->getFormSession('user.register');
 
         $data['fields'] = $this->getRegistrationFields();
@@ -196,6 +201,8 @@ class UserTags extends Tags
      */
     public function profileForm()
     {
+        $this->ensureFrontendAuthEnabled();
+
         if (session()->has('status')) {
             return $this->parse(['success' => true]);
         }
@@ -248,6 +255,8 @@ class UserTags extends Tags
      */
     public function passwordForm()
     {
+        $this->ensureFrontendAuthEnabled();
+
         if (session()->has('status')) {
             return $this->parse(['success' => true]);
         }
@@ -308,6 +317,8 @@ class UserTags extends Tags
      */
     public function passkeyForm()
     {
+        $this->ensureFrontendAuthEnabled();
+
         $data = [
             'passkey_options_url' => route('statamic.passkeys.create'),
             'passkey_verify_url' => route('statamic.passkeys.store'),
@@ -361,6 +372,8 @@ class UserTags extends Tags
      */
     public function deletePasskeyForm()
     {
+        $this->ensureFrontendAuthEnabled();
+
         if (! $user = User::current()) {
             return '';
         }
@@ -414,6 +427,8 @@ class UserTags extends Tags
      */
     public function logoutUrl()
     {
+        $this->ensureFrontendAuthEnabled();
+
         $queryParams = [];
 
         if ($redirect = $this->params->get('redirect')) {
@@ -430,6 +445,8 @@ class UserTags extends Tags
      */
     public function logout()
     {
+        $this->ensureFrontendAuthEnabled();
+
         auth()->logout();
 
         abort(redirect($this->params->get('redirect', '/'), $this->params->get('response', 302)));
@@ -444,6 +461,8 @@ class UserTags extends Tags
      */
     public function forgotPasswordForm()
     {
+        $this->ensureFrontendAuthEnabled();
+
         $data = $this->getFormSession('user.forgot_password');
 
         // Alias for backwards compatibility.
@@ -508,6 +527,8 @@ class UserTags extends Tags
      */
     public function resetPasswordForm()
     {
+        $this->ensureFrontendAuthEnabled();
+
         if (session()->has('status')) {
             return $this->parse(['success' => true]);
         }
@@ -750,6 +771,8 @@ class UserTags extends Tags
      */
     public function elevatedSessionForm()
     {
+        $this->ensureFrontendAuthEnabled();
+
         if (! ($user = User::current())) {
             return;
         }
@@ -817,6 +840,8 @@ class UserTags extends Tags
      */
     public function twoFactorChallengeForm()
     {
+        $this->ensureFrontendAuthEnabled();
+
         if (
             ! TwoFactor::enabled()
             || session()->missing('login.id')
@@ -868,6 +893,8 @@ class UserTags extends Tags
      */
     public function twoFactorEnableForm()
     {
+        $this->ensureFrontendAuthEnabled();
+
         $user = User::current();
 
         if (
@@ -918,6 +945,8 @@ class UserTags extends Tags
      */
     public function twoFactorSetupForm()
     {
+        $this->ensureFrontendAuthEnabled();
+
         $user = User::current();
 
         if (
@@ -1000,6 +1029,8 @@ class UserTags extends Tags
      */
     public function twoFactorRecoveryCodesDownloadUrl()
     {
+        $this->ensureFrontendAuthEnabled();
+
         $user = User::current();
 
         if (
@@ -1021,6 +1052,8 @@ class UserTags extends Tags
      */
     public function resetTwoFactorRecoveryCodesForm()
     {
+        $this->ensureFrontendAuthEnabled();
+
         $user = User::current();
 
         if (
@@ -1070,6 +1103,8 @@ class UserTags extends Tags
      */
     public function disableTwoFactorForm()
     {
+        $this->ensureFrontendAuthEnabled();
+
         $user = User::current();
 
         if (
@@ -1283,5 +1318,13 @@ class UserTags extends Tags
             })
             ->values()
             ->all();
+    }
+
+    private function ensureFrontendAuthEnabled(): void
+    {
+        throw_unless(
+            config('statamic.users.frontend_auth_enabled', true),
+            new FrontendAuthenticationDisabledException
+        );
     }
 }

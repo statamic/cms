@@ -96,4 +96,22 @@ class ResetPasswordFormTest extends TestCase
         $this->assertStringContainsString($expectedRedirect, $output);
         $this->assertStringContainsString($expectedErrorRedirect, $output);
     }
+
+    #[Test]
+    public function it_returns_404_when_frontend_authentication_is_disabled(): void
+    {
+        config(['statamic.users.frontend_auth_enabled' => false]);
+
+        $this->get('/!/auth/password/reset/token')->assertNotFound();
+        $this->post('/!/auth/password/reset')->assertNotFound();
+    }
+
+    #[Test]
+    public function account_activation_remains_available(): void
+    {
+        config(['statamic.users.frontend_auth_enabled' => false]);
+
+        $this->get('/!/auth/activate/token')->assertOk();
+        $this->post('/!/auth/activate')->assertRedirect()->assertSessionHasErrors(['token', 'email', 'password']);
+    }
 }
