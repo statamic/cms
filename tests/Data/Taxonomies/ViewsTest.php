@@ -93,6 +93,22 @@ class ViewsTest extends TestCase
     }
 
     #[Test]
+    public function it_loops_over_the_taxonomy_terms_in_antlers()
+    {
+        $this->viewShouldReturnRaw('tags.index', '{{ terms }}{{ title }} {{ url }}{{ /terms }} | {{ tags }}{{ title }}{{ /tags }}');
+
+        $this->get('/fr/tags')->assertOk()->assertSee('Le Test /fr/tags/le-test | Le Test');
+    }
+
+    #[Test]
+    public function it_loops_over_the_taxonomy_terms_in_blade()
+    {
+        $this->viewShouldReturnRaw('tags.index', '@foreach ($terms as $term){{ $term->title }} {{ $term->url }}@endforeach | @foreach ($tags as $tag){{ $tag->title }}@endforeach', 'blade.php');
+
+        $this->get('/fr/tags')->assertOk()->assertSee('Le Test /fr/tags/le-test | Le Test');
+    }
+
+    #[Test]
     public function the_term_url_404s_if_the_view_doesnt_exist()
     {
         $this->get('/tags/test')->assertNotFound();
