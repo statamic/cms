@@ -35,16 +35,14 @@
         }
     }
 
-    .replicator-set-slot--full,
-    .replicator-set-slot--card-cols-1,
     .replicator-set-slot--card-cols-2,
     .replicator-set-slot--card-cols-3 {
-        .publish-fields {
+        > div > [data-replicator-set] > [data-replicator-set-fields] > div > .publish-fields {
             /* Prevent columns and gaps exceeding the container */
             grid-column-gap: unset;
 
-            * {
-                --col-span: 12;
+            > .form-group {
+                --col-span: var(--grid-columns);
             }
         }
     }

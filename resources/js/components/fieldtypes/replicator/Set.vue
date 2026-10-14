@@ -1,5 +1,6 @@
 <script setup>
 import { computed, inject, ref } from 'vue';
+import { DropdownMenuCheckboxItem } from 'reka-ui';
 import {
     Icon,
     Switch,
@@ -246,14 +247,15 @@ function onSetDropdownClosed() {
                             <Button icon="dots" variant="ghost" size="xs" :aria-label="__('Open dropdown menu')" />
                         </template>
                         <DropdownMenu>
-                            <div
+                            <DropdownMenuCheckboxItem
                                 v-if="config.card"
-                                class="col-span-2 flex items-center justify-between gap-4 rounded-lg px-3 py-1.5 text-sm text-gray-700 dark:text-gray-300"
-                                @pointerdown.stop
+                                class="col-span-2 flex items-center justify-between gap-4 rounded-lg px-3 py-1.5 text-sm text-gray-700 outline-hidden cursor-pointer data-highlighted:bg-gray-100 dark:text-gray-300 dark:data-highlighted:bg-gray-800"
+                                :model-value="enabled"
+                                @update:model-value="toggleEnabledState"
                             >
                                 <span>{{ __('Visible') }}</span>
-                                <Switch size="xs" :model-value="enabled" @update:model-value="toggleEnabledState" />
-                            </div>
+                                <Icon v-if="enabled" name="checkmark" class="size-3.5" aria-hidden="true" />
+                            </DropdownMenuCheckboxItem>
                             <DropdownSeparator v-if="config.card" />
                             <DropdownItem
                                 v-if="fieldActions.length"
@@ -295,6 +297,7 @@ function onSetDropdownClosed() {
 
             <div
                 v-show="!collapsed && hasFields"
+                data-replicator-set-fields
                 :class="{ 'contain-paint': collapsed, 'isolate': !collapsed }"
                 class="border-t border-t-gray-300! dark:border-t-white/10!"
             >
