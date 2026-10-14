@@ -28,6 +28,11 @@
         min-width: 0;
         padding-block-start: 1.5rem;
 
+        /* Too narrow for the collapsed preview, it only shows as clipped text */
+        [data-replicator-set-preview] {
+            display: none;
+        }
+
         > div > [data-replicator-set-picker] {
             position: absolute;
             z-index: var(--z-index-above);

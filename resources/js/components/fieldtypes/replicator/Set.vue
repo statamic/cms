@@ -222,6 +222,7 @@ function onSetDropdownClosed() {
                     />
                     <Subheading
                         v-show="collapsed"
+                        data-replicator-set-preview
                         v-html="previewText"
                         class="overflow-hidden text-ellipsis whitespace-nowrap"
                     />
