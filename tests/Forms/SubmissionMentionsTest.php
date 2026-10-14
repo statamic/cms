@@ -170,6 +170,47 @@ class SubmissionMentionsTest extends TestCase
     }
 
     #[Test]
+    public function it_replaces_mentions_in_content()
+    {
+        $this->assertSame(
+            'Hi Granny Smith, from Stripes',
+            SubmissionMentions::replace($this->makeSubmission(), 'Hi [[ apple ]], from [[zebra]]')
+        );
+    }
+
+    #[Test]
+    public function it_decodes_escaped_brackets_when_replacing_without_mentions()
+    {
+        $this->assertSame('Not [[a mention]]', SubmissionMentions::replace($this->makeSubmission(), 'Not \\[[a mention]]'));
+    }
+
+    #[Test]
+    public function it_runs_the_replace_callback_without_seeing_submitted_values()
+    {
+        $seen = null;
+
+        $result = SubmissionMentions::replace($this->makeSubmission(), '[[apple]] {{ x }}', function ($text) use (&$seen) {
+            $seen = $text;
+
+            return str_replace('{{ x }}', 'X', $text);
+        });
+
+        $this->assertStringNotContainsString('Granny Smith', $seen);
+        $this->assertStringContainsString('{{ x }}', $seen);
+        $this->assertStringContainsString('Granny Smith', $result);
+        $this->assertStringContainsString(' X', $result);
+    }
+
+    #[Test]
+    public function it_uses_provided_submission_data_when_replacing()
+    {
+        $this->assertSame(
+            'Provided',
+            SubmissionMentions::replace($this->makeSubmission(), '[[apple]]', submissionData: ['apple' => 'Provided'])
+        );
+    }
+
+    #[Test]
     public function it_resolves_site_and_registered_values()
     {
         config(['app.name' => 'My App']);

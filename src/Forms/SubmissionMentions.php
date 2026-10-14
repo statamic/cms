@@ -93,6 +93,13 @@ class SubmissionMentions
         return $values;
     }
 
+    public static function replace(Submission $submission, string $content, ?callable $using = null, ?array $submissionData = null): string
+    {
+        $values = static::values($submission, static::handlesIn($content), $submissionData);
+
+        return Mentions::replace($content, $values, using: $using);
+    }
+
     public static function mentionValue(mixed $value): string
     {
         if ($value instanceof Value) {

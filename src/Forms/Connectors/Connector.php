@@ -238,11 +238,6 @@ abstract class Connector
         return SubmissionMentions::options($this->form());
     }
 
-    protected function mentionValues(Submission $submission, string ...$contents): array
-    {
-        return SubmissionMentions::values($submission, SubmissionMentions::handlesIn(...$contents));
-    }
-
     public function routes(Router $router): void
     {
         //
