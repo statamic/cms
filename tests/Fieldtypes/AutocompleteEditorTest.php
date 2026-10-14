@@ -225,6 +225,28 @@ class AutocompleteEditorTest extends TestCase
     }
 
     #[Test]
+    public function parse_markdown_escapes_raw_html()
+    {
+        $this->assertSame(
+            '&lt;script&gt;alert(1)&lt;/script&gt;',
+            trim(AutocompleteEditor::parseMarkdown('<script>alert(1)</script>'))
+        );
+
+        $this->assertSame(
+            'Hi &lt;a href="https://example.com"&gt;x&lt;/a&gt; &lt;b&gt;',
+            AutocompleteEditor::parseMarkdown('Hi <a href="https://example.com">x</a> &lt;b&gt;', inline: true)
+        );
+    }
+
+    #[Test]
+    public function parse_markdown_drops_unsafe_links()
+    {
+        $html = AutocompleteEditor::parseMarkdown('[x](javascript:alert(1))', inline: true);
+
+        $this->assertStringNotContainsString('javascript:', $html);
+    }
+
+    #[Test]
     public function augment_parses_markdown_without_a_field()
     {
         $this->assertSame('<p>Hi <strong>John</strong></p>', trim((new AutocompleteEditor)->augment('Hi **John**')));
@@ -302,13 +324,32 @@ class AutocompleteEditorTest extends TestCase
     }
 
     #[Test]
-    public function mention_tokens_keep_their_original_spacing_and_work_in_links_and_code()
+    public function mention_tokens_keep_their_original_spacing_and_work_in_link_text_and_code()
     {
         $fieldtype = $this->fieldtype(['inline' => true]);
 
-        $html = $fieldtype->augment('[[a]] [[   b   ]] [x]([[ c ]]) `[[ d ]]`');
+        $html = $fieldtype->augment('[[a]] [[   b   ]] [[[ c ]]](https://example.com) `[[ d ]]`');
 
-        $this->assertSame('[[a]] [[   b   ]] <a href="[[ c ]]">x</a> <code>[[ d ]]</code>', $html);
+        $this->assertSame('[[a]] [[   b   ]] <a href="https://example.com">[[ c ]]</a> <code>[[ d ]]</code>', $html);
+    }
+
+    #[Test]
+    public function mentions_inside_tags_stay_literal()
+    {
+        $html = AutocompleteEditor::parseMarkdown('[x]([[ url ]] "[[ title ]]") ![[[ alt ]]]([[ src ]]) [y](https://example.com/?id=[[ id ]])', inline: true);
+
+        $this->assertSame(
+            '<a href="&#91;&#91; url ]]" title="&#91;&#91; title ]]">x</a> <img src="&#91;&#91; src ]]" alt="&#91;&#91; alt ]]" /> <a href="https://example.com/?id=&#91;&#91; id ]]">y</a>',
+            $html
+        );
+    }
+
+    #[Test]
+    public function a_mention_value_cannot_become_a_javascript_url()
+    {
+        $html = AutocompleteEditor::renderHtml('[x]([[ url ]])', ['url' => 'javascript:alert(1)']);
+
+        $this->assertStringNotContainsString('javascript:', $html);
     }
 
     #[Test]

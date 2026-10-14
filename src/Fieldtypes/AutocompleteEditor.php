@@ -161,7 +161,9 @@ class AutocompleteEditor extends Fieldtype
             return $sentinel;
         }, $markdown);
 
-        $html = Markdown::parser('default')->parse($markdown);
+        $html = Markdown::parser('default')
+            ->newInstance(['html_input' => 'escape', 'allow_unsafe_links' => false])
+            ->parse($markdown);
 
         $html = str_replace('[[', '&#91;&#91;', $html);
         $html = preg_replace_callback(
@@ -169,6 +171,13 @@ class AutocompleteEditor extends Fieldtype
             fn ($matches) => str_repeat('&#92;', strlen($matches[0])),
             $html
         );
+
+        // Mentions only resolve in text. One inside a tag, such as a link or image
+        // destination, is restored as a literal so a value can never end up in an
+        // attribute, where escaping alone can't stop a `javascript:` URL.
+        $literals = array_map(fn ($token) => str_replace('[[', '&#91;&#91;', $token), $mentions);
+        $html = preg_replace_callback('/<[^>]*>/', fn ($matches) => strtr($matches[0], $literals), $html);
+
         $html = strtr($html, $mentions);
 
         return $inline ? static::unwrapParagraph($html) : $html;
