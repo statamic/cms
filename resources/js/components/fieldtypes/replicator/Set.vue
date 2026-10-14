@@ -88,7 +88,7 @@ const fieldActions = computed(() => {
     return toFieldActions('replicator-fieldtype-set', fieldActionPayload.value);
 });
 
-const previewText = computed(() => {
+const previewItems = computed(() => {
     return Object.entries(data_get(previews.value, fieldPathPrefix.value) || {})
         .filter(([handle, value]) => {
             if (!handle.endsWith('_')) return false;
@@ -110,8 +110,18 @@ const previewText = computed(() => {
 
             return escapeHtml(JSON.stringify(value));
         })
-        .filter((html) => html && html.trim() !== '')
-        .join(' <span class="text-gray-400 dark:text-gray-600">/</span> ');
+        .filter((html) => html && html.trim() !== '');
+});
+
+const previewText = computed(() => previewItems.value.join(' <span class="text-gray-400 dark:text-gray-600">/</span> '));
+
+const firstPreviewText = computed(() => {
+    if (!previewItems.value.length) return null;
+
+    const el = document.createElement('div');
+    el.innerHTML = previewItems.value[0];
+
+    return el.textContent.trim() || null;
 });
 
 function toggleEnabledState() {
@@ -214,6 +224,7 @@ function onSetDropdownClosed() {
                         </span>
                         {{ __(config.display) || config.handle }}
                     </Badge>
+                    <span v-if="firstPreviewText" class="sr-only">{{ firstPreviewText }}</span>
                     <Icon
                         v-if="config.instructions && !collapsed"
                         name="info-square"
@@ -223,6 +234,7 @@ function onSetDropdownClosed() {
                     <Subheading
                         v-show="collapsed"
                         data-replicator-set-preview
+                        aria-hidden="true"
                         v-html="previewText"
                         class="overflow-hidden text-ellipsis whitespace-nowrap"
                     />
