@@ -39,6 +39,19 @@ class PreparserTest extends ParserTestCase
         }
     }
 
+    public function test_registered_visitors_keep_the_render_node_cache_across_parser_resolutions()
+    {
+        Runtime::addVisitor(new RecordingNodeVisitor);
+        app(Parser::class)->parse('<p>{{ title }}</p>', ['title' => 'Hello']);
+        $cached = RuntimeParser::getNodeCache();
+
+        $this->assertNotEmpty($cached);
+
+        app(Parser::class)->parse('<p>{{ title }}</p>', ['title' => 'Hello']);
+
+        $this->assertSame($cached, RuntimeParser::getNodeCache());
+    }
+
     public function test_runtime_facade_preparsers_reach_existing_and_future_parsers()
     {
         $parser = app(Parser::class);
