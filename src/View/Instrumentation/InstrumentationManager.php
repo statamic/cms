@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Config;
 use InvalidArgumentException;
 use Statamic\View\Antlers\Language\Nodes\AntlersNode;
 use Statamic\View\Antlers\Language\Runtime\RuntimeConfiguration;
+use Statamic\View\Antlers\Language\Runtime\RuntimeParser;
 use Statamic\View\Antlers\Language\Runtime\Tracing\NodeVisitorContract;
 use Statamic\View\Antlers\Language\Runtime\Tracing\RuntimeTracerContract;
 use WeakMap;
@@ -77,6 +78,7 @@ class InstrumentationManager
     {
         if (! in_array($visitor, $this->runtimeVisitors, true)) {
             $this->runtimeVisitors[] = $visitor;
+            RuntimeParser::clearRenderNodeCache();
         }
 
         $this->applyToAntlers(fn (RuntimeConfiguration $config) => $config->addVisitor($visitor));
@@ -86,7 +88,10 @@ class InstrumentationManager
 
     public function removeVisitor(NodeVisitorContract $visitor): static
     {
-        $this->runtimeVisitors = $this->without($this->runtimeVisitors, $visitor);
+        if (in_array($visitor, $this->runtimeVisitors, true)) {
+            $this->runtimeVisitors = $this->without($this->runtimeVisitors, $visitor);
+            RuntimeParser::clearRenderNodeCache();
+        }
 
         $this->applyToAntlers(fn (RuntimeConfiguration $config) => $config->removeVisitor($visitor));
 
@@ -230,6 +235,10 @@ class InstrumentationManager
 
         foreach ($antlers as $piece) {
             $this->removeFromAntlers($piece);
+        }
+
+        if ($visitors !== []) {
+            RuntimeParser::clearRenderNodeCache();
         }
 
         $this->applyToAntlers(function (RuntimeConfiguration $config) use ($preparsers, $visitors) {

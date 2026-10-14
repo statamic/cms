@@ -233,7 +233,6 @@ class RuntimeConfiguration
         }
 
         $this->visitors[] = $visitor;
-        RuntimeParser::clearRenderNodeCache();
     }
 
     /** @return void */
@@ -247,7 +246,6 @@ class RuntimeConfiguration
             $this->visitors,
             fn ($registered) => $registered !== $visitor
         ));
-        RuntimeParser::clearRenderNodeCache();
     }
 
     /**
