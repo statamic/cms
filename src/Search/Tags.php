@@ -2,6 +2,7 @@
 
 namespace Statamic\Search;
 
+use Illuminate\Support\Str;
 use Statamic\Facades\Search;
 use Statamic\Facades\Site;
 use Statamic\Tags\Concerns;
@@ -37,6 +38,7 @@ class Tags extends BaseTags
         $this->queryConditions($builder);
         $this->queryScopes($builder);
         $this->queryOrderBys($builder);
+        $this->appendArguments($builder);
 
         $results = $this->getQueryResults($builder);
 
@@ -61,5 +63,16 @@ class Tags extends BaseTags
         }
 
         return $query->whereIn('site', $sites);
+    }
+
+    protected function appendArguments($query)
+    {
+        $arguments = collect($this->params)
+            ->filter(fn ($value, $key) => Str::startsWith($key, 'with:'))
+            ->mapWithKeys(fn ($value, $key) => [Str::after($key, 'with:') => $value]);
+
+        return $arguments->count()
+            ? $query->withArguments($arguments->all())
+            : $query;
     }
 }
