@@ -37,6 +37,7 @@ class SubmissionMentions
         }
 
         $others = [
+            'form.title' => __('Form Title'),
             'site.name' => __('Site Name'),
             'site.url' => __('Site URL'),
         ];
@@ -72,12 +73,14 @@ class SubmissionMentions
         $values = [];
 
         foreach ($handles as $handle) {
-            if ($handle === 'site.name') {
+            if ($handle === 'form.title') {
+                $value = $submission->form()->title();
+            } elseif ($handle === 'site.name') {
                 $value = $submission->site()->name();
             } elseif ($handle === 'site.url') {
                 $value = $submission->site()->absoluteUrl();
             } elseif (isset($registered[$handle])) {
-                $value = $registered[$handle]['value']();
+                $value = $registered[$handle]['value']($submission);
             } elseif (str_starts_with($handle, 'globals.')) {
                 $value = static::globalValue($submission, $handle, $globals);
             } elseif (in_array($handle, self::EXCLUDED_FORM_VALUES) || ! $submission->form()->fields()->has($handle)) {

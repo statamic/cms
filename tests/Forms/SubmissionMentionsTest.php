@@ -36,6 +36,7 @@ class SubmissionMentionsTest extends TestCase
             'apple' => 'Apple',
             'app.name' => 'App Name',
             'globals.company.name' => 'Company: Name',
+            'form.title' => 'Form Title',
             'shop.owner' => 'Owner',
             'site.name' => 'Site Name',
             'site.url' => 'Site URL',
@@ -94,7 +95,7 @@ class SubmissionMentionsTest extends TestCase
         tap(GlobalSet::make('company')->title('Company'))->save();
 
         $this->assertArrayNotHasKey('globals.company.name', SubmissionMentions::options($this->makeForm()));
-        $this->assertCount(5, SubmissionMentions::options($this->makeForm()));
+        $this->assertCount(6, SubmissionMentions::options($this->makeForm()));
     }
 
     #[Test]
@@ -134,7 +135,7 @@ class SubmissionMentionsTest extends TestCase
     #[Test]
     public function it_throws_for_invalid_registered_handles()
     {
-        foreach (['owner', 'shop owner.name', 'shop.na!me', 'site.custom', 'globals.company.name'] as $handle) {
+        foreach (['owner', 'shop owner.name', 'shop.na!me', 'site.custom', 'form.custom', 'globals.company.name'] as $handle) {
             try {
                 Form::registerMention($handle, 'Label', fn () => 'x');
                 $this->fail("Handle [{$handle}] should have been rejected.");
@@ -223,6 +224,31 @@ class SubmissionMentionsTest extends TestCase
             'site.url' => 'http://localhost',
             'app.name' => 'My App',
         ], $values);
+    }
+
+    #[Test]
+    public function it_resolves_the_form_title()
+    {
+        $submission = $this->makeSubmission();
+        $submission->form()->title('Contact Us')->save();
+
+        $this->assertSame(['form.title' => 'Contact Us'], SubmissionMentions::values($submission, ['form.title']));
+    }
+
+    #[Test]
+    public function it_passes_the_submission_to_registered_closures()
+    {
+        $received = null;
+        Form::registerMention('shop.owner', 'Owner', function ($submission) use (&$received) {
+            $received = $submission;
+
+            return 'Jason';
+        });
+
+        $submission = $this->makeSubmission();
+
+        $this->assertSame(['shop.owner' => 'Jason'], SubmissionMentions::values($submission, ['shop.owner']));
+        $this->assertSame($submission, $received);
     }
 
     #[Test]

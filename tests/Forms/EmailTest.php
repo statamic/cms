@@ -475,6 +475,22 @@ class EmailTest extends TestCase
     }
 
     #[Test]
+    public function it_resolves_the_form_title_mention_in_the_subject_and_body()
+    {
+        $email = $this->makeEmailWithConfig([
+            'subject' => 'New: [[ form.title ]]',
+            'body' => 'From [[ form.title ]]',
+        ], build: false);
+
+        $title = $email->getSubmission()->form()->title();
+
+        $html = $email->render();
+
+        $this->assertEquals('New: '.$title, $email->subject);
+        $this->assertStringContainsString('<p>From '.$title.'</p>', $html);
+    }
+
+    #[Test]
     public function globals_mentions_use_the_submissions_site()
     {
         $this->setSites([
