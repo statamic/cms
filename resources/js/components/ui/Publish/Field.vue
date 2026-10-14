@@ -180,8 +180,7 @@ const shouldShowLabelText = computed(() => !props.config.hide_display);
 // screen-reader-only label to the control below.
 const shouldShowLabel = computed(
     () =>
-        shouldShowLabelText.value || // Need to see the text
-        isRequired.value || // Need to see the required asterisk
+        shouldShowLabelText.value || // Need to see the text (and required asterisk, when shown)
         isLocked.value || // Need to see the avatar
         isSyncable.value, // Need to see the icon
 );

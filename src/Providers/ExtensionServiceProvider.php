@@ -50,6 +50,7 @@ class ExtensionServiceProvider extends ServiceProvider
         'move_asset_folder' => Actions\MoveAssetFolder::class,
         'rename_asset_folder' => Actions\RenameAssetFolder::class,
         'impersonate' => Actions\Impersonate::class,
+        'localize' => Actions\Localize::class,
     ];
 
     protected $dictionaries = [
