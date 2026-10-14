@@ -10,6 +10,7 @@ use Statamic\Contracts\Forms\Submission as SubmissionContract;
 use Statamic\Exceptions\FormNotFoundException;
 use Statamic\Facades\File;
 use Statamic\Facades\Folder;
+use Statamic\Fieldtypes\AutocompleteEditor\Mentions;
 use Statamic\Forms\Exporters\ExporterRepository;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -18,6 +19,7 @@ class FormRepository implements Contract
 {
     private $configs = [];
     private $redirects = [];
+    private $mentions = [];
 
     /**
      * Find a form.
@@ -141,6 +143,22 @@ class FormRepository implements Contract
         $this->redirects[$form] = $callback;
 
         return $this;
+    }
+
+    public function registerMention(string $handle, string $label, Closure $value)
+    {
+        if (! str_contains($handle, '.') || ! Mentions::isValidValue($handle)) {
+            throw new InvalidArgumentException("Invalid mention handle [{$handle}]. It must contain a dot and only use letters, numbers, underscores, dashes and dots.");
+        }
+
+        $this->mentions[$handle] = ['label' => $label, 'value' => $value];
+
+        return $this;
+    }
+
+    public function mentions(): array
+    {
+        return $this->mentions;
     }
 
     public function getSubmissionRedirect(SubmissionContract $submission)
