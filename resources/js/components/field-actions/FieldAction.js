@@ -22,6 +22,8 @@ export default class FieldAction {
         this.#quick = action.quick ?? false;
         this.#dangerous = action.dangerous ?? false;
         this.title = action.title;
+        this.ariaExpanded = action.ariaExpanded;
+        this.ariaControls = action.ariaControls;
     }
 
     get visible() {

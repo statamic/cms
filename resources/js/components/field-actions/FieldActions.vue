@@ -27,6 +27,8 @@
                 :class="{ '!cursor-not-allowed': action.disabled }"
                 :icon-only="true"
                 :aria-label="action.title"
+                :aria-expanded="action.ariaExpanded"
+                :aria-controls="action.ariaControls"
             >
                 <ui-icon :name="action.icon" class="size-3.5" :class="{ '!opacity-30': action.disabled }" />
             </Button>

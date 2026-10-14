@@ -1,4 +1,5 @@
 import { afterEach, expect, test } from 'vitest';
+import { userEvent } from 'vitest/browser';
 import { mount } from '@vue/test-utils';
 import { h, nextTick, Teleport } from 'vue';
 import * as Globals from '@/bootstrap/globals';
@@ -9,7 +10,7 @@ import Select from '@/components/fieldtypes/SelectFieldtype.vue';
 import ElementContainer from '@/components/ElementContainer.vue';
 import Container from '@/components/ui/Publish/Container.vue';
 import Fields from '@/components/ui/Publish/Fields.vue';
-import { Button, InputGroup, InputGroupAppend, InputGroupPrepend } from '@ui';
+import { Button, Icon, InputGroup, InputGroupAppend, InputGroupPrepend } from '@ui';
 import FieldsProvider from '@/components/ui/Publish/FieldsProvider.vue';
 import '../../../css/app.css';
 
@@ -50,6 +51,7 @@ async function render(fields, width, values = {}, meta = {}) {
             components: {
                 ...components,
                 'ui-button': Button,
+                'ui-icon': Icon,
                 'ui-input-group': InputGroup,
                 'ui-input-group-append': InputGroupAppend,
                 'ui-input-group-prepend': InputGroupPrepend,
@@ -158,6 +160,45 @@ test('collapsing and expanding preserves a narrow group layout', async () => {
     component.vm.toggleCollapsed();
     await nextTick();
     assertStacked('options_first', 'options_second');
+});
+
+test('a collapsible group label toggles its content and preserves its field action', async () => {
+    await render([group('options', [text('first')], { collapsible: true, collapsed: true, actions: true })], 1000);
+
+    const content = document.getElementById('field_options-content');
+    const expand = () => wrapper.find('button[aria-label="Expand"]');
+    const collapse = () => wrapper.find('button[aria-label="Collapse"]');
+    const name = wrapper.find('.group-fieldtype [data-ui-field-header] .cursor-pointer');
+
+    expect(expand().attributes('aria-controls')).toBe('field_options-content');
+    expect(expand().attributes('aria-expanded')).toBe('false');
+    expect(content.classList.contains('hidden')).toBe(true);
+    expect(wrapper.find('.group-fieldtype label[for="field_options"]').exists()).toBe(false);
+    expect(name.exists()).toBe(true);
+
+    await name.trigger('click');
+    expect(collapse().attributes('aria-expanded')).toBe('true');
+    expect(content.classList.contains('hidden')).toBe(false);
+
+    await collapse().trigger('click');
+    expect(expand().attributes('aria-expanded')).toBe('false');
+    expect(content.classList.contains('hidden')).toBe(true);
+
+    expand().element.focus();
+    await userEvent.keyboard('{Enter}');
+    expect(collapse().attributes('aria-expanded')).toBe('true');
+    expect(content.classList.contains('hidden')).toBe(false);
+    collapse().element.focus();
+    await userEvent.keyboard(' ');
+    expect(expand().attributes('aria-expanded')).toBe('false');
+    expect(content.classList.contains('hidden')).toBe(true);
+});
+
+test('a non-collapsible group retains its label', async () => {
+    await render([group('options', [text('first')])], 1000);
+
+    expect(wrapper.find('.group-fieldtype label[for="field_options"]').exists()).toBe(true);
+    expect(wrapper.find('button[aria-controls="field_options-content"]').exists()).toBe(false);
 });
 
 test.each([300, 1000])('spacers follow the local group width at %ipx', async width => {
