@@ -22,6 +22,7 @@ use Statamic\Data\AugmentedCollection;
 use Statamic\Entries\AugmentedEntry;
 use Statamic\Entries\Collection;
 use Statamic\Entries\Entry;
+use Statamic\Entries\EntryCollection;
 use Statamic\Events\EntryBlueprintFound;
 use Statamic\Events\EntryCreated;
 use Statamic\Events\EntryCreating;
@@ -1672,6 +1673,138 @@ class EntryTest extends TestCase
         $this->assertEquals(['de', 'fr'], $descendants->keys()->sort()->values()->all());
         $this->assertSame($fr, $descendants->get('fr'));
         $this->assertSame($de, $descendants->get('de'));
+    }
+
+    #[Test]
+    public function it_only_queries_descendants_once_when_getting_every_localization()
+    {
+        $collection = (new Collection)->handle('pages')->save();
+
+        $entry = (new Entry)->id('a')->locale('en')->collection($collection);
+        $fr = (new Entry)->id('b')->locale('fr')->origin('a')->collection($collection);
+        $es = (new Entry)->id('c')->locale('es')->origin('a')->collection($collection);
+        $de = (new Entry)->id('d')->locale('de')->origin('b')->collection($collection);
+
+        Facades\Entry::shouldReceive('query')->times(3)->andReturn(
+            $this->fakeDescendantsQuery(collect([$fr, $es])),
+            $this->fakeDescendantsQuery(collect([$de]), ['b', 'c']),
+            $this->fakeDescendantsQuery(collect(), ['d']),
+        );
+
+        $this->assertSame($entry, $entry->in('en'));
+        $this->assertSame($fr, $entry->in('fr'));
+        $this->assertSame($es, $entry->in('es'));
+        $this->assertSame($de, $entry->in('de'));
+        $this->assertNull($entry->in('it'));
+        $this->assertTrue($entry->existsIn('de'));
+        $this->assertEquals(['de', 'es', 'fr'], $entry->descendants()->keys()->sort()->values()->all());
+    }
+
+    #[Test]
+    public function modifying_the_returned_descendants_does_not_affect_the_cached_ones()
+    {
+        $this->setSites([
+            'en' => ['locale' => 'en_US', 'url' => '/'],
+            'fr' => ['locale' => 'fr_FR', 'url' => '/fr/'],
+        ]);
+
+        $en = EntryFactory::collection('test')->id('en')->locale('en')->create();
+        $fr = EntryFactory::collection('test')->id('fr')->origin('en')->locale('fr')->create();
+
+        $en->descendants()->forget('fr');
+        $en->directDescendants()->put('de', $fr);
+
+        $this->assertInstanceOf(EntryCollection::class, $en->descendants());
+        $this->assertEquals(['fr' => $fr], $en->descendants()->all());
+        $this->assertEquals(['fr' => $fr], $en->directDescendants()->all());
+        $this->assertSame($fr, $en->in('fr'));
+    }
+
+    #[Test]
+    public function the_descendants_cache_is_cleared_when_localizations_are_added_or_deleted()
+    {
+        $this->setSites([
+            'en' => ['locale' => 'en_US', 'url' => '/'],
+            'fr' => ['locale' => 'fr_FR', 'url' => '/fr/'],
+            'de' => ['locale' => 'de_DE', 'url' => '/de/'],
+        ]);
+
+        $en = EntryFactory::collection('test')->id('en')->locale('en')->create();
+        $this->assertNull($en->in('fr'));
+
+        $fr = tap($en->makeLocalization('fr')->id('fr'))->save();
+        $this->assertEquals('fr', $en->in('fr')?->id());
+        $this->assertNull($en->in('de'));
+        $this->assertEquals([], $fr->descendants()->all());
+
+        $de = tap($fr->makeLocalization('de')->id('de'))->save();
+        $this->assertEquals('de', $en->in('de')?->id());
+        $this->assertEquals('de', $fr->in('de')?->id());
+        $this->assertEquals(['fr', 'de'], $en->descendants()->keys()->all());
+        $this->assertEquals(['de'], $fr->descendants()->keys()->all());
+
+        $de->delete();
+        $this->assertNull($en->in('de'));
+        $this->assertEquals(['fr'], $en->descendants()->keys()->all());
+        $this->assertEquals([], $fr->descendants()->all());
+        $this->assertEquals([], $fr->directDescendants()->all());
+    }
+
+    #[Test]
+    public function the_descendants_cache_is_cleared_when_detaching_localizations()
+    {
+        $this->setSites([
+            'en' => ['locale' => 'en_US', 'url' => '/'],
+            'fr' => ['locale' => 'fr_FR', 'url' => '/fr/'],
+            'de' => ['locale' => 'de_DE', 'url' => '/de/'],
+        ]);
+
+        $en = EntryFactory::collection('test')->id('en')->locale('en')->create();
+        $fr = EntryFactory::collection('test')->id('fr')->origin('en')->locale('fr')->create();
+        EntryFactory::collection('test')->id('de')->origin('fr')->locale('de')->create();
+
+        $this->assertEquals('de', $en->in('de')?->id());
+        $this->assertEquals(['de'], $fr->descendants()->keys()->all());
+
+        $fr->detachLocalizations();
+
+        $this->assertNull($en->in('de'));
+        $this->assertEquals(['fr'], $en->descendants()->keys()->all());
+        $this->assertEquals([], $fr->descendants()->all());
+        $this->assertNull(Facades\Entry::find('de')->in('en'));
+    }
+
+    #[Test]
+    public function the_descendants_cache_is_cleared_for_the_previous_origin_when_the_origin_changes()
+    {
+        $this->setSites([
+            'en' => ['locale' => 'en_US', 'url' => '/'],
+            'fr' => ['locale' => 'fr_FR', 'url' => '/fr/'],
+            'es' => ['locale' => 'es_ES', 'url' => '/es/'],
+            'de' => ['locale' => 'de_DE', 'url' => '/de/'],
+        ]);
+
+        $en = EntryFactory::collection('test')->id('en')->locale('en')->create();
+        $fr = EntryFactory::collection('test')->id('fr')->origin('en')->locale('fr')->create();
+        $es = EntryFactory::collection('test')->id('es')->origin('en')->locale('es')->create();
+        $de = EntryFactory::collection('test')->id('de')->origin('fr')->locale('de')->create();
+
+        $this->assertEquals(['de'], $fr->descendants()->keys()->all());
+        $this->assertEquals(['de'], $fr->directDescendants()->keys()->all());
+        $this->assertEquals([], $es->descendants()->all());
+
+        $de->origin('es')->save();
+
+        $this->assertEquals([], $fr->descendants()->all());
+        $this->assertEquals([], $fr->directDescendants()->all());
+        $this->assertEquals(['de'], $es->descendants()->keys()->all());
+        $this->assertEquals('de', $en->in('de')?->id());
+
+        $de->origin(null)->save();
+
+        $this->assertNull($en->in('de'));
+        $this->assertEquals([], $es->descendants()->all());
+        $this->assertEquals(['fr', 'es'], $en->descendants()->keys()->all());
     }
 
     private function fakeDescendantsQuery($results, ?array $whereInOrigins = null): QueryBuilder
