@@ -9,7 +9,7 @@ const { open, messages, floating } = useAiChat();
 const inputClasses = computed(() =>
     floating.value
         ? // The middle of the lowercase letters sits about 1.4px below the middle of the capitals, so even padding looks low unless we nudge it.
-        'border-0! bg-transparent! pt-[3.5px]! pb-[6px]! placeholder:text-gray-500! shadow-none! outline-hidden! ps-1! pe-10! dark:bg-transparent!'
+        'border-0! bg-transparent! pt-[3.5px]! pb-[6px]! placeholder:text-gray-600! shadow-none! outline-hidden! ps-1! pe-10! dark:bg-transparent!'
         : 'pe-10',
 );
 const prompt = ref('');
