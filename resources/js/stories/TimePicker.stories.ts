@@ -1,6 +1,6 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
 import {ref} from 'vue';
-import {TimePicker} from '@ui';
+import {TimePicker} from '@statamic/cms/ui';
 
 const meta = {
     title: 'Forms/TimePicker',
@@ -23,44 +23,30 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const defaultCode = `
-<TimePicker v-model="time" />
-`;
-
 export const _DocsIntro: Story = {
     tags: ['!dev'],
-    parameters: {
-        docs: {
-            source: { code: defaultCode }
-        }
-    },
     render: () => ({
         components: { TimePicker },
         setup() {
             const time = ref(null);
             return { time };
         },
-        template: defaultCode,
+        template: `
+            <TimePicker v-model="time" />
+        `,
     }),
 };
 
-const withSecondsCode = `
-<TimePicker v-model="time" granularity="second" />
-`;
-
 export const _WithSeconds: Story = {
     tags: ['!dev'],
-    parameters: {
-        docs: {
-            source: { code: withSecondsCode }
-        }
-    },
     render: () => ({
         components: { TimePicker },
         setup() {
             const time = ref(null);
             return { preciseTime: time };
         },
-        template: withSecondsCode,
+        template: `
+            <TimePicker v-model="time" granularity="second" />
+        `,
     }),
 };

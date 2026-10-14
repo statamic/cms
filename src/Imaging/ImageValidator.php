@@ -7,6 +7,8 @@ use Symfony\Component\Mime\MimeTypes;
 
 class ImageValidator
 {
+    private static array $extensionSupport = [];
+
     public function __construct(private DriverInterface $driver)
     {
     }
@@ -47,7 +49,8 @@ class ImageValidator
             return false;
         }
 
-        return $this->driver->supports($extension);
+        return static::$extensionSupport[$this->driver::class][strtolower($extension)]
+            ??= $this->driver->supports($extension);
     }
 
     /**

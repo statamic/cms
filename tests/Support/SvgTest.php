@@ -127,13 +127,31 @@ class SvgTest extends TestCase
     }
 
     #[Test]
-    public function it_preserves_xml_declaration()
+    public function it_removes_xml_declaration()
     {
         $svg = '<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg"><rect/></svg>';
 
         $result = Svg::sanitize($svg);
 
-        $this->assertStringStartsWith('<?xml', $result);
+        $this->assertStringStartsWith('<svg', $result);
+    }
+
+    #[Test]
+    #[DataProvider('xmlStylesheetProvider')]
+    public function it_removes_xml_stylesheet_processing_instructions($svg)
+    {
+        $this->assertStringNotContainsString('xml-stylesheet', Svg::sanitize($svg));
+    }
+
+    public static function xmlStylesheetProvider()
+    {
+        $pi = '<?xml-stylesheet type="text/xsl" href="data:text/xml;base64,PHhzbDpzdHlsZXNoZWV0Lz4="?>';
+
+        return [
+            'on its own' => [$pi.'<svg xmlns="http://www.w3.org/2000/svg"><rect/></svg>'],
+            'after a declaration' => ['<?xml version="1.0"?>'.$pi.'<svg xmlns="http://www.w3.org/2000/svg"><rect/></svg>'],
+            'on separate lines' => ['<?xml version="1.0"?>'."\n".$pi."\n".'<svg xmlns="http://www.w3.org/2000/svg"><rect/></svg>'],
+        ];
     }
 
     #[Test]

@@ -54,6 +54,10 @@ export default {
 
     props: ['action', 'initialFieldset'],
 
+    provide: {
+        isInsideFieldset: true,
+    },
+
     data() {
         return {
             method: 'patch',

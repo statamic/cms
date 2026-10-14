@@ -155,7 +155,8 @@ import Paragraph from '@tiptap/extension-paragraph';
 import Strike from '@tiptap/extension-strike';
 import Subscript from '@tiptap/extension-subscript';
 import Superscript from '@tiptap/extension-superscript';
-import { Table, TableRow, TableCell, TableHeader } from '@tiptap/extension-table';
+import { TableRow, TableCell, TableHeader } from '@tiptap/extension-table';
+import { BardTable as Table } from './BardTable.js';
 import Text from '@tiptap/extension-text';
 import TextAlign from '@tiptap/extension-text-align';
 import Typography from '@tiptap/extension-typography';
@@ -449,18 +450,20 @@ export default {
             }
         },
 
-        value(value, oldValue) {
+        value(value) {
             if (!this.editor) return;
-
-            if (this.editor.view.dom.contains(document.activeElement)) return;
 
             const oldContent = this.editor.getJSON();
             const content = this.valueToContent(value);
 
-            if (JSON.stringify(content) !== JSON.stringify(oldContent)) {
-                this.editor.commands.clearContent(false);
-                this.editor.commands.setContent(content, true);
-            }
+            if (JSON.stringify(content) === JSON.stringify(oldContent)) return;
+
+            // Sets sync their own values into the editor, so while it's focused those changes
+            // don't need a rebuild, which would destroy the field being typed in.
+            if (this.editorIsFocused() && this.onlySetValuesDiffer(value, oldContent.content ?? [])) return;
+
+            this.editor.commands.clearContent(false);
+            this.editor.commands.setContent(content, true);
         },
 
         readOnly(readOnly) {
@@ -952,6 +955,24 @@ export default {
             return value.length ? { type: 'doc', content: value } : null;
         },
 
+        editorIsFocused() {
+            return this.editor.view.dom.contains(document.activeElement);
+        },
+
+        onlySetValuesDiffer(nodes, oldNodes) {
+            return JSON.stringify(this.withoutSetValues(nodes)) === JSON.stringify(this.withoutSetValues(oldNodes));
+        },
+
+        withoutSetValues(nodes) {
+            return nodes.map((node) => {
+                if (node.type === 'set') return { ...node, attrs: { ...node.attrs, values: null } };
+
+                if (node.content) return { ...node, content: this.withoutSetValues(node.content) };
+
+                return node;
+            });
+        },
+
         getExtensions() {
             let modeExts = this.inputIsInline ? [DocumentInline] : [DocumentBlock, HardBreak];
 
@@ -1007,7 +1028,7 @@ export default {
             });
 
             let exts = [
-                CharacterCount.configure({ limit: this.config.character_limit }),
+                CharacterCount.configure(),
                 ...modeExts,
                 DisableCtrlEnter,
                 SlashSetPicker.configure({

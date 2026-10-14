@@ -1,5 +1,5 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
-import {TabContent, TabList, Tabs, TabTrigger} from '@ui';
+import {TabContent, TabList, Tabs, TabTrigger} from '@statamic/cms/ui';
 import {ref} from 'vue';
 
 const meta = {
@@ -24,38 +24,31 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const defaultCode = `
-<Tabs v-model="activeTab" class="w-full">
-    <TabList>
-        <TabTrigger text="Shiny" name="one" />
-        <TabTrigger text="Happy" name="two" />
-        <TabTrigger text="People" name="three" />
-    </TabList>
-    <TabContent name="one">
-        <p class="py-8">Content of Tab 1</p>
-    </TabContent>
-    <TabContent name="two">
-        <p class="py-8">Content of Tab 2</p>
-    </TabContent>
-    <TabContent name="three">
-        <p class="py-8">Content of Tab 3</p>
-    </TabContent>
-</Tabs>
-`;
-
 export const _DocsIntro: Story = {
     tags: ['!dev'],
-    parameters: {
-        docs: {
-            source: { code: defaultCode }
-        }
-    },
     render: () => ({
         components: { Tabs, TabList, TabTrigger, TabContent },
         setup() {
             const activeTab = ref('tab1');
             return { activeTab };
         },
-        template: defaultCode,
+        template: `
+            <Tabs v-model="activeTab" class="w-full">
+                <TabList>
+                    <TabTrigger text="Shiny" name="one" />
+                    <TabTrigger text="Happy" name="two" />
+                    <TabTrigger text="People" name="three" />
+                </TabList>
+                <TabContent name="one">
+                    <p class="py-8">Content of Tab 1</p>
+                </TabContent>
+                <TabContent name="two">
+                    <p class="py-8">Content of Tab 2</p>
+                </TabContent>
+                <TabContent name="three">
+                    <p class="py-8">Content of Tab 3</p>
+                </TabContent>
+            </Tabs>
+        `,
     }),
 };

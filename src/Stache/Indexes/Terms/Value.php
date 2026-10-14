@@ -7,6 +7,18 @@ use Statamic\Stache\Indexes\Value as Index;
 
 class Value extends Index
 {
+    public function getItemValue($item)
+    {
+        // The augmented `entries_count` value only considers published entries, so
+        // when filtering (e.g. via the `min_count` param on the taxonomy tag) we
+        // need to resolve the same published-only count for consistency.
+        if ($this->name === 'entries_count') {
+            return Term::entriesCount($item, 'published');
+        }
+
+        return parent::getItemValue($item);
+    }
+
     public function getItems()
     {
         $associatedItems = $this->store->index('associations')->items()

@@ -90,3 +90,21 @@ test('dragging a draggable element inside the set is allowed', async () => {
 
     expect(event.defaultPrevented).toBe(false);
 });
+
+test('clicking a custom select field does not bubble its mousedown to ProseMirror', () => {
+    const wrapper = mountSet();
+    const parent = document.createElement('div');
+    const combobox = document.createElement('div');
+    const selectedOption = document.createElement('div');
+    const mousedown = vi.fn();
+
+    combobox.dataset.uiCombobox = '';
+    combobox.append(selectedOption);
+    wrapper.find('[data-type]').element.append(combobox);
+    parent.append(wrapper.element);
+    parent.addEventListener('mousedown', mousedown);
+
+    selectedOption.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+
+    expect(mousedown).not.toHaveBeenCalled();
+});

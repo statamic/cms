@@ -29,6 +29,7 @@ const selectedRatio = ref(null);
 const baseRatio = ref(null);
 const isFlipped = ref(false);
 const enterBinding = ref(null);
+const saveBinding = ref(null);
 const isOptionKeyPressed = ref(false);
 const initialCropBoxCenter = ref(null);
 const isAdjustingCropBox = ref(false);
@@ -38,6 +39,7 @@ const showConfirmation = ref(false);
 const uploading = ref(false);
 const pendingCrop = ref(null);
 const cropDimensions = ref(null);
+const cropEdges = ref({});
 const defaultQuality = Statamic.$config.get('cropQuality') || 90;
 
 function normalizeFormat(format) {
@@ -122,6 +124,7 @@ function resetState() {
     uploading.value = false;
     pendingCrop.value = null;
     cropDimensions.value = null;
+    cropEdges.value = {};
     quality.value = initialQuality();
     format.value = sourceFormat.value;
     background.value = 'white';
@@ -159,7 +162,7 @@ function createCropper(imageElement) {
         aspectRatio: NaN,
         viewMode: 1,
         dragMode: 'crop',
-        autoCropArea: 0.9,
+        autoCropArea: 1,
         restore: false,
         guides: true,
         center: true,
@@ -176,6 +179,7 @@ function createCropper(imageElement) {
         cropstart: onCropStart,
         cropmove: onCropMove,
         cropend: onCropEnd,
+        ready: updateCropEdges,
         crop: onCrop,
     });
 }
@@ -184,6 +188,30 @@ function onCrop(event) {
     cropDimensions.value = {
         width: Math.round(event.detail.width),
         height: Math.round(event.detail.height),
+    };
+
+    updateCropEdges();
+}
+
+// Track which edges of the visible image the crop box touches, so the controls on those
+// edges can be drawn inside the crop box instead of being clipped.
+function updateCropEdges() {
+    if (!cropper.value) return;
+
+    const container = cropper.value.getContainerData();
+    const canvas = cropper.value.getCanvasData();
+    const box = cropper.value.getCropBoxData();
+
+    const top = Math.max(canvas.top, 0);
+    const left = Math.max(canvas.left, 0);
+    const right = Math.min(canvas.left + canvas.width, container.width);
+    const bottom = Math.min(canvas.top + canvas.height, container.height);
+
+    cropEdges.value = {
+        'at-top': box.top - top < 1,
+        'at-left': box.left - left < 1,
+        'at-right': right - (box.left + box.width) < 1,
+        'at-bottom': bottom - (box.top + box.height) < 1,
     };
 }
 
@@ -375,6 +403,12 @@ function bindKeyboardShortcuts() {
         }
     });
 
+    // Cmd+S and Cmd+Shift+S finish the crop rather than saving the asset editor underneath
+    saveBinding.value = keys.bindGlobal(['mod+s', 'mod+shift+s'], (e) => {
+        e.preventDefault();
+        if (cropper.value && !showConfirmation.value && !uploading.value) crop();
+    });
+
     // Track Option/Alt key for center-based resizing
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
@@ -400,6 +434,10 @@ function unbindKeyboardShortcuts() {
     if (enterBinding.value) {
         enterBinding.value.destroy();
         enterBinding.value = null;
+    }
+    if (saveBinding.value) {
+        saveBinding.value.destroy();
+        saveBinding.value = null;
     }
     // Remove Option/Alt key listeners
     window.removeEventListener('keydown', handleKeyDown);
@@ -469,7 +507,7 @@ function close() {
 
             <!-- Content -->
             <div class="bg-gray-300 p-3 inset-shadow-xs dark:bg-gray-850 flex flex-1 flex-col overflow-auto relative min-h-0 w-full items-center justify-center" role="img" :aria-label="__('Image crop area')">
-                <div class="h-full w-full min-h-0 flex items-center justify-center overflow-hidden">
+                <div :class="cropEdges" class="crop-editor-canvas h-full w-full min-h-0 flex items-center justify-center">
                     <img ref="image" :src="asset.preview" :crossorigin="crossOrigin" :alt="__('Image to crop')" class="max-w-full max-h-full" @error="onImageError" />
                 </div>
                 <div
