@@ -1,6 +1,7 @@
 export const {
     Alert,
     AuthCard,
+    AutocompleteEditor,
     Avatar,
     Badge,
     Button,

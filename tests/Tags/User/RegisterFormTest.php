@@ -70,10 +70,10 @@ EOT
         preg_match_all('/<label>.+<\/label><input.+>/U', $output, $actual);
 
         $expected = [
-            '<label>Email Address</label><input id="userregister-form-email-field" type="email" name="email" value="">',
+            '<label>Email Address</label><input id="userregister-form-email-field" type="email" name="email" value="" autocomplete="email">',
             '<label>Password</label><input id="userregister-form-password-field" type="password" name="password" value="">',
             '<label>Password Confirmation</label><input id="userregister-form-password-confirmation-field" type="password" name="password_confirmation" value="">',
-            '<label>Name</label><input id="userregister-form-name-field" type="text" name="name" value="">',
+            '<label>Name</label><input id="userregister-form-name-field" type="text" name="name" value="" autocomplete="name">',
         ];
 
         $this->assertEquals($expected, $actual[0]);
@@ -96,7 +96,7 @@ EOT
         preg_match_all('/<label>.+<\/label><input.+>/U', $output, $actual);
 
         $expected = [
-            '<label>Email Address</label><input id="userregister-form-email-field" type="email" name="email" value="">',
+            '<label>Email Address</label><input id="userregister-form-email-field" type="email" name="email" value="" autocomplete="email">',
             '<label>Password</label><input id="userregister-form-password-field" type="password" name="password" value="">',
             '<label>Password Confirmation</label><input id="userregister-form-password-confirmation-field" type="password" name="password_confirmation" value="">',
             '<label>Full Name</label><input id="userregister-form-name-field" type="text" name="name" value="">',

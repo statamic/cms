@@ -18,6 +18,7 @@ use Statamic\Sites\Site;
  * @method static void set(string $key, $value)
  * @method static void data(array $data)
  * @method static self hydrated(Closure $callback)
+ * @method static self hydratedOnce(Closure $callback)
  * @method static self hydrate()
  * @method static array getViewData(string $view)
  * @method static Collection sections()

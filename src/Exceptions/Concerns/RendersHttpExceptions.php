@@ -52,7 +52,7 @@ trait RendersHttpExceptions
 
     protected function contents()
     {
-        Cascade::hydrated(function ($cascade) {
+        Cascade::hydratedOnce(function ($cascade) {
             $cascade->set('response_code', $this->getStatusCode());
         });
 

@@ -699,6 +699,23 @@ class FrontendTest extends TestCase
     }
 
     #[Test]
+    public function a_404_does_not_leak_its_response_code_into_later_requests()
+    {
+        // In a long-lived process the Cascade is reused between requests. A 404 render
+        // must not poison the response_code seen by subsequent successful requests.
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+        $this->viewShouldReturnRaw('some_template', 'Page {{ response_code }}');
+        $this->viewShouldReturnRaw('errors.404', 'Not found {{ response_code }}');
+
+        $this->createPage('about', ['with' => ['template' => 'some_template']]);
+
+        $this->get('unknown')->assertNotFound()->assertSee('Not found 404');
+
+        $this->get('/about')->assertOk()->assertSee('Page 200');
+    }
+
+    #[Test]
     public function it_sets_the_translation_locale_based_on_site()
     {
         app('translator')->addNamespace('test', __DIR__.'/__fixtures__/lang');
