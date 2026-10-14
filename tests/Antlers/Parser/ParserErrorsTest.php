@@ -214,4 +214,14 @@ EOT;
     {
         $this->assertThrowsParserError('{{ tag_name :$}}');
     }
+
+    public function test_unclosed_variable_accessor_throws_error()
+    {
+        $this->assertThrowsParserError('{{ values[keys[0] }}');
+    }
+
+    public function test_variable_accessor_ending_on_an_unterminated_string_throws_error()
+    {
+        $this->assertThrowsParserError('{{ values[" }}');
+    }
 }

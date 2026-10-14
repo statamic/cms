@@ -3,7 +3,9 @@
 namespace Tests\Feature\Assets;
 
 use Illuminate\Http\UploadedFile;
+use Mockery;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\User;
 use Tests\FakesRoles;
@@ -75,6 +77,10 @@ class SvgThumbnailTest extends TestCase
 
         $this->setTestRoles(['test' => ['access cp']]);
         $user = User::make()->assignRole('test')->save();
+
+        $asset = Mockery::mock($container->asset('one.svg'))->makePartial();
+        $asset->shouldNotReceive('disk');
+        Asset::shouldReceive('find')->with('test::one.svg')->andReturn($asset);
 
         $this
             ->actingAs($user)

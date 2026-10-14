@@ -53,36 +53,44 @@ class InstrumentationManager
         $this->runtimeConfigurations = new WeakMap;
     }
 
-    public function preparse(callable $preparser): void
+    public function preparse(callable $preparser): static
     {
         if (! in_array($preparser, $this->runtimePreparsers, true)) {
             $this->runtimePreparsers[] = $preparser;
         }
 
         $this->applyToAntlers(fn (RuntimeConfiguration $config) => $config->preparse($preparser));
+
+        return $this;
     }
 
-    public function removePreparser(callable $preparser): void
+    public function removePreparser(callable $preparser): static
     {
         $this->runtimePreparsers = $this->without($this->runtimePreparsers, $preparser);
 
         $this->applyToAntlers(fn (RuntimeConfiguration $config) => $config->removePreparser($preparser));
+
+        return $this;
     }
 
-    public function addVisitor(NodeVisitorContract $visitor): void
+    public function addVisitor(NodeVisitorContract $visitor): static
     {
         if (! in_array($visitor, $this->runtimeVisitors, true)) {
             $this->runtimeVisitors[] = $visitor;
         }
 
         $this->applyToAntlers(fn (RuntimeConfiguration $config) => $config->addVisitor($visitor));
+
+        return $this;
     }
 
-    public function removeVisitor(NodeVisitorContract $visitor): void
+    public function removeVisitor(NodeVisitorContract $visitor): static
     {
         $this->runtimeVisitors = $this->without($this->runtimeVisitors, $visitor);
 
         $this->applyToAntlers(fn (RuntimeConfiguration $config) => $config->removeVisitor($visitor));
+
+        return $this;
     }
 
     /** @param  string[]|null  $engines */
@@ -296,9 +304,11 @@ class InstrumentationManager
         }
     }
 
-    public function sync(): void
+    public function sync(): static
     {
         $this->configuredInstrumenter();
+
+        return $this;
     }
 
     public function instrumenting(): bool
