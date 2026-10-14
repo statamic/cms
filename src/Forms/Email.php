@@ -14,6 +14,8 @@ use Statamic\Facades\Config;
 use Statamic\Facades\Form;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Parse;
+use Statamic\Fieldtypes\AutocompleteEditor;
+use Statamic\Fieldtypes\AutocompleteEditor\Mentions;
 use Statamic\Forms\Fields\FormField;
 use Statamic\Sites\Site;
 use Statamic\Support\Arr;
@@ -30,6 +32,7 @@ class Email extends Mailable
     protected $submissionData;
     protected $config;
     protected $site;
+    protected $mentionValues = [];
     private $globalData;
 
     public function __construct(Submission $submission, array $config, Site $site)
@@ -71,12 +74,28 @@ class Email extends Mailable
         $this->submissionData = $this->submission->toAugmentedArray();
         $this->config = $this->parseConfig($this->config);
 
+        $subject = __((string) ($this->config['subject'] ?? ''));
+        $body = (string) ($this->config['body'] ?? '');
+
+        $this->mentionValues = SubmissionMentions::values(
+            $this->submission,
+            SubmissionMentions::handlesIn($subject, $body),
+            $this->submissionData
+        );
+
         $this
-            ->subject(isset($this->config['subject']) ? __($this->config['subject']) : __('Form Submission'))
+            ->subject($this->renderSubject($subject))
             ->addAddresses()
             ->addViews()
             ->addAttachments()
             ->addData();
+    }
+
+    protected function renderSubject(string $subject): string
+    {
+        $subject = Mentions::replace($subject, $this->mentionValues, using: fn ($text) => $this->parseConfigValue($text));
+
+        return trim(preg_replace('/\s+/', ' ', $subject)) ?: __('Form Submission');
     }
 
     protected function addAddresses()
@@ -192,9 +211,15 @@ class Email extends Mailable
             ? Blueprint::makeFromTabs($configFields)->fields()->addValues($form->data()->all())->augment()->values()->all()
             : [];
 
+        $emailConfig = $this->config;
+
+        if (filled($body = $emailConfig->get('body'))) {
+            $emailConfig = $emailConfig->merge(['body' => AutocompleteEditor::renderHtml($body, $this->mentionValues)]);
+        }
+
         $data = array_merge($augmented, $this->getGlobalsData(), [
             'form_config' => $formConfig,
-            'email_config' => $this->config,
+            'email_config' => $emailConfig,
             'config' => Cascade::config(),
             'fields' => $fields,
             'sections' => $sections->all(),
@@ -313,9 +338,11 @@ class Email extends Mailable
     {
         return collect($config)
             ->except('conditions')
-            ->map(fn ($value) => is_array($value)
-                ? array_map(fn ($item) => Str::startsWith($item, 'field:') ? $item : $this->parseConfigValue($item), $value)
-                : $this->parseConfigValue($value));
+            ->map(fn ($value, $key) => match (true) {
+                in_array($key, ['subject', 'body']) => $value,
+                is_array($value) => array_map(fn ($item) => Str::startsWith($item, 'field:') ? $item : $this->parseConfigValue($item), $value),
+                default => $this->parseConfigValue($value),
+            });
     }
 
     private function parseConfigValue($value): string
