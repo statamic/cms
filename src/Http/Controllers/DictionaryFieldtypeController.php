@@ -25,14 +25,23 @@ class DictionaryFieldtypeController extends Controller
             throw new ForbiddenHttpException;
         }
 
-        $options = $dictionary->options($request->search);
-
         // Return an ordered list of key/value pairs rather than a value-keyed object.
         // When the values are integers, the browser would re-sort the object's keys ascending,
         // discarding the dictionary's own order.
         return [
-            'data' => collect($options)
-                ->map(fn ($label, $key) => ['key' => (string) $key, 'value' => $label])
+            'data' => collect($dictionary->optionItems($request->search))
+                ->map(function ($item) {
+                    $option = [
+                        'key' => (string) $item->value(),
+                        'value' => $item->label(),
+                    ];
+
+                    if ($icon = $item->icon()) {
+                        $option['icon'] = $icon;
+                    }
+
+                    return $option;
+                })
                 ->values()
                 ->all(),
         ];

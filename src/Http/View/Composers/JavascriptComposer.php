@@ -73,6 +73,7 @@ class JavascriptComposer
             'defaultPreferences' => Preference::default()->all(),
             'paginationSize' => config('statamic.cp.pagination_size'),
             'paginationSizeOptions' => config('statamic.cp.pagination_size_options'),
+            'selectAllLimit' => config('statamic.cp.select_all_limit'),
             'multisiteEnabled' => Site::multiEnabled(),
             'sites' => $this->sites(),
             'selectedSite' => Site::selected()->handle(),

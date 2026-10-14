@@ -74,12 +74,20 @@ class PasswordProtector extends Protector
 
     public function isValidSchemePassword(string $password): bool
     {
-        return in_array($password, $this->schemePasswords());
+        return $this->passwordIsOneOf($password, $this->schemePasswords());
     }
 
     public function isValidLocalPassword(string $password): bool
     {
-        return in_array($password, $this->localPasswords());
+        return $this->passwordIsOneOf($password, $this->localPasswords());
+    }
+
+    protected function passwordIsOneOf(string $password, array $passwords): bool
+    {
+        // Compare as strings, strictly. A loose in_array() would let numeric
+        // strings match by value ("1e3" for "1000"), and passwords written
+        // unquoted in YAML or config arrive as integers.
+        return in_array($password, array_map('strval', $passwords), true);
     }
 
     protected function isPasswordFormUrl()

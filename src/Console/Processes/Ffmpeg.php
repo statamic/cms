@@ -71,6 +71,10 @@ class Ffmpeg extends Process
 
     private function resolveFfmpegBinary(): ?string
     {
+        if (! $this->procOpenAvailable()) {
+            return null;
+        }
+
         if ($binary = config('statamic.assets.ffmpeg.binary')) {
             return is_executable($binary) ? $binary : null;
         }
@@ -95,6 +99,11 @@ class Ffmpeg extends Process
         }
 
         return $resolved;
+    }
+
+    protected function procOpenAvailable(): bool
+    {
+        return function_exists('proc_open');
     }
 
     public static function clearBinaryCache(): void

@@ -16,8 +16,13 @@ class Radio
     const PING_CACHE_KEY = 'statamic.outpost.pinged';
     const PING_INTERVAL = 300; // seconds
 
-    public function __construct(private Outpost $outpost)
+    public function __construct(private ?Outpost $outpost = null)
     {
+    }
+
+    private function outpost(): Outpost
+    {
+        return $this->outpost ??= app(Outpost::class);
     }
 
     public function ping(): void
@@ -39,7 +44,7 @@ class Radio
     private function contactOutpost(): void
     {
         try {
-            $this->outpost->radio();
+            $this->outpost()->radio();
         } catch (Throwable $e) {
             Log::debug('Error contacting Outpost: '.$e->getMessage());
         }

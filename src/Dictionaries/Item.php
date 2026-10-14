@@ -16,9 +16,14 @@ class Item extends LabeledValue implements \ArrayAccess
         );
     }
 
+    public function icon(): ?string
+    {
+        return $this->extra['icon'] ?? null;
+    }
+
     public function data(): array
     {
-        return Arr::except($this->extra, ['label']);
+        return Arr::except($this->extra, ['label', 'icon']);
     }
 
     public function offsetExists(mixed $offset): bool

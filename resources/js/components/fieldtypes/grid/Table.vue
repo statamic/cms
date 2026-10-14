@@ -20,6 +20,7 @@
             :item-class="sortableItemClass"
             :handle-class="sortableHandleClass"
             :disabled="usesSectionRowSortable"
+            :distance="pointerDragThreshold"
             append-to="body"
             @dragstart="$emit('focus')"
             @dragend="$emit('blur')"
@@ -39,12 +40,14 @@
                     :meta-path-prefix="metaPathPrefix"
                     :can-delete="canDeleteRows"
                     :can-add-rows="canAddRows"
+                    :total-rows="rows.length"
                     :has-error="rowHasError(row._id)"
                     :read-only
                     @updated="(row, value) => $emit('updated', row, value)"
                     @meta-updated="$emit('meta-updated', row._id, $event)"
                     @duplicate="(row) => $emit('duplicate', row)"
                     @removed="(row) => $emit('removed', row)"
+                    @moved="(from, to) => $emit('moved', from, to)"
                     @focus="$emit('focus')"
                     @blur="$emit('blur')"
                 />
@@ -60,7 +63,7 @@
 import View from './View.vue';
 import GridRow from './Row.vue';
 import GridHeaderCell from './HeaderCell.vue';
-import { SortableList } from '../../sortable/Sortable';
+import { SortableList, POINTER_DRAG_THRESHOLD } from '../../sortable/Sortable';
 
 export default {
     mixins: [View],
@@ -69,6 +72,10 @@ export default {
         GridRow,
         GridHeaderCell,
         SortableList,
+    },
+
+    setup() {
+        return { pointerDragThreshold: POINTER_DRAG_THRESHOLD };
     },
 
     computed: {
