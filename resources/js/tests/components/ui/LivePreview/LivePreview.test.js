@@ -10,7 +10,15 @@ vi.mock('axios', () => ({
 
 vi.mock('@/components/ui/LivePreview/ManagesIframes.js', async () => {
     const { ref } = await import('vue');
-    return { useIframeManager: () => ({ previousUrl: ref(null), updateIframeContents: vi.fn() }) };
+    return {
+        useIframeManager: () => ({
+            previousUrl: ref(null),
+            updateIframeContents: vi.fn(),
+            selectFields: vi.fn(),
+            highlightField: vi.fn(),
+            dispose: vi.fn(),
+        }),
+    };
 });
 
 vi.mock('@ui', async () => {
