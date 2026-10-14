@@ -1,7 +1,8 @@
 <script setup>
 import { cva } from 'cva';
 import { hasComponent } from '@/composables/has-component.js';
-import { computed, getCurrentInstance, nextTick, onBeforeUnmount, onMounted, provide, ref, useAttrs, useSlots, watch } from 'vue';
+import { computed, getCurrentInstance, nextTick, onBeforeUnmount, onMounted, provide, ref, useAttrs, useId, useSlots, watch } from 'vue';
+import { hideOthers as ariaHideOthers } from 'aria-hidden';
 import Icon from '../Icon/Icon.vue';
 import Heading from '../Heading.vue';
 import { portals, keys } from '@api';
@@ -30,6 +31,8 @@ const props = defineProps({
     beforeClose: { type: Function, default: () => true },
     /** When `true`, clicking outside the modal will dismiss it. */
     dismissible: { type: Boolean, default: true },
+    /** When `true`, focus moves to the first focusable element on open. When `false`, focus stays on the dialog so Tab reaches the first control. */
+    autofocus: { type: Boolean, default: true },
 });
 
 const restAttrs = computed(() => {
@@ -61,9 +64,12 @@ const modalContent = ref(null);
 const mounted = ref(false);
 const visible = ref(false);
 const escBinding = ref(null);
+let undoHideOthers = null;
 
 const instance = getCurrentInstance();
 const hasModalTitleComponent = hasComponent('ModalTitle');
+const titleId = useId();
+const labelledBy = computed(() => hasModalTitleComponent.value || props.title ? titleId : undefined);
 const isUsingOpenProp = computed(() => instance?.vnode.props?.hasOwnProperty('open'));
 const portal = computed(() => modal.value ? `#portal-target-${modal.value.id}` : null);
 const isTopPortal = computed(() => portals.all()[portals.all().length - 1].id === modal.value.id);
@@ -80,7 +86,10 @@ function open() {
         nextTick(() => {
             visible.value = true;
             emit('opened');
-            nextTick(() => focusFirstFocusable());
+            nextTick(() => {
+                hidePageBehind();
+                focusOnOpen();
+            });
         });
     });
 }
@@ -93,13 +102,39 @@ const FOCUSABLE_SELECTOR = [
     'textarea:not([disabled])',
 ].join(', ');
 
-function focusFirstFocusable() {
+function focusOnOpen() {
+    if (!props.autofocus) {
+        modalContent.value?.focus();
+        return;
+    }
+
     const first = modalContent.value?.querySelector(FOCUSABLE_SELECTOR);
     if (first instanceof HTMLElement) {
         first.focus();
     } else {
         modalContent.value?.focus();
     }
+}
+
+// Modal owns initial focus; prevent FocusScope from focusing the first tabbable first.
+function onMountAutoFocus(event) {
+    event.preventDefault();
+}
+
+function hidePageBehind() {
+    undoHideOthers?.();
+    undoHideOthers = null;
+
+    // Match Reka DialogContent: aria-hide everything except the dialog so the page
+    // behind leaves the accessibility tree. Overlay stays pointer-interactive.
+    if (modalContent.value) {
+        undoHideOthers = ariaHideOthers(modalContent.value);
+    }
+}
+
+function revealPageBehind() {
+    undoHideOthers?.();
+    undoHideOthers = null;
 }
 
 function close() {
@@ -140,6 +175,7 @@ function runCloseCallback() {
 }
 
 function cleanup() {
+    revealPageBehind();
     modal.value?.destroy();
     escBinding.value?.destroy();
 }
@@ -164,6 +200,7 @@ defineExpose({
 });
 
 provide('closeModal', close);
+provide('modalTitleId', titleId);
 </script>
 
 <template>
@@ -171,7 +208,7 @@ provide('closeModal', close);
         <slot name="trigger" />
     </div>
     <teleport :to="portal" v-if="mounted && portal">
-        <FocusScope loop :trapped="isTopPortal" class="vue-portal-target modal">
+        <FocusScope loop :trapped="isTopPortal" class="vue-portal-target modal" @mount-auto-focus="onMountAutoFocus">
             <transition
                 enter-active-class="duration-200"
                 enter-from-class="opacity-0"
@@ -190,9 +227,9 @@ provide('closeModal', close);
                 leave-from-class="opacity-100 scale-100"
                 leave-to-class="opacity-0 scale-95"
             >
-                <div ref="modalContent" v-if="visible" v-bind="restAttrs" :class="[modalClasses, attrs.class]" data-ui-modal-content>
+                <div ref="modalContent" v-if="visible" role="dialog" aria-modal="true" tabindex="-1" :aria-labelledby="labelledBy" v-bind="restAttrs" :class="[modalClasses, attrs.class]" data-ui-modal-content>
                     <div class="relative space-y-3 rounded-xl overflow-auto max-h-[60vh] border border-gray-400/60 bg-white p-4 shadow-[0_1px_16px_-2px_rgba(63,63,71,0.2)] dark:border-none dark:bg-gray-800 dark:shadow-[0_1px_16px_-2px_rgba(0,0,0,.5)] dark:inset-shadow-2xs dark:inset-shadow-white/10">
-                        <div v-if="!hasModalTitleComponent && (title || icon)" data-ui-modal-title class="flex items-center gap-2">
+                        <div v-if="!hasModalTitleComponent && (title || icon)" :id="titleId" data-ui-modal-title class="flex items-center gap-2">
                             <Icon :name="icon" v-if="icon" class="size-4" />
                             <Heading :text="title" size="lg" class="font-semibold text-gray-950 dark:text-gray-100" />
                         </div>

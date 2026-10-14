@@ -1,56 +1,54 @@
 <template>
-    <div>
-        <Combobox
-            searchable
-            :disabled="config.disabled"
-            :ignore-filter="typeahead || hasNamedGroups"
-            :max-selections="maxSelections"
-            :model-value="items.map((item) => item.id)"
-            :multiple
-            :options="comboboxOptions"
-            :placeholder="__(config.placeholder) || __('Choose...')"
-            :read-only="readOnly"
-            :taggable="isTaggable"
-            :close-on-select="isTaggable"
-            :search-keys="searchKeys"
-            :virtualize="!hasNamedGroups"
-            option-label="title"
-            option-value="id"
-            @update:modelValue="itemsSelected"
-            @search="onSearch"
-        >
-            <template #before-option="option" v-if="hasNamedGroups">
-                <div
-                    v-if="option._showGroupSeparator"
-                    class="mx-2 mb-2.25 mt-0.75 border-t border-gray-200 dark:border-gray-700"
-                    role="separator"
-                />
-                <Subheading
-                    v-if="option._groupLabel"
-                    size="sm"
-                    class="px-2.5 pb-1 pt-1.5 font-semibold uppercase tracking-wide text-gray-950 text-2xs dark:text-gray-300"
-                    :text="option._groupLabel"
-                />
-            </template>
-            <template #option="{ title, hint, status }">
-                <div class="flex w-full text-left items-center gap-2">
-                    <StatusIndicator v-if="status" :status="status" />
-                    <div v-text="title" class="truncate grow" />
-                    <ui-badge v-if="hint" size="sm" v-text="hint" />
-                </div>
-            </template>
-            <template #no-options>
-                <div v-text="noOptionsText" />
-            </template>
-            <template #selected-option>
-                <span v-if="items.length === 1" v-text="items[0].title" class="truncate"></span>
-            </template>
-            <template #selected-options>
-                <!-- We don't want to display the selected options here. The RelationshipInput component does that for us. -->
-                <div></div>
-            </template>
-        </Combobox>
-    </div>
+    <Combobox
+        searchable
+        :disabled="config.disabled"
+        :ignore-filter="typeahead || hasNamedGroups"
+        :max-selections="maxSelections"
+        :model-value="items.map((item) => item.id)"
+        :multiple
+        :options="comboboxOptions"
+        :placeholder="__(config.placeholder) || __('Choose...')"
+        :read-only="readOnly"
+        :taggable="isTaggable"
+        :close-on-select="isTaggable"
+        :search-keys="searchKeys"
+        :virtualize="!hasNamedGroups"
+        option-label="title"
+        option-value="id"
+        @update:modelValue="itemsSelected"
+        @search="onSearch"
+    >
+        <template #before-option="option" v-if="hasNamedGroups">
+            <div
+                v-if="option._showGroupSeparator"
+                class="mx-2 mb-2.25 mt-0.75 border-t border-gray-200 dark:border-gray-700"
+                role="separator"
+            />
+            <Subheading
+                v-if="option._groupLabel"
+                size="sm"
+                class="px-2.5 pb-1 pt-1.5 font-semibold uppercase tracking-wide text-gray-950 text-2xs dark:text-gray-300"
+                :text="option._groupLabel"
+            />
+        </template>
+        <template #option="{ title, hint, status }">
+            <div class="flex w-full text-left items-center gap-2">
+                <StatusIndicator v-if="status" :status="status" />
+                <div v-text="title" class="truncate grow" />
+                <ui-badge v-if="hint" size="sm" v-text="hint" />
+            </div>
+        </template>
+        <template #no-options>
+            <div v-text="noOptionsText" />
+        </template>
+        <template #selected-option>
+            <span v-if="items.length === 1" v-text="items[0].title" class="truncate"></span>
+        </template>
+        <template #selected-options>
+            <!-- We don't want to display the selected options here. The RelationshipInput component does that for us. -->
+            <div></div>
+        </template>
+    </Combobox>
 </template>
 
 <script>
