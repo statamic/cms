@@ -11,6 +11,7 @@
                 'focus-outline': moving,
             },
         ]"
+        :data-grid-row-id="values._id"
         :data-error="hasError ?? undefined"
         :data-moving="moving || undefined"
     >

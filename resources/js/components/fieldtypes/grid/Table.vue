@@ -1,5 +1,12 @@
 <template>
-    <table class="grid-table" :class="{ 'mb-4': rows.length > 0 }" v-if="rows.length > 0">
+    <table
+        class="grid-table"
+        :class="{
+            'mb-4': (rows.length > 0 || usesSectionRowSortable) && !grid.usesExternalAddRow,
+            'grid-table--sectioned': showsHeadersInSection && !grid.fullScreenMode,
+        }"
+        v-if="rows.length > 0 || usesSectionRowSortable"
+    >
         <thead>
             <tr>
                 <th class="w-3" v-if="grid.isReorderable"></th>
@@ -12,6 +19,7 @@
             :vertical="true"
             :item-class="sortableItemClass"
             :handle-class="sortableHandleClass"
+            :disabled="usesSectionRowSortable"
             :distance="pointerDragThreshold"
             append-to="body"
             @dragstart="$emit('focus')"
@@ -19,7 +27,7 @@
             @update:model-value="(rows) => $emit('sorted', rows)"
             v-slot="{}"
         >
-            <tbody>
+            <tbody ref="zone" :class="{ 'publish-section-row-zone': usesSectionRowSortable }">
                 <grid-row
                     v-for="(row, index) in rows"
                     :key="`row-${row._id}`"
@@ -43,6 +51,9 @@
                     @focus="$emit('focus')"
                     @blur="$emit('blur')"
                 />
+                <tr v-if="usesSectionRowSortable && !rows.length">
+                    <td :colspan="emptyColspan" class="h-16"></td>
+                </tr>
             </tbody>
         </sortable-list>
     </table>
@@ -65,6 +76,12 @@ export default {
 
     setup() {
         return { pointerDragThreshold: POINTER_DRAG_THRESHOLD };
+    },
+
+    computed: {
+        emptyColspan() {
+            return this.fields.length + (this.grid.isReorderable ? 1 : 0) + 1;
+        },
     },
 };
 </script>

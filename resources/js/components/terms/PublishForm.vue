@@ -103,6 +103,7 @@
                                 v-if="showLocalizationSelector"
                                 :localizations
                                 :localizing
+                                :confirming-switch="!!pendingLocalization"
                                 @selected="localizationSelected"
                             />
                         </div>
