@@ -87,12 +87,15 @@
     }
 
     .replicator-card-set-row-start.replicator-card-set-has-entry-connector {
-        &.replicator-set-slot--card-cols-2 > div > [data-replicator-set-picker]:not([data-replicator-set-picker-end]) {
+        &.replicator-set-slot--card-cols-2 > div > [data-replicator-set-picker]:not([data-replicator-set-picker-end]),
+        &.replicator-set-slot--card-cols-3 > div > [data-replicator-set-picker]:not([data-replicator-set-picker-end]) {
             width: calc(200% + 0.75rem);
         }
 
-        &.replicator-set-slot--card-cols-3 > div > [data-replicator-set-picker]:not([data-replicator-set-picker-end]) {
-            width: calc(300% + 1.5rem);
+        @container panel (width > 935px) {
+            &.replicator-set-slot--card-cols-3 > div > [data-replicator-set-picker]:not([data-replicator-set-picker-end]) {
+                width: calc(300% + 1.5rem);
+            }
         }
     }
 }

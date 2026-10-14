@@ -141,6 +141,7 @@ import {
 } from './cardLayouts.js';
 
 const CARD_MULTI_COLUMN_MIN_WIDTH = 635;
+const CARD_THREE_COLUMN_MIN_WIDTH = 935;
 
 export default {
     mixins: [Fieldtype, ManagesSetMeta],
@@ -169,6 +170,7 @@ export default {
             setsCache: {},
             loadingSet: null,
             cardMultiColumnLayout: false,
+            cardMaxColumns: 2,
             cardLayoutObserver: null,
         };
     },
@@ -515,6 +517,7 @@ export default {
                 value: this.value,
                 layouts: this.cardLayouts,
                 multiColumn: this.cardMultiColumnLayout,
+                maxColumns: this.cardMaxColumns,
             });
         },
 
@@ -541,8 +544,7 @@ export default {
             this.cardLayoutObserver = null;
 
             const root = this.$refs.setList;
-            const panel = root?.closest('[data-ui-panel]')
-                ?? root?.closest('[class*="container/panel"]');
+            const panel = root?.closest('[data-ui-panel], [class*="container/panel"]');
 
             if (!panel) {
                 this.cardMultiColumnLayout = false;
@@ -551,6 +553,7 @@ export default {
 
             const update = () => {
                 this.cardMultiColumnLayout = panel.clientWidth > CARD_MULTI_COLUMN_MIN_WIDTH;
+                this.cardMaxColumns = panel.clientWidth > CARD_THREE_COLUMN_MIN_WIDTH ? 3 : 2;
             };
 
             update();

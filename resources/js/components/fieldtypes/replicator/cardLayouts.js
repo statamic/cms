@@ -62,7 +62,7 @@ function setId(set) {
     return set._id ?? set.id;
 }
 
-export function getCardGroupMemberIds({ index, value, layouts, multiColumn }) {
+export function getCardGroupMemberIds({ index, value, layouts, multiColumn, maxColumns = 3 }) {
     const set = value[index];
 
     if (!set) {
@@ -76,9 +76,12 @@ export function getCardGroupMemberIds({ index, value, layouts, multiColumn }) {
     }
 
     const groupStart = index - layout.positionInGroup;
+    const columns = Math.min(layout.columns, maxColumns);
+    const rowStart = groupStart + Math.floor(layout.positionInGroup / columns) * columns;
+    const rowEnd = Math.min(rowStart + columns, groupStart + layout.groupSize);
 
     return value
-        .slice(groupStart, groupStart + layout.groupSize)
+        .slice(rowStart, rowEnd)
         .map((item) => setId(item));
 }
 
