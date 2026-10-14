@@ -112,6 +112,185 @@ class EditGlobalVariablesTest extends TestCase
     }
 
     #[Test]
+    public function it_marks_localizations_as_fully_synced_when_they_have_no_localized_data()
+    {
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+        ]);
+
+        $blueprint = Blueprint::make()->setContents(['fields' => [
+            ['handle' => 'foo', 'field' => ['type' => 'text']],
+        ]]);
+        Blueprint::partialMock();
+        Blueprint::shouldReceive('find')->with('globals.test')->andReturn($blueprint);
+
+        $this->setTestRoles(['test' => [
+            'access cp',
+            'edit test globals',
+            'access en site',
+            'access fr site',
+        ]]);
+        $user = User::make()->assignRole('test')->save();
+
+        $global = GlobalSet::make('test')->sites(['en', 'fr' => 'en'])->save();
+        $global->in('en')->data(['foo' => 'bar'])->save();
+        $global->in('fr')->data(['foo' => 'baz'])->save();
+
+        $this
+            ->actingAs($user)
+            ->get($global->in('en')->editUrl())
+            ->assertSuccessful()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('globals/Edit')
+                ->where('localizations.0.handle', 'en')
+                ->where('localizations.0.active', true)
+                ->where('localizations.0.root', true)
+                ->where('localizations.0.origin', false)
+                ->where('localizations.0.fully_synced', false)
+                ->where('localizations.1.handle', 'fr')
+                ->where('localizations.1.active', false)
+                ->where('localizations.1.root', false)
+                ->where('localizations.1.origin', false)
+                ->where('localizations.1.fully_synced', false)
+            );
+
+        $this
+            ->actingAs($user)
+            ->get($global->in('fr')->editUrl())
+            ->assertSuccessful()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('globals/Edit')
+                ->where('localizations.0.handle', 'en')
+                ->where('localizations.0.active', false)
+                ->where('localizations.0.root', true)
+                ->where('localizations.0.origin', true)
+                ->where('localizations.1.handle', 'fr')
+                ->where('localizations.1.active', true)
+                ->where('localizations.1.root', false)
+                ->where('localizations.1.origin', false)
+                ->where('localizations.1.fully_synced', false)
+            );
+
+        $global->in('fr')->data([])->save();
+
+        $this
+            ->actingAs($user)
+            ->get($global->in('en')->editUrl())
+            ->assertSuccessful()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('globals/Edit')
+                ->where('localizations.0.handle', 'en')
+                ->where('localizations.0.fully_synced', false)
+                ->where('localizations.1.handle', 'fr')
+                ->where('localizations.1.fully_synced', true)
+            );
+
+        // Matching origin values still counts as unsynced once data is stored locally.
+        $global->in('fr')->data(['foo' => 'bar'])->save();
+
+        $this
+            ->actingAs($user)
+            ->get($global->in('en')->editUrl())
+            ->assertSuccessful()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('globals/Edit')
+                ->where('localizations.1.handle', 'fr')
+                ->where('localizations.1.fully_synced', false)
+            );
+    }
+
+    #[Test]
+    public function it_marks_root_when_the_origin_is_not_the_root()
+    {
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+            'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://de.test.com/'],
+        ]);
+
+        $blueprint = Blueprint::make()->setContents(['fields' => [
+            ['handle' => 'foo', 'field' => ['type' => 'text']],
+        ]]);
+        Blueprint::partialMock();
+        Blueprint::shouldReceive('find')->with('globals.test')->andReturn($blueprint);
+
+        $this->setTestRoles(['test' => [
+            'access cp',
+            'edit test globals',
+            'access en site',
+            'access fr site',
+            'access de site',
+        ]]);
+        $user = User::make()->assignRole('test')->save();
+
+        $global = GlobalSet::make('test')->sites(['en', 'fr' => 'en', 'de' => 'fr'])->save();
+        $global->in('en')->data(['foo' => 'bar'])->save();
+        $global->in('fr')->data([])->save();
+        $global->in('de')->data([])->save();
+
+        $this
+            ->actingAs($user)
+            ->get($global->in('de')->editUrl())
+            ->assertSuccessful()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('globals/Edit')
+                ->where('localizations.0.handle', 'en')
+                ->where('localizations.0.root', true)
+                ->where('localizations.0.origin', false)
+                ->where('localizations.0.active', false)
+                ->where('localizations.1.handle', 'fr')
+                ->where('localizations.1.root', false)
+                ->where('localizations.1.origin', true)
+                ->where('localizations.1.active', false)
+                ->where('localizations.2.handle', 'de')
+                ->where('localizations.2.root', false)
+                ->where('localizations.2.origin', false)
+                ->where('localizations.2.active', true)
+            );
+    }
+
+    #[Test]
+    public function it_orders_localizations_by_configured_site_order()
+    {
+        $this->setSites([
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/', 'group' => 'EU', 'group_handle' => 'eu'],
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/', 'group' => 'UK', 'group_handle' => 'uk'],
+        ]);
+
+        $blueprint = Blueprint::make()->setContents(['fields' => [
+            ['handle' => 'foo', 'field' => ['type' => 'text']],
+        ]]);
+        Blueprint::partialMock();
+        Blueprint::shouldReceive('find')->with('globals.test')->andReturn($blueprint);
+
+        $this->setTestRoles(['test' => [
+            'access cp',
+            'edit test globals',
+            'access en site',
+            'access fr site',
+        ]]);
+        $user = User::make()->assignRole('test')->save();
+
+        // Global set sites() keys start with en, but Site::all() starts with fr.
+        $global = GlobalSet::make('test')->sites(['en', 'fr' => 'en'])->save();
+        $global->in('en')->data(['foo' => 'bar'])->save();
+        $global->in('fr')->data([])->save();
+
+        $this
+            ->actingAs($user)
+            ->get($global->in('en')->editUrl())
+            ->assertSuccessful()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('globals/Edit')
+                ->where('localizations.0.handle', 'fr')
+                ->where('localizations.0.group', 'EU')
+                ->where('localizations.1.handle', 'en')
+                ->where('localizations.1.group', 'UK')
+            );
+    }
+
+    #[Test]
     public function it_404s_if_invalid_site()
     {
         $this->setSites([
