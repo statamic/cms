@@ -51,6 +51,9 @@
         > div > [data-replicator-set-picker]:not([data-replicator-set-picker-end]) {
             top: 0;
             width: 100%;
+            height: 1.5rem;
+            align-items: center;
+            padding: 0;
         }
     }
 
