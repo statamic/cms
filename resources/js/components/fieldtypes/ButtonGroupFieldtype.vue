@@ -4,9 +4,8 @@
             <Button
                 v-if="config.appearance_previews"
                 ref="button"
-                :disabled="config.disabled"
+                :disabled="config.disabled || isReadOnly"
                 :name="name"
-                :read-only="isReadOnly"
                 :value="option.value"
                 :variant="value == option.value ? 'pressed' : 'default'"
                 :class="appearancePreviewButtonClass(option.value)"
@@ -20,9 +19,8 @@
             <Button
                 v-else
                 ref="button"
-                :disabled="config.disabled"
+                :disabled="config.disabled || isReadOnly"
                 :name="name"
-                :read-only="isReadOnly"
                 :text="option.label || option.value"
                 :value="option.value"
                 :variant="value == option.value ? 'pressed' : 'default'"
@@ -83,6 +81,7 @@ export default {
         },
 
         updateSelectedOption(newValue) {
+            if (this.isReadOnly) return;
             this.update(this.value == newValue && this.config.clearable ? null : newValue);
         },
 

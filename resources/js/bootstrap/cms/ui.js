@@ -1,6 +1,7 @@
 export {
     Alert,
     AuthCard,
+    AutocompleteEditor,
     Avatar,
     Badge,
     Button,

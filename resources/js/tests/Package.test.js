@@ -129,6 +129,7 @@ it('exports ui', async () => {
     const expectedCmsPackageExports = [
         'Alert',
         'AuthCard',
+        'AutocompleteEditor',
         'Badge',
         'Button',
         'ButtonGroup',

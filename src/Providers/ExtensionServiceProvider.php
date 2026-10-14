@@ -73,6 +73,7 @@ class ExtensionServiceProvider extends ServiceProvider
         'asset_container' => Fieldtypes\AssetContainer::class,
         'asset_folder' => Fieldtypes\AssetFolder::class,
         'assets' => Fieldtypes\Assets\Assets::class,
+        'autocomplete_editor' => Fieldtypes\AutocompleteEditor::class,
         'bard' => Fieldtypes\Bard::class,
         'bard_buttons_setting' => Fieldtypes\Bard\Buttons::class,
         'blueprints' => Fieldtypes\Blueprints::class,
