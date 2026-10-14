@@ -8,9 +8,9 @@ use Illuminate\Support\Collection;
 use Statamic\Contracts\Tokens\Token;
 use Statamic\Facades\Site as Sites;
 use Statamic\Sites\Site;
+use Statamic\View\Antlers\Language\Facades\Runtime;
 use Statamic\View\Instrumentation\FieldDomTracer;
 use Statamic\View\Instrumentation\FieldMarkers;
-use Statamic\View\Instrumentation\InstrumentationManager;
 
 class LivePreview
 {
@@ -50,15 +50,14 @@ class LivePreview
 
     private function traceFields(FieldDomTracer $tracer, Closure $callback)
     {
-        $manager = app(InstrumentationManager::class);
         $markers = FieldMarkers::make()->using($tracer);
 
-        $manager->register($markers);
+        Runtime::register($markers);
 
         try {
             return $tracer->capture($callback);
         } finally {
-            $manager->forget($markers);
+            Runtime::forget($markers);
         }
     }
 
