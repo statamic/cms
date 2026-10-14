@@ -185,7 +185,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
     public function blueprint($blueprint = null)
     {
-        $key = "entry-{$this->id()}-blueprint";
+        $key = 'entry-'.($this->id() ?? 'obj-'.spl_object_id($this)).'-blueprint';
 
         return $this
             ->fluentlyGetOrSet('blueprint')
@@ -1184,6 +1184,11 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         // Avoid using the authors() method.
         if ($field === 'authors') {
             return $this->value('authors');
+        }
+
+        // Avoid resolving the Site object.
+        if ($field === 'site') {
+            return $this->locale();
         }
 
         // Reset the cached uri so it gets recalculated.

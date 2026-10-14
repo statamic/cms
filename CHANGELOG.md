@@ -1,5 +1,69 @@
 # Release Notes
 
+## 6.35.1 (2026-10-06)
+
+### What's fixed
+- Harden asset authorization [#15196](https://github.com/statamic/cms/issues/15196) by @duncanmcclean
+- Fix Forgot Password balance [#15581](https://github.com/statamic/cms/issues/15581) by @jaygeorge
+- Tighten SVG sanitization [#15582](https://github.com/statamic/cms/issues/15582) by @jasonvarga
+- Harden remote URL validation [#15584](https://github.com/statamic/cms/issues/15584) by @jasonvarga
+- Fix theme resetting after leaving preferences page [#15579](https://github.com/statamic/cms/issues/15579) by @duncanmcclean
+- Fix fieldtypes extending Replicator when adding sets [#15574](https://github.com/statamic/cms/issues/15574) by @joshuablum
+- Tighten class based validation rules [#15585](https://github.com/statamic/cms/issues/15585) by @jasonvarga
+- Compare field conditions without eval() [#15564](https://github.com/statamic/cms/issues/15564) by @bpmore
+- Fix scheduled and expired status queries when both date behaviors are private [#15577](https://github.com/statamic/cms/issues/15577) by @wakqasahmed
+- Respect collection wheres inside nested where closures [#15563](https://github.com/statamic/cms/issues/15563) by @lazerg
+- Harden user file paths [#15593](https://github.com/statamic/cms/issues/15593) by @jasonvarga
+- French translations [#15565](https://github.com/statamic/cms/issues/15565) by @ebeauchamps
+- Danish translations [#15570](https://github.com/statamic/cms/issues/15570) by @FoksVHox
+- Bump the npm_and_yarn group across 1 directory with 3 updates [#15568](https://github.com/statamic/cms/issues/15568) by @dependabot
+- Bump the npm_and_yarn group across 1 directory with 3 updates [#15587](https://github.com/statamic/cms/issues/15587) by @dependabot
+
+
+
+## 6.35.0 (2026-10-01)
+
+### What's new
+- Add placeholder support to code fieldtype [#15519](https://github.com/statamic/cms/issues/15519) by @daun
+- Implement includes_any field condition [#13135](https://github.com/statamic/cms/issues/13135) by @miicah
+- Make actions available in a collection tree view [#14331](https://github.com/statamic/cms/issues/14331) by @Devsome
+- Augment video fields to a value object carrying the provider [#15458](https://github.com/statamic/cms/issues/15458) by @edalzell
+- Add id and privacy hash to augmented video values [#15553](https://github.com/statamic/cms/issues/15553) by @jasonvarga
+
+### What's fixed
+- Make Outpost resolve lazily [#15520](https://github.com/statamic/cms/issues/15520) by @daun
+- Memoize version read [#15521](https://github.com/statamic/cms/issues/15521) by @daun
+- Invalidate static cache when an asset is reuploaded [#15514](https://github.com/statamic/cms/issues/15514) by @lazerg
+- Avoid marking entries dirty when the assets fieldtype reloads [#15518](https://github.com/statamic/cms/issues/15518) by @lazerg
+- Delete revisions when an entry is deleted [#15499](https://github.com/statamic/cms/issues/15499) by @ecomunicare
+- Fix Bard read-only background [#15053](https://github.com/statamic/cms/issues/15053) by @daun
+- Use the fieldtype's config() when building the publish array [#15148](https://github.com/statamic/cms/issues/15148) by @duncanmcclean
+- Pass validation replacements when storing and updating terms [#15352](https://github.com/statamic/cms/issues/15352) by @duncanmcclean
+- Prevent logging GitHub bypassed rule violations as git errors [#15525](https://github.com/statamic/cms/issues/15525) by @lazerg
+- Fix `computed property "saving" is readonly` warnings on publish forms [#14871](https://github.com/statamic/cms/issues/14871) by @duncanmcclean
+- Improve performance of data reference updates [#15089](https://github.com/statamic/cms/issues/15089) by @daun
+- Short-circuit a Value wrapping null before it reaches a modifier [#15540](https://github.com/statamic/cms/issues/15540) by @joshdaugherty
+- Only recreate the fake Stache directory when it's gone [#15538](https://github.com/statamic/cms/issues/15538) by @joshdaugherty
+- Fail `contains` field conditions against an object instead of throwing [#15535](https://github.com/statamic/cms/issues/15535) by @joshdaugherty
+- Invert custom field conditions only once under `unless` and `hide_when` [#15533](https://github.com/statamic/cms/issues/15533) by @joshdaugherty
+- Match `contains_any` values literally in field conditions [#15531](https://github.com/statamic/cms/issues/15531) by @joshdaugherty
+- Fix booleans being considered empty by field conditions [#15529](https://github.com/statamic/cms/issues/15529) by @joshdaugherty
+- Give unsaved entries their own blueprint cache key [#15509](https://github.com/statamic/cms/issues/15509) by @lwekuiper
+- Augment appended form config fields in emails [#15510](https://github.com/statamic/cms/issues/15510) by @lwekuiper
+- Measure ArrayableString values as strings in the length modifier [#15543](https://github.com/statamic/cms/issues/15543) by @jasonvarga
+- Show actions on the root page in collection tree view [#15547](https://github.com/statamic/cms/issues/15547) by @duncanmcclean
+- Harden impersonation action [#15545](https://github.com/statamic/cms/issues/15545) by @duncanmcclean
+- Only count published entries in augmented entries fields [#15546](https://github.com/statamic/cms/issues/15546) by @duncanmcclean
+- Apply search index query scope alongside filter when saving items [#15544](https://github.com/statamic/cms/issues/15544) by @duncanmcclean
+- Give each Stache traversal its own filter [#15551](https://github.com/statamic/cms/issues/15551) by @joshdaugherty
+- Forget the structure's memoized collection on collection save and delete [#15549](https://github.com/statamic/cms/issues/15549) by @joshdaugherty
+- Make the video Embed method based and add trackable embed urls [#15554](https://github.com/statamic/cms/issues/15554) by @jasonvarga
+- Don't translate validation rule labels [#15558](https://github.com/statamic/cms/issues/15558) by @helloDanuk
+- Add info fieldtype title to translator [#15555](https://github.com/statamic/cms/issues/15555) by @helloDanuk
+- German translations [#15559](https://github.com/statamic/cms/issues/15559) by @helloDanuk
+
+
+
 ## 6.34.1 (2026-09-23)
 
 ### What's fixed
