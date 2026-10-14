@@ -1,6 +1,9 @@
 <template>
     <div class="flex flex-col gap-3">
-        <div class="flex flex-wrap items-center gap-3 rounded-xl border border-gray-200 bg-gray-50 px-3 pr-2 py-2 dark:border-gray-700 dark:bg-gray-800">
+        <div
+            v-if="showOrigins"
+            class="flex flex-wrap items-center gap-3 rounded-xl border border-gray-200 bg-gray-50 px-3 pr-2 py-2 dark:border-gray-700 dark:bg-gray-800"
+        >
             <Checkbox
                 size="sm"
                 solo
@@ -53,7 +56,7 @@
         <table class="grid-table">
             <thead>
                 <tr>
-                    <th scope="col" class="checkbox-column w-8">
+                    <th v-if="showOrigins" scope="col" class="checkbox-column w-8">
                         <span class="sr-only">{{ __('Select') }}</span>
                     </th>
                     <th scope="col">
@@ -61,7 +64,7 @@
                             {{ __('Site') }}
                         </div>
                     </th>
-                    <th scope="col">
+                    <th v-if="showOrigins" scope="col">
                         <div class="flex items-center justify-between">
                             {{ __('Origin') }}
                         </div>
@@ -71,9 +74,10 @@
             <tbody>
                 <template v-for="group in siteGroups" :key="group.key">
                     <tr v-if="hasNamedGroups">
-                        <td colspan="3" class="sticky top-[calc(--spacing(7)+1px)] z-(--z-index-above) bg-gray-50 py-2! dark:bg-gray-800">
+                        <td :colspan="columnCount" class="sticky top-[calc(--spacing(7)+1px)] z-(--z-index-above) bg-gray-50 py-2! dark:bg-gray-800">
                             <div class="flex items-center gap-4 ps-1!">
                                 <Checkbox
+                                    v-if="showOrigins"
                                     size="sm"
                                     solo
                                     :model-value="isGroupSelected(group)"
@@ -90,7 +94,7 @@
                         </td>
                     </tr>
                     <tr v-for="site in group.items" :key="site.handle">
-                        <td class="checkbox-column ps-3!">
+                        <td v-if="showOrigins" class="checkbox-column ps-3!">
                             <Checkbox
                                 size="sm"
                                 class="pt-2.5"
@@ -106,7 +110,7 @@
                                 <Heading :text="__(site.name)" />
                             </div>
                         </td>
-                        <td class="grid-cell">
+                        <td v-if="showOrigins" class="grid-cell">
                             <Select
                                 class="w-full"
                                 :options="siteOriginOptions(site)"
@@ -180,6 +184,14 @@ export default {
     },
 
     computed: {
+        showOrigins() {
+            return this.config.origins !== false;
+        },
+
+        columnCount() {
+            return this.showOrigins ? 3 : 1;
+        },
+
         hasNamedGroups() {
             return hasNamedSiteGroups(this.sites);
         },
