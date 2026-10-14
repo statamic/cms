@@ -1,26 +1,5 @@
 /* GROUP REPLICATOR CARD SETS
 =================================================== */
-.replicator-card-set-row-start {
-    --pull: 1.5rem;
-
-    &:not(.replicator-card-set-has-entry-connector) {
-        [data-ui-popover-trigger] {
-            position: absolute;
-            z-index: var(--z-index-above);
-            transform: translateY(calc(0% - var(--pull)));
-            width: 100%;
-        }
-    }
-
-    &.replicator-card-set-has-entry-connector {
-        [data-ui-popover-trigger] {
-            position: relative;
-            z-index: var(--z-index-above);
-            width: 100%;
-        }
-    }
-}
-
 @container panel (width > 635px) {
     .replicator-set-list {
         display: flex;
@@ -37,8 +16,16 @@
 
     .replicator-set-slot--card-cols-2,
     .replicator-set-slot--card-cols-3 {
+        position: relative;
         width: calc((100% - 0.75rem) / 2);
         min-width: 0;
+        padding-block-start: 1.5rem;
+
+        > div > [data-replicator-set-picker] {
+            position: absolute;
+            z-index: var(--z-index-above);
+            margin-block-start: 0;
+        }
     }
 
     @container panel (width > 935px) {
@@ -62,44 +49,51 @@
         }
     }
 
-    .replicator-card-set-inset-picker:not(.replicator-card-set-row-start) {
-        position: relative;
-        margin-block-start: 1.5rem;
+    .replicator-card-set-row-start {
+        > div > [data-replicator-set-picker]:not([data-replicator-set-picker-end]) {
+            top: 0;
+            width: 100%;
+        }
+    }
 
-        [data-replicator-connector] {
+    .replicator-card-set-inset-picker {
+        &:not(.replicator-card-set-row-start) > div > [data-replicator-set-picker] [data-replicator-connector] {
             display: none;
         }
 
-        [data-ui-popover-trigger] {
+        &:not(.replicator-card-set-row-start) > div > [data-replicator-set-picker]:not([data-replicator-set-picker-end]),
+        > div > [data-replicator-set-picker-end] {
+            display: flex;
             position: absolute;
-            inset: 0;
-            left: -1.15rem;
+            inset: 1.5rem auto 0 -0.75rem;
+            width: 0.75rem;
+            align-items: center;
+            padding: 0;
             writing-mode: vertical-lr;
 
             [data-insert-handle] {
                 position: absolute;
                 top: 0;
-                left: calc(0.5rem + 2px);
+                left: 50%;
+                transform: translateX(-50%);
                 height: 100%;
                 width: 0.325rem;
                 background: linear-gradient(to bottom, var(--color-gray-100) 0%, var(--color-gray-200) 50%, var(--color-gray-100) 100%);
             }
         }
 
-        /* Nudge to account for rounding error / subpixel positioning */
-        &:nth-child(3n + 1) [data-ui-popover-trigger] {
-            [data-insert-handle] {
-                left: calc(0.5rem + 1.5px);
-            }
+        > div > [data-replicator-set-picker][data-replicator-set-picker-end] {
+            right: -0.75rem;
+            left: auto;
         }
     }
 
     .replicator-card-set-row-start.replicator-card-set-has-entry-connector {
-        &.replicator-set-slot--card-cols-2 [data-ui-popover-trigger] {
+        &.replicator-set-slot--card-cols-2 > div > [data-replicator-set-picker]:not([data-replicator-set-picker-end]) {
             width: calc(200% + 0.75rem);
         }
 
-        &.replicator-set-slot--card-cols-3 [data-ui-popover-trigger] {
+        &.replicator-set-slot--card-cols-3 > div > [data-replicator-set-picker]:not([data-replicator-set-picker-end]) {
             width: calc(300% + 1.5rem);
         }
     }

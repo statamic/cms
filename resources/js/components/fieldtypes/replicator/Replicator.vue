@@ -88,6 +88,19 @@
                                                 :loading-set="loadingSet"
                                                 @added="addSet"
                                             />
+                                            <add-set-button
+                                                v-if="canAddSet && cardLayouts[index].isCard
+                                                    && cardLayouts[index].groupSize > 1
+                                                    && cardLayouts[index].positionInGroup === cardLayouts[index].groupSize - 1"
+                                                variant="between"
+                                                after
+                                                :groups="groupConfigs"
+                                                :sets="setConfigs"
+                                                :index="index + 1"
+                                                :show-connector="false"
+                                                :loading-set="loadingSet"
+                                                @added="addSet"
+                                            />
                                         </template>
                                     </ReplicatorSet>
                                 </div>

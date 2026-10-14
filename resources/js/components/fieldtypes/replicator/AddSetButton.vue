@@ -16,8 +16,10 @@
     <set-picker v-else :enabled="enabled" :sets="groups" align="center" :loading-set="loadingSet" @added="addSet">
         <template #trigger>
             <div
+                data-replicator-set-picker
+                :data-replicator-set-picker-end="after || undefined"
                 class="flex justify-center relative group py-3"
-                :class="{ 'py-3.5 -mt-2 top-0.5': isFirst }"
+                :class="{ 'py-3.5 -mt-2 top-0.5': isFirst, hidden: after }"
             >
                 <div
                     v-if="showConnector"
@@ -63,6 +65,7 @@ const props = defineProps({
     showConnector: { type: Boolean, default: true },
     variant: { type: String, default: 'button' },
     isFirst: { type: Boolean, default: false },
+    after: { type: Boolean, default: false },
     loadingSet: { type: String, default: null },
     readOnly: { type: Boolean, default: false },
 });
