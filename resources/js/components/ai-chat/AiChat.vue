@@ -9,7 +9,7 @@ const { open, messages, floating } = useAiChat();
 const inputClasses = computed(() =>
     floating.value
         ? // The middle of the lowercase letters sits about 1.4px below the middle of the capitals, so even padding looks low unless we nudge it.
-        'border-0! bg-transparent! pt-[3.5px]! pb-[6px]! shadow-none! outline-hidden! ps-1! pe-10! dark:bg-transparent!'
+        'border-0! bg-transparent! pt-[3.5px]! pb-[6px]! placeholder:text-gray-500! shadow-none! outline-hidden! ps-1! pe-10! dark:bg-transparent!'
         : 'pe-10',
 );
 const prompt = ref('');
@@ -114,7 +114,7 @@ function scrollToBottom() {
                 size="xs"
                 round
                 :class="floating ? 'end-3.25 bottom-3.25' : 'end-5.25 bottom-5.25'"
-                class="absolute bg-none! bg-primary! disabled:opacity-100! hover:bg-primary-hover! border-0 shadow-none! inset-shadow-none! [&_svg]:opacity-100! [&_g]:[stroke-width:1.5]"
+                class="absolute border-0 bg-none! bg-primary! shadow-none! inset-shadow-none! transition-[background-color] duration-150 hover:bg-primary-hover! disabled:opacity-100! disabled:bg-primary/8! dark:disabled:bg-primary/20! [&_svg]:opacity-100! disabled:[&_svg]:text-primary/50! dark:disabled:[&_svg]:text-white/50! [&_g]:[stroke-width:1.5]"
                 :aria-label="__('Send')"
                 v-tooltip="__('Send')"
                 :disabled="!prompt.trim()"
