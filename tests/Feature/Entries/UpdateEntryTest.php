@@ -8,9 +8,11 @@ use Illuminate\Support\Facades\Event;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\EntrySaving;
+use Statamic\Events\RevisionSaving;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
+use Statamic\Facades\Folder;
 use Statamic\Facades\Role;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
@@ -24,6 +26,25 @@ class UpdateEntryTest extends TestCase
 {
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->dir = __DIR__.'/tmp';
+
+        config([
+            'statamic.editions.pro' => true,
+            'statamic.revisions.path' => $this->dir,
+            'statamic.revisions.enabled' => true,
+        ]);
+    }
+
+    public function tearDown(): void
+    {
+        Folder::delete($this->dir);
+        parent::tearDown();
+    }
 
     #[Test]
     public function it_denies_access_if_you_dont_have_edit_permission()
@@ -536,6 +557,188 @@ class UpdateEntryTest extends TestCase
     }
 
     #[Test]
+    public function non_revisable_fields_are_saved_with_raw_values()
+    {
+        [$user, $collection] = $this->seedUserAndCollection(true);
+
+        $this->seedBlueprintFields($collection, [
+            'related' => ['type' => 'entries', 'revisable' => false],
+            'when' => ['type' => 'date', 'format' => 'Y-m-d', 'revisable' => false],
+        ]);
+
+        $entry = EntryFactory::id('1')
+            ->slug('test')
+            ->collection('test')
+            ->published(true)
+            ->data(['title' => 'Test'])
+            ->create();
+
+        $this
+            ->actingAs($user)
+            ->update($entry, [
+                'related' => ['2', '3'],
+                'when' => '2024-03-04',
+            ])
+            ->assertOk();
+
+        $entry = Entry::find($entry->id());
+        $this->assertSame(['2', '3'], $entry->get('related'));
+        $this->assertSame('2024-03-04', $entry->get('when'));
+    }
+
+    #[Test]
+    public function non_revisable_fields_are_not_saved_when_the_revision_is_cancelled()
+    {
+        [$user, $collection] = $this->seedUserAndCollection(true);
+
+        $this->seedBlueprintFields($collection, [
+            'foo' => ['type' => 'text', 'revisable' => false],
+        ]);
+
+        $entry = EntryFactory::id('1')
+            ->slug('test')
+            ->collection('test')
+            ->published(true)
+            ->data(['title' => 'Test', 'foo' => 'bar'])
+            ->create();
+
+        Event::listen(RevisionSaving::class, fn () => false);
+
+        $this
+            ->actingAs($user)
+            ->update($entry, ['foo' => 'not bar'])
+            ->assertOk();
+
+        $this->assertEquals('bar', $entry->fresh()->get('foo'));
+    }
+
+    #[Test]
+    public function non_revisable_fields_are_not_removed_from_an_entry_without_an_origin()
+    {
+        [$user, $collection] = $this->seedUserAndCollection(true);
+
+        $this->seedBlueprintFields($collection, [
+            'foo' => ['type' => 'text', 'revisable' => false],
+        ]);
+
+        $entry = EntryFactory::id('1')
+            ->slug('test')
+            ->collection('test')
+            ->published(true)
+            ->data(['title' => 'Test', 'foo' => 'bar'])
+            ->create();
+
+        // A single site install doesn't send _localized at all.
+        $this
+            ->actingAs($user)
+            ->update($entry, ['foo' => 'bar'])
+            ->assertOk();
+
+        $this->assertEquals('bar', $entry->fresh()->get('foo'));
+    }
+
+    #[Test]
+    public function published_entry_without_non_revisable_fields_is_not_saved()
+    {
+        [$user, $collection] = $this->seedUserAndCollection(true);
+
+        $this->seedBlueprintFields($collection, [
+            'foo' => ['type' => 'text'],
+        ]);
+
+        $entry = EntryFactory::id('1')
+            ->slug('test')
+            ->collection('test')
+            ->published(true)
+            ->data(['title' => 'Test'])
+            ->create();
+
+        Event::fake([EntrySaving::class]);
+
+        $this
+            ->actingAs($user)
+            ->update($entry, ['foo' => 'bar'])
+            ->assertOk();
+
+        Event::assertNotDispatched(EntrySaving::class);
+        $this->assertTrue($entry->fresh()->hasWorkingCopy());
+    }
+
+    #[Test]
+    public function non_revisable_fields_are_only_saved_to_the_localization_while_localized()
+    {
+        $this->setSites([
+            'en' => ['locale' => 'en', 'url' => '/'],
+            'fr' => ['locale' => 'fr', 'url' => '/fr/'],
+        ]);
+
+        [$user, $collection] = $this->seedUserAndCollection(true);
+        $collection->sites(['en', 'fr'])->save();
+
+        $this->seedBlueprintFields($collection, [
+            'foo' => ['type' => 'text', 'revisable' => false],
+        ]);
+
+        $origin = EntryFactory::collection($collection)
+            ->locale('en')
+            ->slug('origin')
+            ->published(true)
+            ->data(['title' => 'Origin', 'foo' => 'bar'])
+            ->create();
+
+        $localization = EntryFactory::collection($collection)
+            ->locale('fr')
+            ->origin($origin)
+            ->slug('localization')
+            ->published(true)
+            ->create();
+
+        $this
+            ->actingAs($user)
+            ->update($localization, [
+                'foo' => 'bar',
+                '_localized' => [],
+            ])
+            ->assertOk();
+
+        $localization = $localization->fresh();
+        $this->assertFalse($localization->has('foo'));
+        $this->assertEquals('bar', $localization->foo);
+
+        $this
+            ->actingAs($user)
+            ->update($localization, [
+                'foo' => 'le bar',
+                '_localized' => ['foo'],
+            ])
+            ->assertOk();
+
+        $localization = $localization->fresh();
+        $this->assertEquals('le bar', $localization->get('foo'));
+        $this->assertEquals('bar', $origin->fresh()->get('foo'));
+
+        $this
+            ->actingAs($user)
+            ->update($localization, [
+                'foo' => 'bar',
+                '_localized' => [],
+            ])
+            ->assertOk();
+
+        $localization = $localization->fresh();
+        $this->assertFalse($localization->has('foo'));
+        $this->assertEquals('bar', $localization->foo);
+
+        // Publishing merges non-revisable fields back from the live entry, which no
+        // longer has the handle, so the field stays synced with the origin.
+        $localization->publishWorkingCopy(['user' => $user]);
+
+        $localization = $localization->fresh();
+        $this->assertFalse($localization->has('foo'));
+        $this->assertEquals('bar', $localization->foo);
+    }
+
+    #[Test]
     public function it_can_validate_against_published_value()
     {
         [$user, $collection] = $this->seedUserAndCollection();
@@ -558,7 +761,41 @@ class UpdateEntryTest extends TestCase
     #[Test]
     public function published_entry_gets_saved_to_working_copy()
     {
-        $this->markTestIncomplete();
+        [$user, $collection] = $this->seedUserAndCollection(true);
+
+        $this->seedBlueprintFields($collection, [
+            'revisable' => ['type' => 'text'],
+            'non_revisable' => ['type' => 'text', 'revisable' => false],
+        ]);
+
+        $entry = EntryFactory::id('1')
+            ->slug('test')
+            ->collection('test')
+            ->data(['title' => 'Revisable Test', 'published' => true])
+            ->create();
+
+        $this
+            ->actingAs($user)
+            ->update($entry, [
+                'revisable' => 'revise me',
+                'non_revisable' => 'no revisions for you',
+            ])
+            ->assertOk();
+
+        $entry = Entry::find($entry->id());
+        $this->assertEquals('no revisions for you', $entry->non_revisable);
+        $this->assertEquals('Revisable Test', $entry->title);
+        $this->assertEquals('test', $entry->slug());
+        $this->assertNull($entry->revisable);
+
+        $workingCopy = $entry->fromWorkingCopy();
+        $this->assertEquals('updated-entry', $workingCopy->slug());
+        $this->assertEquals([
+            'title' => 'Updated entry',
+            'revisable' => 'revise me',
+            'non_revisable' => 'no revisions for you',
+            'published' => true,
+        ], $workingCopy->data()->all());
     }
 
     #[Test]
@@ -646,7 +883,7 @@ class UpdateEntryTest extends TestCase
             ->assertJsonValidationErrors(['slug']);
     }
 
-    private function seedUserAndCollection()
+    private function seedUserAndCollection(bool $enableRevisions = false)
     {
         $this->setTestRoles(['test' => [
             'access cp',
@@ -655,7 +892,7 @@ class UpdateEntryTest extends TestCase
             'access fr site',
         ]]);
         $user = tap(User::make()->assignRole('test'))->save();
-        $collection = tap(Collection::make('test'))->save();
+        $collection = tap(Collection::make('test')->revisionsEnabled($enableRevisions))->save();
 
         return [$user, $collection];
     }
