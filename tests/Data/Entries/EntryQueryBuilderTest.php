@@ -78,6 +78,16 @@ class EntryQueryBuilderTest extends TestCase
     }
 
     #[Test]
+    public function where_in_and_where_not_in_are_case_insensitive()
+    {
+        EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post One'])->create();
+        EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post Two'])->create();
+
+        $this->assertSame(['Post One'], Entry::query()->whereIn('title', ['POST ONE'])->get()->map->title->all());
+        $this->assertSame(['Post Two'], Entry::query()->whereNotIn('title', ['POST ONE'])->get()->map->title->all());
+    }
+
+    #[Test]
     public function entries_are_found_using_or_where_not_in()
     {
         EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1'])->create();
@@ -451,6 +461,35 @@ class EntryQueryBuilderTest extends TestCase
 
         $this->assertCount(6, $entries);
         $this->assertEquals(['1', '2', '4', '6', '7', '9'], $entries->map->id()->all());
+    }
+
+    #[Test]
+    public function entries_are_found_using_nested_where_on_collection()
+    {
+        EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1'])->create();
+        EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2'])->create();
+        EntryFactory::id('3')->slug('page-1')->collection('pages')->data(['title' => 'Page 1'])->create();
+        EntryFactory::id('4')->slug('page-2')->collection('pages')->data(['title' => 'Page 2'])->create();
+        EntryFactory::id('5')->slug('event-1')->collection('events')->data(['title' => 'Event 1'])->create();
+
+        $entries = Entry::query()
+            ->where(function ($query) {
+                $query->where('collection', 'posts');
+            })
+            ->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['1', '2'], $entries->map->id()->all());
+
+        $entries = Entry::query()
+            ->where(function ($query) {
+                $query->where('collection', 'posts')->orWhereIn('collection', ['events']);
+            })
+            ->orWhere('title', 'Page 2')
+            ->get();
+
+        $this->assertCount(4, $entries);
+        $this->assertEquals(['1', '2', '5', '4'], $entries->map->id()->all());
     }
 
     #[Test]
@@ -1318,6 +1357,12 @@ class EntryQueryBuilderTest extends TestCase
         EntryFactory::collection('alerts')->id('alerts-past')->published(true)->date(now()->subDay())->create();
         EntryFactory::collection('alerts')->id('alerts-past-draft')->published(false)->date(now()->subDay())->create();
 
+        Collection::make('promos')->dated(true)->futureDateBehavior('private')->pastDateBehavior('private')->save();
+        EntryFactory::collection('promos')->id('promo-future')->published(true)->date(now()->addDay())->create();
+        EntryFactory::collection('promos')->id('promo-future-draft')->published(false)->date(now()->addDay())->create();
+        EntryFactory::collection('promos')->id('promo-past')->published(true)->date(now()->subDay())->create();
+        EntryFactory::collection('promos')->id('promo-past-draft')->published(false)->date(now()->subDay())->create();
+
         // Undated, but with customized date behavior. Nonsensical situation, but it can happen.
         // See https://github.com/statamic/eloquent-driver/issues/288
         Collection::make('undated')->dated(false)->futureDateBehavior('private')->pastDateBehavior('private')->save();
@@ -1342,6 +1387,8 @@ class EntryQueryBuilderTest extends TestCase
                 'news-past-draft',
                 'alerts-future-draft',
                 'alerts-past-draft',
+                'promo-future-draft',
+                'promo-past-draft',
                 'undated-draft',
             ]],
             'published' => ['published', [
@@ -1358,9 +1405,11 @@ class EntryQueryBuilderTest extends TestCase
             ]],
             'scheduled' => ['scheduled', [
                 'blog-future',
+                'promo-future',
             ]],
             'expired' => ['expired', [
                 'event-past',
+                'promo-past',
             ]],
         ];
     }

@@ -185,7 +185,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
     public function blueprint($blueprint = null)
     {
-        $key = "entry-{$this->id()}-blueprint";
+        $key = 'entry-'.($this->id() ?? 'obj-'.spl_object_id($this)).'-blueprint';
 
         return $this
             ->fluentlyGetOrSet('blueprint')
@@ -284,6 +284,8 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         if ($withEvents) {
             EntryDeleted::dispatch($this);
         }
+
+        $withEvents ? $this->deleteRevisions() : $this->deleteRevisionsQuietly();
 
         return true;
     }
@@ -761,7 +763,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             'id' => $this->id(),
             'slug' => $this->slug(),
             'published' => $this->published(),
-            'date' => $this->collection()->dated() ? $this->date()->timestamp : null,
+            'date' => $this->collection()->dated() && (! $this->hasOrigin() || $this->hasExplicitDate()) ? $this->date()->timestamp : null,
             'data' => $this->data()->except(['updated_by', 'updated_at'])->all(),
         ];
     }
@@ -781,9 +783,13 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             ->data($attrs['data'])
             ->slug($attrs['slug']);
 
-        if ($this->collection()->dated() && ($date = Arr::get($attrs, 'date'))) {
-            if ($this->isRoot() || $this->blueprint()->field('date')->isLocalizable()) {
+        if ($this->collection()->dated()) {
+            $date = Arr::get($attrs, 'date');
+
+            if ($date !== null && ($this->isRoot() || $this->blueprint()->field('date')->isLocalizable())) {
                 $entry->date(Carbon::createFromTimestamp($date, config('app.timezone')));
+            } elseif ($date === null && $this->hasOrigin()) {
+                $entry->date(null);
             }
         }
 
@@ -1178,6 +1184,11 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         // Avoid using the authors() method.
         if ($field === 'authors') {
             return $this->value('authors');
+        }
+
+        // Avoid resolving the Site object.
+        if ($field === 'site') {
+            return $this->locale();
         }
 
         // Reset the cached uri so it gets recalculated.

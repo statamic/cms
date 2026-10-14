@@ -48,3 +48,15 @@ test('no aria-label is rendered when the label comes from the slot', () => {
     expect(wrapper.find('[role="checkbox"]').attributes('aria-label')).toBeUndefined();
 });
 
+test('indeterminate sets data-state and shows the dash indicator', () => {
+    const wrapper = mount(Checkbox, {
+        props: { label: 'Select items', modelValue: false, indeterminate: true },
+    });
+
+    const root = wrapper.find('[role="checkbox"]');
+
+    expect(root.attributes('data-state')).toBe('indeterminate');
+    expect(root.attributes('aria-checked')).toBe('mixed');
+    expect(wrapper.find('svg path').attributes('d')).toBe('M2 1H8');
+});
+

@@ -2,9 +2,11 @@
 
 namespace Tests\StaticCaching;
 
+use Illuminate\Contracts\Events\Dispatcher;
 use Mockery;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Entries\Entry;
+use Statamic\Events\AssetReuploaded;
 use Statamic\Events\BlueprintSaved;
 use Statamic\Events\CollectionTreeEntriesMovedOrRemoved;
 use Statamic\Facades\Entry as EntryFacade;
@@ -106,5 +108,17 @@ class InvalidateTest extends TestCase
         $invalidate = new Invalidate(Mockery::mock(Invalidator::class), $cacher);
 
         $invalidate->invalidateMovedOrRemovedEntries($event);
+    }
+
+    #[Test]
+    public function it_refreshes_an_asset_when_it_is_reuploaded()
+    {
+        $events = Mockery::mock(Dispatcher::class);
+        $events->shouldReceive('listen')->with(AssetReuploaded::class, Invalidate::class.'@refreshAsset')->once();
+        $events->shouldReceive('listen');
+
+        $invalidate = new Invalidate(Mockery::mock(Invalidator::class), Mockery::mock(Cacher::class));
+
+        $invalidate->subscribe($events);
     }
 }

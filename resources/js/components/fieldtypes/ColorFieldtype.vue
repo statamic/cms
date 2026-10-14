@@ -1,8 +1,11 @@
 <template>
-    <div class="flex items-center">
-        <!-- <div class="input-group w-auto" :class="{ 'max-w-[130px]': config.allow_any }"> -->
-        <div class="flex items-center rounded-full relative border shadow-ui-sm with-contrast:border-gray-500">
+    <div class="flex w-full min-w-0 items-center">
+        <div
+            class="flex items-center rounded-full relative border shadow-ui-sm with-contrast:border-gray-500"
+            :class="{ 'border-dashed border-gray-300 dark:border-gray-700 dark:with-contrast:border-gray-600': isReadOnly }"
+        >
             <ui-popover
+                v-if="!isReadOnly"
                 ref="colorPopover"
                 name="swatches"
                 direction="bottom"
@@ -12,10 +15,13 @@
                 @update:open="popoverOpen = $event"
             >
                 <template #trigger>
-                    <button type="button" class="cursor-pointer size-9 border rounded-full flex items-center justify-center with-contrast:border-gray-500" :aria-label="__('Pick Color')">
+                    <button
+                        type="button"
+                        class="cursor-pointer size-9 border rounded-full flex items-center justify-center with-contrast:border-gray-500"
+                        :aria-label="__('Pick Color')"
+                    >
                         <div
                             class="size-8 rounded-full"
-                            :class="{ 'cursor-not-allowed': isReadOnly }"
                             :style="{ 'background-color': customColor || value }"
                         />
                     </button>
@@ -57,8 +63,29 @@
                 </template>
             </ui-popover>
 
+            <div
+                v-else-if="hasColorSelected"
+                class="pointer-events-none flex size-9 shrink-0 items-center justify-center rounded-full border border-transparent"
+                role="img"
+                :aria-label="__('Color')"
+            >
+                <div
+                    class="size-8 rounded-full"
+                    :style="{ 'background-color': customColor || value }"
+                />
+            </div>
+
+            <div
+                v-else
+                class="pointer-events-none flex h-9 min-h-9 shrink-0 items-center justify-center rounded-full bg-gray-50 px-4 text-sm text-gray-400 dark:bg-gray-900 dark:text-gray-400"
+                role="status"
+                data-color-readonly-empty
+            >
+                {{ __('None') }}
+            </div>
+
             <input
-                v-if="config.allow_any"
+                v-if="config.allow_any && (!isReadOnly || hasColorSelected)"
                 class="font-mono text-sm px-2 w-24 outline-none"
                 maxlength="7"
                 type="text"
@@ -69,7 +96,7 @@
             />
         </div>
 
-        <ui-button v-if="value" icon="x" :aria-label="__('Reset')" @click="resetColor" round inset size="sm" variant="ghost" class="ms-1" />
+        <ui-button v-if="value && !isReadOnly" icon="x" :aria-label="__('Reset')" @click="resetColor" round inset size="sm" variant="ghost" class="ms-1" />
     </div>
 </template>
 
@@ -98,6 +125,14 @@ export default {
     },
 
     computed: {
+        hasColorSelected() {
+            const v = this.value;
+            if (v == null || v === false) return false;
+            if (typeof v === 'string' && v.trim() === '') return false;
+
+            return true;
+        },
+
         replicatorPreview() {
             if (!this.showFieldPreviews) return;
 
