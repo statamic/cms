@@ -11,6 +11,7 @@ use Statamic\Facades\GlobalSet;
 use Statamic\Fields\LabeledValue;
 use Statamic\Fields\Value;
 use Statamic\Fieldtypes\AutocompleteEditor\Mentions;
+use Statamic\Fieldtypes\Markdown;
 use Statamic\Fieldtypes\Relationship;
 use Stringable;
 
@@ -20,7 +21,7 @@ class SubmissionMentions
 {
     private const EXCLUDED_GLOBAL_FIELDTYPES = [
         'bard', 'replicator', 'grid', 'group', 'table', 'array', 'yaml', 'code',
-        'section', 'spacer', 'revealer', 'html', 'hidden',
+        'section', 'spacer', 'revealer', 'html', 'hidden', 'icon',
     ];
 
     private const EXCLUDED_FORM_VALUES = ['id', 'date', 'form'];
@@ -150,6 +151,12 @@ class SubmissionMentions
                 : [];
         }
 
-        return $globals[$setHandle][$fieldHandle] ?? null;
+        $value = $globals[$setHandle][$fieldHandle] ?? null;
+
+        if ($value instanceof Value && $value->fieldtype() instanceof Markdown) {
+            return $value->raw();
+        }
+
+        return $value;
     }
 }

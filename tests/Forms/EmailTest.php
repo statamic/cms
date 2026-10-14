@@ -503,6 +503,32 @@ class EmailTest extends TestCase
     }
 
     #[Test]
+    public function markdown_globals_mentions_use_the_raw_text()
+    {
+        $set = GlobalSet::make()->handle('company_information')->sites(['en'])->save();
+        $set->makeLocalization('en')->data(['bio' => 'We make *things*'])->save();
+
+        BlueprintRepository::partialMock();
+        BlueprintRepository::shouldReceive('find')->with('globals.company_information')
+            ->andReturn(Blueprint::makeFromFields(['bio' => ['type' => 'markdown']]));
+
+        $form = tap(Form::make('test')->formFields(['fields' => []]))->save();
+        $submission = $form->makeSubmission()->data([]);
+
+        $email = new Email($submission, [
+            'to' => 'test@test.com',
+            'subject' => '[[ globals.company_information.bio ]]',
+            'body' => '[[ globals.company_information.bio ]]',
+        ], Site::default());
+
+        $html = $email->render();
+
+        $this->assertEquals('We make *things*', $email->subject);
+        $this->assertStringNotContainsString('&lt;p&gt;', $html);
+        $this->assertStringContainsString('We make *things*', $html);
+    }
+
+    #[Test]
     public function it_uses_the_custom_view_instead_of_the_body_when_one_is_configured()
     {
         $email = $this->makeEmailWithConfig(['body' => 'Hello [[ name ]]', 'html' => 'emails.custom']);

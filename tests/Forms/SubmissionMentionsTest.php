@@ -71,6 +71,7 @@ class SubmissionMentionsTest extends TestCase
             'secret' => ['type' => 'hidden'],
             'related' => ['type' => 'entries'],
             'custom' => ['type' => 'test_relationship'],
+            'logo' => ['type' => 'icon'],
         ]);
 
         $handles = array_keys(SubmissionMentions::options($this->makeForm()));
@@ -82,6 +83,7 @@ class SubmissionMentionsTest extends TestCase
         $this->assertNotContains('globals.company.secret', $handles);
         $this->assertNotContains('globals.company.related', $handles);
         $this->assertNotContains('globals.company.custom', $handles);
+        $this->assertNotContains('globals.company.logo', $handles);
     }
 
     #[Test]
@@ -132,7 +134,7 @@ class SubmissionMentionsTest extends TestCase
     #[Test]
     public function it_throws_for_invalid_registered_handles()
     {
-        foreach (['owner', 'shop owner.name', 'shop.na!me'] as $handle) {
+        foreach (['owner', 'shop owner.name', 'shop.na!me', 'site.custom', 'globals.company.name'] as $handle) {
             try {
                 Form::registerMention($handle, 'Label', fn () => 'x');
                 $this->fail("Handle [{$handle}] should have been rejected.");
@@ -209,6 +211,20 @@ class SubmissionMentionsTest extends TestCase
         $this->assertSame(
             ['globals.company.name' => 'Company FR'],
             SubmissionMentions::values($submission, ['globals.company.name'])
+        );
+    }
+
+    #[Test]
+    public function it_resolves_markdown_globals_to_their_raw_text()
+    {
+        $this->makeGlobalSet('company', 'Company', ['bio' => ['type' => 'markdown']])
+            ->makeLocalization('en')->data(['bio' => 'Some *emphasis* & more'])->save();
+
+        $this->assertArrayHasKey('globals.company.bio', SubmissionMentions::options($this->makeForm()));
+
+        $this->assertSame(
+            ['globals.company.bio' => 'Some *emphasis* & more'],
+            SubmissionMentions::values($this->makeSubmission(), ['globals.company.bio'])
         );
     }
 
