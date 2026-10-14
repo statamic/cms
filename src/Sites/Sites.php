@@ -58,29 +58,6 @@ class Sites
         return $this->sites->count() > 1;
     }
 
-    public function filterByGroup($handles, ?string $siteHandle)
-    {
-        if (! $siteHandle || ! ($site = $this->get($siteHandle))) {
-            return collect($handles);
-        }
-
-        $groupKey = $site->groupHandle() ?? $site->group();
-
-        if (! $groupKey) {
-            return collect($handles);
-        }
-
-        return collect($handles)->filter(function ($handle) use ($groupKey) {
-            $other = $this->get($handle);
-
-            if (! $other) {
-                return false;
-            }
-
-            return ($other->groupHandle() ?? $other->group()) === $groupKey;
-        });
-    }
-
     public function get($handle)
     {
         return $this->sites->get($handle);

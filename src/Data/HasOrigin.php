@@ -12,23 +12,37 @@ trait HasOrigin
     protected $origin;
     private $cachedKeys;
 
-    public function keys()
+    public function keys(array $visited = [])
     {
-        if ($this->cachedKeys) {
+        if (empty($visited) && $this->cachedKeys) {
             return $this->cachedKeys;
         }
 
+        $key = $this->originVisitKey();
+
+        if (in_array($key, $visited, true)) {
+            return collect();
+        }
+
+        $visited[] = $key;
+
         $originFallbackKeys = method_exists($this, 'getOriginFallbackValues') ? $this->getOriginFallbackValues()->keys() : collect();
 
-        $originKeys = $this->hasOrigin() ? $this->origin()->keys() : collect();
+        $originKeys = $this->hasOrigin() ? $this->origin()->keys($visited) : collect();
 
         $computedKeys = method_exists($this, 'computedKeys') ? $this->computedKeys() : [];
 
-        return $this->cachedKeys = collect()
+        $keys = collect()
             ->merge($originFallbackKeys)
             ->merge($originKeys)
             ->merge($this->data->keys())
             ->merge($computedKeys);
+
+        if (count($visited) === 1) {
+            $this->cachedKeys = $keys;
+        }
+
+        return $keys;
     }
 
     public function values()
@@ -36,11 +50,19 @@ trait HasOrigin
         return $this->getValues(false);
     }
 
-    public function getValues($wrapComputed)
+    public function getValues($wrapComputed, array $visited = [])
     {
+        $key = $this->originVisitKey();
+
+        if (in_array($key, $visited, true)) {
+            return collect();
+        }
+
+        $visited[] = $key;
+
         $originFallbackValues = method_exists($this, 'getOriginFallbackValues') ? $this->getOriginFallbackValues() : collect();
 
-        $originValues = $this->hasOrigin() ? $this->origin()->values() : collect();
+        $originValues = $this->hasOrigin() ? $this->origin()->getValues($wrapComputed, $visited) : collect();
 
         $computedData = method_exists($this, 'getComputedData') ? $this->getComputedData($wrapComputed) : [];
 
@@ -51,11 +73,19 @@ trait HasOrigin
             ->merge($computedData);
     }
 
-    public function value($key)
+    public function value($key, array $visited = [])
     {
+        $visitKey = $this->originVisitKey();
+
+        if (in_array($visitKey, $visited, true)) {
+            return null;
+        }
+
+        $visited[] = $visitKey;
+
         $originFallbackValue = method_exists($this, 'getOriginFallbackValue') ? $this->getOriginFallbackValue($key) : null;
 
-        $originValue = $this->hasOrigin() ? $this->origin()->value($key) : $originFallbackValue;
+        $originValue = $this->hasOrigin() ? $this->origin()->value($key, $visited) : $originFallbackValue;
 
         $value = $this->has($key) ? $this->get($key) : $originValue;
 
@@ -111,14 +141,60 @@ trait HasOrigin
         return ! $this->hasOrigin();
     }
 
-    public function root()
+    public function hasOriginCycle(): bool
     {
+        $seen = [];
         $entry = $this;
 
         while ($entry->hasOrigin()) {
+            $key = $entry->originVisitKey();
+
+            if (isset($seen[$key])) {
+                return true;
+            }
+
+            $seen[$key] = true;
+
+            $entry = $entry->origin();
+
+            if (! $entry) {
+                break;
+            }
+        }
+
+        return false;
+    }
+
+    public function root()
+    {
+        $entry = $this;
+        $seen = [];
+
+        while ($entry->hasOrigin()) {
+            $key = $entry->originVisitKey();
+
+            if (isset($seen[$key])) {
+                break;
+            }
+
+            $seen[$key] = true;
+
             $entry = $entry->origin();
         }
 
         return $entry;
+    }
+
+    protected function originVisitKey()
+    {
+        if (method_exists($this, 'id')) {
+            $id = $this->id();
+
+            if ($id !== null) {
+                return $id;
+            }
+        }
+
+        return 'object:'.spl_object_id($this);
     }
 }

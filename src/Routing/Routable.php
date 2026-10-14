@@ -28,7 +28,7 @@ trait Routable
                 return null;
             }
 
-            $lang = method_exists($this, 'site') ? $this->site()->lang() : null;
+            $lang = method_exists($this, 'site') ? $this->site()?->lang() : null;
 
             return Str::slug($slug, '-', $lang);
         })->args(func_get_args());

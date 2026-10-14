@@ -97,6 +97,7 @@ class EntryRevisionsController extends CpController
                     'exists' => $exists,
                     'root' => $exists ? $localized->isRoot() : false,
                     'origin' => $exists ? $localized->id() === optional($entry->origin())->id() : null,
+                    'origin_handle' => $exists ? optional($localized->origin())->locale() : null,
                     'published' => $exists ? $localized->published() : false,
                     'url' => $exists ? $localized->editUrl() : null,
                 ];

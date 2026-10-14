@@ -108,4 +108,35 @@ class UpdateGlobalsTest extends TestCase
         $this->assertNotNull(GlobalVariables::find('test::de'));
         $this->assertNull(GlobalVariables::find('test::it'));
     }
+
+    #[Test]
+    public function it_rejects_circular_origin_references()
+    {
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+        ]);
+
+        $this->setTestRoles(['test' => ['access cp', 'configure globals']]);
+        $user = User::make()->assignRole('test')->save();
+
+        $global = GlobalSet::make('test')->sites(['en', 'fr'])->save();
+
+        $this
+            ->actingAs($user)
+            ->patchJson($global->updateUrl(), [
+                'title' => 'test',
+                'sites' => [
+                    ['name' => 'English', 'handle' => 'en', 'enabled' => true, 'origin' => 'fr'],
+                    ['name' => 'French', 'handle' => 'fr', 'enabled' => true, 'origin' => 'en'],
+                ],
+            ])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors('sites');
+
+        $this->assertEquals([
+            'en' => null,
+            'fr' => null,
+        ], GlobalSet::find('test')->origins()->all());
+    }
 }

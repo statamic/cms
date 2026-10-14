@@ -110,12 +110,35 @@ class GlobalsController extends CpController
                 ->filter(fn ($site) => $site['enabled'])
                 ->mapWithKeys(fn ($site) => [$site['handle'] => $site['origin']]);
 
+            $this->validateAcyclicOrigins($sites);
+
             $set->sites($sites);
         }
 
         $set->save();
 
         return response('', 204);
+    }
+
+    private function validateAcyclicOrigins($origins)
+    {
+        $origins = collect($origins);
+
+        foreach ($origins as $start => $origin) {
+            $seen = [];
+            $current = $start;
+
+            while ($current) {
+                if (isset($seen[$current])) {
+                    throw \Illuminate\Validation\ValidationException::withMessages([
+                        'sites' => __('Origin sites cannot reference each other in a loop.'),
+                    ]);
+                }
+
+                $seen[$current] = true;
+                $current = $origins->get($current);
+            }
+        }
     }
 
     public function create()
@@ -202,7 +225,7 @@ class GlobalsController extends CpController
 
         if (Site::multiEnabled()) {
             $fields['sites'] = [
-                'display' => __('Sites'),
+                'display' => __('Localizations'),
                 'fields' => [
                     'sites' => [
                         'type' => 'global_set_sites',
