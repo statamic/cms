@@ -3,6 +3,7 @@ import { computed, provide, ref, watch, onMounted, onUnmounted, useTemplateRef }
 import useResizable from '@/composables/use-resizable.js';
 import useAiChat from '@/composables/use-ai-chat.js';
 import AiChat from '@/components/ai-chat/AiChat.vue';
+import AiChatDockStrip from '@/components/ai-chat/AiChatDockStrip.vue';
 import { Tabs, TabList, TabTrigger } from '@ui';
 
 const minWidth = 175;
@@ -21,13 +22,15 @@ const left = {
 // The right panel is shared by the page (e.g. an inspector) and the AI chat. When both want it, they become tabs.
 const pagePanelActive = ref(false);
 const pagePanelLabel = ref(null);
-const { open: chatOpen } = useAiChat();
+const { open: chatOpen, floating: chatFloating } = useAiChat();
+// The chat only uses the right panel when it's docked there, rather than floating in the corner.
+const chatInPanel = computed(() => chatOpen.value && !chatFloating.value);
 const rightTab = ref('chat');
-const showRightTabs = computed(() => pagePanelActive.value && chatOpen.value);
-const showPagePanel = computed(() => pagePanelActive.value && (!chatOpen.value || rightTab.value === 'page'));
-const showChat = computed(() => chatOpen.value && (!pagePanelActive.value || rightTab.value === 'chat'));
+const showRightTabs = computed(() => pagePanelActive.value && chatInPanel.value);
+const showPagePanel = computed(() => pagePanelActive.value && (!chatInPanel.value || rightTab.value === 'page'));
+const showChat = computed(() => chatInPanel.value && (!pagePanelActive.value || rightTab.value === 'chat'));
 
-watch(chatOpen, (open) => (rightTab.value = open ? 'chat' : 'page'));
+watch(chatInPanel, (inPanel) => (rightTab.value = inPanel ? 'chat' : 'page'));
 
 // The chat has its own default and remembered width, separate from page panels.
 const rightSizes = {
@@ -37,7 +40,7 @@ const rightSizes = {
 
 const right = {
     ref: useTemplateRef('rightPanel'),
-    active: computed(() => pagePanelActive.value || chatOpen.value),
+    active: computed(() => pagePanelActive.value || chatInPanel.value),
     edge: 'left',
     get defaults() {
         return rightSizes[showChat.value ? 'chat' : 'page'].defaults;
@@ -155,11 +158,24 @@ onUnmounted(() => {
                 </TabList>
             </Tabs>
             <div v-show="showPagePanel" id="right-panel-page" class="min-[1000px]:grid flex-1"></div>
-            <div v-show="showChat" class="layout-panel-content flex flex-1 flex-col min-h-0" :data-mobile-open="chatOpen">
-                <AiChat />
+            <div v-show="showChat" class="layout-panel-content flex flex-1 min-h-0" :data-mobile-open="chatOpen">
+                <div class="flex min-w-0 flex-1 flex-col">
+                    <AiChat v-if="!chatFloating" />
+                </div>
+                <AiChatDockStrip v-if="!chatFloating" />
             </div>
         </div>
     </Teleport>
+
+    <div
+        v-if="chatOpen && chatFloating"
+        class="fixed end-4 bottom-4 max-h-[calc(100dvh-11rem)] z-(--z-index-modal) flex w-95 max-w-[calc(100vw-2rem)] rounded-2xl border border-gray-200/80 bg-white/70 ps-2 shadow-2xl backdrop-blur-xl dark:border-gray-700/80 dark:bg-gray-900/70"
+    >
+        <div class="flex min-w-0 flex-1 flex-col">
+            <AiChat />
+        </div>
+        <AiChatDockStrip />
+    </div>
 
     <slot />
 </template>
