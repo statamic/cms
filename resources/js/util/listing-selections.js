@@ -42,6 +42,14 @@ export function removePageSelections(selections, pageIds) {
     return (selections || []).filter((id) => !remove.has(id));
 }
 
+export function replaceSelections(selections, ids) {
+    selections.splice(0, selections.length);
+
+    for (const id of ids) {
+        selections.push(id);
+    }
+}
+
 export function canSelectAllMatching({
     hasUrl,
     total,
@@ -94,12 +102,23 @@ export async function fetchAllMatchingIds({
     pageSize,
     signal,
     maxSelections = Infinity,
+    selectAllLimit = Infinity,
 }) {
     const perPage = Math.max(1, pageSize || 100);
     const ids = [];
     const seen = new Set();
     let page = 1;
     let lastPage = Math.max(1, Math.ceil(total / perPage));
+
+    function enforceSelectAllLimit(count) {
+        if (count > selectAllLimit) {
+            const error = new Error('Selection limit reached');
+            error.code = 'SELECTION_LIMIT_REACHED';
+            throw error;
+        }
+    }
+
+    enforceSelectAllLimit(total);
 
     while (page <= lastPage) {
         if (signal?.aborted) {
@@ -119,10 +138,12 @@ export async function fetchAllMatchingIds({
         });
 
         const pageItems = Object.values(response?.data?.data || {});
+        enforceSelectAllLimit(response?.data?.meta?.total);
 
         for (const item of pageItems) {
             const id = item.id;
             if (seen.has(id)) continue;
+            enforceSelectAllLimit(ids.length + 1);
             seen.add(id);
             ids.push(id);
 

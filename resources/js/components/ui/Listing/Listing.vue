@@ -23,7 +23,14 @@ import Table from './Table.vue';
 import Pagination from './Pagination.vue';
 import { sortBy } from 'lodash-es';
 import fuzzysort from 'fuzzysort';
-import { canSelectAllMatching as canSelectAllMatchingHelper, fetchAllMatchingIds, isPageFullySelected, isRequestCanceled, resolveSelectAllLimit } from '@/util/listing-selections.js';
+import {
+    canSelectAllMatching as canSelectAllMatchingHelper,
+    fetchAllMatchingIds,
+    isPageFullySelected,
+    isRequestCanceled,
+    replaceSelections,
+    resolveSelectAllLimit,
+} from '@/util/listing-selections.js';
 
 const emit = defineEmits([
     'update:columns',
@@ -362,16 +369,23 @@ async function selectAllMatching() {
             pageSize: selectAllMatchingPageSize(),
             signal: controller.signal,
             maxSelections: props.maxSelections,
+            selectAllLimit: selectAllLimit.value,
         });
 
         if (selectAllMatchingSource !== controller) return;
 
         selectedAllMatchingCount.value = ids.length;
-        selections.value.splice(0, selections.value.length, ...ids);
+        replaceSelections(selections.value, ids);
         selectedAllMatching.value = true;
     } catch (e) {
         if (isRequestCanceled(e) || selectAllMatchingSource !== controller) return;
-        Statamic.$toast.error(e.response ? e.response.data.message : __('Something went wrong'), {
+        let message = e.response ? e.response.data.message : __('Something went wrong');
+
+        if (e.code === 'SELECTION_LIMIT_REACHED') {
+            message = __('messages.selections_select_all_limit_reached', { limit: selectAllLimit.value });
+        }
+
+        Statamic.$toast.error(message, {
             duration: null,
         });
     } finally {

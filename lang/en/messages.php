@@ -242,6 +242,7 @@ return [
     'selections_limit_reached' => 'Selection limit reached. Cannot select :title',
     'selections_select_all' => ':selected of :total items selected. Check to select items.',
     'selections_select_all_matching' => 'Select :total items across all pages',
+    'selections_select_all_limit_reached' => 'The results now exceed the selection limit of :limit items. Refresh the listing and try again.',
     'session_expiry_dismissed_banner' => 'Your session is about to expire. Click here to extend it and stay signed in.',
     'session_expiry_dismissed_login_banner' => 'Your session has expired. Click here to log back in.',
     'session_expiry_enter_password' => 'Enter your password to continue.',

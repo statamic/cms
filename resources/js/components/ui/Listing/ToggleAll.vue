@@ -7,6 +7,7 @@ import {
     isPagePartiallySelected,
     pageItemIds,
     removePageSelections,
+    replaceSelections,
     unionPageSelections,
 } from '@/util/listing-selections.js';
 
@@ -47,12 +48,12 @@ function selectPageItems() {
         pageItemIds(items.value),
         maxSelections.value ?? Infinity,
     );
-    selections.value.splice(0, selections.value.length, ...next);
+    replaceSelections(selections.value, next);
 }
 
 function deselectPageItems() {
     const next = removePageSelections(selections.value, pageItemIds(items.value));
-    selections.value.splice(0, selections.value.length, ...next);
+    replaceSelections(selections.value, next);
 }
 
 function getAriaLabel() {
