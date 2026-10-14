@@ -14,6 +14,7 @@ const inputClasses = computed(() =>
 );
 const prompt = ref('');
 
+
 // Floating, the examples are hidden until you press / in the empty box. Docked, they show above the input.
 const showExamples = ref(false);
 const thread = useTemplateRef('thread');
