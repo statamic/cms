@@ -2,7 +2,7 @@
     <div class="flex gap-2 sm:gap-3">
         <!-- Link type selector -->
         <div class="w-fit">
-            <Select :options v-model="option" :adaptive-width="true" />
+            <Select :options v-model="option" :adaptive-width="true" :read-only="isReadOnly" />
         </div>
 
         <div class="flex min-w-0 flex-1">
@@ -16,6 +16,7 @@
                 :meta="matchedType.meta"
                 :value="selectedByType[option]"
                 :handle="option"
+                :read-only="isReadOnly"
                 @update:value="typeSelected"
                 @update:meta="updateTypeMeta(option, $event)"
             />
@@ -94,14 +95,14 @@ export default {
             if (this.metaChanging) return;
 
             if (option === null) {
-                this.update(null);
+                if (!this.isReadOnly) this.update(null);
             } else if (option === 'url') {
-                this.updateDebounced(this.urlValue);
+                if (!this.isReadOnly) this.updateDebounced(this.urlValue);
             } else if (option === 'first-child') {
-                this.update('@child');
+                if (!this.isReadOnly) this.update('@child');
             } else if (this.matchedType) {
                 this.loadTypeMeta(option).then(() => {
-                    if (this.option !== option) return;
+                    if (this.option !== option || this.isReadOnly) return;
 
                     this.typeValue
                         ? this.update(this.typeValue)
@@ -114,6 +115,7 @@ export default {
 
         urlValue(url) {
             if (this.metaChanging) return;
+            if (this.isReadOnly) return;
             this.syncUrlDebounced(url);
         },
 
@@ -174,6 +176,7 @@ export default {
         },
 
         typeSelected(selected) {
+            if (this.isReadOnly) return;
             this.selectedByType = { ...this.selectedByType, [this.option]: selected };
             this.update(this.typeValue);
             this.updateMeta({

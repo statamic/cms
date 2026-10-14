@@ -26,6 +26,7 @@
                     :action-url="actionUrl"
                     :action-context="actionContext"
                     :allow-bulk-actions="allowBulkActions"
+                    :allow-select-all-matching="false"
                     :selections="selectedAssets"
                     :max-selections="maxFiles"
                     :preferences-prefix="preferencesPrefix"
