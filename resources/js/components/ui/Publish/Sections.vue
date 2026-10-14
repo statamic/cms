@@ -26,7 +26,7 @@ import { computed, nextTick, onBeforeUnmount, provide, ref, watch } from 'vue';
 const { container, visibleValues, extraValues, revealerValues, asConfig, hiddenFields, setHiddenField, values, setFieldValue, setValues, readOnly, editingSections, canAddSections, meta, setFieldMeta } = injectContainerContext();
 const tab = injectTabContext();
 const visibleSections = computed(() => {
-    return tab.sections.filter((section) => {
+    return tab.value.sections.filter((section) => {
         return section.fields.some((field) => {
             return new ShowField(
                 visibleValues.value,
@@ -107,9 +107,9 @@ function sectionKey(section) {
 
 function reorderSections(reordered) {
     const reorderedKeys = new Set(reordered.map(sectionKey));
-    const remaining = tab.sections.filter((section) => !reorderedKeys.has(sectionKey(section)));
+    const remaining = tab.value.sections.filter((section) => !reorderedKeys.has(sectionKey(section)));
 
-    tab.sections.splice(0, tab.sections.length, ...reordered, ...remaining);
+    tab.value.sections.splice(0, tab.value.sections.length, ...reordered, ...remaining);
     persistGroupOrder(reordered);
 }
 
@@ -164,14 +164,14 @@ function isOtherSection(section) {
 }
 
 function insertNamedSection(section) {
-    const index = tab.sections.findIndex(isOtherSection);
+    const index = tab.value.sections.findIndex(isOtherSection);
 
     if (index === -1) {
-        tab.sections.push(section);
+        tab.value.sections.push(section);
         return;
     }
 
-    tab.sections.splice(index, 0, section);
+    tab.value.sections.splice(index, 0, section);
 }
 
 function uniqueGroupKey(title) {
@@ -274,9 +274,9 @@ function removeGroup(section) {
     delete next[section.editable_title_handle];
     delete next[fromHandle];
 
-    const index = tab.sections.findIndex((item) => sectionKey(item) === sectionKey(section));
+    const index = tab.value.sections.findIndex((item) => sectionKey(item) === sectionKey(section));
     if (index !== -1) {
-        tab.sections.splice(index, 1);
+        tab.value.sections.splice(index, 1);
     }
 
     setValues(valuesWithOtherLast(next));

@@ -67,7 +67,7 @@ class Session
     {
         $this->regionCount += 1;
 
-        return md5($this->url.$this->regionCount);
+        return md5($this->url.'|'.$this->regionCount);
     }
 
     public function pushRegion($contents, $context, $extension): StringRegion

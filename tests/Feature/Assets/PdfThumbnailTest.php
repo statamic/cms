@@ -3,7 +3,9 @@
 namespace Tests\Feature\Assets;
 
 use Illuminate\Http\UploadedFile;
+use Mockery;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\User;
 use Tests\FakesRoles;
@@ -75,6 +77,10 @@ class PdfThumbnailTest extends TestCase
 
         $this->setTestRoles(['test' => ['access cp']]);
         $user = User::make()->assignRole('test')->save();
+
+        $asset = Mockery::mock($container->asset('one.pdf'))->makePartial();
+        $asset->shouldNotReceive('contents');
+        Asset::shouldReceive('find')->with('test::one.pdf')->andReturn($asset);
 
         $this
             ->actingAs($user)
