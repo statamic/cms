@@ -420,7 +420,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contain
         if (FormInstances::formsForCollection($this->handle())->isNotEmpty() && ! $blueprint->hasField('form_instances')) {
             $blueprint->ensureField('form_instances', [
                 'type' => 'form_instances',
-                'display' => __('Forms'),
+                'display' => 'Forms',
                 'collection' => $this->handle(),
                 'mode' => 'select',
             ], 'sidebar');

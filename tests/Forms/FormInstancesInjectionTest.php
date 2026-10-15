@@ -63,6 +63,16 @@ class FormInstancesInjectionTest extends TestCase
     }
 
     #[Test]
+    public function the_injected_display_is_not_translated()
+    {
+        app()->setLocale('fr');
+
+        Form::make('rsvp')->set('unique_instances', true)->set('unique_instances_collections', ['events'])->save();
+
+        $this->assertEquals('Forms', $this->blueprint('events')->field('form_instances')->display());
+    }
+
+    #[Test]
     public function it_doesnt_inject_the_field_without_unique_instances()
     {
         Form::make('rsvp')->set('unique_instances', false)->set('unique_instances_collections', ['events'])->save();
