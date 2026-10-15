@@ -7,102 +7,43 @@ const mountFieldtype = (props = {}) =>
         props: {
             handle: 'rsvp_form',
             config: { type: 'form', max_items: 1 },
-            meta: { configurable: true, data: [] },
-            value: { form: ['contact'], config: { submission_limit: 1 } },
+            meta: { data: [] },
+            value: ['contact'],
             ...props,
         },
         global: {
             stubs: {
                 RelationshipFieldtype: true,
-                SubmissionListing: true,
-                InlineSubmissionForm: true,
-                PublishContainer: true,
-                PublishTabs: true,
-                Stack: true,
-                Button: true,
+                SubmissionsStack: true,
             },
         },
     });
 
-test('config is kept when the form is unchanged', () => {
+test('the value is passed through as plain handles', async () => {
     const wrapper = mountFieldtype();
 
-    wrapper.vm.formUpdated(['contact']);
-
-    expect(wrapper.emitted('update:value')[0]).toEqual([{ form: ['contact'], config: { submission_limit: 1 } }]);
-});
-
-test('config is cleared when the form changes', () => {
-    const wrapper = mountFieldtype();
-
-    wrapper.vm.formUpdated(['other']);
-
-    expect(wrapper.emitted('update:value')[0]).toEqual([{ form: ['other'], config: {} }]);
-});
-
-test('plain handles are used when not configurable', () => {
-    const wrapper = mountFieldtype({
-        meta: { configurable: false, data: [] },
-        value: ['contact'],
-    });
-
-    wrapper.vm.formUpdated(['other']);
+    await wrapper.findComponent({ name: 'RelationshipFieldtype' }).vm.$emit('update:value', ['other']);
 
     expect(wrapper.emitted('update:value')[0]).toEqual([['other']]);
 });
 
-test('only modified fields are persisted as overrides', async () => {
+test('items only have submissions when the form matches the submissions meta', () => {
     const wrapper = mountFieldtype({
-        meta: {
-            configurable: true,
-            data: [],
-            configureMeta: {
-                form: 'contact',
-                blueprint: {},
-                values: {},
-                meta: {},
-                originValues: { submission_limit: 100, closed_message: null },
-                originMeta: {},
-            },
-        },
+        meta: { data: [], submissions: { form: 'contact', filters: [], actionUrl: '/' } },
     });
 
-    wrapper.vm.configuringForm = true;
-    await wrapper.vm.$nextTick();
+    const formItem = wrapper.vm.$.provides.formFieldtypeItem;
 
-    expect(wrapper.vm.configOverrides).toEqual({ submission_limit: 1, closed_message: null });
-    expect(wrapper.vm.modifiedOverrides).toEqual(['submission_limit']);
-
-    wrapper.vm.configOverrides.closed_message = 'Full.';
-    wrapper.vm.modifiedOverrides.push('closed_message');
-    wrapper.vm.applyConfigure();
-
-    expect(wrapper.emitted('update:value')[0]).toEqual([
-        { form: ['contact'], config: { submission_limit: 1, closed_message: 'Full.' } },
-    ]);
+    expect(formItem.hasSubmissions({ id: 'contact' })).toBe(true);
+    expect(formItem.hasSubmissions({ id: 'other' })).toBe(false);
+    expect(formItem.hasConfigure({ id: 'contact' })).toBe(false);
 });
 
-test('synced fields are dropped from the overrides', async () => {
+test('submissions are hidden once the form is unlinked', () => {
     const wrapper = mountFieldtype({
-        meta: {
-            configurable: true,
-            data: [],
-            configureMeta: {
-                form: 'contact',
-                blueprint: {},
-                values: {},
-                meta: {},
-                originValues: { submission_limit: 100 },
-                originMeta: {},
-            },
-        },
+        value: [],
+        meta: { data: [], submissions: { form: 'contact', filters: [], actionUrl: '/' } },
     });
 
-    wrapper.vm.configuringForm = true;
-    await wrapper.vm.$nextTick();
-
-    wrapper.vm.modifiedOverrides = [];
-    wrapper.vm.applyConfigure();
-
-    expect(wrapper.emitted('update:value')[0]).toEqual([{ form: ['contact'], config: {} }]);
+    expect(wrapper.vm.submissionsMeta).toBeNull();
 });

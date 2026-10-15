@@ -15,12 +15,12 @@
 
             <div class="flex flex-1 items-center justify-end">
                 <Button
-                    v-if="formItem.hasSubmissions()"
+                    v-if="formItem.hasSubmissions(item)"
                     size="xs"
                     variant="ghost"
                     icon="eye"
                     :text="__('View Submissions')"
-                    @click="formItem.viewSubmissions()"
+                    @click="formItem.viewSubmissions(item)"
                 />
 
                 <div class="flex items-center" v-if="!readOnly">
@@ -30,9 +30,9 @@
                         </template>
                         <DropdownMenu>
                             <DropdownItem
-                                v-if="formItem.hasConfigure()"
+                                v-if="formItem.hasConfigure(item)"
                                 :text="__('Configure')"
-                                @click="formItem.configure()"
+                                @click="formItem.configure(item)"
                             />
                             <DropdownItem
                                 :text="__('Unlink')"
