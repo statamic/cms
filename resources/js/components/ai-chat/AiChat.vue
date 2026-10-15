@@ -18,6 +18,9 @@ const prompt = ref('');
 const showExamples = ref(false);
 const thread = useTemplateRef('thread');
 const form = useTemplateRef('form');
+const examples = useTemplateRef('examples');
+// Floating, the examples are only there once opened. Docked, they're there until the first message.
+const examplesVisible = computed(() => !messages.value.length && (floating.value ? showExamples.value : true));
 
 // Move focus into the chat when it opens, so keyboard and screen reader users land on the input.
 // Closing is done with the same header button, which still has focus, so there's nothing to restore.
@@ -42,7 +45,22 @@ function onFocusOut(event) {
     if (!event.currentTarget.contains(event.relatedTarget)) showExamples.value = false;
 }
 
+// Enter sends from the input. On a card it does what a button does, and picks it.
+function onEnter(event) {
+    if (event.target.tagName !== 'TEXTAREA') return;
+
+    event.preventDefault();
+    send();
+}
+
 function onKeydown(event) {
+    // From the empty input, up and down go into the example cards.
+    if (event.target.tagName === 'TEXTAREA' && (event.key === 'ArrowDown' || event.key === 'ArrowUp') && !prompt.value && examplesVisible.value && examples.value) {
+        event.preventDefault();
+        event.key === 'ArrowDown' ? examples.value.focusFirst() : examples.value.focusLast();
+        return;
+    }
+
     if (floating.value && event.key === '/' && !prompt.value && !event.metaKey && !event.ctrlKey && !event.altKey) {
         event.preventDefault();
         showExamples.value = true;
@@ -68,6 +86,7 @@ function send(text = prompt.value) {
 
     messages.value.push({ role: 'user', text });
     prompt.value = '';
+    focusInput();
     scrollToBottom();
 
     // Prototype: fake a reply.
@@ -90,7 +109,7 @@ function scrollToBottom() {
             <!-- mt-auto keeps messages next to the input, while still scrolling once they overflow -->
             <div class="relative mt-auto space-y-3">
                 <!-- Docked, show the examples above the input until a request has been sent -->
-                <AiChatExamples v-if="!floating && !messages.length" :examples="suggestions" @pick="send" />
+                <AiChatExamples v-if="!floating && !messages.length" ref="examples" :examples="suggestions" @pick="send" @exit="focusInput" />
                 <div
                     v-for="(message, i) in messages"
                     :key="i"
@@ -104,13 +123,13 @@ function scrollToBottom() {
                 />
             </div>
         </div>
-        <form ref="form" :class="['relative ps-0.25', floating ? 'p-2' : 'p-2.5']" @submit.prevent="send()" @keydown.enter.exact.prevent="send()" @keydown="onKeydown">
+        <form ref="form" :class="['relative ps-0.25', floating ? 'p-2' : 'p-2.5']" @submit.prevent="send()" @keydown.enter.exact="onEnter" @keydown="onKeydown">
             <!-- Examples, opened by pressing / in the empty box -->
             <div
                 v-if="floating && showExamples && !messages.length"
                 class="absolute -start-2.75 bottom-full z-20 mb-3 rounded-2xl border shadow-none border-transparent [background:linear-gradient(white,white)_padding-box,linear-gradient(135deg,var(--color-primary),#60a5fa)_border-box] dark:[background:linear-gradient(var(--color-gray-900),var(--color-gray-900))_padding-box,linear-gradient(135deg,var(--color-primary),#60a5fa)_border-box]"
             >
-                <AiChatExamples :examples="suggestions" padded @pick="send" />
+                <AiChatExamples ref="examples" :examples="suggestions" padded @pick="send" @exit="focusInput" />
             </div>
             <Textarea
                 v-model="prompt"

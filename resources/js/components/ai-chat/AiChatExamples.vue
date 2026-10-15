@@ -1,4 +1,5 @@
 <script setup>
+import { useTemplateRef } from 'vue';
 import { Icon } from '@ui';
 
 defineProps({
@@ -7,14 +8,37 @@ defineProps({
     padded: { type: Boolean, default: false },
 });
 
-defineEmits(['pick']);
+const emit = defineEmits(['pick', 'exit']);
+
+const list = useTemplateRef('list');
+const cards = () => [...(list.value?.querySelectorAll('button') ?? [])];
+
+const focusFirst = () => cards()[0]?.focus();
+const focusLast = () => cards().at(-1)?.focus();
+
+// Up and down move between the cards. Down from the last one hands focus back to the input.
+function onKeydown(event) {
+    if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return;
+
+    const all = cards();
+    const index = all.indexOf(document.activeElement);
+    if (index < 0) return;
+
+    event.preventDefault();
+    const next = event.key === 'ArrowDown' ? index + 1 : index - 1;
+
+    if (next >= all.length) emit('exit');
+    else if (next >= 0) all[next].focus();
+}
+
+defineExpose({ focusFirst, focusLast });
 </script>
 
 <template>
     <div :class="['space-y-2', padded ? 'p-2' : '']">
         <p class="px-1 text-sm tracking-tight text-gray-600 dark:text-gray-400">{{ __('Try asking') }}</p>
 
-        <div class="flex flex-col gap-2.5">
+        <div ref="list" class="flex flex-col gap-2.5" @keydown="onKeydown">
             <!-- Styled like the CP's Card: white, a 1px ring, rounded-xl. -->
             <button
                 v-for="example in examples"
