@@ -131,6 +131,8 @@ function scrollToBottom() {
                         v-else
                         :class="[
                             'max-w-[85%] rounded-xl px-3 py-2 text-sm',
+                            // A new turn gets a little more room above it, so it doesn't merge with the answer before
+                            message.role === 'user' && i > 0 ? 'mt-7.5' : 'mb-5',
                             message.role === 'user'
                                 // Your messages are a white card with a ring, like the CP's Card and the tool-call cards
                                 ? 'ms-auto bg-white text-gray-900 ring ring-gray-200 dark:bg-gray-850 dark:text-gray-200 dark:ring-gray-700/80'
