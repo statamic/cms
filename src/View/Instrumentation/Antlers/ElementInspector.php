@@ -138,7 +138,7 @@ class ElementInspector
 
     /**
      * @param  int[]  $offsets
-     * @return array<int, array{0: string, 1: string|null, 2: string}> offset => [kind, attribute name, partial run]
+     * @return array<int, array{0: string, 1: string|null, 2: string}>
      */
     public function classifyTagPositions(string $markup, array $offsets): array
     {
@@ -504,7 +504,6 @@ class ElementInspector
         return $char === '<' && RegionExtents::startsPhpBlock($content, $index);
     }
 
-    /** @return int|false Offset immediately after the Antlers region or PHP block. */
     protected function embeddedEnd(string $content, int $start, int $length): int|false
     {
         return RegionExtents::embeddedEndInBytes($content, $start, $length) ?? false;

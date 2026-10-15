@@ -7,7 +7,6 @@ use Statamic\View\Instrumentation\HtmlSpec;
 /** @internal */
 class RegionExtents
 {
-    /** @return int|false|null Null when no Antlers region or PHP block starts at the offset. */
     public static function embeddedEndInBytes(string $source, int $start, int $length): int|false|null
     {
         $char = $source[$start] ?? '';

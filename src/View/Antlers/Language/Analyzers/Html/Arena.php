@@ -68,16 +68,16 @@ class Arena
     /** @var array<int, int> */
     public array $embeddedOwner = [];
 
-    /** @var array<int, int> target id => anchor id */
+    /** @var array<int, int> */
     public array $sourceAnchor = [];
 
-    /** @var array<int, int|null> anchor id => target id */
+    /** @var array<int, int|null> */
     public array $anchorTarget = [];
 
-    /** @var array<int, int> node id => normalized byte offset of its unedited value */
+    /** @var array<int, int> */
     public array $sourceStart = [];
 
-    /** @var array<int, int> element id => normalized byte offset of its unedited closing markup */
+    /** @var array<int, int> */
     public array $closingStart = [];
 
     public function allocate(int $kind): int

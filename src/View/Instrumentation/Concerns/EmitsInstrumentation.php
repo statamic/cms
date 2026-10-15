@@ -149,7 +149,6 @@ trait EmitsInstrumentation
         }
     }
 
-    /** @return string One of the SKIP_* constants. */
     protected function skipReasonFor(TemplateRegion $region): string
     {
         $context = $region->context();
