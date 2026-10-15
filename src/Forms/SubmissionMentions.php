@@ -119,6 +119,10 @@ class SubmissionMentions
             return (string) ($value->label() ?? $value->value());
         }
 
+        if (static::isAugmentedOption($value)) {
+            return (string) ($value['label'] ?? $value['value']);
+        }
+
         if ($value instanceof Asset) {
             return (string) $value->absoluteUrl();
         }
@@ -139,6 +143,15 @@ class SubmissionMentions
         }
 
         return '';
+    }
+
+    private static function isAugmentedOption(mixed $value): bool
+    {
+        if (! is_array($value) || count($value) !== 3) {
+            return false;
+        }
+
+        return array_key_exists('key', $value) && array_key_exists('value', $value) && array_key_exists('label', $value);
     }
 
     private static function formFieldValue(Submission $submission, string $handle, mixed $value): mixed

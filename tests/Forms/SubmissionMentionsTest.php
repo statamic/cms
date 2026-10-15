@@ -10,9 +10,11 @@ use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
 use Statamic\Facades\GlobalSet;
+use Statamic\Facades\Site;
 use Statamic\Fields\LabeledValue;
 use Statamic\Fields\Value;
 use Statamic\Fieldtypes\Relationship;
+use Statamic\Forms\Email;
 use Statamic\Forms\SubmissionMentions;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -342,6 +344,80 @@ class SubmissionMentionsTest extends TestCase
                 return 'str';
             }
         }));
+    }
+
+    #[Test]
+    public function it_prints_the_label_of_each_selected_option()
+    {
+        $options = ['red' => 'Red', 'blue' => 'Blue', 'green' => 'Green'];
+
+        $form = tap(Form::make('choices')->formFields([
+            'fields' => [
+                ['handle' => 'boxes', 'field' => ['type' => 'checkboxes', 'options' => $options]],
+                ['handle' => 'multi', 'field' => ['type' => 'select', 'multiple' => true, 'options' => $options]],
+                ['handle' => 'single', 'field' => ['type' => 'select', 'options' => $options]],
+                ['handle' => 'radio', 'field' => ['type' => 'radio', 'options' => $options]],
+                ['handle' => 'buttons', 'field' => ['type' => 'button_group', 'options' => $options]],
+            ],
+        ]))->save();
+
+        $submission = $form->makeSubmission()->data([
+            'boxes' => ['red', 'blue'],
+            'multi' => ['red', 'blue'],
+            'single' => 'green',
+            'radio' => 'green',
+            'buttons' => 'green',
+        ]);
+
+        $this->assertSame([
+            'boxes' => 'Red, Blue',
+            'multi' => 'Red, Blue',
+            'single' => 'Green',
+            'radio' => 'Green',
+            'buttons' => 'Green',
+        ], SubmissionMentions::values($submission, ['boxes', 'multi', 'single', 'radio', 'buttons']));
+
+        $this->assertSame(
+            'Red, Blue | Red, Blue | Green',
+            SubmissionMentions::replace($submission, '[[ boxes ]] | [[ multi ]] | [[ single ]]')
+        );
+
+        $email = new Email($submission, ['to' => 'test@test.com', 'subject' => 'Picked [[ boxes ]]', 'body' => 'You chose [[ multi ]]'], Site::default());
+
+        $this->assertStringContainsString('You chose Red, Blue', $email->render());
+        $this->assertSame('Picked Red, Blue', $email->subject);
+    }
+
+    #[Test]
+    public function it_prints_the_label_of_each_selected_option_in_a_checkboxes_global()
+    {
+        $this->makeGlobalSet('company', 'Company', [
+            'services' => ['type' => 'checkboxes', 'options' => ['red' => 'Red', 'blue' => 'Blue', 'green' => 'Green']],
+        ])->makeLocalization('en')->data(['services' => ['red', 'blue']])->save();
+
+        $submission = $this->makeSubmission();
+
+        $this->assertSame(
+            ['globals.company.services' => 'Red, Blue'],
+            SubmissionMentions::values($submission, ['globals.company.services'])
+        );
+
+        $email = new Email($submission, [
+            'to' => 'test@test.com',
+            'subject' => 'Offering [[ globals.company.services ]]',
+            'body' => 'We do [[ globals.company.services ]]',
+        ], Site::default());
+
+        $this->assertStringContainsString('We do Red, Blue', $email->render());
+        $this->assertSame('Offering Red, Blue', $email->subject);
+    }
+
+    #[Test]
+    public function it_only_collapses_arrays_with_exactly_the_option_shape()
+    {
+        $this->assertSame('Red', SubmissionMentions::mentionValue(['key' => 'red', 'value' => 'red', 'label' => 'Red']));
+        $this->assertSame('red', SubmissionMentions::mentionValue(['key' => 'red', 'value' => 'red', 'label' => null]));
+        $this->assertSame('a, b, c, d', SubmissionMentions::mentionValue(['key' => 'a', 'value' => 'b', 'label' => 'c', 'extra' => 'd']));
     }
 
     #[Test]
