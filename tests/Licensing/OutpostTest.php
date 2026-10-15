@@ -59,21 +59,19 @@ class OutpostTest extends TestCase
     }
 
     #[Test]
-    public function it_contacts_the_outpost_and_caches_the_response()
+    public function it_contacts_the_outpost_and_caches_the_response_for_50_to_59_minutes()
     {
         $outpost = $this->outpostWithJsonResponse(['foo' => 'bar']);
 
-        $expectedResponse = [
-            'foo' => 'bar',
-            'expiry' => now()->addHour()->timestamp,
-            'payload' => $outpost->payload(),
-        ];
+        $response = $outpost->response();
 
-        $this->assertEquals($expectedResponse, $outpost->response());
-        Carbon::setTestNow(now()->addHour()->subSecond(1));
-        $this->assertCachedResponseEquals($expectedResponse);
-        Carbon::setTestNow(now()->addSeconds(1));
-        $this->assertResponseNotCached();
+        $this->assertEquals([
+            'foo' => 'bar',
+            'expiry' => $response['expiry'],
+            'payload' => $outpost->payload(),
+        ], $response);
+        $this->assertExpiresBetween(now()->addMinutes(50), now()->addMinutes(59), $response);
+        $this->assertCachedUntilExpiry($response);
     }
 
     #[Test]
@@ -181,6 +179,38 @@ class OutpostTest extends TestCase
     }
 
     #[Test]
+    public function license_key_file_response_excludes_packages_that_are_not_installed()
+    {
+        config(['statamic.system.license_key' => 'testsitekey12345']);
+
+        $encrypter = new Encrypter('testsitekey12345');
+        $encryptedKeyFile = $encrypter->encrypt(json_encode(['packages' => [
+            'foo/bar' => ['valid' => true, 'exists' => true, 'version_limit' => null],
+            'not/installed' => ['valid' => false, 'exists' => true, 'version_limit' => null],
+        ]]));
+
+        File::shouldReceive('exists')
+            ->with(storage_path('license.key'))
+            ->once()
+            ->andReturnTrue();
+
+        File::shouldReceive('get')
+            ->with(storage_path('license.key'))
+            ->once()
+            ->andReturn($encryptedKeyFile);
+
+        Addon::shouldReceive('all')->andReturn(collect([
+            (new FakeOutpostAddon('foo/bar', '1.2.3', null, true, true)),
+        ]));
+
+        $response = $this->outpost()->response();
+
+        $this->assertEquals([
+            'foo/bar' => ['valid' => true, 'exists' => true, 'version_limit' => null],
+        ], $response['packages']);
+    }
+
+    #[Test]
     public function license_key_file_response_doesnt_fetch_marketplace_data()
     {
         config(['statamic.system.license_key' => 'testsitekey12345']);
@@ -219,17 +249,14 @@ class OutpostTest extends TestCase
         $this->setCachedResponse(['payload' => ['old' => 'stuff']]);
         $outpost = $this->outpostWithJsonResponse(['newer' => 'response']);
 
-        $expectedResponse = [
-            'newer' => 'response',
-            'expiry' => now()->addHour()->timestamp,
-            'payload' => $outpost->payload(),
-        ];
+        $response = $outpost->response();
 
-        $this->assertEquals($expectedResponse, $outpost->response());
-        Carbon::setTestNow(now()->addHour()->subSecond(1));
-        $this->assertCachedResponseEquals($expectedResponse);
-        Carbon::setTestNow(now()->addSeconds(1));
-        $this->assertResponseNotCached();
+        $this->assertEquals([
+            'newer' => 'response',
+            'expiry' => $response['expiry'],
+            'payload' => $outpost->payload(),
+        ], $response);
+        $this->assertCachedUntilExpiry($response);
     }
 
     #[Test]
@@ -244,41 +271,37 @@ class OutpostTest extends TestCase
     }
 
     #[Test]
-    public function it_caches_a_timed_out_request_for_5_minutes()
+    public function it_caches_a_timed_out_request_for_5_to_10_minutes()
     {
         $outpost = $this->outpostWithResponse(
             $e = new ConnectException('', new Request('POST', '/v3/query'))
         );
 
-        $expectedResponse = [
-            'error' => $e->getCode(),
-            'expiry' => now()->addMinutes(5)->timestamp,
-            'payload' => $outpost->payload(),
-        ];
+        $response = $outpost->response();
 
-        $this->assertEquals($expectedResponse, $outpost->response());
-        Carbon::setTestNow(now()->addMinutes(5)->subSecond(1));
-        $this->assertCachedResponseEquals($expectedResponse);
-        Carbon::setTestNow(now()->addSeconds(1));
-        $this->assertResponseNotCached();
+        $this->assertEquals([
+            'error' => $e->getCode(),
+            'expiry' => $response['expiry'],
+            'payload' => $outpost->payload(),
+        ], $response);
+        $this->assertExpiresBetween(now()->addMinutes(5), now()->addMinutes(10), $response);
+        $this->assertCachedUntilExpiry($response);
     }
 
     #[Test]
-    public function it_caches_a_500_error_for_5_minutes()
+    public function it_caches_a_500_error_for_5_to_10_minutes()
     {
         $outpost = $this->outpostWithErrorResponse(500);
 
-        $expectedResponse = [
-            'error' => 500,
-            'expiry' => now()->addMinutes(5)->timestamp,
-            'payload' => $outpost->payload(),
-        ];
+        $response = $outpost->response();
 
-        $this->assertEquals($expectedResponse, $outpost->response());
-        Carbon::setTestNow(now()->addMinutes(5)->subSecond(1));
-        $this->assertCachedResponseEquals($expectedResponse);
-        Carbon::setTestNow(now()->addSeconds(1));
-        $this->assertResponseNotCached();
+        $this->assertEquals([
+            'error' => 500,
+            'expiry' => $response['expiry'],
+            'payload' => $outpost->payload(),
+        ], $response);
+        $this->assertExpiresBetween(now()->addMinutes(5), now()->addMinutes(10), $response);
+        $this->assertCachedUntilExpiry($response);
     }
 
     #[Test]
@@ -387,6 +410,20 @@ class OutpostTest extends TestCase
     private function assertResponseNotCached()
     {
         $this->assertNull(Cache::store('outpost')->get('statamic.outpost.response'));
+    }
+
+    private function assertExpiresBetween($earliest, $latest, $response)
+    {
+        $this->assertGreaterThanOrEqual($earliest->timestamp, $response['expiry']);
+        $this->assertLessThanOrEqual($latest->timestamp, $response['expiry']);
+    }
+
+    private function assertCachedUntilExpiry($response)
+    {
+        Carbon::setTestNow(Carbon::createFromTimestamp($response['expiry'])->subSecond());
+        $this->assertCachedResponseEquals($response);
+        Carbon::setTestNow(now()->addSecond());
+        $this->assertResponseNotCached();
     }
 
     private function setCachedResponse($response)
