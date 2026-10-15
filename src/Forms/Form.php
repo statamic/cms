@@ -248,7 +248,7 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
             return [];
         }
 
-        return $this->get('unique_instances_collections') ?? [];
+        return Arr::wrap($this->get('unique_instances_collections'));
     }
 
     /**

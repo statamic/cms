@@ -124,4 +124,12 @@ class FormInstancesInjectionTest extends TestCase
 
         $this->assertEquals([], $form->uniqueInstancesCollections());
     }
+
+    #[Test]
+    public function the_form_wraps_a_single_collection_in_an_array()
+    {
+        $form = Form::make('rsvp')->set('unique_instances', true)->set('unique_instances_collections', 'events');
+
+        $this->assertEquals(['events'], $form->uniqueInstancesCollections());
+    }
 }
