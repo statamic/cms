@@ -2,6 +2,8 @@
 import { computed, nextTick, onMounted, ref, useTemplateRef, watch } from 'vue';
 import { Button, Icon, Textarea } from '@ui';
 import AiChatExamples from './AiChatExamples.vue';
+import AiChatRun from './AiChatRun.vue';
+import { planRun, playRun } from './mock-runs.js';
 import useAiChat from '@/composables/use-ai-chat.js';
 
 const { open, messages, floating, focusRequests, leave } = useAiChat();
@@ -92,11 +94,13 @@ function send(text = prompt.value) {
     focusInput();
     scrollToBottom();
 
-    // Prototype: fake a reply.
+    // Prototype: answer with the tool calls the MCP would make, played one after another.
+    const run = planRun(text);
     setTimeout(() => {
-        messages.value.push({ role: 'assistant', text: __("This is a prototype, so I can't do that yet.") });
+        messages.value.push({ role: 'assistant', run });
         scrollToBottom();
-    }, 600);
+        playRun(run, scrollToBottom);
+    }, 500);
 }
 
 function scrollToBottom() {
@@ -113,17 +117,19 @@ function scrollToBottom() {
             <div class="relative mt-auto space-y-3">
                 <!-- Docked, show the examples above the input until a request has been sent -->
                 <AiChatExamples v-if="!floating && !messages.length" ref="examples" :examples="suggestions" @pick="send" @exit="focusInput" />
-                <div
-                    v-for="(message, i) in messages"
-                    :key="i"
-                    :class="[
-                        'max-w-[85%] rounded-xl px-3 py-2 text-sm',
-                        message.role === 'user'
-                            ? 'ms-auto bg-gray-900 text-white dark:bg-gray-200 dark:text-gray-900'
-                            : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200',
-                    ]"
-                    v-text="message.text"
-                />
+                <template v-for="(message, i) in messages" :key="i">
+                    <AiChatRun v-if="message.run" :run="message.run" />
+                    <div
+                        v-else
+                        :class="[
+                            'max-w-[85%] rounded-xl px-3 py-2 text-sm',
+                            message.role === 'user'
+                                ? 'ms-auto bg-gray-900 text-white dark:bg-gray-200 dark:text-gray-900'
+                                : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200',
+                        ]"
+                        v-text="message.text"
+                    />
+                </template>
             </div>
         </div>
         <form
