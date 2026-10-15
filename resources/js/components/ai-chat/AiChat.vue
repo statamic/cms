@@ -119,8 +119,8 @@ function scrollToBottom() {
     <!-- Docked in the sidebar, fill the height. Floating, be only as tall as the content. -->
     <div data-ai-chat :class="['relative flex min-h-0 flex-col', floating ? 'flex-initial' : 'flex-1']" @focusout="onFocusOut">
         <!-- Floating, there is nothing to show above the input until the first message. Docked, it fills the space. -->
-        <!-- As the thread scrolls, messages fade out under the top edge (the padding there is clear, so nothing fades at rest) instead of being cut off by a hard line, and the top corners follow the card's -->
-        <div v-if="messages.length || !floating" ref="thread" :class="['flex min-h-0 flex-col overflow-y-auto ps-0.5 pe-2.5 pt-3.5 pb-2 [mask-image:linear-gradient(to_bottom,transparent,black_50px)]', floating ? 'flex-initial rounded-t-[11px]' : 'flex-1']">
+        <!-- As the thread scrolls, messages fade out under the top edge (only once it has scrolled, via a scroll-driven animation, so nothing fades at rest) instead of being cut off by a hard line, and the top corners follow the card's -->
+        <div v-if="messages.length || !floating" ref="thread" :class="['flex min-h-0 flex-col overflow-y-auto ps-0.5 pe-2.5 pt-3.5 pb-2 ai-chat-thread', floating ? 'flex-initial rounded-t-[11px]' : 'flex-1']">
             <!-- mt-auto keeps messages next to the input, while still scrolling once they overflow -->
             <div class="relative mt-auto space-y-3">
                 <!-- Docked, show the examples above the input until a request has been sent -->
@@ -207,3 +207,23 @@ function scrollToBottom() {
         </form>
     </div>
 </template>
+
+<style>
+@property --ai-chat-fade {
+    syntax: '<length>';
+    inherits: false;
+    initial-value: 0px;
+}
+
+@keyframes ai-chat-thread-fade {
+    to { --ai-chat-fade: 50px; }
+}
+
+/* The fade grows from nothing to 50px over the first 50px of scrolling */
+.ai-chat-thread {
+    mask-image: linear-gradient(to bottom, transparent, black var(--ai-chat-fade));
+    animation: ai-chat-thread-fade linear both;
+    animation-timeline: scroll(self);
+    animation-range: 0 50px;
+}
+</style>
