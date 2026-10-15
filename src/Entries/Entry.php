@@ -1024,6 +1024,10 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
     public function uri()
     {
+        if (! $this->id() && $uri = $this->getSupplement('live_preview_uri')) {
+            return $uri;
+        }
+
         if ($this->id() && Blink::store('entry-uris')->has($this->id())) {
             return Blink::store('entry-uris')->get($this->id());
         }
