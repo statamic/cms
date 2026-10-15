@@ -79,7 +79,10 @@ class Email extends Mailable
 
         $this->mentionValues = SubmissionMentions::values(
             $this->submission,
-            SubmissionMentions::handlesIn($subject, $body),
+            array_values(array_unique([
+                ...SubmissionMentions::handlesIn($subject),
+                ...SubmissionMentions::handlesIn($body, markdown: true),
+            ])),
             $this->submissionData
         );
 

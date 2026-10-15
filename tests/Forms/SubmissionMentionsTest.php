@@ -148,11 +148,48 @@ class SubmissionMentionsTest extends TestCase
     }
 
     #[Test]
+    public function it_ignores_escaped_literals_when_extracting_handles()
+    {
+        $this->assertSame(
+            ['name'],
+            SubmissionMentions::handlesIn('\\[[ shop.name ]] [[ name ]]')
+        );
+        $this->assertSame([], SubmissionMentions::handlesIn('\\[\\[ shop.owner \\]\\]', markdown: true));
+    }
+
+    #[Test]
+    public function it_does_not_resolve_escaped_literals_in_replace()
+    {
+        $calls = 0;
+        Form::registerMention('shop.name', 'Shop', function () use (&$calls) {
+            $calls++;
+
+            return 'Acme';
+        });
+
+        $this->assertSame(
+            '[[ shop.name ]]',
+            SubmissionMentions::replace($this->makeSubmission(), '\\[[ shop.name ]]')
+        );
+        $this->assertSame(0, $calls);
+
+        $this->assertSame(
+            '[[ shop.name ]] Granny Smith',
+            SubmissionMentions::replace($this->makeSubmission(), '\\[[ shop.name ]] [[ apple ]]')
+        );
+        $this->assertSame(0, $calls);
+    }
+
+    #[Test]
     public function it_extracts_handles_from_content()
     {
         $this->assertSame(
-            ['name', 'site.url', 'globals.a.b'],
-            SubmissionMentions::handlesIn('Hi [[ name ]] at [[site.url]]', '[[name]] [[ globals.a.b ]] [ nope ]')
+            ['name', 'site.url'],
+            SubmissionMentions::handlesIn('Hi [[ name ]] at [[site.url]]')
+        );
+        $this->assertSame(
+            ['name', 'globals.a.b'],
+            SubmissionMentions::handlesIn('[[name]] [[ globals.a.b ]] [ nope ]', markdown: true)
         );
     }
 

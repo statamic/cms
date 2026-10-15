@@ -61,9 +61,13 @@ class SubmissionMentions
         return $options + $others;
     }
 
-    public static function handlesIn(string ...$contents): array
+    public static function handlesIn(string $content, bool $markdown = false): array
     {
-        preg_match_all(Mentions::TOKEN, implode("\n", $contents), $matches);
+        if (! $markdown) {
+            return Mentions::handles($content);
+        }
+
+        preg_match_all(Mentions::TOKEN, $content, $matches);
 
         return array_values(array_unique($matches[1]));
     }

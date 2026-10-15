@@ -406,6 +406,30 @@ class EmailTest extends TestCase
     }
 
     #[Test]
+    public function it_does_not_resolve_escaped_mentions_in_the_subject_or_body()
+    {
+        $calls = 0;
+        Form::registerMention('shop.name', 'Shop', function () use (&$calls) {
+            $calls++;
+
+            return 'Acme';
+        });
+
+        $email = $this->makeEmailWithConfig([
+            'subject' => '\\[[ shop.name ]] [[ name ]]',
+            'body' => '\\[\\[ shop.name \\]\\]  [[ name ]]',
+        ], build: false);
+
+        $html = $email->render();
+
+        $this->assertEquals('[[ shop.name ]] Foo Bar', $email->subject);
+        $this->assertStringContainsString('&#91;&#91; shop.name ]]', $html);
+        $this->assertStringContainsString('Foo Bar', $html);
+        $this->assertStringNotContainsString('Acme', $html);
+        $this->assertSame(0, $calls);
+    }
+
+    #[Test]
     public function it_keeps_antlers_in_the_subject()
     {
         $email = $this->makeEmailWithConfig(['subject' => '{{ name | upper }} via [[ email ]]']);
