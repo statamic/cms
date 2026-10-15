@@ -20,7 +20,7 @@ const { messages, floating, newChat } = useAiChat();
         <button
             v-else
             type="button"
-            class="absolute end-10 top-2 z-10 flex h-7 cursor-pointer items-center justify-center gap-1 rounded-lg px-2 text-xs text-red-600 opacity-70 transition-opacity hover:bg-red-600/5 focus-visible:opacity-100 focus-visible:focus-outline group-hover/chat:opacity-100 dark:text-red-400 dark:hover:bg-red-400/10"
+            class="absolute end-10 top-2 z-10 flex h-7 cursor-pointer items-center justify-center gap-1 rounded-lg px-2 text-xs text-red-600 opacity-0 transition-opacity hover:bg-red-600/5 focus-visible:opacity-100 focus-visible:focus-outline group-hover/chat:opacity-100 dark:text-red-400 dark:hover:bg-red-400/10"
             @click="newChat"
            
         >

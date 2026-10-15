@@ -59,6 +59,14 @@ function onEnter(event) {
 }
 
 function onKeydown(event) {
+    // Shift+Enter adds a new line natively. Alt+Enter doesn't in a textarea, so do it by hand, and tell the input (and autosize) it changed.
+    if (event.key === 'Enter' && event.altKey && !event.shiftKey && !event.metaKey && !event.ctrlKey && event.target.tagName === 'TEXTAREA') {
+        event.preventDefault();
+        event.target.setRangeText('\n', event.target.selectionStart, event.target.selectionEnd, 'end');
+        event.target.dispatchEvent(new Event('input', { bubbles: true }));
+        return;
+    }
+
     // From the empty input, up and down go into the example cards.
     if (event.target.tagName === 'TEXTAREA' && (event.key === 'ArrowDown' || event.key === 'ArrowUp') && !prompt.value && examplesVisible.value && examples.value) {
         event.preventDefault();
@@ -215,6 +223,7 @@ function scrollToBottom() {
                 :class="floating ? 'end-4.75 bottom-[11.75px]' : 'end-5.25 bottom-5.25'"
                 class="absolute border-0 bg-none! bg-primary! shadow-none! inset-shadow-none! transition-[background-color] duration-150 hover:bg-primary-hover! disabled:opacity-100! disabled:bg-primary/8! dark:disabled:bg-primary/20! [&_svg]:opacity-100! disabled:[&_svg]:text-primary/50! dark:disabled:[&_svg]:text-white/50! [&_g]:[stroke-width:1.5]"
                 :aria-label="__('Send')"
+                tabindex="-1"
                 v-tooltip="__('Send')"
                 :disabled="!prompt.trim()"
             />

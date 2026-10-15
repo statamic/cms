@@ -10,7 +10,7 @@ defineProps({
 
 <template>
     <div class="space-y-3">
-        <div class="flex items-center justify-between gap-2 px-1">
+        <div class="flex items-center gap-2 px-1">
             <p class="text-sm font-medium tracking-tight text-gray-700 dark:text-white">{{ run.title }}</p>
             <Badge pill :color="run.status === 'done' ? 'emerald' : 'blue'" :text="run.status === 'done' ? __('Done') : __('Working')" />
         </div>
