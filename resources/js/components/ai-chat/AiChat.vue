@@ -2,6 +2,7 @@
 import { computed, nextTick, onMounted, ref, useTemplateRef, watch } from 'vue';
 import { Button, Icon, Textarea } from '@ui';
 import AiChatExamples from './AiChatExamples.vue';
+import AiChatShortcuts from './AiChatShortcuts.vue';
 import AiChatRun from './AiChatRun.vue';
 import { planRun, playRun } from './mock-runs.js';
 import useAiChat from '@/composables/use-ai-chat.js';
@@ -16,20 +17,20 @@ const inputClasses = computed(() =>
 );
 const prompt = ref('');
 
-// Floating, the examples are hidden until you press / in the empty box (a hint shows while it's focused and empty). Docked, they show above the input.
-const showExamples = ref(false);
+// Floating, the help (the examples, then the keyboard shortcuts) is hidden until you press / in the empty box (a hint shows while it's focused and empty). Docked, they show above the input.
+const showHelp = ref(false);
 const thread = useTemplateRef('thread');
 const form = useTemplateRef('form');
 const examples = useTemplateRef('examples');
 // Floating, the examples are only there once opened. Docked, they're there until the first message.
-const examplesVisible = computed(() => !messages.value.length && (floating.value ? showExamples.value : true));
+const examplesVisible = computed(() => !messages.value.length && (floating.value ? showHelp.value : true));
 
 // Move focus into the chat when it opens, so keyboard and screen reader users land on the input.
 // Closing is done with the same header button, which still has focus, so there's nothing to restore.
 const focusInput = () => nextTick(() => form.value?.querySelector('textarea')?.focus());
 watch(open, (isOpen) => {
     if (isOpen) focusInput();
-    else showExamples.value = false; // the floating chat stays mounted while closed, so put the examples away
+    else showHelp.value = false; // the floating chat stays mounted while closed, so put the help away
 });
 // The keyboard shortcut asks for focus when the chat is already open.
 watch(focusRequests, focusInput);
@@ -43,11 +44,11 @@ const suggestions = [
     { text: 'Create a landing page for the summer sale', icon: 'page' },
 ];
 
-watch(prompt, (value) => value && (showExamples.value = false));
+watch(prompt, (value) => value && (showHelp.value = false));
 
-// When focus moves to something outside the chat, put the examples away. (The key hint hides itself, as it only shows while focus is inside the card.)
+// When focus moves to something outside the chat, put the help away. (The key hint hides itself, as it only shows while focus is inside the card.)
 function onFocusOut(event) {
-    if (!event.currentTarget.contains(event.relatedTarget)) showExamples.value = false;
+    if (!event.currentTarget.contains(event.relatedTarget)) showHelp.value = false;
 }
 
 // Enter sends from the input. On a card it does what a button does, and picks it.
@@ -67,6 +68,15 @@ function onKeydown(event) {
         return;
     }
 
+    // Any key typed in the input puts the help away. Modifiers on their own don't count, Escape and Tab have their own jobs, and up and down are for choosing an example, when the examples are in the help (floating, before the first message).
+    const choosingExample = (event.key === 'ArrowDown' || event.key === 'ArrowUp') && floating.value && examplesVisible.value;
+    if (showHelp.value && event.target.tagName === 'TEXTAREA' && !['Shift', 'Control', 'Alt', 'Meta', 'Escape', 'Tab'].includes(event.key) && !choosingExample) {
+        showHelp.value = false;
+
+        // / opens the help, so pressing it again closes it rather than typing a slash
+        if (event.key === '/') return event.preventDefault();
+    }
+
     // From the empty input, up and down go into the example cards.
     if (event.target.tagName === 'TEXTAREA' && (event.key === 'ArrowDown' || event.key === 'ArrowUp') && !prompt.value && examplesVisible.value && examples.value) {
         event.preventDefault();
@@ -74,15 +84,15 @@ function onKeydown(event) {
         return;
     }
 
-    if (floating.value && event.key === '/' && !prompt.value && !event.metaKey && !event.ctrlKey && !event.altKey) {
+    if (event.key === '/' && !prompt.value && !event.metaKey && !event.ctrlKey && !event.altKey) {
         event.preventDefault();
-        showExamples.value = true;
+        showHelp.value = true;
     } else if (event.key === 'Escape') {
         // Stop other Escape handlers in the CP (like closing a stack) from also acting.
         event.stopPropagation();
 
-        if (showExamples.value) {
-            showExamples.value = false;
+        if (showHelp.value) {
+            showHelp.value = false;
             focusInput();
         } else {
             // Leave the chat open, and hand focus back to the page.
@@ -101,9 +111,9 @@ function send(text = prompt.value) {
     text = text.trim();
     if (!text) return;
 
-    showExamples.value = false;
+    showHelp.value = false;
 
-    // Typing /clear (or just clear) starts a new chat. Floating, a leading / opens the examples, so the bare word works there.
+    // Typing /clear (or just clear) starts a new chat. A leading / opens the help, so the bare word works there.
     if (/^\/?(clear|new)$/i.test(text)) {
         prompt.value = '';
         shrinkInput();
@@ -139,8 +149,9 @@ function scrollToBottom() {
     <!-- Docked in the sidebar, fill the height. Floating, be only as tall as the content. -->
     <div data-ai-chat :class="['relative flex min-h-0 flex-col', floating ? 'flex-initial' : 'flex-1']" @focusout="onFocusOut">
         <!-- Floating, there is nothing to show above the input until the first message. Docked, it fills the space. -->
+        <!-- While the help is open it dims, so the help stands out in front of it -->
         <!-- As the thread scrolls, messages fade out under the top edge (only once it has scrolled, via a scroll-driven animation, so nothing fades at rest) instead of being cut off by a hard line, and the top corners follow the card's -->
-        <div v-if="messages.length || !floating" ref="thread" :class="['flex min-h-0 flex-col overflow-y-auto ps-0.5 pe-2.5 pt-3.5 pb-2 ai-chat-thread', floating ? 'flex-initial rounded-t-[11px]' : 'flex-1']">
+        <div v-if="messages.length || !floating" ref="thread" :class="['flex min-h-0 flex-col overflow-y-auto ps-0.5 pe-2.5 pt-3.5 pb-2 ai-chat-thread transition-opacity duration-150', floating ? 'flex-initial rounded-t-[11px]' : 'flex-1', showHelp ? 'opacity-40' : '']">
             <!-- mt-auto keeps messages next to the input, while still scrolling once they overflow -->
             <div class="relative mt-auto space-y-3">
                 <!-- Docked, show the examples above the input until a request has been sent -->
@@ -176,7 +187,7 @@ function scrollToBottom() {
             @keydown.enter.exact="onEnter"
             @keydown="onKeydown"
         >
-            <!-- Examples, opened by pressing / in the empty box -->
+            <!-- Help (the examples, until there's a conversation, and the keyboard shortcuts), opened by pressing / in the empty box -->
             <!-- The same fade up as the chat itself, in and out, a touch quicker -->
             <Transition
                 enter-active-class="transition duration-150 ease-out motion-reduce:transition-none"
@@ -185,10 +196,13 @@ function scrollToBottom() {
                 leave-to-class="translate-y-3 opacity-0"
             >
                 <div
-                    v-if="floating && showExamples && !messages.length"
-                    class="absolute -start-2.75 bottom-full z-20 mb-3 rounded-2xl border shadow-none border-transparent [background:linear-gradient(white,white)_padding-box,linear-gradient(135deg,var(--color-primary),#60a5fa)_border-box] dark:[background:linear-gradient(var(--color-gray-900),var(--color-gray-900))_padding-box,linear-gradient(135deg,var(--color-primary),#60a5fa)_border-box]"
+                    v-if="showHelp"
+                    :class="floating ? (messages.length ? 'start-[7px] w-[calc(100%-14px)]' : '-start-2.75 w-[calc(100%+11px)]') : 'start-0.25 end-2.5'"
+                    class="absolute bottom-full z-20 mb-3 rounded-2xl border border-gray-200 bg-white shadow-ui-lg dark:border-gray-700 dark:bg-gray-900"
                 >
-                    <AiChatExamples ref="examples" :examples="suggestions" padded @pick="send" @exit="focusInput" />
+                    <!-- Docked, the examples are already above the input until the first message -->
+                    <AiChatExamples v-if="floating && !messages.length" ref="examples" :examples="suggestions" padded @pick="send" @exit="focusInput" />
+                    <AiChatShortcuts :after-examples="floating && !messages.length" :has-examples="!messages.length" />
                 </div>
             </Transition>
             <!-- Like the command palette's search row, an icon in front of the text -->
@@ -204,15 +218,15 @@ function scrollToBottom() {
                 elastic
                 :class="[inputClasses, floating ? 'ps-8.5!' : 'ps-9.5!']"
             />
-            <!-- Floating, a hint about the / key sits next to the send button while the chat is focused and nothing has been typed. Just a hint, not a button. Docked, the examples are already showing. -->
+            <!-- A hint about the / key sits next to the send button while the chat is focused and nothing has been typed. Just a hint, not a button. -->
             <div
-                v-if="floating && !messages.length"
-                v-show="!prompt && !showExamples"
+                v-show="!prompt && !showHelp"
                 aria-hidden="true"
-                class="pointer-events-none absolute end-12.5 bottom-[12.5px] flex h-6.5 items-center gap-1.5 px-1.5 text-xs text-gray-500 opacity-0 transition-opacity group-focus-within/chat:opacity-100 dark:text-gray-400"
+                :class="floating ? 'end-12.5 bottom-[12.5px]' : 'end-13 bottom-[21.75px]'"
+                class="pointer-events-none absolute flex h-6.5 items-center gap-1.5 px-1.5 text-xs text-gray-500 opacity-0 transition-opacity group-focus-within/chat:opacity-100 dark:text-gray-400"
             >
                 <kbd class="rounded-md bg-gray-950/5 px-[0.3125rem] py-[0.0625rem] font-sans text-[0.625rem]/4 font-medium ring-1 ring-gray-950/10 dark:bg-white/5 dark:ring-white/10">/</kbd>
-                {{ __('examples') }}
+                {{ __('help') }}
             </div>
             <Button
                 type="submit"
