@@ -72,7 +72,7 @@ class Outpost
 
     private function performAndCacheRequest()
     {
-        return $this->cacheResponse(now()->addSeconds(random_int(50 * 60, 70 * 60)), $this->performRequest());
+        return $this->cacheResponse(now()->addSeconds(random_int(50 * 60, 59 * 60)), $this->performRequest());
     }
 
     private function performRequest()

@@ -57,7 +57,7 @@ class OutpostTest extends TestCase
     }
 
     #[Test]
-    public function it_contacts_the_outpost_and_caches_the_response_for_50_to_70_minutes()
+    public function it_contacts_the_outpost_and_caches_the_response_for_50_to_59_minutes()
     {
         $outpost = $this->outpostWithJsonResponse(['foo' => 'bar']);
 
@@ -68,7 +68,7 @@ class OutpostTest extends TestCase
             'expiry' => $response['expiry'],
             'payload' => $outpost->payload(),
         ], $response);
-        $this->assertExpiresBetween(now()->addMinutes(50), now()->addMinutes(70), $response);
+        $this->assertExpiresBetween(now()->addMinutes(50), now()->addMinutes(59), $response);
         $this->assertCachedUntilExpiry($response);
     }
 
