@@ -48,7 +48,7 @@ class AntlersString
     /**
      * @internal
      *
-     * @return string The rendered output with its instrumentation markers.
+     * @return string
      */
     public function instrumented()
     {

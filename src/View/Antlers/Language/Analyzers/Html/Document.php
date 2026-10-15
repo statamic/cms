@@ -38,6 +38,8 @@ class Document
 
     protected static array $impliedCloseTargets = HtmlSpec::IMPLIED_CLOSE_TARGETS;
 
+    protected static array $impliedEndTags = HtmlSpec::IMPLIED_END_TAGS;
+
     protected static array $scopeBoundaries = HtmlSpec::SCOPE_BOUNDARIES;
 
     protected static array $listItemScopeBoundaries = HtmlSpec::LIST_ITEM_SCOPE_BOUNDARIES;
@@ -130,29 +132,29 @@ class Document
 
     protected int $rawTextClosingOffset = 0;
 
-    /** @var array<string, int> html element name => number of those elements on the open stack */
+    /** @var array<string, int> */
     protected array $openElementCounts = [];
 
-    /** @var array<string, mixed> answers derived from the open stack, cleared whenever it changes */
+    /** @var array<string, mixed> */
     protected array $stackFacts = [];
 
-    /** @var array<int, array{0: array<int, string|null>, 1: int|null}> container id => insertion chain */
+    /** @var array<int, array{0: array<int, string|null>, 1: int|null}> */
     protected array $insertionChains = [];
 
     protected int $tableStartDepth = 0;
 
-    /** @var array<int, TableMode> template element id => current template insertion mode */
+    /** @var array<int, TableMode> */
     protected array $templateInsertionModes = [];
 
-    /** @var array<int, array<string, mixed>> keyed by spl_object_id of the language node */
+    /** @var array<int, array<string, mixed>> */
     protected array $regionPlacements = [];
 
-    /** @var array<int, int> element id => byte offset of its opening `<` */
+    /** @var array<int, int> */
     protected array $elementSourceStarts = [];
 
     protected string $authoredSource;
 
-    /** @var array<int, array{offset: int, line: int}>|null keyed by normalized byte offset */
+    /** @var array<int, array{offset: int, line: int}>|null */
     protected ?array $authoredPositions = null;
 
     protected ?bool $mapsAuthoredSource = null;

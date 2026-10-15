@@ -148,14 +148,6 @@ final class HtmlContext
             return false;
         }
 
-        $tableModes = [
-            'thead' => true,
-            'tbody' => true,
-            'tfoot' => true,
-            'tr' => true,
-            'colgroup' => true,
-        ];
-
         for ($index = $table + 1, $count = count($this->elementStack); $index < $count; $index++) {
             $name = $this->elementStack[$index];
 
@@ -163,7 +155,7 @@ final class HtmlContext
                 return false;
             }
 
-            if (! isset($tableModes[$name])) {
+            if (! isset(HtmlSpec::TABLE_CELL_ANCESTORS[$name])) {
                 return false;
             }
         }

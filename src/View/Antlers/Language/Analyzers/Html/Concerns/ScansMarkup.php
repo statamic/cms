@@ -458,9 +458,6 @@ trait ScansMarkup
         return $this->regionStarts[$this->regionCursor] ?? null;
     }
 
-    /**
-     * @return string|null|false Static name, null for a dynamic name, or false for a missing name.
-     */
     protected function tagName(int $start, int $end, bool $closing): string|false|null
     {
         $index = $start + 1;

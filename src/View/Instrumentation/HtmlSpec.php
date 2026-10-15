@@ -163,6 +163,12 @@ class HtmlSpec
         'rtc' => ['rb' => true, 'rp' => true, 'rt' => true, 'rtc' => true],
     ];
 
+    const IMPLIED_END_TAGS = [
+        'dd' => true, 'dt' => true, 'li' => true, 'optgroup' => true,
+        'option' => true, 'p' => true, 'rb' => true, 'rp' => true,
+        'rt' => true, 'rtc' => true,
+    ];
+
     const SCOPE_BOUNDARIES = [
         'applet' => true, 'caption' => true, 'html' => true,
         'table' => true, 'td' => true, 'th' => true, 'marquee' => true,
@@ -199,6 +205,10 @@ class HtmlSpec
 
     const TABLE_SECTIONS = [
         'thead' => true, 'tbody' => true, 'tfoot' => true,
+    ];
+
+    const TABLE_CELL_ANCESTORS = [
+        'thead' => true, 'tbody' => true, 'tfoot' => true, 'tr' => true, 'colgroup' => true,
     ];
 
     const TABLE_STRUCTURAL_ELEMENTS = [
