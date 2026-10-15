@@ -33,8 +33,9 @@ class FormInstancesTest extends TestCase
 
         Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true)->byDefault();
 
-        Form::make('contact')->set('unique_instances', true)->set('submission_limit', 100)->save();
-        Form::make('feedback')->set('unique_instances', true)->save();
+        Form::make('contact')->set('unique_instances', true)->set('unique_instances_collections', ['pages'])->set('submission_limit', 100)->save();
+        Form::make('feedback')->set('unique_instances', true)->set('unique_instances_collections', ['pages'])->save();
+        Form::make('survey')->set('unique_instances', true)->set('unique_instances_collections', ['events'])->save();
         Form::make('newsletter')->save();
     }
 
@@ -304,14 +305,53 @@ class FormInstancesTest extends TestCase
     }
 
     #[Test]
-    public function it_only_offers_unique_instances_forms_the_user_can_view()
+    public function it_only_offers_forms_targeting_the_collection_that_the_user_can_view()
     {
-        $this->setTestRoles(['editor' => ['access cp', 'edit contact form', 'edit newsletter form']]);
+        $this->setTestRoles(['editor' => ['access cp', 'edit contact form', 'edit survey form', 'edit newsletter form']]);
         $this->actingAs(tap(User::make()->assignRole('editor'))->save());
+
+        $fieldtype = (new Field('form_instances', ['type' => 'form_instances', 'collection' => 'pages']))->fieldtype();
+
+        $items = $fieldtype->getIndexItems(new Request(['paginate' => false]));
+
+        $this->assertEquals(['contact'], $items->pluck('id')->all());
+    }
+
+    #[Test]
+    public function it_offers_forms_targeting_the_parent_entrys_collection()
+    {
+        $this->actingAs(tap(User::make()->makeSuper())->save());
+
+        $fieldtype = $this->field()->setParent($this->entry())->fieldtype();
+
+        $this->assertEquals(['collection' => 'pages'], $fieldtype->preload()['getBaseSelectionsUrlParameters']);
+        $this->assertEquals(['contact', 'feedback'], $fieldtype->getIndexItems(new Request(['paginate' => false]))->pluck('id')->all());
+    }
+
+    #[Test]
+    public function it_offers_forms_targeting_the_requested_collection()
+    {
+        $this->actingAs(tap(User::make()->makeSuper())->save());
+
+        request()->merge(['collection' => 'events']);
 
         $items = $this->fieldtype()->getIndexItems(new Request(['paginate' => false]));
 
-        $this->assertEquals(['contact'], $items->pluck('id')->all());
+        $this->assertEquals(['survey'], $items->pluck('id')->all());
+    }
+
+    #[Test]
+    public function it_offers_no_forms_without_a_collection()
+    {
+        $this->actingAs(tap(User::make()->makeSuper())->save());
+
+        $this->assertEquals([], $this->fieldtype()->getIndexItems(new Request(['paginate' => false]))->pluck('id')->all());
+    }
+
+    #[Test]
+    public function it_is_not_selectable()
+    {
+        $this->assertFalse($this->fieldtype()->selectable());
     }
 
     #[Test]

@@ -121,7 +121,7 @@ class AccessTest extends TestCase
     #[Test]
     public function the_submission_limit_is_scoped_per_entry_when_unique_instances_is_enabled()
     {
-        $form = $this->makeForm(['submission_limit' => 2, 'unique_instances' => true]);
+        $form = $this->makeForm(['submission_limit' => 2, 'unique_instances' => true, 'unique_instances_collections' => ['events']]);
 
         $this->submit($form, 2, entry: 'event-1');
         $this->submit($form, 1, entry: 'event-2');
@@ -136,7 +136,7 @@ class AccessTest extends TestCase
     #[Test]
     public function an_entry_can_override_the_submission_limit()
     {
-        $form = $this->makeForm(['submission_limit' => 5, 'unique_instances' => true]);
+        $form = $this->makeForm(['submission_limit' => 5, 'unique_instances' => true, 'unique_instances_collections' => ['events']]);
 
         $this->makeEntry('event-1', ['contact' => ['submission_limit' => 1]]);
 
@@ -149,7 +149,7 @@ class AccessTest extends TestCase
     #[Test]
     public function an_entry_can_override_the_close_date_and_message()
     {
-        $form = $this->makeForm(['unique_instances' => true]);
+        $form = $this->makeForm(['unique_instances' => true, 'unique_instances_collections' => ['events']]);
 
         $this->makeEntry('event-1', ['contact' => [
             'close_date' => '2026-07-01 09:00',
@@ -164,7 +164,7 @@ class AccessTest extends TestCase
     #[Test]
     public function an_entry_can_override_require_login_off()
     {
-        $form = $this->makeForm(['require_login' => true, 'unique_instances' => true]);
+        $form = $this->makeForm(['require_login' => true, 'unique_instances' => true, 'unique_instances_collections' => ['events']]);
 
         $this->makeEntry('event-1', ['contact' => ['require_login' => false]]);
 
@@ -175,7 +175,7 @@ class AccessTest extends TestCase
     #[Test]
     public function overrides_from_an_entry_using_a_different_form_are_ignored()
     {
-        $form = $this->makeForm(['unique_instances' => true]);
+        $form = $this->makeForm(['unique_instances' => true, 'unique_instances_collections' => ['events']]);
 
         $this->makeEntry('event-1', ['another_form' => ['close_date' => '2026-07-01 09:00']]);
 

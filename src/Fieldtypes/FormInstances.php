@@ -9,7 +9,6 @@ use Statamic\Facades;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\User;
 use Statamic\Fields\Blueprint;
-use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
 use Statamic\Forms\ConfigFields;
 use Statamic\Forms\Fieldtype as FormFieldtype;
@@ -23,12 +22,32 @@ class FormInstances extends FormFieldtype
     protected static $handle = 'form_instances';
     protected $component = 'form_instances';
     protected $icon = 'fieldtype-form';
+    protected $selectable = false;
 
     public static function forEntry(Entry $entry): array
     {
-        $field = $entry->blueprint()->fields()->all()->first(fn (Field $field) => $field->type() === static::handle());
+        $field = $entry->blueprint()->fields()->get(static::handle());
 
-        return $field ? static::toMap($entry->value($field->handle())) : [];
+        if (! $field || $field->type() !== static::handle()) {
+            return [];
+        }
+
+        $forms = static::formsForCollection($entry->collectionHandle());
+
+        return collect(static::toMap($entry->value(static::handle())))
+            ->filter(fn ($config, $handle) => $forms->has($handle))
+            ->all();
+    }
+
+    public static function formsForCollection(?string $collection): Collection
+    {
+        if (! $collection || ! Statamic::formsProInstalled()) {
+            return collect();
+        }
+
+        return Facades\Form::all()
+            ->filter(fn (FormContract $form) => in_array($collection, $form->uniqueInstancesCollections()))
+            ->keyBy->handle();
     }
 
     protected function configFieldItems(): array
@@ -36,7 +55,6 @@ class FormInstances extends FormFieldtype
         return [
             [
                 'display' => __('Appearance'),
-                'instructions' => __('statamic::fieldtypes.form_instances.config.placement'),
                 'fields' => [
                     'mode' => [
                         'display' => __('UI Mode'),
@@ -146,7 +164,21 @@ class FormInstances extends FormFieldtype
 
     protected function selectableForms(): Collection
     {
-        return parent::selectableForms()->filter->hasUniqueInstances();
+        $forms = static::formsForCollection($this->collectionHandle());
+
+        return parent::selectableForms()->filter(fn (FormContract $form) => $forms->has($form->handle()));
+    }
+
+    protected function getBaseSelectionsUrlParameters()
+    {
+        return ['collection' => $this->collectionHandle()];
+    }
+
+    private function collectionHandle(): ?string
+    {
+        return $this->parentEntry()?->collectionHandle()
+            ?? $this->config('collection')
+            ?? request()->input('collection');
     }
 
     public function preload()

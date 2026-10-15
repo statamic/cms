@@ -34,7 +34,7 @@ class InstanceTest extends TestCase
 
     private function makeForm(array $data = [])
     {
-        return tap(Form::make('contact')->data(array_merge(['unique_instances' => true], $data)))->save();
+        return tap(Form::make('contact')->data(array_merge(['unique_instances' => true, 'unique_instances_collections' => ['events']], $data)))->save();
     }
 
     private function makeEntry(string $id, array $formInstances): void
@@ -141,28 +141,54 @@ class InstanceTest extends TestCase
     }
 
     #[Test]
-    public function the_first_top_level_form_instances_field_wins()
+    public function overrides_are_only_read_from_the_form_instances_handle()
     {
         $form = $this->makeForm(['submission_limit' => 5]);
 
         Blueprint::make('event')->setNamespace('collections.events')->setContents(['fields' => [
-            ['handle' => 'first', 'field' => ['type' => 'form_instances']],
-            ['handle' => 'second', 'field' => ['type' => 'form_instances']],
+            ['handle' => 'other', 'field' => ['type' => 'form_instances']],
         ]])->save();
 
         (new EntryFactory)->collection('events')->id('event-1')->slug('event-1')->data([
-            'first' => ['contact' => ['submission_limit' => 1]],
-            'second' => ['contact' => ['submission_limit' => 99]],
+            'other' => ['contact' => ['submission_limit' => 1]],
         ])->create();
 
-        $this->assertEquals(1, $form->instance('event-1')->config('submission_limit'));
+        $this->assertEquals(5, $form->instance('event-1')->config('submission_limit'));
+    }
+
+    #[Test]
+    public function a_form_instances_handle_with_another_type_is_ignored()
+    {
+        $form = $this->makeForm(['submission_limit' => 5]);
+
+        Blueprint::make('event')->setNamespace('collections.events')->setContents(['fields' => [
+            ['handle' => 'form_instances', 'field' => ['type' => 'yaml']],
+        ]])->save();
+
+        (new EntryFactory)->collection('events')->id('event-1')->slug('event-1')->data([
+            'form_instances' => ['contact' => ['submission_limit' => 1]],
+        ])->create();
+
+        $this->assertEquals(5, $form->instance('event-1')->config('submission_limit'));
+    }
+
+    #[Test]
+    public function overrides_are_ignored_once_the_form_stops_targeting_the_entrys_collection()
+    {
+        $form = $this->makeForm(['submission_limit' => 5]);
+
+        $this->makeEntry('event-1', ['contact' => ['submission_limit' => 1]]);
+
+        $form->set('unique_instances_collections', ['pages'])->save();
+
+        $this->assertEquals(5, $form->instance('event-1')->config('submission_limit'));
     }
 
     #[Test]
     public function each_form_in_the_field_has_its_own_overrides()
     {
         $form = $this->makeForm(['submission_limit' => 5]);
-        $feedback = tap(Form::make('feedback')->data(['unique_instances' => true, 'submission_limit' => 5]))->save();
+        $feedback = tap(Form::make('feedback')->data(['unique_instances' => true, 'unique_instances_collections' => ['events'], 'submission_limit' => 5]))->save();
 
         $this->makeEntry('event-1', [
             'contact' => ['submission_limit' => 1],

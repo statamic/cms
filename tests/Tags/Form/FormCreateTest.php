@@ -65,7 +65,7 @@ class FormCreateTest extends FormTestCase
     {
         Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
 
-        Form::find('contact')->set('unique_instances', true);
+        Form::find('contact')->set('unique_instances', true)->set('unique_instances_collections', ['events'])->save();
 
         $this->makeEntry('event-1', ['contact' => []]);
 
@@ -87,7 +87,7 @@ class FormCreateTest extends FormTestCase
     {
         Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
 
-        Form::find('contact')->set('unique_instances', true);
+        Form::find('contact')->set('unique_instances', true)->set('unique_instances_collections', ['events']);
 
         $output = $this->tag('{{ form:contact }}{{ /form:contact }}');
 
@@ -99,7 +99,7 @@ class FormCreateTest extends FormTestCase
     {
         Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
 
-        Form::find('contact')->set('unique_instances', true);
+        Form::find('contact')->set('unique_instances', true)->set('unique_instances_collections', ['events']);
 
         $this->makeEntry('event-1', ['another_form' => []]);
 
@@ -113,7 +113,7 @@ class FormCreateTest extends FormTestCase
     {
         Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
 
-        Form::find('contact')->set('unique_instances', true);
+        Form::find('contact')->set('unique_instances', true)->set('unique_instances_collections', ['events']);
 
         $this->makeEntry('event-1', ['another_form' => []]);
 
@@ -128,7 +128,7 @@ class FormCreateTest extends FormTestCase
     {
         Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
 
-        Form::find('contact')->set('unique_instances', true);
+        Form::find('contact')->set('unique_instances', true)->set('unique_instances_collections', ['events']);
 
         Blueprint::make('event')->setNamespace('collections.events')->setContents(['fields' => [
             ['handle' => 'rsvp_form', 'field' => ['type' => 'form', 'max_items' => 1]],
@@ -147,7 +147,7 @@ class FormCreateTest extends FormTestCase
     {
         Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
 
-        Form::find('contact')->set('unique_instances', true);
+        Form::find('contact')->set('unique_instances', true)->set('unique_instances_collections', ['events']);
 
         $output = $this->tag('{{ form:contact }}{{ restricted }}|{{ status }}|{{ restriction_message }}{{ /form:contact }}');
 
@@ -168,7 +168,7 @@ class FormCreateTest extends FormTestCase
     {
         Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
 
-        Form::find('contact')->set('unique_instances', true);
+        Form::find('contact')->set('unique_instances', true)->set('unique_instances_collections', ['events']);
 
         $this->makeEntry('event-1', ['contact' => ['close_date' => '2000-01-01']]);
 
@@ -1893,7 +1893,7 @@ EOT
         $this->createMultiPageForm();
 
         $form = Form::find('survey');
-        $form->set('unique_instances', true)->save();
+        $form->set('unique_instances', true)->set('unique_instances_collections', ['events'])->save();
         $this->makeEntry('event-a', ['survey' => []]);
         $this->makeEntry('event-b', ['survey' => []]);
 
@@ -1913,7 +1913,7 @@ EOT
         $this->createMultiPageForm();
 
         $form = Form::find('survey');
-        $form->set('unique_instances', true)->save();
+        $form->set('unique_instances', true)->set('unique_instances_collections', ['events'])->save();
         $this->makeEntry('event-a', ['survey' => []]);
         $this->makeEntry('event-b', ['survey' => []]);
 

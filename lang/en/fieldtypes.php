@@ -105,7 +105,6 @@ return [
     'form.config.max_items' => 'Set a maximum number of selectable forms.',
     'form.config.query_scopes' => 'Choose which query scopes should be applied when retrieving selectable forms.',
     'form.title' => 'Form',
-    'form_instances.config.placement' => 'Add once per blueprint, at the top level (not inside a Grid, Replicator, Bard or Group).',
     'form_instances.title' => 'Form Instances',
     'grid.config.add_row' => 'Customize the label of the "Add Row" button.',
     'grid.config.border' => 'Show a border and padding around fields in this group.',

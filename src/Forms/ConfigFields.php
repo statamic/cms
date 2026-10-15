@@ -108,6 +108,15 @@ class ConfigFields
                             'type' => 'toggle',
                             'instructions' => __('statamic::messages.form_configure_unique_instances_instructions'),
                         ],
+                        'unique_instances_collections' => [
+                            'display' => __('Collections'),
+                            'type' => 'collections',
+                            'mode' => 'select',
+                            'instructions' => __('statamic::messages.form_configure_unique_instances_collections_instructions'),
+                            'if' => [
+                                'unique_instances' => 'equals true',
+                            ],
+                        ],
                     ] : []),
                     'generate_fake_submissions' => [
                         'display' => __('Enable Fake Submission Generator'),

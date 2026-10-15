@@ -1811,7 +1811,7 @@ class SubmitFormTest extends TestCase
     {
         $this->makeEntry('event-1', ['contact' => []]);
 
-        $this->form->set('unique_instances', true)->save();
+        $this->form->set('unique_instances', true)->set('unique_instances_collections', ['events'])->save();
 
         $result = $this->action()->entry('event-1')->submit(['email' => 'san@holo.com']);
 
@@ -1821,7 +1821,7 @@ class SubmitFormTest extends TestCase
     #[Test]
     public function it_rejects_the_submission_when_unique_instances_is_enabled_and_no_entry_is_provided()
     {
-        $this->form->set('unique_instances', true)->save();
+        $this->form->set('unique_instances', true)->set('unique_instances_collections', ['events'])->save();
 
         $this->expectException(ValidationException::class);
 
@@ -1831,7 +1831,7 @@ class SubmitFormTest extends TestCase
     #[Test]
     public function it_rejects_the_submission_when_the_entry_does_not_exist()
     {
-        $this->form->set('unique_instances', true)->save();
+        $this->form->set('unique_instances', true)->set('unique_instances_collections', ['events'])->save();
 
         $this->expectException(ValidationException::class);
 
@@ -1843,7 +1843,7 @@ class SubmitFormTest extends TestCase
     {
         $this->makeEntry('event-1', ['another_form' => []]);
 
-        $this->form->set('unique_instances', true)->save();
+        $this->form->set('unique_instances', true)->set('unique_instances_collections', ['events'])->save();
 
         $this->expectException(ValidationException::class);
 
@@ -1858,7 +1858,7 @@ class SubmitFormTest extends TestCase
 
         (new EntryFactory)->collection('events')->id('event-1')->slug('event-one')->data($data)->create();
 
-        $this->form->set('unique_instances', true)->save();
+        $this->form->set('unique_instances', true)->set('unique_instances_collections', ['events'])->save();
 
         $this->expectException(ValidationException::class);
 
@@ -1891,11 +1891,11 @@ class SubmitFormTest extends TestCase
     {
         $this->makeEntry('event-1', ['contact' => [], 'feedback' => []]);
 
-        $feedback = tap(Form::make('feedback')->set('unique_instances', true)->formFields([
+        $feedback = tap(Form::make('feedback')->set('unique_instances', true)->set('unique_instances_collections', ['events'])->formFields([
             'pages' => [['id' => 'main', 'sections' => [['fields' => [['handle' => 'rating', 'field' => ['type' => 'short_answer']]]]]]],
         ]))->save();
 
-        $this->form->set('unique_instances', true)->save();
+        $this->form->set('unique_instances', true)->set('unique_instances_collections', ['events'])->save();
 
         $contactResult = $this->action()->entry('event-1')->submit(['email' => 'san@holo.com']);
         $feedbackResult = app(SubmitForm::class)->form($feedback)->page('main')->entry('event-1')->submit(['rating' => '5']);
@@ -1904,6 +1904,18 @@ class SubmitFormTest extends TestCase
         $this->assertEquals('event-1', $feedbackResult->submission->get('_entry'));
 
         $feedback->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function it_rejects_the_submission_when_the_form_no_longer_targets_the_entrys_collection()
+    {
+        $this->makeEntry('event-1', ['contact' => []]);
+
+        $this->form->set('unique_instances', true)->set('unique_instances_collections', ['pages'])->save();
+
+        $this->expectException(ValidationException::class);
+
+        $this->action()->entry('event-1')->submit(['email' => 'san@holo.com']);
     }
 
     #[Test]
@@ -1922,7 +1934,7 @@ class SubmitFormTest extends TestCase
         $this->makeEntry('event-1', ['contact' => []]);
         $this->makeEntry('event-2', ['contact' => []]);
 
-        $this->form->set('unique_instances', true)->save();
+        $this->form->set('unique_instances', true)->set('unique_instances_collections', ['events'])->save();
 
         $partial = tap($this->form->makeSubmission()->data(['_entry' => 'event-1', 'email' => 'san@holo.com'])->asPartial())->save();
 
@@ -1939,7 +1951,7 @@ class SubmitFormTest extends TestCase
     {
         $this->makeEntry('event-1', ['contact' => []]);
 
-        $this->form->set('unique_instances', true)->save();
+        $this->form->set('unique_instances', true)->set('unique_instances_collections', ['events'])->save();
 
         $partial = tap($this->form->makeSubmission()->data(['_entry' => 'event-1'])->asPartial())->save();
 
@@ -1953,7 +1965,7 @@ class SubmitFormTest extends TestCase
     {
         $this->makeEntry('event-1', ['contact' => ['close_date' => '2020-01-01 09:00']]);
 
-        $this->form->set('unique_instances', true)->save();
+        $this->form->set('unique_instances', true)->set('unique_instances_collections', ['events'])->save();
 
         $this->expectException(FormRestrictedException::class);
 
@@ -1966,7 +1978,7 @@ class SubmitFormTest extends TestCase
         Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturnFalse();
         Blink::forget('forms-pro-installed');
 
-        $this->form->set('unique_instances', true)->save();
+        $this->form->set('unique_instances', true)->set('unique_instances_collections', ['events'])->save();
 
         $result = $this->action()->submit(['email' => 'san@holo.com']);
 

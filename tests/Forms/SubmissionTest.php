@@ -609,7 +609,7 @@ class SubmissionTest extends TestCase
         Bus::fake();
         Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
 
-        $form = tap(Form::make('contact_us')->data(['unique_instances' => true])->connections([
+        $form = tap(Form::make('contact_us')->data(['unique_instances' => true, 'unique_instances_collections' => ['events']])->connections([
             'webhook' => [['url' => 'https://example.com/form-webhook']],
         ]))->save();
 
@@ -633,7 +633,7 @@ class SubmissionTest extends TestCase
         Bus::fake();
         Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
 
-        $form = tap(Form::make('contact_us')->data(['unique_instances' => true])->connections([
+        $form = tap(Form::make('contact_us')->data(['unique_instances' => true, 'unique_instances_collections' => ['events']])->connections([
             'webhook' => [['url' => 'https://example.com/form-webhook']],
         ]))->save();
 

@@ -242,6 +242,15 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
         return (bool) $this->get('unique_instances');
     }
 
+    public function uniqueInstancesCollections(): array
+    {
+        if (! $this->hasUniqueInstances()) {
+            return [];
+        }
+
+        return $this->get('unique_instances_collections') ?? [];
+    }
+
     /**
      * Get the blueprint.
      *
