@@ -169,7 +169,7 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, ContainsQ
             ->setNamespace('taxonomies.'.$this->handle());
 
         $contents = $blueprint->contents();
-        $contents['title'] = Str::singular($this->title());
+        $contents['title'] = Str::startsWith(app()->getLocale(), 'en') ? Str::singular($this->title()) : $this->title();
         $blueprint->setContents($contents);
 
         return $blueprint;
