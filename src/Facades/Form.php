@@ -17,8 +17,8 @@ use Statamic\Forms\Exporters\ExporterRepository;
  * @method static array extraConfigFor(string $handle)
  * @method static array extraConfigPositionsFor(string $handle)
  * @method static self redirect(string $form, \Closure $callback)
- * @method static self registerMention(string $handle, string $label, \Closure $value)
- * @method static array mentions()
+ * @method static self addMention(string $handle, string $label, \Closure $value)
+ * @method static array additionalMentions()
  * @method static \Closure getSubmissionRedirect(Submission $submission)
  * @method static ExporterRepository exporters()
  *

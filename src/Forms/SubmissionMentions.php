@@ -44,7 +44,7 @@ class SubmissionMentions
             'site.url' => __('Site URL'),
         ];
 
-        foreach (FormFacade::mentions() as $handle => $mention) {
+        foreach (FormFacade::additionalMentions() as $handle => $mention) {
             $others[$handle] = __($mention['label']);
         }
 
@@ -74,7 +74,7 @@ class SubmissionMentions
 
     public static function values(Submission $submission, array $handles, ?array $submissionData = null): array
     {
-        $registered = FormFacade::mentions();
+        $additional = FormFacade::additionalMentions();
         $globals = [];
         $values = [];
 
@@ -85,8 +85,8 @@ class SubmissionMentions
                 $value = $submission->site()->name();
             } elseif ($handle === 'site.url') {
                 $value = $submission->site()->absoluteUrl();
-            } elseif (isset($registered[$handle])) {
-                $value = $registered[$handle]['value']($submission);
+            } elseif (isset($additional[$handle])) {
+                $value = $additional[$handle]['value']($submission);
             } elseif (str_starts_with($handle, 'globals.')) {
                 $value = static::globalValue($submission, $handle, $globals);
             } elseif (in_array($handle, self::EXCLUDED_FORM_VALUES) || ! $submission->form()->fields()->has($handle)) {

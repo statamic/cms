@@ -29,7 +29,7 @@ class SubmissionMentionsTest extends TestCase
         $this->makeGlobalSet('company', 'Company', [
             'name' => ['type' => 'text', 'display' => 'Name'],
         ]);
-        Form::registerMention('shop.owner', 'Owner', fn () => 'x');
+        Form::addMention('shop.owner', 'Owner', fn () => 'x');
 
         $form = $this->makeForm();
 
@@ -101,10 +101,10 @@ class SubmissionMentionsTest extends TestCase
     }
 
     #[Test]
-    public function it_does_not_call_registered_closures_when_building_options()
+    public function it_does_not_call_added_closures_when_building_options()
     {
         $called = false;
-        Form::registerMention('shop.owner', 'Owner', function () use (&$called) {
+        Form::addMention('shop.owner', 'Owner', function () use (&$called) {
             $called = true;
         });
 
@@ -114,15 +114,15 @@ class SubmissionMentionsTest extends TestCase
     }
 
     #[Test]
-    public function it_only_calls_registered_closures_that_are_referenced()
+    public function it_only_calls_added_closures_that_are_referenced()
     {
         $calls = [];
-        Form::registerMention('shop.owner', 'Owner', function () use (&$calls) {
+        Form::addMention('shop.owner', 'Owner', function () use (&$calls) {
             $calls[] = 'owner';
 
             return 'Jason';
         });
-        Form::registerMention('shop.other', 'Other', function () use (&$calls) {
+        Form::addMention('shop.other', 'Other', function () use (&$calls) {
             $calls[] = 'other';
 
             return 'Nope';
@@ -135,11 +135,11 @@ class SubmissionMentionsTest extends TestCase
     }
 
     #[Test]
-    public function it_throws_for_invalid_registered_handles()
+    public function it_throws_for_invalid_added_handles()
     {
         foreach (['owner', 'shop owner.name', 'shop.na!me', 'site.custom', 'form.custom', 'globals.company.name'] as $handle) {
             try {
-                Form::registerMention($handle, 'Label', fn () => 'x');
+                Form::addMention($handle, 'Label', fn () => 'x');
                 $this->fail("Handle [{$handle}] should have been rejected.");
             } catch (InvalidArgumentException $e) {
                 $this->assertStringContainsString($handle, $e->getMessage());
@@ -161,7 +161,7 @@ class SubmissionMentionsTest extends TestCase
     public function it_does_not_resolve_escaped_literals_in_replace()
     {
         $calls = 0;
-        Form::registerMention('shop.name', 'Shop', function () use (&$calls) {
+        Form::addMention('shop.name', 'Shop', function () use (&$calls) {
             $calls++;
 
             return 'Acme';
@@ -251,7 +251,7 @@ class SubmissionMentionsTest extends TestCase
     }
 
     #[Test]
-    public function it_resolves_site_and_registered_values()
+    public function it_resolves_site_and_added_values()
     {
         config(['app.name' => 'My App']);
         $this->setSites(['en' => ['url' => 'http://localhost/', 'locale' => 'en_US', 'name' => 'Test Site']]);
@@ -275,10 +275,10 @@ class SubmissionMentionsTest extends TestCase
     }
 
     #[Test]
-    public function it_passes_the_submission_to_registered_closures()
+    public function it_passes_the_submission_to_added_closures()
     {
         $received = null;
-        Form::registerMention('shop.owner', 'Owner', function ($submission) use (&$received) {
+        Form::addMention('shop.owner', 'Owner', function ($submission) use (&$received) {
             $received = $submission;
 
             return 'Jason';

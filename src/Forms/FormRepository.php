@@ -19,7 +19,7 @@ class FormRepository implements Contract
 {
     private $configs = [];
     private $redirects = [];
-    private $mentions = [];
+    private $additionalMentions = [];
 
     /**
      * Find a form.
@@ -145,7 +145,7 @@ class FormRepository implements Contract
         return $this;
     }
 
-    public function registerMention(string $handle, string $label, Closure $value)
+    public function addMention(string $handle, string $label, Closure $value)
     {
         if (! str_contains($handle, '.') || ! Mentions::isValidValue($handle)) {
             throw new InvalidArgumentException("Invalid mention handle [{$handle}]. It must contain a dot and only use letters, numbers, underscores, dashes and dots.");
@@ -155,14 +155,14 @@ class FormRepository implements Contract
             throw new InvalidArgumentException("Invalid mention handle [{$handle}]. The [form.], [site.] and [globals.] prefixes are reserved.");
         }
 
-        $this->mentions[$handle] = ['label' => $label, 'value' => $value];
+        $this->additionalMentions[$handle] = ['label' => $label, 'value' => $value];
 
         return $this;
     }
 
-    public function mentions(): array
+    public function additionalMentions(): array
     {
-        return $this->mentions;
+        return $this->additionalMentions;
     }
 
     public function getSubmissionRedirect(SubmissionContract $submission)

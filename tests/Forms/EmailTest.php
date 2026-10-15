@@ -409,7 +409,7 @@ class EmailTest extends TestCase
     public function it_does_not_resolve_escaped_mentions_in_the_subject_or_body()
     {
         $calls = 0;
-        Form::registerMention('shop.name', 'Shop', function () use (&$calls) {
+        Form::addMention('shop.name', 'Shop', function () use (&$calls) {
             $calls++;
 
             return 'Acme';
