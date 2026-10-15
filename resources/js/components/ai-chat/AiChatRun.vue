@@ -20,7 +20,7 @@ defineProps({
             v-for="step in run.steps"
             :key="step.tool"
             :class="[
-                'flex items-start gap-2.5 rounded-xl bg-white p-3.5 ring ring-gray-200 dark:bg-gray-850 dark:ring-gray-700/80',
+                'flex items-start gap-2.5 rounded-xl bg-white p-3.5 shadow-ui-sm ring ring-gray-200 dark:bg-gray-850 dark:shadow-ui-md dark:ring-gray-700/80',
                 step.state === 'pending' ? 'opacity-60' : '',
             ]"
         >
@@ -41,7 +41,7 @@ defineProps({
         <!-- The outcome, built like the tool-call cards above it: a tick and the same spacing -->
         <div
             v-if="run.status === 'done'"
-            class="flex items-start gap-2.5 rounded-xl bg-white p-3.5 ring ring-gray-200 dark:bg-gray-850 dark:ring-gray-700/80"
+            class="flex items-start gap-2.5 rounded-xl bg-white p-3.5 shadow-ui-sm ring ring-gray-200 dark:bg-gray-850 dark:shadow-ui-md dark:ring-gray-700/80"
         >
             <div class="mt-0.5 flex size-4 shrink-0 items-center justify-center">
                 <AiChatDoneIcon />
