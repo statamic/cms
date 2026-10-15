@@ -185,7 +185,9 @@ class FormInstances extends FormFieldtype
     {
         $data = parent::preload();
 
-        $forms = collect($this->field->value()['forms'] ?? []);
+        $forms = collect($this->field->value()['forms'] ?? [])
+            ->merge(static::formsForCollection($this->parentEntry()?->collectionHandle())->keys())
+            ->unique();
 
         $data['submissions'] = $forms
             ->mapWithKeys(fn ($handle) => [$handle => $this->submissionsMeta($handle)])

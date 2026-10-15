@@ -245,6 +245,21 @@ class FormInstancesTest extends TestCase
     }
 
     #[Test]
+    public function it_preloads_meta_for_forms_that_can_still_be_picked()
+    {
+        $this->actingAs(tap(User::make()->makeSuper())->save());
+
+        $preload = $this->field()
+            ->setParent($this->entry())
+            ->setValue(['forms' => [], 'config' => []])
+            ->fieldtype()
+            ->preload();
+
+        $this->assertEquals(['contact', 'feedback'], array_keys($preload['configureMeta']));
+        $this->assertEquals(['contact', 'feedback'], array_keys($preload['submissions']));
+    }
+
+    #[Test]
     public function it_only_preloads_configure_meta_for_users_who_can_edit_the_form()
     {
         $this->setTestRoles(['editor' => ['access cp', 'edit feedback form']]);

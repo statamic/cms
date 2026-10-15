@@ -95,3 +95,18 @@ test('applying only keeps modified fields for the form being configured', async 
     ]);
     expect(wrapper.vm.configuring).toBe(false);
 });
+
+test('a form selected after load can be configured', async () => {
+    const wrapper = mountFieldtype({ value: { forms: [], config: {} } });
+
+    await wrapper.findComponent({ name: 'RelationshipFieldtype' }).vm.$emit('update:value', ['feedback']);
+    await wrapper.setProps({ value: wrapper.emitted('update:value')[0][0] });
+
+    expect(formItem(wrapper).hasConfigure({ id: 'feedback' })).toBe(true);
+
+    formItem(wrapper).configure({ id: 'feedback' });
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.vm.configuring).toBe(true);
+    expect(wrapper.vm.configOverrides).toEqual({ submission_limit: 10 });
+});
