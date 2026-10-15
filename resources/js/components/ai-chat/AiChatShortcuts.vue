@@ -15,7 +15,7 @@ const shortcuts = [
     { keys: ['Enter'], text: 'Send' },
     { keys: ['Shift', 'Enter'], text: 'New line' },
     { keys: ['↑'], text: 'Pick an example', or: ['↓'], needsExamples: true },
-    { keys: ['Esc'], text: 'Close' },
+    { keys: ['Esc'], text: 'Back to the page' },
 ];
 
 // Choosing an example only makes sense while they're showing
