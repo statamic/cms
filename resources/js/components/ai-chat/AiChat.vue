@@ -4,7 +4,7 @@ import { Button, Textarea } from '@ui';
 import AiChatExamples from './AiChatExamples.vue';
 import useAiChat from '@/composables/use-ai-chat.js';
 
-const { open, messages, floating } = useAiChat();
+const { open, messages, floating, focusRequests, leave } = useAiChat();
 // Floating, the input sits straight on the card with no box of its own. Docked, it keeps its usual white box.
 const inputClasses = computed(() =>
     floating.value
@@ -14,8 +14,7 @@ const inputClasses = computed(() =>
 );
 const prompt = ref('');
 
-
-// Floating, the examples are hidden until you press / in the empty box. Docked, they show above the input.
+// Floating, the examples are hidden until you press / in the empty box (a hint shows while it's focused and empty). Docked, they show above the input.
 const showExamples = ref(false);
 const thread = useTemplateRef('thread');
 const form = useTemplateRef('form');
@@ -24,6 +23,8 @@ const form = useTemplateRef('form');
 // Closing is done with the same header button, which still has focus, so there's nothing to restore.
 const focusInput = () => nextTick(() => form.value?.querySelector('textarea')?.focus());
 watch(open, (isOpen) => isOpen && focusInput());
+// The keyboard shortcut asks for focus when the chat is already open.
+watch(focusRequests, focusInput);
 // Switching between docked and floating remounts the chat, so refocus then too.
 onMounted(() => open.value && focusInput());
 
@@ -36,14 +37,26 @@ const suggestions = [
 
 watch(prompt, (value) => value && (showExamples.value = false));
 
+// When focus moves to something outside the chat, put the examples away. (The key hint hides itself, as it only shows while focus is inside the card.)
+function onFocusOut(event) {
+    if (!event.currentTarget.contains(event.relatedTarget)) showExamples.value = false;
+}
+
 function onKeydown(event) {
     if (floating.value && event.key === '/' && !prompt.value && !event.metaKey && !event.ctrlKey && !event.altKey) {
         event.preventDefault();
         showExamples.value = true;
-    } else if (event.key === 'Escape' && showExamples.value) {
+    } else if (event.key === 'Escape') {
+        // Stop other Escape handlers in the CP (like closing a stack) from also acting.
         event.stopPropagation();
-        showExamples.value = false;
-        focusInput();
+
+        if (showExamples.value) {
+            showExamples.value = false;
+            focusInput();
+        } else {
+            // Leave the chat open, and hand focus back to the page.
+            leave();
+        }
     }
 }
 
@@ -71,7 +84,7 @@ function scrollToBottom() {
 
 <template>
     <!-- Docked in the sidebar, fill the height. Floating, be only as tall as the content. -->
-    <div :class="['relative flex min-h-0 flex-col', floating ? 'flex-initial' : 'flex-1']">
+    <div data-ai-chat :class="['relative flex min-h-0 flex-col', floating ? 'flex-initial' : 'flex-1']" @focusout="onFocusOut">
         <!-- Floating, there is nothing to show above the input until the first message. Docked, it fills the space. -->
         <div v-if="messages.length || !floating" ref="thread" :class="['flex min-h-0 flex-col overflow-y-auto ps-0.5 pe-2.5 py-2', floating ? 'flex-initial' : 'flex-1']">
             <!-- mt-auto keeps messages next to the input, while still scrolling once they overflow -->
@@ -91,23 +104,33 @@ function scrollToBottom() {
                 />
             </div>
         </div>
-
         <form ref="form" :class="['relative ps-0.25', floating ? 'p-2' : 'p-2.5']" @submit.prevent="send()" @keydown.enter.exact.prevent="send()" @keydown="onKeydown">
             <!-- Examples, opened by pressing / in the empty box -->
             <div
                 v-if="floating && showExamples && !messages.length"
-                class="absolute start-0 end-2.5 bottom-full z-20 rounded-2xl border border-gray-200 bg-white p-2 shadow-xl dark:border-gray-700 dark:bg-gray-900"
+                class="absolute -start-2.75 bottom-full z-20 mb-3 rounded-2xl border p-2 shadow-none border-transparent [background:linear-gradient(white,white)_padding-box,linear-gradient(135deg,var(--color-primary),#60a5fa)_border-box] dark:[background:linear-gradient(var(--color-gray-900),var(--color-gray-900))_padding-box,linear-gradient(135deg,var(--color-primary),#60a5fa)_border-box]"
             >
                 <AiChatExamples :examples="suggestions" @pick="send" />
             </div>
             <Textarea
                 v-model="prompt"
-                :placeholder="floating ? __('Ask anything, or press / for examples') : __('Ask anything...')"
+                :placeholder="floating ? __('Ask anything…') : __('Ask anything...')"
                 rows="1"
                 resize="none"
                 elastic
                 :class="inputClasses"
             />
+            <!-- Floating, a hint about the / key sits next to the send button while the chat is focused and nothing has been typed. Just a hint, not a button. Docked, the examples are already showing. -->
+            <div
+                v-if="floating && !messages.length"
+                v-show="!prompt && !showExamples"
+                aria-hidden="true"
+                class="pointer-events-none absolute end-11 bottom-3.25 flex h-6.5 items-center gap-1.5 px-1.5 text-xs text-gray-500 opacity-0 transition-opacity group-focus-within/chat:opacity-100 dark:text-gray-400"
+            >
+                {{ __('Press') }}
+                <kbd class="rounded-md bg-gray-950/5 px-[0.3125rem] py-[0.0625rem] font-sans text-[0.625rem]/4 font-medium ring-1 ring-gray-950/10 dark:bg-white/5 dark:ring-white/10">/</kbd>
+                {{ __('for examples') }}
+            </div>
             <Button
                 type="submit"
                 icon="arrow-up"

@@ -25,12 +25,50 @@ const floating = ref(getStored(floatingKey, true));
 
 watch(floating, (value) => store(floatingKey, value));
 
+// Bumped to ask the chat to focus its input when it's already open.
+const focusRequests = ref(0);
+// Where focus was before it moved into the chat, so Esc and the shortcut can hand it back.
+let previousFocus = null;
+
+const isInChat = () => !!document.activeElement?.closest?.('[data-ai-chat]');
+
+function rememberFocus() {
+    const el = document.activeElement;
+    if (el && el !== document.body && !el.closest?.('[data-ai-chat]')) previousFocus = el;
+}
+
+function leave() {
+    const el = previousFocus;
+    previousFocus = null;
+
+    if (el && document.contains(el)) el.focus();
+    else document.activeElement?.blur?.();
+}
+
 export default function useAiChat() {
     return {
         open,
         messages,
         floating,
-        toggle: () => (open.value = !open.value),
+        focusRequests,
+        toggle: () => {
+            if (!open.value) rememberFocus();
+            open.value = !open.value;
+        },
         close: () => (open.value = false),
+        leave,
+        // The keyboard shortcut: closed opens (and focuses), open but unfocused focuses, focused closes.
+        shortcut: () => {
+            if (!open.value) {
+                rememberFocus();
+                open.value = true;
+            } else if (!isInChat()) {
+                rememberFocus();
+                focusRequests.value++;
+            } else {
+                open.value = false;
+                leave();
+            }
+        },
     };
 }
