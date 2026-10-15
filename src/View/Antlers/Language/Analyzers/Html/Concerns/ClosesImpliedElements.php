@@ -327,12 +327,6 @@ trait ClosesImpliedElements
 
     protected function generateImpliedEndTags(?string $except = null): void
     {
-        $implied = [
-            'dd' => true, 'dt' => true, 'li' => true, 'optgroup' => true,
-            'option' => true, 'p' => true, 'rb' => true, 'rp' => true,
-            'rt' => true, 'rtc' => true,
-        ];
-
         while ($this->stack) {
             $index = count($this->stack) - 1;
             $element = $this->stack[$index];
@@ -343,7 +337,7 @@ trait ClosesImpliedElements
 
             $name = $this->arena->name[$element] ?? '';
 
-            if ($name === $except || ! isset($implied[$name])) {
+            if ($name === $except || ! isset(self::$impliedEndTags[$name])) {
                 return;
             }
 
