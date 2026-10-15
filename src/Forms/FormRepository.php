@@ -10,6 +10,7 @@ use Statamic\Contracts\Forms\Submission as SubmissionContract;
 use Statamic\Exceptions\FormNotFoundException;
 use Statamic\Facades\File;
 use Statamic\Facades\Folder;
+use Statamic\Fieldtypes\AutocompleteEditor\Mentions;
 use Statamic\Forms\Exporters\ExporterRepository;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -18,6 +19,7 @@ class FormRepository implements Contract
 {
     private $configs = [];
     private $redirects = [];
+    private $additionalMentions = [];
 
     /**
      * Find a form.
@@ -141,6 +143,26 @@ class FormRepository implements Contract
         $this->redirects[$form] = $callback;
 
         return $this;
+    }
+
+    public function addMention(string $handle, string $label, Closure $value)
+    {
+        if (! str_contains($handle, '.') || ! Mentions::isValidValue($handle)) {
+            throw new InvalidArgumentException("Invalid mention handle [{$handle}]. It must contain a dot and only use letters, numbers, underscores, dashes and dots.");
+        }
+
+        if (str_starts_with($handle, 'form.') || str_starts_with($handle, 'site.') || str_starts_with($handle, 'globals.') || str_starts_with($handle, 'config.')) {
+            throw new InvalidArgumentException("Invalid mention handle [{$handle}]. The [form.], [site.], [globals.] and [config.] prefixes are reserved.");
+        }
+
+        $this->additionalMentions[$handle] = ['label' => $label, 'value' => $value];
+
+        return $this;
+    }
+
+    public function additionalMentions(): array
+    {
+        return $this->additionalMentions;
     }
 
     public function getSubmissionRedirect(SubmissionContract $submission)

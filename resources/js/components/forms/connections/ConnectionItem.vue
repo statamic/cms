@@ -39,6 +39,7 @@ function toggleCollapsedState() {
             <div class="flex items-center gap-2">
                 <Switch
                     size="xs"
+                    :label="__('Enabled')"
                     :model-value="enabled"
                     @update:model-value="emit('update:enabled', $event)"
                     v-tooltip="enabled ? __('Enabled') : __('Disabled')"

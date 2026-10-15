@@ -20,15 +20,19 @@ const props = defineProps({
 
 const { appearance } = injectRadioContext() ?? { appearance: computed(() => 'default') };
 
+const isChips = computed(() => appearance.value === 'chips');
+
 const hasItemSlot = !!useSlots().item;
 
 const itemClasses = computed(() => {
     return hasItemSlot ? [] : [
-        'shadow-ui-xs mt-0.5 size-4 cursor-default rounded-full',
+        'shadow-ui-xs mt-0.5 size-4 cursor-default rounded-full outline-hidden',
         'focus:focus-outline border border-gray-400/75 bg-white with-contrast:border-gray-100',
         'data-[state=checked]:border-ui-accent-bg data-[disabled]:opacity-50',
         'dark:border-gray-700 dark:bg-gray-500',
         'dark:data-[state=checked]:border-ui-accent-bg dark:data-[state=checked]:bg-ui-accent-bg',
+        'data-readonly:data-[state=unchecked]:border-dashed! data-readonly:data-[state=unchecked]:border-gray-500/90 data-readonly:data-[state=unchecked]:with-contrast:border-gray-100',
+        'data-readonly:data-[state=unchecked]:dark:border! data-readonly:data-[state=unchecked]:dark:border-dashed! data-readonly:data-[state=unchecked]:dark:bg-gray-900',
     ];
 });
 </script>
@@ -36,7 +40,7 @@ const itemClasses = computed(() => {
 <template>
     <div
         class="relative flex items-start gap-1.5"
-        :class="appearance === 'chips' ? 'mb-0 rounded-full border border-gray-300 bg-linear-to-b from-white to-white p-2 py-2 pe-4 shadow-ui-sm transition-[background] hover:bg-gray-50 hover:to-gray-50 with-contrast:border-gray-500 dark:border-gray-700/80 dark:from-gray-850 dark:to-gray-900 dark:shadow-ui-md dark:hover:bg-gray-900 dark:hover:to-gray-850 bg-white dark:bg-gray-925' : null"
+        :class="isChips ? 'mb-0 rounded-full border border-gray-300 bg-linear-to-b from-white to-white p-2 py-2 pe-4 shadow-ui-sm transition-[background] hover:bg-gray-50 hover:to-gray-50 with-contrast:border-gray-500 dark:border-gray-700/80 dark:from-gray-850 dark:to-gray-900 dark:shadow-ui-md dark:hover:bg-gray-900 dark:hover:to-gray-850 bg-white dark:bg-gray-925' : null"
         data-ui-radio-item
     >
         <RadioGroupItem
@@ -44,6 +48,7 @@ const itemClasses = computed(() => {
             :value="value"
             :disabled="readOnly || disabled"
             :class="[itemClasses, itemClass]"
+            :data-readonly="readOnly ? true : undefined"
             :aria-describedby="description ? `${props.id}-description` : undefined"
         >
             <slot name="item">

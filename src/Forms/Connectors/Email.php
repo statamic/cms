@@ -169,16 +169,18 @@ class Email extends Connector
                                 [
                                     'handle' => 'subject',
                                     'field' => [
-                                        'type' => 'text',
+                                        'type' => 'autocomplete_editor',
                                         'display' => __('Subject'),
+                                        'markdown' => false,
+                                        'options' => $this->mentionOptions(),
                                     ],
                                 ],
-                                // TODO: Replace with autocomplete editor once its merged (https://github.com/statamic/cms/pull/15055)
                                 [
                                     'handle' => 'body',
                                     'field' => [
-                                        'type' => 'textarea',
+                                        'type' => 'autocomplete_editor',
                                         'display' => __('Message'),
+                                        'options' => $this->mentionOptions(),
                                         'instructions' => __('statamic::messages.form_configure_email_body_instructions'),
                                     ],
                                 ],

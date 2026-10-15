@@ -29,6 +29,11 @@ const props = defineProps({
         type: String,
         default: '',
     },
+    /** Controls the heading level. Defaults to `3` so items nest under EmptyStateMenu's `h2`. */
+    level: {
+        type: Number,
+        default: 3,
+    },
 });
 
 const slots = useSlots();
@@ -65,7 +70,7 @@ const linkComponent = computed(() => {
         >
             <Icon :name="icon" class="size-6 me-4 mt-1 text-gray-400" />
             <div class="flex-1 me-6 text-start">
-                <ui-heading size="xl" :level="3" :text="heading" class="mb-1.5 font-semibold" />
+                <ui-heading size="xl" :level="level" :text="heading" class="mb-1.5 font-semibold" />
                 <ui-description v-if="description" :text="description" />
                 <slot />
             </div>

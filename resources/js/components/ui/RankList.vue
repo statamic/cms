@@ -107,6 +107,7 @@ watch(
             >
                 <DragHandle
                     v-if="!disabled"
+                    tabindex="-1"
                     :class="
                         hasCustomOrder ? 'text-primary! [&_svg]:opacity-100' : '[&_svg]:opacity-75 dark:[&_svg]:opacity-50'
                     "
