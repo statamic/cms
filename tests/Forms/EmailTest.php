@@ -334,13 +334,14 @@ class EmailTest extends TestCase
 
         $email = new Email($submission, [
             'to' => 'test@test.com',
-            'body' => "Hello {{ name }},\nThanks for getting in touch.",
+            'body' => "Hello [[ name ]],\n\nThanks for getting in touch.",
         ], Site::default());
 
         $body = $email->render();
 
-        $this->assertStringContainsString('Hello Jack Black,<br', $body);
-        $this->assertStringContainsString('Thanks for getting in touch.', $body);
+        $this->assertEquals("Hello [[ name ]],\n\nThanks for getting in touch.", $email->getConfig()['body']);
+        $this->assertStringContainsString('<p>Hello Jack Black,</p>', $body);
+        $this->assertStringContainsString('<p>Thanks for getting in touch.</p>', $body);
         $this->assertStringNotContainsString('<b>Name:</b>', $body);
     }
 
@@ -357,7 +358,7 @@ class EmailTest extends TestCase
 
         $email = new Email($submission, [
             'to' => 'test@test.com',
-            'body' => 'New submission from {{ name }}',
+            'body' => 'New submission from [[ name ]]',
         ], Site::default());
 
         $body = $email->render();
@@ -367,9 +368,210 @@ class EmailTest extends TestCase
     }
 
     #[Test]
+    public function it_does_not_parse_antlers_in_the_body()
+    {
+        $email = $this->makeEmailWithConfig(['body' => 'Hello {{ name }} {{ config:app.name }}'], build: false);
+
+        $body = $email->render();
+
+        $this->assertStringContainsString('{{ name }}', $body);
+        $this->assertStringNotContainsString('Foo Bar', $body);
+    }
+
+    #[Test]
+    public function it_escapes_submitted_markdown_and_html_in_the_body()
+    {
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'name', 'field' => ['type' => 'short_answer']],
+            ],
+        ]))->save();
+
+        $submission = $form->makeSubmission()->data(['name' => '[Reset](https://evil.test) **bold** <b>hi</b>']);
+
+        $body = (new Email($submission, ['to' => 'test@test.com', 'body' => 'From [[ name ]]'], Site::default()))->render();
+
+        $this->assertStringNotContainsString('href="https://evil.test"', $body);
+        $this->assertStringNotContainsString('<strong>bold</strong>', $body);
+        $this->assertStringNotContainsString('<b>hi</b>', $body);
+        $this->assertStringContainsString('[Reset](https://evil.test) **bold** &lt;b&gt;hi&lt;/b&gt;', $body);
+    }
+
+    #[Test]
+    public function it_replaces_mentions_in_the_subject()
+    {
+        $email = $this->makeEmailWithConfig(['subject' => 'New message from [[ name ]] & *friends* \[[ name ]]']);
+
+        $this->assertEquals('New message from Foo Bar & *friends* [[ name ]]', $email->subject);
+    }
+
+    #[Test]
+    public function it_does_not_resolve_escaped_mentions_in_the_subject_or_body()
+    {
+        $calls = 0;
+        Form::addMention('shop.name', 'Shop', function () use (&$calls) {
+            $calls++;
+
+            return 'Acme';
+        });
+
+        $email = $this->makeEmailWithConfig([
+            'subject' => '\\[[ shop.name ]] [[ name ]]',
+            'body' => '\\[\\[ shop.name \\]\\]  [[ name ]]',
+        ], build: false);
+
+        $html = $email->render();
+
+        $this->assertEquals('[[ shop.name ]] Foo Bar', $email->subject);
+        $this->assertStringContainsString('&#91;&#91; shop.name ]]', $html);
+        $this->assertStringContainsString('Foo Bar', $html);
+        $this->assertStringNotContainsString('Acme', $html);
+        $this->assertSame(0, $calls);
+    }
+
+    #[Test]
+    public function it_keeps_antlers_in_the_subject()
+    {
+        $email = $this->makeEmailWithConfig(['subject' => '{{ name | upper }} via [[ email ]]']);
+
+        $this->assertEquals('FOO BAR via foo@bar.com', $email->subject);
+    }
+
+    #[Test]
+    public function submitted_values_in_the_subject_are_not_parsed()
+    {
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'name', 'field' => ['type' => 'short_answer']],
+                ['handle' => 'secret', 'field' => ['type' => 'short_answer']],
+            ],
+        ]))->save();
+
+        $submission = $form->makeSubmission()->data(['name' => '[[ secret ]]', 'secret' => 'shh']);
+
+        $email = tap(new Email($submission, ['to' => 'test@test.com', 'subject' => 'From {{ name }}'], Site::default()))->build();
+
+        $this->assertEquals('From [[ secret ]]', $email->subject);
+    }
+
+    #[Test]
+    public function submitted_values_in_the_subject_are_verbatim_and_single_line()
+    {
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'name', 'field' => ['type' => 'short_answer']],
+            ],
+        ]))->save();
+
+        $makeSubject = fn ($name) => tap(new Email(
+            $form->makeSubmission()->data(['name' => $name]),
+            ['to' => 'test@test.com', 'subject' => 'Hi [[ name ]]'],
+            Site::default()
+        ))->build()->subject;
+
+        $this->assertEquals('Hi <b>A</b> &amp; {{ x }}', $makeSubject('<b>A</b> &amp; {{ x }}'));
+        $this->assertEquals('Hi line one line two', $makeSubject("line one\r\n\r\nline two"));
+    }
+
+    #[Test]
+    public function it_falls_back_to_the_default_subject_when_empty()
+    {
+        $this->assertEquals('Form Submission', $this->makeEmailWithConfig([])->subject);
+        $this->assertEquals('Form Submission', $this->makeEmailWithConfig(['subject' => '  '])->subject);
+    }
+
+    #[Test]
+    public function it_resolves_site_app_and_global_mentions_in_the_subject_and_body()
+    {
+        config(['app.name' => 'My App']);
+
+        $email = $this->makeEmailWithConfig([
+            'subject' => '[[ site.name ]] | [[ config.app.name ]] | [[ globals.company_information.name ]]',
+            'body' => '[[ site.url ]] | [[ config.app.name ]] | [[ globals.company_information.email ]]',
+        ], build: false);
+
+        $site = Site::default();
+
+        $html = $email->render();
+
+        $this->assertEquals($site->name().' | My App | Example Company', $email->subject);
+        $this->assertStringContainsString('<p>'.$site->absoluteUrl().' | My App | info@example.com</p>', $html);
+    }
+
+    #[Test]
+    public function it_resolves_the_form_title_mention_in_the_subject_and_body()
+    {
+        $email = $this->makeEmailWithConfig([
+            'subject' => 'New: [[ form.title ]]',
+            'body' => 'From [[ form.title ]]',
+        ], build: false);
+
+        $title = $email->getSubmission()->form()->title();
+
+        $html = $email->render();
+
+        $this->assertEquals('New: '.$title, $email->subject);
+        $this->assertStringContainsString('<p>From '.$title.'</p>', $html);
+    }
+
+    #[Test]
+    public function globals_mentions_use_the_submissions_site()
+    {
+        $this->setSites([
+            'en' => ['locale' => 'en_US', 'url' => '/'],
+            'fr' => ['locale' => 'fr_FR', 'url' => '/fr'],
+        ]);
+
+        $set = GlobalSet::make()->handle('company_information')->sites(['en', 'fr'])->save();
+        $set->makeLocalization('en')->data(['name' => 'Example Company'])->save();
+        $set->makeLocalization('fr')->data(['name' => 'Société Exemple'])->save();
+
+        BlueprintRepository::partialMock();
+        BlueprintRepository::shouldReceive('find')->with('globals.company_information')
+            ->andReturn(Blueprint::makeFromFields(['name' => ['type' => 'text']]));
+
+        $form = tap(Form::make('test')->formFields(['fields' => []]))->save();
+        $submission = $form->makeSubmission()->data([]);
+        $submission->site('fr');
+
+        $email = tap(new Email($submission, [
+            'to' => 'test@test.com',
+            'subject' => '[[ globals.company_information.name ]]',
+        ], Site::get('fr')))->build();
+
+        $this->assertEquals('Société Exemple', $email->subject);
+    }
+
+    #[Test]
+    public function markdown_globals_mentions_use_the_raw_text()
+    {
+        $set = GlobalSet::make()->handle('company_information')->sites(['en'])->save();
+        $set->makeLocalization('en')->data(['bio' => 'We make *things*'])->save();
+
+        BlueprintRepository::partialMock();
+        BlueprintRepository::shouldReceive('find')->with('globals.company_information')
+            ->andReturn(Blueprint::makeFromFields(['bio' => ['type' => 'markdown']]));
+
+        $form = tap(Form::make('test')->formFields(['fields' => []]))->save();
+        $submission = $form->makeSubmission()->data([]);
+
+        $email = new Email($submission, [
+            'to' => 'test@test.com',
+            'subject' => '[[ globals.company_information.bio ]]',
+            'body' => '[[ globals.company_information.bio ]]',
+        ], Site::default());
+
+        $html = $email->render();
+
+        $this->assertEquals('We make *things*', $email->subject);
+        $this->assertStringNotContainsString('&lt;p&gt;', $html);
+        $this->assertStringContainsString('We make *things*', $html);
+    }
+
+    #[Test]
     public function it_uses_the_custom_view_instead_of_the_body_when_one_is_configured()
     {
-        $email = $this->makeEmailWithConfig(['body' => 'Hello {{ name }}', 'html' => 'emails.custom']);
+        $email = $this->makeEmailWithConfig(['body' => 'Hello [[ name ]]', 'html' => 'emails.custom']);
 
         $this->assertEquals('emails.custom', $email->view);
     }
@@ -628,7 +830,7 @@ class EmailTest extends TestCase
         return tap(new Email($submission, ['to' => 'test@test.com'], Site::default()))->build();
     }
 
-    private function makeEmailWithConfig(array $config)
+    private function makeEmailWithConfig(array $config, bool $build = true)
     {
         $globalSet = GlobalSet::make()->handle('company_information')->save();
         $globalSet->in('en')->data([
@@ -656,11 +858,13 @@ class EmailTest extends TestCase
             'email' => 'foo@bar.com',
         ]);
 
-        return tap(new Email(
+        $email = new Email(
             $submission,
             array_merge(['to' => 'test@test.com'], $config),
             Site::default()
-        ))->build();
+        );
+
+        return $build ? tap($email)->build() : $email;
     }
 
     #[Test]

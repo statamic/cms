@@ -1,5 +1,5 @@
 {{ if email_config:body }}
-    {{ email_config:body | sanitize | nl2br }}
+    {{ email_config:body }}
 {{ else }}
     {{ fields }}
         <b>{{ display }}:</b>

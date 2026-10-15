@@ -13,6 +13,7 @@ use Statamic\Extend\RegistersItself;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Validator;
+use Statamic\Forms\SubmissionMentions;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -230,6 +231,11 @@ abstract class Connector
     protected function processConnection(array $connection): array
     {
         return $this->blueprint()->fields()->addValues($connection)->process()->values()->all();
+    }
+
+    protected function mentionOptions(): array
+    {
+        return SubmissionMentions::options($this->form());
     }
 
     public function routes(Router $router): void
