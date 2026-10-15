@@ -41,7 +41,8 @@ function leave() {
     const el = previousFocus;
     previousFocus = null;
 
-    if (el && document.contains(el)) el.focus();
+    // preventScroll, so a field that's scrolled out of view gets focus back without the page jumping to it
+    if (el && document.contains(el)) el.focus({ preventScroll: true });
     else document.activeElement?.blur?.();
 }
 
