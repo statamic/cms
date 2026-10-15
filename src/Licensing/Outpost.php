@@ -72,7 +72,7 @@ class Outpost
 
     private function performAndCacheRequest()
     {
-        return $this->cacheResponse(now()->addHour(), $this->performRequest());
+        return $this->cacheResponse(now()->addSeconds(random_int(50 * 60, 70 * 60)), $this->performRequest());
     }
 
     private function performRequest()
@@ -208,7 +208,7 @@ class Outpost
     {
         Log::debug('Error contacting Outpost: '.$e->getMessage());
 
-        return $this->cacheResponse(now()->addMinutes(5), ['error' => $e->getCode()]);
+        return $this->cacheResponse(now()->addSeconds(random_int(5 * 60, 10 * 60)), ['error' => $e->getCode()]);
     }
 
     private function cache()
