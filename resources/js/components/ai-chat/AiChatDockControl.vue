@@ -3,7 +3,15 @@ import { computed } from 'vue';
 import { Icon } from '@ui';
 import useAiChat from '@/composables/use-ai-chat.js';
 
-const { floating } = useAiChat();
+const { floating, focusRequests } = useAiChat();
+
+// This is the last thing in the chat, so Tab from it loops back to the input rather than leaving the card.
+function loopToInput(event) {
+    if (event.shiftKey) return;
+
+    event.preventDefault();
+    focusRequests.value++;
+}
 
 const label = computed(() => (floating.value ? __('Dock to sidebar') : __('Float in corner')));
 const icon = computed(() => (floating.value ? 'bar-sidebar-left-panel-open' : 'bar-sidebar-right-panel-open'));
@@ -24,6 +32,7 @@ const icon = computed(() => (floating.value ? 'bar-sidebar-left-panel-open' : 'b
                 : 'end-2 top-2 opacity-60 hover:bg-gray-950/5 dark:hover:bg-white/10',
         ]"
         @click="floating = !floating"
+        @keydown.tab="loopToInput"
     >
         <Icon :name="icon" class="size-3.5" />
     </button>

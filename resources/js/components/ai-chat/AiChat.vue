@@ -6,7 +6,7 @@ import AiChatRun from './AiChatRun.vue';
 import { planRun, playRun } from './mock-runs.js';
 import useAiChat from '@/composables/use-ai-chat.js';
 
-const { open, messages, floating, focusRequests, leave } = useAiChat();
+const { open, messages, floating, focusRequests, leave, newChat } = useAiChat();
 // Floating, the input sits straight on the card with no box of its own (the card carries the focus edge). Docked, it keeps its usual white box, which gets the same focused decoration as the floating card: the purple-to-blue gradient edge, a 1px blue line just inside it (2px in all, like a focused field) and a purple glow.
 const inputClasses = computed(() =>
     floating.value
@@ -95,7 +95,16 @@ function send(text = prompt.value) {
 
     showExamples.value = false;
 
-    messages.value.push({ role: 'user', text });
+    // Typing /clear (or just clear) starts a new chat. Floating, a leading / opens the examples, so the bare word works there.
+    if (/^\/?(clear|new)$/i.test(text)) {
+        prompt.value = '';
+        shrinkInput();
+        newChat();
+        return;
+    }
+
+    const message = { role: 'user', text };
+    messages.value.push(message);
     prompt.value = '';
     shrinkInput();
     focusInput();
@@ -104,6 +113,9 @@ function send(text = prompt.value) {
     // Prototype: answer with the tool calls the MCP would make, played one after another.
     const run = planRun(text);
     setTimeout(() => {
+        // The chat was cleared while we waited
+        if (!messages.value.includes(message)) return;
+
         messages.value.push({ role: 'assistant', run });
         scrollToBottom();
         playRun(run, scrollToBottom);

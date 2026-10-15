@@ -57,6 +57,11 @@ export default function useAiChat() {
             open.value = !open.value;
         },
         close: () => (open.value = false),
+        // Start over: empty the thread and put the cursor back in the input.
+        newChat: () => {
+            messages.value = [];
+            focusRequests.value++;
+        },
         leave,
         // The keyboard shortcut: closed opens (and focuses), open but unfocused focuses, focused closes.
         shortcut: () => {
