@@ -140,12 +140,20 @@ function scrollToBottom() {
             @keydown="onKeydown"
         >
             <!-- Examples, opened by pressing / in the empty box -->
-            <div
-                v-if="floating && showExamples && !messages.length"
-                class="absolute -start-2.75 bottom-full z-20 mb-3 rounded-2xl border shadow-none border-transparent [background:linear-gradient(white,white)_padding-box,linear-gradient(135deg,var(--color-primary),#60a5fa)_border-box] dark:[background:linear-gradient(var(--color-gray-900),var(--color-gray-900))_padding-box,linear-gradient(135deg,var(--color-primary),#60a5fa)_border-box]"
+            <!-- The same fade up as the chat itself, in and out, a touch quicker -->
+            <Transition
+                enter-active-class="transition duration-150 ease-out motion-reduce:transition-none"
+                enter-from-class="translate-y-3 opacity-0"
+                leave-active-class="transition duration-150 ease-out motion-reduce:transition-none"
+                leave-to-class="translate-y-3 opacity-0"
             >
-                <AiChatExamples ref="examples" :examples="suggestions" padded @pick="send" @exit="focusInput" />
-            </div>
+                <div
+                    v-if="floating && showExamples && !messages.length"
+                    class="absolute -start-2.75 bottom-full z-20 mb-3 rounded-2xl border shadow-none border-transparent [background:linear-gradient(white,white)_padding-box,linear-gradient(135deg,var(--color-primary),#60a5fa)_border-box] dark:[background:linear-gradient(var(--color-gray-900),var(--color-gray-900))_padding-box,linear-gradient(135deg,var(--color-primary),#60a5fa)_border-box]"
+                >
+                    <AiChatExamples ref="examples" :examples="suggestions" padded @pick="send" @exit="focusInput" />
+                </div>
+            </Transition>
             <!-- Like the command palette's search row, an icon in front of the text -->
             <Icon
                 name="ai-chat"
