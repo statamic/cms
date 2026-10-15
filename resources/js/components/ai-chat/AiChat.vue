@@ -108,9 +108,9 @@ function scrollToBottom() {
             <!-- Examples, opened by pressing / in the empty box -->
             <div
                 v-if="floating && showExamples && !messages.length"
-                class="absolute -start-2.75 bottom-full z-20 mb-3 rounded-2xl border p-2 shadow-none border-transparent [background:linear-gradient(white,white)_padding-box,linear-gradient(135deg,var(--color-primary),#60a5fa)_border-box] dark:[background:linear-gradient(var(--color-gray-900),var(--color-gray-900))_padding-box,linear-gradient(135deg,var(--color-primary),#60a5fa)_border-box]"
+                class="absolute -start-2.75 bottom-full z-20 mb-3 rounded-2xl border shadow-none border-transparent [background:linear-gradient(white,white)_padding-box,linear-gradient(135deg,var(--color-primary),#60a5fa)_border-box] dark:[background:linear-gradient(var(--color-gray-900),var(--color-gray-900))_padding-box,linear-gradient(135deg,var(--color-primary),#60a5fa)_border-box]"
             >
-                <AiChatExamples :examples="suggestions" @pick="send" />
+                <AiChatExamples :examples="suggestions" padded @pick="send" />
             </div>
             <Textarea
                 v-model="prompt"
