@@ -9,7 +9,7 @@ const { open, messages, floating, focusRequests, leave } = useAiChat();
 const inputClasses = computed(() =>
     floating.value
         ? // The middle of the lowercase letters sits about 1.4px below the middle of the capitals, so even padding looks low unless we nudge it.
-        'border-0 pt-[2.5px]! pb-[7px]! placeholder:text-gray-500 shadow-none! outline-hidden ps-1! pe-12! dark:bg-transparent!'
+        'border-0 pt-[3.5px]! pb-[6px]! placeholder:text-gray-500 shadow-none! outline-hidden ps-1! pe-12! dark:bg-transparent!'
         : 'pe-10 focus:border-transparent focus:[background:linear-gradient(white,white)_padding-box,linear-gradient(135deg,var(--color-primary),#60a5fa)_border-box] dark:focus:[background:linear-gradient(var(--color-gray-900),var(--color-gray-900))_padding-box,linear-gradient(135deg,var(--color-primary),#60a5fa)_border-box] focus:outline-1 focus:-outline-offset-2 focus:outline-blue-400 focus:shadow-[0_10px_40px_-10px_color-mix(in_oklab,var(--color-primary)_45%,transparent)]',
 );
 const prompt = ref('');
@@ -149,7 +149,7 @@ function scrollToBottom() {
             <!-- Like the command palette's search row, an icon in front of the text -->
             <Icon
                 name="ai-chat"
-                :class="['pointer-events-none absolute z-10 size-4 text-gray-400', floating ? (messages.length ? 'start-[19px]' : 'start-2.5') + ' top-[16px]' : 'start-3 top-[25px]']"
+                :class="['pointer-events-none absolute z-10 size-4 text-gray-400', floating ? (messages.length ? 'start-[19px]' : 'start-2.5') + ' top-[16.5px]' : 'start-3 top-[26px]']"
             />
             <Textarea
                 v-model="prompt"
@@ -164,7 +164,7 @@ function scrollToBottom() {
                 v-if="floating && !messages.length"
                 v-show="!prompt && !showExamples"
                 aria-hidden="true"
-                class="pointer-events-none absolute end-12.5 bottom-3.25 flex h-6.5 items-center gap-1.5 px-1.5 text-xs text-gray-500 opacity-0 transition-opacity group-focus-within/chat:opacity-100 dark:text-gray-400"
+                class="pointer-events-none absolute end-12.5 bottom-[12.5px] flex h-6.5 items-center gap-1.5 px-1.5 text-xs text-gray-500 opacity-0 transition-opacity group-focus-within/chat:opacity-100 dark:text-gray-400"
             >
                 <kbd class="rounded-md bg-gray-950/5 px-[0.3125rem] py-[0.0625rem] font-sans text-[0.625rem]/4 font-medium ring-1 ring-gray-950/10 dark:bg-white/5 dark:ring-white/10">/</kbd>
                 {{ __('examples') }}
@@ -175,13 +175,12 @@ function scrollToBottom() {
                 variant="primary"
                 size="xs"
                 round
-                :class="floating ? 'end-4.75 bottom-3.25' : 'end-5.25 bottom-5.25'"
+                :class="floating ? 'end-4.75 bottom-[11.75px]' : 'end-5.25 bottom-5.25'"
                 class="absolute border-0 bg-none! bg-primary! shadow-none! inset-shadow-none! transition-[background-color] duration-150 hover:bg-primary-hover! disabled:opacity-100! disabled:bg-primary/8! dark:disabled:bg-primary/20! [&_svg]:opacity-100! disabled:[&_svg]:text-primary/50! dark:disabled:[&_svg]:text-white/50! [&_g]:[stroke-width:1.5]"
                 :aria-label="__('Send')"
                 v-tooltip="__('Send')"
                 :disabled="!prompt.trim()"
             />
         </form>
-
     </div>
 </template>
