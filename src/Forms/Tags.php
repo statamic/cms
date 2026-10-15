@@ -14,6 +14,7 @@ use Statamic\Facades\Blueprint;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Form;
 use Statamic\Fields\Tab;
+use Statamic\Fieldtypes\FormInstances;
 use Statamic\Forms\JsDrivers\AbstractJsDriver;
 use Statamic\Forms\JsDrivers\JsDriver;
 use Statamic\Forms\Logic\PageLogic;
@@ -193,7 +194,7 @@ class Tags extends BaseTags
             return null;
         }
 
-        return FormFieldValues::on($entry)->references($form->handle()) ? $id : null;
+        return array_key_exists($form->handle(), FormInstances::forEntry($entry)) ? $id : null;
     }
 
     /**

@@ -31,243 +31,45 @@ class FormTest extends TestCase
 
         Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true)->byDefault();
 
-        Form::make('contact')->save();
+        Form::make('contact')->set('unique_instances', true)->save();
+        Form::make('other')->save();
     }
 
-    private function fieldtype(array $config = [])
+    private function field(array $config = []): Field
     {
-        return (new Field('rsvp_form', array_merge(['type' => 'form', 'max_items' => 1], $config)))->fieldtype();
+        return new Field('rsvp_form', array_merge(['type' => 'form', 'max_items' => 1], $config));
+    }
+
+    private function entry()
+    {
+        return Entry::make()->id('entry-id')->collection(tap(Collection::make('pages'))->save());
     }
 
     #[Test]
-    public function it_processes_to_a_plain_handle_when_nothing_is_configured()
+    public function it_processes_to_plain_handles()
     {
-        $this->assertEquals('contact', $this->fieldtype()->process(['form' => ['contact'], 'config' => []]));
+        $this->assertEquals('contact', $this->field()->fieldtype()->process(['contact']));
+        $this->assertEquals(['contact', 'other'], $this->field(['max_items' => 2])->fieldtype()->process(['contact', 'other']));
+        $this->assertNull($this->field()->fieldtype()->process([]));
     }
 
     #[Test]
-    public function it_processes_to_an_array_when_config_is_present()
+    public function it_pre_processes_to_plain_handles()
     {
-        $value = $this->fieldtype()->process(['form' => ['contact'], 'config' => [
-            'submission_limit' => 5,
-            'submission_limit_period' => 'day',
-            'closed_message' => null,
-        ]]);
-
-        $this->assertEquals(['form' => 'contact', 'config' => [
-            'submission_limit' => 5,
-            'submission_limit_period' => 'day',
-        ]], $value);
+        $this->assertEquals(['contact'], $this->field()->fieldtype()->preProcess('contact'));
+        $this->assertEquals(['contact', 'other'], $this->field(['max_items' => 2])->fieldtype()->preProcess(['contact', 'other']));
     }
 
     #[Test]
-    public function it_keeps_falsy_overrides()
-    {
-        $value = $this->fieldtype()->process(['form' => ['contact'], 'config' => [
-            'require_login' => false,
-        ]]);
-
-        $this->assertEquals(['form' => 'contact', 'config' => ['require_login' => false]], $value);
-    }
-
-    #[Test]
-    public function it_keeps_an_empty_connections_override()
-    {
-        $value = $this->fieldtype()->process(['form' => ['contact'], 'config' => ['connections' => []]]);
-
-        $this->assertSame(['form' => 'contact', 'config' => ['connections' => []]], $value);
-    }
-
-    #[Test]
-    public function it_pre_processes_an_empty_connections_override()
-    {
-        $value = $this->fieldtype()->preProcess(['form' => 'contact', 'config' => ['connections' => []]]);
-
-        $this->assertSame(['connections' => []], $value['config']);
-    }
-
-    #[Test]
-    public function it_drops_blank_overrides()
-    {
-        $value = $this->fieldtype()->process(['form' => ['contact'], 'config' => [
-            'close_date' => null,
-            'closed_message' => '',
-        ]]);
-
-        $this->assertEquals('contact', $value);
-    }
-
-    #[Test]
-    public function it_processes_to_null_without_a_form()
-    {
-        $this->assertNull($this->fieldtype()->process(['form' => [], 'config' => ['submission_limit' => 5]]));
-    }
-
-    #[Test]
-    public function it_processes_handles_normally_when_multiple_forms_are_allowed()
-    {
-        $this->assertEquals(['contact', 'other'], $this->fieldtype(['max_items' => 2])->process(['contact', 'other']));
-    }
-
-    #[Test]
-    public function it_processes_to_a_plain_handle_without_forms_pro()
-    {
-        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(false);
-
-        $value = $this->fieldtype()->process(['form' => ['contact'], 'config' => ['submission_limit' => 5]]);
-
-        $this->assertEquals('contact', $value);
-    }
-
-    #[Test]
-    public function it_validates_against_the_form_handles()
-    {
-        $fieldtype = $this->fieldtype();
-
-        $this->assertEquals([], $fieldtype->preProcessValidatable(['form' => [], 'config' => ['closed_message' => 'Closed.']]));
-        $this->assertEquals(['contact'], $fieldtype->preProcessValidatable(['form' => ['contact'], 'config' => []]));
-        $this->assertEquals(['array', 'max:1'], $fieldtype->rules());
-    }
-
-    #[Test]
-    public function it_pre_processes_both_stored_shapes()
-    {
-        $fromString = $this->fieldtype()->preProcess('contact');
-        $fromArray = $this->fieldtype()->preProcess(['form' => 'contact', 'config' => ['submission_limit' => 5]]);
-
-        $this->assertEquals(['contact'], $fromString['form']);
-        $this->assertEquals([], $fromString['config']);
-
-        $this->assertEquals(['contact'], $fromArray['form']);
-        $this->assertEquals(['submission_limit' => 5], $fromArray['config']);
-    }
-
-    #[Test]
-    public function it_pre_processes_to_handles_without_forms_pro()
-    {
-        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(false);
-
-        $this->assertEquals(['contact'], $this->fieldtype()->preProcess(['form' => 'contact', 'config' => ['submission_limit' => 5]]));
-    }
-
-    #[Test]
-    public function it_preloads_item_data_for_both_stored_shapes()
+    public function it_doesnt_preload_configure_meta()
     {
         $this->actingAs(tap(User::make()->makeSuper())->save());
 
-        $field = new Field('rsvp_form', ['type' => 'form', 'max_items' => 1]);
+        $preload = $this->field()->setParent($this->entry())->setValue(['contact'])->fieldtype()->preload();
 
-        $fromString = $field->setValue('contact')->fieldtype()->preload();
-        $fromArray = $field->setValue(['form' => 'contact', 'config' => ['submission_limit' => 1]])->fieldtype()->preload();
-
-        $this->assertEquals('contact', $fromString['data'][0]['id']);
-        $this->assertEquals('contact', $fromArray['data'][0]['id']);
-    }
-
-    #[Test]
-    public function it_preloads_the_forms_values_as_origin_values()
-    {
-        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
-
-        $this->actingAs(tap(User::make()->makeSuper())->save());
-
-        Form::find('contact')->set('unique_instances', true)->set('submission_limit', 100)->save();
-
-        $preload = (new Field('rsvp_form', ['type' => 'form', 'max_items' => 1]))
-            ->setParent(Entry::make())
-            ->setValue(['form' => 'contact', 'config' => ['submission_limit' => 25]])
-            ->fieldtype()
-            ->preload();
-
-        $configureMeta = $preload['configureMeta'];
-
-        $this->assertEquals(100, $configureMeta['originValues']['submission_limit']);
-        $this->assertArrayNotHasKey('values', $configureMeta);
-
-        $fields = collect($configureMeta['blueprint']['tabs'][0]['sections'][0]['fields']);
-
-        $this->assertTrue($fields->every(fn ($field) => $field['localizable']));
-    }
-
-    #[Test]
-    public function it_preloads_the_forms_own_connections_as_origin_values()
-    {
-        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
-
-        $this->actingAs(tap(User::make()->makeSuper())->save());
-
-        Form::find('contact')->set('unique_instances', true)->connections([
-            'webhook' => [['id' => 'abc', 'url' => 'https://example.com/webhook']],
-        ])->save();
-
-        $preload = (new Field('rsvp_form', ['type' => 'form', 'max_items' => 1]))
-            ->setParent(Entry::make())
-            ->setValue(['form' => 'contact', 'config' => []])
-            ->fieldtype()
-            ->preload();
-
-        $originConnections = $preload['configureMeta']['originValues']['connections'];
-
-        $this->assertEquals('https://example.com/webhook', $originConnections['webhook'][0]['url']);
-    }
-
-    #[Test]
-    public function it_only_preloads_configure_meta_for_users_who_can_edit_the_form()
-    {
-        Form::find('contact')->set('unique_instances', true)->save();
-
-        $preload = fn () => (new Field('rsvp_form', ['type' => 'form', 'max_items' => 1]))
-            ->setParent(Entry::make())
-            ->setValue(['form' => 'contact', 'config' => []])
-            ->fieldtype()
-            ->preload();
-
-        $this->actingAs(tap(User::make()->makeSuper())->save());
-        $this->assertArrayHasKey('configureMeta', $preload());
-
-        $this->setTestRoles(['editor' => ['access cp'], 'manager' => ['access cp', 'edit contact form']]);
-
-        $this->actingAs(tap(User::make()->assignRole('editor'))->save());
-        $this->assertArrayNotHasKey('configureMeta', $preload());
-
-        $this->actingAs(tap(User::make()->assignRole('manager'))->save());
-        $this->assertArrayHasKey('configureMeta', $preload());
-    }
-
-    #[Test]
-    public function it_doesnt_pre_process_the_stored_config_for_users_who_cant_edit_the_form()
-    {
-        $this->setTestRoles(['editor' => ['access cp']]);
-        $value = ['form' => 'contact', 'config' => ['submission_limit' => 5, 'connections' => ['webhook' => []]]];
-
-        $this->assertSame(5, $this->fieldtype()->preProcess($value)['config']['submission_limit']);
-
-        $this->actingAs(tap(User::make()->assignRole('editor'))->save());
-
-        $this->assertSame(['form' => ['contact'], 'config' => []], $this->fieldtype()->preProcess($value));
-    }
-
-    #[Test]
-    public function it_ignores_incoming_config_for_users_who_cant_edit_the_form_without_a_parent_entry()
-    {
-        $this->setTestRoles(['editor' => ['access cp']]);
-        $this->actingAs(tap(User::make()->assignRole('editor'))->save());
-
-        $this->assertSame('contact', $this->fieldtype()->process(['form' => ['contact'], 'config' => ['submission_limit' => 5]]));
-    }
-
-    #[Test]
-    public function it_doesnt_preload_configure_meta_when_the_parent_is_not_an_entry()
-    {
-        $this->actingAs(tap(User::make()->makeSuper())->save());
-
-        Form::find('contact')->set('unique_instances', true)->save();
-
-        $field = (new Field('rsvp_form', ['type' => 'form', 'max_items' => 1]))
-            ->setValue(['form' => 'contact', 'config' => []]);
-
-        $this->assertArrayNotHasKey('configureMeta', $field->fieldtype()->preload());
-        $this->assertArrayHasKey('configureMeta', $field->setParent(Entry::make())->fieldtype()->preload());
+        $this->assertEquals('contact', $preload['data'][0]['id']);
+        $this->assertArrayNotHasKey('configureMeta', $preload);
+        $this->assertArrayNotHasKey('configurable', $preload);
     }
 
     #[Test]
@@ -275,10 +77,8 @@ class FormTest extends TestCase
     {
         $this->actingAs(tap(User::make()->makeSuper())->save());
 
-        Form::find('contact')->set('unique_instances', true)->save();
-
-        $preload = fn (int $maxItems) => (new Field('rsvp_form', ['type' => 'form', 'max_items' => $maxItems]))
-            ->setParent(Entry::make()->id('entry-id')->collection(tap(Collection::make('pages'))->save()))
+        $preload = fn (int $maxItems) => $this->field(['max_items' => $maxItems])
+            ->setParent($this->entry())
             ->setValue(['contact'])
             ->fieldtype()
             ->preload();
@@ -288,16 +88,50 @@ class FormTest extends TestCase
     }
 
     #[Test]
-    public function it_augments_both_stored_shapes_to_the_form()
+    public function it_only_preloads_submissions_for_unique_instances_forms_on_an_entry()
     {
-        $this->assertEquals('contact', $this->fieldtype()->augment('contact')->handle());
-        $this->assertEquals('contact', $this->fieldtype()->augment(['form' => 'contact', 'config' => []])->handle());
+        $this->actingAs(tap(User::make()->makeSuper())->save());
+
+        $preload = fn ($form, $parent) => $this->field()->setParent($parent)->setValue([$form])->fieldtype()->preload();
+
+        $this->assertArrayHasKey('submissions', $preload('contact', $this->entry()));
+        $this->assertArrayNotHasKey('submissions', $preload('other', $this->entry()));
+        $this->assertArrayNotHasKey('submissions', $preload('contact', null));
     }
 
     #[Test]
-    public function it_queries_both_stored_shapes_by_handle()
+    public function it_only_preloads_submissions_for_users_who_can_view_submissions()
     {
-        $this->assertEquals('contact', $this->fieldtype()->toQueryableValue('contact'));
-        $this->assertEquals('contact', $this->fieldtype()->toQueryableValue(['form' => 'contact', 'config' => []]));
+        $this->setTestRoles(['editor' => ['access cp', 'edit contact form'], 'viewer' => ['access cp', 'view contact form submissions']]);
+
+        $preload = fn () => $this->field()->setParent($this->entry())->setValue(['contact'])->fieldtype()->preload();
+
+        $this->actingAs(tap(User::make()->assignRole('editor'))->save());
+        $this->assertArrayNotHasKey('submissions', $preload());
+
+        $this->actingAs(tap(User::make()->assignRole('viewer'))->save());
+        $this->assertArrayHasKey('submissions', $preload());
+    }
+
+    #[Test]
+    public function it_adds_a_submissions_url_to_index_items_for_users_who_can_view_submissions()
+    {
+        $this->setTestRoles(['editor' => ['access cp', 'edit contact form'], 'viewer' => ['access cp', 'view contact form submissions']]);
+
+        $index = fn () => $this->field(['max_items' => 2])->setParent($this->entry())->fieldtype()->preProcessIndex(['contact', 'other'])->keyBy('id');
+
+        $this->actingAs(tap(User::make()->assignRole('editor'))->save());
+        $this->assertArrayNotHasKey('submissions_url', $index()['contact']);
+
+        $this->actingAs(tap(User::make()->assignRole('viewer'))->save());
+        $this->assertStringStartsWith(Form::find('contact')->submissionsUrl().'?filters=', $index()['contact']['submissions_url']);
+        $this->assertArrayNotHasKey('submissions_url', $index()['other']);
+    }
+
+    #[Test]
+    public function it_augments_to_the_form()
+    {
+        $this->assertEquals('contact', $this->field()->fieldtype()->augment('contact')->handle());
+        $this->assertEquals(['contact', 'other'], $this->field(['max_items' => 2])->fieldtype()->augment(['contact', 'other'])->map->handle()->all());
     }
 }

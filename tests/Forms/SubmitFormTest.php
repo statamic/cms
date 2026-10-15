@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Actions\MarkAsNotSpam;
 use Statamic\Events\FormSubmitted;
@@ -1808,7 +1809,7 @@ class SubmitFormTest extends TestCase
     #[Test]
     public function it_attaches_the_entry_when_unique_instances_is_enabled()
     {
-        $this->makeEntry('event-1', ['form' => 'contact', 'config' => []]);
+        $this->makeEntry('event-1', ['contact' => []]);
 
         $this->form->set('unique_instances', true)->save();
 
@@ -1840,7 +1841,7 @@ class SubmitFormTest extends TestCase
     #[Test]
     public function it_rejects_the_submission_when_the_entry_doesnt_use_the_form()
     {
-        $this->makeEntry('event-1', ['form' => 'another_form', 'config' => []]);
+        $this->makeEntry('event-1', ['another_form' => []]);
 
         $this->form->set('unique_instances', true)->save();
 
@@ -1850,25 +1851,59 @@ class SubmitFormTest extends TestCase
     }
 
     #[Test]
-    public function it_accepts_an_entry_referencing_the_form_from_a_nested_field()
+    #[DataProvider('formFieldReferences')]
+    public function it_rejects_an_entry_that_only_references_the_form_from_a_form_field($fields, $data)
     {
-        Blueprint::make('event')->setNamespace('collections.events')->setContents(['fields' => [
-            ['handle' => 'blocks', 'field' => ['type' => 'replicator', 'sets' => [
-                'rsvp' => ['fields' => [
-                    ['handle' => 'rsvp_form', 'field' => ['type' => 'form', 'max_items' => 1]],
-                ]],
-            ]]],
-        ]])->save();
+        Blueprint::make('event')->setNamespace('collections.events')->setContents(['fields' => $fields])->save();
 
-        (new EntryFactory)->collection('events')->id('event-1')->slug('event-one')->data(['blocks' => [
-            ['type' => 'rsvp', 'rsvp_form' => ['form' => 'contact', 'config' => []]],
-        ]])->create();
+        (new EntryFactory)->collection('events')->id('event-1')->slug('event-one')->data($data)->create();
 
         $this->form->set('unique_instances', true)->save();
 
-        $result = $this->action()->entry('event-1')->submit(['email' => 'san@holo.com']);
+        $this->expectException(ValidationException::class);
 
-        $this->assertEquals('event-1', $result->submission->get('_entry'));
+        $this->action()->entry('event-1')->submit(['email' => 'san@holo.com']);
+    }
+
+    public static function formFieldReferences(): array
+    {
+        $form = ['handle' => 'rsvp_form', 'field' => ['type' => 'form', 'max_items' => 1]];
+        $instances = ['handle' => 'form_instances', 'field' => ['type' => 'form_instances']];
+
+        return [
+            'top level form field' => [
+                [$form],
+                ['rsvp_form' => 'contact'],
+            ],
+            'form field in a replicator' => [
+                [['handle' => 'blocks', 'field' => ['type' => 'replicator', 'sets' => ['rsvp' => ['fields' => [$form]]]]]],
+                ['blocks' => [['type' => 'rsvp', 'rsvp_form' => 'contact']]],
+            ],
+            'nested form instances field' => [
+                [['handle' => 'blocks', 'field' => ['type' => 'replicator', 'sets' => ['rsvp' => ['fields' => [$instances]]]]]],
+                ['blocks' => [['type' => 'rsvp', 'form_instances' => ['contact' => []]]]],
+            ],
+        ];
+    }
+
+    #[Test]
+    public function it_accepts_each_form_enabled_on_the_entry()
+    {
+        $this->makeEntry('event-1', ['contact' => [], 'feedback' => []]);
+
+        $feedback = tap(Form::make('feedback')->set('unique_instances', true)->formFields([
+            'pages' => [['id' => 'main', 'sections' => [['fields' => [['handle' => 'rating', 'field' => ['type' => 'short_answer']]]]]]],
+        ]))->save();
+
+        $this->form->set('unique_instances', true)->save();
+
+        $contactResult = $this->action()->entry('event-1')->submit(['email' => 'san@holo.com']);
+        $feedbackResult = app(SubmitForm::class)->form($feedback)->page('main')->entry('event-1')->submit(['rating' => '5']);
+
+        $this->assertEquals('event-1', $contactResult->submission->get('_entry'));
+        $this->assertEquals('event-1', $feedbackResult->submission->get('_entry'));
+
+        $feedback->submissions()->each->delete();
     }
 
     #[Test]
@@ -1884,8 +1919,8 @@ class SubmitFormTest extends TestCase
     #[Test]
     public function it_starts_a_fresh_submission_when_resuming_a_partial_from_another_entry()
     {
-        $this->makeEntry('event-1', ['form' => 'contact', 'config' => []]);
-        $this->makeEntry('event-2', ['form' => 'contact', 'config' => []]);
+        $this->makeEntry('event-1', ['contact' => []]);
+        $this->makeEntry('event-2', ['contact' => []]);
 
         $this->form->set('unique_instances', true)->save();
 
@@ -1902,7 +1937,7 @@ class SubmitFormTest extends TestCase
     #[Test]
     public function it_resumes_a_partial_from_the_same_entry()
     {
-        $this->makeEntry('event-1', ['form' => 'contact', 'config' => []]);
+        $this->makeEntry('event-1', ['contact' => []]);
 
         $this->form->set('unique_instances', true)->save();
 
@@ -1916,7 +1951,7 @@ class SubmitFormTest extends TestCase
     #[Test]
     public function it_rejects_the_submission_when_an_entry_override_restricts_the_form()
     {
-        $this->makeEntry('event-1', ['form' => 'contact', 'config' => ['close_date' => '2020-01-01 09:00']]);
+        $this->makeEntry('event-1', ['contact' => ['close_date' => '2020-01-01 09:00']]);
 
         $this->form->set('unique_instances', true)->save();
 
@@ -1938,13 +1973,13 @@ class SubmitFormTest extends TestCase
         $this->assertFalse($result->submission->has('entry'));
     }
 
-    private function makeEntry(string $id, array $formValue): void
+    private function makeEntry(string $id, array $formInstances): void
     {
         Blueprint::make('event')->setNamespace('collections.events')->setContents(['fields' => [
-            ['handle' => 'rsvp_form', 'field' => ['type' => 'form', 'max_items' => 1]],
+            ['handle' => 'form_instances', 'field' => ['type' => 'form_instances']],
         ]])->save();
 
-        (new EntryFactory)->collection('events')->id($id)->slug($id)->data(['rsvp_form' => $formValue])->create();
+        (new EntryFactory)->collection('events')->id($id)->slug($id)->data(['form_instances' => $formInstances])->create();
     }
 
     private function uploadForm(bool $honeypot = false)

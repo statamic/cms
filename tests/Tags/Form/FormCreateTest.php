@@ -67,7 +67,7 @@ class FormCreateTest extends FormTestCase
 
         Form::find('contact')->set('unique_instances', true);
 
-        $this->makeEntry('event-1', ['form' => 'contact', 'config' => []]);
+        $this->makeEntry('event-1', ['contact' => []]);
 
         $output = $this->tag('{{ form:contact }}{{ /form:contact }}', ['id' => 'event-1']);
 
@@ -101,7 +101,7 @@ class FormCreateTest extends FormTestCase
 
         Form::find('contact')->set('unique_instances', true);
 
-        $this->makeEntry('event-1', ['form' => 'another_form', 'config' => []]);
+        $this->makeEntry('event-1', ['another_form' => []]);
 
         $output = $this->tag('{{ form:contact }}{{ /form:contact }}', ['id' => 'event-1']);
 
@@ -115,11 +115,30 @@ class FormCreateTest extends FormTestCase
 
         Form::find('contact')->set('unique_instances', true);
 
-        $this->makeEntry('event-1', ['form' => 'another_form', 'config' => []]);
+        $this->makeEntry('event-1', ['another_form' => []]);
 
         $output = $this->tag('{{ form:contact }}{{ restricted }}|{{ status }}|{{ restriction_message }}{{ /form:contact }}', ['id' => 'event-1']);
 
         $this->assertStringContainsString('1|closed|'.__('statamic::validation.form_must_be_submitted_from_an_entry'), $output);
+        $this->assertStringNotContainsString('name="_entry"', $output);
+    }
+
+    #[Test]
+    public function it_renders_the_closed_state_when_only_a_form_field_references_the_form()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        Form::find('contact')->set('unique_instances', true);
+
+        Blueprint::make('event')->setNamespace('collections.events')->setContents(['fields' => [
+            ['handle' => 'rsvp_form', 'field' => ['type' => 'form', 'max_items' => 1]],
+        ]])->save();
+
+        (new EntryFactory)->collection('events')->id('event-1')->slug('event-1')->data(['rsvp_form' => 'contact'])->create();
+
+        $output = $this->tag('{{ form:contact }}{{ restricted }}|{{ status }}{{ /form:contact }}', ['id' => 'event-1']);
+
+        $this->assertStringContainsString('1|closed', $output);
         $this->assertStringNotContainsString('name="_entry"', $output);
     }
 
@@ -151,20 +170,20 @@ class FormCreateTest extends FormTestCase
 
         Form::find('contact')->set('unique_instances', true);
 
-        $this->makeEntry('event-1', ['form' => 'contact', 'config' => ['close_date' => '2000-01-01']]);
+        $this->makeEntry('event-1', ['contact' => ['close_date' => '2000-01-01']]);
 
         $output = $this->tag('{{ form:contact }}{{ restricted }}|{{ status }}{{ /form:contact }}', ['id' => 'event-1']);
 
         $this->assertStringContainsString('|closed', $output);
     }
 
-    private function makeEntry(string $id, array $formValue): void
+    private function makeEntry(string $id, array $formInstances): void
     {
         Blueprint::make('event')->setNamespace('collections.events')->setContents(['fields' => [
-            ['handle' => 'rsvp_form', 'field' => ['type' => 'form', 'max_items' => 1]],
+            ['handle' => 'form_instances', 'field' => ['type' => 'form_instances']],
         ]])->save();
 
-        (new EntryFactory)->collection('events')->id($id)->slug($id)->data(['rsvp_form' => $formValue])->create();
+        (new EntryFactory)->collection('events')->id($id)->slug($id)->data(['form_instances' => $formInstances])->create();
     }
 
     #[Test]
@@ -1875,8 +1894,8 @@ EOT
 
         $form = Form::find('survey');
         $form->set('unique_instances', true)->save();
-        $this->makeEntry('event-a', ['form' => 'survey', 'config' => []]);
-        $this->makeEntry('event-b', ['form' => 'survey', 'config' => []]);
+        $this->makeEntry('event-a', ['survey' => []]);
+        $this->makeEntry('event-b', ['survey' => []]);
 
         $this->post('/!/forms/survey', ['_page' => 'page_one', '_entry' => 'event-a', 'name' => 'Olaf']);
 
@@ -1895,8 +1914,8 @@ EOT
 
         $form = Form::find('survey');
         $form->set('unique_instances', true)->save();
-        $this->makeEntry('event-a', ['form' => 'survey', 'config' => []]);
-        $this->makeEntry('event-b', ['form' => 'survey', 'config' => []]);
+        $this->makeEntry('event-a', ['survey' => []]);
+        $this->makeEntry('event-b', ['survey' => []]);
 
         $this->post('/!/forms/survey', ['_page' => 'page_one', '_entry' => 'event-a', 'name' => 'Olaf']);
         $this->post('/!/forms/survey', ['_page' => 'page_one', '_entry' => 'event-b', 'name' => 'Sven']);

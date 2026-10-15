@@ -8,6 +8,7 @@ use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Entry;
 use Statamic\Facades\User;
+use Statamic\Fieldtypes\FormInstances;
 
 use function Statamic\trans as __;
 
@@ -83,7 +84,7 @@ class Instance
                 return [];
             }
 
-            return FormFieldValues::on($entry)->config($this->form->handle());
+            return FormInstances::forEntry($entry)[$this->form->handle()] ?? [];
         });
     }
 

@@ -16,6 +16,7 @@ use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
+use Statamic\Fieldtypes\FormInstances;
 use Statamic\Forms\Logic\PageLogic;
 use Statamic\Rules\AllowedFile;
 use Statamic\Support\Arr;
@@ -150,7 +151,7 @@ class SubmitForm
 
         $entry = $this->entry ? Entry::find($this->entry) : null;
 
-        if (! $entry || ! FormFieldValues::on($entry)->references($this->form->handle())) {
+        if (! $entry || ! array_key_exists($this->form->handle(), FormInstances::forEntry($entry))) {
             throw ValidationException::withMessages(['*' => [__('statamic::validation.form_must_be_submitted_from_an_entry')]]);
         }
 

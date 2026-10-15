@@ -69,14 +69,14 @@ class AccessTest extends TestCase
         }
     }
 
-    private function makeEntry(string $id, array $formValue): void
+    private function makeEntry(string $id, array $formInstances): void
     {
         Blueprint::make('event')->setNamespace('collections.events')->setContents(['fields' => [
             ['handle' => 'title', 'field' => ['type' => 'text']],
-            ['handle' => 'rsvp_form', 'field' => ['type' => 'form', 'max_items' => 1]],
+            ['handle' => 'form_instances', 'field' => ['type' => 'form_instances']],
         ]])->save();
 
-        (new EntryFactory)->collection('events')->id($id)->slug($id)->data(['rsvp_form' => $formValue])->create();
+        (new EntryFactory)->collection('events')->id($id)->slug($id)->data(['form_instances' => $formInstances])->create();
     }
 
     #[Test]
@@ -138,7 +138,7 @@ class AccessTest extends TestCase
     {
         $form = $this->makeForm(['submission_limit' => 5, 'unique_instances' => true]);
 
-        $this->makeEntry('event-1', ['form' => 'contact', 'config' => ['submission_limit' => 1]]);
+        $this->makeEntry('event-1', ['contact' => ['submission_limit' => 1]]);
 
         $this->submit($form, 1, entry: 'event-1');
 
@@ -151,7 +151,7 @@ class AccessTest extends TestCase
     {
         $form = $this->makeForm(['unique_instances' => true]);
 
-        $this->makeEntry('event-1', ['form' => 'contact', 'config' => [
+        $this->makeEntry('event-1', ['contact' => [
             'close_date' => '2026-07-01 09:00',
             'closed_message' => 'This event is full.',
         ]]);
@@ -166,7 +166,7 @@ class AccessTest extends TestCase
     {
         $form = $this->makeForm(['require_login' => true, 'unique_instances' => true]);
 
-        $this->makeEntry('event-1', ['form' => 'contact', 'config' => ['require_login' => false]]);
+        $this->makeEntry('event-1', ['contact' => ['require_login' => false]]);
 
         $this->assertFalse($form->instance('event-1')->restricted());
         $this->assertTrue($form->restricted());
@@ -177,7 +177,7 @@ class AccessTest extends TestCase
     {
         $form = $this->makeForm(['unique_instances' => true]);
 
-        $this->makeEntry('event-1', ['form' => 'another_form', 'config' => ['close_date' => '2026-07-01 09:00']]);
+        $this->makeEntry('event-1', ['another_form' => ['close_date' => '2026-07-01 09:00']]);
 
         $this->assertFalse($form->instance('event-1')->restricted());
     }

@@ -37,14 +37,14 @@ class InstanceTest extends TestCase
         return tap(Form::make('contact')->data(array_merge(['unique_instances' => true], $data)))->save();
     }
 
-    private function makeEntry(string $id, array $formValue): void
+    private function makeEntry(string $id, array $formInstances): void
     {
         Blueprint::make('event')->setNamespace('collections.events')->setContents(['fields' => [
             ['handle' => 'title', 'field' => ['type' => 'text']],
-            ['handle' => 'rsvp_form', 'field' => ['type' => 'form', 'max_items' => 1]],
+            ['handle' => 'form_instances', 'field' => ['type' => 'form_instances']],
         ]])->save();
 
-        (new EntryFactory)->collection('events')->id($id)->slug($id)->data(['rsvp_form' => $formValue])->create();
+        (new EntryFactory)->collection('events')->id($id)->slug($id)->data(['form_instances' => $formInstances])->create();
     }
 
     #[Test]
@@ -93,7 +93,7 @@ class InstanceTest extends TestCase
     {
         $form = $this->makeForm(['submission_limit' => 5, 'closed_message' => 'Closed.']);
 
-        $this->makeEntry('event-1', ['form' => 'contact', 'config' => ['submission_limit' => 1]]);
+        $this->makeEntry('event-1', ['contact' => ['submission_limit' => 1]]);
 
         $instance = $form->instance('event-1');
 
@@ -111,7 +111,7 @@ class InstanceTest extends TestCase
 
         $form = $this->makeForm(['submission_limit' => 5]);
 
-        $this->makeEntry('event-1', ['form' => 'contact', 'config' => ['submission_limit' => 1]]);
+        $this->makeEntry('event-1', ['contact' => ['submission_limit' => 1]]);
 
         Collection::findByHandle('events')->sites(['en', 'fr'])->save();
 
@@ -121,23 +121,76 @@ class InstanceTest extends TestCase
     }
 
     #[Test]
-    public function overrides_are_found_in_nested_fields()
+    public function overrides_in_a_nested_form_instances_field_are_ignored()
     {
         $form = $this->makeForm(['submission_limit' => 5]);
 
         Blueprint::make('event')->setNamespace('collections.events')->setContents(['fields' => [
             ['handle' => 'blocks', 'field' => ['type' => 'replicator', 'sets' => [
                 'rsvp' => ['fields' => [
-                    ['handle' => 'rsvp_form', 'field' => ['type' => 'form', 'max_items' => 1]],
+                    ['handle' => 'form_instances', 'field' => ['type' => 'form_instances']],
                 ]],
             ]]],
         ]])->save();
 
         (new EntryFactory)->collection('events')->id('event-1')->slug('event-1')->data(['blocks' => [
-            ['type' => 'rsvp', 'rsvp_form' => ['form' => 'contact', 'config' => ['submission_limit' => 1]]],
+            ['type' => 'rsvp', 'form_instances' => ['contact' => ['submission_limit' => 1]]],
         ]])->create();
 
+        $this->assertEquals(5, $form->instance('event-1')->config('submission_limit'));
+    }
+
+    #[Test]
+    public function the_first_top_level_form_instances_field_wins()
+    {
+        $form = $this->makeForm(['submission_limit' => 5]);
+
+        Blueprint::make('event')->setNamespace('collections.events')->setContents(['fields' => [
+            ['handle' => 'first', 'field' => ['type' => 'form_instances']],
+            ['handle' => 'second', 'field' => ['type' => 'form_instances']],
+        ]])->save();
+
+        (new EntryFactory)->collection('events')->id('event-1')->slug('event-1')->data([
+            'first' => ['contact' => ['submission_limit' => 1]],
+            'second' => ['contact' => ['submission_limit' => 99]],
+        ])->create();
+
         $this->assertEquals(1, $form->instance('event-1')->config('submission_limit'));
+    }
+
+    #[Test]
+    public function each_form_in_the_field_has_its_own_overrides()
+    {
+        $form = $this->makeForm(['submission_limit' => 5]);
+        $feedback = tap(Form::make('feedback')->data(['unique_instances' => true, 'submission_limit' => 5]))->save();
+
+        $this->makeEntry('event-1', [
+            'contact' => ['submission_limit' => 1],
+            'feedback' => ['close_date' => '2020-01-01 09:00'],
+        ]);
+
+        $this->assertEquals(1, $form->instance('event-1')->config('submission_limit'));
+        $this->assertNull($form->instance('event-1')->config('close_date'));
+        $this->assertEquals('open', $form->instance('event-1')->status());
+
+        $this->assertEquals(5, $feedback->instance('event-1')->config('submission_limit'));
+        $this->assertEquals('closed', $feedback->instance('event-1')->status());
+    }
+
+    #[Test]
+    public function overrides_are_not_read_from_a_form_field()
+    {
+        $form = $this->makeForm(['submission_limit' => 5]);
+
+        Blueprint::make('event')->setNamespace('collections.events')->setContents(['fields' => [
+            ['handle' => 'rsvp_form', 'field' => ['type' => 'form', 'max_items' => 1]],
+        ]])->save();
+
+        (new EntryFactory)->collection('events')->id('event-1')->slug('event-1')->data([
+            'rsvp_form' => ['form' => 'contact', 'config' => ['submission_limit' => 1]],
+        ])->create();
+
+        $this->assertEquals(5, $form->instance('event-1')->config('submission_limit'));
     }
 
     #[Test]
@@ -145,7 +198,7 @@ class InstanceTest extends TestCase
     {
         $form = $this->makeForm(['submission_limit' => 5]);
 
-        $this->makeEntry('event-1', ['form' => 'another_form', 'config' => ['submission_limit' => 1]]);
+        $this->makeEntry('event-1', ['another_form' => ['submission_limit' => 1]]);
 
         $this->assertEquals(5, $form->instance('event-1')->config('submission_limit'));
     }
@@ -155,7 +208,7 @@ class InstanceTest extends TestCase
     {
         $form = $this->makeForm(['submission_limit' => 5]);
 
-        $this->makeEntry('event-1', ['form' => 'contact', 'config' => []]);
+        $this->makeEntry('event-1', ['contact' => []]);
 
         $this->assertEquals(5, $form->instance('event-1')->config('submission_limit'));
     }
@@ -167,7 +220,7 @@ class InstanceTest extends TestCase
             'webhook' => [['url' => 'https://example.com/form']],
         ]))->save();
 
-        $this->makeEntry('event-1', ['form' => 'contact', 'config' => [
+        $this->makeEntry('event-1', ['contact' => [
             'connections' => ['webhook' => [['url' => 'https://example.com/entry']]],
         ]]);
 
@@ -184,7 +237,7 @@ class InstanceTest extends TestCase
             'webhook' => [['url' => 'https://example.com/form']],
         ]))->save();
 
-        $this->makeEntry('event-1', ['form' => 'contact', 'config' => []]);
+        $this->makeEntry('event-1', ['contact' => []]);
 
         $this->assertEquals(
             ['webhook' => [['url' => 'https://example.com/form']]],
@@ -199,7 +252,7 @@ class InstanceTest extends TestCase
             'webhook' => [['url' => 'https://example.com/form']],
         ]))->save();
 
-        $this->makeEntry('event-1', ['form' => 'contact', 'config' => ['connections' => []]]);
+        $this->makeEntry('event-1', ['contact' => ['connections' => []]]);
 
         $this->assertEquals([], $form->instance('event-1')->connections()->all());
     }

@@ -2,6 +2,7 @@
 
 namespace Statamic\Forms;
 
+use Illuminate\Support\Collection;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\CP\Column;
@@ -10,13 +11,10 @@ use Statamic\Facades;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Scope;
 use Statamic\Facades\User;
-use Statamic\Fields\Blueprint;
-use Statamic\Fields\Fields;
 use Statamic\Fieldtypes\Relationship;
 use Statamic\GraphQL\Types\FormType;
 use Statamic\Query\ItemQueryBuilder;
 use Statamic\Query\Scopes\Filter;
-use Statamic\Statamic;
 use Statamic\Support\Arr;
 
 use function Statamic\trans as __;
@@ -86,141 +84,6 @@ class Fieldtype extends Relationship
         ];
     }
 
-    public function preProcess($data)
-    {
-        if (! $this->configCanBeOverridden()) {
-            return $this->toFormHandles($data);
-        }
-
-        $handles = $this->toFormHandles($data);
-
-        if (! $form = Facades\Form::find(Arr::first($handles))) {
-            return ['form' => $handles, 'config' => []];
-        }
-
-        if ($this->cannotConfigure($form)) {
-            return ['form' => $handles, 'config' => []];
-        }
-
-        $config = Arr::get($data, 'config', []);
-
-        return [
-            'form' => $handles,
-            'config' => $this->overrideFields($form)->addValues($config)->preProcess()->values()->only(array_keys($config))->all(),
-        ];
-    }
-
-    public function preProcessConfig($data)
-    {
-        $handles = $this->toFormHandles($data);
-
-        return $this->config('max_items') === 1 ? Arr::first($handles) : $handles;
-    }
-
-    public function process($data)
-    {
-        if (! $this->configCanBeOverridden()) {
-            return parent::process($this->toFormHandles($data));
-        }
-
-        if (! $handle = Arr::first($this->toFormHandles($data))) {
-            return null;
-        }
-
-        if (! $form = Facades\Form::find($handle)) {
-            return $handle;
-        }
-
-        if ($this->cannotConfigure($form)) {
-            $config = ($entry = $this->parentEntry()) ? FormFieldValues::on($entry)->config($handle) : [];
-
-            return $config ? ['form' => $handle, 'config' => $config] : $handle;
-        }
-
-        $config = Arr::get($data, 'config', []);
-
-        // Only desynced fields are submitted, so a key's presence means it's an
-        // override. Falsy values count; an override is only "empty" when blank.
-        $config = $this->overrideFields($form)
-            ->addValues($config)
-            ->process()
-            ->values()
-            ->only(array_keys($config))
-            ->reject(fn ($value) => $value === null || $value === '')
-            ->all();
-
-        return $config ? ['form' => $handle, 'config' => $config] : $handle;
-    }
-
-    public function preProcessValidatable($value)
-    {
-        return $this->toFormHandles($value);
-    }
-
-    private function cannotConfigure(FormContract $form): bool
-    {
-        return ($user = User::current()) && ! $user->can('edit', $form);
-    }
-
-    private function configCanBeOverridden(): bool
-    {
-        return Statamic::formsProInstalled() && $this->config('max_items') === 1;
-    }
-
-    private function toFormHandles($value): array
-    {
-        if (is_array($value) && Arr::isAssoc($value)) {
-            $value = $value['form'] ?? null;
-        }
-
-        return array_values(array_filter(Arr::wrap($value)));
-    }
-
-    private function overrideFields(FormContract $form): Fields
-    {
-        return $this->overrideBlueprint($form)->fields();
-    }
-
-    private function overrideBlueprint(FormContract $form): Blueprint
-    {
-        $access = ConfigFields::fields()['access'];
-        $access['fields'] = collect($access['fields'])->map(fn (array $field): array => [
-            ...$field,
-            'localizable' => true,
-        ]);
-
-        $connections = [
-            'display' => __('Connections'),
-            'fields' => [
-                'connections' => [
-                    'type' => 'form_connections',
-                    'display' => __('Connections'),
-                    'instructions' => __('statamic::messages.form_fieldtype_connections_instructions'),
-                    'localizable' => true,
-                    'form' => $form->handle(),
-                ],
-            ],
-        ];
-
-        return Facades\Blueprint::make()->setContents([
-            'tabs' => ['main' => ['sections' => [
-                $this->toBlueprintSection($access),
-                $this->toBlueprintSection($connections),
-            ]]],
-        ]);
-    }
-
-    private function toBlueprintSection(array $section): array
-    {
-        return [
-            'display' => $section['display'],
-            'fields' => collect($section['fields'])
-                ->map(fn (array $field, string $handle): array => ['handle' => $handle, 'field' => $field])
-                ->values()
-                ->all(),
-        ];
-    }
-
     protected function getColumns()
     {
         return [
@@ -249,9 +112,7 @@ class Fieldtype extends Relationship
     public function getIndexItems($request)
     {
         $query = (new ItemQueryBuilder())
-            ->withItems(new DataCollection(
-                Facades\Form::all()->filter(fn ($form) => User::current()->can('view', $form))
-            ));
+            ->withItems(new DataCollection($this->selectableForms()));
 
         if ($search = $request->search) {
             $query->where('title', 'like', '%'.$search.'%');
@@ -284,18 +145,17 @@ class Fieldtype extends Relationship
         return $query->get()->map($formFields);
     }
 
+    protected function selectableForms(): Collection
+    {
+        return Facades\Form::all()->filter(fn ($form) => User::current()->can('view', $form));
+    }
+
     public function preload()
     {
         $data = parent::preload();
 
-        $data['configurable'] = $this->configCanBeOverridden();
-
         if ($submissions = $this->submissionsPreloadData()) {
             $data['submissions'] = $submissions;
-        }
-
-        if ($configureMeta = $this->configureMetaPreloadData()) {
-            $data['configureMeta'] = $configureMeta;
         }
 
         return $data;
@@ -307,7 +167,12 @@ class Fieldtype extends Relationship
             return null;
         }
 
-        if (! $form = $this->viewableUniqueInstancesForm(Arr::first($this->toFormHandles($this->field->value())))) {
+        return $this->submissionsMeta(Arr::first(Arr::wrap($this->field->value())));
+    }
+
+    protected function submissionsMeta(?string $handle): ?array
+    {
+        if (! $form = $this->viewableUniqueInstancesForm($handle)) {
             return null;
         }
 
@@ -319,36 +184,6 @@ class Fieldtype extends Relationship
             'form' => $form->handle(),
             'filters' => Scope::filters('form-submissions', ['form' => $form->handle(), 'entry' => $entry->id()]),
             'actionUrl' => cp_route('forms.submissions.actions.run', $form->handle()),
-        ];
-    }
-
-    private function configureMetaPreloadData(): ?array
-    {
-        if (! $this->configCanBeOverridden() || ! $this->parentEntry()) {
-            return null;
-        }
-
-        if (! $form = $this->uniqueInstancesForm(Arr::first($this->toFormHandles($this->field->value())))) {
-            return null;
-        }
-
-        if ($this->cannotConfigure($form)) {
-            return null;
-        }
-
-        $config = Arr::get($this->field->value(), 'config', []);
-
-        $formData = [...$form->data()->all(), 'connections' => $form->connections()->all()];
-
-        $origin = $this->overrideFields($form)->addValues($formData)->preProcess();
-        $fields = $this->overrideFields($form)->addValues(array_merge($formData, $config))->preProcess();
-
-        return [
-            'form' => $form->handle(),
-            'blueprint' => $this->overrideBlueprint($form)->toPublishArray(),
-            'meta' => $fields->meta(),
-            'originValues' => $origin->values()->all(),
-            'originMeta' => $origin->meta(),
         ];
     }
 
@@ -381,14 +216,14 @@ class Fieldtype extends Relationship
         return $form->submissionsUrl().'?filters='.$filters;
     }
 
-    private function parentEntry(): ?EntryContract
+    protected function parentEntry(): ?EntryContract
     {
         $parent = $this->field->parent();
 
         return $parent instanceof EntryContract ? $parent : null;
     }
 
-    private function uniqueInstancesForm(?string $handle): ?FormContract
+    protected function uniqueInstancesForm(?string $handle): ?FormContract
     {
         if (! $handle || ! $form = Facades\Form::find($handle)) {
             return null;
@@ -404,26 +239,6 @@ class Fieldtype extends Relationship
         }
 
         return User::current()->can('viewSubmissions', $form) ? $form : null;
-    }
-
-    public function getItemData($values)
-    {
-        return parent::getItemData($this->toFormHandles($values));
-    }
-
-    public function augment($values)
-    {
-        return parent::augment($this->toFormHandles($values));
-    }
-
-    public function shallowAugment($values)
-    {
-        return parent::shallowAugment($this->toFormHandles($values));
-    }
-
-    public function toQueryableValue($value)
-    {
-        return parent::toQueryableValue($this->toFormHandles($value));
     }
 
     public function augmentValue($value)

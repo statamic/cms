@@ -604,7 +604,7 @@ class SubmissionTest extends TestCase
 
     #[Test]
     #[DataProvider('connectionOverrideProvider')]
-    public function finalizing_resolves_the_entrys_connection_override($rsvpFormValue, string $expectedUrl)
+    public function finalizing_resolves_the_entrys_connection_override($formInstances, string $expectedUrl)
     {
         Bus::fake();
         Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
@@ -614,11 +614,11 @@ class SubmissionTest extends TestCase
         ]))->save();
 
         Blueprint::make('event')->setNamespace('collections.events')->setContents(['fields' => [
-            ['handle' => 'rsvp_form', 'field' => ['type' => 'form', 'max_items' => 1]],
+            ['handle' => 'form_instances', 'field' => ['type' => 'form_instances']],
         ]])->save();
 
         (new EntryFactory)->collection('events')->id('event-1')->slug('event-1')->data([
-            'rsvp_form' => $rsvpFormValue,
+            'form_instances' => $formInstances,
         ])->create();
 
         $form->makeSubmission()->set('_entry', 'event-1')->asPartial()->finalize();
@@ -638,11 +638,11 @@ class SubmissionTest extends TestCase
         ]))->save();
 
         Blueprint::make('event')->setNamespace('collections.events')->setContents(['fields' => [
-            ['handle' => 'rsvp_form', 'field' => ['type' => 'form', 'max_items' => 1]],
+            ['handle' => 'form_instances', 'field' => ['type' => 'form_instances']],
         ]])->save();
 
         (new EntryFactory)->collection('events')->id('event-1')->slug('event-1')->data([
-            'rsvp_form' => ['form' => 'contact_us', 'config' => ['connections' => []]],
+            'form_instances' => ['contact_us' => ['connections' => []]],
         ])->create();
 
         $form->makeSubmission()->set('_entry', 'event-1')->asPartial()->finalize();
@@ -654,13 +654,13 @@ class SubmissionTest extends TestCase
     {
         return [
             'entry overrides the connection' => [
-                ['form' => 'contact_us', 'config' => [
+                ['contact_us' => [
                     'connections' => ['webhook' => [['url' => 'https://example.com/entry-webhook']]],
                 ]],
                 'https://example.com/entry-webhook',
             ],
             'entry has no override' => [
-                'contact_us',
+                ['contact_us' => []],
                 'https://example.com/form-webhook',
             ],
         ];

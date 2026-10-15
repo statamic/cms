@@ -99,6 +99,7 @@ class ExtensionServiceProvider extends ServiceProvider
         'form_connections' => Fieldtypes\FormConnections::class,
         'form_fields' => Fieldtypes\FormFields::class,
         'form_heading' => Fieldtypes\FormHeading::class,
+        'form_instances' => Fieldtypes\FormInstances::class,
         'form_paragraph' => Fieldtypes\FormParagraph::class,
         'form_upload' => Fieldtypes\FormUpload::class,
         'hidden' => Fieldtypes\Hidden::class,
