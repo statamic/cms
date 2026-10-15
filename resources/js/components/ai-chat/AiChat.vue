@@ -119,7 +119,8 @@ function scrollToBottom() {
     <!-- Docked in the sidebar, fill the height. Floating, be only as tall as the content. -->
     <div data-ai-chat :class="['relative flex min-h-0 flex-col', floating ? 'flex-initial' : 'flex-1']" @focusout="onFocusOut">
         <!-- Floating, there is nothing to show above the input until the first message. Docked, it fills the space. -->
-        <div v-if="messages.length || !floating" ref="thread" :class="['flex min-h-0 flex-col overflow-y-auto ps-0.5 pe-2.5 pt-3.5 pb-2', floating ? 'flex-initial' : 'flex-1']">
+        <!-- As the thread scrolls, messages fade out under the top edge (the padding there is clear, so nothing fades at rest) instead of being cut off by a hard line, and the top corners follow the card's -->
+        <div v-if="messages.length || !floating" ref="thread" :class="['flex min-h-0 flex-col overflow-y-auto ps-0.5 pe-2.5 pt-3.5 pb-2 [mask-image:linear-gradient(to_bottom,transparent,black_50px)]', floating ? 'flex-initial rounded-t-[11px]' : 'flex-1']">
             <!-- mt-auto keeps messages next to the input, while still scrolling once they overflow -->
             <div class="relative mt-auto space-y-3">
                 <!-- Docked, show the examples above the input until a request has been sent -->
