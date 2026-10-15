@@ -486,8 +486,8 @@ class EmailTest extends TestCase
         config(['app.name' => 'My App']);
 
         $email = $this->makeEmailWithConfig([
-            'subject' => '[[ site.name ]] | [[ app.name ]] | [[ globals.company_information.name ]]',
-            'body' => '[[ site.url ]] | [[ app.name ]] | [[ globals.company_information.email ]]',
+            'subject' => '[[ site.name ]] | [[ config.app.name ]] | [[ globals.company_information.name ]]',
+            'body' => '[[ site.url ]] | [[ config.app.name ]] | [[ globals.company_information.email ]]',
         ], build: false);
 
         $site = Site::default();

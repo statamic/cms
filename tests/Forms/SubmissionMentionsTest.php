@@ -36,7 +36,7 @@ class SubmissionMentionsTest extends TestCase
         $this->assertSame([
             'zebra' => 'Zebra',
             'apple' => 'Apple',
-            'app.name' => 'App Name',
+            'config.app.name' => 'App Name',
             'globals.company.name' => 'Company: Name',
             'form.title' => 'Form Title',
             'shop.owner' => 'Owner',
@@ -137,7 +137,7 @@ class SubmissionMentionsTest extends TestCase
     #[Test]
     public function it_throws_for_invalid_added_handles()
     {
-        foreach (['owner', 'shop owner.name', 'shop.na!me', 'site.custom', 'form.custom', 'globals.company.name'] as $handle) {
+        foreach (['owner', 'shop owner.name', 'shop.na!me', 'site.custom', 'form.custom', 'globals.company.name', 'config.custom'] as $handle) {
             try {
                 Form::addMention($handle, 'Label', fn () => 'x');
                 $this->fail("Handle [{$handle}] should have been rejected.");
@@ -145,6 +145,12 @@ class SubmissionMentionsTest extends TestCase
                 $this->assertStringContainsString($handle, $e->getMessage());
             }
         }
+    }
+
+    #[Test]
+    public function it_has_no_additional_mentions_by_default()
+    {
+        $this->assertSame([], Form::additionalMentions());
     }
 
     #[Test]
@@ -256,12 +262,12 @@ class SubmissionMentionsTest extends TestCase
         config(['app.name' => 'My App']);
         $this->setSites(['en' => ['url' => 'http://localhost/', 'locale' => 'en_US', 'name' => 'Test Site']]);
 
-        $values = SubmissionMentions::values($this->makeSubmission(), ['site.name', 'site.url', 'app.name']);
+        $values = SubmissionMentions::values($this->makeSubmission(), ['site.name', 'site.url', 'config.app.name']);
 
         $this->assertSame([
             'site.name' => 'Test Site',
             'site.url' => 'http://localhost',
-            'app.name' => 'My App',
+            'config.app.name' => 'My App',
         ], $values);
     }
 

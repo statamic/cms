@@ -151,8 +151,8 @@ class FormRepository implements Contract
             throw new InvalidArgumentException("Invalid mention handle [{$handle}]. It must contain a dot and only use letters, numbers, underscores, dashes and dots.");
         }
 
-        if (str_starts_with($handle, 'form.') || str_starts_with($handle, 'site.') || str_starts_with($handle, 'globals.')) {
-            throw new InvalidArgumentException("Invalid mention handle [{$handle}]. The [form.], [site.] and [globals.] prefixes are reserved.");
+        if (str_starts_with($handle, 'form.') || str_starts_with($handle, 'site.') || str_starts_with($handle, 'globals.') || str_starts_with($handle, 'config.')) {
+            throw new InvalidArgumentException("Invalid mention handle [{$handle}]. The [form.], [site.], [globals.] and [config.] prefixes are reserved.");
         }
 
         $this->additionalMentions[$handle] = ['label' => $label, 'value' => $value];

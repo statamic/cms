@@ -42,6 +42,7 @@ class SubmissionMentions
             'form.title' => __('Form Title'),
             'site.name' => __('Site Name'),
             'site.url' => __('Site URL'),
+            'config.app.name' => __('App Name'),
         ];
 
         foreach (FormFacade::additionalMentions() as $handle => $mention) {
@@ -85,6 +86,8 @@ class SubmissionMentions
                 $value = $submission->site()->name();
             } elseif ($handle === 'site.url') {
                 $value = $submission->site()->absoluteUrl();
+            } elseif ($handle === 'config.app.name') {
+                $value = config('app.name');
             } elseif (isset($additional[$handle])) {
                 $value = $additional[$handle]['value']($submission);
             } elseif (str_starts_with($handle, 'globals.')) {

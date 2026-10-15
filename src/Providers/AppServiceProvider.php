@@ -148,8 +148,6 @@ class AppServiceProvider extends ServiceProvider
             return ! $route || $request->is($route.'/*');
         });
 
-        Facades\Form::addMention('app.name', 'App Name', fn () => config('app.name'));
-
         $this->addAboutCommandInfo();
 
         $this->registerElevatedSessionMacros();
