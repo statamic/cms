@@ -481,6 +481,11 @@ final class Addon
         return $this->directory = Path::tidy(Str::ensureRight($dir, '/'));
     }
 
+    public function hasMarketplaceData()
+    {
+        return $this->hasMarketplaceData;
+    }
+
     public function existsOnMarketplace()
     {
         return $this->marketplaceSlug() !== null;

@@ -13,6 +13,8 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Addons\Addon as AddonInstance;
+use Statamic\Addons\Manifest;
 use Statamic\Facades\Addon;
 use Statamic\Licensing\Outpost;
 use Tests\TestCase;
@@ -176,6 +178,39 @@ class OutpostTest extends TestCase
                 'private/addon' => ['valid' => true, 'exists' => false, 'version_limit' => null],
             ],
         ], $response);
+    }
+
+    #[Test]
+    public function license_key_file_response_doesnt_fetch_marketplace_data()
+    {
+        config(['statamic.system.license_key' => 'testsitekey12345']);
+
+        $encrypter = new Encrypter('testsitekey12345');
+        $encryptedKeyFile = $encrypter->encrypt(json_encode(['packages' => []]));
+
+        File::shouldReceive('exists')
+            ->with(storage_path('license.key'))
+            ->once()
+            ->andReturnTrue();
+
+        File::shouldReceive('get')
+            ->with(storage_path('license.key'))
+            ->once()
+            ->andReturn($encryptedKeyFile);
+
+        Addon::shouldReceive('all')->andReturn(collect([
+            AddonInstance::makeFromPackage(['id' => 'without/data']),
+            AddonInstance::makeFromPackage(['id' => 'with/data', 'marketplaceId' => 1, 'marketplaceSlug' => 'with-data', 'isCommercial' => true]),
+        ]));
+
+        $this->mock(Manifest::class, fn ($mock) => $mock->shouldNotReceive('fetchPackageDataFromMarketplace'));
+
+        $response = $this->outpost()->response();
+
+        $this->assertEquals([
+            'without/data' => ['valid' => true, 'exists' => false, 'version_limit' => null],
+            'with/data' => ['valid' => false, 'exists' => true, 'version_limit' => null],
+        ], $response['packages']);
     }
 
     #[Test]
@@ -390,6 +425,11 @@ class FakeOutpostAddon
     public function edition()
     {
         return $this->edition;
+    }
+
+    public function hasMarketplaceData()
+    {
+        return true;
     }
 
     public function existsOnMarketplace()
