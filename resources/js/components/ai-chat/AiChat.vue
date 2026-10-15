@@ -25,7 +25,10 @@ const examplesVisible = computed(() => !messages.value.length && (floating.value
 // Move focus into the chat when it opens, so keyboard and screen reader users land on the input.
 // Closing is done with the same header button, which still has focus, so there's nothing to restore.
 const focusInput = () => nextTick(() => form.value?.querySelector('textarea')?.focus());
-watch(open, (isOpen) => isOpen && focusInput());
+watch(open, (isOpen) => {
+    if (isOpen) focusInput();
+    else showExamples.value = false; // the floating chat stays mounted while closed, so put the examples away
+});
 // The keyboard shortcut asks for focus when the chat is already open.
 watch(focusRequests, focusInput);
 // Switching between docked and floating remounts the chat, so refocus then too.

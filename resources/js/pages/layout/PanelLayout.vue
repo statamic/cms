@@ -170,14 +170,23 @@ onUnmounted(() => {
         </div>
     </Teleport>
 
-    <div
-        v-if="chatOpen && chatFloating"
-        :class="chatCardClasses"
-        class="fixed end-4.75 bottom-5 max-h-[calc(100dvh-11rem)] z-(--z-index-modal) group/chat flex w-84 max-w-[calc(100vw-2rem)] flex-col"
+    <!-- The floating chat fades up as it opens and fades back down as it closes, the same movement both ways. Reduced motion skips it. It stays mounted while closed (hidden), so opening it doesn't wait on building the chat and the animation starts straight away. -->
+    <Transition
+        enter-active-class="transition duration-200 ease-out motion-reduce:transition-none"
+        enter-from-class="translate-y-3 opacity-0"
+        leave-active-class="transition duration-200 ease-out motion-reduce:transition-none"
+        leave-to-class="translate-y-3 opacity-0"
     >
-        <AiChat />
-        <AiChatDockControl />
-    </div>
+        <div
+            v-if="chatFloating"
+            v-show="chatOpen"
+            :class="chatCardClasses"
+            class="fixed end-4.75 bottom-5 max-h-[calc(100dvh-11rem)] z-(--z-index-modal) group/chat flex w-84 max-w-[calc(100vw-2rem)] flex-col"
+        >
+            <AiChat />
+            <AiChatDockControl />
+        </div>
+    </Transition>
 
     <slot />
 </template>
