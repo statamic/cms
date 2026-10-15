@@ -59,6 +59,30 @@ class ConfigureFormInstancesTest extends TestCase
     }
 
     #[Test]
+    public function an_entry_editor_without_form_permission_keeps_the_working_copy_config_on_save()
+    {
+        config(['statamic.revisions.enabled' => true]);
+
+        [$user, $entry] = $this->seedEntry(['access cp', 'edit test entries', 'access en site'], ['contact' => []]);
+        $entry->collection()->revisionsEnabled(true)->save();
+
+        tap($entry->makeWorkingCopy(), function ($copy) {
+            $attrs = $copy->attributes();
+            $attrs['data']['form_instances'] = ['contact' => self::STORED];
+            $copy->attributes($attrs);
+        })->save();
+
+        $this->save($user, $entry, ['forms' => ['contact'], 'config' => ['contact' => []]]);
+
+        $entry = Entry::find($entry->id());
+
+        $this->assertSame('A', $entry->get('title'));
+        $this->assertEquals(['contact' => []], $entry->get('form_instances'));
+        $this->assertSame('Updated', $entry->fromWorkingCopy()->get('title'));
+        $this->assertEquals(['contact' => self::STORED], $entry->fromWorkingCopy()->get('form_instances'));
+    }
+
+    #[Test]
     public function an_entry_editor_without_form_permission_keeps_each_forms_own_config()
     {
         [$user, $entry] = $this->seedEntry(['access cp', 'edit test entries', 'access en site'], [
