@@ -83,6 +83,12 @@ function onKeydown(event) {
     }
 }
 
+// The input grows with what you type (the autosize library sets its height), but it only notices typing.
+// Clearing it from code leaves it as tall as the message was, so tell it to measure again.
+function shrinkInput() {
+    nextTick(() => form.value?.querySelector('textarea')?.dispatchEvent(new Event('autosize:update')));
+}
+
 function send(text = prompt.value) {
     text = text.trim();
     if (!text) return;
@@ -91,6 +97,7 @@ function send(text = prompt.value) {
 
     messages.value.push({ role: 'user', text });
     prompt.value = '';
+    shrinkInput();
     focusInput();
     scrollToBottom();
 
@@ -112,7 +119,7 @@ function scrollToBottom() {
     <!-- Docked in the sidebar, fill the height. Floating, be only as tall as the content. -->
     <div data-ai-chat :class="['relative flex min-h-0 flex-col', floating ? 'flex-initial' : 'flex-1']" @focusout="onFocusOut">
         <!-- Floating, there is nothing to show above the input until the first message. Docked, it fills the space. -->
-        <div v-if="messages.length || !floating" ref="thread" :class="['flex min-h-0 flex-col overflow-y-auto ps-0.5 pe-2.5 py-2', floating ? 'flex-initial' : 'flex-1']">
+        <div v-if="messages.length || !floating" ref="thread" :class="['flex min-h-0 flex-col overflow-y-auto ps-0.5 pe-2.5 pt-3.5 pb-2', floating ? 'flex-initial' : 'flex-1']">
             <!-- mt-auto keeps messages next to the input, while still scrolling once they overflow -->
             <div class="relative mt-auto space-y-3">
                 <!-- Docked, show the examples above the input until a request has been sent -->
@@ -124,7 +131,8 @@ function scrollToBottom() {
                         :class="[
                             'max-w-[85%] rounded-xl px-3 py-2 text-sm',
                             message.role === 'user'
-                                ? 'ms-auto bg-gray-900 text-white dark:bg-gray-200 dark:text-gray-900'
+                                // Your messages are a white card with a ring, like the CP's Card and the tool-call cards
+                                ? 'ms-auto bg-white text-gray-900 ring ring-gray-200 dark:bg-gray-850 dark:text-gray-200 dark:ring-gray-700/80'
                                 : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200',
                         ]"
                         v-text="message.text"

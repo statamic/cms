@@ -19,7 +19,8 @@ const icon = computed(() => (floating.value ? 'bar-sidebar-left-panel-open' : 'b
             // Same size and shape in both layouts, so the focus outline matches
             'absolute z-10 flex size-7 cursor-pointer items-center justify-center rounded-lg text-gray-600 transition-opacity hover:text-gray-900 focus-visible:opacity-100 focus-visible:focus-outline group-hover/chat:opacity-100 dark:text-gray-300 dark:hover:text-white',
             floating
-                ? '-end-3.5 -top-3.5 border border-gray-200 bg-white opacity-0 shadow-md dark:border-gray-600 dark:bg-gray-800'
+                // Anchored from the bottom, level with where the card's top corner is when it's just the input bar, so it stays put as messages make the card grow upwards
+                ? '-end-3.5 bottom-[37.5px] border border-gray-200 bg-white opacity-0 shadow-md dark:border-gray-600 dark:bg-gray-800'
                 : 'end-2 top-2 opacity-60 hover:bg-gray-950/5 dark:hover:bg-white/10',
         ]"
         @click="floating = !floating"
