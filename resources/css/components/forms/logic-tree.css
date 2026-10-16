@@ -1,0 +1,396 @@
+/* GROUP LOGIC TREE CONNECTORS
+=================================================== */
+/*
+    URL: /cp/forms/{handle}/logic (Tree view)
+
+    Connects source fields to destination page headers using CSS anchor
+    positioning. Inspired by: https://codepen.io/cbolson/pen/emzegWP
+
+    Markup (LogicTree.vue):
+
+        - Each page column is a .linked-list__column (.linked-list__page-name + .linked-list__sections).
+        - Each section is a .linked-list__section (.linked-list__section-marker + <ul>).
+        - Page headers: .linked-list__page-name with anchor-name: --page-N.
+        - Source fields: .linked-list__connector with --end-connection: --page-N, pointing at the target page’s anchor name.
+        - Multi-column hops: add .linked-list__page-leap on the source <li> and a .linked-list__extra-leap-connector child for the bridge segment. This helps separate multi-column connectors from adjacent pages.
+
+    Direct leap anatomy (source below destination page header):
+
+        [destination page header]
+                           ┌────── ::after — gap midpoint → destination corner
+                           │
+        [source]───────────┘ ::before — source centre → gap midpoint
+
+    Each direct connector is two pseudo-elements on .linked-list__connector:
+
+        ::before — vertical leg from source centre up toward the destination,
+                   plus the left half of the inter-column gap
+        ::after  — right half of the gap + rounded corner at the destination
+
+    Page leaps (.linked-list__page-leap + .linked-list__extra-leap-connector):
+
+        ::before on .linked-list__extra-leap-connector — stub out from the
+                   source and along the first gap
+        ::after  on .linked-list__extra-leap-connector — corner into the
+                   second column
+        ::before on .linked-list__connector — vertical leg from the buffer
+                   rail down to the destination page header
+
+    Anchors:
+
+        --start-connection — set on each .linked-list__connector <li> (the source)
+        var(--end-connection) — anchor name of the target page header, declared in
+                             markup as --end-connection: --page-N on the source <li>
+        anchor-scope: --start-connection — keeps each source’s connector isolated
+*/
+@layer components {
+    .linked-list-container {
+        /* Don't let max-content grid width expand ancestors — scroll inside here only */
+        width: 100%;
+        max-width: 100%;
+        overflow-x: auto;
+        overflow-y: visible;
+        contain: inline-size;
+        overscroll-behavior-x: contain;
+    }
+
+    .linked-list {
+        --join-stroke: 1px;
+        --join-line: var(--join-stroke) solid var(--color-blue-400);
+        --join-radius: 20px;
+
+        :where(.dark) & {
+            --join-line: var(--join-stroke) solid var(--color-blue-500);
+        }
+        --gap: 6rem;
+        --column-width: 12.5rem;
+
+        --item-padding: 1rem;
+        --item-height: 3.2rem;
+
+        /* Bit of a magic number here to pull the line into the gap between the items */
+        --buffer-top-pull: calc(0.8rem + var(--item-padding));
+        --buffer-left-pull: 1.5rem;
+
+        /* GROUP LOGIC TREE CONNECTORS / LAYOUT
+        =================================================== */
+        position: relative;
+        display: grid;
+        align-items: start;
+        grid-auto-flow: column;
+        grid-auto-columns: var(--column-width);
+        width: max-content;
+        margin-inline: auto;
+        gap: var(--gap);
+        @apply px-2 sm:px-6 md:px-12 pb-12;
+
+        .linked-list__column {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .linked-list__page-name {
+            @apply px-2 pt-2;
+        }
+
+        .linked-list__sections {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .linked-list__section {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .linked-list__section-marker {
+            display: flex;
+            align-items: end;
+            justify-content: center;
+            .linked-list__section:not(:first-child) & {
+                height: var(--item-height);
+            }
+            @apply text-2xs font-medium text-gray-800 dark:text-gray-200;
+            + ul {
+                @apply rounded-t-none;
+            }
+        }
+
+        .linked-list__section-marker-label {
+            @apply max-w-[8rem] shrink-0 select-none pt-1.5 rounded-t-xl bg-gray-100 dark:bg-transparent;
+            max-width: unset;
+            width: 100%;
+        }
+
+        ul {
+            margin: 0;
+            list-style: none;
+            display: grid;
+            gap: 0.5rem;
+            @apply p-1.5 px-1.5 bg-gray-100 rounded-lg dark:bg-gray-900/60;
+
+            li {
+                /* Use a grid instead of flexbox so we can force things into column 1 and 2.
+                   If we use flexbox then invisible items such as .linked-list__extra-leap-connector will take up an flex child space, changing the layout of items with a leap connector. */
+                display: grid;
+                grid-template-columns: 1rem 1fr;
+                > * {
+                    grid-row: 1;
+                }
+                & > svg {
+                    grid-column: 1;
+                }
+                .linked-list__field-name {
+                    grid-column: 2;
+                }
+                gap: 0.5rem;
+                height: var(--item-height);
+                padding-block: var(--item-padding);
+                @apply px-3 border-1 border-gray-300 rounded-md bg-white shadow-ui-xs text-xs text-gray-850 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:shadow-none;
+                &[data-field-item-selected] {
+                    /* Don't muddy the blue "selected" border layered on top */
+                    border-color: transparent;
+                }
+            }
+
+            /* A fieldset import <li> is a plain column; its rows carry the chrome. */
+            li.linked-list__fieldset {
+                display: flex;
+                flex-direction: column;
+                height: auto;
+                padding: 0;
+                @apply border-0! bg-transparent! shadow-none!;
+            }
+
+            /* GROUP LOGIC TREE CONNECTORS / SOURCE
+            =================================================== */
+            .linked-list__connector {
+                anchor-name: --start-connection;
+                anchor-scope: --start-connection; /* one anchor per source row */
+
+                /* GROUP LOGIC TREE CONNECTORS / DIRECT LEAP
+                =================================================== */
+                /* ::before spans source right edge → gap midpoint.
+                   ::after  spans gap midpoint → destination left edge. */
+                &::before,
+                &::after {
+                    content: '';
+                    position: absolute;
+                    pointer-events: none;
+                    border: var(--join-line);
+                    right: calc(anchor(left var(--end-connection)) + var(--gap) / 2);
+                    left: anchor(right --start-connection);
+                }
+
+                &::before {
+                    top: anchor(bottom var(--end-connection));
+                    bottom: anchor(center --start-connection);
+                    border-left-color: transparent;
+                    border-top-color: transparent;
+                    border-radius: 0 0 var(--join-radius) 0;
+                }
+
+                &::after {
+                    top: auto;
+                    right: anchor(left var(--end-connection));
+                    bottom: calc(anchor(bottom var(--end-connection)) - var(--join-stroke));
+                    left: calc(anchor(left var(--end-connection)) - var(--gap) / 2 - var(--join-stroke));
+                    height: var(--join-radius);
+                    border-right-color: transparent;
+                    border-bottom-color: transparent;
+                    border-radius: var(--join-radius) 0 0 0;
+                }
+            }
+            /* GROUP LOGIC TREE CONNECTORS / PAGE LEAP (SOURCE → NON-ADJACENT PAGE)
+            =================================================== */
+            /* Overrides the direct-hop ::before to terminate at the buffer rail instead of the source centre, leaving room for the bridge element. */
+            .linked-list__page-leap {
+                &::before,
+                &::after {
+                    border-style: dashed;
+                }
+                &::before {
+                    bottom: calc(anchor(center --start-connection) + var(--buffer-top-pull));
+                    left: calc(anchor(right --start-connection) + var(--gap));
+                }
+                /* When there's no adjacent cell, we don't need the extra leap connector, because we don't need to "cut" through a join */
+                &:not(.has-adjacent-cell) {
+                    &::before {
+                        bottom: anchor(center --start-connection);
+                        left: anchor(right --start-connection);
+                    }
+                    .linked-list__extra-leap-connector {
+                        display: none;
+                    }
+                }
+            }
+        }
+    }
+
+    /* GROUP LOGIC TREE CONNECTORS / VIEW MODES
+    =================================================== */
+    .linked-list__field-name {
+        @apply line-clamp-1 select-none;
+        [data-field-number] {
+            /* Optically align */
+            position: relative;
+            top: -0.2px;
+        }
+    }
+
+    .linked-list--expanded {
+        /* Bit of a magic number here to pull the line into the gap between the items */
+        --buffer-top-pull: calc(1.45rem + var(--item-padding));
+        --item-height: 4.5rem;
+        .linked-list__field-name {
+            @apply line-clamp-2;
+        }
+    }
+
+    /* GROUP LOGIC TREE / EMPTY SECTION
+    =================================================== */
+    /* Shown when a section has no fields (e.g. its last field was dragged out) so
+       the section sticks around as a drop target. */
+    .linked-list__empty-section {
+        @apply flex items-center justify-center rounded-md border border-dashed border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-800 text-2xs text-gray-500 dark:text-gray-400 select-none;
+        height: var(--item-height, 3.2rem);
+    }
+
+    /* While an item is dragged over the section, Sortable inserts it here - hide the placeholder. */
+    .field-sort-container:has([data-field-item]) .linked-list__empty-section {
+        display: none;
+    }
+
+    /* GROUP LOGIC TREE CONNECTORS / FIELDSETS
+    =================================================== */
+    /* A fieldset import is one entry (one <li>) holding a row per field. Each row
+       mirrors a normal field chip. The var fallbacks let the drag mirror - which
+       is cloned outside the tree - keep the right height. */
+    .linked-list__fieldset-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        height: var(--item-height, 3.2rem);
+        padding-block: var(--item-padding, 1rem);
+        @apply px-3 border-1 border-dashed border-gray-400/75! rounded-md bg-white shadow-ui-xs text-xs text-gray-850 dark:border-gray-600! dark:bg-gray-800 dark:text-gray-200 dark:shadow-none opacity-75;
+    }
+
+    .linked-list__hidden-field {
+        @apply opacity-75;
+    }
+
+    /* GROUP LOGIC TREE CONNECTORS / LEAP BRIDGE (FIRST GAP + CORNER)
+    =================================================== */
+    .linked-list__extra-leap-connector {
+        &::before {
+            top: calc(anchor(top --start-connection) + var(--buffer-top-pull) / 2 - var(--join-stroke) * 4);
+            bottom: anchor(center --start-connection);
+            left: anchor(right --start-connection);
+            width: calc(var(--gap) - var(--buffer-left-pull));
+            border-block-end: var(--join-line);
+            border-inline-end: var(--join-line);
+            border-bottom-right-radius: var(--join-radius);
+        }
+
+        &::after {
+            top: calc(anchor(center --start-connection) - var(--buffer-top-pull) - var(--join-stroke));
+            bottom: calc(anchor(center --start-connection) + var(--buffer-top-pull) / 2  + var(--join-stroke));
+            width: calc(var(--buffer-left-pull) + var(--join-stroke) * 2);
+            left: calc(anchor(right --start-connection) + var(--gap) - var(--buffer-left-pull) - var(--join-stroke));
+            border-inline-start: var(--join-line);
+            border-block-start: var(--join-line);
+            border-top-left-radius: var(--join-radius);
+        }
+
+        &::before,
+        &::after {
+            border-style: dashed;
+            content: '';
+            position: absolute;
+            pointer-events: none;
+        }
+    }
+
+    /* GROUP LOGIC TREE CONNECTORS / SELECTED ITEM
+    =================================================== */
+    /* When an item is selected, highlight its connection. */
+
+    /* When an item is selected, it should be on top of the other items. */
+    [data-field-item-selected] {
+        z-index: var(--z-index-above);
+    }
+
+    .linked-list:has([data-field-item-selected]) {
+        --_border-color: var(--color-blue-200);
+        .dark & {
+            --_border-color: var(--color-blue-925);
+        }
+
+        /* When an item is selected, get all columns that don't have an end connection */
+        .linked-list__column:not(.linked-list__column--has-end-connection) {
+            /* and dim their end connection arrow too */
+            .linked-list__page-name .logic-arrow {
+                color: var(--_border-color)!important;
+            }
+        }
+    }
+
+    .linked-list:has([data-field-item-selected].linked-list__connector) {
+        /* Dim the connectors of other relationships that are not selected */
+        li:not([data-field-item-selected]) {
+            &::before {
+                border-right-color: var(--_border-color);
+                border-bottom-color: var(--_border-color);
+            }
+            &::after {
+                border-left-color: var(--_border-color);
+                border-top-color: var(--_border-color);
+            }
+            .linked-list__extra-leap-connector {
+                &::before {
+                    border-block-end-color: var(--_border-color);
+                    border-inline-end-color: var(--_border-color);
+                }
+                &::after {
+                    border-block-start-color: var(--_border-color);
+                    border-inline-start-color: var(--_border-color);
+                }
+            }
+        }
+    }
+
+    /* GROUP LOGIC TREE CONNECTORS / DRAG MIRROR
+    =================================================== */
+    /* The drag mirror is cloned into <body>, outside the scoped tree styles, so it
+       needs its own look. A single field mirrors a normal chip. */
+    .linked-list__mirror {
+        display: grid;
+        grid-template-columns: 1rem 1fr;
+        gap: 0.5rem;
+        height: var(--item-height, 3.2rem);
+        padding-block: var(--item-padding, 1rem);
+        @apply px-3 border border-gray-300 rounded-md bg-white shadow-lg text-xs text-gray-850 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 cursor-grabbing;
+
+        > * {
+            grid-row: 1;
+        }
+        & > svg {
+            grid-column: 1;
+        }
+        .linked-list__field-name {
+            grid-column: 2;
+        }
+    }
+
+    /* A fieldset mirror is a plain column; its .linked-list__fieldset-row children keep their own chrome. */
+    .linked-list__mirror.linked-list__fieldset {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        height: auto;
+        padding: 0;
+        @apply border-0! bg-transparent! shadow-none!;
+    }
+}

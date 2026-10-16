@@ -6,26 +6,23 @@ use Statamic\Facades\User;
 
 class FormSubmissionPolicy
 {
-    public function before($user, $ability)
-    {
-        $user = User::fromUser($user);
-
-        if ($user->isSuper() || $user->hasPermission('configure forms')) {
-            return true;
-        }
-    }
-
     public function view($user, $submission)
     {
-        $user = User::fromUser($user);
-
-        return $user->hasPermission("view {$submission->form()->handle()} form submissions");
+        return User::fromUser($user)->can('viewSubmissions', $submission->form());
     }
 
     public function delete($user, $submission)
     {
-        $user = User::fromUser($user);
+        return User::fromUser($user)->can('deleteSubmissions', $submission->form());
+    }
 
-        return $user->hasPermission("delete {$submission->form()->handle()} form submissions");
+    public function markAsSpam($user, $submission)
+    {
+        return User::fromUser($user)->can('manageSpam', $submission->form());
+    }
+
+    public function markAsNotSpam($user, $submission)
+    {
+        return User::fromUser($user)->can('manageSpam', $submission->form());
     }
 }

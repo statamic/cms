@@ -83,7 +83,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-    <div class="group/input relative block w-full" data-ui-input>
+    <div class="group/input relative block w-full st-text-legibility" data-ui-input>
         <textarea
             ref="textarea"
             :class="classes"
@@ -93,6 +93,7 @@ onBeforeUnmount(() => {
             :value="modelValue"
             :disabled="disabled"
             :readonly="readOnly"
+            :required="required"
             :aria-describedby="resolvedDescribedBy"
             :aria-invalid="invalid ? 'true' : undefined"
             data-ui-control

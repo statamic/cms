@@ -7,6 +7,7 @@ use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Values;
+use Statamic\Forms\Fields\FormFields;
 use Statamic\GraphQL\Types\GroupType;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -170,8 +171,12 @@ class Group extends Fieldtype
     {
         $field = $this->field();
 
+        $formFields = new FormFields([
+            'sections' => [['fields' => $this->config('fields')]],
+        ]);
+
         $data['fields'] = collect($this->fields()->all())
-            ->map(fn ($child) => $child->setForm($field->form())->setHandle($field->handle().'.'.$child->handle()))
+            ->map(fn ($child) => $child->setForm($field->form())->setFormField($formFields->field($child->handle()))->setHandle($field->handle().'.'.$child->handle()))
             ->map(fn ($child) => $recursiveCallback($child))
             ->values()
             ->all();

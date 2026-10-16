@@ -56,6 +56,8 @@ const props = defineProps({
     inputAttrs: { type: [Object, String], default: () => ({}) },
     /** Additional CSS classes for the input element */
     inputClass: { type: String, default: '' },
+    /** When `true`, applies enhanced text legibility styles */
+    legibleText: { type: Boolean, default: true },
 });
 
 const { id, describedBy, invalid } = useUiFieldId(toRef(props, 'id'));
@@ -106,6 +108,10 @@ const resolvedDescribedBy = computed(() =>
 
 const hasPrependedIcon = computed(() => !!props.iconPrepend || !!props.icon || !!slots.prepend);
 const hasAppendedIcon = computed(() => !!props.iconAppend || !!slots.append || clearable.value || props.viewable || canCopy.value || props.loading);
+const wrapperClasses = computed(() => ([
+    'group/input relative block w-full',
+    props.legibleText ? 'st-text-legibility' : null,
+]));
 
 const inputClasses = computed(() => {
     const classes = cva({
@@ -224,7 +230,7 @@ defineExpose({ focus, select });
 <template>
     <ui-input-group v-bind="outerAttrs">
         <ui-input-group-prepend v-if="prepend" v-text="prepend" />
-        <div class="group/input relative block w-full st-text-legibility" data-ui-input>
+        <div :class="wrapperClasses" data-ui-input>
             <div v-if="hasPrependedIcon" :class="prependedIconClasses">
                 <slot name="prepend">
                     <Icon :name="iconPrepend || icon" />

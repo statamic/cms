@@ -15,6 +15,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | File Uploads Path
+    |--------------------------------------------------------------------------
+    |
+    | The path (on the file uploads disk) where file uploads are stored
+    | before they're converted to an asset or deleted.
+    |
+    */
+
+    'file_uploads_path' => env('STATAMIC_FORM_UPLOADS_PATH', 'statamic/form-uploads'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Email View Folder
     |--------------------------------------------------------------------------
     |
@@ -34,6 +46,45 @@ return [
     */
 
     'send_email_job' => \Statamic\Forms\SendEmail::class,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Connections Cache Store
+    |--------------------------------------------------------------------------
+    |
+    | The cache store used to track when a submission's connections have all
+    | finished, so its temporary files can be deleted. A persistent store
+    | such as "database" or "redis" is recommended. Null uses the default.
+    |
+    */
+
+    'connections_cache_store' => null,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Partial Submissions
+    |--------------------------------------------------------------------------
+    |
+    | Partial submissions are automatically deleted after a set number of days.
+    | Set this to null to prevent their automatic deletion.
+    |
+    */
+
+    'delete_partial_submissions_after' => 7,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Spam Submissions
+    |--------------------------------------------------------------------------
+    |
+    | Spam submissions are automatically deleted a set number of days after
+    | being marked as spam. Files uploaded through form upload fields are
+    | kept for the same period, so that submissions marked as not spam
+    | can still be finalized. Set this to null to prevent their deletion.
+    |
+    */
+
+    'delete_spam_submissions_after' => 30,
 
     /*
     |--------------------------------------------------------------------------

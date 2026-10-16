@@ -3,7 +3,6 @@
 namespace Tests\Forms;
 
 use PHPUnit\Framework\Attributes\Test;
-use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
 use Statamic\Facades\FormSubmission;
 use Statamic\Forms\Exporters\CsvExporter;
@@ -17,10 +16,12 @@ class CsvExporterTest extends TestCase
     #[Test]
     public function it_neutralizes_formula_injection_in_submission_values()
     {
-        $blueprint = Blueprint::makeFromFields(['name' => ['type' => 'text']]);
-        Blueprint::shouldReceive('find')->with('forms.test')->andReturn($blueprint);
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'name', 'field' => ['type' => 'short_answer']],
+            ],
+        ]))->save();
 
-        $form = tap(Form::make('test'))->save();
         FormSubmission::make()->form($form)->data(['name' => '=1+1'])->save();
 
         $csv = (new CsvExporter)->setForm($form)->setConfig([])->export();
@@ -63,13 +64,12 @@ class CsvExporterTest extends TestCase
 
     private function makeFormWithSubmission()
     {
-        $blueprint = Blueprint::makeFromFields([
-            'name' => ['type' => 'text'],
-            'email' => ['type' => 'text', 'display' => 'Email Address'],
-        ]);
-        Blueprint::partialMock()->shouldReceive('find')->with('forms.test')->andReturn($blueprint);
-
-        $form = tap(Form::make('test'))->save();
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'name', 'field' => ['type' => 'short_answer']],
+                ['handle' => 'email', 'field' => ['type' => 'short_answer', 'display' => 'Email Address']],
+            ],
+        ]))->save();
 
         FormSubmission::make()->form($form)->data(['name' => 'John', 'email' => 'john@example.com'])->save();
 
