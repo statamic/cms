@@ -91,6 +91,7 @@
                     :tab="tab"
                     v-show="currentTab === tab._id"
                     :show-section-handle-field="showSectionHandleField"
+                    :show-section-card-field="showSectionCardField"
                     :show-section-collapsible-field="showSectionCollapsibleField"
                     :show-section-hide-field="showSectionHideField"
                     :new-section-text="newSectionText"
@@ -168,6 +169,10 @@ export default {
             default: false,
         },
         showSectionHandleField: {
+            type: Boolean,
+            default: false,
+        },
+        showSectionCardField: {
             type: Boolean,
             default: false,
         },

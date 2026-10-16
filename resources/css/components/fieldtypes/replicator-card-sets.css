@@ -1,0 +1,116 @@
+/* GROUP REPLICATOR CARD SETS
+=================================================== */
+[data-replicator-dragging] [data-replicator-connector],
+[data-replicator-dragging] [data-replicator-set-picker],
+.draggable-mirror [data-replicator-connector],
+.draggable-mirror [data-replicator-set-picker] {
+    visibility: hidden;
+}
+
+@container panel (width > 635px) {
+    .replicator-set-list {
+        display: flex;
+        flex-wrap: wrap;
+        column-gap: 0.75rem;
+        align-items: start;
+    }
+
+    .replicator-set-slot--full,
+    .replicator-set-slot--card-cols-1 {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .replicator-set-slot--card-cols-2,
+    .replicator-set-slot--card-cols-3 {
+        position: relative;
+        width: calc((100% - 0.75rem) / 2);
+        min-width: 0;
+        padding-block-start: 1.5rem;
+
+        /* Too narrow for the collapsed preview, it only shows as clipped text */
+        [data-replicator-set-preview] {
+            display: none;
+        }
+
+        > div > [data-replicator-set-picker] {
+            position: absolute;
+            z-index: var(--z-index-above);
+            margin-block-start: 0;
+        }
+    }
+
+    @container panel (width > 935px) {
+        .replicator-set-slot--card-cols-3 {
+            width: calc((100% - 1.5rem) / 3);
+            min-width: 0;
+        }
+    }
+
+    .replicator-set-slot--card-cols-2,
+    .replicator-set-slot--card-cols-3 {
+        > div > [data-replicator-set] > [data-replicator-set-fields] > div > .publish-fields {
+            /* Prevent columns and gaps exceeding the container */
+            grid-column-gap: unset;
+
+            > .form-group {
+                --col-span: var(--grid-columns);
+            }
+        }
+    }
+
+    .replicator-card-set-row-start {
+        > div > [data-replicator-set-picker]:not([data-replicator-set-picker-end]) {
+            top: 0;
+            width: 100%;
+            height: 1.5rem;
+            align-items: center;
+            padding: 0;
+        }
+    }
+
+    .replicator-card-set-inset-picker {
+        &:not(.replicator-card-set-row-start) > div > [data-replicator-set-picker] [data-replicator-connector] {
+            display: none;
+        }
+
+        &:not(.replicator-card-set-row-start) > div > [data-replicator-set-picker]:not([data-replicator-set-picker-end]),
+        > div > [data-replicator-set-picker-end] {
+            display: flex;
+            position: absolute;
+            inset: 1.5rem auto 0 -0.75rem;
+            width: 0.75rem;
+            align-items: center;
+            padding: 0;
+            writing-mode: vertical-lr;
+
+            [data-insert-handle] {
+                position: absolute;
+                top: 0;
+                left: 50%;
+                transform: translateX(-50%);
+                height: 100%;
+                width: 0.325rem;
+                background: linear-gradient(to bottom, var(--color-gray-100) 0%, var(--color-gray-200) 50%, var(--color-gray-100) 100%);
+            }
+        }
+
+        > div > [data-replicator-set-picker][data-replicator-set-picker-end] {
+            right: -0.75rem;
+            left: auto;
+        }
+    }
+
+    .replicator-card-set-row-start.replicator-card-set-has-entry-connector {
+        &.replicator-set-slot--card-cols-2 > div > [data-replicator-set-picker]:not([data-replicator-set-picker-end]),
+        &.replicator-set-slot--card-cols-3 > div > [data-replicator-set-picker]:not([data-replicator-set-picker-end]) {
+            width: calc(200% + 0.75rem);
+        }
+
+        @container panel (width > 935px) {
+            &.replicator-set-slot--card-cols-3 > div > [data-replicator-set-picker]:not([data-replicator-set-picker-end]) {
+                width: calc(300% + 1.5rem);
+            }
+        }
+    }
+}

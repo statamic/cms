@@ -31,6 +31,7 @@ class SetsTest extends TestCase
                         'instructions' => 'One instructions',
                         'icon' => 'one-icon',
                         'hide' => true,
+                        'card' => true,
                         'fields' => [
                             ['handle' => 'field_one', 'field' => ['type' => 'text']],
                         ],
@@ -65,6 +66,7 @@ class SetsTest extends TestCase
                         'icon' => 'one-icon',
                         'image' => null,
                         'hide' => true,
+                        'card' => true,
                         'fields' => [
                             [
                                 '_id' => 'group-alfa-section-one-0',
@@ -97,6 +99,7 @@ class SetsTest extends TestCase
                         'icon' => null,
                         'image' => null,
                         'hide' => null,
+                        'card' => false,
                         'fields' => [
                             [
                                 '_id' => 'group-bravo-section-two-0',
@@ -149,6 +152,7 @@ class SetsTest extends TestCase
                         'icon' => 'one-icon',
                         'image' => null,
                         'hide' => null,
+                        'card' => false,
                         'fields' => [
                             [
                                 '_id' => 'group-main-section-one-0',
@@ -254,6 +258,7 @@ class SetsTest extends TestCase
                         ],
                         'handle' => 'one',
                         'id' => 'one',
+                        'card' => false,
                         'image' => null,
                     ],
                 ],
@@ -294,6 +299,7 @@ class SetsTest extends TestCase
                         ],
                         'handle' => 'two',
                         'id' => 'two',
+                        'card' => false,
                         'image' => null,
                     ],
                 ],
@@ -357,6 +363,7 @@ class SetsTest extends TestCase
                         ],
                         'handle' => 'one',
                         'id' => 'one',
+                        'card' => false,
                         'image' => null,
                     ],
                 ],
@@ -457,6 +464,7 @@ class SetsTest extends TestCase
                         'icon' => 'one-icon',
                         'image' => null,
                         'hide' => false,
+                        'card' => false,
                         'fields' => [
                             [
                                 'handle' => 'field_one',

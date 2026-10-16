@@ -89,6 +89,10 @@ class FieldTransformer
                                             unset($set['hide']);
                                         }
 
+                                        if (! Arr::get($set, 'card')) {
+                                            unset($set['card']);
+                                        }
+
                                         return $set;
                                     })
                                     ->filter()
