@@ -3,7 +3,6 @@
 namespace Statamic\Http\Controllers\CP\Forms;
 
 use Illuminate\Http\Request;
-use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\CP\Column;
@@ -159,15 +158,15 @@ class FormsController extends CpController
 
         $fields = ConfigFields::blueprint($form)->fields()->addValues($request->all());
 
-        $fields->validate();
+        $fields->validator()->validator()
+            ->after(function ($validator) use ($form) {
+                if (($validator->getData()['unique_instances'] ?? false) && ! $form->hasUniqueInstances() && $form->fields()->has('entry')) {
+                    $validator->errors()->add('unique_instances', __('statamic::validation.form_unique_instances_entry_field'));
+                }
+            })
+            ->validate();
 
         $values = $fields->process()->values()->all();
-
-        if (($values['unique_instances'] ?? false) && ! $form->hasUniqueInstances() && $form->fields()->has('entry')) {
-            throw ValidationException::withMessages([
-                'unique_instances' => __('statamic::validation.form_unique_instances_entry_field'),
-            ]);
-        }
 
         $data = collect($values)->except(['title', 'honeypot', 'store']);
 
