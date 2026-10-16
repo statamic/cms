@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Forms;
 
+use Facades\Statamic\Console\Processes\Composer;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Facades\Blueprint as BlueprintFacade;
@@ -26,6 +27,13 @@ class ViewConnectorsTest extends TestCase
         $app['config']['statamic.forms.forms'] = $this->fakeStacheDirectory.'/forms';
 
         $app->booting(fn () => AcmeConnector::register());
+    }
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(false)->byDefault();
     }
 
     #[Test]

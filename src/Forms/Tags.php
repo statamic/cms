@@ -11,8 +11,10 @@ use Statamic\Contracts\Forms\Submission;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
+use Statamic\Facades\Entry;
 use Statamic\Facades\Form;
 use Statamic\Fields\Tab;
+use Statamic\Fieldtypes\FormInstances;
 use Statamic\Forms\JsDrivers\AbstractJsDriver;
 use Statamic\Forms\JsDrivers\JsDriver;
 use Statamic\Forms\Logic\PageLogic;
@@ -99,9 +101,19 @@ class Tags extends BaseTags
             $data['previous_page_url'] = $this->previousPageUrl();
         }
 
-        $data['restricted'] = $form->restricted();
-        $data['restriction_message'] = $form->restrictionMessage();
-        $data['status'] = $form->status();
+        $entry = $this->submittableEntry($form);
+
+        if ($form->hasUniqueInstances() && ! $entry) {
+            $data['restricted'] = true;
+            $data['restriction_message'] = __('statamic::validation.form_must_be_submitted_from_an_entry');
+            $data['status'] = 'closed';
+        } else {
+            $instance = $form->instance($entry);
+
+            $data['restricted'] = $instance->restricted();
+            $data['restriction_message'] = $instance->restrictionMessage();
+            $data['status'] = $instance->status();
+        }
 
         if ($jsDriver) {
             $data['js_driver'] = $jsDriver->handle();
@@ -144,6 +156,10 @@ class Tags extends BaseTags
             $params['page'] = Arr::get($this->currentPage(), 'id');
         }
 
+        if ($entry) {
+            $params['entry'] = $entry;
+        }
+
         if (! $this->canParseContents()) {
             return array_merge([
                 'attrs' => $this->formAttrs($action, $method, $knownParams, $attrs),
@@ -166,6 +182,19 @@ class Tags extends BaseTags
         }
 
         return $html;
+    }
+
+    private function submittableEntry(FormContract $form): ?string
+    {
+        if (! $form->hasUniqueInstances() || ! $id = $this->context->value('id')) {
+            return null;
+        }
+
+        if (! $entry = Entry::find($id)) {
+            return null;
+        }
+
+        return array_key_exists($form->handle(), FormInstances::forEntry($entry)) ? $entry->root()->id() : null;
     }
 
     /**
@@ -591,7 +620,7 @@ class Tags extends BaseTags
 
     private function getPartialSubmission(): ?Submission
     {
-        $id = session()->get("form.{$this->form()->handle()}.partial_submission");
+        $id = session()->get(SubmitForm::partialSubmissionSessionKey($this->form(), $this->submittableEntry($this->form())));
         $submission = $this->form()->submission($id);
 
         if ($submission && ! $submission->isPartial()) {

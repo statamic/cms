@@ -151,7 +151,7 @@ class Email extends Mailable
             return $this;
         }
 
-        $this->getRenderableFieldData(Arr::except($this->submissionData, ['id', 'date', 'form']))
+        $this->getRenderableFieldData(Arr::except($this->submissionData, $this->nonFieldKeys()))
             ->filter(fn ($field) => in_array($field['fieldtype'], ['assets', 'files', 'form_upload']))
             ->each(function ($field) {
                 $field['value'] = $field['value']->value();
@@ -244,7 +244,7 @@ class Email extends Mailable
             ->reject(fn (FormField $field) => $field->fieldtype()->collectsValue())
             ->keys();
 
-        $fields = $this->getRenderableFieldData(Arr::except($augmented, ['id', 'date', 'form']))
+        $fields = $this->getRenderableFieldData(Arr::except($augmented, $this->nonFieldKeys()))
             ->reject(fn ($field) => $excludedFields->contains($field['handle']))
             ->when(Arr::has($this->config, 'attachments'), function ($fields) {
                 return $fields->reject(fn ($field) => in_array($field['fieldtype'], ['assets', 'files', 'form_upload']));
@@ -266,6 +266,17 @@ class Email extends Mailable
             ])
             ->values()
             ->all();
+    }
+
+    private function nonFieldKeys(): array
+    {
+        $keys = ['id', 'date', 'form'];
+
+        if ($this->submission->has('_entry')) {
+            $keys[] = 'entry';
+        }
+
+        return $keys;
     }
 
     protected function getRenderableFieldData($values)

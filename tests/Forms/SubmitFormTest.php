@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Actions\MarkAsNotSpam;
 use Statamic\Events\FormSubmitted;
@@ -19,6 +20,10 @@ use Statamic\Exceptions\FormRestrictedException;
 use Statamic\Exceptions\SilentFormFailureException;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
+use Statamic\Facades\Blink;
+use Statamic\Facades\Blueprint;
+use Statamic\Facades\Collection;
+use Statamic\Facades\Entry;
 use Statamic\Facades\Fieldset;
 use Statamic\Facades\File;
 use Statamic\Facades\Form;
@@ -28,6 +33,7 @@ use Statamic\Forms\Email;
 use Statamic\Forms\SendEmail;
 use Statamic\Forms\SubmissionResult;
 use Statamic\Forms\SubmitForm;
+use Tests\Factories\EntryFactory;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -1800,6 +1806,249 @@ class SubmitFormTest extends TestCase
         $this->assertTrue($result->isFinalized());
 
         $form->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function it_attaches_the_entry_when_unique_instances_is_enabled()
+    {
+        $this->makeEntry('event-1', ['contact' => []]);
+
+        $this->form->set('unique_instances', true)->set('unique_instances_collections', ['events'])->save();
+
+        $result = $this->action()->entry('event-1')->submit(['email' => 'san@holo.com']);
+
+        $this->assertEquals('event-1', $result->submission->get('_entry'));
+    }
+
+    #[Test]
+    public function it_rejects_the_submission_when_unique_instances_is_enabled_and_no_entry_is_provided()
+    {
+        $this->form->set('unique_instances', true)->set('unique_instances_collections', ['events'])->save();
+
+        $this->expectException(ValidationException::class);
+
+        $this->action()->submit(['email' => 'san@holo.com']);
+    }
+
+    #[Test]
+    public function it_rejects_the_submission_when_the_entry_does_not_exist()
+    {
+        $this->form->set('unique_instances', true)->set('unique_instances_collections', ['events'])->save();
+
+        $this->expectException(ValidationException::class);
+
+        $this->action()->entry('missing')->submit(['email' => 'san@holo.com']);
+    }
+
+    #[Test]
+    public function it_rejects_the_submission_when_the_entry_doesnt_use_the_form()
+    {
+        $this->makeEntry('event-1', ['another_form' => []]);
+
+        $this->form->set('unique_instances', true)->set('unique_instances_collections', ['events'])->save();
+
+        $this->expectException(ValidationException::class);
+
+        $this->action()->entry('event-1')->submit(['email' => 'san@holo.com']);
+    }
+
+    #[Test]
+    #[DataProvider('formFieldReferences')]
+    public function it_rejects_an_entry_that_only_references_the_form_from_a_form_field($fields, $data)
+    {
+        Blueprint::make('event')->setNamespace('collections.events')->setContents(['fields' => $fields])->save();
+
+        (new EntryFactory)->collection('events')->id('event-1')->slug('event-one')->data($data)->create();
+
+        $this->form->set('unique_instances', true)->set('unique_instances_collections', ['events'])->save();
+
+        $this->expectException(ValidationException::class);
+
+        $this->action()->entry('event-1')->submit(['email' => 'san@holo.com']);
+    }
+
+    public static function formFieldReferences(): array
+    {
+        $form = ['handle' => 'rsvp_form', 'field' => ['type' => 'form', 'max_items' => 1]];
+        $instances = ['handle' => 'form_instances', 'field' => ['type' => 'form_instances']];
+
+        return [
+            'top level form field' => [
+                [$form],
+                ['rsvp_form' => 'contact'],
+            ],
+            'form field in a replicator' => [
+                [['handle' => 'blocks', 'field' => ['type' => 'replicator', 'sets' => ['rsvp' => ['fields' => [$form]]]]]],
+                ['blocks' => [['type' => 'rsvp', 'rsvp_form' => 'contact']]],
+            ],
+            'nested form instances field' => [
+                [['handle' => 'blocks', 'field' => ['type' => 'replicator', 'sets' => ['rsvp' => ['fields' => [$instances]]]]]],
+                ['blocks' => [['type' => 'rsvp', 'form_instances' => ['contact' => []]]]],
+            ],
+        ];
+    }
+
+    #[Test]
+    public function it_accepts_each_form_enabled_on_the_entry()
+    {
+        $this->makeEntry('event-1', ['contact' => [], 'feedback' => []]);
+
+        $feedback = tap(Form::make('feedback')->set('unique_instances', true)->set('unique_instances_collections', ['events'])->formFields([
+            'pages' => [['id' => 'main', 'sections' => [['fields' => [['handle' => 'rating', 'field' => ['type' => 'short_answer']]]]]]],
+        ]))->save();
+
+        $this->form->set('unique_instances', true)->set('unique_instances_collections', ['events'])->save();
+
+        $contactResult = $this->action()->entry('event-1')->submit(['email' => 'san@holo.com']);
+        $feedbackResult = app(SubmitForm::class)->form($feedback)->page('main')->entry('event-1')->submit(['rating' => '5']);
+
+        $this->assertEquals('event-1', $contactResult->submission->get('_entry'));
+        $this->assertEquals('event-1', $feedbackResult->submission->get('_entry'));
+
+        $feedback->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function it_rejects_the_submission_when_the_form_no_longer_targets_the_entrys_collection()
+    {
+        $this->makeEntry('event-1', ['contact' => []]);
+
+        $this->form->set('unique_instances', true)->set('unique_instances_collections', ['pages'])->save();
+
+        $this->expectException(ValidationException::class);
+
+        $this->action()->entry('event-1')->submit(['email' => 'san@holo.com']);
+    }
+
+    #[Test]
+    public function it_ignores_the_entry_when_unique_instances_is_disabled()
+    {
+        (new EntryFactory)->collection('events')->id('event-1')->slug('event-one')->create();
+
+        $result = $this->action()->entry('event-1')->submit(['email' => 'san@holo.com']);
+
+        $this->assertFalse($result->submission->has('entry'));
+    }
+
+    #[Test]
+    public function it_starts_a_fresh_submission_when_resuming_a_partial_from_another_entry()
+    {
+        $this->makeEntry('event-1', ['contact' => []]);
+        $this->makeEntry('event-2', ['contact' => []]);
+
+        $this->form->set('unique_instances', true)->set('unique_instances_collections', ['events'])->save();
+
+        $partial = tap($this->form->makeSubmission()->data(['_entry' => 'event-1', 'email' => 'san@holo.com'])->asPartial())->save();
+
+        $result = $this->action()->entry('event-2')->resume($partial)->submit(['email' => 'foba@bett.com']);
+
+        $this->assertNotEquals($partial->id(), $result->submission->id());
+        $this->assertEquals('event-2', $result->submission->get('_entry'));
+        $this->assertEquals('event-1', $this->form->submission($partial->id())->get('_entry'));
+        $this->assertEquals('san@holo.com', $this->form->submission($partial->id())->get('email'));
+    }
+
+    #[Test]
+    public function it_resumes_a_partial_from_the_same_entry()
+    {
+        $this->makeEntry('event-1', ['contact' => []]);
+
+        $this->form->set('unique_instances', true)->set('unique_instances_collections', ['events'])->save();
+
+        $partial = tap($this->form->makeSubmission()->data(['_entry' => 'event-1'])->asPartial())->save();
+
+        $result = $this->action()->entry('event-1')->resume($partial)->submit(['email' => 'san@holo.com']);
+
+        $this->assertEquals($partial->id(), $result->submission->id());
+    }
+
+    #[Test]
+    public function it_attaches_the_root_entry_when_submitted_from_a_localization()
+    {
+        $this->makeLocalizedEntry('event-1', ['contact' => []]);
+
+        $this->form->set('unique_instances', true)->set('unique_instances_collections', ['events'])->save();
+
+        $result = $this->action()->entry('event-1-fr')->submit(['email' => 'san@holo.com']);
+
+        $this->assertEquals('event-1', $result->submission->get('_entry'));
+    }
+
+    #[Test]
+    public function it_resumes_a_partial_started_on_another_localization_of_the_entry()
+    {
+        $this->makeLocalizedEntry('event-1', ['contact' => []]);
+
+        $this->form->set('unique_instances', true)->set('unique_instances_collections', ['events'])->save();
+
+        $partial = tap($this->form->makeSubmission()->data(['_entry' => 'event-1'])->asPartial())->save();
+
+        $result = $this->action()->entry('event-1-fr')->resume($partial)->submit(['email' => 'san@holo.com']);
+
+        $this->assertEquals($partial->id(), $result->submission->id());
+        $this->assertEquals('event-1', $result->submission->get('_entry'));
+    }
+
+    #[Test]
+    public function it_rejects_a_localizations_submission_once_the_shared_limit_is_reached()
+    {
+        $this->makeLocalizedEntry('event-1', ['contact' => ['submission_limit' => 1]]);
+
+        $this->form->set('unique_instances', true)->set('unique_instances_collections', ['events'])->save();
+
+        $this->action()->entry('event-1')->submit(['email' => 'san@holo.com']);
+
+        $this->expectException(FormRestrictedException::class);
+
+        $this->action()->entry('event-1-fr')->submit(['email' => 'foba@bett.com']);
+    }
+
+    #[Test]
+    public function it_rejects_the_submission_when_an_entry_override_restricts_the_form()
+    {
+        $this->makeEntry('event-1', ['contact' => ['close_date' => '2020-01-01 09:00']]);
+
+        $this->form->set('unique_instances', true)->set('unique_instances_collections', ['events'])->save();
+
+        $this->expectException(FormRestrictedException::class);
+
+        $this->action()->entry('event-1')->submit(['email' => 'san@holo.com']);
+    }
+
+    #[Test]
+    public function it_ignores_unique_instances_when_forms_pro_is_not_installed()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturnFalse();
+        Blink::forget('forms-pro-installed');
+
+        $this->form->set('unique_instances', true)->set('unique_instances_collections', ['events'])->save();
+
+        $result = $this->action()->submit(['email' => 'san@holo.com']);
+
+        $this->assertFalse($result->submission->has('entry'));
+    }
+
+    private function makeEntry(string $id, array $formInstances): void
+    {
+        Blueprint::make('event')->setNamespace('collections.events')->setContents(['fields' => [
+            ['handle' => 'form_instances', 'field' => ['type' => 'form_instances']],
+        ]])->save();
+
+        (new EntryFactory)->collection('events')->id($id)->slug($id)->data(['form_instances' => $formInstances])->create();
+    }
+
+    private function makeLocalizedEntry(string $id, array $formInstances): void
+    {
+        $this->setSites([
+            'en' => ['url' => '/', 'locale' => 'en'],
+            'fr' => ['url' => '/fr/', 'locale' => 'fr'],
+        ]);
+
+        $this->makeEntry($id, $formInstances);
+
+        Collection::findByHandle('events')->sites(['en', 'fr'])->save();
+
+        Entry::find($id)->makeLocalization('fr')->id($id.'-fr')->save();
     }
 
     private function uploadForm(bool $honeypot = false)

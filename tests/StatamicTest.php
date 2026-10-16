@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Request;
@@ -364,5 +365,14 @@ class StatamicTest extends TestCase
 
         $this->assertSame(50, Statamic::cpPerPage(1000));
         $this->assertSame(25, Statamic::cpPerPage(25));
+    }
+
+    #[Test]
+    public function forms_pro_installed_check_is_memoized()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->once()->andReturnTrue();
+
+        $this->assertTrue(Statamic::formsProInstalled());
+        $this->assertTrue(Statamic::formsProInstalled());
     }
 }

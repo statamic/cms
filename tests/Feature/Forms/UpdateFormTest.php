@@ -2,7 +2,9 @@
 
 namespace Tests\Feature\Forms;
 
+use Facades\Statamic\Console\Processes\Composer;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\Fieldset;
 use Statamic\Facades\Form;
 use Statamic\Facades\User;
 use Tests\FakesRoles;
@@ -19,6 +21,13 @@ class UpdateFormTest extends TestCase
         parent::resolveApplicationConfiguration($app);
 
         $app['config']['statamic.forms.forms'] = $this->fakeStacheDirectory.'/forms';
+    }
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(false)->byDefault();
     }
 
     #[Test]
@@ -112,6 +121,139 @@ class UpdateFormTest extends TestCase
             'another_config' => 'bar',
             'some_config' => 'foo',
         ], $updated->data()->all());
+    }
+
+    #[Test]
+    public function it_cant_enable_unique_instances_when_the_form_has_an_entry_field()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'entry', 'field' => ['type' => 'short_answer']],
+            ],
+        ]))->save();
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->update($form, ['unique_instances' => true, 'unique_instances_collections' => ['events']])
+            ->assertSessionHasErrors(['unique_instances' => __('statamic::validation.form_unique_instances_entry_field')]);
+
+        $this->assertFalse(Form::find('test')->hasUniqueInstances());
+    }
+
+    #[Test]
+    public function it_cant_enable_unique_instances_when_the_form_imports_an_entry_field()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        $fieldset = Fieldset::make('contest')->setContents([
+            'fields' => [
+                ['handle' => 'try', 'field' => ['type' => 'short_answer']],
+            ],
+        ]);
+        Fieldset::shouldReceive('find')->with('contest')->andReturn($fieldset);
+
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['import' => 'contest', 'prefix' => 'en'],
+            ],
+        ]))->save();
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->update($form, ['unique_instances' => true, 'unique_instances_collections' => ['events']])
+            ->assertSessionHasErrors(['unique_instances' => __('statamic::validation.form_unique_instances_entry_field')]);
+
+        $this->assertFalse(Form::find('test')->hasUniqueInstances());
+    }
+
+    #[Test]
+    public function it_reports_the_entry_field_and_missing_collections_together()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'entry', 'field' => ['type' => 'short_answer']],
+            ],
+        ]))->save();
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->update($form, ['unique_instances' => true, 'unique_instances_collections' => []])
+            ->assertSessionHasErrors([
+                'unique_instances' => __('statamic::validation.form_unique_instances_entry_field'),
+                'unique_instances_collections' => 'This field is required when Unique Instances is true.',
+            ]);
+
+        $this->assertFalse(Form::find('test')->hasUniqueInstances());
+    }
+
+    #[Test]
+    public function it_can_enable_unique_instances_when_the_form_has_no_entry_field()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'name', 'field' => ['type' => 'short_answer']],
+            ],
+        ]))->save();
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->update($form, ['unique_instances' => true, 'unique_instances_collections' => ['events']])
+            ->assertSessionHasNoErrors();
+
+        $this->assertTrue(Form::find('test')->hasUniqueInstances());
+    }
+
+    #[Test]
+    public function it_requires_collections_when_enabling_unique_instances()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        $form = tap(Form::make('test'))->save();
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->update($form, ['unique_instances' => true, 'unique_instances_collections' => []])
+            ->assertSessionHasErrors(['unique_instances_collections' => 'This field is required when Unique Instances is true.']);
+
+        $this->assertFalse(Form::find('test')->hasUniqueInstances());
+    }
+
+    #[Test]
+    public function it_enables_unique_instances_with_a_collection()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        $form = tap(Form::make('test'))->save();
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->update($form, ['unique_instances' => true, 'unique_instances_collections' => ['events']])
+            ->assertSessionHasNoErrors();
+
+        $form = Form::find('test');
+        $this->assertTrue($form->hasUniqueInstances());
+        $this->assertEquals(['events'], $form->uniqueInstancesCollections());
+    }
+
+    #[Test]
+    public function it_doesnt_require_collections_when_unique_instances_is_off()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        $form = tap(Form::make('test'))->save();
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->update($form, ['unique_instances' => false, 'unique_instances_collections' => []])
+            ->assertSessionHasNoErrors();
+
+        $this->assertFalse(Form::find('test')->hasUniqueInstances());
     }
 
     private function userWithoutPermission()

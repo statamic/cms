@@ -198,7 +198,9 @@ class EntriesController extends CpController
 
         $entry = $entry->fromWorkingCopy();
 
+        Blink::forget("entry-{$entry->id()}-blueprint");
         $blueprint = $entry->blueprint();
+        $blueprint->setParent($entry);
 
         $data = $request->except('id');
 

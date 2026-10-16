@@ -10,11 +10,15 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\AssetContainer;
+use Statamic\Facades\Blueprint;
+use Statamic\Facades\Collection;
+use Statamic\Facades\Entry;
 use Statamic\Facades\Fieldset as FieldsetRepository;
 use Statamic\Facades\Form;
 use Statamic\Fields\Fieldset;
 use Statamic\Forms\SendEmail;
 use Statamic\Statamic;
+use Tests\Factories\EntryFactory;
 
 class FormCreateTest extends FormTestCase
 {
@@ -56,6 +60,244 @@ class FormCreateTest extends FormTestCase
 
         $this->assertStringContainsString('<input type="hidden" name="_redirect" value="http://localhost#form" />', $output);
         $this->assertStringContainsString('<input type="hidden" name="_error_redirect" value="http://localhost#form" />', $output);
+    }
+
+    #[Test]
+    public function it_renders_a_hidden_entry_input_when_unique_instances_is_enabled()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        Form::find('contact')->set('unique_instances', true)->set('unique_instances_collections', ['events'])->save();
+
+        $this->makeEntry('event-1', ['contact' => []]);
+
+        $output = $this->tag('{{ form:contact }}{{ /form:contact }}', ['id' => 'event-1']);
+
+        $this->assertStringContainsString('<input type="hidden" name="_entry" value="event-1" />', $output);
+    }
+
+    #[Test]
+    public function it_doesnt_render_a_hidden_entry_input_when_unique_instances_is_disabled()
+    {
+        $output = $this->tag('{{ form:contact }}{{ /form:contact }}', ['id' => 'event-1']);
+
+        $this->assertStringNotContainsString('name="_entry"', $output);
+    }
+
+    #[Test]
+    public function it_doesnt_render_a_hidden_entry_input_outside_an_entry_context()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        Form::find('contact')->set('unique_instances', true)->set('unique_instances_collections', ['events']);
+
+        $output = $this->tag('{{ form:contact }}{{ /form:contact }}');
+
+        $this->assertStringNotContainsString('name="_entry"', $output);
+    }
+
+    #[Test]
+    public function it_doesnt_render_a_hidden_entry_input_when_the_entry_doesnt_use_the_form()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        Form::find('contact')->set('unique_instances', true)->set('unique_instances_collections', ['events']);
+
+        $this->makeEntry('event-1', ['another_form' => []]);
+
+        $output = $this->tag('{{ form:contact }}{{ /form:contact }}', ['id' => 'event-1']);
+
+        $this->assertStringNotContainsString('name="_entry"', $output);
+    }
+
+    #[Test]
+    public function it_renders_the_closed_state_when_the_entry_doesnt_use_the_form()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        Form::find('contact')->set('unique_instances', true)->set('unique_instances_collections', ['events']);
+
+        $this->makeEntry('event-1', ['another_form' => []]);
+
+        $output = $this->tag('{{ form:contact }}{{ restricted }}|{{ status }}|{{ restriction_message }}{{ /form:contact }}', ['id' => 'event-1']);
+
+        $this->assertStringContainsString('1|closed|'.__('statamic::validation.form_must_be_submitted_from_an_entry'), $output);
+        $this->assertStringNotContainsString('name="_entry"', $output);
+    }
+
+    #[Test]
+    public function it_renders_the_closed_state_when_only_a_form_field_references_the_form()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        Form::find('contact')->set('unique_instances', true)->set('unique_instances_collections', ['events']);
+
+        Blueprint::make('event')->setNamespace('collections.events')->setContents(['fields' => [
+            ['handle' => 'rsvp_form', 'field' => ['type' => 'form', 'max_items' => 1]],
+        ]])->save();
+
+        (new EntryFactory)->collection('events')->id('event-1')->slug('event-1')->data(['rsvp_form' => 'contact'])->create();
+
+        $output = $this->tag('{{ form:contact }}{{ restricted }}|{{ status }}{{ /form:contact }}', ['id' => 'event-1']);
+
+        $this->assertStringContainsString('1|closed', $output);
+        $this->assertStringNotContainsString('name="_entry"', $output);
+    }
+
+    #[Test]
+    public function it_renders_the_closed_state_outside_an_entry_context()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        Form::find('contact')->set('unique_instances', true)->set('unique_instances_collections', ['events']);
+
+        $output = $this->tag('{{ form:contact }}{{ restricted }}|{{ status }}|{{ restriction_message }}{{ /form:contact }}');
+
+        $this->assertStringContainsString('1|closed|'.__('statamic::validation.form_must_be_submitted_from_an_entry'), $output);
+        $this->assertStringNotContainsString('name="_entry"', $output);
+    }
+
+    #[Test]
+    public function it_doesnt_render_the_closed_state_when_unique_instances_is_disabled()
+    {
+        $output = $this->tag('{{ form:contact }}{{ restricted }}|{{ status }}{{ /form:contact }}');
+
+        $this->assertStringNotContainsString('closed', $output);
+    }
+
+    #[Test]
+    public function it_uses_entry_restrictions_when_the_entry_uses_the_form()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        Form::find('contact')->set('unique_instances', true)->set('unique_instances_collections', ['events']);
+
+        $this->makeEntry('event-1', ['contact' => ['close_date' => '2000-01-01']]);
+
+        $output = $this->tag('{{ form:contact }}{{ restricted }}|{{ status }}{{ /form:contact }}', ['id' => 'event-1']);
+
+        $this->assertStringContainsString('|closed', $output);
+    }
+
+    #[Test]
+    public function a_localization_renders_its_roots_entry_in_the_hidden_input()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        Form::find('contact')->set('unique_instances', true)->set('unique_instances_collections', ['events'])->save();
+
+        $this->makeLocalizedEntry('event-1', ['contact' => []]);
+
+        $output = $this->tag('{{ form:contact }}{{ /form:contact }}', ['id' => 'event-1-fr']);
+
+        $this->assertStringContainsString('<input type="hidden" name="_entry" value="event-1" />', $output);
+    }
+
+    #[Test]
+    public function a_localization_renders_the_shared_instances_status()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        Form::find('contact')->set('unique_instances', true)->set('unique_instances_collections', ['events'])->save();
+
+        $this->makeLocalizedEntry('event-1', ['contact' => ['submission_limit' => 1]]);
+
+        Form::find('contact')->makeSubmission()->data(['_entry' => 'event-1'])->save();
+
+        $output = $this->tag('{{ form:contact }}{{ restricted }}|{{ status }}{{ /form:contact }}', ['id' => 'event-1-fr']);
+
+        $this->assertStringContainsString('1|limit_reached', $output);
+    }
+
+    #[Test]
+    public function a_submission_from_a_localization_is_attached_to_the_root_entry()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        $form = tap(Form::find('contact')->set('unique_instances', true)->set('unique_instances_collections', ['events']))->save();
+
+        $this->makeLocalizedEntry('event-1', ['contact' => []]);
+
+        $this
+            ->post('/!/forms/contact', ['_entry' => 'event-1-fr', 'email' => 'san@holo.com'], ['Referer' => 'http://localhost/fr/event-1'])
+            ->assertSessionHasNoErrors();
+
+        $submission = $form->submissions()->first();
+        $this->assertEquals('event-1', $submission->get('_entry'));
+        $this->assertEquals('fr', $submission->get('_site'));
+    }
+
+    #[Test]
+    public function localizations_share_the_submission_limit()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        $form = tap(Form::find('contact')->set('unique_instances', true)->set('unique_instances_collections', ['events']))->save();
+
+        $this->makeLocalizedEntry('event-1', ['contact' => ['submission_limit' => 1]]);
+
+        $this->post('/!/forms/contact', ['_entry' => 'event-1', 'email' => 'san@holo.com'])->assertSessionHasNoErrors();
+
+        $this
+            ->post('/!/forms/contact', ['_entry' => 'event-1-fr', 'email' => 'foba@bett.com'])
+            ->assertSessionHasErrors('*', null, 'form.contact');
+
+        $this->assertCount(1, $form->submissions());
+    }
+
+    #[Test]
+    public function a_partial_submission_started_on_a_localization_can_be_completed_on_the_root()
+    {
+        $this->createMultiPageForm();
+
+        $form = Form::find('survey');
+        $form->set('unique_instances', true)->set('unique_instances_collections', ['events'])->save();
+
+        $this->makeLocalizedEntry('event-1', ['survey' => []]);
+
+        $this->post('/!/forms/survey', ['_page' => 'page_one', '_entry' => 'event-1-fr', 'name' => 'Olaf']);
+
+        $id = session('form.survey.event-1.partial_submission');
+        $this->assertNotNull($id);
+
+        $template = '{{ form:survey }}{{ fields }}{{ handle }}={{ value }},{{ /fields }}{{ /form:survey }}';
+        $this->assertStringContainsString('name=Olaf,', $this->normalizeHtml($this->tag($template, ['id' => 'event-1'])));
+
+        $this
+            ->post('/!/forms/survey', ['_page' => 'page_two', '_entry' => 'event-1', 'email' => 'olaf@example.com'])
+            ->assertSessionHasNoErrors()
+            ->assertSessionMissing('form.survey.event-1.partial_submission');
+
+        $this->assertCount(1, $form->submissions());
+        $submission = $form->submission($id);
+        $this->assertFalse($submission->isPartial());
+        $this->assertEquals('event-1', $submission->get('_entry'));
+        $this->assertEquals('Olaf', $submission->get('name'));
+
+        $form->submissions()->each->delete();
+    }
+
+    private function makeLocalizedEntry(string $id, array $formInstances): void
+    {
+        $this->setSites([
+            'en' => ['url' => 'http://localhost/', 'locale' => 'en'],
+            'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
+        ]);
+
+        $this->makeEntry($id, $formInstances);
+
+        Collection::findByHandle('events')->sites(['en', 'fr'])->save();
+
+        Entry::find($id)->makeLocalization('fr')->id($id.'-fr')->save();
+    }
+
+    private function makeEntry(string $id, array $formInstances): void
+    {
+        Blueprint::make('event')->setNamespace('collections.events')->setContents(['fields' => [
+            ['handle' => 'form_instances', 'field' => ['type' => 'form_instances']],
+        ]])->save();
+
+        (new EntryFactory)->collection('events')->id($id)->slug($id)->data(['form_instances' => $formInstances])->create();
     }
 
     #[Test]
@@ -1755,6 +1997,62 @@ EOT
         request()->merge(['page' => 'page_two']);
         $pageTwo = $this->normalizeHtml($this->tag('{{ form:survey }}{{ fields }}{{ handle }}={{ value }},{{ /fields }}{{ /form:survey }}'));
         $this->assertStringContainsString('email=olaf@example.com,', $pageTwo);
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function it_only_populates_fields_from_the_partial_submission_of_the_entry_being_rendered()
+    {
+        $this->createMultiPageForm();
+
+        $form = Form::find('survey');
+        $form->set('unique_instances', true)->set('unique_instances_collections', ['events'])->save();
+        $this->makeEntry('event-a', ['survey' => []]);
+        $this->makeEntry('event-b', ['survey' => []]);
+
+        $this->post('/!/forms/survey', ['_page' => 'page_one', '_entry' => 'event-a', 'name' => 'Olaf']);
+
+        $template = '{{ form:survey }}{{ fields }}{{ handle }}={{ value }},{{ /fields }}{{ /form:survey }}';
+
+        $this->assertStringContainsString('name=Olaf,', $this->normalizeHtml($this->tag($template, ['id' => 'event-a'])));
+        $this->assertStringContainsString('name=,', $this->normalizeHtml($this->tag($template, ['id' => 'event-b'])));
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function it_keeps_a_separate_partial_submission_for_each_entry()
+    {
+        $this->createMultiPageForm();
+
+        $form = Form::find('survey');
+        $form->set('unique_instances', true)->set('unique_instances_collections', ['events'])->save();
+        $this->makeEntry('event-a', ['survey' => []]);
+        $this->makeEntry('event-b', ['survey' => []]);
+
+        $this->post('/!/forms/survey', ['_page' => 'page_one', '_entry' => 'event-a', 'name' => 'Olaf']);
+        $this->post('/!/forms/survey', ['_page' => 'page_one', '_entry' => 'event-b', 'name' => 'Sven']);
+
+        $this->assertCount(2, $form->submissions());
+        $idA = session('form.survey.event-a.partial_submission');
+        $idB = session('form.survey.event-b.partial_submission');
+        $this->assertNotEquals($idA, $idB);
+        $this->assertEquals('Olaf', $form->submission($idA)->get('name'));
+        $this->assertEquals('event-a', $form->submission($idA)->get('_entry'));
+        $this->assertEquals('Sven', $form->submission($idB)->get('name'));
+
+        $this
+            ->post('/!/forms/survey', ['_page' => 'page_two', '_entry' => 'event-a', 'email' => 'olaf@example.com'])
+            ->assertSessionHasNoErrors()
+            ->assertSessionMissing('form.survey.event-a.partial_submission')
+            ->assertSessionHas('form.survey.event-b.partial_submission', $idB);
+
+        $finalized = $form->submission($idA);
+        $this->assertFalse($finalized->isPartial());
+        $this->assertEquals('event-a', $finalized->get('_entry'));
+        $this->assertEquals('Olaf', $finalized->get('name'));
+        $this->assertTrue($form->submission($idB)->isPartial());
 
         $form->submissions()->each->delete();
     }

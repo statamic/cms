@@ -11,6 +11,7 @@ use Illuminate\Validation\ValidationException;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Exceptions\FormRestrictedException;
 use Statamic\Exceptions\SilentFormFailureException;
+use Statamic\Facades\Entry;
 use Statamic\Facades\Form;
 use Statamic\Facades\URL;
 use Statamic\Forms\Exceptions\FileContentTypeRequiredException;
@@ -31,10 +32,16 @@ class FormController extends Controller
 
         $action->form($form);
 
+        $entry = is_string($entry = $request->input('_entry')) ? (Entry::find($entry)?->root()->id() ?? $entry) : null;
+
+        if ($entry) {
+            $action->entry($entry);
+        }
+
         if ($form->hasMultiplePages()) {
             $action->page($form->formFields()->pages()->first()['id']);
 
-            if ($partialSubmission = $this->getPartialSubmission($form)) {
+            if ($partialSubmission = $this->getPartialSubmission($form, $entry)) {
                 $action->resume($partialSubmission);
             }
 
@@ -58,8 +65,8 @@ class FormController extends Controller
             $result = $action->submit($request->all(), $request->allFiles());
 
             $result->isFinalized()
-                ? $this->forgetPartialSubmission($form)
-                : $this->setPartialSubmission($form, $result->submission);
+                ? $this->forgetPartialSubmission($form, $entry)
+                : $this->setPartialSubmission($form, $entry, $result->submission);
 
             return $this->formSuccess($params, $result);
         } catch (FormRestrictedException $e) {
@@ -68,7 +75,7 @@ class FormController extends Controller
             $result = new SubmissionResult(submission: $action->submission());
 
             if ($result->submission->isSpam()) {
-                $this->forgetPartialSubmission($form);
+                $this->forgetPartialSubmission($form, $entry);
             }
 
             return $this->formSuccess($params, $result, silentFailure: true);
@@ -193,14 +200,14 @@ class FormController extends Controller
         return $redirect;
     }
 
-    private function setPartialSubmission($form, $submission): void
+    private function setPartialSubmission($form, ?string $entry, $submission): void
     {
-        session()->put("form.{$form->handle()}.partial_submission", $submission->id());
+        session()->put(SubmitForm::partialSubmissionSessionKey($form, $entry), $submission->id());
     }
 
-    private function getPartialSubmission($form): ?Submission
+    private function getPartialSubmission($form, ?string $entry): ?Submission
     {
-        $id = session()->get("form.{$form->handle()}.partial_submission");
+        $id = session()->get(SubmitForm::partialSubmissionSessionKey($form, $entry));
         $submission = $form->submission($id);
 
         if ($submission && ! $submission->isPartial()) {
@@ -210,8 +217,8 @@ class FormController extends Controller
         return $submission;
     }
 
-    private function forgetPartialSubmission($form): void
+    private function forgetPartialSubmission($form, ?string $entry): void
     {
-        session()->forget("form.{$form->handle()}.partial_submission");
+        session()->forget(SubmitForm::partialSubmissionSessionKey($form, $entry));
     }
 }

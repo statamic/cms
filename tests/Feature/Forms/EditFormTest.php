@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Forms;
 
+use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Support\Facades\Log;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Form;
@@ -20,6 +21,13 @@ class EditFormTest extends TestCase
         parent::resolveApplicationConfiguration($app);
 
         $app['config']['statamic.forms.forms'] = $this->fakeStacheDirectory.'/forms';
+    }
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(false)->byDefault();
     }
 
     #[Test]
