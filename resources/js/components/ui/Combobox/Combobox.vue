@@ -110,7 +110,7 @@ const triggerClasses = computed(() => cva({
             xs: 'px-2 h-6 text-[0.8125rem] rounded-md',
         },
         readOnly: {
-            true: 'border-dashed',
+            true: 'border-dashed read-only-field:not-dark:bg-none read-only-field:not-dark:bg-gray-100 read-only-field:text-gray-600 read-only-field:not-dark:shadow-none dark:read-only-field:text-gray-500',
         },
         disabled: {
             true: 'opacity-50 cursor-not-allowed',
