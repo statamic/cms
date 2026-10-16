@@ -8,9 +8,6 @@ const { open, toggle, shortcut, focus } = useAiChat();
 const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform);
 const modifierLabel = isMac ? '⌘' : 'Ctrl';
 
-// The dark pill is always there, like the Search box beside it. While the chat is open the icon and text brighten.
-const activeClasses = 'text-white [&_svg]:text-white!';
-
 let binding = null;
 
 onMounted(() => {
@@ -43,7 +40,6 @@ onUnmounted(() => binding?.destroy());
         :aria-label="__('Ask')"
         :aria-pressed="open"
         :aria-keyshortcuts="'Control+/ Meta+/'"
-        :class="open ? activeClasses : ''"
         class="group relative inline-flex items-center justify-center gap-x-1.5 shrink-0 cursor-pointer h-8 min-w-8 sm:px-1.5 sm:pe-[8.5px] whitespace-nowrap rounded-xl text-xs text-white/60 hover:text-white/70 bg-black/40 ring-1 ring-white/10 hover:bg-black/45"
         @click="toggle"
     >
