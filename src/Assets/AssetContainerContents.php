@@ -183,26 +183,14 @@ class AssetContainerContents
             return $this->metaFiles[$key];
         }
 
-        $files = collect($this->filesystem()->listContents($recursive ? $folder : $folder.'/.meta', $recursive))
+        $path = $recursive ? $folder : trim($folder, '/').'/.meta';
+
+        $files = collect($this->filesystem()->listContents($path, $recursive))
             ->filter(fn ($attributes) => $attributes->isFile())
             ->keyBy('path')
             ->map(fn ($file) => $this->normalizeFlysystemAttributes($file))
             ->filter(fn ($file, $path) => $this->isMetaPath($path))
             ->sortKeys();
-
-        // Filter by folder and recursiveness. But don't bother if we're
-        // requesting the root recursively as it's already that way.
-        if ($folder === '/' && $recursive) {
-            //
-        } else {
-            $files = $files->filter(function ($file) use ($folder, $recursive) {
-                $dir = $file['dirname'];
-                $dir = substr($dir, 0, -6); // remove .meta/ from the end
-                $dir = $dir ?: '/';
-
-                return $recursive ? Str::startsWith($dir, $folder) : $dir == $folder;
-            });
-        }
 
         return $this->metaFiles[$key] = $files;
     }
