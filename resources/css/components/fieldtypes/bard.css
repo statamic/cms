@@ -93,6 +93,11 @@
         @apply bg-white text-gray-925 dark:bg-gray-900 dark:text-gray-300;
     }
 
+    /* Fields configured as read only get the same grey surface as other read-only controls. */
+    [data-ui-field-read-only] .bard-editor.mode\:read-only .ProseMirror {
+        @apply bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400;
+    }
+
     .bard-editor.mode\:minimal .ProseMirror {
         min-height: 80px;
     }

@@ -283,6 +283,7 @@ watch(
                 'shadow-ui-sm appearance-none antialiased disabled:shadow-none',
                 themeClass,
                 { 'code-fullscreen': fullScreenMode },
+                readOnly ? 'read-only-field:bg-gray-100 read-only-field:shadow-none dark:read-only-field:bg-gray-800' : '',
             ]"
         >
             <publish-field-fullscreen-header
@@ -329,7 +330,7 @@ watch(
                 class="font-mono text-xs border border-gray-300 dark:border dark:border-gray-700 dark:bg-gray-900 rounded-lg [&_.CodeMirror]:rounded-lg"
                 :class="{
                     'dark:border-t-0 rounded-t-none [&_.CodeMirror]:rounded-t-none': showToolbar,
-                    'border-dashed with-contrast:border-gray-500 dark:border-gray-700': readOnly,
+                    'border-dashed with-contrast:border-gray-500 dark:border-gray-700 dark:read-only-field:bg-transparent': readOnly,
                 }"
             ></div>
         </div>

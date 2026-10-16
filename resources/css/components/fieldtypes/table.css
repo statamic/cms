@@ -122,6 +122,12 @@ Table Fieldtype
         @apply border-none bg-white dark:bg-gray-900 text-sm shadow-none;
     }
 
+    /* Fields configured as read only get the same grey surface as other read-only controls. */
+    [data-ui-field-read-only] & tbody td:not(.table-drag-handle),
+    [data-ui-field-read-only] & [data-ui-control]:read-only:enabled {
+        @apply bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400;
+    }
+
     .row-controls {
         @apply w-8 text-center ps-0;
         vertical-align: middle;

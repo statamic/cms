@@ -1,6 +1,6 @@
 <template>
     <!-- Safari doesn't support `position: relative` on `<tr>` elements, but these two properties can be used as an alternative. Source: https://mtsknn.fi/blog/relative-tr-in-safari/ transform: translate(0); clip-path: inset(0); -->
-    <tr class="group relative bg-white hover:bg-gray-50 dark:bg-gray-900 dark:hover:bg-gray-900 border-b dark:border-gray-600 last:border-b-0" :class="{ 'cursor-grab': !readOnly }" style="transform: translate(0); clip-path: inset(0);">
+    <tr class="group relative bg-white hover:bg-gray-50 dark:bg-gray-900 dark:hover:bg-gray-900 border-b dark:border-gray-600 last:border-b-0" :class="{ 'cursor-grab': !readOnly, 'read-only-field:bg-gray-100 read-only-field:hover:bg-gray-100 dark:read-only-field:bg-gray-800 dark:read-only-field:hover:bg-gray-800': readOnly }" style="transform: translate(0); clip-path: inset(0);">
         <td class="flex h-full min-w-0 items-center gap-2 p-3 sm:gap-3 [.link-fieldtype_&]:py-1.5">
             <div
                 v-if="canShowSvg"
