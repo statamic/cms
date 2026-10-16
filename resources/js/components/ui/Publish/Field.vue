@@ -303,7 +303,7 @@ const fieldtypeComponentEvents = computed(() => ({
                         />
                     </Transition>
                     <template v-if="shouldShowLabelText">
-                        <span v-tooltip="{ content: config.handle, copyable: true }" :class="{ 'text-gray-500': shouldMarkReadOnly }">
+                        <span v-tooltip="{ content: config.handle, copyable: true }" :class="{ 'text-gray-500 dark:text-gray-400': shouldMarkReadOnly }">
                             {{ __(config.display) }}
                         </span>
                     </template>
