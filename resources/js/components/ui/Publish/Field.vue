@@ -212,6 +212,9 @@ const isReadOnly = computed(() => {
     );
 });
 
+const lockedBy = computed(() => fieldLocks.value[handle] ?? null);
+const isLocked = computed(() => lockedBy.value !== null && lockedBy.value.id !== Statamic.user.id);
+
 // Only grey out fields that are read only by themselves. When the whole container
 // or fields provider is read only, greying out every field would just be noise.
 const shouldGreyOutReadOnly = computed(() => {
@@ -219,9 +222,6 @@ const shouldGreyOutReadOnly = computed(() => {
 
     return !containerReadOnly.value && !fieldsProviderReadOnly.value;
 });
-
-const lockedBy = computed(() => fieldLocks.value[handle] ?? null);
-const isLocked = computed(() => lockedBy.value !== null && lockedBy.value.id !== Statamic.user.id);
 
 const isSyncable = computed(() => {
     // Only top-level fields can be synced.
@@ -345,8 +345,9 @@ const fieldtypeComponentEvents = computed(() => ({
     transform: translateX(-5px) scale(0.85);
 }
 
-/* Read only controls all get a dashed border, so we can use that to target them. */
-.read-only-field :deep([class*="border-dashed"]) {
+/* Read only controls all get a dashed border, so we can use that to target them.
+   Checked checkboxes keep the class but not the dashes, so leave them alone. */
+.read-only-field :deep([class*="border-dashed"]:not([data-state="checked"], [data-state="indeterminate"])) {
     background-color: var(--color-gray-100);
     background-image: none;
     color: var(--color-gray-600);
@@ -357,7 +358,7 @@ const fieldtypeComponentEvents = computed(() => ({
     color: var(--color-gray-500);
 }
 
-:where(.dark) .read-only-field :deep([class*="border-dashed"]) {
+:where(.dark) .read-only-field :deep([class*="border-dashed"]:not([data-state="checked"], [data-state="indeterminate"])) {
     background-color: var(--color-gray-800);
     color: var(--color-gray-400);
 }
