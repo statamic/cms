@@ -2,7 +2,7 @@
     <div class="flex w-full min-w-0 items-center">
         <div
             class="flex items-center rounded-full relative border shadow-ui-sm with-contrast:border-gray-500"
-            :class="{ 'border-dashed border-gray-300 dark:border-gray-700 dark:with-contrast:border-gray-600 read-only-field:bg-gray-100 read-only-field:shadow-none dark:read-only-field:bg-gray-800': isReadOnly }"
+            :class="{ 'border-dashed border-gray-300 dark:border-gray-700 dark:with-contrast:border-gray-600 read-only-field:not-dark:bg-gray-100 read-only-field:not-dark:shadow-none': isReadOnly }"
         >
             <ui-popover
                 v-if="!isReadOnly"

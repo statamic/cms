@@ -52,7 +52,7 @@ const classes = cva({
         'border border-gray-300 with-contrast:border-gray-500 dark:border-gray-700',
         'text-gray-900 dark:text-gray-300',
         'appearance-none antialiased shadow-ui-sm disabled:shadow-none read-only:border-dashed not-prose',
-        'read-only-field:read-only:enabled:bg-gray-100 read-only-field:read-only:enabled:text-gray-600 read-only-field:read-only:enabled:shadow-none dark:read-only-field:read-only:enabled:bg-gray-800 dark:read-only-field:read-only:enabled:text-gray-400',
+        'read-only-field:not-dark:read-only:enabled:bg-gray-100 read-only-field:read-only:enabled:text-gray-600 read-only-field:not-dark:read-only:enabled:shadow-none dark:read-only-field:read-only:enabled:text-gray-500',
     ],
     variants: {
         resize: {

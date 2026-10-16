@@ -1,7 +1,7 @@
 <template>
     <div
         class="autocomplete-editor @container/autocomplete-editor shadow-ui-sm rounded-lg border border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-900"
-        :class="{ 'border-dashed read-only-field:bg-gray-100 read-only-field:text-gray-600 read-only-field:shadow-none dark:read-only-field:bg-gray-800 dark:read-only-field:text-gray-400': readOnly, 'mode:inline': inline }"
+        :class="{ 'border-dashed read-only-field:not-dark:bg-gray-100 read-only-field:text-gray-600 read-only-field:not-dark:shadow-none dark:read-only-field:text-gray-500': readOnly, 'mode:inline': inline }"
     >
         <div
             v-if="showToolbar && editor"

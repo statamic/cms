@@ -47,7 +47,7 @@ const setToNow = () => {
             'shadow-ui-sm not-prose h-10 rounded-lg py-2 px-3 disabled:shadow-none',
             'data-invalid:border-red-500',
             disabled ? 'disabled:shadow-none disabled:opacity-50' : '',
-            readOnly ? 'border-dashed read-only-field:bg-gray-100 read-only-field:text-gray-600 read-only-field:shadow-none dark:read-only-field:bg-gray-800 dark:read-only-field:text-gray-400' : '',
+            readOnly ? 'border-dashed read-only-field:not-dark:bg-gray-100 read-only-field:text-gray-600 read-only-field:not-dark:shadow-none dark:read-only-field:text-gray-500' : '',
         ]"
     >
         <div class="flex-1 flex items-center">
