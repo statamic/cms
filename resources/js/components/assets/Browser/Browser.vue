@@ -26,6 +26,7 @@
                     :action-url="actionUrl"
                     :action-context="actionContext"
                     :allow-bulk-actions="allowBulkActions"
+                    :allow-select-all-matching="false"
                     :selections="selectedAssets"
                     :max-selections="maxFiles"
                     :preferences-prefix="preferencesPrefix"
@@ -65,7 +66,7 @@
                                                 :text="__('Edit Blueprint')"
                                                 :href="container.blueprint_url"
                                             />
-                                            <DropdownSeparator v-if="actions.length" />
+                                            <DropdownSeparator v-if="(canCreateContainers || container.can_edit || container.can_edit_blueprint) && actions.length" />
                                             <DropdownItem
                                                 v-for="action in actions"
                                                 :key="action.handle"
@@ -588,7 +589,7 @@ export default {
                 Statamic.$toast.success(response.message || __('Action completed'));
             }
 
-            if (!response.redirect) router.reload();
+            if (!response.redirect) router.reload({ onSuccess: () => this.$refs.listing.refresh() });
         },
 
         assetSaved() {

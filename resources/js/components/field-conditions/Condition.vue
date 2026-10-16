@@ -41,6 +41,7 @@
 
         <Switch
             v-if="showValueToggle"
+            :label="valueToggleLabel"
             :model-value="condition.value === 'true'"
             @update:model-value="valueUpdated"
         />
@@ -114,6 +115,12 @@ export default {
                 ['toggle', 'revealer'].includes(this.field.config.type) &&
                 ['equals', 'not', '===', '!=='].includes(this.condition.operator)
             );
+        },
+
+        valueToggleLabel() {
+            const field = __(this.field?.config.display) || this.condition.field;
+
+            return field ? __('Value for :field', { field }) : __('Value');
         },
 
         showValueDropdown() {

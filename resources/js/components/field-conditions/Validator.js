@@ -11,13 +11,28 @@ const ROOT_PREFIX_RE = /^\$?root\./;
 const isEmpty = (value) => {
     if (value === null || value === undefined) return true;
 
-    // Object.keys() would consider numbers empty.
-    if (typeof value === 'number') return false;
+    // Object.keys() would consider numbers and booleans empty.
+    if (typeof value === 'number' || typeof value === 'boolean') return false;
 
     return Array.isArray(value) ? value.length === 0 : Object.keys(value).length === 0;
 };
 
 const isString = (str) => str != null && typeof str.valueOf() === 'string';
+
+const COMPARISONS = {
+    '==': (lhs, rhs) => lhs == rhs,
+    '!=': (lhs, rhs) => lhs != rhs,
+    '===': (lhs, rhs) => lhs === rhs,
+    '!==': (lhs, rhs) => lhs !== rhs,
+    '>': (lhs, rhs) => lhs > rhs,
+    '>=': (lhs, rhs) => lhs >= rhs,
+    '<': (lhs, rhs) => lhs < rhs,
+    '<=': (lhs, rhs) => lhs <= rhs,
+};
+
+// prepareLhs() and prepareRhs() JSON-encode string operands, so decode them before comparing.
+// Non-string operands, like an undefined lhs, aren't valid JSON and are compared as is.
+const decodeOperand = (operand) => (isString(operand) ? JSON.parse(operand) : operand);
 
 export default class {
     constructor(field, values, rootValues, currentFieldPath, revealerFields, extraPayload) {
@@ -53,7 +68,9 @@ export default class {
         if (conditions === undefined) {
             return true;
         } else if (this.isCustomConditionWithoutTarget(conditions)) {
-            return this.passesCustomCondition(this.prepareCondition(conditions));
+            let passes = this.passesCustomCondition(this.prepareCondition(conditions));
+
+            return this.showOnPass ? passes : !passes;
         }
 
         let passes = this.passOnAny ? this.passesAnyConditions(conditions) : this.passesAllConditions(conditions);
@@ -172,7 +189,7 @@ export default class {
             lhs = null;
         }
 
-        // Prepare for eval() and return.
+        // JSON-encode strings, which passesCondition() decodes before comparing.
         return isString(lhs) ? JSON.stringify(lhs.trim()) : lhs;
     }
 
@@ -192,7 +209,7 @@ export default class {
             return Number(rhs);
         }
 
-        // When performing a comparison that cannot be eval()'d, return rhs as is.
+        // When performing a comparison that isn't a plain operator comparison, return rhs as is.
         if (rhs === 'empty' || operator === 'includes') {
             return rhs;
         }
@@ -202,7 +219,7 @@ export default class {
             return rhs.split(',').map((string) => string.trim());
         }
 
-        // Prepare for eval() and return.
+        // JSON-encode strings, which passesCondition() decodes before comparing.
         return isString(rhs) ? JSON.stringify(rhs.trim()) : rhs;
     }
 
@@ -264,10 +281,21 @@ export default class {
             return false;
         }
 
-        return eval(`${condition.lhs} ${condition.operator} ${condition.rhs}`);
+        const compare = COMPARISONS[condition.operator];
+
+        if (!compare) {
+            throw new Error(`Statamic field condition operator [${condition.operator}] is not supported.`);
+        }
+
+        return compare(decodeOperand(condition.lhs), decodeOperand(condition.rhs));
     }
 
     passesIncludesCondition(condition) {
+        // Arrays and strings can be searched. Other objects, like a date range, can't.
+        if (typeof condition.lhs?.includes !== 'function') {
+            return false;
+        }
+
         return condition.lhs.includes(condition.rhs);
     }
 
@@ -284,7 +312,10 @@ export default class {
             return intersection(condition.lhs, condition.rhs).length;
         }
 
-        return new RegExp(condition.rhs.join('|')).test(condition.lhs);
+        // Match each value literally, so characters like `.`, `(` or `+` aren't read as a pattern.
+        const lhs = condition.lhs === null || condition.lhs === undefined ? '' : String(condition.lhs);
+
+        return condition.rhs.some((value) => lhs.includes(value));
     }
 
     passesCustomCondition(condition) {
@@ -306,7 +337,9 @@ export default class {
             ...this.extraPayload,
         });
 
-        return this.showOnPass ? passes : !passes;
+        // Inverting for `unless` and `hide_when` is left to passesConditions(), so a custom
+        // condition nested in a field's conditions isn't inverted twice.
+        return passes;
     }
 
     passesNonRevealerConditions(dottedPrefix) {

@@ -5,7 +5,7 @@
             :label="__('Required')"
             :instructions="__('messages.field_validation_required_instructions')"
         >
-            <Switch v-model="isRequired" />
+            <Switch v-model="isRequired" :label="__('Required')" />
         </Field>
 
         <Field
@@ -13,7 +13,7 @@
             :label="__('Sometimes')"
             :instructions="__('messages.field_validation_sometimes_instructions')"
         >
-            <Switch v-model="sometimesValidate" />
+            <Switch v-model="sometimesValidate" :label="__('Sometimes')" />
         </Field>
 
         <Field class="form-group field-w-100" :label="__('Rules')">
@@ -43,7 +43,7 @@
                 <template #option="option">
                     <template v-if="option.create">{{ __('Add ":value"', { value: option.value }) }}</template>
                     <template v-else>
-                        {{ __(option.display) }} <code class="px-1 rounded-sm text-[0.8rem]">{{ valueWithoutTrailingColon(option.value) }}</code>
+                        {{ option.display }} <code class="px-1 rounded-sm text-[0.8rem]">{{ valueWithoutTrailingColon(option.value) }}</code>
                     </template>
                 </template>
 

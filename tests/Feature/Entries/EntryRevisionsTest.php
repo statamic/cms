@@ -7,6 +7,7 @@ use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\EntryDeleted;
 use Statamic\Events\EntryDeleting;
@@ -324,6 +325,39 @@ class EntryRevisionsTest extends TestCase
         $this->assertEquals('user-1', $revision->user()->id());
         $this->assertEquals('Test!', $revision->message());
         $this->assertEquals('unpublish', $revision->action());
+    }
+
+    #[Test]
+    #[DataProvider('workingCopyActionsProvider')]
+    public function blueprint_fields_point_to_the_new_entry_after_publishing_or_unpublishing_a_working_copy($method)
+    {
+        $this->setTestBlueprint('test', ['foo' => ['type' => 'text']]);
+
+        $entry = EntryFactory::id('1')
+            ->slug('test')
+            ->collection('blog')
+            ->published($method === 'unpublishWorkingCopy')
+            ->date('2010-12-25')
+            ->data(['blueprint' => 'test', 'title' => 'Title', 'foo' => 'bar'])
+            ->create();
+
+        $entry->makeWorkingCopy()->save();
+
+        $this->assertSame($entry, $entry->blueprint()->setParent($entry)->field('foo')->parent());
+
+        $published = $entry->{$method}();
+
+        $this->assertNotSame($entry, $published);
+        $this->assertSame($published, $published->blueprint()->field('foo')->parent());
+        $this->assertSame($published, $published->blueprint()->parent());
+    }
+
+    public static function workingCopyActionsProvider()
+    {
+        return [
+            'publish' => ['publishWorkingCopy'],
+            'unpublish' => ['unpublishWorkingCopy'],
+        ];
     }
 
     #[Test]

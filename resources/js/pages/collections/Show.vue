@@ -15,7 +15,7 @@
                         <DropdownItem v-if="canEdit" :text="__('Configure Collection')" icon="cog" :href="editUrl" />
                         <DropdownItem v-if="canEditBlueprints" :text="__('Edit Blueprints')" icon="blueprint-edit" :href="blueprintsUrl" />
                         <DropdownItem v-if="canEdit" :text="__('Scaffold Views')" icon="scaffold" :href="scaffoldUrl" />
-                        <DropdownSeparator v-if="canEdit || canEditBlueprints || actions.length" />
+                        <DropdownSeparator v-if="(canEdit || canEditBlueprints) && actions.length" />
                         <DropdownItem
                             v-for="action in actions"
                             :key="action.handle"
@@ -141,6 +141,7 @@
                     :url="entriesActionUrl"
                     :context="{ view: 'tree' }"
                     :item="branch.entry"
+                    :actions="branch.actions"
                     @started="treeActionStarted"
                     @completed="treeActionCompleted"
                     v-slot="{ actions, loadActions, shouldShowSkeleton }"
@@ -150,10 +151,10 @@
                         @focus="loadActions"
                         @click="loadActions"
                         placement="left-start"
-                        :class="{ invisible: isRoot }"
+                        :class="{ invisible: isRoot && branch.actions && !branchTreeActions(actions).length }"
                     >
                         <DropdownMenu>
-                            <template v-if="depth < structureMaxDepth">
+                            <template v-if="canCreateChildEntry(depth, isRoot)">
                                 <DropdownLabel :text="__('Create Child Entry')" v-if="blueprints.length > 1" />
                                 <DropdownItem
                                     v-for="blueprint in blueprints"
@@ -166,7 +167,7 @@
 
                             <DropdownSeparator
                                 v-if="
-                                    depth < structureMaxDepth &&
+                                    canCreateChildEntry(depth, isRoot) &&
                                     (shouldShowSkeleton || branchTreeActions(actions).length)
                                 "
                             />
@@ -193,15 +194,15 @@
 
                             <DropdownSeparator
                                 v-if="
-                                    branch.can_delete &&
-                                    (depth < structureMaxDepth ||
+                                    canDeleteTreeBranch(branch, isRoot) &&
+                                    (canCreateChildEntry(depth, isRoot) ||
                                         shouldShowSkeleton ||
                                         branchTreeActions(actions).length)
                                 "
                             />
 
                             <DropdownItem
-                                v-if="branch.can_delete"
+                                v-if="canDeleteTreeBranch(branch, isRoot)"
                                 :text="__('Delete')"
                                 icon="trash"
                                 variant="destructive"
@@ -453,6 +454,14 @@ export default {
             return this.canUseStructureTree ? 'tree' : 'list';
         },
 
+        canCreateChildEntry(depth, isRoot) {
+            return !isRoot && depth < this.structureMaxDepth;
+        },
+
+        canDeleteTreeBranch(branch, isRoot) {
+            return !isRoot && branch.can_delete;
+        },
+
         deleteTreeBranch(branch, removeFromUi) {
             this.showEntryDeletionConfirmation = true;
             this.entryBeingDeleted = branch;
@@ -527,7 +536,13 @@ export default {
                 Statamic.$toast.success(response.message || __('Action completed'));
             }
 
-            if (!response.redirect) router.reload();
+            if (!response.redirect) router.reload({ onSuccess: () => this.refreshCurrentView() });
+        },
+
+        refreshCurrentView() {
+            if (this.view === 'list') this.$refs.list?.refresh();
+            if (this.view === 'calendar') this.$refs.calendar?.refresh();
+            if (this.view === 'tree' && !this.treeIsDirty) this.$refs.tree?.refresh();
         },
 
         addToCommandPalette() {
