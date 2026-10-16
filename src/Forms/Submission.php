@@ -422,7 +422,7 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
                 'id' => $this->id(),
                 'date' => $this->date(),
             ])
-            ->when($this->has('_entry') && ! $fields->contains('entry'), fn ($values) => $values->merge([
+            ->when($this->has('_entry'), fn ($values) => $values->merge([
                 'entry' => $this->get('_entry'),
             ]))
             ->all();
@@ -434,7 +434,7 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
             'form' => $this->form,
         ]);
 
-        if ($this->has('_entry') && ! $this->form()->fields()->has('entry')) {
+        if ($this->has('_entry')) {
             $data['entry'] = $this->entry();
         }
 

@@ -285,7 +285,7 @@ class SubmissionTest extends TestCase
     }
 
     #[Test]
-    public function a_form_field_named_entry_isnt_replaced_by_the_attached_entry()
+    public function the_attached_entry_replaces_a_form_field_named_entry()
     {
         (new EntryFactory)->collection('events')->id('event-1')->slug('event-one')->create();
 
@@ -298,6 +298,21 @@ class SubmissionTest extends TestCase
         $submission = $form->makeSubmission()->data(['entry' => 'Raffle ticket'])->set('_entry', 'event-1');
 
         $this->assertEquals('event-1', $submission->entry()->id());
+        $this->assertEquals('event-1', $submission->toArray()['entry']);
+        $this->assertEquals('event-1', $submission->augmentedArrayData()['entry']->id());
+    }
+
+    #[Test]
+    public function a_form_field_named_entry_is_kept_without_an_attached_entry()
+    {
+        $form = tap(Form::make('contact_us')->formFields([
+            'sections' => [['fields' => [
+                ['handle' => 'entry', 'field' => ['type' => 'text']],
+            ]]],
+        ]))->save();
+
+        $submission = $form->makeSubmission()->data(['entry' => 'Raffle ticket']);
+
         $this->assertEquals('Raffle ticket', $submission->toArray()['entry']);
         $this->assertEquals('Raffle ticket', $submission->augmentedArrayData()['entry']);
     }

@@ -272,7 +272,7 @@ class Email extends Mailable
     {
         $keys = ['id', 'date', 'form'];
 
-        if (! $this->submission->form()->fields()->has('entry')) {
+        if ($this->submission->has('_entry')) {
             $keys[] = 'entry';
         }
 

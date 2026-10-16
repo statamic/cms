@@ -342,6 +342,44 @@ class EmailTest extends TestCase
     }
 
     #[Test]
+    public function it_excludes_a_field_named_entry_from_the_fields_data_when_an_entry_is_attached()
+    {
+        (new EntryFactory)->collection('events')->id('event-1')->slug('event-one')->create();
+
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'name', 'field' => ['type' => 'short_answer']],
+                ['handle' => 'entry', 'field' => ['type' => 'short_answer']],
+            ],
+        ]))->save();
+
+        $submission = $form->makeSubmission()->data(['name' => 'Foo Bar', 'entry' => 'Raffle ticket'])->set('_entry', 'event-1');
+
+        $email = tap(new Email($submission, ['to' => 'test@test.com'], Site::default()))->build();
+
+        $this->assertEquals(['name'], collect($email->viewData['fields'])->pluck('handle')->all());
+        $this->assertEquals('event-1', $email->viewData['entry']->value()->id());
+    }
+
+    #[Test]
+    public function it_includes_a_field_named_entry_in_the_fields_data_without_an_attached_entry()
+    {
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'name', 'field' => ['type' => 'short_answer']],
+                ['handle' => 'entry', 'field' => ['type' => 'short_answer']],
+            ],
+        ]))->save();
+
+        $submission = $form->makeSubmission()->data(['name' => 'Foo Bar', 'entry' => 'Raffle ticket']);
+
+        $email = tap(new Email($submission, ['to' => 'test@test.com'], Site::default()))->build();
+
+        $this->assertEquals(['name', 'entry'], collect($email->viewData['fields'])->pluck('handle')->all());
+        $this->assertEquals('Raffle ticket', $email->viewData['entry']->value());
+    }
+
+    #[Test]
     public function it_renders_the_body_in_the_automagic_email_instead_of_listing_the_fields()
     {
         $form = tap(Form::make('test')->formFields([
