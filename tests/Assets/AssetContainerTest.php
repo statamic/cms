@@ -380,6 +380,11 @@ class AssetContainerTest extends TestCase
     #[Test]
     public function it_gets_all_meta_files_by_default()
     {
+        // The cached listing doesn't include meta files, so they must come from the filesystem.
+        Cache::put('asset-list-contents-test', collect([
+            'a.txt' => ['type' => 'file', 'path' => 'a.txt', 'dirname' => ''],
+        ]));
+
         $this->assertEquals([
             '.meta/a.txt.yaml',
             '.meta/b.txt.yaml',
@@ -811,23 +816,6 @@ class AssetContainerTest extends TestCase
             ['one', 'one.jpg', 'one/two.jpg'],
             Cache::get('asset-list-contents-test')->keys()->all()
         );
-    }
-
-    #[Test]
-    public function it_gets_meta_files_from_the_filesystem_when_the_listing_is_cached_without_them()
-    {
-        Cache::put('asset-list-contents-test', collect([
-            'a.txt' => ['type' => 'file', 'path' => 'a.txt', 'dirname' => ''],
-        ]));
-
-        $this->assertEquals([
-            '.meta/a.txt.yaml',
-            '.meta/b.txt.yaml',
-            'nested/.meta/nested-a.txt.yaml',
-            'nested/.meta/nested-b.txt.yaml',
-            'nested/double-nested/.meta/double-nested-a.txt.yaml',
-            'nested/double-nested/.meta/double-nested-b.txt.yaml',
-        ], $this->containerWithDisk()->metaFiles()->all());
     }
 
     #[Test]
