@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Statamic\Imaging\ImageValidator;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
@@ -548,6 +549,26 @@ class AssetTest extends TestCase
 
         $this->assertTrue($asset->exists());
         $this->assertFalse(Cache::has('asset-list-contents-test_container'));
+    }
+
+    #[Test]
+    public function exists_checks_the_disk_once_per_path()
+    {
+        Storage::disk('test')->put('yes.txt', '');
+        Storage::disk('test')->put('.meta/yes.txt.yaml', "width: 10\nsize: 20\n");
+
+        $fake = Storage::disk('test');
+        $disk = Mockery::mock(FilesystemAdapter::class, [$fake->getDriver(), $fake->getAdapter(), $fake->getConfig()])->makePartial();
+        $disk->shouldReceive('exists')->with('yes.txt')->once()->andReturn(true);
+        $disk->shouldReceive('exists')->with('other.txt')->once()->andReturn(false);
+        Storage::set('test', $disk);
+
+        $asset = (new Asset)->container($this->container)->path('yes.txt');
+
+        $this->assertTrue($asset->exists());
+        $this->assertEquals(10, $asset->meta('width'));
+        $this->assertEquals(20, $asset->meta('size'));
+        $this->assertFalse($asset->path('other.txt')->exists());
     }
 
     #[Test]
