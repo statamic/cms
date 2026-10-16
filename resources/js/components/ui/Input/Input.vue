@@ -114,7 +114,7 @@ const inputClasses = computed(() => {
             'border border-gray-300 with-contrast:border-gray-500 dark:border-gray-700 dark:with-contrast:border-gray-500 dark:inset-shadow-2xs dark:inset-shadow-black',
             'text-gray-925 dark:text-gray-300 placeholder:text-gray-500 dark:placeholder:text-gray-400/85',
             'appearance-none antialiased shadow-ui-sm disabled:shadow-none disabled:opacity-50 read-only:border-dashed not-prose',
-            'read-only:bg-gray-100 read-only:text-gray-600 read-only:shadow-none dark:read-only:bg-gray-800 dark:read-only:text-gray-400',
+            'read-only:enabled:bg-gray-100 read-only:enabled:text-gray-600 read-only:enabled:shadow-none dark:read-only:enabled:bg-gray-800 dark:read-only:enabled:text-gray-400',
         ],
         variants: {
             size: {
