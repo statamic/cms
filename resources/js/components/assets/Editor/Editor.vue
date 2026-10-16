@@ -163,7 +163,7 @@
             <focal-point-editor
                 v-if="showFocalPointEditor && isFocalPointEditorEnabled"
                 :data="values.focus"
-                :image="asset.preview"
+                :image="asset.large_thumbnail"
                 @selected="selectFocalPoint"
                 @closed="closeFocalPointEditor"
                 @save="saveFocalPoint"
