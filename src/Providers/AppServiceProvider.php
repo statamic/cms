@@ -312,6 +312,7 @@ class AppServiceProvider extends ServiceProvider
         $router = $this->app->make(Router::class);
 
         collect([
+            \Statamic\Http\Middleware\RedirectIndexPhpUrls::class,
             \Statamic\Http\Middleware\StacheLock::class,
             \Statamic\Http\Middleware\HandleToken::class,
             \Statamic\Http\Middleware\Localize::class,
