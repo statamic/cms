@@ -7,6 +7,7 @@ use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\Facades;
 use Statamic\Facades\GraphQL;
+use Statamic\Facades\Scope;
 use Statamic\Facades\User;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\Fields;
@@ -21,6 +22,8 @@ class FormInstances extends FormFieldtype
 {
     protected static $handle = 'form_instances';
     protected $component = 'form_instances';
+    protected $indexComponent = 'form_instances';
+    protected $itemComponent = 'form-related-item';
     protected $icon = 'fieldtype-form';
     protected $selectable = false;
 
@@ -165,11 +168,17 @@ class FormInstances extends FormFieldtype
             ->all();
     }
 
-    protected function selectableForms(): Collection
+    private function selectableForms(): Collection
     {
-        $forms = static::formsForCollection($this->collectionHandle());
+        return static::formsForCollection($this->collectionHandle())
+            ->filter(fn (FormContract $form) => User::current()->can('view', $form));
+    }
 
-        return parent::selectableForms()->filter(fn (FormContract $form) => $forms->has($form->handle()));
+    protected function applyIndexQueryScopes($query, $params)
+    {
+        parent::applyIndexQueryScopes($query, $params);
+
+        $query->whereIn('handle', static::formsForCollection($this->collectionHandle())->keys()->all());
     }
 
     protected function getBaseSelectionsUrlParameters()
@@ -203,6 +212,72 @@ class FormInstances extends FormFieldtype
             ->all();
 
         return $data;
+    }
+
+    private function submissionsMeta(string $handle): ?array
+    {
+        if (! $form = $this->viewableSubmissionsForm($handle)) {
+            return null;
+        }
+
+        if (! $entry = $this->parentEntry()) {
+            return null;
+        }
+
+        return [
+            'form' => $form->handle(),
+            'filters' => Scope::filters('form-submissions', ['form' => $form->handle(), 'entry' => $entry->id()]),
+            'actionUrl' => cp_route('forms.submissions.actions.run', $form->handle()),
+        ];
+    }
+
+    public function preProcessIndex($data)
+    {
+        return parent::preProcessIndex($data)->map(function ($item) {
+            if ($url = $this->submissionsUrl($item['id'])) {
+                $item['submissions_url'] = $url;
+            }
+
+            return $item;
+        });
+    }
+
+    private function submissionsUrl(string $handle): ?string
+    {
+        if (! $form = $this->viewableSubmissionsForm($handle)) {
+            return null;
+        }
+
+        if (! $entry = $this->parentEntry()) {
+            return null;
+        }
+
+        $filters = base64_encode(json_encode([
+            'submission_entry' => ['entry' => $entry->id()],
+            'submission_status' => ['status' => 'finalized'],
+        ]));
+
+        return $form->submissionsUrl().'?filters='.$filters;
+    }
+
+    private function viewableSubmissionsForm(string $handle): ?FormContract
+    {
+        if (! $form = Facades\Form::find($handle)) {
+            return null;
+        }
+
+        if (! $form->hasUniqueInstances() || ! User::current()->can('viewSubmissions', $form)) {
+            return null;
+        }
+
+        return $form;
+    }
+
+    private function parentEntry(): ?Entry
+    {
+        $parent = $this->field->parent();
+
+        return $parent instanceof Entry ? $parent : null;
     }
 
     private function configureMeta(string $handle): ?array

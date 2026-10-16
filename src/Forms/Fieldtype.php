@@ -2,9 +2,6 @@
 
 namespace Statamic\Forms;
 
-use Illuminate\Support\Collection;
-use Statamic\Contracts\Entries\Entry as EntryContract;
-use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\CP\Column;
 use Statamic\Data\DataCollection;
 use Statamic\Facades;
@@ -15,16 +12,12 @@ use Statamic\Fieldtypes\Relationship;
 use Statamic\GraphQL\Types\FormType;
 use Statamic\Query\ItemQueryBuilder;
 use Statamic\Query\Scopes\Filter;
-use Statamic\Support\Arr;
 
 use function Statamic\trans as __;
 
 class Fieldtype extends Relationship
 {
     protected static $handle = 'form';
-    protected $component = 'form';
-    protected $indexComponent = 'form';
-    protected $itemComponent = 'form-related-item';
     protected $statusIcons = false;
     protected $canCreate = false;
     protected $canEdit = false;
@@ -84,6 +77,11 @@ class Fieldtype extends Relationship
         ];
     }
 
+    public function fieldsetContents()
+    {
+        return [];
+    }
+
     protected function getColumns()
     {
         return [
@@ -112,7 +110,9 @@ class Fieldtype extends Relationship
     public function getIndexItems($request)
     {
         $query = (new ItemQueryBuilder())
-            ->withItems(new DataCollection($this->selectableForms()));
+            ->withItems(new DataCollection(
+                Facades\Form::all()->filter(fn ($form) => User::current()->can('view', $form))
+            ));
 
         if ($search = $request->search) {
             $query->where('title', 'like', '%'.$search.'%');
@@ -143,102 +143,6 @@ class Fieldtype extends Relationship
         }
 
         return $query->get()->map($formFields);
-    }
-
-    protected function selectableForms(): Collection
-    {
-        return Facades\Form::all()->filter(fn ($form) => User::current()->can('view', $form));
-    }
-
-    public function preload()
-    {
-        $data = parent::preload();
-
-        if ($submissions = $this->submissionsPreloadData()) {
-            $data['submissions'] = $submissions;
-        }
-
-        return $data;
-    }
-
-    private function submissionsPreloadData(): ?array
-    {
-        if ($this->config('max_items') !== 1) {
-            return null;
-        }
-
-        return $this->submissionsMeta(Arr::first(Arr::wrap($this->field->value())));
-    }
-
-    protected function submissionsMeta(?string $handle): ?array
-    {
-        if (! $form = $this->viewableUniqueInstancesForm($handle)) {
-            return null;
-        }
-
-        if (! $entry = $this->parentEntry()) {
-            return null;
-        }
-
-        return [
-            'form' => $form->handle(),
-            'filters' => Scope::filters('form-submissions', ['form' => $form->handle(), 'entry' => $entry->id()]),
-            'actionUrl' => cp_route('forms.submissions.actions.run', $form->handle()),
-        ];
-    }
-
-    public function preProcessIndex($data)
-    {
-        return parent::preProcessIndex($data)->map(function ($item) {
-            if ($url = $this->submissionsUrl($item['id'])) {
-                $item['submissions_url'] = $url;
-            }
-
-            return $item;
-        });
-    }
-
-    private function submissionsUrl(string $handle): ?string
-    {
-        if (! $form = $this->viewableUniqueInstancesForm($handle)) {
-            return null;
-        }
-
-        if (! $entry = $this->parentEntry()) {
-            return null;
-        }
-
-        $filters = base64_encode(json_encode([
-            'submission_entry' => ['entry' => $entry->id()],
-            'submission_status' => ['status' => 'finalized'],
-        ]));
-
-        return $form->submissionsUrl().'?filters='.$filters;
-    }
-
-    protected function parentEntry(): ?EntryContract
-    {
-        $parent = $this->field->parent();
-
-        return $parent instanceof EntryContract ? $parent : null;
-    }
-
-    protected function uniqueInstancesForm(?string $handle): ?FormContract
-    {
-        if (! $handle || ! $form = Facades\Form::find($handle)) {
-            return null;
-        }
-
-        return $form->hasUniqueInstances() ? $form : null;
-    }
-
-    private function viewableUniqueInstancesForm(?string $handle): ?FormContract
-    {
-        if (! $form = $this->uniqueInstancesForm($handle)) {
-            return null;
-        }
-
-        return User::current()->can('viewSubmissions', $form) ? $form : null;
     }
 
     public function augmentValue($value)

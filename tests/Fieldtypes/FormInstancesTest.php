@@ -358,6 +358,21 @@ class FormInstancesTest extends TestCase
     }
 
     #[Test]
+    public function it_only_preloads_submissions_for_unique_instances_forms_on_an_entry()
+    {
+        $this->actingAs(tap(User::make()->makeSuper())->save());
+
+        $preload = fn ($parent) => $this->field()
+            ->setParent($parent)
+            ->setValue(['forms' => ['contact', 'newsletter'], 'config' => []])
+            ->fieldtype()
+            ->preload();
+
+        $this->assertEquals(['contact', 'feedback'], array_keys($preload($this->entry())['submissions']));
+        $this->assertEmpty($preload(null)['submissions']);
+    }
+
+    #[Test]
     public function it_preloads_item_data_for_the_forms()
     {
         $this->actingAs(tap(User::make()->makeSuper())->save());
@@ -439,9 +454,25 @@ class FormInstancesTest extends TestCase
     {
         $this->actingAs(tap(User::make()->makeSuper())->save());
 
-        $index = $this->field()->setParent($this->entry())->fieldtype()->preProcessIndex(['contact' => [], 'feedback' => []]);
+        $index = $this->field()->setParent($this->entry())->fieldtype()->preProcessIndex(['contact' => [], 'feedback' => [], 'newsletter' => []]);
 
-        $this->assertEquals(['contact', 'feedback'], $index->pluck('id')->all());
+        $this->assertEquals(['contact', 'feedback', 'newsletter'], $index->pluck('id')->all());
         $this->assertStringStartsWith(Form::find('contact')->submissionsUrl().'?filters=', $index[0]['submissions_url']);
+        $this->assertArrayNotHasKey('submissions_url', $index[2]);
+    }
+
+    #[Test]
+    public function it_only_adds_a_submissions_url_to_index_items_for_users_who_can_view_submissions()
+    {
+        $this->setTestRoles(['editor' => ['access cp', 'edit contact form'], 'viewer' => ['access cp', 'view contact form submissions']]);
+
+        $index = fn () => $this->field()->setParent($this->entry())->fieldtype()->preProcessIndex(['contact' => [], 'feedback' => []])->keyBy('id');
+
+        $this->actingAs(tap(User::make()->assignRole('editor'))->save());
+        $this->assertArrayNotHasKey('submissions_url', $index()['contact']);
+
+        $this->actingAs(tap(User::make()->assignRole('viewer'))->save());
+        $this->assertArrayHasKey('submissions_url', $index()['contact']);
+        $this->assertArrayNotHasKey('submissions_url', $index()['feedback']);
     }
 }
