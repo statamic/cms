@@ -78,9 +78,10 @@ class DefaultSchema implements ConfigConvertible
     private function getMiddleware()
     {
         return array_merge(
-            [HandleAuthentication::class, CacheResponse::class],
+            [HandleAuthentication::class],
             config('statamic.graphql.middleware', []),
-            GraphQL::getExtraMiddleware()
+            GraphQL::getExtraMiddleware(),
+            [CacheResponse::class],
         );
     }
 
