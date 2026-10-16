@@ -281,6 +281,8 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
         Facades\Entry::delete($this);
 
+        $this->flushDescendantsCache($this);
+
         if ($withEvents) {
             EntryDeleted::dispatch($this);
         }
@@ -297,7 +299,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             $withEvents ? $entry->delete() : $entry->deleteQuietly();
         });
 
-        Blink::forget('entry-descendants-'.$this->id());
+        $this->flushDescendantsCache($this);
 
         return true;
     }
@@ -315,7 +317,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
                     ->save();
             });
 
-        Blink::forget('entry-descendants-'.$this->id());
+        $this->flushDescendantsCache($this);
 
         return true;
     }
@@ -401,6 +403,8 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
     public function save()
     {
+        $originalOrigin = $this->getOriginal('origin');
+
         $isNew = is_null(Facades\Entry::find($this->id()));
 
         $withEvents = $this->withEvents;
@@ -440,7 +444,13 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             Blink::store('collection-mounts')->flush();
         }
 
-        $this->ancestors()->each(fn ($entry) => Blink::forget('entry-descendants-'.$entry->id()));
+        if ($origin = $this->origin()) {
+            $this->flushDescendantsCache($origin);
+        }
+
+        if ($originalOrigin && $originalOrigin !== $origin?->id() && ($previousOrigin = Facades\Entry::find($originalOrigin))) {
+            $this->flushDescendantsCache($previousOrigin);
+        }
 
         if ($isNew && $this->collection()->orderable()) {
             // The entry only gets appended to the tree when it's read, so anything that
@@ -867,7 +877,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
     public function directDescendants()
     {
-        return Blink::once('entry-descendants-'.$this->id(), function () {
+        return clone Blink::once('entry-descendants-'.$this->id(), function () {
             return Facades\Entry::query()
                 ->where('collection', $this->collectionHandle())
                 ->where('origin', $this->id())->get()
@@ -877,31 +887,41 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
     public function descendants()
     {
-        $localizations = $this->directDescendants();
+        return clone Blink::once('entry-all-descendants-'.$this->id(), function () {
+            $localizations = $this->directDescendants();
 
-        // Breadth-first: fetch each level in one batched query instead of one query per node.
-        $origins = $localizations->map->id()->values()->all();
-        $seen = array_merge($origins, [$this->id()]);
+            // Breadth-first: fetch each level in one batched query instead of one query per node.
+            $origins = $localizations->map->id()->values()->all();
+            $seen = array_merge($origins, [$this->id()]);
 
-        while (! empty($origins)) {
-            $children = Facades\Entry::query()
-                ->where('collection', $this->collectionHandle())
-                ->whereIn('origin', $origins)
-                ->get()
-                // Guard against cyclic or duplicate origin data, which would
-                // otherwise loop forever as the same entries reappear.
-                ->reject(fn ($entry) => in_array($entry->id(), $seen, true));
+            while (! empty($origins)) {
+                $children = Facades\Entry::query()
+                    ->where('collection', $this->collectionHandle())
+                    ->whereIn('origin', $origins)
+                    ->get()
+                    // Guard against cyclic or duplicate origin data, which would
+                    // otherwise loop forever as the same entries reappear.
+                    ->reject(fn ($entry) => in_array($entry->id(), $seen, true));
 
-            if ($children->isEmpty()) {
-                break;
+                if ($children->isEmpty()) {
+                    break;
+                }
+
+                $localizations = $localizations->merge($children->keyBy->locale());
+                $origins = $children->map->id()->values()->all();
+                $seen = array_merge($seen, $origins);
             }
 
-            $localizations = $localizations->merge($children->keyBy->locale());
-            $origins = $children->map->id()->values()->all();
-            $seen = array_merge($seen, $origins);
-        }
+            return $localizations;
+        });
+    }
 
-        return $localizations;
+    private function flushDescendantsCache($entry): void
+    {
+        $entry->ancestors()->prepend($entry)->each(function ($entry) {
+            Blink::forget('entry-descendants-'.$entry->id());
+            Blink::forget('entry-all-descendants-'.$entry->id());
+        });
     }
 
     public function existsIn($locale)
@@ -1184,6 +1204,11 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         // Avoid using the authors() method.
         if ($field === 'authors') {
             return $this->value('authors');
+        }
+
+        // Avoid resolving the Site object.
+        if ($field === 'site') {
+            return $this->locale();
         }
 
         // Reset the cached uri so it gets recalculated.
