@@ -122,6 +122,44 @@ class UpdateFormTest extends TestCase
         ], $updated->data()->all());
     }
 
+    #[Test]
+    public function it_cant_enable_unique_instances_when_the_form_has_an_entry_field()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'entry', 'field' => ['type' => 'short_answer']],
+            ],
+        ]))->save();
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->update($form, ['unique_instances' => true])
+            ->assertSessionHasErrors(['unique_instances' => __('statamic::validation.form_unique_instances_entry_field')]);
+
+        $this->assertFalse(Form::find('test')->hasUniqueInstances());
+    }
+
+    #[Test]
+    public function it_can_enable_unique_instances_when_the_form_has_no_entry_field()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'name', 'field' => ['type' => 'short_answer']],
+            ],
+        ]))->save();
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->update($form, ['unique_instances' => true])
+            ->assertSessionHasNoErrors();
+
+        $this->assertTrue(Form::find('test')->hasUniqueInstances());
+    }
+
     private function userWithoutPermission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
