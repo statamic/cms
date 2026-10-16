@@ -1413,6 +1413,31 @@ class EntryTest extends TestCase
     }
 
     #[Test]
+    public function unsaved_entries_do_not_inherit_the_blueprint_of_a_freed_entry()
+    {
+        BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
+            'post' => $post = (new Blueprint)->setHandle('post'),
+        ]));
+        BlueprintRepository::shouldReceive('in')->with('collections/products')->andReturn(collect([
+            'product' => $product = (new Blueprint)->setHandle('product'),
+        ]));
+        $blog = tap(Collection::make('blog'))->save();
+        $products = tap(Collection::make('products'))->save();
+
+        // PHP hands the object id of a freed object to one of the next objects it
+        // allocates. Resolve a blog entry's blueprint, free the entry, and make
+        // sure a product entry that takes over its object id does not get its
+        // blueprint. A handful of rounds is enough for an id to be recycled.
+        for ($i = 0; $i < 50; $i++) {
+            $blogEntry = (new Entry)->collection($blog);
+            $blogEntry->blueprint();
+            unset($blogEntry);
+
+            $this->assertSame($product, (new Entry)->collection($products)->blueprint());
+        }
+    }
+
+    #[Test]
     public function the_blueprint_is_blinked_when_getting_and_flushed_when_setting()
     {
         $collection = Mockery::mock(Collection::make('blog'));
