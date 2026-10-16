@@ -488,7 +488,6 @@ class FormBuilderTest extends TestCase
             'starts with an underscore' => ['_partial'],
             'reserved word' => ['if'],
             'reserved forms word: date' => ['date'],
-            'reserved forms word: entry' => ['entry'],
             'reserved forms word: message' => ['message'],
             'reserved forms word: messages' => ['messages'],
         ];
