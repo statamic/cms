@@ -113,6 +113,7 @@ class ConfigFields
                             'type' => 'collections',
                             'mode' => 'select',
                             'instructions' => __('statamic::messages.form_configure_unique_instances_collections_instructions'),
+                            'validate' => 'required_if:unique_instances,true',
                             'if' => [
                                 'unique_instances' => 'equals true',
                             ],
