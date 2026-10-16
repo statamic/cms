@@ -161,15 +161,13 @@ const getInputLabel = (part) => {
                 <DatePickerAnchor as-child>
                     <div
                         :class="[
-                            'flex w-full items-center overflow-x-auto overflow-y-hidden uppercase',
+                            'flex w-full items-center overflow-x-auto overflow-y-hidden bg-white uppercase dark:bg-gray-900',
                             'border border-gray-300 dark:border-gray-700',
-                            'leading-[1.375rem] text-gray-600',
-                            'not-prose h-10 rounded-lg px-2 disabled:shadow-none',
+                            'leading-[1.375rem] text-gray-600 dark:text-gray-300',
+                            'shadow-ui-sm not-prose h-10 rounded-lg px-2 disabled:shadow-none',
                             'data-invalid:border-red-500',
                             'disabled:shadow-none disabled:opacity-50',
-                            readOnly
-                                ? 'border-dashed bg-gray-100 dark:bg-gray-800 dark:text-gray-400'
-                                : 'bg-white shadow-ui-sm dark:bg-gray-900 dark:text-gray-300',
+                            readOnly ? 'border-dashed read-only-field:bg-gray-100 read-only-field:text-gray-600 read-only-field:shadow-none dark:read-only-field:bg-gray-800 dark:read-only-field:text-gray-400' : '',
                         ]"
                         :aria-invalid="isInvalid"
                         role="textbox"

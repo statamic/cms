@@ -90,7 +90,7 @@ const wrapperAttrs = computed(() => {
     return rest;
 });
 
-const triggerClasses = computed(() => twMerge(cva({
+const triggerClasses = computed(() => cva({
     base: 'w-full flex items-center justify-between antialiased cursor-pointer',
     variants: {
         variant: {
@@ -110,7 +110,7 @@ const triggerClasses = computed(() => twMerge(cva({
             xs: 'px-2 h-6 text-[0.8125rem] rounded-md',
         },
         readOnly: {
-            true: 'border-dashed bg-none bg-gray-100 text-gray-600 shadow-none dark:bg-gray-800 dark:text-gray-400 dark:shadow-none',
+            true: 'border-dashed read-only-field:bg-none read-only-field:bg-gray-100 read-only-field:text-gray-600 read-only-field:shadow-none dark:read-only-field:bg-gray-800 dark:read-only-field:text-gray-400 dark:read-only-field:shadow-none',
         },
         disabled: {
             true: 'opacity-50 cursor-not-allowed',
@@ -122,7 +122,7 @@ const triggerClasses = computed(() => twMerge(cva({
     'discrete-focus-outline': props.discreteFocusOutline,
     readOnly: props.readOnly,
     disabled: props.disabled,
-})));
+}));
 
 const itemClasses = cva({
     base: [
