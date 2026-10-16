@@ -42,14 +42,16 @@ class ListedSubmission extends JsonResource
 
     protected function values($extra = [])
     {
-        return $this->columns->mapWithKeys(function ($column) use ($extra) {
+        $hasUniqueInstances = $this->resource->form()->hasUniqueInstances();
+
+        return $this->columns->mapWithKeys(function ($column) use ($extra, $hasUniqueInstances) {
             $key = $column->field;
 
             if ($key === 'status') {
                 return ['status' => $this->resource->status()];
             }
 
-            if ($key === 'entry') {
+            if ($key === 'entry' && $hasUniqueInstances) {
                 $entry = (new Field('entry', ['type' => 'entries']))
                     ->setValue($this->resource->get('_entry'))
                     ->setParent($this->resource)
