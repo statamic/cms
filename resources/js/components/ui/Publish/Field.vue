@@ -215,9 +215,9 @@ const isReadOnly = computed(() => {
 const lockedBy = computed(() => fieldLocks.value[handle] ?? null);
 const isLocked = computed(() => lockedBy.value !== null && lockedBy.value.id !== Statamic.user.id);
 
-// Only grey out fields that are read only by themselves. When the whole container
-// or fields provider is read only, greying out every field would just be noise.
-const shouldGreyOutReadOnly = computed(() => {
+// Only label fields that are read only by themselves. When the whole container
+// or fields provider is read only, labelling every field would just be noise.
+const shouldMarkReadOnly = computed(() => {
     if (!isReadOnly.value || isLocked.value) return false;
 
     return !containerReadOnly.value && !fieldsProviderReadOnly.value;
@@ -274,7 +274,7 @@ const fieldtypeComponentEvents = computed(() => ({
     >
         <Field
             v-show="shouldRenderField"
-            :class="[`${config.type}-fieldtype`, { 'opacity-0 pointer-events-none': shouldHideFieldVisually, 'read-only-field': shouldGreyOutReadOnly }]"
+            :class="[`${config.type}-fieldtype`, { 'opacity-0 pointer-events-none': shouldHideFieldVisually }]"
             :inert="shouldHideFieldVisually"
             :id="fieldId"
             :dir="direction"
@@ -299,7 +299,7 @@ const fieldtypeComponentEvents = computed(() => ({
                         />
                     </Transition>
                     <template v-if="shouldShowLabelText">
-                        <span v-tooltip="{ content: config.handle, copyable: true }">
+                        <span v-tooltip="{ content: config.handle, copyable: true }" :class="{ 'text-gray-500': shouldMarkReadOnly }">
                             {{ __(config.display) }}
                         </span>
                     </template>
@@ -308,7 +308,7 @@ const fieldtypeComponentEvents = computed(() => ({
                     </template>
                     <ui-button size="sm" class="[&_svg]:translate-y-0.5" inset icon="synced" variant="ghost" v-tooltip="__('messages.field_synced_with_origin')" v-if="!isReadOnly && isSyncable" v-show="isSynced" @click="desync" />
                     <ui-button size="sm" class="[&_svg]:translate-y-0.5" inset icon="unsynced" variant="ghost" v-tooltip="__('messages.field_desynced_from_origin')" v-if="!isReadOnly && isSyncable" v-show="!isSynced" @click="sync" />
-                    <span v-if="shouldGreyOutReadOnly" class="ms-2 text-2xs font-normal text-gray-500 dark:text-gray-400">
+                    <span v-if="shouldMarkReadOnly" class="ms-2 text-2xs font-normal text-gray-500 dark:text-gray-400">
                         <Icon name="padlock-locked" class="inline size-3! -mt-0.5 me-0.5 align-middle" />
                         {{ __('Read Only') }}
                     </span>
@@ -343,23 +343,5 @@ const fieldtypeComponentEvents = computed(() => ({
 .lock-avatar-pop-leave-to {
     opacity: 0;
     transform: translateX(-5px) scale(0.85);
-}
-
-/* Read only controls all get a dashed border, so we can use that to target them.
-   Checked checkboxes keep the class but not the dashes, so leave them alone. */
-.read-only-field :deep([class*="border-dashed"]:not([data-state="checked"], [data-state="indeterminate"])) {
-    background-color: var(--color-gray-100);
-    background-image: none;
-    color: var(--color-gray-600);
-    box-shadow: none;
-}
-
-.read-only-field :deep([data-ui-label]) {
-    color: var(--color-gray-500);
-}
-
-:where(.dark) .read-only-field :deep([class*="border-dashed"]:not([data-state="checked"], [data-state="indeterminate"])) {
-    background-color: var(--color-gray-800);
-    color: var(--color-gray-400);
 }
 </style>

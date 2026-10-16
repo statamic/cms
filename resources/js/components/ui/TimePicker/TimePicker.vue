@@ -41,13 +41,15 @@ const setToNow = () => {
         :granularity="granularity"
         :disabled="disabled || readOnly"
         :class="[
-            'flex items-center w-full bg-white dark:bg-gray-900',
+            'flex items-center w-full',
             'border border-gray-300 dark:border-gray-700',
-            'leading-5 text-gray-600 dark:text-gray-300',
-            'shadow-ui-sm not-prose h-10 rounded-lg py-2 px-3 disabled:shadow-none',
+            'leading-5 text-gray-600',
+            'not-prose h-10 rounded-lg py-2 px-3 disabled:shadow-none',
             'data-invalid:border-red-500',
             disabled ? 'disabled:shadow-none disabled:opacity-50' : '',
-            readOnly ? 'border-dashed' : '',
+            readOnly
+                ? 'border-dashed bg-gray-100 dark:bg-gray-800 dark:text-gray-400'
+                : 'bg-white shadow-ui-sm dark:bg-gray-900 dark:text-gray-300',
         ]"
     >
         <div class="flex-1 flex items-center">

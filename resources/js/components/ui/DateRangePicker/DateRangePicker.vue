@@ -140,13 +140,15 @@ const hoverCardDate = computed(() => {
                 <DateRangePickerAnchor as-child>
                 <div
                     :class="[
-                        'flex items-center w-full overflow-x-auto overflow-y-hidden bg-white dark:bg-gray-900',
+                        'flex items-center w-full overflow-x-auto overflow-y-hidden',
                         'border border-gray-300 dark:border-gray-700',
-                        'leading-[1.375rem] text-gray-600 dark:text-gray-300 @max-xs:text-xs',
-                        'shadow-ui-sm not-prose h-10 rounded-lg px-2 disabled:shadow-none',
+                        'leading-[1.375rem] text-gray-600 @max-xs:text-xs',
+                        'not-prose h-10 rounded-lg px-2 disabled:shadow-none',
                         'data-invalid:border-red-500',
                         'disabled:shadow-none disabled:opacity-50',
-                        readOnly ? 'border-dashed' : '',
+                        readOnly
+                            ? 'border-dashed bg-gray-100 dark:bg-gray-800 dark:text-gray-400'
+                            : 'bg-white shadow-ui-sm dark:bg-gray-900 dark:text-gray-300',
                     ]"
                 >
                     <DateRangePickerTrigger
