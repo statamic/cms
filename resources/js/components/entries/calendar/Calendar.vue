@@ -159,6 +159,8 @@ function shouldFetchEntries(
 
     return false;
 }
+
+defineExpose({ refresh: fetchEntries });
 </script>
 
 <template>
