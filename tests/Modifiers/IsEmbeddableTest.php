@@ -15,6 +15,8 @@ class IsEmbeddableTest extends TestCase
             'youtube.com' => [true, 'https://www.youtube.com/watch?v=s9F5fhJQo34'],
             'youtu.be' => [true, 'https://www.youtu.be/watch?v=s9F5fhJQo34'],
             'vimeo' => [true, 'https://vimeo.com/22439234'],
+            'cloudflare' => [true, 'https://customer-wve7oze7jjxdb0j6.cloudflarestream.com/b209b1484821fff0ed2e5535fbb4ff7b/manifest/video.m3u8'],
+            'cloudflare without an id' => [false, 'https://customer-wve7oze7jjxdb0j6.cloudflarestream.com/'],
             'other' => [false, 'http://video-home-system.com/video.mp4'],
         ];
     }
