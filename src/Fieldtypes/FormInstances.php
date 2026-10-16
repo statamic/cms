@@ -100,9 +100,12 @@ class FormInstances extends FormFieldtype
     {
         $stored = $this->storedValue();
 
+        $addable = User::current() ? $this->selectableForms()->map->handle() : null;
+
         $map = collect($data['forms'] ?? [])
             ->filter()
             ->unique()
+            ->filter(fn ($handle) => array_key_exists($handle, $stored) || ! $addable || $addable->contains($handle))
             ->mapWithKeys(fn ($handle) => [$handle => $this->processConfigFor($handle, $data['config'][$handle] ?? [], $stored[$handle] ?? [])])
             ->all();
 

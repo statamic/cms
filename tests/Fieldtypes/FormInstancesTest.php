@@ -159,7 +159,9 @@ class FormInstancesTest extends TestCase
     #[Test]
     public function it_keeps_each_rows_stored_config_for_users_who_cant_edit_the_form()
     {
-        $this->setTestRoles(['editor' => ['access cp', 'edit feedback form']]);
+        Form::make('poll')->set('unique_instances', true)->set('unique_instances_collections', ['pages'])->save();
+
+        $this->setTestRoles(['editor' => ['access cp', 'edit feedback form', 'view poll form submissions']]);
         $this->actingAs(tap(User::make()->assignRole('editor'))->save());
 
         $entry = $this->entry(['form_instances' => [
@@ -168,28 +170,75 @@ class FormInstancesTest extends TestCase
         ]]);
 
         $value = $this->field()->setParent($entry)->fieldtype()->process([
-            'forms' => ['contact', 'feedback', 'newsletter'],
+            'forms' => ['contact', 'feedback', 'poll'],
             'config' => [
                 'contact' => ['submission_limit' => 99],
                 'feedback' => ['submission_limit' => 20],
-                'newsletter' => ['submission_limit' => 1],
+                'poll' => ['submission_limit' => 1],
             ],
         ]);
 
         $this->assertEquals([
             'contact' => ['submission_limit' => 5],
             'feedback' => ['submission_limit' => 20],
-            'newsletter' => [],
+            'poll' => [],
         ], $value);
     }
 
     #[Test]
     public function it_ignores_incoming_config_for_users_who_cant_edit_the_form_without_a_parent_entry()
     {
+        $this->setTestRoles(['editor' => ['access cp', 'view contact form submissions']]);
+        $this->actingAs(tap(User::make()->assignRole('editor'))->save());
+
+        $fieldtype = (new Field('form_instances', ['type' => 'form_instances', 'collection' => 'pages']))->fieldtype();
+
+        $this->assertSame(['contact' => []], $fieldtype->process(['forms' => ['contact'], 'config' => ['contact' => ['submission_limit' => 5]]]));
+    }
+
+    #[Test]
+    public function it_doesnt_add_forms_the_user_cant_view()
+    {
+        $this->setTestRoles(['editor' => ['access cp', 'view contact form submissions']]);
+        $this->actingAs(tap(User::make()->assignRole('editor'))->save());
+
+        $value = $this->field()->setParent($this->entry())->fieldtype()->process(['forms' => ['contact', 'feedback']]);
+
+        $this->assertSame(['contact' => []], $value);
+    }
+
+    #[Test]
+    public function it_doesnt_add_forms_that_dont_target_the_collection()
+    {
+        $this->actingAs(tap(User::make()->makeSuper())->save());
+
+        $value = $this->field()->setParent($this->entry())->fieldtype()->process(['forms' => ['contact', 'survey', 'newsletter', 'missing']]);
+
+        $this->assertSame(['contact' => []], $value);
+    }
+
+    #[Test]
+    public function it_keeps_stored_forms_the_user_couldnt_add()
+    {
         $this->setTestRoles(['editor' => ['access cp']]);
         $this->actingAs(tap(User::make()->assignRole('editor'))->save());
 
-        $this->assertSame(['contact' => []], $this->fieldtype()->process(['forms' => ['contact'], 'config' => ['contact' => ['submission_limit' => 5]]]));
+        $entry = $this->entry(['form_instances' => [
+            'survey' => ['submission_limit' => 5],
+            'feedback' => [],
+        ]]);
+
+        $value = $this->field()->setParent($entry)->fieldtype()->process(['forms' => ['survey', 'feedback']]);
+
+        $this->assertSame(['survey' => ['submission_limit' => 5], 'feedback' => []], $value);
+    }
+
+    #[Test]
+    public function it_adds_any_form_without_a_current_user()
+    {
+        $value = $this->field()->setParent($this->entry())->fieldtype()->process(['forms' => ['survey', 'newsletter']]);
+
+        $this->assertSame(['survey' => [], 'newsletter' => []], $value);
     }
 
     #[Test]

@@ -40,9 +40,9 @@ class ConfigureFormInstancesTest extends TestCase
 
         Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true)->byDefault();
 
-        Form::make('contact')->set('unique_instances', true)->save();
-        Form::make('feedback')->set('unique_instances', true)->save();
-        Form::make('other')->set('unique_instances', true)->save();
+        Form::make('contact')->set('unique_instances', true)->set('unique_instances_collections', ['test'])->save();
+        Form::make('feedback')->set('unique_instances', true)->set('unique_instances_collections', ['test'])->save();
+        Form::make('other')->set('unique_instances', true)->set('unique_instances_collections', ['test'])->save();
     }
 
     #[Test]
@@ -101,7 +101,7 @@ class ConfigureFormInstancesTest extends TestCase
     #[Test]
     public function an_entry_editor_without_form_permission_can_add_and_remove_forms()
     {
-        [$user, $entry] = $this->seedEntry(['access cp', 'edit test entries', 'access en site'], [
+        [$user, $entry] = $this->seedEntry(['access cp', 'edit test entries', 'access en site', 'view other form submissions'], [
             'contact' => self::STORED,
             'feedback' => ['submission_limit' => 99],
         ]);
@@ -112,6 +112,43 @@ class ConfigureFormInstancesTest extends TestCase
         ]]);
 
         $this->assertEquals(['contact' => self::STORED, 'other' => []], Entry::find($entry->id())->get('form_instances'));
+    }
+
+    #[Test]
+    public function an_entry_editor_cant_add_a_form_they_cant_view()
+    {
+        [$user, $entry] = $this->seedEntry(['access cp', 'edit test entries', 'access en site', 'view contact form submissions'], null);
+
+        $this->save($user, $entry, ['forms' => ['contact', 'other'], 'config' => ['contact' => [], 'other' => []]]);
+
+        $this->assertSame(['contact' => []], Entry::find($entry->id())->get('form_instances'));
+    }
+
+    #[Test]
+    public function an_entry_editor_cant_add_a_form_that_doesnt_target_the_collection()
+    {
+        Form::make('elsewhere')->set('unique_instances', true)->set('unique_instances_collections', ['events'])->save();
+
+        [$user, $entry] = $this->seedEntry(['access cp', 'edit test entries', 'access en site', 'edit forms'], null);
+
+        $this->save($user, $entry, ['forms' => ['contact', 'elsewhere'], 'config' => ['contact' => [], 'elsewhere' => []]]);
+
+        $this->assertSame(['contact' => []], Entry::find($entry->id())->get('form_instances'));
+    }
+
+    #[Test]
+    public function an_entry_editor_keeps_a_stored_form_they_couldnt_add()
+    {
+        Form::make('elsewhere')->set('unique_instances', true)->set('unique_instances_collections', ['events'])->save();
+
+        [$user, $entry] = $this->seedEntry(['access cp', 'edit test entries', 'access en site'], [
+            'contact' => self::STORED,
+            'elsewhere' => [],
+        ]);
+
+        $this->save($user, $entry, ['forms' => ['contact', 'elsewhere'], 'config' => ['contact' => [], 'elsewhere' => []]]);
+
+        $this->assertEquals(['contact' => self::STORED, 'elsewhere' => []], Entry::find($entry->id())->get('form_instances'));
     }
 
     #[Test]
