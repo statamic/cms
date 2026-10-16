@@ -47,7 +47,9 @@ class NamespacedTagsTest extends TestCase
             {
                 parent::__construct($app);
 
-                $this->tagNamespace = $tagNamespace;
+                if ($tagNamespace !== null) {
+                    $this->tagNamespace = $tagNamespace;
+                }
             }
 
             protected function autoloadFilesFromFolder($folder, $requiredClass = null): array

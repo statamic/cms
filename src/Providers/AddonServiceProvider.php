@@ -167,7 +167,7 @@ abstract class AddonServiceProvider extends ServiceProvider
      */
     protected $fieldsetNamespace;
 
-    protected ?string $tagNamespace;
+    protected ?string $tagNamespace = null;
 
     /**
      * @var string
