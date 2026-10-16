@@ -1,5 +1,13 @@
 <template>
     <div class="datetime min-w-[145px]">
+        <div
+            v-if="isReadOnly && !hasDate && !isInline"
+            class="rounded-lg border border-dashed border-gray-300 bg-gray-50 px-3 py-3 text-center text-sm text-gray-400 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-400"
+            data-date-readonly-empty
+        >
+            {{ __('None') }}
+        </div>
+
         <Button :text="__('Add Date')" icon="calendar" v-if="!isReadOnly && !isInline && !hasDate" @click="addDate" />
 
         <Component
@@ -188,13 +196,21 @@ export default {
                 let start = value.start;
                 let end = value.end;
 
+                if (!start.offset && !start.timeZone) {
+                    start = toZoned(start, this.displayTimezone);
+                }
+
+                if (!end.offset && !end.timeZone) {
+                    end = toZoned(end, this.displayTimezone);
+                }
+
                 if (!this.hasTime) {
                     end.set({ hour: 23, minute: 59, second: 59 });
                 }
 
                 return this.update({
-                    start: toZoned(start, 'UTC').toAbsoluteString(),
-                    end: toZoned(end, 'UTC').toAbsoluteString(),
+                    start: toTimeZone(start, 'UTC').toAbsoluteString(),
+                    end: toTimeZone(end, 'UTC').toAbsoluteString(),
                 });
             }
 

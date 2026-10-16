@@ -49,6 +49,7 @@
                         :variant="!revisionsEnabled ? 'primary' : 'default'"
                         @click.prevent="save"
                         v-text="saveText"
+                        v-tooltip="saveAndCloseTooltip"
                     />
                 </save-button-options>
 
@@ -77,7 +78,7 @@
             :blueprint="fieldset"
             v-model="values"
             :extra-values="extraValues"
-            :meta="meta"
+            v-model:meta="meta"
             :origin-values="originValues"
             :origin-meta="originMeta"
             :errors="errors"
@@ -124,6 +125,7 @@
                             <Panel class="flex justify-between px-5! py-3! dark:bg-gray-800!" v-if="!revisionsEnabled">
                                 <Heading :text="__('Published')" />
                                 <Switch
+                                    :label="__('Published')"
                                     :model-value="published"
                                     :disabled="!canManagePublishState"
                                     @update:model-value="setFieldValue('published', $event)"
@@ -285,6 +287,8 @@ import {
 	Stack,
 } from '@ui';
 import resetValuesFromResponse from '@/util/resetValuesFromResponse.js';
+import debounce from '@/util/debounce.js';
+import shortcutLabel from '@/util/shortcutLabel.js';
 import { computed, ref } from 'vue';
 import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } from '@ui/Publish/SavePipeline.js';
 import { router } from '@inertiajs/vue3';
@@ -352,11 +356,13 @@ export default {
         previewTargets: Array,
         autosaveInterval: Number,
         parent: String,
+        initialTitleFormat: Object,
     },
 
     data() {
         return {
             actions: this.initialActions,
+            titleFormat: this.initialTitleFormat,
             localizing: false,
             trackDirtyState: true,
             fieldset: this.initialFieldset,
@@ -393,7 +399,9 @@ export default {
 
             saveKeyBinding: null,
             quickSaveKeyBinding: null,
+            saveAndCloseKeyBinding: null,
             quickSave: false,
+            closeAfterSave: false,
             isAutosave: false,
             autosaveIntervalInstance: null,
             syncFieldConfirmationText: __('messages.sync_entry_field_confirmation_text'),
@@ -416,8 +424,13 @@ export default {
             return computed(() => this.$refs.container);
         },
 
-        saving() {
-            return this.savingRef.value;
+        saving: {
+            get() {
+                return this.savingRef.value;
+            },
+            set(value) {
+                this.savingRef.value = value;
+            },
         },
 
         errors() {
@@ -434,6 +447,12 @@ export default {
 
         canSave() {
             return !this.readOnly && !this.somethingIsLoading;
+        },
+
+        saveAndCloseTooltip() {
+            if (!this.isInline) return null;
+
+            return __('Save & Close (:shortcut)', { shortcut: shortcutLabel('mod+shift+s') });
         },
 
         canPublish() {
@@ -457,7 +476,7 @@ export default {
         },
 
         showLivePreviewButton() {
-            return !this.readOnly && !this.isCreating && this.isBase && this.livePreviewUrl;
+            return !this.isPreviewing && !this.readOnly && !this.isCreating && this.isBase && this.livePreviewUrl;
         },
 
         showVisitUrlButton() {
@@ -564,6 +583,7 @@ export default {
                         _blueprint: this.fieldset.handle,
                         _localized: this.localizedFields,
                         _parent: this.parent,
+                        _auto_slug: this.meta.slug?.auto ?? false,
                     }),
                     new AfterSaveHooks('entry', {
                         collection: this.collectionHandle,
@@ -583,7 +603,7 @@ export default {
                         this.values = resetValuesFromResponse(response.data.data.values, this.$refs.container);
                         this.extraValues = response.data.data.extraValues;
                         this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 500);
-                        this.$nextTick(() => this.$emit('saved', response));
+                        this.emitSaved(response);
                         return;
                     }
 
@@ -609,13 +629,15 @@ export default {
                         this.initialPublished = response.data.data.published;
                         this.activeLocalization.published = response.data.data.published;
                         this.activeLocalization.status = response.data.data.status;
-                        this.$nextTick(() => this.$emit('saved', response));
+                        this.emitSaved(response);
                     }
 
                     this.quickSave = false;
                     this.isAutosave = false;
                 })
                 .catch((e) => {
+                    this.closeAfterSave = false;
+
                     if (!(e instanceof PipelineStopped)) {
                         this.$toast.error(__('Something went wrong'));
                         console.error(e);
@@ -627,6 +649,42 @@ export default {
             if (this.canPublish) {
                 this.confirmingPublish = true;
             }
+        },
+
+        generateTitle() {
+            if (!this.titleFormat) return;
+
+            const values = this.titleFormatValues();
+            const serialized = JSON.stringify(values);
+
+            if (serialized === this.lastTitleFormatValues) return;
+            this.lastTitleFormatValues = serialized;
+
+            this.titleRequest?.abort();
+            this.titleRequest = new AbortController();
+
+            this.$axios
+                .post(
+                    this.titleFormat.url,
+                    { blueprint: this.fieldset.handle, values },
+                    { signal: this.titleRequest.signal },
+                )
+                .then(({ data }) => {
+                    if (data.title !== this.values.title) this.$refs.container.setFieldValue('title', data.title);
+                })
+                .catch((e) => {
+                    if (e.code !== 'ERR_CANCELED') throw e;
+                });
+        },
+
+        titleFormatValues() {
+            // The server discards these, so sending them would only mean pointless
+            // requests whenever the slug gets regenerated from the title.
+            const fields = this.titleFormat.fields.filter(
+                (field) => field in this.values && !['title', 'slug'].includes(field),
+            );
+
+            return Object.fromEntries(fields.map((field) => [field, this.values[field]]));
         },
 
         localizationSelected(localization) {
@@ -662,10 +720,6 @@ export default {
             } else {
                 this.createLocalization(localization);
             }
-
-            if (this.isBase) {
-                window.history.replaceState({}, '', localization.url);
-            }
         },
 
         editLocalization(localization) {
@@ -685,6 +739,7 @@ export default {
                 this.collection = data.collection;
                 this.title = data.editing ? data.values.title : this.title;
                 this.actions = data.actions;
+                this.titleFormat = data.titleFormat;
 				this.itemActions = data.itemActions;
                 this.fieldset = data.blueprint;
                 this.permalink = data.permalink;
@@ -693,6 +748,10 @@ export default {
                 this.localizing = false;
                 this.initialPublished = data.values.published;
                 this.readOnly = data.readOnly;
+
+                if (this.isBase && localization.url) {
+                    window.history.replaceState({}, '', localization.url + window.location.hash);
+                }
 
                 this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 500); // after any fieldtypes do a debounced update
             });
@@ -782,7 +841,7 @@ export default {
                 this.activeLocalization.published = response.data.data.published;
                 this.activeLocalization.status = response.data.data.status;
                 this.permalink = response.data.data.permalink;
-                this.$nextTick(() => this.$emit('saved', response));
+                this.emitSaved(response);
             }
         },
 
@@ -850,7 +909,15 @@ export default {
 
         redirectTo(location) {
             router.get(location);
-        }
+        },
+
+        emitSaved(response) {
+            this.$nextTick(() => {
+                this.$emit('saved', response);
+                if (this.closeAfterSave) this.$emit('close');
+                this.closeAfterSave = false;
+            });
+        },
     },
 
     mounted() {
@@ -867,6 +934,16 @@ export default {
             this.save();
         });
 
+        if (this.isInline) {
+            this.saveAndCloseKeyBinding = this.$keys.bindGlobal(['mod+shift+s'], (e) => {
+                e.preventDefault();
+                if (this.confirmingPublish || !this.canSave) return;
+                this.quickSave = true;
+                this.closeAfterSave = true;
+                this.save();
+            });
+        }
+
         if (typeof this.autosaveInterval === 'number') {
             this.setAutosaveInterval();
         }
@@ -876,6 +953,11 @@ export default {
 
     created() {
         window.history.replaceState({}, document.title, document.location.href.replace('created=true', ''));
+
+        if (this.titleFormat) {
+            this.lastTitleFormatValues = JSON.stringify(this.titleFormatValues());
+            this.$watch('values', debounce(() => this.generateTitle(), 300), { deep: true });
+        }
 
         this.selectedOrigin =
             this.originBehavior === 'active'
@@ -888,6 +970,7 @@ export default {
 	    clearTimeout(this.trackDirtyStateTimeout);
 	    this.saveKeyBinding.destroy();
 	    this.quickSaveKeyBinding.destroy();
+	    this.saveAndCloseKeyBinding?.destroy();
     },
 };
 </script>

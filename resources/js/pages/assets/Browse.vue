@@ -1,6 +1,7 @@
 <script>
 import Head from '@/pages/layout/Head.vue';
 import { DocsCallout } from '@ui';
+import { toRaw } from 'vue';
 
 export default {
     components: {
@@ -17,6 +18,16 @@ export default {
         };
     },
 
+    computed: {
+        headTitle() {
+            const title = __(this.container.title);
+            const section = __('Assets');
+
+            // Avoid duplicating when the container is named "Assets".
+            return title === section ? section : [title, section];
+        },
+    },
+
     mounted() {
         this.bindBrowserNavigation();
     },
@@ -29,7 +40,7 @@ export default {
          * navigation back and forth through folders using browser buttons.
          */
         bindBrowserNavigation() {
-            window.history.replaceState({ container: { ...this.container }, path: this.path }, '');
+            window.history.replaceState({ container: toRaw(this.container), path: this.path }, '');
 
             window.onpopstate = (e) => {
                 this.path = e.state.path;
@@ -71,7 +82,7 @@ export default {
 
             window.history.pushState(
                 {
-                    container: { ...this.container },
+                    container: toRaw(this.container),
                     path: this.path,
                 },
                 '',
@@ -91,7 +102,7 @@ export default {
 
 <template>
     <div class="h-full" v-cloak>
-        <Head :title="container.title" />
+        <Head :title="headTitle" />
 
         <asset-browser
             ref="browser"

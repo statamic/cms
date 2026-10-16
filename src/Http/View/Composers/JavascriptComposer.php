@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 use Statamic\Assets\CropAspectRatios;
 use Statamic\CommandPalette\Category;
+use Statamic\CP\Assets\CropProcessor;
 use Statamic\CP\Color;
 use Statamic\Facades\CommandPalette;
 use Statamic\Facades\CP\Toast;
@@ -66,11 +67,13 @@ class JavascriptComposer
             'googleDocsViewer' => config('statamic.assets.google_docs_viewer'),
             'focalPointEditorEnabled' => config('statamic.assets.focal_point_editor'),
             'cropAspectRatios' => CropAspectRatios::all(),
+            'cropQuality' => CropProcessor::defaultQuality(),
             'elevatedSessionsEnabled' => config('statamic.users.elevated_sessions_enabled'),
             'user' => $this->user($user),
             'defaultPreferences' => Preference::default()->all(),
             'paginationSize' => config('statamic.cp.pagination_size'),
             'paginationSizeOptions' => config('statamic.cp.pagination_size_options'),
+            'selectAllLimit' => config('statamic.cp.select_all_limit'),
             'multisiteEnabled' => Site::multiEnabled(),
             'sites' => $this->sites(),
             'selectedSite' => Site::selected()->handle(),
@@ -124,6 +127,11 @@ class JavascriptComposer
     protected function translations(): array
     {
         $translations = app('translator')->toJson();
+
+        if (app('translator')->locale() === 'en') {
+            return $translations;
+        }
+
         $fallbackTranslations = tap(app('translator'))->setLocale(app('translator')->getFallback())->toJson();
 
         return array_merge($fallbackTranslations, $translations);

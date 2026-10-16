@@ -23,6 +23,14 @@ import Table from './Table.vue';
 import Pagination from './Pagination.vue';
 import { sortBy } from 'lodash-es';
 import fuzzysort from 'fuzzysort';
+import {
+    canSelectAllMatching as canSelectAllMatchingHelper,
+    fetchAllMatchingIds,
+    isPageFullySelected,
+    isRequestCanceled,
+    replaceSelections,
+    resolveSelectAllLimit,
+} from '@/util/listing-selections.js';
 
 const emit = defineEmits([
     'update:columns',
@@ -51,6 +59,11 @@ const props = defineProps({
     },
     /** When `true`, bulk actions are available when items are selected. */
     allowBulkActions: {
+        type: Boolean,
+        default: true,
+    },
+    /** When `true`, offers selecting all matching results across pages after the current page is selected. */
+    allowSelectAllMatching: {
         type: Boolean,
         default: true,
     },
@@ -173,14 +186,19 @@ const currentPage = ref(1);
 const perPage = ref(initializePerPage());
 const initializing = ref(true);
 const loading = ref(true);
+const selectingAllMatching = ref(false);
+const selectedAllMatching = ref(false);
+const selectedAllMatchingCount = ref(0);
+const selectAllLimit = computed(() => resolveSelectAllLimit(Statamic.$config.get('selectAllLimit')));
 let popping = false;
 let source = null;
+let selectAllMatchingSource = null;
 const searchQuery = ref(null);
 const columns = ref(initializeColumns());
 const sortColumn = ref(props.sortColumn || (columns.value.length ? columns.value[0].field : null));
 const sortDirection = ref(props.sortDirection || getDefaultSortDirectionForColumn(sortColumn.value));
 const selections = ref(props.selections || []);
-const allowsSelections = computed(() => (props.selections || hasActions.value) && !props.reorderable);
+const allowsSelections = computed(() => (props.selections || (props.allowBulkActions && hasActions.value)) && !props.reorderable);
 const allowsMultipleSelections = computed(() => props.maxSelections > 1);
 const hasReachedSelectionLimit = computed(() => selections.value.length === props.maxSelections);
 const hasActions = computed(() => !!props.actionUrl);
@@ -274,9 +292,12 @@ const forwardedTableCellSlots = computed(() => {
 });
 
 const activeFilterBadgeCount = computed(() => {
-    let count = Object.keys(activeFilterBadges.value).length;
+    const filterHandles = props.filters.map((filter) => filter.handle);
+    const badgeHandles = Object.keys(activeFilterBadges.value).filter((handle) => filterHandles.includes(handle));
 
-    if (activeFilterBadges.value.hasOwnProperty('fields')) {
+    let count = badgeHandles.length;
+
+    if (badgeHandles.includes('fields')) {
         count = count + Object.keys(activeFilterBadges.value.fields).length - 1;
     }
 
@@ -319,9 +340,75 @@ const shouldRequestFirstPage = computed(() => {
     return false;
 });
 
+function abortSelectAllMatching() {
+    if (selectAllMatchingSource) {
+        selectAllMatchingSource.abort();
+        selectAllMatchingSource = null;
+    }
+    selectingAllMatching.value = false;
+}
+
+async function selectAllMatching() {
+    if (!props.url || !meta.value?.total) return;
+    if (meta.value.total > selectAllLimit.value) return;
+
+    abortSelectAllMatching();
+    selectingAllMatching.value = true;
+    const controller = new AbortController();
+    selectAllMatchingSource = controller;
+
+    try {
+        const ids = await fetchAllMatchingIds({
+            get: axios.get.bind(axios),
+            url: props.url,
+            parameters: {
+                ...parameters.value,
+                columns: 'id',
+            },
+            total: meta.value.total,
+            pageSize: selectAllMatchingPageSize(),
+            signal: controller.signal,
+            maxSelections: props.maxSelections,
+            selectAllLimit: selectAllLimit.value,
+        });
+
+        if (selectAllMatchingSource !== controller) return;
+
+        selectedAllMatchingCount.value = ids.length;
+        replaceSelections(selections.value, ids);
+        selectedAllMatching.value = true;
+    } catch (e) {
+        if (isRequestCanceled(e) || selectAllMatchingSource !== controller) return;
+        let message = e.response ? e.response.data.message : __('Something went wrong');
+
+        if (e.code === 'SELECTION_LIMIT_REACHED') {
+            message = __('messages.selections_select_all_limit_reached', { limit: selectAllLimit.value });
+        }
+
+        Statamic.$toast.error(message, {
+            duration: null,
+        });
+    } finally {
+        if (selectAllMatchingSource !== controller) return;
+        selectingAllMatching.value = false;
+        selectAllMatchingSource = null;
+    }
+}
+
+function selectAllMatchingPageSize() {
+    const options = Statamic.$config.get('paginationSizeOptions');
+
+    if (Array.isArray(options) && options.length > 0) {
+        return Math.max(...options.map(Number));
+    }
+
+    return perPage.value || meta.value?.per_page || 100;
+}
+
 function request() {
     if (props.items) return;
 
+    abortSelectAllMatching();
     loading.value = true;
 
     if (source) source.abort();
@@ -348,7 +435,7 @@ function request() {
             });
         })
         .catch((e) => {
-            if (axios.isCancel(e)) return;
+            if (isRequestCanceled(e) || axios.isCancel(e)) return;
             initializing.value = false;
             loading.value = false;
             if (e.request && !e.response) return;
@@ -554,8 +641,57 @@ function selectRange(from, to) {
 }
 
 function clearSelections() {
+    abortSelectAllMatching();
+    selectedAllMatching.value = false;
+    selectedAllMatchingCount.value = 0;
     selections.value.splice(0, selections.value.length);
 }
+
+const pageFullySelected = computed(() => isPageFullySelected(items.value, selections.value));
+
+const allMatchingSelected = computed(() => selectedAllMatching.value);
+
+const canSelectAllMatching = computed(() =>
+    props.allowSelectAllMatching &&
+    canSelectAllMatchingHelper({
+        hasUrl: !!props.url && !props.items,
+        total: meta.value?.total ?? 0,
+        pageSize: items.value?.length ?? 0,
+        pageFullySelected: pageFullySelected.value,
+        allMatchingSelected: allMatchingSelected.value,
+        selectedCount: selections.value.length,
+        maxSelections: props.maxSelections,
+        selectAllLimit: selectAllLimit.value,
+    }),
+);
+
+// Only invalidate all-matching mode when the result set itself changes.
+const matchingQueryKey = computed(() =>
+    JSON.stringify({
+        url: props.url ?? null,
+        additionalParameters: props.additionalParameters ?? {},
+        search: parameters.value.search ?? null,
+        filters: parameters.value.filters ?? null,
+        sort: parameters.value.sort ?? null,
+        order: parameters.value.order ?? null,
+    }),
+);
+
+watch(matchingQueryKey, () => {
+    selectedAllMatching.value = false;
+    selectedAllMatchingCount.value = 0;
+});
+
+watch(
+    selections,
+    (next) => {
+        if (selectedAllMatching.value && next.length < selectedAllMatchingCount.value) {
+            selectedAllMatching.value = false;
+            selectedAllMatchingCount.value = 0;
+        }
+    },
+    { deep: true },
+);
 
 function setFilters(filters) {
     activeFilters.value = filters || {};
@@ -648,6 +784,12 @@ provideListingContext({
     selectRange,
     toggleSelection,
     clearSelections,
+    selectAllMatching,
+    selectingAllMatching,
+    canSelectAllMatching,
+    allMatchingSelected,
+    selectedAllMatching,
+    selectedAllMatchingCount,
     actionUrl: toRef(() => props.actionUrl),
     actionContext: toRef(() => props.actionContext),
     showBulkActions,
@@ -686,6 +828,8 @@ watch(parameters, (newParams, oldParams) => {
     pushState();
 });
 
+watch(() => props.url, () => request());
+
 watch(loading, (loading) => Statamic.$progress.loading(id, loading));
 
 onMounted(() => {
@@ -697,6 +841,8 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
     Statamic.$progress.complete(id);
+    abortSelectAllMatching();
+    if (source) source.abort();
     if (props.pushQuery) window.removeEventListener('popstate', popState);
 });
 
@@ -717,12 +863,12 @@ autoApplyState();
     <div>
         <slot name="initializing" v-if="shouldShowSkeleton">
             <div class="flex flex-col gap-4 justify-between mt-3 starting-style-transition starting-style-transition--delay">
-                <ui-skeleton class="h-5 w-48" />
-                <div class="flex gap-2 sm:gap-3">
-                    <ui-skeleton class="h-9 w-96" />
-                    <ui-skeleton class="h-9 w-24" />
+                <ui-skeleton v-if="showPresets" class="h-5 w-48" />
+                <div v-if="allowSearch || hasFilters || allowCustomizingColumns" class="flex gap-2 sm:gap-3">
+                    <ui-skeleton v-if="allowSearch" class="h-9 w-96" />
+                    <ui-skeleton v-if="hasFilters" class="h-9 w-24" />
                     <div class="flex-1" />
-                    <ui-skeleton class="size-10" />
+                    <ui-skeleton v-if="allowCustomizingColumns" class="size-10" />
                 </div>
                 <ui-skeleton class="h-48 w-full" />
             </div>
@@ -730,7 +876,7 @@ autoApplyState();
         <slot v-if="!initializing" :items="items" :is-column-visible="isColumnVisible" :loading="loading">
             <Presets v-if="showPresets" />
             <div v-if="allowSearch || hasFilters || allowCustomizingColumns" class="relative overflow-clip flex items-center gap-2 sm:gap-3 min-h-16 starting-style-transition st-overflow-clip-margin">
-                <div class="flex flex-1 items-center gap-2 sm:gap-3 w-full">
+                <div class="flex flex-1 items-center gap-2 sm:gap-3 overflow-x-auto -ms-1 ps-1 py-1">
                     <Search v-if="allowSearch" />
                     <Filters v-if="hasFilters" />
                 </div>

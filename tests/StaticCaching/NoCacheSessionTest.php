@@ -49,6 +49,22 @@ class NoCacheSessionTest extends TestCase
     }
 
     #[Test]
+    public function when_pushing_a_region_it_will_filter_out_private_variables()
+    {
+        $session = new Session('/');
+
+        $region = $session->pushRegion('', [
+            'foo' => 'bar',
+            '__env' => 'env value',
+            '__blaze' => fn () => 'a closure',
+        ], '');
+
+        $this->assertEquals([
+            'foo' => 'bar',
+        ], $region->context());
+    }
+
+    #[Test]
     public function it_gets_the_fragment_data()
     {
         // fragment data should be the context,
@@ -75,6 +91,26 @@ class NoCacheSessionTest extends TestCase
             'baz' => 'qux',
             'title' => 'local title',
         ], $region->fragmentData());
+    }
+
+    /**
+     * @see https://github.com/statamic/cms/issues/15450
+     **/
+    #[Test]
+    public function it_generates_unique_region_ids_across_urls()
+    {
+        $home = new Session('https://example.test/');
+        $error = new Session('https://example.test/1');
+
+        for ($i = 0; $i < 14; $i++) {
+            $home->getRegionId();
+        }
+
+        for ($i = 0; $i < 4; $i++) {
+            $error->getRegionId();
+        }
+
+        $this->assertNotEquals($home->getRegionId(), $error->getRegionId());
     }
 
     #[Test]

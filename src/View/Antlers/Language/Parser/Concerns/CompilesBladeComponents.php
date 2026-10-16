@@ -34,6 +34,10 @@ trait CompilesBladeComponents
             $params .= ' component_name___="'.$name.'"';
         }
 
+        if ($bound = $this->getBoundParameterNames($component)) {
+            $params .= ' component_bound___="'.implode(',', $bound).'"';
+        }
+
         if ($component->isClosingTag && ! $component->isSelfClosing) {
             return "{{ /%component_proxy:{$tagMethod} }}";
         }
@@ -49,6 +53,15 @@ trait CompilesBladeComponents
         $close = "{{ /%component_proxy:$tagMethod }}";
 
         return $open.$innerContent.$close;
+    }
+
+    protected function getBoundParameterNames(ComponentNode $component): array
+    {
+        return collect($component->parameters)
+            ->filter(fn ($parameter) => in_array($parameter->type, [ParameterType::DynamicVariable, ParameterType::ShorthandDynamicVariable]))
+            ->map(fn ($parameter) => $parameter->materializedName)
+            ->values()
+            ->all();
     }
 
     protected function getParamValue(string $value): string

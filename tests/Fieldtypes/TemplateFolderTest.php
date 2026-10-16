@@ -6,24 +6,27 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\File;
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\TemplateFolder;
+use Tests\DeletesDirectories;
 use Tests\TestCase;
 
 class TemplateFolderTest extends TestCase
 {
+    use DeletesDirectories;
+
     private string $dir;
 
     public function setUp(): void
     {
         parent::setUp();
 
-        app('files')->makeDirectory($this->dir = __DIR__.'/templates-test-tmp', force: true);
+        app('files')->makeDirectory($this->dir = __DIR__.'/template-folder-test-tmp', force: true);
 
         $this->app['config']->set('view.paths', [$this->dir.'/views']);
     }
 
     public function tearDown(): void
     {
-        app('files')->deleteDirectory($this->dir);
+        $this->deleteDirectory($this->dir);
 
         parent::tearDown();
     }

@@ -42,11 +42,15 @@ class UpdateGlobalsTest extends TestCase
 
         $this
             ->actingAs($user)
-            ->patchJson($global->updateUrl(), ['title' => 'Testing'])
+            ->patchJson($global->updateUrl(), [
+                'title' => 'Testing',
+                'layout_mode' => 'multi_column',
+            ])
             ->assertSuccessful();
 
         $global = GlobalSet::find('test');
         $this->assertEquals('Testing', $global->title());
+        $this->assertEquals('multi_column', $global->layoutMode());
 
         Event::assertDispatched(GlobalSetSaved::class, function ($event) {
             return $event->globals->handle() === 'test';

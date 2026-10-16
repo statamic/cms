@@ -175,6 +175,24 @@ class MetaControllerTest extends TestCase
     }
 
     #[Test]
+    public function it_preloads_meta_using_the_preprocessed_value()
+    {
+        $response = $this->fieldMeta(User::make()->makeSuper()->save(), [
+            'handle' => 'test',
+            'type' => 'grid',
+            'min_rows' => 2,
+            'fields' => [
+                ['handle' => 'words', 'field' => ['type' => 'text']],
+            ],
+        ], [])->assertOk();
+
+        $ids = collect($response->json('value'))->pluck('_id')->all();
+
+        $this->assertCount(2, $ids);
+        $this->assertEquals($ids, array_keys($response->json('meta.existing')));
+    }
+
+    #[Test]
     public function it_gates_assets_through_the_preload_path()
     {
         Storage::fake('private', ['url' => '/assets']);

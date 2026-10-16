@@ -16,13 +16,12 @@ class FormSubmissionsStore extends ChildStore
 {
     protected $valueIndex = Value::class;
     protected $storeIndexes = [
-        'form',
         'date',
     ];
 
     public function getItemKey($item)
     {
-        return $item->id();
+        return $item->form()->handle().'::'.$item->id();
     }
 
     public function getItemFilter(SplFileInfo $file)

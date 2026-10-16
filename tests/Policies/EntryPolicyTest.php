@@ -152,6 +152,32 @@ class EntryPolicyTest extends PolicyTestCase
     }
 
     #[Test]
+    public function user_with_configure_permission_can_do_it_all()
+    {
+        $userWithPermission = $this->userWithPermissions(['configure collections']);
+        $userWithoutPermission = $this->userWithPermissions([]);
+
+        $collection = tap(Collection::make('alfa'))->save();
+        $entry = EntryFactory::id('1')->collection($collection)->create();
+
+        $this->assertTrue($userWithPermission->can('view', $entry));
+        $this->assertTrue($userWithPermission->can('edit', $entry));
+        $this->assertTrue($userWithPermission->can('update', $entry));
+        $this->assertTrue($userWithPermission->can('create', [Entry::class, $collection]));
+        $this->assertTrue($userWithPermission->can('store', [Entry::class, $collection]));
+        $this->assertTrue($userWithPermission->can('delete', $entry));
+        $this->assertTrue($userWithPermission->can('publish', $entry));
+
+        $this->assertFalse($userWithoutPermission->can('view', $entry));
+        $this->assertFalse($userWithoutPermission->can('edit', $entry));
+        $this->assertFalse($userWithoutPermission->can('update', $entry));
+        $this->assertFalse($userWithoutPermission->can('create', [Entry::class, $collection]));
+        $this->assertFalse($userWithoutPermission->can('store', [Entry::class, $collection]));
+        $this->assertFalse($userWithoutPermission->can('delete', $entry));
+        $this->assertFalse($userWithoutPermission->can('publish', $entry));
+    }
+
+    #[Test]
     public function another_authors_entry_is_editable()
     {
         $this->markTestIncomplete();

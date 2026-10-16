@@ -3,34 +3,22 @@
 namespace Statamic\Console\Commands;
 
 use Illuminate\Console\Command;
+use Statamic\Console\Commands\Concerns\HasStacheExcludes;
 use Statamic\Console\RunsInPlease;
 use Statamic\Facades\Stache;
 
 class StacheClear extends Command
 {
-    use RunsInPlease;
+    use HasStacheExcludes, RunsInPlease;
 
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'statamic:stache:clear';
+    protected $signature = 'statamic:stache:clear {--exclude= : Comma-separated list of store keys to exclude}';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
     protected $description = 'Clear the "Stache" cache';
 
-    /**
-     * Execute the console command.
-     *
-     * @return void
-     */
     public function handle()
     {
+        $this->addExcludes($this->option('exclude'));
+
         Stache::clear();
 
         $this->components->info('You have trimmed the Stache. It looks dashing.');

@@ -88,6 +88,7 @@ it('exports inertia', async () => {
         'toggleArchitecturalBackground',
         'useArchitecturalBackground',
         'useForm',
+        'usePage',
         'usePoll',
     ];
 
@@ -124,6 +125,7 @@ it('exports ui', async () => {
     const expectedCmsPackageExports = [
         'Alert',
         'AuthCard',
+        'AutocompleteEditor',
         'Badge',
         'Button',
         'ButtonGroup',
@@ -138,6 +140,9 @@ it('exports ui', async () => {
         'CodeEditor',
         'Combobox',
         'ConfirmationModal',
+        'ContentDirection',
+        'useContentDirection',
+        'useUiDirection',
         'Context',
         'ContextFooter',
         'ContextHeader',

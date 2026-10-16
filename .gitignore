@@ -17,5 +17,6 @@ composer.lock
 .env
 bundle-stats.html
 .claude/settings.local.json
+.claude/worktrees
 polyscope.json
 storybook-static

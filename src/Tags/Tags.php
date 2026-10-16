@@ -23,7 +23,7 @@ abstract class Tags
     /**
      * The content written between the tags (when a tag pair).
      *
-     * @public string
+     * @var string
      */
     public $content;
 
@@ -32,14 +32,14 @@ abstract class Tags
     /**
      * The variable context around which this tag is positioned.
      *
-     * @public array
+     * @var Context
      */
     public $context;
 
     /**
      * The parameters used on this tag.
      *
-     * @public array
+     * @var Parameters
      */
     public $params;
 
@@ -73,7 +73,7 @@ abstract class Tags
     /**
      * The parser instance that executed this tag.
      *
-     * @var \Statamic\View\Antlers\Parser
+     * @var \Statamic\Contracts\View\Antlers\Parser
      */
     public $parser;
 

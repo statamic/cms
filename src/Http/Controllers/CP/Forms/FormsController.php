@@ -3,7 +3,9 @@
 namespace Statamic\Http\Controllers\CP\Forms;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
+use InvalidArgumentException;
 use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\CP\Column;
 use Statamic\CP\PublishForm;
@@ -88,7 +90,12 @@ class FormsController extends CpController
                 'handle' => $exporter->handle(),
                 'title' => $exporter->title(),
                 'downloadUrl' => $exporter->downloadUrl(),
+                'supportsColumnSelection' => $exporter->supportsColumnSelection(),
             ])->values(),
+            'exportColumns' => $form->fields()
+                ->map(fn ($field) => ['handle' => $field->handle(), 'title' => __($field->display())])
+                ->push(['handle' => 'date', 'title' => __('Date')])
+                ->values(),
             'redirectUrl' => cp_route('forms.index'),
         ]);
     }
@@ -320,6 +327,7 @@ class FormsController extends CpController
                                     'display' => __('HTML view'),
                                     'instructions' => __('statamic::messages.form_configure_email_html_instructions'),
                                     'folder' => config('statamic.forms.email_view_folder'),
+                                    'clearable' => true,
                                 ],
                             ],
                             [
@@ -329,6 +337,7 @@ class FormsController extends CpController
                                     'display' => __('Text view'),
                                     'instructions' => __('statamic::messages.form_configure_email_text_instructions'),
                                     'folder' => config('statamic.forms.email_view_folder'),
+                                    'clearable' => true,
                                 ],
                             ],
                             [
@@ -366,17 +375,25 @@ class FormsController extends CpController
 
         ];
 
+        $positions = Form::extraConfigPositionsFor($form->handle());
+
         foreach (Form::extraConfigFor($form->handle()) as $handle => $config) {
+            $before = $positions[$handle]['beforeSection'] ?? null;
+            $after = $positions[$handle]['afterSection'] ?? null;
             $merged = false;
             foreach ($fields as $sectionHandle => $section) {
                 if ($section['display'] == __($config['display'])) {
+                    if ($before || $after) {
+                        throw new InvalidArgumentException("The [{$config['display']}] section already exists, so beforeSection and afterSection can't be used.");
+                    }
+
                     $fields[$sectionHandle]['fields'] += $config['fields'];
                     $merged = true;
                 }
             }
 
             if (! $merged) {
-                $fields[$handle] = $config;
+                $fields = $this->insertSection($fields, $handle, $config, $before, $after);
             }
         }
 
@@ -398,5 +415,43 @@ class FormsController extends CpController
             ],
         ])->all());
 
+    }
+
+    protected function insertSection(array $sections, string $handle, array $section, ?string $before = null, ?string $after = null): array
+    {
+        if (isset($sections[$handle]) && ($before || $after)) {
+            Log::warning("Form config section [{$handle}] replaces an existing section, so its position was ignored.");
+        }
+
+        if (isset($sections[$handle]) || (! $before && ! $after)) {
+            $sections[$handle] = $section;
+
+            return $sections;
+        }
+
+        $result = [];
+        $inserted = false;
+
+        foreach ($sections as $existingHandle => $existing) {
+            if ($before === $existingHandle) {
+                $result[$handle] = $section;
+                $inserted = true;
+            }
+
+            $result[$existingHandle] = $existing;
+
+            if ($after === $existingHandle) {
+                $result[$handle] = $section;
+                $inserted = true;
+            }
+        }
+
+        if (! $inserted) {
+            Log::warning("Form config section [{$handle}] could not be placed relative to [".($before ?? $after).'] because it does not exist. Appending it instead.');
+
+            return $sections + [$handle => $section];
+        }
+
+        return $result;
     }
 }

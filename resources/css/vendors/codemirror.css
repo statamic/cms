@@ -3,6 +3,7 @@
 .CodeMirror {
     /* Set height, width, borders, and global font properties here */
     @apply text-gray-900 dark:text-gray-300 leading-normal min-h-20;
+    direction: ltr;
 }
 
 /* CODEMIRROR / PADDING
@@ -102,6 +103,10 @@
     &.CodeMirror pre.CodeMirror-line,
     &.CodeMirror pre.CodeMirror-line-like {
         @apply text-gray-900 dark:text-gray-300;
+    }
+
+    &.CodeMirror pre.CodeMirror-placeholder {
+        @apply text-gray-500;
     }
 
     .CodeMirror-gutters {
@@ -509,6 +514,10 @@ span.CodeMirror-selectedtext {
         background: #263238;
         @apply dark:bg-gray-900;
         color: #eeffff;
+    }
+
+    &.CodeMirror pre.CodeMirror-placeholder {
+        @apply text-gray-400/85;
     }
 
     .CodeMirror-gutters {

@@ -7,7 +7,7 @@ import { computed, ref, watch } from 'vue';
 
 defineOptions({ layout: Outside });
 
-const props = defineProps(['errors', 'action', 'token', 'email', 'redirect', 'title', 'loginUrl']);
+const props = defineProps(['errors', 'action', 'token', 'email', 'emailReadonly', 'redirect', 'title', 'loginUrl']);
 
 const errors = ref(props.errors);
 watch(() => props.errors, (newErrors) => errors.value = newErrors);
@@ -47,11 +47,11 @@ const submit = () => {
             class="flex flex-col gap-6"
         >
             <Field :label="__('Email Address')" :error="errors?.email">
-                <Input v-model="email" autofocus type="email" />
+                <Input v-model="email" :read-only="emailReadonly" :focus="! emailReadonly" type="email" />
             </Field>
 
             <Field :label="__('Password')" :error="errors?.password">
-                <Input v-model="password" type="password" />
+                <Input v-model="password" :focus="emailReadonly" type="password" />
             </Field>
 
             <Field :label="__('Confirm Password')" :error="errors?.password_confirmation">

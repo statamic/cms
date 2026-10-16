@@ -8,6 +8,8 @@ const hasDefaultSlot = !!slots.default;
 const props = defineProps({
     /** The ID of the form element this label is for */
     for: { type: String, default: null },
+    /** Optional id attribute for the label element itself */
+    id: { type: String, default: null },
     /** Optional badge text to display on the right side of the label */
     badge: { type: String, default: '' },
     required: { type: Boolean, default: false },
@@ -18,8 +20,9 @@ const props = defineProps({
 
 <template>
     <label
-        class="flex justify-between mb-1.5 text-sm font-medium [&_button]:font-medium text-gray-925 select-none dark:text-gray-300 [&_button:has(svg)]:h-auto"
+        class="flex justify-between text-sm font-medium [&_button]:font-medium text-gray-925 select-none dark:text-gray-300 [&_button:has(svg)]:h-auto"
         data-ui-label
+        :id="id"
         :for="for"
     >
         <div>

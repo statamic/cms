@@ -9,7 +9,7 @@ interface Form extends Arrayable
     /**
      * Get or set the handle.
      *
-     * @param  string|null  $name
+     * @param  string|null  $handle
      * @return string
      */
     public function handle($handle = null);

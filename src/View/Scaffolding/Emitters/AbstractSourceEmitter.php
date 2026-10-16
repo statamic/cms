@@ -10,9 +10,14 @@ use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Statamic\View\Scaffolding\TemplateGenerator;
 use Stringable;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 abstract class AbstractSourceEmitter implements Stringable
 {
     protected static array $blueprintStack = [];
+    protected static array $variableStack = [];
+    protected static ?string $currentIterationVar = null;
     protected array $specialLoopVariables = [
         'key',
         'value',

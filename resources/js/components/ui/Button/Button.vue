@@ -25,6 +25,7 @@ const props = defineProps({
     inset: { type: Boolean, default: false },
     /** When `true`, the button shows an animated loading icon */
     loading: { type: Boolean, default: false },
+    readOnly: { type: Boolean, default: false },
     /** When `true`, the button will be rounded */
     round: { type: Boolean, default: false },
     /** Controls the size of the button. Options: `2xs`, `xs`, `sm`, `base`, `lg` */
@@ -42,7 +43,7 @@ const slots = useSlots();
 const hasDefaultSlot = !!slots.default;
 const tag = computed(() => {
     if (props.as) return props.as;
-    if (props.href && !props.disabled && !props.loading) {
+    if (props.href && !props.disabled && !props.loading && !props.readOnly) {
         return props.target === '_blank' ? 'a' : Link;
     }
     return 'button';
@@ -68,7 +69,7 @@ const buttonClasses = computed(() => {
                 subtle: 'bg-transparent hover:bg-gray-400/10 text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:bg-white/7 dark:hover:text-gray-200 [&_svg]:opacity-35',
                 pressed: [
                     'bg-linear-to-b from-gray-200 to-gray-150 text-gray-900 border border-gray-300 inset-shadow-sm/10',
-                    'dark:from-black dark:to-black dark:text-white dark:border-gray-700/80',
+                    'dark:from-gray-950 dark:to-gray-900 dark:text-white dark:border-gray-700/80',
                 ],
             },
             size: {
@@ -126,7 +127,7 @@ const restAttrs = computed(() => {
         :is="tag"
         v-bind="restAttrs"
         :class="buttonClasses"
-        :disabled="disabled || loading"
+        :disabled="disabled || loading || readOnly"
         :data-ui-group-target="['subtle', 'ghost'].includes(props.variant) ? null : true"
         :href
         :target

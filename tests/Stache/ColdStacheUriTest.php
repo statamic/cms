@@ -4,7 +4,6 @@ namespace Tests\Stache;
 
 use Facades\Tests\Factories\EntryFactory;
 use PHPUnit\Framework\Attributes\Test;
-use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Stache;
@@ -18,7 +17,6 @@ class ColdStacheUriTest extends TestCase
     private function simulateColdStache(): void
     {
         Stache::clear();
-        Blink::flush();
     }
 
     #[Test]

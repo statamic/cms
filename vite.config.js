@@ -44,7 +44,16 @@ export default defineConfig(({ mode, command }) => {
             },
         },
         build: {
-            minify: isProdBuild
+            minify: isProdBuild,
+            rollupOptions: {
+                output: {
+                    advancedChunks: {
+                        groups: [
+                            { name: 'icons', test: /resources[\\/]svg[\\/]icons[\\/].*\.svg/ },
+                        ],
+                    },
+                },
+            },
         },
         test: {
             projects: [
@@ -56,6 +65,20 @@ export default defineConfig(({ mode, command }) => {
                         setupFiles: 'resources/js/tests/setup.js',
                         include: ['resources/js/tests/**/*.test.js'],
                         exclude: ['resources/js/tests/browser/**'],
+                    },
+                },
+                {
+                    extends: true,
+                    test: {
+                        name: 'browser',
+                        include: ['resources/js/tests/browser/**/*.test.js'],
+                        browser: {
+                            enabled: true,
+                            headless: true,
+                            viewport: { width: 1280, height: 900 },
+                            provider: playwright(),
+                            instances: [{ browser: 'chromium' }],
+                        },
                     },
                 },
                 {

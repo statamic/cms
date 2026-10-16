@@ -1,20 +1,33 @@
 ---
 name: changelog
 description: Generate a changelog for a release
-disable-model-invocation: true
 ---
 
 Generate a changelog entry for the CHANGELOG.md file by following these steps:
 
 ## 1. Get commits since last tag
 
-Run `git --no-pager log $(git describe --tags --abbrev=0)..HEAD --oneline --no-decorate --first-parent --no-merges`) to get the list of commits.
+First, fetch tags from origin — they sit off-branch (see note below) so they don't come down with a normal `git pull`/`git fetch` on the branch:
+
+```
+git fetch origin --tags
+```
+
+Then run the following to get the list of commits:
+
+```
+git --no-pager log $(git merge-base $(git tag --list 'v*' --sort=-v:refname | head -n1) HEAD)..HEAD --oneline --no-decorate --no-merges
+```
+
+Note: The release workflow tags a separate "Build assets" commit that is *not* an ancestor of the branch, so the tag itself never lands on `6.x`. That means `git describe --tags` walks back to a stale tag. Instead, take the newest tag and use its `git merge-base` with `HEAD`, which resolves to the release commit that *is* on the branch.
+
+5.x commits are merged into 6.x as-is (not squashed), so this plain `--no-merges` log already walks both the 6.x mainline and every commit brought in via a 5.x merge, in true chronological order — it only excludes the merge commits themselves (multi-parent, no real change of their own).
 
 ## 2. Process each commit
 
 For each commit:
 - Extract the PR number from the commit message (e.g., `(#13331)`)
-- Remove the commit SHA and `[6.x]` prefix from the message
+- Remove the commit SHA and `[6.x]`/`[5.x]` prefix from the message
 - Fetch the PR author from GitHub using a sequential loop — do NOT use parallel background jobs (`&`) as they interleave stdout unpredictably. Use: `for pr in <numbers>; do echo -n "PR $pr: "; gh pr view $pr --json author --jq '.author.login'; done`
 
 ## 3. Skip certain commits
@@ -22,8 +35,17 @@ For each commit:
 Skip commits that are:
 - Test fixture updates (e.g., "Update composer test fixtures")
 - CI/workflow changes (e.g., "Only run lint workflow...")
+- Test-only fixes with no user-facing effect (e.g., "Fix failing Guzzle tests" — check the PR body; if it says the bug only affected tests, skip it)
+- Internal release/workflow-only PRs (e.g., "Update Release Workflow")
+- Commits with no PR number, or whose message is itself a merge bookkeeping commit (e.g., "Merge 5.x (#NUM)", "Merge branch '5.x' into...")
 
 Do not skip dependency bumps from dependabot.
+
+For `[5.x]`-prefixed commits, also skip/dedupe:
+- Changes already superseded by a bigger PR in this release. Read the PR bodies — if a larger 6.x PR's description explicitly covers what the smaller 5.x fix addressed (e.g., a big OAuth rework that says it removes email-based matching supersedes a smaller "Fix OAuth" email-trust patch), skip the smaller one and note it in the summary (step 10).
+- Changes that no longer apply to 6.x because 6.x already handled it independently (e.g., a 5.x "Drop support for Laravel 10/11" PR when 6.x already dropped those versions).
+
+When in doubt about whether a `[5.x]`-prefixed commit is user-facing, lean toward including it — security/authorization hardening fixes (auth checks, method-resolution guarding, validation hardening) belong in the changelog even without a lot of detail in the title, matching how they're written up in the 5.x changelog (e.g. "Harden remote URL validation", "Fix token path traversal").
 
 ## 4. Categorize commits
 
@@ -37,7 +59,7 @@ Format: `- Description [#NUMBER](https://github.com/statamic/cms/issues/NUMBER) 
 ## 6. Order entries
 
 - Reverse the list so earliest commits come first (git log shows newest first)
-- Within each category, maintain chronological order
+- Within each category, maintain chronological order — this already interleaves 5.x-origin commits correctly since step 1's log is in true merge order
 - Translation PRs get moved to the bottom of the list
 - Dependabot PRs get moved to the bottom, after translations
 

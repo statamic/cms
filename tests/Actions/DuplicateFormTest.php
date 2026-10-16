@@ -7,11 +7,13 @@ use Statamic\Actions\DuplicateForm;
 use Statamic\Facades\Form;
 use Statamic\Facades\User;
 use Tests\FakesRoles;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class DuplicateFormTest extends TestCase
 {
     use FakesRoles;
+    use PreventSavingStacheItemsToDisk;
 
     public function setUp(): void
     {

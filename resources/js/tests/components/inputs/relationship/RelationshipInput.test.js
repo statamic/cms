@@ -239,3 +239,41 @@ describe('RelationshipInput in-flight request deduplication', () => {
         b.unmount();
     });
 });
+
+describe('RelationshipInput refetches item data for unresolved values', () => {
+    test('fetches item data when the value prop changes to include an id with no matching data', async () => {
+        const d = deferred();
+        const post = vi.fn(() => d.promise);
+
+        const wrapper = mountInput({ axiosPost: post, itemDataUrl: '/test/stale-value' });
+        await flushPromises();
+
+        await wrapper.setProps({ value: ['taxonomy::bob'] });
+        await flushPromises();
+
+        expect(post).toHaveBeenCalledWith(
+            '/test/stale-value',
+            { site: 'default', selections: ['taxonomy::bob'] },
+            expect.anything(),
+        );
+
+        d.resolve({ data: { data: [] } });
+        await flushPromises();
+
+        wrapper.unmount();
+    });
+
+    test('does not refetch when the new value is already covered by existing data', async () => {
+        const post = vi.fn(() => Promise.resolve({ data: { data: [] } }));
+
+        const wrapper = mountInput({ axiosPost: post, itemDataUrl: '/test/stale-value-known' });
+        await flushPromises();
+
+        await wrapper.setProps({ data: [{ id: '1', title: 'One' }], value: ['1'] });
+        await flushPromises();
+
+        expect(post).not.toHaveBeenCalled();
+
+        wrapper.unmount();
+    });
+});

@@ -14,6 +14,9 @@ use Statamic\Facades\Path;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class AssetFolder implements Arrayable, ContainsQueryableValues, Contract
 {
     use FluentlyGetsAndSets;
@@ -162,7 +165,7 @@ class AssetFolder implements Arrayable, ContainsQueryableValues, Contract
     /**
      * Rename the folder.
      *
-     * @param  string  $filename
+     * @param  string  $name
      * @return AssetFolder
      *
      * @throws \Exception

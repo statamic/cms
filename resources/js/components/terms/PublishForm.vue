@@ -45,7 +45,7 @@
 
             <div class="hidden items-center md:flex">
                 <save-button-options v-if="!readOnly" :show-options="!isInline" :preferences-prefix="preferencesPrefix">
-                    <Button :disabled="!canSave" variant="primary" @click.prevent="save" :text="saveText" />
+                    <Button :disabled="!canSave" variant="primary" @click.prevent="save" :text="saveText" v-tooltip="saveAndCloseTooltip" />
                 </save-button-options>
             </div>
 
@@ -150,6 +150,7 @@ import { ref, computed } from 'vue';
 import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } from '@ui/Publish/SavePipeline.js';
 import ItemActions from '@/components/actions/ItemActions.vue';
 import { router } from '@inertiajs/vue3';
+import shortcutLabel from '@/util/shortcutLabel.js';
 
 export default {
     mixins: [HasPreferences, HasActions],
@@ -225,7 +226,9 @@ export default {
             preferencesPrefix: `taxonomies.${this.taxonomyHandle}`,
             saveKeyBinding: null,
             quickSaveKeyBinding: null,
+            saveAndCloseKeyBinding: null,
             quickSave: false,
+            closeAfterSave: false,
             syncFieldConfirmationText: __('messages.sync_term_field_confirmation_text'),
             pendingLocalization: null,
         };
@@ -246,8 +249,13 @@ export default {
             return computed(() => this.$refs.container);
         },
 
-        saving() {
-            return this.savingRef.value;
+        saving: {
+            get() {
+                return this.savingRef.value;
+            },
+            set(value) {
+                this.savingRef.value = value;
+            },
         },
 
         errors() {
@@ -266,12 +274,18 @@ export default {
             return !this.readOnly && !this.somethingIsLoading;
         },
 
+        saveAndCloseTooltip() {
+            if (!this.isInline) return null;
+
+            return __('Save & Close (:shortcut)', { shortcut: shortcutLabel('mod+shift+s') });
+        },
+
         livePreviewUrl() {
             return this.localizations.find((l) => l.active).livePreviewUrl;
         },
 
         showLivePreviewButton() {
-            return !this.readOnly && !this.isCreating && this.isBase && this.livePreviewUrl && this.showVisitUrlButton;
+            return !this.isPreviewing && !this.readOnly && !this.isCreating && this.isBase && this.livePreviewUrl && this.showVisitUrlButton;
         },
 
         showVisitUrlButton() {
@@ -384,12 +398,14 @@ export default {
                     // the hooks are resolved because if this form is being shown in a stack, we only
                     // want to close it once everything's done.
                     else {
-                        this.$nextTick(() => this.$emit('saved', response));
+                        this.emitSaved(response);
                     }
 
                     this.quickSave = false;
                 })
                 .catch((e) => {
+                    this.closeAfterSave = false;
+
                     if (!(e instanceof PipelineStopped)) {
                         this.$toast.error(__('Something went wrong'));
                         console.error(e);
@@ -421,10 +437,6 @@ export default {
             } else {
                 this.createLocalization(localization);
             }
-
-            if (this.publishContainer === 'base') {
-                window.history.replaceState({}, '', localization.url);
-            }
         },
 
         editLocalization(localization) {
@@ -445,6 +457,10 @@ export default {
                 this.reference = data.reference;
                 this.localizing = false;
                 this.$nextTick(() => this.$refs.container.clearDirtyState());
+
+                if (this.publishContainer === 'base' && localization.url) {
+                    window.history.replaceState({}, '', localization.url + window.location.hash);
+                }
             });
         },
 
@@ -498,7 +514,15 @@ export default {
 
         redirectTo(location) {
             router.get(location);
-        }
+        },
+
+        emitSaved(response) {
+            this.$nextTick(() => {
+                this.$emit('saved', response);
+                if (this.closeAfterSave) this.$emit('close');
+                this.closeAfterSave = false;
+            });
+        },
     },
 
     mounted() {
@@ -513,6 +537,16 @@ export default {
             this.save();
         });
 
+        if (this.isInline) {
+            this.saveAndCloseKeyBinding = this.$keys.bindGlobal(['mod+shift+s'], (e) => {
+                e.preventDefault();
+                if (!this.canSave) return;
+                this.quickSave = true;
+                this.closeAfterSave = true;
+                this.save();
+            });
+        }
+
         this.addToCommandPalette();
     },
 
@@ -523,6 +557,7 @@ export default {
 	beforeUnmount() {
         this.saveKeyBinding.destroy();
         this.quickSaveKeyBinding.destroy();
+        this.saveAndCloseKeyBinding?.destroy();
     },
 };
 </script>

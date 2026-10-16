@@ -22,7 +22,11 @@ abstract class Tree implements ContainsQueryableValues, Contract, Localization
     protected $locale;
     protected $tree = [];
     protected $cachedFlattenedPages;
+    protected $cachedFlattenedPagesById;
+    protected $cachedFlattenedPagesByReference;
+    protected $cachedFlattenedPageOrder;
     protected $withEntries = false;
+    protected $withEvents = true;
     protected $uriCacheEnabled = true;
 
     public function idKey()
@@ -52,7 +56,25 @@ abstract class Tree implements ContainsQueryableValues, Contract, Localization
                     return $this->structure()->validateTree($tree, $this->locale());
                 });
             })
+            ->setter(function ($tree) {
+                return $this->removeNullItems($tree);
+            })
             ->args(func_get_args());
+    }
+
+    protected function removeNullItems($tree)
+    {
+        return collect($tree)
+            ->reject(fn ($item) => is_null($item))
+            ->map(function ($item) {
+                if (isset($item['children'])) {
+                    $item['children'] = $this->removeNullItems($item['children']);
+                }
+
+                return $item;
+            })
+            ->values()
+            ->all();
     }
 
     public function root()
@@ -143,48 +165,81 @@ abstract class Tree implements ContainsQueryableValues, Contract, Localization
 
     public function find($id): ?Page
     {
-        return $this->flattenedPages()
-            ->keyBy->id()
-            ->get($id);
+        return ($this->cachedFlattenedPagesById ??= $this->flattenedPages()->keyBy->id())->get($id);
     }
 
     public function findByEntry($id)
     {
-        return $this->flattenedPages()
-            ->filter->reference()
-            ->keyBy->reference()
-            ->get($id);
+        return ($this->cachedFlattenedPagesByReference ??= $this->flattenedPages()->filter->reference()->keyBy->reference())->get($id);
+    }
+
+    public function entryOrder($reference)
+    {
+        return ($this->cachedFlattenedPageOrder ??= $this->flattenedPages()->map->reference()->flip())->get($reference);
+    }
+
+    public function flushCache()
+    {
+        $this->cachedFlattenedPages = null;
+        $this->cachedFlattenedPagesById = null;
+        $this->cachedFlattenedPagesByReference = null;
+        $this->cachedFlattenedPageOrder = null;
+
+        return $this;
     }
 
     public function save()
     {
-        if ($this->dispatchSavingEvent() === false) {
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
+        if ($withEvents && $this->dispatchSavingEvent() === false) {
             return false;
         }
 
-        $this->cachedFlattenedPages = null;
+        $this->flushCache();
 
-        Blink::forget('collection-structure-flattened-pages-collection*');
         Blink::forget('collection-structure-tree*');
 
         $this->repository()->save($this);
 
-        $this->dispatchSavedEvent();
+        if ($withEvents) {
+            $this->dispatchSavedEvent();
+        }
 
         $this->syncOriginal();
 
         return true;
     }
 
+    public function saveQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->save();
+    }
+
     public function delete()
     {
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
         Blink::forget('collection-structure-tree*');
 
         $this->repository()->delete($this);
 
-        $this->dispatchDeletedEvent();
+        if ($withEvents) {
+            $this->dispatchDeletedEvent();
+        }
 
         return true;
+    }
+
+    public function deleteQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->delete();
     }
 
     abstract protected function repository();

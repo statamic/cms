@@ -46,9 +46,10 @@
 <script>
 import Field from './Field.vue';
 import FieldSettings from '../fields/ImportSettings.vue';
+import PreservesImportedSections from './PreservesImportedSections.js';
 
 export default {
-    mixins: [Field],
+    mixins: [Field, PreservesImportedSections],
 
     components: { FieldSettings },
 
@@ -76,6 +77,10 @@ export default {
         },
 
         sectionBehavior() {
+            if (!this.canPreserveImportedSections) {
+                return 'flatten';
+            }
+
             return this.field.section_behavior ?? 'preserve';
         },
 

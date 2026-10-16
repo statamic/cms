@@ -2,6 +2,7 @@
 
 namespace Tests\Antlers;
 
+use Statamic\Contracts\View\Antlers\Parser as ParserContract;
 use Statamic\Facades\YAML;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\BlueprintRepository;
@@ -46,6 +47,14 @@ class ParserTestCase extends TestCase
         parent::setUp();
 
         GlobalRuntimeState::resetGlobalState();
+
+        // The guarded/allowed path lists on GlobalRuntimeState are only populated as a side
+        // effect of resolving the real parser, and resetGlobalState() doesn't clear them. The
+        // tests here build their own parsers, so without this they'd run against whatever the
+        // last test to resolve one happened to leave behind - or against empty lists, which
+        // silently drop every modifier in user content, if nothing has resolved one yet.
+        app(ParserContract::class);
+
         GlobalRuntimeState::$throwErrorOnAccessViolation = false;
         GlobalRuntimeState::$allowPhpInContent = false;
         GlobalRuntimeState::$allowMethodsInContent = false;

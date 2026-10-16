@@ -4,6 +4,7 @@
             @update:model-value="update"
             :disabled="config.disabled || isReadOnly"
             :id="fieldId"
+            :label="__(config.display)"
             :model-value="value"
             :read-only="isReadOnly"
         />

@@ -150,8 +150,11 @@ class Email extends Mailable
             return;
         }
 
+        $disk = config('statamic.system.file_uploads_disk', 'local');
+        $basePath = config('statamic.system.file_uploads_path', 'statamic/file-uploads');
+
         foreach ($value as $file) {
-            $this->attachFromStorageDisk('local', 'statamic/file-uploads/'.$file);
+            $this->attachFromStorageDisk($disk, $basePath.'/'.$file);
         }
     }
 
@@ -165,7 +168,7 @@ class Email extends Mailable
                 return $fields->reject(fn ($field) => in_array($field['fieldtype'], ['assets', 'files']));
             });
         $formConfig = ($configFields = Form::extraConfigFor($form->handle()))
-            ? Blueprint::makeFromTabs($configFields)->fields()->addValues($form->data()->all())->values()->all()
+            ? Blueprint::makeFromTabs($configFields)->fields()->addValues($form->data()->all())->augment()->values()->all()
             : [];
 
         $data = array_merge($augmented, $this->getGlobalsData(), [

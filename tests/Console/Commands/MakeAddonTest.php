@@ -3,6 +3,7 @@
 namespace Tests\Console\Commands;
 
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\Process;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
@@ -18,6 +19,10 @@ class MakeAddonTest extends TestCase
         parent::setUp();
 
         $this->markTestSkippedInWindows();
+
+        // Without this, the addon's `npm install` runs for real. Since the testbench app
+        // has no package.json, npm walks up and installs against this repo's own one.
+        Process::fake();
 
         $this->files = app(Filesystem::class);
         $this->fakeSuccessfulComposerRequire();

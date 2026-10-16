@@ -27,22 +27,13 @@ class CollectionStructure extends Structure
         });
     }
 
-    private function flattenedPages($entry)
-    {
-        return Blink::once('collection-structure-flattened-pages-collection'.$this->handle().'-'.$entry->locale(), function () use ($entry) {
-            return $this->in($entry->locale())->flattenedPages();
-        });
-    }
-
     public function entryUri($entry)
     {
         if (! $this->route($entry->locale())) {
             return null;
         }
 
-        $page = $this->flattenedPages($entry)
-            ->keyBy->reference()
-            ->get($entry->id());
+        $page = $this->in($entry->locale())->findByEntry($entry->id());
 
         $page?->setEntry($entry);
 
@@ -117,6 +108,14 @@ class CollectionStructure extends Structure
                 return $branch;
             })
             ->all();
+    }
+
+    public function flushCache($site = null)
+    {
+        Blink::forget('collection-structure-tree-'.$this->handle().'-'.($site ?? '*'));
+        Blink::forget('collection-structure-tree-entries::'.$this->handle().'::'.($site ?? '*'));
+
+        return parent::flushCache($site);
     }
 
     public function save()

@@ -3,6 +3,7 @@
 namespace Statamic\Dictionaries;
 
 use Facades\Statamic\Console\Processes\Process;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 class Locales extends BasicDictionary
@@ -17,17 +18,19 @@ class Locales extends BasicDictionary
 
     protected function getItems(): array
     {
-        $output = Process::run($this->buildLocalesCommand());
+        return Cache::rememberForever('statamic.dictionaries.locales', function () {
+            $output = Process::run($this->buildLocalesCommand());
 
-        return collect(explode(PHP_EOL, $output))
-            ->filter(fn ($locale) => mb_check_encoding($locale, 'UTF-8'))
-            ->map(fn ($locale) => Str::before($locale, '.'))
-            ->reject(fn ($locale) => in_array($locale, ['C', 'POSIX']))
-            ->filter()
-            ->sort()
-            ->values()
-            ->map(fn ($locale) => ['name' => $locale])
-            ->all();
+            return collect(explode(PHP_EOL, $output))
+                ->filter(fn ($locale) => mb_check_encoding($locale, 'UTF-8'))
+                ->map(fn ($locale) => Str::before($locale, '.'))
+                ->reject(fn ($locale) => in_array($locale, ['C', 'POSIX']))
+                ->filter()
+                ->sort()
+                ->values()
+                ->map(fn ($locale) => ['name' => $locale])
+                ->all();
+        });
     }
 
     private function buildLocalesCommand(): array
@@ -42,5 +45,10 @@ class Locales extends BasicDictionary
         }
 
         return ['locale', '-a'];
+    }
+
+    public function allowsPublicAccess(): bool
+    {
+        return true;
     }
 }

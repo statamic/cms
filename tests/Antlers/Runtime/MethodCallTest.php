@@ -343,6 +343,60 @@ ANTLERS;
         ], false, true));
     }
 
+    public function test_implicit_method_calls_blocked_in_user_content()
+    {
+        $counter = new CallCounter();
+
+        // Resolving a variable path to a zero-argument method is still a method
+        // call, so it honors the same setting as the explicit `:method()` syntax.
+        $this->assertSame('', $this->renderUserContent('{{ counter.increment }}', ['counter' => $counter]));
+        $this->assertSame('', $this->renderUserContent('{{ counter:increment }}', ['counter' => $counter]));
+
+        // Str::camel() maps a snake_case path onto a camelCase method.
+        $this->assertSame('', $this->renderUserContent('{{ counter.increment_twice }}', ['counter' => $counter]));
+
+        $this->assertSame('Count: 0', (string) $counter);
+    }
+
+    public function test_implicit_method_calls_allowed_in_user_content_when_configured()
+    {
+        GlobalRuntimeState::$allowMethodsInContent = true;
+
+        $object = new StringLengthObject('Hello');
+
+        $this->assertSame('5', $this->renderUserContent('{{ object.length }}', ['object' => $object]));
+
+        GlobalRuntimeState::$allowMethodsInContent = false;
+    }
+
+    public function test_implicit_method_calls_still_work_in_templates()
+    {
+        $object = new StringLengthObject('Hello');
+
+        $this->assertSame('5', $this->renderString('{{ object.length }}', [
+            'object' => $object,
+        ], false, true));
+
+        $this->assertSame('5', $this->renderString('{{ object:length }}', [
+            'object' => $object,
+        ], false, true));
+    }
+
+    private function renderUserContent($content, $data)
+    {
+        $textFieldtype = new Text();
+        $field = new Field('text_field', [
+            'type' => 'text',
+            'antlers' => true,
+        ]);
+
+        $textFieldtype->setField($field);
+
+        return $this->renderString('{{ text_field }}', array_merge($data, [
+            'text_field' => new Value($content, 'text_field', $textFieldtype),
+        ]), false, true);
+    }
+
     public function test_nested_value_does_not_reset_user_data_flag()
     {
         $textFieldtype = new Text();

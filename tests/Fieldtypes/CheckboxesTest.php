@@ -24,4 +24,15 @@ class CheckboxesTest extends TestCase
         $this->assertSame(['foo', 'bar'], $this->field([])->process(['foo', null, 'bar']));
         $this->assertSame(['foo', 'bar'], $this->field([])->preProcessValidatable(['foo', null, 'bar']));
     }
+
+    #[Test]
+    public function it_migrates_the_legacy_inline_config_to_appearance()
+    {
+        $ft = new Checkboxes;
+
+        $this->assertSame(['appearance' => 'inline'], $ft->migrateConfig(['inline' => true]));
+        $this->assertSame([], $ft->migrateConfig(['inline' => false]));
+        $this->assertSame(['appearance' => 'chips'], $ft->migrateConfig(['appearance' => 'chips', 'inline' => true]));
+        $this->assertSame(['appearance' => 'default'], $ft->migrateConfig(['appearance' => 'default']));
+    }
 }

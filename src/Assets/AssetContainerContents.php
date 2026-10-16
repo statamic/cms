@@ -6,7 +6,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use League\Flysystem\DirectoryListing;
 use Statamic\Facades\Stache;
-use Statamic\Statamic;
 use Statamic\Support\Str;
 
 class AssetContainerContents
@@ -31,7 +30,7 @@ class AssetContainerContents
      */
     public function all()
     {
-        if ($this->files && ! Statamic::isWorker()) {
+        if ($this->files) {
             return $this->files;
         }
 
@@ -209,7 +208,7 @@ class AssetContainerContents
 
     public function filteredFilesIn($folder, $recursive)
     {
-        if (isset($this->filteredFiles[$key = $folder.($recursive ? '-recursive' : '')]) && ! Statamic::isWorker()) {
+        if (isset($this->filteredFiles[$key = $folder.($recursive ? '-recursive' : '')])) {
             return $this->filteredFiles[$key];
         }
 
@@ -239,7 +238,7 @@ class AssetContainerContents
 
     public function filteredDirectoriesIn($folder, $recursive)
     {
-        if (isset($this->filteredDirectories[$key = $folder.($recursive ? '-recursive' : '')]) && ! Statamic::isWorker()) {
+        if (isset($this->filteredDirectories[$key = $folder.($recursive ? '-recursive' : '')])) {
             return $this->filteredDirectories[$key];
         }
 
@@ -296,10 +295,6 @@ class AssetContainerContents
         }
 
         $files = $this->all()->put($path, $metadata);
-
-        if (Statamic::isWorker()) {
-            $this->cacheStore()->put($this->key(), $files, $this->ttl());
-        }
 
         $this->filteredFiles = null;
         $this->filteredDirectories = null;

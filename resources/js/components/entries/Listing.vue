@@ -139,7 +139,7 @@ export default {
                     this.$toast.success(__('Entries successfully reordered'));
                 })
                 .catch((e) => {
-                    this.$toast.error(__('Something went wrong'));
+                    this.$toast.error(e.response?.data?.message || __('Something went wrong'));
                 });
         },
     },

@@ -45,7 +45,7 @@ class LicenseSet extends Command
 
         LicenseSetEvent::dispatch();
 
-        $this->checkInfo('Statamic license key set successfully.');
+        $this->components->info('Statamic license key set successfully.');
     }
 
     /**

@@ -2,9 +2,7 @@
 
 namespace Statamic\Fieldtypes\Bard;
 
-use Statamic\Contracts\Entries\Entry;
-use Statamic\Facades\Data;
-use Statamic\Facades\Site;
+use Statamic\Fieldtypes\Link as LinkFieldtype;
 use Statamic\Support\Str;
 use Tiptap\Marks\Link;
 
@@ -64,16 +62,26 @@ class LinkMark extends Link
 
         $ref = str($href)->after('statamic://')->before('?')->before('#')->toString();
 
-        if (! $item = Data::find($ref)) {
+        $selectAcrossSites = Augmentor::$currentBardConfig['select_across_sites'] ?? false;
+        $localize = ! $selectAcrossSites && ! $this->isApi();
+
+        $item = null;
+
+        foreach (LinkFieldtype::types() as $type) {
+            if (Str::startsWith($ref, "{$type->handle()}::")) {
+                $item = $type->resolve(Str::after($ref, "{$type->handle()}::"), null, $localize);
+                break;
+            }
+        }
+
+        if (! $item) {
             return '';
         }
 
-        $selectAcrossSites = Augmentor::$currentBardConfig['select_across_sites'] ?? false;
-
         $extras = Str::after($href, $ref);
 
-        if (! $selectAcrossSites && ! $this->isApi() && $item instanceof Entry) {
-            return ($item->in(Site::current()->handle()) ?? $item)->url().$extras;
+        if (! is_object($item)) {
+            return $item.$extras;
         }
 
         return $selectAcrossSites ? $item->absoluteUrl().$extras : $item->url().$extras;

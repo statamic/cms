@@ -354,7 +354,56 @@ class FieldTest extends TestCase
             'required' => true,
             'read_only' => false, // deprecated
             'always_save' => false,
+            'reserve_space_when_hidden' => false,
         ], $field->toPublishArray());
+    }
+
+    #[Test]
+    public function to_publish_array_passes_through_reserve_space_when_hidden()
+    {
+        FieldtypeRepository::partialMock();
+
+        FieldtypeRepository::shouldReceive('find')
+            ->with('example')
+            ->andReturn(new class extends Fieldtype
+            {
+                protected $component = 'example';
+
+                protected $configFields = [];
+            });
+
+        $field = new Field('test', [
+            'type' => 'example',
+            'reserve_space_when_hidden' => true,
+        ]);
+
+        $this->assertTrue($field->toPublishArray()['reserve_space_when_hidden']);
+    }
+
+    #[Test]
+    public function the_publish_array_uses_config_provided_by_the_fieldtype()
+    {
+        FieldtypeRepository::partialMock();
+
+        FieldtypeRepository::shouldReceive('find')
+            ->with('example')
+            ->andReturn(new class extends Fieldtype
+            {
+                protected $configFields = [
+                    'options' => ['type' => 'array'],
+                ];
+
+                public function config(?string $key = null, $fallback = null)
+                {
+                    $config = array_merge(parent::config(), ['options' => ['one' => 'One', 'two' => 'Two']]);
+
+                    return $key ? ($config[$key] ?? $fallback) : $config;
+                }
+            });
+
+        $field = new Field('test', ['type' => 'example']);
+
+        $this->assertSame(['one' => 'One', 'two' => 'Two'], $field->toPublishArray()['options']);
     }
 
     #[Test]

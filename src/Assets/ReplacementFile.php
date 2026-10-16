@@ -31,9 +31,8 @@ class ReplacementFile
 
     public function writeTo(Filesystem $disk, $path)
     {
-        $disk->put(
-            $path,
-            Storage::disk('local')->readStream($this->path)
-        );
+        $sourceDisk = Storage::disk(config('statamic.system.file_uploads_disk', 'local'));
+
+        $disk->put($path, $sourceDisk->readStream($this->path));
     }
 }

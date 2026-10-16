@@ -31,4 +31,9 @@ class Timezones extends BasicDictionary
 
         return stripos($offsetInSecs, '-') === false ? "+{$hoursAndSec}" : "-{$hoursAndSec}";
     }
+
+    public function allowsPublicAccess(): bool
+    {
+        return true;
+    }
 }

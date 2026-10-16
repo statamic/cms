@@ -7,10 +7,49 @@ use Mockery;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\StaticCache;
 use Statamic\StaticCaching\Cacher;
+use Statamic\StaticCaching\Cachers\ApplicationCacher;
 use Tests\TestCase;
 
 class ManagerTest extends TestCase
 {
+    #[Test]
+    public function application_driver_uses_the_default_cache_store_when_no_custom_store_is_defined()
+    {
+        config([
+            'statamic.static_caching.strategy' => 'half',
+            'statamic.static_caching.strategies.half.driver' => 'application',
+        ]);
+
+        $cacher = StaticCache::driver();
+
+        $this->assertInstanceOf(ApplicationCacher::class, $cacher);
+        $this->assertSame(Cache::store(), $this->getCacherCache($cacher));
+    }
+
+    #[Test]
+    public function application_driver_uses_the_custom_static_cache_store_when_defined()
+    {
+        config([
+            'statamic.static_caching.strategy' => 'half',
+            'statamic.static_caching.strategies.half.driver' => 'application',
+            'cache.stores.static_cache' => ['driver' => 'array'],
+        ]);
+
+        $cacher = StaticCache::driver();
+
+        $this->assertInstanceOf(ApplicationCacher::class, $cacher);
+        $this->assertSame(Cache::store('static_cache'), $this->getCacherCache($cacher));
+        $this->assertNotSame(Cache::store(), $this->getCacherCache($cacher));
+    }
+
+    private function getCacherCache(ApplicationCacher $cacher)
+    {
+        $property = new \ReflectionProperty($cacher, 'cache');
+        $property->setAccessible(true);
+
+        return $property->getValue($cacher);
+    }
+
     #[Test]
     public function it_flushes()
     {

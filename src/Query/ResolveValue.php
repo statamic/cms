@@ -5,16 +5,11 @@ namespace Statamic\Query;
 use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Contracts\Query\QueryableValue;
 use Statamic\Support\Arr;
+use Statamic\Support\MethodDenylist;
 use Statamic\Support\Str;
 
 class ResolveValue
 {
-    private array $denylist = [
-        'delete', 'deleteFile', 'deleteQuietly',
-        'destroy', 'forceDelete', 'save', 'saveQuietly',
-        'truncate', 'update', 'updateQuietly', 'write', 'writeFile',
-    ];
-
     public function __invoke($item, $name)
     {
         if (Str::startsWith($name, 'data->')) {
@@ -58,7 +53,7 @@ class ResolveValue
             return $item->getQueryableValue($name);
         }
 
-        if (method_exists($item, $method = Str::camel($name)) && ! in_array($method, $this->denylist)) {
+        if (method_exists($item, $method = Str::camel($name)) && ! MethodDenylist::blocks($method)) {
             return $item->{$method}();
         }
 

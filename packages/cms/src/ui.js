@@ -1,6 +1,7 @@
 export const {
     Alert,
     AuthCard,
+    AutocompleteEditor,
     Avatar,
     Badge,
     Button,
@@ -17,6 +18,9 @@ export const {
     Combobox,
     CommandPaletteItem,
     ConfirmationModal,
+    ContentDirection,
+    useContentDirection,
+    useUiDirection,
     Context,
     ContextFooter,
     ContextHeader,

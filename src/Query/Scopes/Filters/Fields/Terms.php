@@ -63,7 +63,7 @@ class Terms extends FieldtypeFilter
             ? $this->fieldtype->taxonomies()[0].'::'.$values['term']
             : $values['term'];
 
-        $term = Facades\Term::find($id)->title();
+        $term = Facades\Term::find($id)->in(Facades\Site::selected()->handle())->title();
 
         return $field.': '.$term;
     }

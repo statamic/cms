@@ -2,6 +2,9 @@
 
 namespace Statamic\Events;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class AssetContainerDeleting extends Event
 {
     public function __construct(public $container)

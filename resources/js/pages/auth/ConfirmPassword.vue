@@ -42,7 +42,7 @@ async function confirmWithPasskey() {
 
         <Form v-if="!isOnlyUsingPasskey" method="post" :action="submitUrl" class="flex flex-col gap-6" v-slot="{ errors }">
             <Field v-if="isConfirmingPassword" :label="__('Password')" :error="errors.password">
-                <Input name="password" type="password" viewable autofocus />
+                <Input name="password" type="password" autocomplete="current-password" viewable autofocus />
             </Field>
 
             <Field v-if="isUsingVerificationCode" :label="__('Verification Code')" :error="errors.verification_code">

@@ -38,15 +38,17 @@ class FieldsController extends CpController
 
         $blueprint = $this->blueprint($fieldtype->configBlueprint());
 
+        $values = $fieldtype->migrateConfig($request->values);
+
         $fields = $blueprint
             ->fields()
-            ->addValues($request->values)
+            ->addValues($values)
             ->preProcess();
 
         if ($request->reference) {
             $originFields = $blueprint
                 ->fields()
-                ->addValues(FieldRepository::find($request->reference)->config())
+                ->addValues($fieldtype->migrateConfig(FieldRepository::find($request->reference)->config()))
                 ->preProcess();
 
             $originValues = Arr::except($originFields->values()->all(), 'handle');
@@ -56,7 +58,7 @@ class FieldsController extends CpController
         return [
             'fieldtype' => $fieldtype->toArray(),
             'blueprint' => $blueprint->toPublishArray(),
-            'values' => array_merge($request->values, $fields->values()->all()),
+            'values' => array_merge($values, $fields->values()->all()),
             'meta' => $fields->meta(),
             'originValues' => $originValues ?? null,
             'originMeta' => $originMeta ?? null,
@@ -129,6 +131,8 @@ class FieldsController extends CpController
         $fields->validate($extraRules, $customMessages);
 
         $values = array_merge($request->values, $fields->process()->values()->all());
+
+        $values = $fieldtype->migrateConfig($values);
 
         return $values;
     }

@@ -101,6 +101,11 @@ abstract class AddonTestCase extends OrchestraTestCase
 
         $app['config']->set('statamic.users.repository', 'file');
 
+        $app['config']->set('cache.stores.outpost', [
+            'driver' => 'file',
+            'path' => storage_path('framework/cache/outpost-data'),
+        ]);
+
         $app['config']->set('statamic.stache.watcher', false);
         $app['config']->set('statamic.stache.stores.taxonomies.directory', $directory.'/../tests/__fixtures__/content/taxonomies');
         $app['config']->set('statamic.stache.stores.terms.directory', $directory.'/../tests/__fixtures__/content/taxonomies');

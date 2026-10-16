@@ -13,7 +13,7 @@ use Statamic\OAuth\Provider;
  * @method static null|\Statamic\Contracts\Auth\User findByEmail(string $email)
  * @method static null|\Statamic\Contracts\Auth\User findByOAuthId(Provider $provider, string $id)
  * @method static \Statamic\Contracts\Auth\User findOrFail($id)
- * @method static query()
+ * @method static \Statamic\Contracts\Query\Builder query()
  * @method static int count()
  * @method static null|\Statamic\Contracts\Auth\User current()
  * @method static null|\Statamic\Contracts\Auth\User fromUser($user)

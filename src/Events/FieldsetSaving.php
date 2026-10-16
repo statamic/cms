@@ -2,6 +2,9 @@
 
 namespace Statamic\Events;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class FieldsetSaving extends Event
 {
     public function __construct(public $fieldset)

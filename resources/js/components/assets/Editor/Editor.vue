@@ -104,7 +104,7 @@
                             </div>
 
                             <!-- Video -->
-                            <video :src="asset.url" class="max-w-full max-h-full object-contain" controls v-else-if="asset.isVideo" />
+                            <video :src="asset.url" :width="asset.width" :height="asset.height" class="max-w-full max-h-full object-contain" controls v-else-if="asset.isVideo" />
 
                             <!-- Other thumbnail -->
                             <img v-else-if="asset.preview" :src="asset.preview" class="asset-thumb shadow-ui-xl max-w-full max-h-full object-contain" />
@@ -136,10 +136,6 @@
                         @update:model-value="updateValues"
                     >
                         <div class="h-1/2 w-full overflow-scroll sm:p-4 md:h-full md:w-1/3 md:grow md:pt-px">
-                            <div v-if="saving" class="loading">
-                                <Icon name="loading" />
-                            </div>
-
                             <PublishTabs />
                         </div>
                     </PublishContainer>
@@ -159,7 +155,7 @@
                     <div class="flex items-center space-x-3 rtl:space-x-reverse">
                         <ui-button v-if="showNavigation" icon="chevron-left" @click="navigateToPreviousAsset" v-tooltip="__('Previous Asset')" />
                         <ui-button v-if="showNavigation" icon="chevron-right" @click="navigateToNextAsset" v-tooltip="__('Next Asset')" />
-                        <ui-button variant="primary" icon="save" @click="saveAndClose" v-if="!readOnly" :text="__('Save')" />
+                        <ui-button variant="primary" :icon="saving ? null : 'save'" @click="saveAndClose" v-if="!readOnly" :loading="saving" :text="__('Save')" v-tooltip="saveAndCloseTooltip" />
                     </div>
                 </div>
             </template>
@@ -170,6 +166,7 @@
                 :image="asset.preview"
                 @selected="selectFocalPoint"
                 @closed="closeFocalPointEditor"
+                @save="saveFocalPoint"
             />
 
             <crop-editor
@@ -211,10 +208,11 @@ import {
     Stack,
 } from '@ui';
 import ItemActions from '@/components/actions/ItemActions.vue';
+import shortcutLabel from '@/util/shortcutLabel.js';
 import useCheckerboard from '@/composables/checkerboard.js';
 
 export default {
-    emits: ['previous', 'next', 'saved', 'closed', 'action-started', 'action-completed'],
+    emits: ['previous', 'next', 'saved', 'closed', 'created', 'action-started', 'action-completed'],
 
     components: {
         Button,
@@ -249,6 +247,10 @@ export default {
                 return true;
             },
         },
+        redirectAfterCrop: {
+            type: Boolean,
+            default: true,
+        },
     },
 
     data() {
@@ -274,6 +276,10 @@ export default {
     computed: {
         readOnly() {
             return !this.asset.isEditable;
+        },
+
+        saveAndCloseTooltip() {
+            return __('Save & Close (:shortcut)', { shortcut: shortcutLabel('mod+shift+s') });
         },
 
         isImage() {
@@ -317,10 +323,24 @@ export default {
         this.load();
 
         window.addEventListener('keydown', this.keydown);
+
+        this.saveKeyBinding = this.$keys.bindGlobal(['mod+s'], (e) => {
+            e.preventDefault();
+            if (this.readOnly || this.loading || this.saving) return;
+            this.save().catch(() => {});
+        });
+
+        this.saveAndCloseKeyBinding = this.$keys.bindGlobal(['mod+shift+s'], (e) => {
+            e.preventDefault();
+            if (this.readOnly || this.loading || this.saving) return;
+            this.saveAndClose();
+        });
     },
 
     beforeUnmount() {
         window.removeEventListener('keydown', this.keydown);
+        this.saveKeyBinding.destroy();
+        this.saveAndCloseKeyBinding.destroy();
     },
 
     events: {
@@ -381,29 +401,49 @@ export default {
         },
 
         keydown(event) {
-            if ((event.metaKey || event.ctrlKey) && event.key === 'ArrowLeft') {
+            if (!event.metaKey && !event.ctrlKey) return;
+
+            if (this.isEditingText(event.target)) return;
+
+            if (event.key === 'ArrowLeft') {
                 this.navigateToPreviousAsset();
             }
 
-            if ((event.metaKey || event.ctrlKey) && event.key === 'ArrowRight') {
+            if (event.key === 'ArrowRight') {
                 this.navigateToNextAsset();
             }
         },
 
+        isEditingText(element) {
+            if (!element) return false;
+
+            const tag = element.tagName;
+
+            return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || element.isContentEditable;
+        },
+
         navigateToPreviousAsset() {
-            if (this.$dirty.has(this.publishContainer)) {
-                this.save();
+            if (this.saving) return;
+
+            if (!this.$dirty.has(this.publishContainer)) {
+                return this.$emit('previous');
             }
 
-            this.$emit('previous');
+            this.save()
+                .then(() => this.$emit('previous'))
+                .catch(() => {});
         },
 
         navigateToNextAsset() {
-            if (this.$dirty.has(this.publishContainer)) {
-                this.save();
+            if (this.saving) return;
+
+            if (!this.$dirty.has(this.publishContainer)) {
+                return this.$emit('next');
             }
 
-            this.$emit('next');
+            this.save()
+                .then(() => this.$emit('next'))
+                .catch(() => {});
         },
 
         openFocalPointEditor() {
@@ -418,6 +458,14 @@ export default {
             point = point === '50-50-1' ? null : point;
             this.values['focus'] = point;
             this.$dirty.add(this.publishContainer);
+        },
+
+        saveFocalPoint({ close = false } = {}) {
+            this.$nextTick(() => {
+                this.save()
+                    .then(() => close && this.$emit('closed'))
+                    .catch(() => {});
+            });
         },
 
         openCropEditor() {
@@ -436,6 +484,11 @@ export default {
         },
 
         handleCropCreated(newAssetId) {
+            if (!this.redirectAfterCrop) {
+                this.$emit('created', newAssetId);
+                return;
+            }
+
             const [containerHandle, assetPath] = newAssetId.split('::');
             const editUrl = cp_url(`assets/browse/${containerHandle}/${assetPath}/edit`);
             router.get(editUrl);
@@ -484,7 +537,9 @@ export default {
         },
 
         saveAndClose() {
-            this.save().then(() => this.$emit('closed'));
+            this.save()
+                .then(() => this.$emit('closed'))
+                .catch(() => {});
         },
 
         clearErrors() {

@@ -42,6 +42,20 @@ class GlobalSetVariablesPolicyTest extends PolicyTestCase
     }
 
     #[Test]
+    public function variables_are_viewable_and_editable_with_configure_permission()
+    {
+        $forbiddenUser = $this->userWithPermissions([]);
+        $authorizedUser = $this->userWithPermissions(['configure globals']);
+        $variables = tap(GlobalSet::make('test'))->save()->inDefaultSite();
+
+        $this->assertTrue($authorizedUser->can('view', $variables));
+        $this->assertTrue($authorizedUser->can('edit', $variables));
+
+        $this->assertFalse($forbiddenUser->can('view', $variables));
+        $this->assertFalse($forbiddenUser->can('edit', $variables));
+    }
+
+    #[Test]
     public function variables_can_be_created_with_configure_permission()
     {
         $forbiddenUser = $this->userWithPermissions([]);

@@ -173,4 +173,9 @@ class Currencies extends BasicDictionary
             ['code' => 'ZWG', 'name' => __('statamic::dictionary-currencies.ZWG'), 'symbol' => '$', 'decimals' => 2],
         ];
     }
+
+    public function allowsPublicAccess(): bool
+    {
+        return true;
+    }
 }
