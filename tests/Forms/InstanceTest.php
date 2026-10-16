@@ -8,6 +8,7 @@ use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Form;
+use Statamic\Fieldtypes\FormInstances;
 use Statamic\Forms\Instance;
 use Statamic\Support\Arr;
 use Tests\Factories\EntryFactory;
@@ -102,22 +103,48 @@ class InstanceTest extends TestCase
     }
 
     #[Test]
-    public function a_localization_inherits_overrides_from_its_origin()
+    public function a_localization_uses_its_roots_forms_and_overrides()
+    {
+        $this->setSites([
+            'en' => ['url' => '/', 'locale' => 'en'],
+            'fr' => ['url' => '/fr/', 'locale' => 'fr'],
+            'fr_ca' => ['url' => '/fr-ca/', 'locale' => 'fr_CA'],
+        ]);
+
+        $this->makeForm(['submission_limit' => 5]);
+
+        $this->makeEntry('event-1', ['contact' => ['submission_limit' => 1]]);
+
+        Collection::findByHandle('events')->sites(['en', 'fr', 'fr_ca'])->save();
+
+        tap(Entry::find('event-1')->makeLocalization('fr')->id('event-1-fr'))->save();
+        tap(Entry::find('event-1-fr')->makeLocalization('fr_ca')->id('event-1-fr-ca'))->save();
+
+        $this->assertEquals(['contact' => ['submission_limit' => 1]], FormInstances::forEntry(Entry::find('event-1-fr')));
+        $this->assertEquals(['contact' => ['submission_limit' => 1]], FormInstances::forEntry(Entry::find('event-1-fr-ca')));
+    }
+
+    #[Test]
+    public function a_localizations_own_form_instances_value_is_ignored()
     {
         $this->setSites([
             'en' => ['url' => '/', 'locale' => 'en'],
             'fr' => ['url' => '/fr/', 'locale' => 'fr'],
         ]);
 
-        $form = $this->makeForm(['submission_limit' => 5]);
+        $this->makeForm(['submission_limit' => 5]);
+        Form::make('feedback')->data(['unique_instances' => true, 'unique_instances_collections' => ['events']])->save();
 
         $this->makeEntry('event-1', ['contact' => ['submission_limit' => 1]]);
 
         Collection::findByHandle('events')->sites(['en', 'fr'])->save();
 
-        tap(Entry::find('event-1')->makeLocalization('fr')->id('event-1-fr'))->save();
+        tap(Entry::find('event-1')->makeLocalization('fr')->id('event-1-fr')->data(['form_instances' => [
+            'contact' => ['submission_limit' => 10],
+            'feedback' => [],
+        ]]))->save();
 
-        $this->assertEquals(1, $form->instance('event-1-fr')->config('submission_limit'));
+        $this->assertEquals(['contact' => ['submission_limit' => 1]], FormInstances::forEntry(Entry::find('event-1-fr')));
     }
 
     #[Test]

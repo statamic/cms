@@ -22,6 +22,8 @@ use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
+use Statamic\Facades\Collection;
+use Statamic\Facades\Entry;
 use Statamic\Facades\Fieldset;
 use Statamic\Facades\File;
 use Statamic\Facades\Form;
@@ -1961,6 +1963,47 @@ class SubmitFormTest extends TestCase
     }
 
     #[Test]
+    public function it_attaches_the_root_entry_when_submitted_from_a_localization()
+    {
+        $this->makeLocalizedEntry('event-1', ['contact' => []]);
+
+        $this->form->set('unique_instances', true)->set('unique_instances_collections', ['events'])->save();
+
+        $result = $this->action()->entry('event-1-fr')->submit(['email' => 'san@holo.com']);
+
+        $this->assertEquals('event-1', $result->submission->get('_entry'));
+    }
+
+    #[Test]
+    public function it_resumes_a_partial_started_on_another_localization_of_the_entry()
+    {
+        $this->makeLocalizedEntry('event-1', ['contact' => []]);
+
+        $this->form->set('unique_instances', true)->set('unique_instances_collections', ['events'])->save();
+
+        $partial = tap($this->form->makeSubmission()->data(['_entry' => 'event-1'])->asPartial())->save();
+
+        $result = $this->action()->entry('event-1-fr')->resume($partial)->submit(['email' => 'san@holo.com']);
+
+        $this->assertEquals($partial->id(), $result->submission->id());
+        $this->assertEquals('event-1', $result->submission->get('_entry'));
+    }
+
+    #[Test]
+    public function it_rejects_a_localizations_submission_once_the_shared_limit_is_reached()
+    {
+        $this->makeLocalizedEntry('event-1', ['contact' => ['submission_limit' => 1]]);
+
+        $this->form->set('unique_instances', true)->set('unique_instances_collections', ['events'])->save();
+
+        $this->action()->entry('event-1')->submit(['email' => 'san@holo.com']);
+
+        $this->expectException(FormRestrictedException::class);
+
+        $this->action()->entry('event-1-fr')->submit(['email' => 'foba@bett.com']);
+    }
+
+    #[Test]
     public function it_rejects_the_submission_when_an_entry_override_restricts_the_form()
     {
         $this->makeEntry('event-1', ['contact' => ['close_date' => '2020-01-01 09:00']]);
@@ -1992,6 +2035,20 @@ class SubmitFormTest extends TestCase
         ]])->save();
 
         (new EntryFactory)->collection('events')->id($id)->slug($id)->data(['form_instances' => $formInstances])->create();
+    }
+
+    private function makeLocalizedEntry(string $id, array $formInstances): void
+    {
+        $this->setSites([
+            'en' => ['url' => '/', 'locale' => 'en'],
+            'fr' => ['url' => '/fr/', 'locale' => 'fr'],
+        ]);
+
+        $this->makeEntry($id, $formInstances);
+
+        Collection::findByHandle('events')->sites(['en', 'fr'])->save();
+
+        Entry::find($id)->makeLocalization('fr')->id($id.'-fr')->save();
     }
 
     private function uploadForm(bool $honeypot = false)

@@ -155,7 +155,7 @@ class SubmitForm
             throw ValidationException::withMessages(['*' => [__('statamic::validation.form_must_be_submitted_from_an_entry')]]);
         }
 
-        return $entry;
+        return $entry->root();
     }
 
     /**

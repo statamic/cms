@@ -11,6 +11,7 @@ use Statamic\Facades\Entry;
 use Statamic\Facades\Form;
 use Statamic\Facades\User;
 use Statamic\Fields\Field;
+use Statamic\Query\Scopes\Filters\SubmissionEntry;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -474,5 +475,29 @@ class FormInstancesTest extends TestCase
         $this->actingAs(tap(User::make()->assignRole('viewer'))->save());
         $this->assertArrayHasKey('submissions_url', $index()['contact']);
         $this->assertArrayNotHasKey('submissions_url', $index()['feedback']);
+    }
+
+    #[Test]
+    public function a_localization_filters_submissions_by_its_root_entry()
+    {
+        $this->actingAs(tap(User::make()->makeSuper())->save());
+
+        $this->setSites([
+            'en' => ['url' => '/', 'locale' => 'en'],
+            'fr' => ['url' => '/fr/', 'locale' => 'fr'],
+        ]);
+
+        tap($this->entry()->collection(tap(Collection::make('pages')->sites(['en', 'fr']))->save()))->save();
+
+        $localization = tap(Entry::find('entry-id')->makeLocalization('fr')->id('entry-id-fr'))->save();
+
+        $fieldtype = $this->field()->setParent($localization)->setValue(['forms' => ['contact']])->fieldtype();
+
+        $filter = $fieldtype->preload()['submissions']['contact']['filters']->first(fn ($filter) => $filter instanceof SubmissionEntry);
+        $this->assertEquals(['entry' => 'entry-id'], $filter->autoApply());
+
+        $url = $fieldtype->preProcessIndex(['contact' => []])[0]['submissions_url'];
+        parse_str(parse_url($url, PHP_URL_QUERY), $query);
+        $this->assertEquals(['entry' => 'entry-id'], json_decode(base64_decode($query['filters']), true)['submission_entry']);
     }
 }

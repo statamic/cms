@@ -11,6 +11,7 @@ use Illuminate\Validation\ValidationException;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Exceptions\FormRestrictedException;
 use Statamic\Exceptions\SilentFormFailureException;
+use Statamic\Facades\Entry;
 use Statamic\Facades\Form;
 use Statamic\Facades\URL;
 use Statamic\Forms\Exceptions\FileContentTypeRequiredException;
@@ -31,7 +32,7 @@ class FormController extends Controller
 
         $action->form($form);
 
-        $entry = is_string($entry = $request->input('_entry')) ? $entry : null;
+        $entry = is_string($entry = $request->input('_entry')) ? (Entry::find($entry)?->root()->id() ?? $entry) : null;
 
         if ($entry) {
             $action->entry($entry);

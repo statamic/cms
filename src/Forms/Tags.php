@@ -194,7 +194,7 @@ class Tags extends BaseTags
             return null;
         }
 
-        return array_key_exists($form->handle(), FormInstances::forEntry($entry)) ? $id : null;
+        return array_key_exists($form->handle(), FormInstances::forEntry($entry)) ? $entry->root()->id() : null;
     }
 
     /**

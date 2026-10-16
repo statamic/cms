@@ -29,6 +29,8 @@ class FormInstances extends FormFieldtype
 
     public static function forEntry(Entry $entry): array
     {
+        $entry = $entry->root();
+
         $field = $entry->blueprint()->fields()->get(static::handle());
 
         if (! $field || $field->type() !== static::handle()) {
@@ -226,7 +228,7 @@ class FormInstances extends FormFieldtype
 
         return [
             'form' => $form->handle(),
-            'filters' => Scope::filters('form-submissions', ['form' => $form->handle(), 'entry' => $entry->id()]),
+            'filters' => Scope::filters('form-submissions', ['form' => $form->handle(), 'entry' => $entry->root()->id()]),
             'actionUrl' => cp_route('forms.submissions.actions.run', $form->handle()),
         ];
     }
@@ -253,7 +255,7 @@ class FormInstances extends FormFieldtype
         }
 
         $filters = base64_encode(json_encode([
-            'submission_entry' => ['entry' => $entry->id()],
+            'submission_entry' => ['entry' => $entry->root()->id()],
             'submission_status' => ['status' => 'finalized'],
         ]));
 

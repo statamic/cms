@@ -11,6 +11,8 @@ use Illuminate\Validation\ValidationException;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blueprint;
+use Statamic\Facades\Collection;
+use Statamic\Facades\Entry;
 use Statamic\Facades\Fieldset as FieldsetRepository;
 use Statamic\Facades\Form;
 use Statamic\Fields\Fieldset;
@@ -175,6 +177,118 @@ class FormCreateTest extends FormTestCase
         $output = $this->tag('{{ form:contact }}{{ restricted }}|{{ status }}{{ /form:contact }}', ['id' => 'event-1']);
 
         $this->assertStringContainsString('|closed', $output);
+    }
+
+    #[Test]
+    public function a_localization_renders_its_roots_entry_in_the_hidden_input()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        Form::find('contact')->set('unique_instances', true)->set('unique_instances_collections', ['events'])->save();
+
+        $this->makeLocalizedEntry('event-1', ['contact' => []]);
+
+        $output = $this->tag('{{ form:contact }}{{ /form:contact }}', ['id' => 'event-1-fr']);
+
+        $this->assertStringContainsString('<input type="hidden" name="_entry" value="event-1" />', $output);
+    }
+
+    #[Test]
+    public function a_localization_renders_the_shared_instances_status()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        Form::find('contact')->set('unique_instances', true)->set('unique_instances_collections', ['events'])->save();
+
+        $this->makeLocalizedEntry('event-1', ['contact' => ['submission_limit' => 1]]);
+
+        Form::find('contact')->makeSubmission()->data(['_entry' => 'event-1'])->save();
+
+        $output = $this->tag('{{ form:contact }}{{ restricted }}|{{ status }}{{ /form:contact }}', ['id' => 'event-1-fr']);
+
+        $this->assertStringContainsString('1|limit_reached', $output);
+    }
+
+    #[Test]
+    public function a_submission_from_a_localization_is_attached_to_the_root_entry()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        $form = tap(Form::find('contact')->set('unique_instances', true)->set('unique_instances_collections', ['events']))->save();
+
+        $this->makeLocalizedEntry('event-1', ['contact' => []]);
+
+        $this
+            ->post('/!/forms/contact', ['_entry' => 'event-1-fr', 'email' => 'san@holo.com'], ['Referer' => 'http://localhost/fr/event-1'])
+            ->assertSessionHasNoErrors();
+
+        $submission = $form->submissions()->first();
+        $this->assertEquals('event-1', $submission->get('_entry'));
+        $this->assertEquals('fr', $submission->get('_site'));
+    }
+
+    #[Test]
+    public function localizations_share_the_submission_limit()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        $form = tap(Form::find('contact')->set('unique_instances', true)->set('unique_instances_collections', ['events']))->save();
+
+        $this->makeLocalizedEntry('event-1', ['contact' => ['submission_limit' => 1]]);
+
+        $this->post('/!/forms/contact', ['_entry' => 'event-1', 'email' => 'san@holo.com'])->assertSessionHasNoErrors();
+
+        $this
+            ->post('/!/forms/contact', ['_entry' => 'event-1-fr', 'email' => 'foba@bett.com'])
+            ->assertSessionHasErrors('*', null, 'form.contact');
+
+        $this->assertCount(1, $form->submissions());
+    }
+
+    #[Test]
+    public function a_partial_submission_started_on_a_localization_can_be_completed_on_the_root()
+    {
+        $this->createMultiPageForm();
+
+        $form = Form::find('survey');
+        $form->set('unique_instances', true)->set('unique_instances_collections', ['events'])->save();
+
+        $this->makeLocalizedEntry('event-1', ['survey' => []]);
+
+        $this->post('/!/forms/survey', ['_page' => 'page_one', '_entry' => 'event-1-fr', 'name' => 'Olaf']);
+
+        $id = session('form.survey.event-1.partial_submission');
+        $this->assertNotNull($id);
+
+        $template = '{{ form:survey }}{{ fields }}{{ handle }}={{ value }},{{ /fields }}{{ /form:survey }}';
+        $this->assertStringContainsString('name=Olaf,', $this->normalizeHtml($this->tag($template, ['id' => 'event-1'])));
+
+        $this
+            ->post('/!/forms/survey', ['_page' => 'page_two', '_entry' => 'event-1', 'email' => 'olaf@example.com'])
+            ->assertSessionHasNoErrors()
+            ->assertSessionMissing('form.survey.event-1.partial_submission');
+
+        $this->assertCount(1, $form->submissions());
+        $submission = $form->submission($id);
+        $this->assertFalse($submission->isPartial());
+        $this->assertEquals('event-1', $submission->get('_entry'));
+        $this->assertEquals('Olaf', $submission->get('name'));
+
+        $form->submissions()->each->delete();
+    }
+
+    private function makeLocalizedEntry(string $id, array $formInstances): void
+    {
+        $this->setSites([
+            'en' => ['url' => 'http://localhost/', 'locale' => 'en'],
+            'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
+        ]);
+
+        $this->makeEntry($id, $formInstances);
+
+        Collection::findByHandle('events')->sites(['en', 'fr'])->save();
+
+        Entry::find($id)->makeLocalization('fr')->id($id.'-fr')->save();
     }
 
     private function makeEntry(string $id, array $formInstances): void
