@@ -15,7 +15,7 @@
                         <DropdownItem v-if="canEdit" :text="__('Configure Collection')" icon="cog" :href="editUrl" />
                         <DropdownItem v-if="canEditBlueprints" :text="__('Edit Blueprints')" icon="blueprint-edit" :href="blueprintsUrl" />
                         <DropdownItem v-if="canEdit" :text="__('Scaffold Views')" icon="scaffold" :href="scaffoldUrl" />
-                        <DropdownSeparator v-if="canEdit || canEditBlueprints || actions.length" />
+                        <DropdownSeparator v-if="(canEdit || canEditBlueprints) && actions.length" />
                         <DropdownItem
                             v-for="action in actions"
                             :key="action.handle"
@@ -536,7 +536,13 @@ export default {
                 Statamic.$toast.success(response.message || __('Action completed'));
             }
 
-            if (!response.redirect) router.reload();
+            if (!response.redirect) router.reload({ onSuccess: () => this.refreshCurrentView() });
+        },
+
+        refreshCurrentView() {
+            if (this.view === 'list') this.$refs.list?.refresh();
+            if (this.view === 'calendar') this.$refs.calendar?.refresh();
+            if (this.view === 'tree' && !this.treeIsDirty) this.$refs.tree?.refresh();
         },
 
         addToCommandPalette() {

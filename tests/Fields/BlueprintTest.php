@@ -869,6 +869,56 @@ class BlueprintTest extends TestCase
     }
 
     #[Test]
+    public function it_keeps_the_fields_when_the_parent_changes_to_one_with_the_same_blueprint()
+    {
+        $finds = 0;
+        FieldRepository::shouldReceive('find')
+            ->with('fieldset_one.field_one')
+            ->andReturnUsing(function () use (&$finds) {
+                $finds++;
+
+                return new Field('field_one', ['type' => 'text']);
+            });
+
+        $blueprint = (new Blueprint)
+            ->setNamespace('collections/collection_one')
+            ->setHandle('blueprint_one')
+            ->setContents(['fields' => [['handle' => 'one', 'field' => 'fieldset_one.field_one']]]);
+
+        $collection = tap(StatamicCollection::make('collection_one'))->save();
+        $entryA = (new Entry)->collection($collection)->blueprint('blueprint_one');
+        $entryB = (new Entry)->collection($collection)->blueprint('blueprint_one');
+
+        $this->assertSame($entryA, $blueprint->setParent($entryA)->field('one')->parent());
+        $findsForOneBuild = $finds;
+
+        foreach ([$entryB, $entryA, $entryB] as $entry) {
+            $this->assertSame($entry, $blueprint->setParent($entry)->field('one')->parent());
+        }
+
+        $this->assertSame($findsForOneBuild, $finds);
+    }
+
+    #[Test]
+    public function fields_keep_their_parent_when_the_blueprint_moves_to_another_parent()
+    {
+        $blueprint = (new Blueprint)
+            ->setNamespace('collections/collection_one')
+            ->setHandle('blueprint_one')
+            ->setContents(['fields' => [['handle' => 'one', 'field' => ['type' => 'text']]]]);
+
+        $collection = tap(StatamicCollection::make('collection_one'))->save();
+        $entryA = (new Entry)->collection($collection)->blueprint('blueprint_one');
+        $entryB = (new Entry)->collection($collection)->blueprint('blueprint_one');
+
+        $fieldA = $blueprint->setParent($entryA)->field('one');
+        $fieldB = $blueprint->setParent($entryB)->field('one');
+
+        $this->assertSame($entryA, $fieldA->parent());
+        $this->assertSame($entryB, $fieldB->parent());
+    }
+
+    #[Test]
     public function it_ensures_a_field_has_config()
     {
         FieldsetRepository::shouldReceive('find')->with('the_partial')->andReturn(
