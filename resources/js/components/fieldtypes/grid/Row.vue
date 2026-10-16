@@ -1,5 +1,6 @@
 <template>
     <tr
+        :data-grid-row-id="values._id"
         tabindex="-1"
         data-reorder-focus
         :class="[

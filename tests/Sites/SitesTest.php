@@ -57,6 +57,33 @@ class SitesTest extends TestCase
     }
 
     #[Test]
+    public function filters_handles_by_group()
+    {
+        $this->sites->setSites([
+            'en' => ['url' => '/', 'group' => 'London'],
+            'fr' => ['url' => '/fr', 'group' => 'London'],
+            'de' => ['url' => '/de', 'group' => 'Paris'],
+            'nl' => ['url' => '/nl'],
+        ]);
+
+        $handles = collect(['en', 'fr', 'de', 'nl']);
+
+        $this->assertEquals(['en', 'fr'], $this->sites->filterByGroup($handles, 'en')->values()->all());
+        $this->assertEquals(['de'], $this->sites->filterByGroup($handles, 'de')->values()->all());
+        $this->assertEquals(['en', 'fr', 'de', 'nl'], $this->sites->filterByGroup($handles, 'nl')->values()->all());
+        $this->assertEquals(['en', 'fr', 'de', 'nl'], $this->sites->filterByGroup($handles, null)->values()->all());
+
+        $this->sites->setSites([
+            'en' => ['url' => '/', 'group' => 'London', 'group_handle' => 'london'],
+            'fr' => ['url' => '/fr', 'group' => 'London', 'group_handle' => 'paris'],
+            'de' => ['url' => '/de', 'group' => 'London', 'group_handle' => 'london'],
+        ]);
+
+        $this->assertEquals(['en', 'de'], $this->sites->filterByGroup(['en', 'fr', 'de'], 'en')->values()->all());
+        $this->assertEquals(['fr'], $this->sites->filterByGroup(['en', 'fr', 'de'], 'fr')->values()->all());
+    }
+
+    #[Test]
     public function gets_authorized_sites()
     {
         Role::make('test')

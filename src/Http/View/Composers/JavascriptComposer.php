@@ -99,6 +99,8 @@ class JavascriptComposer
                 'handle' => $site->handle(),
                 'lang' => $site->lang(),
                 'direction' => $site->direction(),
+                'group' => $site->group(),
+                'group_handle' => $site->groupHandle(),
             ];
         })->values();
     }

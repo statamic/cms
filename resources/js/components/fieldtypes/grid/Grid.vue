@@ -46,7 +46,14 @@
                         @blur="blurred"
                     />
 
-                    <ui-button size="sm" v-if="canAddRows" v-text="__(addRowButtonLabel)" @click.prevent="addRow" />
+                    <Teleport
+                        v-if="canAddRows"
+                        :disabled="!usesExternalAddRow"
+                        defer
+                        :to="addRowTeleportTarget"
+                    >
+                        <ui-button size="sm" v-text="__(addRowButtonLabel)" @click.prevent="addRow" />
+                    </Teleport>
                 </section>
             </div>
         </element-container>
@@ -95,6 +102,10 @@ export default {
         isInGridField: true,
     },
 
+    inject: {
+        sectionAddRowTarget: { default: null },
+    },
+
     computed: {
         component() {
             const stackAt = this.config.stack_at ?? 550;
@@ -125,6 +136,16 @@ export default {
 
         addRowButtonLabel() {
             return __(this.config.add_row) || __('Add Row');
+        },
+
+        usesExternalAddRow() {
+            return !!this.sectionAddRowTarget && !!this.config.headers_in_section && !this.fullScreenMode;
+        },
+
+        addRowTeleportTarget() {
+            if (!this.usesExternalAddRow) return 'body';
+
+            return `[${this.sectionAddRowTarget}="${CSS.escape(this.handle)}"]`;
         },
 
         hasMaxRows() {
@@ -197,6 +218,11 @@ export default {
 
             this.updateRowMeta(id, this.meta.new);
             this.update([...this.value, row]);
+
+            // Only auto-focus on Configure Sites sectioned grids, not every Grid in the CP.
+            if (this.config.headers_in_section) {
+                this.focusNewRow(id);
+            }
         },
 
         updated(index, row) {
@@ -250,6 +276,23 @@ export default {
             // TODO
         },
 
+        focusNewRow(id, attempts = 0) {
+            const row = document.querySelector(`[data-grid-row-id="${CSS.escape(id)}"]`);
+            const focusable = row?.querySelector(
+                'input:not([type="hidden"]):not([disabled]), textarea:not([disabled]), select:not([disabled])',
+            );
+
+            if (focusable) {
+                focusable.focus();
+                row.scrollIntoView({ block: 'nearest' });
+                return;
+            }
+
+            if (attempts < 20) {
+                requestAnimationFrame(() => this.focusNewRow(id, attempts + 1));
+            }
+        },
+
         blurred() {
             setTimeout(() => {
                 if (!this.$el.contains(document.activeElement)) {
@@ -273,6 +316,7 @@ export default {
                 metaPathPrefix: { get: () => this.metaPathPrefix },
                 fullScreenMode: { get: () => this.fullScreenMode },
                 toggleFullScreen: { get: () => this.toggleFullScreen },
+                usesExternalAddRow: { get: () => this.usesExternalAddRow },
             });
             return grid;
         },
