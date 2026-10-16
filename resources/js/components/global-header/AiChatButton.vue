@@ -3,7 +3,7 @@ import { onMounted, onUnmounted } from 'vue';
 import { Icon } from '@ui';
 import useAiChat from '@/composables/use-ai-chat.js';
 
-const { open, toggle, shortcut } = useAiChat();
+const { open, toggle, shortcut, focus } = useAiChat();
 
 const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform);
 const modifierLabel = isMac ? '⌘' : 'Ctrl';
@@ -17,10 +17,19 @@ onMounted(() => {
     binding = Statamic.$keys.bindGlobal(['mod+/'], (e) => {
         // Leave it to code editors, where the same shortcut comments a line.
         if (e.target?.closest?.('.cm-editor, .CodeMirror')) return;
-        // And don't open the chat behind a modal.
-        if (document.querySelector('[role="dialog"][data-state="open"]')) return;
+        // And don't open the chat behind a modal. The command palette is the exception, as it lists Ask with this shortcut.
+        const dialog = document.querySelector('[role="dialog"][data-state="open"]');
+        if (dialog && !dialog.hasAttribute('data-command-palette')) return;
 
         e.preventDefault();
+
+        if (dialog) {
+            // Close the palette (the same as pressing Escape), then wait for it to hand focus back before moving it into the chat. If the chat is already open it's focused, not closed.
+            document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', code: 'Escape', keyCode: 27, which: 27, bubbles: true }));
+            setTimeout(focus, 450);
+            return;
+        }
+
         shortcut();
     });
 });

@@ -63,6 +63,15 @@ export default function useAiChat() {
             focusRequests.value++;
         },
         leave,
+        // Open the chat if it's closed, or just focus it if it's open, and never close it. For coming from the command palette.
+        focus: () => {
+            if (!open.value) {
+                rememberFocus();
+                open.value = true;
+            } else {
+                focusRequests.value++;
+            }
+        },
         // The keyboard shortcut: closed opens (and focuses), open but unfocused focuses, focused closes.
         shortcut: () => {
             if (!open.value) {

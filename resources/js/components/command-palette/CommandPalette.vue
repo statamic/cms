@@ -323,7 +323,7 @@ router.on('start', () => Statamic.$commandPalette.clear());
         </DialogTrigger>
         <DialogPortal>
             <DialogOverlay class="fixed inset-0 z-30 bg-gray-800/20 backdrop-blur-[2px] dark:bg-gray-800/50" />
-            <DialogContent :class="[modalClasses, $attrs.class]" data-ui-modal-content :aria-describedby="undefined">
+            <DialogContent :class="[modalClasses, $attrs.class]" data-ui-modal-content data-command-palette :aria-describedby="undefined">
                 <VisuallyHidden asChild>
                     <DialogTitle>{{ __('Command Palette') }}</DialogTitle>
                 </VisuallyHidden>
