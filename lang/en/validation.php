@@ -207,6 +207,7 @@ return [
     'form_insight_unknown' => 'Insight :insight does not exist.',
     'form_must_be_submitted_from_an_entry' => 'This form must be submitted from an entry.',
     'form_unique_instances_entry_field' => 'Rename the `entry` field before enabling Unique Instances.',
+    'form_unique_instances_reserved_entry_handle' => 'The `entry` handle is reserved on forms with Unique Instances enabled.',
     'one_site_without_origin' => 'At least one site must not have an origin.',
     'options_require_keys' => 'All options must have keys.',
     'origin_cannot_be_disabled' => 'Cannot select a disabled origin.',

@@ -53,7 +53,13 @@ class FormBuilderController extends CpController
 
         $this->validateFields($request);
 
-        $this->validateUniqueHandles($request);
+        $handles = $this->submittedHandles($request);
+
+        $this->validateUniqueHandles($handles);
+
+        if ($form->hasUniqueInstances()) {
+            $this->validateUniqueInstancesHandles($handles);
+        }
 
         $this->setFormFields($request, $form);
 
@@ -141,9 +147,8 @@ class FormBuilderController extends CpController
         }
     }
 
-    private function validateUniqueHandles(Request $request): void
+    private function submittedHandles(Request $request): array
     {
-        $errors = [];
         $handleToIds = [];
 
         foreach ($request->pages as $page) {
@@ -171,6 +176,13 @@ class FormBuilderController extends CpController
             }
         }
 
+        return $handleToIds;
+    }
+
+    private function validateUniqueHandles(array $handleToIds): void
+    {
+        $errors = [];
+
         foreach ($handleToIds as $handle => $ids) {
             if (count($ids) > 1) {
                 $message = __('statamic::validation.duplicate_field_handle', ['handle' => $handle]);
@@ -179,6 +191,19 @@ class FormBuilderController extends CpController
                     $errors["{$id}.handle"] = [$message];
                 }
             }
+        }
+
+        if (! empty($errors)) {
+            throw ValidationException::withMessages($errors);
+        }
+    }
+
+    private function validateUniqueInstancesHandles(array $handleToIds): void
+    {
+        $errors = [];
+
+        foreach (array_unique($handleToIds['entry'] ?? []) as $id) {
+            $errors["{$id}.handle"] = [__('statamic::validation.form_unique_instances_reserved_entry_handle')];
         }
 
         if (! empty($errors)) {
