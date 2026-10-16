@@ -215,12 +215,16 @@ const isReadOnly = computed(() => {
 const lockedBy = computed(() => fieldLocks.value[handle] ?? null);
 const isLocked = computed(() => lockedBy.value !== null && lockedBy.value.id !== Statamic.user.id);
 
-// Only label fields that are read only by themselves. When the whole container
-// or fields provider is read only, labelling every field would just be noise.
+// Only mark fields configured as read only. Fields that are read only for other
+// reasons (permissions, locks, synced with their origin) keep the plain read only style.
 const shouldMarkReadOnly = computed(() => {
-    if (!isReadOnly.value || isLocked.value) return false;
+    if (isLocked.value) return false;
 
-    return !containerReadOnly.value && !fieldsProviderReadOnly.value;
+    return (
+        props.config.visibility === 'read_only' ||
+        props.config.visibility === 'computed' ||
+        props.config.read_only === true
+    );
 });
 
 const isSyncable = computed(() => {
@@ -282,7 +286,7 @@ const fieldtypeComponentEvents = computed(() => ({
             :instructions-below="config.instructions_position === 'below'"
             :required="isRequired"
             :errors="errors"
-            :read-only="isReadOnly"
+            :read-only="shouldMarkReadOnly"
             :inline="asConfig"
             :full-width-setting="config.full_width_setting"
             v-bind="$attrs"
