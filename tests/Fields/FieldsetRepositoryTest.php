@@ -76,6 +76,41 @@ EOT;
     }
 
     #[Test]
+    public function deleting_a_fieldset_removes_it_from_the_cache()
+    {
+        File::shouldReceive('exists')->with('/path/to/resources/fieldsets/sub/test.yaml')->times(3)->andReturn(true, false, false);
+        File::shouldReceive('get')->with('/path/to/resources/fieldsets/sub/test.yaml')->once()->andReturn('title: Test Fieldset');
+        File::shouldReceive('delete')->with('/path/to/resources/fieldsets/sub/test.yaml')->once();
+
+        $fieldset = $this->repo->find('sub/test');
+        $this->assertInstanceOf(Fieldset::class, $fieldset);
+
+        $this->repo->delete($fieldset);
+
+        $this->assertNull($this->repo->find('sub/test'));
+        $this->assertNull($this->repo->find('sub.test'));
+    }
+
+    #[Test]
+    public function resetting_a_namespaced_fieldset_removes_it_from_the_cache()
+    {
+        $this->repo->addNamespace('foo', '/path/to/foo');
+
+        File::shouldReceive('exists')->with('/path/to/resources/fieldsets/vendor/foo/sub/test.yaml')->twice()->andReturn(true, false);
+        File::shouldReceive('get')->with('/path/to/resources/fieldsets/vendor/foo/sub/test.yaml')->once()->andReturn('title: Overridden');
+        File::shouldReceive('delete')->with('/path/to/resources/fieldsets/vendor/foo/sub/test.yaml')->once();
+        File::shouldReceive('exists')->with('/path/to/foo/sub/test.yaml')->once()->andReturnTrue();
+        File::shouldReceive('get')->with('/path/to/foo/sub/test.yaml')->once()->andReturn('title: Original');
+
+        $overridden = $this->repo->find('foo::sub.test');
+        $this->assertEquals('Overridden', $overridden->title());
+
+        $this->repo->reset($overridden);
+
+        $this->assertEquals('Original', $this->repo->find('foo::sub/test')->title());
+    }
+
+    #[Test]
     public function it_returns_null_if_fieldset_doesnt_exist()
     {
         File::shouldReceive('exists')->with('/path/to/resources/fieldsets/unknown.yaml')->once()->andReturnFalse();
