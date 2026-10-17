@@ -171,6 +171,8 @@ class FieldsetRepository
             "{$directory}/{$handle}.yaml",
             YAML::dump($fieldset->contents())
         );
+
+        $this->fieldsets[$this->normalizeHandle($fieldset->handle())] = $fieldset;
     }
 
     public function delete(Fieldset $fieldset)
@@ -180,6 +182,8 @@ class FieldsetRepository
         }
 
         File::delete($fieldset->path());
+
+        unset($this->fieldsets[$this->normalizeHandle($fieldset->handle())]);
     }
 
     public function reset(Fieldset $fieldset)
