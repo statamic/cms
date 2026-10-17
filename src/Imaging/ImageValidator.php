@@ -9,7 +9,6 @@ class ImageValidator
 {
     /**
      * Formats every supported driver can read, so there's no need to ask it.
-     * Asking Imagick costs hundreds of milliseconds on the first call per process.
      */
     private const ALWAYS_SUPPORTED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif'];
 
