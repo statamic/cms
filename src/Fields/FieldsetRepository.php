@@ -193,6 +193,8 @@ class FieldsetRepository
         }
 
         File::delete($this->overriddenNamespacedFieldsetPath($fieldset->handle()));
+
+        unset($this->fieldsets[$this->normalizeHandle($fieldset->handle())]);
     }
 
     private function normalizeHandle(string $handle): string
