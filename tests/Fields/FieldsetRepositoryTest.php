@@ -75,6 +75,23 @@ EOT;
         $this->assertSame($fieldset, $this->repo->find('sub/test'));
     }
 
+    #[Test]
+    #[DataProvider('cacheProvider')]
+    public function it_caches_fieldsets($handle, $alternateHandle, $expectedPath)
+    {
+        $this->repo->addNamespace('foo', '/path/to/foo');
+
+        File::shouldReceive('exists')->with(\Mockery::pattern('#^/path/to/resources/fieldsets/vendor/foo/#'))->andReturnFalse();
+        File::shouldReceive('exists')->with($expectedPath)->once()->andReturnTrue();
+        File::shouldReceive('get')->with($expectedPath)->once()->andReturn('title: Test Fieldset');
+
+        $fieldset = $this->repo->find($handle);
+
+        $this->assertInstanceOf(Fieldset::class, $fieldset);
+        $this->assertSame($fieldset, $this->repo->find($handle));
+        $this->assertSame($fieldset, $this->repo->find($alternateHandle));
+    }
+
     public static function cacheProvider()
     {
         return [
