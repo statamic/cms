@@ -75,6 +75,15 @@ EOT;
         $this->assertSame($fieldset, $this->repo->find('sub/test'));
     }
 
+    public static function cacheProvider()
+    {
+        return [
+            'standard' => ['test', 'test', '/path/to/resources/fieldsets/test.yaml'],
+            'standard subdir' => ['sub.test', 'sub/test', '/path/to/resources/fieldsets/sub/test.yaml'],
+            'standard subdir with slash' => ['sub/test', 'sub.test', '/path/to/resources/fieldsets/sub/test.yaml'],
+        ];
+    }
+
     #[Test]
     public function deleting_a_fieldset_removes_it_from_the_cache()
     {
