@@ -7,7 +7,6 @@ use Statamic\Exceptions\FieldsetNotFoundException;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\Facades\YAML;
-use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 class FieldsetRepository
@@ -30,11 +29,11 @@ class FieldsetRepository
 
     public function find(string $handle): ?Fieldset
     {
-        if ($cached = Arr::get($this->fieldsets, $handle)) {
+        $handle = $this->normalizeHandle($handle);
+
+        if ($cached = $this->fieldsets[$handle] ?? null) {
             return $cached;
         }
-
-        $handle = str_replace('/', '.', $handle);
 
         $path = Str::contains($handle, '::')
             ? $this->findNamespacedFieldsetPath($handle)
@@ -190,6 +189,11 @@ class FieldsetRepository
         }
 
         File::delete($this->overriddenNamespacedFieldsetPath($fieldset->handle()));
+    }
+
+    private function normalizeHandle(string $handle): string
+    {
+        return str_replace('/', '.', $handle);
     }
 
     public function addNamespace(string $namespace, string $directory): void
