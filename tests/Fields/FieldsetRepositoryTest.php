@@ -102,6 +102,27 @@ EOT;
     }
 
     #[Test]
+    #[DataProvider('cacheProvider')]
+    public function saving_a_fieldset_updates_the_cache($handle, $alternateHandle, $expectedPath)
+    {
+        $this->repo->addNamespace('foo', '/path/to/foo');
+
+        File::shouldReceive('exists')->with(\Mockery::pattern('#^/path/to/resources/fieldsets/vendor/foo/#'))->andReturnFalse();
+        File::shouldReceive('exists')->with($expectedPath)->once()->andReturnTrue();
+        File::shouldReceive('get')->with($expectedPath)->once()->andReturn('title: Original');
+        File::shouldReceive('put')->once();
+
+        $original = $this->repo->find($handle);
+        $this->assertEquals('Original', $original->title());
+
+        $replacement = $this->repo->make($original->handle())->setContents(['title' => 'Updated']);
+        $this->repo->save($replacement);
+
+        $this->assertSame($replacement, $this->repo->find($handle));
+        $this->assertSame($replacement, $this->repo->find($alternateHandle));
+    }
+
+    #[Test]
     public function deleting_a_fieldset_removes_it_from_the_cache()
     {
         File::shouldReceive('exists')->with('/path/to/resources/fieldsets/sub/test.yaml')->times(3)->andReturn(true, false, false);
