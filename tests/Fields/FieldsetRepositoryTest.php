@@ -62,8 +62,8 @@ EOT;
 title: Test Fieldset
 fields: []
 EOT;
-        File::shouldReceive('exists')->with('/path/to/resources/fieldsets/sub/test.yaml')->twice()->andReturnTrue();
-        File::shouldReceive('get')->with('/path/to/resources/fieldsets/sub/test.yaml')->twice()->andReturn($contents);
+        File::shouldReceive('exists')->with('/path/to/resources/fieldsets/sub/test.yaml')->once()->andReturnTrue();
+        File::shouldReceive('get')->with('/path/to/resources/fieldsets/sub/test.yaml')->once()->andReturn($contents);
 
         $fieldset = $this->repo->find('sub.test');
 
@@ -71,8 +71,8 @@ EOT;
         $this->assertEquals('Test Fieldset', $fieldset->title());
         $this->assertEquals('sub.test', $fieldset->handle());
 
-        // Test that using slash delimiter instead of dots returns the same thing.
-        $this->assertEquals($fieldset, $this->repo->find('sub/test'));
+        // Test that using slash delimiter instead of dots returns the same (cached) thing.
+        $this->assertSame($fieldset, $this->repo->find('sub/test'));
     }
 
     #[Test]
