@@ -218,7 +218,12 @@ class GlideController extends Controller
             return;
         }
 
-        $path = Str::after($this->request->url(), Site::current()->absoluteUrl());
+        $url = $this->request->url();
+        $siteUrl = Site::current()->absoluteUrl();
+
+        $path = Str::startsWith(Str::ensureRight($url, '/'), Str::ensureRight($siteUrl, '/'))
+            ? Str::after($url, $siteUrl)
+            : $this->request->getPathInfo();
 
         try {
             SignatureFactory::create(Config::getAppKey())->validateRequest($path, $this->request->query->all());
