@@ -98,6 +98,8 @@ EOT;
             'standard' => ['test', 'test', '/path/to/resources/fieldsets/test.yaml'],
             'standard subdir' => ['sub.test', 'sub/test', '/path/to/resources/fieldsets/sub/test.yaml'],
             'standard subdir with slash' => ['sub/test', 'sub.test', '/path/to/resources/fieldsets/sub/test.yaml'],
+            'namespace' => ['foo::test', 'foo::test', '/path/to/foo/test.yaml'],
+            'namespace, subdir' => ['foo::sub.test', 'foo::sub/test', '/path/to/foo/sub/test.yaml'],
         ];
     }
 
