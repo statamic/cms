@@ -86,6 +86,8 @@ class IncludeTagTest extends ParserTestCase
         $this->viewShouldReturnRaw('assigner', '{{ leaked = "LEAK" }}');
         $this->viewShouldReturnRaw('reader', 'R[{{ leaked }}]');
         $this->viewShouldReturnRaw('template', '{{ items }}{{ include:assigner }}{{ /items }}[{{ leaked }}][{{ foreach:items }}{{ leaked }}{{ /foreach:items }}]{{ partial:reader }}');
+
+        // Render as a view so the template shares the runtime parser with the include, as in a real request.
         $this->assertSame('[][]R[]', view('template', ['items' => [['a' => 1], ['a' => 2]]])->render());
     }
 
