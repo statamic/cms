@@ -32,5 +32,5 @@ test('destroying a portal forgets that it was disabled', () => {
     fullscreen.setDisabled(true);
     fullscreen.destroy();
 
-    expect(portals.disabled.has(fullscreen.id)).toBe(false);
+    expect(portals.isDisabled(fullscreen.id)).toBe(false);
 });

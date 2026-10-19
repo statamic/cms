@@ -2,9 +2,10 @@ import Portal from './Portal';
 import { reactive, ref } from 'vue';
 
 export default class Portals {
+    #disabled = reactive(new Set());
+
     constructor() {
         this.portals = ref([]);
-        this.disabled = reactive(new Set());
     }
 
     all() {
@@ -14,7 +15,7 @@ export default class Portals {
     // The topmost portal that's actually rendering into its target. Disabled portals
     // (e.g. fullscreen fieldtypes not in fullscreen) render inline, so they don't count.
     top() {
-        return this.all().filter((portal) => !this.disabled.has(portal.id)).at(-1);
+        return this.all().filter((portal) => !this.isDisabled(portal.id)).at(-1);
     }
 
     create(name, data = {}) {
@@ -25,8 +26,12 @@ export default class Portals {
         return portal;
     }
 
+    isDisabled(id) {
+        return this.#disabled.has(id);
+    }
+
     setDisabled(id, disabled) {
-        disabled ? this.disabled.add(id) : this.disabled.delete(id);
+        disabled ? this.#disabled.add(id) : this.#disabled.delete(id);
     }
 
     destroy(id) {
@@ -34,7 +39,7 @@ export default class Portals {
 
         if (i !== -1) this.portals.value.splice(i, 1);
 
-        this.disabled.delete(id);
+        this.#disabled.delete(id);
     }
 
     stacks() {
