@@ -176,7 +176,6 @@
                                 :assets="items"
                                 :action-url="actionUrl"
                                 :thumbnail-size="gridThumbnailSize"
-                                :selected-assets="selectedAssets"
                                 :show-checkerboard="showCheckerboard"
                                 :checkerboard-mode="checkerboardMode"
                                 v-bind="sharedAssetProps"
@@ -452,6 +451,7 @@ export default {
                 maxFiles: this.maxFiles,
                 restrictFolderNavigation: this.restrictFolderNavigation,
                 path: this.path,
+                selectedAssets: this.selectedAssets,
                 moving: this.moving,
                 creatingFolder: this.creatingFolder,
                 creatingFolderError: this.creatingFolderError,

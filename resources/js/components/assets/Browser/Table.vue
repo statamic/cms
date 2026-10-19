@@ -102,7 +102,7 @@
                     class="group flex w-fit items-center gap-2 sm:gap-3"
                     :draggable="true"
                     @dragover.prevent
-                    @dragstart="draggingAsset = asset.id"
+                    @dragstart="assetDragStarted($event, asset)"
                     @dragend="draggingAsset = null"
                     :data-moving="isMoving(asset.id) || null"
                     :class="{ 'text-gray-400 dark:text-gray-500': isDragging(asset.id) || isMoving(asset.id) }"

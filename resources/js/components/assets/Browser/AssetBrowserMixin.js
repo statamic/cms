@@ -1,3 +1,5 @@
+import { showMultipleAssetDragBadge } from './dragBadge.js';
+
 export default {
     props: {
         actionUrl: String,
@@ -9,6 +11,7 @@ export default {
         restrictFolderNavigation: Boolean,
         creatingFolder: Boolean,
         creatingFolderError: Boolean,
+        selectedAssets: { type: Array, default: () => [] },
         moving: { type: Array, default: () => [] },
     },
 
@@ -23,7 +26,15 @@ export default {
 
     computed: {
         draggedAssetIds() {
-            return this.draggingAsset ? [this.draggingAsset] : [];
+            if (!this.draggingAsset) return [];
+
+            // Dragging a selected asset brings the rest of the selection along with it,
+            // except anything still moving from an earlier drop, since its ID is about to change.
+            if (!this.selectedAssets.includes(this.draggingAsset)) return [this.draggingAsset];
+
+            return this.assets
+                .filter((asset) => asset.id === this.draggingAsset || (this.selectedAssets.includes(asset.id) && this.canMoveAsset(asset) && !this.isMoving(asset.id)))
+                .map((asset) => asset.id);
         },
 
         draggingMovable() {
@@ -108,6 +119,14 @@ export default {
 
         canMoveFolder(folder) {
             return folder.actions.some((action) => action.handle === 'move_asset_folder');
+        },
+
+        assetDragStarted(event, asset) {
+            this.draggingAsset = asset.id;
+
+            if (this.draggedAssetIds.length > 1) {
+                showMultipleAssetDragBadge(event, this.draggedAssetIds.length);
+            }
         },
 
         canDropOn(folder) {
