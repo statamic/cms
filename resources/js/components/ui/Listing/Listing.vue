@@ -39,6 +39,7 @@ const emit = defineEmits([
     'update:selections',
     'update:searchQuery',
     'requestCompleted',
+    'requestFailed',
     'reordered',
     'refreshing',
 ]);
@@ -438,6 +439,7 @@ function request() {
             if (isRequestCanceled(e) || axios.isCancel(e)) return;
             initializing.value = false;
             loading.value = false;
+            emit('requestFailed', e);
             if (e.request && !e.response) return;
             Statamic.$toast.error(e.response ? e.response.data.message : __('Something went wrong'), {
                 duration: null,
