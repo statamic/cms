@@ -12,6 +12,7 @@ export default {
         creatingFolder: Boolean,
         creatingFolderError: Boolean,
         selectedAssets: { type: Array, default: () => [] },
+        moving: { type: Array, default: () => [] },
     },
 
     data() {
@@ -19,8 +20,7 @@ export default {
             newFolderName: null,
             draggingAsset: null,
             draggingFolder: null,
-            moving: [],
-            pendingCallbacks: [],
+            dragOverFolder: null,
         }
     },
 
@@ -35,24 +35,31 @@ export default {
                 .filter((asset) => asset.id === this.draggingAsset || (this.selectedAssets.includes(asset.id) && this.canMoveAsset(asset)))
                 .map((asset) => asset.id);
         },
+
+        draggingMovable() {
+            if (this.draggingAsset) {
+                return this.canMoveAsset(this.assets.find((asset) => asset.id === this.draggingAsset));
+            }
+
+            if (this.draggingFolder) {
+                return this.canMoveFolder(this.folders.find((folder) => folder.path === this.draggingFolder));
+            }
+
+            return false;
+        },
     },
 
     watch: {
-        assets() {
-            // Moved items vanish once the listing refreshes, so stop tracking them.
-            this.moving = [];
-
-            // Update selections in the same render, so moved assets don't visibly deselect before they disappear.
-            this.pendingCallbacks.forEach(([name, ...args]) => Statamic.$callbacks.call(name, ...args));
-            this.pendingCallbacks = [];
-        },
-
         draggingAsset() {
             this.$emit('prevent-dragging', this.draggingAsset !== null);
         },
 
         draggingFolder() {
             this.$emit('prevent-dragging', this.draggingFolder !== null);
+        },
+
+        draggingMovable(movable) {
+            this.$emit('dragging-movable', movable);
         },
 
         newFolderName() {
@@ -117,52 +124,50 @@ export default {
             }
         },
 
+        canDropOn(folder) {
+            return this.draggingMovable && folder.path !== this.draggingFolder;
+        },
+
+        folderDragOver(event, folder) {
+            if (!this.canDropOn(folder)) return;
+
+            event.preventDefault();
+            this.dragOverFolder = folder.path;
+        },
+
+        folderDragLeave(event) {
+            if (event.currentTarget.contains(event.relatedTarget)) return;
+
+            this.dragOverFolder = null;
+        },
+
         handleFolderDrop(destinationFolder) {
-            if (this.draggingAsset) {
+            const destination = destinationFolder.path;
+
+            if (this.draggingAsset && this.draggingMovable) {
                 let asset = this.assets.find((asset) => asset.id === this.draggingAsset);
                 let action = asset.actions.find((action) => action.handle === 'move_asset');
 
-                if (action) this.moveItems(this.actionUrl, action, this.draggedAssetIds, destinationFolder.path);
+                // Search results can come from anywhere, so skip assets that are already in the destination.
+                let ids = this.assets
+                    .filter((asset) => this.draggedAssetIds.includes(asset.id) && parentPath(asset.path) !== destination)
+                    .map((asset) => asset.id);
 
-                this.draggingAsset = null;
+                if (ids.length) this.$emit('move-items', { url: this.actionUrl, action, items: ids, destination });
             }
 
-            if (this.draggingFolder) {
+            if (this.draggingFolder && this.draggingMovable) {
                 let folder = this.folders.find((folder) => folder.path === this.draggingFolder);
                 let action = folder.actions.find((action) => action.handle === 'move_asset_folder');
 
-                if (action) this.moveItems(this.folderActionUrl, action, [folder.path], destinationFolder.path);
-
-                this.draggingFolder = null;
+                if (folder.path !== destination && parentPath(folder.path) !== destination) {
+                    this.$emit('move-items', { url: this.folderActionUrl, action, items: [folder.path], destination });
+                }
             }
-        },
 
-        moveItems(url, action, items, destination) {
-            const payload = {
-                action: action.handle,
-                context: action.context,
-                selections: items,
-                values: { folder: destination },
-            };
-
-            this.moving.push(...items);
-            this.actionStarted();
-
-            this.$axios
-                .post(url, payload)
-                .then(({ data }) => {
-                    const folder = destination === '/' ? __('All') : destination.split('/').pop();
-
-                    // Moved assets get new IDs, so the action tells us how to keep them selected.
-                    if (data.callback) this.pendingCallbacks.push(data.callback);
-
-                    Statamic.$toast.success(__('Moved to :folder', { folder }));
-                    this.$emit('action-completed');
-                })
-                .catch((error) => {
-                    this.moving = this.moving.filter((moving) => !items.includes(moving));
-                    this.actionCompleted(false, error.response?.data);
-                });
+            this.draggingAsset = null;
+            this.draggingFolder = null;
+            this.dragOverFolder = null;
         },
 
         isDragging(id) {
@@ -174,3 +179,7 @@ export default {
         },
     },
 };
+
+function parentPath(path) {
+    return path.includes('/') ? path.slice(0, path.lastIndexOf('/')) : '/';
+}

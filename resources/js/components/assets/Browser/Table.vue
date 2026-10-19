@@ -9,12 +9,9 @@
                     class="pointer-events-auto"
                     :class="{ 'pointer-events-none': isMoving(folder.path) }"
                     :draggable="canMoveFolder(folder)"
-                    @dragover.prevent="dragOverFolder = folder.path"
-                    @dragleave.prevent="!$event.currentTarget.contains($event.relatedTarget) && (dragOverFolder = null)"
-                    @drop="
-                        handleFolderDrop(folder);
-                        dragOverFolder = null;
-                    "
+                    @dragover="folderDragOver($event, folder)"
+                    @dragleave="folderDragLeave"
+                    @drop.prevent="handleFolderDrop(folder)"
                     @dragstart="draggingFolder = folder.path"
                     @dragend="
                         draggingFolder = null;
@@ -184,12 +181,6 @@ export default {
         columns: Array,
         visibleColumns: Array,
         isSearching: Boolean
-    },
-
-    data() {
-        return {
-            dragOverFolder: null,
-        };
     },
 
     watch: {

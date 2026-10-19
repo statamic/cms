@@ -22,6 +22,8 @@ export default {
     props: {
         path: String,
         droppable: Boolean,
+        /** Search results come from any folder, so the current folder becomes a valid drop target. */
+        currentDroppable: Boolean,
     },
 
     emits: ['navigated', 'dropped'],
@@ -60,7 +62,7 @@ export default {
         },
 
         canDropOn(index) {
-            return this.droppable && !this.isLastFolder(index);
+            return this.droppable && (this.currentDroppable || !this.isLastFolder(index));
         },
 
         dragOver(event, index) {
