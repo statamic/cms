@@ -122,7 +122,10 @@
                                 <Breadcrumbs
                                     v-if="!restrictFolderNavigation"
                                     :path="path"
+                                    :droppable="draggingMovable"
+                                    :current-droppable="isSearching"
                                     @navigated="selectFolder"
+                                    @dropped="moveDraggedItemToFolder"
                                 />
                                 <div v-if="mode === 'grid'" class="flex items-center gap-2 mr-2">
                                     <ui-button
@@ -339,6 +342,9 @@ export default {
             shifting: false,
             lastItemClicked: null,
             preventDragging: false,
+            draggingMovable: false,
+            moving: [],
+            settlingMoves: [],
             gridThumbnailSize: this.$preferences.get('assets.browser_thumbnail_size', 200),
         };
     },
@@ -446,6 +452,7 @@ export default {
                 maxFiles: this.maxFiles,
                 restrictFolderNavigation: this.restrictFolderNavigation,
                 path: this.path,
+                moving: this.moving,
                 creatingFolder: this.creatingFolder,
                 creatingFolderError: this.creatingFolderError,
             };
@@ -464,6 +471,8 @@ export default {
                     this.creatingFolderError = false;
                 },
                 'prevent-dragging': (preventDragging) => (this.preventDragging = preventDragging),
+                'dragging-movable': (movable) => (this.draggingMovable = movable),
+                'move-items': this.moveItems,
                 'update:creatingFolderError': (value) => (this.creatingFolderError = value),
             };
         },
@@ -564,7 +573,8 @@ export default {
             }
 
             this.initializing = false;
-            this.loading = false;
+
+            this.settleMoves();
         },
 
         actionStarted() {
@@ -726,6 +736,53 @@ export default {
             this.page = 1;
 
             this.$emit('navigated', this.path);
+        },
+
+        moveItems({ url, action, items, destination }) {
+            const payload = {
+                action: action.handle,
+                context: action.context,
+                selections: items,
+                values: { folder: destination },
+            };
+
+            this.moving.push(...items);
+            this.actionStarted();
+
+            this.$axios
+                .post(url, payload)
+                .then(({ data }) => {
+                    const folder = destination === '/' ? __('All') : destination.split('/').pop();
+
+                    // Keep the items' spinners until the refreshed listing arrives without them.
+                    this.settlingMoves.push({ items, callback: data.callback });
+
+                    Statamic.$toast.success(__('Moved to :folder', { folder }));
+                })
+                .catch((error) => {
+                    this.moving = this.moving.filter((item) => !items.includes(item));
+                    Statamic.$toast.error(error.response?.data?.message || __('Action failed'));
+                })
+                .finally(() => this.$refs.listing.refresh());
+        },
+
+        settleMoves() {
+            this.settlingMoves.forEach(({ items, callback }) => {
+                this.moving = this.moving.filter((item) => !items.includes(item));
+
+                // Moved assets get new IDs, so the action tells us how to keep them selected. Doing it in the
+                // same render as the refresh stops them visibly deselecting before they disappear.
+                if (callback) Statamic.$callbacks.call(callback[0], ...callback.slice(1));
+            });
+
+            this.settlingMoves = [];
+
+            // Keep the progress bar going while another move is still in flight.
+            this.loading = this.moving.length > 0;
+        },
+
+        moveDraggedItemToFolder(path) {
+            this.$refs[this.mode]?.handleFolderDrop({ path });
         },
 
         selectRange(from, to) {

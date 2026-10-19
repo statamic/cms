@@ -1,20 +1,16 @@
 <template>
-    <Card inset variant="flat">
+    <Card inset variant="flat" class="[&_tr:has([data-moving])]:pointer-events-none">
         <ListingTable contained>
             <template #tbody-start>
                 <tr
                     v-if="!restrictFolderNavigation"
                     v-for="(folder, i) in folders"
                     :key="folder.path"
-                    class="pointer-events-auto"
-                    :class="{ 'bg-blue-50': dragOverFolder === folder.path }"
+                    :class="isMoving(folder.path) ? 'pointer-events-none' : 'pointer-events-auto'"
                     :draggable="canMoveFolder(folder)"
-                    @dragover.prevent="dragOverFolder = folder.path"
-                    @dragleave.prevent="dragOverFolder = null"
-                    @drop="
-                        handleFolderDrop(folder);
-                        dragOverFolder = null;
-                    "
+                    @dragover="folderDragOver($event, folder)"
+                    @dragleave="folderDragLeave"
+                    @drop.prevent="handleFolderDrop(folder)"
                     @dragstart="draggingFolder = folder.path"
                     @dragend="
                         draggingFolder = null;
@@ -24,8 +20,20 @@
                     <td />
                     <td v-for="column in visibleColumns">
                         <template v-if="column.field === 'basename'">
-                            <a class="group flex cursor-pointer items-center" @click="selectFolder(folder.path)">
+                            <a
+                                class="group -m-1 -me-2.5 flex w-fit cursor-pointer items-center rounded-lg p-1 pe-2.5"
+                                :class="{
+                                    'ring-2 ring-blue-400': dragOverFolder === folder.path,
+                                    'text-gray-400 dark:text-gray-500': isMoving(folder.path),
+                                }"
+                                @click="selectFolder(folder.path)"
+                            >
+                                <!-- Icons load asynchronously, so reserve the space to stop the row jumping. -->
+                                <div v-if="isMoving(folder.path)" class="me-2 flex size-8 shrink-0 items-center justify-center">
+                                    <ui-icon name="loading" class="size-5 text-gray-700 dark:text-gray-200" />
+                                </div>
                                 <file-icon
+                                    v-else
                                     extension="folder"
                                     class="me-2 inline-block size-8 shrink-0 text-blue-400/90 group-hover:text-blue-400"
                                 />
@@ -96,12 +104,20 @@
                     @dragover.prevent
                     @dragstart="draggingAsset = asset.id"
                     @dragend="draggingAsset = null"
+                    :data-moving="isMoving(asset.id) || null"
+                    :class="{ 'text-gray-400 dark:text-gray-500': isDragging(asset.id) || isMoving(asset.id) }"
                 >
+                    <!-- Icons load asynchronously, so reserve the space to stop the row jumping. -->
+                    <div v-if="isMoving(asset.id)" class="flex size-8 shrink-0 items-center justify-center">
+                        <ui-icon name="loading" class="size-5 text-gray-700 dark:text-gray-200" />
+                    </div>
                     <asset-thumbnail
+                        v-else
                         :asset="asset"
                         alt=""
                         :square="true"
                         class="size-8 cursor-pointer"
+                        :class="{ 'opacity-50': isDragging(asset.id) }"
                         @click.native.stop="$emit('edit-asset', asset)"
                     />
                     <button
@@ -164,12 +180,6 @@ export default {
         columns: Array,
         visibleColumns: Array,
         isSearching: Boolean
-    },
-
-    data() {
-        return {
-            dragOverFolder: null,
-        };
     },
 
     watch: {
