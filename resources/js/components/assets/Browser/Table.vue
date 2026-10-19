@@ -110,7 +110,7 @@
                     @dragstart="assetDragStarted($event, asset)"
                     @dragend="draggingAsset = null"
                     :data-moving="isMoving(asset.id) || null"
-                    :class="{ 'text-gray-400 dark:text-gray-500': isMoving(asset.id), 'opacity-50': isDragging(asset.id) }"
+                    :class="{ 'text-gray-400 dark:text-gray-500': isDragging(asset.id) || isMoving(asset.id) }"
                 >
                     <ui-icon
                         v-if="isMoving(asset.id)"
@@ -123,6 +123,7 @@
                         alt=""
                         :square="true"
                         class="size-8 cursor-pointer"
+                        :class="{ 'opacity-50': isDragging(asset.id) }"
                         @click.native.stop="$emit('edit-asset', asset)"
                     />
                     <button
