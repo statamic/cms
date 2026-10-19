@@ -54,6 +54,19 @@ test('viewing submissions opens the stack for that form', async () => {
     expect(wrapper.vm.viewingSubmissions).toBe(true);
 });
 
+test('submissions are hidden once the form is removed from the field', async () => {
+    const wrapper = mountFieldtype();
+
+    formItem(wrapper).viewSubmissions({ id: 'contact' });
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.vm.submissionsMeta.form).toBe('contact');
+
+    await wrapper.setProps({ value: { forms: ['feedback'], config: { feedback: [] } } });
+
+    expect(wrapper.vm.submissionsMeta).toBeNull();
+});
+
 test('config is kept for forms that remain when the forms change', async () => {
     const wrapper = mountFieldtype();
 
