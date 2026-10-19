@@ -145,11 +145,15 @@ export default {
 
             this.$axios
                 .post(url, payload)
-                .then(() => {
+                .then(({ data }) => {
                     const folder = destination === '/' ? __('All') : destination.split('/').pop();
 
+                    // Moved assets get new IDs, so the action tells us how to keep them selected.
+                    if (data.callback) {
+                        Statamic.$callbacks.call(data.callback[0], ...data.callback.slice(1));
+                    }
+
                     Statamic.$toast.success(__('Moved to :folder', { folder }));
-                    Statamic.$events.$emit('removeFromSelections', items);
                     this.$emit('action-completed');
                 })
                 .catch((error) => {
