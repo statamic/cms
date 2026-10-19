@@ -20,15 +20,16 @@ export function showMultipleAssetDragBadge(event, count) {
 
     const cleanUp = () => {
         badge.remove();
-        document.removeEventListener('dragover', follow);
-        document.removeEventListener('dragend', cleanUp);
-        document.removeEventListener('drop', cleanUp);
+        document.removeEventListener('dragover', follow, true);
+        document.removeEventListener('dragend', cleanUp, true);
+        document.removeEventListener('drop', cleanUp, true);
     };
 
     follow(event);
-    document.addEventListener('dragover', follow);
-    document.addEventListener('dragend', cleanUp);
-    document.addEventListener('drop', cleanUp);
+    // Capture, so elements that stop drag events from bubbling (like the uploader) can't hide them.
+    document.addEventListener('dragover', follow, true);
+    document.addEventListener('dragend', cleanUp, true);
+    document.addEventListener('drop', cleanUp, true);
 }
 
 function hideNativeDragImage(event) {
