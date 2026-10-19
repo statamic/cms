@@ -17,6 +17,7 @@ use Statamic\Events\SubmissionFinalized;
 use Statamic\Events\SubmissionSaved;
 use Statamic\Events\SubmissionSaving;
 use Statamic\Facades\Blueprint;
+use Statamic\Facades\Collection as CollectionFacade;
 use Statamic\Facades\Form;
 use Statamic\Facades\FormSubmission;
 use Statamic\Facades\Site;
@@ -282,6 +283,48 @@ class SubmissionTest extends TestCase
 
         $this->assertEquals($entry->id(), $submission->entry()->id());
         $this->assertEquals($entry->id(), $submission->augmentedArrayData()['entry']->id());
+    }
+
+    #[Test]
+    public function the_entry_is_augmented_to_the_localization_for_the_submissions_site()
+    {
+        $this->setSites([
+            'en' => ['locale' => 'en_US', 'url' => '/'],
+            'fr' => ['locale' => 'fr_FR', 'url' => '/fr/'],
+        ]);
+
+        CollectionFacade::make('events')->sites(['en', 'fr'])->routes('/events/{slug}')->save();
+        (new EntryFactory)->collection('events')->id('event-1')->locale('en')->slug('event-one')->data(['title' => 'Event One'])->create();
+        (new EntryFactory)->collection('events')->id('event-1-fr')->locale('fr')->origin('event-1')->slug('evenement-un')->data(['title' => 'Événement Un'])->create();
+
+        $form = tap(Form::make('contact_us')->formFields(['sections' => []]))->save();
+
+        $submission = $form->makeSubmission()->set('_entry', 'event-1')->site('fr');
+
+        $entry = $submission->augmentedArrayData()['entry'];
+        $this->assertEquals('event-1-fr', $entry->id());
+        $this->assertEquals('Événement Un', $entry->get('title'));
+        $this->assertEquals('/fr/events/evenement-un', $entry->url());
+        $this->assertEquals('event-1', $submission->entry()->id());
+        $this->assertEquals('event-1', $submission->toArray()['entry']);
+    }
+
+    #[Test]
+    public function the_entry_is_augmented_to_the_root_when_it_isnt_localized_into_the_submissions_site()
+    {
+        $this->setSites([
+            'en' => ['locale' => 'en_US', 'url' => '/'],
+            'fr' => ['locale' => 'fr_FR', 'url' => '/fr/'],
+        ]);
+
+        CollectionFacade::make('events')->sites(['en', 'fr'])->routes('/events/{slug}')->save();
+        (new EntryFactory)->collection('events')->id('event-1')->locale('en')->slug('event-one')->create();
+
+        $form = tap(Form::make('contact_us')->formFields(['sections' => []]))->save();
+
+        $submission = $form->makeSubmission()->set('_entry', 'event-1')->site('fr');
+
+        $this->assertEquals('event-1', $submission->augmentedArrayData()['entry']->id());
     }
 
     #[Test]

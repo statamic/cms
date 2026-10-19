@@ -12,6 +12,7 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blueprint;
+use Statamic\Facades\Collection;
 use Statamic\Facades\Form;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Site;
@@ -339,6 +340,26 @@ class EmailTest extends TestCase
 
         $this->assertEquals(['name'], collect($email->viewData['fields'])->pluck('handle')->all());
         $this->assertEquals('event-1', $email->viewData['entry']->value()->id());
+    }
+
+    #[Test]
+    public function the_entry_is_the_localization_for_the_submissions_site()
+    {
+        $this->setSites([
+            'en' => ['locale' => 'en_US', 'url' => '/'],
+            'fr' => ['locale' => 'fr_FR', 'url' => '/fr/'],
+        ]);
+
+        Collection::make('events')->sites(['en', 'fr'])->save();
+        (new EntryFactory)->collection('events')->id('event-1')->locale('en')->slug('event-one')->create();
+        (new EntryFactory)->collection('events')->id('event-1-fr')->locale('fr')->origin('event-1')->slug('evenement-un')->create();
+
+        $form = tap(Form::make('test')->formFields(['fields' => []]))->save();
+        $submission = $form->makeSubmission()->set('_entry', 'event-1')->site('fr');
+
+        $email = tap(new Email($submission, ['to' => 'test@test.com'], Site::get('fr')))->build();
+
+        $this->assertEquals('event-1-fr', $email->viewData['entry']->value()->id());
     }
 
     #[Test]

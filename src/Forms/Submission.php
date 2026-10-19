@@ -435,7 +435,8 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
         ]);
 
         if ($this->has('_entry')) {
-            $data['entry'] = $this->entry();
+            $root = $this->entry();
+            $data['entry'] = $root?->in($this->site()->handle()) ?? $root;
         }
 
         return $data;
