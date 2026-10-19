@@ -7,7 +7,11 @@
                 :icon="isHomeFolder(part) ? 'home' : !isLastFolder(index) ? 'folder' : 'folder-open'"
                 :text="isHomeFolder(part) ? __('All') : part"
                 @click="selectFolder(index)"
+                @dragover="dragOver($event, index)"
+                @dragleave="dragLeave($event)"
+                @drop="drop($event, index)"
                 class="gap-2 h-8!"
+                :class="{ 'ring-2 ring-blue-400': dropTarget === index }"
             />
         </div>
     </div>
@@ -17,6 +21,15 @@
 export default {
     props: {
         path: String,
+        droppable: Boolean,
+    },
+
+    emits: ['navigated', 'dropped'],
+
+    data() {
+        return {
+            dropTarget: null,
+        };
     },
 
     computed: {
@@ -31,11 +44,44 @@ export default {
         },
     },
 
-    methods: {
-        selectFolder(index) {
-            const path = index === 0 ? '/' : this.pathParts.slice(1, index + 1).join('/');
+    watch: {
+        droppable(droppable) {
+            if (!droppable) this.dropTarget = null;
+        },
+    },
 
-            this.$emit('navigated', path);
+    methods: {
+        pathFor(index) {
+            return index === 0 ? '/' : this.pathParts.slice(1, index + 1).join('/');
+        },
+
+        selectFolder(index) {
+            this.$emit('navigated', this.pathFor(index));
+        },
+
+        canDropOn(index) {
+            return this.droppable && !this.isLastFolder(index);
+        },
+
+        dragOver(event, index) {
+            if (!this.canDropOn(index)) return;
+
+            event.preventDefault();
+            this.dropTarget = index;
+        },
+
+        dragLeave(event) {
+            if (event.currentTarget.contains(event.relatedTarget)) return;
+
+            this.dropTarget = null;
+        },
+
+        drop(event, index) {
+            if (!this.canDropOn(index)) return;
+
+            event.preventDefault();
+            this.dropTarget = null;
+            this.$emit('dropped', this.pathFor(index));
         },
 
         isHomeFolder(part) {

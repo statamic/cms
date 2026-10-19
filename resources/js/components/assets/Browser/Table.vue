@@ -7,18 +7,18 @@
                     v-for="(folder, i) in folders"
                     :key="folder.path"
                     class="pointer-events-auto"
-                    :class="{ 'bg-blue-50': draggingFolder === folder.path }"
+                    :class="{ 'bg-blue-50': dragOverFolder === folder.path }"
                     :draggable="canMoveFolder(folder)"
-                    @dragover.prevent="draggingFolder = folder.path"
-                    @dragleave.prevent="draggingFolder = null"
+                    @dragover.prevent="dragOverFolder = folder.path"
+                    @dragleave.prevent="dragOverFolder = null"
                     @drop="
                         handleFolderDrop(folder);
-                        draggingFolder = null;
+                        dragOverFolder = null;
                     "
                     @dragstart="draggingFolder = folder.path"
                     @dragend="
                         draggingFolder = null;
-                        draggingFolder = null;
+                        dragOverFolder = null;
                     "
                 >
                     <td />
@@ -159,10 +159,17 @@ export default {
     },
 
     props: {
+        assets: Array,
         loading: Boolean,
         columns: Array,
         visibleColumns: Array,
         isSearching: Boolean
+    },
+
+    data() {
+        return {
+            dragOverFolder: null,
+        };
     },
 
     watch: {

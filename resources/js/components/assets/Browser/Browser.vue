@@ -122,7 +122,9 @@
                                 <Breadcrumbs
                                     v-if="!restrictFolderNavigation"
                                     :path="path"
+                                    :droppable="preventDragging"
                                     @navigated="selectFolder"
+                                    @dropped="moveDraggedItemToFolder"
                                 />
                                 <div v-if="mode === 'grid'" class="flex items-center gap-2 mr-2">
                                     <ui-button
@@ -726,6 +728,10 @@ export default {
             this.page = 1;
 
             this.$emit('navigated', this.path);
+        },
+
+        moveDraggedItemToFolder(path) {
+            this.$refs[this.mode]?.handleFolderDrop({ path });
         },
 
         selectRange(from, to) {
