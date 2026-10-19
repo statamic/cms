@@ -20,6 +20,7 @@ export default {
             draggingAsset: null,
             draggingFolder: null,
             moving: [],
+            pendingCallbacks: [],
         }
     },
 
@@ -40,6 +41,10 @@ export default {
         assets() {
             // Moved items vanish once the listing refreshes, so stop tracking them.
             this.moving = [];
+
+            // Update selections in the same render, so moved assets don't visibly deselect before they disappear.
+            this.pendingCallbacks.forEach(([name, ...args]) => Statamic.$callbacks.call(name, ...args));
+            this.pendingCallbacks = [];
         },
 
         draggingAsset() {
@@ -149,9 +154,7 @@ export default {
                     const folder = destination === '/' ? __('All') : destination.split('/').pop();
 
                     // Moved assets get new IDs, so the action tells us how to keep them selected.
-                    if (data.callback) {
-                        Statamic.$callbacks.call(data.callback[0], ...data.callback.slice(1));
-                    }
+                    if (data.callback) this.pendingCallbacks.push(data.callback);
 
                     Statamic.$toast.success(__('Moved to :folder', { folder }));
                     this.$emit('action-completed');

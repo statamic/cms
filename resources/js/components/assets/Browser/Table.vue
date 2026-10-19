@@ -32,11 +32,10 @@
                                 }"
                                 @click="selectFolder(folder.path)"
                             >
-                                <ui-icon
-                                    v-if="isMoving(folder.path)"
-                                    name="loading"
-                                    class="me-2 size-8 shrink-0 p-1.5 text-gray-700 dark:text-gray-200"
-                                />
+                                <!-- Icons load asynchronously, so reserve the space to stop the row jumping. -->
+                                <div v-if="isMoving(folder.path)" class="me-2 flex size-8 shrink-0 items-center justify-center">
+                                    <ui-icon name="loading" class="size-5 text-gray-700 dark:text-gray-200" />
+                                </div>
                                 <file-icon
                                     v-else
                                     extension="folder"
@@ -112,11 +111,10 @@
                     :data-moving="isMoving(asset.id) || null"
                     :class="{ 'text-gray-400 dark:text-gray-500': isDragging(asset.id) || isMoving(asset.id) }"
                 >
-                    <ui-icon
-                        v-if="isMoving(asset.id)"
-                        name="loading"
-                        class="size-8 shrink-0 p-1.5 text-gray-700 dark:text-gray-200"
-                    />
+                    <!-- Icons load asynchronously, so reserve the space to stop the row jumping. -->
+                    <div v-if="isMoving(asset.id)" class="flex size-8 shrink-0 items-center justify-center">
+                        <ui-icon name="loading" class="size-5 text-gray-700 dark:text-gray-200" />
+                    </div>
                     <asset-thumbnail
                         v-else
                         :asset="asset"
