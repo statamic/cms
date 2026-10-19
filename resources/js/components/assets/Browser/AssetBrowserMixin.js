@@ -1,3 +1,5 @@
+import { showMultipleAssetDragBadge } from './dragBadge.js';
+
 export default {
     props: {
         actionUrl: String,
@@ -100,6 +102,14 @@ export default {
 
         canMoveFolder(folder) {
             return folder.actions.some((action) => action.handle === 'move_asset_folder');
+        },
+
+        assetDragStarted(event, asset) {
+            this.draggingAsset = asset.id;
+
+            if (this.draggedAssetIds.length > 1) {
+                showMultipleAssetDragBadge(event, this.draggedAssetIds.length);
+            }
         },
 
         handleFolderDrop(destinationFolder) {
