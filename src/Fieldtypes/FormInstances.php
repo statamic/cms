@@ -13,7 +13,6 @@ use Statamic\Fields\Blueprint;
 use Statamic\Fields\Fields;
 use Statamic\Forms\ConfigFields;
 use Statamic\Forms\Fieldtype as FormFieldtype;
-use Statamic\GraphQL\Types\FormType;
 use Statamic\Statamic;
 
 use function Statamic\trans as __;
@@ -357,14 +356,22 @@ class FormInstances extends FormFieldtype
         return parent::getItemData($values['forms'] ?? $values);
     }
 
-    protected function collect($value)
+    public function augment($values)
     {
-        return collect(array_keys(static::toMap($value)));
+        return null;
     }
 
     public function shallowAugment($values)
     {
-        return parent::shallowAugment(array_keys(static::toMap($values)));
+        return null;
+    }
+
+    protected function getItemsForPreProcessIndex($values): Collection
+    {
+        return collect(array_keys(static::toMap($values)))
+            ->map(fn ($handle) => $this->augmentValue($handle))
+            ->filter()
+            ->values();
     }
 
     public function toQueryableValue($value)
@@ -374,6 +381,6 @@ class FormInstances extends FormFieldtype
 
     public function toGqlType()
     {
-        return GraphQL::listOf(GraphQL::type(FormType::NAME));
+        return GraphQL::string();
     }
 }

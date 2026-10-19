@@ -435,12 +435,12 @@ class FormInstancesTest extends TestCase
     }
 
     #[Test]
-    public function it_augments_to_a_collection_of_forms()
+    public function it_does_not_augment()
     {
-        $augmented = $this->fieldtype()->augment(['feedback' => [], 'contact' => ['submission_limit' => 5]]);
+        $value = ['feedback' => [], 'contact' => ['submission_limit' => 5]];
 
-        $this->assertEquals(['feedback', 'contact'], $augmented->map->handle()->all());
-        $this->assertEquals(['contact'], $this->fieldtype()->shallowAugment(['contact' => []])->map(fn ($form) => $form['handle']->value())->all());
+        $this->assertNull($this->fieldtype()->augment($value));
+        $this->assertNull($this->fieldtype()->shallowAugment($value));
     }
 
     #[Test]
