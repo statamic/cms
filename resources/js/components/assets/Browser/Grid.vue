@@ -10,7 +10,10 @@
                 v-for="folder in folders"
                 :key="folder.path"
                 class="group/folder relative p-1"
-                :class="{ 'rounded-xl ring-2 ring-blue-400': dragOverFolder === folder.path }"
+                :class="{
+                    'rounded-xl ring-2 ring-blue-400': dragOverFolder === folder.path,
+                    'pointer-events-none': isMoving(folder.path),
+                }"
                 :draggable="true"
                 @dragover.prevent="dragOverFolder = folder.path"
                 @dragleave.prevent="dragOverFolder = null"
@@ -24,6 +27,9 @@
                     dragOverFolder = null;
                 "
             >
+                <div v-if="isMoving(folder.path)" class="absolute inset-0 z-10 flex items-center justify-center rounded-xl bg-white/75 dark:bg-gray-900/75">
+                    <ui-icon name="loading" class="size-6 text-gray-700 dark:text-gray-200" />
+                </div>
                 <ItemActions
                     :url="folderActionUrl"
                     :actions="folderActions(folder)"
@@ -103,11 +109,14 @@
                             <div
                                 class="asset-tile group relative bg-white dark:bg-gray-900"
                                 :class="[
-                                    { 'opacity-50!': draggingAsset === asset.id },
+                                    { 'opacity-50!': draggingAsset === asset.id, 'pointer-events-none': isMoving(asset.id) },
                                     asset.can_be_transparent && showCheckerboard ? `bg-checkerboard bg-checkerboard-${checkerboardMode}` : '',
                                     asset.can_be_transparent && !showCheckerboard ? 'bg-checkerboard before:opacity-0 hover:before:opacity-100' : '',
                                 ]"
                             >
+                                <div v-if="isMoving(asset.id)" class="absolute inset-0 z-10 flex items-center justify-center rounded-[inherit] bg-white/75 dark:bg-gray-900/75">
+                                    <ui-icon name="loading" class="size-6 text-gray-700 dark:text-gray-200" />
+                                </div>
                                 <button
                                     class="size-full"
                                     :draggable="true"

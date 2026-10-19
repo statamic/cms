@@ -1,5 +1,5 @@
 <template>
-    <Card inset variant="flat">
+    <Card inset variant="flat" class="[&_tr:has([data-moving])]:pointer-events-none">
         <ListingTable contained>
             <template #tbody-start>
                 <tr
@@ -7,7 +7,10 @@
                     v-for="(folder, i) in folders"
                     :key="folder.path"
                     class="pointer-events-auto"
-                    :class="{ 'bg-blue-50': dragOverFolder === folder.path }"
+                    :class="{
+                        'bg-blue-50': dragOverFolder === folder.path,
+                        'pointer-events-none': isMoving(folder.path),
+                    }"
                     :draggable="canMoveFolder(folder)"
                     @dragover.prevent="dragOverFolder = folder.path"
                     @dragleave.prevent="dragOverFolder = null"
@@ -24,8 +27,18 @@
                     <td />
                     <td v-for="column in visibleColumns">
                         <template v-if="column.field === 'basename'">
-                            <a class="group flex cursor-pointer items-center" @click="selectFolder(folder.path)">
+                            <a
+                                class="group flex cursor-pointer items-center"
+                                :class="{ 'text-gray-400 dark:text-gray-500': isMoving(folder.path) }"
+                                @click="selectFolder(folder.path)"
+                            >
+                                <ui-icon
+                                    v-if="isMoving(folder.path)"
+                                    name="loading"
+                                    class="me-2 size-8 shrink-0 p-1.5 text-gray-700 dark:text-gray-200"
+                                />
                                 <file-icon
+                                    v-else
                                     extension="folder"
                                     class="me-2 inline-block size-8 shrink-0 text-blue-400/90 group-hover:text-blue-400"
                                 />
@@ -96,8 +109,16 @@
                     @dragover.prevent
                     @dragstart="draggingAsset = asset.id"
                     @dragend="draggingAsset = null"
+                    :data-moving="isMoving(asset.id) || null"
+                    :class="{ 'text-gray-400 dark:text-gray-500': isMoving(asset.id) }"
                 >
+                    <ui-icon
+                        v-if="isMoving(asset.id)"
+                        name="loading"
+                        class="size-8 shrink-0 p-1.5 text-gray-700 dark:text-gray-200"
+                    />
                     <asset-thumbnail
+                        v-else
                         :asset="asset"
                         alt=""
                         :square="true"

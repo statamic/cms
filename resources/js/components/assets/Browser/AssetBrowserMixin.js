@@ -16,10 +16,16 @@ export default {
             newFolderName: null,
             draggingAsset: null,
             draggingFolder: null,
+            moving: [],
         }
     },
 
     watch: {
+        assets() {
+            // Moved items vanish once the listing refreshes, so stop tracking them.
+            this.moving = [];
+        },
+
         draggingAsset() {
             this.$emit('prevent-dragging', this.draggingAsset !== null);
         },
@@ -87,43 +93,48 @@ export default {
                 let asset = this.assets.find((asset) => asset.id === this.draggingAsset);
                 let action = asset.actions.find((action) => action.handle === 'move_asset');
 
-                if (!action) {
-                    return;
-                }
+                if (action) this.moveItem(this.actionUrl, action, asset.id, destinationFolder.path);
 
-                const payload = {
-                    action: action.handle,
-                    context: action.context,
-                    selections: [this.draggingAsset],
-                    values: { folder: destinationFolder.path },
-                };
-
-                this.$axios
-                    .post(this.actionUrl, payload)
-                    .then(response => this.$emit('action-completed', true, response))
-                    .finally(() => this.draggingAsset = null);
+                this.draggingAsset = null;
             }
 
             if (this.draggingFolder) {
                 let folder = this.folders.find((folder) => folder.path === this.draggingFolder);
                 let action = folder.actions.find((action) => action.handle === 'move_asset_folder');
 
-                if (!action) {
-                    return;
-                }
+                if (action) this.moveItem(this.folderActionUrl, action, folder.path, destinationFolder.path);
 
-                const payload = {
-                    action: action.handle,
-                    context: action.context,
-                    selections: [this.draggingFolder],
-                    values: { folder: destinationFolder.path },
-                };
-
-                this.$axios
-                    .post(this.folderActionUrl, payload)
-                    .then(response => this.$emit('action-completed', true, response))
-                    .finally(() => this.draggingFolder = null);
+                this.draggingFolder = null;
             }
+        },
+
+        moveItem(url, action, item, destination) {
+            const payload = {
+                action: action.handle,
+                context: action.context,
+                selections: [item],
+                values: { folder: destination },
+            };
+
+            this.moving.push(item);
+            this.actionStarted();
+
+            this.$axios
+                .post(url, payload)
+                .then(() => {
+                    const folder = destination === '/' ? __('All') : destination.split('/').pop();
+
+                    Statamic.$toast.success(__('Moved to :folder', { folder }));
+                    this.$emit('action-completed');
+                })
+                .catch((error) => {
+                    this.moving = this.moving.filter((moving) => moving !== item);
+                    this.actionCompleted(false, error.response?.data);
+                });
+        },
+
+        isMoving(item) {
+            return this.moving.includes(item);
         },
     },
 };
