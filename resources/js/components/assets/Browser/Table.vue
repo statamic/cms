@@ -110,7 +110,7 @@
                     @dragstart="draggingAsset = asset.id"
                     @dragend="draggingAsset = null"
                     :data-moving="isMoving(asset.id) || null"
-                    :class="{ 'text-gray-400 dark:text-gray-500': isMoving(asset.id) }"
+                    :class="{ 'text-gray-400 dark:text-gray-500': isMoving(asset.id), 'opacity-50': isDragging(asset.id) }"
                 >
                     <ui-icon
                         v-if="isMoving(asset.id)"

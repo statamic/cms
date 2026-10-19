@@ -9,6 +9,7 @@ export default {
         restrictFolderNavigation: Boolean,
         creatingFolder: Boolean,
         creatingFolderError: Boolean,
+        selectedAssets: { type: Array, default: () => [] },
     },
 
     data() {
@@ -18,6 +19,19 @@ export default {
             draggingFolder: null,
             moving: [],
         }
+    },
+
+    computed: {
+        draggedAssetIds() {
+            if (!this.draggingAsset) return [];
+
+            // Dragging a selected asset brings the rest of the selection along with it.
+            if (!this.selectedAssets.includes(this.draggingAsset)) return [this.draggingAsset];
+
+            return this.assets
+                .filter((asset) => asset.id === this.draggingAsset || (this.selectedAssets.includes(asset.id) && this.canMoveAsset(asset)))
+                .map((asset) => asset.id);
+        },
     },
 
     watch: {
@@ -93,7 +107,7 @@ export default {
                 let asset = this.assets.find((asset) => asset.id === this.draggingAsset);
                 let action = asset.actions.find((action) => action.handle === 'move_asset');
 
-                if (action) this.moveItem(this.actionUrl, action, asset.id, destinationFolder.path);
+                if (action) this.moveItems(this.actionUrl, action, this.draggedAssetIds, destinationFolder.path);
 
                 this.draggingAsset = null;
             }
@@ -102,21 +116,21 @@ export default {
                 let folder = this.folders.find((folder) => folder.path === this.draggingFolder);
                 let action = folder.actions.find((action) => action.handle === 'move_asset_folder');
 
-                if (action) this.moveItem(this.folderActionUrl, action, folder.path, destinationFolder.path);
+                if (action) this.moveItems(this.folderActionUrl, action, [folder.path], destinationFolder.path);
 
                 this.draggingFolder = null;
             }
         },
 
-        moveItem(url, action, item, destination) {
+        moveItems(url, action, items, destination) {
             const payload = {
                 action: action.handle,
                 context: action.context,
-                selections: [item],
+                selections: items,
                 values: { folder: destination },
             };
 
-            this.moving.push(item);
+            this.moving.push(...items);
             this.actionStarted();
 
             this.$axios
@@ -125,12 +139,17 @@ export default {
                     const folder = destination === '/' ? __('All') : destination.split('/').pop();
 
                     Statamic.$toast.success(__('Moved to :folder', { folder }));
+                    Statamic.$events.$emit('removeFromSelections', items);
                     this.$emit('action-completed');
                 })
                 .catch((error) => {
-                    this.moving = this.moving.filter((moving) => moving !== item);
+                    this.moving = this.moving.filter((moving) => !items.includes(moving));
                     this.actionCompleted(false, error.response?.data);
                 });
+        },
+
+        isDragging(id) {
+            return this.draggedAssetIds.includes(id);
         },
 
         isMoving(item) {

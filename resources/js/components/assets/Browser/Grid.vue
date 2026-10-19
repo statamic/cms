@@ -109,7 +109,7 @@
                             <div
                                 class="asset-tile group relative bg-white dark:bg-gray-900"
                                 :class="[
-                                    { 'opacity-50!': draggingAsset === asset.id, 'pointer-events-none': isMoving(asset.id) },
+                                    { 'opacity-50!': isDragging(asset.id), 'pointer-events-none': isMoving(asset.id) },
                                     asset.can_be_transparent && showCheckerboard ? `bg-checkerboard bg-checkerboard-${checkerboardMode}` : '',
                                     asset.can_be_transparent && !showCheckerboard ? 'bg-checkerboard before:opacity-0 hover:before:opacity-100' : '',
                                 ]"
@@ -236,7 +236,6 @@ export default {
 
     props: {
         assets: { type: Array },
-        selectedAssets: { type: Array },
         thumbnailSize: { type: Number },
         maxFiles: { type: Number },
         showCheckerboard: { type: Boolean, default: false },
