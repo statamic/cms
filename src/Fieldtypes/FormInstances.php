@@ -23,7 +23,7 @@ class FormInstances extends FormFieldtype
     protected static $handle = 'form_instances';
     protected $component = 'form_instances';
     protected $indexComponent = 'form_instances';
-    protected $itemComponent = 'form-related-item';
+    protected $itemComponent = 'form-instances-item';
     protected $icon = 'fieldtype-form';
     protected $selectable = false;
 

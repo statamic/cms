@@ -32,7 +32,7 @@ const mountFieldtype = (props = {}) =>
         },
     });
 
-const formItem = (wrapper) => wrapper.vm.$.provides.formFieldtypeItem;
+const formItem = (wrapper) => wrapper.vm.$.provides.formInstancesItem;
 
 test('configure and submissions are offered per form', () => {
     const wrapper = mountFieldtype();

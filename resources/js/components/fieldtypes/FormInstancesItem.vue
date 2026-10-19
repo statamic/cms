@@ -60,7 +60,7 @@ export default {
 
     inject: {
         formItem: {
-            from: 'formFieldtypeItem',
+            from: 'formInstancesItem',
         },
     },
 

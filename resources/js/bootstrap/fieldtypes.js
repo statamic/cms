@@ -34,7 +34,7 @@ import GridIndex from '../components/fieldtypes/grid/GridIndex.vue';
 import GroupFieldtype from '../components/fieldtypes/GroupFieldtype.vue';
 import FormInstancesFieldtype from '../components/fieldtypes/FormInstancesFieldtype.vue';
 import FormInstancesIndexFieldtype from '../components/fieldtypes/FormInstancesIndexFieldtype.vue';
-import FormRelatedItem from '../components/fieldtypes/FormRelatedItem.vue';
+import FormInstancesItem from '../components/fieldtypes/FormInstancesItem.vue';
 import FormFieldsFieldtype from '../components/fieldtypes/FormFieldsFieldtype.vue';
 import FormConnectionsFieldtype from '../components/fieldtypes/FormConnectionsFieldtype.vue';
 import FormHeadingFieldtype from '../components/fieldtypes/FormHeadingFieldtype.vue';
@@ -121,7 +121,7 @@ export default function registerFieldtypes(app) {
     app.component('grid-fieldtype', Grid);
     app.component('grid-fieldtype-index', GridIndex);
     app.component('group-fieldtype', GroupFieldtype);
-    app.component('form-related-item', FormRelatedItem);
+    app.component('form-instances-item', FormInstancesItem);
     app.component('form_instances-fieldtype', FormInstancesFieldtype);
     app.component('form_instances-fieldtype-index', FormInstancesIndexFieldtype);
     app.component('form_fields-fieldtype', FormFieldsFieldtype);

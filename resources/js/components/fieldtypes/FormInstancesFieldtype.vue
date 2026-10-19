@@ -66,7 +66,7 @@ export default {
 
     provide() {
         return {
-            formFieldtypeItem: {
+            formInstancesItem: {
                 hasSubmissions: (item) => !!this.meta.submissions?.[item.id],
                 hasConfigure: (item) => !!this.meta.configureMeta?.[item.id],
                 viewSubmissions: (item) => (this.viewingSubmissionsFor = item.id),
