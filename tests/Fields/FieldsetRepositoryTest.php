@@ -62,8 +62,8 @@ EOT;
 title: Test Fieldset
 fields: []
 EOT;
-        File::shouldReceive('exists')->with('/path/to/resources/fieldsets/sub/test.yaml')->twice()->andReturnTrue();
-        File::shouldReceive('get')->with('/path/to/resources/fieldsets/sub/test.yaml')->twice()->andReturn($contents);
+        File::shouldReceive('exists')->with('/path/to/resources/fieldsets/sub/test.yaml')->once()->andReturnTrue();
+        File::shouldReceive('get')->with('/path/to/resources/fieldsets/sub/test.yaml')->once()->andReturn($contents);
 
         $fieldset = $this->repo->find('sub.test');
 
@@ -71,8 +71,93 @@ EOT;
         $this->assertEquals('Test Fieldset', $fieldset->title());
         $this->assertEquals('sub.test', $fieldset->handle());
 
-        // Test that using slash delimiter instead of dots returns the same thing.
-        $this->assertEquals($fieldset, $this->repo->find('sub/test'));
+        // Test that using slash delimiter instead of dots returns the same (cached) thing.
+        $this->assertSame($fieldset, $this->repo->find('sub/test'));
+    }
+
+    #[Test]
+    #[DataProvider('cacheProvider')]
+    public function it_caches_fieldsets($handle, $alternateHandle, $expectedPath)
+    {
+        $this->repo->addNamespace('foo', '/path/to/foo');
+
+        File::shouldReceive('exists')->with(\Mockery::pattern('#^/path/to/resources/fieldsets/vendor/foo/#'))->andReturnFalse();
+        File::shouldReceive('exists')->with($expectedPath)->once()->andReturnTrue();
+        File::shouldReceive('get')->with($expectedPath)->once()->andReturn('title: Test Fieldset');
+
+        $fieldset = $this->repo->find($handle);
+
+        $this->assertInstanceOf(Fieldset::class, $fieldset);
+        $this->assertSame($fieldset, $this->repo->find($handle));
+        $this->assertSame($fieldset, $this->repo->find($alternateHandle));
+    }
+
+    public static function cacheProvider()
+    {
+        return [
+            'standard' => ['test', 'test', '/path/to/resources/fieldsets/test.yaml'],
+            'standard subdir' => ['sub.test', 'sub/test', '/path/to/resources/fieldsets/sub/test.yaml'],
+            'standard subdir with slash' => ['sub/test', 'sub.test', '/path/to/resources/fieldsets/sub/test.yaml'],
+            'namespace' => ['foo::test', 'foo::test', '/path/to/foo/test.yaml'],
+            'namespace, subdir' => ['foo::sub.test', 'foo::sub/test', '/path/to/foo/sub/test.yaml'],
+            'namespace, subdir with slash' => ['foo::sub/test', 'foo::sub.test', '/path/to/foo/sub/test.yaml'],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('cacheProvider')]
+    public function saving_a_fieldset_updates_the_cache($handle, $alternateHandle, $expectedPath)
+    {
+        $this->repo->addNamespace('foo', '/path/to/foo');
+
+        File::shouldReceive('exists')->with(\Mockery::pattern('#^/path/to/resources/fieldsets/vendor/foo/#'))->andReturnFalse();
+        File::shouldReceive('exists')->with($expectedPath)->once()->andReturnTrue();
+        File::shouldReceive('get')->with($expectedPath)->once()->andReturn('title: Original');
+        File::shouldReceive('put')->once();
+
+        $original = $this->repo->find($handle);
+        $this->assertEquals('Original', $original->title());
+
+        $replacement = $this->repo->make($original->handle())->setContents(['title' => 'Updated']);
+        $this->repo->save($replacement);
+
+        $this->assertSame($replacement, $this->repo->find($handle));
+        $this->assertSame($replacement, $this->repo->find($alternateHandle));
+    }
+
+    #[Test]
+    public function deleting_a_fieldset_removes_it_from_the_cache()
+    {
+        File::shouldReceive('exists')->with('/path/to/resources/fieldsets/sub/test.yaml')->times(3)->andReturn(true, false, false);
+        File::shouldReceive('get')->with('/path/to/resources/fieldsets/sub/test.yaml')->once()->andReturn('title: Test Fieldset');
+        File::shouldReceive('delete')->with('/path/to/resources/fieldsets/sub/test.yaml')->once();
+
+        $fieldset = $this->repo->find('sub/test');
+        $this->assertInstanceOf(Fieldset::class, $fieldset);
+
+        $this->repo->delete($fieldset);
+
+        $this->assertNull($this->repo->find('sub/test'));
+        $this->assertNull($this->repo->find('sub.test'));
+    }
+
+    #[Test]
+    public function resetting_a_namespaced_fieldset_removes_it_from_the_cache()
+    {
+        $this->repo->addNamespace('foo', '/path/to/foo');
+
+        File::shouldReceive('exists')->with('/path/to/resources/fieldsets/vendor/foo/sub/test.yaml')->twice()->andReturn(true, false);
+        File::shouldReceive('get')->with('/path/to/resources/fieldsets/vendor/foo/sub/test.yaml')->once()->andReturn('title: Overridden');
+        File::shouldReceive('delete')->with('/path/to/resources/fieldsets/vendor/foo/sub/test.yaml')->once();
+        File::shouldReceive('exists')->with('/path/to/foo/sub/test.yaml')->once()->andReturnTrue();
+        File::shouldReceive('get')->with('/path/to/foo/sub/test.yaml')->once()->andReturn('title: Original');
+
+        $overridden = $this->repo->find('foo::sub.test');
+        $this->assertEquals('Overridden', $overridden->title());
+
+        $this->repo->reset($overridden);
+
+        $this->assertEquals('Original', $this->repo->find('foo::sub/test')->title());
     }
 
     #[Test]
