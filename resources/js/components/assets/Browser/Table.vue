@@ -7,13 +7,10 @@
                     v-for="(folder, i) in folders"
                     :key="folder.path"
                     class="pointer-events-auto"
-                    :class="{
-                        'bg-blue-50': dragOverFolder === folder.path,
-                        'pointer-events-none': isMoving(folder.path),
-                    }"
+                    :class="{ 'pointer-events-none': isMoving(folder.path) }"
                     :draggable="canMoveFolder(folder)"
                     @dragover.prevent="dragOverFolder = folder.path"
-                    @dragleave.prevent="dragOverFolder = null"
+                    @dragleave.prevent="!$event.currentTarget.contains($event.relatedTarget) && (dragOverFolder = null)"
                     @drop="
                         handleFolderDrop(folder);
                         dragOverFolder = null;
@@ -28,8 +25,11 @@
                     <td v-for="column in visibleColumns">
                         <template v-if="column.field === 'basename'">
                             <a
-                                class="group flex cursor-pointer items-center"
-                                :class="{ 'text-gray-400 dark:text-gray-500': isMoving(folder.path) }"
+                                class="group -m-1 -me-2.5 flex w-fit cursor-pointer items-center rounded-lg p-1 pe-2.5"
+                                :class="{
+                                    'ring-2 ring-blue-400': dragOverFolder === folder.path,
+                                    'text-gray-400 dark:text-gray-500': isMoving(folder.path),
+                                }"
                                 @click="selectFolder(folder.path)"
                             >
                                 <ui-icon

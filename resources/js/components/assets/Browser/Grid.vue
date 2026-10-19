@@ -16,7 +16,7 @@
                 }"
                 :draggable="true"
                 @dragover.prevent="dragOverFolder = folder.path"
-                @dragleave.prevent="dragOverFolder = null"
+                @dragleave.prevent="!$event.currentTarget.contains($event.relatedTarget) && (dragOverFolder = null)"
                 @drop="
                     handleFolderDrop(folder);
                     dragOverFolder = null;
