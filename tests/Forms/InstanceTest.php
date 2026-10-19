@@ -125,6 +125,42 @@ class InstanceTest extends TestCase
     }
 
     #[Test]
+    public function a_localization_instance_resolves_to_its_root_entry()
+    {
+        $this->setSites([
+            'en' => ['url' => '/', 'locale' => 'en'],
+            'fr' => ['url' => '/fr/', 'locale' => 'fr'],
+        ]);
+
+        $form = $this->makeForm(['submission_limit' => 1]);
+
+        $this->makeEntry('event-1', []);
+
+        Collection::findByHandle('events')->sites(['en', 'fr'])->save();
+
+        tap(Entry::find('event-1')->makeLocalization('fr')->id('event-1-fr'))->save();
+
+        $form->makeSubmission()->id('sub-1')->set('_entry', 'event-1')->save();
+
+        $root = $form->instance('event-1');
+        $localization = $form->instance('event-1-fr');
+
+        $this->assertEquals('limit_reached', $root->status());
+        $this->assertEquals('limit_reached', $localization->status());
+        $this->assertTrue($localization->restricted());
+        $this->assertEquals('event-1', $localization->entry());
+        $this->assertEquals('event-1', (new Instance($form, 'event-1-fr'))->entry());
+    }
+
+    #[Test]
+    public function an_instance_keeps_the_given_id_when_the_entry_is_missing()
+    {
+        $form = $this->makeForm();
+
+        $this->assertEquals('missing', $form->instance('missing')->entry());
+    }
+
+    #[Test]
     public function a_localizations_own_form_instances_value_is_ignored()
     {
         $this->setSites([

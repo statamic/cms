@@ -14,10 +14,13 @@ use function Statamic\trans as __;
 
 class Instance
 {
+    protected ?string $entry;
+
     public function __construct(
         protected FormContract $form,
-        protected ?string $entry = null,
+        ?string $entry = null,
     ) {
+        $this->entry = $entry ? (Entry::find($entry)?->root()->id() ?? $entry) : null;
     }
 
     public function form(): FormContract
