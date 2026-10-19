@@ -339,7 +339,7 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
 
     public function connectionJobs(): array
     {
-        return $this->form()->instance($this->entry()?->id())->connections()
+        return $this->form()->instance($this->get('_entry'))->connections()
             ->map(fn ($connections, $handle) => FormConnector::find($handle)?->setForm($this->form())->setConnections($connections)->finalized($this))
             ->flatten()
             ->filter()
