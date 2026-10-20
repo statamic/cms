@@ -30,10 +30,15 @@ const mountFieldtype = () =>
         },
         global: {
             stubs: {
-                Stack: defineComponent({ setup: (_, { slots }) => () => h('div', slots.default?.()) }),
+                Stack: defineComponent({
+                    name: 'Stack',
+                    props: ['open', 'beforeClose', 'title', 'size'],
+                    emits: ['update:open'],
+                    setup: (_, { slots }) => () => h('div', [slots.default?.(), slots['footer-end']?.()]),
+                }),
                 ConnectorsListing: defineComponent({ name: 'ConnectorsListing', emits: ['select'], render: () => null }),
-                ConnectionEditor: defineComponent({ name: 'ConnectionEditor', props: ['component', 'modelValue'], render: () => null }),
-                Button: true,
+                ConnectionEditor: defineComponent({ name: 'ConnectionEditor', props: ['component', 'modelValue', 'errors'], render: () => null }),
+                Button: defineComponent({ name: 'Button', props: ['text', 'disabled', 'loading'], emits: ['click'], render: () => null }),
                 Badge: true,
                 Card: defineComponent({ setup: (_, { slots }) => () => h('div', slots.default?.()) }),
                 ToggleGroup: true,
@@ -53,6 +58,29 @@ const deferred = () => {
 const editorResponse = (name, value) => ({ data: { component: { name, props: {} }, value } });
 
 const open = (wrapper, handle) => wrapper.findComponent({ name: 'ConnectorsListing' }).vm.$emit('select', handle);
+
+const apply = (wrapper) =>
+    wrapper
+        .findAllComponents({ name: 'Button' })
+        .find((button) => button.props('text') === 'Apply')
+        .vm.$emit('click');
+
+const editorStack = (wrapper) => wrapper.findAllComponents({ name: 'Stack' })[1];
+
+const openEditor = async (wrapper, handle, value = []) => {
+    axios.post.mockResolvedValueOnce(editorResponse(`${handle}-connector`, value));
+    open(wrapper, handle);
+    await flushPromises();
+};
+
+const pendingApply = async (wrapper) => {
+    const validate = deferred();
+    axios.post.mockReturnValueOnce(validate.promise);
+    apply(wrapper);
+    await flushPromises();
+
+    return validate;
+};
 
 beforeEach(() => vi.clearAllMocks());
 
@@ -100,4 +128,98 @@ test('a failed editor request closes the editor', async () => {
 
     expect(toast.error).toHaveBeenCalled();
     expect(wrapper.findComponent({ name: 'ConnectionEditor' }).exists()).toBe(false);
+});
+
+test('apply does nothing while the editor is loading', async () => {
+    axios.post.mockReturnValueOnce(new Promise(() => {}));
+
+    const wrapper = mountFieldtype();
+
+    open(wrapper, 'email');
+    apply(wrapper);
+    await flushPromises();
+
+    expect(axios.post).toHaveBeenCalledTimes(1);
+    expect(axios.post).toHaveBeenCalledWith('/cp/forms/contact/connect/email/editor', expect.anything());
+});
+
+test('reopening a connector after applying fetches its editor using the applied value', async () => {
+    const wrapper = mountFieldtype();
+    await openEditor(wrapper, 'email');
+
+    const applied = [{ id: 'applied', to: ['applied@example.com'] }];
+    axios.post.mockResolvedValueOnce({ data: applied });
+    apply(wrapper);
+    await flushPromises();
+
+    const value = wrapper.emitted('update:value').at(-1)[0];
+    expect(value).toEqual({ email: applied });
+    await wrapper.setProps({ value });
+
+    await openEditor(wrapper, 'email');
+
+    expect(axios.post).toHaveBeenLastCalledWith('/cp/forms/contact/connect/email/editor', applied);
+});
+
+test('the editor cannot be closed while applying', async () => {
+    const wrapper = mountFieldtype();
+    await openEditor(wrapper, 'email');
+
+    expect(editorStack(wrapper).props('beforeClose')()).toBe(true);
+
+    const validate = await pendingApply(wrapper);
+
+    expect(editorStack(wrapper).props('beforeClose')()).toBe(false);
+
+    validate.resolve({ data: [] });
+    await flushPromises();
+});
+
+test('a pending apply is discarded when the editor is closed', async () => {
+    const wrapper = mountFieldtype();
+    await openEditor(wrapper, 'email');
+    const validate = await pendingApply(wrapper);
+
+    editorStack(wrapper).vm.$emit('update:open', false);
+    await flushPromises();
+
+    expect(editorStack(wrapper).props('beforeClose')()).toBe(true);
+
+    validate.resolve({ data: [{ id: 'late' }] });
+    await flushPromises();
+
+    expect(wrapper.emitted('update:value')).toBeUndefined();
+});
+
+test('a pending apply never writes to another connector', async () => {
+    const wrapper = mountFieldtype();
+    await openEditor(wrapper, 'email');
+    const validate = await pendingApply(wrapper);
+
+    editorStack(wrapper).vm.$emit('update:open', false);
+    await openEditor(wrapper, 'webhook');
+
+    validate.resolve({ data: [{ id: 'late' }] });
+    await flushPromises();
+
+    expect(wrapper.emitted('update:value')).toBeUndefined();
+    expect(editorStack(wrapper).props('open')).toBe(true);
+    expect(wrapper.findComponent({ name: 'ConnectionEditor' }).props('component').name).toBe('webhook-connector');
+});
+
+test('a stale validation failure is not shown on another connector', async () => {
+    const wrapper = mountFieldtype();
+    await openEditor(wrapper, 'email');
+    const validate = deferred();
+    axios.post.mockReturnValueOnce(validate.promise.then(() => Promise.reject({ response: { status: 422, data: { errors: { to: ['Required'] } } } })));
+    apply(wrapper);
+    await flushPromises();
+
+    editorStack(wrapper).vm.$emit('update:open', false);
+    await openEditor(wrapper, 'webhook');
+
+    validate.resolve();
+    await flushPromises();
+
+    expect(wrapper.findComponent({ name: 'ConnectionEditor' }).props('errors')).toEqual({});
 });

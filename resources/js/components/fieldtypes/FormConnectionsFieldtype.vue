@@ -88,25 +88,35 @@ function closeEditor() {
     component.value = null;
     loading.value = false;
     errors.value = {};
+    saving.value = false;
 }
 
 function applyConnector() {
     if (saving.value || loading.value || !connector.value) return;
+
+    const request = editorRequest;
+    const handle = editingHandle.value;
 
     errors.value = {};
     saving.value = true;
 
     axios.post(connector.value.action, draft.value)
         .then(({ data }) => {
-            update({ ...(props.value ?? {}), [editingHandle.value]: data });
+            if (request !== editorRequest) return;
+
+            update({ ...(props.value ?? {}), [handle]: data });
             closeEditor();
         })
         .catch((e) => {
+            if (request !== editorRequest) return;
+
             if (e.response?.status === 422) {
                 errors.value = e.response.data.errors;
             }
         })
-        .finally(() => (saving.value = false));
+        .finally(() => {
+            if (request === editorRequest) saving.value = false;
+        });
 }
 
 defineExpose(expose);
@@ -137,7 +147,13 @@ defineExpose(expose);
         </template>
     </Stack>
 
-    <Stack :open="!!editingHandle" size="half" :title="connector ? __(connector.title) : ''" @update:open="closeEditor">
+    <Stack
+        :open="!!editingHandle"
+        size="half"
+        :title="connector ? __(connector.title) : ''"
+        :before-close="() => !saving"
+        @update:open="closeEditor"
+    >
         <div v-if="loading" class="flex justify-center py-8">
             <Icon name="loading" />
         </div>
