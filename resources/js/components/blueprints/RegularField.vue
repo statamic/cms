@@ -26,6 +26,7 @@
                     </div>
 
                     <div class="flex items-center">
+                        <ui-button v-if="canSuggest" inset size="sm" :icon="aiSuggestIcon" :variant="aiSuggestions ? 'ghost-pressed' : 'subtle'" v-tooltip="__('AI Suggestions')" @click="aiSuggestions = !aiSuggestions" />
                         <ui-button v-if="canDefineLocalizable" inset size="sm" icon="earth" :variant="localizable ? 'ghost-pressed' : 'subtle'" v-tooltip="__('Localizable')" @click="localizable = !localizable" />
                         <ui-button inset size="sm" icon="duplicate" variant="subtle" @click.prevent="$emit('duplicate')" v-tooltip="__('Duplicate')" />
                         <ui-button inset size="sm" icon="trash" variant="subtle" @click.prevent="$emit('deleted')" v-tooltip="__('Remove')" />
@@ -58,6 +59,7 @@ import Field from './Field.vue';
 import FieldSettings from '../fields/Settings.vue';
 import WidthSelector from '../fields/WidthSelector.vue';
 import CanDefineLocalizable from '../fields/CanDefineLocalizable';
+import { icon as aiSuggestIcon, suggestableTypes } from '../ai-suggest/use-ai-suggest.js';
 import titleize from '../../util/titleize';
 import deslugify from '../../util/deslugify';
 import { Icon, Stack } from '@/components/ui';
@@ -129,6 +131,29 @@ export default {
 
         widthClass() {
             return `${field_width_class(this.width)}`;
+        },
+
+        aiSuggestIcon() {
+            return aiSuggestIcon;
+        },
+
+        // Prototype: only fields that hold plain text can take a suggestion
+        canSuggest() {
+            return suggestableTypes.includes(this.field.fieldtype || this.field.config.type);
+        },
+
+        // Prototype: switches on the suggest button for this field, like Localizable. Left out of the config when off.
+        aiSuggestions: {
+            get() {
+                return this.field.config.ai_suggestions || false;
+            },
+            set(enabled) {
+                let field = this.field;
+                if (enabled) field.config.ai_suggestions = true;
+                else delete field.config.ai_suggestions;
+                if (field.type === 'reference') field.config_overrides.push('ai_suggestions');
+                this.$emit('updated', field);
+            },
         },
 
         localizable: {

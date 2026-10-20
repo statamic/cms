@@ -11,6 +11,8 @@ import {
 } from '@ui';
 import FieldActions from '@/components/field-actions/FieldActions.vue';
 import ShowField from '@/components/field-conditions/ShowField.js';
+import AiSuggest from '@/components/ai-suggest/AiSuggest.vue';
+import { suggestableTypes } from '@/components/ai-suggest/use-ai-suggest.js';
 
 const props = defineProps({
     config: {
@@ -197,6 +199,9 @@ const shouldShowFieldPreviews = computed(() => {
 
 const isLocalizable = computed(() => props.config.localizable);
 
+// Prototype: fields with AI suggestions switched on in the blueprint get a suggest button, floating in the field's top right corner
+const canSuggest = computed(() => props.config.ai_suggestions && suggestableTypes.includes(props.config.type) && !isReadOnly.value);
+
 const isReadOnly = computed(() => {
     if (containerReadOnly.value) return true;
     if (fieldsProviderReadOnly.value) return true;
@@ -325,12 +330,21 @@ const fieldtypeComponentEvents = computed(() => ({
             <div class="text-xs text-red-600" v-if="!fieldtypeComponentExists && fieldtypeComponent !== 'spacer-fieldtype'">
                 Component <code v-text="fieldtypeComponent"></code> does not exist.
             </div>
-            <div v-if="fieldtypeComponentExists" @focusin="focused" @focusout="blurred" :class="{ 'pointer-events-none select-none': isLocked }">
+            <div v-if="fieldtypeComponentExists" @focusin="focused" @focusout="blurred" :class="{ 'pointer-events-none select-none': isLocked, relative: canSuggest }">
                 <Component
                     ref="fieldtype"
                     :is="fieldtypeComponent"
                     v-bind="fieldtypeComponentProps"
                     v-on="fieldtypeComponentEvents"
+                />
+                <!-- Prototype: the suggest button floats in the field's top right corner -->
+                <AiSuggest
+                    v-if="canSuggest"
+                    button-class="absolute! end-1.5 top-[7px] z-10"
+                    :config="config"
+                    :value="value"
+                    :values="values"
+                    @apply="valueUpdated"
                 />
             </div>
         </Field>
