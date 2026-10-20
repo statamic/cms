@@ -12,6 +12,8 @@ const emit = defineEmits(['update:open']);
 const props = defineProps({
     /** The preferred alignment against the trigger. May change when collisions occur. Options: `start`, `center`, `end` */
     align: { type: String, default: 'center' },
+    /** Shifts the popover along the trigger's edge, in pixels, from where `align` puts it. Negative values move it past the `start` or `end` edge. */
+    alignOffset: { type: Number, default: 0 },
     /** When `true`, an arrow is displayed near the trigger. */
     arrow: { type: Boolean, default: false },
     /** When `true`, the internal padding of the popover is removed. */
@@ -70,6 +72,7 @@ function updateOpen(value) {
                 :data-ui-exclude-z-manipulation="excludeZManipulation ? '' : undefined"
                 :class="[popoverContentClasses, $attrs.class]"
                 :align
+                :alignOffset
                 :sideOffset="offset"
                 :side
                 @interact-outside="(e) => !dismissible && e.preventDefault()"
