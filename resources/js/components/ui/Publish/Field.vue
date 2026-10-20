@@ -6,6 +6,7 @@ import { useUiDirection } from '@/composables/ui-direction';
 import {
     Avatar,
     Field,
+    Icon,
     Label,
 } from '@ui';
 import FieldActions from '@/components/field-actions/FieldActions.vue';
@@ -214,6 +215,18 @@ const isReadOnly = computed(() => {
 const lockedBy = computed(() => fieldLocks.value[handle] ?? null);
 const isLocked = computed(() => lockedBy.value !== null && lockedBy.value.id !== Statamic.user.id);
 
+// Only mark fields configured as read only. Fields that are read only for other
+// reasons (permissions, locks, synced with their origin) keep the plain read only style.
+const shouldMarkReadOnly = computed(() => {
+    if (isLocked.value) return false;
+
+    return (
+        props.config.visibility === 'read_only' ||
+        props.config.visibility === 'computed' ||
+        props.config.read_only === true
+    );
+});
+
 const isSyncable = computed(() => {
     // Only top-level fields can be synced.
     if (isNested.value) return false;
@@ -273,7 +286,7 @@ const fieldtypeComponentEvents = computed(() => ({
             :instructions-below="config.instructions_position === 'below'"
             :required="isRequired"
             :errors="errors"
-            :read-only="isReadOnly"
+            :read-only="shouldMarkReadOnly"
             :inline="asConfig"
             :full-width-setting="config.full_width_setting"
             v-bind="$attrs"
@@ -290,7 +303,7 @@ const fieldtypeComponentEvents = computed(() => ({
                         />
                     </Transition>
                     <template v-if="shouldShowLabelText">
-                        <span v-tooltip="{ content: config.handle, copyable: true }">
+                        <span v-tooltip="{ content: config.handle, copyable: true }" :class="{ 'text-gray-500 dark:text-gray-400': shouldMarkReadOnly }">
                             {{ __(config.display) }}
                         </span>
                     </template>
@@ -299,6 +312,10 @@ const fieldtypeComponentEvents = computed(() => ({
                     </template>
                     <ui-button size="sm" class="[&_svg]:translate-y-0.5" inset icon="synced" variant="ghost" v-tooltip="__('messages.field_synced_with_origin')" v-if="!isReadOnly && isSyncable" v-show="isSynced" @click="desync" />
                     <ui-button size="sm" class="[&_svg]:translate-y-0.5" inset icon="unsynced" variant="ghost" v-tooltip="__('messages.field_desynced_from_origin')" v-if="!isReadOnly && isSyncable" v-show="!isSynced" @click="sync" />
+                    <span v-if="shouldMarkReadOnly" class="ms-2 text-2xs font-normal text-gray-500 dark:text-gray-400">
+                        <Icon name="padlock-locked" class="inline size-3! -mt-0.5 me-0.5 align-middle" />
+                        {{ __('Read Only') }}
+                    </span>
                 </Label>
             </template>
             <template #actions v-if="shouldShowFieldActions">
