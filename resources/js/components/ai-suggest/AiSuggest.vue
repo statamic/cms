@@ -1,5 +1,5 @@
 <script setup>
-import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, ref, useTemplateRef, watch } from 'vue';
 import { Button, Icon, Popover } from '@ui';
 import { steer, suggestFor } from './mock-suggestions.js';
 import { icon } from './use-ai-suggest.js';
@@ -61,10 +61,25 @@ watch(body, (el) => {
 
 onBeforeUnmount(() => observer?.disconnect());
 
+// Arrow keys go round the suggestions and the "Make it…" box (which is below them), so Up from the box lands on the last suggestion.
+const panel = useTemplateRef('panel');
+
+function onArrowKey(event) {
+    if (!['ArrowDown', 'ArrowUp'].includes(event.key)) return;
+
+    const stops = [...panel.value.querySelectorAll('[data-suggestions] button, input')];
+    const index = stops.indexOf(document.activeElement);
+    if (index === -1 || stops.length < 2) return;
+
+    event.preventDefault();
+    stops[(index + (event.key === 'ArrowDown' ? 1 : -1) + stops.length) % stops.length].focus();
+}
+
 function apply(text) {
     emit('apply', text);
     open.value = false;
 }
+
 
 // Rewrites show what changed: words they added are highlighted in yellow and words they dropped are struck through.
 // A word-level diff, from the longest run of words the two have in common.
@@ -126,77 +141,82 @@ function follow(text) {
             />
         </template>
 
-        <div class="flex items-center gap-2 border-b border-gray-200 px-3 py-2.5 dark:border-white/10">
-            <Icon :name="icon" class="size-3.5 text-primary" />
-            <span class="text-xs font-medium text-gray-700 dark:text-gray-300">
-                {{ __('Suggestions') }}
-            </span>
-        </div>
+        <!-- Up and down move between the suggestions and the "Make it…" box, as well as Tab -->
+        <div ref="panel" @keydown="onArrowKey">
+            <div class="flex items-center gap-2 border-b border-gray-200 px-3 py-2.5 dark:border-white/10">
+                <Icon :name="icon" class="size-3.5 text-primary" />
+                <span class="text-xs font-medium text-gray-700 dark:text-gray-300">
+                    {{ __('Suggestions') }}
+                </span>
+            </div>
 
-        <!-- Eases to the height of what's inside, so it doesn't snap when the suggestions arrive -->
-        <div :style="{ height: bodyHeight }" :class="['overflow-hidden', easeHeight ? 'transition-[height] duration-150 ease-out motion-reduce:transition-none' : '']">
-            <div ref="body">
-                <!-- While it "thinks", three lines that pulse where the suggestions will be -->
-                <div v-if="loading" class="space-y-3 p-3" aria-busy="true">
-                    <div v-for="i in 3" :key="i" class="space-y-1.5">
-                        <div class="h-2.5 w-14 animate-pulse rounded bg-gray-200 dark:bg-white/10" />
-                        <div class="h-3 animate-pulse rounded bg-gray-100 dark:bg-white/5" :class="['w-full', 'w-4/5', 'w-2/3'][i - 1]" />
+            <!-- Eases to the height of what's inside, so it doesn't snap when the suggestions arrive -->
+            <div :style="{ height: bodyHeight }" :class="['overflow-hidden', easeHeight ? 'transition-[height] duration-150 ease-out motion-reduce:transition-none' : '']">
+                <div ref="body">
+                    <!-- While it "thinks", three lines that pulse where the suggestions will be -->
+                    <div v-if="loading" class="space-y-3 p-3" aria-busy="true">
+                        <div v-for="i in 3" :key="i" class="space-y-1.5">
+                            <div class="h-2.5 w-14 animate-pulse rounded bg-gray-200 dark:bg-white/10" />
+                            <div class="h-3 animate-pulse rounded bg-gray-100 dark:bg-white/5" :class="['w-full', 'w-4/5', 'w-2/3'][i - 1]" />
+                        </div>
+                    </div>
+
+                    <!-- Picking one puts it in the field, replacing what's there -->
+                    <div v-else-if="result" data-suggestions class="space-y-0.5 p-1.5">
+                        <button
+                            v-for="suggestion in result.suggestions"
+                            :key="suggestion.text"
+                            type="button"
+                            class="block w-full cursor-pointer rounded-lg px-2.5 py-[9px] text-start hover:bg-gray-100 dark:hover:bg-white/5"
+                            @click="apply(suggestion.text)"
+                        >
+                            <span v-if="suggestion.label" class="mb-0.5 block text-2xs font-medium text-gray-500 dark:text-gray-400">{{ __(suggestion.label) }}</span>
+                            <span v-if="showDiff" class="block text-sm leading-[18px] text-gray-900 dark:text-gray-200">
+                                <template v-for="(part, p) in diffWords(original, suggestion.text)" :key="p">
+                                    <span
+                                        :class="{
+                                            'rounded-sm bg-yellow-100 text-gray-900 dark:bg-yellow-400/20 dark:text-yellow-100': part.type === 'added',
+                                            'text-gray-400 line-through dark:text-gray-500': part.type === 'removed',
+                                        }"
+                                        >{{ part.text }}</span
+                                    >{{ ' ' }}
+                                </template>
+                            </span>
+                            <span v-else class="block text-sm leading-[18px] text-gray-900 dark:text-gray-200">{{ suggestion.text }}</span>
+                        </button>
                     </div>
                 </div>
+            </div>
 
-                <!-- Picking one puts it in the field, replacing what's there -->
-                <div v-else-if="result" class="space-y-0.5 p-1.5">
+            <!-- Tell it how to rework the suggestions -->
+            <div class="space-y-2 border-t border-gray-200 px-3 py-2.5 dark:border-white/10">
+                <form @submit.prevent="follow(instruction)">
+                    <input
+                        v-model="instruction"
+                        type="text"
+                        :placeholder="__('Make it…')"
+                        class="w-full rounded-md border border-gray-200 bg-white px-2 py-1 text-sm dark:border-white/10 dark:bg-gray-900"
+                    />
+                </form>
+                <div class="flex flex-wrap gap-1.5">
                     <button
-                        v-for="suggestion in result.suggestions"
-                        :key="suggestion.text"
+                        v-for="chip in chips"
+                        :key="chip"
                         type="button"
-                        class="block w-full cursor-pointer rounded-lg px-2.5 py-[9px] text-start hover:bg-gray-100 focus-visible:bg-gray-100 focus-visible:outline-hidden dark:hover:bg-white/5 dark:focus-visible:bg-white/5"
-                        @click="apply(suggestion.text)"
+                        class="cursor-pointer rounded-full border border-gray-200 px-2 py-0.5 text-xs text-gray-600 hover:bg-gray-100 aria-disabled:cursor-default aria-disabled:opacity-50 dark:border-white/10 dark:text-gray-300 dark:hover:bg-white/5"
+                        :aria-disabled="loading"
+                        @click="!loading && follow(chip)"
                     >
-                        <span v-if="suggestion.label" class="mb-0.5 block text-2xs font-medium text-gray-500 dark:text-gray-400">{{ __(suggestion.label) }}</span>
-                        <span v-if="showDiff" class="block text-sm leading-[18px] text-gray-900 dark:text-gray-200">
-                            <template v-for="(part, p) in diffWords(original, suggestion.text)" :key="p">
-                                <span
-                                    :class="{
-                                        'rounded-sm bg-yellow-100 text-gray-900 dark:bg-yellow-400/20 dark:text-yellow-100': part.type === 'added',
-                                        'text-gray-400 line-through dark:text-gray-500': part.type === 'removed',
-                                    }"
-                                    >{{ part.text }}</span
-                                >{{ ' ' }}
-                            </template>
-                        </span>
-                        <span v-else class="block text-sm leading-[18px] text-gray-900 dark:text-gray-200">{{ suggestion.text }}</span>
+                        {{ __(chip) }}
                     </button>
                 </div>
             </div>
-        </div>
 
-        <!-- Tell it how to rework the suggestions -->
-        <div class="space-y-2 border-t border-gray-200 px-3 py-2.5 dark:border-white/10">
-            <form @submit.prevent="follow(instruction)">
-                <input
-                    v-model="instruction"
-                    type="text"
-                    :placeholder="__('Make it…')"
-                    class="w-full rounded-md border border-gray-200 bg-white px-2 py-1 text-sm outline-hidden focus:border-blue-400 dark:border-white/10 dark:bg-gray-900"
-                />
-            </form>
-            <div class="flex flex-wrap gap-1.5">
-                <button
-                    v-for="chip in chips"
-                    :key="chip"
-                    type="button"
-                    class="cursor-pointer rounded-full border border-gray-200 px-2 py-0.5 text-xs text-gray-600 hover:bg-gray-100 dark:border-white/10 dark:text-gray-300 dark:hover:bg-white/5"
-                    :disabled="loading"
-                    @click="follow(chip)"
-                >
-                    {{ __(chip) }}
-                </button>
+            <div class="flex justify-end border-t border-gray-200 px-2 py-1.5 dark:border-white/10">
+                <!-- Not disabled while it works, as that would drop focus from the button. It just ignores clicks until the new suggestions are in. -->
+                <Button size="xs" variant="ghost" icon="refresh" :text="__('Try again')" :aria-disabled="loading" class="aria-disabled:cursor-default aria-disabled:opacity-50" @click="!loading && generate()" />
             </div>
         </div>
-
-        <div class="flex justify-end border-t border-gray-200 px-2 py-1.5 dark:border-white/10">
-            <Button size="xs" variant="ghost" icon="refresh" :text="__('Try again')" :disabled="loading" @click="generate()" />
-        </div>
     </Popover>
+
 </template>
