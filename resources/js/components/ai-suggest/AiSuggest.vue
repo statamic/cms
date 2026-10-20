@@ -207,12 +207,13 @@ function follow(text) {
                     </div>
 
                     <!-- Picking one puts it in the field, replacing what's there -->
-                    <div v-else-if="result" data-suggestions class="space-y-0.5 p-1.5">
+                    <!-- A faint line between suggestions, stopping short of the edges and lined up with the text, in the middle of a 5px gap. A hovered suggestion's background (an ::after) reaches 3px past its top and bottom to cover the lines either side; the suggestion is lifted above its neighbours so it covers the line below too. -->
+                    <div v-else-if="result" data-suggestions class="p-1.5">
                         <button
                             v-for="suggestion in result.suggestions"
                             :key="suggestion.text"
                             type="button"
-                            class="group block w-full cursor-pointer rounded-lg px-2.5 py-[9px] text-start hover:bg-gray-100 dark:hover:bg-white/5"
+                            class="group relative block w-full cursor-pointer rounded-lg px-2.5 py-3 text-start not-first:mt-[5px] not-first:before:absolute not-first:before:inset-x-2.5 not-first:before:-top-[3px] not-first:before:h-px not-first:before:bg-gray-200 after:absolute after:inset-x-0 after:-inset-y-[3px] after:-z-10 after:rounded-lg hover:z-10 hover:before:opacity-0 hover:after:bg-gray-100 dark:not-first:before:bg-white/10 dark:hover:after:bg-white/5"
                             @click="apply(suggestion.text)"
                             @mouseenter="showPreview(suggestion.text)"
                             @mouseleave="hidePreview"
