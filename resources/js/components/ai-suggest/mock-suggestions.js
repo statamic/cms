@@ -64,6 +64,24 @@ function generalPack(subject) {
     };
 }
 
+// What each draft is going for, shown as its eyebrow so the drafts are easy to tell apart. In the same order as the packs above.
+const draftLabels = {
+    sale: {
+        title: ['Direct', 'Offer-led', 'Urgent'],
+        subtitle: ['Value', 'Scarcity', 'Ongoing'],
+        excerpt: ['Overview', "What's included", 'Short'],
+        meta: ['Benefit-led', 'Announcement', 'Short'],
+        note: ['Pricing', 'Checkout', 'Terms'],
+    },
+    general: {
+        title: ['Direct', 'Guide', 'Explainer'],
+        subtitle: ['Overview', "What's new", 'Guide'],
+        excerpt: ['Overview', 'In depth', 'Beginner-friendly'],
+        meta: ['Guide', 'Simple', 'Short'],
+        note: ['Credit', 'Freshness', 'Contact'],
+    },
+};
+
 // Takes out filler and wordy phrasing
 function tighten(text) {
     return upperFirst(
@@ -102,12 +120,14 @@ export function suggestFor(config, value, values) {
     const kind = kindOf(config);
     const long = ['excerpt', 'meta'].includes(kind) || ['textarea', 'markdown'].includes(config.type);
     const subject = subjectOf(values?.title || config.display || '');
-    const pack = (/\b(sale|offer|discount|deals?)\b/i.test(subject) ? salePack : generalPack)(subject)[kind];
+    const theme = /\b(sale|offer|discount|deals?)\b/i.test(subject) ? 'sale' : 'general';
+    const pack = (theme === 'sale' ? salePack : generalPack)(subject)[kind];
+    const labels = draftLabels[theme][kind];
     const current = typeof value === 'string' ? tidy(value) : '';
     const finish = (text) => (long ? sentence(text) : text);
 
     if (!current) {
-        return { mode: 'write', kind, long, suggestions: pack.map((text) => ({ text })) };
+        return { mode: 'write', kind, long, suggestions: pack.map((text, i) => ({ label: labels[i], text })) };
     }
 
     // A rewrite that comes out the same as what's there (a short title, say) is swapped for a fresh draft instead
@@ -124,7 +144,7 @@ export function suggestFor(config, value, values) {
         kind,
         long,
         suggestions: rewrites.map((rewrite) => {
-            while (seen.has(rewrite.text.toLowerCase()) && spare < pack.length) rewrite = { label: 'Fresh take', text: pack[spare++] };
+            while (seen.has(rewrite.text.toLowerCase()) && spare < pack.length) rewrite = { label: labels[spare], text: pack[spare++] };
             seen.add(rewrite.text.toLowerCase());
             return rewrite;
         }),
