@@ -25,6 +25,7 @@ use Statamic\Facades\FormSubmission;
 use Statamic\Facades\Site as Sites;
 use Statamic\Facades\Stache;
 use Statamic\Fields\Field;
+use Statamic\Fields\Value;
 use Statamic\Forms\Connectors\RecordConnectionSuccess;
 use Statamic\Forms\Uploaders\AssetsUploader;
 use Statamic\Forms\Uploaders\FilesUploader;
@@ -435,8 +436,11 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
         ]);
 
         if ($this->has('_entry')) {
-            $root = $this->entry();
-            $data['entry'] = $root?->in($this->site()->handle()) ?? $root;
+            $data['entry'] = new Value(function () {
+                $root = $this->entry();
+
+                return $root?->in($this->site()->handle()) ?? $root;
+            }, 'entry');
         }
 
         return $data;

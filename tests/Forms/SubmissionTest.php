@@ -328,6 +328,25 @@ class SubmissionTest extends TestCase
     }
 
     #[Test]
+    public function the_entry_is_only_resolved_when_it_is_used()
+    {
+        $form = tap(Form::make('contact_us')->formFields([
+            'sections' => [['fields' => [
+                ['handle' => 'name', 'field' => ['type' => 'text']],
+            ]]],
+        ]))->save();
+
+        $submission = $form->makeSubmission()->data(['name' => 'San Holo'])->set('_entry', 'event-1');
+
+        $augmented = $submission->augmented();
+        $this->assertEquals('San Holo', $augmented->get('name')->value());
+
+        (new EntryFactory)->collection('events')->id('event-1')->slug('event-one')->create();
+
+        $this->assertEquals('event-1', $augmented->get('entry')->value()->id());
+    }
+
+    #[Test]
     public function the_attached_entry_replaces_a_form_field_named_entry()
     {
         (new EntryFactory)->collection('events')->id('event-1')->slug('event-one')->create();
