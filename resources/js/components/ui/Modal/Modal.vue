@@ -29,7 +29,7 @@ const props = defineProps({
     open: { type: Boolean, default: false },
     /** Callback that fires before the modal closes. */
     beforeClose: { type: Function, default: () => true },
-    /** When `true`, clicking outside the modal will dismiss it. */
+    /** When `true`, clicking outside the modal or pressing Esc will dismiss it. */
     dismissible: { type: Boolean, default: true },
     /** When `true`, focus moves to the first focusable element on open. When `false`, focus stays on the dialog so Tab reaches the first control. */
     autofocus: { type: Boolean, default: true },
@@ -201,7 +201,7 @@ defineExpose({
     runCloseCallback,
 });
 
-provide('closeModal', close);
+provide('closeModal', runCloseCallback);
 provide('modalTitleId', titleId);
 </script>
 
