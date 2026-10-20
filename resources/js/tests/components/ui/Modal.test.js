@@ -83,3 +83,21 @@ test('hides the page behind from the accessibility tree', async () => {
 
     vi.useRealTimers();
 });
+
+test('keeps focus trapped when a disabled portal is created after it', async () => {
+    await openModal({ title: 'Licensing Alert', autofocus: false });
+    await nextTick();
+
+    // e.g. a Bard field's fullscreen portal, registered as the page behind loads
+    const fullscreen = portals.create('bard-fullscreen');
+    fullscreen.setDisabled(true);
+    await nextTick();
+
+    const input = document.createElement('input');
+    document.body.appendChild(input);
+    input.focus();
+
+    expect(document.activeElement).toBe(document.querySelector('[data-ui-modal-content]'));
+
+    fullscreen.destroy();
+});

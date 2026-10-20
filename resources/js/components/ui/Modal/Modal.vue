@@ -72,7 +72,9 @@ const titleId = useId();
 const labelledBy = computed(() => hasModalTitleComponent.value || props.title ? titleId : undefined);
 const isUsingOpenProp = computed(() => instance?.vnode.props?.hasOwnProperty('open'));
 const portal = computed(() => modal.value ? `#portal-target-${modal.value.id}` : null);
-const isTopPortal = computed(() => portals.all()[portals.all().length - 1].id === modal.value.id);
+// Not just the last portal created: fields like Bard register inline portals as they load,
+// which would switch off the focus trap of a modal opened on page load (e.g. the licensing alert).
+const isTopPortal = computed(() => portals.top()?.id === modal.value.id);
 
 function open() {
     if (!modal.value) modal.value = portals.create('modal');
