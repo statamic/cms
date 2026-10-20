@@ -1,7 +1,7 @@
 <script setup>
-import { nextTick, onBeforeUnmount, ref, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue';
 import { Button, Icon, Popover } from '@ui';
-import { suggestFor } from './mock-suggestions.js';
+import { steer, suggestFor } from './mock-suggestions.js';
 import { icon } from './use-ai-suggest.js';
 
 const props = defineProps({
@@ -18,16 +18,20 @@ const emit = defineEmits(['apply']);
 const open = ref(false);
 const loading = ref(false);
 const result = ref(null);
+// What was in the field when the suggestions were made, to show what changed
+const original = ref('');
 let timer = null;
 
-// Prototype: "think" for a moment, then show the mock suggestions
-function generate() {
+// Prototype: "think" for a moment, then show the mock suggestions. rework reshapes them, to follow an instruction from the "Make it…" box.
+function generate(rework = null) {
     loading.value = true;
     clearTimeout(timer);
     timer = setTimeout(() => {
-        result.value = suggestFor(props.config, props.value, props.values);
+        original.value = typeof props.value === 'string' ? props.value : '';
+        const fresh = suggestFor(props.config, props.value, props.values);
+        result.value = rework ? rework(fresh) : fresh;
         loading.value = false;
-    }, 900);
+    }, rework ? 700 : 900);
 }
 
 function toggled(isOpen) {
@@ -60,6 +64,50 @@ onBeforeUnmount(() => observer?.disconnect());
 function apply(text) {
     emit('apply', text);
     open.value = false;
+}
+
+// Rewrites show what changed: words they added are highlighted and words they dropped are struck through.
+// A word-level diff, from the longest run of words the two have in common.
+function diffWords(from, to) {
+    const a = from.split(/\s+/).filter(Boolean);
+    const b = to.split(/\s+/).filter(Boolean);
+    const key = (word) => word.toLowerCase().replace(/[^\w'-]/g, '');
+    const common = Array.from({ length: a.length + 1 }, () => Array(b.length + 1).fill(0));
+
+    for (let i = a.length - 1; i >= 0; i--) {
+        for (let j = b.length - 1; j >= 0; j--) {
+            common[i][j] = key(a[i]) === key(b[j]) ? common[i + 1][j + 1] + 1 : Math.max(common[i + 1][j], common[i][j + 1]);
+        }
+    }
+
+    const parts = [];
+    let i = 0;
+    let j = 0;
+
+    while (i < a.length || j < b.length) {
+        if (i < a.length && j < b.length && key(a[i]) === key(b[j])) {
+            parts.push({ text: b[j++], type: 'same' });
+            i++;
+        } else if (j < b.length && (i === a.length || common[i][j + 1] >= common[i + 1][j])) {
+            parts.push({ text: b[j++], type: 'added' });
+        } else {
+            parts.push({ text: a[i++], type: 'removed' });
+        }
+    }
+
+    return parts;
+}
+
+const showDiff = computed(() => result.value?.mode === 'improve' && original.value);
+
+// The "Make it…" box: type an instruction or pick a chip, and the suggestions are reworked to follow it
+const instruction = ref('');
+const chips = ['Shorter', 'More formal', 'Friendlier'];
+
+function follow(text) {
+    if (!text.trim()) return;
+    instruction.value = '';
+    generate((fresh) => steer(fresh, text));
 }
 </script>
 
@@ -106,14 +154,49 @@ function apply(text) {
                         @click="apply(suggestion.text)"
                     >
                         <span v-if="suggestion.label" class="mb-0.5 block text-2xs font-medium text-gray-500 dark:text-gray-400">{{ __(suggestion.label) }}</span>
-                        <span class="block text-sm leading-[18px] text-gray-900 dark:text-gray-200">{{ suggestion.text }}</span>
+                        <span v-if="showDiff" class="block text-sm leading-[18px] text-gray-900 dark:text-gray-200">
+                            <template v-for="(part, p) in diffWords(original, suggestion.text)" :key="p">
+                                <span
+                                    :class="{
+                                        'rounded-sm bg-emerald-100 text-emerald-900 dark:bg-emerald-500/20 dark:text-emerald-200': part.type === 'added',
+                                        'text-gray-400 line-through dark:text-gray-500': part.type === 'removed',
+                                    }"
+                                    >{{ part.text }}</span
+                                >{{ ' ' }}
+                            </template>
+                        </span>
+                        <span v-else class="block text-sm leading-[18px] text-gray-900 dark:text-gray-200">{{ suggestion.text }}</span>
                     </button>
                 </div>
             </div>
         </div>
 
+        <!-- Tell it how to rework the suggestions -->
+        <div class="space-y-2 border-t border-gray-200 px-3 py-2.5 dark:border-white/10">
+            <form @submit.prevent="follow(instruction)">
+                <input
+                    v-model="instruction"
+                    type="text"
+                    :placeholder="__('Make it…')"
+                    class="w-full rounded-md border border-gray-200 bg-white px-2 py-1 text-sm outline-hidden focus:border-blue-400 dark:border-white/10 dark:bg-gray-900"
+                />
+            </form>
+            <div class="flex flex-wrap gap-1.5">
+                <button
+                    v-for="chip in chips"
+                    :key="chip"
+                    type="button"
+                    class="cursor-pointer rounded-full border border-gray-200 px-2 py-0.5 text-xs text-gray-600 hover:bg-gray-100 dark:border-white/10 dark:text-gray-300 dark:hover:bg-white/5"
+                    :disabled="loading"
+                    @click="follow(chip)"
+                >
+                    {{ __(chip) }}
+                </button>
+            </div>
+        </div>
+
         <div class="flex justify-end border-t border-gray-200 px-2 py-1.5 dark:border-white/10">
-            <Button size="xs" variant="ghost" icon="sync" :text="__('Try again')" :disabled="loading" @click="generate" />
+            <Button size="xs" variant="ghost" icon="sync" :text="__('Try again')" :disabled="loading" @click="generate()" />
         </div>
     </Popover>
 </template>

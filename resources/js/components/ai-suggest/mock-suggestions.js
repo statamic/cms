@@ -131,3 +131,37 @@ export function suggestFor(config, value, values) {
     };
 }
 
+// Prototype: rework a set of suggestions to follow an instruction from the "Make it…" box
+const formal = (text) =>
+    upperFirst(
+        text
+            .replace(/^(Enjoy|Discover) /, '')
+            .replace(/^Good news: /, '')
+            .replace(/\bdon't\b/gi, 'do not')
+            .replace(/\bit's\b/gi, 'it is')
+            .replace(/\bwe've\b/gi, 'we have')
+            .replace(/\bhere's\b/gi, 'here is')
+            .replace(/\bthey're\b/gi, 'they are')
+            .replace(/\bwhat's\b/gi, 'what is')
+            .replace(/\bgrab a bargain\b/gi, 'take advantage of the offers')
+            .replace(/\bbig\b/gi, 'significant')
+            .replace(/\bbiggest-ever\b/gi, 'most substantial')
+            .replace(/\bdiscounts\b/gi, 'reductions'),
+    );
+
+export function steer(result, instruction) {
+    const finish = (text) => (result.long ? sentence(text) : text);
+    const how = instruction.trim().toLowerCase();
+
+    const rework = (text) => {
+        if (/short|concise|brief/.test(how)) return finish(punchier(text, result.long));
+        if (/formal|professional/.test(how)) return finish(formal(text));
+        if (/friend|warm|casual/.test(how)) return finish(/^(Enjoy|Discover|Good news)/.test(text) ? text : warmer(text, result.long));
+        return finish(tighten(text));
+    };
+
+    // Two suggestions can come out the same once reworked, so only the first of each is kept
+    const texts = [...new Set(result.suggestions.map((suggestion) => rework(suggestion.text)))];
+
+    return { ...result, suggestions: texts.map((text) => ({ label: upperFirst(instruction.trim()), text })) };
+}
