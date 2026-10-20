@@ -17,7 +17,7 @@ class FormConnections extends Fieldtype
     public function preload()
     {
         if (! $form = $this->form()) {
-            return ['form' => null, 'types' => [], 'components' => []];
+            return ['form' => null, 'types' => []];
         }
 
         return [
@@ -28,12 +28,9 @@ class FormConnections extends Fieldtype
                 'description' => $connector->description(),
                 'icon' => $connector->icon(),
                 'developer' => $connector->developer(),
-                'count' => $connector->forForm($form)->count(),
                 'action' => cp_route('forms.connect.validate', [$form->handle(), $connector->handle()]),
+                'editor' => cp_route('forms.connect.editor', [$form->handle(), $connector->handle()]),
             ])->values()->all(),
-            'components' => FormConnector::all()->mapWithKeys(fn (Connector $connector): array => [
-                $connector->handle() => $connector->forForm($form)->render(),
-            ])->all(),
         ];
     }
 

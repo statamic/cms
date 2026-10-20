@@ -25,22 +25,20 @@ class FormConnectionsTest extends TestCase
     }
 
     #[Test]
-    public function it_preloads_connection_types_and_components()
+    public function it_preloads_connection_types()
     {
         $this->actingAs(tap(User::make()->makeSuper())->save());
 
         $preload = $this->fieldtype()->preload();
 
         $this->assertEquals('contact', $preload['form']['handle']);
+        $this->assertEquals(['form', 'types'], array_keys($preload));
 
         $types = collect($preload['types'])->keyBy('handle');
 
-        $this->assertEquals(1, $types['email']['count']);
-        $this->assertEquals(1, $types['webhook']['count']);
+        $this->assertEquals(['email', 'webhook'], $types->keys()->all());
         $this->assertEquals(cp_route('forms.connect.validate', ['contact', 'webhook']), $types['webhook']['action']);
-
-        $this->assertEquals('email-connector', $preload['components']['email']->toArray()['name']);
-        $this->assertEquals('webhook-connector', $preload['components']['webhook']->toArray()['name']);
+        $this->assertEquals(cp_route('forms.connect.editor', ['contact', 'webhook']), $types['webhook']['editor']);
     }
 
     #[Test]
@@ -81,7 +79,7 @@ class FormConnectionsTest extends TestCase
     {
         $fieldtype = $this->fieldtype(['form' => 'missing']);
 
-        $this->assertEquals(['form' => null, 'types' => [], 'components' => []], $fieldtype->preload());
+        $this->assertEquals(['form' => null, 'types' => []], $fieldtype->preload());
         $this->assertEquals([], $fieldtype->preProcess(['webhook' => [['id' => 'def']]]));
         $this->assertNull($fieldtype->process(['webhook' => [['url' => 'https://example.com/webhook']]]));
     }

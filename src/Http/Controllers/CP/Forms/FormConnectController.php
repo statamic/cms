@@ -81,6 +81,20 @@ class FormConnectController extends CpController
         return $connector->setConnections($connections)->preProcess($connections);
     }
 
+    public function editor(Request $request, $form, string $handle)
+    {
+        $this->authorize('edit', $form);
+
+        throw_unless($connector = FormConnector::find($handle)?->setForm($form), NotFoundHttpException::class);
+
+        $connections = $connector->process($request->all());
+
+        return [
+            'component' => $connector->setConnections($connections)->render()->toArray(),
+            'value' => $connector->preProcess($connections),
+        ];
+    }
+
     private function validatedConnections(Request $request, $form, string $handle): array
     {
         throw_unless($connector = FormConnector::find($handle)?->forForm($form), NotFoundHttpException::class);
