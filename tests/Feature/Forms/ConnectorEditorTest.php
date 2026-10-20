@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Forms;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Facades\Blueprint;
@@ -73,6 +74,51 @@ class ConnectorEditorTest extends TestCase
     }
 
     #[Test]
+    #[DataProvider('malformedConnectionsProvider')]
+    public function it_rejects_structurally_malformed_connections($connections, $errorKey)
+    {
+        $this->setTestRoles(['test' => ['access cp', 'edit forms']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+        $form = tap(Form::make('test'))->save();
+
+        $this
+            ->actingAs($user)
+            ->postJson(cp_route('forms.connect.editor', [$form->handle(), 'grid_test']), $connections)
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors($errorKey);
+    }
+
+    public static function malformedConnectionsProvider()
+    {
+        return [
+            'non-array connection' => [['x'], '0'],
+            'non-string id' => [[['id' => ['a']]], '0.id'],
+            'non-boolean enabled' => [[['enabled' => 'x']], '0.enabled'],
+            'non-array conditions' => [[['conditions' => 'x']], '0.conditions'],
+            'non-array condition row' => [[['conditions' => ['x']]], '0.conditions.0'],
+        ];
+    }
+
+    #[Test]
+    public function it_opens_connections_that_fail_the_connectors_own_rules()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'edit forms']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+        $form = tap(Form::make('test'))->save();
+        $connections = [['id' => 'a', 'rows' => [['label' => 'Too long']]]];
+
+        $this
+            ->actingAs($user)
+            ->postJson(cp_route('forms.connect.validate', [$form->handle(), 'grid_test']), $connections)
+            ->assertJsonValidationErrors('0.rows.0.label');
+
+        $this
+            ->postJson(cp_route('forms.connect.editor', [$form->handle(), 'grid_test']), $connections)
+            ->assertOk()
+            ->assertJsonPath('value.0.id', 'a');
+    }
+
+    #[Test]
     public function it_404s_if_the_connector_doesnt_exist()
     {
         $this->setTestRoles(['test' => ['access cp', 'edit forms']]);
@@ -116,5 +162,10 @@ class GridTestConnector extends Connector
         return Blueprint::make()->setContents(['tabs' => ['main' => ['sections' => [['fields' => [
             ['handle' => 'rows', 'field' => ['type' => 'grid', 'fields' => [['handle' => 'label', 'field' => ['type' => 'text']]]]],
         ]]]]]]);
+    }
+
+    protected function connectionRules(): array
+    {
+        return ['rows.*.label' => ['max:3']];
     }
 }

@@ -87,6 +87,15 @@ class FormConnectController extends CpController
 
         throw_unless($connector = FormConnector::find($handle)?->setForm($form), NotFoundHttpException::class);
 
+        // Only check the shape. Stored connections that fail the connector's rules must still open so they can be fixed.
+        Validator::make($request->all(), [
+            '*' => ['array'],
+            '*.id' => ['nullable', 'string'],
+            '*.enabled' => ['nullable', 'boolean'],
+            '*.conditions' => ['nullable', 'array'],
+            '*.conditions.*' => ['array'],
+        ])->validate();
+
         $connections = $connector->process($request->all());
 
         return [
