@@ -1,8 +1,8 @@
 <script setup>
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, useTemplateRef, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, ref, useTemplateRef, watch } from 'vue';
 import { Button, Icon, Popover } from '@ui';
 import { steer, suggestFor } from './mock-suggestions.js';
-import useAiSuggest, { icon } from './use-ai-suggest.js';
+import { icon } from './use-ai-suggest.js';
 
 const props = defineProps({
     // The field's config, its current value, and the values of the fields around it (for context, like the entry's title)
@@ -14,10 +14,6 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['apply']);
-
-const { mounted, previewStyle } = useAiSuggest();
-onMounted(() => mounted.value++);
-onBeforeUnmount(() => mounted.value--);
 
 const open = ref(false);
 const loading = ref(false);
@@ -65,16 +61,9 @@ watch(body, (el) => {
 
 onBeforeUnmount(() => observer?.disconnect());
 
-// Prototype: how the preview looks in the field. Grey text is gray-500 (gray-400 in dark mode), the lightest that still passes AA.
-const previewClasses = computed(
-    () =>
-        ({
-            grey: 'border-gray-300 bg-white text-gray-500 dark:border-white/10 dark:bg-gray-900 dark:text-gray-400',
-            tinted: 'border-yellow-300 bg-yellow-50 text-gray-900 dark:border-yellow-400/40 dark:bg-yellow-950 dark:text-gray-100',
-            diff: 'border-gray-300 bg-white text-gray-900 dark:border-white/10 dark:bg-gray-900 dark:text-gray-100',
-            italic: 'border-primary/50 bg-white text-gray-500 italic dark:bg-gray-900 dark:text-gray-400',
-        })[previewStyle.value],
-);
+// Single-line fields need the dropdown 16px below the button to clear the field's bottom border. In a multi-line field the button sits well inside it, so the dropdown can sit closer.
+const isMultiline = computed(() => ['textarea', 'markdown'].includes(props.config.type));
+const dropdownOffset = computed(() => (isMultiline.value ? 8 : 16));
 
 // Arrow keys go round the suggestions and the "Make it…" box (which is below them), so Up from the box lands on the last suggestion.
 const panel = useTemplateRef('panel');
@@ -96,7 +85,7 @@ function apply(text) {
     preview.value = null;
 }
 
-// Hovering or focusing a suggestion previews it in the field. It's laid over the field, styled like the field's own text, until you move off it.
+// Hovering or focusing a suggestion previews it in the field, in grey (gray-500, the lightest that passes AA). It's laid over the field, matching its padding and font, until you move off it.
 const preview = ref(null);
 const overlay = useTemplateRef('overlay');
 const overlayStyle = ref({});
@@ -107,10 +96,15 @@ function showPreview(text) {
     if (field) {
         const css = getComputedStyle(field);
         overlayStyle.value = {
+            // The field's own padding, so the preview wraps exactly where the text will once it's picked
             padding: css.padding,
-            // Room for the suggest button, so the text doesn't run under it
-            paddingInlineEnd: '2.5rem',
-            font: css.font,
+            // Longhands rather than the font shorthand, which the browser reports as empty when the field sets font features
+            fontFamily: css.fontFamily,
+            fontSize: css.fontSize,
+            fontWeight: css.fontWeight,
+            letterSpacing: css.letterSpacing,
+            fontFeatureSettings: css.fontFeatureSettings,
+            fontVariationSettings: css.fontVariationSettings,
             lineHeight: css.lineHeight,
             borderWidth: css.borderWidth,
             borderRadius: css.borderRadius,
@@ -179,8 +173,7 @@ function follow(text) {
 
 <template>
     <!-- Opens below the button, with its right edge lined up with the field's (the button sits 6px in from it) -->
-    <!-- Prototype: it stays open when you click elsewhere while the preview styles are being compared. Close it with Esc or the button. -->
-    <Popover :open="open" @update:open="toggled" align="end" :align-offset="-6" :offset="16" :dismissible="false" inset class="w-80!">
+    <Popover :open="open" @update:open="toggled" align="end" :align-offset="-6" :offset="dropdownOffset" inset class="w-80!">
         <template #trigger>
             <Button
                 size="xs"
@@ -282,19 +275,7 @@ function follow(text) {
         v-show="preview"
         aria-hidden="true"
         :style="overlayStyle"
-        :class="['pointer-events-none absolute inset-0 z-[5] overflow-hidden border-solid', previewClasses]"
-    >
-        <template v-if="previewStyle === 'diff' && original">
-            <template v-for="(part, p) in diffWords(original, preview || '')" :key="p">
-                <span
-                    :class="{
-                        'rounded-sm bg-yellow-100 text-gray-900 dark:bg-yellow-400/20 dark:text-yellow-100': part.type === 'added',
-                        'text-gray-500 line-through group-hover:text-gray-600 dark:text-gray-400': part.type === 'removed',
-                    }"
-                    >{{ part.text }}</span
-                >{{ ' ' }}
-            </template>
-        </template>
-        <template v-else>{{ preview }}</template>
-    </div>
+        class="pointer-events-none absolute inset-0 z-[5] overflow-hidden border-solid border-gray-300 bg-white text-gray-500 antialiased dark:border-white/10 dark:bg-gray-900 dark:text-gray-400"
+        v-text="preview"
+    />
 </template>
