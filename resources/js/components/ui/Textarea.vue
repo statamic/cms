@@ -3,7 +3,7 @@ import { cva } from 'cva';
 import CharacterCounter from './CharacterCounter.vue';
 import Button from './Button/Button.vue';
 import autosize from 'autosize/dist/autosize.js';
-import { computed, nextTick, onBeforeUnmount, onMounted, toRef, useAttrs, useTemplateRef } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, toRef, useAttrs, useTemplateRef, watch } from 'vue';
 import useCopy from '@/composables/copy';
 import { mergeAriaDescribedBy, useUiFieldId } from '@/composables/ui-field-id.js';
 
@@ -75,6 +75,10 @@ onMounted(() => {
         setTimeout(() => nextTick(() => autosize.update(textarea.value)), 1);
     }
 });
+
+if (props.elastic) {
+    watch(() => props.modelValue, () => autosize.update(textarea.value), { flush: 'post' });
+}
 
 onBeforeUnmount(() => {
     if (props.elastic) {
