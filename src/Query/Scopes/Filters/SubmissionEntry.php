@@ -10,6 +10,8 @@ use function Statamic\trans as __;
 
 class SubmissionEntry extends Filter
 {
+    private $options;
+
     public static function title()
     {
         return __('Entry');
@@ -59,15 +61,25 @@ class SubmissionEntry extends Filter
 
     private function options()
     {
-        $ids = $this->form()
-            ->querySubmissions()
-            ->whereNotNull('_entry')
-            ->pluck('_entry')
-            ->unique()
-            ->values();
+        return $this->options ??= $this->queryOptions();
+    }
+
+    private function queryOptions()
+    {
+        if ($entry = $this->context['entry'] ?? null) {
+            $ids = [$entry];
+        } else {
+            $ids = $this->form()
+                ->querySubmissions()
+                ->whereNotNull('_entry')
+                ->pluck('_entry')
+                ->unique()
+                ->values()
+                ->all();
+        }
 
         return Entry::query()
-            ->whereIn('id', $ids->all())
+            ->whereIn('id', $ids)
             ->get(['id', 'title'])
             ->mapWithKeys(fn ($entry) => [$entry->id() => $entry->value('title')]);
     }

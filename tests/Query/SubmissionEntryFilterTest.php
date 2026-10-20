@@ -3,6 +3,8 @@
 namespace Tests\Query;
 
 use Facades\Statamic\Console\Processes\Composer;
+use Illuminate\Database\Events\QueryExecuted;
+use Illuminate\Support\Facades\Event;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Form;
 use Statamic\Facades\FormSubmission;
@@ -72,6 +74,37 @@ class SubmissionEntryFilterTest extends TestCase
             'event-1' => 'Event One',
             'event-2' => 'Event Two',
         ], $this->filter()->fieldItems()['entry']['options']);
+    }
+
+    #[Test]
+    public function it_only_offers_the_context_entry_as_an_option()
+    {
+        (new EntryFactory)->collection('events')->id('event-1')->slug('event-one')->data(['title' => 'Event One'])->create();
+        (new EntryFactory)->collection('events')->id('event-2')->slug('event-two')->data(['title' => 'Event Two'])->create();
+
+        $form = Form::find('test');
+
+        FormSubmission::make()->form($form)->id('1')->data(['_entry' => 'event-1'])->save();
+        FormSubmission::make()->form($form)->id('2')->data(['_entry' => 'event-2'])->save();
+
+        $this->assertEquals([
+            'event-2' => 'Event Two',
+        ], $this->filter(['entry' => 'event-2'])->fieldItems()['entry']['options']);
+    }
+
+    #[Test]
+    public function it_queries_the_options_once_when_serialized()
+    {
+        config(['statamic.system.fake_sql_queries' => true]);
+
+        $queries = 0;
+        Event::listen(QueryExecuted::class, function () use (&$queries) {
+            $queries++;
+        });
+
+        $this->filter()->toArray();
+
+        $this->assertEquals(2, $queries);
     }
 
     #[Test]
