@@ -201,6 +201,9 @@ const isLocalizable = computed(() => props.config.localizable);
 
 // Prototype: fields with AI suggestions switched on in the blueprint get a suggest button, floating in the field's top right corner
 const canSuggest = computed(() => props.config.ai_suggestions && suggestableTypes.includes(props.config.type) && !isReadOnly.value);
+// The suggest button floats over the field's text. A multi-line field makes room for it on the right, so the text wraps before it.
+// A single-line field gives the button a backing in the field's colour instead, so long text slips behind it.
+const isSuggestMultiline = computed(() => ['textarea', 'markdown'].includes(props.config.type));
 
 const isReadOnly = computed(() => {
     if (containerReadOnly.value) return true;
@@ -330,7 +333,7 @@ const fieldtypeComponentEvents = computed(() => ({
             <div class="text-xs text-red-600" v-if="!fieldtypeComponentExists && fieldtypeComponent !== 'spacer-fieldtype'">
                 Component <code v-text="fieldtypeComponent"></code> does not exist.
             </div>
-            <div v-if="fieldtypeComponentExists" @focusin="focused" @focusout="blurred" :class="{ 'pointer-events-none select-none': isLocked, relative: canSuggest }">
+            <div v-if="fieldtypeComponentExists" @focusin="focused" @focusout="blurred" :class="{ 'pointer-events-none select-none': isLocked, relative: canSuggest, '[&_textarea]:pe-9!': canSuggest && isSuggestMultiline }">
                 <Component
                     ref="fieldtype"
                     :is="fieldtypeComponent"
@@ -340,7 +343,7 @@ const fieldtypeComponentEvents = computed(() => ({
                 <!-- Prototype: the suggest button floats in the field's top right corner -->
                 <AiSuggest
                     v-if="canSuggest"
-                    button-class="absolute! end-1.5 top-[7px] z-10"
+                    :button-class="['absolute! end-1.5 top-[7px] z-10', !isSuggestMultiline && 'bg-white! shadow-[-6px_0_6px_white]! dark:bg-gray-900! dark:shadow-[-6px_0_6px_var(--color-gray-900)]!']"
                     :config="config"
                     :value="value"
                     :values="values"
