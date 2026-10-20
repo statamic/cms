@@ -154,3 +154,21 @@ describe('ModalClose', () => {
         wrapper.unmount();
     });
 });
+
+test('dismissing closes once', async () => {
+    vi.useFakeTimers();
+
+    const beforeClose = vi.fn(() => true);
+    const wrapper = await openModal({ beforeClose });
+
+    document.querySelector('.vue-portal-target.modal .inset-0').click();
+    await vi.advanceTimersByTimeAsync(300);
+    await flushPromises();
+
+    expect(beforeClose).toHaveBeenCalledOnce();
+    expect(wrapper.emitted('dismissed')).toHaveLength(1);
+    expect(wrapper.emitted('update:open')).toEqual([[false]]);
+
+    wrapper.unmount();
+    vi.useRealTimers();
+});

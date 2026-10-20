@@ -157,7 +157,6 @@ function dismiss() {
     if (!runCloseCallback()) return;
 
     emit('dismissed');
-    close();
 }
 
 function updateOpen(value) {
