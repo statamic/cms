@@ -167,16 +167,16 @@ function follow(text) {
                             v-for="suggestion in result.suggestions"
                             :key="suggestion.text"
                             type="button"
-                            class="block w-full cursor-pointer rounded-lg px-2.5 py-[9px] text-start hover:bg-gray-100 dark:hover:bg-white/5"
+                            class="group block w-full cursor-pointer rounded-lg px-2.5 py-[9px] text-start hover:bg-gray-100 dark:hover:bg-white/5"
                             @click="apply(suggestion.text)"
                         >
-                            <span v-if="suggestion.label" class="mb-0.5 block text-2xs font-medium text-gray-500 dark:text-gray-400">{{ __(suggestion.label) }}</span>
+                            <span v-if="suggestion.label" class="mb-0.5 block text-2xs font-medium text-gray-500 group-hover:text-gray-600 dark:text-gray-400">{{ __(suggestion.label) }}</span>
                             <span v-if="showDiff" class="block text-sm leading-[18px] text-gray-900 dark:text-gray-200">
                                 <template v-for="(part, p) in diffWords(original, suggestion.text)" :key="p">
                                     <span
                                         :class="{
                                             'rounded-sm bg-yellow-100 text-gray-900 dark:bg-yellow-400/20 dark:text-yellow-100': part.type === 'added',
-                                            'text-gray-400 line-through dark:text-gray-500': part.type === 'removed',
+                                            'text-gray-500 line-through group-hover:text-gray-600 dark:text-gray-400': part.type === 'removed',
                                         }"
                                         >{{ part.text }}</span
                                     >{{ ' ' }}
