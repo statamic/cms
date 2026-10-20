@@ -27,7 +27,7 @@
                 >
                     <template #action-buttons-right>
                         <slot name="action-buttons-right" />
-                        <Button icon="x" size="sm" variant="ghost" class="-me-2" @click="close" />
+                        <Button icon="x" size="sm" variant="ghost" class="-me-2" @click="confirmClose" />
                     </template>
                 </component>
             </div>
