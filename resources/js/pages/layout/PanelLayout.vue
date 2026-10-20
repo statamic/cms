@@ -5,7 +5,7 @@ import useAiChat from '@/composables/use-ai-chat.js';
 import AiChat from '@/components/ai-chat/AiChat.vue';
 import AiChatDockControl from '@/components/ai-chat/AiChatDockControl.vue';
 import AiChatNewControl from '@/components/ai-chat/AiChatNewControl.vue';
-import { Icon, Tabs, TabList, TabTrigger } from '@ui';
+import { Tabs, TabList, TabTrigger } from '@ui';
 
 const minWidth = 175;
 const maxWidth = 450;
@@ -23,42 +23,7 @@ const left = {
 // The right panel is shared by the page (e.g. an inspector) and the AI chat. When both want it, they become tabs.
 const pagePanelActive = ref(false);
 const pagePanelLabel = ref(null);
-const { open: chatOpen, floating: chatFloating, messages: chatMessages, draft: chatDraft, focusRequests: chatFocusRequests } = useAiChat();
-
-// Prototype: what the floating card does when you click away from it while it's empty. Flip through them with the toggle in the bottom left.
-const compactOptions = [
-    { key: 'off', label: 'Stays full size' },
-    { key: 'pill', label: 'Shrinks to a narrower pill' },
-    { key: 'circle', label: 'Shrinks to a circle' },
-];
-const compactOptionKey = 'statamic.ai-chat.compact-option';
-const compactOption = ref((() => {
-    try {
-        return Math.min(Number(localStorage.getItem(compactOptionKey)) || 0, compactOptions.length - 1);
-    } catch {
-        return 0;
-    }
-})());
-watch(compactOption, (value) => {
-    try {
-        localStorage.setItem(compactOptionKey, String(value));
-    } catch {}
-});
-const compactStyle = computed(() => compactOptions[compactOption.value].key);
-
-// Whether focus is somewhere in the floating card. Opening the chat moves focus into it, so count it as focused straight away, or the card would grow from small as it fades in.
-const chatCardFocused = ref(false);
-watch(chatOpen, (isOpen) => isOpen && (chatCardFocused.value = true), { flush: 'sync' });
-const onChatCardFocusOut = (event) => (chatCardFocused.value = event.currentTarget.contains(event.relatedTarget));
-
-// Empty means nothing sent and nothing typed, so a half-written message is never tucked away.
-const chatCompact = computed(() => compactStyle.value !== 'off' && !chatCardFocused.value && !chatMessages.value.length && !chatDraft.value.trim());
-const chatCardSizeClasses = computed(() => {
-    if (!chatCompact.value) return 'w-84 h-auto';
-    return compactStyle.value === 'pill' ? 'w-52 h-auto' : 'w-11 h-11 rounded-[22px]! overflow-clip';
-});
-// Shrinking to a circle, keep the input at its full width (the card clips it) so it doesn't wrap and stretch the card taller on the way.
-const chatContentClasses = computed(() => (compactStyle.value === 'circle' && !chatMessages.value.length ? '[&>[data-ai-chat]]:min-w-[325px]' : ''));
+const { open: chatOpen, floating: chatFloating } = useAiChat();
 
 // Switching between floating and docked swaps the floating card in or out of the page. That isn't opening or closing the chat, so skip its fade then, or it plays as a distraction while the sidebar appears instantly.
 const switchingLayout = ref(false);
@@ -215,57 +180,24 @@ onUnmounted(() => {
     </Teleport>
 
     <!-- The floating chat fades up as it opens and fades back down as it closes, the same movement both ways. Reduced motion skips it. It stays mounted while closed (hidden), so opening it doesn't wait on building the chat and the animation starts straight away. -->
-    <!-- The card always carries its transition (it also eases its size as it shrinks when empty and unfocused), so the fade's active classes are only markers. -->
     <Transition
         :css="!switchingLayout"
-        enter-active-class="ai-chat-card-fading"
+        enter-active-class="transition duration-200 ease-out motion-reduce:transition-none"
         enter-from-class="translate-y-3 opacity-0"
-        leave-active-class="ai-chat-card-fading"
+        leave-active-class="transition duration-200 ease-out motion-reduce:transition-none"
         leave-to-class="translate-y-3 opacity-0"
     >
         <div
             v-if="chatFloating"
             v-show="chatOpen"
-            :class="[chatCardClasses, chatCardSizeClasses, chatContentClasses]"
-            class="fixed end-4.75 bottom-5 max-h-[calc(100dvh-11rem)] z-(--z-index-modal) group/chat flex max-w-[calc(100vw-2rem)] flex-col [interpolate-size:allow-keywords] transition-[opacity,translate,width,height,border-radius] duration-200 ease-out motion-reduce:transition-none"
-            @focusin="chatCardFocused = true"
-            @focusout="onChatCardFocusOut"
+            :class="chatCardClasses"
+            class="fixed end-4.75 bottom-5 max-h-[calc(100dvh-11rem)] z-(--z-index-modal) group/chat flex w-84 max-w-[calc(100vw-2rem)] flex-col"
         >
             <AiChat />
             <AiChatNewControl />
             <AiChatDockControl />
-            <!-- Shrunk to a circle, the card is just the chat icon. Clicking it puts you back in the input, which grows the card again. -->
-            <Transition
-                enter-active-class="transition-opacity duration-150 motion-reduce:transition-none"
-                enter-from-class="opacity-0"
-                leave-active-class="transition-opacity duration-100 motion-reduce:transition-none"
-                leave-to-class="opacity-0"
-            >
-                <button
-                    v-if="chatCompact && compactStyle === 'circle'"
-                    type="button"
-                    tabindex="-1"
-                    class="absolute inset-0 z-30 flex cursor-pointer items-center justify-center rounded-full bg-white text-gray-500 hover:text-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:text-gray-200"
-                    :aria-label="__('Ask anything…')"
-                    @mousedown.prevent
-                    @click="chatFocusRequests++"
-                >
-                    <Icon name="ai-chat" class="size-4.5" />
-                </button>
-            </Transition>
         </div>
     </Transition>
-
-    <!-- Prototype: flips through what the floating card does when it's empty and unfocused -->
-    <button
-        v-if="chatFloating"
-        type="button"
-        class="fixed start-4 bottom-4 z-(--z-index-modal) cursor-pointer rounded-md border border-gray-300 bg-white px-2 py-1 font-mono text-xs text-gray-700 shadow-sm dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"
-        @mousedown.prevent
-        @click="compactOption = (compactOption + 1) % compactOptions.length"
-    >
-        {{ compactOption + 1 }}/{{ compactOptions.length }} · {{ compactOptions[compactOption].label }}
-    </button>
 
     <slot />
 </template>

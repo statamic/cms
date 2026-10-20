@@ -7,7 +7,7 @@ import AiChatRun from './AiChatRun.vue';
 import { planRun, playRun } from './mock-runs.js';
 import useAiChat from '@/composables/use-ai-chat.js';
 
-const { open, messages, draft, floating, focusRequests, leave, newChat } = useAiChat();
+const { open, messages, floating, focusRequests, leave, newChat } = useAiChat();
 // Floating, the input sits straight on the card with no box of its own (the card carries the focus edge). Docked, it keeps its usual white box, which gets the same focused decoration as the floating card: the purple-to-blue gradient edge, a 1px blue line just inside it (2px in all, like a focused field) and a purple glow.
 const inputClasses = computed(() =>
     floating.value
@@ -45,7 +45,6 @@ const suggestions = [
 ];
 
 watch(prompt, (value) => value && (showHelp.value = false));
-watch(prompt, (value) => (draft.value = value));
 
 // When focus moves to something outside the chat, put the help away. (The key hint hides itself, as it only shows while focus is inside the card.)
 function onFocusOut(event) {
