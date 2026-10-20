@@ -5,6 +5,7 @@ import useAiChat from '@/composables/use-ai-chat.js';
 import AiChat from '@/components/ai-chat/AiChat.vue';
 import AiChatDockControl from '@/components/ai-chat/AiChatDockControl.vue';
 import AiChatNewControl from '@/components/ai-chat/AiChatNewControl.vue';
+import AiSuggestPreviewToggle from '@/components/ai-suggest/AiSuggestPreviewToggle.vue';
 import { Tabs, TabList, TabTrigger } from '@ui';
 
 const minWidth = 175;
@@ -198,6 +199,8 @@ onUnmounted(() => {
             <AiChatDockControl />
         </div>
     </Transition>
+
+    <AiSuggestPreviewToggle />
 
     <slot />
 </template>
