@@ -66,7 +66,7 @@
                                                 :text="__('Edit Blueprint')"
                                                 :href="container.blueprint_url"
                                             />
-                                            <DropdownSeparator v-if="actions.length" />
+                                            <DropdownSeparator v-if="(canCreateContainers || container.can_edit || container.can_edit_blueprint) && actions.length" />
                                             <DropdownItem
                                                 v-for="action in actions"
                                                 :key="action.handle"

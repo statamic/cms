@@ -19,7 +19,7 @@ class Install extends Command
      *
      * @var string
      */
-    protected $signature = 'statamic:install';
+    protected $signature = 'statamic:install {--no-cache-clear : Skip clearing the application cache}';
 
     /**
      * The console command description.
@@ -115,7 +115,9 @@ class Install extends Command
 
     protected function clearCache()
     {
-        $this->call('cache:clear');
+        if (! $this->option('no-cache-clear')) {
+            $this->call('cache:clear');
+        }
 
         return $this;
     }

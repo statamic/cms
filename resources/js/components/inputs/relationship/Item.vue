@@ -5,7 +5,7 @@
             'h-full': !readOnlyFormRow,
             'h-10 min-h-10 shrink-0 py-0': readOnlyFormRow,
             invalid: item.invalid,
-            'border-dashed': readOnlyEntriesRow,
+            'border-dashed read-only-field:not-dark:bg-gray-100 read-only-field:not-dark:shadow-none': readOnlyEntriesRow,
         }"
     >
         <ui-icon name="handles" class="item-move sortable-handle size-4 cursor-grab text-gray-300 dark:text-gray-700" v-if="sortable" />

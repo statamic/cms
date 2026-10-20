@@ -89,7 +89,7 @@ class Assets extends Fieldtype
                         'type' => 'toggle',
                         'if' => [
                             'container' => 'not empty',
-                            'dynamic' => 'not true',
+                            'dynamic' => 'empty',
                         ],
                         'width' => '50',
                     ],

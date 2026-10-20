@@ -1,5 +1,64 @@
 # Release Notes
 
+## 6.36.0 (2026-10-16)
+
+### What's new
+- Allow ensuring fields in fieldsets [#11097](https://github.com/statamic/cms/issues/11097) by @duncanmcclean
+- Append configs before and after [#15067](https://github.com/statamic/cms/issues/15067) by @jackmcdade
+- Autocomplete editor [#15055](https://github.com/statamic/cms/issues/15055) by @jasonvarga
+
+### What's fixed
+- Fall back to full page load when Firefox hits history size limit [#15601](https://github.com/statamic/cms/issues/15601) by @duncanmcclean
+- Refresh the asset listing after a container action completes [#15600](https://github.com/statamic/cms/issues/15600) by @jacksleight
+- Fix Bard Character Limit [#15597](https://github.com/statamic/cms/issues/15597) by @jackmcdade
+- Add a timeout to Marketplace API requests [#15591](https://github.com/statamic/cms/issues/15591) by @lazerg
+- Fix quadratic required-word matching in Comb search [#15578](https://github.com/statamic/cms/issues/15578) by @edalzell
+- Improve performance of non-Inertia control panel responses [#15477](https://github.com/statamic/cms/issues/15477) by @lazerg
+- Modal remove behind from accessibility tree [#15569](https://github.com/statamic/cms/issues/15569) by @jaygeorge
+- Fix lost URL tracking in the static cache under concurrent requests [#15606](https://github.com/statamic/cms/issues/15606) by @edalzell
+- Hide section behavior control where imported sections can't be preserved [#15604](https://github.com/statamic/cms/issues/15604) by @jaygeorge
+- Open command palette items in a new tab with Cmd+Enter [#15614](https://github.com/statamic/cms/issues/15614) by @jaygeorge
+- Show asset editor saving state on the Save button [#15617](https://github.com/statamic/cms/issues/15617) by @jaygeorge
+- Save the asset editor with Cmd+S [#15618](https://github.com/statamic/cms/issues/15618) by @jaygeorge
+- Fix `is_homepage` when trailing slashes are enforced [#15613](https://github.com/statamic/cms/issues/15613) by @jhhazelaar
+- Improve list of CP's formatting locales [#15589](https://github.com/statamic/cms/issues/15589) by @joshuablum
+- Keep the architectural background lines thin on wide screens [#15625](https://github.com/statamic/cms/issues/15625) by @jaygeorge
+- Fix the CP's missing italic font [#15630](https://github.com/statamic/cms/issues/15630) by @jaygeorge
+- Fix table row hover sticking in Safari [#15638](https://github.com/statamic/cms/issues/15638) by @jaygeorge
+- Stache index cleanup [#15641](https://github.com/statamic/cms/issues/15641) by @jasonvarga
+- Give Switch controls an accessible name [#15575](https://github.com/statamic/cms/issues/15575) by @jaygeorge
+- Fix duplicate burger ARIA id and empty-state heading order [#15572](https://github.com/statamic/cms/issues/15572) by @jaygeorge
+- Use keyboard to reorder replicator sets [#15592](https://github.com/statamic/cms/issues/15592) by @jaygeorge
+- Don't autofocus Licensing Alert actions [#15571](https://github.com/statamic/cms/issues/15571) by @jaygeorge
+- Start image crops at the full image [#15631](https://github.com/statamic/cms/issues/15631) by @jaygeorge
+- Make the save and close keyboard shortcut consistent [#15619](https://github.com/statamic/cms/issues/15619) by @jaygeorge
+- Consistent read only states [#14667](https://github.com/statamic/cms/issues/14667) by @jaygeorge
+- Associate ui/Field labels with nested controls [#15573](https://github.com/statamic/cms/issues/15573) by @jaygeorge
+- Fix/15396 field error association [#15576](https://github.com/statamic/cms/issues/15576) by @jaygeorge
+- Fix/15401 nested interactive controls [#15580](https://github.com/statamic/cms/issues/15580) by @jaygeorge
+- Bard set selection/focus outline improvements [#14336](https://github.com/statamic/cms/issues/14336) by @jaygeorge
+- Select all entries, including all pages [#15283](https://github.com/statamic/cms/issues/15283) by @jaygeorge
+- Give the Replicator's add set button an accessible name [#15644](https://github.com/statamic/cms/issues/15644) by @jaygeorge
+- Escape bound attributes passed to components from Antlers [#15624](https://github.com/statamic/cms/issues/15624) by @jacksleight
+- Stagger Outpost pings [#15649](https://github.com/statamic/cms/issues/15649) by @duncanmcclean
+- Cache Entry::descendants() per request [#15645](https://github.com/statamic/cms/issues/15645) by @joshuablum
+- Fix crash when the license key file lists uninstalled addons [#15651](https://github.com/statamic/cms/issues/15651) by @joshuablum
+- Handle empty Marketplace client responses [#15654](https://github.com/statamic/cms/issues/15654) by @joshuablum
+- Rebuild the nav preferences tree after resetting customizations [#15656](https://github.com/statamic/cms/issues/15656) by @wakqasahmed
+- Don't fetch Marketplace data during offline license validation [#15653](https://github.com/statamic/cms/issues/15653) by @joshuablum
+- Fix taxonomy index terms for multi-site and Blade [#15646](https://github.com/statamic/cms/issues/15646) by @joshuablum
+- Fix blueprint fields being rebuilt for every entry [#15639](https://github.com/statamic/cms/issues/15639) by @daun
+- Keep true and false strings in component attributes from Antlers [#15626](https://github.com/statamic/cms/issues/15626) by @jacksleight
+- Use proportional figures by default [#15660](https://github.com/statamic/cms/issues/15660) by @jaygeorge
+- Fix `default: current` Users fieldtype behavior [#15072](https://github.com/statamic/cms/issues/15072) by @joshuablum
+- Show a loading state while the icon and template fieldtypes fetch their options [#15633](https://github.com/statamic/cms/issues/15633) by @duncanmcclean
+- Fix the actions dropdown separator and refresh listings after item actions [#15629](https://github.com/statamic/cms/issues/15629) by @duncanmcclean
+- Hide Assets fieldtype's "Restrict to Folder" toggle when using a dynamic folder [#15635](https://github.com/statamic/cms/issues/15635) by @joshuablum
+- Improve the UX of taggable comboboxes [#15249](https://github.com/statamic/cms/issues/15249) by @duncanmcclean
+- Even out fieldtype icon stroke widths [#15661](https://github.com/statamic/cms/issues/15661) by @jaygeorge
+
+
+
 ## 6.35.1 (2026-10-06)
 
 ### What's fixed
