@@ -197,3 +197,6 @@
 
 @custom-variant with-contrast (&:where([data-contrast="increased"] *));
 
+/* Read-only controls inside a read-only field get a greyed out surface. */
+@custom-variant read-only-field (&:where([data-ui-field-read-only] *));
+

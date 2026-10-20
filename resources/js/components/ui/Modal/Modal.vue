@@ -29,7 +29,7 @@ const props = defineProps({
     open: { type: Boolean, default: false },
     /** Callback that fires before the modal closes. */
     beforeClose: { type: Function, default: () => true },
-    /** When `true`, clicking outside the modal will dismiss it. */
+    /** When `true`, clicking outside the modal or pressing Esc will dismiss it. */
     dismissible: { type: Boolean, default: true },
     /** When `true`, focus moves to the first focusable element on open. When `false`, focus stays on the dialog so Tab reaches the first control. */
     autofocus: { type: Boolean, default: true },
@@ -72,7 +72,9 @@ const titleId = useId();
 const labelledBy = computed(() => hasModalTitleComponent.value || props.title ? titleId : undefined);
 const isUsingOpenProp = computed(() => instance?.vnode.props?.hasOwnProperty('open'));
 const portal = computed(() => modal.value ? `#portal-target-${modal.value.id}` : null);
-const isTopPortal = computed(() => portals.all()[portals.all().length - 1].id === modal.value.id);
+// Not just the last portal created: fields like Bard register inline portals as they load,
+// which would switch off the focus trap of a modal opened on page load (e.g. the licensing alert).
+const isTopPortal = computed(() => portals.top()?.id === modal.value.id);
 
 function open() {
     if (!modal.value) modal.value = portals.create('modal');
@@ -155,7 +157,6 @@ function dismiss() {
     if (!runCloseCallback()) return;
 
     emit('dismissed');
-    close();
 }
 
 function updateOpen(value) {
@@ -199,7 +200,7 @@ defineExpose({
     runCloseCallback,
 });
 
-provide('closeModal', close);
+provide('closeModal', runCloseCallback);
 provide('modalTitleId', titleId);
 </script>
 
