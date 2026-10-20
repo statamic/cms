@@ -202,6 +202,7 @@ return [
     'form_chart_not_applicable' => 'Chart :chart cannot be used for field :field.',
     'form_chart_unknown_chart' => 'Chart :chart does not exist.',
     'form_chart_unknown_field' => 'Field :field does not exist on this form.',
+    'form_connections_invalid' => 'Invalid connections.',
     'form_insight_duplicate' => 'Insight :insight is used more than once for field :field.',
     'form_insight_not_applicable' => 'Insight :insight cannot be used for field :field.',
     'form_insight_unknown' => 'Insight :insight does not exist.',

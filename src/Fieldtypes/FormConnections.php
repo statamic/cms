@@ -2,6 +2,7 @@
 
 namespace Statamic\Fieldtypes;
 
+use Illuminate\Support\Facades\Validator;
 use Statamic\Contracts\Forms\Form;
 use Statamic\Facades\Form as Forms;
 use Statamic\Facades\FormConnector;
@@ -32,6 +33,27 @@ class FormConnections extends Fieldtype
                 'editor' => cp_route('forms.connect.editor', [$form->handle(), $connector->handle()]),
             ])->values()->all(),
         ];
+    }
+
+    public function rules(): array
+    {
+        return [function ($attribute, $value, $fail) {
+            if (! $form = $this->form()) {
+                return;
+            }
+
+            $valid = collect(is_array($value) ? $value : [])->every(function ($connections, $handle) use ($form) {
+                if (! $connector = FormConnector::find($handle)?->forForm($form)) {
+                    return true;
+                }
+
+                return Validator::make(Connector::normalizeConnections($connections), $connector->rules())->passes();
+            });
+
+            if (! $valid) {
+                $fail(__('statamic::validation.form_connections_invalid'));
+            }
+        }];
     }
 
     public function preProcess($value)

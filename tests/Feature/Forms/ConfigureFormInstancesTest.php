@@ -199,15 +199,57 @@ class ConfigureFormInstancesTest extends TestCase
         $this->assertEquals(['contact' => self::STORED], Entry::find($entry->id())->get('form_instances'));
     }
 
+    #[Test]
+    public function an_editor_with_form_permission_cant_save_an_invalid_connection_override()
+    {
+        [$user, $entry] = $this->seedEntry(['access cp', 'edit test entries', 'access en site', 'edit contact form'], ['contact' => self::STORED]);
+
+        $this->update($user, $entry, ['forms' => ['contact'], 'config' => [
+            'contact' => ['connections' => ['email' => [['to' => 'admin@example.com', 'html' => 'statamic::auth.login']]]],
+        ]])->assertUnprocessable()->assertJsonValidationErrors(['form_instances' => 'Invalid connections.']);
+
+        $this->assertSame('A', Entry::find($entry->id())->get('title'));
+        $this->assertEquals(['contact' => self::STORED], Entry::find($entry->id())->get('form_instances'));
+    }
+
+    #[Test]
+    public function an_editor_with_form_permission_cant_save_an_invalid_access_override()
+    {
+        [$user, $entry] = $this->seedEntry(['access cp', 'edit test entries', 'access en site', 'edit contact form'], ['contact' => self::STORED]);
+
+        $this->update($user, $entry, ['forms' => ['contact'], 'config' => [
+            'contact' => ['submission_limit' => 'lots'],
+        ]])->assertUnprocessable()->assertJsonValidationErrors('form_instances');
+
+        $this->assertSame('A', Entry::find($entry->id())->get('title'));
+        $this->assertEquals(['contact' => self::STORED], Entry::find($entry->id())->get('form_instances'));
+    }
+
+    #[Test]
+    public function an_entry_editor_without_form_permission_isnt_blocked_by_an_invalid_override()
+    {
+        [$user, $entry] = $this->seedEntry(['access cp', 'edit test entries', 'access en site'], ['contact' => self::STORED]);
+
+        $this->save($user, $entry, ['forms' => ['contact'], 'config' => [
+            'contact' => ['submission_limit' => 'lots', 'connections' => ['email' => [['to' => 'admin@example.com', 'html' => 'statamic::auth.login']]]],
+        ]]);
+
+        $this->assertSame('Updated', Entry::find($entry->id())->get('title'));
+        $this->assertEquals(['contact' => self::STORED], Entry::find($entry->id())->get('form_instances'));
+    }
+
     private function save($user, $entry, array $formInstances): void
     {
-        $this->actingAs($user)
-            ->patchJson($entry->updateUrl(), [
-                'title' => 'Updated',
-                'slug' => 'a',
-                'form_instances' => $formInstances,
-            ])
-            ->assertOk();
+        $this->update($user, $entry, $formInstances)->assertOk();
+    }
+
+    private function update($user, $entry, array $formInstances)
+    {
+        return $this->actingAs($user)->patchJson($entry->updateUrl(), [
+            'title' => 'Updated',
+            'slug' => 'a',
+            'form_instances' => $formInstances,
+        ]);
     }
 
     private function seedEntry(array $permissions, ?array $formInstances): array

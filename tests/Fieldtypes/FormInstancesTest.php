@@ -258,13 +258,14 @@ class FormInstancesTest extends TestCase
     }
 
     #[Test]
-    public function it_validates_against_the_form_handles()
+    public function it_validates_against_the_forms_and_their_config()
     {
         $fieldtype = $this->fieldtype();
 
-        $this->assertSame(['contact'], $fieldtype->preProcessValidatable(['forms' => ['contact'], 'config' => []]));
+        $this->assertSame(['forms' => ['contact'], 'config' => []], $fieldtype->preProcessValidatable(['forms' => ['contact'], 'config' => []]));
+        $this->assertSame([], $fieldtype->preProcessValidatable(['forms' => [], 'config' => []]));
         $this->assertSame([], $fieldtype->preProcessValidatable(null));
-        $this->assertEquals(['array'], $fieldtype->rules());
+        $this->assertSame('array', $fieldtype->rules()[0]);
     }
 
     #[Test]

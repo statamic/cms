@@ -146,7 +146,28 @@ class FormInstances extends FormFieldtype
 
     public function preProcessValidatable($value)
     {
-        return $value['forms'] ?? [];
+        if (! $forms = $value['forms'] ?? []) {
+            return [];
+        }
+
+        return ['forms' => $forms, 'config' => collect(static::toMap($value['config'] ?? []))->only($forms)->all()];
+    }
+
+    public function rules(): array
+    {
+        return [...parent::rules(), function ($attribute, $value, $fail) {
+            foreach (static::toMap($value['config'] ?? []) as $handle => $overrides) {
+                if (! $form = $this->configurableForm($handle)) {
+                    continue;
+                }
+
+                $validator = $this->overrideFields($form)->only(array_keys($overrides))->addValues($overrides)->validator()->validator();
+
+                if ($validator->fails()) {
+                    return $fail($validator->errors()->first());
+                }
+            }
+        }];
     }
 
     private function configurableForm(string $handle): ?FormContract
