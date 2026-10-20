@@ -278,7 +278,7 @@ const fieldtypeComponentEvents = computed(() => ({
     >
         <Field
             v-show="shouldRenderField"
-            :class="[`${config.type}-fieldtype`, { 'opacity-0 pointer-events-none': shouldHideFieldVisually }]"
+            :class="[`${config.type}-fieldtype`, { 'opacity-0 pointer-events-none': shouldHideFieldVisually, 'publish-field-hidden': !shouldRenderField }]"
             :inert="shouldHideFieldVisually"
             :id="fieldId"
             :dir="direction"
