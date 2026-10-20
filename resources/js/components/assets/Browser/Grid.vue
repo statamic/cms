@@ -107,12 +107,13 @@
                                 class="asset-tile group relative bg-white dark:bg-gray-900"
                                 :class="[
                                     { 'pointer-events-none': isMoving(asset.id) },
+                                    { 'opacity-50!': isDragging(asset.id) && !isMoving(asset.id) },
                                     asset.can_be_transparent && showCheckerboard ? `bg-checkerboard bg-checkerboard-${checkerboardMode}` : '',
                                     asset.can_be_transparent && !showCheckerboard ? 'bg-checkerboard before:opacity-0 hover:before:opacity-100' : '',
                                 ]"
                             >
-                                <div v-if="isDragging(asset.id) || isMoving(asset.id)" class="absolute inset-0 z-10 flex items-center justify-center rounded-[inherit] bg-white/75 dark:bg-gray-900/75">
-                                    <ui-icon v-if="isMoving(asset.id)" name="loading" class="size-6 text-gray-700 dark:text-gray-200" />
+                                <div v-if="isMoving(asset.id)" class="absolute inset-0 z-10 flex items-center justify-center rounded-[inherit] bg-white/75 dark:bg-gray-900/75">
+                                    <ui-icon name="loading" class="size-6 text-gray-700 dark:text-gray-200" />
                                 </div>
                                 <button
                                     class="size-full"
