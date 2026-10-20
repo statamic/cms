@@ -66,7 +66,7 @@ function apply(text) {
     open.value = false;
 }
 
-// Rewrites show what changed: words they added are highlighted and words they dropped are struck through.
+// Rewrites show what changed: words they added are highlighted in yellow and words they dropped are struck through.
 // A word-level diff, from the longest run of words the two have in common.
 function diffWords(from, to) {
     const a = from.split(/\s+/).filter(Boolean);
@@ -158,7 +158,7 @@ function follow(text) {
                             <template v-for="(part, p) in diffWords(original, suggestion.text)" :key="p">
                                 <span
                                     :class="{
-                                        'rounded-sm bg-emerald-100 text-emerald-900 dark:bg-emerald-500/20 dark:text-emerald-200': part.type === 'added',
+                                        'rounded-sm bg-yellow-100 text-gray-900 dark:bg-yellow-400/20 dark:text-yellow-100': part.type === 'added',
                                         'text-gray-400 line-through dark:text-gray-500': part.type === 'removed',
                                     }"
                                     >{{ part.text }}</span
