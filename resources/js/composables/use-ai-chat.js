@@ -20,6 +20,8 @@ function store(key, value) {
 // Module scoped so the chat stays open (and keeps its messages) across Inertia navigation.
 const open = ref(false);
 const messages = ref([]);
+// What's typed in the input but not sent yet, so the floating card knows whether it's empty.
+const draft = ref('');
 // Prototype: float the chat in the bottom right corner instead of docking it in the right sidebar.
 const floating = ref(getStored(floatingKey, true));
 
@@ -50,6 +52,7 @@ export default function useAiChat() {
     return {
         open,
         messages,
+        draft,
         floating,
         focusRequests,
         toggle: () => {
