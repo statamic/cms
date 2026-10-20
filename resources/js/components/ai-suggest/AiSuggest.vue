@@ -196,7 +196,7 @@ function follow(text) {
         </div>
 
         <div class="flex justify-end border-t border-gray-200 px-2 py-1.5 dark:border-white/10">
-            <Button size="xs" variant="ghost" icon="sync" :text="__('Try again')" :disabled="loading" @click="generate()" />
+            <Button size="xs" variant="ghost" icon="refresh" :text="__('Try again')" :disabled="loading" @click="generate()" />
         </div>
     </Popover>
 </template>
