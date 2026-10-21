@@ -33,7 +33,7 @@ class AugmentedForm extends AbstractAugmented
             'id' => $page->handle(),
             'display' => $page->display(),
             'instructions' => $page->instructions(),
-            'sections' => $page->sections()->map(fn (Section $section) => $this->sectionToArray($section))->all(),
+            'sections' => $page->expandedSections()->map(fn (Section $section) => $this->sectionToArray($section))->all(),
         ])->all();
     }
 

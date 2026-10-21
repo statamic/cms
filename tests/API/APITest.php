@@ -332,6 +332,80 @@ class APITest extends TestCase
     }
 
     #[Test]
+    public function it_expands_imported_fieldset_sections_in_form_sections_and_pages()
+    {
+        Facades\Config::set('statamic.api.resources.forms', true);
+
+        Facades\Fieldset::make('address')->setContents([
+            'sections' => [
+                [
+                    'display' => 'Street',
+                    'fields' => [
+                        ['handle' => 'street', 'field' => ['type' => 'text']],
+                    ],
+                ],
+                [
+                    'display' => 'Location',
+                    'instructions' => 'Where are you?',
+                    'fields' => [
+                        ['handle' => 'city', 'field' => ['type' => 'text']],
+                    ],
+                ],
+            ],
+        ])->save();
+
+        Facades\Form::make('contact')->formFields([
+            'sections' => [
+                [
+                    'display' => 'Your Details',
+                    'fields' => [
+                        ['handle' => 'name', 'field' => ['type' => 'short_answer']],
+                        ['import' => 'address', 'prefix' => 'home_', 'config' => ['city' => ['display' => 'Home City']]],
+                        ['handle' => 'email', 'field' => ['type' => 'short_answer']],
+                    ],
+                ],
+            ],
+        ])->save();
+
+        $expected = [
+            [
+                'display' => 'Your Details',
+                'instructions' => null,
+                'fields' => [
+                    'name' => ['type' => 'text', 'handle' => 'name', 'width' => 100],
+                ],
+            ],
+            [
+                'display' => 'Street',
+                'instructions' => null,
+                'fields' => [
+                    'home_street' => ['type' => 'text', 'handle' => 'home_street', 'width' => 100],
+                ],
+            ],
+            [
+                'display' => 'Location',
+                'instructions' => 'Where are you?',
+                'fields' => [
+                    'home_city' => ['type' => 'text', 'display' => 'Home City', 'handle' => 'home_city', 'width' => 100],
+                ],
+            ],
+            [
+                'display' => 'Your Details',
+                'instructions' => null,
+                'fields' => [
+                    'email' => ['type' => 'text', 'handle' => 'email', 'width' => 100],
+                ],
+            ],
+        ];
+
+        $this
+            ->get('/api/forms/contact')
+            ->assertSuccessful()
+            ->assertJsonPath('data.sections', $expected)
+            ->assertJsonPath('data.pages.0.sections', $expected);
+    }
+
+    #[Test]
     public function it_queries_form_pages()
     {
         Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);

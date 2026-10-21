@@ -365,7 +365,7 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
 
     public function sections(): Collection
     {
-        return $this->pages()->flatMap(fn (Tab $page) => $page->sections());
+        return $this->pages()->flatMap(fn (Tab $page) => $page->expandedSections());
     }
 
     public function pages(): Collection

@@ -10,6 +10,7 @@ use Illuminate\Support\Carbon;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\GraphQL\CastableToValidationString;
+use Statamic\Facades\Fieldset;
 use Statamic\Facades\Form;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -465,6 +466,79 @@ GQL;
                                 ['display' => 'Your Details', 'fields' => [['handle' => 'name']]],
                             ],
                         ],
+                    ],
+                ],
+            ]]);
+    }
+
+    #[Test]
+    public function it_expands_imported_fieldset_sections()
+    {
+        Fieldset::make('address')->setContents([
+            'sections' => [
+                [
+                    'display' => 'Street',
+                    'fields' => [
+                        ['handle' => 'street', 'field' => ['type' => 'text']],
+                    ],
+                ],
+                [
+                    'display' => 'Location',
+                    'fields' => [
+                        ['handle' => 'city', 'field' => ['type' => 'text']],
+                    ],
+                ],
+            ],
+        ])->save();
+
+        Form::make('contact')->formFields([
+            'sections' => [
+                [
+                    'display' => 'Your Details',
+                    'fields' => [
+                        ['handle' => 'name', 'field' => ['type' => 'short_answer']],
+                        ['import' => 'address', 'prefix' => 'home_'],
+                    ],
+                ],
+            ],
+        ])->save();
+
+        $query = <<<'GQL'
+{
+    form(handle: "contact") {
+        sections {
+            display
+            fields {
+                handle
+            }
+        }
+        pages {
+            sections {
+                display
+                fields {
+                    handle
+                }
+            }
+        }
+    }
+}
+GQL;
+
+        $expected = [
+            ['display' => 'Your Details', 'fields' => [['handle' => 'name']]],
+            ['display' => 'Street', 'fields' => [['handle' => 'home_street']]],
+            ['display' => 'Location', 'fields' => [['handle' => 'home_city']]],
+        ];
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => [
+                'form' => [
+                    'sections' => $expected,
+                    'pages' => [
+                        ['sections' => $expected],
                     ],
                 ],
             ]]);

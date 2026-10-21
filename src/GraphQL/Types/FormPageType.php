@@ -36,7 +36,7 @@ class FormPageType extends \Rebing\GraphQL\Support\Type
             'sections' => [
                 'type' => GraphQL::listOf(GraphQL::type(SectionType::NAME)),
                 'resolve' => function ($page) {
-                    return $page->sections()->all();
+                    return $page->expandedSections()->all();
                 },
             ],
         ];
