@@ -83,7 +83,7 @@ class ConnectorEditorTest extends TestCase
 
         $this
             ->actingAs($user)
-            ->postJson(cp_route('forms.connect.editor', [$form->handle(), 'grid_test']), $connections)
+            ->postJson(cp_route('forms.connect.editor', [$form->handle(), 'grid_test']), $connections, [], JSON_PRESERVE_ZERO_FRACTION)
             ->assertUnprocessable()
             ->assertJsonValidationErrors($errorKey);
     }
@@ -93,6 +93,8 @@ class ConnectorEditorTest extends TestCase
         return [
             'non-array connection' => [['x'], '0'],
             'array id' => [[['id' => ['a']]], '0.id'],
+            'boolean id' => [[['id' => true]], '0.id'],
+            'float id' => [[['id' => 1.0]], '0.id'],
             'non-boolean enabled' => [[['enabled' => 'x']], '0.enabled'],
             'non-array conditions' => [[['conditions' => 'x']], '0.conditions'],
             'non-array condition row' => [[['conditions' => ['x']]], '0.conditions.0'],

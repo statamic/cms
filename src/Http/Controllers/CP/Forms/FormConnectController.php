@@ -91,7 +91,7 @@ class FormConnectController extends CpController
         // Only check the shape. Stored connections that fail the connector's rules must still open so they can be fixed.
         Validator::make($request->all(), [
             '*' => ['array'],
-            '*.id' => ['nullable', Rule::anyOf(['string', 'integer'])],
+            '*.id' => ['nullable', Rule::anyOf(['string', 'integer:strict'])],
             '*.enabled' => ['nullable', 'boolean'],
             '*.conditions' => ['nullable', 'array'],
             '*.conditions.*' => ['array'],
